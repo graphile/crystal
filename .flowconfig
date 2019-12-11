@@ -3,6 +3,7 @@
 <PROJECT_ROOT>/packages/.*/index\.js\.flow
 <PROJECT_ROOT>/packages/.*/node8plus/.*\.flow
 <PROJECT_ROOT>/postgraphile
+<PROJECT_ROOT>/packages
 
 [include]
 

@@ -321,6 +321,7 @@ export default (function PgBasicsPlugin(
     pgIgnoreIndexes = true, // TODO:v5: change this to false
     pgHideIndexWarnings = false,
     pgLegacyJsonUuid = false, // TODO:v5: remove this
+    pgAugmentIntrospectionResults,
   }
 ) {
   let pgOmit = baseOmit;
@@ -354,6 +355,7 @@ export default (function PgBasicsPlugin(
         pgField,
         sqlCommentByAddingTags,
         pgPrepareAndRun,
+        pgAugmentIntrospectionResults,
       });
     },
     ["PgBasics"]

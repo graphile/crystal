@@ -444,6 +444,20 @@ function smartCommentConstraints(introspectionResults) {
   });
 }
 
+/* The argument to this must not contain cyclic references! */
+const deepClone = value => {
+  if (Array.isArray(value)) {
+    return value.map(val => deepClone(val));
+  } else if (typeof value === "object" && value) {
+    return Object.keys(value).reduce((memo, k) => {
+      memo[k] = deepClone(value[k]);
+      return memo;
+    }, {});
+  } else {
+    return value;
+  }
+};
+
 export default (async function PgIntrospectionPlugin(
   builder,
   {
@@ -455,15 +469,9 @@ export default (async function PgIntrospectionPlugin(
     pgIncludeExtensionResources = false,
     pgLegacyFunctionsOnly = false,
     pgSkipInstallingWatchFixtures = false,
-    pgAugmentIntrospectionResults,
     pgOwnerConnectionString,
   }
 ) {
-  const augment = introspectionResults => {
-    [pgAugmentIntrospectionResults, smartCommentConstraints].forEach(fn =>
-      fn ? fn(introspectionResults) : null
-    );
-  };
   /**
    * @summary introspect database and get the table/view/constraints.
    * @returns {Promise<PgIntrospectionResultsByKind>}
@@ -474,14 +482,7 @@ export default (async function PgIntrospectionPlugin(
       throw new Error("Argument 'schemas' (array) is required");
     }
     const cacheKey = `PgIntrospectionPlugin-introspectionResultsByKind-v${version}`;
-    const cloneResults = obj => {
-      const result = Object.keys(obj).reduce((memo, k) => {
-        memo[k] = Array.isArray(obj[k]) ? obj[k].map(v => ({ ...v })) : obj[k];
-        return memo;
-      }, {});
-      return result;
-    };
-    const introspectionResultsByKind = cloneResults(
+    const introspectionResultsByKind = deepClone(
       await persistentMemoizeWithKey(cacheKey, () =>
         withPgClient(pgConfig, async pgClient => {
           const versionResult = await pgClient.query(
@@ -579,6 +580,14 @@ export default (async function PgIntrospectionPlugin(
         console.warn("⚠️ WARNING⚠️  " + errorMessage); // eslint-disable-line no-console
       }
     }
+    return introspectionResultsByKind;
+  }
+
+  function introspectionResultsFromRaw(
+    rawResults,
+    pgAugmentIntrospectionResults
+  ) {
+    const introspectionResultsByKind = deepClone(rawResults);
 
     const xByY = (arrayOfX, attrKey) =>
       arrayOfX.reduce((memo, x) => {
@@ -650,6 +659,11 @@ export default (async function PgIntrospectionPlugin(
       });
     };
 
+    const augment = introspectionResults => {
+      [pgAugmentIntrospectionResults, smartCommentConstraints].forEach(fn =>
+        fn ? fn(introspectionResults) : null
+      );
+    };
     augment(introspectionResultsByKind);
 
     relate(
@@ -826,7 +840,7 @@ export default (async function PgIntrospectionPlugin(
     return introspectionResultsByKind;
   }
 
-  let introspectionResultsByKind = await introspect();
+  let rawIntrospectionResultsByKind = await introspect();
 
   let listener;
 
@@ -842,7 +856,7 @@ export default (async function PgIntrospectionPlugin(
         async () => {
           debug(`Schema change detected: re-inspecting schema...`);
           try {
-            introspectionResultsByKind = await introspect();
+            rawIntrospectionResultsByKind = await introspect();
             debug(`Schema change detected: re-inspecting schema complete`);
             triggerRebuild();
           } catch (e) {
@@ -1037,6 +1051,10 @@ export default (async function PgIntrospectionPlugin(
   builder.hook(
     "build",
     build => {
+      const introspectionResultsByKind = introspectionResultsFromRaw(
+        rawIntrospectionResultsByKind,
+        build.pgAugmentIntrospectionResults
+      );
       if (introspectionResultsByKind.__pgVersion < 90500) {
         // TODO:v5: remove this workaround
         // This is a bit of a hack, but until we have plugin priorities it's the

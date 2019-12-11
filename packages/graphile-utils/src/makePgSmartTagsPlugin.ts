@@ -1,5 +1,9 @@
-import { Build, Plugin } from "graphile-build";
-import { PgEntityKind, PgEntity } from "graphile-build-pg";
+import { Plugin } from "graphile-build";
+import {
+  PgEntityKind,
+  PgEntity,
+  PgIntrospectionResultsByKind,
+} from "graphile-build-pg";
 import { inspect } from "util";
 import { entityIsIdentifiedBy } from "./introspectionHelpers";
 
@@ -116,39 +120,57 @@ export function makePgSmartTagsPlugin(
       );
     }
 
-    builder.hook("build", (build: Build) => {
-      const { pgIntrospectionResultsByKind } = build;
-      rules.forEach((rule, idx) => {
-        const relevantIntrospectionResults: PgEntity[] =
-          pgIntrospectionResultsByKind[rule.kind];
+    builder.hook(
+      "build",
+      build => {
+        const oldPgAugmentIntrospectionResults =
+          build.pgAugmentIntrospectionResults;
+        build.pgAugmentIntrospectionResults = (
+          inIntrospectionResult: PgIntrospectionResultsByKind
+        ): PgIntrospectionResultsByKind => {
+          let pgIntrospectionResultsByKind = inIntrospectionResult;
+          if (oldPgAugmentIntrospectionResults) {
+            pgIntrospectionResultsByKind = oldPgAugmentIntrospectionResults(
+              pgIntrospectionResultsByKind
+            );
+          }
+          rules.forEach((rule, idx) => {
+            const relevantIntrospectionResults: PgEntity[] =
+              pgIntrospectionResultsByKind[rule.kind];
 
-        let hits = 0;
-        relevantIntrospectionResults.forEach(entity => {
-          if (!rule.match(entity)) {
-            return;
-          }
-          hits++;
-          if (rule.tags) {
-            // Overwrite relevant tags
-            Object.assign(entity.tags, rule.tags);
-          }
-          if (rule.description != null) {
-            // Overwrite comment if specified
-            entity.description = rule.description;
-          }
-        });
+            let hits = 0;
+            relevantIntrospectionResults.forEach(entity => {
+              if (!rule.match(entity)) {
+                return;
+              }
+              hits++;
+              if (rule.tags) {
+                // Overwrite relevant tags
+                Object.assign(entity.tags, rule.tags);
+              }
+              if (rule.description != null) {
+                // Overwrite comment if specified
+                entity.description = rule.description;
+              }
+            });
 
-        // Let people know if their rules don't match; it's probably a mistake.
-        if (hits === 0) {
-          console.warn(
-            `WARNING: there were no matches for makePgSmartTagsPlugin rule ${idx} - ${inspect(
-              rawRules[idx]
-            )}`
-          );
-        }
-      });
-      return build;
-    });
+            // Let people know if their rules don't match; it's probably a mistake.
+            if (hits === 0) {
+              console.warn(
+                `WARNING: there were no matches for makePgSmartTagsPlugin rule ${idx} - ${inspect(
+                  rawRules[idx]
+                )}`
+              );
+            }
+          });
+          return pgIntrospectionResultsByKind;
+        };
+        return build;
+      },
+      [],
+      ["PgIntrospection"],
+      ["PgBasics"]
+    );
   };
   return plugin;
 }
