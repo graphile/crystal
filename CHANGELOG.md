@@ -6,6 +6,11 @@ helpful to you also.
 # [](https://github.com/graphile/graphile-engine/compare/v4.5.4...v) (2019-12-11)
 
 
+### Bug Fixes
+
+* **utils:** fix smart tags for attributes ([324f066](https://github.com/graphile/graphile-engine/commit/324f0669a2b21c2445b6e7b8bb2ecd805f5de5ad))
+
+
 
 ## [4.5.4](https://github.com/graphile/graphile-engine/compare/v4.5.3...v4.5.4) (2019-12-11)
 
