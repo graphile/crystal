@@ -7,6 +7,15 @@ to you also.
 **IMPORTANT NOTE**: most of the changes in PostGraphile actually come from
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
+## [4.5.3](https://github.com/graphile/postgraphile/compare/v4.5.2...v4.5.3) (2019-12-11)
+
+
+### Bug Fixes
+
+* **deps:** upgrade graphile-utils ([e19184f](https://github.com/graphile/postgraphile/commit/e19184f1153b7a6c57af7a5150094398ed192e8f))
+
+
+
 ## [4.5.2](https://github.com/graphile/postgraphile/compare/v4.5.1...v4.5.2) (2019-12-11)
 
 
