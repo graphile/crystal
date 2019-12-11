@@ -1,6 +1,6 @@
 {
   "name": "graphile-utils",
-  "version": "4.5.3",
+  "version": "4.5.4",
   "description": "Utilities to help with building graphile-build plugins",
   "main": "node8plus/index.js",
   "types": "node8plus/index.d.ts",

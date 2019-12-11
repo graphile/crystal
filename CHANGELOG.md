@@ -6,6 +6,11 @@ helpful to you also.
 # [](https://github.com/graphile/graphile-engine/compare/v4.5.3...v) (2019-12-11)
 
 
+### Bug Fixes
+
+* **utils:** to match early enough, we need build to be passed ([9aa5565](https://github.com/graphile/graphile-engine/commit/9aa556522eb8ca691bbc9d1f717c3289f6ef126c))
+
+
 
 ## [4.5.3](https://github.com/graphile/graphile-engine/compare/v4.5.2...v4.5.3) (2019-12-11)
 
