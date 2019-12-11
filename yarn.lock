@@ -3908,10 +3908,10 @@ graphile-build@4.5.0:
     pluralize "^7.0.0"
     semver "^6.0.0"
 
-graphile-utils@4.5.4:
-  version "4.5.4"
-  resolved "https://registry.yarnpkg.com/graphile-utils/-/graphile-utils-4.5.4.tgz#44483a334c08150c2f4849ddd410c22d9294571c"
-  integrity sha512-Qp+VQ++J+Fk2u0Gta8R6PK3wGNxzPBxliae5YjETSO5/jh8DXMKwSTBahaCo0+1yAAjmY2NzWDxXtC0RjTP4OQ==
+graphile-utils@4.5.5:
+  version "4.5.5"
+  resolved "https://registry.yarnpkg.com/graphile-utils/-/graphile-utils-4.5.5.tgz#71380090d6d930ecb4f6698f31641c0e5e5fcf89"
+  integrity sha512-AAQTsuA97aAURXMdg3+vkswcvPA3KtqlPXNkeDnlGXwEmQjTBudFWLctnL58iQxZm5AxEyBWok3TWlj6aHgMqA==
   dependencies:
     debug "^4.1.1"
     graphql ">=0.9 <0.14 || ^14.0.2"
