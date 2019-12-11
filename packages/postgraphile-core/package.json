@@ -1,6 +1,6 @@
 {
   "name": "postgraphile-core",
-  "version": "4.5.0",
+  "version": "4.5.3",
   "description": "",
   "main": "node8plus/index.js",
   "scripts": {
@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "graphile-build": "4.5.0",
-    "graphile-build-pg": "4.5.0"
+    "graphile-build-pg": "4.5.3"
   },
   "devDependencies": {
     "@types/node": "^12.0.0",
