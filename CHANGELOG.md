@@ -7,6 +7,17 @@ to you also.
 **IMPORTANT NOTE**: most of the changes in PostGraphile actually come from
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
+## [4.5.1](https://github.com/graphile/postgraphile/compare/v4.5.0...v4.5.1) (2019-12-11)
+
+
+### Bug Fixes
+
+* **deps:** upgrade postgraphile-core ([ff5784a](https://github.com/graphile/postgraphile/commit/ff5784a436ead9412dad9075280d524139c682d3))
+* **deps:** upgrade serialize-javascript dep ([c735ea1](https://github.com/graphile/postgraphile/commit/c735ea11fde31c7ef5deb09347f41a9175176358))
+* **docker:** add missing files to Dockerfile ([04310e2](https://github.com/graphile/postgraphile/commit/04310e2b1766bd1705e39fef078738298a5444f4))
+
+
+
 # [4.5.0](https://github.com/graphile/postgraphile/compare/v4.5.0-rc.4...v4.5.0) (2019-11-22)
 
 
@@ -79,8 +90,8 @@ changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
 ### Bug Fixes
 
-* make sure x-graphql-event-stream url is domain relative ([#1148](https://github.com/graphile/postgraphile/issues/1148)) ([c1b8ca7](https://github.com/graphile/postgraphile/commit/c1b8ca797e5785d9b3b1e8bc393e888b481614b6)), closes [#1143](https://github.com/graphile/postgraphile/issues/1143)
 * **deps:** upgrade postgraphile-core ([#1156](https://github.com/graphile/postgraphile/issues/1156)) ([d032df8](https://github.com/graphile/postgraphile/commit/d032df8432d9ae3b25597dd8b1195222f7dd2bc6))
+* make sure x-graphql-event-stream url is domain relative ([#1148](https://github.com/graphile/postgraphile/issues/1148)) ([c1b8ca7](https://github.com/graphile/postgraphile/commit/c1b8ca797e5785d9b3b1e8bc393e888b481614b6)), closes [#1143](https://github.com/graphile/postgraphile/issues/1143)
 
 
 
@@ -506,8 +517,8 @@ changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
 ### Features
 
-* **errors:** improve server-side message when JWT expired ([#879](https://github.com/graphile/postgraphile/issues/879)) ([400af56](https://github.com/graphile/postgraphile/commit/400af5632b96dcca1a1a4d33dfd7b43fe31eceb5))
 * upgrade postgraphile-core ([3e12708](https://github.com/graphile/postgraphile/commit/3e127086f457db9d46be139e624478095288270c))
+* **errors:** improve server-side message when JWT expired ([#879](https://github.com/graphile/postgraphile/issues/879)) ([400af56](https://github.com/graphile/postgraphile/commit/400af5632b96dcca1a1a4d33dfd7b43fe31eceb5))
 
 
 
@@ -550,9 +561,9 @@ changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
 ### Features
 
+* upgrade postgraphile-core ([#855](https://github.com/graphile/postgraphile/issues/855)) ([db017b5](https://github.com/graphile/postgraphile/commit/db017b5007db91265748a0dc003f6dde7ac18dff))
 * **cli:** add --skip-plugins option ([#853](https://github.com/graphile/postgraphile/issues/853)) ([e75cbd7](https://github.com/graphile/postgraphile/commit/e75cbd713d4e9dc8d57c575a29ff25b1894a62c2))
 * **deps:** upgrade postgraphile-core for better errors ([464ecd0](https://github.com/graphile/postgraphile/commit/464ecd09db35a33d1032bc495505c7dc96a2fa55))
-* upgrade postgraphile-core ([#855](https://github.com/graphile/postgraphile/issues/855)) ([db017b5](https://github.com/graphile/postgraphile/commit/db017b5007db91265748a0dc003f6dde7ac18dff))
 
 
 
@@ -687,8 +698,8 @@ changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
 ### Features
 
-* simple collections and massive perf gains on small queries ([#766](https://github.com/graphile/postgraphile/issues/766)) ([d8d131e](https://github.com/graphile/postgraphile/commit/d8d131ed0191841456cd41d24d8a4cf86ba3d8d5))
 * **hooks:** add a hook to the request handler ([#770](https://github.com/graphile/postgraphile/issues/770)) ([ade11be](https://github.com/graphile/postgraphile/commit/ade11bea519bfcf57c21f0ae6e04957e07629797))
+* simple collections and massive perf gains on small queries ([#766](https://github.com/graphile/postgraphile/issues/766)) ([d8d131e](https://github.com/graphile/postgraphile/commit/d8d131ed0191841456cd41d24d8a4cf86ba3d8d5))
 
 
 
@@ -771,15 +782,15 @@ changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
 ### Bug Fixes
 
-* **cli:** better --legacy-relation validation ([b6a59d9](https://github.com/graphile/postgraphile/commit/b6a59d9b137c670e77b3bf289fcc49128f854615))
 * sed compatibility OSX/Linux ([8f41002](https://github.com/graphile/postgraphile/commit/8f410024b5999604efe4921f245215126750d05a))
+* **cli:** better --legacy-relation validation ([b6a59d9](https://github.com/graphile/postgraphile/commit/b6a59d9b137c670e77b3bf289fcc49128f854615))
 
 
 ### Features
 
-* **cluster:** introduce cluster feature ([#694](https://github.com/graphile/postgraphile/issues/694)) ([bc64196](https://github.com/graphile/postgraphile/commit/bc64196bb4e4676f7a579de9486db83485ea3c0b))
-* SQL perf++; CLI overhall; CLI opts to use Json/Uuid & reduce nullables ([#697](https://github.com/graphile/postgraphile/issues/697)) ([7a1abfc](https://github.com/graphile/postgraphile/commit/7a1abfc9c5e59b02fd25da9d71b051cd00b501b5))
 * **errors:** more helpful error if extendedErrors argument is wrong type ([5ab4c94](https://github.com/graphile/postgraphile/commit/5ab4c944fa7b45c2dc10e909365698033ab6b4d8))
+* SQL perf++; CLI overhall; CLI opts to use Json/Uuid & reduce nullables ([#697](https://github.com/graphile/postgraphile/issues/697)) ([7a1abfc](https://github.com/graphile/postgraphile/commit/7a1abfc9c5e59b02fd25da9d71b051cd00b501b5))
+* **cluster:** introduce cluster feature ([#694](https://github.com/graphile/postgraphile/issues/694)) ([bc64196](https://github.com/graphile/postgraphile/commit/bc64196bb4e4676f7a579de9486db83485ea3c0b))
 
 
 
@@ -948,6 +959,7 @@ changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
 ### Bug Fixes
 
+* pervasive typo ([e62d7af](https://github.com/graphile/postgraphile/commit/e62d7af5c47065a0aba27f0518c02ac795931d89))
 * **auth:** send a 401 status on expired token ([#472](https://github.com/graphile/postgraphile/issues/472)) ([fa241f4](https://github.com/graphile/postgraphile/commit/fa241f477f57c4f1547279cf400285771585e5d9))
 * **build:** Support spaces in folder name ([#441](https://github.com/graphile/postgraphile/issues/441)) ([df347e7](https://github.com/graphile/postgraphile/commit/df347e76f1ca295f96b3928198d18c92646796a8))
 * **cli:** invalid program destructuring ([#434](https://github.com/graphile/postgraphile/issues/434)) ([998ba25](https://github.com/graphile/postgraphile/commit/998ba25c95f75fc5519f8d8a64c88bc88c433dc7))
@@ -955,7 +967,6 @@ changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 * **postgraphql:** don't throw on auth header if auth not enabled ([#437](https://github.com/graphile/postgraphile/issues/437)) ([b2155c9](https://github.com/graphile/postgraphile/commit/b2155c9a5048b90f9f8c0357eeb2f3084241c60d))
 * **postgraphql:** Throw if jwtSecret set but jwtPgTypeIndentifer isn't ([#466](https://github.com/graphile/postgraphile/issues/466)) ([f68056c](https://github.com/graphile/postgraphile/commit/f68056ce91d9c9432feef1e05e634a341cf3932d))
 * **regression:** change jwtPgTypeIdentifier error to warning ([1c88d61](https://github.com/graphile/postgraphile/commit/1c88d6131b2e03dc8dca11a190a70c26a6d212e8))
-* pervasive typo ([e62d7af](https://github.com/graphile/postgraphile/commit/e62d7af5c47065a0aba27f0518c02ac795931d89))
 
 
 ### Features
@@ -1499,6 +1510,7 @@ changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
 ### Bug Fixes
 
+* **tests:** leaking clients ([458c5cd](https://github.com/graphile/postgraphile/commit/458c5cd2b5182f3be8e39d7894741cb66dff6630))
 * add client fetching to server ([ea1e2e7](https://github.com/graphile/postgraphile/commit/ea1e2e7518489f32b43aced411225af5f7a74f65))
 * add tests to linting ([55f54cf](https://github.com/graphile/postgraphile/commit/55f54cfda093312ec61f85d5deaaf50a37673e18))
 * allow test watch to take arguments ([5449723](https://github.com/graphile/postgraphile/commit/544972319dc5c2ec8f3ae6a7397183496be5c4dc))
@@ -1512,11 +1524,17 @@ changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 * npm bin is added to path ([c8fa39b](https://github.com/graphile/postgraphile/commit/c8fa39b52ec20fa273e96cc1d6a923c95387d40e))
 * release client back to the pool on request end ([07de95e](https://github.com/graphile/postgraphile/commit/07de95efdf961817347f2daeac87704eef027470))
 * some misc errors ([2fef40a](https://github.com/graphile/postgraphile/commit/2fef40adfbe1ec931ea06c19fb6dafa7a683c135))
-* **tests:** leaking clients ([458c5cd](https://github.com/graphile/postgraphile/commit/458c5cd2b5182f3be8e39d7894741cb66dff6630))
 
 
 ### Features
 
+* **graphql:** add delete mutation ([4346654](https://github.com/graphile/postgraphile/commit/4346654bca832a2608c7e4a6a8dc57ba177d643f))
+* **graphql:** add relay object identification interface ([e0fe4a9](https://github.com/graphile/postgraphile/commit/e0fe4a94af6361db894090e4b372746a01c9da7c))
+* **package:** add json and graphql extensions to tests watch ([25d9945](https://github.com/graphile/postgraphile/commit/25d994559833c22b01ade2f5e11a19f0abaa4012))
+* **package:** add release step and binary ([84830e4](https://github.com/graphile/postgraphile/commit/84830e4a35230a6566f9c42e102047a63f185e3f))
+* **package:** only publish certain files ([7d26e8e](https://github.com/graphile/postgraphile/commit/7d26e8e17c42138c3db38bd0abbd4bd996c88307))
+* **postgres:** catalog now knows about the pg config ([e0c42c9](https://github.com/graphile/postgraphile/commit/e0c42c9e24177591e77e2f01f5e4daa09cde5b05))
+* **server:** rename create server file ([6379744](https://github.com/graphile/postgraphile/commit/637974420eb1be9a92bdeb96b0aa8bd2ac303154))
 * add conditions to list field resolution ([cf343ad](https://github.com/graphile/postgraphile/commit/cf343ade7797af31d79b0721b5eec1ecb5ed79c4))
 * add default orderBy ([562c390](https://github.com/graphile/postgraphile/commit/562c3904fccb15b14495f8923638b7f75e33a470))
 * add editor config ([e8faede](https://github.com/graphile/postgraphile/commit/e8faede3cf422232cff35c6135da6014bd59e743))
@@ -1528,17 +1546,10 @@ changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 * add personal TODO file to .gitignore ([8d85c8b](https://github.com/graphile/postgraphile/commit/8d85c8bd674c52824c3a8b09d0bafb3b19f250c2))
 * add post example data ([fe0deab](https://github.com/graphile/postgraphile/commit/fe0deabbeff7e25ca75642b8c5b4eceab2408b93))
 * add reverse foreign key ([33bc5a7](https://github.com/graphile/postgraphile/commit/33bc5a7964430da9d3b364ce5d6e45d0485d2c83))
-* **graphql:** add delete mutation ([4346654](https://github.com/graphile/postgraphile/commit/4346654bca832a2608c7e4a6a8dc57ba177d643f))
-* **graphql:** add relay object identification interface ([e0fe4a9](https://github.com/graphile/postgraphile/commit/e0fe4a94af6361db894090e4b372746a01c9da7c))
-* **package:** add json and graphql extensions to tests watch ([25d9945](https://github.com/graphile/postgraphile/commit/25d994559833c22b01ade2f5e11a19f0abaa4012))
-* add update mutation ([3c2916e](https://github.com/graphile/postgraphile/commit/3c2916e1d4d99f3484ebe261f20455134da81528))
-* **package:** add release step and binary ([84830e4](https://github.com/graphile/postgraphile/commit/84830e4a35230a6566f9c42e102047a63f185e3f))
-* **package:** only publish certain files ([7d26e8e](https://github.com/graphile/postgraphile/commit/7d26e8e17c42138c3db38bd0abbd4bd996c88307))
-* **postgres:** catalog now knows about the pg config ([e0c42c9](https://github.com/graphile/postgraphile/commit/e0c42c9e24177591e77e2f01f5e4daa09cde5b05))
 * add table insertion ([10ca562](https://github.com/graphile/postgraphile/commit/10ca5625504cc583a9104974f6ad051416591ca9))
+* add update mutation ([3c2916e](https://github.com/graphile/postgraphile/commit/3c2916e1d4d99f3484ebe261f20455134da81528))
 * have insert mutation follow relay specification ([9957fe9](https://github.com/graphile/postgraphile/commit/9957fe914bedd21ad805a3d99f38aa6580fbe9e0))
 * log the stack for errors in development ([680a057](https://github.com/graphile/postgraphile/commit/680a057e67ac78f9d6a97471e131721d38bb8656))
-* **server:** rename create server file ([6379744](https://github.com/graphile/postgraphile/commit/637974420eb1be9a92bdeb96b0aa8bd2ac303154))
 * optimize parallel single resolve calls ([4965954](https://github.com/graphile/postgraphile/commit/4965954d439dfa048cf4ca243eee91949ef64d70))
 * restart sequences after manual insertions ([7ed2f27](https://github.com/graphile/postgraphile/commit/7ed2f277e7812c4f5c2eed2f9e90b88b7aad7b25))
 
