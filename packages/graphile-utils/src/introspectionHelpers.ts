@@ -7,6 +7,7 @@ import {
   PgProc,
 } from "graphile-build-pg";
 import parseIdentifierParts from "./parseIdentifierParts";
+import { Build } from "graphile-build";
 
 export function isAttribute(obj: PgEntity): obj is PgAttribute {
   return obj.kind === PgEntityKind.ATTRIBUTE;
@@ -26,7 +27,8 @@ export function isProcedure(obj: PgEntity): obj is PgProc {
 
 export function entityIsIdentifiedBy(
   obj: PgEntity,
-  identifier: string
+  identifier: string,
+  build: Build
 ): boolean {
   const parts = parseIdentifierParts(identifier);
   if (parts.length === 1) {
@@ -49,10 +51,16 @@ export function entityIsIdentifiedBy(
     const [grandparentName, parentName, expectedName] = parts;
     if (isAttribute(obj) || isConstraint(obj)) {
       // Parent is a table, grandparent is a schema
+      const klass:
+        | PgClass
+        | undefined = build.pgIntrospectionResultsByKind.class.find(
+        (kls: PgClass) => kls.id === obj.classId
+      );
       return (
         obj.name === expectedName &&
-        obj.class.name === parentName &&
-        obj.class.namespaceName === grandparentName
+        !!klass &&
+        klass.name === parentName &&
+        klass.namespaceName === grandparentName
       );
     } else {
       // Parent is a schema; grandparent doesn't make sense

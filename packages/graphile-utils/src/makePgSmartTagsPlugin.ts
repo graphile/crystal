@@ -1,4 +1,4 @@
-import { Plugin } from "graphile-build";
+import { Plugin, Build } from "graphile-build";
 import {
   PgEntityKind,
   PgEntity,
@@ -7,7 +7,7 @@ import {
 import { inspect } from "util";
 import { entityIsIdentifiedBy } from "./introspectionHelpers";
 
-export type PgSmartTagFilterFunction<T> = (input: T) => boolean;
+export type PgSmartTagFilterFunction<T> = (input: T, build: Build) => boolean;
 
 export type PgSmartTagTags = {
   [tagName: string]: null | true | string | string[];
@@ -57,17 +57,17 @@ function compileRule<T extends PgEntity>(
     );
   }
 
-  const match: PgSmartTagFilterFunction<T> = obj => {
+  const match: PgSmartTagFilterFunction<T> = (obj, build) => {
     if (obj.kind !== kind) {
       return false;
     }
 
     if (typeof incomingMatch === "function") {
       // User supplied a match function; delegate to that:
-      return incomingMatch(obj);
+      return incomingMatch(obj, build);
     } else if (typeof incomingMatch === "string") {
       // It's a fully-qualified case-sensitive name of the thing.
-      return entityIsIdentifiedBy(obj, incomingMatch);
+      return entityIsIdentifiedBy(obj, incomingMatch, build);
     } else {
       throw new Error(
         "makePgSmartTagsPlugin rule 'match' is neither a string nor a function"
@@ -140,7 +140,7 @@ export function makePgSmartTagsPlugin(
 
             let hits = 0;
             relevantIntrospectionResults.forEach(entity => {
-              if (!rule.match(entity)) {
+              if (!rule.match(entity, build)) {
                 return;
               }
               hits++;
