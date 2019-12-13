@@ -38,7 +38,12 @@ export function entityIsIdentifiedBy(
     const [parentName, expectedName] = parts;
     if (isAttribute(obj) || isConstraint(obj)) {
       // Parent is a table
-      return obj.name === expectedName && obj.class.name === parentName;
+      const klass:
+        | PgClass
+        | undefined = build.pgIntrospectionResultsByKind.class.find(
+        (kls: PgClass) => kls.id === obj.classId
+      );
+      return obj.name === expectedName && !!klass && klass.name === parentName;
     } else if (isClass(obj) || isProcedure(obj)) {
       // Parent is a schema
       return obj.name === expectedName && obj.namespaceName === parentName;
