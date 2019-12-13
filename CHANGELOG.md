@@ -3,7 +3,12 @@
 We use PostGraphile's GitHub releases tab to log our changes in detail, but
 this auto-generated changelog helps us to produce that list, and it may be
 helpful to you also.
-# [](https://github.com/graphile/graphile-engine/compare/v4.5.5...v) (2019-12-11)
+# [](https://github.com/graphile/graphile-engine/compare/v4.5.5...v) (2019-12-13)
+
+
+### Bug Fixes
+
+* **utils:** fix smart tags regression on unqualified tables ([#587](https://github.com/graphile/graphile-engine/issues/587)) ([f56511f](https://github.com/graphile/graphile-engine/commit/f56511fcd8755611e5feed20f0a1eff28bc3cbc8))
 
 
 
