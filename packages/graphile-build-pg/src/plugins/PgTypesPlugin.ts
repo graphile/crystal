@@ -817,9 +817,16 @@ export default (function PgTypesPlugin(
             subtype.id,
             typeModifier
           );
+          const gqlRangeInputSubType = getGqlInputTypeByTypeIdAndModifier(
+            subtype.id,
+            typeModifier
+          );
 
           if (!gqlRangeSubType || !isNamedType(gqlRangeSubType)) {
             throw new Error("Range of unsupported type");
+          }
+          if (!gqlRangeInputSubType || !isNamedType(gqlRangeInputSubType)) {
+            throw new Error("Range of unsupported input type");
           }
           const existingRange = getTypeByName(
             inflection.rangeType(gqlRangeSubType.name)
@@ -874,7 +881,7 @@ export default (function PgTypesPlugin(
               fields: {
                 value: {
                   description: "The value at one end of our range.",
-                  type: new GraphQLNonNull(gqlRangeSubType),
+                  type: new GraphQLNonNull(gqlRangeInputSubType),
                 },
 
                 inclusive: {
