@@ -68,7 +68,7 @@ module.exports = {
               {
                 name: "graphql",
                 message:
-                  'Please refer to `build.graphql` instead, or use `import("graphql")` in value positions. (This helps us to avoid multiple `graphql` modules in the `node_modules` tree from causing issues.)',
+                  'Please refer to `build.graphql` instead, or use `import("graphql")` in type positions. (This helps us to avoid multiple `graphql` modules in the `node_modules` tree from causing issues for users.)',
               },
             ],
           },
