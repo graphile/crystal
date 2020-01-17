@@ -117,10 +117,12 @@ export interface PostGraphileOptions<
   // `json` (which causes the stack to become an array with elements for each
   // line of the stack). Recommended in development, not recommended in
   // production.
+  /* @middlewareOnly */
   showErrorStack?: boolean | 'json';
   // Extends the error response with additional details from the Postgres
   // error.  Can be any combination of `['hint', 'detail', 'errcode']`.
   // Default is `[]`.
+  /* @middlewareOnly */
   extendedErrors?: Array<string>;
   // Enables ability to modify errors before sending them down to the client.
   // Optionally can send down custom responses. If you use this then
