@@ -473,8 +473,7 @@ export default (async function PgIntrospectionPlugin(
   }
 ) {
   /**
-   * @summary introspect database and get the table/view/constraints.
-   * @returns {Promise<PgIntrospectionResultsByKind>}
+   * Introspect database and get the table/view/constraints.
    */
   async function introspect(): Promise<PgIntrospectionResultsByKind> {
     // Perform introspection
@@ -996,6 +995,8 @@ export default (async function PgIntrospectionPlugin(
           if (affectsOurSchemas) {
             this._handleChange();
           }
+        } else if (payload.type === "manual") {
+          this._handleChange();
         } else {
           throw new Error(`Payload type '${payload.type}' not recognised`);
         }

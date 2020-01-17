@@ -459,7 +459,7 @@ ${sql.join(
   orderBy(
     exprGen: SQLGen,
     ascending: boolean = true,
-    nullsFirst: boolean | null
+    nullsFirst: boolean | null = null
   ) {
     this.checkLock("orderBy");
     this.data.orderBy.push([exprGen, ascending, nullsFirst]);

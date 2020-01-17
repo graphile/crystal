@@ -1,13 +1,13 @@
 #!/bin/bash
 set -e
 echo "BOOTSTRAP"
-npx lerna bootstrap
+yarn lerna bootstrap
 echo "CLEANING BUILT FILES"
-rm -Rf packages/*/node8plus packages/*/dist
+yarn clean
 echo "PREPACKING"
-./scripts/prepack-all
+yarn prepack:all
 echo "TEST"
-npx lerna run --concurrency 1 test
+yarn test
 
 TAG="${1:-next}"
 

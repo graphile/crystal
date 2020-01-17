@@ -8,12 +8,7 @@ import {
   SubscriptionPlugin,
   MutationPayloadQueryPlugin,
 } from "graphile-build";
-import {
-  GraphQLSchema,
-  GraphQLObjectType,
-  GraphQLString,
-  printSchema,
-} from "graphql";
+import { GraphQLSchema, GraphQLObjectType, GraphQLString } from "graphql";
 
 const makeSchemaWithSpy = spy =>
   buildSchema(
@@ -77,15 +72,15 @@ it("Can tweak the schema", async () => {
   const schema = await makeSchemaWithSpy(spy);
   expect(spySchema).toBeTruthy();
   expect(spySchema).toEqual(schema);
-  expect(printSchema(schema)).toMatchInlineSnapshot(`
-"\\"\\"\\"MODIFIED DESCRIPTION\\"\\"\\"
-type Query {
-  \\"\\"\\"
-  Exposes the root query type nested one level down. This is helpful for Relay 1
-  which can only query top level fields if they are in a particular form.
-  \\"\\"\\"
-  query: Query!
-}
-"
-`);
+  expect(schema).toMatchInlineSnapshot(`
+    """MODIFIED DESCRIPTION"""
+    type Query {
+      """
+      Exposes the root query type nested one level down. This is helpful for Relay 1
+      which can only query top level fields if they are in a particular form.
+      """
+      query: Query!
+    }
+
+  `);
 });

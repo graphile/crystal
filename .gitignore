@@ -6,3 +6,5 @@ node_modules
 /.vscode
 *.tgz
 yarn-error.log
+tsconfig.tsbuildinfo
+.env

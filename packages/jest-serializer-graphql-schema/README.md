@@ -6,7 +6,7 @@ of [GraphQL schemas](https://graphql.org/learn/schema/) using the
 
 This serializer only works on instances of the `GraphQLSchema` class
 exported from [`graphql-js`](https://github.com/graphql/graphql-js).
-It does *not* work on <abbr title="abstract syntax tree">AST</abbr>
+It does _not_ work on <abbr title="abstract syntax tree">AST</abbr>
 objects.
 
 # Install
@@ -58,7 +58,7 @@ const getSchema = async (url: string) => {
 test("Pokemon GraphQL API has a consistent schema", async () => {
   const schema = await getSchema("https://graphql-pokemon.now.sh");
   expect(schema).toMatchSnapshot();
-});;
+});
 ```
 
 This test will produce the following snapshot:
@@ -177,5 +177,5 @@ import { lexicographicSortSchema } from "graphql";
 test("Pokemon GraphQL API has a consistent schema", async () => {
   const schema = await getSchema("https://graphql-pokemon.now.sh");
   expect(lexicographicSortSchema(schema)).toMatchSnapshot();
-});;
+});
 ```
