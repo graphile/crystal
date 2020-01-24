@@ -1,6 +1,6 @@
 import debugFactory from "debug";
 import { Plugin } from "graphile-build";
-import { PubSub } from "graphql-subscriptions";
+import { PubSub, withFilter } from "graphql-subscriptions";
 
 const debug = debugFactory("pg-pubsub");
 
@@ -38,13 +38,14 @@ const PgSubscriptionResolverPlugin: Plugin = function(builder, { pubsub }) {
       const {
         topic: topicGen,
         unsubscribeTopic: unsubscribeTopicGen,
+        filter,
       } = pgSubscription;
       if (!topicGen) {
         return field;
       }
       return extend(field, {
         subscribe: async (
-          _parent: any,
+          parent: any,
           args: any,
           resolveContext: any,
           resolveInfo: any
@@ -94,6 +95,19 @@ const PgSubscriptionResolverPlugin: Plugin = function(builder, { pubsub }) {
             });
           }
 
+          if (filter) {
+            if (typeof filter !== "function") {
+              throw new Error(
+                "filter provided to pgSubscription must be a function"
+              );
+            }
+            return withFilter(() => asyncIterator, filter)(
+              parent,
+              args,
+              resolveContext,
+              resolveInfo
+            );
+          }
           return asyncIterator;
         },
         ...(field.resolve
