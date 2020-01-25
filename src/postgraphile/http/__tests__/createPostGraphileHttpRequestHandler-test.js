@@ -10,10 +10,12 @@ const http = require('http');
 const http2 = require('http2');
 const connect = require('connect');
 const express = require('express');
-const compress = require('koa-compress');
+const koaCompress = require('koa-compress');
 const koa = require('koa');
 const koaMount = require('koa-mount');
 const fastify = require('fastify');
+const fastifyCompress = require('fastify-compress');
+const fastifyHelmet = require('fastify-helmet');
 // tslint:disable-next-line variable-name
 const EventEmitter = require('events');
 
@@ -124,6 +126,7 @@ const serverCreators = new Map([
         return server;
       }
       const app = fastify({ serverFactory });
+      if (_options && _options.onPreCreate) _options.onPreCreate(app);
       if (subpath) {
         throw new Error('Fastify does not support subpath at this time');
       } else {
@@ -1104,7 +1107,7 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
           {
             onPreCreate: app => {
               app.use(
-                compress({
+                koaCompress({
                   threshold: 0,
                 }),
               );
@@ -1117,6 +1120,25 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
           .get(`${subpath}/graphiql`)
           .expect(200)
           .expect('Content-Encoding', /gzip/);
+      });
+    }
+
+    if (name === 'fastify') {
+      const createFastifyWithPluginsServer = () =>
+        createServer(
+          { graphiql: true },
+          {
+            onPreCreate: app => {
+              app.register(fastifyHelmet);
+              app.register(fastifyCompress, { global: true, threshold: 0 });
+            },
+          },
+        );
+      test('fastify plugins work', async () => {
+        const server = await createFastifyWithPluginsServer();
+        const res = await request(server).get(`${subpath}/graphiql`);
+        expect(res.headers['x-download-options']).toBe('noopen'); // fastify-helmet
+        expect(res.headers['content-encoding']).toBe('gzip'); // fastify-compress
       });
     }
   });
