@@ -3,7 +3,13 @@
 We use PostGraphile's GitHub releases tab to log our changes in detail, but
 this auto-generated changelog helps us to produce that list, and it may be
 helpful to you also.
-# [](https://github.com/graphile/graphile-engine/compare/v4.5.6...v) (2019-12-13)
+# [](https://github.com/graphile/graphile-engine/compare/v4.5.6...v) (2020-01-27)
+
+
+### Features
+
+* **subscriptions:** [@pg](https://github.com/pg)Subscription now supports filter ([#596](https://github.com/graphile/graphile-engine/issues/596)) ([b197408](https://github.com/graphile/graphile-engine/commit/b197408bc80efdf5ab8c8dffbdab0d70e2c8f191))
+* selectively back-port fixes from master ([#594](https://github.com/graphile/graphile-engine/issues/594)) ([9536750](https://github.com/graphile/graphile-engine/commit/953675007d745be51a1c29d3e533636233d8aa0f)), closes [#577](https://github.com/graphile/graphile-engine/issues/577) [#582](https://github.com/graphile/graphile-engine/issues/582) [#583](https://github.com/graphile/graphile-engine/issues/583) [#590](https://github.com/graphile/graphile-engine/issues/590) [#589](https://github.com/graphile/graphile-engine/issues/589) [#565](https://github.com/graphile/graphile-engine/issues/565) [#505](https://github.com/graphile/graphile-engine/issues/505) [#591](https://github.com/graphile/graphile-engine/issues/591)
 
 
 

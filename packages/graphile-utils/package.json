@@ -1,6 +1,6 @@
 {
   "name": "graphile-utils",
-  "version": "4.5.6",
+  "version": "4.6.0",
   "description": "Utilities to help with building graphile-build plugins",
   "main": "node8plus/index.js",
   "types": "node8plus/index.d.ts",
@@ -37,10 +37,10 @@
     "node": ">=8.6"
   },
   "devDependencies": {
-    "graphile-build": "4.5.0",
-    "graphile-build-pg": "4.5.3",
+    "graphile-build": "4.6.0",
+    "graphile-build-pg": "4.6.0",
     "jest": "^24.8.0",
-    "jest-serializer-graphql-schema": "4.5.0",
+    "jest-serializer-graphql-schema": "4.6.0",
     "ts-node": "^8.1.0",
     "typescript": "^3.4.5"
   },
