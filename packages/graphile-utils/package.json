@@ -1,0 +1,54 @@
+{
+  "name": "graphile-utils",
+  "version": "4.6.0",
+  "description": "Utilities to help with building graphile-build plugins",
+  "main": "node8plus/index.js",
+  "types": "node8plus/index.d.ts",
+  "scripts": {
+    "test": "scripts/test",
+    "prepack": "mkdir -p node8plus && tsc",
+    "watch": "mkdir -p node8plus && tsc --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/graphile/graphile-build.git"
+  },
+  "keywords": [
+    "graphile",
+    "graphql",
+    "engine",
+    "plugin",
+    "build",
+    "extension",
+    "utils",
+    "utilities"
+  ],
+  "author": "Benjie Gillam <code@benjiegillam.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/graphile/graphile-build/issues"
+  },
+  "homepage": "https://github.com/graphile/graphile-build/tree/master/packages/graphile-utils",
+  "dependencies": {
+    "debug": "^4.1.1",
+    "graphql": ">=0.9 <0.14 || ^14.0.2"
+  },
+  "engines": {
+    "node": ">=8.6"
+  },
+  "devDependencies": {
+    "graphile-build": "4.6.0",
+    "graphile-build-pg": "4.6.0",
+    "jest": "^24.8.0",
+    "jest-serializer-graphql-schema": "4.6.0",
+    "ts-node": "^8.1.0",
+    "typescript": "^3.4.5"
+  },
+  "peerDependencies": {
+    "graphile-build": "^4.5.0",
+    "graphile-build-pg": "^4.5.0"
+  },
+  "files": [
+    "node8plus"
+  ]
+}

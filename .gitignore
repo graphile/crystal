@@ -1,0 +1,10 @@
+node_modules
+/postgraphile/
+/pg-omit-archived/
+/pg-simplify-inflector/
+/operation-hooks/
+/.vscode
+*.tgz
+yarn-error.log
+tsconfig.tsbuildinfo
+.env

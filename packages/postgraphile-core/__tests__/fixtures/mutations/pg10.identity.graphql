@@ -1,0 +1,33 @@
+mutation {
+  a: createAlwaysAsIdentity(input:{
+    alwaysAsIdentity: {
+      t: "test"
+    }
+  }) {
+    alwaysAsIdentity {
+      id
+      t
+    }
+  }
+  b: createByDefaultAsIdentity(input:{
+    byDefaultAsIdentity: {
+      t: "test"
+    }
+  }) {
+    byDefaultAsIdentity {
+      id
+      t
+    }
+  }
+  c: createByDefaultAsIdentity(input:{
+    byDefaultAsIdentity: {
+      id: 100
+      t: "test"
+    }
+  }) {
+    byDefaultAsIdentity {
+      id
+      t
+    }
+  }
+}

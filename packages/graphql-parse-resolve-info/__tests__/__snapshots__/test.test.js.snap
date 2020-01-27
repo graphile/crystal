@@ -1,0 +1,908 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`basic 1`] = `
+Object {
+  "alias": "allPosts",
+  "args": Object {},
+  "fieldsByTypeName": Object {
+    "PostsConnection": Object {
+      "edges": Object {
+        "alias": "edges",
+        "args": Object {},
+        "fieldsByTypeName": Object {
+          "PostEdge": Object {
+            "cursor": Object {
+              "alias": "cursor",
+              "args": Object {},
+              "fieldsByTypeName": Object {},
+              "name": "cursor",
+            },
+            "node": Object {
+              "alias": "node",
+              "args": Object {},
+              "fieldsByTypeName": Object {
+                "Post": Object {
+                  "author": Object {
+                    "alias": "author",
+                    "args": Object {},
+                    "fieldsByTypeName": Object {
+                      "Person": Object {
+                        "firstName": Object {
+                          "alias": "firstName",
+                          "args": Object {},
+                          "fieldsByTypeName": Object {},
+                          "name": "firstName",
+                        },
+                        "firstPost": Object {
+                          "alias": "firstPost",
+                          "args": Object {},
+                          "fieldsByTypeName": Object {
+                            "Post": Object {
+                              "author": Object {
+                                "alias": "author",
+                                "args": Object {},
+                                "fieldsByTypeName": Object {
+                                  "Person": Object {
+                                    "firstName": Object {
+                                      "alias": "firstName",
+                                      "args": Object {},
+                                      "fieldsByTypeName": Object {},
+                                      "name": "firstName",
+                                    },
+                                    "id": Object {
+                                      "alias": "id",
+                                      "args": Object {},
+                                      "fieldsByTypeName": Object {},
+                                      "name": "id",
+                                    },
+                                    "name": Object {
+                                      "alias": "name",
+                                      "args": Object {},
+                                      "fieldsByTypeName": Object {},
+                                      "name": "name",
+                                    },
+                                  },
+                                },
+                                "name": "personByAuthorId",
+                              },
+                              "headline": Object {
+                                "alias": "headline",
+                                "args": Object {},
+                                "fieldsByTypeName": Object {},
+                                "name": "headline",
+                              },
+                              "headlineTrimmed": Object {
+                                "alias": "headlineTrimmed",
+                                "args": Object {},
+                                "fieldsByTypeName": Object {},
+                                "name": "headlineTrimmed",
+                              },
+                              "id": Object {
+                                "alias": "id",
+                                "args": Object {},
+                                "fieldsByTypeName": Object {},
+                                "name": "id",
+                              },
+                            },
+                          },
+                          "name": "firstPost",
+                        },
+                        "friends": Object {
+                          "alias": "friends",
+                          "args": Object {},
+                          "fieldsByTypeName": Object {
+                            "PersonConnection": Object {
+                              "nodes": Object {
+                                "alias": "nodes",
+                                "args": Object {},
+                                "fieldsByTypeName": Object {
+                                  "Person": Object {
+                                    "firstName": Object {
+                                      "alias": "firstName",
+                                      "args": Object {},
+                                      "fieldsByTypeName": Object {},
+                                      "name": "firstName",
+                                    },
+                                    "id": Object {
+                                      "alias": "id",
+                                      "args": Object {},
+                                      "fieldsByTypeName": Object {},
+                                      "name": "id",
+                                    },
+                                    "name": Object {
+                                      "alias": "name",
+                                      "args": Object {},
+                                      "fieldsByTypeName": Object {},
+                                      "name": "name",
+                                    },
+                                  },
+                                },
+                                "name": "nodes",
+                              },
+                              "pageInfo": Object {
+                                "alias": "pageInfo",
+                                "args": Object {},
+                                "fieldsByTypeName": Object {
+                                  "PageInfo": Object {
+                                    "startCursor": Object {
+                                      "alias": "startCursor",
+                                      "args": Object {},
+                                      "fieldsByTypeName": Object {},
+                                      "name": "startCursor",
+                                    },
+                                  },
+                                },
+                                "name": "pageInfo",
+                              },
+                              "totalCount": Object {
+                                "alias": "totalCount",
+                                "args": Object {},
+                                "fieldsByTypeName": Object {},
+                                "name": "totalCount",
+                              },
+                            },
+                          },
+                          "name": "friends",
+                        },
+                        "id": Object {
+                          "alias": "id",
+                          "args": Object {},
+                          "fieldsByTypeName": Object {},
+                          "name": "id",
+                        },
+                        "name": Object {
+                          "alias": "name",
+                          "args": Object {},
+                          "fieldsByTypeName": Object {},
+                          "name": "name",
+                        },
+                      },
+                    },
+                    "name": "personByAuthorId",
+                  },
+                  "headline": Object {
+                    "alias": "headline",
+                    "args": Object {},
+                    "fieldsByTypeName": Object {},
+                    "name": "headline",
+                  },
+                  "headlineTrimmed": Object {
+                    "alias": "headlineTrimmed",
+                    "args": Object {},
+                    "fieldsByTypeName": Object {},
+                    "name": "headlineTrimmed",
+                  },
+                  "id": Object {
+                    "alias": "id",
+                    "args": Object {},
+                    "fieldsByTypeName": Object {},
+                    "name": "id",
+                  },
+                },
+              },
+              "name": "node",
+            },
+          },
+        },
+        "name": "edges",
+      },
+    },
+  },
+  "name": "allPosts",
+}
+`;
+
+exports[`basic 2`] = `
+Object {
+  "alias": "allPosts",
+  "args": Object {},
+  "fields": Object {
+    "edges": Object {
+      "alias": "edges",
+      "args": Object {},
+      "fieldsByTypeName": Object {
+        "PostEdge": Object {
+          "cursor": Object {
+            "alias": "cursor",
+            "args": Object {},
+            "fieldsByTypeName": Object {},
+            "name": "cursor",
+          },
+          "node": Object {
+            "alias": "node",
+            "args": Object {},
+            "fieldsByTypeName": Object {
+              "Post": Object {
+                "author": Object {
+                  "alias": "author",
+                  "args": Object {},
+                  "fieldsByTypeName": Object {
+                    "Person": Object {
+                      "firstName": Object {
+                        "alias": "firstName",
+                        "args": Object {},
+                        "fieldsByTypeName": Object {},
+                        "name": "firstName",
+                      },
+                      "firstPost": Object {
+                        "alias": "firstPost",
+                        "args": Object {},
+                        "fieldsByTypeName": Object {
+                          "Post": Object {
+                            "author": Object {
+                              "alias": "author",
+                              "args": Object {},
+                              "fieldsByTypeName": Object {
+                                "Person": Object {
+                                  "firstName": Object {
+                                    "alias": "firstName",
+                                    "args": Object {},
+                                    "fieldsByTypeName": Object {},
+                                    "name": "firstName",
+                                  },
+                                  "id": Object {
+                                    "alias": "id",
+                                    "args": Object {},
+                                    "fieldsByTypeName": Object {},
+                                    "name": "id",
+                                  },
+                                  "name": Object {
+                                    "alias": "name",
+                                    "args": Object {},
+                                    "fieldsByTypeName": Object {},
+                                    "name": "name",
+                                  },
+                                },
+                              },
+                              "name": "personByAuthorId",
+                            },
+                            "headline": Object {
+                              "alias": "headline",
+                              "args": Object {},
+                              "fieldsByTypeName": Object {},
+                              "name": "headline",
+                            },
+                            "headlineTrimmed": Object {
+                              "alias": "headlineTrimmed",
+                              "args": Object {},
+                              "fieldsByTypeName": Object {},
+                              "name": "headlineTrimmed",
+                            },
+                            "id": Object {
+                              "alias": "id",
+                              "args": Object {},
+                              "fieldsByTypeName": Object {},
+                              "name": "id",
+                            },
+                          },
+                        },
+                        "name": "firstPost",
+                      },
+                      "friends": Object {
+                        "alias": "friends",
+                        "args": Object {},
+                        "fieldsByTypeName": Object {
+                          "PersonConnection": Object {
+                            "nodes": Object {
+                              "alias": "nodes",
+                              "args": Object {},
+                              "fieldsByTypeName": Object {
+                                "Person": Object {
+                                  "firstName": Object {
+                                    "alias": "firstName",
+                                    "args": Object {},
+                                    "fieldsByTypeName": Object {},
+                                    "name": "firstName",
+                                  },
+                                  "id": Object {
+                                    "alias": "id",
+                                    "args": Object {},
+                                    "fieldsByTypeName": Object {},
+                                    "name": "id",
+                                  },
+                                  "name": Object {
+                                    "alias": "name",
+                                    "args": Object {},
+                                    "fieldsByTypeName": Object {},
+                                    "name": "name",
+                                  },
+                                },
+                              },
+                              "name": "nodes",
+                            },
+                            "pageInfo": Object {
+                              "alias": "pageInfo",
+                              "args": Object {},
+                              "fieldsByTypeName": Object {
+                                "PageInfo": Object {
+                                  "startCursor": Object {
+                                    "alias": "startCursor",
+                                    "args": Object {},
+                                    "fieldsByTypeName": Object {},
+                                    "name": "startCursor",
+                                  },
+                                },
+                              },
+                              "name": "pageInfo",
+                            },
+                            "totalCount": Object {
+                              "alias": "totalCount",
+                              "args": Object {},
+                              "fieldsByTypeName": Object {},
+                              "name": "totalCount",
+                            },
+                          },
+                        },
+                        "name": "friends",
+                      },
+                      "id": Object {
+                        "alias": "id",
+                        "args": Object {},
+                        "fieldsByTypeName": Object {},
+                        "name": "id",
+                      },
+                      "name": Object {
+                        "alias": "name",
+                        "args": Object {},
+                        "fieldsByTypeName": Object {},
+                        "name": "name",
+                      },
+                    },
+                  },
+                  "name": "personByAuthorId",
+                },
+                "headline": Object {
+                  "alias": "headline",
+                  "args": Object {},
+                  "fieldsByTypeName": Object {},
+                  "name": "headline",
+                },
+                "headlineTrimmed": Object {
+                  "alias": "headlineTrimmed",
+                  "args": Object {},
+                  "fieldsByTypeName": Object {},
+                  "name": "headlineTrimmed",
+                },
+                "id": Object {
+                  "alias": "id",
+                  "args": Object {},
+                  "fieldsByTypeName": Object {},
+                  "name": "id",
+                },
+              },
+            },
+            "name": "node",
+          },
+        },
+      },
+      "name": "edges",
+    },
+  },
+  "fieldsByTypeName": Object {
+    "PostsConnection": Object {
+      "edges": Object {
+        "alias": "edges",
+        "args": Object {},
+        "fieldsByTypeName": Object {
+          "PostEdge": Object {
+            "cursor": Object {
+              "alias": "cursor",
+              "args": Object {},
+              "fieldsByTypeName": Object {},
+              "name": "cursor",
+            },
+            "node": Object {
+              "alias": "node",
+              "args": Object {},
+              "fieldsByTypeName": Object {
+                "Post": Object {
+                  "author": Object {
+                    "alias": "author",
+                    "args": Object {},
+                    "fieldsByTypeName": Object {
+                      "Person": Object {
+                        "firstName": Object {
+                          "alias": "firstName",
+                          "args": Object {},
+                          "fieldsByTypeName": Object {},
+                          "name": "firstName",
+                        },
+                        "firstPost": Object {
+                          "alias": "firstPost",
+                          "args": Object {},
+                          "fieldsByTypeName": Object {
+                            "Post": Object {
+                              "author": Object {
+                                "alias": "author",
+                                "args": Object {},
+                                "fieldsByTypeName": Object {
+                                  "Person": Object {
+                                    "firstName": Object {
+                                      "alias": "firstName",
+                                      "args": Object {},
+                                      "fieldsByTypeName": Object {},
+                                      "name": "firstName",
+                                    },
+                                    "id": Object {
+                                      "alias": "id",
+                                      "args": Object {},
+                                      "fieldsByTypeName": Object {},
+                                      "name": "id",
+                                    },
+                                    "name": Object {
+                                      "alias": "name",
+                                      "args": Object {},
+                                      "fieldsByTypeName": Object {},
+                                      "name": "name",
+                                    },
+                                  },
+                                },
+                                "name": "personByAuthorId",
+                              },
+                              "headline": Object {
+                                "alias": "headline",
+                                "args": Object {},
+                                "fieldsByTypeName": Object {},
+                                "name": "headline",
+                              },
+                              "headlineTrimmed": Object {
+                                "alias": "headlineTrimmed",
+                                "args": Object {},
+                                "fieldsByTypeName": Object {},
+                                "name": "headlineTrimmed",
+                              },
+                              "id": Object {
+                                "alias": "id",
+                                "args": Object {},
+                                "fieldsByTypeName": Object {},
+                                "name": "id",
+                              },
+                            },
+                          },
+                          "name": "firstPost",
+                        },
+                        "friends": Object {
+                          "alias": "friends",
+                          "args": Object {},
+                          "fieldsByTypeName": Object {
+                            "PersonConnection": Object {
+                              "nodes": Object {
+                                "alias": "nodes",
+                                "args": Object {},
+                                "fieldsByTypeName": Object {
+                                  "Person": Object {
+                                    "firstName": Object {
+                                      "alias": "firstName",
+                                      "args": Object {},
+                                      "fieldsByTypeName": Object {},
+                                      "name": "firstName",
+                                    },
+                                    "id": Object {
+                                      "alias": "id",
+                                      "args": Object {},
+                                      "fieldsByTypeName": Object {},
+                                      "name": "id",
+                                    },
+                                    "name": Object {
+                                      "alias": "name",
+                                      "args": Object {},
+                                      "fieldsByTypeName": Object {},
+                                      "name": "name",
+                                    },
+                                  },
+                                },
+                                "name": "nodes",
+                              },
+                              "pageInfo": Object {
+                                "alias": "pageInfo",
+                                "args": Object {},
+                                "fieldsByTypeName": Object {
+                                  "PageInfo": Object {
+                                    "startCursor": Object {
+                                      "alias": "startCursor",
+                                      "args": Object {},
+                                      "fieldsByTypeName": Object {},
+                                      "name": "startCursor",
+                                    },
+                                  },
+                                },
+                                "name": "pageInfo",
+                              },
+                              "totalCount": Object {
+                                "alias": "totalCount",
+                                "args": Object {},
+                                "fieldsByTypeName": Object {},
+                                "name": "totalCount",
+                              },
+                            },
+                          },
+                          "name": "friends",
+                        },
+                        "id": Object {
+                          "alias": "id",
+                          "args": Object {},
+                          "fieldsByTypeName": Object {},
+                          "name": "id",
+                        },
+                        "name": Object {
+                          "alias": "name",
+                          "args": Object {},
+                          "fieldsByTypeName": Object {},
+                          "name": "name",
+                        },
+                      },
+                    },
+                    "name": "personByAuthorId",
+                  },
+                  "headline": Object {
+                    "alias": "headline",
+                    "args": Object {},
+                    "fieldsByTypeName": Object {},
+                    "name": "headline",
+                  },
+                  "headlineTrimmed": Object {
+                    "alias": "headlineTrimmed",
+                    "args": Object {},
+                    "fieldsByTypeName": Object {},
+                    "name": "headlineTrimmed",
+                  },
+                  "id": Object {
+                    "alias": "id",
+                    "args": Object {},
+                    "fieldsByTypeName": Object {},
+                    "name": "id",
+                  },
+                },
+              },
+              "name": "node",
+            },
+          },
+        },
+        "name": "edges",
+      },
+    },
+  },
+  "name": "allPosts",
+}
+`;
+
+exports[`directives 1`] = `
+Object {
+  "alias": "allPosts",
+  "args": Object {},
+  "fieldsByTypeName": Object {
+    "PostsConnection": Object {
+      "edges": Object {
+        "alias": "edges",
+        "args": Object {},
+        "fieldsByTypeName": Object {
+          "PostEdge": Object {
+            "node": Object {
+              "alias": "node",
+              "args": Object {},
+              "fieldsByTypeName": Object {
+                "Post": Object {
+                  "author": Object {
+                    "alias": "author",
+                    "args": Object {},
+                    "fieldsByTypeName": Object {
+                      "Person": Object {
+                        "firstPost": Object {
+                          "alias": "firstPost",
+                          "args": Object {},
+                          "fieldsByTypeName": Object {
+                            "Post": Object {
+                              "author": Object {
+                                "alias": "author",
+                                "args": Object {},
+                                "fieldsByTypeName": Object {
+                                  "Person": Object {
+                                    "id": Object {
+                                      "alias": "id",
+                                      "args": Object {},
+                                      "fieldsByTypeName": Object {},
+                                      "name": "id",
+                                    },
+                                  },
+                                },
+                                "name": "personByAuthorId",
+                              },
+                              "headline": Object {
+                                "alias": "headline",
+                                "args": Object {},
+                                "fieldsByTypeName": Object {},
+                                "name": "headline",
+                              },
+                              "id": Object {
+                                "alias": "id",
+                                "args": Object {},
+                                "fieldsByTypeName": Object {},
+                                "name": "id",
+                              },
+                            },
+                          },
+                          "name": "firstPost",
+                        },
+                        "friends": Object {
+                          "alias": "friends",
+                          "args": Object {},
+                          "fieldsByTypeName": Object {
+                            "PersonConnection": Object {
+                              "nodes": Object {
+                                "alias": "nodes",
+                                "args": Object {},
+                                "fieldsByTypeName": Object {
+                                  "Person": Object {
+                                    "id": Object {
+                                      "alias": "id",
+                                      "args": Object {},
+                                      "fieldsByTypeName": Object {},
+                                      "name": "id",
+                                    },
+                                  },
+                                },
+                                "name": "nodes",
+                              },
+                            },
+                          },
+                          "name": "friends",
+                        },
+                        "id": Object {
+                          "alias": "id",
+                          "args": Object {},
+                          "fieldsByTypeName": Object {},
+                          "name": "id",
+                        },
+                      },
+                    },
+                    "name": "personByAuthorId",
+                  },
+                  "headline": Object {
+                    "alias": "headline",
+                    "args": Object {},
+                    "fieldsByTypeName": Object {},
+                    "name": "headline",
+                  },
+                  "id": Object {
+                    "alias": "id",
+                    "args": Object {},
+                    "fieldsByTypeName": Object {},
+                    "name": "id",
+                  },
+                },
+              },
+              "name": "node",
+            },
+          },
+        },
+        "name": "edges",
+      },
+    },
+  },
+  "name": "allPosts",
+}
+`;
+
+exports[`directives 2`] = `
+Object {
+  "alias": "allPosts",
+  "args": Object {},
+  "fields": Object {
+    "edges": Object {
+      "alias": "edges",
+      "args": Object {},
+      "fieldsByTypeName": Object {
+        "PostEdge": Object {
+          "node": Object {
+            "alias": "node",
+            "args": Object {},
+            "fieldsByTypeName": Object {
+              "Post": Object {
+                "author": Object {
+                  "alias": "author",
+                  "args": Object {},
+                  "fieldsByTypeName": Object {
+                    "Person": Object {
+                      "firstPost": Object {
+                        "alias": "firstPost",
+                        "args": Object {},
+                        "fieldsByTypeName": Object {
+                          "Post": Object {
+                            "author": Object {
+                              "alias": "author",
+                              "args": Object {},
+                              "fieldsByTypeName": Object {
+                                "Person": Object {
+                                  "id": Object {
+                                    "alias": "id",
+                                    "args": Object {},
+                                    "fieldsByTypeName": Object {},
+                                    "name": "id",
+                                  },
+                                },
+                              },
+                              "name": "personByAuthorId",
+                            },
+                            "headline": Object {
+                              "alias": "headline",
+                              "args": Object {},
+                              "fieldsByTypeName": Object {},
+                              "name": "headline",
+                            },
+                            "id": Object {
+                              "alias": "id",
+                              "args": Object {},
+                              "fieldsByTypeName": Object {},
+                              "name": "id",
+                            },
+                          },
+                        },
+                        "name": "firstPost",
+                      },
+                      "friends": Object {
+                        "alias": "friends",
+                        "args": Object {},
+                        "fieldsByTypeName": Object {
+                          "PersonConnection": Object {
+                            "nodes": Object {
+                              "alias": "nodes",
+                              "args": Object {},
+                              "fieldsByTypeName": Object {
+                                "Person": Object {
+                                  "id": Object {
+                                    "alias": "id",
+                                    "args": Object {},
+                                    "fieldsByTypeName": Object {},
+                                    "name": "id",
+                                  },
+                                },
+                              },
+                              "name": "nodes",
+                            },
+                          },
+                        },
+                        "name": "friends",
+                      },
+                      "id": Object {
+                        "alias": "id",
+                        "args": Object {},
+                        "fieldsByTypeName": Object {},
+                        "name": "id",
+                      },
+                    },
+                  },
+                  "name": "personByAuthorId",
+                },
+                "headline": Object {
+                  "alias": "headline",
+                  "args": Object {},
+                  "fieldsByTypeName": Object {},
+                  "name": "headline",
+                },
+                "id": Object {
+                  "alias": "id",
+                  "args": Object {},
+                  "fieldsByTypeName": Object {},
+                  "name": "id",
+                },
+              },
+            },
+            "name": "node",
+          },
+        },
+      },
+      "name": "edges",
+    },
+  },
+  "fieldsByTypeName": Object {
+    "PostsConnection": Object {
+      "edges": Object {
+        "alias": "edges",
+        "args": Object {},
+        "fieldsByTypeName": Object {
+          "PostEdge": Object {
+            "node": Object {
+              "alias": "node",
+              "args": Object {},
+              "fieldsByTypeName": Object {
+                "Post": Object {
+                  "author": Object {
+                    "alias": "author",
+                    "args": Object {},
+                    "fieldsByTypeName": Object {
+                      "Person": Object {
+                        "firstPost": Object {
+                          "alias": "firstPost",
+                          "args": Object {},
+                          "fieldsByTypeName": Object {
+                            "Post": Object {
+                              "author": Object {
+                                "alias": "author",
+                                "args": Object {},
+                                "fieldsByTypeName": Object {
+                                  "Person": Object {
+                                    "id": Object {
+                                      "alias": "id",
+                                      "args": Object {},
+                                      "fieldsByTypeName": Object {},
+                                      "name": "id",
+                                    },
+                                  },
+                                },
+                                "name": "personByAuthorId",
+                              },
+                              "headline": Object {
+                                "alias": "headline",
+                                "args": Object {},
+                                "fieldsByTypeName": Object {},
+                                "name": "headline",
+                              },
+                              "id": Object {
+                                "alias": "id",
+                                "args": Object {},
+                                "fieldsByTypeName": Object {},
+                                "name": "id",
+                              },
+                            },
+                          },
+                          "name": "firstPost",
+                        },
+                        "friends": Object {
+                          "alias": "friends",
+                          "args": Object {},
+                          "fieldsByTypeName": Object {
+                            "PersonConnection": Object {
+                              "nodes": Object {
+                                "alias": "nodes",
+                                "args": Object {},
+                                "fieldsByTypeName": Object {
+                                  "Person": Object {
+                                    "id": Object {
+                                      "alias": "id",
+                                      "args": Object {},
+                                      "fieldsByTypeName": Object {},
+                                      "name": "id",
+                                    },
+                                  },
+                                },
+                                "name": "nodes",
+                              },
+                            },
+                          },
+                          "name": "friends",
+                        },
+                        "id": Object {
+                          "alias": "id",
+                          "args": Object {},
+                          "fieldsByTypeName": Object {},
+                          "name": "id",
+                        },
+                      },
+                    },
+                    "name": "personByAuthorId",
+                  },
+                  "headline": Object {
+                    "alias": "headline",
+                    "args": Object {},
+                    "fieldsByTypeName": Object {},
+                    "name": "headline",
+                  },
+                  "id": Object {
+                    "alias": "id",
+                    "args": Object {},
+                    "fieldsByTypeName": Object {},
+                    "name": "id",
+                  },
+                },
+              },
+              "name": "node",
+            },
+          },
+        },
+        "name": "edges",
+      },
+    },
+  },
+  "name": "allPosts",
+}
+`;

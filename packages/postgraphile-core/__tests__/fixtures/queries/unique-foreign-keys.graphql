@@ -1,0 +1,20 @@
+{
+  allCompoundKeys {
+    nodes {
+      personId1
+      personId2
+      uniqueForeignKeyByCompoundKey1AndCompoundKey2 {
+        compoundKey1
+        compoundKey2
+        compoundKeyByCompoundKey1AndCompoundKey2 {
+          personId1
+          personId2
+          uniqueForeignKeyByCompoundKey1AndCompoundKey2 {
+            compoundKey1
+            compoundKey2
+          }
+        }
+      }
+    }
+  }
+}

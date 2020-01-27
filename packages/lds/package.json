@@ -1,0 +1,52 @@
+{
+  "name": "@graphile/lds",
+  "version": "4.5.0",
+  "description": "Logical decoding server for PostgreSQL, monitors for new/edited/deleted rows and announces them to interested clients.",
+  "main": "dist/index.js",
+  "scripts": {
+    "db:init": "dropdb --if-exists lds_test && createdb lds_test && psql -X1v ON_ERROR_STOP=1 -v VERBOSITY=verbose -f __tests__/schema.sql lds_test",
+    "test": "npm run db:init && jest -i",
+    "prepack": "tsc",
+    "watch": "tsc --watch"
+  },
+  "bin": {
+    "graphile-lds": "./dist/cli.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/graphile/graphile-engine.git"
+  },
+  "keywords": [
+    "pg",
+    "Postgres",
+    "PostgreSQL",
+    "logicial",
+    "decoding",
+    "logical",
+    "replication",
+    "changes",
+    "Graphile",
+    "PostGraphile"
+  ],
+  "author": "Benjie Gillam <code@benjiegillam.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/graphile/graphile-engine/issues"
+  },
+  "homepage": "https://github.com/graphile/graphile-engine/tree/master/packages/lds#readme",
+  "dependencies": {
+    "@types/pg": "^7.4.14",
+    "@types/ws": "^6.0.1",
+    "pg": ">=6.5 <8",
+    "ws": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.12",
+    "jest": "24.9.0",
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.4.5"
+  },
+  "files": [
+    "dist"
+  ]
+}

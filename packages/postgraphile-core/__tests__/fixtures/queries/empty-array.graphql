@@ -1,0 +1,9 @@
+query {
+  allPeople(first: 1) {
+    nodes {
+      id
+      name
+      aliases
+    }
+  }
+}

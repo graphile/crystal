@@ -1,0 +1,198 @@
+mutation {
+  typeFunctionMutation(input: { id: 11 }) {
+    type {
+      ...type
+    }
+  }
+  typeFunctionListMutation(input: {}) {
+    types {
+      ...type
+    }
+  }
+  typeFunctionConnectionMutation(input: {}) {
+    types {
+      ...type
+    }
+  }
+  # Must come next to last
+  updateTypeById(
+    input: {
+      id: 11
+      typePatch: {
+        point: { x: 99, y: 77 }
+        smallint: 1
+        bigint: "1"
+        numeric: "1"
+        decimal: "1"
+        boolean: true
+        varchar: "1"
+        enum: RED
+        enumArray: [RED, GREEN, BLUE]
+        domain: 1
+        domain2: 1
+        textArray: ["Hi"]
+        json: "{\"json\":true}"
+        jsonb: "{\"jsonb\":true}"
+        numrange: {
+          start: { value: "1", inclusive: true }
+          end: { value: "7", inclusive: true }
+        }
+        daterange: {
+          start: { value: "1985-01-01", inclusive: true }
+          end: { value: "2020-01-01", inclusive: true }
+        }
+        anIntRange: {
+          start: { value: 1, inclusive: true }
+          end: { value: 2, inclusive: true }
+        }
+        timestamp: "2012-01-11"
+        timestamptz: "2012-01-01"
+        date: "2010-01-01"
+        time: "19:00:00"
+        timetz: "19:00:00"
+        interval: { minutes: 27 }
+        intervalArray: [{ minutes: 27 }]
+        money: 27
+        compoundType: { a: 1 }
+        nestedCompoundType: { a: { a: 1 } }
+      }
+    }
+  ) {
+    type {
+      ...type
+    }
+  }
+  # Must come last
+  createType(
+    input: {
+      type: {
+        point: { x: 99, y: 77 }
+        smallint: 1
+        bigint: "1"
+        numeric: "1"
+        decimal: "1"
+        boolean: true
+        varchar: "1"
+        enum: RED
+        enumArray: [RED, GREEN, BLUE]
+        domain: 1
+        domain2: 1
+        textArray: ["Hi"]
+        json: "{\"json\":true}"
+        jsonb: "{\"jsonb\":true}"
+        numrange: {
+          start: { value: "1", inclusive: true }
+          end: { value: "7", inclusive: true }
+        }
+        daterange: {
+          start: { value: "1985-01-01", inclusive: true }
+          end: { value: "2020-01-01", inclusive: true }
+        }
+        anIntRange: {
+          start: { value: 1, inclusive: true }
+          end: { value: 2, inclusive: true }
+        }
+        timestamp: "2012-01-11"
+        timestamptz: "2012-01-01"
+        date: "2010-01-01"
+        time: "19:00:00"
+        timetz: "19:00:00"
+        interval: { minutes: 27 }
+        intervalArray: [{ minutes: 27 }]
+        money: 27
+        compoundType: { a: 1 }
+        nestedCompoundType: { a: { a: 1 } }
+      }
+    }
+  ) {
+    type {
+      ...type
+    }
+  }
+}
+
+fragment compoundType on CompoundType {
+  a
+  b
+  c
+  d
+  e
+  f
+  fooBar
+}
+
+fragment type on Type {
+  smallint
+  bigint
+  boolean
+  enum
+  enumArray
+  domain
+  domain2
+  textArray
+  json
+  jsonb
+  nullableRange {
+    start {
+      value
+      inclusive
+    }
+    end {
+      value
+      inclusive
+    }
+  }
+  numrange {
+    start {
+      value
+      inclusive
+    }
+    end {
+      value
+      inclusive
+    }
+  }
+  anIntRange {
+    start {
+      value
+      inclusive
+    }
+    end {
+      value
+      inclusive
+    }
+  }
+  money
+  compoundType {
+    ...compoundType
+  }
+  nestedCompoundType {
+    a {
+      ...compoundType
+    }
+    b {
+      ...compoundType
+    }
+    bazBuz
+  }
+  nullableCompoundType {
+    ...compoundType
+  }
+  nullableNestedCompoundType {
+    a {
+      ...compoundType
+    }
+    b {
+      ...compoundType
+    }
+    bazBuz
+  }
+  point {
+    x
+    y
+  }
+  nullablePoint {
+    x
+    y
+  }
+}

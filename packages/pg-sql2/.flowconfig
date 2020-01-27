@@ -1,0 +1,8 @@
+[ignore]
+<PROJECT_ROOT>/node_modules/conventional-changelog-core/test
+
+[include]
+
+[libs]
+
+[options]

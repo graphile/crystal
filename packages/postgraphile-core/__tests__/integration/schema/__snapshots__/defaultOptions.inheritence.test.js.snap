@@ -1,0 +1,799 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`prints a schema with the default options against inheritence schema 1`] = `
+"""All input for the create \`File\` mutation."""
+input CreateFileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`File\` to be created by this mutation."""
+  file: FileInput!
+}
+
+"""The output of our create \`File\` mutation."""
+type CreateFilePayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`File\` that was created by this mutation."""
+  file: File
+
+  """An edge for our \`File\`. May be used by Relay 1."""
+  fileEdge(
+    """The method to use when ordering \`File\`."""
+    orderBy: [FilesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): FilesEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create \`UserFile\` mutation."""
+input CreateUserFileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`UserFile\` to be created by this mutation."""
+  userFile: UserFileInput!
+}
+
+"""The output of our create \`UserFile\` mutation."""
+type CreateUserFilePayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single \`User\` that is related to this \`UserFile\`."""
+  userByUserId: User
+
+  """The \`UserFile\` that was created by this mutation."""
+  userFile: UserFile
+
+  """An edge for our \`UserFile\`. May be used by Relay 1."""
+  userFileEdge(
+    """The method to use when ordering \`UserFile\`."""
+    orderBy: [UserFilesOrderBy!] = [NATURAL]
+  ): UserFilesEdge
+}
+
+"""All input for the create \`User\` mutation."""
+input CreateUserInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`User\` to be created by this mutation."""
+  user: UserInput!
+}
+
+"""The output of our create \`User\` mutation."""
+type CreateUserPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The \`User\` that was created by this mutation."""
+  user: User
+
+  """An edge for our \`User\`. May be used by Relay 1."""
+  userEdge(
+    """The method to use when ordering \`User\`."""
+    orderBy: [UsersOrderBy!] = [PRIMARY_KEY_ASC]
+  ): UsersEdge
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""All input for the \`deleteFileById\` mutation."""
+input DeleteFileByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the \`deleteFile\` mutation."""
+input DeleteFileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`File\` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete \`File\` mutation."""
+type DeleteFilePayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedFileId: ID
+
+  """The \`File\` that was deleted by this mutation."""
+  file: File
+
+  """An edge for our \`File\`. May be used by Relay 1."""
+  fileEdge(
+    """The method to use when ordering \`File\`."""
+    orderBy: [FilesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): FilesEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the \`deleteUserById\` mutation."""
+input DeleteUserByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the \`deleteUser\` mutation."""
+input DeleteUserInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`User\` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete \`User\` mutation."""
+type DeleteUserPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedUserId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The \`User\` that was deleted by this mutation."""
+  user: User
+
+  """An edge for our \`User\`. May be used by Relay 1."""
+  userEdge(
+    """The method to use when ordering \`User\`."""
+    orderBy: [UsersOrderBy!] = [PRIMARY_KEY_ASC]
+  ): UsersEdge
+}
+
+type File implements Node {
+  filename: String!
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against \`File\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input FileCondition {
+  """Checks for equality with the object’s \`filename\` field."""
+  filename: String
+
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+}
+
+"""An input for mutations affecting \`File\`"""
+input FileInput {
+  filename: String!
+  id: Int
+}
+
+"""Represents an update to a \`File\`. Fields that are set will be updated."""
+input FilePatch {
+  filename: String
+  id: Int
+}
+
+"""A connection to a list of \`File\` values."""
+type FilesConnection {
+  """
+  A list of edges which contains the \`File\` and cursor to aid in pagination.
+  """
+  edges: [FilesEdge!]!
+
+  """A list of \`File\` objects."""
+  nodes: [File]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`File\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`File\` edge in the connection."""
+type FilesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`File\` at the end of the edge."""
+  node: File
+}
+
+"""Methods to use when ordering \`File\`."""
+enum FilesOrderBy {
+  FILENAME_ASC
+  FILENAME_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  """Creates a single \`File\`."""
+  createFile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateFileInput!
+  ): CreateFilePayload
+
+  """Creates a single \`User\`."""
+  createUser(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateUserInput!
+  ): CreateUserPayload
+
+  """Creates a single \`UserFile\`."""
+  createUserFile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateUserFileInput!
+  ): CreateUserFilePayload
+
+  """Deletes a single \`File\` using its globally unique id."""
+  deleteFile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteFileInput!
+  ): DeleteFilePayload
+
+  """Deletes a single \`File\` using a unique key."""
+  deleteFileById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteFileByIdInput!
+  ): DeleteFilePayload
+
+  """Deletes a single \`User\` using its globally unique id."""
+  deleteUser(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteUserInput!
+  ): DeleteUserPayload
+
+  """Deletes a single \`User\` using a unique key."""
+  deleteUserById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteUserByIdInput!
+  ): DeleteUserPayload
+
+  """Updates a single \`File\` using its globally unique id and a patch."""
+  updateFile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateFileInput!
+  ): UpdateFilePayload
+
+  """Updates a single \`File\` using a unique key and a patch."""
+  updateFileById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateFileByIdInput!
+  ): UpdateFilePayload
+
+  """Updates a single \`User\` using its globally unique id and a patch."""
+  updateUser(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateUserInput!
+  ): UpdateUserPayload
+
+  """Updates a single \`User\` using a unique key and a patch."""
+  updateUserById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateUserByIdInput!
+  ): UpdateUserPayload
+}
+
+"""An object with a globally unique \`ID\`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query implements Node {
+  """Reads and enables pagination through a set of \`File\`."""
+  allFiles(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: FileCondition
+
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """The method to use when ordering \`File\`."""
+    orderBy: [FilesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): FilesConnection
+
+  """Reads and enables pagination through a set of \`UserFile\`."""
+  allUserFiles(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: UserFileCondition
+
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """The method to use when ordering \`UserFile\`."""
+    orderBy: [UserFilesOrderBy!] = [NATURAL]
+  ): UserFilesConnection
+
+  """Reads and enables pagination through a set of \`User\`."""
+  allUsers(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: UserCondition
+
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """The method to use when ordering \`User\`."""
+    orderBy: [UsersOrderBy!] = [PRIMARY_KEY_ASC]
+  ): UsersConnection
+
+  """Reads a single \`File\` using its globally unique \`ID\`."""
+  file(
+    """The globally unique \`ID\` to be used in selecting a single \`File\`."""
+    nodeId: ID!
+  ): File
+  fileById(id: Int!): File
+
+  """Fetches an object given its globally unique \`ID\`."""
+  node(
+    """The globally unique \`ID\`."""
+    nodeId: ID!
+  ): Node
+
+  """
+  The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
+  """
+  nodeId: ID!
+
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+
+  """Reads a single \`User\` using its globally unique \`ID\`."""
+  user(
+    """The globally unique \`ID\` to be used in selecting a single \`User\`."""
+    nodeId: ID!
+  ): User
+  userById(id: Int!): User
+}
+
+"""All input for the \`updateFileById\` mutation."""
+input UpdateFileByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the \`File\` being updated.
+  """
+  filePatch: FilePatch!
+  id: Int!
+}
+
+"""All input for the \`updateFile\` mutation."""
+input UpdateFileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the \`File\` being updated.
+  """
+  filePatch: FilePatch!
+
+  """
+  The globally unique \`ID\` which will identify a single \`File\` to be updated.
+  """
+  nodeId: ID!
+}
+
+"""The output of our update \`File\` mutation."""
+type UpdateFilePayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`File\` that was updated by this mutation."""
+  file: File
+
+  """An edge for our \`File\`. May be used by Relay 1."""
+  fileEdge(
+    """The method to use when ordering \`File\`."""
+    orderBy: [FilesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): FilesEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the \`updateUserById\` mutation."""
+input UpdateUserByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the \`User\` being updated.
+  """
+  userPatch: UserPatch!
+}
+
+"""All input for the \`updateUser\` mutation."""
+input UpdateUserInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`User\` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the \`User\` being updated.
+  """
+  userPatch: UserPatch!
+}
+
+"""The output of our update \`User\` mutation."""
+type UpdateUserPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The \`User\` that was updated by this mutation."""
+  user: User
+
+  """An edge for our \`User\`. May be used by Relay 1."""
+  userEdge(
+    """The method to use when ordering \`User\`."""
+    orderBy: [UsersOrderBy!] = [PRIMARY_KEY_ASC]
+  ): UsersEdge
+}
+
+type User implements Node {
+  id: Int!
+  name: String!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """Reads and enables pagination through a set of \`UserFile\`."""
+  userFilesByUserId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: UserFileCondition
+
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """The method to use when ordering \`UserFile\`."""
+    orderBy: [UserFilesOrderBy!] = [NATURAL]
+  ): UserFilesConnection!
+}
+
+"""
+A condition to be used against \`User\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input UserCondition {
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+
+  """Checks for equality with the object’s \`name\` field."""
+  name: String
+}
+
+type UserFile {
+  filename: String!
+  id: Int!
+
+  """Reads a single \`User\` that is related to this \`UserFile\`."""
+  userByUserId: User
+  userId: Int!
+}
+
+"""
+A condition to be used against \`UserFile\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input UserFileCondition {
+  """Checks for equality with the object’s \`filename\` field."""
+  filename: String
+
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+
+  """Checks for equality with the object’s \`userId\` field."""
+  userId: Int
+}
+
+"""An input for mutations affecting \`UserFile\`"""
+input UserFileInput {
+  filename: String!
+  id: Int
+  userId: Int!
+}
+
+"""A connection to a list of \`UserFile\` values."""
+type UserFilesConnection {
+  """
+  A list of edges which contains the \`UserFile\` and cursor to aid in pagination.
+  """
+  edges: [UserFilesEdge!]!
+
+  """A list of \`UserFile\` objects."""
+  nodes: [UserFile]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`UserFile\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`UserFile\` edge in the connection."""
+type UserFilesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`UserFile\` at the end of the edge."""
+  node: UserFile
+}
+
+"""Methods to use when ordering \`UserFile\`."""
+enum UserFilesOrderBy {
+  FILENAME_ASC
+  FILENAME_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  USER_ID_ASC
+  USER_ID_DESC
+}
+
+"""An input for mutations affecting \`User\`"""
+input UserInput {
+  id: Int
+  name: String!
+}
+
+"""Represents an update to a \`User\`. Fields that are set will be updated."""
+input UserPatch {
+  id: Int
+  name: String
+}
+
+"""A connection to a list of \`User\` values."""
+type UsersConnection {
+  """
+  A list of edges which contains the \`User\` and cursor to aid in pagination.
+  """
+  edges: [UsersEdge!]!
+
+  """A list of \`User\` objects."""
+  nodes: [User]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`User\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`User\` edge in the connection."""
+type UsersEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`User\` at the end of the edge."""
+  node: User
+}
+
+"""Methods to use when ordering \`User\`."""
+enum UsersOrderBy {
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+`;

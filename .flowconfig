@@ -1,0 +1,12 @@
+[ignore]
+<PROJECT_ROOT>/node_modules/conventional-changelog-core/test
+<PROJECT_ROOT>/packages/.*/index\.js\.flow
+<PROJECT_ROOT>/packages/.*/node8plus/.*\.flow
+<PROJECT_ROOT>/postgraphile
+<PROJECT_ROOT>/packages
+
+[include]
+
+[libs]
+
+[options]
