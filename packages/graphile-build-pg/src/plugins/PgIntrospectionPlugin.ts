@@ -20,6 +20,9 @@ const debug = debugFactory("graphile-build-pg");
 const WATCH_FIXTURES_PATH = `${__dirname}/../../res/watch-fixtures.sql`;
 
 // TODO: rename RawishIntrospectionResults
+type PgAugmentIntrospectionResultsFn = (
+  introspectionResult: RawishIntrospectionResults
+) => RawishIntrospectionResults;
 
 declare module "graphile-build" {
   interface GraphileBuildOptions {
@@ -28,9 +31,7 @@ declare module "graphile-build" {
     pgIncludeExtensionResources?: boolean;
     pgLegacyFunctionsOnly?: boolean;
     pgSkipInstallingWatchFixtures?: boolean;
-    pgAugmentIntrospectionResults?: (
-      introspectionResult: RawishIntrospectionResults
-    ) => RawishIntrospectionResults;
+    pgAugmentIntrospectionResults?: PgAugmentIntrospectionResultsFn;
     pgOwnerConnectionString?: string;
   }
 
@@ -538,6 +539,23 @@ type RawishIntrospectionResults = Pick<
   | "index"
 >;
 
+/* The argument to this must not contain cyclic references! */
+function deepClone<T>(value: T): T {
+  if (Array.isArray(value)) {
+    return value.map(val => deepClone(val)) as any;
+  } else if (typeof value === "object" && value) {
+    return Object.keys(value).reduce(
+      (memo, k) => {
+        memo[k] = deepClone(value[k]);
+        return memo;
+      },
+      {} as T
+    );
+  } else {
+    return value;
+  }
+}
+
 export default (async function PgIntrospectionPlugin(
   builder,
   {
@@ -549,37 +567,19 @@ export default (async function PgIntrospectionPlugin(
     pgIncludeExtensionResources = false,
     pgLegacyFunctionsOnly = false,
     pgSkipInstallingWatchFixtures = false,
-    pgAugmentIntrospectionResults,
     pgOwnerConnectionString,
   }
 ) {
-  const augment = (introspectionResults: RawishIntrospectionResults) => {
-    [pgAugmentIntrospectionResults, smartCommentConstraints].forEach(fn =>
-      fn ? fn(introspectionResults) : null
-    );
-  };
   /**
    * Introspect database and get the table/view/constraints.
    */
-  async function introspect(): Promise<PgIntrospectionResultsByKind> {
+  async function introspect(): Promise<RawishIntrospectionResults> {
     // Perform introspection
     if (!Array.isArray(schemas)) {
       throw new Error("Argument 'schemas' (array) is required");
     }
     const cacheKey = `PgIntrospectionPlugin-introspectionResultsByKind-v${version}`;
-    const cloneResults = <T>(obj: T): T => {
-      const result = Object.keys(obj).reduce(
-        (memo, k) => {
-          memo[k] = Array.isArray(obj[k])
-            ? obj[k].map((v: object) => ({ ...v }))
-            : obj[k];
-          return memo;
-        },
-        {} as T
-      );
-      return result;
-    };
-    const rawishIntrospectionResultsByKind = cloneResults(
+    const rawishIntrospectionResultsByKind = deepClone(
       await persistentMemoizeWithKey(
         cacheKey,
         (): Promise<RawishIntrospectionResults> =>
@@ -692,6 +692,13 @@ export default (async function PgIntrospectionPlugin(
         console.warn("⚠️ WARNING⚠️  " + errorMessage); // eslint-disable-line no-console
       }
     }
+    return rawishIntrospectionResultsByKind;
+  }
+  function introspectionResultsFromRaw(
+    rawResults: RawishIntrospectionResults,
+    pgAugmentIntrospectionResults: PgAugmentIntrospectionResultsFn
+  ): PgIntrospectionResultsByKind {
+    const rawishIntrospectionResultsByKind = deepClone(rawResults);
 
     const xByY = <X>(arrayOfX: X[], attrKey: string) =>
       arrayOfX.reduce(
@@ -766,6 +773,11 @@ export default (async function PgIntrospectionPlugin(
       });
     }
 
+    const augment = (introspectionResults: RawishIntrospectionResults) => {
+      [pgAugmentIntrospectionResults, smartCommentConstraints].forEach(fn =>
+        fn ? fn(introspectionResults) : null
+      );
+    };
     augment(introspectionResultsByKind);
 
     relate(
@@ -967,7 +979,7 @@ export default (async function PgIntrospectionPlugin(
     return introspectionResultsByKind;
   }
 
-  let introspectionResultsByKind = await introspect();
+  let rawIntrospectionResultsByKind = await introspect();
 
   let listener: Listener | null = null;
 
@@ -986,7 +998,7 @@ export default (async function PgIntrospectionPlugin(
         async () => {
           debug(`Schema change detected: re-inspecting schema...`);
           try {
-            introspectionResultsByKind = await introspect();
+            rawIntrospectionResultsByKind = await introspect();
             debug(`Schema change detected: re-inspecting schema complete`);
             triggerRebuild();
           } catch (e) {
@@ -1201,6 +1213,10 @@ export default (async function PgIntrospectionPlugin(
   builder.hook(
     "build",
     build => {
+      const introspectionResultsByKind = introspectionResultsFromRaw(
+        rawIntrospectionResultsByKind,
+        build.pgAugmentIntrospectionResults
+      );
       if (introspectionResultsByKind.__pgVersion < 90500) {
         // TODO:v5: remove this workaround
         // This is a bit of a hack, but until we have plugin priorities it's the

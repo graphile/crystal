@@ -1,9 +1,13 @@
-import { Build, Plugin } from "graphile-build";
-import { PgEntityKind, PgEntity } from "graphile-build-pg";
+import { Plugin, Build } from "graphile-build";
+import {
+  PgEntityKind,
+  PgEntity,
+  PgIntrospectionResultsByKind,
+} from "graphile-build-pg";
 import { inspect } from "util";
 import { entityIsIdentifiedBy } from "./introspectionHelpers";
 
-export type PgSmartTagFilterFunction<T> = (input: T) => boolean;
+export type PgSmartTagFilterFunction<T> = (input: T, build: Build) => boolean;
 
 export type PgSmartTagTags = {
   [tagName: string]: null | true | string | string[];
@@ -53,17 +57,17 @@ function compileRule<T extends PgEntity>(
     );
   }
 
-  const match: PgSmartTagFilterFunction<T> = obj => {
+  const match: PgSmartTagFilterFunction<T> = (obj, build) => {
     if (obj.kind !== kind) {
       return false;
     }
 
     if (typeof incomingMatch === "function") {
       // User supplied a match function; delegate to that:
-      return incomingMatch(obj);
+      return incomingMatch(obj, build);
     } else if (typeof incomingMatch === "string") {
       // It's a fully-qualified case-sensitive name of the thing.
-      return entityIsIdentifiedBy(obj, incomingMatch);
+      return entityIsIdentifiedBy(obj, incomingMatch, build);
     } else {
       throw new Error(
         "makePgSmartTagsPlugin rule 'match' is neither a string nor a function"
@@ -116,39 +120,68 @@ export function makePgSmartTagsPlugin(
       );
     }
 
-    builder.hook("build", (build: Build) => {
-      const { pgIntrospectionResultsByKind } = build;
-      rules.forEach((rule, idx) => {
-        const relevantIntrospectionResults: PgEntity[] =
-          pgIntrospectionResultsByKind[rule.kind];
+    builder.hook(
+      "build",
+      build => {
+        const oldPgAugmentIntrospectionResults =
+          build.pgAugmentIntrospectionResults;
+        build.pgAugmentIntrospectionResults = (
+          inIntrospectionResult: PgIntrospectionResultsByKind
+        ): PgIntrospectionResultsByKind => {
+          let pgIntrospectionResultsByKind = inIntrospectionResult;
+          if (oldPgAugmentIntrospectionResults) {
+            pgIntrospectionResultsByKind = oldPgAugmentIntrospectionResults(
+              pgIntrospectionResultsByKind
+            );
+          }
 
-        let hits = 0;
-        relevantIntrospectionResults.forEach(entity => {
-          if (!rule.match(entity)) {
-            return;
-          }
-          hits++;
-          if (rule.tags) {
-            // Overwrite relevant tags
-            Object.assign(entity.tags, rule.tags);
-          }
-          if (rule.description != null) {
-            // Overwrite comment if specified
-            entity.description = rule.description;
-          }
-        });
+          /**
+           * The introspection results aren't currently on Build (we're helping
+           * this happen now!), so we're going to fake it to make the API more
+           * straightforward
+           */
+          const buildWithIntrospection = {
+            ...build,
+            pgIntrospectionResultsByKind,
+          };
 
-        // Let people know if their rules don't match; it's probably a mistake.
-        if (hits === 0) {
-          console.warn(
-            `WARNING: there were no matches for makePgSmartTagsPlugin rule ${idx} - ${inspect(
-              rawRules[idx]
-            )}`
-          );
-        }
-      });
-      return build;
-    });
+          rules.forEach((rule, idx) => {
+            const relevantIntrospectionResults: PgEntity[] =
+              pgIntrospectionResultsByKind[rule.kind];
+
+            let hits = 0;
+            relevantIntrospectionResults.forEach(entity => {
+              if (!rule.match(entity, buildWithIntrospection)) {
+                return;
+              }
+              hits++;
+              if (rule.tags) {
+                // Overwrite relevant tags
+                Object.assign(entity.tags, rule.tags);
+              }
+              if (rule.description != null) {
+                // Overwrite comment if specified
+                entity.description = rule.description;
+              }
+            });
+
+            // Let people know if their rules don't match; it's probably a mistake.
+            if (hits === 0) {
+              console.warn(
+                `WARNING: there were no matches for makePgSmartTagsPlugin rule ${idx} - ${inspect(
+                  rawRules[idx]
+                )}`
+              );
+            }
+          });
+          return pgIntrospectionResultsByKind;
+        };
+        return build;
+      },
+      [],
+      ["PgIntrospection"],
+      ["PgBasics"]
+    );
   };
   return plugin;
 }

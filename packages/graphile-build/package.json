@@ -1,6 +1,6 @@
 {
   "name": "graphile-build",
-  "version": "4.6.0-alpha.0",
+  "version": "4.6.0",
   "description": "Build a GraphQL schema from plugins",
   "main": "node8plus/index.js",
   "types": "node8plus/index.d.ts",
@@ -47,7 +47,7 @@
     "@babel/cli": "^7.0.0",
     "eslint_d": "^8.0.0",
     "jest": "^24.8.0",
-    "jest-serializer-graphql-schema": "4.6.0-alpha.0"
+    "jest-serializer-graphql-schema": "4.6.0"
   },
   "peerDependencies": {
     "graphql": ">=0.9 <0.14 || ^14.0.2"

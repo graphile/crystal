@@ -1,6 +1,6 @@
 {
   "name": "@graphile/pg-pubsub",
-  "version": "4.6.0-alpha.0",
+  "version": "4.6.0",
   "description": "Subscriptions plugin for PostGraphile using PostgreSQL's LISTEN/NOTIFY",
   "main": "dist/index.js",
   "scripts": {
@@ -46,7 +46,7 @@
     "graphile-build-pg": "4.6.0-alpha.0",
     "graphql": ">=0.6 <15",
     "jest": "24.9.0",
-    "jest-serializer-graphql-schema": "4.6.0-alpha.0",
+    "jest-serializer-graphql-schema": "4.6.0",
     "mock-req": "^0.2.0",
     "mock-res": "^0.5.0",
     "pg": "^7.10.0",

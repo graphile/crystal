@@ -123,7 +123,7 @@ export default function makeAddPgTableConditionPlugin(
         }: {
           condition: { [key: string]: any } | null;
         }) {
-          if (!condition) {
+          if (!condition || !(conditionFieldName in condition)) {
             return {};
           }
           const { [conditionFieldName]: conditionValue } = condition;

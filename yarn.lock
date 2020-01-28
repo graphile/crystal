@@ -4153,6 +4153,23 @@ graphile-build-pg@4.4.5:
     pg-sql2 "4.4.5"
     postgres-interval "^1.2.0"
 
+graphile-build-pg@4.6.0-alpha.0:
+  version "4.6.0-alpha.0"
+  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.6.0-alpha.0.tgz#1ac3d40d2600d364bc9ad4a9544d66abdad806f8"
+  integrity sha512-mIgEqhcCSuNo6Q+NDZH9P6ArVM4eDS520lBDvJf0XpKEBiow/JH0zZX451xUEDxuSEEq9G95TIWeE3Q2nuLl8g==
+  dependencies:
+    "@graphile/lru" "4.6.0-alpha.0"
+    "@types/lodash" "^4.14.149"
+    "@types/pg" "^7.11.2"
+    chalk "^2.4.2"
+    debug "^4.1.1"
+    graphile-build "4.6.0-alpha.0"
+    graphql-iso-date "^3.6.0"
+    jsonwebtoken "^8.5.1"
+    lodash ">=4 <5"
+    pg-sql2 "4.6.0-alpha.0"
+    postgres-interval "^1.2.0"
+
 graphile-build@4.4.5:
   version "4.4.5"
   resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-4.4.5.tgz#264071a8d24559951b8e62c61e8023e5de99aee6"
@@ -4165,6 +4182,22 @@ graphile-build@4.4.5:
     iterall "^1.2.2"
     lodash ">=4 <5"
     lru-cache "^5.0.0"
+    pluralize "^7.0.0"
+    semver "^6.0.0"
+
+graphile-build@4.6.0-alpha.0:
+  version "4.6.0-alpha.0"
+  resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-4.6.0-alpha.0.tgz#2e41cf502a47ffa31fdef7d33b365635789d9828"
+  integrity sha512-MnJPvsRjFzizKG/2bO3gRJVbw81sLgmMhjRXUzSkGc73kjhwyjoh1ECZVIwnH1ys8Fv8PbckEg6mrarjvgtP9g==
+  dependencies:
+    "@graphile/lru" "4.6.0-alpha.0"
+    "@types/pluralize" "^0.0.29"
+    "@types/semver" "^6.2.0"
+    chalk "^2.4.2"
+    debug "^4.1.1"
+    graphql-parse-resolve-info "4.6.0-alpha.0"
+    iterall "^1.2.2"
+    lodash ">=4 <5"
     pluralize "^7.0.0"
     semver "^6.0.0"
 

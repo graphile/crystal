@@ -3,21 +3,60 @@
 We use PostGraphile's GitHub releases tab to log our changes in detail, but
 this auto-generated changelog helps us to produce that list, and it may be
 helpful to you also.
-# [](https://github.com/graphile/graphile-engine/compare/v4.6.0-alpha.0...v) (2019-12-09)
+# [](https://github.com/graphile/graphile-engine/compare/v4.6.0...v) (2020-01-27)
 
 
 
-# [4.6.0-alpha.0](https://github.com/graphile/graphile-engine/compare/v4.5.2...v4.6.0-alpha.0) (2019-12-09)
+# [4.6.0](https://github.com/graphile/graphile-engine/compare/v4.5.6...v4.6.0) (2020-01-27)
+
+
+### Features
+
+* **subscriptions:** [@pg](https://github.com/pg)Subscription now supports filter ([#596](https://github.com/graphile/graphile-engine/issues/596)) ([b197408](https://github.com/graphile/graphile-engine/commit/b197408bc80efdf5ab8c8dffbdab0d70e2c8f191))
+* selectively back-port fixes from master ([#594](https://github.com/graphile/graphile-engine/issues/594)) ([9536750](https://github.com/graphile/graphile-engine/commit/953675007d745be51a1c29d3e533636233d8aa0f)), closes [#577](https://github.com/graphile/graphile-engine/issues/577) [#582](https://github.com/graphile/graphile-engine/issues/582) [#583](https://github.com/graphile/graphile-engine/issues/583) [#590](https://github.com/graphile/graphile-engine/issues/590) [#589](https://github.com/graphile/graphile-engine/issues/589) [#565](https://github.com/graphile/graphile-engine/issues/565) [#505](https://github.com/graphile/graphile-engine/issues/505) [#591](https://github.com/graphile/graphile-engine/issues/591)
+
+
+
+## [4.5.6](https://github.com/graphile/graphile-engine/compare/v4.5.5...v4.5.6) (2019-12-13)
+
+
+### Bug Fixes
+
+* **utils:** fix smart tags regression on unqualified tables ([#587](https://github.com/graphile/graphile-engine/issues/587)) ([f56511f](https://github.com/graphile/graphile-engine/commit/f56511fcd8755611e5feed20f0a1eff28bc3cbc8))
+
+
+
+## [4.5.5](https://github.com/graphile/graphile-engine/compare/v4.5.4...v4.5.5) (2019-12-11)
+
+
+### Bug Fixes
+
+* **utils:** fix smart tags for attributes ([324f066](https://github.com/graphile/graphile-engine/commit/324f0669a2b21c2445b6e7b8bb2ecd805f5de5ad))
+
+
+
+## [4.5.4](https://github.com/graphile/graphile-engine/compare/v4.5.3...v4.5.4) (2019-12-11)
+
+
+### Bug Fixes
+
+* **utils:** to match early enough, we need build to be passed ([9aa5565](https://github.com/graphile/graphile-engine/commit/9aa556522eb8ca691bbc9d1f717c3289f6ef126c))
+
+
+
+## [4.5.3](https://github.com/graphile/graphile-engine/compare/v4.5.2...v4.5.3) (2019-12-11)
 
 
 ### Bug Fixes
 
 * **deps:** bump graphile-utils peerDependencies ([cd6b52a](https://github.com/graphile/graphile-engine/commit/cd6b52a2aa4c012fb01b59b4a489592298a5235b))
+* **smart-tags:** enable using Smart Tags with [@foreign](https://github.com/foreign)Key and [@primary](https://github.com/primary)Key ([#586](https://github.com/graphile/graphile-engine/issues/586)) ([b2d8c65](https://github.com/graphile/graphile-engine/commit/b2d8c656aec4d8b380d609e4c11c78ff157becc9))
+* **utils:** only apply condition when specified ([#572](https://github.com/graphile/graphile-engine/issues/572)) ([314fce1](https://github.com/graphile/graphile-engine/commit/314fce122995ab7f6017e6c43910a2fec4171623))
 
 
 ### Features
 
-* **types:** convert graphile-build and -pg to TypeScript ([#573](https://github.com/graphile/graphile-engine/issues/573)) ([3506d4f](https://github.com/graphile/graphile-engine/commit/3506d4f17231f7468d0fa40f34091acd5082b238))
+* **utils:** makeExtendSchemaPlugin accepts typeDef array ([#574](https://github.com/graphile/graphile-engine/issues/574)) ([82ff872](https://github.com/graphile/graphile-engine/commit/82ff8725670b512c037e04ef9426097332f976a9))
 
 
 

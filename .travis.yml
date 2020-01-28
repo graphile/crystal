@@ -27,6 +27,7 @@ before_script:
   - sudo service postgresql restart
   - git clone https://github.com/eulerto/wal2json.git
   - sudo bash -c "cd wal2json && USE_PGXS=1 make && USE_PGXS=1 make install"
+  - createdb graphileengine_test
 
 script:
   - scripts/ci
