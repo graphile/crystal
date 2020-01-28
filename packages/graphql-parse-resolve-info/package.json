@@ -1,0 +1,54 @@
+{
+  "name": "graphql-parse-resolve-info",
+  "version": "4.6.0-alpha.0",
+  "description": "Parse GraphQLResolveInfo (the 4th argument of resolve) into a simple tree",
+  "main": "index.js",
+  "types": "node8plus/index.d.ts",
+  "scripts": {
+    "test": "jest",
+    "prepack": "tsc -b && tsc --target ES2019 --lib ES2018 --outDir dist-turbo --declarationDir dist-turbo"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/graphile/graphile-build.git"
+  },
+  "keywords": [
+    "graphile",
+    "graphql",
+    "engine",
+    "resolveinfo",
+    "graphqljs",
+    "graphql-js",
+    "graphqlresolveinfo"
+  ],
+  "author": "Benjie Gillam <code@benjiegillam.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/graphile/graphile-build/issues"
+  },
+  "homepage": "https://github.com/graphile/graphile-build/tree/master/packages/graphql-parse-resolve-info",
+  "peerDependencies": {
+    "graphql": ">=0.9 <0.14 || ^14.0.2"
+  },
+  "devDependencies": {
+    "@types/debug": "^4.1.4",
+    "@types/jest": "^24.0.12",
+    "@types/node": "^12.0.0",
+    "eslint_d": "^8.0.0",
+    "jest": "^24.8.0",
+    "ts-jest": "^24.0.2",
+    "ts-node": "^8.1.0",
+    "typescript": "^3.7.2"
+  },
+  "dependencies": {
+    "debug": "^4.1.1"
+  },
+  "files": [
+    "node8plus",
+    "index.js",
+    "dist-turbo"
+  ],
+  "engines": {
+    "node": ">=8.6"
+  }
+}

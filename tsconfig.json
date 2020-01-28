@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "allowJs": false,
+    "target": "es2017",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "pretty": true,
+    "importHelpers": true,
+    "experimentalDecorators": true,
+    "noImplicitAny": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "strictNullChecks": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "preserveWatchOutput": true,
+    "lib": ["es2018", "esnext.asynciterable"],
+    "noEmit": true
+  },
+  "exclude": ["node_modules", "node8plus", "dist-turbo"],
+  "include": ["packages"],
+  "references": [
+    { "path": "packages/graphile-build" },
+    { "path": "packages/graphile-build-pg" },
+    { "path": "packages/graphile-utils" },
+    { "path": "packages/graphql-parse-resolve-info" },
+    { "path": "packages/jest-serializer-graphql-schema" },
+    { "path": "packages/lds" },
+    { "path": "packages/lru" },
+    { "path": "packages/pg-pubsub" },
+    { "path": "packages/pg-sql2" },
+    { "path": "packages/postgraphile-core" },
+    { "path": "packages/subscriptions-lds" }
+  ]
+}

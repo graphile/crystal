@@ -1,0 +1,5 @@
+examples
+yarn.lock
+__tests__
+scripts
+.npmignore

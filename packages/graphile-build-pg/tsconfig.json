@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "declarationDir": "./node8plus",
+    "outDir": "./node8plus",
+    "noEmit": false
+  },
+  "include": ["src/**/*"],
+  "references": [
+    { "path": "../graphile-build" },
+    { "path": "../lru" },
+    { "path": "../jest-serializer-graphql-schema" },
+    { "path": "../pg-sql2" }
+  ]
+}

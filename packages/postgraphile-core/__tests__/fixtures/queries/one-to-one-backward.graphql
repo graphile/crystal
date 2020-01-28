@@ -1,0 +1,33 @@
+{
+  allPeople {
+    edges {
+      cursor
+      node {
+        ...PersonDetails
+        leftArm: leftArmByPersonId {
+          nodeId
+          id
+          personId
+          personByPersonId {
+            ...PersonDetails
+          }
+          lengthInMetres
+        }
+        secret: personSecretByPersonId {
+          nodeId
+          personId
+          personByPersonId {
+            ...PersonDetails
+          }
+          secret
+        }
+      }
+    }
+  }
+}
+
+fragment PersonDetails on Person {
+  id
+  name
+  firstName
+}

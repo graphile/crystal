@@ -1,0 +1,47 @@
+{
+  "name": "postgraphile-core",
+  "version": "4.6.0",
+  "description": "",
+  "main": "node8plus/index.js",
+  "scripts": {
+    "test": "scripts/test",
+    "prepack": "tsc -b"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/graphile/graphile-build.git"
+  },
+  "author": "Benjie Gillam <code@benjiegillam.com>",
+  "homepage": "https://github.com/graphile/graphile-build/tree/master/packages/postgraphile-core",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/graphile/graphile-build/issues"
+  },
+  "dependencies": {
+    "graphile-build": "4.6.0",
+    "graphile-build-pg": "4.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^12.0.0",
+    "@types/pg": "^7.4.14",
+    "debug": "^4.1.1",
+    "jest": "^24.8.0",
+    "jest-serializer-graphql-schema": "4.6.0",
+    "jest-silent-reporter": "^0.1.2",
+    "jsonwebtoken": "^8.5.1",
+    "pg-connection-string": "^2.1.0",
+    "ts-node": "^8.1.0",
+    "typescript": "^3.7.2"
+  },
+  "peerDependencies": {
+    "graphql": ">=0.9 <0.14 || ^14.0.2",
+    "pg": ">=6.1.0 <8"
+  },
+  "files": [
+    "node8plus",
+    "index.js"
+  ],
+  "engines": {
+    "node": ">=8.6"
+  }
+}
