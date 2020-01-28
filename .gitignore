@@ -8,3 +8,4 @@ node_modules
 yarn-error.log
 tsconfig.tsbuildinfo
 .env
+_LOCAL

@@ -5,9 +5,15 @@ import {
   PgAttribute,
   PgEntity,
   PgProc,
+  RawishIntrospectionResults,
 } from "graphile-build-pg";
 import parseIdentifierParts from "./parseIdentifierParts";
-import { Build } from "graphile-build";
+import { Build, BuildBase } from "graphile-build";
+
+export type BuildWithIntrospection = BuildBase &
+  Omit<Partial<Build>, "pgIntrospectionResultsByKind"> & {
+    pgIntrospectionResultsByKind: RawishIntrospectionResults;
+  };
 
 export function isAttribute(obj: PgEntity): obj is PgAttribute {
   return obj.kind === PgEntityKind.ATTRIBUTE;
@@ -28,7 +34,7 @@ export function isProcedure(obj: PgEntity): obj is PgProc {
 export function entityIsIdentifiedBy(
   obj: PgEntity,
   identifier: string,
-  build: Build
+  build: BuildWithIntrospection
 ): boolean {
   const parts = parseIdentifierParts(identifier);
   if (parts.length === 1) {

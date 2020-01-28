@@ -135,6 +135,8 @@ export {
   PgIntrospectionResultsByKind,
   PgEntity,
   PgEntityKind,
+  PgAugmentIntrospectionResultsFn,
+  RawishIntrospectionResults,
 } from "./plugins/PgIntrospectionPlugin";
 
 import QueryBuilder from "./QueryBuilder";

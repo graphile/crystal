@@ -20,7 +20,7 @@ const debug = debugFactory("graphile-build-pg");
 const WATCH_FIXTURES_PATH = `${__dirname}/../../res/watch-fixtures.sql`;
 
 // TODO: rename RawishIntrospectionResults
-type PgAugmentIntrospectionResultsFn = (
+export type PgAugmentIntrospectionResultsFn = (
   introspectionResult: RawishIntrospectionResults
 ) => RawishIntrospectionResults;
 
@@ -37,6 +37,7 @@ declare module "graphile-build" {
 
   interface Build {
     pgIntrospectionResultsByKind: PgIntrospectionResultsByKind;
+    pgAugmentIntrospectionResults?: PgAugmentIntrospectionResultsFn;
   }
 }
 
@@ -526,7 +527,7 @@ function smartCommentConstraints(
   });
 }
 
-type RawishIntrospectionResults = Pick<
+export type RawishIntrospectionResults = Pick<
   PgIntrospectionResultsByKind,
   | "__pgVersion"
   | "namespace"
@@ -696,7 +697,7 @@ export default (async function PgIntrospectionPlugin(
   }
   function introspectionResultsFromRaw(
     rawResults: RawishIntrospectionResults,
-    pgAugmentIntrospectionResults: PgAugmentIntrospectionResultsFn
+    pgAugmentIntrospectionResults?: PgAugmentIntrospectionResultsFn
   ): PgIntrospectionResultsByKind {
     const rawishIntrospectionResultsByKind = deepClone(rawResults);
 

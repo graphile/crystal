@@ -1,13 +1,19 @@
-import { Plugin, Build } from "graphile-build";
+import { Plugin } from "graphile-build";
 import {
   PgEntityKind,
   PgEntity,
-  PgIntrospectionResultsByKind,
+  PgAugmentIntrospectionResultsFn,
 } from "graphile-build-pg";
 import { inspect } from "util";
-import { entityIsIdentifiedBy } from "./introspectionHelpers";
+import {
+  entityIsIdentifiedBy,
+  BuildWithIntrospection,
+} from "./introspectionHelpers";
 
-export type PgSmartTagFilterFunction<T> = (input: T, build: Build) => boolean;
+export type PgSmartTagFilterFunction<T> = (
+  input: T,
+  build: BuildWithIntrospection
+) => boolean;
 
 export type PgSmartTagTags = {
   [tagName: string]: null | true | string | string[];
@@ -125,9 +131,7 @@ export function makePgSmartTagsPlugin(
       build => {
         const oldPgAugmentIntrospectionResults =
           build.pgAugmentIntrospectionResults;
-        build.pgAugmentIntrospectionResults = (
-          inIntrospectionResult: PgIntrospectionResultsByKind
-        ): PgIntrospectionResultsByKind => {
+        const newPgAugmentIntrospectionResults: PgAugmentIntrospectionResultsFn = inIntrospectionResult => {
           let pgIntrospectionResultsByKind = inIntrospectionResult;
           if (oldPgAugmentIntrospectionResults) {
             pgIntrospectionResultsByKind = oldPgAugmentIntrospectionResults(
@@ -140,7 +144,7 @@ export function makePgSmartTagsPlugin(
            * this happen now!), so we're going to fake it to make the API more
            * straightforward
            */
-          const buildWithIntrospection = {
+          const buildWithIntrospection: BuildWithIntrospection = {
             ...build,
             pgIntrospectionResultsByKind,
           };
@@ -176,6 +180,7 @@ export function makePgSmartTagsPlugin(
           });
           return pgIntrospectionResultsByKind;
         };
+        build.pgAugmentIntrospectionResults = newPgAugmentIntrospectionResults;
         return build;
       },
       [],
