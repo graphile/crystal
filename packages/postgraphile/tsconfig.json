@@ -1,25 +1,17 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "declaration": true,
-    "declarationDir": "./build",
-    "allowJs": false,
     "rootDir": "src",
-    "outDir": "build",
-    "target": "es2017",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "inlineSourceMap": true,
-    "pretty": true,
-    "importHelpers": true,
-    "experimentalDecorators": true,
-    "noImplicitAny": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "strictNullChecks": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUnusedParameters": true,
-    "noUnusedLocals": true,
-    "lib": ["es2017", "esnext.asynciterable"]
+    "declarationDir": "./build",
+    "outDir": "./build",
+    "noEmit": false
   },
+  "include": ["src/**/*"],
+  "references": [
+    { "path": "../graphile-utils" },
+    { "path": "../lru" },
+    { "path": "../postgraphile-core" }
+  ],
   "exclude": [
     "index.js",
     "plugins.d.ts",

@@ -31,9 +31,10 @@
     { "path": "packages/jest-serializer-graphql-schema" },
     { "path": "packages/lds" },
     { "path": "packages/lru" },
-    { "path": "packages/pg-pubsub" },
     { "path": "packages/pg-sql2" },
     { "path": "packages/postgraphile-core" },
-    { "path": "packages/subscriptions-lds" }
+    { "path": "packages/postgraphile" },
+    { "path": "packages/subscriptions-lds" },
+    { "path": "packages/pg-pubsub" }
   ]
 }

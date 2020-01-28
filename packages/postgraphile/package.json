@@ -33,7 +33,8 @@
     "postgraphile": "cli.js"
   },
   "scripts": {
-    "build": "./scripts/build",
+    "prebuild": "rm -rf build && mkdir build && scripts/make-assets",
+    "build": "tsc -b",
     "dev": "./scripts/dev",
     "lint": "eslint --ext .ts,.js .",
     "lint:fix": "yarn run lint --fix",
@@ -42,7 +43,8 @@
     "prettier:fix": "yarn prettier --write",
     "prettier:check": "yarn prettier --list-different",
     "test": "./scripts/test",
-    "prepack": "./scripts/build",
+    "prepack": "yarn build",
+    "preprepack": "yarn prebuild",
     "changelog": "(cat scripts/CHANGELOG_HEADER.md; npx conventional-changelog -p angular --release-count 0) > CHANGELOG.md",
     "version": "yarn run changelog && git add CHANGELOG.md"
   },
@@ -121,11 +123,19 @@
     "transform": {
       ".*": "<rootDir>/resources/jest-preprocessor.js"
     },
-    "moduleFileExtensions": ["ts", "js", "json"],
-    "setupFiles": ["<rootDir>/resources/jest-setup.js"],
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json"
+    ],
+    "setupFiles": [
+      "<rootDir>/resources/jest-setup.js"
+    ],
     "browser": false,
     "testEnvironment": "node",
-    "roots": ["<rootDir>/src"],
+    "roots": [
+      "<rootDir>/src"
+    ],
     "testRegex": "/__tests__/[^.]+-test.(t|j)s$"
   },
   "files": [

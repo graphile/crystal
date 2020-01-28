@@ -37,7 +37,7 @@
     "jest": "^24.8.0",
     "lerna": "^3.18.4",
     "pg": "^7.10.0",
-    "postgraphile": "^4.4.4",
+    "postgraphile": "4.6.0",
     "prettier": "^1.18.2",
     "typescript": "^3.7.2"
   },

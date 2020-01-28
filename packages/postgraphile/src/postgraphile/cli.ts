@@ -22,7 +22,9 @@ import cluster = require('cluster');
 import { makePluginHook, PostGraphilePlugin } from './pluginHook';
 import debugFactory = require('debug');
 import { mixed } from '../interfaces';
+// @ts-ignore
 import * as manifest from '../../package.json';
+// @ts-ignore
 import sponsors = require('../../sponsors.json');
 import { enhanceHttpServerWithSubscriptions } from './http/subscriptions';
 import { existsSync } from 'fs';
@@ -539,7 +541,7 @@ const coerce = (o: ReturnType<typeof parsePgConnectionString>): PoolConfig => {
     user: typeof o.user === 'string' ? o.user : undefined,
     database: typeof o.database === 'string' ? o.database : undefined,
     password: typeof o.password === 'string' ? o.password : undefined,
-    port: o.port || typeof o.port === 'number' ? o.port : undefined,
+    port: o.port || typeof o.port === 'number' ? parseInt(o.port, 10) : undefined,
     host: typeof o.host === 'string' ? o.host : undefined,
   };
 };

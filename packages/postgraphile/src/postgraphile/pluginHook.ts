@@ -2,6 +2,7 @@ import { AddFlagFn } from './cli';
 import { Server, IncomingMessage } from 'http';
 import { HttpRequestHandler, PostGraphileOptions } from '../interfaces';
 import { WithPostGraphileContextFn } from './withPostGraphileContext';
+// @ts-ignore
 import { version } from '../../package.json';
 import * as graphql from 'graphql';
 import { ExecutionParams } from 'subscriptions-transport-ws';
