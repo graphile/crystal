@@ -38,6 +38,7 @@ export default function withPgClient<T>(
     }
 
     // Mock the query function.
+    // @ts-ignore
     client.query = jest.fn(client.query);
 
     // Try to run our test, if it fails we still want to cleanup the client.

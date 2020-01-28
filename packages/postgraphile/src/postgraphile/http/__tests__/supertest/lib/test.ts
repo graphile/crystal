@@ -1,4 +1,3 @@
-// tslint:disable
 /**
  * Module dependencies.
  */
@@ -8,24 +7,38 @@ import * as util from 'util';
 import * as http from 'http';
 import * as https from 'https';
 import * as assert from 'assert';
+import { AddressInfo } from 'net';
 
 // @ts-ignore
 const Request: any = request.Request;
 
 /**
+ * Return an `Error` with `msg` and results properties.
+ */
+
+type CustomError = Error & {
+  expected: any;
+  actual: any;
+  showDiff: boolean;
+};
+
+function error(msg: string, expected: any, actual: any): CustomError {
+  return Object.assign(new Error(msg), {
+    expected,
+    actual,
+    showDiff: true,
+  });
+}
+
+/**
  * Initialize a new `Test` with the given `app`,
  * request `method` and `path`.
- *
- * @param {Server} app
- * @param {String} method
- * @param {String} path
- * @api public
  */
 
 class Test extends Request {
-  constructor(app: any, method: any, path: any, host?: any) {
+  constructor(app: http.Server, method: string, path: string, host?: string) {
     super(method.toUpperCase(), path);
-    this._enableHttp2 = app._http2;
+    this._enableHttp2 = app['_http2'];
     this.redirects(0);
     this.buffer();
     this.app = app;
@@ -37,13 +50,13 @@ class Test extends Request {
     const donePromise = new Promise(resolve => {
       this.completeCallback = resolve;
     });
-    let promise;
-    this.then = (cb, ecb) => {
-      if (!promise)
+    let promise: Promise<any> | null = null;
+    this.then = (cb: any, ecb: any) => {
+      if (!promise) {
         promise = oldThen.call(
           this,
           () => donePromise,
-          e => {
+          (e: any) => {
             if (this.expectedStatus >= 400 && e.status === this.expectedStatus) {
               return donePromise;
             } else {
@@ -52,25 +65,21 @@ class Test extends Request {
             }
           },
         );
-      return promise.then(cb, ecb);
+      }
+      return promise!.then(cb, ecb);
     };
   }
   /**
    * Returns a URL, extracted from a server.
-   *
-   * @param {Server} app
-   * @param {String} path
-   * @returns {String} URL address
-   * @api private
    */
 
-  serverAddress(app: any, path: any, host: any) {
+  serverAddress(app: http.Server, path: string, host?: string): string {
     let addr = app.address();
     let port;
     let protocol;
 
     if (!addr) this._server = app.listen(0);
-    port = app.address().port;
+    port = (app.address() as AddressInfo).port;
     protocol = app instanceof https.Server ? 'https' : 'http';
     return protocol + '://' + (host || '127.0.0.1') + ':' + port + path;
   }
@@ -86,9 +95,6 @@ class Test extends Request {
    *   .expect('Content-Type', 'application/json')
    *   .expect('Content-Type', 'application/json', fn)
    *   .expect(fn)
-   *
-   * @return {Test}
-   * @api public
    */
 
   expect(a: any, b: any, c: any) {
@@ -126,12 +132,9 @@ class Test extends Request {
   /**
    * Defer invoking superagent's `.end()` until
    * the server is listening.
-   *
-   * @param {Function} fn
-   * @api public
    */
 
-  end(fn: any) {
+  end(fn: Function) {
     let server = this._server;
     let end = Request.prototype.end;
 
@@ -150,14 +153,9 @@ class Test extends Request {
 
   /**
    * Perform assertions and invoke `fn(err, res)`.
-   *
-   * @param {?Error} resError
-   * @param {Response} res
-   * @param {Function} fn
-   * @api private
    */
 
-  assert(resError: any, res: any, fn: any) {
+  assert(resError: Error | null, res: request.Response, fn: Function) {
     this.completeCallback(res);
     let error;
     let i;
@@ -200,14 +198,9 @@ class Test extends Request {
 
   /**
    * Perform assertions on a response body and return an Error upon failure.
-   *
-   * @param {Mixed} body
-   * @param {Response} res
-   * @return {?Error}
-   * @api private
    */
 
-  _assertBody(body: any, res: any) {
+  _assertBody(body: any, res: request.Response): Error | null {
     let isregexp = body instanceof RegExp;
     let a;
     let b;
@@ -235,18 +228,17 @@ class Test extends Request {
         return error('expected ' + a + ' response body, got ' + b, body, res.body);
       }
     }
+    return null;
   }
 
   /**
    * Perform assertions on a response header and return an Error upon failure.
-   *
-   * @param {Object} header
-   * @param {Response} res
-   * @return {?Error}
-   * @api private
    */
 
-  _assertHeader(header: any, res: any) {
+  _assertHeader(
+    header: { name: string; value: string | RegExp },
+    res: request.Response,
+  ): Error | null {
     let field = header.name;
     let actual = res.header[field.toLowerCase()];
     let fieldExpected = header.value;
@@ -257,9 +249,8 @@ class Test extends Request {
       (Array.isArray(actual) && actual.toString() === fieldExpected) ||
       fieldExpected === actual
     ) {
-      return;
-    }
-    if (fieldExpected instanceof RegExp) {
+      return null;
+    } else if (fieldExpected instanceof RegExp) {
       if (!fieldExpected.test(actual)) {
         return new Error(
           'expected "' + field + '" matching ' + fieldExpected + ', got "' + actual + '"',
@@ -268,18 +259,14 @@ class Test extends Request {
     } else {
       return new Error('expected "' + field + '" of "' + fieldExpected + '", got "' + actual + '"');
     }
+    return null;
   }
 
   /**
    * Perform assertions on the response status and return an Error upon failure.
-   *
-   * @param {Number} status
-   * @param {Response} res
-   * @return {?Error}
-   * @api private
    */
 
-  _assertStatus(status: any, res: any) {
+  _assertStatus(status: number, res: request.Response): Error | null {
     let a;
     let b;
     if (res.status !== status) {
@@ -287,43 +274,20 @@ class Test extends Request {
       b = http.STATUS_CODES[res.status];
       return new Error('expected ' + status + ' "' + a + '", got ' + res.status + ' "' + b + '"');
     }
+    return null;
   }
 
   /**
    * Performs an assertion by calling a function and return an Error upon failure.
-   *
-   * @param {Function} fn
-   * @param {Response} res
-   * @return {?Error}
-   * @api private
    */
-  _assertFunction(fn: any, res: any) {
-    let err;
+  _assertFunction(fn: Function, res: request.Response): Error | null {
+    let err: Error | null = null;
     try {
       err = fn(res);
     } catch (e) {
       err = e;
     }
-    if (err instanceof Error) return err;
+    return err instanceof Error ? err : null;
   }
 }
-
-/**
- * Return an `Error` with `msg` and results properties.
- *
- * @param {String} msg
- * @param {Mixed} expected
- * @param {Mixed} actual
- * @return {Error}
- * @api private
- */
-
-function error(msg: any, expected: any, actual: any) {
-  let err: any = new Error(msg);
-  err.expected = expected;
-  err.actual = actual;
-  err.showDiff = true;
-  return err;
-}
-
 export default Test;
