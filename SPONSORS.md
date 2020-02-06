@@ -8,7 +8,6 @@ sponsor](https://graphile.org/sponsor/).
 
 - Chad Furman
 - Storyscript
-- Point 72 Ventures
 
 ## Leaders
 
@@ -16,16 +15,18 @@ sponsor](https://graphile.org/sponsor/).
 - DOMONDA
 - Stagency
 - James Allain
+- Robert Claypool
 - 8th Light
 - Jack Dinker
 - Nigel Taylor
 - OpenLaw NZ
+- DocIQ
+- Principia Mentis
 - Partners in School Innovation
 - Sterblue
 - HR-ON
-- DocIQ
 - Ian Stewart
-- Principia Mentis
+- Janakan Arulkumarasan
 
 ## Supporters
 
@@ -36,15 +37,14 @@ sponsor](https://graphile.org/sponsor/).
 - Michel Pelletier
 - Chris Watland
 - James Rascoe
-- Dan Lynch
 - Mark Lipscombe
 - purge
-- Robert Claypool
 - Frank
 - Mark Rapoza
 - innovation.rocks
 - cybere
-- dwwoelfel
+- Daniel Woelfel
 - Bjørn Michelsen
 - CJ
 - Ben Botwin
+- Cameron Ellis
