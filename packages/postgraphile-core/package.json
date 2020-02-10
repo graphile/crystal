@@ -30,7 +30,7 @@
     "jest-silent-reporter": "^0.1.2",
     "jsonwebtoken": "^8.5.1",
     "pg-connection-string": "^2.1.0",
-    "ts-node": "^8.1.0",
+    "ts-node": "^8.6.2",
     "typescript": "^3.7.2"
   },
   "peerDependencies": {

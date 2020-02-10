@@ -40,7 +40,7 @@
     "graphile-build-pg": "4.6.0",
     "jest": "^24.8.0",
     "jest-serializer-graphql-schema": "4.6.0",
-    "ts-node": "^8.1.0",
+    "ts-node": "^8.6.2",
     "typescript": "^3.7.2"
   },
   "peerDependencies": {

@@ -51,7 +51,7 @@
     "mock-res": "^0.5.0",
     "pg": "^7.10.0",
     "postgraphile": "4.6.0",
-    "ts-jest": "^24.1.0",
+    "ts-jest": "^25.2.0",
     "typescript": "^3.7.2"
   },
   "files": [

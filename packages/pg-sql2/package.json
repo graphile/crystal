@@ -37,8 +37,8 @@
     "@types/node": "12.7.5",
     "jest": "24.9.0",
     "markdown-doctest": "^1.0.0",
-    "ts-jest": "24.1.0",
-    "ts-node": "8.4.1",
+    "ts-jest": "25.2.0",
+    "ts-node": "8.6.2",
     "typescript": "^3.7.2"
   },
   "peerDependencies": {
