@@ -6,8 +6,8 @@
 ![MIT license](https://img.shields.io/npm/l/graphile-utils.svg)
 [![Follow](https://img.shields.io/badge/twitter-@GraphileHQ-blue.svg)](https://twitter.com/GraphileHQ)
 
-This package contains helpers for building plugins for GraphQL schemas
-utilising Graphile Engine, such as the one produced by
+This package contains helpers for building plugins for GraphQL schemas utilising
+Graphile Engine, such as the one produced by
 [PostGraphile](https://graphile.org/postgraphile).
 
 Documentation is currently available
@@ -19,9 +19,9 @@ PRs to improve documentation are always welcome!
 
 ## Crowd-funded open-source software
 
-To help us develop this software sustainably under the MIT license, we ask
-all individuals and businesses that use it to help support its ongoing
-maintenance and development via sponsorship.
+To help us develop this software sustainably under the MIT license, we ask all
+individuals and businesses that use it to help support its ongoing maintenance
+and development via sponsorship.
 
 ### [Click here to find out more about sponsors and sponsorship.](https://www.graphile.org/sponsor/)
 
@@ -38,10 +38,10 @@ And please give some love to our featured sponsors 🤩:
 ### `gql`
 
 Similar to the default export from `graphql-tag`, this export can be used to
-form tagged template literals that are useful when building schema
-extensions. `gql` in `graphile-utils` differs from `graphql-tag` in a number
-of ways, most notably: it can use interpolation to generate dynamically named
-fields and types, and it can embed raw values using the `embed` helper.
+form tagged template literals that are useful when building schema extensions.
+`gql` in `graphile-utils` differs from `graphql-tag` in a number of ways, most
+notably: it can use interpolation to generate dynamically named fields and
+types, and it can embed raw values using the `embed` helper.
 
 ### `embed`
 
@@ -52,8 +52,8 @@ directives.
 
 Docs: https://www.graphile.org/postgraphile/make-extend-schema-plugin/
 
-Enables you to add additonal types or extend existing types within your
-Graphile Engine GraphQL schema.
+Enables you to add additonal types or extend existing types within your Graphile
+Engine GraphQL schema.
 
 ```js
 const {
@@ -128,6 +128,6 @@ augment it with a third party library (e.g. graphql-shield), etc.
 
 Docs: https://www.graphile.org/postgraphile/make-wrap-resolvers-plugin/
 
-Enables you to wrap the field resolvers in the generated GraphQL API,
-allowing you to take an action before or after the resolver, or even modify
-the resolver result.
+Enables you to wrap the field resolvers in the generated GraphQL API, allowing
+you to take an action before or after the resolver, or even modify the resolver
+result.

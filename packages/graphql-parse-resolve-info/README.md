@@ -20,9 +20,9 @@ Also provides a quick way to get the alias of the current field being resolved.
 
 ## Crowd-funded open-source software
 
-To help us develop this software sustainably under the MIT license, we ask
-all individuals and businesses that use it to help support its ongoing
-maintenance and development via sponsorship.
+To help us develop this software sustainably under the MIT license, we ask all
+individuals and businesses that use it to help support its ongoing maintenance
+and development via sponsorship.
 
 ### [Click here to find out more about sponsors and sponsorship.](https://www.graphile.org/sponsor/)
 
@@ -46,21 +46,25 @@ Gets the tree of subfields of the current field that is being requested,
 returning the following properties (recursively):
 
 - `name`: the name of the GraphQL field
-- `alias`: the alias this GraphQL field has been requested as, or if no alias was specified then the `name`
-- `args`: the arguments this field was called with; at the root level this
-  will be equivalent to the `args` that the `resolve(data, args, context, resolveInfo) {}` method receives, at deeper levels this allows you to get the
-  `args` for the nested fields without waiting for their resolvers to be called.
+- `alias`: the alias this GraphQL field has been requested as, or if no alias
+  was specified then the `name`
+- `args`: the arguments this field was called with; at the root level this will
+  be equivalent to the `args` that the
+  `resolve(data, args, context, resolveInfo) {}` method receives, at deeper
+  levels this allows you to get the `args` for the nested fields without waiting
+  for their resolvers to be called.
 - `fieldsByTypeName`: an object keyed by GraphQL object type names, where the
   values are another object keyed by the aliases of the fields requested with
-  values of the same format as the root level (i.e. `{alias, name, args, fieldsByTypeName}`); see below for an example
+  values of the same format as the root level (i.e.
+  `{alias, name, args, fieldsByTypeName}`); see below for an example
 
 Note that because GraphQL supports interfaces a resolver may return items of
 different types. For this reason, we key the fields by the GraphQL type name of
 the various fragments that were requested into the `fieldsByTypeName` field.
 
 Once you know which specific type the result is going to be, you can then use
-this type (and its interfaces) to determine which sub-fields were requested -
-we provide a `simplifyParsedResolveInfoFragmentWithType` helper to aid you with
+this type (and its interfaces) to determine which sub-fields were requested - we
+provide a `simplifyParsedResolveInfoFragmentWithType` helper to aid you with
 this. In many cases you will know what type the result will be (because it can
 only be one type) so you will probably use this helper heavily.
 
@@ -369,4 +373,6 @@ single-level object containing only the fields compatible with
 
 ## Thanks
 
-This project was originally based on https://github.com/tjmehta/graphql-parse-fields, but has evolved a lot since then.
+This project was originally based on
+https://github.com/tjmehta/graphql-parse-fields, but has evolved a lot since
+then.

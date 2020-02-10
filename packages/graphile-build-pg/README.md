@@ -6,17 +6,17 @@
 ![MIT license](https://img.shields.io/npm/l/graphile-build-pg.svg)
 [![Follow](https://img.shields.io/badge/twitter-@GraphileHQ-blue.svg)](https://twitter.com/GraphileHQ)
 
-`graphile-build-pg` is a collection of Graphile Engine plugins that allow you
-to extend your GraphQL schema with high-performance types and fields based on
+`graphile-build-pg` is a collection of Graphile Engine plugins that allow you to
+extend your GraphQL schema with high-performance types and fields based on
 resources found in your PostgreSQL database schema.
 
 <!-- SPONSORS_BEGIN -->
 
 ## Crowd-funded open-source software
 
-To help us develop this software sustainably under the MIT license, we ask
-all individuals and businesses that use it to help support its ongoing
-maintenance and development via sponsorship.
+To help us develop this software sustainably under the MIT license, we ask all
+individuals and businesses that use it to help support its ongoing maintenance
+and development via sponsorship.
 
 ### [Click here to find out more about sponsors and sponsorship.](https://www.graphile.org/sponsor/)
 
@@ -32,25 +32,25 @@ And please give some love to our featured sponsors 🤩:
 
 ## About
 
-Thanks to Graphile Engine's advanced [query
-look-ahead](https://www.graphile.org/graphile-build/look-ahead/) features,
-the plugins in this package do not exhibit the N+1 query problem common in
-many database-based GraphQL APIs. For all but the flattest GraphQL queries
-these plugins typically outperform `DataLoader`-based solutions.
+Thanks to Graphile Engine's advanced
+[query look-ahead](https://www.graphile.org/graphile-build/look-ahead/)
+features, the plugins in this package do not exhibit the N+1 query problem
+common in many database-based GraphQL APIs. For all but the flattest GraphQL
+queries these plugins typically outperform `DataLoader`-based solutions.
 
 An example of an application built on `graphile-build-pg` is
-[PostGraphile](https://github.com/graphile/postgraphile) which with one
-command connects to your PostgreSQL database and provides a full highly
-performant standards-compliant GraphQL API.
+[PostGraphile](https://github.com/graphile/postgraphile) which with one command
+connects to your PostgreSQL database and provides a full highly performant
+standards-compliant GraphQL API.
 
-**It is recommended that you use PostGraphile directly unless you really want
-to get low level access to this library.**
+**It is recommended that you use PostGraphile directly unless you really want to
+get low level access to this library.**
 
 If you prefer to use the plugins yourself it's advised that you use the
 `defaultPlugins` export from `graphile-build-pg` and then create a new array
 based on that into which you may insert or remove specific plugins. This is
-because it is ordered in a way to ensure the plugins work correctly (and we
-may still split up or restructure the plugins).
+because it is ordered in a way to ensure the plugins work correctly (and we may
+still split up or restructure the plugins).
 
 ### Export: `defaultPlugins`
 

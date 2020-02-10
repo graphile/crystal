@@ -1,8 +1,8 @@
 # Sponsors
 
 These individuals and companies give back to PostGraphile by sponsoring its
-ongoing development. Find out [how you can become a
-sponsor](https://graphile.org/sponsor/).
+ongoing development. Find out
+[how you can become a sponsor](https://graphile.org/sponsor/).
 
 ## Featured
 

@@ -10,19 +10,20 @@ Following are some guidelines for contributions.
 
 ## Setting up a development environment
 
-Please see [the CONTRIBUTING.md in PostGraphile](https://github.com/graphile/postgraphile/blob/master/CONTRIBUTING.md#development-environment).
+Please see
+[the CONTRIBUTING.md in PostGraphile](https://github.com/graphile/postgraphile/blob/master/CONTRIBUTING.md#development-environment).
 
 ## ASK FIRST!
 
 There's nothing worse than having your PR with 3 days of work in it rejected
-because it's just too complex to be sensibly reviewed! If you're interested
-in opening a PR please open an issue to discuss it, or come chat with us:
+because it's just too complex to be sensibly reviewed! If you're interested in
+opening a PR please open an issue to discuss it, or come chat with us:
 http://discord.gg/graphile
 
 Sometimes, your suggestions are more appropriate as a plugin rather than in
 core - if this is the case then we'll let you know and can guide you how to
-achieve this. Sometimes it may make sense to change your PR into a series
-of smaller PRs that each focus on changing one thing.
+achieve this. Sometimes it may make sense to change your PR into a series of
+smaller PRs that each focus on changing one thing.
 
 Small, focussed PRs are generally welcome without previous approval.
 
@@ -34,14 +35,13 @@ immutability in favour of more performant operations (we only target the V8
 engine in Node) and we tend to use explicit loops rather than functional
 equivalents.
 
-Typically we care more about the load on the Garbage Collector than we do on
-the absolute performance of the code - so try and avoid allocations where
-possible.
+Typically we care more about the load on the Garbage Collector than we do on the
+absolute performance of the code - so try and avoid allocations where possible.
 
 This said, we still want PostGraphile to be maintainable so code quality and
-legibility is important. We're not super interested in micro-optimisations;
-if you want to do a PR with performance enhancements that are more than a
-couple lines of code, please come chat with us first.
+legibility is important. We're not super interested in micro-optimisations; if
+you want to do a PR with performance enhancements that are more than a couple
+lines of code, please come chat with us first.
 
 ### `Array.reduce(...)`
 
@@ -89,4 +89,5 @@ to.
 
 - `Object.values(obj)` is better than `Object.keys(obj).map(k => obj[k])`.
 - `arr.find(...)` is better than `arr.filter(...)[0]`
-- use `async`/`await` - [performance optimisations are coming](https://v8.dev/blog/fast-async)
+- use `async`/`await` -
+  [performance optimisations are coming](https://v8.dev/blog/fast-async)

@@ -8,17 +8,20 @@
 ![MIT license](https://img.shields.io/npm/l/graphile-build.svg)
 [![Follow](https://img.shields.io/badge/twitter-@GraphileHQ-blue.svg)](https://twitter.com/GraphileHQ)
 
-Graphile Engine enables you to build high-performance easily-extensible GraphQL schemas by combining plugins.
+Graphile Engine enables you to build high-performance easily-extensible GraphQL
+schemas by combining plugins.
 
-**NOTE**: _You might be looking for [PostGraphile](https://github.com/graphile/postgraphile) which is Graphile Engine applied to a PostgreSQL database._
+**NOTE**: _You might be looking for
+[PostGraphile](https://github.com/graphile/postgraphile) which is Graphile
+Engine applied to a PostgreSQL database._
 
 <!-- SPONSORS_BEGIN -->
 
 ## Crowd-funded open-source software
 
-To help us develop this software sustainably under the MIT license, we ask
-all individuals and businesses that use it to help support its ongoing
-maintenance and development via sponsorship.
+To help us develop this software sustainably under the MIT license, we ask all
+individuals and businesses that use it to help support its ongoing maintenance
+and development via sponsorship.
 
 ### [Click here to find out more about sponsors and sponsorship.](https://www.graphile.org/sponsor/)
 
@@ -39,9 +42,9 @@ enables you to build a GraphQL schema out of plugins with advanced performance
 capabilities enabled via GraphQL look-ahead functionality.
 
 **[graphile-build-pg][]**: A selection of graphile-build plugins related to
-PostgreSQL: schema introspection, generation of fields and types for all
-tables, computed columns, query procedures, etc - if there's certain features
-you don't want, simply don't use that plugin!
+PostgreSQL: schema introspection, generation of fields and types for all tables,
+computed columns, query procedures, etc - if there's certain features you don't
+want, simply don't use that plugin!
 
 **[graphile-utils][]**: A collection of helper utilities to make writing
 graphile-build plugins easier.
@@ -57,15 +60,15 @@ are required from the SQL database).
 ## Brief History
 
 Proof of concept was built by [@Benjie](https://twitter.com/benjie) in 2017,
-growing out of a need for greater performance, easier extensibility and
-greater customisation in [PostGraphQL][postgraphile]. Over the next year
-thanks to the input of the community and ongoing development and testing,
-Graphile Engine has matured into the production-ready system it is today.
+growing out of a need for greater performance, easier extensibility and greater
+customisation in [PostGraphQL][postgraphile]. Over the next year thanks to the
+input of the community and ongoing development and testing, Graphile Engine has
+matured into the production-ready system it is today.
 
 ## Development
 
-Below is a quick-start, for more detailed instructions, please [see the
-CONTRIBUTING.md documentation in PostGraphile](https://github.com/graphile/postgraphile/blob/master/CONTRIBUTING.md).
+Below is a quick-start, for more detailed instructions, please
+[see the CONTRIBUTING.md documentation in PostGraphile](https://github.com/graphile/postgraphile/blob/master/CONTRIBUTING.md).
 
 ```bash
 yarn
@@ -73,8 +76,8 @@ yarn lerna bootstrap
 yarn watch
 ```
 
-`yarn watch` will keep monitoring and compiling the babel files, so open
-another terminal to run the tests (Note: your PostgreSQL server must be
+`yarn watch` will keep monitoring and compiling the babel files, so open another
+terminal to run the tests (Note: your PostgreSQL server must be
 [configured for logical decoding](packages/lds/README.md#postgresql-configuration)):
 
 ```bash
@@ -83,9 +86,9 @@ export TEST_DATABASE_URL="postgres:///graphileengine_test"
 yarn lerna run test
 ```
 
-If the above succeeds, you're good to go! If not, please try again after
-running `yarn install --force` and always feel free to reach out via [our
-discord chat](http://discord.gg/graphile) on the #core-development channel.
+If the above succeeds, you're good to go! If not, please try again after running
+`yarn install --force` and always feel free to reach out via
+[our discord chat](http://discord.gg/graphile) on the #core-development channel.
 
 ### Working with Docker
 

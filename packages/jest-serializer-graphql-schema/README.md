@@ -1,13 +1,13 @@
 # jest-serializer-graphql-schema
 
-A serializer for doing [snapshot testing](https://jestjs.io/docs/en/snapshot-testing)
-of [GraphQL schemas](https://graphql.org/learn/schema/) using the
+A serializer for doing
+[snapshot testing](https://jestjs.io/docs/en/snapshot-testing) of
+[GraphQL schemas](https://graphql.org/learn/schema/) using the
 [Jest](https://jestjs.io/) testing framework.
 
-This serializer only works on instances of the `GraphQLSchema` class
-exported from [`graphql-js`](https://github.com/graphql/graphql-js).
-It does _not_ work on <abbr title="abstract syntax tree">AST</abbr>
-objects.
+This serializer only works on instances of the `GraphQLSchema` class exported
+from [`graphql-js`](https://github.com/graphql/graphql-js). It does _not_ work
+on <abbr title="abstract syntax tree">AST</abbr> objects.
 
 # Install
 
@@ -165,11 +165,10 @@ type Query {
 
 # Sorting Schemas
 
-Note that by default, schemas are _not_ sorted before serialization.
-This means that if the content of the schema is reordered, your
-snapshot test will fail. If you don't care about the order of the
-content of your schema, sort your schema before calling
-`.toMatchSnapshot()`, like this:
+Note that by default, schemas are _not_ sorted before serialization. This means
+that if the content of the schema is reordered, your snapshot test will fail. If
+you don't care about the order of the content of your schema, sort your schema
+before calling `.toMatchSnapshot()`, like this:
 
 ```ts
 import { lexicographicSortSchema } from "graphql";

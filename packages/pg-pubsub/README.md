@@ -1,9 +1,9 @@
 # @graphile/pg-pubsub
 
-This PostGraphile [server
-plugin](https://www.graphile.org/postgraphile/plugins/) provides a `pubsub`
-instance to [schema
-plugins](https://www.graphile.org/postgraphile/extending/) that uses
+This PostGraphile
+[server plugin](https://www.graphile.org/postgraphile/plugins/) provides a
+`pubsub` instance to
+[schema plugins](https://www.graphile.org/postgraphile/extending/) that uses
 PostgreSQL `LISTEN`/`NOTIFY` to provide realtime features.
 
 Also adds support for `@pgSubscriptions` directive to easily define your own
@@ -11,18 +11,19 @@ subscriptions using LISTEN/NOTIFY with `makeExtendSchemaPlugin`; and adds the
 `--simple-subscriptions` feature which, when enabled, adds a simple `listen`
 subscription field to your GraphQL API.
 
-It's intended that you use this plugin as a provider of realtime data to
-other plugins which can use it to add subscription fields to your API.
+It's intended that you use this plugin as a provider of realtime data to other
+plugins which can use it to add subscription fields to your API.
 
-For full documentation, see: https://www.graphile.org/postgraphile/subscriptions/
+For full documentation, see:
+https://www.graphile.org/postgraphile/subscriptions/
 
 <!-- SPONSORS_BEGIN -->
 
 ## Crowd-funded open-source software
 
-To help us develop this software sustainably under the MIT license, we ask
-all individuals and businesses that use it to help support its ongoing
-maintenance and development via sponsorship.
+To help us develop this software sustainably under the MIT license, we ask all
+individuals and businesses that use it to help support its ongoing maintenance
+and development via sponsorship.
 
 ### [Click here to find out more about sponsors and sponsorship.](https://www.graphile.org/sponsor/)
 

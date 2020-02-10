@@ -12,23 +12,23 @@ advanced query look-ahead features. Each plugin typically has its own small
 purpose (such as implementing the Node interface, adding `query: Query` to
 mutation payloads, or watching an external source for schema changes) and by
 combining these plugins together you get a large, powerful, and manageable
-GraphQL schema. Plugins enable you to make broad changes to your GraphQL
-schema with minimal code and without sacrificing performance.
+GraphQL schema. Plugins enable you to make broad changes to your GraphQL schema
+with minimal code and without sacrificing performance.
 
 An example of an application built on `graphile-build` is
-[PostGraphile](https://github.com/graphile/postgraphile) which with one
-command connects to your PostgreSQL database and provides a full highly
-performant standards-compliant GraphQL API. The separate `graphile-build-pg`
-module contains the plugins that are specific to PostgreSQL support
-(`graphile-build` itself does not know about databases).
+[PostGraphile](https://github.com/graphile/postgraphile) which with one command
+connects to your PostgreSQL database and provides a full highly performant
+standards-compliant GraphQL API. The separate `graphile-build-pg` module
+contains the plugins that are specific to PostgreSQL support (`graphile-build`
+itself does not know about databases).
 
 <!-- SPONSORS_BEGIN -->
 
 ## Crowd-funded open-source software
 
-To help us develop this software sustainably under the MIT license, we ask
-all individuals and businesses that use it to help support its ongoing
-maintenance and development via sponsorship.
+To help us develop this software sustainably under the MIT license, we ask all
+individuals and businesses that use it to help support its ongoing maintenance
+and development via sponsorship.
 
 ### [Click here to find out more about sponsors and sponsorship.](https://www.graphile.org/sponsor/)
 
@@ -44,11 +44,10 @@ And please give some love to our featured sponsors 🤩:
 
 ## Documentation
 
-**For in-depth documentation about `graphile-build`, please see [the graphile
-documentation website at graphile.org](https://www.graphile.org/).** The
-below just serves as a limited quick-reference for people already familiar
+**For in-depth documentation about `graphile-build`, please see
+[the graphile documentation website at graphile.org](https://www.graphile.org/).**
+The below just serves as a limited quick-reference for people already familiar
 with the library.
 
-**Please note: rather than using the raw plugin interface that
-`graphile-build` exposes, you may want to use the helpers in
-the `graphile-utils` module.**
+**Please note: rather than using the raw plugin interface that `graphile-build`
+exposes, you may want to use the helpers in the `graphile-utils` module.**

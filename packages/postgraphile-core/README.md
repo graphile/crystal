@@ -7,17 +7,17 @@
 [![Follow](https://img.shields.io/badge/twitter-@GraphileHQ-blue.svg)](https://twitter.com/GraphileHQ)
 
 This module is the compatibility between the web layer of
-[PostGraphile](https://graphile.org/postgraphile/) and the GraphQL schema
-built with Graphile Engine. It loads the relevant `graphile-build-pg` plugins
-and augments the inflector depending on the PostGraphile options provided.
+[PostGraphile](https://graphile.org/postgraphile/) and the GraphQL schema built
+with Graphile Engine. It loads the relevant `graphile-build-pg` plugins and
+augments the inflector depending on the PostGraphile options provided.
 
 <!-- SPONSORS_BEGIN -->
 
 ## Crowd-funded open-source software
 
-To help us develop this software sustainably under the MIT license, we ask
-all individuals and businesses that use it to help support its ongoing
-maintenance and development via sponsorship.
+To help us develop this software sustainably under the MIT license, we ask all
+individuals and businesses that use it to help support its ongoing maintenance
+and development via sponsorship.
 
 ### [Click here to find out more about sponsors and sponsorship.](https://www.graphile.org/sponsor/)
 
@@ -37,19 +37,19 @@ Unless you want to use the low-level API you probably want to go to the
 PostGraphile (previously 'PostGraphQL') repository instead:
 [https://github.com/graphile/postgraphile](https://github.com/graphile/postgraphile)
 
-It's suitable to use this module in your own application, but please be aware you
-need to bring your own security in the form of an authenticated `pgClient` (see
-below).
+It's suitable to use this module in your own application, but please be aware
+you need to bring your own security in the form of an authenticated `pgClient`
+(see below).
 
 For more information about PostGraphile and Graphile Engine please see the
 documentation at [graphile.org](https://www.graphile.org/).
 
 ## `createPostGraphileSchema(pgConfig, schemas, options)`
 
-This is the function you're most likely to use in production, it will return
-a promise to a GraphQL schema. You are responsible in for implementing
-security by passing a pre-authenticated `pgClient` inside the GraphQL
-`context` when you resolve a GraphQL query or mutation.
+This is the function you're most likely to use in production, it will return a
+promise to a GraphQL schema. You are responsible in for implementing security by
+passing a pre-authenticated `pgClient` inside the GraphQL `context` when you
+resolve a GraphQL query or mutation.
 
 Example:
 
@@ -141,8 +141,7 @@ runQuery(
 ```
 
 To see how this works in a real application, check out
-[`withPostGraphileContext` in
-PostGraphile](https://github.com/graphile/postgraphile/blob/master/src/postgraphile/withPostGraphileContext.ts)
+[`withPostGraphileContext` in PostGraphile](https://github.com/graphile/postgraphile/blob/master/src/postgraphile/withPostGraphileContext.ts)
 
 ## `watchPostGraphileSchema(pgConfig, schemas, options, onNewSchema)`
 

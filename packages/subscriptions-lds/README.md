@@ -1,17 +1,18 @@
 # @graphile/subscriptions-lds
 
-PostGraphile schema plugin to provide live updates powered by PostgreSQL
-logical decoding. Used as part of PostGraphile's live queries support.
+PostGraphile schema plugin to provide live updates powered by PostgreSQL logical
+decoding. Used as part of PostGraphile's live queries support.
 
-For more background, see [postgraphile issue #92](https://github.com/graphile/postgraphile/issues/92#issuecomment-313476989).
+For more background, see
+[postgraphile issue #92](https://github.com/graphile/postgraphile/issues/92#issuecomment-313476989).
 
 <!-- SPONSORS_BEGIN -->
 
 ## Crowd-funded open-source software
 
-To help us develop this software sustainably under the MIT license, we ask
-all individuals and businesses that use it to help support its ongoing
-maintenance and development via sponsorship.
+To help us develop this software sustainably under the MIT license, we ask all
+individuals and businesses that use it to help support its ongoing maintenance
+and development via sponsorship.
 
 ### [Click here to find out more about sponsors and sponsorship.](https://www.graphile.org/sponsor/)
 
@@ -37,10 +38,14 @@ yarn add @graphile/subscriptions-lds
 
 To use this plugin:
 
-- Ensure your PostgreSQL server has `wal_level = logical` and the `wal2json` plugin (see "Setting up PostgreSQL" below)
+- Ensure your PostgreSQL server has `wal_level = logical` and the `wal2json`
+  plugin (see "Setting up PostgreSQL" below)
 - Load this plugin with `--append-plugins` (or `appendPlugins`)
 - Enable PostGraphile live with `--live` (or `live: true`)
-- If you don't use a superuser or database owner PostgreSQL user with PostGraphile normally (or if you pass a pool to the PostGraphile library), you must provide a superuser or database owner connection string via `--owner-connection` (or `ownerConnectionString`)
+- If you don't use a superuser or database owner PostgreSQL user with
+  PostGraphile normally (or if you pass a pool to the PostGraphile library), you
+  must provide a superuser or database owner connection string via
+  `--owner-connection` (or `ownerConnectionString`)
 
 CLI:
 
@@ -77,18 +82,18 @@ app.use(
 We currently only support PG10+; if you need support for 9.x please get in
 touch.
 
-TL;DR: set `wal_level = logical` in `postgresql.conf` and ensure `wal2json`
-is installed.
+TL;DR: set `wal_level = logical` in `postgresql.conf` and ensure `wal2json` is
+installed.
 
 This plugin uses logical decoding and `wal2json`, so you must configure your
 PostgreSQL database to support this.
 
 ### Setting wal_level = logical
 
-In your `postgresql.conf` you need to enable `wal_level = logical`. You
-should ensure that the following settings are set (the `10`s can be any
-number greater than 1; set them to how many PostGraphile instances you're
-expecting to run, plus a little buffer for regular replication needs):
+In your `postgresql.conf` you need to enable `wal_level = logical`. You should
+ensure that the following settings are set (the `10`s can be any number greater
+than 1; set them to how many PostGraphile instances you're expecting to run,
+plus a little buffer for regular replication needs):
 
 ```
 wal_level = logical
@@ -98,14 +103,14 @@ max_replication_slots = 10
 
 ### Installing wal2json
 
-You also need to ensure that `wal2json` is installed. This comes as standard
-in many managed PostgreSQL services, such as Amazon RDS, but to install it locally:
+You also need to ensure that `wal2json` is installed. This comes as standard in
+many managed PostgreSQL services, such as Amazon RDS, but to install it locally:
 
-1. Ensure that `which pg_config` returns the path to the **correct**
-   `pg_config` binary - the one related to your PostgreSQL install. (For
-   example, if on a Mac you've installed both Postgres.app _and_ PostgreSQL from
-   homebrew then you must modify your `PATH` variable to point at whichever one
-   you use, e.g. `export PATH="/Applications/Postgres.app/Contents/Versions/10/bin/:$PATH"`)
+1. Ensure that `which pg_config` returns the path to the **correct** `pg_config`
+   binary - the one related to your PostgreSQL install. (For example, if on a
+   Mac you've installed both Postgres.app _and_ PostgreSQL from homebrew then
+   you must modify your `PATH` variable to point at whichever one you use, e.g.
+   `export PATH="/Applications/Postgres.app/Contents/Versions/10/bin/:$PATH"`)
 2. Run the below code (it takes about 10 seconds):
 
 ```bash
@@ -119,21 +124,21 @@ USE_PGXS=1 make install
 
 ## Optimising
 
-Please note that the defaults shown below are likely to change over time
-based on user feedback. This document will not necessarily be updated with
-the new defaults.
+Please note that the defaults shown below are likely to change over time based
+on user feedback. This document will not necessarily be updated with the new
+defaults.
 
 ### `LD_WAIT` (default 125)
 
 This environmental variable controls how often in milliseconds we check for
-changes from the database. Setting it smaller leads to more timely updates
-but increases overhead. Setting it larger increases efficiency but means each
-batch takes longer to process which may slow the Node.js event loop.
+changes from the database. Setting it smaller leads to more timely updates but
+increases overhead. Setting it larger increases efficiency but means each batch
+takes longer to process which may slow the Node.js event loop.
 
 ### `LIVE_THROTTLE` (default 500)
 
-This environmental variable is the minimum duration in milliseconds between
-live updates to the same subscription.
+This environmental variable is the minimum duration in milliseconds between live
+updates to the same subscription.
 
 If your server is getting overwhelmed, you may increase this to increase the
 period between live updates sent to clients.
@@ -141,23 +146,23 @@ period between live updates sent to clients.
 If your application is not responsive enough, you may decrease this to get
 closer to real-time updates.
 
-(Throttle fires on both the leading and trailing edge, so decreasing this
-only affects successive updates, not the initial update.)
+(Throttle fires on both the leading and trailing edge, so decreasing this only
+affects successive updates, not the initial update.)
 
 ### `LD_TABLE_PATTERN` (default "\*.\*")
 
 Set this envvar to e.g. `app_public.*` to only monitor tables in the
-`app_public` schema. See [`filter-tables` in the wal2json
-documentation](https://github.com/eulerto/wal2json#parameters)
+`app_public` schema. See
+[`filter-tables` in the wal2json documentation](https://github.com/eulerto/wal2json#parameters)
 
 ## Running LDS externally
 
 If you reach sufficient scale that running `@graphile/lds` on its own server
-makes sense (rather than using the embedded version) then you can do so
-easily. Follow the steps in the `@graphile/lds` README to get the server up
-and running, and then set environmental variable `LDS_SERVER_URL` to the full
-websocket URL to your LDS server, e.g. `ws://127.0.0.1:9876` (default) before
-loading this plugin.
+makes sense (rather than using the embedded version) then you can do so easily.
+Follow the steps in the `@graphile/lds` README to get the server up and running,
+and then set environmental variable `LDS_SERVER_URL` to the full websocket URL
+to your LDS server, e.g. `ws://127.0.0.1:9876` (default) before loading this
+plugin.
 
 ## Compatibility check
 
