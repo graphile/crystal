@@ -243,17 +243,17 @@ class PostGraphiQL extends React.PureComponent {
       return null;
     }
 
-    var token = cm.getTokenAt(mousePos);
-    var start = { line: mousePos.line, ch: token.start };
-    var end = { line: mousePos.line, ch: token.end };
-    var relevantMousePos = {
+    const token = cm.getTokenAt(mousePos);
+    const start = { line: mousePos.line, ch: token.start };
+    const end = { line: mousePos.line, ch: token.end };
+    const relevantMousePos = {
       start: cm.indexFromPos(start),
       end: cm.indexFromPos(end),
     };
 
-    var position = relevantMousePos;
+    const position = relevantMousePos;
 
-    var def = parsedQuery.definitions.find(definition => {
+    const def = parsedQuery.definitions.find(definition => {
       if (!definition.loc) {
         console.log("Missing location information for definition");
         return false;
@@ -270,23 +270,23 @@ class PostGraphiQL extends React.PureComponent {
       return null;
     }
 
-    var operationKind =
+    const operationKind =
       def.kind === "OperationDefinition"
         ? def.operation
         : def.kind === "FragmentDefinition"
         ? "fragment"
         : "unknown";
 
-    var operationName =
+    const operationName =
       def.kind === "OperationDefinition" && !!def.name
         ? def.name.value
         : def.kind === "FragmentDefinition" && !!def.name
         ? def.name.value
         : "unknown";
 
-    var selector = `.graphiql-explorer-root #${operationKind}-${operationName}`;
+    const selector = `.graphiql-explorer-root #${operationKind}-${operationName}`;
 
-    var el = document.querySelector(selector);
+    const el = document.querySelector(selector);
     el && el.scrollIntoView();
   };
 
