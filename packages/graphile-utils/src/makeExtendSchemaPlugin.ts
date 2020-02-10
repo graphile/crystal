@@ -682,33 +682,30 @@ export default function makeExtendSchemaPlugin(
     build: Build,
   ): import("graphql").GraphQLFieldConfigArgumentMap {
     if (args && args.length) {
-      return args.reduce(
-        (memo, arg) => {
-          if (arg.kind === "InputValueDefinition") {
-            const name = getName(arg.name);
-            const type = getType(arg.type, build);
-            const description = getDescription(arg.description);
-            let defaultValue;
-            if (arg.defaultValue) {
-              defaultValue = getValue(arg.defaultValue, type);
-            }
-            if (!build.graphql.isInputType(type)) {
-              throw new Error(`Expected input type, but found '${type}'`);
-            }
-            memo[name] = {
-              type,
-              ...(defaultValue != null ? { defaultValue } : null),
-              ...(description ? { description } : null),
-            };
-          } else {
-            throw new Error(
-              `Unexpected '${arg.kind}', we were expecting an 'InputValueDefinition'`,
-            );
+      return args.reduce((memo, arg) => {
+        if (arg.kind === "InputValueDefinition") {
+          const name = getName(arg.name);
+          const type = getType(arg.type, build);
+          const description = getDescription(arg.description);
+          let defaultValue;
+          if (arg.defaultValue) {
+            defaultValue = getValue(arg.defaultValue, type);
           }
-          return memo;
-        },
-        {} as import("graphql").GraphQLFieldConfigArgumentMap,
-      );
+          if (!build.graphql.isInputType(type)) {
+            throw new Error(`Expected input type, but found '${type}'`);
+          }
+          memo[name] = {
+            type,
+            ...(defaultValue != null ? { defaultValue } : null),
+            ...(description ? { description } : null),
+          };
+        } else {
+          throw new Error(
+            `Unexpected '${arg.kind}', we were expecting an 'InputValueDefinition'`,
+          );
+        }
+        return memo;
+      }, {} as import("graphql").GraphQLFieldConfigArgumentMap);
     }
     return {};
   }

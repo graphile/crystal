@@ -44,42 +44,33 @@ export default (function PgRecordReturnTypesPlugin(builder) {
         if (returnType.id !== "2249") {
           return;
         }
-        const argTypes = proc.argTypeIds.reduce(
-          (prev, typeId, idx) => {
-            if (
-              proc.argModes.length === 0 || // all args are `in`
-              proc.argModes[idx] === "i" || // this arg is `in`
-              proc.argModes[idx] === "b" // this arg is `inout`
-            ) {
-              prev.push(introspectionResultsByKind.typeById[typeId]);
-            }
-            return prev;
-          },
-          [] as PgType[],
-        );
+        const argTypes = proc.argTypeIds.reduce((prev, typeId, idx) => {
+          if (
+            proc.argModes.length === 0 || // all args are `in`
+            proc.argModes[idx] === "i" || // this arg is `in`
+            proc.argModes[idx] === "b" // this arg is `inout`
+          ) {
+            prev.push(introspectionResultsByKind.typeById[typeId]);
+          }
+          return prev;
+        }, [] as PgType[]);
         const argModesWithOutput = [
           "o", // OUT,
           "b", // INOUT
           "t", // TABLE
         ];
-        const outputArgNames = proc.argTypeIds.reduce(
-          (prev, _, idx) => {
-            if (argModesWithOutput.includes(proc.argModes[idx])) {
-              prev.push(proc.argNames[idx] || "");
-            }
-            return prev;
-          },
-          [] as string[],
-        );
-        const outputArgTypes = proc.argTypeIds.reduce(
-          (prev, typeId, idx) => {
-            if (argModesWithOutput.includes(proc.argModes[idx])) {
-              prev.push(introspectionResultsByKind.typeById[typeId]);
-            }
-            return prev;
-          },
-          [] as PgType[],
-        );
+        const outputArgNames = proc.argTypeIds.reduce((prev, _, idx) => {
+          if (argModesWithOutput.includes(proc.argModes[idx])) {
+            prev.push(proc.argNames[idx] || "");
+          }
+          return prev;
+        }, [] as string[]);
+        const outputArgTypes = proc.argTypeIds.reduce((prev, typeId, idx) => {
+          if (argModesWithOutput.includes(proc.argModes[idx])) {
+            prev.push(introspectionResultsByKind.typeById[typeId]);
+          }
+          return prev;
+        }, [] as PgType[]);
         const isMutation = !proc.isStable;
         const firstArgType = argTypes[0];
         const computed =

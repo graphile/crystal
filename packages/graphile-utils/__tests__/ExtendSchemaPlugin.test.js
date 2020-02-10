@@ -461,7 +461,10 @@ it("supports @scope directive with variable value", async () => {
               nullTest: null
               embedTest: ${embed({
                 [secret]: "Fred",
-                sub: [[11, 22], [33, 44]],
+                sub: [
+                  [11, 22],
+                  [33, 44],
+                ],
               })}
             )
         }

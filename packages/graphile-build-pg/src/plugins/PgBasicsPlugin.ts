@@ -623,9 +623,9 @@ function makePgBaseInflectors(): Partial<Inflection> {
         return updateFieldName;
       }
       return this.camelCase(
-        `update-${this._singularizedTableName(table)}-by-${detailedKeys
-          .map(key => this.column(key))
-          .join("-and-")}`,
+        `update-${this._singularizedTableName(
+          table,
+        )}-by-${detailedKeys.map(key => this.column(key)).join("-and-")}`,
       );
     },
     deleteByKeys(
@@ -639,9 +639,9 @@ function makePgBaseInflectors(): Partial<Inflection> {
         return deleteFieldName;
       }
       return this.camelCase(
-        `delete-${this._singularizedTableName(table)}-by-${detailedKeys
-          .map(key => this.column(key))
-          .join("-and-")}`,
+        `delete-${this._singularizedTableName(
+          table,
+        )}-by-${detailedKeys.map(key => this.column(key)).join("-and-")}`,
       );
     },
     updateByKeysInputType(
@@ -655,9 +655,9 @@ function makePgBaseInflectors(): Partial<Inflection> {
         return this.upperCamelCase(`${updateFieldName}-input`);
       }
       return this.upperCamelCase(
-        `update-${this._singularizedTableName(table)}-by-${detailedKeys
-          .map(key => this.column(key))
-          .join("-and-")}-input`,
+        `update-${this._singularizedTableName(
+          table,
+        )}-by-${detailedKeys.map(key => this.column(key)).join("-and-")}-input`,
       );
     },
     deleteByKeysInputType(
@@ -671,9 +671,9 @@ function makePgBaseInflectors(): Partial<Inflection> {
         return this.upperCamelCase(`${deleteFieldName}-input`);
       }
       return this.upperCamelCase(
-        `delete-${this._singularizedTableName(table)}-by-${detailedKeys
-          .map(key => this.column(key))
-          .join("-and-")}-input`,
+        `delete-${this._singularizedTableName(
+          table,
+        )}-by-${detailedKeys.map(key => this.column(key)).join("-and-")}-input`,
       );
     },
     updateNode(this: Inflection, table: PgClass) {
@@ -979,24 +979,21 @@ function sqlCommentByAddingTags(entity: PgEntity, tagsToAdd: SmartTags) {
 
   const description = entity.description;
   const tagsSql = Object.keys(tags)
-    .reduce(
-      (memo, tag) => {
-        const tagValue = tags[tag];
-        const valueArray = Array.isArray(tagValue) ? tagValue : [tagValue];
-        const highlightOrNot = tag in tagsToAdd ? chalk.bold.green : identity;
-        valueArray.forEach(value => {
-          memo.push(
-            highlightOrNot(
-              `@${escape(escape(tag))}${
-                value === true ? "" : " " + escape(escape(value))
-              }`,
-            ),
-          );
-        });
-        return memo;
-      },
-      [] as Array<string>,
-    )
+    .reduce((memo, tag) => {
+      const tagValue = tags[tag];
+      const valueArray = Array.isArray(tagValue) ? tagValue : [tagValue];
+      const highlightOrNot = tag in tagsToAdd ? chalk.bold.green : identity;
+      valueArray.forEach(value => {
+        memo.push(
+          highlightOrNot(
+            `@${escape(escape(tag))}${
+              value === true ? "" : " " + escape(escape(value))
+            }`,
+          ),
+        );
+      });
+      return memo;
+    }, [] as Array<string>)
     .join("\\n");
   const commentValue = `E'${tagsSql}${
     description ? "\\n" + escape(description) : ""

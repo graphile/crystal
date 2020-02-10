@@ -87,15 +87,13 @@ const makePluginEtc = (defaultCounter = 0) => {
 };
 
 test("generated schema n = 0, n = 3", async () => {
-  const schema0 = (await getBuilder([
-    ...defaultPlugins,
-    makePluginEtc(0).plugin,
-  ])).buildSchema();
+  const schema0 = (
+    await getBuilder([...defaultPlugins, makePluginEtc(0).plugin])
+  ).buildSchema();
   expect(schema0).toMatchSnapshot();
-  const schema3 = (await getBuilder([
-    ...defaultPlugins,
-    makePluginEtc(3).plugin,
-  ])).buildSchema();
+  const schema3 = (
+    await getBuilder([...defaultPlugins, makePluginEtc(3).plugin])
+  ).buildSchema();
   expect(schema3).toMatchSnapshot();
 });
 

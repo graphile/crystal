@@ -545,13 +545,10 @@ function deepClone<T>(value: T): T {
   if (Array.isArray(value)) {
     return value.map(val => deepClone(val)) as any;
   } else if (typeof value === "object" && value) {
-    return Object.keys(value).reduce(
-      (memo, k) => {
-        memo[k] = deepClone(value[k]);
-        return memo;
-      },
-      {} as T,
-    );
+    return Object.keys(value).reduce((memo, k) => {
+      memo[k] = deepClone(value[k]);
+      return memo;
+    }, {} as T);
   } else {
     return value;
   }
@@ -702,22 +699,16 @@ export default (async function PgIntrospectionPlugin(
     const rawishIntrospectionResultsByKind = deepClone(rawResults);
 
     const xByY = <X>(arrayOfX: X[], attrKey: string) =>
-      arrayOfX.reduce(
-        (memo, x) => {
-          memo[x[attrKey]] = x;
-          return memo;
-        },
-        {} as { [attrKey: string]: X },
-      );
+      arrayOfX.reduce((memo, x) => {
+        memo[x[attrKey]] = x;
+        return memo;
+      }, {} as { [attrKey: string]: X });
     const xByYAndZ = <X>(arrayOfX: X[], attrKey: string, attrKey2: string) =>
-      arrayOfX.reduce(
-        (memo, x) => {
-          if (!memo[x[attrKey]]) memo[x[attrKey]] = {};
-          memo[x[attrKey]][x[attrKey2]] = x;
-          return memo;
-        },
-        {} as { [attrKey: string]: { [attrKey: string]: X } },
-      );
+      arrayOfX.reduce((memo, x) => {
+        if (!memo[x[attrKey]]) memo[x[attrKey]] = {};
+        memo[x[attrKey]][x[attrKey2]] = x;
+        return memo;
+      }, {} as { [attrKey: string]: { [attrKey: string]: X } });
     const introspectionResultsByKind: PgIntrospectionResultsByKind = {
       ...rawishIntrospectionResultsByKind,
       namespaceById: xByY(rawishIntrospectionResultsByKind.namespace, "id"),

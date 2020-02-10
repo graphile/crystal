@@ -527,21 +527,23 @@ export function debugPgClient(
       if (!results) {
         return Promise.resolve([]);
       }
-      return (await Promise.all(
-        results.map(async r => {
-          const { result: resultPromise, ...rest } = r;
-          const result = await resultPromise;
-          const firstKey = result && result[0] && Object.keys(result[0])[0];
-          if (!firstKey) {
-            return null;
-          }
-          const plan = result.map((r: any) => r[firstKey]).join("\n");
-          return {
-            ...rest,
-            plan,
-          };
-        }),
-      )).filter((entry: unknown): entry is ExplainResult => !!entry);
+      return (
+        await Promise.all(
+          results.map(async r => {
+            const { result: resultPromise, ...rest } = r;
+            const result = await resultPromise;
+            const firstKey = result && result[0] && Object.keys(result[0])[0];
+            if (!firstKey) {
+              return null;
+            }
+            const plan = result.map((r: any) => r[firstKey]).join("\n");
+            return {
+              ...rest,
+              plan,
+            };
+          }),
+        )
+      ).filter((entry: unknown): entry is ExplainResult => !!entry);
     };
 
     if (debugPgNotice.enabled) {

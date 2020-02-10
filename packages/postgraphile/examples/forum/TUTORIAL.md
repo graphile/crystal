@@ -530,8 +530,8 @@ all of the posts that match our search condition and not just one.
 > ```
 
 > **Note:** Postgres has awesome text searching capabilities, the function above
-> uses a basic `ILIKE`
-> [pattern matching](https://www.postgresql.org/docs/9.6/static/functions-matching.html)
+> uses a basic
+> [`ILIKE` pattern matching](https://www.postgresql.org/docs/9.6/static/functions-matching.html)
 > operator. If you want high quality full text searching you don’t need to look
 > outside Postgres. Instead look into the Postgres
 > [Full Text Search](https://www.postgresql.org/docs/9.6/static/textsearch.html)

@@ -89,57 +89,45 @@ export default function makeProcField(
     throw new Error("Mutation procedure cannot be computed");
   }
   const sliceAmount = computed ? 1 : 0;
-  const argNames = proc.argTypeIds.reduce(
-    (prev, _, idx) => {
-      if (
-        idx >= sliceAmount && // Was a .slice() call
-        (proc.argModes.length === 0 || // all args are `in`
-        proc.argModes[idx] === "i" || // this arg is `in`
-          proc.argModes[idx] === "b") // this arg is `inout`
-      ) {
-        prev.push(proc.argNames[idx] || "");
-      }
-      return prev;
-    },
-    [] as string[],
-  );
-  const argTypes = proc.argTypeIds.reduce(
-    (prev, typeId, idx) => {
-      if (
-        idx >= sliceAmount && // Was a .slice() call
-        (proc.argModes.length === 0 || // all args are `in`
-        proc.argModes[idx] === "i" || // this arg is `in`
-          proc.argModes[idx] === "b") // this arg is `inout`
-      ) {
-        prev.push(introspectionResultsByKind.typeById[typeId]);
-      }
-      return prev;
-    },
-    [] as PgType[],
-  );
+  const argNames = proc.argTypeIds.reduce((prev, _, idx) => {
+    if (
+      idx >= sliceAmount && // Was a .slice() call
+      (proc.argModes.length === 0 || // all args are `in`
+      proc.argModes[idx] === "i" || // this arg is `in`
+        proc.argModes[idx] === "b") // this arg is `inout`
+    ) {
+      prev.push(proc.argNames[idx] || "");
+    }
+    return prev;
+  }, [] as string[]);
+  const argTypes = proc.argTypeIds.reduce((prev, typeId, idx) => {
+    if (
+      idx >= sliceAmount && // Was a .slice() call
+      (proc.argModes.length === 0 || // all args are `in`
+      proc.argModes[idx] === "i" || // this arg is `in`
+        proc.argModes[idx] === "b") // this arg is `inout`
+    ) {
+      prev.push(introspectionResultsByKind.typeById[typeId]);
+    }
+    return prev;
+  }, [] as PgType[]);
   const argModesWithOutput = [
     "o", // OUT,
     "b", // INOUT
     "t", // TABLE
   ];
-  const outputArgNames = proc.argTypeIds.reduce(
-    (prev, _, idx) => {
-      if (argModesWithOutput.includes(proc.argModes[idx])) {
-        prev.push(proc.argNames[idx] || "");
-      }
-      return prev;
-    },
-    [] as string[],
-  );
-  const outputArgTypes = proc.argTypeIds.reduce(
-    (prev, typeId, idx) => {
-      if (argModesWithOutput.includes(proc.argModes[idx])) {
-        prev.push(introspectionResultsByKind.typeById[typeId]);
-      }
-      return prev;
-    },
-    [] as PgType[],
-  );
+  const outputArgNames = proc.argTypeIds.reduce((prev, _, idx) => {
+    if (argModesWithOutput.includes(proc.argModes[idx])) {
+      prev.push(proc.argNames[idx] || "");
+    }
+    return prev;
+  }, [] as string[]);
+  const outputArgTypes = proc.argTypeIds.reduce((prev, typeId, idx) => {
+    if (argModesWithOutput.includes(proc.argModes[idx])) {
+      prev.push(introspectionResultsByKind.typeById[typeId]);
+    }
+    return prev;
+  }, [] as PgType[]);
   const requiredArgCount = Math.max(0, argNames.length - proc.argDefaultsNum);
   const variantFromName = (name: string) => {
     if (name.match(/(_p|P)atch$/)) {
