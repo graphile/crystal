@@ -2,11 +2,14 @@ module.exports = {
   parser: "babel-eslint",
   parserOptions: {
     sourceType: "module",
+    //project: 'tsconfig.json',
   },
   extends: [
     "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended",
+    //'plugin:@typescript-eslint/recommended-requiring-type-checking',
+    "prettier",
     "prettier/@typescript-eslint",
   ],
   plugins: ["jest", "graphql", "tsdoc"],
@@ -19,8 +22,6 @@ module.exports = {
     jasmine: false,
   },
   rules: {
-    "prettier/prettier": "error",
-
     "@typescript-eslint/ban-ts-ignore": "off",
     "@typescript-eslint/camelcase": "off",
     "@typescript-eslint/no-empty-interface": "off",
@@ -98,8 +99,11 @@ module.exports = {
     {
       files: ["**/__tests__/**/*.{ts,js}"],
       rules: {
+        // Disable these to enable faster test writing
         "prefer-const": "off",
+        "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/explicit-function-return-type": "off",
 
         // We don't normally care about race conditions in tests
         "require-atomic-updates": "warn",

@@ -39,9 +39,6 @@
     "lint": "eslint --ext .ts,.js .",
     "lint:fix": "yarn run lint --fix",
     "make-assets": "./scripts/make-assets",
-    "prettier": "prettier 'src/**/*.[tj]s' 'postgraphiql/src/**/*.[tj]s'",
-    "prettier:fix": "yarn prettier --write",
-    "prettier:check": "yarn prettier --list-different",
     "test": "./scripts/test",
     "prepack": "yarn build",
     "preprepack": "yarn prebuild",
@@ -102,7 +99,6 @@
     "eslint-config-prettier": "^6.3.0",
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-jest": "^22.17.0",
-    "eslint-plugin-prettier": "^3.1.1",
     "express": "^4.14.0",
     "fastify": "^2.2.0",
     "html-webpack-inline-source-plugin": "^0.0.10",
@@ -126,11 +122,19 @@
     "transform": {
       ".*": "<rootDir>/resources/jest-preprocessor.js"
     },
-    "moduleFileExtensions": ["ts", "js", "json"],
-    "setupFiles": ["<rootDir>/resources/jest-setup.js"],
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json"
+    ],
+    "setupFiles": [
+      "<rootDir>/resources/jest-setup.js"
+    ],
     "browser": false,
     "testEnvironment": "node",
-    "roots": ["<rootDir>/src"],
+    "roots": [
+      "<rootDir>/src"
+    ],
     "testRegex": "/__tests__/[^.]+-test.(t|j)s$"
   },
   "files": [

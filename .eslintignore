@@ -1,11 +1,14 @@
 node_modules
+/packages/pg-sql2/examples
 /packages/pg-sql2/lib
 /packages/postgraphile/postgraphiql
+/packages/postgraphile/assets
 /packages/postgraphile/src/assets
 node7minus
 node8plus
+build-turbo
+build
 dist-turbo
-examples
 dist
 CHANGELOG.md
 _LOCAL

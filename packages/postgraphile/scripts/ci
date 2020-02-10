@@ -1,16 +1,10 @@
 #!/usr/bin/env bash
 
 set -e
-echo "[1/4]: Linting Code with Prettier"
-yarn prettier:check
-
-echo "[2/4]: Building Code"
+echo "[1/2]: Building Code"
 scripts/build
 
-echo "[3/4]: Linting Code with ESLint"
-yarn lint
-
-echo "[4/4]: Testing Project"
+echo "[2/2]: Testing Project"
 scripts/test
 
 echo ""

@@ -2,14 +2,19 @@
   "private": true,
   "scripts": {
     "check": "yarn clean && yarn lint && yarn prepack:all && yarn test",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx .",
-    "lint:fix": "yarn run lint --fix && prettier --write '**/*.{json,md,html}'",
+    "lint:fix": "yarn prettier:fix && yarn run eslint --fix",
     "test": "lerna run --concurrency 1 test",
     "prepack:all": "scripts/prepack-all",
     "watch": "tsc -b --watch",
     "clean": "rm -Rf packages/*/node8plus/ packages/*/dist packages/*/dist-turbo packages/*/tsconfig.tsbuildinfo",
     "changelog": "(cat scripts/CHANGELOG_HEADER.md; npx conventional-changelog -p angular --release-count 0) > CHANGELOG.md",
-    "version": "yarn run changelog && git add CHANGELOG.md"
+    "version": "yarn run changelog && git add CHANGELOG.md",
+    "-----": "-----",
+    "eslint": "eslint --ext .js,.jsx,.ts,.tsx .",
+    "prettier": "prettier --ignore-path ./.eslintignore",
+    "prettier:all": "yarn prettier '**/*.{json,md,html,js,jsx,ts,tsx}'",
+    "prettier:fix": "yarn prettier:all --write",
+    "prettier:check": "yarn prettier:all --list-different"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
@@ -29,7 +34,6 @@
     "eslint-config-prettier": "^6.3.0",
     "eslint-plugin-graphql": "^3.0.3",
     "eslint-plugin-jest": "^22.5.1",
-    "eslint-plugin-prettier": "^3.0.1",
     "eslint-plugin-tsdoc": "^0.2.0",
     "eslint_d": "^8.0.0",
     "graphql": ">=0.9 <0.14 || ^14.0.2",
