@@ -19,7 +19,7 @@ declare module "graphile-build" {
 
 export default (function PgMutationCreatePlugin(
   builder,
-  { pgDisableDefaultMutations }
+  { pgDisableDefaultMutations },
 ) {
   if (pgDisableDefaultMutations) {
     return;
@@ -73,19 +73,19 @@ export default (function PgMutationCreatePlugin(
           const Table = pgGetGqlTypeByTypeIdAndModifier(table.type.id, null);
           if (!Table) {
             debug(
-              `There was no table type for table '${table.namespace.name}.${table.name}', so we're not generating a create mutation for it.`
+              `There was no table type for table '${table.namespace.name}.${table.name}', so we're not generating a create mutation for it.`,
             );
 
             return memo;
           }
           const TableInput = pgGetGqlInputTypeByTypeIdAndModifier(
             table.type.id,
-            null
+            null,
           );
 
           if (!TableInput) {
             debug(
-              `There was no input type for table '${table.namespace.name}.${table.name}', so we're going to omit it from the create mutation.`
+              `There was no input type for table '${table.namespace.name}.${table.name}', so we're going to omit it from the create mutation.`,
             );
           }
           const tableTypeName = inflection.tableType(table);
@@ -114,19 +114,19 @@ export default (function PgMutationCreatePlugin(
 
             {
               __origin: `Adding table create input type for ${describePgEntity(
-                table
+                table,
               )}. You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                 table,
                 {
                   name: "newNameHere",
-                }
+                },
               )}`,
               isPgCreateInputType: true,
               ...({
                 pgInflection: table, // TODO:v5: remove - TYPO!
               } as {}),
               pgIntrospection: table,
-            }
+            },
           );
 
           const PayloadType = newWithHooks(
@@ -155,7 +155,7 @@ export default (function PgMutationCreatePlugin(
                     {
                       isPgCreatePayloadResultField: true,
                       pgFieldIntrospection: table,
-                    }
+                    },
                   ),
                 };
               },
@@ -163,20 +163,20 @@ export default (function PgMutationCreatePlugin(
 
             {
               __origin: `Adding table create payload type for ${describePgEntity(
-                table
+                table,
               )}. You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                 table,
                 {
                   name: "newNameHere",
-                }
+                },
               )}\n\nor disable the built-in create mutation via:\n\n  ${sqlCommentByAddingTags(
                 table,
-                { omit: "create" }
+                { omit: "create" },
               )}`,
               isMutationPayload: true,
               isPgCreatePayloadType: true,
               pgIntrospection: table,
-            }
+            },
           );
 
           const fieldName = inflection.createField(table);
@@ -190,7 +190,7 @@ export default (function PgMutationCreatePlugin(
                   const relevantAttributes = table.attributes.filter(
                     attr =>
                       pgColumnFilter(attr, build, context) &&
-                      !omit(attr, "create")
+                      !omit(attr, "create"),
                   );
 
                   return {
@@ -207,13 +207,13 @@ export default (function PgMutationCreatePlugin(
                       const { pgClient } = resolveContext;
                       const parsedResolveInfoFragment = parseResolveInfo(
                         resolveInfo,
-                        true
+                        true,
                       );
 
                       parsedResolveInfoFragment.args = args; // Allow overriding via makeWrapResolversPlugin
                       const resolveData = getDataFromParsedResolveInfoFragment(
                         parsedResolveInfoFragment,
-                        PayloadType
+                        PayloadType,
                       );
 
                       const insertedRowAlias = sql.identifier(Symbol());
@@ -224,7 +224,7 @@ export default (function PgMutationCreatePlugin(
                         {},
                         null,
                         resolveContext,
-                        resolveInfo.rootValue
+                        resolveInfo.rootValue,
                       );
 
                       const sqlColumns: SQL[] = [];
@@ -236,12 +236,12 @@ export default (function PgMutationCreatePlugin(
                         if (
                           Object.prototype.hasOwnProperty.call(
                             inputData,
-                            fieldName
+                            fieldName,
                           )
                         ) {
                           sqlColumns.push(sql.identifier(attr.name));
                           sqlValues.push(
-                            gql2pg(val, attr.type, attr.typeModifier)
+                            gql2pg(val, attr.type, attr.typeModifier),
                           );
                         }
                       });
@@ -251,7 +251,7 @@ insert into ${sql.identifier(table.namespace.name, table.name)} ${
                         sqlColumns.length
                           ? sql.fragment`(${sql.join(
                               sqlColumns,
-                              ", "
+                              ", ",
                             )}) values(${sql.join(sqlValues, ", ")})`
                           : sql.fragment`default values`
                       } returning *`;
@@ -264,16 +264,16 @@ insert into ${sql.identifier(table.namespace.name, table.name)} ${
                           sql.identifier(table.namespace.name, table.name),
                           mutationQuery,
                           insertedRowAlias,
-                          query
+                          query,
                         );
 
                         row = rows[0];
                         await pgClient.query(
-                          "RELEASE SAVEPOINT graphql_mutation"
+                          "RELEASE SAVEPOINT graphql_mutation",
                         );
                       } catch (e) {
                         await pgClient.query(
-                          "ROLLBACK TO SAVEPOINT graphql_mutation"
+                          "ROLLBACK TO SAVEPOINT graphql_mutation",
                         );
 
                         throw e;
@@ -288,27 +288,27 @@ insert into ${sql.identifier(table.namespace.name, table.name)} ${
                 {
                   pgFieldIntrospection: table,
                   isPgCreateMutationField: true,
-                }
+                },
               ),
             },
 
             `Adding create mutation for ${describePgEntity(
-              table
+              table,
             )}. You can omit this default mutation with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               table,
               {
                 omit: "create",
-              }
-            )}`
+              },
+            )}`,
           );
 
           return memo;
         }, {}),
-        `Adding default 'create' mutation to root mutation`
+        `Adding default 'create' mutation to root mutation`,
       );
     },
     ["PgMutationCreate"],
     [],
-    ["PgTables"]
+    ["PgTables"],
   );
 } as Plugin);

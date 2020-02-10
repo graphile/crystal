@@ -9,7 +9,7 @@ import { ResolvedLookAhead, GraphileResolverContext } from "graphile-build";
 
 type QueryBuilderCallback = (
   queryBuilder: QueryBuilder,
-  resolveData: ResolvedLookAhead
+  resolveData: ResolvedLookAhead,
 ) => void;
 type AggregateQueryBuilderCallback = (queryBuilder: QueryBuilder) => void;
 
@@ -44,7 +44,7 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
   // TODO:v5: context is not optional
   withBuilder: ((builder: QueryBuilder) => void) | null | undefined,
   context: GraphileResolverContext,
-  rootValue: any
+  rootValue: any,
 ): SQL => {
   const {
     pgQuery,
@@ -85,7 +85,7 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
   const queryBuilder = new QueryBuilder(
     queryBuilderOptions,
     context,
-    rootValue
+    rootValue,
   );
 
   queryBuilder.from(from, fromAlias ? fromAlias : undefined);
@@ -105,7 +105,7 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
     queryHasBefore: boolean,
     queryHasFirst: boolean,
     offset = 0,
-    invert = false
+    invert = false,
   ) {
     /*
      * Strap in, 'coz this function gets hairy!
@@ -317,12 +317,12 @@ exists(
                 sql.fragment`json_build_array(${sql.join(orderBy, ", ")})`,
               ],
 
-              ", "
+              ", ",
             )})`;
           } else {
             return sql.fragment`json_build_array(${sql.join(
               getPgCursorPrefix(),
-              ", "
+              ", ",
             )}, ${
               /*
                * NOTE[useAsterisk/row_number]: If we have useAsterisk then the
@@ -332,12 +332,12 @@ exists(
                */
               options.useAsterisk
                 ? sql.fragment`${sql.literal(
-                    queryBuilder.getFinalOffset() || 0
+                    queryBuilder.getFinalOffset() || 0,
                   )} + `
                 : sql.fragment``
             }(row_number() over (partition by 1)))`;
           }
-        }
+        },
       );
     }
   }
@@ -350,7 +350,7 @@ exists(
       if (orderByExpressionsAndDirections.length > 0) {
         if (!queryBuilder.isOrderUnique()) {
           throw new Error(
-            "The order supplied is not unique, so before/after cursors cannot be used. Please ensure the supplied order includes all the columns from the primary key or a unique constraint."
+            "The order supplied is not unique, so before/after cursors cannot be used. Please ensure the supplied order includes all the columns from the primary key or a unique constraint.",
           );
         }
         const rawPrefixes = cursorValue.slice(0, cursorValue.length - 1);
@@ -391,10 +391,10 @@ OR\
         // TODO:v5: we should be able to do this in JS-land rather than SQL-land
         sqlFilter = sql.fragment`(((${sql.join(
           getPgCursorPrefix(),
-          ", "
+          ", ",
         )}) = (${sql.join(
           rawPrefixes.map(val => sql.value(val)),
-          ", "
+          ", ",
         )})) AND (${sqlFilter}))`;
         queryBuilder.whereBound(sqlFilter, isAfter);
       } else if (
@@ -447,7 +447,7 @@ OR\
           canHaveCursorInWhere,
           queryHasBefore,
           queryHasFirst,
-          queryBuilder.getFinalOffset() || 0
+          queryBuilder.getFinalOffset() || 0,
         );
 
     const hasPreviousPage = queryHasZeroLimit
@@ -458,7 +458,7 @@ OR\
           queryHasAfter,
           queryHasLast,
           queryBuilder.getFinalOffset() || 0,
-          true
+          true,
         );
 
     const sqlWith = haveFields
@@ -483,12 +483,12 @@ OR\
       const aggregateQueryBuilder = new QueryBuilder(
         queryBuilderOptions,
         context,
-        rootValue
+        rootValue,
       );
 
       aggregateQueryBuilder.from(
         queryBuilder.getTableExpression(),
-        queryBuilder.getTableAlias()
+        queryBuilder.getTableAlias(),
       );
 
       for (let i = 0, l = pgAggregateQuery.length; i < l; i++) {
@@ -509,14 +509,14 @@ OR\
     if (options.withPaginationAsFields) {
       return sql.fragment`${sqlWith} select ${sql.join(
         fields.map(
-          ([expr, alias]) => sql.fragment`${expr} as ${sql.identifier(alias)}`
+          ([expr, alias]) => sql.fragment`${expr} as ${sql.identifier(alias)}`,
         ),
 
-        ", "
+        ", ",
       )} ${sqlFrom}`;
     } else {
       return sql.fragment`${sqlWith} select ${queryBuilder.jsonbBuildObject(
-        fields
+        fields,
       )} ${sqlFrom}`;
     }
   } else {

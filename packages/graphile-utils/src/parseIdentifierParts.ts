@@ -19,7 +19,7 @@ export default function parseIdentifierParts(identifier: string): string[] {
       } else {
         if (current !== "") {
           throw new Error(
-            `Unexpected '${char}' at position '${index}' when parsing identifier '${identifier}'`
+            `Unexpected '${char}' at position '${index}' when parsing identifier '${identifier}'`,
           );
         }
         inQuotes = true;
@@ -32,7 +32,7 @@ export default function parseIdentifierParts(identifier: string): string[] {
     } else {
       if (!inQuotes && hadQuotes) {
         throw new Error(
-          `Unexpected '${char}' at position '${index}' when parsing identifier '${identifier}'`
+          `Unexpected '${char}' at position '${index}' when parsing identifier '${identifier}'`,
         );
       }
       current += char;

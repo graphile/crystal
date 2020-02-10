@@ -10,26 +10,29 @@ import {
   print as printGraphql,
   specifiedRules,
   DocumentNode,
-} from 'graphql';
-import { extendedFormatError } from '../extendedFormatError';
-import { IncomingMessage, ServerResponse } from 'http';
-import { isKoaApp, middleware as koaMiddleware } from './koaMiddleware';
-import { pluginHookFromOptions } from '../pluginHook';
-import { HttpRequestHandler, CreateRequestHandlerOptions } from '../../interfaces';
-import setupServerSentEvents from './setupServerSentEvents';
-import withPostGraphileContext from '../withPostGraphileContext';
-import { Context as KoaContext } from 'koa';
-import LRU from '@graphile/lru';
+} from "graphql";
+import { extendedFormatError } from "../extendedFormatError";
+import { IncomingMessage, ServerResponse } from "http";
+import { isKoaApp, middleware as koaMiddleware } from "./koaMiddleware";
+import { pluginHookFromOptions } from "../pluginHook";
+import {
+  HttpRequestHandler,
+  CreateRequestHandlerOptions,
+} from "../../interfaces";
+import setupServerSentEvents from "./setupServerSentEvents";
+import withPostGraphileContext from "../withPostGraphileContext";
+import { Context as KoaContext } from "koa";
+import LRU from "@graphile/lru";
 
-import chalk from 'chalk';
-import Debugger = require('debug'); // tslint:disable-line variable-name
-import httpError = require('http-errors');
-import parseUrl = require('parseurl');
-import finalHandler = require('finalhandler');
-import bodyParser = require('body-parser');
-import crypto = require('crypto');
+import chalk from "chalk";
+import Debugger = require("debug"); // tslint:disable-line variable-name
+import httpError = require("http-errors");
+import parseUrl = require("parseurl");
+import finalHandler = require("finalhandler");
+import bodyParser = require("body-parser");
+import crypto = require("crypto");
 
-const ALLOW_EXPLAIN_PLACEHOLDER = '__SHOULD_ALLOW_EXPLAIN__';
+const ALLOW_EXPLAIN_PLACEHOLDER = "__SHOULD_ALLOW_EXPLAIN__";
 const noop = () => {
   /* noop */
 };
@@ -42,36 +45,39 @@ const { createHash } = crypto;
  *
  * @type {Buffer}
  */
-import favicon from '../../assets/favicon.ico';
+import favicon from "../../assets/favicon.ico";
 
 /**
  * The GraphiQL HTML file as a string. We need it to be a string, because we
  * will use a regular expression to replace some variables.
  */
-import baseGraphiqlHtml from '../../assets/graphiql.html';
-import { enhanceHttpServerWithSubscriptions } from './subscriptions';
-import { GraphileResolverContext } from 'postgraphile-core';
+import baseGraphiqlHtml from "../../assets/graphiql.html";
+import { enhanceHttpServerWithSubscriptions } from "./subscriptions";
+import { GraphileResolverContext } from "postgraphile-core";
 
 /**
  * When writing JSON to the browser, we need to be careful that it doesn't get
  * interpretted as HTML.
  */
 const JS_ESCAPE_LOOKUP = {
-  '<': '\\u003c',
-  '>': '\\u003e',
-  '/': '\\u002f',
-  '\u2028': '\\u2028',
-  '\u2029': '\\u2029',
+  "<": "\\u003c",
+  ">": "\\u003e",
+  "/": "\\u002f",
+  "\u2028": "\\u2028",
+  "\u2029": "\\u2029",
 };
 function safeJSONStringify(obj: {}) {
-  return JSON.stringify(obj).replace(/[<>/\u2028\u2029]/g, chr => JS_ESCAPE_LOOKUP[chr]);
+  return JSON.stringify(obj).replace(
+    /[<>/\u2028\u2029]/g,
+    chr => JS_ESCAPE_LOOKUP[chr],
+  );
 }
 
 /**
  * When people webpack us up, e.g. for lambda, if they don't want GraphiQL then
  * they can seriously reduce bundle size by omitting the assets.
  */
-const shouldOmitAssets = process.env.POSTGRAPHILE_OMIT_ASSETS === '1';
+const shouldOmitAssets = process.env.POSTGRAPHILE_OMIT_ASSETS === "1";
 
 // Used by `createPostGraphileHttpRequestHandler`
 let lastString: string;
@@ -79,9 +85,9 @@ let lastHash: string;
 const calculateQueryHash = (queryString: string): string => {
   if (queryString !== lastString) {
     lastString = queryString;
-    lastHash = createHash('sha1')
+    lastHash = createHash("sha1")
       .update(queryString)
-      .digest('base64');
+      .digest("base64");
   }
   return lastHash;
 };
@@ -99,16 +105,19 @@ export function isEmpty(value: any): boolean {
 }
 /* tslint:enable forin */
 
-const isPostGraphileDevelopmentMode = process.env.POSTGRAPHILE_ENV === 'development';
+const isPostGraphileDevelopmentMode =
+  process.env.POSTGRAPHILE_ENV === "development";
 
-const debugGraphql = Debugger('postgraphile:graphql');
-const debugRequest = Debugger('postgraphile:request');
+const debugGraphql = Debugger("postgraphile:graphql");
+const debugRequest = Debugger("postgraphile:request");
 
 /**
  * We need to be able to share the withPostGraphileContext logic between HTTP
  * and websockets
  */
-function withPostGraphileContextFromReqResGenerator(options: CreateRequestHandlerOptions) {
+function withPostGraphileContextFromReqResGenerator(
+  options: CreateRequestHandlerOptions,
+) {
   const {
     pgSettings: pgSettingsGenerator,
     allowExplain: allowExplainGenerator,
@@ -123,15 +132,15 @@ function withPostGraphileContextFromReqResGenerator(options: CreateRequestHandle
   ): Promise<TResult> => {
     const jwtToken = jwtSecret ? getJwtToken(req) : null;
     const additionalContext =
-      typeof additionalGraphQLContextFromRequest === 'function'
+      typeof additionalGraphQLContextFromRequest === "function"
         ? await additionalGraphQLContextFromRequest(req, res)
         : null;
     const pgSettings =
-      typeof pgSettingsGenerator === 'function'
+      typeof pgSettingsGenerator === "function"
         ? await pgSettingsGenerator(req)
         : pgSettingsGenerator;
     const allowExplain =
-      typeof allowExplainGenerator === 'function'
+      typeof allowExplainGenerator === "function"
         ? await allowExplainGenerator(req)
         : allowExplainGenerator;
     return withPostGraphileContext<TResult>(
@@ -139,11 +148,13 @@ function withPostGraphileContextFromReqResGenerator(options: CreateRequestHandle
         ...options,
         jwtToken,
         pgSettings,
-        explain: allowExplain && req.headers['x-postgraphile-explain'] === 'on',
+        explain: allowExplain && req.headers["x-postgraphile-explain"] === "on",
         ...moreOptions,
       },
       context => {
-        const graphqlContext = additionalContext ? { ...additionalContext, ...context } : context;
+        const graphqlContext = additionalContext
+          ? { ...additionalContext, ...context }
+          : context;
         return fn(graphqlContext);
       },
     );
@@ -177,50 +188,58 @@ export default function createPostGraphileHttpRequestHandler(
   const subscriptions = !!options.subscriptions;
   const live = !!options.live;
   const enhanceGraphiql =
-    options.enhanceGraphiql === false ? false : !!options.enhanceGraphiql || subscriptions || live;
+    options.enhanceGraphiql === false
+      ? false
+      : !!options.enhanceGraphiql || subscriptions || live;
   const enableCors = !!options.enableCors || isPostGraphileDevelopmentMode;
   const graphiql = options.graphiql === true;
-  if (options['absoluteRoutes']) {
+  if (options["absoluteRoutes"]) {
     throw new Error(
-      'Sorry - the `absoluteRoutes` setting has been replaced with `externalUrlBase` which solves the issue in a cleaner way. Please update your settings. Thank you for testing a PostGraphile pre-release 🙏',
+      "Sorry - the `absoluteRoutes` setting has been replaced with `externalUrlBase` which solves the issue in a cleaner way. Please update your settings. Thank you for testing a PostGraphile pre-release 🙏",
     );
   }
 
   // Using let because we might override it on the first request.
   let externalUrlBase = options.externalUrlBase;
-  if (externalUrlBase && externalUrlBase.endsWith('/')) {
-    throw new Error('externalUrlBase must not end with a slash (`/`)');
+  if (externalUrlBase && externalUrlBase.endsWith("/")) {
+    throw new Error("externalUrlBase must not end with a slash (`/`)");
   }
 
   const pluginHook = pluginHookFromOptions(options);
 
-  const origGraphiqlHtml = pluginHook('postgraphile:graphiql:html', baseGraphiqlHtml, { options });
+  const origGraphiqlHtml = pluginHook(
+    "postgraphile:graphiql:html",
+    baseGraphiqlHtml,
+    { options },
+  );
 
-  if (pgDefaultRole && typeof pgSettings === 'function') {
+  if (pgDefaultRole && typeof pgSettings === "function") {
     throw new Error(
-      'pgDefaultRole cannot be combined with pgSettings(req) - please remove pgDefaultRole and instead always return a `role` key from pgSettings(req).',
+      "pgDefaultRole cannot be combined with pgSettings(req) - please remove pgDefaultRole and instead always return a `role` key from pgSettings(req).",
     );
   }
   if (
     pgDefaultRole &&
     pgSettings &&
-    typeof pgSettings === 'object' &&
+    typeof pgSettings === "object" &&
     Object.keys(pgSettings)
       .map(s => s.toLowerCase())
-      .includes('role')
+      .includes("role")
   ) {
     throw new Error(
-      'pgDefaultRole cannot be combined with pgSettings.role - please use one or the other.',
+      "pgDefaultRole cannot be combined with pgSettings.role - please use one or the other.",
     );
   }
   if (graphiql && shouldOmitAssets) {
-    throw new Error('Cannot enable GraphiQL when POSTGRAPHILE_OMIT_ASSETS is set');
+    throw new Error(
+      "Cannot enable GraphiQL when POSTGRAPHILE_OMIT_ASSETS is set",
+    );
   }
 
   // Gets the route names for our GraphQL endpoint, and our GraphiQL endpoint.
-  const graphqlRoute = options.graphqlRoute || '/graphql';
-  const graphiqlRoute = graphiql ? options.graphiqlRoute || '/graphiql' : null;
-  const streamRoute = `${graphqlRoute.replace(/\/*$/, '')}/stream`;
+  const graphqlRoute = options.graphqlRoute || "/graphql";
+  const graphiqlRoute = graphiql ? options.graphiqlRoute || "/graphiql" : null;
+  const streamRoute = `${graphqlRoute.replace(/\/*$/, "")}/stream`;
 
   // Throw an error of the GraphQL and GraphiQL routes are the same.
   if (graphqlRoute === graphiqlRoute)
@@ -241,13 +260,16 @@ export default function createPostGraphileHttpRequestHandler(
     // If the user wants to see the error’s stack, let’s add it to the
     // formatted error.
     if (showErrorStack)
-      (formattedError as object)['stack'] =
-        error.stack != null && showErrorStack === 'json' ? error.stack.split('\n') : error.stack;
+      (formattedError as object)["stack"] =
+        error.stack != null && showErrorStack === "json"
+          ? error.stack.split("\n")
+          : error.stack;
 
     return formattedError;
   };
 
-  const DEFAULT_HANDLE_ERRORS = (errors: Array<GraphQLError>) => errors.map(formatError);
+  const DEFAULT_HANDLE_ERRORS = (errors: Array<GraphQLError>) =>
+    errors.map(formatError);
   const handleErrors = options.handleErrors || DEFAULT_HANDLE_ERRORS;
 
   function convertKoaBodyParserToConnect(req: any, _res: any, next: any): any {
@@ -271,15 +293,30 @@ export default function createPostGraphileHttpRequestHandler(
     // Parse URL encoded bodies (forms).
     bodyParser.urlencoded({ extended: false, limit: options.bodySizeLimit }),
     // Parse `application/graphql` content type bodies as text.
-    bodyParser.text({ type: 'application/graphql', limit: options.bodySizeLimit }),
+    bodyParser.text({
+      type: "application/graphql",
+      limit: options.bodySizeLimit,
+    }),
   ];
 
   // We'll turn this into one function now so it can be better JIT optimised
   const bodyParserMiddlewaresComposed = bodyParserMiddlewares.reduce(
     (
-      parent: (req: IncomingMessage, res: ServerResponse, next: (err?: Error) => void) => void,
-      fn: (req: IncomingMessage, res: ServerResponse, next: (err?: Error) => void) => void,
-    ): ((req: IncomingMessage, res: ServerResponse, next: (err?: Error) => void) => void) => {
+      parent: (
+        req: IncomingMessage,
+        res: ServerResponse,
+        next: (err?: Error) => void,
+      ) => void,
+      fn: (
+        req: IncomingMessage,
+        res: ServerResponse,
+        next: (err?: Error) => void,
+      ) => void,
+    ): ((
+      req: IncomingMessage,
+      res: ServerResponse,
+      next: (err?: Error) => void,
+    ) => void) => {
       return (req, res, next) => {
         parent(req, res, error => {
           if (error) {
@@ -289,7 +326,11 @@ export default function createPostGraphileHttpRequestHandler(
         });
       };
     },
-    (_req: IncomingMessage, _res: ServerResponse, next: (err?: Error) => void) => next(),
+    (
+      _req: IncomingMessage,
+      _res: ServerResponse,
+      next: (err?: Error) => void,
+    ) => next(),
   );
 
   // And we really want that function to be await-able
@@ -307,11 +348,17 @@ export default function createPostGraphileHttpRequestHandler(
   // We only need to calculate the graphiql HTML once; but we need to receive the first request to do so.
   let graphiqlHtml: string | null;
 
-  const withPostGraphileContextFromReqRes = withPostGraphileContextFromReqResGenerator(options);
-
-  const staticValidationRules = pluginHook('postgraphile:validationRules:static', specifiedRules, {
+  const withPostGraphileContextFromReqRes = withPostGraphileContextFromReqResGenerator(
     options,
-  });
+  );
+
+  const staticValidationRules = pluginHook(
+    "postgraphile:validationRules:static",
+    specifiedRules,
+    {
+      options,
+    },
+  );
 
   // Typically clients use static queries, so we can cache the parse and
   // validate stages for when we see the same query again.
@@ -346,7 +393,7 @@ export default function createPostGraphileHttpRequestHandler(
     if (result) {
       return result;
     } else {
-      const source = new Source(queryString, 'GraphQL Http Request');
+      const source = new Source(queryString, "GraphQL Http Request");
       let queryDocumentAst: DocumentNode | void;
 
       // Catch an errors while parsing so that we can set the `statusCode` to
@@ -358,10 +405,14 @@ export default function createPostGraphileHttpRequestHandler(
         throw error;
       }
 
-      if (debugRequest.enabled) debugRequest('GraphQL query is parsed.');
+      if (debugRequest.enabled) debugRequest("GraphQL query is parsed.");
 
       // Validate our GraphQL query using given rules.
-      const validationErrors = validateGraphql(gqlSchema, queryDocumentAst, staticValidationRules);
+      const validationErrors = validateGraphql(
+        gqlSchema,
+        queryDocumentAst,
+        staticValidationRules,
+      );
       const cacheResult: CacheEntry = {
         queryDocumentAst,
         validationErrors,
@@ -374,23 +425,28 @@ export default function createPostGraphileHttpRequestHandler(
     }
   };
 
-  let firstRequestHandler: ((req: IncomingMessage, pathname: string) => void) | null = (
-    req,
-    pathname,
-  ) => {
+  let firstRequestHandler:
+    | ((req: IncomingMessage, pathname: string) => void)
+    | null = (req, pathname) => {
     // Never be called again
     firstRequestHandler = null;
 
     if (externalUrlBase == null) {
       // User hasn't specified externalUrlBase; let's try and guess it
-      const { pathname: originalPathname = '' } = parseUrl.original(req) || {};
-      if (originalPathname !== pathname && originalPathname.endsWith(pathname)) {
+      const { pathname: originalPathname = "" } = parseUrl.original(req) || {};
+      if (
+        originalPathname !== pathname &&
+        originalPathname.endsWith(pathname)
+      ) {
         // We were mounted on a subpath (e.g. `app.use('/path/to', postgraphile(...))`).
         // Figure out our externalUrlBase for ourselves.
-        externalUrlBase = originalPathname.substr(0, originalPathname.length - pathname.length);
+        externalUrlBase = originalPathname.substr(
+          0,
+          originalPathname.length - pathname.length,
+        );
       }
       // Make sure we have a string, at least
-      externalUrlBase = externalUrlBase || '';
+      externalUrlBase = externalUrlBase || "";
     }
 
     // Takes the original GraphiQL HTML file and replaces the default config object.
@@ -403,7 +459,7 @@ export default function createPostGraphileHttpRequestHandler(
             enhanceGraphiql,
             subscriptions,
             allowExplain:
-              typeof options.allowExplain === 'function'
+              typeof options.allowExplain === "function"
                 ? ALLOW_EXPLAIN_PLACEHOLDER
                 : !!options.allowExplain,
           })};</script>\n  </head>`,
@@ -411,7 +467,7 @@ export default function createPostGraphileHttpRequestHandler(
       : null;
 
     if (subscriptions) {
-      const server = req && req.connection && req.connection['server'];
+      const server = req && req.connection && req.connection["server"];
       if (!server) {
         // tslint:disable-next-line no-console
         console.warn(
@@ -452,7 +508,7 @@ export default function createPostGraphileHttpRequestHandler(
     // PostGraphile not to handle the request further (return null). NOTE: if
     // you return `null` from this hook then you are also responsible for
     // calling `next()` (should that be required).
-    const req = pluginHook('postgraphile:http:handler', incomingReq, {
+    const req = pluginHook("postgraphile:http:handler", incomingReq, {
       options,
       res,
       next,
@@ -468,7 +524,7 @@ export default function createPostGraphileHttpRequestHandler(
     // on port 5783.
     if (enableCors) addCORSHeaders(res);
 
-    const { pathname = '' } = parseUrl(req) || {};
+    const { pathname = "" } = parseUrl(req) || {};
 
     // Certain things depend on externalUrlBase, which we guess if the user
     // doesn't supply it, so we calculate them on the first request. After
@@ -488,22 +544,22 @@ export default function createPostGraphileHttpRequestHandler(
 
       // If this is the favicon path and it has not yet been handled, let us
       // serve our GraphQL favicon.
-      if (pathname === '/favicon.ico') {
+      if (pathname === "/favicon.ico") {
         // If this is the wrong method, we should let the client know.
-        if (!(req.method === 'GET' || req.method === 'HEAD')) {
-          res.statusCode = req.method === 'OPTIONS' ? 200 : 405;
-          res.setHeader('Allow', 'GET, HEAD, OPTIONS');
+        if (!(req.method === "GET" || req.method === "HEAD")) {
+          res.statusCode = req.method === "OPTIONS" ? 200 : 405;
+          res.setHeader("Allow", "GET, HEAD, OPTIONS");
           res.end();
           return;
         }
 
         // Otherwise we are good and should pipe the favicon to the browser.
         res.statusCode = 200;
-        res.setHeader('Cache-Control', 'public, max-age=86400');
-        res.setHeader('Content-Type', 'image/x-icon');
+        res.setHeader("Cache-Control", "public, max-age=86400");
+        res.setHeader("Content-Type", "image/x-icon");
 
         // End early if the method is `HEAD`.
-        if (req.method === 'HEAD') {
+        if (req.method === "HEAD") {
           res.end();
           return;
         }
@@ -517,8 +573,8 @@ export default function createPostGraphileHttpRequestHandler(
       // ======================================================================
 
       // Setup an event stream so we can broadcast events to graphiql, etc.
-      if (pathname === streamRoute || pathname === '/_postgraphile/stream') {
-        if (!watchPg || req.headers.accept !== 'text/event-stream') {
+      if (pathname === streamRoute || pathname === "/_postgraphile/stream") {
+        if (!watchPg || req.headers.accept !== "text/event-stream") {
           res.statusCode = 405;
           res.end();
           return;
@@ -536,32 +592,32 @@ export default function createPostGraphileHttpRequestHandler(
         // If we are developing PostGraphile, instead just redirect.
         if (isPostGraphileDevelopmentMode) {
           res.statusCode = 302;
-          res.setHeader('Location', 'http://localhost:5783');
+          res.setHeader("Location", "http://localhost:5783");
           res.end();
           return;
         }
 
         // If using the incorrect method, let the user know.
-        if (!(req.method === 'GET' || req.method === 'HEAD')) {
-          res.statusCode = req.method === 'OPTIONS' ? 200 : 405;
-          res.setHeader('Allow', 'GET, HEAD, OPTIONS');
+        if (!(req.method === "GET" || req.method === "HEAD")) {
+          res.statusCode = req.method === "OPTIONS" ? 200 : 405;
+          res.setHeader("Allow", "GET, HEAD, OPTIONS");
           res.end();
           return;
         }
 
         res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-        res.setHeader('Content-Security-Policy', "frame-ancestors 'self'");
+        res.setHeader("Content-Type", "text/html; charset=utf-8");
+        res.setHeader("X-Frame-Options", "SAMEORIGIN");
+        res.setHeader("Content-Security-Policy", "frame-ancestors 'self'");
 
         // End early if the method is `HEAD`.
-        if (req.method === 'HEAD') {
+        if (req.method === "HEAD") {
           res.end();
           return;
         }
 
         // Actually renders GraphiQL.
-        if (graphiqlHtml && typeof options.allowExplain === 'function') {
+        if (graphiqlHtml && typeof options.allowExplain === "function") {
           res.end(
             graphiqlHtml.replace(
               `"${ALLOW_EXPLAIN_PLACEHOLDER}"`, // Because JSON escaped
@@ -587,11 +643,14 @@ export default function createPostGraphileHttpRequestHandler(
     if (watchPg) {
       // Inform GraphiQL and other clients that they can subscribe to events
       // (such as the schema being updated) at the following URL
-      res.setHeader('X-GraphQL-Event-Stream', `${externalUrlBase}${streamRoute}`);
+      res.setHeader(
+        "X-GraphQL-Event-Stream",
+        `${externalUrlBase}${streamRoute}`,
+      );
     }
 
     // Don’t execute our GraphQL stuffs for `OPTIONS` requests.
-    if (req.method === 'OPTIONS') {
+    if (req.method === "OPTIONS") {
       res.statusCode = 200;
       res.end();
       return;
@@ -609,7 +668,7 @@ export default function createPostGraphileHttpRequestHandler(
     const queryTimeStart = !disableQueryLog && process.hrtime();
     let pgRole: string | undefined;
 
-    if (debugRequest.enabled) debugRequest('GraphQL query request has begun.');
+    if (debugRequest.enabled) debugRequest("GraphQL query request has begun.");
     let returnArray = false;
 
     // This big `try`/`catch`/`finally` block represents the execution of our
@@ -629,9 +688,9 @@ export default function createPostGraphileHttpRequestHandler(
       await parseBody(req, res);
 
       // If this is not one of the correct methods, throw an error.
-      if (req.method !== 'POST') {
-        res.setHeader('Allow', 'POST, OPTIONS');
-        throw httpError(405, 'Only `POST` requests are allowed.');
+      if (req.method !== "POST") {
+        res.setHeader("Allow", "POST, OPTIONS");
+        throw httpError(405, "Only `POST` requests are allowed.");
       }
 
       // Get the parameters we will use to run a GraphQL request. `params` may
@@ -642,12 +701,15 @@ export default function createPostGraphileHttpRequestHandler(
       // - `operationName`: The optional name of the GraphQL operation we will
       //   be executing.
       const body: string | object = (req as any).body;
-      paramsList = typeof body === 'string' ? { query: body } : body;
+      paramsList = typeof body === "string" ? { query: body } : body;
 
       // Validate our paramsList object a bit.
       if (paramsList == null)
-        throw httpError(400, 'Must provide an object parameters, not nullish value.');
-      if (typeof paramsList !== 'object')
+        throw httpError(
+          400,
+          "Must provide an object parameters, not nullish value.",
+        );
+      if (typeof paramsList !== "object")
         throw httpError(
           400,
           `Expected parameter object, not value of type '${typeof paramsList}'.`,
@@ -656,7 +718,7 @@ export default function createPostGraphileHttpRequestHandler(
         if (!enableQueryBatching) {
           throw httpError(
             501,
-            'Batching queries as an array is currently unsupported. Please provide a single query object.',
+            "Batching queries as an array is currently unsupported. Please provide a single query object.",
           );
         } else {
           returnArray = true;
@@ -664,7 +726,7 @@ export default function createPostGraphileHttpRequestHandler(
       } else {
         paramsList = [paramsList];
       }
-      paramsList = pluginHook('postgraphile:httpParamsList', paramsList, {
+      paramsList = pluginHook("postgraphile:httpParamsList", paramsList, {
         options,
         req,
         res,
@@ -677,17 +739,17 @@ export default function createPostGraphileHttpRequestHandler(
           let result: any;
           const meta = Object.create(null);
           try {
-            if (!params) throw httpError(400, 'Invalid query structure.');
+            if (!params) throw httpError(400, "Invalid query structure.");
             const { query, operationName } = params;
             let { variables } = params;
-            if (!query) throw httpError(400, 'Must provide a query string.');
+            if (!query) throw httpError(400, "Must provide a query string.");
 
             // If variables is a string, we assume it is a JSON string and that it
             // needs to be parsed.
-            if (typeof variables === 'string') {
+            if (typeof variables === "string") {
               // If variables is just an empty string, we should set it to null and
               // ignore it.
-              if (variables === '') {
+              if (variables === "") {
                 variables = null;
               } else {
                 // Otherwise, let us try to parse it as JSON.
@@ -701,31 +763,41 @@ export default function createPostGraphileHttpRequestHandler(
             }
 
             // Throw an error if `variables` is not an object.
-            if (variables != null && typeof variables !== 'object')
-              throw httpError(400, `Variables must be an object, not '${typeof variables}'.`);
+            if (variables != null && typeof variables !== "object")
+              throw httpError(
+                400,
+                `Variables must be an object, not '${typeof variables}'.`,
+              );
 
             // Throw an error if `operationName` is not a string.
-            if (operationName != null && typeof operationName !== 'string')
+            if (operationName != null && typeof operationName !== "string")
               throw httpError(
                 400,
                 `Operation name must be a string, not '${typeof operationName}'.`,
               );
 
             let validationErrors: ReadonlyArray<GraphQLError>;
-            ({ queryDocumentAst, validationErrors } = parseQuery(gqlSchema, query));
+            ({ queryDocumentAst, validationErrors } = parseQuery(
+              gqlSchema,
+              query,
+            ));
 
             if (validationErrors.length === 0) {
               // You are strongly encouraged to use
               // `postgraphile:validationRules:static` if possible - you should
               // only use this one if you need access to variables.
-              const moreValidationRules = pluginHook('postgraphile:validationRules', [], {
-                options,
-                req,
-                res,
-                variables,
-                operationName,
-                meta,
-              });
+              const moreValidationRules = pluginHook(
+                "postgraphile:validationRules",
+                [],
+                {
+                  options,
+                  req,
+                  res,
+                  variables,
+                  operationName,
+                  meta,
+                },
+              );
               if (moreValidationRules.length) {
                 validationErrors = validateGraphql(
                   gqlSchema,
@@ -740,16 +812,17 @@ export default function createPostGraphileHttpRequestHandler(
             if (validationErrors.length > 0) {
               result = { errors: validationErrors, statusCode: 400 };
             } else if (!queryDocumentAst) {
-              throw new Error('Could not process query');
+              throw new Error("Could not process query");
             } else {
-              if (debugRequest.enabled) debugRequest('GraphQL query is validated.');
+              if (debugRequest.enabled)
+                debugRequest("GraphQL query is validated.");
 
               // Lazily log the query. If this debugger isn’t enabled, don’t run it.
               if (debugGraphql.enabled)
                 debugGraphql(
-                  '%s',
+                  "%s",
                   printGraphql(queryDocumentAst)
-                    .replace(/\s+/g, ' ')
+                    .replace(/\s+/g, " ")
                     .trim(),
                 );
 
@@ -773,7 +846,7 @@ export default function createPostGraphileHttpRequestHandler(
                     operationName,
                   );
                   const { getExplainResults } = graphqlContext;
-                  if (typeof getExplainResults === 'function') {
+                  if (typeof getExplainResults === "function") {
                     return Promise.resolve(graphqlResult).then(async obj => ({
                       ...obj,
                       // Add our explain data
@@ -803,7 +876,7 @@ export default function createPostGraphileHttpRequestHandler(
             if (!isEmpty(meta)) {
               result.meta = meta;
             }
-            result = pluginHook('postgraphile:http:result', result, {
+            result = pluginHook("postgraphile:http:result", result, {
               options,
               returnArray,
               queryDocumentAst,
@@ -821,7 +894,7 @@ export default function createPostGraphileHttpRequestHandler(
               const timeDiff = queryTimeStart && process.hrtime(queryTimeStart);
               setImmediate(() => {
                 const prettyQuery = printGraphql(definitelyQueryDocumentAst)
-                  .replace(/\s+/g, ' ')
+                  .replace(/\s+/g, " ")
                   .trim();
                 const errorCount = (result.errors || []).length;
                 const ms = timeDiff[0] * 1e3 + timeDiff[1] * 1e-6;
@@ -835,25 +908,29 @@ export default function createPostGraphileHttpRequestHandler(
                 } else if (resultStatusCode === 403) {
                   message = chalk.red(`403 forbidden error`);
                 } else {
-                  message = chalk[errorCount === 0 ? 'green' : 'red'](`${errorCount} error(s)`);
+                  message = chalk[errorCount === 0 ? "green" : "red"](
+                    `${errorCount} error(s)`,
+                  );
                 }
 
                 // tslint:disable-next-line no-console
                 console.log(
                   `${message} ${
-                    pgRole != null ? `as ${chalk.magenta(pgRole)} ` : ''
+                    pgRole != null ? `as ${chalk.magenta(pgRole)} ` : ""
                   }in ${chalk.grey(`${ms.toFixed(2)}ms`)} :: ${prettyQuery}`,
                 );
               });
             }
-            if (debugRequest.enabled) debugRequest('GraphQL query has been executed.');
+            if (debugRequest.enabled)
+              debugRequest("GraphQL query has been executed.");
           }
           return result;
         }),
       );
     } catch (error) {
       // Set our status code and send the client our results!
-      if (res.statusCode === 200) res.statusCode = error.status || error.statusCode || 500;
+      if (res.statusCode === 200)
+        res.statusCode = error.status || error.statusCode || 500;
 
       // Overwrite entire response
       returnArray = false;
@@ -872,9 +949,9 @@ export default function createPostGraphileHttpRequestHandler(
         results[0].statusCode = undefined;
       }
 
-      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.setHeader("Content-Type", "application/json; charset=utf-8");
       const { statusCode, result } = pluginHook(
-        'postgraphile:http:end',
+        "postgraphile:http:end",
         {
           statusCode: res.statusCode,
           result: returnArray ? results : results[0]!,
@@ -893,7 +970,11 @@ export default function createPostGraphileHttpRequestHandler(
       res.end(JSON.stringify(result));
 
       if (debugRequest.enabled)
-        debugRequest('GraphQL ' + (returnArray ? 'queries' : 'query') + ' request finished.');
+        debugRequest(
+          "GraphQL " +
+            (returnArray ? "queries" : "query") +
+            " request finished.",
+        );
     }
   };
 
@@ -936,7 +1017,7 @@ export default function createPostGraphileHttpRequestHandler(
   middleware.handleErrors = handleErrors;
   middleware.options = options;
 
-  const hookedMiddleware = pluginHook('postgraphile:middleware', middleware, {
+  const hookedMiddleware = pluginHook("postgraphile:middleware", middleware, {
     options,
   });
   // Sanity check:
@@ -962,33 +1043,39 @@ export default function createPostGraphileHttpRequestHandler(
  * [1]: http://www.html5rocks.com/static/images/cors_server_flowchart.png
  */
 function addCORSHeaders(res: ServerResponse): void {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'HEAD, GET, POST');
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "HEAD, GET, POST");
   res.setHeader(
-    'Access-Control-Allow-Headers',
+    "Access-Control-Allow-Headers",
     [
-      'Origin',
-      'X-Requested-With',
+      "Origin",
+      "X-Requested-With",
       // Used by `express-graphql` to determine whether to expose the GraphiQL
       // interface (`text/html`) or not.
-      'Accept',
+      "Accept",
       // Used by PostGraphile for auth purposes.
-      'Authorization',
+      "Authorization",
       // Used by GraphQL Playground and other Apollo-enabled servers
-      'X-Apollo-Tracing',
+      "X-Apollo-Tracing",
       // The `Content-*` headers are used when making requests with a body,
       // like in a POST request.
-      'Content-Type',
-      'Content-Length',
+      "Content-Type",
+      "Content-Length",
       // For our 'Explain' feature
-      'X-PostGraphile-Explain',
-    ].join(', '),
+      "X-PostGraphile-Explain",
+    ].join(", "),
   );
-  res.setHeader('Access-Control-Expose-Headers', ['X-GraphQL-Event-Stream'].join(', '));
+  res.setHeader(
+    "Access-Control-Expose-Headers",
+    ["X-GraphQL-Event-Stream"].join(", "),
+  );
 }
 
 function createBadAuthorizationHeaderError(): httpError.HttpError {
-  return httpError(400, 'Authorization header is not of the correct bearer scheme format.');
+  return httpError(
+    400,
+    "Authorization header is not of the correct bearer scheme format.",
+  );
 }
 
 /**

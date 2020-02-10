@@ -53,7 +53,7 @@ const withPgClient = (url, fn) => {
 
 const transactionlessQuery = (query, variables) => {
   return withTransactionlessPgClient(pgClient =>
-    pgClient.query(query, variables)
+    pgClient.query(query, variables),
   );
 };
 
@@ -74,7 +74,7 @@ let prepopulatedDBKeepalive;
 
 const populateDatabase = async client => {
   await client.query(
-    await readFilePromise(`${__dirname}/kitchen-sink-data.sql`, "utf8")
+    await readFilePromise(`${__dirname}/kitchen-sink-data.sql`, "utf8"),
   );
   return {};
 };

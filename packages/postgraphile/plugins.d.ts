@@ -1,1 +1,1 @@
-export * from './build/plugins';
+export * from "./build/plugins";

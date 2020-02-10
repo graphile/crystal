@@ -1,30 +1,30 @@
-jest.unmock('postgraphile-core');
+jest.unmock("postgraphile-core");
 
-import { resolve as resolvePath } from 'path';
-import { readFile, readdirSync } from 'fs';
-import { graphql } from 'graphql';
-import withPgClient from '../../__tests__/utils/withPgClient';
-import { $$pgClient } from '../../postgres/inventory/pgClientFromContext';
-import { createPostGraphileSchema } from '..';
+import { resolve as resolvePath } from "path";
+import { readFile, readdirSync } from "fs";
+import { graphql } from "graphql";
+import withPgClient from "../../__tests__/utils/withPgClient";
+import { $$pgClient } from "../../postgres/inventory/pgClientFromContext";
+import { createPostGraphileSchema } from "..";
 
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20;
 
 const kitchenSinkData = new Promise((resolve, reject) => {
-  readFile('examples/kitchen-sink/data.sql', (error, data) => {
+  readFile("examples/kitchen-sink/data.sql", (error, data) => {
     if (error) reject(error);
-    else resolve(data.toString().replace(/begin;|commit;/g, ''));
+    else resolve(data.toString().replace(/begin;|commit;/g, ""));
   });
 });
 
-const mutationsDir = resolvePath(__dirname, 'fixtures/mutations');
+const mutationsDir = resolvePath(__dirname, "fixtures/mutations");
 const mutationFileNames = readdirSync(mutationsDir);
 let mutationResults = [];
 
 beforeAll(() => {
   // Get a GraphQL schema instance that we can query.
   const gqlSchemaPromise = withPgClient(async pgClient => {
-    return await createPostGraphileSchema(pgClient, ['a', 'b', 'c']);
+    return await createPostGraphileSchema(pgClient, ["a", "b", "c"]);
   })();
 
   // Execute all of the mutations in parallel. We will not wait for them to
@@ -40,7 +40,7 @@ beforeAll(() => {
     return await withPgClient(async pgClient => {
       // Read the mutation from the file system.
       const mutation = await new Promise((resolve, reject) => {
-        readFile(resolvePath(mutationsDir, fileName), 'utf8', (error, data) => {
+        readFile(resolvePath(mutationsDir, fileName), "utf8", (error, data) => {
           if (error) reject(error);
           else resolve(data);
         });

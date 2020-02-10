@@ -102,7 +102,7 @@ export { LiveSource, LiveProvider, LiveMonitor, LiveCoordinator } from "./Live";
 
 export const getBuilder = async (
   plugins: Array<Plugin>,
-  options: GraphileBuildOptions = {}
+  options: GraphileBuildOptions = {},
 ): Promise<SchemaBuilder> => {
   const builder = new SchemaBuilder(options);
   for (let i = 0, l = plugins.length; i < l; i++) {
@@ -110,8 +110,8 @@ export const getBuilder = async (
     if (typeof plugin !== "function") {
       throw new Error(
         `Expected a list of plugin functions, instead list contained a non-function at index ${i}: ${util.inspect(
-          plugin
-        )}`
+          plugin,
+        )}`,
       );
     }
     // $FlowFixMe: displayName
@@ -124,7 +124,7 @@ export const getBuilder = async (
 
 export const buildSchema = async (
   plugins: Array<Plugin>,
-  options: GraphileBuildOptions = {}
+  options: GraphileBuildOptions = {},
 ): Promise<import("graphql").GraphQLSchema> => {
   const builder: SchemaBuilder = await getBuilder(plugins, options);
   return builder.buildSchema();

@@ -1,7 +1,7 @@
 import { Plugin, ScopeGraphQLObjectType } from "../SchemaBuilder";
 
 function isValidSubscription(
-  Subscription: import("graphql").GraphQLObjectType | null
+  Subscription: import("graphql").GraphQLObjectType | null,
 ) {
   try {
     if (!Subscription) {
@@ -64,7 +64,7 @@ export default (async function SubscriptionPlugin(builder, { live }) {
             subscription: Subscription,
           },
 
-          "Adding subscription type to schema"
+          "Adding subscription type to schema",
         );
       } else {
         return schema;
@@ -72,6 +72,6 @@ export default (async function SubscriptionPlugin(builder, { live }) {
     },
     ["Subscription"],
     [],
-    ["Query"]
+    ["Query"],
   );
 } as Plugin);

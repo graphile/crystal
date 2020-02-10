@@ -34,7 +34,7 @@ export function isProcedure(obj: PgEntity): obj is PgProc {
 export function entityIsIdentifiedBy(
   obj: PgEntity,
   identifier: string,
-  build: BuildWithIntrospection
+  build: BuildWithIntrospection,
 ): boolean {
   const parts = parseIdentifierParts(identifier);
   if (parts.length === 1) {
@@ -47,7 +47,7 @@ export function entityIsIdentifiedBy(
       const klass:
         | PgClass
         | undefined = build.pgIntrospectionResultsByKind.class.find(
-        (kls: PgClass) => kls.id === obj.classId
+        (kls: PgClass) => kls.id === obj.classId,
       );
       return obj.name === expectedName && !!klass && klass.name === parentName;
     } else if (isClass(obj) || isProcedure(obj)) {
@@ -55,7 +55,7 @@ export function entityIsIdentifiedBy(
       return obj.name === expectedName && obj.namespaceName === parentName;
     } else {
       throw new Error(
-        `Type '${obj.kind}' not supported by makeSmartCommentsPlugin`
+        `Type '${obj.kind}' not supported by makeSmartCommentsPlugin`,
       );
     }
   } else if (parts.length === 3) {
@@ -65,7 +65,7 @@ export function entityIsIdentifiedBy(
       const klass:
         | PgClass
         | undefined = build.pgIntrospectionResultsByKind.class.find(
-        (kls: PgClass) => kls.id === obj.classId
+        (kls: PgClass) => kls.id === obj.classId,
       );
       return (
         obj.name === expectedName &&
@@ -76,12 +76,12 @@ export function entityIsIdentifiedBy(
     } else {
       // Parent is a schema; grandparent doesn't make sense
       throw new Error(
-        `Identifier '${identifier}' does not make sense for a '${obj.kind}' entity`
+        `Identifier '${identifier}' does not make sense for a '${obj.kind}' entity`,
       );
     }
   } else {
     throw new Error(
-      `makeSmartCommentsPlugin did not know how to interpret match '${identifier}'`
+      `makeSmartCommentsPlugin did not know how to interpret match '${identifier}'`,
     );
   }
 }

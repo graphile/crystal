@@ -13,14 +13,14 @@ const HOST = process.env.LD_HOST || "127.0.0.1";
 const SLOTS = parseInt(process.env.LD_MAX_CLIENTS || "", 10) || 50;
 const SLEEP_DURATION = Math.max(
   1,
-  parseInt(process.env.LD_WAIT || "", 10) || 125
+  parseInt(process.env.LD_WAIT || "", 10) || 125,
 );
 const stringify = JSON.stringify;
 
 async function main() {
   if (!CONNECTION_STRING) {
     throw new Error(
-      "No connection string provided, please set envvar LD_DATABASE_URL."
+      "No connection string provided, please set envvar LD_DATABASE_URL.",
     );
   }
   // Now slot is created, create websocket server
@@ -40,7 +40,7 @@ async function main() {
         ws.send(
           JSON.stringify({
             _: "KA",
-          })
+          }),
         );
       }
     });
@@ -131,7 +131,7 @@ async function main() {
     ws.send(
       JSON.stringify({
         _: "ACK",
-      })
+      }),
     );
   });
 

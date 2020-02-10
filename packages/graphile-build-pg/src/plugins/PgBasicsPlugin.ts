@@ -53,8 +53,8 @@ export function stringTag(pgEntity: PgEntity, tagName: string): string | null {
   } else {
     throw new Error(
       `Expected smart tag '${tagName}' on '${describePgEntity(
-        pgEntity
-      )}' to be a string, but instead received '${inspect(tagVal)}'`
+        pgEntity,
+      )}' to be a string, but instead received '${inspect(tagVal)}'`,
     );
   }
 }
@@ -62,7 +62,7 @@ export function stringTag(pgEntity: PgEntity, tagName: string): string | null {
 type PgColumnFilterFunction = (
   attr: PgAttribute,
   build: Build,
-  context: Context
+  context: Context,
 ) => boolean;
 
 type PgConfig = import("pg").Pool | import("pg").PoolClient | string;
@@ -137,7 +137,7 @@ declare module "graphile-build" {
       pseudoColumnName: string,
       proc: PgProc,
       table: PgClass,
-      ascending: boolean
+      ascending: boolean,
     ): string;
     domainType(type: PgType): string;
     enumName(inValue: string): string;
@@ -151,7 +151,7 @@ declare module "graphile-build" {
       proc: PgProc,
       gqlType: import("graphql").GraphQLNamedType,
       plural?: boolean,
-      outputArgNames?: Array<string>
+      outputArgNames?: Array<string>,
     ): string;
     functionQueryName(proc: PgProc): string;
     functionQueryNameList(proc: PgProc): string;
@@ -160,68 +160,68 @@ declare module "graphile-build" {
     functionOutputFieldName(
       proc: PgProc,
       outputArgName: string,
-      index: number
+      index: number,
     ): string;
     tableType(table: PgClass): string;
     column(attr: PgAttribute): string;
     computedColumn(
       pseudoColumnName: string,
       proc: PgProc,
-      _table: PgClass
+      _table: PgClass,
     ): string;
     computedColumnList(
       pseudoColumnName: string,
       proc: PgProc,
-      _table: PgClass
+      _table: PgClass,
     ): string;
     singleRelationByKeys(
       detailedKeys: PgAttribute[],
       table: PgClass,
       _foreignTable: PgClass,
-      constraint: PgConstraint
+      constraint: PgConstraint,
     ): string;
     singleRelationByKeysBackwards(
       detailedKeys: PgAttribute[],
       table: PgClass,
       _foreignTable: PgClass,
-      constraint: PgConstraint
+      constraint: PgConstraint,
     ): string;
     manyRelationByKeys(
       detailedKeys: PgAttribute[],
       table: PgClass,
       _foreignTable: PgClass,
-      constraint: PgConstraint
+      constraint: PgConstraint,
     ): string;
     manyRelationByKeysSimple(
       detailedKeys: PgAttribute[],
       table: PgClass,
       _foreignTable: PgClass,
-      constraint: PgConstraint
+      constraint: PgConstraint,
     ): string;
     rowByUniqueKeys(
       detailedKeys: PgAttribute[],
       table: PgClass,
-      constraint: PgConstraint
+      constraint: PgConstraint,
     ): string;
     updateByKeys(
       detailedKeys: PgAttribute[],
       table: PgClass,
-      constraint: PgConstraint
+      constraint: PgConstraint,
     ): string;
     deleteByKeys(
       detailedKeys: PgAttribute[],
       table: PgClass,
-      constraint: PgConstraint
+      constraint: PgConstraint,
     ): string;
     updateByKeysInputType(
       detailedKeys: PgAttribute[],
       table: PgClass,
-      constraint: PgConstraint
+      constraint: PgConstraint,
     ): string;
     deleteByKeysInputType(
       detailedKeys: PgAttribute[],
       table: PgClass,
-      constraint: PgConstraint
+      constraint: PgConstraint,
     ): string;
     updateNode(table: PgClass): string;
     deleteNode(table: PgClass): string;
@@ -291,19 +291,19 @@ function makePgBaseInflectors(): Partial<Inflection> {
     },
     _tableName(this: Inflection, table: PgClass) {
       return this.coerceToGraphQLName(
-        stringTag(table, "name") || stringTag(table.type, "name") || table.name
+        stringTag(table, "name") || stringTag(table.type, "name") || table.name,
       );
     },
     _singularizedTableName(this: Inflection, table: PgClass): string {
       return this.singularize(this._tableName(table)).replace(
         /.(?:(?:[_-]i|I)nput|(?:[_-]p|P)atch)$/,
-        "$&_record"
+        "$&_record",
       );
     },
     _columnName(
       this: Inflection,
       attr: PgAttribute,
-      _options?: { skipRowId?: boolean }
+      _options?: { skipRowId?: boolean },
     ) {
       return this.coerceToGraphQLName(stringTag(attr, "name") || attr.name);
     },
@@ -329,7 +329,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       pseudoColumnName: string,
       proc: PgProc,
       table: PgClass,
-      ascending: boolean
+      ascending: boolean,
     ) {
       const columnName = this.computedColumn(pseudoColumnName, proc, table);
 
@@ -428,12 +428,12 @@ function makePgBaseInflectors(): Partial<Inflection> {
     },
     allRows(this: Inflection, table: PgClass) {
       return this.camelCase(
-        `all-${this.pluralize(this._singularizedTableName(table))}`
+        `all-${this.pluralize(this._singularizedTableName(table))}`,
       );
     },
     allRowsSimple(this: Inflection, table: PgClass) {
       return this.camelCase(
-        `all-${this.pluralize(this._singularizedTableName(table))}-list`
+        `all-${this.pluralize(this._singularizedTableName(table))}-list`,
       );
     },
     functionMutationName(this: Inflection, proc: PgProc) {
@@ -444,7 +444,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       proc: PgProc,
       gqlType: import("graphql").GraphQLNamedType,
       plural = false,
-      outputArgNames: Array<string> = []
+      outputArgNames: Array<string> = [],
     ): string {
       const resultFieldName = stringTag(proc, "resultFieldName");
       if (resultFieldName) {
@@ -485,7 +485,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       this: Inflection,
       _proc: PgProc,
       outputArgName: string,
-      index: number
+      index: number,
     ) {
       return this.argument(outputArgName, index);
     },
@@ -499,7 +499,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       this: Inflection,
       pseudoColumnName: string,
       proc: PgProc,
-      _table: PgClass
+      _table: PgClass,
     ) {
       return stringTag(proc, "fieldName") || this.camelCase(pseudoColumnName);
     },
@@ -507,7 +507,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       this: Inflection,
       pseudoColumnName: string,
       proc: PgProc,
-      _table: PgClass
+      _table: PgClass,
     ) {
       return stringTag(proc, "fieldName")
         ? stringTag(proc, "fieldName") + "List"
@@ -518,7 +518,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       detailedKeys: PgAttribute[],
       table: PgClass,
       _foreignTable: PgClass,
-      constraint: PgConstraint
+      constraint: PgConstraint,
     ) {
       const fieldName = stringTag(constraint, "fieldName");
       if (fieldName) {
@@ -527,7 +527,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       return this.camelCase(
         `${this._singularizedTableName(table)}-by-${detailedKeys
           .map(key => this.column(key))
-          .join("-and-")}`
+          .join("-and-")}`,
       );
     },
     singleRelationByKeysBackwards(
@@ -535,11 +535,11 @@ function makePgBaseInflectors(): Partial<Inflection> {
       detailedKeys: PgAttribute[],
       table: PgClass,
       _foreignTable: PgClass,
-      constraint: PgConstraint
+      constraint: PgConstraint,
     ) {
       const foreignSingleFieldName = stringTag(
         constraint,
-        "foreignSingleFieldName"
+        "foreignSingleFieldName",
       );
       if (foreignSingleFieldName) {
         return foreignSingleFieldName;
@@ -552,7 +552,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
         detailedKeys,
         table,
         _foreignTable,
-        constraint
+        constraint,
       );
     },
     manyRelationByKeys(
@@ -560,7 +560,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       detailedKeys: PgAttribute[],
       table: PgClass,
       _foreignTable: PgClass,
-      constraint: PgConstraint
+      constraint: PgConstraint,
     ) {
       const foreignFieldName = stringTag(constraint, "foreignFieldName");
       if (foreignFieldName) {
@@ -568,8 +568,8 @@ function makePgBaseInflectors(): Partial<Inflection> {
       }
       return this.camelCase(
         `${this.pluralize(
-          this._singularizedTableName(table)
-        )}-by-${detailedKeys.map(key => this.column(key)).join("-and-")}`
+          this._singularizedTableName(table),
+        )}-by-${detailedKeys.map(key => this.column(key)).join("-and-")}`,
       );
     },
     manyRelationByKeysSimple(
@@ -577,11 +577,11 @@ function makePgBaseInflectors(): Partial<Inflection> {
       detailedKeys: PgAttribute[],
       table: PgClass,
       _foreignTable: PgClass,
-      constraint: PgConstraint
+      constraint: PgConstraint,
     ) {
       const foreignSimpleFieldName = stringTag(
         constraint,
-        "foreignSimpleFieldName"
+        "foreignSimpleFieldName",
       );
       if (foreignSimpleFieldName) {
         return foreignSimpleFieldName;
@@ -592,15 +592,15 @@ function makePgBaseInflectors(): Partial<Inflection> {
       }
       return this.camelCase(
         `${this.pluralize(
-          this._singularizedTableName(table)
-        )}-by-${detailedKeys.map(key => this.column(key)).join("-and-")}-list`
+          this._singularizedTableName(table),
+        )}-by-${detailedKeys.map(key => this.column(key)).join("-and-")}-list`,
       );
     },
     rowByUniqueKeys(
       this: Inflection,
       detailedKeys: PgAttribute[],
       table: PgClass,
-      constraint: PgConstraint
+      constraint: PgConstraint,
     ) {
       const fieldName = stringTag(constraint, "fieldName");
       if (fieldName) {
@@ -609,14 +609,14 @@ function makePgBaseInflectors(): Partial<Inflection> {
       return this.camelCase(
         `${this._singularizedTableName(table)}-by-${detailedKeys
           .map(key => this.column(key))
-          .join("-and-")}`
+          .join("-and-")}`,
       );
     },
     updateByKeys(
       this: Inflection,
       detailedKeys: PgAttribute[],
       table: PgClass,
-      constraint: PgConstraint
+      constraint: PgConstraint,
     ) {
       const updateFieldName = stringTag(constraint, "updateFieldName");
       if (updateFieldName) {
@@ -625,14 +625,14 @@ function makePgBaseInflectors(): Partial<Inflection> {
       return this.camelCase(
         `update-${this._singularizedTableName(table)}-by-${detailedKeys
           .map(key => this.column(key))
-          .join("-and-")}`
+          .join("-and-")}`,
       );
     },
     deleteByKeys(
       this: Inflection,
       detailedKeys: PgAttribute[],
       table: PgClass,
-      constraint: PgConstraint
+      constraint: PgConstraint,
     ) {
       const deleteFieldName = stringTag(constraint, "deleteFieldName");
       if (deleteFieldName) {
@@ -641,14 +641,14 @@ function makePgBaseInflectors(): Partial<Inflection> {
       return this.camelCase(
         `delete-${this._singularizedTableName(table)}-by-${detailedKeys
           .map(key => this.column(key))
-          .join("-and-")}`
+          .join("-and-")}`,
       );
     },
     updateByKeysInputType(
       this: Inflection,
       detailedKeys: PgAttribute[],
       table: PgClass,
-      constraint: PgConstraint
+      constraint: PgConstraint,
     ) {
       const updateFieldName = stringTag(constraint, "updateFieldName");
       if (updateFieldName) {
@@ -657,14 +657,14 @@ function makePgBaseInflectors(): Partial<Inflection> {
       return this.upperCamelCase(
         `update-${this._singularizedTableName(table)}-by-${detailedKeys
           .map(key => this.column(key))
-          .join("-and-")}-input`
+          .join("-and-")}-input`,
       );
     },
     deleteByKeysInputType(
       this: Inflection,
       detailedKeys: PgAttribute[],
       table: PgClass,
-      constraint: PgConstraint
+      constraint: PgConstraint,
     ) {
       const deleteFieldName = stringTag(constraint, "deleteFieldName");
       if (deleteFieldName) {
@@ -673,7 +673,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       return this.upperCamelCase(
         `delete-${this._singularizedTableName(table)}-by-${detailedKeys
           .map(key => this.column(key))
-          .join("-and-")}-input`
+          .join("-and-")}-input`,
       );
     },
     updateNode(this: Inflection, table: PgClass) {
@@ -687,12 +687,12 @@ function makePgBaseInflectors(): Partial<Inflection> {
     },
     updateNodeInputType(this: Inflection, table: PgClass) {
       return this.upperCamelCase(
-        `update-${this._singularizedTableName(table)}-input`
+        `update-${this._singularizedTableName(table)}-input`,
       );
     },
     deleteNodeInputType(this: Inflection, table: PgClass) {
       return this.upperCamelCase(
-        `delete-${this._singularizedTableName(table)}-input`
+        `delete-${this._singularizedTableName(table)}-input`,
       );
     },
     edgeField(this: Inflection, table: PgClass) {
@@ -709,7 +709,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
     },
     recordFunctionEdge(this: Inflection, proc: PgProc) {
       return this.upperCamelCase(
-        `${this.singularize(this._functionName(proc))}-edge`
+        `${this.singularize(this._functionName(proc))}-edge`,
       );
     },
     scalarFunctionConnection(this: Inflection, proc: PgProc) {
@@ -717,7 +717,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
     },
     scalarFunctionEdge(this: Inflection, proc: PgProc) {
       return this.upperCamelCase(
-        `${this.singularize(this._functionName(proc))}-edge`
+        `${this.singularize(this._functionName(proc))}-edge`,
       );
     },
     createField(this: Inflection, table: PgClass) {
@@ -725,22 +725,22 @@ function makePgBaseInflectors(): Partial<Inflection> {
     },
     createInputType(this: Inflection, table: PgClass) {
       return this.upperCamelCase(
-        `create-${this._singularizedTableName(table)}-input`
+        `create-${this._singularizedTableName(table)}-input`,
       );
     },
     createPayloadType(this: Inflection, table: PgClass) {
       return this.upperCamelCase(
-        `create-${this._singularizedTableName(table)}-payload`
+        `create-${this._singularizedTableName(table)}-payload`,
       );
     },
     updatePayloadType(this: Inflection, table: PgClass) {
       return this.upperCamelCase(
-        `update-${this._singularizedTableName(table)}-payload`
+        `update-${this._singularizedTableName(table)}-payload`,
       );
     },
     deletePayloadType(this: Inflection, table: PgClass) {
       return this.upperCamelCase(
-        `delete-${this._singularizedTableName(table)}-payload`
+        `delete-${this._singularizedTableName(table)}-payload`,
       );
     },
   };
@@ -750,7 +750,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
 const defaultPgColumnFilter: PgColumnFilterFunction = (
   _attr,
   _build,
-  _context
+  _context,
 ) => true;
 
 function identity<T>(val: T): T {
@@ -766,10 +766,10 @@ export function preventEmptyResult<O>(obj: O): O {
         const stringifiedArgs = require("util").inspect(args);
         throw new Error(
           `Inflector for '${key}' returned '${String(
-            result
+            result,
           )}'; expected non-empty string\n` +
             `See: https://github.com/graphile/graphile-build/blob/master/packages/graphile-build-pg/src/plugins/PgBasicsPlugin.js\n` +
-            `Arguments passed to ${key}:\n${stringifiedArgs}`
+            `Arguments passed to ${key}:\n${stringifiedArgs}`,
         );
       }
       return result;
@@ -780,7 +780,7 @@ export function preventEmptyResult<O>(obj: O): O {
 
 const omitWithRBACChecks = (omit: typeof baseOmit): typeof baseOmit => (
   entity: PgProc | PgClass | PgAttribute | PgConstraint,
-  permission: string
+  permission: string,
 ) => {
   const ORDINARY_TABLE = "r";
   const VIEW = "v";
@@ -852,7 +852,7 @@ const omitWithRBACChecks = (omit: typeof baseOmit): typeof baseOmit => (
 
 const omitUnindexed = (omit: typeof baseOmit, hideIndexWarnings: boolean) => (
   entity: PgProc | PgClass | PgAttribute | PgConstraint,
-  permission: string
+  permission: string,
 ) => {
   if (
     entity.kind === "attribute" &&
@@ -877,10 +877,10 @@ const omitUnindexed = (omit: typeof baseOmit, hideIndexWarnings: boolean) => (
         console.log(
           "%s",
           `Disabled 'read' permission for ${describePgEntity(
-            entity
+            entity,
           )} because it isn't indexed. For more information see https://graphile.org/postgraphile/best-practices/ To fix, perform\n\n  CREATE INDEX ON ${`"${klass.namespaceName}"."${klass.name}"`}("${entity.keyAttributes
             .map(a => a.name)
-            .join('", "')}");`
+            .join('", "')}");`,
         );
       }
     }
@@ -891,21 +891,21 @@ const omitUnindexed = (omit: typeof baseOmit, hideIndexWarnings: boolean) => (
 
 export function describePgEntity(
   entity: PgEntity,
-  includeAlias = true
+  includeAlias = true,
 ): string {
   const getAlias = !includeAlias
     ? () => ""
     : () => {
         const tags: SmartTags = pickBy(
           entity.tags,
-          (_value, key) => key === "name" || key.endsWith("Name")
+          (_value, key) => key === "name" || key.endsWith("Name"),
         );
 
         if (Object.keys(tags).length) {
           return ` (with smart comments: ${chalk.bold(
             Object.keys(tags)
               .map(t => `@${t} ${tags[t]}`)
-              .join(" | ")
+              .join(" | "),
           )})`;
         }
         return "";
@@ -914,7 +914,7 @@ export function describePgEntity(
   try {
     if (entity.kind === "constraint") {
       return `constraint ${chalk.bold(
-        `"${entity.name}"`
+        `"${entity.name}"`,
       )} on ${describePgEntity(entity.class, false)}${getAlias()}`;
     } else if (entity.kind === "class") {
       // see pg_class.relkind https://www.postgresql.org/docs/10/static/catalog-pg-class.html
@@ -928,16 +928,16 @@ export function describePgEntity(
           m: "materialized view",
         }[entity.classKind] || "table-like";
       return `${kind} ${chalk.bold(
-        `"${entity.namespaceName}"."${entity.name}"`
+        `"${entity.namespaceName}"."${entity.name}"`,
       )}${getAlias()}`;
     } else if (entity.kind === "procedure") {
       return `function ${chalk.bold(
-        `"${entity.namespaceName}"."${entity.name}"(...args...)`
+        `"${entity.namespaceName}"."${entity.name}"(...args...)`,
       )}${getAlias()}`;
     } else if (entity.kind === "attribute") {
       return `column ${chalk.bold(`"${entity.name}"`)} on ${describePgEntity(
         entity.class,
-        false
+        false,
       )}${getAlias()}`;
     }
   } catch (e) {
@@ -967,7 +967,7 @@ function sqlCommentByAddingTags(entity: PgEntity, tagsToAdd: SmartTags) {
           "\n": "\\n",
           "\r": "\\r",
           "\t": "\\t",
-        }[chr] || "\\" + chr)
+        }[chr] || "\\" + chr),
     );
 
   // tagsToAdd is here twice to ensure that the keys in tagsToAdd come first, but that they also "win" any conflicts.
@@ -989,13 +989,13 @@ function sqlCommentByAddingTags(entity: PgEntity, tagsToAdd: SmartTags) {
             highlightOrNot(
               `@${escape(escape(tag))}${
                 value === true ? "" : " " + escape(escape(value))
-              }`
-            )
+              }`,
+            ),
           );
         });
         return memo;
       },
-      [] as Array<string>
+      [] as Array<string>,
     )
     .join("\\n");
   const commentValue = `E'${tagsSql}${
@@ -1039,7 +1039,7 @@ export default (function PgBasicsPlugin(
     pgHideIndexWarnings = false,
     pgLegacyJsonUuid = false, // TODO:v5: remove this
     pgAugmentIntrospectionResults,
-  }
+  },
 ) {
   let pgOmit = baseOmit;
   if (!pgIgnoreRBAC) {
@@ -1077,10 +1077,10 @@ export default (function PgBasicsPlugin(
       return build.extend(
         build,
         buildExtensions,
-        "Adding the graphile-build-pg basics"
+        "Adding the graphile-build-pg basics",
       );
     },
-    ["PgBasics"]
+    ["PgBasics"],
   );
 
   builder.hook(
@@ -1097,9 +1097,9 @@ export default (function PgBasicsPlugin(
       return build.extend(
         inflection,
         makePgBaseInflectors(),
-        "Default inflectors from PgBasicsPlugin. You can override these with `makeAddInflectorsPlugin(..., true)`."
+        "Default inflectors from PgBasicsPlugin. You can override these with `makeAddInflectorsPlugin(..., true)`.",
       );
     },
-    ["PgBasics"]
+    ["PgBasics"],
   );
 } as Plugin);

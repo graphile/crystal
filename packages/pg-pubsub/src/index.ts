@@ -30,11 +30,11 @@ const plugin: PostGraphilePlugin = {
   ["cli:flags:add:schema"](addFlag) {
     addFlag(
       "-S, --simple-subscriptions",
-      "⚡️[experimental] add simple subscription support"
+      "⚡️[experimental] add simple subscription support",
     );
     addFlag(
       "--subscription-authorization-function [schemaDotFunctionName]",
-      "⚡️[experimental] PG function to call to check user is allowed to subscribe"
+      "⚡️[experimental] PG function to call to check user is allowed to subscribe",
     );
     return addFlag;
   },
@@ -100,14 +100,14 @@ const plugin: PostGraphilePlugin = {
     };
     const listenToChannelWithClient = async function(
       client: pg.PoolClient,
-      channel: string
+      channel: string,
     ): Promise<void> {
       const sql = "LISTEN " + client.escapeIdentifier(channel);
       await client.query(sql);
     };
     const unlistenFromChannelWithClient = async function(
       client: pg.PoolClient,
-      channel: string
+      channel: string,
     ): Promise<void> {
       const sql = "UNLISTEN " + client.escapeIdentifier(channel);
       await client.query(sql);
@@ -150,7 +150,7 @@ const plugin: PostGraphilePlugin = {
       if (attempts > 0 && attempts % 5 === 0) {
         // eslint-disable-next-line no-console
         console.warn(
-          `WARNING: @graphile/pg-pubsub cannot establish a connection to the server; reattempting with exponential backoff (attempt ${attempts})`
+          `WARNING: @graphile/pg-pubsub cannot establish a connection to the server; reattempting with exponential backoff (attempt ${attempts})`,
         );
       }
       // Permanently check client out of the pool
@@ -162,8 +162,8 @@ const plugin: PostGraphilePlugin = {
         const delay = Math.floor(
           Math.min(
             RECONNECT_MAX_DELAY,
-            RECONNECT_BASE_DELAY * Math.random() * 2 ** attempts
-          )
+            RECONNECT_BASE_DELAY * Math.random() * 2 ** attempts,
+          ),
         );
         await sleep(delay);
         return setupClient(attempts + 1);
@@ -175,7 +175,7 @@ const plugin: PostGraphilePlugin = {
         client.query("select 1").catch(e => {
           // eslint-disable-next-line no-console
           console.error(
-            "Listen client keepalive error (will attempt reconnect):"
+            "Listen client keepalive error (will attempt reconnect):",
           );
           // eslint-disable-next-line no-console
           console.error(e);
@@ -190,13 +190,13 @@ const plugin: PostGraphilePlugin = {
         .map(([channel]) => channel);
       try {
         await Promise.all(
-          channels.map(channel => listenToChannelWithClient(client, channel))
+          channels.map(channel => listenToChannelWithClient(client, channel)),
         );
       } catch (e) {
         // eslint-disable-next-line no-console
         console.error(
           `Error occurred when listening to channel; retrying after ${attempts *
-            2} seconds`
+            2} seconds`,
         );
         // eslint-disable-next-line no-console
         console.error(e);
@@ -211,7 +211,7 @@ const plugin: PostGraphilePlugin = {
       // eslint-disable-next-line no-console
       console.error(
         "Error occurred when trying to set up initial client. Current state is undefined. Suggest server restart.",
-        e
+        e,
       );
     });
     pgPool.on("remove", (client: pg.PoolClient) => {

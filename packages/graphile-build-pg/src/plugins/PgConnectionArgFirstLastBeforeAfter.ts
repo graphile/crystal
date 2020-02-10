@@ -58,12 +58,12 @@ export default (function PgConnectionArgs(builder) {
               if (typeof last === "number") {
                 if (first != null) {
                   throw new Error(
-                    "We don't support setting both first and last"
+                    "We don't support setting both first and last",
                   );
                 }
                 if (offset != null) {
                   throw new Error(
-                    "We don't support setting both offset and last"
+                    "We don't support setting both offset and last",
                   );
                 }
                 queryBuilder.last(last);
@@ -76,7 +76,7 @@ export default (function PgConnectionArgs(builder) {
                 return queryBuilder.addCursorCondition(cursorValues, isAfter);
               } catch (e) {
                 throw new Error(
-                  "Invalid cursor, please enter a cursor from a previous request, or null."
+                  "Invalid cursor, please enter a cursor from a previous request, or null.",
                 );
               }
             }
@@ -126,9 +126,9 @@ export default (function PgConnectionArgs(builder) {
 
         isPgFieldConnection
           ? `Adding connection pagination args to field '${fieldName}' of '${Self.name}'`
-          : `Adding simple collection args to field '${fieldName}' of '${Self.name}'`
+          : `Adding simple collection args to field '${fieldName}' of '${Self.name}'`,
       );
     },
-    ["PgConnectionArgFirstLastBeforeAfter"]
+    ["PgConnectionArgFirstLastBeforeAfter"],
   );
 } as Plugin);

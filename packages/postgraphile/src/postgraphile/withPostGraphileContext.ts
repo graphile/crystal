@@ -1,12 +1,19 @@
-import createDebugger = require('debug');
-import jwt = require('jsonwebtoken');
-import { Pool, PoolClient, QueryConfig, QueryResult } from 'pg';
-import { ExecutionResult, OperationDefinitionNode, Kind } from 'graphql';
-import * as sql from 'pg-sql2';
-import { $$pgClient } from '../postgres/inventory/pgClientFromContext';
-import { pluginHookFromOptions } from './pluginHook';
-import { mixed, WithPostGraphileContextOptions, GraphileClaims } from '../interfaces';
-import { formatSQLForDebugging, GraphileResolverContext } from 'postgraphile-core';
+import createDebugger = require("debug");
+import jwt = require("jsonwebtoken");
+import { Pool, PoolClient, QueryConfig, QueryResult } from "pg";
+import { ExecutionResult, OperationDefinitionNode, Kind } from "graphql";
+import * as sql from "pg-sql2";
+import { $$pgClient } from "../postgres/inventory/pgClientFromContext";
+import { pluginHookFromOptions } from "./pluginHook";
+import {
+  mixed,
+  WithPostGraphileContextOptions,
+  GraphileClaims,
+} from "../interfaces";
+import {
+  formatSQLForDebugging,
+  GraphileResolverContext,
+} from "postgraphile-core";
 
 const undefinedIfEmpty = (
   o?: Array<string | RegExp> | string | RegExp,
@@ -18,21 +25,24 @@ export type WithPostGraphileContextFn<TResult = ExecutionResult> = (
   callback: (context: GraphileResolverContext) => Promise<TResult> | TResult,
 ) => Promise<TResult>;
 
-const debugPg = createDebugger('postgraphile:postgres');
-const debugPgError = createDebugger('postgraphile:postgres:error');
-const debugPgNotice = createDebugger('postgraphile:postgres:notice');
+const debugPg = createDebugger("postgraphile:postgres");
+const debugPgError = createDebugger("postgraphile:postgres:error");
+const debugPgNotice = createDebugger("postgraphile:postgres:notice");
 
 /**
  * Formats an error/notice from `pg` and feeds it into a `debug` function.
  */
-function debugPgErrorObject(debugFn: createDebugger.IDebugger, object: PgNotice) {
+function debugPgErrorObject(
+  debugFn: createDebugger.IDebugger,
+  object: PgNotice,
+) {
   debugFn(
-    '%s%s: %s%s%s',
-    object.severity || 'ERROR',
-    object.code ? `[${object.code}]` : '',
+    "%s%s: %s%s%s",
+    object.severity || "ERROR",
+    object.code ? `[${object.code}]` : "",
     object.message || object,
-    object.where ? ` | WHERE: ${object.where}` : '',
-    object.hint ? ` | HINT: ${object.hint}` : '',
+    object.where ? ` | WHERE: ${object.where}` : "",
+    object.hint ? ` | HINT: ${object.hint}` : "",
   );
 }
 
@@ -40,7 +50,10 @@ type WithAuthenticatedPgClientFunction = <T>(
   cb: (pgClient: PoolClient) => Promise<T>,
 ) => Promise<T>;
 
-const simpleWithPgClientCache = new WeakMap<Pool, WithAuthenticatedPgClientFunction>();
+const simpleWithPgClientCache = new WeakMap<
+  Pool,
+  WithAuthenticatedPgClientFunction
+>();
 function simpleWithPgClient(pgPool: Pool) {
   const cached = simpleWithPgClientCache.get(pgPool);
   if (cached) {
@@ -68,7 +81,7 @@ const withDefaultPostGraphileContext = async <TResult = ExecutionResult>(
     jwtSecret,
     jwtPublicKey,
     jwtAudiences,
-    jwtRole = ['role'],
+    jwtRole = ["role"],
     jwtVerifyOptions,
     pgDefaultRole,
     pgSettings,
@@ -87,9 +100,12 @@ const withDefaultPostGraphileContext = async <TResult = ExecutionResult>(
       if (definition.kind === Kind.OPERATION_DEFINITION) {
         if (!operationName && operation) {
           throw new Error(
-            'Multiple operations present in GraphQL query, you must specify an `operationName` so we know which one to execute.',
+            "Multiple operations present in GraphQL query, you must specify an `operationName` so we know which one to execute.",
           );
-        } else if (!operationName || (definition.name && definition.name.value === operationName)) {
+        } else if (
+          !operationName ||
+          (definition.name && definition.name.value === operationName)
+        ) {
           operation = definition;
         }
       }
@@ -99,7 +115,11 @@ const withDefaultPostGraphileContext = async <TResult = ExecutionResult>(
   // Warning: this is only set if pgForceTransaction is falsy
   const operationType = operation != null ? operation.operation : null;
 
-  const { role: pgRole, localSettings, jwtClaims } = await getSettingsForPgClientTransaction({
+  const {
+    role: pgRole,
+    localSettings,
+    jwtClaims,
+  } = await getSettingsForPgClientTransaction({
     jwtToken,
     jwtSecret,
     jwtPublicKey,
@@ -123,19 +143,25 @@ const withDefaultPostGraphileContext = async <TResult = ExecutionResult>(
         // Make sure that the third config is always `true` so that we are only
         // ever setting variables on the transaction.
         // Also, we're using `unshift` to undo the reverse-looping we're doing
-        sqlSettings.unshift(sql.fragment`set_config(${sql.value(key)}, ${sql.value(value)}, true)`);
+        sqlSettings.unshift(
+          sql.fragment`set_config(${sql.value(key)}, ${sql.value(
+            value,
+          )}, true)`,
+        );
       }
     }
   }
 
   const sqlSettingsQuery =
-    sqlSettings.length > 0 ? sql.compile(sql.query`select ${sql.join(sqlSettings, ', ')}`) : null;
+    sqlSettings.length > 0
+      ? sql.compile(sql.query`select ${sql.join(sqlSettings, ", ")}`)
+      : null;
 
   // If we can avoid transactions, we get greater performance.
   const needTransaction =
     pgForceTransaction ||
     !!sqlSettingsQuery ||
-    (operationType !== 'query' && operationType !== 'subscription');
+    (operationType !== "query" && operationType !== "subscription");
 
   // Now we've caught as many errors as we can at this stage, let's create a DB connection.
   const withAuthenticatedPgClient: WithAuthenticatedPgClientFunction = !needTransaction
@@ -145,7 +171,7 @@ const withDefaultPostGraphileContext = async <TResult = ExecutionResult>(
         const pgClient = await pgPool.connect();
 
         // Begin our transaction
-        await pgClient.query('begin');
+        await pgClient.query("begin");
 
         try {
           // If there is at least one local setting, load it into the database.
@@ -159,7 +185,7 @@ const withDefaultPostGraphileContext = async <TResult = ExecutionResult>(
           // Cleanup our Postgres client by ending the transaction and releasing
           // the client back to the pool. Always do this even if the query fails.
           try {
-            await pgClient.query('commit');
+            await pgClient.query("commit");
           } finally {
             pgClient.release();
           }
@@ -183,20 +209,28 @@ const withDefaultPostGraphileContext = async <TResult = ExecutionResult>(
         cb?: void,
       ): Promise<QueryResult> {
         if (!textOrQueryOptions) {
-          throw new Error('Incompatible call to singleStatement - no statement passed?');
-        } else if (typeof textOrQueryOptions === 'object') {
+          throw new Error(
+            "Incompatible call to singleStatement - no statement passed?",
+          );
+        } else if (typeof textOrQueryOptions === "object") {
           if (values || cb) {
-            throw new Error('Incompatible call to singleStatement - expected no callback');
+            throw new Error(
+              "Incompatible call to singleStatement - expected no callback",
+            );
           }
-        } else if (typeof textOrQueryOptions !== 'string') {
-          throw new Error('Incompatible call to singleStatement - bad query');
+        } else if (typeof textOrQueryOptions !== "string") {
+          throw new Error("Incompatible call to singleStatement - bad query");
         } else if (values && !Array.isArray(values)) {
-          throw new Error('Incompatible call to singleStatement - bad values');
+          throw new Error("Incompatible call to singleStatement - bad values");
         } else if (cb) {
-          throw new Error('Incompatible call to singleStatement - expected to return promise');
+          throw new Error(
+            "Incompatible call to singleStatement - expected to return promise",
+          );
         }
         // Generate an authenticated client on the fly
-        return withAuthenticatedPgClient(pgClient => pgClient.query(textOrQueryOptions, values));
+        return withAuthenticatedPgClient(pgClient =>
+          pgClient.query(textOrQueryOptions, values),
+        );
       },
     } as any; // tslint:disable-line no-any
 
@@ -264,9 +298,13 @@ async function withPostGraphileContext<TResult = ExecutionResult>(
   callback: (context: GraphileResolverContext) => Promise<TResult> | TResult,
 ): Promise<TResult> {
   const pluginHook = pluginHookFromOptions(options);
-  const withContext = pluginHook('withPostGraphileContext', withDefaultPostGraphileContext, {
-    options,
-  });
+  const withContext = pluginHook(
+    "withPostGraphileContext",
+    withDefaultPostGraphileContext,
+    {
+      options,
+    },
+  );
   return withContext(options, callback);
 }
 
@@ -319,19 +357,23 @@ async function getSettingsForPgClientTransaction({
       // secret had unsupported type, throw a 403 error.
       if (
         !Buffer.isBuffer(jwtVerificationSecret) &&
-        typeof jwtVerificationSecret !== 'string' &&
-        typeof jwtVerificationSecret !== 'function'
+        typeof jwtVerificationSecret !== "string" &&
+        typeof jwtVerificationSecret !== "function"
       ) {
         // tslint:disable-next-line no-console
         console.error(
           `ERROR: '${
-            jwtPublicKey ? 'jwtPublicKey' : 'jwtSecret'
+            jwtPublicKey ? "jwtPublicKey" : "jwtSecret"
           }' was not set to a string or buffer - rejecting JWT-authenticated request.`,
         );
-        throw new Error('Not allowed to provide a JWT token.');
+        throw new Error("Not allowed to provide a JWT token.");
       }
 
-      if (jwtAudiences != null && jwtVerifyOptions && 'audience' in jwtVerifyOptions)
+      if (
+        jwtAudiences != null &&
+        jwtVerifyOptions &&
+        "audience" in jwtVerifyOptions
+      )
         throw new Error(
           `Provide either 'jwtAudiences' or 'jwtVerifyOptions.audience' but not both`,
         );
@@ -344,9 +386,9 @@ async function getSettingsForPgClientTransaction({
             ...jwtVerifyOptions,
             audience:
               jwtAudiences ||
-              (jwtVerifyOptions && 'audience' in (jwtVerifyOptions as object)
+              (jwtVerifyOptions && "audience" in (jwtVerifyOptions as object)
                 ? undefinedIfEmpty(jwtVerifyOptions.audience)
-                : ['postgraphile']),
+                : ["postgraphile"]),
           },
           (err, decoded) => {
             if (err) reject(err);
@@ -355,8 +397,8 @@ async function getSettingsForPgClientTransaction({
         );
       });
 
-      if (typeof claims === 'string') {
-        throw new Error('Invalid JWT payload');
+      if (typeof claims === "string") {
+        throw new Error("Invalid JWT payload");
       }
 
       // jwt.verify returns `object | string`; but the `object` part is really a map
@@ -366,10 +408,12 @@ async function getSettingsForPgClientTransaction({
 
       // If there is a `role` property in the claims, use that instead of our
       // default role.
-      if (typeof roleClaim !== 'undefined') {
-        if (typeof roleClaim !== 'string')
+      if (typeof roleClaim !== "undefined") {
+        if (typeof roleClaim !== "string")
           throw new Error(
-            `JWT \`role\` claim must be a string. Instead found '${typeof jwtClaims['role']}'.`,
+            `JWT \`role\` claim must be a string. Instead found '${typeof jwtClaims[
+              "role"
+            ]}'.`,
           );
 
         role = roleClaim;
@@ -378,7 +422,7 @@ async function getSettingsForPgClientTransaction({
       // In case this error is thrown in an HTTP context, we want to add status code
       // Note. jwt.verify will add a name key to its errors. (https://github.com/auth0/node-jsonwebtoken#errors--codes)
       error.statusCode =
-        'name' in error && error.name === 'TokenExpiredError'
+        "name" in error && error.name === "TokenExpiredError"
           ? // The correct status code for an expired ( but otherwise acceptable token is 401 )
             401
           : // All other authentication errors should get a 403 status code.
@@ -394,13 +438,13 @@ async function getSettingsForPgClientTransaction({
 
   // Set the custom provided settings before jwt claims and role are set
   // this prevents an accidentional overwriting
-  if (pgSettings && typeof pgSettings === 'object') {
+  if (pgSettings && typeof pgSettings === "object") {
     for (const key in pgSettings) {
       if (
         Object.prototype.hasOwnProperty.call(pgSettings, key) &&
         isPgSettingValid(pgSettings[key])
       ) {
-        if (key === 'role') {
+        if (key === "role") {
           role = String(pgSettings[key]);
         } else {
           localSettings.push([key, String(pgSettings[key])]);
@@ -411,8 +455,8 @@ async function getSettingsForPgClientTransaction({
 
   // If there is a rule, we want to set the root `role` setting locally
   // to be our role. The role may only be null if we have no default role.
-  if (typeof role === 'string') {
-    localSettings.push(['role', role]);
+  if (typeof role === "string") {
+    localSettings.push(["role", role]);
   }
 
   // If we have some JWT claims, we want to set those claims as local
@@ -422,7 +466,9 @@ async function getSettingsForPgClientTransaction({
       const rawValue = jwtClaims[key];
       // Unsafe to pass raw object/array to pg.query -> set_config; instead JSONify
       const value: mixed =
-        rawValue != null && typeof rawValue === 'object' ? JSON.stringify(rawValue) : rawValue;
+        rawValue != null && typeof rawValue === "object"
+          ? JSON.stringify(rawValue)
+          : rawValue;
       if (isPgSettingValid(value)) {
         localSettings.push([`jwt.claims.${key}`, String(value)]);
       }
@@ -442,11 +488,11 @@ interface RawExplainResult {
   query: string;
   result: any;
 }
-type ExplainResult = Omit<RawExplainResult, 'result'> & {
+type ExplainResult = Omit<RawExplainResult, "result"> & {
   plan: string;
 };
 
-declare module 'pg' {
+declare module "pg" {
   interface ClientBase {
     _explainResults: Array<RawExplainResult> | null;
     startExplain: () => void;
@@ -460,7 +506,10 @@ declare module 'pg' {
  * @private
  */
 // tslint:disable no-any
-export function debugPgClient(pgClient: PoolClient, allowExplain = false): PoolClient {
+export function debugPgClient(
+  pgClient: PoolClient,
+  allowExplain = false,
+): PoolClient {
   // If Postgres debugging is enabled, enhance our query function by adding
   // a debug statement.
   if (!pgClient[$$pgClientOrigQuery]) {
@@ -486,7 +535,7 @@ export function debugPgClient(pgClient: PoolClient, allowExplain = false): PoolC
           if (!firstKey) {
             return null;
           }
-          const plan = result.map((r: any) => r[firstKey]).join('\n');
+          const plan = result.map((r: any) => r[firstKey]).join("\n");
           return {
             ...rest,
             plan,
@@ -496,15 +545,15 @@ export function debugPgClient(pgClient: PoolClient, allowExplain = false): PoolC
     };
 
     if (debugPgNotice.enabled) {
-      pgClient.on('notice', (msg: PgNotice) => {
+      pgClient.on("notice", (msg: PgNotice) => {
         debugPgErrorObject(debugPgNotice, msg);
       });
     }
     const logError = (error: PgNotice | Error) => {
-      if (error.name && error['severity']) {
+      if (error.name && error["severity"]) {
         debugPgErrorObject(debugPgError, error as PgNotice);
       } else {
-        debugPgError('%O', error);
+        debugPgError("%O", error);
       }
     };
 
@@ -514,19 +563,22 @@ export function debugPgClient(pgClient: PoolClient, allowExplain = false): PoolC
         const [a, b, c] = args;
         // If we understand it (and it uses the promises API)
         if (
-          (typeof a === 'string' && !c && (!b || Array.isArray(b))) ||
-          (typeof a === 'object' && !b && !c)
+          (typeof a === "string" && !c && (!b || Array.isArray(b))) ||
+          (typeof a === "object" && !b && !c)
         ) {
           if (debugPg.enabled) {
             // Debug just the query text. We don’t want to debug variables because
             // there may be passwords in there.
-            debugPg('%s', formatSQLForDebugging(a && a.text ? a.text : a));
+            debugPg("%s", formatSQLForDebugging(a && a.text ? a.text : a));
           }
 
           if (pgClient._explainResults) {
             const query = a && a.text ? a.text : a;
             const values = a && a.text ? a.values : b;
-            if (query.match(/^\s*(select|insert|update|delete|with)\s/i) && !query.includes(';')) {
+            if (
+              query.match(/^\s*(select|insert|update|delete|with)\s/i) &&
+              !query.includes(";")
+            ) {
               // Explain it
               const explain = `explain ${query}`;
               pgClient._explainResults.push({
@@ -587,9 +639,9 @@ function isPgSettingValid(pgSetting: mixed): boolean {
   }
   const typeOfPgSetting = typeof pgSetting;
   if (
-    typeOfPgSetting === 'string' ||
-    typeOfPgSetting === 'number' ||
-    typeOfPgSetting === 'boolean'
+    typeOfPgSetting === "string" ||
+    typeOfPgSetting === "number" ||
+    typeOfPgSetting === "boolean"
   ) {
     return true;
   }
@@ -600,7 +652,7 @@ function isPgSettingValid(pgSetting: mixed): boolean {
 }
 // tslint:enable no-any
 interface PgNotice extends Error {
-  name: 'notice';
+  name: "notice";
   message: string;
   length: number;
   severity: string;

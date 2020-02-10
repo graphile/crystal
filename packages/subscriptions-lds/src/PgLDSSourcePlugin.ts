@@ -49,7 +49,7 @@ export class LDSLiveSource {
     const { ldsURL, connectionString, sleepDuration, tablePattern } = options;
     if (!ldsURL && !connectionString) {
       throw new Error(
-        "No LDS URL or connectionString was passed to LDSLiveSource; this likely means that you don't have `ownerConnectionString` specified in the PostGraphile library call."
+        "No LDS URL or connectionString was passed to LDSLiveSource; this likely means that you don't have `ownerConnectionString` specified in the PostGraphile library call.",
       );
     }
     this.url = ldsURL || null;
@@ -83,7 +83,7 @@ export class LDSLiveSource {
           temporary: true,
           sleepDuration: this.sleepDuration,
           tablePattern: this.tablePattern,
-        }
+        },
       );
     }
   }
@@ -91,7 +91,7 @@ export class LDSLiveSource {
   public subscribeCollection(
     callback: () => void,
     collectionIdentifier: any,
-    predicate?: Predicate
+    predicate?: Predicate,
   ): SubscriptionReleaser | null {
     return this.sub(
       JSON.stringify([
@@ -99,14 +99,14 @@ export class LDSLiveSource {
         collectionIdentifier.name,
       ]),
       callback,
-      predicate
+      predicate,
     );
   }
 
   public subscribeRecord(
     callback: () => void,
     collectionIdentifier: any,
-    recordIdentifier: any
+    recordIdentifier: any,
   ): SubscriptionReleaser | null {
     return this.sub(
       JSON.stringify([
@@ -114,7 +114,7 @@ export class LDSLiveSource {
         collectionIdentifier.name,
         recordIdentifier,
       ]),
-      callback
+      callback,
     );
   }
 
@@ -139,7 +139,7 @@ export class LDSLiveSource {
     }
     if (!this.url.match(/^wss?:\/\//)) {
       throw new Error(
-        `Invalid URL, must be a websocket ws:// or wss:// URL, you passed '${this.url}'`
+        `Invalid URL, must be a websocket ws:// or wss:// URL, you passed '${this.url}'`,
       );
     }
     this.ws = new WebSocket(this.url);
@@ -179,7 +179,7 @@ export class LDSLiveSource {
   private sub(
     topic: string,
     cb: SubscriptionCallback,
-    predicate?: Predicate | void
+    predicate?: Predicate | void,
   ) {
     if (!this.live) {
       return null;
@@ -255,7 +255,7 @@ export class LDSLiveSource {
         console.warn(
           "Unhandled announcement type: ",
           // @ts-ignore
-          announcement && announcement._
+          announcement && announcement._,
         );
       }
     }
@@ -286,7 +286,7 @@ export class LDSLiveSource {
         "Error occurred when processing message,",
         message,
         ":",
-        e.message
+        e.message,
       );
     }
   };
@@ -325,7 +325,7 @@ const PgLDSSourcePlugin: Plugin = async function(
     pgOwnerConnectionString,
     ldsSleepDuration = getSafeNumber(process.env.LD_WAIT),
     ldsTablePattern = process.env.LD_TABLE_PATTERN,
-  }
+  },
 ) {
   // Connect to LDS server
   try {
@@ -342,7 +342,7 @@ const PgLDSSourcePlugin: Plugin = async function(
         build.liveCoordinator.registerSource("pg", source);
         return build;
       },
-      ["PgLDSSource"]
+      ["PgLDSSource"],
     );
     if (process.env.NODE_ENV === "test") {
       // Need a way of releasing it
@@ -358,7 +358,7 @@ const PgLDSSourcePlugin: Plugin = async function(
   } catch (e) {
     console.error(
       "Could not Initiate PgLDSSourcePlugin, continuing without LDS live queries. Error:",
-      e.message
+      e.message,
     );
     return;
   }

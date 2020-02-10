@@ -68,7 +68,7 @@ app.use(
       //...
       require("@graphile/subscriptions-lds").default,
     ],
-  })
+  }),
 );
 ```
 

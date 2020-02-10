@@ -53,7 +53,7 @@ function argNameIsIf(arg: any): boolean {
 
 function skipField(
   resolveInfo: GraphQLResolveInfo,
-  { directives = [] }: SelectionNode
+  { directives = [] }: SelectionNode,
 ) {
   let skip = false;
   directives.forEach(directive => {
@@ -76,7 +76,7 @@ function skipField(
 // Originally based on https://github.com/tjmehta/graphql-parse-fields
 
 export function getAliasFromResolveInfo(
-  resolveInfo: GraphQLResolveInfo
+  resolveInfo: GraphQLResolveInfo,
 ): string {
   const asts: ReadonlyArray<FieldNode> =
     // @ts-ignore Property 'fieldASTs' does not exist on type 'GraphQLResolveInfo'.
@@ -100,19 +100,19 @@ export interface ParseOptions {
 }
 
 export function parseResolveInfo(
-  resolveInfo: GraphQLResolveInfo
+  resolveInfo: GraphQLResolveInfo,
 ): ResolveTree | null;
 export function parseResolveInfo(
   resolveInfo: GraphQLResolveInfo,
-  forceParse: true
+  forceParse: true,
 ): ResolveTree;
 export function parseResolveInfo(
   resolveInfo: GraphQLResolveInfo,
-  options: ParseOptions
+  options: ParseOptions,
 ): ResolveTree | FieldsByTypeName | null | void;
 export function parseResolveInfo(
   resolveInfo: GraphQLResolveInfo,
-  inOptions: ParseOptions | true = {}
+  inOptions: ParseOptions | true = {},
 ): ResolveTree | FieldsByTypeName | null | void {
   const fieldNodes: ReadonlyArray<FieldNode> =
     // @ts-ignore Property 'fieldASTs' does not exist on type 'GraphQLResolveInfo'.
@@ -135,14 +135,14 @@ export function parseResolveInfo(
     resolveInfo,
     undefined,
     options,
-    parentType
+    parentType,
   );
   if (!options.keepRoot) {
     const typeKey = firstKey(tree);
     if (!typeKey) {
       if (forceParse) {
         throw new Error(
-          `GraphQL schema issue: simplified parseResolveInfo failed (tree had no keys); perhaps you need to use the keepRoot option?`
+          `GraphQL schema issue: simplified parseResolveInfo failed (tree had no keys); perhaps you need to use the keepRoot option?`,
         );
       }
       return null;
@@ -152,7 +152,7 @@ export function parseResolveInfo(
     if (!fieldKey) {
       if (forceParse) {
         throw new Error(
-          `GraphQL schema issue: simplified parseResolveInfo failed (could not get key from fields); perhaps you need to use the keepRoot option?`
+          `GraphQL schema issue: simplified parseResolveInfo failed (could not get key from fields); perhaps you need to use the keepRoot option?`,
         );
       }
       return null;
@@ -164,7 +164,7 @@ export function parseResolveInfo(
 
 function getFieldFromAST<TContext>(
   ast: ASTNode,
-  parentType: GraphQLCompositeType
+  parentType: GraphQLCompositeType,
 ): GraphQLField<GraphQLCompositeType, TContext> | undefined {
   if (ast.kind === "Field") {
     const fieldNode: FieldNode = ast;
@@ -186,7 +186,7 @@ function fieldTreeFromAST<T extends SelectionNode>(
   initTree: FieldsByTypeName = {},
   options: ParseOptions = {},
   parentType: GraphQLCompositeType,
-  depth = ""
+  depth = "",
 ): FieldsByTypeName {
   const instance = iNum++;
   if (DEBUG_ENABLED)
@@ -194,7 +194,7 @@ function fieldTreeFromAST<T extends SelectionNode>(
       "%s[%d] Entering fieldTreeFromAST with parent type '%s'",
       depth,
       instance,
-      parentType
+      parentType,
     );
   const { variableValues } = resolveInfo;
   const fragments = resolveInfo.fragments || {};
@@ -212,7 +212,7 @@ function fieldTreeFromAST<T extends SelectionNode>(
         instance,
         idx + 1,
         asts.length,
-        selectionVal.kind
+        selectionVal.kind,
       );
     if (skipField(resolveInfo, selectionVal)) {
       if (DEBUG_ENABLED)
@@ -227,7 +227,7 @@ function fieldTreeFromAST<T extends SelectionNode>(
             "%s[%d] IGNORING because field '%s' is reserved",
             depth,
             instance,
-            name
+            name,
           );
       } else {
         const alias: string =
@@ -238,7 +238,7 @@ function fieldTreeFromAST<T extends SelectionNode>(
             depth,
             instance,
             name,
-            alias
+            alias,
           );
         const field = getFieldFromAST(val, parentType);
         if (field == null) {
@@ -278,7 +278,7 @@ function fieldTreeFromAST<T extends SelectionNode>(
             tree[parentType.name][alias].fieldsByTypeName,
             options,
             newParentType,
-            `${depth}  `
+            `${depth}  `,
           );
         } else {
           // No fields to add
@@ -305,7 +305,7 @@ function fieldTreeFromAST<T extends SelectionNode>(
           tree,
           options,
           newParentType,
-          `${depth}  `
+          `${depth}  `,
         );
       }
     } else if (selectionVal.kind === "InlineFragment" && options.deep) {
@@ -321,7 +321,7 @@ function fieldTreeFromAST<T extends SelectionNode>(
           depth,
           instance,
           parentType,
-          fragmentType
+          fragmentType,
         );
       if (fragmentType && isCompositeType(fragmentType)) {
         const newParentType: GraphQLCompositeType = fragmentType;
@@ -331,7 +331,7 @@ function fieldTreeFromAST<T extends SelectionNode>(
           tree,
           options,
           newParentType,
-          `${depth}  `
+          `${depth}  `,
         );
       }
     } else {
@@ -340,7 +340,7 @@ function fieldTreeFromAST<T extends SelectionNode>(
           "%s[%d] IGNORING because kind '%s' not understood",
           depth,
           instance,
-          selectionVal.kind
+          selectionVal.kind,
         );
     }
     // Ref: https://github.com/graphile/postgraphile/pull/342/files#diff-d6702ec9fed755c88b9d70b430fda4d8R148
@@ -359,7 +359,7 @@ function firstKey(obj: object) {
 
 function getType(
   resolveInfo: GraphQLResolveInfo,
-  typeCondition: NamedTypeNode
+  typeCondition: NamedTypeNode,
 ) {
   const { schema } = resolveInfo;
   const { kind, name } = typeCondition;
@@ -371,7 +371,7 @@ function getType(
 
 export function simplifyParsedResolveInfoFragmentWithType(
   parsedResolveInfoFragment: ResolveTree,
-  type: GraphQLType
+  type: GraphQLType,
 ) {
   const { fieldsByTypeName } = parsedResolveInfoFragment;
   const fields = {};

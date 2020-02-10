@@ -22,7 +22,7 @@ const ONLY = 2;
 
 export default (function PgBackwardRelationPlugin(
   builder,
-  { pgLegacyRelations, pgSimpleCollections, subscriptions }
+  { pgLegacyRelations, pgSimpleCollections, subscriptions },
 ) {
   const legacyRelationMode =
     {
@@ -68,18 +68,18 @@ export default (function PgBackwardRelationPlugin(
       const foreignTable = pgIntrospection;
       // This is a relation in which WE are foreign
       const foreignKeyConstraints = foreignTable.foreignConstraints.filter(
-        con => con.type === "f"
+        con => con.type === "f",
       );
 
       const foreignTableTypeName = inflection.tableType(foreignTable);
       const gqlForeignTableType = pgGetGqlTypeByTypeIdAndModifier(
         foreignTable.type.id,
-        null
+        null,
       );
 
       if (!gqlForeignTableType) {
         debug(
-          `Could not determine type for foreign table with id ${foreignTable.type.id}`
+          `Could not determine type for foreign table with id ${foreignTable.type.id}`,
         );
 
         return fields;
@@ -95,7 +95,7 @@ export default (function PgBackwardRelationPlugin(
             introspectionResultsByKind.classById[constraint.classId];
           if (!table) {
             throw new Error(
-              `Could not find the table that referenced us (constraint: ${constraint.name})`
+              `Could not find the table that referenced us (constraint: ${constraint.name})`,
             );
           }
           if (!table.isSelectable) {
@@ -105,12 +105,12 @@ export default (function PgBackwardRelationPlugin(
           const tableTypeName = inflection.tableType(table);
           const gqlTableType = pgGetGqlTypeByTypeIdAndModifier(
             table.type.id,
-            null
+            null,
           );
 
           if (!gqlTableType) {
             debug(
-              `Could not determine type for table with id ${constraint.classId}`
+              `Could not determine type for table with id ${constraint.classId}`,
             );
 
             return memo;
@@ -132,7 +132,7 @@ export default (function PgBackwardRelationPlugin(
             c =>
               (c.type === "p" || c.type === "u") &&
               c.keyAttributeNums.length === keys.length &&
-              c.keyAttributeNums.every((n, i) => keys[i].num === n)
+              c.keyAttributeNums.every((n, i) => keys[i].num === n),
           );
 
           const isDeprecated = isUnique && legacyRelationMode === DEPRECATED;
@@ -142,7 +142,7 @@ export default (function PgBackwardRelationPlugin(
                 keys,
                 table,
                 foreignTable,
-                constraint
+                constraint,
               )
             : null;
 
@@ -179,7 +179,7 @@ export default (function PgBackwardRelationPlugin(
                           queryBuilder.select(() => {
                             const resolveData = getDataFromParsedResolveInfoFragment(
                               parsedResolveInfoFragment,
-                              gqlTableType
+                              gqlTableType,
                             );
 
                             const tableAlias = sql.identifier(Symbol());
@@ -206,15 +206,15 @@ export default (function PgBackwardRelationPlugin(
                                 keys.forEach((key, i) => {
                                   innerQueryBuilder.where(
                                     sql.fragment`${tableAlias}.${sql.identifier(
-                                      key.name
+                                      key.name,
                                     )} = ${foreignTableAlias}.${sql.identifier(
-                                      foreignKeys[i].name
-                                    )}`
+                                      foreignKeys[i].name,
+                                    )}`,
                                   );
                                 });
                               },
                               queryBuilder.context,
-                              queryBuilder.rootValue
+                              queryBuilder.rootValue,
                             );
 
                             return sql.fragment`(${query})`;
@@ -230,7 +230,7 @@ export default (function PgBackwardRelationPlugin(
                       args: {},
                       resolve: (data, _args, _resolveContext, resolveInfo) => {
                         const safeAlias = getSafeAliasFromResolveInfo(
-                          resolveInfo
+                          resolveInfo,
                         );
 
                         const record = data[safeAlias];
@@ -247,18 +247,18 @@ export default (function PgBackwardRelationPlugin(
                   {
                     pgFieldIntrospection: table,
                     isPgBackwardSingleRelationField: true,
-                  }
+                  },
                 ),
               },
 
               `Backward relation (single) for ${describePgEntity(
-                constraint
+                constraint,
               )}. To rename this relation with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                 constraint,
                 {
                   foreignSingleFieldName: "newNameHere",
-                }
-              )}`
+                },
+              )}`,
             );
           }
           function makeFields(isConnection: boolean) {
@@ -267,13 +267,13 @@ export default (function PgBackwardRelationPlugin(
                   keys,
                   table,
                   foreignTable,
-                  constraint
+                  constraint,
                 )
               : inflection.manyRelationByKeysSimple(
                   keys,
                   table,
                   foreignTable,
-                  constraint
+                  constraint,
                 );
 
             memo = extend(
@@ -299,7 +299,7 @@ export default (function PgBackwardRelationPlugin(
                           queryBuilder.select(() => {
                             const resolveData = getDataFromParsedResolveInfoFragment(
                               parsedResolveInfoFragment,
-                              isConnection ? ConnectionType : TableType
+                              isConnection ? ConnectionType : TableType,
                             );
 
                             const tableAlias = sql.identifier(Symbol());
@@ -317,17 +317,17 @@ export default (function PgBackwardRelationPlugin(
                                     data => record => {
                                       return keys.every(
                                         key =>
-                                          record[key.name] === data[key.name]
+                                          record[key.name] === data[key.name],
                                       );
                                     },
                                     keys.reduce((memo, key, i) => {
                                       memo[
                                         key.name
                                       ] = sql.fragment`${foreignTableAlias}.${sql.identifier(
-                                        foreignKeys[i].name
+                                        foreignKeys[i].name,
                                       )}`;
                                       return memo;
-                                    }, {})
+                                    }, {}),
                                   );
                                 }
                                 if (primaryKeys) {
@@ -352,29 +352,29 @@ export default (function PgBackwardRelationPlugin(
                                         primaryKeys.forEach(key => {
                                           innerQueryBuilder.orderBy(
                                             sql.fragment`${innerQueryBuilder.getTableAlias()}.${sql.identifier(
-                                              key.name
+                                              key.name,
                                             )}`,
-                                            true
+                                            true,
                                           );
                                         });
                                         innerQueryBuilder.setOrderIsUnique();
                                       }
-                                    }
+                                    },
                                   );
                                 }
 
                                 keys.forEach((key, i) => {
                                   innerQueryBuilder.where(
                                     sql.fragment`${tableAlias}.${sql.identifier(
-                                      key.name
+                                      key.name,
                                     )} = ${foreignTableAlias}.${sql.identifier(
-                                      foreignKeys[i].name
-                                    )}`
+                                      foreignKeys[i].name,
+                                    )}`,
                                   );
                                 });
                               },
                               queryBuilder.context,
-                              queryBuilder.rootValue
+                              queryBuilder.rootValue,
                             );
 
                             return sql.fragment`(${query})`;
@@ -385,30 +385,30 @@ export default (function PgBackwardRelationPlugin(
 
                     if (!gqlTableType) {
                       throw new Error(
-                        `Could not determine getTableType for table '${table.name}'`
+                        `Could not determine getTableType for table '${table.name}'`,
                       );
                     }
 
                     const ConnectionTypeOrNull = getTypeByName(
-                      inflection.connection(getNamedType(gqlTableType).name)
+                      inflection.connection(getNamedType(gqlTableType).name),
                     );
                     if (
                       !ConnectionTypeOrNull ||
                       !(ConnectionTypeOrNull instanceof GraphQLObjectType)
                     ) {
                       throw new Error(
-                        `Could not determine ConnectionType for table '${table.name}'`
+                        `Could not determine ConnectionType for table '${table.name}'`,
                       );
                     }
                     const ConnectionType = ConnectionTypeOrNull;
 
                     const TableTypeOrNull = pgGetGqlTypeByTypeIdAndModifier(
                       table.type.id,
-                      null
+                      null,
                     );
                     if (!TableTypeOrNull) {
                       throw new Error(
-                        `Could not determine TableType for table '${table.name}'`
+                        `Could not determine TableType for table '${table.name}'`,
                       );
                     }
                     const TableType = TableTypeOrNull;
@@ -420,12 +420,12 @@ export default (function PgBackwardRelationPlugin(
                       type: isConnection
                         ? new GraphQLNonNull(ConnectionType)
                         : new GraphQLNonNull(
-                            new GraphQLList(new GraphQLNonNull(TableType))
+                            new GraphQLList(new GraphQLNonNull(TableType)),
                           ),
                       args: {},
                       resolve: (data, _args, _resolveContext, resolveInfo) => {
                         const safeAlias = getSafeAliasFromResolveInfo(
-                          resolveInfo
+                          resolveInfo,
                         );
                         const liveCollection =
                           resolveInfo.rootValue &&
@@ -457,7 +457,7 @@ export default (function PgBackwardRelationPlugin(
                               (r: any) =>
                                 r &&
                                 r.__identifiers &&
-                                liveRecord("pg", table, r.__identifiers)
+                                liveRecord("pg", table, r.__identifiers),
                             );
                           }
                           return records;
@@ -477,22 +477,22 @@ export default (function PgBackwardRelationPlugin(
                     isPgFieldSimpleCollection: !isConnection,
                     isPgBackwardRelationField: true,
                     pgFieldIntrospection: table,
-                  }
+                  },
                 ),
               },
 
               `Backward relation (${
                 isConnection ? "connection" : "simple collection"
               }) for ${describePgEntity(
-                constraint
+                constraint,
               )}. To rename this relation with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                 constraint,
                 {
                   [isConnection
                     ? "foreignFieldName"
                     : "foreignSimpleFieldName"]: "newNameHere",
-                }
-              )}`
+                },
+              )}`,
             );
           }
           if (
@@ -519,9 +519,9 @@ export default (function PgBackwardRelationPlugin(
           }
           return memo;
         }, {}),
-        `Adding backward relations for ${Self.name}`
+        `Adding backward relations for ${Self.name}`,
       );
     },
-    ["PgBackwardRelation"]
+    ["PgBackwardRelation"],
   );
 } as Plugin);

@@ -52,18 +52,18 @@ if (skipLDSTests) {
 
               await pgClient.query(
                 "insert into live_test.users (name, favorite_color) values ($1, $2), ($3, $4)",
-                ["Alice", "red", "Bob", "green"]
+                ["Alice", "red", "Bob", "green"],
               );
               data = await next(getLatest);
               expect(getNodes()).toHaveLength(2);
 
               await pgClient.query(
                 "insert into live_test.users (name, favorite_color) values ($1, $2), ($3, $4)",
-                ["Caroline", "red", "Dave", "blue"]
+                ["Caroline", "red", "Dave", "blue"],
               );
               data = await next(getLatest);
               expect(getNodes()).toHaveLength(4);
-            }
+            },
           ));
 
         test("simple filter", () =>
@@ -97,7 +97,7 @@ if (skipLDSTests) {
 
               await pgClient.query(
                 "insert into live_test.users (name, favorite_color) values ($1, $2), ($3, $4)",
-                ["Alice", "red", "Bob", "green"]
+                ["Alice", "red", "Bob", "green"],
               );
               data = await next(getLatest);
               expect(getNodes()).toHaveLength(1);
@@ -105,10 +105,10 @@ if (skipLDSTests) {
 
               await pgClient.query(
                 "insert into live_test.users (name, favorite_color) values ($1, $2)",
-                ["Caroline", "blue"]
+                ["Caroline", "blue"],
               );
               await expectNoChange(getLatest);
-            }
+            },
           ));
 
         test("composite key", async () => {
@@ -116,24 +116,24 @@ if (skipLDSTests) {
             rows: [user],
           } = await transactionlessQuery(
             "insert into live_test.users(name) values($1) returning *",
-            ["Stuart"]
+            ["Stuart"],
           );
 
           const {
             rows: [todo],
           } = await transactionlessQuery(
             "insert into live_test.todos(user_id, task) values($1, $2) returning *",
-            [user.id, "Write tests"]
+            [user.id, "Write tests"],
           );
 
           await transactionlessQuery(
             "insert into live_test.todos_log(user_id, todo_id, action) values($1, $2, $3) returning *",
-            [user.id, todo.id, "checked"]
+            [user.id, todo.id, "checked"],
           );
 
           await transactionlessQuery(
             "insert into live_test.todos_log_viewed(user_id, todo_id) values($1, $2) returning *",
-            [user.id, todo.id]
+            [user.id, todo.id],
           );
 
           await liveTest(
@@ -181,12 +181,12 @@ if (skipLDSTests) {
 
               await pgClient.query(
                 "insert into live_test.todos_log_viewed(user_id, todo_id) values($1, $2) returning *",
-                [user.id, todo.id]
+                [user.id, todo.id],
               );
               data = await next(getLatest);
               expect(data.data.log).toBeTruthy();
               expect(getViewedAtNodes()).toHaveLength(2);
-            }
+            },
           );
         });
 
@@ -195,13 +195,13 @@ if (skipLDSTests) {
             rows: [user],
           } = await transactionlessQuery(
             "insert into live_test.users(name) values($1) returning *",
-            ["Stuart"]
+            ["Stuart"],
           );
           const {
             rows: [todo],
           } = await transactionlessQuery(
             "insert into live_test.todos(user_id, task) values($1, $2) returning *",
-            [user.id, "Write tests"]
+            [user.id, "Write tests"],
           );
 
           await liveTest(
@@ -251,7 +251,7 @@ if (skipLDSTests) {
 
               await pgClient.query(
                 "update live_test.todos set completed = true where id = $1",
-                [todo.id]
+                [todo.id],
               );
               data = await next(getLatest);
               expect(getNodes()).toHaveLength(1);
@@ -259,12 +259,12 @@ if (skipLDSTests) {
 
               await pgClient.query(
                 "update live_test.todos set completed = false where id = $1",
-                [todo.id]
+                [todo.id],
               );
               data = await next(getLatest);
               expect(getNodes()).toHaveLength(1);
               expect(getNodes()[0].completed).toBe(false);
-            }
+            },
           );
         });
 
@@ -273,13 +273,13 @@ if (skipLDSTests) {
             rows: [user],
           } = await transactionlessQuery(
             "insert into live_test.users(name) values($1) returning *",
-            ["Stuart"]
+            ["Stuart"],
           );
           const {
             rows: [todo],
           } = await transactionlessQuery(
             "insert into live_test.todos(user_id, task) values($1, $2) returning *",
-            [user.id, "Write tests"]
+            [user.id, "Write tests"],
           );
 
           await liveTest(
@@ -329,11 +329,11 @@ if (skipLDSTests) {
 
               await pgClient.query(
                 "delete from live_test.todos where id = $1",
-                [todo.id]
+                [todo.id],
               );
               data = await next(getLatest);
               expect(getNodes()).toHaveLength(0);
-            }
+            },
           );
         });
 
@@ -342,11 +342,11 @@ if (skipLDSTests) {
             rows: [user],
           } = await transactionlessQuery(
             "insert into live_test.users(name) values($1) returning *",
-            ["Stuart"]
+            ["Stuart"],
           );
           await transactionlessQuery(
             "insert into live_test.todos(user_id, task) values($1, $2) returning *",
-            [user.id, "Write tests"]
+            [user.id, "Write tests"],
           );
 
           await liveTest(
@@ -396,14 +396,14 @@ if (skipLDSTests) {
 
               await pgClient.query(
                 "insert into live_test.todos (user_id, task) values ($1, $2)",
-                [user.id, "Another Task"]
+                [user.id, "Another Task"],
               );
               data = await next(getLatest);
               expect(getNodes()).toHaveLength(2);
-            }
+            },
           );
         });
-      }
+      },
     );
   });
 }

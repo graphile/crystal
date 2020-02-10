@@ -22,7 +22,7 @@ type CallResult = undefined | null | string | number | boolean | SQL;
 
 function callIfNecessary<T extends CallResult>(
   o: Gen<T> | T,
-  context: GenContext
+  context: GenContext,
 ): T {
   if (typeof o === "function") {
     return o(context);
@@ -33,7 +33,7 @@ function callIfNecessary<T extends CallResult>(
 
 function callIfNecessaryArray<T extends CallResult>(
   o: Array<Gen<T> | T>,
-  context: GenContext
+  context: GenContext,
 ): Array<T> {
   if (Array.isArray(o)) {
     return o.map(v => callIfNecessary(v, context));
@@ -111,7 +111,7 @@ class QueryBuilder {
     liveConditions: Array<
       [
         (data?: any) => (record: any) => boolean,
-        { [key: string]: SQL } | undefined
+        { [key: string]: SQL } | undefined,
       ]
     >;
   };
@@ -147,7 +147,7 @@ class QueryBuilder {
   constructor(
     options: QueryBuilderOptions = {},
     context: GraphileResolverContext,
-    rootValue?: any
+    rootValue?: any,
   ) {
     this.context = context || {};
     this.rootValue = rootValue;
@@ -279,7 +279,7 @@ class QueryBuilder {
   jsonbBuildObject(
     fields: Array<
       [SQL, string /* used to be RawAlias, but cannot work with symbols! */]
-    >
+    >,
   ) {
     if (this.supportsJSONB && fields.length > 50) {
       const fieldsChunks = chunk(fields, 50);
@@ -287,23 +287,23 @@ class QueryBuilder {
         sql.fragment`jsonb_build_object(${sql.join(
           fieldsChunk.map(
             ([expr, alias]) =>
-              sql.fragment`${sql.literal(alias)}::text, ${expr}`
+              sql.fragment`${sql.literal(alias)}::text, ${expr}`,
           ),
 
-          ", "
+          ", ",
         )})`;
       return sql.fragment`(${sql.join(
         fieldsChunks.map(chunkToJson),
-        " || "
+        " || ",
       )})::json`;
     } else {
       // PG9.4 will have issues with more than 100 parameters (50 keys)
       return sql.fragment`json_build_object(${sql.join(
         fields.map(
-          ([expr, alias]) => sql.fragment`${sql.literal(alias)}::text, ${expr}`
+          ([expr, alias]) => sql.fragment`${sql.literal(alias)}::text, ${expr}`,
         ),
 
-        ", "
+        ", ",
       )})`;
     }
   }
@@ -321,7 +321,7 @@ class QueryBuilder {
 
   makeLiveCollection(
     _table: PgClass,
-    cb?: (checker: (data: any) => (record: any) => boolean) => void
+    cb?: (checker: (data: any) => (record: any) => boolean) => void,
   ) {
     /* the actual condition doesn't matter hugely, 'select' should work */
     if (!this.rootValue || !this.rootValue.liveConditions) return;
@@ -329,7 +329,7 @@ class QueryBuilder {
     const checkerGenerator = (data?: any) => {
       // Compute this once.
       const checkers = liveConditions.map(([checkerGenerator]) =>
-        checkerGenerator(data)
+        checkerGenerator(data),
       );
 
       return (record: any) => checkers.every(checker => checker(record));
@@ -338,7 +338,7 @@ class QueryBuilder {
       const parentQueryBuilder = this.parentQueryBuilder;
       if (cb) {
         throw new Error(
-          "Either use parentQueryBuilder or pass callback, not both."
+          "Either use parentQueryBuilder or pass callback, not both.",
         );
       }
       parentQueryBuilder.beforeLock("select", () => {
@@ -347,7 +347,7 @@ class QueryBuilder {
         const allRequirements = this.data.liveConditions.reduce(
           (memo, [_checkerGenerator, requirements]) =>
             requirements ? Object.assign(memo, requirements) : memo,
-          {}
+          {},
         );
 
         parentQueryBuilder.select(
@@ -355,30 +355,30 @@ class QueryBuilder {
 json_build_object('__id', ${sql.value(id)}::int
 ${sql.join(
   Object.keys(allRequirements).map(
-    key => sql.fragment`, ${sql.literal(key)}::text, ${allRequirements[key]}`
+    key => sql.fragment`, ${sql.literal(key)}::text, ${allRequirements[key]}`,
   ),
 
-  ""
+  "",
 )})`,
-          "__live"
+          "__live",
         );
       });
     } else if (cb) {
       cb(checkerGenerator);
     } else {
       throw new Error(
-        "makeLiveCollection was called without parentQueryBuilder and without callback"
+        "makeLiveCollection was called without parentQueryBuilder and without callback",
       );
     }
   }
 
   addLiveCondition(
     checkerGenerator: (data: {}) => (record: any) => boolean,
-    requirements?: { [key: string]: SQL }
+    requirements?: { [key: string]: SQL },
   ) {
     if (requirements && !this.parentQueryBuilder) {
       throw new Error(
-        "There's no parentQueryBuilder, so there cannot be requirements"
+        "There's no parentQueryBuilder, so there cannot be requirements",
       );
     }
     this.data.liveConditions.push([checkerGenerator, requirements]);
@@ -408,7 +408,7 @@ ${sql.join(
     }
     if (this.data.selectCursor) {
       throw new Error(
-        "Cannot use .fixedSelectExpression() with .selectCursor()"
+        "Cannot use .fixedSelectExpression() with .selectCursor()",
       );
     }
     this.data.fixedSelectExpression = exprGen;
@@ -443,13 +443,13 @@ ${sql.join(
         primaryKeys.map(key =>
           escapeLarge(
             sql.fragment`${this.getTableAlias()}.${sql.identifier(key.name)}`,
-            key.type
-          )
+            key.type,
+          ),
         ),
 
-        ", "
+        ", ",
       )})`,
-      "__identifiers"
+      "__identifiers",
     );
 
     this.selectedIdentifiers = true;
@@ -488,7 +488,7 @@ ${sql.join(
   orderBy(
     exprGen: SQLGen,
     ascending = true,
-    nullsFirst: boolean | null = null
+    nullsFirst: boolean | null = null,
   ) {
     this.checkLock("orderBy");
     this.data.orderBy.push([exprGen, ascending, nullsFirst]);
@@ -588,7 +588,7 @@ ${sql.join(
     if (this.compiledData.last != null) {
       if (offset > 0 && limit != null) {
         throw new Error(
-          "Issue within pagination, please report your query to graphile-build"
+          "Issue within pagination, please report your query to graphile-build",
         );
       }
       if (limit != null) {
@@ -637,10 +637,10 @@ ${sql.join(
     return sql.join(
       this.compiledData.select.map(
         ([sqlFragment, alias]) =>
-          sql.fragment`to_json(${sqlFragment}) as ${sql.identifier(alias)}`
+          sql.fragment`to_json(${sqlFragment}) as ${sql.identifier(alias)}`,
       ),
 
-      ", "
+      ", ",
     );
   }
   buildSelectJson({
@@ -688,7 +688,7 @@ ${sql.join(
     {
       addNullCase,
       addNotDistinctFromNullCase,
-    }: { addNullCase?: boolean; addNotDistinctFromNullCase?: boolean }
+    }: { addNullCase?: boolean; addNotDistinctFromNullCase?: boolean },
   ) {
     this.lock("where");
     const clauses = [
@@ -737,14 +737,14 @@ ${sql.join(
       addNullCase?: boolean;
       addNotDistinctFromNullCase?: boolean;
       useAsterisk?: boolean;
-    } = {}
+    } = {},
   ): SQL {
     this.lockEverything();
 
     if (this.compiledData.fixedSelectExpression) {
       if (Object.keys(options).length > 0) {
         throw new Error(
-          "Do not pass options to QueryBuilder.build() when using `buildNamedChildSelecting`"
+          "Do not pass options to QueryBuilder.build() when using `buildNamedChildSelecting`",
         );
       }
     }
@@ -792,10 +792,10 @@ ${
                 : nullsFirst === false
                 ? sql.fragment` NULLS LAST`
                 : sql.blank
-            }`
+            }`,
         ),
 
-        ","
+        ",",
       )}`
     : sql.blank
 }
@@ -824,7 +824,7 @@ order by (row_number() over (partition by 1)) desc`; /* We don't need to factor 
       const aggAlias = Symbol();
       fragment = sql.fragment`select json_agg(${sql.identifier(
         aggAlias,
-        "object"
+        "object",
       )}) from (${fragment}) as ${sql.identifier(aggAlias)}`;
       fragment = sql.fragment`select coalesce((${fragment}), '[]'::json)`;
     }
@@ -857,12 +857,12 @@ order by (row_number() over (partition by 1)) desc`; /* We don't need to factor 
       // Handle properties separately
       this.compiledData[type].lower = callIfNecessaryArray(
         this.data[type].lower,
-        context
+        context,
       );
 
       this.compiledData[type].upper = callIfNecessaryArray(
         this.data[type].upper,
-        context
+        context,
       );
     } else if (type === "fixedSelectExpression") {
       this.compiledData[type] = callIfNecessary(this.data[type], context);
@@ -934,7 +934,7 @@ order by (row_number() over (partition by 1)) desc`; /* We don't need to factor 
         throw new Error(
           `'${type}' has already been locked\n    ` +
             lock.replace(/\n/g, "\n    ") +
-            "\n"
+            "\n",
         );
       }
       throw new Error(`'${type}' has already been locked`);
@@ -972,11 +972,11 @@ order by (row_number() over (partition by 1)) desc`; /* We don't need to factor 
     name: RawAlias,
     from: SQLGen,
     selectExpression: SQLGen,
-    alias?: SQLAlias
+    alias?: SQLAlias,
   ): QueryBuilder {
     if (this._children.has(name)) {
       throw new Error(
-        `QueryBuilder already has a child named ${name.toString()}`
+        `QueryBuilder already has a child named ${name.toString()}`,
       );
     }
     const child = this.buildChild();

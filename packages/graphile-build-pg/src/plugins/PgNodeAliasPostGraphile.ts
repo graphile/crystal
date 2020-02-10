@@ -20,6 +20,6 @@ export default (async function PgNodeAliasPostGraphile(builder) {
       }
       return object;
     },
-    ["PgNodeAliasPostGraphile"]
+    ["PgNodeAliasPostGraphile"],
   );
 } as Plugin);

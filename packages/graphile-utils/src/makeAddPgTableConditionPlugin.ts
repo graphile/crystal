@@ -18,7 +18,7 @@ export default function makeAddPgTableConditionPlugin(
   tableName: string,
   conditionFieldName: string,
   conditionFieldSpecGenerator: (
-    build: Build
+    build: Build,
   ) => import("graphql").GraphQLInputFieldConfig,
   conditionGenerator: (
     value: unknown,
@@ -27,8 +27,8 @@ export default function makeAddPgTableConditionPlugin(
       sql: typeof sqlType;
       sqlTableAlias: SQL;
     },
-    build: Build
-  ) => SQL | null | void
+    build: Build,
+  ) => SQL | null | void,
 ) {
   const displayName = `makeAddPgTableConditionPlugin__${schemaName}__${tableName}__${conditionFieldName}`;
   const plugin: Plugin = builder => {
@@ -49,7 +49,7 @@ export default function makeAddPgTableConditionPlugin(
       if (!meta.seen) {
         // eslint-disable-next-line no-console
         console.error(
-          `WARNING: failed to add condition '${conditionFieldName}' to table "${schemaName}"."${tableName}"; did you get the schema/table name right?`
+          `WARNING: failed to add condition '${conditionFieldName}' to table "${schemaName}"."${tableName}"; did you get the schema/table name right?`,
         );
       }
       return schema;
@@ -87,12 +87,12 @@ export default function makeAddPgTableConditionPlugin(
                   conditionFieldSpec,
                   conditionFieldName,
                 },
-              }
+              },
             ),
           },
-          `Adding '${conditionFieldName}' condition to '${table.name}'`
+          `Adding '${conditionFieldName}' condition to '${table.name}'`,
         );
-      }
+      },
     );
     builder.hook(
       "GraphQLObjectType:fields:field:args",
@@ -136,7 +136,7 @@ export default function makeAddPgTableConditionPlugin(
                   sql,
                   sqlTableAlias: queryBuilder.getTableAlias(),
                 },
-                build
+                build,
               );
               if (sqlCondition) {
                 queryBuilder.where(sqlCondition);
@@ -146,7 +146,7 @@ export default function makeAddPgTableConditionPlugin(
         });
 
         return args;
-      }
+      },
     );
   };
   plugin.displayName = displayName;

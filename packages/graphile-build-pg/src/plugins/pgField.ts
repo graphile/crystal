@@ -18,7 +18,7 @@ interface PgFieldOptions {
   hoistCursor?: boolean;
   withQueryBuilder?: (
     queryBuilder: QueryBuilder,
-    extra: { parsedResolveInfoFragment: ResolveTree }
+    extra: { parsedResolveInfoFragment: ResolveTree },
   ) => void;
 }
 
@@ -34,7 +34,7 @@ export default function pgField(
 
   inFieldScope: Omit<ScopeGraphQLObjectTypeFieldsField, "fieldName"> = {},
   whereFrom: ((queryBuilder: QueryBuilder) => SQL) | false = false,
-  options: PgFieldOptions = {}
+  options: PgFieldOptions = {},
 ) {
   const fieldScope: ScopeGraphQLInputObjectTypeFieldsField = {
     ...inFieldScope,
@@ -64,7 +64,7 @@ export default function pgField(
       if (isLeafType && !options.pgType) {
         // eslint-disable-next-line no-console
         throw new Error(
-          "pgField call omits options.pgType for a leaf type; certain tweaks may not be applied!"
+          "pgField call omits options.pgType for a leaf type; certain tweaks may not be applied!",
         );
       }
       const {
@@ -73,12 +73,12 @@ export default function pgField(
       } = fieldContext;
       addDataGenerator(parsedResolveInfoFragment => {
         const safeAlias = getSafeAliasFromAlias(
-          parsedResolveInfoFragment.alias
+          parsedResolveInfoFragment.alias,
         );
 
         const resolveData = getDataFromParsedResolveInfoFragment(
           parsedResolveInfoFragment,
-          FieldType
+          FieldType,
         );
 
         return {
@@ -100,7 +100,7 @@ export default function pgField(
                       tableAlias,
                       options.pgType,
                       options.pgTypeModifier || null,
-                      {}
+                      {},
                     )
                   : tableAlias,
                 resolveData,
@@ -116,7 +116,7 @@ export default function pgField(
                   }
                 },
                 queryBuilder.context,
-                queryBuilder.rootValue
+                queryBuilder.rootValue,
               );
 
               return sql.fragment`(${query})`;
@@ -138,6 +138,6 @@ export default function pgField(
         ...fieldSpec,
       };
     },
-    fieldScope
+    fieldScope,
   );
 }

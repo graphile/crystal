@@ -21,6 +21,6 @@ export default (function PgColumnDeprecationPlugin(builder) {
           : String(pgFieldIntrospection.tags.deprecated),
       };
     },
-    ["PgColumnDeprecation"]
+    ["PgColumnDeprecation"],
   );
 } as Plugin);

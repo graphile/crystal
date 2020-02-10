@@ -21,7 +21,7 @@ function getCompatibleComputedColumns(build: Build, table: PgClass) {
       const computedColumnDetails = getComputedColumnDetails(
         build,
         table,
-        proc
+        proc,
       );
       if (!computedColumnDetails) return memo;
       const { pseudoColumnName } = computedColumnDetails;
@@ -54,7 +54,7 @@ function getCompatibleComputedColumns(build: Build, table: PgClass) {
       proc: PgProc;
       pseudoColumnName: string;
       returnType: PgType;
-    }[]
+    }[],
   );
 }
 
@@ -77,7 +77,7 @@ export default (function PgConditionComputedColumnPlugin(builder) {
       }
       const compatibleComputedColumns = getCompatibleComputedColumns(
         build,
-        table
+        table,
       );
 
       return extend(
@@ -86,12 +86,12 @@ export default (function PgConditionComputedColumnPlugin(builder) {
           const fieldName = inflection.computedColumn(
             pseudoColumnName,
             proc,
-            table
+            table,
           );
 
           const Type = pgGetGqlInputTypeByTypeIdAndModifier(
             proc.returnTypeId,
-            null
+            null,
           );
 
           if (!Type) return memo;
@@ -108,23 +108,23 @@ export default (function PgConditionComputedColumnPlugin(builder) {
                 {
                   isPgConnectionConditionInputField: true,
                   pgFieldIntrospection: proc,
-                }
+                },
               ),
             },
 
             `Adding computed column condition argument for ${describePgEntity(
-              proc
-            )}`
+              proc,
+            )}`,
           );
 
           return memo;
         }, {}),
         `Adding computed column condition arguments for ${describePgEntity(
-          table
-        )}`
+          table,
+        )}`,
       );
     },
-    ["PgConditionComputedColumn"]
+    ["PgConditionComputedColumn"],
   );
 
   builder.hook(
@@ -177,7 +177,7 @@ export default (function PgConditionComputedColumnPlugin(builder) {
         throw new Error(`Failed to get TableType for table '${table.name}'`);
       }
       const TableConditionType = getTypeByName(
-        inflection.conditionType(getNamedType(TableType).name)
+        inflection.conditionType(getNamedType(TableType).name),
       );
 
       if (!TableConditionType) {
@@ -185,19 +185,19 @@ export default (function PgConditionComputedColumnPlugin(builder) {
       }
       assert(
         getNullableType(args.condition.type) === TableConditionType,
-        "Condition is present, but doesn't match?"
+        "Condition is present, but doesn't match?",
       );
 
       const compatibleComputedColumns = getCompatibleComputedColumns(
         build,
-        table
+        table,
       ).map(o => {
         const { proc, pseudoColumnName } = o;
 
         const fieldName = inflection.computedColumn(
           pseudoColumnName,
           proc,
-          table
+          table,
         );
 
         const sqlFnName = sql.identifier(proc.namespaceName, proc.name);
@@ -220,13 +220,13 @@ export default (function PgConditionComputedColumnPlugin(builder) {
                       sql.fragment`${sqlCall} = ${gql2pg(
                         val,
                         returnType,
-                        null
-                      )}`
+                        null,
+                      )}`,
                     );
                   } else if (val === null) {
                     queryBuilder.where(sql.fragment`${sqlCall} IS NULL`);
                   }
-                }
+                },
               );
             }
           },
@@ -235,6 +235,6 @@ export default (function PgConditionComputedColumnPlugin(builder) {
 
       return args;
     },
-    ["PgConditionComputedColumn"]
+    ["PgConditionComputedColumn"],
   );
 } as Plugin);

@@ -1,4 +1,4 @@
-export * from 'graphile-utils';
+export * from "graphile-utils";
 
 export {
   mixed,
@@ -9,7 +9,7 @@ export {
   GraphQLErrorExtended,
   HttpRequestHandler,
   WithPostGraphileContextOptions,
-} from './interfaces';
+} from "./interfaces";
 
 export {
   Plugin,
@@ -24,7 +24,7 @@ export {
   PostGraphileInflectionPlugin,
   PostGraphileClassicIdsInflectionPlugin,
   GraphileResolverContext,
-} from 'postgraphile-core';
+} from "postgraphile-core";
 
 export {
   postgraphile,
@@ -37,9 +37,9 @@ export {
   createPostGraphileSchema as createPostGraphQLSchema,
   watchPostGraphileSchema as watchPostGraphQLSchema,
   withPostGraphileContext as withPostGraphQLContext,
-} from './postgraphile';
+} from "./postgraphile";
 
-export { makePluginHook, PostGraphilePlugin } from './postgraphile/pluginHook';
+export { makePluginHook, PostGraphilePlugin } from "./postgraphile/pluginHook";
 
-import { postgraphile } from './postgraphile';
+import { postgraphile } from "./postgraphile";
 export default postgraphile;

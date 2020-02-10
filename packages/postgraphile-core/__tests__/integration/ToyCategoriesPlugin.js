@@ -26,7 +26,7 @@ module.exports = builder => {
                 queryBuilder.select(() => {
                   const resolveData = getDataFromParsedResolveInfoFragment(
                     parsedResolveInfoFragment,
-                    Category
+                    Category,
                   );
                   const foreignTableAlias = sql.identifier(Symbol());
                   const query = queryFromResolveData(
@@ -44,18 +44,18 @@ module.exports = builder => {
                         "toyCategoriesSubquery",
                         sql.identifier("named_query_builder", "toy_categories"),
                         sql.identifier(alias, "category_id"),
-                        sql.identifier(alias)
+                        sql.identifier(alias),
                       );
                       innerInnerQueryBuilder.where(
-                        sql.fragment`${innerInnerQueryBuilder.getTableAlias()}.toy_id = ${queryBuilder.getTableAlias()}.id`
+                        sql.fragment`${innerInnerQueryBuilder.getTableAlias()}.toy_id = ${queryBuilder.getTableAlias()}.id`,
                       );
                       innerQueryBuilder.where(
                         () =>
-                          sql.fragment`${innerQueryBuilder.getTableAlias()}.id IN (${innerInnerQueryBuilder.build()})`
+                          sql.fragment`${innerQueryBuilder.getTableAlias()}.id IN (${innerInnerQueryBuilder.build()})`,
                       );
                     },
                     queryBuilder.context,
-                    queryBuilder.rootValue
+                    queryBuilder.rootValue,
                   );
                   return sql.fragment`(${query})`;
                 }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
@@ -73,7 +73,7 @@ module.exports = builder => {
         },
         {
           /* w/e */
-        }
+        },
       ),
     });
   });
@@ -101,12 +101,12 @@ module.exports = builder => {
           pgQuery: queryBuilder => {
             if (approved != null) {
               const toyCategoriesQueryBuilder = queryBuilder.getNamedChild(
-                "toyCategoriesSubquery"
+                "toyCategoriesSubquery",
               );
               toyCategoriesQueryBuilder.where(
                 sql.fragment`${toyCategoriesQueryBuilder.getTableAlias()}.approved = ${sql.value(
-                  approved
-                )}`
+                  approved,
+                )}`,
               );
             }
           },
@@ -120,8 +120,8 @@ module.exports = builder => {
             type: GraphQLBoolean,
           },
         },
-        "Test"
+        "Test",
       );
-    }
+    },
   );
 };

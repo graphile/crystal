@@ -43,7 +43,7 @@ export default function makeProcField(
     computed?: boolean;
     isMutation?: boolean;
     forceList?: boolean;
-  }
+  },
 ) {
   const {
     pgIntrospectionResultsByKind: introspectionResultsByKind,
@@ -101,7 +101,7 @@ export default function makeProcField(
       }
       return prev;
     },
-    [] as string[]
+    [] as string[],
   );
   const argTypes = proc.argTypeIds.reduce(
     (prev, typeId, idx) => {
@@ -115,7 +115,7 @@ export default function makeProcField(
       }
       return prev;
     },
-    [] as PgType[]
+    [] as PgType[],
   );
   const argModesWithOutput = [
     "o", // OUT,
@@ -129,7 +129,7 @@ export default function makeProcField(
       }
       return prev;
     },
-    [] as string[]
+    [] as string[],
   );
   const outputArgTypes = proc.argTypeIds.reduce(
     (prev, typeId, idx) => {
@@ -138,7 +138,7 @@ export default function makeProcField(
       }
       return prev;
     },
-    [] as PgType[]
+    [] as PgType[],
   );
   const requiredArgCount = Math.max(0, argNames.length - proc.argDefaultsNum);
   const variantFromName = (name: string) => {
@@ -168,20 +168,20 @@ export default function makeProcField(
     if (!Type) {
       const hint = type.class
         ? `; this might be because no INSERT column privileges are granted on ${describePgEntity(
-            type.class
+            type.class,
           )}. You can use 'Smart Comments' to tell PostGraphile to instead use the "${chalk.bold.green(
-            "base"
+            "base",
           )}" input type which includes all columns:\n\n  ${sqlCommentByAddingTags(
             proc,
             {
               [`arg${idx}variant`]: "base",
-            }
+            },
           )}\n`
         : "";
       throw new Error(
         `Could not determine type for argument ${idx} ('${
           argNames[idx]
-        }') of function ${describePgEntity(proc)}${hint}`
+        }') of function ${describePgEntity(proc)}${hint}`,
       );
     }
     if (idx >= notNullArgCount) {
@@ -200,7 +200,7 @@ export default function makeProcField(
     : null;
   if (!returnType) {
     throw new Error(
-      `Could not determine return type for function '${proc.name}'`
+      `Could not determine return type for function '${proc.name}'`,
     );
   }
   let type: import("graphql").GraphQLOutputType;
@@ -238,8 +238,8 @@ export default function makeProcField(
         if (!ConnectionType) {
           throw new Error(
             `Do not have a connection type '${inflection.connection(
-              name
-            )}' for '${name}' so cannot create procedure field`
+              name,
+            )}' for '${name}' so cannot create procedure field`,
           );
         }
         type = new GraphQLNonNull(ConnectionType);
@@ -262,13 +262,13 @@ export default function makeProcField(
     }
   } else if (isRecordLike) {
     const tmpRecordType = getTypeByName(
-      inflection.recordFunctionReturnType(proc)
+      inflection.recordFunctionReturnType(proc),
     );
     if (!tmpRecordType || !isOutputType(tmpRecordType)) {
       throw new Error(
         `Do not have an output record type '${inflection.recordFunctionReturnType(
-          proc
-        )}' for '${proc.name}' so cannot create procedure field`
+          proc,
+        )}' for '${proc.name}' so cannot create procedure field`,
       );
     }
     const RecordType = tmpRecordType;
@@ -280,16 +280,16 @@ export default function makeProcField(
         fieldScope.isPgFieldSimpleCollection = true;
       } else {
         const ConnectionType = getTypeByName(
-          inflection.recordFunctionConnection(proc)
+          inflection.recordFunctionConnection(proc),
         );
 
         if (!ConnectionType) {
           throw new Error(
             `Do not have a connection type '${inflection.recordFunctionConnection(
-              proc
+              proc,
             )}' for '${
               getNamedType(RecordType).name
-            }' so cannot create procedure field`
+            }' so cannot create procedure field`,
           );
         }
         type = new GraphQLNonNull(ConnectionType);
@@ -356,7 +356,7 @@ export default function makeProcField(
       function makeMutationCall(
         parsedResolveInfoFragment: ResolveTree,
         _ReturnType: import("graphql").GraphQLOutputType,
-        { implicitArgs = [] }: { implicitArgs?: SQL[] } = {}
+        { implicitArgs = [] }: { implicitArgs?: SQL[] } = {},
       ): SQL {
         const { args: rawArgs = {} } = parsedResolveInfoFragment;
         const args = isMutation ? rawArgs.input : rawArgs;
@@ -392,7 +392,7 @@ export default function makeProcField(
         }
         const functionCall = sql.fragment`${sql.identifier(
           proc.namespace.name,
-          proc.name
+          proc.name,
         )}(${sql.join([...implicitArgs, ...sqlArgValues], ", ")})`;
         return rawReturnType.isPgArray
           ? sql.fragment`unnest(${functionCall})`
@@ -405,11 +405,11 @@ export default function makeProcField(
         functionAlias: SQL,
         parentQueryBuilder: QueryBuilder | null,
         resolveContext?: GraphileResolverContext,
-        resolveInfo?: import("graphql").GraphQLResolveInfo
+        resolveInfo?: import("graphql").GraphQLResolveInfo,
       ) {
         const resolveData = getDataFromParsedResolveInfoFragment(
           parsedResolveInfoFragment,
-          ReturnType
+          ReturnType,
         );
 
         const isConnection = !forceList && !isMutation && proc.returnsSet;
@@ -448,10 +448,10 @@ export default function makeProcField(
                     sql.fragment`${functionAlias}`,
                     returnTypeTable.type,
                     null,
-                    resolveData
+                    resolveData,
                   ),
 
-                  "value"
+                  "value",
                 );
               } else {
                 innerQueryBuilder.select(
@@ -459,10 +459,10 @@ export default function makeProcField(
                     sql.fragment`${functionAlias}`,
                     returnType,
                     null, // We can't determine a type modifier for functions
-                    resolveData
+                    resolveData,
                   ),
 
-                  "value"
+                  "value",
                 );
               }
             } else if (
@@ -477,7 +477,7 @@ export default function makeProcField(
           parentQueryBuilder ? parentQueryBuilder.context! : resolveContext!,
           parentQueryBuilder
             ? parentQueryBuilder.rootValue
-            : resolveInfo && resolveInfo.rootValue
+            : resolveInfo && resolveInfo.rootValue,
         );
 
         return query;
@@ -494,7 +494,7 @@ export default function makeProcField(
                   ReturnType,
                   {
                     implicitArgs: [parentTableAlias],
-                  }
+                  },
                 );
 
                 const query = makeQuery(
@@ -502,7 +502,7 @@ export default function makeProcField(
                   ReturnType,
                   sqlMutationQuery,
                   functionAlias,
-                  queryBuilder
+                  queryBuilder,
                 );
 
                 return sql.fragment`(${query})`;
@@ -527,7 +527,7 @@ export default function makeProcField(
           proc,
           getNamedType(type),
           proc.returnsSet || rawReturnType.isPgArray,
-          outputArgNames
+          outputArgNames,
         );
 
         const isNotVoid = String(returnType.id) !== "2278";
@@ -537,7 +537,7 @@ export default function makeProcField(
           {
             name: inflection.functionPayloadType(proc),
             description: `The output of our \`${inflection.functionMutationName(
-              proc
+              proc,
             )}\` mutation.`,
             fields: ({ fieldWithHooks }) => {
               return Object.assign(
@@ -569,35 +569,35 @@ export default function makeProcField(
                         false,
                         {
                           pgType: returnType,
-                        }
+                        },
                       ),
 
                       // Result
                     }
-                  : null
+                  : null,
               );
             },
           },
 
           {
             __origin: `Adding mutation function payload type for ${describePgEntity(
-              proc
+              proc,
             )}. You can rename the function's GraphQL field (and its dependent types) via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               proc,
               {
                 name: "newNameHere",
-              }
+              },
             )}`,
             isMutationPayload: true,
             ...payloadTypeScope,
-          }
+          },
         );
 
         ReturnType = PayloadType;
         const inputTypeSpec: GraphileInputObjectTypeConfig = {
           name: inflection.functionInputType(proc),
           description: `All input for the \`${inflection.functionMutationName(
-            proc
+            proc,
           )}\` mutation.`,
           fields: {
             clientMutationId: {
@@ -609,18 +609,18 @@ export default function makeProcField(
         };
         const InputType = newWithHooks(GraphQLInputObjectType, inputTypeSpec, {
           __origin: `Adding mutation function input type for ${describePgEntity(
-            proc
+            proc,
           )}. You can rename the function's GraphQL field (and its dependent types) via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
             proc,
             {
               name: "newNameHere",
-            }
+            },
           )}`,
           isMutationInput: true,
         });
         if (!InputType) {
           throw new Error(
-            `Failed to construct InputType '${inputTypeSpec.name}'`
+            `Failed to construct InputType '${inputTypeSpec.name}'`,
           );
         }
 
@@ -666,11 +666,11 @@ export default function makeProcField(
                   // EITHER `isMutation` is true, or `ConnectionType` does not
                   // exist - either way, we're not returning a connection.
                   return value.data.map((v: any) =>
-                    pg2gql(firstValue(v), returnType)
+                    pg2gql(firstValue(v), returnType),
                   );
                 } else if (proc.returnsSet || rawReturnType.isPgArray) {
                   return value.map((v: any) =>
-                    pg2gql(firstValue(v), returnType)
+                    pg2gql(firstValue(v), returnType),
                   );
                 } else {
                   return pg2gql(value, returnType);
@@ -683,7 +683,7 @@ export default function makeProcField(
                           liveRecord(
                             "pg",
                             returnTypeTable,
-                            record.__identifiers
+                            record.__identifiers,
                           );
                         }
                       }
@@ -716,14 +716,14 @@ export default function makeProcField(
                 resolveInfo.rootValue && resolveInfo.rootValue.liveRecord;
               const parsedResolveInfoFragment = parseResolveInfo(
                 resolveInfo,
-                true
+                true,
               );
               parsedResolveInfoFragment.args = args; // Allow overriding via makeWrapResolversPlugin
               const functionAlias = sql.identifier(Symbol());
               const sqlMutationQuery = makeMutationCall(
                 parsedResolveInfoFragment,
                 resolveInfo.returnType,
-                {}
+                {},
               );
 
               let queryResultRows;
@@ -735,7 +735,7 @@ export default function makeProcField(
                   functionAlias,
                   null,
                   resolveContext,
-                  resolveInfo
+                  resolveInfo,
                 );
 
                 const intermediateIdentifier = sql.identifier(Symbol());
@@ -752,7 +752,7 @@ export default function makeProcField(
                       ? null
                       : sql.identifier(
                           returnType.namespaceName,
-                          returnType.name
+                          returnType.name,
                         ),
 
                     sql.query`select ${
@@ -770,13 +770,13 @@ export default function makeProcField(
                           outputArgTypes,
                           outputArgNames,
                         }
-                      : null
+                      : null,
                   );
 
                   await pgClient.query("RELEASE SAVEPOINT graphql_mutation");
                 } catch (e) {
                   await pgClient.query(
-                    "ROLLBACK TO SAVEPOINT graphql_mutation"
+                    "ROLLBACK TO SAVEPOINT graphql_mutation",
                   );
 
                   throw e;
@@ -789,7 +789,7 @@ export default function makeProcField(
                   functionAlias,
                   null,
                   resolveContext,
-                  resolveInfo
+                  resolveInfo,
                 );
 
                 const { text, values } = sql.compile(query);
@@ -797,7 +797,7 @@ export default function makeProcField(
                 const queryResult = await pgPrepareAndRun(
                   pgClient,
                   text,
-                  values
+                  values,
                 );
 
                 queryResultRows = queryResult.rows;
@@ -812,7 +812,7 @@ export default function makeProcField(
                           liveRecord(
                             "pg",
                             returnTypeTable,
-                            record.__identifiers
+                            record.__identifiers,
                           );
                         }
                       }
@@ -873,6 +873,6 @@ export default function makeProcField(
             },
       };
     },
-    fieldScope
+    fieldScope,
   );
 }

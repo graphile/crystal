@@ -6,7 +6,7 @@ test(
     graphileBuildOptions: {
       pgUseCustomNetworkScalars: false,
     },
-  })
+  }),
 );
 test(
   "prints a schema to test network scalars using custom network scalar types",
@@ -14,5 +14,5 @@ test(
     graphileBuildOptions: {
       pgUseCustomNetworkScalars: true,
     },
-  })
+  }),
 );

@@ -24,8 +24,8 @@ test(
             return inputType.call(this, name);
           },
         }),
-        true
+        true,
       ),
     ],
-  })
+  }),
 );

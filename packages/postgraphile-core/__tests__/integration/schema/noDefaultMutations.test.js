@@ -5,5 +5,5 @@ test(
   core.test("c", {
     disableDefaultMutations: true,
     setofFunctionsContainNulls: false,
-  })
+  }),
 );

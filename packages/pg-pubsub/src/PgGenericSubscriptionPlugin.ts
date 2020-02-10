@@ -45,7 +45,7 @@ const PgGenericSubscriptionPlugin: Plugin = function(
     pubsub,
     pgSubscriptionPrefix = "postgraphile:",
     pgSubscriptionAuthorizationFunction,
-  }
+  },
 ) {
   if (!isPubSub(pubsub)) {
     debug("Subscriptions disabled - no pubsub provided");
@@ -65,9 +65,9 @@ const PgGenericSubscriptionPlugin: Plugin = function(
             return this.upperCamelCase(`${this.listen()}-payload`);
           },
         },
-        "Adding listen / listenPayload inflectors from PgGenericSubscriptionPlugin"
+        "Adding listen / listenPayload inflectors from PgGenericSubscriptionPlugin",
       ),
-    ["PgGenericSubscription"]
+    ["PgGenericSubscription"],
   );
 
   builder.hook(
@@ -132,7 +132,7 @@ const PgGenericSubscriptionPlugin: Plugin = function(
                       payload,
                       _args,
                       resolveContext,
-                      resolveInfo
+                      resolveInfo,
                     ) => {
                       if (!payload.relatedNodeId) {
                         return null;
@@ -143,11 +143,11 @@ const PgGenericSubscriptionPlugin: Plugin = function(
                         { getDataFromParsedResolveInfoFragment },
                         {},
                         resolveContext,
-                        resolveInfo
+                        resolveInfo,
                       );
                     },
                   }),
-                  scope
+                  scope,
                 ),
                 // We don't use 'nodeId' here because it's likely your cache will
                 // use 'nodeId' as the cache key.
@@ -190,8 +190,8 @@ const PgGenericSubscriptionPlugin: Plugin = function(
                   const { text, values } = sql.compile(
                     sql.query`select unsubscribe_topic from ${sql.identifier(
                       parsedFunctionParts.namespaceName,
-                      parsedFunctionParts.entityName
-                    )}(${sql.value(topic)}) unsubscribe_topic`
+                      parsedFunctionParts.entityName,
+                    )}(${sql.value(topic)}) unsubscribe_topic`,
                   );
                   const {
                     rows: [[_unsubscribeTopic]],
@@ -212,12 +212,12 @@ const PgGenericSubscriptionPlugin: Plugin = function(
                 if (unsubscribeTopic) {
                   // Subscribe to event revoking subscription
                   const unsubscribeIterator = pubsub.asyncIterator(
-                    unsubscribeTopic
+                    unsubscribeTopic,
                   );
                   unsubscribeIterator.next().then(() => {
                     debug(
                       "Unsubscribe triggered on channel %s",
-                      unsubscribeTopic
+                      unsubscribeTopic,
                     );
                     if (asyncIterator.return) {
                       asyncIterator.return();
@@ -238,15 +238,15 @@ const PgGenericSubscriptionPlugin: Plugin = function(
                 return result;
               },
             }),
-            listenScope
+            listenScope,
           ),
         },
-        "Adding listen field to Subscription type"
+        "Adding listen field to Subscription type",
       );
     },
     ["PgGenericSubscription"],
     [],
-    ["Node", "Query"]
+    ["Node", "Query"],
   );
 };
 

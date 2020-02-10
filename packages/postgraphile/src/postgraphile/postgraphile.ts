@@ -1,20 +1,24 @@
-import { Pool, PoolConfig } from 'pg';
-import { IncomingMessage, ServerResponse } from 'http';
-import { GraphQLSchema } from 'graphql';
-import { EventEmitter } from 'events';
-import { createPostGraphileSchema, watchPostGraphileSchema } from 'postgraphile-core';
-import createPostGraphileHttpRequestHandler from './http/createPostGraphileHttpRequestHandler';
-import exportPostGraphileSchema from './schema/exportPostGraphileSchema';
-import { pluginHookFromOptions } from './pluginHook';
-import { PostGraphileOptions, mixed, HttpRequestHandler } from '../interfaces';
-import chalk from 'chalk';
-import { debugPgClient } from './withPostGraphileContext';
+import { Pool, PoolConfig } from "pg";
+import { IncomingMessage, ServerResponse } from "http";
+import { GraphQLSchema } from "graphql";
+import { EventEmitter } from "events";
+import {
+  createPostGraphileSchema,
+  watchPostGraphileSchema,
+} from "postgraphile-core";
+import createPostGraphileHttpRequestHandler from "./http/createPostGraphileHttpRequestHandler";
+import exportPostGraphileSchema from "./schema/exportPostGraphileSchema";
+import { pluginHookFromOptions } from "./pluginHook";
+import { PostGraphileOptions, mixed, HttpRequestHandler } from "../interfaces";
+import chalk from "chalk";
+import { debugPgClient } from "./withPostGraphileContext";
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 // tslint:disable-next-line no-any
 function isPlainObject(obj: any) {
-  if (!obj || typeof obj !== 'object' || String(obj) !== '[object Object]') return false;
+  if (!obj || typeof obj !== "object" || String(obj) !== "[object Object]")
+    return false;
   const proto = Object.getPrototypeOf(obj);
   if (proto === null || proto === Object.prototype) {
     return true;
@@ -49,7 +53,7 @@ export function getPostgraphileSchemaBuilder<
     incomingOptions.subscriptions = true;
   }
   const pluginHook = pluginHookFromOptions(incomingOptions);
-  const options = pluginHook('postgraphile:options', incomingOptions, {
+  const options = pluginHook("postgraphile:options", incomingOptions, {
     pgPool,
     schema,
   });
@@ -58,18 +62,23 @@ export function getPostgraphileSchemaBuilder<
   if (options.jwtSecret && !options.jwtPgTypeIdentifier) {
     // tslint:disable-next-line no-console
     console.warn(
-      'WARNING: jwtSecret provided, however jwtPgTypeIdentifier (token identifier) not provided.',
+      "WARNING: jwtSecret provided, however jwtPgTypeIdentifier (token identifier) not provided.",
     );
   }
 
-  if (options.handleErrors && (options.extendedErrors || options.showErrorStack)) {
-    throw new Error(`You cannot combine 'handleErrors' with the other error options`);
+  if (
+    options.handleErrors &&
+    (options.extendedErrors || options.showErrorStack)
+  ) {
+    throw new Error(
+      `You cannot combine 'handleErrors' with the other error options`,
+    );
   }
 
   // Creates the Postgres schemas array.
   const pgSchemas: Array<string> = Array.isArray(schema) ? schema : [schema];
 
-  const _emitter: EventEmitter = options['_emitter'] || new EventEmitter();
+  const _emitter: EventEmitter = options["_emitter"] || new EventEmitter();
 
   // Creates a promise which will resolve to a GraphQL schema. Connects a
   // client from our pool to introspect the database.
@@ -81,7 +90,8 @@ export function getPostgraphileSchemaBuilder<
 
   return {
     _emitter,
-    getGraphQLSchema: () => (gqlSchema ? Promise.resolve(gqlSchema) : gqlSchemaPromise),
+    getGraphQLSchema: () =>
+      gqlSchema ? Promise.resolve(gqlSchema) : gqlSchemaPromise,
     options,
   };
 
@@ -91,25 +101,34 @@ export function getPostgraphileSchemaBuilder<
     while (true) {
       try {
         if (options.watchPg) {
-          await watchPostGraphileSchema(pgPool, pgSchemas, options, newSchema => {
-            gqlSchema = newSchema;
-            _emitter.emit('schemas:changed');
-            exportGqlSchema(gqlSchema);
-          });
+          await watchPostGraphileSchema(
+            pgPool,
+            pgSchemas,
+            options,
+            newSchema => {
+              gqlSchema = newSchema;
+              _emitter.emit("schemas:changed");
+              exportGqlSchema(gqlSchema);
+            },
+          );
           if (!gqlSchema) {
             throw new Error(
               "Consistency error: watchPostGraphileSchema promises to call the callback before the promise resolves; but this hasn't happened",
             );
           }
         } else {
-          gqlSchema = await createPostGraphileSchema(pgPool, pgSchemas, options);
+          gqlSchema = await createPostGraphileSchema(
+            pgPool,
+            pgSchemas,
+            options,
+          );
           exportGqlSchema(gqlSchema);
         }
         if (attempts > 0) {
           // tslint:disable-next-line no-console
           console.error(
             `Schema ${
-              attempts > 15 ? 'eventually' : attempts > 5 ? 'finally' : 'now'
+              attempts > 15 ? "eventually" : attempts > 5 ? "finally" : "now"
             } generated successfully`,
           );
         }
@@ -121,9 +140,10 @@ export function getPostgraphileSchemaBuilder<
         // If we fail to build our schema, log the error and either exit or retry shortly
         logSeriousError(
           error,
-          'building the initial schema' + (attempts > 1 ? ` (attempt ${attempts})` : ''),
+          "building the initial schema" +
+            (attempts > 1 ? ` (attempt ${attempts})` : ""),
           exitOnFail
-            ? 'Exiting because `retryOnInitFail` is not set.'
+            ? "Exiting because `retryOnInitFail` is not set."
             : `We'll try again in ${delay}ms.`,
         );
         if (exitOnFail) {
@@ -142,7 +162,7 @@ export function getPostgraphileSchemaBuilder<
       // If we exit cleanly; let calling scripts know there was a problem.
       process.exitCode = 35;
       // If we fail to export our schema, log the error.
-      logSeriousError(error, 'exporting the schema');
+      logSeriousError(error, "exporting the schema");
     }
   }
 }
@@ -166,7 +186,10 @@ export default function postgraphile<
   Response extends ServerResponse = ServerResponse
 >(
   poolOrConfig?: Pool | PoolConfig | string,
-  schemaOrOptions?: string | Array<string> | PostGraphileOptions<Request, Response>,
+  schemaOrOptions?:
+    | string
+    | Array<string>
+    | PostGraphileOptions<Request, Response>,
   maybeOptions?: PostGraphileOptions<Request, Response>,
 ): HttpRequestHandler {
   let schema: string | Array<string>;
@@ -177,31 +200,31 @@ export default function postgraphile<
   // If the second argument is a string or array, it is the schemas so set the
   // `schema` value and try to use the third argument (or a default) for
   // `incomingOptions`.
-  if (typeof schemaOrOptions === 'string' || Array.isArray(schemaOrOptions)) {
+  if (typeof schemaOrOptions === "string" || Array.isArray(schemaOrOptions)) {
     schema = schemaOrOptions;
     incomingOptions = maybeOptions || {};
   }
   // If the second argument is null or an object then use default `schema`
   // and set incomingOptions to second or third argument (or default).
-  else if (typeof schemaOrOptions === 'object') {
-    schema = 'public';
+  else if (typeof schemaOrOptions === "object") {
+    schema = "public";
     incomingOptions = schemaOrOptions || maybeOptions || {};
   }
   // Otherwise if the second argument is present it's invalid: throw an error.
   else if (arguments.length > 1) {
     throw new Error(
-      'The second argument to postgraphile was invalid... did you mean to set a schema?',
+      "The second argument to postgraphile was invalid... did you mean to set a schema?",
     );
   }
   // No schema or options specified, use defaults.
   else {
-    schema = 'public';
+    schema = "public";
     incomingOptions = {};
   }
 
-  if (typeof poolOrConfig === 'undefined' && arguments.length >= 1) {
+  if (typeof poolOrConfig === "undefined" && arguments.length >= 1) {
     throw new Error(
-      'The first argument to postgraphile was `undefined`... did you mean to set pool options?',
+      "The first argument to postgraphile was `undefined`... did you mean to set pool options?",
     );
   }
 
@@ -209,7 +232,7 @@ export default function postgraphile<
   // Postgres pool.
   const pgPool = toPgPool(poolOrConfig);
 
-  pgPool.on('error', err => {
+  pgPool.on("error", err => {
     /*
      * This handler is required so that client connection errors don't bring
      * the server down (via `unhandledError`).
@@ -219,21 +242,22 @@ export default function postgraphile<
      * that the event listener is registered.
      */
     // tslint:disable-next-line no-console
-    console.error('PostgreSQL client generated error: ', err.message);
+    console.error("PostgreSQL client generated error: ", err.message);
   });
 
-  pgPool.on('connect', pgClient => {
+  pgPool.on("connect", pgClient => {
     // Enhance our Postgres client with debugging stuffs.
     debugPgClient(pgClient, !!options.allowExplain);
   });
 
-  const { getGraphQLSchema, options, _emitter } = getPostgraphileSchemaBuilder<Request, Response>(
-    pgPool,
-    schema,
-    incomingOptions,
-  );
+  const { getGraphQLSchema, options, _emitter } = getPostgraphileSchemaBuilder<
+    Request,
+    Response
+  >(pgPool, schema, incomingOptions);
   return createPostGraphileHttpRequestHandler({
-    ...(typeof poolOrConfig === 'string' ? { ownerConnectionString: poolOrConfig } : {}),
+    ...(typeof poolOrConfig === "string"
+      ? { ownerConnectionString: poolOrConfig }
+      : {}),
     ...options,
     getGqlSchema: getGraphQLSchema,
     pgPool,
@@ -244,8 +268,8 @@ export default function postgraphile<
 function logSeriousError(error: Error, when: string, nextSteps?: string) {
   // tslint:disable-next-line no-console
   console.error(
-    `A ${chalk.bold('serious error')} occurred when ${chalk.bold(when)}. ${
-      nextSteps ? nextSteps + ' ' : ''
+    `A ${chalk.bold("serious error")} occurred when ${chalk.bold(when)}. ${
+      nextSteps ? nextSteps + " " : ""
     }Error details:\n\n${error.stack}\n`,
   );
 }
@@ -253,7 +277,9 @@ function logSeriousError(error: Error, when: string, nextSteps?: string) {
 function hasPoolConstructor(obj: mixed): boolean {
   return (
     // tslint:disable-next-line no-any
-    (obj && typeof obj.constructor === 'function' && obj.constructor === (Pool as any).super_) ||
+    (obj &&
+      typeof obj.constructor === "function" &&
+      obj.constructor === (Pool as any).super_) ||
     false
   );
 }
@@ -261,7 +287,7 @@ function hasPoolConstructor(obj: mixed): boolean {
 function constructorName(obj: mixed): string | null {
   return (
     (obj &&
-      typeof obj.constructor === 'function' &&
+      typeof obj.constructor === "function" &&
       obj.constructor.name &&
       String(obj.constructor.name)) ||
     null
@@ -275,7 +301,7 @@ function toPgPool(poolOrConfig: any): Pool {
     return poolOrConfig;
   }
 
-  if (typeof poolOrConfig === 'string') {
+  if (typeof poolOrConfig === "string") {
     // If it is a string, let us parse it to get a config to create a `Pool`.
     return new Pool({ connectionString: poolOrConfig });
   } else if (!poolOrConfig) {
@@ -285,7 +311,7 @@ function toPgPool(poolOrConfig: any): Pool {
     // The user handed over a configuration object, pass it through
     return new Pool(poolOrConfig);
   } else {
-    throw new Error('Invalid connection string / Pool ');
+    throw new Error("Invalid connection string / Pool ");
   }
 }
 
@@ -295,13 +321,16 @@ function quacksLikePgPool(pgConfig: any): pgConfig is Pool {
   if (hasPoolConstructor(pgConfig)) return true;
 
   // A diagnosis of exclusion
-  if (!pgConfig || typeof pgConfig !== 'object') return false;
-  if (constructorName(pgConfig) !== 'Pool' && constructorName(pgConfig) !== 'BoundPool')
+  if (!pgConfig || typeof pgConfig !== "object") return false;
+  if (
+    constructorName(pgConfig) !== "Pool" &&
+    constructorName(pgConfig) !== "BoundPool"
+  )
     return false;
-  if (!pgConfig['Client']) return false;
-  if (!pgConfig['options']) return false;
-  if (typeof pgConfig['connect'] !== 'function') return false;
-  if (typeof pgConfig['end'] !== 'function') return false;
-  if (typeof pgConfig['query'] !== 'function') return false;
+  if (!pgConfig["Client"]) return false;
+  if (!pgConfig["options"]) return false;
+  if (typeof pgConfig["connect"] !== "function") return false;
+  if (typeof pgConfig["end"] !== "function") return false;
+  if (typeof pgConfig["query"] !== "function") return false;
   return true;
 }

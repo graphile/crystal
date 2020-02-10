@@ -1,7 +1,7 @@
 /* tslint:disable */
 
-const tsc = require('typescript');
-const tsConfig = require('../tsconfig.json');
+const tsc = require("typescript");
+const tsConfig = require("../tsconfig.json");
 
 const compilerOptions = tsConfig.compilerOptions;
 

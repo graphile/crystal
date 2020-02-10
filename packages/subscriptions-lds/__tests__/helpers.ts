@@ -6,7 +6,7 @@ export { PoolClient } from "pg";
 
 export async function withClient<T = void>(
   connectionString: string,
-  callback: (pgClient: pg.PoolClient) => Promise<T>
+  callback: (pgClient: pg.PoolClient) => Promise<T>,
 ): Promise<T> {
   const pool = new pg.Pool({
     connectionString,
@@ -28,7 +28,7 @@ export async function query(text: string, values: Array<any> = []) {
 }
 
 export async function withLiveSource<T = void>(
-  callback: (liveSource: LDSLiveSource) => Promise<T>
+  callback: (liveSource: LDSLiveSource) => Promise<T>,
 ): Promise<T> {
   const liveSource = new LDSLiveSource({
     connectionString: DATABASE_URL,
@@ -43,9 +43,9 @@ export async function withLiveSource<T = void>(
 }
 
 export async function withLiveSourceAndClient<T = void>(
-  callback: (ls: LDSLiveSource, pgClient: pg.PoolClient) => Promise<T>
+  callback: (ls: LDSLiveSource, pgClient: pg.PoolClient) => Promise<T>,
 ): Promise<T> {
   return withClient(DATABASE_URL, pgClient =>
-    withLiveSource(liveSource => callback(liveSource, pgClient))
+    withLiveSource(liveSource => callback(liveSource, pgClient)),
   );
 }

@@ -6,5 +6,5 @@ test(
     enableTags: false,
     legacyRelations: "omit",
     setofFunctionsContainNulls: false,
-  })
+  }),
 );

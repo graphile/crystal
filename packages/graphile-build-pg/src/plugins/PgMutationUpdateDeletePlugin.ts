@@ -34,7 +34,7 @@ const debug = debugFactory("graphile-build-pg");
 
 export default (async function PgMutationUpdateDeletePlugin(
   builder,
-  { pgDisableDefaultMutations }
+  { pgDisableDefaultMutations },
 ) {
   if (pgDisableDefaultMutations) {
     return;
@@ -105,7 +105,7 @@ export default (async function PgMutationUpdateDeletePlugin(
 
               const tmpTableType = pgGetGqlTypeByTypeIdAndModifier(
                 table.type.id,
-                null
+                null,
               );
               if (
                 !tmpTableType ||
@@ -124,22 +124,22 @@ export default (async function PgMutationUpdateDeletePlugin(
                 args: { [argName: string]: any },
                 condition: SQL,
                 context: ContextGraphQLObjectTypeFieldsField,
-                resolveContext: GraphileResolverContext
+                resolveContext: GraphileResolverContext,
               ) {
                 const { input } = args;
                 const parsedResolveInfoFragment = parseResolveInfo(
                   resolveInfo,
-                  true
+                  true,
                 );
                 parsedResolveInfoFragment.args = args; // Allow overriding via makeWrapResolversPlugin
                 const resolveData = getDataFromParsedResolveInfoFragment(
                   parsedResolveInfoFragment,
-                  PayloadType
+                  PayloadType,
                 );
 
                 const sqlTypeIdentifier = sql.identifier(
                   table.namespace.name,
-                  table.name
+                  table.name,
                 );
 
                 let sqlMutationQuery;
@@ -171,10 +171,10 @@ export default (async function PgMutationUpdateDeletePlugin(
                   sqlMutationQuery = sql.query`\
 update ${sql.identifier(table.namespace.name, table.name)} set ${sql.join(
                     sqlColumns.map(
-                      (col, i) => sql.fragment`${col} = ${sqlValues[i]}`
+                      (col, i) => sql.fragment`${col} = ${sqlValues[i]}`,
                     ),
 
-                    ", "
+                    ", ",
                   )}
 where ${condition}
 returning *`;
@@ -193,7 +193,7 @@ returning *`;
                   {},
                   null,
                   resolveContext,
-                  resolveInfo.rootValue
+                  resolveInfo.rootValue,
                 );
 
                 let row;
@@ -204,14 +204,14 @@ returning *`;
                     sqlTypeIdentifier,
                     sqlMutationQuery,
                     modifiedRowAlias,
-                    query
+                    query,
                   );
 
                   row = rows[0];
                   await pgClient.query("RELEASE SAVEPOINT graphql_mutation");
                 } catch (e) {
                   await pgClient.query(
-                    "ROLLBACK TO SAVEPOINT graphql_mutation"
+                    "ROLLBACK TO SAVEPOINT graphql_mutation",
                   );
 
                   throw e;
@@ -219,8 +219,8 @@ returning *`;
                 if (!row) {
                   throw new Error(
                     `No values were ${mode}d in collection '${inflection.pluralize(
-                      inflection._singularizedTableName(table)
-                    )}' because no values you can ${mode} were found matching these criteria.`
+                      inflection._singularizedTableName(table),
+                    )}' because no values you can ${mode} were found matching these criteria.`,
                   );
                 }
                 return {
@@ -230,27 +230,27 @@ returning *`;
               }
               if (TableType) {
                 const uniqueConstraints = table.constraints.filter(
-                  con => con.type === "u" || con.type === "p"
+                  con => con.type === "u" || con.type === "p",
                 );
 
                 const Table = pgGetGqlTypeByTypeIdAndModifier(
                   table.type.id,
-                  null
+                  null,
                 );
 
                 if (!Table) {
                   throw new Error(
-                    `Could not determine GraphQL type for table '${table.name}'`
+                    `Could not determine GraphQL type for table '${table.name}'`,
                   );
                 }
 
                 const tableTypeName = getNamedType(Table).name;
                 const TablePatch = getTypeByName(
-                  inflection.patchType(getNamedType(Table).name)
+                  inflection.patchType(getNamedType(Table).name),
                 );
                 if (mode === "update" && !TablePatch) {
                   throw new Error(
-                    `Could not find TablePatch type for table '${table.name}'`
+                    `Could not find TablePatch type for table '${table.name}'`,
                   );
                 }
 
@@ -265,7 +265,7 @@ returning *`;
                     const tableName = inflection.tableFieldName(table);
                     // This should really be `-node-id` but for compatibility with PostGraphQL v3 we haven't made that change.
                     const deletedNodeIdFieldName = inflection.deletedNodeId(
-                      table
+                      table,
                     );
 
                     return Object.assign(
@@ -286,7 +286,7 @@ returning *`;
                           },
 
                           {},
-                          false
+                          false,
                         ),
                       },
 
@@ -296,7 +296,7 @@ returning *`;
                               deletedNodeIdFieldName,
                               ({ addDataGenerator }) => {
                                 const fieldDataGeneratorsByTableType = fieldDataGeneratorsByFieldNameByType.get(
-                                  TableType
+                                  TableType,
                                 );
 
                                 const gens =
@@ -315,7 +315,7 @@ returning *`;
                                       data.data.__identifiers &&
                                       getNodeIdForTypeAndIdentifiers(
                                         Table,
-                                        ...data.data.__identifiers
+                                        ...data.data.__identifiers,
                                       )
                                     );
                                   },
@@ -323,21 +323,21 @@ returning *`;
                               },
                               {
                                 isPgMutationPayloadDeletedNodeIdField: true,
-                              }
+                              },
                             ),
                           }
-                        : null
+                        : null,
                     );
                   },
                 };
                 const payloadScope: ScopeGraphQLObjectType = {
                   __origin: `Adding table ${mode} mutation payload type for ${describePgEntity(
-                    table
+                    table,
                   )}. You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                     table,
                     {
                       name: "newNameHere",
-                    }
+                    },
                   )}`,
                   isMutationPayload: true,
                   isPgUpdatePayloadType: mode === "update",
@@ -348,7 +348,7 @@ returning *`;
                   GraphQLObjectType,
                   payloadSpec,
 
-                  payloadScope
+                  payloadScope,
                 );
 
                 // NodeId
@@ -385,24 +385,24 @@ returning *`;
                         mode === "update"
                           ? {
                               [inflection.patchField(
-                                inflection.tableFieldName(table)
+                                inflection.tableFieldName(table),
                               )]: {
                                 description: `An object where the defined keys will be set on the \`${tableTypeName}\` being ${mode}d.`,
                                 type: new GraphQLNonNull(TablePatch!),
                               },
                             }
-                          : null
+                          : null,
                       ),
                     },
 
                     {
                       __origin: `Adding table ${mode} (by node ID) mutation input type for ${describePgEntity(
-                        table
+                        table,
                       )}. You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                         table,
                         {
                           name: "newNameHere",
-                        }
+                        },
                       )}`,
                       isPgUpdateInputType: mode === "update",
                       isPgUpdateNodeInputType: mode === "update",
@@ -413,17 +413,17 @@ returning *`;
                       } as {}),
                       pgIntrospection: table,
                       isMutationInput: true,
-                    }
+                    },
                   );
 
                   if (!InputType) {
                     throw new Error(
-                      `Could not build input type for '${table.name}'`
+                      `Could not build input type for '${table.name}'`,
                     );
                   }
                   if (!PayloadType) {
                     throw new Error(
-                      `Could not build payload type for '${table.name}'`
+                      `Could not build payload type for '${table.name}'`,
                     );
                   }
 
@@ -452,7 +452,7 @@ returning *`;
                               _parent,
                               args,
                               resolveContext: GraphileResolverContext,
-                              resolveInfo
+                              resolveInfo,
                             ) {
                               const { input } = args;
                               const { pgClient } = resolveContext;
@@ -479,18 +479,18 @@ returning *`;
                                     primaryKeys.map(
                                       (key, idx) =>
                                         sql.fragment`${sql.identifier(
-                                          key.name
+                                          key.name,
                                         )} = ${gql2pg(
                                           identifiers[idx],
                                           key.type,
-                                          key.typeModifier
-                                        )}`
+                                          key.typeModifier,
+                                        )}`,
                                     ),
 
-                                    ") and ("
+                                    ") and (",
                                   )})`,
                                   context,
-                                  resolveContext
+                                  resolveContext,
                                 );
                               } catch (e) {
                                 debug(e);
@@ -505,11 +505,11 @@ returning *`;
                           [mode === "update"
                             ? "isPgUpdateMutationField"
                             : "isPgDeleteMutationField"]: true,
-                        }
+                        },
                       ),
                     },
 
-                    "Adding ${mode} mutation for ${describePgEntity(table)}"
+                    "Adding ${mode} mutation for ${describePgEntity(table)}",
                   );
                 }
 
@@ -522,8 +522,8 @@ returning *`;
                   if (!keys.every(_ => _)) {
                     throw new Error(
                       `Consistency error: could not find an attribute in the constraint when building the ${mode} mutation for ${describePgEntity(
-                        table
-                      )}!`
+                        table,
+                      )}!`,
                     );
                   }
                   if (keys.some(key => omit(key, "read"))) {
@@ -551,7 +551,7 @@ returning *`;
                         mode === "update"
                           ? {
                               [inflection.patchField(
-                                inflection.tableFieldName(table)
+                                inflection.tableFieldName(table),
                               )]: {
                                 description: `An object where the defined keys will be set on the \`${tableTypeName}\` being ${mode}d.`,
                                 type: new GraphQLNonNull(TablePatch!),
@@ -561,11 +561,11 @@ returning *`;
                         keys.reduce((memo, key) => {
                           const KeyType = pgGetGqlInputTypeByTypeIdAndModifier(
                             key.typeId,
-                            key.typeModifier
+                            key.typeModifier,
                           );
                           if (!KeyType) {
                             throw new Error(
-                              `Failed to get input type for key '${key.name}' on '${key.class.name}'`
+                              `Failed to get input type for key '${key.name}' on '${key.class.name}'`,
                             );
                           }
                           memo[inflection.column(key)] = {
@@ -574,18 +574,18 @@ returning *`;
                           };
 
                           return memo;
-                        }, {})
+                        }, {}),
                       ),
                     },
 
                     {
                       __origin: `Adding table ${mode} mutation input type for ${describePgEntity(
-                        constraint
+                        constraint,
                       )}. You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                         table,
                         {
                           name: "newNameHere",
-                        }
+                        },
                       )}`,
                       isPgUpdateInputType: mode === "update",
                       isPgUpdateByKeysInputType: mode === "update",
@@ -597,17 +597,17 @@ returning *`;
                       pgIntrospection: table,
                       pgKeys: keys,
                       isMutationInput: true,
-                    }
+                    },
                   );
 
                   if (!PayloadType) {
                     throw new Error(
-                      `Failed to determine payload type for '${fieldName}' mutation`
+                      `Failed to determine payload type for '${fieldName}' mutation`,
                     );
                   }
                   if (!InputType) {
                     throw new Error(
-                      `Failed to determine input type for '${fieldName}' mutation`
+                      `Failed to determine input type for '${fieldName}' mutation`,
                     );
                   }
 
@@ -636,7 +636,7 @@ returning *`;
                               _parent,
                               args,
                               resolveContext,
-                              resolveInfo
+                              resolveInfo,
                             ) {
                               const { input } = args;
                               const { pgClient } = resolveContext;
@@ -650,18 +650,18 @@ returning *`;
                                   keys.map(
                                     key =>
                                       sql.fragment`${sql.identifier(
-                                        key.name
+                                        key.name,
                                       )} = ${gql2pg(
                                         input[inflection.column(key)],
                                         key.type,
-                                        key.typeModifier
-                                      )}`
+                                        key.typeModifier,
+                                      )}`,
                                   ),
 
-                                  ") and ("
+                                  ") and (",
                                 )})`,
                                 context,
-                                resolveContext
+                                resolveContext,
                               );
                             },
                           };
@@ -673,24 +673,24 @@ returning *`;
                           [mode === "update"
                             ? "isPgUpdateMutationField"
                             : "isPgDeleteMutationField"]: true,
-                        }
+                        },
                       ),
                     },
 
                     `Adding ${mode} mutation for ${describePgEntity(
-                      constraint
-                    )}`
+                      constraint,
+                    )}`,
                   );
                 });
               }
               return memo;
             }, outerMemo),
-          {}
+          {},
         ),
 
-        `Adding default update/delete mutations to root Mutation type`
+        `Adding default update/delete mutations to root Mutation type`,
       );
     },
-    ["PgMutationUpdateDelete"]
+    ["PgMutationUpdateDelete"],
   );
 } as Plugin);

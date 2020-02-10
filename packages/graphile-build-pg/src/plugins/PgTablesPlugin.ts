@@ -39,7 +39,7 @@ declare module "graphile-build" {
       attrName: string,
       pgType: PgType,
       spec: import("graphql").GraphQLInputFieldConfig,
-      typeModifier?: PgTypeModifier
+      typeModifier?: PgTypeModifier,
     ) => import("graphql").GraphQLInputFieldConfig;
   }
 }
@@ -71,11 +71,11 @@ interface FieldSpecMap {
 
 export default (function PgTablesPlugin(
   builder,
-  { pgForbidSetofFunctionsToReturnNull = false, subscriptions = false }
+  { pgForbidSetofFunctionsToReturnNull = false, subscriptions = false },
 ) {
   const handleNullRow: <T extends {}>(
     row: T,
-    identifiers: unknown[]
+    identifiers: unknown[],
   ) => T | null = pgForbidSetofFunctionsToReturnNull
     ? (row, _identifiers) => row
     : (row, identifiers) => {
@@ -165,7 +165,7 @@ export default (function PgTablesPlugin(
             if (pg2GqlMapper[tablePgType.id]) {
               // Already handled
               throw new Error(
-                `Register was called but there's already a mapper in place for '${tablePgType.id}'!`
+                `Register was called but there's already a mapper in place for '${tablePgType.id}'!`,
               );
             }
             const tableSpec: GraphileObjectTypeConfig<any, any> = {
@@ -228,12 +228,12 @@ export default (function PgTablesPlugin(
                             }
                           }
                           return identifier;
-                        }
+                        },
                       );
 
                       return getNodeIdForTypeAndIdentifiers(
                         Self,
-                        ...finalIdentifiers
+                        ...finalIdentifiers,
                       );
                     },
                   };
@@ -247,22 +247,22 @@ export default (function PgTablesPlugin(
 
               {
                 __origin: `Adding table type for ${describePgEntity(
-                  table
+                  table,
                 )}. You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                   table,
                   {
                     name: "newNameHere",
-                  }
+                  },
                 )}`,
                 pgIntrospection: table,
                 isPgRowType: table.isSelectable,
                 isPgCompoundType: !table.isSelectable, // TODO:v5: remove - typo
                 isPgCompositeType: !table.isSelectable,
-              }
+              },
             );
             if (!tmpTableType) {
               throw new Error(
-                `Failed to construct TableType for '${tableSpec.name}'`
+                `Failed to construct TableType for '${tableSpec.name}'`,
               );
             }
             TableType = tmpTableType;
@@ -280,12 +280,12 @@ export default (function PgTablesPlugin(
 
               {
                 __origin: `Adding table input type for ${describePgEntity(
-                  table
+                  table,
                 )}. You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                   table,
                   {
                     name: "newNameHere",
-                  }
+                  },
                 )}`,
                 pgIntrospection: table,
                 isInputType: true,
@@ -302,7 +302,7 @@ export default (function PgTablesPlugin(
                 },
               },
 
-              true // If no fields, skip type automatically
+              true, // If no fields, skip type automatically
             );
 
             if (table.isSelectable) {
@@ -320,12 +320,12 @@ export default (function PgTablesPlugin(
 
                 {
                   __origin: `Adding table patch type for ${describePgEntity(
-                    table
+                    table,
                   )}. You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                     table,
                     {
                       name: "newNameHere",
-                    }
+                    },
                   )}`,
                   pgIntrospection: table,
                   isPgRowType: table.isSelectable,
@@ -336,7 +336,7 @@ export default (function PgTablesPlugin(
                     attrName,
                     pgType,
                     spec,
-                    typeModifier
+                    typeModifier,
                   ) {
                     pgPatchInputFields[fieldName] = {
                       name: attrName,
@@ -348,7 +348,7 @@ export default (function PgTablesPlugin(
                   },
                 },
 
-                true // Safe to skip this if no fields support updating
+                true, // Safe to skip this if no fields support updating
               );
               TableBaseInputType = newWithHooks(
                 GraphQLInputObjectType,
@@ -359,12 +359,12 @@ export default (function PgTablesPlugin(
 
                 {
                   __origin: `Adding table base input type for ${describePgEntity(
-                    table
+                    table,
                   )}. You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                     table,
                     {
                       name: "newNameHere",
-                    }
+                    },
                   )}`,
                   pgIntrospection: table,
                   isPgRowType: table.isSelectable,
@@ -375,7 +375,7 @@ export default (function PgTablesPlugin(
                     attrName,
                     pgType,
                     spec,
-                    typeModifier
+                    typeModifier,
                   ) {
                     pgBaseInputFields[fieldName] = {
                       name: attrName,
@@ -385,7 +385,7 @@ export default (function PgTablesPlugin(
 
                     return spec;
                   },
-                }
+                },
               );
             }
 
@@ -411,7 +411,7 @@ export default (function PgTablesPlugin(
                     return sql.fragment`${gql2pg(
                       v,
                       type,
-                      typeModifier
+                      typeModifier,
                     )}::${sql.identifier(type.namespaceName, type.name)}`;
                   } else {
                     return sql.null; // TODO: return default instead.
@@ -420,10 +420,10 @@ export default (function PgTablesPlugin(
 
                 return sql.fragment`row(${sql.join(
                   attributes.map(attr2sql),
-                  ","
+                  ",",
                 )})::${sql.identifier(
                   tablePgType.namespaceName,
-                  tablePgType.name
+                  tablePgType.name,
                 )}`;
               },
             };
@@ -458,7 +458,7 @@ export default (function PgTablesPlugin(
                     },
                     {
                       isCursorField: true,
-                    }
+                    },
                   ),
 
                   node: pgField(
@@ -470,17 +470,17 @@ export default (function PgTablesPlugin(
                       type: nullableIf(
                         GraphQLNonNull,
                         !pgForbidSetofFunctionsToReturnNull,
-                        TableType
+                        TableType,
                       ),
 
                       resolve(data, _args, _resolveContext, resolveInfo) {
                         const safeAlias = getSafeAliasFromResolveInfo(
-                          resolveInfo
+                          resolveInfo,
                         );
 
                         const record = handleNullRow(
                           data[safeAlias],
-                          data.__identifiers
+                          data.__identifiers,
                         );
 
                         const liveRecord =
@@ -506,19 +506,19 @@ export default (function PgTablesPlugin(
                           queryBuilder.selectIdentifiers(table);
                         }
                       },
-                    }
+                    },
                   ),
                 };
               },
             };
             const EdgeType = newWithHooks(GraphQLObjectType, edgeSpec, {
               __origin: `Adding table edge type for ${describePgEntity(
-                table
+                table,
               )}. You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                 table,
                 {
                   name: "newNameHere",
-                }
+                },
               )}`,
               isEdgeType: true,
               isPgRowEdgeType: true,
@@ -528,7 +528,7 @@ export default (function PgTablesPlugin(
 
             if (!EdgeType) {
               throw new Error(
-                `Failed to construct EdgeType for '${edgeSpec.name}'`
+                `Failed to construct EdgeType for '${edgeSpec.name}'`,
               );
             }
 
@@ -555,14 +555,14 @@ export default (function PgTablesPlugin(
                           nullableIf(
                             GraphQLNonNull,
                             !pgForbidSetofFunctionsToReturnNull,
-                            TableType
-                          )
-                        )
+                            TableType,
+                          ),
+                        ),
                       ),
 
                       resolve(data, _args, _resolveContext, resolveInfo) {
                         const safeAlias = getSafeAliasFromResolveInfo(
-                          resolveInfo
+                          resolveInfo,
                         );
 
                         const liveRecord =
@@ -571,7 +571,7 @@ export default (function PgTablesPlugin(
                         return data.data.map((entry: any) => {
                           const record = handleNullRow(
                             entry[safeAlias],
-                            entry[safeAlias].__identifiers
+                            entry[safeAlias].__identifiers,
                           );
 
                           if (
@@ -583,7 +583,7 @@ export default (function PgTablesPlugin(
                             liveRecord(
                               "pg",
                               table,
-                              entry[safeAlias].__identifiers
+                              entry[safeAlias].__identifiers,
                             );
                           }
 
@@ -600,7 +600,7 @@ export default (function PgTablesPlugin(
                           queryBuilder.selectIdentifiers(table);
                         }
                       },
-                    }
+                    },
                   ),
 
                   edges: pgField(
@@ -610,12 +610,12 @@ export default (function PgTablesPlugin(
                     {
                       description: `A list of edges which contains the \`${tableTypeName}\` and cursor to aid in pagination.`,
                       type: new GraphQLNonNull(
-                        new GraphQLList(new GraphQLNonNull(EdgeType))
+                        new GraphQLList(new GraphQLNonNull(EdgeType)),
                       ),
 
                       resolve(data, _args, _context, resolveInfo) {
                         const safeAlias = getSafeAliasFromResolveInfo(
-                          resolveInfo
+                          resolveInfo,
                         );
 
                         return data.data.map((entry: any) => ({
@@ -629,7 +629,7 @@ export default (function PgTablesPlugin(
                     false,
                     {
                       hoistCursor: true,
-                    }
+                    },
                   ),
 
                   ...(PageInfo
@@ -648,12 +648,12 @@ export default (function PgTablesPlugin(
             };
             const connectionScope: ScopeGraphQLObjectType = {
               __origin: `Adding table connection type for ${describePgEntity(
-                table
+                table,
               )}. You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                 table,
                 {
                   name: "newNameHere",
-                }
+                },
               )}`,
               isConnectionType: true,
               isPgRowConnectionType: true,
@@ -663,7 +663,7 @@ export default (function PgTablesPlugin(
             };
             newWithHooks(GraphQLObjectType, connectionSpec, connectionScope);
           },
-          true
+          true,
         );
 
         pgRegisterGqlInputTypeByTypeId(
@@ -672,7 +672,7 @@ export default (function PgTablesPlugin(
             // This must come first, it triggers creation of all the types
             const TableType = pgGetGqlTypeByTypeIdAndModifier(
               tablePgType.id,
-              null
+              null,
             );
 
             // This must come after the pgGetGqlTypeByTypeIdAndModifier call
@@ -686,7 +686,9 @@ export default (function PgTablesPlugin(
             }
             if (TableType) {
               const type = getTypeByName(
-                inflection.inputType(build.graphql.getNamedType(TableType).name)
+                inflection.inputType(
+                  build.graphql.getNamedType(TableType).name,
+                ),
               );
               if (isInputType(type)) {
                 return type;
@@ -694,7 +696,7 @@ export default (function PgTablesPlugin(
             }
             return null;
           },
-          true
+          true,
         );
 
         if (arrayTablePgType) {
@@ -710,17 +712,17 @@ export default (function PgTablesPlugin(
             () => {
               const TableType = pgGetGqlTypeByTypeIdAndModifier(
                 tablePgType.id,
-                null
+                null,
               );
               if (!TableType) {
                 throw new Error(
-                  `Failed to get table type for id '${arrayTablePgType.id}'`
+                  `Failed to get table type for id '${arrayTablePgType.id}'`,
                 );
               }
 
               return new GraphQLList(TableType);
             },
-            true
+            true,
           );
 
           pgRegisterGqlInputTypeByTypeId(
@@ -728,14 +730,14 @@ export default (function PgTablesPlugin(
             (_set, modifier) => {
               const RelevantTableInputType = pgGetGqlInputTypeByTypeIdAndModifier(
                 tablePgType.id,
-                modifier
+                modifier,
               );
 
               if (RelevantTableInputType) {
                 return new GraphQLList(RelevantTableInputType);
               }
             },
-            true
+            true,
           );
         }
       });
@@ -743,6 +745,6 @@ export default (function PgTablesPlugin(
     },
     ["PgTables"],
     [],
-    ["PgTypes"]
+    ["PgTypes"],
   );
 } as Plugin);

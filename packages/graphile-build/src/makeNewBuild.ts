@@ -177,7 +177,7 @@ function getSafeAliasFromAlias(alias: string) {
     return `@${alias}`;
   } else if (alias.length > 1024) {
     throw new Error(
-      `GraphQL alias '${alias}' is too long, use shorter aliases (max length 1024).`
+      `GraphQL alias '${alias}' is too long, use shorter aliases (max length 1024).`,
     );
   } else {
     return `@@${hashFieldAlias(alias)}`;
@@ -190,7 +190,7 @@ function getSafeAliasFromAlias(alias: string) {
  * identifier.
  */
 function getSafeAliasFromResolveInfo(
-  resolveInfo: import("graphql").GraphQLResolveInfo
+  resolveInfo: import("graphql").GraphQLResolveInfo,
 ) {
   const alias = rawGetAliasFromResolveInfo(resolveInfo);
   return getSafeAliasFromAlias(alias);
@@ -200,7 +200,7 @@ type FieldSpec = graphql.GraphQLFieldConfig<any, any>;
 
 export type GetDataFromParsedResolveInfoFragmentFunction = (
   parsedResolveInfoFragment: ResolveTree,
-  Type: graphql.GraphQLOutputType
+  Type: graphql.GraphQLOutputType,
 ) => ResolvedLookAhead;
 
 export type FieldWithHooksFunction = (
@@ -208,7 +208,7 @@ export type FieldWithHooksFunction = (
   spec:
     | FieldSpec
     | ((context: ContextGraphQLObjectTypeFieldsField) => FieldSpec),
-  fieldScope: ScopeGraphQLObjectTypeFieldsField
+  fieldScope: ScopeGraphQLObjectTypeFieldsField,
 ) => graphql.GraphQLFieldConfig<any, any>;
 
 export type InputFieldWithHooksFunction = (
@@ -216,13 +216,13 @@ export type InputFieldWithHooksFunction = (
   spec:
     | graphql.GraphQLInputFieldConfig
     | ((
-        context: ContextGraphQLInputObjectTypeFieldsField
+        context: ContextGraphQLInputObjectTypeFieldsField,
       ) => graphql.GraphQLInputFieldConfig),
-  fieldScope: ScopeGraphQLInputObjectTypeFieldsField
+  fieldScope: ScopeGraphQLInputObjectTypeFieldsField,
 ) => graphql.GraphQLInputFieldConfig;
 
 function getNameFromType(
-  Type: graphql.GraphQLNamedType | graphql.GraphQLSchema
+  Type: graphql.GraphQLNamedType | graphql.GraphQLSchema,
 ) {
   if (Type instanceof GraphQLSchema) {
     return "schema";
@@ -247,19 +247,19 @@ function mergeData(
   data: ResolvedLookAhead,
   gen: DataGeneratorFunction,
   ReturnType: graphql.GraphQLOutputType,
-  arg: ResolveTree
+  arg: ResolveTree,
 ): void;
 function mergeData(
   data: ResolvedLookAhead,
   gen: ArgDataGeneratorFunction,
   ReturnType: graphql.GraphQLOutputType,
-  arg: { [fieldName: string]: unknown }
+  arg: { [fieldName: string]: unknown },
 ): void;
 function mergeData(
   data: ResolvedLookAhead,
   gen: DataGeneratorFunction | ArgDataGeneratorFunction,
   ReturnType: graphql.GraphQLOutputType,
-  arg: any
+  arg: any,
 ): void {
   const results: Array<ResolvedLookAhead> | void = ensureArray<
     ResolvedLookAhead
@@ -326,7 +326,7 @@ if (["development", "test"].indexOf(process.env.NODE_ENV || "") >= 0) {
     if (isDev && !fn.displayName && !fn.name && debug.enabled) {
       // eslint-disable-next-line no-console
       console.trace(
-        "WARNING: you've added a function with no name as an argDataGenerator, doing so may make debugging more challenging"
+        "WARNING: you've added a function with no name as an argDataGenerator, doing so may make debugging more challenging",
       );
     }
   };
@@ -384,13 +384,13 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
     Type: { new (...args: any[]): T },
     spec: any,
     inScope: any,
-    performNonEmptyFieldsCheck: boolean
+    performNonEmptyFieldsCheck: boolean,
   ): T | null | undefined {
     const scope = inScope || {};
     if (!inScope) {
       // eslint-disable-next-line no-console
       console.warn(
-        `No scope was provided to new ${Type.name}[name=${spec.name}], it's highly recommended that you add a scope so other hooks can easily reference your object - please check usage of 'newWithHooks'. To mute this message, just pass an empty object.`
+        `No scope was provided to new ${Type.name}[name=${spec.name}], it's highly recommended that you add a scope so other hooks can easily reference your object - please check usage of 'newWithHooks'. To mute this message, just pass an empty object.`,
       );
     }
     if (!Type) {
@@ -398,7 +398,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
     }
     if (!this.newWithHooks) {
       throw new Error(
-        "Please do not generate the schema during the build building phase, use 'init' instead"
+        "Please do not generate the schema during the build building phase, use 'init' instead",
       );
     }
     const fieldDataGeneratorsByFieldName: {
@@ -413,7 +413,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
       knownTypeNames.indexOf(Type.name) >= 0
     ) {
       throw new Error(
-        `GraphQL conflict for '${Type.name}' detected! Multiple versions of graphql exist in your node_modules?`
+        `GraphQL conflict for '${Type.name}' detected! Multiple versions of graphql exist in your node_modules?`,
       );
     }
     if (Type === GraphQLSchema) {
@@ -425,12 +425,12 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
         this,
         "GraphQLSchema",
         (newSpec as unknown) as graphql.GraphQLSchemaConfig,
-        context
+        context,
       );
     } else if (Type === GraphQLObjectType) {
       const addDataGeneratorForField = (
         fieldName: string,
-        fn: DataGeneratorFunction
+        fn: DataGeneratorFunction,
       ): void => {
         // $FlowFixMe: displayName
         fn.displayName =
@@ -443,7 +443,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
       };
       const recurseDataGeneratorsForField = (
         fieldName: string,
-        iKnowWhatIAmDoing?: boolean
+        iKnowWhatIAmDoing?: boolean,
       ): void => {
         /*
          * Recursing data generators is not safe in general; however there
@@ -457,7 +457,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
           recurseDataGeneratorsForFieldWarned = true;
           // eslint-disable-next-line no-console
           console.error(
-            "Use of `recurseDataGeneratorsForField` is NOT SAFE. e.g. `{n1: node { a: field1 }, n2: node { a: field2 } }` cannot resolve correctly."
+            "Use of `recurseDataGeneratorsForField` is NOT SAFE. e.g. `{n1: node { a: field1 }, n2: node { a: field2 } }` cannot resolve correctly.",
           );
         }
         const fn: DataGeneratorFunction = (
@@ -469,7 +469,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
           const { args } = parsedResolveInfoFragment;
           const { fields } = this.simplifyParsedResolveInfoFragmentWithType(
             parsedResolveInfoFragment,
-            ReturnType
+            ReturnType,
           );
 
           const results: any[] = [];
@@ -478,11 +478,11 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
             throw new Error("Could not determine GraphQL type");
           }
           const fieldDataGeneratorsByFieldName = fieldDataGeneratorsByFieldNameByType.get(
-            StrippedType
+            StrippedType,
           );
 
           const argDataGeneratorsForSelfByFieldName = fieldArgDataGeneratorsByFieldNameByType.get(
-            Self as graphql.GraphQLObjectType
+            Self as graphql.GraphQLObjectType,
           );
 
           if (argDataGeneratorsForSelfByFieldName) {
@@ -524,7 +524,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
                 ) {
                   const gen = gens[genIndex];
                   const local = ensureArray(
-                    gen(field, typeFields[field.name].type, data, ...rest)
+                    gen(field, typeFields[field.name].type, data, ...rest),
                   );
 
                   if (local) {
@@ -537,7 +537,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
           return results;
         };
         fn.displayName = `recurseDataGeneratorsForField(${getNameFromType(
-          Self
+          Self,
         )}:${fieldName})`;
         addDataGeneratorForField(fieldName, fn);
         // get type from field, get
@@ -560,7 +560,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
         objectSpec,
         objectContext,
 
-        `|${newSpec.name}`
+        `|${newSpec.name}`,
       );
 
       const rawSpec = newSpec;
@@ -582,7 +582,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
             "GraphQLObjectType:interfaces",
             rawInterfaces,
             interfacesContext,
-            `|${getNameFromType(Self)}`
+            `|${getNameFromType(Self)}`,
           );
         },
         fields: () => {
@@ -590,11 +590,11 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
           const fieldWithHooks: FieldWithHooksFunction = (
             fieldName,
             spec,
-            fieldScope
+            fieldScope,
           ) => {
             if (!isString(fieldName)) {
               throw new Error(
-                "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is current necessary."
+                "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is current necessary.",
               );
             }
             if (!fieldScope) {
@@ -605,7 +605,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
                   "Keys within this object should contain the phrase 'field' " +
                   "since they will be merged into the parent objects scope and " +
                   "are not allowed to clash. If you really have no additional " +
-                  "information to give, please just pass `{}`."
+                  "information to give, please just pass `{}`.",
               );
             }
 
@@ -620,11 +620,11 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
                   fieldName,
                 },
 
-                `Within context for GraphQLObjectType '${rawSpec.name}'`
+                `Within context for GraphQLObjectType '${rawSpec.name}'`,
               ),
 
               fieldScope,
-              `Extending scope for field '${fieldName}' within context for GraphQLObjectType '${rawSpec.name}'`
+              `Extending scope for field '${fieldName}' within context for GraphQLObjectType '${rawSpec.name}'`,
             );
             const context: ContextGraphQLObjectTypeFieldsField = {
               ...commonContext,
@@ -638,7 +638,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
               },
               getDataFromParsedResolveInfoFragment: (
                 parsedResolveInfoFragment,
-                ReturnType
+                ReturnType,
               ): ResolvedLookAhead => {
                 const Type = getNamedType(ReturnType as graphql.GraphQLType);
                 const data: ResolvedLookAhead = {};
@@ -648,7 +648,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
                   args,
                 } = this.simplifyParsedResolveInfoFragmentWithType(
                   parsedResolveInfoFragment,
-                  ReturnType
+                  ReturnType,
                 );
 
                 // Args -> argDataGenerators
@@ -665,7 +665,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
                       "Failed to execute argDataGenerator '%s' on %s of %s",
                       gen.displayName || gen.name || "anonymous",
                       fieldName,
-                      getNameFromType(Self)
+                      getNameFromType(Self),
                     );
 
                     throw e;
@@ -675,11 +675,11 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
                 // finalSpec.type -> fieldData
                 if (!finalSpec) {
                   throw new Error(
-                    "It's too early to call this! Call from within resolve"
+                    "It's too early to call this! Call from within resolve",
                   );
                 }
                 const fieldDataGeneratorsByFieldName = fieldDataGeneratorsByFieldNameByType.get(
-                  Type
+                  Type,
                 );
 
                 if (
@@ -718,7 +718,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
               "GraphQLObjectType:fields:field",
               newSpec,
               context,
-              `|${getNameFromType(Self)}.fields.${fieldName}`
+              `|${getNameFromType(Self)}.fields.${fieldName}`,
             );
 
             newSpec.args = newSpec.args || {};
@@ -735,7 +735,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
                 newSpec.args,
                 argsContext,
 
-                `|${getNameFromType(Self)}.fields.${fieldName}`
+                `|${getNameFromType(Self)}.fields.${fieldName}`,
               ),
             };
 
@@ -764,11 +764,11 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
               rawFields,
               `Default field included in newWithHooks call for '${
                 rawSpec.name
-              }'. ${inScope.__origin || ""}`
+              }'. ${inScope.__origin || ""}`,
             ),
 
             fieldsContext,
-            `|${rawSpec.name}`
+            `|${rawSpec.name}`,
           );
 
           // Finally, check through all the fields that they've all been processed; any that have not we should do so now.
@@ -781,7 +781,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
                 fieldSpec,
                 {
                   autoField: true, // We don't have any additional information
-                }
+                },
               );
             }
           }
@@ -799,7 +799,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
         "GraphQLInputObjectType",
         newSpec,
         commonContext,
-        `|${newSpec.name}`
+        `|${newSpec.name}`,
       );
 
       newSpec.fields = newSpec.fields || {};
@@ -812,11 +812,11 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
           const fieldWithHooks: InputFieldWithHooksFunction = (
             fieldName,
             spec,
-            fieldScope = {}
+            fieldScope = {},
           ) => {
             if (!isString(fieldName)) {
               throw new Error(
-                "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is current necessary."
+                "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is current necessary.",
               );
             }
             const finalFieldScope: ScopeGraphQLInputObjectTypeFieldsFieldWithFieldName = extend(
@@ -826,11 +826,11 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
                   fieldName,
                 },
 
-                `Within context for GraphQLInputObjectType '${rawSpec.name}'`
+                `Within context for GraphQLInputObjectType '${rawSpec.name}'`,
               ),
 
               fieldScope,
-              `Extending scope for field '${fieldName}' within context for GraphQLInputObjectType '${rawSpec.name}'`
+              `Extending scope for field '${fieldName}' within context for GraphQLInputObjectType '${rawSpec.name}'`,
             );
             const context: ContextGraphQLInputObjectTypeFieldsField = {
               ...commonContext,
@@ -847,7 +847,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
               "GraphQLInputObjectType:fields:field",
               newSpec,
               context,
-              `|${getNameFromType(Self)}.fields.${fieldName}`
+              `|${getNameFromType(Self)}.fields.${fieldName}`,
             );
 
             const finalSpec = newSpec;
@@ -870,14 +870,14 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
             rawFields,
             `Default field included in newWithHooks call for '${
               rawSpec.name
-            }'. ${inScope.__origin || ""}`
+            }'. ${inScope.__origin || ""}`,
           );
           const fieldsSpec = builder.applyHooks(
             this,
             "GraphQLInputObjectType:fields",
             fieldsList,
             fieldsContext,
-            `|${getNameFromType(Self)}`
+            `|${getNameFromType(Self)}`,
           );
 
           // Finally, check through all the fields that they've all been processed; any that have not we should do so now.
@@ -890,7 +890,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
                 fieldSpec,
                 {
                   autoField: true, // We don't have any additional information
-                }
+                },
               );
             }
           }
@@ -908,7 +908,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
         "GraphQLEnumType",
         newSpec,
         commonContext,
-        `|${newSpec.name}`
+        `|${newSpec.name}`,
       );
 
       newSpec.values = builder.applyHooks(
@@ -916,7 +916,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
         "GraphQLEnumType:values",
         newSpec.values,
         commonContext,
-        `|${newSpec.name}`
+        `|${newSpec.name}`,
       );
 
       const values = newSpec.values;
@@ -927,7 +927,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
           "GraphQLEnumType:values:value",
           value,
           commonContext,
-          `|${newSpec.name}|${valueKey}`
+          `|${newSpec.name}|${valueKey}`,
         );
 
         memo[valueKey] = newValue;
@@ -944,7 +944,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
         "GraphQLUnionType",
         newSpec,
         { ...commonContext },
-        `|${newSpec.name}`
+        `|${newSpec.name}`,
       );
 
       const rawSpec = newSpec as GraphileUnionTypeConfig<any, any>;
@@ -966,7 +966,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
             "GraphQLUnionType:types",
             rawTypes,
             typesContext,
-            `|${getNameFromType(Self)}`
+            `|${getNameFromType(Self)}`,
           );
         },
       };
@@ -997,7 +997,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
           throw e;
         }
         const isProbablyAnEmptyObjectError = !!e.message.match(
-          /function which returns such an object/
+          /function which returns such an object/,
         );
 
         if (!isProbablyAnEmptyObjectError) {
@@ -1017,18 +1017,18 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
         scope.__origin ||
           (this
             ? `'newWithHooks' call during hook '${this.status.currentHookName}'`
-            : null)
+            : null),
       );
     }
     if (Type !== GraphQLSchema) {
       fieldDataGeneratorsByFieldNameByType.set(
         Self as graphql.GraphQLNamedType,
-        fieldDataGeneratorsByFieldName
+        fieldDataGeneratorsByFieldName,
       );
 
       fieldArgDataGeneratorsByFieldNameByType.set(
         Self as graphql.GraphQLNamedType,
-        fieldArgDataGeneratorsByFieldName
+        fieldArgDataGeneratorsByFieldName,
       );
     }
 
@@ -1046,7 +1046,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
     hasVersion(
       packageName: string,
       range: string,
-      options: { includePrerelease?: boolean } = { includePrerelease: true }
+      options: { includePrerelease?: boolean } = { includePrerelease: true },
     ): boolean {
       const packageVersion = this.versions[packageName];
       if (!packageVersion) return false;
@@ -1067,11 +1067,11 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
     },
     addType(
       type: graphql.GraphQLNamedType,
-      origin?: string | null | undefined
+      origin?: string | null | undefined,
     ): void {
       if (!type.name) {
         throw new Error(
-          `addType must only be called with named types, try using require('graphql').getNamedType`
+          `addType must only be called with named types, try using require('graphql').getNamedType`,
         );
       }
       const newTypeSource =
@@ -1086,19 +1086,19 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
           const firstEntityDetails = !oldTypeSource
             ? "The first type was registered from an unknown origin."
             : `The first entity was:\n\n${indent(
-                chalk.magenta(oldTypeSource)
+                chalk.magenta(oldTypeSource),
               )}`;
           const secondEntityDetails = !newTypeSource
             ? "The second type was registered from an unknown origin."
             : `The second entity was:\n\n${indent(
-                chalk.yellow(newTypeSource)
+                chalk.yellow(newTypeSource),
               )}`;
           throw new Error(
             `A type naming conflict has occurred - two entities have tried to define the same type '${chalk.bold(
-              type.name
+              type.name,
             )}'.\n\n${indent(firstEntityDetails)}\n\n${indent(
-              secondEntityDetails
-            )}`
+              secondEntityDetails,
+            )}`,
           );
         }
       } else {

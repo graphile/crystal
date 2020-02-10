@@ -62,7 +62,7 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
       // This is a relation in which we (table) are local, and there's a foreign table
 
       const foreignKeyConstraints = table.constraints.filter(
-        con => con.type === "f"
+        con => con.type === "f",
       );
 
       return extend(
@@ -73,12 +73,12 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
           }
           const gqlTableType = pgGetGqlTypeByTypeIdAndModifier(
             table.type.id,
-            null
+            null,
           );
 
           if (!gqlTableType) {
             debug(
-              `Could not determine type for table with id ${constraint.classId}`
+              `Could not determine type for table with id ${constraint.classId}`,
             );
 
             return memo;
@@ -92,12 +92,12 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
           }
           const gqlForeignTableType = pgGetGqlTypeByTypeIdAndModifier(
             foreignTable.type.id,
-            null
+            null,
           );
 
           if (!gqlForeignTableType) {
             debug(
-              `Could not determine type for foreign table with id ${constraint.foreignClassId}`
+              `Could not determine type for foreign table with id ${constraint.foreignClassId}`,
             );
 
             return memo;
@@ -124,7 +124,7 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
             keys,
             foreignTable,
             table,
-            constraint
+            constraint,
           );
 
           memo = extend(
@@ -142,14 +142,14 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
                         queryBuilder.select(() => {
                           const resolveData = getDataFromParsedResolveInfoFragment(
                             parsedResolveInfoFragment,
-                            gqlForeignTableType
+                            gqlForeignTableType,
                           );
 
                           const foreignTableAlias = sql.identifier(Symbol());
                           const query = queryFromResolveData(
                             sql.identifier(
                               foreignSchema.name,
-                              foreignTable.name
+                              foreignTable.name,
                             ),
 
                             foreignTableAlias,
@@ -169,21 +169,21 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
                                 foreignTable.primaryKeyConstraint
                               ) {
                                 innerQueryBuilder.selectIdentifiers(
-                                  foreignTable
+                                  foreignTable,
                                 );
                               }
                               keys.forEach((key, i) => {
                                 innerQueryBuilder.where(
                                   sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
-                                    key.name
+                                    key.name,
                                   )} = ${foreignTableAlias}.${sql.identifier(
-                                    foreignKeys[i].name
-                                  )}`
+                                    foreignKeys[i].name,
+                                  )}`,
                                 );
                               });
                             },
                             queryBuilder.context,
-                            queryBuilder.rootValue
+                            queryBuilder.rootValue,
                           );
 
                           return sql.fragment`(${query})`;
@@ -200,7 +200,7 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
                       const data = isMutationPayload ? rawData.data : rawData;
                       if (!data) return null;
                       const safeAlias = getSafeAliasFromResolveInfo(
-                        resolveInfo
+                        resolveInfo,
                       );
 
                       const record = data[safeAlias];
@@ -217,25 +217,25 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
                 {
                   pgFieldIntrospection: constraint,
                   isPgForwardRelationField: true,
-                }
+                },
               ),
             },
 
             `Forward relation for ${describePgEntity(
-              constraint
+              constraint,
             )}. To rename this relation with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               constraint,
               {
                 fieldName: "newNameHere",
-              }
-            )}`
+              },
+            )}`,
           );
 
           return memo;
         }, {}),
-        `Adding forward relations to '${Self.name}'`
+        `Adding forward relations to '${Self.name}'`,
       );
     },
-    ["PgForwardRelation"]
+    ["PgForwardRelation"],
   );
 } as Plugin);

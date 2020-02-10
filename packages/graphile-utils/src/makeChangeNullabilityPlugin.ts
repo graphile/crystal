@@ -14,18 +14,18 @@ interface ChangeNullabilityRules {
 }
 
 export default function makeChangeNullabilityPlugin(
-  rules: ChangeNullabilityRules
+  rules: ChangeNullabilityRules,
 ): Plugin {
   return (builder: SchemaBuilder, _options: Options) => {
     function changeNullability(
       field: import("graphql").GraphQLInputFieldConfig,
       build: Build,
-      context: ContextGraphQLInputObjectTypeFieldsField
+      context: ContextGraphQLInputObjectTypeFieldsField,
     ): typeof field;
     function changeNullability(
       field: import("graphql").GraphQLFieldConfig<any, any>,
       build: Build,
-      context: ContextGraphQLObjectTypeFieldsField
+      context: ContextGraphQLObjectTypeFieldsField,
     ): typeof field;
     function changeNullability<
       Field extends

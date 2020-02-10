@@ -185,7 +185,7 @@ beforeAll(() => {
           // Read the query from the file system.
           const query = await readFile(
             resolvePath(queriesDir, fileName),
-            "utf8"
+            "utf8",
           );
           // Get the appropriate GraphQL schema for this fixture. We want to test
           // some specific fixtures against a schema configured slightly
@@ -229,7 +229,7 @@ beforeAll(() => {
           await pgClient.query("savepoint test");
           if (gqlSchema === gqlSchemas.rbac) {
             await pgClient.query(
-              "select set_config('role', 'postgraphile_test_visitor', true), set_config('jwt.claims.user_id', '3', true)"
+              "select set_config('role', 'postgraphile_test_visitor', true), set_config('jwt.claims.user_id', '3', true)",
             );
           }
 

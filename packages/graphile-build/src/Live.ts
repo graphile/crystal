@@ -11,7 +11,7 @@ const DEBOUNCE_DURATION = 25;
 
 const MONITOR_THROTTLE_DURATION = Math.max(
   DEBOUNCE_DURATION + 1,
-  parseInt(process.env.LIVE_THROTTLE || "", 10) || 500
+  parseInt(process.env.LIVE_THROTTLE || "", 10) || 500,
 );
 
 /*
@@ -22,7 +22,7 @@ export abstract class LiveSource {
   subscribeCollection(
     _callback: SubscriptionCallback,
     _collectionIdentifier: any,
-    _predicate?: Predicate
+    _predicate?: Predicate,
   ): SubscriptionReleaser | null {
     return null;
   }
@@ -30,7 +30,7 @@ export abstract class LiveSource {
   subscribeRecord(
     _callback: SubscriptionCallback,
     _collectionIdentifier: any,
-    _recordIdentifier: any
+    _recordIdentifier: any,
   ): SubscriptionReleaser | null {
     return null;
   }
@@ -61,7 +61,7 @@ export class LiveProvider {
 
   recordIdentifierIsValid(
     _collectionIdentifier: any,
-    _recordIdentifier: any
+    _recordIdentifier: any,
   ): boolean {
     return false;
   }
@@ -95,7 +95,7 @@ export class LiveMonitor {
 
   constructor(
     providers: { [namespace: string]: LiveProvider },
-    extraRootValue: any
+    extraRootValue: any,
   ) {
     this.extraRootValue = extraRootValue;
     this.released = false;
@@ -182,7 +182,7 @@ export class LiveMonitor {
       {
         leading: true,
         trailing: true,
-      }
+      },
     );
 
     this.onChange = this.onChange.bind(this);
@@ -192,7 +192,7 @@ export class LiveMonitor {
     // Clear out of date subscriptionReleasers
     {
       const oldCounters = Object.keys(
-        this.subscriptionReleasersByCounter
+        this.subscriptionReleasersByCounter,
       ).filter(n => parseInt(n, 10) < currentCounter);
       for (const oldCounter of oldCounters) {
         const arry = this.subscriptionReleasersByCounter[oldCounter];
@@ -205,7 +205,7 @@ export class LiveMonitor {
     // Clear out of date liveConditions
     {
       const oldCounters = Object.keys(this.liveConditionsByCounter).filter(
-        n => parseInt(n, 10) < currentCounter
+        n => parseInt(n, 10) < currentCounter,
       );
 
       for (const oldCounter of oldCounters) {
@@ -234,7 +234,7 @@ export class LiveMonitor {
     counter: number,
     namespace: string,
     collectionIdentifier: any,
-    predicate: (record: any) => boolean = () => true
+    predicate: (record: any) => boolean = () => true,
   ) {
     const handleChange = this.handleChange;
     if (this.released || !handleChange) {
@@ -244,14 +244,14 @@ export class LiveMonitor {
     if (!provider || provider.sources.length === 0) return;
     if (!provider.collectionIdentifierIsValid(collectionIdentifier)) {
       throw new Error(
-        `Invalid collection identifier passed to LiveMonitor[${namespace}]: ${collectionIdentifier}`
+        `Invalid collection identifier passed to LiveMonitor[${namespace}]: ${collectionIdentifier}`,
       );
     }
     for (const source of provider.sources) {
       const releaser = source.subscribeCollection(
         handleChange,
         collectionIdentifier,
-        predicate
+        predicate,
       );
 
       if (releaser) {
@@ -264,7 +264,7 @@ export class LiveMonitor {
     counter: number,
     namespace: string,
     collectionIdentifier: any,
-    recordIdentifier: any
+    recordIdentifier: any,
   ) {
     const handleChange = this.handleChange;
     if (this.released || !handleChange) {
@@ -275,21 +275,21 @@ export class LiveMonitor {
     if (!provider || provider.sources.length === 0) return;
     if (!provider.collectionIdentifierIsValid(collectionIdentifier)) {
       throw new Error(
-        `Invalid collection identifier passed to LiveMonitor[${namespace}]: ${collectionIdentifier}`
+        `Invalid collection identifier passed to LiveMonitor[${namespace}]: ${collectionIdentifier}`,
       );
     }
     if (
       !provider.recordIdentifierIsValid(collectionIdentifier, recordIdentifier)
     ) {
       throw new Error(
-        `Invalid record identifier passed to LiveMonitor[${namespace}]: ${collectionIdentifier}`
+        `Invalid record identifier passed to LiveMonitor[${namespace}]: ${collectionIdentifier}`,
       );
     }
     for (const source of provider.sources) {
       const releaser = source.subscribeRecord(
         handleChange,
         collectionIdentifier,
-        recordIdentifier
+        recordIdentifier,
       );
 
       if (releaser) {
@@ -324,7 +324,7 @@ export class LiveCoordinator {
     if (!this.providers[namespace]) {
       // eslint-disable-next-line no-console
       console.warn(
-        `LiveProvider '${namespace}' is not registered, skipping live source.`
+        `LiveProvider '${namespace}' is not registered, skipping live source.`,
       );
 
       return;
@@ -340,7 +340,7 @@ export class LiveCoordinator {
     _parent: any,
     _args: any,
     _context: any,
-    _info: import("graphql").GraphQLResolveInfo
+    _info: import("graphql").GraphQLResolveInfo,
   ): AsyncIterator<void> {
     const monitor = this.getMonitor({
       liveAbort: (e: Error) => {

@@ -58,7 +58,7 @@ export function formatSQLForDebugging(sql: string) {
     .replace(/(\n|^|\()\s+/g, "$1")
     .replace(
       /(\(|\)|\), ?|, ?| (select|insert|update|delete|from|where|and|or|order|limit)(?= ))/g,
-      handleIndent
+      handleIndent,
     )
     .replace(/\(\s*([A-Za-z0-9_."' =]{1,50})\s*\)/g, "($1)")
     .replace(/\(\s*(\([A-Za-z0-9_."' =]{1,50}\))\s*\)/g, "($1)")

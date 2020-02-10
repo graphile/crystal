@@ -13,13 +13,13 @@ export default function callbackToAsyncIterator<
   ReturnVal extends any
 >(
   listener: (
-    callback: (arg?: CallbackInput) => any
+    callback: (arg?: CallbackInput) => any,
   ) => (ReturnVal | null | undefined) | Promise<ReturnVal | null | undefined>,
   options: {
     onError?: (err: Error) => void;
     onClose?: (arg: ReturnVal | null | undefined) => void;
     buffering?: boolean;
-  } = {}
+  } = {},
 ): AsyncIterator<CallbackInput> {
   const { onError = defaultOnError, buffering = true, onClose } = options;
   let pullQueue: ((result?: {

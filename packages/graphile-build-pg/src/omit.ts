@@ -52,12 +52,12 @@ function parse(arrOrNot: SmartTagValue | null, errorPrefix = "Error") {
       if (str[0] === ":") {
         const abbreviations: string[] = str.substr(1).split("");
         const perms: (string | null)[] = abbreviations.map(
-          (p): string | null => aliases[p]
+          (p): string | null => aliases[p],
         );
         const badIndex = perms.findIndex(p => !p);
         if (badIndex >= 0) {
           throw new Error(
-            `${errorPrefix} - abbreviated parameter '${abbreviations[badIndex]}' in '${str}' not understood`
+            `${errorPrefix} - abbreviated parameter '${abbreviations[badIndex]}' in '${str}' not understood`,
           );
         }
         return perms as string[];
@@ -66,7 +66,7 @@ function parse(arrOrNot: SmartTagValue | null, errorPrefix = "Error") {
         // TODO: warning if not in list?
         return perms;
       }
-    })
+    }),
   );
 
   if (all) {
@@ -88,7 +88,7 @@ export default function omit(
     | "many"
     | "execute"
     | "base"
-    | string
+    | string,
 ): boolean {
   const tags = entity.tags;
   const omitSpecRaw = tags.omit;
@@ -100,17 +100,17 @@ export default function omit(
 
   if (omitSpecRaw && includeSpecRaw) {
     throw new Error(
-      `Error when processing instructions for ${entity.kind} '${entity.name}' - you must only specify @omit or @include, not both`
+      `Error when processing instructions for ${entity.kind} '${entity.name}' - you must only specify @omit or @include, not both`,
     );
   }
   const omitSpec = parse(
     omitSpecRaw,
-    `Error when processing @omit instructions for ${entity.kind} '${entity.name}'`
+    `Error when processing @omit instructions for ${entity.kind} '${entity.name}'`,
   );
 
   const includeSpec = parse(
     includeSpecRaw,
-    `Error when processing @include instructions for ${entity.kind} '${entity.name}'`
+    `Error when processing @include instructions for ${entity.kind} '${entity.name}'`,
   );
 
   if (omitSpec) {
@@ -119,16 +119,16 @@ export default function omit(
     }
     if (omitSpec.indexOf(READ) >= 0) {
       const bad = PERMISSIONS_THAT_REQUIRE_READ.filter(
-        p => omitSpec.indexOf(p) === -1
+        p => omitSpec.indexOf(p) === -1,
       );
 
       if (bad.length > 0) {
         throw new Error(
           `Processing @omit for ${entity.kind} '${entity.name}' - '${bad.join(
-            ","
+            ",",
           )}' must be omitted when '${READ}' is omitted. Add '${bad.join(
-            ","
-          )}' to the @omit clause, or use '@omit' to omit all actions.`
+            ",",
+          )}' to the @omit clause, or use '@omit' to omit all actions.`,
         );
       }
     }
@@ -136,17 +136,17 @@ export default function omit(
   } else if (includeSpec) {
     if (includeSpec === true) {
       throw new Error(
-        `Error when processing instructions for ${entity.kind} '${entity.name}' - @include should specify a list of actions`
+        `Error when processing instructions for ${entity.kind} '${entity.name}' - @include should specify a list of actions`,
       );
     }
     if (includeSpec.indexOf(READ) === -1) {
       const bad = PERMISSIONS_THAT_REQUIRE_READ.find(
-        p => includeSpec.indexOf(p) >= 0
+        p => includeSpec.indexOf(p) >= 0,
       );
 
       if (bad) {
         throw new Error(
-          `Error when processing @include for ${entity.kind} '${entity.name}' - we currently don't support '${bad}' when '${READ}' is forbidden`
+          `Error when processing @include for ${entity.kind} '${entity.name}' - we currently don't support '${bad}' when '${READ}' is forbidden`,
         );
       }
     }

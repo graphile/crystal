@@ -9,7 +9,7 @@ import { ServerResponse, ClientRequest } from "http";
 function sanitise<TInput>(json: TInput): TInput {
   if (Array.isArray(json)) {
     return json.map(
-      <TEntry>(el: TEntry): TEntry => sanitise<TEntry>(el)
+      <TEntry>(el: TEntry): TEntry => sanitise<TEntry>(el),
     ) as any;
   } else if (json && typeof json === "object") {
     const result: any = {};
@@ -54,7 +54,7 @@ export const runQuery = function runGraphQLQuery(
   checker = (json: any, _req: ClientRequest, res: ServerResponse) => {
     expect(sanitise(json)).toMatchSnapshot();
     expect(res.statusCode).toBe(200);
-  }
+  },
 ) {
   return new Promise((resolve, reject) => {
     const body = {
@@ -84,13 +84,13 @@ export const runQuery = function runGraphQLQuery(
           try {
             const json = res._getJSON();
             const checkResult = Promise.resolve().then(() =>
-              checker(json, req, res)
+              checker(json, req, res),
             );
             checkResult.then(() => innerResolve(), innerReject);
           } catch (e) {
             innerReject(e);
           }
-        })
+        }),
       );
     });
     ctx.middleware(req, res, err => {

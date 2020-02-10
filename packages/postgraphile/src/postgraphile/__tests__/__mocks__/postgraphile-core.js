@@ -1,8 +1,8 @@
-const { GraphQLSchema, GraphQLObjectType, GraphQLInt } = require('graphql');
+const { GraphQLSchema, GraphQLObjectType, GraphQLInt } = require("graphql");
 
 const dummySchema = new GraphQLSchema({
   query: new GraphQLObjectType({
-    name: 'MockSchemaQuery',
+    name: "MockSchemaQuery",
     fields: {
       foo: {
         type: GraphQLInt,

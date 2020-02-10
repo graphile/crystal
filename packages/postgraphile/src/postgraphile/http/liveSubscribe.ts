@@ -17,10 +17,10 @@ import {
   execute,
   GraphQLError,
   ExecutionResult,
-} from 'graphql';
-import mapAsyncIterator from './mapAsyncIterator';
-import { isAsyncIterable } from 'iterall';
-import { GraphileResolverContext } from 'postgraphile-core';
+} from "graphql";
+import mapAsyncIterator from "./mapAsyncIterator";
+import { isAsyncIterable } from "iterall";
+import { GraphileResolverContext } from "postgraphile-core";
 
 type mixed = any;
 
@@ -104,7 +104,7 @@ function liveSubscribeImpl(
         fieldResolver,
       );
     } finally {
-      if (payload && typeof payload.release === 'function') {
+      if (payload && typeof payload.release === "function") {
         payload.release();
       }
     }

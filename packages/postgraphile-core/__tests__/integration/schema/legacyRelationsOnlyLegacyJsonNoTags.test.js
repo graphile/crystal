@@ -7,5 +7,5 @@ test(
     enableTags: false,
     legacyJsonUuid: true,
     setofFunctionsContainNulls: false,
-  })
+  }),
 );

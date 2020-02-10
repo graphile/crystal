@@ -17,11 +17,11 @@ test(
     {},
     pgClient => {
       return pgClient.query(
-        "create function a.create_post(t text) returns a.post as $$ select null::a.post; $$ language sql volatile;"
+        "create function a.create_post(t text) returns a.post as $$ select null::a.post; $$ language sql volatile;",
       );
     },
     () => {
       expect(consoleWarnSpy).toHaveBeenCalled();
-    }
-  )
+    },
+  ),
 );

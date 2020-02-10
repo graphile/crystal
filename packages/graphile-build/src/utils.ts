@@ -21,7 +21,7 @@ export const constantCaseAll = (str: string) =>
     .toUpperCase();
 
 export const formatInsideUnderscores = (fn: (input: string) => string) => (
-  str: string
+  str: string,
 ) => {
   const matches = str.match(/^(_*)([\s\S]*?)(_*)$/);
   if (!matches) {

@@ -64,7 +64,7 @@ export default (function PgScalarFunctionConnectionPlugin(builder) {
           pgGetGqlTypeByTypeIdAndModifier(returnType.id, null) || GraphQLString;
         if (!NodeType || !isOutputType(NodeType)) {
           throw new Error(
-            `Could not retrieve NodeType for type with oid '${returnType.id}'`
+            `Could not retrieve NodeType for type with oid '${returnType.id}'`,
           );
         }
 
@@ -94,7 +94,7 @@ export default (function PgScalarFunctionConnectionPlugin(builder) {
                 },
                 {
                   isCursorField: true,
-                }
+                },
               ),
 
               node: {
@@ -111,12 +111,12 @@ export default (function PgScalarFunctionConnectionPlugin(builder) {
         };
         const edgeScope: ScopeGraphQLObjectType = {
           __origin: `Adding function result edge type for ${describePgEntity(
-            proc
+            proc,
           )}. You can rename the function's GraphQL field (and its dependent types) via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
             proc,
             {
               name: "newNameHere",
-            }
+            },
           )}`,
           isEdgeType: true,
           nodeType: NodeType,
@@ -126,12 +126,12 @@ export default (function PgScalarFunctionConnectionPlugin(builder) {
           GraphQLObjectType,
           edgeSpec,
 
-          edgeScope
+          edgeScope,
         );
 
         if (!EdgeType) {
           throw new Error(
-            `Failed to construct EdgeType for '${edgeSpec.name}'`
+            `Failed to construct EdgeType for '${edgeSpec.name}'`,
           );
         }
 
@@ -152,7 +152,7 @@ export default (function PgScalarFunctionConnectionPlugin(builder) {
                   type: new GraphQLNonNull(new GraphQLList(NodeType)),
                   resolve(data) {
                     return data.data.map(
-                      (entry: { value: any }) => entry.value
+                      (entry: { value: any }) => entry.value,
                     );
                   },
                 }),
@@ -166,7 +166,7 @@ export default (function PgScalarFunctionConnectionPlugin(builder) {
                       getNamedType(NodeType).name
                     }\` and cursor to aid in pagination.`,
                     type: new GraphQLNonNull(
-                      new GraphQLList(new GraphQLNonNull(EdgeType))
+                      new GraphQLList(new GraphQLNonNull(EdgeType)),
                     ),
 
                     resolve(data) {
@@ -178,7 +178,7 @@ export default (function PgScalarFunctionConnectionPlugin(builder) {
                   false,
                   {
                     hoistCursor: true,
-                  }
+                  },
                 ),
               };
             },
@@ -186,25 +186,25 @@ export default (function PgScalarFunctionConnectionPlugin(builder) {
 
           {
             __origin: `Adding function connection type for ${describePgEntity(
-              proc
+              proc,
             )}. You can rename the function's GraphQL field (and its dependent types) via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               proc,
               {
                 name: "newNameHere",
-              }
+              },
             )}`,
             isConnectionType: true,
             isPgRowConnectionType: true,
             edgeType: EdgeType,
             nodeType: NodeType,
             pgIntrospection: proc,
-          }
+          },
         );
       });
       return _;
     },
     ["PgScalarFunctionConnection"],
     [],
-    ["PgTypes"]
+    ["PgTypes"],
   );
 } as Plugin);

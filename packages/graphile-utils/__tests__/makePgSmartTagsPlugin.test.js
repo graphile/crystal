@@ -184,7 +184,7 @@ test.each([
       testQuery,
       null,
       context,
-      {}
+      {},
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();

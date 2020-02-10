@@ -24,7 +24,7 @@ const GRAPHILE_PREPARED_STATEMENT_CACHE = "_graphilePreparedStatementCache";
 export default function pgPrepareAndRun(
   pgClient: PoolClient,
   text: string,
-  values: any
+  values: any,
 ) {
   const connection: unknown = pgClient["connection"];
   if (

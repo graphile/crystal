@@ -3,7 +3,7 @@ import { PgType } from "./PgIntrospectionPlugin";
 
 export default (function PgQueryProceduresPlugin(
   builder,
-  { pgSimpleCollections }
+  { pgSimpleCollections },
 ) {
   builder.hook(
     "GraphQLObjectType:fields",
@@ -46,11 +46,12 @@ export default (function PgQueryProceduresPlugin(
               }
               return prev;
             },
-            [] as PgType[]
+            [] as PgType[],
           );
           if (
             argTypes.some(
-              type => type.type === "c" && type.class && type.class.isSelectable
+              type =>
+                type.type === "c" && type.class && type.class.isSelectable,
             )
           ) {
             // Selects a table, ignore!
@@ -83,13 +84,13 @@ export default (function PgQueryProceduresPlugin(
                 },
 
                 `Adding query field for ${describePgEntity(
-                  proc
+                  proc,
                 )}. You can rename this field with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                   proc,
                   {
                     name: "newNameHere",
-                  }
-                )}`
+                  },
+                )}`,
               );
             } catch (e) {
               swallowError(e);
@@ -108,9 +109,9 @@ export default (function PgQueryProceduresPlugin(
           }
           return memo;
         }, {}),
-        `Adding query procedures to root Query type`
+        `Adding query procedures to root Query type`,
       );
     },
-    ["PgQueryProcedures"]
+    ["PgQueryProcedures"],
   );
 } as Plugin);

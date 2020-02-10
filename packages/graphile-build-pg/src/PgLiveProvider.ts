@@ -12,7 +12,7 @@ export default class PgLiveProvider extends LiveProvider {
 
   recordIdentifierIsValid(
     collectionIdentifier: PgClass,
-    recordIdentifier: Array<any>
+    recordIdentifier: Array<any>,
   ) {
     if (!Array.isArray(recordIdentifier)) return false;
     if (!collectionIdentifier.primaryKeyConstraint) return false;

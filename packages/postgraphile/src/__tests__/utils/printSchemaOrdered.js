@@ -1,5 +1,5 @@
-import { parse, buildASTSchema } from 'graphql';
-import { printSchema } from 'graphql/utilities';
+import { parse, buildASTSchema } from "graphql";
+import { printSchema } from "graphql/utilities";
 
 export default function printSchemaOrdered(originalSchema) {
   // Clone schema so we don't damage anything

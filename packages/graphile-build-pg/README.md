@@ -67,7 +67,7 @@ import { defaultPlugins as pgDefaultPlugins } from "graphile-build-pg";
 async function getSchema(
   pgConfig = process.env.DATABASE_URL,
   pgSchemas = ["public"],
-  additionalPlugins = []
+  additionalPlugins = [],
 ) {
   return getBuilder(
     [...defaultPlugins, ...pgDefaultPlugins, ...additionalPlugins],
@@ -75,7 +75,7 @@ async function getSchema(
       pgConfig,
       pgSchemas,
       pgExtendedTypes: true,
-    }
+    },
   );
 }
 ```

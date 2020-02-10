@@ -53,13 +53,13 @@ export default (function PgOrderAllColumnsPlugin(builder) {
             },
 
             `Adding ascending orderBy enum value for ${describePgEntity(
-              attr
+              attr,
             )}. You can rename this field with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               attr,
               {
                 name: "newNameHere",
-              }
-            )}`
+              },
+            )}`,
           );
 
           memo = extend(
@@ -71,20 +71,20 @@ export default (function PgOrderAllColumnsPlugin(builder) {
             },
 
             `Adding descending orderBy enum value for ${describePgEntity(
-              attr
+              attr,
             )}. You can rename this field with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               attr,
               {
                 name: "newNameHere",
-              }
-            )}`
+              },
+            )}`,
           );
 
           return memo;
         }, {}),
-        `Adding order values from table '${table.name}'`
+        `Adding order values from table '${table.name}'`,
       );
     },
-    ["PgOrderAllColumns"]
+    ["PgOrderAllColumns"],
   );
 } as Plugin);

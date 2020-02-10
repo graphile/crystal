@@ -11,14 +11,14 @@ test("cleans up", async () => {
   await l.init();
   const { rows: initialPgRows } = await query(
     "select * from pg_catalog.pg_replication_slots where slot_name = $1",
-    [l.slotName]
+    [l.slotName],
   );
   expect(initialPgRows.length).toEqual(1);
   await l.close();
   await sleep(20);
   const { rows: finalPgRows } = await query(
     "select * from pg_catalog.pg_replication_slots where slot_name = $1",
-    [l.slotName]
+    [l.slotName],
   );
   expect(finalPgRows.length).toEqual(0);
 });
@@ -32,13 +32,13 @@ test("reports changes", () =>
     liveSource.subscribeCollection(
       collectionWithPredicateMockCb,
       fooTableSpec,
-      d => d.name === "Ciao"
+      d => d.name === "Ciao",
     );
     const {
       rows: [{ id }],
     } = await pgClient.query(
       "insert into app_public.foo (name) values ($1) returning *",
-      ["Howdy"]
+      ["Howdy"],
     );
     liveSource.subscribeRecord(recordMockCb, fooTableSpec, [id]);
     await sleep(100);

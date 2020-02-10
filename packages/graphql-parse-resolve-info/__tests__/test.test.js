@@ -188,7 +188,7 @@ const Query = new GraphQLObjectType({
         const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
         const simplifiedFragment = simplifyParsedResolveInfoFragmentWithType(
           parsedResolveInfoFragment,
-          resolveInfo.returnType
+          resolveInfo.returnType,
         );
         context.test({
           parsedResolveInfoFragment,
@@ -222,7 +222,7 @@ test("basic", async () => {
         {
           test: _o => (o = _o),
         },
-        variables
+        variables,
       ).then(d => {
         try {
           const { errors } = d;
@@ -236,7 +236,7 @@ test("basic", async () => {
           reject(new Error("test not called?"));
         }
       }, reject);
-    }
+    },
   );
   expect(parsedResolveInfoFragment).toMatchSnapshot();
   expect(simplifiedFragment).toMatchSnapshot();
@@ -257,7 +257,7 @@ test("directives", async () => {
         {
           test: _o => (o = _o),
         },
-        variables
+        variables,
       ).then(d => {
         try {
           const { errors } = d;
@@ -271,7 +271,7 @@ test("directives", async () => {
           reject(new Error("test not called?"));
         }
       }, reject);
-    }
+    },
   );
   expect(parsedResolveInfoFragment).toMatchSnapshot();
   expect(simplifiedFragment).toMatchSnapshot();

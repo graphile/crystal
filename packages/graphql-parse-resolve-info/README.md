@@ -219,7 +219,7 @@ const Query = new GraphQLObjectType({
         const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
         const simplifiedFragment = simplifyParsedResolveInfoFragmentWithType(
           parsedResolveInfoFragment,
-          resolveInfo.returnType
+          resolveInfo.returnType,
         );
         // ...
       },

@@ -26,9 +26,9 @@ export default (function MutationPayloadQueryPlugin(builder) {
           },
         },
 
-        `Adding 'query' field to mutation payload ${Self.name}`
+        `Adding 'query' field to mutation payload ${Self.name}`,
       );
     },
-    ["MutationPayloadQuery"]
+    ["MutationPayloadQuery"],
   );
 } as Plugin);

@@ -164,7 +164,7 @@ beforeAll(() => {
             console.log(result.errors.map(e => e.originalError || e));
           }
           return result;
-        })
+        }),
       );
     });
   })();

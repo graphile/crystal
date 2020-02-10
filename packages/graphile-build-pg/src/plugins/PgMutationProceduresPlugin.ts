@@ -43,22 +43,22 @@ export default (function PgMutationProceduresPlugin(builder) {
               },
 
               `Adding mutation field for ${describePgEntity(
-                proc
+                proc,
               )}. You can rename this field with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                 proc,
                 {
                   name: "newNameHere",
-                }
-              )}`
+                },
+              )}`,
             );
           } catch (e) {
             swallowError(e);
           }
           return memo;
         }, {}),
-        `Adding mutation procedure to root Mutation field`
+        `Adding mutation procedure to root Mutation field`,
       );
     },
-    ["PgMutationProcedures"]
+    ["PgMutationProcedures"],
   );
 } as Plugin);

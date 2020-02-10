@@ -17,7 +17,7 @@ export default function makeAddPgTableOrderByPlugin(
   schemaName: string,
   tableName: string,
   ordersGenerator: (build: Build) => MakeAddPgTableOrderByPluginOrders,
-  hint = `Adding orders with makeAddPgTableOrderByPlugin to "${schemaName}"."${tableName}"`
+  hint = `Adding orders with makeAddPgTableOrderByPlugin to "${schemaName}"."${tableName}"`,
 ) {
   const displayName = `makeAddPgTableOrderByPlugin_${schemaName}_${tableName}`;
   const plugin: Plugin = builder => {
@@ -48,7 +48,7 @@ export default function makeAddPgTableOrderByPlugin(
 export function orderByAscDesc(
   baseName: string,
   columnOrSqlFragment: string | SQL,
-  unique = false
+  unique = false,
 ): MakeAddPgTableOrderByPluginOrders {
   return {
     [`${baseName}_ASC`]: {

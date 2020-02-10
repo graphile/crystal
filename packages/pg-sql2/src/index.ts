@@ -59,7 +59,7 @@ function makeIdentifierNode(names: Array<string | symbol>): SQLIdentifierNode {
     !names.every(isStringOrSymbol)
   ) {
     throw new Error(
-      "Invalid argument to makeIdentifierNode - expected array of strings/symbols"
+      "Invalid argument to makeIdentifierNode - expected array of strings/symbols",
     );
   }
   return { type: "IDENTIFIER", names, [$$trusted]: true };
@@ -71,7 +71,7 @@ function makeValueNode(rawValue: any): SQLValueNode {
 
 function ensureNonEmptyArray<T>(
   array: Array<T>,
-  allowZeroLength = false
+  allowZeroLength = false,
 ): Array<T> {
   if (!Array.isArray(array)) {
     throw debugError(new Error("Expected array"));
@@ -82,7 +82,7 @@ function ensureNonEmptyArray<T>(
   for (let idx = 0, l = array.length; idx < l; idx++) {
     if (array[idx] == null) {
       throw debugError(
-        new Error(`Array index ${idx} is ${String(array[idx])}`)
+        new Error(`Array index ${idx} is ${String(array[idx])}`),
       );
     }
   }
@@ -136,12 +136,14 @@ export function compile(sql: SQLQuery | SQLNode): QueryConfig {
             mappedNames.push(identifierForSymbol);
           } else {
             throw debugError(
-              new Error(`Expected string or symbol, received '${String(name)}'`)
+              new Error(
+                `Expected string or symbol, received '${String(name)}'`,
+              ),
             );
           }
         }
         sqlFragments.push(
-          nameCount === 1 ? mappedNames[0] : mappedNames.join(".")
+          nameCount === 1 ? mappedNames[0] : mappedNames.join("."),
         );
         break;
       }
@@ -184,7 +186,7 @@ export function query(
 ): SQLQuery {
   if (!Array.isArray(strings)) {
     throw new Error(
-      "sql.query should be used as a template literal, not a function call!"
+      "sql.query should be used as a template literal, not a function call!",
     );
   }
   const first = strings[0];
@@ -203,7 +205,7 @@ export function query(
     const text = strings[i];
     if (typeof text !== "string") {
       throw new Error(
-        "sql.query should be used as a template literal, not a function call."
+        "sql.query should be used as a template literal, not a function call.",
       );
     }
     if (text.length > 0) {

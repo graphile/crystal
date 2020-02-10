@@ -29,7 +29,7 @@ SOFTWARE.
 */
 export default function makeGraphQLJSONType(
   graphql: typeof import("graphql"),
-  name: string
+  name: string,
 ) {
   const { GraphQLScalarType, Kind } = graphql;
 
@@ -39,7 +39,7 @@ export default function makeGraphQLJSONType(
 
   const parseLiteral: import("graphql").GraphQLScalarLiteralParser<any> = (
     ast,
-    variables
+    variables,
   ) => {
     switch (ast.kind) {
       case Kind.STRING:

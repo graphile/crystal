@@ -6,12 +6,12 @@ interface Inflectors {
 type InflectorsGenerator = (
   inflection: Inflectors,
   build: BuildBase,
-  options: Options
+  options: Options,
 ) => Inflectors;
 
 export default function makeAddInflectorsPlugin(
   additionalInflectorsOrGenerator: Inflectors | InflectorsGenerator,
-  replace = false
+  replace = false,
 ): Plugin {
   return (builder, options) => {
     builder.hook("inflection", (inflection, build) => {
@@ -28,8 +28,8 @@ export default function makeAddInflectorsPlugin(
           inflection,
           additionalInflectors,
           `Adding inflectors ('${Object.keys(additionalInflectors).join(
-            "', '"
-          )}') via makeAddInflectorsPlugin. You can pass \`true\` as the second argument to makeAddInflectorsPlugin to allow overwriting existing inflectors.`
+            "', '",
+          )}') via makeAddInflectorsPlugin. You can pass \`true\` as the second argument to makeAddInflectorsPlugin to allow overwriting existing inflectors.`,
         );
       }
     });

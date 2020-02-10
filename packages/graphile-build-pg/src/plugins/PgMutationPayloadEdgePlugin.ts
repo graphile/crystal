@@ -14,14 +14,14 @@ declare module "graphile-build" {
 }
 
 function isOrderBySpecArray(
-  specs: OrderBySpec | OrderBySpec[]
+  specs: OrderBySpec | OrderBySpec[],
 ): specs is OrderBySpec[] {
   return Array.isArray(specs[0]);
 }
 
 export default (function PgMutationPayloadEdgePlugin(
   builder,
-  { pgSimpleCollections, disableIssue397Fix }
+  { pgSimpleCollections, disableIssue397Fix },
 ) {
   builder.hook(
     "GraphQLObjectType:fields",
@@ -82,7 +82,7 @@ export default (function PgMutationPayloadEdgePlugin(
       }
       const tableTypeName = getNamedType(TableType).name;
       const TableOrderByType = getTypeByName(
-        inflection.orderByType(tableTypeName)
+        inflection.orderByType(tableTypeName),
       );
 
       const TableEdgeType = getTypeByName(inflection.edge(tableTypeName));
@@ -117,7 +117,7 @@ export default (function PgMutationPayloadEdgePlugin(
                       orderBy: {
                         description: `The method to use when ordering \`${tableTypeName}\`.`,
                         type: new GraphQLList(
-                          new GraphQLNonNull(TableOrderByType)
+                          new GraphQLNonNull(TableOrderByType),
                         ),
 
                         defaultValue: defaultValueEnum
@@ -198,7 +198,7 @@ export default (function PgMutationPayloadEdgePlugin(
                       }
                       const expr = isString(col)
                         ? sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
-                            col
+                            col,
                           )}`
                         : col;
                       expressions.push(expr);
@@ -211,8 +211,8 @@ export default (function PgMutationPayloadEdgePlugin(
                     primaryKeys.forEach(key => {
                       expressions.push(
                         sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
-                          key.name
-                        )}`
+                          key.name,
+                        )}`,
                       );
                     });
                   }
@@ -220,22 +220,22 @@ export default (function PgMutationPayloadEdgePlugin(
                     queryBuilder.select(
                       sql.fragment`json_build_array(${sql.join(
                         aliases.map(a => sql.fragment`${sql.literal(a)}::text`),
-                        ", "
+                        ", ",
                       )}, json_build_array(${sql.join(expressions, ", ")}))`,
-                      "__order_" + aliases.join("__")
+                      "__order_" + aliases.join("__"),
                     );
                   }
                 }
               },
-            }
+            },
           ),
         },
 
         `Adding edge field for table ${describePgEntity(
-          table
-        )} to mutation payload '${Self.name}'`
+          table,
+        )} to mutation payload '${Self.name}'`,
       );
     },
-    ["PgMutationPayloadEdge"]
+    ["PgMutationPayloadEdge"],
   );
 } as Plugin);

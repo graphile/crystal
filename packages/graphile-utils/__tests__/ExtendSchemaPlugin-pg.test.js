@@ -61,7 +61,7 @@ it("allows adding a custom single field to PG schema", async () => {
                   (tableAlias, sqlBuilder) => {
                     sqlBuilder.orderBy(sql.fragment`random()`);
                     sqlBuilder.limit(1);
-                  }
+                  },
                 );
                 return rows[0];
               },
@@ -89,7 +89,7 @@ it("allows adding a custom single field to PG schema", async () => {
       `,
       null,
       { pgClient },
-      {}
+      {},
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();
@@ -123,7 +123,7 @@ it("allows adding a custom field returning a list to PG schema", async () => {
                   (tableAlias, sqlBuilder) => {
                     sqlBuilder.orderBy(sql.fragment`random()`);
                     sqlBuilder.limit(3);
-                  }
+                  },
                 );
                 return rows;
               },
@@ -151,7 +151,7 @@ it("allows adding a custom field returning a list to PG schema", async () => {
       `,
       null,
       { pgClient },
-      {}
+      {},
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();
@@ -198,7 +198,7 @@ it("allows adding a simple mutation field to PG schema", async () => {
                     rows: [user],
                   } = await pgClient.query(
                     `insert into graphile_utils.users(name, email, bio) values ($1, $2, $3) returning *`,
-                    [args.input.name, args.input.email, args.input.bio]
+                    [args.input.name, args.input.email, args.input.bio],
                   );
                   const [
                     row,
@@ -206,14 +206,14 @@ it("allows adding a simple mutation field to PG schema", async () => {
                     sql.fragment`graphile_utils.users`,
                     (tableAlias, sqlBuilder) => {
                       sqlBuilder.where(
-                        sql.fragment`${tableAlias}.id = ${sql.value(user.id)}`
+                        sql.fragment`${tableAlias}.id = ${sql.value(user.id)}`,
                       );
-                    }
+                    },
                   );
                   await mockSendEmail(
                     args.input.email,
                     "Welcome to my site",
-                    `You're user ${user.id} - thanks for being awesome`
+                    `You're user ${user.id} - thanks for being awesome`,
                   );
 
                   await pgClient.query("RELEASE SAVEPOINT graphql_mutation");
@@ -222,7 +222,7 @@ it("allows adding a simple mutation field to PG schema", async () => {
                   };
                 } catch (e) {
                   await pgClient.query(
-                    "ROLLBACK TO SAVEPOINT graphql_mutation"
+                    "ROLLBACK TO SAVEPOINT graphql_mutation",
                   );
                   throw e;
                 }
@@ -271,7 +271,7 @@ it("allows adding a simple mutation field to PG schema", async () => {
       `,
       null,
       { pgClient },
-      {}
+      {},
     );
     expect(errors).toBeFalsy();
     expect(data.user1).toBeTruthy();
@@ -325,13 +325,13 @@ it("allows adding a field to an existing table, and requesting necessary data al
       `,
       null,
       { pgClient },
-      {}
+      {},
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();
     expect(data.userById).toBeTruthy();
     expect(data.userById.customField).toEqual(
-      `User 1 fetched (name: Alice) [{"number_int":1,"string_text":"hi"},{"number_int":2,"string_text":"bye"}]`
+      `User 1 fetched (name: Alice) [{"number_int":1,"string_text":"hi"},{"number_int":2,"string_text":"bye"}]`,
     );
   } finally {
     await pgClient.release();
@@ -345,14 +345,14 @@ it("allows adding a custom connection", async () => {
       makeExtendSchemaPlugin(build => {
         const { pgSql: sql } = build;
         const table = build.pgIntrospectionResultsByKind.class.find(
-          tbl => tbl.namespaceName === "graphile_utils" && tbl.name === "users"
+          tbl => tbl.namespaceName === "graphile_utils" && tbl.name === "users",
         );
         return {
           typeDefs: gql`
             extend type Query {
               myCustomConnection: UsersConnection
                 @scope(isPgFieldConnection: true, pgFieldIntrospection: ${embed(
-                  table
+                  table,
                 )})
             }
           `,
@@ -360,7 +360,7 @@ it("allows adding a custom connection", async () => {
             Query: {
               myCustomConnection(_parent, args, context, resolveInfo) {
                 return resolveInfo.graphile.selectGraphQLResultFromTable(
-                  sql.fragment`graphile_utils.users`
+                  sql.fragment`graphile_utils.users`,
                 );
               },
             },
@@ -398,7 +398,7 @@ it("allows adding a custom connection", async () => {
       `,
       null,
       { pgClient },
-      {}
+      {},
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();
@@ -437,7 +437,7 @@ it("allows adding a custom connection without requiring directives", async () =>
             Query: {
               myCustomConnection(_parent, args, context, resolveInfo) {
                 return resolveInfo.graphile.selectGraphQLResultFromTable(
-                  sql.fragment`graphile_utils.users`
+                  sql.fragment`graphile_utils.users`,
                 );
               },
             },
@@ -475,7 +475,7 @@ it("allows adding a custom connection without requiring directives", async () =>
       `,
       null,
       { pgClient },
-      {}
+      {},
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();
@@ -511,7 +511,7 @@ it("allows adding a custom connection to a nested type", async () => {
                 source: ${embed(sql.fragment`graphile_utils.pets`)}
                 withQueryBuilder: ${embed(queryBuilder => {
                   queryBuilder.where(
-                    sql.fragment`${queryBuilder.getTableAlias()}.user_id = ${queryBuilder.parentQueryBuilder.getTableAlias()}.id`
+                    sql.fragment`${queryBuilder.getTableAlias()}.user_id = ${queryBuilder.parentQueryBuilder.getTableAlias()}.id`,
                   );
                 })}
               )
@@ -568,7 +568,7 @@ it("allows adding a custom connection to a nested type", async () => {
       `,
       null,
       { pgClient },
-      {}
+      {},
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();
@@ -606,8 +606,8 @@ it("allows adding a custom list to a nested type", async () => {
                   if (args.idLessThan) {
                     queryBuilder.where(
                       sql.fragment`${queryBuilder.getTableAlias()}.id < ${sql.value(
-                        args.idLessThan
-                      )}`
+                        args.idLessThan,
+                      )}`,
                     );
                   }
                 })}
@@ -637,7 +637,7 @@ it("allows adding a custom list to a nested type", async () => {
       `,
       null,
       { pgClient },
-      {}
+      {},
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();
@@ -663,8 +663,8 @@ it("allows adding a single table entry to a nested type", async () => {
                 source: ${embed(
                   (parentQueryBuilder, args) =>
                     sql.fragment`(select * from graphile_utils.users where users.id = ${sql.value(
-                      args.id
-                    )} and users.id <> ${parentQueryBuilder.getTableAlias()}.id limit 1)`
+                      args.id,
+                    )} and users.id <> ${parentQueryBuilder.getTableAlias()}.id limit 1)`,
                 )}
               )
             }
@@ -698,7 +698,7 @@ it("allows adding a single table entry to a nested type", async () => {
       `,
       null,
       { pgClient },
-      {}
+      {},
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();
@@ -728,13 +728,13 @@ it("allows to retrieve a single scalar value", async () => {
               myCustomScalarWithFunction: String! @pgQuery(
                 fragment: ${embed(
                   queryBuilder =>
-                    sql.fragment`(${queryBuilder.getTableAlias()}.name || ' ' || ${queryBuilder.getTableAlias()}.email)`
+                    sql.fragment`(${queryBuilder.getTableAlias()}.name || ' ' || ${queryBuilder.getTableAlias()}.email)`,
                 )}
               )
               myCustomScalarWithFunctionAndArgument(test: Int!): Int! @pgQuery(
                 fragment: ${embed(
                   (queryBuilder, args) =>
-                    sql.fragment`(SELECT ${sql.value(args.test)}::integer)`
+                    sql.fragment`(SELECT ${sql.value(args.test)}::integer)`,
                 )}
               )
             }
@@ -764,14 +764,14 @@ it("allows to retrieve a single scalar value", async () => {
       `,
       null,
       { pgClient },
-      {}
+      {},
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();
     expect(data.user).toBeTruthy();
     expect(data.user.myCustomScalar).toBe(100);
     expect(data.user.myCustomScalarWithFunction).toBe(
-      "Alice alice@example.com"
+      "Alice alice@example.com",
     );
     expect(data.user.myCustomScalarWithFunctionAndArgument).toBe(102);
     expect(data.user.m100).toBe(100);
@@ -793,7 +793,7 @@ it("allows to retrieve array scalar values", async () => {
             extend type User {
               myCustomArrayOfScalars: [String!]! @pgQuery(
                 fragment: ${embed(
-                  sql.fragment`array(SELECT name from graphile_utils.pets)`
+                  sql.fragment`array(SELECT name from graphile_utils.pets)`,
                 )}
               )
               
@@ -819,7 +819,7 @@ it("allows to retrieve array scalar values", async () => {
       `,
       null,
       { pgClient },
-      {}
+      {},
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();

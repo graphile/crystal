@@ -14,7 +14,7 @@ declare module "graphile-build" {
 
 export default (function PgJWTPlugin(
   builder,
-  { pgJwtTypeIdentifier, pgJwtSecret, pgJwtSignOptions }
+  { pgJwtTypeIdentifier, pgJwtSecret, pgJwtSignOptions },
 ) {
   builder.hook(
     "init",
@@ -38,11 +38,11 @@ export default (function PgJWTPlugin(
       }
       if (!pgJwtSecret) {
         throw new Error(
-          "pgJwtTypeIdentifier was specified without pgJwtSecret"
+          "pgJwtTypeIdentifier was specified without pgJwtSecret",
         );
       }
       const { namespaceName, entityName: typeName } = parseIdentifier(
-        pgJwtTypeIdentifier
+        pgJwtTypeIdentifier,
       );
 
       const compositeClass = introspectionResultsByKind.class.find(
@@ -52,12 +52,12 @@ export default (function PgJWTPlugin(
           !table.isUpdatable &&
           !table.isDeletable &&
           table.name === typeName &&
-          table.namespaceName === namespaceName
+          table.namespaceName === namespaceName,
       );
 
       if (!compositeClass) {
         throw new Error(
-          `Could not find JWT type '"${namespaceName}"."${typeName}"'`
+          `Could not find JWT type '"${namespaceName}"."${typeName}"'`,
         );
       }
       const compositeType = compositeClass.type;
@@ -91,7 +91,7 @@ export default (function PgJWTPlugin(
                   }
                   return memo;
                 },
-                {} as { [attributeName: string]: unknown }
+                {} as { [attributeName: string]: unknown },
               );
               return signJwt(
                 token,
@@ -115,18 +115,18 @@ export default (function PgJWTPlugin(
                     ? null
                     : {
                         expiresIn: "1 day",
-                      }
-                )
+                      },
+                ),
               );
             },
           },
 
           {
             __origin: `Adding JWT type based on ${describePgEntity(
-              compositeType
+              compositeType,
             )}`,
             isPgJwtType: true,
-          }
+          },
         );
 
         cb(JWTType);
@@ -142,7 +142,7 @@ export default (function PgJWTPlugin(
           },
           unmap: () => {
             throw new Error(
-              "We don't support passing a JWT token into GraphQL currently"
+              "We don't support passing a JWT token into GraphQL currently",
             );
           },
         };
@@ -152,22 +152,22 @@ export default (function PgJWTPlugin(
             compositeClass.attributes.map(
               attr =>
                 sql.fragment`${sql.literal(
-                  attr.name
+                  attr.name,
                 )}::text, ${pgTweakFragmentForTypeAndModifier(
                   sql.fragment`(${fragment}).${sql.identifier(attr.name)}`,
                   attr.type,
                   attr.typeModifier,
-                  {}
-                )}`
+                  {},
+                )}`,
             ),
 
-            ", "
+            ", ",
           )})`;
       });
       return _;
     },
     ["PgJWT"],
     [],
-    ["PgIntrospection"]
+    ["PgIntrospection"],
   );
 } as Plugin);

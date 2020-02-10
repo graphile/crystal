@@ -47,7 +47,7 @@ export default (function PgConnectionTotalCount(builder) {
                   pgAggregateQuery: aggregateQueryBuilder => {
                     aggregateQueryBuilder.select(
                       sql.fragment`count(1)`,
-                      "totalCount"
+                      "totalCount",
                     );
                   },
                 };
@@ -64,13 +64,13 @@ export default (function PgConnectionTotalCount(builder) {
             },
             {
               isPgConnectionTotalCountField: true,
-            }
+            },
           ),
         },
 
-        `Adding totalCount to connection '${Self.name}'`
+        `Adding totalCount to connection '${Self.name}'`,
       );
     },
-    ["PgConnectionTotalCount"]
+    ["PgConnectionTotalCount"],
   );
 } as Plugin);

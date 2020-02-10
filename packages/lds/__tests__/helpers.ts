@@ -7,7 +7,7 @@ export { PoolClient } from "pg";
 export async function tryDropSlot(slotName: string) {
   try {
     await withClient(DATABASE_URL, pgClient =>
-      pgClient.query("select pg_drop_replication_slot($1)", [slotName])
+      pgClient.query("select pg_drop_replication_slot($1)", [slotName]),
     );
   } catch (e) {
     // Noop
@@ -16,7 +16,7 @@ export async function tryDropSlot(slotName: string) {
 
 export async function withClient<T = void>(
   connectionString: string,
-  callback: (pgClient: pg.PoolClient) => Promise<T>
+  callback: (pgClient: pg.PoolClient) => Promise<T>,
 ): Promise<T> {
   const pool = new pg.Pool({
     connectionString,
@@ -38,15 +38,15 @@ export async function query(text: string, values: Array<any> = []) {
 }
 
 export async function withLdAndClient<T = void>(
-  callback: (ld: PgLogicalDecoding, client: pg.PoolClient) => Promise<T>
+  callback: (ld: PgLogicalDecoding, client: pg.PoolClient) => Promise<T>,
 ): Promise<T> {
   return withClient(DATABASE_URL, pgClient =>
-    withLd(ld => callback(ld, pgClient))
+    withLd(ld => callback(ld, pgClient)),
   );
 }
 
 export async function withLd<T = void>(
-  callback: (ld: PgLogicalDecoding) => Promise<T>
+  callback: (ld: PgLogicalDecoding) => Promise<T>,
 ): Promise<T> {
   const slotName = "get_ld";
   const ld = new PgLogicalDecoding(DATABASE_URL, {

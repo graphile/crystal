@@ -1,5 +1,10 @@
-import { Server, IncomingMessage, ServerResponse, OutgoingHttpHeaders } from 'http';
-import { HttpRequestHandler, Middleware } from '../../interfaces';
+import {
+  Server,
+  IncomingMessage,
+  ServerResponse,
+  OutgoingHttpHeaders,
+} from "http";
+import { HttpRequestHandler, Middleware } from "../../interfaces";
 import {
   subscribe as graphqlSubscribe,
   ExecutionResult,
@@ -8,14 +13,18 @@ import {
   GraphQLError,
   parse,
   DocumentNode,
-} from 'graphql';
-import * as WebSocket from 'ws';
-import { SubscriptionServer, ConnectionContext, ExecutionParams } from 'subscriptions-transport-ws';
-import parseUrl = require('parseurl');
-import { pluginHookFromOptions } from '../pluginHook';
-import { isEmpty } from './createPostGraphileHttpRequestHandler';
-import liveSubscribe from './liveSubscribe';
-import { GraphileResolverContext } from 'postgraphile-core';
+} from "graphql";
+import * as WebSocket from "ws";
+import {
+  SubscriptionServer,
+  ConnectionContext,
+  ExecutionParams,
+} from "subscriptions-transport-ws";
+import parseUrl = require("parseurl");
+import { pluginHookFromOptions } from "../pluginHook";
+import { isEmpty } from "./createPostGraphileHttpRequestHandler";
+import liveSubscribe from "./liveSubscribe";
+import { GraphileResolverContext } from "postgraphile-core";
 
 interface Deferred<T> extends Promise<T> {
   resolve: (input?: T | PromiseLike<T> | undefined) => void;
@@ -55,10 +64,10 @@ export async function enhanceHttpServerWithSubscriptions<
     keepAlive?: number;
   },
 ): Promise<void> {
-  if (websocketServer['__postgraphileSubscriptionsEnabled']) {
+  if (websocketServer["__postgraphileSubscriptionsEnabled"]) {
     return;
   }
-  websocketServer['__postgraphileSubscriptionsEnabled'] = true;
+  websocketServer["__postgraphileSubscriptionsEnabled"] = true;
   const {
     options,
     getGraphQLSchema,
@@ -66,16 +75,22 @@ export async function enhanceHttpServerWithSubscriptions<
     handleErrors,
   } = postgraphileMiddleware;
   const pluginHook = pluginHookFromOptions(options);
-  const externalUrlBase = options.externalUrlBase || '';
-  const graphqlRoute = options.graphqlRoute || '/graphql';
+  const externalUrlBase = options.externalUrlBase || "";
+  const graphqlRoute = options.graphqlRoute || "/graphql";
 
   const schema = await getGraphQLSchema();
 
-  const keepalivePromisesByContextKey: { [contextKey: string]: Deferred<void> | null } = {};
+  const keepalivePromisesByContextKey: {
+    [contextKey: string]: Deferred<void> | null;
+  } = {};
 
-  const contextKey = (ws: WebSocket, opId: string): string => ws['postgraphileId'] + '|' + opId;
+  const contextKey = (ws: WebSocket, opId: string): string =>
+    ws["postgraphileId"] + "|" + opId;
 
-  const releaseContextForSocketAndOpId = (ws: WebSocket, opId: string): void => {
+  const releaseContextForSocketAndOpId = (
+    ws: WebSocket,
+    opId: string,
+  ): void => {
     const promise = keepalivePromisesByContextKey[contextKey(ws, opId)];
     if (promise) {
       promise.resolve();
@@ -90,7 +105,7 @@ export async function enhanceHttpServerWithSubscriptions<
   ): Deferred<void> => {
     releaseContextForSocketAndOpId(ws, opId);
     const promise = deferred();
-    promise['context'] = context;
+    promise["context"] = context;
     keepalivePromisesByContextKey[contextKey(ws, opId)] = promise;
     return promise;
   };
@@ -114,11 +129,11 @@ export async function enhanceHttpServerWithSubscriptions<
     req: Request;
     res: Response;
   }> => {
-    const req = socket['__postgraphileReq'];
+    const req = socket["__postgraphileReq"];
     if (!req) {
-      throw new Error('req could not be extracted');
+      throw new Error("req could not be extracted");
     }
-    let dummyRes: Response | undefined = socket['__postgraphileRes'];
+    let dummyRes: Response | undefined = socket["__postgraphileRes"];
     if (req.res) {
       throw new Error(
         "Please get in touch with Benjie; we weren't expecting req.res to be present but we want to reserve it for future usage.",
@@ -149,20 +164,28 @@ export async function enhanceHttpServerWithSubscriptions<
 
       // reqResFromSocket is only called once per socket, so there's no race condition here
       // eslint-disable-next-line require-atomic-updates
-      socket['__postgraphileRes'] = dummyRes;
+      socket["__postgraphileRes"] = dummyRes;
     }
     return { req, res: dummyRes };
   };
 
-  const getContext = (socket: WebSocket, opId: string): Promise<GraphileResolverContext> => {
+  const getContext = (
+    socket: WebSocket,
+    opId: string,
+  ): Promise<GraphileResolverContext> => {
     return new Promise((resolve, reject): void => {
       reqResFromSocket(socket)
         .then(({ req, res }) =>
-          withPostGraphileContextFromReqRes(req, res, { singleStatement: true }, context => {
-            const promise = addContextForSocketAndOpId(context, socket, opId);
-            resolve(promise['context']);
-            return promise;
-          }),
+          withPostGraphileContextFromReqRes(
+            req,
+            res,
+            { singleStatement: true },
+            context => {
+              const promise = addContextForSocketAndOpId(context, socket, opId);
+              resolve(promise["context"]);
+              return promise;
+            },
+          ),
         )
         .then(null, reject);
     });
@@ -172,25 +195,31 @@ export async function enhanceHttpServerWithSubscriptions<
 
   let socketId = 0;
 
-  websocketServer.on('upgrade', (req, socket, head) => {
-    const { pathname = '' } = parseUrl(req) || {};
+  websocketServer.on("upgrade", (req, socket, head) => {
+    const { pathname = "" } = parseUrl(req) || {};
     const isGraphqlRoute = pathname === externalUrlBase + graphqlRoute;
     if (isGraphqlRoute) {
       wss.handleUpgrade(req, socket, head, ws => {
-        wss.emit('connection', ws, req);
+        wss.emit("connection", ws, req);
       });
     }
   });
-  const staticValidationRules = pluginHook('postgraphile:validationRules:static', specifiedRules, {
-    options,
-  });
+  const staticValidationRules = pluginHook(
+    "postgraphile:validationRules:static",
+    specifiedRules,
+    {
+      options,
+    },
+  );
 
   SubscriptionServer.create(
     {
       schema,
       validationRules: staticValidationRules,
       execute: () => {
-        throw new Error('Only subscriptions are allowed over websocket transport');
+        throw new Error(
+          "Only subscriptions are allowed over websocket transport",
+        );
       },
       subscribe: options.live ? liveSubscribe : graphqlSubscribe,
       onConnect(
@@ -199,15 +228,18 @@ export async function enhanceHttpServerWithSubscriptions<
         connectionContext: ConnectionContext,
       ) {
         const { socket, request } = connectionContext;
-        socket['postgraphileId'] = ++socketId;
+        socket["postgraphileId"] = ++socketId;
         if (!request) {
-          throw new Error('No request!');
+          throw new Error("No request!");
         }
         const normalizedConnectionParams = lowerCaseKeys(connectionParams);
-        request['connectionParams'] = connectionParams;
-        request['normalizedConnectionParams'] = normalizedConnectionParams;
-        socket['__postgraphileReq'] = request;
-        if (!request.headers.authorization && normalizedConnectionParams['authorization']) {
+        request["connectionParams"] = connectionParams;
+        request["normalizedConnectionParams"] = normalizedConnectionParams;
+        socket["__postgraphileReq"] = request;
+        if (
+          !request.headers.authorization &&
+          normalizedConnectionParams["authorization"]
+        ) {
           /*
            * Enable JWT support through connectionParams.
            *
@@ -215,17 +247,23 @@ export async function enhanceHttpServerWithSubscriptions<
            * reasons (e.g. we don't want to allow overriding of Origin /
            * Referer / etc)
            */
-          request.headers.authorization = String(normalizedConnectionParams['authorization']);
+          request.headers.authorization = String(
+            normalizedConnectionParams["authorization"],
+          );
         }
 
-        socket['postgraphileHeaders'] = {
+        socket["postgraphileHeaders"] = {
           ...normalizedConnectionParams,
           // The original headers must win (for security)
           ...request.headers,
         };
       },
       // tslint:disable-next-line no-any
-      async onOperation(message: any, params: ExecutionParams, socket: WebSocket) {
+      async onOperation(
+        message: any,
+        params: ExecutionParams,
+        socket: WebSocket,
+      ) {
         const opId = message.id;
         const context = await getContext(socket, opId);
 
@@ -236,14 +274,16 @@ export async function enhanceHttpServerWithSubscriptions<
 
         const { req, res } = await reqResFromSocket(socket);
         const meta = {};
-        const formatResponse = <TExecutionResult extends ExecutionResult = ExecutionResult>(
+        const formatResponse = <
+          TExecutionResult extends ExecutionResult = ExecutionResult
+        >(
           response: TExecutionResult,
         ): TExecutionResult => {
           if (response.errors) {
             response.errors = handleErrors(response.errors, req, res);
           }
           if (!isEmpty(meta)) {
-            response['meta'] = meta;
+            response["meta"] = meta;
           }
 
           return response;
@@ -252,7 +292,7 @@ export async function enhanceHttpServerWithSubscriptions<
         // eslint-disable-next-line require-atomic-updates
         params.formatResponse = formatResponse;
         const hookedParams = pluginHook
-          ? pluginHook('postgraphile:ws:onOperation', params, {
+          ? pluginHook("postgraphile:ws:onOperation", params, {
               message,
               params,
               socket,
@@ -262,20 +302,26 @@ export async function enhanceHttpServerWithSubscriptions<
         const finalParams: typeof hookedParams & { query: DocumentNode } = {
           ...hookedParams,
           query:
-            typeof hookedParams.query !== 'string' ? hookedParams.query : parse(hookedParams.query),
+            typeof hookedParams.query !== "string"
+              ? hookedParams.query
+              : parse(hookedParams.query),
         };
 
         // You are strongly encouraged to use
         // `postgraphile:validationRules:static` if possible - you should
         // only use this one if you need access to variables.
-        const moreValidationRules = pluginHook('postgraphile:validationRules', [], {
-          options,
-          req,
-          res,
-          variables: params.variables,
-          operationName: params.operationName,
-          meta,
-        });
+        const moreValidationRules = pluginHook(
+          "postgraphile:validationRules",
+          [],
+          {
+            options,
+            req,
+            res,
+            variables: params.variables,
+            operationName: params.operationName,
+            meta,
+          },
+        );
         if (moreValidationRules.length) {
           const validationErrors: ReadonlyArray<GraphQLError> = validate(
             params.schema,
@@ -284,9 +330,10 @@ export async function enhanceHttpServerWithSubscriptions<
           );
           if (validationErrors.length) {
             const error = new Error(
-              'Query validation failed: \n' + validationErrors.map(e => e.message).join('\n'),
+              "Query validation failed: \n" +
+                validationErrors.map(e => e.message).join("\n"),
             );
-            error['errors'] = validationErrors;
+            error["errors"] = validationErrors;
             return Promise.reject(error);
           }
         }

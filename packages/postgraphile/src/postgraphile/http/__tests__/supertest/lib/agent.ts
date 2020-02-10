@@ -3,9 +3,9 @@
  * Module dependencies.
  */
 
-import { agent as Agent } from 'superagent';
-import * as http from 'http';
-import Test from './test';
+import { agent as Agent } from "superagent";
+import * as http from "http";
+import Test from "./test";
 
 const methods = http.METHODS.map(m => m.toLowerCase());
 
@@ -20,7 +20,7 @@ const methods = http.METHODS.map(m => m.toLowerCase());
 function TestAgent(app: any, options: any) {
   // @ts-ignore
   if (!(this instanceof TestAgent)) return new TestAgent(app, options);
-  if (typeof app === 'function') app = http.createServer(app); // eslint-disable-line no-param-reassign
+  if (typeof app === "function") app = http.createServer(app); // eslint-disable-line no-param-reassign
   if (options) {
     this._ca = options.ca;
     this._key = options.key;
@@ -51,9 +51,9 @@ methods.forEach(method => {
     req.cert(this._cert);
     req.key(this._key);
 
-    req.on('response', this._saveCookies.bind(this));
-    req.on('redirect', this._saveCookies.bind(this));
-    req.on('redirect', this._attachCookies.bind(this, req));
+    req.on("response", this._saveCookies.bind(this));
+    req.on("redirect", this._saveCookies.bind(this));
+    req.on("redirect", this._attachCookies.bind(this, req));
     this._attachCookies(req);
 
     return req;

@@ -1,7 +1,7 @@
 // tslint:disable no-any
-import * as http from 'http';
-import Test from './lib/test';
-import agent from './lib/agent';
+import * as http from "http";
+import Test from "./lib/test";
+import agent from "./lib/agent";
 
 const methods = http.METHODS.map(m => m.toLowerCase());
 
@@ -16,7 +16,7 @@ const methods = http.METHODS.map(m => m.toLowerCase());
 export default (app: any) => {
   const obj: any = {};
 
-  if (typeof app === 'function') {
+  if (typeof app === "function") {
     app = http.createServer(app); // eslint-disable-line no-param-reassign
   }
 

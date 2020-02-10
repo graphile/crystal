@@ -7,7 +7,7 @@ import { base64, nullableIf } from "../utils";
 
 export default (function PgRecordFunctionConnectionPlugin(
   builder,
-  { pgForbidSetofFunctionsToReturnNull = false }
+  { pgForbidSetofFunctionsToReturnNull = false },
 ) {
   builder.hook(
     "init",
@@ -50,14 +50,14 @@ export default (function PgRecordFunctionConnectionPlugin(
         // on function arguments and return types, however maybe a later
         // version of PG will?
         const NodeType = getTypeByName(
-          inflection.recordFunctionReturnType(proc)
+          inflection.recordFunctionReturnType(proc),
         );
 
         if (!NodeType || !isOutputType(NodeType)) {
           throw new Error(
             `Do not have a node type '${inflection.recordFunctionReturnType(
-              proc
-            )}' for '${proc.name}' so cannot create connection type`
+              proc,
+            )}' for '${proc.name}' so cannot create connection type`,
           );
         }
 
@@ -89,7 +89,7 @@ export default (function PgRecordFunctionConnectionPlugin(
                 },
                 {
                   isCursorField: true,
-                }
+                },
               ),
 
               node: pgField(
@@ -103,7 +103,7 @@ export default (function PgRecordFunctionConnectionPlugin(
                   type: nullableIf(
                     GraphQLNonNull,
                     !pgForbidSetofFunctionsToReturnNull,
-                    NodeType
+                    NodeType,
                   ),
 
                   resolve(data, _args, _context, resolveInfo) {
@@ -114,19 +114,19 @@ export default (function PgRecordFunctionConnectionPlugin(
                 },
 
                 {},
-                false
+                false,
               ),
             };
           },
         };
         const edgeScope: ScopeGraphQLObjectType = {
           __origin: `Adding function result edge type for ${describePgEntity(
-            proc
+            proc,
           )}. You can rename the function's GraphQL field (and its dependent types) via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
             proc,
             {
               name: "newNameHere",
-            }
+            },
           )}`,
           isEdgeType: true,
           nodeType: NodeType,
@@ -136,7 +136,7 @@ export default (function PgRecordFunctionConnectionPlugin(
 
         if (!EdgeType) {
           throw new Error(
-            `Failed to construct EdgeType type '${edgeSpec.name}'`
+            `Failed to construct EdgeType type '${edgeSpec.name}'`,
           );
         }
 
@@ -159,9 +159,9 @@ export default (function PgRecordFunctionConnectionPlugin(
                       nullableIf(
                         GraphQLNonNull,
                         !pgForbidSetofFunctionsToReturnNull,
-                        NodeType
-                      )
-                    )
+                        NodeType,
+                      ),
+                    ),
                   ),
 
                   resolve(data, _args, _context, resolveInfo) {
@@ -179,19 +179,19 @@ export default (function PgRecordFunctionConnectionPlugin(
                       getNamedType(NodeType).name
                     }\` and cursor to aid in pagination.`,
                     type: new GraphQLNonNull(
-                      new GraphQLList(new GraphQLNonNull(EdgeType))
+                      new GraphQLList(new GraphQLNonNull(EdgeType)),
                     ),
 
                     resolve(data, _args, _context, resolveInfo) {
                       const safeAlias = getSafeAliasFromResolveInfo(
-                        resolveInfo
+                        resolveInfo,
                       );
 
                       return data.data.map(
                         (entry: object & { __cursor?: string }) => ({
                           __cursor: entry.__cursor,
                           ...entry[safeAlias],
-                        })
+                        }),
                       );
                     },
                   },
@@ -200,7 +200,7 @@ export default (function PgRecordFunctionConnectionPlugin(
                   false,
                   {
                     hoistCursor: true,
-                  }
+                  },
                 ),
               };
             },
@@ -208,23 +208,23 @@ export default (function PgRecordFunctionConnectionPlugin(
 
           {
             __origin: `Adding function connection type for ${describePgEntity(
-              proc
+              proc,
             )}. You can rename the function's GraphQL field (and its dependent types) via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               proc,
               {
                 name: "newNameHere",
-              }
+              },
             )}`,
             isConnectionType: true,
             isPgRowConnectionType: true,
             edgeType: EdgeType,
             nodeType: NodeType,
             pgIntrospection: proc,
-          }
+          },
         );
       });
       return _;
     },
-    ["PgRecordFunctionConnection"]
+    ["PgRecordFunctionConnection"],
   );
 } as Plugin);

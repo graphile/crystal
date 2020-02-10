@@ -54,7 +54,7 @@ export default (async function PgRowNode(builder, { subscriptions }) {
           _parsedResolveInfoFragment,
           _ReturnType,
           resolveData,
-          resolveInfo
+          resolveInfo,
         ) => {
           const { pgClient } = resolveContext;
           const liveRecord =
@@ -78,17 +78,17 @@ export default (async function PgRowNode(builder, { subscriptions }) {
               primaryKeys.forEach((key, idx) => {
                 queryBuilder.where(
                   sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
-                    key.name
+                    key.name,
                   )} = ${gql2pg(
                     identifiers[idx],
                     primaryKeys[idx].type,
-                    primaryKeys[idx].typeModifier
-                  )}`
+                    primaryKeys[idx].typeModifier,
+                  )}`,
                 );
               });
             },
             resolveContext,
-            resolveInfo && resolveInfo.rootValue
+            resolveInfo && resolveInfo.rootValue,
           );
 
           const { text, values } = sql.compile(query);
@@ -100,12 +100,12 @@ export default (async function PgRowNode(builder, { subscriptions }) {
             liveRecord("pg", table, row.__identifiers);
           }
           return row;
-        }
+        },
       );
 
       return object;
     },
-    ["PgRowNode"]
+    ["PgRowNode"],
   );
 
   builder.hook(
@@ -146,12 +146,12 @@ export default (async function PgRowNode(builder, { subscriptions }) {
 
           const TableType = pgGetGqlTypeByTypeIdAndModifier(
             table.type.id,
-            null
+            null,
           );
 
           const sqlFullTableName = sql.identifier(
             table.namespace.name,
-            table.name
+            table.name,
           );
 
           if (TableType) {
@@ -186,7 +186,7 @@ export default (async function PgRowNode(builder, { subscriptions }) {
                         _parent,
                         args,
                         resolveContext,
-                        resolveInfo
+                        resolveInfo,
                       ) {
                         const { pgClient } = resolveContext;
                         const liveRecord =
@@ -207,13 +207,13 @@ export default (async function PgRowNode(builder, { subscriptions }) {
 
                           const parsedResolveInfoFragment = parseResolveInfo(
                             resolveInfo,
-                            true
+                            true,
                           );
 
                           parsedResolveInfoFragment.args = args; // Allow overriding via makeWrapResolversPlugin
                           const resolveData = getDataFromParsedResolveInfoFragment(
                             parsedResolveInfoFragment,
-                            TableType
+                            TableType,
                           );
 
                           const query = queryFromResolveData(
@@ -230,17 +230,17 @@ export default (async function PgRowNode(builder, { subscriptions }) {
                               primaryKeys.forEach((key, idx) => {
                                 queryBuilder.where(
                                   sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
-                                    key.name
+                                    key.name,
                                   )} = ${gql2pg(
                                     identifiers[idx],
                                     primaryKeys[idx].type,
-                                    primaryKeys[idx].typeModifier
-                                  )}`
+                                    primaryKeys[idx].typeModifier,
+                                  )}`,
                                 );
                               });
                             },
                             resolveContext,
-                            resolveInfo.rootValue
+                            resolveInfo.rootValue,
                           );
 
                           const { text, values } = sql.compile(query);
@@ -261,23 +261,23 @@ export default (async function PgRowNode(builder, { subscriptions }) {
                   {
                     isPgNodeQuery: true,
                     pgFieldIntrospection: table,
-                  }
+                  },
                 ),
               },
 
               `Adding row by globally unique identifier field for ${describePgEntity(
-                table
+                table,
               )}. You can rename this table via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                 table,
-                { name: "newNameHere" }
-              )}`
+                { name: "newNameHere" },
+              )}`,
             );
           }
           return memo;
         }, {}),
-        `Adding "row by node ID" fields to root Query type`
+        `Adding "row by node ID" fields to root Query type`,
       );
     },
-    ["PgRowNode"]
+    ["PgRowNode"],
   );
 } as Plugin);

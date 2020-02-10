@@ -68,7 +68,7 @@ it("requests the required sibling columns", async () => {
         jwtClaims: {
           user_id: 2,
         },
-      }
+      },
     );
     expect(result.errors).toBeFalsy();
     result.data.allUsers.nodes.forEach(user => {
@@ -157,7 +157,7 @@ it("requests the required child columns", async () => {
         jwtClaims: {
           user_id: 2,
         },
-      }
+      },
     );
     expect(result.errors).toBeFalsy();
     expect(result.data.createUser).toBeTruthy();

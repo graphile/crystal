@@ -8,7 +8,7 @@
  */
 export function makeIntrospectionQuery(
   serverVersionNum: number,
-  options: { pgLegacyFunctionsOnly?: boolean } = {}
+  options: { pgLegacyFunctionsOnly?: boolean } = {},
 ): string {
   const { pgLegacyFunctionsOnly } = options;
   return `\

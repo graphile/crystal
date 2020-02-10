@@ -29,7 +29,7 @@ function check(description, sql) {
                       type: build.graphql.GraphQLInt,
                     },
                   });
-                }
+                },
               );
             },
           ],
@@ -52,49 +52,49 @@ check(
   "simple collections naming clash",
   `
     comment on constraint post_author_id_fkey on a.post is E'@foreignFieldName clash\nRest of existing ''comment'' \nhere.';
-  `
+  `,
 );
 
 check(
   "table naming clash - direct",
   `
     comment on table a.post is E'@name person\nRest of existing ''comment'' \nhere.';
-  `
+  `,
 );
 
 check(
   "table naming clash - condition",
   `
     comment on table a.post is E'@name person_condition\nRest of existing ''comment'' \nhere.';
-  `
+  `,
 );
 
 check(
   "table naming clash - order",
   `
     comment on table a.post is E'@name people_order_by\nRest of existing ''comment'' \nhere.';
-  `
+  `,
 );
 
 check(
   "table naming clash - query",
   `
     comment on table a.post is E'@name query\nRest of existing ''comment'' \nhere.';
-  `
+  `,
 );
 
 check(
   "table naming clash - mutation",
   `
     comment on table a.post is E'@name mutation\nRest of existing ''comment'' \nhere.';
-  `
+  `,
 );
 
 check(
   "table naming clash - subscription",
   `
     comment on table a.post is E'@name subscription\nRest of existing ''comment'' \nhere.';
-  `
+  `,
 );
 
 check(
@@ -102,41 +102,41 @@ check(
   `
     comment on table a.post is E'@name q_edge\nRest of existing ''comment'' \nhere.';
     comment on function c.int_set_query(int, int, int) is E'@name q\nRest of existing ''comment'' \nhere.';
-  `
+  `,
 );
 check(
   "function naming clash - nodeId",
   `
     comment on function c.int_set_query(int, int, int) is E'@name nodeId\nRest of existing ''comment'' \nhere.';
-  `
+  `,
 );
 check(
   "function naming clash - createPost",
   `
     comment on function a.mutation_text_array() is E'@name createPost\nRest of existing ''comment'' \nhere.';
-  `
+  `,
 );
 check(
   "function naming clash - updatePost",
   `
     comment on function a.mutation_text_array() is E'@name updatePost\nRest of existing ''comment'' \nhere.';
-  `
+  `,
 );
 check(
   "function naming clash - deletePost",
   `
     comment on function a.mutation_text_array() is E'@name deletePost\nRest of existing ''comment'' \nhere.';
-  `
+  `,
 );
 check(
   "function naming clash - computed",
   `
     comment on function c.edge_case_computed(c.edge_case) is E'@fieldName rowId\nRest of existing ''comment'' \nhere.';
-  `
+  `,
 );
 check(
   "column naming clash - rename",
   `
     comment on column c.edge_case.row_id is E'@name wontCastEasy\nRest of existing ''comment'' \nhere.';
-  `
+  `,
 );

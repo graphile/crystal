@@ -69,7 +69,7 @@ describe("sql.join", () => {
         sql.query`baz.qux(1, 2, 3)`,
         sql.query`baz.qux(${sql.value(1)}, ${sql.query`2`}, 3)`,
       ],
-      ", "
+      ", ",
     )}`;
     expect(node.map(sansSymbols)).toEqual([
       { type: "RAW", text: "select " },
@@ -112,7 +112,7 @@ describe("sql.compile", () => {
 
   it("more complex", () => {
     const node = sql.query`select ${sql.query`${sql.value(
-      1
+      1,
     )} ${sql.query`from ${sql.identifier("foo", 'b"z"b"z""b')}`}`}`;
     expect(sql.compile(node)).toEqual({
       text: 'select $1 from "foo"."b""z""b""z""""b"',
@@ -128,7 +128,7 @@ describe("sql.compile", () => {
         sql.query`baz.qux(1, 2, 3)`,
         sql.query`baz.qux(${sql.value(1)}, ${sql.query`2`}, 3)`,
       ],
-      ", "
+      ", ",
     )}`;
     expect(sql.compile(node)).toEqual({
       text: 'select $1, "foo"."bar", baz.qux(1, 2, 3), baz.qux($2, 2, 3)',
@@ -147,7 +147,7 @@ describe("sqli", () => {
           sql.query`baz.qux(1, 2, 3)`,
           sql.query`baz.qux(${sql.value(1)}, ${sql.query`2`}, 3)`,
         ],
-        ", "
+        ", ",
       )}`;
     }).toThrowErrorMatchingSnapshot();
   });
@@ -161,7 +161,7 @@ describe("sqli", () => {
           sql.query`baz.qux(1, 2, 3)`,
           sql.query`baz.qux(${sql.value(1)}, ${sql.query`2`}, 3)`,
         ],
-        ", "
+        ", ",
       )}, ${3}`;
     }).toThrowErrorMatchingSnapshot();
   });

@@ -31,7 +31,7 @@ export type OrderBySpec =
        * - false: `NULLS LAST`
        * - null: ` `
        */
-      boolean | null | undefined
+      boolean | null | undefined,
     ];
 
 function isOrderBySpec(spec: unknown): spec is OrderBySpec {
@@ -82,21 +82,21 @@ export default (function PgConnectionArgOrderBy(builder, { orderByNullsLast }) {
 
           {
             __origin: `Adding connection "orderBy" argument for ${describePgEntity(
-              table
+              table,
             )}. You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               table,
               {
                 name: "newNameHere",
-              }
+              },
             )}`,
             pgIntrospection: table,
             isPgRowSortEnum: true,
-          }
+          },
         );
       });
       return _;
     },
-    ["PgConnectionArgOrderBy"]
+    ["PgConnectionArgOrderBy"],
   );
 
   builder.hook(
@@ -160,14 +160,14 @@ export default (function PgConnectionArgOrderBy(builder, { orderByNullsLast }) {
       }
       const tableTypeName = getNamedType(TableType).name;
       const TableOrderByType = getTypeByName(
-        inflection.orderByType(tableTypeName)
+        inflection.orderByType(tableTypeName),
       );
       if (!TableOrderByType) {
         return args;
       }
 
       const cursorPrefixFromOrderBy = (
-        orderBy: OrderByValue[] | null
+        orderBy: OrderByValue[] | null,
       ): SQL[] | null => {
         if (orderBy) {
           const cursorPrefixes: SQL[] = [];
@@ -206,7 +206,7 @@ export default (function PgConnectionArgOrderBy(builder, { orderByNullsLast }) {
                 orders.forEach(([col, ascending, specNullsFirst]) => {
                   const expr = isString(col)
                     ? sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
-                        col
+                        col,
                       )}`
                     : col;
                   // If the enum specifies null ordering, use that
@@ -237,9 +237,9 @@ export default (function PgConnectionArgOrderBy(builder, { orderByNullsLast }) {
           },
         },
 
-        `Adding 'orderBy' argument to field '${fieldName}' of '${Self.name}'`
+        `Adding 'orderBy' argument to field '${fieldName}' of '${Self.name}'`,
       );
     },
-    ["PgConnectionArgOrderBy"]
+    ["PgConnectionArgOrderBy"],
   );
 } as Plugin);

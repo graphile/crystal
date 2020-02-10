@@ -55,7 +55,7 @@ export default (function PgRecordReturnTypesPlugin(builder) {
             }
             return prev;
           },
-          [] as PgType[]
+          [] as PgType[],
         );
         const argModesWithOutput = [
           "o", // OUT,
@@ -69,7 +69,7 @@ export default (function PgRecordReturnTypesPlugin(builder) {
             }
             return prev;
           },
-          [] as string[]
+          [] as string[],
         );
         const outputArgTypes = proc.argTypeIds.reduce(
           (prev, typeId, idx) => {
@@ -78,7 +78,7 @@ export default (function PgRecordReturnTypesPlugin(builder) {
             }
             return prev;
           },
-          [] as PgType[]
+          [] as PgType[],
         );
         const isMutation = !proc.isStable;
         const firstArgType = argTypes[0];
@@ -94,7 +94,7 @@ export default (function PgRecordReturnTypesPlugin(builder) {
           ? inflection.computedColumn(
               proc.name.substr(firstArgType.name.length + 1),
               proc,
-              firstArgType.class
+              firstArgType.class,
             )
           : inflection.functionQueryName(proc);
         const recordReturnSpec: GraphileObjectTypeConfig<any, any> = {
@@ -109,24 +109,24 @@ export default (function PgRecordReturnTypesPlugin(builder) {
               const fieldName = inflection.functionOutputFieldName(
                 proc,
                 outputArgName,
-                idx + 1
+                idx + 1,
               );
 
               const fieldType = pgGetGqlTypeByTypeIdAndModifier(
                 outputArgTypes[idx].id,
-                null
+                null,
               );
               if (!fieldType) {
                 throw new Error(
-                  `Could not determing GraphQL type for record returning function '${proc.name}'`
+                  `Could not determing GraphQL type for record returning function '${proc.name}'`,
                 );
               }
 
               if (memo[fieldName]) {
                 throw new Error(
                   `Tried to register field name '${fieldName}' twice in '${describePgEntity(
-                    proc
-                  )}'; the argument names are too similar.`
+                    proc,
+                  )}'; the argument names are too similar.`,
                 );
               }
               memo[fieldName] = fieldWithHooks(
@@ -135,7 +135,7 @@ export default (function PgRecordReturnTypesPlugin(builder) {
                   const { addDataGenerator } = fieldContext;
                   addDataGenerator(parsedResolveInfoFragment => {
                     const safeAlias = getSafeAliasFromAlias(
-                      parsedResolveInfoFragment.alias
+                      parsedResolveInfoFragment.alias,
                     );
 
                     return {
@@ -151,14 +151,14 @@ export default (function PgRecordReturnTypesPlugin(builder) {
                               // In PG 9.x and 10, the column names appear to be assigned with a `column` prefix.
                               outputArgName !== ""
                                 ? outputArgName
-                                : `column${idx + 1}`
+                                : `column${idx + 1}`,
                             )})`,
                             outputArgTypes[idx],
                             null,
-                            queryBuilder
+                            queryBuilder,
                           ),
 
-                          safeAlias
+                          safeAlias,
                         );
                       },
                     };
@@ -167,14 +167,14 @@ export default (function PgRecordReturnTypesPlugin(builder) {
                     type: fieldType,
                     resolve(data, _args, _context, resolveInfo) {
                       const safeAlias = getSafeAliasFromResolveInfo(
-                        resolveInfo
+                        resolveInfo,
                       );
 
                       return data[safeAlias];
                     },
                   };
                 },
-                {}
+                {},
               );
 
               return memo;
@@ -183,17 +183,17 @@ export default (function PgRecordReturnTypesPlugin(builder) {
         };
         const recordReturnScope: ScopeGraphQLObjectType = {
           __origin: `Adding record return type for ${describePgEntity(
-            proc
+            proc,
           )}. You can rename the function's GraphQL field (and its dependent types) via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
             proc,
             {
               name: "newNameHere",
-            }
+            },
           )}\n\nYou can rename just the function's GraphQL result type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
             proc,
             {
               resultTypeName: "newNameHere",
-            }
+            },
           )}`,
           isRecordReturnType: true,
           pgIntrospection: proc,
@@ -202,11 +202,11 @@ export default (function PgRecordReturnTypesPlugin(builder) {
           GraphQLObjectType,
           recordReturnSpec,
 
-          recordReturnScope
+          recordReturnScope,
         );
       });
       return _;
     },
-    ["PgRecordReturnTypes"]
+    ["PgRecordReturnTypes"],
   );
 } as Plugin);

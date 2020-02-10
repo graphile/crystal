@@ -55,7 +55,7 @@ export interface LDSubscription {
 export default async function subscribeToLogicalDecoding(
   connectionString: string,
   callback: AnnounceCallback,
-  options: Options = {}
+  options: Options = {},
 ): Promise<LDSubscription> {
   const {
     slotName = "postgraphile",
@@ -84,7 +84,7 @@ export default async function subscribeToLogicalDecoding(
       throw new FatalError(`Invalid slot name '${slotName}'?`, e);
     } else {
       console.error(
-        "An unhandled error occurred when attempting to create the replication slot:"
+        "An unhandled error occurred when attempting to create the replication slot:",
       );
       console.trace(e);
       throw e;

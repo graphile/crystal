@@ -58,8 +58,8 @@ export function gql(
           throw new Error(
             `Placeholder ${idx +
               1} is invalid - expected string or GraphQL AST, but received '${typeof interpolatedValue}'. Happened after '${gqlStrings.join(
-              ""
-            )}'`
+              "",
+            )}'`,
           );
         }
       }

@@ -10,7 +10,7 @@ declare module "graphile-build" {
 
 export default (async function PgAllRows(
   builder,
-  { pgViewUniqueKey, pgSimpleCollections, subscriptions }
+  { pgViewUniqueKey, pgSimpleCollections, subscriptions },
 ) {
   builder.hook(
     "GraphQLObjectType:fields",
@@ -46,7 +46,7 @@ export default (async function PgAllRows(
 
           const TableTypeOrNull = pgGetGqlTypeByTypeIdAndModifier(
             table.type.id,
-            null
+            null,
           );
 
           if (
@@ -58,7 +58,7 @@ export default (async function PgAllRows(
           const TableType = TableTypeOrNull;
           const tableTypeName = TableType.name;
           const ConnectionTypeOrNull = getTypeByName(
-            inflection.connection(TableType.name)
+            inflection.connection(TableType.name),
           );
 
           if (
@@ -66,7 +66,7 @@ export default (async function PgAllRows(
             !(ConnectionTypeOrNull instanceof GraphQLObjectType)
           ) {
             throw new Error(
-              `Could not find GraphQL type for table '${table.name}'`
+              `Could not find GraphQL type for table '${table.name}'`,
             );
           }
           const ConnectionType = ConnectionTypeOrNull;
@@ -81,12 +81,12 @@ export default (async function PgAllRows(
             : undefined;
           if (isView && table.tags.uniqueKey && !uniqueIdAttribute) {
             throw new Error(
-              `Could not find the named unique key '${table.tags.uniqueKey}' on view '${table.namespaceName}.${table.name}'`
+              `Could not find the named unique key '${table.tags.uniqueKey}' on view '${table.namespaceName}.${table.name}'`,
             );
           }
           if (!ConnectionType) {
             throw new Error(
-              `Could not find GraphQL connection type for table '${table.name}'`
+              `Could not find GraphQL connection type for table '${table.name}'`,
             );
           }
           const schema = table.namespace;
@@ -110,13 +110,13 @@ export default (async function PgAllRows(
                     const { pgClient } = resolveContext;
                     const parsedResolveInfoFragment = parseResolveInfo(
                       resolveInfo,
-                      true
+                      true,
                     );
 
                     parsedResolveInfoFragment.args = args; // Allow overriding via makeWrapResolversPlugin
                     const resolveData = getDataFromParsedResolveInfoFragment(
                       parsedResolveInfoFragment,
-                      resolveInfo.returnType
+                      resolveInfo.returnType,
                     );
 
                     let checkerGenerator:
@@ -137,7 +137,7 @@ export default (async function PgAllRows(
                             table,
                             _checkerGenerator => {
                               checkerGenerator = _checkerGenerator;
-                            }
+                            },
                           );
                         }
                         if (primaryKeys) {
@@ -154,9 +154,9 @@ export default (async function PgAllRows(
                               primaryKeys.forEach(key => {
                                 queryBuilder.orderBy(
                                   sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
-                                    key.name
+                                    key.name,
                                   )}`,
-                                  true
+                                  true,
                                 );
                               });
                               queryBuilder.setOrderIsUnique();
@@ -171,9 +171,9 @@ export default (async function PgAllRows(
 
                               queryBuilder.orderBy(
                                 sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
-                                  uniqueIdAttribute.name
+                                  uniqueIdAttribute.name,
                                 )}`,
-                                true
+                                true,
                               );
 
                               queryBuilder.setOrderIsUnique();
@@ -182,7 +182,7 @@ export default (async function PgAllRows(
                         }
                       },
                       resolveContext,
-                      resolveInfo.rootValue
+                      resolveInfo.rootValue,
                     );
 
                     const { text, values } = sql.compile(query);
@@ -190,7 +190,7 @@ export default (async function PgAllRows(
                     const result = await pgPrepareAndRun(
                       pgClient,
                       text,
-                      values
+                      values,
                     );
 
                     const liveCollection =
@@ -218,7 +218,7 @@ export default (async function PgAllRows(
                       ) {
                         result.rows.forEach(
                           row =>
-                            row && liveRecord("pg", table, row.__identifiers)
+                            row && liveRecord("pg", table, row.__identifiers),
                         );
                       }
                       return result.rows;
@@ -230,7 +230,7 @@ export default (async function PgAllRows(
                 isPgFieldConnection: isConnection,
                 isPgFieldSimpleCollection: !isConnection,
                 pgFieldIntrospection: table,
-              }
+              },
             );
           }
           const simpleCollections =
@@ -246,11 +246,11 @@ export default (async function PgAllRows(
           }
           return memo;
         }, {}),
-        `Adding 'all*' relations to root Query`
+        `Adding 'all*' relations to root Query`,
       );
     },
     ["PgAllRows"],
     [],
-    ["PgTables"]
+    ["PgTables"],
   );
 } as Plugin);

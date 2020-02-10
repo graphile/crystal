@@ -7,8 +7,8 @@ test(
     {},
     `
 comment on column d.tv_shows.title is E'@omit create';
-`
-  )
+`,
+  ),
 );
 
 test(
@@ -18,8 +18,8 @@ test(
     {},
     `
 comment on column d.tv_shows.title is E'@omit update';
-`
-  )
+`,
+  ),
 );
 
 test(
@@ -29,8 +29,8 @@ test(
     {},
     `
 comment on column d.tv_shows.title is E'@omit read,create,update,delete,all,many';
-`
-  )
+`,
+  ),
 );
 
 test(
@@ -41,8 +41,8 @@ test(
     `
 comment on column d.tv_shows.title is E'@omit *';
 comment on column d.tv_episodes.title is E'@omit';
-`
-  )
+`,
+  ),
 );
 
 test(
@@ -52,8 +52,8 @@ test(
     {},
     `
 comment on column d.tv_episodes.title is E'@omit order';
-`
-  )
+`,
+  ),
 );
 
 test(
@@ -63,6 +63,6 @@ test(
     {},
     `
 comment on function d.person_full_name(d.person) is E'@omit execute';
-`
-  )
+`,
+  ),
 );

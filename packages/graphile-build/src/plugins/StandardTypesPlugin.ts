@@ -27,13 +27,13 @@ export default (function StandardTypesPlugin(builder) {
 
       const Cursor = stringType(
         "Cursor",
-        "A location in a connection that can be used for resuming pagination."
+        "A location in a connection that can be used for resuming pagination.",
       );
 
       build.addType(Cursor, "graphile-build built-in");
       return build;
     },
-    ["StandardTypes"]
+    ["StandardTypes"],
   );
 
   builder.hook(
@@ -63,7 +63,7 @@ export default (function StandardTypesPlugin(builder) {
                   type: new GraphQLNonNull(GraphQLBoolean),
                 };
               },
-              { isPageInfoHasNextPageField: true }
+              { isPageInfoHasNextPageField: true },
             ),
 
             hasPreviousPage: fieldWithHooks(
@@ -80,7 +80,7 @@ export default (function StandardTypesPlugin(builder) {
                   type: new GraphQLNonNull(GraphQLBoolean),
                 };
               },
-              { isPageInfoHasPreviousPageField: true }
+              { isPageInfoHasPreviousPageField: true },
             ),
           };
         },
@@ -95,6 +95,6 @@ export default (function StandardTypesPlugin(builder) {
 
       return _;
     },
-    ["StandardTypes", "PageInfo"]
+    ["StandardTypes", "PageInfo"],
   );
 } as Plugin);

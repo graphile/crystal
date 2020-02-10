@@ -46,7 +46,7 @@ const ensureValidPlugins = (name: string, arr: Array<Plugin>) => {
       throw new Error(
         `Option '${name}' should be an array of functions, found '${
           fn == null ? String(fn) : typeof fn
-        }' at index ${i}`
+        }' at index ${i}`,
       );
     }
   }
@@ -86,7 +86,7 @@ export interface PostGraphileCoreOptions {
   pgColumnFilter?: <TContext extends Context>(
     attr: mixed,
     build: Build,
-    context: TContext
+    context: TContext,
   ) => boolean;
 
   /**
@@ -121,7 +121,7 @@ export { inflections };
 export const postGraphileBaseOverrides = {
   enumName(value: string) {
     return inflections.defaultUtils.constantCase(
-      inflections.defaultInflection.enumName(value)
+      inflections.defaultInflection.enumName(value),
     );
   },
 };
@@ -134,7 +134,7 @@ export const postGraphileClassicIdsOverrides = {
 
 export const postGraphileInflection = inflections.newInflector(
   // @ts-ignore
-  postGraphileBaseOverrides
+  postGraphileBaseOverrides,
 );
 
 // @ts-ignore
@@ -160,7 +160,7 @@ export const PostGraphileInflectionPlugin = function(builder: SchemaBuilder) {
 } as Plugin;
 
 export const PostGraphileClassicIdsInflectionPlugin = function(
-  builder: SchemaBuilder
+  builder: SchemaBuilder,
 ) {
   builder.hook("inflection", (inflection: Inflection) => {
     const previous = inflection._columnName;
@@ -190,12 +190,12 @@ const awaitKeys = async (obj: { [key: string]: Promise<any> }) => {
 export const getPostGraphileBuilder = async (
   pgConfig: PgConfig,
   schemas: string | Array<string>,
-  options: PostGraphileCoreOptions = {}
+  options: PostGraphileCoreOptions = {},
 ) => {
   // @ts-ignore
   if (options.inflector) {
     throw new Error(
-      "Passing an inflector via PostGraphile options was deprecated in v4.0.0-beta.7; instead please write an inflector plugin: https://www.graphile.org/postgraphile/inflection/"
+      "Passing an inflector via PostGraphile options was deprecated in v4.0.0-beta.7; instead please write an inflector plugin: https://www.graphile.org/postgraphile/inflection/",
     );
   }
   const {
@@ -240,7 +240,7 @@ export const getPostGraphileBuilder = async (
   ) {
     throw new Error(
       "Invalid configuration for legacy relations: " +
-        JSON.stringify(legacyRelations)
+        JSON.stringify(legacyRelations),
     );
   }
   if (
@@ -249,7 +249,7 @@ export const getPostGraphileBuilder = async (
   ) {
     throw new Error(
       "Invalid configuration for simple collections: " +
-        JSON.stringify(simpleCollections)
+        JSON.stringify(simpleCollections),
     );
   }
   if (replaceAllPlugins) {
@@ -259,7 +259,7 @@ export const getPostGraphileBuilder = async (
       (appendPlugins && appendPlugins.length)
     ) {
       throw new Error(
-        "When using 'replaceAllPlugins' you must not specify 'appendPlugins'/'prependPlugins'"
+        "When using 'replaceAllPlugins' you must not specify 'appendPlugins'/'prependPlugins'",
       );
     }
   }
@@ -282,15 +282,15 @@ export const getPostGraphileBuilder = async (
               } else {
                 resolve(data);
               }
-            }
+            },
           );
-        }
+        },
       );
       try {
         memoizeCache = JSON.parse(cacheString);
       } catch (e) {
         throw new Error(
-          `Failed to parse cache file '${readCache}', perhaps it is corrupted? ${e}`
+          `Failed to parse cache file '${readCache}', perhaps it is corrupted? ${e}`,
         );
       }
     } else if (typeof readCache === "object" && !Array.isArray(readCache)) {
@@ -299,7 +299,7 @@ export const getPostGraphileBuilder = async (
       throw new Error(
         `'readCache' not understood; expected string or object, but received '${
           Array.isArray(readCache) ? "array" : typeof readCache
-        }'`
+        }'`,
       );
     }
   }
@@ -331,8 +331,8 @@ export const getPostGraphileBuilder = async (
                 resolve();
               }
             });
-          })
-      )
+          }),
+      ),
     );
   } else if (writeCache) {
     throw new Error("Cannot write cache without 'setWriteCacheCallback'");
@@ -345,7 +345,7 @@ export const getPostGraphileBuilder = async (
   ensureValidPlugins("skipPlugins", skipPlugins);
   if (inflector) {
     throw new Error(
-      "Custom inflector arguments are not supported, please use the inflector plugin API instead: https://www.graphile.org/postgraphile/inflection/"
+      "Custom inflector arguments are not supported, please use the inflector plugin API instead: https://www.graphile.org/postgraphile/inflection/",
     );
   }
   const inflectionOverridePlugins = classicIds
@@ -366,7 +366,7 @@ export const getPostGraphileBuilder = async (
         ...appendPlugins,
       ];
   const invalidSkipPlugins = skipPlugins.filter(
-    pluginToSkip => basePluginList.indexOf(pluginToSkip) < 0
+    pluginToSkip => basePluginList.indexOf(pluginToSkip) < 0,
   );
   if (invalidSkipPlugins.length) {
     function getFunctionName(fn: Plugin) {
@@ -375,11 +375,11 @@ export const getPostGraphileBuilder = async (
     throw new Error(
       `You tried to skip plugins that would never have been loaded anyway. Perhaps you've made a mistake in your skipPlugins list, or have sourced the plugin from a duplicate plugin module - check for duplicate modules in your 'node_modules' folder. The plugins that you requested to skip were: ${invalidSkipPlugins
         .map(getFunctionName)
-        .join(", ")}`
+        .join(", ")}`,
     );
   }
   const finalPluginList = basePluginList.filter(
-    p => skipPlugins.indexOf(p) === -1
+    p => skipPlugins.indexOf(p) === -1,
   );
   return getBuilder(finalPluginList, {
     pgConfig,
@@ -439,7 +439,7 @@ function abort(e: Error) {
 export const createPostGraphileSchema = async (
   pgConfig: PgConfig,
   schemas: Array<string> | string,
-  options: PostGraphileCoreOptions = {}
+  options: PostGraphileCoreOptions = {},
 ) => {
   let writeCache: undefined | (() => Promise<void>);
   const builder = await getPostGraphileBuilder(pgConfig, schemas, {
@@ -462,11 +462,11 @@ export const watchPostGraphileSchema = async (
   pgConfig: PgConfig,
   schemas: Array<string> | string,
   options: PostGraphileCoreOptions = {},
-  onNewSchema: SchemaListener
+  onNewSchema: SchemaListener,
 ) => {
   if (typeof onNewSchema !== "function") {
     throw new Error(
-      "You cannot call watchPostGraphileSchema without a function to pass new schemas to"
+      "You cannot call watchPostGraphileSchema without a function to pass new schemas to",
     );
   }
   if (options.readCache) {

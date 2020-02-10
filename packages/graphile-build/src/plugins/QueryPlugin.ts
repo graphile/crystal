@@ -10,10 +10,10 @@ export default (async function QueryPlugin(builder) {
           $$isQuery: Symbol("isQuery"),
         },
 
-        `Extending Build`
+        `Extending Build`,
       ),
 
-    ["Query"]
+    ["Query"],
   );
 
   builder.hook(
@@ -51,7 +51,7 @@ export default (async function QueryPlugin(builder) {
           isRootQuery: true,
         },
 
-        true
+        true,
       );
 
       if (queryType) {
@@ -61,12 +61,12 @@ export default (async function QueryPlugin(builder) {
             query: queryType,
           },
 
-          `Adding 'query' type to Schema`
+          `Adding 'query' type to Schema`,
         );
       } else {
         return schema;
       }
     },
-    ["Query"]
+    ["Query"],
   );
 } as Plugin);

@@ -25,7 +25,7 @@ export const parseTags = (str: string) => {
     {
       tags: {},
       text: "",
-    }
+    },
   );
 };
 
@@ -38,6 +38,6 @@ export const nullableIf = <
 >(
   GraphQLNonNull: typeof import("graphql").GraphQLNonNull,
   condition: TCond,
-  Type: TType
+  Type: TType,
 ): TCond extends true ? TType : import("graphql").GraphQLNonNull<TType> =>
   (condition ? Type : new GraphQLNonNull(Type)) as any;

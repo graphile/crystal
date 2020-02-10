@@ -2,7 +2,7 @@ import { Plugin, Build } from "../SchemaBuilder";
 
 export default (function SwallowErrorsPlugin(
   builder,
-  { dontSwallowErrors = false }
+  { dontSwallowErrors = false },
 ) {
   builder.hook(
     "build",
@@ -21,6 +21,6 @@ export default (function SwallowErrorsPlugin(
         return build;
       }
     },
-    ["SwallowErrors"]
+    ["SwallowErrors"],
   );
 } as Plugin);

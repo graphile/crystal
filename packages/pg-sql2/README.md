@@ -39,18 +39,18 @@ const fields = ["name", "age", "height"];
 const sqlFields = sql.join(
   // sql.identifier safely escapes arguments and joins them with dots
   fields.map(fieldName => sql.identifier(tableName, fieldName)),
-  ", "
+  ", ",
 );
 
 // sql.value will store the value and instead add a placeholder to the SQL
 // statement, to ensure that no SQL injection can occur.
 const sqlConditions = sql.query`created_at > NOW() - interval '3 years' and age > ${sql.value(
-  22
+  22,
 )}`;
 
 // This could be a full query, but we're going to embed it in another query safely
 const innerQuery = sql.query`select ${sqlFields} from ${sql.identifier(
-  tableName
+  tableName,
 )} where ${sqlConditions}`;
 
 // Symbols are automatically assigned unique identifiers
@@ -136,9 +136,9 @@ sql.query`
     ${sql.join(
       fragments.map(
         ({ sqlFragment, alias }) =>
-          sql.query`${sql.literal(alias)}, ${sqlFragment}`
+          sql.query`${sql.literal(alias)}, ${sqlFragment}`,
       ),
-      ",\n"
+      ",\n",
     )}
   )`;
 

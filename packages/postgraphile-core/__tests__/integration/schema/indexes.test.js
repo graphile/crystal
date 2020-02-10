@@ -2,12 +2,12 @@ const core = require("./core");
 
 test(
   "prints a schema respecting indexes for conditions and order by",
-  core.test(["a", "b", "c"], { ignoreIndexes: false })
+  core.test(["a", "b", "c"], { ignoreIndexes: false }),
 );
 
 test(
   "prints a schema for index_expressions",
-  core.test(["index_expressions"], { disableDefaultMutations: true })
+  core.test(["index_expressions"], { disableDefaultMutations: true }),
 );
 
 const IndexTypeCheckerPlugin = builder => {
@@ -26,5 +26,5 @@ test(
   "index types are present on introspection",
   core.test(["index_expressions"], {
     appendPlugins: [IndexTypeCheckerPlugin],
-  })
+  }),
 );

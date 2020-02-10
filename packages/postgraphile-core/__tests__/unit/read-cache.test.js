@@ -49,7 +49,7 @@ describe("When readCache is String", () => {
   test("if cache file has content, persistentMemoizeWithKey should be a valid function", async () => {
     // mock fs.readFile to return an object
     fs.readFile.mockImplementationOnce((path, options, cb) =>
-      cb(null, '{ "__test": true }')
+      cb(null, '{ "__test": true }'),
     );
 
     // mock getBuilder to fake output
@@ -74,7 +74,7 @@ describe("When readCache is String", () => {
   test("if cache file has invalid content, getPostGraphileBuilder should error", async () => {
     // mock fs.readFile to return an object
     fs.readFile.mockImplementationOnce((path, options, cb) =>
-      cb(null, "thisisnotjson")
+      cb(null, "thisisnotjson"),
     );
 
     // call our method and check error

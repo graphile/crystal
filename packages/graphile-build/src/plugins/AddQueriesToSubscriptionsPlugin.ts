@@ -2,7 +2,7 @@ import { Plugin } from "../SchemaBuilder";
 
 const AddQueriesToSubscriptionsPlugin: Plugin = function(
   builder,
-  { subscriptions, live }
+  { subscriptions, live },
 ) {
   if (!subscriptions || !live) {
     return;
@@ -71,21 +71,21 @@ const AddQueriesToSubscriptionsPlugin: Plugin = function(
             {
               isLiveField: true,
               originalField: queryField,
-            }
+            },
           );
 
           return memo;
         },
-        {}
+        {},
       );
 
       return extend(
         fields,
         subscriptionFields,
-        "Adding Query fields to Subscription type"
+        "Adding Query fields to Subscription type",
       );
     },
-    ["AddQueriesToSubscriptions"]
+    ["AddQueriesToSubscriptions"],
   );
 };
 export default AddQueriesToSubscriptionsPlugin;

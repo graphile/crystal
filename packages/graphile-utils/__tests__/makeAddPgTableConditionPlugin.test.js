@@ -55,9 +55,9 @@ const PetsCountPlugin = makeAddPgTableConditionPlugin(
     expect(build.graphql).toBeTruthy();
     const { sqlTableAlias, sql } = helpers;
     return sql.fragment`(select count(*) from graphile_utils.pets where pets.user_id = ${sqlTableAlias}.id) >= ${sql.value(
-      value
+      value,
     )}`;
-  }
+  },
 );
 
 it("allows adding a condition to a Relay connection", async () => {
@@ -85,7 +85,7 @@ it("allows adding a condition to a Relay connection", async () => {
       `,
       null,
       { pgClient },
-      {}
+      {},
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();
@@ -122,7 +122,7 @@ it("allows adding a condition to a simple collection", async () => {
       `,
       null,
       { pgClient },
-      {}
+      {},
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();

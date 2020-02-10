@@ -20,7 +20,7 @@ type ResolverWrapperFn<
   source: TSource,
   args: TArgs,
   context: TContext,
-  resolveInfo: import("graphql").GraphQLResolveInfo
+  resolveInfo: import("graphql").GraphQLResolveInfo,
 ) => any;
 interface ResolverWrapperRequirements {
   childColumns?: Array<{ column: string; alias: string }>;
@@ -45,30 +45,30 @@ type ResolverWrapperFilter<T> = (
   context: ContextGraphQLObjectTypeFieldsField,
   build: Build,
   field: import("graphql").GraphQLFieldConfig<any, any>,
-  options: Options
+  options: Options,
 ) => T | null;
 
 type ResolverWrapperFilterRule<T> = (
-  match: T
+  match: T,
 ) => ResolverWrapperRule | ResolverWrapperFn;
 
 export default function makeWrapResolversPlugin(
-  rulesOrGenerator: ResolverWrapperRules | ResolverWrapperRulesGenerator
+  rulesOrGenerator: ResolverWrapperRules | ResolverWrapperRulesGenerator,
 ): Plugin;
 export default function makeWrapResolversPlugin<T>(
   filter: ResolverWrapperFilter<T>,
-  rule: ResolverWrapperFilterRule<T>
+  rule: ResolverWrapperFilterRule<T>,
 ): Plugin;
 export default function makeWrapResolversPlugin<T>(
   rulesOrGeneratorOrFilter:
     | ResolverWrapperRules
     | ResolverWrapperRulesGenerator
     | ResolverWrapperFilter<T>,
-  rule?: ResolverWrapperFilterRule<T>
+  rule?: ResolverWrapperFilterRule<T>,
 ): Plugin {
   if (rule && typeof rule !== "function") {
     throw new Error(
-      "Invalid call signature for makeWrapResolversPlugin, expected second argument to be a function"
+      "Invalid call signature for makeWrapResolversPlugin, expected second argument to be a function",
     );
   }
   return (builder: SchemaBuilder, options: Options) => {
@@ -97,7 +97,7 @@ export default function makeWrapResolversPlugin<T>(
           if (filterResult !== null) {
             // eslint-disable-next-line no-console
             console.error(
-              `Filter should return either a truthy value, or 'null', instead received: '${filterResult}'`
+              `Filter should return either a truthy value, or 'null', instead received: '${filterResult}'`,
             );
           }
           return field;
@@ -112,7 +112,7 @@ export default function makeWrapResolversPlugin<T>(
       } else {
         // Should not happen
         throw new Error(
-          "Bad call signature for function makeWrapResolversPlugin"
+          "Bad call signature for function makeWrapResolversPlugin",
         );
       }
       if (!resolveWrapperOrSpec) {
@@ -134,14 +134,14 @@ export default function makeWrapResolversPlugin<T>(
           resolveWrapperRequirements.childColumns.forEach(
             ({ column, alias }) => {
               requireChildColumn(build, context, column, alias);
-            }
+            },
           );
         }
         if (resolveWrapperRequirements.siblingColumns) {
           resolveWrapperRequirements.siblingColumns.forEach(
             ({ column, alias }) => {
               requireSiblingColumn(build, context, column, alias);
-            }
+            },
           );
         }
       }
@@ -156,8 +156,8 @@ export default function makeWrapResolversPlugin<T>(
             oldResolve(
               // @ts-ignore We're calling it dynamically, allowing the parent to override args.
               ...overrideParams.concat(
-                resolveParams.slice(overrideParams.length)
-              )
+                resolveParams.slice(overrideParams.length),
+              ),
             );
           const [source, args, graphqlContext, resolveInfo] = resolveParams;
           const resolveInfoWithHelpers = {
@@ -166,7 +166,7 @@ export default function makeWrapResolversPlugin<T>(
               build,
               context,
               graphqlContext,
-              resolveInfo
+              resolveInfo,
             ),
           };
           return resolveWrapper(
@@ -174,7 +174,7 @@ export default function makeWrapResolversPlugin<T>(
             source,
             args,
             graphqlContext,
-            resolveInfoWithHelpers
+            resolveInfoWithHelpers,
           );
         },
       };

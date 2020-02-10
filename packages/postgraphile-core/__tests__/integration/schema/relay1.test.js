@@ -5,5 +5,5 @@ test(
   core.test("c", {
     classicIds: true,
     setofFunctionsContainNulls: false,
-  })
+  }),
 );

@@ -16,7 +16,7 @@ const options = {};
 const EventEmitter = require("events");
 
 const defaultPlugins = allDefaultPlugins.filter(
-  plugin => plugin !== MutationPlugin
+  plugin => plugin !== MutationPlugin,
 );
 
 const makePluginEtc = (defaultCounter = 0) => {
@@ -31,7 +31,7 @@ const makePluginEtc = (defaultCounter = 0) => {
       },
       triggerRebuild => {
         eventEmitter.removeListener("change", triggerRebuild);
-      }
+      },
     );
     builder.hook("build", build => {
       return build.extend(build, {
@@ -58,7 +58,7 @@ const makePluginEtc = (defaultCounter = 0) => {
             };
           },
         },
-        {}
+        {},
       );
       return extend(fields, {
         dummy: fieldWithHooks(
@@ -71,7 +71,7 @@ const makePluginEtc = (defaultCounter = 0) => {
               },
             };
           },
-          { isDummyField: true }
+          { isDummyField: true },
         ),
       });
     });
@@ -151,7 +151,7 @@ test("schema is updated when rebuild triggered", async () => {
             n
           }
         }
-      `
+      `,
     );
     if (result.errors) {
       // eslint-disable-next-line no-console

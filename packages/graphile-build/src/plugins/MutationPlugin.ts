@@ -35,7 +35,7 @@ export default (async function MutationPlugin(builder) {
           __origin: `graphile-build built-in (root mutation type)`,
           isRootMutation: true,
         },
-        true
+        true,
       );
 
       if (isValidMutation(Mutation)) {
@@ -45,7 +45,7 @@ export default (async function MutationPlugin(builder) {
             mutation: Mutation,
           },
 
-          "Adding mutation type to schema"
+          "Adding mutation type to schema",
         );
       } else {
         return schema;
@@ -53,6 +53,6 @@ export default (async function MutationPlugin(builder) {
     },
     ["Mutation"],
     [],
-    ["Query"]
+    ["Query"],
   );
 } as Plugin);

@@ -12,7 +12,7 @@ export function indent(text: string) {
 export default function extend<Obj1 extends any, Obj2 extends any>(
   base: Obj1,
   extra: Obj2,
-  hint: string
+  hint: string,
 ): Obj1 & Obj2 {
   const hints = base[$$hints] || {};
 
@@ -31,8 +31,10 @@ export default function extend<Obj1 extends any, Obj2 extends any>(
         : `The second entity was:\n\n${indent(chalk.yellow(hintB))}`;
       throw new Error(
         `A naming conflict has occurred - two entities have tried to define the same key '${chalk.bold(
-          key
-        )}'.\n\n${indent(firstEntityDetails)}\n\n${indent(secondEntityDetails)}`
+          key,
+        )}'.\n\n${indent(firstEntityDetails)}\n\n${indent(
+          secondEntityDetails,
+        )}`,
       );
     }
     if (hintB) {

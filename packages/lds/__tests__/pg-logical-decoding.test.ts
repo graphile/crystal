@@ -19,23 +19,23 @@ test("default creates slot for itself, cleans itself up on close", async () => {
   await ld.dropStaleSlots();
   await ld.createSlot();
   const { rows: initialRows } = await query(
-    "select * from postgraphile_meta.logical_decoding_slots"
+    "select * from postgraphile_meta.logical_decoding_slots",
   );
   expect(initialRows.length).toEqual(1);
   expect(initialRows[0].slot_name).toEqual(slotName);
   const { rows: initialPgRows } = await query(
     "select * from pg_catalog.pg_replication_slots where slot_name = $1",
-    [slotName]
+    [slotName],
   );
   expect(initialPgRows.length).toEqual(1);
   await ld.close();
   const { rows: finalRows } = await query(
-    "select * from postgraphile_meta.logical_decoding_slots"
+    "select * from postgraphile_meta.logical_decoding_slots",
   );
   expect(finalRows.length).toEqual(0);
   const { rows: finalPgRows } = await query(
     "select * from pg_catalog.pg_replication_slots where slot_name = $1",
-    [slotName]
+    [slotName],
   );
   expect(finalPgRows.length).toEqual(0);
 });
@@ -51,12 +51,12 @@ test("temporary creates slot for itself, PostgreSQL automatically cleans up for 
   await ld.dropStaleSlots();
   await ld.createSlot();
   const { rows: initialRows } = await query(
-    "select * from postgraphile_meta.logical_decoding_slots"
+    "select * from postgraphile_meta.logical_decoding_slots",
   );
   expect(initialRows.length).toEqual(0);
   const { rows: initialPgRows } = await query(
     "select * from pg_catalog.pg_replication_slots where slot_name = $1",
-    [slotName]
+    [slotName],
   );
   expect(initialPgRows.length).toEqual(1);
   await ld.close();
@@ -64,7 +64,7 @@ test("temporary creates slot for itself, PostgreSQL automatically cleans up for 
   await sleep(500);
   const { rows: finalPgRows } = await query(
     "select * from pg_catalog.pg_replication_slots where slot_name = $1",
-    [slotName]
+    [slotName],
   );
   expect(finalPgRows).toHaveLength(0);
 });
@@ -103,7 +103,7 @@ test("notified on update", () =>
     const {
       rows: [{ id }],
     } = await client.query(
-      "insert into app_public.foo(name) values('temporary') returning id"
+      "insert into app_public.foo(name) values('temporary') returning id",
     );
     await ld.getChanges(); // clear changes from this insert
     const changes1 = await ld.getChanges();
@@ -144,7 +144,7 @@ test("notified on delete", () =>
     const {
       rows: [{ id }],
     } = await client.query(
-      "insert into app_public.foo(name) values('temporary') returning id"
+      "insert into app_public.foo(name) values('temporary') returning id",
     );
     await ld.getChanges(); // clear changes from this insert
     const changes1 = await ld.getChanges();
@@ -179,7 +179,7 @@ test("multiple notifications", () =>
     const {
       rows: [{ id: id1 }, { id: id2 }],
     } = await client.query(
-      "insert into app_public.foo(name) values('temporary1'), ('temporary2') returning id"
+      "insert into app_public.foo(name) values('temporary1'), ('temporary2') returning id",
     );
     try {
       await client.query(
@@ -191,7 +191,7 @@ test("multiple notifications", () =>
         update app_public.foo set name = name || name where id = ${id2};
         update app_public.foo set name = name || name where id = ${id2};
         update app_public.foo set name = name || name where id = ${id2};
-      `
+      `,
       );
     } finally {
       await client.query("commit;");
@@ -242,10 +242,10 @@ test("multiple notifications", () =>
     expect(statement2change1.oldkeys.keyvalues[0]).toEqual(id1);
     expect(statement2change2.columnvalues[1]).toEqual("temporary2temporary2");
     expect(statement2change3.columnvalues[1]).toEqual(
-      "temporary2temporary2temporary2temporary2"
+      "temporary2temporary2temporary2temporary2",
     );
     expect(statement2change4.columnvalues[1]).toEqual(
-      "temporary2temporary2temporary2temporary2temporary2temporary2temporary2temporary2"
+      "temporary2temporary2temporary2temporary2temporary2temporary2temporary2temporary2",
     );
 
     // Get final change

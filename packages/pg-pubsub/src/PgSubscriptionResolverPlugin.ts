@@ -50,7 +50,7 @@ const PgSubscriptionResolverPlugin: Plugin = function(builder, { pubsub }) {
             parent: any,
             args: any,
             resolveContext: any,
-            resolveInfo: any
+            resolveInfo: any,
           ) => {
             const topic =
               typeof topicGen === "function"
@@ -70,7 +70,7 @@ const PgSubscriptionResolverPlugin: Plugin = function(builder, { pubsub }) {
             if (unsubscribeTopic) {
               // Subscribe to event revoking subscription
               const unsubscribeTopics: Array<string> = Array.isArray(
-                unsubscribeTopic
+                unsubscribeTopic,
               )
                 ? unsubscribeTopic
                 : [unsubscribeTopic];
@@ -83,7 +83,7 @@ const PgSubscriptionResolverPlugin: Plugin = function(builder, { pubsub }) {
                 unsubscribeIterator.next().then(() => {
                   debug(
                     "Unsubscribe triggered on channel %s",
-                    unsubscribeIterator["topic"]
+                    unsubscribeIterator["topic"],
                   );
                   if (asyncIterator.return) {
                     asyncIterator.return();
@@ -100,14 +100,14 @@ const PgSubscriptionResolverPlugin: Plugin = function(builder, { pubsub }) {
             if (filter) {
               if (typeof filter !== "function") {
                 throw new Error(
-                  "filter provided to pgSubscription must be a function"
+                  "filter provided to pgSubscription must be a function",
                 );
               }
               return withFilter(() => asyncIterator, filter)(
                 parent,
                 args,
                 resolveContext,
-                resolveInfo
+                resolveInfo,
               );
             }
             return asyncIterator;
@@ -120,10 +120,10 @@ const PgSubscriptionResolverPlugin: Plugin = function(builder, { pubsub }) {
                 },
               }),
         },
-        "Adding subscribe function to Subscription field"
+        "Adding subscribe function to Subscription field",
       );
     },
-    ["PgSubscriptionResolver"]
+    ["PgSubscriptionResolver"],
   );
 };
 

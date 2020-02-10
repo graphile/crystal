@@ -63,7 +63,7 @@ const DummyConnectionPlugin = async builder => {
             return {
               map: () => ({
                 [getSafeAliasFromAlias(alias)]: Math.floor(
-                  Math.random() * 10000
+                  Math.random() * 10000,
                 ),
               }),
             };
@@ -84,7 +84,7 @@ const DummyConnectionPlugin = async builder => {
           };
         },
       },
-      {}
+      {},
     );
     return extend(fields, {
       dummyConnection: fieldWithHooks(
@@ -103,7 +103,7 @@ const DummyConnectionPlugin = async builder => {
           addArgDataGenerator(function connectionAfter(
             { after },
             ReturnType,
-            data
+            data,
           ) {
             const sorts = data.sort || [];
             if (after) {
@@ -119,7 +119,7 @@ const DummyConnectionPlugin = async builder => {
                     const comparison = compare(
                       afterValues[i],
                       obj[field],
-                      ascending
+                      ascending,
                     );
                     return (
                       comparison < 0 || (comparison === 0 && oldFilter(obj))
@@ -166,15 +166,17 @@ const DummyConnectionPlugin = async builder => {
                                   (
                                     parsedResolveInfoFragment,
                                     ReturnType,
-                                    data
+                                    data,
                                   ) => {
                                     if (data.sort) {
                                       return {
                                         map: obj => ({
                                           __cursor: base64(
                                             JSON.stringify(
-                                              data.sort.map(([key]) => obj[key])
-                                            )
+                                              data.sort.map(
+                                                ([key]) => obj[key],
+                                              ),
+                                            ),
                                           ),
                                         }),
                                       };
@@ -185,7 +187,7 @@ const DummyConnectionPlugin = async builder => {
                                         }),
                                       };
                                     }
-                                  }
+                                  },
                                 );
                                 return {
                                   cursor: {
@@ -203,9 +205,9 @@ const DummyConnectionPlugin = async builder => {
                                 };
                               },
                             },
-                            {}
-                          )
-                        )
+                            {},
+                          ),
+                        ),
                       ),
                       resolve(data) {
                         return data;
@@ -220,7 +222,7 @@ const DummyConnectionPlugin = async builder => {
                   };
                 },
               },
-              {}
+              {},
             ),
             args: {
               first: {
@@ -258,7 +260,7 @@ const DummyConnectionPlugin = async builder => {
               parsedResolveInfoFragment.args = args; // Allow overriding via makeWrapResolversPlugin
               const resolveData = getDataFromParsedResolveInfoFragment(
                 parsedResolveInfoFragment,
-                resolveInfo.returnType
+                resolveInfo.returnType,
               );
               let result = dummyData.slice();
               for (const filter of resolveData.filter || []) {
@@ -275,14 +277,14 @@ const DummyConnectionPlugin = async builder => {
                 const idx = dummyData.indexOf(entry);
                 return (resolveData.map || []).reduce(
                   (memo, map) => Object.assign(memo, map(entry, idx)),
-                  {}
+                  {},
                 );
               });
               return ret;
             },
           };
         },
-        { isDummyConnectionField: true }
+        { isDummyConnectionField: true },
       ),
     });
   });
@@ -313,7 +315,7 @@ test("no arguments", async () => {
           }
         }
       }
-    `
+    `,
   );
   if (result.errors) {
     // eslint-disable-next-line no-console
@@ -327,7 +329,7 @@ test("no arguments", async () => {
     "qux",
   ]);
   expect(result.data.dummyConnection.edges.map(({ cursor }) => cursor)).toEqual(
-    ["0", "1", "2", "3"]
+    ["0", "1", "2", "3"],
   );
   expect(result).toMatchSnapshot();
 });
@@ -352,7 +354,7 @@ test("sort", async () => {
           }
         }
       }
-    `
+    `,
   );
   if (result.errors) {
     // eslint-disable-next-line no-console
@@ -368,7 +370,7 @@ test("sort", async () => {
   expect(
     result.data.dummyConnection.edges
       .map(({ cursor }) => cursor)
-      .map(base64Decode)
+      .map(base64Decode),
   ).toEqual(['["bar"]', '["baz"]', '["foo"]', '["qux"]']);
   expect(result).toMatchSnapshot();
 });
@@ -393,14 +395,14 @@ test("after", async () => {
           }
         }
       }
-    `
+    `,
   );
   expect(result.data.dummyConnection.nodes.map(n => n.id)).toEqual([
     "baz",
     "qux",
   ]);
   expect(result.data.dummyConnection.edges.map(({ cursor }) => cursor)).toEqual(
-    ["2", "3"]
+    ["2", "3"],
   );
   expect(result).toMatchSnapshot();
 });
@@ -425,7 +427,7 @@ test("sort, after", async () => {
           }
         }
       }
-    `
+    `,
   );
   if (result.errors) {
     // eslint-disable-next-line no-console
@@ -439,7 +441,7 @@ test("sort, after", async () => {
   expect(
     result.data.dummyConnection.edges
       .map(({ cursor }) => cursor)
-      .map(base64Decode)
+      .map(base64Decode),
   ).toEqual(['["foo"]', '["qux"]']);
   expect(result).toMatchSnapshot();
 });

@@ -21,7 +21,7 @@ const WATCH_FIXTURES_PATH = `${__dirname}/../../res/watch-fixtures.sql`;
 
 // TODO: rename RawishIntrospectionResults
 export type PgAugmentIntrospectionResultsFn = (
-  introspectionResult: RawishIntrospectionResults
+  introspectionResult: RawishIntrospectionResults,
 ) => RawishIntrospectionResults;
 
 declare module "graphile-build" {
@@ -277,7 +277,7 @@ const removeQuotes = (str: string) => {
   if (trimmed[0] === '"') {
     if (trimmed[trimmed.length - 1] !== '"') {
       throw new Error(
-        `We failed to parse a quoted identifier '${str}'. Please avoid putting quotes or commas in smart comment identifiers (or file a PR to fix the parser).`
+        `We failed to parse a quoted identifier '${str}'. Please avoid putting quotes or commas in smart comment identifiers (or file a PR to fix the parser).`,
       );
     }
     return trimmed.substr(1, trimmed.length - 2);
@@ -313,19 +313,19 @@ function parseConstraintSpec(rawSpec: string) {
 }
 
 function smartCommentConstraints(
-  introspectionResults: RawishIntrospectionResults
+  introspectionResults: RawishIntrospectionResults,
 ) {
   const attributesByNames = (
     tbl: PgClass,
     cols: string[],
-    debugStr: string
+    debugStr: string,
   ): PgAttribute[] => {
     const attributes = introspectionResults.attribute
       .filter(a => a.classId === tbl.id)
       .sort((a, b) => a.num - b.num);
     if (!cols) {
       const pk = introspectionResults.constraint.find(
-        c => c.classId == tbl.id && c.type === "p"
+        c => c.classId == tbl.id && c.type === "p",
       );
 
       if (pk) {
@@ -333,14 +333,14 @@ function smartCommentConstraints(
           const attr = attributes.find(a => a.num === n);
           if (!attr) {
             throw new Error(
-              `Could not find attribute '${n}' in '${describePgEntity(pk)}'`
+              `Could not find attribute '${n}' in '${describePgEntity(pk)}'`,
             );
           }
           return attr;
         });
       } else {
         throw new Error(
-          `No columns specified for '${tbl.namespaceName}.${tbl.name}' (oid: ${tbl.id}) and no PK found (${debugStr}).`
+          `No columns specified for '${tbl.namespaceName}.${tbl.name}' (oid: ${tbl.id}) and no PK found (${debugStr}).`,
         );
       }
     }
@@ -348,7 +348,7 @@ function smartCommentConstraints(
       const attr = attributes.find(a => a.name === colName);
       if (!attr) {
         throw new Error(
-          `Could not find attribute '${colName}' in '${tbl.namespaceName}.${tbl.name}'`
+          `Could not find attribute '${colName}' in '${tbl.namespaceName}.${tbl.name}'`,
         );
       }
       return attr;
@@ -358,7 +358,7 @@ function smartCommentConstraints(
   // First: primary keys
   introspectionResults.class.forEach(klass => {
     const namespace = introspectionResults.namespace.find(
-      n => n.id === klass.namespaceId
+      n => n.id === klass.namespaceId,
     );
 
     if (!namespace) {
@@ -367,18 +367,18 @@ function smartCommentConstraints(
     if (klass.tags.primaryKey) {
       if (typeof klass.tags.primaryKey !== "string") {
         throw new Error(
-          `@primaryKey configuration of '${klass.namespaceName}.${klass.name}' is invalid; please specify just once "@primaryKey col1,col2"`
+          `@primaryKey configuration of '${klass.namespaceName}.${klass.name}' is invalid; please specify just once "@primaryKey col1,col2"`,
         );
       }
       const { spec: pkSpec, tags, description } = parseConstraintSpec(
-        klass.tags.primaryKey
+        klass.tags.primaryKey,
       );
 
       const columns: string[] = parseSqlColumnArray(pkSpec);
       const attributes = attributesByNames(
         klass,
         columns,
-        `@primaryKey ${klass.tags.primaryKey}`
+        `@primaryKey ${klass.tags.primaryKey}`,
       );
 
       attributes.forEach(attr => {
@@ -415,7 +415,7 @@ function smartCommentConstraints(
   // Now primary keys are in place, we can apply foreign keys
   introspectionResults.class.forEach(klass => {
     const namespace = introspectionResults.namespace.find(
-      n => n.id === klass.namespaceId
+      n => n.id === klass.namespaceId,
     );
 
     if (!namespace) {
@@ -429,26 +429,26 @@ function smartCommentConstraints(
         typeof foreignKey === "string" ? [foreignKey] : foreignKey;
       if (!Array.isArray(foreignKeys)) {
         throw new Error(
-          `Invalid foreign key smart comment specified on '${klass.namespaceName}.${klass.name}'`
+          `Invalid foreign key smart comment specified on '${klass.namespaceName}.${klass.name}'`,
         );
       }
       foreignKeys.forEach((fkSpecRaw, index) => {
         if (typeof fkSpecRaw !== "string") {
           throw new Error(
-            `Invalid foreign key spec (${index}) on '${klass.namespaceName}.${klass.name}'`
+            `Invalid foreign key spec (${index}) on '${klass.namespaceName}.${klass.name}'`,
           );
         }
         const { spec: fkSpec, tags, description } = parseConstraintSpec(
-          fkSpecRaw
+          fkSpecRaw,
         );
 
         const matches = fkSpec.match(
-          /^\(([^()]+)\) references ([^().]+)(?:\.([^().]+))?(?:\s*\(([^()]+)\))?$/i
+          /^\(([^()]+)\) references ([^().]+)(?:\.([^().]+))?(?:\s*\(([^()]+)\))?$/i,
         );
 
         if (!matches) {
           throw new Error(
-            `Invalid foreignKey syntax for '${klass.namespaceName}.${klass.name}'; expected something like "(col1,col2) references schema.table (c1, c2)", you passed '${fkSpecRaw}'`
+            `Invalid foreignKey syntax for '${klass.namespaceName}.${klass.name}'; expected something like "(col1,col2) references schema.table (c1, c2)", you passed '${fkSpecRaw}'`,
           );
         }
         const [
@@ -470,16 +470,16 @@ function smartCommentConstraints(
           : null;
 
         const foreignKlass = introspectionResults.class.find(
-          k => k.name === foreignTable && k.namespaceName === foreignSchema
+          k => k.name === foreignTable && k.namespaceName === foreignSchema,
         );
 
         if (!foreignKlass) {
           throw new Error(
-            `@foreignKey smart comment referenced non-existant table/view '${foreignSchema}'.'${foreignTable}'. Note that this reference must use *database names* (i.e. it does not respect @name). (${fkSpecRaw})`
+            `@foreignKey smart comment referenced non-existant table/view '${foreignSchema}'.'${foreignTable}'. Note that this reference must use *database names* (i.e. it does not respect @name). (${fkSpecRaw})`,
           );
         }
         const foreignNamespace = introspectionResults.namespace.find(
-          n => n.id === foreignKlass.namespaceId
+          n => n.id === foreignKlass.namespaceId,
         );
 
         if (!foreignNamespace) {
@@ -489,12 +489,12 @@ function smartCommentConstraints(
         const keyAttributeNums = attributesByNames(
           klass,
           columns,
-          `@foreignKey ${fkSpecRaw}`
+          `@foreignKey ${fkSpecRaw}`,
         ).map(a => a.num);
         const foreignKeyAttributeNums = attributesByNames(
           foreignKlass,
           foreignColumns!,
-          `@foreignKey ${fkSpecRaw}`
+          `@foreignKey ${fkSpecRaw}`,
         ).map(a => a.num);
 
         // Now we need to fake a constraint for this:
@@ -550,7 +550,7 @@ function deepClone<T>(value: T): T {
         memo[k] = deepClone(value[k]);
         return memo;
       },
-      {} as T
+      {} as T,
     );
   } else {
     return value;
@@ -569,7 +569,7 @@ export default (async function PgIntrospectionPlugin(
     pgLegacyFunctionsOnly = false,
     pgSkipInstallingWatchFixtures = false,
     pgOwnerConnectionString,
-  }
+  },
 ) {
   /**
    * Introspect database and get the table/view/constraints.
@@ -588,19 +588,19 @@ export default (async function PgIntrospectionPlugin(
             pgConfig,
             async (pgClient): Promise<RawishIntrospectionResults> => {
               const versionResult = await pgClient.query(
-                "show server_version_num;"
+                "show server_version_num;",
               );
 
               const serverVersionNum = parseInt(
                 versionResult.rows[0].server_version_num,
-                10
+                10,
               );
 
               const introspectionQuery = makeIntrospectionQuery(
                 serverVersionNum,
                 {
                   pgLegacyFunctionsOnly,
-                }
+                },
               );
 
               const { rows } = await pgClient.query(introspectionQuery, [
@@ -650,7 +650,7 @@ export default (async function PgIntrospectionPlugin(
 
               const extensionConfigurationClassIds = flatMap(
                 result.extension,
-                e => e.configurationClassIds
+                e => e.configurationClassIds,
               );
 
               result.class.forEach(klass => {
@@ -672,20 +672,20 @@ export default (async function PgIntrospectionPlugin(
               });
 
               return Object.freeze(result);
-            }
-          )
-      )
+            },
+          ),
+      ),
     );
 
     const knownSchemas = rawishIntrospectionResultsByKind.namespace.map(
-      n => n.name
+      n => n.name,
     );
     const missingSchemas = schemas.filter(s => knownSchemas.indexOf(s) < 0);
     if (missingSchemas.length) {
       const errorMessage = `You requested to use schema '${schemas.join(
-        "', '"
+        "', '",
       )}'; however we couldn't find some of those! Missing schemas are: '${missingSchemas.join(
-        "', '"
+        "', '",
       )}'`;
       if (pgThrowOnMissingSchema) {
         throw new Error(errorMessage);
@@ -697,7 +697,7 @@ export default (async function PgIntrospectionPlugin(
   }
   function introspectionResultsFromRaw(
     rawResults: RawishIntrospectionResults,
-    pgAugmentIntrospectionResults?: PgAugmentIntrospectionResultsFn
+    pgAugmentIntrospectionResults?: PgAugmentIntrospectionResultsFn,
   ): PgIntrospectionResultsByKind {
     const rawishIntrospectionResultsByKind = deepClone(rawResults);
 
@@ -707,7 +707,7 @@ export default (async function PgIntrospectionPlugin(
           memo[x[attrKey]] = x;
           return memo;
         },
-        {} as { [attrKey: string]: X }
+        {} as { [attrKey: string]: X },
       );
     const xByYAndZ = <X>(arrayOfX: X[], attrKey: string, attrKey2: string) =>
       arrayOfX.reduce(
@@ -716,7 +716,7 @@ export default (async function PgIntrospectionPlugin(
           memo[x[attrKey]][x[attrKey2]] = x;
           return memo;
         },
-        {} as { [attrKey: string]: { [attrKey: string]: X } }
+        {} as { [attrKey: string]: { [attrKey: string]: X } },
       );
     const introspectionResultsByKind: PgIntrospectionResultsByKind = {
       ...rawishIntrospectionResultsByKind,
@@ -726,7 +726,7 @@ export default (async function PgIntrospectionPlugin(
       attributeByClassIdAndNum: xByYAndZ(
         rawishIntrospectionResultsByKind.attribute,
         "classId",
-        "num"
+        "num",
       ),
       extensionById: xByY(rawishIntrospectionResultsByKind.extension, "id"),
     };
@@ -736,7 +736,7 @@ export default (async function PgIntrospectionPlugin(
       newAttr: string,
       lookupAttr: string,
       lookup: { [id: string]: PgEntity },
-      missingOk = false
+      missingOk = false,
     ) {
       array.forEach(entry => {
         const key = entry[lookupAttr];
@@ -750,8 +750,8 @@ export default (async function PgIntrospectionPlugin(
                 }
                 throw new Error(
                   `Could not look up '${newAttr}' by '${lookupAttr}' ('${innerKey}') on '${JSON.stringify(
-                    entry
-                  )}'`
+                    entry,
+                  )}'`,
                 );
               }
               return result;
@@ -765,8 +765,8 @@ export default (async function PgIntrospectionPlugin(
             }
             throw new Error(
               `Could not look up '${newAttr}' by '${lookupAttr}' on '${JSON.stringify(
-                entry
-              )}'`
+                entry,
+              )}'`,
             );
           }
           entry[newAttr] = result;
@@ -776,7 +776,7 @@ export default (async function PgIntrospectionPlugin(
 
     const augment = (introspectionResults: RawishIntrospectionResults) => {
       [pgAugmentIntrospectionResults, smartCommentConstraints].forEach(fn =>
-        fn ? fn(introspectionResults) : null
+        fn ? fn(introspectionResults) : null,
       );
     };
     augment(introspectionResultsByKind);
@@ -786,35 +786,35 @@ export default (async function PgIntrospectionPlugin(
       "namespace",
       "namespaceId",
       introspectionResultsByKind.namespaceById,
-      true // Because it could be a type defined in a different namespace - which is fine so long as we don't allow querying it directly
+      true, // Because it could be a type defined in a different namespace - which is fine so long as we don't allow querying it directly
     );
 
     relate(
       introspectionResultsByKind.class,
       "type",
       "typeId",
-      introspectionResultsByKind.typeById
+      introspectionResultsByKind.typeById,
     );
 
     relate(
       introspectionResultsByKind.attribute,
       "class",
       "classId",
-      introspectionResultsByKind.classById
+      introspectionResultsByKind.classById,
     );
 
     relate(
       introspectionResultsByKind.attribute,
       "type",
       "typeId",
-      introspectionResultsByKind.typeById
+      introspectionResultsByKind.typeById,
     );
 
     relate(
       introspectionResultsByKind.procedure,
       "namespace",
       "namespaceId",
-      introspectionResultsByKind.namespaceById
+      introspectionResultsByKind.namespaceById,
     );
 
     relate(
@@ -822,7 +822,7 @@ export default (async function PgIntrospectionPlugin(
       "class",
       "classId",
       introspectionResultsByKind.classById,
-      true
+      true,
     );
 
     relate(
@@ -830,7 +830,7 @@ export default (async function PgIntrospectionPlugin(
       "domainBaseType",
       "domainBaseTypeId",
       introspectionResultsByKind.typeById,
-      true // Because not all types are domains
+      true, // Because not all types are domains
     );
 
     relate(
@@ -838,14 +838,14 @@ export default (async function PgIntrospectionPlugin(
       "arrayItemType",
       "arrayItemTypeId",
       introspectionResultsByKind.typeById,
-      true // Because not all types are arrays
+      true, // Because not all types are arrays
     );
 
     relate(
       introspectionResultsByKind.constraint,
       "class",
       "classId",
-      introspectionResultsByKind.classById
+      introspectionResultsByKind.classById,
     );
 
     relate(
@@ -853,7 +853,7 @@ export default (async function PgIntrospectionPlugin(
       "foreignClass",
       "foreignClassId",
       introspectionResultsByKind.classById,
-      true // Because many constraints don't apply to foreign classes
+      true, // Because many constraints don't apply to foreign classes
     );
 
     relate(
@@ -861,7 +861,7 @@ export default (async function PgIntrospectionPlugin(
       "namespace",
       "namespaceId",
       introspectionResultsByKind.namespaceById,
-      true // Because the extension could be a defined in a different namespace
+      true, // Because the extension could be a defined in a different namespace
     );
 
     relate(
@@ -869,14 +869,14 @@ export default (async function PgIntrospectionPlugin(
       "configurationClasses",
       "configurationClassIds",
       introspectionResultsByKind.classById,
-      true // Because the configuration table could be a defined in a different namespace
+      true, // Because the configuration table could be a defined in a different namespace
     );
 
     relate(
       introspectionResultsByKind.index,
       "class",
       "classId",
-      introspectionResultsByKind.classById
+      introspectionResultsByKind.classById,
     );
 
     // Reverse arrayItemType -> arrayType
@@ -889,23 +889,23 @@ export default (async function PgIntrospectionPlugin(
     // Table/type columns / constraints
     introspectionResultsByKind.class.forEach(klass => {
       klass.attributes = introspectionResultsByKind.attribute.filter(
-        attr => attr.classId === klass.id
+        attr => attr.classId === klass.id,
       );
 
       klass.canUseAsterisk = !klass.attributes.some(
-        attr => attr.columnLevelSelectGrant
+        attr => attr.columnLevelSelectGrant,
       );
 
       klass.constraints = introspectionResultsByKind.constraint.filter(
-        constraint => constraint.classId === klass.id
+        constraint => constraint.classId === klass.id,
       );
 
       klass.foreignConstraints = introspectionResultsByKind.constraint.filter(
-        constraint => constraint.foreignClassId === klass.id
+        constraint => constraint.foreignClassId === klass.id,
       );
 
       klass.primaryKeyConstraint = klass.constraints.find(
-        constraint => constraint.type === "p"
+        constraint => constraint.type === "p",
       );
     });
 
@@ -914,13 +914,13 @@ export default (async function PgIntrospectionPlugin(
       if (constraint.keyAttributeNums && constraint.class) {
         constraint.keyAttributes = constraint.keyAttributeNums.map(nr => {
           const attr = constraint.class.attributes.find(
-            attr => attr.num === nr
+            attr => attr.num === nr,
           );
           if (!attr) {
             throw new Error(
               `Could not find attribute with index '${nr}' on '${describePgEntity(
-                constraint.class
-              )}`
+                constraint.class,
+              )}`,
             );
           }
           return attr;
@@ -936,12 +936,12 @@ export default (async function PgIntrospectionPlugin(
             if (!attr) {
               throw new Error(
                 `Could not find attribute with index '${nr}' on '${describePgEntity(
-                  constraint.class
-                )}`
+                  constraint.class,
+                )}`,
               );
             }
             return attr;
-          }
+          },
         );
       } else {
         constraint.foreignKeyAttributes = [];
@@ -951,7 +951,7 @@ export default (async function PgIntrospectionPlugin(
     // Detect which columns and constraints are indexed
     introspectionResultsByKind.index.forEach(index => {
       const columns = index.attributeNums.map(nr =>
-        index.class.attributes.find(attr => attr.num === nr)
+        index.class.attributes.find(attr => attr.num === nr),
       );
 
       // Indexed column (for orderBy / filter):
@@ -969,7 +969,7 @@ export default (async function PgIntrospectionPlugin(
         .forEach(constraint => {
           if (
             constraint.keyAttributeNums.every(
-              (nr, idx) => index.attributeNums[idx] === nr
+              (nr, idx) => index.attributeNums[idx] === nr,
             )
           ) {
             constraint.isIndexed = true;
@@ -1011,7 +1011,7 @@ export default (async function PgIntrospectionPlugin(
         {
           leading: true,
           trailing: true,
-        }
+        },
       );
 
       this._listener = this._listener.bind(this);
@@ -1055,20 +1055,20 @@ export default (async function PgIntrospectionPlugin(
                     /* eslint-disable no-console */
                     console.warn(
                       `${chalk.bold.yellow(
-                        "Failed to setup watch fixtures in Postgres database"
-                      )} ️️⚠️`
+                        "Failed to setup watch fixtures in Postgres database",
+                      )} ️️⚠️`,
                     );
 
                     console.warn(
                       chalk.yellow(
-                        "This is likely because the PostgreSQL user in the connection string does not have sufficient privileges; you can solve this by passing the 'owner' connection string via '--owner-connection' / 'ownerConnectionString'. If the fixtures already exist, the watch functionality may still work."
-                      )
+                        "This is likely because the PostgreSQL user in the connection string does not have sufficient privileges; you can solve this by passing the 'owner' connection string via '--owner-connection' / 'ownerConnectionString'. If the fixtures already exist, the watch functionality may still work.",
+                      ),
                     );
 
                     console.warn(
                       chalk.yellow(
-                        "Enable DEBUG='graphile-build-pg' to see the error"
-                      )
+                        "Enable DEBUG='graphile-build-pg' to see the error",
+                      ),
                     );
 
                     /* eslint-enable no-console */
@@ -1077,7 +1077,7 @@ export default (async function PgIntrospectionPlugin(
                 } finally {
                   await pgClient.query("commit;");
                 }
-              }
+              },
             );
           }
 
@@ -1105,7 +1105,7 @@ export default (async function PgIntrospectionPlugin(
       // eslint-disable-next-line no-console
       console.error(
         "Error occurred for PG watching client; reconnecting in 2 seconds.",
-        e.message
+        e.message,
       );
 
       await this._releaseClient();
@@ -1141,7 +1141,7 @@ export default (async function PgIntrospectionPlugin(
         if (payload.type === "ddl") {
           const commands = (payload.payload || [])
             .filter(
-              ({ schema }) => schema == null || schemas.indexOf(schema) >= 0
+              ({ schema }) => schema == null || schemas.indexOf(schema) >= 0,
             )
             .map(({ command }) => command);
           if (commands.length) {
@@ -1149,7 +1149,7 @@ export default (async function PgIntrospectionPlugin(
           }
         } else if (payload.type === "drop") {
           const affectsOurSchemas = (payload.payload || []).some(
-            schemaName => schemas.indexOf(schemaName) >= 0
+            schemaName => schemas.indexOf(schemaName) >= 0,
           );
 
           if (affectsOurSchemas) {
@@ -1159,7 +1159,7 @@ export default (async function PgIntrospectionPlugin(
           this._handleChange();
         } else {
           throw new Error(
-            `Payload type '${(payload as any).type}' not recognised`
+            `Payload type '${(payload as any).type}' not recognised`,
           );
         }
       } catch (e) {
@@ -1208,7 +1208,7 @@ export default (async function PgIntrospectionPlugin(
       if (l) {
         await l.stop();
       }
-    }
+    },
   );
 
   builder.hook(
@@ -1216,7 +1216,7 @@ export default (async function PgIntrospectionPlugin(
     build => {
       const introspectionResultsByKind = introspectionResultsFromRaw(
         rawIntrospectionResultsByKind,
-        build.pgAugmentIntrospectionResults
+        build.pgAugmentIntrospectionResults,
       );
       if (introspectionResultsByKind.__pgVersion < 90500) {
         // TODO:v5: remove this workaround
@@ -1231,11 +1231,11 @@ export default (async function PgIntrospectionPlugin(
         {
           pgIntrospectionResultsByKind: introspectionResultsByKind,
         },
-        "Adding PG introspection results from graphile-build-pg PgIntrospectionPlugin"
+        "Adding PG introspection results from graphile-build-pg PgIntrospectionPlugin",
       );
     },
     ["PgIntrospection"],
     [],
-    ["PgBasics"]
+    ["PgBasics"],
   );
 } as Plugin);

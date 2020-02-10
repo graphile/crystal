@@ -88,8 +88,8 @@ yarn add postgraphile
 ```
 
 ```js
-import { createServer } from 'http';
-import postgraphile from 'postgraphile';
+import { createServer } from "http";
+import postgraphile from "postgraphile";
 
 createServer(postgraphile());
 ```

@@ -32,7 +32,7 @@ export default (function PgConnectionArgOrderByDefaultValue(builder) {
       }
       const tableTypeName = getNamedType(TableType).name;
       const TableOrderByType = getTypeByName(
-        inflection.orderByType(tableTypeName)
+        inflection.orderByType(tableTypeName),
       );
 
       if (!TableOrderByType || !(TableOrderByType instanceof GraphQLEnumType)) {
@@ -52,12 +52,12 @@ export default (function PgConnectionArgOrderByDefaultValue(builder) {
               defaultValue: defaultValueEnum && [defaultValueEnum.value],
             },
 
-            `Adding defaultValue to orderBy for field '${fieldName}' of '${Self.name}' (inner)`
+            `Adding defaultValue to orderBy for field '${fieldName}' of '${Self.name}' (inner)`,
           ),
         },
-        `Adding defaultValue to orderBy for field '${fieldName}' of '${Self.name}' (outer)`
+        `Adding defaultValue to orderBy for field '${fieldName}' of '${Self.name}' (outer)`,
       );
     },
-    ["PgConnectionArgOrderByDefaultValue"]
+    ["PgConnectionArgOrderByDefaultValue"],
   );
 } as Plugin);

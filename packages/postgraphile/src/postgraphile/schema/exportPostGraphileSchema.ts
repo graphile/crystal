@@ -1,21 +1,24 @@
-import { readFile as origReadFile, writeFile as origWriteFile } from 'fs';
+import { readFile as origReadFile, writeFile as origWriteFile } from "fs";
 import {
   graphql,
   GraphQLSchema,
   introspectionQuery,
   printSchema,
   lexicographicSortSchema,
-} from 'graphql';
-import { PostGraphileOptions } from '../../interfaces';
-import { promisify } from 'util';
+} from "graphql";
+import { PostGraphileOptions } from "../../interfaces";
+import { promisify } from "util";
 
 const readFile = promisify(origReadFile);
 const writeFile = promisify(origWriteFile);
 
-async function writeFileIfDiffers(path: string, contents: string): Promise<void> {
+async function writeFileIfDiffers(
+  path: string,
+  contents: string,
+): Promise<void> {
   let oldContents: string | null = null;
   try {
-    oldContents = await readFile(path, 'utf8');
+    oldContents = await readFile(path, "utf8");
   } catch (e) {
     /* noop */
   }
@@ -32,9 +35,13 @@ export default async function exportPostGraphileSchema(
   options: PostGraphileOptions = {},
 ): Promise<void> {
   const jsonPath =
-    typeof options.exportJsonSchemaPath === 'string' ? options.exportJsonSchemaPath : null;
+    typeof options.exportJsonSchemaPath === "string"
+      ? options.exportJsonSchemaPath
+      : null;
   const graphqlPath =
-    typeof options.exportGqlSchemaPath === 'string' ? options.exportGqlSchemaPath : null;
+    typeof options.exportGqlSchemaPath === "string"
+      ? options.exportGqlSchemaPath
+      : null;
 
   // Sort schema, if requested
   const finalSchema =

@@ -5,7 +5,7 @@ import { PgClass, PgProc, PgEntityKind, PgType } from "./PgIntrospectionPlugin";
 export const getComputedColumnDetails = (
   build: Build,
   table: PgClass,
-  proc: PgProc
+  proc: PgProc,
 ) => {
   if (!proc.isStable) return null;
   if (proc.namespaceId !== table.namespaceId) return null;
@@ -24,7 +24,7 @@ export const getComputedColumnDetails = (
       }
       return prev;
     },
-    [] as PgType[]
+    [] as PgType[],
   );
   if (
     argTypes
@@ -41,7 +41,7 @@ export const getComputedColumnDetails = (
 
 export default (function PgComputedColumnsPlugin(
   builder,
-  { pgSimpleCollections }
+  { pgSimpleCollections },
 ) {
   builder.hook(
     "GraphQLObjectType:fields",
@@ -84,7 +84,7 @@ export default (function PgComputedColumnsPlugin(
           const computedColumnDetails = getComputedColumnDetails(
             build,
             table,
-            proc
+            proc,
           );
 
           if (!computedColumnDetails) return memo;
@@ -105,13 +105,13 @@ export default (function PgComputedColumnsPlugin(
                 },
 
                 `Adding computed column for ${describePgEntity(
-                  proc
+                  proc,
                 )}. You can rename this field with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
                   proc,
                   {
                     fieldName: "newNameHere",
-                  }
-                )}`
+                  },
+                )}`,
               );
             } catch (e) {
               swallowError(e);
@@ -130,9 +130,9 @@ export default (function PgComputedColumnsPlugin(
           }
           return memo;
         }, {}),
-        `Adding computed column to '${Self.name}'`
+        `Adding computed column to '${Self.name}'`,
       );
     },
-    ["PgComputedColumns"]
+    ["PgComputedColumns"],
   );
 } as Plugin);

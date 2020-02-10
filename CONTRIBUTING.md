@@ -53,7 +53,7 @@ significantly.
 // Slow:
 const result = ["a", "b", "c"].reduce(
   (memo, letter) => ({ ...memo, [letter]: true }),
-  {}
+  {},
 );
 
 // Faster:

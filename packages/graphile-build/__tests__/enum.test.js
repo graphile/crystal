@@ -22,7 +22,7 @@ function EnumPlugin(builder) {
       },
       {
         isMyEnum: true,
-      }
+      },
     );
     return extend(fields, {
       enum: {

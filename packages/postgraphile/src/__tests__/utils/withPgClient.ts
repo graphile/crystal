@@ -1,6 +1,6 @@
-import { PoolClient } from 'pg';
-import pgPool from './pgPool';
-import kitchenSinkSchemaSql from './kitchenSinkSchemaSql';
+import { PoolClient } from "pg";
+import pgPool from "./pgPool";
+import kitchenSinkSchemaSql from "./kitchenSinkSchemaSql";
 
 /**
  * Takes a function implementation of a test, and provides it a Postgres
@@ -20,9 +20,9 @@ export default function withPgClient<T>(
     // is resolved correctly.
     //
     // @see https://github.com/brianc/node-postgres/issues/1142
-    if ((client as object)['errno']) throw client;
+    if ((client as object)["errno"]) throw client;
 
-    await client.query('begin');
+    await client.query("begin");
     await client.query("set local timezone to '+04:00'");
 
     // Run our kichen sink schema Sql, if there is an error we should report it
@@ -30,7 +30,7 @@ export default function withPgClient<T>(
       await client.query(await kitchenSinkSchemaSql);
     } catch (error) {
       // Release the client if an error was thrown.
-      await client.query('rollback');
+      await client.query("rollback");
       client.release();
       // Log the error for debugging purposes.
       console.error(error.stack || error); // tslint:disable-line no-console
@@ -47,7 +47,7 @@ export default function withPgClient<T>(
     } finally {
       // Always rollback our changes and release the client, even if the test
       // fails.
-      await client.query('rollback');
+      await client.query("rollback");
       client.release();
     }
 

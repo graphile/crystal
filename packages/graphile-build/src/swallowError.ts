@@ -20,12 +20,12 @@ export default function swallowError(e: Error): void {
     if (errorSnippet) {
       // eslint-disable-next-line no-console
       console.warn(
-        `Recoverable error occurred; use envvar 'DEBUG="graphile-build:warn"' for full error (see: https://graphile.org/postgraphile/debugging )\n> ${errorSnippet}…`
+        `Recoverable error occurred; use envvar 'DEBUG="graphile-build:warn"' for full error (see: https://graphile.org/postgraphile/debugging )\n> ${errorSnippet}…`,
       );
     } else {
       // eslint-disable-next-line no-console
       console.warn(
-        `Recoverable error occurred; use envvar 'DEBUG="graphile-build:warn"' for error (see: https://graphile.org/postgraphile/debugging )`
+        `Recoverable error occurred; use envvar 'DEBUG="graphile-build:warn"' for error (see: https://graphile.org/postgraphile/debugging )`,
       );
     }
     debugWarn(e);

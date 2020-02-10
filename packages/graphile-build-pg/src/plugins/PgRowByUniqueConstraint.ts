@@ -10,7 +10,7 @@ declare module "graphile-build" {
 
 export default (async function PgRowByUniqueConstraint(
   builder,
-  { subscriptions }
+  { subscriptions },
 ) {
   builder.hook(
     "GraphQLObjectType:fields",
@@ -47,17 +47,17 @@ export default (async function PgRowByUniqueConstraint(
 
           const TableType = pgGetGqlTypeByTypeIdAndModifier(
             table.type.id,
-            null
+            null,
           );
 
           const sqlFullTableName = sql.identifier(
             table.namespace.name,
-            table.name
+            table.name,
           );
 
           if (TableType) {
             const uniqueConstraints = table.constraints.filter(
-              con => con.type === "u" || con.type === "p"
+              con => con.type === "u" || con.type === "p",
             );
 
             uniqueConstraints.forEach(constraint => {
@@ -70,13 +70,13 @@ export default (async function PgRowByUniqueConstraint(
               }
               if (!keys.every(_ => _)) {
                 throw new Error(
-                  "Consistency error: could not find an attribute!"
+                  "Consistency error: could not find an attribute!",
                 );
               }
               const fieldName = inflection.rowByUniqueKeys(
                 keys,
                 table,
-                constraint
+                constraint,
               );
 
               const keysIncludingMeta = keys.map(key => ({
@@ -91,7 +91,7 @@ export default (async function PgRowByUniqueConstraint(
               };
               const queryFromResolveDataCallback = (
                 queryBuilder: QueryBuilder,
-                args: { [argName: string]: any }
+                args: { [argName: string]: any },
               ) => {
                 if (subscriptions && table.primaryKeyConstraint) {
                   queryBuilder.selectIdentifiers(table);
@@ -103,10 +103,10 @@ export default (async function PgRowByUniqueConstraint(
                       sql.fragment`${sqlTableAlias}.${sqlIdentifier} = ${gql2pg(
                         args[columnName],
                         type,
-                        typeModifier
-                      )}`
+                        typeModifier,
+                      )}`,
                     );
-                  }
+                  },
                 );
               };
 
@@ -119,14 +119,14 @@ export default (async function PgRowByUniqueConstraint(
                       (memo, { typeId, typeModifier, columnName, name }) => {
                         const InputType = pgGetGqlInputTypeByTypeIdAndModifier(
                           typeId,
-                          typeModifier
+                          typeModifier,
                         );
 
                         if (!InputType) {
                           throw new Error(
                             `Could not find input type for key '${name}' on type '${
                               getNamedType(TableType).name
-                            }'`
+                            }'`,
                           );
                         }
                         memo[columnName] = {
@@ -135,7 +135,7 @@ export default (async function PgRowByUniqueConstraint(
 
                         return memo;
                       },
-                      {}
+                      {},
                     ),
 
                     async resolve(_parent, args, resolveContext, resolveInfo) {
@@ -145,13 +145,13 @@ export default (async function PgRowByUniqueConstraint(
                         resolveInfo.rootValue.liveRecord;
                       const parsedResolveInfoFragment = parseResolveInfo(
                         resolveInfo,
-                        true
+                        true,
                       );
 
                       parsedResolveInfoFragment.args = args; // Allow overriding via makeWrapResolversPlugin
                       const resolveData = getDataFromParsedResolveInfoFragment(
                         parsedResolveInfoFragment,
-                        TableType
+                        TableType,
                       );
 
                       const query = queryFromResolveData(
@@ -162,7 +162,7 @@ export default (async function PgRowByUniqueConstraint(
                         queryBuilder =>
                           queryFromResolveDataCallback(queryBuilder, args),
                         resolveContext,
-                        resolveInfo.rootValue
+                        resolveInfo.rootValue,
                       );
 
                       const { text, values } = sql.compile(query);
@@ -180,15 +180,15 @@ export default (async function PgRowByUniqueConstraint(
                 {
                   isPgRowByUniqueConstraintField: true,
                   pgFieldIntrospection: constraint,
-                }
+                },
               );
             });
           }
           return memo;
         }, {}),
-        `Adding "row by unique constraint" fields to root Query type`
+        `Adding "row by unique constraint" fields to root Query type`,
       );
     },
-    ["PgRowByUniqueConstraint"]
+    ["PgRowByUniqueConstraint"],
   );
 } as Plugin);

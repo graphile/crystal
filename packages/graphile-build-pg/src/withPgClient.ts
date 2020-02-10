@@ -45,7 +45,7 @@ export function quacksLikePgPool(pgConfig: unknown): boolean {
 
 export const getPgClientAndReleaserFromConfig = async (
   pgConfig: pg.PoolClient | pg.Pool | string | undefined = process.env
-    .DATABASE_URL
+    .DATABASE_URL,
 ) => {
   let releasePgClient = () => {};
   let pgClient: pg.PoolClient | pg.Client;
@@ -53,7 +53,7 @@ export const getPgClientAndReleaserFromConfig = async (
     pgClient = pgConfig as pg.PoolClient;
     if (!pgClient.release) {
       throw new Error(
-        "We only support PG clients from a PG pool (because otherwise the `await` call can hang indefinitely if an error occurs and there's no error handler)"
+        "We only support PG clients from a PG pool (because otherwise the `await` call can hang indefinitely if an error occurs and there's no error handler)",
       );
     }
   } else if (pgConfig instanceof pg.Pool || quacksLikePgPool(pgConfig)) {
@@ -69,15 +69,15 @@ export const getPgClientAndReleaserFromConfig = async (
     });
     releasePgClient = () =>
       new Promise<undefined>((resolve, reject) =>
-        client.end(err => (err ? reject(err) : resolve()))
+        client.end(err => (err ? reject(err) : resolve())),
       );
 
     await new Promise((resolve, reject) =>
-      client.connect(err => (err ? reject(err) : resolve()))
+      client.connect(err => (err ? reject(err) : resolve())),
     );
   } else {
     throw new Error(
-      "You must provide either a pg.Pool or pg.Client instance or a PostgreSQL connection string."
+      "You must provide either a pg.Pool or pg.Client instance or a PostgreSQL connection string.",
     );
   }
   return { pgClient, releasePgClient };
@@ -85,13 +85,13 @@ export const getPgClientAndReleaserFromConfig = async (
 
 const withPgClient = async (
   pgConfig: pg.PoolClient | pg.Pool | string | undefined,
-  fn: (pgClient: pg.PoolClient | pg.Client) => any
+  fn: (pgClient: pg.PoolClient | pg.Client) => any,
 ) => {
   if (!fn) {
     throw new Error("Nothing to do!");
   }
   const { pgClient, releasePgClient } = await getPgClientAndReleaserFromConfig(
-    pgConfig
+    pgConfig,
   );
 
   const errorHandler = (e: Error) => {

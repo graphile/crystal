@@ -131,7 +131,7 @@ export default class PgLogicalDecoding extends EventEmitter {
             from pg_catalog.pg_replication_slots
             where pg_replication_slots.slot_name = deleted_slots.slot_name
           )
-        `
+        `,
       );
     } catch (e) {
       if (e.code === "42P01") {
@@ -149,14 +149,14 @@ export default class PgLogicalDecoding extends EventEmitter {
     try {
       await client.query(
         `SELECT pg_catalog.pg_create_logical_replication_slot($1, 'wal2json', $2)`,
-        [this.slotName, !!this.temporary]
+        [this.slotName, !!this.temporary],
       );
     } catch (e) {
       if (e.code === "58P01") {
         const err = new FatalError(
           "Couldn't create replication slot, seems you don't have wal2json installed? Error: " +
             e.message,
-          e
+          e,
         );
         throw err;
       } else {
@@ -167,7 +167,7 @@ export default class PgLogicalDecoding extends EventEmitter {
 
   public async getChanges(
     uptoLsn: string | null = null,
-    uptoNchanges: number | null = null
+    uptoNchanges: number | null = null,
   ): Promise<Array<Payload>> {
     const client = await this.getClient();
     await this.trackSelf(client);
@@ -183,7 +183,7 @@ export default class PgLogicalDecoding extends EventEmitter {
         console.warn("Replication slot went away?");
         await this.createSlot();
         console.warn(
-          "Recreated slot; retrying getChanges (no further output implies success)"
+          "Recreated slot; retrying getChanges (no further output implies success)",
         );
         await sleep(500);
         return this.getChanges(uptoLsn, uptoNchanges);
@@ -200,7 +200,7 @@ export default class PgLogicalDecoding extends EventEmitter {
       ]);
       await client.query(
         "delete from postgraphile_meta.logical_decoding_slots where slot_name = $1",
-        [this.slotName]
+        [this.slotName],
       );
     }
     if (this.client) {
@@ -259,7 +259,7 @@ export default class PgLogicalDecoding extends EventEmitter {
 
   private async trackSelf(
     client: pg.PoolClient,
-    skipSchema = false
+    skipSchema = false,
   ): Promise<void> {
     if (this.temporary) {
       // No need to track temporary replication slots
@@ -273,7 +273,7 @@ export default class PgLogicalDecoding extends EventEmitter {
         on conflict (slot_name)
         do update set last_checkin = now();
         `,
-        [this.slotName]
+        [this.slotName],
       );
     } catch (e) {
       if (!skipSchema) {

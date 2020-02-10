@@ -38,9 +38,9 @@ export default (function PgOrderByPrimaryKeyPlugin(builder) {
           },
         },
 
-        `Adding primary key asc/desc sort to table '${table.name}'`
+        `Adding primary key asc/desc sort to table '${table.name}'`,
       );
     },
-    ["PgOrderByPrimaryKey"]
+    ["PgOrderByPrimaryKey"],
   );
 } as Plugin);

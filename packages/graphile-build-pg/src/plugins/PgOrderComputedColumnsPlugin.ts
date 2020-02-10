@@ -35,7 +35,7 @@ export default (function PgOrderComputedColumnsPlugin(builder) {
           const computedColumnDetails = getComputedColumnDetails(
             build,
             table,
-            proc
+            proc,
           );
 
           if (!computedColumnDetails) return memo;
@@ -66,7 +66,7 @@ export default (function PgOrderComputedColumnsPlugin(builder) {
           memo.push({ proc, pseudoColumnName });
           return memo;
         },
-        [] as { proc: PgProc; pseudoColumnName: string }[]
+        [] as { proc: PgProc; pseudoColumnName: string }[],
       );
 
       return extend(
@@ -77,14 +77,14 @@ export default (function PgOrderComputedColumnsPlugin(builder) {
               pseudoColumnName,
               proc,
               table,
-              true
+              true,
             );
 
             const descFieldName = inflection.orderByComputedColumnEnum(
               pseudoColumnName,
               proc,
               table,
-              false
+              false,
             );
 
             const unique = !!proc.tags.isUnique;
@@ -96,7 +96,7 @@ export default (function PgOrderComputedColumnsPlugin(builder) {
             }): SQL =>
               sql.fragment`(${sql.identifier(
                 proc.namespaceName,
-                proc.name
+                proc.name,
               )}(${queryBuilder.getTableAlias()}))`;
 
             memo = extend(
@@ -112,8 +112,8 @@ export default (function PgOrderComputedColumnsPlugin(builder) {
               },
 
               `Adding ascending orderBy enum value for ${describePgEntity(
-                proc
-              )}. You can rename this field by removing the '@sortable' smart comment from the function.`
+                proc,
+              )}. You can rename this field by removing the '@sortable' smart comment from the function.`,
             );
 
             memo = extend(
@@ -129,17 +129,17 @@ export default (function PgOrderComputedColumnsPlugin(builder) {
               },
 
               `Adding descending orderBy enum value for ${describePgEntity(
-                proc
-              )}. You can rename this field by removing the '@sortable' smart comment from the function.`
+                proc,
+              )}. You can rename this field by removing the '@sortable' smart comment from the function.`,
             );
 
             return memo;
           },
-          {} as import("graphql").GraphQLEnumValueConfigMap
+          {} as import("graphql").GraphQLEnumValueConfigMap,
         ),
-        `Adding order values from table '${table.name}'`
+        `Adding order values from table '${table.name}'`,
       );
     },
-    ["PgOrderComputedColumns"]
+    ["PgOrderComputedColumns"],
   );
 } as Plugin);

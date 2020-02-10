@@ -1,12 +1,17 @@
-import React from 'react';
-import GraphiQL from 'graphiql';
-import { getOperationAST, parse } from 'graphql';
-import GraphiQLExplorer from 'graphiql-explorer';
-import StorageAPI from 'graphiql/dist/utility/StorageAPI';
-import './postgraphiql.css';
-import { buildClientSchema, introspectionQuery, isType, GraphQLObjectType } from 'graphql';
-import { SubscriptionClient } from 'subscriptions-transport-ws';
-import formatSQL from '../formatSQL';
+import React from "react";
+import GraphiQL from "graphiql";
+import { getOperationAST, parse } from "graphql";
+import GraphiQLExplorer from "graphiql-explorer";
+import StorageAPI from "graphiql/dist/utility/StorageAPI";
+import "./postgraphiql.css";
+import {
+  buildClientSchema,
+  introspectionQuery,
+  isType,
+  GraphQLObjectType,
+} from "graphql";
+import { SubscriptionClient } from "subscriptions-transport-ws";
+import formatSQL from "../formatSQL";
 
 const defaultQuery = `\
 # Welcome to PostGraphile's built-in GraphiQL IDE
@@ -46,13 +51,13 @@ const isSubscription = ({ query, operationName }) => {
 
   const operation = getOperationAST(node, operationName);
 
-  return operation && operation.operation === 'subscription';
+  return operation && operation.operation === "subscription";
 };
 
 const {
   POSTGRAPHILE_CONFIG = {
-    graphqlUrl: 'http://localhost:5000/graphql',
-    streamUrl: 'http://localhost:5000/graphql/stream',
+    graphqlUrl: "http://localhost:5000/graphql",
+    streamUrl: "http://localhost:5000/graphql/stream",
     enhanceGraphiql: true,
     subscriptions: true,
     allowExplain: true,
@@ -70,15 +75,15 @@ const isValidJSON = json => {
 
 const l = window.location;
 const websocketUrl = POSTGRAPHILE_CONFIG.graphqlUrl.match(/^https?:/)
-  ? POSTGRAPHILE_CONFIG.graphqlUrl.replace(/^http/, 'ws')
-  : `ws${l.protocol === 'https:' ? 's' : ''}://${l.hostname}${
-      l.port !== 80 && l.port !== 443 ? ':' + l.port : ''
+  ? POSTGRAPHILE_CONFIG.graphqlUrl.replace(/^http/, "ws")
+  : `ws${l.protocol === "https:" ? "s" : ""}://${l.hostname}${
+      l.port !== 80 && l.port !== 443 ? ":" + l.port : ""
     }${POSTGRAPHILE_CONFIG.graphqlUrl}`;
 
 const STORAGE_KEYS = {
-  SAVE_HEADERS_TEXT: 'PostGraphiQL:saveHeadersText',
-  HEADERS_TEXT: 'PostGraphiQL:headersText',
-  EXPLAIN: 'PostGraphiQL:explain',
+  SAVE_HEADERS_TEXT: "PostGraphiQL:saveHeadersText",
+  HEADERS_TEXT: "PostGraphiQL:headersText",
+  EXPLAIN: "PostGraphiQL:explain",
 };
 
 /**
@@ -93,17 +98,23 @@ class PostGraphiQL extends React.PureComponent {
     // Our GraphQL schema which GraphiQL will use to do its intelligence
     // stuffs.
     schema: null,
-    query: '',
+    query: "",
     showHeaderEditor: false,
-    saveHeadersText: this._storage.get(STORAGE_KEYS.SAVE_HEADERS_TEXT) === 'true',
-    headersText: this._storage.get(STORAGE_KEYS.HEADERS_TEXT) || '{\n"Authorization": null\n}\n',
-    explain: this._storage.get(STORAGE_KEYS.EXPLAIN) === 'true',
+    saveHeadersText:
+      this._storage.get(STORAGE_KEYS.SAVE_HEADERS_TEXT) === "true",
+    headersText:
+      this._storage.get(STORAGE_KEYS.HEADERS_TEXT) ||
+      '{\n"Authorization": null\n}\n',
+    explain: this._storage.get(STORAGE_KEYS.EXPLAIN) === "true",
     explainResult: null,
     headersTextValid: true,
-    explorerIsOpen: this._storage.get('explorerIsOpen') === 'false' ? false : true,
+    explorerIsOpen:
+      this._storage.get("explorerIsOpen") === "false" ? false : true,
     haveActiveSubscription: false,
     socketStatus:
-      POSTGRAPHILE_CONFIG.enhanceGraphiql && POSTGRAPHILE_CONFIG.subscriptions ? 'pending' : null,
+      POSTGRAPHILE_CONFIG.enhanceGraphiql && POSTGRAPHILE_CONFIG.subscriptions
+        ? "pending"
+        : null,
   };
 
   _onEditQuery = query => {
@@ -125,30 +136,34 @@ class PostGraphiQL extends React.PureComponent {
     this.updateSchema();
 
     if (this.subscriptionsClient) {
-      const unlisten1 = this.subscriptionsClient.on('connected', () => {
-        this.setState({ socketStatus: 'connected', error: null });
+      const unlisten1 = this.subscriptionsClient.on("connected", () => {
+        this.setState({ socketStatus: "connected", error: null });
       });
-      const unlisten2 = this.subscriptionsClient.on('disconnected', () => {
-        this.setState({ socketStatus: 'disconnected' });
+      const unlisten2 = this.subscriptionsClient.on("disconnected", () => {
+        this.setState({ socketStatus: "disconnected" });
       });
-      const unlisten3 = this.subscriptionsClient.on('connecting', () => {
-        this.setState({ socketStatus: 'connecting' });
+      const unlisten3 = this.subscriptionsClient.on("connecting", () => {
+        this.setState({ socketStatus: "connecting" });
       });
-      const unlisten4 = this.subscriptionsClient.on('reconnected', () => {
-        this.setState({ socketStatus: 'reconnected', error: null });
+      const unlisten4 = this.subscriptionsClient.on("reconnected", () => {
+        this.setState({ socketStatus: "reconnected", error: null });
         setTimeout(() => {
           this.setState(state =>
-            state.socketStatus === 'reconnected' ? { socketStatus: 'connected' } : {},
+            state.socketStatus === "reconnected"
+              ? { socketStatus: "connected" }
+              : {},
           );
         }, 5000);
       });
-      const unlisten5 = this.subscriptionsClient.on('reconnecting', () => {
-        this.setState({ socketStatus: 'reconnecting' });
+      const unlisten5 = this.subscriptionsClient.on("reconnecting", () => {
+        this.setState({ socketStatus: "reconnecting" });
       });
-      const unlisten6 = this.subscriptionsClient.on('error', error => {
+      const unlisten6 = this.subscriptionsClient.on("error", error => {
         // tslint:disable-next-line no-console
-        console.error('Client connection error', error);
-        this.setState({ error: new Error('Subscriptions client connection error') });
+        console.error("Client connection error", error);
+        this.setState({
+          error: new Error("Subscriptions client connection error"),
+        });
       });
       this.unlistenSubscriptionsClient = () => {
         unlisten1();
@@ -168,7 +183,7 @@ class PostGraphiQL extends React.PureComponent {
 
       // When we get a change notification, we want to update our schema.
       eventSource.addEventListener(
-        'change',
+        "change",
         () => {
           this.updateSchema();
         },
@@ -177,21 +192,26 @@ class PostGraphiQL extends React.PureComponent {
 
       // Add event listeners that just log things in the console.
       eventSource.addEventListener(
-        'open',
+        "open",
         () => {
           // tslint:disable-next-line no-console
-          console.log('PostGraphile: Listening for server sent events');
+          console.log("PostGraphile: Listening for server sent events");
           this.setState({ error: null });
           this.updateSchema();
         },
         false,
       );
       eventSource.addEventListener(
-        'error',
+        "error",
         error => {
           // tslint:disable-next-line no-console
-          console.error('PostGraphile: Failed to connect to event stream', error);
-          this.setState({ error: new Error('Failed to connect to event stream') });
+          console.error(
+            "PostGraphile: Failed to connect to event stream",
+            error,
+          );
+          this.setState({
+            error: new Error("Failed to connect to event stream"),
+          });
         },
         false,
       );
@@ -200,11 +220,11 @@ class PostGraphiQL extends React.PureComponent {
       this._eventSource = eventSource;
     }
     const graphiql = this.graphiql;
-    this.setState({ query: graphiql._storage.get('query') || defaultQuery });
+    this.setState({ query: graphiql._storage.get("query") || defaultQuery });
     const editor = graphiql.getQueryEditor();
-    editor.setOption('extraKeys', {
+    editor.setOption("extraKeys", {
       ...(editor.options.extraKeys || {}),
-      'Shift-Alt-LeftClick': this._handleInspectOperation,
+      "Shift-Alt-LeftClick": this._handleInspectOperation,
     });
   }
 
@@ -216,7 +236,7 @@ class PostGraphiQL extends React.PureComponent {
   }
 
   _handleInspectOperation = (cm, mousePos) => {
-    const parsedQuery = parse(this.state.query || '');
+    const parsedQuery = parse(this.state.query || "");
 
     if (!parsedQuery) {
       console.error("Couldn't parse query document");
@@ -235,7 +255,7 @@ class PostGraphiQL extends React.PureComponent {
 
     var def = parsedQuery.definitions.find(definition => {
       if (!definition.loc) {
-        console.log('Missing location information for definition');
+        console.log("Missing location information for definition");
         return false;
       }
 
@@ -244,23 +264,25 @@ class PostGraphiQL extends React.PureComponent {
     });
 
     if (!def) {
-      console.error('Unable to find definition corresponding to mouse position');
+      console.error(
+        "Unable to find definition corresponding to mouse position",
+      );
       return null;
     }
 
     var operationKind =
-      def.kind === 'OperationDefinition'
+      def.kind === "OperationDefinition"
         ? def.operation
-        : def.kind === 'FragmentDefinition'
-        ? 'fragment'
-        : 'unknown';
+        : def.kind === "FragmentDefinition"
+        ? "fragment"
+        : "unknown";
 
     var operationName =
-      def.kind === 'OperationDefinition' && !!def.name
+      def.kind === "OperationDefinition" && !!def.name
         ? def.name.value
-        : def.kind === 'FragmentDefinition' && !!def.name
+        : def.kind === "FragmentDefinition" && !!def.name
         ? def.name.value
-        : 'unknown';
+        : "unknown";
 
     var selector = `.graphiql-explorer-root #${operationKind}-${operationName}`;
 
@@ -303,24 +325,26 @@ class PostGraphiQL extends React.PureComponent {
   async executeQuery(graphQLParams) {
     const extraHeaders = this.getHeaders();
     const response = await fetch(POSTGRAPHILE_CONFIG.graphqlUrl, {
-      method: 'POST',
+      method: "POST",
       headers: Object.assign(
         {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
+          Accept: "application/json",
+          "Content-Type": "application/json",
           ...(this.state.explain && POSTGRAPHILE_CONFIG.allowExplain
-            ? { 'X-PostGraphile-Explain': 'on' }
+            ? { "X-PostGraphile-Explain": "on" }
             : null),
         },
         extraHeaders,
       ),
-      credentials: 'same-origin',
+      credentials: "same-origin",
       body: JSON.stringify(graphQLParams),
     });
 
     const result = await response.json();
 
-    this.setState({ explainResult: result && result.explain ? result.explain : null });
+    this.setState({
+      explainResult: result && result.explain ? result.explain : null,
+    });
 
     return result;
   }
@@ -333,7 +357,7 @@ class PostGraphiQL extends React.PureComponent {
     if (isSubscription(graphQLParams) && this.subscriptionsClient) {
       return {
         subscribe: observer => {
-          observer.next('Waiting for subscription to yield data…');
+          observer.next("Waiting for subscription to yield data…");
 
           // Hack because GraphiQL logs `[object Object]` on error otherwise
           const oldError = observer.error;
@@ -350,7 +374,9 @@ class PostGraphiQL extends React.PureComponent {
             });
           };
 
-          const subscription = this.subscriptionsClient.request(graphQLParams).subscribe(observer);
+          const subscription = this.subscriptionsClient
+            .request(graphQLParams)
+            .subscribe(observer);
           this.setState({ haveActiveSubscription: true });
           this.activeSubscription = subscription;
           return subscription;
@@ -383,11 +409,11 @@ class PostGraphiQL extends React.PureComponent {
       this._updateGraphiQLDocExplorerNavStack(schema);
 
       // tslint:disable-next-line no-console
-      console.log('PostGraphile: Schema updated');
+      console.log("PostGraphile: Schema updated");
       this.setState({ error: null });
     } catch (error) {
       // tslint:disable-next-line no-console
-      console.error('Error occurred when updating the schema:');
+      console.error("Error occurred when updating the schema:");
       // tslint:disable-next-line no-console
       console.error(error);
       this.setState({ error });
@@ -451,7 +477,9 @@ class PostGraphiQL extends React.PureComponent {
           // worse. We want to update the information for an object field.
           // Ok, so since this is an object field, we will assume that the last
           // element in our stack was an object type.
-          const nextLastType = nextSchema.getType(navStack[i - 1] ? navStack[i - 1].name : null);
+          const nextLastType = nextSchema.getType(
+            navStack[i - 1] ? navStack[i - 1].name : null,
+          );
 
           // If there is no type for the last type in the nav stack’s name.
           // Panic!
@@ -497,11 +525,14 @@ class PostGraphiQL extends React.PureComponent {
 
   handlePrettifyQuery = () => {
     const editor = this.getQueryEditor();
-    if (typeof window.prettier !== 'undefined' && typeof window.prettierPlugins !== 'undefined') {
+    if (
+      typeof window.prettier !== "undefined" &&
+      typeof window.prettierPlugins !== "undefined"
+    ) {
       // TODO: window.prettier.formatWithCursor
       editor.setValue(
         window.prettier.format(editor.getValue(), {
-          parser: 'graphql',
+          parser: "graphql",
           plugins: window.prettierPlugins,
         }),
       );
@@ -521,7 +552,7 @@ class PostGraphiQL extends React.PureComponent {
   handleToggleExplorer = () => {
     this.setState({ explorerIsOpen: !this.state.explorerIsOpen }, () =>
       this._storage.set(
-        'explorerIsOpen',
+        "explorerIsOpen",
         // stringify so that storage API will store the state (it deletes key if value is false)
         JSON.stringify(this.state.explorerIsOpen),
       ),
@@ -538,7 +569,7 @@ class PostGraphiQL extends React.PureComponent {
         );
         this._storage.set(
           STORAGE_KEYS.HEADERS_TEXT,
-          this.state.saveHeadersText ? this.state.headersText : '',
+          this.state.saveHeadersText ? this.state.headersText : "",
         );
       },
     );
@@ -548,7 +579,10 @@ class PostGraphiQL extends React.PureComponent {
     this.setState(
       oldState => ({ explain: !oldState.explain }),
       () => {
-        this._storage.set(STORAGE_KEYS.EXPLAIN, JSON.stringify(this.state.explain));
+        this._storage.set(
+          STORAGE_KEYS.EXPLAIN,
+          JSON.stringify(this.state.explain),
+        );
         try {
           this.graphiql.handleRunQuery();
         } catch (e) {
@@ -565,17 +599,27 @@ class PostGraphiQL extends React.PureComponent {
     }
     const icon =
       {
-        connecting: '🤔',
-        reconnecting: '😓',
-        connected: '😀',
-        reconnected: '😅',
-        disconnected: '☹️',
-      }[socketStatus] || '😐';
+        connecting: "🤔",
+        reconnecting: "😓",
+        connected: "😀",
+        reconnected: "😅",
+        disconnected: "☹️",
+      }[socketStatus] || "😐";
     const tick = (
-      <path fill="transparent" stroke="white" d="M30,50 L45,65 L70,30" strokeWidth="8" />
+      <path
+        fill="transparent"
+        stroke="white"
+        d="M30,50 L45,65 L70,30"
+        strokeWidth="8"
+      />
     );
     const cross = (
-      <path fill="transparent" stroke="white" d="M30,30 L70,70 M30,70 L70,30" strokeWidth="8" />
+      <path
+        fill="transparent"
+        stroke="white"
+        d="M30,30 L70,70 M30,70 L70,30"
+        strokeWidth="8"
+      />
     );
     const decoration =
       {
@@ -587,14 +631,19 @@ class PostGraphiQL extends React.PureComponent {
       }[socketStatus] || null;
     const color =
       {
-        connected: 'green',
-        reconnected: 'green',
-        connecting: 'orange',
-        reconnecting: 'orange',
-        disconnected: 'red',
-      }[socketStatus] || 'gray';
+        connected: "green",
+        reconnected: "green",
+        connecting: "orange",
+        reconnecting: "orange",
+        disconnected: "red",
+      }[socketStatus] || "gray";
     const svg = (
-      <svg width="25" height="25" viewBox="0 0 100 100" style={{ marginTop: 4 }}>
+      <svg
+        width="25"
+        height="25"
+        viewBox="0 0 100 100"
+        style={{ marginTop: 4 }}
+      >
         <circle fill={color} cx="50" cy="50" r="45" />
         {decoration}
       </svg>
@@ -603,18 +652,18 @@ class PostGraphiQL extends React.PureComponent {
       <>
         {error ? (
           <div
-            style={{ fontSize: '1.5em', marginRight: '0.25em' }}
+            style={{ fontSize: "1.5em", marginRight: "0.25em" }}
             title={error.message || `Error occurred: ${error}`}
             onClick={() => this.setState({ error: null })}
           >
             <span aria-label="ERROR" role="img">
-              {'⚠️'}
+              {"⚠️"}
             </span>
           </div>
         ) : null}
         <div
-          style={{ fontSize: '1.5em', marginRight: '0.25em' }}
-          title={'Websocket status: ' + socketStatus}
+          style={{ fontSize: "1.5em", marginRight: "0.25em" }}
+          title={"Websocket status: " + socketStatus}
           onClick={this.cancelSubscription}
         >
           <span aria-label={socketStatus} role="img">
@@ -646,30 +695,38 @@ class PostGraphiQL extends React.PureComponent {
       return (
         <div
           className={`postgraphiql-container graphiql-container ${
-            this.state.explain && this.state.explainResult && this.state.explainResult.length
-              ? 'explain-mode'
-              : ''
+            this.state.explain &&
+            this.state.explainResult &&
+            this.state.explainResult.length
+              ? "explain-mode"
+              : ""
           }`}
         >
           <GraphiQLExplorer
             schema={schema}
             query={this.state.query}
             onEdit={this._onEditQuery}
-            onRunOperation={operationName => this.graphiql.handleRunQuery(operationName)}
+            onRunOperation={operationName =>
+              this.graphiql.handleRunQuery(operationName)
+            }
             explorerIsOpen={this.state.explorerIsOpen}
             onToggleExplorer={this.handleToggleExplorer}
             //getDefaultScalarArgValue={getDefaultScalarArgValue}
             //makeDefaultArg={makeDefaultArg}
           />
-          <GraphiQL onEditQuery={this._onEditQuery} query={this.state.query} {...sharedProps}>
+          <GraphiQL
+            onEditQuery={this._onEditQuery}
+            query={this.state.query}
+            {...sharedProps}
+          >
             <GraphiQL.Logo>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{ display: "flex", alignItems: "center" }}>
                 <div>
                   <img
                     src="https://www.graphile.org/images/postgraphile-tiny.optimized.svg"
                     width="32"
                     height="32"
-                    style={{ marginTop: '4px', marginRight: '0.5rem' }}
+                    style={{ marginTop: "4px", marginRight: "0.5rem" }}
                   />
                 </div>
                 <div>
@@ -703,7 +760,7 @@ class PostGraphiQL extends React.PureComponent {
               />
               {POSTGRAPHILE_CONFIG.allowExplain ? (
                 <GraphiQL.Button
-                  label={this.state.explain ? 'Explain ON' : 'Explain disabled'}
+                  label={this.state.explain ? "Explain ON" : "Explain disabled"}
                   title="View the SQL statements that this query invokes"
                   onClick={this.handleToggleExplain}
                 />
@@ -716,10 +773,10 @@ class PostGraphiQL extends React.PureComponent {
                     {this.state.explainResult.map(res => (
                       <div>
                         <h4>
-                          Result from SQL{' '}
+                          Result from SQL{" "}
                           <a href="https://www.postgresql.org/docs/current/sql-explain.html">
                             EXPLAIN
-                          </a>{' '}
+                          </a>{" "}
                           on executed query:
                         </h4>
                         <pre className="explain-plan">
@@ -732,38 +789,40 @@ class PostGraphiQL extends React.PureComponent {
                       </div>
                     ))}
                     <p>
-                      Having performance issues?{' '}
-                      <a href="https://www.graphile.org/support/">We can help with that!</a>
+                      Having performance issues?{" "}
+                      <a href="https://www.graphile.org/support/">
+                        We can help with that!
+                      </a>
                     </p>
                     <hr />
                   </div>
                 ) : null}
                 <div className="postgraphile-regular-footer">
-                  PostGraphile:{' '}
+                  PostGraphile:{" "}
                   <a
                     title="Open PostGraphile documentation"
                     href="https://graphile.org/postgraphile/introduction/"
                     target="new"
                   >
                     Documentation
-                  </a>{' '}
-                  |{' '}
+                  </a>{" "}
+                  |{" "}
                   <a
                     title="Open PostGraphile documentation"
                     href="https://graphile.org/postgraphile/examples/"
                     target="new"
                   >
                     Examples
-                  </a>{' '}
-                  |{' '}
+                  </a>{" "}
+                  |{" "}
                   <a
                     title="PostGraphile is supported by the community, please sponsor ongoing development"
                     href="https://graphile.org/sponsor/"
                     target="new"
                   >
                     Sponsor
-                  </a>{' '}
-                  |{' '}
+                  </a>{" "}
+                  |{" "}
                   <a
                     title="Get support from the team behind PostGraphile"
                     href="https://graphile.org/support/"
@@ -788,8 +847,14 @@ class PostGraphiQL extends React.PureComponent {
                   headersTextValid: isValidJSON(e.target.value),
                 },
                 () => {
-                  if (this.state.headersTextValid && this.state.saveHeadersText) {
-                    this._storage.set(STORAGE_KEYS.HEADERS_TEXT, this.state.headersText);
+                  if (
+                    this.state.headersTextValid &&
+                    this.state.saveHeadersText
+                  ) {
+                    this._storage.set(
+                      STORAGE_KEYS.HEADERS_TEXT,
+                      this.state.headersText,
+                    );
                   }
                   if (this.state.headersTextValid && this.subscriptionsClient) {
                     // Reconnect to websocket with new headers
@@ -800,7 +865,7 @@ class PostGraphiQL extends React.PureComponent {
             }
           >
             <div className="docExplorerHide" onClick={this.handleToggleHeaders}>
-              {'\u2715'}
+              {"\u2715"}
             </div>
           </EditHeaders>
         </div>
@@ -809,14 +874,22 @@ class PostGraphiQL extends React.PureComponent {
   }
 }
 
-function EditHeaders({ children, open, value, onChange, valid, saveHeaders, toggleSaveHeaders }) {
+function EditHeaders({
+  children,
+  open,
+  value,
+  onChange,
+  valid,
+  saveHeaders,
+  toggleSaveHeaders,
+}) {
   return (
     <div
       className="graphiql-container not-really"
       style={{
-        display: open ? 'block' : 'none',
-        width: '300px',
-        flexBasis: '300px',
+        display: open ? "block" : "none",
+        width: "300px",
+        flexBasis: "300px",
       }}
     >
       <div className="docExplorerWrap">
@@ -827,13 +900,17 @@ function EditHeaders({ children, open, value, onChange, valid, saveHeaders, togg
           </div>
           <div className="doc-explorer-contents">
             <label>
-              <input type="checkbox" checked={saveHeaders} onChange={toggleSaveHeaders} />
+              <input
+                type="checkbox"
+                checked={saveHeaders}
+                onChange={toggleSaveHeaders}
+              />
               Persist headers
             </label>
             <textarea
               value={value}
               onChange={onChange}
-              style={valid ? {} : { backgroundColor: '#fdd' }}
+              style={valid ? {} : { backgroundColor: "#fdd" }}
             />
           </div>
         </div>

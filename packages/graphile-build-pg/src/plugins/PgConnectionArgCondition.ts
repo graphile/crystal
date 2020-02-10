@@ -54,17 +54,17 @@ export default (function PgConnectionArgCondition(builder) {
                         type:
                           pgGetGqlInputTypeByTypeIdAndModifier(
                             attr.typeId,
-                            attr.typeModifier
+                            attr.typeModifier,
                           ) || GraphQLString,
                       },
 
                       {
                         isPgConnectionConditionInputField: true,
-                      }
+                      },
                     ),
                   },
 
-                  `Adding condition argument for ${describePgEntity(attr)}`
+                  `Adding condition argument for ${describePgEntity(attr)}`,
                 );
 
                 return memo;
@@ -74,25 +74,25 @@ export default (function PgConnectionArgCondition(builder) {
 
           {
             __origin: `Adding condition type for ${describePgEntity(
-              table
+              table,
             )}. You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               table,
               {
                 name: "newNameHere",
-              }
+              },
             )}`,
             pgIntrospection: table,
             isPgCondition: true,
           },
 
-          true // Conditions might all be filtered
+          true, // Conditions might all be filtered
         );
       });
       return _;
     },
     ["PgConnectionArgCondition"],
     [],
-    ["PgTypes"]
+    ["PgTypes"],
   );
 
   builder.hook(
@@ -151,11 +151,11 @@ export default (function PgConnectionArgCondition(builder) {
       const TableType = pgGetGqlTypeByTypeIdAndModifier(table.type.id, null);
       if (!TableType) {
         throw new Error(
-          `Could not determine TableType for table '${table.name}'`
+          `Could not determine TableType for table '${table.name}'`,
         );
       }
       const TableConditionType = getTypeByName(
-        inflection.conditionType(getNamedType(TableType).name)
+        inflection.conditionType(getNamedType(TableType).name),
       );
 
       if (!TableConditionType) {
@@ -163,7 +163,7 @@ export default (function PgConnectionArgCondition(builder) {
       }
 
       const relevantAttributes = table.attributes.filter(
-        attr => pgColumnFilter(attr, build, context) && !omit(attr, "filter")
+        attr => pgColumnFilter(attr, build, context) && !omit(attr, "filter"),
       );
 
       addArgDataGenerator(function connectionCondition({ condition }) {
@@ -175,23 +175,23 @@ export default (function PgConnectionArgCondition(builder) {
                 const val = condition[fieldName];
                 if (val != null) {
                   queryBuilder.addLiveCondition(() => record =>
-                    record[attr.name] === val
+                    record[attr.name] === val,
                   );
 
                   queryBuilder.where(
                     sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
-                      attr.name
-                    )} = ${gql2pg(val, attr.type, attr.typeModifier)}`
+                      attr.name,
+                    )} = ${gql2pg(val, attr.type, attr.typeModifier)}`,
                   );
                 } else if (val === null) {
                   queryBuilder.addLiveCondition(() => record =>
-                    record[attr.name] == null
+                    record[attr.name] == null,
                   );
 
                   queryBuilder.where(
                     sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
-                      attr.name
-                    )} IS NULL`
+                      attr.name,
+                    )} IS NULL`,
                   );
                 }
               });
@@ -210,9 +210,9 @@ export default (function PgConnectionArgCondition(builder) {
           },
         },
 
-        `Adding condition to connection field '${fieldName}' of '${Self.name}'`
+        `Adding condition to connection field '${fieldName}' of '${Self.name}'`,
       );
     },
-    ["PgConnectionArgCondition"]
+    ["PgConnectionArgCondition"],
   );
 } as Plugin);

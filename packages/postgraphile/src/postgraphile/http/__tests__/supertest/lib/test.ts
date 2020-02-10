@@ -2,12 +2,12 @@
  * Module dependencies.
  */
 
-import * as request from 'superagent';
-import * as util from 'util';
-import * as http from 'http';
-import * as https from 'https';
-import * as assert from 'assert';
-import { AddressInfo } from 'net';
+import * as request from "superagent";
+import * as util from "util";
+import * as http from "http";
+import * as https from "https";
+import * as assert from "assert";
+import { AddressInfo } from "net";
 
 // @ts-ignore
 const Request: any = request.Request;
@@ -38,12 +38,15 @@ function error(msg: string, expected: any, actual: any): CustomError {
 class Test extends Request {
   constructor(app: http.Server, method: string, path: string, host?: string) {
     super(method.toUpperCase(), path);
-    this._enableHttp2 = app['_http2'];
+    this._enableHttp2 = app["_http2"];
     this.redirects(0);
     this.buffer();
     this.app = app;
     this._asserts = [];
-    this.url = typeof app === 'string' ? app + path : this.serverAddress(app, path, host);
+    this.url =
+      typeof app === "string"
+        ? app + path
+        : this.serverAddress(app, path, host);
 
     // Make awaiting work
     const oldThen = this.then;
@@ -57,7 +60,10 @@ class Test extends Request {
           this,
           () => donePromise,
           (e: any) => {
-            if (this.expectedStatus >= 400 && e.status === this.expectedStatus) {
+            if (
+              this.expectedStatus >= 400 &&
+              e.status === this.expectedStatus
+            ) {
               return donePromise;
             } else {
               console.error(e);
@@ -80,8 +86,8 @@ class Test extends Request {
 
     if (!addr) this._server = app.listen(0);
     port = (app.address() as AddressInfo).port;
-    protocol = app instanceof https.Server ? 'https' : 'http';
-    return protocol + '://' + (host || '127.0.0.1') + ':' + port + path;
+    protocol = app instanceof https.Server ? "https" : "http";
+    return protocol + "://" + (host || "127.0.0.1") + ":" + port + path;
   }
 
   /**
@@ -99,27 +105,29 @@ class Test extends Request {
 
   expect(a: any, b: any, c: any) {
     // callback
-    if (typeof a === 'function') {
+    if (typeof a === "function") {
       this._asserts.push(a);
       return this;
     }
-    if (typeof b === 'function') this.end(b);
-    if (typeof c === 'function') this.end(c);
+    if (typeof b === "function") this.end(b);
+    if (typeof c === "function") this.end(c);
 
     // status
-    if (typeof a === 'number') {
+    if (typeof a === "number") {
       this.expectedStatus = a;
       this._asserts.push(this._assertStatus.bind(this, a));
       // body
-      if (typeof b !== 'function' && arguments.length > 1) {
+      if (typeof b !== "function" && arguments.length > 1) {
         this._asserts.push(this._assertBody.bind(this, b));
       }
       return this;
     }
 
     // header field
-    if (typeof b === 'string' || typeof b === 'number' || b instanceof RegExp) {
-      this._asserts.push(this._assertHeader.bind(this, { name: '' + a, value: b }));
+    if (typeof b === "string" || typeof b === "number" || b instanceof RegExp) {
+      this._asserts.push(
+        this._assertHeader.bind(this, { name: "" + a, value: b }),
+      );
       return this;
     }
 
@@ -165,19 +173,21 @@ class Test extends Request {
     // do not check further for other asserts, if any, in such case
     // https://nodejs.org/api/errors.html#errors_common_system_errors
     let sysErrors = {
-      ECONNREFUSED: 'Connection refused',
-      ECONNRESET: 'Connection reset by peer',
-      EPIPE: 'Broken pipe',
-      ETIMEDOUT: 'Operation timed out',
+      ECONNREFUSED: "Connection refused",
+      ECONNRESET: "Connection reset by peer",
+      EPIPE: "Broken pipe",
+      ETIMEDOUT: "Operation timed out",
     };
 
     if (!res && resError) {
       if (
         resError instanceof Error &&
-        resError['syscall'] === 'connect' &&
-        Object.getOwnPropertyNames(sysErrors).indexOf(resError['code']) >= 0
+        resError["syscall"] === "connect" &&
+        Object.getOwnPropertyNames(sysErrors).indexOf(resError["code"]) >= 0
       ) {
-        error = new Error(resError['code'] + ': ' + sysErrors[resError['code']]);
+        error = new Error(
+          resError["code"] + ": " + sysErrors[resError["code"]],
+        );
       } else {
         error = resError;
       }
@@ -189,7 +199,11 @@ class Test extends Request {
     }
 
     // set unexpected superagent error if no other error has occurred.
-    if (!error && resError instanceof Error && (!res || resError['status'] !== res.status)) {
+    if (
+      !error &&
+      resError instanceof Error &&
+      (!res || resError["status"] !== res.status)
+    ) {
       error = resError;
     }
 
@@ -206,13 +220,17 @@ class Test extends Request {
     let b;
 
     // parsed
-    if (typeof body === 'object' && !isregexp) {
+    if (typeof body === "object" && !isregexp) {
       try {
         assert.deepStrictEqual(body, res.body);
       } catch (err) {
         a = util.inspect(body);
         b = util.inspect(res.body);
-        return error('expected ' + a + ' response body, got ' + b, body, res.body);
+        return error(
+          "expected " + a + " response body, got " + b,
+          body,
+          res.body,
+        );
       }
     } else if (body !== res.text) {
       // string
@@ -222,10 +240,18 @@ class Test extends Request {
       // regexp
       if (isregexp) {
         if (!body.test(res.text)) {
-          return error('expected body ' + b + ' to match ' + body, body, res.body);
+          return error(
+            "expected body " + b + " to match " + body,
+            body,
+            res.body,
+          );
         }
       } else {
-        return error('expected ' + a + ' response body, got ' + b, body, res.body);
+        return error(
+          "expected " + a + " response body, got " + b,
+          body,
+          res.body,
+        );
       }
     }
     return null;
@@ -243,7 +269,8 @@ class Test extends Request {
     let actual = res.header[field.toLowerCase()];
     let fieldExpected = header.value;
 
-    if (typeof actual === 'undefined') return new Error('expected "' + field + '" header field');
+    if (typeof actual === "undefined")
+      return new Error('expected "' + field + '" header field');
     // This check handles header values that may be a String or single element Array
     if (
       (Array.isArray(actual) && actual.toString() === fieldExpected) ||
@@ -253,11 +280,25 @@ class Test extends Request {
     } else if (fieldExpected instanceof RegExp) {
       if (!fieldExpected.test(actual)) {
         return new Error(
-          'expected "' + field + '" matching ' + fieldExpected + ', got "' + actual + '"',
+          'expected "' +
+            field +
+            '" matching ' +
+            fieldExpected +
+            ', got "' +
+            actual +
+            '"',
         );
       }
     } else {
-      return new Error('expected "' + field + '" of "' + fieldExpected + '", got "' + actual + '"');
+      return new Error(
+        'expected "' +
+          field +
+          '" of "' +
+          fieldExpected +
+          '", got "' +
+          actual +
+          '"',
+      );
     }
     return null;
   }
@@ -272,7 +313,17 @@ class Test extends Request {
     if (res.status !== status) {
       a = http.STATUS_CODES[status];
       b = http.STATUS_CODES[res.status];
-      return new Error('expected ' + status + ' "' + a + '", got ' + res.status + ' "' + b + '"');
+      return new Error(
+        "expected " +
+          status +
+          ' "' +
+          a +
+          '", got ' +
+          res.status +
+          ' "' +
+          b +
+          '"',
+      );
     }
     return null;
   }

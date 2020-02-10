@@ -22,7 +22,7 @@ const makeSchemaWithSpy = spy =>
     ],
     {
       optionKey: "optionValue",
-    }
+    },
   );
 
 const makeSpy = fn => jest.fn(fn || (schema => schema));

@@ -12,7 +12,7 @@ import {
 
 export type PgSmartTagFilterFunction<T> = (
   input: T,
-  build: BuildWithIntrospection
+  build: BuildWithIntrospection,
 ) => boolean;
 
 export type PgSmartTagTags = {
@@ -54,12 +54,12 @@ const validKinds = Object.entries(meaningByKind)
   .join(", ");
 
 function compileRule<T extends PgEntity>(
-  rule: PgSmartTagRule<T>
+  rule: PgSmartTagRule<T>,
 ): CompiledPgSmartTagRule<T> {
   const { kind, match: incomingMatch, ...rest } = rule;
   if (!Object.prototype.hasOwnProperty.call(meaningByKind, kind)) {
     throw new Error(
-      `makePgSmartTagsPlugin rule has invalid kind '${kind}'; valid kinds are: ${validKinds}`
+      `makePgSmartTagsPlugin rule has invalid kind '${kind}'; valid kinds are: ${validKinds}`,
     );
   }
 
@@ -76,7 +76,7 @@ function compileRule<T extends PgEntity>(
       return entityIsIdentifiedBy(obj, incomingMatch, build);
     } else {
       throw new Error(
-        "makePgSmartTagsPlugin rule 'match' is neither a string nor a function"
+        "makePgSmartTagsPlugin rule 'match' is neither a string nor a function",
       );
     }
   };
@@ -88,7 +88,7 @@ function compileRule<T extends PgEntity>(
 }
 
 function rulesFrom(
-  ruleOrRules: PgSmartTagRule | PgSmartTagRule[] | null
+  ruleOrRules: PgSmartTagRule | PgSmartTagRule[] | null,
 ): [CompiledPgSmartTagRule<PgEntity>[], PgSmartTagRule[]] {
   const rawRules = Array.isArray(ruleOrRules)
     ? ruleOrRules
@@ -99,16 +99,16 @@ function rulesFrom(
 }
 
 export type UpdatePgSmartTagRulesCallback = (
-  ruleOrRules: PgSmartTagRule | PgSmartTagRule[] | null
+  ruleOrRules: PgSmartTagRule | PgSmartTagRule[] | null,
 ) => void;
 
 export type SubscribeToPgSmartTagUpdatesCallback = (
-  cb: UpdatePgSmartTagRulesCallback | null
+  cb: UpdatePgSmartTagRulesCallback | null,
 ) => void | Promise<void>;
 
 export function makePgSmartTagsPlugin(
   ruleOrRules: PgSmartTagRule | PgSmartTagRule[] | null,
-  subscribeToUpdatesCallback?: SubscribeToPgSmartTagUpdatesCallback | null
+  subscribeToUpdatesCallback?: SubscribeToPgSmartTagUpdatesCallback | null,
 ): Plugin {
   let [rules, rawRules] = rulesFrom(ruleOrRules);
   const plugin: Plugin = (builder, _options) => {
@@ -122,7 +122,7 @@ export function makePgSmartTagsPlugin(
         },
         async () => {
           await subscribeToUpdatesCallback(null);
-        }
+        },
       );
     }
 
@@ -135,7 +135,7 @@ export function makePgSmartTagsPlugin(
           let pgIntrospectionResultsByKind = inIntrospectionResult;
           if (oldPgAugmentIntrospectionResults) {
             pgIntrospectionResultsByKind = oldPgAugmentIntrospectionResults(
-              pgIntrospectionResultsByKind
+              pgIntrospectionResultsByKind,
             );
           }
 
@@ -173,8 +173,8 @@ export function makePgSmartTagsPlugin(
             if (hits === 0) {
               console.warn(
                 `WARNING: there were no matches for makePgSmartTagsPlugin rule ${idx} - ${inspect(
-                  rawRules[idx]
-                )}`
+                  rawRules[idx],
+                )}`,
               );
             }
           });
@@ -185,7 +185,7 @@ export function makePgSmartTagsPlugin(
       },
       [],
       ["PgIntrospection"],
-      ["PgBasics"]
+      ["PgBasics"],
     );
   };
   return plugin;
@@ -247,14 +247,14 @@ export type JSONPgSmartTags = {
 };
 
 function pgSmartTagRulesFromJSON(
-  json: JSONPgSmartTags | null
+  json: JSONPgSmartTags | null,
 ): PgSmartTagRule[] {
   if (!json) {
     return [];
   }
   if (json.version !== 1) {
     throw new Error(
-      'This version of graphile-utils only supports the version 1 smart tags JSON format; e.g. `{version: 1, config: { class: { my_table: { tags: { omit: "create,update,delete" } } } } }`'
+      'This version of graphile-utils only supports the version 1 smart tags JSON format; e.g. `{version: 1, config: { class: { my_table: { tags: { omit: "create,update,delete" } } } } }`',
     );
   }
   const specByIdentifierByKind = json.config;
@@ -266,17 +266,17 @@ function pgSmartTagRulesFromJSON(
     subKind: PgEntityKind,
     obj: unknown,
     key: string,
-    deprecated = false
+    deprecated = false,
   ): void {
     if (kind !== PgEntityKind.CLASS) {
       throw new Error(
-        `makeJSONPgSmartTagsPlugin: '${key}' is only valid on a class; you tried to set it on a '${kind}' at 'config.${kind}.${identifier}.${key}'`
+        `makeJSONPgSmartTagsPlugin: '${key}' is only valid on a class; you tried to set it on a '${kind}' at 'config.${kind}.${identifier}.${key}'`,
       );
     }
     const path = `config.${kind}.${identifier}.${key}`;
     if (deprecated) {
       console.warn(
-        `Tags JSON path '${path}' is deprecated, please use 'config.${kind}.${identifier}.attribute' instead`
+        `Tags JSON path '${path}' is deprecated, please use 'config.${kind}.${identifier}.attribute' instead`,
       );
     }
     if (typeof obj !== "object" || obj == null) {
@@ -286,7 +286,7 @@ function pgSmartTagRulesFromJSON(
     for (const entityName of Object.keys(entities)) {
       if (entityName.includes(".")) {
         throw new Error(
-          `${key} '${entityName}' should not contain a period at '${path}'. This nested entry does not need further description.`
+          `${key} '${entityName}' should not contain a period at '${path}'. This nested entry does not need further description.`,
         );
       }
       const entitySpec = entities[entityName];
@@ -298,10 +298,10 @@ function pgSmartTagRulesFromJSON(
       if (Object.keys(entityRest).length > 0) {
         console.warn(
           `WARNING: makeJSONPgSmartTagsPlugin '${key}' only supports 'tags' and 'description' currently, you have also set '${Object.keys(
-            entityRest
+            entityRest,
           ).join(
-            "', '"
-          )}' at '${path}.${entityName}'. Perhaps you forgot to add a "tags" entry containing these keys?`
+            "', '",
+          )}' at '${path}.${entityName}'. Perhaps you forgot to add a "tags" entry containing these keys?`,
         );
       }
       rules.push({
@@ -316,7 +316,7 @@ function pgSmartTagRulesFromJSON(
   for (const rawKind of Object.keys(specByIdentifierByKind)) {
     if (!Object.prototype.hasOwnProperty.call(meaningByKind, rawKind)) {
       throw new Error(
-        `makeJSONPgSmartTagsPlugin JSON rule has invalid kind '${rawKind}'; valid kinds are: ${validKinds}`
+        `makeJSONPgSmartTagsPlugin JSON rule has invalid kind '${rawKind}'; valid kinds are: ${validKinds}`,
       );
     }
     const kind: PgEntityKind = rawKind as any;
@@ -335,8 +335,8 @@ function pgSmartTagRulesFromJSON(
       if (Object.keys(rest).length > 0) {
         console.warn(
           `WARNING: makeJSONPgSmartTagsPlugin identifier spec only supports 'tags', 'description', 'attribute' and 'constraint' currently, you have also set '${Object.keys(
-            rest
-          ).join("', '")}' at 'config.${kind}.${identifier}'`
+            rest,
+          ).join("', '")}' at 'config.${kind}.${identifier}'`,
         );
       }
 
@@ -355,7 +355,7 @@ function pgSmartTagRulesFromJSON(
           PgEntityKind.ATTRIBUTE,
           columns,
           "columns",
-          true
+          true,
         );
       }
       if (attribute) {
@@ -364,7 +364,7 @@ function pgSmartTagRulesFromJSON(
           identifier,
           PgEntityKind.ATTRIBUTE,
           attribute,
-          "attribute"
+          "attribute",
         );
       }
       if (constraint) {
@@ -373,7 +373,7 @@ function pgSmartTagRulesFromJSON(
           identifier,
           PgEntityKind.CONSTRAINT,
           constraint,
-          "constraint"
+          "constraint",
         );
       }
     }
@@ -383,16 +383,16 @@ function pgSmartTagRulesFromJSON(
 }
 
 export type UpdateJSONPgSmartTagsCallback = (
-  json: JSONPgSmartTags | null
+  json: JSONPgSmartTags | null,
 ) => void;
 
 export type SubscribeToJSONPgSmartTagsUpdatesCallback = (
-  cb: UpdateJSONPgSmartTagsCallback | null
+  cb: UpdateJSONPgSmartTagsCallback | null,
 ) => void | Promise<void>;
 
 export function makeJSONPgSmartTagsPlugin(
   json: JSONPgSmartTags | null,
-  subscribeToJSONUpdatesCallback?: SubscribeToJSONPgSmartTagsUpdatesCallback | null
+  subscribeToJSONUpdatesCallback?: SubscribeToJSONPgSmartTagsUpdatesCallback | null,
 ): Plugin {
   // Get rules from JSON
   let rules = pgSmartTagRulesFromJSON(json);

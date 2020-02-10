@@ -12,7 +12,7 @@ type PgGetSelectValueForFieldAndTypeAndModifier = (
   sqlFullName: SQL,
   type: PgType,
   typeModifier: PgTypeModifier,
-  parentQueryBuilder: QueryBuilder
+  parentQueryBuilder: QueryBuilder,
 ) => SQL;
 
 declare module "graphile-build" {
@@ -40,7 +40,7 @@ export default (function PgColumnsPlugin(builder) {
         sqlFullName,
         type,
         typeModifier,
-        parentQueryBuilder
+        parentQueryBuilder,
       ) => {
         const { getDataFromParsedResolveInfoFragment } = fieldContext;
         if (type.isPgArray && type.arrayItemType) {
@@ -57,7 +57,7 @@ else (
     ident,
     type.arrayItemType,
     typeModifier,
-    parentQueryBuilder
+    parentQueryBuilder,
   )}) from unnest(${sqlFullName}) as ${ident}
 )
 end
@@ -65,7 +65,7 @@ end
         } else {
           const resolveData = getDataFromParsedResolveInfoFragment(
             parsedResolveInfoFragment,
-            ReturnType
+            ReturnType,
           );
 
           if (type.type === "c") {
@@ -82,7 +82,7 @@ end
               },
               null,
               parentQueryBuilder ? parentQueryBuilder.context : (null as any),
-              parentQueryBuilder ? parentQueryBuilder.rootValue : null
+              parentQueryBuilder ? parentQueryBuilder.rootValue : null,
             );
 
             return jsonBuildObject;
@@ -91,7 +91,7 @@ end
               sqlFullName,
               type,
               typeModifier,
-              resolveData
+              resolveData,
             );
           }
         }
@@ -101,12 +101,12 @@ end
         {
           pgGetSelectValueForFieldAndTypeAndModifier: getSelectValueForFieldAndTypeAndModifier,
         },
-        "Adding pgGetSelectValueForFieldAndTypeAndModifier in PgColumnsPlugin"
+        "Adding pgGetSelectValueForFieldAndTypeAndModifier in PgColumnsPlugin",
       );
     },
     ["PgColumns"],
     [],
-    ["PgTypes"]
+    ["PgTypes"],
   );
 
   builder.hook(
@@ -149,7 +149,7 @@ end
           const fieldName = inflection.column(attr);
           if (memo[fieldName]) {
             throw new Error(
-              `Two columns produce the same GraphQL field name '${fieldName}' on class '${table.namespaceName}.${table.name}'; one of them is '${attr.name}'`
+              `Two columns produce the same GraphQL field name '${fieldName}' on class '${table.namespaceName}.${table.name}'; one of them is '${attr.name}'`,
             );
           }
           memo = extend(
@@ -164,7 +164,7 @@ end
                   const ReturnType =
                     pgGetGqlTypeByTypeIdAndModifier(
                       attr.typeId,
-                      attr.typeModifier
+                      attr.typeModifier,
                     ) || GraphQLString;
                   addDataGenerator(parsedResolveInfoFragment => {
                     return {
@@ -177,10 +177,10 @@ end
                             sql.fragment`(${queryBuilder.getTableAlias()}.${sqlColumn})`, // The brackets are necessary to stop the parser getting confused, ref: https://www.postgresql.org/docs/9.6/static/rowtypes.html#ROWTYPES-ACCESSING
                             type,
                             typeModifier,
-                            queryBuilder
+                            queryBuilder,
                           ),
 
-                          fieldName
+                          fieldName,
                         );
                       },
                     };
@@ -193,7 +193,7 @@ end
                       !attr.isNotNull &&
                         !attr.type.domainIsNotNull &&
                         !attr.tags.notNull,
-                      ReturnType
+                      ReturnType,
                     ),
 
                     resolve: (data, _args, _context, _resolveInfo) => {
@@ -201,26 +201,26 @@ end
                     },
                   };
                 },
-                { pgFieldIntrospection: attr }
+                { pgFieldIntrospection: attr },
               ),
             },
 
             `Adding field for ${describePgEntity(
-              attr
+              attr,
             )}. You can rename this field with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               attr,
               {
                 name: "newNameHere",
-              }
-            )}`
+              },
+            )}`,
           );
 
           return memo;
         }, {}),
-        `Adding columns to '${describePgEntity(table)}'`
+        `Adding columns to '${describePgEntity(table)}'`,
       );
     },
-    ["PgColumns"]
+    ["PgColumns"],
   );
 
   builder.hook(
@@ -272,7 +272,7 @@ end
           const fieldName = inflection.column(attr);
           if (memo[fieldName]) {
             throw new Error(
-              `Two columns produce the same GraphQL field name '${fieldName}' on input class '${table.namespaceName}.${table.name}'; one of them is '${attr.name}'`
+              `Two columns produce the same GraphQL field name '${fieldName}' on input class '${table.namespaceName}.${table.name}'; one of them is '${attr.name}'`,
             );
           }
           if (!pgAddSubfield) {
@@ -301,33 +301,33 @@ end
                         attr.identity === "d",
                       pgGetGqlInputTypeByTypeIdAndModifier(
                         attr.typeId,
-                        attr.typeModifier
-                      ) || GraphQLString
+                        attr.typeModifier,
+                      ) || GraphQLString,
                     ),
                   },
 
-                  attr.typeModifier
+                  attr.typeModifier,
                 ),
 
-                { pgFieldIntrospection: attr }
+                { pgFieldIntrospection: attr },
               ),
             },
 
             `Adding input object field for ${describePgEntity(
-              attr
+              attr,
             )}. You can rename this field with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
               attr,
               {
                 name: "newNameHere",
-              }
-            )}`
+              },
+            )}`,
           );
 
           return memo;
         }, {}),
-        `Adding columns to input object for ${describePgEntity(table)}`
+        `Adding columns to input object for ${describePgEntity(table)}`,
       );
     },
-    ["PgColumns"]
+    ["PgColumns"],
   );
 } as Plugin);

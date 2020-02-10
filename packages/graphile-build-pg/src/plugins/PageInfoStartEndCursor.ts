@@ -40,7 +40,7 @@ export default (function PageInfoStartEndCursor(builder) {
             },
             {
               isPageInfoStartCursorField: true,
-            }
+            },
           ),
 
           endCursor: fieldWithHooks(
@@ -55,15 +55,15 @@ export default (function PageInfoStartEndCursor(builder) {
             },
             {
               isPageInfoEndCursorField: true,
-            }
+            },
           ),
         },
 
-        `Adding startCursor/endCursor to ${Self.name}`
+        `Adding startCursor/endCursor to ${Self.name}`,
       );
     },
     ["PageInfoStartEndCursor"],
     [],
-    ["Cursor"]
+    ["Cursor"],
   );
 } as Plugin);

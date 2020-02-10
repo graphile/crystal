@@ -1,18 +1,23 @@
 /* tslint:disable:no-any */
-import { GraphQLError, GraphQLSchema, SourceLocation, DocumentNode } from 'graphql';
-import { IncomingMessage, ServerResponse } from 'http';
-import { PluginHookFn } from './postgraphile/pluginHook';
-import { Pool, PoolClient } from 'pg';
-import { Plugin, PostGraphileCoreOptions } from 'postgraphile-core';
-import jwt = require('jsonwebtoken');
-import { EventEmitter } from 'events';
-import { GraphileResolverContext } from 'postgraphile-core';
+import {
+  GraphQLError,
+  GraphQLSchema,
+  SourceLocation,
+  DocumentNode,
+} from "graphql";
+import { IncomingMessage, ServerResponse } from "http";
+import { PluginHookFn } from "./postgraphile/pluginHook";
+import { Pool, PoolClient } from "pg";
+import { Plugin, PostGraphileCoreOptions } from "postgraphile-core";
+import jwt = require("jsonwebtoken");
+import { EventEmitter } from "events";
+import { GraphileResolverContext } from "postgraphile-core";
 
 export interface GraphileClaims {
   [claimName: string]: undefined | null | string | number | boolean;
 }
 
-declare module 'postgraphile-core' {
+declare module "postgraphile-core" {
   interface GraphileResolverContext {
     pgClient: PoolClient;
     pgRole?: string;
@@ -132,7 +137,7 @@ export interface PostGraphileOptions<
   // line of the stack). Recommended in development, not recommended in
   // production.
   /* @middlewareOnly */
-  showErrorStack?: boolean | 'json';
+  showErrorStack?: boolean | "json";
   // Extends the error response with additional details from the Postgres
   // error.  Can be any combination of `['hint', 'detail', 'errcode']`.
   // Default is `[]`.
@@ -250,7 +255,7 @@ export interface PostGraphileOptions<
   // we export 'only' the old relation shapes, both new and old but mark the
   // old ones as 'deprecated' (default), or 'omit' (recommended) the old
   // relation shapes entirely.
-  legacyRelations?: 'only' | 'deprecated' | 'omit';
+  legacyRelations?: "only" | "deprecated" | "omit";
   // ONLY use this option if you require the v3 typenames 'Json' and 'Uuid'
   // over 'JSON' and 'UUID'.
   legacyJsonUuid?: boolean;
@@ -292,7 +297,7 @@ export interface PostGraphileOptions<
   // "omit" (default) - relay connections only,
   // "only" (not recommended) - simple collections only (no Relay connections),
   // "both" - both.
-  simpleCollections?: 'omit' | 'both' | 'only';
+  simpleCollections?: "omit" | "both" | "only";
   // Max query cache size in bytes (extremely approximate, not
   // accurate at all). Default `50000000` (~50MB). Set to 0 to
   // disable.

@@ -3,7 +3,7 @@ import { QueryBuilder, SQL } from "graphile-build-pg";
 
 export type SelectGraphQLResultFromTable = (
   tableFragment: SQL,
-  builderCallback: (alias: SQL, sqlBuilder: QueryBuilder) => void
+  builderCallback: (alias: SQL, sqlBuilder: QueryBuilder) => void,
 ) => Promise<any>;
 
 export interface GraphileHelpers {
@@ -16,7 +16,7 @@ export function makeFieldHelpers(
   build: Build,
   fieldContext: ContextGraphQLObjectTypeFieldsField,
   context: any,
-  resolveInfo: import("graphql").GraphQLResolveInfo
+  resolveInfo: import("graphql").GraphQLResolveInfo,
 ) {
   const { parseResolveInfo, pgQueryFromResolveData, pgSql: sql } = build;
   const { getDataFromParsedResolveInfoFragment, scope } = fieldContext;
@@ -34,7 +34,7 @@ export function makeFieldHelpers(
 
   const selectGraphQLResultFromTable: SelectGraphQLResultFromTable = async (
     tableFragment: SQL,
-    builderCallback?: (alias: SQL, sqlBuilder: QueryBuilder) => void
+    builderCallback?: (alias: SQL, sqlBuilder: QueryBuilder) => void,
   ) => {
     const { pgClient } = context;
     const parsedResolveInfoFragment = parseResolveInfo(resolveInfo, true);
@@ -42,7 +42,7 @@ export function makeFieldHelpers(
 
     const resolveData = getDataFromParsedResolveInfoFragment(
       parsedResolveInfoFragment,
-      PayloadType
+      PayloadType,
     );
     const tableAlias = sql.identifier(Symbol());
     const query = pgQueryFromResolveData(
@@ -67,7 +67,7 @@ export function makeFieldHelpers(
         }
       },
       context,
-      resolveInfo.rootValue
+      resolveInfo.rootValue,
     );
     const { text, values } = sql.compile(query);
     const { rows } = await pgClient.query(text, values);
@@ -83,7 +83,7 @@ export function makeFieldHelpers(
         liveRecord
       ) {
         rows.forEach(
-          (row: any) => row && liveRecord("pg", table, row.__identifiers)
+          (row: any) => row && liveRecord("pg", table, row.__identifiers),
         );
       }
       return rows;
@@ -103,14 +103,14 @@ export function requireColumn(
   context: ContextGraphQLObjectTypeFieldsField,
   method: "addArgDataGenerator" | "addDataGenerator",
   col: string,
-  alias: string
+  alias: string,
 ): void {
   const { pgSql: sql } = build;
   context[method](() => ({
     pgQuery: (queryBuilder: QueryBuilder) => {
       queryBuilder.select(
         sql.query`${queryBuilder.getTableAlias()}.${sql.identifier(col)}`,
-        alias
+        alias,
       );
     },
   }));
@@ -120,7 +120,7 @@ export function requireChildColumn(
   build: Build,
   context: ContextGraphQLObjectTypeFieldsField,
   col: string,
-  alias: string
+  alias: string,
 ): void {
   return requireColumn(build, context, "addArgDataGenerator", col, alias);
 }
@@ -129,7 +129,7 @@ export function requireSiblingColumn(
   build: Build,
   context: ContextGraphQLObjectTypeFieldsField,
   col: string,
-  alias: string
+  alias: string,
 ): void {
   return requireColumn(build, context, "addDataGenerator", col, alias);
 }

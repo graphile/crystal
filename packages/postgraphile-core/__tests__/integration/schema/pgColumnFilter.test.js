@@ -5,5 +5,5 @@ test(
   core.test("a", {
     pgColumnFilter: attr => attr.name !== "headline",
     setofFunctionsContainNulls: false,
-  })
+  }),
 );

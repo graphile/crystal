@@ -12,7 +12,7 @@ exports.skipLDSTests = v && v < 10;
 let schema;
 exports.resetDatabase = async function resetDatabase() {
   await withTransactionlessPgClient(pgClient =>
-    pgClient.query("delete from live_test.users")
+    pgClient.query("delete from live_test.users"),
   );
 };
 
@@ -56,7 +56,7 @@ exports.liveTest = (query, variables, cb) => {
       query,
       null,
       { pgClient },
-      variables
+      variables,
     );
     if (iterator.errors) {
       // Not actually an iterator
@@ -112,7 +112,7 @@ exports.liveTest = (query, variables, cb) => {
     }
     if (changes.length) {
       throw new Error(
-        changes.length + " more values found after test completed!"
+        changes.length + " more values found after test completed!",
       );
     }
   });
@@ -127,7 +127,7 @@ exports.next = async function next(getLatest, duration = 5000) {
     if (error) throw error;
     if (ended)
       throw new Error(
-        "You called `next` but the iterator has already ended - maybe an error occurred"
+        "You called `next` but the iterator has already ended - maybe an error occurred",
       );
     if (values.length > 0) {
       expect(values).toHaveLength(1);
@@ -136,7 +136,7 @@ exports.next = async function next(getLatest, duration = 5000) {
     await sleep(10);
   }
   throw new Error(
-    `Your call to \`next\` timed out waiting for new data (timeout: ${duration}ms)`
+    `Your call to \`next\` timed out waiting for new data (timeout: ${duration}ms)`,
   );
 };
 

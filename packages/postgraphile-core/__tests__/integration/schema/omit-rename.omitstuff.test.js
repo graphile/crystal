@@ -7,8 +7,8 @@ test(
     {},
     `
 comment on table d.films is E'@omit create,update,delete';
-`
-  )
+`,
+  ),
 );
 
 test(
@@ -18,8 +18,8 @@ test(
     {},
     `
 comment on table d.films is E'@omit create';
-`
-  )
+`,
+  ),
 );
 
 test(
@@ -29,8 +29,8 @@ test(
     {},
     `
 comment on table d.films is E'@omit update';
-`
-  )
+`,
+  ),
 );
 
 test(
@@ -40,8 +40,8 @@ test(
     {},
     `
 comment on table d.films is E'@omit delete';
-`
-  )
+`,
+  ),
 );
 
 test(
@@ -51,8 +51,8 @@ test(
     {},
     `
 comment on table d.films is E'@omit read,all,update,create,delete,many';
-`
-  )
+`,
+  ),
 );
 
 test(
@@ -63,8 +63,8 @@ test(
     `
 comment on table d.films is E'@omit *';
 comment on table d.tv_shows is E'@omit';
-`
-  )
+`,
+  ),
 );
 
 test(
@@ -76,8 +76,8 @@ test(
 comment on constraint post_author_id_fkey on d.post is E'@omit many\n@fieldName author';
 comment on constraint tv_shows_studio_id_fkey on d.tv_shows is E'@omit many';
 comment on table d.tv_episodes is E'@omit many';
-`
-  )
+`,
+  ),
 );
 
 test(
@@ -87,6 +87,6 @@ test(
     {},
     `
 comment on table d.tv_shows is E'@omit order';
-`
-  )
+`,
+  ),
 );

@@ -7,10 +7,13 @@ const { graphql } = require("graphql");
 // Create a simple plugin that adds a random field to every GraphQLObject
 function MyRandomFieldPlugin(
   builder,
-  { myDefaultMin = 1, myDefaultMax = 100 }
+  { myDefaultMin = 1, myDefaultMax = 100 },
 ) {
   builder.hook("GraphQLObjectType:fields", (fields, build) => {
-    const { extend, graphql: { GraphQLInt } } = build;
+    const {
+      extend,
+      graphql: { GraphQLInt },
+    } = build;
     return extend(fields, {
       random: {
         type: GraphQLInt,
@@ -47,7 +50,7 @@ function MyRandomFieldPlugin(
       }
     `,
     null,
-    {}
+    {},
   );
   console.log(result); // { data: { random: 4 } }
 })().catch(e => {

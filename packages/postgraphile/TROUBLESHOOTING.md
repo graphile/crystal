@@ -31,7 +31,7 @@ Details at ...
 
 Thanks! 🙏
 
-====================    END OF INSTRUCTIONS    ==================== 
+====================    END OF INSTRUCTIONS    ====================
 -->
 
 # Troubleshooting
@@ -77,10 +77,10 @@ Details at [issue #482](https://github.com/graphile/postgraphile/issues/482) and
 
 Check the following:
 
-* return a named type (e.g. a scalar, table name or domain) - we don't currently support anonymous types
-* query procedures must not return `VOID` (mutations can, however)
-* mark it as `STABLE` if it's a query, or `VOLATILE` if it's a mutation
-* it should be defined in one of the Postgres schemas you've told PostGraphile to introspect (via `postgraphile --schema`)
+- return a named type (e.g. a scalar, table name or domain) - we don't currently support anonymous types
+- query procedures must not return `VOID` (mutations can, however)
+- mark it as `STABLE` if it's a query, or `VOLATILE` if it's a mutation
+- it should be defined in one of the Postgres schemas you've told PostGraphile to introspect (via `postgraphile --schema`)
 
 ```sql
 create function MY_SCHEMA.my_function() returns INTEGER as $$
@@ -90,17 +90,15 @@ $$ language sql STABLE;
 
 Details at [issue #529](https://github.com/graphile/postgraphile/issues/529).
 
-
-
 ## Using JWTs
 
 ### Role not successfully changing with JWT
 
 Check the following:
 
-* If you're using postgraphile as a library with express, make sure that the ``jwtRole`` option is passed an ``array``, not a string, and that the list of strings in the array matches whatever enum type you have designated as a role in your ``jwt_token`` type in the schema.
-* Make sure that any function that returns your ``jwt_token`` type returns the exact text string of your DB role that you want the token to identify 
-* If you're using postgraphile as a libary, make sure that ``pgDefaultRole`` is also set to your role that any user will be assigned before providing an jwt
+- If you're using postgraphile as a library with express, make sure that the `jwtRole` option is passed an `array`, not a string, and that the list of strings in the array matches whatever enum type you have designated as a role in your `jwt_token` type in the schema.
+- Make sure that any function that returns your `jwt_token` type returns the exact text string of your DB role that you want the token to identify
+- If you're using postgraphile as a libary, make sure that `pgDefaultRole` is also set to your role that any user will be assigned before providing an jwt
 
 ### Example
 
@@ -128,7 +126,7 @@ CREATE TYPE app.jwt_token AS ENUM (
 
 -- from tutorial
 CREATE OR REPLACE FUNCTION app.authenticate (
-  username TEXT, 
+  username TEXT,
   password TEXT
 ) RETURNS app.jwt_token AS $$
 DECLARE

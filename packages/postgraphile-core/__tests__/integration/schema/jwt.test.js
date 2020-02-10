@@ -5,5 +5,5 @@ test(
   core.test("b", {
     jwtSecret: "secret",
     jwtPgTypeIdentifier: "b.jwt_token",
-  })
+  }),
 );

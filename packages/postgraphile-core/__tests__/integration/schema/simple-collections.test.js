@@ -5,7 +5,7 @@ test(
   core.test("c", {
     simpleCollections: "both",
     setofFunctionsContainNulls: false,
-  })
+  }),
 );
 
 test(
@@ -13,7 +13,7 @@ test(
   core.test("c", {
     simpleCollections: "only",
     setofFunctionsContainNulls: false,
-  })
+  }),
 );
 
 test(
@@ -27,8 +27,8 @@ test(
     pgClient =>
       pgClient.query(`
         comment on table simple_collections.people is E'@simpleCollections omit';
-      `)
-  )
+      `),
+  ),
 );
 
 test(
@@ -42,8 +42,8 @@ test(
     pgClient =>
       pgClient.query(`
         comment on function simple_collections.people_odd_pets(simple_collections.people) is E'@simpleCollections only';
-      `)
-  )
+      `),
+  ),
 );
 
 test(
@@ -57,6 +57,6 @@ test(
     pgClient =>
       pgClient.query(`
         comment on constraint pets_owner_id_fkey on simple_collections.pets is E'@simpleCollections only';
-      `)
-  )
+      `),
+  ),
 );

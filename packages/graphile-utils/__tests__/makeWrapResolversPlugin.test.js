@@ -36,7 +36,7 @@ const makeSchemaWithSpyAndPlugins = (spy, plugins) =>
     ],
     {
       optionKey: "optionValue",
-    }
+    },
   );
 
 const makeEchoSpy = fn =>
@@ -44,7 +44,7 @@ const makeEchoSpy = fn =>
     fn ||
       ((parent, args, _context, _resolveInfo) => {
         return args.message;
-      })
+      }),
   );
 
 describe("wrapping named resolvers", () => {
@@ -76,7 +76,7 @@ describe("wrapping named resolvers", () => {
           }
         `,
         rootValue,
-        { test: true }
+        { test: true },
       );
       expect(result.errors).toBeFalsy();
       expect(result.data.echo).toEqual("Hello");
@@ -95,7 +95,7 @@ describe("wrapping named resolvers", () => {
       resolve(
         { ...parent, rideover: true },
         { message: args.message.toUpperCase() },
-        { ...context, override: true }
+        { ...context, override: true },
       );
 
     const spy = makeEchoSpy();
@@ -115,7 +115,7 @@ describe("wrapping named resolvers", () => {
         }
       `,
       rootValue,
-      { test: true }
+      { test: true },
     );
     expect(result.errors).toBeFalsy();
     expect(result.data.echo).toEqual("HELLO");
@@ -153,7 +153,7 @@ describe("wrapping named resolvers", () => {
         }
       `,
       rootValue,
-      { test: true }
+      { test: true },
     );
     expect(result.errors).toBeTruthy();
     expect(result.data.echo).toBe(null);
@@ -193,7 +193,7 @@ describe("wrapping named resolvers", () => {
         }
       `,
       rootValue,
-      { test: true }
+      { test: true },
     );
     expect(result.errors).toBeTruthy();
     expect(result.data.echo).toBe(null);
@@ -225,7 +225,7 @@ describe("wrapping named resolvers", () => {
         }
       `,
       rootValue,
-      { test: true }
+      { test: true },
     );
     expect(result.errors).toBeFalsy();
     expect(result.data.echo).toBe("hello");
@@ -266,7 +266,7 @@ describe("wrapping named resolvers", () => {
         }
       `,
       rootValue,
-      { test: true }
+      { test: true },
     );
     expect(options).toBeTruthy();
     expect(options.optionKey).toEqual("optionValue");
@@ -297,7 +297,7 @@ describe("wrapping resolvers matching a filter", () => {
       user,
       args,
       _context,
-      _resolveInfo
+      _resolveInfo,
     ) => {
       before.push([
         `Mutation '${scope.fieldName}' starting with arguments:`,
@@ -337,7 +337,7 @@ describe("wrapping resolvers matching a filter", () => {
         }
       `,
       rootValue,
-      { test: true }
+      { test: true },
     );
     expect(result.errors).toBeFalsy();
     expect(result.data.a).toBe(8);

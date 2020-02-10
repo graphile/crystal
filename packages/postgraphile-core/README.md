@@ -61,7 +61,7 @@ const schema = await createPostGraphileSchema(
     dynamicJson: true,
     pgJwtSecret: process.env.JWT_SECRET,
     pgJwtTypeIdentifier: "users_schema.jwt_type",
-  }
+  },
 );
 ```
 
@@ -90,7 +90,7 @@ async function runQuery(query, variables) {
       dynamicJson: true,
       pgJwtSecret: process.env.JWT_SECRET,
       pgJwtTypeIdentifier: "users_schema.jwt_type",
-    }
+    },
   );
 
   // Fetch a postgres client from the pool
@@ -114,7 +114,7 @@ async function runQuery(query, variables) {
       /* CONTEXT > */ {
         pgClient: pgClient,
       } /* < CONTEXT */,
-      variables
+      variables,
     );
   } finally {
     // commit the transaction (or rollback if there was an error) to clear the local settings
@@ -128,7 +128,7 @@ async function runQuery(query, variables) {
 // Normally you'd execute a query in response to an HTTP request or similar
 runQuery(
   // This query obviously depends on your database schema
-  "query MyQuery { allPosts { nodes { id, title, author: userByAuthorId { username } } } }"
+  "query MyQuery { allPosts { nodes { id, title, author: userByAuthorId { username } } } }",
 )
   .then(result => {
     console.dir(result);

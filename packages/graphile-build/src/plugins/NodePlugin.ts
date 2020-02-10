@@ -18,12 +18,12 @@ export type NodeFetcher<T = any> = (
   parsedResolveInfoFragment: ResolveTree,
   type: import("graphql").GraphQLType,
   resolveData: ResolvedLookAhead,
-  resolveInfo: import("graphql").GraphQLResolveInfo
+  resolveInfo: import("graphql").GraphQLResolveInfo,
 ) => T;
 
 export default (function NodePlugin(
   builder,
-  { nodeIdFieldName: inNodeIdFieldName }
+  { nodeIdFieldName: inNodeIdFieldName },
 ) {
   const nodeIdFieldName: string = inNodeIdFieldName
     ? String(inNodeIdFieldName)
@@ -45,7 +45,7 @@ export default (function NodePlugin(
             ...identifiers: unknown[]
           ) {
             return base64(
-              JSON.stringify([this.getNodeAlias(Type), ...identifiers])
+              JSON.stringify([this.getNodeAlias(Type), ...identifiers]),
             );
           },
           getTypeAndIdentifiersFromNodeId(nodeId: string) {
@@ -77,7 +77,7 @@ export default (function NodePlugin(
             ) {
               // eslint-disable-next-line no-console
               console.warn(
-                `SERIOUS WARNING: two GraphQL types (${typeName} and ${nodeTypeNameByAlias[alias]}) are trying to use the same node alias '${alias}' which may mean that the Relay Global Object Identification identifiers in your schema may not be unique. To solve this, you should skip the PgNodeAliasPostGraphile plugin, but note this will change all your existing Node IDs. For alternative solutions, get in touch via GitHub or Discord`
+                `SERIOUS WARNING: two GraphQL types (${typeName} and ${nodeTypeNameByAlias[alias]}) are trying to use the same node alias '${alias}' which may mean that the Relay Global Object Identification identifiers in your schema may not be unique. To solve this, you should skip the PgNodeAliasPostGraphile plugin, but note this will change all your existing Node IDs. For alternative solutions, get in touch via GitHub or Discord`,
               );
             }
             nodeAliasByTypeName[typeName] = alias;
@@ -85,10 +85,10 @@ export default (function NodePlugin(
           },
         },
 
-        `Adding 'Node' interface support to the Build`
+        `Adding 'Node' interface support to the Build`,
       );
     },
-    ["Node"]
+    ["Node"],
   );
 
   builder.hook(
@@ -140,12 +140,12 @@ export default (function NodePlugin(
 
         {
           __origin: `graphile-build built-in (NodePlugin); you can omit this plugin if you like, but you'll lose compatibility with Relay`,
-        }
+        },
       );
 
       return _;
     },
-    ["Node"]
+    ["Node"],
   );
 
   builder.hook(
@@ -153,7 +153,7 @@ export default (function NodePlugin(
     function addNodeIdToQuery(
       interfaces: Array<import("graphql").GraphQLInterfaceTypeConfig<any, any>>,
       build,
-      context
+      context,
     ) {
       const { getTypeByName, inflection } = build;
       const {
@@ -165,7 +165,7 @@ export default (function NodePlugin(
       const Type = getTypeByName(inflection.builtin("Node"));
       if (!(Type instanceof build.graphql.GraphQLInterfaceType)) {
         console.error(
-          "Expected 'Node' to be a GraphQLInterfaceType but it wasn't"
+          "Expected 'Node' to be a GraphQLInterfaceType but it wasn't",
         );
         return interfaces;
       }
@@ -178,7 +178,7 @@ export default (function NodePlugin(
       Array<import("graphql").GraphQLInterfaceTypeConfig<any, any>>,
       ContextGraphQLObjectTypeInterfaces
     >,
-    ["Node"]
+    ["Node"],
   );
 
   builder.hook(
@@ -217,7 +217,7 @@ export default (function NodePlugin(
               const Node = getTypeByName(inflection.builtin("Node"));
               if (!(Node instanceof build.graphql.GraphQLInterfaceType)) {
                 throw new Error(
-                  "Expected 'Node' to be a GraphQLInterfaceType but it wasn't"
+                  "Expected 'Node' to be a GraphQLInterfaceType but it wasn't",
                 );
               }
               return {
@@ -239,7 +239,7 @@ export default (function NodePlugin(
                     { getDataFromParsedResolveInfoFragment },
                     data,
                     context,
-                    resolveInfo
+                    resolveInfo,
                   );
                 },
               };
@@ -247,13 +247,13 @@ export default (function NodePlugin(
 
             {
               isRootNodeField: true,
-            }
+            },
           ),
         },
 
-        `Adding Relay Global Object Identification support to the root Query via 'node' and '${nodeIdFieldName}' fields`
+        `Adding Relay Global Object Identification support to the root Query via 'node' and '${nodeIdFieldName}' fields`,
       );
     },
-    ["Node"]
+    ["Node"],
   );
 } as Plugin);

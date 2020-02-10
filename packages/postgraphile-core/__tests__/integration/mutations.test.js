@@ -99,7 +99,7 @@ beforeAll(() => {
       // Read the mutation from the file system.
       const mutation = await readFile(
         resolvePath(mutationsDir, fileName),
-        "utf8"
+        "utf8",
       );
 
       // Add data to the client instance we are using.
@@ -130,7 +130,7 @@ beforeAll(() => {
         schemaToUse = useCustomNetworkScalarsSchema;
       } else if (fileName.startsWith("rbac.")) {
         await pgClient.query(
-          "select set_config('role', 'postgraphile_test_visitor', true), set_config('jwt.claims.user_id', '3', true)"
+          "select set_config('role', 'postgraphile_test_visitor', true), set_config('jwt.claims.user_id', '3', true)",
         );
         schemaToUse = rbacSchema;
       } else {
@@ -150,7 +150,7 @@ beforeAll(() => {
         {
           pgClient: pgClient,
         },
-        variables
+        variables,
       );
       if (result.errors) {
         // eslint-disable-next-line no-console

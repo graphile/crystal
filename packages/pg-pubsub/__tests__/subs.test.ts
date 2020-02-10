@@ -77,7 +77,7 @@ describe("Middleware defaults", () => {
         expect(json.errors).toBeFalsy();
         const schema = buildClientSchema(json.data);
         expect(schema).toMatchSnapshot();
-      }
+      },
     );
   });
 });
@@ -87,7 +87,7 @@ describe("Subscriptions", () => {
     init({
       ...CLI_DEFAULTS,
       simpleSubscriptions: true,
-    })
+    }),
   );
   afterAll(teardown);
 
@@ -101,7 +101,7 @@ describe("Subscriptions", () => {
         expect(res.statusCode).toEqual(200);
         const schema = buildClientSchema(json.data);
         expect(schema).toMatchSnapshot();
-      }
+      },
     );
   });
 });

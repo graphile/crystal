@@ -12,7 +12,7 @@ export default async function resolveNode<T = unknown>(
   },
   data: unknown,
   context: Context,
-  resolveInfo: import("graphql").GraphQLResolveInfo
+  resolveInfo: import("graphql").GraphQLResolveInfo,
 ): Promise<T | null> {
   const {
     $$isQuery,
@@ -35,7 +35,7 @@ export default async function resolveNode<T = unknown>(
     const parsedResolveInfoFragment = parseResolveInfo(resolveInfo, true);
     const resolveData = getDataFromParsedResolveInfoFragment(
       parsedResolveInfoFragment,
-      getNamedType(Type) as import("graphql").GraphQLOutputType
+      getNamedType(Type) as import("graphql").GraphQLOutputType,
     );
 
     const node = await resolver(
@@ -45,7 +45,7 @@ export default async function resolveNode<T = unknown>(
       parsedResolveInfoFragment,
       resolveInfo.returnType,
       resolveData,
-      resolveInfo
+      resolveInfo,
     );
 
     Object.defineProperty(node, $$nodeType, {

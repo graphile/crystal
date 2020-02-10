@@ -32,7 +32,7 @@ function deprecateEverything(obj: {
   return Object.keys(obj).reduce((memo, key) => {
     memo[key] = deprecate(
       obj[key],
-      `Something (probably a plugin) called the old inflection system (inflector: '${key}'). This system has been deprecated since 4.0.0-beta.6 (4th May 2018) and is not used internally so using it may cause inconsistencies, instead please use the plugin-capable inflection system https://www.graphile.org/postgraphile/inflection/`
+      `Something (probably a plugin) called the old inflection system (inflector: '${key}'). This system has been deprecated since 4.0.0-beta.6 (4th May 2018) and is not used internally so using it may cause inconsistencies, instead please use the plugin-capable inflection system https://www.graphile.org/postgraphile/inflection/`,
     );
 
     return memo;
@@ -74,12 +74,12 @@ export const newInflector = (
     upperCamelCase,
     pluralize,
     singularize,
-  }: InflectorUtils = defaultUtils
+  }: InflectorUtils = defaultUtils,
 ): Inflector => {
   function singularizeTable(tableName: string): string {
     return singularize(tableName).replace(
       /.(?:(?:[_-]i|I)nput|(?:[_-]p|P)atch)$/,
-      "$&_record"
+      "$&_record",
     );
   }
 
@@ -96,7 +96,7 @@ export const newInflector = (
         name: string,
         ascending: boolean,
         _table: string,
-        _schema: string | null | undefined
+        _schema: string | null | undefined,
       ) {
         return constantCase(`${name}_${ascending ? "asc" : "desc"}`);
       },
@@ -232,45 +232,45 @@ export const newInflector = (
       singleRelationByKeys(
         detailedKeys: Keys,
         table: string,
-        schema: string | null | undefined
+        schema: string | null | undefined,
       ) {
         return camelCase(
           `${this.tableName(table, schema)}-by-${detailedKeys
             .map(key => this.column(key.column, key.table, key.schema))
-            .join("-and-")}`
+            .join("-and-")}`,
         );
       },
       rowByUniqueKeys(
         detailedKeys: Keys,
         table: string,
-        schema: string | null | undefined
+        schema: string | null | undefined,
       ) {
         return camelCase(
           `${this.tableName(table, schema)}-by-${detailedKeys
             .map(key => this.column(key.column, key.table, key.schema))
-            .join("-and-")}`
+            .join("-and-")}`,
         );
       },
       updateByKeys(
         detailedKeys: Keys,
         table: string,
-        schema: string | null | undefined
+        schema: string | null | undefined,
       ) {
         return camelCase(
           `update-${this.tableName(table, schema)}-by-${detailedKeys
             .map(key => this.column(key.column, key.table, key.schema))
-            .join("-and-")}`
+            .join("-and-")}`,
         );
       },
       deleteByKeys(
         detailedKeys: Keys,
         table: string,
-        schema: string | null | undefined
+        schema: string | null | undefined,
       ) {
         return camelCase(
           `delete-${this.tableName(table, schema)}-by-${detailedKeys
             .map(key => this.column(key.column, key.table, key.schema))
-            .join("-and-")}`
+            .join("-and-")}`,
         );
       },
       updateNode(name: string, _schema: string | null | undefined) {
@@ -282,23 +282,23 @@ export const newInflector = (
       updateByKeysInputType(
         detailedKeys: Keys,
         name: string,
-        _schema: string | null | undefined
+        _schema: string | null | undefined,
       ) {
         return upperCamelCase(
           `update-${singularizeTable(name)}-by-${detailedKeys
             .map(key => this.column(key.column, key.table, key.schema))
-            .join("-and-")}-input`
+            .join("-and-")}-input`,
         );
       },
       deleteByKeysInputType(
         detailedKeys: Keys,
         name: string,
-        _schema: string | null | undefined
+        _schema: string | null | undefined,
       ) {
         return upperCamelCase(
           `delete-${singularizeTable(name)}-by-${detailedKeys
             .map(key => this.column(key.column, key.table, key.schema))
-            .join("-and-")}-input`
+            .join("-and-")}-input`,
         );
       },
       updateNodeInputType(name: string, _schema: string | null | undefined) {
@@ -312,14 +312,14 @@ export const newInflector = (
         table: string,
         schema: string | null | undefined,
         _foreignTable: string,
-        _foreignSchema: string | null | undefined
+        _foreignSchema: string | null | undefined,
       ) {
         return camelCase(
           `${this.pluralize(
-            this.tableName(table, schema)
+            this.tableName(table, schema),
           )}-by-${detailedKeys
             .map(key => this.column(key.column, key.table, key.schema))
-            .join("-and-")}`
+            .join("-and-")}`,
         );
       },
       edge(typeName: string) {
@@ -333,13 +333,13 @@ export const newInflector = (
       },
       scalarFunctionConnection(
         procName: string,
-        _procSchema: string | null | undefined
+        _procSchema: string | null | undefined,
       ) {
         return upperCamelCase(`${procName}-connection`);
       },
       scalarFunctionEdge(
         procName: string,
-        _procSchema: string | null | undefined
+        _procSchema: string | null | undefined,
       ) {
         return upperCamelCase(`${procName}-edge`);
       },
@@ -359,7 +359,7 @@ export const newInflector = (
         return upperCamelCase(`delete-${singularizeTable(name)}-payload`);
       },
       ...overrides,
-    })
+    }),
   );
 };
 
