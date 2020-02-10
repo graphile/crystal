@@ -11,13 +11,9 @@ const methods = http.METHODS.map(m => m.toLowerCase());
 
 /**
  * Initialize a new `TestAgent`.
- *
- * @param {Function|Server} app
- * @param {Object} options
- * @api public
  */
 
-function TestAgent(app: any, options: any) {
+function TestAgent(app: http.RequestListener | http.Server, options: any) {
   // @ts-ignore
   if (!(this instanceof TestAgent)) return new TestAgent(app, options);
   if (typeof app === "function") app = http.createServer(app); // eslint-disable-line no-param-reassign

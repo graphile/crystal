@@ -502,8 +502,6 @@ declare module "pg" {
 
 /**
  * Adds debug logging funcionality to a Postgres client.
- *
- * @private
  */
 // tslint:disable no-any
 export function debugPgClient(
@@ -613,8 +611,6 @@ export function debugPgClient(
 
 /**
  * Safely gets the value at `path` (array of keys) of `inObject`.
- *
- * @private
  */
 function getPath(inObject: mixed, path: Array<string>): any {
   let object = inObject;
@@ -632,8 +628,6 @@ function getPath(inObject: mixed, path: Array<string>): any {
  * Check if a pgSetting is a string or a number.
  * Null and Undefined settings are not valid and will be ignored.
  * pgSettings of other types throw an error.
- *
- * @private
  */
 function isPgSettingValid(pgSetting: mixed): boolean {
   if (pgSetting === undefined || pgSetting === null) {

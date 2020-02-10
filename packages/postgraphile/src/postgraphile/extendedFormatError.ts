@@ -6,7 +6,7 @@ import {
 } from "../interfaces";
 
 /**
- * Extracts the requested fields from a pg error object, handling 'code' -> 'errcode' mapping.
+ * Extracts the requested fields from a pg error object, handling 'code' → 'errcode' mapping.
  */
 function pickPgError(
   err: mixed,

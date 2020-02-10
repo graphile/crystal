@@ -8,17 +8,14 @@ const methods = http.METHODS.map(m => m.toLowerCase());
 /**
  * Test against the given `app`,
  * returning a new `Test`.
- *
- * @param {Function|Server} app
- * @return {Test}
- * @api public
  */
-export default (app: any) => {
+export default (appOrCallback: http.Server | http.RequestListener): Test => {
   const obj: any = {};
 
-  if (typeof app === "function") {
-    app = http.createServer(app); // eslint-disable-line no-param-reassign
-  }
+  const app =
+    typeof appOrCallback === "function"
+      ? http.createServer(appOrCallback)
+      : appOrCallback;
 
   methods.forEach(method => {
     obj[method] = (url: string) => {

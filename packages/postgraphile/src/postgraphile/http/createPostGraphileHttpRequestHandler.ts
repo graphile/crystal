@@ -42,8 +42,6 @@ const { createHash } = crypto;
 /**
  * The favicon file in `Buffer` format. We can send a `Buffer` directly to the
  * client.
- *
- * @type {Buffer}
  */
 import favicon from "../../assets/favicon.ico";
 
@@ -1089,8 +1087,6 @@ function createBadAuthorizationHeaderError(): httpError.HttpError {
  * ```
  *
  * [1]: https://tools.ietf.org/html/rfc7235
- *
- * @private
  */
 const authorizationBearerRex = /^\s*bearer\s+([a-z0-9\-._~+/]+=*)\s*$/i;
 
@@ -1099,10 +1095,6 @@ const authorizationBearerRex = /^\s*bearer\s+([a-z0-9\-._~+/]+=*)\s*$/i;
  * `Authorization` header in the `Bearer` format. Will throw an error if the
  * header is in the incorrect format, but will not throw an error if the header
  * does not exist.
- *
- * @private
- * @param {IncomingMessage} request
- * @returns {string | null}
  */
 function getJwtToken(request: IncomingMessage): string | null {
   const { authorization } = request.headers;

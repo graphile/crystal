@@ -43,8 +43,12 @@ type DirectOrCallback<Request, T> = T | ((req: Request) => PromiseOrDirect<T>);
  *
  * The `mixed` type is identical to the `mixed` type in Flow.
  *
- * @see https://github.com/Microsoft/TypeScript/issues/9999
- * @see https://flowtype.org/docs/builtins.html#mixed
+ * @remarks
+ *
+ * See also:
+ *
+ * - {@link https://github.com/Microsoft/TypeScript/issues/9999}
+ * - {@link https://flowtype.org/docs/builtins.html#mixed}
  */
 export type mixed = {} | string | number | boolean | undefined | null;
 
