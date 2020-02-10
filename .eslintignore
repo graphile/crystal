@@ -1,6 +1,7 @@
-/packages/pg-sql2/lib
-/postgraphile
 node_modules
+/packages/pg-sql2/lib
+/packages/postgraphile/postgraphiql
+/packages/postgraphile/src/assets
 node7minus
 node8plus
 dist-turbo

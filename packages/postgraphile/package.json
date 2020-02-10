@@ -100,6 +100,7 @@
     "css-loader": "2.1.1",
     "eslint": "^6.4.0",
     "eslint-config-prettier": "^6.3.0",
+    "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-jest": "^22.17.0",
     "eslint-plugin-prettier": "^3.1.1",
     "express": "^4.14.0",
@@ -112,6 +113,7 @@
     "koa-mount": "^4.0.0",
     "nodemon": "^1.11.0",
     "pg-minify": "~1.0.0",
+    "postgraphiql": "1.0.0",
     "prettier": "^1.18.2",
     "source-map-support": "^0.5.12",
     "style-loader": "^0.23.0",
@@ -124,19 +126,11 @@
     "transform": {
       ".*": "<rootDir>/resources/jest-preprocessor.js"
     },
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json"
-    ],
-    "setupFiles": [
-      "<rootDir>/resources/jest-setup.js"
-    ],
+    "moduleFileExtensions": ["ts", "js", "json"],
+    "setupFiles": ["<rootDir>/resources/jest-setup.js"],
     "browser": false,
     "testEnvironment": "node",
-    "roots": [
-      "<rootDir>/src"
-    ],
+    "roots": ["<rootDir>/src"],
     "testRegex": "/__tests__/[^.]+-test.(t|j)s$"
   },
   "files": [

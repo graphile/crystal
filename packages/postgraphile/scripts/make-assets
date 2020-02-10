@@ -43,14 +43,14 @@ async function main() {
   await new Promise((resolve, reject) => {
     // Install the older version of GraphQL for GraphiQL
     execSync('yarn', {
-      cwd: `${__dirname}/../postgraphiql`,
+      cwd: `${__dirname}/../../postgraphiql`,
     });
     // Webpack up everything
     webpack(
       {
         mode: 'production',
         target: 'web',
-        entry: `${__dirname}/../postgraphiql/src/index.js`,
+        entry: `${__dirname}/../../postgraphiql/src/index.js`,
         node: {
           dgram: 'empty',
           fs: 'empty',
@@ -95,11 +95,11 @@ async function main() {
           // Prevent webpack from attempting to import flow stuff (dynamic requires in GraphiQL)
           new webpack.ContextReplacementPlugin(
             /graphql-language-service-interface[\\/]dist$/,
-            /^\.\/.*\.js$/
+            /^\.\/.*\.js$/,
           ),
           new HtmlWebpackPlugin({
             filename: 'graphiql.html',
-            template: `${__dirname}/../postgraphiql/public/index.html`,
+            template: `${__dirname}/../../postgraphiql/public/index.html`,
             inlineSource: '.(js|css)$', // embed all javascript and css inline
             inject: 'body',
           }),
@@ -119,7 +119,7 @@ async function main() {
         fs.unlinkSync(`${ASSETS_SOURCE_DIR}/graphiql.js`);
         console.log(stats.toString('minimal'));
         resolve();
-      }
+      },
     );
   });
 
@@ -140,7 +140,7 @@ async function main() {
       }
       fs.writeFileSync(
         `${ASSETS_DEST_DIR}/${filename}.ts`,
-        `export default process.env.POSTGRAPHILE_OMIT_ASSETS === '1'\n  ? null\n  : ${output};\n`
+        `export default process.env.POSTGRAPHILE_OMIT_ASSETS === '1'\n  ? null\n  : ${output};\n`,
       );
     });
 }
@@ -151,5 +151,5 @@ main().then(
     console.error('An error occurred');
     console.error(err);
     process.exit(3);
-  }
+  },
 );
