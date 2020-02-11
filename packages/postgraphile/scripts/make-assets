@@ -1,25 +1,25 @@
 #!/usr/bin/env node
-const fs = require('fs');
-const { execSync } = require('child_process');
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
+const fs = require("fs");
+const { execSync } = require("child_process");
+const webpack = require("webpack");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const HtmlWebpackInlineSourcePlugin = require("html-webpack-inline-source-plugin");
 
 const ASSETS_SOURCE_DIR = `${__dirname}/../assets/`;
 const ASSETS_DEST_DIR = `${__dirname}/../src/assets/`;
 
 async function main() {
-  console.log('... Making sponsors.json');
-  const sponsorsMd = fs.readFileSync(`${__dirname}/../SPONSORS.md`, 'utf8');
-  const lines = sponsorsMd.split('\n');
+  console.log("... Making sponsors.json");
+  const sponsorsMd = fs.readFileSync(`${__dirname}/../SPONSORS.md`, "utf8");
+  const lines = sponsorsMd.split("\n");
   const tiers = [];
   let tier;
   for (const line of lines) {
-    if (line.startsWith('## ')) {
+    if (line.startsWith("## ")) {
       tier = [];
       tiers.push(tier);
-    } else if (line.startsWith('* ') || line.startsWith('- ')) {
-      tier.push(line.substr(2).replace(/\s?\(.*$/, ''));
+    } else if (line.startsWith("* ") || line.startsWith("- ")) {
+      tier.push(line.substr(2).replace(/\s?\(.*$/, ""));
     }
   }
   tiers.reverse();
@@ -35,32 +35,31 @@ async function main() {
     }
   }
   sponsors.sort();
-  fs.writeFileSync(`${__dirname}/../sponsors.json`, JSON.stringify(sponsors, null, 2));
+  fs.writeFileSync(
+    `${__dirname}/../sponsors.json`,
+    JSON.stringify(sponsors, null, 2),
+  );
 
-  console.log('... Building GraphiQL');
+  console.log("... Building GraphiQL");
 
   // Step 1: compile GraphiQL
   await new Promise((resolve, reject) => {
-    // Install the older version of GraphQL for GraphiQL
-    execSync('yarn', {
-      cwd: `${__dirname}/../../postgraphiql`,
-    });
     // Webpack up everything
     webpack(
       {
-        mode: 'production',
-        target: 'web',
+        mode: "production",
+        target: "web",
         entry: `${__dirname}/../../postgraphiql/src/index.js`,
         node: {
-          dgram: 'empty',
-          fs: 'empty',
-          net: 'empty',
-          tls: 'empty',
-          child_process: 'empty',
+          dgram: "empty",
+          fs: "empty",
+          net: "empty",
+          tls: "empty",
+          child_process: "empty",
         },
         output: {
           path: ASSETS_SOURCE_DIR,
-          filename: 'graphiql.js',
+          filename: "graphiql.js",
         },
         module: {
           rules: [
@@ -68,27 +67,27 @@ async function main() {
               test: /\.jsx?$/,
               exclude: /node_modules/,
               use: {
-                loader: 'babel-loader',
+                loader: "babel-loader",
                 options: {
-                  presets: ['@babel/preset-env', '@babel/preset-react'],
+                  presets: ["@babel/preset-env", "@babel/preset-react"],
                   plugins: [
-                    '@babel/plugin-proposal-class-properties',
-                    '@babel/plugin-transform-runtime',
+                    "@babel/plugin-proposal-class-properties",
+                    "@babel/plugin-transform-runtime",
                   ],
                 },
               },
             },
             {
               test: /\.css$/,
-              use: [{ loader: 'style-loader' }, { loader: 'css-loader' }],
+              use: [{ loader: "style-loader" }, { loader: "css-loader" }],
             },
           ],
         },
         plugins: [
           new webpack.DefinePlugin({
             // Hack required due to https://unpkg.com/graphql@0.13.2/jsutils/instanceOf.js
-            process: 'false',
-            'process.env': {
+            process: "false",
+            "process.env": {
               NODE_ENV: '"production"',
             },
           }),
@@ -98,10 +97,10 @@ async function main() {
             /^\.\/.*\.js$/,
           ),
           new HtmlWebpackPlugin({
-            filename: 'graphiql.html',
+            filename: "graphiql.html",
             template: `${__dirname}/../../postgraphiql/public/index.html`,
-            inlineSource: '.(js|css)$', // embed all javascript and css inline
-            inject: 'body',
+            inlineSource: ".(js|css)$", // embed all javascript and css inline
+            inject: "body",
           }),
           new HtmlWebpackInlineSourcePlugin(),
         ],
@@ -112,12 +111,12 @@ async function main() {
           process.exit(1);
         }
         if (stats.hasErrors()) {
-          console.log(stats.toString('minimal'));
+          console.log(stats.toString("minimal"));
           process.exit(2);
         }
         // We only want the HTML file
         fs.unlinkSync(`${ASSETS_SOURCE_DIR}/graphiql.js`);
-        console.log(stats.toString('minimal'));
+        console.log(stats.toString("minimal"));
         resolve();
       },
     );
@@ -125,18 +124,20 @@ async function main() {
 
   const shouldBeBinary = filename => !filename.match(/\.html$/);
 
-  console.log('... Compiling the assets');
+  console.log("... Compiling the assets");
   // Step 2: compile the assets
   const files = fs.readdirSync(ASSETS_SOURCE_DIR);
   files
-    .filter(f => f[0] !== '.')
+    .filter(f => f[0] !== ".")
     .map(filename => {
       const fileContent = fs.readFileSync(`${ASSETS_SOURCE_DIR}/${filename}`);
       let output;
       if (shouldBeBinary(filename)) {
-        output = `Buffer.from(\n  '${fileContent.toString('base64')}',\n  'base64'\n)`;
+        output = `Buffer.from(\n  '${fileContent.toString(
+          "base64",
+        )}',\n  'base64'\n)`;
       } else {
-        output = `${JSON.stringify(fileContent.toString('utf8'))}`;
+        output = `${JSON.stringify(fileContent.toString("utf8"))}`;
       }
       fs.writeFileSync(
         `${ASSETS_DEST_DIR}/${filename}.ts`,
@@ -148,7 +149,7 @@ async function main() {
 main().then(
   () => {},
   err => {
-    console.error('An error occurred');
+    console.error("An error occurred");
     console.error(err);
     process.exit(3);
   },
