@@ -12,7 +12,6 @@ module.exports = {
         },
       },
     ],
-    "@babel/flow",
   ],
   env: {
     test: {
@@ -25,7 +24,6 @@ module.exports = {
             },
           },
         ],
-        "@babel/flow",
       ],
     },
   },

@@ -78,14 +78,6 @@ module.exports = {
       },
     },
 
-    // Rules for Flow only
-    {
-      files: ["*.js", "*.jsx"],
-      rules: {
-        "@typescript-eslint/explicit-function-return-type": "off",
-      },
-    },
-
     // Rules for TypeScript only
     {
       files: ["*.ts", "*.tsx"],
