@@ -5,6 +5,7 @@ import {
   ExecutionResult,
   specifiedRules,
   validate,
+  execute,
   GraphQLError,
   parse,
   DocumentNode,
@@ -188,9 +189,7 @@ export async function enhanceHttpServerWithSubscriptions<
     {
       schema,
       validationRules: staticValidationRules,
-      execute: () => {
-        throw new Error('Only subscriptions are allowed over websocket transport');
-      },
+      execute,
       subscribe: options.live ? liveSubscribe : graphqlSubscribe,
       onConnect(
         connectionParams: object,
