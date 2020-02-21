@@ -189,7 +189,8 @@ export async function enhanceHttpServerWithSubscriptions<
     {
       schema,
       validationRules: staticValidationRules,
-      execute: options.websocketTransport ?  execute :  () => {     throw new Error('Only subscriptions are allowed over websocket transport'); },
+      execute: options.websocketTransport ?  execute :
+                () => {  throw new Error('Only subscriptions are allowed over websocket transport'); },
       subscribe: options.live ? liveSubscribe : graphqlSubscribe,
       onConnect(
         connectionParams: object,
