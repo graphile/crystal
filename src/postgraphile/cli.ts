@@ -664,7 +664,7 @@ const postgraphileOptions = pluginHook(
     graphiql: !disableGraphiql,
     enhanceGraphiql: enhanceGraphiql ? true : undefined,
     jwtPgTypeIdentifier: jwtPgTypeIdentifier || deprecatedJwtPgTypeIdentifier,
-    jwtSecret: jwtSecret || deprecatedJwtSecret,
+    jwtSecret: jwtSecret || deprecatedJwtSecret || process.env.JWT_SECRET,
     jwtPublicKey,
     jwtAudiences,
     jwtSignOptions,
