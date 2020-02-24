@@ -123,3 +123,10 @@ export {
 };
 
 export { upperFirst, camelCase, constantCase } from "graphile-build";
+
+export { parseTags } from "./utils";
+
+export {
+  default as withPgClient,
+  getPgClientAndReleaserFromConfig,
+} from "./withPgClient";

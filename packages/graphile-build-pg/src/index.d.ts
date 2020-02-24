@@ -107,3 +107,19 @@ export {
   CursorValue,
   CursorComparator,
 } from "./QueryBuilder";
+
+export function parseTags(
+  str: string
+): {
+  tags: { [key: string]: string | string[] | boolean };
+  text: string;
+};
+
+import { Client, Pool } from "pg";
+export function withPgClient<T = void>(
+  pgConfig: Client | Pool | string,
+  fn: (pgClient: Client) => Promise<T>
+): Promise<T>;
+export function getPgClientAndReleaserFromConfig(
+  pgConfig: Client | Pool | string
+): Promise<{ pgClient: Client; releasePgClient: () => void }>;
