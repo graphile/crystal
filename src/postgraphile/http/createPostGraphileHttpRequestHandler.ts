@@ -413,8 +413,11 @@ export default function createPostGraphileHttpRequestHandler(
         )
       : null;
 
-    if (subscriptions || options.websocketOperations == 'all'
-                      || options.websocketOperations == 'subscriptions') {
+    if (
+      subscriptions ||
+      options.websocketOperations == 'all' ||
+      options.websocketOperations == 'subscriptions'
+    ) {
       const server = req && req.connection && req.connection['server'];
       if (!server) {
         // tslint:disable-next-line no-console
