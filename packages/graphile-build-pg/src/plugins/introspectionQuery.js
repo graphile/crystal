@@ -9,9 +9,19 @@
  */
 function makeIntrospectionQuery(
   serverVersionNum: number,
-  options: { pgLegacyFunctionsOnly?: boolean } = {}
+  options: {
+    pgLegacyFunctionsOnly?: boolean,
+    pgIgnoreRBAC?: boolean,
+  } = {}
 ): string {
-  const { pgLegacyFunctionsOnly } = options;
+  const { pgLegacyFunctionsOnly = false, pgIgnoreRBAC = true } = options;
+  const unionRBAC = `
+    union all
+      select pg_roles.oid _oid, pg_roles.*
+      from pg_roles, accessible_roles, pg_auth_members
+      where pg_auth_members.roleid = pg_roles.oid
+        and pg_auth_members.member = accessible_roles._oid 
+  `;
   return `\
 -- @see https://www.postgresql.org/docs/9.5/static/catalogs.html
 -- @see https://github.com/graphile/graphile-engine/blob/master/packages/graphile-build-pg/src/plugins/introspectionQuery.js
@@ -20,15 +30,11 @@ function makeIntrospectionQuery(
 -- - \`$1\`: An array of strings that represent the namespaces we are introspecting.
 -- - \`$2\`: set true to include functions/tables/etc that come from extensions
 with
-  recursive accessible_roles(_oid) as (
+  ${!pgIgnoreRBAC ? "recursive" : ""} accessible_roles(_oid) as (
     select oid _oid, pg_roles.*
     from pg_roles
     where rolname = current_user
-  union all
-    select pg_roles.oid _oid, pg_roles.*
-    from pg_roles, accessible_roles, pg_auth_members
-    where pg_auth_members.roleid = pg_roles.oid
-    and pg_auth_members.member = accessible_roles._oid
+    ${!pgIgnoreRBAC ? unionRBAC : ""}
   ),
   -- @see https://www.postgresql.org/docs/9.5/static/catalog-pg-namespace.html
   namespace as (

@@ -468,6 +468,7 @@ export default (async function PgIntrospectionPlugin(
     pgThrowOnMissingSchema = false,
     pgIncludeExtensionResources = false,
     pgLegacyFunctionsOnly = false,
+    pgIgnoreRBAC = true,
     pgSkipInstallingWatchFixtures = false,
     pgOwnerConnectionString,
   }
@@ -493,6 +494,7 @@ export default (async function PgIntrospectionPlugin(
           );
           const introspectionQuery = makeIntrospectionQuery(serverVersionNum, {
             pgLegacyFunctionsOnly,
+            pgIgnoreRBAC,
           });
           const { rows } = await pgClient.query(introspectionQuery, [
             schemas,
