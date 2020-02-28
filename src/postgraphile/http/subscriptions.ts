@@ -190,7 +190,7 @@ export async function enhanceHttpServerWithSubscriptions<
       schema,
       validationRules: staticValidationRules,
       execute:
-        options.websocketOperations == 'all'
+        options.websocketOperations === 'all'
           ? execute
           : () => {
               throw new Error('Only subscriptions are allowed over websocket transport');
