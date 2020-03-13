@@ -13,7 +13,7 @@ sponsor](https://graphile.org/sponsor/).
 ## Leaders
 
 - Joe Dennis
-- domanda
+- domonda
 - Stagency
 - James Allain
 - Robert Claypool
