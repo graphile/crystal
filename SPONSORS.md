@@ -8,11 +8,12 @@ sponsor](https://graphile.org/sponsor/).
 
 - Chad Furman
 - Storyscript
+- Postlight
 
 ## Leaders
 
 - Joe Dennis
-- DOMONDA
+- domanda
 - Stagency
 - James Allain
 - Robert Claypool
@@ -26,6 +27,7 @@ sponsor](https://graphile.org/sponsor/).
 - Sterblue
 - HR-ON
 - Ian Stewart
+- Qwick
 - Janakan Arulkumarasan
 
 ## Supporters
@@ -38,7 +40,6 @@ sponsor](https://graphile.org/sponsor/).
 - Chris Watland
 - James Rascoe
 - Mark Lipscombe
-- purge
 - Frank
 - Mark Rapoza
 - innovation.rocks
@@ -48,3 +49,4 @@ sponsor](https://graphile.org/sponsor/).
 - CJ
 - Ben Botwin
 - Cameron Ellis
+- Mansoor Razzaq
