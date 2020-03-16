@@ -3893,6 +3893,37 @@ graphile-build-pg@4.6.0:
     pg-sql2 "4.5.0"
     postgres-interval "^1.2.0"
 
+graphile-build-pg@^4.5.3:
+  version "4.5.3"
+  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.5.3.tgz#13a584fb737b3a638d73cea1cfa4cca88dcf22a4"
+  integrity sha512-Sp3DC/PC9c8+dQkQ6FM5F2TwByWQIMX3TKpxm63SePFJfPdq2Lbl4mOjBxJykYf4Fh094MVAIz4Alz5a1yRBKw==
+  dependencies:
+    "@graphile/lru" "4.5.0"
+    chalk "^2.4.2"
+    debug "^4.1.1"
+    graphile-build "4.5.0"
+    graphql-iso-date "^3.6.0"
+    jsonwebtoken "^8.5.1"
+    lodash ">=4 <5"
+    lru-cache ">=4 <5"
+    pg-sql2 "4.5.0"
+    postgres-interval "^1.2.0"
+
+graphile-build@4.5.0, graphile-build@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-4.5.0.tgz#f7c627c146e051f454c4f19116231e9d8b653e04"
+  integrity sha512-U/1K4nHWp3MGJ7kwTwIYBZnO3ZDlufmHHpdd1t4uFA46OtxdP7RG7KnXyol/XB8hfTfqSVGabaZP8lr+NVyQPA==
+  dependencies:
+    "@graphile/lru" "4.5.0"
+    chalk "^2.4.2"
+    debug "^4.1.1"
+    graphql-parse-resolve-info "4.5.0"
+    iterall "^1.2.2"
+    lodash ">=4 <5"
+    lru-cache "^5.0.0"
+    pluralize "^7.0.0"
+    semver "^6.0.0"
+
 graphile-build@4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/graphile-build/-/graphile-build-4.6.0.tgz#04480c86779be2070deeaceea245cb6acf65f716"
@@ -3928,10 +3959,17 @@ graphql-parse-resolve-info@4.5.0:
   dependencies:
     debug "^4.1.1"
 
-"graphql@>=0.9 <0.14 || ^14.0.2", "graphql@^0.6.0 || ^0.7.0 || ^0.8.0-b || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.2":
+"graphql@>=0.9 <0.14 || ^14.0.2":
   version "14.5.8"
   resolved "https://registry.yarnpkg.com/graphql/-/graphql-14.5.8.tgz#504f3d3114cb9a0a3f359bbbcf38d9e5bf6a6b3c"
   integrity sha512-MMwmi0zlVLQKLdGiMfWkgQD7dY/TUKt4L+zgJ/aR0Howebod3aNgP5JkgvAULiR2HPVZaP2VEElqtdidHweLkg==
+  dependencies:
+    iterall "^1.2.2"
+
+graphql@^14.6.0:
+  version "14.6.0"
+  resolved "https://registry.yarnpkg.com/graphql/-/graphql-14.6.0.tgz#57822297111e874ea12f5cd4419616930cd83e49"
+  integrity sha512-VKzfvHEKybTKjQVpTFrA5yUq2S9ihcZvfJAtsDBBCuV6wauPu1xl/f9ehgVf0FcEJJs4vz6ysb/ZMkGigQZseg==
   dependencies:
     iterall "^1.2.2"
 
