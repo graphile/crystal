@@ -8,7 +8,7 @@
 
 Parses a `GraphQLResolveInfo` object into a tree of the fields that are being
 requested to enable optimisations to your GraphQL schema (e.g. to determine
-which fields are required from the SQL database).
+which fields are required from the backend).
 
 Useful for optimising your GraphQL resolvers by allowing them to look ahead in
 the request, reducing the number of SQL queries or HTTP requests required to
