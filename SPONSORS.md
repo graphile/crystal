@@ -1,7 +1,7 @@
 # Sponsors
 
-These individuals and companies give back to PostGraphile by sponsoring its
-ongoing development. Find out [how you can become a
+These individuals and companies sponsor ongoing development of projects in
+the Graphile ecosystem. Find out [how you can become a
 sponsor](https://graphile.org/sponsor/).
 
 ## Featured
@@ -14,39 +14,41 @@ sponsor](https://graphile.org/sponsor/).
 
 - Joe Dennis
 - domonda
-- Stagency
-- James Allain
 - Robert Claypool
-- 8th Light
+- James Allain
+- Stagency
 - Jack Dinker
+- 8th Light
 - Nigel Taylor
-- OpenLaw NZ
 - DocIQ
 - Principia Mentis
+- Qwick
 - Partners in School Innovation
+- OpenLaw NZ
 - Sterblue
 - HR-ON
 - Ian Stewart
-- Qwick
 - Janakan Arulkumarasan
 
 ## Supporters
 
-- Daniel Einspanger
+- Daniel Einspanjer
 - Sam Levin
-- Matt Bretl (also a major community contributor!)
 - stlbucket
-- Michel Pelletier
+- Matt Bretl
 - Chris Watland
 - James Rascoe
 - Mark Lipscombe
+- Michel Pelletier
 - Frank
 - Mark Rapoza
 - innovation.rocks
 - cybere
 - Daniel Woelfel
+- Philipp Litzenberger
 - Bjørn Michelsen
 - CJ
 - Ben Botwin
 - Cameron Ellis
 - Mansoor Razzaq
+- Borut Jures
