@@ -24,10 +24,12 @@ maintenance and development via sponsorship.
 And please give some love to our featured sponsors 🤩:
 
 <table><tr>
-<td align="center"><a href="http://chads.website/"><img src="https://www.graphile.org/images/sponsors/chadf.png" width="90" height="90" alt="Chad Furman" /><br />Chad Furman</a></td>
-<td align="center"><a href="https://storyscript.io/?utm_source=postgraphile"><img src="https://www.graphile.org/images/sponsors/storyscript.png" width="90" height="90" alt="Storyscript" /><br />Storyscript</a></td>
-<td align="center"><a href="https://postlight.com/?utm_source=graphile"><img src="https://www.graphile.org/images/sponsors/postlight.png" width="90" height="90" alt="Postlight" /><br />Postlight</a></td>
+<td align="center"><a href="http://chads.website"><img src="https://graphile.org/images/sponsors/chadf.png" width="90" height="90" alt="Chad Furman" /><br />Chad Furman</a> *</td>
+<td align="center"><a href="https://storyscript.io/?utm_source=postgraphile"><img src="https://graphile.org/images/sponsors/storyscript.png" width="90" height="90" alt="Storyscript" /><br />Storyscript</a> *</td>
+<td align="center"><a href="https://postlight.com/?utm_source=graphile"><img src="https://graphile.org/images/sponsors/postlight.png" width="90" height="90" alt="Postlight" /><br />Postlight</a> *</td>
 </tr></table>
+
+<em>\* Sponsors the entire Graphile suite</em>
 
 <!-- SPONSORS_END -->
 
@@ -130,11 +132,11 @@ runQuery(
   // This query obviously depends on your database schema
   "query MyQuery { allPosts { nodes { id, title, author: userByAuthorId { username } } } }"
 )
-  .then(result => {
+  .then((result) => {
     console.dir(result);
     pgPool.end();
   })
-  .catch(e => {
+  .catch((e) => {
     console.error(e);
     process.exit(1);
   });
