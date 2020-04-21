@@ -1,6 +1,6 @@
-import upperFirstAll = require("lodash/upperFirst");
-import camelCaseAll = require("lodash/camelCase");
-import plz = require("pluralize");
+import upperFirstAll from "lodash/upperFirst";
+import camelCaseAll from "lodash/camelCase";
+import plz from "pluralize";
 
 const bindAll = (obj: {}, keys: Array<string>) => {
   keys.forEach(key => {

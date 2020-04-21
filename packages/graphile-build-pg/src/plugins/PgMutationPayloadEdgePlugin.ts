@@ -1,5 +1,5 @@
 import { Plugin } from "graphile-build";
-import isString = require("lodash/isString");
+import isString from "lodash/isString";
 import { SQL } from "../QueryBuilder";
 import { OrderByValue, OrderBySpec } from "./PgConnectionArgOrderBy";
 import { PgEntityKind } from "./PgIntrospectionPlugin";

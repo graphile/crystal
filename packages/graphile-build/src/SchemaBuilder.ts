@@ -34,7 +34,7 @@ import {
   GraphQLEnumValueConfig,
   GraphQLOutputType,
 } from "graphql";
-import EventEmitter = require("events");
+import EventEmitter from "events";
 // TODO: when we move to TypeScript, change this to:
 // import { EventEmitter } from "events";
 

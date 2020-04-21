@@ -12,20 +12,20 @@ import config from "./postgraphilerc";
 
 import { createServer } from "http";
 import chalk from "chalk";
-import program = require("commander");
-import jwt = require("jsonwebtoken");
+import program from "commander";
+import jwt from "jsonwebtoken";
 import { parse as parsePgConnectionString } from "pg-connection-string";
 import postgraphile, { getPostgraphileSchemaBuilder } from "./postgraphile";
 import { makePgSmartTagsFromFilePlugin } from "../plugins";
 import { Pool, PoolConfig } from "pg";
-import cluster = require("cluster");
+import cluster from "cluster";
 import { makePluginHook, PostGraphilePlugin } from "./pluginHook";
-import debugFactory = require("debug");
+import debugFactory from "debug";
 import { mixed } from "../interfaces";
 // @ts-ignore
 import * as manifest from "../../package.json";
 // @ts-ignore
-import sponsors = require("../../sponsors.json");
+import sponsors from "../../sponsors.json";
 import { enhanceHttpServerWithSubscriptions } from "./http/subscriptions";
 import { existsSync } from "fs";
 

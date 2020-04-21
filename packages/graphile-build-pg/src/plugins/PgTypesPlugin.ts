@@ -8,7 +8,7 @@ import {
   ResolvedLookAhead,
 } from "graphile-build";
 import makeGraphQLJSONType from "../GraphQLJSON";
-import rawParseInterval = require("postgres-interval");
+import rawParseInterval from "postgres-interval";
 import LRU from "@graphile/lru";
 import {
   PgEntity,

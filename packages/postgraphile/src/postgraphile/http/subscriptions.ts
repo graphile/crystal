@@ -20,7 +20,7 @@ import {
   ConnectionContext,
   ExecutionParams,
 } from "subscriptions-transport-ws";
-import parseUrl = require("parseurl");
+import parseUrl from "parseurl";
 import { pluginHookFromOptions } from "../pluginHook";
 import { isEmpty } from "./createPostGraphileHttpRequestHandler";
 import liveSubscribe from "./liveSubscribe";

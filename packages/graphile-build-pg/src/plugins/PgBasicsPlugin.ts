@@ -32,7 +32,7 @@ import makeProcField from "./makeProcField";
 import parseIdentifier from "../parseIdentifier";
 import viaTemporaryTable from "./viaTemporaryTable";
 import chalk from "chalk";
-import pickBy = require("lodash/pickBy");
+import pickBy from "lodash/pickBy";
 import PgLiveProvider from "../PgLiveProvider";
 import pgPrepareAndRun from "../pgPrepareAndRun";
 import { PoolClient } from "pg";

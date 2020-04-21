@@ -2,9 +2,9 @@ import QueryBuilder from "./QueryBuilder";
 import { QueryBuilderOptions } from "./QueryBuilder";
 import * as sql from "pg-sql2";
 import { SQL } from "pg-sql2";
-import isSafeInteger = require("lodash/isSafeInteger");
-import flatten = require("lodash/flatten");
-import assert = require("assert");
+import isSafeInteger from "lodash/isSafeInteger";
+import flatten from "lodash/flatten";
+import assert from "assert";
 import { ResolvedLookAhead, GraphileResolverContext } from "graphile-build";
 
 type QueryBuilderCallback = (
