@@ -4,7 +4,13 @@ import { sign as signJwt } from "jsonwebtoken";
 declare module "graphile-build" {
   interface GraphileBuildOptions {
     pgJwtTypeIdentifier?: string;
-    pgJwtSecret?: string;
+    pgJwtSecret?:
+      | string
+      | Buffer
+      | {
+          key: string | Buffer;
+          passphrase: string;
+        };
     pgJwtSignOptions?: import("jsonwebtoken").SignOptions;
   }
   interface ScopeGraphQLScalarType {

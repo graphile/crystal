@@ -49,9 +49,7 @@ export type NumberGen = Gen<number> | number;
 export type CursorValue = Array<unknown>;
 export type CursorComparator = (val: CursorValue, isAfter: boolean) => void;
 
-export type QueryBuilderOptions = {
-  supportsJSONB?: boolean; // Defaults to true
-};
+export type QueryBuilderOptions = {};
 
 function escapeLarge(sqlFragment: SQL, type: PgType) {
   const actualType = type.domainBaseType || type;
@@ -77,7 +75,6 @@ class QueryBuilder {
   parentQueryBuilder: QueryBuilder | void;
   context: GraphileResolverContext;
   rootValue: any;
-  supportsJSONB: boolean;
   locks: {
     [a: string]: false | true | string | undefined;
   };
@@ -145,17 +142,12 @@ class QueryBuilder {
   _children: Map<RawAlias, QueryBuilder>;
 
   constructor(
-    options: QueryBuilderOptions = {},
+    _options: QueryBuilderOptions = {},
     context: GraphileResolverContext,
     rootValue?: any,
   ) {
     this.context = context || {};
     this.rootValue = rootValue;
-    this.supportsJSONB =
-      typeof options.supportsJSONB === "undefined" ||
-      options.supportsJSONB === null
-        ? true
-        : !!options.supportsJSONB;
 
     this.locks = {
       // As a performance optimisation, we're going to list a number of lock
@@ -281,8 +273,12 @@ class QueryBuilder {
       [SQL, string /* used to be RawAlias, but cannot work with symbols! */]
     >,
   ) {
-    if (this.supportsJSONB && fields.length > 50) {
+    if (fields.length > 50) {
+      // PostgreSQL limits functions to receiving `max_function_args` arguments
+      // (default: 100)
       const fieldsChunks = chunk(fields, 50);
+
+      // JSONB concat required PostgreSQL 9.5+
       const chunkToJson = (fieldsChunk: [SQL, string][]) =>
         sql.fragment`jsonb_build_object(${sql.join(
           fieldsChunk.map(
@@ -297,7 +293,6 @@ class QueryBuilder {
         " || ",
       )})::json`;
     } else {
-      // PostgreSQL limits functions to receiving max_function_args arguments (default: 100)
       return sql.fragment`json_build_object(${sql.join(
         fields.map(
           ([expr, alias]) => sql.fragment`${sql.literal(alias)}::text, ${expr}`,
@@ -962,7 +957,7 @@ order by (row_number() over (partition by 1)) desc`; /* We don't need to factor 
   }
   /** this method is experimental */
   buildChild(): QueryBuilder {
-    const options = { supportsJSONB: this.supportsJSONB };
+    const options = {};
     const child = new QueryBuilder(options, this.context, this.rootValue);
     child.parentQueryBuilder = this;
     return child;

@@ -14,7 +14,6 @@ import { describePgEntity } from "./PgBasicsPlugin";
 
 // @ts-ignore
 import { version } from "../../package.json";
-import queryFromResolveDataFactory from "../queryFromResolveDataFactory";
 
 const debug = debugFactory("graphile-build-pg");
 const WATCH_FIXTURES_PATH = `${__dirname}/../../res/watch-fixtures.sql`;
@@ -1211,14 +1210,6 @@ export default (async function PgIntrospectionPlugin(
         rawIntrospectionResultsByKind,
         build.pgAugmentIntrospectionResults,
       );
-      if (introspectionResultsByKind.__pgVersion < 90500) {
-        // TODO:v5: remove this workaround
-        // This is a bit of a hack, but until we have plugin priorities it's the
-        // easiest way to conditionally support PG9.4.
-        build.pgQueryFromResolveData = queryFromResolveDataFactory({
-          supportsJSONB: false,
-        });
-      }
       return build.extend(
         build,
         {

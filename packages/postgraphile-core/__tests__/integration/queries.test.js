@@ -34,11 +34,6 @@ beforeAll(() => {
   // Get a few GraphQL schema instance that we can query.
   const gqlSchemasPromise = withPgClient(async pgClient => {
     const serverVersionNum = await getServerVersionNum(pgClient);
-    if (serverVersionNum < 90500) {
-      // Remove tests not supported by PG9.4
-      testsToSkip.push("json-overflow.graphql");
-    }
-
     // A selection of omit/rename comments on the d schema
     await pgClient.query(await dSchemaComments());
 

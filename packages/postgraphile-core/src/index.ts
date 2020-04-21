@@ -13,7 +13,6 @@ import {
 } from "graphile-build";
 import {
   defaultPlugins as pgDefaultPlugins,
-  inflections,
   Inflector,
   PgAttribute,
   formatSQLForDebugging,
@@ -112,39 +111,6 @@ export interface PostGraphileCoreOptions {
 }
 
 type PgConfig = Pool | PoolClient | string;
-
-/*
- * BELOW HERE IS DEPRECATED!!
- */
-export { inflections };
-
-export const postGraphileBaseOverrides = {
-  enumName(value: string) {
-    return inflections.defaultUtils.constantCase(
-      inflections.defaultInflection.enumName(value),
-    );
-  },
-};
-
-export const postGraphileClassicIdsOverrides = {
-  column(name: string, _table: string, _schema?: string) {
-    return name === "id" ? "rowId" : inflections.defaultUtils.camelCase(name);
-  },
-};
-
-export const postGraphileInflection = inflections.newInflector(
-  // @ts-ignore
-  postGraphileBaseOverrides,
-);
-
-// @ts-ignore
-export const postGraphileClassicIdsInflection = inflections.newInflector({
-  ...postGraphileBaseOverrides,
-  ...postGraphileClassicIdsOverrides,
-});
-/*
- * ABOVE HERE IS DEPRECATED.
- */
 
 export const PostGraphileInflectionPlugin = function(builder: SchemaBuilder) {
   builder.hook("inflection", (inflection: Inflection) => {
@@ -386,13 +352,6 @@ export const getPostGraphileBuilder = async (
     pgSchemas: Array.isArray(schemas) ? schemas : [schemas],
     pgExtendedTypes: !!dynamicJson,
     pgColumnFilter: pgColumnFilter || (() => true),
-    ...({
-      pgInflection:
-        inflector ||
-        (classicIds
-          ? postGraphileClassicIdsInflection
-          : postGraphileInflection),
-    } as any),
     nodeIdFieldName: nodeIdFieldName || (classicIds ? "id" : "nodeId"),
     pgJwtTypeIdentifier: jwtPgTypeIdentifier,
     pgJwtSecret: jwtSecret,
@@ -496,11 +455,3 @@ export const watchPostGraphileSchema = async (
     await builder.unwatchSchema();
   };
 };
-
-// Backwards compat
-export const postGraphQLBaseOverrides = postGraphileBaseOverrides;
-export const postGraphQLClassicIdsOverrides = postGraphileClassicIdsOverrides;
-export const postGraphQLInflection = postGraphileInflection;
-export const postGraphQLClassicIdsInflection = postGraphileClassicIdsInflection;
-export const createPostGraphQLSchema = createPostGraphileSchema;
-export const watchPostGraphQLSchema = watchPostGraphileSchema;
