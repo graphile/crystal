@@ -89,6 +89,7 @@ describe("When readCache is String", () => {
       error = e;
     }
     expect(error).toBeDefined();
+    mockFs.restore();
     expect(error).toMatchSnapshot();
   });
 });
