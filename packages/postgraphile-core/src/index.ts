@@ -13,7 +13,6 @@ import {
 } from "graphile-build";
 import {
   defaultPlugins as pgDefaultPlugins,
-  inflections,
   Inflector,
   PgAttribute,
   formatSQLForDebugging,
@@ -112,39 +111,6 @@ export interface PostGraphileCoreOptions {
 }
 
 type PgConfig = Pool | PoolClient | string;
-
-/*
- * BELOW HERE IS DEPRECATED!!
- */
-export { inflections };
-
-export const postGraphileBaseOverrides = {
-  enumName(value: string) {
-    return inflections.defaultUtils.constantCase(
-      inflections.defaultInflection.enumName(value),
-    );
-  },
-};
-
-export const postGraphileClassicIdsOverrides = {
-  column(name: string, _table: string, _schema?: string) {
-    return name === "id" ? "rowId" : inflections.defaultUtils.camelCase(name);
-  },
-};
-
-export const postGraphileInflection = inflections.newInflector(
-  // @ts-ignore
-  postGraphileBaseOverrides,
-);
-
-// @ts-ignore
-export const postGraphileClassicIdsInflection = inflections.newInflector({
-  ...postGraphileBaseOverrides,
-  ...postGraphileClassicIdsOverrides,
-});
-/*
- * ABOVE HERE IS DEPRECATED.
- */
 
 export const PostGraphileInflectionPlugin = function(builder: SchemaBuilder) {
   builder.hook("inflection", (inflection: Inflection) => {
