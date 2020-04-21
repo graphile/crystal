@@ -79,18 +79,22 @@ export const runQuery = function runGraphQLQuery(
       reject(e);
     });
     res.on("finish", () => {
-      resolve(
-        new Promise((innerResolve, innerReject) => {
-          try {
-            const json = res._getJSON();
-            const checkResult = Promise.resolve().then(() =>
-              checker(json, req, res),
-            );
-            checkResult.then(() => innerResolve(), innerReject);
-          } catch (e) {
-            innerReject(e);
-          }
-        }),
+      // The setImmediate here is so we don't get a jest async console.log error
+      // about the `console.log` in PostGraphile's HTTP handler
+      setImmediate(() =>
+        resolve(
+          new Promise((innerResolve, innerReject) => {
+            try {
+              const json = res._getJSON();
+              const checkResult = Promise.resolve().then(() =>
+                checker(json, req, res),
+              );
+              checkResult.then(() => innerResolve(), innerReject);
+            } catch (e) {
+              innerReject(e);
+            }
+          }),
+        ),
       );
     });
     ctx.middleware(req, res, err => {
