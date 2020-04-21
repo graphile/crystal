@@ -32,11 +32,6 @@ export {
   watchPostGraphileSchema,
   withPostGraphileContext,
   enhanceHttpServerWithSubscriptions,
-  // Backwards compatibility
-  postgraphile as postgraphql,
-  createPostGraphileSchema as createPostGraphQLSchema,
-  watchPostGraphileSchema as watchPostGraphQLSchema,
-  withPostGraphileContext as withPostGraphQLContext,
 } from "./postgraphile";
 
 export { makePluginHook, PostGraphilePlugin } from "./postgraphile/pluginHook";

@@ -462,11 +462,3 @@ export const watchPostGraphileSchema = async (
     await builder.unwatchSchema();
   };
 };
-
-// Backwards compat
-export const postGraphQLBaseOverrides = postGraphileBaseOverrides;
-export const postGraphQLClassicIdsOverrides = postGraphileClassicIdsOverrides;
-export const postGraphQLInflection = postGraphileInflection;
-export const postGraphQLClassicIdsInflection = postGraphileClassicIdsInflection;
-export const createPostGraphQLSchema = createPostGraphileSchema;
-export const watchPostGraphQLSchema = watchPostGraphileSchema;

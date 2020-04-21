@@ -102,7 +102,6 @@ export {
   PgOrderByPrimaryKeyPlugin,
   PgRowNode,
   PgNodeAliasPostGraphile,
-  PgNodeAliasPostGraphile as PgNodeAliasPostGraphQL,
   PgRecordReturnTypesPlugin,
   PgRecordFunctionConnectionPlugin,
   PgScalarFunctionConnectionPlugin,
