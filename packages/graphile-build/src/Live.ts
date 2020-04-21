@@ -67,6 +67,8 @@ export class LiveProvider {
   }
 }
 
+type ReleaseType = () => void;
+
 /*
  * During a single execution of GraphQL (specifically a subscription request),
  * the LiveMonitor tracks the resources viewed and subscribes to updates in them.
@@ -91,7 +93,7 @@ export class LiveMonitor {
     (): void;
     cancel: () => void;
   } | null;
-  onChange: (callback: () => void) => () => void;
+  onChange: (callback: (input?: any) => void) => ReleaseType;
 
   constructor(
     providers: { [namespace: string]: LiveProvider },
@@ -143,7 +145,7 @@ export class LiveMonitor {
           liveCollection: this.liveCollection.bind(this, counter),
           liveRecord: this.liveRecord.bind(this, counter),
           liveConditions: this.liveConditionsByCounter[String(counter)],
-          release: () => {
+          release: (): void => {
             // Despite it's name, this means that the execution has complete, which means we're actually releasing everything *before* this.
             this.resetBefore(counter);
           },
@@ -156,7 +158,7 @@ export class LiveMonitor {
       }
     };
 
-    this.onChange = function(callback: () => void) {
+    this.onChange = function(callback: () => void): ReleaseType {
       if (this.released) {
         throw new Error("Monitors cannot be reused.");
       }
@@ -168,7 +170,7 @@ export class LiveMonitor {
       if (this.handleChange) {
         setImmediate(this.handleChange);
       }
-      return () => {
+      return (): void => {
         if (this.changeCallback === callback) {
           this.changeCallback = null;
         }
@@ -341,7 +343,7 @@ export class LiveCoordinator {
     _args: any,
     _context: any,
     _info: import("graphql").GraphQLResolveInfo,
-  ): AsyncIterator<void> {
+  ): AsyncIterator<unknown> {
     const monitor = this.getMonitor({
       liveAbort: (e: Error) => {
         if (iterator && iterator.throw) iterator.throw(e);
@@ -354,7 +356,7 @@ export class LiveCoordinator {
 }
 
 export function makeAsyncIteratorFromMonitor(monitor: LiveMonitor) {
-  return callbackToAsyncIterator(monitor.onChange, {
+  return callbackToAsyncIterator<unknown, ReleaseType>(monitor.onChange, {
     onClose: release => {
       if (release) release();
     },
