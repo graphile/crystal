@@ -1211,14 +1211,6 @@ export default (async function PgIntrospectionPlugin(
         rawIntrospectionResultsByKind,
         build.pgAugmentIntrospectionResults,
       );
-      if (introspectionResultsByKind.__pgVersion < 90500) {
-        // TODO:v5: remove this workaround
-        // This is a bit of a hack, but until we have plugin priorities it's the
-        // easiest way to conditionally support PG9.4.
-        build.pgQueryFromResolveData = queryFromResolveDataFactory({
-          supportsJSONB: false,
-        });
-      }
       return build.extend(
         build,
         {
