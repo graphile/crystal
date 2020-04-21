@@ -49,6 +49,7 @@ matrix:
         - postgresql
       env:
         - PGVERSION=10
+        - PGHOST=localhost
         - PGPORT=5433
         - TEST_DATABASE_URL=postgres://localhost:5433/graphileengine_test
         - TEST_PG_URL=postgres://localhost:5433/postgraphile_test
