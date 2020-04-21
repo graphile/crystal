@@ -1,17 +1,25 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
+export PATH="$PATH:`pwd`/node_modules/.bin"
 
 set -e
-echo "[1/4]: Linting Code with Prettier"
-yarn prettier:check
+echo "[1/4]: Building Code"
+npm run prepack:all
 
-echo "[2/4]: Building Code"
-scripts/build
+echo "[2/4]: Checking Code Format"
+npm run prettier:check
 
-echo "[3/4]: Linting Code with ESLint"
-yarn lint
+echo "[3/4]: Linting Code"
+npm run eslint
 
 echo "[4/4]: Testing Project"
-scripts/test
+for I in packages/*/; do
+  if [[ "$PGVERSION" != "9.6" || ( "$I" != "packages/lds/" && "$I" != "packages/subscriptions-lds/" ) ]]; then
+    cd $I
+    npm run test
+    cd -
+  fi;
+done
 
 echo ""
 echo "CI completed succesfully 🎉"

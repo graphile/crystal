@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "declarationDir": "./dist",
+    "outDir": "./dist"
+  },
+  "include": ["src/**/*"],
+  "references": [
+    { "path": "../graphile-build" },
+    { "path": "../lru" },
+    { "path": "../jest-serializer-graphql-schema" },
+    { "path": "../pg-sql2" }
+  ]
+}

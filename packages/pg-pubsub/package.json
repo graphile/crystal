@@ -1,0 +1,60 @@
+{
+  "name": "@graphile/pg-pubsub",
+  "version": "4.6.0",
+  "description": "Subscriptions plugin for PostGraphile using PostgreSQL's LISTEN/NOTIFY",
+  "main": "dist/index.js",
+  "scripts": {
+    "db:init": "psql -X1v ON_ERROR_STOP=1 -v VERBOSITY=verbose -f __tests__/schema.sql \"$TEST_DATABASE_URL\"",
+    "test": "npm run db:init && jest -i",
+    "prepack": "tsc -b"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/graphile/graphile-engine.git"
+  },
+  "keywords": [
+    "pg",
+    "Postgres",
+    "plugin",
+    "PostgreSQL",
+    "Graphile",
+    "PostGraphile",
+    "subscriptions",
+    "realtime"
+  ],
+  "author": "Benjie Gillam <code@benjiegillam.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/graphile/graphile-engine/issues"
+  },
+  "homepage": "https://github.com/graphile/graphile-engine/tree/master/packages/pg-pubsub#readme",
+  "dependencies": {
+    "@types/debug": "^4.1.4",
+    "@types/pg": "^7.4.14",
+    "debug": "^4.1.1",
+    "graphql-subscriptions": "^1.1.0"
+  },
+  "peerDependencies": {
+    "graphile-build": "4.6.0",
+    "graphile-build-pg": "4.6.0",
+    "graphql": ">=0.6 <15",
+    "postgraphile": "^4.6.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.12",
+    "graphile-build": "4.6.0",
+    "graphile-build-pg": "4.6.0",
+    "graphql": ">=0.6 <15",
+    "jest": "24.9.0",
+    "jest-serializer-graphql-schema": "4.6.0",
+    "mock-req": "^0.2.0",
+    "mock-res": "^0.5.0",
+    "pg": "^7.10.0",
+    "postgraphile": "4.6.0",
+    "ts-jest": "^25.2.0",
+    "typescript": "^3.7.2"
+  },
+  "files": [
+    "dist"
+  ]
+}

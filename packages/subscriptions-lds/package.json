@@ -1,0 +1,52 @@
+{
+  "name": "@graphile/subscriptions-lds",
+  "version": "4.6.0-alpha.0",
+  "description": "Subscriptions plugin for PostGraphile using PostgreSQL logicial decoding",
+  "main": "dist/index.js",
+  "scripts": {
+    "db:init": "dropdb --if-exists lds_test && createdb lds_test && psql -X1v ON_ERROR_STOP=1 -v VERBOSITY=verbose -f __tests__/schema.sql lds_test",
+    "test": "npm run db:init && jest -i",
+    "prepack": "tsc -b"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/graphile/graphile-engine.git"
+  },
+  "keywords": [
+    "pg",
+    "Postgres",
+    "plugin",
+    "PostgreSQL",
+    "logicial",
+    "decoding",
+    "logical",
+    "replication",
+    "changes",
+    "Graphile",
+    "PostGraphile"
+  ],
+  "author": "Benjie Gillam <code@benjiegillam.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/graphile/graphile-engine/issues"
+  },
+  "homepage": "https://github.com/graphile/graphile-engine/tree/master/packages/subscriptions-lds#readme",
+  "dependencies": {
+    "@graphile/lds": "4.6.0-alpha.0",
+    "@types/ws": "^6.0.1",
+    "ws": "^7.0.0"
+  },
+  "peerDependencies": {
+    "postgraphile-core": ">4.3.1 <5"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.12",
+    "jest": "24.9.0",
+    "pg": "^7.10.0",
+    "ts-jest": "^25.2.0",
+    "typescript": "^3.7.2"
+  },
+  "files": [
+    "dist"
+  ]
+}

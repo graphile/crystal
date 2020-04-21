@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+
+# Make sure any generated assets are built
+lerna run preprepack --stream
+
+# Build everything in the relevant order according to TypeScript project references
+tsc -b
+
+# Now run `prepack` on each package (slightly parallelised)
+lerna run prepack --stream

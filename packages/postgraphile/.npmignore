@@ -1,0 +1,17 @@
+.DS_Store
+node_modules
+npm-debug.log*
+TODO.md
+.editorconfig
+tsconfig.json
+.vscode
+src
+dist/__tests__
+dist/**/__tests__
+dist/__mocks__
+dist/**/__mocks__
+typings
+scripts
+examples
+docs
+resources/jest-*

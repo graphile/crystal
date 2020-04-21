@@ -1,14 +1,13 @@
 {
   "compilerOptions": {
+    "composite": true,
     "declaration": true,
-    "declarationDir": "./build",
+    "declarationMap": true,
     "allowJs": false,
-    "rootDir": "src",
-    "outDir": "build",
-    "target": "es2017",
+    "target": "es2019",
     "module": "commonjs",
     "moduleResolution": "node",
-    "inlineSourceMap": true,
+    "sourceMap": true,
     "pretty": true,
     "importHelpers": true,
     "experimentalDecorators": true,
@@ -18,20 +17,23 @@
     "noFallthroughCasesInSwitch": true,
     "noUnusedParameters": true,
     "noUnusedLocals": true,
-    "lib": ["es2017", "esnext.asynciterable"]
+    "preserveWatchOutput": true,
+    "lib": ["es2018", "esnext.asynciterable"]
   },
-  "exclude": [
-    "index.js",
-    "plugins.d.ts",
-    "node_modules",
-    "build",
-    "build-turbo",
-    "examples",
-    "utils",
-    "resources",
-    "src/postgraphile/graphiql",
-    "__tests__",
-    "**/__tests__",
-    "*-test.js"
+  "exclude": ["node_modules", "dist"],
+  "include": [],
+  "references": [
+    { "path": "packages/graphile-build" },
+    { "path": "packages/graphile-build-pg" },
+    { "path": "packages/graphile-utils" },
+    { "path": "packages/graphql-parse-resolve-info" },
+    { "path": "packages/jest-serializer-graphql-schema" },
+    { "path": "packages/lds" },
+    { "path": "packages/lru" },
+    { "path": "packages/pg-sql2" },
+    { "path": "packages/postgraphile-core" },
+    { "path": "packages/postgraphile" },
+    { "path": "packages/subscriptions-lds" },
+    { "path": "packages/pg-pubsub" }
   ]
 }

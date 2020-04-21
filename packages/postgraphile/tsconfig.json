@@ -1,0 +1,27 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "declarationDir": "./dist",
+    "outDir": "./dist"
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../graphile-utils" },
+    { "path": "../lru" },
+    { "path": "../postgraphile-core" }
+  ],
+  "exclude": [
+    "index.js",
+    "plugins.d.ts",
+    "node_modules",
+    "dist",
+    "examples",
+    "utils",
+    "resources",
+    "src/postgraphile/graphiql",
+    "__tests__",
+    "**/__tests__",
+    "*-test.js"
+  ]
+}

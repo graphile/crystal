@@ -1,0 +1,25 @@
+mutation {
+  updatePersonById(input:{
+    id: 3
+    personPatch:{
+      name:"Budd Daay"
+      aliases: ["BD", "Buddy"]
+      about: null
+      email: "buddy@example.com"
+      site: {
+        url: "http://buddy.com"
+      }
+    }
+  }) {
+    person{
+      id
+      name
+      aliases
+      about
+      email
+      site {
+        url
+      }
+    }
+  }
+}

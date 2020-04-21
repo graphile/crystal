@@ -1,0 +1,21 @@
+#!/bin/bash
+set -e
+echo "BOOTSTRAP"
+yarn lerna bootstrap
+echo "CLEANING BUILT FILES"
+yarn clean
+echo "PREPACKING"
+yarn prepack:all
+echo "TEST"
+yarn test
+
+TAG="${1:-next}"
+
+# Only shift if there's something to shift
+if [ "x$1" != "x" ]; then shift; fi;
+
+npx lerna publish --exact --npm-tag="$TAG" "$@"
+yarn run changelog
+git add CHANGELOG.md
+git commit -m"chore: update CHANGELOG"
+git push && git push --tags

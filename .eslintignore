@@ -1,4 +1,11 @@
 node_modules
-build
-build-turbo
-postgraphiql
+/packages/pg-sql2/examples
+/packages/pg-sql2/lib
+/packages/postgraphile/sponsors.json
+/packages/postgraphile/postgraphiql
+/packages/postgraphile/assets
+/packages/postgraphile/src/assets
+/wal2json
+dist
+CHANGELOG.md
+_LOCAL

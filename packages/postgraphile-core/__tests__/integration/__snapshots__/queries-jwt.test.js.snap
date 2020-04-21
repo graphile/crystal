@@ -1,0 +1,80 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`jwt authenticate fail 1`] = `
+Object {
+  "data": Object {
+    "authenticateFail": Object {
+      "jwtToken": null,
+    },
+  },
+}
+`;
+
+exports[`jwt normal 1`] = `
+Object {
+  "data": Object {
+    "authenticate": Object {
+      "jwtToken": Object {
+        "a": 1,
+        "b": "2",
+        "c": "3",
+        "exp": "2130969600",
+        "role": "yay",
+      },
+    },
+  },
+}
+`;
+
+exports[`jwt pgJwtTypeIdentifier 1`] = `
+Object {
+  "a": 1,
+  "aud": "postgraphile",
+  "b": "2",
+  "c": "3",
+  "exp": 2130969600,
+  "iat": "[timestamp]",
+  "iss": "postgraphile",
+  "role": "yay",
+}
+`;
+
+exports[`jwt pgJwtTypeIdentifier with payload 1`] = `
+Object {
+  "authPayload": Object {
+    "admin": true,
+    "id": 1,
+    "jwt": Object {
+      "a": 1,
+      "aud": "postgraphile",
+      "b": 2,
+      "c": 3,
+      "exp": 2130969600,
+      "iat": "[timestamp]",
+      "iss": "postgraphile",
+      "role": "yay",
+    },
+    "personById": Object {
+      "id": 1,
+      "name": "John Smith",
+    },
+  },
+  "personById": Object {
+    "id": 1,
+    "name": "John Smith",
+  },
+}
+`;
+
+exports[`jwt pgJwtTypeIdentifier, big numbers 1`] = `
+Object {
+  "a": 1,
+  "aud": "postgraphile",
+  "b": "1234567890123456789.123456789",
+  "c": "987654321098765432",
+  "exp": 2130969600,
+  "iat": "[timestamp]",
+  "iss": "postgraphile",
+  "role": "yay",
+}
+`;

@@ -1,0 +1,243 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`after 1`] = `
+Object {
+  "data": Object {
+    "dummyConnection": Object {
+      "edges": Array [
+        Object {
+          "cursor": "2",
+          "node": Object {
+            "caps": "BAZ",
+            "id": "baz",
+          },
+        },
+        Object {
+          "cursor": "3",
+          "node": Object {
+            "caps": "QUX",
+            "id": "qux",
+          },
+        },
+      ],
+      "nodes": Array [
+        Object {
+          "caps": "BAZ",
+          "id": "baz",
+        },
+        Object {
+          "caps": "QUX",
+          "id": "qux",
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`generated schema 1`] = `
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+type Dummy {
+  id: String!
+  caps: String!
+  random: Int!
+}
+
+type DummyConnection {
+  edges: [DummyEdge!]
+  nodes: [Dummy!]
+}
+
+enum DummyConnectionSortBy {
+  ID_ASC
+  ID_DESC
+  CAPS_ASC
+  CAPS_DESC
+}
+
+type DummyEdge {
+  cursor: Cursor
+  node: Dummy
+}
+
+"""An object with a globally unique \`ID\`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  id: ID!
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query implements Node {
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+
+  """
+  The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
+  """
+  id: ID!
+
+  """Fetches an object given its globally unique \`ID\`."""
+  node(
+    """The globally unique \`ID\`."""
+    id: ID!
+  ): Node
+  dummyConnection(first: Int, after: Cursor, sortBy: DummyConnectionSortBy): DummyConnection
+}
+
+`;
+
+exports[`no arguments 1`] = `
+Object {
+  "data": Object {
+    "dummyConnection": Object {
+      "edges": Array [
+        Object {
+          "cursor": "0",
+          "node": Object {
+            "caps": "FOO",
+            "id": "foo",
+          },
+        },
+        Object {
+          "cursor": "1",
+          "node": Object {
+            "caps": "BAR",
+            "id": "bar",
+          },
+        },
+        Object {
+          "cursor": "2",
+          "node": Object {
+            "caps": "BAZ",
+            "id": "baz",
+          },
+        },
+        Object {
+          "cursor": "3",
+          "node": Object {
+            "caps": "QUX",
+            "id": "qux",
+          },
+        },
+      ],
+      "nodes": Array [
+        Object {
+          "caps": "FOO",
+          "id": "foo",
+        },
+        Object {
+          "caps": "BAR",
+          "id": "bar",
+        },
+        Object {
+          "caps": "BAZ",
+          "id": "baz",
+        },
+        Object {
+          "caps": "QUX",
+          "id": "qux",
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`sort 1`] = `
+Object {
+  "data": Object {
+    "dummyConnection": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJiYXIiXQ==",
+          "node": Object {
+            "caps": "BAR",
+            "id": "bar",
+          },
+        },
+        Object {
+          "cursor": "WyJiYXoiXQ==",
+          "node": Object {
+            "caps": "BAZ",
+            "id": "baz",
+          },
+        },
+        Object {
+          "cursor": "WyJmb28iXQ==",
+          "node": Object {
+            "caps": "FOO",
+            "id": "foo",
+          },
+        },
+        Object {
+          "cursor": "WyJxdXgiXQ==",
+          "node": Object {
+            "caps": "QUX",
+            "id": "qux",
+          },
+        },
+      ],
+      "nodes": Array [
+        Object {
+          "caps": "BAR",
+          "id": "bar",
+        },
+        Object {
+          "caps": "BAZ",
+          "id": "baz",
+        },
+        Object {
+          "caps": "FOO",
+          "id": "foo",
+        },
+        Object {
+          "caps": "QUX",
+          "id": "qux",
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`sort, after 1`] = `
+Object {
+  "data": Object {
+    "dummyConnection": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJmb28iXQ==",
+          "node": Object {
+            "caps": "FOO",
+            "id": "foo",
+          },
+        },
+        Object {
+          "cursor": "WyJxdXgiXQ==",
+          "node": Object {
+            "caps": "QUX",
+            "id": "qux",
+          },
+        },
+      ],
+      "nodes": Array [
+        Object {
+          "caps": "FOO",
+          "id": "foo",
+        },
+        Object {
+          "caps": "QUX",
+          "id": "qux",
+        },
+      ],
+    },
+  },
+}
+`;
