@@ -44,6 +44,7 @@
     "pg": "^7.10.0",
     "postgraphile": "4.6.0",
     "prettier": "^1.19.1",
+    "ts-jest": "^25.4.0",
     "typescript": "^3.9.0-beta"
   },
   "workspaces": [

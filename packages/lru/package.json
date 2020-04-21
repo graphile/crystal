@@ -24,11 +24,7 @@
   "engines": {
     "node": ">=12.16"
   },
-  "devDependencies": {
-    "jest": "^24.8.0",
-    "ts-node": "^8.6.2",
-    "typescript": "^3.9.0-beta"
-  },
+  "devDependencies": {},
   "files": [
     "dist"
   ]

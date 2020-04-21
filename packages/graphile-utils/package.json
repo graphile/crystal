@@ -37,11 +37,7 @@
   },
   "devDependencies": {
     "graphile-build": "4.6.0",
-    "graphile-build-pg": "4.6.0",
-    "jest": "^24.8.0",
-    "jest-serializer-graphql-schema": "4.6.0",
-    "ts-node": "^8.6.2",
-    "typescript": "^3.9.0-beta"
+    "graphile-build-pg": "4.6.0"
   },
   "peerDependencies": {
     "graphile-build": "^4.5.0",

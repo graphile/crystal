@@ -40,11 +40,7 @@
     "postgraphile-core": ">4.3.1 <5"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.12",
-    "jest": "24.9.0",
-    "pg": "^7.10.0",
-    "ts-jest": "^25.2.0",
-    "typescript": "^3.9.0-beta"
+    "pg": "^7.10.0"
   },
   "files": [
     "dist"

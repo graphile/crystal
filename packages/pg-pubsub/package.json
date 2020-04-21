@@ -43,14 +43,10 @@
     "graphile-build": "4.6.0",
     "graphile-build-pg": "4.6.0",
     "graphql": ">=0.6 <15",
-    "jest": "24.9.0",
-    "jest-serializer-graphql-schema": "4.6.0",
     "mock-req": "^0.2.0",
     "mock-res": "^0.5.0",
     "pg": "^7.10.0",
-    "postgraphile": "4.6.0",
-    "ts-jest": "^25.2.0",
-    "typescript": "^3.9.0-beta"
+    "postgraphile": "4.6.0"
   },
   "files": [
     "dist"
