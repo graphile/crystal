@@ -33,7 +33,7 @@
     "graphql": ">=0.9 <0.14 || ^14.0.2"
   },
   "engines": {
-    "node": ">=8.6"
+    "node": ">=12.16"
   },
   "devDependencies": {
     "graphile-build": "4.6.0",

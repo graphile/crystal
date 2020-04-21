@@ -42,6 +42,6 @@
     "index.js"
   ],
   "engines": {
-    "node": ">=8.6"
+    "node": ">=12.16"
   }
 }

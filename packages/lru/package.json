@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/graphile/graphile-build/tree/master/packages/lru",
   "engines": {
-    "node": ">=8.6"
+    "node": ">=12.16"
   },
   "devDependencies": {
     "jest": "^24.8.0",

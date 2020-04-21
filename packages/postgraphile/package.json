@@ -39,7 +39,7 @@
     "lint": "eslint --ext .ts,.js .",
     "lint:fix": "yarn run lint --fix",
     "make-assets": "./scripts/make-assets",
-    "test": "./scripts/test",
+    "test": "jest --maxWorkers 3",
     "prepack": "yarn build",
     "preprepack": "yarn prebuild",
     "changelog": "(cat scripts/CHANGELOG_HEADER.md; npx conventional-changelog -p angular --release-count 0) > CHANGELOG.md",
@@ -148,6 +148,6 @@
     "plugins.d.ts"
   ],
   "engines": {
-    "node": ">=8.6"
+    "node": ">=12.16"
   }
 }

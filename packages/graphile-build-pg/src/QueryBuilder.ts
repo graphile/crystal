@@ -297,7 +297,7 @@ class QueryBuilder {
         " || ",
       )})::json`;
     } else {
-      // PG9.4 will have issues with more than 100 parameters (50 keys)
+      // PostgreSQL limits functions to receiving max_function_args arguments (default: 100)
       return sql.fragment`json_build_object(${sql.join(
         fields.map(
           ([expr, alias]) => sql.fragment`${sql.literal(alias)}::text, ${expr}`,

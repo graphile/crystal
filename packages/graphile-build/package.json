@@ -41,7 +41,7 @@
     "semver": "^6.0.0"
   },
   "engines": {
-    "node": ">=8.6"
+    "node": ">=12.16"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",

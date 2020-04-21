@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-npm_bin=$(npm bin)
-
-$npm_bin/jest --maxWorkers 3 $@
