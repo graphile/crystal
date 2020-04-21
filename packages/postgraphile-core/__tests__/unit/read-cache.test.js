@@ -127,6 +127,7 @@ describe("when readCache is not String or Object, getPostGraphileBuilder should 
       error = e;
     }
     expect(error).toBeDefined();
+    mockFs.restore();
     expect(error).toMatchSnapshot();
   });
   test("when its Array", async () => {
@@ -140,6 +141,7 @@ describe("when readCache is not String or Object, getPostGraphileBuilder should 
       error = e;
     }
     expect(error).toBeDefined();
+    mockFs.restore();
     expect(error).toMatchSnapshot();
   });
   test("when its Number", async () => {
@@ -153,6 +155,7 @@ describe("when readCache is not String or Object, getPostGraphileBuilder should 
       error = e;
     }
     expect(error).toBeDefined();
+    mockFs.restore();
     expect(error).toMatchSnapshot();
   });
 });
