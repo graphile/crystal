@@ -1,4 +1,4 @@
-import * as pg from "pg";
+import { Pool, PoolClient } from "pg";
 import { LDSLiveSource } from "../src/PgLDSSourcePlugin";
 
 export const DATABASE_URL = process.env.LDS_TEST_DATABASE_URL || "lds_test";
@@ -6,9 +6,9 @@ export { PoolClient } from "pg";
 
 export async function withClient<T = void>(
   connectionString: string,
-  callback: (pgClient: pg.PoolClient) => Promise<T>,
+  callback: (pgClient: PoolClient) => Promise<T>,
 ): Promise<T> {
-  const pool = new pg.Pool({
+  const pool = new Pool({
     connectionString,
   });
   try {
@@ -43,7 +43,7 @@ export async function withLiveSource<T = void>(
 }
 
 export async function withLiveSourceAndClient<T = void>(
-  callback: (ls: LDSLiveSource, pgClient: pg.PoolClient) => Promise<T>,
+  callback: (ls: LDSLiveSource, pgClient: PoolClient) => Promise<T>,
 ): Promise<T> {
   return withClient(DATABASE_URL, pgClient =>
     withLiveSource(liveSource => callback(liveSource, pgClient)),

@@ -1,4 +1,4 @@
-import * as pg from "pg";
+import { PoolClient, Pool } from "pg";
 import PgLogicalDecoding from "../src/pg-logical-decoding";
 
 export const DATABASE_URL = process.env.LDS_TEST_DATABASE_URL || "lds_test";
@@ -16,9 +16,9 @@ export async function tryDropSlot(slotName: string) {
 
 export async function withClient<T = void>(
   connectionString: string,
-  callback: (pgClient: pg.PoolClient) => Promise<T>,
+  callback: (pgClient: PoolClient) => Promise<T>,
 ): Promise<T> {
-  const pool = new pg.Pool({
+  const pool = new Pool({
     connectionString,
   });
   try {
@@ -38,7 +38,7 @@ export async function query(text: string, values: Array<any> = []) {
 }
 
 export async function withLdAndClient<T = void>(
-  callback: (ld: PgLogicalDecoding, client: pg.PoolClient) => Promise<T>,
+  callback: (ld: PgLogicalDecoding, client: PoolClient) => Promise<T>,
 ): Promise<T> {
   return withClient(DATABASE_URL, pgClient =>
     withLd(ld => callback(ld, pgClient)),

@@ -1,4 +1,4 @@
-import * as pg from "pg";
+import { Client, PoolClient, Pool } from "pg";
 import debugFactory from "debug";
 
 const debug = debugFactory("graphile-build-pg");
@@ -44,25 +44,24 @@ export function quacksLikePgPool(pgConfig: unknown): boolean {
 }
 
 export const getPgClientAndReleaserFromConfig = async (
-  pgConfig: pg.PoolClient | pg.Pool | string | undefined = process.env
-    .DATABASE_URL,
+  pgConfig: PoolClient | Pool | string | undefined = process.env.DATABASE_URL,
 ) => {
   let releasePgClient = () => {};
-  let pgClient: pg.PoolClient | pg.Client;
-  if (pgConfig instanceof pg.Client || quacksLikePgClient(pgConfig)) {
-    pgClient = pgConfig as pg.PoolClient;
+  let pgClient: PoolClient | Client;
+  if (pgConfig instanceof Client || quacksLikePgClient(pgConfig)) {
+    pgClient = pgConfig as PoolClient;
     if (!pgClient.release) {
       throw new Error(
         "We only support PG clients from a PG pool (because otherwise the `await` call can hang indefinitely if an error occurs and there's no error handler)",
       );
     }
-  } else if (pgConfig instanceof pg.Pool || quacksLikePgPool(pgConfig)) {
-    const pgPool = pgConfig as pg.Pool;
+  } else if (pgConfig instanceof Pool || quacksLikePgPool(pgConfig)) {
+    const pgPool = pgConfig as Pool;
     const client = await pgPool.connect();
     pgClient = client;
     releasePgClient = () => client.release();
   } else if (pgConfig === undefined || typeof pgConfig === "string") {
-    const client = new pg.Client(pgConfig);
+    const client = new Client(pgConfig);
     pgClient = client;
     client.on("error", e => {
       debug("pgClient error occurred: %s", e);
@@ -84,8 +83,8 @@ export const getPgClientAndReleaserFromConfig = async (
 };
 
 const withPgClient = async (
-  pgConfig: pg.PoolClient | pg.Pool | string | undefined,
-  fn: (pgClient: pg.PoolClient | pg.Client) => any,
+  pgConfig: PoolClient | Pool | string | undefined,
+  fn: (pgClient: PoolClient | Client) => any,
 ) => {
   if (!fn) {
     throw new Error("Nothing to do!");

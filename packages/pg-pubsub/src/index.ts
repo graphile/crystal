@@ -4,7 +4,7 @@ import createDebugger from "debug";
 import { PostGraphilePlugin } from "postgraphile";
 import PgGenericSubscriptionPlugin from "./PgGenericSubscriptionPlugin";
 import PgSubscriptionResolverPlugin from "./PgSubscriptionResolverPlugin";
-import * as pg from "pg";
+import { PoolClient } from "pg";
 
 const RECONNECT_BASE_DELAY = 100;
 const RECONNECT_MAX_DELAY = 30000;
@@ -80,8 +80,8 @@ const plugin: PostGraphilePlugin = {
       }
       pubsub.publish(msg.channel, payload);
     };
-    let listeningClient: pg.PoolClient | null;
-    const cleanClient = function(client: pg.PoolClient) {
+    let listeningClient: PoolClient | null;
+    const cleanClient = function(client: PoolClient) {
       client.removeListener("notification", handleNotification);
       clearInterval(client["keepAliveInterval"]);
       delete client["keepAliveInterval"];
@@ -89,7 +89,7 @@ const plugin: PostGraphilePlugin = {
         listeningClient = null;
       }
     };
-    const releaseClient = function(client: pg.PoolClient): void {
+    const releaseClient = function(client: PoolClient): void {
       if (!client) {
         return;
       }
@@ -99,14 +99,14 @@ const plugin: PostGraphilePlugin = {
       }
     };
     const listenToChannelWithClient = async function(
-      client: pg.PoolClient,
+      client: PoolClient,
       channel: string,
     ): Promise<void> {
       const sql = "LISTEN " + client.escapeIdentifier(channel);
       await client.query(sql);
     };
     const unlistenFromChannelWithClient = async function(
-      client: pg.PoolClient,
+      client: PoolClient,
       channel: string,
     ): Promise<void> {
       const sql = "UNLISTEN " + client.escapeIdentifier(channel);
@@ -154,7 +154,7 @@ const plugin: PostGraphilePlugin = {
         );
       }
       // Permanently check client out of the pool
-      let client: pg.PoolClient;
+      let client: PoolClient;
       try {
         client = await pgPool.connect();
       } catch (e) {
@@ -214,7 +214,7 @@ const plugin: PostGraphilePlugin = {
         e,
       );
     });
-    pgPool.on("remove", (client: pg.PoolClient) => {
+    pgPool.on("remove", (client: PoolClient) => {
       if (client === listeningClient) {
         cleanClient(client);
         if (!pgPool.ending) {

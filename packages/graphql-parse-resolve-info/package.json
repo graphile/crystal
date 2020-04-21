@@ -5,7 +5,6 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "jest",
     "prepack": "tsc -b"
   },
   "repository": {
@@ -32,12 +31,8 @@
   },
   "devDependencies": {
     "@types/debug": "^4.1.4",
-    "@types/jest": "^24.0.12",
     "@types/node": "^12.0.0",
     "eslint_d": "^8.0.0",
-    "jest": "^24.8.0",
-    "ts-jest": "^25.2.0",
-    "ts-node": "^8.6.2",
     "typescript": "^3.9.0-beta"
   },
   "dependencies": {

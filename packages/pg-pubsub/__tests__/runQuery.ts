@@ -1,9 +1,9 @@
 // @ts-ignore
-import * as MockReq from "mock-req";
+import MockReq from "mock-req";
 // @ts-ignore
-import * as MockRes from "mock-res";
+import MockRes from "mock-res";
 import { HttpRequestHandler } from "postgraphile";
-import * as pg from "pg";
+import { Pool } from "pg";
 import { ServerResponse, ClientRequest } from "http";
 
 function sanitise<TInput>(json: TInput): TInput {
@@ -42,7 +42,7 @@ function sanitise<TInput>(json: TInput): TInput {
 }
 export interface TestCtx {
   middleware: HttpRequestHandler;
-  pgPool: pg.Pool;
+  pgPool: Pool;
   release: () => Promise<void>;
 }
 

@@ -1,6 +1,7 @@
 module.exports = {
   plugins: [
     "@babel/plugin-transform-modules-commonjs",
+    // TODO:v5: remove this?
     "@babel/plugin-syntax-object-rest-spread",
   ],
   presets: [
@@ -12,6 +13,7 @@ module.exports = {
         },
       },
     ],
+    "@babel/preset-typescript",
   ],
   env: {
     test: {
@@ -24,6 +26,7 @@ module.exports = {
             },
           },
         ],
+        "@babel/preset-typescript",
       ],
     },
   },
