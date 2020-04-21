@@ -3,8 +3,7 @@
   "compilerOptions": {
     "rootDir": "src",
     "declarationDir": "./dist",
-    "outDir": "./dist",
-    "noEmit": false
+    "outDir": "./dist"
   },
   "include": ["src/**/*"],
   "references": [{ "path": "../lds" }, { "path": "../postgraphile-core" }]

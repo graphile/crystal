@@ -4,7 +4,6 @@
     "rootDir": "src",
     "declarationDir": "./dist",
     "outDir": "./dist",
-    "noEmit": false
   },
   "include": ["src"],
   "references": [
