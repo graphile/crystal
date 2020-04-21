@@ -201,7 +201,7 @@ PostGraphile features include:
 [Full requirements are on the website](https://www.graphile.org/postgraphile/requirements/),
 but a basic summary is:
 
-- Node v8.6+
+- Node v12.16+
 - PostgreSQL 9.6+
 - Linux, macOS or Windows
 

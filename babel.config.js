@@ -8,7 +8,7 @@ module.exports = {
       "@babel/env",
       {
         targets: {
-          node: "8.6",
+          node: "12.16",
         },
       },
     ],

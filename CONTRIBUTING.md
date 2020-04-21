@@ -81,13 +81,12 @@ Try to avoid repeating yourself - by putting shared logic into a shared
 function, V8 can perform shared JIT optimisations and ultimately this should
 mean that the code runs faster (and uses less memory).
 
-### Leverage ES6
+### Leverage ES2019
 
-Graphile Engine currently requires at least Node 8.6+; this means we get access
-to a lot of ES6 goodness. Use https://node.green/ to check what we have access
-to.
+Graphile Engine currently requires at least Node 12.16+; this means we get
+access to a lot of ES2019 goodness. Use https://node.green/ to check what we
+have access to.
 
 - `Object.values(obj)` is better than `Object.keys(obj).map(k => obj[k])`.
 - `arr.find(...)` is better than `arr.filter(...)[0]`
-- use `async`/`await` -
-  [performance optimisations are coming](https://v8.dev/blog/fast-async)
+- use `async`/`await` - [it's fast!](https://v8.dev/blog/fast-async)
