@@ -139,9 +139,8 @@ export {
   RawishIntrospectionResults,
 } from "./plugins/PgIntrospectionPlugin";
 
-import QueryBuilder from "./QueryBuilder";
-export { QueryBuilder };
 export {
+  default as QueryBuilder,
   sql,
   SQL,
   GraphileResolverContext,
@@ -154,3 +153,9 @@ export {
   CursorValue,
   CursorComparator,
 } from "./QueryBuilder";
+export { parseTags } from "./utils";
+
+export {
+  default as withPgClient,
+  getPgClientAndReleaserFromConfig,
+} from "./withPgClient";
