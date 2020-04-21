@@ -202,7 +202,7 @@ PostGraphile features include:
 but a basic summary is:
 
 - Node v8.6+
-- PostgreSQL 9.6+ (officially; but currently works with 9.4+)
+- PostgreSQL 9.6+
 - Linux, macOS or Windows
 
 Caveats:
