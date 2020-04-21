@@ -7,9 +7,9 @@
 
     "target": "es2019",
     "lib": ["es2020"],
-    "module": "ES2020",
+    "module": "commonjs",
     "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
 
     "sourceMap": true,
     "pretty": true,
