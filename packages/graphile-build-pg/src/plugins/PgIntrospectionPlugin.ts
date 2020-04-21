@@ -564,6 +564,7 @@ export default (async function PgIntrospectionPlugin(
     pgThrowOnMissingSchema = false,
     pgIncludeExtensionResources = false,
     pgLegacyFunctionsOnly = false,
+    pgIgnoreRBAC = true,
     pgSkipInstallingWatchFixtures = false,
     pgOwnerConnectionString,
   },
@@ -597,6 +598,7 @@ export default (async function PgIntrospectionPlugin(
                 serverVersionNum,
                 {
                   pgLegacyFunctionsOnly,
+                  pgIgnoreRBAC,
                 },
               );
 
