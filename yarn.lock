@@ -13792,10 +13792,10 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@^3.4.3, typescript@^3.7.2:
-  version "3.7.5"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.7.5.tgz#0692e21f65fd4108b9330238aac11dd2e177a1ae"
-  integrity sha512-/P5lkRXkWHNAbcJIiHPfRoKqyd7bsyCma1hZNUGfn20qm64T6ZBlrzprymeu918H+mB/0rIg2gGK/BXkhhYgBw==
+typescript@^3.9.0-beta:
+  version "3.9.0-dev.20200421"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.0-dev.20200421.tgz#8b008150249c5479d22c356ad8f71e5cdda5ddb2"
+  integrity sha512-Mf8D018c5yChmOBnjQVovxAVHzBu8liij398dF+Bbtqg5/5b4dazkI6Ervdy3GElL8v43v36tm4uLNHyYu9dLQ==
 
 uc.micro@^1.0.1, uc.micro@^1.0.5:
   version "1.0.6"

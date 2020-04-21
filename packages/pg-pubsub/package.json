@@ -52,7 +52,7 @@
     "pg": "^7.10.0",
     "postgraphile": "4.6.0",
     "ts-jest": "^25.2.0",
-    "typescript": "^3.7.2"
+    "typescript": "^3.9.0-beta"
   },
   "files": [
     "dist"

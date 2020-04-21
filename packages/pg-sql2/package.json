@@ -39,7 +39,7 @@
     "markdown-doctest": "^1.0.0",
     "ts-jest": "25.2.0",
     "ts-node": "8.6.2",
-    "typescript": "^3.7.2"
+    "typescript": "^3.9.0-beta"
   },
   "peerDependencies": {
     "pg": ">=6.1.0 <8"

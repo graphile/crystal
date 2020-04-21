@@ -38,7 +38,7 @@
     "jest": "^24.8.0",
     "ts-jest": "^25.2.0",
     "ts-node": "^8.6.2",
-    "typescript": "^3.7.2"
+    "typescript": "^3.9.0-beta"
   },
   "dependencies": {
     "debug": "^4.1.1"

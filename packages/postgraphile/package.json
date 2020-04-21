@@ -115,7 +115,7 @@
     "style-loader": "^0.23.0",
     "superagent": "^4.1.0",
     "ts-node": "^8.6.2",
-    "typescript": "^3.4.3",
+    "typescript": "^3.9.0-beta",
     "webpack": "^4.17.2"
   },
   "jest": {

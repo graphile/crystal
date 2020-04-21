@@ -41,7 +41,7 @@
     "jest": "^24.8.0",
     "jest-serializer-graphql-schema": "4.6.0",
     "ts-node": "^8.6.2",
-    "typescript": "^3.7.2"
+    "typescript": "^3.9.0-beta"
   },
   "peerDependencies": {
     "graphile-build": "^4.5.0",
