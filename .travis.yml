@@ -26,7 +26,8 @@ before_script:
   - sudo bash -c "echo -e 'wal_level = logical\nmax_replication_slots =
     10\nmax_wal_senders = 10' >>
     /etc/postgresql/$PGVERSION/main/postgresql.conf"
-  - sudo service postgresql restart
+  - sudo service postgresql stop
+  - sudo service postgresql start
   - git clone https://github.com/eulerto/wal2json.git
   - sudo bash -c "cd wal2json && USE_PGXS=1 make && USE_PGXS=1 make install"
   - createdb graphileengine_test
@@ -48,27 +49,9 @@ matrix:
         - postgresql
       env:
         - PGVERSION=10
-        - TEST_DATABASE_URL=postgres://localhost:5432/graphileengine_test
-        - TEST_PG_URL=postgres://localhost:5432/postgraphile_test
-        - LDS_TEST_DATABASE_URL=postgres://travis:travis@localhost:5432/lds_test
-        - PGVERSION=10
-      sudo: false
-      dist: xenial
-    - node_js: 12
-      addons:
-        apt:
-          packages:
-            - postgresql-10
-            - postgresql-client-10
-            - postgresql-server-dev-10
-        postgresql: 10
-      services:
-        - postgresql
-      env:
-        - PGVERSION=10
-        - TEST_DATABASE_URL=postgres://localhost:5432/graphileengine_test
-        - TEST_PG_URL=postgres://localhost:5432/postgraphile_test
-        - LDS_TEST_DATABASE_URL=postgres://travis:travis@localhost:5432/lds_test
-        - PGVERSION=10
+        - PGPORT=5433
+        - TEST_DATABASE_URL=postgres://localhost:5433/graphileengine_test
+        - TEST_PG_URL=postgres://localhost:5433/postgraphile_test
+        - LDS_TEST_DATABASE_URL=postgres://travis:travis@localhost:5433/lds_test
       sudo: false
       dist: xenial
