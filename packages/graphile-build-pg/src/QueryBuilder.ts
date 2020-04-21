@@ -142,7 +142,7 @@ class QueryBuilder {
   _children: Map<RawAlias, QueryBuilder>;
 
   constructor(
-    options: QueryBuilderOptions = {},
+    _options: QueryBuilderOptions = {},
     context: GraphileResolverContext,
     rootValue?: any,
   ) {

@@ -14,7 +14,6 @@ import { describePgEntity } from "./PgBasicsPlugin";
 
 // @ts-ignore
 import { version } from "../../package.json";
-import queryFromResolveDataFactory from "../queryFromResolveDataFactory";
 
 const debug = debugFactory("graphile-build-pg");
 const WATCH_FIXTURES_PATH = `${__dirname}/../../res/watch-fixtures.sql`;
