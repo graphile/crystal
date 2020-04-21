@@ -263,7 +263,7 @@ returning *`;
                   description: `The output of our ${mode} \`${tableTypeName}\` mutation.`,
                   fields: ({ fieldWithHooks }) => {
                     const tableName = inflection.tableFieldName(table);
-                    // This should really be `-node-id` but for compatibility with PostGraphQL v3 we haven't made that change.
+                    // TODO:v5: this should really be `-node-id` but for compatibility with PostGraphQL v3 we haven't made that change.
                     const deletedNodeIdFieldName = inflection.deletedNodeId(
                       table,
                     );

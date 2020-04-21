@@ -33,8 +33,6 @@ import PgMutationUpdateDeletePlugin from "./plugins/PgMutationUpdateDeletePlugin
 import PgMutationProceduresPlugin from "./plugins/PgMutationProceduresPlugin";
 import PgMutationPayloadEdgePlugin from "./plugins/PgMutationPayloadEdgePlugin";
 
-import * as inflections from "./inflections";
-
 import parseIdentifier from "./parseIdentifier";
 import omit from "./omit";
 export { formatSQLForDebugging } from "./plugins/debugSql";
@@ -78,8 +76,6 @@ export const defaultPlugins = [
   PgMutationPayloadEdgePlugin,
 ];
 
-export { inflections };
-
 // TypeScript compatibility
 
 export {
@@ -106,7 +102,6 @@ export {
   PgOrderByPrimaryKeyPlugin,
   PgRowNode,
   PgNodeAliasPostGraphile,
-  PgNodeAliasPostGraphile as PgNodeAliasPostGraphQL,
   PgRecordReturnTypesPlugin,
   PgRecordFunctionConnectionPlugin,
   PgScalarFunctionConnectionPlugin,
