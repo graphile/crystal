@@ -9,8 +9,8 @@
 export function makeIntrospectionQuery(
   serverVersionNum: number,
   options: {
-    pgLegacyFunctionsOnly?: boolean,
-    pgIgnoreRBAC?: boolean,
+    pgLegacyFunctionsOnly?: boolean;
+    pgIgnoreRBAC?: boolean;
   } = {}
 ): string {
   const { pgLegacyFunctionsOnly = false, pgIgnoreRBAC = true } = options;

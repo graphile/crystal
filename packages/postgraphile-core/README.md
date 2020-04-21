@@ -132,11 +132,11 @@ runQuery(
   // This query obviously depends on your database schema
   "query MyQuery { allPosts { nodes { id, title, author: userByAuthorId { username } } } }"
 )
-  .then((result) => {
+  .then(result => {
     console.dir(result);
     pgPool.end();
   })
-  .catch((e) => {
+  .catch(e => {
     console.error(e);
     process.exit(1);
   });
