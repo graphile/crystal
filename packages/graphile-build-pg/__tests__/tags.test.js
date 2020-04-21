@@ -1,4 +1,4 @@
-const { parseTags } = require("../node8plus/utils");
+const { parseTags } = require("../dist/utils");
 
 test("tags are removed correctly", () => {
   expect(

@@ -34,8 +34,7 @@ COPY package.json yarn.lock /postgraphile/
 COPY *.md /postgraphile/
 COPY index.js cli.js isTurbo.js plugins.js plugins.d.ts /postgraphile/
 COPY docker/.postgraphilerc.js /postgraphile/
-COPY --from=builder /postgraphile/build/ /postgraphile/build/
-COPY --from=builder /postgraphile/build-turbo/ /postgraphile/build-turbo/
+COPY --from=builder /postgraphile/dist/ /postgraphile/dist/
 COPY --from=builder /postgraphile/sponsors.json /postgraphile/
 
 ########################################
@@ -44,7 +43,6 @@ FROM node:12-alpine
 LABEL description="Instant extensible high-performance GraphQL API for your PostgreSQL database https://graphile.org/postgraphile"
 
 EXPOSE 5000
-ENV GRAPHILE_TURBO=1
 WORKDIR /postgraphile/
 ENTRYPOINT ["./cli.js"]
 

@@ -2,8 +2,8 @@
   "name": "graphile-build-pg",
   "version": "4.6.0",
   "description": "Build a GraphQL schema by reflection over a PostgreSQL schema. Easy to customize since it's built with plugins on graphile-build",
-  "main": "node8plus/index.js",
-  "types": "node8plus/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
     "prepack": "tsc -b"
@@ -58,7 +58,7 @@
     "jest-serializer-graphql-schema": "4.6.0"
   },
   "files": [
-    "node8plus",
+    "dist",
     "res",
     "index.js"
   ],

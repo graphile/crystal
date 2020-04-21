@@ -6,10 +6,10 @@ TODO.md
 tsconfig.json
 .vscode
 src
-build/__tests__
-build/**/__tests__
-build/__mocks__
-build/**/__mocks__
+dist/__tests__
+dist/**/__tests__
+dist/__mocks__
+dist/**/__mocks__
 typings
 scripts
 examples

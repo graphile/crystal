@@ -6,11 +6,6 @@ node_modules
 /packages/postgraphile/assets
 /packages/postgraphile/src/assets
 /wal2json
-node7minus
-node8plus
-build-turbo
-build
-dist-turbo
 dist
 CHANGELOG.md
 _LOCAL

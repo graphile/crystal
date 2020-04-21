@@ -66,6 +66,5 @@ matrix:
         - TEST_DATABASE_URL=postgres://localhost:5432/graphileengine_test
         - LDS_TEST_DATABASE_URL=postgres://travis:travis@localhost:5432/lds_test
         - PGVERSION=10
-        - GRAPHILE_TURBO=1
       sudo: false
       dist: xenial

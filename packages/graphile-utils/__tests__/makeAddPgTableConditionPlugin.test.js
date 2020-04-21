@@ -6,7 +6,7 @@ import {
   gql,
   embed,
   makeAddPgTableConditionPlugin,
-} from "../node8plus";
+} from "../dist";
 
 const clean = data => {
   if (Array.isArray(data)) {

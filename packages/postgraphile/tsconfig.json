@@ -2,11 +2,11 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
-    "declarationDir": "./build",
-    "outDir": "./build",
+    "declarationDir": "./dist",
+    "outDir": "./dist",
     "noEmit": false
   },
-  "include": ["src/**/*"],
+  "include": ["src"],
   "references": [
     { "path": "../graphile-utils" },
     { "path": "../lru" },
@@ -16,8 +16,7 @@
     "index.js",
     "plugins.d.ts",
     "node_modules",
-    "build",
-    "build-turbo",
+    "dist",
     "examples",
     "utils",
     "resources",

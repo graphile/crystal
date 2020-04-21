@@ -4,7 +4,7 @@
     "declaration": true,
     "declarationMap": true,
     "allowJs": false,
-    "target": "es2017",
+    "target": "es2019",
     "module": "commonjs",
     "moduleResolution": "node",
     "sourceMap": true,
@@ -18,11 +18,10 @@
     "noUnusedParameters": true,
     "noUnusedLocals": true,
     "preserveWatchOutput": true,
-    "lib": ["es2018", "esnext.asynciterable"],
-    "noEmit": true
+    "lib": ["es2018", "esnext.asynciterable"]
   },
-  "exclude": ["node_modules", "node8plus", "dist-turbo"],
-  "include": ["packages"],
+  "exclude": ["node_modules", "dist"],
+  "include": [],
   "references": [
     { "path": "packages/graphile-build" },
     { "path": "packages/graphile-build-pg" },

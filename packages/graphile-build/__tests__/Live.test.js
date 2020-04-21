@@ -3,7 +3,7 @@ const {
   LiveCoordinator,
   LiveProvider,
   makeAsyncIteratorFromMonitor,
-} = require("../node8plus/Live");
+} = require("../dist/Live");
 
 // TODO: this file needs a *lot* more tests!
 

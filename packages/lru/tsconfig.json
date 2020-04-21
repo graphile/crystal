@@ -2,8 +2,8 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
-    "declarationDir": "./node8plus",
-    "outDir": "./node8plus",
+    "declarationDir": "./dist",
+    "outDir": "./dist",
     "noEmit": false
   },
   "include": ["src/**/*"]

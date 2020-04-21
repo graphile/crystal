@@ -2,7 +2,6 @@ Dockerfile
 .git
 node_modules
 postgraphiql/node_modules
-build
-build-turbo
+dist
 examples
 .clinic

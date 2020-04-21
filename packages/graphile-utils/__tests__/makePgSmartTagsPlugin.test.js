@@ -1,7 +1,7 @@
 import pg from "pg";
 import { graphql } from "graphql";
 import { createPostGraphileSchema } from "postgraphile-core";
-import { makeJSONPgSmartTagsPlugin } from "../node8plus";
+import { makeJSONPgSmartTagsPlugin } from "../dist";
 
 let pgPool = null;
 

@@ -43,3 +43,5 @@ export { makePluginHook, PostGraphilePlugin } from "./postgraphile/pluginHook";
 
 import { postgraphile } from "./postgraphile";
 export default postgraphile;
+
+export * from "./plugins";

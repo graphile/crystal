@@ -19,7 +19,7 @@ import { GraphileEmbed } from "./gql";
 import { InputObjectTypeExtensionNode } from "graphql/language/ast";
 
 import { GraphileHelpers, makeFieldHelpers } from "./fieldHelpers";
-import { DirectiveMap } from "graphile-build/node8plus/SchemaBuilder";
+import { DirectiveMap } from "graphile-build/dist/SchemaBuilder";
 
 // TODO:v5: Remove
 const recurseDataGeneratorsWorkaroundFieldByType = new Map();

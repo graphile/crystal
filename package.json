@@ -6,7 +6,7 @@
     "test": "lerna run --concurrency 1 test",
     "prepack:all": "scripts/prepack-all",
     "watch": "yarn workspace postgraphile prebuild && tsc -b --watch",
-    "clean": "rm -Rf packages/*/node8plus/ packages/*/dist packages/*/dist-turbo packages/*/tsconfig.tsbuildinfo",
+    "clean": "rm -Rf packages/*/dist packages/*/tsconfig.tsbuildinfo",
     "changelog": "(cat scripts/CHANGELOG_HEADER.md; npx conventional-changelog -p angular --release-count 0) > CHANGELOG.md",
     "version": "yarn run changelog && git add CHANGELOG.md",
     "-----": "-----",

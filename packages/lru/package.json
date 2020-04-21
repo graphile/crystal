@@ -2,8 +2,8 @@
   "name": "@graphile/lru",
   "version": "4.6.0-alpha.0",
   "description": "Extremely simple zero-dependencies ES6 LRU (you probably want lru-cache instead)",
-  "main": "node8plus/index.js",
-  "types": "node8plus/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
     "prepack": "tsc -b"
@@ -30,6 +30,6 @@
     "typescript": "^3.7.2"
   },
   "files": [
-    "node8plus"
+    "dist"
   ]
 }

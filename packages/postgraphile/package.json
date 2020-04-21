@@ -27,10 +27,10 @@
     "url": "https://github.com/graphile/postgraphile/issues"
   },
   "repository": "github:graphile/postgraphile",
-  "main": "index.js",
-  "types": "build/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "bin": {
-    "postgraphile": "cli.js"
+    "postgraphile": "dist/postgraphile/cli.js"
   },
   "scripts": {
     "prebuild": "rm -rf build && mkdir build && scripts/make-assets",
@@ -139,13 +139,7 @@
   },
   "files": [
     "sponsors.json",
-    "build",
-    "build-turbo",
-    "isTurbo.js",
-    "index.js",
-    "cli.js",
-    "plugins.js",
-    "plugins.d.ts"
+    "dist"
   ],
   "engines": {
     "node": ">=12.16"

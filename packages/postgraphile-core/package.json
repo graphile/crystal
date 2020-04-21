@@ -2,7 +2,7 @@
   "name": "postgraphile-core",
   "version": "4.6.0",
   "description": "",
-  "main": "node8plus/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "scripts/test",
     "prepack": "tsc -b"
@@ -38,7 +38,7 @@
     "pg": ">=6.1.0 <8"
   },
   "files": [
-    "node8plus",
+    "dist",
     "index.js"
   ],
   "engines": {

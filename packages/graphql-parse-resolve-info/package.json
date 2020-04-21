@@ -2,11 +2,11 @@
   "name": "graphql-parse-resolve-info",
   "version": "4.6.0-alpha.0",
   "description": "Parse GraphQLResolveInfo (the 4th argument of resolve) into a simple tree",
-  "main": "index.js",
-  "types": "node8plus/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
-    "prepack": "tsc -b && tsc --target ES2019 --lib ES2018 --outDir dist-turbo --declarationDir dist-turbo"
+    "prepack": "tsc -b"
   },
   "repository": {
     "type": "git",
@@ -44,9 +44,7 @@
     "debug": "^4.1.1"
   },
   "files": [
-    "node8plus",
-    "index.js",
-    "dist-turbo"
+    "dist"
   ],
   "engines": {
     "node": ">=12.16"

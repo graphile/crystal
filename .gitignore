@@ -1,9 +1,6 @@
 node_modules
 coverage
-build
-build-turbo
 dist
-dist-turbo
 /pg-omit-archived/
 /pg-simplify-inflector/
 /operation-hooks/
