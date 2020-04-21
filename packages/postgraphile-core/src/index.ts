@@ -352,13 +352,6 @@ export const getPostGraphileBuilder = async (
     pgSchemas: Array.isArray(schemas) ? schemas : [schemas],
     pgExtendedTypes: !!dynamicJson,
     pgColumnFilter: pgColumnFilter || (() => true),
-    ...({
-      pgInflection:
-        inflector ||
-        (classicIds
-          ? postGraphileClassicIdsInflection
-          : postGraphileInflection),
-    } as any),
     nodeIdFieldName: nodeIdFieldName || (classicIds ? "id" : "nodeId"),
     pgJwtTypeIdentifier: jwtPgTypeIdentifier,
     pgJwtSecret: jwtSecret,

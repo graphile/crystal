@@ -19,8 +19,6 @@ export {
   SchemaListener,
   Inflection,
   Options,
-  postGraphileBaseOverrides,
-  postGraphileClassicIdsOverrides,
   PostGraphileInflectionPlugin,
   PostGraphileClassicIdsInflectionPlugin,
   GraphileResolverContext,
