@@ -6,7 +6,7 @@ import {
 } from "graphql-parse-resolve-info";
 import debugFactory from "debug";
 import { ResolveTree } from "graphql-parse-resolve-info";
-import pluralize = require("pluralize");
+import pluralize from "pluralize";
 import LRU from "@graphile/lru";
 import * as semver from "semver";
 import { upperCamelCase, camelCase, constantCase } from "./utils";

@@ -34,9 +34,7 @@ import {
   GraphQLEnumValueConfig,
   GraphQLOutputType,
 } from "graphql";
-import EventEmitter = require("events");
-// TODO: when we move to TypeScript, change this to:
-// import { EventEmitter } from "events";
+import { EventEmitter } from "events";
 
 import { LiveCoordinator } from "./Live";
 import { ResolveTree } from "graphql-parse-resolve-info";

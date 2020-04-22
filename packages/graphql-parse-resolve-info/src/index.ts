@@ -1,4 +1,4 @@
-import * as assert from "assert";
+import assert from "assert";
 import {
   getNamedType,
   isCompositeType,
@@ -18,7 +18,7 @@ import {
   NamedTypeNode,
 } from "graphql";
 import { getArgumentValues } from "graphql/execution/values";
-import * as debugFactory from "debug";
+import debugFactory from "debug";
 
 export interface FieldsByTypeName {
   [str: string]: {

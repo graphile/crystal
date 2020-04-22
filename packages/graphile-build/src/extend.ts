@@ -9,7 +9,7 @@ export function indent(text: string) {
   );
 }
 
-export default function extend<Obj1 extends any, Obj2 extends any>(
+export default function extend<Obj1 extends {}, Obj2 extends {}>(
   base: Obj1,
   extra: Obj2,
   hint: string,

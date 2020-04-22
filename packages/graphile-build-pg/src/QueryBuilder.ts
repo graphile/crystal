@@ -1,6 +1,6 @@
 import * as sql from "pg-sql2";
-import isSafeInteger = require("lodash/isSafeInteger");
-import chunk = require("lodash/chunk");
+import isSafeInteger from "lodash/isSafeInteger";
+import chunk from "lodash/chunk";
 import { PgClass, PgType } from "./plugins/PgIntrospectionPlugin";
 import { GraphileResolverContext } from "graphile-build";
 

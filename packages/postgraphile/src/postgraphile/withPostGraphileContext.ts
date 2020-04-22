@@ -1,5 +1,5 @@
-import createDebugger = require("debug");
-import jwt = require("jsonwebtoken");
+import createDebugger from "debug";
+import jwt from "jsonwebtoken";
 import { Pool, PoolClient, QueryConfig, QueryResult } from "pg";
 import { ExecutionResult, OperationDefinitionNode, Kind } from "graphql";
 import * as sql from "pg-sql2";

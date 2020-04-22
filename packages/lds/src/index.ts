@@ -93,8 +93,10 @@ export default async function subscribeToLogicalDecoding(
 
   let loopTimeout: NodeJS.Timer;
 
+  let finished = false;
   const ldSubscription = {
     close: async () => {
+      finished = true;
       clearTimeout(loopTimeout);
       await client.close();
     },
@@ -159,9 +161,15 @@ export default async function subscribeToLogicalDecoding(
         });
       }
     } catch (e) {
+      if (finished) {
+        return;
+      }
       console.error("Error during LDS loop:", e.message);
       // Recovery time...
       loopTimeout = setTimeout(loop, sleepDuration * 10);
+      return;
+    }
+    if (finished) {
       return;
     }
     loopTimeout = setTimeout(loop, sleepDuration);

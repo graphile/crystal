@@ -1,4 +1,4 @@
-import util = require("util");
+import util from "util";
 import SchemaBuilder from "./SchemaBuilder";
 import {
   SwallowErrorsPlugin,

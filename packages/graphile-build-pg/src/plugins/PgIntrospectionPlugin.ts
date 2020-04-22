@@ -7,8 +7,8 @@ import { parseTags } from "../utils";
 import { readFile as rawReadFile } from "fs";
 import debugFactory from "debug";
 import chalk from "chalk";
-import throttle = require("lodash/throttle");
-import flatMap = require("lodash/flatMap");
+import throttle from "lodash/throttle";
+import flatMap from "lodash/flatMap";
 import { makeIntrospectionQuery } from "./introspectionQuery";
 import { describePgEntity } from "./PgBasicsPlugin";
 

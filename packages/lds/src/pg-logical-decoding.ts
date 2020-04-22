@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import * as pg from "pg";
+import { Pool, PoolClient } from "pg";
 import { EventEmitter } from "events";
 import FatalError from "./fatal-error";
 
@@ -92,8 +92,8 @@ export default class PgLogicalDecoding extends EventEmitter {
   public readonly temporary: boolean;
   private connectionString: string;
   private tablePattern: string;
-  private pool: pg.Pool | null;
-  private client: Promise<pg.PoolClient> | null;
+  private pool: Pool | null;
+  private client: Promise<PoolClient> | null;
 
   constructor(connectionString: string, options?: Options) {
     super();
@@ -107,7 +107,7 @@ export default class PgLogicalDecoding extends EventEmitter {
     this.slotName = slotName;
     this.temporary = temporary;
     // We just use the pool to get better error handling
-    this.pool = new pg.Pool({
+    this.pool = new Pool({
       connectionString: this.connectionString,
       max: 1,
     });
@@ -230,7 +230,7 @@ export default class PgLogicalDecoding extends EventEmitter {
 
   /****************************************************************************/
 
-  private async getClient(): Promise<pg.PoolClient> {
+  private async getClient(): Promise<PoolClient> {
     if (!this.pool) {
       throw new Error("Pool has been closed");
     }
@@ -258,7 +258,7 @@ export default class PgLogicalDecoding extends EventEmitter {
   };
 
   private async trackSelf(
-    client: pg.PoolClient,
+    client: PoolClient,
     skipSchema = false,
   ): Promise<void> {
     if (this.temporary) {

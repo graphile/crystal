@@ -25,12 +25,12 @@ import { Context as KoaContext } from "koa";
 import LRU from "@graphile/lru";
 
 import chalk from "chalk";
-import Debugger = require("debug"); // tslint:disable-line variable-name
-import httpError = require("http-errors");
-import parseUrl = require("parseurl");
-import finalHandler = require("finalhandler");
-import bodyParser = require("body-parser");
-import crypto = require("crypto");
+import Debugger from "debug"; // tslint:disable-line variable-name
+import httpError from "http-errors";
+import parseUrl from "parseurl";
+import finalHandler from "finalhandler";
+import bodyParser from "body-parser";
+import crypto from "crypto";
 
 const ALLOW_EXPLAIN_PLACEHOLDER = "__SHOULD_ALLOW_EXPLAIN__";
 const noop = () => {

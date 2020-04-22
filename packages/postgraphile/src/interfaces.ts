@@ -9,7 +9,7 @@ import { IncomingMessage, ServerResponse } from "http";
 import { PluginHookFn } from "./postgraphile/pluginHook";
 import { Pool, PoolClient } from "pg";
 import { Plugin, PostGraphileCoreOptions } from "postgraphile-core";
-import jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 import { EventEmitter } from "events";
 import { GraphileResolverContext } from "postgraphile-core";
 

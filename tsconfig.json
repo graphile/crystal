@@ -4,9 +4,13 @@
     "declaration": true,
     "declarationMap": true,
     "allowJs": false,
+
     "target": "es2019",
+    "lib": ["es2020"],
     "module": "commonjs",
     "moduleResolution": "node",
+    "esModuleInterop": true,
+
     "sourceMap": true,
     "pretty": true,
     "importHelpers": true,
@@ -17,8 +21,7 @@
     "noFallthroughCasesInSwitch": true,
     "noUnusedParameters": true,
     "noUnusedLocals": true,
-    "preserveWatchOutput": true,
-    "lib": ["es2018", "esnext.asynciterable"]
+    "preserveWatchOutput": true
   },
   "exclude": ["node_modules", "dist"],
   "include": [],

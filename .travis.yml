@@ -19,7 +19,7 @@ env:
 cache: yarn
 
 install:
-  - yarn
+  - yarn --frozen-lockfile
   - lerna bootstrap
 
 before_script:

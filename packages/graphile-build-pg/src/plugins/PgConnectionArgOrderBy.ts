@@ -1,4 +1,4 @@
-import isString = require("lodash/isString");
+import isString from "lodash/isString";
 import { Plugin } from "graphile-build";
 import { SQL } from "../QueryBuilder";
 import { PgEntityKind } from "./PgIntrospectionPlugin";

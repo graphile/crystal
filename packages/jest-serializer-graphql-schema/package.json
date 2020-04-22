@@ -30,9 +30,7 @@
   "devDependencies": {
     "@types/node-fetch": "^2.5.2",
     "node-fetch": "^2.6.0",
-    "pretty-format": "^24.9.0",
-    "ts-jest": "^25.2.0",
-    "typescript": "^3.7.2"
+    "pretty-format": "^24.9.0"
   },
   "files": [
     "dist"

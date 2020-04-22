@@ -53,9 +53,7 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
-    "eslint_d": "^8.0.0",
-    "jest": "^24.8.0",
-    "jest-serializer-graphql-schema": "4.6.0"
+    "eslint_d": "^8.0.0"
   },
   "files": [
     "dist",

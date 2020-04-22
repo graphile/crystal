@@ -39,12 +39,7 @@
     "pg": ">=6.5 <8",
     "ws": "^7.0.0"
   },
-  "devDependencies": {
-    "@types/jest": "^24.0.12",
-    "jest": "24.9.0",
-    "ts-jest": "^25.2.0",
-    "typescript": "^3.7.2"
-  },
+  "devDependencies": {},
   "files": [
     "dist"
   ]

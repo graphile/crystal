@@ -1,6 +1,6 @@
 import { Plugin, Build } from "graphile-build";
 import { getComputedColumnDetails } from "./PgComputedColumnsPlugin";
-import assert = require("assert");
+import assert from "assert";
 import { PgClass, PgProc, PgType } from "./PgIntrospectionPlugin";
 
 function getCompatibleComputedColumns(build: Build, table: PgClass) {

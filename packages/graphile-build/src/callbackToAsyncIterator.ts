@@ -8,12 +8,9 @@ const defaultOnError = (err: Error) => {
   throw err;
 };
 
-export default function callbackToAsyncIterator<
-  CallbackInput extends any,
-  ReturnVal extends any
->(
+export default function callbackToAsyncIterator<CallbackInput, ReturnVal>(
   listener: (
-    callback: (arg?: CallbackInput) => any,
+    callback: (value?: CallbackInput) => void,
   ) => (ReturnVal | null | undefined) | Promise<ReturnVal | null | undefined>,
   options: {
     onError?: (err: Error) => void;

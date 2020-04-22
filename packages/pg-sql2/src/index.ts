@@ -1,4 +1,4 @@
-import * as debugFactory from "debug";
+import debugFactory from "debug";
 import { QueryConfig } from "pg";
 import LRU from "@graphile/lru";
 

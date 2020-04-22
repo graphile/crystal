@@ -389,7 +389,7 @@ export const getPostGraphileBuilder = async (
 
 function abort(e: Error) {
   // eslint-disable-next-line no-console
-  console.error("Error occured whilst writing cache");
+  console.error("Error occurred whilst writing cache");
   // eslint-disable-next-line no-console
   console.error(e);
   process.exit(1);

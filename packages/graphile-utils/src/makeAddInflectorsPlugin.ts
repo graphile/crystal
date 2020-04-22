@@ -4,7 +4,7 @@ interface Inflectors {
   [str: string]: (...args: Array<any>) => any;
 }
 type InflectorsGenerator = (
-  inflection: Inflectors,
+  inflection: Partial<Inflectors>,
   build: BuildBase,
   options: Options,
 ) => Inflectors;

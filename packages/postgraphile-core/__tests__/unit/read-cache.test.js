@@ -1,13 +1,17 @@
+jest.mock("graphile-build");
+
+const mockFs = require("mock-fs");
 const fs = require("fs");
 const graphileBuild = require("graphile-build");
 const { getPostGraphileBuilder } = require("../..");
 
-jest.mock("fs");
-jest.mock("graphile-build");
-
 beforeEach(() => {
   // required for mocks assertions
   jest.resetAllMocks();
+});
+
+afterEach(() => {
+  mockFs.restore();
 });
 
 /*
@@ -47,10 +51,9 @@ test("when no readCache flag, persistentMemoizeWithKey should be undefined", asy
 
 describe("When readCache is String", () => {
   test("if cache file has content, persistentMemoizeWithKey should be a valid function", async () => {
-    // mock fs.readFile to return an object
-    fs.readFile.mockImplementationOnce((path, options, cb) =>
-      cb(null, '{ "__test": true }'),
-    );
+    mockFs({
+      "path/to/cache": '{ "__test": true }',
+    });
 
     // mock getBuilder to fake output
     const expectedOutput = {};
@@ -60,7 +63,6 @@ describe("When readCache is String", () => {
       readCache: "path/to/cache",
     });
     expect(output).toBe(expectedOutput);
-    expect(fs.readFile).toHaveBeenCalledTimes(1);
     expect(graphileBuild.getBuilder).toHaveBeenCalledTimes(1);
     // check persistentMemoizeWithKey, the actual "result" of readCache flag
     const {
@@ -72,10 +74,9 @@ describe("When readCache is String", () => {
   });
 
   test("if cache file has invalid content, getPostGraphileBuilder should error", async () => {
-    // mock fs.readFile to return an object
-    fs.readFile.mockImplementationOnce((path, options, cb) =>
-      cb(null, "thisisnotjson"),
-    );
+    mockFs({
+      "path/to/cache": "thisisnotjson",
+    });
 
     // call our method and check error
 
@@ -88,8 +89,8 @@ describe("When readCache is String", () => {
       error = e;
     }
     expect(error).toBeDefined();
+    mockFs.restore();
     expect(error).toMatchSnapshot();
-    expect(fs.readFile).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -126,6 +127,7 @@ describe("when readCache is not String or Object, getPostGraphileBuilder should 
       error = e;
     }
     expect(error).toBeDefined();
+    mockFs.restore();
     expect(error).toMatchSnapshot();
   });
   test("when its Array", async () => {
@@ -139,6 +141,7 @@ describe("when readCache is not String or Object, getPostGraphileBuilder should 
       error = e;
     }
     expect(error).toBeDefined();
+    mockFs.restore();
     expect(error).toMatchSnapshot();
   });
   test("when its Number", async () => {
@@ -152,6 +155,7 @@ describe("when readCache is not String or Object, getPostGraphileBuilder should 
       error = e;
     }
     expect(error).toBeDefined();
+    mockFs.restore();
     expect(error).toMatchSnapshot();
   });
 });
