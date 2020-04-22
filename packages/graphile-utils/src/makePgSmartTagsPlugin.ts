@@ -220,7 +220,7 @@ export function makePgSmartTagsPlugin(
 export type JSONPgSmartTags = {
   version: 1;
   config: {
-    [kind in PgSmartTagSupportedKinds]: {
+    [kind in PgSmartTagSupportedKinds]?: {
       [identifier: string]: {
         tags?: PgSmartTagTags;
         description?: string;
