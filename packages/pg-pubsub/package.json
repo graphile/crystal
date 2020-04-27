@@ -47,7 +47,7 @@
     "jest-serializer-graphql-schema": "4.6.0",
     "mock-req": "^0.2.0",
     "mock-res": "^0.5.0",
-    "pg": "^7.10.0",
+    "pg": ">=6.1.0 <9",
     "postgraphile": "^4.4.0",
     "ts-jest": "^24.1.0",
     "typescript": "^3.4.5"

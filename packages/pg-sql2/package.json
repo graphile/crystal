@@ -43,7 +43,7 @@
     "typescript": "^3.6.3"
   },
   "peerDependencies": {
-    "pg": ">=6.1.0 <8"
+    "pg": ">=6.1.0 <9"
   },
   "dependencies": {
     "@graphile/lru": "4.5.0",
