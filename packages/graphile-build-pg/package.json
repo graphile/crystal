@@ -5,7 +5,6 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "jest",
     "prepack": "tsc -b"
   },
   "repository": {
@@ -52,10 +51,7 @@
   "peerDependencies": {
     "pg": ">=6.1.0 <9"
   },
-  "devDependencies": {
-    "@babel/cli": "^7.0.0",
-    "eslint_d": "^8.0.0"
-  },
+  "devDependencies": {},
   "files": [
     "dist",
     "res",

@@ -3,8 +3,9 @@
   "scripts": {
     "check": "yarn clean && yarn lint && yarn prepack:all && yarn test",
     "lint:fix": "yarn prettier:fix && yarn run eslint --fix",
-    "pretest": "./scripts/pretest",
+    "pretest": "tsc -b && ./scripts/pretest && lerna run pretest",
     "test": "jest -i",
+    "posttest": "lerna run posttest",
     "prepack:all": "scripts/prepack-all",
     "watch": "yarn workspace postgraphile prebuild && tsc -b --watch",
     "clean": "rm -Rf packages/*/dist packages/*/tsconfig.tsbuildinfo",

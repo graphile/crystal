@@ -62,6 +62,7 @@ describe("When readCache is String", () => {
     const output = await getPostGraphileBuilder({}, [], {
       readCache: "path/to/cache",
     });
+    mockFs.restore();
     expect(output).toBe(expectedOutput);
     expect(graphileBuild.getBuilder).toHaveBeenCalledTimes(1);
     // check persistentMemoizeWithKey, the actual "result" of readCache flag
@@ -88,8 +89,8 @@ describe("When readCache is String", () => {
     } catch (e) {
       error = e;
     }
-    expect(error).toBeDefined();
     mockFs.restore();
+    expect(error).toBeDefined();
     expect(error).toMatchSnapshot();
   });
 });

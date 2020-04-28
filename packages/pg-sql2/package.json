@@ -5,8 +5,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "tsc -b && node dist/index.js && jest && markdown-doctest",
-    "test:u": "tsc -b && node dist/index.js && jest -u && markdown-doctest",
+    "pretest": "node dist/index.js",
+    "posttest": "yarn test:docs",
     "test:docs": "markdown-doctest",
     "prepack": "tsc -b"
   },

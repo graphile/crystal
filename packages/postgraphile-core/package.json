@@ -4,7 +4,6 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "test": "scripts/test",
     "prepack": "tsc -b"
   },
   "repository": {
@@ -26,6 +25,7 @@
     "@types/pg": "^7.4.14",
     "debug": "^4.1.1",
     "jsonwebtoken": "^8.5.1",
+    "mock-fs": "^4.11.0",
     "pg-connection-string": "^2.1.0"
   },
   "peerDependencies": {

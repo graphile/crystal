@@ -1,1 +1,0 @@
-\ir ../../lds/__tests__/schema.sql

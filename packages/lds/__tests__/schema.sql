@@ -1,3 +1,5 @@
+-- This is also used by packages/subscriptions-lds
+
 \ir ./drop_replication_slot.sql
 
 drop schema if exists app_public cascade;

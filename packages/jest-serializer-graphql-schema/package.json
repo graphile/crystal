@@ -6,8 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "prepack": "tsc -b",
-    "watch": "tsc -b --watch",
-    "test": "jest"
+    "watch": "tsc -b --watch"
   },
   "repository": {
     "type": "git",
@@ -28,8 +27,6 @@
     "graphql": "^14.0.2"
   },
   "devDependencies": {
-    "@types/node-fetch": "^2.5.2",
-    "node-fetch": "^2.6.0",
     "pretty-format": "^24.9.0"
   },
   "files": [
