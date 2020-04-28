@@ -319,4 +319,44 @@ export function join(items: Array<SQL>, rawSeparator = ""): SQLQuery {
 
 export const blank = query``;
 
-export { query as fragment, nullNode as null };
+export {
+  query as fragment,
+  trueNode as true,
+  falseNode as false,
+  nullNode as null,
+};
+
+export interface PgSQL {
+  (strings: TemplateStringsArray, ...values: Array<SQL>): SQLQuery;
+  escapeSqlIdentifier: typeof escapeSqlIdentifier;
+  compile: typeof compile;
+  query: typeof query;
+  raw: typeof raw;
+  identifier: typeof identifier;
+  value: typeof value;
+  literal: typeof literal;
+  join: typeof join;
+  blank: typeof blank;
+  fragment: typeof query;
+  true: typeof trueNode;
+  false: typeof falseNode;
+  null: typeof nullNode;
+}
+
+const pgSql: PgSQL = Object.assign(query, {
+  escapeSqlIdentifier,
+  compile,
+  query,
+  raw,
+  identifier,
+  value,
+  literal,
+  join,
+  blank,
+  fragment: query,
+  true: trueNode,
+  false: falseNode,
+  null: nullNode,
+});
+
+export default pgSql;

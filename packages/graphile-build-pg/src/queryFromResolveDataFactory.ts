@@ -1,6 +1,6 @@
 import QueryBuilder from "./QueryBuilder";
 import { QueryBuilderOptions } from "./QueryBuilder";
-import * as sql from "pg-sql2";
+import sql from "pg-sql2";
 import { SQL } from "pg-sql2";
 import isSafeInteger from "lodash/isSafeInteger";
 import flatten from "lodash/flatten";

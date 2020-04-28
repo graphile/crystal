@@ -31,7 +31,7 @@ And please give some love to our featured sponsors 🤩:
 ## Usage
 
 ```js
-const sql = require("pg-sql2");
+const { default: sql } = require("pg-sql2");
 // or import sql from 'pg-sql2';
 
 const tableName = "user";

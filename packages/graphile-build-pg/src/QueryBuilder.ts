@@ -1,4 +1,4 @@
-import * as sql from "pg-sql2";
+import sql, { SQL, SQLRawValue } from "pg-sql2";
 import isSafeInteger from "lodash/isSafeInteger";
 import chunk from "lodash/chunk";
 import { PgClass, PgType } from "./plugins/PgIntrospectionPlugin";
@@ -6,7 +6,6 @@ import { GraphileResolverContext } from "graphile-build";
 
 export { GraphileResolverContext };
 
-type SQL = import("pg-sql2").SQL;
 export { sql, SQL };
 
 const isDev = process.env.POSTGRAPHILE_ENV === "development";
@@ -46,7 +45,7 @@ export type RawAlias = symbol | string;
 export type SQLAlias = SQL;
 export type SQLGen = Gen<SQL> | SQL;
 export type NumberGen = Gen<number> | number;
-export type CursorValue = Array<unknown>;
+export type CursorValue = Array<SQLRawValue>;
 export type CursorComparator = (val: CursorValue, isAfter: boolean) => void;
 
 export type QueryBuilderOptions = {};
@@ -66,7 +65,7 @@ function escapeLarge(sqlFragment: SQL, type: PgType) {
       return sqlFragment;
     }
     // Otherwise force the id to be a string
-    return sql.fragment`((${sqlFragment})::numeric)::text`;
+    return sql`((${sqlFragment})::numeric)::text`;
   }
   return sqlFragment;
 }
