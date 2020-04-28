@@ -1,7 +1,7 @@
 # pg-sql2
 
-Create SQL in a powerful and flexible manner without opening yourself to SQL
-injection attacks using the power of ES6 tagged template literals.
+Create highly dynamic SQL in a powerful and flexible manner without opening
+yourself to SQL injection attacks.
 
 A key aim of this library is to be very fast, if you think you can improve
 performance further please open a PR!
@@ -86,8 +86,8 @@ console.log(values); // [ 22 ]
 
 ### `` sql`...` ``
 
-Builds part of (or the whole of) an SQL query, safely interpretting the embedded
-expressions. If a non `sql.*` expression is passed in, e.g.:
+Builds part of (or the whole of) an SQL query, safely interpreting the embedded
+expressions. If a non `sql` expression is passed in, e.g.:
 
 <!-- skip-example -->
 
@@ -95,7 +95,8 @@ expressions. If a non `sql.*` expression is passed in, e.g.:
 sql`select ${1}`;
 ```
 
-then an error will be thrown.
+then an error will be thrown. This prevents SQL injection, as all values must go
+through an allowed API.
 
 ### `sql.identifier(ident, ...)`
 
@@ -116,10 +117,10 @@ that is not sensitive and is trusted (not user-provided data), e.g. for the key
 arguments to `json_build_object(key, val, key, val, ...)` which you have
 produced.
 
-### `sql.join(arrayOfFragments, delimeter)`
+### `sql.join(arrayOfFragments, delimiter)`
 
-Joins an array of sql.query values using the delimeter (which is treated as a
-raw SQL string); e.g.
+Joins an array of `sql` values using the delimiter (which is treated as a raw
+SQL string); e.g.
 
 ```js
 const arrayOfSqlFields = ["a", "b", "c", "d"].map(n => sql.identifier(n));
@@ -170,8 +171,8 @@ additional work that was done to it
 [in postgraphql](https://github.com/postgraphql/postgraphql/blob/9c36d7e9b9ad74e665de18964fd2554f9f639903/src/postgres/utils/sql.ts)
 and offering the following enhancements:
 
-- Better development experience for people not using Flow/TypeScript (throws
-  errors a lot earlier allowing you to catch issues at the source)
+- Better development experience for people not using TypeScript (throws errors a
+  lot earlier allowing you to catch issues at the source)
 - Slightly more helpful error messages
 - Uses a symbol-key on the query nodes to protect against an object accidentally
   being inserted verbatim and being treated as valid (because every Symbol is
