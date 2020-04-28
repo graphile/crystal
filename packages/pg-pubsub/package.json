@@ -1,6 +1,6 @@
 {
   "name": "@graphile/pg-pubsub",
-  "version": "4.6.0",
+  "version": "4.7.0",
   "description": "Subscriptions plugin for PostGraphile using PostgreSQL's LISTEN/NOTIFY",
   "main": "dist/index.js",
   "scripts": {
@@ -33,20 +33,20 @@
     "graphql-subscriptions": "^1.1.0"
   },
   "peerDependencies": {
-    "graphile-build": "4.6.0",
-    "graphile-build-pg": "4.6.0",
+    "graphile-build": "^4.7.0",
+    "graphile-build-pg": "^4.7.0",
     "graphql": ">=0.6 <15",
-    "postgraphile": "^4.6.0"
+    "postgraphile": "^4.7.0"
   },
   "devDependencies": {
     "@types/jest": "^24.0.12",
-    "graphile-build": "4.6.0",
-    "graphile-build-pg": "4.6.0",
+    "graphile-build": "4.7.0",
+    "graphile-build-pg": "4.7.0",
     "graphql": ">=0.6 <15",
     "mock-req": "^0.2.0",
     "mock-res": "^0.5.0",
-    "pg": "^7.10.0",
-    "postgraphile": "4.6.0"
+    "pg": ">=6.1.0 <9",
+    "postgraphile": "4.7.0"
   },
   "files": [
     "dist"

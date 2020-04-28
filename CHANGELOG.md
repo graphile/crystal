@@ -3,7 +3,22 @@
 We use PostGraphile's GitHub releases tab to log our changes in detail, but
 this auto-generated changelog helps us to produce that list, and it may be
 helpful to you also.
-# [](https://github.com/graphile/graphile-engine/compare/v4.6.0...v) (2020-01-27)
+# [](https://github.com/graphile/graphile-engine/compare/v4.7.0...v) (2020-04-27)
+
+
+
+# [4.7.0](https://github.com/graphile/graphile-engine/compare/v4.6.0...v4.7.0) (2020-04-27)
+
+
+### Bug Fixes
+
+* **introspection:** don't query roles when ignoring RBAC ([#598](https://github.com/graphile/graphile-engine/issues/598)) ([bfe2427](https://github.com/graphile/graphile-engine/commit/bfe24276c9ff5eb7d3e9e7aff56a4d2ea61f30c6))
+* **types:** relax index signature in JSONPgSmartTags ([#618](https://github.com/graphile/graphile-engine/issues/618)) ([edf2abf](https://github.com/graphile/graphile-engine/commit/edf2abf18dd87e63415c273631dc38741b4e531b))
+
+
+### Features
+
+* **graphile-build-pg:** expose more utils ([#601](https://github.com/graphile/graphile-engine/issues/601)) ([ac74e2d](https://github.com/graphile/graphile-engine/commit/ac74e2d7088a9d96ef9cac7645f2c6b52d7a66d8))
 
 **IMPORTANT NOTE**: most of the changes in PostGraphile actually come from
 Graphile Engine, so you should also reference [those

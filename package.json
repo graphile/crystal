@@ -32,7 +32,7 @@
     "babel-jest": "^25.4.0",
     "concurrently": "^4.1.0",
     "conventional-changelog-cli": "^2.0.31",
-    "eslint": "^6.4.0",
+    "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.1",
     "eslint-plugin-graphql": "^3.1.1",
     "eslint-plugin-jest": "^23.8.2",
@@ -41,11 +41,12 @@
     "graphql": ">=0.9 <0.14 || ^14.0.2",
     "jest": "^25.4.0",
     "lerna": "^3.18.4",
-    "pg": "^7.10.0",
-    "postgraphile": "4.6.0",
+    "pg": ">=6.1.0 <9",
+    "postgraphile": "4.7.0",
     "prettier": "^1.19.1",
     "ts-jest": "^25.4.0",
-    "typescript": "^3.9.0-beta"
+    "typescript": "^3.9.0-beta",
+    "webpack": "^4.41.5"
   },
   "workspaces": [
     "packages/*"
