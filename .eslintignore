@@ -1,6 +1,5 @@
 node_modules
 /packages/pg-sql2/examples
-/packages/pg-sql2/lib
 /packages/postgraphile/sponsors.json
 /packages/postgraphile/postgraphiql
 /packages/postgraphile/assets
