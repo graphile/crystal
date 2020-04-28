@@ -4,7 +4,7 @@ import LRU from "@graphile/lru";
 
 const debug = debugFactory("pg-sql2");
 
-function debugError(err: Error) {
+function debugError(err: Error): Error {
   debug(err);
   return err;
 }
@@ -23,8 +23,10 @@ export interface SQLIdentifierNode {
   [$$trusted]: true;
 }
 
+export type SQLRawValue = string | number | boolean | null | Array<SQLRawValue>;
+
 export interface SQLValueNode {
-  value: any;
+  value: SQLRawValue;
   type: "VALUE";
   [$$trusted]: true;
 }
@@ -48,7 +50,7 @@ function makeRawNode(text: string): SQLRawNode {
   return newNode;
 }
 
-function isStringOrSymbol(val: any): val is string | symbol {
+function isStringOrSymbol(val: unknown): val is string | symbol {
   return typeof val === "string" || typeof val === "symbol";
 }
 
@@ -65,8 +67,19 @@ function makeIdentifierNode(names: Array<string | symbol>): SQLIdentifierNode {
   return { type: "IDENTIFIER", names, [$$trusted]: true };
 }
 
-function makeValueNode(rawValue: any): SQLValueNode {
+function makeValueNode(rawValue: SQLRawValue): SQLValueNode {
   return { type: "VALUE", value: rawValue, [$$trusted]: true };
+}
+
+function isSQLNode(node: unknown): node is SQLNode {
+  return typeof node === "object" && node !== null && node[$$trusted] === true;
+}
+
+function enforceValidNode(node: unknown): SQLNode {
+  if (isSQLNode(node)) {
+    return node;
+  }
+  throw new Error(`Expected SQL item, instead received '${String(node)}'.`);
 }
 
 function ensureNonEmptyArray<T>(
@@ -89,6 +102,14 @@ function ensureNonEmptyArray<T>(
   return array;
 }
 
+// Copied from https://github.com/brianc/node-postgres/blob/860cccd53105f7bc32fed8b1de69805f0ecd12eb/lib/client.js#L285-L302
+// Ported from PostgreSQL 9.2.4 source code in src/interfaces/libpq/fe-exec.c
+// Trivial performance optimizations by Benjie.
+// Replaced with regexp because it's 11x faster by Benjie.
+export function escapeSqlIdentifier(str: string): string {
+  return `"${str.replace(/"/g, '""')}"`;
+}
+
 export function compile(sql: SQLQuery | SQLNode): QueryConfig {
   const items = Array.isArray(sql) ? sql : [sql];
 
@@ -102,7 +123,7 @@ export function compile(sql: SQLQuery | SQLNode): QueryConfig {
   // compile time.
   const values = [];
 
-  // When we come accross a symbol in our identifier, we create a unique
+  // When we come across a symbol in our identifier, we create a unique
   // alias for it that shouldn’t be in the users schema. This helps maintain
   // sanity when constructing large Sql queries with many aliases.
   let nextSymbolId = 0;
@@ -161,13 +182,6 @@ export function compile(sql: SQLQuery | SQLNode): QueryConfig {
     text,
     values,
   };
-}
-
-function enforceValidNode(node: any): SQLNode {
-  if (node !== null && node[$$trusted] === true) {
-    return node;
-  }
-  throw new Error(`Expected SQL item, instead received '${String(node)}'.`);
 }
 
 /**
@@ -247,7 +261,7 @@ export function identifier(...names: Array<string | symbol>): SQLNode {
  * Creates a Sql item for a value that will be included in our final query.
  * This value will be added in a way which avoids Sql injection.
  */
-export function value(val: any): SQLNode {
+export function value(val: SQLRawValue): SQLNode {
   return makeValueNode(val);
 }
 
@@ -278,7 +292,7 @@ export function literal(val: string | number | boolean | null): SQLNode {
 }
 
 /**
- * Join some Sql items together seperated by a string. Useful when dealing
+ * Join some Sql items together separated by a string. Useful when dealing
  * with lists of Sql items that doesn’t make sense as a Sql query.
  */
 export function join(items: Array<SQL>, rawSeparator = ""): SQLQuery {
@@ -301,14 +315,6 @@ export function join(items: Array<SQL>, rawSeparator = ""): SQLQuery {
     }
   }
   return currentItems;
-}
-
-// Copied from https://github.com/brianc/node-postgres/blob/860cccd53105f7bc32fed8b1de69805f0ecd12eb/lib/client.js#L285-L302
-// Ported from PostgreSQL 9.2.4 source code in src/interfaces/libpq/fe-exec.c
-// Trivial performance optimisations by Benjie.
-// Replaced with regexp because it's 11x faster by Benjie.
-export function escapeSqlIdentifier(str: string) {
-  return `"${str.replace(/"/g, '""')}"`;
 }
 
 export const blank = query``;
