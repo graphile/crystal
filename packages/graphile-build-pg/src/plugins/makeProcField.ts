@@ -6,7 +6,7 @@ import {
   GraphileInputObjectTypeConfig,
 } from "graphile-build";
 import { PgProc, PgType, SmartTags } from "./PgIntrospectionPlugin";
-import { SQL } from "pg-sql2";
+import type { SQL } from "pg-sql2";
 import debugSql from "./debugSql";
 import chalk from "chalk";
 import { ResolveTree } from "graphql-parse-resolve-info";

@@ -1,4 +1,5 @@
 import sql from "pg-sql2";
+import type { PgSQL } from "pg-sql2";
 import { inspect } from "util";
 import { Plugin, Context, Build, Inflection } from "graphile-build";
 // @ts-ignore
@@ -88,7 +89,7 @@ declare module "graphile-build" {
   }
 
   interface Build {
-    pgSql: import("pg-sql2").PgSQL;
+    pgSql: PgSQL;
     graphileBuildPgVersion: string;
     pgStrictFunctions: boolean;
     pgColumnFilter: PgColumnFilterFunction;

@@ -6,7 +6,7 @@ import { GraphileResolverContext } from "graphile-build";
 
 export { GraphileResolverContext };
 
-export { sql, SQL };
+export { sql, SQL, SQLRawValue };
 
 const isDev = process.env.POSTGRAPHILE_ENV === "development";
 
