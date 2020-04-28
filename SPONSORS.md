@@ -1,8 +1,8 @@
 # Sponsors
 
-These individuals and companies sponsor ongoing development of projects in the
-Graphile ecosystem. Find out
-[how you can become a sponsor](https://graphile.org/sponsor/).
+These individuals and companies sponsor ongoing development of projects in
+the Graphile ecosystem. Find out [how you can become a
+sponsor](https://graphile.org/sponsor/).
 
 ## Featured
 

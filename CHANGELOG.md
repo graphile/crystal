@@ -5,6 +5,19 @@ this auto-generated changelog helps us to produce that list, and it may be
 helpful to you also.
 # [](https://github.com/graphile/graphile-engine/compare/v4.6.0...v) (2020-01-27)
 
+**IMPORTANT NOTE**: most of the changes in PostGraphile actually come from
+Graphile Engine, so you should also reference [those
+changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
+# [4.7.0](https://github.com/graphile/postgraphile/compare/v4.6.0...v4.7.0) (2020-04-27)
+
+
+### Features
+
+* **cli:** look for JWT_SECRET in environment variables ([#1236](https://github.com/graphile/postgraphile/issues/1236)) ([dd2b6b2](https://github.com/graphile/postgraphile/commit/dd2b6b2b364efd015e46cd1faab4d37d2fd9fbad))
+
+
+
+# [4.6.0](https://github.com/graphile/postgraphile/compare/v4.5.5...v4.6.0) (2020-01-27)
 
 
 # [4.6.0](https://github.com/graphile/graphile-engine/compare/v4.5.6...v4.6.0) (2020-01-27)

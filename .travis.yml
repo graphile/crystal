@@ -2,8 +2,10 @@ dist: xenial
 language: node_js
 
 node_js:
+  - "8"
+  - "10"
   - "12"
-  - "13"
+  - "14"
 
 addons:
   postgresql: "9.6"
