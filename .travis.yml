@@ -32,6 +32,7 @@ before_script:
   - sudo bash -c "cd wal2json && USE_PGXS=1 make && USE_PGXS=1 make install"
   - createdb graphileengine_test
   - createdb postgraphile_test
+  - createdb travis || true
   - psql -c "ALTER USER travis WITH PASSWORD 'travis';"
 
 script:
