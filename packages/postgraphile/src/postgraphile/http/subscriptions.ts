@@ -145,7 +145,7 @@ export async function enhanceHttpServerWithSubscriptions<
         statusCode: number,
         _statusMessage?: OutgoingHttpHeaders | string | undefined,
         headers?: OutgoingHttpHeaders | undefined,
-      ): void => {
+      ): Response => {
         if (statusCode && statusCode > 200) {
           // tslint:disable-next-line no-console
           console.error(
@@ -159,6 +159,7 @@ export async function enhanceHttpServerWithSubscriptions<
           );
           socket.close();
         }
+        return this;
       };
       await applyMiddleware(options.websocketMiddlewares, req, dummyRes);
 

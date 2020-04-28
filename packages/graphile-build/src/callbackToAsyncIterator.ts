@@ -2,7 +2,6 @@
 // From https://raw.githubusercontent.com/withspectrum/callback-to-async-iterator/master/src/index.js
 // License MIT (Copyright (c) 2017 Maximilian Stoiber)
 // Based on https://github.com/apollographql/graphql-subscriptions/blob/master/src/event-emitter-to-async-iterator.ts
-import { $$asyncIterator } from "iterall";
 
 const defaultOnError = (err: Error) => {
   throw err;
@@ -17,7 +16,7 @@ export default function callbackToAsyncIterator<CallbackInput, ReturnVal>(
     onClose?: (arg: ReturnVal | null | undefined) => void;
     buffering?: boolean;
   } = {},
-): AsyncIterator<CallbackInput> {
+): AsyncIterableIterator<CallbackInput> {
   const { onError = defaultOnError, buffering = true, onClose } = options;
   let pullQueue: ((result?: {
     value: CallbackInput | undefined;
@@ -78,7 +77,7 @@ export default function callbackToAsyncIterator<CallbackInput, ReturnVal>(
         onError(error);
         return Promise.reject(error);
       },
-      [$$asyncIterator]() {
+      [Symbol.asyncIterator]() {
         return this;
       },
     };
@@ -94,7 +93,7 @@ export default function callbackToAsyncIterator<CallbackInput, ReturnVal>(
       throw(error: Error) {
         return Promise.reject(error);
       },
-      [$$asyncIterator]() {
+      [Symbol.asyncIterator]() {
         return this;
       },
     };

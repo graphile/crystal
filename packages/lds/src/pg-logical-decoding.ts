@@ -6,7 +6,7 @@ import FatalError from "./fatal-error";
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 declare module "pg" {
-  interface ConnectionConfig {
+  interface ClientConfig {
     replication?: string;
   }
 }

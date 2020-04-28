@@ -431,7 +431,8 @@ export default function createPostGraphileHttpRequestHandler(
 
     if (externalUrlBase == null) {
       // User hasn't specified externalUrlBase; let's try and guess it
-      const { pathname: originalPathname = "" } = parseUrl.original(req) || {};
+      const { pathname: rawOriginalPathname } = parseUrl.original(req) || {};
+      const originalPathname = rawOriginalPathname || "";
       if (
         originalPathname !== pathname &&
         originalPathname.endsWith(pathname)
@@ -522,7 +523,8 @@ export default function createPostGraphileHttpRequestHandler(
     // on port 5783.
     if (enableCors) addCORSHeaders(res);
 
-    const { pathname = "" } = parseUrl(req) || {};
+    const { pathname: rawPathname } = parseUrl(req) || {};
+    const pathname = rawPathname || "";
 
     // Certain things depend on externalUrlBase, which we guess if the user
     // doesn't supply it, so we calculate them on the first request. After
