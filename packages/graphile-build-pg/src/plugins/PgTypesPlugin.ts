@@ -315,7 +315,7 @@ export default (function PgTypesPlugin(
               }.${type.name}' (type: ${type === null ? "null" : typeof type})`,
             );
           }
-          return sql.fragment`array[${sql.join(
+          return sql`array[${sql.join(
             val.map(v => gql2pg(v, arrayItemType, modifier)),
             ", ",
           )}]::${sql.identifier(type.namespaceName)}.${sql.identifier(
@@ -434,9 +434,9 @@ export default (function PgTypesPlugin(
       ];
 
       const tweakToJson = (fragment: SQL) => fragment; // Since everything is to_json'd now, just pass through
-      const tweakToText = (fragment: SQL) => sql.fragment`(${fragment})::text`;
+      const tweakToText = (fragment: SQL) => sql`(${fragment})::text`;
       const tweakToNumericText = (fragment: SQL) =>
-        sql.fragment`(${fragment})::numeric::text`;
+        sql`(${fragment})::numeric::text`;
       const pgTweaksByTypeIdAndModifer: {
         [modifier: string]: {
           [typeId: string]: FragmentTweaker;
@@ -691,7 +691,7 @@ export default (function PgTypesPlugin(
 
       pg2GqlMapper[790] = {
         map: _ => _,
-        unmap: val => sql.fragment`(${sql.value(val)})::money`,
+        unmap: val => sql`(${sql.value(val)})::money`,
       };
 
       // point
@@ -705,7 +705,7 @@ export default (function PgTypesPlugin(
             return { x, y };
           }
         },
-        unmap: o => sql.fragment`point(${sql.value(o.x)}, ${sql.value(o.y)})`,
+        unmap: o => sql`point(${sql.value(o.x)}, ${sql.value(o.y)})`,
       };
 
       // TODO: add more support for geometric types
@@ -985,14 +985,14 @@ export default (function PgTypesPlugin(
           }
           pgTweaksByTypeIdAndModifer[type.id][
             typeModifierKey
-          ] = fragment => sql.fragment`\
+          ] = fragment => sql`\
 case
 when (${fragment}) is null then null
 else json_build_object(
   'start',
   case when lower(${fragment}) is null then null
   else json_build_object('value', ${pgTweakFragmentForTypeAndModifier(
-    sql.fragment`lower(${fragment})`,
+    sql`lower(${fragment})`,
     subtype,
     typeModifier,
     {},
@@ -1001,7 +1001,7 @@ else json_build_object(
   'end',
   case when upper(${fragment}) is null then null
   else json_build_object('value', ${pgTweakFragmentForTypeAndModifier(
-    sql.fragment`upper(${fragment})`,
+    sql`upper(${fragment})`,
     subtype,
     typeModifier,
     {},
@@ -1019,7 +1019,7 @@ end`;
                 (end && gql2pg(end.value, subtype, null)) || sql.null;
               const lowerInclusive = start && !start.inclusive ? "(" : "[";
               const upperInclusive = end && !end.inclusive ? ")" : "]";
-              return sql.fragment`${sql.identifier(
+              return sql`${sql.identifier(
                 type.namespaceName,
                 type.name,
               )}(${lower}, ${upper}, ${sql.literal(
@@ -1449,7 +1449,7 @@ end`;
         map: identity,
         // When unmapping we need to convert back to hstore
         unmap: o =>
-          sql.fragment`(${sql.value(hstoreStringify(o))}::${sql.identifier(
+          sql`(${sql.value(hstoreStringify(o))}::${sql.identifier(
             hstoreType.namespaceName,
             hstoreType.name,
           )})`,

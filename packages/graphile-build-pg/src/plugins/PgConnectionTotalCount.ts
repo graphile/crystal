@@ -45,10 +45,7 @@ export default (function PgConnectionTotalCount(builder) {
               addDataGenerator(() => {
                 return {
                   pgAggregateQuery: aggregateQueryBuilder => {
-                    aggregateQueryBuilder.select(
-                      sql.fragment`count(1)`,
-                      "totalCount",
-                    );
+                    aggregateQueryBuilder.select(sql`count(1)`, "totalCount");
                   },
                 };
               });

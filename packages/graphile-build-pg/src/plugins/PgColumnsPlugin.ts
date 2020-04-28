@@ -45,7 +45,7 @@ export default (function PgColumnsPlugin(builder) {
         const { getDataFromParsedResolveInfoFragment } = fieldContext;
         if (type.isPgArray && type.arrayItemType) {
           const ident = sql.identifier(Symbol());
-          return sql.fragment`(\
+          return sql`(\
 case
 when ${sqlFullName} is null then null
 when coalesce(array_length(${sqlFullName}, 1), 0) = 0 then '[]'::json
@@ -174,7 +174,7 @@ end
                             ReturnType,
                             fieldContext,
                             parsedResolveInfoFragment,
-                            sql.fragment`(${queryBuilder.getTableAlias()}.${sqlColumn})`, // The brackets are necessary to stop the parser getting confused, ref: https://www.postgresql.org/docs/9.6/static/rowtypes.html#ROWTYPES-ACCESSING
+                            sql`(${queryBuilder.getTableAlias()}.${sqlColumn})`, // The brackets are necessary to stop the parser getting confused, ref: https://www.postgresql.org/docs/9.6/static/rowtypes.html#ROWTYPES-ACCESSING
                             type,
                             typeModifier,
                             queryBuilder,

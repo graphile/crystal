@@ -246,14 +246,14 @@ export default (function PgMutationCreatePlugin(
                         }
                       });
 
-                      const mutationQuery = sql.query`\
+                      const mutationQuery = sql`\
 insert into ${sql.identifier(table.namespace.name, table.name)} ${
                         sqlColumns.length
-                          ? sql.fragment`(${sql.join(
+                          ? sql`(${sql.join(
                               sqlColumns,
                               ", ",
                             )}) values(${sql.join(sqlValues, ", ")})`
-                          : sql.fragment`default values`
+                          : sql`default values`
                       } returning *`;
 
                       let row;

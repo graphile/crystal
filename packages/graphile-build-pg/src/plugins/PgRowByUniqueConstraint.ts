@@ -100,7 +100,7 @@ export default (async function PgRowByUniqueConstraint(
                 keysIncludingMeta.forEach(
                   ({ sqlIdentifier, columnName, type, typeModifier }) => {
                     queryBuilder.where(
-                      sql.fragment`${sqlTableAlias}.${sqlIdentifier} = ${gql2pg(
+                      sql`${sqlTableAlias}.${sqlIdentifier} = ${gql2pg(
                         args[columnName],
                         type,
                         typeModifier,

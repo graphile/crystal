@@ -2,7 +2,7 @@ import createDebugger from "debug";
 import jwt from "jsonwebtoken";
 import { Pool, PoolClient, QueryConfig, QueryResult } from "pg";
 import { ExecutionResult, OperationDefinitionNode, Kind } from "graphql";
-import * as sql from "pg-sql2";
+import sql, { SQLQuery } from "pg-sql2";
 import { $$pgClient } from "../postgres/inventory/pgClientFromContext";
 import { pluginHookFromOptions } from "./pluginHook";
 import {
@@ -130,7 +130,7 @@ const withDefaultPostGraphileContext = async <TResult = ExecutionResult>(
     pgSettings,
   });
 
-  const sqlSettings: Array<sql.SQLQuery> = [];
+  const sqlSettings: Array<SQLQuery> = [];
   if (localSettings.length > 0) {
     // Later settings should win, so we're going to loop backwards and not
     // add settings for keys we've already seen.
@@ -144,9 +144,7 @@ const withDefaultPostGraphileContext = async <TResult = ExecutionResult>(
         // ever setting variables on the transaction.
         // Also, we're using `unshift` to undo the reverse-looping we're doing
         sqlSettings.unshift(
-          sql.fragment`set_config(${sql.value(key)}, ${sql.value(
-            value,
-          )}, true)`,
+          sql`set_config(${sql.value(key)}, ${sql.value(value)}, true)`,
         );
       }
     }
@@ -154,7 +152,7 @@ const withDefaultPostGraphileContext = async <TResult = ExecutionResult>(
 
   const sqlSettingsQuery =
     sqlSettings.length > 0
-      ? sql.compile(sql.query`select ${sql.join(sqlSettings, ", ")}`)
+      ? sql.compile(sql`select ${sql.join(sqlSettings, ", ")}`)
       : null;
 
   // If we can avoid transactions, we get greater performance.

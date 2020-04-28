@@ -136,7 +136,7 @@ export default (function PgRecordReturnTypesPlugin(builder) {
                             fieldType,
                             fieldContext,
                             parsedResolveInfoFragment,
-                            sql.fragment`(${queryBuilder.getTableAlias()}.${sql.identifier(
+                            sql`(${queryBuilder.getTableAlias()}.${sql.identifier(
                               // According to https://www.postgresql.org/docs/10/static/sql-createfunction.html,
                               // "If you omit the name for an output argument, the system will choose a default column name."
                               // In PG 9.x and 10, the column names appear to be assigned with a `column` prefix.

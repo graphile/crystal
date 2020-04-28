@@ -197,7 +197,7 @@ export default (function PgMutationPayloadEdgePlugin(
                         return;
                       }
                       const expr = isString(col)
-                        ? sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
+                        ? sql`${queryBuilder.getTableAlias()}.${sql.identifier(
                             col,
                           )}`
                         : col;
@@ -210,7 +210,7 @@ export default (function PgMutationPayloadEdgePlugin(
                     // Add PKs
                     primaryKeys.forEach(key => {
                       expressions.push(
-                        sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
+                        sql`${queryBuilder.getTableAlias()}.${sql.identifier(
                           key.name,
                         )}`,
                       );
@@ -218,8 +218,8 @@ export default (function PgMutationPayloadEdgePlugin(
                   }
                   if (aliases.length) {
                     queryBuilder.select(
-                      sql.fragment`json_build_array(${sql.join(
-                        aliases.map(a => sql.fragment`${sql.literal(a)}::text`),
+                      sql`json_build_array(${sql.join(
+                        aliases.map(a => sql`${sql.literal(a)}::text`),
                         ", ",
                       )}, json_build_array(${sql.join(expressions, ", ")}))`,
                       "__order_" + aliases.join("__"),

@@ -4,6 +4,6 @@ module.exports = {
     "pg-sql2": sql,
   },
   globals: {
-    sql,
+    sql: sql.default,
   },
 };

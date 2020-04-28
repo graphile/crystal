@@ -168,18 +168,16 @@ export default (async function PgMutationUpdateDeletePlugin(
                   if (sqlColumns.length === 0) {
                     return null;
                   }
-                  sqlMutationQuery = sql.query`\
+                  sqlMutationQuery = sql`\
 update ${sql.identifier(table.namespace.name, table.name)} set ${sql.join(
-                    sqlColumns.map(
-                      (col, i) => sql.fragment`${col} = ${sqlValues[i]}`,
-                    ),
+                    sqlColumns.map((col, i) => sql`${col} = ${sqlValues[i]}`),
 
                     ", ",
                   )}
 where ${condition}
 returning *`;
                 } else {
-                  sqlMutationQuery = sql.query`\
+                  sqlMutationQuery = sql`\
 delete from ${sql.identifier(table.namespace.name, table.name)}
 where ${condition}
 returning *`;
@@ -475,10 +473,10 @@ returning *`;
                                   getDataFromParsedResolveInfoFragment,
                                   PayloadType,
                                   args,
-                                  sql.fragment`(${sql.join(
+                                  sql`(${sql.join(
                                     primaryKeys.map(
                                       (key, idx) =>
-                                        sql.fragment`${sql.identifier(
+                                        sql`${sql.identifier(
                                           key.name,
                                         )} = ${gql2pg(
                                           identifiers[idx],
@@ -646,10 +644,10 @@ returning *`;
                                 getDataFromParsedResolveInfoFragment,
                                 PayloadType,
                                 args,
-                                sql.fragment`(${sql.join(
+                                sql`(${sql.join(
                                   keys.map(
                                     key =>
-                                      sql.fragment`${sql.identifier(
+                                      sql`${sql.identifier(
                                         key.name,
                                       )} = ${gql2pg(
                                         input[inflection.column(key)],

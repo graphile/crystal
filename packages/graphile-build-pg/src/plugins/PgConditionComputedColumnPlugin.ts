@@ -214,17 +214,13 @@ export default (function PgConditionComputedColumnPlugin(builder) {
               compatibleComputedColumns.forEach(
                 ({ fieldName, sqlFnName, returnType }) => {
                   const val = condition[fieldName];
-                  const sqlCall = sql.fragment`${sqlFnName}(${queryBuilder.getTableAlias()})`;
+                  const sqlCall = sql`${sqlFnName}(${queryBuilder.getTableAlias()})`;
                   if (val != null) {
                     queryBuilder.where(
-                      sql.fragment`${sqlCall} = ${gql2pg(
-                        val,
-                        returnType,
-                        null,
-                      )}`,
+                      sql`${sqlCall} = ${gql2pg(val, returnType, null)}`,
                     );
                   } else if (val === null) {
-                    queryBuilder.where(sql.fragment`${sqlCall} IS NULL`);
+                    queryBuilder.where(sql`${sqlCall} IS NULL`);
                   }
                 },
               );

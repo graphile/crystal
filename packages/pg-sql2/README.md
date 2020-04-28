@@ -1,7 +1,7 @@
 # pg-sql2
 
-Create SQL in a powerful and flexible manner without opening yourself to SQL
-injection attacks using the power of ES6 tagged template literals.
+Create highly dynamic SQL in a powerful and flexible manner without opening
+yourself to SQL injection attacks.
 
 A key aim of this library is to be very fast, if you think you can improve
 performance further please open a PR!
@@ -31,7 +31,7 @@ And please give some love to our featured sponsors 🤩:
 ## Usage
 
 ```js
-const sql = require("pg-sql2");
+const { default: sql } = require("pg-sql2");
 // or import sql from 'pg-sql2';
 
 const tableName = "user";
@@ -46,19 +46,19 @@ const sqlFields = sql.join(
 
 // sql.value will store the value and instead add a placeholder to the SQL
 // statement, to ensure that no SQL injection can occur.
-const sqlConditions = sql.query`created_at > NOW() - interval '3 years' and age > ${sql.value(
+const sqlConditions = sql`created_at > NOW() - interval '3 years' and age > ${sql.value(
   22,
 )}`;
 
 // This could be a full query, but we're going to embed it in another query safely
-const innerQuery = sql.query`select ${sqlFields} from ${sql.identifier(
+const innerQuery = sql`select ${sqlFields} from ${sql.identifier(
   tableName,
 )} where ${sqlConditions}`;
 
 // Symbols are automatically assigned unique identifiers
 const sqlAlias = sql.identifier(Symbol());
 
-const query = sql.query`
+const query = sql`
 with ${sqlAlias} as (${innerQuery})
 select
   (select json_agg(row_to_json(${sqlAlias})) from ${sqlAlias}) as all_data,
@@ -84,18 +84,19 @@ console.log(values); // [ 22 ]
 
 ## API
 
-### `` sql.query`...` ``
+### `` sql`...` ``
 
-Builds part of (or the whole of) an SQL query, safely interpretting the embedded
-expressions. If a non `sql.*` expression is passed in, e.g.:
+Builds part of (or the whole of) an SQL query, safely interpreting the embedded
+expressions. If a non `sql` expression is passed in, e.g.:
 
 <!-- skip-example -->
 
 ```js
-sql.query`select ${1}`;
+sql`select ${1}`;
 ```
 
-then an error will be thrown.
+then an error will be thrown. This prevents SQL injection, as all values must go
+through an allowed API.
 
 ### `sql.identifier(ident, ...)`
 
@@ -116,42 +117,37 @@ that is not sensitive and is trusted (not user-provided data), e.g. for the key
 arguments to `json_build_object(key, val, key, val, ...)` which you have
 produced.
 
-### `sql.join(arrayOfFragments, delimeter)`
+### `sql.join(arrayOfFragments, delimiter)`
 
-Joins an array of sql.query values using the delimeter (which is treated as a
-raw SQL string); e.g.
+Joins an array of `sql` values using the delimiter (which is treated as a raw
+SQL string); e.g.
 
 ```js
 const arrayOfSqlFields = ["a", "b", "c", "d"].map(n => sql.identifier(n));
-sql.query`select ${sql.join(arrayOfSqlFields, ", ")}`; // -> select "a", "b", "c", "d"
+sql`select ${sql.join(arrayOfSqlFields, ", ")}`; // -> select "a", "b", "c", "d"
 
-const arrayOfSqlConditions = [
-  sql.query`a = 1`,
-  sql.query`b = 2`,
-  sql.query`c = 3`,
-];
-sql.query`where (${sql.join(arrayOfSqlConditions, ") and (")})`; // -> where (a = 1) and (b = 2) and (c = 3)
+const arrayOfSqlConditions = [sql`a = 1`, sql`b = 2`, sql`c = 3`];
+sql`where (${sql.join(arrayOfSqlConditions, ") and (")})`; // -> where (a = 1) and (b = 2) and (c = 3)
 
 const fragments = [
   { alias: "name", sqlFragment: sql.identifier("user", "name") },
   { alias: "age", sqlFragment: sql.identifier("user", "age") },
 ];
-sql.query`
+sql`
   json_build_object(
     ${sql.join(
       fragments.map(
-        ({ sqlFragment, alias }) =>
-          sql.query`${sql.literal(alias)}, ${sqlFragment}`,
+        ({ sqlFragment, alias }) => sql`${sql.literal(alias)}, ${sqlFragment}`,
       ),
       ",\n",
     )}
   )`;
 
 const arrayOfSqlInnerJoins = [
-  sql.query`inner join bar on (bar.foo_id = foo.id)`,
-  sql.query`inner join baz on (baz.bar_id = bar.id)`,
+  sql`inner join bar on (bar.foo_id = foo.id)`,
+  sql`inner join baz on (baz.bar_id = bar.id)`,
 ];
-sql.query`select * from foo ${sql.join(arrayOfSqlInnerJoins, " ")}`;
+sql`select * from foo ${sql.join(arrayOfSqlInnerJoins, " ")}`;
 // select * from foo inner join bar on (bar.foo_id = foo.id) inner join baz on (baz.bar_id = bar.id)
 ```
 
@@ -161,7 +157,7 @@ Compiles the query into an SQL statement and a list of values, ready to be
 executed
 
 ```js
-const query = sql.query`...`;
+const query = sql`...`;
 const { text, values } = sql.compile(query);
 
 // const { rows } = await pg.query(text, values);
@@ -175,8 +171,8 @@ additional work that was done to it
 [in postgraphql](https://github.com/postgraphql/postgraphql/blob/9c36d7e9b9ad74e665de18964fd2554f9f639903/src/postgres/utils/sql.ts)
 and offering the following enhancements:
 
-- Better development experience for people not using Flow/TypeScript (throws
-  errors a lot earlier allowing you to catch issues at the source)
+- Better development experience for people not using TypeScript (throws errors a
+  lot earlier allowing you to catch issues at the source)
 - Slightly more helpful error messages
 - Uses a symbol-key on the query nodes to protect against an object accidentally
   being inserted verbatim and being treated as valid (because every Symbol is

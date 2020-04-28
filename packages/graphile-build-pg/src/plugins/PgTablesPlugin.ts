@@ -408,7 +408,7 @@ export default (function PgTablesPlugin(
                   const v = obj[fieldName];
                   if (inputField && v != null) {
                     const { type, typeModifier } = inputField;
-                    return sql.fragment`${gql2pg(
+                    return sql`${gql2pg(
                       v,
                       type,
                       typeModifier,
@@ -418,7 +418,7 @@ export default (function PgTablesPlugin(
                   }
                 };
 
-                return sql.fragment`row(${sql.join(
+                return sql`row(${sql.join(
                   attributes.map(attr2sql),
                   ",",
                 )})::${sql.identifier(

@@ -205,7 +205,7 @@ export default (function PgConnectionArgOrderBy(builder, { orderByNullsLast }) {
                   : specs;
                 orders.forEach(([col, ascending, specNullsFirst]) => {
                   const expr = isString(col)
-                    ? sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
+                    ? sql`${queryBuilder.getTableAlias()}.${sql.identifier(
                         col,
                       )}`
                     : col;

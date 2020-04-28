@@ -4,7 +4,8 @@ import plz from "pluralize";
 
 const bindAll = (obj: {}, keys: Array<string>) => {
   keys.forEach(key => {
-    obj[key] = obj[key].bind(obj);
+    // The Object.assign is to copy across any function properties
+    obj[key] = Object.assign(obj[key].bind(obj), obj[key]);
   });
   return obj;
 };
