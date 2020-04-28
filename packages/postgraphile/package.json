@@ -54,7 +54,7 @@
     "@types/ws": "^6.0.1",
     "body-parser": "^1.15.2",
     "chalk": "^2.4.2",
-    "commander": "^2.19.0",
+    "commander": "^5.1.0",
     "debug": "^4.1.1",
     "finalhandler": "^1.0.6",
     "graphile-utils": "^4.7.0",

@@ -8,7 +8,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { $$asyncIterator, getAsyncIterator } from "iterall";
+import { getAsyncIterator } from "iterall";
 type PromiseOrValue<T> = T | Promise<T>;
 
 /**
@@ -19,7 +19,7 @@ export default function mapAsyncIterator<T, U>(
   iterable: AsyncIterable<T>,
   callback: (val: T) => PromiseOrValue<U>,
   rejectCallback?: (val: any) => PromiseOrValue<U>,
-) {
+): AsyncIterableIterator<T> {
   const iterator = getAsyncIterator(iterable);
   let $return: any;
   let abruptClose: any;
@@ -64,7 +64,7 @@ export default function mapAsyncIterator<T, U>(
       }
       return Promise.reject(error).catch(abruptClose);
     },
-    [$$asyncIterator]() {
+    [Symbol.asyncIterator]() {
       return this;
     },
   };

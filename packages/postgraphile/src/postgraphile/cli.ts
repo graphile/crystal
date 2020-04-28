@@ -91,18 +91,22 @@ program
   .description(manifest.description);
 // .option('-d, --demo', 'run PostGraphile using the demo database connection')
 
-export type AddFlagFn = (
+export type AddFlagFn<T = any> = (
   optionString: string,
   description: string,
-  parse?: (option: string) => mixed,
-) => AddFlagFn;
+  parse?: (option: string, previous: T) => T,
+) => AddFlagFn<T>;
 
-function addFlag(
+function addFlag<T>(
   optionString: string,
   description: string,
-  parse?: (option: string) => mixed,
-): AddFlagFn {
-  program.option(optionString, description, parse);
+  parse?: (option: string, previous: T) => T,
+): AddFlagFn<T> {
+  if (parse) {
+    program.option<T>(optionString, description, parse);
+  } else {
+    program.option(optionString, description);
+  }
   return addFlag;
 }
 
@@ -419,7 +423,7 @@ function exitWithErrorMessage(message: string): never {
   process.exit(1);
 }
 
-if (program.args.length) {
+if (program.args.length > 0) {
   exitWithErrorMessage(
     `ERROR: some of the parameters you passed could not be processed: '${program.args.join(
       "', '",
