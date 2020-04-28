@@ -174,7 +174,7 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
      * just invert everything.
      */
 
-    const sqlCommonUnbounded = sql.fragment`\
+    const sqlCommonUnbounded = sql`\
 select 1
 from ${queryBuilder.getTableExpression()} as ${queryBuilder.getTableAlias()}`;
     /*
@@ -192,7 +192,7 @@ from ${queryBuilder.getTableExpression()} as ${queryBuilder.getTableAlias()}`;
      * upper bound. In hasPreviousPage mode (invert === true), it represents
      * everything from `(before || END)` backwards, with no lower bound.
      */
-    const sqlCommon = sql.fragment`\
+    const sqlCommon = sql`\
 ${sqlCommonUnbounded}
 where ${queryBuilder.buildWhereClause(!invert, invert, options)}`;
 
@@ -225,7 +225,7 @@ where ${queryBuilder.buildWhereClause(!invert, invert, options)}`;
          * `first` clause, otherwise there could be a next page before the
          * `before` clause.
          */
-        return sql.fragment`\
+        return sql`\
 exists(
   ${sqlCommonUnbounded}
   where ${queryBuilder.buildWhereClause(false, false, options)}
@@ -253,12 +253,12 @@ exists(
          */
         // Drop the `first` limit, see if there are any records that aren't
         // already in the list we've fetched.
-        return sql.fragment`\
+        return sql`\
 exists(
   ${sqlCommon}
   and (${queryBuilder.getSelectCursor() ||
     sql.null})::text not in (select __cursor::text from ${sqlQueryAlias})
-  ${offset === 0 ? sql.blank : sql.fragment`offset ${sql.value(offset)}`}
+  ${offset === 0 ? sql.blank : sql`offset ${sql.value(offset)}`}
 )`;
       }
     } else {
@@ -272,11 +272,11 @@ exists(
       if (limit == null) {
         // If paginating backwards, then offset > 0 has already been dealt
         // with. Unbounded, so there's no next page.
-        return sql.fragment`false`;
+        return sql`false`;
       } else if (invert) {
         assert(offset === 0);
         // Paginating backwards and there's no offset (which factors in before/after), so there's no previous page.
-        return sql.fragment`false`;
+        return sql`false`;
       } else {
         assert(!invert);
         /*
@@ -285,7 +285,7 @@ exists(
          *
          * We want to see if there's more than limit+offset records in sqlCommon.
          */
-        return sql.fragment`\
+        return sql`\
 exists(
   ${sqlCommon}
   offset ${sql.literal(limit + offset)}
@@ -310,16 +310,16 @@ exists(
             .getOrderByExpressionsAndDirections()
             .map(([expr]) => expr);
           if (queryBuilder.isOrderUnique() && orderBy.length > 0) {
-            return sql.fragment`json_build_array(${sql.join(
+            return sql`json_build_array(${sql.join(
               [
                 ...getPgCursorPrefix(),
-                sql.fragment`json_build_array(${sql.join(orderBy, ", ")})`,
+                sql`json_build_array(${sql.join(orderBy, ", ")})`,
               ],
 
               ", ",
             )})`;
           } else {
-            return sql.fragment`json_build_array(${sql.join(
+            return sql`json_build_array(${sql.join(
               getPgCursorPrefix(),
               ", ",
             )}, ${
@@ -330,10 +330,8 @@ exists(
                * again. See matching NOTE in QueryBuilder.js.
                */
               options.useAsterisk
-                ? sql.fragment`${sql.literal(
-                    queryBuilder.getFinalOffset() || 0,
-                  )} + `
-                : sql.fragment``
+                ? sql`${sql.literal(queryBuilder.getFinalOffset() || 0)} + `
+                : sql``
             }(row_number() over (partition by 1)))`;
           }
         },
@@ -343,7 +341,7 @@ exists(
   if (options.withPagination || options.withPaginationAsFields) {
     queryBuilder.setCursorComparator((cursorValue, isAfter) => {
       function badCursor() {
-        queryBuilder.whereBound(sql.fragment`false`, isAfter);
+        queryBuilder.whereBound(sql`false`, isAfter);
       }
       const orderByExpressionsAndDirections = queryBuilder.getOrderByExpressionsAndDirections();
       if (orderByExpressionsAndDirections.length > 0) {
@@ -362,19 +360,17 @@ exists(
           badCursor();
           return;
         }
-        let sqlFilter = sql.fragment`false`;
+        let sqlFilter = sql`false`;
         const sqlCursors = rawCursors.map(val => sql.value(val));
         for (let i = orderByExpressionsAndDirections.length - 1; i >= 0; i--) {
           const [sqlExpression, ascending] = orderByExpressionsAndDirections[i];
           // If ascending and isAfter then >
           // If ascending and isBefore then <
           const comparison =
-            Number(ascending) ^ Number(!isAfter)
-              ? sql.fragment`>`
-              : sql.fragment`<`;
+            Number(ascending) ^ Number(!isAfter) ? sql`>` : sql`<`;
 
           const sqlOldFilter = sqlFilter;
-          sqlFilter = sql.fragment`\
+          sqlFilter = sql`\
 (\
   (${sqlExpression} ${comparison} ${sqlCursors[i] || sql.null})
 OR\
@@ -388,7 +384,7 @@ OR\
 
         // Check the cursor prefixes apply
         // TODO:v5: we should be able to do this in JS-land rather than SQL-land
-        sqlFilter = sql.fragment`(((${sql.join(
+        sqlFilter = sql`(((${sql.join(
           getPgCursorPrefix(),
           ", ",
         )}) = (${sql.join(
@@ -461,13 +457,13 @@ OR\
         );
 
     const sqlWith = haveFields
-      ? sql.fragment`with ${sqlQueryAlias} as (${query}), ${sqlSummaryAlias} as (select json_agg(to_json(${sqlQueryAlias})) as data from ${sqlQueryAlias})`
-      : sql.fragment``;
-    const sqlFrom = sql.fragment``;
+      ? sql`with ${sqlQueryAlias} as (${query}), ${sqlSummaryAlias} as (select json_agg(to_json(${sqlQueryAlias})) as data from ${sqlQueryAlias})`
+      : sql``;
+    const sqlFrom = sql``;
     const fields: Array<[SQL, string]> = [];
     if (haveFields) {
       fields.push([
-        sql.fragment`coalesce((select ${sqlSummaryAlias}.data from ${sqlSummaryAlias}), '[]'::json)`,
+        sql`coalesce((select ${sqlSummaryAlias}.data from ${sqlSummaryAlias}), '[]'::json)`,
         "data",
       ]);
 
@@ -497,7 +493,7 @@ OR\
         onlyJsonField: true,
       });
 
-      const aggregatesSql = sql.fragment`\
+      const aggregatesSql = sql`\
 (
   select ${aggregateJsonBuildObject}
   from ${queryBuilder.getTableExpression()} as ${queryBuilder.getTableAlias()}
@@ -506,15 +502,13 @@ OR\
       fields.push([aggregatesSql, "aggregates"]);
     }
     if (options.withPaginationAsFields) {
-      return sql.fragment`${sqlWith} select ${sql.join(
-        fields.map(
-          ([expr, alias]) => sql.fragment`${expr} as ${sql.identifier(alias)}`,
-        ),
+      return sql`${sqlWith} select ${sql.join(
+        fields.map(([expr, alias]) => sql`${expr} as ${sql.identifier(alias)}`),
 
         ", ",
       )} ${sqlFrom}`;
     } else {
-      return sql.fragment`${sqlWith} select ${queryBuilder.jsonbBuildObject(
+      return sql`${sqlWith} select ${queryBuilder.jsonbBuildObject(
         fields,
       )} ${sqlFrom}`;
     }

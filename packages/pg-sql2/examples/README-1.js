@@ -13,19 +13,19 @@ const sqlFields = sql.join(
 
 // sql.value will store the value and instead add a placeholder to the SQL
 // statement, to ensure that no SQL injection can occur.
-const sqlConditions = sql.query`created_at > NOW() - interval '3 years' and age > ${sql.value(
+const sqlConditions = sql`created_at > NOW() - interval '3 years' and age > ${sql.value(
   22,
 )}`;
 
 // This could be a full query, but we're going to embed it in another query safely
-const innerQuery = sql.query`select ${sqlFields} from ${sql.identifier(
+const innerQuery = sql`select ${sqlFields} from ${sql.identifier(
   tableName,
 )} where ${sqlConditions}`;
 
 // Symbols are automatically assigned unique identifiers
 const sqlAlias = sql.identifier(Symbol());
 
-const query = sql.query`
+const query = sql`
 with ${sqlAlias} as (${innerQuery})
 select
   (select json_agg(row_to_json(${sqlAlias})) from ${sqlAlias}) as all_data,

@@ -179,7 +179,7 @@ export default (function PgConnectionArgCondition(builder) {
                   );
 
                   queryBuilder.where(
-                    sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
+                    sql`${queryBuilder.getTableAlias()}.${sql.identifier(
                       attr.name,
                     )} = ${gql2pg(val, attr.type, attr.typeModifier)}`,
                   );
@@ -189,7 +189,7 @@ export default (function PgConnectionArgCondition(builder) {
                   );
 
                   queryBuilder.where(
-                    sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
+                    sql`${queryBuilder.getTableAlias()}.${sql.identifier(
                       attr.name,
                     )} IS NULL`,
                   );

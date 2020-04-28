@@ -36,12 +36,12 @@ describe("sql.identifier", () => {
 
 describe("sql.query", () => {
   it("simple", () => {
-    const node = sql.query`select 1`;
+    const node = sql`select 1`;
     expect(node.map(sansSymbols)).toEqual([{ type: "RAW", text: "select 1" }]);
   });
 
   it("with values", () => {
-    const node = sql.query`select ${sql.value(1)}::integer`;
+    const node = sql`select ${sql.value(1)}::integer`;
     expect(node.map(sansSymbols)).toEqual([
       { type: "RAW", text: "select " },
       { type: "VALUE", value: 1 },
@@ -50,7 +50,7 @@ describe("sql.query", () => {
   });
 
   it("with sub-sub-sub query", () => {
-    const node = sql.query`select ${sql.query`1 ${sql.query`from ${sql.query`foo`}`}`}`;
+    const node = sql`select ${sql`1 ${sql`from ${sql`foo`}`}`}`;
     expect(node.map(sansSymbols)).toEqual([
       { type: "RAW", text: "select " },
       { type: "RAW", text: "1 " },
@@ -62,12 +62,12 @@ describe("sql.query", () => {
 
 describe("sql.join", () => {
   it("various sub-parts", () => {
-    const node = sql.query`select ${sql.join(
+    const node = sql`select ${sql.join(
       [
         sql.value(1),
         sql.identifier("foo", "bar"),
-        sql.query`baz.qux(1, 2, 3)`,
-        sql.query`baz.qux(${sql.value(1)}, ${sql.query`2`}, 3)`,
+        sql`baz.qux(1, 2, 3)`,
+        sql`baz.qux(${sql.value(1)}, ${sql`2`}, 3)`,
       ],
       ", ",
     )}`;
@@ -90,12 +90,12 @@ describe("sql.join", () => {
 
 describe("sql.compile", () => {
   it("simple", () => {
-    const node = sql.query`select 1`;
+    const node = sql`select 1`;
     expect(sql.compile(node)).toEqual({ text: "select 1", values: [] });
   });
 
   it("with values", () => {
-    const node = sql.query`select ${sql.value(1)}::integer`;
+    const node = sql`select ${sql.value(1)}::integer`;
     expect(sql.compile(node)).toEqual({
       text: "select $1::integer",
       values: [1],
@@ -103,7 +103,7 @@ describe("sql.compile", () => {
   });
 
   it("with sub-sub-sub query", () => {
-    const node = sql.query`select ${sql.query`1 ${sql.query`from ${sql.query`foo`}`}`}`;
+    const node = sql`select ${sql`1 ${sql`from ${sql`foo`}`}`}`;
     expect(sql.compile(node)).toEqual({
       text: "select 1 from foo",
       values: [],
@@ -111,9 +111,10 @@ describe("sql.compile", () => {
   });
 
   it("more complex", () => {
-    const node = sql.query`select ${sql.query`${sql.value(
-      1,
-    )} ${sql.query`from ${sql.identifier("foo", 'b"z"b"z""b')}`}`}`;
+    const node = sql`select ${sql`${sql.value(1)} ${sql`from ${sql.identifier(
+      "foo",
+      'b"z"b"z""b',
+    )}`}`}`;
     expect(sql.compile(node)).toEqual({
       text: 'select $1 from "foo"."b""z""b""z""""b"',
       values: [1],
@@ -121,12 +122,12 @@ describe("sql.compile", () => {
   });
 
   it("including a join", () => {
-    const node = sql.query`select ${sql.join(
+    const node = sql`select ${sql.join(
       [
         sql.value(1),
         sql.identifier("foo", "bar"),
-        sql.query`baz.qux(1, 2, 3)`,
-        sql.query`baz.qux(${sql.value(1)}, ${sql.query`2`}, 3)`,
+        sql`baz.qux(1, 2, 3)`,
+        sql`baz.qux(${sql.value(1)}, ${sql`2`}, 3)`,
       ],
       ", ",
     )}`;
@@ -140,12 +141,12 @@ describe("sql.compile", () => {
 describe("sqli", () => {
   it("subbing an object of similar layout", () => {
     expect(() => {
-      sql.query`select ${sql.join(
+      sql`select ${sql.join(
         [
           { type: "VALUE", value: 1 },
           sql.identifier("foo", "bar"),
-          sql.query`baz.qux(1, 2, 3)`,
-          sql.query`baz.qux(${sql.value(1)}, ${sql.query`2`}, 3)`,
+          sql`baz.qux(1, 2, 3)`,
+          sql`baz.qux(${sql.value(1)}, ${sql`2`}, 3)`,
         ],
         ", ",
       )}`;
@@ -154,12 +155,12 @@ describe("sqli", () => {
 
   it("including a join", () => {
     expect(() => {
-      sql.query`select ${sql.join(
+      sql`select ${sql.join(
         [
           sql.value(1),
           sql.identifier("foo", "bar"),
-          sql.query`baz.qux(1, 2, 3)`,
-          sql.query`baz.qux(${sql.value(1)}, ${sql.query`2`}, 3)`,
+          sql`baz.qux(1, 2, 3)`,
+          sql`baz.qux(${sql.value(1)}, ${sql`2`}, 3)`,
         ],
         ", ",
       )}, ${3}`;

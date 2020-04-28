@@ -54,7 +54,7 @@ const PetsCountPlugin = makeAddPgTableConditionPlugin(
   (value, helpers, build) => {
     expect(build.graphql).toBeTruthy();
     const { sqlTableAlias, sql } = helpers;
-    return sql.fragment`(select count(*) from graphile_utils.pets where pets.user_id = ${sqlTableAlias}.id) >= ${sql.value(
+    return sql`(select count(*) from graphile_utils.pets where pets.user_id = ${sqlTableAlias}.id) >= ${sql.value(
       value,
     )}`;
   },

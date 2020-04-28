@@ -188,7 +188,7 @@ const PgGenericSubscriptionPlugin: Plugin = function(
                 let unsubscribeTopic: string | void;
                 if (parsedFunctionParts) {
                   const { text, values } = sql.compile(
-                    sql.query`select unsubscribe_topic from ${sql.identifier(
+                    sql`select unsubscribe_topic from ${sql.identifier(
                       parsedFunctionParts.namespaceName,
                       parsedFunctionParts.entityName,
                     )}(${sql.value(topic)}) unsubscribe_topic`,

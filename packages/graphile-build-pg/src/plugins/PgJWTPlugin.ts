@@ -151,13 +151,13 @@ export default (function PgJWTPlugin(
         };
 
         pgTweaksByTypeId[compositeType.id] = fragment =>
-          sql.fragment`json_build_object(${sql.join(
+          sql`json_build_object(${sql.join(
             compositeClass.attributes.map(
               attr =>
-                sql.fragment`${sql.literal(
+                sql`${sql.literal(
                   attr.name,
                 )}::text, ${pgTweakFragmentForTypeAndModifier(
-                  sql.fragment`(${fragment}).${sql.identifier(attr.name)}`,
+                  sql`(${fragment}).${sql.identifier(attr.name)}`,
                   attr.type,
                   attr.typeModifier,
                   {},

@@ -30,7 +30,7 @@ module.exports = builder => {
                   );
                   const foreignTableAlias = sql.identifier(Symbol());
                   const query = queryFromResolveData(
-                    sql.fragment`named_query_builder.categories`,
+                    sql`named_query_builder.categories`,
                     foreignTableAlias,
                     resolveData,
                     {
@@ -47,17 +47,17 @@ module.exports = builder => {
                         sql.identifier(alias),
                       );
                       innerInnerQueryBuilder.where(
-                        sql.fragment`${innerInnerQueryBuilder.getTableAlias()}.toy_id = ${queryBuilder.getTableAlias()}.id`,
+                        sql`${innerInnerQueryBuilder.getTableAlias()}.toy_id = ${queryBuilder.getTableAlias()}.id`,
                       );
                       innerQueryBuilder.where(
                         () =>
-                          sql.fragment`${innerQueryBuilder.getTableAlias()}.id IN (${innerInnerQueryBuilder.build()})`,
+                          sql`${innerQueryBuilder.getTableAlias()}.id IN (${innerInnerQueryBuilder.build()})`,
                       );
                     },
                     queryBuilder.context,
                     queryBuilder.rootValue,
                   );
-                  return sql.fragment`(${query})`;
+                  return sql`(${query})`;
                 }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
               },
             };
@@ -104,7 +104,7 @@ module.exports = builder => {
                 "toyCategoriesSubquery",
               );
               toyCategoriesQueryBuilder.where(
-                sql.fragment`${toyCategoriesQueryBuilder.getTableAlias()}.approved = ${sql.value(
+                sql`${toyCategoriesQueryBuilder.getTableAlias()}.approved = ${sql.value(
                   approved,
                 )}`,
               );

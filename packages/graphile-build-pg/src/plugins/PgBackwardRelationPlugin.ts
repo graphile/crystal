@@ -205,7 +205,7 @@ export default (function PgBackwardRelationPlugin(
                                 }
                                 keys.forEach((key, i) => {
                                   innerQueryBuilder.where(
-                                    sql.fragment`${tableAlias}.${sql.identifier(
+                                    sql`${tableAlias}.${sql.identifier(
                                       key.name,
                                     )} = ${foreignTableAlias}.${sql.identifier(
                                       foreignKeys[i].name,
@@ -217,7 +217,7 @@ export default (function PgBackwardRelationPlugin(
                               queryBuilder.rootValue,
                             );
 
-                            return sql.fragment`(${query})`;
+                            return sql`(${query})`;
                           }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
                         },
                       };
@@ -323,7 +323,7 @@ export default (function PgBackwardRelationPlugin(
                                     keys.reduce((memo, key, i) => {
                                       memo[
                                         key.name
-                                      ] = sql.fragment`${foreignTableAlias}.${sql.identifier(
+                                      ] = sql`${foreignTableAlias}.${sql.identifier(
                                         foreignKeys[i].name,
                                       )}`;
                                       return memo;
@@ -351,7 +351,7 @@ export default (function PgBackwardRelationPlugin(
 
                                         primaryKeys.forEach(key => {
                                           innerQueryBuilder.orderBy(
-                                            sql.fragment`${innerQueryBuilder.getTableAlias()}.${sql.identifier(
+                                            sql`${innerQueryBuilder.getTableAlias()}.${sql.identifier(
                                               key.name,
                                             )}`,
                                             true,
@@ -365,7 +365,7 @@ export default (function PgBackwardRelationPlugin(
 
                                 keys.forEach((key, i) => {
                                   innerQueryBuilder.where(
-                                    sql.fragment`${tableAlias}.${sql.identifier(
+                                    sql`${tableAlias}.${sql.identifier(
                                       key.name,
                                     )} = ${foreignTableAlias}.${sql.identifier(
                                       foreignKeys[i].name,
@@ -377,7 +377,7 @@ export default (function PgBackwardRelationPlugin(
                               queryBuilder.rootValue,
                             );
 
-                            return sql.fragment`(${query})`;
+                            return sql`(${query})`;
                           }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
                         },
                       };

@@ -1,5 +1,5 @@
 import sql from "pg-sql2";
-import type { PgSQL } from "pg-sql2";
+import { PgSQL } from "pg-sql2";
 import { inspect } from "util";
 import { Plugin, Context, Build, Inflection } from "graphile-build";
 // @ts-ignore

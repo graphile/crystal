@@ -109,7 +109,7 @@ export function requireColumn(
   context[method](() => ({
     pgQuery: (queryBuilder: QueryBuilder) => {
       queryBuilder.select(
-        sql.query`${queryBuilder.getTableAlias()}.${sql.identifier(col)}`,
+        sql`${queryBuilder.getTableAlias()}.${sql.identifier(col)}`,
         alias,
       );
     },

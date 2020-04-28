@@ -93,7 +93,7 @@ export default (function PgOrderComputedColumnsPlugin(builder) {
           }: {
             queryBuilder: QueryBuilder;
           }): SQL =>
-            sql.fragment`(${sql.identifier(
+            sql`(${sql.identifier(
               proc.namespaceName,
               proc.name,
             )}(${queryBuilder.getTableAlias()}))`;

@@ -77,7 +77,7 @@ export default (async function PgRowNode(builder, { subscriptions }) {
               }
               primaryKeys.forEach((key, idx) => {
                 queryBuilder.where(
-                  sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
+                  sql`${queryBuilder.getTableAlias()}.${sql.identifier(
                     key.name,
                   )} = ${gql2pg(
                     identifiers[idx],
@@ -229,7 +229,7 @@ export default (async function PgRowNode(builder, { subscriptions }) {
                               }
                               primaryKeys.forEach((key, idx) => {
                                 queryBuilder.where(
-                                  sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
+                                  sql`${queryBuilder.getTableAlias()}.${sql.identifier(
                                     key.name,
                                   )} = ${gql2pg(
                                     identifiers[idx],

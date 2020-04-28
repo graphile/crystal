@@ -119,7 +119,7 @@ export default function pgField(
                 queryBuilder.rootValue,
               );
 
-              return sql.fragment`(${query})`;
+              return sql`(${query})`;
             }, safeAlias);
           },
         };

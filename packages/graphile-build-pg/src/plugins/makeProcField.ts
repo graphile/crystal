@@ -6,7 +6,7 @@ import {
   GraphileInputObjectTypeConfig,
 } from "graphile-build";
 import { PgProc, PgType, SmartTags } from "./PgIntrospectionPlugin";
-import type { SQL } from "pg-sql2";
+import { SQL } from "pg-sql2";
 import debugSql from "./debugSql";
 import chalk from "chalk";
 import { ResolveTree } from "graphql-parse-resolve-info";
@@ -369,7 +369,7 @@ export default function makeProcField(
           } else if (argIndex + 1 > requiredArgCount && haveNames) {
             const sqlArgName = argName ? sql.identifier(argName) : null;
             if (sqlArgName) {
-              sqlArgValues.unshift(sql.fragment`${sqlArgName} := ${sqlValue}`);
+              sqlArgValues.unshift(sql`${sqlArgName} := ${sqlValue}`);
             } else {
               haveNames = false;
               sqlArgValues.unshift(sqlValue);
@@ -378,12 +378,12 @@ export default function makeProcField(
             sqlArgValues.unshift(sqlValue);
           }
         }
-        const functionCall = sql.fragment`${sql.identifier(
+        const functionCall = sql`${sql.identifier(
           proc.namespace.name,
           proc.name,
         )}(${sql.join([...implicitArgs, ...sqlArgValues], ", ")})`;
         return rawReturnType.isPgArray
-          ? sql.fragment`unnest(${functionCall})`
+          ? sql`unnest(${functionCall})`
           : functionCall;
       }
       function makeQuery(
@@ -433,7 +433,7 @@ export default function makeProcField(
               if (returnTypeTable) {
                 innerQueryBuilder.select(
                   pgTweakFragmentForTypeAndModifier(
-                    sql.fragment`${functionAlias}`,
+                    sql`${functionAlias}`,
                     returnTypeTable.type,
                     null,
                     resolveData,
@@ -444,7 +444,7 @@ export default function makeProcField(
               } else {
                 innerQueryBuilder.select(
                   pgTweakFragmentForTypeAndModifier(
-                    sql.fragment`${functionAlias}`,
+                    sql`${functionAlias}`,
                     returnType,
                     null, // We can't determine a type modifier for functions
                     resolveData,
@@ -493,7 +493,7 @@ export default function makeProcField(
                   queryBuilder,
                 );
 
-                return sql.fragment`(${query})`;
+                return sql`(${query})`;
               }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
             },
           };
@@ -743,12 +743,12 @@ export default function makeProcField(
                           returnType.name,
                         ),
 
-                    sql.query`select ${
+                    sql`select ${
                       isPgClass
-                        ? sql.query`${intermediateIdentifier}.*`
+                        ? sql`${intermediateIdentifier}.*`
                         : isPgRecord
-                        ? sql.query`${intermediateIdentifier}.*`
-                        : sql.query`${intermediateIdentifier} as ${functionAlias}`
+                        ? sql`${intermediateIdentifier}.*`
+                        : sql`${intermediateIdentifier} as ${functionAlias}`
                     } from ${sqlMutationQuery} ${intermediateIdentifier}`,
                     functionAlias,
                     query,

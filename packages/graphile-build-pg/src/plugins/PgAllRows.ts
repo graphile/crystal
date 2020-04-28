@@ -153,7 +153,7 @@ export default (async function PgAllRows(
 
                               primaryKeys.forEach(key => {
                                 queryBuilder.orderBy(
-                                  sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
+                                  sql`${queryBuilder.getTableAlias()}.${sql.identifier(
                                     key.name,
                                   )}`,
                                   true,
@@ -170,7 +170,7 @@ export default (async function PgAllRows(
                               ];
 
                               queryBuilder.orderBy(
-                                sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
+                                sql`${queryBuilder.getTableAlias()}.${sql.identifier(
                                   uniqueIdAttribute.name,
                                 )}`,
                                 true,

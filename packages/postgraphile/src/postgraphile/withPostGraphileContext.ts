@@ -144,9 +144,7 @@ const withDefaultPostGraphileContext = async <TResult = ExecutionResult>(
         // ever setting variables on the transaction.
         // Also, we're using `unshift` to undo the reverse-looping we're doing
         sqlSettings.unshift(
-          sql.fragment`set_config(${sql.value(key)}, ${sql.value(
-            value,
-          )}, true)`,
+          sql`set_config(${sql.value(key)}, ${sql.value(value)}, true)`,
         );
       }
     }
@@ -154,7 +152,7 @@ const withDefaultPostGraphileContext = async <TResult = ExecutionResult>(
 
   const sqlSettingsQuery =
     sqlSettings.length > 0
-      ? sql.compile(sql.query`select ${sql.join(sqlSettings, ", ")}`)
+      ? sql.compile(sql`select ${sql.join(sqlSettings, ", ")}`)
       : null;
 
   // If we can avoid transactions, we get greater performance.

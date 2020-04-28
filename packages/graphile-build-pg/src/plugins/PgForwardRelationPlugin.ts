@@ -174,7 +174,7 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
                               }
                               keys.forEach((key, i) => {
                                 innerQueryBuilder.where(
-                                  sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(
+                                  sql`${queryBuilder.getTableAlias()}.${sql.identifier(
                                     key.name,
                                   )} = ${foreignTableAlias}.${sql.identifier(
                                     foreignKeys[i].name,
@@ -186,7 +186,7 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
                             queryBuilder.rootValue,
                           );
 
-                          return sql.fragment`(${query})`;
+                          return sql`(${query})`;
                         }, getSafeAliasFromAlias(parsedResolveInfoFragment.alias));
                       },
                     };

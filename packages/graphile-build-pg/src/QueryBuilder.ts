@@ -279,22 +279,18 @@ class QueryBuilder {
 
       // JSONB concat required PostgreSQL 9.5+
       const chunkToJson = (fieldsChunk: [SQL, string][]) =>
-        sql.fragment`jsonb_build_object(${sql.join(
+        sql`jsonb_build_object(${sql.join(
           fieldsChunk.map(
-            ([expr, alias]) =>
-              sql.fragment`${sql.literal(alias)}::text, ${expr}`,
+            ([expr, alias]) => sql`${sql.literal(alias)}::text, ${expr}`,
           ),
 
           ", ",
         )})`;
-      return sql.fragment`(${sql.join(
-        fieldsChunks.map(chunkToJson),
-        " || ",
-      )})::json`;
+      return sql`(${sql.join(fieldsChunks.map(chunkToJson), " || ")})::json`;
     } else {
-      return sql.fragment`json_build_object(${sql.join(
+      return sql`json_build_object(${sql.join(
         fields.map(
-          ([expr, alias]) => sql.fragment`${sql.literal(alias)}::text, ${expr}`,
+          ([expr, alias]) => sql`${sql.literal(alias)}::text, ${expr}`,
         ),
 
         ", ",
@@ -345,11 +341,11 @@ class QueryBuilder {
         );
 
         parentQueryBuilder.select(
-          sql.fragment`\
+          sql`\
 json_build_object('__id', ${sql.value(id)}::int
 ${sql.join(
   Object.keys(allRequirements).map(
-    key => sql.fragment`, ${sql.literal(key)}::text, ${allRequirements[key]}`,
+    key => sql`, ${sql.literal(key)}::text, ${allRequirements[key]}`,
   ),
 
   "",
@@ -433,10 +429,10 @@ ${sql.join(
     if (!primaryKey) return;
     const primaryKeys = primaryKey.keyAttributes;
     this.select(
-      sql.fragment`json_build_array(${sql.join(
+      sql`json_build_array(${sql.join(
         primaryKeys.map(key =>
           escapeLarge(
-            sql.fragment`${this.getTableAlias()}.${sql.identifier(key.name)}`,
+            sql`${this.getTableAlias()}.${sql.identifier(key.name)}`,
             key.type,
           ),
         ),
@@ -631,7 +627,7 @@ ${sql.join(
     return sql.join(
       this.compiledData.select.map(
         ([sqlFragment, alias]) =>
-          sql.fragment`to_json(${sqlFragment}) as ${sql.identifier(alias)}`,
+          sql`to_json(${sqlFragment}) as ${sql.identifier(alias)}`,
       ),
 
       ", ",
@@ -647,7 +643,7 @@ ${sql.join(
     this.lockEverything();
     let buildObject = this.compiledData.select.length
       ? this.jsonbBuildObject(this.compiledData.select)
-      : sql.fragment`to_json(${this.getTableAlias()})`;
+      : sql`to_json(${this.getTableAlias()})`;
     if (addNotDistinctFromNullCase) {
       /*
        * `is null` is not sufficient here because the record might exist but
@@ -655,7 +651,7 @@ ${sql.join(
        * to assert that the record itself doesn't exist. This is typically used
        * with column values.
        */
-      buildObject = sql.fragment`(case when (${this.getTableAlias()} is not distinct from null) then null else ${buildObject} end)`;
+      buildObject = sql`(case when (${this.getTableAlias()} is not distinct from null) then null else ${buildObject} end)`;
     } else if (addNullCase) {
       /*
        * `is null` is probably used here because it's the result of a function;
@@ -663,7 +659,7 @@ ${sql.join(
        * and  `(null,null,null)::my_type`, always opting for the latter which
        * then causes issues with the `GraphQLNonNull`s in the schema.
        */
-      buildObject = sql.fragment`(case when (${this.getTableAlias()} is null) then null else ${buildObject} end)`;
+      buildObject = sql`(case when (${this.getTableAlias()} is null) then null else ${buildObject} end)`;
     }
     return buildObject;
   }
@@ -671,7 +667,7 @@ ${sql.join(
     this.lock("whereBound");
     const clauses = this.compiledData.whereBound[isLower ? "lower" : "upper"];
     if (clauses.length) {
-      return sql.fragment`(${sql.join(clauses, ") and (")})`;
+      return sql`(${sql.join(clauses, ") and (")})`;
     } else {
       return sql.literal(true);
     }
@@ -710,18 +706,16 @@ ${sql.join(
        * result of a function call returning a compound type was indeed null.
        */
       ...(addNotDistinctFromNullCase
-        ? [sql.fragment`(${this.getTableAlias()} is distinct from null)`]
+        ? [sql`(${this.getTableAlias()} is distinct from null)`]
         : addNullCase
-        ? [sql.fragment`not (${this.getTableAlias()} is null)`]
+        ? [sql`not (${this.getTableAlias()} is null)`]
         : []),
       ...this.compiledData.where,
       ...(includeLowerBound ? [this.buildWhereBoundClause(true)] : []),
       ...(includeUpperBound ? [this.buildWhereBoundClause(false)] : []),
     ];
 
-    return clauses.length
-      ? sql.fragment`(${sql.join(clauses, ") and (")})`
-      : sql.fragment`1 = 1`;
+    return clauses.length ? sql`(${sql.join(clauses, ") and (")})` : sql`1 = 1`;
   }
   build(
     options: {
@@ -757,34 +751,32 @@ ${sql.join(
     const { limit, offset, flip } = this.getFinalLimitAndOffset();
     const fields =
       asJson || asJsonAggregate
-        ? sql.fragment`${this.buildSelectJson({
+        ? sql`${this.buildSelectJson({
             addNullCase,
             addNotDistinctFromNullCase,
           })} as object`
         : this.buildSelectFields();
 
-    let fragment = sql.fragment`\
-select ${useAsterisk ? sql.fragment`${this.getTableAlias()}.*` : fields}
+    let fragment = sql`\
+select ${useAsterisk ? sql`${this.getTableAlias()}.*` : fields}
 ${(this.compiledData.from &&
-  sql.fragment`from ${this.compiledData.from[0]} as ${this.getTableAlias()}`) ||
+  sql`from ${this.compiledData.from[0]} as ${this.getTableAlias()}`) ||
   sql.blank}
 ${(this.compiledData.join.length && sql.join(this.compiledData.join, " ")) ||
   sql.blank}
 where ${this.buildWhereClause(true, true, options)}
 ${
   this.compiledData.orderBy.length
-    ? sql.fragment`order by ${sql.join(
+    ? sql`order by ${sql.join(
         this.compiledData.orderBy.map(
           ([expr, ascending, nullsFirst]) =>
-            sql.fragment`${expr} ${
-              Number(ascending) ^ Number(flip)
-                ? sql.fragment`ASC`
-                : sql.fragment`DESC`
+            sql`${expr} ${
+              Number(ascending) ^ Number(flip) ? sql`ASC` : sql`DESC`
             }${
               nullsFirst === true
-                ? sql.fragment` NULLS FIRST`
+                ? sql` NULLS FIRST`
                 : nullsFirst === false
-                ? sql.fragment` NULLS LAST`
+                ? sql` NULLS LAST`
                 : sql.blank
             }`,
         ),
@@ -793,12 +785,11 @@ ${
       )}`
     : sql.blank
 }
-${(isSafeInteger(limit) && sql.fragment`limit ${sql.literal(limit)}`) ||
-  sql.blank}
-${(offset && sql.fragment`offset ${sql.literal(offset)}`) || sql.blank}`;
+${(isSafeInteger(limit) && sql`limit ${sql.literal(limit)}`) || sql.blank}
+${(offset && sql`offset ${sql.literal(offset)}`) || sql.blank}`;
     if (flip) {
       const flipAlias = Symbol();
-      fragment = sql.fragment`\
+      fragment = sql`\
 with ${sql.identifier(flipAlias)} as (
   ${fragment}
 )
@@ -812,15 +803,15 @@ order by (row_number() over (partition by 1)) desc`; /* We don't need to factor 
        * subquery, row_number() outside of this subquery WON'T include the
        * offset. We must add it back wherever row_number() is used.
        */
-      fragment = sql.fragment`select ${fields} from (${fragment}) ${this.getTableAlias()}`;
+      fragment = sql`select ${fields} from (${fragment}) ${this.getTableAlias()}`;
     }
     if (asJsonAggregate) {
       const aggAlias = Symbol();
-      fragment = sql.fragment`select json_agg(${sql.identifier(
+      fragment = sql`select json_agg(${sql.identifier(
         aggAlias,
         "object",
       )}) from (${fragment}) as ${sql.identifier(aggAlias)}`;
-      fragment = sql.fragment`select coalesce((${fragment}), '[]'::json)`;
+      fragment = sql`select coalesce((${fragment}), '[]'::json)`;
     }
     return fragment;
   }

@@ -57,9 +57,9 @@ it("allows adding a custom single field to PG schema", async () => {
             Query: {
               async randomUser(_query, args, context, resolveInfo) {
                 const rows = await resolveInfo.graphile.selectGraphQLResultFromTable(
-                  sql.fragment`graphile_utils.users`,
+                  sql`graphile_utils.users`,
                   (tableAlias, sqlBuilder) => {
-                    sqlBuilder.orderBy(sql.fragment`random()`);
+                    sqlBuilder.orderBy(sql`random()`);
                     sqlBuilder.limit(1);
                   },
                 );
@@ -119,9 +119,9 @@ it("allows adding a custom field returning a list to PG schema", async () => {
             Query: {
               async randomUsers(_query, args, context, resolveInfo) {
                 const rows = await resolveInfo.graphile.selectGraphQLResultFromTable(
-                  sql.fragment`graphile_utils.users`,
+                  sql`graphile_utils.users`,
                   (tableAlias, sqlBuilder) => {
-                    sqlBuilder.orderBy(sql.fragment`random()`);
+                    sqlBuilder.orderBy(sql`random()`);
                     sqlBuilder.limit(3);
                   },
                 );
@@ -203,10 +203,10 @@ it("allows adding a simple mutation field to PG schema", async () => {
                   const [
                     row,
                   ] = await resolveInfo.graphile.selectGraphQLResultFromTable(
-                    sql.fragment`graphile_utils.users`,
+                    sql`graphile_utils.users`,
                     (tableAlias, sqlBuilder) => {
                       sqlBuilder.where(
-                        sql.fragment`${tableAlias}.id = ${sql.value(user.id)}`,
+                        sql`${tableAlias}.id = ${sql.value(user.id)}`,
                       );
                     },
                   );
@@ -360,7 +360,7 @@ it("allows adding a custom connection", async () => {
             Query: {
               myCustomConnection(_parent, args, context, resolveInfo) {
                 return resolveInfo.graphile.selectGraphQLResultFromTable(
-                  sql.fragment`graphile_utils.users`,
+                  sql`graphile_utils.users`,
                 );
               },
             },
@@ -437,7 +437,7 @@ it("allows adding a custom connection without requiring directives", async () =>
             Query: {
               myCustomConnection(_parent, args, context, resolveInfo) {
                 return resolveInfo.graphile.selectGraphQLResultFromTable(
-                  sql.fragment`graphile_utils.users`,
+                  sql`graphile_utils.users`,
                 );
               },
             },
@@ -508,10 +508,10 @@ it("allows adding a custom connection to a nested type", async () => {
           typeDefs: gql`
             extend type User {
               pets: PetsConnection @pgQuery(
-                source: ${embed(sql.fragment`graphile_utils.pets`)}
+                source: ${embed(sql`graphile_utils.pets`)}
                 withQueryBuilder: ${embed(queryBuilder => {
                   queryBuilder.where(
-                    sql.fragment`${queryBuilder.getTableAlias()}.user_id = ${queryBuilder.parentQueryBuilder.getTableAlias()}.id`,
+                    sql`${queryBuilder.getTableAlias()}.user_id = ${queryBuilder.parentQueryBuilder.getTableAlias()}.id`,
                   );
                 })}
               )
@@ -601,11 +601,11 @@ it("allows adding a custom list to a nested type", async () => {
           typeDefs: gql`
             extend type User {
               myCustomList(idLessThan: Int): [User] @pgQuery(
-                source: ${embed(sql.fragment`graphile_utils.users`)}
+                source: ${embed(sql`graphile_utils.users`)}
                 withQueryBuilder: ${embed((queryBuilder, args) => {
                   if (args.idLessThan) {
                     queryBuilder.where(
-                      sql.fragment`${queryBuilder.getTableAlias()}.id < ${sql.value(
+                      sql`${queryBuilder.getTableAlias()}.id < ${sql.value(
                         args.idLessThan,
                       )}`,
                     );
@@ -662,7 +662,7 @@ it("allows adding a single table entry to a nested type", async () => {
               myCustomRecord(id: Int!): User @pgQuery(
                 source: ${embed(
                   (parentQueryBuilder, args) =>
-                    sql.fragment`(select * from graphile_utils.users where users.id = ${sql.value(
+                    sql`(select * from graphile_utils.users where users.id = ${sql.value(
                       args.id,
                     )} and users.id <> ${parentQueryBuilder.getTableAlias()}.id limit 1)`,
                 )}
@@ -723,18 +723,18 @@ it("allows to retrieve a single scalar value", async () => {
           typeDefs: gql`
             extend type User {
               myCustomScalar: Int! @pgQuery(
-                fragment: ${embed(sql.fragment`(SELECT 100)`)}
+                fragment: ${embed(sql`(SELECT 100)`)}
               )
               myCustomScalarWithFunction: String! @pgQuery(
                 fragment: ${embed(
                   queryBuilder =>
-                    sql.fragment`(${queryBuilder.getTableAlias()}.name || ' ' || ${queryBuilder.getTableAlias()}.email)`,
+                    sql`(${queryBuilder.getTableAlias()}.name || ' ' || ${queryBuilder.getTableAlias()}.email)`,
                 )}
               )
               myCustomScalarWithFunctionAndArgument(test: Int!): Int! @pgQuery(
                 fragment: ${embed(
                   (queryBuilder, args) =>
-                    sql.fragment`(SELECT ${sql.value(args.test)}::integer)`,
+                    sql`(SELECT ${sql.value(args.test)}::integer)`,
                 )}
               )
             }
@@ -793,7 +793,7 @@ it("allows to retrieve array scalar values", async () => {
             extend type User {
               myCustomArrayOfScalars: [String!]! @pgQuery(
                 fragment: ${embed(
-                  sql.fragment`array(SELECT name from graphile_utils.pets)`,
+                  sql`array(SELECT name from graphile_utils.pets)`,
                 )}
               )
               
