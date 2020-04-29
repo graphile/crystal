@@ -277,7 +277,7 @@ export function query(
   strings: TemplateStringsArray,
   ...values: Array<SQL>
 ): SQLQuery {
-  if (!Array.isArray(strings)) {
+  if (!Array.isArray(strings) || !strings.raw) {
     throw new Error(
       "sql.query should be used as a template literal, not a function call!",
     );
