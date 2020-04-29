@@ -2,7 +2,7 @@ import createDebugger from "debug";
 import jwt from "jsonwebtoken";
 import { Pool, PoolClient, QueryConfig, QueryResult } from "pg";
 import { ExecutionResult, OperationDefinitionNode, Kind } from "graphql";
-import sql, { SQLQuery } from "pg-sql2";
+import sql, { SQL } from "pg-sql2";
 import { $$pgClient } from "../postgres/inventory/pgClientFromContext";
 import { pluginHookFromOptions } from "./pluginHook";
 import {
@@ -130,7 +130,7 @@ const withDefaultPostGraphileContext = async <TResult = ExecutionResult>(
     pgSettings,
   });
 
-  const sqlSettings: Array<SQLQuery> = [];
+  const sqlSettings: Array<SQL> = [];
   if (localSettings.length > 0) {
     // Later settings should win, so we're going to loop backwards and not
     // add settings for keys we've already seen.

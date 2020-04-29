@@ -1,5 +1,5 @@
 import { PoolClient } from "pg";
-import sql, { SQL, SQLQuery } from "pg-sql2";
+import sql, { SQL } from "pg-sql2";
 import debugSql from "./debugSql";
 
 /*
@@ -49,7 +49,7 @@ export default async function viaTemporaryTable(
 ) {
   const { outputArgTypes, outputArgNames } = pgRecordInfo || {};
 
-  async function performQuery(pgClient: PoolClient, sqlQuery: SQLQuery) {
+  async function performQuery(pgClient: PoolClient, sqlQuery: SQL) {
     // TODO: look into rowMode = 'array'
     const { text, values } = sql.compile(sqlQuery);
     if (debugSql.enabled) debugSql(text);

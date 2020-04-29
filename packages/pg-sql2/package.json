@@ -36,13 +36,9 @@
     "@types/node": "12.7.5",
     "markdown-doctest": "^1.0.0"
   },
-  "peerDependencies": {
-    "pg": ">=6.1.0 <9"
-  },
+  "peerDependencies": {},
   "dependencies": {
-    "@graphile/lru": "4.6.0-alpha.0",
-    "@types/pg": ">=6 <8",
-    "debug": ">=3 <5"
+    "@graphile/lru": "4.6.0-alpha.0"
   },
   "files": [
     "dist"
