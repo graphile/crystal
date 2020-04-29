@@ -1,14 +1,5 @@
-import debugFactory from "debug";
-import { QueryConfig } from "pg";
 import LRU from "@graphile/lru";
 import { inspect } from "util";
-
-const debug = debugFactory("pg-sql2");
-
-function debugError(source: string, err: Error): Error {
-  debug("pg-sql2 error occurred in %s: %o", source, err);
-  return err;
-}
 
 /**
  * This is the secret to our safety; since this is a symbol it cannot be faked
@@ -53,8 +44,14 @@ export interface SQLValueNode {
   [$$trusted]: true;
 }
 
-export type SQLNode = SQLRawNode | SQLValueNode | SQLIdentifierNode;
-export type SQLQuery = Array<SQLNode>;
+// We deliberately don't expose these as they're only used internally.
+type SQLNode = SQLRawNode | SQLValueNode | SQLIdentifierNode;
+type SQLQuery = Array<SQLNode>;
+
+/**
+ * Representation of SQL, identifiers, values, etc; to generate a query that
+ * can be issued to the database it needs to be fed to `sql.compile`.
+ */
 export type SQL = SQLNode | SQLQuery;
 
 /**
@@ -120,7 +117,11 @@ function makeRawNode(text: string): SQLRawNode {
     return n;
   }
   if (typeof text !== "string") {
-    throw new Error("Invalid argument to makeRawNode - expected string");
+    throw new Error(
+      `[pg-sql2] Invalid argument to makeRawNode - expected string, but received '${inspect(
+        text,
+      )}'`,
+    );
   }
   const newNode: SQLRawNode = Object.freeze({
     type: "RAW",
@@ -152,7 +153,7 @@ function enforceValidNode(node: unknown): SQLNode {
     return node;
   }
   throw new Error(
-    `Invalid pg-sql2 expression. Expected an SQL item but received '${inspect(
+    `[pg-sql2] Invalid expression. Expected an SQL item but received '${inspect(
       node,
     )}'. This may mean that there is an issue in the SQL expression where a dynamic value was not escaped via 'sql.value(...)', an identifier wasn't wrapped with 'sql.identifier(...)', or a SQL expression was added without using the \`sql\` tagged template literal.`,
   );
@@ -162,8 +163,13 @@ function enforceValidNode(node: unknown): SQLNode {
  * Accepts an sql`...` expression and compiles it out to SQL text with
  * placeholders, and the values to substitute for these values.
  */
-export function compile(sql: SQLQuery | SQLNode): QueryConfig {
-  const items: SQLQuery = Array.isArray(sql) ? sql : [sql];
+export function compile(
+  sql: SQL,
+): {
+  text: string;
+  values: SQLRawValue[];
+} {
+  const items: Array<SQLNode> = Array.isArray(sql) ? sql : [sql];
 
   const itemCount = items.length;
 
@@ -234,11 +240,10 @@ export function compile(sql: SQLQuery | SQLNode): QueryConfig {
             // escape it because we know all of the characters are safe.
             mappedNames.push(identifierForSymbol);
           } else {
-            throw debugError(
-              "compile/IDENTIFIER",
-              new Error(
-                `Expected string or SymbolAndName, received '${inspect(name)}'`,
-              ),
+            throw new Error(
+              `[pg-sql2] Invalid IDENTIFIER node, expected string or SymbolAndName, received '${inspect(
+                name,
+              )}' - this could be a bug in pg-sql2, please report it.`,
             );
           }
         }
@@ -263,6 +268,9 @@ export function compile(sql: SQLQuery | SQLNode): QueryConfig {
   };
 }
 
+// LRU not necessary
+const CACHE_SIMPLE_FRAGMENTS = new Map<string, SQLRawNode>();
+
 /**
  * A template string tag that creates a `SQL` query out of some strings and
  * some values. Use this to construct all PostgreSQL queries to avoid SQL
@@ -271,44 +279,42 @@ export function compile(sql: SQLQuery | SQLNode): QueryConfig {
  * Note that using this function, the user *must* specify if they are injecting
  * raw text. This makes a SQL injection vulnerability harder to create.
  */
-// LRU not necessary
-const CACHE_SIMPLE_FRAGMENTS = new Map<string, SQLQuery>();
 export function query(
   strings: TemplateStringsArray,
   ...values: Array<SQL>
-): SQLQuery {
+): SQL {
   if (!Array.isArray(strings) || !strings.raw) {
     throw new Error(
-      "sql.query should be used as a template literal, not a function call!",
+      "[pg-sql2] sql.query should be used as a template literal, not a function call.",
     );
   }
   const first = strings[0];
   // Reduce memory churn with a cache
-  if (strings.length === 1 && typeof first === "string" && first.length < 20) {
-    const cached = CACHE_SIMPLE_FRAGMENTS.get(first);
-    if (cached) {
-      return cached;
+  if (strings.length === 1) {
+    let node = CACHE_SIMPLE_FRAGMENTS.get(first);
+    if (!node) {
+      node = makeRawNode(first);
+      CACHE_SIMPLE_FRAGMENTS.set(first, node);
     }
-    const node = [makeRawNode(first)];
-    CACHE_SIMPLE_FRAGMENTS.set(first, node);
     return node;
   }
-  const items = [];
+  const items: Array<SQLNode> = [];
   for (let i = 0, l = strings.length; i < l; i++) {
     const text = strings[i];
     if (typeof text !== "string") {
       throw new Error(
-        "sql.query should be used as a template literal, not a function call.",
+        "[pg-sql2] sql.query must be invoked as a template literal, not a function call.",
       );
     }
     if (text.length > 0) {
       items.push(makeRawNode(text));
     }
-    if (values[i]) {
+    if (i < l - 1) {
       const val = values[i];
       if (Array.isArray(val)) {
-        const nodes: SQLQuery = val.map(enforceValidNode);
-        items.push(...nodes);
+        // Avoid allocating a new array by using forEach rather than map.
+        val.forEach(enforceValidNode);
+        items.push(...val);
       } else {
         const node: SQLNode = enforceValidNode(val);
         items.push(node);
@@ -318,13 +324,32 @@ export function query(
   return items;
 }
 
+let sqlRawWarningOutput = false;
 /**
  * Creates a SQL item for some raw SQL text. Just plain ol‘ raw SQL. This
- * method is dangerous though because it involves no escaping, so proceed
- * with caution!
+ * method is dangerous though because it involves no escaping, so proceed with
+ * caution! It's very very rarely warranted - there is likely a safer way of
+ * achieving your goal.
  */
 export function raw(text: string): SQLNode {
-  return makeRawNode(String(text));
+  if (!sqlRawWarningOutput) {
+    sqlRawWarningOutput = true;
+    try {
+      throw new Error("sql.raw first invoked here");
+    } catch (e) {
+      console.warn(
+        `[pg-sql2] WARNING: you're using the sql.raw escape hatch, usage of this API is rarely required and is highly discouraged. Please be sure this is what you intend. ${e.stack}`,
+      );
+    }
+  }
+  if (typeof text !== "string") {
+    throw new Error(
+      `[pg-sql2] sql.raw must be passed a string, but it was passed '${inspect(
+        text,
+      )}'.`,
+    );
+  }
+  return makeRawNode(text);
 }
 
 /**
@@ -339,7 +364,7 @@ export function identifier(...names: Array<string | symbol>): SQLNode {
   const nameCount = names.length;
   if (nameCount === 0) {
     throw new Error(
-      "Invalid call to sql.identifier() - you must pass at least one argument.",
+      "[pg-sql2] Invalid call to sql.identifier() - you must pass at least one argument.",
     );
   }
 
@@ -354,7 +379,7 @@ export function identifier(...names: Array<string | symbol>): SQLNode {
       finalNames[i] = getSymbolAndName(name);
     } else {
       throw new Error(
-        `Invalid argument to sql.identifier - argument ${i} (0-indexed) should be a string or a symbol, but was '${inspect(
+        `[pg-sql2] Invalid argument to sql.identifier - argument ${i} (0-indexed) should be a string or a symbol, but was '${inspect(
           name,
         )}'`,
       );
@@ -372,35 +397,37 @@ export function value(val: SQLRawValue): SQLNode {
   return makeValueNode(val);
 }
 
-const trueNode = raw(`TRUE`);
-const falseNode = raw(`FALSE`);
-const nullNode = raw(`NULL`);
+const trueNode = makeRawNode(`TRUE`);
+const falseNode = makeRawNode(`FALSE`);
+const nullNode = makeRawNode(`NULL`);
+export const blank = makeRawNode(``);
 
 /**
  * If the value is simple will inline it into the query, otherwise will defer
- * to value.
+ * to `sql.value`.
  */
 export function literal(val: string | number | boolean | null): SQLNode {
-  if (typeof val === "string" && val.match(/^[-a-zA-Z0-9_@! ]*$/)) {
-    return raw(`'${val}'`);
+  if (typeof val === "string" && val.match(/^[-a-zA-Z0-9_@!$ ]*$/)) {
+    return makeRawNode(`'${val}'`);
   } else if (typeof val === "number" && Number.isFinite(val)) {
     if (Number.isInteger(val)) {
-      return raw(String(val));
+      return makeRawNode(String(val));
     } else {
-      return raw(`'${0 + val}'::float`);
+      return makeRawNode(`'${0 + val}'::float`);
     }
   } else if (typeof val === "boolean") {
     return val ? trueNode : falseNode;
   } else if (val == null) {
     return nullNode;
   } else {
-    return makeValueNode(val);
+    return value(val);
   }
 }
 
 /**
- * Join some SQL items together separated by a string. Useful when dealing
- * with lists of SQL items that doesn’t make sense as a SQL query.
+ * Join some SQL items together, optionally separated by a string. Useful when
+ * dealing with lists of SQL items, for example a dynamic list of columns or
+ * variadic SQL function arguments.
  */
 export function join(
   items: Array<Array<SQLNode> | SQLNode>,
@@ -408,14 +435,20 @@ export function join(
 ): SQLQuery {
   if (!Array.isArray(items)) {
     throw new Error(
-      `Invalid sql.join call - the first argument should be an array, but it wasn't.`,
+      `[pg-sql2] Invalid sql.join call - the first argument should be an array, but it was '${inspect(
+        items,
+      )}'.`,
     );
   }
   if (typeof separator !== "string") {
-    throw new Error("Invalid separator - must be a string");
+    throw new Error(
+      `[pg-sql2] Invalid separator passed to sql.join - must be a string, but we received '${inspect(
+        separator,
+      )}'`,
+    );
   }
-  const sepNode = makeRawNode(separator);
   const hasSeparator = separator.length > 0;
+  const sepNode = hasSeparator ? makeRawNode(separator) : blank;
 
   const currentItems: Array<SQLNode> = [];
   for (let i = 0, l = items.length; i < l; i++) {
@@ -442,8 +475,6 @@ export function join(
   return currentItems;
 }
 
-export const blank = query``;
-
 export {
   query as fragment,
   trueNode as true,
@@ -452,7 +483,7 @@ export {
 };
 
 export interface PgSQL {
-  (strings: TemplateStringsArray, ...values: Array<SQL>): SQLQuery;
+  (strings: TemplateStringsArray, ...values: Array<SQL>): SQL;
   escapeSqlIdentifier: typeof escapeSqlIdentifier;
   compile: typeof compile;
   query: typeof query;

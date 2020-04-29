@@ -37,7 +37,12 @@ describe("sql.identifier", () => {
 describe("sql.query", () => {
   it("simple", () => {
     const node = sql`select 1`;
-    expect(node.map(sansSymbols)).toEqual([{ type: "RAW", text: "select 1" }]);
+    expect(sansSymbols(node)).toEqual({ type: "RAW", text: "select 1" });
+    const node2 = sql`select ${sql`1`}`;
+    expect(node2.map(sansSymbols)).toEqual([
+      { type: "RAW", text: "select " },
+      { type: "RAW", text: "1" },
+    ]);
   });
 
   it("with values", () => {
