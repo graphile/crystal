@@ -184,6 +184,7 @@ export function compile(
    * time.
    */
   const values: SQLRawValue = [];
+  let valueCount = 0;
 
   /**
    * When we come across a symbol in our identifier, we create a unique alias
@@ -253,8 +254,14 @@ export function compile(
         break;
       }
       case "VALUE":
-        values.push(item.value);
-        sqlFragments.push(`$${values.length}`);
+        valueCount++;
+        if (valueCount > 65535) {
+          throw new Error(
+            "[pg-sql2] This SQL statement would contain too many placeholders; PostgreSQL supports at most 65535 placeholders. To solve this, consider refactoring the query to use arrays/unnest where possible, or split it into multiple queries.",
+          );
+        }
+        values[valueCount] = item.value;
+        sqlFragments.push(`$${valueCount}`);
         break;
       default:
       // This cannot happen
