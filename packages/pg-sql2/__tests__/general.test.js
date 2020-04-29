@@ -22,14 +22,14 @@ it("sql.value", () => {
 describe("sql.identifier", () => {
   it("one", () => {
     const node = sql.identifier("foo");
-    expect(sansSymbols(node)).toEqual({ type: "IDENTIFIER", names: ["foo"] });
+    expect(sansSymbols(node)).toEqual({ type: "IDENTIFIER", names: ['"foo"'] });
   });
 
   it("many", () => {
     const node = sql.identifier("foo", "bar", 'b"z');
     expect(sansSymbols(node)).toEqual({
       type: "IDENTIFIER",
-      names: ["foo", "bar", 'b"z'],
+      names: ['"foo"', '"bar"', '"b""z"'],
     });
   });
 });
@@ -58,6 +58,15 @@ describe("sql.query", () => {
       { type: "RAW", text: "foo" },
     ]);
   });
+
+  it("with symbols", () => {
+    const sym1 = Symbol("---flibble-de£dee---");
+    const node = sql`select 1 as ${sql.identifier(sym1)}`;
+    expect(node.map(sansSymbols)).toEqual([
+      { type: "RAW", text: "select 1 as " },
+      { type: "IDENTIFIER", names: [{ s: sym1, n: "flibble_de_dee" }] },
+    ]);
+  });
 });
 
 describe("sql.join", () => {
@@ -75,7 +84,7 @@ describe("sql.join", () => {
       { type: "RAW", text: "select " },
       { type: "VALUE", value: 1 },
       { type: "RAW", text: ", " },
-      { type: "IDENTIFIER", names: ["foo", "bar"] },
+      { type: "IDENTIFIER", names: ['"foo"', '"bar"'] },
       { type: "RAW", text: ", " },
       { type: "RAW", text: "baz.qux(1, 2, 3)" },
       { type: "RAW", text: ", " },
@@ -136,6 +145,46 @@ describe("sql.compile", () => {
       values: [1, 1],
     });
   });
+
+  it("handles symbols", () => {
+    const barSym = Symbol("bar");
+    const node = sql`\
+    select 1
+    from
+      foo ${sql.identifier(Symbol("foo"))},
+      foo ${sql.identifier(Symbol("foo"))},
+      foo ${sql.identifier(Symbol())},
+      foo ${sql.identifier(Symbol("foo"))},
+      bar ${sql.identifier(Symbol("bar_2"))},
+      bar ${sql.identifier(Symbol())},
+      bar ${sql.identifier(Symbol())},
+      bar ${sql.identifier(barSym)},
+      bar ${sql.identifier(barSym)},
+      bar ${sql.identifier(Symbol())},
+      bar ${sql.identifier(barSym)},
+      baz ${sql.identifier(
+        Symbol(
+          "KSLDFJP(J£_RDIGFJf90-2mf)sd_(wng)*nq£(nrgd_f(gkw)dfksdfg)*hd)(jq£_)jermg)ieng_q£j_fopkgpejgt@£lvi:hwn*(twe):jhwoy£@(:iowrljw*yr(ehgso:dihgf(weygpsrhgowev(&",
+        ),
+      )}`;
+    expect(sql.compile(node)).toEqual({
+      text: `    select 1
+    from
+      foo __foo_1__,
+      foo __foo_2__,
+      foo __local_1__,
+      foo __foo_3__,
+      bar __bar_2_1__,
+      bar __local_2__,
+      bar __local_3__,
+      bar __bar_1__,
+      bar __bar_1__,
+      bar __local_4__,
+      bar __bar_1__,
+      baz __k_s_l_d_f_j_p_j_r_d_i_g_f_jf90_2mf_sd_wng_nq_nrgd_1__`,
+      values: [],
+    });
+  });
 });
 
 describe("sqli", () => {
@@ -144,6 +193,20 @@ describe("sqli", () => {
       sql`select ${sql.join(
         [
           { type: "VALUE", value: 1 },
+          sql.identifier("foo", "bar"),
+          sql`baz.qux(1, 2, 3)`,
+          sql`baz.qux(${sql.value(1)}, ${sql`2`}, 3)`,
+        ],
+        ", ",
+      )}`;
+    }).toThrowErrorMatchingSnapshot();
+  });
+
+  it("subbing in a scalar", () => {
+    expect(() => {
+      sql`select ${sql.join(
+        [
+          1,
           sql.identifier("foo", "bar"),
           sql`baz.qux(1, 2, 3)`,
           sql`baz.qux(${sql.value(1)}, ${sql`2`}, 3)`,

@@ -1,5 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`sqli including a join 1`] = `"Expected SQL item, instead received '3'."`;
+exports[`sqli including a join 1`] = `"Invalid pg-sql2 expression. Expected an SQL item but received '3'. This may mean that there is an issue in the SQL expression where a dynamic value was not escaped via 'sql.value(...)', an identifier wasn't wrapped with 'sql.identifier(...)', or a SQL expression was added without using the \`sql\` tagged template literal."`;
 
-exports[`sqli subbing an object of similar layout 1`] = `"Expected SQL item, instead received '[object Object]'."`;
+exports[`sqli subbing an object of similar layout 1`] = `"Invalid pg-sql2 expression. Expected an SQL item but received '{ type: 'VALUE', value: 1 }'. This may mean that there is an issue in the SQL expression where a dynamic value was not escaped via 'sql.value(...)', an identifier wasn't wrapped with 'sql.identifier(...)', or a SQL expression was added without using the \`sql\` tagged template literal."`;
+
+exports[`sqli subbing in a scalar 1`] = `"Invalid pg-sql2 expression. Expected an SQL item but received '1'. This may mean that there is an issue in the SQL expression where a dynamic value was not escaped via 'sql.value(...)', an identifier wasn't wrapped with 'sql.identifier(...)', or a SQL expression was added without using the \`sql\` tagged template literal."`;
