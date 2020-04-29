@@ -331,7 +331,7 @@ let sqlRawWarningOutput = false;
  * caution! It's very very rarely warranted - there is likely a safer way of
  * achieving your goal.
  */
-export function raw(text: string): SQLNode {
+export function raw(text: string): SQL {
   if (!sqlRawWarningOutput) {
     sqlRawWarningOutput = true;
     try {
@@ -357,7 +357,7 @@ export function raw(text: string): SQLNode {
  * a table, schema, or column name. An identifier may also have a namespace,
  * thus why many names are accepted.
  */
-export function identifier(...names: Array<string | symbol>): SQLNode {
+export function identifier(...names: Array<string | symbol>): SQL {
   // By doing the validation here rather than at compile time we can reduce
   // redundant work - the same sql.identifier can be used in multiple queries.
 
@@ -393,7 +393,7 @@ export function identifier(...names: Array<string | symbol>): SQLNode {
  * Creates a SQL item for a value that will be included in our final query.
  * This value will be added in a way which avoids SQL injection.
  */
-export function value(val: SQLRawValue): SQLNode {
+export function value(val: SQLRawValue): SQL {
   return makeValueNode(val);
 }
 
@@ -406,7 +406,7 @@ export const blank = makeRawNode(``);
  * If the value is simple will inline it into the query, otherwise will defer
  * to `sql.value`.
  */
-export function literal(val: string | number | boolean | null): SQLNode {
+export function literal(val: string | number | boolean | null): SQL {
   if (typeof val === "string" && val.match(/^[-a-zA-Z0-9_@!$ ]*$/)) {
     return makeRawNode(`'${val}'`);
   } else if (typeof val === "number" && Number.isFinite(val)) {
@@ -432,7 +432,7 @@ export function literal(val: string | number | boolean | null): SQLNode {
 export function join(
   items: Array<Array<SQLNode> | SQLNode>,
   separator = "",
-): SQLQuery {
+): SQL {
   if (!Array.isArray(items)) {
     throw new Error(
       `[pg-sql2] Invalid sql.join call - the first argument should be an array, but it was '${inspect(
