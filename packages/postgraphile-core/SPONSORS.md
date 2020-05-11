@@ -16,13 +16,11 @@ sponsor](https://graphile.org/sponsor/).
 - domonda
 - Robert Claypool
 - James Allain
-- Stagency
 - Jack Dinker
-- 8th Light
 - Nigel Taylor
+- Qwick
 - DocIQ
 - Principia Mentis
-- Qwick
 - Partners in School Innovation
 - OpenLaw NZ
 - Sterblue
@@ -37,14 +35,12 @@ sponsor](https://graphile.org/sponsor/).
 - stlbucket
 - Matt Bretl
 - Chris Watland
-- James Rascoe
 - Mark Lipscombe
-- Michel Pelletier
-- Frank
+- James Rascoe
 - Mark Rapoza
 - innovation.rocks
-- cybere
 - Daniel Woelfel
+- cybere
 - Philipp Litzenberger
 - Bjørn Michelsen
 - CJ
