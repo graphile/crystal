@@ -535,20 +535,32 @@ class SchemaBuilder extends EventEmitter {
           console.error(e);
         }
       };
-      for (const fn of this.watchers) {
-        await fn(this.triggerChange);
+      try {
+        this._watching = true;
+        for (const fn of this.watchers) {
+          await fn(this.triggerChange);
+        }
+
+        // Now we're about to build the first schema, any further
+        // `triggerChange` calls should be honoured.
+        ignoreChangeTriggers = false;
+
+        if (listener) {
+          this.on("schema", listener);
+        }
+        this.emit("schema", this.buildSchema());
+      } catch (e) {
+        try {
+          this._busy = false;
+          // Abort abort!
+          await this.unwatchSchema();
+        } catch (e2) {
+          console.error(
+            `Error when unwatching schema after error during schema build: ${e}`
+          );
+        }
+        throw e;
       }
-
-      // Now we're about to build the first schema, any further `triggerChange`
-      // calls should be honoured.
-      ignoreChangeTriggers = false;
-
-      if (listener) {
-        this.on("schema", listener);
-      }
-      this.emit("schema", this.buildSchema());
-
-      this._watching = true;
     } finally {
       this._busy = false;
     }
