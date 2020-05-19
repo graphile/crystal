@@ -43,7 +43,8 @@
     "graphql": "^15.0.0",
     "graphql-parse-resolve-info": "4.7.0",
     "pg": "^8.2.1",
-    "postgraphile-core": ">4.3.1 <5"
+    "postgraphile-core": ">4.3.1 <5",
+    "typescript": "^3.9.2"
   },
   "files": [
     "dist"

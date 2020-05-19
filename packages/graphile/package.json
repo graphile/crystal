@@ -19,5 +19,8 @@
   "homepage": "https://www.graphile.org",
   "files": [
     "index.js"
-  ]
+  ],
+  "devDependencies": {
+    "typescript": "^3.9.2"
+  }
 }

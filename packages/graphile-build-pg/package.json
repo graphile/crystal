@@ -52,6 +52,11 @@
     "postgres-interval": "^1.2.0",
     "tslib": "^2.0.0"
   },
+  "devDependencies": {
+    "graphql": "^15.0.0",
+    "graphql-parse-resolve-info": "4.7.0",
+    "typescript": "^3.9.2"
+  },
   "peerDependencies": {
     "graphql": "^15.0.0",
     "graphql-parse-resolve-info": "4.7.0",

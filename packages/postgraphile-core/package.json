@@ -33,7 +33,8 @@
     "jsonwebtoken": "^8.5.1",
     "mock-fs": "^4.12.0",
     "pg": "^8.2.1",
-    "pg-connection-string": "^2.2.3"
+    "pg-connection-string": "^2.2.3",
+    "typescript": "^3.9.2"
   },
   "peerDependencies": {
     "graphql": "^15.0.0",

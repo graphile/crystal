@@ -30,11 +30,11 @@
     "@types/debug": "^4.1.5",
     "@types/pg": "^7.14.3",
     "debug": "^4.2.0",
+    "graphile-build": "4.7.0",
     "graphql-subscriptions": "^1.1.0",
     "tslib": "^2.0.0"
   },
   "peerDependencies": {
-    "graphile-build": "4.7.0",
     "graphile-build-pg": "4.7.0",
     "graphql": "^15.0.0",
     "graphql-parse-resolve-info": "4.7.0",
@@ -42,11 +42,13 @@
   },
   "devDependencies": {
     "@types/jest": "^25.2.3",
+    "graphile-build-pg": "4.7.0",
     "graphql": "^15.0.0",
     "mock-req": "^0.2.0",
     "mock-res": "^0.5.0",
     "pg": "^8.2.1",
-    "postgraphile": "4.7.0"
+    "postgraphile": "4.7.0",
+    "typescript": "^3.9.2"
   },
   "files": [
     "dist"
