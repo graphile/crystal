@@ -41,6 +41,7 @@
   },
   "devDependencies": {
     "@types/jest": "^25.2.3",
+    "@types/pg": "^7.14.3",
     "graphile-build": "4.7.0",
     "graphile-build-pg": "4.7.0",
     "graphql": "^15.0.0",
