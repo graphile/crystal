@@ -51,11 +51,10 @@ import favicon from "../../assets/favicon.ico";
  */
 import baseGraphiqlHtml from "../../assets/graphiql.html";
 import { enhanceHttpServerWithSubscriptions } from "./subscriptions";
-import { GraphileResolverContext } from "postgraphile-core";
 
 /**
  * When writing JSON to the browser, we need to be careful that it doesn't get
- * interpretted as HTML.
+ * interpreted as HTML.
  */
 const JS_ESCAPE_LOOKUP = {
   "<": "\\u003c",
@@ -92,14 +91,12 @@ const calculateQueryHash = (queryString: string): string => {
 // faster than `Object.keys(value).length === 0`.
 // NOTE: we don't need a `hasOwnProperty` call here because isEmpty is called
 // with an `Object.create(null)` object, so it has no no-own properties.
-/* tslint:disable forin */
 export function isEmpty(value: any): boolean {
   for (const _key in value) {
     return false;
   }
   return true;
 }
-/* tslint:enable forin */
 
 const isPostGraphileDevelopmentMode =
   process.env.POSTGRAPHILE_ENV === "development";
@@ -124,7 +121,9 @@ function withPostGraphileContextFromReqResGenerator(
     req: IncomingMessage,
     res: ServerResponse,
     moreOptions: any,
-    fn: (ctx: GraphileResolverContext) => Promise<TResult> | TResult,
+    fn: (
+      ctx: GraphileEngine.GraphileResolverContext,
+    ) => Promise<TResult> | TResult,
   ): Promise<TResult> => {
     const jwtToken = jwtSecret ? getJwtToken(req) : null;
     const additionalContext =
@@ -295,7 +294,7 @@ export default function createPostGraphileHttpRequestHandler(
     }),
   ];
 
-  // We'll turn this into one function now so it can be better JIT optimised
+  // We'll turn this into one function now so it can be better JIT optimized
   const bodyParserMiddlewaresComposed = bodyParserMiddlewares.reduce(
     (
       parent: (
@@ -435,7 +434,7 @@ export default function createPostGraphileHttpRequestHandler(
         originalPathname !== pathname &&
         originalPathname.endsWith(pathname)
       ) {
-        // We were mounted on a subpath (e.g. `app.use('/path/to', postgraphile(...))`).
+        // We were mounted on a sub-path (e.g. `app.use('/path/to', postgraphile(...))`).
         // Figure out our externalUrlBase for ourselves.
         externalUrlBase = originalPathname.substr(
           0,
@@ -831,7 +830,7 @@ export default function createPostGraphileHttpRequestHandler(
                   variables,
                   operationName,
                 },
-                (graphqlContext: GraphileResolverContext) => {
+                (graphqlContext: GraphileEngine.GraphileResolverContext) => {
                   pgRole = graphqlContext.pgRole;
                   const graphqlResult = executeGraphql(
                     gqlSchema,
@@ -1001,7 +1000,7 @@ export default function createPostGraphileHttpRequestHandler(
       const res = b as ServerResponse;
       const next = c || finalHandler(req, res);
 
-      // Execute our request handler. If the request errored out, call `next` with the error.
+      // Execute our request handler. If the request triggered an error, call `next` with the error.
       requestHandler(req, res, next).catch(next);
     }
   };

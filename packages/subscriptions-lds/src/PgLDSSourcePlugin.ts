@@ -1,16 +1,19 @@
 /* eslint-disable no-console */
-import { Plugin } from "postgraphile-core";
+import "graphile-build";
+import "graphile-build-pg";
 import WebSocket from "ws";
 import subscribeToLogicalDecoding, {
   Announcement,
   LDSubscription,
 } from "@graphile/lds";
 
-declare module "graphile-build" {
-  interface GraphileBuildOptions {
-    pgLDSUrl?: string;
-    ldsSleepDuration?: number;
-    ldsTablePattern?: string;
+declare global {
+  namespace GraphileEngine {
+    interface GraphileBuildOptions {
+      pgLDSUrl?: string;
+      ldsSleepDuration?: number;
+      ldsTablePattern?: string;
+    }
   }
 }
 
@@ -318,7 +321,7 @@ function getSafeNumber(str: string | undefined): number | undefined {
   return undefined;
 }
 
-const PgLDSSourcePlugin: Plugin = async function (
+const PgLDSSourcePlugin: GraphileEngine.Plugin = async function (
   builder,
   {
     pgLDSUrl = process.env.LDS_URL,

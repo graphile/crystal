@@ -20,7 +20,6 @@ import {
 } from "graphql";
 import mapAsyncIterator from "./mapAsyncIterator";
 import { isAsyncIterable } from "iterall";
-import { GraphileResolverContext } from "postgraphile-core";
 
 type mixed = any;
 
@@ -28,7 +27,7 @@ export default function liveSubscribe(
   argsOrSchema: any | GraphQLSchema,
   document: DocumentNode,
   rootValue?: any,
-  contextValue?: GraphileResolverContext,
+  contextValue?: GraphileEngine.GraphileResolverContext,
   variableValues?: { [key: string]: any },
   operationName?: string,
   fieldResolver?: GraphQLFieldResolver<any, any>,
@@ -63,7 +62,7 @@ function liveSubscribeImpl(
   schema: GraphQLSchema,
   document: DocumentNode,
   rootValue?: any,
-  contextValue?: GraphileResolverContext,
+  contextValue?: GraphileEngine.GraphileResolverContext,
   variableValues?: { [key: string]: any },
   operationName?: string,
   fieldResolver?: GraphQLFieldResolver<any, any>,

@@ -1,16 +1,5 @@
 import * as fs from "fs";
-import {
-  defaultPlugins,
-  getBuilder,
-  Plugin,
-  GraphileBuildOptions,
-  SchemaListener,
-  Build,
-  Context,
-  SchemaBuilder,
-  Inflection,
-  GraphileResolverContext,
-} from "graphile-build";
+import { defaultPlugins, getBuilder, SchemaBuilder } from "graphile-build";
 import {
   defaultPlugins as pgDefaultPlugins,
   Inflector,
@@ -20,22 +9,14 @@ import {
 import { Pool, PoolClient } from "pg";
 import { SignOptions, Secret } from "jsonwebtoken";
 
-export {
-  Plugin,
-  Build,
-  Context,
-  SchemaBuilder,
-  SchemaListener,
-  Inflection,
-  GraphileBuildOptions,
-  GraphileBuildOptions as Options,
-  formatSQLForDebugging,
-  GraphileResolverContext,
-};
+export { SchemaBuilder, formatSQLForDebugging };
 
 export type mixed = {} | string | number | boolean | undefined | null;
 
-const ensureValidPlugins = (name: string, arr: Array<Plugin>) => {
+const ensureValidPlugins = (
+  name: string,
+  arr: Array<GraphileEngine.Plugin>,
+) => {
   if (!Array.isArray(arr)) {
     throw new Error(`Option '${name}' should be an array`);
   }
@@ -51,69 +32,73 @@ const ensureValidPlugins = (name: string, arr: Array<Plugin>) => {
   }
 };
 
-export interface PostGraphileCoreOptions {
-  dynamicJson?: boolean;
-  classicIds?: boolean;
-  disableDefaultMutations?: boolean;
-  nodeIdFieldName?: string;
-  /**
-   * Additional Options to pass through into the graphile schema building
-   * system (received via the second argument of a plugin).
-   */
-  graphileBuildOptions?: Partial<GraphileBuildOptions>;
-  /**
-   * @deprecated Use graphileBuildOptions instead
-   */
-  graphqlBuildOptions?: Partial<GraphileBuildOptions>;
-  replaceAllPlugins?: Array<Plugin>;
-  appendPlugins?: Array<Plugin>;
-  /**
-   * @deprecated Use `appendPlugins` with dependencies instead.
-   */
-  prependPlugins?: Array<Plugin>;
-  skipPlugins?: Array<Plugin>;
-  jwtPgTypeIdentifier?: string;
-  jwtSecret?: Secret;
-  jwtSignOptions?: SignOptions;
-  /**
-   * @deprecated UNSUPPORTED! Use an inflector plugin instead.
-   */
-  inflector?: Inflector;
-  /**
-   * @deprecated Use smart comments/tags instead
-   */
-  pgColumnFilter?: <TContext extends Context>(
-    attr: mixed,
-    build: Build,
-    context: TContext,
-  ) => boolean;
+declare global {
+  namespace GraphileEngine {
+    export interface PostGraphileCoreOptions {
+      dynamicJson?: boolean;
+      classicIds?: boolean;
+      disableDefaultMutations?: boolean;
+      nodeIdFieldName?: string;
+      /**
+       * Additional Options to pass through into the graphile schema building
+       * system (received via the second argument of a plugin).
+       */
+      graphileBuildOptions?: Partial<GraphileEngine.GraphileBuildOptions>;
+      /**
+       * @deprecated Use graphileBuildOptions instead
+       */
+      graphqlBuildOptions?: Partial<GraphileEngine.GraphileBuildOptions>;
+      replaceAllPlugins?: Array<GraphileEngine.Plugin>;
+      appendPlugins?: Array<GraphileEngine.Plugin>;
+      /**
+       * @deprecated Use `appendPlugins` with dependencies instead.
+       */
+      prependPlugins?: Array<GraphileEngine.Plugin>;
+      skipPlugins?: Array<GraphileEngine.Plugin>;
+      jwtPgTypeIdentifier?: string;
+      jwtSecret?: Secret;
+      jwtSignOptions?: SignOptions;
+      /**
+       * @deprecated UNSUPPORTED! Use an inflector plugin instead.
+       */
+      inflector?: Inflector;
+      /**
+       * @deprecated Use smart comments/tags instead
+       */
+      pgColumnFilter?: <TContext extends GraphileEngine.Context>(
+        attr: mixed,
+        build: GraphileEngine.Build,
+        context: TContext,
+      ) => boolean;
 
-  /**
-   * @deprecated Use '\@primaryKey' smart comment instead
-   */
-  viewUniqueKey?: string;
-  enableTags?: boolean;
-  readCache?: string | object;
-  writeCache?: string;
-  setWriteCacheCallback?: (fn: () => Promise<void>) => void;
-  legacyRelations?: "only" | "deprecated" | "omit";
-  setofFunctionsContainNulls?: boolean;
-  legacyJsonUuid?: boolean;
-  simpleCollections?: "only" | "both" | "omit";
-  includeExtensionResources?: boolean;
-  ignoreRBAC?: boolean;
-  legacyFunctionsOnly?: boolean;
-  ignoreIndexes?: boolean;
-  hideIndexWarnings?: boolean;
-  subscriptions?: boolean;
-  live?: boolean;
-  ownerConnectionString?: string;
+      /**
+       * @deprecated Use '\@primaryKey' smart comment instead
+       */
+      viewUniqueKey?: string;
+      enableTags?: boolean;
+      readCache?: string | object;
+      writeCache?: string;
+      setWriteCacheCallback?: (fn: () => Promise<void>) => void;
+      legacyRelations?: "only" | "deprecated" | "omit";
+      setofFunctionsContainNulls?: boolean;
+      legacyJsonUuid?: boolean;
+      simpleCollections?: "only" | "both" | "omit";
+      includeExtensionResources?: boolean;
+      ignoreRBAC?: boolean;
+      legacyFunctionsOnly?: boolean;
+      ignoreIndexes?: boolean;
+      hideIndexWarnings?: boolean;
+      subscriptions?: boolean;
+      live?: boolean;
+      ownerConnectionString?: string;
+    }
+  }
 }
 
 type PgConfig = Pool | PoolClient | string;
 
 export const PostGraphileInflectionPlugin = function (builder: SchemaBuilder) {
-  builder.hook("inflection", (inflection: Inflection) => {
+  builder.hook("inflection", (inflection: GraphileEngine.Inflection) => {
     const previous = inflection.enumName;
     // Overwrite directly so that we don't lose the 'extend' hints
     Object.assign(inflection, {
@@ -123,12 +108,12 @@ export const PostGraphileInflectionPlugin = function (builder: SchemaBuilder) {
     });
     return inflection;
   });
-} as Plugin;
+} as GraphileEngine.Plugin;
 
 export const PostGraphileClassicIdsInflectionPlugin = function (
   builder: SchemaBuilder,
 ) {
-  builder.hook("inflection", (inflection: Inflection) => {
+  builder.hook("inflection", (inflection: GraphileEngine.Inflection) => {
     const previous = inflection._columnName;
     // Overwrite directly so that we don't lose the 'extend' hints
     Object.assign(inflection, {
@@ -141,7 +126,7 @@ export const PostGraphileClassicIdsInflectionPlugin = function (
     });
     return inflection;
   });
-} as Plugin;
+} as GraphileEngine.Plugin;
 
 const awaitKeys = async (obj: { [key: string]: Promise<any> }) => {
   const result = {};
@@ -156,7 +141,7 @@ const awaitKeys = async (obj: { [key: string]: Promise<any> }) => {
 export const getPostGraphileBuilder = async (
   pgConfig: PgConfig,
   schemas: string | Array<string>,
-  options: PostGraphileCoreOptions = {},
+  options: GraphileEngine.PostGraphileCoreOptions = {},
 ) => {
   // @ts-ignore
   if (options.inflector) {
@@ -335,7 +320,7 @@ export const getPostGraphileBuilder = async (
     (pluginToSkip) => basePluginList.indexOf(pluginToSkip) < 0,
   );
   if (invalidSkipPlugins.length) {
-    function getFunctionName(fn: Plugin) {
+    function getFunctionName(fn: GraphileEngine.Plugin) {
       return fn.displayName || fn.name || String(fn);
     }
     throw new Error(
@@ -399,7 +384,7 @@ function abort(e: Error) {
 export const createPostGraphileSchema = async (
   pgConfig: PgConfig,
   schemas: Array<string> | string,
-  options: PostGraphileCoreOptions = {},
+  options: GraphileEngine.PostGraphileCoreOptions = {},
 ) => {
   let writeCache: undefined | (() => Promise<void>);
   const builder = await getPostGraphileBuilder(pgConfig, schemas, {
@@ -421,8 +406,8 @@ export const createPostGraphileSchema = async (
 export const watchPostGraphileSchema = async (
   pgConfig: PgConfig,
   schemas: Array<string> | string,
-  options: PostGraphileCoreOptions = {},
-  onNewSchema: SchemaListener,
+  options: GraphileEngine.PostGraphileCoreOptions = {},
+  onNewSchema: GraphileEngine.SchemaListener,
 ) => {
   if (typeof onNewSchema !== "function") {
     throw new Error(

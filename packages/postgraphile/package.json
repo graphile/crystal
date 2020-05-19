@@ -44,6 +44,7 @@
   },
   "dependencies": {
     "@graphile/lru": "4.6.0-alpha.0",
+    "@types/body-parser": "^1.19.0",
     "@types/json5": "^0.0.30",
     "@types/jsonwebtoken": "^8.5.0",
     "@types/koa": "^2.11.3",

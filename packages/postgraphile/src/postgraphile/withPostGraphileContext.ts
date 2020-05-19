@@ -10,10 +10,7 @@ import {
   WithPostGraphileContextOptions,
   GraphileClaims,
 } from "../interfaces";
-import {
-  formatSQLForDebugging,
-  GraphileResolverContext,
-} from "postgraphile-core";
+import { formatSQLForDebugging } from "postgraphile-core";
 
 const undefinedIfEmpty = (
   o?: Array<string | RegExp> | string | RegExp,
@@ -22,7 +19,9 @@ const undefinedIfEmpty = (
 
 export type WithPostGraphileContextFn<TResult = ExecutionResult> = (
   options: WithPostGraphileContextOptions,
-  callback: (context: GraphileResolverContext) => Promise<TResult> | TResult,
+  callback: (
+    context: GraphileEngine.GraphileResolverContext,
+  ) => Promise<TResult> | TResult,
 ) => Promise<TResult>;
 
 const debugPg = createDebugger("postgraphile:postgres");
@@ -73,7 +72,9 @@ function simpleWithPgClient(pgPool: Pool) {
 
 const withDefaultPostGraphileContext = async <TResult = ExecutionResult>(
   options: WithPostGraphileContextOptions,
-  callback: (context: GraphileResolverContext) => Promise<TResult> | TResult,
+  callback: (
+    context: GraphileEngine.GraphileResolverContext,
+  ) => Promise<TResult> | TResult,
 ): Promise<TResult> => {
   const {
     pgPool,
@@ -293,7 +294,9 @@ const withDefaultPostGraphileContext = async <TResult = ExecutionResult>(
  */
 async function withPostGraphileContext<TResult = ExecutionResult>(
   options: WithPostGraphileContextOptions,
-  callback: (context: GraphileResolverContext) => Promise<TResult> | TResult,
+  callback: (
+    context: GraphileEngine.GraphileResolverContext,
+  ) => Promise<TResult> | TResult,
 ): Promise<TResult> {
   const pluginHook = pluginHookFromOptions(options);
   const withContext = pluginHook(
@@ -435,7 +438,7 @@ async function getSettingsForPgClientTransaction({
   const localSettings: Array<[string, string]> = [];
 
   // Set the custom provided settings before jwt claims and role are set
-  // this prevents an accidentional overwriting
+  // this prevents an accidental overwriting
   if (pgSettings && typeof pgSettings === "object") {
     for (const key in pgSettings) {
       if (
@@ -499,7 +502,7 @@ declare module "pg" {
 }
 
 /**
- * Adds debug logging funcionality to a Postgres client.
+ * Adds debug logging functionality to a Postgres client.
  */
 // tslint:disable no-any
 export function debugPgClient(

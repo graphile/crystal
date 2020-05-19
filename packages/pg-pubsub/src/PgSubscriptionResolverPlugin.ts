@@ -1,5 +1,4 @@
 import debugFactory from "debug";
-import { Plugin } from "graphile-build";
 import { PubSub, withFilter } from "graphql-subscriptions";
 
 const debug = debugFactory("pg-pubsub");
@@ -13,7 +12,10 @@ function isPubSub(pubsub: any): pubsub is PubSub {
  * `subscribe` method.
  */
 
-const PgSubscriptionResolverPlugin: Plugin = function (builder, { pubsub }) {
+const PgSubscriptionResolverPlugin: GraphileEngine.Plugin = function (
+  builder,
+  { pubsub },
+) {
   if (!isPubSub(pubsub)) {
     debug("Subscriptions disabled - no pubsub provided");
     return;

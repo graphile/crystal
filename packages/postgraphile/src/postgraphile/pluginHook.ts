@@ -1,6 +1,6 @@
 import { AddFlagFn } from "./cli";
 import { Server, IncomingMessage } from "http";
-import { HttpRequestHandler, PostGraphileOptions } from "../interfaces";
+import { HttpRequestHandler } from "../interfaces";
 import { WithPostGraphileContextFn } from "./withPostGraphileContext";
 // @ts-ignore
 import { version } from "../../package.json";
@@ -45,14 +45,14 @@ export interface PostGraphilePlugin {
   "cli:flags:add:workarounds"?: HookFn<AddFlagFn>;
   // tslint:disable-next-line no-any
   "cli:library:options"?: HookFn<
-    PostGraphileOptions,
+    GraphileEngine.PostGraphileOptions,
     { config: any; cliOptions: any }
   >;
   "cli:server:middleware"?: HookFn<HttpRequestHandler>;
   "cli:server:created"?: HookFn<Server>;
   "cli:greeting"?: HookFn<Array<string | null | void>>;
 
-  "postgraphile:options"?: HookFn<PostGraphileOptions>;
+  "postgraphile:options"?: HookFn<GraphileEngine.PostGraphileOptions>;
   "postgraphile:validationRules:static"?: HookFn<typeof graphql.specifiedRules>;
   "postgraphile:graphiql:html"?: HookFn<string>;
   "postgraphile:http:handler"?: HookFn<IncomingMessage>;
@@ -176,7 +176,7 @@ export function makePluginHook(
 }
 
 export function pluginHookFromOptions(
-  options: PostGraphileOptions,
+  options: GraphileEngine.PostGraphileOptions,
 ): PluginHookFn {
   if (typeof options.pluginHook === "function") {
     return options.pluginHook;

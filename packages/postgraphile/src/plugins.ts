@@ -1,17 +1,16 @@
 import { readFileSync, Stats, readFile, watchFile, unwatchFile } from "fs";
 import { makeJSONPgSmartTagsPlugin, JSONPgSmartTags } from "graphile-utils";
 import * as JSON5 from "json5";
-import { Plugin } from "postgraphile-core";
 
 export const makePgSmartTagsFromFilePlugin = (
   tagsFile = process.cwd() + "/postgraphile.tags.json5",
-): Plugin => {
+): GraphileEngine.Plugin => {
   /*
    * We're wrapping the `smartTagsPlugin` defined below with a plugin wrapper
    * so that any errors from reading the smart tags file are thrown when the
    * plugin is *loaded* rather than from when it is defined.
    */
-  const plugin: Plugin = (builder, options) => {
+  const plugin: GraphileEngine.Plugin = (builder, options) => {
     function handleTagsError(err: Error): void {
       console.error(
         `Failed to process smart tags file '${tagsFile}': ${err.message}`,

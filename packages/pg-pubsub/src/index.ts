@@ -9,16 +9,15 @@ import { PoolClient } from "pg";
 const RECONNECT_BASE_DELAY = 100;
 const RECONNECT_MAX_DELAY = 30000;
 
-declare module "postgraphile" {
-  interface PostGraphileOptions {
-    simpleSubscriptions?: boolean;
-    subscriptionAuthorizationFunction?: string;
-  }
-}
-
-declare module "graphile-build" {
-  interface Options {
-    pubsub: PubSub;
+declare global {
+  namespace GraphileEngine {
+    interface PostGraphileOptions {
+      simpleSubscriptions?: boolean;
+      subscriptionAuthorizationFunction?: string;
+    }
+    interface GraphileBuildOptions {
+      pubsub?: PubSub;
+    }
   }
 }
 

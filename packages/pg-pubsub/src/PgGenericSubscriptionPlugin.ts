@@ -1,32 +1,28 @@
 import debugFactory from "debug";
-import {
-  Plugin,
-  GraphileObjectTypeConfig,
-  ScopeGraphQLObjectTypeFieldsField,
-  Inflection,
-} from "graphile-build";
 import { PubSub } from "graphql-subscriptions";
 import "graphile-build-pg"; // For the types
 
-declare module "graphile-build" {
-  interface GraphileBuildOptions {
-    pubsub?: PubSub;
-    pgSubscriptionPrefix?: string;
-    pgSubscriptionAuthorizationFunction?: string;
-  }
+declare global {
+  namespace GraphileEngine {
+    interface GraphileBuildOptions {
+      pubsub?: PubSub;
+      pgSubscriptionPrefix?: string;
+      pgSubscriptionAuthorizationFunction?: string;
+    }
 
-  interface Inflection {
-    listen(): string;
-    listenPayload(): string;
-  }
+    interface Inflection {
+      listen(): string;
+      listenPayload(): string;
+    }
 
-  interface ScopeGraphQLObjectType {
-    isPgGenericSubscriptionPayloadType?: boolean;
-  }
+    interface ScopeGraphQLObjectType {
+      isPgGenericSubscriptionPayloadType?: boolean;
+    }
 
-  interface ScopeGraphQLObjectTypeFieldsField {
-    isPgGenericSubscriptionPayloadRelatedNodeField?: boolean;
-    isPgGenericSubscriptionRootField?: boolean;
+    interface ScopeGraphQLObjectTypeFieldsField {
+      isPgGenericSubscriptionPayloadRelatedNodeField?: boolean;
+      isPgGenericSubscriptionRootField?: boolean;
+    }
   }
 }
 
@@ -39,7 +35,7 @@ function isPubSub(pubsub: any): pubsub is PubSub {
   return !!pubsub;
 }
 
-const PgGenericSubscriptionPlugin: Plugin = function (
+const PgGenericSubscriptionPlugin: GraphileEngine.Plugin = function (
   builder,
   {
     pubsub,
@@ -58,10 +54,10 @@ const PgGenericSubscriptionPlugin: Plugin = function (
       build.extend(
         inflection,
         {
-          listen(this: Inflection) {
+          listen(this: GraphileEngine.Inflection) {
             return "listen";
           },
-          listenPayload(this: Inflection) {
+          listenPayload(this: GraphileEngine.Inflection) {
             return this.upperCamelCase(`${this.listen()}-payload`);
           },
         },
@@ -106,10 +102,10 @@ const PgGenericSubscriptionPlugin: Plugin = function (
         throw new Error("Failed to load Query type");
       }
 
-      const scope: ScopeGraphQLObjectTypeFieldsField = {
+      const scope: GraphileEngine.ScopeGraphQLObjectTypeFieldsField = {
         isPgGenericSubscriptionPayloadRelatedNodeField: true,
       };
-      const spec: GraphileObjectTypeConfig<any, any> = {
+      const spec: GraphileEngine.GraphileObjectTypeConfig<any, any> = {
         name: inflection.listenPayload(),
         fields: () => ({
           query: {
@@ -165,7 +161,7 @@ const PgGenericSubscriptionPlugin: Plugin = function (
       });
 
       const listen = inflection.listen();
-      const listenScope: ScopeGraphQLObjectTypeFieldsField = {
+      const listenScope: GraphileEngine.ScopeGraphQLObjectTypeFieldsField = {
         isPgGenericSubscriptionRootField: true,
       };
 
