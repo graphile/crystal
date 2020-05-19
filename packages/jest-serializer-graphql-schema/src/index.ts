@@ -10,4 +10,4 @@ const GraphQLSchemaSnapshotSerializer: Plugin = {
   },
 };
 
-module.exports = GraphQLSchemaSnapshotSerializer;
+export default GraphQLSchemaSnapshotSerializer;

@@ -35,7 +35,11 @@
     "tslib": "^2.0.0",
     "ws": "^7.3.0"
   },
+  "peerDependencies": {
+    "graphile-build": "4.7.0"
+  },
   "devDependencies": {
+    "graphile-build": "4.7.0",
     "graphql": "^15.0.0",
     "graphql-parse-resolve-info": "4.7.0",
     "pg": "^8.2.1",

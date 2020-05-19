@@ -27,6 +27,7 @@
     "graphql": "^15.0.0"
   },
   "devDependencies": {
+    "graphql": "^15.0.0",
     "pretty-format": "^26.0.1"
   },
   "files": [
