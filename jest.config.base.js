@@ -1,9 +1,8 @@
-module.exports = dir => {
+module.exports = (dir) => {
   const packageJson = require(`${dir}/package.json`);
 
   return {
     testEnvironment: "node",
-    browser: false,
     transform: {
       "^.+\\.tsx?$": "babel-jest",
     },
