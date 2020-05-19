@@ -4,12 +4,14 @@ module.exports = (dir) => {
   return {
     testEnvironment: "node",
     transform: {
-      "^.+\\.tsx?$": "babel-jest",
+      "^.+\\.tsx?$": require.resolve("ts-jest"),
     },
     testMatch: ["<rootDir>/**/__tests__/**/*.test.[jt]s?(x)"],
     moduleFileExtensions: ["js", "json", "jsx", "ts", "tsx", "node"],
     roots: [`<rootDir>`],
-    snapshotSerializers: ["jest-serializer-graphql-schema"],
+    snapshotSerializers: [
+      `${__dirname}/packages/jest-serializer-graphql-schema`,
+    ],
 
     rootDir: dir,
     name: packageJson.name,
