@@ -1638,6 +1638,7 @@ __metadata:
     "@graphile/lds": 4.7.0
     "@types/ws": ^7.2.4
     graphile-build: 4.7.0
+    graphile-build-pg: 4.7.0
     graphql: ^15.0.0
     graphql-parse-resolve-info: 4.7.0
     pg: ^8.2.1
@@ -1647,6 +1648,7 @@ __metadata:
     ws: ^7.3.0
   peerDependencies:
     graphile-build: 4.7.0
+    graphile-build-pg: 4.7.0
   languageName: unknown
   linkType: soft
 

@@ -8,7 +8,7 @@
     "posttest": "lerna run posttest",
     "prepack:all": "scripts/prepack-all",
     "watch": "yarn workspace postgraphile prebuild && tsc -b --watch",
-    "clean": "jest --clearCache && rm -Rf packages/*/dist packages/*/tsconfig.tsbuildinfo",
+    "clean": "jest --clearCache && rm -Rf 'packages/*/dist' 'packages/*/tsconfig.tsbuildinfo'",
     "changelog": "(cat scripts/CHANGELOG_HEADER.md; npx conventional-changelog -p angular --release-count 0) > CHANGELOG.md",
     "version": "yarn run changelog && git add CHANGELOG.md",
     "-----": "-----",
