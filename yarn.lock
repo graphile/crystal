@@ -1598,6 +1598,8 @@ __metadata:
 "@graphile/lru@4.6.0-alpha.0, @graphile/lru@workspace:packages/lru":
   version: 0.0.0-use.local
   resolution: "@graphile/lru@workspace:packages/lru"
+  dependencies:
+    tslib: ^2.0.0
   languageName: unknown
   linkType: soft
 
@@ -10072,6 +10074,7 @@ fsevents@^1.2.7:
     "@types/node": ^14.0.1
     debug: ^4.2.0
     eslint_d: ^8.1.1
+    graphql: ^15.0.0
     tslib: ^2.0.0
   peerDependencies:
     graphql: ^15.0.0
@@ -16668,6 +16671,7 @@ fsevents@^1.2.7:
   version: 0.0.0-use.local
   resolution: "postgraphiql@workspace:packages/postgraphiql"
   dependencies:
+    "@babel/runtime": ^7.9.6
     "@typescript-eslint/eslint-plugin": ^2.34.0
     "@typescript-eslint/parser": ^2.34.0
     babel-eslint: ^10.0.0
