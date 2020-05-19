@@ -20,7 +20,7 @@ export default function makeAddPgTableOrderByPlugin(
   hint = `Adding orders with makeAddPgTableOrderByPlugin to "${schemaName}"."${tableName}"`,
 ) {
   const displayName = `makeAddPgTableOrderByPlugin_${schemaName}_${tableName}`;
-  const plugin: Plugin = builder => {
+  const plugin: Plugin = (builder) => {
     builder.hook("GraphQLEnumType:values", (values, build, context) => {
       const { extend } = build;
       const {

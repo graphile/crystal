@@ -32,7 +32,7 @@ const dSchemaComments = () =>
 
 beforeAll(() => {
   // Get a few GraphQL schema instance that we can query.
-  const gqlSchemasPromise = withPgClient(async pgClient => {
+  const gqlSchemasPromise = withPgClient(async (pgClient) => {
     const serverVersionNum = await getServerVersionNum(pgClient);
     // A selection of omit/rename comments on the d schema
     await pgClient.query(await dSchemaComments());
@@ -83,7 +83,7 @@ beforeAll(() => {
       }),
       createPostGraphileSchema(pgClient, ["a", "b", "c"], {
         subscriptions: true,
-        pgColumnFilter: attr => attr.name !== "headline",
+        pgColumnFilter: (attr) => attr.name !== "headline",
         setofFunctionsContainNulls: false,
       }),
       createPostGraphileSchema(pgClient, ["a", "b", "c"], {
@@ -156,7 +156,7 @@ beforeAll(() => {
     // before we can do anything else!
     const gqlSchemas = await gqlSchemasPromise;
     // Get a new Postgres client instance.
-    return await withPgClient(async pgClient => {
+    return await withPgClient(async (pgClient) => {
       // Add data to the client instance we are using.
       await pgClient.query(await kitchenSinkData());
       const serverVersionNum = await getServerVersionNum(pgClient);
@@ -170,7 +170,7 @@ beforeAll(() => {
           results.push(Promise.resolve());
           continue;
         }
-        const process = async fileName => {
+        const process = async (fileName) => {
           if (fileName.startsWith("pg10.")) {
             if (serverVersionNum < 100000) {
               console.log("Skipping test as PG version is less than 10");
@@ -235,7 +235,7 @@ beforeAll(() => {
             });
             if (result.errors) {
               // eslint-disable-next-line no-console
-              console.log(result.errors.map(e => e.originalError || e));
+              console.log(result.errors.map((e) => e.originalError || e));
             }
             return result;
           } finally {

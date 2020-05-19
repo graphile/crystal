@@ -151,9 +151,7 @@ const hashCache = new LRU({ maxLength: 100000 });
 function hashFieldAlias(str: string) {
   const precomputed = hashCache.get(str);
   if (precomputed) return precomputed;
-  const hash = createHash("sha1")
-    .update(str)
-    .digest("hex");
+  const hash = createHash("sha1").update(str).digest("hex");
   hashCache.set(str, hash);
   return hash;
 }
@@ -295,7 +293,7 @@ const knownTypes = [
   GraphQLUnionType,
 ];
 
-const knownTypeNames = knownTypes.map(k => k.name);
+const knownTypeNames = knownTypes.map((k) => k.name);
 
 /**
  * In v4 if you're not using TypeScript we allow users to return arrays of the
@@ -319,9 +317,9 @@ function ensureArray<T>(val: null | T | Array<T>): void | Array<T> {
 let ensureName: (fn: {
   (...args: any[]): any;
   displayName?: string;
-}) => void = _fn => {};
+}) => void = (_fn) => {};
 if (["development", "test"].indexOf(process.env.NODE_ENV || "") >= 0) {
-  ensureName = fn => {
+  ensureName = (fn) => {
     // $FlowFixMe: displayName
     if (isDev && !fn.displayName && !fn.name && debug.enabled) {
       // eslint-disable-next-line no-console

@@ -114,8 +114,8 @@ export function makePgSmartTagsPlugin(
   const plugin: Plugin = (builder, _options) => {
     if (subscribeToUpdatesCallback) {
       builder.registerWatcher(
-        async triggerRebuild => {
-          await subscribeToUpdatesCallback(newRuleOrRules => {
+        async (triggerRebuild) => {
+          await subscribeToUpdatesCallback((newRuleOrRules) => {
             [rules, rawRules] = rulesFrom(newRuleOrRules);
             triggerRebuild();
           });
@@ -128,10 +128,12 @@ export function makePgSmartTagsPlugin(
 
     builder.hook(
       "build",
-      build => {
+      (build) => {
         const oldPgAugmentIntrospectionResults =
           build.pgAugmentIntrospectionResults;
-        const newPgAugmentIntrospectionResults: PgAugmentIntrospectionResultsFn = inIntrospectionResult => {
+        const newPgAugmentIntrospectionResults: PgAugmentIntrospectionResultsFn = (
+          inIntrospectionResult,
+        ) => {
           let pgIntrospectionResultsByKind = inIntrospectionResult;
           if (oldPgAugmentIntrospectionResults) {
             pgIntrospectionResultsByKind = oldPgAugmentIntrospectionResults(
@@ -154,7 +156,7 @@ export function makePgSmartTagsPlugin(
               pgIntrospectionResultsByKind[rule.kind];
 
             let hits = 0;
-            relevantIntrospectionResults.forEach(entity => {
+            relevantIntrospectionResults.forEach((entity) => {
               if (!rule.match(entity, buildWithIntrospection)) {
                 return;
               }
@@ -399,11 +401,11 @@ export function makeJSONPgSmartTagsPlugin(
 
   // Wrap listener callback with JSON conversion
   const subscribeToUpdatesCallback: SubscribeToPgSmartTagUpdatesCallback | null = subscribeToJSONUpdatesCallback
-    ? cb => {
+    ? (cb) => {
         if (!cb) {
           return subscribeToJSONUpdatesCallback(cb);
         } else {
-          return subscribeToJSONUpdatesCallback(json => {
+          return subscribeToJSONUpdatesCallback((json) => {
             try {
               rules = pgSmartTagRulesFromJSON(json);
               return cb(rules);

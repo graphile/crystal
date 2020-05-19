@@ -33,7 +33,7 @@ function MyRandomFieldPlugin(
   });
 }
 
-(async function() {
+(async function () {
   // Create our GraphQL schema by applying all the plugins
   const schema = await buildSchema([...defaultPlugins, MyRandomFieldPlugin], {
     // ... options
@@ -53,7 +53,7 @@ function MyRandomFieldPlugin(
     {},
   );
   console.log(result); // { data: { random: 4 } }
-})().catch(e => {
+})().catch((e) => {
   console.error(e);
   process.exit(1);
 });

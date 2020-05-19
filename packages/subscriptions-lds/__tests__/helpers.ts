@@ -24,7 +24,7 @@ export async function withClient<T = void>(
 }
 
 export async function query(text: string, values: Array<any> = []) {
-  return withClient(DATABASE_URL, pgClient => pgClient.query(text, values));
+  return withClient(DATABASE_URL, (pgClient) => pgClient.query(text, values));
 }
 
 export async function withLiveSource<T = void>(
@@ -45,7 +45,7 @@ export async function withLiveSource<T = void>(
 export async function withLiveSourceAndClient<T = void>(
   callback: (ls: LDSLiveSource, pgClient: PoolClient) => Promise<T>,
 ): Promise<T> {
-  return withClient(DATABASE_URL, pgClient =>
-    withLiveSource(liveSource => callback(liveSource, pgClient)),
+  return withClient(DATABASE_URL, (pgClient) =>
+    withLiveSource((liveSource) => callback(liveSource, pgClient)),
   );
 }

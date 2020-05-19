@@ -59,7 +59,7 @@ function simpleWithPgClient(pgPool: Pool) {
   if (cached) {
     return cached;
   }
-  const func: WithAuthenticatedPgClientFunction = async cb => {
+  const func: WithAuthenticatedPgClientFunction = async (cb) => {
     const pgClient = await pgPool.connect();
     try {
       return await cb(pgClient);
@@ -164,7 +164,7 @@ const withDefaultPostGraphileContext = async <TResult = ExecutionResult>(
   // Now we've caught as many errors as we can at this stage, let's create a DB connection.
   const withAuthenticatedPgClient: WithAuthenticatedPgClientFunction = !needTransaction
     ? simpleWithPgClient(pgPool)
-    : async cb => {
+    : async (cb) => {
         // Connect a new Postgres client
         const pgClient = await pgPool.connect();
 
@@ -226,7 +226,7 @@ const withDefaultPostGraphileContext = async <TResult = ExecutionResult>(
           );
         }
         // Generate an authenticated client on the fly
-        return withAuthenticatedPgClient(pgClient =>
+        return withAuthenticatedPgClient((pgClient) =>
           pgClient.query(textOrQueryOptions, values),
         );
       },
@@ -238,7 +238,7 @@ const withDefaultPostGraphileContext = async <TResult = ExecutionResult>(
       jwtClaims,
     });
   } else {
-    return withAuthenticatedPgClient(async pgClient => {
+    return withAuthenticatedPgClient(async (pgClient) => {
       let results: Promise<Array<ExplainResult>> | null = null;
       if (explain) {
         pgClient.startExplain();
@@ -525,7 +525,7 @@ export function debugPgClient(
       }
       return (
         await Promise.all(
-          results.map(async r => {
+          results.map(async (r) => {
             const { result: resultPromise, ...rest } = r;
             const result = await resultPromise;
             const firstKey = result && result[0] && Object.keys(result[0])[0];
@@ -557,7 +557,7 @@ export function debugPgClient(
 
     if (debugPg.enabled || debugPgNotice.enabled || allowExplain) {
       // tslint:disable-next-line only-arrow-functions
-      pgClient.query = function(...args: Array<any>): any {
+      pgClient.query = function (...args: Array<any>): any {
         const [a, b, c] = args;
         // If we understand it (and it uses the promises API)
         if (

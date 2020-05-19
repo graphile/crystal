@@ -40,7 +40,7 @@ const withPgClient = (url, fn) => {
     fn = url;
     url = process.env.TEST_DATABASE_URL;
   }
-  return withTransactionlessPgClient(url, async client => {
+  return withTransactionlessPgClient(url, async (client) => {
     await client.query("begin");
     try {
       await client.query("set local timezone to '+04:00'");
@@ -52,13 +52,13 @@ const withPgClient = (url, fn) => {
 };
 
 const transactionlessQuery = (query, variables) => {
-  return withTransactionlessPgClient(pgClient =>
+  return withTransactionlessPgClient((pgClient) =>
     pgClient.query(query, variables),
   );
 };
 
 const withDbFromUrl = async (url, fn) => {
-  return withPgClient(url, async client => {
+  return withPgClient(url, async (client) => {
     try {
       await client.query("BEGIN ISOLATION LEVEL SERIALIZABLE;");
       return fn(client);
@@ -68,18 +68,18 @@ const withDbFromUrl = async (url, fn) => {
   });
 };
 
-const withRootDb = fn => withDbFromUrl(process.env.TEST_DATABASE_URL, fn);
+const withRootDb = (fn) => withDbFromUrl(process.env.TEST_DATABASE_URL, fn);
 
 let prepopulatedDBKeepalive;
 
-const populateDatabase = async client => {
+const populateDatabase = async (client) => {
   await client.query(
     await readFilePromise(`${__dirname}/kitchen-sink-data.sql`, "utf8"),
   );
   return {};
 };
 
-const withPrepopulatedDb = async fn => {
+const withPrepopulatedDb = async (fn) => {
   if (!prepopulatedDBKeepalive) {
     throw new Error("You must call setup and teardown to use this");
   }
@@ -104,7 +104,7 @@ const withPrepopulatedDb = async fn => {
   }
 };
 
-withPrepopulatedDb.setup = done => {
+withPrepopulatedDb.setup = (done) => {
   if (prepopulatedDBKeepalive) {
     throw new Error("There's already a prepopulated DB running");
   }
@@ -116,7 +116,7 @@ withPrepopulatedDb.setup = done => {
   });
   prepopulatedDBKeepalive.resolve = res;
   prepopulatedDBKeepalive.reject = rej;
-  withRootDb(async client => {
+  withRootDb(async (client) => {
     prepopulatedDBKeepalive.client = client;
     try {
       prepopulatedDBKeepalive.vars = await populateDatabase(client);

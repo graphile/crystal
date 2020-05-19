@@ -7,7 +7,7 @@ import { agent as Agent } from "superagent";
 import * as http from "http";
 import Test from "./test";
 
-const methods = http.METHODS.map(m => m.toLowerCase());
+const methods = http.METHODS.map((m) => m.toLowerCase());
 
 /**
  * Initialize a new `TestAgent`.
@@ -33,14 +33,14 @@ function TestAgent(app: http.RequestListener | http.Server, options: any) {
 Object.setPrototypeOf(TestAgent.prototype, Agent.prototype);
 
 // set a host name
-TestAgent.prototype.host = function(host: any) {
+TestAgent.prototype.host = function (host: any) {
   this._host = host;
   return this;
 };
 
 // override HTTP verb methods
-methods.forEach(method => {
-  TestAgent.prototype[method] = function(url: any, _fn: any) {
+methods.forEach((method) => {
+  TestAgent.prototype[method] = function (url: any, _fn: any) {
     // eslint-disable-line no-unused-vars
     let req = new Test(this.app, method.toUpperCase(), url, this._host);
     req.ca(this._ca);

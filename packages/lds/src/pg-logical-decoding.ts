@@ -3,7 +3,7 @@ import { Pool, PoolClient } from "pg";
 import { EventEmitter } from "events";
 import FatalError from "./fatal-error";
 
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 declare module "pg" {
   interface ClientConfig {
@@ -238,7 +238,7 @@ export default class PgLogicalDecoding extends EventEmitter {
       return this.client;
     }
     this.client = this.pool.connect();
-    return this.client.catch(e => {
+    return this.client.catch((e) => {
       this.client = null;
       return Promise.reject(e);
     });
@@ -247,7 +247,7 @@ export default class PgLogicalDecoding extends EventEmitter {
   private onPoolError = (err: Error) => {
     if (this.client) {
       this.client
-        .then(c => c.release(err))
+        .then((c) => c.release(err))
         .catch(() => {
           // noop
         });

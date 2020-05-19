@@ -77,7 +77,7 @@ export default (async function PgAllRows(
           const isView = (t: PgClass) => t.classKind === "v";
           const viewUniqueKey = table.tags.uniqueKey || pgViewUniqueKey;
           const uniqueIdAttribute = viewUniqueKey
-            ? attributes.find(attr => attr.name === viewUniqueKey)
+            ? attributes.find((attr) => attr.name === viewUniqueKey)
             : undefined;
           if (isView && table.tags.uniqueKey && !uniqueIdAttribute) {
             throw new Error(
@@ -131,11 +131,11 @@ export default (async function PgAllRows(
                         withPaginationAsFields: isConnection,
                       },
 
-                      queryBuilder => {
+                      (queryBuilder) => {
                         if (subscriptions) {
                           queryBuilder.makeLiveCollection(
                             table,
-                            _checkerGenerator => {
+                            (_checkerGenerator) => {
                               checkerGenerator = _checkerGenerator;
                             },
                           );
@@ -151,7 +151,7 @@ export default (async function PgAllRows(
                                 "primary_key_asc",
                               ];
 
-                              primaryKeys.forEach(key => {
+                              primaryKeys.forEach((key) => {
                                 queryBuilder.orderBy(
                                   sql`${queryBuilder.getTableAlias()}.${sql.identifier(
                                     key.name,
@@ -217,7 +217,7 @@ export default (async function PgAllRows(
                         liveRecord
                       ) {
                         result.rows.forEach(
-                          row =>
+                          (row) =>
                             row && liveRecord("pg", table, row.__identifiers),
                         );
                       }

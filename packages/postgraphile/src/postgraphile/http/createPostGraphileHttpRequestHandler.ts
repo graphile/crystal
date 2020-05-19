@@ -67,7 +67,7 @@ const JS_ESCAPE_LOOKUP = {
 function safeJSONStringify(obj: {}) {
   return JSON.stringify(obj).replace(
     /[<>/\u2028\u2029]/g,
-    chr => JS_ESCAPE_LOOKUP[chr],
+    (chr) => JS_ESCAPE_LOOKUP[chr],
   );
 }
 
@@ -83,9 +83,7 @@ let lastHash: string;
 const calculateQueryHash = (queryString: string): string => {
   if (queryString !== lastString) {
     lastString = queryString;
-    lastHash = createHash("sha1")
-      .update(queryString)
-      .digest("base64");
+    lastHash = createHash("sha1").update(queryString).digest("base64");
   }
   return lastHash;
 };
@@ -149,7 +147,7 @@ function withPostGraphileContextFromReqResGenerator(
         explain: allowExplain && req.headers["x-postgraphile-explain"] === "on",
         ...moreOptions,
       },
-      context => {
+      (context) => {
         const graphqlContext = additionalContext
           ? { ...additionalContext, ...context }
           : context;
@@ -221,7 +219,7 @@ export default function createPostGraphileHttpRequestHandler(
     pgSettings &&
     typeof pgSettings === "object" &&
     Object.keys(pgSettings)
-      .map(s => s.toLowerCase())
+      .map((s) => s.toLowerCase())
       .includes("role")
   ) {
     throw new Error(
@@ -316,7 +314,7 @@ export default function createPostGraphileHttpRequestHandler(
       next: (err?: Error) => void,
     ) => void) => {
       return (req, res, next) => {
-        parent(req, res, error => {
+        parent(req, res, (error) => {
           if (error) {
             return next(error);
           }
@@ -487,7 +485,7 @@ export default function createPostGraphileHttpRequestHandler(
   let theOneAndOnlyGraphQLSchema: GraphQLSchema | null = null;
   if (!watchPg) {
     getGqlSchema()
-      .then(schema => {
+      .then((schema) => {
         theOneAndOnlyGraphQLSchema = schema;
       })
       .catch(noop);
@@ -821,9 +819,7 @@ export default function createPostGraphileHttpRequestHandler(
               if (debugGraphql.enabled)
                 debugGraphql(
                   "%s",
-                  printGraphql(queryDocumentAst)
-                    .replace(/\s+/g, " ")
-                    .trim(),
+                  printGraphql(queryDocumentAst).replace(/\s+/g, " ").trim(),
                 );
 
               result = await withPostGraphileContextFromReqRes(
@@ -847,7 +843,7 @@ export default function createPostGraphileHttpRequestHandler(
                   );
                   const { getExplainResults } = graphqlContext;
                   if (typeof getExplainResults === "function") {
-                    return Promise.resolve(graphqlResult).then(async obj => ({
+                    return Promise.resolve(graphqlResult).then(async (obj) => ({
                       ...obj,
                       // Add our explain data
                       explain: await getExplainResults(),

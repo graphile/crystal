@@ -6,14 +6,14 @@ export default function printSchemaOrdered(originalSchema) {
   const schema = buildASTSchema(parse(printSchema(originalSchema)));
 
   const typeMap = schema.getTypeMap();
-  Object.keys(typeMap).forEach(name => {
+  Object.keys(typeMap).forEach((name) => {
     const gqlType = typeMap[name];
 
     // Object?
     if (gqlType.getFields) {
       const fields = gqlType.getFields();
       const keys = Object.keys(fields).sort();
-      keys.forEach(key => {
+      keys.forEach((key) => {
         const value = fields[key];
 
         // Move the key to the end of the object

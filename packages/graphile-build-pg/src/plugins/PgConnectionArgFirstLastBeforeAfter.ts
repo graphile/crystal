@@ -41,7 +41,7 @@ export default (function PgConnectionArgs(builder) {
         before,
       }) {
         return {
-          pgQuery: queryBuilder => {
+          pgQuery: (queryBuilder) => {
             if (typeof first === "number") {
               queryBuilder.first(first);
             }

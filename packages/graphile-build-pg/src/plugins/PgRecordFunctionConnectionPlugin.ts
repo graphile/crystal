@@ -34,7 +34,7 @@ export default (function PgRecordFunctionConnectionPlugin(
 
       const Cursor = getTypeByName("Cursor");
 
-      introspectionResultsByKind.procedure.forEach(proc => {
+      introspectionResultsByKind.procedure.forEach((proc) => {
         // PERFORMANCE: These used to be .filter(...) calls
         if (!proc.returnsSet) return;
         if (!proc.namespace) return;

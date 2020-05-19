@@ -13,7 +13,7 @@ import { PostGraphileOptions, mixed, HttpRequestHandler } from "../interfaces";
 import chalk from "chalk";
 import { debugPgClient } from "./withPostGraphileContext";
 
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // tslint:disable-next-line no-any
 function isPlainObject(obj: any) {
@@ -105,7 +105,7 @@ export function getPostgraphileSchemaBuilder<
             pgPool,
             pgSchemas,
             options,
-            newSchema => {
+            (newSchema) => {
               gqlSchema = newSchema;
               _emitter.emit("schemas:changed");
               exportGqlSchema(gqlSchema);
@@ -232,7 +232,7 @@ export default function postgraphile<
   // Postgres pool.
   const pgPool = toPgPool(poolOrConfig);
 
-  pgPool.on("error", err => {
+  pgPool.on("error", (err) => {
     /*
      * This handler is required so that client connection errors don't bring
      * the server down (via `unhandledError`).
@@ -245,7 +245,7 @@ export default function postgraphile<
     console.error("PostgreSQL client generated error: ", err.message);
   });
 
-  pgPool.on("connect", pgClient => {
+  pgPool.on("connect", (pgClient) => {
     // Enhance our Postgres client with debugging stuffs.
     debugPgClient(pgClient, !!options.allowExplain);
   });

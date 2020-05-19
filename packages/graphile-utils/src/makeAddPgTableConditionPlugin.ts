@@ -31,7 +31,7 @@ export default function makeAddPgTableConditionPlugin(
   ) => SQL | null | void,
 ) {
   const displayName = `makeAddPgTableConditionPlugin__${schemaName}__${tableName}__${conditionFieldName}`;
-  const plugin: Plugin = builder => {
+  const plugin: Plugin = (builder) => {
     const instance = Symbol(displayName);
     builder.hook("build", function trackSeen(build) {
       if (!build._pluginMeta) {

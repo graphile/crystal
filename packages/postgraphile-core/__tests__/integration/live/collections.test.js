@@ -17,7 +17,7 @@ if (skipLDSTests) {
   beforeAll(() => createSchema());
   afterAll(() => releaseSchema());
 
-  [true, false].forEach(simpleCollection => {
+  [true, false].forEach((simpleCollection) => {
     describe(
       simpleCollection ? "simple collections" : "relay connections",
       () => {
@@ -101,7 +101,7 @@ if (skipLDSTests) {
               );
               data = await next(getLatest);
               expect(getNodes()).toHaveLength(1);
-              expect(getNodes().map(n => n.name)).toEqual(["Alice"]);
+              expect(getNodes().map((n) => n.name)).toEqual(["Alice"]);
 
               await pgClient.query(
                 "insert into live_test.users (name, favorite_color) values ($1, $2)",

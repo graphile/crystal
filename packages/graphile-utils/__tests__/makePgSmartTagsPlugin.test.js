@@ -178,7 +178,7 @@ test.each([
     disableDefaultMutations: true,
     appendPlugins: [makeJSONPgSmartTagsPlugin(json)],
   });
-  await withContext(async context => {
+  await withContext(async (context) => {
     const { data, errors } = await graphql(
       schema,
       testQuery,

@@ -23,7 +23,7 @@ let queryResults = [];
 
 beforeAll(() => {
   // Get a few GraphQL schema instance that we can query.
-  const gqlSchemasPromise = withPgClient(async pgClient => {
+  const gqlSchemasPromise = withPgClient(async (pgClient) => {
     // Different fixtures need different schemas with different configurations.
     // Make all of the different schemas with different configurations that we
     // need and wait for them to be created in parallel.
@@ -50,12 +50,12 @@ beforeAll(() => {
     // before we can do anything else!
     const gqlSchemas = await gqlSchemasPromise;
     // Get a new Postgres client instance.
-    return await withPgClient(async pgClient => {
+    return await withPgClient(async (pgClient) => {
       // Add data to the client instance we are using.
       await pgClient.query(await kitchenSinkData);
       // Run all of our queries in parallel.
       return await Promise.all(
-        queryFileNames.map(async fileName => {
+        queryFileNames.map(async (fileName) => {
           // Read the query from the file system.
           const query = await new Promise((resolve, reject) => {
             readFile(

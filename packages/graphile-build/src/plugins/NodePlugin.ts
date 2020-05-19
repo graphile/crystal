@@ -30,7 +30,7 @@ export default (function NodePlugin(
     : "id";
   builder.hook(
     "build",
-    build => {
+    (build) => {
       const nodeFetcherByTypeName = {};
       const nodeAliasByTypeName = {};
       const nodeTypeNameByAlias = {};
@@ -115,7 +115,7 @@ export default (function NodePlugin(
         {
           name: inflection.builtin("Node"),
           description: "An object with a globally unique `ID`.",
-          resolveType: value => {
+          resolveType: (value) => {
             if (value === $$isQuery) {
               if (!Query) {
                 const type = getTypeByName(inflection.builtin("Query"));

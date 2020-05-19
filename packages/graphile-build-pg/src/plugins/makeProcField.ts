@@ -425,7 +425,7 @@ export default function makeProcField(
               (isTableLike || isRecordLike),
           },
 
-          innerQueryBuilder => {
+          (innerQueryBuilder) => {
             if (parentQueryBuilder) {
               innerQueryBuilder.parentQueryBuilder = parentQueryBuilder;
             }
@@ -473,7 +473,7 @@ export default function makeProcField(
       if (computed) {
         addDataGenerator((parsedResolveInfoFragment, ReturnType) => {
           return {
-            pgQuery: queryBuilder => {
+            pgQuery: (queryBuilder) => {
               queryBuilder.select(() => {
                 const parentTableAlias = queryBuilder.getTableAlias();
                 const functionAlias = sql.identifier(Symbol());
@@ -666,7 +666,7 @@ export default function makeProcField(
               } else {
                 const makeRecordLive: (record: any) => void =
                   subscriptions && isTableLike && returnTypeTable && liveRecord
-                    ? record => {
+                    ? (record) => {
                         if (record) {
                           liveRecord(
                             "pg",
@@ -675,7 +675,7 @@ export default function makeProcField(
                           );
                         }
                       }
-                    : _record => {};
+                    : (_record) => {};
                 if (proc.returnsSet && !isMutation && !forceList) {
                   // Connection - do not make live (the connection will handle this)
                   return addStartEndCursor({
@@ -795,7 +795,7 @@ export default function makeProcField(
               const result = (() => {
                 const makeRecordLive: (record: any) => void =
                   subscriptions && isTableLike && returnTypeTable && liveRecord
-                    ? record => {
+                    ? (record) => {
                         if (record) {
                           liveRecord(
                             "pg",
@@ -804,7 +804,7 @@ export default function makeProcField(
                           );
                         }
                       }
-                    : _record => {};
+                    : (_record) => {};
                 if (returnFirstValueAsValue) {
                   // `returnFirstValueAsValue` implies either `isMutation` is
                   // true, or `ConnectionType` does not exist - either way,
@@ -816,7 +816,7 @@ export default function makeProcField(
                       return pg2gql(fv, returnType);
                     });
                   } else if (proc.returnsSet || rawReturnType.isPgArray) {
-                    return rows.map(v => {
+                    return rows.map((v) => {
                       const fv = firstValue(v);
                       makeRecordLive(fv);
                       return pg2gql(fv, returnType);
@@ -839,7 +839,7 @@ export default function makeProcField(
                     });
                   } else if (proc.returnsSet || rawReturnType.isPgArray) {
                     // List
-                    return rows.map(row => {
+                    return rows.map((row) => {
                       makeRecordLive(row);
                       return pg2gql(row, returnType);
                     });

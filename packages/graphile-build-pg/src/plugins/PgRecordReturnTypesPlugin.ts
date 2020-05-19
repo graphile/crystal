@@ -34,7 +34,7 @@ export default (function PgRecordReturnTypesPlugin(builder) {
         throw new Error("Required Build properties were not present");
       }
 
-      introspectionResultsByKind.procedure.forEach(proc => {
+      introspectionResultsByKind.procedure.forEach((proc) => {
         // PERFORMANCE: These used to be .filter(...) calls
         if (!proc.namespace) return;
         if (omit(proc, "execute")) return;
@@ -122,15 +122,15 @@ export default (function PgRecordReturnTypesPlugin(builder) {
               }
               memo[fieldName] = fieldWithHooks(
                 fieldName,
-                fieldContext => {
+                (fieldContext) => {
                   const { addDataGenerator } = fieldContext;
-                  addDataGenerator(parsedResolveInfoFragment => {
+                  addDataGenerator((parsedResolveInfoFragment) => {
                     const safeAlias = getSafeAliasFromAlias(
                       parsedResolveInfoFragment.alias,
                     );
 
                     return {
-                      pgQuery: queryBuilder => {
+                      pgQuery: (queryBuilder) => {
                         queryBuilder.select(
                           getSelectValueForFieldAndTypeAndModifier(
                             fieldType,

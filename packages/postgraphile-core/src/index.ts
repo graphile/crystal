@@ -112,7 +112,7 @@ export interface PostGraphileCoreOptions {
 
 type PgConfig = Pool | PoolClient | string;
 
-export const PostGraphileInflectionPlugin = function(builder: SchemaBuilder) {
+export const PostGraphileInflectionPlugin = function (builder: SchemaBuilder) {
   builder.hook("inflection", (inflection: Inflection) => {
     const previous = inflection.enumName;
     // Overwrite directly so that we don't lose the 'extend' hints
@@ -125,7 +125,7 @@ export const PostGraphileInflectionPlugin = function(builder: SchemaBuilder) {
   });
 } as Plugin;
 
-export const PostGraphileClassicIdsInflectionPlugin = function(
+export const PostGraphileClassicIdsInflectionPlugin = function (
   builder: SchemaBuilder,
 ) {
   builder.hook("inflection", (inflection: Inflection) => {
@@ -287,9 +287,9 @@ export const getPostGraphileBuilder = async (
   if (writeCache && setWriteCacheCallback) {
     setWriteCacheCallback(() =>
       awaitKeys(memoizeCache).then(
-        obj =>
+        (obj) =>
           new Promise<void>((resolve, reject) => {
-            fs.writeFile(writeCache, JSON.stringify(obj), err => {
+            fs.writeFile(writeCache, JSON.stringify(obj), (err) => {
               memoizeCache = {};
               if (err) {
                 reject(err);
@@ -332,7 +332,7 @@ export const getPostGraphileBuilder = async (
         ...appendPlugins,
       ];
   const invalidSkipPlugins = skipPlugins.filter(
-    pluginToSkip => basePluginList.indexOf(pluginToSkip) < 0,
+    (pluginToSkip) => basePluginList.indexOf(pluginToSkip) < 0,
   );
   if (invalidSkipPlugins.length) {
     function getFunctionName(fn: Plugin) {
@@ -346,7 +346,7 @@ export const getPostGraphileBuilder = async (
     );
   }
   const finalPluginList = basePluginList.filter(
-    p => skipPlugins.indexOf(p) === -1,
+    (p) => skipPlugins.indexOf(p) === -1,
   );
   return getBuilder(finalPluginList, {
     pgConfig,

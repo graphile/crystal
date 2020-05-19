@@ -1,6 +1,6 @@
 import { Plugin } from "../SchemaBuilder";
 
-const AddQueriesToSubscriptionsPlugin: Plugin = function(
+const AddQueriesToSubscriptionsPlugin: Plugin = function (
   builder,
   { subscriptions, live },
 ) {

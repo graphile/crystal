@@ -132,14 +132,14 @@ async function main() {
     );
   });
 
-  const shouldBeBinary = filename => !filename.match(/\.html$/);
+  const shouldBeBinary = (filename) => !filename.match(/\.html$/);
 
   console.log("... Compiling the assets");
   // Step 2: compile the assets
   const files = fs.readdirSync(ASSETS_SOURCE_DIR);
   files
-    .filter(f => f[0] !== ".")
-    .map(filename => {
+    .filter((f) => f[0] !== ".")
+    .map((filename) => {
       const fileContent = fs.readFileSync(`${ASSETS_SOURCE_DIR}/${filename}`);
       let output;
       if (shouldBeBinary(filename)) {
@@ -158,7 +158,7 @@ async function main() {
 
 main().then(
   () => {},
-  err => {
+  (err) => {
     console.error("An error occurred");
     console.error(err);
     process.exit(3);

@@ -3,7 +3,7 @@ import { graphql } from "graphql";
 import { createPostGraphileSchema } from "postgraphile-core";
 import { makeExtendSchemaPlugin, gql, embed } from "../";
 
-const clean = data => {
+const clean = (data) => {
   if (Array.isArray(data)) {
     return data.map(clean);
   } else if (data && typeof data === "object") {
@@ -24,7 +24,7 @@ const clean = data => {
 };
 
 function mockSendEmail() {
-  return new Promise(resolve => setTimeout(resolve, 1));
+  return new Promise((resolve) => setTimeout(resolve, 1));
 }
 let pgPool;
 
@@ -45,7 +45,7 @@ it("allows adding a custom single field to PG schema", async () => {
   const schema = await createPostGraphileSchema(pgPool, ["graphile_utils"], {
     disableDefaultMutations: true,
     appendPlugins: [
-      makeExtendSchemaPlugin(build => {
+      makeExtendSchemaPlugin((build) => {
         const { pgSql: sql } = build;
         return {
           typeDefs: gql`
@@ -107,7 +107,7 @@ it("allows adding a custom field returning a list to PG schema", async () => {
   const schema = await createPostGraphileSchema(pgPool, ["graphile_utils"], {
     disableDefaultMutations: true,
     appendPlugins: [
-      makeExtendSchemaPlugin(build => {
+      makeExtendSchemaPlugin((build) => {
         const { pgSql: sql } = build;
         return {
           typeDefs: gql`
@@ -170,7 +170,7 @@ it("allows adding a simple mutation field to PG schema", async () => {
   const schema = await createPostGraphileSchema(pgPool, ["graphile_utils"], {
     disableDefaultMutations: true,
     appendPlugins: [
-      makeExtendSchemaPlugin(build => {
+      makeExtendSchemaPlugin((build) => {
         const { pgSql: sql } = build;
         return {
           typeDefs: gql`
@@ -300,7 +300,7 @@ it("allows adding a field to an existing table, and requesting necessary data al
         `,
         resolvers: {
           User: {
-            customField: user => {
+            customField: (user) => {
               return `User ${user.id} fetched (name: ${
                 user.name
               }) ${JSON.stringify(user.renamedComplexColumn)}`;
@@ -342,10 +342,11 @@ it("allows adding a custom connection", async () => {
   const schema = await createPostGraphileSchema(pgPool, ["graphile_utils"], {
     disableDefaultMutations: true,
     appendPlugins: [
-      makeExtendSchemaPlugin(build => {
+      makeExtendSchemaPlugin((build) => {
         const { pgSql: sql } = build;
         const table = build.pgIntrospectionResultsByKind.class.find(
-          tbl => tbl.namespaceName === "graphile_utils" && tbl.name === "users",
+          (tbl) =>
+            tbl.namespaceName === "graphile_utils" && tbl.name === "users",
         );
         return {
           typeDefs: gql`
@@ -425,7 +426,7 @@ it("allows adding a custom connection without requiring directives", async () =>
   const schema = await createPostGraphileSchema(pgPool, ["graphile_utils"], {
     disableDefaultMutations: true,
     appendPlugins: [
-      makeExtendSchemaPlugin(build => {
+      makeExtendSchemaPlugin((build) => {
         const { pgSql: sql } = build;
         return {
           typeDefs: gql`
@@ -502,14 +503,14 @@ it("allows adding a custom connection to a nested type", async () => {
   const schema = await createPostGraphileSchema(pgPool, ["graphile_utils"], {
     disableDefaultMutations: true,
     appendPlugins: [
-      makeExtendSchemaPlugin(build => {
+      makeExtendSchemaPlugin((build) => {
         const { pgSql: sql } = build;
         return {
           typeDefs: gql`
             extend type User {
               pets: PetsConnection @pgQuery(
                 source: ${embed(sql`graphile_utils.pets`)}
-                withQueryBuilder: ${embed(queryBuilder => {
+                withQueryBuilder: ${embed((queryBuilder) => {
                   queryBuilder.where(
                     sql`${queryBuilder.getTableAlias()}.user_id = ${queryBuilder.parentQueryBuilder.getTableAlias()}.id`,
                   );
@@ -584,7 +585,7 @@ it("allows adding a custom connection to a nested type", async () => {
     expect(caroline.p2).toBeTruthy();
     expect(caroline.p2.nodes).toHaveLength(2);
     expect(caroline.p2.totalCount).toEqual(3);
-    expect(caroline.p2.nodes.map(n => n.name)).toEqual(["Goldie", "Spot"]);
+    expect(caroline.p2.nodes.map((n) => n.name)).toEqual(["Goldie", "Spot"]);
     expect(data).toMatchSnapshot();
   } finally {
     pgClient.release();
@@ -595,7 +596,7 @@ it("allows adding a custom list to a nested type", async () => {
   const schema = await createPostGraphileSchema(pgPool, ["graphile_utils"], {
     disableDefaultMutations: true,
     appendPlugins: [
-      makeExtendSchemaPlugin(build => {
+      makeExtendSchemaPlugin((build) => {
         const { pgSql: sql } = build;
         return {
           typeDefs: gql`
@@ -654,7 +655,7 @@ it("allows adding a single table entry to a nested type", async () => {
   const schema = await createPostGraphileSchema(pgPool, ["graphile_utils"], {
     disableDefaultMutations: true,
     appendPlugins: [
-      makeExtendSchemaPlugin(build => {
+      makeExtendSchemaPlugin((build) => {
         const { pgSql: sql } = build;
         return {
           typeDefs: gql`
@@ -717,7 +718,7 @@ it("allows to retrieve a single scalar value", async () => {
   const schema = await createPostGraphileSchema(pgPool, ["graphile_utils"], {
     disableDefaultMutations: true,
     appendPlugins: [
-      makeExtendSchemaPlugin(build => {
+      makeExtendSchemaPlugin((build) => {
         const { pgSql: sql } = build;
         return {
           typeDefs: gql`
@@ -727,7 +728,7 @@ it("allows to retrieve a single scalar value", async () => {
               )
               myCustomScalarWithFunction: String! @pgQuery(
                 fragment: ${embed(
-                  queryBuilder =>
+                  (queryBuilder) =>
                     sql`(${queryBuilder.getTableAlias()}.name || ' ' || ${queryBuilder.getTableAlias()}.email)`,
                 )}
               )
@@ -786,7 +787,7 @@ it("allows to retrieve array scalar values", async () => {
   const schema = await createPostGraphileSchema(pgPool, ["graphile_utils"], {
     disableDefaultMutations: true,
     appendPlugins: [
-      makeExtendSchemaPlugin(build => {
+      makeExtendSchemaPlugin((build) => {
         const { pgSql: sql } = build;
         return {
           typeDefs: gql`

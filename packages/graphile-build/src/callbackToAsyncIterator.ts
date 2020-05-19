@@ -35,7 +35,7 @@ export default function callbackToAsyncIterator<CallbackInput, ReturnVal>(
   }
 
   function pullValue() {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       if (pushQueue.length !== 0) {
         resolve({ value: pushQueue.shift(), done: false });
       } else {
@@ -47,7 +47,7 @@ export default function callbackToAsyncIterator<CallbackInput, ReturnVal>(
   function emptyQueue() {
     if (listening) {
       listening = false;
-      pullQueue.forEach(resolve => resolve({ value: undefined, done: true }));
+      pullQueue.forEach((resolve) => resolve({ value: undefined, done: true }));
       pullQueue = [];
       pushQueue = [];
       onClose && onClose(listenerReturnValue);
@@ -56,11 +56,11 @@ export default function callbackToAsyncIterator<CallbackInput, ReturnVal>(
 
   try {
     // Start listener
-    Promise.resolve(listener(value => pushValue(value)))
-      .then(a => {
+    Promise.resolve(listener((value) => pushValue(value)))
+      .then((a) => {
         listenerReturnValue = a;
       })
-      .catch(err => {
+      .catch((err) => {
         onError(err);
       });
 

@@ -47,7 +47,7 @@ declare module "graphile-build" {
 const hasNonNullKey = (row: { [key: string]: unknown }) => {
   if (
     Array.isArray(row.__identifiers) &&
-    row.__identifiers.every(i => i != null)
+    row.__identifiers.every((i) => i != null)
   ) {
     return true;
   }
@@ -82,7 +82,7 @@ export default (function PgTablesPlugin(
         if (
           (identifiers &&
             Array.isArray(identifiers) &&
-            identifiers.some(i => i !== null)) ||
+            identifiers.some((i) => i !== null)) ||
           hasNonNullKey(row)
         ) {
           return row;
@@ -130,7 +130,7 @@ export default (function PgTablesPlugin(
         throw new Error("Expected 'Cursor' type to exist");
       }
 
-      introspectionResultsByKind.class.forEach(table => {
+      introspectionResultsByKind.class.forEach((table) => {
         const tablePgType = table.type;
         if (!tablePgType) {
           throw new Error("Could not determine the type for this table");
@@ -158,7 +158,7 @@ export default (function PgTablesPlugin(
           | null = null;
         pgRegisterGqlTypeByTypeId(
           tablePgType.id,
-          cb => {
+          (cb) => {
             if (TableType) {
               return TableType;
             }
@@ -186,7 +186,7 @@ export default (function PgTablesPlugin(
                   // Enable nodeId interface
                   addDataGeneratorForField(nodeIdFieldName, () => {
                     return {
-                      pgQuery: queryBuilder => {
+                      pgQuery: (queryBuilder) => {
                         queryBuilder.selectIdentifiers(table);
                       },
                     };
@@ -390,7 +390,7 @@ export default (function PgTablesPlugin(
             }
 
             pg2GqlMapper[tablePgType.id] = {
-              map: _ => _,
+              map: (_) => _,
               unmap: (obj, modifier) => {
                 let fieldLookup: FieldSpecMap;
                 if (modifier === "patch") {
@@ -438,7 +438,7 @@ export default (function PgTablesPlugin(
                     ({ addDataGenerator }) => {
                       addDataGenerator(() => ({
                         usesCursor: true,
-                        pgQuery: queryBuilder => {
+                        pgQuery: (queryBuilder) => {
                           if (primaryKeys) {
                             queryBuilder.selectIdentifiers(table);
                           }
@@ -501,7 +501,7 @@ export default (function PgTablesPlugin(
                     {},
                     false,
                     {
-                      withQueryBuilder: queryBuilder => {
+                      withQueryBuilder: (queryBuilder) => {
                         if (subscriptions) {
                           queryBuilder.selectIdentifiers(table);
                         }
@@ -595,7 +595,7 @@ export default (function PgTablesPlugin(
                     {},
                     false,
                     {
-                      withQueryBuilder: queryBuilder => {
+                      withQueryBuilder: (queryBuilder) => {
                         if (subscriptions) {
                           queryBuilder.selectIdentifiers(table);
                         }

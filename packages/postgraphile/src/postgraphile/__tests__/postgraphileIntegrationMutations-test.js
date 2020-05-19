@@ -23,7 +23,7 @@ let mutationResults = [];
 
 beforeAll(() => {
   // Get a GraphQL schema instance that we can query.
-  const gqlSchemaPromise = withPgClient(async pgClient => {
+  const gqlSchemaPromise = withPgClient(async (pgClient) => {
     return await createPostGraphileSchema(pgClient, ["a", "b", "c"]);
   })();
 
@@ -32,12 +32,12 @@ beforeAll(() => {
   //
   // All of our mutations get there own Postgres client instance. Queries share
   // a client instance.
-  mutationResults = mutationFileNames.map(async fileName => {
+  mutationResults = mutationFileNames.map(async (fileName) => {
     // Wait for the schema to resolve. We need the schema to be introspected
     // before we can do anything else!
     let gqlSchema = await gqlSchemaPromise;
     // Get a new Postgres client and run the mutation.
-    return await withPgClient(async pgClient => {
+    return await withPgClient(async (pgClient) => {
       // Read the mutation from the file system.
       const mutation = await new Promise((resolve, reject) => {
         readFile(resolvePath(mutationsDir, fileName), "utf8", (error, data) => {

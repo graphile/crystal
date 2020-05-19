@@ -24,7 +24,7 @@ declare module "graphile-build" {
 export default (function PgColumnsPlugin(builder) {
   builder.hook(
     "build",
-    build => {
+    (build) => {
       const {
         pgSql: sql,
         pgTweakFragmentForTypeAndModifier,
@@ -157,7 +157,7 @@ end
             {
               [fieldName]: fieldWithHooks(
                 fieldName,
-                fieldContext => {
+                (fieldContext) => {
                   const { type, typeModifier } = attr;
                   const sqlColumn = sql.identifier(attr.name);
                   const { addDataGenerator } = fieldContext;
@@ -166,9 +166,9 @@ end
                       attr.typeId,
                       attr.typeModifier,
                     ) || GraphQLString;
-                  addDataGenerator(parsedResolveInfoFragment => {
+                  addDataGenerator((parsedResolveInfoFragment) => {
                     return {
-                      pgQuery: queryBuilder => {
+                      pgQuery: (queryBuilder) => {
                         queryBuilder.select(
                           getSelectValueForFieldAndTypeAndModifier(
                             ReturnType,

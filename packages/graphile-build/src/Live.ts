@@ -106,7 +106,7 @@ export class LiveMonitor {
     this.changeCallback = null;
     this.changeCounter = 0;
     this.liveConditionsByCounter = {};
-    const handleChange = function() {
+    const handleChange = function () {
       /* This function is throttled to ~25ms (see constructor); it's purpose is
        * to bundle up all the changes that occur in a small window into the same
        * handle change flow, so _reallyHandleChange doesn't get called twice in
@@ -124,7 +124,7 @@ export class LiveMonitor {
       trailing: true,
     });
 
-    const _reallyHandleChange = function() {
+    const _reallyHandleChange = function () {
       // This function is throttled to MONITOR_THROTTLE_DURATION (see constructor)
       if (this.changeCallback) {
         // Convince Flow this won't suddenly become null
@@ -158,7 +158,7 @@ export class LiveMonitor {
       }
     };
 
-    this.onChange = function(callback: () => void): ReleaseType {
+    this.onChange = function (callback: () => void): ReleaseType {
       if (this.released) {
         throw new Error("Monitors cannot be reused.");
       }
@@ -195,7 +195,7 @@ export class LiveMonitor {
     {
       const oldCounters = Object.keys(
         this.subscriptionReleasersByCounter,
-      ).filter(n => parseInt(n, 10) < currentCounter);
+      ).filter((n) => parseInt(n, 10) < currentCounter);
       for (const oldCounter of oldCounters) {
         const arry = this.subscriptionReleasersByCounter[oldCounter];
         for (const releaser of arry) {
@@ -207,7 +207,7 @@ export class LiveMonitor {
     // Clear out of date liveConditions
     {
       const oldCounters = Object.keys(this.liveConditionsByCounter).filter(
-        n => parseInt(n, 10) < currentCounter,
+        (n) => parseInt(n, 10) < currentCounter,
       );
 
       for (const oldCounter of oldCounters) {
@@ -357,7 +357,7 @@ export class LiveCoordinator {
 
 export function makeAsyncIteratorFromMonitor(monitor: LiveMonitor) {
   return callbackToAsyncIterator<unknown, ReleaseType>(monitor.onChange, {
-    onClose: release => {
+    onClose: (release) => {
       if (release) release();
     },
   });

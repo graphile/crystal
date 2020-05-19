@@ -35,7 +35,7 @@ function callIfNecessaryArray<T extends CallResult>(
   context: GenContext,
 ): Array<T> {
   if (Array.isArray(o)) {
-    return o.map(v => callIfNecessary(v, context));
+    return o.map((v) => callIfNecessary(v, context));
   } else {
     return o;
   }
@@ -322,7 +322,7 @@ class QueryBuilder {
         checkerGenerator(data),
       );
 
-      return (record: any) => checkers.every(checker => checker(record));
+      return (record: any) => checkers.every((checker) => checker(record));
     };
     if (this.parentQueryBuilder) {
       const parentQueryBuilder = this.parentQueryBuilder;
@@ -345,7 +345,7 @@ class QueryBuilder {
 json_build_object('__id', ${sql.value(id)}::int
 ${sql.join(
   Object.keys(allRequirements).map(
-    key => sql`, ${sql.literal(key)}::text, ${allRequirements[key]}`,
+    (key) => sql`, ${sql.literal(key)}::text, ${allRequirements[key]}`,
   ),
 
   "",
@@ -430,7 +430,7 @@ ${sql.join(
     const primaryKeys = primaryKey.keyAttributes;
     this.select(
       sql`json_build_array(${sql.join(
-        primaryKeys.map(key =>
+        primaryKeys.map((key) =>
           escapeLarge(
             sql`${this.getTableAlias()}.${sql.identifier(key.name)}`,
             key.type,
@@ -496,7 +496,7 @@ ${sql.join(
     if (this.data.offset != null) {
       // Add the offsets together (this should be able to recurse)
       const previous = this.data.offset;
-      this.data.offset = context => {
+      this.data.offset = (context) => {
         return (
           callIfNecessary(previous, context) +
           callIfNecessary(offsetGen, context)
@@ -759,11 +759,15 @@ ${sql.join(
 
     let fragment = sql`\
 select ${useAsterisk ? sql`${this.getTableAlias()}.*` : fields}
-${(this.compiledData.from &&
-  sql`from ${this.compiledData.from[0]} as ${this.getTableAlias()}`) ||
-  sql.blank}
-${(this.compiledData.join.length && sql.join(this.compiledData.join, " ")) ||
-  sql.blank}
+${
+  (this.compiledData.from &&
+    sql`from ${this.compiledData.from[0]} as ${this.getTableAlias()}`) ||
+  sql.blank
+}
+${
+  (this.compiledData.join.length && sql.join(this.compiledData.join, " ")) ||
+  sql.blank
+}
 where ${this.buildWhereClause(true, true, options)}
 ${
   this.compiledData.orderBy.length

@@ -6,13 +6,13 @@ let schema;
 
 beforeAll(async () => {
   // Get a few GraphQL schema instance that we can query.
-  schema = await withPgClient(async pgClient =>
+  schema = await withPgClient(async (pgClient) =>
     createPostGraphileSchema(pgClient, ["ranges"]),
   );
 });
 
 test("numeric range", () =>
-  withPgClient(async pgClient => {
+  withPgClient(async (pgClient) => {
     const {
       rows: [row],
     } = await pgClient.query(
@@ -42,7 +42,7 @@ test("numeric range", () =>
   }));
 
 test("bigint range", () =>
-  withPgClient(async pgClient => {
+  withPgClient(async (pgClient) => {
     const {
       rows: [row],
     } = await pgClient.query(
@@ -72,7 +72,7 @@ test("bigint range", () =>
   }));
 
 test("ts range", () =>
-  withPgClient(async pgClient => {
+  withPgClient(async (pgClient) => {
     const {
       rows: [row],
     } = await pgClient.query(
@@ -98,7 +98,7 @@ test("ts range", () =>
   }));
 
 test("tstz range", () =>
-  withPgClient(async pgClient => {
+  withPgClient(async (pgClient) => {
     const {
       rows: [row],
     } = await pgClient.query(

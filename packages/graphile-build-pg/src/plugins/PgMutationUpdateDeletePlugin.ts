@@ -96,7 +96,7 @@ export default (async function PgMutationUpdateDeletePlugin(
                 table.isUpdatable &&
                 !omit(table, "update") &&
                 // Check at least one attribute is updatable
-                table.attributes.find(attr => !omit(attr, "update"));
+                table.attributes.find((attr) => !omit(attr, "update"));
               const canDelete =
                 mode === "delete" &&
                 table.isDeletable &&
@@ -151,7 +151,7 @@ export default (async function PgMutationUpdateDeletePlugin(
                       inflection.patchField(inflection.tableFieldName(table))
                     ];
 
-                  table.attributes.forEach(attr => {
+                  table.attributes.forEach((attr) => {
                     // PERFORMANCE: These used to be .filter(...) calls
                     if (!pgColumnFilter(attr, build, context)) return;
                     if (omit(attr, "update")) return;
@@ -228,7 +228,7 @@ returning *`;
               }
               if (TableType) {
                 const uniqueConstraints = table.constraints.filter(
-                  con => con.type === "u" || con.type === "p",
+                  (con) => con.type === "u" || con.type === "p",
                 );
 
                 const Table = pgGetGqlTypeByTypeIdAndModifier(
@@ -304,7 +304,7 @@ returning *`;
                                   ];
 
                                 if (gens) {
-                                  gens.forEach(gen => addDataGenerator(gen));
+                                  gens.forEach((gen) => addDataGenerator(gen));
                                 }
                                 return {
                                   type: GraphQLID,
@@ -430,7 +430,7 @@ returning *`;
                     {
                       [fieldName]: fieldWithHooks(
                         fieldName,
-                        context => {
+                        (context) => {
                           const {
                             getDataFromParsedResolveInfoFragment,
                           } = context;
@@ -512,19 +512,19 @@ returning *`;
                 }
 
                 // Unique
-                uniqueConstraints.forEach(constraint => {
+                uniqueConstraints.forEach((constraint) => {
                   if (omit(constraint, mode)) {
                     return;
                   }
                   const keys = constraint.keyAttributes;
-                  if (!keys.every(_ => _)) {
+                  if (!keys.every((_) => _)) {
                     throw new Error(
                       `Consistency error: could not find an attribute in the constraint when building the ${mode} mutation for ${describePgEntity(
                         table,
                       )}!`,
                     );
                   }
-                  if (keys.some(key => omit(key, "read"))) {
+                  if (keys.some((key) => omit(key, "read"))) {
                     return;
                   }
                   const fieldName = inflection[
@@ -614,7 +614,7 @@ returning *`;
                     {
                       [fieldName]: fieldWithHooks(
                         fieldName,
-                        context => {
+                        (context) => {
                           const {
                             getDataFromParsedResolveInfoFragment,
                           } = context;
@@ -646,7 +646,7 @@ returning *`;
                                 args,
                                 sql`(${sql.join(
                                   keys.map(
-                                    key =>
+                                    (key) =>
                                       sql`${sql.identifier(
                                         key.name,
                                       )} = ${gql2pg(

@@ -57,18 +57,18 @@ export default (async function PgRowByUniqueConstraint(
 
           if (TableType) {
             const uniqueConstraints = table.constraints.filter(
-              con => con.type === "u" || con.type === "p",
+              (con) => con.type === "u" || con.type === "p",
             );
 
-            uniqueConstraints.forEach(constraint => {
+            uniqueConstraints.forEach((constraint) => {
               if (omit(constraint, "read")) {
                 return;
               }
               const keys = constraint.keyAttributes;
-              if (keys.some(key => omit(key, "read"))) {
+              if (keys.some((key) => omit(key, "read"))) {
                 return;
               }
-              if (!keys.every(_ => _)) {
+              if (!keys.every((_) => _)) {
                 throw new Error(
                   "Consistency error: could not find an attribute!",
                 );
@@ -79,7 +79,7 @@ export default (async function PgRowByUniqueConstraint(
                 constraint,
               );
 
-              const keysIncludingMeta = keys.map(key => ({
+              const keysIncludingMeta = keys.map((key) => ({
                 ...key,
                 sqlIdentifier: sql.identifier(key.name),
                 columnName: inflection.column(key),
@@ -159,7 +159,7 @@ export default (async function PgRowByUniqueConstraint(
                         undefined,
                         resolveData,
                         queryFromResolveDataOptions,
-                        queryBuilder =>
+                        (queryBuilder) =>
                           queryFromResolveDataCallback(queryBuilder, args),
                         resolveContext,
                         resolveInfo.rootValue,

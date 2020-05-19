@@ -8,7 +8,7 @@ import {
   makeAddPgTableConditionPlugin,
 } from "../dist";
 
-const clean = data => {
+const clean = (data) => {
   if (Array.isArray(data)) {
     return data.map(clean);
   } else if (data && typeof data === "object") {
@@ -47,7 +47,7 @@ const PetsCountPlugin = makeAddPgTableConditionPlugin(
   "graphile_utils",
   "users",
   "petCountAtLeast",
-  build => ({
+  (build) => ({
     description: "Filters users to those that have at least this many pets",
     type: build.graphql.GraphQLInt,
   }),

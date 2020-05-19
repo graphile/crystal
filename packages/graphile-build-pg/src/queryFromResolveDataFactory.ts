@@ -256,8 +256,9 @@ exists(
         return sql`\
 exists(
   ${sqlCommon}
-  and (${queryBuilder.getSelectCursor() ||
-    sql.null})::text not in (select __cursor::text from ${sqlQueryAlias})
+  and (${
+    queryBuilder.getSelectCursor() || sql.null
+  })::text not in (select __cursor::text from ${sqlQueryAlias})
   ${offset === 0 ? sql.blank : sql`offset ${sql.value(offset)}`}
 )`;
       }
@@ -296,7 +297,7 @@ exists(
   const getPgCursorPrefix = (): SQL[] =>
     rawCursorPrefix && rawCursorPrefix.length > 0
       ? rawCursorPrefix
-      : queryBuilder.data.cursorPrefix.map(val => sql.literal(val));
+      : queryBuilder.data.cursorPrefix.map((val) => sql.literal(val));
   if (
     options.withPagination ||
     options.withPaginationAsFields ||
@@ -361,7 +362,7 @@ exists(
           return;
         }
         let sqlFilter = sql`false`;
-        const sqlCursors = rawCursors.map(val => sql.value(val));
+        const sqlCursors = rawCursors.map((val) => sql.value(val));
         for (let i = orderByExpressionsAndDirections.length - 1; i >= 0; i--) {
           const [sqlExpression, ascending] = orderByExpressionsAndDirections[i];
           // If ascending and isAfter then >
@@ -388,7 +389,7 @@ OR\
           getPgCursorPrefix(),
           ", ",
         )}) = (${sql.join(
-          rawPrefixes.map(val => sql.value(val)),
+          rawPrefixes.map((val) => sql.value(val)),
           ", ",
         )})) AND (${sqlFilter}))`;
         queryBuilder.whereBound(sqlFilter, isAfter);

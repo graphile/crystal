@@ -15,7 +15,7 @@ test(
   core.test(
     ["a", "b", "c"],
     {},
-    pgClient => {
+    (pgClient) => {
       return pgClient.query(
         "create function a.create_post(t text) returns a.post as $$ select null::a.post; $$ language sql volatile;",
       );

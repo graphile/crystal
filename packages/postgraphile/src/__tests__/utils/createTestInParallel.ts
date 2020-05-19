@@ -25,7 +25,7 @@ export default function createTestInParallel(): (
     test(name, async () => {
       // If the tests have not yet been run then run all of our tests.
       if (!testResults) {
-        testResults = testFns.map(testFn => Promise.resolve(testFn()));
+        testResults = testFns.map((testFn) => Promise.resolve(testFn()));
       }
       // Await the result.
       await testResults[index];

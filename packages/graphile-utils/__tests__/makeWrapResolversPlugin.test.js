@@ -10,7 +10,7 @@ import {
 } from "graphile-build";
 import { graphql } from "graphql";
 
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const makeSchemaWithSpyAndPlugins = (spy, plugins) =>
   buildSchema(
@@ -20,7 +20,7 @@ const makeSchemaWithSpyAndPlugins = (spy, plugins) =>
       MutationPlugin,
       SubscriptionPlugin,
       MutationPayloadQueryPlugin,
-      makeExtendSchemaPlugin(_build => ({
+      makeExtendSchemaPlugin((_build) => ({
         typeDefs: gql`
           extend type Query {
             echo(message: String!): String
@@ -39,7 +39,7 @@ const makeSchemaWithSpyAndPlugins = (spy, plugins) =>
     },
   );
 
-const makeEchoSpy = fn =>
+const makeEchoSpy = (fn) =>
   jest.fn(
     fn ||
       ((parent, args, _context, _resolveInfo) => {
@@ -50,7 +50,7 @@ const makeEchoSpy = fn =>
 describe("wrapping named resolvers", () => {
   it("passes args by default", async () => {
     const wrappers = [
-      resolve => resolve(),
+      (resolve) => resolve(),
       (resolve, parent) => resolve(parent),
       (resolve, parent, args) => resolve(parent, args),
       (resolve, parent, args, context) => resolve(parent, args, context),
@@ -164,7 +164,7 @@ describe("wrapping named resolvers", () => {
   });
 
   it("can asynchronously abort resolver after", async () => {
-    const wrapper = async resolve => {
+    const wrapper = async (resolve) => {
       const result = await resolve();
       // eslint-disable-next-line no-constant-condition
       if (true) {
@@ -204,7 +204,7 @@ describe("wrapping named resolvers", () => {
   });
 
   it("can modify result of resolver", async () => {
-    const wrapper = async resolve => {
+    const wrapper = async (resolve) => {
       const result = await resolve();
       return result.toLowerCase();
     };
@@ -239,14 +239,14 @@ describe("wrapping named resolvers", () => {
   });
 
   it("can supports options modify result of resolver", async () => {
-    const wrapper = async resolve => {
+    const wrapper = async (resolve) => {
       const result = await resolve();
       return result.toLowerCase();
     };
     const spy = makeEchoSpy();
     let options;
     const schema = await makeSchemaWithSpyAndPlugins(spy, [
-      makeWrapResolversPlugin(_options => {
+      makeWrapResolversPlugin((_options) => {
         options = _options;
         return {
           Query: {
@@ -284,7 +284,7 @@ describe("wrapping named resolvers", () => {
 
 describe("wrapping resolvers matching a filter", () => {
   it("filters correctly", async () => {
-    const filter = context => {
+    const filter = (context) => {
       if (context.scope.isRootMutation && context.scope.fieldName !== "c") {
         return { scope: context.scope };
       }

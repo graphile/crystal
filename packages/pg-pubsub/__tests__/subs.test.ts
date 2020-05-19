@@ -25,10 +25,10 @@ const init = async (options: PostGraphileOptions = {}) => {
   // Keep track of the clients, one of them is our subscriptions client which we
   // must release manually.
   const clients: Array<PoolClient> = [];
-  pgPool.on("acquire", client => {
+  pgPool.on("acquire", (client) => {
     clients.push(client);
   });
-  pgPool.on("remove", client => {
+  pgPool.on("remove", (client) => {
     const i = clients.indexOf(client);
     clients.splice(i, 1);
   });
@@ -44,7 +44,7 @@ const init = async (options: PostGraphileOptions = {}) => {
     pgPool,
     release: async () => {
       const endPromise = pgPool.end();
-      clients.forEach(c => c.release());
+      clients.forEach((c) => c.release());
       await endPromise;
     },
   };

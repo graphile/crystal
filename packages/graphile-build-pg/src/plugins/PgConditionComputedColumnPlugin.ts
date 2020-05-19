@@ -191,7 +191,7 @@ export default (function PgConditionComputedColumnPlugin(builder) {
       const compatibleComputedColumns = getCompatibleComputedColumns(
         build,
         table,
-      ).map(o => {
+      ).map((o) => {
         const { proc, pseudoColumnName } = o;
 
         const fieldName = inflection.computedColumn(
@@ -209,7 +209,7 @@ export default (function PgConditionComputedColumnPlugin(builder) {
       });
       addArgDataGenerator(function connectionCondition({ condition }) {
         return {
-          pgQuery: queryBuilder => {
+          pgQuery: (queryBuilder) => {
             if (typeof condition === "object" && condition != null) {
               compatibleComputedColumns.forEach(
                 ({ fieldName, sqlFnName, returnType }) => {

@@ -3,7 +3,7 @@ const { withPgClient } = require("../../helpers");
 const { createPostGraphileSchema } = require("../../..");
 
 exports.test = (schemas, options, setup, finalCheck = () => {}) => () =>
-  withPgClient(async client => {
+  withPgClient(async (client) => {
     if (setup) {
       if (typeof setup === "function") {
         await setup(client);

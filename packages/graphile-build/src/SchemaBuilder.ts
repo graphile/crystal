@@ -867,12 +867,12 @@ class SchemaBuilder extends EventEmitter {
       throw new Error(`Sorry, '${hookName}' is not a supported hook`);
     }
     if (this._currentPluginName) {
-      fn.displayName = `${this._currentPluginName}/${hookName}/${(provides &&
-        provides.length &&
-        provides.join("+")) ||
+      fn.displayName = `${this._currentPluginName}/${hookName}/${
+        (provides && provides.length && provides.join("+")) ||
         fn.displayName ||
         fn.name ||
-        "unnamed"}`;
+        "unnamed"
+      }`;
     }
     if (provides) {
       if (!fn.displayName && provides.length) {
@@ -944,21 +944,21 @@ class SchemaBuilder extends EventEmitter {
           after: oldAfter,
         } = oldHook;
         if (newProvides) {
-          if (oldBefore && oldBefore.some(dep => newProvides.includes(dep))) {
+          if (oldBefore && oldBefore.some((dep) => newProvides.includes(dep))) {
             // Old says it has to come before new
             setMin(idx + 1, oldHook);
           }
-          if (oldAfter && oldAfter.some(dep => newProvides.includes(dep))) {
+          if (oldAfter && oldAfter.some((dep) => newProvides.includes(dep))) {
             // Old says it has to be after new
             setMax(idx, oldHook);
           }
         }
         if (oldProvides) {
-          if (newBefore && newBefore.some(dep => oldProvides.includes(dep))) {
+          if (newBefore && newBefore.some((dep) => oldProvides.includes(dep))) {
             // New says it has to come before old
             setMax(idx, oldHook);
           }
-          if (newAfter && newAfter.some(dep => oldProvides.includes(dep))) {
+          if (newAfter && newAfter.some((dep) => oldProvides.includes(dep))) {
             // New says it has to be after old
             setMin(idx + 1, oldHook);
           }
@@ -1171,9 +1171,9 @@ class SchemaBuilder extends EventEmitter {
 
           if (!newObj) {
             throw new Error(
-              `Hook '${hook.displayName ||
-                hook.name ||
-                "anonymous"}' for '${hookName}' returned falsy value '${newObj}'`,
+              `Hook '${
+                hook.displayName || hook.name || "anonymous"
+              }' for '${hookName}' returned falsy value '${newObj}'`,
             );
           }
           debug(
@@ -1224,7 +1224,7 @@ class SchemaBuilder extends EventEmitter {
     // Bind all functions so they can be dereferenced
     bindAll(
       build,
-      Object.keys(build).filter(key => typeof build[key] === "function"),
+      Object.keys(build).filter((key) => typeof build[key] === "function"),
     );
 
     Object.freeze(build);

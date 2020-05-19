@@ -54,7 +54,7 @@ function parse(arrOrNot: SmartTagValue | null, errorPrefix = "Error") {
         const perms: (string | null)[] = abbreviations.map(
           (p): string | null => aliases[p],
         );
-        const badIndex = perms.findIndex(p => !p);
+        const badIndex = perms.findIndex((p) => !p);
         if (badIndex >= 0) {
           throw new Error(
             `${errorPrefix} - abbreviated parameter '${abbreviations[badIndex]}' in '${str}' not understood`,
@@ -119,7 +119,7 @@ export default function omit(
     }
     if (omitSpec.indexOf(READ) >= 0) {
       const bad = PERMISSIONS_THAT_REQUIRE_READ.filter(
-        p => omitSpec.indexOf(p) === -1,
+        (p) => omitSpec.indexOf(p) === -1,
       );
 
       if (bad.length > 0) {
@@ -141,7 +141,7 @@ export default function omit(
     }
     if (includeSpec.indexOf(READ) === -1) {
       const bad = PERMISSIONS_THAT_REQUIRE_READ.find(
-        p => includeSpec.indexOf(p) >= 0,
+        (p) => includeSpec.indexOf(p) >= 0,
       );
 
       if (bad) {

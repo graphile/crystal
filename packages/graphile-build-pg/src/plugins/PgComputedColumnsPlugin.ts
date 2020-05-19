@@ -26,7 +26,9 @@ export const getComputedColumnDetails = (
   if (
     argTypes
       .slice(1)
-      .some(type => type.type === "c" && type.class && type.class.isSelectable)
+      .some(
+        (type) => type.type === "c" && type.class && type.class.isSelectable,
+      )
   ) {
     // Accepts two input tables? Skip.
     return null;

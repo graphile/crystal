@@ -173,7 +173,7 @@ export default (function PgTypesPlugin(
   // XXX: most of this should be in an "init" hook, not a "build" hook
   builder.hook(
     "build",
-    build => {
+    (build) => {
       const {
         pgIntrospectionResultsByKind: rawIntrospectionResultsByKind,
         getTypeByName,
@@ -249,7 +249,7 @@ export default (function PgTypesPlugin(
       ): ((valueFromPostgres: any) => any) => {
         if (pg2GqlMapper[type.id]) {
           const map = pg2GqlMapper[type.id].map;
-          return val => (isNull(val) ? null : map(val));
+          return (val) => (isNull(val) ? null : map(val));
         } else if (type.domainBaseType) {
           return pg2gqlForType(type.domainBaseType);
         } else if (type.isPgArray) {
@@ -257,7 +257,7 @@ export default (function PgTypesPlugin(
             throw new Error("isPgArray without arrayItemType");
           }
           const elementHandler = pg2gqlForType(type.arrayItemType);
-          return val => {
+          return (val) => {
             if (isNull(val)) return null;
             if (!Array.isArray(val)) {
               throw new Error(
@@ -316,7 +316,7 @@ export default (function PgTypesPlugin(
             );
           }
           return sql`array[${sql.join(
-            val.map(v => gql2pg(v, arrayItemType, modifier)),
+            val.map((v) => gql2pg(v, arrayItemType, modifier)),
             ", ",
           )}]::${sql.identifier(type.namespaceName)}.${sql.identifier(
             type.name,
@@ -401,9 +401,9 @@ export default (function PgTypesPlugin(
         new GraphQLScalarType({
           name,
           description,
-          serialize: value => String(value),
-          parseValue: value => String(value),
-          parseLiteral: ast => {
+          serialize: (value) => String(value),
+          parseValue: (value) => String(value),
+          parseLiteral: (ast) => {
             if (ast.kind !== Kind.STRING) {
               throw new Error("Can only parse string values");
             }
@@ -656,20 +656,20 @@ export default (function PgTypesPlugin(
       if (pgExtendedTypes) {
         pg2GqlMapper[114] = {
           map: identity,
-          unmap: o => sql.value(jsonStringify(o)),
+          unmap: (o) => sql.value(jsonStringify(o)),
         };
       } else {
         pg2GqlMapper[114] = {
           map: jsonStringify,
-          unmap: str => sql.value(str),
+          unmap: (str) => sql.value(str),
         };
       }
       pg2GqlMapper[3802] = pg2GqlMapper[114]; // jsonb
 
       // interval
       pg2GqlMapper[1186] = {
-        map: str => parseInterval(str),
-        unmap: o => {
+        map: (str) => parseInterval(str),
+        unmap: (o) => {
           const keys = [
             "seconds",
             "minutes",
@@ -690,8 +690,8 @@ export default (function PgTypesPlugin(
       };
 
       pg2GqlMapper[790] = {
-        map: _ => _,
-        unmap: val => sql`(${sql.value(val)})::money`,
+        map: (_) => _,
+        unmap: (val) => sql`(${sql.value(val)})::money`,
       };
 
       // point
@@ -701,11 +701,11 @@ export default (function PgTypesPlugin(
             const [x, y] = f
               .substr(1, f.length - 2)
               .split(",")
-              .map(f => parseFloat(f));
+              .map((f) => parseFloat(f));
             return { x, y };
           }
         },
-        unmap: o => sql`point(${sql.value(o.x)}, ${sql.value(o.y)})`,
+        unmap: (o) => sql`point(${sql.value(o.x)}, ${sql.value(o.y)})`,
       };
 
       // TODO: add more support for geometric types
@@ -721,7 +721,9 @@ export default (function PgTypesPlugin(
         typeId: string,
         typeModifier: PgTypeModifier,
       ) => {
-        const type = introspectionResultsByKind.type.find(t => t.id === typeId);
+        const type = introspectionResultsByKind.type.find(
+          (t) => t.id === typeId,
+        );
         if (!type) {
           throw new Error(
             `Could not find type with oid '${typeId}' in the introspection results`,
@@ -983,9 +985,9 @@ export default (function PgTypesPlugin(
           if (pgTweaksByTypeIdAndModifer[type.id] === undefined) {
             pgTweaksByTypeIdAndModifer[type.id] = {};
           }
-          pgTweaksByTypeIdAndModifer[type.id][
-            typeModifierKey
-          ] = fragment => sql`\
+          pgTweaksByTypeIdAndModifer[type.id][typeModifierKey] = (
+            fragment,
+          ) => sql`\
 case
 when (${fragment}) is null then null
 else json_build_object(
@@ -1152,7 +1154,7 @@ end`;
         }
         if (!gqlTypeByTypeIdAndModifier[typeId][typeModifierKey]) {
           const type = introspectionResultsByKind.type.find(
-            t => t.id === typeId,
+            (t) => t.id === typeId,
           );
 
           if (!type) {
@@ -1388,7 +1390,7 @@ end`;
 
   builder.hook(
     "build",
-    build => {
+    (build) => {
       // This hook tells graphile-build-pg about the hstore database type so it
       // knows how to express it in input/output.
       if (pgSkipHstore) return build;
@@ -1415,7 +1417,7 @@ end`;
 
       // Check we have the hstore extension
       const hstoreExtension = introspectionResultsByKind.extension.find(
-        e => e.name === "hstore",
+        (e) => e.name === "hstore",
       );
 
       if (!hstoreExtension) {
@@ -1424,7 +1426,7 @@ end`;
 
       // Get the 'hstore' type itself:
       const hstoreType = introspectionResultsByKind.type.find(
-        t =>
+        (t) =>
           t.name === "hstore" && t.namespaceId === hstoreExtension.namespaceId,
       );
 
@@ -1448,7 +1450,7 @@ end`;
         // node-postgres parses hstore for us, no action required on map
         map: identity,
         // When unmapping we need to convert back to hstore
-        unmap: o =>
+        unmap: (o) =>
           sql`(${sql.value(hstoreStringify(o))}::${sql.identifier(
             hstoreType.namespaceName,
             hstoreType.name,

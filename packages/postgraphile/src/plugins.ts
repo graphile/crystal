@@ -25,7 +25,7 @@ export const makePgSmartTagsFromFilePlugin = (
     let tagsListener: null | ((current: Stats, previous: Stats) => void) = null;
     const smartTagsPlugin = makeJSONPgSmartTagsPlugin(
       initialTagsJSON,
-      updateJSON => {
+      (updateJSON) => {
         if (tagsListener) {
           unwatchFile(tagsFile, tagsListener);
           tagsListener = null;

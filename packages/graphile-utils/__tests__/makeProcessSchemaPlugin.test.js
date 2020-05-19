@@ -10,7 +10,7 @@ import {
 } from "graphile-build";
 import { GraphQLSchema, GraphQLObjectType, GraphQLString } from "graphql";
 
-const makeSchemaWithSpy = spy =>
+const makeSchemaWithSpy = (spy) =>
   buildSchema(
     [
       StandardTypesPlugin,
@@ -25,11 +25,11 @@ const makeSchemaWithSpy = spy =>
     },
   );
 
-const makeSpy = fn => jest.fn(fn || (schema => schema));
+const makeSpy = (fn) => jest.fn(fn || ((schema) => schema));
 
 it("Gets passed the final schema", async () => {
   let spySchema;
-  const spy = makeSpy(_schema => {
+  const spy = makeSpy((_schema) => {
     spySchema = _schema;
     return _schema;
   });
@@ -52,7 +52,7 @@ const simpleSchema = new GraphQLSchema({
 
 it("Can replace the schema", async () => {
   let spySchema;
-  const spy = makeSpy(_schema => {
+  const spy = makeSpy((_schema) => {
     spySchema = _schema;
     return simpleSchema;
   });
@@ -64,7 +64,7 @@ it("Can replace the schema", async () => {
 
 it("Can tweak the schema", async () => {
   let spySchema;
-  const spy = makeSpy(_schema => {
+  const spy = makeSpy((_schema) => {
     _schema.getQueryType().description = "MODIFIED DESCRIPTION";
     spySchema = _schema;
     return _schema;

@@ -2,7 +2,7 @@ import { LDSLiveSource } from "../src/PgLDSSourcePlugin";
 import { DATABASE_URL, query, withLiveSourceAndClient } from "./helpers";
 
 const fooTableSpec = { namespaceName: "app_public", name: "foo" };
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 test("cleans up", async () => {
   const l = new LDSLiveSource({
@@ -36,7 +36,7 @@ test("reports changes", () =>
     liveSource.subscribeCollection(
       collectionWithPredicateMockCb,
       fooTableSpec,
-      d => d.name === "Ciao",
+      (d) => d.name === "Ciao",
     );
     const {
       rows: [{ id }],

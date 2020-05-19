@@ -15,7 +15,7 @@ function expectHttpError(promise, statusCode, message) {
     () => {
       throw new Error("Expected a Http error.");
     },
-    error => {
+    (error) => {
       expect(error.statusCode).toBe(statusCode);
       expect(error.message).toBe(message);
     },
@@ -32,7 +32,7 @@ test("will be a noop for no token, secret, or default role", async () => {
 test("will pass in a context object with the client", async () => {
   const pgClient = { query: jest.fn(), release: jest.fn() };
   const pgPool = { connect: jest.fn(() => pgClient) };
-  await withPostGraphileContext({ pgPool }, client => {
+  await withPostGraphileContext({ pgPool }, (client) => {
     expect(client[$$pgClient]).toBe(pgClient);
   });
 });
@@ -42,7 +42,7 @@ test("will record queries run inside the transaction", async () => {
   const query2 = Symbol();
   const pgClient = { query: jest.fn(), release: jest.fn() };
   const pgPool = { connect: jest.fn(() => pgClient) };
-  await withPostGraphileContext({ pgPool }, client => {
+  await withPostGraphileContext({ pgPool }, (client) => {
     client[$$pgClient].query(query1);
     client[$$pgClient].query(query2);
   });
@@ -272,7 +272,7 @@ test("will include JWT claims as jwtClaims in context callback", async () => {
       }),
       jwtSecret: "secret",
     },
-    context => context,
+    (context) => context,
   );
   expect(jwtClaims).toEqual({ aud: "postgraphile", a: 1, b: 2, c: 3 });
 });
@@ -284,7 +284,7 @@ test("jwtClaims should be null if there is no JWT token", async () => {
     {
       pgPool,
     },
-    context => context,
+    (context) => context,
   );
   expect(jwtClaims).toBeNull();
 });

@@ -526,7 +526,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       }
       return this.camelCase(
         `${this._singularizedTableName(table)}-by-${detailedKeys
-          .map(key => this.column(key))
+          .map((key) => this.column(key))
           .join("-and-")}`,
       );
     },
@@ -569,7 +569,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       return this.camelCase(
         `${this.pluralize(
           this._singularizedTableName(table),
-        )}-by-${detailedKeys.map(key => this.column(key)).join("-and-")}`,
+        )}-by-${detailedKeys.map((key) => this.column(key)).join("-and-")}`,
       );
     },
     manyRelationByKeysSimple(
@@ -593,7 +593,9 @@ function makePgBaseInflectors(): Partial<Inflection> {
       return this.camelCase(
         `${this.pluralize(
           this._singularizedTableName(table),
-        )}-by-${detailedKeys.map(key => this.column(key)).join("-and-")}-list`,
+        )}-by-${detailedKeys
+          .map((key) => this.column(key))
+          .join("-and-")}-list`,
       );
     },
     rowByUniqueKeys(
@@ -608,7 +610,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       }
       return this.camelCase(
         `${this._singularizedTableName(table)}-by-${detailedKeys
-          .map(key => this.column(key))
+          .map((key) => this.column(key))
           .join("-and-")}`,
       );
     },
@@ -625,7 +627,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       return this.camelCase(
         `update-${this._singularizedTableName(
           table,
-        )}-by-${detailedKeys.map(key => this.column(key)).join("-and-")}`,
+        )}-by-${detailedKeys.map((key) => this.column(key)).join("-and-")}`,
       );
     },
     deleteByKeys(
@@ -641,7 +643,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       return this.camelCase(
         `delete-${this._singularizedTableName(
           table,
-        )}-by-${detailedKeys.map(key => this.column(key)).join("-and-")}`,
+        )}-by-${detailedKeys.map((key) => this.column(key)).join("-and-")}`,
       );
     },
     updateByKeysInputType(
@@ -657,7 +659,9 @@ function makePgBaseInflectors(): Partial<Inflection> {
       return this.upperCamelCase(
         `update-${this._singularizedTableName(
           table,
-        )}-by-${detailedKeys.map(key => this.column(key)).join("-and-")}-input`,
+        )}-by-${detailedKeys
+          .map((key) => this.column(key))
+          .join("-and-")}-input`,
       );
     },
     deleteByKeysInputType(
@@ -673,7 +677,9 @@ function makePgBaseInflectors(): Partial<Inflection> {
       return this.upperCamelCase(
         `delete-${this._singularizedTableName(
           table,
-        )}-by-${detailedKeys.map(key => this.column(key)).join("-and-")}-input`,
+        )}-by-${detailedKeys
+          .map((key) => this.column(key))
+          .join("-and-")}-input`,
       );
     },
     updateNode(this: Inflection, table: PgClass) {
@@ -760,7 +766,7 @@ function identity<T>(val: T): T {
 export function preventEmptyResult<O>(obj: O): O {
   return Object.keys(obj).reduce((memo, key) => {
     const fn = obj[key];
-    memo[key] = function(...args: any[]) {
+    memo[key] = function (...args: any[]) {
       const result = fn.apply(this, args);
       if (typeof result !== "string" || result.length === 0) {
         const stringifiedArgs = require("util").inspect(args);
@@ -800,19 +806,19 @@ const omitWithRBACChecks = (omit: typeof baseOmit): typeof baseOmit => (
     if (
       (permission === READ || permission === ALL || permission === MANY) &&
       !tableEntity.aclSelectable &&
-      !tableEntity.attributes.some(attr => attr.aclSelectable)
+      !tableEntity.attributes.some((attr) => attr.aclSelectable)
     ) {
       return true;
     } else if (
       permission === CREATE &&
       !tableEntity.aclInsertable &&
-      !tableEntity.attributes.some(attr => attr.aclInsertable)
+      !tableEntity.attributes.some((attr) => attr.aclInsertable)
     ) {
       return true;
     } else if (
       permission === UPDATE &&
       !tableEntity.aclUpdatable &&
-      !tableEntity.attributes.some(attr => attr.aclUpdatable)
+      !tableEntity.attributes.some((attr) => attr.aclUpdatable)
     ) {
       return true;
     } else if (permission === DELETE && !tableEntity.aclDeletable) {
@@ -825,7 +831,7 @@ const omitWithRBACChecks = (omit: typeof baseOmit): typeof baseOmit => (
     // Have we got *any* permissions on the table?
     if (
       klass.aclSelectable ||
-      klass.attributes.some(attr => attr.aclSelectable)
+      klass.attributes.some((attr) => attr.aclSelectable)
     ) {
       // Yes; this is a regular table; omit if RBAC permissions tell us to.
       if (
@@ -879,7 +885,7 @@ const omitUnindexed = (omit: typeof baseOmit, hideIndexWarnings: boolean) => (
           `Disabled 'read' permission for ${describePgEntity(
             entity,
           )} because it isn't indexed. For more information see https://graphile.org/postgraphile/best-practices/ To fix, perform\n\n  CREATE INDEX ON ${`"${klass.namespaceName}"."${klass.name}"`}("${entity.keyAttributes
-            .map(a => a.name)
+            .map((a) => a.name)
             .join('", "')}");`,
         );
       }
@@ -904,7 +910,7 @@ export function describePgEntity(
         if (Object.keys(tags).length) {
           return ` (with smart comments: ${chalk.bold(
             Object.keys(tags)
-              .map(t => `@${t} ${tags[t]}`)
+              .map((t) => `@${t} ${tags[t]}`)
               .join(" | "),
           )})`;
         }
@@ -960,7 +966,7 @@ function sqlCommentByAddingTags(entity: PgEntity, tagsToAdd: SmartTags) {
   const escape = (str: string) =>
     str.replace(
       /['\\\b\f\n\r\t]/g,
-      chr =>
+      (chr) =>
         ({
           "\b": "\\b",
           "\f": "\\f",
@@ -983,7 +989,7 @@ function sqlCommentByAddingTags(entity: PgEntity, tagsToAdd: SmartTags) {
       const tagValue = tags[tag];
       const valueArray = Array.isArray(tagValue) ? tagValue : [tagValue];
       const highlightOrNot = tag in tagsToAdd ? chalk.bold.green : identity;
-      valueArray.forEach(value => {
+      valueArray.forEach((value) => {
         memo.push(
           highlightOrNot(
             `@${escape(escape(tag))}${
@@ -1047,7 +1053,7 @@ export default (function PgBasicsPlugin(
   }
   builder.hook(
     "build",
-    build => {
+    (build) => {
       build.versions["graphile-build-pg"] = version;
       build.liveCoordinator.registerProvider(new PgLiveProvider());
       const buildExtensions: Partial<Build> = {
@@ -1085,7 +1091,7 @@ export default (function PgBasicsPlugin(
     (inflection, build) => {
       // TODO:v5: move this to postgraphile-core
       const oldBuiltin = inflection.builtin;
-      inflection.builtin = function(name) {
+      inflection.builtin = function (name) {
         if (pgLegacyJsonUuid && name === "JSON") return "Json";
         if (pgLegacyJsonUuid && name === "UUID") return "Uuid";
         return oldBuiltin.call(this, name);

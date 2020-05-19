@@ -58,7 +58,7 @@ export default (function PgConnectionArgOrderBy(builder, { orderByNullsLast }) {
         sqlCommentByAddingTags,
         describePgEntity,
       } = build;
-      introspectionResultsByKind.class.forEach(table => {
+      introspectionResultsByKind.class.forEach((table) => {
         // PERFORMANCE: These used to be .filter(...) calls
         if (!table.isSelectable || omit(table, "order")) return;
         if (!table.namespace) return;
@@ -196,9 +196,9 @@ export default (function PgConnectionArgOrderBy(builder, { orderByNullsLast }) {
           : null;
         return {
           pgCursorPrefix: cursorPrefixFromOrderBy(orderBy),
-          pgQuery: queryBuilder => {
+          pgQuery: (queryBuilder) => {
             if (orderBy != null) {
-              orderBy.forEach(item => {
+              orderBy.forEach((item) => {
                 const { specs, unique } = item;
                 const orders: OrderBySpec[] = isOrderBySpec(specs)
                   ? [specs]

@@ -1,7 +1,7 @@
 import subscribeToLogicalDecoding from "../src/index";
 import { DATABASE_URL, withClient } from "./helpers";
 
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 test("gets expected data, cleans up, doesn't receive data after cleanup", async () => {
   const mockCallback = jest.fn();
@@ -10,7 +10,7 @@ test("gets expected data, cleans up, doesn't receive data after cleanup", async 
     sleepDuration: 50,
     slotName: "index_test_slot",
   });
-  await withClient(DATABASE_URL, async pgClient => {
+  await withClient(DATABASE_URL, async (pgClient) => {
     const {
       rows: [{ id }],
     } = await pgClient.query(
@@ -28,7 +28,7 @@ test("gets expected data, cleans up, doesn't receive data after cleanup", async 
   await sub.close();
   expect(mockCallback).toHaveBeenCalledTimes(4);
   // Now run a new mutation, and expect the mockCallback not to have been called
-  await withClient(DATABASE_URL, pgClient =>
+  await withClient(DATABASE_URL, (pgClient) =>
     pgClient.query(
       "insert into app_public.foo(name) values ('temp') returning id",
     ),
@@ -38,13 +38,13 @@ test("gets expected data, cleans up, doesn't receive data after cleanup", async 
   const {
     mock: { calls },
   } = mockCallback;
-  calls.forEach(call => {
+  calls.forEach((call) => {
     expect(Array.isArray(call)).toBe(true);
     const o = call[0];
     expect(o.schema).toEqual("app_public");
     expect(o.table).toEqual("foo");
   });
-  const [insertC, update, updateC, del] = calls.map(c => c[0]);
+  const [insertC, update, updateC, del] = calls.map((c) => c[0]);
 
   expect(insertC._).toEqual("insertC");
   expect(insertC.data.name).toEqual("temp");

@@ -106,13 +106,13 @@ export default async function viaTemporaryTable(
     );
 
     const { rows } = result;
-    const firstNonNullRow = rows.find(row => row !== null);
+    const firstNonNullRow = rows.find((row) => row !== null);
     // TODO: we should be able to have `pg` not interpret the results as
     // objects and instead just return them as arrays - then we can just do
     // `row[0]`. PR welcome!
     const firstKey = firstNonNullRow && Object.keys(firstNonNullRow)[0];
-    const rawValues = rows.map(row => row && row[firstKey]);
-    const values = rawValues.filter(rawValue => rawValue !== null);
+    const rawValues = rows.map((row) => row && row[firstKey]);
+    const values = rawValues.filter((rawValue) => rawValue !== null);
     const sqlValuesAlias = sql.identifier(Symbol());
     const convertFieldBack = isPgClassLike
       ? sql`\
@@ -139,7 +139,7 @@ select ${sql.join(
           ", ",
         )}
 from (values ${sql.join(
-          values.map(value => sql`(${sql.value(value)}::text[])`),
+          values.map((value) => sql`(${sql.value(value)}::text[])`),
           ", ",
         )}) as ${sqlValuesAlias}(output_value_list)`
       : sql`\
@@ -152,7 +152,7 @@ from unnest((${sql.value(values)})::text[]) str`;
             sql`with ${sqlResultSourceAlias} as (${convertFieldBack}) ${sqlResultQuery}`,
           )
         : { rows: [] };
-    const finalRows = rawValues.map(rawValue =>
+    const finalRows = rawValues.map((rawValue) =>
       /*
        * We can't simply return 'null' here because this is expected to have
        * come from PG, and that would never return 'null' for a row - only

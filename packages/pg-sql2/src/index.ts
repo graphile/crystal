@@ -73,7 +73,7 @@ function mangleName(str: string): string {
   return (
     str
       // Keep the identifier simple so it doesn't need escaping.
-      .replace(/[A-Z]/g, l => `_${l.toLowerCase()}`)
+      .replace(/[A-Z]/g, (l) => `_${l.toLowerCase()}`)
       .replace(/[^a-z0-9_]+/g, "_")
 
       // Avoid double-underscores.

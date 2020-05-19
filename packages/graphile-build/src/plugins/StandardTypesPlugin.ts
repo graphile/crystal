@@ -15,9 +15,9 @@ export default (function StandardTypesPlugin(builder) {
         new build.graphql.GraphQLScalarType({
           name,
           description,
-          serialize: value => String(value),
-          parseValue: value => String(value),
-          parseLiteral: ast => {
+          serialize: (value) => String(value),
+          parseValue: (value) => String(value),
+          parseLiteral: (ast) => {
             if (ast.kind !== Kind.STRING) {
               throw new Error("Can only parse string values");
             }

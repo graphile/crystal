@@ -62,7 +62,7 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
       // This is a relation in which we (table) are local, and there's a foreign table
 
       const foreignKeyConstraints = table.constraints.filter(
-        con => con.type === "f",
+        (con) => con.type === "f",
       );
 
       return extend(
@@ -110,13 +110,13 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
 
           const keys = constraint.keyAttributes;
           const foreignKeys = constraint.foreignKeyAttributes;
-          if (!keys.every(_ => _) || !foreignKeys.every(_ => _)) {
+          if (!keys.every((_) => _) || !foreignKeys.every((_) => _)) {
             throw new Error("Could not find key columns!");
           }
-          if (keys.some(key => omit(key, "read"))) {
+          if (keys.some((key) => omit(key, "read"))) {
             return memo;
           }
-          if (foreignKeys.some(key => omit(key, "read"))) {
+          if (foreignKeys.some((key) => omit(key, "read"))) {
             return memo;
           }
 
@@ -136,9 +136,9 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
                   getDataFromParsedResolveInfoFragment,
                   addDataGenerator,
                 }) => {
-                  addDataGenerator(parsedResolveInfoFragment => {
+                  addDataGenerator((parsedResolveInfoFragment) => {
                     return {
-                      pgQuery: queryBuilder => {
+                      pgQuery: (queryBuilder) => {
                         queryBuilder.select(() => {
                           const resolveData = getDataFromParsedResolveInfoFragment(
                             parsedResolveInfoFragment,
@@ -159,7 +159,7 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
                               asJson: true,
                             },
 
-                            innerQueryBuilder => {
+                            (innerQueryBuilder) => {
                               innerQueryBuilder.parentQueryBuilder = queryBuilder;
                               if (subscriptions && table.primaryKeyConstraint) {
                                 queryBuilder.selectIdentifiers(table);

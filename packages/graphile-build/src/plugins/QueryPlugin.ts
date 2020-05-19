@@ -3,7 +3,7 @@ import { Plugin } from "../SchemaBuilder";
 export default (async function QueryPlugin(builder) {
   builder.hook(
     "build",
-    build =>
+    (build) =>
       build.extend(
         build,
         {

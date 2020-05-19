@@ -47,7 +47,7 @@ export default (function PgQueryProceduresPlugin(
           }, [] as PgType[]);
           if (
             argTypes.some(
-              type =>
+              (type) =>
                 type.type === "c" && type.class && type.class.isSelectable,
             )
           ) {

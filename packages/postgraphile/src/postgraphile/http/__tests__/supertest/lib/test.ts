@@ -50,7 +50,7 @@ class Test extends Request {
 
     // Make awaiting work
     const oldThen = this.then;
-    const donePromise = new Promise(resolve => {
+    const donePromise = new Promise((resolve) => {
       this.completeCallback = resolve;
     });
     let promise: Promise<any> | null = null;

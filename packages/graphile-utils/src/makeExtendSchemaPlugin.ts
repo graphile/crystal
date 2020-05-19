@@ -107,7 +107,7 @@ export default function makeExtendSchemaPlugin(
   let graphql: Build["graphql"];
   return (builder: SchemaBuilder, schemaOptions: Options): void => {
     // Add stuff to the schema
-    builder.hook("build", build => {
+    builder.hook("build", (build) => {
       // Extract GraphQL into the scope so that our other functions can use it.
       graphql = build.graphql;
 
@@ -148,7 +148,7 @@ export default function makeExtendSchemaPlugin(
         GraphQLObjectType: {},
       };
       const newTypes: Array<NewTypeDef> = [];
-      mergedTypeDefinitions.forEach(definition => {
+      mergedTypeDefinitions.forEach((definition) => {
         if (definition.kind === "EnumTypeDefinition") {
           newTypes.push({
             type: GraphQLEnumType,
@@ -616,7 +616,7 @@ export default function makeExtendSchemaPlugin(
       }
 
       const values = enumType.getValues();
-      const enumValue = values.find(v => v.name === enumValueName);
+      const enumValue = values.find((v) => v.name === enumValueName);
       return enumValue ? enumValue.value : undefined;
     } else if (value.kind === "NullValue") {
       return null;
@@ -625,7 +625,7 @@ export default function makeExtendSchemaPlugin(
       const childType:
         | import("graphql").GraphQLList<import("graphql").GraphQLType>
         | null = type && graphql.isListType(type) ? type.ofType : null;
-      return value.values.map(value => getValue(value, childType));
+      return value.values.map((value) => getValue(value, childType));
     } else if (value.kind === "GraphileEmbed") {
       // RAW!
       return value.value;
@@ -917,13 +917,13 @@ export default function makeExtendSchemaPlugin(
               const table: PgClass = pgIntrospection;
               if (Array.isArray(directives.requires.columns)) {
                 const attrs = table.attributes.filter(
-                  attr => directives.requires.columns.indexOf(attr.name) >= 0,
+                  (attr) => directives.requires.columns.indexOf(attr.name) >= 0,
                 );
-                const fieldNames = attrs.map(attr =>
+                const fieldNames = attrs.map((attr) =>
                   build.inflection.column(attr),
                 );
                 const ReturnTypes = attrs.map(
-                  attr =>
+                  (attr) =>
                     build.pgGetGqlTypeByTypeIdAndModifier(
                       attr.typeId,
                       attr.typeModifier,

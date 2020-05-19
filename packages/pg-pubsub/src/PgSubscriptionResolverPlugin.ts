@@ -13,7 +13,7 @@ function isPubSub(pubsub: any): pubsub is PubSub {
  * `subscribe` method.
  */
 
-const PgSubscriptionResolverPlugin: Plugin = function(builder, { pubsub }) {
+const PgSubscriptionResolverPlugin: Plugin = function (builder, { pubsub }) {
   if (!isPubSub(pubsub)) {
     debug("Subscriptions disabled - no pubsub provided");
     return;
@@ -74,12 +74,12 @@ const PgSubscriptionResolverPlugin: Plugin = function(builder, { pubsub }) {
               )
                 ? unsubscribeTopic
                 : [unsubscribeTopic];
-              const unsubscribeIterators = unsubscribeTopics.map(t => {
+              const unsubscribeIterators = unsubscribeTopics.map((t) => {
                 const i = pubsub.asyncIterator(t);
                 i["topic"] = t;
                 return i;
               });
-              unsubscribeIterators.forEach(unsubscribeIterator => {
+              unsubscribeIterators.forEach((unsubscribeIterator) => {
                 unsubscribeIterator.next().then(() => {
                   debug(
                     "Unsubscribe triggered on channel %s",
@@ -88,7 +88,7 @@ const PgSubscriptionResolverPlugin: Plugin = function(builder, { pubsub }) {
                   if (asyncIterator.return) {
                     asyncIterator.return();
                   }
-                  unsubscribeIterators.forEach(i => {
+                  unsubscribeIterators.forEach((i) => {
                     if (i.return) {
                       i.return();
                     }

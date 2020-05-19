@@ -56,7 +56,7 @@ function skipField(
   { directives = [] }: SelectionNode,
 ) {
   let skip = false;
-  directives.forEach(directive => {
+  directives.forEach((directive) => {
     const directiveName = directive.name.value;
     if (Array.isArray(directive.arguments)) {
       const ifArgumentAst = directive.arguments.find(argNameIsIf);

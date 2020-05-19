@@ -6,7 +6,7 @@ export { PoolClient } from "pg";
 
 export async function tryDropSlot(slotName: string) {
   try {
-    await withClient(DATABASE_URL, pgClient =>
+    await withClient(DATABASE_URL, (pgClient) =>
       pgClient.query("select pg_drop_replication_slot($1)", [slotName]),
     );
   } catch (e) {
@@ -34,14 +34,14 @@ export async function withClient<T = void>(
 }
 
 export async function query(text: string, values: Array<any> = []) {
-  return withClient(DATABASE_URL, pgClient => pgClient.query(text, values));
+  return withClient(DATABASE_URL, (pgClient) => pgClient.query(text, values));
 }
 
 export async function withLdAndClient<T = void>(
   callback: (ld: PgLogicalDecoding, client: PoolClient) => Promise<T>,
 ): Promise<T> {
-  return withClient(DATABASE_URL, pgClient =>
-    withLd(ld => callback(ld, pgClient)),
+  return withClient(DATABASE_URL, (pgClient) =>
+    withLd((ld) => callback(ld, pgClient)),
   );
 }
 

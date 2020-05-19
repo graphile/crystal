@@ -49,7 +49,7 @@ export default function pgField(
   } = build;
   return fieldWithHooks(
     fieldName,
-    fieldContext => {
+    (fieldContext) => {
       const fieldSpec =
         typeof fieldSpecGenerator === "function"
           ? fieldSpecGenerator(fieldContext)
@@ -71,7 +71,7 @@ export default function pgField(
         getDataFromParsedResolveInfoFragment,
         addDataGenerator,
       } = fieldContext;
-      addDataGenerator(parsedResolveInfoFragment => {
+      addDataGenerator((parsedResolveInfoFragment) => {
         const safeAlias = getSafeAliasFromAlias(
           parsedResolveInfoFragment.alias,
         );
@@ -87,7 +87,7 @@ export default function pgField(
           resolveData.usesCursor.length
             ? { usesCursor: true }
             : null),
-          pgQuery: queryBuilder => {
+          pgQuery: (queryBuilder) => {
             queryBuilder.select(() => {
               const tableAlias =
                 whereFrom === false
@@ -107,7 +107,7 @@ export default function pgField(
                 whereFrom === false
                   ? { onlyJsonField: true }
                   : { asJson: true },
-                innerQueryBuilder => {
+                (innerQueryBuilder) => {
                   innerQueryBuilder.parentQueryBuilder = queryBuilder;
                   if (typeof options.withQueryBuilder === "function") {
                     options.withQueryBuilder(innerQueryBuilder, {

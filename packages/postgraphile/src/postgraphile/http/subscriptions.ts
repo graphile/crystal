@@ -118,7 +118,7 @@ export async function enhanceHttpServerWithSubscriptions<
     for (const middleware of middlewares) {
       // TODO: add Koa support
       await new Promise((resolve, reject): void => {
-        middleware(req, res, err => (err ? reject(err) : resolve()));
+        middleware(req, res, (err) => (err ? reject(err) : resolve()));
       });
     }
   };
@@ -181,7 +181,7 @@ export async function enhanceHttpServerWithSubscriptions<
             req,
             res,
             { singleStatement: true },
-            context => {
+            (context) => {
               const promise = addContextForSocketAndOpId(context, socket, opId);
               resolve(promise["context"]);
               return promise;
@@ -200,7 +200,7 @@ export async function enhanceHttpServerWithSubscriptions<
     const { pathname = "" } = parseUrl(req) || {};
     const isGraphqlRoute = pathname === externalUrlBase + graphqlRoute;
     if (isGraphqlRoute) {
-      wss.handleUpgrade(req, socket, head, ws => {
+      wss.handleUpgrade(req, socket, head, (ws) => {
         wss.emit("connection", ws, req);
       });
     }
@@ -332,7 +332,7 @@ export async function enhanceHttpServerWithSubscriptions<
           if (validationErrors.length) {
             const error = new Error(
               "Query validation failed: \n" +
-                validationErrors.map(e => e.message).join("\n"),
+                validationErrors.map((e) => e.message).join("\n"),
             );
             error["errors"] = validationErrors;
             return Promise.reject(error);

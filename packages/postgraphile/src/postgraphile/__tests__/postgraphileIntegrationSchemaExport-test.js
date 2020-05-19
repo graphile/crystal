@@ -10,7 +10,7 @@ import { readFileSync, existsSync } from "fs";
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20;
 
-const gqlSchemaPromise = withPgClient(async pgClient => {
+const gqlSchemaPromise = withPgClient(async (pgClient) => {
   return await createPostGraphileSchema(pgClient, ["a", "b", "c"]);
 })();
 

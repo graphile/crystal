@@ -113,7 +113,7 @@ function liveSubscribeImpl(
   // Resolve the Source Stream, then map every source value to a
   // ExecutionResult value as described above.
   return sourcePromise.then(
-    resultOrStream =>
+    (resultOrStream) =>
       // Note: Flow can't refine isAsyncIterable, so explicit casts are used.
       isAsyncIterable(resultOrStream)
         ? mapAsyncIterator(

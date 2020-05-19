@@ -18,7 +18,7 @@ afterAll(() => {
   }
 });
 
-const makeSchemaWithPlugins = plugins =>
+const makeSchemaWithPlugins = (plugins) =>
   createPostGraphileSchema(pgPool, ["graphile_utils"], {
     appendPlugins: plugins,
   });
@@ -71,7 +71,7 @@ it("requests the required sibling columns", async () => {
       },
     );
     expect(result.errors).toBeFalsy();
-    result.data.allUsers.nodes.forEach(user => {
+    result.data.allUsers.nodes.forEach((user) => {
       if (user.id === 2) {
         expect(user.email).not.toBeNull();
       } else {
