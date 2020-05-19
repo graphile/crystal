@@ -16760,6 +16760,7 @@ fsevents@^1.2.7:
   dependencies:
     "@babel/runtime": ^7.9.6
     "@types/jest": ^25.2.3
+    "@types/ws": ^7.2.4
     "@typescript-eslint/eslint-plugin": ^2.34.0
     "@typescript-eslint/parser": ^2.34.0
     babel-eslint: ^10.0.0
@@ -16781,6 +16782,7 @@ fsevents@^1.2.7:
     subscriptions-transport-ws: ^0.9.16
     ts-node: ^8.10.1
     typescript: ^3.9.2
+    ws: ^7.3.0
   languageName: unknown
   linkType: soft
 
