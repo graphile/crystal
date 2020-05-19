@@ -40,8 +40,10 @@
     "graphile-build": "4.7.0",
     "graphile-build-pg": "4.7.0",
     "iterall": "^1.3.0",
+    "jest": "^26.0.1",
     "pg": "^8.2.1",
     "postgraphile-core": "4.7.0",
+    "ts-node": "^8.10.1",
     "typescript": "^3.9.2"
   },
   "peerDependencies": {

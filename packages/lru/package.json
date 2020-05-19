@@ -30,6 +30,8 @@
     "tslib": "^2.0.0"
   },
   "devDependencies": {
+    "jest": "^26.0.1",
+    "ts-node": "^8.10.1",
     "typescript": "^3.9.2"
   }
 }

@@ -55,6 +55,8 @@
   "devDependencies": {
     "graphql": "^15.0.0",
     "graphql-parse-resolve-info": "4.7.0",
+    "jest": "^26.0.1",
+    "ts-node": "^8.10.1",
     "typescript": "^3.9.2"
   },
   "peerDependencies": {

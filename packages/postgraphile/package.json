@@ -100,6 +100,7 @@
     "fastify": "^2.14.1",
     "html-webpack-inline-source-plugin": "^1.0.0-beta.2",
     "html-webpack-plugin": "^4.3.0",
+    "jest": "^26.0.1",
     "koa": "^2.12.0",
     "koa-compress": "^4.0.1",
     "koa-mount": "^4.0.0",
@@ -112,6 +113,7 @@
     "source-map-support": "^0.5.19",
     "style-loader": "^1.2.1",
     "superagent": "^5.2.2",
+    "ts-node": "^8.10.1",
     "typescript": "^3.9.2",
     "webpack": "^4.43.0"
   },

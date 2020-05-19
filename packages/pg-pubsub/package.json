@@ -44,10 +44,12 @@
     "@types/jest": "^25.2.3",
     "graphile-build-pg": "4.7.0",
     "graphql": "^15.0.0",
+    "jest": "^26.0.1",
     "mock-req": "^0.2.0",
     "mock-res": "^0.5.0",
     "pg": "^8.2.1",
     "postgraphile": "4.7.0",
+    "ts-node": "^8.10.1",
     "typescript": "^3.9.2"
   },
   "files": [

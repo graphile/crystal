@@ -28,7 +28,9 @@
   },
   "devDependencies": {
     "graphql": "^15.0.0",
+    "jest": "^26.0.1",
     "pretty-format": "^26.0.1",
+    "ts-node": "^8.10.1",
     "typescript": "^3.9.2"
   },
   "files": [
