@@ -46,10 +46,12 @@
     "lodash": ">=4 <5",
     "lru-cache": ">=4 <5",
     "pg-sql2": "4.7.0",
-    "postgres-interval": "^1.2.0"
+    "postgres-interval": "^1.2.0",
+    "tslib": "^1.5.0"
   },
   "peerDependencies": {
     "graphql": ">=0.9 <0.14 || ^14.0.2",
+    "graphql-parse-resolve-info": "4.7.0",
     "pg": ">=6.1.0 <9"
   },
   "files": [

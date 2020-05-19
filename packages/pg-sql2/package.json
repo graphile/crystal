@@ -37,7 +37,8 @@
     "markdown-doctest": "^1.0.0"
   },
   "dependencies": {
-    "@graphile/lru": "4.6.0-alpha.0"
+    "@graphile/lru": "4.6.0-alpha.0",
+    "tslib": "^1.5.0"
   },
   "files": [
     "dist"

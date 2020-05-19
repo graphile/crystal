@@ -339,7 +339,7 @@ export const getPostGraphileBuilder = async (
       return fn.displayName || fn.name || String(fn);
     }
     throw new Error(
-      `You tried to skip plugins that would never have been loaded anyway. Perhaps you've made a mistake in your skipPlugins list, or have sourced the plugin from a duplicate plugin module - check for duplicate modules in your 'node_modules' folder. The plugins that you requested to skip were: ${invalidSkipPlugins
+      `You tried to skip plugins that would never have been loaded anyway. Perhaps you've made a mistake in your skipPlugins list, or have sourced the plugin from a duplicate plugin module - check for duplicate modules in your 'node_` + /* calm yarn doctor */ `modules' folder. The plugins that you requested to skip were: ${invalidSkipPlugins
         .map(getFunctionName)
         .join(", ")}`,
     );

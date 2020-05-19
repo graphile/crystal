@@ -37,7 +37,8 @@
     "iterall": "^1.2.2",
     "lodash": ">=4 <5",
     "pluralize": "^7.0.0",
-    "semver": "^6.0.0"
+    "semver": "^6.0.0",
+    "tslib": "^1.5.0"
   },
   "engines": {
     "node": ">=12.16"
