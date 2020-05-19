@@ -58,6 +58,7 @@
     "graphile-build-pg": "4.7.0",
     "graphile-utils": "^4.7.0",
     "graphql": "^0.6.0 || ^0.7.0 || ^0.8.0-b || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.2",
+    "graphql-parse-resolve-info": "4.7.0",
     "http-errors": "^1.5.1",
     "iterall": "^1.0.2",
     "json5": "^2.1.1",

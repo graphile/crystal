@@ -19,6 +19,7 @@
   "dependencies": {
     "graphile-build": "4.7.0",
     "graphile-build-pg": "4.7.0",
+    "graphql-parse-resolve-info": "4.7.0",
     "tslib": "^1.5.0"
   },
   "devDependencies": {
@@ -29,6 +30,7 @@
     "graphile-utils": "4.7.0",
     "jsonwebtoken": "^8.5.1",
     "mock-fs": "^4.11.0",
+    "pg": ">=6.1.0 <9",
     "pg-connection-string": "^2.1.0"
   },
   "peerDependencies": {

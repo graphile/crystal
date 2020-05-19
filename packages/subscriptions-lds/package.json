@@ -35,11 +35,11 @@
     "tslib": "^1.5.0",
     "ws": "^7.0.0"
   },
-  "peerDependencies": {
-    "postgraphile-core": ">4.3.1 <5"
-  },
   "devDependencies": {
-    "pg": ">=6.1.0 <9"
+    "graphql": ">=0.9 <0.14 || ^14.0.2",
+    "graphql-parse-resolve-info": "4.7.0",
+    "pg": ">=6.1.0 <9",
+    "postgraphile-core": ">4.3.1 <5"
   },
   "files": [
     "dist"

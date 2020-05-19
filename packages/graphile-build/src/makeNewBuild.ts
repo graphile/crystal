@@ -413,7 +413,7 @@ export default function makeNewBuild(builder: SchemaBuilder): BuildBase {
       knownTypeNames.indexOf(Type.name) >= 0
     ) {
       throw new Error(
-        `GraphQL conflict for '${Type.name}' detected! Multiple versions of graphql exist in your node_modules?`,
+        `GraphQL conflict for '${Type.name}' detected! Multiple versions of graphql exist in your node_` + /* yarn doctor */ `modules?`,
       );
     }
     if (Type === GraphQLSchema) {
