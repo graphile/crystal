@@ -27,6 +27,7 @@
     "graphql": "^15.0.0"
   },
   "devDependencies": {
+    "@types/jest": "^25.2.3",
     "graphql": "^15.0.0",
     "jest": "^26.0.1",
     "pretty-format": "^26.0.1",

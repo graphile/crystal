@@ -1585,6 +1585,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@graphile/lds@workspace:packages/lds"
   dependencies:
+    "@types/jest": ^25.2.3
     "@types/pg": ^7.14.3
     "@types/ws": ^7.2.4
     jest: ^26.0.1
@@ -1602,6 +1603,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@graphile/lru@workspace:packages/lru"
   dependencies:
+    "@types/jest": ^25.2.3
     jest: ^26.0.1
     ts-node: ^8.10.1
     tslib: ^2.0.0
@@ -1642,6 +1644,7 @@ __metadata:
   resolution: "@graphile/subscriptions-lds@workspace:packages/subscriptions-lds"
   dependencies:
     "@graphile/lds": 4.7.0
+    "@types/jest": ^25.2.3
     "@types/ws": ^7.2.4
     graphile-build: 4.7.0
     graphile-build-pg: 4.7.0
@@ -9907,6 +9910,7 @@ fsevents@^1.2.7:
   dependencies:
     "@graphile/lru": 4.6.0-alpha.0
     "@types/debug": ^4.1.5
+    "@types/jest": ^25.2.3
     "@types/jsonwebtoken": ^8.5.0
     "@types/lodash": ^4.14.151
     "@types/node": ^14.0.1
@@ -9939,6 +9943,7 @@ fsevents@^1.2.7:
   dependencies:
     "@graphile/lru": 4.6.0-alpha.0
     "@types/debug": ^4.1.5
+    "@types/jest": ^25.2.3
     "@types/lodash": ^4.14.151
     "@types/node": ^14.0.1
     "@types/pluralize": ^0.0.29
@@ -9964,6 +9969,7 @@ fsevents@^1.2.7:
   version: 0.0.0-use.local
   resolution: "graphile-utils@workspace:packages/graphile-utils"
   dependencies:
+    "@types/jest": ^25.2.3
     "@types/node": ^14.0.1
     debug: ^4.2.0
     graphile-build: 4.7.0
@@ -9987,6 +9993,7 @@ fsevents@^1.2.7:
   version: 0.0.0-use.local
   resolution: "graphile@workspace:packages/graphile"
   dependencies:
+    "@types/jest": ^25.2.3
     jest: ^26.0.1
     ts-node: ^8.10.1
     typescript: ^3.9.2
@@ -10128,6 +10135,7 @@ fsevents@^1.2.7:
   resolution: "graphql-parse-resolve-info@workspace:packages/graphql-parse-resolve-info"
   dependencies:
     "@types/debug": ^4.1.5
+    "@types/jest": ^25.2.3
     "@types/node": ^14.0.1
     debug: ^4.2.0
     eslint_d: ^8.1.1
@@ -12395,6 +12403,7 @@ fsevents@^1.2.7:
   version: 0.0.0-use.local
   resolution: "jest-serializer-graphql-schema@workspace:packages/jest-serializer-graphql-schema"
   dependencies:
+    "@types/jest": ^25.2.3
     graphql: ^15.0.0
     jest: ^26.0.1
     pretty-format: ^26.0.1
@@ -15604,6 +15613,7 @@ fsevents@^1.2.7:
   dependencies:
     "@graphile/lru": 4.6.0-alpha.0
     "@types/debug": 4.1.5
+    "@types/jest": ^25.2.3
     "@types/node": 14.0.1
     jest: ^26.0.1
     markdown-doctest: ^1.0.0
@@ -16640,6 +16650,7 @@ fsevents@^1.2.7:
   resolution: "postgraphile-core@workspace:packages/postgraphile-core"
   dependencies:
     "@graphile/subscriptions-lds": 4.7.0
+    "@types/jest": ^25.2.3
     "@types/jsonwebtoken": ^8.5.0
     "@types/node": ^14.0.1
     "@types/pg": ^7.14.3
@@ -16748,6 +16759,7 @@ fsevents@^1.2.7:
   resolution: "postgraphiql@workspace:packages/postgraphiql"
   dependencies:
     "@babel/runtime": ^7.9.6
+    "@types/jest": ^25.2.3
     "@typescript-eslint/eslint-plugin": ^2.34.0
     "@typescript-eslint/parser": ^2.34.0
     babel-eslint: ^10.0.0

@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@graphile/subscriptions-lds": "4.7.0",
+    "@types/jest": "^25.2.3",
     "@types/node": "^14.0.1",
     "@types/pg": "^7.14.3",
     "debug": "^4.2.0",

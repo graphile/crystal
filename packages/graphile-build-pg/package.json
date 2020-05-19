@@ -53,6 +53,7 @@
     "tslib": "^2.0.0"
   },
   "devDependencies": {
+    "@types/jest": "^25.2.3",
     "graphql": "^15.0.0",
     "graphql-parse-resolve-info": "4.7.0",
     "jest": "^26.0.1",
