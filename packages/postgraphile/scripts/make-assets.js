@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 const fs = require("fs");
-const { execSync } = require("child_process");
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const HtmlWebpackInlineSourcePlugin = require("html-webpack-inline-source-plugin");
@@ -118,10 +117,13 @@ async function main() {
       (err, stats) => {
         if (err) {
           console.error(err);
+          reject(err);
           process.exit(1);
         }
         if (stats.hasErrors()) {
-          console.log(stats.toString("minimal"));
+          const message = stats.toString("minimal");
+          console.log(message);
+          reject(new Error(message));
           process.exit(2);
         }
         // We only want the HTML file
