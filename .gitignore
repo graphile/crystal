@@ -12,3 +12,9 @@ tsconfig.tsbuildinfo
 .env
 _LOCAL
 .DS_Store
+
+# yarn2 stuff
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+.pnp.*

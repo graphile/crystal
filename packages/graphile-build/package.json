@@ -42,7 +42,6 @@
   "engines": {
     "node": ">=12.16"
   },
-  "devDependencies": {},
   "peerDependencies": {
     "graphql": ">=0.9 <0.14 || ^14.0.2"
   },

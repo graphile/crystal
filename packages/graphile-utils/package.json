@@ -40,7 +40,8 @@
   },
   "peerDependencies": {
     "graphile-build": "^4.5.0",
-    "graphile-build-pg": "^4.5.0"
+    "graphile-build-pg": "^4.5.0",
+    "pg": ">=6.1.0 <9"
   },
   "files": [
     "dist"

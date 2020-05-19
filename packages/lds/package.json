@@ -37,7 +37,6 @@
     "pg": ">=6.1.0 <9",
     "ws": "^7.0.0"
   },
-  "devDependencies": {},
   "files": [
     "dist"
   ]

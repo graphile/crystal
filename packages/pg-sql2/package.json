@@ -36,7 +36,6 @@
     "@types/node": "12.7.5",
     "markdown-doctest": "^1.0.0"
   },
-  "peerDependencies": {},
   "dependencies": {
     "@graphile/lru": "4.6.0-alpha.0"
   },

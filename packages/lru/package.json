@@ -23,7 +23,6 @@
   "engines": {
     "node": ">=12.16"
   },
-  "devDependencies": {},
   "files": [
     "dist"
   ]
