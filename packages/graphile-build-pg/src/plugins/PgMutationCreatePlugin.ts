@@ -1,19 +1,20 @@
-import { Plugin } from "graphile-build";
 import debugFactory from "debug";
 import { SQL } from "../QueryBuilder";
 
 const debug = debugFactory("graphile-build-pg");
 
-declare module "graphile-build" {
-  interface ScopeGraphQLObjectType {
-    isPgCreatePayloadType?: boolean;
-  }
-  interface ScopeGraphQLObjectTypeFieldsField {
-    isPgCreateMutationField?: boolean;
-    isPgCreatePayloadResultField?: boolean;
-  }
-  interface ScopeGraphQLInputObjectType {
-    isPgCreateInputType?: boolean;
+declare global {
+  namespace GraphileEngine {
+    interface ScopeGraphQLObjectType {
+      isPgCreatePayloadType?: boolean;
+    }
+    interface ScopeGraphQLObjectTypeFieldsField {
+      isPgCreateMutationField?: boolean;
+      isPgCreatePayloadResultField?: boolean;
+    }
+    interface ScopeGraphQLInputObjectType {
+      isPgCreateInputType?: boolean;
+    }
   }
 }
 
@@ -311,4 +312,4 @@ insert into ${sql.identifier(table.namespace.name, table.name)} ${
     [],
     ["PgTables"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

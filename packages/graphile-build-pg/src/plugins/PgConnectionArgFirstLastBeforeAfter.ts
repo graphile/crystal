@@ -1,5 +1,3 @@
-import { Plugin } from "graphile-build";
-
 const base64Decode = (str: string) =>
   Buffer.from(String(str), "base64").toString("utf8");
 
@@ -131,4 +129,4 @@ export default (function PgConnectionArgs(builder) {
     },
     ["PgConnectionArgFirstLastBeforeAfter"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

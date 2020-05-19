@@ -1,10 +1,11 @@
-import { Plugin } from "graphile-build";
 import debugSql from "./debugSql";
 import { PgClass } from "./PgIntrospectionPlugin";
 
-declare module "graphile-build" {
-  interface GraphileBuildOptions {
-    pgViewUniqueKey?: string; // DEPRECATED; use the @primaryKey smart tag instead
+declare global {
+  namespace GraphileEngine {
+    interface GraphileBuildOptions {
+      pgViewUniqueKey?: string; // DEPRECATED; use the @primaryKey smart tag instead
+    }
   }
 }
 
@@ -253,4 +254,4 @@ export default (async function PgAllRows(
     [],
     ["PgTables"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

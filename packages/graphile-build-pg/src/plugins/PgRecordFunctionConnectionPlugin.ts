@@ -1,8 +1,3 @@
-import {
-  Plugin,
-  GraphileObjectTypeConfig,
-  ScopeGraphQLObjectType,
-} from "graphile-build";
 import { base64, nullableIf } from "../utils";
 
 export default (function PgRecordFunctionConnectionPlugin(
@@ -65,7 +60,7 @@ export default (function PgRecordFunctionConnectionPlugin(
           throw new Error("Cursor type not found");
         }
 
-        const edgeSpec: GraphileObjectTypeConfig<any, any> = {
+        const edgeSpec: GraphileEngine.GraphileObjectTypeConfig<any, any> = {
           name: inflection.recordFunctionEdge(proc),
           description: `A \`${
             getNamedType(NodeType).name
@@ -119,7 +114,7 @@ export default (function PgRecordFunctionConnectionPlugin(
             };
           },
         };
-        const edgeScope: ScopeGraphQLObjectType = {
+        const edgeScope: GraphileEngine.ScopeGraphQLObjectType = {
           __origin: `Adding function result edge type for ${describePgEntity(
             proc,
           )}. You can rename the function's GraphQL field (and its dependent types) via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
@@ -227,4 +222,4 @@ export default (function PgRecordFunctionConnectionPlugin(
     },
     ["PgRecordFunctionConnection"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

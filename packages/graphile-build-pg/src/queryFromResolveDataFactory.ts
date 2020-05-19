@@ -4,30 +4,31 @@ import sql, { SQL } from "pg-sql2";
 import isSafeInteger from "lodash/isSafeInteger";
 import flatten from "lodash/flatten";
 import assert from "assert";
-import { ResolvedLookAhead, GraphileResolverContext } from "graphile-build";
 
 type QueryBuilderCallback = (
   queryBuilder: QueryBuilder,
-  resolveData: ResolvedLookAhead,
+  resolveData: GraphileEngine.ResolvedLookAhead,
 ) => void;
 type AggregateQueryBuilderCallback = (queryBuilder: QueryBuilder) => void;
 
-declare module "graphile-build" {
-  interface LookAheadData {
-    pgQuery: QueryBuilderCallback;
-    pgAggregateQuery: AggregateQueryBuilderCallback;
-    pgCursorPrefix: SQL | SQL[] | null;
-    pgDontUseAsterisk: boolean;
-    calculateHasNextPage: boolean;
-    calculateHasPreviousPage: boolean;
-    usesCursor: boolean;
+declare global {
+  namespace GraphileEngine {
+    interface LookAheadData {
+      pgQuery: QueryBuilderCallback;
+      pgAggregateQuery: AggregateQueryBuilderCallback;
+      pgCursorPrefix: SQL | SQL[] | null;
+      pgDontUseAsterisk: boolean;
+      calculateHasNextPage: boolean;
+      calculateHasPreviousPage: boolean;
+      usesCursor: boolean;
+    }
   }
 }
 
 export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
   from: SQL,
   fromAlias: SQL | null | undefined,
-  resolveData: ResolvedLookAhead,
+  resolveData: GraphileEngine.ResolvedLookAhead,
   inOptions: {
     withPagination?: boolean;
     withPaginationAsFields?: boolean;
@@ -42,7 +43,7 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
 
   // TODO:v5: context is not optional
   withBuilder: ((builder: QueryBuilder) => void) | null | undefined,
-  context: GraphileResolverContext,
+  context: GraphileEngine.GraphileResolverContext,
   rootValue: any,
 ): SQL => {
   const {
@@ -241,7 +242,7 @@ exists(
          * `sqlCommon` and see if it's larger than `first`:
          * `(select count(*) > ${first} from (${sqlCommon}) __random_table_alias__)`
          *
-         * If !queryHasBefore, we could build a subquery table of offsetData
+         * If !queryHasBefore, we could build a sub-query table of offsetData
          * from sqlCommon and see if it contains any rows:
          * `EXISTS(select 1 from (${sqlCommon} OFFSET ${first}) __random_table_alias__)`.
          *
@@ -326,7 +327,7 @@ exists(
             )}, ${
               /*
                * NOTE[useAsterisk/row_number]: If we have useAsterisk then the
-               * query with limit offset is in a subquery, so our row_number()
+               * query with limit offset is in a sub-query, so our row_number()
                * call doesn't know about it. Here we add the offset back in
                * again. See matching NOTE in QueryBuilder.js.
                */

@@ -1,4 +1,3 @@
-import { Plugin, ContextGraphQLObjectTypeFieldsField } from "graphile-build";
 import { ResolveTree } from "graphql-parse-resolve-info";
 import { PgTypeModifier } from "./PgBasicsPlugin";
 import { PgType } from "./PgIntrospectionPlugin";
@@ -7,7 +6,7 @@ import { nullableIf } from "../utils";
 
 type PgGetSelectValueForFieldAndTypeAndModifier = (
   ReturnType: import("graphql").GraphQLOutputType,
-  fieldContext: ContextGraphQLObjectTypeFieldsField,
+  fieldContext: GraphileEngine.ContextGraphQLObjectTypeFieldsField,
   parsedResolveInfoFragment: ResolveTree,
   sqlFullName: SQL,
   type: PgType,
@@ -15,9 +14,11 @@ type PgGetSelectValueForFieldAndTypeAndModifier = (
   parentQueryBuilder: QueryBuilder,
 ) => SQL;
 
-declare module "graphile-build" {
-  interface Build {
-    pgGetSelectValueForFieldAndTypeAndModifier: PgGetSelectValueForFieldAndTypeAndModifier;
+declare global {
+  namespace GraphileEngine {
+    interface Build {
+      pgGetSelectValueForFieldAndTypeAndModifier: PgGetSelectValueForFieldAndTypeAndModifier;
+    }
   }
 }
 
@@ -330,4 +331,4 @@ end
     },
     ["PgColumns"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

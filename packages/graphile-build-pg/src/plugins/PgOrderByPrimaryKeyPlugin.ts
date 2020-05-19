@@ -1,5 +1,3 @@
-import { Plugin } from "graphile-build";
-
 export default (function PgOrderByPrimaryKeyPlugin(builder) {
   builder.hook(
     "GraphQLEnumType:values",
@@ -43,4 +41,4 @@ export default (function PgOrderByPrimaryKeyPlugin(builder) {
     },
     ["PgOrderByPrimaryKey"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

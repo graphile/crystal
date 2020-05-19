@@ -1,11 +1,12 @@
 import isString from "lodash/isString";
-import { Plugin } from "graphile-build";
 import { SQL } from "../QueryBuilder";
 import { PgEntityKind } from "./PgIntrospectionPlugin";
 
-declare module "graphile-build" {
-  interface GraphileBuildOptions {
-    orderByNullsLast?: boolean | null;
+declare global {
+  namespace GraphileEngine {
+    interface GraphileBuildOptions {
+      orderByNullsLast?: boolean | null;
+    }
   }
 }
 
@@ -242,4 +243,4 @@ export default (function PgConnectionArgOrderBy(builder, { orderByNullsLast }) {
     },
     ["PgConnectionArgOrderBy"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

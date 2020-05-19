@@ -1,21 +1,16 @@
-import {
-  Build,
-  FieldWithHooksFunction,
-  ScopeGraphQLObjectTypeFieldsField,
-  ScopeGraphQLObjectType,
-  GraphileInputObjectTypeConfig,
-} from "graphile-build";
 import { PgProc, PgType, SmartTags } from "./PgIntrospectionPlugin";
 import { SQL } from "pg-sql2";
 import debugSql from "./debugSql";
 import chalk from "chalk";
 import { ResolveTree } from "graphql-parse-resolve-info";
-import QueryBuilder, { GraphileResolverContext } from "../QueryBuilder";
+import QueryBuilder from "../QueryBuilder";
 import { nullableIf } from "../utils";
 
-declare module "graphile-build" {
-  interface GraphileBuildOptions {
-    pgForbidSetofFunctionsToReturnNull?: boolean;
+declare global {
+  namespace GraphileEngine {
+    interface GraphileBuildOptions {
+      pgForbidSetofFunctionsToReturnNull?: boolean;
+    }
   }
 }
 
@@ -32,14 +27,14 @@ const firstValue = (obj: { [key: string]: any }): any => {
 export default function makeProcField(
   fieldName: string,
   proc: PgProc,
-  build: Build,
+  build: GraphileEngine.Build,
   {
     fieldWithHooks,
     computed = false,
     isMutation = false,
     forceList = false,
   }: {
-    fieldWithHooks: FieldWithHooksFunction;
+    fieldWithHooks: GraphileEngine.FieldWithHooksFunction;
     computed?: boolean;
     isMutation?: boolean;
     forceList?: boolean;
@@ -192,10 +187,10 @@ export default function makeProcField(
     );
   }
   let type: import("graphql").GraphQLOutputType;
-  const fieldScope: ScopeGraphQLObjectTypeFieldsField = {
+  const fieldScope: GraphileEngine.ScopeGraphQLObjectTypeFieldsField = {
     fieldName,
   };
-  const payloadTypeScope: ScopeGraphQLObjectType = {};
+  const payloadTypeScope: GraphileEngine.ScopeGraphQLObjectType = {};
   fieldScope.pgFieldIntrospection = proc;
   payloadTypeScope.pgIntrospection = proc;
   let returnFirstValueAsValue = false;
@@ -392,7 +387,7 @@ export default function makeProcField(
         sqlMutationQuery: SQL,
         functionAlias: SQL,
         parentQueryBuilder: QueryBuilder | null,
-        resolveContext?: GraphileResolverContext,
+        resolveContext?: GraphileEngine.GraphileResolverContext,
         resolveInfo?: import("graphql").GraphQLResolveInfo,
       ) {
         const resolveData = getDataFromParsedResolveInfoFragment(
@@ -582,7 +577,7 @@ export default function makeProcField(
         );
 
         ReturnType = PayloadType;
-        const inputTypeSpec: GraphileInputObjectTypeConfig = {
+        const inputTypeSpec: GraphileEngine.GraphileInputObjectTypeConfig = {
           name: inflection.functionInputType(proc),
           description: `All input for the \`${inflection.functionMutationName(
             proc,

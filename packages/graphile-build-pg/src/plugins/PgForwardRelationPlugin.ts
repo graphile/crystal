@@ -1,10 +1,11 @@
-import { Plugin } from "graphile-build";
 import debugFactory from "debug";
 import { stringTag } from "./PgBasicsPlugin";
 
-declare module "graphile-build" {
-  interface ScopeGraphQLObjectTypeFieldsField {
-    isPgForwardRelationField?: boolean;
+declare global {
+  namespace GraphileEngine {
+    interface ScopeGraphQLObjectTypeFieldsField {
+      isPgForwardRelationField?: boolean;
+    }
   }
 }
 
@@ -238,4 +239,4 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
     },
     ["PgForwardRelation"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

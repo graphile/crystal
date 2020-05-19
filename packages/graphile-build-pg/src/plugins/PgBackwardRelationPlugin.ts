@@ -1,16 +1,17 @@
 import debugFactory from "debug";
 
-import { Plugin } from "graphile-build";
 import { stringTag } from "./PgBasicsPlugin";
 import { PgEntityKind } from "./PgIntrospectionPlugin";
 
-declare module "graphile-build" {
-  interface GraphileBuildOptions {
-    pgLegacyRelations?: "only" | "deprecated" | "omit";
-  }
-  interface ScopeGraphQLObjectTypeFieldsField {
-    isPgBackwardSingleRelationField?: boolean;
-    isPgBackwardRelationField?: boolean;
+declare global {
+  namespace GraphileEngine {
+    interface GraphileBuildOptions {
+      pgLegacyRelations?: "only" | "deprecated" | "omit";
+    }
+    interface ScopeGraphQLObjectTypeFieldsField {
+      isPgBackwardSingleRelationField?: boolean;
+      isPgBackwardRelationField?: boolean;
+    }
   }
 }
 
@@ -524,4 +525,4 @@ export default (function PgBackwardRelationPlugin(
     },
     ["PgBackwardRelation"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

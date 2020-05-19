@@ -1,6 +1,5 @@
 import sql, { PgSQL } from "pg-sql2";
 import { inspect } from "util";
-import { Plugin, Context, Build, Inflection } from "graphile-build";
 // @ts-ignore
 import { version } from "../../package.json";
 import {
@@ -61,218 +60,223 @@ export function stringTag(pgEntity: PgEntity, tagName: string): string | null {
 
 type PgColumnFilterFunction = (
   attr: PgAttribute,
-  build: Build,
-  context: Context,
+  build: GraphileEngine.Build,
+  context: GraphileEngine.Context,
 ) => boolean;
 
 type PgConfig = import("pg").Pool | import("pg").PoolClient | string;
 
-declare module "graphile-build" {
-  interface GraphileResolverContext {
-    pgClient: PoolClient;
-  }
+declare global {
+  namespace GraphileEngine {
+    interface GraphileResolverContext {
+      pgClient: PoolClient;
+    }
 
-  interface GraphileBuildOptions {
-    pgConfig: PgConfig;
-    pgSchemas: Array<string>;
-    persistentMemoizeWithKey?: <T>(key: string, fn: () => T) => T;
+    interface GraphileBuildOptions {
+      pgConfig: PgConfig;
+      pgSchemas: Array<string>;
+      persistentMemoizeWithKey?: <T>(key: string, fn: () => T) => T;
 
-    pgDisableDefaultMutations?: boolean;
-    pgSimpleCollections?: "only" | "both" | "omit";
-    pgStrictFunctions?: boolean;
-    pgColumnFilter?: PgColumnFilterFunction;
-    pgIgnoreRBAC?: boolean;
-    pgIgnoreIndexes?: boolean;
-    pgHideIndexWarnings?: boolean;
-    pgLegacyJsonUuid?: boolean;
-  }
+      pgDisableDefaultMutations?: boolean;
+      pgSimpleCollections?: "only" | "both" | "omit";
+      pgStrictFunctions?: boolean;
+      pgColumnFilter?: PgColumnFilterFunction;
+      pgIgnoreRBAC?: boolean;
+      pgIgnoreIndexes?: boolean;
+      pgHideIndexWarnings?: boolean;
+      pgLegacyJsonUuid?: boolean;
+    }
 
-  interface Build {
-    pgSql: PgSQL;
-    graphileBuildPgVersion: string;
-    pgStrictFunctions: boolean;
-    pgColumnFilter: PgColumnFilterFunction;
-    pgQueryFromResolveData: ReturnType<typeof queryFromResolveDataFactory>;
-    pgAddStartEndCursor: typeof addStartEndCursor;
-    pgOmit: typeof baseOmit;
-    pgMakeProcField: typeof makeProcField;
-    pgParseIdentifier: typeof parseIdentifier;
-    pgViaTemporaryTable: typeof viaTemporaryTable;
-    describePgEntity: typeof describePgEntity;
-    pgField: typeof pgField;
-    sqlCommentByAddingTags: typeof sqlCommentByAddingTags;
-    pgPrepareAndRun: typeof pgPrepareAndRun;
-  }
+    interface Build {
+      pgSql: PgSQL;
+      graphileBuildPgVersion: string;
+      pgStrictFunctions: boolean;
+      pgColumnFilter: PgColumnFilterFunction;
+      pgQueryFromResolveData: ReturnType<typeof queryFromResolveDataFactory>;
+      pgAddStartEndCursor: typeof addStartEndCursor;
+      pgOmit: typeof baseOmit;
+      pgMakeProcField: typeof makeProcField;
+      pgParseIdentifier: typeof parseIdentifier;
+      pgViaTemporaryTable: typeof viaTemporaryTable;
+      describePgEntity: typeof describePgEntity;
+      pgField: typeof pgField;
+      sqlCommentByAddingTags: typeof sqlCommentByAddingTags;
+      pgPrepareAndRun: typeof pgPrepareAndRun;
+    }
 
-  interface Inflection {
-    conditionType(typeName: string): string;
-    inputType(typeName: string): string;
-    rangeBoundType(typeName: string): string;
-    rangeType(typeName: string): string;
-    patchType(typeName: string): string;
-    baseInputType(typeName: string): string;
-    patchField(itemName: string): string;
-    orderByType(typeName: string): string;
-    edge(typeName: string): string;
-    connection(typeName: string): string;
+    interface Inflection {
+      conditionType(typeName: string): string;
+      inputType(typeName: string): string;
+      rangeBoundType(typeName: string): string;
+      rangeType(typeName: string): string;
+      patchType(typeName: string): string;
+      baseInputType(typeName: string): string;
+      patchField(itemName: string): string;
+      orderByType(typeName: string): string;
+      edge(typeName: string): string;
+      connection(typeName: string): string;
 
-    // These helpers handle overrides via smart comments. They should only
-    // be used in other inflectors, hence the underscore prefix.
-    //
-    // IMPORTANT: do NOT do case transforms here, because detail can be
-    // lost, e.g.
-    // `constantCase(camelCase('foo_1')) !== constantCase('foo_1')`
-    _functionName(proc: PgProc): string;
-    _typeName(type: PgType): string;
-    _tableName(table: PgClass): string;
-    _singularizedTableName(table: PgClass): string;
-    _columnName(attr: PgAttribute, _options?: { skipRowId?: boolean }): string;
+      // These helpers handle overrides via smart comments. They should only
+      // be used in other inflectors, hence the underscore prefix.
+      //
+      // IMPORTANT: do NOT do case transforms here, because detail can be
+      // lost, e.g.
+      // `constantCase(camelCase('foo_1')) !== constantCase('foo_1')`
+      _functionName(proc: PgProc): string;
+      _typeName(type: PgType): string;
+      _tableName(table: PgClass): string;
+      _singularizedTableName(table: PgClass): string;
+      _columnName(
+        attr: PgAttribute,
+        _options?: { skipRowId?: boolean },
+      ): string;
 
-    // From here down, functions are passed database introspection results
-    enumType(type: PgType): string;
-    argument(name: string | null | undefined, index: number): string;
-    orderByEnum(columnName: string, ascending: boolean): string;
-    orderByColumnEnum(attr: PgAttribute, ascending: boolean): string;
-    orderByComputedColumnEnum(
-      pseudoColumnName: string,
-      proc: PgProc,
-      table: PgClass,
-      ascending: boolean,
-    ): string;
-    domainType(type: PgType): string;
-    enumName(inValue: string): string;
+      // From here down, functions are passed database introspection results
+      enumType(type: PgType): string;
+      argument(name: string | null | undefined, index: number): string;
+      orderByEnum(columnName: string, ascending: boolean): string;
+      orderByColumnEnum(attr: PgAttribute, ascending: boolean): string;
+      orderByComputedColumnEnum(
+        pseudoColumnName: string,
+        proc: PgProc,
+        table: PgClass,
+        ascending: boolean,
+      ): string;
+      domainType(type: PgType): string;
+      enumName(inValue: string): string;
 
-    tableNode(table: PgClass): string;
-    tableFieldName(table: PgClass): string;
-    allRows(table: PgClass): string;
-    allRowsSimple(table: PgClass): string;
-    functionMutationName(proc: PgProc): string;
-    functionMutationResultFieldName(
-      proc: PgProc,
-      gqlType: import("graphql").GraphQLNamedType,
-      plural?: boolean,
-      outputArgNames?: Array<string>,
-    ): string;
-    functionQueryName(proc: PgProc): string;
-    functionQueryNameList(proc: PgProc): string;
-    functionPayloadType(proc: PgProc): string;
-    functionInputType(proc: PgProc): string;
-    functionOutputFieldName(
-      proc: PgProc,
-      outputArgName: string,
-      index: number,
-    ): string;
-    tableType(table: PgClass): string;
-    column(attr: PgAttribute): string;
-    computedColumn(
-      pseudoColumnName: string,
-      proc: PgProc,
-      _table: PgClass,
-    ): string;
-    computedColumnList(
-      pseudoColumnName: string,
-      proc: PgProc,
-      _table: PgClass,
-    ): string;
-    singleRelationByKeys(
-      detailedKeys: PgAttribute[],
-      table: PgClass,
-      _foreignTable: PgClass,
-      constraint: PgConstraint,
-    ): string;
-    singleRelationByKeysBackwards(
-      detailedKeys: PgAttribute[],
-      table: PgClass,
-      _foreignTable: PgClass,
-      constraint: PgConstraint,
-    ): string;
-    manyRelationByKeys(
-      detailedKeys: PgAttribute[],
-      table: PgClass,
-      _foreignTable: PgClass,
-      constraint: PgConstraint,
-    ): string;
-    manyRelationByKeysSimple(
-      detailedKeys: PgAttribute[],
-      table: PgClass,
-      _foreignTable: PgClass,
-      constraint: PgConstraint,
-    ): string;
-    rowByUniqueKeys(
-      detailedKeys: PgAttribute[],
-      table: PgClass,
-      constraint: PgConstraint,
-    ): string;
-    updateByKeys(
-      detailedKeys: PgAttribute[],
-      table: PgClass,
-      constraint: PgConstraint,
-    ): string;
-    deleteByKeys(
-      detailedKeys: PgAttribute[],
-      table: PgClass,
-      constraint: PgConstraint,
-    ): string;
-    updateByKeysInputType(
-      detailedKeys: PgAttribute[],
-      table: PgClass,
-      constraint: PgConstraint,
-    ): string;
-    deleteByKeysInputType(
-      detailedKeys: PgAttribute[],
-      table: PgClass,
-      constraint: PgConstraint,
-    ): string;
-    updateNode(table: PgClass): string;
-    deleteNode(table: PgClass): string;
-    deletedNodeId(table: PgClass): string;
-    updateNodeInputType(table: PgClass): string;
-    deleteNodeInputType(table: PgClass): string;
-    edgeField(table: PgClass): string;
-    recordFunctionReturnType(proc: PgProc): string;
-    recordFunctionConnection(proc: PgProc): string;
-    recordFunctionEdge(proc: PgProc): string;
-    scalarFunctionConnection(proc: PgProc): string;
-    scalarFunctionEdge(proc: PgProc): string;
-    createField(table: PgClass): string;
-    createInputType(table: PgClass): string;
-    createPayloadType(table: PgClass): string;
-    updatePayloadType(table: PgClass): string;
-    deletePayloadType(table: PgClass): string;
+      tableNode(table: PgClass): string;
+      tableFieldName(table: PgClass): string;
+      allRows(table: PgClass): string;
+      allRowsSimple(table: PgClass): string;
+      functionMutationName(proc: PgProc): string;
+      functionMutationResultFieldName(
+        proc: PgProc,
+        gqlType: import("graphql").GraphQLNamedType,
+        plural?: boolean,
+        outputArgNames?: Array<string>,
+      ): string;
+      functionQueryName(proc: PgProc): string;
+      functionQueryNameList(proc: PgProc): string;
+      functionPayloadType(proc: PgProc): string;
+      functionInputType(proc: PgProc): string;
+      functionOutputFieldName(
+        proc: PgProc,
+        outputArgName: string,
+        index: number,
+      ): string;
+      tableType(table: PgClass): string;
+      column(attr: PgAttribute): string;
+      computedColumn(
+        pseudoColumnName: string,
+        proc: PgProc,
+        _table: PgClass,
+      ): string;
+      computedColumnList(
+        pseudoColumnName: string,
+        proc: PgProc,
+        _table: PgClass,
+      ): string;
+      singleRelationByKeys(
+        detailedKeys: PgAttribute[],
+        table: PgClass,
+        _foreignTable: PgClass,
+        constraint: PgConstraint,
+      ): string;
+      singleRelationByKeysBackwards(
+        detailedKeys: PgAttribute[],
+        table: PgClass,
+        _foreignTable: PgClass,
+        constraint: PgConstraint,
+      ): string;
+      manyRelationByKeys(
+        detailedKeys: PgAttribute[],
+        table: PgClass,
+        _foreignTable: PgClass,
+        constraint: PgConstraint,
+      ): string;
+      manyRelationByKeysSimple(
+        detailedKeys: PgAttribute[],
+        table: PgClass,
+        _foreignTable: PgClass,
+        constraint: PgConstraint,
+      ): string;
+      rowByUniqueKeys(
+        detailedKeys: PgAttribute[],
+        table: PgClass,
+        constraint: PgConstraint,
+      ): string;
+      updateByKeys(
+        detailedKeys: PgAttribute[],
+        table: PgClass,
+        constraint: PgConstraint,
+      ): string;
+      deleteByKeys(
+        detailedKeys: PgAttribute[],
+        table: PgClass,
+        constraint: PgConstraint,
+      ): string;
+      updateByKeysInputType(
+        detailedKeys: PgAttribute[],
+        table: PgClass,
+        constraint: PgConstraint,
+      ): string;
+      deleteByKeysInputType(
+        detailedKeys: PgAttribute[],
+        table: PgClass,
+        constraint: PgConstraint,
+      ): string;
+      updateNode(table: PgClass): string;
+      deleteNode(table: PgClass): string;
+      deletedNodeId(table: PgClass): string;
+      updateNodeInputType(table: PgClass): string;
+      deleteNodeInputType(table: PgClass): string;
+      edgeField(table: PgClass): string;
+      recordFunctionReturnType(proc: PgProc): string;
+      recordFunctionConnection(proc: PgProc): string;
+      recordFunctionEdge(proc: PgProc): string;
+      scalarFunctionConnection(proc: PgProc): string;
+      scalarFunctionEdge(proc: PgProc): string;
+      createField(table: PgClass): string;
+      createInputType(table: PgClass): string;
+      createPayloadType(table: PgClass): string;
+      updatePayloadType(table: PgClass): string;
+      deletePayloadType(table: PgClass): string;
+    }
   }
 }
 
-function makePgBaseInflectors(): Partial<Inflection> {
-  const inflectors: Partial<Inflection> = {
+function makePgBaseInflectors(): Partial<GraphileEngine.Inflection> {
+  const inflectors: Partial<GraphileEngine.Inflection> = {
     // These helpers are passed GraphQL type names as strings
-    conditionType(this: Inflection, typeName: string) {
+    conditionType(this: GraphileEngine.Inflection, typeName: string) {
       return this.upperCamelCase(`${typeName}-condition`);
     },
-    inputType(this: Inflection, typeName: string) {
+    inputType(this: GraphileEngine.Inflection, typeName: string) {
       return this.upperCamelCase(`${typeName}-input`);
     },
-    rangeBoundType(this: Inflection, typeName: string) {
+    rangeBoundType(this: GraphileEngine.Inflection, typeName: string) {
       return this.upperCamelCase(`${typeName}-range-bound`);
     },
-    rangeType(this: Inflection, typeName: string) {
+    rangeType(this: GraphileEngine.Inflection, typeName: string) {
       return this.upperCamelCase(`${typeName}-range`);
     },
-    patchType(this: Inflection, typeName: string) {
+    patchType(this: GraphileEngine.Inflection, typeName: string) {
       return this.upperCamelCase(`${typeName}-patch`);
     },
-    baseInputType(this: Inflection, typeName: string) {
+    baseInputType(this: GraphileEngine.Inflection, typeName: string) {
       return this.upperCamelCase(`${typeName}-base-input`);
     },
-    patchField(this: Inflection, itemName: string) {
+    patchField(this: GraphileEngine.Inflection, itemName: string) {
       return this.camelCase(`${itemName}-patch`);
     },
-    orderByType(this: Inflection, typeName: string) {
+    orderByType(this: GraphileEngine.Inflection, typeName: string) {
       return this.upperCamelCase(`${this.pluralize(typeName)}-order-by`);
     },
-    edge(this: Inflection, typeName: string) {
+    edge(this: GraphileEngine.Inflection, typeName: string) {
       return this.upperCamelCase(`${this.pluralize(typeName)}-edge`);
     },
-    connection(this: Inflection, typeName: string) {
+    connection(this: GraphileEngine.Inflection, typeName: string) {
       return this.upperCamelCase(`${this.pluralize(typeName)}-connection`);
     },
 
@@ -282,26 +286,29 @@ function makePgBaseInflectors(): Partial<Inflection> {
     // IMPORTANT: do NOT do case transforms here, because detail can be
     // lost, e.g.
     // `constantCase(camelCase('foo_1')) !== constantCase('foo_1')`
-    _functionName(this: Inflection, proc: PgProc) {
+    _functionName(this: GraphileEngine.Inflection, proc: PgProc) {
       return this.coerceToGraphQLName(stringTag(proc, "name") || proc.name);
     },
-    _typeName(this: Inflection, type: PgType) {
+    _typeName(this: GraphileEngine.Inflection, type: PgType) {
       // 'type' introspection result
       return this.coerceToGraphQLName(stringTag(type, "name") || type.name);
     },
-    _tableName(this: Inflection, table: PgClass) {
+    _tableName(this: GraphileEngine.Inflection, table: PgClass) {
       return this.coerceToGraphQLName(
         stringTag(table, "name") || stringTag(table.type, "name") || table.name,
       );
     },
-    _singularizedTableName(this: Inflection, table: PgClass): string {
+    _singularizedTableName(
+      this: GraphileEngine.Inflection,
+      table: PgClass,
+    ): string {
       return this.singularize(this._tableName(table)).replace(
         /.(?:(?:[_-]i|I)nput|(?:[_-]p|P)atch)$/,
         "$&_record",
       );
     },
     _columnName(
-      this: Inflection,
+      this: GraphileEngine.Inflection,
       attr: PgAttribute,
       _options?: { skipRowId?: boolean },
     ) {
@@ -309,23 +316,31 @@ function makePgBaseInflectors(): Partial<Inflection> {
     },
 
     // From here down, functions are passed database introspection results
-    enumType(this: Inflection, type: PgType) {
+    enumType(this: GraphileEngine.Inflection, type: PgType) {
       return this.upperCamelCase(this._typeName(type));
     },
-    argument(this: Inflection, name: string | null | undefined, index: number) {
+    argument(
+      this: GraphileEngine.Inflection,
+      name: string | null | undefined,
+      index: number,
+    ) {
       return this.coerceToGraphQLName(this.camelCase(name || `arg${index}`));
     },
-    orderByEnum(this: Inflection, columnName, ascending) {
+    orderByEnum(this: GraphileEngine.Inflection, columnName, ascending) {
       return this.constantCase(`${columnName}_${ascending ? "asc" : "desc"}`);
     },
-    orderByColumnEnum(this: Inflection, attr: PgAttribute, ascending: boolean) {
+    orderByColumnEnum(
+      this: GraphileEngine.Inflection,
+      attr: PgAttribute,
+      ascending: boolean,
+    ) {
       const columnName = this._columnName(attr, {
         skipRowId: true, // Because we messed up 😔
       });
       return this.orderByEnum(columnName, ascending);
     },
     orderByComputedColumnEnum(
-      this: Inflection,
+      this: GraphileEngine.Inflection,
       pseudoColumnName: string,
       proc: PgProc,
       table: PgClass,
@@ -335,10 +350,10 @@ function makePgBaseInflectors(): Partial<Inflection> {
 
       return this.orderByEnum(columnName, ascending);
     },
-    domainType(this: Inflection, type: PgType) {
+    domainType(this: GraphileEngine.Inflection, type: PgType) {
       return this.upperCamelCase(this._typeName(type));
     },
-    enumName(this: Inflection, inValue: string) {
+    enumName(this: GraphileEngine.Inflection, inValue: string) {
       let value = inValue;
 
       if (value === "") {
@@ -358,7 +373,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       // might find in enums. Generally we only support enums that are
       // alphanumeric, if these replacements don't work for you, you should
       // pass a custom inflector that replaces this `enumName` method
-      // with one of your own chosing.
+      // with one of your own choosing.
       value =
         {
           // SQL comparison operators
@@ -420,27 +435,27 @@ function makePgBaseInflectors(): Partial<Inflection> {
       return value;
     },
 
-    tableNode(this: Inflection, table: PgClass) {
+    tableNode(this: GraphileEngine.Inflection, table: PgClass) {
       return this.camelCase(this._singularizedTableName(table));
     },
-    tableFieldName(this: Inflection, table: PgClass) {
+    tableFieldName(this: GraphileEngine.Inflection, table: PgClass) {
       return this.camelCase(this._singularizedTableName(table));
     },
-    allRows(this: Inflection, table: PgClass) {
+    allRows(this: GraphileEngine.Inflection, table: PgClass) {
       return this.camelCase(
         `all-${this.pluralize(this._singularizedTableName(table))}`,
       );
     },
-    allRowsSimple(this: Inflection, table: PgClass) {
+    allRowsSimple(this: GraphileEngine.Inflection, table: PgClass) {
       return this.camelCase(
         `all-${this.pluralize(this._singularizedTableName(table))}-list`,
       );
     },
-    functionMutationName(this: Inflection, proc: PgProc) {
+    functionMutationName(this: GraphileEngine.Inflection, proc: PgProc) {
       return this.camelCase(this._functionName(proc));
     },
     functionMutationResultFieldName(
-      this: Inflection,
+      this: GraphileEngine.Inflection,
       proc: PgProc,
       gqlType: import("graphql").GraphQLNamedType,
       plural = false,
@@ -469,34 +484,34 @@ function makePgBaseInflectors(): Partial<Inflection> {
       }
       return plural ? this.pluralize(name) : name;
     },
-    functionQueryName(this: Inflection, proc: PgProc) {
+    functionQueryName(this: GraphileEngine.Inflection, proc: PgProc) {
       return this.camelCase(this._functionName(proc));
     },
-    functionQueryNameList(this: Inflection, proc: PgProc) {
+    functionQueryNameList(this: GraphileEngine.Inflection, proc: PgProc) {
       return this.camelCase(`${this._functionName(proc)}-list`);
     },
-    functionPayloadType(this: Inflection, proc: PgProc) {
+    functionPayloadType(this: GraphileEngine.Inflection, proc: PgProc) {
       return this.upperCamelCase(`${this._functionName(proc)}-payload`);
     },
-    functionInputType(this: Inflection, proc: PgProc) {
+    functionInputType(this: GraphileEngine.Inflection, proc: PgProc) {
       return this.upperCamelCase(`${this._functionName(proc)}-input`);
     },
     functionOutputFieldName(
-      this: Inflection,
+      this: GraphileEngine.Inflection,
       _proc: PgProc,
       outputArgName: string,
       index: number,
     ) {
       return this.argument(outputArgName, index);
     },
-    tableType(this: Inflection, table: PgClass) {
+    tableType(this: GraphileEngine.Inflection, table: PgClass) {
       return this.upperCamelCase(this._singularizedTableName(table));
     },
-    column(this: Inflection, attr: PgAttribute) {
+    column(this: GraphileEngine.Inflection, attr: PgAttribute) {
       return this.camelCase(this._columnName(attr));
     },
     computedColumn(
-      this: Inflection,
+      this: GraphileEngine.Inflection,
       pseudoColumnName: string,
       proc: PgProc,
       _table: PgClass,
@@ -504,7 +519,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       return stringTag(proc, "fieldName") || this.camelCase(pseudoColumnName);
     },
     computedColumnList(
-      this: Inflection,
+      this: GraphileEngine.Inflection,
       pseudoColumnName: string,
       proc: PgProc,
       _table: PgClass,
@@ -514,7 +529,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
         : this.camelCase(`${pseudoColumnName}-list`);
     },
     singleRelationByKeys(
-      this: Inflection,
+      this: GraphileEngine.Inflection,
       detailedKeys: PgAttribute[],
       table: PgClass,
       _foreignTable: PgClass,
@@ -531,7 +546,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       );
     },
     singleRelationByKeysBackwards(
-      this: Inflection,
+      this: GraphileEngine.Inflection,
       detailedKeys: PgAttribute[],
       table: PgClass,
       _foreignTable: PgClass,
@@ -556,7 +571,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       );
     },
     manyRelationByKeys(
-      this: Inflection,
+      this: GraphileEngine.Inflection,
       detailedKeys: PgAttribute[],
       table: PgClass,
       _foreignTable: PgClass,
@@ -573,7 +588,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       );
     },
     manyRelationByKeysSimple(
-      this: Inflection,
+      this: GraphileEngine.Inflection,
       detailedKeys: PgAttribute[],
       table: PgClass,
       _foreignTable: PgClass,
@@ -599,7 +614,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       );
     },
     rowByUniqueKeys(
-      this: Inflection,
+      this: GraphileEngine.Inflection,
       detailedKeys: PgAttribute[],
       table: PgClass,
       constraint: PgConstraint,
@@ -615,7 +630,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       );
     },
     updateByKeys(
-      this: Inflection,
+      this: GraphileEngine.Inflection,
       detailedKeys: PgAttribute[],
       table: PgClass,
       constraint: PgConstraint,
@@ -631,7 +646,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       );
     },
     deleteByKeys(
-      this: Inflection,
+      this: GraphileEngine.Inflection,
       detailedKeys: PgAttribute[],
       table: PgClass,
       constraint: PgConstraint,
@@ -647,7 +662,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       );
     },
     updateByKeysInputType(
-      this: Inflection,
+      this: GraphileEngine.Inflection,
       detailedKeys: PgAttribute[],
       table: PgClass,
       constraint: PgConstraint,
@@ -665,7 +680,7 @@ function makePgBaseInflectors(): Partial<Inflection> {
       );
     },
     deleteByKeysInputType(
-      this: Inflection,
+      this: GraphileEngine.Inflection,
       detailedKeys: PgAttribute[],
       table: PgClass,
       constraint: PgConstraint,
@@ -682,69 +697,69 @@ function makePgBaseInflectors(): Partial<Inflection> {
           .join("-and-")}-input`,
       );
     },
-    updateNode(this: Inflection, table: PgClass) {
+    updateNode(this: GraphileEngine.Inflection, table: PgClass) {
       return this.camelCase(`update-${this._singularizedTableName(table)}`);
     },
-    deleteNode(this: Inflection, table: PgClass) {
+    deleteNode(this: GraphileEngine.Inflection, table: PgClass) {
       return this.camelCase(`delete-${this._singularizedTableName(table)}`);
     },
-    deletedNodeId(this: Inflection, table: PgClass) {
+    deletedNodeId(this: GraphileEngine.Inflection, table: PgClass) {
       return this.camelCase(`deleted-${this.singularize(table.name)}-id`);
     },
-    updateNodeInputType(this: Inflection, table: PgClass) {
+    updateNodeInputType(this: GraphileEngine.Inflection, table: PgClass) {
       return this.upperCamelCase(
         `update-${this._singularizedTableName(table)}-input`,
       );
     },
-    deleteNodeInputType(this: Inflection, table: PgClass) {
+    deleteNodeInputType(this: GraphileEngine.Inflection, table: PgClass) {
       return this.upperCamelCase(
         `delete-${this._singularizedTableName(table)}-input`,
       );
     },
-    edgeField(this: Inflection, table: PgClass) {
+    edgeField(this: GraphileEngine.Inflection, table: PgClass) {
       return this.camelCase(`${this._singularizedTableName(table)}-edge`);
     },
-    recordFunctionReturnType(this: Inflection, proc: PgProc) {
+    recordFunctionReturnType(this: GraphileEngine.Inflection, proc: PgProc) {
       return (
         stringTag(proc, "resultTypeName") ||
         this.upperCamelCase(`${this._functionName(proc)}-record`)
       );
     },
-    recordFunctionConnection(this: Inflection, proc: PgProc) {
+    recordFunctionConnection(this: GraphileEngine.Inflection, proc: PgProc) {
       return this.upperCamelCase(`${this._functionName(proc)}-connection`);
     },
-    recordFunctionEdge(this: Inflection, proc: PgProc) {
+    recordFunctionEdge(this: GraphileEngine.Inflection, proc: PgProc) {
       return this.upperCamelCase(
         `${this.singularize(this._functionName(proc))}-edge`,
       );
     },
-    scalarFunctionConnection(this: Inflection, proc: PgProc) {
+    scalarFunctionConnection(this: GraphileEngine.Inflection, proc: PgProc) {
       return this.upperCamelCase(`${this._functionName(proc)}-connection`);
     },
-    scalarFunctionEdge(this: Inflection, proc: PgProc) {
+    scalarFunctionEdge(this: GraphileEngine.Inflection, proc: PgProc) {
       return this.upperCamelCase(
         `${this.singularize(this._functionName(proc))}-edge`,
       );
     },
-    createField(this: Inflection, table: PgClass) {
+    createField(this: GraphileEngine.Inflection, table: PgClass) {
       return this.camelCase(`create-${this._singularizedTableName(table)}`);
     },
-    createInputType(this: Inflection, table: PgClass) {
+    createInputType(this: GraphileEngine.Inflection, table: PgClass) {
       return this.upperCamelCase(
         `create-${this._singularizedTableName(table)}-input`,
       );
     },
-    createPayloadType(this: Inflection, table: PgClass) {
+    createPayloadType(this: GraphileEngine.Inflection, table: PgClass) {
       return this.upperCamelCase(
         `create-${this._singularizedTableName(table)}-payload`,
       );
     },
-    updatePayloadType(this: Inflection, table: PgClass) {
+    updatePayloadType(this: GraphileEngine.Inflection, table: PgClass) {
       return this.upperCamelCase(
         `update-${this._singularizedTableName(table)}-payload`,
       );
     },
-    deletePayloadType(this: Inflection, table: PgClass) {
+    deletePayloadType(this: GraphileEngine.Inflection, table: PgClass) {
       return this.upperCamelCase(
         `delete-${this._singularizedTableName(table)}-payload`,
       );
@@ -1056,7 +1071,7 @@ export default (function PgBasicsPlugin(
     (build) => {
       build.versions["graphile-build-pg"] = version;
       build.liveCoordinator.registerProvider(new PgLiveProvider());
-      const buildExtensions: Partial<Build> = {
+      const buildExtensions: Partial<GraphileEngine.Build> = {
         graphileBuildPgVersion: version,
         pgSql: sql,
         pgStrictFunctions,
@@ -1105,4 +1120,4 @@ export default (function PgBasicsPlugin(
     },
     ["PgBasics"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

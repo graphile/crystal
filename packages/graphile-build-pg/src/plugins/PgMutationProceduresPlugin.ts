@@ -1,5 +1,3 @@
-import { Plugin } from "graphile-build";
-
 export default (function PgMutationProceduresPlugin(builder) {
   builder.hook(
     "GraphQLObjectType:fields",
@@ -61,4 +59,4 @@ export default (function PgMutationProceduresPlugin(builder) {
     },
     ["PgMutationProcedures"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

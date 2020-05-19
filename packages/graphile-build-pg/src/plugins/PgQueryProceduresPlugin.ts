@@ -1,4 +1,3 @@
-import { Plugin } from "graphile-build";
 import { PgType } from "./PgIntrospectionPlugin";
 
 export default (function PgQueryProceduresPlugin(
@@ -111,4 +110,4 @@ export default (function PgQueryProceduresPlugin(
     },
     ["PgQueryProcedures"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

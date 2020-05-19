@@ -1,10 +1,11 @@
-import { Plugin } from "graphile-build";
 import debugSql from "./debugSql";
 import QueryBuilder from "../QueryBuilder";
 
-declare module "graphile-build" {
-  interface ScopeGraphQLObjectTypeFieldsField {
-    isPgRowByUniqueConstraintField?: boolean;
+declare global {
+  namespace GraphileEngine {
+    interface ScopeGraphQLObjectTypeFieldsField {
+      isPgRowByUniqueConstraintField?: boolean;
+    }
   }
 }
 
@@ -85,7 +86,7 @@ export default (async function PgRowByUniqueConstraint(
                 columnName: inflection.column(key),
               }));
 
-              // Precomputation for performance
+              // Pre-computation for performance
               const queryFromResolveDataOptions = {
                 useAsterisk: false, // Because it's only a single relation, no need
               };
@@ -191,4 +192,4 @@ export default (async function PgRowByUniqueConstraint(
     },
     ["PgRowByUniqueConstraint"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

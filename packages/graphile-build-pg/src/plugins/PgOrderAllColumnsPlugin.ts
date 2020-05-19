@@ -1,4 +1,3 @@
-import { Plugin } from "graphile-build";
 import { OrderByValue } from "./PgConnectionArgOrderBy";
 
 export default (function PgOrderAllColumnsPlugin(builder) {
@@ -87,4 +86,4 @@ export default (function PgOrderAllColumnsPlugin(builder) {
     },
     ["PgOrderAllColumns"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

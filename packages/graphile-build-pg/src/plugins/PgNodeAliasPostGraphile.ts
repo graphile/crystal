@@ -1,5 +1,3 @@
-import { Plugin } from "graphile-build";
-
 export default (async function PgNodeAliasPostGraphile(builder) {
   builder.hook(
     "GraphQLObjectType",
@@ -22,4 +20,4 @@ export default (async function PgNodeAliasPostGraphile(builder) {
     },
     ["PgNodeAliasPostGraphile"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

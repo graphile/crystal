@@ -1,15 +1,16 @@
-import { Plugin } from "graphile-build";
 import isString from "lodash/isString";
 import { SQL } from "../QueryBuilder";
 import { OrderByValue, OrderBySpec } from "./PgConnectionArgOrderBy";
 import { PgEntityKind } from "./PgIntrospectionPlugin";
 
-declare module "graphile-build" {
-  interface GraphileBuildOptions {
-    disableIssue397Fix?: boolean;
-  }
-  interface ScopeGraphQLObjectTypeFieldsField {
-    isPgMutationPayloadEdgeField?: boolean;
+declare global {
+  namespace GraphileEngine {
+    interface GraphileBuildOptions {
+      disableIssue397Fix?: boolean;
+    }
+    interface ScopeGraphQLObjectTypeFieldsField {
+      isPgMutationPayloadEdgeField?: boolean;
+    }
   }
 }
 
@@ -242,4 +243,4 @@ export default (function PgMutationPayloadEdgePlugin(
     },
     ["PgMutationPayloadEdge"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

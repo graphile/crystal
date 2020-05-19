@@ -1,32 +1,27 @@
-import {
-  Plugin,
-  GraphileObjectTypeConfig,
-  ScopeGraphQLObjectType,
-  GraphileResolverContext,
-  ContextGraphQLObjectTypeFieldsField,
-  GetDataFromParsedResolveInfoFragmentFunction,
-} from "graphile-build";
+import { GetDataFromParsedResolveInfoFragmentFunction } from "graphile-build";
 import debugFactory from "debug";
 import { SQL } from "../QueryBuilder";
 import { PgAttribute } from "./PgIntrospectionPlugin";
 
-declare module "graphile-build" {
-  interface ScopeGraphQLObjectType {
-    isPgUpdatePayloadType?: boolean;
-    isPgDeletePayloadType?: boolean;
-  }
-  interface ScopeGraphQLObjectTypeFieldsField {
-    isPgNodeMutation?: boolean;
-    isPgMutationPayloadDeletedNodeIdField?: boolean;
-  }
-  interface ScopeGraphQLInputObjectType {
-    isPgUpdateInputType?: boolean;
-    isPgUpdateNodeInputType?: boolean;
-    isPgDeleteInputType?: boolean;
-    isPgDeleteNodeInputType?: boolean;
-    isPgUpdateByKeysInputType?: boolean;
-    isPgDeleteByKeysInputType?: boolean;
-    pgKeys?: PgAttribute[];
+declare global {
+  namespace GraphileEngine {
+    interface ScopeGraphQLObjectType {
+      isPgUpdatePayloadType?: boolean;
+      isPgDeletePayloadType?: boolean;
+    }
+    interface ScopeGraphQLObjectTypeFieldsField {
+      isPgNodeMutation?: boolean;
+      isPgMutationPayloadDeletedNodeIdField?: boolean;
+    }
+    interface ScopeGraphQLInputObjectType {
+      isPgUpdateInputType?: boolean;
+      isPgUpdateNodeInputType?: boolean;
+      isPgDeleteInputType?: boolean;
+      isPgDeleteNodeInputType?: boolean;
+      isPgUpdateByKeysInputType?: boolean;
+      isPgDeleteByKeysInputType?: boolean;
+      pgKeys?: PgAttribute[];
+    }
   }
 }
 
@@ -117,14 +112,14 @@ export default (async function PgMutationUpdateDeletePlugin(
               const TableType = tmpTableType;
 
               async function commonCodeRenameMe(
-                pgClient: GraphileResolverContext["pgClient"],
+                pgClient: GraphileEngine.GraphileResolverContext["pgClient"],
                 resolveInfo: import("graphql").GraphQLResolveInfo,
                 getDataFromParsedResolveInfoFragment: GetDataFromParsedResolveInfoFragmentFunction,
                 PayloadType: import("graphql").GraphQLObjectType<any, any>,
                 args: { [argName: string]: any },
                 condition: SQL,
-                context: ContextGraphQLObjectTypeFieldsField,
-                resolveContext: GraphileResolverContext,
+                context: GraphileEngine.ContextGraphQLObjectTypeFieldsField,
+                resolveContext: GraphileEngine.GraphileResolverContext,
               ) {
                 const { input } = args;
                 const parsedResolveInfoFragment = parseResolveInfo(
@@ -252,7 +247,10 @@ returning *`;
                   );
                 }
 
-                const payloadSpec: GraphileObjectTypeConfig<any, any> = {
+                const payloadSpec: GraphileEngine.GraphileObjectTypeConfig<
+                  any,
+                  any
+                > = {
                   name: inflection[
                     mode === "delete"
                       ? "deletePayloadType"
@@ -328,7 +326,7 @@ returning *`;
                     );
                   },
                 };
-                const payloadScope: ScopeGraphQLObjectType = {
+                const payloadScope: GraphileEngine.ScopeGraphQLObjectType = {
                   __origin: `Adding table ${mode} mutation payload type for ${describePgEntity(
                     table,
                   )}. You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
@@ -449,7 +447,7 @@ returning *`;
                             async resolve(
                               _parent,
                               args,
-                              resolveContext: GraphileResolverContext,
+                              resolveContext: GraphileEngine.GraphileResolverContext,
                               resolveInfo,
                             ) {
                               const { input } = args;
@@ -691,4 +689,4 @@ returning *`;
     },
     ["PgMutationUpdateDelete"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

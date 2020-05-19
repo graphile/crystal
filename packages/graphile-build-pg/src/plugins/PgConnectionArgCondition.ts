@@ -1,11 +1,11 @@
-import { Plugin } from "graphile-build";
-
-declare module "graphile-build" {
-  interface ScopeGraphQLInputObjectType {
-    isPgCondition?: boolean;
-  }
-  interface ScopeGraphQLInputObjectTypeFieldsField {
-    isPgConnectionConditionInputField?: boolean;
+declare global {
+  namespace GraphileEngine {
+    interface ScopeGraphQLInputObjectType {
+      isPgCondition?: boolean;
+    }
+    interface ScopeGraphQLInputObjectTypeFieldsField {
+      isPgConnectionConditionInputField?: boolean;
+    }
   }
 }
 
@@ -215,4 +215,4 @@ export default (function PgConnectionArgCondition(builder) {
     },
     ["PgConnectionArgCondition"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

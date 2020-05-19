@@ -1,9 +1,8 @@
-import { Plugin, Build } from "graphile-build";
 import { PgClass, PgProc, PgEntityKind, PgType } from "./PgIntrospectionPlugin";
 
 // This interface is not official yet, don't rely on it.
 export const getComputedColumnDetails = (
-  build: Build,
+  build: GraphileEngine.Build,
   table: PgClass,
   proc: PgProc,
 ) => {
@@ -134,4 +133,4 @@ export default (function PgComputedColumnsPlugin(
     },
     ["PgComputedColumns"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

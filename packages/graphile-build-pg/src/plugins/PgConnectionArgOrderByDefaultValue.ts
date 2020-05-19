@@ -1,5 +1,3 @@
-import { Plugin } from "graphile-build";
-
 export default (function PgConnectionArgOrderByDefaultValue(builder) {
   builder.hook(
     "GraphQLObjectType:fields:field:args",
@@ -61,4 +59,4 @@ export default (function PgConnectionArgOrderByDefaultValue(builder) {
     },
     ["PgConnectionArgOrderByDefaultValue"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

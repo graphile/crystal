@@ -1,3 +1,5 @@
+import "graphile-build";
+
 import PgBasicsPlugin from "./plugins/PgBasicsPlugin";
 import PgIntrospectionPlugin from "./plugins/PgIntrospectionPlugin";
 import PgTypesPlugin from "./plugins/PgTypesPlugin";
@@ -138,7 +140,6 @@ export {
   default as QueryBuilder,
   sql,
   SQL,
-  GraphileResolverContext,
   GenContext,
   Gen,
   RawAlias,

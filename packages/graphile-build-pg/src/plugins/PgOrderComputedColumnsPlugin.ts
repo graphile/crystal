@@ -1,4 +1,3 @@
-import { Plugin } from "graphile-build";
 import { getComputedColumnDetails } from "./PgComputedColumnsPlugin";
 import { PgProc, PgEntityKind } from "./PgIntrospectionPlugin";
 import QueryBuilder, { SQL } from "../QueryBuilder";
@@ -139,4 +138,4 @@ export default (function PgOrderComputedColumnsPlugin(builder) {
     },
     ["PgOrderComputedColumns"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

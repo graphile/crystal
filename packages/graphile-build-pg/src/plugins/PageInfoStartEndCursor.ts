@@ -1,9 +1,9 @@
-import { Plugin } from "graphile-build";
-
-declare module "graphile-build" {
-  interface ScopeGraphQLObjectTypeFieldsField {
-    isPageInfoStartCursorField?: boolean;
-    isPageInfoEndCursorField?: boolean;
+declare global {
+  namespace GraphileEngine {
+    interface ScopeGraphQLObjectTypeFieldsField {
+      isPageInfoStartCursorField?: boolean;
+      isPageInfoEndCursorField?: boolean;
+    }
   }
 }
 
@@ -66,4 +66,4 @@ export default (function PageInfoStartEndCursor(builder) {
     [],
     ["Cursor"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

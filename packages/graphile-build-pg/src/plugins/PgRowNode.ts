@@ -1,10 +1,11 @@
-import { Plugin } from "graphile-build";
 import debugSql from "./debugSql";
 import { PgEntityKind } from "./PgIntrospectionPlugin";
 
-declare module "graphile-build" {
-  interface ScopeGraphQLObjectTypeFieldsField {
-    isPgNodeQuery?: boolean;
+declare global {
+  namespace GraphileEngine {
+    interface ScopeGraphQLObjectTypeFieldsField {
+      isPgNodeQuery?: boolean;
+    }
   }
 }
 
@@ -280,4 +281,4 @@ export default (async function PgRowNode(builder, { subscriptions }) {
     },
     ["PgRowNode"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

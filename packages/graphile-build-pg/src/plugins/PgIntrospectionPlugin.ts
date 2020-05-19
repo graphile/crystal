@@ -1,4 +1,3 @@
-import { Plugin } from "graphile-build";
 import { Client, PoolClient } from "pg";
 import withPgClient, {
   getPgClientAndReleaserFromConfig,
@@ -23,20 +22,22 @@ export type PgAugmentIntrospectionResultsFn = (
   introspectionResult: RawishIntrospectionResults,
 ) => RawishIntrospectionResults;
 
-declare module "graphile-build" {
-  interface GraphileBuildOptions {
-    pgEnableTags?: boolean;
-    pgThrowOnMissingSchema?: boolean;
-    pgIncludeExtensionResources?: boolean;
-    pgLegacyFunctionsOnly?: boolean;
-    pgSkipInstallingWatchFixtures?: boolean;
-    pgAugmentIntrospectionResults?: PgAugmentIntrospectionResultsFn;
-    pgOwnerConnectionString?: string;
-  }
+declare global {
+  namespace GraphileEngine {
+    interface GraphileBuildOptions {
+      pgEnableTags?: boolean;
+      pgThrowOnMissingSchema?: boolean;
+      pgIncludeExtensionResources?: boolean;
+      pgLegacyFunctionsOnly?: boolean;
+      pgSkipInstallingWatchFixtures?: boolean;
+      pgAugmentIntrospectionResults?: PgAugmentIntrospectionResultsFn;
+      pgOwnerConnectionString?: string;
+    }
 
-  interface Build {
-    pgIntrospectionResultsByKind: PgIntrospectionResultsByKind;
-    pgAugmentIntrospectionResults?: PgAugmentIntrospectionResultsFn;
+    interface Build {
+      pgIntrospectionResultsByKind: PgIntrospectionResultsByKind;
+      pgAugmentIntrospectionResults?: PgAugmentIntrospectionResultsFn;
+    }
   }
 }
 
@@ -474,7 +475,7 @@ function smartCommentConstraints(
 
         if (!foreignKlass) {
           throw new Error(
-            `@foreignKey smart comment referenced non-existant table/view '${foreignSchema}'.'${foreignTable}'. Note that this reference must use *database names* (i.e. it does not respect @name). (${fkSpecRaw})`,
+            `@foreignKey smart comment referenced non-existent table/view '${foreignSchema}'.'${foreignTable}'. Note that this reference must use *database names* (i.e. it does not respect @name). (${fkSpecRaw})`,
           );
         }
         const foreignNamespace = introspectionResults.namespace.find(
@@ -1029,7 +1030,7 @@ export default (async function PgIntrospectionPlugin(
         pgClient.on("notification", this._listener);
         pgClient.on("error", this._handleClientError);
         if (this.stopped) {
-          // In case watch mode was cancelled in the interrim.
+          // In case watch mode was cancelled in the interim.
           return this._releaseClient();
         } else {
           await pgClient.query("listen postgraphile_watch");
@@ -1153,7 +1154,7 @@ export default (async function PgIntrospectionPlugin(
           this._handleChange();
         } else {
           throw new Error(
-            `Payload type '${(payload as any).type}' not recognised`,
+            `Payload type '${(payload as any).type}' not recognized`,
           );
         }
       } catch (e) {
@@ -1224,4 +1225,4 @@ export default (async function PgIntrospectionPlugin(
     [],
     ["PgBasics"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);
