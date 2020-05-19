@@ -8,5 +8,4 @@ module.exports = {
   testMatch: ["<rootDir>/packages/*/**/__tests__/**/*.test.[jt]s?(x)"],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   testEnvironment: "node",
-  browser: false,
 };
