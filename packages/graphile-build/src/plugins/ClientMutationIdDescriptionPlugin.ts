@@ -1,4 +1,4 @@
-import SchemaBuilder, { Plugin } from "../SchemaBuilder";
+import SchemaBuilder from "../SchemaBuilder";
 
 export default (function ClientMutationIdDescriptionPlugin(
   builder: SchemaBuilder,
@@ -85,4 +85,4 @@ export default (function ClientMutationIdDescriptionPlugin(
     },
     ["ClientMutationIdDescription"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

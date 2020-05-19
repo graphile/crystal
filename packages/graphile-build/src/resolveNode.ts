@@ -1,17 +1,16 @@
-import { Build, Context } from "./SchemaBuilder";
 import { GetDataFromParsedResolveInfoFragmentFunction } from "./makeNewBuild";
 import { NodeFetcher } from "./plugins/NodePlugin";
 
 export default async function resolveNode<T = unknown>(
   nodeId: string,
-  build: Build,
+  build: GraphileEngine.Build,
   {
     getDataFromParsedResolveInfoFragment,
   }: {
     getDataFromParsedResolveInfoFragment: GetDataFromParsedResolveInfoFragmentFunction;
   },
   data: unknown,
-  context: Context,
+  context: GraphileEngine.Context,
   resolveInfo: import("graphql").GraphQLResolveInfo,
 ): Promise<T | null> {
   const {

@@ -1,5 +1,3 @@
-import { Plugin, ScopeGraphQLObjectType } from "../SchemaBuilder";
-
 function isValidSubscription(
   Subscription: import("graphql").GraphQLObjectType | null,
 ) {
@@ -51,7 +49,7 @@ export default (async function SubscriptionPlugin(builder, { live }) {
         description: live ? liveDescription : description,
         fields: {},
       };
-      const scope: ScopeGraphQLObjectType = {
+      const scope: GraphileEngine.ScopeGraphQLObjectType = {
         __origin: `graphile-build built-in (root subscription type)`,
         isRootSubscription: true,
       };
@@ -74,4 +72,4 @@ export default (async function SubscriptionPlugin(builder, { live }) {
     [],
     ["Query"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

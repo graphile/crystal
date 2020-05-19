@@ -1,16 +1,10 @@
-import {
-  Plugin,
-  Build,
-  GraphileObjectTypeConfig,
-  ScopeGraphQLObjectType,
-} from "../SchemaBuilder";
 import { Kind } from "graphql/language";
 
 export default (function StandardTypesPlugin(builder) {
   // XXX: this should be in an "init" plugin, but PgTypesPlugin requires it in build - fix that, then fix this
   builder.hook(
     "build",
-    (build: Build): Build => {
+    (build: GraphileEngine.Build): GraphileEngine.Build => {
       const stringType = (name: string, description: string | null) =>
         new build.graphql.GraphQLScalarType({
           name,
@@ -44,7 +38,7 @@ export default (function StandardTypesPlugin(builder) {
         graphql: { GraphQLNonNull, GraphQLObjectType, GraphQLBoolean },
         inflection,
       } = build;
-      const spec: GraphileObjectTypeConfig<any, any> = {
+      const spec: GraphileEngine.GraphileObjectTypeConfig<any, any> = {
         name: inflection.builtin("PageInfo"),
         description: "Information about pagination in a connection.",
         fields({ fieldWithHooks }) {
@@ -85,7 +79,7 @@ export default (function StandardTypesPlugin(builder) {
           };
         },
       };
-      const scope: ScopeGraphQLObjectType = {
+      const scope: GraphileEngine.ScopeGraphQLObjectType = {
         __origin: `graphile-build built-in`,
         isPageInfo: true,
       };
@@ -97,4 +91,4 @@ export default (function StandardTypesPlugin(builder) {
     },
     ["StandardTypes", "PageInfo"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

@@ -1,5 +1,3 @@
-import { Plugin } from "../SchemaBuilder";
-
 export default (async function QueryPlugin(builder) {
   builder.hook(
     "build",
@@ -69,4 +67,4 @@ export default (async function QueryPlugin(builder) {
     },
     ["Query"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

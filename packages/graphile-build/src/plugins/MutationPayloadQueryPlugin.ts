@@ -1,5 +1,3 @@
-import { Plugin } from "../SchemaBuilder";
-
 export default (function MutationPayloadQueryPlugin(builder) {
   builder.hook(
     "GraphQLObjectType:fields",
@@ -31,4 +29,4 @@ export default (function MutationPayloadQueryPlugin(builder) {
     },
     ["MutationPayloadQuery"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);
