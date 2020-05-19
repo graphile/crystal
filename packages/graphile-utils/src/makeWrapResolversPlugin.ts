@@ -1,10 +1,4 @@
-import {
-  SchemaBuilder,
-  Options,
-  Plugin,
-  Build,
-  ContextGraphQLObjectTypeFieldsField,
-} from "graphile-build";
+import { SchemaBuilder } from "graphile-build";
 import {
   makeFieldHelpers,
   requireChildColumn,
@@ -39,13 +33,15 @@ interface ResolverWrapperRules {
   };
 }
 
-type ResolverWrapperRulesGenerator = (options: Options) => ResolverWrapperRules;
+type ResolverWrapperRulesGenerator = (
+  options: GraphileEngine.GraphileBuildOptions,
+) => ResolverWrapperRules;
 
 type ResolverWrapperFilter<T> = (
-  context: ContextGraphQLObjectTypeFieldsField,
-  build: Build,
+  context: GraphileEngine.ContextGraphQLObjectTypeFieldsField,
+  build: GraphileEngine.Build,
   field: import("graphql").GraphQLFieldConfig<any, any>,
-  options: Options,
+  options: GraphileEngine.GraphileBuildOptions,
 ) => T | null;
 
 type ResolverWrapperFilterRule<T> = (
@@ -54,24 +50,27 @@ type ResolverWrapperFilterRule<T> = (
 
 export default function makeWrapResolversPlugin(
   rulesOrGenerator: ResolverWrapperRules | ResolverWrapperRulesGenerator,
-): Plugin;
+): GraphileEngine.Plugin;
 export default function makeWrapResolversPlugin<T>(
   filter: ResolverWrapperFilter<T>,
   rule: ResolverWrapperFilterRule<T>,
-): Plugin;
+): GraphileEngine.Plugin;
 export default function makeWrapResolversPlugin<T>(
   rulesOrGeneratorOrFilter:
     | ResolverWrapperRules
     | ResolverWrapperRulesGenerator
     | ResolverWrapperFilter<T>,
   rule?: ResolverWrapperFilterRule<T>,
-): Plugin {
+): GraphileEngine.Plugin {
   if (rule && typeof rule !== "function") {
     throw new Error(
       "Invalid call signature for makeWrapResolversPlugin, expected second argument to be a function",
     );
   }
-  return (builder: SchemaBuilder, options: Options) => {
+  return (
+    builder: SchemaBuilder,
+    options: GraphileEngine.GraphileBuildOptions,
+  ) => {
     // Disambiguate first argument
     const rulesOrGenerator:
       | ResolverWrapperRules

@@ -1,4 +1,3 @@
-import { Build, ContextGraphQLObjectTypeFieldsField } from "graphile-build";
 import { QueryBuilder, SQL } from "graphile-build-pg";
 
 export type SelectGraphQLResultFromTable = (
@@ -7,14 +6,14 @@ export type SelectGraphQLResultFromTable = (
 ) => Promise<any>;
 
 export interface GraphileHelpers {
-  build: Build;
-  fieldContext: ContextGraphQLObjectTypeFieldsField;
+  build: GraphileEngine.Build;
+  fieldContext: GraphileEngine.ContextGraphQLObjectTypeFieldsField;
   selectGraphQLResultFromTable: SelectGraphQLResultFromTable;
 }
 
 export function makeFieldHelpers(
-  build: Build,
-  fieldContext: ContextGraphQLObjectTypeFieldsField,
+  build: GraphileEngine.Build,
+  fieldContext: GraphileEngine.ContextGraphQLObjectTypeFieldsField,
   context: any,
   resolveInfo: import("graphql").GraphQLResolveInfo,
 ) {
@@ -99,8 +98,8 @@ export function makeFieldHelpers(
 }
 
 export function requireColumn(
-  build: Build,
-  context: ContextGraphQLObjectTypeFieldsField,
+  build: GraphileEngine.Build,
+  context: GraphileEngine.ContextGraphQLObjectTypeFieldsField,
   method: "addArgDataGenerator" | "addDataGenerator",
   col: string,
   alias: string,
@@ -117,8 +116,8 @@ export function requireColumn(
 }
 
 export function requireChildColumn(
-  build: Build,
-  context: ContextGraphQLObjectTypeFieldsField,
+  build: GraphileEngine.Build,
+  context: GraphileEngine.ContextGraphQLObjectTypeFieldsField,
   col: string,
   alias: string,
 ): void {
@@ -126,8 +125,8 @@ export function requireChildColumn(
 }
 
 export function requireSiblingColumn(
-  build: Build,
-  context: ContextGraphQLObjectTypeFieldsField,
+  build: GraphileEngine.Build,
+  context: GraphileEngine.ContextGraphQLObjectTypeFieldsField,
   col: string,
   alias: string,
 ): void {

@@ -1,4 +1,3 @@
-import { Plugin } from "graphile-build";
 import {
   PgEntityKind,
   PgEntity,
@@ -109,9 +108,9 @@ export type SubscribeToPgSmartTagUpdatesCallback = (
 export function makePgSmartTagsPlugin(
   ruleOrRules: PgSmartTagRule | PgSmartTagRule[] | null,
   subscribeToUpdatesCallback?: SubscribeToPgSmartTagUpdatesCallback | null,
-): Plugin {
+): GraphileEngine.Plugin {
   let [rules, rawRules] = rulesFrom(ruleOrRules);
-  const plugin: Plugin = (builder, _options) => {
+  const plugin: GraphileEngine.Plugin = (builder, _options) => {
     if (subscribeToUpdatesCallback) {
       builder.registerWatcher(
         async (triggerRebuild) => {
@@ -395,7 +394,7 @@ export type SubscribeToJSONPgSmartTagsUpdatesCallback = (
 export function makeJSONPgSmartTagsPlugin(
   json: JSONPgSmartTags | null,
   subscribeToJSONUpdatesCallback?: SubscribeToJSONPgSmartTagsUpdatesCallback | null,
-): Plugin {
+): GraphileEngine.Plugin {
   // Get rules from JSON
   let rules = pgSmartTagRulesFromJSON(json);
 

@@ -1,18 +1,16 @@
-import { Plugin, Options, BuildBase } from "graphile-build";
-
 interface Inflectors {
   [str: string]: (...args: Array<any>) => any;
 }
 type InflectorsGenerator = (
   inflection: Partial<Inflectors>,
-  build: BuildBase,
-  options: Options,
+  build: GraphileEngine.BuildBase,
+  options: GraphileEngine.GraphileBuildOptions,
 ) => Inflectors;
 
 export default function makeAddInflectorsPlugin(
   additionalInflectorsOrGenerator: Inflectors | InflectorsGenerator,
   replace = false,
-): Plugin {
+): GraphileEngine.Plugin {
   return (builder, options) => {
     builder.hook("inflection", (inflection, build) => {
       const additionalInflectors =
