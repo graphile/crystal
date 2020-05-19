@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/graphile/graphile-build/tree/master/packages/graphql-parse-resolve-info",
   "peerDependencies": {
-    "graphql": ">=0.9 <0.14 || ^14.0.2"
+    "graphql": "^15.0.0"
   },
   "devDependencies": {
     "@types/debug": "^4.1.5",

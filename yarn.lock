@@ -1838,7 +1838,7 @@ __metadata:
   peerDependencies:
     graphile-build: 4.7.0
     graphile-build-pg: 4.7.0
-    graphql: ">=0.6 <15"
+    graphql: ^15.0.0
     graphql-parse-resolve-info: 4.7.0
     postgraphile: ^4.7.0
   languageName: unknown
@@ -10316,7 +10316,7 @@ fsevents@^1.2.7:
     postgres-interval: ^1.2.0
     tslib: ^2.0.0
   peerDependencies:
-    graphql: ">=0.9 <0.14 || ^14.0.2"
+    graphql: ^15.0.0
     graphql-parse-resolve-info: 4.7.0
     pg: ">=6.1.0 <9"
   languageName: unknown
@@ -10338,7 +10338,7 @@ fsevents@^1.2.7:
     semver: ^7.3.2
     tslib: ^2.0.0
   peerDependencies:
-    graphql: ">=0.9 <0.14 || ^14.0.2"
+    graphql: ^15.0.0
   languageName: unknown
   linkType: soft
 
@@ -10505,7 +10505,7 @@ fsevents@^1.2.7:
     eslint_d: ^8.1.1
     tslib: ^2.0.0
   peerDependencies:
-    graphql: ">=0.9 <0.14 || ^14.0.2"
+    graphql: ^15.0.0
   languageName: unknown
   linkType: soft
 
@@ -12763,7 +12763,7 @@ fsevents@^1.2.7:
   dependencies:
     pretty-format: ^26.0.1
   peerDependencies:
-    graphql: ^14.0.2
+    graphql: ^15.0.0
   languageName: unknown
   linkType: soft
 
@@ -17096,7 +17096,7 @@ fsevents@^1.2.7:
     pg-connection-string: ^2.2.3
     tslib: ^2.0.0
   peerDependencies:
-    graphql: ">=0.9 <0.14 || ^14.0.2"
+    graphql: ^15.0.0
     pg: ">=6.1.0 <9"
   languageName: unknown
   linkType: soft

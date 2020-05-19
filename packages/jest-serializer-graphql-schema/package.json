@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/graphile/graphile-engine/tree/master/packages/jest-serializer-graphql-schema#readme",
   "peerDependencies": {
-    "graphql": "^14.0.2"
+    "graphql": "^15.0.0"
   },
   "devDependencies": {
     "pretty-format": "^26.0.1"
