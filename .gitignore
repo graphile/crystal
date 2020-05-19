@@ -4,7 +4,6 @@ dist
 /pg-omit-archived/
 /pg-simplify-inflector/
 /operation-hooks/
-/.vscode
 *.tgz
 yarn-error.log
 npm-debug.log
