@@ -1550,6 +1550,7 @@ __metadata:
     "@types/pg": ^7.4.14
     "@types/ws": ^6.0.1
     pg: ">=6.1.0 <9"
+    tslib: ^1.5.0
     ws: ^7.0.0
   bin:
     graphile-lds: ./dist/cli.js
@@ -1570,32 +1571,34 @@ __metadata:
     "@types/jest": ^24.0.12
     "@types/pg": ^7.4.14
     debug: ^4.1.1
-    graphile-build: 4.7.0
-    graphile-build-pg: 4.7.0
     graphql: ">=0.6 <15"
     graphql-subscriptions: ^1.1.0
     mock-req: ^0.2.0
     mock-res: ^0.5.0
     pg: ">=6.1.0 <9"
     postgraphile: 4.7.0
+    tslib: ^1.5.0
   peerDependencies:
-    graphile-build: ^4.7.0
-    graphile-build-pg: ^4.7.0
+    graphile-build: 4.7.0
+    graphile-build-pg: 4.7.0
     graphql: ">=0.6 <15"
+    graphql-parse-resolve-info: 4.7.0
     postgraphile: ^4.7.0
   languageName: unknown
   linkType: soft
 
-"@graphile/subscriptions-lds@workspace:packages/subscriptions-lds":
+"@graphile/subscriptions-lds@4.7.0, @graphile/subscriptions-lds@workspace:packages/subscriptions-lds":
   version: 0.0.0-use.local
   resolution: "@graphile/subscriptions-lds@workspace:packages/subscriptions-lds"
   dependencies:
     "@graphile/lds": 4.7.0
     "@types/ws": ^6.0.1
+    graphql: ">=0.9 <0.14 || ^14.0.2"
+    graphql-parse-resolve-info: 4.7.0
     pg: ">=6.1.0 <9"
-    ws: ^7.0.0
-  peerDependencies:
     postgraphile-core: ">4.3.1 <5"
+    tslib: ^1.5.0
+    ws: ^7.0.0
   languageName: unknown
   linkType: soft
 
@@ -9684,8 +9687,10 @@ fsevents@^1.2.7:
     lru-cache: ">=4 <5"
     pg-sql2: 4.7.0
     postgres-interval: ^1.2.0
+    tslib: ^1.5.0
   peerDependencies:
     graphql: ">=0.9 <0.14 || ^14.0.2"
+    graphql-parse-resolve-info: 4.7.0
     pg: ">=6.1.0 <9"
   languageName: unknown
   linkType: soft
@@ -9704,22 +9709,25 @@ fsevents@^1.2.7:
     lodash: ">=4 <5"
     pluralize: ^7.0.0
     semver: ^6.0.0
+    tslib: ^1.5.0
   peerDependencies:
     graphql: ">=0.9 <0.14 || ^14.0.2"
   languageName: unknown
   linkType: soft
 
-"graphile-utils@^4.7.0, graphile-utils@workspace:packages/graphile-utils":
+"graphile-utils@4.7.0, graphile-utils@^4.7.0, graphile-utils@workspace:packages/graphile-utils":
   version: 0.0.0-use.local
   resolution: "graphile-utils@workspace:packages/graphile-utils"
   dependencies:
     debug: ^4.1.1
+    graphql: ">=0.9 <0.14 || ^14.0.2"
+    iterall: ^1.2.2
+    pg: ">=6.1.0 <9"
+    postgraphile-core: 4.7.0
+    tslib: ^1.5.0
+  peerDependencies:
     graphile-build: 4.7.0
     graphile-build-pg: 4.7.0
-    graphql: ">=0.9 <0.14 || ^14.0.2"
-  peerDependencies:
-    graphile-build: ^4.5.0
-    graphile-build-pg: ^4.5.0
     pg: ">=6.1.0 <9"
   languageName: unknown
   linkType: soft
@@ -9868,6 +9876,7 @@ fsevents@^1.2.7:
     "@types/node": ^12.0.0
     debug: ^4.1.1
     eslint_d: ^8.0.0
+    tslib: ^1.5.0
   peerDependencies:
     graphql: ">=0.9 <0.14 || ^14.0.2"
   languageName: unknown
@@ -15334,6 +15343,7 @@ fsevents@^1.2.7:
     "@types/debug": 4.1.5
     "@types/node": 12.7.5
     markdown-doctest: ^1.0.0
+    tslib: ^1.5.0
   languageName: unknown
   linkType: soft
 
@@ -15519,7 +15529,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"pnp-webpack-plugin@npm:1.6.4":
+"pnp-webpack-plugin@npm:1.6.4, pnp-webpack-plugin@npm:^1.6.4":
   version: 1.6.4
   resolution: "pnp-webpack-plugin@npm:1.6.4"
   dependencies:
@@ -16380,18 +16390,23 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"postgraphile-core@4.7.0, postgraphile-core@workspace:packages/postgraphile-core":
+"postgraphile-core@4.7.0, postgraphile-core@>4.3.1 <5, postgraphile-core@workspace:packages/postgraphile-core":
   version: 0.0.0-use.local
   resolution: "postgraphile-core@workspace:packages/postgraphile-core"
   dependencies:
+    "@graphile/subscriptions-lds": 4.7.0
     "@types/node": ^12.0.0
     "@types/pg": ^7.4.14
     debug: ^4.1.1
     graphile-build: 4.7.0
     graphile-build-pg: 4.7.0
+    graphile-utils: 4.7.0
+    graphql-parse-resolve-info: 4.7.0
     jsonwebtoken: ^8.5.1
     mock-fs: ^4.11.0
+    pg: ">=6.1.0 <9"
     pg-connection-string: ^2.1.0
+    tslib: ^1.5.0
   peerDependencies:
     graphql: ">=0.9 <0.14 || ^14.0.2"
     pg: ">=6.1.0 <9"
@@ -16437,8 +16452,11 @@ fsevents@^1.2.7:
     express: ^4.14.0
     fastify: ^2.2.0
     finalhandler: ^1.0.6
+    graphile-build: 4.7.0
+    graphile-build-pg: 4.7.0
     graphile-utils: ^4.7.0
     graphql: ^0.6.0 || ^0.7.0 || ^0.8.0-b || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.2
+    graphql-parse-resolve-info: 4.7.0
     html-webpack-inline-source-plugin: ^0.0.10
     html-webpack-plugin: ^3.2.0
     http-errors: ^1.5.1
@@ -16455,6 +16473,7 @@ fsevents@^1.2.7:
     pg-connection-string: ^2.0.0
     pg-minify: ~1.0.0
     pg-sql2: 4.7.0
+    pnp-webpack-plugin: ^1.6.4
     postgraphile-core: 4.7.0
     postgraphiql: 1.0.0
     prettier: ^1.19.1
@@ -16481,6 +16500,7 @@ fsevents@^1.2.7:
     react: ^16.12.0
     react-dom: ^16.12.0
     react-scripts: ^3.0.0
+    subscriptions-transport-ws: ^0.9.15
   languageName: unknown
   linkType: soft
 

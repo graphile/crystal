@@ -4,6 +4,7 @@ const { execSync } = require("child_process");
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const HtmlWebpackInlineSourcePlugin = require("html-webpack-inline-source-plugin");
+const PnpWebpackPlugin = require("pnp-webpack-plugin");
 
 const ASSETS_SOURCE_DIR = `${__dirname}/../assets/`;
 const ASSETS_DEST_DIR = `${__dirname}/../src/assets/`;
@@ -47,6 +48,15 @@ async function main() {
     // Webpack up everything
     webpack(
       {
+        /* yarn pnp; remove when we've upgraded to Webpack 5 */
+        resolve: {
+          plugins: [PnpWebpackPlugin],
+        },
+        resolveLoader: {
+          plugins: [PnpWebpackPlugin.moduleLoader(module)],
+        },
+        /* end: yarn pnp */
+
         mode: "production",
         target: "web",
         entry: `${__dirname}/../../postgraphiql/src/index.js`,
