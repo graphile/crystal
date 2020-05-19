@@ -8,3 +8,5 @@ node_modules
 dist
 CHANGELOG.md
 _LOCAL
+.yarn
+.pnp.*
