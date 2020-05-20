@@ -2,7 +2,6 @@ import * as fs from "fs";
 import { defaultPlugins, getBuilder, SchemaBuilder } from "graphile-build";
 import {
   defaultPlugins as pgDefaultPlugins,
-  Inflector,
   PgAttribute,
   formatSQLForDebugging,
 } from "graphile-build-pg";
@@ -58,10 +57,6 @@ declare global {
       jwtPgTypeIdentifier?: string;
       jwtSecret?: Secret;
       jwtSignOptions?: SignOptions;
-      /**
-       * @deprecated UNSUPPORTED! Use an inflector plugin instead.
-       */
-      inflector?: Inflector;
       /**
        * @deprecated Use smart comments/tags instead
        */
@@ -163,7 +158,6 @@ export const getPostGraphileBuilder = async (
     disableDefaultMutations,
     graphileBuildOptions,
     graphqlBuildOptions, // DEPRECATED!
-    inflector, // NO LONGER SUPPORTED!
     pgColumnFilter,
     viewUniqueKey,
     enableTags = true,
@@ -294,11 +288,6 @@ export const getPostGraphileBuilder = async (
   ensureValidPlugins("prependPlugins", prependPlugins);
   ensureValidPlugins("appendPlugins", appendPlugins);
   ensureValidPlugins("skipPlugins", skipPlugins);
-  if (inflector) {
-    throw new Error(
-      "Custom inflector arguments are not supported, please use the inflector plugin API instead: https://www.graphile.org/postgraphile/inflection/",
-    );
-  }
   const inflectionOverridePlugins = classicIds
     ? [PostGraphileInflectionPlugin, PostGraphileClassicIdsInflectionPlugin]
     : [PostGraphileInflectionPlugin];
