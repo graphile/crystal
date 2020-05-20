@@ -1621,7 +1621,7 @@ __metadata:
     debug: ^4.2.0
     graphile-build: 4.7.0
     graphile-build-pg: 4.7.0
-    graphql: ^15.0.0
+    graphql: ^14.6.0
     graphql-subscriptions: ^1.1.0
     jest: ^26.0.1
     mock-req: ^0.2.0
@@ -1633,7 +1633,7 @@ __metadata:
     typescript: ^3.9.2
   peerDependencies:
     graphile-build-pg: 4.7.0
-    graphql: ^15.0.0
+    graphql: ^14.6.0
     graphql-parse-resolve-info: 4.7.0
     postgraphile: ^4.7.0
   languageName: unknown
@@ -1649,7 +1649,7 @@ __metadata:
     "@types/ws": ^7.2.4
     graphile-build: 4.7.0
     graphile-build-pg: 4.7.0
-    graphql: ^15.0.0
+    graphql: ^14.6.0
     graphql-parse-resolve-info: 4.7.0
     jest: ^26.0.1
     pg: ^8.2.1
@@ -9919,7 +9919,7 @@ fsevents@^1.2.7:
     chalk: ^4.0.0
     debug: ^4.2.0
     graphile-build: 4.7.0
-    graphql: ^15.0.0
+    graphql: ^14.6.0
     graphql-iso-date: ^3.6.1
     graphql-parse-resolve-info: 4.7.0
     jest: ^26.0.1
@@ -9932,7 +9932,7 @@ fsevents@^1.2.7:
     tslib: ^2.0.0
     typescript: ^3.9.2
   peerDependencies:
-    graphql: ^15.0.0
+    graphql: ^14.6.0
     graphql-parse-resolve-info: 4.7.0
     pg: ">=6.1.0 <9"
   languageName: unknown
@@ -9951,7 +9951,7 @@ fsevents@^1.2.7:
     "@types/semver": ^7.2.0
     chalk: ^4.0.0
     debug: ^4.2.0
-    graphql: ^15.0.0
+    graphql: ^14.6.0
     graphql-parse-resolve-info: 4.7.0
     iterall: ^1.3.0
     jest: ^26.0.1
@@ -9962,7 +9962,7 @@ fsevents@^1.2.7:
     tslib: ^2.0.0
     typescript: ^3.9.2
   peerDependencies:
-    graphql: ^15.0.0
+    graphql: ^14.6.0
   languageName: unknown
   linkType: soft
 
@@ -9976,7 +9976,7 @@ fsevents@^1.2.7:
     debug: ^4.2.0
     graphile-build: 4.7.0
     graphile-build-pg: 4.7.0
-    graphql: ^15.0.0
+    graphql: ^14.6.0
     iterall: ^1.3.0
     jest: ^26.0.1
     pg: ^8.2.1
@@ -10141,13 +10141,13 @@ fsevents@^1.2.7:
     "@types/node": ^14.0.1
     debug: ^4.2.0
     eslint_d: ^8.1.1
-    graphql: ^15.0.0
+    graphql: ^14.6.0
     jest: ^26.0.1
     ts-node: ^8.10.1
     tslib: ^2.0.0
     typescript: ^3.9.2
   peerDependencies:
-    graphql: ^15.0.0
+    graphql: ^14.6.0
   languageName: unknown
   linkType: soft
 
@@ -10171,19 +10171,12 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"graphql@npm:^14.0.0":
+"graphql@npm:^14.0.0, graphql@npm:^14.6.0":
   version: 14.6.0
   resolution: "graphql@npm:14.6.0"
   dependencies:
     iterall: ^1.2.2
   checksum: 3/24cab2758cea2ce592c59af28cac0fc80d2f2eac2f2441ce0152ce3c5a3a2416394aadf71b2d8db58f46c44ca3d20747eb168f58502f6eadafab0f11dea13791
-  languageName: node
-  linkType: hard
-
-"graphql@npm:^15.0.0":
-  version: 15.0.0
-  resolution: "graphql@npm:15.0.0"
-  checksum: 3/f5119751edf48d088ca4ab0a410e66bf270cb5887db1f1a20675dccb0009497c2840704b580283a2ce364b1c5b47d9ceee879ece1a63350e3cd17679f87b3afe
   languageName: node
   linkType: hard
 
@@ -12406,13 +12399,13 @@ fsevents@^1.2.7:
   resolution: "jest-serializer-graphql-schema@workspace:packages/jest-serializer-graphql-schema"
   dependencies:
     "@types/jest": ^25.2.3
-    graphql: ^15.0.0
+    graphql: ^14.6.0
     jest: ^26.0.1
     pretty-format: ^26.0.1
     ts-node: ^8.10.1
     typescript: ^3.9.2
   peerDependencies:
-    graphql: ^15.0.0
+    graphql: ^14.6.0
   languageName: unknown
   linkType: soft
 
@@ -16660,7 +16653,7 @@ fsevents@^1.2.7:
     graphile-build: 4.7.0
     graphile-build-pg: 4.7.0
     graphile-utils: 4.7.0
-    graphql: ^15.0.0
+    graphql: ^14.6.0
     graphql-parse-resolve-info: 4.7.0
     jest: ^26.0.1
     jsonwebtoken: ^8.5.1
@@ -16671,7 +16664,7 @@ fsevents@^1.2.7:
     tslib: ^2.0.0
     typescript: ^3.9.2
   peerDependencies:
-    graphql: ^15.0.0
+    graphql: ^14.6.0
     pg: ">=6.1.0 <9"
   languageName: unknown
   linkType: soft
@@ -16719,7 +16712,7 @@ fsevents@^1.2.7:
     graphile-build: 4.7.0
     graphile-build-pg: 4.7.0
     graphile-utils: ^4.7.0
-    graphql: ^15.0.0
+    graphql: ^14.6.0
     graphql-parse-resolve-info: 4.7.0
     html-webpack-inline-source-plugin: ^1.0.0-beta.2
     html-webpack-plugin: ^4.3.0
@@ -18246,7 +18239,7 @@ resolve@~1.12.0:
     eslint-plugin-react-hooks: ^2.0.0
     eslint-plugin-tsdoc: ^0.2.4
     eslint_d: ^8.1.1
-    graphql: ^15.0.0
+    graphql: ^14.6.0
     jest: ^26.0.1
     lerna: ^3.21.0
     pg: ^8.2.1

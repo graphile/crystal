@@ -36,14 +36,14 @@
   },
   "peerDependencies": {
     "graphile-build-pg": "4.7.0",
-    "graphql": "^15.0.0",
+    "graphql": "^14.6.0",
     "graphql-parse-resolve-info": "4.7.0",
     "postgraphile": "^4.7.0"
   },
   "devDependencies": {
     "@types/jest": "^25.2.3",
     "graphile-build-pg": "4.7.0",
-    "graphql": "^15.0.0",
+    "graphql": "^14.6.0",
     "jest": "^26.0.1",
     "mock-req": "^0.2.0",
     "mock-res": "^0.5.0",
