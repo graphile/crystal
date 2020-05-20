@@ -29,13 +29,19 @@ module.exports = {
     // We need this for our `GraphileEngine` namespace
     "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/no-var-requires": "off",
-    "@typescript-eslint/no-unused-vars": [
-      "error",
+    "@typescript-eslint/no-unused-vars": "off",
+    /*
       {
         argsIgnorePattern: "^_",
         varsIgnorePattern: "^_",
         args: "after-used",
         ignoreRestSiblings: true,
+      },
+    */
+    "@typescript-eslint/no-unused-vars-experimental": [
+      "error",
+      {
+        ignoreArgsIfArgsAfterAreUsed: true,
       },
     ],
 
