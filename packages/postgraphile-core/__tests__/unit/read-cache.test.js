@@ -1,4 +1,5 @@
 jest.mock("graphile-build");
+jest.setTimeout(20000);
 
 const mockFs = require("mock-fs");
 const fs = require("fs");
