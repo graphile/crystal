@@ -12403,6 +12403,7 @@ fsevents@^1.2.7:
     jest: ^26.0.1
     pretty-format: ^26.0.1
     ts-node: ^8.10.1
+    tslib: ^2.0.0
     typescript: ^3.9.2
   peerDependencies:
     graphql: ^14.6.0
