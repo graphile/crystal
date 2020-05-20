@@ -3,9 +3,9 @@
   "scripts": {
     "check": "yarn clean && yarn lint && yarn prepack:all && yarn test",
     "lint:fix": "yarn prettier:fix && yarn run eslint --fix",
-    "pretest": "tsc -b && ./scripts/pretest && yarn workspaces foreach --topological-dev run pretest",
+    "pretest": "tsc -b && ./scripts/pretest && yarn workspaces foreach --topological run pretest",
     "test": "jest -i",
-    "posttest": "yarn workspaces foreach --topological-dev run posttest",
+    "posttest": "yarn workspaces foreach --topological run posttest",
     "prepack:all": "scripts/prepack-all",
     "watch": "yarn workspace postgraphile prebuild && tsc -b --watch",
     "clean": "jest --clearCache && rm -Rf 'packages/*/dist' 'packages/*/tsconfig.tsbuildinfo'",
