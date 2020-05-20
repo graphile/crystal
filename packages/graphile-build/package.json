@@ -37,7 +37,7 @@
     "graphql-parse-resolve-info": "4.7.0",
     "iterall": "^1.3.0",
     "lodash": "^4.17.15",
-    "pluralize": "^8.0.0",
+    "pluralize": "^7.0.0",
     "semver": "^7.3.2",
     "tslib": "^2.0.0"
   },

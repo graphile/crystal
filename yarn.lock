@@ -9956,7 +9956,7 @@ fsevents@^1.2.7:
     iterall: ^1.3.0
     jest: ^26.0.1
     lodash: ^4.17.15
-    pluralize: ^8.0.0
+    pluralize: ^7.0.0
     semver: ^7.3.2
     ts-node: ^8.10.1
     tslib: ^2.0.0
@@ -15786,10 +15786,10 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"pluralize@npm:^8.0.0":
-  version: 8.0.0
-  resolution: "pluralize@npm:8.0.0"
-  checksum: 3/5251b470a0c8e5181ac7e1d61028553f90cb2c85c34b8e468cea269ae715499524546c2c3681029ef5697d86c54bfb12e49388f5cc6082051e84f5888588f4ec
+"pluralize@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "pluralize@npm:7.0.0"
+  checksum: 3/d35d8aeda1eb2f81123131e76ed0f2f48d681abfa4c46e4c6fdd6dca622650c8bd531aa0c5a3c7f779bd9660d08ceb51660e1f55def4bd14328ecfa76fe69962
   languageName: node
   linkType: hard
 
