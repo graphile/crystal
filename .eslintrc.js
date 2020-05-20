@@ -26,12 +26,8 @@ module.exports = {
     "@typescript-eslint/camelcase": "off",
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/no-empty-interface": "off",
-    "@typescript-eslint/no-namespace": [
-      "error",
-      {
-        allowDeclarations: true,
-      },
-    ],
+    // We need this for our `GraphileEngine` namespace
+    "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/no-var-requires": "off",
     "@typescript-eslint/no-unused-vars": [
       "error",
