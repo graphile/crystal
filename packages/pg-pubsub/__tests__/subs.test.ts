@@ -1,7 +1,6 @@
 import {
   postgraphile,
   makePluginHook,
-  PostGraphileOptions,
 } from "postgraphile";
 import {
   introspectionQuery as INTROSPECTION_QUERY,
@@ -14,7 +13,7 @@ import { runQuery, TestCtx } from "./runQuery";
 let ctx: TestCtx | null = null;
 const CLI_DEFAULTS = {};
 
-const init = async (options: PostGraphileOptions = {}) => {
+const init = async (options: GraphileEngine.PostGraphileOptions = {}) => {
   if (ctx) {
     throw new Error("CTX wasn't torn down");
   }
