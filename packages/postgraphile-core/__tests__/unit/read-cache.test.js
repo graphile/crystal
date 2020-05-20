@@ -9,6 +9,7 @@ const { getPostGraphileBuilder } = require("../..");
 beforeEach(() => {
   // required for mocks assertions
   jest.resetAllMocks();
+  mockFs.restore();
 });
 
 afterEach(() => {
