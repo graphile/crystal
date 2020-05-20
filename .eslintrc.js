@@ -2,7 +2,6 @@ module.exports = {
   parser: "babel-eslint",
   parserOptions: {
     sourceType: "module",
-    //project: 'tsconfig.json',
   },
   extends: [
     "eslint:recommended",
@@ -29,22 +28,15 @@ module.exports = {
     // We need this for our `GraphileEngine` namespace
     "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/no-var-requires": "off",
-    "@typescript-eslint/no-unused-vars": "off",
-    /*
+    "@typescript-eslint/no-unused-vars": [
+      "error",
       {
         argsIgnorePattern: "^_",
         varsIgnorePattern: "^_",
         args: "after-used",
         ignoreRestSiblings: true,
       },
-    */
-    "@typescript-eslint/no-unused-vars-experimental": [
-      "error",
-      {
-        ignoreArgsIfArgsAfterAreUsed: true,
-      },
     ],
-
     "no-confusing-arrow": 0,
     "no-else-return": 0,
     "no-underscore-dangle": 0,
@@ -93,6 +85,24 @@ module.exports = {
       rules: {
         "no-dupe-class-members": "off",
         "no-undef": "off",
+      },
+    },
+
+    // Stricter rules for source code
+    {
+      files: ["packages/*/src/**/*.ts", "packages/*/src/**/*.tsx"],
+      parser: "@typescript-eslint/parser",
+      parserOptions: {
+        project: ["tsconfig.json", "packages/*/tsconfig.json"],
+      },
+      rules: {
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars-experimental": [
+          "error",
+          {
+            ignoreArgsIfArgsAfterAreUsed: true,
+          },
+        ],
       },
     },
 
