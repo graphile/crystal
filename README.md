@@ -74,7 +74,6 @@ Below is a quick-start, for more detailed instructions, please
 
 ```bash
 yarn
-yarn lerna bootstrap
 yarn watch
 ```
 
@@ -85,7 +84,7 @@ terminal to run the tests (Note: your PostgreSQL server must be
 ```bash
 createdb graphileengine_test
 export TEST_DATABASE_URL="postgres:///graphileengine_test"
-yarn lerna run test
+yarn test
 ```
 
 If the above succeeds, you're good to go! If not, please try again after running
@@ -98,7 +97,6 @@ If you want to work in a Docker environment you can follow
 [the instructions on the wiki](https://github.com/graphile/graphile-build/wiki/Development-with-docker-compose).
 
 [postgraphile]: https://github.com/graphile/postgraphile
-[lerna]: https://github.com/lerna/lerna
 [graphile-build]: packages/graphile-build/
 [graphile-build-pg]: packages/graphile-build-pg/
 [graphile-utils]: packages/graphile-utils/

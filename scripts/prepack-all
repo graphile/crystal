@@ -2,10 +2,10 @@
 set -e
 
 # Make sure any generated assets are built
-lerna run preprepack --stream
+yarn workspaces foreach --parallel --topological-dev run preprepack
 
 # Build everything in the relevant order according to TypeScript project references
 tsc -b
 
 # Now run `prepack` on each package (slightly parallelised)
-lerna run prepack --stream
+yarn workspaces foreach --parallel --topological-dev run prepack
