@@ -20,7 +20,7 @@ cache: yarn
 
 install:
   - npm install -g yarn
-  - yarn --frozen-lockfile
+  - yarn --immutable
   - lerna bootstrap
 
 before_script:
