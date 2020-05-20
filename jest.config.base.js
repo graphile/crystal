@@ -4,7 +4,7 @@ module.exports = (dir) => {
   return {
     testEnvironment: "node",
     transform: {
-      "^.+\\.jsx?$": require.resolve("babel-jest"),
+      "^.+\\.jsx?$": `${__dirname}/.jest-babel-transform.js`,
       "^.+\\.tsx?$": require.resolve("ts-jest"),
     },
     testMatch: ["<rootDir>/**/__tests__/**/*.test.[jt]s?(x)"],
