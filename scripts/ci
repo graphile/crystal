@@ -10,7 +10,7 @@ echo "[2/4]: Checking Code Format"
 yarn prettier:check
 
 echo "[3/4]: Linting Code"
-yarn eslint
+yarn eslint .
 
 echo "[4/4]: Testing Project"
 yarn run pretest
