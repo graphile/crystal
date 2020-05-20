@@ -36,6 +36,7 @@
     "dev": "./scripts/dev",
     "lint": "eslint --ext .ts,.js .",
     "lint:fix": "yarn run lint --fix",
+    "test": "true",
     "make-assets": "./scripts/make-assets.js",
     "prepack": "yarn build",
     "preprepack": "yarn prebuild",
