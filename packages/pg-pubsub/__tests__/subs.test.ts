@@ -1,7 +1,4 @@
-import {
-  postgraphile,
-  makePluginHook,
-} from "postgraphile";
+import { postgraphile, makePluginHook } from "postgraphile";
 import {
   introspectionQuery as INTROSPECTION_QUERY,
   buildClientSchema,
