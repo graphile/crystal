@@ -41,9 +41,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Configure PostgreSQL
         run: |
-          cat .github/workflows/ci/docker-entrypoint-initdb.d/010-enable_wal.sh | docker exec -t postgres bash
-          cat .github/workflows/ci/docker-entrypoint-initdb.d/020-wal2json.sh | docker exec -t postgres bash
-          cat .github/workflows/ci/docker-entrypoint-initdb.d/030-setup.sh | docker exec -t postgres bash
+          cat .github/workflows/ci/docker-entrypoint-initdb.d/010-enable_wal.sh | docker exec -i postgres bash
+          cat .github/workflows/ci/docker-entrypoint-initdb.d/020-wal2json.sh | docker exec -i postgres bash
+          cat .github/workflows/ci/docker-entrypoint-initdb.d/030-setup.sh | docker exec -i postgres bash
       - name: Install pg_dump
         run: |
           sudo bash -c "echo deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main >> /etc/apt/sources.list.d/pgdg.list"
