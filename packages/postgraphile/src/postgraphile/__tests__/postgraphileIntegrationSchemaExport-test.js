@@ -7,6 +7,11 @@ import exportPostGraphileSchema from "../schema/exportPostGraphileSchema";
 import mockFs from "mock-fs";
 import { readFileSync, existsSync } from "fs";
 
+// When running jest from the root of the monorepo, the directory is the
+// repository root, so all the file paths are incorrect. I couldn't find a way
+// to have jest automatically `process.chdir` for each test suite.
+process.chdir(__dirname + "/../../..");
+
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20;
 

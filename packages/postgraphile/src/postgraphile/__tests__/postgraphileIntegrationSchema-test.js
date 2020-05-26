@@ -7,6 +7,11 @@ import printSchemaOrdered from "../../__tests__/utils/printSchemaOrdered";
 import withPgClient from "../../__tests__/utils/withPgClient";
 import { createPostGraphileSchema } from "..";
 
+// When running jest from the root of the monorepo, the directory is the
+// repository root, so all the file paths are incorrect. I couldn't find a way
+// to have jest automatically `process.chdir` for each test suite.
+process.chdir(__dirname + "/../../..");
+
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20;
 
