@@ -62,8 +62,10 @@ if [ $SERVER_VERSION_NUM -ge 100000 ]; then
   psql -Xqv ON_ERROR_STOP=1 -f packages/postgraphile-core/__tests__/pg10-schema.sql "$TEST_DATABASE_URL"
 fi;
 
-dropdb --if-exists lds_test
-createdb lds_test
+psql -Xqv ON_ERROR_STOP=1 "$TEST_DATABASE_URL" <<HERE
+DROP DATABASE IF EXISTS lds_test;
+CREATE DATABASE lds_test;
+HERE
 psql -X1v ON_ERROR_STOP=1 -v VERBOSITY=verbose -f packages/lds/__tests__/schema.sql lds_test
 
 clear
