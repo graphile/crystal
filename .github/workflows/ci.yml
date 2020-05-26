@@ -1,0 +1,54 @@
+name: Node CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      CI: true
+      PGVERSION: ${{ matrix.postgres-version}}
+      TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/graphileengine_test
+      TEST_PG_URL: postgres://postgres:postgres@localhost:5432/postgraphile_test
+      LDS_TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/lds_test
+
+    strategy:
+      matrix:
+        postgres-version: [9.6, 10, 11, 12, 13]
+        node-version: [10.x, 12.x, 14.x]
+
+    services:
+      postgres:
+        image: postgres:${{ matrix.postgres-version }}
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - "0.0.0.0:5432:5432"
+        # needed because the postgres container does not provide a healthcheck
+        options:
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s
+          --health-retries 5
+        volumes:
+          - ./.github/workflows/ci/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install pg_dump
+        run: |
+          sudo bash -c "echo deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main >> /etc/apt/sources.list.d/pgdg.list"
+          wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+          sudo apt-get update
+          sudo apt-get -yqq install postgresql-client-${{ matrix.postgres-version }}
+      - name: yarn, lint, build and test
+        run: |
+          cp .env.ci .env
+          yarn --immutable
+          ./scripts/ci
