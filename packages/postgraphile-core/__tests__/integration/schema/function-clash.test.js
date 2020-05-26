@@ -2,7 +2,7 @@ const core = require("./core");
 
 let consoleWarnSpy;
 beforeAll(() => {
-  consoleWarnSpy = jest.spyOn(global.console, "warn");
+  consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
 });
 afterAll(() => {
   if (consoleWarnSpy) {
