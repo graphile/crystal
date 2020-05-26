@@ -4,6 +4,10 @@ import { $$pgClient } from "../../postgres/inventory/pgClientFromContext";
 import withPostGraphileContext from "../withPostGraphileContext";
 import { readFileSync, readFile } from "fs";
 
+beforeEach(() => {
+  jest.restoreAllMocks();
+});
+
 const jwt = require("jsonwebtoken");
 
 /**
@@ -73,6 +77,7 @@ test("will return the asynchronous value from the callback", async () => {
 test("will throw an error if there was a `jwtToken`, but no `jwtSecret`", async () => {
   const pgClient = { query: jest.fn(), release: jest.fn() };
   const pgPool = { connect: jest.fn(() => pgClient) };
+  const spy = jest.spyOn(console, "error").mockImplementation(() => {});
   await expectHttpError(
     withPostGraphileContext({ pgPool, jwtToken: "asd" }, () => {}),
     403,
@@ -80,11 +85,20 @@ test("will throw an error if there was a `jwtToken`, but no `jwtSecret`", async 
   );
   // Never set up the transaction due to error
   expect(pgClient.query.mock.calls).toEqual([]);
+  expect(spy.mock.calls).toMatchInlineSnapshot(`
+    Array [
+      Array [
+        "ERROR: 'jwtSecret' was not set to a string or buffer - rejecting JWT-authenticated request.",
+      ],
+    ]
+  `);
 });
 
 test("will throw an error if there was a `jwtToken`, but `jwtSecret` had unsupported format", async () => {
   const pgClient = { query: jest.fn(), release: jest.fn() };
   const pgPool = { connect: jest.fn(() => pgClient) };
+  const spy = jest.spyOn(console, "error").mockImplementation(() => {});
+
   await expectHttpError(
     withPostGraphileContext(
       { pgPool, jwtToken: "asd", jwtSecret: true },
@@ -95,6 +109,13 @@ test("will throw an error if there was a `jwtToken`, but `jwtSecret` had unsuppo
   );
   // Never set up the transaction due to error
   expect(pgClient.query.mock.calls).toEqual([]);
+  expect(spy.mock.calls).toMatchInlineSnapshot(`
+    Array [
+      Array [
+        "ERROR: 'jwtSecret' was not set to a string or buffer - rejecting JWT-authenticated request.",
+      ],
+    ]
+  `);
 });
 
 test("will throw an error for a malformed `jwtToken`", async () => {
