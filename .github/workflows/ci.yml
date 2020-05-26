@@ -13,12 +13,13 @@ jobs:
       TEST_PG_URL: postgres://postgres:postgres@localhost:5432/postgraphile_test
       LDS_TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/lds_test
       TERM: xterm
+      FORCE_COLOR: 1
 
     strategy:
       fail-fast: false
       matrix:
         postgres-version: [10, 11, 12]
-        node-version: [10.x, 12.x, 14.x]
+        node-version: [12.x, 14.x]
 
     services:
       postgres:
