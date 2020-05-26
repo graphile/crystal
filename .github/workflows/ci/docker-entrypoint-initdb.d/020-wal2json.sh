@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -e
-createuser root
 
 # This setup script is heavily inspired by
 # https://github.com/debezium/docker-images/blob/master/postgres/11/Dockerfile
@@ -10,6 +9,7 @@ WAL2JSON_COMMIT_ID=c54d89649c3fe5e0aa79c3a87493935232e962a7
 USE_PGXS=1
 export PGUSER=postgres
 export PGPASSWORD=postgres
+createuser root
 
 apt-get update
 apt-get install -f -y --no-install-recommends \
