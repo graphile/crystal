@@ -31,8 +31,6 @@ jobs:
         options:
           --health-cmd pg_isready --health-interval 10s --health-timeout 5s
           --health-retries 5
-        volumes:
-          - ./.github/workflows/ci/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
 
     steps:
       - name: Checkout
@@ -41,6 +39,11 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+      - name: Configure PostgreSQL
+        run: |
+          cat .github/workflows/ci/docker-entrypoint-initdb.d/010-enable_wal.sh | docker exec -t postgres bash
+          cat .github/workflows/ci/docker-entrypoint-initdb.d/020-wal2json.sh | docker exec -t postgres bash
+          cat .github/workflows/ci/docker-entrypoint-initdb.d/030-setup.sh | docker exec -t postgres bash
       - name: Install pg_dump
         run: |
           sudo bash -c "echo deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main >> /etc/apt/sources.list.d/pgdg.list"
