@@ -53,7 +53,7 @@ if current_setting('server_version_num')::int >= 90500 then
   -- JSONB supported
   -- current_setting(x, true) supported
   create function c.current_user_id() returns int as $$
-    select nullif(current_setting('jwt.claims.user_id', true), '')::int;
+    select nullif(current_setting('jwt.claims.user_id'::text, true), '')::int;
   $$ language sql stable;
 else
   execute 'alter database ' || quote_ident(current_database()) || ' set jwt.claims.user_id to ''''';
