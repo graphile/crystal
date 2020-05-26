@@ -123,11 +123,17 @@ beforeAll(() => {
     ]);
     // Now for RBAC-enabled tests
     await pgClient.query("set role postgraphile_test_authenticator");
+
+    const spy = jest.spyOn(console, "warn").mockImplementation(() => {});
     const [rbac] = await Promise.all([
       createPostGraphileSchema(pgClient, ["a", "b", "c"], {
         ignoreRBAC: false,
       }),
     ]);
+    // Expect rbac schema to output Recoverable error about post_with_suffix
+    expect(spy.mock.calls).toHaveLength(1);
+    spy.mockRestore();
+
     debug(printSchema(normal));
     return {
       normal,
