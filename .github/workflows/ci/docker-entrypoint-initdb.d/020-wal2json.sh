@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -e
+createuser root
 
 # This setup script is heavily inspired by
 # https://github.com/debezium/docker-images/blob/master/postgres/11/Dockerfile
