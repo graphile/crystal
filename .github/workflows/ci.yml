@@ -14,6 +14,7 @@ jobs:
       LDS_TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/lds_test
 
     strategy:
+      fail-fast: false
       matrix:
         postgres-version: [10, 11, 12]
         node-version: [10.x, 12.x, 14.x]
