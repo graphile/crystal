@@ -41,6 +41,7 @@ const withPgClient = (url, fn) => {
     url = process.env.TEST_DATABASE_URL;
   }
   return withTransactionlessPgClient(url, async (client) => {
+    client.setMaxListeners(100);
     await client.query("begin");
     try {
       await client.query("set local timezone to '+04:00'");
