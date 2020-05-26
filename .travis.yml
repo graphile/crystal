@@ -15,6 +15,7 @@ env:
   PGVERSION: 10
   TEST_DATABASE_URL: postgres://localhost:5432/graphileengine_test
   TEST_PG_URL: postgres://localhost:5432/postgraphile_test
+  FORCE_COLOR: 1
 
 cache: yarn
 
