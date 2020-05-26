@@ -17,38 +17,44 @@ const gqlSchemaPromise = withPgClient(async (pgClient) => {
 afterEach(() => mockFs.restore());
 
 test("exports a schema as JSON", async () => {
-  mockFs();
   const gqlSchema = await gqlSchemaPromise;
+  mockFs();
   await exportPostGraphileSchema(gqlSchema, {
     exportJsonSchemaPath: "/schema.json",
   });
-  expect(readFileSync("/schema.json", "utf8").toMatchSnapshot());
+  const schemaJson = readFileSync("/schema.json", "utf8");
   mockFs.restore();
+  expect(schemaJson).toMatchSnapshot();
 });
 
 test("exports a schema as GQL", async () => {
-  mockFs();
   const gqlSchema = await gqlSchemaPromise;
+  mockFs();
   await exportPostGraphileSchema(gqlSchema, {
     exportGqlSchemaPath: "/schema.gql",
   });
-  expect(readFileSync("/schema.gql", "utf8").toMatchSnapshot());
+  const schemaGql = readFileSync("/schema.gql", "utf8");
+  mockFs.restore();
+  expect(schemaGql).toMatchSnapshot();
 });
 
 test("exports a sorted schema as GQL", async () => {
-  mockFs();
   const gqlSchema = await gqlSchemaPromise;
+  mockFs();
   await exportPostGraphileSchema(gqlSchema, {
     exportGqlSchemaPath: "/schema.gql",
     sortExport: true,
   });
-  expect(readFileSync("/schema.gql", "utf8").toMatchSnapshot());
+  const schemaGql = readFileSync("/schema.gql", "utf8");
+  mockFs.restore();
+  expect(schemaGql).toMatchSnapshot();
 });
 
 test("does not export a schema when not enabled", async () => {
-  mockFs();
   const gqlSchema = await gqlSchemaPromise;
+  mockFs();
   await exportPostGraphileSchema(gqlSchema);
   expect(existsSync("/schema.gql")).toBe(false);
   expect(existsSync("/schema.json")).toBe(false);
+  mockFs.restore();
 });
