@@ -21,6 +21,7 @@ cache: yarn
 install:
   - npm install -g yarn
   - yarn --immutable
+  - yarn build
 
 before_script:
   - sudo bash -c "echo -e 'wal_level = logical\nmax_replication_slots =
