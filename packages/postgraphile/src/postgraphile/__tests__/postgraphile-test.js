@@ -9,6 +9,21 @@ import { createPostGraphileSchema, watchPostGraphileSchema } from "..";
 import createPostGraphileHttpRequestHandler from "../http/createPostGraphileHttpRequestHandler";
 import postgraphile from "../postgraphile";
 import chalk from "chalk";
+import { GraphQLSchema, GraphQLObjectType, GraphQLInt } from "graphql";
+
+const blankSchema = new GraphQLSchema({
+  query: new GraphQLObjectType({
+    name: "Query",
+    fields: {
+      _: {
+        type: GraphQLInt,
+      },
+    },
+  }),
+});
+watchPostGraphileSchema.mockImplementation((a, b, c, d) => {
+  d(blankSchema);
+});
 
 createPostGraphileHttpRequestHandler.mockImplementation(({ getGqlSchema }) =>
   Promise.resolve(getGqlSchema()).then(() => null),
