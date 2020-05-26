@@ -134,6 +134,7 @@ insert into b.types values (
   '192.168.0.0/24',
   'feed.dead.beef'
 );
+alter sequence b.types_id_seq restart with 13;
 
 insert into c.edge_case values
   (default, 20, 1),
