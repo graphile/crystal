@@ -32,6 +32,7 @@ const init = async (options: GraphileEngine.PostGraphileOptions = {}) => {
   const pluginHook = makePluginHook([PgPubsub]);
   const middleware = postgraphile(pgPool, ["pubsub_test"], {
     pluginHook,
+    disableQueryLog: true,
     ignoreRBAC: false,
     ...options,
   });
