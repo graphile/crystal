@@ -66,7 +66,7 @@ psql -Xqv ON_ERROR_STOP=1 "$TEST_DATABASE_URL" <<HERE
 DROP DATABASE IF EXISTS lds_test;
 CREATE DATABASE lds_test;
 HERE
-psql -X1v ON_ERROR_STOP=1 -v VERBOSITY=verbose -f packages/lds/__tests__/schema.sql lds_test
+psql -X1v ON_ERROR_STOP=1 -v VERBOSITY=verbose -f packages/lds/__tests__/schema.sql "$LDS_TEST_DATABASE_URL"
 
 clear
 echo "Database reset successfully ✅"
