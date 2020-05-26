@@ -50,8 +50,5 @@ jobs:
           wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
           sudo apt-get update
           sudo apt-get -yqq install postgresql-client-${{ matrix.postgres-version }}
-      - name: yarn, lint, build and test
-        run: |
-          cp .env.ci .env
-          yarn --immutable
-          ./scripts/ci
+      - run: yarn --immutable
+      - run: ./scripts/ci
