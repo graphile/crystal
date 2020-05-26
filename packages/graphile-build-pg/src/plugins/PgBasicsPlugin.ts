@@ -895,7 +895,7 @@ const omitUnindexed = (omit: typeof baseOmit, hideIndexWarnings: boolean) => (
       if (shouldOutputWarning) {
         entity["_omitUnindexedReadWarningGiven"] = true;
         // eslint-disable-next-line no-console
-        console.log(
+        console.warn(
           "%s",
           `Disabled 'read' permission for ${describePgEntity(
             entity,
