@@ -6,13 +6,13 @@ node_js:
   - "14"
 
 addons:
-  postgresql: "9.6"
+  postgresql: "10"
   apt:
     packages:
-      - postgresql-server-dev-9.6
+      - postgresql-server-dev-10
 
 env:
-  PGVERSION: 9.6
+  PGVERSION: 10
   TEST_DATABASE_URL: postgres://localhost:5432/graphileengine_test
   TEST_PG_URL: postgres://localhost:5432/postgraphile_test
 
@@ -44,14 +44,14 @@ matrix:
     - addons:
         apt:
           packages:
-            - postgresql-10
-            - postgresql-client-10
-            - postgresql-server-dev-10
-        postgresql: 10
+            - postgresql-11
+            - postgresql-client-11
+            - postgresql-server-dev-11
+        postgresql: 11
       services:
         - postgresql
       env:
-        - PGVERSION=10
+        - PGVERSION=11
         - TEST_DATABASE_URL=postgres://localhost:5432/graphileengine_test
         - TEST_PG_URL=postgres://localhost:5432/postgraphile_test
         - LDS_TEST_DATABASE_URL=postgres://travis:travis@localhost:5432/lds_test
