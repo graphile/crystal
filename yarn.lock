@@ -2562,6 +2562,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/mock-fs@npm:4.10.0":
+  version: 4.10.0
+  resolution: "@types/mock-fs@npm:4.10.0"
+  dependencies:
+    "@types/node": "*"
+  checksum: 3/30c153cf54e76f4720caa63bc3ca92b1618336d2e148b3536b8ab17996f2709866583c65d4bcb39612a30e793dbe2bb0adf94a8758fba060ad05b843c622acd0
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:*, @types/node@npm:14.0.1, @types/node@npm:^14.0.1":
   version: 14.0.1
   resolution: "@types/node@npm:14.0.1"
@@ -16302,6 +16311,7 @@ resolve@~1.12.0:
     "@babel/plugin-transform-runtime": ^7.9.6
     "@babel/preset-env": ^7.9.6
     "@babel/preset-typescript": ^7.9.0
+    "@types/mock-fs": 4.10.0
     "@types/node": ^14.0.1
     "@typescript-eslint/eslint-plugin": ^2.34.0
     "@typescript-eslint/parser": ^2.34.0
@@ -16323,6 +16333,7 @@ resolve@~1.12.0:
     eslint_d: ^8.1.1
     graphql: ^14.6.0
     jest: ^26.0.1
+    mock-fs: ^4.12.0
     pg: ^8.2.1
     prettier: ^2.0.5
     ts-jest: ^26.0.0

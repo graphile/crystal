@@ -17,5 +17,7 @@ module.exports = (dir) => {
     rootDir: dir,
     name: packageJson.name,
     displayName: packageJson.name,
+
+    setupFiles: [`${__dirname}/__tests__/setup-mock-fs.ts`],
   };
 };
