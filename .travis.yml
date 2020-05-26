@@ -29,7 +29,7 @@ before_script:
     10\nmax_wal_senders = 10' >>
     /etc/postgresql/$PGVERSION/main/postgresql.conf"
   - sudo service postgresql stop
-  - sudo service postgresql start
+  - sudo service postgresql start $PGVERSION
   - git clone https://github.com/eulerto/wal2json.git
   - sudo bash -c "cd wal2json && USE_PGXS=1 make && USE_PGXS=1 make install"
   - createdb graphileengine_test
