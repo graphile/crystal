@@ -14873,6 +14873,7 @@ fsevents@^1.2.7:
     "@graphile/subscriptions-lds": 4.7.0
     "@types/jest": ^25.2.3
     "@types/jsonwebtoken": ^8.5.0
+    "@types/mock-fs": ^4.10.0
     "@types/node": ^14.0.1
     "@types/pg": ^7.14.3
     debug: ^4.2.0

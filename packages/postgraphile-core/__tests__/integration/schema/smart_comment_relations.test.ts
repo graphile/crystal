@@ -1,8 +1,9 @@
 import * as core from "./core";
 import { GraphQLObjectType } from "graphql";
+import { PoolClient } from "pg";
 
 // WARNING: this function is not guaranteed to be SQL injection safe.
-const offerViewComment = (comment) => (pgClient) =>
+const offerViewComment = (comment: string) => (pgClient: PoolClient) =>
   pgClient.query(
     `comment on view smart_comment_relations.offer_view is E'${comment.replace(
       /'/g,

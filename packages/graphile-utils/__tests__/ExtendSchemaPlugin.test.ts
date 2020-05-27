@@ -16,6 +16,14 @@ import {
 import { graphql, subscribe, parse } from "graphql";
 import { $$asyncIterator } from "iterall";
 
+declare global {
+  namespace GraphileEngine {
+    interface Inflection {
+      echoFieldName(): string
+    }
+  }
+}
+
 function TestUtils_ExtractScopePlugin(
   hook,
   objectTypeName,
@@ -283,7 +291,7 @@ it("throws the proper error if an array of typeDefs aren't all DocumentNodes", (
               """
               randomNumbers: [Int!]!
             }
-          `,
+          ` as any,
         ],
         resolvers,
       })),
@@ -305,7 +313,7 @@ it("throws the proper error if a single typeDef isn't a DocumentNode", () => {
               """
               randomNumbers: [Int!]!
             }
-          `,
+          ` as any,
         resolvers,
       })),
     ]),
@@ -721,6 +729,12 @@ it("supports defining a more complex mutation", async () => {
   expect(data).toMatchSnapshot();
 });
 
+function assertIterator<T>(
+  i: T | AsyncIterableIterator<T>,
+): asserts i is AsyncIterableIterator<T> {
+  expect(typeof (i as any).next).toBe("function");
+}
+
 it("supports defining a simple subscription", async () => {
   const schema = await buildSchema([
     ...simplePlugins,
@@ -770,8 +784,7 @@ it("supports defining a simple subscription", async () => {
   );
   after = Date.now();
 
-  // expect(iterator).toBeInstanceOf(AsyncIterator);
-  expect(iterator.errors).toBeFalsy();
+  assertIterator(iterator);
   expect(timerRunning).toBeTruthy();
 
   // Lets get the next 5 values
