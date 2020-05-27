@@ -16,11 +16,27 @@ function readFilePromise(filename, encoding) {
   });
 }
 
-export const withTransactionlessPgClient = async (url, fn) => {
-  if (!fn) {
-    fn = url;
-    url = process.env.TEST_DATABASE_URL;
-  }
+type WithPgClientCallback<T> = (client: PoolClient) => Promise<T>;
+
+export function withTransactionlessPgClient<T>(
+  fn: WithPgClientCallback<T>,
+): Promise<T>;
+export function withTransactionlessPgClient<T>(
+  url: string,
+  fn: WithPgClientCallback<T>,
+): Promise<T>;
+export async function withTransactionlessPgClient<T>(
+  urlOrFn: string | WithPgClientCallback<T>,
+  maybeFn?: WithPgClientCallback<T>,
+): Promise<T> {
+  const fn: WithPgClientCallback<T> =
+    typeof maybeFn === "function"
+      ? maybeFn
+      : typeof urlOrFn === "function"
+      ? urlOrFn
+      : (urlOrFn as never);
+  const url =
+    typeof urlOrFn === "string" ? urlOrFn : process.env.TEST_DATABASE_URL;
   const pgPool = new pg.Pool({ connectionString: url });
   try {
     const client = await pgPool.connect();
@@ -32,21 +48,25 @@ export const withTransactionlessPgClient = async (url, fn) => {
   } finally {
     await pgPool.end();
   }
-};
+}
 
-type WithPgClientCallback<T> = (client: PoolClient) => Promise<T>;
 export function withPgClient<T>(fn: WithPgClientCallback<T>): Promise<T>;
 export function withPgClient<T>(
   url: string,
   fn: WithPgClientCallback<T>,
 ): Promise<T>;
-export function withPgClient<T>(
+export async function withPgClient<T>(
   urlOrFn: string | WithPgClientCallback<T>,
   maybeFn?: WithPgClientCallback<T>,
 ): Promise<T> {
   const fn: WithPgClientCallback<T> =
-    typeof urlOrFn === "string" ? maybeFn! : urlOrFn;
-  const url = maybeFn ? urlOrFn : process.env.TEST_DATABASE_URL;
+    typeof maybeFn === "function"
+      ? maybeFn
+      : typeof urlOrFn === "function"
+      ? urlOrFn
+      : (urlOrFn as never);
+  const url =
+    typeof urlOrFn === "string" ? urlOrFn : process.env.TEST_DATABASE_URL;
   return withTransactionlessPgClient(url, async (client) => {
     client.setMaxListeners(100);
     await client.query("begin");

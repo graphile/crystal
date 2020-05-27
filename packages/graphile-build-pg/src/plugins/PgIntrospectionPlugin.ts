@@ -558,7 +558,7 @@ export default (async function PgIntrospectionPlugin(
   builder,
   {
     pgConfig,
-    pgSchemas: schemas,
+    pgSchemas: schemas = ["public"],
     pgEnableTags,
     persistentMemoizeWithKey = (_key, fn) => fn(),
     pgThrowOnMissingSchema = false,

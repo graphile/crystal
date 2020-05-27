@@ -1,22 +1,22 @@
-const { subscribe, validate } = require("graphql");
-const { withTransactionlessPgClient } = require("../helpers");
-const { createPostGraphileSchema } = require("../..");
-const { default: SubscriptionsLDS } = require("@graphile/subscriptions-lds");
+import { subscribe, validate } from "graphql";
+import { withTransactionlessPgClient } from "../helpers";
+import { createPostGraphileSchema } from "../..";
+import SubscriptionsLDS from "@graphile/subscriptions-lds";
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const v = parseFloat(process.env.PGVERSION);
 
-exports.skipLDSTests = v && v < 10;
+export const skipLDSTests = v && v < 10;
 
 let schema;
-exports.resetDatabase = async function resetDatabase() {
+export async function resetDatabase() {
   await withTransactionlessPgClient((pgClient) =>
     pgClient.query("delete from live_test.users"),
   );
-};
+}
 
-exports.createSchema = async function createSchema() {
+export async function createSchema() {
   await withTransactionlessPgClient(async (pgClient) => {
     schema = await createPostGraphileSchema(pgClient, "live_test", {
       live: true,
@@ -28,9 +28,9 @@ exports.createSchema = async function createSchema() {
       appendPlugins: [SubscriptionsLDS],
     });
   });
-};
+}
 
-exports.releaseSchema = function releaseSchema() {
+export function releaseSchema() {
   // Release the LDS source
   if (
     schema &&
@@ -39,9 +39,9 @@ exports.releaseSchema = function releaseSchema() {
   ) {
     schema.__pgLdsSource.close();
   }
-};
+}
 
-exports.liveTest = (query, variables, cb) => {
+export const liveTest = (query, variables, cb) => {
   if (!cb) {
     cb = variables;
     variables = null;
@@ -118,9 +118,7 @@ exports.liveTest = (query, variables, cb) => {
   });
 };
 
-exports.sleep = sleep;
-
-exports.next = async function next(getLatest, duration = 5000) {
+export async function next(getLatest, duration = 5000) {
   const start = Date.now();
   while (Date.now() - start <= duration) {
     const { values, ended, error } = getLatest();
@@ -138,9 +136,9 @@ exports.next = async function next(getLatest, duration = 5000) {
   throw new Error(
     `Your call to \`next\` timed out waiting for new data (timeout: ${duration}ms)`,
   );
-};
+}
 
-exports.expectNoChange = async function next(getLatest, duration = 250) {
+export async function expectNoChange(getLatest, duration = 250) {
   const start = Date.now();
   while (Date.now() - start <= duration) {
     const { values, ended, error } = getLatest();
@@ -151,4 +149,4 @@ exports.expectNoChange = async function next(getLatest, duration = 250) {
     }
     await sleep(10);
   }
-};
+}
