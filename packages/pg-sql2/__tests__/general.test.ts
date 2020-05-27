@@ -1,4 +1,4 @@
-import sql from "../src";
+import sql, { SQLQuery } from "../src";
 
 function sansSymbols(obj) {
   if (obj && typeof obj === "object") {
@@ -11,11 +11,19 @@ function sansSymbols(obj) {
   }
 }
 
-it("sql.value", () => {
-  const node = sql.value({ foo: { bar: 1 } });
+it("sql.value(nonsense)", () => {
+  const node = sql.value({ foo: { bar: 1 } } as any);
   expect(sansSymbols(node)).toEqual({
     type: "VALUE",
     value: { foo: { bar: 1 } },
+  });
+});
+
+it("sql.value(nr)", () => {
+  const node = sql.value(3);
+  expect(sansSymbols(node)).toEqual({
+    type: "VALUE",
+    value: 3,
   });
 });
 
@@ -38,7 +46,7 @@ describe("sql.query", () => {
   it("simple", () => {
     const node = sql`select 1`;
     expect(sansSymbols(node)).toEqual({ type: "RAW", text: "select 1" });
-    const node2 = sql`select ${sql`1`}`;
+    const node2 = sql`select ${sql`1`}` as SQLQuery;
     expect(node2.map(sansSymbols)).toEqual([
       { type: "RAW", text: "select " },
       { type: "RAW", text: "1" },
@@ -46,7 +54,7 @@ describe("sql.query", () => {
   });
 
   it("with values", () => {
-    const node = sql`select ${sql.value(1)}::integer`;
+    const node = sql`select ${sql.value(1)}::integer` as SQLQuery;
     expect(node.map(sansSymbols)).toEqual([
       { type: "RAW", text: "select " },
       { type: "VALUE", value: 1 },
@@ -55,7 +63,7 @@ describe("sql.query", () => {
   });
 
   it("with sub-sub-sub query", () => {
-    const node = sql`select ${sql`1 ${sql`from ${sql`foo`}`}`}`;
+    const node = sql`select ${sql`1 ${sql`from ${sql`foo`}`}`}` as SQLQuery;
     expect(node.map(sansSymbols)).toEqual([
       { type: "RAW", text: "select " },
       { type: "RAW", text: "1 " },
@@ -66,7 +74,7 @@ describe("sql.query", () => {
 
   it("with symbols", () => {
     const sym1 = Symbol("---flibble-de£dee---");
-    const node = sql`select 1 as ${sql.identifier(sym1)}`;
+    const node = sql`select 1 as ${sql.identifier(sym1)}` as SQLQuery;
     expect(node.map(sansSymbols)).toEqual([
       { type: "RAW", text: "select 1 as " },
       { type: "IDENTIFIER", names: [{ s: sym1, n: "flibble_de_dee" }] },
@@ -84,7 +92,7 @@ describe("sql.join", () => {
         sql`baz.qux(${sql.value(1)}, ${sql`2`}, 3)`,
       ],
       ", ",
-    )}`;
+    )}` as SQLQuery;
     expect(node.map(sansSymbols)).toEqual([
       { type: "RAW", text: "select " },
       { type: "VALUE", value: 1 },
@@ -197,7 +205,7 @@ describe("sqli", () => {
     expect(() => {
       sql`select ${sql.join(
         [
-          { type: "VALUE", value: 1 },
+          { type: "VALUE", value: 1 } as any,
           sql.identifier("foo", "bar"),
           sql`baz.qux(1, 2, 3)`,
           sql`baz.qux(${sql.value(1)}, ${sql`2`}, 3)`,
@@ -211,7 +219,7 @@ describe("sqli", () => {
     expect(() => {
       sql`select ${sql.join(
         [
-          1,
+          1 as any,
           sql.identifier("foo", "bar"),
           sql`baz.qux(1, 2, 3)`,
           sql`baz.qux(${sql.value(1)}, ${sql`2`}, 3)`,
@@ -231,7 +239,7 @@ describe("sqli", () => {
           sql`baz.qux(${sql.value(1)}, ${sql`2`}, 3)`,
         ],
         ", ",
-      )}, ${3}`;
+      )}, ${3 as any}`;
     }).toThrowErrorMatchingSnapshot();
   });
 });

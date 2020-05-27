@@ -9,8 +9,7 @@ import {
 
 class DummyProvider extends LiveProvider {
   constructor() {
-    super();
-    this.namespace = "dummy";
+    super("dummy");
   }
 
   collectionIdentifierIsValid() {
@@ -23,6 +22,8 @@ class DummyProvider extends LiveProvider {
 }
 
 class DummySource extends LiveSource {
+  collectionListeners: any[];
+  recordListeners: any[];
   constructor() {
     super();
     this.collectionListeners = [];
@@ -71,7 +72,7 @@ test("works", async () => {
   const dummyProvider = new DummyProvider();
   lc.registerProvider(dummyProvider);
   lc.registerSource("dummy", dummySource);
-  const monitor = lc.getMonitor();
+  const monitor = lc.getMonitor({});
   const asyncIterator = makeAsyncIteratorFromMonitor(monitor);
   const collection = Symbol("collection");
   const record = Symbol("record");

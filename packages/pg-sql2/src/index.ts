@@ -44,9 +44,10 @@ export interface SQLValueNode {
   [$$trusted]: true;
 }
 
-// We deliberately don't expose these as they're only used internally.
-type SQLNode = SQLRawNode | SQLValueNode | SQLIdentifierNode;
-type SQLQuery = Array<SQLNode>;
+/** @internal */
+export type SQLNode = SQLRawNode | SQLValueNode | SQLIdentifierNode;
+/** @internal */
+export type SQLQuery = Array<SQLNode>;
 
 /**
  * Representation of SQL, identifiers, values, etc; to generate a query that

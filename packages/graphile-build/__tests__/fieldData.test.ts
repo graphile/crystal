@@ -110,7 +110,7 @@ const DummyConnectionPlugin = async (builder) => {
             if (after) {
               if (sorts.length) {
                 const afterValues = JSON.parse(base64Decode(after));
-                let filter = () => false;
+                let filter: (obj?: any) => boolean = () => false;
                 // a > b || (a == b && (next))
                 for (let i = sorts.length - 1; i >= 0; i--) {
                   const [field, ascending] = sorts[i];
@@ -237,19 +237,15 @@ const DummyConnectionPlugin = async (builder) => {
                   name: "DummyConnectionSortBy",
                   values: {
                     ID_ASC: {
-                      name: "ID_ASC",
                       value: ["ID", true],
                     },
                     ID_DESC: {
-                      name: "ID_DESC",
                       value: ["ID", false],
                     },
                     CAPS_ASC: {
-                      name: "CAPS_ASC",
                       value: ["CAPS", true],
                     },
                     CAPS_DESC: {
-                      name: "CAPS_DESC",
                       value: ["CAPS", false],
                     },
                   },

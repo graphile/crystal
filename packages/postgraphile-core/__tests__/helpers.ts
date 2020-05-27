@@ -1,6 +1,5 @@
-const pg = require("pg");
-const { readFile } = require("fs");
-const pgConnectionString = require("pg-connection-string");
+import pg from "pg";
+import { readFile } from "fs";
 
 // Reduce throttling on CI
 process.env.LIVE_THROTTLE = "100";
@@ -22,7 +21,7 @@ const withTransactionlessPgClient = async (url, fn) => {
     fn = url;
     url = process.env.TEST_DATABASE_URL;
   }
-  const pgPool = new pg.Pool(pgConnectionString.parse(url));
+  const pgPool = new pg.Pool({ connectionString: url });
   try {
     const client = await pgPool.connect();
     try {
@@ -50,12 +49,6 @@ const withPgClient = (url, fn) => {
       await client.query("rollback");
     }
   });
-};
-
-const transactionlessQuery = (query, variables) => {
-  return withTransactionlessPgClient((pgClient) =>
-    pgClient.query(query, variables),
-  );
 };
 
 const withDbFromUrl = async (url, fn) => {
@@ -148,5 +141,4 @@ exports.withRootDb = withRootDb;
 exports.withPrepopulatedDb = withPrepopulatedDb;
 exports.withPgClient = withPgClient;
 exports.withTransactionlessPgClient = withTransactionlessPgClient;
-exports.transactionlessQuery = transactionlessQuery;
 exports.getServerVersionNum = getServerVersionNum;
