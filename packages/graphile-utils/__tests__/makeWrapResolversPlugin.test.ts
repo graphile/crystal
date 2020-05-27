@@ -1,4 +1,10 @@
-import { gql, makeWrapResolversPlugin, makeExtendSchemaPlugin } from "../";
+import {
+  gql,
+  makeWrapResolversPlugin,
+  makeExtendSchemaPlugin,
+  ResolverWrapperFn,
+  ResolverWrapperFilterRule,
+} from "../src";
 import {
   buildSchema,
   // defaultPlugins,
@@ -8,7 +14,8 @@ import {
   SubscriptionPlugin,
   MutationPayloadQueryPlugin,
 } from "graphile-build";
-import { graphql } from "graphql";
+import { graphql, GraphQLFieldResolver } from "graphql";
+import assert from "assert";
 
 declare global {
   namespace GraphileEngine {
@@ -18,9 +25,12 @@ declare global {
   }
 }
 
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const makeSchemaWithSpyAndPlugins = (spy, plugins) =>
+const makeSchemaWithSpyAndPlugins = (
+  spy: any,
+  plugins: GraphileEngine.Plugin[],
+) =>
   buildSchema(
     [
       StandardTypesPlugin,
@@ -47,7 +57,7 @@ const makeSchemaWithSpyAndPlugins = (spy, plugins) =>
     },
   );
 
-const makeEchoSpy = (fn) =>
+const makeEchoSpy = (fn?: any) =>
   jest.fn(
     fn ||
       ((parent, args, _context, _resolveInfo) => {
@@ -57,7 +67,7 @@ const makeEchoSpy = (fn) =>
 
 describe("wrapping named resolvers", () => {
   it("passes args by default", async () => {
-    const wrappers = [
+    const wrappers: ResolverWrapperFn[] = [
       (resolve) => resolve(),
       (resolve, parent) => resolve(parent),
       (resolve, parent, args) => resolve(parent, args),
@@ -87,6 +97,7 @@ describe("wrapping named resolvers", () => {
         { test: true },
       );
       expect(result.errors).toBeFalsy();
+      assert(result.data);
       expect(result.data.echo).toEqual("Hello");
       expect(spy).toHaveBeenCalledTimes(1);
       const spyArgs = spy.mock.calls[0];
@@ -99,7 +110,12 @@ describe("wrapping named resolvers", () => {
   });
 
   it("can override args", async () => {
-    const wrapper = (resolve, parent, args, context) =>
+    const wrapper: GraphQLFieldResolver<any, any> = (
+      resolve,
+      parent,
+      args,
+      context,
+    ) =>
       resolve(
         { ...parent, rideover: true },
         { message: args.message.toUpperCase() },
@@ -126,6 +142,7 @@ describe("wrapping named resolvers", () => {
       { test: true },
     );
     expect(result.errors).toBeFalsy();
+    assert(result.data);
     expect(result.data.echo).toEqual("HELLO");
     expect(spy).toHaveBeenCalledTimes(1);
     const spyArgs = spy.mock.calls[0];
@@ -164,15 +181,17 @@ describe("wrapping named resolvers", () => {
       { test: true },
     );
     expect(result.errors).toBeTruthy();
+    assert(result.data);
     expect(result.data.echo).toBe(null);
     expect(spy).not.toHaveBeenCalled();
     expect(result.errors).toHaveLength(1);
     expect(called).toBe(false);
+    assert(result.errors);
     expect(result.errors[0]).toMatchInlineSnapshot(`[GraphQLError: Abort]`);
   });
 
   it("can asynchronously abort resolver after", async () => {
-    const wrapper = async (resolve) => {
+    const wrapper: ResolverWrapperFn = async (resolve) => {
       const result = await resolve();
       // eslint-disable-next-line no-constant-condition
       if (true) {
@@ -204,15 +223,17 @@ describe("wrapping named resolvers", () => {
       { test: true },
     );
     expect(result.errors).toBeTruthy();
+    assert(result.data);
     expect(result.data.echo).toBe(null);
     expect(spy).toHaveBeenCalledTimes(1);
     expect(result.errors).toHaveLength(1);
     expect(called).toBe(true);
+    assert(result.errors);
     expect(result.errors[0]).toMatchInlineSnapshot(`[GraphQLError: Abort]`);
   });
 
   it("can modify result of resolver", async () => {
-    const wrapper = async (resolve) => {
+    const wrapper: ResolverWrapperFn = async (resolve) => {
       const result = await resolve();
       return result.toLowerCase();
     };
@@ -236,6 +257,7 @@ describe("wrapping named resolvers", () => {
       { test: true },
     );
     expect(result.errors).toBeFalsy();
+    assert(result.data);
     expect(result.data.echo).toBe("hello");
     expect(spy).toHaveBeenCalledTimes(1);
     const spyArgs = spy.mock.calls[0];
@@ -247,12 +269,12 @@ describe("wrapping named resolvers", () => {
   });
 
   it("can supports options modify result of resolver", async () => {
-    const wrapper = async (resolve) => {
+    const wrapper: ResolverWrapperFn = async (resolve) => {
       const result = await resolve();
       return result.toLowerCase();
     };
     const spy = makeEchoSpy();
-    let options;
+    let options: any;
     const schema = await makeSchemaWithSpyAndPlugins(spy, [
       makeWrapResolversPlugin((_options) => {
         options = _options;
@@ -277,8 +299,10 @@ describe("wrapping named resolvers", () => {
       { test: true },
     );
     expect(options).toBeTruthy();
+    assert(options);
     expect(options.optionKey).toEqual("optionValue");
     expect(result.errors).toBeFalsy();
+    assert(result.data);
     expect(result.data.echo).toBe("hello");
     expect(spy).toHaveBeenCalledTimes(1);
     const spyArgs = spy.mock.calls[0];
@@ -292,15 +316,24 @@ describe("wrapping named resolvers", () => {
 
 describe("wrapping resolvers matching a filter", () => {
   it("filters correctly", async () => {
-    const filter = (context) => {
-      if (context.scope.isRootMutation && context.scope.fieldName !== "c") {
+    const filter = (
+      context:
+        | GraphileEngine.Context
+        | GraphileEngine.ContextGraphQLObjectTypeFieldsField,
+    ) => {
+      if (
+        "isRootMutation" in context.scope &&
+        "fieldName" in context.scope &&
+        context.scope.isRootMutation &&
+        context.scope.fieldName !== "c"
+      ) {
         return { scope: context.scope };
       }
       return null;
     };
-    const before = [];
-    const after = [];
-    const rule = ({ scope }) => async (
+    const before: any[] = [];
+    const after: any[] = [];
+    const rule: ResolverWrapperFilterRule<any> = ({ scope }) => async (
       resolver,
       user,
       args,
@@ -348,6 +381,7 @@ describe("wrapping resolvers matching a filter", () => {
       { test: true },
     );
     expect(result.errors).toBeFalsy();
+    assert(result.data);
     expect(result.data.a).toBe(8);
     expect(result.data.b).toBe("1ARG2");
     expect(result.data.c).toBe("1NOWRAP");

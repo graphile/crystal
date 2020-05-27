@@ -5,7 +5,7 @@ import {
   requireSiblingColumn,
 } from "./fieldHelpers";
 
-type ResolverWrapperFn<
+export type ResolverWrapperFn<
   TSource = any,
   TContext = any,
   TArgs = { [argName: string]: any }
