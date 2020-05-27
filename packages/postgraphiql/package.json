@@ -14,7 +14,8 @@
     "react-dom": "^16.13.1",
     "react-scripts": "^3.4.1",
     "subscriptions-transport-ws": "^0.9.16",
-    "ws": "^7.3.0"
+    "ws": "^7.3.0",
+    "snyk": "^1.329.0"
   },
   "browserslist": [
     ">0.2%",
@@ -37,5 +38,10 @@
     "jest": "^26.0.1",
     "ts-node": "^8.10.1",
     "typescript": "^3.9.2"
-  }
+  },
+  "scripts": {
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
+  },
+  "snyk": true
 }
