@@ -19,7 +19,7 @@ function testLinkedList(cache: LRU, expectedList: string[] | null = null) {
     current = current.next;
   }
   expect(current).toBe(null);
-  expect(cache._tail).toBe(previous);
+  expect(cache["_tail"]).toBe(previous);
 }
 
 it("set 1", () => {

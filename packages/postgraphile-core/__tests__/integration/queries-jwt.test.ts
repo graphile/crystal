@@ -7,7 +7,7 @@ import { promises as fsp } from "fs";
 //const debug = debugFactory("graphile-build:schema");
 import jwt from "jsonwebtoken";
 
-let queryResults = [];
+let queryResults: any[] = [];
 
 const kitchenSinkData = () =>
   fsp.readFile(`${__dirname}/../kitchen-sink-data.sql`, "utf8");
@@ -43,7 +43,7 @@ const tests = [
       data: {
         authenticate: { jwtToken: str },
       },
-    }) => {
+    }: any) => {
       return Object.assign(jwt.verify(str, jwtSecret), {
         iat: "[timestamp]",
       });
@@ -61,7 +61,7 @@ const tests = [
       data: {
         authenticate: { jwtToken: str },
       },
-    }) => {
+    }: any) => {
       return Object.assign(jwt.verify(str, jwtSecret), {
         iat: "[timestamp]",
       });
@@ -96,7 +96,7 @@ const tests = [
       }
     }`,
     schema: "withJwt",
-    process: ({ data: { authenticatePayload } }) => {
+    process: ({ data: { authenticatePayload } }: any) => {
       const { jwt: str } = authenticatePayload.authPayload;
       return {
         ...authenticatePayload,

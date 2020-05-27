@@ -1,16 +1,17 @@
-import { subscribe, validate, DocumentNode } from "graphql";
+import { subscribe, validate, DocumentNode, GraphQLSchema } from "graphql";
 import { withTransactionlessPgClient } from "../helpers";
 import { createPostGraphileSchema } from "../..";
 import SubscriptionsLDS from "@graphile/subscriptions-lds";
 import { PoolClient } from "pg";
 
-export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+export const sleep = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
 
-const v = parseFloat(process.env.PGVERSION);
+const v = parseFloat(process.env.PGVERSION || "");
 
 export const skipLDSTests = v && v < 10;
 
-let schema;
+let schema: GraphQLSchema;
 export async function resetDatabase() {
   await withTransactionlessPgClient((pgClient) =>
     pgClient.query("delete from live_test.users"),
@@ -35,10 +36,10 @@ export function releaseSchema() {
   // Release the LDS source
   if (
     schema &&
-    schema.__pgLdsSource &&
-    typeof schema.__pgLdsSource.close === "function"
+    schema["__pgLdsSource"] &&
+    typeof schema["__pgLdsSource"].close === "function"
   ) {
-    schema.__pgLdsSource.close();
+    schema["__pgLdsSource"].close();
   }
 }
 
@@ -95,11 +96,11 @@ export function liveTest<T>(
     );
     if (!isIterator(iterator)) {
       // Not actually an iterator
-      throw iterator.errors[0].originalError || iterator.errors[0];
+      throw iterator.errors![0].originalError || iterator.errors![0];
     }
     let changes: any[] = [];
     let ended = false;
-    let error = null;
+    let error: Error | null = null;
     function getChanges() {
       let values = changes;
       changes = [];
@@ -125,7 +126,7 @@ export function liveTest<T>(
             if (value.errors) {
               ended = true;
               error = value.errors[0];
-              iterator.throw(value.errors[0]);
+              iterator.throw!(value.errors[0]);
             } else {
               changes.push(value);
             }
@@ -140,7 +141,7 @@ export function liveTest<T>(
     try {
       result = await cb(pgClient, getChanges);
     } finally {
-      iterator.return();
+      iterator.return!();
     }
     // Assert there's no more data
     while (!ended) {
@@ -155,7 +156,7 @@ export function liveTest<T>(
   });
 }
 
-export async function next(getLatest, duration = 5000) {
+export async function next(getLatest: () => any, duration = 5000) {
   const start = Date.now();
   while (Date.now() - start <= duration) {
     const { values, ended, error } = getLatest();
@@ -175,7 +176,7 @@ export async function next(getLatest, duration = 5000) {
   );
 }
 
-export async function expectNoChange(getLatest, duration = 250) {
+export async function expectNoChange(getLatest: () => any, duration = 250) {
   const start = Date.now();
   while (Date.now() - start <= duration) {
     const { values, ended, error } = getLatest();

@@ -1,6 +1,6 @@
 import sql, { SQLQuery } from "../src";
 
-function sansSymbols(obj) {
+function sansSymbols(obj: any) {
   if (obj && typeof obj === "object") {
     return Object.keys(obj).reduce((memo, key) => {
       memo[key] = obj[key];
