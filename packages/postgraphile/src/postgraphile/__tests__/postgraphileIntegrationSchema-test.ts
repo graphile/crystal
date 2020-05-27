@@ -6,6 +6,8 @@ jest.unmock("postgraphile-core");
 import printSchemaOrdered from "../../__tests__/utils/printSchemaOrdered";
 import withPgClient from "../../__tests__/utils/withPgClient";
 import { createPostGraphileSchema } from "..";
+import { PoolClient } from "pg";
+import { GraphQLSchema } from "graphql";
 
 // When running jest from the root of the monorepo, the directory is the
 // repository root, so all the file paths are incorrect. I couldn't find a way
@@ -15,9 +17,13 @@ process.chdir(__dirname + "/../../..");
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20;
 
-let testResults;
+// TODO: rewrite me into separate test files
+let testResults: any[];
 
-const testFixtures = [
+const testFixtures: Array<{
+  name: string;
+  createSchema: (client: PoolClient) => Promise<GraphQLSchema>;
+}> = [
   {
     name: "prints a schema with the default options",
     createSchema: (client) => createPostGraphileSchema(client, ["a", "b", "c"]),

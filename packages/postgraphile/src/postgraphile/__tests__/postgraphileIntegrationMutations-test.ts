@@ -15,7 +15,7 @@ process.chdir(__dirname + "/../../..");
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20;
 
-const kitchenSinkData = new Promise((resolve, reject) => {
+const kitchenSinkData = new Promise<string>((resolve, reject) => {
   readFile("examples/kitchen-sink/data.sql", (error, data) => {
     if (error) reject(error);
     else resolve(data.toString().replace(/begin;|commit;/g, ""));
@@ -24,7 +24,9 @@ const kitchenSinkData = new Promise((resolve, reject) => {
 
 const mutationsDir = resolvePath(__dirname, "fixtures/mutations");
 const mutationFileNames = readdirSync(mutationsDir);
-let mutationResults = [];
+
+// TODO: rewrite me into separate test files
+let mutationResults: any[] = [];
 
 beforeAll(() => {
   // Get a GraphQL schema instance that we can query.
@@ -44,7 +46,7 @@ beforeAll(() => {
     // Get a new Postgres client and run the mutation.
     return await withPgClient(async (pgClient) => {
       // Read the mutation from the file system.
-      const mutation = await new Promise((resolve, reject) => {
+      const mutation = await new Promise<string>((resolve, reject) => {
         readFile(resolvePath(mutationsDir, fileName), "utf8", (error, data) => {
           if (error) reject(error);
           else resolve(data);

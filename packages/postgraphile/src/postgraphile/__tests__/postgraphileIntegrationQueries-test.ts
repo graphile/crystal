@@ -15,7 +15,7 @@ process.chdir(__dirname + "/../../..");
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20;
 
-const kitchenSinkData = new Promise((resolve, reject) => {
+const kitchenSinkData = new Promise<string>((resolve, reject) => {
   readFile("examples/kitchen-sink/data.sql", (error, data) => {
     if (error) reject(error);
     else resolve(data.toString().replace(/begin;|commit;/g, ""));
@@ -24,7 +24,9 @@ const kitchenSinkData = new Promise((resolve, reject) => {
 
 const queriesDir = resolvePath(__dirname, "fixtures/queries");
 const queryFileNames = readdirSync(queriesDir);
-let queryResults = [];
+
+// TODO: rewrite me into separate test files
+let queryResults: any[] = [];
 
 beforeAll(() => {
   // Get a few GraphQL schema instance that we can query.
@@ -62,7 +64,7 @@ beforeAll(() => {
       return await Promise.all(
         queryFileNames.map(async (fileName) => {
           // Read the query from the file system.
-          const query = await new Promise((resolve, reject) => {
+          const query = await new Promise<string>((resolve, reject) => {
             readFile(
               resolvePath(queriesDir, fileName),
               "utf8",
