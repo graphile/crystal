@@ -1,4 +1,4 @@
-import core from "./core";
+import * as core from "./core";
 
 test(
   "prints a schema from non-root role, using RBAC permissions",

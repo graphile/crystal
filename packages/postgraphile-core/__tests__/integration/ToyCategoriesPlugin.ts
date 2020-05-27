@@ -1,4 +1,4 @@
-module.exports = (builder) => {
+export default (builder) => {
   // This hook adds the 'Toy.categories' field
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
     const {

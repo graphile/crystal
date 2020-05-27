@@ -1,28 +1,19 @@
 import { resolve as resolvePath } from "path";
-import { readdirSync, readFile as rawReadFile } from "fs";
+import { readdirSync, promises as fsp } from "fs";
 import { graphql } from "graphql";
 import { withPgClient, getServerVersionNum } from "../helpers";
 import { createPostGraphileSchema } from "../..";
-
-function readFile(filename, encoding) {
-  return new Promise((resolve, reject) => {
-    rawReadFile(filename, encoding, (err, res) => {
-      if (err) reject(err);
-      else resolve(res);
-    });
-  });
-}
 
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20;
 
 const kitchenSinkData = () =>
-  readFile(`${__dirname}/../kitchen-sink-data.sql`, "utf8");
+  fsp.readFile(`${__dirname}/../kitchen-sink-data.sql`, "utf8");
 
-const pg10Data = () => readFile(`${__dirname}/../pg10-data.sql`, "utf8");
+const pg10Data = () => fsp.readFile(`${__dirname}/../pg10-data.sql`, "utf8");
 
 const dSchemaComments = () =>
-  readFile(`${__dirname}/../kitchen-sink-d-schema-comments.sql`, "utf8");
+  fsp.readFile(`${__dirname}/../kitchen-sink-d-schema-comments.sql`, "utf8");
 
 const mutationsDir = `${__dirname}/../fixtures/mutations`;
 const mutationFileNames = readdirSync(mutationsDir);
@@ -97,7 +88,7 @@ beforeAll(() => {
     // Get a new Postgres client and run the mutation.
     return await withPgClient(async (pgClient) => {
       // Read the mutation from the file system.
-      const mutation = await readFile(
+      const mutation = await fsp.readFile(
         resolvePath(mutationsDir, fileName),
         "utf8",
       );

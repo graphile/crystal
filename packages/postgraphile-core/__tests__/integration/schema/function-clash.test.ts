@@ -1,4 +1,4 @@
-import core from "./core";
+import * as core from "./core";
 
 let consoleWarnSpy;
 beforeAll(() => {

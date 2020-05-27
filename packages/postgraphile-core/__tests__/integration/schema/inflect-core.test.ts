@@ -1,4 +1,4 @@
-import core from "./core";
+import * as core from "./core";
 import { makeAddInflectorsPlugin } from "graphile-utils";
 
 test(

@@ -1,7 +1,8 @@
-import { subscribe, validate } from "graphql";
+import { subscribe, validate, DocumentNode } from "graphql";
 import { withTransactionlessPgClient } from "../helpers";
 import { createPostGraphileSchema } from "../..";
 import SubscriptionsLDS from "@graphile/subscriptions-lds";
+import { PoolClient } from "pg";
 
 export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -41,16 +42,50 @@ export function releaseSchema() {
   }
 }
 
-export const liveTest = (query, variables, cb) => {
-  if (!cb) {
-    cb = variables;
-    variables = null;
-  }
+function isIterator<T>(
+  i: T | AsyncIterableIterator<T>,
+): i is AsyncIterableIterator<T> {
+  return typeof (i as any).next === "function";
+}
+
+type JSONValue =
+  | null
+  | boolean
+  | number
+  | string
+  | Array<JSONValue>
+  | { [key: string]: JSONValue };
+
+type LiveTestCallback<T> = (
+  client: PoolClient,
+  getChanges: () => { values: any[]; ended: boolean; error: Error | null },
+) => Promise<T>;
+export function liveTest<T>(
+  query: DocumentNode,
+  cb: LiveTestCallback<T>,
+): Promise<T>;
+export function liveTest<T>(
+  query: DocumentNode,
+  variables: JSONValue,
+  cb: LiveTestCallback<T>,
+): Promise<T>;
+export function liveTest<T>(
+  query: DocumentNode,
+  varsOrCb: JSONValue | LiveTestCallback<T>,
+  maybeCb?: LiveTestCallback<T>,
+): Promise<T> {
+  const variables: JSONValue = typeof varsOrCb === "object" ? varsOrCb : null;
+  const cb: LiveTestCallback<T> =
+    typeof varsOrCb === "function"
+      ? varsOrCb
+      : typeof maybeCb === "function"
+      ? maybeCb
+      : (maybeCb as never);
 
   const errors = validate(schema, query);
   if (errors && errors.length) throw errors[0];
 
-  return withTransactionlessPgClient(async (pgClient) => {
+  return withTransactionlessPgClient<T>(async (pgClient) => {
     const iterator = await subscribe(
       schema,
       query,
@@ -58,11 +93,11 @@ export const liveTest = (query, variables, cb) => {
       { pgClient },
       variables,
     );
-    if (iterator.errors) {
+    if (!isIterator(iterator)) {
       // Not actually an iterator
       throw iterator.errors[0].originalError || iterator.errors[0];
     }
-    let changes = [];
+    let changes: any[] = [];
     let ended = false;
     let error = null;
     function getChanges() {
@@ -101,8 +136,9 @@ export const liveTest = (query, variables, cb) => {
       }
       ended = true;
     })();
+    let result: T;
     try {
-      await cb(pgClient, getChanges);
+      result = await cb(pgClient, getChanges);
     } finally {
       iterator.return();
     }
@@ -115,8 +151,9 @@ export const liveTest = (query, variables, cb) => {
         changes.length + " more values found after test completed!",
       );
     }
+    return result;
   });
-};
+}
 
 export async function next(getLatest, duration = 5000) {
   const start = Date.now();

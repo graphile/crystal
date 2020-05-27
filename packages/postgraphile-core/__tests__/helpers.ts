@@ -1,4 +1,4 @@
-import pg, { PoolClient } from "pg";
+import pg, { PoolClient, QueryResult } from "pg";
 import { readFile } from "fs";
 
 // Reduce throttling on CI
@@ -77,6 +77,12 @@ export async function withPgClient<T>(
       await client.query("rollback");
     }
   });
+}
+
+export function transactionlessQuery<T = any>(query, variables) {
+  return withTransactionlessPgClient<QueryResult<T>>((pgClient) =>
+    pgClient.query<T>(query, variables),
+  );
 }
 
 const withDbFromUrl = async (url, fn) => {

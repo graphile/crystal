@@ -859,6 +859,7 @@ for (const { name, createServerFromHandler, subpath = "" } of toTest) {
                 exception: {
                   hint: "my custom error hint",
                   detail: "my custom error detail",
+                  code: "MYCODE",
                 },
               },
             },

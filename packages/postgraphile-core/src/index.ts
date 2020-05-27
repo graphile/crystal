@@ -61,7 +61,7 @@ declare global {
        * @deprecated Use smart comments/tags instead
        */
       pgColumnFilter?: <TContext extends GraphileEngine.Context>(
-        attr: mixed,
+        attr: PgAttribute,
         build: GraphileEngine.Build,
         context: TContext,
       ) => boolean;

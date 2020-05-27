@@ -1,8 +1,14 @@
-const { lexicographicSortSchema } = require("graphql");
-const { withPgClient } = require("../../helpers");
-const { createPostGraphileSchema } = require("../../..");
+import { lexicographicSortSchema, GraphQLSchema } from "graphql";
+import { withPgClient } from "../../helpers";
+import { createPostGraphileSchema } from "../../..";
+import { PoolClient } from "pg";
 
-exports.test = (schemas, options, setup, finalCheck = () => {}) => () =>
+export const test = (
+  schemas: string | string[],
+  options: GraphileEngine.PostGraphileCoreOptions = {},
+  setup: ((client: PoolClient) => void) | string | null = null,
+  finalCheck: (schema: GraphQLSchema) => void = () => {},
+) => () =>
   withPgClient(async (client) => {
     if (setup) {
       if (typeof setup === "function") {

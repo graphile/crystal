@@ -1,4 +1,4 @@
-import core from "./core";
+import * as core from "./core";
 import { NodePlugin } from "graphile-build";
 
 test(

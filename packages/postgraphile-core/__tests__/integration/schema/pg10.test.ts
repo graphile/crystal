@@ -1,4 +1,4 @@
-import core from "./core";
+import * as core from "./core";
 
 test(
   "prints a schema to test PG10-specific features with default options",

@@ -1,25 +1,16 @@
 import { graphql } from "graphql";
 import { withPgClient } from "../helpers";
 import { createPostGraphileSchema } from "../..";
-import { readFile as rawReadFile } from "fs";
+import { promises as fsp } from "fs";
 //import { printSchema } from "graphql/utilities";
 //import debugFactory from "debug";
 //const debug = debugFactory("graphile-build:schema");
 import jwt from "jsonwebtoken";
 
-function readFile(filename, encoding) {
-  return new Promise((resolve, reject) => {
-    rawReadFile(filename, encoding, (err, res) => {
-      if (err) reject(err);
-      else resolve(res);
-    });
-  });
-}
-
 let queryResults = [];
 
 const kitchenSinkData = () =>
-  readFile(`${__dirname}/../kitchen-sink-data.sql`, "utf8");
+  fsp.readFile(`${__dirname}/../kitchen-sink-data.sql`, "utf8");
 
 const jwtSecret =
   "This is static for the tests, use a better one if you set one!";

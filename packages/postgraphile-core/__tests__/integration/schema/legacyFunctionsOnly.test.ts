@@ -1,4 +1,4 @@
-import core from "./core";
+import * as core from "./core";
 
 test(
   "prints a schema with only legacy functions",

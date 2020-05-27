@@ -114,7 +114,7 @@ if (skipLDSTests) {
         test("composite key", async () => {
           const {
             rows: [user],
-          } = await transactionlessQuery(
+          } = await transactionlessQuery<any>(
             "insert into live_test.users(name) values($1) returning *",
             ["Stuart"],
           );

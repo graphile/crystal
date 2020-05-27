@@ -1,4 +1,5 @@
-import core from "./core";
+import * as core from "./core";
+import { GraphQLObjectType } from "graphql";
 
 // WARNING: this function is not guaranteed to be SQL injection safe.
 const offerViewComment = (comment) => (pgClient) =>
@@ -42,7 +43,7 @@ test(
 @primaryKey id
 @foreignKey (post_id) references post`),
     (schema) => {
-      const Offer = schema.getType("Offer");
+      const Offer = schema.getType("Offer") as GraphQLObjectType;
       const fields = Offer.getFields();
       expect(fields.nodeId).toBeTruthy();
       expect(fields.postsByPostId).toBeFalsy();
@@ -67,7 +68,7 @@ test(
 @foreignKey (post_id) references post_view`,
     ),
     (schema) => {
-      const Offer = schema.getType("Offer");
+      const Offer = schema.getType("Offer") as GraphQLObjectType;
       const fields = Offer.getFields();
       expect(fields.nodeId).toBeTruthy();
       expect(fields.postByPostId).toBeTruthy();
@@ -91,7 +92,7 @@ comment on view smart_comment_relations.offer_view is E'@name offers
 @foreignKey (post_id) references post_view(id)';`,
       ),
     (schema) => {
-      const Offer = schema.getType("Offer");
+      const Offer = schema.getType("Offer") as GraphQLObjectType;
       const fields = Offer.getFields();
       expect(fields.nodeId).toBeTruthy();
       expect(fields.postByPostId).toBeTruthy();
