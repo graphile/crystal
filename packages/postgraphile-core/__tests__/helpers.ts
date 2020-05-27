@@ -1,5 +1,5 @@
 import pg, { PoolClient, QueryResult } from "pg";
-import { readFile } from "fs";
+import { promises as fsp } from "fs";
 
 // Reduce throttling on CI
 process.env.LIVE_THROTTLE = "100";
@@ -7,26 +7,17 @@ process.env.LIVE_THROTTLE = "100";
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 60;
 
-function readFilePromise(filename, encoding) {
-  return new Promise((resolve, reject) => {
-    readFile(filename, encoding, (err, res) => {
-      if (err) reject(err);
-      else resolve(res);
-    });
-  });
-}
-
 type WithPgClientCallback<T> = (client: PoolClient) => Promise<T>;
 
 export function withTransactionlessPgClient<T>(
   fn: WithPgClientCallback<T>,
 ): Promise<T>;
 export function withTransactionlessPgClient<T>(
-  url: string,
+  url: string | undefined,
   fn: WithPgClientCallback<T>,
 ): Promise<T>;
 export async function withTransactionlessPgClient<T>(
-  urlOrFn: string | WithPgClientCallback<T>,
+  urlOrFn: string | undefined | WithPgClientCallback<T>,
   maybeFn?: WithPgClientCallback<T>,
 ): Promise<T> {
   const fn: WithPgClientCallback<T> =
@@ -35,7 +26,7 @@ export async function withTransactionlessPgClient<T>(
       : typeof urlOrFn === "function"
       ? urlOrFn
       : (urlOrFn as never);
-  const url =
+  const url: string | undefined =
     typeof urlOrFn === "string" ? urlOrFn : process.env.TEST_DATABASE_URL;
   const pgPool = new pg.Pool({ connectionString: url });
   try {
@@ -52,11 +43,11 @@ export async function withTransactionlessPgClient<T>(
 
 export function withPgClient<T>(fn: WithPgClientCallback<T>): Promise<T>;
 export function withPgClient<T>(
-  url: string,
+  url: string | undefined,
   fn: WithPgClientCallback<T>,
 ): Promise<T>;
 export async function withPgClient<T>(
-  urlOrFn: string | WithPgClientCallback<T>,
+  urlOrFn: string | undefined | WithPgClientCallback<T>,
   maybeFn?: WithPgClientCallback<T>,
 ): Promise<T> {
   const fn: WithPgClientCallback<T> =
@@ -79,14 +70,20 @@ export async function withPgClient<T>(
   });
 }
 
-export function transactionlessQuery<T = any>(query, variables) {
+export function transactionlessQuery<T = any>(
+  query: string,
+  variables: any[] = [],
+) {
   return withTransactionlessPgClient<QueryResult<T>>((pgClient) =>
     pgClient.query<T>(query, variables),
   );
 }
 
-const withDbFromUrl = async (url, fn) => {
-  return withPgClient(url, async (client) => {
+async function withDbFromUrl<T>(
+  url: string | undefined,
+  fn: (client: PoolClient) => T,
+) {
+  return withPgClient<T>(url, async (client) => {
     try {
       await client.query("BEGIN ISOLATION LEVEL SERIALIZABLE;");
       return fn(client);
@@ -94,21 +91,24 @@ const withDbFromUrl = async (url, fn) => {
       await client.query("COMMIT;");
     }
   });
-};
+}
 
-export const withRootDb = (fn) =>
-  withDbFromUrl(process.env.TEST_DATABASE_URL, fn);
+export async function withRootDb<T>(fn: (client: PoolClient) => T): Promise<T> {
+  return withDbFromUrl<T>(process.env.TEST_DATABASE_URL, fn);
+}
 
-let prepopulatedDBKeepalive;
+let prepopulatedDBKeepalive: any;
 
-const populateDatabase = async (client) => {
+const populateDatabase = async (client: PoolClient) => {
   await client.query(
-    await readFilePromise(`${__dirname}/kitchen-sink-data.sql`, "utf8"),
+    await fsp.readFile(`${__dirname}/kitchen-sink-data.sql`, "utf8"),
   );
   return {};
 };
 
-export const withPrepopulatedDb = async (fn) => {
+export async function withPrepopulatedDb<T>(
+  fn: (client: PoolClient, vars: typeof prepopulatedDBKeepalive["vars"]) => T,
+): Promise<T> {
   if (!prepopulatedDBKeepalive) {
     throw new Error("You must call setup and teardown to use this");
   }
@@ -117,8 +117,9 @@ export const withPrepopulatedDb = async (fn) => {
     throw new Error("No prepopulated vars");
   }
   let err;
+  let result: T;
   try {
-    await fn(client, vars);
+    result = await fn(client, vars);
   } catch (e) {
     err = e;
   }
@@ -131,9 +132,10 @@ export const withPrepopulatedDb = async (fn) => {
   if (err) {
     throw err;
   }
-};
+  return result!;
+}
 
-withPrepopulatedDb.setup = (done) => {
+withPrepopulatedDb.setup = (done: (e?: Error) => void) => {
   if (prepopulatedDBKeepalive) {
     throw new Error("There's already a prepopulated DB running");
   }
@@ -167,7 +169,7 @@ withPrepopulatedDb.teardown = () => {
   prepopulatedDBKeepalive = null;
 };
 
-export async function getServerVersionNum(pgClient) {
+export async function getServerVersionNum(pgClient: PoolClient) {
   const versionResult = await pgClient.query("show server_version_num;");
   return parseInt(versionResult.rows[0].server_version_num, 10);
 }

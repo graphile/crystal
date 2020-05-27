@@ -7,6 +7,7 @@ import { printSchema } from "graphql/utilities";
 import debugFactory from "debug";
 import { makeExtendSchemaPlugin, gql } from "graphile-utils";
 import ToyCategoriesPlugin from "./ToyCategoriesPlugin";
+import assert from "assert";
 
 const debug = debugFactory("graphile-build:schema");
 
@@ -14,8 +15,8 @@ const readFile = fsp.readFile;
 
 const queriesDir = `${__dirname}/../fixtures/queries`;
 const queryFileNames = readdirSync(queriesDir);
-const testsToSkip = [];
-let queryResults = [];
+const testsToSkip: any[] = [];
+let queryResults: any[] = [];
 
 const kitchenSinkData = () =>
   readFile(`${__dirname}/../kitchen-sink-data.sql`, "utf8");
@@ -74,7 +75,7 @@ beforeAll(() => {
       createPostGraphileSchema(pgClient, ["a", "b", "c"], {
         subscriptions: true,
         dynamicJson: true,
-        setofFunctionsContainNulls: null,
+        setofFunctionsContainNulls: undefined,
       }),
       createPostGraphileSchema(pgClient, ["a", "b", "c"], {
         subscriptions: true,
@@ -129,6 +130,7 @@ beforeAll(() => {
     expect(spy.mock.calls).toHaveLength(1);
     spy.mockRestore();
 
+    assert(normal);
     debug(printSchema(normal));
     return {
       normal,
@@ -171,7 +173,7 @@ beforeAll(() => {
           results.push(Promise.resolve());
           continue;
         }
-        const process = async (fileName) => {
+        const process = async (fileName: string) => {
           if (fileName.startsWith("pg10.")) {
             if (serverVersionNum < 100000) {
               console.log("Skipping test as PG version is less than 10");

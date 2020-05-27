@@ -1522,6 +1522,7 @@ __metadata:
   resolution: "@graphile/lru@workspace:packages/lru"
   dependencies:
     "@types/jest": ^25.2.3
+    "@types/node": ^14.0.5
     jest: ^26.0.1
     ts-node: ^8.10.1
     tslib: ^2.0.0
@@ -2594,6 +2595,13 @@ __metadata:
   version: 14.0.1
   resolution: "@types/node@npm:14.0.1"
   checksum: 3/97255869f674e3324fdef235173bafb7911a0786434703738008d92f5a4ec189bab2c08a1847f80a6569a5622f0f44a190e1479b08e363368a847e84e0c00902
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^14.0.5":
+  version: 14.0.5
+  resolution: "@types/node@npm:14.0.5"
+  checksum: 3/38a9f9b66c2657b4ba520e40073369d4a33438dd45f9c001d98a7cda40e88a5ea28485c320fa00fc706b5473b549cacc9a8b9796e4d69681c032619e12f73f7d
   languageName: node
   linkType: hard
 
@@ -14871,6 +14879,7 @@ fsevents@^1.2.7:
   resolution: "postgraphile-core@workspace:packages/postgraphile-core"
   dependencies:
     "@graphile/subscriptions-lds": 4.7.0
+    "@types/debug": ^4.1.5
     "@types/jest": ^25.2.3
     "@types/jsonwebtoken": ^8.5.0
     "@types/mock-fs": ^4.10.0

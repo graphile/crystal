@@ -3,6 +3,7 @@ import { readdirSync, promises as fsp } from "fs";
 import { graphql } from "graphql";
 import { withPgClient, getServerVersionNum } from "../helpers";
 import { createPostGraphileSchema } from "../..";
+import assert from "assert";
 
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20;
@@ -17,7 +18,7 @@ const dSchemaComments = () =>
 
 const mutationsDir = `${__dirname}/../fixtures/mutations`;
 const mutationFileNames = readdirSync(mutationsDir);
-let mutationResults = [];
+let mutationResults: any[] = [];
 
 beforeAll(() => {
   // Get a GraphQL schema instance that we can query.
@@ -133,6 +134,7 @@ beforeAll(() => {
         ? JSON.parse(matches[1].replace(/\n#/g, "\n"))
         : null;
 
+      assert(schemaToUse);
       // Return the result of our GraphQL query.
       const result = await graphql(
         schemaToUse,

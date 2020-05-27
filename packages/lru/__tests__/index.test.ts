@@ -1,14 +1,16 @@
 import LRU from "..";
+import assert from "assert";
 
-function testLinkedList(cache, expectedList = null) {
+function testLinkedList(cache: LRU, expectedList: string[] | null = null) {
   if (expectedList) {
     expect(cache.length).toEqual(expectedList.length);
   }
   let previous = null;
-  let current = cache._head;
+  let current = cache["_head"];
   // eslint-disable-next-line no-constant-condition
   for (let index = 0; index < cache.length; index++) {
     expect(current).toBeTruthy();
+    assert(current);
     expect(current.prev).toBe(previous);
     if (expectedList) {
       expect(current.key).toEqual(expectedList[index]);

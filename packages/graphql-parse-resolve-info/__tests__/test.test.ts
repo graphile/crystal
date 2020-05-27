@@ -13,6 +13,7 @@ import {
   GraphQLSchema,
 } from "graphql";
 import { Kind } from "graphql/language";
+import assert from "assert";
 
 const query = `
   query Test($include: Boolean!, $exclude: Boolean!) {
@@ -83,7 +84,7 @@ const PageInfo = new GraphQLObjectType({
   },
 });
 
-const Person = new GraphQLObjectType({
+const Person: GraphQLObjectType = new GraphQLObjectType({
   name: "Person",
   fields: () => ({
     id: {
@@ -186,6 +187,7 @@ const Query = new GraphQLObjectType({
       type: new GraphQLNonNull(PostsConnection),
       resolve(parent, args, context, resolveInfo) {
         const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
+        assert(parsedResolveInfoFragment);
         const simplifiedFragment = simplifyParsedResolveInfoFragmentWithType(
           parsedResolveInfoFragment,
           resolveInfo.returnType,
@@ -214,13 +216,13 @@ test("basic", async () => {
   };
   const { parsedResolveInfoFragment, simplifiedFragment } = await new Promise(
     (resolve, reject) => {
-      let o;
+      let o: any;
       graphql(
         Schema,
         query,
         null,
         {
-          test: (_o) => (o = _o),
+          test: (_o: any) => (o = _o),
         },
         variables,
       ).then((d) => {
@@ -249,13 +251,13 @@ test("directives", async () => {
   };
   const { parsedResolveInfoFragment, simplifiedFragment } = await new Promise(
     (resolve, reject) => {
-      let o;
+      let o: any;
       graphql(
         Schema,
         query,
         null,
         {
-          test: (_o) => (o = _o),
+          test: (_o: any) => (o = _o),
         },
         variables,
       ).then((d) => {
