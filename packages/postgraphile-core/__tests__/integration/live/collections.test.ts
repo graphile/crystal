@@ -7,7 +7,7 @@ import {
   next,
   expectNoChange,
   resetDatabase,
-} from "../live_helpers.js";
+} from "../live_helpers";
 import { transactionlessQuery } from "../../helpers";
 
 if (skipLDSTests) {
@@ -41,7 +41,7 @@ if (skipLDSTests) {
                   }
                 `,
             async (pgClient, getLatest) => {
-              let data;
+              let data: any;
               let getNodes = () =>
                 simpleCollection
                   ? data.data.allUsersList
@@ -86,7 +86,7 @@ if (skipLDSTests) {
                   }
                 `,
             async (pgClient, getLatest) => {
-              let data;
+              let data: any;
               let getNodes = () =>
                 simpleCollection
                   ? data.data.allUsersList
@@ -101,7 +101,7 @@ if (skipLDSTests) {
               );
               data = await next(getLatest);
               expect(getNodes()).toHaveLength(1);
-              expect(getNodes().map((n) => n.name)).toEqual(["Alice"]);
+              expect(getNodes().map((n: any) => n.name)).toEqual(["Alice"]);
 
               await pgClient.query(
                 "insert into live_test.users (name, favorite_color) values ($1, $2)",
@@ -168,7 +168,7 @@ if (skipLDSTests) {
                 `,
             { userId: user.id, todoId: todo.id },
             async (pgClient, getLatest) => {
-              let data;
+              let data: any;
 
               let getViewedAtNodes = () =>
                 simpleCollection
@@ -236,7 +236,7 @@ if (skipLDSTests) {
                 `,
             { id: user.id },
             async (pgClient, getLatest) => {
-              let data;
+              let data: any;
               let getNodes = () =>
                 simpleCollection
                   ? data.data.user.todosByUserIdList
@@ -314,7 +314,7 @@ if (skipLDSTests) {
                 `,
             { id: user.id },
             async (pgClient, getLatest) => {
-              let data;
+              let data: any;
               let getNodes = () =>
                 simpleCollection
                   ? data.data.user.todosByUserIdList
@@ -381,7 +381,7 @@ if (skipLDSTests) {
                 `,
             { id: user.id },
             async (pgClient, getLatest) => {
-              let data;
+              let data: any;
               let getNodes = () =>
                 simpleCollection
                   ? data.data.user.todosByUserIdList

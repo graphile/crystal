@@ -1,8 +1,9 @@
-import { graphql } from "graphql";
+import { graphql, GraphQLSchema } from "graphql";
 import { withPgClient } from "../helpers";
 import { createPostGraphileSchema } from "../..";
+import assert from "assert";
 
-let schema;
+let schema: GraphQLSchema;
 
 beforeAll(async () => {
   // Get a few GraphQL schema instance that we can query.
@@ -29,6 +30,7 @@ test("numeric range", () =>
       { id: row.id },
     );
     expect(result.errors).toBeFalsy();
+    assert(result.data);
     expect(result.data.rangeTestById.num).toEqual({
       start: {
         value: "-1234567890123456789.123456789012",

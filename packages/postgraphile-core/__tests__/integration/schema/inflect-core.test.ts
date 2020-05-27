@@ -16,12 +16,12 @@ test(
 
             if (name === "Interval") return "I";
             if (name === "Point") return "P";
-            return builtin.call(this, name);
+            return builtin!.call(this, name);
           },
           inputType(name) {
             if (name === "I") return "II";
             if (name === "P") return "PP";
-            return inputType.call(this, name);
+            return inputType!.call(this, name);
           },
         }),
         true,

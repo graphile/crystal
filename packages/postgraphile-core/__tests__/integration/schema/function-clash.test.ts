@@ -1,6 +1,6 @@
 import * as core from "./core";
 
-let consoleWarnSpy;
+let consoleWarnSpy: jest.SpyInstance;
 beforeAll(() => {
   consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
 });

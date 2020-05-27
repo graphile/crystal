@@ -10,11 +10,11 @@ test(
   core.test(["index_expressions"], { disableDefaultMutations: true }),
 );
 
-const IndexTypeCheckerPlugin = (builder) => {
+const IndexTypeCheckerPlugin: GraphileEngine.Plugin = (builder) => {
   builder.hook("build", (build) => {
     const { pgIntrospectionResultsByKind } = build;
     if (
-      !pgIntrospectionResultsByKind.index.every((idx) => idx.indexType != null)
+      !pgIntrospectionResultsByKind!.index.every((idx) => idx.indexType != null)
     ) {
       throw new Error("indexType missing");
     }

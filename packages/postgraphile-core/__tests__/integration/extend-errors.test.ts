@@ -1,9 +1,7 @@
 import { withPgClient } from "../helpers";
 import { createPostGraphileSchema } from "../..";
-// eslint-disable-next-line no-unused-vars
-import { printSchema } from "graphql";
 
-function check(description, sql) {
+function check(description: string, sql: string) {
   test(description, async () => {
     let error;
     // eslint-disable-next-line no-unused-vars
@@ -24,11 +22,15 @@ function check(description, sql) {
                   if (!context.scope.isRootSubscription) {
                     return fields;
                   }
-                  return build.extend(fields, {
-                    mySub: {
-                      type: build.graphql.GraphQLInt,
+                  return build.extend(
+                    fields,
+                    {
+                      mySub: {
+                        type: build.graphql.GraphQLInt,
+                      },
                     },
-                  });
+                    "TEST",
+                  );
                 },
               );
             },
