@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 echo "BOOTSTRAP"
-yarn lerna bootstrap
+# yarn lerna bootstrap
 echo "CLEANING BUILT FILES"
 yarn clean
 echo "PREPACKING"
