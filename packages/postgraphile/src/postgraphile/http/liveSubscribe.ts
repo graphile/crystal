@@ -20,7 +20,6 @@ import {
 } from "graphql";
 import mapAsyncIterator from "./mapAsyncIterator";
 import { isAsyncIterable } from "iterall";
-import { GraphileResolverContext } from "postgraphile-core";
 
 type mixed = any;
 
@@ -28,7 +27,7 @@ export default function liveSubscribe(
   argsOrSchema: any | GraphQLSchema,
   document: DocumentNode,
   rootValue?: any,
-  contextValue?: GraphileResolverContext,
+  contextValue?: GraphileEngine.GraphileResolverContext,
   variableValues?: { [key: string]: any },
   operationName?: string,
   fieldResolver?: GraphQLFieldResolver<any, any>,
@@ -63,7 +62,7 @@ function liveSubscribeImpl(
   schema: GraphQLSchema,
   document: DocumentNode,
   rootValue?: any,
-  contextValue?: GraphileResolverContext,
+  contextValue?: GraphileEngine.GraphileResolverContext,
   variableValues?: { [key: string]: any },
   operationName?: string,
   fieldResolver?: GraphQLFieldResolver<any, any>,
@@ -113,7 +112,7 @@ function liveSubscribeImpl(
   // Resolve the Source Stream, then map every source value to a
   // ExecutionResult value as described above.
   return sourcePromise.then(
-    resultOrStream =>
+    (resultOrStream) =>
       // Note: Flow can't refine isAsyncIterable, so explicit casts are used.
       isAsyncIterable(resultOrStream)
         ? mapAsyncIterator(

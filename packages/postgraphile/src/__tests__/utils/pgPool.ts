@@ -7,6 +7,6 @@ const pgPool = new Pool({
   ...parsePgConnectionString(pgUrl),
   max: 15,
   idleTimeoutMillis: 500,
-});
+} as any);
 
 export default pgPool;

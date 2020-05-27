@@ -3,7 +3,7 @@ const { withTransactionlessPgClient } = require("../helpers");
 const { createPostGraphileSchema } = require("../..");
 const { default: SubscriptionsLDS } = require("@graphile/subscriptions-lds");
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const v = parseFloat(process.env.PGVERSION);
 
@@ -11,13 +11,13 @@ exports.skipLDSTests = v && v < 10;
 
 let schema;
 exports.resetDatabase = async function resetDatabase() {
-  await withTransactionlessPgClient(pgClient =>
+  await withTransactionlessPgClient((pgClient) =>
     pgClient.query("delete from live_test.users"),
   );
 };
 
 exports.createSchema = async function createSchema() {
-  await withTransactionlessPgClient(async pgClient => {
+  await withTransactionlessPgClient(async (pgClient) => {
     schema = await createPostGraphileSchema(pgClient, "live_test", {
       live: true,
       ownerConnectionString: process.env.TEST_DATABASE_URL,
@@ -50,7 +50,7 @@ exports.liveTest = (query, variables, cb) => {
   const errors = validate(schema, query);
   if (errors && errors.length) throw errors[0];
 
-  return withTransactionlessPgClient(async pgClient => {
+  return withTransactionlessPgClient(async (pgClient) => {
     const iterator = await subscribe(
       schema,
       query,

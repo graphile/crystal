@@ -74,8 +74,6 @@ cd graphile-engine
 
 # Install deps:
 yarn
-# Monorepo stuff:
-yarn lerna bootstrap
 # Run initial build:
 yarn prepack:all
 

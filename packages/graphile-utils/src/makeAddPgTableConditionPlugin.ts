@@ -1,15 +1,17 @@
 // BELOW HERE, IMPORTS ARE ONLY TYPES (not values)
+import "graphile-build";
 import { SQL, sql as sqlType, QueryBuilder } from "graphile-build-pg";
-import { Build, Plugin } from "graphile-build";
 
-declare module "graphile-build" {
-  interface ScopeGraphQLInputObjectTypeFieldsField {
-    addPgTableCondition?: {
-      schemaName: string;
-      tableName: string;
-      conditionFieldSpec: import("graphql").GraphQLInputFieldConfig;
-      conditionFieldName: string;
-    };
+declare global {
+  namespace GraphileEngine {
+    interface ScopeGraphQLInputObjectTypeFieldsField {
+      addPgTableCondition?: {
+        schemaName: string;
+        tableName: string;
+        conditionFieldSpec: import("graphql").GraphQLInputFieldConfig;
+        conditionFieldName: string;
+      };
+    }
   }
 }
 
@@ -18,7 +20,7 @@ export default function makeAddPgTableConditionPlugin(
   tableName: string,
   conditionFieldName: string,
   conditionFieldSpecGenerator: (
-    build: Build,
+    build: GraphileEngine.Build,
   ) => import("graphql").GraphQLInputFieldConfig,
   conditionGenerator: (
     value: unknown,
@@ -27,11 +29,11 @@ export default function makeAddPgTableConditionPlugin(
       sql: typeof sqlType;
       sqlTableAlias: SQL;
     },
-    build: Build,
+    build: GraphileEngine.Build,
   ) => SQL | null | void,
 ) {
   const displayName = `makeAddPgTableConditionPlugin__${schemaName}__${tableName}__${conditionFieldName}`;
-  const plugin: Plugin = builder => {
+  const plugin: GraphileEngine.Plugin = (builder) => {
     const instance = Symbol(displayName);
     builder.hook("build", function trackSeen(build) {
       if (!build._pluginMeta) {

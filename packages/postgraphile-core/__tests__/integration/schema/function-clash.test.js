@@ -2,7 +2,7 @@ const core = require("./core");
 
 let consoleWarnSpy;
 beforeAll(() => {
-  consoleWarnSpy = jest.spyOn(global.console, "warn");
+  consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
 });
 afterAll(() => {
   if (consoleWarnSpy) {
@@ -15,7 +15,7 @@ test(
   core.test(
     ["a", "b", "c"],
     {},
-    pgClient => {
+    (pgClient) => {
       return pgClient.query(
         "create function a.create_post(t text) returns a.post as $$ select null::a.post; $$ language sql volatile;",
       );

@@ -7,6 +7,11 @@ import printSchemaOrdered from "../../__tests__/utils/printSchemaOrdered";
 import withPgClient from "../../__tests__/utils/withPgClient";
 import { createPostGraphileSchema } from "..";
 
+// When running jest from the root of the monorepo, the directory is the
+// repository root, so all the file paths are incorrect. I couldn't find a way
+// to have jest automatically `process.chdir` for each test suite.
+process.chdir(__dirname + "/../../..");
+
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20;
 
@@ -15,16 +20,16 @@ let testResults;
 const testFixtures = [
   {
     name: "prints a schema with the default options",
-    createSchema: client => createPostGraphileSchema(client, ["a", "b", "c"]),
+    createSchema: (client) => createPostGraphileSchema(client, ["a", "b", "c"]),
   },
   {
     name: "prints a schema with Relay 1 style ids",
-    createSchema: client =>
+    createSchema: (client) =>
       createPostGraphileSchema(client, "c", { classicIds: true }),
   },
   {
     name: "prints a schema with a JWT generating mutation",
-    createSchema: client =>
+    createSchema: (client) =>
       createPostGraphileSchema(client, "b", {
         jwtSecret: "secret",
         jwtPgTypeIdentifier: "b.jwt_token",
@@ -32,12 +37,12 @@ const testFixtures = [
   },
   {
     name: "prints a schema without default mutations",
-    createSchema: client =>
+    createSchema: (client) =>
       createPostGraphileSchema(client, "c", { disableDefaultMutations: true }),
   },
   {
     name: "prints a schema with nulls reduced and old Json, Uuid",
-    createSchema: client =>
+    createSchema: (client) =>
       createPostGraphileSchema(client, ["a", "b", "c"], {
         setofFunctionsContainNulls: false,
         legacyJsonUuid: true,
@@ -46,8 +51,8 @@ const testFixtures = [
 ];
 
 beforeAll(() => {
-  testResults = testFixtures.map(testFixture =>
-    withPgClient(async client => {
+  testResults = testFixtures.map((testFixture) =>
+    withPgClient(async (client) => {
       return await testFixture.createSchema(client);
     })(),
   );

@@ -3,7 +3,7 @@ import * as http from "http";
 import Test from "./lib/test";
 import agent from "./lib/agent";
 
-const methods = http.METHODS.map(m => m.toLowerCase());
+const methods = http.METHODS.map((m) => m.toLowerCase());
 
 /**
  * Test against the given `app`,
@@ -17,7 +17,7 @@ export default (appOrCallback: http.Server | http.RequestListener): Test => {
       ? http.createServer(appOrCallback)
       : appOrCallback;
 
-  methods.forEach(method => {
+  methods.forEach((method) => {
     obj[method] = (url: string) => {
       return new Test(app, method, url);
     };

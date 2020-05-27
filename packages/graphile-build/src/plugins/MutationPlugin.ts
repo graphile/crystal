@@ -1,5 +1,3 @@
-import { Plugin } from "../SchemaBuilder";
-
 function isValidMutation(Mutation: import("graphql").GraphQLObjectType | null) {
   try {
     if (!Mutation) {
@@ -55,4 +53,4 @@ export default (async function MutationPlugin(builder) {
     [],
     ["Query"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

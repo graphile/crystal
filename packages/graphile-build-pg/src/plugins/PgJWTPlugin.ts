@@ -1,20 +1,21 @@
-import { Plugin } from "graphile-build";
 import { sign as signJwt } from "jsonwebtoken";
 
-declare module "graphile-build" {
-  interface GraphileBuildOptions {
-    pgJwtTypeIdentifier?: string;
-    pgJwtSecret?:
-      | string
-      | Buffer
-      | {
-          key: string | Buffer;
-          passphrase: string;
-        };
-    pgJwtSignOptions?: import("jsonwebtoken").SignOptions;
-  }
-  interface ScopeGraphQLScalarType {
-    isPgJwtType?: boolean;
+declare global {
+  namespace GraphileEngine {
+    interface GraphileBuildOptions {
+      pgJwtTypeIdentifier?: string;
+      pgJwtSecret?:
+        | string
+        | Buffer
+        | {
+            key: string | Buffer;
+            passphrase: string;
+          };
+      pgJwtSignOptions?: import("jsonwebtoken").SignOptions;
+    }
+    interface ScopeGraphQLScalarType {
+      isPgJwtType?: boolean;
+    }
   }
 }
 
@@ -52,7 +53,7 @@ export default (function PgJWTPlugin(
       );
 
       const compositeClass = introspectionResultsByKind.class.find(
-        table =>
+        (table) =>
           !table.isSelectable &&
           !table.isInsertable &&
           !table.isUpdatable &&
@@ -78,7 +79,7 @@ export default (function PgJWTPlugin(
       const compositeTypeName = inflection.tableType(compositeClass);
 
       // NOTE: we deliberately do not create an input type
-      pgRegisterGqlTypeByTypeId(compositeType.id, cb => {
+      pgRegisterGqlTypeByTypeId(compositeType.id, (cb) => {
         const JWTType = newWithHooks(
           GraphQLScalarType,
           {
@@ -135,10 +136,10 @@ export default (function PgJWTPlugin(
         cb(JWTType);
 
         pg2GqlMapper[compositeType.id] = {
-          map: value => {
+          map: (value) => {
             if (!value) return null;
             const values = Object.values(value);
-            if (values.some(v => v != null)) {
+            if (values.some((v) => v != null)) {
               return value;
             }
             return null;
@@ -150,10 +151,10 @@ export default (function PgJWTPlugin(
           },
         };
 
-        pgTweaksByTypeId[compositeType.id] = fragment =>
+        pgTweaksByTypeId[compositeType.id] = (fragment) =>
           sql`json_build_object(${sql.join(
             compositeClass.attributes.map(
-              attr =>
+              (attr) =>
                 sql`${sql.literal(
                   attr.name,
                 )}::text, ${pgTweakFragmentForTypeAndModifier(
@@ -173,4 +174,4 @@ export default (function PgJWTPlugin(
     [],
     ["PgIntrospection"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

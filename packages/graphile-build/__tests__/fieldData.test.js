@@ -9,8 +9,9 @@ const {
 } = require("graphql");
 const { buildSchema, defaultPlugins } = require("../");
 
-const base64 = str => Buffer.from(String(str)).toString("base64");
-const base64Decode = str => Buffer.from(String(str), "base64").toString("utf8");
+const base64 = (str) => Buffer.from(String(str)).toString("base64");
+const base64Decode = (str) =>
+  Buffer.from(String(str), "base64").toString("utf8");
 
 const dummyData = [
   { ID: "foo", CAPS: "FOO" },
@@ -28,7 +29,7 @@ const compare = (a, b, ascending) => {
   }
 };
 
-const DummyConnectionPlugin = async builder => {
+const DummyConnectionPlugin = async (builder) => {
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
     const {
       extend,
@@ -51,12 +52,12 @@ const DummyConnectionPlugin = async builder => {
         fields: ({ addDataGeneratorForField }) => {
           addDataGeneratorForField("id", ({ alias }) => {
             return {
-              map: obj => ({ [getSafeAliasFromAlias(alias)]: obj.ID }),
+              map: (obj) => ({ [getSafeAliasFromAlias(alias)]: obj.ID }),
             };
           });
           addDataGeneratorForField("caps", ({ alias }) => {
             return {
-              map: obj => ({ [getSafeAliasFromAlias(alias)]: obj.CAPS }),
+              map: (obj) => ({ [getSafeAliasFromAlias(alias)]: obj.CAPS }),
             };
           });
           addDataGeneratorForField("random", ({ alias }) => {
@@ -114,7 +115,7 @@ const DummyConnectionPlugin = async builder => {
                 for (let i = sorts.length - 1; i >= 0; i--) {
                   const [field, ascending] = sorts[i];
                   const oldFilter = filter;
-                  filter = obj => {
+                  filter = (obj) => {
                     if (!afterValues[i]) return true;
                     const comparison = compare(
                       afterValues[i],
@@ -170,7 +171,7 @@ const DummyConnectionPlugin = async builder => {
                                   ) => {
                                     if (data.sort) {
                                       return {
-                                        map: obj => ({
+                                        map: (obj) => ({
                                           __cursor: base64(
                                             JSON.stringify(
                                               data.sort.map(
@@ -273,7 +274,7 @@ const DummyConnectionPlugin = async builder => {
                   result.sort((a, b) => compare(a[field], b[field], ascending));
                 }
               }
-              const ret = result.map(entry => {
+              const ret = result.map((entry) => {
                 const idx = dummyData.indexOf(entry);
                 return (resolveData.map || []).reduce(
                   (memo, map) => Object.assign(memo, map(entry, idx)),
@@ -319,10 +320,10 @@ test("no arguments", async () => {
   );
   if (result.errors) {
     // eslint-disable-next-line no-console
-    console.log(result.errors.map(e => e.originalError));
+    console.log(result.errors.map((e) => e.originalError));
   }
   expect(result.errors).toBeFalsy();
-  expect(result.data.dummyConnection.nodes.map(n => n.id)).toEqual([
+  expect(result.data.dummyConnection.nodes.map((n) => n.id)).toEqual([
     "foo",
     "bar",
     "baz",
@@ -358,10 +359,10 @@ test("sort", async () => {
   );
   if (result.errors) {
     // eslint-disable-next-line no-console
-    console.log(result.errors.map(e => e.originalError));
+    console.log(result.errors.map((e) => e.originalError));
   }
   expect(result.errors).toBeFalsy();
-  expect(result.data.dummyConnection.nodes.map(n => n.id)).toEqual([
+  expect(result.data.dummyConnection.nodes.map((n) => n.id)).toEqual([
     "bar",
     "baz",
     "foo",
@@ -397,7 +398,7 @@ test("after", async () => {
       }
     `,
   );
-  expect(result.data.dummyConnection.nodes.map(n => n.id)).toEqual([
+  expect(result.data.dummyConnection.nodes.map((n) => n.id)).toEqual([
     "baz",
     "qux",
   ]);
@@ -431,10 +432,10 @@ test("sort, after", async () => {
   );
   if (result.errors) {
     // eslint-disable-next-line no-console
-    console.log(result.errors.map(e => e.originalError));
+    console.log(result.errors.map((e) => e.originalError));
   }
   expect(result.errors).toBeFalsy();
-  expect(result.data.dummyConnection.nodes.map(n => n.id)).toEqual([
+  expect(result.data.dummyConnection.nodes.map((n) => n.id)).toEqual([
     "foo",
     "qux",
   ]);

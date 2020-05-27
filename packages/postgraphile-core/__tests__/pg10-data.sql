@@ -9,3 +9,5 @@ insert into pg10.network values
   (8, '::ffff:1.2.3.0/128', '::ffff:1.2.3.0/128', 'AABBCCDDEEFF', '08002b0102030405');
 
 alter sequence pg10.network_id_seq restart with 9;
+alter table pg10.always_as_identity alter column id restart with 1;
+alter table pg10.by_default_as_identity alter column id restart with 1;

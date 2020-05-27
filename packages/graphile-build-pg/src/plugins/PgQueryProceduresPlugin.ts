@@ -1,4 +1,3 @@
-import { Plugin } from "graphile-build";
 import { PgType } from "./PgIntrospectionPlugin";
 
 export default (function PgQueryProceduresPlugin(
@@ -47,7 +46,7 @@ export default (function PgQueryProceduresPlugin(
           }, [] as PgType[]);
           if (
             argTypes.some(
-              type =>
+              (type) =>
                 type.type === "c" && type.class && type.class.isSelectable,
             )
           ) {
@@ -111,4 +110,4 @@ export default (function PgQueryProceduresPlugin(
     },
     ["PgQueryProcedures"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

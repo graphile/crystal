@@ -16,7 +16,7 @@ const options = {};
 const EventEmitter = require("events");
 
 const defaultPlugins = allDefaultPlugins.filter(
-  plugin => plugin !== MutationPlugin,
+  (plugin) => plugin !== MutationPlugin,
 );
 
 const makePluginEtc = (defaultCounter = 0) => {
@@ -24,16 +24,16 @@ const makePluginEtc = (defaultCounter = 0) => {
 
   const eventEmitter = new EventEmitter();
 
-  const DummyWatchPlugin = async builder => {
+  const DummyWatchPlugin = async (builder) => {
     builder.registerWatcher(
-      triggerRebuild => {
+      (triggerRebuild) => {
         eventEmitter.on("change", triggerRebuild);
       },
-      triggerRebuild => {
+      (triggerRebuild) => {
         eventEmitter.removeListener("change", triggerRebuild);
       },
     );
-    builder.hook("build", build => {
+    builder.hook("build", (build) => {
       return build.extend(build, {
         dummyCounter: counter,
       });
@@ -140,7 +140,7 @@ test("schema is updated when rebuild triggered", async () => {
   expect(schema0).not.toEqual(schema1);
   expect(printSchema(schema0)).not.toEqual(printSchema(schema1));
 
-  const getNFrom = async schema => {
+  const getNFrom = async (schema) => {
     const result = await graphql(
       schema,
       `
@@ -153,7 +153,7 @@ test("schema is updated when rebuild triggered", async () => {
     );
     if (result.errors) {
       // eslint-disable-next-line no-console
-      console.log(result.errors.map(e => e.originalError));
+      console.log(result.errors.map((e) => e.originalError));
     }
     expect(result.errors).toBeFalsy();
     return result.data.dummy.n;

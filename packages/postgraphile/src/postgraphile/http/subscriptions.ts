@@ -24,7 +24,6 @@ import parseUrl from "parseurl";
 import { pluginHookFromOptions } from "../pluginHook";
 import { isEmpty } from "./createPostGraphileHttpRequestHandler";
 import liveSubscribe from "./liveSubscribe";
-import { GraphileResolverContext } from "postgraphile-core";
 
 interface Deferred<T> extends Promise<T> {
   resolve: (input?: T | PromiseLike<T> | undefined) => void;
@@ -99,7 +98,7 @@ export async function enhanceHttpServerWithSubscriptions<
   };
 
   const addContextForSocketAndOpId = (
-    context: GraphileResolverContext,
+    context: GraphileEngine.GraphileResolverContext,
     ws: WebSocket,
     opId: string,
   ): Deferred<void> => {
@@ -118,7 +117,7 @@ export async function enhanceHttpServerWithSubscriptions<
     for (const middleware of middlewares) {
       // TODO: add Koa support
       await new Promise((resolve, reject): void => {
-        middleware(req, res, err => (err ? reject(err) : resolve()));
+        middleware(req, res, (err) => (err ? reject(err) : resolve()));
       });
     }
   };
@@ -173,7 +172,7 @@ export async function enhanceHttpServerWithSubscriptions<
   const getContext = (
     socket: WebSocket,
     opId: string,
-  ): Promise<GraphileResolverContext> => {
+  ): Promise<GraphileEngine.GraphileResolverContext> => {
     return new Promise((resolve, reject): void => {
       reqResFromSocket(socket)
         .then(({ req, res }) =>
@@ -181,7 +180,7 @@ export async function enhanceHttpServerWithSubscriptions<
             req,
             res,
             { singleStatement: true },
-            context => {
+            (context) => {
               const promise = addContextForSocketAndOpId(context, socket, opId);
               resolve(promise["context"]);
               return promise;
@@ -200,7 +199,7 @@ export async function enhanceHttpServerWithSubscriptions<
     const { pathname = "" } = parseUrl(req) || {};
     const isGraphqlRoute = pathname === externalUrlBase + graphqlRoute;
     if (isGraphqlRoute) {
-      wss.handleUpgrade(req, socket, head, ws => {
+      wss.handleUpgrade(req, socket, head, (ws) => {
         wss.emit("connection", ws, req);
       });
     }
@@ -332,7 +331,7 @@ export async function enhanceHttpServerWithSubscriptions<
           if (validationErrors.length) {
             const error = new Error(
               "Query validation failed: \n" +
-                validationErrors.map(e => e.message).join("\n"),
+                validationErrors.map((e) => e.message).join("\n"),
             );
             error["errors"] = validationErrors;
             return Promise.reject(error);

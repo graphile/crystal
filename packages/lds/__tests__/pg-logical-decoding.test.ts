@@ -1,7 +1,7 @@
 import PgLogicalDecoding from "../src/pg-logical-decoding";
 import { tryDropSlot, DATABASE_URL, query, withLdAndClient } from "./helpers";
 
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 test("opens and closes cleanly", async () => {
   const ld = new PgLogicalDecoding(DATABASE_URL, {

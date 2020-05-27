@@ -64,7 +64,7 @@ const {
   },
 } = window;
 
-const isValidJSON = json => {
+const isValidJSON = (json) => {
   try {
     JSON.parse(json);
     return true;
@@ -117,7 +117,7 @@ class PostGraphiQL extends React.PureComponent {
         : null,
   };
 
-  _onEditQuery = query => {
+  _onEditQuery = (query) => {
     this.setState({ query });
   };
 
@@ -148,7 +148,7 @@ class PostGraphiQL extends React.PureComponent {
       const unlisten4 = this.subscriptionsClient.on("reconnected", () => {
         this.setState({ socketStatus: "reconnected", error: null });
         setTimeout(() => {
-          this.setState(state =>
+          this.setState((state) =>
             state.socketStatus === "reconnected"
               ? { socketStatus: "connected" }
               : {},
@@ -158,7 +158,7 @@ class PostGraphiQL extends React.PureComponent {
       const unlisten5 = this.subscriptionsClient.on("reconnecting", () => {
         this.setState({ socketStatus: "reconnecting" });
       });
-      const unlisten6 = this.subscriptionsClient.on("error", error => {
+      const unlisten6 = this.subscriptionsClient.on("error", (error) => {
         // tslint:disable-next-line no-console
         console.error("Client connection error", error);
         this.setState({
@@ -203,7 +203,7 @@ class PostGraphiQL extends React.PureComponent {
       );
       eventSource.addEventListener(
         "error",
-        error => {
+        (error) => {
           // tslint:disable-next-line no-console
           console.error(
             "PostGraphile: Failed to connect to event stream",
@@ -253,7 +253,7 @@ class PostGraphiQL extends React.PureComponent {
 
     const position = relevantMousePos;
 
-    const def = parsedQuery.definitions.find(definition => {
+    const def = parsedQuery.definitions.find((definition) => {
       if (!definition.loc) {
         console.log("Missing location information for definition");
         return false;
@@ -352,16 +352,16 @@ class PostGraphiQL extends React.PureComponent {
   /**
    * Routes the request either to the subscriptionClient or to executeQuery.
    */
-  fetcher = graphQLParams => {
+  fetcher = (graphQLParams) => {
     this.cancelSubscription();
     if (isSubscription(graphQLParams) && this.subscriptionsClient) {
       return {
-        subscribe: observer => {
+        subscribe: (observer) => {
           observer.next("Waiting for subscription to yield data…");
 
           // Hack because GraphiQL logs `[object Object]` on error otherwise
           const oldError = observer.error;
-          observer.error = function(error) {
+          observer.error = function (error) {
             let stack;
             try {
               stack = JSON.stringify(error, null, 2);
@@ -507,7 +507,7 @@ class PostGraphiQL extends React.PureComponent {
           return { ...navStackItem, def: nextField };
         }
       })
-      .filter(_ => _);
+      .filter((_) => _);
 
     // This is very hacky but works. React is cool.
     if (allOk) {
@@ -541,7 +541,7 @@ class PostGraphiQL extends React.PureComponent {
     }
   };
 
-  handleToggleHistory = e => {
+  handleToggleHistory = (e) => {
     this.graphiql.handleToggleHistory(e);
   };
 
@@ -561,7 +561,7 @@ class PostGraphiQL extends React.PureComponent {
 
   handleToggleSaveHeaders = () => {
     this.setState(
-      oldState => ({ saveHeadersText: !oldState.saveHeadersText }),
+      (oldState) => ({ saveHeadersText: !oldState.saveHeadersText }),
       () => {
         this._storage.set(
           STORAGE_KEYS.SAVE_HEADERS_TEXT,
@@ -577,7 +577,7 @@ class PostGraphiQL extends React.PureComponent {
 
   handleToggleExplain = () => {
     this.setState(
-      oldState => ({ explain: !oldState.explain }),
+      (oldState) => ({ explain: !oldState.explain }),
       () => {
         this._storage.set(
           STORAGE_KEYS.EXPLAIN,
@@ -674,7 +674,7 @@ class PostGraphiQL extends React.PureComponent {
     );
   }
 
-  setGraphiqlRef = ref => {
+  setGraphiqlRef = (ref) => {
     if (!ref) {
       return;
     }
@@ -706,7 +706,7 @@ class PostGraphiQL extends React.PureComponent {
             schema={schema}
             query={this.state.query}
             onEdit={this._onEditQuery}
-            onRunOperation={operationName =>
+            onRunOperation={(operationName) =>
               this.graphiql.handleRunQuery(operationName)
             }
             explorerIsOpen={this.state.explorerIsOpen}
@@ -770,7 +770,7 @@ class PostGraphiQL extends React.PureComponent {
               <div className="postgraphile-footer">
                 {this.state.explainResult && this.state.explainResult.length ? (
                   <div className="postgraphile-plan-footer">
-                    {this.state.explainResult.map(res => (
+                    {this.state.explainResult.map((res) => (
                       <div>
                         <h4>
                           Result from SQL{" "}
@@ -840,7 +840,7 @@ class PostGraphiQL extends React.PureComponent {
             valid={this.state.headersTextValid}
             toggleSaveHeaders={this.handleToggleSaveHeaders}
             saveHeaders={this.state.saveHeadersText}
-            onChange={e =>
+            onChange={(e) =>
               this.setState(
                 {
                   headersText: e.target.value,

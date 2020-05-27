@@ -23,8 +23,16 @@
   "engines": {
     "node": ">=12.16"
   },
-  "devDependencies": {},
   "files": [
     "dist"
-  ]
+  ],
+  "dependencies": {
+    "tslib": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^25.2.3",
+    "jest": "^26.0.1",
+    "ts-node": "^8.10.1",
+    "typescript": "^3.9.2"
+  }
 }

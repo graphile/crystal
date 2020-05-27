@@ -1,12 +1,3 @@
-import {
-  Plugin,
-  GraphileObjectTypeConfig,
-  ScopeGraphQLObjectType,
-  GraphileInputObjectTypeConfig,
-  Build,
-  Inflection,
-  ResolvedLookAhead,
-} from "graphile-build";
 import makeGraphQLJSONType from "../GraphQLJSON";
 import rawParseInterval from "postgres-interval";
 import LRU from "@graphile/lru";
@@ -30,7 +21,10 @@ interface GqlInputTypeByTypeIdAndModifier {
   };
 }
 
-type FragmentTweaker = (fragment: SQL, resolveData: ResolvedLookAhead) => SQL;
+type FragmentTweaker = (
+  fragment: SQL,
+  resolveData: GraphileEngine.ResolvedLookAhead,
+) => SQL;
 
 type TypeGen<T> = (
   set: (type: T) => void,
@@ -44,100 +38,102 @@ type Pg2GqlMapper = {
   };
 };
 
-declare module "graphile-build" {
-  interface Build {
-    pgGqlTypeByTypeIdAndModifier?: GqlTypeByTypeIdAndModifier;
-    pgGqlInputTypeByTypeIdAndModifier?: GqlInputTypeByTypeIdAndModifier;
+declare global {
+  namespace GraphileEngine {
+    interface Build {
+      pgGqlTypeByTypeIdAndModifier?: GqlTypeByTypeIdAndModifier;
+      pgGqlInputTypeByTypeIdAndModifier?: GqlInputTypeByTypeIdAndModifier;
 
-    pgRegisterGqlTypeByTypeId(
-      typeId: string,
-      gen: TypeGen<import("graphql").GraphQLOutputType>,
-      yieldToExisting?: boolean,
-    ): void;
-    pgRegisterGqlInputTypeByTypeId(
-      typeId: string,
-      gen: TypeGen<import("graphql").GraphQLInputType>,
-      yieldToExisting?: boolean,
-    ): void;
-    pgGetGqlTypeByTypeIdAndModifier(
-      typeId: string,
-      typeModifier: PgTypeModifier,
-      useFallback?: boolean,
-    ): import("graphql").GraphQLOutputType | null;
-    pgGetGqlInputTypeByTypeIdAndModifier(
-      typeId: string,
-      typeModifier: PgTypeModifier,
-      useFallback?: boolean,
-    ): import("graphql").GraphQLInputType | null;
-    pg2GqlMapper: Pg2GqlMapper;
-    pg2gql: (val: any, type: PgType) => any;
-    pg2gqlForType: (type: PgType) => (value: any) => any;
-    gql2pg: (val: any, type: PgType, modifier?: PgTypeModifier) => SQL;
-    pgTweakFragmentForTypeAndModifier: (
-      fragment: SQL,
-      type: PgType,
-      typeModifier: PgTypeModifier,
-      resolveData: ResolvedLookAhead,
-    ) => SQL;
-    pgTweaksByTypeId: {
-      [typeId: string]: FragmentTweaker;
-    };
-    pgTweaksByTypeIdAndModifer: {
-      [modifier: string]: {
+      pgRegisterGqlTypeByTypeId(
+        typeId: string,
+        gen: TypeGen<import("graphql").GraphQLOutputType>,
+        yieldToExisting?: boolean,
+      ): void;
+      pgRegisterGqlInputTypeByTypeId(
+        typeId: string,
+        gen: TypeGen<import("graphql").GraphQLInputType>,
+        yieldToExisting?: boolean,
+      ): void;
+      pgGetGqlTypeByTypeIdAndModifier(
+        typeId: string,
+        typeModifier: PgTypeModifier,
+        useFallback?: boolean,
+      ): import("graphql").GraphQLOutputType | null;
+      pgGetGqlInputTypeByTypeIdAndModifier(
+        typeId: string,
+        typeModifier: PgTypeModifier,
+        useFallback?: boolean,
+      ): import("graphql").GraphQLInputType | null;
+      pg2GqlMapper: Pg2GqlMapper;
+      pg2gql: (val: any, type: PgType) => any;
+      pg2gqlForType: (type: PgType) => (value: any) => any;
+      gql2pg: (val: any, type: PgType, modifier?: PgTypeModifier) => SQL;
+      pgTweakFragmentForTypeAndModifier: (
+        fragment: SQL,
+        type: PgType,
+        typeModifier: PgTypeModifier,
+        resolveData: ResolvedLookAhead,
+      ) => SQL;
+      pgTweaksByTypeId: {
         [typeId: string]: FragmentTweaker;
       };
-    };
-  }
+      pgTweaksByTypeIdAndModifier: {
+        [modifier: string]: {
+          [typeId: string]: FragmentTweaker;
+        };
+      };
+    }
 
-  interface GraphileBuildOptions {
-    pgExtendedTypes?: boolean;
-    pgSkipHstore?: boolean;
-    pgUseCustomNetworkScalars?: boolean;
-    disableIssue390Fix?: boolean;
-  }
+    interface GraphileBuildOptions {
+      pgExtendedTypes?: boolean;
+      pgSkipHstore?: boolean;
+      pgUseCustomNetworkScalars?: boolean;
+      disableIssue390Fix?: boolean;
+    }
 
-  interface ScopeGraphQLObjectType {
-    pgIntrospection?: PgEntity;
-    pgIntrospectionTable?: PgClass;
-    pgSubtypeIntrospection?: PgEntity;
-    pgTypeModifier?: PgTypeModifier;
-    isIntervalType?: boolean;
-    isPointType?: boolean;
-    isPgRangeType?: boolean;
-    isPgRangeBoundType?: boolean;
-  }
+    interface ScopeGraphQLObjectType {
+      pgIntrospection?: PgEntity;
+      pgIntrospectionTable?: PgClass;
+      pgSubtypeIntrospection?: PgEntity;
+      pgTypeModifier?: PgTypeModifier;
+      isIntervalType?: boolean;
+      isPointType?: boolean;
+      isPgRangeType?: boolean;
+      isPgRangeBoundType?: boolean;
+    }
 
-  interface ScopeGraphQLObjectTypeFieldsField {
-    pgFieldIntrospection?: PgEntity;
-    pgFieldIntrospectionTable?: PgClass;
-    pgFieldConstraint?: PgConstraint;
-    isPgFieldConnection?: boolean;
-    isPgFieldSimpleCollection?: boolean;
-    isCursorField?: boolean;
-  }
+    interface ScopeGraphQLObjectTypeFieldsField {
+      pgFieldIntrospection?: PgEntity;
+      pgFieldIntrospectionTable?: PgClass;
+      pgFieldConstraint?: PgConstraint;
+      isPgFieldConnection?: boolean;
+      isPgFieldSimpleCollection?: boolean;
+      isCursorField?: boolean;
+    }
 
-  interface ScopeGraphQLInputObjectType {
-    pgIntrospection?: PgEntity;
-    pgSubtypeIntrospection?: PgEntity;
-    pgTypeModifier?: PgTypeModifier;
-    isIntervalInputType?: boolean;
-    isPointInputType?: boolean;
-    isPgRangeInputType?: boolean;
-    isPgRangeBoundInputType?: boolean;
-  }
+    interface ScopeGraphQLInputObjectType {
+      pgIntrospection?: PgEntity;
+      pgSubtypeIntrospection?: PgEntity;
+      pgTypeModifier?: PgTypeModifier;
+      isIntervalInputType?: boolean;
+      isPointInputType?: boolean;
+      isPgRangeInputType?: boolean;
+      isPgRangeBoundInputType?: boolean;
+    }
 
-  interface ScopeGraphQLInputObjectTypeFieldsField {
-    pgFieldIntrospection?: PgEntity;
-  }
+    interface ScopeGraphQLInputObjectTypeFieldsField {
+      pgFieldIntrospection?: PgEntity;
+    }
 
-  interface ScopeGraphQLEnumType {
-    pgIntrospection?: PgEntity;
-    isPgEnumType?: boolean;
-    isPgRowSortEnum?: boolean;
-  }
+    interface ScopeGraphQLEnumType {
+      pgIntrospection?: PgEntity;
+      isPgEnumType?: boolean;
+      isPgRowSortEnum?: boolean;
+    }
 
-  interface Inflection {
-    hstoreType(): string;
+    interface Inflection {
+      hstoreType(): string;
+    }
   }
 }
 
@@ -173,7 +169,7 @@ export default (function PgTypesPlugin(
   // XXX: most of this should be in an "init" hook, not a "build" hook
   builder.hook(
     "build",
-    build => {
+    (build) => {
       const {
         pgIntrospectionResultsByKind: rawIntrospectionResultsByKind,
         getTypeByName,
@@ -249,7 +245,7 @@ export default (function PgTypesPlugin(
       ): ((valueFromPostgres: any) => any) => {
         if (pg2GqlMapper[type.id]) {
           const map = pg2GqlMapper[type.id].map;
-          return val => (isNull(val) ? null : map(val));
+          return (val) => (isNull(val) ? null : map(val));
         } else if (type.domainBaseType) {
           return pg2gqlForType(type.domainBaseType);
         } else if (type.isPgArray) {
@@ -257,7 +253,7 @@ export default (function PgTypesPlugin(
             throw new Error("isPgArray without arrayItemType");
           }
           const elementHandler = pg2gqlForType(type.arrayItemType);
-          return val => {
+          return (val) => {
             if (isNull(val)) return null;
             if (!Array.isArray(val)) {
               throw new Error(
@@ -316,7 +312,7 @@ export default (function PgTypesPlugin(
             );
           }
           return sql`array[${sql.join(
-            val.map(v => gql2pg(v, arrayItemType, modifier)),
+            val.map((v) => gql2pg(v, arrayItemType, modifier)),
             ", ",
           )}]::${sql.identifier(type.namespaceName)}.${sql.identifier(
             type.name,
@@ -360,13 +356,13 @@ export default (function PgTypesPlugin(
           },
         };
       };
-      const intervalSpec: GraphileObjectTypeConfig<any, any> = {
+      const intervalSpec: GraphileEngine.GraphileObjectTypeConfig<any, any> = {
         name: inflection.builtin("Interval"),
         description:
           "An interval of time that has passed where the smallest distinct unit is a second.",
         fields: makeIntervalFields(),
       };
-      const intervalScope: ScopeGraphQLObjectType = {
+      const intervalScope: GraphileEngine.ScopeGraphQLObjectType = {
         isIntervalType: true,
       };
       const GQLInterval = newWithHooks(
@@ -401,9 +397,9 @@ export default (function PgTypesPlugin(
         new GraphQLScalarType({
           name,
           description,
-          serialize: value => String(value),
-          parseValue: value => String(value),
-          parseLiteral: ast => {
+          serialize: (value) => String(value),
+          parseValue: (value) => String(value),
+          parseLiteral: (ast) => {
             if (ast.kind !== Kind.STRING) {
               throw new Error("Can only parse string values");
             }
@@ -437,7 +433,7 @@ export default (function PgTypesPlugin(
       const tweakToText = (fragment: SQL) => sql`(${fragment})::text`;
       const tweakToNumericText = (fragment: SQL) =>
         sql`(${fragment})::numeric::text`;
-      const pgTweaksByTypeIdAndModifer: {
+      const pgTweaksByTypeIdAndModifier: {
         [modifier: string]: {
           [typeId: string]: FragmentTweaker;
         };
@@ -467,12 +463,12 @@ export default (function PgTypesPlugin(
         fragment: SQL,
         type: PgType,
         typeModifier: PgTypeModifier,
-        resolveData: ResolvedLookAhead,
+        resolveData: GraphileEngine.ResolvedLookAhead,
       ): SQL => {
         const typeModifierKey = typeModifier != null ? typeModifier : -1;
         const tweaker: FragmentTweaker =
-          (pgTweaksByTypeIdAndModifer[type.id] &&
-            pgTweaksByTypeIdAndModifer[type.id][typeModifierKey]) ||
+          (pgTweaksByTypeIdAndModifier[type.id] &&
+            pgTweaksByTypeIdAndModifier[type.id][typeModifierKey]) ||
           pgTweaksByTypeId[type.id];
         if (tweaker) {
           return tweaker(fragment, resolveData);
@@ -656,20 +652,20 @@ export default (function PgTypesPlugin(
       if (pgExtendedTypes) {
         pg2GqlMapper[114] = {
           map: identity,
-          unmap: o => sql.value(jsonStringify(o)),
+          unmap: (o) => sql.value(jsonStringify(o)),
         };
       } else {
         pg2GqlMapper[114] = {
           map: jsonStringify,
-          unmap: str => sql.value(str),
+          unmap: (str) => sql.value(str),
         };
       }
       pg2GqlMapper[3802] = pg2GqlMapper[114]; // jsonb
 
       // interval
       pg2GqlMapper[1186] = {
-        map: str => parseInterval(str),
-        unmap: o => {
+        map: (str) => parseInterval(str),
+        unmap: (o) => {
           const keys = [
             "seconds",
             "minutes",
@@ -690,8 +686,8 @@ export default (function PgTypesPlugin(
       };
 
       pg2GqlMapper[790] = {
-        map: _ => _,
-        unmap: val => sql`(${sql.value(val)})::money`,
+        map: (_) => _,
+        unmap: (val) => sql`(${sql.value(val)})::money`,
       };
 
       // point
@@ -701,11 +697,11 @@ export default (function PgTypesPlugin(
             const [x, y] = f
               .substr(1, f.length - 2)
               .split(",")
-              .map(f => parseFloat(f));
+              .map((f) => parseFloat(f));
             return { x, y };
           }
         },
-        unmap: o => sql`point(${sql.value(o.x)}, ${sql.value(o.y)})`,
+        unmap: (o) => sql`point(${sql.value(o.x)}, ${sql.value(o.y)})`,
       };
 
       // TODO: add more support for geometric types
@@ -721,7 +717,9 @@ export default (function PgTypesPlugin(
         typeId: string,
         typeModifier: PgTypeModifier,
       ) => {
-        const type = introspectionResultsByKind.type.find(t => t.id === typeId);
+        const type = introspectionResultsByKind.type.find(
+          (t) => t.id === typeId,
+        );
         if (!type) {
           throw new Error(
             `Could not find type with oid '${typeId}' in the introspection results`,
@@ -839,7 +837,10 @@ export default (function PgTypesPlugin(
             | import("graphql").GraphQLInputObjectType
             | null = null;
           if (!Range) {
-            const rangeBoundSpec: GraphileObjectTypeConfig<any, any> = {
+            const rangeBoundSpec: GraphileEngine.GraphileObjectTypeConfig<
+              any,
+              any
+            > = {
               name: inflection.rangeBoundType(gqlRangeSubType.name),
               description:
                 "The value at one end of a range. A range can either include this value, or not.",
@@ -874,7 +875,7 @@ export default (function PgTypesPlugin(
               );
             }
 
-            const rangeBoundInputSpec: GraphileInputObjectTypeConfig = {
+            const rangeBoundInputSpec: GraphileEngine.GraphileInputObjectTypeConfig = {
               name: inflection.inputType(RangeBound.name),
               description:
                 "The value at one end of a range. A range can either include this value, or not.",
@@ -908,7 +909,10 @@ export default (function PgTypesPlugin(
               );
             }
 
-            const rangeSpec: GraphileObjectTypeConfig<any, any> = {
+            const rangeSpec: GraphileEngine.GraphileObjectTypeConfig<
+              any,
+              any
+            > = {
               name: inflection.rangeType(gqlRangeSubType.name),
               description: `A range of \`${gqlRangeSubType.name}\`.`,
               fields: {
@@ -923,7 +927,7 @@ export default (function PgTypesPlugin(
                 },
               },
             };
-            const rangeScope: ScopeGraphQLObjectType = {
+            const rangeScope: GraphileEngine.ScopeGraphQLObjectType = {
               isPgRangeType: true,
               pgIntrospection: type,
               pgSubtypeIntrospection: subtype,
@@ -936,7 +940,7 @@ export default (function PgTypesPlugin(
               );
             }
 
-            const rangeInputSpec: GraphileInputObjectTypeConfig = {
+            const rangeInputSpec: GraphileEngine.GraphileInputObjectTypeConfig = {
               name: inflection.inputType(Range.name),
               description: `A range of \`${gqlRangeSubType.name}\`.`,
               fields: {
@@ -980,12 +984,12 @@ export default (function PgTypesPlugin(
           gqlInputTypeByTypeIdAndModifier[type.id][
             typeModifierKey
           ] = RangeInput;
-          if (pgTweaksByTypeIdAndModifer[type.id] === undefined) {
-            pgTweaksByTypeIdAndModifer[type.id] = {};
+          if (pgTweaksByTypeIdAndModifier[type.id] === undefined) {
+            pgTweaksByTypeIdAndModifier[type.id] = {};
           }
-          pgTweaksByTypeIdAndModifer[type.id][
-            typeModifierKey
-          ] = fragment => sql`\
+          pgTweaksByTypeIdAndModifier[type.id][typeModifierKey] = (
+            fragment,
+          ) => sql`\
 case
 when (${fragment}) is null then null
 else json_build_object(
@@ -1152,7 +1156,7 @@ end`;
         }
         if (!gqlTypeByTypeIdAndModifier[typeId][typeModifierKey]) {
           const type = introspectionResultsByKind.type.find(
-            t => t.id === typeId,
+            (t) => t.id === typeId,
           );
 
           if (!type) {
@@ -1320,7 +1324,7 @@ end`;
         fragment: SQL,
         type: PgType,
         typeModifier: PgTypeModifier,
-        resolveData: ResolvedLookAhead,
+        resolveData: GraphileEngine.ResolvedLookAhead,
       ) {
         if (typeModifier === undefined) {
           // eslint-disable-next-line no-console
@@ -1337,7 +1341,7 @@ end`;
       }
       // END OF DEPRECATIONS!
 
-      const buildExtension: Partial<Build> = {
+      const buildExtension: Partial<GraphileEngine.Build> = {
         pgRegisterGqlTypeByTypeId: registerGqlTypeByTypeId,
         pgRegisterGqlInputTypeByTypeId: registerGqlInputTypeByTypeId,
         pgGetGqlTypeByTypeIdAndModifier: getGqlTypeByTypeIdAndModifier,
@@ -1348,7 +1352,7 @@ end`;
         gql2pg,
         pgTweakFragmentForTypeAndModifier,
         pgTweaksByTypeId,
-        pgTweaksByTypeIdAndModifer,
+        pgTweaksByTypeIdAndModifier,
       };
 
       // DEPRECATED METHODS:
@@ -1376,7 +1380,7 @@ end`;
       // This hook allows you to append a plugin which renames the KeyValueHash
       // (hstore) type name.
       if (pgSkipHstore) return inflection;
-      const newInflectors: Partial<Inflection> = {
+      const newInflectors: Partial<GraphileEngine.Inflection> = {
         hstoreType() {
           return "KeyValueHash";
         },
@@ -1388,7 +1392,7 @@ end`;
 
   builder.hook(
     "build",
-    build => {
+    (build) => {
       // This hook tells graphile-build-pg about the hstore database type so it
       // knows how to express it in input/output.
       if (pgSkipHstore) return build;
@@ -1415,7 +1419,7 @@ end`;
 
       // Check we have the hstore extension
       const hstoreExtension = introspectionResultsByKind.extension.find(
-        e => e.name === "hstore",
+        (e) => e.name === "hstore",
       );
 
       if (!hstoreExtension) {
@@ -1424,7 +1428,7 @@ end`;
 
       // Get the 'hstore' type itself:
       const hstoreType = introspectionResultsByKind.type.find(
-        t =>
+        (t) =>
           t.name === "hstore" && t.namespaceId === hstoreExtension.namespaceId,
       );
 
@@ -1448,7 +1452,7 @@ end`;
         // node-postgres parses hstore for us, no action required on map
         map: identity,
         // When unmapping we need to convert back to hstore
-        unmap: o =>
+        unmap: (o) =>
           sql`(${sql.value(hstoreStringify(o))}::${sql.identifier(
             hstoreType.namespaceName,
             hstoreType.name,
@@ -1463,7 +1467,7 @@ end`;
   );
 
   /* End of hstore type */
-} as Plugin);
+} as GraphileEngine.Plugin);
 
 interface HStoreValue {
   [key: string]: string | null;

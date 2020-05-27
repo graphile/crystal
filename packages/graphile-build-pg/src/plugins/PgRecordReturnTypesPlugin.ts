@@ -1,13 +1,10 @@
-import {
-  Plugin,
-  GraphileObjectTypeConfig,
-  ScopeGraphQLObjectType,
-} from "graphile-build";
 import { PgType } from "./PgIntrospectionPlugin";
 
-declare module "graphile-build" {
-  interface ScopeGraphQLObjectType {
-    isRecordReturnType?: boolean;
+declare global {
+  namespace GraphileEngine {
+    interface ScopeGraphQLObjectType {
+      isRecordReturnType?: boolean;
+    }
   }
 }
 
@@ -34,7 +31,7 @@ export default (function PgRecordReturnTypesPlugin(builder) {
         throw new Error("Required Build properties were not present");
       }
 
-      introspectionResultsByKind.procedure.forEach(proc => {
+      introspectionResultsByKind.procedure.forEach((proc) => {
         // PERFORMANCE: These used to be .filter(...) calls
         if (!proc.namespace) return;
         if (omit(proc, "execute")) return;
@@ -88,7 +85,10 @@ export default (function PgRecordReturnTypesPlugin(builder) {
               firstArgType.class,
             )
           : inflection.functionQueryName(proc);
-        const recordReturnSpec: GraphileObjectTypeConfig<any, any> = {
+        const recordReturnSpec: GraphileEngine.GraphileObjectTypeConfig<
+          any,
+          any
+        > = {
           name: inflection.recordFunctionReturnType(proc),
           description: `The return type of our \`${procFieldName}\` ${
             isMutation ? "mutation" : "query"
@@ -109,7 +109,7 @@ export default (function PgRecordReturnTypesPlugin(builder) {
               );
               if (!fieldType) {
                 throw new Error(
-                  `Could not determing GraphQL type for record returning function '${proc.name}'`,
+                  `Could not determine GraphQL type for record returning function '${proc.name}'`,
                 );
               }
 
@@ -122,15 +122,15 @@ export default (function PgRecordReturnTypesPlugin(builder) {
               }
               memo[fieldName] = fieldWithHooks(
                 fieldName,
-                fieldContext => {
+                (fieldContext) => {
                   const { addDataGenerator } = fieldContext;
-                  addDataGenerator(parsedResolveInfoFragment => {
+                  addDataGenerator((parsedResolveInfoFragment) => {
                     const safeAlias = getSafeAliasFromAlias(
                       parsedResolveInfoFragment.alias,
                     );
 
                     return {
-                      pgQuery: queryBuilder => {
+                      pgQuery: (queryBuilder) => {
                         queryBuilder.select(
                           getSelectValueForFieldAndTypeAndModifier(
                             fieldType,
@@ -172,7 +172,7 @@ export default (function PgRecordReturnTypesPlugin(builder) {
             }, {});
           },
         };
-        const recordReturnScope: ScopeGraphQLObjectType = {
+        const recordReturnScope: GraphileEngine.ScopeGraphQLObjectType = {
           __origin: `Adding record return type for ${describePgEntity(
             proc,
           )}. You can rename the function's GraphQL field (and its dependent types) via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
@@ -200,4 +200,4 @@ export default (function PgRecordReturnTypesPlugin(builder) {
     },
     ["PgRecordReturnTypes"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

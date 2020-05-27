@@ -31,14 +31,26 @@
   "homepage": "https://github.com/graphile/graphile-engine/tree/master/packages/subscriptions-lds#readme",
   "dependencies": {
     "@graphile/lds": "4.7.0",
-    "@types/ws": "^6.0.1",
-    "ws": "^7.0.0"
+    "@types/ws": "^7.2.4",
+    "tslib": "^2.0.0",
+    "ws": "^7.3.0"
   },
   "peerDependencies": {
-    "postgraphile-core": ">4.3.1 <5"
+    "graphile-build": "4.7.0",
+    "graphile-build-pg": "4.7.0"
   },
   "devDependencies": {
-    "pg": ">=6.1.0 <9"
+    "@types/jest": "^25.2.3",
+    "@types/pg": "^7.14.3",
+    "graphile-build": "4.7.0",
+    "graphile-build-pg": "4.7.0",
+    "graphql": "^14.6.0",
+    "graphql-parse-resolve-info": "4.7.0",
+    "jest": "^26.0.1",
+    "pg": "^8.2.1",
+    "postgraphile-core": ">4.3.1 <5",
+    "ts-node": "^8.10.1",
+    "typescript": "^3.9.2"
   },
   "files": [
     "dist"

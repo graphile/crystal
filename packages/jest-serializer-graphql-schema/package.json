@@ -24,10 +24,16 @@
   },
   "homepage": "https://github.com/graphile/graphile-engine/tree/master/packages/jest-serializer-graphql-schema#readme",
   "peerDependencies": {
-    "graphql": "^14.0.2"
+    "graphql": "^14.6.0"
   },
   "devDependencies": {
-    "pretty-format": "^24.9.0"
+    "@types/jest": "^25.2.3",
+    "graphql": "^14.6.0",
+    "jest": "^26.0.1",
+    "pretty-format": "^26.0.1",
+    "ts-node": "^8.10.1",
+    "tslib": "^2.0.0",
+    "typescript": "^3.9.2"
   },
   "files": [
     "dist"

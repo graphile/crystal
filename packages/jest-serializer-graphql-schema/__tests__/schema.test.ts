@@ -1,6 +1,7 @@
 import { buildASTSchema, parse } from "graphql";
 
-const GraphQLSchemaSnapshotSerializer = require("../src");
+import * as GraphQLSchemaSnapshotSerializer from "../src";
+
 expect.addSnapshotSerializer(GraphQLSchemaSnapshotSerializer);
 
 /** schema from https://graphql-pokemon.now.sh" */

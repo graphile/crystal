@@ -1,9 +1,8 @@
-import { Plugin, Build } from "graphile-build";
 import { PgClass, PgProc, PgEntityKind, PgType } from "./PgIntrospectionPlugin";
 
 // This interface is not official yet, don't rely on it.
 export const getComputedColumnDetails = (
-  build: Build,
+  build: GraphileEngine.Build,
   table: PgClass,
   proc: PgProc,
 ) => {
@@ -26,7 +25,9 @@ export const getComputedColumnDetails = (
   if (
     argTypes
       .slice(1)
-      .some(type => type.type === "c" && type.class && type.class.isSelectable)
+      .some(
+        (type) => type.type === "c" && type.class && type.class.isSelectable,
+      )
   ) {
     // Accepts two input tables? Skip.
     return null;
@@ -132,4 +133,4 @@ export default (function PgComputedColumnsPlugin(
     },
     ["PgComputedColumns"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

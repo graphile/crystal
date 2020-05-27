@@ -212,7 +212,7 @@ program
   .option(
     "--extended-errors <string>",
     "a comma separated list of extended Postgres error fields to display in the GraphQL result. Recommended in development: 'hint,detail,errcode'. Default: none",
-    (option: string) => option.split(",").filter(_ => _),
+    (option: string) => option.split(",").filter((_) => _),
   );
 
 pluginHook("cli:flags:add:errorHandling", addFlag);
@@ -328,7 +328,7 @@ program
   .option(
     "-A, --jwt-verify-audience <string>",
     "a comma separated list of JWT audiences that will be accepted; defaults to 'postgraphile'. To disable audience verification, set to ''.",
-    (option: string) => option.split(",").filter(_ => _),
+    (option: string) => option.split(",").filter((_) => _),
   )
   .option(
     "--jwt-verify-clock-tolerance <number>",
@@ -449,7 +449,7 @@ process.on("SIGINT", () => {
 const configOptions = config["options"] || {};
 const overridesFromOptions = {};
 ["ignoreIndexes", "ignoreRbac", "setofFunctionsContainNulls"].forEach(
-  option => {
+  (option) => {
     if (option in configOptions) {
       overridesFromOptions[option] = configOptions[option];
     }
@@ -529,7 +529,7 @@ const {
   ...overridesFromOptions,
 } as typeof program;
 
-const showErrorStack = (val => {
+const showErrorStack = ((val) => {
   switch (val) {
     case "string":
     case true:
@@ -620,7 +620,7 @@ const loadPlugins = (rawNames: mixed) => {
   const names = Array.isArray(rawNames)
     ? rawNames
     : String(rawNames).split(",");
-  return names.map(rawName => {
+  return names.map((rawName) => {
     if (typeof rawName === "function") {
       return rawName;
     }
@@ -771,7 +771,7 @@ if (noServer) {
   // No need for a server, let's just spin up the schema builder
   (async (): Promise<void> => {
     const pgPool = new Pool(pgConfig);
-    pgPool.on("error", err => {
+    pgPool.on("error", (err) => {
       // tslint:disable-next-line no-console
       console.error("PostgreSQL client generated error: ", err.message);
     });
@@ -784,7 +784,7 @@ if (noServer) {
     if (!watchPg) {
       await pgPool.end();
     }
-  })().then(null, e => {
+  })().then(null, (e) => {
     console.error("Error occurred!");
     console.error(e);
     process.exit(1);
@@ -932,7 +932,7 @@ if (noServer) {
               safeConnectionString,
             )}${postgraphileOptions.watchPg ? " (watching)" : ""}`,
             `Postgres schema(s):  ${schemas
-              .map(schema => chalk.magenta(schema))
+              .map((schema) => chalk.magenta(schema))
               .join(", ")}`,
             `Documentation:       ${chalk.underline(
               `https://graphile.org/postgraphile/introduction/`,
@@ -952,7 +952,7 @@ if (noServer) {
             chalk,
           },
         ).filter(isString);
-        console.log(information.map(msg => `  ‣ ${msg}`).join("\n"));
+        console.log(information.map((msg) => `  ‣ ${msg}`).join("\n"));
 
         console.log("");
         console.log(chalk.gray("* * *"));

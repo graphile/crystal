@@ -30,7 +30,7 @@ let mutationResults = [];
 
 beforeAll(() => {
   // Get a GraphQL schema instance that we can query.
-  const gqlSchemaPromise = withPgClient(async pgClient => {
+  const gqlSchemaPromise = withPgClient(async (pgClient) => {
     // A selection of omit/rename comments on the d schema
     await pgClient.query(await dSchemaComments());
     const serverVersionNum = await getServerVersionNum(pgClient);
@@ -82,7 +82,7 @@ beforeAll(() => {
   //
   // All of our mutations get there own Postgres client instance. Queries share
   // a client instance.
-  mutationResults = mutationFileNames.map(async fileName => {
+  mutationResults = mutationFileNames.map(async (fileName) => {
     // Wait for the schema to resolve. We need the schema to be introspected
     // before we can do anything else!
     let {
@@ -95,7 +95,7 @@ beforeAll(() => {
       rbacSchema,
     } = await gqlSchemaPromise;
     // Get a new Postgres client and run the mutation.
-    return await withPgClient(async pgClient => {
+    return await withPgClient(async (pgClient) => {
       // Read the mutation from the file system.
       const mutation = await readFile(
         resolvePath(mutationsDir, fileName),
@@ -154,7 +154,19 @@ beforeAll(() => {
       );
       if (result.errors) {
         // eslint-disable-next-line no-console
-        console.log(result.errors.map(e => e.originalError));
+        console.log(
+          `GraphQL mutation '${fileName}' had an error:\n  ` +
+            result.errors
+              .map((e) => {
+                const error = e.originalError || e;
+                let message = error.message || String(e);
+                if (e.locations && e.locations[0]) {
+                  message = `[${e.locations[0].line}:${e.locations[0].column}]: ${message}`;
+                }
+                return message;
+              })
+              .join("\n  "),
+        );
       }
       return result;
     });

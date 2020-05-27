@@ -1,6 +1,4 @@
-import { Plugin } from "../SchemaBuilder";
-
-const AddQueriesToSubscriptionsPlugin: Plugin = function(
+const AddQueriesToSubscriptionsPlugin: GraphileEngine.Plugin = function (
   builder,
   { subscriptions, live },
 ) {

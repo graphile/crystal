@@ -11,9 +11,7 @@ let lastHash: string;
 const hash = (str: string): string => {
   if (str !== lastString) {
     lastString = str;
-    lastHash = createHash("sha1")
-      .update(str)
-      .digest("base64");
+    lastHash = createHash("sha1").update(str).digest("base64");
   }
   return lastHash;
 };
@@ -48,7 +46,7 @@ export default function pgPrepareAndRun(
               .then(() => {
                 delete connection[PARSED_STATEMENTS][key];
               })
-              .catch(e => {
+              .catch((e) => {
                 // eslint-disable-next-line no-console
                 console.error("Error releasing prepared query", e);
               });

@@ -121,7 +121,7 @@ const tests = [
 
 beforeAll(() => {
   // Get a few GraphQL schema instance that we can query.
-  const gqlSchemasPromise = withPgClient(async pgClient => {
+  const gqlSchemasPromise = withPgClient(async (pgClient) => {
     // Different fixtures need different schemas with different configurations.
     // Make all of the different schemas with different configurations that we
     // need and wait for them to be created in parallel.
@@ -148,7 +148,7 @@ beforeAll(() => {
     // before we can do anything else!
     const gqlSchemas = await gqlSchemasPromise;
     // Get a new Postgres client instance.
-    return await withPgClient(async pgClient => {
+    return await withPgClient(async (pgClient) => {
       // Add data to the client instance we are using.
       await pgClient.query(await kitchenSinkData());
       // Run all of our queries in parallel.
@@ -161,7 +161,7 @@ beforeAll(() => {
           });
           if (result.errors && result.errors.length) {
             // eslint-disable-next-line no-console
-            console.log(result.errors.map(e => e.originalError || e));
+            console.log(result.errors.map((e) => e.originalError || e));
           }
           return result;
         }),
@@ -176,7 +176,7 @@ beforeAll(() => {
 });
 
 for (let i = 0; i < tests.length; i++) {
-  const { name, process = _ => _ } = tests[i];
+  const { name, process = (_) => _ } = tests[i];
   test(name, async () => {
     expect(process(await queryResults[i])).toMatchSnapshot();
   });

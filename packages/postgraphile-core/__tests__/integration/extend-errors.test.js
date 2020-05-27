@@ -8,7 +8,7 @@ function check(description, sql) {
     let error;
     // eslint-disable-next-line no-unused-vars
     let schema;
-    await withPgClient(async pgClient => {
+    await withPgClient(async (pgClient) => {
       await pgClient.query(sql);
       try {
         schema = await createPostGraphileSchema(pgClient, ["a", "b", "c"], {

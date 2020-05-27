@@ -1,19 +1,20 @@
-import { Plugin } from "graphile-build";
 import debugFactory from "debug";
 import { SQL } from "../QueryBuilder";
 
 const debug = debugFactory("graphile-build-pg");
 
-declare module "graphile-build" {
-  interface ScopeGraphQLObjectType {
-    isPgCreatePayloadType?: boolean;
-  }
-  interface ScopeGraphQLObjectTypeFieldsField {
-    isPgCreateMutationField?: boolean;
-    isPgCreatePayloadResultField?: boolean;
-  }
-  interface ScopeGraphQLInputObjectType {
-    isPgCreateInputType?: boolean;
+declare global {
+  namespace GraphileEngine {
+    interface ScopeGraphQLObjectType {
+      isPgCreatePayloadType?: boolean;
+    }
+    interface ScopeGraphQLObjectTypeFieldsField {
+      isPgCreateMutationField?: boolean;
+      isPgCreatePayloadResultField?: boolean;
+    }
+    interface ScopeGraphQLInputObjectType {
+      isPgCreateInputType?: boolean;
+    }
   }
 }
 
@@ -185,10 +186,10 @@ export default (function PgMutationCreatePlugin(
             {
               [fieldName]: fieldWithHooks(
                 fieldName,
-                context => {
+                (context) => {
                   const { getDataFromParsedResolveInfoFragment } = context;
                   const relevantAttributes = table.attributes.filter(
-                    attr =>
+                    (attr) =>
                       pgColumnFilter(attr, build, context) &&
                       !omit(attr, "create"),
                   );
@@ -230,7 +231,7 @@ export default (function PgMutationCreatePlugin(
                       const sqlColumns: SQL[] = [];
                       const sqlValues: SQL[] = [];
                       const inputData = input[inflection.tableFieldName(table)];
-                      relevantAttributes.forEach(attr => {
+                      relevantAttributes.forEach((attr) => {
                         const fieldName = inflection.column(attr);
                         const val = inputData[fieldName];
                         if (
@@ -311,4 +312,4 @@ insert into ${sql.identifier(table.namespace.name, table.name)} ${
     [],
     ["PgTables"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

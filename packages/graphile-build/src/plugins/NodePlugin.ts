@@ -1,10 +1,3 @@
-import {
-  Plugin,
-  ResolvedLookAhead,
-  Hook,
-  ContextGraphQLObjectTypeInterfaces,
-  GraphileResolverContext,
-} from "../SchemaBuilder";
 import { ResolveTree } from "graphql-parse-resolve-info";
 
 const base64 = (str: string) => Buffer.from(String(str)).toString("base64");
@@ -14,10 +7,10 @@ const base64Decode = (str: string) =>
 export type NodeFetcher<T = any> = (
   data: unknown,
   identifiers: Array<unknown>,
-  context: GraphileResolverContext,
+  context: GraphileEngine.GraphileResolverContext,
   parsedResolveInfoFragment: ResolveTree,
   type: import("graphql").GraphQLType,
-  resolveData: ResolvedLookAhead,
+  resolveData: GraphileEngine.ResolvedLookAhead,
   resolveInfo: import("graphql").GraphQLResolveInfo,
 ) => T;
 
@@ -30,7 +23,7 @@ export default (function NodePlugin(
     : "id";
   builder.hook(
     "build",
-    build => {
+    (build) => {
       const nodeFetcherByTypeName = {};
       const nodeAliasByTypeName = {};
       const nodeTypeNameByAlias = {};
@@ -115,7 +108,7 @@ export default (function NodePlugin(
         {
           name: inflection.builtin("Node"),
           description: "An object with a globally unique `ID`.",
-          resolveType: value => {
+          resolveType: (value) => {
             if (value === $$isQuery) {
               if (!Query) {
                 const type = getTypeByName(inflection.builtin("Query"));
@@ -174,9 +167,9 @@ export default (function NodePlugin(
       } else {
         return interfaces;
       }
-    } as Hook<
+    } as GraphileEngine.Hook<
       Array<import("graphql").GraphQLInterfaceTypeConfig<any, any>>,
-      ContextGraphQLObjectTypeInterfaces
+      GraphileEngine.ContextGraphQLObjectTypeInterfaces
     >,
     ["Node"],
   );
@@ -256,4 +249,4 @@ export default (function NodePlugin(
     },
     ["Node"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

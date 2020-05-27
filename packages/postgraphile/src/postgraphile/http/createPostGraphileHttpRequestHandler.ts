@@ -51,11 +51,10 @@ import favicon from "../../assets/favicon.ico";
  */
 import baseGraphiqlHtml from "../../assets/graphiql.html";
 import { enhanceHttpServerWithSubscriptions } from "./subscriptions";
-import { GraphileResolverContext } from "postgraphile-core";
 
 /**
  * When writing JSON to the browser, we need to be careful that it doesn't get
- * interpretted as HTML.
+ * interpreted as HTML.
  */
 const JS_ESCAPE_LOOKUP = {
   "<": "\\u003c",
@@ -67,7 +66,7 @@ const JS_ESCAPE_LOOKUP = {
 function safeJSONStringify(obj: {}) {
   return JSON.stringify(obj).replace(
     /[<>/\u2028\u2029]/g,
-    chr => JS_ESCAPE_LOOKUP[chr],
+    (chr) => JS_ESCAPE_LOOKUP[chr],
   );
 }
 
@@ -83,9 +82,7 @@ let lastHash: string;
 const calculateQueryHash = (queryString: string): string => {
   if (queryString !== lastString) {
     lastString = queryString;
-    lastHash = createHash("sha1")
-      .update(queryString)
-      .digest("base64");
+    lastHash = createHash("sha1").update(queryString).digest("base64");
   }
   return lastHash;
 };
@@ -94,14 +91,12 @@ const calculateQueryHash = (queryString: string): string => {
 // faster than `Object.keys(value).length === 0`.
 // NOTE: we don't need a `hasOwnProperty` call here because isEmpty is called
 // with an `Object.create(null)` object, so it has no no-own properties.
-/* tslint:disable forin */
 export function isEmpty(value: any): boolean {
   for (const _key in value) {
     return false;
   }
   return true;
 }
-/* tslint:enable forin */
 
 const isPostGraphileDevelopmentMode =
   process.env.POSTGRAPHILE_ENV === "development";
@@ -126,7 +121,9 @@ function withPostGraphileContextFromReqResGenerator(
     req: IncomingMessage,
     res: ServerResponse,
     moreOptions: any,
-    fn: (ctx: GraphileResolverContext) => Promise<TResult> | TResult,
+    fn: (
+      ctx: GraphileEngine.GraphileResolverContext,
+    ) => Promise<TResult> | TResult,
   ): Promise<TResult> => {
     const jwtToken = jwtSecret ? getJwtToken(req) : null;
     const additionalContext =
@@ -149,7 +146,7 @@ function withPostGraphileContextFromReqResGenerator(
         explain: allowExplain && req.headers["x-postgraphile-explain"] === "on",
         ...moreOptions,
       },
-      context => {
+      (context) => {
         const graphqlContext = additionalContext
           ? { ...additionalContext, ...context }
           : context;
@@ -221,7 +218,7 @@ export default function createPostGraphileHttpRequestHandler(
     pgSettings &&
     typeof pgSettings === "object" &&
     Object.keys(pgSettings)
-      .map(s => s.toLowerCase())
+      .map((s) => s.toLowerCase())
       .includes("role")
   ) {
     throw new Error(
@@ -297,7 +294,7 @@ export default function createPostGraphileHttpRequestHandler(
     }),
   ];
 
-  // We'll turn this into one function now so it can be better JIT optimised
+  // We'll turn this into one function now so it can be better JIT optimized
   const bodyParserMiddlewaresComposed = bodyParserMiddlewares.reduce(
     (
       parent: (
@@ -316,7 +313,7 @@ export default function createPostGraphileHttpRequestHandler(
       next: (err?: Error) => void,
     ) => void) => {
       return (req, res, next) => {
-        parent(req, res, error => {
+        parent(req, res, (error) => {
           if (error) {
             return next(error);
           }
@@ -437,7 +434,7 @@ export default function createPostGraphileHttpRequestHandler(
         originalPathname !== pathname &&
         originalPathname.endsWith(pathname)
       ) {
-        // We were mounted on a subpath (e.g. `app.use('/path/to', postgraphile(...))`).
+        // We were mounted on a sub-path (e.g. `app.use('/path/to', postgraphile(...))`).
         // Figure out our externalUrlBase for ourselves.
         externalUrlBase = originalPathname.substr(
           0,
@@ -487,7 +484,7 @@ export default function createPostGraphileHttpRequestHandler(
   let theOneAndOnlyGraphQLSchema: GraphQLSchema | null = null;
   if (!watchPg) {
     getGqlSchema()
-      .then(schema => {
+      .then((schema) => {
         theOneAndOnlyGraphQLSchema = schema;
       })
       .catch(noop);
@@ -821,9 +818,7 @@ export default function createPostGraphileHttpRequestHandler(
               if (debugGraphql.enabled)
                 debugGraphql(
                   "%s",
-                  printGraphql(queryDocumentAst)
-                    .replace(/\s+/g, " ")
-                    .trim(),
+                  printGraphql(queryDocumentAst).replace(/\s+/g, " ").trim(),
                 );
 
               result = await withPostGraphileContextFromReqRes(
@@ -835,7 +830,7 @@ export default function createPostGraphileHttpRequestHandler(
                   variables,
                   operationName,
                 },
-                (graphqlContext: GraphileResolverContext) => {
+                (graphqlContext: GraphileEngine.GraphileResolverContext) => {
                   pgRole = graphqlContext.pgRole;
                   const graphqlResult = executeGraphql(
                     gqlSchema,
@@ -847,7 +842,7 @@ export default function createPostGraphileHttpRequestHandler(
                   );
                   const { getExplainResults } = graphqlContext;
                   if (typeof getExplainResults === "function") {
-                    return Promise.resolve(graphqlResult).then(async obj => ({
+                    return Promise.resolve(graphqlResult).then(async (obj) => ({
                       ...obj,
                       // Add our explain data
                       explain: await getExplainResults(),
@@ -1005,7 +1000,7 @@ export default function createPostGraphileHttpRequestHandler(
       const res = b as ServerResponse;
       const next = c || finalHandler(req, res);
 
-      // Execute our request handler. If the request errored out, call `next` with the error.
+      // Execute our request handler. If the request triggered an error, call `next` with the error.
       requestHandler(req, res, next).catch(next);
     }
   };

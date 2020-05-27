@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 const fs = require("fs");
-const { execSync } = require("child_process");
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const HtmlWebpackInlineSourcePlugin = require("html-webpack-inline-source-plugin");
+const PnpWebpackPlugin = require("pnp-webpack-plugin");
 
 const ASSETS_SOURCE_DIR = `${__dirname}/../assets/`;
 const ASSETS_DEST_DIR = `${__dirname}/../src/assets/`;
@@ -47,6 +47,15 @@ async function main() {
     // Webpack up everything
     webpack(
       {
+        /* yarn pnp; remove when we've upgraded to Webpack 5 */
+        resolve: {
+          plugins: [PnpWebpackPlugin],
+        },
+        resolveLoader: {
+          plugins: [PnpWebpackPlugin.moduleLoader(module)],
+        },
+        /* end: yarn pnp */
+
         mode: "production",
         target: "web",
         entry: `${__dirname}/../../postgraphiql/src/index.js`,
@@ -67,19 +76,25 @@ async function main() {
               test: /\.jsx?$/,
               exclude: /node_modules/,
               use: {
-                loader: "babel-loader",
+                loader: require.resolve("babel-loader"),
                 options: {
-                  presets: ["@babel/preset-env", "@babel/preset-react"],
+                  presets: [
+                    require.resolve("@babel/preset-env"),
+                    require.resolve("@babel/preset-react"),
+                  ],
                   plugins: [
-                    "@babel/plugin-proposal-class-properties",
-                    "@babel/plugin-transform-runtime",
+                    require.resolve("@babel/plugin-proposal-class-properties"),
+                    require.resolve("@babel/plugin-transform-runtime"),
                   ],
                 },
               },
             },
             {
               test: /\.css$/,
-              use: [{ loader: "style-loader" }, { loader: "css-loader" }],
+              use: [
+                { loader: require.resolve("style-loader") },
+                { loader: require.resolve("css-loader") },
+              ],
             },
           ],
         },
@@ -102,16 +117,19 @@ async function main() {
             inlineSource: ".(js|css)$", // embed all javascript and css inline
             inject: "body",
           }),
-          new HtmlWebpackInlineSourcePlugin(),
+          new HtmlWebpackInlineSourcePlugin(HtmlWebpackPlugin),
         ],
       },
       (err, stats) => {
         if (err) {
           console.error(err);
+          reject(err);
           process.exit(1);
         }
         if (stats.hasErrors()) {
-          console.log(stats.toString("minimal"));
+          const message = stats.toString("minimal");
+          console.log(message);
+          reject(new Error(message));
           process.exit(2);
         }
         // We only want the HTML file
@@ -122,14 +140,14 @@ async function main() {
     );
   });
 
-  const shouldBeBinary = filename => !filename.match(/\.html$/);
+  const shouldBeBinary = (filename) => !filename.match(/\.html$/);
 
   console.log("... Compiling the assets");
   // Step 2: compile the assets
   const files = fs.readdirSync(ASSETS_SOURCE_DIR);
   files
-    .filter(f => f[0] !== ".")
-    .map(filename => {
+    .filter((f) => f[0] !== ".")
+    .map((filename) => {
       const fileContent = fs.readFileSync(`${ASSETS_SOURCE_DIR}/${filename}`);
       let output;
       if (shouldBeBinary(filename)) {
@@ -148,7 +166,7 @@ async function main() {
 
 main().then(
   () => {},
-  err => {
+  (err) => {
     console.error("An error occurred");
     console.error(err);
     process.exit(3);

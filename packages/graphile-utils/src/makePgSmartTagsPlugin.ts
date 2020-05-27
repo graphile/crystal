@@ -1,4 +1,3 @@
-import { Plugin } from "graphile-build";
 import {
   PgEntityKind,
   PgEntity,
@@ -109,13 +108,13 @@ export type SubscribeToPgSmartTagUpdatesCallback = (
 export function makePgSmartTagsPlugin(
   ruleOrRules: PgSmartTagRule | PgSmartTagRule[] | null,
   subscribeToUpdatesCallback?: SubscribeToPgSmartTagUpdatesCallback | null,
-): Plugin {
+): GraphileEngine.Plugin {
   let [rules, rawRules] = rulesFrom(ruleOrRules);
-  const plugin: Plugin = (builder, _options) => {
+  const plugin: GraphileEngine.Plugin = (builder, _options) => {
     if (subscribeToUpdatesCallback) {
       builder.registerWatcher(
-        async triggerRebuild => {
-          await subscribeToUpdatesCallback(newRuleOrRules => {
+        async (triggerRebuild) => {
+          await subscribeToUpdatesCallback((newRuleOrRules) => {
             [rules, rawRules] = rulesFrom(newRuleOrRules);
             triggerRebuild();
           });
@@ -128,10 +127,12 @@ export function makePgSmartTagsPlugin(
 
     builder.hook(
       "build",
-      build => {
+      (build) => {
         const oldPgAugmentIntrospectionResults =
           build.pgAugmentIntrospectionResults;
-        const newPgAugmentIntrospectionResults: PgAugmentIntrospectionResultsFn = inIntrospectionResult => {
+        const newPgAugmentIntrospectionResults: PgAugmentIntrospectionResultsFn = (
+          inIntrospectionResult,
+        ) => {
           let pgIntrospectionResultsByKind = inIntrospectionResult;
           if (oldPgAugmentIntrospectionResults) {
             pgIntrospectionResultsByKind = oldPgAugmentIntrospectionResults(
@@ -154,7 +155,7 @@ export function makePgSmartTagsPlugin(
               pgIntrospectionResultsByKind[rule.kind];
 
             let hits = 0;
-            relevantIntrospectionResults.forEach(entity => {
+            relevantIntrospectionResults.forEach((entity) => {
               if (!rule.match(entity, buildWithIntrospection)) {
                 return;
               }
@@ -393,17 +394,17 @@ export type SubscribeToJSONPgSmartTagsUpdatesCallback = (
 export function makeJSONPgSmartTagsPlugin(
   json: JSONPgSmartTags | null,
   subscribeToJSONUpdatesCallback?: SubscribeToJSONPgSmartTagsUpdatesCallback | null,
-): Plugin {
+): GraphileEngine.Plugin {
   // Get rules from JSON
   let rules = pgSmartTagRulesFromJSON(json);
 
   // Wrap listener callback with JSON conversion
   const subscribeToUpdatesCallback: SubscribeToPgSmartTagUpdatesCallback | null = subscribeToJSONUpdatesCallback
-    ? cb => {
+    ? (cb) => {
         if (!cb) {
           return subscribeToJSONUpdatesCallback(cb);
         } else {
-          return subscribeToJSONUpdatesCallback(json => {
+          return subscribeToJSONUpdatesCallback((json) => {
             try {
               rules = pgSmartTagRulesFromJSON(json);
               return cb(rules);

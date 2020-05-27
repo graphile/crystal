@@ -1,15 +1,16 @@
-import { Plugin } from "graphile-build";
 import isString from "lodash/isString";
 import { SQL } from "../QueryBuilder";
 import { OrderByValue, OrderBySpec } from "./PgConnectionArgOrderBy";
 import { PgEntityKind } from "./PgIntrospectionPlugin";
 
-declare module "graphile-build" {
-  interface GraphileBuildOptions {
-    disableIssue397Fix?: boolean;
-  }
-  interface ScopeGraphQLObjectTypeFieldsField {
-    isPgMutationPayloadEdgeField?: boolean;
+declare global {
+  namespace GraphileEngine {
+    interface GraphileBuildOptions {
+      disableIssue397Fix?: boolean;
+    }
+    interface ScopeGraphQLObjectTypeFieldsField {
+      isPgMutationPayloadEdgeField?: boolean;
+    }
   }
 }
 
@@ -99,7 +100,9 @@ export default (function PgMutationPayloadEdgePlugin(
       const defaultValueEnum =
         canOrderBy &&
         TableOrderByType instanceof GraphQLEnumType &&
-        (TableOrderByType.getValues().find(v => v.name === "PRIMARY_KEY_ASC") ||
+        (TableOrderByType.getValues().find(
+          (v) => v.name === "PRIMARY_KEY_ASC",
+        ) ||
           TableOrderByType.getValues()[0]);
       return extend(
         fields,
@@ -142,8 +145,8 @@ export default (function PgMutationPayloadEdgePlugin(
                       : [rawOrderBy]
                     : null;
                 const order =
-                  orderBy && orderBy.some(item => item.alias)
-                    ? orderBy.filter(item => item.alias)
+                  orderBy && orderBy.some((item) => item.alias)
+                    ? orderBy.filter((item) => item.alias)
                     : null;
 
                 if (!order) {
@@ -160,7 +163,9 @@ export default (function PgMutationPayloadEdgePlugin(
                 return {
                   ...edge,
                   __cursor:
-                    edge[`__order_${order.map(item => item.alias).join("__")}`],
+                    edge[
+                      `__order_${order.map((item) => item.alias).join("__")}`
+                    ],
                 };
               },
             },
@@ -186,7 +191,7 @@ export default (function PgMutationPayloadEdgePlugin(
                   const aliases: string[] = [];
                   const expressions: SQL[] = [];
                   let unique = false;
-                  orderBy.forEach(item => {
+                  orderBy.forEach((item) => {
                     const { alias, specs, unique: itemIsUnique } = item;
                     unique = unique || itemIsUnique || false;
                     const orders: OrderBySpec[] = isOrderBySpecArray(specs)
@@ -208,7 +213,7 @@ export default (function PgMutationPayloadEdgePlugin(
                   });
                   if (!unique && primaryKeys) {
                     // Add PKs
-                    primaryKeys.forEach(key => {
+                    primaryKeys.forEach((key) => {
                       expressions.push(
                         sql`${queryBuilder.getTableAlias()}.${sql.identifier(
                           key.name,
@@ -219,7 +224,7 @@ export default (function PgMutationPayloadEdgePlugin(
                   if (aliases.length) {
                     queryBuilder.select(
                       sql`json_build_array(${sql.join(
-                        aliases.map(a => sql`${sql.literal(a)}::text`),
+                        aliases.map((a) => sql`${sql.literal(a)}::text`),
                         ", ",
                       )}, json_build_array(${sql.join(expressions, ", ")}))`,
                       "__order_" + aliases.join("__"),
@@ -238,4 +243,4 @@ export default (function PgMutationPayloadEdgePlugin(
     },
     ["PgMutationPayloadEdge"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

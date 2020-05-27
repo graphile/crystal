@@ -4,6 +4,10 @@ import { $$pgClient } from "../../postgres/inventory/pgClientFromContext";
 import withPostGraphileContext from "../withPostGraphileContext";
 import { readFileSync, readFile } from "fs";
 
+beforeEach(() => {
+  jest.restoreAllMocks();
+});
+
 const jwt = require("jsonwebtoken");
 
 /**
@@ -15,7 +19,7 @@ function expectHttpError(promise, statusCode, message) {
     () => {
       throw new Error("Expected a Http error.");
     },
-    error => {
+    (error) => {
       expect(error.statusCode).toBe(statusCode);
       expect(error.message).toBe(message);
     },
@@ -32,7 +36,7 @@ test("will be a noop for no token, secret, or default role", async () => {
 test("will pass in a context object with the client", async () => {
   const pgClient = { query: jest.fn(), release: jest.fn() };
   const pgPool = { connect: jest.fn(() => pgClient) };
-  await withPostGraphileContext({ pgPool }, client => {
+  await withPostGraphileContext({ pgPool }, (client) => {
     expect(client[$$pgClient]).toBe(pgClient);
   });
 });
@@ -42,7 +46,7 @@ test("will record queries run inside the transaction", async () => {
   const query2 = Symbol();
   const pgClient = { query: jest.fn(), release: jest.fn() };
   const pgPool = { connect: jest.fn(() => pgClient) };
-  await withPostGraphileContext({ pgPool }, client => {
+  await withPostGraphileContext({ pgPool }, (client) => {
     client[$$pgClient].query(query1);
     client[$$pgClient].query(query2);
   });
@@ -73,6 +77,7 @@ test("will return the asynchronous value from the callback", async () => {
 test("will throw an error if there was a `jwtToken`, but no `jwtSecret`", async () => {
   const pgClient = { query: jest.fn(), release: jest.fn() };
   const pgPool = { connect: jest.fn(() => pgClient) };
+  const spy = jest.spyOn(console, "error").mockImplementation(() => {});
   await expectHttpError(
     withPostGraphileContext({ pgPool, jwtToken: "asd" }, () => {}),
     403,
@@ -80,11 +85,20 @@ test("will throw an error if there was a `jwtToken`, but no `jwtSecret`", async 
   );
   // Never set up the transaction due to error
   expect(pgClient.query.mock.calls).toEqual([]);
+  expect(spy.mock.calls).toMatchInlineSnapshot(`
+    Array [
+      Array [
+        "ERROR: 'jwtSecret' was not set to a string or buffer - rejecting JWT-authenticated request.",
+      ],
+    ]
+  `);
 });
 
 test("will throw an error if there was a `jwtToken`, but `jwtSecret` had unsupported format", async () => {
   const pgClient = { query: jest.fn(), release: jest.fn() };
   const pgPool = { connect: jest.fn(() => pgClient) };
+  const spy = jest.spyOn(console, "error").mockImplementation(() => {});
+
   await expectHttpError(
     withPostGraphileContext(
       { pgPool, jwtToken: "asd", jwtSecret: true },
@@ -95,6 +109,13 @@ test("will throw an error if there was a `jwtToken`, but `jwtSecret` had unsuppo
   );
   // Never set up the transaction due to error
   expect(pgClient.query.mock.calls).toEqual([]);
+  expect(spy.mock.calls).toMatchInlineSnapshot(`
+    Array [
+      Array [
+        "ERROR: 'jwtSecret' was not set to a string or buffer - rejecting JWT-authenticated request.",
+      ],
+    ]
+  `);
 });
 
 test("will throw an error for a malformed `jwtToken`", async () => {
@@ -272,7 +293,7 @@ test("will include JWT claims as jwtClaims in context callback", async () => {
       }),
       jwtSecret: "secret",
     },
-    context => context,
+    (context) => context,
   );
   expect(jwtClaims).toEqual({ aud: "postgraphile", a: 1, b: 2, c: 3 });
 });
@@ -284,7 +305,7 @@ test("jwtClaims should be null if there is no JWT token", async () => {
     {
       pgPool,
     },
-    context => context,
+    (context) => context,
   );
   expect(jwtClaims).toBeNull();
 });

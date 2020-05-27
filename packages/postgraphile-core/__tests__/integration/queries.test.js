@@ -32,7 +32,7 @@ const dSchemaComments = () =>
 
 beforeAll(() => {
   // Get a few GraphQL schema instance that we can query.
-  const gqlSchemasPromise = withPgClient(async pgClient => {
+  const gqlSchemasPromise = withPgClient(async (pgClient) => {
     const serverVersionNum = await getServerVersionNum(pgClient);
     // A selection of omit/rename comments on the d schema
     await pgClient.query(await dSchemaComments());
@@ -83,7 +83,7 @@ beforeAll(() => {
       }),
       createPostGraphileSchema(pgClient, ["a", "b", "c"], {
         subscriptions: true,
-        pgColumnFilter: attr => attr.name !== "headline",
+        pgColumnFilter: (attr) => attr.name !== "headline",
         setofFunctionsContainNulls: false,
       }),
       createPostGraphileSchema(pgClient, ["a", "b", "c"], {
@@ -123,11 +123,17 @@ beforeAll(() => {
     ]);
     // Now for RBAC-enabled tests
     await pgClient.query("set role postgraphile_test_authenticator");
+
+    const spy = jest.spyOn(console, "warn").mockImplementation(() => {});
     const [rbac] = await Promise.all([
       createPostGraphileSchema(pgClient, ["a", "b", "c"], {
         ignoreRBAC: false,
       }),
     ]);
+    // Expect rbac schema to output Recoverable error about post_with_suffix
+    expect(spy.mock.calls).toHaveLength(1);
+    spy.mockRestore();
+
     debug(printSchema(normal));
     return {
       normal,
@@ -156,7 +162,7 @@ beforeAll(() => {
     // before we can do anything else!
     const gqlSchemas = await gqlSchemasPromise;
     // Get a new Postgres client instance.
-    return await withPgClient(async pgClient => {
+    return await withPgClient(async (pgClient) => {
       // Add data to the client instance we are using.
       await pgClient.query(await kitchenSinkData());
       const serverVersionNum = await getServerVersionNum(pgClient);
@@ -170,7 +176,7 @@ beforeAll(() => {
           results.push(Promise.resolve());
           continue;
         }
-        const process = async fileName => {
+        const process = async (fileName) => {
           if (fileName.startsWith("pg10.")) {
             if (serverVersionNum < 100000) {
               console.log("Skipping test as PG version is less than 10");
@@ -235,7 +241,19 @@ beforeAll(() => {
             });
             if (result.errors) {
               // eslint-disable-next-line no-console
-              console.log(result.errors.map(e => e.originalError || e));
+              console.log(
+                `GraphQL query '${fileName}' had an error:\n  ` +
+                  result.errors
+                    .map((e) => {
+                      const error = e.originalError || e;
+                      let message = error.message || String(e);
+                      if (e.locations && e.locations[0]) {
+                        message = `[${e.locations[0].line}:${e.locations[0].column}]: ${message}`;
+                      }
+                      return message;
+                    })
+                    .join("\n  "),
+              );
             }
             return result;
           } finally {

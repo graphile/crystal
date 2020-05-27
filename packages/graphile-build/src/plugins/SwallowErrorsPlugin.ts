@@ -1,12 +1,10 @@
-import { Plugin, Build } from "../SchemaBuilder";
-
 export default (function SwallowErrorsPlugin(
   builder,
   { dontSwallowErrors = false },
 ) {
   builder.hook(
     "build",
-    (build: Build): Build => {
+    (build: GraphileEngine.Build): GraphileEngine.Build => {
       if (dontSwallowErrors) {
         // This plugin is a bit of a misnomer - to better maintain backwards
         // compatibility, `swallowError` still exists on `makeNewBuild`; and
@@ -23,4 +21,4 @@ export default (function SwallowErrorsPlugin(
     },
     ["SwallowErrors"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

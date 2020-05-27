@@ -4,7 +4,7 @@ const { createPostGraphileSchema } = require("../../..");
 const PluginThatWouldNotHaveLoadedAnyway = () => {};
 
 test("throws error when skipPlugins is passed a plugin that would not have loaded", () =>
-  withPgClient(async client => {
+  withPgClient(async (client) => {
     let err;
     try {
       await createPostGraphileSchema(client, "a", {

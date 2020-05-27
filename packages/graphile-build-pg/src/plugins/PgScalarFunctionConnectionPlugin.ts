@@ -1,9 +1,3 @@
-import {
-  Plugin,
-  GraphileObjectTypeConfig,
-  ScopeGraphQLObjectType,
-} from "graphile-build";
-
 const base64 = (str: string) => Buffer.from(String(str)).toString("base64");
 
 export default (function PgScalarFunctionConnectionPlugin(builder) {
@@ -33,7 +27,7 @@ export default (function PgScalarFunctionConnectionPlugin(builder) {
       } = build;
 
       const Cursor = getTypeByName("Cursor");
-      introspectionResultsByKind.procedure.forEach(proc => {
+      introspectionResultsByKind.procedure.forEach((proc) => {
         // PERFORMANCE: These used to be .filter(...) calls
         if (!proc.returnsSet) return;
         if (!proc.namespace) return;
@@ -68,7 +62,7 @@ export default (function PgScalarFunctionConnectionPlugin(builder) {
           );
         }
 
-        const edgeSpec: GraphileObjectTypeConfig<any, any> = {
+        const edgeSpec: GraphileEngine.GraphileObjectTypeConfig<any, any> = {
           name: inflection.scalarFunctionEdge(proc),
           description: `A \`${
             getNamedType(NodeType).name
@@ -109,7 +103,7 @@ export default (function PgScalarFunctionConnectionPlugin(builder) {
             };
           },
         };
-        const edgeScope: ScopeGraphQLObjectType = {
+        const edgeScope: GraphileEngine.ScopeGraphQLObjectType = {
           __origin: `Adding function result edge type for ${describePgEntity(
             proc,
           )}. You can rename the function's GraphQL field (and its dependent types) via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
@@ -207,4 +201,4 @@ export default (function PgScalarFunctionConnectionPlugin(builder) {
     [],
     ["PgTypes"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

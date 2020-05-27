@@ -4,12 +4,17 @@
   "version": "1.0.0",
   "homepage": "https://graphile.org/postgraphile/",
   "dependencies": {
-    "graphiql": "^0.17.0",
-    "graphiql-explorer": "^0.4.5",
-    "graphql": "^14.5.8",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0",
-    "react-scripts": "^3.0.0"
+    "@babel/runtime": "^7.9.6",
+    "@types/ws": "^7.2.4",
+    "graphiql": "^0.17.5",
+    "graphiql-explorer": "^0.6.2",
+    "graphql": "^14.0.0",
+    "prop-types": "^15.7.2",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-scripts": "^3.4.1",
+    "subscriptions-transport-ws": "^0.9.16",
+    "ws": "^7.3.0"
   },
   "browserslist": [
     ">0.2%",
@@ -17,5 +22,20 @@
     "not ie <= 11",
     "not op_mini all"
   ],
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/jest": "^25.2.3",
+    "@typescript-eslint/eslint-plugin": "^2.34.0",
+    "@typescript-eslint/parser": "^2.34.0",
+    "babel-eslint": "^10.0.0",
+    "eslint": "^6.8.0",
+    "eslint-config-react-app": "^5.2.1",
+    "eslint-plugin-flowtype": "^4.0.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.20.0",
+    "eslint-plugin-react-hooks": "^2.0.0",
+    "jest": "^26.0.1",
+    "ts-node": "^8.10.1",
+    "typescript": "^3.9.2"
+  }
 }

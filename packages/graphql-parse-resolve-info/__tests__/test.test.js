@@ -64,9 +64,9 @@ const query = `
 
 const Cursor = new GraphQLScalarType({
   name: "Cursor",
-  serialize: value => String(value),
-  parseValue: value => String(value),
-  parseLiteral: ast => {
+  serialize: (value) => String(value),
+  parseValue: (value) => String(value),
+  parseLiteral: (ast) => {
     if (ast.kind !== Kind.STRING) {
       throw new Error("Can only parse string values");
     }
@@ -220,10 +220,10 @@ test("basic", async () => {
         query,
         null,
         {
-          test: _o => (o = _o),
+          test: (_o) => (o = _o),
         },
         variables,
-      ).then(d => {
+      ).then((d) => {
         try {
           const { errors } = d;
           expect(errors).toBeFalsy();
@@ -255,10 +255,10 @@ test("directives", async () => {
         query,
         null,
         {
-          test: _o => (o = _o),
+          test: (_o) => (o = _o),
         },
         variables,
-      ).then(d => {
+      ).then((d) => {
         try {
           const { errors } = d;
           expect(errors).toBeFalsy();

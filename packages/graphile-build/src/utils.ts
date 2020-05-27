@@ -3,7 +3,7 @@ import camelCaseAll from "lodash/camelCase";
 import plz from "pluralize";
 
 const bindAll = (obj: {}, keys: Array<string>) => {
-  keys.forEach(key => {
+  keys.forEach((key) => {
     // The Object.assign is to copy across any function properties
     obj[key] = Object.assign(obj[key].bind(obj), obj[key]);
   });

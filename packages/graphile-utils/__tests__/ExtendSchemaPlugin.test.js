@@ -27,7 +27,7 @@ function TestUtils_ExtractScopePlugin(
       ? fieldNameOrCallback
       : possiblyCallback;
   const fieldName = possiblyCallback && fieldNameOrCallback;
-  return builder => {
+  return (builder) => {
     builder.hook(hook, (_, build, context) => {
       const { Self } = context;
       const currentObjectTypeName = (Self && Self.name) || _.name;
@@ -78,7 +78,7 @@ const resolvers = {
         if (frequency == null) {
           throw new Error("No frequency specified");
         }
-        return new Promise(resolve =>
+        return new Promise((resolve) =>
           setTimeout(() => resolve(Date.now()), frequency),
         );
       },
@@ -109,7 +109,7 @@ const resolvers = {
           if (valueQueue.length) {
             return Promise.resolve(valueQueue.shift());
           } else {
-            return new Promise(resolve => {
+            return new Promise((resolve) => {
               callbackQueue.push(resolve);
             });
           }
@@ -145,7 +145,7 @@ const resolvers = {
 it("allows adding a simple type", async () => {
   const schema = await buildSchema([
     ...simplePlugins,
-    makeExtendSchemaPlugin(_build => ({
+    makeExtendSchemaPlugin((_build) => ({
       typeDefs: gql`
         extend type Query {
           """
@@ -172,7 +172,7 @@ it("allows adding a simple type", async () => {
 it("allows adding a non-null type", async () => {
   const schema = await buildSchema([
     ...simplePlugins,
-    makeExtendSchemaPlugin(_build => ({
+    makeExtendSchemaPlugin((_build) => ({
       typeDefs: gql`
         extend type Query {
           """
@@ -199,7 +199,7 @@ it("allows adding a non-null type", async () => {
 it("allows adding a non-null list of non-null type", async () => {
   const schema = await buildSchema([
     ...simplePlugins,
-    makeExtendSchemaPlugin(_build => ({
+    makeExtendSchemaPlugin((_build) => ({
       typeDefs: gql`
         extend type Query {
           """
@@ -226,7 +226,7 @@ it("allows adding a non-null list of non-null type", async () => {
 it("accepts an array of typedefs", async () => {
   const schema = await buildSchema([
     ...simplePlugins,
-    makeExtendSchemaPlugin(_build => ({
+    makeExtendSchemaPlugin((_build) => ({
       typeDefs: [
         gql`
           extend type Query {
@@ -266,7 +266,7 @@ it("throws the proper error if an array of typeDefs aren't all DocumentNodes", (
   return expect(
     buildSchema([
       ...simplePlugins,
-      makeExtendSchemaPlugin(_build => ({
+      makeExtendSchemaPlugin((_build) => ({
         typeDefs: [
           gql`
             extend type Query {
@@ -297,7 +297,7 @@ it("throws the proper error if a single typeDef isn't a DocumentNode", () => {
   return expect(
     buildSchema([
       ...simplePlugins,
-      makeExtendSchemaPlugin(_build => ({
+      makeExtendSchemaPlugin((_build) => ({
         typeDefs: `
             extend type Query {
               """
@@ -317,7 +317,7 @@ it("throws the proper error if a single typeDef isn't a DocumentNode", () => {
 it("allows adding a field with arguments", async () => {
   const schema = await buildSchema([
     ...simplePlugins,
-    makeExtendSchemaPlugin(_build => ({
+    makeExtendSchemaPlugin((_build) => ({
       typeDefs: gql`
         extend type Query {
           """
@@ -349,7 +349,7 @@ it("allows adding a field with arguments named using a custom inflector", async 
         return this.camelCase("my-custom-echo-field-name");
       },
     }),
-    makeExtendSchemaPlugin(build => ({
+    makeExtendSchemaPlugin((build) => ({
       typeDefs: gql`
         extend type Query {
           """
@@ -390,7 +390,7 @@ it("supports @scope directive with simple values", async () => {
   }
   const schema = await buildSchema([
     ...simplePlugins,
-    makeExtendSchemaPlugin(_build => ({
+    makeExtendSchemaPlugin((_build) => ({
       typeDefs: gql`
         extend type Query {
           """
@@ -446,7 +446,7 @@ it("supports @scope directive with variable value", async () => {
   const secret = Symbol("test-secret");
   const schema = await buildSchema([
     ...simplePlugins,
-    makeExtendSchemaPlugin(_build => ({
+    makeExtendSchemaPlugin((_build) => ({
       typeDefs: gql`
         extend type Query {
           """
@@ -522,7 +522,7 @@ it("supports defining new types", async () => {
   `;
   const schema = await buildSchema([
     ...simplePlugins,
-    makeExtendSchemaPlugin(_build => ({
+    makeExtendSchemaPlugin((_build) => ({
       typeDefs: gql`
         ${EchoCount}
         ${EchoInput}
@@ -613,7 +613,7 @@ it("supports defining new types", async () => {
   expect(data).toMatchSnapshot();
   expect(inputsSeen.length).toEqual(4);
   expect(enumsSeen.length).toEqual(4);
-  expect(inputsSeen.map(s => s.count)).toEqual([
+  expect(inputsSeen.map((s) => s.count)).toEqual([
     "forever and ever and ever",
     "ONCE",
     "TWICE",
@@ -630,7 +630,7 @@ it("supports defining new types", async () => {
 it("supports defining a simple mutation", async () => {
   const schema = await buildSchema([
     ...simplePlugins,
-    makeExtendSchemaPlugin(_build => ({
+    makeExtendSchemaPlugin((_build) => ({
       typeDefs: gql`
         extend type Mutation {
           add(a: Int, b: Int): Int
@@ -655,7 +655,7 @@ it("supports defining a simple mutation", async () => {
 it("supports defining a more complex mutation", async () => {
   const schema = await buildSchema([
     ...simplePlugins,
-    makeExtendSchemaPlugin(_build => ({
+    makeExtendSchemaPlugin((_build) => ({
       typeDefs: gql`
         input EchoInput {
           text: String!
@@ -724,7 +724,7 @@ it("supports defining a more complex mutation", async () => {
 it("supports defining a simple subscription", async () => {
   const schema = await buildSchema([
     ...simplePlugins,
-    makeExtendSchemaPlugin(_build => ({
+    makeExtendSchemaPlugin((_build) => ({
       typeDefs: gql`
         extend type Subscription {
           clockTicks(

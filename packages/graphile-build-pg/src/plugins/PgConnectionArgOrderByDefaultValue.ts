@@ -1,5 +1,3 @@
-import { Plugin } from "graphile-build";
-
 export default (function PgConnectionArgOrderByDefaultValue(builder) {
   builder.hook(
     "GraphQLObjectType:fields:field:args",
@@ -40,8 +38,9 @@ export default (function PgConnectionArgOrderByDefaultValue(builder) {
       }
 
       const defaultValueEnum =
-        TableOrderByType.getValues().find(v => v.name === "PRIMARY_KEY_ASC") ||
-        TableOrderByType.getValues()[0];
+        TableOrderByType.getValues().find(
+          (v) => v.name === "PRIMARY_KEY_ASC",
+        ) || TableOrderByType.getValues()[0];
 
       return extend(
         args,
@@ -60,4 +59,4 @@ export default (function PgConnectionArgOrderByDefaultValue(builder) {
     },
     ["PgConnectionArgOrderByDefaultValue"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

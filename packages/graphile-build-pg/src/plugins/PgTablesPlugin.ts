@@ -1,53 +1,50 @@
-import {
-  Plugin,
-  GraphileObjectTypeConfig,
-  ScopeGraphQLObjectType,
-} from "graphile-build";
 import { PgType, PgAttribute } from "./PgIntrospectionPlugin";
 import { PgTypeModifier } from "./PgBasicsPlugin";
 import { nullableIf, base64 } from "../utils";
 
-declare module "graphile-build" {
-  interface ScopeGraphQLObjectType {
-    isPgRowType?: boolean;
-    isPgCompoundType?: boolean;
-    isPgCompositeType?: boolean;
+declare global {
+  namespace GraphileEngine {
+    interface ScopeGraphQLObjectType {
+      isPgRowType?: boolean;
+      isPgCompoundType?: boolean;
+      isPgCompositeType?: boolean;
 
-    /* Connections */
-    isEdgeType?: boolean;
-    isPgRowEdgeType?: boolean;
-    isConnectionType?: boolean;
-    isPgRowConnectionType?: boolean;
-    nodeType?: import("graphql").GraphQLType /* But not a list */;
-    edgeType?: import("graphql").GraphQLObjectType;
-  }
+      /* Connections */
+      isEdgeType?: boolean;
+      isPgRowEdgeType?: boolean;
+      isConnectionType?: boolean;
+      isPgRowConnectionType?: boolean;
+      nodeType?: import("graphql").GraphQLType /* But not a list */;
+      edgeType?: import("graphql").GraphQLObjectType;
+    }
 
-  interface ScopeGraphQLInputObjectType {
-    /** Mutation input type? */
-    isInputType?: boolean;
+    interface ScopeGraphQLInputObjectType {
+      /** Mutation input type? */
+      isInputType?: boolean;
 
-    /** Mutation input for 'update' mutations */
-    isPgPatch?: boolean;
+      /** Mutation input for 'update' mutations */
+      isPgPatch?: boolean;
 
-    /** Mutation input for the 'base' variant */
-    isPgBaseInput?: boolean;
+      /** Mutation input for the 'base' variant */
+      isPgBaseInput?: boolean;
 
-    isPgRowType?: boolean;
-    isPgCompoundType?: boolean;
-    pgAddSubfield?: (
-      fieldName: string,
-      attrName: string,
-      pgType: PgType,
-      spec: import("graphql").GraphQLInputFieldConfig,
-      typeModifier?: PgTypeModifier,
-    ) => import("graphql").GraphQLInputFieldConfig;
+      isPgRowType?: boolean;
+      isPgCompoundType?: boolean;
+      pgAddSubfield?: (
+        fieldName: string,
+        attrName: string,
+        pgType: PgType,
+        spec: import("graphql").GraphQLInputFieldConfig,
+        typeModifier?: PgTypeModifier,
+      ) => import("graphql").GraphQLInputFieldConfig;
+    }
   }
 }
 
 const hasNonNullKey = (row: { [key: string]: unknown }) => {
   if (
     Array.isArray(row.__identifiers) &&
-    row.__identifiers.every(i => i != null)
+    row.__identifiers.every((i) => i != null)
   ) {
     return true;
   }
@@ -82,7 +79,7 @@ export default (function PgTablesPlugin(
         if (
           (identifiers &&
             Array.isArray(identifiers) &&
-            identifiers.some(i => i !== null)) ||
+            identifiers.some((i) => i !== null)) ||
           hasNonNullKey(row)
         ) {
           return row;
@@ -130,7 +127,7 @@ export default (function PgTablesPlugin(
         throw new Error("Expected 'Cursor' type to exist");
       }
 
-      introspectionResultsByKind.class.forEach(table => {
+      introspectionResultsByKind.class.forEach((table) => {
         const tablePgType = table.type;
         if (!tablePgType) {
           throw new Error("Could not determine the type for this table");
@@ -158,7 +155,7 @@ export default (function PgTablesPlugin(
           | null = null;
         pgRegisterGqlTypeByTypeId(
           tablePgType.id,
-          cb => {
+          (cb) => {
             if (TableType) {
               return TableType;
             }
@@ -168,7 +165,10 @@ export default (function PgTablesPlugin(
                 `Register was called but there's already a mapper in place for '${tablePgType.id}'!`,
               );
             }
-            const tableSpec: GraphileObjectTypeConfig<any, any> = {
+            const tableSpec: GraphileEngine.GraphileObjectTypeConfig<
+              any,
+              any
+            > = {
               description: table.description || tablePgType.description || null,
               name: tableTypeName,
               interfaces: () => {
@@ -186,7 +186,7 @@ export default (function PgTablesPlugin(
                   // Enable nodeId interface
                   addDataGeneratorForField(nodeIdFieldName, () => {
                     return {
-                      pgQuery: queryBuilder => {
+                      pgQuery: (queryBuilder) => {
                         queryBuilder.selectIdentifiers(table);
                       },
                     };
@@ -390,7 +390,7 @@ export default (function PgTablesPlugin(
             }
 
             pg2GqlMapper[tablePgType.id] = {
-              map: _ => _,
+              map: (_) => _,
               unmap: (obj, modifier) => {
                 let fieldLookup: FieldSpecMap;
                 if (modifier === "patch") {
@@ -428,7 +428,10 @@ export default (function PgTablesPlugin(
               },
             };
 
-            const edgeSpec: GraphileObjectTypeConfig<any, any> = {
+            const edgeSpec: GraphileEngine.GraphileObjectTypeConfig<
+              any,
+              any
+            > = {
               description: `A \`${tableTypeName}\` edge in the connection.`,
               name: inflection.edge(TableType.name),
               fields: ({ fieldWithHooks }) => {
@@ -438,7 +441,7 @@ export default (function PgTablesPlugin(
                     ({ addDataGenerator }) => {
                       addDataGenerator(() => ({
                         usesCursor: true,
-                        pgQuery: queryBuilder => {
+                        pgQuery: (queryBuilder) => {
                           if (primaryKeys) {
                             queryBuilder.selectIdentifiers(table);
                           }
@@ -501,7 +504,7 @@ export default (function PgTablesPlugin(
                     {},
                     false,
                     {
-                      withQueryBuilder: queryBuilder => {
+                      withQueryBuilder: (queryBuilder) => {
                         if (subscriptions) {
                           queryBuilder.selectIdentifiers(table);
                         }
@@ -535,7 +538,10 @@ export default (function PgTablesPlugin(
             const PageInfo = getTypeByName(inflection.builtin("PageInfo"));
 
             /*const ConnectionType = */
-            const connectionSpec: GraphileObjectTypeConfig<any, any> = {
+            const connectionSpec: GraphileEngine.GraphileObjectTypeConfig<
+              any,
+              any
+            > = {
               description: `A connection to a list of \`${tableTypeName}\` values.`,
               name: inflection.connection(TableType.name),
               fields: ({
@@ -595,7 +601,7 @@ export default (function PgTablesPlugin(
                     {},
                     false,
                     {
-                      withQueryBuilder: queryBuilder => {
+                      withQueryBuilder: (queryBuilder) => {
                         if (subscriptions) {
                           queryBuilder.selectIdentifiers(table);
                         }
@@ -646,7 +652,7 @@ export default (function PgTablesPlugin(
                 };
               },
             };
-            const connectionScope: ScopeGraphQLObjectType = {
+            const connectionScope: GraphileEngine.ScopeGraphQLObjectType = {
               __origin: `Adding table connection type for ${describePgEntity(
                 table,
               )}. You can rename the table's GraphQL type via a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
@@ -747,4 +753,4 @@ export default (function PgTablesPlugin(
     [],
     ["PgTypes"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

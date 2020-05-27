@@ -8,10 +8,9 @@ import {
   RawishIntrospectionResults,
 } from "graphile-build-pg";
 import parseIdentifierParts from "./parseIdentifierParts";
-import { Build, BuildBase } from "graphile-build";
 
-export type BuildWithIntrospection = BuildBase &
-  Omit<Partial<Build>, "pgIntrospectionResultsByKind"> & {
+export type BuildWithIntrospection = GraphileEngine.BuildBase &
+  Omit<Partial<GraphileEngine.Build>, "pgIntrospectionResultsByKind"> & {
     pgIntrospectionResultsByKind: RawishIntrospectionResults;
   };
 

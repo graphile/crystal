@@ -1,6 +1,5 @@
 // BELOW HERE, IMPORTS ARE ONLY TYPES (not values)
 import { SQL } from "graphile-build-pg";
-import { Build, Plugin } from "graphile-build";
 
 type OrderSpec = [string | SQL, boolean] | [string | SQL, boolean, boolean];
 export interface MakeAddPgTableOrderByPluginOrders {
@@ -16,11 +15,13 @@ export interface MakeAddPgTableOrderByPluginOrders {
 export default function makeAddPgTableOrderByPlugin(
   schemaName: string,
   tableName: string,
-  ordersGenerator: (build: Build) => MakeAddPgTableOrderByPluginOrders,
+  ordersGenerator: (
+    build: GraphileEngine.Build,
+  ) => MakeAddPgTableOrderByPluginOrders,
   hint = `Adding orders with makeAddPgTableOrderByPlugin to "${schemaName}"."${tableName}"`,
 ) {
   const displayName = `makeAddPgTableOrderByPlugin_${schemaName}_${tableName}`;
-  const plugin: Plugin = builder => {
+  const plugin: GraphileEngine.Plugin = (builder) => {
     builder.hook("GraphQLEnumType:values", (values, build, context) => {
       const { extend } = build;
       const {

@@ -73,7 +73,7 @@ function mangleName(str: string): string {
   return (
     str
       // Keep the identifier simple so it doesn't need escaping.
-      .replace(/[A-Z]/g, l => `_${l.toLowerCase()}`)
+      .replace(/[A-Z]/g, (l) => `_${l.toLowerCase()}`)
       .replace(/[^a-z0-9_]+/g, "_")
 
       // Avoid double-underscores.
@@ -260,7 +260,7 @@ export function compile(
             "[pg-sql2] This SQL statement would contain too many placeholders; PostgreSQL supports at most 65535 placeholders. To solve this, consider refactoring the query to use arrays/unnest where possible, or split it into multiple queries.",
           );
         }
-        values[valueCount] = item.value;
+        values[valueCount - 1] = item.value;
         sqlFragments.push(`$${valueCount}`);
         break;
       default:

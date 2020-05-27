@@ -35,7 +35,7 @@ async function main() {
   } = {};
   // Send keepalive every 25 seconds
   setInterval(() => {
-    clients.forEach(ws => {
+    clients.forEach((ws) => {
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(
           JSON.stringify({
@@ -113,7 +113,7 @@ async function main() {
           console.error("Socket is already registered for ", stringifiedKey);
           return;
         }
-        const emptyIndex = channelClients.findIndex(s => !s);
+        const emptyIndex = channelClients.findIndex((s) => !s);
         if (emptyIndex < 0) {
           console.error("All sockets are full");
           return;
@@ -135,7 +135,7 @@ async function main() {
     );
   });
 
-  const callback: AnnounceCallback = function(announcement) {
+  const callback: AnnounceCallback = function (announcement) {
     const { _: kind, schema, table } = announcement;
     if (!channels[schema] || !channels[schema][table]) return;
     const stringifiedKey =
@@ -162,7 +162,7 @@ async function main() {
   });
 }
 
-main().catch(e => {
+main().catch((e) => {
   console.error(e);
   process.exit(1);
 });

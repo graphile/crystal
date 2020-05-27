@@ -1,4 +1,4 @@
-module.exports = builder => {
+module.exports = (builder) => {
   // This hook adds the 'Toy.categories' field
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
     const {
@@ -20,9 +20,9 @@ module.exports = builder => {
       categories: fieldWithHooks(
         "categories",
         ({ addDataGenerator, getDataFromParsedResolveInfoFragment }) => {
-          addDataGenerator(parsedResolveInfoFragment => {
+          addDataGenerator((parsedResolveInfoFragment) => {
             return {
-              pgQuery: queryBuilder => {
+              pgQuery: (queryBuilder) => {
                 queryBuilder.select(() => {
                   const resolveData = getDataFromParsedResolveInfoFragment(
                     parsedResolveInfoFragment,
@@ -37,7 +37,7 @@ module.exports = builder => {
                       useAsterisk: false,
                       asJsonAggregate: true,
                     },
-                    innerQueryBuilder => {
+                    (innerQueryBuilder) => {
                       innerQueryBuilder.parentQueryBuilder = queryBuilder;
                       const alias = Symbol("toyCategoriesSubquery");
                       const innerInnerQueryBuilder = innerQueryBuilder.buildNamedChildSelecting(
@@ -98,7 +98,7 @@ module.exports = builder => {
 
       addArgDataGenerator(({ approved }) => {
         return {
-          pgQuery: queryBuilder => {
+          pgQuery: (queryBuilder) => {
             if (approved != null) {
               const toyCategoriesQueryBuilder = queryBuilder.getNamedChild(
                 "toyCategoriesSubquery",

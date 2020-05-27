@@ -1,11 +1,11 @@
-import { Plugin } from "graphile-build";
-
-declare module "graphile-build" {
-  interface ScopeGraphQLInputObjectType {
-    isPgCondition?: boolean;
-  }
-  interface ScopeGraphQLInputObjectTypeFieldsField {
-    isPgConnectionConditionInputField?: boolean;
+declare global {
+  namespace GraphileEngine {
+    interface ScopeGraphQLInputObjectType {
+      isPgCondition?: boolean;
+    }
+    interface ScopeGraphQLInputObjectTypeFieldsField {
+      isPgConnectionConditionInputField?: boolean;
+    }
   }
 }
 
@@ -24,7 +24,7 @@ export default (function PgConnectionArgCondition(builder) {
         describePgEntity,
         sqlCommentByAddingTags,
       } = build;
-      introspectionResultsByKind.class.forEach(table => {
+      introspectionResultsByKind.class.forEach((table) => {
         // PERFORMANCE: These used to be .filter(...) calls
         if (!table.isSelectable || omit(table, "filter")) return;
         if (!table.namespace) return;
@@ -36,7 +36,7 @@ export default (function PgConnectionArgCondition(builder) {
           {
             description: `A condition to be used against \`${tableTypeName}\` object types. All fields are tested for equality and combined with a logical ‘and.’`,
             name: inflection.conditionType(inflection.tableType(table)),
-            fields: context => {
+            fields: (context) => {
               const { fieldWithHooks } = context;
               return table.attributes.reduce((memo, attr) => {
                 // PERFORMANCE: These used to be .filter(...) calls
@@ -163,18 +163,18 @@ export default (function PgConnectionArgCondition(builder) {
       }
 
       const relevantAttributes = table.attributes.filter(
-        attr => pgColumnFilter(attr, build, context) && !omit(attr, "filter"),
+        (attr) => pgColumnFilter(attr, build, context) && !omit(attr, "filter"),
       );
 
       addArgDataGenerator(function connectionCondition({ condition }) {
         return {
-          pgQuery: queryBuilder => {
+          pgQuery: (queryBuilder) => {
             if (typeof condition === "object" && condition != null) {
-              relevantAttributes.forEach(attr => {
+              relevantAttributes.forEach((attr) => {
                 const fieldName = inflection.column(attr);
                 const val = condition[fieldName];
                 if (val != null) {
-                  queryBuilder.addLiveCondition(() => record =>
+                  queryBuilder.addLiveCondition(() => (record) =>
                     record[attr.name] === val,
                   );
 
@@ -184,7 +184,7 @@ export default (function PgConnectionArgCondition(builder) {
                     )} = ${gql2pg(val, attr.type, attr.typeModifier)}`,
                   );
                 } else if (val === null) {
-                  queryBuilder.addLiveCondition(() => record =>
+                  queryBuilder.addLiveCondition(() => (record) =>
                     record[attr.name] == null,
                   );
 
@@ -215,4 +215,4 @@ export default (function PgConnectionArgCondition(builder) {
     },
     ["PgConnectionArgCondition"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

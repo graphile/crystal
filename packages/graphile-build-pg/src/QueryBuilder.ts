@@ -2,9 +2,6 @@ import sql, { SQL, SQLRawValue } from "pg-sql2";
 import isSafeInteger from "lodash/isSafeInteger";
 import chunk from "lodash/chunk";
 import { PgClass, PgType } from "./plugins/PgIntrospectionPlugin";
-import { GraphileResolverContext } from "graphile-build";
-
-export { GraphileResolverContext };
 
 export { sql, SQL, SQLRawValue };
 
@@ -35,7 +32,7 @@ function callIfNecessaryArray<T extends CallResult>(
   context: GenContext,
 ): Array<T> {
   if (Array.isArray(o)) {
-    return o.map(v => callIfNecessary(v, context));
+    return o.map((v) => callIfNecessary(v, context));
   } else {
     return o;
   }
@@ -72,7 +69,7 @@ function escapeLarge(sqlFragment: SQL, type: PgType) {
 
 class QueryBuilder {
   parentQueryBuilder: QueryBuilder | void;
-  context: GraphileResolverContext;
+  context: GraphileEngine.GraphileResolverContext;
   rootValue: any;
   locks: {
     [a: string]: false | true | string | undefined;
@@ -142,14 +139,14 @@ class QueryBuilder {
 
   constructor(
     _options: QueryBuilderOptions = {},
-    context: GraphileResolverContext,
+    context: GraphileEngine.GraphileResolverContext,
     rootValue?: any,
   ) {
     this.context = context || {};
     this.rootValue = rootValue;
 
     this.locks = {
-      // As a performance optimisation, we're going to list a number of lock
+      // As a performance optimization, we're going to list a number of lock
       // types so that V8 doesn't need to mutate the object too much
       cursorComparator: false,
       fixedSelectExpression: false,
@@ -190,7 +187,7 @@ class QueryBuilder {
       first: null,
       last: null,
       beforeLock: {
-        // As a performance optimisation, we're going to list a number of lock
+        // As a performance optimization, we're going to list a number of lock
         // types so that V8 doesn't need to mutate the object too much
         cursorComparator: [],
         fixedSelectExpression: [],
@@ -322,7 +319,7 @@ class QueryBuilder {
         checkerGenerator(data),
       );
 
-      return (record: any) => checkers.every(checker => checker(record));
+      return (record: any) => checkers.every((checker) => checker(record));
     };
     if (this.parentQueryBuilder) {
       const parentQueryBuilder = this.parentQueryBuilder;
@@ -345,7 +342,7 @@ class QueryBuilder {
 json_build_object('__id', ${sql.value(id)}::int
 ${sql.join(
   Object.keys(allRequirements).map(
-    key => sql`, ${sql.literal(key)}::text, ${allRequirements[key]}`,
+    (key) => sql`, ${sql.literal(key)}::text, ${allRequirements[key]}`,
   ),
 
   "",
@@ -430,7 +427,7 @@ ${sql.join(
     const primaryKeys = primaryKey.keyAttributes;
     this.select(
       sql`json_build_array(${sql.join(
-        primaryKeys.map(key =>
+        primaryKeys.map((key) =>
           escapeLarge(
             sql`${this.getTableAlias()}.${sql.identifier(key.name)}`,
             key.type,
@@ -496,7 +493,7 @@ ${sql.join(
     if (this.data.offset != null) {
       // Add the offsets together (this should be able to recurse)
       const previous = this.data.offset;
-      this.data.offset = context => {
+      this.data.offset = (context) => {
         return (
           callIfNecessary(previous, context) +
           callIfNecessary(offsetGen, context)
@@ -759,11 +756,15 @@ ${sql.join(
 
     let fragment = sql`\
 select ${useAsterisk ? sql`${this.getTableAlias()}.*` : fields}
-${(this.compiledData.from &&
-  sql`from ${this.compiledData.from[0]} as ${this.getTableAlias()}`) ||
-  sql.blank}
-${(this.compiledData.join.length && sql.join(this.compiledData.join, " ")) ||
-  sql.blank}
+${
+  (this.compiledData.from &&
+    sql`from ${this.compiledData.from[0]} as ${this.getTableAlias()}`) ||
+  sql.blank
+}
+${
+  (this.compiledData.join.length && sql.join(this.compiledData.join, " ")) ||
+  sql.blank
+}
 where ${this.buildWhereClause(true, true, options)}
 ${
   this.compiledData.orderBy.length
@@ -800,7 +801,7 @@ order by (row_number() over (partition by 1)) desc`; /* We don't need to factor 
     if (useAsterisk) {
       /*
        * NOTE[useAsterisk/row_number]: since LIMIT/OFFSET is inside this
-       * subquery, row_number() outside of this subquery WON'T include the
+       * sub-query, row_number() outside of this sub-query WON'T include the
        * offset. We must add it back wherever row_number() is used.
        */
       fragment = sql`select ${fields} from (${fragment}) ${this.getTableAlias()}`;
@@ -833,7 +834,9 @@ order by (row_number() over (partition by 1)) desc`; /* We don't need to factor 
       }
     }
     if (type !== "select") {
-      this.locks[type] = isDev ? new Error("Initally locked here").stack : true;
+      this.locks[type] = isDev
+        ? new Error("Initially locked here").stack
+        : true;
     }
     if (type === "cursorComparator") {
       // It's meant to be a function
@@ -879,7 +882,9 @@ order by (row_number() over (partition by 1)) desc`; /* We don't need to factor 
           }
         }
       }
-      this.locks[type] = isDev ? new Error("Initally locked here").stack : true;
+      this.locks[type] = isDev
+        ? new Error("Initially locked here").stack
+        : true;
       this.compiledData[type] = data;
     } else if (type === "orderBy") {
       this.compiledData[type] = this.data[type].map(([a, b, c]) => [

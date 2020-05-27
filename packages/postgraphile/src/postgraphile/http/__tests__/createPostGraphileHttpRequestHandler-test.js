@@ -4,7 +4,7 @@ import { $$pgClient } from "../../../postgres/inventory/pgClientFromContext";
 import createPostGraphileHttpRequestHandler from "../createPostGraphileHttpRequestHandler";
 import request from "./supertest";
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const http = require("http");
 const http2 = require("http2");
@@ -85,7 +85,7 @@ const defaultOptions = {
 const serverCreators = new Map([
   [
     "http",
-    handler => {
+    (handler) => {
       return http.createServer(handler);
     },
   ],
@@ -211,9 +211,7 @@ for (const { name, createServerFromHandler, subpath = "" } of toTest) {
   describe(name + (subpath ? ` (@${subpath})` : ""), () => {
     test("will 404 for route other than that specified 1", async () => {
       const server1 = await createServer();
-      await request(server1)
-        .post("/x")
-        .expect(404);
+      await request(server1).post("/x").expect(404);
     });
 
     if (subpath) {
@@ -221,23 +219,17 @@ for (const { name, createServerFromHandler, subpath = "" } of toTest) {
         const server2 = await createServer({
           graphqlRoute: `${subpath}/graphql`,
         });
-        await request(server2)
-          .post(`${subpath}/graphql`)
-          .expect(404);
+        await request(server2).post(`${subpath}/graphql`).expect(404);
       });
       test("will 404 for route other than that specified 3", async () => {
         const server3 = await createServer({ graphqlRoute: `/graphql` });
-        await request(server3)
-          .post(`/graphql`)
-          .expect(404);
+        await request(server3).post(`/graphql`).expect(404);
       });
     }
 
     test("will 404 for route other than that specified 4", async () => {
       const server4 = await createServer({ graphqlRoute: `/x` });
-      await request(server4)
-        .post(`${subpath}/graphql`)
-        .expect(404);
+      await request(server4).post(`${subpath}/graphql`).expect(404);
     });
 
     test("will respond to queries on a different route", async () => {
@@ -815,8 +807,8 @@ for (const { name, createServerFromHandler, subpath = "" } of toTest) {
       pgClient.query.mockClear();
       pgClient.release.mockClear();
       const server = await createServer({
-        handleErrors: errors => {
-          return errors.map(error => {
+        handleErrors: (errors) => {
+          return errors.map((error) => {
             return {
               ...error,
               message: "my custom error message",
@@ -905,21 +897,15 @@ for (const { name, createServerFromHandler, subpath = "" } of toTest) {
 
     test("will not serve a favicon when graphiql is disabled", async () => {
       const server1 = await createServer({ graphiql: false });
-      await request(server1)
-        .get(`/favicon.ico`)
-        .expect(404);
+      await request(server1).get(`/favicon.ico`).expect(404);
       if (subpath) {
-        await request(server1)
-          .get(`${subpath}/favicon.ico`)
-          .expect(404);
+        await request(server1).get(`${subpath}/favicon.ico`).expect(404);
       }
     });
 
     test("will not allow if no text/event-stream headers are set", async () => {
       const server = await createServer({ graphiql: true });
-      await request(server)
-        .get(`${subpath}/graphql/stream`)
-        .expect(405);
+      await request(server).get(`${subpath}/graphql/stream`).expect(405);
     });
 
     test("will return an event-stream", async () => {
@@ -929,7 +915,7 @@ for (const { name, createServerFromHandler, subpath = "" } of toTest) {
         .set("Accept", "text/event-stream")
         .expect(200)
         .expect("event: open\n\nevent: change\ndata: schema\n\n")
-        .then(res => res); // Trick superagent into finishing
+        .then((res) => res); // Trick superagent into finishing
       await sleep(200);
       server._emitter.emit("schemas:changed");
       await sleep(100);
@@ -941,9 +927,7 @@ for (const { name, createServerFromHandler, subpath = "" } of toTest) {
     test("will render GraphiQL if enabled", async () => {
       const server1 = await createServer();
       const server2 = await createServer({ graphiql: true });
-      await request(server1)
-        .get(`${subpath}/graphiql`)
-        .expect(404);
+      await request(server1).get(`${subpath}/graphiql`).expect(404);
       await request(server2)
         .get(`${subpath}/graphiql`)
         .expect(200)
@@ -983,19 +967,13 @@ for (const { name, createServerFromHandler, subpath = "" } of toTest) {
         graphiql: false,
         graphiqlRoute: `/x`,
       });
-      await request(server1)
-        .get(`${subpath}/x`)
-        .expect(404);
+      await request(server1).get(`${subpath}/x`).expect(404);
       await request(server2)
         .get(`${subpath}/x`)
         .expect(200)
         .expect("Content-Type", "text/html; charset=utf-8");
-      await request(server3)
-        .get(`${subpath}/x`)
-        .expect(404);
-      await request(server3)
-        .get(`${subpath}/graphiql`)
-        .expect(404);
+      await request(server3).get(`${subpath}/x`).expect(404);
+      await request(server3).get(`${subpath}/graphiql`).expect(404);
     });
 
     test("cannot use a rejected GraphQL schema", async () => {
@@ -1058,7 +1036,7 @@ for (const { name, createServerFromHandler, subpath = "" } of toTest) {
       pgClient.query.mockClear();
       pgClient.release.mockClear();
       const server = await createServer({
-        pgSettings: req => ({
+        pgSettings: (req) => ({
           "foo.string": "test1",
           "foo.number": 42,
         }),
@@ -1128,7 +1106,7 @@ for (const { name, createServerFromHandler, subpath = "" } of toTest) {
         createServer(
           { graphiql: true },
           {
-            onPreCreate: app => {
+            onPreCreate: (app) => {
               app.use(
                 compress({
                   threshold: 0,

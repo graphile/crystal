@@ -32,13 +32,19 @@
   },
   "homepage": "https://github.com/graphile/graphile-engine/tree/master/packages/lds#readme",
   "dependencies": {
-    "@types/pg": "^7.4.14",
-    "@types/ws": "^6.0.1",
-    "pg": ">=6.1.0 <9",
-    "ws": "^7.0.0"
+    "@types/pg": "^7.14.3",
+    "@types/ws": "^7.2.4",
+    "pg": "^8.2.1",
+    "tslib": "^2.0.0",
+    "ws": "^7.3.0"
   },
-  "devDependencies": {},
   "files": [
     "dist"
-  ]
+  ],
+  "devDependencies": {
+    "@types/jest": "^25.2.3",
+    "jest": "^26.0.1",
+    "ts-node": "^8.10.1",
+    "typescript": "^3.9.2"
+  }
 }

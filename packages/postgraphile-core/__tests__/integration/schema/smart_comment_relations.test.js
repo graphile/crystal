@@ -1,7 +1,7 @@
 const core = require("./core");
 
 // WARNING: this function is not guaranteed to be SQL injection safe.
-const offerViewComment = comment => pgClient =>
+const offerViewComment = (comment) => (pgClient) =>
   pgClient.query(
     `comment on view smart_comment_relations.offer_view is E'${comment.replace(
       /'/g,
@@ -29,7 +29,7 @@ test("referencing non-existent table (throws error)", async () => {
   }
   expect(error).toBeTruthy();
   expect(error).toMatchInlineSnapshot(
-    `[Error: @foreignKey smart comment referenced non-existant table/view 'smart_comment_relations'.'posts'. Note that this reference must use *database names* (i.e. it does not respect @name). ((post_id) references posts)]`,
+    `[Error: @foreignKey smart comment referenced non-existent table/view 'smart_comment_relations'.'posts'. Note that this reference must use *database names* (i.e. it does not respect @name). ((post_id) references posts)]`,
   );
 });
 
@@ -41,18 +41,18 @@ test(
     offerViewComment(`@name offers
 @primaryKey id
 @foreignKey (post_id) references post`),
-    schema => {
+    (schema) => {
       const Offer = schema.getType("Offer");
       const fields = Offer.getFields();
       expect(fields.nodeId).toBeTruthy();
       expect(fields.postsByPostId).toBeFalsy();
       expect(Object.keys(fields)).toMatchInlineSnapshot(`
-Array [
-  "nodeId",
-  "id",
-  "postId",
-]
-`);
+        Array [
+          "nodeId",
+          "id",
+          "postId",
+        ]
+      `);
     },
   ),
 );
@@ -66,7 +66,7 @@ test(
 @primaryKey id
 @foreignKey (post_id) references post_view`,
     ),
-    schema => {
+    (schema) => {
       const Offer = schema.getType("Offer");
       const fields = Offer.getFields();
       expect(fields.nodeId).toBeTruthy();
@@ -80,7 +80,7 @@ test(
   core.test(
     ["smart_comment_relations"],
     {},
-    pgClient =>
+    (pgClient) =>
       pgClient.query(
         `
 comment on view smart_comment_relations.post_view is E'@name posts
@@ -90,7 +90,7 @@ comment on view smart_comment_relations.offer_view is E'@name offers
 @primaryKey id
 @foreignKey (post_id) references post_view(id)';`,
       ),
-    schema => {
+    (schema) => {
       const Offer = schema.getType("Offer");
       const fields = Offer.getFields();
       expect(fields.nodeId).toBeTruthy();

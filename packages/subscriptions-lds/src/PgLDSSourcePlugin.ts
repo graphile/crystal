@@ -1,16 +1,19 @@
 /* eslint-disable no-console */
-import { Plugin } from "postgraphile-core";
+import "graphile-build";
+import "graphile-build-pg";
 import WebSocket from "ws";
 import subscribeToLogicalDecoding, {
   Announcement,
   LDSubscription,
 } from "@graphile/lds";
 
-declare module "graphile-build" {
-  interface GraphileBuildOptions {
-    pgLDSUrl?: string;
-    ldsSleepDuration?: number;
-    ldsTablePattern?: string;
+declare global {
+  namespace GraphileEngine {
+    interface GraphileBuildOptions {
+      pgLDSUrl?: string;
+      ldsSleepDuration?: number;
+      ldsTablePattern?: string;
+    }
   }
 }
 
@@ -143,7 +146,7 @@ export class LDSLiveSource {
       );
     }
     this.ws = new WebSocket(this.url);
-    this.ws.on("error", err => {
+    this.ws.on("error", (err) => {
       console.error("Websocket error: ", err.message);
       this.reconnect();
     });
@@ -318,7 +321,7 @@ function getSafeNumber(str: string | undefined): number | undefined {
   return undefined;
 }
 
-const PgLDSSourcePlugin: Plugin = async function(
+const PgLDSSourcePlugin: GraphileEngine.Plugin = async function (
   builder,
   {
     pgLDSUrl = process.env.LDS_URL,
@@ -338,7 +341,7 @@ const PgLDSSourcePlugin: Plugin = async function(
     });
     builder.hook(
       "build",
-      build => {
+      (build) => {
         build.liveCoordinator.registerSource("pg", source);
         return build;
       },
@@ -346,7 +349,7 @@ const PgLDSSourcePlugin: Plugin = async function(
     );
     if (process.env.NODE_ENV === "test") {
       // Need a way of releasing it
-      builder.hook("finalize", schema => {
+      builder.hook("finalize", (schema) => {
         Object.defineProperty(schema, "__pgLdsSource", {
           value: source,
           enumerable: false,

@@ -1,4 +1,5 @@
 node_modules
+/.vscode/pnpify
 /packages/pg-sql2/examples
 /packages/postgraphile/sponsors.json
 /packages/postgraphile/postgraphiql
@@ -8,3 +9,5 @@ node_modules
 dist
 CHANGELOG.md
 _LOCAL
+.yarn
+.pnp.*

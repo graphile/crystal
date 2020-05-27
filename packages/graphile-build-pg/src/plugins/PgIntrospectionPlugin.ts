@@ -1,4 +1,3 @@
-import { Plugin } from "graphile-build";
 import { Client, PoolClient } from "pg";
 import withPgClient, {
   getPgClientAndReleaserFromConfig,
@@ -23,20 +22,22 @@ export type PgAugmentIntrospectionResultsFn = (
   introspectionResult: RawishIntrospectionResults,
 ) => RawishIntrospectionResults;
 
-declare module "graphile-build" {
-  interface GraphileBuildOptions {
-    pgEnableTags?: boolean;
-    pgThrowOnMissingSchema?: boolean;
-    pgIncludeExtensionResources?: boolean;
-    pgLegacyFunctionsOnly?: boolean;
-    pgSkipInstallingWatchFixtures?: boolean;
-    pgAugmentIntrospectionResults?: PgAugmentIntrospectionResultsFn;
-    pgOwnerConnectionString?: string;
-  }
+declare global {
+  namespace GraphileEngine {
+    interface GraphileBuildOptions {
+      pgEnableTags?: boolean;
+      pgThrowOnMissingSchema?: boolean;
+      pgIncludeExtensionResources?: boolean;
+      pgLegacyFunctionsOnly?: boolean;
+      pgSkipInstallingWatchFixtures?: boolean;
+      pgAugmentIntrospectionResults?: PgAugmentIntrospectionResultsFn;
+      pgOwnerConnectionString?: string;
+    }
 
-  interface Build {
-    pgIntrospectionResultsByKind: PgIntrospectionResultsByKind;
-    pgAugmentIntrospectionResults?: PgAugmentIntrospectionResultsFn;
+    interface Build {
+      pgIntrospectionResultsByKind: PgIntrospectionResultsByKind;
+      pgAugmentIntrospectionResults?: PgAugmentIntrospectionResultsFn;
+    }
   }
 }
 
@@ -320,16 +321,16 @@ function smartCommentConstraints(
     debugStr: string,
   ): PgAttribute[] => {
     const attributes = introspectionResults.attribute
-      .filter(a => a.classId === tbl.id)
+      .filter((a) => a.classId === tbl.id)
       .sort((a, b) => a.num - b.num);
     if (!cols) {
       const pk = introspectionResults.constraint.find(
-        c => c.classId == tbl.id && c.type === "p",
+        (c) => c.classId == tbl.id && c.type === "p",
       );
 
       if (pk) {
-        return pk.keyAttributeNums.map(n => {
-          const attr = attributes.find(a => a.num === n);
+        return pk.keyAttributeNums.map((n) => {
+          const attr = attributes.find((a) => a.num === n);
           if (!attr) {
             throw new Error(
               `Could not find attribute '${n}' in '${describePgEntity(pk)}'`,
@@ -343,8 +344,8 @@ function smartCommentConstraints(
         );
       }
     }
-    return cols.map(colName => {
-      const attr = attributes.find(a => a.name === colName);
+    return cols.map((colName) => {
+      const attr = attributes.find((a) => a.name === colName);
       if (!attr) {
         throw new Error(
           `Could not find attribute '${colName}' in '${tbl.namespaceName}.${tbl.name}'`,
@@ -355,9 +356,9 @@ function smartCommentConstraints(
   };
 
   // First: primary keys
-  introspectionResults.class.forEach(klass => {
+  introspectionResults.class.forEach((klass) => {
     const namespace = introspectionResults.namespace.find(
-      n => n.id === klass.namespaceId,
+      (n) => n.id === klass.namespaceId,
     );
 
     if (!namespace) {
@@ -380,10 +381,10 @@ function smartCommentConstraints(
         `@primaryKey ${klass.tags.primaryKey}`,
       );
 
-      attributes.forEach(attr => {
+      attributes.forEach((attr) => {
         attr.tags.notNull = true;
       });
-      const keyAttributeNums = attributes.map(a => a.num);
+      const keyAttributeNums = attributes.map((a) => a.num);
       // Now we need to fake a constraint for this:
       const fakeConstraint: PgConstraint = {
         kind: PgEntityKind.CONSTRAINT,
@@ -412,16 +413,16 @@ function smartCommentConstraints(
     }
   });
   // Now primary keys are in place, we can apply foreign keys
-  introspectionResults.class.forEach(klass => {
+  introspectionResults.class.forEach((klass) => {
     const namespace = introspectionResults.namespace.find(
-      n => n.id === klass.namespaceId,
+      (n) => n.id === klass.namespaceId,
     );
 
     if (!namespace) {
       return;
     }
     const getType = () =>
-      introspectionResults.type.find(t => t.id === klass.typeId)!;
+      introspectionResults.type.find((t) => t.id === klass.typeId)!;
     const foreignKey = klass.tags.foreignKey || getType().tags.foreignKey;
     if (foreignKey) {
       const foreignKeys =
@@ -469,16 +470,16 @@ function smartCommentConstraints(
           : null;
 
         const foreignKlass = introspectionResults.class.find(
-          k => k.name === foreignTable && k.namespaceName === foreignSchema,
+          (k) => k.name === foreignTable && k.namespaceName === foreignSchema,
         );
 
         if (!foreignKlass) {
           throw new Error(
-            `@foreignKey smart comment referenced non-existant table/view '${foreignSchema}'.'${foreignTable}'. Note that this reference must use *database names* (i.e. it does not respect @name). (${fkSpecRaw})`,
+            `@foreignKey smart comment referenced non-existent table/view '${foreignSchema}'.'${foreignTable}'. Note that this reference must use *database names* (i.e. it does not respect @name). (${fkSpecRaw})`,
           );
         }
         const foreignNamespace = introspectionResults.namespace.find(
-          n => n.id === foreignKlass.namespaceId,
+          (n) => n.id === foreignKlass.namespaceId,
         );
 
         if (!foreignNamespace) {
@@ -489,12 +490,12 @@ function smartCommentConstraints(
           klass,
           columns,
           `@foreignKey ${fkSpecRaw}`,
-        ).map(a => a.num);
+        ).map((a) => a.num);
         const foreignKeyAttributeNums = attributesByNames(
           foreignKlass,
           foreignColumns!,
           `@foreignKey ${fkSpecRaw}`,
-        ).map(a => a.num);
+        ).map((a) => a.num);
 
         // Now we need to fake a constraint for this:
         const fakeConstraint: PgConstraint = {
@@ -542,7 +543,7 @@ export type RawishIntrospectionResults = Pick<
 /* The argument to this must not contain cyclic references! */
 function deepClone<T>(value: T): T {
   if (Array.isArray(value)) {
-    return value.map(val => deepClone(val)) as any;
+    return value.map((val) => deepClone(val)) as any;
   } else if (typeof value === "object" && value) {
     return Object.keys(value).reduce((memo, k) => {
       memo[k] = deepClone(value[k]);
@@ -632,7 +633,7 @@ export default (async function PgIntrospectionPlugin(
                 "procedure",
                 "extension",
                 "index",
-              ].forEach(kind => {
+              ].forEach((kind) => {
                 result[kind].forEach((object: PgEntity) => {
                   // Keep a copy of the raw comment
                   object.comment = object.description;
@@ -648,10 +649,10 @@ export default (async function PgIntrospectionPlugin(
 
               const extensionConfigurationClassIds = flatMap(
                 result.extension,
-                e => e.configurationClassIds,
+                (e) => e.configurationClassIds,
               );
 
-              result.class.forEach(klass => {
+              result.class.forEach((klass) => {
                 klass.isExtensionConfigurationTable =
                   extensionConfigurationClassIds.indexOf(klass.id) >= 0;
               });
@@ -665,7 +666,7 @@ export default (async function PgIntrospectionPlugin(
                 "procedure",
                 "extension",
                 "index",
-              ].forEach(k => {
+              ].forEach((k) => {
                 result[k].forEach(Object.freeze);
               });
 
@@ -676,9 +677,9 @@ export default (async function PgIntrospectionPlugin(
     );
 
     const knownSchemas = rawishIntrospectionResultsByKind.namespace.map(
-      n => n.name,
+      (n) => n.name,
     );
-    const missingSchemas = schemas.filter(s => knownSchemas.indexOf(s) < 0);
+    const missingSchemas = schemas.filter((s) => knownSchemas.indexOf(s) < 0);
     if (missingSchemas.length) {
       const errorMessage = `You requested to use schema '${schemas.join(
         "', '",
@@ -730,11 +731,11 @@ export default (async function PgIntrospectionPlugin(
       lookup: { [id: string]: PgEntity },
       missingOk = false,
     ) {
-      array.forEach(entry => {
+      array.forEach((entry) => {
         const key = entry[lookupAttr];
         if (Array.isArray(key)) {
           entry[newAttr] = key
-            .map(innerKey => {
+            .map((innerKey) => {
               const result = lookup[innerKey];
               if (innerKey && !result) {
                 if (missingOk) {
@@ -748,7 +749,7 @@ export default (async function PgIntrospectionPlugin(
               }
               return result;
             })
-            .filter(_ => _);
+            .filter((_) => _);
         } else {
           const result = lookup[key];
           if (key && !result) {
@@ -767,7 +768,7 @@ export default (async function PgIntrospectionPlugin(
     }
 
     const augment = (introspectionResults: RawishIntrospectionResults) => {
-      [pgAugmentIntrospectionResults, smartCommentConstraints].forEach(fn =>
+      [pgAugmentIntrospectionResults, smartCommentConstraints].forEach((fn) =>
         fn ? fn(introspectionResults) : null,
       );
     };
@@ -872,41 +873,41 @@ export default (async function PgIntrospectionPlugin(
     );
 
     // Reverse arrayItemType -> arrayType
-    introspectionResultsByKind.type.forEach(type => {
+    introspectionResultsByKind.type.forEach((type) => {
       if (type.arrayItemType) {
         type.arrayItemType.arrayType = type;
       }
     });
 
     // Table/type columns / constraints
-    introspectionResultsByKind.class.forEach(klass => {
+    introspectionResultsByKind.class.forEach((klass) => {
       klass.attributes = introspectionResultsByKind.attribute.filter(
-        attr => attr.classId === klass.id,
+        (attr) => attr.classId === klass.id,
       );
 
       klass.canUseAsterisk = !klass.attributes.some(
-        attr => attr.columnLevelSelectGrant,
+        (attr) => attr.columnLevelSelectGrant,
       );
 
       klass.constraints = introspectionResultsByKind.constraint.filter(
-        constraint => constraint.classId === klass.id,
+        (constraint) => constraint.classId === klass.id,
       );
 
       klass.foreignConstraints = introspectionResultsByKind.constraint.filter(
-        constraint => constraint.foreignClassId === klass.id,
+        (constraint) => constraint.foreignClassId === klass.id,
       );
 
       klass.primaryKeyConstraint = klass.constraints.find(
-        constraint => constraint.type === "p",
+        (constraint) => constraint.type === "p",
       );
     });
 
     // Constraint attributes
-    introspectionResultsByKind.constraint.forEach(constraint => {
+    introspectionResultsByKind.constraint.forEach((constraint) => {
       if (constraint.keyAttributeNums && constraint.class) {
-        constraint.keyAttributes = constraint.keyAttributeNums.map(nr => {
+        constraint.keyAttributes = constraint.keyAttributeNums.map((nr) => {
           const attr = constraint.class.attributes.find(
-            attr => attr.num === nr,
+            (attr) => attr.num === nr,
           );
           if (!attr) {
             throw new Error(
@@ -923,8 +924,10 @@ export default (async function PgIntrospectionPlugin(
       const { foreignClass } = constraint;
       if (constraint.foreignKeyAttributeNums && foreignClass) {
         constraint.foreignKeyAttributes = constraint.foreignKeyAttributeNums.map(
-          nr => {
-            const attr = foreignClass.attributes.find(attr => attr.num === nr);
+          (nr) => {
+            const attr = foreignClass.attributes.find(
+              (attr) => attr.num === nr,
+            );
             if (!attr) {
               throw new Error(
                 `Could not find attribute with index '${nr}' on '${describePgEntity(
@@ -941,9 +944,9 @@ export default (async function PgIntrospectionPlugin(
     });
 
     // Detect which columns and constraints are indexed
-    introspectionResultsByKind.index.forEach(index => {
-      const columns = index.attributeNums.map(nr =>
-        index.class.attributes.find(attr => attr.num === nr),
+    introspectionResultsByKind.index.forEach((index) => {
+      const columns = index.attributeNums.map((nr) =>
+        index.class.attributes.find((attr) => attr.num === nr),
       );
 
       // Indexed column (for orderBy / filter):
@@ -957,8 +960,8 @@ export default (async function PgIntrospectionPlugin(
 
       // Indexed constraints (for reverse relations):
       index.class.constraints
-        .filter(constraint => constraint.type === "f")
-        .forEach(constraint => {
+        .filter((constraint) => constraint.type === "f")
+        .forEach((constraint) => {
           if (
             constraint.keyAttributeNums.every(
               (nr, idx) => index.attributeNums[idx] === nr,
@@ -1027,7 +1030,7 @@ export default (async function PgIntrospectionPlugin(
         pgClient.on("notification", this._listener);
         pgClient.on("error", this._handleClientError);
         if (this.stopped) {
-          // In case watch mode was cancelled in the interrim.
+          // In case watch mode was cancelled in the interim.
           return this._releaseClient();
         } else {
           await pgClient.query("listen postgraphile_watch");
@@ -1038,7 +1041,7 @@ export default (async function PgIntrospectionPlugin(
             const sql = `begin; ${watchSqlInner};`;
             await withPgClient(
               pgOwnerConnectionString || pgConfig,
-              async pgClient => {
+              async (pgClient) => {
                 try {
                   await pgClient.query(sql);
                 } catch (error) {
@@ -1141,7 +1144,7 @@ export default (async function PgIntrospectionPlugin(
           }
         } else if (payload.type === "drop") {
           const affectsOurSchemas = (payload.payload || []).some(
-            schemaName => schemas.indexOf(schemaName) >= 0,
+            (schemaName) => schemas.indexOf(schemaName) >= 0,
           );
 
           if (affectsOurSchemas) {
@@ -1151,7 +1154,7 @@ export default (async function PgIntrospectionPlugin(
           this._handleChange();
         } else {
           throw new Error(
-            `Payload type '${(payload as any).type}' not recognised`,
+            `Payload type '${(payload as any).type}' not recognized`,
           );
         }
       } catch (e) {
@@ -1172,7 +1175,7 @@ export default (async function PgIntrospectionPlugin(
       this.client = null;
       this._reallyReleaseClient = null;
       if (pgClient) {
-        pgClient.query("unlisten postgraphile_watch").catch(e => {
+        pgClient.query("unlisten postgraphile_watch").catch((e) => {
           debug(`Error occurred trying to unlisten watch: ${e}`);
         });
         pgClient.removeListener("notification", this._listener);
@@ -1185,7 +1188,7 @@ export default (async function PgIntrospectionPlugin(
   }
 
   builder.registerWatcher(
-    async triggerRebuild => {
+    async (triggerRebuild) => {
       // In case we started listening before, clean up
       if (listener) {
         await listener.stop();
@@ -1205,7 +1208,7 @@ export default (async function PgIntrospectionPlugin(
 
   builder.hook(
     "build",
-    build => {
+    (build) => {
       const introspectionResultsByKind = introspectionResultsFromRaw(
         rawIntrospectionResultsByKind,
         build.pgAugmentIntrospectionResults,
@@ -1222,4 +1225,4 @@ export default (async function PgIntrospectionPlugin(
     [],
     ["PgBasics"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

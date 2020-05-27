@@ -1,16 +1,17 @@
 import debugFactory from "debug";
 
-import { Plugin } from "graphile-build";
 import { stringTag } from "./PgBasicsPlugin";
 import { PgEntityKind } from "./PgIntrospectionPlugin";
 
-declare module "graphile-build" {
-  interface GraphileBuildOptions {
-    pgLegacyRelations?: "only" | "deprecated" | "omit";
-  }
-  interface ScopeGraphQLObjectTypeFieldsField {
-    isPgBackwardSingleRelationField?: boolean;
-    isPgBackwardRelationField?: boolean;
+declare global {
+  namespace GraphileEngine {
+    interface GraphileBuildOptions {
+      pgLegacyRelations?: "only" | "deprecated" | "omit";
+    }
+    interface ScopeGraphQLObjectTypeFieldsField {
+      isPgBackwardSingleRelationField?: boolean;
+      isPgBackwardRelationField?: boolean;
+    }
   }
 }
 
@@ -68,7 +69,7 @@ export default (function PgBackwardRelationPlugin(
       const foreignTable = pgIntrospection;
       // This is a relation in which WE are foreign
       const foreignKeyConstraints = foreignTable.foreignConstraints.filter(
-        con => con.type === "f",
+        (con) => con.type === "f",
       );
 
       const foreignTableTypeName = inflection.tableType(foreignTable);
@@ -119,17 +120,17 @@ export default (function PgBackwardRelationPlugin(
 
           const keys = constraint.keyAttributes;
           const foreignKeys = constraint.foreignKeyAttributes;
-          if (!keys.every(_ => _) || !foreignKeys.every(_ => _)) {
+          if (!keys.every((_) => _) || !foreignKeys.every((_) => _)) {
             throw new Error("Could not find key columns!");
           }
-          if (keys.some(key => omit(key, "read"))) {
+          if (keys.some((key) => omit(key, "read"))) {
             return memo;
           }
-          if (foreignKeys.some(key => omit(key, "read"))) {
+          if (foreignKeys.some((key) => omit(key, "read"))) {
             return memo;
           }
           const isUnique = !!table.constraints.find(
-            c =>
+            (c) =>
               (c.type === "p" || c.type === "u") &&
               c.keyAttributeNums.length === keys.length &&
               c.keyAttributeNums.every((n, i) => keys[i].num === n),
@@ -173,9 +174,9 @@ export default (function PgBackwardRelationPlugin(
                     addDataGenerator,
                   }) => {
                     const sqlFrom = sql.identifier(schema.name, table.name);
-                    addDataGenerator(parsedResolveInfoFragment => {
+                    addDataGenerator((parsedResolveInfoFragment) => {
                       return {
-                        pgQuery: queryBuilder => {
+                        pgQuery: (queryBuilder) => {
                           queryBuilder.select(() => {
                             const resolveData = getDataFromParsedResolveInfoFragment(
                               parsedResolveInfoFragment,
@@ -195,7 +196,7 @@ export default (function PgBackwardRelationPlugin(
                                 withPagination: false,
                               },
 
-                              innerQueryBuilder => {
+                              (innerQueryBuilder) => {
                                 innerQueryBuilder.parentQueryBuilder = queryBuilder;
                                 if (
                                   subscriptions &&
@@ -293,9 +294,9 @@ export default (function PgBackwardRelationPlugin(
                       asJsonAggregate: !isConnection,
                     };
 
-                    addDataGenerator(parsedResolveInfoFragment => {
+                    addDataGenerator((parsedResolveInfoFragment) => {
                       return {
-                        pgQuery: queryBuilder => {
+                        pgQuery: (queryBuilder) => {
                           queryBuilder.select(() => {
                             const resolveData = getDataFromParsedResolveInfoFragment(
                               parsedResolveInfoFragment,
@@ -309,14 +310,14 @@ export default (function PgBackwardRelationPlugin(
                               tableAlias,
                               resolveData,
                               queryOptions,
-                              innerQueryBuilder => {
+                              (innerQueryBuilder) => {
                                 innerQueryBuilder.parentQueryBuilder = queryBuilder;
                                 if (subscriptions) {
                                   innerQueryBuilder.makeLiveCollection(table);
                                   innerQueryBuilder.addLiveCondition(
-                                    data => record => {
+                                    (data) => (record) => {
                                       return keys.every(
-                                        key =>
+                                        (key) =>
                                           record[key.name] === data[key.name],
                                       );
                                     },
@@ -349,7 +350,7 @@ export default (function PgBackwardRelationPlugin(
                                           "primary_key_asc",
                                         ];
 
-                                        primaryKeys.forEach(key => {
+                                        primaryKeys.forEach((key) => {
                                           innerQueryBuilder.orderBy(
                                             sql`${innerQueryBuilder.getTableAlias()}.${sql.identifier(
                                               key.name,
@@ -524,4 +525,4 @@ export default (function PgBackwardRelationPlugin(
     },
     ["PgBackwardRelation"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

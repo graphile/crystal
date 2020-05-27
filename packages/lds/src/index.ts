@@ -156,7 +156,7 @@ export default async function subscribeToLogicalDecoding(
       if (!temporary && nextStaleCheck < Date.now()) {
         // Roughly every 15 minutes, drop stale slots.
         nextStaleCheck = Date.now() + DROP_STALE_SLOTS_INTERVAL;
-        client.dropStaleSlots().catch(e => {
+        client.dropStaleSlots().catch((e) => {
           console.error("Failed to drop stale slots:", e.message);
         });
       }

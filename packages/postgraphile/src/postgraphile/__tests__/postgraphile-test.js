@@ -9,6 +9,21 @@ import { createPostGraphileSchema, watchPostGraphileSchema } from "..";
 import createPostGraphileHttpRequestHandler from "../http/createPostGraphileHttpRequestHandler";
 import postgraphile from "../postgraphile";
 import chalk from "chalk";
+import { GraphQLSchema, GraphQLObjectType, GraphQLInt } from "graphql";
+
+const blankSchema = new GraphQLSchema({
+  query: new GraphQLObjectType({
+    name: "Query",
+    fields: {
+      _: {
+        type: GraphQLInt,
+      },
+    },
+  }),
+});
+watchPostGraphileSchema.mockImplementation((a, b, c, d) => {
+  d(blankSchema);
+});
 
 createPostGraphileHttpRequestHandler.mockImplementation(({ getGqlSchema }) =>
   Promise.resolve(getGqlSchema()).then(() => null),
@@ -88,7 +103,15 @@ test("will watch Postgres schemas when `watchPg` is true", async () => {
 
 test("will not error if jwtSecret is provided without jwtPgTypeIdentifier", async () => {
   const pgPool = new Pool();
+  const spy = jest.spyOn(console, "warn").mockImplementation(() => {});
   expect(() => postgraphile(pgPool, [], { jwtSecret: "test" })).not.toThrow();
+  expect(spy.mock.calls).toMatchInlineSnapshot(`
+    Array [
+      Array [
+        "WARNING: jwtSecret provided, however jwtPgTypeIdentifier (token identifier) not provided.",
+      ],
+    ]
+  `);
 });
 
 test("will throw on undefined positional arguments", async () => {

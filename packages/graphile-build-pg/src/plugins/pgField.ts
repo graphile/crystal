@@ -1,16 +1,7 @@
-import {
-  Build,
-  ContextGraphQLObjectTypeFieldsField,
-  ScopeGraphQLObjectTypeFieldsField,
-  ScopeGraphQLInputObjectTypeFieldsField,
-} from "graphile-build";
 import { PgType } from "./PgIntrospectionPlugin";
 import QueryBuilder, { SQL } from "../QueryBuilder";
-import { FieldWithHooksFunction } from "graphile-build";
 import { ResolveTree } from "graphql-parse-resolve-info";
 import { PgTypeModifier } from "./PgBasicsPlugin";
-
-export { FieldWithHooksFunction };
 
 interface PgFieldOptions {
   pgType?: PgType;
@@ -25,18 +16,23 @@ interface PgFieldOptions {
 type FieldSpec = import("graphql").GraphQLFieldConfig<any, any>;
 
 export default function pgField(
-  build: Build,
-  fieldWithHooks: FieldWithHooksFunction,
+  build: GraphileEngine.Build,
+  fieldWithHooks: GraphileEngine.FieldWithHooksFunction,
   fieldName: string,
   fieldSpecGenerator:
-    | ((fieldContext: ContextGraphQLObjectTypeFieldsField) => FieldSpec)
+    | ((
+        fieldContext: GraphileEngine.ContextGraphQLObjectTypeFieldsField,
+      ) => FieldSpec)
     | FieldSpec,
 
-  inFieldScope: Omit<ScopeGraphQLObjectTypeFieldsField, "fieldName"> = {},
+  inFieldScope: Omit<
+    GraphileEngine.ScopeGraphQLObjectTypeFieldsField,
+    "fieldName"
+  > = {},
   whereFrom: ((queryBuilder: QueryBuilder) => SQL) | false = false,
   options: PgFieldOptions = {},
 ) {
-  const fieldScope: ScopeGraphQLInputObjectTypeFieldsField = {
+  const fieldScope: GraphileEngine.ScopeGraphQLInputObjectTypeFieldsField = {
     ...inFieldScope,
     fieldName,
   };
@@ -49,7 +45,7 @@ export default function pgField(
   } = build;
   return fieldWithHooks(
     fieldName,
-    fieldContext => {
+    (fieldContext) => {
       const fieldSpec =
         typeof fieldSpecGenerator === "function"
           ? fieldSpecGenerator(fieldContext)
@@ -71,7 +67,7 @@ export default function pgField(
         getDataFromParsedResolveInfoFragment,
         addDataGenerator,
       } = fieldContext;
-      addDataGenerator(parsedResolveInfoFragment => {
+      addDataGenerator((parsedResolveInfoFragment) => {
         const safeAlias = getSafeAliasFromAlias(
           parsedResolveInfoFragment.alias,
         );
@@ -87,7 +83,7 @@ export default function pgField(
           resolveData.usesCursor.length
             ? { usesCursor: true }
             : null),
-          pgQuery: queryBuilder => {
+          pgQuery: (queryBuilder) => {
             queryBuilder.select(() => {
               const tableAlias =
                 whereFrom === false
@@ -107,7 +103,7 @@ export default function pgField(
                 whereFrom === false
                   ? { onlyJsonField: true }
                   : { asJson: true },
-                innerQueryBuilder => {
+                (innerQueryBuilder) => {
                   innerQueryBuilder.parentQueryBuilder = queryBuilder;
                   if (typeof options.withQueryBuilder === "function") {
                     options.withQueryBuilder(innerQueryBuilder, {

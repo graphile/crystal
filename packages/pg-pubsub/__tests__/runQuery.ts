@@ -97,7 +97,7 @@ export const runQuery = function runGraphQLQuery(
         ),
       );
     });
-    ctx.middleware(req, res, err => {
+    ctx.middleware(req, res, (err) => {
       reject(err);
     });
   });

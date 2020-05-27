@@ -50,14 +50,14 @@ export default function makeGraphQLJSONType(
         return parseFloat(ast.value);
       case Kind.OBJECT: {
         const value = Object.create(null);
-        ast.fields.forEach(field => {
+        ast.fields.forEach((field) => {
           value[field.name.value] = parseLiteral(field.value, variables);
         });
 
         return value;
       }
       case Kind.LIST:
-        return ast.values.map(n => parseLiteral(n, variables));
+        return ast.values.map((n) => parseLiteral(n, variables));
       case Kind.NULL:
         return null;
       case Kind.VARIABLE: {

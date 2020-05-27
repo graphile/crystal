@@ -3,7 +3,6 @@ export * from "graphile-utils";
 export {
   mixed,
   Middleware,
-  PostGraphileOptions,
   CreateRequestHandlerOptions,
   GraphQLFormattedErrorExtended,
   GraphQLErrorExtended,
@@ -12,16 +11,9 @@ export {
 } from "./interfaces";
 
 export {
-  Plugin,
-  Build,
-  Context,
   SchemaBuilder,
-  SchemaListener,
-  Inflection,
-  Options,
   PostGraphileInflectionPlugin,
   PostGraphileClassicIdsInflectionPlugin,
-  GraphileResolverContext,
 } from "postgraphile-core";
 
 export {

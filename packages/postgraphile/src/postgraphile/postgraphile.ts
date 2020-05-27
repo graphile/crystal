@@ -9,11 +9,11 @@ import {
 import createPostGraphileHttpRequestHandler from "./http/createPostGraphileHttpRequestHandler";
 import exportPostGraphileSchema from "./schema/exportPostGraphileSchema";
 import { pluginHookFromOptions } from "./pluginHook";
-import { PostGraphileOptions, mixed, HttpRequestHandler } from "../interfaces";
+import { mixed, HttpRequestHandler } from "../interfaces";
 import chalk from "chalk";
 import { debugPgClient } from "./withPostGraphileContext";
 
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // tslint:disable-next-line no-any
 function isPlainObject(obj: any) {
@@ -32,7 +32,7 @@ export interface PostgraphileSchemaBuilder<
 > {
   _emitter: EventEmitter;
   getGraphQLSchema: () => Promise<GraphQLSchema>;
-  options: PostGraphileOptions<Request, Response>;
+  options: GraphileEngine.PostGraphileOptions<Request, Response>;
 }
 
 /**
@@ -46,7 +46,7 @@ export function getPostgraphileSchemaBuilder<
 >(
   pgPool: Pool,
   schema: string | Array<string>,
-  incomingOptions: PostGraphileOptions<Request, Response>,
+  incomingOptions: GraphileEngine.PostGraphileOptions<Request, Response>,
 ): PostgraphileSchemaBuilder {
   if (incomingOptions.live && incomingOptions.subscriptions == null) {
     // live implies subscriptions
@@ -105,7 +105,7 @@ export function getPostgraphileSchemaBuilder<
             pgPool,
             pgSchemas,
             options,
-            newSchema => {
+            (newSchema) => {
               gqlSchema = newSchema;
               _emitter.emit("schemas:changed");
               exportGqlSchema(gqlSchema);
@@ -172,14 +172,14 @@ export default function postgraphile<
 >(
   poolOrConfig?: Pool | PoolConfig | string,
   schema?: string | Array<string>,
-  options?: PostGraphileOptions<Request, Response>,
+  options?: GraphileEngine.PostGraphileOptions<Request, Response>,
 ): HttpRequestHandler;
 export default function postgraphile<
   Request extends IncomingMessage = IncomingMessage,
   Response extends ServerResponse = ServerResponse
 >(
   poolOrConfig?: Pool | PoolConfig | string,
-  options?: PostGraphileOptions<Request, Response>,
+  options?: GraphileEngine.PostGraphileOptions<Request, Response>,
 ): HttpRequestHandler;
 export default function postgraphile<
   Request extends IncomingMessage = IncomingMessage,
@@ -189,13 +189,13 @@ export default function postgraphile<
   schemaOrOptions?:
     | string
     | Array<string>
-    | PostGraphileOptions<Request, Response>,
-  maybeOptions?: PostGraphileOptions<Request, Response>,
+    | GraphileEngine.PostGraphileOptions<Request, Response>,
+  maybeOptions?: GraphileEngine.PostGraphileOptions<Request, Response>,
 ): HttpRequestHandler {
   let schema: string | Array<string>;
   // These are the raw options we're passed in; getPostgraphileSchemaBuilder
   // must process them with `pluginHook` before we can rely on them.
-  let incomingOptions: PostGraphileOptions<Request, Response>;
+  let incomingOptions: GraphileEngine.PostGraphileOptions<Request, Response>;
 
   // If the second argument is a string or array, it is the schemas so set the
   // `schema` value and try to use the third argument (or a default) for
@@ -232,7 +232,7 @@ export default function postgraphile<
   // Postgres pool.
   const pgPool = toPgPool(poolOrConfig);
 
-  pgPool.on("error", err => {
+  pgPool.on("error", (err) => {
     /*
      * This handler is required so that client connection errors don't bring
      * the server down (via `unhandledError`).
@@ -245,7 +245,7 @@ export default function postgraphile<
     console.error("PostgreSQL client generated error: ", err.message);
   });
 
-  pgPool.on("connect", pgClient => {
+  pgPool.on("connect", (pgClient) => {
     // Enhance our Postgres client with debugging stuffs.
     debugPgClient(pgClient, !!options.allowExplain);
   });

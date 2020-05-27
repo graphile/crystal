@@ -1,5 +1,3 @@
-import { Plugin } from "graphile-build";
-
 export default (function PgColumnDeprecationPlugin(builder) {
   builder.hook(
     "GraphQLObjectType:fields:field",
@@ -23,4 +21,4 @@ export default (function PgColumnDeprecationPlugin(builder) {
     },
     ["PgColumnDeprecation"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

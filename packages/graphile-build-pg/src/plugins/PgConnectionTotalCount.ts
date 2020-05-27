@@ -1,8 +1,8 @@
-import { Plugin } from "graphile-build";
-
-declare module "graphile-build" {
-  interface ScopeGraphQLObjectTypeFieldsField {
-    isPgConnectionTotalCountField?: boolean;
+declare global {
+  namespace GraphileEngine {
+    interface ScopeGraphQLObjectTypeFieldsField {
+      isPgConnectionTotalCountField?: boolean;
+    }
   }
 }
 
@@ -44,7 +44,7 @@ export default (function PgConnectionTotalCount(builder) {
             ({ addDataGenerator }) => {
               addDataGenerator(() => {
                 return {
-                  pgAggregateQuery: aggregateQueryBuilder => {
+                  pgAggregateQuery: (aggregateQueryBuilder) => {
                     aggregateQueryBuilder.select(sql`count(1)`, "totalCount");
                   },
                 };
@@ -70,4 +70,4 @@ export default (function PgConnectionTotalCount(builder) {
     },
     ["PgConnectionTotalCount"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

@@ -1,25 +1,9 @@
-import {
-  SchemaBuilder,
-  Build,
-  Plugin,
-  Options,
-  ContextGraphQLObjectTypeFieldsField,
-  BuildBase,
-  ScopeGraphQLEnumType,
-  ScopeGraphQLObjectType,
-  GraphileObjectTypeConfig,
-  ContextGraphQLObjectTypeFields,
-  ContextGraphQLInputObjectTypeFields,
-  ScopeGraphQLUnionType,
-  GraphileUnionTypeConfig,
-  ScopeGraphQLObjectTypeFieldsField,
-} from "graphile-build";
+import { SchemaBuilder } from "graphile-build";
 import { QueryBuilder, PgClass, PgEntityKind } from "graphile-build-pg";
 import { GraphileEmbed } from "./gql";
 import { InputObjectTypeExtensionNode } from "graphql/language/ast";
 
 import { GraphileHelpers, makeFieldHelpers } from "./fieldHelpers";
-import { DirectiveMap } from "graphile-build/dist/SchemaBuilder";
 
 // TODO:v5: Remove
 const recurseDataGeneratorsWorkaroundFieldByType = new Map();
@@ -99,15 +83,18 @@ export default function makeExtendSchemaPlugin(
   generator:
     | ExtensionDefinition
     | ((
-        build: Partial<Build> & BuildBase,
-        schemaOptions: Options,
+        build: Partial<GraphileEngine.Build> & GraphileEngine.BuildBase,
+        schemaOptions: GraphileEngine.GraphileBuildOptions,
       ) => ExtensionDefinition),
   uniqueId = String(Math.random()).substr(2),
-): Plugin {
-  let graphql: Build["graphql"];
-  return (builder: SchemaBuilder, schemaOptions: Options): void => {
+): GraphileEngine.Plugin {
+  let graphql: GraphileEngine.Build["graphql"];
+  return (
+    builder: SchemaBuilder,
+    schemaOptions: GraphileEngine.GraphileBuildOptions,
+  ): void => {
     // Add stuff to the schema
-    builder.hook("build", build => {
+    builder.hook("build", (build) => {
       // Extract GraphQL into the scope so that our other functions can use it.
       graphql = build.graphql;
 
@@ -148,7 +135,7 @@ export default function makeExtendSchemaPlugin(
         GraphQLObjectType: {},
       };
       const newTypes: Array<NewTypeDef> = [];
-      mergedTypeDefinitions.forEach(definition => {
+      mergedTypeDefinitions.forEach((definition) => {
         if (definition.kind === "EnumTypeDefinition") {
           newTypes.push({
             type: GraphQLEnumType,
@@ -298,7 +285,7 @@ export default function makeExtendSchemaPlugin(
             },
             {},
           );
-          const scope: ScopeGraphQLEnumType = {
+          const scope: GraphileEngine.ScopeGraphQLEnumType = {
             directives,
             ...(directives.scope || {}),
           };
@@ -309,15 +296,17 @@ export default function makeExtendSchemaPlugin(
           const description = getDescription(definition.description);
           const interfaces = getInterfaces(definition.interfaces, build);
           const directives = getDirectives(definition.directives);
-          const scope: ScopeGraphQLObjectType = {
+          const scope: GraphileEngine.ScopeGraphQLObjectType = {
             __origin: `makeExtendSchemaPlugin`,
             directives,
             ...(directives.scope || {}),
           };
-          const spec: GraphileObjectTypeConfig<any, any> = {
+          const spec: GraphileEngine.GraphileObjectTypeConfig<any, any> = {
             name,
             interfaces,
-            fields: (fieldsContext: ContextGraphQLObjectTypeFields) =>
+            fields: (
+              fieldsContext: GraphileEngine.ContextGraphQLObjectTypeFields,
+            ) =>
               getFields(
                 fieldsContext.Self,
                 definition.fields,
@@ -346,7 +335,9 @@ export default function makeExtendSchemaPlugin(
             type,
             {
               name,
-              fields: ({ Self }: ContextGraphQLInputObjectTypeFields) =>
+              fields: ({
+                Self,
+              }: GraphileEngine.ContextGraphQLInputObjectTypeFields) =>
                 getInputFields(Self, definition.fields, build),
               ...(description
                 ? {
@@ -361,14 +352,14 @@ export default function makeExtendSchemaPlugin(
           const name = getName(definition.name);
           const description = getDescription(definition.description);
           const directives = getDirectives(definition.directives);
-          const scope: ScopeGraphQLUnionType = {
+          const scope: GraphileEngine.ScopeGraphQLUnionType = {
             __origin: `makeExtendSchemaPlugin`,
             directives,
             ...(directives.scope || {}),
           };
           const resolver = resolvers[name] as UnionResolver | undefined;
           const resolveType = resolver && resolver.__resolveType;
-          const spec: GraphileUnionTypeConfig<any, any> = {
+          const spec: GraphileEngine.GraphileUnionTypeConfig<any, any> = {
             name,
             types: (): import("graphql").GraphQLObjectType[] => {
               if (Array.isArray(definition.types)) {
@@ -546,7 +537,7 @@ export default function makeExtendSchemaPlugin(
 
   function getType(
     type: import("graphql").TypeNode,
-    build: Build,
+    build: GraphileEngine.Build,
   ): import("graphql").GraphQLType {
     if (type.kind === "NamedType") {
       const Type = build.getTypeByName(getName(type.name));
@@ -569,7 +560,7 @@ export default function makeExtendSchemaPlugin(
 
   function getInterfaces(
     interfaces: ReadonlyArray<import("graphql").NamedTypeNode>,
-    _build: Build,
+    _build: GraphileEngine.Build,
   ) {
     if (interfaces.length) {
       throw new Error(
@@ -616,7 +607,7 @@ export default function makeExtendSchemaPlugin(
       }
 
       const values = enumType.getValues();
-      const enumValue = values.find(v => v.name === enumValueName);
+      const enumValue = values.find((v) => v.name === enumValueName);
       return enumValue ? enumValue.value : undefined;
     } else if (value.kind === "NullValue") {
       return null;
@@ -625,7 +616,7 @@ export default function makeExtendSchemaPlugin(
       const childType:
         | import("graphql").GraphQLList<import("graphql").GraphQLType>
         | null = type && graphql.isListType(type) ? type.ofType : null;
-      return value.values.map(value => getValue(value, childType));
+      return value.values.map((value) => getValue(value, childType));
     } else if (value.kind === "GraphileEmbed") {
       // RAW!
       return value.value;
@@ -638,7 +629,7 @@ export default function makeExtendSchemaPlugin(
 
   function getDirectives(
     directives: ReadonlyArray<import("graphql").DirectiveNode> | void,
-  ): DirectiveMap {
+  ): GraphileEngine.DirectiveMap {
     return (directives || []).reduce((directivesList, directive) => {
       if (directive.kind === "Directive") {
         const name = getName(directive.name);
@@ -679,7 +670,7 @@ export default function makeExtendSchemaPlugin(
 
   function getArguments(
     args: ReadonlyArray<import("graphql").InputValueDefinitionNode> | void,
-    build: Build,
+    build: GraphileEngine.Build,
   ): import("graphql").GraphQLFieldConfigArgumentMap {
     if (args && args.length) {
       return args.reduce((memo, arg) => {
@@ -719,7 +710,7 @@ export default function makeExtendSchemaPlugin(
     }: {
       fieldWithHooks: any;
     },
-    build: Build,
+    build: GraphileEngine.Build,
   ) {
     const scopeByType = build.scopeByType || new Map();
     if (!build.graphql.isNamedType(SelfGeneric)) {
@@ -732,7 +723,7 @@ export default function makeExtendSchemaPlugin(
     } = build;
     function augmentResolver(
       resolver: AugmentedGraphQLFieldResolver<TSource, any>,
-      fieldContext: ContextGraphQLObjectTypeFieldsField,
+      fieldContext: GraphileEngine.ContextGraphQLObjectTypeFieldsField,
       type: import("graphql").GraphQLOutputType,
     ) {
       let got = false;
@@ -790,10 +781,13 @@ export default function makeExtendSchemaPlugin(
           const nullableType = build.graphql.getNullableType(type);
           const namedType = build.graphql.getNamedType(type);
           const typeScope = (scopeByType.get(namedType) || {}) as Partial<
-            ScopeGraphQLObjectType
+            GraphileEngine.ScopeGraphQLObjectType
           >;
           const directives = getDirectives(field.directives);
-          const scope: Omit<ScopeGraphQLObjectTypeFieldsField, "fieldName"> = {
+          const scope: Omit<
+            GraphileEngine.ScopeGraphQLObjectTypeFieldsField,
+            "fieldName"
+          > = {
             ...(typeScope.pgIntrospection &&
             typeScope.pgIntrospection.kind === "class"
               ? {
@@ -897,12 +891,12 @@ export default function makeExtendSchemaPlugin(
             }
           }
           const fieldSpecGenerator = (
-            fieldContext: ContextGraphQLObjectTypeFieldsField,
+            fieldContext: GraphileEngine.ContextGraphQLObjectTypeFieldsField,
           ): {
             type: import("graphql").GraphQLOutputType;
             args?: {};
             deprecationReason?: string;
-            descroption?: string;
+            description?: string;
           } => {
             const { pgIntrospection } = fieldContext.scope;
             // @requires directive: pulls down necessary columns from table.
@@ -917,13 +911,13 @@ export default function makeExtendSchemaPlugin(
               const table: PgClass = pgIntrospection;
               if (Array.isArray(directives.requires.columns)) {
                 const attrs = table.attributes.filter(
-                  attr => directives.requires.columns.indexOf(attr.name) >= 0,
+                  (attr) => directives.requires.columns.indexOf(attr.name) >= 0,
                 );
-                const fieldNames = attrs.map(attr =>
+                const fieldNames = attrs.map((attr) =>
                   build.inflection.column(attr),
                 );
                 const ReturnTypes = attrs.map(
-                  attr =>
+                  (attr) =>
                     build.pgGetGqlTypeByTypeIdAndModifier(
                       attr.typeId,
                       attr.typeModifier,
@@ -1115,7 +1109,7 @@ export default function makeExtendSchemaPlugin(
   function getInputFields<TSource>(
     _Self: TSource,
     fields: ReadonlyArray<import("graphql").InputValueDefinitionNode> | void,
-    build: Build,
+    build: GraphileEngine.Build,
   ) {
     if (fields && fields.length) {
       return fields.reduce((memo, field) => {

@@ -1,11 +1,4 @@
-import {
-  SchemaBuilder,
-  Build,
-  Plugin,
-  Options,
-  ContextGraphQLObjectTypeFieldsField,
-  ContextGraphQLInputObjectTypeFieldsField,
-} from "graphile-build";
+import { SchemaBuilder } from "graphile-build";
 
 interface ChangeNullabilityRules {
   [typeName: string]: {
@@ -15,26 +8,33 @@ interface ChangeNullabilityRules {
 
 export default function makeChangeNullabilityPlugin(
   rules: ChangeNullabilityRules,
-): Plugin {
-  return (builder: SchemaBuilder, _options: Options) => {
+): GraphileEngine.Plugin {
+  return (
+    builder: SchemaBuilder,
+    _options: GraphileEngine.GraphileBuildOptions,
+  ) => {
     function changeNullability(
       field: import("graphql").GraphQLInputFieldConfig,
-      build: Build,
-      context: ContextGraphQLInputObjectTypeFieldsField,
+      build: GraphileEngine.Build,
+      context: GraphileEngine.ContextGraphQLInputObjectTypeFieldsField,
     ): typeof field;
     function changeNullability(
       field: import("graphql").GraphQLFieldConfig<any, any>,
-      build: Build,
-      context: ContextGraphQLObjectTypeFieldsField,
+      build: GraphileEngine.Build,
+      context: GraphileEngine.ContextGraphQLObjectTypeFieldsField,
     ): typeof field;
     function changeNullability<
       Field extends
         | import("graphql").GraphQLInputFieldConfig
         | import("graphql").GraphQLFieldConfig<any, any>,
       Context extends
-        | ContextGraphQLInputObjectTypeFieldsField
-        | ContextGraphQLObjectTypeFieldsField
-    >(field: Field, build: Build, context: Context): typeof field {
+        | GraphileEngine.ContextGraphQLInputObjectTypeFieldsField
+        | GraphileEngine.ContextGraphQLObjectTypeFieldsField
+    >(
+      field: Field,
+      build: GraphileEngine.Build,
+      context: Context,
+    ): typeof field {
       const {
         Self,
         scope: { fieldName },
@@ -57,7 +57,7 @@ export default function makeChangeNullabilityPlugin(
           ? nullableType
           : nullableType === field.type
           ? new GraphQLNonNull(field.type)
-          : field.type, // Optimisation if it's already non-null
+          : field.type, // Optimization if it's already non-null
       };
     }
     builder.hook("GraphQLInputObjectType:fields:field", changeNullability);

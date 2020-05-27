@@ -1,3 +1,5 @@
+alter sequence inheritence.file_id_seq restart with 1;
+alter sequence c.issue756_id_seq restart with 1;
 insert into a.no_primary_key (id, str) values
   (1, 'one'),
   (2, 'two'),
@@ -132,6 +134,7 @@ insert into b.types values (
   '192.168.0.0/24',
   'feed.dead.beef'
 );
+alter sequence b.types_id_seq restart with 13;
 
 insert into c.edge_case values
   (default, 20, 1),

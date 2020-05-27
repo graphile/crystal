@@ -2,11 +2,10 @@ import { readFile as origReadFile, writeFile as origWriteFile } from "fs";
 import {
   graphql,
   GraphQLSchema,
-  introspectionQuery,
+  getIntrospectionQuery,
   printSchema,
   lexicographicSortSchema,
 } from "graphql";
-import { PostGraphileOptions } from "../../interfaces";
 import { promisify } from "util";
 
 const readFile = promisify(origReadFile);
@@ -32,7 +31,7 @@ async function writeFileIfDiffers(
  */
 export default async function exportPostGraphileSchema(
   schema: GraphQLSchema,
-  options: PostGraphileOptions = {},
+  options: GraphileEngine.PostGraphileOptions = {},
 ): Promise<void> {
   const jsonPath =
     typeof options.exportJsonSchemaPath === "string"
@@ -51,7 +50,7 @@ export default async function exportPostGraphileSchema(
 
   // JSON version
   if (jsonPath) {
-    const result = await graphql(finalSchema, introspectionQuery);
+    const result = await graphql(finalSchema, getIntrospectionQuery());
     await writeFileIfDiffers(jsonPath, JSON.stringify(result, null, 2));
   }
 

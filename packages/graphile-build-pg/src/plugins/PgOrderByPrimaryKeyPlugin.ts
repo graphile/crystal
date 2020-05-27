@@ -1,5 +1,3 @@
-import { Plugin } from "graphile-build";
-
 export default (function PgOrderByPrimaryKeyPlugin(builder) {
   builder.hook(
     "GraphQLEnumType:values",
@@ -24,7 +22,7 @@ export default (function PgOrderByPrimaryKeyPlugin(builder) {
           PRIMARY_KEY_ASC: {
             value: {
               alias: "primary_key_asc",
-              specs: primaryKeys.map(key => [key.name, true]),
+              specs: primaryKeys.map((key) => [key.name, true]),
               unique: true,
             },
           },
@@ -32,7 +30,7 @@ export default (function PgOrderByPrimaryKeyPlugin(builder) {
           PRIMARY_KEY_DESC: {
             value: {
               alias: "primary_key_desc",
-              specs: primaryKeys.map(key => [key.name, false]),
+              specs: primaryKeys.map((key) => [key.name, false]),
               unique: true,
             },
           },
@@ -43,4 +41,4 @@ export default (function PgOrderByPrimaryKeyPlugin(builder) {
     },
     ["PgOrderByPrimaryKey"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);

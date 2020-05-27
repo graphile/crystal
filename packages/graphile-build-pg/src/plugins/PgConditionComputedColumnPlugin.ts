@@ -1,9 +1,11 @@
-import { Plugin, Build } from "graphile-build";
 import { getComputedColumnDetails } from "./PgComputedColumnsPlugin";
 import assert from "assert";
 import { PgClass, PgProc, PgType } from "./PgIntrospectionPlugin";
 
-function getCompatibleComputedColumns(build: Build, table: PgClass) {
+function getCompatibleComputedColumns(
+  build: GraphileEngine.Build,
+  table: PgClass,
+) {
   const {
     pgIntrospectionResultsByKind: introspectionResultsByKind,
     pgOmit: omit,
@@ -191,7 +193,7 @@ export default (function PgConditionComputedColumnPlugin(builder) {
       const compatibleComputedColumns = getCompatibleComputedColumns(
         build,
         table,
-      ).map(o => {
+      ).map((o) => {
         const { proc, pseudoColumnName } = o;
 
         const fieldName = inflection.computedColumn(
@@ -209,7 +211,7 @@ export default (function PgConditionComputedColumnPlugin(builder) {
       });
       addArgDataGenerator(function connectionCondition({ condition }) {
         return {
-          pgQuery: queryBuilder => {
+          pgQuery: (queryBuilder) => {
             if (typeof condition === "object" && condition != null) {
               compatibleComputedColumns.forEach(
                 ({ fieldName, sqlFnName, returnType }) => {
@@ -233,4 +235,4 @@ export default (function PgConditionComputedColumnPlugin(builder) {
     },
     ["PgConditionComputedColumn"],
   );
-} as Plugin);
+} as GraphileEngine.Plugin);
