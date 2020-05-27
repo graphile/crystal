@@ -16,7 +16,7 @@ function readFilePromise(filename, encoding) {
   });
 }
 
-const withTransactionlessPgClient = async (url, fn) => {
+export const withTransactionlessPgClient = async (url, fn) => {
   if (!fn) {
     fn = url;
     url = process.env.TEST_DATABASE_URL;
@@ -34,7 +34,7 @@ const withTransactionlessPgClient = async (url, fn) => {
   }
 };
 
-const withPgClient = (url, fn) => {
+export const withPgClient = (url, fn) => {
   if (!fn) {
     fn = url;
     url = process.env.TEST_DATABASE_URL;
@@ -62,7 +62,8 @@ const withDbFromUrl = async (url, fn) => {
   });
 };
 
-const withRootDb = (fn) => withDbFromUrl(process.env.TEST_DATABASE_URL, fn);
+export const withRootDb = (fn) =>
+  withDbFromUrl(process.env.TEST_DATABASE_URL, fn);
 
 let prepopulatedDBKeepalive;
 
@@ -73,7 +74,7 @@ const populateDatabase = async (client) => {
   return {};
 };
 
-const withPrepopulatedDb = async (fn) => {
+export const withPrepopulatedDb = async (fn) => {
   if (!prepopulatedDBKeepalive) {
     throw new Error("You must call setup and teardown to use this");
   }
@@ -132,13 +133,7 @@ withPrepopulatedDb.teardown = () => {
   prepopulatedDBKeepalive = null;
 };
 
-async function getServerVersionNum(pgClient) {
+export async function getServerVersionNum(pgClient) {
   const versionResult = await pgClient.query("show server_version_num;");
   return parseInt(versionResult.rows[0].server_version_num, 10);
 }
-
-exports.withRootDb = withRootDb;
-exports.withPrepopulatedDb = withPrepopulatedDb;
-exports.withPgClient = withPgClient;
-exports.withTransactionlessPgClient = withTransactionlessPgClient;
-exports.getServerVersionNum = getServerVersionNum;
