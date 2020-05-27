@@ -68,7 +68,7 @@ function escapeLarge(sqlFragment: SQL, type: PgType) {
 }
 
 class QueryBuilder {
-  parentQueryBuilder: QueryBuilder | void;
+  parentQueryBuilder: QueryBuilder | undefined;
   context: GraphileEngine.GraphileResolverContext;
   rootValue: any;
   locks: {

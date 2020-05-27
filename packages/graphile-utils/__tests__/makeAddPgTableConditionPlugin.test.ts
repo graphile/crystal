@@ -1,4 +1,4 @@
-import pg from "pg";
+import pg, { Pool } from "pg";
 import { graphql } from "graphql";
 import { createPostGraphileSchema } from "postgraphile-core";
 import {
@@ -7,8 +7,9 @@ import {
   embed,
   makeAddPgTableConditionPlugin,
 } from "../dist";
+import assert from "assert";
 
-const clean = (data) => {
+const clean = (data: any): any => {
   if (Array.isArray(data)) {
     return data.map(clean);
   } else if (data && typeof data === "object") {
@@ -28,7 +29,7 @@ const clean = (data) => {
   }
 };
 
-let pgPool;
+let pgPool: Pool;
 
 beforeAll(() => {
   pgPool = new pg.Pool({
@@ -39,7 +40,6 @@ beforeAll(() => {
 afterAll(() => {
   if (pgPool) {
     pgPool.end();
-    pgPool = null;
   }
 });
 
@@ -55,7 +55,7 @@ const PetsCountPlugin = makeAddPgTableConditionPlugin(
     expect(build.graphql).toBeTruthy();
     const { sqlTableAlias, sql } = helpers;
     return sql`(select count(*) from graphile_utils.pets where pets.user_id = ${sqlTableAlias}.id) >= ${sql.value(
-      value,
+      value as any,
     )}`;
   },
 );
@@ -89,6 +89,7 @@ it("allows adding a condition to a Relay connection", async () => {
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();
+    assert(data);
     expect(data.allUsers).toBeTruthy();
     expect(data.allUsers.nodes).toBeTruthy();
     expect(data.allUsers.nodes.length).toEqual(1);
@@ -126,6 +127,7 @@ it("allows adding a condition to a simple collection", async () => {
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();
+    assert(data);
     expect(data.allUsersList).toBeTruthy();
     expect(data.allUsersList.length).toEqual(1);
     expect(data.allUsersList[0].email).toEqual("caroline@example.com");

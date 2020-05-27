@@ -1,9 +1,9 @@
-import pg from "pg";
+import pg, { Pool, PoolClient } from "pg";
 import { graphql } from "graphql";
 import { createPostGraphileSchema } from "postgraphile-core";
 import { makeJSONPgSmartTagsPlugin } from "../dist";
 
-let pgPool = null;
+let pgPool: Pool;
 
 beforeAll(() => {
   pgPool = new pg.Pool({
@@ -14,7 +14,6 @@ beforeAll(() => {
 afterAll(() => {
   if (pgPool) {
     pgPool.end();
-    pgPool = null;
   }
 });
 
@@ -32,7 +31,9 @@ const testQuery = /* GraphQL */ `
   }
 `;
 
-async function withContext(callback) {
+async function withContext<T>(
+  callback: (context: { pgClient: PoolClient }) => Promise<T>,
+): Promise<T> {
   const pgClient = await pgPool.connect();
   try {
     return await callback({ pgClient });
@@ -50,7 +51,7 @@ test.each([
   [
     "fully qualified table name, embedded column",
     {
-      version: 1,
+      version: 1 as const,
       config: {
         class: {
           // Fully qualified table name
@@ -76,7 +77,7 @@ test.each([
   [
     "simple table name, embedded column",
     {
-      version: 1,
+      version: 1 as const,
       config: {
         class: {
           // Just table name (no schema)
@@ -101,7 +102,7 @@ test.each([
   [
     "simple table name, table.column",
     {
-      version: 1,
+      version: 1 as const,
       config: {
         class: {
           test_smart_tags: {
@@ -126,7 +127,7 @@ test.each([
   [
     "simple table name, fully qualified column",
     {
-      version: 1,
+      version: 1 as const,
       config: {
         class: {
           test_smart_tags: {
@@ -151,7 +152,7 @@ test.each([
   [
     "simple table name, simple column name",
     {
-      version: 1,
+      version: 1 as const,
       config: {
         class: {
           test_smart_tags: {

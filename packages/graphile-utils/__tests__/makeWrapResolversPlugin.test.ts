@@ -10,6 +10,14 @@ import {
 } from "graphile-build";
 import { graphql } from "graphql";
 
+declare global {
+  namespace GraphileEngine {
+    interface GraphileBuildOptions {
+      optionKey?: string;
+    }
+  }
+}
+
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const makeSchemaWithSpyAndPlugins = (spy, plugins) =>

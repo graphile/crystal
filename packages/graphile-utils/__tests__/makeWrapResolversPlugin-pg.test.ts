@@ -1,9 +1,10 @@
 import { makeWrapResolversPlugin, makeChangeNullabilityPlugin } from "../";
 import { graphql } from "graphql";
 import { createPostGraphileSchema } from "postgraphile-core";
-import pg from "pg";
+import pg, { Pool } from "pg";
+import assert from "assert";
 
-let pgPool;
+let pgPool: Pool;
 
 beforeAll(() => {
   pgPool = new pg.Pool({
@@ -14,11 +15,10 @@ beforeAll(() => {
 afterAll(() => {
   if (pgPool) {
     pgPool.end();
-    pgPool = null;
   }
 });
 
-const makeSchemaWithPlugins = (plugins) =>
+const makeSchemaWithPlugins = (plugins: GraphileEngine.Plugin[]) =>
   createPostGraphileSchema(pgPool, ["graphile_utils"], {
     appendPlugins: plugins,
   });
@@ -71,7 +71,8 @@ it("requests the required sibling columns", async () => {
       },
     );
     expect(result.errors).toBeFalsy();
-    result.data.allUsers.nodes.forEach((user) => {
+    assert(result.data);
+    result.data.allUsers.nodes.forEach((user: any) => {
       if (user.id === 2) {
         expect(user.email).not.toBeNull();
       } else {
@@ -160,6 +161,7 @@ it("requests the required child columns", async () => {
       },
     );
     expect(result.errors).toBeFalsy();
+    assert(result.data);
     expect(result.data.createUser).toBeTruthy();
     expect(newUserId).not.toBeUndefined();
     const { user } = result.data.createUser;

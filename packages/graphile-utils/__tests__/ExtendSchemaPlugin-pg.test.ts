@@ -1,9 +1,12 @@
-import pg from "pg";
+import pg, { Pool, Query } from "pg";
 import { graphql } from "graphql";
 import { createPostGraphileSchema } from "postgraphile-core";
 import { makeExtendSchemaPlugin, gql, embed } from "../";
+import { ExecutionResultDataDefault } from "graphql/execution/execute";
+import assert from "assert";
+import { QueryBuilder } from "../../../.yarn/$$virtual/graphile-build-pg-virtual-92e0f683b8/1/packages/graphile-build-pg/dist";
 
-const clean = (data) => {
+const clean = (data: any): any => {
   if (Array.isArray(data)) {
     return data.map(clean);
   } else if (data && typeof data === "object") {
@@ -23,10 +26,10 @@ const clean = (data) => {
   }
 };
 
-function mockSendEmail() {
+function mockSendEmail(...args: any[]) {
   return new Promise((resolve) => setTimeout(resolve, 1));
 }
-let pgPool;
+let pgPool: Pool;
 
 beforeAll(() => {
   pgPool = new pg.Pool({
@@ -37,7 +40,6 @@ beforeAll(() => {
 afterAll(() => {
   if (pgPool) {
     pgPool.end();
-    pgPool = null;
   }
 });
 
@@ -46,7 +48,7 @@ it("allows adding a custom single field to PG schema", async () => {
     disableDefaultMutations: true,
     appendPlugins: [
       makeExtendSchemaPlugin((build) => {
-        const { pgSql: sql } = build;
+        const sql = build.pgSql!;
         return {
           typeDefs: gql`
             extend type Query {
@@ -93,6 +95,7 @@ it("allows adding a custom single field to PG schema", async () => {
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();
+    assert(data);
     expect(data.randomUser).toBeTruthy();
     expect(data.randomUser.id).toBeTruthy();
     expect(data.randomUser.nodeId).toBeTruthy();
@@ -108,7 +111,7 @@ it("allows adding a custom field returning a list to PG schema", async () => {
     disableDefaultMutations: true,
     appendPlugins: [
       makeExtendSchemaPlugin((build) => {
-        const { pgSql: sql } = build;
+        const sql = build.pgSql!;
         return {
           typeDefs: gql`
             extend type Query {
@@ -155,6 +158,7 @@ it("allows adding a custom field returning a list to PG schema", async () => {
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();
+    assert(data);
     expect(data.randomUsers).toBeTruthy();
     expect(data.randomUsers.length).toEqual(3);
     expect(data.randomUsers[2].id).toBeTruthy();
@@ -171,7 +175,7 @@ it("allows adding a simple mutation field to PG schema", async () => {
     disableDefaultMutations: true,
     appendPlugins: [
       makeExtendSchemaPlugin((build) => {
-        const { pgSql: sql } = build;
+        const sql = build.pgSql!;
         return {
           typeDefs: gql`
             input RegisterUserInput {
@@ -274,6 +278,7 @@ it("allows adding a simple mutation field to PG schema", async () => {
       {},
     );
     expect(errors).toBeFalsy();
+    assert(data);
     expect(data.user1).toBeTruthy();
     expect(data.user1.user.nodeId).toBeTruthy();
     expect(data.user1.user.id).toBeTruthy();
@@ -329,6 +334,7 @@ it("allows adding a field to an existing table, and requesting necessary data al
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();
+    assert(data);
     expect(data.userById).toBeTruthy();
     expect(data.userById.customField).toEqual(
       `User 1 fetched (name: Alice) [{"number_int":1,"string_text":"hi"},{"number_int":2,"string_text":"bye"}]`,
@@ -343,8 +349,8 @@ it("allows adding a custom connection", async () => {
     disableDefaultMutations: true,
     appendPlugins: [
       makeExtendSchemaPlugin((build) => {
-        const { pgSql: sql } = build;
-        const table = build.pgIntrospectionResultsByKind.class.find(
+        const sql = build.pgSql!;
+        const table = build.pgIntrospectionResultsByKind!.class.find(
           (tbl) =>
             tbl.namespaceName === "graphile_utils" && tbl.name === "users",
         );
@@ -403,6 +409,7 @@ it("allows adding a custom connection", async () => {
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();
+    assert(data);
     expect(data.myCustomConnection).toBeTruthy();
     expect(data.myCustomConnection.edges.length).toEqual(2);
     expect(data.myCustomConnection.nodes.length).toEqual(2);
@@ -427,7 +434,7 @@ it("allows adding a custom connection without requiring directives", async () =>
     disableDefaultMutations: true,
     appendPlugins: [
       makeExtendSchemaPlugin((build) => {
-        const { pgSql: sql } = build;
+        const sql = build.pgSql!;
         return {
           typeDefs: gql`
             extend type Query {
@@ -480,6 +487,7 @@ it("allows adding a custom connection without requiring directives", async () =>
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();
+    assert(data);
     expect(data.myCustomConnection).toBeTruthy();
     expect(data.myCustomConnection.edges.length).toEqual(2);
     expect(data.myCustomConnection.nodes.length).toEqual(2);
@@ -504,15 +512,15 @@ it("allows adding a custom connection to a nested type", async () => {
     disableDefaultMutations: true,
     appendPlugins: [
       makeExtendSchemaPlugin((build) => {
-        const { pgSql: sql } = build;
+        const sql = build.pgSql!;
         return {
           typeDefs: gql`
             extend type User {
               pets: PetsConnection @pgQuery(
                 source: ${embed(sql`graphile_utils.pets`)}
-                withQueryBuilder: ${embed((queryBuilder) => {
+                withQueryBuilder: ${embed((queryBuilder: QueryBuilder) => {
                   queryBuilder.where(
-                    sql`${queryBuilder.getTableAlias()}.user_id = ${queryBuilder.parentQueryBuilder.getTableAlias()}.id`,
+                    sql`${queryBuilder.getTableAlias()}.user_id = ${queryBuilder.parentQueryBuilder!.getTableAlias()}.id`,
                   );
                 })}
               )
@@ -573,6 +581,7 @@ it("allows adding a custom connection to a nested type", async () => {
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();
+    assert(data);
     expect(data.allUsers).toBeTruthy();
     expect(data.allUsers.nodes).toHaveLength(3);
     const [alice, bob, caroline] = data.allUsers.nodes;
@@ -585,7 +594,10 @@ it("allows adding a custom connection to a nested type", async () => {
     expect(caroline.p2).toBeTruthy();
     expect(caroline.p2.nodes).toHaveLength(2);
     expect(caroline.p2.totalCount).toEqual(3);
-    expect(caroline.p2.nodes.map((n) => n.name)).toEqual(["Goldie", "Spot"]);
+    expect(caroline.p2.nodes.map((n: any) => n.name)).toEqual([
+      "Goldie",
+      "Spot",
+    ]);
     expect(data).toMatchSnapshot();
   } finally {
     pgClient.release();
@@ -597,21 +609,23 @@ it("allows adding a custom list to a nested type", async () => {
     disableDefaultMutations: true,
     appendPlugins: [
       makeExtendSchemaPlugin((build) => {
-        const { pgSql: sql } = build;
+        const sql = build.pgSql!;
         return {
           typeDefs: gql`
             extend type User {
               myCustomList(idLessThan: Int): [User] @pgQuery(
                 source: ${embed(sql`graphile_utils.users`)}
-                withQueryBuilder: ${embed((queryBuilder, args) => {
-                  if (args.idLessThan) {
-                    queryBuilder.where(
-                      sql`${queryBuilder.getTableAlias()}.id < ${sql.value(
-                        args.idLessThan,
-                      )}`,
-                    );
-                  }
-                })}
+                withQueryBuilder: ${embed(
+                  (queryBuilder: QueryBuilder, args: any) => {
+                    if (args.idLessThan) {
+                      queryBuilder.where(
+                        sql`${queryBuilder.getTableAlias()}.id < ${sql.value(
+                          args.idLessThan,
+                        )}`,
+                      );
+                    }
+                  },
+                )}
               )
             }
           `,
@@ -642,6 +656,7 @@ it("allows adding a custom list to a nested type", async () => {
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();
+    assert(data);
     expect(data.user).toBeTruthy();
     expect(data.user.myCustomList).toBeTruthy();
     expect(data.user.myCustomList[0].bio).not.toBe(undefined);
@@ -656,13 +671,13 @@ it("allows adding a single table entry to a nested type", async () => {
     disableDefaultMutations: true,
     appendPlugins: [
       makeExtendSchemaPlugin((build) => {
-        const { pgSql: sql } = build;
+        const sql = build.pgSql!;
         return {
           typeDefs: gql`
             extend type User {
               myCustomRecord(id: Int!): User @pgQuery(
                 source: ${embed(
-                  (parentQueryBuilder, args) =>
+                  (parentQueryBuilder: QueryBuilder, args: any) =>
                     sql`(select * from graphile_utils.users where users.id = ${sql.value(
                       args.id,
                     )} and users.id <> ${parentQueryBuilder.getTableAlias()}.id limit 1)`,
@@ -703,6 +718,7 @@ it("allows adding a single table entry to a nested type", async () => {
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();
+    assert(data);
     expect(data.user).toBeTruthy();
     expect(data.user.myCustomRecord).toBeTruthy();
     expect(data.user.myCustomRecord.id).toBe(2);
@@ -719,7 +735,7 @@ it("allows to retrieve a single scalar value", async () => {
     disableDefaultMutations: true,
     appendPlugins: [
       makeExtendSchemaPlugin((build) => {
-        const { pgSql: sql } = build;
+        const sql = build.pgSql!;
         return {
           typeDefs: gql`
             extend type User {
@@ -728,13 +744,13 @@ it("allows to retrieve a single scalar value", async () => {
               )
               myCustomScalarWithFunction: String! @pgQuery(
                 fragment: ${embed(
-                  (queryBuilder) =>
+                  (queryBuilder: QueryBuilder) =>
                     sql`(${queryBuilder.getTableAlias()}.name || ' ' || ${queryBuilder.getTableAlias()}.email)`,
                 )}
               )
               myCustomScalarWithFunctionAndArgument(test: Int!): Int! @pgQuery(
                 fragment: ${embed(
-                  (queryBuilder, args) =>
+                  (queryBuilder: QueryBuilder, args: any) =>
                     sql`(SELECT ${sql.value(args.test)}::integer)`,
                 )}
               )
@@ -769,6 +785,7 @@ it("allows to retrieve a single scalar value", async () => {
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();
+    assert(data);
     expect(data.user).toBeTruthy();
     expect(data.user.myCustomScalar).toBe(100);
     expect(data.user.myCustomScalarWithFunction).toBe(
@@ -788,7 +805,7 @@ it("allows to retrieve array scalar values", async () => {
     disableDefaultMutations: true,
     appendPlugins: [
       makeExtendSchemaPlugin((build) => {
-        const { pgSql: sql } = build;
+        const sql = build.pgSql!;
         return {
           typeDefs: gql`
             extend type User {
@@ -824,6 +841,7 @@ it("allows to retrieve array scalar values", async () => {
     );
     expect(errors).toBeFalsy();
     expect(data).toBeTruthy();
+    assert(data);
     expect(data.user).toBeTruthy();
     expect(data.user.myCustomArrayOfScalars).toEqual([
       "Felix",

@@ -3,6 +3,8 @@ import {
   makeAddInflectorsPlugin,
   gql,
   embed,
+  Resolvers,
+  ObjectResolver,
 } from "../";
 import {
   buildSchema,
@@ -15,31 +17,34 @@ import {
 } from "graphile-build";
 import { graphql, subscribe, parse } from "graphql";
 import { $$asyncIterator } from "iterall";
+import assert from "assert";
 
 declare global {
   namespace GraphileEngine {
     interface Inflection {
-      echoFieldName(): string
+      echoFieldName(): string;
     }
   }
 }
 
 function TestUtils_ExtractScopePlugin(
-  hook,
-  objectTypeName,
-  fieldNameOrCallback,
-  possiblyCallback,
-) {
+  hook: string,
+  objectTypeName: string,
+  fieldNameOrCallback: string,
+  possiblyCallback: (scope: any) => void,
+): GraphileEngine.Plugin {
   const callback =
     typeof fieldNameOrCallback === "function" && !possiblyCallback
       ? fieldNameOrCallback
       : possiblyCallback;
   const fieldName = possiblyCallback && fieldNameOrCallback;
   return (builder) => {
-    builder.hook(hook, (_, build, context) => {
-      const { Self } = context;
-      const currentObjectTypeName = (Self && Self.name) || _.name;
-      const currentFieldName = Self ? context.scope.fieldName : undefined;
+    builder.hook(hook as any, (_, build, context) => {
+      const Self = (context as any).Self;
+      const currentObjectTypeName = (Self && Self.name) || (_ as any).name;
+      const currentFieldName = Self
+        ? (context.scope as any).fieldName
+        : undefined;
       if (
         currentObjectTypeName === objectTypeName &&
         (!fieldName || fieldName === currentFieldName)
@@ -60,7 +65,7 @@ const simplePlugins = [
 ];
 
 let timerRunning = false;
-const resolvers = {
+const resolvers: Resolvers = {
   Query: {
     randomNumber(_query, _args, _context, _info) {
       return 4; // chosen by fair dice roll. guaranteed to be random. xkcd#221
@@ -95,14 +100,14 @@ const resolvers = {
         if (frequency == null) {
           throw new Error("No frequency specified");
         }
-        const callbackQueue = [];
-        const valueQueue = [];
+        const callbackQueue: any[] = [];
+        const valueQueue: any[] = [];
         // In a normal application you'd define timerRunning here:
         //   const timerRunning = true
         // However, in the tests we want access to this variable so I've moved
         // it to the global scope.
         timerRunning = true;
-        function addValue(v) {
+        function addValue(v: any) {
           if (!timerRunning) {
             return;
           }
@@ -137,7 +142,7 @@ const resolvers = {
             stopIterator();
             return Promise.resolve({ value: undefined, done: true });
           },
-          throw(error) {
+          throw(error: Error) {
             stopIterator();
             return Promise.reject(error);
           },
@@ -174,6 +179,7 @@ it("allows adding a simple type", async () => {
       }
     `,
   );
+  assert(data);
   expect(data.randomNumber).toEqual(4);
 });
 
@@ -201,6 +207,7 @@ it("allows adding a non-null type", async () => {
       }
     `,
   );
+  assert(data);
   expect(data.randomNumber).toEqual(4);
 });
 
@@ -228,6 +235,7 @@ it("allows adding a non-null list of non-null type", async () => {
       }
     `,
   );
+  assert(data);
   expect(data.randomNumbers).toEqual([5, 3, 6]);
 });
 
@@ -266,6 +274,7 @@ it("accepts an array of typedefs", async () => {
       }
     `,
   );
+  assert(data);
   expect(data.randomNumber).toEqual(4);
   expect(data.randomNumbers).toEqual([5, 3, 6]);
 });
@@ -346,6 +355,7 @@ it("allows adding a field with arguments", async () => {
       }
     `,
   );
+  assert(data);
   expect(data.echo).toEqual([1, 1, 2, 3, 5, 8]);
 });
 
@@ -369,7 +379,7 @@ it("allows adding a field with arguments named using a custom inflector", async 
       resolvers: {
         Query: {
           [build.inflection.echoFieldName()]: {
-            resolve: resolvers.Query.echo,
+            resolve: (resolvers.Query as ObjectResolver).echo,
           },
         },
       },
@@ -385,12 +395,13 @@ it("allows adding a field with arguments named using a custom inflector", async 
     `,
   );
   expect(errors).toBeFalsy();
+  assert(data);
   expect(data.echo).toEqual([1, 1, 2, 3, 5, 8]);
 });
 
 it("supports @scope directive with simple values", async () => {
-  let scope;
-  function storeScope(_scope) {
+  let scope: any;
+  function storeScope(_scope: any) {
     if (scope) {
       throw new Error("Scope already stored!");
     }
@@ -440,12 +451,13 @@ it("supports @scope directive with simple values", async () => {
     `,
   );
   expect(errors).toBeFalsy();
+  assert(data);
   expect(data.echo).toEqual([1, 1, 2, 3, 5, 8]);
 });
 
 it("supports @scope directive with variable value", async () => {
-  let scope;
-  function storeScope(_scope) {
+  let scope: any;
+  function storeScope(_scope: any) {
     if (scope) {
       throw new Error("Scope already stored!");
     }
@@ -506,12 +518,13 @@ it("supports @scope directive with variable value", async () => {
     `,
   );
   expect(errors).toBeFalsy();
+  assert(data);
   expect(data.echo).toEqual([1, 1, 2, 3, 5, 8]);
 });
 
 it("supports defining new types", async () => {
-  const inputsSeen = [];
-  const enumsSeen = [];
+  const inputsSeen: any[] = [];
+  const enumsSeen: any[] = [];
   const EchoCount = gql`
     enum EchoCount {
       ONCE
@@ -768,6 +781,7 @@ it("supports defining a simple subscription", async () => {
   let after = Date.now();
   expect(after).toBeGreaterThanOrEqual(before + 100);
   expect(errors).toBeFalsy();
+  assert(data);
   expect(data.clockTicks).toBeGreaterThanOrEqual(before);
   expect(data.clockTicks).toBeLessThanOrEqual(after);
   expect(timerRunning).toBeFalsy();
@@ -802,7 +816,7 @@ it("supports defining a simple subscription", async () => {
   expect(timerRunning).toBeTruthy();
 
   // And now stop the iterator
-  await iterator.return();
+  await iterator.return!();
   expect(timerRunning).toBeFalsy();
   const { value, done } = await iterator.next();
   expect(done).toBeTruthy();

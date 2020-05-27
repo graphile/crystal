@@ -10,7 +10,13 @@ type ResolverWrapperFn<
   TContext = any,
   TArgs = { [argName: string]: any }
 > = (
-  resolve: import("graphql").GraphQLFieldResolver<TSource, TContext, TArgs>,
+  //resolve: import("graphql").GraphQLFieldResolver<TSource, TContext, TArgs>,
+  resolve: (
+    parent?: any,
+    args?: { [key: string]: any },
+    context?: GraphileEngine.GraphileResolverContext,
+    info?: import("graphql").GraphQLResolveInfo,
+  ) => any,
   source: TSource,
   args: TArgs,
   context: TContext,
