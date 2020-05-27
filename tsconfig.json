@@ -19,9 +19,11 @@
     "suppressImplicitAnyIndexErrors": true,
     "strictNullChecks": true,
     "noFallthroughCasesInSwitch": true,
-    "noUnusedParameters": true,
-    "noUnusedLocals": true,
-    "preserveWatchOutput": true
+    "preserveWatchOutput": true,
+
+    // Use eslint for these "lint"-y checks
+    "noUnusedParameters": false,
+    "noUnusedLocals": false
   },
   "exclude": ["node_modules", "dist", ".yarn"],
   "include": [],

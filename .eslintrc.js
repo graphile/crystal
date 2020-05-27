@@ -117,7 +117,7 @@ module.exports = {
         "@typescript-eslint/explicit-function-return-type": "off",
 
         // We don't normally care about race conditions in tests
-        "require-atomic-updates": "warn",
+        "require-atomic-updates": "off",
       },
     },
   ],
