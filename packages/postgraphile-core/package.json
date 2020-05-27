@@ -4,6 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
+    "test": "jest -i",
     "prepack": "tsc -b"
   },
   "repository": {
