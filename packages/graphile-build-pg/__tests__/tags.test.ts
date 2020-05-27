@@ -1,4 +1,4 @@
-const { parseTags } = require("../dist/utils");
+import { parseTags } from "../dist/utils";
 
 test("tags are removed correctly", () => {
   expect(

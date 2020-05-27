@@ -1,7 +1,7 @@
-const { withPgClient } = require("../helpers");
-const { createPostGraphileSchema } = require("../..");
+import { withPgClient } from "../helpers";
+import { createPostGraphileSchema } from "../..";
 // eslint-disable-next-line no-unused-vars
-const { printSchema } = require("graphql");
+import { printSchema } from "graphql";
 
 function check(description, sql) {
   test(description, async () => {

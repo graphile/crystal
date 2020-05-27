@@ -1,4 +1,4 @@
-const core = require("./core");
+import core from "./core";
 
 test(
   "prints a schema without default mutations",

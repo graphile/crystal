@@ -1,4 +1,4 @@
-const {
+import {
   graphql,
   GraphQLObjectType,
   GraphQLEnumType,
@@ -6,8 +6,8 @@ const {
   GraphQLString,
   GraphQLNonNull,
   GraphQLList,
-} = require("graphql");
-const { buildSchema, defaultPlugins } = require("../");
+} from "graphql";
+import { buildSchema, defaultPlugins } from "../";
 
 const base64 = (str) => Buffer.from(String(str)).toString("base64");
 const base64Decode = (str) =>

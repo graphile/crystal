@@ -1,13 +1,13 @@
-const { gql } = require("graphile-utils");
-const {
+import { gql } from "graphile-utils";
+import {
   createSchema,
   releaseSchema,
   skipLDSTests,
   liveTest,
   next,
   resetDatabase,
-} = require("../live_helpers.js");
-const { transactionlessQuery } = require("../../helpers");
+} from "../live_helpers.js";
+import { transactionlessQuery } from "../../helpers";
 
 if (skipLDSTests) {
   test.skip("Skipping LDS tests", () => {});

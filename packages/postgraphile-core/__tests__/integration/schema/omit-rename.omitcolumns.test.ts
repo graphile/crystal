@@ -1,4 +1,4 @@
-const core = require("./core");
+import core from "./core";
 
 test(
   "omit create on column",

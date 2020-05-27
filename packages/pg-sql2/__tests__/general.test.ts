@@ -1,4 +1,4 @@
-const sql = require("../src").default;
+import sql from "../src";
 
 function sansSymbols(obj) {
   if (obj && typeof obj === "object") {

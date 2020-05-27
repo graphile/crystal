@@ -1,4 +1,4 @@
-const core = require("./core");
+import core from "./core";
 
 test(
   "prints a schema from non-root role, using RBAC permissions",

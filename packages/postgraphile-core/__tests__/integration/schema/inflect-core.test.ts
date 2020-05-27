@@ -1,5 +1,5 @@
-const core = require("./core");
-const { makeAddInflectorsPlugin } = require("graphile-utils");
+import core from "./core";
+import { makeAddInflectorsPlugin } from "graphile-utils";
 
 test(
   "prints a schema with the core types inflected",

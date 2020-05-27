@@ -1,4 +1,4 @@
-const core = require("./core");
+import core from "./core";
 
 test(
   "prints a schema with a JWT generating mutation",

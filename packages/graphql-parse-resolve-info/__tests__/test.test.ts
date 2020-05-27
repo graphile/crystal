@@ -1,8 +1,8 @@
-const {
+import {
   parseResolveInfo,
   simplifyParsedResolveInfoFragmentWithType,
-} = require("../src");
-const {
+} from "../src";
+import {
   graphql,
   GraphQLObjectType,
   GraphQLNonNull,
@@ -11,8 +11,8 @@ const {
   GraphQLList,
   GraphQLScalarType,
   GraphQLSchema,
-} = require("graphql");
-const { Kind } = require("graphql/language");
+} from "graphql";
+import { Kind } from "graphql/language";
 
 const query = `
   query Test($include: Boolean!, $exclude: Boolean!) {

@@ -1,5 +1,5 @@
-const { withPgClient } = require("../../helpers");
-const { createPostGraphileSchema } = require("../../..");
+import { withPgClient } from "../../helpers";
+import { createPostGraphileSchema } from "../../..";
 
 const PluginThatWouldNotHaveLoadedAnyway = () => {};
 

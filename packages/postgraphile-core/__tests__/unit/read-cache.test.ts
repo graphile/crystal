@@ -1,10 +1,10 @@
 jest.mock("graphile-build");
 jest.setTimeout(20000);
 
-const mockFs = require("mock-fs");
-const fs = require("fs");
-const graphileBuild = require("graphile-build");
-const { getPostGraphileBuilder } = require("../..");
+import mockFs from "mock-fs";
+import fs from "fs";
+import graphileBuild from "graphile-build";
+import { getPostGraphileBuilder } from "../..";
 
 beforeEach(() => {
   // required for mocks assertions

@@ -1,4 +1,4 @@
-const { buildSchema, defaultPlugins } = require("../");
+import { buildSchema, defaultPlugins } from "../";
 
 function EarlyPlugin(builder) {
   builder.hook("build", (build) => {

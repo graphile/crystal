@@ -1,4 +1,4 @@
-const core = require("./core");
+import core from "./core";
 
 test(
   "prints a schema to test PG10-specific features with default options",

@@ -1,5 +1,5 @@
-const { GraphQLEnumType } = require("graphql");
-const { buildSchema, defaultPlugins } = require("../");
+import { GraphQLEnumType } from "graphql";
+import { buildSchema, defaultPlugins } from "../";
 
 function EnumPlugin(builder) {
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {

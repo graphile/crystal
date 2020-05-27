@@ -1,19 +1,18 @@
-const {
+import {
   graphql,
   GraphQLObjectType,
   GraphQLInt,
   GraphQLNonNull,
   printSchema,
-} = require("graphql");
-const {
+} from "graphql";
+import {
   getBuilder,
-  defaultPlugins: allDefaultPlugins,
+  defaultPlugins as allDefaultPlugins,
   MutationPlugin,
-} = require("../");
+} from "../";
+import { EventEmitter } from "events";
 
 const options = {};
-
-const EventEmitter = require("events");
 
 const defaultPlugins = allDefaultPlugins.filter(
   (plugin) => plugin !== MutationPlugin,

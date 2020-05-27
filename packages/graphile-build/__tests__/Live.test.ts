@@ -1,9 +1,9 @@
-const {
+import {
   LiveSource,
   LiveCoordinator,
   LiveProvider,
   makeAsyncIteratorFromMonitor,
-} = require("../dist/Live");
+} from "../dist/Live";
 
 // TODO: this file needs a *lot* more tests!
 

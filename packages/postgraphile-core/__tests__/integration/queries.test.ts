@@ -1,21 +1,16 @@
-const { graphql } = require("graphql");
-const { withPgClient, getServerVersionNum } = require("../helpers");
-const { createPostGraphileSchema } = require("../..");
-const { readdirSync, readFile: rawReadFile } = require("fs");
-const { resolve: resolvePath } = require("path");
-const { printSchema } = require("graphql/utilities");
-const debug = require("debug")("graphile-build:schema");
-const { makeExtendSchemaPlugin, gql } = require("graphile-utils");
-const ToyCategoriesPlugin = require("./ToyCategoriesPlugin");
+import { graphql } from "graphql";
+import { withPgClient, getServerVersionNum } from "../helpers";
+import { createPostGraphileSchema } from "../..";
+import { readdirSync, promises as fsp } from "fs";
+import { resolve as resolvePath } from "path";
+import { printSchema } from "graphql/utilities";
+import debugFactory from "debug";
+import { makeExtendSchemaPlugin, gql } from "graphile-utils";
+import ToyCategoriesPlugin from "./ToyCategoriesPlugin";
 
-function readFile(filename, encoding) {
-  return new Promise((resolve, reject) => {
-    rawReadFile(filename, encoding, (err, res) => {
-      if (err) reject(err);
-      else resolve(res);
-    });
-  });
-}
+const debug = debugFactory("graphile-build:schema");
+
+const readFile = fsp.readFile;
 
 const queriesDir = `${__dirname}/../fixtures/queries`;
 const queryFileNames = readdirSync(queriesDir);

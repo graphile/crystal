@@ -1,6 +1,6 @@
-const { graphql } = require("graphql");
-const { withPgClient } = require("../helpers");
-const { createPostGraphileSchema } = require("../..");
+import { graphql } from "graphql";
+import { withPgClient } from "../helpers";
+import { createPostGraphileSchema } from "../..";
 
 let schema;
 

@@ -1,4 +1,4 @@
-const core = require("./core");
+import core from "./core";
 
 // WARNING: this function is not guaranteed to be SQL injection safe.
 const offerViewComment = (comment) => (pgClient) =>

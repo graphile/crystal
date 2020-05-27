@@ -1,5 +1,5 @@
-const core = require("./core");
-const { NodePlugin } = require("graphile-build");
+import core from "./core";
+import { NodePlugin } from "graphile-build";
 
 test(
   "prints a schema with the NodePlugin skipped",

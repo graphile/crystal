@@ -1,8 +1,8 @@
-const { resolve: resolvePath } = require("path");
-const { readdirSync, readFile: rawReadFile } = require("fs");
-const { graphql } = require("graphql");
-const { withPgClient, getServerVersionNum } = require("../helpers");
-const { createPostGraphileSchema } = require("../..");
+import { resolve as resolvePath } from "path";
+import { readdirSync, readFile as rawReadFile } from "fs";
+import { graphql } from "graphql";
+import { withPgClient, getServerVersionNum } from "../helpers";
+import { createPostGraphileSchema } from "../..";
 
 function readFile(filename, encoding) {
   return new Promise((resolve, reject) => {

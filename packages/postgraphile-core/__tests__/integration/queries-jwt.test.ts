@@ -1,10 +1,11 @@
-const { graphql } = require("graphql");
-const { withPgClient } = require("../helpers");
-const { createPostGraphileSchema } = require("../..");
-const { readFile: rawReadFile } = require("fs");
-//const { printSchema } = require("graphql/utilities");
-//const debug = require("debug")("graphile-build:schema");
-const jwt = require("jsonwebtoken");
+import { graphql } from "graphql";
+import { withPgClient } from "../helpers";
+import { createPostGraphileSchema } from "../..";
+import { readFile as rawReadFile } from "fs";
+//import { printSchema } from "graphql/utilities";
+//import debugFactory from "debug";
+//const debug = debugFactory("graphile-build:schema");
+import jwt from "jsonwebtoken";
 
 function readFile(filename, encoding) {
   return new Promise((resolve, reject) => {

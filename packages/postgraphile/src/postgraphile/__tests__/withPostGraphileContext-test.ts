@@ -3,12 +3,11 @@
 import { $$pgClient } from "../../postgres/inventory/pgClientFromContext";
 import withPostGraphileContext from "../withPostGraphileContext";
 import { readFileSync, readFile } from "fs";
+import jwt from "jsonwebtoken";
 
 beforeEach(() => {
   jest.restoreAllMocks();
 });
-
-const jwt = require("jsonwebtoken");
 
 /**
  * Expects an Http error. Passes if there is an error of the correct form,

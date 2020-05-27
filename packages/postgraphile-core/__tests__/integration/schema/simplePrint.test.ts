@@ -1,5 +1,5 @@
-const { withPgClient } = require("../../helpers");
-const { createPostGraphileSchema } = require("../../..");
+import { withPgClient } from "../../helpers";
+import { createPostGraphileSchema } from "../../..";
 
 test("Simple schema print (no ordering)", () =>
   withPgClient(async (client) => {
