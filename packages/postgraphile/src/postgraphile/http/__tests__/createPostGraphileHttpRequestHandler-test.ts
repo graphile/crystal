@@ -1,21 +1,23 @@
-/* tslint:disable no-console */
 import { GraphQLSchema, GraphQLObjectType, GraphQLString } from "graphql";
 import { $$pgClient } from "../../../postgres/inventory/pgClientFromContext";
 import createPostGraphileHttpRequestHandler from "../createPostGraphileHttpRequestHandler";
 import request from "./supertest";
+import * as http from "http";
+import * as http2 from "http2";
+import connect from "connect";
+import express from "express";
+import compress from "koa-compress";
+import koa from "koa";
+import koaMount from "koa-mount";
+import fastify, { ServerFactoryFunction } from "fastify";
+import { EventEmitter } from "events";
+import { Pool } from "pg";
+import {
+  GraphQLErrorExtended,
+  CreateRequestHandlerOptions,
+} from "../../../interfaces";
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const http = require("http");
-const http2 = require("http2");
-const connect = require("connect");
-const express = require("express");
-const compress = require("koa-compress");
-const koa = require("koa");
-const koaMount = require("koa-mount");
-const fastify = require("fastify");
-// tslint:disable-next-line variable-name
-const EventEmitter = require("events");
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const shortString = "User_Running_These_Tests";
 // Default bodySizeLimit is 100kB
@@ -44,13 +46,14 @@ const gqlSchema = new GraphQLSchema({
       testError: {
         type: GraphQLString,
         resolve: () => {
-          const err = new Error("test message");
-          err.extensions = { testingExtensions: true };
-          err.detail = "test detail";
-          err.hint = "test hint";
-          err.code = "12345";
-          err.where = "In your code somewhere";
-          err.file = "alcchk.c";
+          const err = Object.assign(new Error("test message"), {
+            extensions: { testingExtensions: true },
+            detail: "test detail",
+            hint: "test hint",
+            code: "12345",
+            where: "In your code somewhere",
+            file: "alcchk.c",
+          });
           throw err;
         },
       },
@@ -74,15 +77,26 @@ const pgClient = {
 
 const pgPool = {
   connect: jest.fn(() => pgClient),
-};
+} as any;
 
 const defaultOptions = {
   getGqlSchema: () => Promise.resolve(gqlSchema),
-  pgPool,
+  pgPool: pgPool as Pool,
   disableQueryLog: true,
 };
 
-const serverCreators = new Map([
+type Server = any;
+type Handler = any;
+interface ServerCreatorOptions<TApp> {
+  onPreCreate?: (app: TApp) => any;
+}
+
+type ServerCreator = <TApp>(
+  handler: Handler,
+  options?: ServerCreatorOptions<TApp>,
+  subpath?: string,
+) => Server;
+const serverCreators: Map<string, ServerCreator> = new Map([
   [
     "http",
     (handler) => {
@@ -116,14 +130,14 @@ const serverCreators = new Map([
   [
     "fastify",
     async (handler, _options, subpath) => {
-      let server;
-      function serverFactory(fastlyHandler, opts) {
+      let server: Server;
+      const serverFactory: ServerFactoryFunction = (fastlyHandler, _opts) => {
         if (server) throw new Error("Factory called twice");
         server = http.createServer((req, res) => {
           fastlyHandler(req, res);
         });
         return server;
-      }
+      };
       const app = fastify({ serverFactory });
       if (subpath) {
         throw new Error("Fastify does not support subpath at this time");
@@ -139,7 +153,7 @@ const serverCreators = new Map([
   ],
   [
     "koa",
-    (handler, options = {}, subpath) => {
+    (handler, options: ServerCreatorOptions<koa> = {}, subpath) => {
       const app = new koa();
       if (options.onPreCreate) options.onPreCreate(app);
       if (subpath) {
@@ -153,14 +167,14 @@ const serverCreators = new Map([
   [
     "fastify-http2",
     async (handler, _options, subpath) => {
-      let server;
-      function serverFactory(fastlyHandler, opts) {
+      let server: Server;
+      const serverFactory: ServerFactoryFunction = (fastlyHandler, _opts) => {
         if (server) throw new Error("Factory called twice");
         server = http2.createServer({}, (req, res) => {
           fastlyHandler(req, res);
         });
         return server;
-      }
+      };
       const app = fastify({ serverFactory, http2: true });
       if (subpath) {
         throw new Error("Fastify does not support subpath at this time");
@@ -175,7 +189,7 @@ const serverCreators = new Map([
       return server;
     },
   ],
-]);
+] as [string, ServerCreator][]);
 
 const toTest = [];
 for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
@@ -186,7 +200,11 @@ for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
 }
 
 for (const { name, createServerFromHandler, subpath = "" } of toTest) {
-  const createServer = async (handlerOptions, serverOptions) => {
+  const createServer = async (
+    handlerOptions?: GraphileEngine.PostGraphileOptions &
+      Partial<Pick<CreateRequestHandlerOptions, "getGqlSchema">>,
+    serverOptions?: {},
+  ) => {
     const _emitter = new EventEmitter();
     const server = await createServerFromHandler(
       createPostGraphileHttpRequestHandler(
@@ -817,6 +835,7 @@ for (const { name, createServerFromHandler, subpath = "" } of toTest) {
                 exception: {
                   hint: "my custom error hint",
                   detail: "my custom error detail",
+                  code: "MYCODE",
                 },
               },
             };
@@ -854,7 +873,7 @@ for (const { name, createServerFromHandler, subpath = "" } of toTest) {
       const server = await createServer({
         handleErrors: (errors, req, res) => {
           res.statusCode = 401;
-          return errors;
+          return [...(errors as GraphQLErrorExtended[])];
         },
       });
       await request(server)
@@ -880,7 +899,7 @@ for (const { name, createServerFromHandler, subpath = "" } of toTest) {
         const server1 = await createServer({ graphiql: true });
         const server2 = await createServer({
           graphiql: true,
-          route: `${subpath}/graphql`,
+          graphqlRoute: `${subpath}/graphql`,
         });
         await request(server1)
           .get("/favicon.ico")
@@ -915,7 +934,7 @@ for (const { name, createServerFromHandler, subpath = "" } of toTest) {
         .set("Accept", "text/event-stream")
         .expect(200)
         .expect("event: open\n\nevent: change\ndata: schema\n\n")
-        .then((res) => res); // Trick superagent into finishing
+        .then((res: any) => res); // Trick superagent into finishing
       await sleep(200);
       server._emitter.emit("schemas:changed");
       await sleep(100);
@@ -977,7 +996,9 @@ for (const { name, createServerFromHandler, subpath = "" } of toTest) {
     });
 
     test("cannot use a rejected GraphQL schema", async () => {
-      const rejectedGraphQLSchema = Promise.reject(new Error("Uh oh!"));
+      const rejectedGraphQLSchema: Promise<GraphQLSchema> = Promise.reject(
+        new Error("Uh oh!"),
+      );
       // We don’t want Jest to complain about uncaught promise rejections.
       rejectedGraphQLSchema.catch(() => {
         /* noop */
@@ -1036,7 +1057,7 @@ for (const { name, createServerFromHandler, subpath = "" } of toTest) {
       pgClient.query.mockClear();
       pgClient.release.mockClear();
       const server = await createServer({
-        pgSettings: (req) => ({
+        pgSettings: (_req) => ({
           "foo.string": "test1",
           "foo.number": 42,
         }),
@@ -1078,7 +1099,7 @@ for (const { name, createServerFromHandler, subpath = "" } of toTest) {
       });
       const additionalGraphQLContextFromRequest = jest.fn(() => ({
         additional: "foo",
-      }));
+      })) as any;
       const server = await createServer({
         additionalGraphQLContextFromRequest,
         getGqlSchema: () => Promise.resolve(contextCheckGqlSchema),
@@ -1106,7 +1127,7 @@ for (const { name, createServerFromHandler, subpath = "" } of toTest) {
         createServer(
           { graphiql: true },
           {
-            onPreCreate: (app) => {
+            onPreCreate: (app: koa) => {
               app.use(
                 compress({
                   threshold: 0,
