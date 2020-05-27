@@ -50,7 +50,7 @@ type ResolverWrapperFilter<T> = (
   options: GraphileEngine.GraphileBuildOptions,
 ) => T | null;
 
-type ResolverWrapperFilterRule<T> = (
+export type ResolverWrapperFilterRule<T> = (
   match: T,
 ) => ResolverWrapperRule | ResolverWrapperFn;
 
