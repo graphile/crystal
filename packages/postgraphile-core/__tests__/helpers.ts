@@ -1,4 +1,4 @@
-import pg from "pg";
+import pg, { PoolClient } from "pg";
 import { readFile } from "fs";
 
 // Reduce throttling on CI
@@ -34,11 +34,19 @@ export const withTransactionlessPgClient = async (url, fn) => {
   }
 };
 
-export const withPgClient = (url, fn) => {
-  if (!fn) {
-    fn = url;
-    url = process.env.TEST_DATABASE_URL;
-  }
+type WithPgClientCallback<T> = (client: PoolClient) => Promise<T>;
+export function withPgClient<T>(fn: WithPgClientCallback<T>): Promise<T>;
+export function withPgClient<T>(
+  url: string,
+  fn: WithPgClientCallback<T>,
+): Promise<T>;
+export function withPgClient<T>(
+  urlOrFn: string | WithPgClientCallback<T>,
+  maybeFn?: WithPgClientCallback<T>,
+): Promise<T> {
+  const fn: WithPgClientCallback<T> =
+    typeof urlOrFn === "string" ? maybeFn! : urlOrFn;
+  const url = maybeFn ? urlOrFn : process.env.TEST_DATABASE_URL;
   return withTransactionlessPgClient(url, async (client) => {
     client.setMaxListeners(100);
     await client.query("begin");
@@ -49,7 +57,7 @@ export const withPgClient = (url, fn) => {
       await client.query("rollback");
     }
   });
-};
+}
 
 const withDbFromUrl = async (url, fn) => {
   return withPgClient(url, async (client) => {

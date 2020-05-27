@@ -4,6 +4,7 @@ import { $$pgClient } from "../../postgres/inventory/pgClientFromContext";
 import withPostGraphileContext from "../withPostGraphileContext";
 import { readFileSync, readFile } from "fs";
 import jwt from "jsonwebtoken";
+import { Pool, PoolClient } from "pg";
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -13,7 +14,11 @@ beforeEach(() => {
  * Expects an Http error. Passes if there is an error of the correct form,
  * fails if there is not.
  */
-function expectHttpError(promise, statusCode, message) {
+function expectHttpError(
+  promise: Promise<any>,
+  statusCode: number,
+  message: string,
+) {
   return promise.then(
     () => {
       throw new Error("Expected a Http error.");
@@ -25,57 +30,55 @@ function expectHttpError(promise, statusCode, message) {
   );
 }
 
+function makePool() {
+  const query = jest.fn();
+  const release = jest.fn();
+  const pgClient = ({ query, release } as any) as PoolClient;
+  const connect = jest.fn(() => pgClient);
+  const pgPool = ({ connect } as any) as Pool;
+  return { query, release, connect, pgClient, pgPool };
+}
+
 test("will be a noop for no token, secret, or default role", async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { query, pgPool } = makePool();
   await withPostGraphileContext({ pgPool }, () => {});
-  expect(pgClient.query.mock.calls).toEqual([["begin"], ["commit"]]);
+  expect(query.mock.calls).toEqual([["begin"], ["commit"]]);
 });
 
 test("will pass in a context object with the client", async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool, pgClient } = makePool();
   await withPostGraphileContext({ pgPool }, (client) => {
     expect(client[$$pgClient]).toBe(pgClient);
   });
 });
 
 test("will record queries run inside the transaction", async () => {
-  const query1 = Symbol();
-  const query2 = Symbol();
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const query1 = Symbol() as any;
+  const query2 = Symbol() as any;
+  const { query, pgPool } = makePool();
   await withPostGraphileContext({ pgPool }, (client) => {
     client[$$pgClient].query(query1);
     client[$$pgClient].query(query2);
   });
-  expect(pgClient.query.mock.calls).toEqual([
-    ["begin"],
-    [query1],
-    [query2],
-    ["commit"],
-  ]);
+  expect(query.mock.calls).toEqual([["begin"], [query1], [query2], ["commit"]]);
 });
 
 test("will return the value from the callback", async () => {
   const value = Symbol();
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool } = makePool();
   expect(await withPostGraphileContext({ pgPool }, () => value)).toBe(value);
 });
 
 test("will return the asynchronous value from the callback", async () => {
   const value = Symbol();
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool } = makePool();
   expect(
     await withPostGraphileContext({ pgPool }, () => Promise.resolve(value)),
   ).toBe(value);
 });
 
 test("will throw an error if there was a `jwtToken`, but no `jwtSecret`", async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool, query } = makePool();
   const spy = jest.spyOn(console, "error").mockImplementation(() => {});
   await expectHttpError(
     withPostGraphileContext({ pgPool, jwtToken: "asd" }, () => {}),
@@ -83,7 +86,7 @@ test("will throw an error if there was a `jwtToken`, but no `jwtSecret`", async 
     "Not allowed to provide a JWT token.",
   );
   // Never set up the transaction due to error
-  expect(pgClient.query.mock.calls).toEqual([]);
+  expect(query.mock.calls).toEqual([]);
   expect(spy.mock.calls).toMatchInlineSnapshot(`
     Array [
       Array [
@@ -94,20 +97,19 @@ test("will throw an error if there was a `jwtToken`, but no `jwtSecret`", async 
 });
 
 test("will throw an error if there was a `jwtToken`, but `jwtSecret` had unsupported format", async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool, query } = makePool();
   const spy = jest.spyOn(console, "error").mockImplementation(() => {});
 
   await expectHttpError(
     withPostGraphileContext(
-      { pgPool, jwtToken: "asd", jwtSecret: true },
+      { pgPool, jwtToken: "asd", jwtSecret: true as any },
       () => {},
     ),
     403,
     "Not allowed to provide a JWT token.",
   );
   // Never set up the transaction due to error
-  expect(pgClient.query.mock.calls).toEqual([]);
+  expect(query.mock.calls).toEqual([]);
   expect(spy.mock.calls).toMatchInlineSnapshot(`
     Array [
       Array [
@@ -118,8 +120,7 @@ test("will throw an error if there was a `jwtToken`, but `jwtSecret` had unsuppo
 });
 
 test("will throw an error for a malformed `jwtToken`", async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool, query } = makePool();
   await expectHttpError(
     withPostGraphileContext(
       { pgPool, jwtToken: "asd", jwtSecret: "secret" },
@@ -129,12 +130,11 @@ test("will throw an error for a malformed `jwtToken`", async () => {
     "jwt malformed",
   );
   // Never set up the transaction due to error
-  expect(pgClient.query.mock.calls).toEqual([]);
+  expect(query.mock.calls).toEqual([]);
 });
 
 test("will throw an error if the JWT token was signed with the wrong signature", async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool, query } = makePool();
   await expectHttpError(
     withPostGraphileContext(
       {
@@ -150,12 +150,11 @@ test("will throw an error if the JWT token was signed with the wrong signature",
     "invalid signature",
   );
   // Never set up the transaction due to error
-  expect(pgClient.query.mock.calls).toEqual([]);
+  expect(query.mock.calls).toEqual([]);
 });
 
 test("will throw an error if the JWT token does not have an audience", async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool, query } = makePool();
   await expectHttpError(
     withPostGraphileContext(
       {
@@ -171,12 +170,11 @@ test("will throw an error if the JWT token does not have an audience", async () 
     "jwt audience invalid. expected: postgraphile",
   );
   // Never set up the transaction due to error
-  expect(pgClient.query.mock.calls).toEqual([]);
+  expect(query.mock.calls).toEqual([]);
 });
 
 test("will throw an error if the JWT token does not have an appropriate audience", async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool, query } = makePool();
   await expectHttpError(
     withPostGraphileContext(
       {
@@ -192,12 +190,11 @@ test("will throw an error if the JWT token does not have an appropriate audience
     "jwt audience invalid. expected: postgraphile",
   );
   // Never set up the transaction due to error
-  expect(pgClient.query.mock.calls).toEqual([]);
+  expect(query.mock.calls).toEqual([]);
 });
 
 test("will succeed with all the correct things", async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool, query } = makePool();
   await withPostGraphileContext(
     {
       pgPool,
@@ -208,7 +205,7 @@ test("will succeed with all the correct things", async () => {
     },
     () => {},
   );
-  expect(pgClient.query.mock.calls).toEqual([
+  expect(query.mock.calls).toEqual([
     ["begin"],
     [
       {
@@ -221,8 +218,7 @@ test("will succeed with all the correct things", async () => {
 });
 
 test("will succeed with jwt and buffer as secret ", async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool, query } = makePool();
   const bufferSecret = Buffer.from("secret", "utf8");
   await withPostGraphileContext(
     {
@@ -234,7 +230,7 @@ test("will succeed with jwt and buffer as secret ", async () => {
     },
     () => {},
   );
-  expect(pgClient.query.mock.calls).toEqual([
+  expect(query.mock.calls).toEqual([
     ["begin"],
     [
       {
@@ -247,8 +243,7 @@ test("will succeed with jwt and buffer as secret ", async () => {
 });
 
 test("will add extra claims as available", async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool, query } = makePool();
   await withPostGraphileContext(
     {
       pgPool,
@@ -259,7 +254,7 @@ test("will add extra claims as available", async () => {
     },
     () => {},
   );
-  expect(pgClient.query.mock.calls).toEqual([
+  expect(query.mock.calls).toEqual([
     ["begin"],
     [
       {
@@ -282,8 +277,7 @@ test("will add extra claims as available", async () => {
 });
 
 test("will include JWT claims as jwtClaims in context callback", async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool } = makePool();
   const { jwtClaims } = await withPostGraphileContext(
     {
       pgPool,
@@ -298,8 +292,7 @@ test("will include JWT claims as jwtClaims in context callback", async () => {
 });
 
 test("jwtClaims should be null if there is no JWT token", async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool } = makePool();
   const { jwtClaims } = await withPostGraphileContext(
     {
       pgPool,
@@ -310,8 +303,7 @@ test("jwtClaims should be null if there is no JWT token", async () => {
 });
 
 test("will add extra settings as available", async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool, query } = makePool();
   await withPostGraphileContext(
     {
       pgPool,
@@ -326,7 +318,7 @@ test("will add extra settings as available", async () => {
     },
     () => {},
   );
-  expect(pgClient.query.mock.calls).toEqual([
+  expect(query.mock.calls).toEqual([
     ["begin"],
     [
       {
@@ -347,8 +339,7 @@ test("will add extra settings as available", async () => {
 });
 
 test("undefined and null extra settings are ignored while 0 is converted to a string", async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool, query } = makePool();
   await withPostGraphileContext(
     {
       pgPool,
@@ -372,7 +363,7 @@ test("undefined and null extra settings are ignored while 0 is converted to a st
     },
     () => {},
   );
-  expect(pgClient.query.mock.calls).toEqual([
+  expect(query.mock.calls).toEqual([
     ["begin"],
     [
       {
@@ -403,8 +394,7 @@ test("undefined and null extra settings are ignored while 0 is converted to a st
 });
 
 test("extra pgSettings that are objects throw an error", async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool } = makePool();
   let message;
   try {
     await withPostGraphileContext(
@@ -415,7 +405,7 @@ test("extra pgSettings that are objects throw an error", async () => {
         }),
         jwtSecret: "secret",
         pgSettings: {
-          "some.object": { toString: () => "SomeObject" },
+          "some.object": { toString: () => "SomeObject" } as any,
         },
       },
       () => {},
@@ -429,8 +419,7 @@ test("extra pgSettings that are objects throw an error", async () => {
 });
 
 test("extra pgSettings that are symbols throw an error", async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool } = makePool();
   let message;
   try {
     await withPostGraphileContext(
@@ -441,7 +430,7 @@ test("extra pgSettings that are symbols throw an error", async () => {
         }),
         jwtSecret: "secret",
         pgSettings: {
-          "some.symbol": Symbol("some.symbol"),
+          "some.symbol": Symbol("some.symbol") as any,
         },
       },
       () => {},
@@ -455,8 +444,7 @@ test("extra pgSettings that are symbols throw an error", async () => {
 });
 
 test("will set the default role if available", async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool, query } = makePool();
   await withPostGraphileContext(
     {
       pgPool,
@@ -465,7 +453,7 @@ test("will set the default role if available", async () => {
     },
     () => {},
   );
-  expect(pgClient.query.mock.calls).toEqual([
+  expect(query.mock.calls).toEqual([
     ["begin"],
     [
       {
@@ -478,8 +466,7 @@ test("will set the default role if available", async () => {
 });
 
 test("will set the default role if no other role was provided in the JWT", async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool, query } = makePool();
   await withPostGraphileContext(
     {
       pgPool,
@@ -491,7 +478,7 @@ test("will set the default role if no other role was provided in the JWT", async
     },
     () => {},
   );
-  expect(pgClient.query.mock.calls).toEqual([
+  expect(query.mock.calls).toEqual([
     ["begin"],
     [
       {
@@ -516,8 +503,7 @@ test("will set the default role if no other role was provided in the JWT", async
 });
 
 test("will set a role provided in the JWT", async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool, query } = makePool();
   await withPostGraphileContext(
     {
       pgPool,
@@ -532,7 +518,7 @@ test("will set a role provided in the JWT", async () => {
     },
     () => {},
   );
-  expect(pgClient.query.mock.calls).toEqual([
+  expect(query.mock.calls).toEqual([
     ["begin"],
     [
       {
@@ -559,8 +545,7 @@ test("will set a role provided in the JWT", async () => {
 });
 
 test("will set a role provided in the JWT superceding the default role", async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool, query } = makePool();
   await withPostGraphileContext(
     {
       pgPool,
@@ -576,7 +561,7 @@ test("will set a role provided in the JWT superceding the default role", async (
     },
     () => {},
   );
-  expect(pgClient.query.mock.calls).toEqual([
+  expect(query.mock.calls).toEqual([
     ["begin"],
     [
       {
@@ -603,8 +588,7 @@ test("will set a role provided in the JWT superceding the default role", async (
 });
 
 test("will set a role provided in the JWT (deep role)", async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool, query } = makePool();
   await withPostGraphileContext(
     {
       pgPool,
@@ -624,7 +608,7 @@ test("will set a role provided in the JWT (deep role)", async () => {
     },
     () => {},
   );
-  expect(pgClient.query.mock.calls).toEqual([
+  expect(query.mock.calls).toEqual([
     ["begin"],
     [
       {
@@ -651,8 +635,7 @@ test("will set a role provided in the JWT (deep role)", async () => {
 });
 
 test('if same settings are set by pgSettings and JWT, JWT will "win", except for the "role" because of legacy', async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool, query } = makePool();
   await withPostGraphileContext(
     {
       pgPool,
@@ -675,7 +658,7 @@ test('if same settings are set by pgSettings and JWT, JWT will "win", except for
     },
     () => {},
   );
-  expect(pgClient.query.mock.calls).toEqual([
+  expect(query.mock.calls).toEqual([
     ["begin"],
     [
       {
@@ -704,8 +687,7 @@ test('if same settings are set by pgSettings and JWT, JWT will "win", except for
 });
 
 test("will set a role provided in the JWT superceding the default role (deep role)", async () => {
-  const pgClient = { query: jest.fn(), release: jest.fn() };
-  const pgPool = { connect: jest.fn(() => pgClient) };
+  const { pgPool, query } = makePool();
   await withPostGraphileContext(
     {
       pgPool,
@@ -726,7 +708,7 @@ test("will set a role provided in the JWT superceding the default role (deep rol
     },
     () => {},
   );
-  expect(pgClient.query.mock.calls).toEqual([
+  expect(query.mock.calls).toEqual([
     ["begin"],
     [
       {
@@ -753,11 +735,10 @@ test("will set a role provided in the JWT superceding the default role (deep rol
 });
 
 describe("jwtVerifyOptions", () => {
-  let pgClient;
-  let pgPool;
+  let query: ReturnType<typeof makePool>["query"];
+  let pgPool: ReturnType<typeof makePool>["pgPool"];
   beforeEach(() => {
-    pgClient = { query: jest.fn(), release: jest.fn() };
-    pgPool = { connect: jest.fn(() => pgClient) };
+    ({ pgPool, query } = makePool());
   });
 
   test("will throw an error if jwtAudiences and jwtVerifyOptions.audience are both provided", async () => {
@@ -776,7 +757,7 @@ describe("jwtVerifyOptions", () => {
       "Provide either 'jwtAudiences' or 'jwtVerifyOptions.audience' but not both",
     );
     // Never set up the transaction due to error
-    expect(pgClient.query.mock.calls).toEqual([]);
+    expect(query.mock.calls).toEqual([]);
   });
 
   test("will throw an error if jwtAudiences is provided and jwtVerifyOptions.audience = undefined", async () => {
@@ -795,7 +776,7 @@ describe("jwtVerifyOptions", () => {
       "Provide either 'jwtAudiences' or 'jwtVerifyOptions.audience' but not both",
     );
     // Never set up the transaction due to error
-    expect(pgClient.query.mock.calls).toEqual([]);
+    expect(query.mock.calls).toEqual([]);
   });
 
   test("will succeed with both jwtAudiences and jwtVerifyOptions if jwtVerifyOptions does not have an audience field", async () => {
@@ -812,7 +793,7 @@ describe("jwtVerifyOptions", () => {
       },
       () => {},
     );
-    expect(pgClient.query.mock.calls).toEqual([
+    expect(query.mock.calls).toEqual([
       ["begin"],
       [
         {
@@ -838,11 +819,11 @@ describe("jwtVerifyOptions", () => {
           subject: "my-subject",
         }),
         jwtSecret: "secret",
-        jwtVerifyOptions: { subject: "my-subject", audience: null },
+        jwtVerifyOptions: { subject: "my-subject", audience: null as any },
       },
       () => {},
     );
-    expect(pgClient.query.mock.calls).toEqual([
+    expect(query.mock.calls).toEqual([
       ["begin"],
       [
         {
@@ -872,7 +853,7 @@ describe("jwtVerifyOptions", () => {
       },
       () => {},
     );
-    expect(pgClient.query.mock.calls).toEqual([
+    expect(query.mock.calls).toEqual([
       ["begin"],
       [
         {
@@ -902,7 +883,7 @@ describe("jwtVerifyOptions", () => {
       },
       () => {},
     );
-    expect(pgClient.query.mock.calls).toEqual([
+    expect(query.mock.calls).toEqual([
       ["begin"],
       [
         {
@@ -938,7 +919,7 @@ describe("jwtVerifyOptions", () => {
       "jwt audience invalid. expected: my-audience",
     );
     // Never set up the transaction due to error
-    expect(pgClient.query.mock.calls).toEqual([]);
+    expect(query.mock.calls).toEqual([]);
   });
 
   test("will throw an error if the JWT token does not have an appropriate audience", async () => {
@@ -956,7 +937,7 @@ describe("jwtVerifyOptions", () => {
       "jwt audience invalid. expected: another-audience",
     );
     // Never set up the transaction due to error
-    expect(pgClient.query.mock.calls).toEqual([]);
+    expect(query.mock.calls).toEqual([]);
   });
 
   test("will throw an error from a mismatched subject", async () => {
@@ -975,7 +956,7 @@ describe("jwtVerifyOptions", () => {
       "jwt subject invalid. expected: orangutan",
     );
     // Never set up the transaction due to error
-    expect(pgClient.query.mock.calls).toEqual([]);
+    expect(query.mock.calls).toEqual([]);
   });
 
   test("will throw an error from an issuer array that does not match iss", async () => {
@@ -996,7 +977,7 @@ describe("jwtVerifyOptions", () => {
       "jwt issuer invalid. expected: alpha:aliens,alpha:ufo",
     );
     // Never set up the transaction due to error
-    expect(pgClient.query.mock.calls).toEqual([]);
+    expect(query.mock.calls).toEqual([]);
   });
 
   test("will default to an audience of ['postgraphile'] if no audience params are provided", async () => {
@@ -1013,7 +994,7 @@ describe("jwtVerifyOptions", () => {
       "jwt audience invalid. expected: postgraphile",
     );
     // No need for transaction since there's no settings
-    expect(pgClient.query.mock.calls).toEqual([]);
+    expect(query.mock.calls).toEqual([]);
   });
 
   test("will succeed using callback for jwtPublicKey", async () => {
@@ -1032,7 +1013,7 @@ describe("jwtVerifyOptions", () => {
     );
     expect(loadKey.mock.calls.length).toBe(1);
     expect(loadKey.mock.calls[0][0]).toEqual({ alg: "HS256", typ: "JWT" });
-    expect(pgClient.query.mock.calls).toEqual([
+    expect(query.mock.calls).toEqual([
       ["begin"],
       [
         {
@@ -1075,7 +1056,7 @@ describe("jwtVerifyOptions", () => {
       },
       () => {},
     );
-    expect(pgClient.query.mock.calls).toEqual([
+    expect(query.mock.calls).toEqual([
       ["begin"],
       [
         {
@@ -1104,7 +1085,7 @@ describe("jwtVerifyOptions", () => {
       },
       () => {},
     );
-    expect(pgClient.query.mock.calls).toEqual([
+    expect(query.mock.calls).toEqual([
       ["begin"],
       [
         {
@@ -1134,7 +1115,7 @@ describe("jwtVerifyOptions", () => {
       },
       () => {},
     );
-    expect(pgClient.query.mock.calls).toEqual([
+    expect(query.mock.calls).toEqual([
       ["begin"],
       [
         {
@@ -1168,7 +1149,7 @@ describe("jwtVerifyOptions", () => {
       403,
       "invalid signature",
     );
-    expect(pgClient.query.mock.calls).toEqual([]);
+    expect(query.mock.calls).toEqual([]);
   });
 
   test("will throw an error on unsupported algorithms on asymmetric encryption verification", async () => {
@@ -1192,6 +1173,6 @@ describe("jwtVerifyOptions", () => {
       403,
       "invalid algorithm",
     );
-    expect(pgClient.query.mock.calls).toEqual([]);
+    expect(query.mock.calls).toEqual([]);
   });
 });
