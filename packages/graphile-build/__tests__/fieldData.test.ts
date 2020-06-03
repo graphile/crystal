@@ -1,3 +1,4 @@
+import "../global";
 import {
   graphql,
   GraphQLObjectType,

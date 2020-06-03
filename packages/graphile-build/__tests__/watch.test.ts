@@ -1,3 +1,4 @@
+import "../global";
 import {
   graphql,
   GraphQLObjectType,
@@ -23,7 +24,7 @@ const makePluginEtc = (defaultCounter = 0) => {
 
   const eventEmitter = new EventEmitter();
 
-  const DummyWatchPlugin = async (builder) => {
+  const DummyWatchPlugin: GraphileEngine.Plugin = async (builder) => {
     builder.registerWatcher(
       (triggerRebuild) => {
         eventEmitter.on("change", triggerRebuild);

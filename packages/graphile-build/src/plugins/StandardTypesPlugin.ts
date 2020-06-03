@@ -1,3 +1,5 @@
+import "../global";
+
 import { Kind } from "graphql/language";
 
 export default (function StandardTypesPlugin(builder) {

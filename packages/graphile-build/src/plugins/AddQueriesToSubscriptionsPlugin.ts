@@ -1,3 +1,5 @@
+import "../global";
+
 const AddQueriesToSubscriptionsPlugin: GraphileEngine.Plugin = function (
   builder,
   { subscriptions, live },

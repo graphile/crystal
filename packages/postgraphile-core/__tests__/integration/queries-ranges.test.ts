@@ -61,7 +61,7 @@ test("bigint range", () =>
       { id: row.id },
     );
     expect(result.errors).toBeFalsy();
-    expect(result.data.rangeTestById.int8).toEqual({
+    expect(result.data?.rangeTestById.int8).toEqual({
       start: {
         value: "-98765432109876543",
         inclusive: true,
@@ -91,7 +91,7 @@ test("ts range", () =>
       { id: row.id },
     );
     expect(result.errors).toBeFalsy();
-    expect(result.data.rangeTestById.ts).toEqual({
+    expect(result.data?.rangeTestById.ts).toEqual({
       start: {
         value: "2019-01-10T21:45:56.356022",
         inclusive: true,
@@ -117,7 +117,7 @@ test("tstz range", () =>
       { id: row.id },
     );
     expect(result.errors).toBeFalsy();
-    expect(result.data.rangeTestById.tstz).toEqual({
+    expect(result.data?.rangeTestById.tstz).toEqual({
       start: {
         value: "2019-01-10T17:45:56.356022-04:00",
         inclusive: true,

@@ -1,11 +1,13 @@
 import callbackToAsyncIterator from "./callbackToAsyncIterator";
 import { throttle } from "lodash";
 
-type SubscriptionReleaser = () => void;
-type SubscriptionCallback = () => void;
+export type LiveSubscriptionReleaser = () => void;
+export type LiveSubscriptionCallback = () => void;
 
-type Predicate = (record: any) => boolean;
-type PredicateGenerator = (data: any) => Predicate;
+export type LivePredicate = (record: any) => boolean;
+export type LivePredicateGenerator = (data: any) => LivePredicate;
+
+export type LiveReleaseType = () => void;
 
 const DEBOUNCE_DURATION = 25;
 
@@ -20,18 +22,18 @@ const MONITOR_THROTTLE_DURATION = Math.max(
  */
 export abstract class LiveSource {
   subscribeCollection(
-    _callback: SubscriptionCallback,
+    _callback: LiveSubscriptionCallback,
     _collectionIdentifier: any,
-    _predicate?: Predicate,
-  ): SubscriptionReleaser | null {
+    _predicate?: LivePredicate,
+  ): LiveSubscriptionReleaser | null {
     return null;
   }
 
   subscribeRecord(
-    _callback: SubscriptionCallback,
+    _callback: LiveSubscriptionCallback,
     _collectionIdentifier: any,
     _recordIdentifier: any,
-  ): SubscriptionReleaser | null {
+  ): LiveSubscriptionReleaser | null {
     return null;
   }
 }
@@ -67,8 +69,6 @@ export class LiveProvider {
   }
 }
 
-type ReleaseType = () => void;
-
 /*
  * During a single execution of GraphQL (specifically a subscription request),
  * the LiveMonitor tracks the resources viewed and subscribes to updates in them.
@@ -80,7 +80,7 @@ export class LiveMonitor {
     [counter: string]: (() => void)[];
   };
 
-  liveConditionsByCounter: { [counter: string]: Array<PredicateGenerator> };
+  liveConditionsByCounter: { [counter: string]: Array<LivePredicateGenerator> };
   changeCallback: ((arg: any) => void) | null;
   changeCounter: number;
   extraRootValue: any;
@@ -93,7 +93,7 @@ export class LiveMonitor {
     (): void;
     cancel: () => void;
   } | null;
-  onChange: (callback: (input?: any) => void) => ReleaseType;
+  onChange: (callback: (input?: any) => void) => LiveReleaseType;
 
   constructor(
     providers: { [namespace: string]: LiveProvider },
@@ -158,7 +158,7 @@ export class LiveMonitor {
       }
     };
 
-    this.onChange = function (callback: () => void): ReleaseType {
+    this.onChange = function (callback: () => void): LiveReleaseType {
       if (this.released) {
         throw new Error("Monitors cannot be reused.");
       }
@@ -356,7 +356,7 @@ export class LiveCoordinator {
 }
 
 export function makeAsyncIteratorFromMonitor(monitor: LiveMonitor) {
-  return callbackToAsyncIterator<unknown, ReleaseType>(monitor.onChange, {
+  return callbackToAsyncIterator<unknown, LiveReleaseType>(monitor.onChange, {
     onClose: (release) => {
       if (release) release();
     },

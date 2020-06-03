@@ -1,27 +1,28 @@
+import "../global";
 import { buildSchema, defaultPlugins } from "../";
 
-function EarlyPlugin(builder) {
+const EarlyPlugin: GraphileEngine.Plugin = (builder) => {
   builder.hook("build", (build) => {
     build.versions["early-plugin"] = "2.5.0";
     return build;
   });
-}
+};
 
-function BetaPlugin(builder) {
+const BetaPlugin: GraphileEngine.Plugin = (builder) => {
   builder.hook("build", (build) => {
     build.versions["beta-plugin"] = "3.4.0-beta.1";
     return build;
   });
-}
+};
 
-function IncompatiblePlugin(builder) {
+const IncompatiblePlugin: GraphileEngine.Plugin = (builder) => {
   builder.hook("build", (build) => {
     build.versions["incompatible-plugin"] = "1.9.0";
     return build;
   });
-}
+};
 
-function FooPlugin(builder) {
+const FooPlugin: GraphileEngine.Plugin = (builder) => {
   builder.hook("build", (build) => {
     if (!build.hasVersion("early-plugin", "^2.0.0")) {
       throw new Error("early-plugin should be loaded at this point");
@@ -41,14 +42,14 @@ function FooPlugin(builder) {
     build.versions["foo-plugin"] = "1.0.0";
     return build;
   });
-}
+};
 
-function LatePlugin(builder) {
+const LatePlugin: GraphileEngine.Plugin = (builder) => {
   builder.hook("build", (build) => {
     build.versions["late-plugin"] = "2.5.0";
     return build;
   });
-}
+};
 
 test("generated schema", async () => {
   const schema = await buildSchema([

@@ -1,3 +1,4 @@
+import "../global";
 import { GraphQLEnumType } from "graphql";
 import { buildSchema, defaultPlugins } from "../";
 

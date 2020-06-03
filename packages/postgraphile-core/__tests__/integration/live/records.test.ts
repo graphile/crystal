@@ -6,7 +6,7 @@ import {
   liveTest,
   next,
   resetDatabase,
-} from "../live_helpers.js";
+} from "../live_helpers";
 import { transactionlessQuery } from "../../helpers";
 
 if (skipLDSTests) {
