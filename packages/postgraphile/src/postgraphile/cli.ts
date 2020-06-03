@@ -164,7 +164,7 @@ program
     "if an error occurs building the initial schema, this flag will cause PostGraphile to keep trying to build the schema with exponential backoff rather than exiting",
   );
 
-pluginHook("cli:flags:add:standard", addFlag);
+pluginHook("cli:flags:add:standard", addFlag, null);
 
 // Schema configuration
 program
@@ -201,7 +201,7 @@ program
     "by default, tables and functions that come from extensions are excluded; use this flag to include them (not recommended)",
   );
 
-pluginHook("cli:flags:add:schema", addFlag);
+pluginHook("cli:flags:add:schema", addFlag, null);
 
 // Error enhancements
 program
@@ -215,7 +215,7 @@ program
     (option: string) => option.split(",").filter((_) => _),
   );
 
-pluginHook("cli:flags:add:errorHandling", addFlag);
+pluginHook("cli:flags:add:errorHandling", addFlag, null);
 
 // Plugin-related options
 program
@@ -232,7 +232,7 @@ program
     "a comma-separated list of Graphile Engine schema plugins to skip",
   );
 
-pluginHook("cli:flags:add:plugins", addFlag);
+pluginHook("cli:flags:add:plugins", addFlag, null);
 
 // Things that relate to -X
 program
@@ -261,7 +261,7 @@ program
     "[experimental] for when you just want to use --write-cache or --export-schema-* and not actually run a server (e.g. CI)",
   );
 
-pluginHook("cli:flags:add:noServer", addFlag);
+pluginHook("cli:flags:add:noServer", addFlag, null);
 
 // Webserver configuration
 program
@@ -312,7 +312,7 @@ program
     "[EXPERIMENTAL] allows users to use the Explain button in GraphiQL to view the plan for the SQL that is executed (DO NOT USE IN PRODUCTION)",
   );
 
-pluginHook("cli:flags:add:webserver", addFlag);
+pluginHook("cli:flags:add:webserver", addFlag, null);
 
 // JWT-related options
 program
@@ -363,10 +363,10 @@ program
     "the Postgres identifier for a composite type that will be used to create JWT tokens",
   );
 
-pluginHook("cli:flags:add:jwt", addFlag);
+pluginHook("cli:flags:add:jwt", addFlag, null);
 
 // Any other options
-pluginHook("cli:flags:add", addFlag);
+pluginHook("cli:flags:add", addFlag, null);
 
 // Deprecated
 program
@@ -388,7 +388,7 @@ program
     "[DEPRECATED] PostGraphile 4.1.0 introduced support for PostgreSQL functions than declare parameters with IN/OUT/INOUT or declare RETURNS TABLE(...); enable this flag to ignore these types of functions. This option will be removed in v5.",
   );
 
-pluginHook("cli:flags:add:deprecated", addFlag);
+pluginHook("cli:flags:add:deprecated", addFlag, null);
 
 // Awkward application workarounds / legacy support
 program
@@ -401,7 +401,7 @@ program
     `ONLY use this option if you require the v3 typenames 'Json' and 'Uuid' over 'JSON' and 'UUID'`,
   );
 
-pluginHook("cli:flags:add:workarounds", addFlag);
+pluginHook("cli:flags:add:workarounds", addFlag, null);
 
 program.on("--help", () => {
   console.log(`
@@ -840,18 +840,7 @@ if (noServer) {
     }
   } else {
     // Create’s our PostGraphile server
-    const rawMiddleware = postgraphile(pgConfig, schemas, postgraphileOptions);
-
-    // You probably don't want this hook; likely you want
-    // `postgraphile:middleware` instead. This hook will likely be removed in
-    // future without warning.
-    const middleware = pluginHook(
-      /* DO NOT USE -> */ "cli:server:middleware" /* <- DO NOT USE */,
-      rawMiddleware,
-      {
-        options: postgraphileOptions,
-      },
-    );
+    const middleware = postgraphile(pgConfig, schemas, postgraphileOptions);
 
     const server = createServer(middleware);
     if (serverTimeout) {
@@ -919,15 +908,16 @@ if (noServer) {
                     postgraphileOptions.live ? "live " : ""
                   }subscriptions enabled)`
                 : ""),
-            !disableGraphiql &&
-              `GraphiQL GUI/IDE:    ${chalk.underline.bold.blue(
-                `http://${hostname}:${actualPort}${graphiqlRoute}`,
-              )}` +
+            !disableGraphiql
+              ? `GraphiQL GUI/IDE:    ${chalk.underline.bold.blue(
+                  `http://${hostname}:${actualPort}${graphiqlRoute}`,
+                )}` +
                 (postgraphileOptions.enhanceGraphiql ||
                 postgraphileOptions.live ||
                 postgraphileOptions.subscriptions
                   ? ""
-                  : ` (enhance with '--enhance-graphiql')`),
+                  : ` (enhance with '--enhance-graphiql')`)
+              : null,
             `Postgres connection: ${chalk.underline.magenta(
               safeConnectionString,
             )}${postgraphileOptions.watchPg ? " (watching)" : ""}`,

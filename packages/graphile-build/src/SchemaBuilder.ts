@@ -322,7 +322,7 @@ class SchemaBuilder extends EventEmitter {
     provides?: Array<string>,
     before?: Array<string>,
     after?: Array<string>,
-  ) {
+  ): void {
     if (!this.hooks[hookName]) {
       throw new Error(`Sorry, '${hookName}' is not a supported hook`);
     }

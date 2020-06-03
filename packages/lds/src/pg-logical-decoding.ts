@@ -112,6 +112,7 @@ export default class PgLogicalDecoding extends EventEmitter {
       max: 1,
     });
     this.pool.on("error", this.onPoolError);
+    this.client = null;
   }
 
   public async dropStaleSlots() {
@@ -172,7 +173,7 @@ export default class PgLogicalDecoding extends EventEmitter {
     const client = await this.getClient();
     await this.trackSelf(client);
     try {
-      const { rows } = await client.query({
+      const { rows } = await client.query<[string, string]>({
         text: `SELECT lsn, data FROM pg_catalog.pg_logical_slot_get_changes($1, $2, $3, 'add-tables', $4::text)`,
         values: [this.slotName, uptoLsn, uptoNchanges, this.tablePattern],
         rowMode: "array",

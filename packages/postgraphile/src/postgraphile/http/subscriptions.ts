@@ -140,11 +140,12 @@ export async function enhanceHttpServerWithSubscriptions<
     }
     if (!dummyRes) {
       dummyRes = new ServerResponse(req) as Response;
-      dummyRes.writeHead = (
+      dummyRes.writeHead = function (
+        this: Response,
         statusCode: number,
         _statusMessage?: OutgoingHttpHeaders | string | undefined,
         headers?: OutgoingHttpHeaders | undefined,
-      ): Response => {
+      ): Response {
         if (statusCode && statusCode > 200) {
           // tslint:disable-next-line no-console
           console.error(

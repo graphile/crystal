@@ -204,7 +204,7 @@ export default function createPostGraphileHttpRequestHandler(
 
   const origGraphiqlHtml = pluginHook(
     "postgraphile:graphiql:html",
-    baseGraphiqlHtml,
+    baseGraphiqlHtml as string,
     { options },
   );
 

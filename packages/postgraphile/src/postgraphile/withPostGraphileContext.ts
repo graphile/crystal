@@ -33,16 +33,14 @@ const debugPgNotice = createDebugger("postgraphile:postgres:notice");
  */
 function debugPgErrorObject(
   debugFn: createDebugger.IDebugger,
-  object: PgNotice,
+  object: Error | PgNotice,
 ) {
-  debugFn(
-    "%s%s: %s%s%s",
-    object.severity || "ERROR",
-    object.code ? `[${object.code}]` : "",
-    object.message || object,
-    object.where ? ` | WHERE: ${object.where}` : "",
-    object.hint ? ` | HINT: ${object.hint}` : "",
-  );
+  const severity = "severity" in object ? object.severity : "ERROR";
+  const code = "code" in object ? `[${object.code}]` : "";
+  const message = object.message || String(object);
+  const where = "where" in object ? ` | WHERE: ${object.where}` : "";
+  const hint = "hint" in object ? ` | HINT: ${object.hint}` : "";
+  debugFn("%s%s: %s%s%s", severity, code, message, where, hint);
 }
 
 type WithAuthenticatedPgClientFunction = <T>(
@@ -546,7 +544,7 @@ export function debugPgClient(
     };
 
     if (debugPgNotice.enabled) {
-      pgClient.on("notice", (msg: PgNotice) => {
+      pgClient.on("notice", (msg: Error | PgNotice) => {
         debugPgErrorObject(debugPgNotice, msg);
       });
     }

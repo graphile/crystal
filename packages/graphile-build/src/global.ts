@@ -47,7 +47,10 @@ declare global {
     }
     interface GraphileResolverContext {}
 
-    type InitObject = never;
+    /**
+     * Do not change this object, your changes will be ignored.
+     */
+    type InitObject = {};
 
     interface Plugin {
       (builder: SchemaBuilder, options: GraphileBuildOptions): Promise<
