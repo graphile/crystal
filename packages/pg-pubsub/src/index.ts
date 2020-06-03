@@ -179,7 +179,7 @@ const plugin: PostGraphilePlugin = {
           // eslint-disable-next-line no-console
           console.error(e);
           releaseClient(client);
-          if (!pgPool.ending) {
+          if (!pgPool["ending"]) {
             setupClient();
           }
         });
@@ -201,7 +201,7 @@ const plugin: PostGraphilePlugin = {
         // eslint-disable-next-line no-console
         console.error(e);
         releaseClient(client);
-        if (!pgPool.ending) {
+        if (!pgPool["ending"]) {
           await sleep(attempts * 2000);
           return setupClient(attempts + 1);
         }
@@ -217,7 +217,7 @@ const plugin: PostGraphilePlugin = {
     pgPool.on("remove", (client: PoolClient) => {
       if (client === listeningClient) {
         cleanClient(client);
-        if (!pgPool.ending) {
+        if (!pgPool["ending"]) {
           setupClient();
         }
       }

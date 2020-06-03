@@ -13,17 +13,21 @@ const methods = http.METHODS.map((m) => m.toLowerCase());
  * Initialize a new `TestAgent`.
  */
 
-function TestAgent(app: http.RequestListener | http.Server, options: any) {
+function TestAgent(
+  this: typeof TestAgent,
+  app: http.RequestListener | http.Server,
+  options: any,
+) {
   // @ts-ignore
   if (!(this instanceof TestAgent)) return new TestAgent(app, options);
   if (typeof app === "function") app = http.createServer(app); // eslint-disable-line no-param-reassign
   if (options) {
-    this._ca = options.ca;
-    this._key = options.key;
-    this._cert = options.cert;
+    this["_ca"] = options.ca;
+    this["_key"] = options.key;
+    this["_cert"] = options.cert;
   }
   Agent.call(this);
-  this.app = app;
+  this["app"] = app;
 }
 
 /**

@@ -7,6 +7,7 @@ import {
 } from "graphile-build-pg";
 import { Pool, PoolClient } from "pg";
 import { SignOptions, Secret } from "jsonwebtoken";
+import * as assert from "assert";
 
 export { SchemaBuilder, formatSQLForDebugging };
 
@@ -93,11 +94,12 @@ declare global {
 type PgConfig = Pool | PoolClient | string;
 
 export const PostGraphileInflectionPlugin = function (builder: SchemaBuilder) {
-  builder.hook("inflection", (inflection: GraphileEngine.Inflection) => {
+  builder.hook("inflection", (inflection) => {
     const previous = inflection.enumName;
+    assert.ok(previous, "Expected previous 'enumName' inflector to exist.");
     // Overwrite directly so that we don't lose the 'extend' hints
     Object.assign(inflection, {
-      enumName(value: string) {
+      enumName(this: GraphileEngine.Inflection, value: string): string {
         return this.constantCase(previous.call(this, value));
       },
     });
@@ -108,11 +110,16 @@ export const PostGraphileInflectionPlugin = function (builder: SchemaBuilder) {
 export const PostGraphileClassicIdsInflectionPlugin = function (
   builder: SchemaBuilder,
 ) {
-  builder.hook("inflection", (inflection: GraphileEngine.Inflection) => {
+  builder.hook("inflection", (inflection) => {
     const previous = inflection._columnName;
+    assert.ok(previous, "Expected previous '_columnName' inflector to exist.");
     // Overwrite directly so that we don't lose the 'extend' hints
     Object.assign(inflection, {
-      _columnName(attr: PgAttribute, options: { skipRowId?: boolean }) {
+      _columnName(
+        this: GraphileEngine.Inflection,
+        attr: PgAttribute,
+        options: { skipRowId?: boolean },
+      ): string {
         const previousValue = previous.call(this, attr, options);
         return (options && options.skipRowId) || previousValue !== "id"
           ? previousValue

@@ -103,7 +103,7 @@ class Test extends Request {
    *   .expect(fn)
    */
 
-  expect(a: any, b: any, c: any) {
+  expect(this: Test, a: any, b: any, c: any) {
     // callback
     if (typeof a === "function") {
       this._asserts.push(a);
@@ -126,7 +126,10 @@ class Test extends Request {
     // header field
     if (typeof b === "string" || typeof b === "number" || b instanceof RegExp) {
       this._asserts.push(
-        this._assertHeader.bind(this, { name: "" + a, value: b }),
+        this._assertHeader.bind(this, {
+          name: String(a),
+          value: typeof b === "number" ? String(b) : b,
+        }),
       );
       return this;
     }
@@ -262,6 +265,7 @@ class Test extends Request {
    */
 
   _assertHeader(
+    this: Test,
     header: { name: string; value: string | RegExp },
     res: request.Response,
   ): Error | null {
