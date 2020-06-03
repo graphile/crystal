@@ -106,7 +106,7 @@ export class LiveMonitor {
     this.changeCallback = null;
     this.changeCounter = 0;
     this.liveConditionsByCounter = {};
-    const handleChange = function () {
+    const handleChange = function (this: LiveMonitor) {
       /* This function is throttled to ~25ms (see constructor); it's purpose is
        * to bundle up all the changes that occur in a small window into the same
        * handle change flow, so _reallyHandleChange doesn't get called twice in
@@ -124,7 +124,7 @@ export class LiveMonitor {
       trailing: true,
     });
 
-    const _reallyHandleChange = function () {
+    const _reallyHandleChange = function (this: LiveMonitor) {
       // This function is throttled to MONITOR_THROTTLE_DURATION (see constructor)
       if (this.changeCallback) {
         // Convince Flow this won't suddenly become null

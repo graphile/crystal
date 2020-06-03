@@ -34,14 +34,21 @@ export default (function NodePlugin(
           $$nodeType: Symbol("nodeType"),
           nodeFetcherByTypeName,
           getNodeIdForTypeAndIdentifiers(
+            this: GraphileEngine.Build,
             Type: import("graphql").GraphQLType,
             ...identifiers: unknown[]
           ) {
             return base64(
-              JSON.stringify([this.getNodeAlias(Type), ...identifiers]),
+              JSON.stringify([
+                this.getNodeAlias(build.graphql.getNamedType(Type).name),
+                ...identifiers,
+              ]),
             );
           },
-          getTypeAndIdentifiersFromNodeId(nodeId: string) {
+          getTypeAndIdentifiersFromNodeId(
+            this: GraphileEngine.Build,
+            nodeId: string,
+          ) {
             const [alias, ...identifiers] = JSON.parse(base64Decode(nodeId));
             return {
               Type: this.getNodeType(alias),
@@ -60,7 +67,7 @@ export default (function NodePlugin(
           getNodeAlias(typeName: string) {
             return nodeAliasByTypeName[typeName] || typeName;
           },
-          getNodeType(alias: string) {
+          getNodeType(this: GraphileEngine.Build, alias: string) {
             return this.getTypeByName(nodeTypeNameByAlias[alias] || alias);
           },
           setNodeAlias(typeName: string, alias: string) {

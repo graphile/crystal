@@ -6,7 +6,7 @@ export default (function StandardTypesPlugin(builder) {
   // XXX: this should be in an "init" plugin, but PgTypesPlugin requires it in build - fix that, then fix this
   builder.hook(
     "build",
-    (build: GraphileEngine.Build): GraphileEngine.Build => {
+    (build) => {
       const stringType = (name: string, description: string | null) =>
         new build.graphql.GraphQLScalarType({
           name,
