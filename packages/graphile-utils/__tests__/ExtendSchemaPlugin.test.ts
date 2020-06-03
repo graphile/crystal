@@ -363,7 +363,7 @@ it("allows adding a field with arguments named using a custom inflector", async 
   const schema = await buildSchema([
     ...simplePlugins,
     makeAddInflectorsPlugin({
-      echoFieldName() {
+      echoFieldName(this: GraphileEngine.Inflection) {
         return this.camelCase("my-custom-echo-field-name");
       },
     }),
