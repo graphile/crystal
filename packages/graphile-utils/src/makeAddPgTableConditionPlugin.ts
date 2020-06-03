@@ -120,17 +120,17 @@ export default function makeAddPgTableConditionPlugin(
           return args;
         }
 
-        addArgDataGenerator(function conditionSQLBuilder({
-          condition,
-        }: {
-          condition: { [key: string]: any } | null;
-        }) {
-          if (!condition || !(conditionFieldName in condition)) {
+        addArgDataGenerator(function conditionSQLBuilder({ condition }) {
+          if (
+            typeof condition !== "object" ||
+            !condition ||
+            !(conditionFieldName in condition)
+          ) {
             return {};
           }
-          const { [conditionFieldName]: conditionValue } = condition;
+          const conditionValue = condition[conditionFieldName];
           return {
-            pgQuery: (queryBuilder: QueryBuilder) => {
+            pgQuery: (queryBuilder: QueryBuilder): void => {
               const sqlCondition = conditionGenerator(
                 conditionValue,
                 {

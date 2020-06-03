@@ -558,7 +558,7 @@ export default (async function PgIntrospectionPlugin(
   builder,
   {
     pgConfig,
-    pgSchemas: schemas,
+    pgSchemas: schemas = ["public"],
     pgEnableTags,
     persistentMemoizeWithKey = (_key, fn) => fn(),
     pgThrowOnMissingSchema = false,
@@ -989,7 +989,10 @@ export default (async function PgIntrospectionPlugin(
     _reallyReleaseClient: (() => void) | null;
     _haveDisplayedError: boolean;
     constructor(triggerRebuild: () => void) {
+      this.client = null;
       this.stopped = false;
+      this._reallyReleaseClient = null;
+      this._haveDisplayedError = false;
       this._handleChange = throttle(
         async () => {
           debug(`Schema change detected: re-inspecting schema...`);

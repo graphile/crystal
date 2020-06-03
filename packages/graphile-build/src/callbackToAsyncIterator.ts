@@ -9,7 +9,7 @@ const defaultOnError = (err: Error) => {
 
 export default function callbackToAsyncIterator<CallbackInput, ReturnVal>(
   listener: (
-    callback: (value?: CallbackInput) => void,
+    callback: (value: CallbackInput) => void,
   ) => (ReturnVal | null | undefined) | Promise<ReturnVal | null | undefined>,
   options: {
     onError?: (err: Error) => void;
@@ -18,15 +18,12 @@ export default function callbackToAsyncIterator<CallbackInput, ReturnVal>(
   } = {},
 ): AsyncIterableIterator<CallbackInput> {
   const { onError = defaultOnError, buffering = true, onClose } = options;
-  let pullQueue: ((result?: {
-    value: CallbackInput | undefined;
-    done: boolean;
-  }) => void)[] = [];
-  let pushQueue: (CallbackInput | undefined)[] = [];
+  let pullQueue: ((result?: IteratorResult<CallbackInput, any>) => void)[] = [];
+  let pushQueue: CallbackInput[] = [];
   let listening = true;
   let listenerReturnValue: ReturnVal | null | undefined;
 
-  function pushValue(value?: CallbackInput) {
+  function pushValue(value: CallbackInput) {
     if (pullQueue.length !== 0) {
       pullQueue.shift()!({ value, done: false });
     } else if (buffering === true) {
@@ -35,9 +32,9 @@ export default function callbackToAsyncIterator<CallbackInput, ReturnVal>(
   }
 
   function pullValue() {
-    return new Promise((resolve) => {
+    return new Promise<IteratorResult<CallbackInput, any>>((resolve) => {
       if (pushQueue.length !== 0) {
-        resolve({ value: pushQueue.shift(), done: false });
+        resolve({ value: pushQueue.shift()!, done: false });
       } else {
         pullQueue.push(resolve);
       }
@@ -66,7 +63,7 @@ export default function callbackToAsyncIterator<CallbackInput, ReturnVal>(
 
     return {
       next() {
-        return listening ? pullValue() : this.return();
+        return listening ? pullValue() : this.return!();
       },
       return() {
         emptyQueue();

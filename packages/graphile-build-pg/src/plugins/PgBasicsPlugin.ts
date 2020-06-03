@@ -73,8 +73,8 @@ declare global {
     }
 
     interface GraphileBuildOptions {
-      pgConfig: PgConfig;
-      pgSchemas: Array<string>;
+      pgConfig?: PgConfig;
+      pgSchemas?: Array<string>;
       persistentMemoizeWithKey?: <T>(key: string, fn: () => T) => T;
 
       pgDisableDefaultMutations?: boolean;

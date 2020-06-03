@@ -55,4 +55,15 @@ jobs:
           sudo apt-get update
           sudo apt-get -yqq install postgresql-client-${{ matrix.postgres-version }}
       - run: yarn --immutable
-      - run: ./scripts/ci
+
+      - name: "Build Code"
+        run: yarn prepack:all
+
+      - name: "Check Code Format"
+        run: yarn prettier:check
+
+      - name: "Lint Code"
+        run: yarn eslint .
+
+      - name: "Test Project"
+        run: yarn run pretest && yarn test && yarn run posttest

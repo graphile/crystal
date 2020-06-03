@@ -1,3 +1,4 @@
+import "./global";
 import util from "util";
 import SchemaBuilder from "./SchemaBuilder";
 import {
@@ -12,7 +13,6 @@ import {
   AddQueriesToSubscriptionsPlugin,
 } from "./plugins";
 import resolveNode from "./resolveNode";
-
 export { GetDataFromParsedResolveInfoFragmentFunction } from "./makeNewBuild";
 
 export {

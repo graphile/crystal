@@ -2,7 +2,7 @@ import { QueryBuilder, SQL } from "graphile-build-pg";
 
 export type SelectGraphQLResultFromTable = (
   tableFragment: SQL,
-  builderCallback: (alias: SQL, sqlBuilder: QueryBuilder) => void,
+  builderCallback?: (alias: SQL, sqlBuilder: QueryBuilder) => void,
 ) => Promise<any>;
 
 export interface GraphileHelpers {

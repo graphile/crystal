@@ -4,6 +4,7 @@
   "description": "Logical decoding server for PostgreSQL, monitors for new/edited/deleted rows and announces them to interested clients.",
   "main": "dist/index.js",
   "scripts": {
+    "test": "jest -i",
     "prepack": "tsc -b"
   },
   "bin": {

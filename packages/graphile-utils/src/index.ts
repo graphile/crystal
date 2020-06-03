@@ -10,6 +10,7 @@ import makeAddPgTableOrderByPlugin, {
   orderByAscDesc,
   MakeAddPgTableOrderByPluginOrders,
 } from "./makeAddPgTableOrderByPlugin";
+export * from "./makeWrapResolversPlugin";
 
 export {
   AugmentedGraphQLFieldResolver,

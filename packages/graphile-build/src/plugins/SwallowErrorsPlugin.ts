@@ -1,10 +1,12 @@
+import "../global";
+
 export default (function SwallowErrorsPlugin(
   builder,
   { dontSwallowErrors = false },
 ) {
   builder.hook(
     "build",
-    (build: GraphileEngine.Build): GraphileEngine.Build => {
+    (build) => {
       if (dontSwallowErrors) {
         // This plugin is a bit of a misnomer - to better maintain backwards
         // compatibility, `swallowError` still exists on `makeNewBuild`; and

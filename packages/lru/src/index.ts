@@ -28,10 +28,13 @@ export default class LRU<KeyType = any, ValueType = any> {
     if (parseInt(String(maxLength), 10) !== maxLength) {
       throw new Error("Max length must be an integer");
     }
-    this._maxLength = maxLength;
 
-    this._dispose = dispose || null;
+    this.length = 0;
+    this._maxLength = maxLength;
+    this._head = null;
+    this._tail = null;
     this._cache = new Map();
+    this._dispose = dispose || null;
 
     this.reset();
   }

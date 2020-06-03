@@ -70,8 +70,8 @@ export default (queryBuilderOptions: QueryBuilderOptions = {}) => (
     (calculateHasNextPage && calculateHasNextPage.length > 0) ||
     (calculateHasPreviousPage && calculateHasPreviousPage.length > 0) ||
     false;
-  const semiRawCursorPrefix: (SQL | SQL[])[] | null = reallyRawCursorPrefix
-    ? reallyRawCursorPrefix.filter((_): _ is SQL | SQL[] => !!_)
+  const semiRawCursorPrefix: SQL[] | null = reallyRawCursorPrefix
+    ? reallyRawCursorPrefix.filter((_): _ is SQL => !!_)
     : null;
   const rawCursorPrefix: SQL[] | null = semiRawCursorPrefix
     ? /*

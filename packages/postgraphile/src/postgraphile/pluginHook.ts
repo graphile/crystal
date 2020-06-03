@@ -1,22 +1,168 @@
 import { AddFlagFn } from "./cli";
-import { Server, IncomingMessage } from "http";
-import { HttpRequestHandler } from "../interfaces";
+import { Server, IncomingMessage, ServerResponse } from "http";
+import { HttpRequestHandler, CreateRequestHandlerOptions } from "../interfaces";
 import { WithPostGraphileContextFn } from "./withPostGraphileContext";
 // @ts-ignore
 import { version } from "../../package.json";
 import * as graphql from "graphql";
 import { ExecutionParams } from "subscriptions-transport-ws";
+import * as assert from "assert";
+import * as WebSocket from "ws";
+import httpError from "http-errors";
+import { Pool } from "pg";
+import chalk from "chalk";
 
 // tslint:disable-next-line no-any
-export type HookFn<TArg, TContext = any> = (
-  arg: TArg,
-  context: TContext,
-) => TArg;
-export type PluginHookFn = <TArgument, TContext = {}>(
-  hookName: string,
-  argument: TArgument,
-  context?: TContext,
-) => TArgument;
+interface PostGraphileHooks {
+  init: [
+    null,
+    {
+      version: string;
+      graphql: typeof import("graphql");
+    },
+  ];
+
+  pluginHook: [PluginHookFn, null];
+
+  "cli:flags:add:standard": [AddFlagFn, null];
+  "cli:flags:add:schema": [AddFlagFn, null];
+  "cli:flags:add:errorHandling": [AddFlagFn, null];
+  "cli:flags:add:plugins": [AddFlagFn, null];
+  "cli:flags:add:noServer": [AddFlagFn, null];
+  "cli:flags:add:webserver": [AddFlagFn, null];
+  "cli:flags:add:jwt": [AddFlagFn, null];
+  "cli:flags:add": [AddFlagFn, null];
+  "cli:flags:add:deprecated": [AddFlagFn, null];
+  "cli:flags:add:workarounds": [AddFlagFn, null];
+  // tslint:disable-next-line no-any
+  "cli:library:options": [
+    GraphileEngine.PostGraphileOptions<any, any>,
+    { config: any; cliOptions: any },
+  ];
+  "cli:server:created": [
+    Server,
+    {
+      options: GraphileEngine.PostGraphileOptions<any, any>;
+      middleware: HttpRequestHandler<IncomingMessage, ServerResponse>;
+    },
+  ];
+  "cli:greeting": [
+    Array<string | null | void>,
+    {
+      options: GraphileEngine.PostGraphileOptions<any, any>;
+      middleware: HttpRequestHandler<IncomingMessage, ServerResponse>;
+      port: any;
+      chalk: typeof chalk;
+    },
+  ];
+
+  "postgraphile:options": [
+    GraphileEngine.PostGraphileOptions<any, any>,
+    { pgPool: Pool; schema: string | string[] },
+  ];
+  "postgraphile:validationRules:static": [
+    typeof graphql.specifiedRules,
+    {
+      options: GraphileEngine.PostGraphileOptions<any, any>;
+    },
+  ];
+  "postgraphile:graphiql:html": [
+    string,
+    {
+      options: GraphileEngine.PostGraphileOptions<any, any>;
+    },
+  ];
+  "postgraphile:http:handler": [
+    IncomingMessage,
+    {
+      options: CreateRequestHandlerOptions;
+      res: ServerResponse;
+      next: (err?: Error | undefined) => void;
+    },
+  ];
+  "postgraphile:http:result": [
+    PostGraphileHTTPResult,
+    {
+      options: CreateRequestHandlerOptions;
+      returnArray: boolean;
+      queryDocumentAst: graphql.DocumentNode | null;
+      req: IncomingMessage;
+      pgRole: string | undefined;
+    },
+  ];
+  "postgraphile:http:end": [
+    PostGraphileHTTPEnd,
+    {
+      options: CreateRequestHandlerOptions;
+      returnArray: boolean;
+      req: IncomingMessage;
+      res: ServerResponse;
+    },
+  ];
+  "postgraphile:httpParamsList": [
+    Array<object>,
+    {
+      options: CreateRequestHandlerOptions;
+      req: IncomingMessage;
+      res: ServerResponse;
+      returnArray: boolean;
+      httpError: typeof httpError;
+    },
+  ];
+
+  /** AVOID THIS where possible; use 'postgraphile:validationRules:static' instead. */
+  "postgraphile:validationRules": [
+    typeof graphql.specifiedRules,
+    {
+      options: CreateRequestHandlerOptions;
+      req: IncomingMessage;
+      res: ServerResponse;
+      variables: { [key: string]: any };
+      operationName: string;
+      meta: {};
+    },
+  ];
+  "postgraphile:middleware": [
+    HttpRequestHandler,
+    {
+      options: GraphileEngine.PostGraphileOptions<any, any>;
+    },
+  ];
+  "postgraphile:ws:onOperation": [
+    ExecutionParams,
+    {
+      message: any;
+      params: ExecutionParams<any>;
+      socket: WebSocket;
+      options: CreateRequestHandlerOptions;
+    },
+  ];
+
+  withPostGraphileContext: [
+    WithPostGraphileContextFn<any>,
+    {
+      options: GraphileEngine.PostGraphileOptions<any, any>;
+    },
+  ];
+}
+
+export type HookName = keyof PostGraphileHooks;
+export type HookType<
+  THookName extends HookName
+> = PostGraphileHooks[THookName][0];
+export type HookContext<
+  THookName extends HookName
+> = PostGraphileHooks[THookName][1];
+
+export type PluginHookFn = <THookName extends HookName>(
+  hookName: THookName,
+  argument: HookType<THookName>,
+  context: HookContext<THookName>,
+) => HookType<THookName>;
+export type HookFn<THookName extends HookName> = (
+  argument: HookType<THookName>,
+  context: HookContext<THookName>,
+) => HookType<THookName>;
 
 export interface PostGraphileHTTPResult {
   statusCode?: number;
@@ -28,52 +174,20 @@ export interface PostGraphileHTTPEnd {
   statusCode?: number;
   result: object | Array<object>;
 }
-export interface PostGraphilePlugin {
-  init?: HookFn<null>;
-
-  pluginHook?: HookFn<PluginHookFn>;
-
-  "cli:flags:add:standard"?: HookFn<AddFlagFn>;
-  "cli:flags:add:schema"?: HookFn<AddFlagFn>;
-  "cli:flags:add:errorHandling"?: HookFn<AddFlagFn>;
-  "cli:flags:add:plugins"?: HookFn<AddFlagFn>;
-  "cli:flags:add:noServer"?: HookFn<AddFlagFn>;
-  "cli:flags:add:webserver"?: HookFn<AddFlagFn>;
-  "cli:flags:add:jwt"?: HookFn<AddFlagFn>;
-  "cli:flags:add"?: HookFn<AddFlagFn>;
-  "cli:flags:add:deprecated"?: HookFn<AddFlagFn>;
-  "cli:flags:add:workarounds"?: HookFn<AddFlagFn>;
-  // tslint:disable-next-line no-any
-  "cli:library:options"?: HookFn<
-    GraphileEngine.PostGraphileOptions,
-    { config: any; cliOptions: any }
-  >;
-  "cli:server:middleware"?: HookFn<HttpRequestHandler>;
-  "cli:server:created"?: HookFn<Server>;
-  "cli:greeting"?: HookFn<Array<string | null | void>>;
-
-  "postgraphile:options"?: HookFn<GraphileEngine.PostGraphileOptions>;
-  "postgraphile:validationRules:static"?: HookFn<typeof graphql.specifiedRules>;
-  "postgraphile:graphiql:html"?: HookFn<string>;
-  "postgraphile:http:handler"?: HookFn<IncomingMessage>;
-  "postgraphile:http:result"?: HookFn<PostGraphileHTTPResult>;
-  "postgraphile:http:end"?: HookFn<PostGraphileHTTPEnd>;
-  "postgraphile:httpParamsList"?: HookFn<Array<object>>;
-  "postgraphile:validationRules"?: HookFn<typeof graphql.specifiedRules>; // AVOID THIS where possible; use 'postgraphile:validationRules:static' instead.
-  "postgraphile:middleware"?: HookFn<HttpRequestHandler>;
-  "postgraphile:ws:onOperation"?: HookFn<ExecutionParams>;
-
-  withPostGraphileContext?: HookFn<WithPostGraphileContextFn<any>>;
-}
-type HookName = keyof PostGraphilePlugin;
+export type PostGraphilePlugin = {
+  [k in HookName]?: HookFn<k>;
+};
 
 const identityHook = <T>(input: T): T => input;
 const identityPluginHook: PluginHookFn = (_hookName, input, _options) => input;
 
-function contextIsSame(context1: {}, context2: {}): boolean {
+function contextIsSame(context1: {} | null, context2: {} | null): boolean {
   // Shortcut if obvious
   if (context1 === context2) {
     return true;
+  }
+  if (!context1 || !context2) {
+    return false;
   }
   // Blacklist approach from now on
   const keys1 = Object.keys(context1);
@@ -97,13 +211,18 @@ function contextIsSame(context1: {}, context2: {}): boolean {
 
 // Caches the last value of the hook, in case it's called with exactly the same
 // arguments again.
-function memoizeHook<T>(hook: HookFn<T>): HookFn<T> {
+function memoizeHook<THookName extends HookName>(
+  hook: HookFn<THookName>,
+): HookFn<THookName> {
   let lastCall: {
-    argument: T;
-    context: {};
-    result: T;
+    argument: HookType<THookName>;
+    context: HookContext<THookName>;
+    result: HookType<THookName>;
   } | null = null;
-  return (argument: T, context: {}): T => {
+  return (
+    argument: HookType<THookName>,
+    context: HookContext<THookName>,
+  ): HookType<THookName> => {
     if (
       lastCall &&
       lastCall.argument === argument &&
@@ -122,27 +241,35 @@ function memoizeHook<T>(hook: HookFn<T>): HookFn<T> {
   };
 }
 
-function shouldMemoizeHook(hookName: HookName) {
+function shouldMemoizeHook(hookName: HookName): boolean {
   return hookName === "withPostGraphileContext";
 }
 
-function makeHook<T>(
+function makeHook<THookName extends HookName>(
   plugins: Array<PostGraphilePlugin>,
-  hookName: HookName,
-): HookFn<T> {
-  const combinedHook = plugins.reduce((previousHook: HookFn<T>, plugin: {}) => {
-    if (typeof plugin[hookName] === "function") {
-      return (argument: T, context: {}) => {
-        return plugin[hookName](previousHook(argument, context), context);
-      };
-    } else {
-      return previousHook;
-    }
-  }, identityHook);
+  hookName: THookName,
+): HookFn<THookName> {
+  const combinedHook = plugins.reduce(
+    (previousHook: HookFn<THookName>, plugin) => {
+      const p = plugin[hookName] as HookFn<THookName> | undefined;
+      if (typeof p === "function") {
+        const hook: HookFn<THookName> = (
+          argument: HookType<THookName>,
+          context: HookContext<THookName>,
+        ) => {
+          return p(previousHook(argument, context), context);
+        };
+        return hook;
+      } else {
+        return previousHook;
+      }
+    },
+    identityHook,
+  );
   if (combinedHook === identityHook) {
     return identityHook;
   } else if (shouldMemoizeHook(hookName)) {
-    return memoizeHook<T>(combinedHook);
+    return memoizeHook<THookName>(combinedHook);
   } else {
     return combinedHook;
   }
@@ -151,23 +278,26 @@ function makeHook<T>(
 export function makePluginHook(
   plugins: Array<PostGraphilePlugin>,
 ): PluginHookFn {
-  const hooks = {};
-  const emptyObject = {}; // caching this makes memoization faster when no context is needed
-  function rawPluginHook<T>(
-    hookName: HookName,
-    argument: T,
-    context: {} = emptyObject,
-  ): T {
+  const hooks: {
+    [k in HookName]?: HookFn<k>;
+  } = {};
+  const rawPluginHook: PluginHookFn = <THookName extends HookName>(
+    hookName: THookName,
+    argument: HookType<THookName>,
+    context: HookContext<THookName>,
+  ) => {
     if (!hooks[hookName]) {
-      hooks[hookName] = makeHook(plugins, hookName);
+      hooks[hookName] = makeHook(plugins, hookName) as any;
     }
-    return hooks[hookName](argument, context);
-  }
+    const hook = hooks[hookName] as HookFn<THookName> | undefined;
+    assert.ok(hook);
+    return hook(argument, context);
+  };
 
   const pluginHook: PluginHookFn = rawPluginHook(
     "pluginHook",
     rawPluginHook,
-    {},
+    null,
   );
   // Use this hook to check your hook is compatible with this version of
   // PostGraphile, also to get a reference to shared graphql instance.
@@ -175,8 +305,11 @@ export function makePluginHook(
   return pluginHook;
 }
 
-export function pluginHookFromOptions(
-  options: GraphileEngine.PostGraphileOptions,
+export function pluginHookFromOptions<
+  Request extends IncomingMessage = IncomingMessage,
+  Response extends ServerResponse = ServerResponse
+>(
+  options: GraphileEngine.PostGraphileOptions<Request, Response>,
 ): PluginHookFn {
   if (typeof options.pluginHook === "function") {
     return options.pluginHook;

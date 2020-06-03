@@ -5,12 +5,18 @@ import {
   requireSiblingColumn,
 } from "./fieldHelpers";
 
-type ResolverWrapperFn<
+export type ResolverWrapperFn<
   TSource = any,
   TContext = any,
   TArgs = { [argName: string]: any }
 > = (
-  resolve: import("graphql").GraphQLFieldResolver<TSource, TContext, TArgs>,
+  //resolve: import("graphql").GraphQLFieldResolver<TSource, TContext, TArgs>,
+  resolve: (
+    parent?: any,
+    args?: { [key: string]: any },
+    context?: GraphileEngine.GraphileResolverContext,
+    info?: import("graphql").GraphQLResolveInfo,
+  ) => any,
   source: TSource,
   args: TArgs,
   context: TContext,
@@ -44,7 +50,7 @@ type ResolverWrapperFilter<T> = (
   options: GraphileEngine.GraphileBuildOptions,
 ) => T | null;
 
-type ResolverWrapperFilterRule<T> = (
+export type ResolverWrapperFilterRule<T> = (
   match: T,
 ) => ResolverWrapperRule | ResolverWrapperFn;
 
