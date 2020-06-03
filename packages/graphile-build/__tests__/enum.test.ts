@@ -1,6 +1,5 @@
-import "../global";
 import { GraphQLEnumType } from "graphql";
-import { buildSchema, defaultPlugins } from "../";
+import { buildSchema, defaultPlugins } from "../src";
 
 declare global {
   namespace GraphileEngine {

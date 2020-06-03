@@ -1,16 +1,16 @@
-import "../global";
 import {
   graphql,
   GraphQLObjectType,
   GraphQLInt,
   GraphQLNonNull,
   printSchema,
+  GraphQLSchema,
 } from "graphql";
 import {
   getBuilder,
   defaultPlugins as allDefaultPlugins,
   MutationPlugin,
-} from "../";
+} from "../src";
 import { EventEmitter } from "events";
 
 const options = {};
@@ -18,6 +18,17 @@ const options = {};
 const defaultPlugins = allDefaultPlugins.filter(
   (plugin) => plugin !== MutationPlugin,
 );
+
+declare global {
+  namespace GraphileEngine {
+    interface Build {
+      dummyCounter: number;
+    }
+    interface ScopeGraphQLObjectTypeFieldsField {
+      isDummyField?: boolean;
+    }
+  }
+}
 
 const makePluginEtc = (defaultCounter = 0) => {
   let counter = defaultCounter;
@@ -34,9 +45,13 @@ const makePluginEtc = (defaultCounter = 0) => {
       },
     );
     builder.hook("build", (build) => {
-      return build.extend(build, {
-        dummyCounter: counter,
-      });
+      return build.extend(
+        build,
+        {
+          dummyCounter: counter,
+        },
+        "TEST",
+      );
     });
     builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
       const { dummyCounter, extend, newWithHooks } = build;
@@ -60,27 +75,31 @@ const makePluginEtc = (defaultCounter = 0) => {
         },
         {},
       );
-      return extend(fields, {
-        dummy: fieldWithHooks(
-          "dummy",
-          () => {
-            return {
-              type: Dummy,
-              resolve() {
-                return {};
-              },
-            };
-          },
-          { isDummyField: true },
-        ),
-      });
+      return extend(
+        fields,
+        {
+          dummy: fieldWithHooks(
+            "dummy",
+            () => {
+              return {
+                type: Dummy,
+                resolve() {
+                  return {};
+                },
+              };
+            },
+            { isDummyField: true },
+          ),
+        },
+        "TEST",
+      );
     });
   };
 
   return {
     plugin: DummyWatchPlugin,
     eventEmitter,
-    setN(n) {
+    setN(n: number) {
       counter = n;
     },
   };
@@ -140,7 +159,7 @@ test("schema is updated when rebuild triggered", async () => {
   expect(schema0).not.toEqual(schema1);
   expect(printSchema(schema0)).not.toEqual(printSchema(schema1));
 
-  const getNFrom = async (schema) => {
+  const getNFrom = async (schema: GraphQLSchema) => {
     const result = await graphql(
       schema,
       `
@@ -156,7 +175,7 @@ test("schema is updated when rebuild triggered", async () => {
       console.log(result.errors.map((e) => e.originalError));
     }
     expect(result.errors).toBeFalsy();
-    return result.data.dummy.n;
+    return result.data?.dummy.n;
   };
 
   expect(await getNFrom(schema0)).toEqual(0);

@@ -79,7 +79,16 @@ declare global {
      * object ahead of time.
      */
     type ResolvedLookAhead<T extends LookAheadData = LookAheadData> = {
-      [P in keyof T]?: Array<T[P]>;
+      [P in keyof T]?:
+        | Array<
+            T[P] extends undefined | null | infer DataType
+              ? DataType extends Array<infer ElementType>
+                ? ElementType
+                : DataType
+              : never
+          >
+        | null
+        | undefined;
     };
 
     interface Inflection extends InflectionBase {}
@@ -332,7 +341,7 @@ declare global {
         args: { [key: string]: unknown },
         ReturnType: GraphQLOutputType,
         data: ResolvedLookAhead,
-      ): Partial<LookAheadData>;
+      ): Partial<LookAheadData> | null | undefined;
       displayName?: string;
     };
 

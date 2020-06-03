@@ -1,4 +1,3 @@
-import "../global";
 import {
   graphql,
   GraphQLObjectType,
@@ -7,8 +6,34 @@ import {
   GraphQLString,
   GraphQLNonNull,
   GraphQLList,
+  GraphQLObjectTypeConfig,
+  GraphQLScalarType,
 } from "graphql";
-import { buildSchema, defaultPlugins } from "../";
+import { buildSchema, defaultPlugins } from "../src";
+
+type ArrayOrNot<T> = T | T[];
+
+declare global {
+  namespace GraphileEngine {
+    interface ScopeGraphQLObjectTypeFieldsField {
+      isDummyConnectionField?: boolean;
+    }
+    interface LookAheadData {
+      usesCursor?: ArrayOrNot<boolean>;
+      limit?: ArrayOrNot<number>;
+      sort?: ArrayOrNot<any>;
+      filter?: ArrayOrNot<(obj: any, index: number) => boolean>;
+      map?: ArrayOrNot<
+        (
+          obj: any,
+          index: number,
+        ) => {
+          [x: string]: any;
+        }
+      >;
+    }
+  }
+}
 
 const base64 = (str: string) => Buffer.from(String(str)).toString("base64");
 const base64Decode = (str: string) =>
@@ -45,7 +70,7 @@ const DummyConnectionPlugin: GraphileEngine.Plugin = async (builder) => {
       fieldWithHooks,
     } = context;
     if (!isRootQuery) return fields;
-    const Cursor = getTypeByName("Cursor");
+    const Cursor = getTypeByName("Cursor") as GraphQLScalarType;
     const Dummy = newWithHooks(
       GraphQLObjectType,
       {
@@ -93,9 +118,12 @@ const DummyConnectionPlugin: GraphileEngine.Plugin = async (builder) => {
       {
         dummyConnection: fieldWithHooks(
           "dummyConnection",
-          ({ addArgDataGenerator, getDataFromParsedResolveInfoFragment }) => {
+          ({
+            addArgDataGenerator,
+            getDataFromParsedResolveInfoFragment,
+          }): import("graphql").GraphQLFieldConfig<any, any, any> => {
             addArgDataGenerator(function connectionFirst({ first }) {
-              if (first) {
+              if (typeof first === "number") {
                 return { limit: [first] };
               }
             });
@@ -110,7 +138,7 @@ const DummyConnectionPlugin: GraphileEngine.Plugin = async (builder) => {
               data,
             ) {
               const sorts = data.sort || [];
-              if (after) {
+              if (typeof after === "string") {
                 if (sorts.length) {
                   const afterValues = JSON.parse(base64Decode(after));
                   let filter: (obj?: any) => boolean = () => false;
@@ -136,7 +164,7 @@ const DummyConnectionPlugin: GraphileEngine.Plugin = async (builder) => {
                 } else {
                   const afterIdx = parseInt(after, 10);
                   return {
-                    filter: [(val, idx) => idx > afterIdx],
+                    filter: [(_val, idx) => idx > afterIdx],
                   };
                 }
               }
@@ -147,8 +175,8 @@ const DummyConnectionPlugin: GraphileEngine.Plugin = async (builder) => {
                 {
                   name: "DummyConnection",
                   fields: ({ recurseDataGeneratorsForField }) => {
-                    recurseDataGeneratorsForField("edges");
-                    recurseDataGeneratorsForField("nodes");
+                    recurseDataGeneratorsForField("edges", true);
+                    recurseDataGeneratorsForField("nodes", true);
                     return {
                       edges: {
                         type: new GraphQLList(
@@ -161,7 +189,7 @@ const DummyConnectionPlugin: GraphileEngine.Plugin = async (builder) => {
                                   addDataGeneratorForField,
                                   recurseDataGeneratorsForField,
                                 }) => {
-                                  recurseDataGeneratorsForField("node");
+                                  recurseDataGeneratorsForField("node", true);
                                   addDataGeneratorForField("cursor", () => ({
                                     usesCursor: [true],
                                   }));
@@ -177,7 +205,7 @@ const DummyConnectionPlugin: GraphileEngine.Plugin = async (builder) => {
                                           map: (obj) => ({
                                             __cursor: base64(
                                               JSON.stringify(
-                                                data.sort.map(
+                                                data.sort!.map(
                                                   ([key]) => obj[key],
                                                 ),
                                               ),
@@ -208,7 +236,10 @@ const DummyConnectionPlugin: GraphileEngine.Plugin = async (builder) => {
                                     },
                                   };
                                 },
-                              },
+                              } as GraphileEngine.GraphileObjectTypeConfig<
+                                any,
+                                any
+                              >,
                               {},
                             ),
                           ),
@@ -256,7 +287,9 @@ const DummyConnectionPlugin: GraphileEngine.Plugin = async (builder) => {
                 },
               },
               resolve(data, args, context, resolveInfo) {
-                const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
+                const parsedResolveInfoFragment = parseResolveInfo(
+                  resolveInfo,
+                )!;
                 parsedResolveInfoFragment.args = args; // Allow overriding via makeWrapResolversPlugin
                 const resolveData = getDataFromParsedResolveInfoFragment(
                   parsedResolveInfoFragment,
@@ -326,14 +359,14 @@ test("no arguments", async () => {
     console.log(result.errors.map((e) => e.originalError));
   }
   expect(result.errors).toBeFalsy();
-  expect(result.data.dummyConnection.nodes.map((n) => n.id)).toEqual([
+  expect(result.data?.dummyConnection.nodes.map((n: any) => n.id)).toEqual([
     "foo",
     "bar",
     "baz",
     "qux",
   ]);
   expect(
-    result.data.dummyConnection.edges.map(({ cursor }) => cursor),
+    result.data?.dummyConnection.edges.map(({ cursor }: any) => cursor),
   ).toEqual(["0", "1", "2", "3"]);
   expect(result).toMatchSnapshot();
 });
@@ -365,15 +398,15 @@ test("sort", async () => {
     console.log(result.errors.map((e) => e.originalError));
   }
   expect(result.errors).toBeFalsy();
-  expect(result.data.dummyConnection.nodes.map((n) => n.id)).toEqual([
+  expect(result.data?.dummyConnection.nodes.map((n: any) => n.id)).toEqual([
     "bar",
     "baz",
     "foo",
     "qux",
   ]);
   expect(
-    result.data.dummyConnection.edges
-      .map(({ cursor }) => cursor)
+    result.data?.dummyConnection.edges
+      .map(({ cursor }: any) => cursor)
       .map(base64Decode),
   ).toEqual(['["bar"]', '["baz"]', '["foo"]', '["qux"]']);
   expect(result).toMatchSnapshot();
@@ -401,12 +434,12 @@ test("after", async () => {
       }
     `,
   );
-  expect(result.data.dummyConnection.nodes.map((n) => n.id)).toEqual([
+  expect(result.data?.dummyConnection.nodes.map((n: any) => n.id)).toEqual([
     "baz",
     "qux",
   ]);
   expect(
-    result.data.dummyConnection.edges.map(({ cursor }) => cursor),
+    result.data?.dummyConnection.edges.map(({ cursor }: any) => cursor),
   ).toEqual(["2", "3"]);
   expect(result).toMatchSnapshot();
 });
@@ -438,13 +471,13 @@ test("sort, after", async () => {
     console.log(result.errors.map((e) => e.originalError));
   }
   expect(result.errors).toBeFalsy();
-  expect(result.data.dummyConnection.nodes.map((n) => n.id)).toEqual([
+  expect(result.data?.dummyConnection.nodes.map((n: any) => n.id)).toEqual([
     "foo",
     "qux",
   ]);
   expect(
-    result.data.dummyConnection.edges
-      .map(({ cursor }) => cursor)
+    result.data?.dummyConnection.edges
+      .map(({ cursor }: any) => cursor)
       .map(base64Decode),
   ).toEqual(['["foo"]', '["qux"]']);
   expect(result).toMatchSnapshot();

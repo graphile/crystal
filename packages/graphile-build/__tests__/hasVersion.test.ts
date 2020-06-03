@@ -1,5 +1,4 @@
-import "../global";
-import { buildSchema, defaultPlugins } from "../";
+import { buildSchema, defaultPlugins } from "../src";
 
 const EarlyPlugin: GraphileEngine.Plugin = (builder) => {
   builder.hook("build", (build) => {

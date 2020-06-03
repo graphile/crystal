@@ -283,7 +283,7 @@ const knownTypeNames = knownTypes.map((k) => k.name);
  *
  * TODO:v5: remove this!
  */
-function ensureArray<T>(val: null | T | Array<T>): void | Array<T> {
+function ensureArray<T>(val: undefined | null | T | Array<T>): void | Array<T> {
   if (val == null) {
     return;
   } else if (Array.isArray(val)) {
