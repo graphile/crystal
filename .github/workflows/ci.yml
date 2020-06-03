@@ -66,4 +66,4 @@ jobs:
         run: yarn eslint .
 
       - name: "Test Project"
-        run: yarn test
+        run: yarn run pretest && yarn test && yarn run posttest
