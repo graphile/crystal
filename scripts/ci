@@ -13,9 +13,7 @@ echo "[3/4]: Linting Code"
 yarn eslint .
 
 echo "[4/4]: Testing Project"
-yarn run pretest
-yarn workspaces foreach run test
-yarn run posttest
+yarn test
 
 echo ""
 echo "CI completed succesfully 🎉"

@@ -6,6 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "pretest": "node dist/index.js",
+    "test": "jest -i",
     "posttest": "yarn test:docs",
     "test:docs": "markdown-doctest",
     "prepack": "tsc -b"

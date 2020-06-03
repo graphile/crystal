@@ -1,3 +1,4 @@
+import "./global";
 import * as graphql from "graphql";
 import {
   parseResolveInfo,
