@@ -1,3 +1,6 @@
+#> rbac: true
+#> options: { ignoreRBAC: false }
+
 mutation {
   updateLeftArmById(input:{
     id: 47

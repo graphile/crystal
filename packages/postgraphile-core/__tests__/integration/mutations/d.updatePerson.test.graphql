@@ -1,10 +1,13 @@
+#> schemas: "d"
+
 mutation {
-  createPerson(input:{
-    person:{
+  updatePersonById(input:{
+    id:1
+    personPatch:{
       lastName:"Doe"
-      colNoOrder:"create1"
-      colNoUpdate:"create2"
-      colNoFilter:"create3"
+      colNoOrder:"update1"
+      colNoCreate:"update2"
+      colNoFilter:"update3"
     }
   }) {
     person{

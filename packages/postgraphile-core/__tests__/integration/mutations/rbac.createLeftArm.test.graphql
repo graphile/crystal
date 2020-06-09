@@ -1,3 +1,6 @@
+#> rbac: true
+#> options: { ignoreRBAC: false }
+
 mutation {
   createLeftArm(input:{
     leftArm:{

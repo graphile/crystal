@@ -1,3 +1,5 @@
+#> schemas: "pg10"
+
 mutation {
   a: createAlwaysAsIdentity(input:{
     alwaysAsIdentity: {

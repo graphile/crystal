@@ -1,12 +1,5 @@
-#!variables!{
-#  "config": {
-#    "a": "5",
-#    "b": "6",
-#    "actually_null": null,
-#    "null_string": "null",
-#    "_\"\\_$@£$)(@*£$": "_\"\\_$@£$)(@*£$"
-#  }
-#}!
+#> variables: { config: { a: "5", b: "6", actually_null: null, null_string: "null", "_\"\\_$@£$)(@*£$": "_\"\\_$@£$)(@*£$" } }
+
 mutation CreateMutation($config: KeyValueHash!) {
   a: createType(input: {
     type: {
