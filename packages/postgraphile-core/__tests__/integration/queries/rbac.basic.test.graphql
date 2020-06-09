@@ -1,3 +1,6 @@
+#> rbac: true
+#> options: { ignoreRBAC: false }
+
 query {
   personSecretByPersonId(personId: 3) { nodeId personId secret }
   allPersonSecrets { nodes { nodeId personId secret } }

@@ -1,3 +1,5 @@
+#> schemas: ["d"]
+
 {
   allPeople(orderBy: COL_NO_CREATE_UPDATE_DESC) {
     nodes {

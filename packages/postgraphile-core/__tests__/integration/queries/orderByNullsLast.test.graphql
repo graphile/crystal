@@ -1,3 +1,5 @@
+#> schemas: ["a"]
+#> options: { graphileBuildOptions: { orderByNullsLast: true } }
 {
   asc: allSimilarTable1S(orderBy: COL2_ASC) {
     nodes {

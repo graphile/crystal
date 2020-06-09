@@ -1,3 +1,5 @@
+#> options: {dynamicJson: true}
+
 query myQuery($myVal: String = "test", $myVal2: JSON = {stringField: "test"}) {
   # All three of these should result in the same value
   a: allMyTables(condition: {jsonData: {stringField: $myVal}}) {

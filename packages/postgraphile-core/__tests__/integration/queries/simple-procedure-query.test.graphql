@@ -1,3 +1,4 @@
+#> options: {simpleCollections: "both"}
 {
   compoundTypeSetQueryList(first: 5) {
     a

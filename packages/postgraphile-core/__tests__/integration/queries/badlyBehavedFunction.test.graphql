@@ -1,3 +1,4 @@
+#> options: {viewUniqueKey: "testviewid", setofFunctionsContainNulls: true,}
 {
   badlyBehavedFunction {
     nodes {

@@ -1,3 +1,4 @@
+#> options: {simpleCollections: "both"}
 query {
   a: allPeopleList { ...personFragment }
   b: allPeopleList(first: 2) { ...personFragment }

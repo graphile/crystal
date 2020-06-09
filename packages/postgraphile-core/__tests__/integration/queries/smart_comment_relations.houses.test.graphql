@@ -1,3 +1,5 @@
+#> schemas: ["smart_comment_relations"]
+
 {
   allHouses {
     nodes {

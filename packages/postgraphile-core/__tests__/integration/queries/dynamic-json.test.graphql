@@ -1,5 +1,4 @@
-# This test file is configured with `dynamicJSON` set to `true`. This is a
-# special case. Every other file has `dynamicJSON` set to `false`.
+#> options: {dynamicJson: true}
 
 query {
   a: jsonIdentity(json: true)

@@ -1,3 +1,6 @@
+#> schemas: ["named_query_builder"]
+#> plugins: ["ToyCategoriesPlugin"]
+
 {
   t1: toyById(id: 1) {
     categories {

@@ -1,3 +1,5 @@
+#> schemas: ["d"]
+
 {
   allPeople(condition:{colNoCreate:"col_no_create1"}) {
     nodes {

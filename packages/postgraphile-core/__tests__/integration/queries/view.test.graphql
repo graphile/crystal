@@ -1,3 +1,4 @@
+#> options: {viewUniqueKey: "testviewid", setofFunctionsContainNulls: true,}
 {
   a: allTestviews { edges { cursor node { testviewid col1 col2 } } }
   b: allTestviews(orderBy: COL1_DESC) { edges { cursor node { testviewid col1 col2 } } }

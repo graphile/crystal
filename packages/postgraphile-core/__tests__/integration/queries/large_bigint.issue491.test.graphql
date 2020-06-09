@@ -1,3 +1,5 @@
+#> schemas: ["large_bigint"]
+
 {
   allLargeNodeIds {
     nodes {
