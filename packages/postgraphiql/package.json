@@ -5,7 +5,6 @@
   "homepage": "https://graphile.org/postgraphile/",
   "dependencies": {
     "@babel/runtime": "^7.9.6",
-    "@types/ws": "^7.2.4",
     "graphiql": "^0.17.5",
     "graphiql-explorer": "^0.6.2",
     "graphql": "^14.0.0",
@@ -13,8 +12,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "^3.4.1",
-    "subscriptions-transport-ws": "^0.9.16",
-    "ws": "^7.3.0"
+    "subscriptions-transport-ws": "^0.9.16"
   },
   "browserslist": [
     ">0.2%",
