@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "deletePersonById": Object {
+      "deletedPersonId": "WyJwZW9wbGUiLDNd",
+    },
+  },
+}
+`;

@@ -1,0 +1,64 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "a": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJ2aWV3X3VuaXF1ZV9rZXlfYXNjIixbMV1d",
+          "node": Object {
+            "col1": 11,
+            "col2": 21,
+            "testviewid": 1,
+          },
+        },
+        Object {
+          "cursor": "WyJ2aWV3X3VuaXF1ZV9rZXlfYXNjIixbMl1d",
+          "node": Object {
+            "col1": 12,
+            "col2": 22,
+            "testviewid": 2,
+          },
+        },
+        Object {
+          "cursor": "WyJ2aWV3X3VuaXF1ZV9rZXlfYXNjIixbM11d",
+          "node": Object {
+            "col1": 13,
+            "col2": 23,
+            "testviewid": 3,
+          },
+        },
+      ],
+    },
+    "b": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJjb2wxX2Rlc2MiLFsxMywzXV0=",
+          "node": Object {
+            "col1": 13,
+            "col2": 23,
+            "testviewid": 3,
+          },
+        },
+        Object {
+          "cursor": "WyJjb2wxX2Rlc2MiLFsxMiwyXV0=",
+          "node": Object {
+            "col1": 12,
+            "col2": 22,
+            "testviewid": 2,
+          },
+        },
+        Object {
+          "cursor": "WyJjb2wxX2Rlc2MiLFsxMSwxXV0=",
+          "node": Object {
+            "col1": 11,
+            "col2": 21,
+            "testviewid": 1,
+          },
+        },
+      ],
+    },
+  },
+}
+`;

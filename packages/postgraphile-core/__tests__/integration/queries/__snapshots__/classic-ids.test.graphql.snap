@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "allEdgeCases": Object {
+      "nodes": Array [
+        Object {
+          "rowId": 2,
+        },
+      ],
+    },
+    "allPosts": Object {
+      "nodes": Array [
+        Object {
+          "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+          "id": "WyJwb3N0cyIsMV0=",
+          "rowId": 1,
+        },
+      ],
+    },
+  },
+}
+`;

@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "updatePersonById": Object {
+      "person": Object {
+        "about": null,
+        "aliases": Array [
+          "BD",
+          "Buddy",
+        ],
+        "email": "buddy@example.com",
+        "id": 3,
+        "name": "Budd Daay",
+        "site": Object {
+          "url": "http://buddy.com",
+        },
+      },
+    },
+  },
+}
+`;

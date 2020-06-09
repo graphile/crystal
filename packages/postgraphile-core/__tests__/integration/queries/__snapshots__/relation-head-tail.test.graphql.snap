@@ -1,0 +1,264 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "allCompoundKeys": Object {
+      "nodes": Array [
+        Object {
+          "foreignKeysByCompoundKey1AndCompoundKey2": Object {
+            "nodes": Array [],
+          },
+          "personId1": 1,
+          "personId2": 2,
+        },
+        Object {
+          "foreignKeysByCompoundKey1AndCompoundKey2": Object {
+            "nodes": Array [
+              Object {
+                "compoundKey1": 2,
+                "compoundKey2": 1,
+                "personId": 5,
+              },
+              Object {
+                "compoundKey1": 2,
+                "compoundKey2": 1,
+                "personId": null,
+              },
+            ],
+          },
+          "personId1": 2,
+          "personId2": 1,
+        },
+        Object {
+          "foreignKeysByCompoundKey1AndCompoundKey2": Object {
+            "nodes": Array [],
+          },
+          "personId1": 2,
+          "personId2": 3,
+        },
+        Object {
+          "foreignKeysByCompoundKey1AndCompoundKey2": Object {
+            "nodes": Array [],
+          },
+          "personId1": 2,
+          "personId2": 5,
+        },
+        Object {
+          "foreignKeysByCompoundKey1AndCompoundKey2": Object {
+            "nodes": Array [],
+          },
+          "personId1": 4,
+          "personId2": 3,
+        },
+        Object {
+          "foreignKeysByCompoundKey1AndCompoundKey2": Object {
+            "nodes": Array [
+              Object {
+                "compoundKey1": 4,
+                "compoundKey2": 4,
+                "personId": null,
+              },
+            ],
+          },
+          "personId1": 4,
+          "personId2": 4,
+        },
+      ],
+    },
+    "allPeople": Object {
+      "nodes": Array [
+        Object {
+          "compoundKeysByPersonId1": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 1,
+                "personId2": 2,
+              },
+            ],
+          },
+          "compoundKeysByPersonId2": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 2,
+                "personId2": 1,
+              },
+            ],
+          },
+          "id": 1,
+          "name": "John Smith",
+          "postsByAuthorId": Object {
+            "nodes": Array [
+              Object {
+                "authorId": 1,
+                "headline": "You hit me with a cricket bat.",
+              },
+              Object {
+                "authorId": 1,
+                "headline": "Large bet on myself in round one.",
+              },
+            ],
+          },
+          "roundOnePost": Object {
+            "nodes": Array [
+              Object {
+                "authorId": 1,
+                "headline": "Large bet on myself in round one.",
+              },
+            ],
+          },
+        },
+        Object {
+          "compoundKeysByPersonId1": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 2,
+                "personId2": 1,
+              },
+              Object {
+                "personId1": 2,
+                "personId2": 3,
+              },
+              Object {
+                "personId1": 2,
+                "personId2": 5,
+              },
+            ],
+          },
+          "compoundKeysByPersonId2": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 1,
+                "personId2": 2,
+              },
+            ],
+          },
+          "id": 2,
+          "name": "Sara Smith",
+          "postsByAuthorId": Object {
+            "nodes": Array [
+              Object {
+                "authorId": 2,
+                "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
+              },
+              Object {
+                "authorId": 2,
+                "headline": "What’s with you kids? Every other day it’s food, food, food.",
+              },
+            ],
+          },
+          "roundOnePost": Object {
+            "nodes": Array [],
+          },
+        },
+        Object {
+          "compoundKeysByPersonId1": Object {
+            "nodes": Array [],
+          },
+          "compoundKeysByPersonId2": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 2,
+                "personId2": 3,
+              },
+              Object {
+                "personId1": 4,
+                "personId2": 3,
+              },
+            ],
+          },
+          "id": 3,
+          "name": "Budd Deey",
+          "postsByAuthorId": Object {
+            "nodes": Array [
+              Object {
+                "authorId": 3,
+                "headline": "You know how I sometimes have really brilliant ideas?",
+              },
+              Object {
+                "authorId": 3,
+                "headline": "They’re not aliens, they’re Earth…liens!",
+              },
+            ],
+          },
+          "roundOnePost": Object {
+            "nodes": Array [],
+          },
+        },
+        Object {
+          "compoundKeysByPersonId1": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 4,
+                "personId2": 3,
+              },
+              Object {
+                "personId1": 4,
+                "personId2": 4,
+              },
+            ],
+          },
+          "compoundKeysByPersonId2": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 4,
+                "personId2": 4,
+              },
+            ],
+          },
+          "id": 4,
+          "name": "Kathryn Ramirez",
+          "postsByAuthorId": Object {
+            "nodes": Array [],
+          },
+          "roundOnePost": Object {
+            "nodes": Array [],
+          },
+        },
+        Object {
+          "compoundKeysByPersonId1": Object {
+            "nodes": Array [],
+          },
+          "compoundKeysByPersonId2": Object {
+            "nodes": Array [
+              Object {
+                "personId1": 2,
+                "personId2": 5,
+              },
+            ],
+          },
+          "id": 5,
+          "name": "Joe Tucker",
+          "postsByAuthorId": Object {
+            "nodes": Array [
+              Object {
+                "authorId": 5,
+                "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+              },
+            ],
+          },
+          "roundOnePost": Object {
+            "nodes": Array [],
+          },
+        },
+        Object {
+          "compoundKeysByPersonId1": Object {
+            "nodes": Array [],
+          },
+          "compoundKeysByPersonId2": Object {
+            "nodes": Array [],
+          },
+          "id": 6,
+          "name": "Twenty Seventwo",
+          "postsByAuthorId": Object {
+            "nodes": Array [],
+          },
+          "roundOnePost": Object {
+            "nodes": Array [],
+          },
+        },
+      ],
+    },
+  },
+}
+`;

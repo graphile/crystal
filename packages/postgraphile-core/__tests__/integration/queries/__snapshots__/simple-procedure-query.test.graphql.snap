@@ -1,0 +1,118 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "allPostsList": Array [
+      Object {
+        "computedIntervalSetList": Array [
+          Object {
+            "minutes": null,
+            "seconds": 12,
+          },
+          Object {
+            "minutes": null,
+            "seconds": null,
+          },
+          Object {
+            "minutes": 36,
+            "seconds": 7,
+          },
+        ],
+        "id": 1,
+      },
+    ],
+    "compoundTypeSetQueryList": Array [
+      Object {
+        "a": 1,
+        "b": "2",
+        "c": "BLUE",
+        "d": null,
+        "e": "_0_BAR",
+        "f": "_EMPTY_",
+        "g": Object {
+          "hours": null,
+          "minutes": null,
+          "seconds": 18,
+        },
+      },
+    ],
+    "intSetQueryList": Array [
+      1,
+      2,
+      3,
+      4,
+      5,
+      null,
+      6,
+    ],
+    "queryIntervalSetList": Array [
+      Object {
+        "days": null,
+        "hours": null,
+        "minutes": null,
+        "months": null,
+        "seconds": 12,
+        "years": null,
+      },
+      Object {
+        "days": null,
+        "hours": 3,
+        "minutes": null,
+        "months": null,
+        "seconds": null,
+        "years": null,
+      },
+      Object {
+        "days": null,
+        "hours": 9,
+        "minutes": 36,
+        "months": null,
+        "seconds": 7,
+        "years": null,
+      },
+    ],
+    "staticBigIntegerList": Array [
+      "30894622507013190",
+      "30894622507013191",
+      "30894622507013192",
+      "30894622507013193",
+      "30894622507013194",
+      "30894622507013195",
+      "30894622507013196",
+      "30894622507013197",
+      "30894622507013198",
+      "30894622507013199",
+      "30894622507013200",
+    ],
+    "tableSetQueryList": Array [
+      Object {
+        "name": "John Smith",
+      },
+      Object {
+        "name": "Sara Smith",
+      },
+      Object {
+        "name": "Budd Deey",
+      },
+      Object {
+        "name": "Kathryn Ramirez",
+      },
+      Object {
+        "name": "Joe Tucker",
+      },
+      Object {
+        "name": "Twenty Seventwo",
+      },
+    ],
+    "tableSetQueryWithOffset6": Array [
+      Object {
+        "name": "Budd Deey",
+      },
+      Object {
+        "name": "Kathryn Ramirez",
+      },
+    ],
+  },
+}
+`;

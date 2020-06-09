@@ -1,0 +1,458 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "allPosts": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "author": Object {
+              "firstName": "Sara",
+              "firstPost": Object {
+                "author": Object {
+                  "firstName": "Sara",
+                  "id": 2,
+                  "name": "Sara Smith",
+                },
+                "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+                "headlineTrimmed": "No… It’s …",
+                "id": 1,
+              },
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Budd",
+                    "id": 3,
+                    "name": "Budd Deey",
+                  },
+                  Object {
+                    "firstName": "Kathryn",
+                    "id": 4,
+                    "name": "Kathryn Ramirez",
+                  },
+                ],
+                "pageInfo": Object {
+                  "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+                },
+                "totalCount": 2,
+              },
+              "id": 2,
+              "name": "Sara Smith",
+            },
+            "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+            "headlineTrimmed": "No… It’s …",
+            "id": 1,
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+          "node": Object {
+            "author": Object {
+              "firstName": "John",
+              "firstPost": Object {
+                "author": Object {
+                  "firstName": "John",
+                  "id": 1,
+                  "name": "John Smith",
+                },
+                "headline": "I hate yogurt. It’s just stuff with bits in.",
+                "headlineTrimmed": "I hate yo…",
+                "id": 2,
+              },
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Sara",
+                    "id": 2,
+                    "name": "Sara Smith",
+                  },
+                  Object {
+                    "firstName": "Budd",
+                    "id": 3,
+                    "name": "Budd Deey",
+                  },
+                ],
+                "pageInfo": Object {
+                  "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+                },
+                "totalCount": 2,
+              },
+              "id": 1,
+              "name": "John Smith",
+            },
+            "headline": "I hate yogurt. It’s just stuff with bits in.",
+            "headlineTrimmed": "I hate yo…",
+            "id": 2,
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+          "node": Object {
+            "author": Object {
+              "firstName": "John",
+              "firstPost": Object {
+                "author": Object {
+                  "firstName": "John",
+                  "id": 1,
+                  "name": "John Smith",
+                },
+                "headline": "I hate yogurt. It’s just stuff with bits in.",
+                "headlineTrimmed": "I hate yo…",
+                "id": 2,
+              },
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Sara",
+                    "id": 2,
+                    "name": "Sara Smith",
+                  },
+                  Object {
+                    "firstName": "Budd",
+                    "id": 3,
+                    "name": "Budd Deey",
+                  },
+                ],
+                "pageInfo": Object {
+                  "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+                },
+                "totalCount": 2,
+              },
+              "id": 1,
+              "name": "John Smith",
+            },
+            "headline": "Is that a cooking show?",
+            "headlineTrimmed": "Is that a…",
+            "id": 3,
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+          "node": Object {
+            "author": Object {
+              "firstName": "John",
+              "firstPost": Object {
+                "author": Object {
+                  "firstName": "John",
+                  "id": 1,
+                  "name": "John Smith",
+                },
+                "headline": "I hate yogurt. It’s just stuff with bits in.",
+                "headlineTrimmed": "I hate yo…",
+                "id": 2,
+              },
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Sara",
+                    "id": 2,
+                    "name": "Sara Smith",
+                  },
+                  Object {
+                    "firstName": "Budd",
+                    "id": 3,
+                    "name": "Budd Deey",
+                  },
+                ],
+                "pageInfo": Object {
+                  "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+                },
+                "totalCount": 2,
+              },
+              "id": 1,
+              "name": "John Smith",
+            },
+            "headline": "You hit me with a cricket bat.",
+            "headlineTrimmed": "You hit m…",
+            "id": 4,
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+          "node": Object {
+            "author": Object {
+              "firstName": "Joe",
+              "firstPost": Object {
+                "author": Object {
+                  "firstName": "Joe",
+                  "id": 5,
+                  "name": "Joe Tucker",
+                },
+                "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+                "headlineTrimmed": "Please, D…",
+                "id": 5,
+              },
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Twenty",
+                    "id": 6,
+                    "name": "Twenty Seventwo",
+                  },
+                ],
+                "pageInfo": Object {
+                  "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+                },
+                "totalCount": 1,
+              },
+              "id": 5,
+              "name": "Joe Tucker",
+            },
+            "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+            "headlineTrimmed": "Please, D…",
+            "id": 5,
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+          "node": Object {
+            "author": Object {
+              "firstName": "Budd",
+              "firstPost": Object {
+                "author": Object {
+                  "firstName": "Budd",
+                  "id": 3,
+                  "name": "Budd Deey",
+                },
+                "headline": "Stop talking, brain thinking. Hush.",
+                "headlineTrimmed": "Stop talk…",
+                "id": 6,
+              },
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Kathryn",
+                    "id": 4,
+                    "name": "Kathryn Ramirez",
+                  },
+                  Object {
+                    "firstName": "Joe",
+                    "id": 5,
+                    "name": "Joe Tucker",
+                  },
+                ],
+                "pageInfo": Object {
+                  "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+                },
+                "totalCount": 2,
+              },
+              "id": 3,
+              "name": "Budd Deey",
+            },
+            "headline": "Stop talking, brain thinking. Hush.",
+            "headlineTrimmed": "Stop talk…",
+            "id": 6,
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs3XV0=",
+          "node": Object {
+            "author": Object {
+              "firstName": "John",
+              "firstPost": Object {
+                "author": Object {
+                  "firstName": "John",
+                  "id": 1,
+                  "name": "John Smith",
+                },
+                "headline": "I hate yogurt. It’s just stuff with bits in.",
+                "headlineTrimmed": "I hate yo…",
+                "id": 2,
+              },
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Sara",
+                    "id": 2,
+                    "name": "Sara Smith",
+                  },
+                  Object {
+                    "firstName": "Budd",
+                    "id": 3,
+                    "name": "Budd Deey",
+                  },
+                ],
+                "pageInfo": Object {
+                  "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+                },
+                "totalCount": 2,
+              },
+              "id": 1,
+              "name": "John Smith",
+            },
+            "headline": "Large bet on myself in round one.",
+            "headlineTrimmed": "Large bet…",
+            "id": 7,
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs4XV0=",
+          "node": Object {
+            "author": Object {
+              "firstName": "Sara",
+              "firstPost": Object {
+                "author": Object {
+                  "firstName": "Sara",
+                  "id": 2,
+                  "name": "Sara Smith",
+                },
+                "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+                "headlineTrimmed": "No… It’s …",
+                "id": 1,
+              },
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Budd",
+                    "id": 3,
+                    "name": "Budd Deey",
+                  },
+                  Object {
+                    "firstName": "Kathryn",
+                    "id": 4,
+                    "name": "Kathryn Ramirez",
+                  },
+                ],
+                "pageInfo": Object {
+                  "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+                },
+                "totalCount": 2,
+              },
+              "id": 2,
+              "name": "Sara Smith",
+            },
+            "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
+            "headlineTrimmed": "It’s a fe…",
+            "id": 8,
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs5XV0=",
+          "node": Object {
+            "author": Object {
+              "firstName": "Budd",
+              "firstPost": Object {
+                "author": Object {
+                  "firstName": "Budd",
+                  "id": 3,
+                  "name": "Budd Deey",
+                },
+                "headline": "Stop talking, brain thinking. Hush.",
+                "headlineTrimmed": "Stop talk…",
+                "id": 6,
+              },
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Kathryn",
+                    "id": 4,
+                    "name": "Kathryn Ramirez",
+                  },
+                  Object {
+                    "firstName": "Joe",
+                    "id": 5,
+                    "name": "Joe Tucker",
+                  },
+                ],
+                "pageInfo": Object {
+                  "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+                },
+                "totalCount": 2,
+              },
+              "id": 3,
+              "name": "Budd Deey",
+            },
+            "headline": "You know how I sometimes have really brilliant ideas?",
+            "headlineTrimmed": "You know …",
+            "id": 9,
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxMF1d",
+          "node": Object {
+            "author": Object {
+              "firstName": "Sara",
+              "firstPost": Object {
+                "author": Object {
+                  "firstName": "Sara",
+                  "id": 2,
+                  "name": "Sara Smith",
+                },
+                "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+                "headlineTrimmed": "No… It’s …",
+                "id": 1,
+              },
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Budd",
+                    "id": 3,
+                    "name": "Budd Deey",
+                  },
+                  Object {
+                    "firstName": "Kathryn",
+                    "id": 4,
+                    "name": "Kathryn Ramirez",
+                  },
+                ],
+                "pageInfo": Object {
+                  "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+                },
+                "totalCount": 2,
+              },
+              "id": 2,
+              "name": "Sara Smith",
+            },
+            "headline": "What’s with you kids? Every other day it’s food, food, food.",
+            "headlineTrimmed": "What’s wi…",
+            "id": 10,
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxMV1d",
+          "node": Object {
+            "author": Object {
+              "firstName": "Budd",
+              "firstPost": Object {
+                "author": Object {
+                  "firstName": "Budd",
+                  "id": 3,
+                  "name": "Budd Deey",
+                },
+                "headline": "Stop talking, brain thinking. Hush.",
+                "headlineTrimmed": "Stop talk…",
+                "id": 6,
+              },
+              "friends": Object {
+                "nodes": Array [
+                  Object {
+                    "firstName": "Kathryn",
+                    "id": 4,
+                    "name": "Kathryn Ramirez",
+                  },
+                  Object {
+                    "firstName": "Joe",
+                    "id": 5,
+                    "name": "Joe Tucker",
+                  },
+                ],
+                "pageInfo": Object {
+                  "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+                },
+                "totalCount": 2,
+              },
+              "id": 3,
+              "name": "Budd Deey",
+            },
+            "headline": "They’re not aliens, they’re Earth…liens!",
+            "headlineTrimmed": "They’re n…",
+            "id": 11,
+          },
+        },
+      ],
+    },
+  },
+}
+`;

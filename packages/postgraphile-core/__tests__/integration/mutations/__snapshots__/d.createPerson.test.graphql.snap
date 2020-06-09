@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "createPerson": Object {
+      "person": Object {
+        "colNoCreate": "col_no_create",
+        "colNoCreateUpdate": "col_no_create_update",
+        "colNoCreateUpdateOrderFilter": "col_no_create_update_order_filter",
+        "colNoFilter": "create3",
+        "colNoOrder": "create1",
+        "colNoUpdate": "create2",
+        "firstName": null,
+        "id": 10,
+        "lastName": "Doe",
+      },
+    },
+  },
+}
+`;

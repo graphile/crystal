@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "createPerson": Object {
+      "person": Object {
+        "about": "Unknown",
+        "aliases": Array [
+          "Jay Doe",
+          "JD",
+        ],
+        "email": "jane.doe@example.com",
+        "id": 10,
+        "name": "Jane Doe",
+        "site": Object {
+          "url": "http://example.com",
+        },
+      },
+    },
+  },
+}
+`;

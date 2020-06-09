@@ -1,0 +1,497 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "a": Object {
+      "clientMutationId": null,
+      "query": Object {
+        "nodeId": "query",
+      },
+      "type": Object {
+        "anIntRange": Object {
+          "end": Object {
+            "inclusive": false,
+            "value": 500,
+          },
+          "start": null,
+        },
+        "bigint": "467131188225",
+        "boolean": false,
+        "compoundType": Object {
+          "a": 123,
+          "b": "abc",
+          "c": "GREEN",
+          "d": "ec4a9fae-4ec5-4763-98eb-0327fb2dc9bf",
+          "e": "FOO_BAR",
+          "f": "_EMPTY_",
+          "fooBar": 20,
+        },
+        "date": "2016-10-15",
+        "daterange": Object {
+          "end": Object {
+            "inclusive": false,
+            "value": "1927-11-07",
+          },
+          "start": Object {
+            "inclusive": true,
+            "value": "1927-11-06",
+          },
+        },
+        "decimal": "15.2",
+        "domain": 6,
+        "domain2": 5,
+        "enum": "RED",
+        "enumArray": Array [
+          "RED",
+          "GREEN",
+        ],
+        "id": 201,
+        "interval": Object {
+          "days": 4,
+          "hours": 3,
+          "minutes": 2,
+          "months": 5,
+          "seconds": 1,
+          "years": 6,
+        },
+        "intervalArray": Array [
+          Object {
+            "days": 5,
+            "hours": 4,
+            "minutes": 3,
+            "months": 6,
+            "seconds": 2,
+            "years": 7,
+          },
+          Object {
+            "days": 6,
+            "hours": 5,
+            "minutes": 4,
+            "months": 7,
+            "seconds": 3,
+            "years": 8,
+          },
+        ],
+        "json": "{\\"x\\":1,\\"y\\":2,\\"z\\":3}",
+        "jsonb": "{\\"a\\":1,\\"b\\":2,\\"c\\":3}",
+        "money": 1234567.89,
+        "nestedCompoundType": Object {
+          "a": Object {
+            "a": 456,
+            "b": "def",
+            "c": "BLUE",
+            "d": "79863dcf-0433-4c3d-bc51-978326d4546f",
+            "e": "BAR_FOO",
+            "f": "ONE",
+            "fooBar": 42,
+          },
+          "b": Object {
+            "a": 789,
+            "b": "ghi",
+            "c": "RED",
+            "d": "b687ee42-c515-4544-b742-525e39517e7d",
+            "e": "BAZ_QUX",
+            "f": "_EMPTY_",
+            "fooBar": -8,
+          },
+          "bazBuz": 0,
+        },
+        "nodeId": "WyJ0eXBlcyIsMjAxXQ==",
+        "nullablePoint": null,
+        "numeric": "15.2",
+        "numrange": Object {
+          "end": null,
+          "start": Object {
+            "inclusive": true,
+            "value": "50",
+          },
+        },
+        "point": Object {
+          "x": 1,
+          "y": 3,
+        },
+        "smallint": 30,
+        "textArray": Array [
+          "have",
+          "you",
+          "ever",
+          "been",
+          "down",
+          "the",
+          "water",
+          "spout",
+          "?",
+        ],
+        "time": "19:13:18.625699",
+        "timestamp": "2016-10-07T16:12:21.747269",
+        "timestamptz": "2016-10-09T16:12:45.218676-04:00",
+        "timetz": "13:13:29.585176-04",
+        "varchar": "abc",
+      },
+    },
+    "b": Object {
+      "a": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs5MDAwXV0=",
+        "node": Object {
+          "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
+        },
+      },
+      "b": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9kZXNjIixbOTAwMF1d",
+        "node": Object {
+          "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
+        },
+      },
+      "c": Object {
+        "cursor": "WyJpZF9hc2MiLFs5MDAwXV0=",
+        "node": Object {
+          "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
+        },
+      },
+      "clientMutationId": null,
+      "d": Object {
+        "cursor": "WyJpZF9kZXNjIixbOTAwMF1d",
+        "node": Object {
+          "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
+        },
+      },
+      "e": Object {
+        "cursor": "WyJlbWFpbF9hc2MiLFsiam9obm55LmJveS5zbWl0aEBlbWFpbC5jb20iXV0=",
+        "node": Object {
+          "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
+        },
+      },
+      "f": Object {
+        "cursor": "WyJlbWFpbF9kZXNjIixbImpvaG5ueS5ib3kuc21pdGhAZW1haWwuY29tIl1d",
+        "node": Object {
+          "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
+        },
+      },
+      "g": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs5MDAwXV0=",
+        "node": Object {
+          "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
+        },
+      },
+      "h": Object {
+        "cursor": "WyJlbWFpbF9kZXNjIiwiaWRfZGVzYyIsWyJqb2hubnkuYm95LnNtaXRoQGVtYWlsLmNvbSIsOTAwMF1d",
+        "node": Object {
+          "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
+        },
+      },
+      "person": Object {
+        "about": "Son of Sara and John Smith.",
+        "config": Object {
+          "_\\"\\\\_$@£$)(@*£$": "_\\"\\\\_$@£$)(@*£$",
+          "a": "5",
+          "actually_null": null,
+          "b": "6",
+          "null_string": "null",
+        },
+        "email": "johnny.boy.smith@email.com",
+        "id": 9000,
+        "issue27UserExists": false,
+        "lastLoginFromIp": "172.16.1.2",
+        "lastLoginFromSubnet": "172.16.0.0/12",
+        "name": "John Smith Jr.",
+        "nodeId": "WyJwZW9wbGUiLDkwMDBd",
+        "userMac": "00:00:00:00:00:00",
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "c": Object {
+      "a": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyMF1d",
+        "node": Object {
+          "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
+        },
+      },
+      "b": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9kZXNjIixbMjBdXQ==",
+        "node": Object {
+          "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
+        },
+      },
+      "c": Object {
+        "cursor": "WyJpZF9hc2MiLFsyMF1d",
+        "node": Object {
+          "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
+        },
+      },
+      "clientMutationId": "hello",
+      "d": Object {
+        "cursor": "WyJpZF9kZXNjIixbMjBdXQ==",
+        "node": Object {
+          "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
+        },
+      },
+      "e": Object {
+        "cursor": "WyJlbWFpbF9hc2MiLFsiYmVzdC5wYWxAZW1haWwuY29tIl1d",
+        "node": Object {
+          "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
+        },
+      },
+      "f": Object {
+        "cursor": "WyJlbWFpbF9kZXNjIixbImJlc3QucGFsQGVtYWlsLmNvbSJdXQ==",
+        "node": Object {
+          "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
+        },
+      },
+      "g": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyMF1d",
+        "node": Object {
+          "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
+        },
+      },
+      "h": Object {
+        "cursor": "WyJlbWFpbF9kZXNjIiwiaWRfZGVzYyIsWyJiZXN0LnBhbEBlbWFpbC5jb20iLDIwXV0=",
+        "node": Object {
+          "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
+        },
+      },
+      "person": Object {
+        "about": "My archnemisis is Budd Deey.",
+        "config": null,
+        "email": "best.pal@email.com",
+        "id": 20,
+        "issue27UserExists": false,
+        "lastLoginFromIp": "192.168.0.42",
+        "lastLoginFromSubnet": "192.168.0.0/16",
+        "name": "Best Pal",
+        "nodeId": "WyJwZW9wbGUiLDIwXQ==",
+        "userMac": "00:00:00:00:00:00",
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "d": Object {
+      "clientMutationId": "world",
+      "compoundKey": Object {
+        "extra": false,
+        "nodeId": "WyJjb21wb3VuZF9rZXlzIiw5MDAwLDIwXQ==",
+        "personByPersonId1": Object {
+          "name": "John Smith Jr.",
+          "nodeId": "WyJwZW9wbGUiLDkwMDBd",
+        },
+        "personByPersonId2": Object {
+          "name": "Best Pal",
+          "nodeId": "WyJwZW9wbGUiLDIwXQ==",
+        },
+        "personId1": 9000,
+        "personId2": 20,
+      },
+      "personByPersonId1": Object {
+        "name": "John Smith Jr.",
+        "nodeId": "WyJwZW9wbGUiLDkwMDBd",
+      },
+      "personByPersonId2": Object {
+        "name": "Best Pal",
+        "nodeId": "WyJwZW9wbGUiLDIwXQ==",
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "e": Object {
+      "edgeCase": Object {
+        "notNullHasDefault": true,
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "f": Object {
+      "edgeCase": Object {
+        "notNullHasDefault": false,
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "g": Object {
+      "a": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxOTk4XV0=",
+        "node": Object {
+          "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDE5OThd",
+        },
+      },
+      "b": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9kZXNjIixbMTk5OF1d",
+        "node": Object {
+          "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDE5OThd",
+        },
+      },
+      "c": Object {
+        "cursor": "WyJpZF9hc2MiLFsxOTk4XV0=",
+        "node": Object {
+          "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDE5OThd",
+        },
+      },
+      "clientMutationId": null,
+      "d": Object {
+        "cursor": "WyJpZF9kZXNjIixbMTk5OF1d",
+        "node": Object {
+          "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDE5OThd",
+        },
+      },
+      "e": Object {
+        "cursor": "WyJlbWFpbF9hc2MiLFsiYnVkZC5kZWV5LnRoZS5zZWNvbmRAZW1haWwuY29tIl1d",
+        "node": Object {
+          "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDE5OThd",
+        },
+      },
+      "f": Object {
+        "cursor": "WyJlbWFpbF9kZXNjIixbImJ1ZGQuZGVleS50aGUuc2Vjb25kQGVtYWlsLmNvbSJdXQ==",
+        "node": Object {
+          "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDE5OThd",
+        },
+      },
+      "g": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxOTk4XV0=",
+        "node": Object {
+          "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDE5OThd",
+        },
+      },
+      "h": Object {
+        "cursor": "WyJlbWFpbF9kZXNjIiwiaWRfZGVzYyIsWyJidWRkLmRlZXkudGhlLnNlY29uZEBlbWFpbC5jb20iLDE5OThdXQ==",
+        "node": Object {
+          "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDE5OThd",
+        },
+      },
+      "person": Object {
+        "about": null,
+        "config": Object {
+          "a": "5",
+          "actually_null": null,
+          "b": "6",
+          "null_string": "null",
+        },
+        "email": "budd.deey.the.second@email.com",
+        "id": 1998,
+        "issue27UserExists": false,
+        "lastLoginFromIp": "10.0.1.42",
+        "lastLoginFromSubnet": "10.0.0.0/8",
+        "name": "Budd Deey",
+        "nodeId": "WyJwZW9wbGUiLDE5OThd",
+        "userMac": "aa:bb:cc:dd:ee:ff",
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "h": Object {
+      "person": Object {
+        "issue27UserExists": true,
+      },
+    },
+    "i": Object {
+      "defaultValue": Object {
+        "id": 2000,
+        "nullValue": null,
+      },
+    },
+    "j": Object {
+      "post": Object {
+        "comptypes": Array [
+          Object {
+            "isOptimised": true,
+            "schedule": "2009-10-24T04:23:54-04:00",
+          },
+          Object {
+            "isOptimised": false,
+            "schedule": "2008-10-24T04:23:54-04:00",
+          },
+          Object {
+            "isOptimised": null,
+            "schedule": "2007-10-24T04:23:54-04:00",
+          },
+        ],
+        "headline": "super headline",
+        "id": 12,
+      },
+    },
+    "k": Object {
+      "p2": Object {
+        "personByAuthorId": Object {
+          "email": "john.smith@email.com",
+        },
+      },
+      "personByAuthorId": Object {
+        "createdAt": null,
+      },
+      "post": Object {
+        "comptypes": Array [
+          Object {
+            "isOptimised": true,
+            "schedule": "2008-10-24T04:17:54-04:00",
+          },
+          Object {
+            "isOptimised": false,
+            "schedule": "2007-10-24T04:17:54-04:00",
+          },
+          Object {
+            "isOptimised": null,
+            "schedule": "2006-10-24T04:17:54-04:00",
+          },
+        ],
+        "headline": "super headline 2",
+        "id": 13,
+        "personByAuthorId": Object {
+          "id": 1,
+        },
+      },
+      "postEdge": Object {
+        "node": Object {
+          "comptypes": Array [
+            Object {
+              "isOptimised": true,
+              "schedule": "2008-10-24T04:17:54-04:00",
+            },
+            Object {
+              "isOptimised": false,
+              "schedule": "2007-10-24T04:17:54-04:00",
+            },
+            Object {
+              "isOptimised": null,
+              "schedule": "2006-10-24T04:17:54-04:00",
+            },
+          ],
+          "headline": "super headline 2",
+          "id": 13,
+          "personByAuthorId": Object {
+            "name": "John Smith",
+          },
+        },
+      },
+    },
+  },
+}
+`;

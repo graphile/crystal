@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "createNetwork": Object {
+      "network": Object {
+        "cidr": "10.0.0.0/8",
+        "id": 7,
+        "inet": "10.0.0.0",
+        "macaddr": "00:00:00:00:00:00",
+        "nodeId": "WyJuZXR3b3JrcyIsN10=",
+      },
+    },
+  },
+}
+`;

@@ -1,0 +1,366 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "add1Mutation": Object {
+      "clientMutationId": null,
+      "integer": 3,
+    },
+    "add2Mutation": Object {
+      "clientMutationId": "hello",
+      "integer": 4,
+    },
+    "add3Mutation": Object {
+      "clientMutationId": "world",
+      "integer": null,
+    },
+    "add4Mutation": Object {
+      "integer": 4,
+    },
+    "add4MutationError": null,
+    "compoundTypeArrayMutation": Object {
+      "compoundTypes": Array [
+        Object {
+          "a": 419,
+          "b": "easy cheesy baked potatoes",
+          "c": "RED",
+          "d": null,
+          "e": "FOO_BAR",
+          "f": "_EMPTY_",
+          "fooBar": 8,
+          "g": Object {
+            "hours": 5,
+            "minutes": null,
+            "seconds": null,
+          },
+        },
+        null,
+        Object {
+          "a": 420,
+          "b": "easy cheesy baked potatoes",
+          "c": "RED",
+          "d": null,
+          "e": "FOO_BAR",
+          "f": "_EMPTY_",
+          "fooBar": 8,
+          "g": Object {
+            "hours": 5,
+            "minutes": null,
+            "seconds": null,
+          },
+        },
+      ],
+    },
+    "compoundTypeMutation": Object {
+      "compoundType": Object {
+        "a": 420,
+        "b": "easy cheesy baked potatoes",
+        "c": "RED",
+        "d": null,
+        "e": "FOO_BAR",
+        "f": "_EMPTY_",
+        "fooBar": 8,
+        "g": Object {
+          "hours": 5,
+          "minutes": null,
+          "seconds": null,
+        },
+      },
+    },
+    "compoundTypeSetMutation": Object {
+      "compoundTypes": Array [
+        Object {
+          "a": 419,
+          "b": "easy cheesy baked potatoes",
+          "c": "RED",
+          "d": null,
+          "e": "FOO_BAR",
+          "f": "_EMPTY_",
+          "fooBar": 8,
+          "g": Object {
+            "hours": 5,
+            "minutes": null,
+            "seconds": null,
+          },
+        },
+        Object {
+          "a": 420,
+          "b": "easy cheesy baked potatoes",
+          "c": "RED",
+          "d": null,
+          "e": "FOO_BAR",
+          "f": "_EMPTY_",
+          "fooBar": 8,
+          "g": Object {
+            "hours": 5,
+            "minutes": null,
+            "seconds": null,
+          },
+        },
+      ],
+    },
+    "guidFn": Object {
+      "guid": null,
+    },
+    "guidFn2": Object {
+      "guid": "0123456789abcde",
+    },
+    "intSetMutation": Object {
+      "integers": Array [
+        1,
+        2,
+        3,
+        4,
+        5,
+        null,
+        6,
+      ],
+    },
+    "issue756Mutation": Object {
+      "issue756": null,
+    },
+    "issue756SetMutation": Object {
+      "issue756S": Array [
+        Object {
+          "id": 1,
+          "ts": "1999-06-10T20:00:00-04:00",
+        },
+        null,
+        Object {
+          "id": 2,
+          "ts": "1999-06-10T20:00:00-04:00",
+        },
+      ],
+    },
+    "jsonIdentityMutation": Object {
+      "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3}",
+    },
+    "jsonIdentityMutationIssue85": Object {
+      "json": "[{\\"amount\\":\\"44\\"},{\\"amount\\":null}]",
+    },
+    "jsonbIdentityMutation": Object {
+      "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3}",
+    },
+    "jsonbIdentityMutationIssue85": Object {
+      "json": "[{\\"amount\\":\\"44\\"},{\\"amount\\":null}]",
+    },
+    "jsonbIdentityMutationPlpgsqlIssue85": Object {
+      "json": "[{\\"amount\\":\\"44\\"},{\\"amount\\":null}]",
+    },
+    "jsonbIdentityMutationPlpgsqlOverridingDefaultIssue85": Object {
+      "json": "[{\\"amount\\":\\"44\\"},{\\"amount\\":null}]",
+    },
+    "jsonbIdentityMutationPlpgsqlWithDefaultIssue85": Object {
+      "json": "[]",
+    },
+    "mult1": Object {
+      "integer": 0,
+    },
+    "mult2": Object {
+      "integer": 1,
+    },
+    "mult3": Object {
+      "integer": 2,
+    },
+    "mult4": Object {
+      "integer": 10,
+    },
+    "mutationCompoundTypeArray": Object {
+      "compoundTypes": Array [
+        Object {
+          "a": 419,
+          "b": "easy cheesy baked potatoes",
+          "c": "RED",
+          "d": null,
+          "e": "BAR_FOO",
+          "f": "_EMPTY_",
+          "fooBar": 8,
+          "g": Object {
+            "hours": 5,
+            "minutes": null,
+            "seconds": null,
+          },
+        },
+        null,
+        Object {
+          "a": 420,
+          "b": "easy cheesy baked potatoes",
+          "c": "RED",
+          "d": null,
+          "e": "BAR_FOO",
+          "f": "_EMPTY_",
+          "fooBar": 8,
+          "g": Object {
+            "hours": 5,
+            "minutes": null,
+            "seconds": null,
+          },
+        },
+      ],
+    },
+    "mutationIntervalArray": Object {
+      "intervals": Array [
+        Object {
+          "days": null,
+          "hours": null,
+          "minutes": null,
+          "months": null,
+          "seconds": 12,
+          "years": null,
+        },
+        Object {
+          "days": null,
+          "hours": 3,
+          "minutes": null,
+          "months": null,
+          "seconds": null,
+          "years": null,
+        },
+        Object {
+          "days": null,
+          "hours": 9,
+          "minutes": 36,
+          "months": null,
+          "seconds": 7,
+          "years": null,
+        },
+      ],
+    },
+    "mutationIntervalSet": Object {
+      "intervals": Array [
+        Object {
+          "days": null,
+          "hours": null,
+          "minutes": null,
+          "months": null,
+          "seconds": 12,
+          "years": null,
+        },
+        Object {
+          "days": null,
+          "hours": 3,
+          "minutes": null,
+          "months": null,
+          "seconds": null,
+          "years": null,
+        },
+        Object {
+          "days": null,
+          "hours": 9,
+          "minutes": 36,
+          "months": null,
+          "seconds": 7,
+          "years": null,
+        },
+      ],
+    },
+    "mutationTextArray": Object {
+      "strings": Array [
+        "str1",
+        "str2",
+        "str3",
+      ],
+    },
+    "noArgsMutation": Object {
+      "clientMutationId": "x",
+      "integer": 2,
+    },
+    "postMany": Object {
+      "posts": Array [
+        Object {
+          "comptypes": Array [
+            Object {
+              "isOptimised": true,
+              "schedule": "2009-10-24T04:23:54-04:00",
+            },
+          ],
+          "headline": "headline",
+          "id": 7,
+        },
+        Object {
+          "comptypes": Array [
+            Object {
+              "isOptimised": null,
+              "schedule": "2009-10-24T04:23:54-04:00",
+            },
+          ],
+          "headline": "headline",
+          "id": 8,
+        },
+        Object {
+          "comptypes": Array [
+            Object {
+              "isOptimised": false,
+              "schedule": "2009-10-24T04:23:54-04:00",
+            },
+          ],
+          "headline": "headline",
+          "id": 9,
+        },
+      ],
+    },
+    "postWithSuffix": Object {
+      "post": Object {
+        "headline": "headline_test",
+        "id": 15,
+      },
+    },
+    "returnVoidMutation": Object {
+      "__typename": "ReturnVoidMutationPayload",
+    },
+    "tableMutation": Object {
+      "personByAuthorId": Object {
+        "id": 5,
+        "name": "Joe Tucker",
+      },
+      "post": Object {
+        "authorId": 5,
+        "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+        "id": 5,
+        "nodeId": "WyJwb3N0cyIsNV0=",
+      },
+      "postEdge": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+        "node": Object {
+          "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+          "id": 5,
+        },
+      },
+    },
+    "tableMutationReturningNull": Object {
+      "personByAuthorId": null,
+      "post": null,
+      "postEdge": null,
+    },
+    "tableSetMutation": Object {
+      "people": Array [
+        Object {
+          "name": "John Smith",
+        },
+        Object {
+          "name": "Sara Smith",
+        },
+        Object {
+          "name": "Budd Deey",
+        },
+        Object {
+          "name": "Kathryn Ramirez",
+        },
+        Object {
+          "name": "Joe Tucker",
+        },
+        Object {
+          "name": "Twenty Seventwo",
+        },
+      ],
+    },
+    "typesMutation": Object {
+      "boolean": false,
+    },
+  },
+  "errors": Array [
+    [GraphQLError: Deliberate error],
+  ],
+}
+`;
