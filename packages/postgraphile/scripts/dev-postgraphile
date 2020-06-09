@@ -20,14 +20,14 @@ if [ "$1" = "--" ]; then
 else
   export DEBUG=${DEBUG-postgraphile*,graphile-build:warn,-postgraphile:graphql,-postgraphile:postgres:explain}
   nodemon \
-    --watch ../packages/postgraphile-core/dist \
-    --watch ../packages/graphile-build-pg/dist \
-    --watch ../packages/graphile-build/dist \
-    --watch ../packages/graphile-utils/dist \
+    --delay 1000ms \
+    --watch ../postgraphile-core/dist \
+    --watch ../graphile-build-pg/dist \
+    --watch ../graphile-build/dist \
+    --watch ../graphile-utils/dist \
     --watch src \
     --ignore __tests__ \
     --ignore __mocks__ \
-    --ignore src/postgraphile/graphiql \
     --ext js,ts \
     --exec "ts-node --transpile-only src/postgraphile/cli.ts $* --show-error-stack json --extended-errors hint,detail,errcode" &
 fi;
