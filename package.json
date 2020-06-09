@@ -12,6 +12,7 @@
     "clean": "jest --clearCache && rm -Rf 'packages/*/dist' 'packages/*/tsconfig.tsbuildinfo'",
     "changelog": "(cat scripts/CHANGELOG_HEADER.md; npx conventional-changelog -p angular --release-count 0) > CHANGELOG.md",
     "version": "yarn run changelog && git add CHANGELOG.md",
+    "w": "yarn workspace",
     "-----": "-----",
     "eslint": "eslint --ext .js,.jsx,.ts,.tsx",
     "prettier": "prettier --ignore-path ./.eslintignore",

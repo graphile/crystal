@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+set -e
+
+echo "Running dev (don't forget to 'yarn make-assets' if you've changed GraphiQL / favicon / etc)..."
+cd $(dirname $0)/..
+
+export POSTGRAPHILE_ENV=development
+export BROWSER=none
+
+# Run Nodemon and watch the PostGraphile source code for changes.
+if [ "$1" = "--" ]; then
+  if [ "$DEBUG" = "" ]; then
+    echo 'You might want to:'
+    echo
+    echo '  export DEBUG="postgraphile*,graphile-build:warn,-postgraphile:graphql,-postgraphile:postgres:explain"'
+  fi
+  shift
+  ts-node --transpile-only src/postgraphile/cli.ts "$@" &
+else
+  export DEBUG=${DEBUG-postgraphile*,graphile-build:warn,-postgraphile:graphql,-postgraphile:postgres:explain}
+  nodemon \
+    --watch ../packages/postgraphile-core/dist \
+    --watch ../packages/graphile-build-pg/dist \
+    --watch ../packages/graphile-build/dist \
+    --watch ../packages/graphile-utils/dist \
+    --watch src \
+    --ignore __tests__ \
+    --ignore __mocks__ \
+    --ignore src/postgraphile/graphiql \
+    --ext js,ts \
+    --exec "ts-node --transpile-only src/postgraphile/cli.ts $* --show-error-stack json --extended-errors hint,detail,errcode" &
+fi;
+
+# Ensure forked process is killed even if we die unexpectedly
+trap 'trap - SIGINT SIGTERM EXIT; JOBS="$(jobs -p)"; [[ "$JOBS" != "" ]] && kill $JOBS 2>/dev/null || true' SIGINT SIGTERM EXIT
+
+wait

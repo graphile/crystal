@@ -1625,7 +1625,7 @@ __metadata:
   dependencies:
     "@types/jest": ^25.2.3
     "@types/pg": ^7.14.3
-    "@types/ws": ^7.2.4
+    "@types/ws": ^7.2.5
     jest: ^26.0.1
     pg: ^8.2.1
     ts-node: ^8.10.1
@@ -1685,7 +1685,7 @@ __metadata:
     "@graphile/lds": 4.7.0
     "@types/jest": ^25.2.3
     "@types/pg": ^7.14.3
-    "@types/ws": ^7.2.4
+    "@types/ws": ^7.2.5
     graphile-build: 4.7.0
     graphile-build-pg: 4.7.0
     graphql: ^14.6.0
@@ -2428,6 +2428,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/concurrently@npm:5.2.1":
+  version: 5.2.1
+  resolution: "@types/concurrently@npm:5.2.1"
+  dependencies:
+    "@types/node": "*"
+  checksum: 3/85e96ec5fe7c6ce789297d3fe70573177a2fe331798e06d7b6c87b4c006473b4195daa3ad7da98a99f9ba93cc1a7d21b5fa830688aaed3a864efd3ab6ac7434c
+  languageName: node
+  linkType: hard
+
 "@types/connect@npm:*, @types/connect@npm:^3.4.33":
   version: 3.4.33
   resolution: "@types/connect@npm:3.4.33"
@@ -2894,12 +2903,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/ws@npm:^7.2.4":
-  version: 7.2.4
-  resolution: "@types/ws@npm:7.2.4"
+"@types/ws@npm:^7.2.5":
+  version: 7.2.5
+  resolution: "@types/ws@npm:7.2.5"
   dependencies:
     "@types/node": "*"
-  checksum: 3/8b8251a8c41b0a48c9e8940d6e447e285420bb77f297272c91fd07be302e0785112c7ee910ae79c90e7c1a988fb2adf5fec9d115c291750f371763d96ad8d20c
+  checksum: 3/bdeb3914d7a75f46e96afb55b1295c5544dd69bd54e7dccef662b9f2de28777e10d1875bdd46614b8f7428c842675d5a8da513f2409d242d44234234f506f266
   languageName: node
   linkType: hard
 
@@ -15027,6 +15036,7 @@ fsevents@^1.2.7:
     "@types/body-parser": ^1.19.0
     "@types/chalk": ^2.2.0
     "@types/commander": ^2.12.2
+    "@types/concurrently": 5.2.1
     "@types/connect": ^3.4.33
     "@types/debug": ^4.1.5
     "@types/express": ^4.17.6
@@ -15043,13 +15053,14 @@ fsevents@^1.2.7:
     "@types/parseurl": ^1.3.1
     "@types/pg": ^7.14.3
     "@types/superagent": ^4.1.7
-    "@types/ws": ^7.2.4
+    "@types/ws": ^7.2.5
     "@typescript-eslint/eslint-plugin": ^2.34.0
     "@typescript-eslint/parser": ^2.34.0
     babel-loader: ^8.1.0
     body-parser: ^1.19.0
     chalk: ^4.0.0
     commander: ^5.1.0
+    concurrently: ^5.2.0
     connect: ^3.7.0
     conventional-changelog-cli: ^2.0.34
     css-loader: 3.5.3
@@ -15104,7 +15115,6 @@ fsevents@^1.2.7:
   dependencies:
     "@babel/runtime": ^7.9.6
     "@types/jest": ^25.2.3
-    "@types/ws": ^7.2.4
     "@typescript-eslint/eslint-plugin": ^2.34.0
     "@typescript-eslint/parser": ^2.34.0
     babel-eslint: ^10.0.0
@@ -15126,7 +15136,6 @@ fsevents@^1.2.7:
     subscriptions-transport-ws: ^0.9.16
     ts-node: ^8.10.1
     typescript: ^3.9.2
-    ws: ^7.3.0
   languageName: unknown
   linkType: soft
 

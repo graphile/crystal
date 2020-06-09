@@ -34,7 +34,7 @@
   "homepage": "https://github.com/graphile/graphile-engine/tree/master/packages/lds#readme",
   "dependencies": {
     "@types/pg": "^7.14.3",
-    "@types/ws": "^7.2.4",
+    "@types/ws": "^7.2.5",
     "pg": "^8.2.1",
     "tslib": "^2.0.0",
     "ws": "^7.3.0"

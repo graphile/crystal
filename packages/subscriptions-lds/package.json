@@ -32,7 +32,7 @@
   "homepage": "https://github.com/graphile/graphile-engine/tree/master/packages/subscriptions-lds#readme",
   "dependencies": {
     "@graphile/lds": "4.7.0",
-    "@types/ws": "^7.2.4",
+    "@types/ws": "^7.2.5",
     "tslib": "^2.0.0",
     "ws": "^7.3.0"
   },
