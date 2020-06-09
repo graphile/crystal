@@ -9,8 +9,6 @@ const { testGraphQL } = require("./_test");
 const query = ${JSON.stringify(src)};
 const path = ${JSON.stringify(path)};
 
-it('execute', () => {
-  testGraphQL(query, path);
-});
+it('execute', () => testGraphQL(query, path));
 `;
 };
