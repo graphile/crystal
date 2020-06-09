@@ -1,0 +1,29 @@
+query{
+  allCompoundKeysList {
+    personId1
+    personId2
+    extra
+    personByPersonId1 {
+      name
+      email
+    }
+    personByPersonId2 {
+      name
+      email
+    }
+  }
+  allForeignKeysList {
+    personId
+    compoundKey1
+    compoundKey2
+    personByPersonId {
+      name
+      email
+    }
+    compoundKeyByCompoundKey1AndCompoundKey2 {
+      personId1
+      personId2
+      extra
+    }
+  }
+}

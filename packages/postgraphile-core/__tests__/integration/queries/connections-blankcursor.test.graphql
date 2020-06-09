@@ -1,0 +1,24 @@
+query {
+  blankCursor: allPeople(first: 2, after: "") { ...personConnection }
+  invalidCursor: allPeople(first: 2, after: "27") { ...personConnection }
+}
+
+fragment personConnection on PeopleConnection {
+  pageInfo {
+    startCursor
+    endCursor
+    hasNextPage
+    hasPreviousPage
+  }
+  totalCount
+  edges {
+    cursor
+    node {
+      id
+      name
+      email
+      config
+      lastLoginFromIp
+    }
+  }
+}

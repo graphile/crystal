@@ -1,0 +1,14 @@
+{
+  allPosts(condition: { rowId: 1 }) {
+    nodes {
+      id
+      rowId
+      headline
+    }
+  }
+  allEdgeCases(condition: { rowId: 2 }) {
+    nodes {
+      rowId
+    }
+  }
+}
