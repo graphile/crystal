@@ -1,0 +1,20 @@
+#> options: {viewUniqueKey: "testviewid", setofFunctionsContainNulls: true,}
+{
+  badlyBehavedFunction {
+    nodes {
+      ...PersonFragment
+    }
+    edges {
+      cursor
+      node {
+        ...PersonFragment
+      }
+    }
+  }
+}
+
+fragment PersonFragment on Person {
+  nodeId
+  id
+  firstName
+}

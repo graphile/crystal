@@ -1,0 +1,10 @@
+#> rbac: true
+#> options: { ignoreRBAC: false }
+
+mutation {
+  deletePersonById(input:{
+    id: 3
+  }) {
+    deletedPersonId
+  }
+}

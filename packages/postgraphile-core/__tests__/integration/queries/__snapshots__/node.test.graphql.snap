@@ -1,0 +1,172 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "a": Object {
+      "nodes": Array [
+        Object {
+          "__typename": "Person",
+          "id": 1,
+          "name": "John Smith",
+          "nodeId": "WyJwZW9wbGUiLDFd",
+        },
+        Object {
+          "__typename": "Person",
+          "id": 2,
+          "name": "Sara Smith",
+          "nodeId": "WyJwZW9wbGUiLDJd",
+        },
+        Object {
+          "__typename": "Person",
+          "id": 3,
+          "name": "Budd Deey",
+          "nodeId": "WyJwZW9wbGUiLDNd",
+        },
+        Object {
+          "__typename": "Person",
+          "id": 4,
+          "name": "Kathryn Ramirez",
+          "nodeId": "WyJwZW9wbGUiLDRd",
+        },
+        Object {
+          "__typename": "Person",
+          "id": 5,
+          "name": "Joe Tucker",
+          "nodeId": "WyJwZW9wbGUiLDVd",
+        },
+        Object {
+          "__typename": "Person",
+          "id": 6,
+          "name": "Twenty Seventwo",
+          "nodeId": "WyJwZW9wbGUiLDZd",
+        },
+      ],
+    },
+    "b": Object {
+      "nodes": Array [
+        Object {
+          "__typename": "CompoundKey",
+          "nodeId": "WyJjb21wb3VuZF9rZXlzIiwxLDJd",
+          "personId1": 1,
+          "personId2": 2,
+        },
+        Object {
+          "__typename": "CompoundKey",
+          "nodeId": "WyJjb21wb3VuZF9rZXlzIiwyLDFd",
+          "personId1": 2,
+          "personId2": 1,
+        },
+        Object {
+          "__typename": "CompoundKey",
+          "nodeId": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
+          "personId1": 2,
+          "personId2": 3,
+        },
+        Object {
+          "__typename": "CompoundKey",
+          "nodeId": "WyJjb21wb3VuZF9rZXlzIiwyLDVd",
+          "personId1": 2,
+          "personId2": 5,
+        },
+        Object {
+          "__typename": "CompoundKey",
+          "nodeId": "WyJjb21wb3VuZF9rZXlzIiw0LDNd",
+          "personId1": 4,
+          "personId2": 3,
+        },
+        Object {
+          "__typename": "CompoundKey",
+          "nodeId": "WyJjb21wb3VuZF9rZXlzIiw0LDRd",
+          "personId1": 4,
+          "personId2": 4,
+        },
+      ],
+    },
+    "c": Object {
+      "__typename": "CompoundKey",
+      "nodeId": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
+      "personId1": 2,
+      "personId2": 3,
+    },
+    "d": Object {
+      "__typename": "Person",
+      "id": 2,
+      "name": "Sara Smith",
+      "nodeId": "WyJwZW9wbGUiLDJd",
+    },
+    "e": Object {
+      "__typename": "CompoundKey",
+      "nodeId": "WyJjb21wb3VuZF9rZXlzIiwxLDJd",
+      "personId1": 1,
+      "personId2": 2,
+    },
+    "f": Object {
+      "__typename": "Person",
+      "id": 5,
+      "name": "Joe Tucker",
+      "nodeId": "WyJwZW9wbGUiLDVd",
+    },
+    "g": null,
+    "h": null,
+    "i": Object {
+      "__typename": "Person",
+      "id": 2,
+      "name": "Sara Smith",
+      "nodeId": "WyJwZW9wbGUiLDJd",
+    },
+    "j": Object {
+      "__typename": "Person",
+      "id": 5,
+      "name": "Joe Tucker",
+      "nodeId": "WyJwZW9wbGUiLDVd",
+    },
+    "k": null,
+    "l": Object {
+      "__typename": "CompoundKey",
+      "nodeId": "WyJjb21wb3VuZF9rZXlzIiwyLDNd",
+      "personId1": 2,
+      "personId2": 3,
+    },
+    "m": Object {
+      "__typename": "CompoundKey",
+      "nodeId": "WyJjb21wb3VuZF9rZXlzIiwxLDJd",
+      "personId1": 1,
+      "personId2": 2,
+    },
+    "n": null,
+    "o": Object {
+      "__typename": "SimilarTable1",
+      "col1": null,
+      "col2": null,
+      "col3": -3,
+      "id": 2,
+      "nodeId": "WyJzaW1pbGFyX3RhYmxlXzFTIiwyXQ==",
+    },
+    "p": Object {
+      "__typename": "SimilarTable2",
+      "col3": -3,
+      "col4": null,
+      "col5": null,
+      "id": 2,
+      "nodeId": "WyJzaW1pbGFyX3RhYmxlXzJTIiwyXQ==",
+    },
+    "q": Object {
+      "__typename": "SimilarTable1",
+      "col1": null,
+      "col2": null,
+      "col3": -3,
+      "id": 2,
+      "nodeId": "WyJzaW1pbGFyX3RhYmxlXzFTIiwyXQ==",
+    },
+    "r": Object {
+      "__typename": "SimilarTable2",
+      "col3": -3,
+      "col4": null,
+      "col5": null,
+      "id": 2,
+      "nodeId": "WyJzaW1pbGFyX3RhYmxlXzJTIiwyXQ==",
+    },
+  },
+}
+`;

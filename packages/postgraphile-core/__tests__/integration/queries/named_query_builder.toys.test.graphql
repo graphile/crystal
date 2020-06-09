@@ -1,0 +1,20 @@
+#> schemas: ["named_query_builder"]
+#> plugins: ["ToyCategoriesPlugin"]
+
+{
+  t1: toyById(id: 1) {
+    categories {
+      name
+    }
+  }
+  t2: toyById(id: 1) {
+    categories(approved: true) {
+      name
+    }
+  }
+  t3: toyById(id: 1) {
+    categories(approved: false) {
+      name
+    }
+  }
+}

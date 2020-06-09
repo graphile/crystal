@@ -1,0 +1,48 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "a": Object {
+      "totalCount": 6,
+    },
+    "b": Object {
+      "nodes": Array [
+        Object {
+          "friends": Object {
+            "totalCount": 2,
+          },
+        },
+        Object {
+          "friends": Object {
+            "totalCount": 2,
+          },
+        },
+        Object {
+          "friends": Object {
+            "totalCount": 2,
+          },
+        },
+        Object {
+          "friends": Object {
+            "totalCount": 2,
+          },
+        },
+        Object {
+          "friends": Object {
+            "totalCount": 1,
+          },
+        },
+        Object {
+          "friends": Object {
+            "totalCount": 0,
+          },
+        },
+      ],
+    },
+    "c": Object {
+      "totalCount": 6,
+    },
+  },
+}
+`;

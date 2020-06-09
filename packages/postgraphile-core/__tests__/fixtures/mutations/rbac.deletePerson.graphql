@@ -1,7 +1,0 @@
-mutation {
-  deletePersonById(input:{
-    id: 3
-  }) {
-    deletedPersonId
-  }
-}

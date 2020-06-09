@@ -2600,7 +2600,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/json5@npm:^0.0.30":
+"@types/json5@npm:0.0.30, @types/json5@npm:^0.0.30":
   version: 0.0.30
   resolution: "@types/json5@npm:0.0.30"
   checksum: 3/af9d434f14dc6337e16454944bca5eadbdf5d0e85a0ef59fe5e011eadabfe126f42f3913bf7fee478747cf34efd88061ac0e15ede07b83986ae31aa2ddda6232
@@ -14987,6 +14987,7 @@ fsevents@^1.2.7:
     "@graphile/subscriptions-lds": 4.7.0
     "@types/debug": ^4.1.5
     "@types/jest": ^25.2.3
+    "@types/json5": 0.0.30
     "@types/jsonwebtoken": ^8.5.0
     "@types/mock-fs": ^4.10.0
     "@types/node": ^14.0.1
@@ -14998,6 +14999,7 @@ fsevents@^1.2.7:
     graphql: ^14.6.0
     graphql-parse-resolve-info: 4.7.0
     jest: ^26.0.1
+    json5: ^2.1.3
     jsonwebtoken: ^8.5.1
     mock-fs: ^4.12.0
     pg: ^8.2.1

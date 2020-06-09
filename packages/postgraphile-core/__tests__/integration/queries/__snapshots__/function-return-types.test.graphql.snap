@@ -1,0 +1,268 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "funcInInout": 15,
+    "funcInOut": 52,
+    "funcOut": 42,
+    "funcOutComplex": Object {
+      "x": 2,
+      "y": Object {
+        "a": 1,
+        "b": "2",
+        "c": "BLUE",
+      },
+      "z": Object {
+        "id": 1,
+        "name": "John Smith",
+        "nodeId": "WyJwZW9wbGUiLDFd",
+        "postsByAuthorId": Object {
+          "nodes": Array [
+            Object {
+              "id": 2,
+              "nodeId": "WyJwb3N0cyIsMl0=",
+            },
+            Object {
+              "id": 3,
+              "nodeId": "WyJwb3N0cyIsM10=",
+            },
+            Object {
+              "id": 4,
+              "nodeId": "WyJwb3N0cyIsNF0=",
+            },
+            Object {
+              "id": 7,
+              "nodeId": "WyJwb3N0cyIsN10=",
+            },
+          ],
+        },
+      },
+    },
+    "funcOutComplexSetof": Object {
+      "nodes": Array [
+        Object {
+          "x": 2,
+          "y": Object {
+            "a": 1,
+            "b": "2",
+            "c": "BLUE",
+          },
+          "z": Object {
+            "id": 1,
+            "name": "John Smith",
+            "nodeId": "WyJwZW9wbGUiLDFd",
+            "postsByAuthorId": Object {
+              "nodes": Array [
+                Object {
+                  "id": 2,
+                  "nodeId": "WyJwb3N0cyIsMl0=",
+                },
+                Object {
+                  "id": 3,
+                  "nodeId": "WyJwb3N0cyIsM10=",
+                },
+                Object {
+                  "id": 4,
+                  "nodeId": "WyJwb3N0cyIsNF0=",
+                },
+                Object {
+                  "id": 7,
+                  "nodeId": "WyJwb3N0cyIsN10=",
+                },
+              ],
+            },
+          },
+        },
+      ],
+      "totalCount": 1,
+    },
+    "funcOutOut": Object {
+      "firstOut": 42,
+      "secondOut": "out",
+    },
+    "funcOutOutCompoundType": Object {
+      "o1": 20,
+      "o2": Object {
+        "a": 1,
+        "b": "2",
+        "c": "BLUE",
+      },
+    },
+    "funcOutOutSetof": Object {
+      "nodes": Array [
+        Object {
+          "o1": 42,
+          "o2": "out",
+        },
+        Object {
+          "o1": 43,
+          "o2": "out2",
+        },
+      ],
+      "totalCount": 2,
+    },
+    "funcOutOutUnnamed": Object {
+      "arg1": 42,
+      "arg2": "out",
+    },
+    "funcOutSetof": Object {
+      "nodes": Array [
+        42,
+        43,
+      ],
+      "totalCount": 2,
+    },
+    "funcOutTable": Object {
+      "id": 1,
+      "nodeId": "WyJwZW9wbGUiLDFd",
+    },
+    "funcOutTableSetof": Object {
+      "nodes": Array [
+        Object {
+          "id": 1,
+          "nodeId": "WyJwZW9wbGUiLDFd",
+        },
+        Object {
+          "id": 2,
+          "nodeId": "WyJwZW9wbGUiLDJd",
+        },
+        Object {
+          "id": 3,
+          "nodeId": "WyJwZW9wbGUiLDNd",
+        },
+        Object {
+          "id": 4,
+          "nodeId": "WyJwZW9wbGUiLDRd",
+        },
+        Object {
+          "id": 5,
+          "nodeId": "WyJwZW9wbGUiLDVd",
+        },
+        Object {
+          "id": 6,
+          "nodeId": "WyJwZW9wbGUiLDZd",
+        },
+      ],
+      "totalCount": 6,
+    },
+    "funcOutUnnamed": 42,
+    "funcOutUnnamedOutOutUnnamed": Object {
+      "arg1": 42,
+      "arg3": 3,
+      "o2": "out2",
+    },
+    "funcReturnsTableMultiCol": Object {
+      "nodes": Array [
+        Object {
+          "col1": 62,
+          "col2": "out",
+        },
+        Object {
+          "col1": 63,
+          "col2": "out2",
+        },
+      ],
+      "totalCount": 2,
+    },
+    "funcReturnsTableOneCol": Object {
+      "nodes": Array [
+        62,
+        63,
+      ],
+      "totalCount": 2,
+    },
+    "personById": Object {
+      "computedComplex": Object {
+        "x": 2,
+        "y": Object {
+          "a": 1,
+          "b": "2",
+          "c": "BLUE",
+        },
+        "z": Object {
+          "id": 1,
+          "name": "John Smith",
+          "nodeId": "WyJwZW9wbGUiLDFd",
+          "postsByAuthorId": Object {
+            "nodes": Array [
+              Object {
+                "id": 2,
+                "nodeId": "WyJwb3N0cyIsMl0=",
+              },
+              Object {
+                "id": 3,
+                "nodeId": "WyJwb3N0cyIsM10=",
+              },
+              Object {
+                "id": 4,
+                "nodeId": "WyJwb3N0cyIsNF0=",
+              },
+              Object {
+                "id": 7,
+                "nodeId": "WyJwb3N0cyIsN10=",
+              },
+            ],
+          },
+        },
+      },
+      "computedFirstArgInout": Object {
+        "id": 1,
+        "name": "John Smith",
+      },
+      "computedFirstArgInoutOut": Object {
+        "o": 42,
+        "person": Object {
+          "id": 1,
+          "name": "John Smith",
+        },
+      },
+      "computedInout": "test John Smith",
+      "computedInoutOut": Object {
+        "ino": "test John Smith",
+        "o": "o John Smith",
+      },
+      "computedOut": "o1 John Smith",
+      "computedOutOut": Object {
+        "o1": "o1 John Smith",
+        "o2": "o2 John Smith",
+      },
+      "id": 1,
+      "name": "John Smith",
+      "nodeId": "WyJwZW9wbGUiLDFd",
+    },
+    "queryOutputTwoRowsBothExist": Object {
+      "l2": Object {
+        "personId": 4,
+      },
+      "leftArm": Object {
+        "id": 42,
+        "lengthInMetres": 0.6,
+        "mood": "neutral",
+        "personByPersonId": Object {
+          "name": "Kathryn Ramirez",
+          "personSecretByPersonId": null,
+        },
+      },
+      "post": Object {
+        "authorId": 2,
+        "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+        "id": 1,
+        "personByAuthorId": Object {
+          "name": "Sara Smith",
+          "personSecretByPersonId": Object {
+            "secret": "Sara Smith is not really my name!",
+          },
+        },
+      },
+      "txt": "Hi421",
+    },
+    "queryOutputTwoRowsNeitherExist": Object {
+      "l2": null,
+      "leftArm": null,
+      "post": null,
+      "txt": "Don't fail me now...999999999999999999",
+    },
+  },
+}
+`;

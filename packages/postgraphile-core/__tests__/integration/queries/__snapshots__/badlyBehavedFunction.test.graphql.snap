@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "badlyBehavedFunction": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwxXQ==",
+          "node": Object {
+            "firstName": "John",
+            "id": 1,
+            "nodeId": "WyJwZW9wbGUiLDFd",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwyXQ==",
+          "node": null,
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwzXQ==",
+          "node": Object {
+            "firstName": "Twenty",
+            "id": 6,
+            "nodeId": "WyJwZW9wbGUiLDZd",
+          },
+        },
+      ],
+      "nodes": Array [
+        Object {
+          "firstName": "John",
+          "id": 1,
+          "nodeId": "WyJwZW9wbGUiLDFd",
+        },
+        null,
+        Object {
+          "firstName": "Twenty",
+          "id": 6,
+          "nodeId": "WyJwZW9wbGUiLDZd",
+        },
+      ],
+    },
+  },
+}
+`;

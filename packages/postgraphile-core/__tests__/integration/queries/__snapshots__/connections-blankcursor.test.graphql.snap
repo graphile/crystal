@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "blankCursor": null,
+    "invalidCursor": null,
+  },
+  "errors": Array [
+    [GraphQLError: Invalid cursor, please enter a cursor from a previous request, or null.],
+    [GraphQLError: Invalid cursor, please enter a cursor from a previous request, or null.],
+  ],
+}
+`;

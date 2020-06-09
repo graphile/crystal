@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "a": null,
+    "b": Object {
+      "__typename": "Query",
+      "a": null,
+      "b": Object {
+        "__typename": "Query",
+        "nodeId": "query",
+      },
+      "nodeId": "query",
+    },
+    "nodeId": "query",
+    "query": Object {
+      "a": null,
+      "b": Object {
+        "__typename": "Query",
+        "nodeId": "query",
+      },
+      "nodeId": "query",
+      "query": Object {
+        "a": null,
+        "b": Object {
+          "__typename": "Query",
+          "nodeId": "query",
+        },
+        "nodeId": "query",
+        "query": Object {
+          "a": null,
+          "b": Object {
+            "__typename": "Query",
+            "nodeId": "query",
+          },
+          "nodeId": "query",
+        },
+      },
+    },
+  },
+}
+`;

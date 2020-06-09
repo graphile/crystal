@@ -1,0 +1,64 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "asc": Object {
+      "nodes": Array [
+        Object {
+          "id": 3,
+          "name": "Budd Deey",
+        },
+        Object {
+          "id": 5,
+          "name": "Joe Tucker",
+        },
+        Object {
+          "id": 1,
+          "name": "John Smith",
+        },
+        Object {
+          "id": 4,
+          "name": "Kathryn Ramirez",
+        },
+        Object {
+          "id": 2,
+          "name": "Sara Smith",
+        },
+        Object {
+          "id": 6,
+          "name": "Twenty Seventwo",
+        },
+      ],
+    },
+    "desc": Object {
+      "nodes": Array [
+        Object {
+          "id": 6,
+          "name": "Twenty Seventwo",
+        },
+        Object {
+          "id": 2,
+          "name": "Sara Smith",
+        },
+        Object {
+          "id": 4,
+          "name": "Kathryn Ramirez",
+        },
+        Object {
+          "id": 1,
+          "name": "John Smith",
+        },
+        Object {
+          "id": 5,
+          "name": "Joe Tucker",
+        },
+        Object {
+          "id": 3,
+          "name": "Budd Deey",
+        },
+      ],
+    },
+  },
+}
+`;

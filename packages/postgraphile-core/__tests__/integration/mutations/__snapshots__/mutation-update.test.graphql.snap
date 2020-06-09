@@ -1,0 +1,227 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "a": Object {
+      "clientMutationId": null,
+      "person": Object {
+        "about": "An older John Smith",
+        "email": "john.smith@email.com",
+        "id": 1,
+        "issue27UserExists": true,
+        "name": "John Smith Sr.",
+        "nodeId": "WyJwZW9wbGUiLDFd",
+      },
+      "personEdge": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+        "node": Object {
+          "id": 1,
+          "nodeId": "WyJwZW9wbGUiLDFd",
+        },
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "b": Object {
+      "clientMutationId": "hello",
+      "person": Object {
+        "about": null,
+        "email": "sarah.smith@email.com",
+        "id": 2,
+        "issue27UserExists": true,
+        "name": "Sarah Smith",
+        "nodeId": "WyJwZW9wbGUiLDJd",
+      },
+      "personEdge": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+        "node": Object {
+          "id": 2,
+          "nodeId": "WyJwZW9wbGUiLDJd",
+        },
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "c": Object {
+      "clientMutationId": "world",
+      "person": Object {
+        "about": "Now with an “H.”",
+        "email": "sarah.smith@email.com",
+        "id": 2,
+        "issue27UserExists": true,
+        "name": "Sarah Smith",
+        "nodeId": "WyJwZW9wbGUiLDJd",
+      },
+      "personEdge": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+        "node": Object {
+          "id": 2,
+          "nodeId": "WyJwZW9wbGUiLDJd",
+        },
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "d": Object {
+      "clientMutationId": null,
+      "person": Object {
+        "about": "I have taken over Budd’s account. Hehehe.",
+        "email": "budd.deey@email.com",
+        "id": 3,
+        "issue27UserExists": true,
+        "name": "Best Pal",
+        "nodeId": "WyJwZW9wbGUiLDNd",
+      },
+      "personEdge": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+        "node": Object {
+          "id": 3,
+          "nodeId": "WyJwZW9wbGUiLDNd",
+        },
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "e": Object {
+      "clientMutationId": null,
+      "person": Object {
+        "about": "Make art not friends.",
+        "email": "kathryn.ramirez@email.com",
+        "id": 4,
+        "issue27UserExists": true,
+        "name": "Kathryn Ramirez",
+        "nodeId": "WyJwZW9wbGUiLDRd",
+      },
+      "personEdge": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+        "node": Object {
+          "id": 4,
+          "nodeId": "WyJwZW9wbGUiLDRd",
+        },
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "f": Object {
+      "clientMutationId": null,
+      "compoundKey": Object {
+        "extra": true,
+        "nodeId": "WyJjb21wb3VuZF9rZXlzIiwyLDJd",
+        "personByPersonId1": Object {
+          "id": 2,
+          "name": "Sarah Smith",
+        },
+        "personByPersonId2": Object {
+          "id": 2,
+          "name": "Sarah Smith",
+        },
+        "personId1": 2,
+        "personId2": 2,
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "g": Object {
+      "clientMutationId": "hello",
+      "compoundKey": Object {
+        "extra": false,
+        "nodeId": "WyJjb21wb3VuZF9rZXlzIiwzLDJd",
+        "personByPersonId1": Object {
+          "id": 3,
+          "name": "Best Pal",
+        },
+        "personByPersonId2": Object {
+          "id": 2,
+          "name": "Sarah Smith",
+        },
+        "personId1": 3,
+        "personId2": 2,
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "h": Object {
+      "clientMutationId": "world",
+      "compoundKey": Object {
+        "extra": false,
+        "nodeId": "WyJjb21wb3VuZF9rZXlzIiw0LDNd",
+        "personByPersonId1": Object {
+          "id": 4,
+          "name": "Kathryn Ramirez",
+        },
+        "personByPersonId2": Object {
+          "id": 3,
+          "name": "Best Pal",
+        },
+        "personId1": 4,
+        "personId2": 3,
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "i": Object {
+      "clientMutationId": null,
+      "person": Object {
+        "about": null,
+        "email": "sarah.smith@email.com",
+        "id": 2,
+        "issue27UserExists": true,
+        "name": "Sarah Smith",
+        "nodeId": "WyJwZW9wbGUiLDJd",
+      },
+      "personEdge": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+        "node": Object {
+          "id": 2,
+          "nodeId": "WyJwZW9wbGUiLDJd",
+        },
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "j": Object {
+      "clientMutationId": null,
+      "person": Object {
+        "about": null,
+        "email": "somethingelse@example.com",
+        "id": 6,
+        "issue27UserExists": false,
+        "name": "Twenty Seventwo",
+        "nodeId": "WyJwZW9wbGUiLDZd",
+      },
+      "personEdge": Object {
+        "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+        "node": Object {
+          "id": 6,
+          "nodeId": "WyJwZW9wbGUiLDZd",
+        },
+      },
+      "query": Object {
+        "nodeId": "query",
+      },
+    },
+    "k": Object {
+      "defaultValue": Object {
+        "id": 1,
+        "nullValue": null,
+      },
+    },
+    "l": Object {
+      "noPrimaryKey": Object {
+        "id": 1,
+        "str": "New String",
+      },
+    },
+  },
+}
+`;

@@ -1,0 +1,1081 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "a": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "config": Object {},
+            "email": "john.smith@email.com",
+            "id": 1,
+            "lastLoginFromIp": "192.168.0.1",
+            "lastLoginFromSubnet": "192.168.0.0/24",
+            "name": "John Smith",
+            "userMac": "00:00:00:00:00:00",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+          "node": Object {
+            "config": Object {
+              "a": "1",
+            },
+            "email": "sara.smith@email.com",
+            "id": 2,
+            "lastLoginFromIp": "10.1.2.3",
+            "lastLoginFromSubnet": "10.0.0.0/8",
+            "name": "Sara Smith",
+            "userMac": "11:22:33:44:55:66",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+          "node": Object {
+            "config": Object {
+              "b": "2",
+            },
+            "email": "budd.deey@email.com",
+            "id": 3,
+            "lastLoginFromIp": "172.21.22.23",
+            "lastLoginFromSubnet": "172.16.0.0/12",
+            "name": "Budd Deey",
+            "userMac": "77:88:99:aa:bb:cc",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+          "node": Object {
+            "config": Object {
+              "a": "3",
+              "b": "4",
+            },
+            "email": "kathryn.ramirez@email.com",
+            "id": 4,
+            "lastLoginFromIp": "192.168.1.2",
+            "lastLoginFromSubnet": "192.168.0.0/16",
+            "name": "Kathryn Ramirez",
+            "userMac": "dd:ee:ff:00:11:22",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+          "node": Object {
+            "config": Object {
+              "_\\"_$@£$)(@*£$": "_\\"_$@£$)(@*£$",
+              "a": "5",
+              "actually_null": null,
+              "b": "6",
+              "null_string": "null",
+            },
+            "email": "joe.tucker@email.com",
+            "id": 5,
+            "lastLoginFromIp": "192.168.0.2",
+            "lastLoginFromSubnet": "192.168.0.0/23",
+            "name": "Joe Tucker",
+            "userMac": "33:44:55:66:77:88",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+          "node": Object {
+            "config": Object {
+              "null_1": null,
+              "null_2": null,
+            },
+            "email": "graphile-build.issue.27.exists@example.com",
+            "id": 6,
+            "lastLoginFromIp": "10.1.2.254",
+            "lastLoginFromSubnet": "10.0.0.0/9",
+            "name": "Twenty Seventwo",
+            "userMac": "99:aa:bb:cc:dd:ee",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      },
+      "totalCount": 6,
+    },
+    "b": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "config": Object {},
+            "email": "john.smith@email.com",
+            "id": 1,
+            "lastLoginFromIp": "192.168.0.1",
+            "lastLoginFromSubnet": "192.168.0.0/24",
+            "name": "John Smith",
+            "userMac": "00:00:00:00:00:00",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+          "node": Object {
+            "config": Object {
+              "a": "1",
+            },
+            "email": "sara.smith@email.com",
+            "id": 2,
+            "lastLoginFromIp": "10.1.2.3",
+            "lastLoginFromSubnet": "10.0.0.0/8",
+            "name": "Sara Smith",
+            "userMac": "11:22:33:44:55:66",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+        "hasNextPage": true,
+        "hasPreviousPage": false,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      },
+      "totalCount": 6,
+    },
+    "c": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+          "node": Object {
+            "config": Object {
+              "_\\"_$@£$)(@*£$": "_\\"_$@£$)(@*£$",
+              "a": "5",
+              "actually_null": null,
+              "b": "6",
+              "null_string": "null",
+            },
+            "email": "joe.tucker@email.com",
+            "id": 5,
+            "lastLoginFromIp": "192.168.0.2",
+            "lastLoginFromSubnet": "192.168.0.0/23",
+            "name": "Joe Tucker",
+            "userMac": "33:44:55:66:77:88",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+          "node": Object {
+            "config": Object {
+              "null_1": null,
+              "null_2": null,
+            },
+            "email": "graphile-build.issue.27.exists@example.com",
+            "id": 6,
+            "lastLoginFromIp": "10.1.2.254",
+            "lastLoginFromSubnet": "10.0.0.0/9",
+            "name": "Twenty Seventwo",
+            "userMac": "99:aa:bb:cc:dd:ee",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": true,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+      },
+      "totalCount": 6,
+    },
+    "d": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsWyJCdWRkIERlZXkiLDNdXQ==",
+          "node": Object {
+            "config": Object {
+              "b": "2",
+            },
+            "email": "budd.deey@email.com",
+            "id": 3,
+            "lastLoginFromIp": "172.21.22.23",
+            "lastLoginFromSubnet": "172.16.0.0/12",
+            "name": "Budd Deey",
+            "userMac": "77:88:99:aa:bb:cc",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsWyJKb2UgVHVja2VyIiw1XV0=",
+          "node": Object {
+            "config": Object {
+              "_\\"_$@£$)(@*£$": "_\\"_$@£$)(@*£$",
+              "a": "5",
+              "actually_null": null,
+              "b": "6",
+              "null_string": "null",
+            },
+            "email": "joe.tucker@email.com",
+            "id": 5,
+            "lastLoginFromIp": "192.168.0.2",
+            "lastLoginFromSubnet": "192.168.0.0/23",
+            "name": "Joe Tucker",
+            "userMac": "33:44:55:66:77:88",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsWyJKb2huIFNtaXRoIiwxXV0=",
+          "node": Object {
+            "config": Object {},
+            "email": "john.smith@email.com",
+            "id": 1,
+            "lastLoginFromIp": "192.168.0.1",
+            "lastLoginFromSubnet": "192.168.0.0/24",
+            "name": "John Smith",
+            "userMac": "00:00:00:00:00:00",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsWyJLYXRocnluIFJhbWlyZXoiLDRdXQ==",
+          "node": Object {
+            "config": Object {
+              "a": "3",
+              "b": "4",
+            },
+            "email": "kathryn.ramirez@email.com",
+            "id": 4,
+            "lastLoginFromIp": "192.168.1.2",
+            "lastLoginFromSubnet": "192.168.0.0/16",
+            "name": "Kathryn Ramirez",
+            "userMac": "dd:ee:ff:00:11:22",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsWyJTYXJhIFNtaXRoIiwyXV0=",
+          "node": Object {
+            "config": Object {
+              "a": "1",
+            },
+            "email": "sara.smith@email.com",
+            "id": 2,
+            "lastLoginFromIp": "10.1.2.3",
+            "lastLoginFromSubnet": "10.0.0.0/8",
+            "name": "Sara Smith",
+            "userMac": "11:22:33:44:55:66",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsWyJUd2VudHkgU2V2ZW50d28iLDZdXQ==",
+          "node": Object {
+            "config": Object {
+              "null_1": null,
+              "null_2": null,
+            },
+            "email": "graphile-build.issue.27.exists@example.com",
+            "id": 6,
+            "lastLoginFromIp": "10.1.2.254",
+            "lastLoginFromSubnet": "10.0.0.0/9",
+            "name": "Twenty Seventwo",
+            "userMac": "99:aa:bb:cc:dd:ee",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJuYW1lX2FzYyIsWyJUd2VudHkgU2V2ZW50d28iLDZdXQ==",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJuYW1lX2FzYyIsWyJCdWRkIERlZXkiLDNdXQ==",
+      },
+      "totalCount": 6,
+    },
+    "e": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYW1lX2Rlc2MiLFsiVHdlbnR5IFNldmVudHdvIiw2XV0=",
+          "node": Object {
+            "config": Object {
+              "null_1": null,
+              "null_2": null,
+            },
+            "email": "graphile-build.issue.27.exists@example.com",
+            "id": 6,
+            "lastLoginFromIp": "10.1.2.254",
+            "lastLoginFromSubnet": "10.0.0.0/9",
+            "name": "Twenty Seventwo",
+            "userMac": "99:aa:bb:cc:dd:ee",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2Rlc2MiLFsiU2FyYSBTbWl0aCIsMl1d",
+          "node": Object {
+            "config": Object {
+              "a": "1",
+            },
+            "email": "sara.smith@email.com",
+            "id": 2,
+            "lastLoginFromIp": "10.1.2.3",
+            "lastLoginFromSubnet": "10.0.0.0/8",
+            "name": "Sara Smith",
+            "userMac": "11:22:33:44:55:66",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2Rlc2MiLFsiS2F0aHJ5biBSYW1pcmV6Iiw0XV0=",
+          "node": Object {
+            "config": Object {
+              "a": "3",
+              "b": "4",
+            },
+            "email": "kathryn.ramirez@email.com",
+            "id": 4,
+            "lastLoginFromIp": "192.168.1.2",
+            "lastLoginFromSubnet": "192.168.0.0/16",
+            "name": "Kathryn Ramirez",
+            "userMac": "dd:ee:ff:00:11:22",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2Rlc2MiLFsiSm9obiBTbWl0aCIsMV1d",
+          "node": Object {
+            "config": Object {},
+            "email": "john.smith@email.com",
+            "id": 1,
+            "lastLoginFromIp": "192.168.0.1",
+            "lastLoginFromSubnet": "192.168.0.0/24",
+            "name": "John Smith",
+            "userMac": "00:00:00:00:00:00",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2Rlc2MiLFsiSm9lIFR1Y2tlciIsNV1d",
+          "node": Object {
+            "config": Object {
+              "_\\"_$@£$)(@*£$": "_\\"_$@£$)(@*£$",
+              "a": "5",
+              "actually_null": null,
+              "b": "6",
+              "null_string": "null",
+            },
+            "email": "joe.tucker@email.com",
+            "id": 5,
+            "lastLoginFromIp": "192.168.0.2",
+            "lastLoginFromSubnet": "192.168.0.0/23",
+            "name": "Joe Tucker",
+            "userMac": "33:44:55:66:77:88",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2Rlc2MiLFsiQnVkZCBEZWV5IiwzXV0=",
+          "node": Object {
+            "config": Object {
+              "b": "2",
+            },
+            "email": "budd.deey@email.com",
+            "id": 3,
+            "lastLoginFromIp": "172.21.22.23",
+            "lastLoginFromSubnet": "172.16.0.0/12",
+            "name": "Budd Deey",
+            "userMac": "77:88:99:aa:bb:cc",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJuYW1lX2Rlc2MiLFsiQnVkZCBEZWV5IiwzXV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJuYW1lX2Rlc2MiLFsiVHdlbnR5IFNldmVudHdvIiw2XV0=",
+      },
+      "totalCount": 6,
+    },
+    "f": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "config": Object {},
+            "email": "john.smith@email.com",
+            "id": 1,
+            "lastLoginFromIp": "192.168.0.1",
+            "lastLoginFromSubnet": "192.168.0.0/24",
+            "name": "John Smith",
+            "userMac": "00:00:00:00:00:00",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+        "hasNextPage": true,
+        "hasPreviousPage": false,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      },
+      "totalCount": 6,
+    },
+    "g": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+          "node": Object {
+            "config": Object {
+              "b": "2",
+            },
+            "email": "budd.deey@email.com",
+            "id": 3,
+            "lastLoginFromIp": "172.21.22.23",
+            "lastLoginFromSubnet": "172.16.0.0/12",
+            "name": "Budd Deey",
+            "userMac": "77:88:99:aa:bb:cc",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+          "node": Object {
+            "config": Object {
+              "a": "3",
+              "b": "4",
+            },
+            "email": "kathryn.ramirez@email.com",
+            "id": 4,
+            "lastLoginFromIp": "192.168.1.2",
+            "lastLoginFromSubnet": "192.168.0.0/16",
+            "name": "Kathryn Ramirez",
+            "userMac": "dd:ee:ff:00:11:22",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+          "node": Object {
+            "config": Object {
+              "_\\"_$@£$)(@*£$": "_\\"_$@£$)(@*£$",
+              "a": "5",
+              "actually_null": null,
+              "b": "6",
+              "null_string": "null",
+            },
+            "email": "joe.tucker@email.com",
+            "id": 5,
+            "lastLoginFromIp": "192.168.0.2",
+            "lastLoginFromSubnet": "192.168.0.0/23",
+            "name": "Joe Tucker",
+            "userMac": "33:44:55:66:77:88",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+          "node": Object {
+            "config": Object {
+              "null_1": null,
+              "null_2": null,
+            },
+            "email": "graphile-build.issue.27.exists@example.com",
+            "id": 6,
+            "lastLoginFromIp": "10.1.2.254",
+            "lastLoginFromSubnet": "10.0.0.0/9",
+            "name": "Twenty Seventwo",
+            "userMac": "99:aa:bb:cc:dd:ee",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": true,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+      },
+      "totalCount": 6,
+    },
+    "h": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJ2aWV3X3VuaXF1ZV9rZXlfYXNjIixbMV1d",
+          "node": Object {
+            "constant": 2,
+            "name": "John Smith",
+            "x": 1,
+          },
+        },
+        Object {
+          "cursor": "WyJ2aWV3X3VuaXF1ZV9rZXlfYXNjIixbMl1d",
+          "node": Object {
+            "constant": 2,
+            "name": "Sara Smith",
+            "x": 2,
+          },
+        },
+        Object {
+          "cursor": "WyJ2aWV3X3VuaXF1ZV9rZXlfYXNjIixbM11d",
+          "node": Object {
+            "constant": 2,
+            "name": "Budd Deey",
+            "x": 3,
+          },
+        },
+        Object {
+          "cursor": "WyJ2aWV3X3VuaXF1ZV9rZXlfYXNjIixbNF1d",
+          "node": Object {
+            "constant": 2,
+            "name": "Kathryn Ramirez",
+            "x": 4,
+          },
+        },
+        Object {
+          "cursor": "WyJ2aWV3X3VuaXF1ZV9rZXlfYXNjIixbNV1d",
+          "node": Object {
+            "constant": 2,
+            "name": "Joe Tucker",
+            "x": 5,
+          },
+        },
+        Object {
+          "cursor": "WyJ2aWV3X3VuaXF1ZV9rZXlfYXNjIixbNl1d",
+          "node": Object {
+            "constant": 2,
+            "name": "Twenty Seventwo",
+            "x": 6,
+          },
+        },
+      ],
+    },
+    "i": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJjb25zdGFudF9hc2MiLFsyLDFdXQ==",
+          "node": Object {
+            "constant": 2,
+            "name": "John Smith",
+            "x": 1,
+          },
+        },
+        Object {
+          "cursor": "WyJjb25zdGFudF9hc2MiLFsyLDJdXQ==",
+          "node": Object {
+            "constant": 2,
+            "name": "Sara Smith",
+            "x": 2,
+          },
+        },
+        Object {
+          "cursor": "WyJjb25zdGFudF9hc2MiLFsyLDNdXQ==",
+          "node": Object {
+            "constant": 2,
+            "name": "Budd Deey",
+            "x": 3,
+          },
+        },
+        Object {
+          "cursor": "WyJjb25zdGFudF9hc2MiLFsyLDRdXQ==",
+          "node": Object {
+            "constant": 2,
+            "name": "Kathryn Ramirez",
+            "x": 4,
+          },
+        },
+        Object {
+          "cursor": "WyJjb25zdGFudF9hc2MiLFsyLDVdXQ==",
+          "node": Object {
+            "constant": 2,
+            "name": "Joe Tucker",
+            "x": 5,
+          },
+        },
+        Object {
+          "cursor": "WyJjb25zdGFudF9hc2MiLFsyLDZdXQ==",
+          "node": Object {
+            "constant": 2,
+            "name": "Twenty Seventwo",
+            "x": 6,
+          },
+        },
+      ],
+    },
+    "j": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "authorId": 2,
+            "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs4XV0=",
+          "node": Object {
+            "authorId": 2,
+            "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxMF1d",
+          "node": Object {
+            "authorId": 2,
+            "headline": "What’s with you kids? Every other day it’s food, food, food.",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxMF1d",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      },
+      "totalCount": 3,
+    },
+    "k": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "authorId": 2,
+            "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs4XV0=",
+          "node": Object {
+            "authorId": 2,
+            "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs4XV0=",
+        "hasNextPage": true,
+        "hasPreviousPage": false,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      },
+      "totalCount": 3,
+    },
+    "l": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJoZWFkbGluZV9hc2MiLFsiWW91IGhpdCBtZSB3aXRoIGEgY3JpY2tldCBiYXQuIiw0XV0=",
+          "node": Object {
+            "authorId": 1,
+            "headline": "You hit me with a cricket bat.",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJoZWFkbGluZV9hc2MiLFsiWW91IGhpdCBtZSB3aXRoIGEgY3JpY2tldCBiYXQuIiw0XV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": true,
+        "startCursor": "WyJoZWFkbGluZV9hc2MiLFsiWW91IGhpdCBtZSB3aXRoIGEgY3JpY2tldCBiYXQuIiw0XV0=",
+      },
+      "totalCount": 4,
+    },
+    "m": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+          "node": Object {
+            "config": Object {
+              "a": "1",
+            },
+            "email": "sara.smith@email.com",
+            "id": 2,
+            "lastLoginFromIp": "10.1.2.3",
+            "lastLoginFromSubnet": "10.0.0.0/8",
+            "name": "Sara Smith",
+            "userMac": "11:22:33:44:55:66",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+          "node": Object {
+            "config": Object {
+              "b": "2",
+            },
+            "email": "budd.deey@email.com",
+            "id": 3,
+            "lastLoginFromIp": "172.21.22.23",
+            "lastLoginFromSubnet": "172.16.0.0/12",
+            "name": "Budd Deey",
+            "userMac": "77:88:99:aa:bb:cc",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+          "node": Object {
+            "config": Object {
+              "a": "3",
+              "b": "4",
+            },
+            "email": "kathryn.ramirez@email.com",
+            "id": 4,
+            "lastLoginFromIp": "192.168.1.2",
+            "lastLoginFromSubnet": "192.168.0.0/16",
+            "name": "Kathryn Ramirez",
+            "userMac": "dd:ee:ff:00:11:22",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+        "hasNextPage": true,
+        "hasPreviousPage": true,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+      },
+      "totalCount": 6,
+    },
+    "n": Object {
+      "edges": Array [],
+      "pageInfo": Object {
+        "endCursor": null,
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": null,
+      },
+      "totalCount": 6,
+    },
+    "nullTest1": Object {
+      "nodes": Array [
+        Object {
+          "nullableInt": 99,
+          "nullableText": "Hello",
+        },
+        Object {
+          "nullableInt": 98,
+          "nullableText": null,
+        },
+        Object {
+          "nullableInt": null,
+          "nullableText": null,
+        },
+        Object {
+          "nullableInt": null,
+          "nullableText": "Hey",
+        },
+        Object {
+          "nullableInt": 95,
+          "nullableText": "Hey",
+        },
+      ],
+    },
+    "o": Object {
+      "nodes": Array [
+        Object {
+          "rowId": 2,
+        },
+      ],
+    },
+    "p": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+          "node": Object {
+            "config": Object {
+              "a": "3",
+              "b": "4",
+            },
+            "email": "kathryn.ramirez@email.com",
+            "id": 4,
+            "lastLoginFromIp": "192.168.1.2",
+            "lastLoginFromSubnet": "192.168.0.0/16",
+            "name": "Kathryn Ramirez",
+            "userMac": "dd:ee:ff:00:11:22",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+          "node": Object {
+            "config": Object {
+              "_\\"_$@£$)(@*£$": "_\\"_$@£$)(@*£$",
+              "a": "5",
+              "actually_null": null,
+              "b": "6",
+              "null_string": "null",
+            },
+            "email": "joe.tucker@email.com",
+            "id": 5,
+            "lastLoginFromIp": "192.168.0.2",
+            "lastLoginFromSubnet": "192.168.0.0/23",
+            "name": "Joe Tucker",
+            "userMac": "33:44:55:66:77:88",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+        "hasNextPage": true,
+        "hasPreviousPage": true,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+      },
+      "totalCount": 6,
+    },
+    "q": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+          "node": Object {
+            "config": Object {
+              "b": "2",
+            },
+            "email": "budd.deey@email.com",
+            "id": 3,
+            "lastLoginFromIp": "172.21.22.23",
+            "lastLoginFromSubnet": "172.16.0.0/12",
+            "name": "Budd Deey",
+            "userMac": "77:88:99:aa:bb:cc",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+        "hasNextPage": true,
+        "hasPreviousPage": true,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFszXV0=",
+      },
+      "totalCount": 6,
+    },
+    "r": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+          "node": Object {
+            "config": Object {
+              "null_1": null,
+              "null_2": null,
+            },
+            "email": "graphile-build.issue.27.exists@example.com",
+            "id": 6,
+            "lastLoginFromIp": "10.1.2.254",
+            "lastLoginFromSubnet": "10.0.0.0/9",
+            "name": "Twenty Seventwo",
+            "userMac": "99:aa:bb:cc:dd:ee",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": true,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+      },
+      "totalCount": 6,
+    },
+    "s": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "config": Object {},
+            "email": "john.smith@email.com",
+            "id": 1,
+            "lastLoginFromIp": "192.168.0.1",
+            "lastLoginFromSubnet": "192.168.0.0/24",
+            "name": "John Smith",
+            "userMac": "00:00:00:00:00:00",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsyXV0=",
+          "node": Object {
+            "config": Object {
+              "a": "1",
+            },
+            "email": "sara.smith@email.com",
+            "id": 2,
+            "lastLoginFromIp": "10.1.2.3",
+            "lastLoginFromSubnet": "10.0.0.0/8",
+            "name": "Sara Smith",
+            "userMac": "11:22:33:44:55:66",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs0XV0=",
+          "node": Object {
+            "config": Object {
+              "a": "3",
+              "b": "4",
+            },
+            "email": "kathryn.ramirez@email.com",
+            "id": 4,
+            "lastLoginFromIp": "192.168.1.2",
+            "lastLoginFromSubnet": "192.168.0.0/16",
+            "name": "Kathryn Ramirez",
+            "userMac": "dd:ee:ff:00:11:22",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs1XV0=",
+          "node": Object {
+            "config": Object {
+              "_\\"_$@£$)(@*£$": "_\\"_$@£$)(@*£$",
+              "a": "5",
+              "actually_null": null,
+              "b": "6",
+              "null_string": "null",
+            },
+            "email": "joe.tucker@email.com",
+            "id": 5,
+            "lastLoginFromIp": "192.168.0.2",
+            "lastLoginFromSubnet": "192.168.0.0/23",
+            "name": "Joe Tucker",
+            "userMac": "33:44:55:66:77:88",
+          },
+        },
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+          "node": Object {
+            "config": Object {
+              "null_1": null,
+              "null_2": null,
+            },
+            "email": "graphile-build.issue.27.exists@example.com",
+            "id": 6,
+            "lastLoginFromIp": "10.1.2.254",
+            "lastLoginFromSubnet": "10.0.0.0/9",
+            "name": "Twenty Seventwo",
+            "userMac": "99:aa:bb:cc:dd:ee",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFs2XV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      },
+      "totalCount": 5,
+    },
+    "t": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJhdXRob3JfaWRfZGVzYyIsImhlYWRsaW5lX2Rlc2MiLFs1LCJQbGVhc2UsIERvbi1Cb3TigKYgbG9vayBpbnRvIHlvdXIgaGFyZCBkcml2ZSwgYW5kIG9wZW4geW91ciBtZXJjeSBmaWxlISIsNV1d",
+          "node": Object {
+            "authorId": 5,
+            "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+          },
+        },
+        Object {
+          "cursor": "WyJhdXRob3JfaWRfZGVzYyIsImhlYWRsaW5lX2Rlc2MiLFszLCJZb3Uga25vdyBob3cgSSBzb21ldGltZXMgaGF2ZSByZWFsbHkgYnJpbGxpYW50IGlkZWFzPyIsOV1d",
+          "node": Object {
+            "authorId": 3,
+            "headline": "You know how I sometimes have really brilliant ideas?",
+          },
+        },
+        Object {
+          "cursor": "WyJhdXRob3JfaWRfZGVzYyIsImhlYWRsaW5lX2Rlc2MiLFszLCJUaGV54oCZcmUgbm90IGFsaWVucywgdGhleeKAmXJlIEVhcnRo4oCmbGllbnMhIiwxMV1d",
+          "node": Object {
+            "authorId": 3,
+            "headline": "They’re not aliens, they’re Earth…liens!",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJhdXRob3JfaWRfZGVzYyIsImhlYWRsaW5lX2Rlc2MiLFszLCJUaGV54oCZcmUgbm90IGFsaWVucywgdGhleeKAmXJlIEVhcnRo4oCmbGllbnMhIiwxMV1d",
+        "hasNextPage": true,
+        "hasPreviousPage": false,
+        "startCursor": "WyJhdXRob3JfaWRfZGVzYyIsImhlYWRsaW5lX2Rlc2MiLFs1LCJQbGVhc2UsIERvbi1Cb3TigKYgbG9vayBpbnRvIHlvdXIgaGFyZCBkcml2ZSwgYW5kIG9wZW4geW91ciBtZXJjeSBmaWxlISIsNV1d",
+      },
+      "totalCount": 11,
+    },
+    "u": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "config": Object {},
+            "email": "john.smith@email.com",
+            "id": 1,
+            "lastLoginFromIp": "192.168.0.1",
+            "lastLoginFromSubnet": "192.168.0.0/24",
+            "name": "John Smith",
+            "userMac": "00:00:00:00:00:00",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      },
+      "totalCount": 1,
+    },
+    "v": Object {
+      "e1": Array [
+        Object {
+          "n1": Object {
+            "id": 1,
+            "personByAuthorId": Object {
+              "name": "Sara Smith",
+            },
+          },
+          "n2": Object {
+            "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+            "personByAuthorId": Object {
+              "id": 2,
+            },
+          },
+        },
+        Object {
+          "n1": Object {
+            "id": 2,
+            "personByAuthorId": Object {
+              "name": "John Smith",
+            },
+          },
+          "n2": Object {
+            "headline": "I hate yogurt. It’s just stuff with bits in.",
+            "personByAuthorId": Object {
+              "id": 1,
+            },
+          },
+        },
+      ],
+      "e2": Array [
+        Object {
+          "node": Object {
+            "nodeId": "WyJwb3N0cyIsMV0=",
+          },
+        },
+        Object {
+          "node": Object {
+            "nodeId": "WyJwb3N0cyIsMl0=",
+          },
+        },
+      ],
+    },
+    "w": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "config": Object {},
+            "email": "john.smith@email.com",
+            "id": 1,
+            "lastLoginFromIp": "192.168.0.1",
+            "lastLoginFromSubnet": "192.168.0.0/24",
+            "name": "John Smith",
+            "userMac": "00:00:00:00:00:00",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      },
+      "totalCount": 1,
+    },
+    "x": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+          "node": Object {
+            "config": Object {},
+            "email": "john.smith@email.com",
+            "id": 1,
+            "lastLoginFromIp": "192.168.0.1",
+            "lastLoginFromSubnet": "192.168.0.0/24",
+            "name": "John Smith",
+            "userMac": "00:00:00:00:00:00",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJwcmltYXJ5X2tleV9hc2MiLFsxXV0=",
+      },
+      "totalCount": 1,
+    },
+  },
+}
+`;

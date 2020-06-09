@@ -1,0 +1,191 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "mutationInInout": Object {
+      "ino": 15,
+    },
+    "mutationInOut": Object {
+      "o": 52,
+    },
+    "mutationOut": Object {
+      "o": 42,
+    },
+    "mutationOutComplex": Object {
+      "result": Object {
+        "x": 2,
+        "y": Object {
+          "a": 1,
+          "b": "2",
+          "c": "BLUE",
+        },
+        "z": Object {
+          "id": 1,
+          "name": "John Smith",
+          "nodeId": "WyJwZW9wbGUiLDFd",
+          "postsByAuthorId": Object {
+            "nodes": Array [
+              Object {
+                "id": 2,
+                "nodeId": "WyJwb3N0cyIsMl0=",
+              },
+              Object {
+                "id": 3,
+                "nodeId": "WyJwb3N0cyIsM10=",
+              },
+              Object {
+                "id": 4,
+                "nodeId": "WyJwb3N0cyIsNF0=",
+              },
+              Object {
+                "id": 7,
+                "nodeId": "WyJwb3N0cyIsN10=",
+              },
+            ],
+          },
+        },
+      },
+    },
+    "mutationOutComplexSetof": Object {
+      "results": Array [
+        Object {
+          "x": 2,
+          "y": Object {
+            "a": 1,
+            "b": "2",
+            "c": "BLUE",
+          },
+          "z": Object {
+            "id": 1,
+            "name": "John Smith",
+            "nodeId": "WyJwZW9wbGUiLDFd",
+            "postsByAuthorId": Object {
+              "nodes": Array [
+                Object {
+                  "id": 2,
+                  "nodeId": "WyJwb3N0cyIsMl0=",
+                },
+                Object {
+                  "id": 3,
+                  "nodeId": "WyJwb3N0cyIsM10=",
+                },
+                Object {
+                  "id": 4,
+                  "nodeId": "WyJwb3N0cyIsNF0=",
+                },
+                Object {
+                  "id": 7,
+                  "nodeId": "WyJwb3N0cyIsN10=",
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+    "mutationOutOut": Object {
+      "result": Object {
+        "firstOut": 42,
+        "secondOut": "out",
+      },
+    },
+    "mutationOutOutCompoundType": Object {
+      "result": Object {
+        "o1": 20,
+        "o2": Object {
+          "a": 1,
+          "b": "2",
+          "c": "BLUE",
+        },
+      },
+    },
+    "mutationOutOutSetof": Object {
+      "results": Array [
+        Object {
+          "o1": 42,
+          "o2": "out",
+        },
+        Object {
+          "o1": 43,
+          "o2": "out2",
+        },
+      ],
+    },
+    "mutationOutOutUnnamed": Object {
+      "result": Object {
+        "arg1": 42,
+        "arg2": "out",
+      },
+    },
+    "mutationOutSetof": Object {
+      "os": Array [
+        42,
+        43,
+      ],
+    },
+    "mutationOutTable": Object {
+      "person": Object {
+        "id": 1,
+        "nodeId": "WyJwZW9wbGUiLDFd",
+      },
+    },
+    "mutationOutTableSetof": Object {
+      "people": Array [
+        Object {
+          "id": 1,
+          "nodeId": "WyJwZW9wbGUiLDFd",
+        },
+        Object {
+          "id": 2,
+          "nodeId": "WyJwZW9wbGUiLDJd",
+        },
+        Object {
+          "id": 3,
+          "nodeId": "WyJwZW9wbGUiLDNd",
+        },
+        Object {
+          "id": 4,
+          "nodeId": "WyJwZW9wbGUiLDRd",
+        },
+        Object {
+          "id": 5,
+          "nodeId": "WyJwZW9wbGUiLDVd",
+        },
+        Object {
+          "id": 6,
+          "nodeId": "WyJwZW9wbGUiLDZd",
+        },
+      ],
+    },
+    "mutationOutUnnamed": Object {
+      "integer": 42,
+    },
+    "mutationOutUnnamedOutOutUnnamed": Object {
+      "result": Object {
+        "arg1": 42,
+        "arg3": 3,
+        "o2": "out2",
+      },
+    },
+    "mutationReturnsTableMultiCol": Object {
+      "results": Array [
+        Object {
+          "col1": 62,
+          "col2": "out",
+        },
+        Object {
+          "col1": 63,
+          "col2": "out2",
+        },
+      ],
+    },
+    "mutationReturnsTableOneCol": Object {
+      "col1S": Array [
+        62,
+        63,
+      ],
+    },
+  },
+}
+`;

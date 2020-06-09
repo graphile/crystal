@@ -1,0 +1,702 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "add1Query": 3,
+    "add2Query": 4,
+    "add3Query": null,
+    "add4Query": 4,
+    "compoundTypeArrayQuery": Array [
+      Object {
+        "a": 419,
+        "b": "easy cheesy baked potatoes",
+        "c": "RED",
+        "d": null,
+        "e": "BAR_FOO",
+        "f": "_EMPTY_",
+        "fooBar": 8,
+        "g": Object {
+          "hours": 2,
+          "minutes": 3,
+          "seconds": 12,
+        },
+      },
+      Object {
+        "a": null,
+        "b": null,
+        "c": null,
+        "d": null,
+        "e": null,
+        "f": null,
+        "fooBar": null,
+        "g": null,
+      },
+      Object {
+        "a": 420,
+        "b": "easy cheesy baked potatoes",
+        "c": "RED",
+        "d": null,
+        "e": "BAR_FOO",
+        "f": "_EMPTY_",
+        "fooBar": 8,
+        "g": Object {
+          "hours": 2,
+          "minutes": 3,
+          "seconds": 12,
+        },
+      },
+    ],
+    "compoundTypeQuery": Object {
+      "a": 420,
+      "b": "easy cheesy baked potatoes",
+      "c": "RED",
+      "d": null,
+      "e": "BAR_FOO",
+      "f": "_EMPTY_",
+      "fooBar": 8,
+      "g": Object {
+        "hours": 2,
+        "minutes": 3,
+        "seconds": 12,
+      },
+    },
+    "compoundTypeSetQuery": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwxXQ==",
+          "node": Object {
+            "a": 1,
+            "b": "2",
+            "c": "BLUE",
+            "d": null,
+            "e": "_0_BAR",
+            "f": "_EMPTY_",
+            "fooBar": 7,
+            "g": Object {
+              "hours": null,
+              "minutes": null,
+              "seconds": 18,
+            },
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJuYXR1cmFsIiwxXQ==",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+      },
+    },
+    "empty": false,
+    "intSetQuery": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwxXQ==",
+          "node": 1,
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwyXQ==",
+          "node": 2,
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwzXQ==",
+          "node": 3,
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw0XQ==",
+          "node": 4,
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw1XQ==",
+          "node": 5,
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw2XQ==",
+          "node": null,
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw3XQ==",
+          "node": 6,
+        },
+      ],
+      "totalCount": 7,
+    },
+    "jsonIdentity": "{\\"a\\":1,\\"b\\":2,\\"c\\":3}",
+    "jsonIdentityIssue85": "[{\\"amount\\":\\"44\\"},{\\"amount\\":null}]",
+    "jsonbIdentity": "{\\"a\\":1,\\"b\\":2,\\"c\\":3}",
+    "jsonbIdentityIssue85": "[{\\"amount\\":\\"44\\"},{\\"amount\\":null}]",
+    "noArgsQuery": 2,
+    "optionalMissingMiddle1": 10,
+    "optionalMissingMiddle1_2": 16,
+    "optionalMissingMiddle2": 10,
+    "optionalMissingMiddle3": 10,
+    "optionalMissingMiddle4": null,
+    "optionalMissingMiddle5": null,
+    "queryCompoundTypeArray": Array [
+      Object {
+        "a": 419,
+        "b": "easy cheesy baked potatoes",
+        "c": "RED",
+        "d": null,
+        "e": "BAR_FOO",
+        "f": "_EMPTY_",
+        "fooBar": 8,
+        "g": Object {
+          "hours": 5,
+          "minutes": null,
+          "seconds": null,
+        },
+      },
+      Object {
+        "a": null,
+        "b": null,
+        "c": null,
+        "d": null,
+        "e": null,
+        "f": null,
+        "fooBar": null,
+        "g": null,
+      },
+      Object {
+        "a": 420,
+        "b": "easy cheesy baked potatoes",
+        "c": "RED",
+        "d": null,
+        "e": "BAR_FOO",
+        "f": "_EMPTY_",
+        "fooBar": 8,
+        "g": Object {
+          "hours": 5,
+          "minutes": null,
+          "seconds": null,
+        },
+      },
+    ],
+    "queryIntervalArray": Array [
+      Object {
+        "days": null,
+        "hours": null,
+        "minutes": null,
+        "months": null,
+        "seconds": 12,
+        "years": null,
+      },
+      Object {
+        "days": null,
+        "hours": 3,
+        "minutes": null,
+        "months": null,
+        "seconds": null,
+        "years": null,
+      },
+      Object {
+        "days": null,
+        "hours": 9,
+        "minutes": 36,
+        "months": null,
+        "seconds": 7,
+        "years": null,
+      },
+    ],
+    "queryIntervalSet": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwxXQ==",
+          "node": Object {
+            "hours": null,
+            "minutes": null,
+            "seconds": 12,
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwyXQ==",
+          "node": Object {
+            "hours": 3,
+            "minutes": null,
+            "seconds": null,
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwzXQ==",
+          "node": Object {
+            "hours": 9,
+            "minutes": 36,
+            "seconds": 7,
+          },
+        },
+      ],
+      "nodes": Array [
+        Object {
+          "days": null,
+          "hours": null,
+          "minutes": null,
+          "months": null,
+          "seconds": 12,
+          "years": null,
+        },
+        Object {
+          "days": null,
+          "hours": 3,
+          "minutes": null,
+          "months": null,
+          "seconds": null,
+          "years": null,
+        },
+        Object {
+          "days": null,
+          "hours": 9,
+          "minutes": 36,
+          "months": null,
+          "seconds": 7,
+          "years": null,
+        },
+      ],
+      "totalCount": 3,
+    },
+    "queryTextArray": Array [
+      "str1",
+      "str2",
+      "str3",
+    ],
+    "staticBigInteger": Object {
+      "edges": Array [
+        Object {
+          "node": "30894622507013190",
+        },
+        Object {
+          "node": "30894622507013191",
+        },
+        Object {
+          "node": "30894622507013192",
+        },
+        Object {
+          "node": "30894622507013193",
+        },
+        Object {
+          "node": "30894622507013194",
+        },
+        Object {
+          "node": "30894622507013195",
+        },
+        Object {
+          "node": "30894622507013196",
+        },
+        Object {
+          "node": "30894622507013197",
+        },
+        Object {
+          "node": "30894622507013198",
+        },
+        Object {
+          "node": "30894622507013199",
+        },
+        Object {
+          "node": "30894622507013200",
+        },
+      ],
+      "totalCount": 11,
+    },
+    "tableQuery": Object {
+      "authorId": 5,
+      "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+      "id": 5,
+      "nodeId": "WyJwb3N0cyIsNV0=",
+    },
+    "tableSetQuery": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwxXQ==",
+          "node": Object {
+            "name": "John Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwyXQ==",
+          "node": Object {
+            "name": "Sara Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwzXQ==",
+          "node": Object {
+            "name": "Budd Deey",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw0XQ==",
+          "node": Object {
+            "name": "Kathryn Ramirez",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw1XQ==",
+          "node": Object {
+            "name": "Joe Tucker",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw2XQ==",
+          "node": Object {
+            "name": "Twenty Seventwo",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJuYXR1cmFsIiw2XQ==",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+      },
+    },
+    "tableSetQueryPlpgsql": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwxXQ==",
+          "node": Object {
+            "name": "John Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwyXQ==",
+          "node": Object {
+            "name": "Sara Smith",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJuYXR1cmFsIiwyXQ==",
+        "hasNextPage": true,
+        "hasPreviousPage": false,
+        "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+      },
+    },
+    "tableSetQueryPlpgsqlOffset2": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwzXQ==",
+          "node": Object {
+            "name": "Budd Deey",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw0XQ==",
+          "node": Object {
+            "name": "Kathryn Ramirez",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJuYXR1cmFsIiw0XQ==",
+        "hasNextPage": true,
+        "hasPreviousPage": true,
+        "startCursor": "WyJuYXR1cmFsIiwzXQ==",
+      },
+    },
+    "tableSetQueryWithOffset": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw0XQ==",
+          "node": Object {
+            "name": "Kathryn Ramirez",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJuYXR1cmFsIiw0XQ==",
+        "hasNextPage": true,
+        "hasPreviousPage": true,
+        "startCursor": "WyJuYXR1cmFsIiw0XQ==",
+      },
+    },
+    "tableSetQueryWithOffset10": Object {
+      "edges": Array [],
+      "pageInfo": Object {
+        "endCursor": null,
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": null,
+      },
+    },
+    "tableSetQueryWithOffset11": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwzXQ==",
+          "node": Object {
+            "name": "Budd Deey",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw0XQ==",
+          "node": Object {
+            "name": "Kathryn Ramirez",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJuYXR1cmFsIiw0XQ==",
+        "hasNextPage": true,
+        "hasPreviousPage": true,
+        "startCursor": "WyJuYXR1cmFsIiwzXQ==",
+      },
+    },
+    "tableSetQueryWithOffset2": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw0XQ==",
+          "node": Object {
+            "name": "Kathryn Ramirez",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJuYXR1cmFsIiw0XQ==",
+        "hasNextPage": true,
+        "hasPreviousPage": true,
+        "startCursor": "WyJuYXR1cmFsIiw0XQ==",
+      },
+    },
+    "tableSetQueryWithOffset3": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwzXQ==",
+          "node": Object {
+            "name": "Budd Deey",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw0XQ==",
+          "node": Object {
+            "name": "Kathryn Ramirez",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJuYXR1cmFsIiw0XQ==",
+        "hasNextPage": true,
+        "hasPreviousPage": true,
+        "startCursor": "WyJuYXR1cmFsIiwzXQ==",
+      },
+    },
+    "tableSetQueryWithOffset4": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwxXQ==",
+          "node": Object {
+            "name": "John Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwyXQ==",
+          "node": Object {
+            "name": "Sara Smith",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJuYXR1cmFsIiwyXQ==",
+        "hasNextPage": true,
+        "hasPreviousPage": false,
+        "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+      },
+    },
+    "tableSetQueryWithOffset5": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw0XQ==",
+          "node": Object {
+            "name": "Kathryn Ramirez",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw1XQ==",
+          "node": Object {
+            "name": "Joe Tucker",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJuYXR1cmFsIiw1XQ==",
+        "hasNextPage": true,
+        "hasPreviousPage": true,
+        "startCursor": "WyJuYXR1cmFsIiw0XQ==",
+      },
+    },
+    "tableSetQueryWithOffset6": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwzXQ==",
+          "node": Object {
+            "name": "Budd Deey",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw0XQ==",
+          "node": Object {
+            "name": "Kathryn Ramirez",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJuYXR1cmFsIiw0XQ==",
+        "hasNextPage": true,
+        "hasPreviousPage": true,
+        "startCursor": "WyJuYXR1cmFsIiwzXQ==",
+      },
+    },
+    "tableSetQueryWithOffset7": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw1XQ==",
+          "node": Object {
+            "name": "Joe Tucker",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw2XQ==",
+          "node": Object {
+            "name": "Twenty Seventwo",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJuYXR1cmFsIiw2XQ==",
+        "hasNextPage": false,
+        "hasPreviousPage": true,
+        "startCursor": "WyJuYXR1cmFsIiw1XQ==",
+      },
+    },
+    "tableSetQueryWithOffset8": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwxXQ==",
+          "node": Object {
+            "name": "John Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwyXQ==",
+          "node": Object {
+            "name": "Sara Smith",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJuYXR1cmFsIiwyXQ==",
+        "hasNextPage": true,
+        "hasPreviousPage": false,
+        "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+      },
+    },
+    "tableSetQueryWithOffset9": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwxXQ==",
+          "node": Object {
+            "name": "John Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwyXQ==",
+          "node": Object {
+            "name": "Sara Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwzXQ==",
+          "node": Object {
+            "name": "Budd Deey",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw0XQ==",
+          "node": Object {
+            "name": "Kathryn Ramirez",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw1XQ==",
+          "node": Object {
+            "name": "Joe Tucker",
+          },
+        },
+        Object {
+          "cursor": "WyJuYXR1cmFsIiw2XQ==",
+          "node": Object {
+            "name": "Twenty Seventwo",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJuYXR1cmFsIiw2XQ==",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+      },
+    },
+    "tableSetQuery_condition": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYXR1cmFsIiwxXQ==",
+          "node": Object {
+            "name": "Budd Deey",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJuYXR1cmFsIiwxXQ==",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJuYXR1cmFsIiwxXQ==",
+      },
+    },
+    "tableSetQuery_sorted": Object {
+      "edges": Array [
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsM10=",
+          "node": Object {
+            "name": "Budd Deey",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsNV0=",
+          "node": Object {
+            "name": "Joe Tucker",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsMV0=",
+          "node": Object {
+            "name": "John Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsNF0=",
+          "node": Object {
+            "name": "Kathryn Ramirez",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsMl0=",
+          "node": Object {
+            "name": "Sara Smith",
+          },
+        },
+        Object {
+          "cursor": "WyJuYW1lX2FzYyIsNl0=",
+          "node": Object {
+            "name": "Twenty Seventwo",
+          },
+        },
+      ],
+      "pageInfo": Object {
+        "endCursor": "WyJuYW1lX2FzYyIsNl0=",
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "WyJuYW1lX2FzYyIsM10=",
+      },
+    },
+    "typesQuery": false,
+  },
+}
+`;

@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "person": Object {
+      "aVeryLongAliasInOrderToTestThatThingsGoThroughPostgresJustFineAndWeDontGetAnyIssuesDueToAliasLength": Object {
+        "totalCount": 2,
+      },
+      "anotherLongAliasInOrderToTestThatThingsGoThroughPostgresJustFineAndWeDontGetAnyIssuesDueToAliasLength": Object {
+        "totalCount": 2,
+      },
+      "email": "sara.smith@email.com",
+      "nodeId": "WyJwZW9wbGUiLDJd",
+    },
+  },
+}
+`;

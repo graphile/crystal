@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "leftArmIdentity": Object {
+      "leftArm": Object {
+        "id": 9001,
+        "lengthInMetres": 77,
+        "mood": "jubilant",
+        "nodeId": "WyJsZWZ0X2FybXMiLDkwMDFd",
+        "personId": 99,
+      },
+    },
+  },
+}
+`;

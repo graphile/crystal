@@ -1,0 +1,177 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`execute 1`] = `
+Object {
+  "data": Object {
+    "allCompoundKeysList": Array [
+      Object {
+        "personId1": 1,
+        "personId2": 2,
+      },
+      Object {
+        "personId1": 2,
+        "personId2": 1,
+      },
+      Object {
+        "personId1": 2,
+        "personId2": 3,
+      },
+      Object {
+        "personId1": 2,
+        "personId2": 5,
+      },
+      Object {
+        "personId1": 4,
+        "personId2": 3,
+      },
+      Object {
+        "personId1": 4,
+        "personId2": 4,
+      },
+    ],
+    "allPeopleList": Array [
+      Object {
+        "compoundKeysByPersonId1List": Array [
+          Object {
+            "personId1": 1,
+            "personId2": 2,
+          },
+        ],
+        "compoundKeysByPersonId2List": Array [
+          Object {
+            "personId1": 2,
+            "personId2": 1,
+          },
+        ],
+        "id": 1,
+        "name": "John Smith",
+        "postsByAuthorIdList": Array [
+          Object {
+            "authorId": 1,
+            "headline": "I hate yogurt. It’s just stuff with bits in.",
+          },
+          Object {
+            "authorId": 1,
+            "headline": "Is that a cooking show?",
+          },
+        ],
+        "roundOnePost": Array [
+          Object {
+            "authorId": 1,
+            "headline": "Large bet on myself in round one.",
+          },
+        ],
+      },
+      Object {
+        "compoundKeysByPersonId1List": Array [
+          Object {
+            "personId1": 2,
+            "personId2": 1,
+          },
+          Object {
+            "personId1": 2,
+            "personId2": 3,
+          },
+          Object {
+            "personId1": 2,
+            "personId2": 5,
+          },
+        ],
+        "compoundKeysByPersonId2List": Array [
+          Object {
+            "personId1": 1,
+            "personId2": 2,
+          },
+        ],
+        "id": 2,
+        "name": "Sara Smith",
+        "postsByAuthorIdList": Array [
+          Object {
+            "authorId": 2,
+            "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+          },
+          Object {
+            "authorId": 2,
+            "headline": "It’s a fez. I wear a fez now. Fezes are cool.",
+          },
+        ],
+        "roundOnePost": Array [],
+      },
+      Object {
+        "compoundKeysByPersonId1List": Array [],
+        "compoundKeysByPersonId2List": Array [
+          Object {
+            "personId1": 2,
+            "personId2": 3,
+          },
+          Object {
+            "personId1": 4,
+            "personId2": 3,
+          },
+        ],
+        "id": 3,
+        "name": "Budd Deey",
+        "postsByAuthorIdList": Array [
+          Object {
+            "authorId": 3,
+            "headline": "Stop talking, brain thinking. Hush.",
+          },
+          Object {
+            "authorId": 3,
+            "headline": "You know how I sometimes have really brilliant ideas?",
+          },
+        ],
+        "roundOnePost": Array [],
+      },
+      Object {
+        "compoundKeysByPersonId1List": Array [
+          Object {
+            "personId1": 4,
+            "personId2": 3,
+          },
+          Object {
+            "personId1": 4,
+            "personId2": 4,
+          },
+        ],
+        "compoundKeysByPersonId2List": Array [
+          Object {
+            "personId1": 4,
+            "personId2": 4,
+          },
+        ],
+        "id": 4,
+        "name": "Kathryn Ramirez",
+        "postsByAuthorIdList": Array [],
+        "roundOnePost": Array [],
+      },
+      Object {
+        "compoundKeysByPersonId1List": Array [],
+        "compoundKeysByPersonId2List": Array [
+          Object {
+            "personId1": 2,
+            "personId2": 5,
+          },
+        ],
+        "id": 5,
+        "name": "Joe Tucker",
+        "postsByAuthorIdList": Array [
+          Object {
+            "authorId": 5,
+            "headline": "Please, Don-Bot… look into your hard drive, and open your mercy file!",
+          },
+        ],
+        "roundOnePost": Array [],
+      },
+      Object {
+        "compoundKeysByPersonId1List": Array [],
+        "compoundKeysByPersonId2List": Array [],
+        "id": 6,
+        "name": "Twenty Seventwo",
+        "postsByAuthorIdList": Array [],
+        "roundOnePost": Array [],
+      },
+    ],
+  },
+}
+`;

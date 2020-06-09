@@ -1,0 +1,17 @@
+#> schemas: ["d"]
+
+{
+  allPeople(orderBy: COL_NO_CREATE_UPDATE_DESC) {
+    nodes {
+      id
+      firstName
+      lastName
+      colNoCreate
+      colNoUpdate
+      colNoOrder
+      colNoFilter
+      colNoCreateUpdate
+      colNoCreateUpdateOrderFilter
+    }
+  }
+}
