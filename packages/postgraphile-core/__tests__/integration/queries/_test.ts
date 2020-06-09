@@ -98,11 +98,26 @@ export const testGraphQL = (query: string, path: string) => {
       ...config.options,
     };
 
+    let spy: jest.SpyInstance | null = null;
+    if (rbac) {
+      await pgClient.query("set role postgraphile_test_authenticator");
+      spy = jest.spyOn(console, "warn").mockImplementation(() => {});
+    }
+
     const schema = await createPostGraphileSchema(
       pgClient,
       schemas,
       postgraphileOptions,
     );
+
+    if (rbac) {
+      await pgClient.query("reset role");
+      if (spy) {
+        // Expect rbac schema to output Recoverable error about post_with_suffix
+        expect(spy.mock.calls).toHaveLength(1);
+        spy.mockRestore();
+      }
+    }
 
     await pgClient.query("savepoint test");
     if (rbac) {
