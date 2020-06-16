@@ -5,9 +5,31 @@ import {
   GraphQLNonNull,
   GraphQLList,
   isScalarType,
-  getNamedType,
+  GraphQLFieldConfig,
+  GraphQLObjectType,
+  GraphQLSchema,
+  GraphQLScalarType,
+  GraphQLInterfaceType,
+  GraphQLUnionType,
+  GraphQLEnumType,
+  GraphQLInputObjectType,
 } from "graphql";
 import { assert } from "console";
+
+type ParentPlan = any;
+type Plan = any;
+
+declare global {
+  namespace GraphileEngine {
+    interface GraphQLObjectTypeGraphileExtension {
+      parentPlan?: ParentPlan;
+      plan?: Plan;
+    }
+  }
+}
+
+export const makeGraphileObjectExtension = () => ({});
+export const makeGraphileObjectFieldExtension = () => ({});
 
 const $$plan = Symbol("plan");
 const $$data = Symbol("data");
@@ -90,24 +112,29 @@ export function makeGraphileWrapResolver() {
       "Expected type to be a named type after unwrapping all GraphQLNonNull and GraphQLList elements, but received unnamed type.",
     );
 
-    // Short-circuit scalars
-    if (isScalarType(unwrappedType)) {
-      return identityWrapper;
-    }
-
     let newWrapper: any;
-    switch (listDepth) {
-      case 0:
-        newWrapper = graphileWrap;
-        break;
-      case 1:
-        newWrapper = graphileWrap1;
-        break;
-      case 2:
-        newWrapper = graphileWrap2;
-        break;
-      default:
-        newWrapper = graphileWrapN(listDepth);
+
+    if (isScalarType(unwrappedType)) {
+      // We never wrap resolver results of scalars
+      newWrapper = identityWrapper;
+    } else if (!unwrappedType?.extensions?.graphile) {
+      // Non-graphile types don't have our `resolver`-wrapper, so don't wrap
+      // the data being fed to them otherwise we risk them getting confused.
+      newWrapper = identityWrapper;
+    } else {
+      switch (listDepth) {
+        case 0:
+          newWrapper = graphileWrap;
+          break;
+        case 1:
+          newWrapper = graphileWrap1;
+          break;
+        case 2:
+          newWrapper = graphileWrap2;
+          break;
+        default:
+          newWrapper = graphileWrapN(listDepth);
+      }
     }
     typeToWrapperMap.set(type, newWrapper);
     return newWrapper;
@@ -118,10 +145,13 @@ export function makeGraphileWrapResolver() {
     TContext,
     TArgs = { [argName: string]: any }
   >(
-    type: GraphQLOutputType,
-    resolver: GraphQLFieldResolver<TSource, TContext, TArgs> | undefined,
-  ): GraphQLFieldResolver<TSource, TContext, TArgs> {
-    let realResolver = resolver || defaultFieldResolver;
+    config: GraphQLFieldConfig<TSource, TContext, TArgs>,
+  ): GraphQLFieldConfig<TSource, TContext, TArgs> {
+    const { resolve, type, extensions } = config;
+    const graphile: GraphileEngine.GraphQLObjectTypeGraphileExtension =
+      extensions?.graphile || {};
+    const { plan } = graphile;
+    let realResolver = resolve || defaultFieldResolver;
 
     const wrap = makeWrapper(type);
     const graphileResolver: GraphQLFieldResolver<
@@ -143,6 +173,9 @@ export function makeGraphileWrapResolver() {
         return wrap(plan, result);
       }
     };
-    return graphileResolver;
+    return {
+      ...config,
+      resolve: graphileResolver,
+    };
   };
 }

@@ -2,7 +2,11 @@ import * as graphql from "graphql";
 import debugFactory from "debug";
 import { ResolveTree } from "graphql-parse-resolve-info";
 import SchemaBuilder from "../SchemaBuilder";
-import { makeGraphileWrapResolver } from "./graphileWrapResolver";
+import {
+  makeGraphileWrapResolver,
+  makeGraphileObjectExtension,
+  makeGraphileObjectFieldExtension,
+} from "./graphileWrapResolver";
 
 let recurseDataGeneratorsForFieldWarned = false;
 
@@ -327,10 +331,13 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
         scope,
       };
 
-      const objectSpec: GraphileEngine.GraphileObjectTypeConfig<
-        any,
-        any
-      > = newSpec;
+      const objectSpec: GraphileEngine.GraphileObjectTypeConfig<any, any> = {
+        ...newSpec,
+        extensions: {
+          ...newSpec.extensions,
+          graphile: makeGraphileObjectExtension(),
+        },
+      };
       const objectContext: GraphileEngine.ContextGraphQLObjectType = {
         ...commonContext,
         addDataGeneratorForField,
@@ -495,6 +502,13 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
             if (typeof newSpec === "function") {
               newSpec = newSpec(context);
             }
+            newSpec = {
+              ...newSpec,
+              extensions: {
+                ...newSpec.extensions,
+                graphile: makeGraphileObjectFieldExtension(),
+              },
+            };
             newSpec = builder.applyHooks(
               this,
               "GraphQLObjectType:fields:field",
@@ -570,10 +584,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
 
           // Perform the Graphile magic
           for (const fieldName in fieldsSpec) {
-            fieldsSpec[fieldName].resolve = graphileWrapResolver(
-              fieldsSpec[fieldName].type,
-              fieldsSpec[fieldName].resolve,
-            );
+            fieldsSpec[fieldName] = graphileWrapResolver(fieldsSpec[fieldName]);
           }
 
           return fieldsSpec;
