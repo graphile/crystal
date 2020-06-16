@@ -2,6 +2,7 @@ import * as graphql from "graphql";
 import debugFactory from "debug";
 import { ResolveTree } from "graphql-parse-resolve-info";
 import SchemaBuilder from "../SchemaBuilder";
+import { makeGraphileWrapResolver } from "./graphileWrapResolver";
 
 let recurseDataGeneratorsForFieldWarned = false;
 
@@ -147,6 +148,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
     graphql.GraphQLNamedType,
     { [fieldName: string]: GraphileEngine.ArgDataGeneratorFunction[] }
   >();
+
+  const graphileWrapResolver = makeGraphileWrapResolver();
   const newWithHooks: any = function newWithHooks<
     T extends
       | graphql.GraphQLSchema
@@ -564,6 +567,15 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
               );
             }
           }
+
+          // Perform the Graphile magic
+          for (const fieldName in fieldsSpec) {
+            fieldsSpec[fieldName].resolve = graphileWrapResolver(
+              fieldsSpec[fieldName].type,
+              fieldsSpec[fieldName].resolve,
+            );
+          }
+
           return fieldsSpec;
         },
       };
