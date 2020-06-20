@@ -126,6 +126,9 @@ export function getPostgraphileSchemaBuilder<
             ? 'Exiting because `retryOnInitFail` is not set.'
             : `We'll try again in ${delay}ms.`,
         );
+        if (options.handleSeriousError) {
+          return options.handleSeriousError(error);
+        }
         if (exitOnFail) {
           process.exit(34);
         }
