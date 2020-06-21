@@ -127,13 +127,13 @@ export function getPostgraphileSchemaBuilder<
             : `We'll try again in ${delay}ms.`,
         );
         if (options.handleSeriousError) {
-          return options.handleSeriousError(error);
-        }
-        if (exitOnFail) {
+          options.handleSeriousError(error);
+        } else if (exitOnFail) {
           process.exit(34);
+        } else if (options.retryOnInitFail) {
+          // Retry shortly
+          await sleep(delay);
         }
-        // Retry shortly
-        await sleep(delay);
       }
     }
   }
