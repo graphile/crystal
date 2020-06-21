@@ -136,7 +136,7 @@ export interface PostGraphileOptions<
   ) => Array<GraphQLErrorExtended>;
   // Enables ability to handle serious errors
   /* @middlewareOnly */
-  handleSeriousError?: (error: Error) => GraphQLSchema;
+  handleSeriousError?: (error: Error) => void;
   // An array of [Graphile Engine](/graphile-build/plugins/) schema plugins to load
   // after the default plugins.
   appendPlugins?: Array<Plugin>;
