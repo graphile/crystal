@@ -15,7 +15,7 @@ import {
   GraphQLInputObjectType,
 } from "graphql";
 import { assert } from "console";
-import { getDataForResolver } from "./crystal";
+import { executePlanFromResolver } from "./crystal";
 
 type ParentPlan = any;
 type Plan = any;
@@ -149,9 +149,6 @@ export function makeGraphileWrapResolver() {
     config: GraphQLFieldConfig<TSource, TContext, TArgs>,
   ): GraphQLFieldConfig<TSource, TContext, TArgs> {
     const { resolve, type, extensions } = config;
-    const graphile: GraphileEngine.GraphQLObjectTypeGraphileExtension =
-      extensions?.graphile || {};
-    const { plan } = graphile;
     let realResolver = resolve || defaultFieldResolver;
 
     const wrap = makeWrapper(type);
@@ -160,8 +157,7 @@ export function makeGraphileWrapResolver() {
       TContext,
       TArgs
     > = function (graphileParent: any, args, context, info) {
-      const data = getDataForResolver(
-        graphile,
+      const { data, plan } = executePlanFromResolver(
         graphileParent,
         args,
         context,
