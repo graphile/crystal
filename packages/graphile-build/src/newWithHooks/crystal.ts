@@ -229,15 +229,26 @@ class Aether {
     const pathIdentity = getPathIdentityFromResolveInfo(info, parent?.[$$path]);
     let batch = this.batches.get(pathIdentity);
     if (batch) {
-      return batch;
+      /*
+       * Since a batch runs for a single (optionally aliased) field in the
+       * operation, we know that the args for all entries within the batch will
+       * be the same. Note, however, that the selection set may differ.
+       */
+    } else {
+      // Make the batch
+      const graphile: GraphileEngine.GraphQLObjectTypeGraphileExtension =
+        info.parentType.extensions?.graphile || {};
+      const { plan } = graphile;
+
+      batch = new Batch(graphile);
+      this.batches.set(pathIdentity, batch);
+
+      // TODO: apply the args
     }
 
-    const graphile: GraphileEngine.GraphQLObjectTypeGraphileExtension =
-      extensions?.graphile || {};
-    const { plan } = graphile;
+    // TODO (somewhere else): selection set fields' dependencies
+    // TODO (somewhere else): selection set fields' args' dependencies (e.g. includeArchived: 'inherit')
 
-    batch = new Batch(graphile);
-    this.batches.set(pathIdentity, batch);
     return batch;
   }
 }
