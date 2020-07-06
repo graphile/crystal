@@ -181,11 +181,11 @@ class Aether {
 
     const rootType =
       document.operation === "query"
-        ? schema.getQueryType()?.name
+        ? schema.getQueryType()
         : document.operation === "mutation"
-        ? schema.getMutationType()?.name
+        ? schema.getMutationType()
         : document.operation === "subscription"
-        ? schema.getSubscriptionType()?.name
+        ? schema.getSubscriptionType()
         : null;
     if (!rootType) {
       throw new Error("Could not determine root type of GraphQL query.");
