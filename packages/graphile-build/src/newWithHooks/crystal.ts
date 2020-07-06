@@ -244,6 +244,16 @@ class Aether {
       this.batches.set(pathIdentity, batch);
 
       // TODO: apply the args
+      const field = info.parentType.getFields()[info.fieldName];
+      for (const arg of field.args) {
+        if (arg.name in args) {
+          const graphile: GraphileEngine.GraphQLObjectTypeGraphileExtension =
+            arg.extensions?.graphile;
+          if (graphile) {
+            graphile.argPlan();
+          }
+        }
+      }
     }
 
     // TODO (somewhere else): selection set fields' dependencies
