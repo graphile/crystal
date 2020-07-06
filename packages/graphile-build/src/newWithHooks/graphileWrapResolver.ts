@@ -15,6 +15,7 @@ import {
   GraphQLInputObjectType,
 } from "graphql";
 import { assert } from "console";
+import { getDataForResolver } from "./crystal";
 
 type ParentPlan = any;
 type Plan = any;
@@ -159,15 +160,20 @@ export function makeGraphileWrapResolver() {
       TContext,
       TArgs
     > = function (graphileParent: any, args, context, info) {
-      const plan = null;
+      const data = getDataForResolver(
+        graphile,
+        graphileParent,
+        args,
+        context,
+        info,
+      );
 
-      // graphileParent will be unset in root resolvers
-      const $data = graphileParent ? graphileParent[$$data] : null;
-
-      let result = realResolver($data, args, context, info);
+      const result =
+        data && typeof data.then === "function"
+          ? data.then((d: any) => realResolver(d, args, context, info))
+          : realResolver(data, args, context, info);
 
       if (result && typeof result.then === "function") {
-        // Promise
         return result.then((data: any) => wrap(plan, data));
       } else {
         return wrap(plan, result);
