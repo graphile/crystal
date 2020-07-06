@@ -166,7 +166,7 @@ export function makeGraphileWrapResolver() {
 
       let result = realResolver($data, args, context, info);
 
-      if (typeof result.then === "function") {
+      if (result && typeof result.then === "function") {
         // Promise
         return result.then((data: any) => wrap(plan, data));
       } else {
