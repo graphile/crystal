@@ -49,7 +49,7 @@
     "eslint-plugin-react-hooks": "^2.0.0",
     "eslint-plugin-tsdoc": "^0.2.4",
     "eslint_d": "^8.1.1",
-    "graphql": "^14.6.0",
+    "graphql": "^15.3.0",
     "jest": "^26.0.1",
     "mock-fs": "^4.12.0",
     "pg": "^8.2.1",

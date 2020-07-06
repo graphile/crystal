@@ -1660,7 +1660,7 @@ __metadata:
     debug: ^4.2.0
     graphile-build: 4.7.0
     graphile-build-pg: 4.7.0
-    graphql: ^14.6.0
+    graphql: ^15.3.0
     graphql-subscriptions: ^1.1.0
     jest: ^26.0.1
     mock-req: ^0.2.0
@@ -1688,7 +1688,7 @@ __metadata:
     "@types/ws": ^7.2.5
     graphile-build: 4.7.0
     graphile-build-pg: 4.7.0
-    graphql: ^14.6.0
+    graphql: ^15.3.0
     graphql-parse-resolve-info: 4.7.0
     jest: ^26.0.1
     pg: ^8.2.1
@@ -8715,7 +8715,7 @@ fsevents@^1.2.7:
     chalk: ^4.0.0
     debug: ^4.2.0
     graphile-build: 4.7.0
-    graphql: ^14.6.0
+    graphql: ^15.3.0
     graphql-iso-date: ^3.6.1
     graphql-parse-resolve-info: 4.7.0
     jest: ^26.0.1
@@ -8747,7 +8747,7 @@ fsevents@^1.2.7:
     "@types/semver": ^7.2.0
     chalk: ^4.0.0
     debug: ^4.2.0
-    graphql: ^14.6.0
+    graphql: ^15.3.0
     graphql-parse-resolve-info: 4.7.0
     iterall: ^1.3.0
     jest: ^26.0.1
@@ -8772,7 +8772,7 @@ fsevents@^1.2.7:
     debug: ^4.2.0
     graphile-build: 4.7.0
     graphile-build-pg: 4.7.0
-    graphql: ^14.6.0
+    graphql: ^15.3.0
     iterall: ^1.3.0
     jest: ^26.0.1
     pg: ^8.2.1
@@ -8937,7 +8937,7 @@ fsevents@^1.2.7:
     "@types/node": ^14.0.1
     debug: ^4.2.0
     eslint_d: ^8.1.1
-    graphql: ^14.6.0
+    graphql: ^15.3.0
     jest: ^26.0.1
     ts-node: ^8.10.1
     tslib: ^2.0.0
@@ -8967,12 +8967,19 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"graphql@npm:^14.0.0, graphql@npm:^14.6.0":
+"graphql@npm:^14.6.0":
   version: 14.6.0
   resolution: "graphql@npm:14.6.0"
   dependencies:
     iterall: ^1.2.2
   checksum: 3/24cab2758cea2ce592c59af28cac0fc80d2f2eac2f2441ce0152ce3c5a3a2416394aadf71b2d8db58f46c44ca3d20747eb168f58502f6eadafab0f11dea13791
+  languageName: node
+  linkType: hard
+
+"graphql@npm:^15.3.0":
+  version: 15.3.0
+  resolution: "graphql@npm:15.3.0"
+  checksum: 3/f01c05eb9102a88f33b4276b38399f066067d5be03c66c3bfec3e71e1793a91750e408f7abb001831bc2daf09746ab70ac0af16894d0ef1f1c1246fb0c2f4b0e
   languageName: node
   linkType: hard
 
@@ -11088,7 +11095,7 @@ fsevents@^1.2.7:
   resolution: "jest-serializer-graphql-schema@workspace:packages/jest-serializer-graphql-schema"
   dependencies:
     "@types/jest": ^25.2.3
-    graphql: ^14.6.0
+    graphql: ^15.3.0
     jest: ^26.0.1
     pretty-format: ^26.0.1
     ts-node: ^8.10.1
@@ -15005,7 +15012,7 @@ fsevents@^1.2.7:
     graphile-build: 4.7.0
     graphile-build-pg: 4.7.0
     graphile-utils: 4.7.0
-    graphql: ^14.6.0
+    graphql: ^15.3.0
     graphql-parse-resolve-info: 4.7.0
     jest: ^26.0.1
     json5: ^2.1.3
@@ -15072,7 +15079,7 @@ fsevents@^1.2.7:
     graphile-build: 4.7.0
     graphile-build-pg: 4.7.0
     graphile-utils: ^4.7.0
-    graphql: ^14.6.0
+    graphql: ^15.3.0
     graphql-parse-resolve-info: 4.7.0
     html-webpack-inline-source-plugin: ^1.0.0-beta.2
     html-webpack-plugin: ^4.3.0
@@ -15127,7 +15134,7 @@ fsevents@^1.2.7:
     eslint-plugin-react-hooks: ^2.0.0
     graphiql: ^0.17.5
     graphiql-explorer: ^0.6.2
-    graphql: ^14.0.0
+    graphql: ^14.6.0
     jest: ^26.0.1
     prop-types: ^15.7.2
     react: ^16.13.1
@@ -16483,7 +16490,7 @@ resolve@~1.12.0:
     eslint-plugin-react-hooks: ^2.0.0
     eslint-plugin-tsdoc: ^0.2.4
     eslint_d: ^8.1.1
-    graphql: ^14.6.0
+    graphql: ^15.3.0
     jest: ^26.0.1
     mock-fs: ^4.12.0
     pg: ^8.2.1

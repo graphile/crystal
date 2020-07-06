@@ -45,7 +45,7 @@
     "@types/pg": "^7.14.3",
     "graphile-build": "4.7.0",
     "graphile-build-pg": "4.7.0",
-    "graphql": "^14.6.0",
+    "graphql": "^15.3.0",
     "graphql-parse-resolve-info": "4.7.0",
     "jest": "^26.0.1",
     "pg": "^8.2.1",
