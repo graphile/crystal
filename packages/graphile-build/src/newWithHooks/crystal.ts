@@ -146,7 +146,9 @@ function populateInfo(
         }
         const fragmentType = schema.getType(selection.typeCondition.name.value);
         assert(
-          fragmentType,
+          isUnionType(fragmentType) ||
+            isInterfaceType(fragmentType) ||
+            isObjectType(fragmentType),
           "Couldn't find type associated with this fragment",
         );
         populateInfo(
@@ -156,6 +158,7 @@ function populateInfo(
           fragmentType,
           path,
         );
+        // TODO...
       }
     }
   }
