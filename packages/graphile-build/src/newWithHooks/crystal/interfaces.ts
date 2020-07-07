@@ -47,7 +47,7 @@ type FutureDependencies<TKeys extends string> = {
  * We're using TrackedObject<...> so we can later consider caching these
  * executions.
  */
-type PlanResolver<TPlan extends Plan, TDependencyKeys extends string> = (
+export type PlanResolver<TPlan extends Plan, TDependencyKeys extends string> = (
   $deps: FutureDependencies<TDependencyKeys>,
   args: TrackedObject<GraphQLArguments>,
   context: TrackedObject<GraphileEngine.GraphileResolverContext>,
@@ -61,7 +61,10 @@ type PlanResolver<TPlan extends Plan, TDependencyKeys extends string> = (
  * ordering, etc). It cannot use any property of the parent object that was not
  * requested via dependencies.
  */
-type ArgPlanResolver<TPlan extends Plan, TDependencyKeys extends string> = (
+export type ArgPlanResolver<
+  TPlan extends Plan,
+  TDependencyKeys extends string
+> = (
   plan: TPlan,
   arg: unknown,
   $deps: FutureDependencies<TDependencyKeys>,

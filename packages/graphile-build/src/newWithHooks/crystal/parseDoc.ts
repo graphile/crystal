@@ -9,93 +9,51 @@ import {
   isNonNullType,
   isObjectType,
   isInterfaceType,
-  SelectionNode,
-  DirectiveNode,
-  ValueNode,
   FieldNode,
   NamedTypeNode,
 } from "graphql";
-import { GraphQLVariables, PathIdentity } from "./interfaces";
+import {
+  GraphQLVariables,
+  PathIdentity,
+  PlanResolver,
+  ArgPlanResolver,
+} from "./interfaces";
 import { Doc } from "./doc";
+import { shouldSkip } from "./parseDocHelpers";
 
 /**
- * @remarks
- * Currently only supports boolean for `@include(if: ...)` / `@skip(if: ...)`
+ * This is the data associated with a particular field within a document.
  */
-function getValue(
-  value: ValueNode,
-  variables: TrackedObject<GraphQLVariables>,
-): boolean {
-  switch (value.kind) {
-    case "BooleanValue": {
-      return value.value;
-    }
-    case "Variable": {
-      return variables.get(value.name.value) as boolean;
-    }
-    default: {
-      throw new Error(
-        `Sorry, we don't current support getting value from '${value.kind}'`,
-      );
-    }
-  }
+interface FieldDigest {
+  fieldName: string;
+  alias: string;
+  plan?: PlanResolver<any, any>;
+  args: {
+    [key: string]: {
+      dependencies: string[];
+      argPlan?: ArgPlanResolver<any, any>;
+    };
+  };
+  fields: {
+    [alias: string]: FieldDigest;
+  };
 }
 
 /**
- * @remarks
- * Currently only supports boolean for `@include(if: ...)` / `@skip(if: ...)`
+ * Parses a Doc with given variables, skipping over items tagged with relevant
+ * `@include(if: false)` / `@skip(if: true)` directives, and returns an
+ * optimized reference describing the document for use by the lookahead system.
  */
-function getDirectiveArgument(
-  directive: DirectiveNode,
-  argName: string,
-  variables: TrackedObject<GraphQLVariables>,
-): boolean | undefined {
-  if (!directive.arguments) {
-    return undefined;
-  }
-  for (const arg of directive.arguments) {
-    if (argName === arg.name.value) {
-      return getValue(arg.value, variables);
-    }
-  }
-  return undefined;
-}
-
-/**
- * Looks for `@include(if: ...)` / `@skip(if: ...)` directives and returns true if should skip; otherwise false
- */
-function shouldSkip(
-  selection: SelectionNode,
-  variables: TrackedObject<GraphQLVariables>,
-): boolean {
-  if (selection.directives) {
-    for (const directive of selection.directives) {
-      if (directive.name.value === "include") {
-        const ifVal = getDirectiveArgument(directive, "if", variables);
-        return ifVal !== false;
-      } else if (directive.name.value === "skip") {
-        const ifVal = getDirectiveArgument(directive, "if", variables);
-        return ifVal === true;
-      } else {
-        /* We don't know about this directive; ignore */
-      }
-    }
-  }
-  return false;
-}
-
 export function parseDoc(doc: Doc, variables: TrackedObject<GraphQLVariables>) {
   const selectionSet = doc.document.selectionSet;
   const parentType = doc.rootType;
-  processSelectionSet(doc, variables, selectionSet, parentType);
+  return processSelectionSet(doc, variables, selectionSet, parentType);
 }
-
-interface Meta {}
 
 function processObjectField(
   doc: Doc,
   variables: TrackedObject<GraphQLVariables>,
-  map: Map<PathIdentity, Meta> = new Map(),
+  map: Map<PathIdentity, FieldDigest> = new Map(),
   selection: FieldNode,
   parentType: GraphQLObjectType,
   pathIdentity: PathIdentity,
@@ -146,6 +104,7 @@ function processObjectField(
     );
   }
 }
+
 function processFragment(
   doc: Doc,
   variables: TrackedObject<GraphQLVariables>,
@@ -153,7 +112,7 @@ function processFragment(
   selectionSet: SelectionSetNode,
   parentType: GraphQLObjectType | GraphQLUnionType | GraphQLInterfaceType,
   path: string = "",
-  map: Map<PathIdentity, Meta> = new Map(),
+  map: Map<PathIdentity, FieldDigest> = new Map(),
 ) {
   if (
     !typeCondition ||
@@ -184,7 +143,7 @@ function processSelectionSet(
   selectionSet: SelectionSetNode,
   parentType: GraphQLObjectType | GraphQLUnionType | GraphQLInterfaceType,
   path: string = "",
-  map: Map<PathIdentity, Meta> = new Map(),
+  map: Map<PathIdentity, FieldDigest> = new Map(),
 ) {
   for (const selection of selectionSet.selections) {
     if (shouldSkip(selection, variables)) {
