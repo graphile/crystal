@@ -33,8 +33,8 @@ type FutureValue<T = unknown> = {
   eval(): T;
 };
 
-type FutureDependencies = {
-  [key: string]: FutureValue<unknown>;
+type FutureDependencies<TKeys extends string> = {
+  [key in TKeys]: FutureValue<unknown>;
 };
 
 /**
@@ -47,11 +47,8 @@ type FutureDependencies = {
  * We're using TrackedObject<...> so we can later consider caching these
  * executions.
  */
-type PlanResolver<
-  TPlan extends Plan,
-  TDependencies extends FutureDependencies
-> = (
-  $deps: TDependencies,
+type PlanResolver<TPlan extends Plan, TDependencyKeys extends string> = (
+  $deps: FutureDependencies<TDependencyKeys>,
   args: TrackedObject<GraphQLArguments>,
   context: TrackedObject<GraphileEngine.GraphileResolverContext>,
 ) => TPlan;
@@ -64,13 +61,10 @@ type PlanResolver<
  * ordering, etc). It cannot use any property of the parent object that was not
  * requested via dependencies.
  */
-type ArgPlanResolver<
-  TPlan extends Plan,
-  TDependencies extends FutureDependencies
-> = (
+type ArgPlanResolver<TPlan extends Plan, TDependencyKeys extends string> = (
   plan: TPlan,
   arg: unknown,
-  $deps: TDependencies,
+  $deps: FutureDependencies<TDependencyKeys>,
   args: TrackedObject<GraphQLArguments>,
   context: TrackedObject<GraphileEngine.GraphileResolverContext>,
 ) => void;
@@ -91,8 +85,10 @@ a child plan. This may not be as optimal as it could possibly be, but it's
 certainly at least as optimal as solving the problem in GraphQL would be
 without lookahead, and it's much easier to understand, write, and handle.
 
+/**
  * Lists the dependencies of this field/argument, such that the parent plan
  * ensures to fetch these values.
+ * /
 type PlanDependenciesResolver<
   TParentPlan extends Plan,
   TDependencies extends FutureDependencies
@@ -101,37 +97,35 @@ type PlanDependenciesResolver<
   args: TrackedObject<GraphQLArguments>,
   context: TrackedObject<GraphileEngine.GraphileResolverContext>,
 ) => TDependencies;
- */
+
 
 /**
  * The list of fields required from the parent object for this plan/argument.
- */
+ * /
+
 type Dependencies<
   TParentObject extends object = object,
   TKeys extends Array<keyof TParentObject>[] = []
 > = Pick<TParentObject, TKeys[number]>;
 
+ */
+
 declare global {
   namespace GraphileEngine {
     interface GraphQLObjectTypeGraphileExtension<
       TPlan extends Plan,
-      TParentObject extends object = object,
-      TDeps extends Array<keyof TParentObject> = []
+      TDependencyKeys extends string = never
     > {
-      /**
-       * Can only have dependencies if there's a parent plan
-       */
-      dependencies?: TDeps;
-      plan?: PlanResolver<TPlan, Dependencies<TParentObject, TDeps>>;
+      dependencies?: TDependencyKeys[];
+      plan?: PlanResolver<TPlan, TDependencyKeys>;
     }
 
     interface GraphQLFieldGraphileExtension<
-      TParentPlan extends Plan,
       TPlan extends Plan,
-      TDeps extends FutureDependencies = {}
+      TDependencyKeys extends string = never
     > {
-      dependencies?: PlanDependenciesResolver<TParentPlan, TDeps>;
-      argPlan?: ArgPlanResolver<TPlan, TDeps>;
+      dependencies?: TDependencyKeys[];
+      argPlan?: ArgPlanResolver<TPlan, TDependencyKeys>;
     }
   }
 }
