@@ -3,9 +3,16 @@ import {
   OperationDefinitionNode,
   GraphQLResolveInfo,
   GraphQLObjectType,
+  FragmentDefinitionNode,
 } from "graphql";
-import { GraphQLRootValue, GraphQLVariables, PathIdentity } from "./interfaces";
+import {
+  GraphQLRootValue,
+  GraphQLVariables,
+  PathIdentity,
+  Plan,
+} from "./interfaces";
 import { Aether } from "./aether";
+import { Path } from "graphql/jsutils/Path";
 
 /**
  * Weak maps cannot use a primitive as a key; so we use this object as a
@@ -23,6 +30,20 @@ interface PathDigestVariant {
    * only be used when the variables given here match the request variables.
    */
   matchesVariables: GraphQLVariables;
+
+  plan: Plan;
+}
+
+function isDigestValidAgainstVariables(variables: GraphQLVariables) {
+  // TODO: optimise this with a JIT or something?
+  return (digest: PathDigestVariant) => {
+    // NOTE: null and undefined are deliberately treated as separate values.
+    // NOTE: variables may define more values than matchesVariables; that
+    // shouldn't affect the match.
+    return Object.keys(digest.matchesVariables).every(
+      (key) => digest.matchesVariables[key] === variables[key],
+    );
+  };
 }
 
 /**
@@ -57,6 +78,9 @@ export class Doc {
   constructor(
     public readonly schema: GraphQLSchema,
     public readonly document: OperationDefinitionNode,
+    public readonly fragments: {
+      [key: string]: FragmentDefinitionNode;
+    },
   ) {
     this.aetherByVariablesByContextByRootValue = new WeakMap();
     this.digestsByPathIdentity = new Map();
@@ -116,8 +140,34 @@ export class Doc {
   }
 
   digestForPath(pathIdentity: PathIdentity, variables: GraphQLVariables) {
-    // Determine if this path has already been digested
+    // Get the list of digests valid for the current path
+    let digests = this.digestsByPathIdentity.get(pathIdentity);
+    if (!digests) {
+      digests = [];
+      this.digestsByPathIdentity.set(pathIdentity, digests);
+    }
+
+    // Can we use one of them?
+    const validDigest = digests.find(isDigestValidAgainstVariables(variables));
+    if (validDigest) {
+      return validDigest;
+    }
+
+    // No... Time to build our own digest then!
+
+    // TODO: find a more efficient way of doing this.
+
+    const trackedVariables = new TrackedObject(variables);
+
+    const parseResult = this.parseDocument(trackedVariables);
+
+    const matchesVariables = {};
+    for (const key of trackedVariables.accessedKeys) {
+      matchesVariables[key] = variables[key];
+    }
   }
+
+  private parseDocument(trackedVariables: TrackedObject<GraphQLVariables>) {}
 }
 
 /**
@@ -125,31 +175,46 @@ export class Doc {
  *
  * @internal
  */
-const docByDocumentBySchema = new WeakMap<
+const docByFragmentsByDocumentBySchema = new WeakMap<
   GraphQLSchema,
-  WeakMap<OperationDefinitionNode, Doc>
+  WeakMap<
+    OperationDefinitionNode,
+    WeakMap<
+      {
+        [key: string]: FragmentDefinitionNode;
+      },
+      Doc
+    >
+  >
 >();
 
 /**
  * Returns the {@link Doc} for the given resolveInfo. Really this only depends
- * on the schema and the document (query, mutation, subscription).
+ * on the schema, the document (query, mutation, subscription) and the
+ * fragments.
  */
 export function getDoc(resolveInfo: GraphQLResolveInfo): Doc {
   const schema = resolveInfo.schema;
   const document = resolveInfo.operation;
+  const fragments = resolveInfo.fragments;
 
   // This is an unrolled loop because it's extremely hot.
   // TODO: would be less error-prone to do this with a macro; fortunately
   // TypeScript catches most of the issues.
-  let docByDocument = docByDocumentBySchema.get(schema);
-  if (!docByDocument) {
-    docByDocument = new WeakMap();
-    docByDocumentBySchema.set(schema, docByDocument);
+  let docByFragmentsByDocument = docByFragmentsByDocumentBySchema.get(schema);
+  if (!docByFragmentsByDocument) {
+    docByFragmentsByDocument = new WeakMap();
+    docByFragmentsByDocumentBySchema.set(schema, docByFragmentsByDocument);
   }
-  let doc = docByDocument.get(document);
+  let docByFragments = docByFragmentsByDocument.get(document);
+  if (!docByFragments) {
+    docByFragments = new WeakMap();
+    docByFragmentsByDocument.set(document, docByFragments);
+  }
+  let doc = docByFragments.get(fragments);
   if (!doc) {
-    doc = new Doc(schema, document);
-    docByDocument.set(document, doc);
+    doc = new Doc(schema, document, fragments);
+    docByFragments.set(fragments, doc);
   }
 
   return doc;

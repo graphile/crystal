@@ -1,15 +1,5 @@
 import {
   GraphQLResolveInfo,
-  GraphQLSchema,
-  SelectionSetNode,
-  GraphQLObjectType,
-  GraphQLUnionType,
-  GraphQLInterfaceType,
-  isUnionType,
-  isListType,
-  isNonNullType,
-  isObjectType,
-  isInterfaceType,
 } from "graphql";
 import {
   GraphQLArguments,
@@ -21,7 +11,6 @@ import {
   $$data,
 } from "./interfaces";
 import { getPathIdentityFromResolveInfo } from "./utils";
-import assert from "assert";
 import { isCrystalResult } from "./crystalResult";
 import { Aether } from "./aether";
 
@@ -128,115 +117,5 @@ export class Batch {
       [$$data]: data,
       [$$path]: pathIdentity,
     };
-  }
-}
-
-function populateInfo(
-  schema: GraphQLSchema,
-  infoByPathIdentity: Map<PathIdentity, Info>,
-  selectionSet: SelectionSetNode,
-  parentType: GraphQLObjectType | GraphQLUnionType | GraphQLInterfaceType,
-  path = "",
-) {
-  for (const selection of selectionSet.selections) {
-    switch (selection.kind) {
-      case "Field": {
-        if (selection.name.value.startsWith("__")) {
-          // Introspection field; ignore
-          break;
-        }
-        assert(
-          !isUnionType(parentType),
-          "Cannot select fields on a union type",
-        );
-        const alias = selection.alias
-          ? selection.alias.value
-          : selection.name.value;
-        const pathIdentity =
-          path + (path ? ">" : "") + `${parentType.name}.${alias}`;
-        const field = parentType.getFields()[selection.name.value];
-        const resultType = field.type;
-        let unwrappedType = resultType;
-        let listDepth = 0;
-        while ("ofType" in unwrappedType && unwrappedType.ofType) {
-          if (isListType(unwrappedType)) {
-            listDepth++;
-          } else if (isNonNullType(unwrappedType)) {
-            // ignore
-          } else {
-            throw new Error("Wrapping type not understood.");
-          }
-          unwrappedType = unwrappedType.ofType;
-        }
-        assert(
-          isObjectType(unwrappedType) ||
-            isUnionType(unwrappedType) ||
-            isInterfaceType(unwrappedType),
-          "Expected type to have been unwrapped to reveal an object, union or interface type",
-        );
-        const graphile = unwrappedType.extensions?.graphile;
-
-        if (isObjectType(parentType)) {
-          infoByPathIdentity.set(pathIdentity, {
-            pathIdentity,
-            graphile,
-            plan: {
-              /* TODO */
-            },
-          });
-        } else {
-          // TODO!
-          // NOTE TO SELF: I think this is the wrong approach. We shouldn't list
-          // out all possibilities for an interface, e.g. "search results" might
-          // return a Node, but only actually implement 4 nodes not all 200;
-          // exhaustively listing them all is expensive and unnecessary. Perhaps
-          // the plan for interfaces should factor in the particular return
-          // types?
-        }
-
-        if (selection.selectionSet) {
-          populateInfo(
-            schema,
-            infoByPathIdentity,
-            selection.selectionSet,
-            unwrappedType,
-            pathIdentity,
-          );
-        }
-        break;
-      }
-      case "InlineFragment": {
-        if (
-          !selection.typeCondition ||
-          (selection.typeCondition &&
-            selection.typeCondition.name.value === parentType.name)
-        ) {
-          // Redundant fragment
-          populateInfo(
-            schema,
-            infoByPathIdentity,
-            selection.selectionSet,
-            parentType,
-            path,
-          );
-          break;
-        }
-        const fragmentType = schema.getType(selection.typeCondition.name.value);
-        assert(
-          isUnionType(fragmentType) ||
-            isInterfaceType(fragmentType) ||
-            isObjectType(fragmentType),
-          "Couldn't find type associated with this fragment",
-        );
-        populateInfo(
-          schema,
-          infoByPathIdentity,
-          selection.selectionSet,
-          fragmentType,
-          path,
-        );
-        // TODO...
-      }
-    }
   }
 }

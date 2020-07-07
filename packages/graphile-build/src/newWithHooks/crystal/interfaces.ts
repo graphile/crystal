@@ -113,7 +113,7 @@ type Dependencies<
 declare global {
   namespace GraphileEngine {
     interface GraphQLObjectTypeGraphileExtension<
-      TPlan extends Plan,
+      TPlan extends Plan = Plan,
       TDependencyKeys extends string = never
     > {
       dependencies?: TDependencyKeys[];
@@ -121,7 +121,7 @@ declare global {
     }
 
     interface GraphQLFieldGraphileExtension<
-      TPlan extends Plan,
+      TPlan extends Plan = Plan,
       TDependencyKeys extends string = never
     > {
       dependencies?: TDependencyKeys[];
