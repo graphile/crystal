@@ -1,6 +1,6 @@
 import { GraphQLResolveInfo } from "graphql";
 import { getDoc } from "./doc";
-import { BatchResult } from "./interfaces";
+import { CrystalResult } from "./interfaces";
 
 /**
  * Called from each GraphQL resolver; this tracks down (or creates) the plan
@@ -17,7 +17,7 @@ export function executePlanFromResolver(
   args: { [key: string]: any },
   context: GraphileEngine.GraphileResolverContext,
   info: GraphQLResolveInfo,
-): Promise<BatchResult> {
+): Promise<CrystalResult> {
   const doc = getDoc(info);
   const aether = doc.getAether(context, info);
   const batch = aether.getBatch(parent, args, context, info);

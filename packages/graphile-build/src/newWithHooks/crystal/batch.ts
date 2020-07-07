@@ -13,16 +13,16 @@ import {
 } from "graphql";
 import {
   GraphQLArguments,
-  BatchResult,
+  CrystalResult,
   PathIdentity,
   Plan,
   $$path,
-  $$root,
+  $$batch,
   $$data,
 } from "./interfaces";
 import { getPathIdentityFromResolveInfo } from "./utils";
 import assert from "assert";
-import { isBatchResult } from "./batchResult";
+import { isCrystalResult } from "./crystalResult";
 
 /**
  * What a Batch knows about a particular PathIdentity
@@ -111,15 +111,15 @@ export class Batch {
   async getResultFor(
     parent: unknown,
     info: GraphQLResolveInfo,
-  ): Promise<BatchResult> {
+  ): Promise<CrystalResult> {
     await this.promise;
     const pathIdentity = getPathIdentityFromResolveInfo(
       info,
-      isBatchResult(parent) ? parent[$$path] : undefined,
+      isCrystalResult(parent) ? parent[$$path] : undefined,
     );
     const data = null;
     return {
-      [$$root]: this,
+      [$$batch]: this,
       [$$data]: data,
       [$$path]: pathIdentity,
     };

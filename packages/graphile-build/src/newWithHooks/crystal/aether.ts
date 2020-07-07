@@ -1,9 +1,9 @@
-import { PathIdentity, BatchResult, $$path, $$root } from "./interfaces";
+import { PathIdentity, CrystalResult, $$path, $$batch } from "./interfaces";
 import { Batch } from "./batch";
 import { Doc } from "./doc";
 import { GraphQLResolveInfo } from "graphql";
 import { getPathIdentityFromResolveInfo } from "./utils";
-import { isBatchResult } from "./batchResult";
+import { isCrystalResult } from "./crystalResult";
 
 /**
  * The Aether represents the context in which resolvers run; we can assume that
@@ -70,19 +70,19 @@ export class Aether {
     context: GraphileEngine.GraphileResolverContext,
     info: GraphQLResolveInfo,
   ): Batch {
-    const parentBatchResult: BatchResult | null = isBatchResult(parent)
+    const parentCrystalResult: CrystalResult | null = isCrystalResult(parent)
       ? parent
       : null;
     const pathIdentity = getPathIdentityFromResolveInfo(
       info,
-      parentBatchResult ? parentBatchResult[$$path] : undefined,
+      parentCrystalResult ? parentCrystalResult[$$path] : undefined,
     );
     if (
-      parentBatchResult &&
-      parentBatchResult[$$root].appliesTo(pathIdentity)
+      parentCrystalResult &&
+      parentCrystalResult[$$batch].appliesTo(pathIdentity)
     ) {
       // There's already a batch root and it applies to us 🎉
-      return parentBatchResult[$$root];
+      return parentCrystalResult[$$batch];
     }
 
     // We must be the batch root.

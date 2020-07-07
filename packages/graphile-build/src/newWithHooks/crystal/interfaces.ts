@@ -6,7 +6,7 @@ export type GraphQLArguments = { [key: string]: unknown };
 
 export const $$plan = Symbol("plan");
 export const $$data = Symbol("data");
-export const $$root = Symbol("root");
+export const $$batch = Symbol("batch");
 // Used to ease creation of PathIdentity
 export const $$path = Symbol("path");
 
@@ -15,8 +15,8 @@ export const $$path = Symbol("path");
  */
 export type PathIdentity = string;
 
-export interface BatchResult {
-  [$$root]: Batch;
+export interface CrystalResult {
+  [$$batch]: Batch;
   [$$data]: unknown;
   [$$path]: PathIdentity;
 }
