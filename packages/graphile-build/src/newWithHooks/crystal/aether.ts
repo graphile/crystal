@@ -92,7 +92,7 @@ export class Aether {
       // No existing batch, we must be the first call to getBatch within this
       // aether for this pathIdentity. Create a batch and cache it so all my
       // counterparts will use it too.
-      batch = new Batch(parent, args, context, info);
+      batch = new Batch(this, parent, args, context, info);
       this.batches.set(pathIdentity, batch);
     }
 

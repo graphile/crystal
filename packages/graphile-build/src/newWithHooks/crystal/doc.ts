@@ -4,7 +4,7 @@ import {
   GraphQLResolveInfo,
   GraphQLObjectType,
 } from "graphql";
-import { GraphQLRootValue, GraphQLVariables } from "./interfaces";
+import { GraphQLRootValue, GraphQLVariables, PathIdentity } from "./interfaces";
 import { Aether } from "./aether";
 
 /**
@@ -14,6 +14,16 @@ import { Aether } from "./aether";
  * @internal
  */
 const WEAK_MAP_FALLBACK_KEY = {};
+
+interface PathDigestVariant {
+  pathIdentity: PathIdentity;
+  /**
+   * This contains ONLY the variables that are used in `@include`/`@skip` and
+   * similar directive; these variables identify the variant. The variant must
+   * only be used when the variables given here match the request variables.
+   */
+  matchesVariables: GraphQLVariables;
+}
 
 /**
  * The Doc represents a GraphQL Document (query, mutation, subscription) within
@@ -39,6 +49,9 @@ export class Doc {
       WeakMap<GraphQLVariables, Aether>
     >
   >;
+
+  private digestsByPathIdentity: Map<PathIdentity, PathDigestVariant[]>;
+
   public readonly rootType: GraphQLObjectType;
 
   constructor(
@@ -46,6 +59,7 @@ export class Doc {
     public readonly document: OperationDefinitionNode,
   ) {
     this.aetherByVariablesByContextByRootValue = new WeakMap();
+    this.digestsByPathIdentity = new Map();
 
     const rootType =
       document.operation === "query"
@@ -99,6 +113,10 @@ export class Doc {
       aetherByVariables.set(variables, aether);
     }
     return aether;
+  }
+
+  digestForPath(pathIdentity: PathIdentity, variables: GraphQLVariables) {
+    // Determine if this path has already been digested
   }
 }
 

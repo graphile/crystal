@@ -23,6 +23,7 @@ import {
 import { getPathIdentityFromResolveInfo } from "./utils";
 import assert from "assert";
 import { isCrystalResult } from "./crystalResult";
+import { Aether } from "./aether";
 
 /**
  * What a Batch knows about a particular PathIdentity
@@ -56,6 +57,7 @@ export class Batch {
   private infoByPathIdentity: Map<PathIdentity, Info>;
 
   constructor(
+    public readonly aether: Aether;
     parent: unknown,
     args: GraphQLArguments,
     context: GraphileEngine.GraphileResolverContext,
@@ -75,6 +77,9 @@ export class Batch {
     context: GraphileEngine.GraphileResolverContext,
     info: GraphQLResolveInfo,
   ) {
+    const pathIdentity = getPathIdentityFromResolveInfo(info, isCrystalResult(parent) ? parent[$$path] : undefined);
+    const digest = this.aether.doc.digestForPath(pathIdentity, info.variableValues)
+
     const graphile: GraphileEngine.GraphQLObjectTypeGraphileExtension =
       info.parentType.extensions?.graphile || {};
     const { plan: planResolver } = graphile;
