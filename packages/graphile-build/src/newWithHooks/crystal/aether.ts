@@ -52,7 +52,8 @@ export class Aether {
   }
 
   /**
-   * Gets (or creates) the batch for a given path identity within the current Aether.
+   * Gets (or creates) the batch for a given path identity within the current
+   * Aether.
    *
    * @param parent - The result of the previous plan execution (null if root
    *   query)
@@ -85,9 +86,12 @@ export class Aether {
     }
 
     // We must be the batch root.
+    // First, see if this pathIdentity has already created a batch:
     let batch = this.batches.get(pathIdentity);
     if (!batch) {
-      // Make the batch
+      // No existing batch, we must be the first call to getBatch within this
+      // aether for this pathIdentity. Create a batch and cache it so all my
+      // counterparts will use it too.
       batch = new Batch(parent, args, context, info);
       this.batches.set(pathIdentity, batch);
     }
