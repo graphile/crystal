@@ -6,9 +6,5 @@
     "outDir": "./dist"
   },
   "include": ["src"],
-  "references": [
-    { "path": "../lru" },
-    { "path": "../graphile-crystal" },
-    { "path": "../graphql-parse-resolve-info" }
-  ]
+  "references": [{ "path": "../lru" }]
 }

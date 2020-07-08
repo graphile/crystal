@@ -1,6 +1,8 @@
 import { Batch } from "./batch";
+import { TrackedObject } from "./trackedObject";
 
 export type GraphQLRootValue = any;
+export type GraphQLContext = object;
 export type GraphQLVariables = { [key: string]: unknown };
 export type GraphQLArguments = { [key: string]: unknown };
 
@@ -54,7 +56,7 @@ export type FutureDependencies<TKeys extends string> = FutureValue<
 export type PlanResolver<TPlan extends Plan, TDependencyKeys extends string> = (
   $deps: FutureDependencies<TDependencyKeys>,
   args: TrackedObject<GraphQLArguments>,
-  context: TrackedObject<GraphileEngine.GraphileResolverContext>,
+  context: TrackedObject<object>,
 ) => TPlan;
 
 /**
@@ -73,14 +75,14 @@ export type PlanResolver<TPlan extends Plan, TDependencyKeys extends string> = (
  */
 export type InputPlanResolver<
   TPlan extends Plan,
-  TOutputPlan extends Plan,
-  TDependencyKeys extends string
+  TDependencyKeys extends string,
+  TOutputPlan extends Plan
 > = (
   plan: TPlan,
   arg: unknown,
   $deps: FutureDependencies<TDependencyKeys>,
   args: TrackedObject<GraphQLArguments>,
-  context: TrackedObject<GraphileEngine.GraphileResolverContext>,
+  context: TrackedObject<object>,
 ) => TOutputPlan | null;
 
 /*
@@ -136,10 +138,11 @@ declare global {
 
     interface GraphQLFieldGraphileExtension<
       TPlan extends Plan = Plan,
-      TDependencyKeys extends string = never
+      TDependencyKeys extends string = never,
+      TOutputPlan extends Plan = Plan
     > {
       dependencies?: TDependencyKeys[];
-      argPlan?: InputPlanResolver<TPlan, TDependencyKeys>;
+      argPlan?: InputPlanResolver<TPlan, TDependencyKeys, TOutputPlan>;
     }
   }
 }

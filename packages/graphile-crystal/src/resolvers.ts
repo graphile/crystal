@@ -6,65 +6,91 @@ import {
   GraphQLList,
   isScalarType,
   GraphQLFieldConfig,
+  GraphQLResolveInfo,
 } from "graphql";
 import { assert } from "console";
-import { executePlanFromResolver } from "./crystal";
+import {
+  GraphQLContext,
+  CrystalResult,
+  PathIdentity,
+  $$batch,
+  $$data,
+  $$path,
+} from "./interfaces";
+import { getDoc } from "./doc";
+import { Batch } from "./batch";
 
-export const makeGraphileObjectExtension = () => ({});
-export const makeGraphileObjectFieldExtension = () => ({});
+export const makeCrystalObjectExtension = () => ({});
+export const makeCrystalObjectFieldExtension = () => ({});
 
-const $$plan = Symbol("plan");
-const $$data = Symbol("data");
-
+function isPromise<T>(
+  possiblyPromise: T | Promise<T>,
+): possiblyPromise is Promise<T> {
+  return (
+    typeof possiblyPromise === "object" &&
+    possiblyPromise &&
+    "then" in possiblyPromise &&
+    typeof possiblyPromise.then === "function"
+  );
+}
 function identityWrapper<T>(plan: any, arg: T): T {
   return arg;
 }
 
-function graphileWrap(plan: any, data: any) {
+interface WrapMeta {
+  batch: Batch;
+  path: PathIdentity;
+}
+
+function graphileWrap(
+  { batch, path }: WrapMeta,
+  data: any,
+): CrystalResult | null {
   // Short-circuit nulls, undefineds, NaNs, etc
   if (data == null || Number.isNaN(data)) {
     return null;
   }
   return {
-    [$$plan]: plan,
     [$$data]: data,
+    [$$batch]: batch,
+    [$$path]: path,
   };
 }
 
-function graphileWrap1(plan: any, data: any) {
+function graphileWrap1(meta: WrapMeta, data: any) {
   // Short-circuit nulls, undefineds, NaNs, etc
   if (data == null || Number.isNaN(data)) {
     return null;
   }
   const list = Array.isArray(data) ? data : [data];
-  return list.map((entry) => graphileWrap(plan, entry));
+  return list.map((entry) => graphileWrap(meta, entry));
 }
 
-function graphileWrap2(plan: any, data: any) {
+function graphileWrap2(meta: WrapMeta, data: any) {
   // Short-circuit nulls, undefineds, NaNs, etc
   if (data == null || Number.isNaN(data)) {
     return null;
   }
   const list = Array.isArray(data) ? data : [data];
-  return list.map((entry) => graphileWrap1(plan, entry));
+  return list.map((entry) => graphileWrap1(meta, entry));
 }
 
 function graphileWrapN(listDepth: number) {
   if (listDepth <= 0) {
     return graphileWrap;
   } else {
-    return (plan: any, data: any): any => {
+    return (meta: WrapMeta, data: any): any => {
       // Short-circuit nulls, undefineds, NaNs, etc
       if (data == null || Number.isNaN(data)) {
         return null;
       }
       const list = Array.isArray(data) ? data : [data];
-      return list.map((entry) => graphileWrapN(listDepth - 1)(plan, entry));
+      return list.map((entry) => graphileWrapN(listDepth - 1)(meta, entry));
     };
   }
 }
 
-export function makeGraphileWrapResolver() {
+export function makeCrystalWrapResolver() {
   // Cached on a per-schema basis, so no need for a WeakMap
   let typeToWrapperMap = new Map<GraphQLOutputType, any>();
 
@@ -124,7 +150,7 @@ export function makeGraphileWrapResolver() {
 
   return function graphileWrapResolver<
     TSource,
-    TContext,
+    TContext extends object,
     TArgs = { [argName: string]: any }
   >(
     config: GraphQLFieldConfig<TSource, TContext, TArgs>,
@@ -137,28 +163,44 @@ export function makeGraphileWrapResolver() {
       TSource,
       TContext,
       TArgs
-    > = function (graphileParent: any, args, context, info) {
-      const { data, plan } = executePlanFromResolver(
+    > = async function (graphileParent: any, args, context, info) {
+      // TODO: this function should not be async; it may be able to resolve sync sometimes.
+      const executionResult = executePlanFromResolver(
         graphileParent,
         args,
         context,
         info,
       );
 
-      const result =
-        data && typeof data.then === "function"
-          ? data.then((d: any) => realResolver(d, args, context, info))
-          : realResolver(data, args, context, info);
-
-      if (result && typeof result.then === "function") {
-        return result.then((data: any) => wrap(plan, data));
-      } else {
-        return wrap(plan, result);
-      }
+      let { [$$data]: data, ...meta } = await executionResult;
+      const result = await realResolver(data as any, args, context, info);
+      return wrap(meta, result);
     };
     return {
       ...config,
       resolve: graphileResolver,
     };
   };
+}
+
+/**
+ * Called from each GraphQL resolver; this tracks down (or creates) the plan
+ * for this specific field, executes it, and returns the result (which should
+ * be data the resolver requires).
+ *
+ * @remarks
+ * Called from `graphileWrapResolver`.
+ *
+ * MUST run synchronously, otherwise we might not batch correctly.
+ */
+function executePlanFromResolver(
+  parent: unknown,
+  args: { [key: string]: any },
+  context: GraphQLContext,
+  info: GraphQLResolveInfo,
+): CrystalResult | Promise<CrystalResult> {
+  const doc = getDoc(info);
+  const aether = doc.getAether(context, info);
+  const batch = aether.getBatch(parent, args, context, info);
+  return batch.getResultFor(parent, info);
 }

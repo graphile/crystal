@@ -1,3 +1,4 @@
+import { TrackedObject } from "./trackedObject";
 import {
   GraphQLSchema,
   OperationDefinitionNode,
@@ -9,11 +10,10 @@ import {
   GraphQLRootValue,
   GraphQLVariables,
   PathIdentity,
-  Plan,
   PlanResolver,
+  GraphQLContext,
 } from "./interfaces";
 import { Aether } from "./aether";
-import { Path } from "graphql/jsutils/Path";
 
 /**
  * Weak maps cannot use a primitive as a key; so we use this object as a
@@ -66,10 +66,7 @@ function isDigestValidAgainstVariables(variables: GraphQLVariables) {
 export class Doc {
   private aetherByVariablesByContextByRootValue: WeakMap<
     GraphQLRootValue,
-    WeakMap<
-      GraphileEngine.GraphileResolverContext,
-      WeakMap<GraphQLVariables, Aether>
-    >
+    WeakMap<GraphQLContext, WeakMap<GraphQLVariables, Aether>>
   >;
 
   private digestsByPathIdentity: Map<PathIdentity, PathDigestVariant[]>;
@@ -105,10 +102,7 @@ export class Doc {
    * If these values are the same, then it's expected that it's the same
    * individual GraphQL operation execution (or at least compatible ones!).
    */
-  getAether(
-    context: GraphileEngine.GraphileResolverContext,
-    resolveInfo: GraphQLResolveInfo,
-  ) {
+  getAether(context: GraphQLContext, resolveInfo: GraphQLResolveInfo) {
     // IMPORTANT: all fallback values MUST be global constants, otherwise we might
     // make multiple Aethers for the same operation.
     const rootValue = resolveInfo.rootValue || WEAK_MAP_FALLBACK_KEY;

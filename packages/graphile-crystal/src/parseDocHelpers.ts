@@ -1,3 +1,4 @@
+import { TrackedObject } from "./trackedObject";
 import { SelectionNode, DirectiveNode, ValueNode } from "graphql";
 import { GraphQLVariables } from "./interfaces";
 

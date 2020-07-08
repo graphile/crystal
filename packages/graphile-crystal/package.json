@@ -1,7 +1,7 @@
 {
-  "name": "graphile-build",
+  "name": "graphile-crystal",
   "version": "4.7.0",
-  "description": "Build a GraphQL schema from plugins",
+  "description": "Look-ahead engine for GraphQL",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -31,30 +31,20 @@
   "dependencies": {
     "@graphile/lru": "4.6.0-alpha.0",
     "@types/node": "^14.0.1",
-    "@types/pluralize": "^0.0.29",
-    "@types/semver": "^7.2.0",
-    "chalk": "^4.0.0",
-    "debug": "^4.2.0",
-    "graphile-crystal": "4.7.0",
-    "graphql-parse-resolve-info": "4.7.0",
-    "iterall": "^1.3.0",
     "lodash": "^4.17.15",
-    "pluralize": "^7.0.0",
-    "semver": "^7.3.2",
     "tslib": "^2.0.0"
   },
   "engines": {
     "node": ">=12.16"
   },
   "peerDependencies": {
-    "graphql": "^14.6.0"
+    "graphql": "^15.3.0"
   },
   "files": [
     "dist",
     "index.js"
   ],
   "devDependencies": {
-    "@types/debug": "^4.1.5",
     "@types/jest": "^25.2.3",
     "@types/lodash": "^4.14.151",
     "graphql": "^15.3.0",

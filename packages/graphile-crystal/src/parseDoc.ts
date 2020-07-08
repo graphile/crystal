@@ -1,3 +1,4 @@
+import { TrackedObject } from "./trackedObject";
 import assert from "assert";
 import {
   SelectionSetNode,
@@ -16,7 +17,7 @@ import {
   GraphQLVariables,
   PathIdentity,
   PlanResolver,
-  ArgPlanResolver,
+  InputPlanResolver,
 } from "./interfaces";
 import { Doc } from "./doc";
 import { shouldSkip } from "./parseDocHelpers";
@@ -25,13 +26,14 @@ import { shouldSkip } from "./parseDocHelpers";
  * This is the data associated with a particular field within a document.
  */
 interface FieldDigest {
+  pathIdentity: PathIdentity;
   fieldName: string;
   alias: string;
   plan?: PlanResolver<any, any>;
   args: {
     [key: string]: {
       dependencies: string[];
-      argPlan?: ArgPlanResolver<any, any>;
+      argPlan?: InputPlanResolver<any, any, any>;
     };
   };
   fields: {
@@ -58,7 +60,8 @@ function processObjectField(
   parentType: GraphQLObjectType,
   pathIdentity: PathIdentity,
 ) {
-  const field = parentType.getFields()[selection.name.value];
+  const fieldName = selection.name.value;
+  const field = parentType.getFields()[fieldName];
   const resultType = field.type;
   let unwrappedType = resultType;
   let listDepth = 0;
@@ -78,18 +81,25 @@ function processObjectField(
       isInterfaceType(unwrappedType),
     "Expected type to have been unwrapped to reveal an object, union or interface type",
   );
-  const graphile = unwrappedType.extensions?.graphile;
+  const graphile:
+    | GraphileEngine.GraphQLObjectTypeGraphileExtension
+    | undefined = unwrappedType.extensions?.graphile;
 
-  let meta = map.get(pathIdentity);
-  if (!meta) {
-    meta = {
+  let fieldDigest = map.get(pathIdentity);
+  if (!fieldDigest) {
+    fieldDigest = {
       pathIdentity,
-      graphile,
-      plan: {
+      fieldName,
+      alias: selection.alias?.value ?? fieldName,
+      plan: graphile?.plan,
+      args: {
+        /* TODO */
+      },
+      fields: {
         /* TODO */
       },
     };
-    map.set(pathIdentity, meta);
+    map.set(pathIdentity, fieldDigest);
   }
   // TODO: multiple fields (across different fragments) might augment this meta
 

@@ -1,4 +1,10 @@
-import { PathIdentity, CrystalResult, $$path, $$batch } from "./interfaces";
+import {
+  PathIdentity,
+  CrystalResult,
+  $$path,
+  $$batch,
+  GraphQLContext,
+} from "./interfaces";
 import { Batch } from "./batch";
 import { Doc } from "./doc";
 import { GraphQLResolveInfo } from "graphql";
@@ -46,7 +52,7 @@ export class Aether {
 
   constructor(
     public readonly doc: Doc,
-    public readonly context: GraphileEngine.GraphileResolverContext,
+    public readonly context: GraphQLContext,
   ) {
     this.batches = new Map();
   }
@@ -67,7 +73,7 @@ export class Aether {
   getBatch(
     parent: unknown,
     args: { [key: string]: unknown },
-    context: GraphileEngine.GraphileResolverContext,
+    context: GraphQLContext,
     info: GraphQLResolveInfo,
   ): Batch {
     const parentCrystalResult: CrystalResult | null = isCrystalResult(parent)

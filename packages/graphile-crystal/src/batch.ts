@@ -8,12 +8,13 @@ import {
   $$path,
   $$batch,
   $$data,
+  GraphQLContext,
 } from "./interfaces";
 import { getPathIdentityFromResolveInfo } from "./utils";
 import { isCrystalResult } from "./crystalResult";
 import { Aether } from "./aether";
-import { futurize, future } from "./future";
-import { mapValues } from "lodash";
+import { future } from "./future";
+import { TrackedObject } from "./trackedObject";
 
 /**
  * What a Batch knows about a particular PathIdentity
@@ -46,7 +47,7 @@ export class Batch {
     public readonly aether: Aether,
     parent: unknown,
     args: GraphQLArguments,
-    context: GraphileEngine.GraphileResolverContext,
+    context: GraphQLContext,
     info: GraphQLResolveInfo,
   ) {
     this.infoByPathIdentity = new Map();
@@ -59,7 +60,7 @@ export class Batch {
   execute(
     parent: unknown,
     args: GraphQLArguments,
-    context: GraphileEngine.GraphileResolverContext,
+    context: GraphQLContext,
     info: GraphQLResolveInfo,
   ) {
     /*

@@ -3,10 +3,10 @@ import debugFactory from "debug";
 import { ResolveTree } from "graphql-parse-resolve-info";
 import SchemaBuilder from "../SchemaBuilder";
 import {
-  makeGraphileWrapResolver,
-  makeGraphileObjectExtension,
-  makeGraphileObjectFieldExtension,
-} from "./graphileWrapResolver";
+  makeCrystalWrapResolver,
+  makeCrystalObjectExtension,
+  makeCrystalObjectFieldExtension,
+} from "graphile-crystal";
 
 let recurseDataGeneratorsForFieldWarned = false;
 
@@ -153,7 +153,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
     { [fieldName: string]: GraphileEngine.ArgDataGeneratorFunction[] }
   >();
 
-  const graphileWrapResolver = makeGraphileWrapResolver();
+  const wrapResolver = makeCrystalWrapResolver();
   const newWithHooks: any = function newWithHooks<
     T extends
       | graphql.GraphQLSchema
@@ -335,7 +335,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
         ...newSpec,
         extensions: {
           ...newSpec.extensions,
-          graphile: makeGraphileObjectExtension(),
+          graphile: makeCrystalObjectExtension(),
         },
       };
       const objectContext: GraphileEngine.ContextGraphQLObjectType = {
@@ -506,7 +506,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
               ...newSpec,
               extensions: {
                 ...newSpec.extensions,
-                graphile: makeGraphileObjectFieldExtension(),
+                graphile: makeCrystalObjectFieldExtension(),
               },
             };
             newSpec = builder.applyHooks(
@@ -584,7 +584,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
 
           // Perform the Graphile magic
           for (const fieldName in fieldsSpec) {
-            fieldsSpec[fieldName] = graphileWrapResolver(fieldsSpec[fieldName]);
+            fieldsSpec[fieldName] = wrapResolver(fieldsSpec[fieldName]);
           }
 
           return fieldsSpec;

@@ -6,7 +6,7 @@
  * We could have used an ES6 proxy for this, but performance is terrible, and
  * this more verbose approach encourages you to avoid .get()s where possible.
  */
-class TrackedObject<T extends object> {
+export class TrackedObject<T extends object> {
   public accessedKeys: Set<keyof T>;
 
   constructor(private obj: T) {
