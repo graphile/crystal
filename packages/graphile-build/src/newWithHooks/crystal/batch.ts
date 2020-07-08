@@ -1,9 +1,8 @@
-import {
-  GraphQLResolveInfo,
-} from "graphql";
+import { GraphQLResolveInfo } from "graphql";
 import {
   GraphQLArguments,
   CrystalResult,
+  FutureDependencies,
   PathIdentity,
   Plan,
   $$path,
@@ -13,6 +12,8 @@ import {
 import { getPathIdentityFromResolveInfo } from "./utils";
 import { isCrystalResult } from "./crystalResult";
 import { Aether } from "./aether";
+import { futurize, future } from "./future";
+import { mapValues } from "lodash";
 
 /**
  * What a Batch knows about a particular PathIdentity
@@ -38,15 +39,11 @@ interface Info {
  * so using the PathIdentity of the batch root.
  */
 export class Batch {
-  /**
-   * Await this promise; when it's done the batch is ready to be used.
-   */
-  public promise: Promise<void>;
-
   private infoByPathIdentity: Map<PathIdentity, Info>;
+  private plan: any;
 
   constructor(
-    public readonly aether: Aether;
+    public readonly aether: Aether,
     parent: unknown,
     args: GraphQLArguments,
     context: GraphileEngine.GraphileResolverContext,
@@ -54,7 +51,6 @@ export class Batch {
   ) {
     this.infoByPathIdentity = new Map();
     this.execute(parent, args, context, info);
-    this.promise = Promise.resolve();
   }
 
   /**
@@ -66,36 +62,57 @@ export class Batch {
     context: GraphileEngine.GraphileResolverContext,
     info: GraphQLResolveInfo,
   ) {
-    const pathIdentity = getPathIdentityFromResolveInfo(info, isCrystalResult(parent) ? parent[$$path] : undefined);
-    const digest = this.aether.doc.digestForPath(pathIdentity, info.variableValues)
-
-    const graphile: GraphileEngine.GraphQLObjectTypeGraphileExtension =
-      info.parentType.extensions?.graphile || {};
-    const { plan: planResolver } = graphile;
-    // TODO: apply the args here
     /*
-     * Since a batch runs for a single (optionally aliased) field in the
-     * operation, we know that the args for all entries within the batch will
-     * be the same. Note, however, that the selection set may differ.
+     * NOTE: although we have access to 'parent' here, we're only using it for
+     * meta-data (path, batch, etc); we must not use the *actual* data in it
+     * here, that's for `getResultFor` below.
      */
-    const field = info.parentType.getFields()[info.fieldName];
-    for (const arg of field.args) {
-      if (arg.name in args) {
-        const graphile: GraphileEngine.GraphQLFieldGraphileExtension =
-          arg.extensions?.graphile;
-        if (graphile) {
-          graphile.argPlan?.(
-            this,
-            args[arg.name],
-            parent?.[$$record],
-            args,
-            context,
-          );
+
+    const pathIdentity = getPathIdentityFromResolveInfo(
+      info,
+      isCrystalResult(parent) ? parent[$$path] : undefined,
+    );
+    const digest = this.aether.doc.digestForPath(
+      pathIdentity,
+      info.variableValues,
+    );
+
+    if (digest?.plan) {
+      const trackedArgs = new TrackedObject(args);
+      const trackedContext = new TrackedObject(context);
+      const $deps: FutureDependencies<any> = future();
+      const plan = digest?.plan($deps, trackedArgs, trackedContext);
+
+      // TODO: apply the args here
+      /*
+       * Since a batch runs for a single (optionally aliased) field in the
+       * operation, we know that the args for all entries within the batch will
+       * be the same. Note, however, that the selection set may differ.
+       */
+      /*
+      for (const arg of digest.args) {
+        if (arg.name in args) {
+          const graphile: GraphileEngine.GraphQLFieldGraphileExtension =
+            arg.extensions?.graphile;
+          if (graphile) {
+            graphile.argPlan?.(
+              this,
+              args[arg.name],
+              parent?.[$$record],
+              args,
+              context,
+            );
+          }
         }
       }
+      */
+      // TODO (somewhere else): selection set fields' dependencies
+      // TODO (somewhere else): selection set fields' args' dependencies (e.g. includeArchived: 'inherit')
+
+      this.plan = plan.finalize();
+    } else {
+      return null;
     }
-    // TODO (somewhere else): selection set fields' dependencies
-    // TODO (somewhere else): selection set fields' args' dependencies (e.g. includeArchived: 'inherit')
   }
 
   appliesTo(pathIdentity: PathIdentity): boolean {
@@ -106,12 +123,11 @@ export class Batch {
     parent: unknown,
     info: GraphQLResolveInfo,
   ): Promise<CrystalResult> {
-    await this.promise;
+    const data = await this.plan.executeWith(parent);
     const pathIdentity = getPathIdentityFromResolveInfo(
       info,
       isCrystalResult(parent) ? parent[$$path] : undefined,
     );
-    const data = null;
     return {
       [$$batch]: this,
       [$$data]: data,

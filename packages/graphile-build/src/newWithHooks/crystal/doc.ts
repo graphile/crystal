@@ -10,6 +10,7 @@ import {
   GraphQLVariables,
   PathIdentity,
   Plan,
+  PlanResolver,
 } from "./interfaces";
 import { Aether } from "./aether";
 import { Path } from "graphql/jsutils/Path";
@@ -31,7 +32,7 @@ interface PathDigestVariant {
    */
   matchesVariables: GraphQLVariables;
 
-  plan: Plan;
+  plan: PlanResolver<any, any>;
 }
 
 function isDigestValidAgainstVariables(variables: GraphQLVariables) {

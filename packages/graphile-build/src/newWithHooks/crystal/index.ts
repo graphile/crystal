@@ -13,7 +13,7 @@ import { CrystalResult } from "./interfaces";
  * MUST run synchronously, otherwise we might not batch correctly.
  */
 export function executePlanFromResolver(
-  parent: any,
+  parent: unknown,
   args: { [key: string]: any },
   context: GraphileEngine.GraphileResolverContext,
   info: GraphQLResolveInfo,

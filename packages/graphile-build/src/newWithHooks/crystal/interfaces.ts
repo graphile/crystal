@@ -28,20 +28,24 @@ export interface Plan {}
  * Can turn it into intermediary representations that can be used in other
  * plans, e.g. `.toSQL()`?
  */
-type FutureValue<T = unknown> = {
+export type FutureValue<T = unknown> = {
   // TODO!
   eval(): T;
 };
 
-type FutureDependencies<TKeys extends string> = {
-  [key in TKeys]: FutureValue<unknown>;
-};
+export type FutureDependencies<TKeys extends string> = FutureValue<
+  {
+    [key in TKeys]: unknown;
+  }
+>;
 
 /**
  * Plan resolver is called on the field of an Object Type; it's passed the
  * "future dependencies" that were returned by it's `dependencies` callback (if
  * any) and returns a Plan. It cannot use any property of the parent object
  * that was not requested via dependencies.
+ *
+ * @returns a plan for this field.
  *
  * @remarks
  * We're using TrackedObject<...> so we can later consider caching these
@@ -60,9 +64,16 @@ export type PlanResolver<TPlan extends Plan, TDependencyKeys extends string> = (
  * augment the field's base plan (e.g. by adding filters, pagination info,
  * ordering, etc). It cannot use any property of the parent object that was not
  * requested via dependencies.
+ *
+ * @returns If the argument is a scalar then null is returned. If the argument
+ * is non-scalar then it _may_ return a plan that is fed into child input
+ * object fields, useful for building a conditions tree with OR/AND/etc. These
+ * plans are special in that they don't resolve to runtime data, they're just
+ * used to augment the root plan.
  */
-export type ArgPlanResolver<
+export type InputPlanResolver<
   TPlan extends Plan,
+  TOutputPlan extends Plan,
   TDependencyKeys extends string
 > = (
   plan: TPlan,
@@ -70,7 +81,7 @@ export type ArgPlanResolver<
   $deps: FutureDependencies<TDependencyKeys>,
   args: TrackedObject<GraphQLArguments>,
   context: TrackedObject<GraphileEngine.GraphileResolverContext>,
-) => void;
+) => TOutputPlan | null;
 
 /*
 
@@ -128,7 +139,7 @@ declare global {
       TDependencyKeys extends string = never
     > {
       dependencies?: TDependencyKeys[];
-      argPlan?: ArgPlanResolver<TPlan, TDependencyKeys>;
+      argPlan?: InputPlanResolver<TPlan, TDependencyKeys>;
     }
   }
 }
