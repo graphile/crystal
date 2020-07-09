@@ -16,6 +16,8 @@ For Graphile Crystal to work, you need to adhere to the following restrictions:
   - `variables` must be an object or `null`/`undefined` (which GraphQL requires
     anyway)
   - None of the above may be a scalar
+  - Do not provide `fieldResolver` (i.e. don't try and override the default
+    field resolver)
 
 ## Advice
 
@@ -35,6 +37,9 @@ change between executions as possible. In particular, this means you should:
 
 ### `enforceCrystal(schema)`
 
-Ensures every resolver in `schema` is wrapped in crystal.
+Ensures every resolver in `schema` is wrapped in crystal. BEWARE - do not do
+this if resolvers may already be wrapped, dual-wrapping resolvers will result in
+hard-to-find bugs. This is particularly relevant if you're using other libraries
+that modify a schema after it was created, such as `graphql-shield`.
 
 TODO: mutate or return derivative?

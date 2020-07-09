@@ -1,5 +1,6 @@
 import { Batch } from "./batch";
 import { TrackedObject } from "./trackedObject";
+import { Plan } from "./plan";
 
 export type GraphQLRootValue = any;
 export type GraphQLContext = object;
@@ -22,8 +23,6 @@ export interface CrystalResult {
   [$$data]: unknown;
   [$$path]: PathIdentity;
 }
-
-export interface Plan {}
 
 /**
  * $-prefixed; represents a value that doesn't exist yet but will in future.

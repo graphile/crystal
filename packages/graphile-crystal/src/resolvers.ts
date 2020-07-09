@@ -23,6 +23,8 @@ import { Batch } from "./batch";
 export const makeCrystalObjectExtension = () => ({});
 export const makeCrystalObjectFieldExtension = () => ({});
 
+export const $$crystalWrappedResolver = Symbol("crystalWrappedResolver");
+
 function isPromise<T>(
   possiblyPromise: T | Promise<T>,
 ): possiblyPromise is Promise<T> {
@@ -94,7 +96,7 @@ export function makeCrystalWrapResolver() {
   // Cached on a per-schema basis, so no need for a WeakMap
   let typeToWrapperMap = new Map<GraphQLOutputType, any>();
 
-  function makeWrapper(type: GraphQLOutputType) {
+  function makeResultWrapper(type: GraphQLOutputType) {
     const wrapper = typeToWrapperMap.get(type);
     if (wrapper) {
       return wrapper;
@@ -148,18 +150,22 @@ export function makeCrystalWrapResolver() {
     return newWrapper;
   }
 
-  return function graphileWrapResolver<
+  return function crystalWrapResolver<
     TSource,
     TContext extends object,
     TArgs = { [argName: string]: any }
   >(
-    config: GraphQLFieldConfig<TSource, TContext, TArgs>,
-  ): GraphQLFieldConfig<TSource, TContext, TArgs> {
-    const { resolve, type, extensions } = config;
+    type: GraphQLOutputType,
+    resolve: GraphQLFieldResolver<
+      TSource,
+      TContext,
+      TArgs
+    > = defaultFieldResolver,
+  ): GraphQLFieldResolver<TSource, TContext, TArgs> {
     let realResolver = resolve || defaultFieldResolver;
 
-    const wrap = makeWrapper(type);
-    const graphileResolver: GraphQLFieldResolver<
+    const wrapResult = makeResultWrapper(type);
+    const crystalResolver: GraphQLFieldResolver<
       TSource,
       TContext,
       TArgs
@@ -174,12 +180,13 @@ export function makeCrystalWrapResolver() {
 
       let { [$$data]: data, ...meta } = await executionResult;
       const result = await realResolver(data as any, args, context, info);
-      return wrap(meta, result);
+      return wrapResult(meta, result);
     };
-    return {
-      ...config,
-      resolve: graphileResolver,
-    };
+    Object.defineProperty(crystalResolver, $$crystalWrappedResolver, {
+      enumerable: false,
+      configurable: false,
+    });
+    return crystalResolver;
   };
 }
 

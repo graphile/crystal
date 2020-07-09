@@ -582,9 +582,15 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
             }
           }
 
-          // Perform the Graphile magic
+          // Perform the Graphile Crystal magic
           for (const fieldName in fieldsSpec) {
-            fieldsSpec[fieldName] = wrapResolver(fieldsSpec[fieldName]);
+            fieldsSpec[fieldName].resolve = wrapResolver(
+              fieldsSpec[fieldName].type,
+              fieldsSpec[fieldName].resolve,
+            );
+
+            // IMPORTANT: **nothing** can modify the resolver from here - i.e.
+            // graphql-shield and friends may cause problems
           }
 
           return fieldsSpec;

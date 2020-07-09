@@ -4,13 +4,13 @@ import {
   CrystalResult,
   FutureDependencies,
   PathIdentity,
-  Plan,
   $$path,
   $$batch,
   $$data,
   GraphQLContext,
 } from "./interfaces";
 import { getPathIdentityFromResolveInfo } from "./utils";
+import { Plan } from "./plan";
 import { isCrystalResult } from "./crystalResult";
 import { Aether } from "./aether";
 import { future } from "./future";
@@ -124,11 +124,19 @@ export class Batch {
     parent: unknown,
     info: GraphQLResolveInfo,
   ): Promise<CrystalResult> {
-    const data = await this.plan.executeWith(parent);
+    // TODO: should be able to return this synchronously (no `async`)
     const pathIdentity = getPathIdentityFromResolveInfo(
       info,
       isCrystalResult(parent) ? parent[$$path] : undefined,
     );
+    if (!this.plan) {
+      return {
+        [$$batch]: this,
+        [$$data]: isCrystalResult(parent) ? parent[$$data] : parent,
+        [$$path]: pathIdentity,
+      };
+    }
+    const data = await this.plan.executeWith(parent);
     return {
       [$$batch]: this,
       [$$data]: data,

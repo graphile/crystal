@@ -6,5 +6,5 @@
     "outDir": "./dist"
   },
   "include": ["src"],
-  "references": [{ "path": "../lru" }]
+  "references": [{ "path": "../lru" }, { "path": "../pg-sql2" }]
 }
