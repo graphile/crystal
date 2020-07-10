@@ -51,13 +51,13 @@ export class Batch {
     info: GraphQLResolveInfo,
   ) {
     this.infoByPathIdentity = new Map();
-    this.execute(parent, args, context, info);
+    this.prepare(parent, args, context, info);
   }
 
   /**
    * Populates infoByPathIdentity **synchronously**.
    */
-  execute(
+  prepare(
     parent: unknown,
     args: GraphQLArguments,
     context: GraphQLContext,
@@ -77,6 +77,8 @@ export class Batch {
       pathIdentity,
       info.variableValues,
     );
+    console.log("Digest:");
+    console.dir(digest);
 
     if (digest?.plan) {
       const trackedArgs = new TrackedObject(args);
@@ -130,6 +132,9 @@ export class Batch {
       isCrystalResult(parent) ? parent[$$path] : undefined,
     );
     if (!this.plan) {
+      console.log(
+        `There's no plan for ${info.parentType.name}.${info.fieldName}`,
+      );
       return {
         [$$batch]: this,
         [$$data]: isCrystalResult(parent) ? parent[$$data] : parent,
@@ -137,6 +142,8 @@ export class Batch {
       };
     }
     const data = await this.plan.executeWith(parent);
+    console.log("EXECUTED PLAN");
+    console.dir(data);
     return {
       [$$batch]: this,
       [$$data]: data,

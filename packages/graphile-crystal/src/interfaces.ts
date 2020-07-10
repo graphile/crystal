@@ -1,6 +1,7 @@
 import { Batch } from "./batch";
 import { TrackedObject } from "./trackedObject";
 import { Plan } from "./plan";
+import { FutureValue } from "./future";
 
 export type GraphQLRootValue = any;
 export type GraphQLContext = object;
@@ -23,16 +24,6 @@ export interface CrystalResult {
   [$$data]: unknown;
   [$$path]: PathIdentity;
 }
-
-/**
- * $-prefixed; represents a value that doesn't exist yet but will in future.
- * Can turn it into intermediary representations that can be used in other
- * plans, e.g. `.toSQL()`?
- */
-export type FutureValue<T = unknown> = {
-  // TODO!
-  eval(): T;
-};
 
 export type FutureDependencies<TKeys extends string> = FutureValue<
   {

@@ -6,10 +6,40 @@ import {
   graphql,
   GraphQLString,
 } from "graphql";
-import { forumLoader, messageLoader, PgConnectionPlan } from "./fetchers";
+import {
+  forumLoader,
+  messageLoader,
+  userLoader,
+  PgConnectionPlan,
+} from "./fetchers";
 import sql from "../../pg-sql2/dist";
 
 const { enforceCrystal } = require("../src");
+
+const User = new GraphQLObjectType({
+  name: "User",
+  fields: {
+    username: {
+      type: GraphQLString,
+      extensions: {
+        graphile: {
+          dependencies: ["username"],
+        },
+      },
+    },
+    gravatarUrl: {
+      type: GraphQLString,
+      resolve(parent) {
+        return parent.gravatar_url;
+      },
+      extensions: {
+        graphile: {
+          dependencies: ["gravatar_url"],
+        },
+      },
+    },
+  },
+});
 
 const Message = new GraphQLObjectType({
   name: "Message",
@@ -28,11 +58,7 @@ const Message = new GraphQLObjectType({
         graphile: {
           dependencies: ["author_id"],
           plan($deps) {
-            const plan = userLoader.getOne();
-            plan.identify(
-              $deps.toSQL(["author_id"]),
-              (identifiers) => sql`${plan.alias}.id = ${identifiers}.author_id`,
-            );
+            const plan = userLoader.fetchById($deps.toSQL(["author_id"]));
             return plan;
           },
         },
@@ -78,7 +104,8 @@ const Forum = new GraphQLObjectType({
           plan($deps) {
             const plan = messageLoader.fetchMany();
             plan.identify(
-              $deps.toSQL(["id"]),
+              $deps.get(["id"]),
+              //$deps.toSQL(["id"]),
               (identifiers) => sql`${plan.alias}.forum_id = ${identifiers}.id`,
             );
             return new PgConnectionPlan(plan);
@@ -116,7 +143,7 @@ const schema = enforceCrystal(
 );
 
 async function main() {
-  console.log(printSchema(schema));
+  //console.log(printSchema(schema));
 
   const query = /* GraphQL */ `
     {

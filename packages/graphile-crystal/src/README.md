@@ -10,6 +10,43 @@ following goals in mind:
 - Easier to debug
 - More flexible
 
+## FutureValue
+
+A `FutureValue` always represents a set of similarly structured POJOs, e.g.:
+
+```json
+[
+  { "id": 1, "text": "hello" },
+  { "id": 2, "text": "good day" },
+  { "id": 3, "text": "greetings" }
+]
+```
+
+Every FutureValue has an `.eval(cb)` function which ultimately resolves to these
+values; but some FutureValues have other ways of retrieving them.
+
+(?) An SQL-compatible FutureValue would have a `.toSQL()` method that would
+return a pg-sql2 fragment, e.g. `select id, text from greetings`.
+
+(?) A GraphQL-compatible FutureValue would have a `.toGraphQLSelectionSet()`
+method which might return a fragment such as `... on Greeting { id text }`.
+
+FutureValues inherently have a "selection" (the list of fields they're
+interested in), and allow transformations to a smaller selection set via the
+`.get(keys)` method. This returns a new FutureValue representing this smaller
+selection, e.g. for the FutureValue above, `fv.get(["id"])` would return a
+FutureValue representing:
+
+```json
+[{ "id": 1 }, { "id": 2 }, { "id": 3 }]
+```
+
+For this more narrow FutureValue, `.toSQL` would return
+`select id from greetings` and `.toGraphQLSelectionSet()` would return
+`... on Greeting { id }`
+
+For a FutureValue, `.keys()` returns the current selection.
+
 ## Glossary
 
 The following query may be referenced in the glossary

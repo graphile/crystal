@@ -1,6 +1,6 @@
 import sql, { SQL } from "pg-sql2";
 import { Plan } from "../src";
-import { FutureValue } from "../src/interfaces";
+import { FutureValue } from "../src/future";
 
 export class ConnectionPlan extends Plan {
   constructor(public readonly subplan: Plan) {
@@ -24,8 +24,11 @@ export class PgConnectionPlan extends ConnectionPlan {
 }
 
 class PgSelectPlan extends Plan {
+  private selections: SQL[];
   private whereClauses: SQL[];
+
   private valuesSymbol: symbol;
+  private aliasSymbol: symbol;
   public alias: SQL;
 
   constructor(
@@ -33,9 +36,17 @@ class PgSelectPlan extends Plan {
     private readonly source: SQL = sql.identifier(sourceName),
   ) {
     super();
-    this.alias = sql.identifier(Symbol(sourceName));
-    this.whereClauses = [];
+
+    this.aliasSymbol = Symbol(sourceName);
+    this.alias = sql.identifier(this.aliasSymbol);
     this.valuesSymbol = Symbol(sourceName + "_values");
+
+    this.selections = [];
+    this.whereClauses = [];
+  }
+
+  select(field) {
+    this.selections.push(sql.identifier(this.aliasSymbol, field));
   }
 
   identify(
@@ -98,6 +109,57 @@ class PgSelectPlan extends Plan {
   }
 }
 
+class SQLCapableFutureValue<TEntry = unknown> extends FutureValue<TEntry> {
+  private aliasSymbol: symbol;
+  private alias: SQL;
+
+  constructor(selection, private source: SQL) {
+    super(selection);
+    this.aliasSymbol = Symbol("TODO");
+    this.alias = sql.identifier(this.aliasSymbol);
+  }
+
+  toSQL(): SQL {
+    return sql.fragment`select ${sql.join(
+      this.selection.map((field) =>
+        sql.identifier(this.aliasSymbol, field as string),
+      ),
+    )} from ${this.source} as ${this.alias}`;
+  }
+
+  get<TNewKeys extends keyof TEntry>(
+    newSelection: Array<TNewKeys>,
+  ): SQLCapableFutureValue<Pick<TEntry, TNewKeys>> {
+    return new SQLCapableFutureValue(newSelection, this.source);
+  }
+
+  eval(): Promise<ReadonlyArray<TEntry>> {
+    /* TODO */
+    return Promise.resolve([]);
+  }
+}
+
+function isSQLCapable<TEntry, T extends FutureValue<TEntry>>(
+  val: T,
+): val is SQLCapableFutureValue<TEntry> {
+  return "toSQL" in val && typeof val.toSQL === "function";
+}
+
+export const toSQL = ($val: FutureValue): SQL | Promise<SQL> => {
+  if (isSQLCapable($val)) {
+    return $val.toSQL();
+  } else {
+    return $val
+      .eval()
+      .then(
+        (entries) =>
+          sql.fragment`select i from json_array_elements(${sql.value(
+            JSON.stringify(entries),
+          )})`,
+      );
+  }
+};
+
 export const forumLoader = {
   fetchMany() {
     return new PgSelectPlan("forums");
@@ -107,6 +169,27 @@ export const forumLoader = {
 export const messageLoader = {
   fetchMany() {
     return new PgSelectPlan("messages");
+  },
+};
+
+export const userLoader = {
+  fetchMany() {
+    return new PgSelectPlan("users");
+  },
+  fetchById($id: FutureValue) {
+    const plan = new PgSelectPlan("users");
+    plan.select("id");
+    plan.where(sql`${plan.alias}.id in (${toSQL($id)})`);
+    /*
+      select
+        __local_8__.id,
+        __local_8__."name"
+      from "public"."genres" as __local_8__
+      where __local_8__."id" in (
+        -- Single record, direct PK lookup
+        select genre_id from "@trackByTrackId"
+      )
+    */
   },
 };
 
@@ -150,6 +233,8 @@ forums:
 // are used.
 
 
+// THIS IS WRONG - the limit is in the wrong place, it should be per-deps:
+
 select row_to_json(deps) as @@deps, row_number() over (partition by 1) as @@row, ...
 from messages
 inner join (
@@ -165,6 +250,51 @@ left join (
   from json_array_elements($1) values
 ) as values (id, stripe_plan_active)
 on (values.id = deps.id)
+where ...
+order by ...
+limit ...
+offset ...
+
+
+select json_object_agg(row_to_json(identifiers)::string, (
+  select json_agg(
+    json_build_object(...)
+    order by ...
+  )
+  from messages
+  left join (
+    select distinct on (values->id) -- distinct may be require to guarantee exactly one match per id
+      values->id,
+      values->stripe_plan_active
+    from json_array_elements($1) values
+  ) as values (id, stripe_plan_active)
+  on (values.id = identifiers.id)
+  where (messages.forum_id = identifiers.id) -- JOIN CLAUSE
+  limit ...
+  offset ...
+)
+from (
+  select distinct -- distinct is an optimization (maybe)
+    id
+  from __forums_0__
+) as identifiers (id)
+
+
+select row_to_json(identifiers) as @@identifiers, row_number() over (partition by 1) as @@row, ...
+from messages
+inner join (
+  select distinct -- distinct is an optimization (maybe)
+    id
+  from __forums_0__
+) as identifiers (id)
+on (messages.forum_id = identifiers.id)
+left join (
+  select distinct on (values->id) -- distinct may be require to guarantee exactly one match per id
+    values->id,
+    values->stripe_plan_active
+  from json_array_elements($1) values
+) as values (id, stripe_plan_active)
+on (values.id = identifiers.id)
 where ...
 order by ...
 limit ...

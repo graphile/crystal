@@ -5,6 +5,12 @@ import {
   GraphQLResolveInfo,
   GraphQLObjectType,
   FragmentDefinitionNode,
+  GraphQLField,
+  GraphQLOutputType,
+  GraphQLUnionType,
+  GraphQLInterfaceType,
+  GraphQLNamedType,
+  SelectionSetNode,
 } from "graphql";
 import {
   GraphQLRootValue,
@@ -12,8 +18,10 @@ import {
   PathIdentity,
   PlanResolver,
   GraphQLContext,
+  InputPlanResolver,
 } from "./interfaces";
 import { Aether } from "./aether";
+import { parseDoc, FieldDigest } from "./parseDoc";
 
 /**
  * Weak maps cannot use a primitive as a key; so we use this object as a
@@ -32,7 +40,7 @@ interface PathDigestVariant {
    */
   matchesVariables: GraphQLVariables;
 
-  plan: PlanResolver<any, any>;
+  fieldDigest: FieldDigest;
 }
 
 function isDigestValidAgainstVariables(variables: GraphQLVariables) {
@@ -134,7 +142,10 @@ export class Doc {
     return aether;
   }
 
-  digestForPath(pathIdentity: PathIdentity, variables: GraphQLVariables) {
+  digestForPath(
+    pathIdentity: PathIdentity,
+    variables: GraphQLVariables,
+  ): FieldDigest {
     // Get the list of digests valid for the current path
     let digests = this.digestsByPathIdentity.get(pathIdentity);
     if (!digests) {
@@ -145,7 +156,7 @@ export class Doc {
     // Can we use one of them?
     const validDigest = digests.find(isDigestValidAgainstVariables(variables));
     if (validDigest) {
-      return validDigest;
+      return validDigest.fieldDigest;
     }
 
     // No... Time to build our own digest then!
@@ -154,15 +165,57 @@ export class Doc {
 
     const trackedVariables = new TrackedObject(variables);
 
-    const parseResult = this.parseDocument(trackedVariables);
+    // TODO: memoize
+    const parseResult = parseDoc(this, trackedVariables);
 
     const matchesVariables = {};
     for (const key of trackedVariables.accessedKeys) {
       matchesVariables[key] = variables[key];
     }
+
+    const fieldDigest = parseResult.fieldDigestByPath.get(pathIdentity);
+
+    if (!fieldDigest) {
+      throw new Error(
+        `Parsing failed, field digest did not exist for '${pathIdentity}'`,
+      );
+    }
+    const newDigest: PathDigestVariant = {
+      pathIdentity,
+      matchesVariables,
+      fieldDigest,
+    };
+
+    digests.push(newDigest);
+    return newDigest.fieldDigest;
   }
 
-  private parseDocument(trackedVariables: TrackedObject<GraphQLVariables>) {}
+  /** 
+  private parseDocument(
+    trackedVariables: TrackedObject<GraphQLVariables>,
+  ): ParsedDocument {
+    const pd: ParsedDocument = {
+      name: this.document.name?.value ?? null,
+      fields: this.collectFields(
+        this.rootType,
+        this.document.selectionSet,
+        trackedVariables,
+      ),
+    };
+  }
+
+  private collectFields(
+    objectType: GraphQLObjectType,
+    selectionSet: SelectionSetNode,
+    trackedVariables: TrackedObject<GraphQLVariables>,
+    visitedFragments: string[]
+  ): {
+    [fieldName: string]: ParsedField;
+  } {
+    const groupedFields: {[responseKey: string]:} = {};
+
+  }
+  */
 }
 
 /**
