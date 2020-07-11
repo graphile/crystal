@@ -83,6 +83,8 @@ export class Batch {
     if (digest?.plan) {
       const trackedArgs = new TrackedObject(args);
       const trackedContext = new TrackedObject(context);
+      // TODO
+      // $deps represents the set of arguments that will be fed into this plan; e.g. for `userById(id: 8)` it'd be the set `[{id: 8}]`.
       const $deps: FutureDependencies<any> = future();
       const plan = digest?.plan($deps, trackedArgs, trackedContext);
 

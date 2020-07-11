@@ -1,21 +1,24 @@
 import { memoize, pick } from "lodash";
 
 /**
- * $-prefixed; represents a value that doesn't exist yet but will in future.
- * Can turn it into intermediary representations that can be used in other
- * plans, e.g. `.toSQL()`?
+ * $-prefixed; represents an abstract set of values that doesn't exist yet but
+ * will in future. Can turn it into intermediary representations that can be
+ * used in other plans, e.g. `.toSQL()`?
  */
 export abstract class FutureValue<TEntry = unknown> {
-  constructor(protected selection: Array<keyof TEntry>) {
-    // Eval should only be called once
-    this.eval = memoize(this.eval.bind(this));
-  }
+  constructor(protected selection: Array<keyof TEntry>) {}
 
   keys(): ReadonlyArray<keyof TEntry> {
     return this.selection;
   }
 
-  abstract eval(): Promise<ReadonlyArray<TEntry>>;
+  feed(data: Array<TEntry>) {
+    for (const cb of this.callbacks) {
+      cb(data);
+    }
+  }
+
+  eval(): Promise<ReadonlyArray<TEntry>> {}
 
   abstract get<TNewKeys extends keyof TEntry>(
     newSelection: Array<TNewKeys>,
