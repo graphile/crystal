@@ -12,20 +12,68 @@ following goals in mind:
 
 ## FutureValue
 
-A `FutureValue` represents an abstract set of similarly structured POJOs, e.g.:
+A `FutureValue` represents a set of values with associated identifiers. The
+identifiers allow grouping the values back up into the expected form, since a
+single FutureValue may be shared across hundreds or thousands of field
+executions (e.g. the field `User.friends` may be called hundreds of times in a
+single GraphQL execution, this would be represented by a single FutureValue, but
+in the resolver we need to determine which of the resulting "friends" was
+actually for us).
+
+Thus the type of a FutureValue is an array of tuples, where the first value in
+the tuple is the identifiers (strings, numbers, booleans, etc) and the second
+value in the tuple is the actual resulting value.
+
+Crystal uses the "dependencies" of a field (including the dependencies of any
+arguments) to determine the identifiers. These are uniqued, and then the
+resulting order is locked so that an array of values (rather than an object) may
+be used for identification.
+
+A future value representing `Query.allGreetings` might be something like:
 
 ```json
 [
-  { "id": 1, "text": "hello" },
-  { "id": 2, "text": "good day" },
-  { "id": 3, "text": "greetings" }
+  [
+    [], // identifiers
+    [
+      { "id": 1, "text": "hello" },
+      { "id": 2, "text": "good day" },
+      { "id": 3, "text": "greetings" }
+    ] // The "value" (since this is a list field, an array is expected)
+  ]
 ]
 ```
 
-This set is abstract because the same `FutureValue` instance may be used with
-multiple input sets, one for each plan execution, so the FutureValue is more of
-a pub/sub, receiving a set of resolved values and distributing these to the
-interested plans/other futures.
+Above we see that the identifiers (the first entry in the tuple) are all empty,
+this is common with root-level fields which have no identifiers.
+
+A field deeper in the tree, such as `User.friends`, likely would have
+identifiers. In the case of `User.friends` the identifiers are likely the
+`User`'s `id`:
+
+```json
+[
+  [
+    [7], // identifiers
+    [
+      { "user_id": 7, "friend_id": 29 },
+      { "user_id": 7, "friend_id": 36 }
+    ] // The "value"
+  ],
+  [
+    [8], // identifiers
+    [
+      { "user_id": 8, "friend_id": 36 },
+      { "user_id": 8, "friend_id": 42 }
+    ] // value
+  ]
+]
+```
+
+This set is **abstract** because the same `FutureValue` instance may be used
+with multiple input sets, one for each plan execution, so the FutureValue is
+more of a pub/sub, receiving a set of resolved values and distributing these to
+the interested plans/other futures.
 
 <!-- Every FutureValue has an `.eval(cb)` function which will call the callback when
 a set of values is available; but  -->
@@ -33,54 +81,15 @@ a set of values is available; but  -->
 You can use `futureValue.transform(cb)` to return a new transformed FutureValue;
 for example to turn a set of database records into a set of stripe customers, or
 a set of stripe customers into a set of booleans determining whether or not each
-user has an active plan.
+user has an active plan. Transforms preserve the identifiers, so they're a
+little like `mapValues` on an object.
 
 You can use `FutureValue.zip([fv1, fv2, ...])` to "zip together" multiple future
-values; e.g.
+values that use the same identifiers. This would require "materialization" of
+the future values, reducing the effectiveness of batching operations, so it
+should be used sparingly.
 
-```js
-// The start value represents the parameters at the root of the query; e.g. for
-// `Query.userById(id: 27)` it would represent `[{id: 27}]`; for
-// `User.stripeCustomer` it would represent `[{stripe_customer_id:
-// "sdfsdfsdfsdf"}, {stripe_customer_id: "asdasdasd"}, ...]` (the set would be
-// as large as there are users).
-//
-// In this case, this is an empty FutureValue representing an array of empty
-// objects because our "allForums" field's resolver will only be called once;
-// given this field is only called once the array will contain only one empty
-// object
-const $startValue = new EntrypointFutureValue();
-
-// The root of our plan; our allForums field fetches N forums for each call:
-const forumsPlan = forumLoader.fetchMany($startValue); // Array<Forum[]>
-
-// Crystal notices that the return type of allForums is a list, so it creates a
-// future representing the individual records. There will be N records (despite
-// there being only 1 forum).
-const $forum = forumsPlan.listEntry();
-
-// Now we're planning the messagesConnection field. We're not going to actually
-// execute this up front; instead dependent fields (such as nodes, edges) may
-// use a clone of it which will be executed.
-//
-// Note that each of the following futures has the same size, so they can later
-// be zipped back together.
-const $forumId = $forum.get("id"); // Array<{id: number}>
-const $forumSecret = forumSecretsLoader.fetchByForumId($forumId); // Array<ForumSecret>
-const $stripeId = $forumSecret.get("stripe_id"); // Array<{stripe_id: string}>
-const $stripeCustomer = stripeLoader.fetchCustomerById($stripeId); // Array<{customer: StripeCustomer }>
-const $hasActivePlan = $stripeCustomer.transform((customer) => ({
-  hasActivePlan: !!customer.subscriptions.find(isActive),
-})); // Array<{hasActivePlan: boolean}>
-// Now we've checked the availability of plans for each forum, we will use that
-// to influence the messages we retrieve for said forum.
-const $forumAndHasPlan = FutureValue.zip([$forumId, $hasActivePlan]); // Array<{id: number, hasActivePlan: boolean}>
-const $messages = messagesLoader.fetchMany(
-  $forumAndHasPlan,
-  (plan) =>
-    sql.fragment`${plan.alias}.forum_id = ${plan.values}.id and ${plan.values}."hasActivePlan" is true`,
-); // Array<Message[]>
-```
+## OUTDATED SECTION - needs review.
 
 Some FutureValues have other ways of referencing the batch of values. For
 example:
@@ -110,6 +119,194 @@ For a FutureValue, `.keys()` returns the current selection.
 Once a plan is established, all FutureValues within it are `.finalize()`-d, at
 which point no further `.eval()` callbacks can be added, and no more `.get()`
 derivatives can be generated (because those derivatives depend on the parent).
+
+## Start value
+
+We all have to start somewhere. The start value represents the parameters at the
+root of the query; e.g. for `Query.userById(id: 27)` it would probably
+represent:
+
+```json
+[[[], { "id": 27 }]]
+```
+
+For `User.stripeCustomer` it might represent
+
+```json
+[
+  [["stripe_1"], { "stripe_customer_id": "stripe_1" }],
+  [["stripe_2"], { "stripe_customer_id": "stripe_2" }]
+]
+```
+
+Note that although there may be 200 users, if there's only 2 stripe customers
+between them (and even if multiple users share the same stripe customer), the
+set above still only contains two values, and despite that it contains
+everything we need to look up the result within the resolvers (all users
+referencing the same stripe customer would just return the same stripe
+customer - that's totally allowed).
+
+A Start Value is modelled as a future.
+
+### Walk-through example
+
+We're going to walk through executing:
+
+```graphql
+{
+  allForums {
+    messagesConnection {
+      nodes {
+        id
+      }
+    }
+  }
+}
+```
+
+`Query.allForums` returns `[Forum!]!` straight from the DB.
+
+`Forum.messageConnection` returns a relay connection `MessagesConnection!`;
+importantly however there's a filter applied to messageConnection that requires
+us to talk to a third party, Stripe, to determine if the forum's plan is
+currently active. This is a contrived example.
+
+`MessagesConnection.nodes` returns `[Message!]!` by executing a cloned version
+of the internal plan from `Forum.messageConnection`.
+
+In this example, our start value is an empty FutureValue representing an array
+of empty objects because our "allForums" field's resolver will only be called
+once; given this field is only called once the array will contain only one empty
+object.
+
+```ts
+type IdentifierValue<TIdentifierTuple extends [], TValue = any> = [
+  TIdentifierTuple,
+  TValue,
+];
+type FutureSet<TIdentifierTuple extends [], TValue = any> = Array<
+  IdentifierValue<TIdentifierTuple, TValue>
+>;
+const $$start = new EntrypointFutureValue(); // FutureSet<[],{}>
+```
+
+For a more complex example, such as `User.stripeCustomer`, the type would
+reflect the "dependencies" of the field and might be something like:
+`FutureSet<[/*user_id*/ number], {user_id: number}>`, or, if the
+stripe_customer_id could be determined ahead of time, maybe
+`FutureSet<[/*stripe_customer_id*/ string], {stripe_customer_id: string}>` or
+even
+`FutureSet<[/*user_id*/ number, /*stripe_customer_id*/ string], {user_id: number, stripe_customer_id: string}>`.
+
+#### Plan: 'Query.allForums'
+
+Crystal determines that the `allForums` field needs to be called, so calls its
+plan function which looks something like this:
+
+```js
+function Query_allForums_plan($$id) {
+  const forumsPlan = forumLoader.fetchMany($$id);
+  return forumsPlan;
+}
+
+const forumsPlan = Query_allForums_plan($$start);
+```
+
+##### Dependencies
+
+Crystal now scans for all the dependencies relevant to this plan:
+
+- `Forum.messageConnection` declares dependencies `["id"]`
+- no further dependencies found.
+
+Crystal uniques this list to produce `["id"]`, and then tells the plan it must
+fetch these dependencies:
+
+```js
+//------------------------------------------------------------------------------
+//!DEPENDENCIES: `Forum.messagesConnection`
+
+forumsPlan.dependencies(["id"]);
+```
+
+##### Result plan
+
+Now Crystal has ensured that the plan fetches everything it needs to, it can
+build a future value to represent what the field should return:
+
+```js
+const $forums = forumsPlan.future(); // FutureSet<[], Array<Forum>>
+```
+
+The next layer of plans, however, would run on a per-forum basis (GraphQL will
+loop through the list for us). We need a way of representing an individual Forum
+rather than the entire list...
+
+#### Plan: Forum.messageConnection
+
+Here Crystal uses the "dependencies" for the messageConnection again, to get an
+identifier for the calls into this field that can be used to unpack the results
+later. Note we pass "1" here as a consistency check, as we must go through 1
+layer of nested lists. If the parent plan returned a singular record we'd use
+`.get(...)` instead of `.each()`. If the parent plan returned a list of lists,
+we'd pass a "2" here.
+
+```js
+const $$id = $forums.each(["id"], 1); // FutureSet<[/*forum_id*/ number], {"id": number}>
+```
+
+Note the two tuples in the comment above are identical: they both contain the
+value of "id" for the record. The later tuple will have derivatives generated
+during the plan, but the first tuple must remain fixed so that we can re-group
+the results later.
+
+This `$$id` identifier behavior is similar to how the "batch loading function"
+in a DataLoader typically works. A DataLoader must return results in the same
+order as the requested inputs; this is normally achieved inside the batch
+loading function: the function fetches all the records from the data source and
+then maps over the inputs, finding the relevant record(s) for each input.
+Crystal handles this matching for us using the identifier.
+
+Now we must call the user's plan using this identifier.
+
+Note that because this is a connection we're building a plan here we're not
+going to actually execute up front; instead dependent fields (such as nodes,
+edges) may use a clone of it which will be executed. We still have to return a
+plan, so we return a special "connection" plan that contains all this logic.
+
+Note further that each of the subplans we're creating here share the same
+identifiers, so they can later be 'zipped' back together.
+
+```js
+function Forum_messageConnection_plan($$id) {
+  const forumSecretPlan = forumSecretsLoader.fetchByForumId($$id);
+  forumSecretPlan.dependencies(["stripe_customer_id"]);
+
+  const $forumSecret = forumSecretPlan.future(); // FutureSet<[/*forum_id*/ number], {stripe_customer_id: string, ...}>
+  // TODO: should getting the non-list version result in a non-list result?
+  const $stripeId = $forumSecret.get(["stripe_customer_id"]); // FutureSet<[/*forum_id*/ number], [/*stripe_customer_id*/ string]>
+
+  const stripeCustomerPlan = stripeLoader.fetchCustomerById($stripeId);
+  const $stripeCustomer = stripeCustomerPlan.future(); // FutureSet<[/*forum_id*/ number], StripeCustomer>
+
+  const $hasActivePlan = $stripeCustomer.transform((customer) => ({
+    hasActivePlan: !!customer.subscriptions.find(isActive),
+  })); // FutureSet<[/*forum_id*/ number], {hasActivePlan: boolean}>
+
+  // Now we've checked the availability of plans for each forum, we will use that
+  // to influence the messages we retrieve for said forum. const
+  // TODO: should we convert this into named properties via some get/alias shenanigans?
+  const $forumAndHasPlan = FutureValue.zip([$$id, $hasActivePlan]); // FutureSet<[/*forum_id*/ number], {id: number, hasActivePlan: boolean}>
+  const messagesPlan = messagesLoader.fetchMany(
+    $forumAndHasPlan,
+    (plan) =>
+      sql.fragment`${plan.alias}.forum_id = ${plan.values}.id and ${plan.values}."hasActivePlan" is true`,
+  );
+  return connectionPlan(messagesPlan);
+}
+
+const connectionPlan = Forum_messageConnection_plan($$id);
+```
 
 ## Glossary
 
