@@ -323,9 +323,13 @@ export default function createPostGraphileHttpRequestHandler(
     validationErrors: ReadonlyArray<GraphQLError>;
     length: number;
   }
-  const queryCache = new LRU({
+
+  //LRU requires a minimum of 2MB so we need to avoid 
+  //instantiation for the disabled value of 0
+  const cacheDisabled = queryCacheMaxSize <= 0;
+  const queryCache = !cacheDisabled ? new LRU({
     maxLength: Math.ceil(queryCacheMaxSize / 100000),
-  });
+  }) : null;
 
   let lastGqlSchema: GraphQLSchema;
   const parseQuery = (
@@ -335,17 +339,19 @@ export default function createPostGraphileHttpRequestHandler(
     queryDocumentAst: DocumentNode;
     validationErrors: ReadonlyArray<GraphQLError>;
   } => {
+    // Only cache queries that are less than 100kB, we don't want DOS attacks
+    // attempting to exhaust our memory.
+    const canCache = !cacheDisabled && queryString.length < 100000;
+
     if (gqlSchema !== lastGqlSchema) {
-      queryCache.reset();
+      if(canCache) {
+        queryCache?.reset();
+      }
       lastGqlSchema = gqlSchema;
     }
 
-    // Only cache queries that are less than 100kB, we don't want DOS attacks
-    // attempting to exhaust our memory.
-    const canCache = queryCacheMaxSize > 0 && queryString.length < 100000;
-
     const hash = canCache ? calculateQueryHash(queryString) : null;
-    const result = canCache ? queryCache.get(hash!) : null;
+    const result = canCache ? queryCache?.get(hash!) : null;
     if (result) {
       return result;
     } else {
@@ -371,7 +377,7 @@ export default function createPostGraphileHttpRequestHandler(
         length: queryString.length,
       };
       if (canCache) {
-        queryCache.set(hash!, cacheResult);
+        queryCache?.set(hash!, cacheResult);
       }
       return cacheResult;
     }
