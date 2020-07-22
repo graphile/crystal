@@ -29,6 +29,8 @@ import finalHandler = require('finalhandler');
 import bodyParser = require('body-parser');
 import crypto = require('crypto');
 
+const CACHE_MULTIPLIER = 100000;
+
 const ALLOW_EXPLAIN_PLACEHOLDER = '__SHOULD_ALLOW_EXPLAIN__';
 const noop = () => {
   /* noop */
@@ -324,12 +326,11 @@ export default function createPostGraphileHttpRequestHandler(
     length: number;
   }
 
-  //LRU requires a minimum of 2MB so we need to avoid 
-  //instantiation for the disabled value of 0
-  const cacheDisabled = queryCacheMaxSize <= 0;
-  const queryCache = !cacheDisabled ? new LRU({
-    maxLength: Math.ceil(queryCacheMaxSize / 100000),
-  }) : null;
+  const cacheSize = Math.ceil(queryCacheMaxSize / CACHE_MULTIPLIER);
+
+  // Do not create an LRU for cache size < 2 because @graphile/lru will baulk.
+  const cacheEnabled = cacheSize >= 2;
+  const queryCache = cacheEnabled ? new LRU({ maxLength: cacheSize }) : null;
 
   let lastGqlSchema: GraphQLSchema;
   const parseQuery = (
@@ -339,19 +340,19 @@ export default function createPostGraphileHttpRequestHandler(
     queryDocumentAst: DocumentNode;
     validationErrors: ReadonlyArray<GraphQLError>;
   } => {
-    // Only cache queries that are less than 100kB, we don't want DOS attacks
-    // attempting to exhaust our memory.
-    const canCache = !cacheDisabled && queryString.length < 100000;
-
     if (gqlSchema !== lastGqlSchema) {
-      if(canCache) {
-        queryCache?.reset();
+      if (queryCache) {
+        queryCache.reset();
       }
       lastGqlSchema = gqlSchema;
     }
 
+    // Only cache queries that are less than 100kB, we don't want DOS attacks
+    // attempting to exhaust our memory.
+    const canCache = cacheEnabled && queryString.length < 100000;
+
     const hash = canCache ? calculateQueryHash(queryString) : null;
-    const result = canCache ? queryCache?.get(hash!) : null;
+    const result = canCache ? queryCache!.get(hash!) : null;
     if (result) {
       return result;
     } else {
@@ -377,7 +378,7 @@ export default function createPostGraphileHttpRequestHandler(
         length: queryString.length,
       };
       if (canCache) {
-        queryCache?.set(hash!, cacheResult);
+        queryCache!.set(hash!, cacheResult);
       }
       return cacheResult;
     }
