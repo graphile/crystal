@@ -415,7 +415,7 @@ export default function createPostGraphileHttpRequestHandler(
 
     if (
       subscriptions &&
-      (options.websocketOperations === 'all' || options.websocketOperations === 'subscriptions')
+      options.websocketOperations !== 'none'
     ) {
       const server = req && req.connection && req.connection['server'];
       if (!server) {
