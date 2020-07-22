@@ -29,6 +29,8 @@ import finalHandler = require('finalhandler');
 import bodyParser = require('body-parser');
 import crypto = require('crypto');
 
+const CACHE_MULTIPLIER = 100000;
+
 const ALLOW_EXPLAIN_PLACEHOLDER = '__SHOULD_ALLOW_EXPLAIN__';
 const noop = () => {
   /* noop */
@@ -323,9 +325,12 @@ export default function createPostGraphileHttpRequestHandler(
     validationErrors: ReadonlyArray<GraphQLError>;
     length: number;
   }
-  const queryCache = new LRU({
-    maxLength: Math.ceil(queryCacheMaxSize / 100000),
-  });
+
+  const cacheSize = Math.ceil(queryCacheMaxSize / CACHE_MULTIPLIER);
+
+  // Do not create an LRU for cache size < 2 because @graphile/lru will baulk.
+  const cacheEnabled = cacheSize >= 2;
+  const queryCache = cacheEnabled ? new LRU({ maxLength: cacheSize }) : null;
 
   let lastGqlSchema: GraphQLSchema;
   const parseQuery = (
@@ -336,16 +341,18 @@ export default function createPostGraphileHttpRequestHandler(
     validationErrors: ReadonlyArray<GraphQLError>;
   } => {
     if (gqlSchema !== lastGqlSchema) {
-      queryCache.reset();
+      if (queryCache) {
+        queryCache.reset();
+      }
       lastGqlSchema = gqlSchema;
     }
 
     // Only cache queries that are less than 100kB, we don't want DOS attacks
     // attempting to exhaust our memory.
-    const canCache = queryCacheMaxSize > 0 && queryString.length < 100000;
+    const canCache = cacheEnabled && queryString.length < 100000;
 
     const hash = canCache ? calculateQueryHash(queryString) : null;
-    const result = canCache ? queryCache.get(hash!) : null;
+    const result = canCache ? queryCache!.get(hash!) : null;
     if (result) {
       return result;
     } else {
@@ -371,7 +378,7 @@ export default function createPostGraphileHttpRequestHandler(
         length: queryString.length,
       };
       if (canCache) {
-        queryCache.set(hash!, cacheResult);
+        queryCache!.set(hash!, cacheResult);
       }
       return cacheResult;
     }
