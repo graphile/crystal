@@ -155,6 +155,11 @@ export function compile(sql: SQLQuery | SQLNode): QueryConfig {
   }
 
   const text = sqlFragments.join("");
+  if (values.length > 65535) {
+    throw new Error(
+      "PostgreSQL allows the use of up to 65535 placeholders; but your statement wants to use ${values.length} placeholders. To solve this issue you could split the statement into multiple statements, or pass more values into a single placeholder by using JSON, arrays, or similar techniques."
+    );
+  }
   return {
     text,
     values,
