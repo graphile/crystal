@@ -720,7 +720,13 @@ if (noServer) {
       console.error('PostgreSQL client generated error: ', err.message);
     });
     const { getGraphQLSchema } = getPostgraphileSchemaBuilder(pgPool, schemas, postgraphileOptions);
-    await getGraphQLSchema();
+    try {
+      await getGraphQLSchema();
+    } catch (e) {
+      console.error('Getting PostGraphile schema generated an error: ', e.message);
+      await pgPool.end();
+      throw e;
+    }
     if (!watchPg) {
       await pgPool.end();
     }
