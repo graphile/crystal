@@ -86,6 +86,12 @@ export function getPostgraphileSchemaBuilder<
   };
 
   async function createGqlSchema(): Promise<GraphQLSchema> {
+    if (options.throwOnInitFail && options.retryOnInitFail) {
+      throw new Error(
+        'PostGraphile configuration is invalid. Both `throwOnInitFail` and `retryOnInitFail` cannot be true. Select only one failed state handling strategy.',
+      );
+    }
+
     let attempts = 0;
     // eslint-disable-next-line no-constant-condition
     while (true) {
@@ -117,16 +123,27 @@ export function getPostgraphileSchemaBuilder<
       } catch (error) {
         attempts++;
         const delay = Math.min(100 * Math.pow(attempts, 2), 30000);
+        const throwOnFail = !!options.throwOnInitFail;
         const exitOnFail = !options.retryOnInitFail;
+
         // If we fail to build our schema, log the error and either exit or retry shortly
         logSeriousError(
           error,
           'building the initial schema' + (attempts > 1 ? ` (attempt ${attempts})` : ''),
-          exitOnFail
+          throwOnFail
+            ? 'Throwing error becuase `throwOnInitFail` is set.'
+            : exitOnFail
             ? 'Exiting because `retryOnInitFail` is not set.'
             : `We'll try again in ${delay}ms.`,
         );
-        if (exitOnFail) {
+        if (throwOnFail) {
+          process.exitCode = 34;
+          throw new Error(
+            `A serious error occurred when building the initial schema. Error messaage: ${
+              error.message ? error.message : error.toString()
+            } See more error details logged to the console above.`,
+          );
+        } else if (exitOnFail) {
           process.exit(34);
         }
         // Retry shortly
