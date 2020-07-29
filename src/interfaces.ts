@@ -10,6 +10,16 @@ import { EventEmitter } from 'events';
 type PromiseOrDirect<T> = T | Promise<T>;
 type DirectOrCallback<Request, T> = T | ((req: Request) => PromiseOrDirect<T>);
 
+// type ValueOf<T> = T[keyof T];
+
+// export enum OnInitFail {
+//   ThrowError = 'throw-error',
+//   ExitProcess = 'exit-process',
+//   Retry = 'retry',
+// }
+
+// export type OnInitFailOption = ValueOf<OnInitFail>;
+
 /**
  * A narrower type than `any` that won’t swallow errors from assumptions about
  * code.
@@ -54,7 +64,7 @@ export interface PostGraphileOptions<
   //   `DROP SCHEMA postgraphile_watch CASCADE;`
   /* @middlewareOnly */
   watchPg?: boolean;
-  // When false (default), PostGraphile will exit if it fails to build the
+  // When false (default), PostGraphile will _exit the process_ if it fails to build the
   // initial schema (for example if it cannot connect to the database, or if
   // there are fatal naming conflicts in the schema). When true, PostGraphile
   // will keep trying to rebuild the schema indefinitely, using an exponential
@@ -62,6 +72,14 @@ export interface PostGraphileOptions<
   // between retries.
   /* @middlewareOnly */
   retryOnInitFail?: boolean;
+  // When true, PostGraphile will _throw an error_ if it fails to build the
+  // initial schema (for example if it cannot connect to the database, or if
+  // there are fatal naming conflicts in the schema). When false (default),
+  // PostGraphile will fallback to another strategy to handle the error
+  // (see `retryOnInitFail`)
+  /* @middlewareOnly */
+  throwOnInitFail?: boolean;
+  // onInitFail?: OnInitFailOption;
   // Connection string to use to connect to the database as a privileged user (e.g. for setting up watch fixtures, logical decoding, etc).
   ownerConnectionString?: string;
   // Enable GraphQL websocket transport support for subscriptions (you still need a subscriptions plugin currently)
