@@ -519,7 +519,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
               fieldWithHooks: ((fieldName, spec, fieldScope) => {
                 if (!isString(fieldName)) {
                   throw new Error(
-                    "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is current necessary."
+                    "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is currently necessary."
                   );
                 }
                 if (!fieldScope) {
@@ -721,7 +721,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
               fieldWithHooks: ((fieldName, spec, fieldScope = {}) => {
                 if (!isString(fieldName)) {
                   throw new Error(
-                    "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is current necessary."
+                    "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is currently necessary."
                   );
                 }
                 const context = {
