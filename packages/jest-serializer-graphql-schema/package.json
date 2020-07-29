@@ -36,5 +36,8 @@
   },
   "files": [
     "dist"
-  ]
+  ],
+  "dependencies": {
+    "tslib": "^1.13.0"
+  }
 }

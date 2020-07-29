@@ -32,5 +32,8 @@
   },
   "files": [
     "node8plus"
-  ]
+  ],
+  "dependencies": {
+    "tslib": "^1.13.0"
+  }
 }

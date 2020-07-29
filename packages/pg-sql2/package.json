@@ -48,7 +48,8 @@
   "dependencies": {
     "@graphile/lru": "4.5.0",
     "@types/pg": ">=6 <8",
-    "debug": ">=3 <5"
+    "debug": ">=3 <5",
+    "tslib": "^1.13.0"
   },
   "files": [
     "node8plus"

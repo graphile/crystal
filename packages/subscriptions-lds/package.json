@@ -35,6 +35,7 @@
   "dependencies": {
     "@graphile/lds": "4.7.0",
     "@types/ws": "^6.0.1",
+    "tslib": "^1.13.0",
     "ws": "^7.0.0"
   },
   "peerDependencies": {

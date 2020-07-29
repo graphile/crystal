@@ -20,7 +20,8 @@
   },
   "dependencies": {
     "graphile-build": "4.7.0",
-    "graphile-build-pg": "4.7.0"
+    "graphile-build-pg": "4.7.0",
+    "tslib": "^1.13.0"
   },
   "devDependencies": {
     "@types/node": "^12.0.0",
