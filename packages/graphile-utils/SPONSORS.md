@@ -14,11 +14,11 @@ sponsor](https://graphile.org/sponsor/).
 
 - Joe Dennis
 - domonda
-- Robert Claypool
 - James Allain
 - Jack Dinker
-- Nigel Taylor
+- Robert Claypool
 - Qwick
+- Nigel Taylor
 - DocIQ
 - Principia Mentis
 - Partners in School Innovation
@@ -26,7 +26,8 @@ sponsor](https://graphile.org/sponsor/).
 - Sterblue
 - HR-ON
 - Ian Stewart
-- Janakan Arulkumarasan
+- Dovetail
+- Jacob Gillespie
 
 ## Supporters
 
@@ -35,16 +36,14 @@ sponsor](https://graphile.org/sponsor/).
 - stlbucket
 - Matt Bretl
 - Chris Watland
-- Mark Lipscombe
-- James Rascoe
 - Mark Rapoza
 - innovation.rocks
+- purge
 - Daniel Woelfel
-- cybere
-- Philipp Litzenberger
 - Bjørn Michelsen
+- Philipp Litzenberger
 - CJ
-- Ben Botwin
+- apoland
 - Cameron Ellis
 - Mansoor Razzaq
-- Borut Jures
+- rcy
