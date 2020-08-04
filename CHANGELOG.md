@@ -3,7 +3,23 @@
 We use PostGraphile's GitHub releases tab to log our changes in detail, but
 this auto-generated changelog helps us to produce that list, and it may be
 helpful to you also.
-# [](https://github.com/graphile/graphile-engine/compare/v4.7.0...v) (2020-04-27)
+# [](https://github.com/graphile/graphile-engine/compare/v4.7.0...v) (2020-08-04)
+
+
+### Bug Fixes
+
+* error message typo ([001de88](https://github.com/graphile/graphile-engine/commit/001de88d93fba7657459e581b7f36dbcfee39ff4))
+* **live:** live collection for single backward relation record ([#625](https://github.com/graphile/graphile-engine/issues/625)) ([7f0225e](https://github.com/graphile/graphile-engine/commit/7f0225e7bb69bbf3c135cdf1c5c155d92e916a71))
+* **watch:** handle errors during watchSchema ([#624](https://github.com/graphile/graphile-engine/issues/624)) ([4ef1b7b](https://github.com/graphile/graphile-engine/commit/4ef1b7b182390e9eeec6a7917b940243dc9c3b0e))
+
+
+### Features
+
+* add support for "enum tables" ([#635](https://github.com/graphile/graphile-engine/issues/635)) ([e6bde66](https://github.com/graphile/graphile-engine/commit/e6bde667e7e9b151e976d504f9c7a60b2b2f5c0c))
+* add support for geometric types ([#637](https://github.com/graphile/graphile-engine/issues/637)) ([419ec87](https://github.com/graphile/graphile-engine/commit/419ec87b5a8affd1d2c24c55b47f3252cd9e6b7f))
+* warn early if placeholders will be exhausted ([#632](https://github.com/graphile/graphile-engine/issues/632)) ([5c22e41](https://github.com/graphile/graphile-engine/commit/5c22e41d667412b2ce2ba6d9870d82fdfad65574))
+* **graphile-utils:** Type update on addPgTableOrderByPlugin ([#629](https://github.com/graphile/graphile-engine/issues/629)) ([91dbf6f](https://github.com/graphile/graphile-engine/commit/91dbf6f117f4995b22d7105e521bbb927d21b2a1))
+* **subscriptions:** [@pg](https://github.com/pg)Subscription now supports initial events ([#612](https://github.com/graphile/graphile-engine/issues/612)) ([e862aad](https://github.com/graphile/graphile-engine/commit/e862aad7f9188975e201dbe01e2d3ed6dbd61476))
 
 
 
