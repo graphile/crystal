@@ -1,0 +1,28 @@
+{
+  all: allLetterDescriptions {
+    nodes {
+      id
+      letter
+      description
+    }
+  }
+  reverse: allLetterDescriptions(orderBy: [LETTER_DESC]) {
+    nodes {
+      id
+      letter
+      description
+    }
+  }
+  b: letterDescriptionByLetter(letter: B) {
+    id
+    letter
+    description
+  }
+  letterC: allLetterDescriptions(condition: { letter: C }) {
+    nodes {
+      id
+      letter
+      description
+    }
+  }
+}

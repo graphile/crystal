@@ -1,0 +1,22 @@
+mutation {
+  deleteLetterDescriptionByLetter(input: { letter: C }) {
+    letterDescription {
+      id
+      letter
+    }
+  }
+  createLetterDescription(
+    input: {
+      letterDescription: {
+        letter: C
+        description: "One does like to see the letter C"
+      }
+    }
+  ) {
+    letterDescription {
+      id
+      letter
+      description
+    }
+  }
+}

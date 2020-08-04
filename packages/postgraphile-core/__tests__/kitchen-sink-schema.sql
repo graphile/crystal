@@ -1,5 +1,20 @@
 -- WARNING: this database is shared with graphile-utils, don't run the tests in parallel!
-drop schema if exists a, b, c, d, inheritence, smart_comment_relations, ranges, index_expressions, simple_collections, live_test, large_bigint, network_types, named_query_builder cascade;
+drop schema if exists
+  a,
+  b,
+  c,
+  d,
+  inheritence,
+  smart_comment_relations,
+  ranges,
+  index_expressions,
+  simple_collections,
+  live_test,
+  large_bigint,
+  network_types,
+  named_query_builder,
+  enum_tables
+cascade;
 drop extension if exists tablefunc;
 drop extension if exists intarray;
 drop extension if exists hstore;
@@ -1091,4 +1106,24 @@ create table named_query_builder.toy_categories (
   toy_id int not null references named_query_builder.toys,
   category_id int not null references named_query_builder.categories,
   approved boolean not null
+);
+
+--------------------------------------------------------------------------------
+
+create schema enum_tables;
+create table enum_tables.abcd (letter text primary key, description text);
+comment on column enum_tables.abcd.description is E'@enumDescription';
+-- Enum table needs values added as part of the migration, not as part of the
+-- data.
+insert into enum_tables.abcd (letter, description) values
+  ('A', 'The letter A'),
+  ('B', 'The letter B'),
+  ('C', 'The letter C'),
+  ('D', 'The letter D');
+comment on table enum_tables.abcd is E'@enum';
+
+create table enum_tables.letter_descriptions(
+  id serial primary key,
+  letter text not null references enum_tables.abcd unique,
+  description text
 );

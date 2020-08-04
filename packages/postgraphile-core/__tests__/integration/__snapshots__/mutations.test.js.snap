@@ -60,6 +60,26 @@ Object {
 }
 `;
 
+exports[`enum_tables.mutations.graphql 1`] = `
+Object {
+  "data": Object {
+    "createLetterDescription": Object {
+      "letterDescription": Object {
+        "description": "One does like to see the letter C",
+        "id": 105,
+        "letter": "C",
+      },
+    },
+    "deleteLetterDescriptionByLetter": Object {
+      "letterDescription": Object {
+        "id": 103,
+        "letter": "C",
+      },
+    },
+  },
+}
+`;
+
 exports[`inheritence.createUserFile.graphql 1`] = `
 Object {
   "data": Object {

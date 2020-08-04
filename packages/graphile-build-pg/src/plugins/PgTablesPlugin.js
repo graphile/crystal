@@ -68,6 +68,9 @@ export default (function PgTablesPlugin(
       const Cursor = getTypeByName("Cursor");
 
       introspectionResultsByKind.class.forEach(table => {
+        if (table.tags.enum) {
+          return;
+        }
         const tablePgType = table.type;
         if (!tablePgType) {
           throw new Error("Could not determine the type for this table");

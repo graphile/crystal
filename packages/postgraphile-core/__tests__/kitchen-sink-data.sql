@@ -250,3 +250,11 @@ insert into named_query_builder.toy_categories(toy_id, category_id, approved) va
   (4, 1, true),
   (4, 2, true),
   (1, 3, false);
+
+--------------------------------------------------------------------------------
+alter sequence enum_tables.letter_descriptions_id_seq restart with 101;
+insert into enum_tables.letter_descriptions(letter, description) values
+  ('A', 'The first letter in the alphabet'),
+  ('B', 'Following closely behind the first letter, this is a popular choice'),
+  ('C', 'Pronounced like ''sea'''),
+  ('D', 'The first letter omitted from the ''ABC'' phrase');

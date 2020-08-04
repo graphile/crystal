@@ -1572,6 +1572,75 @@ Object {
 }
 `;
 
+exports[`enum_tables.queries.graphql 1`] = `
+Object {
+  "data": Object {
+    "all": Object {
+      "nodes": Array [
+        Object {
+          "description": "The first letter in the alphabet",
+          "id": 101,
+          "letter": "A",
+        },
+        Object {
+          "description": "Following closely behind the first letter, this is a popular choice",
+          "id": 102,
+          "letter": "B",
+        },
+        Object {
+          "description": "Pronounced like 'sea'",
+          "id": 103,
+          "letter": "C",
+        },
+        Object {
+          "description": "The first letter omitted from the 'ABC' phrase",
+          "id": 104,
+          "letter": "D",
+        },
+      ],
+    },
+    "b": Object {
+      "description": "Following closely behind the first letter, this is a popular choice",
+      "id": 102,
+      "letter": "B",
+    },
+    "letterC": Object {
+      "nodes": Array [
+        Object {
+          "description": "Pronounced like 'sea'",
+          "id": 103,
+          "letter": "C",
+        },
+      ],
+    },
+    "reverse": Object {
+      "nodes": Array [
+        Object {
+          "description": "The first letter omitted from the 'ABC' phrase",
+          "id": 104,
+          "letter": "D",
+        },
+        Object {
+          "description": "Pronounced like 'sea'",
+          "id": 103,
+          "letter": "C",
+        },
+        Object {
+          "description": "Following closely behind the first letter, this is a popular choice",
+          "id": 102,
+          "letter": "B",
+        },
+        Object {
+          "description": "The first letter in the alphabet",
+          "id": 101,
+          "letter": "A",
+        },
+      ],
+    },
+  },
+}
+`;
+
 exports[`function-return-types.graphql 1`] = `
 Object {
   "data": Object {

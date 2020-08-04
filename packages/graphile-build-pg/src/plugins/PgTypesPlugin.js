@@ -570,8 +570,11 @@ export default (function PgTypesPlugin(
             {
               name: inflection.enumType(type),
               description: type.description,
-              values: type.enumVariants.reduce((memo, value) => {
+              values: type.enumVariants.reduce((memo, value, i) => {
                 memo[inflection.enumName(value)] = {
+                  description: type.enumDescriptions
+                    ? type.enumDescriptions[i]
+                    : null,
                   value: value,
                 };
                 return memo;
