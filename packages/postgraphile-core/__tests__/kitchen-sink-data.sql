@@ -258,3 +258,19 @@ insert into enum_tables.letter_descriptions(letter, description) values
   ('B', 'Following closely behind the first letter, this is a popular choice'),
   ('C', 'Pronounced like ''sea'''),
   ('D', 'The first letter omitted from the ''ABC'' phrase');
+
+--------------------------------------------------------------------------------
+
+alter sequence geometry.geom_id_seq restart with 101;
+insert into geometry.geom(
+  point, line, lseg, box, open_path, closed_path, polygon, circle
+) values (
+  point(4, 2),
+  line(point(7, 11), point(13, 17)),
+  lseg(point(7, 11), point(13, 17)),
+  box(point(7, 11), point(13, 17)),
+  '[(1,3),(3,4),(4,1)]',
+  '((1,3),(3,4),(4,1))',
+  '((1,3),(3,4),(4,1))',
+  '<(10, 10), 7>'
+);

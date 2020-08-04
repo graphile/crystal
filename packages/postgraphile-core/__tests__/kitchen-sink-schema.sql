@@ -13,7 +13,8 @@ drop schema if exists
   large_bigint,
   network_types,
   named_query_builder,
-  enum_tables
+  enum_tables,
+  geometry
 cascade;
 drop extension if exists tablefunc;
 drop extension if exists intarray;
@@ -1126,4 +1127,19 @@ create table enum_tables.letter_descriptions(
   id serial primary key,
   letter text not null references enum_tables.abcd unique,
   description text
+);
+
+--------------------------------------------------------------------------------
+
+create schema geometry;
+create table geometry.geom (
+  id serial primary key,
+  point point,
+  line line,
+  lseg lseg,
+  box box,
+  open_path path,
+  closed_path path,
+  polygon polygon,
+  circle circle
 );

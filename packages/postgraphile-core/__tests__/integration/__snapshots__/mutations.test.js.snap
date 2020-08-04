@@ -80,6 +80,121 @@ Object {
 }
 `;
 
+exports[`geometry.mutations.graphql 1`] = `
+Object {
+  "data": Object {
+    "createGeom": Object {
+      "geom": Object {
+        "box": Object {
+          "a": Object {
+            "x": 2342,
+            "y": 52635,
+          },
+          "b": Object {
+            "x": 123,
+            "y": 12445,
+          },
+        },
+        "circle": Object {
+          "center": Object {
+            "x": 7,
+            "y": 11,
+          },
+          "radius": 3,
+        },
+        "closedPath": Object {
+          "isOpen": false,
+          "points": Array [
+            Object {
+              "x": 0,
+              "y": 0,
+            },
+            Object {
+              "x": 0,
+              "y": 10,
+            },
+            Object {
+              "x": 10,
+              "y": 10,
+            },
+            Object {
+              "x": 10,
+              "y": 0,
+            },
+          ],
+        },
+        "id": 102,
+        "line": Object {
+          "a": Object {
+            "x": -9.785396260017848,
+            "y": 0,
+          },
+          "b": Object {
+            "x": 0,
+            "y": 111,
+          },
+        },
+        "lseg": Object {
+          "a": Object {
+            "x": 99,
+            "y": 111,
+          },
+          "b": Object {
+            "x": 2935,
+            "y": 3548,
+          },
+        },
+        "openPath": Object {
+          "isOpen": true,
+          "points": Array [
+            Object {
+              "x": 0,
+              "y": 0,
+            },
+            Object {
+              "x": 0,
+              "y": 10,
+            },
+            Object {
+              "x": 10,
+              "y": 10,
+            },
+            Object {
+              "x": 10,
+              "y": 0,
+            },
+          ],
+        },
+        "point": Object {
+          "x": 99,
+          "y": 1234,
+        },
+        "polygon": Object {
+          "points": Array [
+            Object {
+              "x": 0,
+              "y": 0,
+            },
+            Object {
+              "x": 0,
+              "y": 10,
+            },
+            Object {
+              "x": 10,
+              "y": 10,
+            },
+            Object {
+              "x": 10,
+              "y": 0,
+            },
+          ],
+        },
+      },
+    },
+  },
+}
+`;
+
 exports[`inheritence.createUserFile.graphql 1`] = `
 Object {
   "data": Object {

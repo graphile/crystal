@@ -1,0 +1,68 @@
+{
+  allGeoms {
+    nodes {
+      id
+      point {
+        x
+        y
+      }
+      line {
+        a {
+          x
+          y
+        }
+        b {
+          x
+          y
+        }
+      }
+      lseg {
+        a {
+          x
+          y
+        }
+        b {
+          x
+          y
+        }
+      }
+      box {
+        a {
+          x
+          y
+        }
+        b {
+          x
+          y
+        }
+      }
+      openPath {
+        isOpen
+        points {
+          x
+          y
+        }
+      }
+      closedPath {
+        isOpen
+        points {
+          x
+          y
+        }
+      }
+      polygon {
+        points {
+          x
+          y
+        }
+      }
+      circle {
+        center {
+          x
+          y
+        }
+        radius
+      }
+    }
+  }
+}

@@ -1908,6 +1908,111 @@ Object {
 }
 `;
 
+exports[`geometry.queries.graphql 1`] = `
+Object {
+  "data": Object {
+    "allGeoms": Object {
+      "nodes": Array [
+        Object {
+          "box": Object {
+            "a": Object {
+              "x": 13,
+              "y": 17,
+            },
+            "b": Object {
+              "x": 7,
+              "y": 11,
+            },
+          },
+          "circle": Object {
+            "center": Object {
+              "x": 10,
+              "y": 10,
+            },
+            "radius": 7,
+          },
+          "closedPath": Object {
+            "isOpen": false,
+            "points": Array [
+              Object {
+                "x": 1,
+                "y": 3,
+              },
+              Object {
+                "x": 3,
+                "y": 4,
+              },
+              Object {
+                "x": 4,
+                "y": 1,
+              },
+            ],
+          },
+          "id": 101,
+          "line": Object {
+            "a": Object {
+              "x": -4,
+              "y": 0,
+            },
+            "b": Object {
+              "x": 0,
+              "y": 4,
+            },
+          },
+          "lseg": Object {
+            "a": Object {
+              "x": 7,
+              "y": 11,
+            },
+            "b": Object {
+              "x": 13,
+              "y": 17,
+            },
+          },
+          "openPath": Object {
+            "isOpen": true,
+            "points": Array [
+              Object {
+                "x": 1,
+                "y": 3,
+              },
+              Object {
+                "x": 3,
+                "y": 4,
+              },
+              Object {
+                "x": 4,
+                "y": 1,
+              },
+            ],
+          },
+          "point": Object {
+            "x": 4,
+            "y": 2,
+          },
+          "polygon": Object {
+            "points": Array [
+              Object {
+                "x": 1,
+                "y": 3,
+              },
+              Object {
+                "x": 3,
+                "y": 4,
+              },
+              Object {
+                "x": 4,
+                "y": 1,
+              },
+            ],
+          },
+        },
+      ],
+    },
+  },
+}
+`;
+
 exports[`json-overflow.graphql 1`] = `
 Object {
   "data": Object {

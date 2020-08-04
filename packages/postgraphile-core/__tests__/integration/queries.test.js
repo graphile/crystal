@@ -60,6 +60,7 @@ beforeAll(() => {
       pg10UseCustomNetworkScalars,
       namedQueryBuilder,
       enumTables,
+      geometry,
     ] = await Promise.all([
       createPostGraphileSchema(pgClient, ["a", "b", "c"], {
         subscriptions: true,
@@ -129,6 +130,12 @@ beforeAll(() => {
       createPostGraphileSchema(pgClient, ["enum_tables"], {
         subscriptions: true,
       }),
+      createPostGraphileSchema(pgClient, ["geometry"], {
+        subscriptions: true,
+        graphileBuildOptions: {
+          pgGeometricTypes: true,
+        },
+      }),
     ]);
     // Now for RBAC-enabled tests
     await pgClient.query("set role postgraphile_test_authenticator");
@@ -154,6 +161,7 @@ beforeAll(() => {
       pg10UseCustomNetworkScalars,
       namedQueryBuilder,
       enumTables,
+      geometry,
     };
   });
 
@@ -228,6 +236,8 @@ beforeAll(() => {
               gqlSchema = gqlSchemas.namedQueryBuilder;
             } else if (fileName.startsWith("enum_tables.")) {
               gqlSchema = gqlSchemas.enumTables;
+            } else if (fileName.startsWith("geometry.")) {
+              gqlSchema = gqlSchemas.geometry;
             } else {
               gqlSchema = gqlSchemas.normal;
             }

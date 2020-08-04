@@ -42,6 +42,7 @@ beforeAll(() => {
       useCustomNetworkScalarsSchema,
       pg10UseCustomNetworkScalarsSchema,
       enumTables,
+      geometry,
     ] = await Promise.all([
       createPostGraphileSchema(pgClient, ["a", "b", "c"]),
       createPostGraphileSchema(pgClient, ["d"]),
@@ -62,6 +63,11 @@ beforeAll(() => {
           })
         : null,
       createPostGraphileSchema(pgClient, ["enum_tables"]),
+      createPostGraphileSchema(pgClient, ["geometry"], {
+        graphileBuildOptions: {
+          pgGeometricTypes: true,
+        },
+      }),
     ]);
     // Now for RBAC-enabled tests
     await pgClient.query("set role postgraphile_test_authenticator");
@@ -77,6 +83,7 @@ beforeAll(() => {
       pg10UseCustomNetworkScalarsSchema,
       rbacSchema,
       enumTables,
+      geometry,
     };
   });
 
@@ -97,6 +104,7 @@ beforeAll(() => {
       pg10UseCustomNetworkScalarsSchema,
       rbacSchema,
       enumTables,
+      geometry,
     } = await gqlSchemaPromise;
     // Get a new Postgres client and run the mutation.
     return await withPgClient(async pgClient => {
@@ -121,6 +129,8 @@ beforeAll(() => {
         schemaToUse = inheritenceSchema;
       } else if (fileName.startsWith("enum_tables.")) {
         schemaToUse = enumTables;
+      } else if (fileName.startsWith("geometry.")) {
+        schemaToUse = geometry;
       } else if (fileName.startsWith("pg10.")) {
         if (serverVersionNum < 100000) {
           // eslint-disable-next-line

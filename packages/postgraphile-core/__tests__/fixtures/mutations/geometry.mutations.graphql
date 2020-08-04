@@ -1,0 +1,104 @@
+mutation {
+  createGeom(
+    input: {
+      geom: {
+        point: { x: 99, y: 1234 }
+        line: { a: { x: 99, y: 1234 }, b: { x: 0, y: 111 } }
+        lseg: { a: { x: 99, y: 111 }, b: { x: 2935, y: 3548 } }
+        box: { a: { x: 123, y: 52635 }, b: { x: 2342, y: 12445 } }
+        openPath: {
+          isOpen: true
+          points: [
+            { x: 0, y: 0 }
+            { x: 0, y: 10 }
+            { x: 10, y: 10 }
+            { x: 10, y: 0 }
+          ]
+        }
+        closedPath: {
+          isOpen: false
+          points: [
+            { x: 0, y: 0 }
+            { x: 0, y: 10 }
+            { x: 10, y: 10 }
+            { x: 10, y: 0 }
+          ]
+        }
+        polygon: {
+          points: [
+            { x: 0, y: 0 }
+            { x: 0, y: 10 }
+            { x: 10, y: 10 }
+            { x: 10, y: 0 }
+          ]
+        }
+        circle: { center: { x: 7, y: 11 }, radius: 3 }
+      }
+    }
+  ) {
+    geom {
+      id
+      point {
+        x
+        y
+      }
+      line {
+        a {
+          x
+          y
+        }
+        b {
+          x
+          y
+        }
+      }
+      lseg {
+        a {
+          x
+          y
+        }
+        b {
+          x
+          y
+        }
+      }
+      box {
+        a {
+          x
+          y
+        }
+        b {
+          x
+          y
+        }
+      }
+      openPath {
+        isOpen
+        points {
+          x
+          y
+        }
+      }
+      closedPath {
+        isOpen
+        points {
+          x
+          y
+        }
+      }
+      polygon {
+        points {
+          x
+          y
+        }
+      }
+      circle {
+        center {
+          x
+          y
+        }
+        radius
+      }
+    }
+  }
+}

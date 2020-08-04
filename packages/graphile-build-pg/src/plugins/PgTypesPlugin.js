@@ -31,6 +31,7 @@ export default (function PgTypesPlugin(
     pgExtendedTypes = true,
     // Adding hstore support is technically a breaking change; this allows people to opt out easily:
     pgSkipHstore = false,
+    pgGeometricTypes = false,
     pgUseCustomNetworkScalars = false,
     disableIssue390Fix = false,
   }
@@ -1147,6 +1148,342 @@ end`;
     ["PgTypes"]
   );
   /* End of hstore type */
+
+  /* Geometric types */
+  builder.hook(
+    "build",
+    build => {
+      // This hook tells graphile-build-pg about the hstore database type so it
+      // knows how to express it in input/output.
+      if (!pgGeometricTypes) return build;
+      const {
+        pgRegisterGqlTypeByTypeId,
+        pgRegisterGqlInputTypeByTypeId,
+        pgGetGqlTypeByTypeIdAndModifier,
+        pgGetGqlInputTypeByTypeIdAndModifier,
+        pg2GqlMapper,
+        pgSql: sql,
+        graphql: {
+          GraphQLObjectType,
+          GraphQLInputObjectType,
+          GraphQLList,
+          GraphQLBoolean,
+          GraphQLFloat,
+        },
+        inflection,
+      } = build;
+
+      // Check we have the hstore extension
+      const LINE = 628;
+      const LSEG = 601;
+      const BOX = 603;
+      const PATH = 602;
+      const POLYGON = 604;
+      const CIRCLE = 718;
+
+      pgRegisterGqlTypeByTypeId(LINE, () => {
+        const Point = pgGetGqlTypeByTypeIdAndModifier("600", null);
+        if (!Point) {
+          throw new Error("Need point type");
+        }
+        return new GraphQLObjectType({
+          name: inflection.builtin("Line"),
+          description:
+            "An infinite line that passes through points 'a' and 'b'.",
+          fields: {
+            a: { type: Point },
+            b: { type: Point },
+          },
+        });
+      });
+      pgRegisterGqlInputTypeByTypeId(LINE, () => {
+        const PointInput = pgGetGqlInputTypeByTypeIdAndModifier("600", null);
+        return new GraphQLInputObjectType({
+          name: inflection.builtin("LineInput"),
+          description:
+            "An infinite line that passes through points 'a' and 'b'.",
+          fields: {
+            a: { type: PointInput },
+            b: { type: PointInput },
+          },
+        });
+      });
+      pg2GqlMapper[LINE] = {
+        map: f => {
+          if (f[0] === "{" && f[f.length - 1] === "}") {
+            const [A, B, C] = f
+              .substr(1, f.length - 2)
+              .split(",")
+              .map(f => parseFloat(f));
+            // Lines have the form Ax + By + C = 0.
+            // So if y = 0, Ax + C = 0; x = -C/A.
+            // If x = 0, By + C = 0; y = -C/B.
+            return {
+              a: { x: -C / A, y: 0 },
+              b: { x: 0, y: -C / B },
+            };
+          }
+        },
+        unmap: o =>
+          sql.fragment`line(point(${sql.value(o.a.x)}, ${sql.value(
+            o.a.y
+          )}), point(${sql.value(o.b.x)}, ${sql.value(o.b.y)}))`,
+      };
+
+      pgRegisterGqlTypeByTypeId(LSEG, () => {
+        const Point = pgGetGqlTypeByTypeIdAndModifier("600", null);
+        return new GraphQLObjectType({
+          name: inflection.builtin("LineSegment"),
+          description: "An finite line between points 'a' and 'b'.",
+          fields: {
+            a: { type: Point },
+            b: { type: Point },
+          },
+        });
+      });
+      pgRegisterGqlInputTypeByTypeId(LSEG, () => {
+        const PointInput = pgGetGqlInputTypeByTypeIdAndModifier("600", null);
+        return new GraphQLInputObjectType({
+          name: inflection.builtin("LineSegmentInput"),
+          description: "An finite line between points 'a' and 'b'.",
+          fields: {
+            a: { type: PointInput },
+            b: { type: PointInput },
+          },
+        });
+      });
+      pg2GqlMapper[LSEG] = {
+        map: f => {
+          if (f[0] === "[" && f[f.length - 1] === "]") {
+            const [x1, y1, x2, y2] = f
+              .substr(1, f.length - 2)
+              .replace(/[()]/g, "")
+              .split(",")
+              .map(f => parseFloat(f));
+            return {
+              a: { x: x1, y: y1 },
+              b: { x: x2, y: y2 },
+            };
+          }
+        },
+        unmap: o =>
+          sql.fragment`lseg(point(${sql.value(o.a.x)}, ${sql.value(
+            o.a.y
+          )}), point(${sql.value(o.b.x)}, ${sql.value(o.b.y)}))`,
+      };
+
+      pgRegisterGqlTypeByTypeId(BOX, () => {
+        const Point = pgGetGqlTypeByTypeIdAndModifier("600", null);
+        return new GraphQLObjectType({
+          name: inflection.builtin("Box"),
+          description:
+            "A rectangular box defined by two opposite corners 'a' and 'b'",
+          fields: {
+            a: { type: Point },
+            b: { type: Point },
+          },
+        });
+      });
+      pgRegisterGqlInputTypeByTypeId(BOX, () => {
+        const PointInput = pgGetGqlInputTypeByTypeIdAndModifier("600", null);
+        return new GraphQLInputObjectType({
+          name: inflection.builtin("BoxInput"),
+          description:
+            "A rectangular box defined by two opposite corners 'a' and 'b'",
+          fields: {
+            a: { type: PointInput },
+            b: { type: PointInput },
+          },
+        });
+      });
+      pg2GqlMapper[BOX] = {
+        map: f => {
+          if (f[0] === "(" && f[f.length - 1] === ")") {
+            const [x1, y1, x2, y2] = f
+              .substr(1, f.length - 2)
+              .replace(/[()]/g, "")
+              .split(",")
+              .map(f => parseFloat(f));
+            return {
+              a: { x: x1, y: y1 },
+              b: { x: x2, y: y2 },
+            };
+          }
+        },
+        unmap: o =>
+          sql.fragment`box(point(${sql.value(o.a.x)}, ${sql.value(
+            o.a.y
+          )}), point(${sql.value(o.b.x)}, ${sql.value(o.b.y)}))`,
+      };
+
+      pgRegisterGqlTypeByTypeId(PATH, () => {
+        const Point = pgGetGqlTypeByTypeIdAndModifier("600", null);
+        return new GraphQLObjectType({
+          name: inflection.builtin("Path"),
+          description: "A path (open or closed) made up of points",
+          fields: {
+            points: {
+              type: new GraphQLList(Point),
+            },
+            isOpen: {
+              description:
+                "True if this is a closed path (similar to a polygon), false otherwise.",
+              type: GraphQLBoolean,
+            },
+          },
+        });
+      });
+      pgRegisterGqlInputTypeByTypeId(PATH, () => {
+        const PointInput = pgGetGqlInputTypeByTypeIdAndModifier("600", null);
+        return new GraphQLInputObjectType({
+          name: inflection.builtin("PathInput"),
+          description: "A path (open or closed) made up of points",
+          fields: {
+            points: {
+              type: new GraphQLList(PointInput),
+            },
+            isOpen: {
+              description:
+                "True if this is a closed path (similar to a polygon), false otherwise.",
+              type: GraphQLBoolean,
+            },
+          },
+        });
+      });
+      pg2GqlMapper[PATH] = {
+        map: f => {
+          let isOpen = null;
+          if (f[0] === "(" && f[f.length - 1] === ")") {
+            isOpen = false;
+          } else if (f[0] === "[" && f[f.length - 1] === "]") {
+            isOpen = true;
+          }
+          if (isOpen !== null) {
+            const xsAndYs = f
+              .substr(1, f.length - 2)
+              .replace(/[()]/g, "")
+              .split(",")
+              .map(f => parseFloat(f));
+            if (xsAndYs.length % 2 !== 0) {
+              throw new Error("Invalid path representation");
+            }
+            const points = [];
+            for (let i = 0, l = xsAndYs.length; i < l; i += 2) {
+              points.push({ x: xsAndYs[i], y: xsAndYs[i + 1] });
+            }
+            return {
+              isOpen,
+              points,
+            };
+          }
+        },
+        unmap: o => {
+          const openParen = o.isOpen ? "[" : "(";
+          const closeParen = o.isOpen ? "]" : ")";
+          const val = `${openParen}${o.points
+            .map(p => `(${p.x},${p.y})`)
+            .join(",")}${closeParen}`;
+          return sql.value(val);
+        },
+      };
+
+      pgRegisterGqlTypeByTypeId(POLYGON, () => {
+        const Point = pgGetGqlTypeByTypeIdAndModifier("600", null);
+        return new GraphQLObjectType({
+          name: inflection.builtin("Polygon"),
+          fields: {
+            points: {
+              type: new GraphQLList(Point),
+            },
+          },
+        });
+      });
+      pgRegisterGqlInputTypeByTypeId(POLYGON, () => {
+        const PointInput = pgGetGqlInputTypeByTypeIdAndModifier("600", null);
+        return new GraphQLInputObjectType({
+          name: inflection.builtin("PolygonInput"),
+          fields: {
+            points: {
+              type: new GraphQLList(PointInput),
+            },
+          },
+        });
+      });
+      pg2GqlMapper[POLYGON] = {
+        map: f => {
+          if (f[0] === "(" && f[f.length - 1] === ")") {
+            const xsAndYs = f
+              .substr(1, f.length - 2)
+              .replace(/[()]/g, "")
+              .split(",")
+              .map(f => parseFloat(f));
+            if (xsAndYs.length % 2 !== 0) {
+              throw new Error("Invalid polygon representation");
+            }
+            const points = [];
+            for (let i = 0, l = xsAndYs.length; i < l; i += 2) {
+              points.push({ x: xsAndYs[i], y: xsAndYs[i + 1] });
+            }
+            return {
+              points,
+            };
+          }
+        },
+        unmap: o => {
+          const val = `(${o.points.map(p => `(${p.x},${p.y})`).join(",")})`;
+          return sql.value(val);
+        },
+      };
+
+      pgRegisterGqlTypeByTypeId(CIRCLE, () => {
+        const Point = pgGetGqlTypeByTypeIdAndModifier("600", null);
+        return new GraphQLObjectType({
+          name: inflection.builtin("Circle"),
+          fields: {
+            center: { type: Point },
+            radius: { type: GraphQLFloat },
+          },
+        });
+      });
+      pgRegisterGqlInputTypeByTypeId(CIRCLE, () => {
+        const PointInput = pgGetGqlInputTypeByTypeIdAndModifier("600", null);
+        return new GraphQLInputObjectType({
+          name: inflection.builtin("CircleInput"),
+          fields: {
+            center: { type: PointInput },
+            radius: { type: GraphQLFloat },
+          },
+        });
+      });
+      pg2GqlMapper[CIRCLE] = {
+        map: f => {
+          if (f[0] === "<" && f[f.length - 1] === ">") {
+            const [x, y, r] = f
+              .substr(1, f.length - 2)
+              .replace(/[()]/g, "")
+              .split(",")
+              .map(f => parseFloat(f));
+            return {
+              center: { x, y },
+              radius: r,
+            };
+          }
+        },
+        unmap: o =>
+          sql.fragment`circle(point(${sql.value(o.center.x)}, ${sql.value(
+            o.center.y
+          )}), ${sql.value(o.radius)})`,
+      };
+
+      // TODO: add the non-nulls!
+
+      return build;
+    },
+    ["PgGeometryTypes"],
+    [],
+    ["PgTypes"]
+  );
+  /* End of geometric types */
 }: Plugin);
 
 function makeGraphQLHstoreType(graphql, hstoreTypeName) {
