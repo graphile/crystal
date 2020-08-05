@@ -7,6 +7,20 @@ to you also.
 **IMPORTANT NOTE**: most of the changes in PostGraphile actually come from
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
+# [4.8.0-rc.0](https://github.com/graphile/postgraphile/compare/v4.7.0...v4.8.0-rc.0) (2020-08-05)
+
+
+### Bug Fixes
+
+* **http:** don't use LRU when queryCacheMaxSize too small ([#1312](https://github.com/graphile/postgraphile/issues/1312)) ([82c0a4c](https://github.com/graphile/postgraphile/commit/82c0a4c3aa5232df30cd4b09a23525e4e406f3d1))
+
+
+### Features
+
+* **deps:** upgrade postgraphile-core ([#1320](https://github.com/graphile/postgraphile/issues/1320)) ([9054cc2](https://github.com/graphile/postgraphile/commit/9054cc2444e1e1ce1554345ec0aa37cd2d9e9c98))
+
+
+
 # [4.7.0](https://github.com/graphile/postgraphile/compare/v4.6.0...v4.7.0) (2020-04-27)
 
 
