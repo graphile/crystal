@@ -3,8 +3,12 @@ import { createHash } from "crypto";
 import LRU from "@graphile/lru";
 import type { PoolClient } from "pg";
 
+const cacheSizeFromEnv = parseInt(
+  process.env.POSTGRAPHILE_PREPARED_STATEMENT_CACHE_SIZE,
+  10
+);
 const POSTGRAPHILE_PREPARED_STATEMENT_CACHE_SIZE =
-  parseInt(process.env.POSTGRAPHILE_PREPARED_STATEMENT_CACHE_SIZE, 10) || 100;
+  !!cacheSizeFromEnv || cacheSizeFromEnv === 0 ? cacheSizeFromEnv : 100;
 
 let lastString: string;
 let lastHash: string;
@@ -27,7 +31,7 @@ export default function pgPrepareAndRun(
   const connection = pgClient.connection;
   if (
     !values ||
-    POSTGRAPHILE_PREPARED_STATEMENT_CACHE_SIZE < 1 ||
+    POSTGRAPHILE_PREPARED_STATEMENT_CACHE_SIZE < 2 ||
     !connection ||
     !connection.parsedStatements
   ) {
