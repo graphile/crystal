@@ -17,6 +17,10 @@ cache: yarn
 script:
   - scripts/ci
 
+# --ignore-engines because some dev-deps require Node 10 or higher.
+install:
+  - yarn --frozen-lockfile --ignore-engines
+
 after_success:
   - "cd examples/forum && scripts/run-schema-demo $DEMO_PG_URL"
 
