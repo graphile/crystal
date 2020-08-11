@@ -7,6 +7,21 @@ to you also.
 **IMPORTANT NOTE**: most of the changes in PostGraphile actually come from
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
+# [4.8.0](https://github.com/graphile/postgraphile/compare/v4.8.0-rc.0...v4.8.0) (2020-08-11)
+
+
+### Bug Fixes
+
+* **deps:** upgrade dependencies to upgrade dot-prop ([#1325](https://github.com/graphile/postgraphile/issues/1325)) ([fe12ece](https://github.com/graphile/postgraphile/commit/fe12ece38abad3938bf593750382e9b052abadcd))
+* **ts:** add jwtSignOptions to PostGraphileOptions type ([#1324](https://github.com/graphile/postgraphile/issues/1324)) ([52f5731](https://github.com/graphile/postgraphile/commit/52f573121bacf9f5d6eb38205f1c028865a191b3))
+
+
+### Features
+
+* **deps:** upgrade postgraphile-engine (enum constraints) ([#1323](https://github.com/graphile/postgraphile/issues/1323)) ([3999b58](https://github.com/graphile/postgraphile/commit/3999b585cc4277827e64c5c23a15ae25bb1080ed))
+
+
+
 # [4.8.0-rc.0](https://github.com/graphile/postgraphile/compare/v4.7.0...v4.8.0-rc.0) (2020-08-05)
 
 
@@ -859,15 +874,11 @@ changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 * **errors:** more helpful error if extendedErrors argument is wrong type ([5ab4c94](https://github.com/graphile/postgraphile/commit/5ab4c944fa7b45c2dc10e909365698033ab6b4d8))
 * SQL perf++; CLI overhall; CLI opts to use Json/Uuid & reduce nullables ([#697](https://github.com/graphile/postgraphile/issues/697)) ([7a1abfc](https://github.com/graphile/postgraphile/commit/7a1abfc9c5e59b02fd25da9d71b051cd00b501b5))
 * **cluster:** introduce cluster feature ([#694](https://github.com/graphile/postgraphile/issues/694)) ([bc64196](https://github.com/graphile/postgraphile/commit/bc64196bb4e4676f7a579de9486db83485ea3c0b))
+* **jwt:** expand jwt verification options ([#655](https://github.com/graphile/postgraphile/issues/655)) ([bf635cb](https://github.com/graphile/postgraphile/commit/bf635cb14b6a78110ea4244111fbf8e6d3332556))
 
 
 
 # [4.0.0-alpha2.33](https://github.com/graphile/postgraphile/compare/v4.0.0-alpha2.32...v4.0.0-alpha2.33) (2018-02-19)
-
-
-### Features
-
-* **jwt:** expand jwt verification options ([#655](https://github.com/graphile/postgraphile/issues/655)) ([bf635cb](https://github.com/graphile/postgraphile/commit/bf635cb14b6a78110ea4244111fbf8e6d3332556))
 
 
 
@@ -903,6 +914,61 @@ changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
 
 
+# [4.0.0-alpha2.28](https://github.com/graphile/postgraphile/compare/v4.0.0-alpha2.27...v4.0.0-alpha2.28) (2018-01-14)
+
+
+### Features
+
+* **additionalGraphQLContextFromRequest:** add res to callback ([#652](https://github.com/graphile/postgraphile/issues/652)) ([1fa4310](https://github.com/graphile/postgraphile/commit/1fa4310dae82d1a28636cb0fc6d4f8294729c5a2))
+
+
+
+# [4.0.0-alpha2.27](https://github.com/graphile/postgraphile/compare/v4.0.0-alpha2.26...v4.0.0-alpha2.27) (2017-12-16)
+
+
+
+# [4.0.0-alpha2.26](https://github.com/graphile/postgraphile/compare/v4.0.0-alpha2.25...v4.0.0-alpha2.26) (2017-12-03)
+
+
+
+# [4.0.0-alpha2.25](https://github.com/graphile/postgraphile/compare/v3.5.4...v4.0.0-alpha2.25) (2017-11-30)
+
+
+
+# [4.0.0-alpha2.24](https://github.com/graphile/postgraphile/compare/v3.5.3...v4.0.0-alpha2.24) (2017-11-29)
+
+
+
+# [4.0.0-alpha2.23](https://github.com/graphile/postgraphile/compare/v3.5.2...v4.0.0-alpha2.23) (2017-11-28)
+
+
+
+# [4.0.0-alpha2.22](https://github.com/graphile/postgraphile/compare/v4.0.0-alpha2.21...v4.0.0-alpha2.22) (2017-11-02)
+
+
+### Features
+
+* **pgSettings:** Only use settings of type string or number ([#589](https://github.com/graphile/postgraphile/issues/589)) ([7a69eb2](https://github.com/graphile/postgraphile/commit/7a69eb25bb93de53abe83373d76eefb05b2799f2))
+
+
+
+# [4.0.0-alpha2.21](https://github.com/graphile/postgraphile/compare/v3.5.1...v4.0.0-alpha2.21) (2017-10-29)
+
+
+### Features
+
+* **postgraphql:** Provide mechanism to add data to resolver context ([#601](https://github.com/graphile/postgraphile/issues/601)) ([5526c2c](https://github.com/graphile/postgraphile/commit/5526c2cc37a7b2242c8f515092ad878e43930bb9))
+
+
+
+# [4.0.0-alpha2.9](https://github.com/graphile/postgraphile/compare/v4.0.0-alpha2.6...v4.0.0-alpha2.9) (2017-08-10)
+
+
+
+# [4.0.0-alpha2.6](https://github.com/graphile/postgraphile/compare/v3.4.0...v4.0.0-alpha2.6) (2017-08-08)
+
+
+
 ## [3.5.5](https://github.com/graphile/postgraphile/compare/v4.0.0-alpha2.28...v3.5.5) (2018-01-30)
 
 
@@ -933,6 +999,40 @@ changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
 
 
+# [4.0.0-alpha2.24](https://github.com/graphile/postgraphile/compare/v3.5.3...v4.0.0-alpha2.24) (2017-11-29)
+
+
+
+# [4.0.0-alpha2.23](https://github.com/graphile/postgraphile/compare/v3.5.2...v4.0.0-alpha2.23) (2017-11-28)
+
+
+
+# [4.0.0-alpha2.22](https://github.com/graphile/postgraphile/compare/v4.0.0-alpha2.21...v4.0.0-alpha2.22) (2017-11-02)
+
+
+### Features
+
+* **pgSettings:** Only use settings of type string or number ([#589](https://github.com/graphile/postgraphile/issues/589)) ([7a69eb2](https://github.com/graphile/postgraphile/commit/7a69eb25bb93de53abe83373d76eefb05b2799f2))
+
+
+
+# [4.0.0-alpha2.21](https://github.com/graphile/postgraphile/compare/v3.5.1...v4.0.0-alpha2.21) (2017-10-29)
+
+
+### Features
+
+* **postgraphql:** Provide mechanism to add data to resolver context ([#601](https://github.com/graphile/postgraphile/issues/601)) ([5526c2c](https://github.com/graphile/postgraphile/commit/5526c2cc37a7b2242c8f515092ad878e43930bb9))
+
+
+
+# [4.0.0-alpha2.9](https://github.com/graphile/postgraphile/compare/v4.0.0-alpha2.6...v4.0.0-alpha2.9) (2017-08-10)
+
+
+
+# [4.0.0-alpha2.6](https://github.com/graphile/postgraphile/compare/v3.4.0...v4.0.0-alpha2.6) (2017-08-08)
+
+
+
 ## [3.5.4](https://github.com/graphile/postgraphile/compare/v4.0.0-alpha2.24...v3.5.4) (2017-11-30)
 
 
@@ -951,11 +1051,67 @@ changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
 
 
+# [4.0.0-alpha2.23](https://github.com/graphile/postgraphile/compare/v3.5.2...v4.0.0-alpha2.23) (2017-11-28)
+
+
+
+# [4.0.0-alpha2.22](https://github.com/graphile/postgraphile/compare/v4.0.0-alpha2.21...v4.0.0-alpha2.22) (2017-11-02)
+
+
+### Features
+
+* **pgSettings:** Only use settings of type string or number ([#589](https://github.com/graphile/postgraphile/issues/589)) ([7a69eb2](https://github.com/graphile/postgraphile/commit/7a69eb25bb93de53abe83373d76eefb05b2799f2))
+
+
+
+# [4.0.0-alpha2.21](https://github.com/graphile/postgraphile/compare/v3.5.1...v4.0.0-alpha2.21) (2017-10-29)
+
+
+### Features
+
+* **postgraphql:** Provide mechanism to add data to resolver context ([#601](https://github.com/graphile/postgraphile/issues/601)) ([5526c2c](https://github.com/graphile/postgraphile/commit/5526c2cc37a7b2242c8f515092ad878e43930bb9))
+
+
+
+# [4.0.0-alpha2.9](https://github.com/graphile/postgraphile/compare/v4.0.0-alpha2.6...v4.0.0-alpha2.9) (2017-08-10)
+
+
+
+# [4.0.0-alpha2.6](https://github.com/graphile/postgraphile/compare/v3.4.0...v4.0.0-alpha2.6) (2017-08-08)
+
+
+
 ## [3.5.3](https://github.com/graphile/postgraphile/compare/v4.0.0-alpha2.23...v3.5.3) (2017-11-29)
 
 
 
 # [4.0.0-alpha2.23](https://github.com/graphile/postgraphile/compare/v3.5.2...v4.0.0-alpha2.23) (2017-11-28)
+
+
+
+# [4.0.0-alpha2.22](https://github.com/graphile/postgraphile/compare/v4.0.0-alpha2.21...v4.0.0-alpha2.22) (2017-11-02)
+
+
+### Features
+
+* **pgSettings:** Only use settings of type string or number ([#589](https://github.com/graphile/postgraphile/issues/589)) ([7a69eb2](https://github.com/graphile/postgraphile/commit/7a69eb25bb93de53abe83373d76eefb05b2799f2))
+
+
+
+# [4.0.0-alpha2.21](https://github.com/graphile/postgraphile/compare/v3.5.1...v4.0.0-alpha2.21) (2017-10-29)
+
+
+### Features
+
+* **postgraphql:** Provide mechanism to add data to resolver context ([#601](https://github.com/graphile/postgraphile/issues/601)) ([5526c2c](https://github.com/graphile/postgraphile/commit/5526c2cc37a7b2242c8f515092ad878e43930bb9))
+
+
+
+# [4.0.0-alpha2.9](https://github.com/graphile/postgraphile/compare/v4.0.0-alpha2.6...v4.0.0-alpha2.9) (2017-08-10)
+
+
+
+# [4.0.0-alpha2.6](https://github.com/graphile/postgraphile/compare/v3.4.0...v4.0.0-alpha2.6) (2017-08-08)
 
 
 
@@ -984,6 +1140,14 @@ changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 ### Features
 
 * **postgraphql:** Provide mechanism to add data to resolver context ([#601](https://github.com/graphile/postgraphile/issues/601)) ([5526c2c](https://github.com/graphile/postgraphile/commit/5526c2cc37a7b2242c8f515092ad878e43930bb9))
+
+
+
+# [4.0.0-alpha2.9](https://github.com/graphile/postgraphile/compare/v4.0.0-alpha2.6...v4.0.0-alpha2.9) (2017-08-10)
+
+
+
+# [4.0.0-alpha2.6](https://github.com/graphile/postgraphile/compare/v3.4.0...v4.0.0-alpha2.6) (2017-08-08)
 
 
 
