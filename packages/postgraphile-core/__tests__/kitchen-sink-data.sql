@@ -259,6 +259,12 @@ insert into enum_tables.letter_descriptions(letter, description) values
   ('C', 'Pronounced like ''sea'''),
   ('D', 'The first letter omitted from the ''ABC'' phrase');
 
+alter sequence enum_tables.referencing_table_id_seq restart with 432;
+insert into enum_tables.referencing_table(enum_1, enum_2, enum_3) values
+  ('a1', null, null),
+  ('a3', 'b2', 'c1'),
+  (null, null, 'c3');
+
 --------------------------------------------------------------------------------
 
 alter sequence geometry.geom_id_seq restart with 101;

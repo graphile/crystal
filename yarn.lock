@@ -774,6 +774,11 @@
   resolved "https://registry.yarnpkg.com/@graphile/lru/-/lru-4.4.5.tgz#a0fb6da9fe2002116bc61708f8d49a2a8ac2f206"
   integrity sha512-nEjt0BVHXabsUuvkx7DIcY7ZibTJSJnxYM4WxO8WdMGPQHXDavkCprhPdStQ8JM1AQls+1ibCrXXkF49zY72PA==
 
+"@graphile/lru@4.5.0", "@graphile/lru@^4.4.1-alpha.2":
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/@graphile/lru/-/lru-4.5.0.tgz#e8fe036d322dfe1715675aab171979981e28ac9e"
+  integrity sha512-OoIgewLowjegJzz3tpcRE5LpQKqsap1ETFaZtC1r9p36h5ieUJnWTxCTpB7XIsU9muMTt7MMt8x0E5apS47QIQ==
+
 "@jest/console@^24.7.1", "@jest/console@^24.9.0":
   version "24.9.0"
   resolved "https://registry.yarnpkg.com/@jest/console/-/console-24.9.0.tgz#79b1bc06fb74a8cfb01cbdedf945584b1b9707f0"
@@ -6669,6 +6674,15 @@ pg-sql2@4.4.5:
   integrity sha512-8qXACinootFhIv9JnpfFzXn79K7sSw+ASx6a2RRqrrh2MV8ElLUTQene+yZm0KjDY4BhSq4ruNGO+CkdLLVglg==
   dependencies:
     "@graphile/lru" "4.4.5"
+    "@types/pg" ">=6 <8"
+    debug ">=3 <5"
+
+pg-sql2@^4.4.1-alpha.2:
+  version "4.7.0"
+  resolved "https://registry.yarnpkg.com/pg-sql2/-/pg-sql2-4.7.0.tgz#2e4964bc0d94b8a81e4bc13651379a6436f8e370"
+  integrity sha512-/9YtclLJW7nIehd4RPxCECz9+mOAmQ5tkDRLbefzCxgctkKj31tsF6Xu1+Rwnnv7/hKyzH+ShzOJrxPRF8jEAw==
+  dependencies:
+    "@graphile/lru" "4.5.0"
     "@types/pg" ">=6 <8"
     debug ">=3 <5"
 

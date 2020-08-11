@@ -1,17 +1,11 @@
 {
   "useWorkspaces": true,
   "npmClient": "yarn",
-  "packages": [
-    "packages/*"
-  ],
+  "packages": ["packages/*"],
   "version": "4.8.0-rc.0",
   "command": {
     "publish": {
-      "allowBranch": [
-        "master",
-        "v4",
-        "canary/*"
-      ]
+      "allowBranch": ["master", "v4", "canary/*"]
     }
   }
 }

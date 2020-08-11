@@ -80,6 +80,21 @@ Object {
 }
 `;
 
+exports[`enum_tables.mutations2.graphql 1`] = `
+Object {
+  "data": Object {
+    "createReferencingTable": Object {
+      "referencingTable": Object {
+        "enum1": "A3",
+        "enum2": "B4",
+        "enum3": null,
+        "id": 435,
+      },
+    },
+  },
+}
+`;
+
 exports[`geometry.mutations.graphql 1`] = `
 Object {
   "data": Object {

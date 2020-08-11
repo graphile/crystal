@@ -77,7 +77,7 @@ module.exports = MySchemaExtensionPlugin;
 e.g.:
 
 ```js
-makeExtendSchemaPlugin((build) => ({
+makeExtendSchemaPlugin(build => ({
   typeDefs: gql`
     type Random {
       float: Float!

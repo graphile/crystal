@@ -1641,6 +1641,35 @@ Object {
 }
 `;
 
+exports[`enum_tables.queries2.graphql 1`] = `
+Object {
+  "data": Object {
+    "all": Object {
+      "nodes": Array [
+        Object {
+          "enum1": "A1",
+          "enum2": null,
+          "enum3": null,
+          "id": 432,
+        },
+        Object {
+          "enum1": "A3",
+          "enum2": "B2",
+          "enum3": "C1",
+          "id": 433,
+        },
+        Object {
+          "enum1": null,
+          "enum2": null,
+          "enum3": "C3",
+          "id": 434,
+        },
+      ],
+    },
+  },
+}
+`;
+
 exports[`function-return-types.graphql 1`] = `
 Object {
   "data": Object {

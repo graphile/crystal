@@ -439,6 +439,9 @@ export default (function PgBasicsPlugin(
 
           // From here down, functions are passed database introspection results
           enumType(type: PgType) {
+            if (type.tags.enumName) {
+              return type.tags.enumName;
+            }
             return this.upperCamelCase(this._typeName(type));
           },
           argument(name: ?string, index: number) {

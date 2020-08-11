@@ -556,142 +556,10 @@ export default (async function PgIntrospectionPlugin(
 
           await Promise.all(
             result.class.map(async klass => {
-              if (
-                klass.tags.enum === true ||
-                typeof klass.tags.enum === "string"
-              ) {
-                // Assert it has a primary key
-                const pk = result.constraint.find(
-                  c => c.classId === klass.id && c.type === "p"
-                );
-                if (!pk) {
-                  // Must be from another schema
-                  return;
-                }
+              const isEnumTable =
+                klass.tags.enum === true || typeof klass.tags.enum === "string";
 
-                // Get all the columns
-                const enumTableColumns = result.attribute
-                  .filter(attr => attr.classId === klass.id)
-                  .sort((a, b) => a.num - b.num);
-
-                // Get description column
-                const descriptionColumn = enumTableColumns.find(
-                  attr =>
-                    attr.name === "description" || attr.tags.enumDescription
-                );
-
-                // Assert primary key is exactly one column
-                const pkColumns = pk.keyAttributeNums.map(nr =>
-                  enumTableColumns.find(attr => attr.num === nr)
-                );
-                if (pkColumns.length !== 1) {
-                  throw new Error(
-                    `Enum table "${klass.namespaceName}"."${klass.name}" has composite primary key`
-                  );
-                }
-
-                // Assert the primary key is text
-                const pkColumn = pkColumns[0];
-                const VARCHAR_ID = "1043";
-                const TEXT_ID = "25";
-                const CHAR_ID = "18";
-                if (
-                  !pkColumn ||
-                  (pkColumn.typeId !== VARCHAR_ID &&
-                    pkColumn.typeId !== TEXT_ID &&
-                    pkColumn.typeId !== CHAR_ID)
-                ) {
-                  throw new Error(
-                    `Enum table "${klass.namespaceName}"."${klass.name}" primary key must be 'text', 'char' or 'varchar'`
-                  );
-                }
-
-                // Load data from the table.
-                const query = pgSql.compile(
-                  pgSql.fragment`select ${pgSql.identifier(pkColumn.name)}${
-                    descriptionColumn
-                      ? pgSql.fragment`, ${pgSql.identifier(
-                          descriptionColumn.name
-                        )}`
-                      : pgSql.blank
-                  } from ${pgSql.identifier(klass.namespaceName, klass.name)};`
-                );
-                const data = await pgClient.query(query);
-
-                // Assert there's at least one value
-                if (data.rows.length < 1) {
-                  throw new Error(
-                    `Enum table "${klass.namespaceName}"."${klass.name}" contains no entries.`
-                  );
-                }
-
-                // Create fake enum type
-                const enumTypeArray = {
-                  kind: "type",
-                  id: `FAKE_ENUM_${klass.namespaceName}_${klass.name}_list`,
-                  name: `_${klass.name}`,
-                  description: null,
-                  tags: {},
-                  namespaceId: klass.namespaceId,
-                  namespaceName: klass.namespaceName,
-                  type: "b",
-                  category: "A",
-                  domainIsNotNull: null,
-                  arrayItemTypeId: null,
-                  typeLength: -1,
-                  isPgArray: true,
-                  classId: null,
-                  domainBaseTypeId: null,
-                  domainTypeModifier: null,
-                  domainHasDefault: false,
-                  enumVariants: null,
-                  enumDescriptions: null,
-                  rangeSubTypeId: null,
-                };
-                const enumType = {
-                  kind: "type",
-                  id: `FAKE_ENUM_${klass.namespaceName}_${klass.name}`,
-                  name: klass.name,
-                  description: klass.description,
-                  tags: klass.tags,
-                  namespaceId: klass.namespaceId,
-                  namespaceName: klass.namespaceName,
-                  type: "e",
-                  category: "E",
-                  domainIsNotNull: null,
-                  arrayItemTypeId: enumTypeArray.id,
-                  typeLength: 4, // ???
-                  isPgArray: false,
-                  classId: null,
-                  domainBaseTypeId: null,
-                  domainTypeModifier: null,
-                  domainHasDefault: false,
-                  enumVariants: data.rows.map(r => r[pkColumn.name]),
-                  enumDescriptions: descriptionColumn
-                    ? data.rows.map(r => r[descriptionColumn.name])
-                    : null,
-                  // TODO: enumDescriptions
-                  rangeSubTypeId: null,
-                };
-                result.type.push(enumType, enumTypeArray);
-
-                // Change type of all attributes that reference this table to
-                // reference this enum type
-                result.constraint.forEach(c => {
-                  if (c.type === "f" && c.foreignClassId === klass.id) {
-                    // Get the attribute
-                    const fkattr = result.attribute.find(
-                      attr =>
-                        attr.classId === c.classId &&
-                        attr.num === c.keyAttributeNums[0]
-                    );
-                    if (fkattr) {
-                      // Override the detected type to pretend to be our enum
-                      fkattr.typeId = enumType.id;
-                    }
-                  }
-                });
-
+              if (isEnumTable) {
                 // Prevent the table being recognised as a table
                 // eslint-disable-next-line require-atomic-updates
                 klass.tags.omit = true;
@@ -703,6 +571,189 @@ export default (async function PgIntrospectionPlugin(
                 klass.isUpdatable = false;
                 // eslint-disable-next-line require-atomic-updates
                 klass.isDeletable = false;
+              }
+
+              const enumConstraints = result.constraint.filter(
+                (con: PgConstraint) => {
+                  if (con.classId === klass.id) {
+                    const isPrimaryKey = con.type === "p";
+                    const isUniqueConstraint = con.type === "u";
+                    if (isPrimaryKey || isUniqueConstraint) {
+                      const isExplicitEnumConstraint =
+                        con.tags.enum === true ||
+                        typeof con.tags.enum === "string";
+                      const isPrimaryKeyOfEnumTableConstraint =
+                        con.type === "p" && isEnumTable;
+                      if (
+                        isExplicitEnumConstraint ||
+                        isPrimaryKeyOfEnumTableConstraint
+                      ) {
+                        const hasExactlyOneColumn =
+                          con.keyAttributeNums.length === 1;
+                        if (!hasExactlyOneColumn) {
+                          throw new Error(
+                            `Enum table "${klass.namespaceName}"."${klass.name}" enum constraint '${con.name}' is composite; it should have exactly one column (found: ${con.keyAttributeNums.length})`
+                          );
+                        }
+                        return true;
+                      }
+                    }
+                  }
+                  return false;
+                }
+              );
+              if (enumConstraints.length > 0) {
+                // Get all the columns
+                const enumTableColumns = result.attribute
+                  .filter(attr => attr.classId === klass.id)
+                  .sort((a, z) => a.num - z.num);
+
+                // Get description column
+                const descriptionColumn = enumTableColumns.find(
+                  attr =>
+                    attr.name === "description" || attr.tags.enumDescription
+                );
+
+                // Assert the columns are text
+                const VARCHAR_ID = "1043";
+                const TEXT_ID = "25";
+                const CHAR_ID = "18";
+                const BPCHAR_ID = "1042";
+
+                // Get the list of columns enums are defined for
+                const enumColumns = enumConstraints.map(con => {
+                  const attr = enumTableColumns.find(
+                    attr => attr.num === con.keyAttributeNums[0]
+                  );
+                  if (!attr) {
+                    throw new Error(
+                      `Enum table "${klass.namespaceName}"."${
+                        klass.name
+                      }" enum column '${
+                        con.keyAttributeNums[0]
+                      }' couldn't be found`
+                    );
+                  }
+                  if (
+                    attr.typeId !== VARCHAR_ID &&
+                    attr.typeId !== TEXT_ID &&
+                    attr.typeId !== CHAR_ID &&
+                    attr.typeId !== BPCHAR_ID
+                  ) {
+                    throw new Error(
+                      `Enum table "${klass.namespaceName}"."${klass.name}" enum column '${attr.name}' must be 'text', 'char' or 'varchar' (actual type OID: ${attr.typeId})`
+                    );
+                  }
+                  return attr;
+                });
+
+                // Load data from the table.
+                const query = pgSql.compile(
+                  pgSql.fragment`select ${pgSql.join(
+                    enumColumns.map(col => pgSql.identifier(col.name)),
+                    ", "
+                  )}${
+                    descriptionColumn
+                      ? pgSql.fragment`, ${pgSql.identifier(
+                          descriptionColumn.name
+                        )}`
+                      : pgSql.blank
+                  } from ${pgSql.identifier(klass.namespaceName, klass.name)};`
+                );
+                const { rows: allData } = await pgClient.query(query);
+
+                // Assert there's at least one value
+                enumConstraints.forEach(constraint => {
+                  const col = enumColumns.find(
+                    col => col.num === constraint.keyAttributeNums[0]
+                  );
+                  if (!col) {
+                    // Should never happen
+                    throw new Error(
+                      "Graphile Engine error - could not find column for enum constraint"
+                    );
+                  }
+                  const data = allData.filter(row => row[col.name] != null);
+                  if (data.length < 1) {
+                    throw new Error(
+                      `Enum table "${klass.namespaceName}"."${klass.name}" contains no entries for enum constraint '${constraint.name}'.`
+                    );
+                  }
+
+                  // Create fake enum type
+                  const constraintIdent =
+                    constraint.type === "p" ? "" : `_${constraint.name}`;
+                  const enumTypeArray = {
+                    kind: "type",
+                    id: `FAKE_ENUM_${klass.namespaceName}_${klass.name}${constraintIdent}_list`,
+                    name: `_${klass.name}${constraintIdent}`,
+                    description: null,
+                    tags: {},
+                    namespaceId: klass.namespaceId,
+                    namespaceName: klass.namespaceName,
+                    type: "b",
+                    category: "A",
+                    domainIsNotNull: null,
+                    arrayItemTypeId: null,
+                    typeLength: -1,
+                    isPgArray: true,
+                    classId: null,
+                    domainBaseTypeId: null,
+                    domainTypeModifier: null,
+                    domainHasDefault: false,
+                    enumVariants: null,
+                    enumDescriptions: null,
+                    rangeSubTypeId: null,
+                  };
+                  const enumType = {
+                    kind: "type",
+                    id: `FAKE_ENUM_${klass.namespaceName}_${klass.name}${constraintIdent}`,
+                    name: `${klass.name}${constraintIdent}`,
+                    description: klass.description,
+                    tags: { ...klass.tags, ...constraint.tags },
+                    namespaceId: klass.namespaceId,
+                    namespaceName: klass.namespaceName,
+                    type: "e",
+                    category: "E",
+                    domainIsNotNull: null,
+                    arrayItemTypeId: enumTypeArray.id,
+                    typeLength: 4, // ???
+                    isPgArray: false,
+                    classId: null,
+                    domainBaseTypeId: null,
+                    domainTypeModifier: null,
+                    domainHasDefault: false,
+                    enumVariants: data.map(r => r[col.name]),
+                    enumDescriptions: descriptionColumn
+                      ? data.map(r => r[descriptionColumn.name])
+                      : null,
+                    // TODO: enumDescriptions
+                    rangeSubTypeId: null,
+                  };
+                  result.type.push(enumType, enumTypeArray);
+
+                  // Change type of all attributes that reference this table to
+                  // reference this enum type
+                  result.constraint.forEach(c => {
+                    if (
+                      c.type === "f" &&
+                      c.foreignClassId === klass.id &&
+                      c.foreignKeyAttributeNums.length === 1 &&
+                      c.foreignKeyAttributeNums[0] === col.num
+                    ) {
+                      // Get the attribute
+                      const fkattr = result.attribute.find(
+                        attr =>
+                          attr.classId === c.classId &&
+                          attr.num === c.keyAttributeNums[0]
+                      );
+                      if (fkattr) {
+                        // Override the detected type to pretend to be our enum
+                        fkattr.typeId = enumType.id;
+                      }
+                    }
+                  });
+                });
               }
             })
           );

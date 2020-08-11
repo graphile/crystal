@@ -1,0 +1,10 @@
+{
+  all: allReferencingTables {
+    nodes {
+      id
+      enum1
+      enum2
+      enum3
+    }
+  }
+}

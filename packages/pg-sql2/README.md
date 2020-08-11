@@ -40,7 +40,7 @@ const fields = ["name", "age", "height"];
 // sql.join is used to join fragments with a common separator, NOT to join tables!
 const sqlFields = sql.join(
   // sql.identifier safely escapes arguments and joins them with dots
-  fields.map((fieldName) => sql.identifier(tableName, fieldName)),
+  fields.map(fieldName => sql.identifier(tableName, fieldName)),
   ", "
 );
 
@@ -119,7 +119,7 @@ have produced.
 Joins an array of sql.query values using the delimeter (which is treated as a raw SQL string); e.g.
 
 ```js
-const arrayOfSqlFields = ["a", "b", "c", "d"].map((n) => sql.identifier(n));
+const arrayOfSqlFields = ["a", "b", "c", "d"].map(n => sql.identifier(n));
 sql.query`select ${sql.join(arrayOfSqlFields, ", ")}`; // -> select "a", "b", "c", "d"
 
 const arrayOfSqlConditions = [
