@@ -1,14 +1,32 @@
+<p align="center">
 <img width="120" height="120" title="PostGraphile logo" src="https://cdn.rawgit.com/graphile/graphile.github.io/a6225f8c3052df5c276ecef28aeb0cade1aec16a/logos/postgraphile.optimized.svg" />
+</p>
 
-# PostGraphile
+<h1 align="center">
+  PostGraphile
+</h1>
 
-[![Patreon sponsor button](https://img.shields.io/badge/sponsor-via%20Patreon-orange.svg)](https://patreon.com/benjie)
-[![Discord chat room](https://img.shields.io/discord/489127045289476126.svg)](http://discord.gg/graphile)
-[![Package on npm](https://img.shields.io/npm/v/postgraphile.svg?style=flat)](https://www.npmjs.com/package/postgraphile)
-![MIT license](https://img.shields.io/npm/l/postgraphile.svg)
-[![Follow](https://img.shields.io/badge/twitter-@GraphileHQ-blue.svg)](https://twitter.com/GraphileHQ)
+<p align="center">
+  <a href="https://patreon.com/benjie">
+    <img src="https://img.shields.io/badge/sponsor-via%20Patreon-orange.svg" alt="Patreon sponsor button" />
+  </a>
+  <a href="http://discord.gg/graphile">
+    <img src="https://img.shields.io/discord/489127045289476126.svg" alt="Discord chat room" />
+  </a>
+  <a href="https://www.npmjs.com/package/postgraphile">
+    <img src="https://img.shields.io/npm/v/postgraphile.svg?style=flat" alt="Package on npm" />
+  </a>
+    <img src="https://img.shields.io/npm/l/postgraphile.svg" alt="MIT license" />
+  <a href="https://twitter.com/GraphileHQ">
+    <img src="https://img.shields.io/badge/twitter-@GraphileHQ-blue.svg" alt="Follow" />
+  </a>
+</p>
 
-_**Instant lightning-fast GraphQL API backed primarily by your PostgreSQL database. Highly customisable and extensible thanks to incredibly powerful plugin system.**_ _Formerly "PostGraphQL"._
+<h4 align="center">
+  <i>
+  Instant lightning-fast GraphQL API backed primarily by your PostgreSQL database. Highly customisable and extensible thanks to incredibly powerful plugin system. Formerly "PostGraphQL".
+  </i>
+</h4>
 
 ## Documentation: [graphile.org/postgraphile](https://graphile.org/postgraphile)
 
