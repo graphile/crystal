@@ -5,7 +5,7 @@ import GraphiQLExplorer from 'graphiql-explorer';
 import StorageAPI from 'graphiql/dist/utility/StorageAPI';
 import './postgraphiql.css';
 import { buildClientSchema, introspectionQuery, isType, GraphQLObjectType } from 'graphql';
-import { SubscriptionClient } from 'subscriptions-transport-ws';
+import { createClient } from '@enisdenjo/graphql-transport-ws';
 import formatSQL from '../formatSQL';
 
 const defaultQuery = `\
@@ -112,8 +112,7 @@ class PostGraphiQL extends React.PureComponent {
 
   subscriptionsClient =
     POSTGRAPHILE_CONFIG.enhanceGraphiql && POSTGRAPHILE_CONFIG.subscriptions
-      ? new SubscriptionClient(websocketUrl, {
-          reconnect: true,
+      ? createClient(websocketUrl, {
           connectionParams: () => this.getHeaders() || {},
         })
       : null;
@@ -124,41 +123,42 @@ class PostGraphiQL extends React.PureComponent {
     // Update the schema for the first time. Log an error if we fail.
     this.updateSchema();
 
-    if (this.subscriptionsClient) {
-      const unlisten1 = this.subscriptionsClient.on('connected', () => {
-        this.setState({ socketStatus: 'connected', error: null });
-      });
-      const unlisten2 = this.subscriptionsClient.on('disconnected', () => {
-        this.setState({ socketStatus: 'disconnected' });
-      });
-      const unlisten3 = this.subscriptionsClient.on('connecting', () => {
-        this.setState({ socketStatus: 'connecting' });
-      });
-      const unlisten4 = this.subscriptionsClient.on('reconnected', () => {
-        this.setState({ socketStatus: 'reconnected', error: null });
-        setTimeout(() => {
-          this.setState(state =>
-            state.socketStatus === 'reconnected' ? { socketStatus: 'connected' } : {},
-          );
-        }, 5000);
-      });
-      const unlisten5 = this.subscriptionsClient.on('reconnecting', () => {
-        this.setState({ socketStatus: 'reconnecting' });
-      });
-      const unlisten6 = this.subscriptionsClient.on('error', error => {
-        // tslint:disable-next-line no-console
-        console.error('Client connection error', error);
-        this.setState({ error: new Error('Subscriptions client connection error') });
-      });
-      this.unlistenSubscriptionsClient = () => {
-        unlisten1();
-        unlisten2();
-        unlisten3();
-        unlisten4();
-        unlisten5();
-        unlisten6();
-      };
-    }
+    // TODO-db-200826 implement required listeners in client
+    // if (this.subscriptionsClient) {
+    //   const unlisten1 = this.subscriptionsClient.on('connected', () => {
+    //     this.setState({ socketStatus: 'connected', error: null });
+    //   });
+    //   const unlisten2 = this.subscriptionsClient.on('disconnected', () => {
+    //     this.setState({ socketStatus: 'disconnected' });
+    //   });
+    //   const unlisten3 = this.subscriptionsClient.on('connecting', () => {
+    //     this.setState({ socketStatus: 'connecting' });
+    //   });
+    //   const unlisten4 = this.subscriptionsClient.on('reconnected', () => {
+    //     this.setState({ socketStatus: 'reconnected', error: null });
+    //     setTimeout(() => {
+    //       this.setState(state =>
+    //         state.socketStatus === 'reconnected' ? { socketStatus: 'connected' } : {},
+    //       );
+    //     }, 5000);
+    //   });
+    //   const unlisten5 = this.subscriptionsClient.on('reconnecting', () => {
+    //     this.setState({ socketStatus: 'reconnecting' });
+    //   });
+    //   const unlisten6 = this.subscriptionsClient.on('error', error => {
+    //     // tslint:disable-next-line no-console
+    //     console.error('Client connection error', error);
+    //     this.setState({ error: new Error('Subscriptions client connection error') });
+    //   });
+    //   this.unlistenSubscriptionsClient = () => {
+    //     unlisten1();
+    //     unlisten2();
+    //     unlisten3();
+    //     unlisten4();
+    //     unlisten5();
+    //     unlisten6();
+    //   };
+    // }
 
     // If we were given a `streamUrl`, we want to construct an `EventSource`
     // and add listeners.
@@ -209,7 +209,9 @@ class PostGraphiQL extends React.PureComponent {
   }
 
   componentWillUnmount() {
-    if (this.unlistenSubscriptionsClient) this.unlistenSubscriptionsClient();
+    // TODO-db-200826 implement required listeners in client
+    // if (this.unlistenSubscriptionsClient) this.unlistenSubscriptionsClient();
+
     // Close out our event source so we get no more events.
     this._eventSource.close();
     this._eventSource = null;
@@ -350,9 +352,9 @@ class PostGraphiQL extends React.PureComponent {
             });
           };
 
-          const subscription = this.subscriptionsClient.request(graphQLParams).subscribe(observer);
+          const unsubscribe = this.subscriptionsClient.subscribe(graphQLParams, observer);
           this.setState({ haveActiveSubscription: true });
-          this.activeSubscription = subscription;
+          this.activeSubscription = { unsubscribe };
           return subscription;
         },
       };
@@ -791,10 +793,11 @@ class PostGraphiQL extends React.PureComponent {
                   if (this.state.headersTextValid && this.state.saveHeadersText) {
                     this._storage.set(STORAGE_KEYS.HEADERS_TEXT, this.state.headersText);
                   }
-                  if (this.state.headersTextValid && this.subscriptionsClient) {
-                    // Reconnect to websocket with new headers
-                    this.subscriptionsClient.close(false, true);
-                  }
+                  // TODO-db-200826 implement reconnecting with new `connectionParams`
+                  // if (this.state.headersTextValid && this.subscriptionsClient) {
+                  //   // Reconnect to websocket with new headers
+                  //   this.subscriptionsClient.close(false, true);
+                  // }
                 },
               )
             }

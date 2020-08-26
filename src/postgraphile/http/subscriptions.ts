@@ -2,19 +2,19 @@ import { Server, IncomingMessage, ServerResponse, OutgoingHttpHeaders } from 'ht
 import { HttpRequestHandler, mixed, Middleware } from '../../interfaces';
 import {
   subscribe as graphqlSubscribe,
-  ExecutionResult,
   specifiedRules,
   validate,
   GraphQLError,
   parse,
-  DocumentNode,
+  ExecutionArgs,
 } from 'graphql';
 import * as WebSocket from 'ws';
-import { SubscriptionServer, ConnectionContext, ExecutionParams } from 'subscriptions-transport-ws';
+import { createServer, ExecutionResultFormatter } from '@enisdenjo/graphql-transport-ws';
+
 import parseUrl = require('parseurl');
 import { pluginHookFromOptions } from '../pluginHook';
 import { isEmpty } from './createPostGraphileHttpRequestHandler';
-import liveSubscribe from './liveSubscribe';
+// import liveSubscribe from './liveSubscribe'; // TODO-db-200826 add support for live queries
 
 interface Deferred<T> extends Promise<T> {
   resolve: (input?: T | PromiseLike<T> | undefined) => void;
@@ -47,14 +47,7 @@ function deferred<T = void>(): Deferred<T> {
 export async function enhanceHttpServerWithSubscriptions<
   Request extends IncomingMessage = IncomingMessage,
   Response extends ServerResponse = ServerResponse
->(
-  websocketServer: Server,
-  postgraphileMiddleware: HttpRequestHandler,
-  subscriptionServerOptions?: {
-    keepAlive?: number;
-    graphqlRoute?: string;
-  },
-): Promise<void> {
+>(websocketServer: Server, postgraphileMiddleware: HttpRequestHandler): Promise<void> {
   if (websocketServer['__postgraphileSubscriptionsEnabled']) {
     return;
   }
@@ -66,9 +59,8 @@ export async function enhanceHttpServerWithSubscriptions<
     handleErrors,
   } = postgraphileMiddleware;
   const pluginHook = pluginHookFromOptions(options);
-  const graphqlRoute =
-    (subscriptionServerOptions && subscriptionServerOptions.graphqlRoute) ||
-    (options.externalUrlBase || '') + (options.graphqlRoute || '/graphql');
+  const externalUrlBase = options.externalUrlBase || '';
+  const graphqlRoute = options.graphqlRoute || '/graphql';
 
   const schema = await getGraphQLSchema();
 
@@ -175,7 +167,7 @@ export async function enhanceHttpServerWithSubscriptions<
 
   websocketServer.on('upgrade', (req, socket, head) => {
     const { pathname = '' } = parseUrl(req) || {};
-    const isGraphqlRoute = pathname === graphqlRoute;
+    const isGraphqlRoute = pathname === externalUrlBase + graphqlRoute;
     if (isGraphqlRoute) {
       wss.handleUpgrade(req, socket, head, ws => {
         wss.emit('connection', ws, req);
@@ -186,26 +178,22 @@ export async function enhanceHttpServerWithSubscriptions<
     options,
   });
 
-  SubscriptionServer.create(
+  createServer(
     {
       schema,
       validationRules: staticValidationRules,
       execute: () => {
         throw new Error('Only subscriptions are allowed over websocket transport');
       },
-      subscribe: options.live ? liveSubscribe : graphqlSubscribe,
-      onConnect(
-        connectionParams: Record<string, any>,
-        _socket: WebSocket,
-        connectionContext: ConnectionContext,
-      ) {
-        const { socket, request } = connectionContext;
+      subscribe: graphqlSubscribe, // TODO-db-200826 add support for live queries
+      onConnect: context => {
+        const { socket, request } = context;
         socket['postgraphileId'] = ++socketId;
         if (!request) {
           throw new Error('No request!');
         }
-        const normalizedConnectionParams = lowerCaseKeys(connectionParams);
-        request['connectionParams'] = connectionParams;
+        const normalizedConnectionParams = lowerCaseKeys(context.connectionParams || {});
+        request['connectionParams'] = context.connectionParams;
         request['normalizedConnectionParams'] = normalizedConnectionParams;
         socket['__postgraphileReq'] = request;
         if (!request.headers.authorization && normalizedConnectionParams['authorization']) {
@@ -224,46 +212,51 @@ export async function enhanceHttpServerWithSubscriptions<
           // The original headers must win (for security)
           ...request.headers,
         };
+
+        return true;
       },
-      // tslint:disable-next-line no-any
-      async onOperation(message: any, params: ExecutionParams, socket: WebSocket) {
+      onSubscribe: async (ctx, message, args) => {
+        const { socket } = ctx;
         const opId = message.id;
         const context = await getContext(socket, opId);
 
         // Override schema (for --watch)
-        params.schema = await getGraphQLSchema();
+        args.schema = await getGraphQLSchema();
 
-        Object.assign(params.context, context);
+        // if the context value is missing, initialise it
+        if (!args.contextValue) {
+          args.contextValue = {};
+        }
+        Object.assign(args.contextValue, context);
 
         const { req, res } = await reqResFromSocket(socket);
         const meta = {};
-        const formatResponse = <TExecutionResult extends ExecutionResult = ExecutionResult>(
-          response: TExecutionResult,
-        ): TExecutionResult => {
+        const executionResultFormatter: ExecutionResultFormatter = (_ctx, response) => {
           if (response.errors) {
             response.errors = handleErrors(response.errors, req, res);
           }
           if (!isEmpty(meta)) {
             response['meta'] = meta;
           }
-
           return response;
         };
-        // onOperation is only called once per params object, so there's no race condition here
-        // eslint-disable-next-line require-atomic-updates
-        params.formatResponse = formatResponse;
+
         const hookedParams = pluginHook
-          ? pluginHook('postgraphile:ws:onOperation', params, {
+          ? pluginHook('postgraphile:ws:onSubscribe', args, {
               message,
-              params,
+              args,
               socket,
               options,
             })
-          : params;
-        const finalParams: typeof hookedParams & { query: DocumentNode } = {
+          : args;
+        const finalParams = {
           ...hookedParams,
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          schema: args.schema!, // is set above
           query:
-            typeof hookedParams.query !== 'string' ? hookedParams.query : parse(hookedParams.query),
+            typeof hookedParams.document !== 'string'
+              ? hookedParams.document
+              : parse(hookedParams.document),
         };
 
         // You are strongly encouraged to use
@@ -273,13 +266,13 @@ export async function enhanceHttpServerWithSubscriptions<
           options,
           req,
           res,
-          variables: params.variables,
-          operationName: params.operationName,
+          variables: args.variableValues,
+          operationName: args.operationName,
           meta,
         });
         if (moreValidationRules.length) {
           const validationErrors: ReadonlyArray<GraphQLError> = validate(
-            params.schema,
+            args.schema,
             finalParams.query,
             moreValidationRules,
           );
@@ -288,31 +281,15 @@ export async function enhanceHttpServerWithSubscriptions<
               'Query validation failed: \n' + validationErrors.map(e => e.message).join('\n'),
             );
             error['errors'] = validationErrors;
-            return Promise.reject(error);
+            throw error;
           }
         }
 
-        return finalParams;
+        return [finalParams, executionResultFormatter] as [ExecutionArgs, ExecutionResultFormatter]; // TS v3.7.2 had problems with tuples...
       },
-      onOperationComplete(socket: WebSocket, opId: string) {
-        releaseContextForSocketAndOpId(socket, opId);
+      onComplete: ({ socket }, msg) => {
+        releaseContextForSocketAndOpId(socket, msg.id);
       },
-
-      /*
-       * Heroku times out after 55s:
-       *   https://devcenter.heroku.com/articles/error-codes#h15-idle-connection
-       *
-       * The subscriptions-transport-ws client times out by default 30s after last keepalive:
-       *   https://github.com/apollographql/subscriptions-transport-ws/blob/52758bfba6190169a28078ecbafd2e457a2ff7a8/src/defaults.ts#L1
-       *
-       * GraphQL Playground times out after 20s:
-       *   https://github.com/prisma/graphql-playground/blob/fa91e1b6d0488e6b5563d8b472682fe728ee0431/packages/graphql-playground-react/src/state/sessions/fetchingSagas.ts#L81
-       *
-       * Pick a number under these ceilings.
-       */
-      keepAlive: 15000,
-
-      ...subscriptionServerOptions,
     },
     wss,
   );

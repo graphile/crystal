@@ -50,6 +50,7 @@
     "prettier:check": "yarn prettier:all --list-different"
   },
   "dependencies": {
+    "@enisdenjo/graphql-transport-ws": "^1.0.2",
     "@graphile/lru": "4.9.0",
     "@types/json5": "^0.0.30",
     "@types/jsonwebtoken": "^8.3.2",
@@ -72,7 +73,6 @@
     "pg-connection-string": "^2.0.0",
     "pg-sql2": "4.9.0",
     "postgraphile-core": "4.9.2",
-    "subscriptions-transport-ws": "^0.9.15",
     "tslib": "^2.0.1",
     "ws": "^6.1.3"
   },
