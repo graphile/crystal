@@ -277,7 +277,10 @@ export async function enhanceHttpServerWithSubscriptions<
           }
         }
 
-        return [hookedParams as ExecutionArgs, executionResultFormatter];
+        return [hookedParams, executionResultFormatter] as [
+          ExecutionArgs,
+          ExecutionResultFormatter,
+        ];
       },
       onComplete: ({ socket }, msg) => {
         releaseContextForSocketAndOpId(socket, msg.id);
