@@ -186,16 +186,19 @@ export async function enhanceHttpServerWithSubscriptions<
         throw new Error('Only subscriptions are allowed over websocket transport');
       },
       subscribe: graphqlSubscribe, // TODO-db-200826 add support for live queries
-      onConnect: context => {
-        const { socket, request } = context;
+      onConnect: ({ socket, request, connectionParams }) => {
         socket['postgraphileId'] = ++socketId;
         if (!request) {
           throw new Error('No request!');
         }
-        const normalizedConnectionParams = lowerCaseKeys(context.connectionParams || {});
-        request['connectionParams'] = context.connectionParams;
-        request['normalizedConnectionParams'] = normalizedConnectionParams;
         socket['__postgraphileReq'] = request;
+
+        let normalizedConnectionParams = {};
+        if (connectionParams) {
+          normalizedConnectionParams = lowerCaseKeys(connectionParams);
+          request['connectionParams'] = connectionParams;
+          request['normalizedConnectionParams'] = normalizedConnectionParams;
+        }
         if (!request.headers.authorization && normalizedConnectionParams['authorization']) {
           /*
            * Enable JWT support through connectionParams.
@@ -215,22 +218,18 @@ export async function enhanceHttpServerWithSubscriptions<
 
         return true;
       },
-      onSubscribe: async (ctx, message, args) => {
-        const { socket } = ctx;
-        const opId = message.id;
-        const context = await getContext(socket, opId);
+      onSubscribe: async ({ socket }, message, args) => {
+        const context = await getContext(socket, message.id);
 
         // Override schema (for --watch)
         args.schema = await getGraphQLSchema();
 
         // if the context value is missing, initialise it
-        if (!args.contextValue) {
-          args.contextValue = {};
-        }
-        Object.assign(args.contextValue, context);
+        args.contextValue = { ...args.contextValue, ...(context as object) }; // mixed?
+
+        const meta = {};
 
         const { req, res } = await reqResFromSocket(socket);
-        const meta = {};
         const executionResultFormatter: ExecutionResultFormatter = (_ctx, response) => {
           if (response.errors) {
             response.errors = handleErrors(response.errors, req, res);
@@ -249,15 +248,6 @@ export async function enhanceHttpServerWithSubscriptions<
               options,
             })
           : args;
-        const finalParams = {
-          ...hookedParams,
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          schema: args.schema!, // is set above
-          query:
-            typeof hookedParams.document !== 'string'
-              ? hookedParams.document
-              : parse(hookedParams.document),
-        };
 
         // You are strongly encouraged to use
         // `postgraphile:validationRules:static` if possible - you should
@@ -273,7 +263,9 @@ export async function enhanceHttpServerWithSubscriptions<
         if (moreValidationRules.length) {
           const validationErrors: ReadonlyArray<GraphQLError> = validate(
             args.schema,
-            finalParams.query,
+            typeof hookedParams.document === 'string'
+              ? parse(hookedParams.document)
+              : hookedParams.document,
             moreValidationRules,
           );
           if (validationErrors.length) {
@@ -285,7 +277,7 @@ export async function enhanceHttpServerWithSubscriptions<
           }
         }
 
-        return [finalParams, executionResultFormatter] as [ExecutionArgs, ExecutionResultFormatter]; // TS v3.7.2 had problems with tuples...
+        return [hookedParams as ExecutionArgs, executionResultFormatter];
       },
       onComplete: ({ socket }, msg) => {
         releaseContextForSocketAndOpId(socket, msg.id);
