@@ -933,10 +933,10 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@enisdenjo/graphql-transport-ws@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@enisdenjo/graphql-transport-ws/-/graphql-transport-ws-1.0.2.tgz#e6a6910bd7cfa268f26e2c0bf3bdd215fac877cf"
-  integrity sha512-iUUPRXEItX8EWmLVgObDpDv0C5ArNitYCNBWB/HA+o/rcjg/PqCiENrfc1VtFWl6Svx29GJKp1hz5H1KX4K7cg==
+"@enisdenjo/graphql-transport-ws@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@enisdenjo/graphql-transport-ws/-/graphql-transport-ws-1.1.0.tgz#90e0bfe63009dabddec37d1e5fc5516e6215b42b"
+  integrity sha512-Pu08QcvyHAN4Yj/wkFxUY0rkNbQTgbbiFeKH487VEWQ/FvX729H1nza4Rjh7KUTFS4aRkD66PQBn2xhJfvZ+3w==
   dependencies:
     ws "^7.3.1"
 

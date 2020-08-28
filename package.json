@@ -50,7 +50,7 @@
     "prettier:check": "yarn prettier:all --list-different"
   },
   "dependencies": {
-    "@enisdenjo/graphql-transport-ws": "^1.0.2",
+    "@enisdenjo/graphql-transport-ws": "^1.1.0",
     "@graphile/lru": "4.9.0",
     "@types/json5": "^0.0.30",
     "@types/jsonwebtoken": "^8.3.2",
