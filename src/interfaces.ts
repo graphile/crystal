@@ -59,9 +59,11 @@ export interface PostGraphileOptions<
   // there are fatal naming conflicts in the schema). When true, PostGraphile
   // will keep trying to rebuild the schema indefinitely, using an exponential
   // backoff between attempts, starting at 100ms and increasing up to 30s delay
-  // between retries.
+  // between retries. When a function, the function will be called passing the
+  // error and the number of attempts, and it should return true to retry,
+  // false to permanently abort trying.
   /* @middlewareOnly */
-  retryOnInitFail?: boolean;
+  retryOnInitFail?: boolean | ((error: Error, attempts: number) => boolean | Promise<boolean>);
   // Connection string to use to connect to the database as a privileged user (e.g. for setting up watch fixtures, logical decoding, etc).
   ownerConnectionString?: string;
   // Enable GraphQL websocket transport support for subscriptions (you still need a subscriptions plugin currently)

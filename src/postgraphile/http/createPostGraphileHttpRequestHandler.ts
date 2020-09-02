@@ -866,7 +866,7 @@ export default function createPostGraphileHttpRequestHandler(
 
       // Overwrite entire response
       returnArray = false;
-      results = [{ errors: [error] }];
+      results = [{ errors: (handleErrors as any)([error], req, res) }];
 
       // If the status code is 500, let’s log our error.
       if (res.statusCode === 500)
