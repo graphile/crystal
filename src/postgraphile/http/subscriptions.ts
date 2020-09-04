@@ -9,7 +9,7 @@ import {
   ExecutionArgs,
 } from 'graphql';
 import * as WebSocket from 'ws';
-import { createServer, ExecutionResultFormatter } from '@enisdenjo/graphql-transport-ws';
+import { createServer, ExecutionResultFormatter } from 'graphql-transport-ws';
 
 import parseUrl = require('parseurl');
 import { pluginHookFromOptions } from '../pluginHook';

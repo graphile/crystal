@@ -933,13 +933,6 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@enisdenjo/graphql-transport-ws@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@enisdenjo/graphql-transport-ws/-/graphql-transport-ws-1.1.0.tgz#90e0bfe63009dabddec37d1e5fc5516e6215b42b"
-  integrity sha512-Pu08QcvyHAN4Yj/wkFxUY0rkNbQTgbbiFeKH487VEWQ/FvX729H1nza4Rjh7KUTFS4aRkD66PQBn2xhJfvZ+3w==
-  dependencies:
-    ws "^7.3.1"
-
 "@eslint/eslintrc@^0.1.3":
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/@eslint/eslintrc/-/eslintrc-0.1.3.tgz#7d1a2b2358552cc04834c0979bd4275362e37085"
@@ -4752,6 +4745,13 @@ graphql-parse-resolve-info@4.9.0:
   dependencies:
     debug "^4.1.1"
     tslib "^2.0.1"
+
+graphql-transport-ws@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/graphql-transport-ws/-/graphql-transport-ws-1.2.0.tgz#0393646d6d799d055e279eddec2dd8a0792df44e"
+  integrity sha512-U/BDq6BpO+fDpqhS4/XXpAmJ9wXQlWTn/wSYz72gz+3tk5A4z7teMhDTiitubQMzcRqK/jp9/7Wz/83gtwgAGw==
+  dependencies:
+    ws "^7.3.1"
 
 "graphql@>=0.9 <0.14 || ^14.0.2", "graphql@^0.6.0 || ^0.7.0 || ^0.8.0-b || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.2":
   version "14.7.0"

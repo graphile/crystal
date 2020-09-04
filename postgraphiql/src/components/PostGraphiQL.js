@@ -5,7 +5,7 @@ import GraphiQLExplorer from 'graphiql-explorer';
 import StorageAPI from 'graphiql/dist/utility/StorageAPI';
 import './postgraphiql.css';
 import { buildClientSchema, introspectionQuery, isType, GraphQLObjectType } from 'graphql';
-import { createClient } from '@enisdenjo/graphql-transport-ws';
+import { createClient } from 'graphql-transport-ws';
 import formatSQL from '../formatSQL';
 
 const defaultQuery = `\
