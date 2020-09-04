@@ -32,7 +32,7 @@ export type mixed = {} | string | number | boolean | undefined | null;
 export type Middleware<
   Request extends IncomingMessage = IncomingMessage,
   Response extends ServerResponse = ServerResponse
-> = (req: Request, res: Response, next: (err?: Error) => void) => void;
+> = (req: Request, res: Response, next: (errOrEscape?: any) => void) => void;
 
 // Please note that the comments for this type are turned into documentation
 // automatically. We try and specify the options in the same order as the CLI.
