@@ -214,17 +214,23 @@ export default (function PgTypesPlugin(
       );
       addType(GQLIntervalInput, "graphile-build-pg built-in");
 
-      const stringType = (name, description) =>
+      const stringType = (name, description, coerce) =>
         new GraphQLScalarType({
           name,
           description,
           serialize: value => String(value),
-          parseValue: value => String(value),
+          parseValue: coerce
+            ? value => coerce(String(value))
+            : value => String(value),
           parseLiteral: ast => {
             if (ast.kind !== Kind.STRING) {
               throw new Error("Can only parse string values");
             }
-            return ast.value;
+            if (coerce) {
+              return coerce(ast.value);
+            } else {
+              return ast.value;
+            }
           },
         });
 
@@ -333,7 +339,19 @@ export default (function PgTypesPlugin(
       );
       const SimpleUUID = stringType(
         inflection.builtin("UUID"),
-        "A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122)."
+        "A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).",
+        string => {
+          if (
+            !/^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$/i.test(
+              string
+            )
+          ) {
+            throw new Error(
+              "Invalid UUID, expected 32 hexadecimal characters, optionally with hypens"
+            );
+          }
+          return string;
+        }
       );
       const InetType = stringType(
         inflection.builtin("InternetAddress"),
