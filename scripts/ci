@@ -3,16 +3,6 @@
 export PATH="$PATH:`pwd`/node_modules/.bin"
 
 set -e
-echo "[1/4]: Building Code"
-npm run prepack:all
-
-echo "[2/4]: Linting Code"
-npm run lint
-
-echo "[3/4]: Checking types"
-npm run flow:check
-
-echo "[4/4]: Testing Project"
 for I in packages/*/; do
   if [[ "$PGVERSION" != "9.4" || ( "$I" != "packages/lds/" && "$I" != "packages/subscriptions-lds/" ) ]]; then
     cd $I
@@ -20,7 +10,3 @@ for I in packages/*/; do
     cd -
   fi;
 done
-
-echo ""
-echo "CI completed succesfully 🎉"
-echo ""

@@ -141,12 +141,12 @@ Object {
         "id": 102,
         "line": Object {
           "a": Object {
-            "x": -9.785396260017848,
+            "x": -25,
             "y": 0,
           },
           "b": Object {
             "x": 0,
-            "y": 111,
+            "y": 100,
           },
         },
         "lseg": Object {

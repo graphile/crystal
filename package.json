@@ -2,16 +2,24 @@
   "private": true,
   "scripts": {
     "check": "yarn clean && yarn lint && yarn prepack:all && yarn test",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx .",
-    "lint:fix": "yarn run lint --fix && prettier --write '**/*.{json,md,html}'",
+    "lint": "yarn eslint .",
+    "lint:fix": "yarn prettier:fix && yarn run eslint --fix .",
     "flow": "flow",
     "flow:check": "flow check",
+    "pretest": "./scripts/pretest",
     "test": "lerna run --concurrency 1 test",
+    "posttest": "true",
     "prepack:all": "scripts/prepack-all",
     "watch": "for I in packages/*/; do echo \"cd $I && npm run watch\" | perl -p -e 's/\\n/\\0/;'; done | xargs -0 node_modules/.bin/concurrently --kill-others",
     "clean": "rm -Rf packages/*/node8plus/",
     "changelog": "(cat scripts/CHANGELOG_HEADER.md; npx conventional-changelog -p angular --release-count 0) > CHANGELOG.md",
-    "version": "yarn run changelog && git add CHANGELOG.md"
+    "version": "yarn run changelog && git add CHANGELOG.md",
+    "-----": "-----",
+    "eslint": "eslint --ext .js,.jsx,.ts,.tsx",
+    "prettier": "prettier --ignore-path ./.eslintignore",
+    "prettier:all": "yarn prettier '**/*.{json,md,html,js,jsx,ts,tsx}'",
+    "prettier:fix": "yarn prettier:all --write",
+    "prettier:check": "yarn prettier:all --list-different"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",

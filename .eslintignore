@@ -1,6 +1,8 @@
 /_LOCAL
+/packages/pg-sql2/examples
 /packages/pg-sql2/lib
 /postgraphile
+/wal2json
 node_modules
 node7minus
 node8plus

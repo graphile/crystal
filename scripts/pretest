@@ -1,0 +1,93 @@
+#!/bin/bash
+set -e
+
+export FORCE_COLOR=1
+
+if [ -x ".env" ]; then
+  set -a
+  . ./.env
+  set +a
+fi;
+
+if [ "$TEST_DATABASE_URL" == "" ]; then
+  echo "ERROR: No test database configured; aborting"
+  echo
+  echo "To resolve this, ensure environmental variable TEST_DATABASE_URL is set"
+  exit 1;
+fi;
+if [ "$LDS_TEST_DATABASE_URL" == "" ]; then
+  echo "ERROR: No LDS test database configured; aborting"
+  echo
+  echo "To resolve this, ensure environmental variable LDS_TEST_DATABASE_URL is set"
+  exit 1;
+fi;
+
+SERVER_VERSION_NUM=$(psql -Xqtv ON_ERROR_STOP=1 -c "show server_version_num;" "$TEST_DATABASE_URL")
+
+# Import latest schema (throw on error)
+psql -Xqv ON_ERROR_STOP=1 "$TEST_DATABASE_URL" <<HERE
+-- Drop our created schemas
+do \$\$
+declare
+  schema_name text;
+begin
+  for schema_name in
+    select nspname from pg_namespace where nspname not like 'pg_%' and nspname not in('information_schema', 'public')
+  loop
+    execute format('drop schema if exists %I cascade;', schema_name);
+  end loop;
+end;
+\$\$ language plpgsql;
+
+-- Clear the extensions
+drop extension if exists tablefunc;
+drop extension if exists intarray;
+drop extension if exists hstore;
+
+-- Reset the roles
+drop role if exists postgraphile_test_authenticator;
+drop role if exists postgraphile_test_user1;
+drop role if exists postgraphile_test_user2;
+drop role if exists postgraphile_test_visitor;
+create role postgraphile_test_authenticator noinherit login password 'testpassword';
+create role postgraphile_test_visitor noinherit;
+create role postgraphile_test_user1;
+create role postgraphile_test_user2;
+grant postgraphile_test_visitor to postgraphile_test_user1;
+grant postgraphile_test_visitor to postgraphile_test_user2;
+grant postgraphile_test_user1 to postgraphile_test_authenticator;
+grant postgraphile_test_user2 to postgraphile_test_authenticator;
+HERE
+
+psql -Xqv ON_ERROR_STOP=1 -f packages/graphile-utils/__tests__/utils-schema.sql "$TEST_DATABASE_URL"
+psql -Xqv ON_ERROR_STOP=1 -f packages/postgraphile-core/__tests__/kitchen-sink-schema.sql "$TEST_DATABASE_URL"
+psql -Xqv ON_ERROR_STOP=1 -f packages/postgraphile-core/__tests__/kitchen-sink-permissions.sql "$TEST_DATABASE_URL"
+psql -Xqv ON_ERROR_STOP=1 -f packages/pg-pubsub/__tests__/schema.sql "$TEST_DATABASE_URL"
+
+if [ $SERVER_VERSION_NUM -ge 100000 ]; then
+  psql -Xqv ON_ERROR_STOP=1 -f packages/postgraphile-core/__tests__/pg10-schema.sql "$TEST_DATABASE_URL"
+fi;
+
+psql -Xqv ON_ERROR_STOP=1 "$TEST_DATABASE_URL" <<HERE
+DROP DATABASE IF EXISTS lds_test;
+CREATE DATABASE lds_test;
+HERE
+psql -X1v ON_ERROR_STOP=1 -v VERBOSITY=verbose -f packages/lds/__tests__/schema.sql "$LDS_TEST_DATABASE_URL"
+
+clear
+echo "Database reset successfully ✅"
+
+# # Now run the tests
+# if [ $SERVER_VERSION_NUM -ge 100000 ]; then
+#   jest --forceExit -i $@
+# else
+#   jest --forceExit -i -t "^((?!pg10).)*$" $@
+# fi;
+
+# Finally re-populate the database to aid debugging
+#psql -Xqv ON_ERROR_STOP=1 -f __tests__/kitchen-sink-data.sql "$TEST_DATABASE_URL"
+#
+#if [ $SERVER_VERSION_NUM -ge 100000 ]; then
+#  psql -Xqv ON_ERROR_STOP=1 -f __tests__/pg10-data.sql "$TEST_DATABASE_URL"
+#fi;
+

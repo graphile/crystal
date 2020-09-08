@@ -3,7 +3,7 @@ mutation {
     input: {
       geom: {
         point: { x: 99, y: 1234 }
-        line: { a: { x: 99, y: 1234 }, b: { x: 0, y: 111 } }
+        line: { a: { x: 25, y: 200 }, b: { x: 0, y: 100 } }
         lseg: { a: { x: 99, y: 111 }, b: { x: 2935, y: 3548 } }
         box: { a: { x: 123, y: 52635 }, b: { x: 2342, y: 12445 } }
         openPath: {
