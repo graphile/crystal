@@ -660,7 +660,27 @@ export default (async function PgIntrospectionPlugin(
                       : pgSql.blank
                   } from ${pgSql.identifier(klass.namespaceName, klass.name)};`
                 );
-                const { rows: allData } = await pgClient.query(query);
+                let allData;
+                try {
+                  ({ rows: allData } = await pgClient.query(query));
+                } catch (e) {
+                  let role = "RELEVANT_POSTGRES_USER";
+                  try {
+                    const {
+                      rows: [{ user }],
+                    } = await pgClient.query("select user;");
+                    role = user;
+                  } catch (e) {
+                    /* ignore */
+                  }
+                  throw new Error(`Introspection could not read from enum table "${klass.namespaceName}"."${klass.name}", perhaps you need to grant access:
+
+  GRANT USAGE ON SCHEMA "${klass.namespaceName}" TO "${role}";
+  GRANT SELECT ON "${klass.namespaceName}"."${klass.name}" TO "${role}";
+
+Original error: ${e.message}
+`);
+                }
 
                 // Assert there's at least one value
                 enumConstraints.forEach(constraint => {
