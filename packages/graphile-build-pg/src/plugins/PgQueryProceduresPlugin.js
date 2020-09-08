@@ -3,7 +3,7 @@ import type { Plugin } from "graphile-build";
 
 export default (function PgQueryProceduresPlugin(
   builder,
-  { pgSimpleCollections }
+  { pgSimpleCollections, disableIssue641Fix = false }
 ) {
   builder.hook(
     "GraphQLObjectType:fields",
@@ -76,6 +76,7 @@ export default (function PgQueryProceduresPlugin(
                   [fieldName]: makeProcField(fieldName, proc, build, {
                     fieldWithHooks,
                     forceList,
+                    isRootQuery: !disableIssue641Fix,
                   }),
                 },
                 `Adding query field for ${describePgEntity(

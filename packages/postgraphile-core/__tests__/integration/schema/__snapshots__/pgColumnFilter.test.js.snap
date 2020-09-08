@@ -2985,7 +2985,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): QueryIntervalSetConnection!
+  ): QueryIntervalSetConnection
   queryTextArray: [String]
 
   """Reads a single \`Reserved\` using its globally unique \`ID\`."""
@@ -3048,7 +3048,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): StaticBigIntegerConnection!
+  ): StaticBigIntegerConnection
   uniqueForeignKeyByCompoundKey1AndCompoundKey2(compoundKey1: Int!, compoundKey2: Int!): UniqueForeignKey
 
   """Reads a single \`ViewTable\` using its globally unique \`ID\`."""

@@ -3541,7 +3541,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): PeopleConnection!
+  ): PeopleConnection
 
   """Reads a single \`CompoundKey\` using its globally unique \`ID\`."""
   compoundKey(
@@ -3571,7 +3571,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): CompoundTypesConnection!
+  ): CompoundTypesConnection
   currentUserId: Int
   funcInInout(i: Int, ino: Int): Int
   funcInOut(i: Int): Int
@@ -3598,7 +3598,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): FuncOutComplexSetofConnection!
+  ): FuncOutComplexSetofConnection
   funcOutOut: FuncOutOutRecord
   funcOutOutCompoundType(i1: Int): FuncOutOutCompoundTypeRecord
   funcOutOutSetof(
@@ -3619,7 +3619,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): FuncOutOutSetofConnection!
+  ): FuncOutOutSetofConnection
   funcOutOutUnnamed: FuncOutOutUnnamedRecord
   funcOutSetof(
     """Read all values in the set after (below) this cursor."""
@@ -3639,7 +3639,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): FuncOutSetofConnection!
+  ): FuncOutSetofConnection
   funcOutTable: Person
 
   """Reads and enables pagination through a set of \`Person\`."""
@@ -3661,7 +3661,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): PeopleConnection!
+  ): PeopleConnection
   funcOutUnnamed: Int
   funcOutUnnamedOutOutUnnamed: FuncOutUnnamedOutOutUnnamedRecord
   funcReturnsTableMultiCol(
@@ -3683,7 +3683,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): FuncReturnsTableMultiColConnection!
+  ): FuncReturnsTableMultiColConnection
   funcReturnsTableOneCol(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -3703,7 +3703,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): FuncReturnsTableOneColConnection!
+  ): FuncReturnsTableOneColConnection
   intSetQuery(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -3725,7 +3725,7 @@ type Query implements Node {
     x: Int
     y: Int
     z: Int
-  ): IntSetQueryConnection!
+  ): IntSetQueryConnection
 
   """Reads a single \`Issue756\` using its globally unique \`ID\`."""
   issue756(
@@ -3820,7 +3820,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): PeopleConnection!
+  ): PeopleConnection
 
   """Reads and enables pagination through a set of \`Person\`."""
   tableSetQueryPlpgsql(
@@ -3841,7 +3841,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): PeopleConnection!
+  ): PeopleConnection
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: Json!, f: FloatRangeInput!): Boolean
 }
 

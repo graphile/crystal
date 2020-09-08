@@ -7252,7 +7252,7 @@ type Query implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
-  ): QueryIntervalSetConnection!
+  ): QueryIntervalSetConnection
   queryTextArray: [String]
   staticBigInteger(
     """Only read the first \`n\` values of the set."""
@@ -7272,7 +7272,7 @@ type Query implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
-  ): StaticBigIntegerConnection!
+  ): StaticBigIntegerConnection
   compoundTypeArrayQuery(object: CompoundTypeInput): [CompoundType]
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
   typeFunction(id: Int): Type
@@ -7296,7 +7296,7 @@ type Query implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
-  ): TypesConnection!
+  ): TypesConnection
   typeFunctionList: [Type]
 
   """Reads and enables pagination through a set of \`Person\`."""
@@ -7318,7 +7318,7 @@ type Query implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
-  ): PeopleConnection! @deprecated(reason: "This is deprecated (comment on function c.badly_behaved_function).")
+  ): PeopleConnection @deprecated(reason: "This is deprecated (comment on function c.badly_behaved_function).")
 
   """Reads and enables pagination through a set of \`CompoundType\`."""
   compoundTypeSetQuery(
@@ -7339,7 +7339,7 @@ type Query implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
-  ): CompoundTypesConnection!
+  ): CompoundTypesConnection
   currentUserId: Int
   funcInInout(i: Int, ino: Int): Int
   funcInOut(i: Int): Int
@@ -7366,7 +7366,7 @@ type Query implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
-  ): FuncOutComplexSetofConnection!
+  ): FuncOutComplexSetofConnection
   funcOutOut: FuncOutOutRecord
   funcOutOutCompoundType(i1: Int): FuncOutOutCompoundTypeRecord
   funcOutOutSetof(
@@ -7387,7 +7387,7 @@ type Query implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
-  ): FuncOutOutSetofConnection!
+  ): FuncOutOutSetofConnection
   funcOutOutUnnamed: FuncOutOutUnnamedRecord
   funcOutSetof(
     """Only read the first \`n\` values of the set."""
@@ -7407,7 +7407,7 @@ type Query implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
-  ): FuncOutSetofConnection!
+  ): FuncOutSetofConnection
   funcOutTable: Person
 
   """Reads and enables pagination through a set of \`Person\`."""
@@ -7429,7 +7429,7 @@ type Query implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
-  ): PeopleConnection!
+  ): PeopleConnection
   funcOutUnnamed: Int
   funcOutUnnamedOutOutUnnamed: FuncOutUnnamedOutOutUnnamedRecord
   funcReturnsTableMultiCol(
@@ -7452,7 +7452,7 @@ type Query implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
-  ): FuncReturnsTableMultiColConnection!
+  ): FuncReturnsTableMultiColConnection
   funcReturnsTableOneCol(
     i: Int
 
@@ -7473,7 +7473,7 @@ type Query implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
-  ): FuncReturnsTableOneColConnection!
+  ): FuncReturnsTableOneColConnection
   intSetQuery(
     x: Int
     y: Int
@@ -7496,7 +7496,7 @@ type Query implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
-  ): IntSetQueryConnection!
+  ): IntSetQueryConnection
   jsonIdentity(json: JSON): JSON
   jsonbIdentity(json: JSON): JSON
   noArgsQuery: Int
@@ -7531,7 +7531,7 @@ type Query implements Node {
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: PersonCondition
-  ): PeopleConnection!
+  ): PeopleConnection
 
   """Reads and enables pagination through a set of \`Person\`."""
   tableSetQueryPlpgsql(
@@ -7552,7 +7552,7 @@ type Query implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
-  ): PeopleConnection!
+  ): PeopleConnection
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
 
   """Reads a single \`DefaultValue\` using its globally unique \`ID\`."""

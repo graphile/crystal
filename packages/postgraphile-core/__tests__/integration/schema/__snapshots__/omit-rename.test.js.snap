@@ -1459,7 +1459,7 @@ type Query implements Node {
     """
     offset: Int
     search: String
-  ): PostsConnection!
+  ): PostsConnection
 
   """Reads a single \`Studio\` using its globally unique \`ID\`."""
   studio(

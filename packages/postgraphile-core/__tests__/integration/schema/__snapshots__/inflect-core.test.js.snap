@@ -7242,7 +7242,7 @@ type Q implements N {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): PeopleConnection! @deprecated(reason: "This is deprecated (comment on function c.badly_behaved_function).")
+  ): PeopleConnection @deprecated(reason: "This is deprecated (comment on function c.badly_behaved_function).")
 
   """Reads a single \`CompoundKey\` using its globally unique \`ID\`."""
   compoundKey(
@@ -7274,7 +7274,7 @@ type Q implements N {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): CompoundTypesConnection!
+  ): CompoundTypesConnection
   currentUserId: Int
 
   """Reads a single \`DefaultValue\` using its globally unique \`ID\`."""
@@ -7310,7 +7310,7 @@ type Q implements N {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): FuncOutComplexSetofConnection!
+  ): FuncOutComplexSetofConnection
   funcOutOut: FuncOutOutRecord
   funcOutOutCompoundType(i1: Int): FuncOutOutCompoundTypeRecord
   funcOutOutSetof(
@@ -7331,7 +7331,7 @@ type Q implements N {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): FuncOutOutSetofConnection!
+  ): FuncOutOutSetofConnection
   funcOutOutUnnamed: FuncOutOutUnnamedRecord
   funcOutSetof(
     """Read all values in the set after (below) this cursor."""
@@ -7351,7 +7351,7 @@ type Q implements N {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): FuncOutSetofConnection!
+  ): FuncOutSetofConnection
   funcOutTable: Person
 
   """Reads and enables pagination through a set of \`Person\`."""
@@ -7373,7 +7373,7 @@ type Q implements N {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): PeopleConnection!
+  ): PeopleConnection
   funcOutUnnamed: Int
   funcOutUnnamedOutOutUnnamed: FuncOutUnnamedOutOutUnnamedRecord
   funcReturnsTableMultiCol(
@@ -7395,7 +7395,7 @@ type Q implements N {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): FuncReturnsTableMultiColConnection!
+  ): FuncReturnsTableMultiColConnection
   funcReturnsTableOneCol(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -7415,7 +7415,7 @@ type Q implements N {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): FuncReturnsTableOneColConnection!
+  ): FuncReturnsTableOneColConnection
 
   """Reads a single \`Input\` using its globally unique \`ID\`."""
   input(
@@ -7444,7 +7444,7 @@ type Q implements N {
     x: Int
     y: Int
     z: Int
-  ): IntSetQueryConnection!
+  ): IntSetQueryConnection
 
   """Reads a single \`Issue756\` using its globally unique \`ID\`."""
   issue756(
@@ -7553,7 +7553,7 @@ type Q implements N {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): QueryIntervalSetConnection!
+  ): QueryIntervalSetConnection
   queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord
   queryTextArray: [String]
 
@@ -7618,7 +7618,7 @@ type Q implements N {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): StaticBigIntegerConnection!
+  ): StaticBigIntegerConnection
   tableQuery(id: Int): Post
 
   """Reads and enables pagination through a set of \`Person\`."""
@@ -7648,7 +7648,7 @@ type Q implements N {
 
     """The method to use when ordering \`Person\`."""
     orderBy: [PeopleOrderBy!]
-  ): PeopleConnection!
+  ): PeopleConnection
 
   """Reads and enables pagination through a set of \`Person\`."""
   tableSetQueryPlpgsql(
@@ -7669,7 +7669,7 @@ type Q implements N {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): PeopleConnection!
+  ): PeopleConnection
 
   """Reads a single \`Type\` using its globally unique \`ID\`."""
   type(
@@ -7698,7 +7698,7 @@ type Q implements N {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): TypesConnection!
+  ): TypesConnection
   typeFunctionList: [Type]
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
   uniqueForeignKeyByCompoundKey1AndCompoundKey2(compoundKey1: Int!, compoundKey2: Int!): UniqueForeignKey

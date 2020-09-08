@@ -999,7 +999,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): TypesConnection!
+  ): TypesConnection
   typeFunctionList: [Type]
 }
 

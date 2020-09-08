@@ -3712,7 +3712,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): PeopleConnection! @deprecated(reason: "This is deprecated (comment on function c.badly_behaved_function).")
+  ): PeopleConnection @deprecated(reason: "This is deprecated (comment on function c.badly_behaved_function).")
 
   """Reads and enables pagination through a set of \`Person\`."""
   badlyBehavedFunctionList(
@@ -3751,7 +3751,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): CompoundTypesConnection!
+  ): CompoundTypesConnection
 
   """Reads and enables pagination through a set of \`CompoundType\`."""
   compoundTypeSetQueryList(
@@ -3787,7 +3787,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): FuncOutComplexSetofConnection!
+  ): FuncOutComplexSetofConnection
   funcOutComplexSetofList(
     a: Int
     b: String
@@ -3818,7 +3818,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): FuncOutOutSetofConnection!
+  ): FuncOutOutSetofConnection
   funcOutOutSetofList(
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -3845,7 +3845,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): FuncOutSetofConnection!
+  ): FuncOutSetofConnection
   funcOutSetofList(
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -3874,7 +3874,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): PeopleConnection!
+  ): PeopleConnection
 
   """Reads and enables pagination through a set of \`Person\`."""
   funcOutTableSetofList(
@@ -3905,7 +3905,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): FuncReturnsTableMultiColConnection!
+  ): FuncReturnsTableMultiColConnection
   funcReturnsTableMultiColList(
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -3933,7 +3933,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): FuncReturnsTableOneColConnection!
+  ): FuncReturnsTableOneColConnection
   funcReturnsTableOneColList(
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -3963,7 +3963,7 @@ type Query implements Node {
     x: Int
     y: Int
     z: Int
-  ): IntSetQueryConnection!
+  ): IntSetQueryConnection
   intSetQueryList(
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -4073,7 +4073,7 @@ type Query implements Node {
 
     """The method to use when ordering \`Person\`."""
     orderBy: [PeopleOrderBy!]
-  ): PeopleConnection!
+  ): PeopleConnection
 
   """Reads and enables pagination through a set of \`Person\`."""
   tableSetQueryList(
@@ -4111,7 +4111,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): PeopleConnection!
+  ): PeopleConnection
 
   """Reads and enables pagination through a set of \`Person\`."""
   tableSetQueryPlpgsqlList(

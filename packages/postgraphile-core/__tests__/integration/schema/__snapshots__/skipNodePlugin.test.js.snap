@@ -6618,7 +6618,7 @@ type Query {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): PeopleConnection! @deprecated(reason: "This is deprecated (comment on function c.badly_behaved_function).")
+  ): PeopleConnection @deprecated(reason: "This is deprecated (comment on function c.badly_behaved_function).")
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
   compoundTypeArrayQuery(object: CompoundTypeInput): [CompoundType]
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
@@ -6642,7 +6642,7 @@ type Query {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): CompoundTypesConnection!
+  ): CompoundTypesConnection
   currentUserId: Int
   defaultValueById(id: Int!): DefaultValue
   funcInInout(i: Int, ino: Int): Int
@@ -6670,7 +6670,7 @@ type Query {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): FuncOutComplexSetofConnection!
+  ): FuncOutComplexSetofConnection
   funcOutOut: FuncOutOutRecord
   funcOutOutCompoundType(i1: Int): FuncOutOutCompoundTypeRecord
   funcOutOutSetof(
@@ -6691,7 +6691,7 @@ type Query {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): FuncOutOutSetofConnection!
+  ): FuncOutOutSetofConnection
   funcOutOutUnnamed: FuncOutOutUnnamedRecord
   funcOutSetof(
     """Read all values in the set after (below) this cursor."""
@@ -6711,7 +6711,7 @@ type Query {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): FuncOutSetofConnection!
+  ): FuncOutSetofConnection
   funcOutTable: Person
 
   """Reads and enables pagination through a set of \`Person\`."""
@@ -6733,7 +6733,7 @@ type Query {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): PeopleConnection!
+  ): PeopleConnection
   funcOutUnnamed: Int
   funcOutUnnamedOutOutUnnamed: FuncOutUnnamedOutOutUnnamedRecord
   funcReturnsTableMultiCol(
@@ -6755,7 +6755,7 @@ type Query {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): FuncReturnsTableMultiColConnection!
+  ): FuncReturnsTableMultiColConnection
   funcReturnsTableOneCol(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -6775,7 +6775,7 @@ type Query {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): FuncReturnsTableOneColConnection!
+  ): FuncReturnsTableOneColConnection
   inputById(id: Int!): Input
   intSetQuery(
     """Read all values in the set after (below) this cursor."""
@@ -6798,7 +6798,7 @@ type Query {
     x: Int
     y: Int
     z: Int
-  ): IntSetQueryConnection!
+  ): IntSetQueryConnection
   issue756ById(id: Int!): Issue756
   jsonbIdentity(json: JSON): JSON
   jsonIdentity(json: JSON): JSON
@@ -6844,7 +6844,7 @@ type Query {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): QueryIntervalSetConnection!
+  ): QueryIntervalSetConnection
   queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord
   queryTextArray: [String]
   reservedById(id: Int!): Reserved
@@ -6871,7 +6871,7 @@ type Query {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): StaticBigIntegerConnection!
+  ): StaticBigIntegerConnection
   tableQuery(id: Int): Post
 
   """Reads and enables pagination through a set of \`Person\`."""
@@ -6901,7 +6901,7 @@ type Query {
 
     """The method to use when ordering \`Person\`."""
     orderBy: [PeopleOrderBy!]
-  ): PeopleConnection!
+  ): PeopleConnection
 
   """Reads and enables pagination through a set of \`Person\`."""
   tableSetQueryPlpgsql(
@@ -6922,7 +6922,7 @@ type Query {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): PeopleConnection!
+  ): PeopleConnection
   typeById(id: Int!): Type
   typeFunction(id: Int): Type
 
@@ -6945,7 +6945,7 @@ type Query {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-  ): TypesConnection!
+  ): TypesConnection
   typeFunctionList: [Type]
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
   uniqueForeignKeyByCompoundKey1AndCompoundKey2(compoundKey1: Int!, compoundKey2: Int!): UniqueForeignKey

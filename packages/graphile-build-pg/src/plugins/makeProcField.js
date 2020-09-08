@@ -26,11 +26,13 @@ export default function makeProcField(
     fieldWithHooks,
     computed = false,
     isMutation = false,
+    isRootQuery = false,
     forceList = false,
   }: {
     fieldWithHooks: FieldWithHooksFunction,
     computed?: boolean,
     isMutation?: boolean,
+    isRootQuery?: boolean,
     forceList?: boolean,
   }
 ) {
@@ -209,7 +211,7 @@ export default function makeProcField(
             )}' for '${TableType.name}' so cannot create procedure field`
           );
         }
-        type = new GraphQLNonNull(ConnectionType);
+        type = ConnectionType;
         fieldScope.isPgFieldConnection = true;
       }
       fieldScope.pgFieldIntrospectionTable = returnTypeTable;
@@ -249,7 +251,7 @@ export default function makeProcField(
             )}' for '${RecordType.name}' so cannot create procedure field`
           );
         }
-        type = new GraphQLNonNull(ConnectionType);
+        type = ConnectionType;
         fieldScope.isPgFieldConnection = true;
       }
     } else {
@@ -275,7 +277,7 @@ export default function makeProcField(
         returnFirstValueAsValue = true;
         fieldScope.isPgFieldSimpleCollection = true;
       } else {
-        type = new GraphQLNonNull(ConnectionType);
+        type = ConnectionType;
         fieldScope.isPgFieldConnection = true;
         // We don't return the first value as the value here because it gets
         // sent down into PgScalarFunctionConnectionPlugin so the relevant
@@ -584,7 +586,12 @@ export default function makeProcField(
           : isTableLike && proc.returnsSet
           ? `Reads and enables pagination through a set of \`${TableType.name}\`.`
           : null,
-        type: nullableIf(GraphQLNonNull, !proc.tags.notNull, ReturnType),
+        type: nullableIf(
+          GraphQLNonNull,
+          !proc.tags.notNull &&
+            (!fieldScope.isPgFieldConnection || isMutation || isRootQuery),
+          ReturnType
+        ),
         args: args,
         resolve: computed
           ? (data, _args, resolveContext, resolveInfo) => {
