@@ -1,6 +1,6 @@
 import { Pool, PoolConfig } from 'pg';
 import { IncomingMessage, ServerResponse } from 'http';
-import { GraphQLSchema } from 'graphql';
+import { GraphQLSchema, GraphQLError } from 'graphql';
 import { EventEmitter } from 'events';
 import { createPostGraphileSchema, watchPostGraphileSchema } from 'postgraphile-core';
 import createPostGraphileHttpRequestHandler from './http/createPostGraphileHttpRequestHandler';
@@ -43,7 +43,20 @@ export function getPostgraphileSchemaBuilder<
   pgPool: Pool,
   schema: string | Array<string>,
   incomingOptions: PostGraphileOptions<Request, Response>,
+  release: null | (() => void) = null,
 ): PostgraphileSchemaBuilder {
+  let released = false;
+  function releaseOnce() {
+    if (released) {
+      throw new Error(
+        'Already released this PostGraphile schema builder; should not have attempted a second release',
+      );
+    }
+    released = true;
+    if (release) {
+      release();
+    }
+  }
   if (incomingOptions.live && incomingOptions.subscriptions == null) {
     // live implies subscriptions
     incomingOptions.subscriptions = true;
@@ -117,20 +130,58 @@ export function getPostgraphileSchemaBuilder<
       } catch (error) {
         attempts++;
         const delay = Math.min(100 * Math.pow(attempts, 2), 30000);
-        const exitOnFail = !options.retryOnInitFail;
-        // If we fail to build our schema, log the error and either exit or retry shortly
-        logSeriousError(
-          error,
-          'building the initial schema' + (attempts > 1 ? ` (attempt ${attempts})` : ''),
-          exitOnFail
-            ? 'Exiting because `retryOnInitFail` is not set.'
-            : `We'll try again in ${delay}ms.`,
-        );
-        if (exitOnFail) {
-          process.exit(34);
+        if (typeof options.retryOnInitFail === 'function') {
+          const start = process.hrtime();
+          try {
+            const retry = await options.retryOnInitFail(error, attempts);
+            const diff = process.hrtime(start);
+            const dur = diff[0] * 1e3 + diff[1] * 1e-6;
+            if (!retry) {
+              releaseOnce();
+              throw error;
+            } else {
+              if (dur < 50) {
+                // retryOnInitFail didn't wait long enough; use default wait.
+                console.error(
+                  `Your retryOnInitFail function should include a delay before resolving; falling back to a ${delay}ms wait (attempts = ${attempts}) to avoid overwhelming the database.`,
+                );
+                await sleep(delay);
+              }
+            }
+          } catch (e) {
+            throw Object.defineProperties(
+              new GraphQLError(
+                'Failed to initialize GraphQL schema.',
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                e,
+              ),
+              {
+                status: {
+                  value: 503,
+                  enumerable: false,
+                },
+              },
+            );
+          }
+        } else {
+          const exitOnFail = !options.retryOnInitFail;
+          // If we fail to build our schema, log the error and either exit or retry shortly
+          logSeriousError(
+            error,
+            'building the initial schema' + (attempts > 1 ? ` (attempt ${attempts})` : ''),
+            exitOnFail
+              ? 'Exiting because `retryOnInitFail` is not set.'
+              : `We'll try again in ${delay}ms.`,
+          );
+          if (exitOnFail) {
+            process.exit(34);
+          }
+          // Retry shortly
+          await sleep(delay);
         }
-        // Retry shortly
-        await sleep(delay);
       }
     }
   }
@@ -207,7 +258,7 @@ export default function postgraphile<
 
   // Do some things with `poolOrConfig` so that in the end, we actually get a
   // Postgres pool.
-  const pgPool = toPgPool(poolOrConfig);
+  const { pgPool, release } = toPgPool(poolOrConfig);
 
   pgPool.on('error', err => {
     /*
@@ -231,6 +282,7 @@ export default function postgraphile<
     pgPool,
     schema,
     incomingOptions,
+    release,
   );
   return createPostGraphileHttpRequestHandler({
     ...(typeof poolOrConfig === 'string' ? { ownerConnectionString: poolOrConfig } : {}),
@@ -269,21 +321,24 @@ function constructorName(obj: mixed): string | null {
 }
 
 // tslint:disable-next-line no-any
-function toPgPool(poolOrConfig: any): Pool {
+function toPgPool(poolOrConfig: any): { pgPool: Pool; release: null | (() => void) } {
   if (quacksLikePgPool(poolOrConfig)) {
     // If it is already a `Pool`, just use it.
-    return poolOrConfig;
+    return { pgPool: poolOrConfig, release: null };
   }
 
   if (typeof poolOrConfig === 'string') {
     // If it is a string, let us parse it to get a config to create a `Pool`.
-    return new Pool({ connectionString: poolOrConfig });
+    const pgPool = new Pool({ connectionString: poolOrConfig });
+    return { pgPool, release: () => pgPool.end() };
   } else if (!poolOrConfig) {
     // Use an empty config and let the defaults take over.
-    return new Pool({});
+    const pgPool = new Pool({});
+    return { pgPool, release: () => pgPool.end() };
   } else if (isPlainObject(poolOrConfig)) {
     // The user handed over a configuration object, pass it through
-    return new Pool(poolOrConfig);
+    const pgPool = new Pool(poolOrConfig);
+    return { pgPool, release: () => pgPool.end() };
   } else {
     throw new Error('Invalid connection string / Pool ');
   }
