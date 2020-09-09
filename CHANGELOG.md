@@ -3,7 +3,19 @@
 We use PostGraphile's GitHub releases tab to log our changes in detail, but
 this auto-generated changelog helps us to produce that list, and it may be
 helpful to you also.
-# [](https://github.com/graphile/graphile-engine/compare/v4.8.0...v) (2020-08-11)
+# [](https://github.com/graphile/graphile-engine/compare/v4.8.0...v) (2020-09-09)
+
+
+### Bug Fixes
+
+* intervals now return zeros instead of nulls (also updated dependencies) ([#656](https://github.com/graphile/graphile-engine/issues/656)) ([2739f79](https://github.com/graphile/graphile-engine/commit/2739f7941c97ca383887686e97cf659b8c20f802))
+* **graphql:** root level custom query connection fields now nullable ([#653](https://github.com/graphile/graphile-engine/issues/653)) ([131c6ac](https://github.com/graphile/graphile-engine/commit/131c6ac16058d8fe81e423c7495dbdaf11ae3cd5))
+* improve error when cannot read from enum table ([#651](https://github.com/graphile/graphile-engine/issues/651)) ([dbafe55](https://github.com/graphile/graphile-engine/commit/dbafe5578c6680a4fd4f81fa0a9097f9fa137774))
+
+
+### Features
+
+* add UUID validation so errors are raised earlier ([#652](https://github.com/graphile/graphile-engine/issues/652)) ([9265262](https://github.com/graphile/graphile-engine/commit/92652620aefe01f81a514477f0dfa1faaf1590cf))
 
 
 

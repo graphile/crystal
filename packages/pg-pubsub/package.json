@@ -1,6 +1,6 @@
 {
   "name": "@graphile/pg-pubsub",
-  "version": "4.8.0",
+  "version": "4.9.0",
   "description": "Subscriptions plugin for PostGraphile using PostgreSQL's LISTEN/NOTIFY",
   "main": "dist/index.js",
   "scripts": {
@@ -45,7 +45,7 @@
     "@types/jest": "25.x",
     "graphql": ">=0.6 <15",
     "jest": "25.x",
-    "jest-serializer-graphql-schema": "4.8.0",
+    "jest-serializer-graphql-schema": "4.9.0",
     "mock-req": "^0.2.0",
     "mock-res": "^0.5.0",
     "pg": ">=6.1.0 <9",
@@ -53,5 +53,7 @@
     "ts-jest": "25.x",
     "typescript": "^4.0.2"
   },
-  "files": ["dist"]
+  "files": [
+    "dist"
+  ]
 }

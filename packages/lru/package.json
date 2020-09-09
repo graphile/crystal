@@ -1,6 +1,6 @@
 {
   "name": "@graphile/lru",
-  "version": "4.8.0-rc.0",
+  "version": "4.9.0",
   "description": "Extremely simple zero-dependencies ES6 LRU (you probably want lru-cache instead)",
   "main": "node8plus/index.js",
   "types": "node8plus/index.d.ts",
@@ -13,7 +13,9 @@
     "type": "git",
     "url": "git+https://github.com/graphile/graphile-build.git"
   },
-  "keywords": ["lru"],
+  "keywords": [
+    "lru"
+  ],
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "bugs": {
@@ -28,7 +30,9 @@
     "ts-node": "^9.0.0",
     "typescript": "^4.0.2"
   },
-  "files": ["node8plus"],
+  "files": [
+    "node8plus"
+  ],
   "dependencies": {
     "tslib": "^2.0.1"
   }

@@ -1,6 +1,6 @@
 {
   "name": "@graphile/lds",
-  "version": "4.8.0-rc.0",
+  "version": "4.9.0",
   "description": "Logical decoding server for PostgreSQL, monitors for new/edited/deleted rows and announces them to interested clients.",
   "main": "dist/index.js",
   "scripts": {
@@ -46,5 +46,7 @@
     "ts-jest": "25.x",
     "typescript": "^4.0.2"
   },
-  "files": ["dist"]
+  "files": [
+    "dist"
+  ]
 }
