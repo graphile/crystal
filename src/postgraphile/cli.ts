@@ -78,10 +78,7 @@ const { argv: argvSansPlugins, plugins: extractedPlugins } = extractPlugins(proc
 
 const pluginHook = makePluginHook(extractedPlugins);
 
-program
-  .version(manifest.version)
-  .usage('[options...]')
-  .description(manifest.description);
+program.version(manifest.version).usage('[options...]').description(manifest.description);
 // .option('-d, --demo', 'run PostGraphile using the demo database connection')
 
 export type AddFlagFn = (
@@ -608,7 +605,7 @@ if (jwtAudiences != null && jwtVerifyAudience != null) {
   );
 }
 
-function trimNulls(obj: object): object {
+function trimNulls(obj: Record<string, any>): Record<string, any> {
   return Object.keys(obj).reduce((memo, key) => {
     if (obj[key] != null) {
       memo[key] = obj[key];

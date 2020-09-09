@@ -1,4 +1,8 @@
+/assets
+/postgraphiql/public
 node_modules
 build
 build-turbo
-postgraphiql
+package.json
+# Has its own linting
+/postgraphiql

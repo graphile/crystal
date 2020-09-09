@@ -210,9 +210,7 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
   describe(name + (subpath ? ` (@${subpath})` : ''), () => {
     test('will 404 for route other than that specified 1', async () => {
       const server1 = await createServer();
-      await request(server1)
-        .post('/x')
-        .expect(404);
+      await request(server1).post('/x').expect(404);
     });
 
     if (subpath) {
@@ -220,23 +218,17 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
         const server2 = await createServer({
           graphqlRoute: `${subpath}/graphql`,
         });
-        await request(server2)
-          .post(`${subpath}/graphql`)
-          .expect(404);
+        await request(server2).post(`${subpath}/graphql`).expect(404);
       });
       test('will 404 for route other than that specified 3', async () => {
         const server3 = await createServer({ graphqlRoute: `/graphql` });
-        await request(server3)
-          .post(`/graphql`)
-          .expect(404);
+        await request(server3).post(`/graphql`).expect(404);
       });
     }
 
     test('will 404 for route other than that specified 4', async () => {
       const server4 = await createServer({ graphqlRoute: `/x` });
-      await request(server4)
-        .post(`${subpath}/graphql`)
-        .expect(404);
+      await request(server4).post(`${subpath}/graphql`).expect(404);
     });
 
     test('will respond to queries on a different route', async () => {
@@ -299,18 +291,12 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
 
     test('will not allow requests other than POST', async () => {
       const server = await createServer();
-      await request(server)
-        .get(`${subpath}/graphql`)
-        .expect(405)
-        .expect('Allow', 'POST, OPTIONS');
+      await request(server).get(`${subpath}/graphql`).expect(405).expect('Allow', 'POST, OPTIONS');
       await request(server)
         .delete(`${subpath}/graphql`)
         .expect(405)
         .expect('Allow', 'POST, OPTIONS');
-      await request(server)
-        .put(`${subpath}/graphql`)
-        .expect(405)
-        .expect('Allow', 'POST, OPTIONS');
+      await request(server).put(`${subpath}/graphql`).expect(405).expect('Allow', 'POST, OPTIONS');
     });
 
     test('will run a query on a POST request with JSON data', async () => {
@@ -881,21 +867,15 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
 
     test('will not serve a favicon when graphiql is disabled', async () => {
       const server1 = await createServer({ graphiql: false });
-      await request(server1)
-        .get(`/favicon.ico`)
-        .expect(404);
+      await request(server1).get(`/favicon.ico`).expect(404);
       if (subpath) {
-        await request(server1)
-          .get(`${subpath}/favicon.ico`)
-          .expect(404);
+        await request(server1).get(`${subpath}/favicon.ico`).expect(404);
       }
     });
 
     test('will not allow if no text/event-stream headers are set', async () => {
       const server = await createServer({ graphiql: true });
-      await request(server)
-        .get(`${subpath}/graphql/stream`)
-        .expect(405);
+      await request(server).get(`${subpath}/graphql/stream`).expect(405);
     });
 
     test('will return an event-stream', async () => {
@@ -917,9 +897,7 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
     test('will render GraphiQL if enabled', async () => {
       const server1 = await createServer();
       const server2 = await createServer({ graphiql: true });
-      await request(server1)
-        .get(`${subpath}/graphiql`)
-        .expect(404);
+      await request(server1).get(`${subpath}/graphiql`).expect(404);
       await request(server2)
         .get(`${subpath}/graphiql`)
         .expect(200)
@@ -929,9 +907,7 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
     test('will set X-GraphQL-Event-Stream if watch enabled', async () => {
       const server1 = await createServer();
       const server2 = await createServer({ watchPg: true });
-      const res1 = await request(server1)
-        .post(`${subpath}/graphql`)
-        .send({ query: '{hello}' });
+      const res1 = await request(server1).post(`${subpath}/graphql`).send({ query: '{hello}' });
       expect(res1.headers['x-graphql-event-stream']).toBeFalsy();
       await request(server2)
         .post(`${subpath}/graphql`)
@@ -959,19 +935,13 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
         graphiql: false,
         graphiqlRoute: `/x`,
       });
-      await request(server1)
-        .get(`${subpath}/x`)
-        .expect(404);
+      await request(server1).get(`${subpath}/x`).expect(404);
       await request(server2)
         .get(`${subpath}/x`)
         .expect(200)
         .expect('Content-Type', 'text/html; charset=utf-8');
-      await request(server3)
-        .get(`${subpath}/x`)
-        .expect(404);
-      await request(server3)
-        .get(`${subpath}/graphiql`)
-        .expect(404);
+      await request(server3).get(`${subpath}/x`).expect(404);
+      await request(server3).get(`${subpath}/graphiql`).expect(404);
     });
 
     test('cannot use a rejected GraphQL schema', async () => {
@@ -990,10 +960,7 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
         /* noop */
       };
       try {
-        await request(server)
-          .post(`${subpath}/graphql`)
-          .send({ query: '{hello}' })
-          .expect(500);
+        await request(server).post(`${subpath}/graphql`).send({ query: '{hello}' }).expect(500);
       } finally {
         console.error = origConsoleError;
       }

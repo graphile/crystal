@@ -9,7 +9,7 @@ import * as http from 'http';
 import * as https from 'https';
 import * as assert from 'assert';
 
-// @ts-ignore
+// @ts-ignore Ignore these types, legacy tests.
 const Request: any = request.Request;
 
 /**

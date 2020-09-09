@@ -9,8 +9,9 @@ module.exports = {
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
     //'plugin:@typescript-eslint/recommended-requiring-type-checking',
-    'plugin:prettier/recommended',
+    'prettier',
     'prettier/@typescript-eslint',
+    'prettier/react',
   ],
   plugins: ['jest'],
   env: {
@@ -22,10 +23,14 @@ module.exports = {
     jasmine: false,
   },
   rules: {
-    'prettier/prettier': 'error',
-
-    '@typescript-eslint/ban-ts-ignore': 'off',
+    '@typescript-eslint/ban-ts-comment': [
+      'error',
+      {
+        'ts-ignore': 'allow-with-description',
+      },
+    ],
     '@typescript-eslint/camelcase': 'off',
+    '@typescript-eslint/no-empty-function': 0,
     '@typescript-eslint/no-var-requires': 'off',
     '@typescript-eslint/no-unused-vars': [
       'error',

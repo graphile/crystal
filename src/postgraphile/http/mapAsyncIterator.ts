@@ -21,7 +21,7 @@ export default function mapAsyncIterator<T, U>(
   iterable: AsyncIterable<T>,
   callback: (val: T) => PromiseOrValue<U>,
   rejectCallback?: (val: any) => PromiseOrValue<U>,
-) {
+): AsyncIterableIterator<U> {
   const iterator = getAsyncIterator(iterable);
   let $return: any;
   let abruptClose: any;
@@ -47,9 +47,7 @@ export default function mapAsyncIterator<T, U>(
     mapReject = (error: any) => asyncMapValue(error, reject).then(iteratorResult, abruptClose);
   }
 
-  /* TODO: Flow doesn't support symbols as keys:
-     https://github.com/facebook/flow/issues/3258 */
-  return {
+  const mappedIterator: AsyncIterableIterator<U> = {
     next() {
       return iterator.next().then(mapResult, mapReject);
     },
@@ -58,17 +56,18 @@ export default function mapAsyncIterator<T, U>(
         ? $return.call(iterator).then(mapResult, mapReject)
         : Promise.resolve({ value: undefined, done: true });
     },
-    throw(error: any) {
-      // $FlowFixMe(>=0.68.0)
+    throw(error) {
       if (typeof iterator.throw === 'function') {
         return iterator.throw(error).then(mapResult, mapReject);
       }
       return Promise.reject(error).catch(abruptClose);
     },
+    // @ts-ignore TypeScript doesn't seem to understand that this is really `Symbol.asyncIterator`
     [$$asyncIterator]() {
       return this;
     },
   };
+  return mappedIterator;
 }
 
 function asyncMapValue<T, U>(value: T, callback: (val: T) => PromiseOrValue<U>): Promise<U> {

@@ -27,7 +27,7 @@ type DirectOrCallback<Request, T> = T | ((req: Request) => PromiseOrDirect<T>);
  * @see https://github.com/Microsoft/TypeScript/issues/9999
  * @see https://flowtype.org/docs/builtins.html#mixed
  */
-export type mixed = {} | string | number | boolean | undefined | null;
+export type mixed = Record<string, any> | string | number | boolean | undefined | null;
 
 export type Middleware<
   Request extends IncomingMessage = IncomingMessage,
@@ -149,7 +149,7 @@ export interface PostGraphileOptions<
   skipPlugins?: Array<Plugin>;
   // A file path string or an object. Reads cached values to improve startup time
   // (you may want to do this in production).
-  readCache?: string | object;
+  readCache?: string | Record<string, any>;
   // A file path string. Writes computed values to local cache file so startup
   // can be faster (do this during the build phase).
   writeCache?: string;
@@ -270,7 +270,10 @@ export interface PostGraphileOptions<
   // can even use this to change the response [experimental], e.g. setting
   // cookies.
   /* @middlewareOnly */
-  additionalGraphQLContextFromRequest?: (req: Request, res: Response) => Promise<{}>;
+  additionalGraphQLContextFromRequest?: (
+    req: Request,
+    res: Response,
+  ) => Promise<Record<string, any>>;
   // [experimental] Plugin hook function, enables functionality within
   // PostGraphile to be expanded with plugins. Generate with
   // `makePluginHook(plugins)` passing a list of plugin objects.

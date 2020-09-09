@@ -64,7 +64,7 @@ const JS_ESCAPE_LOOKUP = {
   '\u2028': '\\u2028',
   '\u2029': '\\u2029',
 };
-function safeJSONStringify(obj: {}) {
+function safeJSONStringify(obj: Record<string, any>) {
   return JSON.stringify(obj).replace(/[<>/\u2028\u2029]/g, chr => JS_ESCAPE_LOOKUP[chr]);
 }
 
@@ -80,9 +80,7 @@ let lastHash: string;
 const calculateQueryHash = (queryString: string): string => {
   if (queryString !== lastString) {
     lastString = queryString;
-    lastHash = createHash('sha1')
-      .update(queryString)
-      .digest('base64');
+    lastHash = createHash('sha1').update(queryString).digest('base64');
   }
   return lastHash;
 };
@@ -147,7 +145,7 @@ function withPostGraphileContextFromReqResGenerator(
       },
       context => {
         const graphqlContext = additionalContext
-          ? { ...additionalContext, ...(context as object) }
+          ? { ...additionalContext, ...(context as Record<string, any>) }
           : context;
         return fn(graphqlContext);
       },
@@ -246,7 +244,7 @@ export default function createPostGraphileHttpRequestHandler(
     // If the user wants to see the error’s stack, let’s add it to the
     // formatted error.
     if (showErrorStack)
-      (formattedError as object)['stack'] =
+      (formattedError as Record<string, any>)['stack'] =
         error.stack != null && showErrorStack === 'json' ? error.stack.split('\n') : error.stack;
 
     return formattedError;
@@ -651,7 +649,7 @@ export default function createPostGraphileHttpRequestHandler(
       // - `variables`: An optional JSON object containing GraphQL variables.
       // - `operationName`: The optional name of the GraphQL operation we will
       //   be executing.
-      const body: string | object = (req as any).body;
+      const body: string | Record<string, any> = (req as any).body;
       paramsList = typeof body === 'string' ? { query: body } : body;
 
       // Validate our paramsList object a bit.
@@ -756,12 +754,7 @@ export default function createPostGraphileHttpRequestHandler(
 
               // Lazily log the query. If this debugger isn’t enabled, don’t run it.
               if (debugGraphql.enabled)
-                debugGraphql(
-                  '%s',
-                  printGraphql(queryDocumentAst)
-                    .replace(/\s+/g, ' ')
-                    .trim(),
-                );
+                debugGraphql('%s', printGraphql(queryDocumentAst).replace(/\s+/g, ' ').trim());
 
               result = await withPostGraphileContextFromReqRes(
                 req,
