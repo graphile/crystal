@@ -4,3 +4,5 @@ node_modules
 build
 build-turbo
 package.json
+# Has its own linting
+/postgraphiql
