@@ -2710,7 +2710,7 @@ type Query implements Node {
 
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
     after: Cursor
-  ): IntSetQueryConnection!
+  ): IntSetQueryConnection
   jsonIdentity(json: JSON): JSON
   noArgsQuery: Int
   tableQuery(id: Int): Post
@@ -2734,7 +2734,7 @@ type Query implements Node {
 
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
     after: Cursor
-  ): PeopleConnection!
+  ): PeopleConnection
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
 
   \\"\\"\\"Reads a single \`Post\` using its globally unique \`ID\`.\\"\\"\\"
@@ -5226,13 +5226,9 @@ exports[`exports a schema as JSON 1`] = `
                 }
               ],
               \\"type\\": {
-                \\"kind\\": \\"NON_NULL\\",
-                \\"name\\": null,
-                \\"ofType\\": {
-                  \\"kind\\": \\"OBJECT\\",
-                  \\"name\\": \\"IntSetQueryConnection\\",
-                  \\"ofType\\": null
-                }
+                \\"kind\\": \\"OBJECT\\",
+                \\"name\\": \\"IntSetQueryConnection\\",
+                \\"ofType\\": null
               },
               \\"isDeprecated\\": false,
               \\"deprecationReason\\": null
@@ -5351,13 +5347,9 @@ exports[`exports a schema as JSON 1`] = `
                 }
               ],
               \\"type\\": {
-                \\"kind\\": \\"NON_NULL\\",
-                \\"name\\": null,
-                \\"ofType\\": {
-                  \\"kind\\": \\"OBJECT\\",
-                  \\"name\\": \\"PeopleConnection\\",
-                  \\"ofType\\": null
-                }
+                \\"kind\\": \\"OBJECT\\",
+                \\"name\\": \\"PeopleConnection\\",
+                \\"ofType\\": null
               },
               \\"isDeprecated\\": false,
               \\"deprecationReason\\": null
@@ -22892,7 +22884,7 @@ type Query implements Node {
     x: Int
     y: Int
     z: Int
-  ): IntSetQueryConnection!
+  ): IntSetQueryConnection
   jsonIdentity(json: JSON): JSON
   noArgsQuery: Int
 
@@ -22966,7 +22958,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     \\"\\"\\"
     offset: Int
-  ): PeopleConnection!
+  ): PeopleConnection
 
   \\"\\"\\"Reads a single \`Type\` using its globally unique \`ID\`.\\"\\"\\"
   type(

@@ -1004,7 +1004,7 @@ type Query implements Node {
     x: Int
     y: Int
     z: Int
-  ): IntSetQueryConnection!
+  ): IntSetQueryConnection
   jsonIdentity(json: JSON): JSON
   noArgsQuery: Int
 
@@ -1048,7 +1048,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     \\"\\"\\"
     offset: Int
-  ): PeopleConnection!
+  ): PeopleConnection
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
 }
 
@@ -5147,7 +5147,7 @@ type Query implements Node {
     x: Int
     y: Int
     z: Int
-  ): IntSetQueryConnection!
+  ): IntSetQueryConnection
   jsonIdentity(json: Json): Json
   noArgsQuery: Int
 
@@ -5221,7 +5221,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     \\"\\"\\"
     offset: Int
-  ): PeopleConnection!
+  ): PeopleConnection
 
   \\"\\"\\"Reads a single \`Type\` using its globally unique \`ID\`.\\"\\"\\"
   type(
@@ -8946,7 +8946,7 @@ type Query implements Node {
     x: Int
     y: Int
     z: Int
-  ): IntSetQueryConnection!
+  ): IntSetQueryConnection
   jsonIdentity(json: JSON): JSON
   noArgsQuery: Int
 
@@ -9020,7 +9020,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     \\"\\"\\"
     offset: Int
-  ): PeopleConnection!
+  ): PeopleConnection
 
   \\"\\"\\"Reads a single \`Type\` using its globally unique \`ID\`.\\"\\"\\"
   type(
@@ -10661,7 +10661,7 @@ type Query implements Node {
     x: Int
     y: Int
     z: Int
-  ): IntSetQueryConnection!
+  ): IntSetQueryConnection
   jsonIdentity(json: JSON): JSON
   noArgsQuery: Int
 
@@ -10710,7 +10710,7 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     \\"\\"\\"
     offset: Int
-  ): PeopleConnection!
+  ): PeopleConnection
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
 }
 
