@@ -9,14 +9,18 @@ test("cleans up", async () => {
     connectionString: DATABASE_URL,
   });
   await l.init();
-  const { rows: initialPgRows } = await query(
+  const {
+    rows: initialPgRows,
+  } = await query(
     "select * from pg_catalog.pg_replication_slots where slot_name = $1",
     [l.slotName]
   );
   expect(initialPgRows.length).toEqual(1);
   await l.close();
   await sleep(20);
-  const { rows: finalPgRows } = await query(
+  const {
+    rows: finalPgRows,
+  } = await query(
     "select * from pg_catalog.pg_replication_slots where slot_name = $1",
     [l.slotName]
   );

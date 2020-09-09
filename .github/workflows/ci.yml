@@ -62,7 +62,7 @@ jobs:
           wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
           sudo apt-get update
           sudo apt-get -yqq install postgresql-client-${{ matrix.postgres-version }}
-      - run: yarn --immutable
+      - run: yarn --immutable --ignore-engines
 
       - name: "Build Code"
         run: yarn prepack:all

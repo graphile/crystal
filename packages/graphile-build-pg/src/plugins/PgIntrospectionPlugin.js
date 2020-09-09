@@ -627,11 +627,7 @@ export default (async function PgIntrospectionPlugin(
                   );
                   if (!attr) {
                     throw new Error(
-                      `Enum table "${klass.namespaceName}"."${
-                        klass.name
-                      }" enum column '${
-                        con.keyAttributeNums[0]
-                      }' couldn't be found`
+                      `Enum table "${klass.namespaceName}"."${klass.name}" enum column '${con.keyAttributeNums[0]}' couldn't be found`
                     );
                   }
                   if (

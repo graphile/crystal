@@ -23,7 +23,9 @@ test("default creates slot for itself, cleans itself up on close", async () => {
   );
   expect(initialRows.length).toEqual(1);
   expect(initialRows[0].slot_name).toEqual(slotName);
-  const { rows: initialPgRows } = await query(
+  const {
+    rows: initialPgRows,
+  } = await query(
     "select * from pg_catalog.pg_replication_slots where slot_name = $1",
     [slotName]
   );
@@ -33,7 +35,9 @@ test("default creates slot for itself, cleans itself up on close", async () => {
     "select * from postgraphile_meta.logical_decoding_slots"
   );
   expect(finalRows.length).toEqual(0);
-  const { rows: finalPgRows } = await query(
+  const {
+    rows: finalPgRows,
+  } = await query(
     "select * from pg_catalog.pg_replication_slots where slot_name = $1",
     [slotName]
   );
@@ -54,7 +58,9 @@ test("temporary creates slot for itself, PostgreSQL automatically cleans up for 
     "select * from postgraphile_meta.logical_decoding_slots"
   );
   expect(initialRows.length).toEqual(0);
-  const { rows: initialPgRows } = await query(
+  const {
+    rows: initialPgRows,
+  } = await query(
     "select * from pg_catalog.pg_replication_slots where slot_name = $1",
     [slotName]
   );
@@ -62,7 +68,9 @@ test("temporary creates slot for itself, PostgreSQL automatically cleans up for 
   await ld.close();
   // Give half a second to clean up the slot
   await sleep(500);
-  const { rows: finalPgRows } = await query(
+  const {
+    rows: finalPgRows,
+  } = await query(
     "select * from pg_catalog.pg_replication_slots where slot_name = $1",
     [slotName]
   );

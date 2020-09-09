@@ -599,7 +599,7 @@ type Query implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
-  ): FoosConnection!
+  ): FoosConnection
   oddFoosArray: [Foo]
   viewerId: Int
 
@@ -1343,7 +1343,7 @@ type Query implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
-  ): FoosConnection!
+  ): FoosConnection
   oddFoosArray: [Foo]
   viewerId: Int
 

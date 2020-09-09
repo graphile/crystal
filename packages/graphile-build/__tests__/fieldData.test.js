@@ -326,9 +326,9 @@ test("no arguments", async () => {
     "baz",
     "qux",
   ]);
-  expect(result.data.dummyConnection.edges.map(({ cursor }) => cursor)).toEqual(
-    ["0", "1", "2", "3"]
-  );
+  expect(
+    result.data.dummyConnection.edges.map(({ cursor }) => cursor)
+  ).toEqual(["0", "1", "2", "3"]);
   expect(result).toMatchSnapshot();
 });
 
@@ -399,9 +399,9 @@ test("after", async () => {
     "baz",
     "qux",
   ]);
-  expect(result.data.dummyConnection.edges.map(({ cursor }) => cursor)).toEqual(
-    ["2", "3"]
-  );
+  expect(
+    result.data.dummyConnection.edges.map(({ cursor }) => cursor)
+  ).toEqual(["2", "3"]);
   expect(result).toMatchSnapshot();
 });
 
