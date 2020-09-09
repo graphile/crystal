@@ -349,7 +349,7 @@ async function getSettingsForPgClientTransaction({
             ...jwtVerifyOptions,
             audience:
               jwtAudiences ||
-              (jwtVerifyOptions && 'audience' in (jwtVerifyOptions as object)
+              (jwtVerifyOptions && 'audience' in (jwtVerifyOptions as Record<string, any>)
                 ? undefinedIfEmpty(jwtVerifyOptions.audience)
                 : ['postgraphile']),
           },
@@ -483,21 +483,23 @@ export function debugPgClient(pgClient: PoolClient, allowExplain = false): PoolC
       if (!results) {
         return Promise.resolve([]);
       }
-      return (await Promise.all(
-        results.map(async r => {
-          const { result: resultPromise, ...rest } = r;
-          const result = await resultPromise;
-          const firstKey = result && result[0] && Object.keys(result[0])[0];
-          if (!firstKey) {
-            return null;
-          }
-          const plan = result.map((r: any) => r[firstKey]).join('\n');
-          return {
-            ...rest,
-            plan,
-          };
-        }),
-      )).filter((entry: unknown): entry is ExplainResult => !!entry);
+      return (
+        await Promise.all(
+          results.map(async r => {
+            const { result: resultPromise, ...rest } = r;
+            const result = await resultPromise;
+            const firstKey = result && result[0] && Object.keys(result[0])[0];
+            if (!firstKey) {
+              return null;
+            }
+            const plan = result.map((r: any) => r[firstKey]).join('\n');
+            return {
+              ...rest,
+              plan,
+            };
+          }),
+        )
+      ).filter((entry: unknown): entry is ExplainResult => !!entry);
     };
 
     if (debugPgNotice.enabled) {
@@ -515,7 +517,7 @@ export function debugPgClient(pgClient: PoolClient, allowExplain = false): PoolC
 
     if (debugPg.enabled || debugPgNotice.enabled || allowExplain) {
       // tslint:disable-next-line only-arrow-functions
-      pgClient.query = function(...args: Array<any>): any {
+      pgClient.query = function (...args: Array<any>): any {
         const [a, b, c] = args;
         // If we understand it (and it uses the promises API)
         if (

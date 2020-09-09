@@ -21,7 +21,7 @@ interface Deferred<T> extends Promise<T> {
   reject: (error: Error) => void;
 }
 
-function lowerCaseKeys(obj: object): object {
+function lowerCaseKeys(obj: Record<string, any>): Record<string, any> {
   return Object.keys(obj).reduce((memo, key) => {
     memo[key.toLowerCase()] = obj[key];
     return memo;
@@ -193,7 +193,7 @@ export async function enhanceHttpServerWithSubscriptions<
       },
       subscribe: options.live ? liveSubscribe : graphqlSubscribe,
       onConnect(
-        connectionParams: object,
+        connectionParams: Record<string, any>,
         _socket: WebSocket,
         connectionContext: ConnectionContext,
       ) {

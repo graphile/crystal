@@ -18,7 +18,7 @@ const methods = http.METHODS.map(m => m.toLowerCase());
  */
 
 function TestAgent(app: any, options: any) {
-  // @ts-ignore
+  // @ts-ignore Legacy type issues
   if (!(this instanceof TestAgent)) return new TestAgent(app, options);
   if (typeof app === 'function') app = http.createServer(app); // eslint-disable-line no-param-reassign
   if (options) {
@@ -37,14 +37,14 @@ function TestAgent(app: any, options: any) {
 Object.setPrototypeOf(TestAgent.prototype, Agent.prototype);
 
 // set a host name
-TestAgent.prototype.host = function(host: any) {
+TestAgent.prototype.host = function (host: any) {
   this._host = host;
   return this;
 };
 
 // override HTTP verb methods
 methods.forEach(method => {
-  TestAgent.prototype[method] = function(url: any, _fn: any) {
+  TestAgent.prototype[method] = function (url: any, _fn: any) {
     // eslint-disable-line no-unused-vars
     let req = new Test(this.app, method.toUpperCase(), url, this._host);
     req.ca(this._ca);

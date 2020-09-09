@@ -8,7 +8,7 @@ import { ExecutionParams } from 'subscriptions-transport-ws';
 
 // tslint:disable-next-line no-any
 export type HookFn<TArg, TContext = any> = (arg: TArg, context: TContext) => TArg;
-export type PluginHookFn = <TArgument, TContext = {}>(
+export type PluginHookFn = <TArgument, TContext = Record<string, any>>(
   hookName: string,
   argument: TArgument,
   context?: TContext,
@@ -16,13 +16,13 @@ export type PluginHookFn = <TArgument, TContext = {}>(
 
 export interface PostGraphileHTTPResult {
   statusCode?: number;
-  result?: object;
-  errors?: Array<object>;
-  meta?: object;
+  result?: Record<string, any>;
+  errors?: Array<Record<string, any>>;
+  meta?: Record<string, any>;
 }
 export interface PostGraphileHTTPEnd {
   statusCode?: number;
-  result: object | Array<object>;
+  result: Record<string, any> | Array<Record<string, any>>;
 }
 export interface PostGraphilePlugin {
   init?: HookFn<null>;
@@ -51,7 +51,7 @@ export interface PostGraphilePlugin {
   'postgraphile:http:handler'?: HookFn<IncomingMessage>;
   'postgraphile:http:result'?: HookFn<PostGraphileHTTPResult>;
   'postgraphile:http:end'?: HookFn<PostGraphileHTTPEnd>;
-  'postgraphile:httpParamsList'?: HookFn<Array<object>>;
+  'postgraphile:httpParamsList'?: HookFn<Array<Record<string, any>>>;
   'postgraphile:validationRules'?: HookFn<typeof graphql.specifiedRules>; // AVOID THIS where possible; use 'postgraphile:validationRules:static' instead.
   'postgraphile:middleware'?: HookFn<HttpRequestHandler>;
   'postgraphile:ws:onOperation'?: HookFn<ExecutionParams>;
@@ -63,7 +63,7 @@ type HookName = keyof PostGraphilePlugin;
 const identityHook = <T>(input: T): T => input;
 const identityPluginHook: PluginHookFn = (_hookName, input, _options) => input;
 
-function contextIsSame(context1: {}, context2: {}): boolean {
+function contextIsSame(context1: Record<string, any>, context2: Record<string, any>): boolean {
   // Shortcut if obvious
   if (context1 === context2) {
     return true;
@@ -93,10 +93,10 @@ function contextIsSame(context1: {}, context2: {}): boolean {
 function memoizeHook<T>(hook: HookFn<T>): HookFn<T> {
   let lastCall: {
     argument: T;
-    context: {};
+    context: Record<string, any>;
     result: T;
   } | null = null;
-  return (argument: T, context: {}): T => {
+  return (argument: T, context: Record<string, any>): T => {
     if (lastCall && lastCall.argument === argument && contextIsSame(lastCall.context, context)) {
       return lastCall.result;
     } else {
@@ -116,9 +116,9 @@ function shouldMemoizeHook(hookName: HookName) {
 }
 
 function makeHook<T>(plugins: Array<PostGraphilePlugin>, hookName: HookName): HookFn<T> {
-  const combinedHook = plugins.reduce((previousHook: HookFn<T>, plugin: {}) => {
+  const combinedHook = plugins.reduce((previousHook: HookFn<T>, plugin: Record<string, any>) => {
     if (typeof plugin[hookName] === 'function') {
-      return (argument: T, context: {}) => {
+      return (argument: T, context: Record<string, any>) => {
         return plugin[hookName](previousHook(argument, context), context);
       };
     } else {
@@ -137,7 +137,11 @@ function makeHook<T>(plugins: Array<PostGraphilePlugin>, hookName: HookName): Ho
 export function makePluginHook(plugins: Array<PostGraphilePlugin>): PluginHookFn {
   const hooks = {};
   const emptyObject = {}; // caching this makes memoization faster when no context is needed
-  function rawPluginHook<T>(hookName: HookName, argument: T, context: {} = emptyObject): T {
+  function rawPluginHook<T>(
+    hookName: HookName,
+    argument: T,
+    context: Record<string, any> = emptyObject,
+  ): T {
     if (!hooks[hookName]) {
       hooks[hookName] = makeHook(plugins, hookName);
     }

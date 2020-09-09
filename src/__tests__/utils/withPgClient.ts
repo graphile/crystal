@@ -20,7 +20,7 @@ export default function withPgClient<T>(
     // is resolved correctly.
     //
     // @see https://github.com/brianc/node-postgres/issues/1142
-    if ((client as object)['errno']) throw client;
+    if ((client as Record<string, any>)['errno']) throw client;
 
     await client.query('begin');
     await client.query("set local timezone to '+04:00'");

@@ -24,7 +24,7 @@ export default function setupServerSentEvents(
   } else {
     res.setHeader('Connection', 'keep-alive');
   }
-  const koaCtx = (req as object)['_koaCtx'];
+  const koaCtx = (req as Record<string, any>)['_koaCtx'];
   const isKoa = !!koaCtx;
   const stream = isKoa ? new PassThrough() : null;
   if (isKoa) {
