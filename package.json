@@ -35,16 +35,19 @@
   "scripts": {
     "build": "./scripts/build",
     "dev": "./scripts/dev",
-    "lint": "eslint --ext .ts,.js .",
-    "lint:fix": "yarn run lint --fix",
+    "lint": "yarn eslint .",
+    "lint:fix": "yarn prettier:fix && yarn run eslint --fix .",
     "make-assets": "./scripts/make-assets",
-    "prettier": "prettier 'src/**/*.[tj]s' 'postgraphiql/src/**/*.[tj]s'",
-    "prettier:fix": "yarn prettier --write",
-    "prettier:check": "yarn prettier --list-different",
     "test": "./scripts/test",
     "prepack": "./scripts/build",
     "changelog": "(cat scripts/CHANGELOG_HEADER.md; npx conventional-changelog -p angular --release-count 0) > CHANGELOG.md",
-    "version": "yarn run changelog && git add CHANGELOG.md"
+    "version": "yarn run changelog && git add CHANGELOG.md",
+    "-----": "-----",
+    "eslint": "eslint --ext .js,.jsx,.ts,.tsx",
+    "prettier": "prettier --ignore-path ./.eslintignore",
+    "prettier:all": "yarn prettier '**/*.{json,md,html,js,jsx,ts,tsx}'",
+    "prettier:fix": "yarn prettier:all --write",
+    "prettier:check": "yarn prettier:all --list-different"
   },
   "dependencies": {
     "@graphile/lru": "4.9.0",
@@ -121,19 +124,11 @@
     "transform": {
       ".*": "<rootDir>/resources/jest-preprocessor.js"
     },
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json"
-    ],
-    "setupFiles": [
-      "<rootDir>/resources/jest-setup.js"
-    ],
+    "moduleFileExtensions": ["ts", "js", "json"],
+    "setupFiles": ["<rootDir>/resources/jest-setup.js"],
     "browser": false,
     "testEnvironment": "node",
-    "roots": [
-      "<rootDir>/src"
-    ],
+    "roots": ["<rootDir>/src"],
     "testRegex": "/__tests__/[^.]+-test.(t|j)s$"
   },
   "files": [
