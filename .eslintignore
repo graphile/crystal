@@ -1,4 +1,6 @@
+/assets
+/postgraphiql/public
 node_modules
 build
 build-turbo
-postgraphiql
+package.json
