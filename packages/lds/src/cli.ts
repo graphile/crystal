@@ -135,7 +135,7 @@ async function main() {
     );
   });
 
-  const callback: AnnounceCallback = function(announcement) {
+  const callback: AnnounceCallback = function (announcement) {
     const { _: kind, schema, table } = announcement;
     if (!channels[schema] || !channels[schema][table]) return;
     const stringifiedKey =

@@ -267,15 +267,15 @@ export default (function PgTypesPlugin(
         }, {}),
 
         // cast numbers above our ken to strings to avoid loss of precision
-        "20": tweakToText,
-        "1700": tweakToText,
+        20: tweakToText,
+        1700: tweakToText,
         // to_json all dates to make them ISO (overrides rawTypes above)
-        "1082": tweakToJson,
-        "1114": tweakToJson,
-        "1184": tweakToJson,
-        "1083": tweakToJson,
-        "1266": tweakToJson,
-        "790": tweakToNumericText,
+        1082: tweakToJson,
+        1114: tweakToJson,
+        1184: tweakToJson,
+        1083: tweakToJson,
+        1266: tweakToJson,
+        790: tweakToNumericText,
       };
 
       const pgTweakFragmentForTypeAndModifier = (
@@ -426,45 +426,45 @@ export default (function PgTypesPlugin(
       addType(TimeType, "graphile-build-pg built-in");
 
       const oidLookup = {
-        "20": stringType(
+        20: stringType(
           inflection.builtin("BigInt"),
           "A signed eight-byte integer. The upper big integer values are greater than the max value for a JavaScript number. Therefore all big integers will be output as strings and not numbers."
         ), // bitint - even though this is int8, it's too big for JS int, so cast to string.
-        "21": GraphQLInt, // int2
-        "23": GraphQLInt, // int4
-        "700": GraphQLFloat, // float4
-        "701": GraphQLFloat, // float8
-        "1700": BigFloat, // numeric
-        "790": GraphQLFloat, // money
+        21: GraphQLInt, // int2
+        23: GraphQLInt, // int4
+        700: GraphQLFloat, // float4
+        701: GraphQLFloat, // float8
+        1700: BigFloat, // numeric
+        790: GraphQLFloat, // money
 
-        "1186": GQLInterval, // interval
-        "1082": DateType, // date
-        "1114": DateTimeType, // timestamp
-        "1184": DateTimeType, // timestamptz
-        "1083": TimeType, // time
-        "1266": TimeType, // timetz
+        1186: GQLInterval, // interval
+        1082: DateType, // date
+        1114: DateTimeType, // timestamp
+        1184: DateTimeType, // timestamptz
+        1083: TimeType, // time
+        1266: TimeType, // timetz
 
-        "114": JSONType, // json
-        "3802": JSONType, // jsonb
-        "2950": UUIDType, // uuid
+        114: JSONType, // json
+        3802: JSONType, // jsonb
+        2950: UUIDType, // uuid
 
-        "1560": BitString, // bit
-        "1562": BitString, // varbit
+        1560: BitString, // bit
+        1562: BitString, // varbit
 
-        "18": GraphQLString, // char
-        "25": GraphQLString, // text
-        "1043": GraphQLString, // varchar
+        18: GraphQLString, // char
+        25: GraphQLString, // text
+        1043: GraphQLString, // varchar
 
-        "600": Point, // point
+        600: Point, // point
 
-        "869": InetType,
-        "650": CidrType,
-        "829": MacAddrType,
-        "774": MacAddr8Type,
+        869: InetType,
+        650: CidrType,
+        829: MacAddrType,
+        774: MacAddr8Type,
       };
       const oidInputLookup = {
-        "1186": GQLIntervalInput, // interval
-        "600": PointInput, // point
+        1186: GQLIntervalInput, // interval
+        600: PointInput, // point
       };
       const jsonStringify = o => JSON.stringify(o);
       if (pgExtendedTypes) {

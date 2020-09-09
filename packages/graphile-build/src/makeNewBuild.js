@@ -63,9 +63,7 @@ const hashCache = new LRU({ maxLength: 100000 });
 function hashFieldAlias(str) {
   const precomputed = hashCache.get(str);
   if (precomputed) return precomputed;
-  const hash = createHash("sha1")
-    .update(str)
-    .digest("hex");
+  const hash = createHash("sha1").update(str).digest("hex");
   hashCache.set(str, hash);
   return hash;
 }

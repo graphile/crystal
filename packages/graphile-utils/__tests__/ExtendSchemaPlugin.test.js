@@ -397,13 +397,13 @@ it("supports @scope directive with simple values", async () => {
           Gives you back what you put in
           """
           echo(input: [Int!]!): [Int!]!
-            @scope(
-              isEchoField: true
-              stringTest: "THIS_IS_A_STRING"
-              intTest: 42
-              floatTest: 3.141592
-              nullTest: null
-            )
+          @scope(
+            isEchoField: true
+            stringTest: "THIS_IS_A_STRING"
+            intTest: 42
+            floatTest: 3.141592
+            nullTest: null
+          )
         }
       `,
       resolvers,

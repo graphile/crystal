@@ -73,7 +73,7 @@ export interface ObjectResolver<TSource = any, TContext = any> {
 }
 
 export interface EnumResolver {
-  [key: string]: string | number | Array<any> | object | symbol;
+  [key: string]: string | number | Array<any> | Record<string, any> | symbol;
 }
 
 export interface Resolvers<TSource = any, TContext = any> {

@@ -277,7 +277,7 @@ function pgSmartTagRulesFromJSON(
     if (typeof obj !== "object" || obj == null) {
       throw new Error(`Invalid value for '${path}'`);
     }
-    const entities: object = obj;
+    const entities: Record<string, any> = obj;
     for (const entityName of Object.keys(entities)) {
       if (entityName.includes(".")) {
         throw new Error(

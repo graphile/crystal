@@ -17,7 +17,7 @@ function deprecate(fn: (...input: Array<any>) => string, message: string) {
   if (typeof fn !== "function") {
     return fn;
   }
-  return function(...args) {
+  return function (...args) {
     if (outputMessages.indexOf(message) === -1) {
       outputMessages.push(message);
       // eslint-disable-next-line no-console

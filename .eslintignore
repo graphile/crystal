@@ -10,3 +10,4 @@ build-turbo
 examples
 dist
 CHANGELOG.md
+package.json

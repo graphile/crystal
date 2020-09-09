@@ -253,12 +253,12 @@ class SchemaBuilder extends EventEmitter {
       throw new Error(`Sorry, '${hookName}' is not a supported hook`);
     }
     if (this._currentPluginName) {
-      fn.displayName = `${this._currentPluginName}/${hookName}/${(provides &&
-        provides.length &&
-        provides.join("+")) ||
+      fn.displayName = `${this._currentPluginName}/${hookName}/${
+        (provides && provides.length && provides.join("+")) ||
         fn.displayName ||
         fn.name ||
-        "unnamed"}`;
+        "unnamed"
+      }`;
     }
     if (provides) {
       if (!fn.displayName && provides.length) {
@@ -416,9 +416,9 @@ class SchemaBuilder extends EventEmitter {
 
           if (!newObj) {
             throw new Error(
-              `Hook '${hook.displayName ||
-                hook.name ||
-                "anonymous"}' for '${hookName}' returned falsy value '${newObj}'`
+              `Hook '${
+                hook.displayName || hook.name || "anonymous"
+              }' for '${hookName}' returned falsy value '${newObj}'`
             );
           }
           debug(

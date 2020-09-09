@@ -26,15 +26,15 @@ interface RowAnnouncement {
 
 export interface InsertCollectionAnnouncement extends CollectionAnnouncement {
   _: "insertC";
-  data: {};
+  data: Record<string, unknown>;
 }
 export interface UpdateCollectionAnnouncement extends CollectionAnnouncement {
   _: "updateC";
-  data: {};
+  data: Record<string, unknown>;
 }
 export interface UpdateRowAnnouncement extends RowAnnouncement {
   _: "update";
-  data: {};
+  data: Record<string, unknown>;
 }
 export interface DeleteRowAnnouncement extends RowAnnouncement {
   _: "delete";

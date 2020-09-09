@@ -3,7 +3,37 @@ name: Node CI
 on: [push, pull_request]
 
 jobs:
-  build:
+  lint:
+    runs-on: ubuntu-latest
+
+    env:
+      CI: true
+      PGVERSION: ${{ matrix.postgres-version}}
+      TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/graphileengine_test
+      TEST_PG_URL: postgres://postgres:postgres@localhost:5432/postgraphile_test
+      LDS_TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/lds_test
+      TERM: xterm
+      FORCE_COLOR: 1
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - run: yarn --immutable --ignore-engines
+
+      - name: "Check Code Format"
+        run: yarn prettier:check
+
+      - name: "Lint Code"
+        run: yarn eslint .
+
+      - name: "Flow"
+        run: npm run flow:check
+
+  test:
     runs-on: ubuntu-latest
 
     env:
@@ -66,15 +96,6 @@ jobs:
 
       - name: "Build Code"
         run: yarn prepack:all
-
-      - name: "Check Code Format"
-        run: yarn prettier:check
-
-      - name: "Lint Code"
-        run: yarn eslint .
-
-      - name: "Flow"
-        run: npm run flow:check
 
       - name: "Test Project"
         run: yarn run pretest && ./scripts/ci && yarn run posttest

@@ -295,7 +295,7 @@ it("allows adding a field to an existing table, and requesting necessary data al
         typeDefs: gql`
           extend type User {
             customField: String
-              @requires(columns: ["id", "name", "slightly_more_complex_column"])
+            @requires(columns: ["id", "name", "slightly_more_complex_column"])
           }
         `,
         resolvers: {

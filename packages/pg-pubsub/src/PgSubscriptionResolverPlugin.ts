@@ -66,7 +66,7 @@ function withInitialEvent(
  * `subscribe` method.
  */
 
-const PgSubscriptionResolverPlugin: Plugin = function(builder, { pubsub }) {
+const PgSubscriptionResolverPlugin: Plugin = function (builder, { pubsub }) {
   if (!isPubSub(pubsub)) {
     debug("Subscriptions disabled - no pubsub provided");
     return;

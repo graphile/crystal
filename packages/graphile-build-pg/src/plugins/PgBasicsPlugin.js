@@ -48,7 +48,7 @@ export function preventEmptyResult<
 >(obj: O): $ObjMap<O, <V>(V) => V> {
   return Object.keys(obj).reduce((memo, key) => {
     const fn = obj[key];
-    memo[key] = function(...args) {
+    memo[key] = function (...args) {
       const result = fn.apply(this, args);
       if (typeof result !== "string" || result.length === 0) {
         const stringifiedArgs = require("util").inspect(args);
@@ -366,7 +366,7 @@ export default (function PgBasicsPlugin(
     (inflection, build) => {
       // TODO:v5: move this to postgraphile-core
       const oldBuiltin = inflection.builtin;
-      inflection.builtin = function(name) {
+      inflection.builtin = function (name) {
         if (pgLegacyJsonUuid && name === "JSON") return "Json";
         if (pgLegacyJsonUuid && name === "UUID") return "Uuid";
         return oldBuiltin.call(this, name);

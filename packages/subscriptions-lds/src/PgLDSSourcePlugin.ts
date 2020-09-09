@@ -245,7 +245,7 @@ export class LDSLiveSource {
       default: {
         console.warn(
           "Unhandled announcement type: ",
-          // @ts-ignore
+          // @ts-ignore Unhandled
           announcement && announcement._
         );
       }
@@ -309,7 +309,7 @@ function getSafeNumber(str: string | undefined): number | undefined {
   return undefined;
 }
 
-const PgLDSSourcePlugin: Plugin = async function(
+const PgLDSSourcePlugin: Plugin = async function (
   builder,
   {
     pgLDSUrl = process.env.LDS_URL,
@@ -322,7 +322,7 @@ const PgLDSSourcePlugin: Plugin = async function(
   try {
     const source = await makeLDSLiveSource({
       ldsURL: typeof pgLDSUrl === "string" ? pgLDSUrl : undefined,
-      // @ts-ignore
+      // @ts-ignore Illicit cast 👀
       connectionString: pgOwnerConnectionString as string,
       sleepDuration: ldsSleepDuration,
       tablePattern: ldsTablePattern,

@@ -28,7 +28,9 @@ export default class QueryBuilder {
     cb?: (checker: (data: any) => (record: any) => boolean) => void
   ): void;
   public addLiveCondition(
-    checkerGenerator: (data: {}) => (record: any) => boolean,
+    checkerGenerator: (
+      data: Record<string, unknown>
+    ) => (record: any) => boolean,
     requirements?: { [key: string]: SQL }
   ): void;
   public setCursorComparator(fn: CursorComparator): void;

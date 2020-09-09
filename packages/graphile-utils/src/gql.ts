@@ -55,8 +55,9 @@ export function gql(
           additionalDefinitions.push(...interpolatedValue.definitions);
         } else {
           throw new Error(
-            `Placeholder ${idx +
-              1} is invalid - expected string or GraphQL AST, but received '${typeof interpolatedValue}'. Happened after '${gqlStrings.join(
+            `Placeholder ${
+              idx + 1
+            } is invalid - expected string or GraphQL AST, but received '${typeof interpolatedValue}'. Happened after '${gqlStrings.join(
               ""
             )}'`
           );

@@ -34,20 +34,18 @@
   "dependencies": {
     "@graphile/lds": "4.8.0-rc.0",
     "@types/ws": "^6.0.1",
-    "tslib": "^1.13.0",
+    "tslib": "^2.0.1",
     "ws": "^7.0.0"
   },
   "peerDependencies": {
     "postgraphile-core": ">4.3.1 <5"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.12",
-    "jest": "24.9.0",
+    "@types/jest": "25.x",
+    "jest": "25.x",
     "pg": ">=6.1.0 <9",
-    "ts-jest": "^24.0.2",
-    "typescript": "^3.4.5"
+    "ts-jest": "25.x",
+    "typescript": "^4.0.2"
   },
-  "files": [
-    "dist"
-  ]
+  "files": ["dist"]
 }

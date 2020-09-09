@@ -17,7 +17,7 @@ import {
 } from "graphql";
 import { EventEmitter } from "events";
 
-type mixed = {} | string | number | boolean | undefined | null;
+type mixed = Record<string, any> | string | number | boolean | undefined | null;
 
 export interface Options {
   [str: string]: any;
@@ -45,6 +45,7 @@ export interface Build {
 export interface Inflection {
   [str: string]: any;
 }
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export interface Scope<Type> {
   [str: string]: any;
 }

@@ -1,7 +1,7 @@
 import { GraphQLSchema, isSchema, printSchema } from "graphql";
-import { Plugin } from "pretty-format";
+import { NewPlugin } from "pretty-format";
 
-const GraphQLSchemaSnapshotSerializer: Plugin = {
+const GraphQLSchemaSnapshotSerializer: NewPlugin = {
   test(val: any) {
     return isSchema(val);
   },

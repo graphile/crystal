@@ -735,8 +735,10 @@ ${sql.join(
 
     let fragment = sql.fragment`\
 select ${useAsterisk ? sql.fragment`${this.getTableAlias()}.*` : fields}
-${this.compiledData.from &&
-  sql.fragment`from ${this.compiledData.from[0]} as ${this.getTableAlias()}`}
+${
+  this.compiledData.from &&
+  sql.fragment`from ${this.compiledData.from[0]} as ${this.getTableAlias()}`
+}
 ${this.compiledData.join.length && sql.join(this.compiledData.join, " ")}
 where ${this.buildWhereClause(true, true, options)}
 ${

@@ -3,9 +3,11 @@ import { Build, Scope } from "graphile-build";
 import { SQL } from "pg-sql2";
 import QueryBuilder from "../QueryBuilder";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type FieldContext<T> = any;
 type FieldWithHooksFunction = any;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface PgFieldOptions<T> {
   hoistCursor?: boolean;
   withQueryBuilder?: (

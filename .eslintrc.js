@@ -21,7 +21,12 @@ module.exports = {
   rules: {
     "prettier/prettier": "error",
 
-    "@typescript-eslint/ban-ts-ignore": "off",
+    "@typescript-eslint/ban-ts-comment": [
+      "error",
+      {
+        "ts-ignore": "allow-with-description",
+      },
+    ],
     "@typescript-eslint/camelcase": "off",
     "@typescript-eslint/no-empty-function": 0,
     "@typescript-eslint/no-var-requires": "off",

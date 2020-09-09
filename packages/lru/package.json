@@ -13,9 +13,7 @@
     "type": "git",
     "url": "git+https://github.com/graphile/graphile-build.git"
   },
-  "keywords": [
-    "lru"
-  ],
+  "keywords": ["lru"],
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "bugs": {
@@ -26,14 +24,12 @@
     "node": ">=8.6"
   },
   "devDependencies": {
-    "jest": "^24.8.0",
-    "ts-node": "^8.1.0",
-    "typescript": "^3.4.5"
+    "jest": "25.x",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.2"
   },
-  "files": [
-    "node8plus"
-  ],
+  "files": ["node8plus"],
   "dependencies": {
-    "tslib": "^1.13.0"
+    "tslib": "^2.0.1"
   }
 }

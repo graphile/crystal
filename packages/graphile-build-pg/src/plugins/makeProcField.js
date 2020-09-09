@@ -81,7 +81,7 @@ export default function makeProcField(
     if (
       idx >= sliceAmount && // Was a .slice() call
       (proc.argModes.length === 0 || // all args are `in`
-      proc.argModes[idx] === "i" || // this arg is `in`
+        proc.argModes[idx] === "i" || // this arg is `in`
         proc.argModes[idx] === "b") // this arg is `inout`
     ) {
       prev.push(proc.argNames[idx] || "");
@@ -92,7 +92,7 @@ export default function makeProcField(
     if (
       idx >= sliceAmount && // Was a .slice() call
       (proc.argModes.length === 0 || // all args are `in`
-      proc.argModes[idx] === "i" || // this arg is `in`
+        proc.argModes[idx] === "i" || // this arg is `in`
         proc.argModes[idx] === "b") // this arg is `inout`
     ) {
       prev.push(introspectionResultsByKind.typeById[typeId]);

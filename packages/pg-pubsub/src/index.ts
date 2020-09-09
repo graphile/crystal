@@ -64,7 +64,7 @@ const plugin: PostGraphilePlugin = {
       eventEmitter,
     });
 
-    const handleNotification = function(msg: {
+    const handleNotification = function (msg: {
       channel: string;
       payload?: string;
     }) {
@@ -81,7 +81,7 @@ const plugin: PostGraphilePlugin = {
       pubsub.publish(msg.channel, payload);
     };
     let listeningClient: pg.PoolClient | null;
-    const cleanClient = function(client: pg.PoolClient) {
+    const cleanClient = function (client: pg.PoolClient) {
       client.removeListener("notification", handleNotification);
       clearInterval(client["keepAliveInterval"]);
       delete client["keepAliveInterval"];
@@ -89,7 +89,7 @@ const plugin: PostGraphilePlugin = {
         listeningClient = null;
       }
     };
-    const releaseClient = function(client: pg.PoolClient): void {
+    const releaseClient = function (client: pg.PoolClient): void {
       if (!client) {
         return;
       }
@@ -98,14 +98,14 @@ const plugin: PostGraphilePlugin = {
         client.release();
       }
     };
-    const listenToChannelWithClient = async function(
+    const listenToChannelWithClient = async function (
       client: pg.PoolClient,
       channel: string
     ): Promise<void> {
       const sql = "LISTEN " + client.escapeIdentifier(channel);
       await client.query(sql);
     };
-    const unlistenFromChannelWithClient = async function(
+    const unlistenFromChannelWithClient = async function (
       client: pg.PoolClient,
       channel: string
     ): Promise<void> {
@@ -113,20 +113,20 @@ const plugin: PostGraphilePlugin = {
       await client.query(sql);
     };
     const channelListenCount: { [key: string]: number } = {};
-    const listen = async function(channel: string) {
+    const listen = async function (channel: string) {
       channelListenCount[channel] = (channelListenCount[channel] || 0) + 1;
       if (channelListenCount[channel] === 1 && listeningClient) {
         await listenToChannelWithClient(listeningClient, channel);
       }
     };
-    const unlisten = async function(channel: string) {
+    const unlisten = async function (channel: string) {
       channelListenCount[channel] = (channelListenCount[channel] || 1) - 1;
       if (channelListenCount[channel] === 0 && listeningClient) {
         await unlistenFromChannelWithClient(listeningClient, channel);
       }
     };
     const aL = eventEmitter.addListener;
-    eventEmitter.addListener = function(name, hook) {
+    eventEmitter.addListener = function (name, hook) {
       if (typeof name === "string") {
         listen(name).catch(e => {
           // eslint-disable-next-line no-console
@@ -136,7 +136,7 @@ const plugin: PostGraphilePlugin = {
       return aL.call(this, name, hook);
     };
     const rL = eventEmitter.removeListener;
-    eventEmitter.removeListener = function(name, hook) {
+    eventEmitter.removeListener = function (name, hook) {
       if (typeof name === "string") {
         unlisten(name).catch(e => {
           // eslint-disable-next-line no-console
@@ -146,7 +146,7 @@ const plugin: PostGraphilePlugin = {
       return rL.call(this, name, hook);
     };
 
-    const setupClient = async function(attempts = 0): Promise<void> {
+    const setupClient = async function (attempts = 0): Promise<void> {
       if (attempts > 0 && attempts % 5 === 0) {
         // eslint-disable-next-line no-console
         console.warn(
@@ -195,8 +195,9 @@ const plugin: PostGraphilePlugin = {
       } catch (e) {
         // eslint-disable-next-line no-console
         console.error(
-          `Error occurred when listening to channel; retrying after ${attempts *
-            2} seconds`
+          `Error occurred when listening to channel; retrying after ${
+            attempts * 2
+          } seconds`
         );
         // eslint-disable-next-line no-console
         console.error(e);

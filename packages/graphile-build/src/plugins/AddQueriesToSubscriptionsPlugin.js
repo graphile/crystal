@@ -2,7 +2,7 @@
 import type { Plugin } from "../SchemaBuilder";
 import type { GraphQLObjectType } from "graphql";
 
-const AddQueriesToSubscriptionsPlugin: Plugin = function(
+const AddQueriesToSubscriptionsPlugin: Plugin = function (
   builder,
   { subscriptions, live }
 ) {

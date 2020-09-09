@@ -13,10 +13,7 @@ export default function swallowError(e: Error): void {
   } else {
     const errorSnippet =
       e && typeof e.toString === "function"
-        ? String(e)
-            .replace(/\n.*/g, "")
-            .substr(0, 320)
-            .trim()
+        ? String(e).replace(/\n.*/g, "").substr(0, 320).trim()
         : null;
     if (errorSnippet) {
       // eslint-disable-next-line no-console

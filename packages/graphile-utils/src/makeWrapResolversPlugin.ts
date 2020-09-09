@@ -148,7 +148,9 @@ export default function makeWrapResolversPlugin<T>(
       if (!resolveWrapper) {
         return field;
       }
-      const { resolve: oldResolve = (obj: object) => obj[fieldName] } = field;
+      const {
+        resolve: oldResolve = (obj: Record<string, any>) => obj[fieldName],
+      } = field;
       return {
         ...field,
         async resolve(...resolveParams) {

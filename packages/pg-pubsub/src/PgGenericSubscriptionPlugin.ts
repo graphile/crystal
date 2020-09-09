@@ -12,7 +12,7 @@ function isPubSub(pubsub: any): pubsub is PubSub {
   return !!pubsub;
 }
 
-const PgGenericSubscriptionPlugin: Plugin = function(
+const PgGenericSubscriptionPlugin: Plugin = function (
   builder,
   {
     pubsub,

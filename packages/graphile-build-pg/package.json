@@ -46,23 +46,19 @@
     "lodash": ">=4 <5",
     "lru-cache": ">=4 <5",
     "pg-sql2": "4.8.0",
-    "postgres-interval": "^1.2.0"
+    "postgres-interval": "^2.1.0"
   },
   "peerDependencies": {
     "pg": ">=6.1.0 <9"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
-    "eslint_d": "^8.0.0",
-    "flow-copy-source": "^1.2.0",
-    "jest": "^24.8.0",
+    "eslint_d": "^9.1.2",
+    "flow-copy-source": "^2.0.9",
+    "jest": "25.x",
     "jest-serializer-graphql-schema": "4.8.0"
   },
-  "files": [
-    "node8plus",
-    "res",
-    "index.js"
-  ],
+  "files": ["node8plus", "res", "index.js"],
   "engines": {
     "node": ">=8.6"
   }

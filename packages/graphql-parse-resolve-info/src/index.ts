@@ -20,7 +20,7 @@ import {
 import { getArgumentValues } from "graphql/execution/values";
 import * as debugFactory from "debug";
 
-type mixed = {} | string | number | boolean | undefined | null;
+type mixed = Record<string, any> | string | number | boolean | undefined | null;
 
 export interface FieldsByTypeName {
   [str: string]: {
@@ -327,7 +327,7 @@ function fieldTreeFromAST<T extends SelectionNode>(
 }
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
-function firstKey(obj: object) {
+function firstKey(obj: Record<string, unknown>) {
   for (const key in obj) {
     if (hasOwnProperty.call(obj, key)) {
       return key;

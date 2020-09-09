@@ -33,7 +33,13 @@ export {
   formatSQLForDebugging,
 };
 
-export type mixed = {} | string | number | boolean | undefined | null;
+export type mixed =
+  | Record<string, any>
+  | string
+  | number
+  | boolean
+  | undefined
+  | null;
 
 const ensureValidPlugins = (name: string, arr: Array<Plugin>) => {
   if (!Array.isArray(arr)) {
@@ -93,7 +99,7 @@ export interface PostGraphileCoreOptions {
    */
   viewUniqueKey?: string;
   enableTags?: boolean;
-  readCache?: string | object;
+  readCache?: string | Record<string, any>;
   writeCache?: string;
   setWriteCacheCallback?: (fn: () => Promise<void>) => void;
   legacyRelations?: "only" | "deprecated" | "omit";
@@ -143,7 +149,7 @@ export const postGraphileClassicIdsInflection = inflections.newInflector({
  * ABOVE HERE IS DEPRECATED.
  */
 
-export const PostGraphileInflectionPlugin = function(builder: SchemaBuilder) {
+export const PostGraphileInflectionPlugin = function (builder: SchemaBuilder) {
   builder.hook("inflection", (inflection: Inflection) => {
     const previous = inflection.enumName;
     // Overwrite directly so that we don't lose the 'extend' hints
@@ -156,7 +162,7 @@ export const PostGraphileInflectionPlugin = function(builder: SchemaBuilder) {
   });
 } as Plugin;
 
-export const PostGraphileClassicIdsInflectionPlugin = function(
+export const PostGraphileClassicIdsInflectionPlugin = function (
   builder: SchemaBuilder
 ) {
   builder.hook("inflection", (inflection: Inflection) => {
@@ -189,7 +195,7 @@ export const getPostGraphileBuilder = async (
   schemas: string | Array<string>,
   options: PostGraphileCoreOptions = {}
 ) => {
-  // @ts-ignore
+  // @ts-ignore Deprecated, doesn't exist on types, checking in JS only
   if (options.inflector) {
     throw new Error(
       "Passing an inflector via PostGraphile options was deprecated in v4.0.0-beta.7; instead please write an inflector plugin: https://www.graphile.org/postgraphile/inflection/"

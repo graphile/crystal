@@ -100,7 +100,7 @@ export class LiveMonitor {
     this.changeCallback = null;
     this.changeCounter = 0;
     this.liveConditionsByCounter = {};
-    this.handleChange = function() {
+    this.handleChange = function () {
       /* This function is throttled to ~25ms (see constructor); it's purpose is
        * to bundle up all the changes that occur in a small window into the same
        * handle change flow, so _reallyHandleChange doesn't get called twice in
@@ -113,7 +113,7 @@ export class LiveMonitor {
       }
     };
 
-    this._reallyHandleChange = function() {
+    this._reallyHandleChange = function () {
       // This function is throttled to MONITOR_THROTTLE_DURATION (see constructor)
       if (this.changeCallback) {
         // Convince Flow this won't suddenly become null
@@ -146,7 +146,7 @@ export class LiveMonitor {
       }
     };
 
-    this.onChange = function(callback: () => void) {
+    this.onChange = function (callback: () => void) {
       if (this.released) {
         throw new Error("Monitors cannot be reused.");
       }

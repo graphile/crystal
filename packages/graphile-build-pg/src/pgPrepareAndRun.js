@@ -15,9 +15,7 @@ let lastHash: string;
 const hash = (str: string): string => {
   if (str !== lastString) {
     lastString = str;
-    lastHash = createHash("sha1")
-      .update(str)
-      .digest("base64");
+    lastHash = createHash("sha1").update(str).digest("base64");
   }
   return lastHash;
 };
