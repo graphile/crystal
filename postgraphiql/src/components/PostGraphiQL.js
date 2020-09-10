@@ -113,7 +113,8 @@ class PostGraphiQL extends React.PureComponent {
   _connectSubscriptions = () => {
     this.subscriptionsClient =
       POSTGRAPHILE_CONFIG.enhanceGraphiql && POSTGRAPHILE_CONFIG.subscriptions
-        ? createClient(websocketUrl, {
+        ? createClient({
+            url: websocketUrl,
             lazy: false,
             connectionParams: () => this.getHeaders() || {},
             on: {
@@ -123,7 +124,7 @@ class PostGraphiQL extends React.PureComponent {
               connected: () => {
                 this.setState({ socketStatus: 'connected', error: null });
               },
-              closed: () => {
+              closed: closeEvent => {
                 console.error('Client socket connection closed', closeEvent);
                 this.setState({ socketStatus: 'closed' });
               },
