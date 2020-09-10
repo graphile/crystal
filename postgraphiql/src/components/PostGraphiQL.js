@@ -781,6 +781,7 @@ class PostGraphiQL extends React.PureComponent {
                     this._storage.set(STORAGE_KEYS.HEADERS_TEXT, this.state.headersText);
                   }
                   if (this.state.headersTextValid && this.subscriptionsClient) {
+                    // Reconnect to websocket with new headers
                     this.subscriptionsClient.dispose();
                     this._connectSubscriptions();
                   }
