@@ -14,7 +14,7 @@ import { createServer, ExecutionResultFormatter } from 'graphql-transport-ws';
 import parseUrl = require('parseurl');
 import { pluginHookFromOptions } from '../pluginHook';
 import { isEmpty } from './createPostGraphileHttpRequestHandler';
-// import liveSubscribe from './liveSubscribe'; // TODO-db-200826 add support for live queries
+import liveSubscribe from './liveSubscribe'; // TODO-db-200826 add support for live queries
 
 interface Deferred<T> extends Promise<T> {
   resolve: (input?: T | PromiseLike<T> | undefined) => void;
@@ -185,7 +185,7 @@ export async function enhanceHttpServerWithSubscriptions<
       execute: () => {
         throw new Error('Only subscriptions are allowed over websocket transport');
       },
-      subscribe: graphqlSubscribe, // TODO-db-200826 add support for live queries
+      subscribe: options.live ? liveSubscribe : graphqlSubscribe,
       onConnect: ({ socket, request, connectionParams }) => {
         socket['postgraphileId'] = ++socketId;
         if (!request) {

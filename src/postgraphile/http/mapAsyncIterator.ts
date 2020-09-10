@@ -66,6 +66,9 @@ export default function mapAsyncIterator<T, U>(
     [$$asyncIterator]() {
       return this;
     },
+    [Symbol.asyncIterator]() {
+      return this;
+    },
   };
   return mappedIterator;
 }
