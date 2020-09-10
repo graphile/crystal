@@ -285,6 +285,13 @@ export async function enhanceHttpServerWithSubscriptions<
       onComplete: ({ socket }, msg) => {
         releaseContextForSocketAndOpId(socket, msg.id);
       },
+      /*
+       * Heroku times out after 55s:
+       *   https://devcenter.heroku.com/articles/error-codes#h15-idle-connection
+       *
+       * The lib itself should manage the keep-alive for client counterparts.
+       */
+      keepAlive: 15000,
     },
     wss,
   );
