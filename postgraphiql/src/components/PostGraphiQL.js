@@ -126,8 +126,10 @@ class PostGraphiQL extends React.PureComponent {
                 this.setState({ socketStatus: 'connected', error: null });
               },
               closed: closeEvent => {
-                console.error('Client socket connection closed', closeEvent);
-                this.setState({ socketStatus: 'closed' });
+                this.setState({
+                  socketStatus: 'closed',
+                  error: new Error(`Socket closed with ${closeEvent.code} ${closeEvent.reason}`),
+                });
               },
             },
           })
@@ -591,7 +593,7 @@ class PostGraphiQL extends React.PureComponent {
         {error ? (
           <div
             style={{ fontSize: '1.5em', marginRight: '0.25em' }}
-            title={error.message || `Error occurred: ${error}`}
+            title={`Socket closed with ${error.code} ${error.reason}`}
             onClick={() => this.setState({ error: null })}
           >
             <span aria-label="ERROR" role="img">
