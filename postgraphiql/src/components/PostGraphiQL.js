@@ -110,12 +110,27 @@ class PostGraphiQL extends React.PureComponent {
     this.setState({ query });
   };
 
-  subscriptionsClient =
-    POSTGRAPHILE_CONFIG.enhanceGraphiql && POSTGRAPHILE_CONFIG.subscriptions
-      ? createClient(websocketUrl, {
-          connectionParams: () => this.getHeaders() || {},
-        })
-      : null;
+  _connectSubscriptions = () => {
+    this.subscriptionsClient =
+      POSTGRAPHILE_CONFIG.enhanceGraphiql && POSTGRAPHILE_CONFIG.subscriptions
+        ? createClient(websocketUrl, {
+            lazy: false,
+            connectionParams: () => this.getHeaders() || {},
+            on: {
+              connecting: () => {
+                this.setState({ socketStatus: 'connecting' });
+              },
+              connected: () => {
+                this.setState({ socketStatus: 'connected', error: null });
+              },
+              closed: () => {
+                console.error('Client socket connection closed', closeEvent);
+                this.setState({ socketStatus: 'closed' });
+              },
+            },
+          })
+        : null;
+  };
 
   activeSubscription = null;
 
@@ -123,42 +138,8 @@ class PostGraphiQL extends React.PureComponent {
     // Update the schema for the first time. Log an error if we fail.
     this.updateSchema();
 
-    // TODO-db-200826 implement required listeners in client
-    // if (this.subscriptionsClient) {
-    //   const unlisten1 = this.subscriptionsClient.on('connected', () => {
-    //     this.setState({ socketStatus: 'connected', error: null });
-    //   });
-    //   const unlisten2 = this.subscriptionsClient.on('disconnected', () => {
-    //     this.setState({ socketStatus: 'disconnected' });
-    //   });
-    //   const unlisten3 = this.subscriptionsClient.on('connecting', () => {
-    //     this.setState({ socketStatus: 'connecting' });
-    //   });
-    //   const unlisten4 = this.subscriptionsClient.on('reconnected', () => {
-    //     this.setState({ socketStatus: 'reconnected', error: null });
-    //     setTimeout(() => {
-    //       this.setState(state =>
-    //         state.socketStatus === 'reconnected' ? { socketStatus: 'connected' } : {},
-    //       );
-    //     }, 5000);
-    //   });
-    //   const unlisten5 = this.subscriptionsClient.on('reconnecting', () => {
-    //     this.setState({ socketStatus: 'reconnecting' });
-    //   });
-    //   const unlisten6 = this.subscriptionsClient.on('error', error => {
-    //     // tslint:disable-next-line no-console
-    //     console.error('Client connection error', error);
-    //     this.setState({ error: new Error('Subscriptions client connection error') });
-    //   });
-    //   this.unlistenSubscriptionsClient = () => {
-    //     unlisten1();
-    //     unlisten2();
-    //     unlisten3();
-    //     unlisten4();
-    //     unlisten5();
-    //     unlisten6();
-    //   };
-    // }
+    // Connect socket if should connect
+    this._connectSubscriptions();
 
     // If we were given a `streamUrl`, we want to construct an `EventSource`
     // and add listeners.
@@ -209,9 +190,10 @@ class PostGraphiQL extends React.PureComponent {
   }
 
   componentWillUnmount() {
-    // TODO-db-200826 implement required listeners in client
-    // if (this.unlistenSubscriptionsClient) this.unlistenSubscriptionsClient();
-
+    // Dispose of connection if available
+    if (this.subscriptionsClient) {
+      this.subscriptionsClient.dispose();
+    }
     // Close out our event source so we get no more events.
     this._eventSource.close();
     this._eventSource = null;
@@ -568,10 +550,8 @@ class PostGraphiQL extends React.PureComponent {
     const icon =
       {
         connecting: '🤔',
-        reconnecting: '😓',
         connected: '😀',
-        reconnected: '😅',
-        disconnected: '☹️',
+        closed: '☹️',
       }[socketStatus] || '😐';
     const tick = (
       <path fill="transparent" stroke="white" d="M30,50 L45,65 L70,30" strokeWidth="8" />
@@ -582,18 +562,14 @@ class PostGraphiQL extends React.PureComponent {
     const decoration =
       {
         connecting: null,
-        reconnecting: null,
         connected: tick,
-        reconnected: tick,
-        disconnected: cross,
+        closed: cross,
       }[socketStatus] || null;
     const color =
       {
         connected: 'green',
-        reconnected: 'green',
         connecting: 'orange',
-        reconnecting: 'orange',
-        disconnected: 'red',
+        closed: 'red',
       }[socketStatus] || 'gray';
     const svg = (
       <svg width="25" height="25" viewBox="0 0 100 100" style={{ marginTop: 4 }}>
@@ -793,11 +769,10 @@ class PostGraphiQL extends React.PureComponent {
                   if (this.state.headersTextValid && this.state.saveHeadersText) {
                     this._storage.set(STORAGE_KEYS.HEADERS_TEXT, this.state.headersText);
                   }
-                  // TODO-db-200826 implement reconnecting with new `connectionParams`
-                  // if (this.state.headersTextValid && this.subscriptionsClient) {
-                  //   // Reconnect to websocket with new headers
-                  //   this.subscriptionsClient.close(false, true);
-                  // }
+                  if (this.state.headersTextValid && this.subscriptionsClient) {
+                    this.subscriptionsClient.dispose();
+                    this._connectSubscriptions();
+                  }
                 },
               )
             }
