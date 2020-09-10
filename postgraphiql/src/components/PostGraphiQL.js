@@ -116,6 +116,7 @@ class PostGraphiQL extends React.PureComponent {
         ? createClient({
             url: websocketUrl,
             lazy: false,
+            retryAttempts: Infinity, // keep retrying while the browser is open
             connectionParams: () => this.getHeaders() || {},
             on: {
               connecting: () => {
