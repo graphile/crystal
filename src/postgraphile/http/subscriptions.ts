@@ -14,7 +14,7 @@ import { createServer, ExecutionResultFormatter } from 'graphql-transport-ws';
 import parseUrl = require('parseurl');
 import { pluginHookFromOptions } from '../pluginHook';
 import { isEmpty } from './createPostGraphileHttpRequestHandler';
-import liveSubscribe from './liveSubscribe'; // TODO-db-200826 add support for live queries
+import liveSubscribe from './liveSubscribe';
 
 interface Deferred<T> extends Promise<T> {
   resolve: (input?: T | PromiseLike<T> | undefined) => void;
