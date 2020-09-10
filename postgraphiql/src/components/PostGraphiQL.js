@@ -335,7 +335,14 @@ class PostGraphiQL extends React.PureComponent {
             });
           };
 
-          const unsubscribe = this.subscriptionsClient.subscribe(graphQLParams, observer);
+          const unsubscribe = this.subscriptionsClient.subscribe(
+            {
+              operationName: graphQLParams.operationName || '',
+              query: graphQLParams.query,
+              variables: graphQLParams.variables || {},
+            },
+            observer,
+          );
           this.setState({ haveActiveSubscription: true });
           this.activeSubscription = { unsubscribe };
           return subscription;
