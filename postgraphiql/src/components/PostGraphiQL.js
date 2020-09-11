@@ -593,7 +593,7 @@ class PostGraphiQL extends React.PureComponent {
         {error ? (
           <div
             style={{ fontSize: '1.5em', marginRight: '0.25em' }}
-            title={`Socket closed with ${error.code} ${error.reason}`}
+            title={error.message || `Error occurred: ${error}`}
             onClick={() => this.setState({ error: null })}
           >
             <span aria-label="ERROR" role="img">
