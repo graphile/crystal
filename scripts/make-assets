@@ -35,7 +35,7 @@ async function main() {
     }
   }
   sponsors.sort();
-  fs.writeFileSync(`${__dirname}/../sponsors.json`, JSON.stringify(sponsors, null, 2));
+  fs.writeFileSync(`${__dirname}/../sponsors.json`, JSON.stringify(sponsors, null, 2) + '\n');
 
   console.log('... Building GraphiQL');
 
@@ -103,7 +103,7 @@ async function main() {
             inlineSource: '.(js|css)$', // embed all javascript and css inline
             inject: 'body',
           }),
-          new HtmlWebpackInlineSourcePlugin(),
+          new HtmlWebpackInlineSourcePlugin(HtmlWebpackPlugin),
         ],
       },
       (err, stats) => {

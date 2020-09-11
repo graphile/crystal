@@ -138,7 +138,7 @@ class PostGraphiQL extends React.PureComponent {
         this.setState({ socketStatus: 'reconnected', error: null });
         setTimeout(() => {
           this.setState(state =>
-            state.socketStatus === 'reconnected' ? { socketStatus: 'connected' } : {}
+            state.socketStatus === 'reconnected' ? { socketStatus: 'connected' } : {},
           );
         }, 5000);
       });
@@ -172,7 +172,7 @@ class PostGraphiQL extends React.PureComponent {
         () => {
           this.updateSchema();
         },
-        false
+        false,
       );
 
       // Add event listeners that just log things in the console.
@@ -184,7 +184,7 @@ class PostGraphiQL extends React.PureComponent {
           this.setState({ error: null });
           this.updateSchema();
         },
-        false
+        false,
       );
       eventSource.addEventListener(
         'error',
@@ -193,7 +193,7 @@ class PostGraphiQL extends React.PureComponent {
           console.error('PostGraphile: Failed to connect to event stream', error);
           this.setState({ error: new Error('Failed to connect to event stream') });
         },
-        false
+        false,
       );
 
       // Store our event source so we can unsubscribe later.
@@ -312,7 +312,7 @@ class PostGraphiQL extends React.PureComponent {
             ? { 'X-PostGraphile-Explain': 'on' }
             : null),
         },
-        extraHeaders
+        extraHeaders,
       ),
       credentials: 'same-origin',
       body: JSON.stringify(graphQLParams),
@@ -503,7 +503,7 @@ class PostGraphiQL extends React.PureComponent {
         window.prettier.format(editor.getValue(), {
           parser: 'graphql',
           plugins: window.prettierPlugins,
-        })
+        }),
       );
     } else {
       return this.graphiql.handlePrettifyQuery();
@@ -523,8 +523,8 @@ class PostGraphiQL extends React.PureComponent {
       this._storage.set(
         'explorerIsOpen',
         // stringify so that storage API will store the state (it deletes key if value is false)
-        JSON.stringify(this.state.explorerIsOpen)
-      )
+        JSON.stringify(this.state.explorerIsOpen),
+      ),
     );
   };
 
@@ -534,13 +534,13 @@ class PostGraphiQL extends React.PureComponent {
       () => {
         this._storage.set(
           STORAGE_KEYS.SAVE_HEADERS_TEXT,
-          JSON.stringify(this.state.saveHeadersText)
+          JSON.stringify(this.state.saveHeadersText),
         );
         this._storage.set(
           STORAGE_KEYS.HEADERS_TEXT,
-          this.state.saveHeadersText ? this.state.headersText : ''
+          this.state.saveHeadersText ? this.state.headersText : '',
         );
-      }
+      },
     );
   };
 
@@ -554,7 +554,7 @@ class PostGraphiQL extends React.PureComponent {
         } catch (e) {
           /* ignore */
         }
-      }
+      },
     );
   };
 
@@ -795,7 +795,7 @@ class PostGraphiQL extends React.PureComponent {
                     // Reconnect to websocket with new headers
                     this.subscriptionsClient.close(false, true);
                   }
-                }
+                },
               )
             }
           >
