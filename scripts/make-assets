@@ -35,7 +35,7 @@ async function main() {
     }
   }
   sponsors.sort();
-  fs.writeFileSync(`${__dirname}/../sponsors.json`, JSON.stringify(sponsors, null, 2));
+  fs.writeFileSync(`${__dirname}/../sponsors.json`, JSON.stringify(sponsors, null, 2) + '\n');
 
   console.log('... Building GraphiQL');
 
