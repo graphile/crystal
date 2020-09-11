@@ -1,8 +1,16 @@
 @import '~graphiql/graphiql.css';
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   margin: 0;
   overflow: hidden;
   width: 100%;
+}
+
+/* Fix weird search alignment issue */
+.graphiql-container .search-box:before {
+  line-height: 1em;
+  top: 1px;
 }
