@@ -4746,10 +4746,10 @@ graphql-parse-resolve-info@4.9.0:
     debug "^4.1.1"
     tslib "^2.0.1"
 
-graphql-transport-ws@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/graphql-transport-ws/-/graphql-transport-ws-1.3.0.tgz#d76ed46959e8f4b0a409e01c4fae7ba7e28b108b"
-  integrity sha512-BF9oXzcsxY5l7TvkcjA/+gy0imljEbIwMptA6Bl4z/+G+ngoEBbEeImjybUFJo2d2aCaBzWzPSlFtV6V9mHMIQ==
+graphql-transport-ws@^1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/graphql-transport-ws/-/graphql-transport-ws-1.4.1.tgz#b3c0755f9c5a3b456d88ba8d3968d51524145ac0"
+  integrity sha512-3bvFlezYo7l7BdtVUwlOvnOK1in0rZ/k7yA9xvhdsCzMSw1dOaSaZEQztZa7hI/6HGHYG4xdLPWw0Et+l73KmA==
   dependencies:
     ws "^7.3.1"
 
