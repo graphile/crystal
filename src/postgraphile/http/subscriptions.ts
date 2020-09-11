@@ -2,15 +2,14 @@ import { Server, IncomingMessage, ServerResponse, OutgoingHttpHeaders } from 'ht
 import { HttpRequestHandler, mixed, Middleware } from '../../interfaces';
 import {
   subscribe as graphqlSubscribe,
+  ExecutionArgs,
   specifiedRules,
   validate,
   GraphQLError,
   parse,
-  ExecutionArgs,
 } from 'graphql';
 import * as WebSocket from 'ws';
 import { createServer, ExecutionResultFormatter } from 'graphql-transport-ws';
-
 import parseUrl = require('parseurl');
 import { pluginHookFromOptions } from '../pluginHook';
 import { isEmpty } from './createPostGraphileHttpRequestHandler';
@@ -192,7 +191,7 @@ export async function enhanceHttpServerWithSubscriptions<
         throw new Error('Only subscriptions are allowed over websocket transport');
       },
       subscribe: options.live ? liveSubscribe : graphqlSubscribe,
-      onConnect: ({ socket, request, connectionParams }) => {
+      onConnect({ socket, request, connectionParams }) {
         socket['postgraphileId'] = ++socketId;
         if (!request) {
           throw new Error('No request!');
@@ -224,7 +223,7 @@ export async function enhanceHttpServerWithSubscriptions<
 
         return true;
       },
-      onSubscribe: async ({ socket }, message, args) => {
+      async onSubscribe({ socket }, message, args) {
         const context = await getContext(socket, message.id);
 
         // Override schema (for --watch)
@@ -288,7 +287,7 @@ export async function enhanceHttpServerWithSubscriptions<
           ExecutionResultFormatter,
         ];
       },
-      onComplete: ({ socket }, msg) => {
+      onComplete({ socket }, msg) {
         releaseContextForSocketAndOpId(socket, msg.id);
       },
       /*
@@ -298,6 +297,7 @@ export async function enhanceHttpServerWithSubscriptions<
        * The lib itself should manage the keep-alive for client counterparts.
        */
       keepAlive: 15000,
+
       ...subscriptionServerOptions,
     },
     wss,
