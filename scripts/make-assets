@@ -103,7 +103,7 @@ async function main() {
             inlineSource: '.(js|css)$', // embed all javascript and css inline
             inject: 'body',
           }),
-          new HtmlWebpackInlineSourcePlugin(),
+          new HtmlWebpackInlineSourcePlugin(HtmlWebpackPlugin),
         ],
       },
       (err, stats) => {
