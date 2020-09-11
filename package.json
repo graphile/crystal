@@ -40,7 +40,7 @@
     "make-assets": "./scripts/make-assets",
     "test": "./scripts/test",
     "prepack": "./scripts/build",
-    "changelog": "(cat scripts/CHANGELOG_HEADER.md; npx conventional-changelog -p angular --release-count 0) > CHANGELOG.md",
+    "changelog": "(cat scripts/CHANGELOG_HEADER.md; npx conventional-changelog -p angular --release-count 0) > CHANGELOG.md && yarn prettier --write CHANGELOG.md",
     "version": "yarn run changelog && git add CHANGELOG.md",
     "-----": "-----",
     "eslint": "eslint --ext .js,.jsx,.ts,.tsx",
