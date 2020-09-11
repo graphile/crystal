@@ -231,7 +231,7 @@ export async function enhanceHttpServerWithSubscriptions<
         args.schema = await getGraphQLSchema();
 
         // if the context value is missing, initialise it
-        args.contextValue = { ...args.contextValue, ...(context as object) }; // mixed?
+        args.contextValue = { ...args.contextValue, ...(context as Record<string, unknown>) };
 
         const meta = {};
 
