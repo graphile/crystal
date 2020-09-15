@@ -8,6 +8,19 @@ to you also.
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
+# [4.9.0](https://github.com/graphile/postgraphile/compare/v4.8.0...v4.9.0) (2020-09-11)
+
+### Bug Fixes
+
+- **graphiql:** fix CSS bundling issue ([#1346](https://github.com/graphile/postgraphile/issues/1346)) ([31f177e](https://github.com/graphile/postgraphile/commit/31f177ea44c47f1097a7cf2256ae717dc3050b60))
+- **graphiql:** fix icon alignment issue ([#1347](https://github.com/graphile/postgraphile/issues/1347)) ([50ccb77](https://github.com/graphile/postgraphile/commit/50ccb77c25978db645849b009c8ff9a5bd0ae220))
+- **types:** update next function for Express compatability ([#1343](https://github.com/graphile/postgraphile/issues/1343)) ([0420c95](https://github.com/graphile/postgraphile/commit/0420c9564f2f38d885f1f24669ac0b5ca1baffb7))
+
+### Features
+
+- allow overriding init fail handling ([#1342](https://github.com/graphile/postgraphile/issues/1342)) ([b06142a](https://github.com/graphile/postgraphile/commit/b06142a4a6481acfca82f4c0962b1441ac259111))
+- upgrade graphile-engine and other dependencies ([#1345](https://github.com/graphile/postgraphile/issues/1345)) ([cd23d26](https://github.com/graphile/postgraphile/commit/cd23d26743d73d4d54b93a15dc89eb1c90f09a4b))
+
 # [4.8.0](https://github.com/graphile/postgraphile/compare/v4.8.0-rc.0...v4.8.0) (2020-08-11)
 
 ### Bug Fixes
