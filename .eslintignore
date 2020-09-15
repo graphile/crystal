@@ -11,3 +11,4 @@ examples
 dist
 CHANGELOG.md
 package.json
+lerna.json

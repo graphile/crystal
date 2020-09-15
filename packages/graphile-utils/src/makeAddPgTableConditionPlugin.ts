@@ -130,7 +130,13 @@ export default function makeAddPgTableConditionPlugin(
         });
 
         return args;
-      }
+      },
+      [],
+      // Make sure we're loaded before PgConnectionArgOrderBy, otherwise
+      // ordering added by conditions will be overridden by the default
+      // ordering.
+      ["PgConnectionArgOrderBy"],
+      []
     );
   };
   plugin.displayName = displayName;
