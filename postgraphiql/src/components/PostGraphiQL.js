@@ -6,6 +6,7 @@ import StorageAPI from 'graphiql/dist/utility/StorageAPI';
 import './postgraphiql.css';
 import { buildClientSchema, introspectionQuery, isType, GraphQLObjectType } from 'graphql';
 import { createClient } from 'graphql-transport-ws';
+import { SubscriptionClient } from 'subscriptions-transport-ws';
 import formatSQL from '../formatSQL';
 
 const defaultQuery = `\
@@ -54,7 +55,7 @@ const {
     graphqlUrl: 'http://localhost:5000/graphql',
     streamUrl: 'http://localhost:5000/graphql/stream',
     enhanceGraphiql: true,
-    subscriptions: true,
+    websockets: 'none', // 'none' | 'v0' | 'v1'
     allowExplain: true,
   },
 } = window;
@@ -102,38 +103,83 @@ class PostGraphiQL extends React.PureComponent {
     headersTextValid: true,
     explorerIsOpen: this._storage.get('explorerIsOpen') === 'false' ? false : true,
     haveActiveSubscription: false,
-    socketStatus:
-      POSTGRAPHILE_CONFIG.enhanceGraphiql && POSTGRAPHILE_CONFIG.subscriptions ? 'pending' : null,
+    socketStatus: POSTGRAPHILE_CONFIG.websockets === 'none' ? null : 'pending',
   };
 
   _onEditQuery = query => {
     this.setState({ query });
   };
 
-  _connectSubscriptions = () => {
-    this.subscriptionsClient =
-      POSTGRAPHILE_CONFIG.enhanceGraphiql && POSTGRAPHILE_CONFIG.subscriptions
-        ? createClient({
-            url: websocketUrl,
-            lazy: false,
-            retryAttempts: Infinity, // keep retrying while the browser is open
-            connectionParams: () => this.getHeaders() || {},
-            on: {
-              connecting: () => {
-                this.setState({ socketStatus: 'connecting' });
-              },
-              connected: () => {
-                this.setState({ socketStatus: 'connected', error: null });
-              },
-              closed: closeEvent => {
-                this.setState({
-                  socketStatus: 'closed',
-                  error: new Error(`Socket closed with ${closeEvent.code} ${closeEvent.reason}`),
-                });
-              },
+  maybeConnectSubscriptions = () => {
+    switch (POSTGRAPHILE_CONFIG.websockets) {
+      case 'none':
+        return;
+      case 'v0':
+        this.subscriptionsClient = new SubscriptionClient(websocketUrl, {
+          reconnect: true,
+          connectionParams: () => this.getHeaders() || {},
+        });
+        const unlisten1 = this.subscriptionsClient.on('connected', () => {
+          this.setState({ socketStatus: 'connected', error: null });
+        });
+        const unlisten2 = this.subscriptionsClient.on('disconnected', () => {
+          this.setState({ socketStatus: 'closed', error: new Error('Socket disconnected') });
+        });
+        const unlisten3 = this.subscriptionsClient.on('connecting', () => {
+          this.setState({ socketStatus: 'connecting' });
+        });
+        const unlisten4 = this.subscriptionsClient.on('reconnected', () => {
+          this.setState({ socketStatus: 'connecting', error: null });
+          setTimeout(() => {
+            this.setState(state =>
+              state.socketStatus === 'reconnected'
+                ? { socketStatus: 'connected', error: null }
+                : {},
+            );
+          }, 5000);
+        });
+        const unlisten5 = this.subscriptionsClient.on('reconnecting', () => {
+          this.setState({ socketStatus: 'connecting' });
+        });
+        const unlisten6 = this.subscriptionsClient.on('error', error => {
+          // tslint:disable-next-line no-console
+          console.error('Client connection error', error);
+          this.setState({ error: new Error('Subscriptions client connection error') });
+        });
+        this.unlistenV0SubscriptionsClient = () => {
+          unlisten1();
+          unlisten2();
+          unlisten3();
+          unlisten4();
+          unlisten5();
+          unlisten6();
+        };
+        return;
+      case 'v1':
+        this.subscriptionsClient = createClient({
+          url: websocketUrl,
+          lazy: false,
+          retryAttempts: Infinity, // keep retrying while the browser is open
+          connectionParams: () => this.getHeaders() || {},
+          on: {
+            connecting: () => {
+              this.setState({ socketStatus: 'connecting' });
             },
-          })
-        : null;
+            connected: () => {
+              this.setState({ socketStatus: 'connected', error: null });
+            },
+            closed: closeEvent => {
+              this.setState({
+                socketStatus: 'closed',
+                error: new Error(`Socket closed with ${closeEvent.code} ${closeEvent.reason}`),
+              });
+            },
+          },
+        });
+        return;
+      default:
+        throw new Error(`Invalid websockets argument ${POSTGRAPHILE_CONFIG.websockets}`);
+    }
   };
 
   activeSubscription = null;
@@ -143,7 +189,7 @@ class PostGraphiQL extends React.PureComponent {
     this.updateSchema();
 
     // Connect socket if should connect
-    this._connectSubscriptions();
+    this.maybeConnectSubscriptions();
 
     // If we were given a `streamUrl`, we want to construct an `EventSource`
     // and add listeners.
@@ -196,7 +242,13 @@ class PostGraphiQL extends React.PureComponent {
   componentWillUnmount() {
     // Dispose of connection if available
     if (this.subscriptionsClient) {
-      this.subscriptionsClient.dispose();
+      if (this.unlistenV0SubscriptionsClient) {
+        // v0
+        this.unlistenV0SubscriptionsClient();
+      } else {
+        // v1
+        this.subscriptionsClient.dispose();
+      }
     }
     // Close out our event source so we get no more events.
     this._eventSource.close();
@@ -338,9 +390,15 @@ class PostGraphiQL extends React.PureComponent {
             });
           };
 
-          const unsubscribe = this.subscriptionsClient.subscribe(graphQLParams, observer);
+          let subscription;
+          if (POSTGRAPHILE_CONFIG.websockets === 'v0') {
+            subscription = this.subscriptionsClient.request(graphQLParams).subscribe(observer);
+          } else if (POSTGRAPHILE_CONFIG.websockets === 'v1') {
+            const unsubscribe = this.subscriptionsClient.subscribe(graphQLParams, observer);
+            subscription = { unsubscribe };
+          }
           this.setState({ haveActiveSubscription: true });
-          this.activeSubscription = { unsubscribe };
+          this.activeSubscription = subscription;
           return subscription;
         },
       };
@@ -775,8 +833,13 @@ class PostGraphiQL extends React.PureComponent {
                   }
                   if (this.state.headersTextValid && this.subscriptionsClient) {
                     // Reconnect to websocket with new headers
-                    this.subscriptionsClient.dispose();
-                    this._connectSubscriptions();
+                    if (POSTGRAPHILE_CONFIG.websockets === 'v0') {
+                      this.subscriptionsClient.close(false, true);
+                    } else {
+                      // v1
+                      this.subscriptionsClient.dispose();
+                      this.maybeConnectSubscriptions();
+                    }
                   }
                 },
               )

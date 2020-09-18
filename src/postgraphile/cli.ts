@@ -117,7 +117,11 @@ program
   )
   .option(
     '-S, --subscriptions',
-    'Enable GraphQL websocket transport support for subscriptions (you still need a subscriptions plugin currently)',
+    'Enable GraphQL support for subscriptions (you still need a subscriptions plugin currently)',
+  )
+  .option(
+    '--websockets <string>',
+    'Choose the version of the websocket transport library. Requires `subscriptions` to be enabled. Defaults to `v0`',
   )
   .option(
     '-L, --live',
@@ -425,6 +429,7 @@ const {
   connection: pgConnectionString,
   ownerConnection,
   subscriptions,
+  websockets = 'v0',
   live,
   watch: watchPg,
   schema: dbSchema,
@@ -792,7 +797,7 @@ if (noServer) {
     }
 
     if (postgraphileOptions.subscriptions) {
-      enhanceHttpServerWithSubscriptions(server, middleware);
+      enhanceHttpServerWithSubscriptions(server, middleware, websockets);
     }
 
     pluginHook('cli:server:created', server, {

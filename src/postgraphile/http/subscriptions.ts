@@ -1,14 +1,17 @@
 import { Server, IncomingMessage, ServerResponse, OutgoingHttpHeaders } from 'http';
-import { HttpRequestHandler, mixed, Middleware } from '../../interfaces';
+import { HttpRequestHandler, mixed, Middleware, PostGraphileOptions } from '../../interfaces';
 import {
   subscribe as graphqlSubscribe,
+  ExecutionResult,
   ExecutionArgs,
   specifiedRules,
   validate,
   GraphQLError,
   parse,
+  DocumentNode,
 } from 'graphql';
 import * as WebSocket from 'ws';
+import { SubscriptionServer, ConnectionContext, ExecutionParams } from 'subscriptions-transport-ws';
 import { createServer, ExecutionResultFormatter } from 'graphql-transport-ws';
 import parseUrl = require('parseurl');
 import { pluginHookFromOptions } from '../pluginHook';
@@ -46,7 +49,11 @@ function deferred<T = void>(): Deferred<T> {
 export async function enhanceHttpServerWithSubscriptions<
   Request extends IncomingMessage = IncomingMessage,
   Response extends ServerResponse = ServerResponse
->(websocketServer: Server, postgraphileMiddleware: HttpRequestHandler): Promise<void> {
+>(
+  websocketServer: Server,
+  postgraphileMiddleware: HttpRequestHandler,
+  websockets: PostGraphileOptions['websockets'] = 'v0',
+): Promise<void> {
   if (websocketServer['__postgraphileSubscriptionsEnabled']) {
     return;
   }
@@ -177,121 +184,281 @@ export async function enhanceHttpServerWithSubscriptions<
     options,
   });
 
-  createServer(
-    {
-      schema,
-      validationRules: staticValidationRules,
-      execute: () => {
-        throw new Error('Only subscriptions are allowed over websocket transport');
-      },
-      subscribe: options.live ? liveSubscribe : graphqlSubscribe,
-      onConnect({ socket, request, connectionParams }) {
-        socket['postgraphileId'] = ++socketId;
-        if (!request) {
-          throw new Error('No request!');
-        }
-        socket['__postgraphileReq'] = request;
+  switch (websockets) {
+    case 'none':
+      break;
+    case 'v0':
+      SubscriptionServer.create(
+        {
+          schema,
+          validationRules: staticValidationRules,
+          execute: () => {
+            throw new Error('Only subscriptions are allowed over websocket transport');
+          },
+          subscribe: options.live
+            ? (
+                schema,
+                document,
+                rootValue,
+                contextValue,
+                variableValues,
+                operationName,
+                fieldResolver,
+              ) =>
+                liveSubscribe({
+                  schema,
+                  document,
+                  rootValue,
+                  contextValue,
+                  variableValues,
+                  operationName,
+                  fieldResolver,
+                })
+            : graphqlSubscribe,
+          onConnect(
+            connectionParams: Record<string, any>,
+            _socket: WebSocket,
+            connectionContext: ConnectionContext,
+          ) {
+            const { socket, request } = connectionContext;
+            socket['postgraphileId'] = ++socketId;
+            if (!request) {
+              throw new Error('No request!');
+            }
+            const normalizedConnectionParams = lowerCaseKeys(connectionParams);
+            request['connectionParams'] = connectionParams;
+            request['normalizedConnectionParams'] = normalizedConnectionParams;
+            socket['__postgraphileReq'] = request;
+            if (!request.headers.authorization && normalizedConnectionParams['authorization']) {
+              /*
+               * Enable JWT support through connectionParams.
+               *
+               * For other headers you'll need to do this yourself for security
+               * reasons (e.g. we don't want to allow overriding of Origin /
+               * Referer / etc)
+               */
+              request.headers.authorization = String(normalizedConnectionParams['authorization']);
+            }
 
-        let normalizedConnectionParams = {};
-        if (connectionParams) {
-          normalizedConnectionParams = lowerCaseKeys(connectionParams);
-          request['connectionParams'] = connectionParams;
-          request['normalizedConnectionParams'] = normalizedConnectionParams;
-        }
-        if (!request.headers.authorization && normalizedConnectionParams['authorization']) {
-          /*
-           * Enable JWT support through connectionParams.
-           *
-           * For other headers you'll need to do this yourself for security
-           * reasons (e.g. we don't want to allow overriding of Origin /
-           * Referer / etc)
-           */
-          request.headers.authorization = String(normalizedConnectionParams['authorization']);
-        }
+            socket['postgraphileHeaders'] = {
+              ...normalizedConnectionParams,
+              // The original headers must win (for security)
+              ...request.headers,
+            };
+          },
+          // tslint:disable-next-line no-any
+          async onOperation(message: any, params: ExecutionParams, socket: WebSocket) {
+            const opId = message.id;
+            const context = await getContext(socket, opId);
 
-        socket['postgraphileHeaders'] = {
-          ...normalizedConnectionParams,
-          // The original headers must win (for security)
-          ...request.headers,
-        };
+            // Override schema (for --watch)
+            params.schema = await getGraphQLSchema();
 
-        return true;
-      },
-      async onSubscribe({ socket }, message, args) {
-        const context = await getContext(socket, message.id);
+            Object.assign(params.context, context);
 
-        // Override schema (for --watch)
-        args.schema = await getGraphQLSchema();
+            const { req, res } = await reqResFromSocket(socket);
+            const meta = {};
+            const formatResponse = <TExecutionResult extends ExecutionResult = ExecutionResult>(
+              response: TExecutionResult,
+            ): TExecutionResult => {
+              if (response.errors) {
+                response.errors = handleErrors(response.errors, req, res);
+              }
+              if (!isEmpty(meta)) {
+                response['meta'] = meta;
+              }
 
-        // if the context value is missing, initialise it
-        args.contextValue = { ...args.contextValue, ...(context as Record<string, unknown>) };
+              return response;
+            };
+            // onOperation is only called once per params object, so there's no race condition here
+            // eslint-disable-next-line require-atomic-updates
+            params.formatResponse = formatResponse;
+            const hookedParams = pluginHook
+              ? pluginHook('postgraphile:ws:onOperation', params, {
+                  message,
+                  params,
+                  socket,
+                  options,
+                })
+              : params;
+            const finalParams: typeof hookedParams & { query: DocumentNode } = {
+              ...hookedParams,
+              query:
+                typeof hookedParams.query !== 'string'
+                  ? hookedParams.query
+                  : parse(hookedParams.query),
+            };
 
-        const meta = {};
-
-        const { req, res } = await reqResFromSocket(socket);
-        const executionResultFormatter: ExecutionResultFormatter = (_ctx, response) => {
-          if (response.errors) {
-            response.errors = handleErrors(response.errors, req, res);
-          }
-          if (!isEmpty(meta)) {
-            response['meta'] = meta;
-          }
-          return response;
-        };
-
-        const hookedParams = pluginHook
-          ? pluginHook('postgraphile:ws:onSubscribe', args, {
-              message,
-              args,
-              socket,
+            // You are strongly encouraged to use
+            // `postgraphile:validationRules:static` if possible - you should
+            // only use this one if you need access to variables.
+            const moreValidationRules = pluginHook('postgraphile:validationRules', [], {
               options,
-            })
-          : args;
+              req,
+              res,
+              variables: params.variables,
+              operationName: params.operationName,
+              meta,
+            });
+            if (moreValidationRules.length) {
+              const validationErrors: ReadonlyArray<GraphQLError> = validate(
+                params.schema,
+                finalParams.query,
+                moreValidationRules,
+              );
+              if (validationErrors.length) {
+                const error = new Error(
+                  'Query validation failed: \n' + validationErrors.map(e => e.message).join('\n'),
+                );
+                error['errors'] = validationErrors;
+                return Promise.reject(error);
+              }
+            }
 
-        // You are strongly encouraged to use
-        // `postgraphile:validationRules:static` if possible - you should
-        // only use this one if you need access to variables.
-        const moreValidationRules = pluginHook('postgraphile:validationRules', [], {
-          options,
-          req,
-          res,
-          variables: args.variableValues,
-          operationName: args.operationName,
-          meta,
-        });
-        if (moreValidationRules.length) {
-          const validationErrors: ReadonlyArray<GraphQLError> = validate(
-            args.schema,
-            typeof hookedParams.document === 'string'
-              ? parse(hookedParams.document)
-              : hookedParams.document,
-            moreValidationRules,
-          );
-          if (validationErrors.length) {
-            const error = new Error(
-              'Query validation failed: \n' + validationErrors.map(e => e.message).join('\n'),
-            );
-            error['errors'] = validationErrors;
-            throw error;
-          }
-        }
+            return finalParams;
+          },
+          onOperationComplete(socket: WebSocket, opId: string) {
+            releaseContextForSocketAndOpId(socket, opId);
+          },
 
-        return [hookedParams, executionResultFormatter] as [
-          ExecutionArgs,
-          ExecutionResultFormatter,
-        ];
-      },
-      onComplete({ socket }, msg) {
-        releaseContextForSocketAndOpId(socket, msg.id);
-      },
-      /*
-       * Heroku times out after 55s:
-       *   https://devcenter.heroku.com/articles/error-codes#h15-idle-connection
-       *
-       * The lib itself should manage the keep-alive for client counterparts.
-       */
-      keepAlive: 15000,
-    },
-    wss,
-  );
+          /*
+           * Heroku times out after 55s:
+           *   https://devcenter.heroku.com/articles/error-codes#h15-idle-connection
+           *
+           * The subscriptions-transport-ws client times out by default 30s after last keepalive:
+           *   https://github.com/apollographql/subscriptions-transport-ws/blob/52758bfba6190169a28078ecbafd2e457a2ff7a8/src/defaults.ts#L1
+           *
+           * GraphQL Playground times out after 20s:
+           *   https://github.com/prisma/graphql-playground/blob/fa91e1b6d0488e6b5563d8b472682fe728ee0431/packages/graphql-playground-react/src/state/sessions/fetchingSagas.ts#L81
+           *
+           * Pick a number under these ceilings.
+           */
+          keepAlive: 15000,
+        },
+        wss,
+      );
+      break;
+    case 'v1': {
+      createServer(
+        {
+          schema,
+          validationRules: staticValidationRules,
+          execute: () => {
+            throw new Error('Only subscriptions are allowed over websocket transport');
+          },
+          subscribe: options.live ? liveSubscribe : graphqlSubscribe,
+          onConnect({ socket, request, connectionParams }) {
+            socket['postgraphileId'] = ++socketId;
+            if (!request) {
+              throw new Error('No request!');
+            }
+            socket['__postgraphileReq'] = request;
+
+            let normalizedConnectionParams = {};
+            if (connectionParams) {
+              normalizedConnectionParams = lowerCaseKeys(connectionParams);
+              request['connectionParams'] = connectionParams;
+              request['normalizedConnectionParams'] = normalizedConnectionParams;
+            }
+            if (!request.headers.authorization && normalizedConnectionParams['authorization']) {
+              /*
+               * Enable JWT support through connectionParams.
+               *
+               * For other headers you'll need to do this yourself for security
+               * reasons (e.g. we don't want to allow overriding of Origin /
+               * Referer / etc)
+               */
+              request.headers.authorization = String(normalizedConnectionParams['authorization']);
+            }
+
+            socket['postgraphileHeaders'] = {
+              ...normalizedConnectionParams,
+              // The original headers must win (for security)
+              ...request.headers,
+            };
+
+            return true;
+          },
+          async onSubscribe({ socket }, message, args) {
+            const context = await getContext(socket, message.id);
+
+            // Override schema (for --watch)
+            args.schema = await getGraphQLSchema();
+
+            // if the context value is missing, initialise it
+            args.contextValue = { ...args.contextValue, ...(context as Record<string, unknown>) };
+
+            const meta = {};
+
+            const { req, res } = await reqResFromSocket(socket);
+            const executionResultFormatter: ExecutionResultFormatter = (_ctx, response) => {
+              if (response.errors) {
+                response.errors = handleErrors(response.errors, req, res);
+              }
+              if (!isEmpty(meta)) {
+                response['meta'] = meta;
+              }
+              return response;
+            };
+
+            const hookedParams = pluginHook
+              ? pluginHook('postgraphile:ws:onSubscribe', args, {
+                  message,
+                  args,
+                  socket,
+                  options,
+                })
+              : args;
+
+            // You are strongly encouraged to use
+            // `postgraphile:validationRules:static` if possible - you should
+            // only use this one if you need access to variables.
+            const moreValidationRules = pluginHook('postgraphile:validationRules', [], {
+              options,
+              req,
+              res,
+              variables: args.variableValues,
+              operationName: args.operationName,
+              meta,
+            });
+            if (moreValidationRules.length) {
+              const validationErrors: ReadonlyArray<GraphQLError> = validate(
+                args.schema,
+                typeof hookedParams.document === 'string'
+                  ? parse(hookedParams.document)
+                  : hookedParams.document,
+                moreValidationRules,
+              );
+              if (validationErrors.length) {
+                const error = new Error(
+                  'Query validation failed: \n' + validationErrors.map(e => e.message).join('\n'),
+                );
+                error['errors'] = validationErrors;
+                throw error;
+              }
+            }
+
+            return [hookedParams, executionResultFormatter] as [
+              ExecutionArgs,
+              ExecutionResultFormatter,
+            ];
+          },
+          onComplete({ socket }, msg) {
+            releaseContextForSocketAndOpId(socket, msg.id);
+          },
+          /*
+           * Heroku times out after 55s:
+           *   https://devcenter.heroku.com/articles/error-codes#h15-idle-connection
+           *
+           * The lib itself should manage the keep-alive for client counterparts.
+           */
+          keepAlive: 15000,
+        },
+        wss,
+      );
+      break;
+    }
+    default:
+      throw new Error(`Invalid websockets argument ${websockets}`);
+  }
 }

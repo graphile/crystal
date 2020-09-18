@@ -183,6 +183,7 @@ export default function createPostGraphileHttpRequestHandler(
     watchPg,
     disableQueryLog,
     enableQueryBatching,
+    websockets = 'v0',
   } = options;
   const subscriptions = !!options.subscriptions;
   const live = !!options.live;
@@ -422,7 +423,7 @@ export default function createPostGraphileHttpRequestHandler(
               ? externalEventStreamRoute || `${externalUrlBase}${eventStreamRoute}`
               : null,
             enhanceGraphiql,
-            subscriptions,
+            websockets: subscriptions ? websockets : 'none',
             allowExplain:
               typeof options.allowExplain === 'function'
                 ? ALLOW_EXPLAIN_PLACEHOLDER
@@ -441,7 +442,7 @@ export default function createPostGraphileHttpRequestHandler(
       } else {
         // Relying on this means that a normal request must come in before an
         // upgrade attempt. It's better to call it manually.
-        enhanceHttpServerWithSubscriptions(server, middleware, { graphqlRoute: graphqlRouteForWs });
+        enhanceHttpServerWithSubscriptions(server, middleware, websockets);
       }
     }
   };
