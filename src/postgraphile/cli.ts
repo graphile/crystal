@@ -125,7 +125,7 @@ program
   )
   .option(
     '--websocket-operations <string>',
-    ' Toggle which GraphQL websocket transport operations are supported. Defaults to `subscriptions`',
+    'Toggle which GraphQL websocket transport operations are supported. Defaults to `subscriptions`',
   )
   .option(
     '-L, --live',
