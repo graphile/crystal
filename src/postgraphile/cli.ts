@@ -124,6 +124,10 @@ program
     'Choose the version of the websocket transport library. Requires `subscriptions` to be enabled. Defaults to `v0`',
   )
   .option(
+    '--websocket-operations <string>',
+    ' Toggle which GraphQL websocket transport operations are supported. Defaults to `subscriptions`',
+  )
+  .option(
     '-L, --live',
     '[EXPERIMENTAL] Enables live-query support via GraphQL subscriptions (sends updated payload any time nested collections/records change). Implies --subscriptions',
   )
@@ -430,6 +434,7 @@ const {
   ownerConnection,
   subscriptions,
   websockets = 'v0',
+  websocketOperations = 'subscriptions',
   live,
   watch: watchPg,
   schema: dbSchema,
@@ -797,7 +802,12 @@ if (noServer) {
     }
 
     if (postgraphileOptions.subscriptions) {
-      enhanceHttpServerWithSubscriptions(server, middleware, websockets);
+      enhanceHttpServerWithSubscriptions({
+        server,
+        middleware,
+        websockets,
+        operations: websocketOperations,
+      });
     }
 
     pluginHook('cli:server:created', server, {

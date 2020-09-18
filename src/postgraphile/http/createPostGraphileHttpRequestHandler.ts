@@ -184,6 +184,7 @@ export default function createPostGraphileHttpRequestHandler(
     disableQueryLog,
     enableQueryBatching,
     websockets = 'v0',
+    websocketOperations = 'subscriptions',
   } = options;
   const subscriptions = !!options.subscriptions;
   const live = !!options.live;
@@ -442,7 +443,12 @@ export default function createPostGraphileHttpRequestHandler(
       } else {
         // Relying on this means that a normal request must come in before an
         // upgrade attempt. It's better to call it manually.
-        enhanceHttpServerWithSubscriptions(server, middleware, websockets);
+        enhanceHttpServerWithSubscriptions({
+          server,
+          middleware,
+          websockets,
+          operations: websocketOperations,
+        });
       }
     }
   };

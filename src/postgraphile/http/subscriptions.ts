@@ -9,6 +9,7 @@ import {
   GraphQLError,
   parse,
   DocumentNode,
+  execute,
 } from 'graphql';
 import * as WebSocket from 'ws';
 import { SubscriptionServer, ConnectionContext, ExecutionParams } from 'subscriptions-transport-ws';
@@ -49,21 +50,19 @@ function deferred<T = void>(): Deferred<T> {
 export async function enhanceHttpServerWithSubscriptions<
   Request extends IncomingMessage = IncomingMessage,
   Response extends ServerResponse = ServerResponse
->(
-  websocketServer: Server,
-  postgraphileMiddleware: HttpRequestHandler,
-  websockets: PostGraphileOptions['websockets'] = 'v0',
-): Promise<void> {
-  if (websocketServer['__postgraphileSubscriptionsEnabled']) {
+>(args: {
+  server: Server;
+  middleware: HttpRequestHandler;
+  websockets: PostGraphileOptions['websockets'];
+  operations: PostGraphileOptions['websocketOperations'];
+}): Promise<void> {
+  const { server, middleware, websockets, operations } = args;
+  if (server['__postgraphileSubscriptionsEnabled']) {
     return;
   }
-  websocketServer['__postgraphileSubscriptionsEnabled'] = true;
-  const {
-    options,
-    getGraphQLSchema,
-    withPostGraphileContextFromReqRes,
-    handleErrors,
-  } = postgraphileMiddleware;
+
+  server['__postgraphileSubscriptionsEnabled'] = true;
+  const { options, getGraphQLSchema, withPostGraphileContextFromReqRes, handleErrors } = middleware;
   const pluginHook = pluginHookFromOptions(options);
   const externalUrlBase = options.externalUrlBase || '';
   const graphqlRoute = options.graphqlRoute || '/graphql';
@@ -171,7 +170,7 @@ export async function enhanceHttpServerWithSubscriptions<
 
   let socketId = 0;
 
-  websocketServer.on('upgrade', (req, socket, head) => {
+  server.on('upgrade', (req, socket, head) => {
     const { pathname = '' } = parseUrl(req) || {};
     const isGraphqlRoute = pathname === externalUrlBase + graphqlRoute;
     if (isGraphqlRoute) {
@@ -192,9 +191,12 @@ export async function enhanceHttpServerWithSubscriptions<
         {
           schema,
           validationRules: staticValidationRules,
-          execute: () => {
-            throw new Error('Only subscriptions are allowed over websocket transport');
-          },
+          execute:
+            operations === 'all'
+              ? execute
+              : () => {
+                  throw new Error('Only subscriptions are allowed over websocket transport');
+                },
           subscribe: options.live
             ? (
                 schema,
@@ -343,9 +345,12 @@ export async function enhanceHttpServerWithSubscriptions<
         {
           schema,
           validationRules: staticValidationRules,
-          execute: () => {
-            throw new Error('Only subscriptions are allowed over websocket transport');
-          },
+          execute:
+            operations === 'all'
+              ? execute
+              : () => {
+                  throw new Error('Only subscriptions are allowed over websocket transport');
+                },
           subscribe: options.live ? liveSubscribe : graphqlSubscribe,
           onConnect({ socket, request, connectionParams }) {
             socket['postgraphileId'] = ++socketId;
