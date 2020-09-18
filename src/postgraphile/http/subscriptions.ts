@@ -46,13 +46,7 @@ function deferred<T = void>(): Deferred<T> {
 export async function enhanceHttpServerWithSubscriptions<
   Request extends IncomingMessage = IncomingMessage,
   Response extends ServerResponse = ServerResponse
->(
-  websocketServer: Server,
-  postgraphileMiddleware: HttpRequestHandler,
-  subscriptionServerOptions?: {
-    keepAlive?: number;
-  },
-): Promise<void> {
+>(websocketServer: Server, postgraphileMiddleware: HttpRequestHandler): Promise<void> {
   if (websocketServer['__postgraphileSubscriptionsEnabled']) {
     return;
   }
@@ -297,8 +291,6 @@ export async function enhanceHttpServerWithSubscriptions<
        * The lib itself should manage the keep-alive for client counterparts.
        */
       keepAlive: 15000,
-
-      ...subscriptionServerOptions,
     },
     wss,
   );
