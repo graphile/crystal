@@ -1933,6 +1933,22 @@ Object {
       "post": null,
       "txt": "Don't fail me now...999999999999999999",
     },
+    "searchTestSummariesList": Array [
+      Object {
+        "id": 1,
+        "totalDuration": Object {
+          "hours": 2,
+          "minutes": 1,
+        },
+      },
+      Object {
+        "id": 2,
+        "totalDuration": Object {
+          "hours": 3,
+          "minutes": 1,
+        },
+      },
+    ],
   },
 }
 `;

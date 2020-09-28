@@ -3796,6 +3796,27 @@ type Query implements Node {
   query: Query!
   queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord
   returnTableWithoutGrants: CompoundKey
+
+  """@simpleCollections only"""
+  searchTestSummaries(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+  ): SearchTestSummariesConnection
   tableQuery(id: Int): Post
 
   """
@@ -3850,6 +3871,37 @@ type QueryOutputTwoRowsRecord {
   leftArm: LeftArm
   post: Post
   txt: String
+}
+
+"""A connection to a list of \`SearchTestSummariesRecord\` values."""
+type SearchTestSummariesConnection {
+  """
+  A list of edges which contains the \`SearchTestSummariesRecord\` and cursor to aid in pagination.
+  """
+  edges: [SearchTestSummaryEdge!]!
+
+  """A list of \`SearchTestSummariesRecord\` objects."""
+  nodes: [SearchTestSummariesRecord!]!
+
+  """
+  The count of *all* \`SearchTestSummariesRecord\` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""The return type of our \`searchTestSummaries\` query."""
+type SearchTestSummariesRecord {
+  id: Int
+  totalDuration: Interval
+}
+
+"""A \`SearchTestSummariesRecord\` edge in the connection."""
+type SearchTestSummaryEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`SearchTestSummariesRecord\` at the end of the edge."""
+  node: SearchTestSummariesRecord!
 }
 
 """All input for the \`tableMutation\` mutation."""

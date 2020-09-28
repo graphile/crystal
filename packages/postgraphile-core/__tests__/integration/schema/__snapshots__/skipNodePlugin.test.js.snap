@@ -6851,6 +6851,13 @@ type Query {
   reservedInputRecordById(id: Int!): ReservedInputRecord
   reservedPatchRecordById(id: Int!): ReservedPatchRecord
   returnTableWithoutGrants: CompoundKey
+  searchTestSummariesList(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Skip the first \`n\` values."""
+    offset: Int
+  ): [SearchTestSummariesRecord]
   similarTable1ById(id: Int!): SimilarTable1
   similarTable2ById(id: Int!): SimilarTable2
   staticBigInteger(
@@ -7193,6 +7200,12 @@ type ReturnVoidMutationPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
+}
+
+"""The return type of our \`searchTestSummaries\` query."""
+type SearchTestSummariesRecord {
+  id: Int
+  totalDuration: Interval
 }
 
 type SimilarTable1 {

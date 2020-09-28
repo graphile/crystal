@@ -4044,6 +4044,13 @@ type Query implements Node {
   query: Query!
   queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord
   returnTableWithoutGrants: CompoundKey
+  searchTestSummariesList(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Skip the first \`n\` values."""
+    offset: Int
+  ): [SearchTestSummariesRecord]
   tableQuery(id: Int): Post
 
   """Reads and enables pagination through a set of \`Person\`."""
@@ -4129,6 +4136,12 @@ type QueryOutputTwoRowsRecord {
   leftArm: LeftArm
   post: Post
   txt: String
+}
+
+"""The return type of our \`searchTestSummaries\` query."""
+type SearchTestSummariesRecord {
+  id: Int
+  totalDuration: Interval
 }
 
 """All input for the \`tableMutation\` mutation."""
@@ -7703,6 +7716,13 @@ type Query implements Node {
   query: Query!
   queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord
   returnTableWithoutGrants: CompoundKey
+  searchTestSummariesList(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Skip the first \`n\` values."""
+    offset: Int
+  ): [SearchTestSummariesRecord]
   tableQuery(id: Int): Post
 
   """Reads and enables pagination through a set of \`Person\`."""
@@ -7738,6 +7758,12 @@ type QueryOutputTwoRowsRecord {
   leftArm: LeftArm
   post: Post
   txt: String
+}
+
+"""The return type of our \`searchTestSummaries\` query."""
+type SearchTestSummariesRecord {
+  id: Int
+  totalDuration: Interval
 }
 
 """All input for the \`tableMutation\` mutation."""

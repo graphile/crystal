@@ -7502,6 +7502,13 @@ type Query implements Node {
   noArgsQuery: Int
   queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord
   returnTableWithoutGrants: CompoundKey
+  searchTestSummariesList(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Skip the first \`n\` values."""
+    offset: Int
+  ): [SearchTestSummariesRecord]
   tableQuery(id: Int): Post
 
   """Reads and enables pagination through a set of \`Person\`."""
@@ -7933,6 +7940,12 @@ type ReturnVoidMutationPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
+}
+
+"""The return type of our \`searchTestSummaries\` query."""
+type SearchTestSummariesRecord {
+  id: Int
+  totalDuration: Interval
 }
 
 type SimilarTable1 implements Node {

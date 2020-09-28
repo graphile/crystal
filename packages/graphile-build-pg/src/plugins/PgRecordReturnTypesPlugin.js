@@ -18,6 +18,7 @@ export default (function PgRecordReturnTypesPlugin(builder) {
         pgGetSelectValueForFieldAndTypeAndModifier: getSelectValueForFieldAndTypeAndModifier,
         getSafeAliasFromResolveInfo,
         getSafeAliasFromAlias,
+        pg2gqlForType,
       } = build;
 
       introspectionResultsByKind.procedure.forEach(proc => {
@@ -129,13 +130,14 @@ export default (function PgRecordReturnTypesPlugin(builder) {
                         },
                       };
                     });
+                    const convertFromPg = pg2gqlForType(outputArgTypes[idx]);
                     return {
                       type: fieldType,
                       resolve(data, _args, _context, resolveInfo) {
                         const safeAlias = getSafeAliasFromResolveInfo(
                           resolveInfo
                         );
-                        return data[safeAlias];
+                        return convertFromPg(data[safeAlias]);
                       },
                     };
                   },

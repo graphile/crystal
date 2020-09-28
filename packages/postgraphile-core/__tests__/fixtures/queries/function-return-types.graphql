@@ -157,6 +157,13 @@
   ) {
     ...OutputTwoRowsFragment
   }
+  searchTestSummariesList {
+    id
+    totalDuration {
+      hours
+      minutes
+    }
+  }
 }
 
 fragment OutputTwoRowsFragment on QueryOutputTwoRowsRecord {

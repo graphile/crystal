@@ -763,6 +763,20 @@ begin
 end;
 $$ language plpgsql stable;
 
+-- Issue #666 from graphile-engine
+CREATE FUNCTION c.search_test_summaries() RETURNS TABLE (
+	id integer,
+	total_duration interval
+) AS $$
+	WITH foo(id, total_duration) AS (
+	VALUES
+		(1, '02:01:00'::interval),
+		(2, '03:01:00'::interval)
+	) SELECT * FROM foo;
+    $$
+LANGUAGE SQL STABLE;
+COMMENT ON FUNCTION c.search_test_summaries() IS E'@simpleCollections only';
+
 -- Begin tests for smart comments
 
 -- Rename table and columns

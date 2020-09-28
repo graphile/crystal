@@ -7582,6 +7582,13 @@ type Q implements N {
   ): ReservedPatchRecord
   reservedPatchRecordById(id: Int!): ReservedPatchRecord
   returnTableWithoutGrants: CompoundKey
+  searchTestSummariesList(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Skip the first \`n\` values."""
+    offset: Int
+  ): [SearchTestSummariesRecord]
 
   """Reads a single \`SimilarTable1\` using its globally unique \`ID\`."""
   similarTable1(
@@ -7967,6 +7974,12 @@ type ReturnVoidMutationPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Q
+}
+
+"""The return type of our \`searchTestSummaries\` query."""
+type SearchTestSummariesRecord {
+  id: Int
+  totalDuration: I
 }
 
 type SimilarTable1 implements N {
