@@ -31,6 +31,7 @@ export {
   watchPostGraphileSchema,
   withPostGraphileContext,
   enhanceHttpServerWithSubscriptions,
+  debugPgClient,
   // Backwards compatability
   postgraphile as postgraphql,
   createPostGraphileSchema as createPostGraphQLSchema,
