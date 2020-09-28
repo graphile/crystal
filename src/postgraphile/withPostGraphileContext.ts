@@ -460,11 +460,9 @@ declare module 'pg' {
 }
 
 /**
- * Adds debug logging funcionality to a Postgres client.
- *
- * @private
+ * Monkey-patches the `query` method of a pg Client to add debugging
+ * functionality. Use with care.
  */
-// tslint:disable no-any
 export function debugPgClient(pgClient: PoolClient, allowExplain = false): PoolClient {
   // If Postgres debugging is enabled, enhance our query function by adding
   // a debug statement.
