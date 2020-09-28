@@ -1,6 +1,10 @@
+import debugFactory from "debug";
 import { GraphQLResolveInfo } from "graphql";
 import { Build, Context } from "graphile-build";
-import { QueryBuilder, SQL } from "graphile-build-pg";
+import { QueryBuilder, SQL, formatSQLForDebugging } from "graphile-build-pg";
+
+// Not really the right scope, but eases debugging for users
+const debugSql = debugFactory("graphile-build-pg:sql");
 
 export type SelectGraphQLResultFromTable = (
   tableFragment: SQL,
@@ -71,6 +75,7 @@ export function makeFieldHelpers<TSource>(
       resolveInfo.rootValue
     );
     const { text, values } = sql.compile(query);
+    if (debugSql.enabled) debugSql("%s", "\n" + formatSQLForDebugging(text));
     const { rows } = await pgClient.query(text, values);
     if (isConnection) {
       return build.pgAddStartEndCursor(rows[0]);
