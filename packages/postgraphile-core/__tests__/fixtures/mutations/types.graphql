@@ -55,14 +55,24 @@ mutation {
         money: 27
         compoundType: { a: 1 }
         nestedCompoundType: { a: { a: 1 } }
-        regproc: "b.type_function" 
-        regprocedure: "b.type_function(int)" 
+        nullablePoint: { x: 0, y: 42 }
+        inet: "192.168.0.0"
+        cidr: "192.168.0.0/16"
+        macaddr: "08:00:2b:01:02:03"
+        regproc: "b.type_function"
+        regprocedure: "b.type_function(int)"
         regoper: "*<>"
         regoperator: "+(integer, integer)"
-        regclass: "c.person" 
-        regtype: "numeric" 
+        regclass: "c.person"
+        regtype: "numeric"
         regconfig: "dutch"
         regdictionary: "dutch_stem"
+        textArrayDomain: ["T1", "T2", "T3"]
+        int8ArrayDomain: [
+          "2098288669218571759"
+          "2098288669218571760"
+          "2098288669218571761"
+        ]
       }
     }
   ) {
@@ -110,12 +120,12 @@ mutation {
         money: 27
         compoundType: { a: 1 }
         nestedCompoundType: { a: { a: 1 } }
-        regproc: "b.type_function" 
-        regprocedure: "b.type_function(int)" 
+        regproc: "b.type_function"
+        regprocedure: "b.type_function(int)"
         regoper: "*<>"
         regoperator: "+(integer, integer)"
-        regclass: "c.person" 
-        regtype: "numeric" 
+        regclass: "c.person"
+        regtype: "numeric"
         regconfig: "dutch"
         regdictionary: "dutch_stem"
       }
@@ -212,6 +222,9 @@ fragment type on Type {
     x
     y
   }
+  inet
+  cidr
+  macaddr
   regproc
   regprocedure
   regoper
@@ -220,4 +233,6 @@ fragment type on Type {
   regtype
   regconfig
   regdictionary
+  textArrayDomain
+  int8ArrayDomain
 }

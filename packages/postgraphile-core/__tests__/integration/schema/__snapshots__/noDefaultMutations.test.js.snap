@@ -2810,6 +2810,7 @@ type Type {
   enumArray: [Color]!
   id: Int!
   inet: InternetAddress
+  int8ArrayDomain: [BigInt]
   interval: Interval!
   intervalArray: [Interval]!
   json: JSON!
@@ -2834,6 +2835,7 @@ type Type {
   regtype: RegType
   smallint: Int!
   textArray: [String]!
+  textArrayDomain: [String]
   time: Time!
   timestamp: Datetime!
   timestamptz: Datetime!

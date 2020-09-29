@@ -250,6 +250,9 @@ create type a.an_int_range as range (
   subtype = a.an_int
 );
 
+create domain c.text_array_domain as text[];
+create domain c.int8_array_domain as int8[];
+
 create table b.types (
   id serial primary key,
   "smallint" smallint not null,
@@ -293,7 +296,9 @@ create table b.types (
   "regclass" regclass, 
   "regtype" regtype, 
   "regconfig" regconfig, 
-  "regdictionary" regdictionary 
+  "regdictionary" regdictionary,
+  "text_array_domain" c.text_array_domain,
+  "int8_array_domain" c.int8_array_domain
 );
 
 comment on table b.types is E'@foreignKey (smallint) references a.post\n@foreignKey (id) references a.post';

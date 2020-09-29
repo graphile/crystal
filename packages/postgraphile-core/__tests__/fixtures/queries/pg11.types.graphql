@@ -8,6 +8,7 @@ fragment type on Type {
   id
   regrole
   regnamespace
+  bigintDomainArrayDomain
 }
 
 fragment typesConnection on TypesConnection {

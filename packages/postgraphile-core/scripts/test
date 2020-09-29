@@ -37,25 +37,25 @@ psql -Xqv ON_ERROR_STOP=1 -f __tests__/kitchen-sink-permissions.sql "$TEST_DATAB
 
 SERVER_VERSION_NUM=$(psql -Xqtv ON_ERROR_STOP=1 -c "show server_version_num;" "$TEST_DATABASE_URL")
 
-if [ $SERVER_VERSION_NUM -ge 100000 ]; then
-  psql -Xqv ON_ERROR_STOP=1 -f __tests__/pg10-schema.sql "$TEST_DATABASE_URL"
+if [ $SERVER_VERSION_NUM -ge 110000 ]; then
+  psql -Xqv ON_ERROR_STOP=1 -f __tests__/pg11-schema.sql "$TEST_DATABASE_URL"
 fi;
 
 clear
 echo "Database reset successfully ✅"
 
 # Now run the tests
-if [ $SERVER_VERSION_NUM -ge 100000 ]; then
+if [ $SERVER_VERSION_NUM -ge 110000 ]; then
   jest --forceExit -i $@
 elif [ $SERVER_VERSION_NUM -ge 90500 ]; then
-  jest --forceExit -i -t "^((?!pg10).)*$" $@
+  jest --forceExit -i -t "^((?!pg11).)*$" $@
 else
-  jest --forceExit -i -t "^((?!pg10|json-overflow).)*$" $@
+  jest --forceExit -i -t "^((?!pg11|json-overflow).)*$" $@
 fi;
 
 # Finally re-populate the database to aid debugging
 psql -Xqv ON_ERROR_STOP=1 -f __tests__/kitchen-sink-data.sql "$TEST_DATABASE_URL"
 
-if [ $SERVER_VERSION_NUM -ge 100000 ]; then
-  psql -Xqv ON_ERROR_STOP=1 -f __tests__/pg10-data.sql "$TEST_DATABASE_URL"
+if [ $SERVER_VERSION_NUM -ge 110000 ]; then
+  psql -Xqv ON_ERROR_STOP=1 -f __tests__/pg11-data.sql "$TEST_DATABASE_URL"
 fi;

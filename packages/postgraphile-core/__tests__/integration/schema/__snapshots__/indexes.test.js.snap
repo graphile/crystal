@@ -8484,6 +8484,7 @@ type Type implements Node {
   enumArray: [Color]!
   id: Int!
   inet: InternetAddress
+  int8ArrayDomain: [BigInt]
   interval: Interval!
   intervalArray: [Interval]!
   json: JSON!
@@ -8519,6 +8520,7 @@ type Type implements Node {
   regtype: RegType
   smallint: Int!
   textArray: [String]!
+  textArrayDomain: [String]
   time: Time!
   timestamp: Datetime!
   timestamptz: Datetime!
@@ -8635,6 +8637,7 @@ input TypeInput {
   enumArray: [Color]!
   id: Int
   inet: InternetAddress
+  int8ArrayDomain: [BigInt]
   interval: IntervalInput!
   intervalArray: [IntervalInput]!
   json: JSON!
@@ -8659,6 +8662,7 @@ input TypeInput {
   regtype: RegType
   smallint: Int!
   textArray: [String]!
+  textArrayDomain: [String]
   time: Time!
   timestamp: Datetime!
   timestamptz: Datetime!
@@ -8682,6 +8686,7 @@ input TypePatch {
   enumArray: [Color]
   id: Int
   inet: InternetAddress
+  int8ArrayDomain: [BigInt]
   interval: IntervalInput
   intervalArray: [IntervalInput]
   json: JSON
@@ -8706,6 +8711,7 @@ input TypePatch {
   regtype: RegType
   smallint: Int
   textArray: [String]
+  textArrayDomain: [String]
   time: Time
   timestamp: Datetime
   timestamptz: Datetime

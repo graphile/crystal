@@ -8345,6 +8345,7 @@ type Type implements Node {
   enumArray: [Color]!
   id: Int!
   inet: InternetAddress
+  int8ArrayDomain: [BigInt]
   interval: Interval!
   intervalArray: [Interval]!
   json: JSON!
@@ -8380,6 +8381,7 @@ type Type implements Node {
   regtype: RegType
   smallint: Int!
   textArray: [String]!
+  textArrayDomain: [String]
   time: Time!
   timestamp: Datetime!
   timestamptz: Datetime!
@@ -8432,6 +8434,9 @@ input TypeCondition {
 
   """Checks for equality with the object’s \`inet\` field."""
   inet: InternetAddress
+
+  """Checks for equality with the object’s \`int8ArrayDomain\` field."""
+  int8ArrayDomain: [BigInt]
 
   """Checks for equality with the object’s \`interval\` field."""
   interval: IntervalInput
@@ -8506,6 +8511,9 @@ input TypeCondition {
 
   """Checks for equality with the object’s \`textArray\` field."""
   textArray: [String]
+
+  """Checks for equality with the object’s \`textArrayDomain\` field."""
+  textArrayDomain: [String]
 
   """Checks for equality with the object’s \`time\` field."""
   time: Time
@@ -8624,6 +8632,7 @@ input TypeInput {
   enumArray: [Color]!
   id: Int
   inet: InternetAddress
+  int8ArrayDomain: [BigInt]
   interval: IntervalInput!
   intervalArray: [IntervalInput]!
   json: JSON!
@@ -8648,6 +8657,7 @@ input TypeInput {
   regtype: RegType
   smallint: Int!
   textArray: [String]!
+  textArrayDomain: [String]
   time: Time!
   timestamp: Datetime!
   timestamptz: Datetime!
@@ -8671,6 +8681,7 @@ input TypePatch {
   enumArray: [Color]
   id: Int
   inet: InternetAddress
+  int8ArrayDomain: [BigInt]
   interval: IntervalInput
   intervalArray: [IntervalInput]
   json: JSON
@@ -8695,6 +8706,7 @@ input TypePatch {
   regtype: RegType
   smallint: Int
   textArray: [String]
+  textArrayDomain: [String]
   time: Time
   timestamp: Datetime
   timestamptz: Datetime
@@ -8790,6 +8802,8 @@ enum TypesOrderBy {
   ID_DESC
   INET_ASC
   INET_DESC
+  INT8_ARRAY_DOMAIN_ASC
+  INT8_ARRAY_DOMAIN_DESC
   INTERVAL_ARRAY_ASC
   INTERVAL_ARRAY_DESC
   INTERVAL_ASC
@@ -8841,6 +8855,8 @@ enum TypesOrderBy {
   SMALLINT_DESC
   TEXT_ARRAY_ASC
   TEXT_ARRAY_DESC
+  TEXT_ARRAY_DOMAIN_ASC
+  TEXT_ARRAY_DOMAIN_DESC
   TIME_ASC
   TIME_DESC
   TIMESTAMP_ASC
@@ -18526,6 +18542,7 @@ type Type implements Node {
   enumArray: [Color]!
   id: Int!
   inet: InternetAddress
+  int8ArrayDomain: [BigInt]
   interval: Interval!
   intervalArray: [Interval]!
   json: JSON!
@@ -18561,6 +18578,7 @@ type Type implements Node {
   regtype: RegType
   smallint: Int!
   textArray: [String]!
+  textArrayDomain: [String]
   time: Time!
   timestamp: Datetime!
   timestamptz: Datetime!
@@ -18613,6 +18631,9 @@ input TypeCondition {
 
   """Checks for equality with the object’s \`inet\` field."""
   inet: InternetAddress
+
+  """Checks for equality with the object’s \`int8ArrayDomain\` field."""
+  int8ArrayDomain: [BigInt]
 
   """Checks for equality with the object’s \`interval\` field."""
   interval: IntervalInput
@@ -18687,6 +18708,9 @@ input TypeCondition {
 
   """Checks for equality with the object’s \`textArray\` field."""
   textArray: [String]
+
+  """Checks for equality with the object’s \`textArrayDomain\` field."""
+  textArrayDomain: [String]
 
   """Checks for equality with the object’s \`time\` field."""
   time: Time
@@ -18805,6 +18829,7 @@ input TypeInput {
   enumArray: [Color]!
   id: Int
   inet: InternetAddress
+  int8ArrayDomain: [BigInt]
   interval: IntervalInput!
   intervalArray: [IntervalInput]!
   json: JSON!
@@ -18829,6 +18854,7 @@ input TypeInput {
   regtype: RegType
   smallint: Int!
   textArray: [String]!
+  textArrayDomain: [String]
   time: Time!
   timestamp: Datetime!
   timestamptz: Datetime!
@@ -18852,6 +18878,7 @@ input TypePatch {
   enumArray: [Color]
   id: Int
   inet: InternetAddress
+  int8ArrayDomain: [BigInt]
   interval: IntervalInput
   intervalArray: [IntervalInput]
   json: JSON
@@ -18876,6 +18903,7 @@ input TypePatch {
   regtype: RegType
   smallint: Int
   textArray: [String]
+  textArrayDomain: [String]
   time: Time
   timestamp: Datetime
   timestamptz: Datetime
@@ -18971,6 +18999,8 @@ enum TypesOrderBy {
   ID_DESC
   INET_ASC
   INET_DESC
+  INT8_ARRAY_DOMAIN_ASC
+  INT8_ARRAY_DOMAIN_DESC
   INTERVAL_ARRAY_ASC
   INTERVAL_ARRAY_DESC
   INTERVAL_ASC
@@ -19022,6 +19052,8 @@ enum TypesOrderBy {
   SMALLINT_DESC
   TEXT_ARRAY_ASC
   TEXT_ARRAY_DESC
+  TEXT_ARRAY_DOMAIN_ASC
+  TEXT_ARRAY_DOMAIN_DESC
   TIME_ASC
   TIME_DESC
   TIMESTAMP_ASC

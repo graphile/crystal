@@ -3938,6 +3938,7 @@ type Type {
   enum: Color!
   enumArray: [Color]!
   inet: InternetAddress
+  int8ArrayDomain: [BigInt]
   interval: Interval!
   intervalArray: [Interval]!
   json: JSON!
@@ -3963,6 +3964,7 @@ type Type {
   rowId: Int!
   smallint: Int!
   textArray: [String]!
+  textArrayDomain: [String]
   time: Time!
   timestamp: Datetime!
   timestamptz: Datetime!

@@ -92,6 +92,19 @@ insert into b.types values (
   null,
   null,
   point(1,3),
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
   null
 );
 
@@ -138,7 +151,9 @@ insert into b.types values (
   'b.types', 
   'int', 
   'english', 
-  'simple'
+  'simple',
+  ARRAY['1 year', '2 months', '3 days']::text[],
+  ARRAY[1, 2, 2098288669218571760]
 );
 
 insert into c.edge_case values

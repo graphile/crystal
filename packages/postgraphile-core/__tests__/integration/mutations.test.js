@@ -19,7 +19,7 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20;
 const kitchenSinkData = () =>
   readFile(`${__dirname}/../kitchen-sink-data.sql`, "utf8");
 
-const pg10Data = () => readFile(`${__dirname}/../pg10-data.sql`, "utf8");
+const pg11Data = () => readFile(`${__dirname}/../pg11-data.sql`, "utf8");
 
 const dSchemaComments = () =>
   readFile(`${__dirname}/../kitchen-sink-d-schema-comments.sql`, "utf8");
@@ -38,25 +38,25 @@ beforeAll(() => {
       gqlSchema,
       dSchema,
       inheritenceSchema,
-      pg10Schema,
+      pg11Schema,
       useCustomNetworkScalarsSchema,
-      pg10UseCustomNetworkScalarsSchema,
+      pg11UseCustomNetworkScalarsSchema,
       enumTables,
       geometry,
     ] = await Promise.all([
       createPostGraphileSchema(pgClient, ["a", "b", "c"]),
       createPostGraphileSchema(pgClient, ["d"]),
       createPostGraphileSchema(pgClient, ["inheritence"]),
-      serverVersionNum >= 100000
-        ? createPostGraphileSchema(pgClient, ["pg10"])
+      serverVersionNum >= 110000
+        ? createPostGraphileSchema(pgClient, ["pg11"])
         : null,
       createPostGraphileSchema(pgClient, ["network_types"], {
         graphileBuildOptions: {
           pgUseCustomNetworkScalars: true,
         },
       }),
-      serverVersionNum >= 100000
-        ? createPostGraphileSchema(pgClient, ["pg10"], {
+      serverVersionNum >= 110000
+        ? createPostGraphileSchema(pgClient, ["pg11"], {
             graphileBuildOptions: {
               pgUseCustomNetworkScalars: true,
             },
@@ -78,9 +78,9 @@ beforeAll(() => {
       gqlSchema,
       dSchema,
       inheritenceSchema,
-      pg10Schema,
+      pg11Schema,
       useCustomNetworkScalarsSchema,
-      pg10UseCustomNetworkScalarsSchema,
+      pg11UseCustomNetworkScalarsSchema,
       rbacSchema,
       enumTables,
       geometry,
@@ -99,9 +99,9 @@ beforeAll(() => {
       gqlSchema,
       dSchema,
       inheritenceSchema,
-      pg10Schema,
+      pg11Schema,
       useCustomNetworkScalarsSchema,
-      pg10UseCustomNetworkScalarsSchema,
+      pg11UseCustomNetworkScalarsSchema,
       rbacSchema,
       enumTables,
       geometry,
@@ -118,8 +118,8 @@ beforeAll(() => {
       await pgClient.query(await kitchenSinkData());
 
       const serverVersionNum = await getServerVersionNum(pgClient);
-      if (serverVersionNum >= 100000) {
-        await pgClient.query(await pg10Data());
+      if (serverVersionNum >= 110000) {
+        await pgClient.query(await pg11Data());
       }
 
       let schemaToUse;
@@ -131,16 +131,16 @@ beforeAll(() => {
         schemaToUse = enumTables;
       } else if (fileName.startsWith("geometry.")) {
         schemaToUse = geometry;
-      } else if (fileName.startsWith("pg10.")) {
-        if (serverVersionNum < 100000) {
+      } else if (fileName.startsWith("pg11.")) {
+        if (serverVersionNum < 110000) {
           // eslint-disable-next-line
-          console.log("Skipping test as PG version is less than 10");
+          console.log("Skipping test as PG version is less than 11");
           return;
         }
-        if (fileName.startsWith("pg10.network_types.")) {
-          schemaToUse = pg10UseCustomNetworkScalarsSchema;
+        if (fileName.startsWith("pg11.network_types.")) {
+          schemaToUse = pg11UseCustomNetworkScalarsSchema;
         } else {
-          schemaToUse = pg10Schema;
+          schemaToUse = pg11Schema;
         }
       } else if (fileName.startsWith("network_types.")) {
         schemaToUse = useCustomNetworkScalarsSchema;

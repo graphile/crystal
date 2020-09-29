@@ -255,9 +255,13 @@ export default (function PgTypesPlugin(
       ];
 
       const tweakToJson = fragment => fragment; // Since everything is to_json'd now, just pass through
+      const tweakToJsonArray = fragment => fragment;
       const tweakToText = fragment => sql.fragment`(${fragment})::text`;
+      const tweakToTextArray = fragment => sql.fragment`(${fragment})::text[]`;
       const tweakToNumericText = fragment =>
         sql.fragment`(${fragment})::numeric::text`;
+      const tweakToNumericTextArray = fragment =>
+        sql.fragment`(${fragment})::numeric[]::text[]`;
       const pgTweaksByTypeIdAndModifer = {};
       const pgTweaksByTypeId = {
         // '::text' rawTypes
@@ -292,13 +296,65 @@ export default (function PgTypesPlugin(
         if (tweaker) {
           return tweaker(fragment, resolveData);
         } else if (type.domainBaseType) {
-          // TODO: check that domains don't support atttypemod
-          return pgTweakFragmentForTypeAndModifier(
-            fragment,
-            type.domainBaseType,
-            type.domainBaseTypeModifier,
-            resolveData
-          );
+          if (type.domainBaseType.isPgArray) {
+            // If we have a domain that's for example an `int8[]`, we must
+            // process it into a `text[]` otherwise we risk loss of accuracy
+            // when taking PostgreSQL's JSON into Node.js.
+            const arrayItemType = type.domainBaseType.arrayItemType;
+
+            const domainBaseTypeModifierKey =
+              type.domainBaseTypeModifier != null
+                ? type.domainBaseTypeModifier
+                : -1;
+            const arrayItemTweaker =
+              (pgTweaksByTypeIdAndModifer[arrayItemType.id] &&
+                pgTweaksByTypeIdAndModifer[arrayItemType.id][
+                  domainBaseTypeModifierKey
+                ]) ||
+              pgTweaksByTypeId[arrayItemType.id];
+
+            // If it's a domain over a known type array (e.g. `bigint[]`), use
+            // the Array version of the tweaker.
+            switch (arrayItemTweaker) {
+              case tweakToText:
+                return tweakToTextArray(fragment);
+              case tweakToNumericText:
+                return tweakToNumericTextArray(fragment);
+              case tweakToJson:
+                return tweakToJsonArray(fragment);
+            }
+
+            // If we get here, it's not a simple type, so use our
+            // infrastructure to figure out what tweaks to apply to the array
+            // item.
+
+            const sqlVal = sql.fragment`val`;
+            const innerFragment = pgTweakFragmentForTypeAndModifier(
+              sqlVal,
+              arrayItemType,
+              type.domainBaseTypeModifier,
+              resolveData
+            );
+
+            if (innerFragment === sqlVal) {
+              // There was no tweak applied to the fragment, no change
+              // necessary.
+              return fragment;
+            } else {
+              // Tweaking was necessary, process each item in the array in this
+              // way, and then return the resulting array, being careful that
+              // nulls are preserved.
+              return sql.fragment`(case when ${fragment} is null then null else array(select ${innerFragment} from unnest(${fragment}) as unnest(${sqlVal})) end)`;
+            }
+          } else {
+            // TODO: check that domains don't support atttypemod
+            return pgTweakFragmentForTypeAndModifier(
+              fragment,
+              type.domainBaseType,
+              type.domainBaseTypeModifier,
+              resolveData
+            );
+          }
         } else if (type.isPgArray) {
           const error = new Error(
             `Internal graphile-build-pg error: should not attempt to tweak an array, please process array before tweaking (type: "${type.namespaceName}.${type.name}")`

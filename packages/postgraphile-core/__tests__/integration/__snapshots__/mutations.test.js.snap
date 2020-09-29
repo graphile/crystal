@@ -252,6 +252,7 @@ Object {
         },
         "bigint": "467131188225",
         "boolean": false,
+        "cidr": "192.168.0.0/16",
         "compoundType": Object {
           "a": 123,
           "b": "abc",
@@ -281,6 +282,12 @@ Object {
           "GREEN",
         ],
         "id": 201,
+        "inet": null,
+        "int8ArrayDomain": Array [
+          "2098288669218571759",
+          "2098288669218571760",
+          "2098288669218571761",
+        ],
         "interval": Object {
           "days": 4,
           "hours": 3,
@@ -309,6 +316,7 @@ Object {
         ],
         "json": "{\\"x\\":1,\\"y\\":2,\\"z\\":3}",
         "jsonb": "{\\"a\\":1,\\"b\\":2,\\"c\\":3}",
+        "macaddr": "0c:af:ec:0f:fe:e0",
         "money": 1234567.89,
         "nestedCompoundType": Object {
           "a": Object {
@@ -356,6 +364,11 @@ Object {
           "water",
           "spout",
           "?",
+        ],
+        "textArrayDomain": Array [
+          "TEXT 2098288669218571759",
+          "TEXT 2098288669218571760",
+          "TEXT 2098288669218571761",
         ],
         "time": "19:13:18.625699",
         "timestamp": "2016-10-07T16:12:21.747269",
@@ -1327,7 +1340,7 @@ Object {
 }
 `;
 
-exports[`pg10.identity.graphql 1`] = `
+exports[`pg11.identity.graphql 1`] = `
 Object {
   "data": Object {
     "a": Object {
@@ -1352,7 +1365,7 @@ Object {
 }
 `;
 
-exports[`pg10.network_types.createNetwork.graphql 1`] = `
+exports[`pg11.network_types.createNetwork.graphql 1`] = `
 Object {
   "data": Object {
     "createNetwork": Object {
@@ -1369,20 +1382,30 @@ Object {
 }
 `;
 
-exports[`pg10.types.graphql 1`] = `
+exports[`pg11.types.graphql 1`] = `
 Object {
   "data": Object {
     "createType": Object {
       "type": Object {
-        "id": 11,
+        "bigintDomainArrayDomain": Array [
+          "2098288669218571759",
+          "2098288669218571760",
+          "2098288669218571761",
+        ],
+        "id": 15,
         "regnamespace": "c",
         "regrole": "postgraphile_test_visitor",
       },
     },
     "updateTypeById": Object {
       "type": Object {
+        "bigintDomainArrayDomain": Array [
+          "2098288669218571759",
+          "2098288669218571760",
+          "2098288669218571761",
+        ],
         "id": 12,
-        "regnamespace": "pg10",
+        "regnamespace": "pg11",
         "regrole": "postgraphile_test_authenticator",
       },
     },
@@ -1874,6 +1897,7 @@ Object {
         },
         "bigint": "1",
         "boolean": true,
+        "cidr": null,
         "compoundType": Object {
           "a": 1,
           "b": null,
@@ -1892,8 +1916,11 @@ Object {
           "BLUE",
         ],
         "id": 1,
+        "inet": null,
+        "int8ArrayDomain": null,
         "json": "{\\"json\\":true}",
         "jsonb": "{\\"jsonb\\":true}",
+        "macaddr": null,
         "money": 27,
         "nestedCompoundType": Object {
           "a": Object {
@@ -1938,6 +1965,7 @@ Object {
         "textArray": Array [
           "Hi",
         ],
+        "textArrayDomain": null,
       },
     },
     "typeFunctionConnectionMutation": Object {
@@ -1955,6 +1983,7 @@ Object {
           },
           "bigint": "467131188225",
           "boolean": true,
+          "cidr": null,
           "compoundType": Object {
             "a": 1,
             "b": "2",
@@ -1972,8 +2001,11 @@ Object {
             "RED",
           ],
           "id": 11,
+          "inet": null,
+          "int8ArrayDomain": null,
           "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3,\\"d\\":{\\"e\\":4,\\"f\\":5,\\"g\\":[6,7,8,\\"x\\",false,null]}}",
           "jsonb": "{\\"1\\":\\"a\\",\\"2\\":\\"b\\",\\"3\\":\\"c\\",\\"4\\":{\\"5\\":\\"d\\",\\"6\\":\\"e\\",\\"7\\":[\\"f\\",\\"g\\",\\"h\\",42,true,null]}}",
+          "macaddr": null,
           "money": 9876543.21,
           "nestedCompoundType": Object {
             "a": Object {
@@ -2030,6 +2062,7 @@ Object {
             "met",
             "you",
           ],
+          "textArrayDomain": null,
         },
         Object {
           "anIntRange": Object {
@@ -2044,6 +2077,7 @@ Object {
           },
           "bigint": "467131188225",
           "boolean": true,
+          "cidr": "192.168.0.0/24",
           "compoundType": Object {
             "a": null,
             "b": null,
@@ -2061,8 +2095,15 @@ Object {
             "RED",
           ],
           "id": 12,
+          "inet": "192.168.0.0",
+          "int8ArrayDomain": Array [
+            "1",
+            "2",
+            "2098288669218571760",
+          ],
           "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3,\\"d\\":{\\"e\\":4,\\"f\\":5,\\"g\\":[6,7,8,\\"x\\",false,null]}}",
           "jsonb": "{\\"1\\":\\"a\\",\\"2\\":\\"b\\",\\"3\\":\\"c\\",\\"4\\":{\\"5\\":\\"d\\",\\"6\\":\\"e\\",\\"7\\":[\\"f\\",\\"g\\",\\"h\\",42,true,null]}}",
+          "macaddr": "fe:ed:de:ad:be:ef",
           "money": 9876543.21,
           "nestedCompoundType": Object {
             "a": Object {
@@ -2118,6 +2159,11 @@ Object {
             "just",
             "met",
             "you",
+          ],
+          "textArrayDomain": Array [
+            "1 year",
+            "2 months",
+            "3 days",
           ],
         },
       ],
@@ -2137,6 +2183,7 @@ Object {
           },
           "bigint": "467131188225",
           "boolean": true,
+          "cidr": null,
           "compoundType": Object {
             "a": 1,
             "b": "2",
@@ -2154,8 +2201,11 @@ Object {
             "RED",
           ],
           "id": 11,
+          "inet": null,
+          "int8ArrayDomain": null,
           "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3,\\"d\\":{\\"e\\":4,\\"f\\":5,\\"g\\":[6,7,8,\\"x\\",false,null]}}",
           "jsonb": "{\\"1\\":\\"a\\",\\"2\\":\\"b\\",\\"3\\":\\"c\\",\\"4\\":{\\"5\\":\\"d\\",\\"6\\":\\"e\\",\\"7\\":[\\"f\\",\\"g\\",\\"h\\",42,true,null]}}",
+          "macaddr": null,
           "money": 9876543.21,
           "nestedCompoundType": Object {
             "a": Object {
@@ -2212,6 +2262,7 @@ Object {
             "met",
             "you",
           ],
+          "textArrayDomain": null,
         },
         Object {
           "anIntRange": Object {
@@ -2226,6 +2277,7 @@ Object {
           },
           "bigint": "467131188225",
           "boolean": true,
+          "cidr": "192.168.0.0/24",
           "compoundType": Object {
             "a": null,
             "b": null,
@@ -2243,8 +2295,15 @@ Object {
             "RED",
           ],
           "id": 12,
+          "inet": "192.168.0.0",
+          "int8ArrayDomain": Array [
+            "1",
+            "2",
+            "2098288669218571760",
+          ],
           "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3,\\"d\\":{\\"e\\":4,\\"f\\":5,\\"g\\":[6,7,8,\\"x\\",false,null]}}",
           "jsonb": "{\\"1\\":\\"a\\",\\"2\\":\\"b\\",\\"3\\":\\"c\\",\\"4\\":{\\"5\\":\\"d\\",\\"6\\":\\"e\\",\\"7\\":[\\"f\\",\\"g\\",\\"h\\",42,true,null]}}",
+          "macaddr": "fe:ed:de:ad:be:ef",
           "money": 9876543.21,
           "nestedCompoundType": Object {
             "a": Object {
@@ -2301,6 +2360,11 @@ Object {
             "met",
             "you",
           ],
+          "textArrayDomain": Array [
+            "1 year",
+            "2 months",
+            "3 days",
+          ],
         },
       ],
     },
@@ -2318,6 +2382,7 @@ Object {
         },
         "bigint": "467131188225",
         "boolean": true,
+        "cidr": null,
         "compoundType": Object {
           "a": 1,
           "b": "2",
@@ -2335,8 +2400,11 @@ Object {
           "RED",
         ],
         "id": 11,
+        "inet": null,
+        "int8ArrayDomain": null,
         "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3,\\"d\\":{\\"e\\":4,\\"f\\":5,\\"g\\":[6,7,8,\\"x\\",false,null]}}",
         "jsonb": "{\\"1\\":\\"a\\",\\"2\\":\\"b\\",\\"3\\":\\"c\\",\\"4\\":{\\"5\\":\\"d\\",\\"6\\":\\"e\\",\\"7\\":[\\"f\\",\\"g\\",\\"h\\",42,true,null]}}",
+        "macaddr": null,
         "money": 9876543.21,
         "nestedCompoundType": Object {
           "a": Object {
@@ -2393,6 +2461,7 @@ Object {
           "met",
           "you",
         ],
+        "textArrayDomain": null,
       },
     },
     "updateTypeById": Object {
@@ -2409,6 +2478,7 @@ Object {
         },
         "bigint": "1",
         "boolean": true,
+        "cidr": "192.168.0.0/16",
         "compoundType": Object {
           "a": 1,
           "b": null,
@@ -2427,8 +2497,15 @@ Object {
           "BLUE",
         ],
         "id": 11,
+        "inet": "192.168.0.0",
+        "int8ArrayDomain": Array [
+          "2098288669218571759",
+          "2098288669218571760",
+          "2098288669218571761",
+        ],
         "json": "{\\"json\\":true}",
         "jsonb": "{\\"jsonb\\":true}",
+        "macaddr": "08:00:2b:01:02:03",
         "money": 27,
         "nestedCompoundType": Object {
           "a": Object {
@@ -2445,7 +2522,10 @@ Object {
         },
         "nullableCompoundType": null,
         "nullableNestedCompoundType": null,
-        "nullablePoint": null,
+        "nullablePoint": Object {
+          "x": 0,
+          "y": 42,
+        },
         "nullableRange": null,
         "numrange": Object {
           "end": Object {
@@ -2472,6 +2552,11 @@ Object {
         "smallint": 1,
         "textArray": Array [
           "Hi",
+        ],
+        "textArrayDomain": Array [
+          "T1",
+          "T2",
+          "T3",
         ],
       },
     },

@@ -5,7 +5,12 @@ mutation {
       id: 12
       typePatch: {
         regrole: "postgraphile_test_authenticator"
-        regnamespace: "pg10"
+        regnamespace: "pg11"
+        bigintDomainArrayDomain: [
+          "2098288669218571759"
+          "2098288669218571760"
+          "2098288669218571761"
+        ]
       }
     }
   ) {
@@ -19,6 +24,11 @@ mutation {
       type: {
         regrole: "postgraphile_test_visitor"
         regnamespace: "c"
+        bigintDomainArrayDomain: [
+          "2098288669218571759"
+          "2098288669218571760"
+          "2098288669218571761"
+        ]
       }
     }
   ) {
@@ -32,4 +42,5 @@ fragment type on Type {
   id
   regrole
   regnamespace
+  bigintDomainArrayDomain
 }

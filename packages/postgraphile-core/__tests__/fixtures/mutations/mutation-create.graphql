@@ -102,6 +102,16 @@ mutation CreateMutation($config: KeyValueHash!) {
       },
       cidr: "192.168.0.0/16",
       macaddr: "0cafec0ffee0"
+      textArrayDomain: [
+        "TEXT 2098288669218571759"
+        "TEXT 2098288669218571760"
+        "TEXT 2098288669218571761"
+      ]
+      int8ArrayDomain: [
+        "2098288669218571759"
+        "2098288669218571760"
+        "2098288669218571761"
+      ]
     }
   }) {
     clientMutationId
@@ -149,6 +159,11 @@ mutation CreateMutation($config: KeyValueHash!) {
       }
       point { x y }
       nullablePoint { x y }
+      inet
+      cidr
+      macaddr
+      textArrayDomain
+      int8ArrayDomain
     }
     query { nodeId }
   }

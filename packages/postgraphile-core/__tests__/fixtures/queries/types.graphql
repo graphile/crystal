@@ -131,6 +131,11 @@ fragment type on Type {
     x
     y
   }
+  inet
+  cidr
+  macaddr
+  textArrayDomain
+  int8ArrayDomain
   postBySmallint {
     id
     headline

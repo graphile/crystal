@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`prints a schema to test PG10-specific features with custom network scalars 1`] = `
+exports[`prints a schema to test PG11-specific features with custom network scalars 1`] = `
 """A connection to a list of \`AlwaysAsIdentity\` values."""
 type AlwaysAsIdentitiesConnection {
   """
@@ -73,6 +73,8 @@ Represents an update to a \`AlwaysAsIdentity\`. Fields that are set will be upda
 input AlwaysAsIdentityPatch {
   t: String
 }
+
+scalar BigintDomain
 
 """A connection to a list of \`ByDefaultAsIdentity\` values."""
 type ByDefaultAsIdentitiesConnection {
@@ -959,6 +961,7 @@ scalar RegNamespace
 scalar RegRole
 
 type Type implements Node {
+  bigintDomainArrayDomain: [BigintDomain]
   id: Int!
 
   """
@@ -973,6 +976,9 @@ type Type implements Node {
 A condition to be used against \`Type\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
 input TypeCondition {
+  """Checks for equality with the object’s \`bigintDomainArrayDomain\` field."""
+  bigintDomainArrayDomain: [BigintDomain]
+
   """Checks for equality with the object’s \`id\` field."""
   id: Int
 
@@ -985,6 +991,7 @@ input TypeCondition {
 
 """An input for mutations affecting \`Type\`"""
 input TypeInput {
+  bigintDomainArrayDomain: [BigintDomain]
   id: Int
   regnamespace: RegNamespace
   regrole: RegRole
@@ -992,6 +999,7 @@ input TypeInput {
 
 """Represents an update to a \`Type\`. Fields that are set will be updated."""
 input TypePatch {
+  bigintDomainArrayDomain: [BigintDomain]
   id: Int
   regnamespace: RegNamespace
   regrole: RegRole
@@ -1025,6 +1033,8 @@ type TypesEdge {
 
 """Methods to use when ordering \`Type\`."""
 enum TypesOrderBy {
+  BIGINT_DOMAIN_ARRAY_DOMAIN_ASC
+  BIGINT_DOMAIN_ARRAY_DOMAIN_DESC
   ID_ASC
   ID_DESC
   NATURAL
@@ -1266,7 +1276,7 @@ type UpdateTypePayload {
 
 `;
 
-exports[`prints a schema to test PG10-specific features with default options 1`] = `
+exports[`prints a schema to test PG11-specific features with default options 1`] = `
 """A connection to a list of \`AlwaysAsIdentity\` values."""
 type AlwaysAsIdentitiesConnection {
   """
@@ -1339,6 +1349,8 @@ Represents an update to a \`AlwaysAsIdentity\`. Fields that are set will be upda
 input AlwaysAsIdentityPatch {
   t: String
 }
+
+scalar BigintDomain
 
 """A connection to a list of \`ByDefaultAsIdentity\` values."""
 type ByDefaultAsIdentitiesConnection {
@@ -2216,6 +2228,7 @@ scalar RegNamespace
 scalar RegRole
 
 type Type implements Node {
+  bigintDomainArrayDomain: [BigintDomain]
   id: Int!
 
   """
@@ -2230,6 +2243,9 @@ type Type implements Node {
 A condition to be used against \`Type\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
 input TypeCondition {
+  """Checks for equality with the object’s \`bigintDomainArrayDomain\` field."""
+  bigintDomainArrayDomain: [BigintDomain]
+
   """Checks for equality with the object’s \`id\` field."""
   id: Int
 
@@ -2242,6 +2258,7 @@ input TypeCondition {
 
 """An input for mutations affecting \`Type\`"""
 input TypeInput {
+  bigintDomainArrayDomain: [BigintDomain]
   id: Int
   regnamespace: RegNamespace
   regrole: RegRole
@@ -2249,6 +2266,7 @@ input TypeInput {
 
 """Represents an update to a \`Type\`. Fields that are set will be updated."""
 input TypePatch {
+  bigintDomainArrayDomain: [BigintDomain]
   id: Int
   regnamespace: RegNamespace
   regrole: RegRole
@@ -2282,6 +2300,8 @@ type TypesEdge {
 
 """Methods to use when ordering \`Type\`."""
 enum TypesOrderBy {
+  BIGINT_DOMAIN_ARRAY_DOMAIN_ASC
+  BIGINT_DOMAIN_ARRAY_DOMAIN_DESC
   ID_ASC
   ID_DESC
   NATURAL

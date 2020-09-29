@@ -8347,6 +8347,8 @@ type Type implements Node {
   regtype: RegType
   regconfig: RegConfig
   regdictionary: RegDictionary
+  textArrayDomain: [String]
+  int8ArrayDomain: [BigInt]
 
   """Reads a single \`Post\` that is related to this \`Type\`."""
   postBySmallint: Post
@@ -8489,6 +8491,12 @@ input TypeCondition {
 
   """Checks for equality with the object’s \`regdictionary\` field."""
   regdictionary: RegDictionary
+
+  """Checks for equality with the object’s \`textArrayDomain\` field."""
+  textArrayDomain: [String]
+
+  """Checks for equality with the object’s \`int8ArrayDomain\` field."""
+  int8ArrayDomain: [BigInt]
 }
 
 """All input for the \`typeFunctionConnectionMutation\` mutation."""
@@ -8621,6 +8629,8 @@ input TypeInput {
   regtype: RegType
   regconfig: RegConfig
   regdictionary: RegDictionary
+  textArrayDomain: [String]
+  int8ArrayDomain: [BigInt]
 }
 
 """Represents an update to a \`Type\`. Fields that are set will be updated."""
@@ -8668,6 +8678,8 @@ input TypePatch {
   regtype: RegType
   regconfig: RegConfig
   regdictionary: RegDictionary
+  textArrayDomain: [String]
+  int8ArrayDomain: [BigInt]
 }
 
 """A connection to a list of \`Type\` values."""
@@ -8815,6 +8827,10 @@ enum TypesOrderBy {
   REGCONFIG_DESC
   REGDICTIONARY_ASC
   REGDICTIONARY_DESC
+  TEXT_ARRAY_DOMAIN_ASC
+  TEXT_ARRAY_DOMAIN_DESC
+  INT8_ARRAY_DOMAIN_ASC
+  INT8_ARRAY_DOMAIN_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
 }
