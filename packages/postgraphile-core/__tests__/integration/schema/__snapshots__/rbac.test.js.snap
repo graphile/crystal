@@ -9070,6 +9070,30 @@ type QueryOutputTwoRowsRecord {
   txt: String
 }
 
+"""A builtin object identifier type for a relation name"""
+scalar RegClass
+
+"""A builtin object identifier type for a text search configuration"""
+scalar RegConfig
+
+"""A builtin object identifier type for a text search dictionary"""
+scalar RegDictionary
+
+"""A builtin object identifier type for an operator"""
+scalar RegOper
+
+"""A builtin object identifier type for an operator with argument types"""
+scalar RegOperator
+
+"""A builtin object identifier type for a function name"""
+scalar RegProc
+
+"""A builtin object identifier type for a function with argument types"""
+scalar RegProcedure
+
+"""A builtin object identifier type for a data type name"""
+scalar RegType
+
 type Reserved implements Node {
   id: Int!
 
@@ -9673,6 +9697,14 @@ type Type implements Node {
 
   """Reads a single \`Post\` that is related to this \`Type\`."""
   postBySmallint: Post
+  regclass: RegClass
+  regconfig: RegConfig
+  regdictionary: RegDictionary
+  regoper: RegOper
+  regoperator: RegOperator
+  regproc: RegProc
+  regprocedure: RegProcedure
+  regtype: RegType
   smallint: Int!
   textArray: [String]!
   time: Time!
@@ -9771,6 +9803,30 @@ input TypeCondition {
 
   """Checks for equality with the object’s \`point\` field."""
   point: PointInput
+
+  """Checks for equality with the object’s \`regclass\` field."""
+  regclass: RegClass
+
+  """Checks for equality with the object’s \`regconfig\` field."""
+  regconfig: RegConfig
+
+  """Checks for equality with the object’s \`regdictionary\` field."""
+  regdictionary: RegDictionary
+
+  """Checks for equality with the object’s \`regoper\` field."""
+  regoper: RegOper
+
+  """Checks for equality with the object’s \`regoperator\` field."""
+  regoperator: RegOperator
+
+  """Checks for equality with the object’s \`regproc\` field."""
+  regproc: RegProc
+
+  """Checks for equality with the object’s \`regprocedure\` field."""
+  regprocedure: RegProcedure
+
+  """Checks for equality with the object’s \`regtype\` field."""
+  regtype: RegType
 
   """Checks for equality with the object’s \`smallint\` field."""
   smallint: Int
@@ -9909,6 +9965,14 @@ input TypeInput {
   numeric: BigFloat!
   numrange: BigFloatRangeInput!
   point: PointInput!
+  regclass: RegClass
+  regconfig: RegConfig
+  regdictionary: RegDictionary
+  regoper: RegOper
+  regoperator: RegOperator
+  regproc: RegProc
+  regprocedure: RegProcedure
+  regtype: RegType
   smallint: Int!
   textArray: [String]!
   time: Time!
@@ -9948,6 +10012,14 @@ input TypePatch {
   numeric: BigFloat
   numrange: BigFloatRangeInput
   point: PointInput
+  regclass: RegClass
+  regconfig: RegConfig
+  regdictionary: RegDictionary
+  regoper: RegOper
+  regoperator: RegOperator
+  regproc: RegProc
+  regprocedure: RegProcedure
+  regtype: RegType
   smallint: Int
   textArray: [String]
   time: Time
@@ -10076,6 +10148,22 @@ enum TypesOrderBy {
   POINT_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  REGCLASS_ASC
+  REGCLASS_DESC
+  REGCONFIG_ASC
+  REGCONFIG_DESC
+  REGDICTIONARY_ASC
+  REGDICTIONARY_DESC
+  REGOPER_ASC
+  REGOPER_DESC
+  REGOPERATOR_ASC
+  REGOPERATOR_DESC
+  REGPROC_ASC
+  REGPROC_DESC
+  REGPROCEDURE_ASC
+  REGPROCEDURE_DESC
+  REGTYPE_ASC
+  REGTYPE_DESC
   SMALLINT_ASC
   SMALLINT_DESC
   TEXT_ARRAY_ASC

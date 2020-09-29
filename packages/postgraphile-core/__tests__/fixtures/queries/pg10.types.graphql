@@ -1,0 +1,29 @@
+query {
+  allTypes {
+    ...typesConnection
+  }
+}
+
+fragment type on Type {
+  id
+  regrole
+  regnamespace
+}
+
+fragment typesConnection on TypesConnection {
+  nodes {
+    ...type
+  }
+  edges {
+    node {
+      ...type
+    }
+  }
+  totalCount
+  pageInfo {
+    hasNextPage
+    hasPreviousPage
+    startCursor
+    endCursor
+  }
+}

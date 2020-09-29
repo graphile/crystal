@@ -1369,6 +1369,27 @@ Object {
 }
 `;
 
+exports[`pg10.types.graphql 1`] = `
+Object {
+  "data": Object {
+    "createType": Object {
+      "type": Object {
+        "id": 11,
+        "regnamespace": "c",
+        "regrole": "postgraphile_test_visitor",
+      },
+    },
+    "updateTypeById": Object {
+      "type": Object {
+        "id": 12,
+        "regnamespace": "pg10",
+        "regrole": "postgraphile_test_authenticator",
+      },
+    },
+  },
+}
+`;
+
 exports[`procedure-mutation.graphql 1`] = `
 Object {
   "data": Object {
@@ -1870,6 +1891,7 @@ Object {
           "GREEN",
           "BLUE",
         ],
+        "id": 1,
         "json": "{\\"json\\":true}",
         "jsonb": "{\\"jsonb\\":true}",
         "money": 27,
@@ -1904,6 +1926,14 @@ Object {
           "x": 99,
           "y": 77,
         },
+        "regclass": "c.person",
+        "regconfig": "dutch",
+        "regdictionary": "dutch_stem",
+        "regoper": "*<>",
+        "regoperator": "+(integer,integer)",
+        "regproc": "b.type_function",
+        "regprocedure": "b.type_function(integer)",
+        "regtype": "numeric",
         "smallint": 1,
         "textArray": Array [
           "Hi",
@@ -1941,6 +1971,7 @@ Object {
             "GREEN",
             "RED",
           ],
+          "id": 11,
           "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3,\\"d\\":{\\"e\\":4,\\"f\\":5,\\"g\\":[6,7,8,\\"x\\",false,null]}}",
           "jsonb": "{\\"1\\":\\"a\\",\\"2\\":\\"b\\",\\"3\\":\\"c\\",\\"4\\":{\\"5\\":\\"d\\",\\"6\\":\\"e\\",\\"7\\":[\\"f\\",\\"g\\",\\"h\\",42,true,null]}}",
           "money": 9876543.21,
@@ -1983,6 +2014,14 @@ Object {
             "x": 1,
             "y": 3,
           },
+          "regclass": null,
+          "regconfig": null,
+          "regdictionary": null,
+          "regoper": null,
+          "regoperator": null,
+          "regproc": null,
+          "regprocedure": null,
+          "regtype": null,
           "smallint": 10,
           "textArray": Array [
             "hey",
@@ -2021,6 +2060,7 @@ Object {
             "GREEN",
             "RED",
           ],
+          "id": 12,
           "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3,\\"d\\":{\\"e\\":4,\\"f\\":5,\\"g\\":[6,7,8,\\"x\\",false,null]}}",
           "jsonb": "{\\"1\\":\\"a\\",\\"2\\":\\"b\\",\\"3\\":\\"c\\",\\"4\\":{\\"5\\":\\"d\\",\\"6\\":\\"e\\",\\"7\\":[\\"f\\",\\"g\\",\\"h\\",42,true,null]}}",
           "money": 9876543.21,
@@ -2063,6 +2103,14 @@ Object {
             "x": 1,
             "y": 3,
           },
+          "regclass": "b.types",
+          "regconfig": "english",
+          "regdictionary": "simple",
+          "regoper": "!",
+          "regoperator": "*(integer,integer)",
+          "regproc": "b.guid_fn",
+          "regprocedure": "b.guid_fn(b.guid)",
+          "regtype": "integer",
           "smallint": 9999,
           "textArray": Array [
             "hey",
@@ -2105,6 +2153,7 @@ Object {
             "GREEN",
             "RED",
           ],
+          "id": 11,
           "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3,\\"d\\":{\\"e\\":4,\\"f\\":5,\\"g\\":[6,7,8,\\"x\\",false,null]}}",
           "jsonb": "{\\"1\\":\\"a\\",\\"2\\":\\"b\\",\\"3\\":\\"c\\",\\"4\\":{\\"5\\":\\"d\\",\\"6\\":\\"e\\",\\"7\\":[\\"f\\",\\"g\\",\\"h\\",42,true,null]}}",
           "money": 9876543.21,
@@ -2147,6 +2196,14 @@ Object {
             "x": 1,
             "y": 3,
           },
+          "regclass": null,
+          "regconfig": null,
+          "regdictionary": null,
+          "regoper": null,
+          "regoperator": null,
+          "regproc": null,
+          "regprocedure": null,
+          "regtype": null,
           "smallint": 10,
           "textArray": Array [
             "hey",
@@ -2185,6 +2242,7 @@ Object {
             "GREEN",
             "RED",
           ],
+          "id": 12,
           "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3,\\"d\\":{\\"e\\":4,\\"f\\":5,\\"g\\":[6,7,8,\\"x\\",false,null]}}",
           "jsonb": "{\\"1\\":\\"a\\",\\"2\\":\\"b\\",\\"3\\":\\"c\\",\\"4\\":{\\"5\\":\\"d\\",\\"6\\":\\"e\\",\\"7\\":[\\"f\\",\\"g\\",\\"h\\",42,true,null]}}",
           "money": 9876543.21,
@@ -2227,6 +2285,14 @@ Object {
             "x": 1,
             "y": 3,
           },
+          "regclass": "b.types",
+          "regconfig": "english",
+          "regdictionary": "simple",
+          "regoper": "!",
+          "regoperator": "*(integer,integer)",
+          "regproc": "b.guid_fn",
+          "regprocedure": "b.guid_fn(b.guid)",
+          "regtype": "integer",
           "smallint": 9999,
           "textArray": Array [
             "hey",
@@ -2268,6 +2334,7 @@ Object {
           "GREEN",
           "RED",
         ],
+        "id": 11,
         "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3,\\"d\\":{\\"e\\":4,\\"f\\":5,\\"g\\":[6,7,8,\\"x\\",false,null]}}",
         "jsonb": "{\\"1\\":\\"a\\",\\"2\\":\\"b\\",\\"3\\":\\"c\\",\\"4\\":{\\"5\\":\\"d\\",\\"6\\":\\"e\\",\\"7\\":[\\"f\\",\\"g\\",\\"h\\",42,true,null]}}",
         "money": 9876543.21,
@@ -2310,6 +2377,14 @@ Object {
           "x": 1,
           "y": 3,
         },
+        "regclass": null,
+        "regconfig": null,
+        "regdictionary": null,
+        "regoper": null,
+        "regoperator": null,
+        "regproc": null,
+        "regprocedure": null,
+        "regtype": null,
         "smallint": 10,
         "textArray": Array [
           "hey",
@@ -2351,6 +2426,7 @@ Object {
           "GREEN",
           "BLUE",
         ],
+        "id": 11,
         "json": "{\\"json\\":true}",
         "jsonb": "{\\"jsonb\\":true}",
         "money": 27,
@@ -2385,6 +2461,14 @@ Object {
           "x": 99,
           "y": 77,
         },
+        "regclass": "c.person",
+        "regconfig": "dutch",
+        "regdictionary": "dutch_stem",
+        "regoper": "*<>",
+        "regoperator": "+(integer,integer)",
+        "regproc": "b.type_function",
+        "regprocedure": "b.type_function(integer)",
+        "regtype": "numeric",
         "smallint": 1,
         "textArray": Array [
           "Hi",

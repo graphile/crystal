@@ -18,3 +18,9 @@ create table pg10.network (
   macaddr macaddr,
   macaddr8 macaddr8
 );
+
+create table pg10.types (
+  id serial primary key,
+  "regrole" regrole, 
+  "regnamespace" regnamespace
+)

@@ -9,3 +9,11 @@ insert into pg10.network values
   (8, '::ffff:1.2.3.0/128', '::ffff:1.2.3.0/128', 'AABBCCDDEEFF', '08002b0102030405');
 
 alter sequence pg10.network_id_seq restart with 9;
+
+insert into pg10.types values (
+  12,
+  'postgraphile_test_authenticator', 
+  'b'
+);
+
+alter sequence pg10.types_id_seq restart with 11;

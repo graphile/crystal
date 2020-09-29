@@ -221,6 +221,7 @@ beforeAll(() => {
             "network_types.graphql": gqlSchemas.useCustomNetworkScalars,
             "pg10.network_types.graphql":
               gqlSchemas.pg10UseCustomNetworkScalars,
+            "pg10.types.graphql": gqlSchemas.pg10UseCustomNetworkScalars,
           };
           let gqlSchema = schemas[fileName];
           if (!gqlSchema) {

@@ -1,0 +1,35 @@
+mutation {
+  # Must come next to last
+  updateTypeById(
+    input: {
+      id: 12
+      typePatch: {
+        regrole: "postgraphile_test_authenticator"
+        regnamespace: "pg10"
+      }
+    }
+  ) {
+    type {
+      ...type
+    }
+  }
+  # Must come last
+  createType(
+    input: {
+      type: {
+        regrole: "postgraphile_test_visitor"
+        regnamespace: "c"
+      }
+    }
+  ) {
+    type {
+      ...type
+    }
+  }
+}
+
+fragment type on Type {
+  id
+  regrole
+  regnamespace
+}

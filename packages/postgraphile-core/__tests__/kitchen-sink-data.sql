@@ -130,7 +130,15 @@ insert into b.types values (
   null,
   '192.168.0.0',
   '192.168.0.0/24',
-  'feed.dead.beef'
+  'feed.dead.beef',
+  'b.guid_fn', 
+  'b.guid_fn(b.guid)', 
+  '!',
+  '*(integer,integer)', 
+  'b.types', 
+  'int', 
+  'english', 
+  'simple'
 );
 
 insert into c.edge_case values

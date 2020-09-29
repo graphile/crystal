@@ -357,6 +357,46 @@ export default (function PgTypesPlugin(
         inflection.builtin("InternetAddress"),
         "An IPv4 or IPv6 host address, and optionally its subnet."
       );
+      const RegProcType = stringType(
+        inflection.builtin("RegProc"),
+        "A builtin object identifier type for a function name"
+      );
+      const RegProcedureType = stringType(
+        inflection.builtin("RegProcedure"),
+        "A builtin object identifier type for a function with argument types"
+      );
+      const RegOperType = stringType(
+        inflection.builtin("RegOper"),
+        "A builtin object identifier type for an operator"
+      );
+      const RegOperatorType = stringType(
+        inflection.builtin("RegOperator"),
+        "A builtin object identifier type for an operator with argument types"
+      );
+      const RegClassType = stringType(
+        inflection.builtin("RegClass"),
+        "A builtin object identifier type for a relation name"
+      );
+      const RegTypeType = stringType(
+        inflection.builtin("RegType"),
+        "A builtin object identifier type for a data type name"
+      );
+      const RegRoleType = stringType(
+        inflection.builtin("RegRole"),
+        "A builtin object identifier type for a role name"
+      );
+      const RegNamespaceType = stringType(
+        inflection.builtin("RegNamespace"),
+        "A builtin object identifier type for a namespace name"
+      );
+      const RegConfigType = stringType(
+        inflection.builtin("RegConfig"),
+        "A builtin object identifier type for a text search configuration"
+      );
+      const RegDictionaryType = stringType(
+        inflection.builtin("RegDictionary"),
+        "A builtin object identifier type for a text search dictionary"
+      );
       const CidrType = pgUseCustomNetworkScalars
         ? stringType(
             inflection.builtin("CidrAddress"),
@@ -424,6 +464,16 @@ export default (function PgTypesPlugin(
       addType(DateType, "graphile-build-pg built-in");
       addType(DateTimeType, "graphile-build-pg built-in");
       addType(TimeType, "graphile-build-pg built-in");
+      addType(RegProcType, "graphile-build-pg built-in");
+      addType(RegProcedureType, "graphile-build-pg built-in");
+      addType(RegOperType, "graphile-build-pg built-in");
+      addType(RegOperatorType, "graphile-build-pg built-in");
+      addType(RegClassType, "graphile-build-pg built-in");
+      addType(RegTypeType, "graphile-build-pg built-in");
+      addType(RegRoleType, "graphile-build-pg built-in");
+      addType(RegNamespaceType, "graphile-build-pg built-in");
+      addType(RegConfigType, "graphile-build-pg built-in");
+      addType(RegDictionaryType, "graphile-build-pg built-in");
 
       const oidLookup = {
         20: stringType(
@@ -461,6 +511,16 @@ export default (function PgTypesPlugin(
         650: CidrType,
         829: MacAddrType,
         774: MacAddr8Type,
+        24: RegProcType,
+        2202: RegProcedureType,
+        2203: RegOperType,
+        2204: RegOperatorType,
+        2205: RegClassType,
+        2206: RegTypeType,
+        4096: RegRoleType,
+        4089: RegNamespaceType,
+        3734: RegConfigType,
+        3769: RegDictionaryType,
       };
       const oidInputLookup = {
         1186: GQLIntervalInput, // interval

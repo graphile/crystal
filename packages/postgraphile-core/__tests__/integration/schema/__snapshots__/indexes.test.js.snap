@@ -7933,6 +7933,30 @@ type QueryOutputTwoRowsRecord {
   txt: String
 }
 
+"""A builtin object identifier type for a relation name"""
+scalar RegClass
+
+"""A builtin object identifier type for a text search configuration"""
+scalar RegConfig
+
+"""A builtin object identifier type for a text search dictionary"""
+scalar RegDictionary
+
+"""A builtin object identifier type for an operator"""
+scalar RegOper
+
+"""A builtin object identifier type for an operator with argument types"""
+scalar RegOperator
+
+"""A builtin object identifier type for a function name"""
+scalar RegProc
+
+"""A builtin object identifier type for a function with argument types"""
+scalar RegProcedure
+
+"""A builtin object identifier type for a data type name"""
+scalar RegType
+
 type Reserved implements Node {
   id: Int!
 
@@ -8485,6 +8509,14 @@ type Type implements Node {
 
   """Reads a single \`Post\` that is related to this \`Type\`."""
   postBySmallint: Post
+  regclass: RegClass
+  regconfig: RegConfig
+  regdictionary: RegDictionary
+  regoper: RegOper
+  regoperator: RegOperator
+  regproc: RegProc
+  regprocedure: RegProcedure
+  regtype: RegType
   smallint: Int!
   textArray: [String]!
   time: Time!
@@ -8617,6 +8649,14 @@ input TypeInput {
   numeric: BigFloat!
   numrange: BigFloatRangeInput!
   point: PointInput!
+  regclass: RegClass
+  regconfig: RegConfig
+  regdictionary: RegDictionary
+  regoper: RegOper
+  regoperator: RegOperator
+  regproc: RegProc
+  regprocedure: RegProcedure
+  regtype: RegType
   smallint: Int!
   textArray: [String]!
   time: Time!
@@ -8656,6 +8696,14 @@ input TypePatch {
   numeric: BigFloat
   numrange: BigFloatRangeInput
   point: PointInput
+  regclass: RegClass
+  regconfig: RegConfig
+  regdictionary: RegDictionary
+  regoper: RegOper
+  regoperator: RegOperator
+  regproc: RegProc
+  regprocedure: RegProcedure
+  regtype: RegType
   smallint: Int
   textArray: [String]
   time: Time
