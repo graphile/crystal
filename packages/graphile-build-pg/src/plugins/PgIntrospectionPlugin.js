@@ -301,7 +301,7 @@ function smartCommentConstraints(introspectionResults) {
     });
   };
 
-  // First: primary keys
+  // First: primary and unique keys
   introspectionResults.class.forEach(klass => {
     const namespace = introspectionResults.namespace.find(
       n => n.id === klass.namespaceId
@@ -309,24 +309,30 @@ function smartCommentConstraints(introspectionResults) {
     if (!namespace) {
       return;
     }
-    if (klass.tags.primaryKey) {
-      if (typeof klass.tags.primaryKey !== "string") {
+    function addKey(key: string, isPrimary = false) {
+      const tag = isPrimary ? "@primaryKey" : "@unique";
+      if (typeof key !== "string") {
+        if (isPrimary) {
+          throw new Error(
+            `${tag} configuration of '${klass.namespaceName}.${klass.name}' is invalid; please specify just once "${tag} col1,col2"`
+          );
+        }
         throw new Error(
-          `@primaryKey configuration of '${klass.namespaceName}.${klass.name}' is invalid; please specify just once "@primaryKey col1,col2"`
+          `${tag} configuration of '${klass.namespaceName}.${
+            klass.name
+          }' is invalid; expected ${
+            isPrimary ? "a string" : "a string or string array"
+          } but found ${typeof key}`
         );
       }
-      const { spec: pkSpec, tags, description } = parseConstraintSpec(
-        klass.tags.primaryKey
-      );
-      const columns: string[] = parseSqlColumnArray(pkSpec);
-      const attributes = attributesByNames(
-        klass,
-        columns,
-        `@primaryKey ${klass.tags.primaryKey}`
-      );
-      attributes.forEach(attr => {
-        attr.tags.notNull = true;
-      });
+      const { spec: keySpec, tags, description } = parseConstraintSpec(key);
+      const columns: string[] = parseSqlColumnArray(keySpec);
+      const attributes = attributesByNames(klass, columns, `${tag} ${key}`);
+      if (isPrimary) {
+        attributes.forEach(attr => {
+          attr.tags.notNull = true;
+        });
+      }
       const keyAttributeNums = attributes.map(a => a.num);
       // Now we need to fake a constraint for this:
       const fakeConstraint = {
@@ -334,8 +340,8 @@ function smartCommentConstraints(introspectionResults) {
         isFake: true,
         isIndexed: true, // otherwise it gets ignored by ignoreIndexes
         id: Math.random(),
-        name: `FAKE_${klass.namespaceName}_${klass.name}_primaryKey`,
-        type: "p", // primary key
+        name: `FAKE_${klass.namespaceName}_${klass.name}_${tag}`,
+        type: isPrimary ? "p" : "u",
         classId: klass.id,
         foreignClassId: null,
         comment: null,
@@ -345,6 +351,16 @@ function smartCommentConstraints(introspectionResults) {
         tags,
       };
       introspectionResults.constraint.push(fakeConstraint);
+    }
+    if (klass.tags.primaryKey) {
+      addKey(klass.tags.primaryKey, true);
+    }
+    if (klass.tags.unique) {
+      if (Array.isArray(klass.tags.unique)) {
+        klass.tags.unique.forEach(key => addKey(key, true));
+      } else {
+        addKey(klass.tags.unique);
+      }
     }
   });
   // Now primary keys are in place, we can apply foreign keys
