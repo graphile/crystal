@@ -388,14 +388,12 @@ export default function createPostGraphileHttpRequestHandler(
     }
   };
 
-  let firstRequestHandler: ((req: IncomingMessage, pathname: string) => void) | null = (
-    req,
-    pathname,
-  ) => {
+  let firstRequestHandler: ((req: IncomingMessage) => void) | null = req => {
     // Never be called again
     firstRequestHandler = null;
     let graphqlRouteForWs = graphqlRoute;
 
+    const { pathname = '' } = parseUrl(req) || {};
     const { pathname: originalPathname = '' } = parseUrl.original(req) || {};
     if (originalPathname !== pathname && originalPathname.endsWith(pathname)) {
       const base = originalPathname.substr(0, originalPathname.length - pathname.length);
@@ -509,7 +507,7 @@ export default function createPostGraphileHttpRequestHandler(
     // Certain things depend on externalUrlBase, which we guess if the user
     // doesn't supply it, so we calculate them on the first request. After
     // first request, this function becomes a NOOP
-    if (firstRequestHandler) firstRequestHandler(req, pathname);
+    if (firstRequestHandler) firstRequestHandler(req);
 
     // ======================================================================
     // GraphQL Watch Stream
@@ -620,8 +618,7 @@ export default function createPostGraphileHttpRequestHandler(
   const graphiqlRouteHandler = neverReject(
     'graphiqlRouteHandler',
     async function graphiqlRouteHandler(req: IncomingMessage, res: ServerResponse) {
-      const { pathname = '' } = parseUrl(req) || {};
-      if (firstRequestHandler) firstRequestHandler(req, pathname);
+      if (firstRequestHandler) firstRequestHandler(req);
 
       // If using the incorrect method, let the user know.
       if (!(req.method === 'GET' || req.method === 'HEAD')) {
@@ -660,8 +657,7 @@ export default function createPostGraphileHttpRequestHandler(
     req: IncomingMessage,
     res: ServerResponse,
   ) {
-    const { pathname = '' } = parseUrl(req) || {};
-    if (firstRequestHandler) firstRequestHandler(req, pathname);
+    if (firstRequestHandler) firstRequestHandler(req);
 
     // Add our CORS headers to be good web citizens (there are perf
     // implications though so be careful!)
