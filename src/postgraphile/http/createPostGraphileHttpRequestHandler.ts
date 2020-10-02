@@ -448,6 +448,27 @@ export default function createPostGraphileHttpRequestHandler(
       .catch(noop);
   }
 
+  function neverReject(
+    middlewareName: string,
+    middleware: (req: IncomingMessage, res: ServerResponse) => Promise<void>,
+  ): (req: IncomingMessage, res: ServerResponse) => Promise<void> {
+    return async (req, res) => {
+      try {
+        await middleware(req, res);
+      } catch (e) {
+        console.error(
+          `An unexpected error occurred whilst processing '${middlewareName}'; this indicates a bug. The connection will be terminated.`,
+        );
+        console.error(e);
+        try {
+          // At least terminate the connection
+          res.statusCode = 500;
+          res.end();
+        } catch (e) {}
+      }
+    };
+  }
+
   /**
    * The actual request handler. It’s an async function so it will return a
    * promise when complete. If the function doesn’t handle anything, it calls
@@ -485,8 +506,7 @@ export default function createPostGraphileHttpRequestHandler(
     if (watchPg) {
       // Setup an event stream so we can broadcast events to graphiql, etc.
       if (pathname === eventStreamRoute || pathname === '/_postgraphile/stream') {
-        eventStreamRouteHandler(req, res);
-        return;
+        return eventStreamRouteHandler(req, res);
       }
     }
 
@@ -504,8 +524,7 @@ export default function createPostGraphileHttpRequestHandler(
       // If this is the favicon path and it has not yet been handled, let us
       // serve our GraphQL favicon.
       if (pathname === '/favicon.ico') {
-        faviconRouteHandler(req, res);
-        return;
+        return faviconRouteHandler(req, res);
       }
 
       // ======================================================================
@@ -522,8 +541,7 @@ export default function createPostGraphileHttpRequestHandler(
           return;
         }
 
-        graphiqlRouteHandler(req, res);
-        return;
+        return graphiqlRouteHandler(req, res);
       }
     }
 
@@ -535,23 +553,36 @@ export default function createPostGraphileHttpRequestHandler(
     }
   };
 
-  function eventStreamRouteHandler(req: IncomingMessage, res: ServerResponse) {
-    // Add our CORS headers to be good web citizens (there are perf
-    // implications though so be careful!)
-    //
-    // Always enable CORS when developing PostGraphile because GraphiQL will be
-    // on port 5783.
-    if (enableCors) addCORSHeaders(res);
+  const eventStreamRouteHandler = neverReject(
+    'eventStreamRouteHandler',
+    async function eventStreamRouteHandler(req: IncomingMessage, res: ServerResponse) {
+      try {
+        // Add our CORS headers to be good web citizens (there are perf
+        // implications though so be careful!)
+        //
+        // Always enable CORS when developing PostGraphile because GraphiQL will be
+        // on port 5783.
+        if (enableCors) addCORSHeaders(res);
 
-    if (req.headers.accept !== 'text/event-stream') {
-      res.statusCode = 405;
-      res.end();
-      return;
-    }
-    setupServerSentEvents(req, res, options);
-  }
+        if (req.headers.accept !== 'text/event-stream') {
+          res.statusCode = 405;
+          res.end();
+          return;
+        }
+        setupServerSentEvents(req, res, options);
+      } catch (e) {
+        console.error('Unexpected error occurred in eventStreamRouteHandler');
+        console.error(e);
+        res.statusCode = 500;
+        res.end();
+      }
+    },
+  );
 
-  async function faviconRouteHandler(req: IncomingMessage, res: ServerResponse) {
+  const faviconRouteHandler = neverReject('faviconRouteHandler', async function faviconRouteHandler(
+    req: IncomingMessage,
+    res: ServerResponse,
+  ) {
     // If this is the wrong method, we should let the client know.
     if (!(req.method === 'GET' || req.method === 'HEAD')) {
       res.statusCode = req.method === 'OPTIONS' ? 200 : 405;
@@ -572,45 +603,51 @@ export default function createPostGraphileHttpRequestHandler(
     }
 
     res.end(favicon);
-  }
+  });
 
-  async function graphiqlRouteHandler(req: IncomingMessage, res: ServerResponse) {
-    const { pathname = '' } = parseUrl(req) || {};
-    if (firstRequestHandler) firstRequestHandler(req, pathname);
+  const graphiqlRouteHandler = neverReject(
+    'graphiqlRouteHandler',
+    async function graphiqlRouteHandler(req: IncomingMessage, res: ServerResponse) {
+      const { pathname = '' } = parseUrl(req) || {};
+      if (firstRequestHandler) firstRequestHandler(req, pathname);
 
-    // If using the incorrect method, let the user know.
-    if (!(req.method === 'GET' || req.method === 'HEAD')) {
-      res.statusCode = req.method === 'OPTIONS' ? 200 : 405;
-      res.setHeader('Allow', 'GET, HEAD, OPTIONS');
-      res.end();
-      return;
-    }
+      // If using the incorrect method, let the user know.
+      if (!(req.method === 'GET' || req.method === 'HEAD')) {
+        res.statusCode = req.method === 'OPTIONS' ? 200 : 405;
+        res.setHeader('Allow', 'GET, HEAD, OPTIONS');
+        res.end();
+        return;
+      }
 
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-    res.setHeader('Content-Security-Policy', "frame-ancestors 'self'");
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+      res.setHeader('Content-Security-Policy', "frame-ancestors 'self'");
 
-    // End early if the method is `HEAD`.
-    if (req.method === 'HEAD') {
-      res.end();
-      return;
-    }
+      // End early if the method is `HEAD`.
+      if (req.method === 'HEAD') {
+        res.end();
+        return;
+      }
 
-    // Actually renders GraphiQL.
-    if (graphiqlHtml && typeof options.allowExplain === 'function') {
-      res.end(
-        graphiqlHtml.replace(
-          `"${ALLOW_EXPLAIN_PLACEHOLDER}"`, // Because JSON escaped
-          JSON.stringify(!!(await options.allowExplain(req))),
-        ),
-      );
-    } else {
-      res.end(graphiqlHtml);
-    }
-  }
+      // Actually renders GraphiQL.
+      if (graphiqlHtml && typeof options.allowExplain === 'function') {
+        res.end(
+          graphiqlHtml.replace(
+            `"${ALLOW_EXPLAIN_PLACEHOLDER}"`, // Because JSON escaped
+            JSON.stringify(!!(await options.allowExplain(req))),
+          ),
+        );
+      } else {
+        res.end(graphiqlHtml);
+      }
+    },
+  );
 
-  async function graphqlRouteHandler(req: IncomingMessage, res: ServerResponse) {
+  const graphqlRouteHandler = neverReject('graphqlRouteHandler', async function graphqlRouteHandler(
+    req: IncomingMessage,
+    res: ServerResponse,
+  ) {
     const { pathname = '' } = parseUrl(req) || {};
     if (firstRequestHandler) firstRequestHandler(req, pathname);
 
@@ -935,7 +972,7 @@ export default function createPostGraphileHttpRequestHandler(
       if (debugRequest.enabled)
         debugRequest('GraphQL ' + (returnArray ? 'queries' : 'query') + ' request finished.');
     }
-  }
+  });
 
   /**
    * A polymorphic request handler that should detect what `http` framework is
