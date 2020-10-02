@@ -106,6 +106,7 @@
     "fastify": "^2.2.0",
     "html-webpack-inline-source-plugin": "^1.0.0-beta.2",
     "html-webpack-plugin": "^4.4.1",
+    "http-proxy": "^1.18.1",
     "jest": "^24.7.1",
     "koa": "^2.5.1",
     "koa-compress": "^3.0.0",
