@@ -224,6 +224,12 @@ export default function createPostGraphileHttpRequestHandler(
   const graphqlRoute = options.graphqlRoute || '/graphql';
   const graphiqlRoute = options.graphiqlRoute || '/graphiql';
   const eventStreamRoute = options.eventStreamRoute || `${graphqlRoute.replace(/\/*$/, '')}/stream`;
+  const externalGraphqlRoute = options.externalGraphqlRoute;
+  const externalEventStreamRoute =
+    options.externalEventStreamRoute ||
+    (externalGraphqlRoute && !options.eventStreamRoute
+      ? externalGraphqlRoute + '/stream'
+      : undefined);
 
   // Throw an error of the GraphQL and GraphiQL routes are the same.
   if (graphqlRoute === graphiqlRoute)
@@ -388,27 +394,31 @@ export default function createPostGraphileHttpRequestHandler(
   ) => {
     // Never be called again
     firstRequestHandler = null;
+    let graphqlRouteForWs = graphqlRoute;
 
-    if (externalUrlBase == null) {
-      // User hasn't specified externalUrlBase; let's try and guess it
-      const { pathname: originalPathname = '' } = parseUrl.original(req) || {};
-      if (originalPathname !== pathname && originalPathname.endsWith(pathname)) {
+    const { pathname: originalPathname = '' } = parseUrl.original(req) || {};
+    if (originalPathname !== pathname && originalPathname.endsWith(pathname)) {
+      const base = originalPathname.substr(0, originalPathname.length - pathname.length);
+      // Our websocket GraphQL route must be at a different place
+      graphqlRouteForWs = base + graphqlRouteForWs;
+      if (externalUrlBase == null) {
+        // User hasn't specified externalUrlBase; let's try and guess it
         // We were mounted on a subpath (e.g. `app.use('/path/to', postgraphile(...))`).
         // Figure out our externalUrlBase for ourselves.
-        externalUrlBase = originalPathname.substr(0, originalPathname.length - pathname.length);
+        externalUrlBase = base;
       }
-      // Make sure we have a string, at least
-      externalUrlBase = externalUrlBase || '';
     }
+    // Make sure we have a string, at least
+    externalUrlBase = externalUrlBase || '';
 
     // Takes the original GraphiQL HTML file and replaces the default config object.
     graphiqlHtml = origGraphiqlHtml
       ? origGraphiqlHtml.replace(
           /<\/head>/,
           `  <script>window.POSTGRAPHILE_CONFIG=${safeJSONStringify({
-            graphqlUrl: options.externalGraphqlRoute || `${externalUrlBase}${graphqlRoute}`,
+            graphqlUrl: externalGraphqlRoute || `${externalUrlBase}${graphqlRoute}`,
             streamUrl: watchPg
-              ? options.externalEventStreamRoute || `${externalUrlBase}${eventStreamRoute}`
+              ? externalEventStreamRoute || `${externalUrlBase}${eventStreamRoute}`
               : null,
             enhanceGraphiql,
             subscriptions,
@@ -430,7 +440,7 @@ export default function createPostGraphileHttpRequestHandler(
       } else {
         // Relying on this means that a normal request must come in before an
         // upgrade attempt. It's better to call it manually.
-        enhanceHttpServerWithSubscriptions(server, middleware);
+        enhanceHttpServerWithSubscriptions(server, middleware, { graphqlRoute: graphqlRouteForWs });
       }
     }
   };
