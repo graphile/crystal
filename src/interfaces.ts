@@ -170,11 +170,30 @@ export interface PostGraphileOptions<
   // The endpoint the GraphQL executer will listen on. Defaults to `/graphql`.
   /* @middlewareOnly */
   graphqlRoute?: string;
+  // The endpoint the watch-mode EventStream will be mounted on (only
+  // appropriate when watchPg is specified). Defaults to
+  // `${graphqlRoute}/stream`.
+  /* @middlewareOnly */
+  eventStreamRoute?: string;
+  // The URL to the GraphQL endpoint for embedding into the GraphiQL client.
+  // We attempt to infer this (for many servers it is the same as
+  // `graphqlRoute`), but you may need to specify it manually if you mount
+  // PostGraphile behind a URL-rewriting proxy, or mount PostGraphile on a
+  // subpath in certain Node.js servers.
+  /* @middlewareOnly */
+  externalGraphqlRoute?: string;
+  // As with `externalGraphqlRoute`, but for `eventStreamRoute` rather than
+  // `graphqlRoute`. This is also used for the `X-GraphQL-Event-Stream` header.
+  /* @middlewareOnly */
+  externalEventStreamRoute?: string;
   // The endpoint the GraphiQL query interface will listen on (**NOTE:**
   // GraphiQL will not be enabled unless the `graphiql` option is set to
   // `true`). Defaults to `/graphiql`.
   /* @middlewareOnly */
   graphiqlRoute?: string;
+  // DEPRECATED - use `externalGraphqlRoute` and `externalEventStreamRoute`
+  // instead.
+  //
   // If you are using watch mode, or have enabled GraphiQL, and you either
   // mount PostGraphile under a path, or use PostGraphile behind some kind of
   // proxy that puts PostGraphile under a subpath (or both!) then you must
@@ -342,6 +361,13 @@ export interface HttpRequestHandler<
     req: Request,
     res: Response,
   ) => Array<GraphQLErrorExtended>;
+  graphqlRoute: string;
+  graphqlRouteHandler: (req: Request, res: Response) => Promise<void>;
+  graphiqlRoute: string;
+  graphiqlRouteHandler: ((req: Request, res: Response) => Promise<void>) | null;
+  faviconRouteHandler: ((req: Request, res: Response) => Promise<void>) | null;
+  eventStreamRoute: string;
+  eventStreamRouteHandler: ((req: Request, res: Response) => Promise<void>) | null;
 }
 
 /**

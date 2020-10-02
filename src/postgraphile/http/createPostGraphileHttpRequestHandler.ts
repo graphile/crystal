@@ -222,8 +222,8 @@ export default function createPostGraphileHttpRequestHandler(
 
   // Gets the route names for our GraphQL endpoint, and our GraphiQL endpoint.
   const graphqlRoute = options.graphqlRoute || '/graphql';
-  const graphiqlRoute = graphiql ? options.graphiqlRoute || '/graphiql' : null;
-  const streamRoute = `${graphqlRoute.replace(/\/*$/, '')}/stream`;
+  const graphiqlRoute = options.graphiqlRoute || '/graphiql';
+  const eventStreamRoute = options.eventStreamRoute || `${graphqlRoute.replace(/\/*$/, '')}/stream`;
 
   // Throw an error of the GraphQL and GraphiQL routes are the same.
   if (graphqlRoute === graphiqlRoute)
@@ -406,8 +406,10 @@ export default function createPostGraphileHttpRequestHandler(
       ? origGraphiqlHtml.replace(
           /<\/head>/,
           `  <script>window.POSTGRAPHILE_CONFIG=${safeJSONStringify({
-            graphqlUrl: `${externalUrlBase}${graphqlRoute}`,
-            streamUrl: watchPg ? `${externalUrlBase}${streamRoute}` : null,
+            graphqlUrl: options.externalGraphqlRoute || `${externalUrlBase}${graphqlRoute}`,
+            streamUrl: watchPg
+              ? options.externalEventStreamRoute || `${externalUrlBase}${eventStreamRoute}`
+              : null,
             enhanceGraphiql,
             subscriptions,
             allowExplain:
@@ -469,19 +471,24 @@ export default function createPostGraphileHttpRequestHandler(
       return;
     }
 
-    // Add our CORS headers to be good web citizens (there are perf
-    // implications though so be careful!)
-    //
-    // Always enable CORS when developing PostGraphile because GraphiQL will be
-    // on port 5783.
-    if (enableCors) addCORSHeaders(res);
-
     const { pathname = '' } = parseUrl(req) || {};
 
     // Certain things depend on externalUrlBase, which we guess if the user
     // doesn't supply it, so we calculate them on the first request. After
     // first request, this function becomes a NOOP
     if (firstRequestHandler) firstRequestHandler(req, pathname);
+
+    // ======================================================================
+    // GraphQL Watch Stream
+    // ======================================================================
+
+    if (watchPg) {
+      // Setup an event stream so we can broadcast events to graphiql, etc.
+      if (pathname === eventStreamRoute || pathname === '/_postgraphile/stream') {
+        eventStreamRouteHandler(req, res);
+        return;
+      }
+    }
 
     const isGraphqlRoute = pathname === graphqlRoute;
 
@@ -497,41 +504,7 @@ export default function createPostGraphileHttpRequestHandler(
       // If this is the favicon path and it has not yet been handled, let us
       // serve our GraphQL favicon.
       if (pathname === '/favicon.ico') {
-        // If this is the wrong method, we should let the client know.
-        if (!(req.method === 'GET' || req.method === 'HEAD')) {
-          res.statusCode = req.method === 'OPTIONS' ? 200 : 405;
-          res.setHeader('Allow', 'GET, HEAD, OPTIONS');
-          res.end();
-          return;
-        }
-
-        // Otherwise we are good and should pipe the favicon to the browser.
-        res.statusCode = 200;
-        res.setHeader('Cache-Control', 'public, max-age=86400');
-        res.setHeader('Content-Type', 'image/x-icon');
-
-        // End early if the method is `HEAD`.
-        if (req.method === 'HEAD') {
-          res.end();
-          return;
-        }
-
-        res.end(favicon);
-        return;
-      }
-
-      // ======================================================================
-      // GraphiQL Watch Stream
-      // ======================================================================
-
-      // Setup an event stream so we can broadcast events to graphiql, etc.
-      if (pathname === streamRoute || pathname === '/_postgraphile/stream') {
-        if (!watchPg || req.headers.accept !== 'text/event-stream') {
-          res.statusCode = 405;
-          res.end();
-          return;
-        }
-        setupServerSentEvents(req, res, options);
+        faviconRouteHandler(req, res);
         return;
       }
 
@@ -549,42 +522,104 @@ export default function createPostGraphileHttpRequestHandler(
           return;
         }
 
-        // If using the incorrect method, let the user know.
-        if (!(req.method === 'GET' || req.method === 'HEAD')) {
-          res.statusCode = req.method === 'OPTIONS' ? 200 : 405;
-          res.setHeader('Allow', 'GET, HEAD, OPTIONS');
-          res.end();
-          return;
-        }
-
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-        res.setHeader('Content-Security-Policy', "frame-ancestors 'self'");
-
-        // End early if the method is `HEAD`.
-        if (req.method === 'HEAD') {
-          res.end();
-          return;
-        }
-
-        // Actually renders GraphiQL.
-        if (graphiqlHtml && typeof options.allowExplain === 'function') {
-          res.end(
-            graphiqlHtml.replace(
-              `"${ALLOW_EXPLAIN_PLACEHOLDER}"`, // Because JSON escaped
-              JSON.stringify(!!(await options.allowExplain(req))),
-            ),
-          );
-        } else {
-          res.end(graphiqlHtml);
-        }
+        graphiqlRouteHandler(req, res);
         return;
       }
     }
 
-    // Don’t handle any requests if this is not the correct route.
-    if (!isGraphqlRoute) return next();
+    if (isGraphqlRoute) {
+      return graphqlRouteHandler(req, res);
+    } else {
+      // This request wasn't for us.
+      return next();
+    }
+  };
+
+  function eventStreamRouteHandler(req: IncomingMessage, res: ServerResponse) {
+    // Add our CORS headers to be good web citizens (there are perf
+    // implications though so be careful!)
+    //
+    // Always enable CORS when developing PostGraphile because GraphiQL will be
+    // on port 5783.
+    if (enableCors) addCORSHeaders(res);
+
+    if (req.headers.accept !== 'text/event-stream') {
+      res.statusCode = 405;
+      res.end();
+      return;
+    }
+    setupServerSentEvents(req, res, options);
+  }
+
+  async function faviconRouteHandler(req: IncomingMessage, res: ServerResponse) {
+    // If this is the wrong method, we should let the client know.
+    if (!(req.method === 'GET' || req.method === 'HEAD')) {
+      res.statusCode = req.method === 'OPTIONS' ? 200 : 405;
+      res.setHeader('Allow', 'GET, HEAD, OPTIONS');
+      res.end();
+      return;
+    }
+
+    // Otherwise we are good and should pipe the favicon to the browser.
+    res.statusCode = 200;
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.setHeader('Content-Type', 'image/x-icon');
+
+    // End early if the method is `HEAD`.
+    if (req.method === 'HEAD') {
+      res.end();
+      return;
+    }
+
+    res.end(favicon);
+  }
+
+  async function graphiqlRouteHandler(req: IncomingMessage, res: ServerResponse) {
+    const { pathname = '' } = parseUrl(req) || {};
+    if (firstRequestHandler) firstRequestHandler(req, pathname);
+
+    // If using the incorrect method, let the user know.
+    if (!(req.method === 'GET' || req.method === 'HEAD')) {
+      res.statusCode = req.method === 'OPTIONS' ? 200 : 405;
+      res.setHeader('Allow', 'GET, HEAD, OPTIONS');
+      res.end();
+      return;
+    }
+
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    res.setHeader('Content-Security-Policy', "frame-ancestors 'self'");
+
+    // End early if the method is `HEAD`.
+    if (req.method === 'HEAD') {
+      res.end();
+      return;
+    }
+
+    // Actually renders GraphiQL.
+    if (graphiqlHtml && typeof options.allowExplain === 'function') {
+      res.end(
+        graphiqlHtml.replace(
+          `"${ALLOW_EXPLAIN_PLACEHOLDER}"`, // Because JSON escaped
+          JSON.stringify(!!(await options.allowExplain(req))),
+        ),
+      );
+    } else {
+      res.end(graphiqlHtml);
+    }
+  }
+
+  async function graphqlRouteHandler(req: IncomingMessage, res: ServerResponse) {
+    const { pathname = '' } = parseUrl(req) || {};
+    if (firstRequestHandler) firstRequestHandler(req, pathname);
+
+    // Add our CORS headers to be good web citizens (there are perf
+    // implications though so be careful!)
+    //
+    // Always enable CORS when developing PostGraphile because GraphiQL will be
+    // on port 5783.
+    if (enableCors) addCORSHeaders(res);
 
     // ========================================================================
     // Execute GraphQL Queries
@@ -595,7 +630,10 @@ export default function createPostGraphileHttpRequestHandler(
     if (watchPg) {
       // Inform GraphiQL and other clients that they can subscribe to events
       // (such as the schema being updated) at the following URL
-      res.setHeader('X-GraphQL-Event-Stream', `${externalUrlBase}${streamRoute}`);
+      res.setHeader(
+        'X-GraphQL-Event-Stream',
+        options.externalEventStreamRoute || `${externalUrlBase}${eventStreamRoute}`,
+      );
     }
 
     // Don’t execute our GraphQL stuffs for `OPTIONS` requests.
@@ -897,7 +935,7 @@ export default function createPostGraphileHttpRequestHandler(
       if (debugRequest.enabled)
         debugRequest('GraphQL ' + (returnArray ? 'queries' : 'query') + ' request finished.');
     }
-  };
+  }
 
   /**
    * A polymorphic request handler that should detect what `http` framework is
@@ -937,6 +975,13 @@ export default function createPostGraphileHttpRequestHandler(
   middleware.withPostGraphileContextFromReqRes = withPostGraphileContextFromReqRes;
   middleware.handleErrors = handleErrors;
   middleware.options = options;
+  middleware.graphqlRoute = graphqlRoute;
+  middleware.graphqlRouteHandler = graphqlRouteHandler;
+  middleware.graphiqlRoute = graphiqlRoute;
+  middleware.graphiqlRouteHandler = graphiql ? graphiqlRouteHandler : null;
+  middleware.faviconRouteHandler = graphiql ? faviconRouteHandler : null;
+  middleware.eventStreamRoute = eventStreamRoute;
+  middleware.eventStreamRouteHandler = watchPg ? eventStreamRouteHandler : null;
 
   const hookedMiddleware = pluginHook('postgraphile:middleware', middleware, {
     options,

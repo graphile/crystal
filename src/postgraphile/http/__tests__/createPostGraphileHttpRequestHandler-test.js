@@ -14,6 +14,7 @@ const compress = require('koa-compress');
 const koa = require('koa');
 const koaMount = require('koa-mount');
 const fastify = require('fastify');
+const restify = require('restify');
 // tslint:disable-next-line variable-name
 const EventEmitter = require('events');
 
@@ -174,12 +175,33 @@ const serverCreators = new Map([
       return server;
     },
   ],
+  [
+    'restify',
+    (handler, options = {}, subpath) => {
+      const app = restify.createServer();
+      if (options.onPreCreate) options.onPreCreate(app);
+      app.opts(handler.graphqlRoute, handler.graphqlRouteHandler);
+      app.post(handler.graphqlRoute, handler.graphqlRouteHandler);
+      if (handler.graphiqlRouteHandler) {
+        app.head(handler.graphiqlRoute, handler.graphiqlRouteHandler);
+        app.get(handler.graphiqlRoute, handler.graphiqlRouteHandler);
+      }
+      if (handler.faviconRouteHandler) {
+        app.get('/favicon.ico', handler.faviconRouteHandler);
+      }
+      if (handler.eventStreamRouteHandler) {
+        app.opts(handler.eventStreamRoute, handler.eventStreamRouteHandler);
+        app.get(handler.eventStreamRoute, handler.eventStreamRouteHandler);
+      }
+      return app;
+    },
+  ],
 ]);
 
 const toTest = [];
 for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
   toTest.push({ name, createServerFromHandler });
-  if (name !== 'http' && name !== 'fastify' && name !== 'fastify-http2') {
+  if (name !== 'http' && name !== 'fastify' && name !== 'fastify-http2' && name !== 'restify') {
     toTest.push({ name, createServerFromHandler, subpath: '/path/to/mount' });
   }
 }
@@ -874,7 +896,7 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
     });
 
     test('will not allow if no text/event-stream headers are set', async () => {
-      const server = await createServer({ graphiql: true });
+      const server = await createServer({ graphiql: true, watchPg: true });
       await request(server).get(`${subpath}/graphql/stream`).expect(405);
     });
 

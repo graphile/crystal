@@ -113,6 +113,7 @@
     "nodemon": "^2.0.4",
     "pg-minify": "~1.6.1",
     "prettier": "^2.1.1",
+    "restify": "^8.5.1",
     "source-map-support": "^0.5.12",
     "style-loader": "^1.2.1",
     "superagent": "^4.1.0",
