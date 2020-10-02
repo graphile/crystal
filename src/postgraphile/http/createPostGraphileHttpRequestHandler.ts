@@ -679,7 +679,7 @@ export default function createPostGraphileHttpRequestHandler(
       // (such as the schema being updated) at the following URL
       res.setHeader(
         'X-GraphQL-Event-Stream',
-        options.externalEventStreamRoute || `${externalUrlBase}${eventStreamRoute}`,
+        externalEventStreamRoute || `${externalUrlBase}${eventStreamRoute}`,
       );
     }
 
