@@ -474,7 +474,9 @@ export default function createPostGraphileHttpRequestHandler(
           // At least terminate the connection
           res.statusCode = 500;
           res.end();
-        } catch (e) {}
+        } catch (e) {
+          /*NOOP*/
+        }
       }
     };
   }
