@@ -39,6 +39,12 @@ export {
   withPostGraphileContext as withPostGraphQLContext,
 } from './postgraphile';
 
+export {
+  PostGraphileResponse,
+  PostGraphileResponseNode,
+  PostGraphileResponseKoa,
+} from './postgraphile/http/frameworks';
+
 export { makePluginHook, PostGraphilePlugin } from './postgraphile/pluginHook';
 
 import { postgraphile } from './postgraphile';

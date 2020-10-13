@@ -2,6 +2,7 @@
 import { GraphQLSchema, GraphQLObjectType, GraphQLString } from 'graphql';
 import { $$pgClient } from '../../../postgres/inventory/pgClientFromContext';
 import createPostGraphileHttpRequestHandler from '../createPostGraphileHttpRequestHandler';
+import { PostGraphileResponseNode } from '../../../';
 import request from './supertest';
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -180,18 +181,20 @@ const serverCreators = new Map([
     (handler, options = {}, subpath) => {
       const app = restify.createServer();
       if (options.onPreCreate) options.onPreCreate(app);
-      app.opts(handler.graphqlRoute, handler.graphqlRouteHandler);
-      app.post(handler.graphqlRoute, handler.graphqlRouteHandler);
+      const handlerToMiddleware = handler => (req, res, next) =>
+        handler(new PostGraphileResponseNode(req, res, next)).catch(next);
+      app.opts(handler.graphqlRoute, handlerToMiddleware(handler.graphqlRouteHandler));
+      app.post(handler.graphqlRoute, handlerToMiddleware(handler.graphqlRouteHandler));
       if (handler.graphiqlRouteHandler) {
-        app.head(handler.graphiqlRoute, handler.graphiqlRouteHandler);
-        app.get(handler.graphiqlRoute, handler.graphiqlRouteHandler);
+        app.head(handler.graphiqlRoute, handlerToMiddleware(handler.graphiqlRouteHandler));
+        app.get(handler.graphiqlRoute, handlerToMiddleware(handler.graphiqlRouteHandler));
       }
       if (handler.faviconRouteHandler) {
-        app.get('/favicon.ico', handler.faviconRouteHandler);
+        app.get('/favicon.ico', handlerToMiddleware(handler.faviconRouteHandler));
       }
       if (handler.eventStreamRouteHandler) {
-        app.opts(handler.eventStreamRoute, handler.eventStreamRouteHandler);
-        app.get(handler.eventStreamRoute, handler.eventStreamRouteHandler);
+        app.opts(handler.eventStreamRoute, handlerToMiddleware(handler.eventStreamRouteHandler));
+        app.get(handler.eventStreamRoute, handlerToMiddleware(handler.eventStreamRouteHandler));
       }
       return app;
     },
