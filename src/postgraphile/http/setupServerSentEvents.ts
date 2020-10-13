@@ -1,11 +1,11 @@
 /* tslint:disable:no-any */
-import { PassThrough } from 'stream';
-import { IncomingMessage, ServerResponse } from 'http';
+import { IncomingMessage } from 'http';
 import { CreateRequestHandlerOptions } from '../../interfaces';
+import { PostGraphileResponse } from './frameworks';
 
 export default function setupServerSentEvents(
   req: IncomingMessage,
-  res: ServerResponse,
+  res: PostGraphileResponse,
   options: CreateRequestHandlerOptions,
 ): void {
   const { _emitter } = options;
@@ -24,42 +24,24 @@ export default function setupServerSentEvents(
   } else {
     res.setHeader('Connection', 'keep-alive');
   }
-  const koaCtx = (req as Record<string, any>)['_koaCtx'];
-  const isKoa = !!koaCtx;
-  const stream = isKoa ? new PassThrough() : null;
-  if (isKoa) {
-    koaCtx.response.body = stream;
-    koaCtx.compress = false;
-  }
-
-  const sse = (str: string) => {
-    if (isKoa) {
-      stream!.write(str);
-    } else {
-      res.write(str);
-
-      // support running within the compression middleware.
-      // https://github.com/expressjs/compression#server-sent-events
-      if (typeof (res as any).flushHeaders === 'function') (res as any).flushHeaders();
-    }
-  };
+  const stream = res.getStream();
 
   // Notify client that connection is open.
-  sse('event: open\n\n');
+  stream.write('event: open\n\n');
 
   // Setup listeners.
-  const schemaChangedCb = () => sse('event: change\ndata: schema\n\n');
+  const schemaChangedCb = () => stream.write('event: change\ndata: schema\n\n');
 
   if (options.watchPg) _emitter.on('schemas:changed', schemaChangedCb);
 
   // Clean up when connection closes.
   const cleanup = () => {
-    if (stream) {
-      stream.end();
-    } else {
-      res.end();
-    }
+    req.removeListener('close', cleanup);
+    req.removeListener('finish', cleanup);
+    req.removeListener('error', cleanup);
+    _emitter.removeListener('test:close', cleanup);
     _emitter.removeListener('schemas:changed', schemaChangedCb);
+    stream.end();
   };
   req.on('close', cleanup);
   req.on('finish', cleanup);

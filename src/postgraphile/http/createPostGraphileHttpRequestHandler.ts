@@ -13,7 +13,6 @@ import {
 } from 'graphql';
 import { extendedFormatError } from '../extendedFormatError';
 import { IncomingMessage, ServerResponse } from 'http';
-import { isKoaApp, middleware as koaMiddleware } from './koaMiddleware';
 import { pluginHookFromOptions } from '../pluginHook';
 import { HttpRequestHandler, mixed, CreateRequestHandlerOptions } from '../../interfaces';
 import setupServerSentEvents from './setupServerSentEvents';
@@ -28,6 +27,8 @@ import parseUrl = require('parseurl');
 import finalHandler = require('finalhandler');
 import bodyParser = require('body-parser');
 import crypto = require('crypto');
+
+const isKoaApp = (a: any, b: any) => a.req && a.res && typeof b === 'function';
 
 const CACHE_MULTIPLIER = 100000;
 
@@ -52,6 +53,12 @@ import favicon from '../../assets/favicon.ico';
  */
 import baseGraphiqlHtml from '../../assets/graphiql.html';
 import { enhanceHttpServerWithSubscriptions } from './subscriptions';
+import {
+  KoaNext,
+  PostGraphileResponse,
+  PostGraphileResponseKoa,
+  PostGraphileResponseNode,
+} from './frameworks';
 
 /**
  * When writing JSON to the browser, we need to be careful that it doesn't get
@@ -302,15 +309,21 @@ export default function createPostGraphileHttpRequestHandler(
   );
 
   // And we really want that function to be await-able
-  const parseBody = (req: IncomingMessage, res: ServerResponse) =>
+  const parseBody = (req: IncomingMessage, res: PostGraphileResponse) =>
     new Promise((resolve, reject) => {
-      bodyParserMiddlewaresComposed(req, res, (error: Error) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve();
-        }
-      });
+      bodyParserMiddlewaresComposed(
+        req,
+        // Note: middleware here doesn't actually use the response, but we pass
+        // the underlying value so types match up.
+        res.getNodeServerResponse(),
+        (error: Error) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve();
+          }
+        },
+      );
     });
 
   // We only need to calculate the graphiql HTML once; but we need to receive the first request to do so.
@@ -458,8 +471,8 @@ export default function createPostGraphileHttpRequestHandler(
 
   function neverReject(
     middlewareName: string,
-    middleware: (req: IncomingMessage, res: ServerResponse) => Promise<void>,
-  ): (req: IncomingMessage, res: ServerResponse) => Promise<void> {
+    middleware: (req: IncomingMessage, res: PostGraphileResponse) => Promise<void>,
+  ): (req: IncomingMessage, res: PostGraphileResponse) => Promise<void> {
     return async (req, res) => {
       try {
         await middleware(req, res);
@@ -482,20 +495,26 @@ export default function createPostGraphileHttpRequestHandler(
   /**
    * The actual request handler. It’s an async function so it will return a
    * promise when complete. If the function doesn’t handle anything, it calls
-   * `next` to let the next middleware try and handle it.
+   * `next` to let the next middleware try and handle it. If the function
+   * throws an error, it's up to the wrapping middleware (imaginatively named
+   * `middleware`, below) to handle the error. Frameworks like Koa have
+   * middlewares reject a promise on error, whereas Express requires you pass
+   * the error to the `next(err)` function.
    */
   const requestHandler = async (
-    incomingReq: IncomingMessage,
-    res: ServerResponse,
-    next: (err?: Error) => void,
+    responseHandler: PostGraphileResponse,
+    next: (err?: Error | 'route') => void,
   ) => {
+    const res = responseHandler;
+    const incomingReq = res.getNodeServerRequest();
+    const nodeRes = res.getNodeServerResponse();
     // You can use this hook either to modify the incoming request or to tell
     // PostGraphile not to handle the request further (return null). NOTE: if
     // you return `null` from this hook then you are also responsible for
     // calling `next()` (should that be required).
     const req = pluginHook('postgraphile:http:handler', incomingReq, {
       options,
-      res,
+      res: nodeRes,
       next,
     });
     if (req == null) {
@@ -565,7 +584,7 @@ export default function createPostGraphileHttpRequestHandler(
 
   const eventStreamRouteHandler = neverReject(
     'eventStreamRouteHandler',
-    async function eventStreamRouteHandler(req: IncomingMessage, res: ServerResponse) {
+    async function eventStreamRouteHandler(req: IncomingMessage, res: PostGraphileResponse) {
       try {
         // Add our CORS headers to be good web citizens (there are perf
         // implications though so be careful!)
@@ -591,7 +610,7 @@ export default function createPostGraphileHttpRequestHandler(
 
   const faviconRouteHandler = neverReject('faviconRouteHandler', async function faviconRouteHandler(
     req: IncomingMessage,
-    res: ServerResponse,
+    res: PostGraphileResponse,
   ) {
     // If this is the wrong method, we should let the client know.
     if (!(req.method === 'GET' || req.method === 'HEAD')) {
@@ -617,7 +636,7 @@ export default function createPostGraphileHttpRequestHandler(
 
   const graphiqlRouteHandler = neverReject(
     'graphiqlRouteHandler',
-    async function graphiqlRouteHandler(req: IncomingMessage, res: ServerResponse) {
+    async function graphiqlRouteHandler(req: IncomingMessage, res: PostGraphileResponse) {
       if (firstRequestHandler) firstRequestHandler(req);
 
       // If using the incorrect method, let the user know.
@@ -655,7 +674,7 @@ export default function createPostGraphileHttpRequestHandler(
 
   const graphqlRouteHandler = neverReject('graphqlRouteHandler', async function graphqlRouteHandler(
     req: IncomingMessage,
-    res: ServerResponse,
+    res: PostGraphileResponse,
   ) {
     if (firstRequestHandler) firstRequestHandler(req);
 
@@ -841,7 +860,8 @@ export default function createPostGraphileHttpRequestHandler(
 
               result = await withPostGraphileContextFromReqRes(
                 req,
-                res,
+                // For backwards compatibilty we must pass the actual node request object.
+                res.getNodeServerResponse(),
                 {
                   singleStatement: false,
                   queryDocumentAst,
@@ -945,9 +965,10 @@ export default function createPostGraphileHttpRequestHandler(
       results = [{ errors: (handleErrors as any)([error], req, res) }];
 
       // If the status code is 500, let’s log our error.
-      if (res.statusCode === 500)
+      if (res.statusCode === 500) {
         // tslint:disable-next-line no-console
         console.error(error.stack);
+      }
     } finally {
       // Finally, we send the client the results.
       if (!returnArray) {
@@ -968,7 +989,8 @@ export default function createPostGraphileHttpRequestHandler(
           options,
           returnArray,
           req,
-          res,
+          // For backwards compatibility, the underlying response object.
+          res: res.getNodeServerResponse(),
         },
       );
 
@@ -977,8 +999,9 @@ export default function createPostGraphileHttpRequestHandler(
       }
       res.end(JSON.stringify(result));
 
-      if (debugRequest.enabled)
+      if (debugRequest.enabled) {
         debugRequest('GraphQL ' + (returnArray ? 'queries' : 'query') + ' request finished.');
+      }
     }
   });
 
@@ -999,8 +1022,13 @@ export default function createPostGraphileHttpRequestHandler(
     if (isKoaApp(a, b)) {
       // Set the correct `koa` variable names…
       const ctx = a as KoaContext;
-      const next = b as (err?: Error) => Promise<any>;
-      return koaMiddleware(ctx, next, requestHandler);
+      const next = b as KoaNext;
+      const responseHandler = new PostGraphileResponseKoa(ctx, next);
+
+      // Execute our request handler. If an error is thrown, we don’t call
+      // `next` with an error. Instead we return the promise and let `koa`
+      // handle the error.
+      return requestHandler(responseHandler, next);
     } else {
       // Set the correct `connect` style variable names. If there was no `next`
       // defined (likely the case if the client is using `http`) we use the
@@ -1008,9 +1036,11 @@ export default function createPostGraphileHttpRequestHandler(
       const req = a as IncomingMessage;
       const res = b as ServerResponse;
       const next = c || finalHandler(req, res);
+      const responseHandler = new PostGraphileResponseNode(req, res, next);
 
       // Execute our request handler. If the request errored out, call `next` with the error.
-      requestHandler(req, res, next).catch(next);
+      requestHandler(responseHandler, next).catch(next);
+      // No return value.
     }
   };
 
@@ -1053,7 +1083,7 @@ export default function createPostGraphileHttpRequestHandler(
  *
  * [1]: http://www.html5rocks.com/static/images/cors_server_flowchart.png
  */
-function addCORSHeaders(res: ServerResponse): void {
+function addCORSHeaders(res: PostGraphileResponse): void {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'HEAD, GET, POST');
   res.setHeader(

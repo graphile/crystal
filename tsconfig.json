@@ -16,8 +16,8 @@
     "suppressImplicitAnyIndexErrors": true,
     "strictNullChecks": true,
     "noFallthroughCasesInSwitch": true,
-    "noUnusedParameters": true,
-    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "noUnusedLocals": false,
     "lib": ["es2017", "esnext.asynciterable"]
   },
   "exclude": [
