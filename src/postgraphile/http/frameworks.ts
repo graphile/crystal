@@ -139,9 +139,16 @@ export class PostGraphileResponseKoa extends PostGraphileResponse {
     super();
     this._ctx = ctx;
     this._next = next;
-    const req = this.getNodeServerResponse();
-    // Hack the req object so we can get back to ctx
+    const req = this.getNodeServerRequest();
+
+    // For backwards compatibility (this is a documented interface)
     (req as any)._koaCtx = ctx;
+
+    // Make `koa-bodyparser` trigger skipping of our `body-parser`
+    if ((ctx.request as any).body) {
+      (req as any)._body = true;
+      (req as any).body = (ctx.request as any).body;
+    }
 
     // In case you're using koa-mount or similar
     (req as any).originalUrl = ctx.request.originalUrl;

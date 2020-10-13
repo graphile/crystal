@@ -266,22 +266,12 @@ export default function createPostGraphileHttpRequestHandler(
   const DEFAULT_HANDLE_ERRORS = (errors: Array<GraphQLError>) => errors.map(formatError);
   const handleErrors = options.handleErrors || DEFAULT_HANDLE_ERRORS;
 
-  function convertKoaBodyParserToConnect(req: any, _res: any, next: any): any {
-    if (req._koaCtx && req._koaCtx.request && req._koaCtx.request.body) {
-      req._body = true;
-      req.body = req._koaCtx.request.body;
-    }
-    next();
-  }
-
   // Define a list of middlewares that will get run before our request handler.
   // Note though that none of these middlewares will intercept a request (i.e.
   // not call `next`). Middlewares that handle a request like favicon
   // middleware will result in a promise that never resolves, and we don’t
   // want that.
   const bodyParserMiddlewares = [
-    // Convert koa body to connect-compatible body
-    convertKoaBodyParserToConnect,
     // Parse JSON bodies.
     bodyParser.json({ limit: options.bodySizeLimit }),
     // Parse URL encoded bodies (forms).
