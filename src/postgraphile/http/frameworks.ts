@@ -164,7 +164,7 @@ export class PostGraphileResponseKoa extends PostGraphileResponse {
 
   flushHeaders(statusCode: number, headers: Headers) {
     this._ctx.status = statusCode;
-    Object.assign(this._ctx.headers, headers);
+    this._ctx.set(headers);
     this._ctx.flushHeaders();
   }
 
