@@ -6,6 +6,7 @@ import { Pool } from 'pg';
 import { Plugin, PostGraphileCoreOptions } from 'postgraphile-core';
 import jwt = require('jsonwebtoken');
 import { EventEmitter } from 'events';
+import { PostGraphileResponse } from './postgraphile/http/frameworks';
 
 type PromiseOrDirect<T> = T | Promise<T>;
 type DirectOrCallback<Request, T> = T | ((req: Request) => PromiseOrDirect<T>);
@@ -362,12 +363,12 @@ export interface HttpRequestHandler<
     res: Response,
   ) => Array<GraphQLErrorExtended>;
   graphqlRoute: string;
-  graphqlRouteHandler: (req: Request, res: Response) => Promise<void>;
+  graphqlRouteHandler: (res: PostGraphileResponse) => Promise<void>;
   graphiqlRoute: string;
-  graphiqlRouteHandler: ((req: Request, res: Response) => Promise<void>) | null;
-  faviconRouteHandler: ((req: Request, res: Response) => Promise<void>) | null;
+  graphiqlRouteHandler: ((res: PostGraphileResponse) => Promise<void>) | null;
+  faviconRouteHandler: ((res: PostGraphileResponse) => Promise<void>) | null;
   eventStreamRoute: string;
-  eventStreamRouteHandler: ((req: Request, res: Response) => Promise<void>) | null;
+  eventStreamRouteHandler: ((res: PostGraphileResponse) => Promise<void>) | null;
 }
 
 /**
