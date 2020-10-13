@@ -64,8 +64,15 @@ export abstract class PostGraphileResponse {
         this._body = moreBody;
       }
     }
-    // NOTE: do not output `Content-Length` as it may interfere with
-    // compression middleware.
+
+    // If possible, set Content-Length to avoid unnecessary chunked encoding
+    if (typeof this._body === 'string') {
+      // String length is not reliable due to multi-byte characters; calculate via Buffer
+      this.setHeader('Content-Length', String(Buffer.byteLength(this._body, 'utf8')));
+    } else if (Buffer.isBuffer(this._body)) {
+      this.setHeader('Content-Length', String(this._body.byteLength));
+    }
+
     this._setHeadersOnce();
     this.setBody(this._body);
   }
