@@ -169,7 +169,7 @@ export class PostGraphileResponseKoa extends PostGraphileResponse {
   }
 
   flushBody(body: Stream | Buffer | string | undefined) {
-    this._ctx.body = body;
+    this._ctx.body = body || '';
     this._next();
   }
 }
