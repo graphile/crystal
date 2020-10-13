@@ -461,11 +461,11 @@ export default function createPostGraphileHttpRequestHandler(
 
   function neverReject(
     middlewareName: string,
-    middleware: (req: IncomingMessage, res: PostGraphileResponse) => Promise<void>,
-  ): (req: IncomingMessage, res: PostGraphileResponse) => Promise<void> {
-    return async (req, res) => {
+    middleware: (res: PostGraphileResponse) => Promise<void>,
+  ): (res: PostGraphileResponse) => Promise<void> {
+    return async res => {
       try {
-        await middleware(req, res);
+        await middleware(res);
       } catch (e) {
         console.error(
           `An unexpected error occurred whilst processing '${middlewareName}'; this indicates a bug. The connection will be terminated.`,
@@ -525,7 +525,7 @@ export default function createPostGraphileHttpRequestHandler(
     if (watchPg) {
       // Setup an event stream so we can broadcast events to graphiql, etc.
       if (pathname === eventStreamRoute || pathname === '/_postgraphile/stream') {
-        return eventStreamRouteHandler(req, res);
+        return eventStreamRouteHandler(res);
       }
     }
 
@@ -543,7 +543,7 @@ export default function createPostGraphileHttpRequestHandler(
       // If this is the favicon path and it has not yet been handled, let us
       // serve our GraphQL favicon.
       if (pathname === '/favicon.ico') {
-        return faviconRouteHandler(req, res);
+        return faviconRouteHandler(res);
       }
 
       // ======================================================================
@@ -560,12 +560,12 @@ export default function createPostGraphileHttpRequestHandler(
           return;
         }
 
-        return graphiqlRouteHandler(req, res);
+        return graphiqlRouteHandler(res);
       }
     }
 
     if (isGraphqlRoute) {
-      return graphqlRouteHandler(req, res);
+      return graphqlRouteHandler(res);
     } else {
       // This request wasn't for us.
       return next();
@@ -574,8 +574,9 @@ export default function createPostGraphileHttpRequestHandler(
 
   const eventStreamRouteHandler = neverReject(
     'eventStreamRouteHandler',
-    async function eventStreamRouteHandler(req: IncomingMessage, res: PostGraphileResponse) {
+    async function eventStreamRouteHandler(res: PostGraphileResponse) {
       try {
+        const req = res.getNodeServerRequest();
         // Add our CORS headers to be good web citizens (there are perf
         // implications though so be careful!)
         //
@@ -599,9 +600,9 @@ export default function createPostGraphileHttpRequestHandler(
   );
 
   const faviconRouteHandler = neverReject('faviconRouteHandler', async function faviconRouteHandler(
-    req: IncomingMessage,
     res: PostGraphileResponse,
   ) {
+    const req = res.getNodeServerRequest();
     // If this is the wrong method, we should let the client know.
     if (!(req.method === 'GET' || req.method === 'HEAD')) {
       res.statusCode = req.method === 'OPTIONS' ? 200 : 405;
@@ -626,7 +627,8 @@ export default function createPostGraphileHttpRequestHandler(
 
   const graphiqlRouteHandler = neverReject(
     'graphiqlRouteHandler',
-    async function graphiqlRouteHandler(req: IncomingMessage, res: PostGraphileResponse) {
+    async function graphiqlRouteHandler(res: PostGraphileResponse) {
+      const req = res.getNodeServerRequest();
       if (firstRequestHandler) firstRequestHandler(req);
 
       // If using the incorrect method, let the user know.
@@ -663,9 +665,9 @@ export default function createPostGraphileHttpRequestHandler(
   );
 
   const graphqlRouteHandler = neverReject('graphqlRouteHandler', async function graphqlRouteHandler(
-    req: IncomingMessage,
     res: PostGraphileResponse,
   ) {
+    const req = res.getNodeServerRequest();
     if (firstRequestHandler) firstRequestHandler(req);
 
     // Add our CORS headers to be good web citizens (there are perf
