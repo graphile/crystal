@@ -11,18 +11,18 @@ type Headers = { [header: string]: string };
 export abstract class PostGraphileResponse {
   private _headers: Headers = {};
   private _body: Buffer | string | PassThrough | undefined;
-  private _flushedHeaders: boolean = false;
+  private _setHeaders: boolean = false;
   public statusCode: number = 200;
 
-  private _flushHeadersOnce() {
-    if (!this._flushedHeaders) {
-      this._flushedHeaders = true;
-      this.flushHeaders(this.statusCode, this._headers);
+  private _setHeadersOnce() {
+    if (!this._setHeaders) {
+      this._setHeaders = true;
+      this.setHeaders(this.statusCode, this._headers);
     }
   }
 
   public setHeader(header: string, value: string): void {
-    if (this._flushedHeaders) {
+    if (this._setHeaders) {
       throw new Error(`Cannot set a header '${header}' when headers already sent`);
     }
     this._headers[header] = value;
@@ -35,9 +35,9 @@ export abstract class PostGraphileResponse {
     if (this._body != null) {
       throw new Error("Cannot return a stream when there's already a response body");
     }
-    this._flushHeadersOnce();
+    this._setHeadersOnce();
     this._body = new PassThrough();
-    this.flushBody(this._body);
+    this.setBody(this._body);
     return this._body;
   }
 
@@ -64,8 +64,10 @@ export abstract class PostGraphileResponse {
         this._body = moreBody;
       }
     }
-    this._flushHeadersOnce();
-    this.flushBody(this._body);
+    // NOTE: do not output `Content-Length` as it may interfere with
+    // compression middleware.
+    this._setHeadersOnce();
+    this.setBody(this._body);
   }
 
   /**
@@ -73,8 +75,8 @@ export abstract class PostGraphileResponse {
    */
   public abstract getNodeServerRequest(): IncomingMessage;
   public abstract getNodeServerResponse(): ServerResponse;
-  public abstract flushHeaders(statusCode: number, headers: Headers): void;
-  public abstract flushBody(body: Stream | Buffer | string | undefined): void;
+  public abstract setHeaders(statusCode: number, headers: Headers): void;
+  public abstract setBody(body: Stream | Buffer | string | undefined): void;
 }
 
 /**
@@ -100,19 +102,16 @@ export class PostGraphileResponseNode extends PostGraphileResponse {
     return this._res;
   }
 
-  flushHeaders(statusCode: number, headers: Headers) {
+  setHeaders(statusCode: number, headers: Headers) {
     for (const key in headers) {
       if (Object.hasOwnProperty.call(headers, key)) {
         this._res.setHeader(key, headers[key]);
       }
     }
-    this._res.writeHead(statusCode);
-    // support running within the compression middleware.
-    // https://github.com/expressjs/compression#server-sent-events
-    if (typeof (this._res as any).flushHeaders === 'function') (this._res as any).flushHeaders();
+    this._res.statusCode = statusCode;
   }
 
-  flushBody(body: Stream | Buffer | string | undefined) {
+  setBody(body: Stream | Buffer | string | undefined) {
     if (typeof body === 'string') {
       this._res.end(body);
     } else if (Buffer.isBuffer(body)) {
@@ -120,8 +119,39 @@ export class PostGraphileResponseNode extends PostGraphileResponse {
     } else if (!body) {
       this._res.end();
     } else {
-      // Must be a stream?
-      body.pipe(this._res);
+      // Must be a stream
+
+      // It'd be really nice if we could just:
+      //
+      //   body.pipe(this._res);
+      //
+      // however we need to support running within the compression middleware
+      // which requires special handling for server-sent events:
+      // https://github.com/expressjs/compression#server-sent-events
+      //
+      // Because of this, we must handle the data streaming manually so we can
+      // flush:
+      const writeData = (data: Buffer | string) => {
+        this._res.write(data);
+        // Technically we should see if `.write()` returned false, and if so we
+        // should pause the stream. However, since our stream is coming from
+        // watch mode, we find it unlikely that a significant amount of data
+        // will be buffered (and we don't recommend watch mode in production),
+        // so it doesn't feel like we need this currently. If it turns out you
+        // need this, a PR would be welcome.
+
+        if (typeof (this._res as any).flush === 'function') {
+          // https://github.com/expressjs/compression#server-sent-events
+          (this._res as any).flush();
+        } else if (typeof (this._res as any).flushHeaders === 'function') {
+          (this._res as any).flushHeaders();
+        }
+      };
+      body.on('data', writeData);
+      body.on('end', () => {
+        body.removeListener('data', writeData);
+        this._res.end();
+      });
     }
   }
 }
@@ -162,13 +192,14 @@ export class PostGraphileResponseKoa extends PostGraphileResponse {
     return this._ctx.res;
   }
 
-  flushHeaders(statusCode: number, headers: Headers) {
+  setHeaders(statusCode: number, headers: Headers) {
     this._ctx.status = statusCode;
     this._ctx.set(headers);
-    this._ctx.flushHeaders();
+    // DO NOT `this._ctx.flushHeaders()` as it will interfere with the compress
+    // middleware.
   }
 
-  flushBody(body: Stream | Buffer | string | undefined) {
+  setBody(body: Stream | Buffer | string | undefined) {
     this._ctx.body = body || '';
     this._next();
   }
