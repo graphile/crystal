@@ -154,11 +154,24 @@ export class PostGraphileResponseNode extends PostGraphileResponse {
           (this._res as any).flushHeaders();
         }
       };
+      let clean = false;
+      const cleanup = () => {
+        if (clean) return;
+        clean = true;
+        body.removeListener('data', writeData);
+        body.removeListener('end', cleanup);
+        this._req.removeListener('close', cleanup);
+        this._req.removeListener('end', cleanup);
+        this._req.removeListener('error', cleanup);
+      };
       body.on('data', writeData);
       body.on('end', () => {
-        body.removeListener('data', writeData);
+        cleanup();
         this._res.end();
       });
+      this._req.on('close', cleanup);
+      this._req.on('end', cleanup);
+      this._req.on('error', cleanup);
     }
   }
 }
