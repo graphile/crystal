@@ -147,11 +147,15 @@ fragment compoundType on CompoundType {
   fooBar
 }
 
+# This should be the same fragment as in queries/types.graphql
 fragment type on Type {
   id
   smallint
   bigint
+  numeric
+  decimal
   boolean
+  varchar
   enum
   enumArray
   domain
@@ -179,6 +183,16 @@ fragment type on Type {
       inclusive
     }
   }
+  daterange {
+    start {
+      value
+      inclusive
+    }
+    end {
+      value
+      inclusive
+    }
+  }
   anIntRange {
     start {
       value
@@ -188,6 +202,27 @@ fragment type on Type {
       value
       inclusive
     }
+  }
+  timestamp
+  timestamptz
+  date
+  time
+  timetz
+  interval {
+    years
+    months
+    days
+    hours
+    minutes
+    seconds
+  }
+  intervalArray {
+    years
+    months
+    days
+    hours
+    minutes
+    seconds
   }
   money
   compoundType {
@@ -235,4 +270,12 @@ fragment type on Type {
   regdictionary
   textArrayDomain
   int8ArrayDomain
+  postBySmallint {
+    id
+    headline
+  }
+  postById {
+    id
+    headline
+  }
 }

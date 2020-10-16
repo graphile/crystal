@@ -1907,6 +1907,18 @@ Object {
           "f": null,
           "fooBar": null,
         },
+        "date": "2010-01-01",
+        "daterange": Object {
+          "end": Object {
+            "inclusive": false,
+            "value": "2020-01-02",
+          },
+          "start": Object {
+            "inclusive": true,
+            "value": "1985-01-01",
+          },
+        },
+        "decimal": "1",
         "domain": 1,
         "domain2": 1,
         "enum": "RED",
@@ -1918,6 +1930,24 @@ Object {
         "id": 1,
         "inet": null,
         "int8ArrayDomain": null,
+        "interval": Object {
+          "days": 0,
+          "hours": 0,
+          "minutes": 27,
+          "months": 0,
+          "seconds": 0,
+          "years": 0,
+        },
+        "intervalArray": Array [
+          Object {
+            "days": 0,
+            "hours": 0,
+            "minutes": 27,
+            "months": 0,
+            "seconds": 0,
+            "years": 0,
+          },
+        ],
         "json": "{\\"json\\":true}",
         "jsonb": "{\\"jsonb\\":true}",
         "macaddr": null,
@@ -1939,6 +1969,7 @@ Object {
         "nullableNestedCompoundType": null,
         "nullablePoint": null,
         "nullableRange": null,
+        "numeric": "1",
         "numrange": Object {
           "end": Object {
             "inclusive": true,
@@ -1953,6 +1984,14 @@ Object {
           "x": 99,
           "y": 77,
         },
+        "postById": Object {
+          "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+          "id": 1,
+        },
+        "postBySmallint": Object {
+          "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+          "id": 1,
+        },
         "regclass": "c.person",
         "regconfig": "dutch",
         "regdictionary": "dutch_stem",
@@ -1966,6 +2005,11 @@ Object {
           "Hi",
         ],
         "textArrayDomain": null,
+        "time": "19:00:00",
+        "timestamp": "2012-01-11T00:00:00",
+        "timestamptz": "2012-01-01T00:00:00-04:00",
+        "timetz": "19:00:00-04",
+        "varchar": "1",
       },
     },
     "typeFunctionConnectionMutation": Object {
@@ -1993,6 +2037,18 @@ Object {
             "f": "_EMPTY_",
             "fooBar": 8,
           },
+          "date": "2016-10-07",
+          "daterange": Object {
+            "end": Object {
+              "inclusive": false,
+              "value": "2016-10-07",
+            },
+            "start": Object {
+              "inclusive": true,
+              "value": "1998-07-12",
+            },
+          },
+          "decimal": "15.2",
           "domain": 5,
           "domain2": 6,
           "enum": "GREEN",
@@ -2003,6 +2059,32 @@ Object {
           "id": 11,
           "inet": null,
           "int8ArrayDomain": null,
+          "interval": Object {
+            "days": 3,
+            "hours": 4,
+            "minutes": 5,
+            "months": 2,
+            "seconds": 6,
+            "years": 1,
+          },
+          "intervalArray": Array [
+            Object {
+              "days": 3,
+              "hours": 4,
+              "minutes": 5,
+              "months": 2,
+              "seconds": 6,
+              "years": 1,
+            },
+            Object {
+              "days": 1,
+              "hours": 1,
+              "minutes": 1,
+              "months": 1,
+              "seconds": 1,
+              "years": 1,
+            },
+          ],
           "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3,\\"d\\":{\\"e\\":4,\\"f\\":5,\\"g\\":[6,7,8,\\"x\\",false,null]}}",
           "jsonb": "{\\"1\\":\\"a\\",\\"2\\":\\"b\\",\\"3\\":\\"c\\",\\"4\\":{\\"5\\":\\"d\\",\\"6\\":\\"e\\",\\"7\\":[\\"f\\",\\"g\\",\\"h\\",42,true,null]}}",
           "macaddr": null,
@@ -2032,6 +2114,7 @@ Object {
           "nullableNestedCompoundType": null,
           "nullablePoint": null,
           "nullableRange": null,
+          "numeric": "15.2",
           "numrange": Object {
             "end": Object {
               "inclusive": false,
@@ -2045,6 +2128,14 @@ Object {
           "point": Object {
             "x": 1,
             "y": 3,
+          },
+          "postById": Object {
+            "headline": "They’re not aliens, they’re Earth…liens!",
+            "id": 11,
+          },
+          "postBySmallint": Object {
+            "headline": "What’s with you kids? Every other day it’s food, food, food.",
+            "id": 10,
           },
           "regclass": null,
           "regconfig": null,
@@ -2063,6 +2154,11 @@ Object {
             "you",
           ],
           "textArrayDomain": null,
+          "time": "04:05:06",
+          "timestamp": "1999-01-08T04:05:06",
+          "timestamptz": "1999-01-08T08:05:06-04:00",
+          "timetz": "04:05:06-08",
+          "varchar": "xyz",
         },
         Object {
           "anIntRange": Object {
@@ -2087,6 +2183,18 @@ Object {
             "f": null,
             "fooBar": null,
           },
+          "date": "2016-10-07",
+          "daterange": Object {
+            "end": Object {
+              "inclusive": false,
+              "value": "2016-10-07",
+            },
+            "start": Object {
+              "inclusive": true,
+              "value": "1998-07-12",
+            },
+          },
+          "decimal": "15.2",
           "domain": 5,
           "domain2": 6,
           "enum": "GREEN",
@@ -2100,6 +2208,32 @@ Object {
             "1",
             "2",
             "2098288669218571760",
+          ],
+          "interval": Object {
+            "days": 3,
+            "hours": 4,
+            "minutes": 5,
+            "months": 2,
+            "seconds": 6,
+            "years": 1,
+          },
+          "intervalArray": Array [
+            Object {
+              "days": 3,
+              "hours": 4,
+              "minutes": 5,
+              "months": 2,
+              "seconds": 6,
+              "years": 1,
+            },
+            Object {
+              "days": 1,
+              "hours": 1,
+              "minutes": 1,
+              "months": 1,
+              "seconds": 1,
+              "years": 1,
+            },
           ],
           "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3,\\"d\\":{\\"e\\":4,\\"f\\":5,\\"g\\":[6,7,8,\\"x\\",false,null]}}",
           "jsonb": "{\\"1\\":\\"a\\",\\"2\\":\\"b\\",\\"3\\":\\"c\\",\\"4\\":{\\"5\\":\\"d\\",\\"6\\":\\"e\\",\\"7\\":[\\"f\\",\\"g\\",\\"h\\",42,true,null]}}",
@@ -2130,6 +2264,7 @@ Object {
           "nullableNestedCompoundType": null,
           "nullablePoint": null,
           "nullableRange": null,
+          "numeric": "15.2",
           "numrange": Object {
             "end": Object {
               "inclusive": false,
@@ -2144,6 +2279,8 @@ Object {
             "x": 1,
             "y": 3,
           },
+          "postById": null,
+          "postBySmallint": null,
           "regclass": "b.types",
           "regconfig": "english",
           "regdictionary": "simple",
@@ -2165,6 +2302,11 @@ Object {
             "2 months",
             "3 days",
           ],
+          "time": "04:05:06",
+          "timestamp": "1999-01-08T04:05:06",
+          "timestamptz": "1999-01-08T08:05:06-04:00",
+          "timetz": "04:05:06-08",
+          "varchar": "xyz",
         },
       ],
     },
@@ -2193,6 +2335,18 @@ Object {
             "f": "_EMPTY_",
             "fooBar": 8,
           },
+          "date": "2016-10-07",
+          "daterange": Object {
+            "end": Object {
+              "inclusive": false,
+              "value": "2016-10-07",
+            },
+            "start": Object {
+              "inclusive": true,
+              "value": "1998-07-12",
+            },
+          },
+          "decimal": "15.2",
           "domain": 5,
           "domain2": 6,
           "enum": "GREEN",
@@ -2203,6 +2357,32 @@ Object {
           "id": 11,
           "inet": null,
           "int8ArrayDomain": null,
+          "interval": Object {
+            "days": 3,
+            "hours": 4,
+            "minutes": 5,
+            "months": 2,
+            "seconds": 6,
+            "years": 1,
+          },
+          "intervalArray": Array [
+            Object {
+              "days": 3,
+              "hours": 4,
+              "minutes": 5,
+              "months": 2,
+              "seconds": 6,
+              "years": 1,
+            },
+            Object {
+              "days": 1,
+              "hours": 1,
+              "minutes": 1,
+              "months": 1,
+              "seconds": 1,
+              "years": 1,
+            },
+          ],
           "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3,\\"d\\":{\\"e\\":4,\\"f\\":5,\\"g\\":[6,7,8,\\"x\\",false,null]}}",
           "jsonb": "{\\"1\\":\\"a\\",\\"2\\":\\"b\\",\\"3\\":\\"c\\",\\"4\\":{\\"5\\":\\"d\\",\\"6\\":\\"e\\",\\"7\\":[\\"f\\",\\"g\\",\\"h\\",42,true,null]}}",
           "macaddr": null,
@@ -2232,6 +2412,7 @@ Object {
           "nullableNestedCompoundType": null,
           "nullablePoint": null,
           "nullableRange": null,
+          "numeric": "15.2",
           "numrange": Object {
             "end": Object {
               "inclusive": false,
@@ -2245,6 +2426,14 @@ Object {
           "point": Object {
             "x": 1,
             "y": 3,
+          },
+          "postById": Object {
+            "headline": "They’re not aliens, they’re Earth…liens!",
+            "id": 11,
+          },
+          "postBySmallint": Object {
+            "headline": "What’s with you kids? Every other day it’s food, food, food.",
+            "id": 10,
           },
           "regclass": null,
           "regconfig": null,
@@ -2263,6 +2452,11 @@ Object {
             "you",
           ],
           "textArrayDomain": null,
+          "time": "04:05:06",
+          "timestamp": "1999-01-08T04:05:06",
+          "timestamptz": "1999-01-08T08:05:06-04:00",
+          "timetz": "04:05:06-08",
+          "varchar": "xyz",
         },
         Object {
           "anIntRange": Object {
@@ -2287,6 +2481,18 @@ Object {
             "f": null,
             "fooBar": null,
           },
+          "date": "2016-10-07",
+          "daterange": Object {
+            "end": Object {
+              "inclusive": false,
+              "value": "2016-10-07",
+            },
+            "start": Object {
+              "inclusive": true,
+              "value": "1998-07-12",
+            },
+          },
+          "decimal": "15.2",
           "domain": 5,
           "domain2": 6,
           "enum": "GREEN",
@@ -2300,6 +2506,32 @@ Object {
             "1",
             "2",
             "2098288669218571760",
+          ],
+          "interval": Object {
+            "days": 3,
+            "hours": 4,
+            "minutes": 5,
+            "months": 2,
+            "seconds": 6,
+            "years": 1,
+          },
+          "intervalArray": Array [
+            Object {
+              "days": 3,
+              "hours": 4,
+              "minutes": 5,
+              "months": 2,
+              "seconds": 6,
+              "years": 1,
+            },
+            Object {
+              "days": 1,
+              "hours": 1,
+              "minutes": 1,
+              "months": 1,
+              "seconds": 1,
+              "years": 1,
+            },
           ],
           "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3,\\"d\\":{\\"e\\":4,\\"f\\":5,\\"g\\":[6,7,8,\\"x\\",false,null]}}",
           "jsonb": "{\\"1\\":\\"a\\",\\"2\\":\\"b\\",\\"3\\":\\"c\\",\\"4\\":{\\"5\\":\\"d\\",\\"6\\":\\"e\\",\\"7\\":[\\"f\\",\\"g\\",\\"h\\",42,true,null]}}",
@@ -2330,6 +2562,7 @@ Object {
           "nullableNestedCompoundType": null,
           "nullablePoint": null,
           "nullableRange": null,
+          "numeric": "15.2",
           "numrange": Object {
             "end": Object {
               "inclusive": false,
@@ -2344,6 +2577,8 @@ Object {
             "x": 1,
             "y": 3,
           },
+          "postById": null,
+          "postBySmallint": null,
           "regclass": "b.types",
           "regconfig": "english",
           "regdictionary": "simple",
@@ -2365,6 +2600,11 @@ Object {
             "2 months",
             "3 days",
           ],
+          "time": "04:05:06",
+          "timestamp": "1999-01-08T04:05:06",
+          "timestamptz": "1999-01-08T08:05:06-04:00",
+          "timetz": "04:05:06-08",
+          "varchar": "xyz",
         },
       ],
     },
@@ -2392,6 +2632,18 @@ Object {
           "f": "_EMPTY_",
           "fooBar": 8,
         },
+        "date": "2016-10-07",
+        "daterange": Object {
+          "end": Object {
+            "inclusive": false,
+            "value": "2016-10-07",
+          },
+          "start": Object {
+            "inclusive": true,
+            "value": "1998-07-12",
+          },
+        },
+        "decimal": "15.2",
         "domain": 5,
         "domain2": 6,
         "enum": "GREEN",
@@ -2402,6 +2654,32 @@ Object {
         "id": 11,
         "inet": null,
         "int8ArrayDomain": null,
+        "interval": Object {
+          "days": 3,
+          "hours": 4,
+          "minutes": 5,
+          "months": 2,
+          "seconds": 6,
+          "years": 1,
+        },
+        "intervalArray": Array [
+          Object {
+            "days": 3,
+            "hours": 4,
+            "minutes": 5,
+            "months": 2,
+            "seconds": 6,
+            "years": 1,
+          },
+          Object {
+            "days": 1,
+            "hours": 1,
+            "minutes": 1,
+            "months": 1,
+            "seconds": 1,
+            "years": 1,
+          },
+        ],
         "json": "{\\"a\\":1,\\"b\\":2,\\"c\\":3,\\"d\\":{\\"e\\":4,\\"f\\":5,\\"g\\":[6,7,8,\\"x\\",false,null]}}",
         "jsonb": "{\\"1\\":\\"a\\",\\"2\\":\\"b\\",\\"3\\":\\"c\\",\\"4\\":{\\"5\\":\\"d\\",\\"6\\":\\"e\\",\\"7\\":[\\"f\\",\\"g\\",\\"h\\",42,true,null]}}",
         "macaddr": null,
@@ -2431,6 +2709,7 @@ Object {
         "nullableNestedCompoundType": null,
         "nullablePoint": null,
         "nullableRange": null,
+        "numeric": "15.2",
         "numrange": Object {
           "end": Object {
             "inclusive": false,
@@ -2444,6 +2723,14 @@ Object {
         "point": Object {
           "x": 1,
           "y": 3,
+        },
+        "postById": Object {
+          "headline": "They’re not aliens, they’re Earth…liens!",
+          "id": 11,
+        },
+        "postBySmallint": Object {
+          "headline": "What’s with you kids? Every other day it’s food, food, food.",
+          "id": 10,
         },
         "regclass": null,
         "regconfig": null,
@@ -2462,6 +2749,11 @@ Object {
           "you",
         ],
         "textArrayDomain": null,
+        "time": "04:05:06",
+        "timestamp": "1999-01-08T04:05:06",
+        "timestamptz": "1999-01-08T08:05:06-04:00",
+        "timetz": "04:05:06-08",
+        "varchar": "xyz",
       },
     },
     "updateTypeById": Object {
@@ -2488,6 +2780,18 @@ Object {
           "f": null,
           "fooBar": null,
         },
+        "date": "2010-01-01",
+        "daterange": Object {
+          "end": Object {
+            "inclusive": false,
+            "value": "2020-01-02",
+          },
+          "start": Object {
+            "inclusive": true,
+            "value": "1985-01-01",
+          },
+        },
+        "decimal": "1",
         "domain": 1,
         "domain2": 1,
         "enum": "RED",
@@ -2502,6 +2806,24 @@ Object {
           "2098288669218571759",
           "2098288669218571760",
           "2098288669218571761",
+        ],
+        "interval": Object {
+          "days": 0,
+          "hours": 0,
+          "minutes": 27,
+          "months": 0,
+          "seconds": 0,
+          "years": 0,
+        },
+        "intervalArray": Array [
+          Object {
+            "days": 0,
+            "hours": 0,
+            "minutes": 27,
+            "months": 0,
+            "seconds": 0,
+            "years": 0,
+          },
         ],
         "json": "{\\"json\\":true}",
         "jsonb": "{\\"jsonb\\":true}",
@@ -2527,6 +2849,7 @@ Object {
           "y": 42,
         },
         "nullableRange": null,
+        "numeric": "1",
         "numrange": Object {
           "end": Object {
             "inclusive": true,
@@ -2540,6 +2863,14 @@ Object {
         "point": Object {
           "x": 99,
           "y": 77,
+        },
+        "postById": Object {
+          "headline": "They’re not aliens, they’re Earth…liens!",
+          "id": 11,
+        },
+        "postBySmallint": Object {
+          "headline": "No… It’s a thing; it’s like a plan, but with more greatness.",
+          "id": 1,
         },
         "regclass": "c.person",
         "regconfig": "dutch",
@@ -2558,6 +2889,11 @@ Object {
           "T2",
           "T3",
         ],
+        "time": "19:00:00",
+        "timestamp": "2012-01-11T00:00:00",
+        "timestamptz": "2012-01-01T00:00:00-04:00",
+        "timetz": "19:00:00-04",
+        "varchar": "1",
       },
     },
   },

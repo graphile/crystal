@@ -56,11 +56,15 @@ fragment compoundType on CompoundType {
   fooBar
 }
 
+# This should be the same fragment as in mutations/types.graphql
 fragment type on Type {
   id
   smallint
   bigint
+  numeric
+  decimal
   boolean
+  varchar
   enum
   enumArray
   domain
@@ -88,6 +92,16 @@ fragment type on Type {
       inclusive
     }
   }
+  daterange {
+    start {
+      value
+      inclusive
+    }
+    end {
+      value
+      inclusive
+    }
+  }
   anIntRange {
     start {
       value
@@ -97,6 +111,27 @@ fragment type on Type {
       value
       inclusive
     }
+  }
+  timestamp
+  timestamptz
+  date
+  time
+  timetz
+  interval {
+    years
+    months
+    days
+    hours
+    minutes
+    seconds
+  }
+  intervalArray {
+    years
+    months
+    days
+    hours
+    minutes
+    seconds
   }
   money
   compoundType {
@@ -134,6 +169,14 @@ fragment type on Type {
   inet
   cidr
   macaddr
+  regproc
+  regprocedure
+  regoper
+  regoperator
+  regclass
+  regtype
+  regconfig
+  regdictionary
   textArrayDomain
   int8ArrayDomain
   postBySmallint {
@@ -144,14 +187,6 @@ fragment type on Type {
     id
     headline
   }
-  regproc
-  regprocedure
-  regoper
-  regoperator
-  regclass
-  regtype
-  regconfig
-  regdictionary
 }
 
 fragment typesConnection on TypesConnection {
