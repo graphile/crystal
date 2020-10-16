@@ -3,7 +3,22 @@
 We use PostGraphile's GitHub releases tab to log our changes in detail, but
 this auto-generated changelog helps us to produce that list, and it may be
 helpful to you also.
-# [](https://github.com/graphile/graphile-engine/compare/v4.9.0...v) (2020-09-09)
+# [](https://github.com/graphile/graphile-engine/compare/v4.9.0...v) (2020-10-16)
+
+
+### Bug Fixes
+
+* **types:** fix parsing interval to support fractional seconds ([#678](https://github.com/graphile/graphile-engine/issues/678)) ([79017c5](https://github.com/graphile/graphile-engine/commit/79017c56d0b3b7ec76cd36b069d00129f6b8501f))
+* domains over array types now correctly apply "tweaks" ([#672](https://github.com/graphile/graphile-engine/issues/672)) ([99259f4](https://github.com/graphile/graphile-engine/commit/99259f4045d95d2e7a555f6788c0755a513a26bc))
+* **graphile-build-pg:** add more numeric casting exceptions ([#661](https://github.com/graphile/graphile-engine/issues/661)) ([ea8480e](https://github.com/graphile/graphile-engine/commit/ea8480e844bfdc025c615af07bbd82886e0f4faf))
+* **proc:** fix output of record/table returning functions ([#667](https://github.com/graphile/graphile-engine/issues/667)) ([7182d92](https://github.com/graphile/graphile-engine/commit/7182d9277f69bd342ffeb7b0c6aefc6a2a2d81fa))
+* **utils:** selectGraphQLResultFromTable now debugs SQL ([#668](https://github.com/graphile/graphile-engine/issues/668)) ([04a996a](https://github.com/graphile/graphile-engine/commit/04a996aa6aca32f2b273001a7500f1ae96dce533))
+* load makeAddPgTableConditionPlugins before PgConnectionArgOrderBy ([#658](https://github.com/graphile/graphile-engine/issues/658)) ([16d7b30](https://github.com/graphile/graphile-engine/commit/16d7b3086649ef972ea8e337acf3bfb56be9416e))
+
+
+### Features
+
+* **smart-tags:** add support for '[@unique](https://github.com/unique)' fake constraints ([#673](https://github.com/graphile/graphile-engine/issues/673)) ([5cd51b6](https://github.com/graphile/graphile-engine/commit/5cd51b66ce1a9ecd0f2574e0105a0d6cbfecbb75))
 
 
 
