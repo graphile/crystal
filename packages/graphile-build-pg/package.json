@@ -45,8 +45,7 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": ">=4 <5",
     "lru-cache": ">=4 <5",
-    "pg-sql2": "4.9.0",
-    "postgres-interval": "^2.1.0"
+    "pg-sql2": "4.9.0"
   },
   "peerDependencies": {
     "pg": ">=6.1.0 <9"

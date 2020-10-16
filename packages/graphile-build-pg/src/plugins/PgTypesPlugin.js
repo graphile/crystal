@@ -3,7 +3,7 @@ import type { Plugin } from "graphile-build";
 
 import makeGraphQLJSONType from "../GraphQLJSON";
 
-import rawParseInterval from "postgres-interval";
+import { parseInterval as rawParseInterval } from "../postgresInterval";
 import LRU from "@graphile/lru";
 
 function indent(str) {
