@@ -8,7 +8,13 @@ to you also.
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
-# [4.9.0](https://github.com/graphile/postgraphile/compare/v4.8.0...v4.9.0) (2020-09-11)
+## [4.9.1](https://github.com/graphile/postgraphile/compare/v4.9.0...v4.9.1) (2020-10-16)
+
+### Features
+
+- export debugPgClient ([#1358](https://github.com/graphile/postgraphile/issues/1358)) ([3b01d52](https://github.com/graphile/postgraphile/commit/3b01d529e7fdc79e14a0bde0bf133e963ecdc088))
+
+# [4.9.0](https://github.com/graphile/postgraphile/compare/v4.8.0...v4.9.0) (2020-09-15)
 
 ### Bug Fixes
 
