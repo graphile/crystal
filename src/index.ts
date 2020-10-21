@@ -43,6 +43,7 @@ export {
   PostGraphileResponse,
   PostGraphileResponseNode,
   PostGraphileResponseKoa,
+  PostGraphileResponseFastify3,
 } from './postgraphile/http/frameworks';
 
 export { makePluginHook, PostGraphilePlugin } from './postgraphile/pluginHook';

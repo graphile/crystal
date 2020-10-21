@@ -1,6 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { PassThrough, Stream } from 'stream';
 import { Context as KoaContext } from 'koa';
+import { FastifyReply, FastifyRequest } from 'fastify';
 
 type Headers = { [header: string]: string };
 
@@ -222,5 +223,46 @@ export class PostGraphileResponseKoa extends PostGraphileResponse {
   setBody(body: Stream | Buffer | string | undefined) {
     this._ctx.body = body || '';
     this._next();
+  }
+}
+
+/**
+ * Suitable for Fastify v3 (use PostGraphileResponseNode and middleware
+ * approach for Fastify v2)
+ */
+export class PostGraphileResponseFastify3 extends PostGraphileResponse {
+  private _request: FastifyRequest;
+  private _reply: FastifyReply<ServerResponse>;
+
+  constructor(request: FastifyRequest, reply: FastifyReply<ServerResponse>) {
+    super();
+    this._request = request;
+    this._reply = reply;
+    const req = this.getNodeServerRequest();
+
+    // Make Fastify's body parsing trigger skipping of our `body-parser`
+    if (this._request.body) {
+      (req as any)._body = true;
+      (req as any).body = this._request.body;
+    }
+
+    //(req as any).originalUrl = (this._request.raw as any).originalUrl;
+  }
+
+  getNodeServerRequest() {
+    return this._request.req;
+  }
+
+  getNodeServerResponse() {
+    return this._reply.res;
+  }
+
+  setHeaders(statusCode: number, headers: Headers) {
+    this._reply.status(statusCode);
+    this._reply.headers(headers);
+  }
+
+  setBody(body: Stream | Buffer | string | undefined) {
+    this._reply.send(body);
   }
 }
