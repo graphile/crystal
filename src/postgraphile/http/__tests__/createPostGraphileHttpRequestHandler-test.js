@@ -18,6 +18,8 @@ const koaMount = require('koa-mount');
 const fastify2 = require('fastify-v2');
 const fastify3 = require('fastify');
 const restify = require('restify');
+const expressCompression = require('compression');
+const fastifyCompression = require('fastify-compress');
 // tslint:disable-next-line variable-name
 const EventEmitter = require('events');
 
@@ -108,6 +110,7 @@ const serverCreators = new Map([
     'express',
     (handler, _options, subpath) => {
       const app = express();
+      app.use(expressCompression({ threshold: 0 }));
       if (subpath) {
         app.use(subpath, handler);
       } else {
@@ -152,6 +155,7 @@ const serverCreators = new Map([
         return server;
       }
       const app = fastify3({ serverFactory, bodyLimit: options.bodySizeLimit || 100 * 1024 });
+      app.register(fastifyCompression, { threshold: 0 });
 
       // Natively, Fastify only supports 'application/json' and 'text/plain' content types
       app.addContentTypeParser(
