@@ -133,7 +133,7 @@ insert into b.types values (
   '04:05:06',
   '04:05:06 -8:00',
   '1 year 2 months 3 days 4 hours 5 minutes 6.789123456 seconds',
-  ARRAY['1 year 2 months 3 days 4 hours 5 minutes 6.789123456 seconds', '1 year 1 months 1 days 1 hours 1 minutes 1 seconds']::interval[],
+  ARRAY['1 year 2 months 3 days 4 hours 5 minutes 6.789123456 seconds', '1 year 1 months 1 days 1 hours 1 minutes 1 seconds', '200 years', '200.200 seconds']::interval[],
   '9876543.21',
   (null, null, null, null, null, null, null, null),
   ((3, '456', 'red', 'aed18400-2a92-46df-8204-b70c728b3520', 'BAR_FOO', 'one', interval '6 hours', 93), (null, null, null, null, null, null, null, null), 7),

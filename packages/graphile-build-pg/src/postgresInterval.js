@@ -30,48 +30,30 @@ export type Interval = {
   seconds: number,
 };
 
-// All intervals will have exactly these properties:
-const BASE: Interval = Object.freeze({
-  years: 0,
-  months: 0,
-  days: 0,
-  hours: 0,
-  minutes: 0,
-  seconds: 0.0,
-});
-
 export function parseInterval(interval: string): Interval {
-  const result = { ...BASE };
-
   if (!interval) {
-    return result;
+    return {
+      years: 0,
+      months: 0,
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0.0,
+    };
   }
 
-  const matches = INTERVAL.exec(interval);
-  if (!matches) {
-    throw new Error(`Failed to parse interval '${interval}' from PostgreSQL`);
-  }
-
-  const [
-    ,
-    years,
-    months,
-    days,
-    plusMinusTime,
-    hours,
-    minutes,
-    seconds,
-  ] = matches;
+  const [, years, months, days, plusMinusTime, hours, minutes, seconds] =
+    INTERVAL.exec(interval) || [];
 
   const timeMultiplier = plusMinusTime === "-" ? -1 : 1;
 
-  if (years) result.years = parseInt(years, 10);
-  if (months) result.months = parseInt(months, 10);
-  if (days) result.days = parseInt(days, 10);
-  if (hours) result.hours = timeMultiplier * parseInt(hours, 10);
-  if (minutes) result.minutes = timeMultiplier * parseInt(minutes, 10);
-  // Seconds can be decimal; all other values are integer
-  if (seconds) result.seconds = timeMultiplier * parseFloat(seconds);
-
-  return result;
+  return {
+    years: years ? parseInt(years, 10) : 0,
+    months: months ? parseInt(months, 10) : 0,
+    days: days ? parseInt(days, 10) : 0,
+    hours: hours ? timeMultiplier * parseInt(hours, 10) : 0,
+    minutes: minutes ? timeMultiplier * parseInt(minutes, 10) : 0,
+    // Seconds can be decimal; all other values are integer
+    seconds: seconds ? timeMultiplier * parseFloat(seconds) : 0,
+  };
 }
