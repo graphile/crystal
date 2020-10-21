@@ -98,6 +98,7 @@ export interface PgType {
   enumDescriptions: string[] | void;
   rangeSubTypeId: string | void;
   tags: { [tag: string]: true | string | Array<string> };
+  isFake?: boolean;
 }
 
 export interface PgAttribute {

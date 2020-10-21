@@ -149,9 +149,11 @@ export default (function PgTypesPlugin(
           return sql.fragment`array[${sql.join(
             val.map(v => gql2pg(v, type.arrayItemType, modifier)),
             ", "
-          )}]::${sql.identifier(type.namespaceName)}.${sql.identifier(
-            type.name
-          )}`;
+          )}]::${
+            type.isFake
+              ? sql.identifier("unknown")
+              : sql.identifier(type.namespaceName, type.name)
+          }`;
         } else {
           return sql.value(val);
         }

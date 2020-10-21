@@ -76,6 +76,9 @@ Object {
         "letter": "C",
       },
     },
+    "referencingTableMutation": Object {
+      "integer": 435,
+    },
   },
 }
 `;

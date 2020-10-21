@@ -124,10 +124,14 @@ select ${sql.join(
             (outputArgName, idx) =>
               sql.query`(${sqlValuesAlias}.output_value_list)[${sql.literal(
                 idx + 1
-              )}]::${sql.identifier(
-                outputArgTypes[idx].namespaceName,
-                outputArgTypes[idx].name
-              )} as ${sql.identifier(
+              )}]::${
+                outputArgTypes[idx].isFake
+                  ? sql.identifier("unknown")
+                  : sql.identifier(
+                      outputArgTypes[idx].namespaceName,
+                      outputArgTypes[idx].name
+                    )
+              } as ${sql.identifier(
                 // According to https://www.postgresql.org/docs/10/static/sql-createfunction.html,
                 // "If you omit the name for an output argument, the system will choose a default column name."
                 // In PG 9.x and 10, the column names appear to be assigned with a `column` prefix.

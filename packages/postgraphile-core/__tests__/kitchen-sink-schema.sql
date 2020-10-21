@@ -1203,6 +1203,18 @@ create table enum_tables.referencing_table(
   enum_3 char(2) references enum_tables.lots_of_enums(enum_3)
 );
 
+-- Relates to https://github.com/graphile/postgraphile/issues/1365
+create function enum_tables.referencing_table_mutation(t enum_tables.referencing_table)
+returns int as $$
+declare
+  v_out int;
+begin
+  insert into enum_tables.referencing_table (enum_1, enum_2, enum_3) values (t.enum_1, t.enum_2, t.enum_3)
+    returning id into v_out;
+  return v_out;
+end;
+$$ language plpgsql volatile;
+
 
 --------------------------------------------------------------------------------
 

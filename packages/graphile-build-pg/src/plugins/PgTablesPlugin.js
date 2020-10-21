@@ -323,11 +323,11 @@ export default (function PgTablesPlugin(
                   const v = obj[fieldName];
                   if (inputField && v != null) {
                     const { type, typeModifier } = inputField;
-                    return sql.fragment`${gql2pg(
-                      v,
-                      type,
-                      typeModifier
-                    )}::${sql.identifier(type.namespaceName, type.name)}`;
+                    return sql.fragment`${gql2pg(v, type, typeModifier)}::${
+                      type.isFake
+                        ? sql.identifier("unknown")
+                        : sql.identifier(type.namespaceName, type.name)
+                    }`;
                   } else {
                     return sql.null; // TODO: return default instead.
                   }
@@ -336,10 +336,14 @@ export default (function PgTablesPlugin(
                 return sql.fragment`row(${sql.join(
                   attributes.map(attr2sql),
                   ","
-                )})::${sql.identifier(
-                  tablePgType.namespaceName,
-                  tablePgType.name
-                )}`;
+                )})::${
+                  tablePgType.isFake
+                    ? sql.identifier("unknown")
+                    : sql.identifier(
+                        tablePgType.namespaceName,
+                        tablePgType.name
+                      )
+                }`;
               },
             };
 

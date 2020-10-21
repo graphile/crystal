@@ -109,6 +109,7 @@ export type PgType = {
   enumDescriptions: ?(string[]),
   rangeSubTypeId: ?string,
   tags: { [string]: string },
+  isFake: ?boolean,
 };
 
 export type PgAttribute = {
@@ -714,9 +715,11 @@ Original error: ${e.message}
 
                   // Create fake enum type
                   const constraintIdent =
-                    constraint.type === "p" ? "" : `_${constraint.name}`;
+                    (constraint.type === "p" ? "" : `_${constraint.name}`) +
+                    "_fake_enum";
                   const enumTypeArray = {
                     kind: "type",
+                    isFake: true,
                     id: `FAKE_ENUM_${klass.namespaceName}_${klass.name}${constraintIdent}_list`,
                     name: `_${klass.name}${constraintIdent}`,
                     description: null,
@@ -739,6 +742,7 @@ Original error: ${e.message}
                   };
                   const enumType = {
                     kind: "type",
+                    isFake: true,
                     id: `FAKE_ENUM_${klass.namespaceName}_${klass.name}${constraintIdent}`,
                     name: `${klass.name}${constraintIdent}`,
                     description: klass.description,

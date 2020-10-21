@@ -19,4 +19,8 @@ mutation {
       description
     }
   }
+
+  referencingTableMutation(input: { t: { enum1: A1, enum2: B2, enum3: C4 } }) {
+    integer
+  }
 }
