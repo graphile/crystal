@@ -232,29 +232,27 @@ export class PostGraphileResponseKoa extends PostGraphileResponse {
  */
 export class PostGraphileResponseFastify3 extends PostGraphileResponse {
   private _request: FastifyRequest;
-  private _reply: FastifyReply<ServerResponse>;
+  private _reply: FastifyReply;
 
-  constructor(request: FastifyRequest, reply: FastifyReply<ServerResponse>) {
+  constructor(request: FastifyRequest, reply: FastifyReply) {
     super();
     this._request = request;
     this._reply = reply;
-    const req = this.getNodeServerRequest();
 
     // Make Fastify's body parsing trigger skipping of our `body-parser`
     if (this._request.body) {
-      (req as any)._body = true;
-      (req as any).body = this._request.body;
+      const req: any = this.getNodeServerRequest();
+      req._body = true;
+      req.body = this._request.body;
     }
-
-    //(req as any).originalUrl = (this._request.raw as any).originalUrl;
   }
 
   getNodeServerRequest() {
-    return this._request.req;
+    return this._request.raw;
   }
 
   getNodeServerResponse() {
-    return this._reply.res;
+    return this._reply.raw;
   }
 
   setHeaders(statusCode: number, headers: Headers) {
