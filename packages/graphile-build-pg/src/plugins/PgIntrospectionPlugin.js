@@ -358,7 +358,7 @@ function smartCommentConstraints(introspectionResults) {
     }
     if (klass.tags.unique) {
       if (Array.isArray(klass.tags.unique)) {
-        klass.tags.unique.forEach(key => addKey(key, true));
+        klass.tags.unique.forEach(key => addKey(key));
       } else {
         addKey(klass.tags.unique);
       }

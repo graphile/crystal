@@ -11980,7 +11980,7 @@ type DeleteStreetPropertyPayload {
 
 type House implements Node {
   buildingId: Int
-  buildingName: String!
+  buildingName: String
   floors: Int
 
   """
