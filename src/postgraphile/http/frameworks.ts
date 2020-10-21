@@ -87,7 +87,7 @@ export abstract class PostGraphileResponse {
 }
 
 /**
- * Suitable for Node's HTTP server, but also connect, express and restify.
+ * Suitable for Node's HTTP server, but also connect, express, restify and fastify.
  */
 export class PostGraphileResponseNode extends PostGraphileResponse {
   private _req: IncomingMessage;
