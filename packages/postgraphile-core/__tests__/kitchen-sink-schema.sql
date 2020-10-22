@@ -1165,8 +1165,8 @@ create table enum_tables.lots_of_enums (
 comment on table enum_tables.lots_of_enums is E'@omit';
 comment on constraint enum_1 on enum_tables.lots_of_enums is E'@enum\n@enumName EnumTheFirst';
 comment on constraint enum_2 on enum_tables.lots_of_enums is E'@enum\n@enumName EnumTheSecond';
-comment on constraint enum_3 on enum_tables.lots_of_enums is E'@enum\n@enumName EnumTheThird';
-comment on constraint enum_4 on enum_tables.lots_of_enums is E'@enum\n@enumName EnumTheFourth';
+comment on constraint enum_3 on enum_tables.lots_of_enums is E'@enum';
+comment on constraint enum_4 on enum_tables.lots_of_enums is E'@enum';
 
 -- Enum table needs values added as part of the migration, not as part of the
 -- data.

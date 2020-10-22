@@ -208,20 +208,6 @@ enum EnumTheSecond {
   B4
 }
 
-enum EnumTheThird {
-  """Desc C1"""
-  C1
-
-  """Desc C2"""
-  C2
-
-  """Desc C3"""
-  C3
-
-  """Desc C4"""
-  C4
-}
-
 enum LetterAToD {
   """The letter A"""
   A
@@ -317,6 +303,20 @@ enum LetterDescriptionsOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+}
+
+enum LotsOfEnumsEnum3 {
+  """Desc C1"""
+  C1
+
+  """Desc C2"""
+  C2
+
+  """Desc C3"""
+  C3
+
+  """Desc C4"""
+  C4
 }
 
 """
@@ -553,7 +553,7 @@ type Query implements Node {
 type ReferencingTable implements Node {
   enum1: EnumTheFirst
   enum2: EnumTheSecond
-  enum3: EnumTheThird
+  enum3: LotsOfEnumsEnum3
   id: Int!
 
   """
@@ -574,7 +574,7 @@ input ReferencingTableCondition {
   enum2: EnumTheSecond
 
   """Checks for equality with the object’s \`enum3\` field."""
-  enum3: EnumTheThird
+  enum3: LotsOfEnumsEnum3
 
   """Checks for equality with the object’s \`id\` field."""
   id: Int
@@ -584,7 +584,7 @@ input ReferencingTableCondition {
 input ReferencingTableInput {
   enum1: EnumTheFirst
   enum2: EnumTheSecond
-  enum3: EnumTheThird
+  enum3: LotsOfEnumsEnum3
   id: Int
 }
 
@@ -619,7 +619,7 @@ Represents an update to a \`ReferencingTable\`. Fields that are set will be upda
 input ReferencingTablePatch {
   enum1: EnumTheFirst
   enum2: EnumTheSecond
-  enum3: EnumTheThird
+  enum3: LotsOfEnumsEnum3
   id: Int
 }
 

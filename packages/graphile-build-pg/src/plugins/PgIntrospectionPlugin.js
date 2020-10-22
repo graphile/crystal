@@ -715,8 +715,7 @@ Original error: ${e.message}
 
                   // Create fake enum type
                   const constraintIdent =
-                    (constraint.type === "p" ? "" : `_${constraint.name}`) +
-                    "_fake_enum";
+                    constraint.type === "p" ? "" : `_${constraint.name}`;
                   const enumTypeArray = {
                     kind: "type",
                     isFake: true,
