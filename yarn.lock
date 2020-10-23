@@ -4333,10 +4333,10 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2:
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.4.tgz#2256bde14d3632958c465ebc96dc467ca07a29fb"
   integrity sha512-WjKPNJF79dtJAVniUlGGWHYGz2jWxT6VhN/4m1NdkbZ2nOsEF+cI1Edgql5zCRhs/VsQYRvrXctxktVXZUkixw==
 
-graphile-build-pg@4.9.1:
-  version "4.9.1"
-  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.9.1.tgz#186d61a0def98abffafdbdd4f9aeb8b0a45ffe5a"
-  integrity sha512-DJZYRq7GbkG0e4HaHRoDDGrGiuspIr7L6IIf/K2vJ7v07eqd5GVLwpShaIF9GtAK9zLCDuNvk6ejoEE9g8y9wA==
+graphile-build-pg@4.9.2:
+  version "4.9.2"
+  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.9.2.tgz#5a56b01076814e0df8da8d63f1e8efecce77c345"
+  integrity sha512-Am9FV7/XQx1Al3xuiRiCLUmR5wAa/TZosaHvIJzEjc9UjIGRq+to96L16RP2SGWqjXdEuAeR8jWzda0lC825Hg==
   dependencies:
     "@graphile/lru" "4.9.0"
     chalk "^2.4.2"
@@ -4363,10 +4363,10 @@ graphile-build@4.9.0:
     pluralize "^7.0.0"
     semver "^6.0.0"
 
-graphile-utils@^4.9.1:
-  version "4.9.1"
-  resolved "https://registry.yarnpkg.com/graphile-utils/-/graphile-utils-4.9.1.tgz#f827d751fea4d1af871d5dffe0dc4e8762772b9d"
-  integrity sha512-VjcgSgOsvzZTvNZc1HY6muGyeC/bt1JrOlgvyKwblI99C3BHcp2/MqAOTQ2H45E5g/iibXgqxc49K7CZj8qdpA==
+graphile-utils@^4.9.2:
+  version "4.9.2"
+  resolved "https://registry.yarnpkg.com/graphile-utils/-/graphile-utils-4.9.2.tgz#5285cec40dfba4732ddd177454d8d8d7afc5c02d"
+  integrity sha512-Dva5W4vzLAzXkqBf6ahQlNDyUTBWrdAy8fCSAwgDZRsc35paB4klXwb20urOChoQdExp7e+3ReQa9C4uVgBlBA==
   dependencies:
     debug "^4.1.1"
     graphql ">=0.9 <0.14 || ^14.0.2"
@@ -7049,13 +7049,13 @@ postcss@^7.0.14, postcss@^7.0.32, postcss@^7.0.5, postcss@^7.0.6:
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
-postgraphile-core@4.9.1:
-  version "4.9.1"
-  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.9.1.tgz#e9241464be22af03e4a84d1e29c00412246556e6"
-  integrity sha512-W2Ev+hThnZym7vHeAvCkoyo/JFFeD3IHuuEL4atkmlRkzaDOsvTEYrQpoKnjHajgAxHcUvIEYJpsHIGZ4p0kIw==
+postgraphile-core@4.9.2:
+  version "4.9.2"
+  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.9.2.tgz#7a102d9629b003d6afa6417b244ee0e83410b308"
+  integrity sha512-eA52SIY32VdfmjZ40kkel0GeUEs9bcGKdoA9t2eTH8paoykdjnHwvprtRHUbs2bsomobWEZsxNfW8NcZ9yZhSQ==
   dependencies:
     graphile-build "4.9.0"
-    graphile-build-pg "4.9.1"
+    graphile-build-pg "4.9.2"
     tslib "^2.0.1"
 
 postgres-array@~2.0.0:
