@@ -3,7 +3,13 @@
 We use PostGraphile's GitHub releases tab to log our changes in detail, but
 this auto-generated changelog helps us to produce that list, and it may be
 helpful to you also.
-# [](https://github.com/graphile/graphile-engine/compare/v4.9.1...v) (2020-10-16)
+# [](https://github.com/graphile/graphile-engine/compare/v4.9.1...v) (2020-10-23)
+
+
+### Bug Fixes
+
+* **tags:** fix non-null for multiple [@unique](https://github.com/unique) tags ([#681](https://github.com/graphile/graphile-engine/issues/681)) ([0747562](https://github.com/graphile/graphile-engine/commit/07475622372a42e1f2105abb50a8a4d8ceb0ba61))
+* **types:** fix enum tables when used in custom mutations ([#680](https://github.com/graphile/graphile-engine/issues/680)) ([ed75ce2](https://github.com/graphile/graphile-engine/commit/ed75ce23e711d5f1190991faabc52cf610e9c482))
 
 
 
