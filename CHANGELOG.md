@@ -8,6 +8,12 @@ to you also.
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
+## [4.9.2](https://github.com/graphile/postgraphile/compare/v4.9.1...v4.9.2) (2020-10-23)
+
+### Bug Fixes
+
+- upgrade postgraphile-core ([#1369](https://github.com/graphile/postgraphile/issues/1369)) ([660682a](https://github.com/graphile/postgraphile/commit/660682ac5de873f7796816b1c15590c2e3f04a59))
+
 ## [4.9.1](https://github.com/graphile/postgraphile/compare/v4.9.0...v4.9.1) (2020-10-16)
 
 ### Features
