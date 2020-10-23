@@ -5118,6 +5118,22 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.4.tgz#2256bde14d3632958c465ebc96dc467ca07a29fb"
   integrity sha512-WjKPNJF79dtJAVniUlGGWHYGz2jWxT6VhN/4m1NdkbZ2nOsEF+cI1Edgql5zCRhs/VsQYRvrXctxktVXZUkixw==
 
+graphile-build-pg@4.9.0:
+  version "4.9.0"
+  resolved "https://registry.yarnpkg.com/graphile-build-pg/-/graphile-build-pg-4.9.0.tgz#1b5b323c7f917d76764ebbcecf05c24353cf85fb"
+  integrity sha512-DhQ/T7cSEwWEQIAUeLH5cnrpXNBhrjMUJW0EOK0B/pCYTrhzO+GPn/3Fa6DeraFeHndojbmOE4t9LGy6vmP+gg==
+  dependencies:
+    "@graphile/lru" "4.9.0"
+    chalk "^2.4.2"
+    debug "^4.1.1"
+    graphile-build "4.9.0"
+    graphql-iso-date "^3.6.0"
+    jsonwebtoken "^8.5.1"
+    lodash ">=4 <5"
+    lru-cache ">=4 <5"
+    pg-sql2 "4.9.0"
+    postgres-interval "^2.1.0"
+
 graphql-config@^3.0.2:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/graphql-config/-/graphql-config-3.0.3.tgz#58907c65ed7d6e04132321450b60e57863ea9a5f"
@@ -7846,6 +7862,15 @@ posix-character-classes@^0.1.0:
   resolved "https://registry.yarnpkg.com/posix-character-classes/-/posix-character-classes-0.1.1.tgz#01eac0fe3b5af71a2a6c02feabb8c1fef7e00eab"
   integrity sha1-AerA/jta9xoqbAL+q7jB/vfgDqs=
 
+postgraphile-core@4.9.0:
+  version "4.9.0"
+  resolved "https://registry.yarnpkg.com/postgraphile-core/-/postgraphile-core-4.9.0.tgz#fbc1d17e0d71a5a1b6266681fa88ea8225edfb45"
+  integrity sha512-mOisw9XoLhsgOutWfD7bAlH55jgxvfHgV4JGfHlvg7avW2eJK6nPkRB69ARvbBmsM7yB0lwetpAN2YbBq/YtdQ==
+  dependencies:
+    graphile-build "4.9.0"
+    graphile-build-pg "4.9.0"
+    tslib "^2.0.1"
+
 postgraphile@^4.4.0, postgraphile@^4.4.4:
   version "4.9.0"
   resolved "https://registry.yarnpkg.com/postgraphile/-/postgraphile-4.9.0.tgz#71bca224833f702803169802ce9b79e36b739be1"
@@ -7898,6 +7923,11 @@ postgres-interval@^1.1.0:
   integrity sha512-9ZhXKM/rw350N1ovuWHbGxnGh/SNJ4cnxHiM0rxE4VN41wsg8P8zWn9hv/buK00RP4WvlOyr/RBDiptyxVbkZQ==
   dependencies:
     xtend "^4.0.0"
+
+postgres-interval@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/postgres-interval/-/postgres-interval-2.1.0.tgz#6ba9dffa13edf7863984adef041e757f12edc264"
+  integrity sha512-LM7OHNmCxmFZkxCran7gu2S2sm1FxXrUCcasE3PkuIQS0pm0xGk4iTfEzrDghFSSRkAtNDbLuYevvKrjhAHZBQ==
 
 prelude-ls@^1.2.1:
   version "1.2.1"
