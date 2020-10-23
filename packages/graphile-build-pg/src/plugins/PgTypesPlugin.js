@@ -3,8 +3,7 @@ import type { Plugin } from "graphile-build";
 
 import makeGraphQLJSONType from "../GraphQLJSON";
 
-import { parseInterval as rawParseInterval } from "../postgresInterval";
-import LRU from "@graphile/lru";
+import { parseInterval } from "../postgresInterval";
 
 function indent(str) {
   return "  " + str.replace(/\n/g, "\n  ");
@@ -12,17 +11,6 @@ function indent(str) {
 
 function identity(value) {
   return value;
-}
-
-const parseCache = new LRU({ maxLength: 500 });
-function parseInterval(str) {
-  let result = parseCache.get(str);
-  if (!result) {
-    result = rawParseInterval(str);
-    Object.freeze(result);
-    parseCache.set(str, result);
-  }
-  return result;
 }
 
 export default (function PgTypesPlugin(
