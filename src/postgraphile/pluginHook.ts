@@ -8,7 +8,7 @@ import {
 import { WithPostGraphileContextFn } from './withPostGraphileContext';
 import { version } from '../../package.json';
 import * as graphql from 'graphql';
-import * as transportWs from 'graphql-transport-ws';
+import * as transportWs from 'graphql-ws';
 import { ExecutionParams } from 'subscriptions-transport-ws';
 
 // tslint:disable-next-line no-any

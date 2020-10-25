@@ -13,7 +13,7 @@ import {
 } from 'graphql';
 import * as WebSocket from 'ws';
 import { SubscriptionServer, ConnectionContext, ExecutionParams } from 'subscriptions-transport-ws';
-import { createServer } from 'graphql-transport-ws';
+import { createServer } from 'graphql-ws';
 import parseUrl = require('parseurl');
 import { pluginHookFromOptions } from '../pluginHook';
 import { isEmpty } from './createPostGraphileHttpRequestHandler';
