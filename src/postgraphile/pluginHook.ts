@@ -1,9 +1,14 @@
 import { AddFlagFn } from './cli';
 import { Server, IncomingMessage } from 'http';
-import { HttpRequestHandler, PostGraphileOptions } from '../interfaces';
+import {
+  HttpRequestHandler,
+  PostGraphileOptions,
+  CreateRequestHandlerOptions,
+} from '../interfaces';
 import { WithPostGraphileContextFn } from './withPostGraphileContext';
 import { version } from '../../package.json';
 import * as graphql from 'graphql';
+import * as transportWs from 'graphql-transport-ws';
 import { ExecutionParams } from 'subscriptions-transport-ws';
 
 // tslint:disable-next-line no-any
@@ -55,7 +60,13 @@ export interface PostGraphilePlugin {
   'postgraphile:validationRules'?: HookFn<typeof graphql.specifiedRules>; // AVOID THIS where possible; use 'postgraphile:validationRules:static' instead.
   'postgraphile:middleware'?: HookFn<HttpRequestHandler>;
   'postgraphile:ws:onOperation'?: HookFn<ExecutionParams>;
-  'postgraphile:ws:onSubscribe'?: HookFn<graphql.ExecutionArgs>;
+  'postgraphile:ws:onSubscribe'?: HookFn<
+    graphql.ExecutionArgs,
+    transportWs.Context & {
+      message: transportWs.SubscribeMessage;
+      options: CreateRequestHandlerOptions;
+    }
+  >;
 
   withPostGraphileContext?: HookFn<WithPostGraphileContextFn>;
 }

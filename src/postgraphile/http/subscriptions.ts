@@ -13,7 +13,7 @@ import {
 } from 'graphql';
 import * as WebSocket from 'ws';
 import { SubscriptionServer, ConnectionContext, ExecutionParams } from 'subscriptions-transport-ws';
-import { createServer, ExecutionResultFormatter } from 'graphql-transport-ws';
+import { createServer } from 'graphql-transport-ws';
 import parseUrl = require('parseurl');
 import { pluginHookFromOptions } from '../pluginHook';
 import { isEmpty } from './createPostGraphileHttpRequestHandler';
@@ -344,19 +344,16 @@ export async function enhanceHttpServerWithSubscriptions<
       createServer(
         {
           schema,
-          validationRules: staticValidationRules,
           execute:
             operations === 'all'
               ? execute
               : () => {
-                  throw new Error('Only subscriptions are allowed over websocket transport');
+                  throw new Error('Only subscriptions are allowed over WebSocket transport');
                 },
           subscribe: options.live ? liveSubscribe : graphqlSubscribe,
-          onConnect({ socket, request, connectionParams }) {
+          onConnect(ctx) {
+            const { socket, request, connectionParams } = ctx;
             socket['postgraphileId'] = ++socketId;
-            if (!request) {
-              throw new Error('No request!');
-            }
             socket['__postgraphileReq'] = request;
 
             let normalizedConnectionParams = {};
@@ -365,6 +362,7 @@ export async function enhanceHttpServerWithSubscriptions<
               request['connectionParams'] = connectionParams;
               request['normalizedConnectionParams'] = normalizedConnectionParams;
             }
+
             if (!request.headers.authorization && normalizedConnectionParams['authorization']) {
               /*
                * Enable JWT support through connectionParams.
@@ -381,36 +379,27 @@ export async function enhanceHttpServerWithSubscriptions<
               // The original headers must win (for security)
               ...request.headers,
             };
-
-            return true;
           },
-          async onSubscribe({ socket }, message, args) {
-            const context = await getContext(socket, message.id);
+          async onSubscribe(ctx, msg) {
+            const context = await getContext(ctx.socket, msg.id);
 
             // Override schema (for --watch)
-            args.schema = await getGraphQLSchema();
+            const schema = await getGraphQLSchema();
 
-            // if the context value is missing, initialise it
-            args.contextValue = { ...args.contextValue, ...(context as Record<string, unknown>) };
-
-            const meta = {};
-
-            const { req, res } = await reqResFromSocket(socket);
-            const executionResultFormatter: ExecutionResultFormatter = (_ctx, response) => {
-              if (response.errors) {
-                response.errors = handleErrors(response.errors, req, res);
-              }
-              if (!isEmpty(meta)) {
-                response['meta'] = meta;
-              }
-              return response;
+            const { payload } = msg;
+            const args: ExecutionArgs = {
+              schema,
+              contextValue: context,
+              operationName: payload.operationName,
+              document: typeof payload.query === 'string' ? parse(payload.query) : payload.query,
+              variableValues: payload.variables,
             };
 
-            const hookedParams = pluginHook
+            // for supplying custom execution arguments
+            const hookedArgs = pluginHook
               ? pluginHook('postgraphile:ws:onSubscribe', args, {
-                  message,
-                  args,
-                  socket,
+                  ...ctx,
+                  message: msg,
                   options,
                 })
               : args;
@@ -418,46 +407,48 @@ export async function enhanceHttpServerWithSubscriptions<
             // You are strongly encouraged to use
             // `postgraphile:validationRules:static` if possible - you should
             // only use this one if you need access to variables.
-            const moreValidationRules = pluginHook('postgraphile:validationRules', [], {
+            const { req, res } = await reqResFromSocket(ctx.socket);
+            const validationRules = pluginHook('postgraphile:validationRules', [], {
               options,
               req,
               res,
-              variables: args.variableValues,
-              operationName: args.operationName,
-              meta,
+              variables: hookedArgs.variableValues,
+              operationName: hookedArgs.operationName,
+              // no meta because validation errors returned from here will be
+              // served through the error message. it contains just the GraphQLErrors
+              // (there is no result to add the meta to)
             });
-            if (moreValidationRules.length) {
-              const validationErrors: ReadonlyArray<GraphQLError> = validate(
-                args.schema,
-                typeof hookedParams.document === 'string'
-                  ? parse(hookedParams.document)
-                  : hookedParams.document,
-                moreValidationRules,
-              );
-              if (validationErrors.length) {
-                const error = new Error(
-                  'Query validation failed: \n' + validationErrors.map(e => e.message).join('\n'),
-                );
-                error['errors'] = validationErrors;
-                throw error;
-              }
+            const validationErrors = validate(
+              hookedArgs.schema,
+              hookedArgs.document,
+              // should the validation rules be applied
+              // in addition to the graphql defaults (as before)
+              // or should they be used exclusively?
+              validationRules.length ? validationRules : undefined,
+            );
+            if (validationErrors.length) {
+              return validationErrors;
             }
 
-            return [hookedParams, executionResultFormatter] as [
-              ExecutionArgs,
-              ExecutionResultFormatter,
-            ];
+            return hookedArgs;
+          },
+          async onError(ctx, _msg, errors) {
+            // errors returned from onSubscribe
+            const { req, res } = await reqResFromSocket(ctx.socket);
+            return handleErrors(errors, req, res);
+          },
+          async onNext(ctx, _msg, _args, result) {
+            if (result.errors) {
+              // operation execution errors
+              const { req, res } = await reqResFromSocket(ctx.socket);
+              result.errors = handleErrors(result.errors, req, res);
+              return result;
+            }
           },
           onComplete({ socket }, msg) {
             releaseContextForSocketAndOpId(socket, msg.id);
           },
-          /*
-           * Heroku times out after 55s:
-           *   https://devcenter.heroku.com/articles/error-codes#h15-idle-connection
-           *
-           * The lib itself should manage the keep-alive for client counterparts.
-           */
-          keepAlive: 15000,
+          // default keepAlive fine? (12 seconds)
         },
         wss,
       );
