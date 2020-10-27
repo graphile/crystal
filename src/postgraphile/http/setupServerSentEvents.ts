@@ -17,8 +17,10 @@ export default function setupServerSentEvents(
 
   // Set headers for Server-Sent Events.
   res.statusCode = 200;
+  // Don't buffer EventStream in nginx
+  res.setHeader('X-Accel-Buffering', 'no');
   res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Cache-Control', 'no-cache, no-transform');
   if (req.httpVersionMajor >= 2) {
     // NOOP
   } else {

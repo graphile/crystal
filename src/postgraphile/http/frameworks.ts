@@ -30,7 +30,7 @@ export abstract class PostGraphileResponse {
   }
 
   /**
-   * Use `getStream` or `end`; not both
+   * Use `getStream` or `end`; not both.
    */
   public getStream(): PassThrough {
     if (this._body != null) {
@@ -221,6 +221,12 @@ export class PostGraphileResponseKoa extends PostGraphileResponse {
   }
 
   setBody(body: Stream | Buffer | string | undefined) {
+    if (typeof body === 'object' && body && !Buffer.isBuffer(body)) {
+      // Stream; we're going to assume this is the EventStream which we want to
+      // be realtime for watch mode, and there's no value in compressing it.
+      this._ctx.compress = false;
+      // TODO: find a better way of flushing the event stream on write.
+    }
     this._ctx.body = body || '';
     this._next();
   }
