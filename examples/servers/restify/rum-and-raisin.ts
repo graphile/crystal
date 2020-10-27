@@ -12,6 +12,32 @@ const middleware = postgraphile(database, schemas, options);
 const server = restify.createServer();
 server.acceptable.push('text/event-stream');
 
+/******************************************************************************/
+// These middlewares aren't needed; we just add them to make sure that
+// PostGraphile still works correctly with them in place.
+
+server.use(restify.plugins.requestLogger());
+
+server.use(restify.plugins.authorizationParser());
+server.use(restify.plugins.dateParser());
+server.use(restify.plugins.queryParser());
+server.use(restify.plugins.jsonp());
+server.use(restify.plugins.gzipResponse());
+server.use(restify.plugins.bodyParser());
+server.use(
+  restify.plugins.requestExpiry({
+    startHeader: 'x-request-start',
+    timeoutHeader: 'x-request-timeout',
+  }),
+);
+server.use(restify.plugins.conditionalRequest());
+
+server.pre(restify.plugins.pre.dedupeSlashes());
+server.use(restify.plugins.pre.sanitizePath());
+server.use(restify.plugins.pre.reqIdHeaders({ headers: ['X-Request-Id'] }));
+
+/******************************************************************************/
+
 /**
  * Converts a PostGraphile route handler into a Fastify request handler.
  */
@@ -50,7 +76,20 @@ if (middleware.options.graphiql) {
 if (middleware.options.watchPg) {
   if (middleware.eventStreamRouteHandler) {
     server.opts(middleware.eventStreamRoute, convertHandler(middleware.eventStreamRouteHandler));
-    server.get(middleware.eventStreamRoute, convertHandler(middleware.eventStreamRouteHandler));
+    server.get(
+      middleware.eventStreamRoute,
+      (_req, res, next) => {
+        // Prevent restify using gzip on the event stream
+        // See: https://github.com/jameswomack/restify-eventsource/blob/832842dd6dc8dd49fccf8babcf1954d462c1ab03/lib/sse.js#L95-L98
+        const resAny: any = res;
+        if (typeof resAny.handledGzip === 'function') {
+          resAny.handledGzip();
+        }
+        res.removeHeader('Content-Encoding');
+        next();
+      },
+      convertHandler(middleware.eventStreamRouteHandler),
+    );
   }
 }
 
