@@ -1199,6 +1199,13 @@
     "@types/connect" "*"
     "@types/node" "*"
 
+"@types/bunyan@*":
+  version "1.8.6"
+  resolved "https://registry.yarnpkg.com/@types/bunyan/-/bunyan-1.8.6.tgz#6527641cca30bedec5feb9ab527b7803b8000582"
+  integrity sha512-YiozPOOsS6bIuz31ilYqR5SlLif4TBWsousN2aCWLi5233nZSX19tFbcQUPdR7xJ8ypPyxkCGNxg0CIV5n9qxQ==
+  dependencies:
+    "@types/node" "*"
+
 "@types/chalk@^2.2.0":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@types/chalk/-/chalk-2.2.0.tgz#b7f6e446f4511029ee8e3f43075fb5b73fbaa0ba"
@@ -1252,6 +1259,11 @@
   resolved "https://registry.yarnpkg.com/@types/debug/-/debug-4.1.5.tgz#b14efa8852b7768d898906613c23f688713e02cd"
   integrity sha512-Q1y515GcOdTHgagaVFhHnIFQ38ygs/kmxdNpvpou+raI9UO3YZcHDngBSYKQklcKlvA7iuQlmIKbzvmxcOE9CQ==
 
+"@types/events@*":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@types/events/-/events-3.0.0.tgz#2862f3f58a9a7f7c3e78d79f130dd4d71c25c2a7"
+  integrity sha512-EaObqwIvayI5a8dCzhFrjKzVwKLxjoG9T6Ppd5CEo07LRKfQ8Yokw54r5+Wq7FaBQ+yXRvQAYPrHwya1/UFt9g==
+
 "@types/express-serve-static-core@*":
   version "4.17.12"
   resolved "https://registry.yarnpkg.com/@types/express-serve-static-core/-/express-serve-static-core-4.17.12.tgz#9a487da757425e4f267e7d1c5720226af7f89591"
@@ -1276,6 +1288,14 @@
   resolved "https://registry.yarnpkg.com/@types/finalhandler/-/finalhandler-1.1.0.tgz#7c62084bac116918c55ad3f884f7c68ca8921124"
   integrity sha512-iMD07b+UPNuqA6cm3yjbTJUfFfZNZpDc6MGQGK60jy5sdqX1W4wUC5RAi3FhaW72+RmVnzYxba8byPP9FWL8/w==
   dependencies:
+    "@types/node" "*"
+
+"@types/formidable@*":
+  version "1.0.31"
+  resolved "https://registry.yarnpkg.com/@types/formidable/-/formidable-1.0.31.tgz#274f9dc2d0a1a9ce1feef48c24ca0859e7ec947b"
+  integrity sha512-dIhM5t8lRP0oWe2HF8MuPvdd1TpPTjhDMAqemcq6oIZQCBQTovhBAdTQ5L5veJB4pdQChadmHuxtB0YzqvfU3Q==
+  dependencies:
+    "@types/events" "*"
     "@types/node" "*"
 
 "@types/html-minifier-terser@^5.0.0":
@@ -1445,6 +1465,16 @@
   resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.3.tgz#7ee330ba7caafb98090bece86a5ee44115904c2c"
   integrity sha512-ewFXqrQHlFsgc09MK5jP5iR7vumV/BYayNC6PgJO2LPe8vrnNFyjQjSppfEngITi0qvfKtzFvgKymGheFM9UOA==
 
+"@types/restify@^8.4.2":
+  version "8.4.2"
+  resolved "https://registry.yarnpkg.com/@types/restify/-/restify-8.4.2.tgz#f071d971d10ad79f6073dfbbeed7729d68760e7f"
+  integrity sha512-jdXB0IrsigqMccBMs3a2kBUUAlYTbjLCbfC63sI00rwTXc+B4UQniGkAJCGS27CAxwkJFAFXzpk0msOQtQ1RXA==
+  dependencies:
+    "@types/bunyan" "*"
+    "@types/formidable" "*"
+    "@types/node" "*"
+    "@types/spdy" "*"
+
 "@types/serve-static@*":
   version "1.13.5"
   resolved "https://registry.yarnpkg.com/@types/serve-static/-/serve-static-1.13.5.tgz#3d25d941a18415d3ab092def846e135a08bbcf53"
@@ -1457,6 +1487,13 @@
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/@types/source-list-map/-/source-list-map-0.1.2.tgz#0078836063ffaf17412349bba364087e0ac02ec9"
   integrity sha512-K5K+yml8LTo9bWJI/rECfIPrGgxdpeNbj+d53lwN4QjW1MCwlkhUms+gtdzigTeUyBr09+u8BwOIY3MXvHdcsA==
+
+"@types/spdy@*":
+  version "3.4.4"
+  resolved "https://registry.yarnpkg.com/@types/spdy/-/spdy-3.4.4.tgz#3282fd4ad8c4603aa49f7017dd520a08a345b2bc"
+  integrity sha512-N9LBlbVRRYq6HgYpPkqQc3a9HJ/iEtVZToW6xlTtJiMhmRJ7jJdV7TaZQJw/Ve/1ePUsQiCTDc4JMuzzag94GA==
+  dependencies:
+    "@types/node" "*"
 
 "@types/stack-utils@^1.0.1":
   version "1.0.1"
