@@ -220,13 +220,15 @@ export class PostGraphileResponseKoa extends PostGraphileResponse {
     // middleware.
   }
 
+  getStream() {
+    // We're going to assume this is the EventStream which we want to
+    // be realtime for watch mode, and there's no value in compressing it.
+    this._ctx.compress = false;
+    // TODO: find a better way of flushing the event stream on write.
+    return super.getStream();
+  }
+
   setBody(body: Stream | Buffer | string | undefined) {
-    if (typeof body === 'object' && body && !Buffer.isBuffer(body)) {
-      // Stream; we're going to assume this is the EventStream which we want to
-      // be realtime for watch mode, and there's no value in compressing it.
-      this._ctx.compress = false;
-      // TODO: find a better way of flushing the event stream on write.
-    }
     this._ctx.body = body || '';
     this._next();
   }
@@ -264,6 +266,17 @@ export class PostGraphileResponseFastify3 extends PostGraphileResponse {
   setHeaders(statusCode: number, headers: Headers) {
     this._reply.status(statusCode);
     this._reply.headers(headers);
+  }
+
+  getStream() {
+    // We're going to assume this is the EventStream which we want to
+    // be realtime for watch mode, and there's no value in compressing it.
+    this.setHeader('x-no-compression', '1');
+    // TODO: this setHeader doesn't seem to actually fix the issue; had to
+    // solve it in userland by adding `{ config: { compress: false } }` to the
+    // route options.
+    // TODO: find a better way of flushing the event stream on write.
+    return super.getStream();
   }
 
   setBody(body: Stream | Buffer | string | undefined) {
