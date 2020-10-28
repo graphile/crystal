@@ -1,14 +1,19 @@
 /* tslint:disable:no-any */
-import { IncomingMessage } from 'http';
 import { CreateRequestHandlerOptions } from '../../interfaces';
 import { PostGraphileResponse } from './frameworks';
 
+/**
+ * Sets the headers and streams a body for server-sent events (primarily used
+ * by watch mode).
+ *
+ * @internal
+ */
 export default function setupServerSentEvents(
-  req: IncomingMessage,
   res: PostGraphileResponse,
   options: CreateRequestHandlerOptions,
 ): void {
-  const { _emitter } = options;
+  const req = res.getNodeServerRequest();
+  const { _emitter, watchPg } = options;
 
   // Making sure these options are set.
   req.socket.setTimeout(0);
@@ -34,7 +39,7 @@ export default function setupServerSentEvents(
   // Setup listeners.
   const schemaChangedCb = () => stream.write('event: change\ndata: schema\n\n');
 
-  if (options.watchPg) _emitter.on('schemas:changed', schemaChangedCb);
+  if (watchPg) _emitter.on('schemas:changed', schemaChangedCb);
 
   // Clean up when connection closes.
   const cleanup = () => {

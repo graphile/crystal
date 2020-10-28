@@ -589,7 +589,7 @@ export default function createPostGraphileHttpRequestHandler(
           res.end();
           return;
         }
-        setupServerSentEvents(req, res, options);
+        setupServerSentEvents(res, options);
       } catch (e) {
         console.error('Unexpected error occurred in eventStreamRouteHandler');
         console.error(e);
