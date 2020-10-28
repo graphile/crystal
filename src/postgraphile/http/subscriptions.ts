@@ -65,7 +65,6 @@ export async function enhanceHttpServerWithSubscriptions<
   server['__postgraphileSubscriptionsEnabled'] = true;
   const { options, getGraphQLSchema, withPostGraphileContextFromReqRes, handleErrors } = middleware;
   const pluginHook = pluginHookFromOptions(options);
-  const externalUrlBase = options.externalUrlBase || '';
   const graphqlRoute =
     args.graphqlRoute || (options.externalUrlBase || '') + (options.graphqlRoute || '/graphql');
 
