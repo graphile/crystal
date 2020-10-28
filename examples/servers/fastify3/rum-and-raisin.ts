@@ -60,12 +60,7 @@ if (middleware.options.watchPg) {
       middleware.eventStreamRoute,
       convertHandler(middleware.eventStreamRouteHandler),
     );
-    fastify.get(
-      middleware.eventStreamRoute,
-      // Must disable compression on event stream otherwise the request just hangs indefinitely
-      { config: { compress: false } },
-      convertHandler(middleware.eventStreamRouteHandler),
-    );
+    fastify.get(middleware.eventStreamRoute, convertHandler(middleware.eventStreamRouteHandler));
   }
 }
 
