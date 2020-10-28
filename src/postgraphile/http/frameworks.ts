@@ -224,6 +224,7 @@ export class PostGraphileResponseKoa extends PostGraphileResponse {
     // We're going to assume this is the EventStream which we want to
     // be realtime for watch mode, and there's no value in compressing it.
     this._ctx.compress = false;
+
     // TODO: find a better way of flushing the event stream on write.
     return super.responseStream();
   }
@@ -271,10 +272,12 @@ export class PostGraphileResponseFastify3 extends PostGraphileResponse {
   responseStream() {
     // We're going to assume this is the EventStream which we want to
     // be realtime for watch mode, and there's no value in compressing it.
-    this.setHeader('x-no-compression', '1');
-    // TODO: this setHeader doesn't seem to actually fix the issue; had to
-    // solve it in userland by adding `{ config: { compress: false } }` to the
-    // route options.
+
+    // Fastify will disable compression if we set the relevant request header
+    // (see:
+    // https://github.com/fastify/fastify-compress/blob/068c673fc0bd50da1f4d9f3fd2423b482c364a89/index.js#L217-L218)
+    this._request.headers['x-no-compression'] = '1';
+
     // TODO: find a better way of flushing the event stream on write.
     return super.responseStream();
   }
