@@ -13,7 +13,6 @@ import {
 } from 'graphql';
 import { extendedFormatError } from '../extendedFormatError';
 import { IncomingMessage, ServerResponse } from 'http';
-import { isKoaApp, middleware as koaMiddleware } from './koaMiddleware';
 import { pluginHookFromOptions } from '../pluginHook';
 import { HttpRequestHandler, mixed, CreateRequestHandlerOptions } from '../../interfaces';
 import setupServerSentEvents from './setupServerSentEvents';
@@ -28,6 +27,8 @@ import parseUrl = require('parseurl');
 import finalHandler = require('finalhandler');
 import bodyParser = require('body-parser');
 import crypto = require('crypto');
+
+const isKoaApp = (a: any, b: any) => a.req && a.res && typeof b === 'function';
 
 const CACHE_MULTIPLIER = 100000;
 
@@ -52,6 +53,12 @@ import favicon from '../../assets/favicon.ico';
  */
 import baseGraphiqlHtml from '../../assets/graphiql.html';
 import { enhanceHttpServerWithSubscriptions } from './subscriptions';
+import {
+  KoaNext,
+  PostGraphileResponse,
+  PostGraphileResponseKoa,
+  PostGraphileResponseNode,
+} from './frameworks';
 
 /**
  * When writing JSON to the browser, we need to be careful that it doesn't get
@@ -222,8 +229,14 @@ export default function createPostGraphileHttpRequestHandler(
 
   // Gets the route names for our GraphQL endpoint, and our GraphiQL endpoint.
   const graphqlRoute = options.graphqlRoute || '/graphql';
-  const graphiqlRoute = graphiql ? options.graphiqlRoute || '/graphiql' : null;
-  const streamRoute = `${graphqlRoute.replace(/\/*$/, '')}/stream`;
+  const graphiqlRoute = options.graphiqlRoute || '/graphiql';
+  const eventStreamRoute = options.eventStreamRoute || `${graphqlRoute.replace(/\/+$/, '')}/stream`;
+  const externalGraphqlRoute = options.externalGraphqlRoute;
+  const externalEventStreamRoute =
+    options.externalEventStreamRoute ||
+    (externalGraphqlRoute && !options.eventStreamRoute
+      ? `${externalGraphqlRoute.replace(/\/+$/, '')}/stream`
+      : undefined);
 
   // Throw an error of the GraphQL and GraphiQL routes are the same.
   if (graphqlRoute === graphiqlRoute)
@@ -253,22 +266,12 @@ export default function createPostGraphileHttpRequestHandler(
   const DEFAULT_HANDLE_ERRORS = (errors: Array<GraphQLError>) => errors.map(formatError);
   const handleErrors = options.handleErrors || DEFAULT_HANDLE_ERRORS;
 
-  function convertKoaBodyParserToConnect(req: any, _res: any, next: any): any {
-    if (req._koaCtx && req._koaCtx.request && req._koaCtx.request.body) {
-      req._body = true;
-      req.body = req._koaCtx.request.body;
-    }
-    next();
-  }
-
   // Define a list of middlewares that will get run before our request handler.
   // Note though that none of these middlewares will intercept a request (i.e.
   // not call `next`). Middlewares that handle a request like favicon
   // middleware will result in a promise that never resolves, and we don’t
   // want that.
   const bodyParserMiddlewares = [
-    // Convert koa body to connect-compatible body
-    convertKoaBodyParserToConnect,
     // Parse JSON bodies.
     bodyParser.json({ limit: options.bodySizeLimit }),
     // Parse URL encoded bodies (forms).
@@ -296,15 +299,21 @@ export default function createPostGraphileHttpRequestHandler(
   );
 
   // And we really want that function to be await-able
-  const parseBody = (req: IncomingMessage, res: ServerResponse) =>
+  const parseBody = (req: IncomingMessage, res: PostGraphileResponse) =>
     new Promise((resolve, reject) => {
-      bodyParserMiddlewaresComposed(req, res, (error: Error) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve();
-        }
-      });
+      bodyParserMiddlewaresComposed(
+        req,
+        // Note: middleware here doesn't actually use the response, but we pass
+        // the underlying value so types match up.
+        res.getNodeServerResponse(),
+        (error: Error) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve();
+          }
+        },
+      );
     });
 
   // We only need to calculate the graphiql HTML once; but we need to receive the first request to do so.
@@ -382,32 +391,36 @@ export default function createPostGraphileHttpRequestHandler(
     }
   };
 
-  let firstRequestHandler: ((req: IncomingMessage, pathname: string) => void) | null = (
-    req,
-    pathname,
-  ) => {
+  let firstRequestHandler: ((req: IncomingMessage) => void) | null = req => {
     // Never be called again
     firstRequestHandler = null;
+    let graphqlRouteForWs = graphqlRoute;
 
-    if (externalUrlBase == null) {
-      // User hasn't specified externalUrlBase; let's try and guess it
-      const { pathname: originalPathname = '' } = parseUrl.original(req) || {};
-      if (originalPathname !== pathname && originalPathname.endsWith(pathname)) {
+    const { pathname = '' } = parseUrl(req) || {};
+    const { pathname: originalPathname = '' } = parseUrl.original(req) || {};
+    if (originalPathname !== pathname && originalPathname.endsWith(pathname)) {
+      const base = originalPathname.substr(0, originalPathname.length - pathname.length);
+      // Our websocket GraphQL route must be at a different place
+      graphqlRouteForWs = base + graphqlRouteForWs;
+      if (externalUrlBase == null) {
+        // User hasn't specified externalUrlBase; let's try and guess it
         // We were mounted on a subpath (e.g. `app.use('/path/to', postgraphile(...))`).
         // Figure out our externalUrlBase for ourselves.
-        externalUrlBase = originalPathname.substr(0, originalPathname.length - pathname.length);
+        externalUrlBase = base;
       }
-      // Make sure we have a string, at least
-      externalUrlBase = externalUrlBase || '';
     }
+    // Make sure we have a string, at least
+    externalUrlBase = externalUrlBase || '';
 
     // Takes the original GraphiQL HTML file and replaces the default config object.
     graphiqlHtml = origGraphiqlHtml
       ? origGraphiqlHtml.replace(
           /<\/head>/,
           `  <script>window.POSTGRAPHILE_CONFIG=${safeJSONStringify({
-            graphqlUrl: `${externalUrlBase}${graphqlRoute}`,
-            streamUrl: watchPg ? `${externalUrlBase}${streamRoute}` : null,
+            graphqlUrl: externalGraphqlRoute || `${externalUrlBase}${graphqlRoute}`,
+            streamUrl: watchPg
+              ? externalEventStreamRoute || `${externalUrlBase}${eventStreamRoute}`
+              : null,
             enhanceGraphiql,
             subscriptions,
             allowExplain:
@@ -428,7 +441,7 @@ export default function createPostGraphileHttpRequestHandler(
       } else {
         // Relying on this means that a normal request must come in before an
         // upgrade attempt. It's better to call it manually.
-        enhanceHttpServerWithSubscriptions(server, middleware);
+        enhanceHttpServerWithSubscriptions(server, middleware, { graphqlRoute: graphqlRouteForWs });
       }
     }
   };
@@ -446,42 +459,75 @@ export default function createPostGraphileHttpRequestHandler(
       .catch(noop);
   }
 
+  function neverReject(
+    middlewareName: string,
+    middleware: (res: PostGraphileResponse) => Promise<void>,
+  ): (res: PostGraphileResponse) => Promise<void> {
+    return async res => {
+      try {
+        await middleware(res);
+      } catch (e) {
+        console.error(
+          `An unexpected error occurred whilst processing '${middlewareName}'; this indicates a bug. The connection will be terminated.`,
+        );
+        console.error(e);
+        try {
+          // At least terminate the connection
+          res.statusCode = 500;
+          res.end();
+        } catch (e) {
+          /*NOOP*/
+        }
+      }
+    };
+  }
+
   /**
    * The actual request handler. It’s an async function so it will return a
    * promise when complete. If the function doesn’t handle anything, it calls
-   * `next` to let the next middleware try and handle it.
+   * `next` to let the next middleware try and handle it. If the function
+   * throws an error, it's up to the wrapping middleware (imaginatively named
+   * `middleware`, below) to handle the error. Frameworks like Koa have
+   * middlewares reject a promise on error, whereas Express requires you pass
+   * the error to the `next(err)` function.
    */
   const requestHandler = async (
-    incomingReq: IncomingMessage,
-    res: ServerResponse,
-    next: (err?: Error) => void,
+    responseHandler: PostGraphileResponse,
+    next: (err?: Error | 'route') => void,
   ) => {
+    const res = responseHandler;
+    const incomingReq = res.getNodeServerRequest();
+    const nodeRes = res.getNodeServerResponse();
     // You can use this hook either to modify the incoming request or to tell
     // PostGraphile not to handle the request further (return null). NOTE: if
     // you return `null` from this hook then you are also responsible for
     // calling `next()` (should that be required).
     const req = pluginHook('postgraphile:http:handler', incomingReq, {
       options,
-      res,
+      res: nodeRes,
       next,
     });
     if (req == null) {
       return;
     }
 
-    // Add our CORS headers to be good web citizens (there are perf
-    // implications though so be careful!)
-    //
-    // Always enable CORS when developing PostGraphile because GraphiQL will be
-    // on port 5783.
-    if (enableCors) addCORSHeaders(res);
-
     const { pathname = '' } = parseUrl(req) || {};
 
     // Certain things depend on externalUrlBase, which we guess if the user
     // doesn't supply it, so we calculate them on the first request. After
     // first request, this function becomes a NOOP
-    if (firstRequestHandler) firstRequestHandler(req, pathname);
+    if (firstRequestHandler) firstRequestHandler(req);
+
+    // ======================================================================
+    // GraphQL Watch Stream
+    // ======================================================================
+
+    if (watchPg) {
+      // Setup an event stream so we can broadcast events to graphiql, etc.
+      if (pathname === eventStreamRoute || pathname === '/_postgraphile/stream') {
+        return eventStreamRouteHandler(res);
+      }
+    }
 
     const isGraphqlRoute = pathname === graphqlRoute;
 
@@ -497,42 +543,7 @@ export default function createPostGraphileHttpRequestHandler(
       // If this is the favicon path and it has not yet been handled, let us
       // serve our GraphQL favicon.
       if (pathname === '/favicon.ico') {
-        // If this is the wrong method, we should let the client know.
-        if (!(req.method === 'GET' || req.method === 'HEAD')) {
-          res.statusCode = req.method === 'OPTIONS' ? 200 : 405;
-          res.setHeader('Allow', 'GET, HEAD, OPTIONS');
-          res.end();
-          return;
-        }
-
-        // Otherwise we are good and should pipe the favicon to the browser.
-        res.statusCode = 200;
-        res.setHeader('Cache-Control', 'public, max-age=86400');
-        res.setHeader('Content-Type', 'image/x-icon');
-
-        // End early if the method is `HEAD`.
-        if (req.method === 'HEAD') {
-          res.end();
-          return;
-        }
-
-        res.end(favicon);
-        return;
-      }
-
-      // ======================================================================
-      // GraphiQL Watch Stream
-      // ======================================================================
-
-      // Setup an event stream so we can broadcast events to graphiql, etc.
-      if (pathname === streamRoute || pathname === '/_postgraphile/stream') {
-        if (!watchPg || req.headers.accept !== 'text/event-stream') {
-          res.statusCode = 405;
-          res.end();
-          return;
-        }
-        setupServerSentEvents(req, res, options);
-        return;
+        return faviconRouteHandler(res);
       }
 
       // ======================================================================
@@ -549,42 +560,122 @@ export default function createPostGraphileHttpRequestHandler(
           return;
         }
 
-        // If using the incorrect method, let the user know.
-        if (!(req.method === 'GET' || req.method === 'HEAD')) {
-          res.statusCode = req.method === 'OPTIONS' ? 200 : 405;
-          res.setHeader('Allow', 'GET, HEAD, OPTIONS');
-          res.end();
-          return;
-        }
-
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-        res.setHeader('Content-Security-Policy', "frame-ancestors 'self'");
-
-        // End early if the method is `HEAD`.
-        if (req.method === 'HEAD') {
-          res.end();
-          return;
-        }
-
-        // Actually renders GraphiQL.
-        if (graphiqlHtml && typeof options.allowExplain === 'function') {
-          res.end(
-            graphiqlHtml.replace(
-              `"${ALLOW_EXPLAIN_PLACEHOLDER}"`, // Because JSON escaped
-              JSON.stringify(!!(await options.allowExplain(req))),
-            ),
-          );
-        } else {
-          res.end(graphiqlHtml);
-        }
-        return;
+        return graphiqlRouteHandler(res);
       }
     }
 
-    // Don’t handle any requests if this is not the correct route.
-    if (!isGraphqlRoute) return next();
+    if (isGraphqlRoute) {
+      return graphqlRouteHandler(res);
+    } else {
+      // This request wasn't for us.
+      return next();
+    }
+  };
+
+  const eventStreamRouteHandler = neverReject(
+    'eventStreamRouteHandler',
+    async function eventStreamRouteHandler(res: PostGraphileResponse) {
+      try {
+        const req = res.getNodeServerRequest();
+        // Add our CORS headers to be good web citizens (there are perf
+        // implications though so be careful!)
+        //
+        // Always enable CORS when developing PostGraphile because GraphiQL will be
+        // on port 5783.
+        if (enableCors) addCORSHeaders(res);
+
+        if (req.headers.accept !== 'text/event-stream') {
+          res.statusCode = 405;
+          res.end();
+          return;
+        }
+        setupServerSentEvents(res, options);
+      } catch (e) {
+        console.error('Unexpected error occurred in eventStreamRouteHandler');
+        console.error(e);
+        res.statusCode = 500;
+        res.end();
+      }
+    },
+  );
+
+  const faviconRouteHandler = neverReject('faviconRouteHandler', async function faviconRouteHandler(
+    res: PostGraphileResponse,
+  ) {
+    const req = res.getNodeServerRequest();
+    // If this is the wrong method, we should let the client know.
+    if (!(req.method === 'GET' || req.method === 'HEAD')) {
+      res.statusCode = req.method === 'OPTIONS' ? 200 : 405;
+      res.setHeader('Allow', 'GET, HEAD, OPTIONS');
+      res.end();
+      return;
+    }
+
+    // Otherwise we are good and should pipe the favicon to the browser.
+    res.statusCode = 200;
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.setHeader('Content-Type', 'image/x-icon');
+
+    // End early if the method is `HEAD`.
+    if (req.method === 'HEAD') {
+      res.end();
+      return;
+    }
+
+    res.end(favicon);
+  });
+
+  const graphiqlRouteHandler = neverReject(
+    'graphiqlRouteHandler',
+    async function graphiqlRouteHandler(res: PostGraphileResponse) {
+      const req = res.getNodeServerRequest();
+      if (firstRequestHandler) firstRequestHandler(req);
+
+      // If using the incorrect method, let the user know.
+      if (!(req.method === 'GET' || req.method === 'HEAD')) {
+        res.statusCode = req.method === 'OPTIONS' ? 200 : 405;
+        res.setHeader('Allow', 'GET, HEAD, OPTIONS');
+        res.end();
+        return;
+      }
+
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+      res.setHeader('Content-Security-Policy', "frame-ancestors 'self'");
+
+      // End early if the method is `HEAD`.
+      if (req.method === 'HEAD') {
+        res.end();
+        return;
+      }
+
+      // Actually renders GraphiQL.
+      if (graphiqlHtml && typeof options.allowExplain === 'function') {
+        res.end(
+          graphiqlHtml.replace(
+            `"${ALLOW_EXPLAIN_PLACEHOLDER}"`, // Because JSON escaped
+            JSON.stringify(!!(await options.allowExplain(req))),
+          ),
+        );
+      } else {
+        res.end(graphiqlHtml);
+      }
+    },
+  );
+
+  const graphqlRouteHandler = neverReject('graphqlRouteHandler', async function graphqlRouteHandler(
+    res: PostGraphileResponse,
+  ) {
+    const req = res.getNodeServerRequest();
+    if (firstRequestHandler) firstRequestHandler(req);
+
+    // Add our CORS headers to be good web citizens (there are perf
+    // implications though so be careful!)
+    //
+    // Always enable CORS when developing PostGraphile because GraphiQL will be
+    // on port 5783.
+    if (enableCors) addCORSHeaders(res);
 
     // ========================================================================
     // Execute GraphQL Queries
@@ -595,7 +686,10 @@ export default function createPostGraphileHttpRequestHandler(
     if (watchPg) {
       // Inform GraphiQL and other clients that they can subscribe to events
       // (such as the schema being updated) at the following URL
-      res.setHeader('X-GraphQL-Event-Stream', `${externalUrlBase}${streamRoute}`);
+      res.setHeader(
+        'X-GraphQL-Event-Stream',
+        externalEventStreamRoute || `${externalUrlBase}${eventStreamRoute}`,
+      );
     }
 
     // Don’t execute our GraphQL stuffs for `OPTIONS` requests.
@@ -758,7 +852,8 @@ export default function createPostGraphileHttpRequestHandler(
 
               result = await withPostGraphileContextFromReqRes(
                 req,
-                res,
+                // For backwards compatibilty we must pass the actual node request object.
+                res.getNodeServerResponse(),
                 {
                   singleStatement: false,
                   queryDocumentAst,
@@ -862,9 +957,10 @@ export default function createPostGraphileHttpRequestHandler(
       results = [{ errors: (handleErrors as any)([error], req, res) }];
 
       // If the status code is 500, let’s log our error.
-      if (res.statusCode === 500)
+      if (res.statusCode === 500) {
         // tslint:disable-next-line no-console
         console.error(error.stack);
+      }
     } finally {
       // Finally, we send the client the results.
       if (!returnArray) {
@@ -885,7 +981,8 @@ export default function createPostGraphileHttpRequestHandler(
           options,
           returnArray,
           req,
-          res,
+          // For backwards compatibility, the underlying response object.
+          res: res.getNodeServerResponse(),
         },
       );
 
@@ -894,10 +991,11 @@ export default function createPostGraphileHttpRequestHandler(
       }
       res.end(JSON.stringify(result));
 
-      if (debugRequest.enabled)
+      if (debugRequest.enabled) {
         debugRequest('GraphQL ' + (returnArray ? 'queries' : 'query') + ' request finished.');
+      }
     }
-  };
+  });
 
   /**
    * A polymorphic request handler that should detect what `http` framework is
@@ -916,8 +1014,13 @@ export default function createPostGraphileHttpRequestHandler(
     if (isKoaApp(a, b)) {
       // Set the correct `koa` variable names…
       const ctx = a as KoaContext;
-      const next = b as (err?: Error) => Promise<any>;
-      return koaMiddleware(ctx, next, requestHandler);
+      const next = b as KoaNext;
+      const responseHandler = new PostGraphileResponseKoa(ctx, next);
+
+      // Execute our request handler. If an error is thrown, we don’t call
+      // `next` with an error. Instead we return the promise and let `koa`
+      // handle the error.
+      return requestHandler(responseHandler, next);
     } else {
       // Set the correct `connect` style variable names. If there was no `next`
       // defined (likely the case if the client is using `http`) we use the
@@ -925,9 +1028,11 @@ export default function createPostGraphileHttpRequestHandler(
       const req = a as IncomingMessage;
       const res = b as ServerResponse;
       const next = c || finalHandler(req, res);
+      const responseHandler = new PostGraphileResponseNode(req, res, next);
 
       // Execute our request handler. If the request errored out, call `next` with the error.
-      requestHandler(req, res, next).catch(next);
+      requestHandler(responseHandler, next).catch(next);
+      // No return value.
     }
   };
 
@@ -937,6 +1042,13 @@ export default function createPostGraphileHttpRequestHandler(
   middleware.withPostGraphileContextFromReqRes = withPostGraphileContextFromReqRes;
   middleware.handleErrors = handleErrors;
   middleware.options = options;
+  middleware.graphqlRoute = graphqlRoute;
+  middleware.graphqlRouteHandler = graphqlRouteHandler;
+  middleware.graphiqlRoute = graphiqlRoute;
+  middleware.graphiqlRouteHandler = graphiql ? graphiqlRouteHandler : null;
+  middleware.faviconRouteHandler = graphiql ? faviconRouteHandler : null;
+  middleware.eventStreamRoute = eventStreamRoute;
+  middleware.eventStreamRouteHandler = watchPg ? eventStreamRouteHandler : null;
 
   const hookedMiddleware = pluginHook('postgraphile:middleware', middleware, {
     options,
@@ -963,7 +1075,7 @@ export default function createPostGraphileHttpRequestHandler(
  *
  * [1]: http://www.html5rocks.com/static/images/cors_server_flowchart.png
  */
-function addCORSHeaders(res: ServerResponse): void {
+function addCORSHeaders(res: PostGraphileResponse): void {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'HEAD, GET, POST');
   res.setHeader(

@@ -192,7 +192,7 @@ Array [
 ]
 `;
 
-exports[`fastify will report an extended error when extendedErrors is enabled 1`] = `
+exports[`fastify2 will report an extended error when extendedErrors is enabled 1`] = `
 Array [
   Object {
     "detail": "test detail",
@@ -220,7 +220,7 @@ Array [
 ]
 `;
 
-exports[`fastify will report standard error when extendedErrors is not enabled 1`] = `
+exports[`fastify2 will report standard error when extendedErrors is not enabled 1`] = `
 Array [
   Object {
     "extensions": Object {
@@ -240,7 +240,7 @@ Array [
 ]
 `;
 
-exports[`fastify-http2 will report an extended error when extendedErrors is enabled 1`] = `
+exports[`fastify2-http2 will report an extended error when extendedErrors is enabled 1`] = `
 Array [
   Object {
     "detail": "test detail",
@@ -268,7 +268,103 @@ Array [
 ]
 `;
 
-exports[`fastify-http2 will report standard error when extendedErrors is not enabled 1`] = `
+exports[`fastify2-http2 will report standard error when extendedErrors is not enabled 1`] = `
+Array [
+  Object {
+    "extensions": Object {
+      "testingExtensions": true,
+    },
+    "locations": Array [
+      Object {
+        "column": 2,
+        "line": 1,
+      },
+    ],
+    "message": "test message",
+    "path": Array [
+      "testError",
+    ],
+  },
+]
+`;
+
+exports[`fastify3 (@/path/to/mount) will report an extended error when extendedErrors is enabled 1`] = `
+Array [
+  Object {
+    "detail": "test detail",
+    "errcode": "12345",
+    "extensions": Object {
+      "exception": Object {
+        "detail": "test detail",
+        "errcode": "12345",
+        "hint": "test hint",
+      },
+      "testingExtensions": true,
+    },
+    "hint": "test hint",
+    "locations": Array [
+      Object {
+        "column": 2,
+        "line": 1,
+      },
+    ],
+    "message": "test message",
+    "path": Array [
+      "testError",
+    ],
+  },
+]
+`;
+
+exports[`fastify3 (@/path/to/mount) will report standard error when extendedErrors is not enabled 1`] = `
+Array [
+  Object {
+    "extensions": Object {
+      "testingExtensions": true,
+    },
+    "locations": Array [
+      Object {
+        "column": 2,
+        "line": 1,
+      },
+    ],
+    "message": "test message",
+    "path": Array [
+      "testError",
+    ],
+  },
+]
+`;
+
+exports[`fastify3 will report an extended error when extendedErrors is enabled 1`] = `
+Array [
+  Object {
+    "detail": "test detail",
+    "errcode": "12345",
+    "extensions": Object {
+      "exception": Object {
+        "detail": "test detail",
+        "errcode": "12345",
+        "hint": "test hint",
+      },
+      "testingExtensions": true,
+    },
+    "hint": "test hint",
+    "locations": Array [
+      Object {
+        "column": 2,
+        "line": 1,
+      },
+    ],
+    "message": "test message",
+    "path": Array [
+      "testError",
+    ],
+  },
+]
+`;
+
+exports[`fastify3 will report standard error when extendedErrors is not enabled 1`] = `
 Array [
   Object {
     "extensions": Object {
@@ -413,6 +509,54 @@ Array [
 `;
 
 exports[`koa will report standard error when extendedErrors is not enabled 1`] = `
+Array [
+  Object {
+    "extensions": Object {
+      "testingExtensions": true,
+    },
+    "locations": Array [
+      Object {
+        "column": 2,
+        "line": 1,
+      },
+    ],
+    "message": "test message",
+    "path": Array [
+      "testError",
+    ],
+  },
+]
+`;
+
+exports[`restify will report an extended error when extendedErrors is enabled 1`] = `
+Array [
+  Object {
+    "detail": "test detail",
+    "errcode": "12345",
+    "extensions": Object {
+      "exception": Object {
+        "detail": "test detail",
+        "errcode": "12345",
+        "hint": "test hint",
+      },
+      "testingExtensions": true,
+    },
+    "hint": "test hint",
+    "locations": Array [
+      Object {
+        "column": 2,
+        "line": 1,
+      },
+    ],
+    "message": "test message",
+    "path": Array [
+      "testError",
+    ],
+  },
+]
+`;
+
+exports[`restify will report standard error when extendedErrors is not enabled 1`] = `
 Array [
   Object {
     "extensions": Object {

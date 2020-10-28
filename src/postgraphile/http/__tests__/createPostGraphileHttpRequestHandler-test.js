@@ -2,7 +2,9 @@
 import { GraphQLSchema, GraphQLObjectType, GraphQLString } from 'graphql';
 import { $$pgClient } from '../../../postgres/inventory/pgClientFromContext';
 import createPostGraphileHttpRequestHandler from '../createPostGraphileHttpRequestHandler';
+import { PostGraphileResponseNode, PostGraphileResponseFastify3 } from '../../../';
 import request from './supertest';
+import fastifyFormBodyParser from 'fastify-formbody';
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -13,7 +15,11 @@ const express = require('express');
 const compress = require('koa-compress');
 const koa = require('koa');
 const koaMount = require('koa-mount');
-const fastify = require('fastify');
+const fastify2 = require('fastify-v2');
+const fastify3 = require('fastify');
+const restify = require('restify');
+const expressCompression = require('compression');
+const fastifyCompression = require('fastify-compress');
 // tslint:disable-next-line variable-name
 const EventEmitter = require('events');
 
@@ -104,6 +110,7 @@ const serverCreators = new Map([
     'express',
     (handler, _options, subpath) => {
       const app = express();
+      app.use(expressCompression({ threshold: 0 }));
       if (subpath) {
         app.use(subpath, handler);
       } else {
@@ -113,7 +120,7 @@ const serverCreators = new Map([
     },
   ],
   [
-    'fastify',
+    'fastify2',
     async (handler, _options, subpath) => {
       let server;
       function serverFactory(fastlyHandler, opts) {
@@ -123,12 +130,63 @@ const serverCreators = new Map([
         });
         return server;
       }
-      const app = fastify({ serverFactory });
+      const app = fastify2({ serverFactory });
       if (subpath) {
         throw new Error('Fastify does not support subpath at this time');
       } else {
         app.use(handler);
       }
+      await app.ready();
+      if (!server) {
+        throw new Error('Fastify server not created!');
+      }
+      return server;
+    },
+  ],
+  [
+    'fastify3',
+    async (handler, options = {}, subpath = '') => {
+      let server;
+      function serverFactory(fastlyHandler, opts) {
+        if (server) throw new Error('Factory called twice');
+        server = http.createServer((req, res) => {
+          fastlyHandler(req, res);
+        });
+        return server;
+      }
+      const app = fastify3({ serverFactory, bodyLimit: options.bodySizeLimit || 100 * 1024 });
+      app.register(fastifyCompression, { threshold: 0 });
+
+      // Natively, Fastify only supports 'application/json' and 'text/plain' content types
+      app.addContentTypeParser(
+        'application/graphql',
+        { parseAs: 'string' },
+        (request, payload, done) => done(null, payload),
+      );
+      // application/x-www-data-urlencoded
+      app.register(fastifyFormBodyParser);
+
+      const convertHandler = handler => (request, reply) =>
+        handler(new PostGraphileResponseFastify3(request, reply));
+      const routes = (router, opts, done) => {
+        router.options(handler.graphqlRoute, convertHandler(handler.graphqlRouteHandler));
+        router.post(handler.graphqlRoute, convertHandler(handler.graphqlRouteHandler));
+        if (handler.graphiqlRouteHandler) {
+          router.head(handler.graphiqlRoute, convertHandler(handler.graphiqlRouteHandler));
+          router.get(handler.graphiqlRoute, convertHandler(handler.graphiqlRouteHandler));
+        }
+        if (handler.faviconRouteHandler) {
+          router.get('/favicon.ico', convertHandler(handler.faviconRouteHandler));
+        }
+        if (handler.eventStreamRouteHandler) {
+          router.options(handler.eventStreamRoute, convertHandler(handler.eventStreamRouteHandler));
+          router.get(handler.eventStreamRoute, convertHandler(handler.eventStreamRouteHandler));
+        }
+        done();
+      };
+
+      app.register(routes, subpath ? { prefix: subpath } : {});
+
       await app.ready();
       if (!server) {
         throw new Error('Fastify server not created!');
@@ -150,7 +208,7 @@ const serverCreators = new Map([
     },
   ],
   [
-    'fastify-http2',
+    'fastify2-http2',
     async (handler, _options, subpath) => {
       let server;
       function serverFactory(fastlyHandler, opts) {
@@ -160,7 +218,7 @@ const serverCreators = new Map([
         });
         return server;
       }
-      const app = fastify({ serverFactory, http2: true });
+      const app = fastify2({ serverFactory, http2: true });
       if (subpath) {
         throw new Error('Fastify does not support subpath at this time');
       } else {
@@ -174,12 +232,35 @@ const serverCreators = new Map([
       return server;
     },
   ],
+  [
+    'restify',
+    (handler, options = {}, subpath) => {
+      const app = restify.createServer();
+      if (options.onPreCreate) options.onPreCreate(app);
+      const handlerToMiddleware = handler => (req, res, next) =>
+        handler(new PostGraphileResponseNode(req, res, next)).catch(next);
+      app.opts(handler.graphqlRoute, handlerToMiddleware(handler.graphqlRouteHandler));
+      app.post(handler.graphqlRoute, handlerToMiddleware(handler.graphqlRouteHandler));
+      if (handler.graphiqlRouteHandler) {
+        app.head(handler.graphiqlRoute, handlerToMiddleware(handler.graphiqlRouteHandler));
+        app.get(handler.graphiqlRoute, handlerToMiddleware(handler.graphiqlRouteHandler));
+      }
+      if (handler.faviconRouteHandler) {
+        app.get('/favicon.ico', handlerToMiddleware(handler.faviconRouteHandler));
+      }
+      if (handler.eventStreamRouteHandler) {
+        app.opts(handler.eventStreamRoute, handlerToMiddleware(handler.eventStreamRouteHandler));
+        app.get(handler.eventStreamRoute, handlerToMiddleware(handler.eventStreamRouteHandler));
+      }
+      return app;
+    },
+  ],
 ]);
 
 const toTest = [];
 for (const [name, createServerFromHandler] of Array.from(serverCreators)) {
   toTest.push({ name, createServerFromHandler });
-  if (name !== 'http' && name !== 'fastify' && name !== 'fastify-http2') {
+  if (name !== 'http' && name !== 'fastify2' && name !== 'fastify2-http2' && name !== 'restify') {
     toTest.push({ name, createServerFromHandler, subpath: '/path/to/mount' });
   }
 }
@@ -289,15 +370,27 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
         .expect('Access-Control-Expose-Headers', 'X-GraphQL-Event-Stream');
     });
 
-    test('will not allow requests other than POST', async () => {
-      const server = await createServer();
-      await request(server).get(`${subpath}/graphql`).expect(405).expect('Allow', 'POST, OPTIONS');
-      await request(server)
-        .delete(`${subpath}/graphql`)
-        .expect(405)
-        .expect('Allow', 'POST, OPTIONS');
-      await request(server).put(`${subpath}/graphql`).expect(405).expect('Allow', 'POST, OPTIONS');
-    });
+    // When we're not using PostGraphile as a middleware but as a route
+    // handler, what happens outside of the added route handlers is up to the
+    // framework. Fastify goes with a 404 rather than 405, so we just disable
+    // this test for fastify3.
+    if (name !== 'fastify3') {
+      test('will not allow requests other than POST', async () => {
+        const server = await createServer();
+        await request(server)
+          .get(`${subpath}/graphql`)
+          .expect(405)
+          .expect('Allow', 'POST, OPTIONS');
+        await request(server)
+          .delete(`${subpath}/graphql`)
+          .expect(405)
+          .expect('Allow', 'POST, OPTIONS');
+        await request(server)
+          .put(`${subpath}/graphql`)
+          .expect(405)
+          .expect('Allow', 'POST, OPTIONS');
+      });
+    }
 
     test('will run a query on a POST request with JSON data', async () => {
       const server = await createServer();
@@ -330,7 +423,9 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
     });
 
     test("will not throw error if there's lots of JSON data and a high limit", async () => {
-      const server = await createServer({ bodySizeLimit: '1MB' });
+      // PostGraphile handles bodySizeLimit internally; however fastify3 does
+      // its own parsing so we must also handle to the handler.
+      const server = await createServer({ bodySizeLimit: '1MB' }, { bodySizeLimit: 1024 * 1024 });
       await request(server)
         .post(`${subpath}/graphql`)
         .set('Content-Type', 'application/json')
@@ -366,7 +461,9 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
     });
 
     test("will not throw error if there's lots of form data and a high limit", async () => {
-      const server = await createServer({ bodySizeLimit: '1MB' });
+      // PostGraphile handles bodySizeLimit internally; however fastify3 does
+      // its own parsing so we must also handle to the handler.
+      const server = await createServer({ bodySizeLimit: '1MB' }, { bodySizeLimit: 1024 * 1024 });
       await request(server)
         .post(`${subpath}/graphql`)
         .set('Content-Type', 'application/x-www-form-urlencoded')
@@ -397,7 +494,9 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
     });
 
     test("will not throw error if there's lots of GraphQL data and a high limit", async () => {
-      const server = await createServer({ bodySizeLimit: '1MB' });
+      // PostGraphile handles bodySizeLimit internally; however fastify3 does
+      // its own parsing so we must also handle to the handler.
+      const server = await createServer({ bodySizeLimit: '1MB' }, { bodySizeLimit: 1024 * 1024 });
       await request(server)
         .post(`${subpath}/graphql`)
         .set('Content-Type', 'application/graphql')
@@ -874,7 +973,7 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
     });
 
     test('will not allow if no text/event-stream headers are set', async () => {
-      const server = await createServer({ graphiql: true });
+      const server = await createServer({ graphiql: true, watchPg: true });
       await request(server).get(`${subpath}/graphql/stream`).expect(405);
     });
 
