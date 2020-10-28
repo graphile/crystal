@@ -804,6 +804,7 @@ if (noServer) {
     if (postgraphileOptions.subscriptions) {
       enhanceHttpServerWithSubscriptions({
         server,
+        graphqlRoute,
         middleware,
         websockets,
         operations: websocketOperations,

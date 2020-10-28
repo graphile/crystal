@@ -445,6 +445,7 @@ export default function createPostGraphileHttpRequestHandler(
         // upgrade attempt. It's better to call it manually.
         enhanceHttpServerWithSubscriptions({
           server,
+          graphqlRoute,
           middleware,
           websockets,
           operations: websocketOperations,

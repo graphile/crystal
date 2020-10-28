@@ -52,6 +52,7 @@ export async function enhanceHttpServerWithSubscriptions<
   Response extends ServerResponse = ServerResponse
 >(args: {
   server: Server;
+  graphqlRoute?: string;
   middleware: HttpRequestHandler;
   websockets: PostGraphileOptions['websockets'];
   operations: PostGraphileOptions['websocketOperations'];
@@ -65,7 +66,8 @@ export async function enhanceHttpServerWithSubscriptions<
   const { options, getGraphQLSchema, withPostGraphileContextFromReqRes, handleErrors } = middleware;
   const pluginHook = pluginHookFromOptions(options);
   const externalUrlBase = options.externalUrlBase || '';
-  const graphqlRoute = options.graphqlRoute || '/graphql';
+  const graphqlRoute =
+    args.graphqlRoute || (options.externalUrlBase || '') + (options.graphqlRoute || '/graphql');
 
   const schema = await getGraphQLSchema();
 
@@ -172,7 +174,7 @@ export async function enhanceHttpServerWithSubscriptions<
 
   server.on('upgrade', (req, socket, head) => {
     const { pathname = '' } = parseUrl(req) || {};
-    const isGraphqlRoute = pathname === externalUrlBase + graphqlRoute;
+    const isGraphqlRoute = pathname === graphqlRoute;
     if (isGraphqlRoute) {
       wss.handleUpgrade(req, socket, head, ws => {
         wss.emit('connection', ws, req);
