@@ -31,7 +31,9 @@ export default function setupServerSentEvents(
   } else {
     res.setHeader('Connection', 'keep-alive');
   }
-  const stream = res.getStream();
+
+  // Creates a stream for the response
+  const stream = res.responseStream();
 
   // Notify client that connection is open.
   stream.write('event: open\n\n');

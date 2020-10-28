@@ -30,9 +30,9 @@ export abstract class PostGraphileResponse {
   }
 
   /**
-   * Use `getStream` or `end`; not both.
+   * Use `responseStream` or `end`; not both.
    */
-  public getStream(): PassThrough {
+  public responseStream(): PassThrough {
     if (this._body != null) {
       throw new Error("Cannot return a stream when there's already a response body");
     }
@@ -43,7 +43,7 @@ export abstract class PostGraphileResponse {
   }
 
   /**
-   * Use `getStream` or `end`; not both
+   * Use `responseStream` or `end`; not both
    */
   public end(moreBody?: Buffer | string | null) {
     if (moreBody) {
@@ -220,12 +220,12 @@ export class PostGraphileResponseKoa extends PostGraphileResponse {
     // middleware.
   }
 
-  getStream() {
+  responseStream() {
     // We're going to assume this is the EventStream which we want to
     // be realtime for watch mode, and there's no value in compressing it.
     this._ctx.compress = false;
     // TODO: find a better way of flushing the event stream on write.
-    return super.getStream();
+    return super.responseStream();
   }
 
   setBody(body: Stream | Buffer | string | undefined) {
@@ -268,7 +268,7 @@ export class PostGraphileResponseFastify3 extends PostGraphileResponse {
     this._reply.headers(headers);
   }
 
-  getStream() {
+  responseStream() {
     // We're going to assume this is the EventStream which we want to
     // be realtime for watch mode, and there's no value in compressing it.
     this.setHeader('x-no-compression', '1');
@@ -276,7 +276,7 @@ export class PostGraphileResponseFastify3 extends PostGraphileResponse {
     // solve it in userland by adding `{ config: { compress: false } }` to the
     // route options.
     // TODO: find a better way of flushing the event stream on write.
-    return super.getStream();
+    return super.responseStream();
   }
 
   setBody(body: Stream | Buffer | string | undefined) {
