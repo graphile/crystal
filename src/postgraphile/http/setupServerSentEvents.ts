@@ -33,7 +33,7 @@ export default function setupServerSentEvents(
   }
 
   // Creates a stream for the response
-  const stream = res.responseStream();
+  const stream = res.endWithStream();
 
   // Notify client that connection is open.
   stream.write('event: open\n\n');
