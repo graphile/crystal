@@ -731,7 +731,7 @@ class PostGraphiQL extends React.PureComponent {
               ) : null}
               <GraphiQL.Button
                 label={'Headers ' + (this.state.saveHeadersText ? 'SAVED' : 'unsaved')}
-                title="Modify the headers to be sent with the requests"
+                title="Should we persist the headers to localStorage? Header editor is next to variable editor at the bottom."
                 onClick={this.handleToggleSaveHeaders}
               />
             </GraphiQL.Toolbar>
