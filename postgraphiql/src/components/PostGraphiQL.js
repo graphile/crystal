@@ -707,15 +707,21 @@ class PostGraphiQL extends React.PureComponent {
                 label="History"
               />
               <GraphiQL.Button
-                label={'Save Headers ' + (this.state.saveHeadersText ? '✔️' : '✖️')}
-                title="Modify the headers to be sent with the requests"
-                onClick={this.handleToggleSaveHeaders}
-              />
-              <GraphiQL.Button
                 label="Explorer"
                 title="Construct a query with the GraphiQL explorer"
                 onClick={this.handleToggleExplorer}
               />
+              <GraphiQL.Button
+                onClick={this.graphiql && this.graphiql.handleMergeQuery}
+                title="Merge Query (Shift-Ctrl-M)"
+                label="Merge"
+              />
+              <GraphiQL.Button
+                onClick={this.graphiql && this.graphiql.handleCopyQuery}
+                title="Copy Query (Shift-Ctrl-C)"
+                label="Copy"
+              />
+
               {POSTGRAPHILE_CONFIG.allowExplain ? (
                 <GraphiQL.Button
                   label={this.state.explain ? 'Explain ON' : 'Explain disabled'}
@@ -723,6 +729,11 @@ class PostGraphiQL extends React.PureComponent {
                   onClick={this.handleToggleExplain}
                 />
               ) : null}
+              <GraphiQL.Button
+                label={'Headers ' + (this.state.saveHeadersText ? 'SAVED' : 'unsaved')}
+                title="Modify the headers to be sent with the requests"
+                onClick={this.handleToggleSaveHeaders}
+              />
             </GraphiQL.Toolbar>
             <GraphiQL.Footer>
               <div className="postgraphile-footer">
