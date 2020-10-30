@@ -106,10 +106,6 @@ class PostGraphiQL extends React.PureComponent {
       POSTGRAPHILE_CONFIG.enhanceGraphiql && POSTGRAPHILE_CONFIG.subscriptions ? 'pending' : null,
   };
 
-  _onEditQuery = query => {
-    this.setState({ query });
-  };
-
   subscriptionsClient =
     POSTGRAPHILE_CONFIG.enhanceGraphiql && POSTGRAPHILE_CONFIG.subscriptions
       ? new SubscriptionClient(websocketUrl, {
@@ -201,6 +197,7 @@ class PostGraphiQL extends React.PureComponent {
     }
     const graphiql = this.graphiql;
     this.setState({ query: graphiql._storage.get('query') || defaultQuery });
+
     const editor = graphiql.getQueryEditor();
     editor.setOption('extraKeys', {
       ...(editor.options.extraKeys || {}),
@@ -300,8 +297,7 @@ class PostGraphiQL extends React.PureComponent {
    * Executes a GraphQL query with some extra information then the standard
    * parameters. Namely a JWT which may be added as an `Authorization` header.
    */
-  async executeQuery(graphQLParams) {
-    const extraHeaders = this.getHeaders();
+  async executeQuery(graphQLParams, extraHeaders) {
     const response = await fetch(POSTGRAPHILE_CONFIG.graphqlUrl, {
       method: 'POST',
       headers: Object.assign(
@@ -333,22 +329,11 @@ class PostGraphiQL extends React.PureComponent {
     if (isSubscription(graphQLParams) && this.subscriptionsClient) {
       return {
         subscribe: observer => {
-          observer.next('Waiting for subscription to yield data…');
-
-          // Hack because GraphiQL logs `[object Object]` on error otherwise
-          const oldError = observer.error;
-          observer.error = function (error) {
-            let stack;
-            try {
-              stack = JSON.stringify(error, null, 2);
-            } catch (e) {
-              stack = error.message || error;
-            }
-            oldError.call(this, {
-              stack,
-              ...error,
-            });
-          };
+          setTimeout(() => {
+            // Without this timeout, this message doesn't display on the first
+            // subscription after the first render of the page.
+            observer.next('Waiting for subscription to yield data…');
+          }, 0);
 
           const subscription = this.subscriptionsClient.request(graphQLParams).subscribe(observer);
           this.setState({ haveActiveSubscription: true });
@@ -493,6 +478,28 @@ class PostGraphiQL extends React.PureComponent {
 
   getQueryEditor = () => {
     return this.graphiql.getQueryEditor();
+  };
+
+  handleEditQuery = query => {
+    this.setState({ query });
+  };
+
+  handleEditHeaders = headersText => {
+    this.setState(
+      {
+        headersText,
+        headersTextValid: isValidJSON(headersText),
+      },
+      () => {
+        if (this.state.headersTextValid && this.state.saveHeadersText) {
+          this._storage.set(STORAGE_KEYS.HEADERS_TEXT, this.state.headersText);
+        }
+        if (this.state.headersTextValid && this.subscriptionsClient) {
+          // Reconnect to websocket with new headers
+          this.subscriptionsClient.close(false, true);
+        }
+      },
+    );
   };
 
   handlePrettifyQuery = () => {
@@ -654,18 +661,26 @@ class PostGraphiQL extends React.PureComponent {
           <GraphiQLExplorer
             schema={schema}
             query={this.state.query}
-            onEdit={this._onEditQuery}
+            onEdit={this.handleEditQuery}
             onRunOperation={operationName => this.graphiql.handleRunQuery(operationName)}
             explorerIsOpen={this.state.explorerIsOpen}
             onToggleExplorer={this.handleToggleExplorer}
             //getDefaultScalarArgValue={getDefaultScalarArgValue}
             //makeDefaultArg={makeDefaultArg}
           />
-          <GraphiQL onEditQuery={this._onEditQuery} query={this.state.query} {...sharedProps}>
+          <GraphiQL
+            onEditQuery={this.handleEditQuery}
+            query={this.state.query}
+            headerEditorEnabled
+            headers={this.state.headersText}
+            onEditHeaders={this.handleEditHeaders}
+            {...sharedProps}
+          >
             <GraphiQL.Logo>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div>
                   <img
+                    alt="PostGraphile logo"
                     src="https://www.graphile.org/images/postgraphile-tiny.optimized.svg"
                     width="32"
                     height="32"
@@ -692,9 +707,9 @@ class PostGraphiQL extends React.PureComponent {
                 label="History"
               />
               <GraphiQL.Button
-                label="Headers"
+                label={'Save Headers ' + (this.state.saveHeadersText ? '✔️' : '✖️')}
                 title="Modify the headers to be sent with the requests"
-                onClick={this.handleToggleHeaders}
+                onClick={this.handleToggleSaveHeaders}
               />
               <GraphiQL.Button
                 label="Explorer"
@@ -775,71 +790,10 @@ class PostGraphiQL extends React.PureComponent {
               </div>
             </GraphiQL.Footer>
           </GraphiQL>
-          <EditHeaders
-            open={this.state.showHeaderEditor}
-            value={this.state.headersText}
-            valid={this.state.headersTextValid}
-            toggleSaveHeaders={this.handleToggleSaveHeaders}
-            saveHeaders={this.state.saveHeadersText}
-            onChange={e =>
-              this.setState(
-                {
-                  headersText: e.target.value,
-                  headersTextValid: isValidJSON(e.target.value),
-                },
-                () => {
-                  if (this.state.headersTextValid && this.state.saveHeadersText) {
-                    this._storage.set(STORAGE_KEYS.HEADERS_TEXT, this.state.headersText);
-                  }
-                  if (this.state.headersTextValid && this.subscriptionsClient) {
-                    // Reconnect to websocket with new headers
-                    this.subscriptionsClient.close(false, true);
-                  }
-                },
-              )
-            }
-          >
-            <div className="docExplorerHide" onClick={this.handleToggleHeaders}>
-              {'\u2715'}
-            </div>
-          </EditHeaders>
         </div>
       );
     }
   }
-}
-
-function EditHeaders({ children, open, value, onChange, valid, saveHeaders, toggleSaveHeaders }) {
-  return (
-    <div
-      className="graphiql-container not-really"
-      style={{
-        display: open ? 'block' : 'none',
-        width: '300px',
-        flexBasis: '300px',
-      }}
-    >
-      <div className="docExplorerWrap">
-        <div className="doc-explorer">
-          <div className="doc-explorer-title-bar">
-            <div className="doc-explorer-title">Edit Headers</div>
-            <div className="doc-explorer-rhs">{children}</div>
-          </div>
-          <div className="doc-explorer-contents">
-            <label>
-              <input type="checkbox" checked={saveHeaders} onChange={toggleSaveHeaders} />
-              Persist headers
-            </label>
-            <textarea
-              value={value}
-              onChange={onChange}
-              style={valid ? {} : { backgroundColor: '#fdd' }}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 }
 
 export default PostGraphiQL;
