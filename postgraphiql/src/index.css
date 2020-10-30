@@ -18,3 +18,7 @@ body,
 .graphiql-container .history-contents li button.favorited {
   display: inline-block;
 }
+
+.graphiql-container button:focus {
+  outline: none;
+}
