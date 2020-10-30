@@ -67,7 +67,7 @@ export async function enhanceHttpServerWithSubscriptions<
   } = postgraphileMiddleware;
   const pluginHook = pluginHookFromOptions(options);
   const graphqlRoute =
-    subscriptionServerOptions?.graphqlRoute ||
+    (subscriptionServerOptions && subscriptionServerOptions.graphqlRoute) ||
     (options.externalUrlBase || '') + (options.graphqlRoute || '/graphql');
 
   const schema = await getGraphQLSchema();
