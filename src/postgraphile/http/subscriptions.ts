@@ -432,7 +432,6 @@ export async function enhanceHttpServerWithSubscriptions<
           onComplete({ socket }, msg) {
             releaseContextForSocketAndOpId(socket, msg.id);
           },
-          // default keepAlive fine? (12 seconds)
         },
         wss,
       );
