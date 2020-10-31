@@ -443,10 +443,8 @@ export default function createPostGraphileHttpRequestHandler(
       } else {
         // Relying on this means that a normal request must come in before an
         // upgrade attempt. It's better to call it manually.
-        enhanceHttpServerWithSubscriptions({
-          server,
+        enhanceHttpServerWithSubscriptions(server, middleware, {
           graphqlRoute: graphqlRouteForWs,
-          middleware,
           websockets,
           operations: websocketOperations,
         });

@@ -50,23 +50,30 @@ function deferred<T = void>(): Deferred<T> {
 export async function enhanceHttpServerWithSubscriptions<
   Request extends IncomingMessage = IncomingMessage,
   Response extends ServerResponse = ServerResponse
->(args: {
-  server: Server;
-  graphqlRoute?: string;
-  middleware: HttpRequestHandler;
-  websockets: PostGraphileOptions['websockets'];
-  operations: PostGraphileOptions['websocketOperations'];
-}): Promise<void> {
-  const { server, middleware, websockets, operations } = args;
-  if (server['__postgraphileSubscriptionsEnabled']) {
+>(
+  websocketServer: Server,
+  postgraphileMiddleware: HttpRequestHandler,
+  subscriptionServerOptions?: {
+    keepAlive?: number;
+    graphqlRoute?: string;
+    websockets: PostGraphileOptions['websockets'];
+    operations: PostGraphileOptions['websocketOperations'];
+  },
+): Promise<void> {
+  if (websocketServer['__postgraphileSubscriptionsEnabled']) {
     return;
   }
-
-  server['__postgraphileSubscriptionsEnabled'] = true;
-  const { options, getGraphQLSchema, withPostGraphileContextFromReqRes, handleErrors } = middleware;
+  websocketServer['__postgraphileSubscriptionsEnabled'] = true;
+  const {
+    options,
+    getGraphQLSchema,
+    withPostGraphileContextFromReqRes,
+    handleErrors,
+  } = postgraphileMiddleware;
   const pluginHook = pluginHookFromOptions(options);
   const graphqlRoute =
-    args.graphqlRoute || (options.externalUrlBase || '') + (options.graphqlRoute || '/graphql');
+    (subscriptionServerOptions && subscriptionServerOptions.graphqlRoute) ||
+    (options.externalUrlBase || '') + (options.graphqlRoute || '/graphql');
 
   const schema = await getGraphQLSchema();
 
@@ -171,7 +178,7 @@ export async function enhanceHttpServerWithSubscriptions<
 
   let socketId = 0;
 
-  server.on('upgrade', (req, socket, head) => {
+  websocketServer.on('upgrade', (req, socket, head) => {
     const { pathname = '' } = parseUrl(req) || {};
     const isGraphqlRoute = pathname === graphqlRoute;
     if (isGraphqlRoute) {
@@ -184,7 +191,7 @@ export async function enhanceHttpServerWithSubscriptions<
     options,
   });
 
-  switch (websockets) {
+  switch (subscriptionServerOptions?.websockets) {
     case 'none':
       break;
     case 'v0':
@@ -193,7 +200,7 @@ export async function enhanceHttpServerWithSubscriptions<
           schema,
           validationRules: staticValidationRules,
           execute:
-            operations === 'all'
+            subscriptionServerOptions?.operations === 'all'
               ? execute
               : () => {
                   throw new Error('Only subscriptions are allowed over websocket transport');
@@ -327,7 +334,7 @@ export async function enhanceHttpServerWithSubscriptions<
         {
           schema,
           execute:
-            operations === 'all'
+            subscriptionServerOptions?.operations === 'all'
               ? execute
               : () => {
                   throw new Error('Only subscriptions are allowed over WebSocket transport');
@@ -438,6 +445,6 @@ export async function enhanceHttpServerWithSubscriptions<
       break;
     }
     default:
-      throw new Error(`Invalid websockets argument ${websockets}`);
+      throw new Error(`Invalid websockets argument ${subscriptionServerOptions?.websockets}`);
   }
 }
