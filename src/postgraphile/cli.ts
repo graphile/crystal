@@ -121,11 +121,11 @@ program
   )
   .option(
     '--websockets <string>',
-    'Choose the version of the websocket transport library. Requires `subscriptions` to be enabled. Defaults to `v0`',
+    'Choose the version of the websocket transport library. Defaults to `v0` if `subscriptions` is true, `none` otherwise',
   )
   .option(
     '--websocket-operations <string>',
-    'Toggle which GraphQL websocket transport operations are supported. Defaults to `subscriptions`',
+    "Toggle which GraphQL websocket transport operations are supported: 'subscriptions' or 'all'. Defaults to `subscriptions`",
   )
   .option(
     '-L, --live',
@@ -433,7 +433,7 @@ const {
   connection: pgConnectionString,
   ownerConnection,
   subscriptions,
-  websockets = 'v0',
+  websockets = subscriptions ? 'v0' : 'none',
   websocketOperations = 'subscriptions',
   live,
   watch: watchPg,

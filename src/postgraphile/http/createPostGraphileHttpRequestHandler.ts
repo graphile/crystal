@@ -172,6 +172,7 @@ export default function createPostGraphileHttpRequestHandler(
   options: CreateRequestHandlerOptions,
 ): HttpRequestHandler {
   const MEGABYTE = 1024 * 1024;
+  const subscriptions = !!options.subscriptions;
   const {
     getGqlSchema,
     pgPool,
@@ -183,10 +184,9 @@ export default function createPostGraphileHttpRequestHandler(
     watchPg,
     disableQueryLog,
     enableQueryBatching,
-    websockets = 'v0',
+    websockets = subscriptions ? 'v0' : 'none',
     websocketOperations = 'subscriptions',
   } = options;
-  const subscriptions = !!options.subscriptions;
   const live = !!options.live;
   const enhanceGraphiql =
     options.enhanceGraphiql === false ? false : !!options.enhanceGraphiql || subscriptions || live;
@@ -424,7 +424,7 @@ export default function createPostGraphileHttpRequestHandler(
               ? externalEventStreamRoute || `${externalUrlBase}${eventStreamRoute}`
               : null,
             enhanceGraphiql,
-            websockets: subscriptions ? websockets : 'none',
+            websockets,
             allowExplain:
               typeof options.allowExplain === 'function'
                 ? ALLOW_EXPLAIN_PLACEHOLDER
