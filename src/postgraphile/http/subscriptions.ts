@@ -386,6 +386,13 @@ export async function enhanceHttpServerWithSubscriptions<
                 })
               : args;
 
+            // when supplying custom execution args from the
+            // onSubscribe, you're trusted to do the validation
+            let validationErrors = validate(hookedArgs.schema, hookedArgs.document);
+            if (validationErrors.length) {
+              return validationErrors;
+            }
+
             // You are strongly encouraged to use
             // `postgraphile:validationRules:static` if possible - you should
             // only use this one if you need access to variables.
@@ -400,16 +407,11 @@ export async function enhanceHttpServerWithSubscriptions<
               // served through the error message. it contains just the GraphQLErrors
               // (there is no result to add the meta to)
             });
-            const validationErrors = validate(
-              hookedArgs.schema,
-              hookedArgs.document,
-              // should the validation rules be applied
-              // in addition to the graphql defaults (as before)
-              // or should they be used exclusively?
-              validationRules.length ? validationRules : undefined,
-            );
-            if (validationErrors.length) {
-              return validationErrors;
+            if (validationRules.length) {
+              validationErrors = validate(hookedArgs.schema, hookedArgs.document, validationRules);
+              if (validationErrors.length) {
+                return validationErrors;
+              }
             }
 
             return hookedArgs;
