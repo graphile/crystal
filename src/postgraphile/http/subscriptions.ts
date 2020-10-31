@@ -208,15 +208,18 @@ export async function enhanceHttpServerWithSubscriptions<
                 operationName,
                 fieldResolver,
               ) =>
-                liveSubscribe({
-                  schema,
+                liveSubscribe(
+                  {
+                    schema,
+                    document,
+                    rootValue,
+                    contextValue,
+                    variableValues,
+                    operationName,
+                    fieldResolver,
+                  },
                   document,
-                  rootValue,
-                  contextValue,
-                  variableValues,
-                  operationName,
-                  fieldResolver,
-                })
+                )
             : graphqlSubscribe,
           onConnect(
             connectionParams: Record<string, any>,
@@ -351,7 +354,7 @@ export async function enhanceHttpServerWithSubscriptions<
               : () => {
                   throw new Error('Only subscriptions are allowed over WebSocket transport');
                 },
-          subscribe: options.live ? liveSubscribe : graphqlSubscribe,
+          subscribe: options.live ? args => liveSubscribe(args, args.document) : graphqlSubscribe,
           onConnect(ctx) {
             const { socket, request, connectionParams } = ctx;
             socket['postgraphileId'] = ++socketId;
