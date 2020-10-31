@@ -124,7 +124,7 @@ program
     'Choose the version of the websocket transport library. Defaults to `v0` if `subscriptions` is true, `none` otherwise',
   )
   .option(
-    '--websocket-operations <string>',
+    '--websocket-operations <operations>',
     "Toggle which GraphQL websocket transport operations are supported: 'subscriptions' or 'all'. Defaults to `subscriptions`",
   )
   .option(
