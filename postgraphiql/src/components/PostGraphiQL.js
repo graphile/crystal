@@ -110,12 +110,12 @@ class PostGraphiQL extends React.PureComponent {
     this.setState({ query });
   };
 
-  maybeConnectSubscriptions = () => {
+  maybeSubscriptionsClient = () => {
     switch (POSTGRAPHILE_CONFIG.websockets) {
       case 'none':
         return;
       case 'v0':
-        this.subscriptionsClient = new SubscriptionClient(websocketUrl, {
+        const client = new SubscriptionClient(websocketUrl, {
           reconnect: true,
           connectionParams: () => this.getHeaders() || {},
         });
@@ -154,9 +154,9 @@ class PostGraphiQL extends React.PureComponent {
           unlisten5();
           unlisten6();
         };
-        return;
+        return client;
       case 'v1':
-        this.subscriptionsClient = createClient({
+        return createClient({
           url: websocketUrl,
           lazy: false,
           retryAttempts: Infinity, // keep retrying while the browser is open
@@ -176,7 +176,6 @@ class PostGraphiQL extends React.PureComponent {
             },
           },
         });
-        return;
       default:
         throw new Error(`Invalid websockets argument ${POSTGRAPHILE_CONFIG.websockets}`);
     }
@@ -189,7 +188,7 @@ class PostGraphiQL extends React.PureComponent {
     this.updateSchema();
 
     // Connect socket if should connect
-    this.maybeConnectSubscriptions();
+    this.subscriptionsClient = this.maybeSubscriptionsClient();
 
     // If we were given a `streamUrl`, we want to construct an `EventSource`
     // and add listeners.
@@ -248,6 +247,7 @@ class PostGraphiQL extends React.PureComponent {
       } else {
         // v1
         this.subscriptionsClient.dispose();
+        this.subscriptionsClient = null;
       }
     }
     // Close out our event source so we get no more events.
@@ -838,7 +838,7 @@ class PostGraphiQL extends React.PureComponent {
                     } else {
                       // v1
                       this.subscriptionsClient.dispose();
-                      this.maybeConnectSubscriptions();
+                      this.subscriptionsClient = this.maybeSubscriptionsClient();
                     }
                   }
                 },
