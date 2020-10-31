@@ -198,29 +198,7 @@ export async function enhanceHttpServerWithSubscriptions<
               : () => {
                   throw new Error('Only subscriptions are allowed over websocket transport');
                 },
-          subscribe: options.live
-            ? (
-                schema,
-                document,
-                rootValue,
-                contextValue,
-                variableValues,
-                operationName,
-                fieldResolver,
-              ) =>
-                liveSubscribe(
-                  {
-                    schema,
-                    document,
-                    rootValue,
-                    contextValue,
-                    variableValues,
-                    operationName,
-                    fieldResolver,
-                  },
-                  document,
-                )
-            : graphqlSubscribe,
+          subscribe: options.live ? liveSubscribe : graphqlSubscribe,
           onConnect(
             connectionParams: Record<string, any>,
             _socket: WebSocket,
