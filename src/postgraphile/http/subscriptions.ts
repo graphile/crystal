@@ -393,7 +393,11 @@ export async function enhanceHttpServerWithWebSockets<
 
             // when supplying custom execution args from the
             // onSubscribe, you're trusted to do the validation
-            let validationErrors = validate(hookedArgs.schema, hookedArgs.document);
+            let validationErrors = validate(
+              hookedArgs.schema,
+              hookedArgs.document,
+              staticValidationRules,
+            );
             if (validationErrors.length) {
               return validationErrors;
             }
