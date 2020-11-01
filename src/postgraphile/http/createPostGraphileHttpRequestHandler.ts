@@ -52,7 +52,7 @@ import favicon from '../../assets/favicon.ico';
  * will use a regular expression to replace some variables.
  */
 import baseGraphiqlHtml from '../../assets/graphiql.html';
-import { enhanceHttpServerWithSubscriptions } from './subscriptions';
+import { enhanceHttpServerWithWebSockets } from './subscriptions';
 import {
   KoaNext,
   PostGraphileResponse,
@@ -450,12 +450,12 @@ export default function createPostGraphileHttpRequestHandler(
       if (!server) {
         // tslint:disable-next-line no-console
         console.warn(
-          "Failed to find server to add websocket listener to, you'll need to call `enhanceHttpServerWithSubscriptions` manually",
+          "Failed to find server to add websocket listener to, you'll need to call `enhanceHttpServerWithWebSockets` manually",
         );
       } else {
         // Relying on this means that a normal request must come in before an
         // upgrade attempt. It's better to call it manually.
-        enhanceHttpServerWithSubscriptions(server, middleware, {
+        enhanceHttpServerWithWebSockets(server, middleware, {
           graphqlRoute: graphqlRouteForWs,
           websockets,
           operations: websocketOperations,

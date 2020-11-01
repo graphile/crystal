@@ -47,7 +47,7 @@ function deferred<T = void>(): Deferred<T> {
   });
 }
 
-export async function enhanceHttpServerWithSubscriptions<
+export async function enhanceHttpServerWithWebSockets<
   Request extends IncomingMessage = IncomingMessage,
   Response extends ServerResponse = ServerResponse
 >(

@@ -24,7 +24,7 @@ import debugFactory = require('debug');
 import { mixed } from '../interfaces';
 import * as manifest from '../../package.json';
 import sponsors = require('../../sponsors.json');
-import { enhanceHttpServerWithSubscriptions } from './http/subscriptions';
+import { enhanceHttpServerWithWebSockets } from './http/subscriptions';
 import { existsSync } from 'fs';
 
 const tagsFile = process.cwd() + '/postgraphile.tags.json5';
@@ -816,7 +816,7 @@ if (noServer) {
     }
 
     if (websockets && websockets !== 'none') {
-      enhanceHttpServerWithSubscriptions(server, middleware, {
+      enhanceHttpServerWithWebSockets(server, middleware, {
         websockets,
         operations: websocketOperations,
       });
