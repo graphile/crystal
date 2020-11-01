@@ -445,7 +445,7 @@ export default function createPostGraphileHttpRequestHandler(
         )
       : null;
 
-    if (subscriptions) {
+    if (websockets && websockets !== 'none') {
       const server = req && req.connection && req.connection['server'];
       if (!server) {
         // tslint:disable-next-line no-console

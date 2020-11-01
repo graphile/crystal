@@ -815,7 +815,7 @@ if (noServer) {
       server.timeout = serverTimeout;
     }
 
-    if (postgraphileOptions.subscriptions) {
+    if (websockets && websockets !== 'none') {
       enhanceHttpServerWithSubscriptions(server, middleware, {
         websockets,
         operations: websocketOperations,
