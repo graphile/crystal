@@ -192,8 +192,6 @@ export async function enhanceHttpServerWithSubscriptions<
   });
 
   switch (subscriptionServerOptions?.websockets) {
-    case 'none':
-      break;
     case 'v0':
       SubscriptionServer.create(
         {

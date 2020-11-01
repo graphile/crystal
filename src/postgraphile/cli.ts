@@ -528,6 +528,20 @@ if (!['omit', 'only', 'deprecated'].includes(rawLegacyRelations)) {
   legacyRelations = rawLegacyRelations;
 }
 
+// Validate websockets argument
+if (websockets) {
+  switch (websockets) {
+    case 'none':
+    case 'v0':
+    case 'v1':
+      break;
+    default:
+      exitWithErrorMessage(
+        `Invalid argument to '--websockets' - expected on of 'none', 'v0', 'v1'; but received '${websockets}'`,
+      );
+  }
+}
+
 const noServer = !yesServer;
 
 // Add custom logic for getting the schemas from our CLI. If we are in demo

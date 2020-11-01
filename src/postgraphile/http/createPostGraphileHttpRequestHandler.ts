@@ -204,6 +204,18 @@ export default function createPostGraphileHttpRequestHandler(
     throw new Error('externalUrlBase must not end with a slash (`/`)');
   }
 
+  // Validate websockets argument
+  if (websockets) {
+    switch (websockets) {
+      case 'none':
+      case 'v0':
+      case 'v1':
+        break;
+      default:
+        throw new Error(`Invalid websockets argument ${websockets}`);
+    }
+  }
+
   const pluginHook = pluginHookFromOptions(options);
 
   const origGraphiqlHtml = pluginHook('postgraphile:graphiql:html', baseGraphiqlHtml, { options });
