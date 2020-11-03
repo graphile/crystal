@@ -56,8 +56,6 @@ export async function enhanceHttpServerWithWebSockets<
   subscriptionServerOptions?: {
     keepAlive?: number;
     graphqlRoute?: string;
-    websockets: PostGraphileOptions['websockets'];
-    operations: PostGraphileOptions['websocketOperations'];
   },
 ): Promise<void> {
   if (websocketServer['__postgraphileSubscriptionsEnabled']) {
@@ -191,14 +189,14 @@ export async function enhanceHttpServerWithWebSockets<
     options,
   });
 
-  switch (subscriptionServerOptions?.websockets) {
+  switch (options.websockets) {
     case 'v0':
       SubscriptionServer.create(
         {
           schema,
           validationRules: staticValidationRules,
           execute:
-            subscriptionServerOptions?.operations === 'all'
+            options.websocketOperations === 'all'
               ? execute
               : () => {
                   throw new Error('Only subscriptions are allowed over websocket transport');
@@ -332,7 +330,7 @@ export async function enhanceHttpServerWithWebSockets<
         {
           schema,
           execute:
-            subscriptionServerOptions?.operations === 'all'
+            options.websocketOperations === 'all'
               ? execute
               : () => {
                   throw new Error('Only subscriptions are allowed over WebSocket transport');
@@ -449,8 +447,6 @@ export async function enhanceHttpServerWithWebSockets<
       break;
     }
     default:
-      throw new Error(
-        `Invalid value for \`websockets\` option: '${subscriptionServerOptions?.websockets}'`,
-      );
+      throw new Error(`Invalid value for \`websockets\` option: '${options.websockets}'`);
   }
 }
