@@ -129,14 +129,7 @@ class PostGraphiQL extends React.PureComponent {
           this.setState({ socketStatus: 'connecting' });
         });
         const unlisten4 = this.subscriptionsClient.on('reconnected', () => {
-          this.setState({ socketStatus: 'connecting', error: null });
-          setTimeout(() => {
-            this.setState(state =>
-              state.socketStatus === 'reconnected'
-                ? { socketStatus: 'connected', error: null }
-                : {},
-            );
-          }, 5000);
+          this.setState({ socketStatus: 'connected', error: null });
         });
         const unlisten5 = this.subscriptionsClient.on('reconnecting', () => {
           this.setState({ socketStatus: 'connecting' });
