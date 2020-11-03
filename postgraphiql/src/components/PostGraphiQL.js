@@ -247,8 +247,8 @@ class PostGraphiQL extends React.PureComponent {
       } else {
         // v1
         this.subscriptionsClient.dispose();
-        this.subscriptionsClient = null;
       }
+      this.subscriptionsClient = null;
     }
     // Close out our event source so we get no more events.
     this._eventSource.close();
