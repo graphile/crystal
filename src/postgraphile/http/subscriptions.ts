@@ -1,5 +1,5 @@
 import { Server, IncomingMessage, ServerResponse, OutgoingHttpHeaders } from 'http';
-import { HttpRequestHandler, mixed, Middleware, PostGraphileOptions } from '../../interfaces';
+import { HttpRequestHandler, mixed, Middleware } from '../../interfaces';
 import {
   subscribe as graphqlSubscribe,
   ExecutionResult,
