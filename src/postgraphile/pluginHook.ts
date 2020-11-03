@@ -62,7 +62,8 @@ export interface PostGraphilePlugin {
   'postgraphile:ws:onOperation'?: HookFn<ExecutionParams>;
   'postgraphile:ws:onSubscribe'?: HookFn<
     graphql.ExecutionArgs,
-    graphqlWs.Context & {
+    {
+      ctx: graphqlWs.Context;
       message: graphqlWs.SubscribeMessage;
       options: CreateRequestHandlerOptions;
     }
