@@ -445,6 +445,7 @@ export async function enhanceHttpServerWithWebSockets<
           onComplete({ socket }, msg) {
             releaseContextForSocketAndOpId(socket, msg.id);
           },
+          ...subscriptionServerOptions,
         },
         wss,
       );
