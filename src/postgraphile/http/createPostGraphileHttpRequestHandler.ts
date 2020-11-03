@@ -126,10 +126,15 @@ function withPostGraphileContextFromReqResGenerator(
     pgSettings: pgSettingsGenerator,
     allowExplain: allowExplainGenerator,
     jwtSecret,
+    additionalOptionsFromRequest,
     additionalGraphQLContextFromRequest,
   } = options;
   return async (req, res, moreOptions, fn) => {
     const jwtToken = jwtSecret ? getJwtToken(req) : null;
+    const additionalOptions =
+      typeof additionalOptionsFromRequest === 'function'
+        ? await additionalOptionsFromRequest(req, res)
+        : {};
     const additionalContext =
       typeof additionalGraphQLContextFromRequest === 'function'
         ? await additionalGraphQLContextFromRequest(req, res)
@@ -149,6 +154,7 @@ function withPostGraphileContextFromReqResGenerator(
         pgSettings,
         explain: allowExplain && req.headers['x-postgraphile-explain'] === 'on',
         ...moreOptions,
+        ...additionalOptions,
       },
       context => {
         const graphqlContext = additionalContext
@@ -319,7 +325,7 @@ export default function createPostGraphileHttpRequestHandler(
   // We only need to calculate the graphiql HTML once; but we need to receive the first request to do so.
   let graphiqlHtml: string | null;
 
-  const withPostGraphileContextFromReqRes = withPostGraphileContextFromReqResGenerator(options);
+  const withPostGraphileContextFromReqRes = options.withPostGraphileContextFromReqRes || withPostGraphileContextFromReqResGenerator(options);
 
   const staticValidationRules = pluginHook('postgraphile:validationRules:static', specifiedRules, {
     options,
