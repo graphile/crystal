@@ -425,8 +425,9 @@ export async function enhanceHttpServerWithWebSockets<
 
             return hookedArgs;
           },
-          async onError(ctx, _msg, errors) {
+          async onError(ctx, msg, errors) {
             // errors returned from onSubscribe
+            releaseContextForSocketAndOpId(ctx.socket, msg.id);
             const { req, res } = await reqResFromSocket(ctx.socket);
             return handleErrors(errors, req, res);
           },
