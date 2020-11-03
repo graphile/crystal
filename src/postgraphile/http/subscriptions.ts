@@ -381,7 +381,7 @@ export async function enhanceHttpServerWithWebSockets<
             // complete, the pluginHook should fill in the gaps
             const hookedArgs = (pluginHook
               ? pluginHook('postgraphile:ws:onSubscribe', args, {
-                  ctx,
+                  context: ctx,
                   message: msg,
                   options,
                 })
