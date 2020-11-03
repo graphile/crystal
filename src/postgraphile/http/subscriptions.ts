@@ -449,6 +449,8 @@ export async function enhanceHttpServerWithWebSockets<
       break;
     }
     default:
-      throw new Error(`Invalid websockets argument ${subscriptionServerOptions?.websockets}`);
+      throw new Error(
+        `Invalid value for \`websockets\` option: '${subscriptionServerOptions?.websockets}'`,
+      );
   }
 }

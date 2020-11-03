@@ -212,7 +212,7 @@ export default function createPostGraphileHttpRequestHandler(
       case 'v1':
         break;
       default:
-        throw new Error(`Invalid websockets argument ${websockets}`);
+        throw new Error(`Invalid value for \`websockets\` option: '${websockets}'`);
     }
   }
 

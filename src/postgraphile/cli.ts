@@ -121,11 +121,11 @@ program
   )
   .option(
     '--websockets <string>',
-    'Choose the version of the websocket transport library. Defaults to `v0` if `subscriptions` is true, `none` otherwise',
+    "Choose the version of the websocket transport library. Defaults to 'v0' if `--subscriptions` was passed, 'none' otherwise",
   )
   .option(
     '--websocket-operations <operations>',
-    "Toggle which GraphQL websocket transport operations are supported: 'subscriptions' or 'all'. Defaults to `subscriptions`",
+    "Toggle which GraphQL websocket transport operations are supported: 'subscriptions' or 'all'. Defaults to 'subscriptions'",
   )
   .option(
     '-L, --live',
