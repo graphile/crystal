@@ -382,7 +382,7 @@ export async function enhanceHttpServerWithWebSockets<
             // for supplying custom execution arguments
             const hookedArgs = pluginHook
               ? pluginHook('postgraphile:ws:onSubscribe', args, {
-                  ...ctx,
+                  ctx,
                   message: msg,
                   options,
                 })
