@@ -393,7 +393,7 @@ export async function enhanceHttpServerWithWebSockets<
 
             // when supplying custom execution args from the
             // onSubscribe, you're trusted to do the validation
-            let validationErrors = validate(
+            const validationErrors = validate(
               hookedArgs.schema,
               hookedArgs.document,
               staticValidationRules,
@@ -406,7 +406,7 @@ export async function enhanceHttpServerWithWebSockets<
             // `postgraphile:validationRules:static` if possible - you should
             // only use this one if you need access to variables.
             const { req, res } = await reqResFromSocket(ctx.socket);
-            const validationRules = pluginHook('postgraphile:validationRules', [], {
+            const moreValidationRules = pluginHook('postgraphile:validationRules', [], {
               options,
               req,
               res,
@@ -416,10 +416,14 @@ export async function enhanceHttpServerWithWebSockets<
               // served through the error message. it contains just the GraphQLErrors
               // (there is no result to add the meta to)
             });
-            if (validationRules.length) {
-              validationErrors = validate(hookedArgs.schema, hookedArgs.document, validationRules);
-              if (validationErrors.length) {
-                return validationErrors;
+            if (moreValidationRules.length) {
+              const moreValidationErrors = validate(
+                hookedArgs.schema,
+                hookedArgs.document,
+                moreValidationRules,
+              );
+              if (moreValidationErrors.length) {
+                return moreValidationErrors;
               }
             }
 
