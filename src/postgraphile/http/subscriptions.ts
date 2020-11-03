@@ -343,12 +343,9 @@ export async function enhanceHttpServerWithWebSockets<
             socket['postgraphileId'] = ++socketId;
             socket['__postgraphileReq'] = request;
 
-            let normalizedConnectionParams = {};
-            if (connectionParams) {
-              normalizedConnectionParams = lowerCaseKeys(connectionParams);
-              request['connectionParams'] = connectionParams;
-              request['normalizedConnectionParams'] = normalizedConnectionParams;
-            }
+            const normalizedConnectionParams = lowerCaseKeys(connectionParams || {});
+            request['connectionParams'] = connectionParams || {};
+            request['normalizedConnectionParams'] = normalizedConnectionParams;
 
             if (!request.headers.authorization && normalizedConnectionParams['authorization']) {
               /*
