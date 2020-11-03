@@ -369,22 +369,23 @@ export async function enhanceHttpServerWithWebSockets<
             const schema = await getGraphQLSchema();
 
             const { payload } = msg;
-            const args: ExecutionArgs = {
+            const args = {
               schema,
               contextValue: context,
               operationName: payload.operationName,
-              document: parse(payload.query),
+              document: payload.query ? parse(payload.query) : null, // parse if there is something to parse
               variableValues: payload.variables,
             };
 
-            // for supplying custom execution arguments
-            const hookedArgs = pluginHook
+            // for supplying custom execution arguments. if not already
+            // complete, the pluginHook should fill in the gaps
+            const hookedArgs = (pluginHook
               ? pluginHook('postgraphile:ws:onSubscribe', args, {
                   ctx,
                   message: msg,
                   options,
                 })
-              : args;
+              : args) as ExecutionArgs;
 
             // when supplying custom execution args from the
             // onSubscribe, you're trusted to do the validation
