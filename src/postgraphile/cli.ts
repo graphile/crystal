@@ -434,7 +434,6 @@ const {
   ownerConnection,
   subscriptions,
   websockets = subscriptions ? 'v0' : 'none',
-  websocketOperations = 'subscriptions',
   live,
   watch: watchPg,
   schema: dbSchema,
