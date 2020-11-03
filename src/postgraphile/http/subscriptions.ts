@@ -378,7 +378,7 @@ export async function enhanceHttpServerWithWebSockets<
               schema,
               contextValue: context,
               operationName: payload.operationName,
-              document: typeof payload.query === 'string' ? parse(payload.query) : payload.query,
+              document: parse(payload.query),
               variableValues: payload.variables,
             };
 
