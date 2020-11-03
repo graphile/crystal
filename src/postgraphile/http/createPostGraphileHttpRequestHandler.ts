@@ -185,7 +185,6 @@ export default function createPostGraphileHttpRequestHandler(
     disableQueryLog,
     enableQueryBatching,
     websockets = subscriptions ? 'v0' : 'none',
-    websocketOperations = 'subscriptions',
   } = options;
   const live = !!options.live;
   const enhanceGraphiql =
@@ -457,8 +456,6 @@ export default function createPostGraphileHttpRequestHandler(
         // upgrade attempt. It's better to call it manually.
         enhanceHttpServerWithWebSockets(server, middleware, {
           graphqlRoute: graphqlRouteForWs,
-          websockets,
-          operations: websocketOperations,
         });
       }
     }

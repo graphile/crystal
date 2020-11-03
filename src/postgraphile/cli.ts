@@ -816,10 +816,7 @@ if (noServer) {
     }
 
     if (websockets && websockets !== 'none') {
-      enhanceHttpServerWithWebSockets(server, middleware, {
-        websockets,
-        operations: websocketOperations,
-      });
+      enhanceHttpServerWithWebSockets(server, middleware);
     }
 
     pluginHook('cli:server:created', server, {
