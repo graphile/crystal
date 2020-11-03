@@ -364,6 +364,7 @@ class PostGraphiQL extends React.PureComponent {
   fetcher = graphQLParams => {
     this.cancelSubscription();
     if (isSubscription(graphQLParams) && this.subscriptionsClient) {
+      const client = this.subscriptionsClient;
       return {
         subscribe: observer => {
           observer.next('Waiting for subscription to yield data…');
@@ -383,13 +384,11 @@ class PostGraphiQL extends React.PureComponent {
             });
           };
 
-          let subscription;
-          if (POSTGRAPHILE_CONFIG.websockets === 'v0') {
-            subscription = this.subscriptionsClient.request(graphQLParams).subscribe(observer);
-          } else if (POSTGRAPHILE_CONFIG.websockets === 'v1') {
-            const unsubscribe = this.subscriptionsClient.subscribe(graphQLParams, observer);
-            subscription = { unsubscribe };
-          }
+          const subscription =
+            POSTGRAPHILE_CONFIG.websockets === 'v0'
+              ? client.request(graphQLParams).subscribe(observer)
+              // v1
+              : { unsubscribe: client.subscribe(graphQLParams, observer) };
           this.setState({ haveActiveSubscription: true });
           this.activeSubscription = subscription;
           return subscription;
