@@ -4756,10 +4756,10 @@ graphql-parse-resolve-info@4.9.0:
     debug "^4.1.1"
     tslib "^2.0.1"
 
-graphql-ws@^1.10.0:
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/graphql-ws/-/graphql-ws-1.10.0.tgz#994e9f41b1a61984d3a4738a71cbc40a6b63d8ea"
-  integrity sha512-LVOXKos15Z75yVJr37x9Ahr3c7GXuYkrR4Cfk/NLL4T9U2UZAWVa1Ub9J6qvc6jDHXuqjafwiHwcBrhq7qgJUA==
+graphql-ws@^1.11.0:
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/graphql-ws/-/graphql-ws-1.11.0.tgz#ebe238f5721dd1834a4d69801b903b5589f6a876"
+  integrity sha512-XgP8YQzwJp0AMKBcVqzzF9N9O1KYhGOgKguonbPMiU9+CLtmJLRBQ5YyPb6unAfeGifWzJmlwvxXTu/3sq0xjg==
   dependencies:
     ws "^7.3.1"
 
