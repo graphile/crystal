@@ -321,6 +321,7 @@ export async function enhanceHttpServerWithWebSockets<
            * Pick a number under these ceilings.
            */
           keepAlive: 15000,
+          ...subscriptionServerOptions,
         },
         wss,
       );
@@ -442,7 +443,6 @@ export async function enhanceHttpServerWithWebSockets<
           onComplete({ socket }, msg) {
             releaseContextForSocketAndOpId(socket, msg.id);
           },
-          ...subscriptionServerOptions,
         },
         wss,
       );
