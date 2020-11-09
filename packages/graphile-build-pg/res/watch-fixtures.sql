@@ -1,4 +1,4 @@
--- @see https://github.com/graphile/postgraphile/blob/886f8752f03d3fa05bdbdd97eeabb153a4d0343e/resources/watch-fixtures.sql
+-- @see https://github.com/graphile/graphile-engine/blob/v4/packages/graphile-build-pg/res/watch-fixtures.sql
 
 -- Adds the functionality for PostGraphile to watch the database for schema
 -- changes. This script is idempotent, you can run it as many times as you
