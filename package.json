@@ -111,6 +111,7 @@
     "express": "^4.14.0",
     "fastify": "^3.7.0",
     "fastify-compress": "^3.3.1",
+    "fastify-cookie": "^4.1.0",
     "fastify-formbody": "^5.0.0",
     "fastify-v2": "npm:fastify@^2.2.0",
     "helmet": "^4.1.1",
