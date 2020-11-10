@@ -1,7 +1,18 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { PassThrough, Stream } from 'stream';
-import { Context as KoaContext } from 'koa';
-import { FastifyReply, FastifyRequest } from 'fastify';
+import type { Context as KoaContext } from 'koa';
+import type { FastifyReply, FastifyRequest } from 'fastify';
+
+declare module 'http' {
+  interface IncomingMessage {
+    _koaCtx?: KoaContext;
+    _fastifyReply?: FastifyReply;
+    _fastifyRequest?: FastifyRequest;
+    _body?: boolean;
+    body?: any;
+    originalUrl?: string;
+  }
+}
 
 type Headers = { [header: string]: string };
 
@@ -192,17 +203,18 @@ export class PostGraphileResponseKoa extends PostGraphileResponse {
     this._next = next;
     const req = this.getNodeServerRequest();
 
-    // For backwards compatibility (this is a documented interface)
-    (req as any)._koaCtx = ctx;
+    // For backwards compatibility, and to allow getting "back" to the Koa
+    // context from pgSettings, etc (this is a documented interface)
+    req._koaCtx = ctx;
 
     // Make `koa-bodyparser` trigger skipping of our `body-parser`
-    if ((ctx.request as any).body) {
-      (req as any)._body = true;
-      (req as any).body = (ctx.request as any).body;
+    if (ctx.request.body) {
+      req._body = true;
+      req.body = ctx.request.body;
     }
 
     // In case you're using koa-mount or similar
-    (req as any).originalUrl = ctx.request.originalUrl;
+    req.originalUrl = ctx.request.originalUrl;
   }
 
   getNodeServerRequest() {
@@ -248,9 +260,14 @@ export class PostGraphileResponseFastify3 extends PostGraphileResponse {
     this._request = request;
     this._reply = reply;
 
+    // For backwards compatibility, and to allow getting "back" to the Fastify
+    // request/reply from pgSettings, etc
+    const req = this.getNodeServerRequest();
+    req._fastifyRequest = this._request;
+    req._fastifyReply = this._reply;
+
     // Make Fastify's body parsing trigger skipping of our `body-parser`
     if (this._request.body) {
-      const req: any = this.getNodeServerRequest();
       req._body = true;
       req.body = this._request.body;
     }
