@@ -6,7 +6,6 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 declare module 'http' {
   interface IncomingMessage {
     _koaCtx?: KoaContext;
-    _fastifyReply?: FastifyReply;
     _fastifyRequest?: FastifyRequest;
     _body?: boolean;
     body?: any;
@@ -261,10 +260,9 @@ export class PostGraphileResponseFastify3 extends PostGraphileResponse {
     this._reply = reply;
 
     // For backwards compatibility, and to allow getting "back" to the Fastify
-    // request/reply from pgSettings, etc
+    // request from pgSettings, etc
     const req = this.getNodeServerRequest();
     req._fastifyRequest = this._request;
-    req._fastifyReply = this._reply;
 
     // Make Fastify's body parsing trigger skipping of our `body-parser`
     if (this._request.body) {
