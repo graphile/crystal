@@ -297,7 +297,8 @@ class PostGraphiQL extends React.PureComponent {
    * Executes a GraphQL query with some extra information then the standard
    * parameters. Namely a JWT which may be added as an `Authorization` header.
    */
-  async executeQuery(graphQLParams, extraHeaders) {
+  executeQuery = async graphQLParams => {
+    const extraHeaders = this.getHeaders();
     const response = await fetch(POSTGRAPHILE_CONFIG.graphqlUrl, {
       method: 'POST',
       headers: Object.assign(
