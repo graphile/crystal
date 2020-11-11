@@ -277,7 +277,7 @@ class PostGraphiQL extends React.PureComponent {
   /**
    * Get the user editable headers as an object
    */
-  getHeaders() {
+  getHeaders = () => {
     const { headersText } = this.state;
     let extraHeaders;
     try {
@@ -291,7 +291,7 @@ class PostGraphiQL extends React.PureComponent {
       // Do nothing
     }
     return extraHeaders;
-  }
+  };
 
   /**
    * Executes a GraphQL query with some extra information then the standard
@@ -320,7 +320,7 @@ class PostGraphiQL extends React.PureComponent {
     this.setState({ explainResult: result && result.explain ? result.explain : null });
 
     return result;
-  }
+  };
 
   /**
    * Routes the request either to the subscriptionClient or to executeQuery.
@@ -395,6 +395,10 @@ class PostGraphiQL extends React.PureComponent {
     // Get the documentation explorer component from GraphiQL. Unfortunately
     // for them this looks like public API. Muwahahahaha.
     const { docExplorerComponent } = this.graphiql;
+    if (!docExplorerComponent) {
+      console.log('No docExplorerComponent, could not update navStack');
+      return;
+    }
     const { navStack } = docExplorerComponent.state;
 
     // If one type/field isn’t find this will be set to false and the
