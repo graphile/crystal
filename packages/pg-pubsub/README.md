@@ -65,6 +65,7 @@ const postgraphileOptions = {
   pluginHook,
   subscriptions: true, // Enable PostGraphile websocket capabilities
   simpleSubscriptions: true, // Add the `listen` subscription field
+  subscriptionEventEmitterMaxListeners: 20, // Set max listeners on eventEmitter, 0 unlimited, 10 default
   websocketMiddlewares: [
     // Add whatever middlewares you need here, note that they should only
     // manipulate properties on req/res, they must not sent response data. e.g.:

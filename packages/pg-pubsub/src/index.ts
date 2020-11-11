@@ -13,6 +13,7 @@ declare module "postgraphile" {
   interface PostGraphileOptions {
     simpleSubscriptions?: boolean;
     subscriptionAuthorizationFunction?: string;
+    subscriptionEventEmitterMaxListeners?: number;
   }
 }
 
@@ -56,6 +57,11 @@ const plugin: PostGraphilePlugin = {
 
   ["postgraphile:options"](incomingOptions, { pgPool }) {
     const eventEmitter = new EventEmitter();
+    if (incomingOptions.subscriptionEventEmitterMaxListeners != null) {
+      eventEmitter.setMaxListeners(
+        incomingOptions.subscriptionEventEmitterMaxListeners
+      );
+    }
     const {
       simpleSubscriptions,
       subscriptionAuthorizationFunction,
