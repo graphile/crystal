@@ -210,6 +210,7 @@ export interface PostGraphileOptions<
   // Set this to `true` to enable the GraphiQL interface.
   /* @middlewareOnly */
   graphiql?: boolean;
+  graphiqlCredentials?: 'include' | 'omit' | 'same-origin';
   // Set this to `true` to add some enhancements to GraphiQL; intended for development usage only (automatically enables with `subscriptions` and `live`).
   /* @middlewareOnly */
   enhanceGraphiql?: boolean;

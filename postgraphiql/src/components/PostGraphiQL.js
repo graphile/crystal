@@ -56,6 +56,7 @@ const {
     enhanceGraphiql: true,
     subscriptions: true,
     allowExplain: true,
+    credentials: 'same-origin',
   },
 } = window;
 
@@ -311,7 +312,7 @@ class PostGraphiQL extends React.PureComponent {
         },
         extraHeaders,
       ),
-      credentials: 'same-origin',
+      credentials: POSTGRAPHILE_CONFIG.credentials,
       body: JSON.stringify(graphQLParams),
     });
 

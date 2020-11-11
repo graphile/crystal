@@ -230,6 +230,9 @@ export default function createPostGraphileHttpRequestHandler(
   // Gets the route names for our GraphQL endpoint, and our GraphiQL endpoint.
   const graphqlRoute = options.graphqlRoute || '/graphql';
   const graphiqlRoute = options.graphiqlRoute || '/graphiql';
+  // Set the request credential behavior in graphiql.
+  const graphiqlCredentials = options.graphiqlCredentials || 'same-origin';
+
   const eventStreamRoute = options.eventStreamRoute || `${graphqlRoute.replace(/\/+$/, '')}/stream`;
   const externalGraphqlRoute = options.externalGraphqlRoute;
   const externalEventStreamRoute =
@@ -427,6 +430,7 @@ export default function createPostGraphileHttpRequestHandler(
               typeof options.allowExplain === 'function'
                 ? ALLOW_EXPLAIN_PLACEHOLDER
                 : !!options.allowExplain,
+            credentials: graphiqlCredentials,
           })};</script>\n  </head>`,
         )
       : null;
