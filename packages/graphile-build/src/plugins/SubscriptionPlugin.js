@@ -49,7 +49,10 @@ export default (async function SubscriptionPlugin(builder, { live }) {
         GraphQLObjectType,
         {
           name: inflection.builtin("Subscription"),
-          description: live ? liveDescription : description,
+          description: build.wrapDescription(
+            live ? liveDescription : description,
+            "type"
+          ),
         },
         {
           __origin: `graphile-build built-in (root subscription type)`,

@@ -84,7 +84,10 @@ export default (function PgConditionComputedColumnPlugin(builder) {
               [fieldName]: fieldWithHooks(
                 fieldName,
                 {
-                  description: `Checks for equality with the object’s \`${fieldName}\` field.`,
+                  description: build.wrapDescription(
+                    `Checks for equality with the object’s \`${fieldName}\` field.`,
+                    "field"
+                  ),
                   type: Type,
                 },
                 {

@@ -87,33 +87,46 @@ export default (function PgConnectionArgs(builder) {
         args,
         {
           first: {
-            description: "Only read the first `n` values of the set.",
+            description: build.wrapDescription(
+              "Only read the first `n` values of the set.",
+              "arg"
+            ),
             type: GraphQLInt,
           },
           ...(isPgFieldConnection
             ? {
                 last: {
-                  description: "Only read the last `n` values of the set.",
+                  description: build.wrapDescription(
+                    "Only read the last `n` values of the set.",
+                    "arg"
+                  ),
                   type: GraphQLInt,
                 },
               }
             : null),
           offset: {
-            description: isPgFieldConnection
-              ? "Skip the first `n` values from our `after` cursor, an alternative to cursor based pagination. May not be used with `last`."
-              : "Skip the first `n` values.",
+            description: build.wrapDescription(
+              isPgFieldConnection
+                ? "Skip the first `n` values from our `after` cursor, an alternative to cursor based pagination. May not be used with `last`."
+                : "Skip the first `n` values.",
+              "arg"
+            ),
             type: GraphQLInt,
           },
           ...(isPgFieldConnection
             ? {
                 before: {
-                  description:
+                  description: build.wrapDescription(
                     "Read all values in the set before (above) this cursor.",
+                    "arg"
+                  ),
                   type: Cursor,
                 },
                 after: {
-                  description:
+                  description: build.wrapDescription(
                     "Read all values in the set after (below) this cursor.",
+                    "arg"
+                  ),
                   type: Cursor,
                 },
               }

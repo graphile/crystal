@@ -1,6 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Pokemon GraphQL API has a consistent schema 1`] = `
+"""Query any Pokémon by number or name"""
+type Query {
+  query: Query
+  pokemons(first: Int!): [Pokemon]
+  pokemon(id: String, name: String): Pokemon
+}
+
 """Represents a Pokémon's attack types"""
 type Attack {
   """The name of this Pokémon attack"""
@@ -85,13 +92,6 @@ type PokemonEvolutionRequirement {
 
   """The name of the candy to evolve"""
   name: String
-}
-
-"""Query any Pokémon by number or name"""
-type Query {
-  query: Query
-  pokemons(first: Int!): [Pokemon]
-  pokemon(id: String, name: String): Pokemon
 }
 
 `;

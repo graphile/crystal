@@ -71,6 +71,10 @@ export type Build = {|
     // eslint-disable-next-line flowtype/no-weak-types
     [string]: (...args: Array<any>) => string,
   },
+  wrapDescription: (
+    description: string,
+    position: "root" | "type" | "field" | "arg"
+  ) => string,
   swallowError: (e: Error) => void,
   // resolveNode: EXPERIMENTAL, API might change!
   resolveNode: resolveNode,

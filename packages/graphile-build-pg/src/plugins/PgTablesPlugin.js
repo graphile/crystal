@@ -128,8 +128,10 @@ export default (function PgTablesPlugin(
                       };
                     });
                     fields[nodeIdFieldName] = {
-                      description:
+                      description: build.wrapDescription(
                         "A globally unique identifier. Can be used in various places throughout the system to identify this single value.",
+                        "field"
+                      ),
                       type: new GraphQLNonNull(GraphQLID),
                       resolve(data) {
                         const identifiers = data.__identifiers;
@@ -197,7 +199,10 @@ export default (function PgTablesPlugin(
             newWithHooks(
               GraphQLInputObjectType,
               {
-                description: `An input for mutations affecting \`${tableTypeName}\``,
+                description: build.wrapDescription(
+                  `An input for mutations affecting \`${tableTypeName}\``,
+                  "type"
+                ),
                 name: inflection.inputType(TableType),
               },
               {
@@ -234,7 +239,10 @@ export default (function PgTablesPlugin(
               TablePatchType = newWithHooks(
                 GraphQLInputObjectType,
                 {
-                  description: `Represents an update to a \`${tableTypeName}\`. Fields that are set will be updated.`,
+                  description: build.wrapDescription(
+                    `Represents an update to a \`${tableTypeName}\`. Fields that are set will be updated.`,
+                    "type"
+                  ),
                   name: inflection.patchType(TableType),
                 },
                 {
@@ -270,7 +278,10 @@ export default (function PgTablesPlugin(
               TableBaseInputType = newWithHooks(
                 GraphQLInputObjectType,
                 {
-                  description: `An input representation of \`${tableTypeName}\` with nullable fields.`,
+                  description: build.wrapDescription(
+                    `An input representation of \`${tableTypeName}\` with nullable fields.`,
+                    "type"
+                  ),
                   name: inflection.baseInputType(TableType),
                 },
                 {
@@ -350,7 +361,10 @@ export default (function PgTablesPlugin(
             const EdgeType = newWithHooks(
               GraphQLObjectType,
               {
-                description: `A \`${tableTypeName}\` edge in the connection.`,
+                description: build.wrapDescription(
+                  `A \`${tableTypeName}\` edge in the connection.`,
+                  "type"
+                ),
                 name: inflection.edge(TableType.name),
                 fields: ({ fieldWithHooks }) => {
                   return {
@@ -366,7 +380,10 @@ export default (function PgTablesPlugin(
                           },
                         }));
                         return {
-                          description: "A cursor for use in pagination.",
+                          description: build.wrapDescription(
+                            "A cursor for use in pagination.",
+                            "field"
+                          ),
                           type: Cursor,
                           resolve(data) {
                             return (
@@ -385,7 +402,10 @@ export default (function PgTablesPlugin(
                       fieldWithHooks,
                       "node",
                       {
-                        description: `The \`${tableTypeName}\` at the end of the edge.`,
+                        description: build.wrapDescription(
+                          `The \`${tableTypeName}\` at the end of the edge.`,
+                          "field"
+                        ),
                         type: nullableIf(
                           !pgForbidSetofFunctionsToReturnNull,
                           TableType
@@ -446,7 +466,10 @@ export default (function PgTablesPlugin(
             newWithHooks(
               GraphQLObjectType,
               {
-                description: `A connection to a list of \`${tableTypeName}\` values.`,
+                description: build.wrapDescription(
+                  `A connection to a list of \`${tableTypeName}\` values.`,
+                  "type"
+                ),
                 name: inflection.connection(TableType.name),
                 fields: ({ recurseDataGeneratorsForField, fieldWithHooks }) => {
                   recurseDataGeneratorsForField("pageInfo", true);
@@ -456,7 +479,10 @@ export default (function PgTablesPlugin(
                       fieldWithHooks,
                       "nodes",
                       {
-                        description: `A list of \`${tableTypeName}\` objects.`,
+                        description: build.wrapDescription(
+                          `A list of \`${tableTypeName}\` objects.`,
+                          "field"
+                        ),
                         type: new GraphQLNonNull(
                           new GraphQLList(
                             nullableIf(
@@ -509,7 +535,10 @@ export default (function PgTablesPlugin(
                       fieldWithHooks,
                       "edges",
                       {
-                        description: `A list of edges which contains the \`${tableTypeName}\` and cursor to aid in pagination.`,
+                        description: build.wrapDescription(
+                          `A list of edges which contains the \`${tableTypeName}\` and cursor to aid in pagination.`,
+                          "field"
+                        ),
                         type: new GraphQLNonNull(
                           new GraphQLList(new GraphQLNonNull(EdgeType))
                         ),
@@ -530,7 +559,10 @@ export default (function PgTablesPlugin(
                       }
                     ),
                     pageInfo: PageInfo && {
-                      description: "Information to aid in pagination.",
+                      description: build.wrapDescription(
+                        "Information to aid in pagination.",
+                        "field"
+                      ),
                       type: new GraphQLNonNull(PageInfo),
                       resolve(data) {
                         return data;

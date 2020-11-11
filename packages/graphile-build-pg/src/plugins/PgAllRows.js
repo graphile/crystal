@@ -84,9 +84,12 @@ export default (async function PgAllRows(
               fieldName,
               ({ getDataFromParsedResolveInfoFragment }) => {
                 return {
-                  description: isConnection
-                    ? `Reads and enables pagination through a set of \`${tableTypeName}\`.`
-                    : `Reads a set of \`${tableTypeName}\`.`,
+                  description: build.wrapDescription(
+                    isConnection
+                      ? `Reads and enables pagination through a set of \`${tableTypeName}\`.`
+                      : `Reads a set of \`${tableTypeName}\`.`,
+                    "field"
+                  ),
                   type: isConnection
                     ? ConnectionType
                     : new GraphQLList(new GraphQLNonNull(TableType)),

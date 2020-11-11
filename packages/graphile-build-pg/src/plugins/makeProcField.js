@@ -481,9 +481,12 @@ export default function makeProcField(
           GraphQLObjectType,
           {
             name: inflection.functionPayloadType(proc),
-            description: `The output of our \`${inflection.functionMutationName(
-              proc
-            )}\` mutation.`,
+            description: build.wrapDescription(
+              `The output of our \`${inflection.functionMutationName(
+                proc
+              )}\` mutation.`,
+              "type"
+            ),
             fields: ({ fieldWithHooks }) => {
               return Object.assign(
                 {},
@@ -538,9 +541,12 @@ export default function makeProcField(
           GraphQLInputObjectType,
           {
             name: inflection.functionInputType(proc),
-            description: `All input for the \`${inflection.functionMutationName(
-              proc
-            )}\` mutation.`,
+            description: build.wrapDescription(
+              `All input for the \`${inflection.functionMutationName(
+                proc
+              )}\` mutation.`,
+              "type"
+            ),
             fields: {
               clientMutationId: {
                 type: GraphQLString,
@@ -584,7 +590,10 @@ export default function makeProcField(
           : isMutation
           ? null
           : isTableLike && proc.returnsSet
-          ? `Reads and enables pagination through a set of \`${TableType.name}\`.`
+          ? build.wrapDescription(
+              `Reads and enables pagination through a set of \`${TableType.name}\`.`,
+              "field"
+            )
           : null,
         type: nullableIf(
           GraphQLNonNull,

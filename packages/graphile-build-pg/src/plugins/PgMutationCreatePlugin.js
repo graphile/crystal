@@ -77,17 +77,25 @@ export default (function PgMutationCreatePlugin(
             GraphQLInputObjectType,
             {
               name: inflection.createInputType(table),
-              description: `All input for the create \`${tableTypeName}\` mutation.`,
+              description: build.wrapDescription(
+                `All input for the create \`${tableTypeName}\` mutation.`,
+                "type"
+              ),
               fields: {
                 clientMutationId: {
-                  description:
+                  description: build.wrapDescription(
                     "An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.",
+                    "field"
+                  ),
                   type: GraphQLString,
                 },
                 ...(TableInput
                   ? {
                       [inflection.tableFieldName(table)]: {
-                        description: `The \`${tableTypeName}\` to be created by this mutation.`,
+                        description: build.wrapDescription(
+                          `The \`${tableTypeName}\` to be created by this mutation.`,
+                          "field"
+                        ),
                         type: new GraphQLNonNull(TableInput),
                       },
                     }
@@ -112,13 +120,18 @@ export default (function PgMutationCreatePlugin(
             GraphQLObjectType,
             {
               name: inflection.createPayloadType(table),
-              description: `The output of our create \`${tableTypeName}\` mutation.`,
+              description: build.wrapDescription(
+                `The output of our create \`${tableTypeName}\` mutation.`,
+                "type"
+              ),
               fields: ({ fieldWithHooks }) => {
                 const tableName = inflection.tableFieldName(table);
                 return {
                   clientMutationId: {
-                    description:
+                    description: build.wrapDescription(
                       "The exact same `clientMutationId` that was provided in the mutation input, unchanged and unused. May be used by a client to track mutations.",
+                      "field"
+                    ),
                     type: GraphQLString,
                   },
                   [tableName]: pgField(
@@ -126,7 +139,10 @@ export default (function PgMutationCreatePlugin(
                     fieldWithHooks,
                     tableName,
                     {
-                      description: `The \`${tableTypeName}\` that was created by this mutation.`,
+                      description: build.wrapDescription(
+                        `The \`${tableTypeName}\` that was created by this mutation.`,
+                        "field"
+                      ),
                       type: Table,
                     },
                     {
@@ -168,7 +184,10 @@ export default (function PgMutationCreatePlugin(
                       !omit(attr, "create")
                   );
                   return {
-                    description: `Creates a single \`${tableTypeName}\`.`,
+                    description: build.wrapDescription(
+                      `Creates a single \`${tableTypeName}\`.`,
+                      "field"
+                    ),
                     type: PayloadType,
                     args: {
                       input: {

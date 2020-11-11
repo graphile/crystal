@@ -9,6 +9,7 @@ import QueryPlugin from "./QueryPlugin";
 import StandardTypesPlugin from "./StandardTypesPlugin";
 import SwallowErrorsPlugin from "./SwallowErrorsPlugin";
 import AddQueriesToSubscriptionsPlugin from "./AddQueriesToSubscriptionsPlugin";
+import TrimEmptyDescriptionsPlugin from "./TrimEmptyDescriptionsPlugin";
 
 export {
   ClientMutationIdDescriptionPlugin,
@@ -20,4 +21,5 @@ export {
   StandardTypesPlugin,
   SwallowErrorsPlugin,
   AddQueriesToSubscriptionsPlugin,
+  TrimEmptyDescriptionsPlugin,
 };

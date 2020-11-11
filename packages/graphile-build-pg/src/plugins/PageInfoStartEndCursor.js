@@ -19,8 +19,10 @@ export default (function PageInfoStartEndCursor(builder) {
             ({ addDataGenerator }) => {
               addDataGenerator(() => ({ usesCursor: [true] }));
               return {
-                description:
+                description: build.wrapDescription(
                   "When paginating backwards, the cursor to continue.",
+                  "field"
+                ),
                 type: Cursor,
               };
             },
@@ -33,8 +35,10 @@ export default (function PageInfoStartEndCursor(builder) {
             ({ addDataGenerator }) => {
               addDataGenerator(() => ({ usesCursor: [true] }));
               return {
-                description:
+                description: build.wrapDescription(
                   "When paginating forwards, the cursor to continue.",
+                  "field"
+                ),
                 type: Cursor,
               };
             },

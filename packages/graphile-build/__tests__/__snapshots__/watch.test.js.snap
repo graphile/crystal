@@ -1,18 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`generated schema n = 0, n = 3 1`] = `
-type Dummy0 {
-  n: Int!
-}
-
-"""An object with a globally unique \`ID\`."""
-interface Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  id: ID!
-}
-
 """The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -34,13 +22,6 @@ type Query implements Node {
   dummy: Dummy0
 }
 
-`;
-
-exports[`generated schema n = 0, n = 3 2`] = `
-type Dummy3 {
-  n: Int!
-}
-
 """An object with a globally unique \`ID\`."""
 interface Node {
   """
@@ -49,6 +30,13 @@ interface Node {
   id: ID!
 }
 
+type Dummy0 {
+  n: Int!
+}
+
+`;
+
+exports[`generated schema n = 0, n = 3 2`] = `
 """The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -68,6 +56,18 @@ type Query implements Node {
     id: ID!
   ): Node
   dummy: Dummy3
+}
+
+"""An object with a globally unique \`ID\`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  id: ID!
+}
+
+type Dummy3 {
+  n: Int!
 }
 
 `;

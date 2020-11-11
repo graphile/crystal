@@ -48,7 +48,10 @@ export default (function PgConnectionTotalCount(builder) {
                 };
               });
               return {
-                description: `The count of *all* \`${nodeTypeName}\` you could get from the connection.`,
+                description: build.wrapDescription(
+                  `The count of *all* \`${nodeTypeName}\` you could get from the connection.`,
+                  "field"
+                ),
                 type: new GraphQLNonNull(GraphQLInt),
                 resolve(parent) {
                   return (

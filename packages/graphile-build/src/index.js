@@ -12,6 +12,7 @@ import {
   ClientMutationIdDescriptionPlugin,
   MutationPayloadQueryPlugin,
   AddQueriesToSubscriptionsPlugin,
+  TrimEmptyDescriptionsPlugin,
 } from "./plugins";
 import resolveNode from "./resolveNode";
 import type { GraphQLSchema } from "graphql";
@@ -85,6 +86,7 @@ export const defaultPlugins: Array<Plugin> = [
   ClientMutationIdDescriptionPlugin,
   MutationPayloadQueryPlugin,
   AddQueriesToSubscriptionsPlugin,
+  TrimEmptyDescriptionsPlugin,
 ];
 
 export {

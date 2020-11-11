@@ -38,12 +38,12 @@
   },
   "peerDependencies": {
     "graphile-build": "4.x",
-    "graphql": ">=0.6 <15",
+    "graphql": ">=0.6 <16",
     "postgraphile": "^4.4.0-beta.10"
   },
   "devDependencies": {
     "@types/jest": "25.x",
-    "graphql": ">=0.6 <15",
+    "graphql": ">=0.6 <16",
     "jest": "25.x",
     "jest-serializer-graphql-schema": "4.9.0",
     "mock-req": "^0.2.0",
@@ -53,7 +53,5 @@
     "ts-jest": "25.x",
     "typescript": "^4.0.2"
   },
-  "files": [
-    "dist"
-  ]
+  "files": ["dist"]
 }

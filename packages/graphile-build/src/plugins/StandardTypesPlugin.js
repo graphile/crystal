@@ -44,7 +44,10 @@ export default (function StandardTypesPlugin(builder) {
         GraphQLObjectType,
         {
           name: inflection.builtin("PageInfo"),
-          description: "Information about pagination in a connection.",
+          description: build.wrapDescription(
+            "Information about pagination in a connection.",
+            "type"
+          ),
           fields: ({ fieldWithHooks }) => ({
             hasNextPage: fieldWithHooks(
               "hasNextPage",
@@ -55,8 +58,10 @@ export default (function StandardTypesPlugin(builder) {
                   };
                 });
                 return {
-                  description:
+                  description: build.wrapDescription(
                     "When paginating forwards, are there more items?",
+                    "field"
+                  ),
                   type: new GraphQLNonNull(GraphQLBoolean),
                 };
               },
@@ -71,8 +76,10 @@ export default (function StandardTypesPlugin(builder) {
                   };
                 });
                 return {
-                  description:
+                  description: build.wrapDescription(
                     "When paginating backwards, are there more items?",
+                    "field"
+                  ),
                   type: new GraphQLNonNull(GraphQLBoolean),
                 };
               },

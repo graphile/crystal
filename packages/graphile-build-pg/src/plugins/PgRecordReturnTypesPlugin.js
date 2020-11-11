@@ -78,9 +78,12 @@ export default (function PgRecordReturnTypesPlugin(builder) {
           GraphQLObjectType,
           {
             name: inflection.recordFunctionReturnType(proc),
-            description: `The return type of our \`${procFieldName}\` ${
-              isMutation ? "mutation" : "query"
-            }.`,
+            description: build.wrapDescription(
+              `The return type of our \`${procFieldName}\` ${
+                isMutation ? "mutation" : "query"
+              }.`,
+              "type"
+            ),
             fields: ({ fieldWithHooks }) => {
               return outputArgNames.reduce((memo, outputArgName, idx) => {
                 const fieldName = inflection.functionOutputFieldName(

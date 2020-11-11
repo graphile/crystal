@@ -22,8 +22,10 @@ export default (function ClientMutationIdDescriptionPlugin(
       return extend(
         field,
         {
-          description:
+          description: build.wrapDescription(
             "An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.",
+            "field"
+          ),
         },
         `Tweaking '${fieldName}' field in '${Self.name}'`
       );
@@ -49,8 +51,10 @@ export default (function ClientMutationIdDescriptionPlugin(
       return extend(
         field,
         {
-          description:
+          description: build.wrapDescription(
             "The exact same `clientMutationId` that was provided in the mutation input, unchanged and unused. May be used by a client to track mutations.",
+            "field"
+          ),
         },
         `Tweaking '${fieldName}' field in '${Self.name}'`
       );
@@ -74,8 +78,10 @@ export default (function ClientMutationIdDescriptionPlugin(
         input: extend(
           args.input,
           {
-            description:
+            description: build.wrapDescription(
               "The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.",
+              "arg"
+            ),
           },
           `Adding a description to input arg for field '${fieldName}' field in '${Self.name}'`
         ),

@@ -31,15 +31,19 @@ export default (async function QueryPlugin(builder) {
       const queryType = newWithHooks(
         GraphQLObjectType,
         {
-          description:
+          description: build.wrapDescription(
             "The root query type which gives access points into the data universe.",
+            "type"
+          ),
           name: inflection.builtin("Query"),
           isTypeOf: (value, _context, info) =>
             info.parentType == null || value === $$isQuery,
           fields: ({ Self }) => ({
             query: {
-              description:
+              description: build.wrapDescription(
                 "Exposes the root query type nested one level down. This is helpful for Relay 1 which can only query top level fields if they are in a particular form.",
+                "field"
+              ),
               type: new GraphQLNonNull(Self),
               resolve() {
                 return $$isQuery;

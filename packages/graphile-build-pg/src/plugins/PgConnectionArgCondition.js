@@ -26,7 +26,10 @@ export default (function PgConnectionArgCondition(builder) {
         newWithHooks(
           GraphQLInputObjectType,
           {
-            description: `A condition to be used against \`${tableTypeName}\` object types. All fields are tested for equality and combined with a logical ‘and.’`,
+            description: build.wrapDescription(
+              `A condition to be used against \`${tableTypeName}\` object types. All fields are tested for equality and combined with a logical ‘and.’`,
+              "type"
+            ),
             name: inflection.conditionType(inflection.tableType(table)),
             fields: context => {
               const { fieldWithHooks } = context;
@@ -42,7 +45,10 @@ export default (function PgConnectionArgCondition(builder) {
                     [fieldName]: fieldWithHooks(
                       fieldName,
                       {
-                        description: `Checks for equality with the object’s \`${fieldName}\` field.`,
+                        description: build.wrapDescription(
+                          `Checks for equality with the object’s \`${fieldName}\` field.`,
+                          "field"
+                        ),
                         type:
                           pgGetGqlInputTypeByTypeIdAndModifier(
                             attr.typeId,
@@ -181,8 +187,10 @@ export default (function PgConnectionArgCondition(builder) {
         args,
         {
           condition: {
-            description:
+            description: build.wrapDescription(
               "A condition to be used in determining which values should be returned by the collection.",
+              "arg"
+            ),
             type: TableConditionType,
           },
         },

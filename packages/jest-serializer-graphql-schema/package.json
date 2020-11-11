@@ -13,11 +13,7 @@
     "type": "git",
     "url": "git+https://github.com/graphile/graphile-engine.git"
   },
-  "keywords": [
-    "jest",
-    "graphql",
-    "schema"
-  ],
+  "keywords": ["jest", "graphql", "schema"],
   "author": "David Baumgold <david@davidbaumgold.com>",
   "license": "MIT",
   "bugs": {
@@ -25,7 +21,7 @@
   },
   "homepage": "https://github.com/graphile/graphile-engine/tree/master/packages/jest-serializer-graphql-schema#readme",
   "peerDependencies": {
-    "graphql": "^14.0.2"
+    "graphql": "^14.0.2 || ^15.4.0"
   },
   "devDependencies": {
     "@types/node-fetch": "^2.5.2",
@@ -34,9 +30,7 @@
     "ts-jest": "25.x",
     "typescript": "^4.0.2"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "dependencies": {
     "tslib": "^2.0.1"
   }

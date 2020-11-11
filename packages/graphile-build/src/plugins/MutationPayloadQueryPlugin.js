@@ -23,8 +23,10 @@ export default (function MutationPayloadQueryPlugin(builder) {
         fields,
         {
           query: {
-            description:
+            description: build.wrapDescription(
               "Our root query field type. Allows us to run any query from our mutation payload.",
+              "field"
+            ),
             type: Query,
             resolve() {
               return $$isQuery;

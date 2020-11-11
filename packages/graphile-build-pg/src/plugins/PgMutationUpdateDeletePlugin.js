@@ -204,7 +204,10 @@ returning *`;
                         ? "deletePayloadType"
                         : "updatePayloadType"
                     ](table),
-                    description: `The output of our ${mode} \`${tableTypeName}\` mutation.`,
+                    description: build.wrapDescription(
+                      `The output of our ${mode} \`${tableTypeName}\` mutation.`,
+                      "type"
+                    ),
                     fields: ({ fieldWithHooks }) => {
                       const tableName = inflection.tableFieldName(table);
                       // This should really be `-node-id` but for compatibility with PostGraphQL v3 we haven't made that change.
@@ -214,8 +217,10 @@ returning *`;
                       return Object.assign(
                         {
                           clientMutationId: {
-                            description:
+                            description: build.wrapDescription(
                               "The exact same `clientMutationId` that was provided in the mutation input, unchanged and unused. May be used by a client to track mutations.",
+                              "field"
+                            ),
                             type: GraphQLString,
                           },
                           [tableName]: pgField(
@@ -223,7 +228,10 @@ returning *`;
                             fieldWithHooks,
                             tableName,
                             {
-                              description: `The \`${tableTypeName}\` that was ${mode}d by this mutation.`,
+                              description: build.wrapDescription(
+                                `The \`${tableTypeName}\` that was ${mode}d by this mutation.`,
+                                "field"
+                              ),
                               type: Table,
                             },
                             {},
@@ -296,7 +304,10 @@ returning *`;
                   const InputType = newWithHooks(
                     GraphQLInputObjectType,
                     {
-                      description: `All input for the \`${fieldName}\` mutation.`,
+                      description: build.wrapDescription(
+                        `All input for the \`${fieldName}\` mutation.`,
+                        "type"
+                      ),
                       name: inflection[
                         mode === "update"
                           ? "updateNodeInputType"
@@ -305,12 +316,17 @@ returning *`;
                       fields: Object.assign(
                         {
                           clientMutationId: {
-                            description:
+                            description: build.wrapDescription(
                               "An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.",
+                              "field"
+                            ),
                             type: GraphQLString,
                           },
                           [nodeIdFieldName]: {
-                            description: `The globally unique \`ID\` which will identify a single \`${tableTypeName}\` to be ${mode}d.`,
+                            description: build.wrapDescription(
+                              `The globally unique \`ID\` which will identify a single \`${tableTypeName}\` to be ${mode}d.`,
+                              "field"
+                            ),
                             type: new GraphQLNonNull(GraphQLID),
                           },
                         },
@@ -319,7 +335,10 @@ returning *`;
                               [inflection.patchField(
                                 inflection.tableFieldName(table)
                               )]: {
-                                description: `An object where the defined keys will be set on the \`${tableTypeName}\` being ${mode}d.`,
+                                description: build.wrapDescription(
+                                  `An object where the defined keys will be set on the \`${tableTypeName}\` being ${mode}d.`,
+                                  "field"
+                                ),
                                 type: new GraphQLNonNull(TablePatch),
                               },
                             }
@@ -355,10 +374,12 @@ returning *`;
                             getDataFromParsedResolveInfoFragment,
                           } = context;
                           return {
-                            description:
+                            description: build.wrapDescription(
                               mode === "update"
                                 ? `Updates a single \`${tableTypeName}\` using its globally unique id and a patch.`
                                 : `Deletes a single \`${tableTypeName}\` using its globally unique id.`,
+                              "field"
+                            ),
                             type: PayloadType,
                             args: {
                               input: {
@@ -450,7 +471,10 @@ returning *`;
                   const InputType = newWithHooks(
                     GraphQLInputObjectType,
                     {
-                      description: `All input for the \`${fieldName}\` mutation.`,
+                      description: build.wrapDescription(
+                        `All input for the \`${fieldName}\` mutation.`,
+                        "type"
+                      ),
                       name: inflection[
                         mode === "update"
                           ? "updateByKeysInputType"
@@ -467,7 +491,10 @@ returning *`;
                               [inflection.patchField(
                                 inflection.tableFieldName(table)
                               )]: {
-                                description: `An object where the defined keys will be set on the \`${tableTypeName}\` being ${mode}d.`,
+                                description: build.wrapDescription(
+                                  `An object where the defined keys will be set on the \`${tableTypeName}\` being ${mode}d.`,
+                                  "field"
+                                ),
                                 type: new GraphQLNonNull(TablePatch),
                               },
                             }
@@ -516,10 +543,12 @@ returning *`;
                             getDataFromParsedResolveInfoFragment,
                           } = context;
                           return {
-                            description:
+                            description: build.wrapDescription(
                               mode === "update"
                                 ? `Updates a single \`${tableTypeName}\` using a unique key and a patch.`
                                 : `Deletes a single \`${tableTypeName}\` using a unique key.`,
+                              "field"
+                            ),
                             type: PayloadType,
                             args: {
                               input: {

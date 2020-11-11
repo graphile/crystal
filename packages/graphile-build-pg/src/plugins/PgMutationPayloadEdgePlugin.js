@@ -80,12 +80,18 @@ export default (function PgMutationPayloadEdgePlugin(
             fieldWithHooks,
             fieldName,
             {
-              description: `An edge for our \`${tableTypeName}\`. May be used by Relay 1.`,
+              description: build.wrapDescription(
+                `An edge for our \`${tableTypeName}\`. May be used by Relay 1.`,
+                "field"
+              ),
               type: TableEdgeType,
               args: canOrderBy
                 ? {
                     orderBy: {
-                      description: `The method to use when ordering \`${tableTypeName}\`.`,
+                      description: build.wrapDescription(
+                        `The method to use when ordering \`${tableTypeName}\`.`,
+                        "arg"
+                      ),
                       type: new GraphQLList(
                         new GraphQLNonNull(TableOrderByType)
                       ),

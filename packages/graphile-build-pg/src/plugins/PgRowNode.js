@@ -153,11 +153,17 @@ export default (async function PgRowNode(builder, { subscriptions }) {
                   fieldName,
                   ({ getDataFromParsedResolveInfoFragment }) => {
                     return {
-                      description: `Reads a single \`${TableType.name}\` using its globally unique \`ID\`.`,
+                      description: build.wrapDescription(
+                        `Reads a single \`${TableType.name}\` using its globally unique \`ID\`.`,
+                        "field"
+                      ),
                       type: TableType,
                       args: {
                         [nodeIdFieldName]: {
-                          description: `The globally unique \`ID\` to be used in selecting a single \`${TableType.name}\`.`,
+                          description: build.wrapDescription(
+                            `The globally unique \`ID\` to be used in selecting a single \`${TableType.name}\`.`,
+                            "arg"
+                          ),
                           type: new GraphQLNonNull(GraphQLID),
                         },
                       },

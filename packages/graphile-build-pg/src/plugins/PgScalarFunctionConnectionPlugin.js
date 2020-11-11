@@ -53,7 +53,10 @@ export default (function PgScalarFunctionConnectionPlugin(builder) {
           GraphQLObjectType,
           {
             name: inflection.scalarFunctionEdge(proc),
-            description: `A \`${NodeType.name}\` edge in the connection.`,
+            description: build.wrapDescription(
+              `A \`${NodeType.name}\` edge in the connection.`,
+              "type"
+            ),
             fields: ({ fieldWithHooks }) => {
               return {
                 cursor: fieldWithHooks(
@@ -63,7 +66,10 @@ export default (function PgScalarFunctionConnectionPlugin(builder) {
                       usesCursor: [true],
                     }));
                     return {
-                      description: "A cursor for use in pagination.",
+                      description: build.wrapDescription(
+                        "A cursor for use in pagination.",
+                        "field"
+                      ),
                       type: Cursor,
                       resolve(data) {
                         return base64(JSON.stringify(data.__cursor));
@@ -75,7 +81,10 @@ export default (function PgScalarFunctionConnectionPlugin(builder) {
                   }
                 ),
                 node: {
-                  description: `The \`${NodeType.name}\` at the end of the edge.`,
+                  description: build.wrapDescription(
+                    `The \`${NodeType.name}\` at the end of the edge.`,
+                    "field"
+                  ),
                   type: NodeType,
                   resolve(data) {
                     return data.value;
@@ -104,11 +113,17 @@ export default (function PgScalarFunctionConnectionPlugin(builder) {
           GraphQLObjectType,
           {
             name: inflection.scalarFunctionConnection(proc),
-            description: `A connection to a list of \`${NodeType.name}\` values.`,
+            description: build.wrapDescription(
+              `A connection to a list of \`${NodeType.name}\` values.`,
+              "type"
+            ),
             fields: ({ fieldWithHooks }) => {
               return {
                 nodes: pgField(build, fieldWithHooks, "nodes", {
-                  description: `A list of \`${NodeType.name}\` objects.`,
+                  description: build.wrapDescription(
+                    `A list of \`${NodeType.name}\` objects.`,
+                    "field"
+                  ),
                   type: new GraphQLNonNull(new GraphQLList(NodeType)),
                   resolve(data) {
                     return data.data.map(entry => entry.value);
@@ -119,7 +134,10 @@ export default (function PgScalarFunctionConnectionPlugin(builder) {
                   fieldWithHooks,
                   "edges",
                   {
-                    description: `A list of edges which contains the \`${NodeType.name}\` and cursor to aid in pagination.`,
+                    description: build.wrapDescription(
+                      `A list of edges which contains the \`${NodeType.name}\` and cursor to aid in pagination.`,
+                      "field"
+                    ),
                     type: new GraphQLNonNull(
                       new GraphQLList(new GraphQLNonNull(EdgeType))
                     ),

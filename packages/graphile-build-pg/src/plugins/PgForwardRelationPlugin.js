@@ -178,7 +178,10 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
                   return {
                     description:
                       constraint.tags.forwardDescription ||
-                      `Reads a single \`${foreignTableTypeName}\` that is related to this \`${tableTypeName}\`.`,
+                      build.wrapDescription(
+                        `Reads a single \`${foreignTableTypeName}\` that is related to this \`${tableTypeName}\`.`,
+                        "field"
+                      ),
                     type: gqlForeignTableType, // Nullable since RLS may forbid fetching
                     resolve: (rawData, _args, resolveContext, resolveInfo) => {
                       const data = isMutationPayload ? rawData.data : rawData;

@@ -213,7 +213,10 @@ export default (function PgBackwardRelationPlugin(
                     return {
                       description:
                         constraint.tags.backwardDescription ||
-                        `Reads a single \`${tableTypeName}\` that is related to this \`${foreignTableTypeName}\`.`,
+                        build.wrapDescription(
+                          `Reads a single \`${tableTypeName}\` that is related to this \`${foreignTableTypeName}\`.`,
+                          "field"
+                        ),
                       type: gqlTableType,
                       args: {},
                       resolve: (data, _args, resolveContext, resolveInfo) => {
@@ -392,7 +395,10 @@ export default (function PgBackwardRelationPlugin(
                     return {
                       description:
                         constraint.tags.backwardDescription ||
-                        `Reads and enables pagination through a set of \`${tableTypeName}\`.`,
+                        build.wrapDescription(
+                          `Reads and enables pagination through a set of \`${tableTypeName}\`.`,
+                          "field"
+                        ),
                       type: isConnection
                         ? new GraphQLNonNull(ConnectionType)
                         : new GraphQLNonNull(

@@ -104,8 +104,7 @@ input CreateBarInput {
   bar: BarInput!
 
   """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
+  An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 }
@@ -122,8 +121,7 @@ type CreateBarPayload {
   ): BarsEdge
 
   """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
+  The exact same \`clientMutationId\` that was provided in the mutation input, unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
@@ -139,8 +137,7 @@ type CreateBarPayload {
 """All input for the create \`Foo\` mutation."""
 input CreateFooInput {
   """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
+  An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
@@ -151,8 +148,7 @@ input CreateFooInput {
 """The output of our create \`Foo\` mutation."""
 type CreateFooPayload {
   """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
+  The exact same \`clientMutationId\` that was provided in the mutation input, unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
@@ -175,8 +171,7 @@ type CreateFooPayload {
 scalar Cursor
 
 """
-A point in time as described by the [ISO
-8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
+A point in time as described by the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
 """
 scalar Datetime
 
@@ -193,8 +188,7 @@ input DeleteBarByIdInput {
 """All input for the \`deleteBar\` mutation."""
 input DeleteBarInput {
   """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
+  An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
@@ -216,8 +210,7 @@ type DeleteBarPayload {
   ): BarsEdge
 
   """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
+  The exact same \`clientMutationId\` that was provided in the mutation input, unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
   deletedBarId: ID
@@ -244,8 +237,7 @@ input DeleteFooByIdInput {
 """All input for the \`deleteFoo\` mutation."""
 input DeleteFooInput {
   """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
+  An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
@@ -258,8 +250,7 @@ input DeleteFooInput {
 """The output of our delete \`Foo\` mutation."""
 type DeleteFooPayload {
   """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
+  The exact same \`clientMutationId\` that was provided in the mutation input, unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
   deletedFooId: ID
@@ -300,8 +291,7 @@ type Foo implements Node {
     last: Int
 
     """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor based pagination. May not be used with \`last\`.
     """
     offset: Int
 
@@ -523,8 +513,7 @@ type Query implements Node {
     last: Int
 
     """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor based pagination. May not be used with \`last\`.
     """
     offset: Int
 
@@ -552,8 +541,7 @@ type Query implements Node {
     last: Int
 
     """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor based pagination. May not be used with \`last\`.
     """
     offset: Int
 
@@ -602,8 +590,7 @@ type Query implements Node {
     last: Int
 
     """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor based pagination. May not be used with \`last\`.
     """
     offset: Int
   ): FoosConnection
@@ -640,8 +627,7 @@ input UpdateBarInput {
   barPatch: BarPatch!
 
   """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
+  An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
@@ -663,8 +649,7 @@ type UpdateBarPayload {
   ): BarsEdge
 
   """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
+  The exact same \`clientMutationId\` that was provided in the mutation input, unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
@@ -695,8 +680,7 @@ input UpdateFooByIdInput {
 """All input for the \`updateFoo\` mutation."""
 input UpdateFooInput {
   """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
+  An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
@@ -714,8 +698,7 @@ input UpdateFooInput {
 """The output of our update \`Foo\` mutation."""
 type UpdateFooPayload {
   """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
+  The exact same \`clientMutationId\` that was provided in the mutation input, unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
@@ -840,8 +823,7 @@ input CreateBarInput {
   bar: BarInput!
 
   """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
+  An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 }
@@ -858,8 +840,7 @@ type CreateBarPayload {
   ): BarsEdge
 
   """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
+  The exact same \`clientMutationId\` that was provided in the mutation input, unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
@@ -875,8 +856,7 @@ type CreateBarPayload {
 """All input for the create \`Foo\` mutation."""
 input CreateFooInput {
   """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
+  An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
@@ -887,8 +867,7 @@ input CreateFooInput {
 """The output of our create \`Foo\` mutation."""
 type CreateFooPayload {
   """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
+  The exact same \`clientMutationId\` that was provided in the mutation input, unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
@@ -911,8 +890,7 @@ type CreateFooPayload {
 scalar Cursor
 
 """
-A point in time as described by the [ISO
-8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
+A point in time as described by the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
 """
 scalar Datetime
 
@@ -929,8 +907,7 @@ input DeleteBarByIdInput {
 """All input for the \`deleteBar\` mutation."""
 input DeleteBarInput {
   """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
+  An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
@@ -952,8 +929,7 @@ type DeleteBarPayload {
   ): BarsEdge
 
   """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
+  The exact same \`clientMutationId\` that was provided in the mutation input, unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
   deletedBarId: ID
@@ -980,8 +956,7 @@ input DeleteFooByIdInput {
 """All input for the \`deleteFoo\` mutation."""
 input DeleteFooInput {
   """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
+  An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
@@ -994,8 +969,7 @@ input DeleteFooInput {
 """The output of our delete \`Foo\` mutation."""
 type DeleteFooPayload {
   """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
+  The exact same \`clientMutationId\` that was provided in the mutation input, unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
   deletedFooId: ID
@@ -1036,8 +1010,7 @@ type Foo implements Node {
     last: Int
 
     """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor based pagination. May not be used with \`last\`.
     """
     offset: Int
 
@@ -1268,8 +1241,7 @@ type Query implements Node {
     last: Int
 
     """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor based pagination. May not be used with \`last\`.
     """
     offset: Int
 
@@ -1297,8 +1269,7 @@ type Query implements Node {
     last: Int
 
     """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor based pagination. May not be used with \`last\`.
     """
     offset: Int
 
@@ -1347,8 +1318,7 @@ type Query implements Node {
     last: Int
 
     """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor based pagination. May not be used with \`last\`.
     """
     offset: Int
   ): FoosConnection
@@ -1392,8 +1362,7 @@ input UpdateBarInput {
   barPatch: BarPatch!
 
   """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
+  An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
@@ -1415,8 +1384,7 @@ type UpdateBarPayload {
   ): BarsEdge
 
   """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
+  The exact same \`clientMutationId\` that was provided in the mutation input, unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
@@ -1447,8 +1415,7 @@ input UpdateFooByIdInput {
 """All input for the \`updateFoo\` mutation."""
 input UpdateFooInput {
   """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
+  An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
@@ -1466,8 +1433,7 @@ input UpdateFooInput {
 """The output of our update \`Foo\` mutation."""
 type UpdateFooPayload {
   """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
+  The exact same \`clientMutationId\` that was provided in the mutation input, unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 

@@ -1,21 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`generated schema 1`] = `
-enum MyEnum {
-  ONE @deprecated(reason: "We no longer support numbers smaller than PI")
-  TWO @deprecated(reason: "We no longer support numbers smaller than PI")
-  THREE @deprecated(reason: "We no longer support numbers smaller than PI")
-  FOUR
-}
-
-"""An object with a globally unique \`ID\`."""
-interface Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  id: ID!
-}
-
 """The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -35,6 +20,21 @@ type Query implements Node {
     id: ID!
   ): Node
   enum: MyEnum
+}
+
+"""An object with a globally unique \`ID\`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  id: ID!
+}
+
+enum MyEnum {
+  ONE @deprecated(reason: "We no longer support numbers smaller than PI")
+  TWO @deprecated(reason: "We no longer support numbers smaller than PI")
+  THREE @deprecated(reason: "We no longer support numbers smaller than PI")
+  FOUR
 }
 
 `;

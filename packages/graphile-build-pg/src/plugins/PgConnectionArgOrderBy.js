@@ -26,7 +26,10 @@ export default (function PgConnectionArgOrderBy(builder, { orderByNullsLast }) {
           GraphQLEnumType,
           {
             name: inflection.orderByType(tableTypeName),
-            description: `Methods to use when ordering \`${tableTypeName}\`.`,
+            description: build.wrapDescription(
+              `Methods to use when ordering \`${tableTypeName}\`.`,
+              "type"
+            ),
             values: {
               NATURAL: {
                 value: {
@@ -174,7 +177,10 @@ export default (function PgConnectionArgOrderBy(builder, { orderByNullsLast }) {
         args,
         {
           orderBy: {
-            description: `The method to use when ordering \`${tableTypeName}\`.`,
+            description: build.wrapDescription(
+              `The method to use when ordering \`${tableTypeName}\`.`,
+              "arg"
+            ),
             type: new GraphQLList(new GraphQLNonNull(TableOrderByType)),
           },
         },

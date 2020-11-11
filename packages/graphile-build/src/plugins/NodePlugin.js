@@ -137,7 +137,10 @@ export default (function NodePlugin(
         GraphQLInterfaceType,
         {
           name: inflection.builtin("Node"),
-          description: "An object with a globally unique `ID`.",
+          description: build.wrapDescription(
+            "An object with a globally unique `ID`.",
+            "type"
+          ),
           resolveType: value => {
             if (value === $$isQuery) {
               if (!Query) Query = getTypeByName(inflection.builtin("Query"));
@@ -148,8 +151,10 @@ export default (function NodePlugin(
           },
           fields: {
             [nodeIdFieldName]: {
-              description:
+              description: build.wrapDescription(
                 "A globally unique identifier. Can be used in various places throughout the system to identify this single value.",
+                "field"
+              ),
               type: new GraphQLNonNull(GraphQLID),
             },
           },
@@ -212,8 +217,10 @@ export default (function NodePlugin(
         fields,
         {
           [nodeIdFieldName]: {
-            description:
+            description: build.wrapDescription(
               "The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.",
+              "field"
+            ),
             type: new GraphQLNonNull(GraphQLID),
             resolve() {
               return "query";
@@ -222,11 +229,17 @@ export default (function NodePlugin(
           node: fieldWithHooks(
             "node",
             ({ getDataFromParsedResolveInfoFragment }) => ({
-              description: "Fetches an object given its globally unique `ID`.",
+              description: build.wrapDescription(
+                "Fetches an object given its globally unique `ID`.",
+                "field"
+              ),
               type: getTypeByName(inflection.builtin("Node")),
               args: {
                 [nodeIdFieldName]: {
-                  description: "The globally unique `ID`.",
+                  description: build.wrapDescription(
+                    "The globally unique `ID`.",
+                    "arg"
+                  ),
                   type: new GraphQLNonNull(GraphQLID),
                 },
               },

@@ -3,14 +3,18 @@ import {
   makePluginHook,
   PostGraphileOptions,
 } from "postgraphile";
-import {
-  introspectionQuery as INTROSPECTION_QUERY,
-  buildClientSchema,
-  lexicographicSortSchema,
-} from "graphql";
+import * as graphql from "graphql";
 import { Pool, PoolClient } from "pg";
 import PgPubsub from "../src";
 import { runQuery, TestCtx } from "./runQuery";
+
+// Support new and old GraphQL.js
+const INTROSPECTION_QUERY: string =
+  typeof graphql.getIntrospectionQuery === "function"
+    ? graphql.getIntrospectionQuery()
+    : (graphql as any).introspectionQuery;
+
+const { buildClientSchema, lexicographicSortSchema } = graphql;
 
 let ctx: TestCtx | null = null;
 const CLI_DEFAULTS = {};

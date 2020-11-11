@@ -29,8 +29,10 @@ export default (async function MutationPlugin(builder) {
         GraphQLObjectType,
         {
           name: inflection.builtin("Mutation"),
-          description:
+          description: build.wrapDescription(
             "The root mutation type which contains root level fields which mutate data.",
+            "type"
+          ),
         },
         {
           __origin: `graphile-build built-in (root mutation type)`,

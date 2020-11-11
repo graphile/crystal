@@ -17,7 +17,12 @@ import type { ResolveTree } from "graphql-parse-resolve-info";
 import pluralize from "pluralize";
 import LRU from "@graphile/lru";
 import semver from "semver";
-import { upperCamelCase, camelCase, constantCase } from "./utils";
+import {
+  upperCamelCase,
+  camelCase,
+  constantCase,
+  wrapDescription,
+} from "./utils";
 import swallowError from "./swallowError";
 import resolveNode from "./resolveNode";
 import { LiveCoordinator } from "./Live";
@@ -987,6 +992,7 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
         return resultingName;
       },
     },
+    wrapDescription,
     swallowError,
     // resolveNode: EXPERIMENTAL, API might change!
     resolveNode,

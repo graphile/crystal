@@ -66,8 +66,10 @@ export default (function PgJWTPlugin(
           GraphQLScalarType,
           {
             name: compositeTypeName,
-            description:
+            description: build.wrapDescription(
               "A JSON Web Token defined by [RFC 7519](https://tools.ietf.org/html/rfc7519) which securely represents claims between two parties.",
+              "type"
+            ),
             serialize(value) {
               const token = attributes.reduce((memo, attr) => {
                 if (attr.name === "exp") {
