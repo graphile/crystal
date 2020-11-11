@@ -6,6 +6,7 @@ import {
 import {
   introspectionQuery as INTROSPECTION_QUERY,
   buildClientSchema,
+  lexicographicSortSchema,
 } from "graphql";
 import { Pool, PoolClient } from "pg";
 import PgPubsub from "../src";
@@ -76,7 +77,7 @@ describe("Middleware defaults", () => {
         expect(res.statusCode).toEqual(200);
         expect(json.errors).toBeFalsy();
         const schema = buildClientSchema(json.data);
-        expect(schema).toMatchSnapshot();
+        expect(lexicographicSortSchema(schema)).toMatchSnapshot();
       }
     );
   });
@@ -100,7 +101,7 @@ describe("Subscriptions", () => {
       async (json, _req, res) => {
         expect(res.statusCode).toEqual(200);
         const schema = buildClientSchema(json.data);
-        expect(schema).toMatchSnapshot();
+        expect(lexicographicSortSchema(schema)).toMatchSnapshot();
       }
     );
   });

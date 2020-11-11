@@ -2,35 +2,36 @@
 
 exports[`Middleware defaults handles the introspection query 1`] = `
 type Bar implements Node {
+  createdAt: Datetime!
+
+  """Reads a single \`Foo\` that is related to this \`Bar\`."""
+  fooByFooId: Foo
+  fooId: Int!
+  id: Int!
+  label: String
+
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
-  id: Int!
-  fooId: Int!
-  label: String
-  createdAt: Datetime!
   updatedAt: Datetime!
-
-  """Reads a single \`Foo\` that is related to this \`Bar\`."""
-  fooByFooId: Foo
 }
 
 """
 A condition to be used against \`Bar\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
 input BarCondition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: Int
+  """Checks for equality with the object’s \`createdAt\` field."""
+  createdAt: Datetime
 
   """Checks for equality with the object’s \`fooId\` field."""
   fooId: Int
 
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+
   """Checks for equality with the object’s \`label\` field."""
   label: String
-
-  """Checks for equality with the object’s \`createdAt\` field."""
-  createdAt: Datetime
 
   """Checks for equality with the object’s \`updatedAt\` field."""
   updatedAt: Datetime
@@ -38,31 +39,31 @@ input BarCondition {
 
 """An input for mutations affecting \`Bar\`"""
 input BarInput {
-  id: Int
-  fooId: Int!
-  label: String
   createdAt: Datetime
+  fooId: Int!
+  id: Int
+  label: String
   updatedAt: Datetime
 }
 
 """Represents an update to a \`Bar\`. Fields that are set will be updated."""
 input BarPatch {
-  id: Int
-  fooId: Int
-  label: String
   createdAt: Datetime
+  fooId: Int
+  id: Int
+  label: String
   updatedAt: Datetime
 }
 
 """A connection to a list of \`Bar\` values."""
 type BarsConnection {
-  """A list of \`Bar\` objects."""
-  nodes: [Bar]!
-
   """
   A list of edges which contains the \`Bar\` and cursor to aid in pagination.
   """
   edges: [BarsEdge!]!
+
+  """A list of \`Bar\` objects."""
+  nodes: [Bar]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
@@ -82,57 +83,57 @@ type BarsEdge {
 
 """Methods to use when ordering \`Bar\`."""
 enum BarsOrderBy {
-  NATURAL
-  ID_ASC
-  ID_DESC
-  FOO_ID_ASC
-  FOO_ID_DESC
-  LABEL_ASC
-  LABEL_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
+  FOO_ID_ASC
+  FOO_ID_DESC
+  ID_ASC
+  ID_DESC
+  LABEL_ASC
+  LABEL_DESC
+  NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
 }
 
 """All input for the create \`Bar\` mutation."""
 input CreateBarInput {
+  """The \`Bar\` to be created by this mutation."""
+  bar: BarInput!
+
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-
-  """The \`Bar\` to be created by this mutation."""
-  bar: BarInput!
 }
 
 """The output of our create \`Bar\` mutation."""
 type CreateBarPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
   """The \`Bar\` that was created by this mutation."""
   bar: Bar
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """Reads a single \`Foo\` that is related to this \`Bar\`."""
-  fooByFooId: Foo
 
   """An edge for our \`Bar\`. May be used by Relay 1."""
   barEdge(
     """The method to use when ordering \`Bar\`."""
     orderBy: [BarsOrderBy!] = [PRIMARY_KEY_ASC]
   ): BarsEdge
+
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """Reads a single \`Foo\` that is related to this \`Bar\`."""
+  fooByFooId: Foo
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
 }
 
 """All input for the create \`Foo\` mutation."""
@@ -158,16 +159,16 @@ type CreateFooPayload {
   """The \`Foo\` that was created by this mutation."""
   foo: Foo
 
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
   """An edge for our \`Foo\`. May be used by Relay 1."""
   fooEdge(
     """The method to use when ordering \`Foo\`."""
     orderBy: [FoosOrderBy!] = [PRIMARY_KEY_ASC]
   ): FoosEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
 }
 
 """A location in a connection that can be used for resuming pagination."""
@@ -205,29 +206,29 @@ input DeleteBarInput {
 
 """The output of our delete \`Bar\` mutation."""
 type DeleteBarPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
   """The \`Bar\` that was deleted by this mutation."""
   bar: Bar
-  deletedBarId: ID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """Reads a single \`Foo\` that is related to this \`Bar\`."""
-  fooByFooId: Foo
 
   """An edge for our \`Bar\`. May be used by Relay 1."""
   barEdge(
     """The method to use when ordering \`Bar\`."""
     orderBy: [BarsOrderBy!] = [PRIMARY_KEY_ASC]
   ): BarsEdge
+
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedBarId: ID
+
+  """Reads a single \`Foo\` that is related to this \`Bar\`."""
+  fooByFooId: Foo
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
 }
 
 """All input for the \`deleteFooById\` mutation."""
@@ -261,35 +262,37 @@ type DeleteFooPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
+  deletedFooId: ID
 
   """The \`Foo\` that was deleted by this mutation."""
   foo: Foo
-  deletedFooId: ID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
 
   """An edge for our \`Foo\`. May be used by Relay 1."""
   fooEdge(
     """The method to use when ordering \`Foo\`."""
     orderBy: [FoosOrderBy!] = [PRIMARY_KEY_ASC]
   ): FoosEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
 }
 
 type Foo implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  id: Int!
-  name: String
-  createdAt: Datetime!
-  updatedAt: Datetime!
-
   """Reads and enables pagination through a set of \`Bar\`."""
   barsByFooId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BarCondition
+
     """Only read the first \`n\` values of the set."""
     first: Int
 
@@ -302,34 +305,32 @@ type Foo implements Node {
     """
     offset: Int
 
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
     """The method to use when ordering \`Bar\`."""
     orderBy: [BarsOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: BarCondition
   ): BarsConnection!
+  createdAt: Datetime!
+  id: Int!
+  name: String
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  updatedAt: Datetime!
 }
 
 """
 A condition to be used against \`Foo\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
 input FooCondition {
+  """Checks for equality with the object’s \`createdAt\` field."""
+  createdAt: Datetime
+
   """Checks for equality with the object’s \`id\` field."""
   id: Int
 
   """Checks for equality with the object’s \`name\` field."""
   name: String
-
-  """Checks for equality with the object’s \`createdAt\` field."""
-  createdAt: Datetime
 
   """Checks for equality with the object’s \`updatedAt\` field."""
   updatedAt: Datetime
@@ -337,29 +338,29 @@ input FooCondition {
 
 """An input for mutations affecting \`Foo\`"""
 input FooInput {
+  createdAt: Datetime
   id: Int
   name: String
-  createdAt: Datetime
   updatedAt: Datetime
 }
 
 """Represents an update to a \`Foo\`. Fields that are set will be updated."""
 input FooPatch {
+  createdAt: Datetime
   id: Int
   name: String
-  createdAt: Datetime
   updatedAt: Datetime
 }
 
 """A connection to a list of \`Foo\` values."""
 type FoosConnection {
-  """A list of \`Foo\` objects."""
-  nodes: [Foo]!
-
   """
   A list of edges which contains the \`Foo\` and cursor to aid in pagination.
   """
   edges: [FoosEdge!]!
+
+  """A list of \`Foo\` objects."""
+  nodes: [Foo]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
@@ -379,17 +380,17 @@ type FoosEdge {
 
 """Methods to use when ordering \`Foo\`."""
 enum FoosOrderBy {
-  NATURAL
+  CREATED_AT_ASC
+  CREATED_AT_DESC
   ID_ASC
   ID_DESC
   NAME_ASC
   NAME_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
+  NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
 }
 
 """
@@ -411,38 +412,6 @@ type Mutation {
     """
     input: CreateFooInput!
   ): CreateFooPayload
-
-  """Updates a single \`Bar\` using its globally unique id and a patch."""
-  updateBar(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateBarInput!
-  ): UpdateBarPayload
-
-  """Updates a single \`Bar\` using a unique key and a patch."""
-  updateBarById(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateBarByIdInput!
-  ): UpdateBarPayload
-
-  """Updates a single \`Foo\` using its globally unique id and a patch."""
-  updateFoo(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateFooInput!
-  ): UpdateFooPayload
-
-  """Updates a single \`Foo\` using a unique key and a patch."""
-  updateFooById(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateFooByIdInput!
-  ): UpdateFooPayload
 
   """Deletes a single \`Bar\` using its globally unique id."""
   deleteBar(
@@ -475,6 +444,38 @@ type Mutation {
     """
     input: DeleteFooByIdInput!
   ): DeleteFooPayload
+
+  """Updates a single \`Bar\` using its globally unique id and a patch."""
+  updateBar(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateBarInput!
+  ): UpdateBarPayload
+
+  """Updates a single \`Bar\` using a unique key and a patch."""
+  updateBarById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateBarByIdInput!
+  ): UpdateBarPayload
+
+  """Updates a single \`Foo\` using its globally unique id and a patch."""
+  updateFoo(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateFooInput!
+  ): UpdateFooPayload
+
+  """Updates a single \`Foo\` using a unique key and a patch."""
+  updateFooById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateFooByIdInput!
+  ): UpdateFooPayload
 }
 
 """An object with a globally unique \`ID\`."""
@@ -487,6 +488,9 @@ interface Node {
 
 """Information about pagination in a connection."""
 type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
   """When paginating forwards, are there more items?"""
   hasNextPage: Boolean!
 
@@ -495,23 +499,82 @@ type PageInfo {
 
   """When paginating backwards, the cursor to continue."""
   startCursor: Cursor
-
-  """When paginating forwards, the cursor to continue."""
-  endCursor: Cursor
 }
 
 """The root query type which gives access points into the data universe."""
 type Query implements Node {
-  """
-  Exposes the root query type nested one level down. This is helpful for Relay 1
-  which can only query top level fields if they are in a particular form.
-  """
-  query: Query!
+  """Reads and enables pagination through a set of \`Bar\`."""
+  allBars(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
 
-  """
-  The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
-  """
-  nodeId: ID!
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BarCondition
+
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """The method to use when ordering \`Bar\`."""
+    orderBy: [BarsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): BarsConnection
+
+  """Reads and enables pagination through a set of \`Foo\`."""
+  allFoos(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: FooCondition
+
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """The method to use when ordering \`Foo\`."""
+    orderBy: [FoosOrderBy!] = [PRIMARY_KEY_ASC]
+  ): FoosConnection
+
+  """Reads a single \`Bar\` using its globally unique \`ID\`."""
+  bar(
+    """The globally unique \`ID\` to be used in selecting a single \`Bar\`."""
+    nodeId: ID!
+  ): Bar
+  barById(id: Int!): Bar
+
+  """Reads a single \`Foo\` using its globally unique \`ID\`."""
+  foo(
+    """The globally unique \`ID\` to be used in selecting a single \`Foo\`."""
+    nodeId: ID!
+  ): Foo
+  fooById(id: Int!): Foo
+  fooOne: Foo
 
   """Fetches an object given its globally unique \`ID\`."""
   node(
@@ -519,69 +582,19 @@ type Query implements Node {
     nodeId: ID!
   ): Node
 
-  """Reads and enables pagination through a set of \`Bar\`."""
-  allBars(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering \`Bar\`."""
-    orderBy: [BarsOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: BarCondition
-  ): BarsConnection
-
-  """Reads and enables pagination through a set of \`Foo\`."""
-  allFoos(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering \`Foo\`."""
-    orderBy: [FoosOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: FooCondition
-  ): FoosConnection
-  barById(id: Int!): Bar
-  fooById(id: Int!): Foo
-  fooOne: Foo
+  """
+  The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
+  """
+  nodeId: ID!
 
   """Reads and enables pagination through a set of \`Foo\`."""
   oddFoos(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
     """Only read the first \`n\` values of the set."""
     first: Int
 
@@ -593,46 +606,39 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
   ): FoosConnection
   oddFoosArray: [Foo]
+
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
   viewerId: Int
-
-  """Reads a single \`Bar\` using its globally unique \`ID\`."""
-  bar(
-    """The globally unique \`ID\` to be used in selecting a single \`Bar\`."""
-    nodeId: ID!
-  ): Bar
-
-  """Reads a single \`Foo\` using its globally unique \`ID\`."""
-  foo(
-    """The globally unique \`ID\` to be used in selecting a single \`Foo\`."""
-    nodeId: ID!
-  ): Foo
 }
 
 """All input for the \`updateBarById\` mutation."""
 input UpdateBarByIdInput {
   """
+  An object where the defined keys will be set on the \`Bar\` being updated.
+  """
+  barPatch: BarPatch!
+
+  """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-
-  """
-  An object where the defined keys will be set on the \`Bar\` being updated.
-  """
-  barPatch: BarPatch!
   id: Int!
 }
 
 """All input for the \`updateBar\` mutation."""
 input UpdateBarInput {
+  """
+  An object where the defined keys will be set on the \`Bar\` being updated.
+  """
+  barPatch: BarPatch!
+
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -643,37 +649,32 @@ input UpdateBarInput {
   The globally unique \`ID\` which will identify a single \`Bar\` to be updated.
   """
   nodeId: ID!
-
-  """
-  An object where the defined keys will be set on the \`Bar\` being updated.
-  """
-  barPatch: BarPatch!
 }
 
 """The output of our update \`Bar\` mutation."""
 type UpdateBarPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
   """The \`Bar\` that was updated by this mutation."""
   bar: Bar
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """Reads a single \`Foo\` that is related to this \`Bar\`."""
-  fooByFooId: Foo
 
   """An edge for our \`Bar\`. May be used by Relay 1."""
   barEdge(
     """The method to use when ordering \`Bar\`."""
     orderBy: [BarsOrderBy!] = [PRIMARY_KEY_ASC]
   ): BarsEdge
+
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """Reads a single \`Foo\` that is related to this \`Bar\`."""
+  fooByFooId: Foo
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
 }
 
 """All input for the \`updateFooById\` mutation."""
@@ -700,14 +701,14 @@ input UpdateFooInput {
   clientMutationId: String
 
   """
-  The globally unique \`ID\` which will identify a single \`Foo\` to be updated.
-  """
-  nodeId: ID!
-
-  """
   An object where the defined keys will be set on the \`Foo\` being updated.
   """
   fooPatch: FooPatch!
+
+  """
+  The globally unique \`ID\` which will identify a single \`Foo\` to be updated.
+  """
+  nodeId: ID!
 }
 
 """The output of our update \`Foo\` mutation."""
@@ -721,51 +722,52 @@ type UpdateFooPayload {
   """The \`Foo\` that was updated by this mutation."""
   foo: Foo
 
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
   """An edge for our \`Foo\`. May be used by Relay 1."""
   fooEdge(
     """The method to use when ordering \`Foo\`."""
     orderBy: [FoosOrderBy!] = [PRIMARY_KEY_ASC]
   ): FoosEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
 }
 
 `;
 
 exports[`Subscriptions handles the introspection query 1`] = `
 type Bar implements Node {
+  createdAt: Datetime!
+
+  """Reads a single \`Foo\` that is related to this \`Bar\`."""
+  fooByFooId: Foo
+  fooId: Int!
+  id: Int!
+  label: String
+
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
-  id: Int!
-  fooId: Int!
-  label: String
-  createdAt: Datetime!
   updatedAt: Datetime!
-
-  """Reads a single \`Foo\` that is related to this \`Bar\`."""
-  fooByFooId: Foo
 }
 
 """
 A condition to be used against \`Bar\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
 input BarCondition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: Int
+  """Checks for equality with the object’s \`createdAt\` field."""
+  createdAt: Datetime
 
   """Checks for equality with the object’s \`fooId\` field."""
   fooId: Int
 
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+
   """Checks for equality with the object’s \`label\` field."""
   label: String
-
-  """Checks for equality with the object’s \`createdAt\` field."""
-  createdAt: Datetime
 
   """Checks for equality with the object’s \`updatedAt\` field."""
   updatedAt: Datetime
@@ -773,31 +775,31 @@ input BarCondition {
 
 """An input for mutations affecting \`Bar\`"""
 input BarInput {
-  id: Int
-  fooId: Int!
-  label: String
   createdAt: Datetime
+  fooId: Int!
+  id: Int
+  label: String
   updatedAt: Datetime
 }
 
 """Represents an update to a \`Bar\`. Fields that are set will be updated."""
 input BarPatch {
-  id: Int
-  fooId: Int
-  label: String
   createdAt: Datetime
+  fooId: Int
+  id: Int
+  label: String
   updatedAt: Datetime
 }
 
 """A connection to a list of \`Bar\` values."""
 type BarsConnection {
-  """A list of \`Bar\` objects."""
-  nodes: [Bar]!
-
   """
   A list of edges which contains the \`Bar\` and cursor to aid in pagination.
   """
   edges: [BarsEdge!]!
+
+  """A list of \`Bar\` objects."""
+  nodes: [Bar]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
@@ -817,57 +819,57 @@ type BarsEdge {
 
 """Methods to use when ordering \`Bar\`."""
 enum BarsOrderBy {
-  NATURAL
-  ID_ASC
-  ID_DESC
-  FOO_ID_ASC
-  FOO_ID_DESC
-  LABEL_ASC
-  LABEL_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
+  FOO_ID_ASC
+  FOO_ID_DESC
+  ID_ASC
+  ID_DESC
+  LABEL_ASC
+  LABEL_DESC
+  NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
 }
 
 """All input for the create \`Bar\` mutation."""
 input CreateBarInput {
+  """The \`Bar\` to be created by this mutation."""
+  bar: BarInput!
+
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-
-  """The \`Bar\` to be created by this mutation."""
-  bar: BarInput!
 }
 
 """The output of our create \`Bar\` mutation."""
 type CreateBarPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
   """The \`Bar\` that was created by this mutation."""
   bar: Bar
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """Reads a single \`Foo\` that is related to this \`Bar\`."""
-  fooByFooId: Foo
 
   """An edge for our \`Bar\`. May be used by Relay 1."""
   barEdge(
     """The method to use when ordering \`Bar\`."""
     orderBy: [BarsOrderBy!] = [PRIMARY_KEY_ASC]
   ): BarsEdge
+
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """Reads a single \`Foo\` that is related to this \`Bar\`."""
+  fooByFooId: Foo
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
 }
 
 """All input for the create \`Foo\` mutation."""
@@ -893,16 +895,16 @@ type CreateFooPayload {
   """The \`Foo\` that was created by this mutation."""
   foo: Foo
 
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
   """An edge for our \`Foo\`. May be used by Relay 1."""
   fooEdge(
     """The method to use when ordering \`Foo\`."""
     orderBy: [FoosOrderBy!] = [PRIMARY_KEY_ASC]
   ): FoosEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
 }
 
 """A location in a connection that can be used for resuming pagination."""
@@ -940,29 +942,29 @@ input DeleteBarInput {
 
 """The output of our delete \`Bar\` mutation."""
 type DeleteBarPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
   """The \`Bar\` that was deleted by this mutation."""
   bar: Bar
-  deletedBarId: ID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """Reads a single \`Foo\` that is related to this \`Bar\`."""
-  fooByFooId: Foo
 
   """An edge for our \`Bar\`. May be used by Relay 1."""
   barEdge(
     """The method to use when ordering \`Bar\`."""
     orderBy: [BarsOrderBy!] = [PRIMARY_KEY_ASC]
   ): BarsEdge
+
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedBarId: ID
+
+  """Reads a single \`Foo\` that is related to this \`Bar\`."""
+  fooByFooId: Foo
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
 }
 
 """All input for the \`deleteFooById\` mutation."""
@@ -996,35 +998,37 @@ type DeleteFooPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
+  deletedFooId: ID
 
   """The \`Foo\` that was deleted by this mutation."""
   foo: Foo
-  deletedFooId: ID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
 
   """An edge for our \`Foo\`. May be used by Relay 1."""
   fooEdge(
     """The method to use when ordering \`Foo\`."""
     orderBy: [FoosOrderBy!] = [PRIMARY_KEY_ASC]
   ): FoosEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
 }
 
 type Foo implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  id: Int!
-  name: String
-  createdAt: Datetime!
-  updatedAt: Datetime!
-
   """Reads and enables pagination through a set of \`Bar\`."""
   barsByFooId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BarCondition
+
     """Only read the first \`n\` values of the set."""
     first: Int
 
@@ -1037,34 +1041,32 @@ type Foo implements Node {
     """
     offset: Int
 
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
     """The method to use when ordering \`Bar\`."""
     orderBy: [BarsOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: BarCondition
   ): BarsConnection!
+  createdAt: Datetime!
+  id: Int!
+  name: String
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  updatedAt: Datetime!
 }
 
 """
 A condition to be used against \`Foo\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
 input FooCondition {
+  """Checks for equality with the object’s \`createdAt\` field."""
+  createdAt: Datetime
+
   """Checks for equality with the object’s \`id\` field."""
   id: Int
 
   """Checks for equality with the object’s \`name\` field."""
   name: String
-
-  """Checks for equality with the object’s \`createdAt\` field."""
-  createdAt: Datetime
 
   """Checks for equality with the object’s \`updatedAt\` field."""
   updatedAt: Datetime
@@ -1072,29 +1074,29 @@ input FooCondition {
 
 """An input for mutations affecting \`Foo\`"""
 input FooInput {
+  createdAt: Datetime
   id: Int
   name: String
-  createdAt: Datetime
   updatedAt: Datetime
 }
 
 """Represents an update to a \`Foo\`. Fields that are set will be updated."""
 input FooPatch {
+  createdAt: Datetime
   id: Int
   name: String
-  createdAt: Datetime
   updatedAt: Datetime
 }
 
 """A connection to a list of \`Foo\` values."""
 type FoosConnection {
-  """A list of \`Foo\` objects."""
-  nodes: [Foo]!
-
   """
   A list of edges which contains the \`Foo\` and cursor to aid in pagination.
   """
   edges: [FoosEdge!]!
+
+  """A list of \`Foo\` objects."""
+  nodes: [Foo]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
@@ -1114,17 +1116,17 @@ type FoosEdge {
 
 """Methods to use when ordering \`Foo\`."""
 enum FoosOrderBy {
-  NATURAL
+  CREATED_AT_ASC
+  CREATED_AT_DESC
   ID_ASC
   ID_DESC
   NAME_ASC
   NAME_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
+  NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
 }
 
 type ListenPayload {
@@ -1156,38 +1158,6 @@ type Mutation {
     input: CreateFooInput!
   ): CreateFooPayload
 
-  """Updates a single \`Bar\` using its globally unique id and a patch."""
-  updateBar(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateBarInput!
-  ): UpdateBarPayload
-
-  """Updates a single \`Bar\` using a unique key and a patch."""
-  updateBarById(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateBarByIdInput!
-  ): UpdateBarPayload
-
-  """Updates a single \`Foo\` using its globally unique id and a patch."""
-  updateFoo(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateFooInput!
-  ): UpdateFooPayload
-
-  """Updates a single \`Foo\` using a unique key and a patch."""
-  updateFooById(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateFooByIdInput!
-  ): UpdateFooPayload
-
   """Deletes a single \`Bar\` using its globally unique id."""
   deleteBar(
     """
@@ -1219,6 +1189,38 @@ type Mutation {
     """
     input: DeleteFooByIdInput!
   ): DeleteFooPayload
+
+  """Updates a single \`Bar\` using its globally unique id and a patch."""
+  updateBar(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateBarInput!
+  ): UpdateBarPayload
+
+  """Updates a single \`Bar\` using a unique key and a patch."""
+  updateBarById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateBarByIdInput!
+  ): UpdateBarPayload
+
+  """Updates a single \`Foo\` using its globally unique id and a patch."""
+  updateFoo(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateFooInput!
+  ): UpdateFooPayload
+
+  """Updates a single \`Foo\` using a unique key and a patch."""
+  updateFooById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateFooByIdInput!
+  ): UpdateFooPayload
 }
 
 """An object with a globally unique \`ID\`."""
@@ -1231,6 +1233,9 @@ interface Node {
 
 """Information about pagination in a connection."""
 type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
   """When paginating forwards, are there more items?"""
   hasNextPage: Boolean!
 
@@ -1239,23 +1244,82 @@ type PageInfo {
 
   """When paginating backwards, the cursor to continue."""
   startCursor: Cursor
-
-  """When paginating forwards, the cursor to continue."""
-  endCursor: Cursor
 }
 
 """The root query type which gives access points into the data universe."""
 type Query implements Node {
-  """
-  Exposes the root query type nested one level down. This is helpful for Relay 1
-  which can only query top level fields if they are in a particular form.
-  """
-  query: Query!
+  """Reads and enables pagination through a set of \`Bar\`."""
+  allBars(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
 
-  """
-  The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
-  """
-  nodeId: ID!
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BarCondition
+
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """The method to use when ordering \`Bar\`."""
+    orderBy: [BarsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): BarsConnection
+
+  """Reads and enables pagination through a set of \`Foo\`."""
+  allFoos(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: FooCondition
+
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """The method to use when ordering \`Foo\`."""
+    orderBy: [FoosOrderBy!] = [PRIMARY_KEY_ASC]
+  ): FoosConnection
+
+  """Reads a single \`Bar\` using its globally unique \`ID\`."""
+  bar(
+    """The globally unique \`ID\` to be used in selecting a single \`Bar\`."""
+    nodeId: ID!
+  ): Bar
+  barById(id: Int!): Bar
+
+  """Reads a single \`Foo\` using its globally unique \`ID\`."""
+  foo(
+    """The globally unique \`ID\` to be used in selecting a single \`Foo\`."""
+    nodeId: ID!
+  ): Foo
+  fooById(id: Int!): Foo
+  fooOne: Foo
 
   """Fetches an object given its globally unique \`ID\`."""
   node(
@@ -1263,69 +1327,19 @@ type Query implements Node {
     nodeId: ID!
   ): Node
 
-  """Reads and enables pagination through a set of \`Bar\`."""
-  allBars(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering \`Bar\`."""
-    orderBy: [BarsOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: BarCondition
-  ): BarsConnection
-
-  """Reads and enables pagination through a set of \`Foo\`."""
-  allFoos(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering \`Foo\`."""
-    orderBy: [FoosOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: FooCondition
-  ): FoosConnection
-  barById(id: Int!): Bar
-  fooById(id: Int!): Foo
-  fooOne: Foo
+  """
+  The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
+  """
+  nodeId: ID!
 
   """Reads and enables pagination through a set of \`Foo\`."""
   oddFoos(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
     """Only read the first \`n\` values of the set."""
     first: Int
 
@@ -1337,27 +1351,15 @@ type Query implements Node {
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
   ): FoosConnection
   oddFoosArray: [Foo]
+
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
   viewerId: Int
-
-  """Reads a single \`Bar\` using its globally unique \`ID\`."""
-  bar(
-    """The globally unique \`ID\` to be used in selecting a single \`Bar\`."""
-    nodeId: ID!
-  ): Bar
-
-  """Reads a single \`Foo\` using its globally unique \`ID\`."""
-  foo(
-    """The globally unique \`ID\` to be used in selecting a single \`Foo\`."""
-    nodeId: ID!
-  ): Foo
 }
 
 """
@@ -1370,20 +1372,25 @@ type Subscription {
 """All input for the \`updateBarById\` mutation."""
 input UpdateBarByIdInput {
   """
+  An object where the defined keys will be set on the \`Bar\` being updated.
+  """
+  barPatch: BarPatch!
+
+  """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-
-  """
-  An object where the defined keys will be set on the \`Bar\` being updated.
-  """
-  barPatch: BarPatch!
   id: Int!
 }
 
 """All input for the \`updateBar\` mutation."""
 input UpdateBarInput {
+  """
+  An object where the defined keys will be set on the \`Bar\` being updated.
+  """
+  barPatch: BarPatch!
+
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -1394,37 +1401,32 @@ input UpdateBarInput {
   The globally unique \`ID\` which will identify a single \`Bar\` to be updated.
   """
   nodeId: ID!
-
-  """
-  An object where the defined keys will be set on the \`Bar\` being updated.
-  """
-  barPatch: BarPatch!
 }
 
 """The output of our update \`Bar\` mutation."""
 type UpdateBarPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
   """The \`Bar\` that was updated by this mutation."""
   bar: Bar
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """Reads a single \`Foo\` that is related to this \`Bar\`."""
-  fooByFooId: Foo
 
   """An edge for our \`Bar\`. May be used by Relay 1."""
   barEdge(
     """The method to use when ordering \`Bar\`."""
     orderBy: [BarsOrderBy!] = [PRIMARY_KEY_ASC]
   ): BarsEdge
+
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """Reads a single \`Foo\` that is related to this \`Bar\`."""
+  fooByFooId: Foo
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
 }
 
 """All input for the \`updateFooById\` mutation."""
@@ -1451,14 +1453,14 @@ input UpdateFooInput {
   clientMutationId: String
 
   """
-  The globally unique \`ID\` which will identify a single \`Foo\` to be updated.
-  """
-  nodeId: ID!
-
-  """
   An object where the defined keys will be set on the \`Foo\` being updated.
   """
   fooPatch: FooPatch!
+
+  """
+  The globally unique \`ID\` which will identify a single \`Foo\` to be updated.
+  """
+  nodeId: ID!
 }
 
 """The output of our update \`Foo\` mutation."""
@@ -1472,16 +1474,16 @@ type UpdateFooPayload {
   """The \`Foo\` that was updated by this mutation."""
   foo: Foo
 
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
   """An edge for our \`Foo\`. May be used by Relay 1."""
   fooEdge(
     """The method to use when ordering \`Foo\`."""
     orderBy: [FoosOrderBy!] = [PRIMARY_KEY_ASC]
   ): FoosEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
 }
 
 `;
