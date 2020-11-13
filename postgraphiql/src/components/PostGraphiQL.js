@@ -116,22 +116,22 @@ class PostGraphiQL extends React.PureComponent {
           reconnect: true,
           connectionParams: () => this.getHeaders() || {},
         });
-        const unlisten1 = this.subscriptionsClient.on('connected', () => {
+        const unlisten1 = client.on('connected', () => {
           this.setState({ socketStatus: 'connected', error: null });
         });
-        const unlisten2 = this.subscriptionsClient.on('disconnected', () => {
+        const unlisten2 = client.on('disconnected', () => {
           this.setState({ socketStatus: 'closed', error: new Error('Socket disconnected') });
         });
-        const unlisten3 = this.subscriptionsClient.on('connecting', () => {
+        const unlisten3 = client.on('connecting', () => {
           this.setState({ socketStatus: 'connecting' });
         });
-        const unlisten4 = this.subscriptionsClient.on('reconnected', () => {
+        const unlisten4 = client.on('reconnected', () => {
           this.setState({ socketStatus: 'connected', error: null });
         });
-        const unlisten5 = this.subscriptionsClient.on('reconnecting', () => {
+        const unlisten5 = client.on('reconnecting', () => {
           this.setState({ socketStatus: 'connecting' });
         });
-        const unlisten6 = this.subscriptionsClient.on('error', error => {
+        const unlisten6 = client.on('error', error => {
           // tslint:disable-next-line no-console
           console.error('Client connection error', error);
           this.setState({ error: new Error('Subscriptions client connection error') });
