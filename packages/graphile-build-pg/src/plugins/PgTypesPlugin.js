@@ -1001,10 +1001,10 @@ end`;
             type.domainBaseTypeId,
             typeModifier
           );
-          const baseInputType =
-            gqlInputTypeByTypeIdAndModifier[type.domainBaseTypeId][
-              typeModifierKey
-            ];
+          const baseInputType = getGqlInputTypeByTypeIdAndModifier(
+            type.domainBaseTypeId,
+            typeModifier
+          );
           // Hack stolen from: https://github.com/graphile/postgraphile/blob/ade728ed8f8e3ecdc5fdad7d770c67aa573578eb/src/graphql/schema/type/aliasGqlType.ts#L16
           gqlTypeByTypeIdAndModifier[type.id][typeModifierKey] = Object.assign(
             Object.create(baseType),

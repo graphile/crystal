@@ -23,9 +23,13 @@ create domain c.bigint_domain as int8;
 -- PG9.6 doesn't support array of domain scalars
 create domain c.bigint_domain_array_domain as c.bigint_domain[];
 
+create domain pg11.domain_constrained_compound_type as
+    c.compound_type check (value is null or (value).a is not null);
+
 create table pg11.types (
   id serial primary key,
   "regrole" regrole, 
   "regnamespace" regnamespace,
-  "bigint_domain_array_domain" c.bigint_domain_array_domain
-)
+  "bigint_domain_array_domain" c.bigint_domain_array_domain,
+  "domain_constrained_compound_type" pg11.domain_constrained_compound_type
+);

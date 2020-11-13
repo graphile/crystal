@@ -11,6 +11,7 @@ mutation {
           "2098288669218571760"
           "2098288669218571761"
         ]
+        domainConstrainedCompoundType: { a: 1 }
       }
     }
   ) {
@@ -29,6 +30,7 @@ mutation {
           "2098288669218571760"
           "2098288669218571761"
         ]
+        domainConstrainedCompoundType: { a: 1 }
       }
     }
   ) {
@@ -43,4 +45,17 @@ fragment type on Type {
   regrole
   regnamespace
   bigintDomainArrayDomain
+  domainConstrainedCompoundType {
+    ...domainConstrainedCompoundType
+  }
+}
+
+fragment domainConstrainedCompoundType on DomainConstrainedCompoundType {
+  a
+  b
+  c
+  d
+  e
+  f
+  fooBar
 }

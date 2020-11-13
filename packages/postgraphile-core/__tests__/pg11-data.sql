@@ -15,13 +15,15 @@ insert into pg11.types values
     11,
     null,
     null,
+    null,
     null
   ),
   (
     12,
     'postgraphile_test_authenticator',
     'b',
-    ARRAY[1, 2, 2098288669218571760]
+    ARRAY[1, 2, 2098288669218571760],
+    (1, '2', 'blue', '4be8a712-3ff7-432e-aa34-fdb43fbd838d', 'FOO_BAR', '', interval '6 hours', 8)
   );
 
 alter sequence pg11.types_id_seq restart with 15;

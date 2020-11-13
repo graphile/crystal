@@ -9,6 +9,19 @@ fragment type on Type {
   regrole
   regnamespace
   bigintDomainArrayDomain
+  domainConstrainedCompoundType {
+    ...domainConstrainedCompoundType
+  }
+}
+
+fragment domainConstrainedCompoundType on DomainConstrainedCompoundType {
+  a
+  b
+  c
+  d
+  e
+  f
+  fooBar
 }
 
 fragment typesConnection on TypesConnection {

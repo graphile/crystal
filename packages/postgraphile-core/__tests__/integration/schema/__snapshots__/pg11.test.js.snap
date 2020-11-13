@@ -154,6 +154,12 @@ input ByDefaultAsIdentityPatch {
 """An IPv4 or IPv6 CIDR address."""
 scalar CidrAddress
 
+enum Color {
+  BLUE
+  GREEN
+  RED
+}
+
 """All input for the create \`AlwaysAsIdentity\` mutation."""
 input CreateAlwaysAsIdentityInput {
   """The \`AlwaysAsIdentity\` to be created by this mutation."""
@@ -489,8 +495,97 @@ type DeleteTypePayload {
   ): TypesEdge
 }
 
+type DomainConstrainedCompoundType {
+  a: Int
+  b: String
+  c: Color
+  d: UUID
+  e: EnumCaps
+  f: EnumWithEmptyString
+  fooBar: Int
+  g: Interval
+}
+
+input DomainConstrainedCompoundTypeInput {
+  a: Int
+  b: String
+  c: Color
+  d: UUID
+  e: EnumCaps
+  f: EnumWithEmptyString
+  fooBar: Int
+  g: IntervalInput
+}
+
+enum EnumCaps {
+  _0_BAR
+  BAR_FOO
+  BAZ_QUX
+  FOO_BAR
+}
+
+enum EnumWithEmptyString {
+  _EMPTY_
+  ONE
+  TWO
+}
+
 """An IPv4 or IPv6 host address, and optionally its subnet."""
 scalar InternetAddress
+
+"""
+An interval of time that has passed where the smallest distinct unit is a second.
+"""
+type Interval {
+  """A quantity of days."""
+  days: Int
+
+  """A quantity of hours."""
+  hours: Int
+
+  """A quantity of minutes."""
+  minutes: Int
+
+  """A quantity of months."""
+  months: Int
+
+  """
+  A quantity of seconds. This is the only non-integer field, as all the other
+  fields will dump their overflow into a smaller unit of time. Intervals don’t
+  have a smaller unit than seconds.
+  """
+  seconds: Float
+
+  """A quantity of years."""
+  years: Int
+}
+
+"""
+An interval of time that has passed where the smallest distinct unit is a second.
+"""
+input IntervalInput {
+  """A quantity of days."""
+  days: Int
+
+  """A quantity of hours."""
+  hours: Int
+
+  """A quantity of minutes."""
+  minutes: Int
+
+  """A quantity of months."""
+  months: Int
+
+  """
+  A quantity of seconds. This is the only non-integer field, as all the other
+  fields will dump their overflow into a smaller unit of time. Intervals don’t
+  have a smaller unit than seconds.
+  """
+  seconds: Float
+
+  """A quantity of years."""
+  years: Int
+}
 
 """A 6-byte MAC address."""
 scalar MacAddress
@@ -962,6 +1057,7 @@ scalar RegRole
 
 type Type implements Node {
   bigintDomainArrayDomain: [BigintDomain]
+  domainConstrainedCompoundType: DomainConstrainedCompoundType
   id: Int!
 
   """
@@ -979,6 +1075,11 @@ input TypeCondition {
   """Checks for equality with the object’s \`bigintDomainArrayDomain\` field."""
   bigintDomainArrayDomain: [BigintDomain]
 
+  """
+  Checks for equality with the object’s \`domainConstrainedCompoundType\` field.
+  """
+  domainConstrainedCompoundType: DomainConstrainedCompoundTypeInput
+
   """Checks for equality with the object’s \`id\` field."""
   id: Int
 
@@ -992,6 +1093,7 @@ input TypeCondition {
 """An input for mutations affecting \`Type\`"""
 input TypeInput {
   bigintDomainArrayDomain: [BigintDomain]
+  domainConstrainedCompoundType: DomainConstrainedCompoundTypeInput
   id: Int
   regnamespace: RegNamespace
   regrole: RegRole
@@ -1000,6 +1102,7 @@ input TypeInput {
 """Represents an update to a \`Type\`. Fields that are set will be updated."""
 input TypePatch {
   bigintDomainArrayDomain: [BigintDomain]
+  domainConstrainedCompoundType: DomainConstrainedCompoundTypeInput
   id: Int
   regnamespace: RegNamespace
   regrole: RegRole
@@ -1035,6 +1138,8 @@ type TypesEdge {
 enum TypesOrderBy {
   BIGINT_DOMAIN_ARRAY_DOMAIN_ASC
   BIGINT_DOMAIN_ARRAY_DOMAIN_DESC
+  DOMAIN_CONSTRAINED_COMPOUND_TYPE_ASC
+  DOMAIN_CONSTRAINED_COMPOUND_TYPE_DESC
   ID_ASC
   ID_DESC
   NATURAL
@@ -1274,6 +1379,11 @@ type UpdateTypePayload {
   ): TypesEdge
 }
 
+"""
+A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+"""
+scalar UUID
+
 `;
 
 exports[`prints a schema to test PG11-specific features with default options 1`] = `
@@ -1425,6 +1535,12 @@ Represents an update to a \`ByDefaultAsIdentity\`. Fields that are set will be u
 input ByDefaultAsIdentityPatch {
   id: Int
   t: String
+}
+
+enum Color {
+  BLUE
+  GREEN
+  RED
 }
 
 """All input for the create \`AlwaysAsIdentity\` mutation."""
@@ -1762,8 +1878,97 @@ type DeleteTypePayload {
   ): TypesEdge
 }
 
+type DomainConstrainedCompoundType {
+  a: Int
+  b: String
+  c: Color
+  d: UUID
+  e: EnumCaps
+  f: EnumWithEmptyString
+  fooBar: Int
+  g: Interval
+}
+
+input DomainConstrainedCompoundTypeInput {
+  a: Int
+  b: String
+  c: Color
+  d: UUID
+  e: EnumCaps
+  f: EnumWithEmptyString
+  fooBar: Int
+  g: IntervalInput
+}
+
+enum EnumCaps {
+  _0_BAR
+  BAR_FOO
+  BAZ_QUX
+  FOO_BAR
+}
+
+enum EnumWithEmptyString {
+  _EMPTY_
+  ONE
+  TWO
+}
+
 """An IPv4 or IPv6 host address, and optionally its subnet."""
 scalar InternetAddress
+
+"""
+An interval of time that has passed where the smallest distinct unit is a second.
+"""
+type Interval {
+  """A quantity of days."""
+  days: Int
+
+  """A quantity of hours."""
+  hours: Int
+
+  """A quantity of minutes."""
+  minutes: Int
+
+  """A quantity of months."""
+  months: Int
+
+  """
+  A quantity of seconds. This is the only non-integer field, as all the other
+  fields will dump their overflow into a smaller unit of time. Intervals don’t
+  have a smaller unit than seconds.
+  """
+  seconds: Float
+
+  """A quantity of years."""
+  years: Int
+}
+
+"""
+An interval of time that has passed where the smallest distinct unit is a second.
+"""
+input IntervalInput {
+  """A quantity of days."""
+  days: Int
+
+  """A quantity of hours."""
+  hours: Int
+
+  """A quantity of minutes."""
+  minutes: Int
+
+  """A quantity of months."""
+  months: Int
+
+  """
+  A quantity of seconds. This is the only non-integer field, as all the other
+  fields will dump their overflow into a smaller unit of time. Intervals don’t
+  have a smaller unit than seconds.
+  """
+  seconds: Float
+
+  """A quantity of years."""
+  years: Int
+}
 
 """
 The root mutation type which contains root level fields which mutate data.
@@ -2229,6 +2434,7 @@ scalar RegRole
 
 type Type implements Node {
   bigintDomainArrayDomain: [BigintDomain]
+  domainConstrainedCompoundType: DomainConstrainedCompoundType
   id: Int!
 
   """
@@ -2246,6 +2452,11 @@ input TypeCondition {
   """Checks for equality with the object’s \`bigintDomainArrayDomain\` field."""
   bigintDomainArrayDomain: [BigintDomain]
 
+  """
+  Checks for equality with the object’s \`domainConstrainedCompoundType\` field.
+  """
+  domainConstrainedCompoundType: DomainConstrainedCompoundTypeInput
+
   """Checks for equality with the object’s \`id\` field."""
   id: Int
 
@@ -2259,6 +2470,7 @@ input TypeCondition {
 """An input for mutations affecting \`Type\`"""
 input TypeInput {
   bigintDomainArrayDomain: [BigintDomain]
+  domainConstrainedCompoundType: DomainConstrainedCompoundTypeInput
   id: Int
   regnamespace: RegNamespace
   regrole: RegRole
@@ -2267,6 +2479,7 @@ input TypeInput {
 """Represents an update to a \`Type\`. Fields that are set will be updated."""
 input TypePatch {
   bigintDomainArrayDomain: [BigintDomain]
+  domainConstrainedCompoundType: DomainConstrainedCompoundTypeInput
   id: Int
   regnamespace: RegNamespace
   regrole: RegRole
@@ -2302,6 +2515,8 @@ type TypesEdge {
 enum TypesOrderBy {
   BIGINT_DOMAIN_ARRAY_DOMAIN_ASC
   BIGINT_DOMAIN_ARRAY_DOMAIN_DESC
+  DOMAIN_CONSTRAINED_COMPOUND_TYPE_ASC
+  DOMAIN_CONSTRAINED_COMPOUND_TYPE_DESC
   ID_ASC
   ID_DESC
   NATURAL
@@ -2540,5 +2755,10 @@ type UpdateTypePayload {
     orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
   ): TypesEdge
 }
+
+"""
+A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+"""
+scalar UUID
 
 `;
