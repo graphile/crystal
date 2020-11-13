@@ -57,6 +57,7 @@ const {
     enhanceGraphiql: true,
     websockets: 'none', // 'none' | 'v0' | 'v1'
     allowExplain: true,
+    credentials: 'same-origin',
   },
 } = window;
 
@@ -104,10 +105,6 @@ class PostGraphiQL extends React.PureComponent {
     explorerIsOpen: this._storage.get('explorerIsOpen') === 'false' ? false : true,
     haveActiveSubscription: false,
     socketStatus: POSTGRAPHILE_CONFIG.websockets === 'none' ? null : 'pending',
-  };
-
-  _onEditQuery = query => {
-    this.setState({ query });
   };
 
   maybeSubscriptionsClient = () => {
@@ -224,6 +221,7 @@ class PostGraphiQL extends React.PureComponent {
     }
     const graphiql = this.graphiql;
     this.setState({ query: graphiql._storage.get('query') || defaultQuery });
+
     const editor = graphiql.getQueryEditor();
     editor.setOption('extraKeys', {
       ...(editor.options.extraKeys || {}),
@@ -313,7 +311,7 @@ class PostGraphiQL extends React.PureComponent {
   /**
    * Get the user editable headers as an object
    */
-  getHeaders() {
+  getHeaders = () => {
     const { headersText } = this.state;
     let extraHeaders;
     try {
@@ -327,13 +325,13 @@ class PostGraphiQL extends React.PureComponent {
       // Do nothing
     }
     return extraHeaders;
-  }
+  };
 
   /**
    * Executes a GraphQL query with some extra information then the standard
    * parameters. Namely a JWT which may be added as an `Authorization` header.
    */
-  async executeQuery(graphQLParams) {
+  executeQuery = async graphQLParams => {
     const extraHeaders = this.getHeaders();
     const response = await fetch(POSTGRAPHILE_CONFIG.graphqlUrl, {
       method: 'POST',
@@ -347,7 +345,7 @@ class PostGraphiQL extends React.PureComponent {
         },
         extraHeaders,
       ),
-      credentials: 'same-origin',
+      credentials: POSTGRAPHILE_CONFIG.credentials,
       body: JSON.stringify(graphQLParams),
     });
 
@@ -356,7 +354,7 @@ class PostGraphiQL extends React.PureComponent {
     this.setState({ explainResult: result && result.explain ? result.explain : null });
 
     return result;
-  }
+  };
 
   /**
    * Routes the request either to the subscriptionClient or to executeQuery.
@@ -367,28 +365,17 @@ class PostGraphiQL extends React.PureComponent {
       const client = this.subscriptionsClient;
       return {
         subscribe: observer => {
-          observer.next('Waiting for subscription to yield data…');
-
-          // Hack because GraphiQL logs `[object Object]` on error otherwise
-          const oldError = observer.error;
-          observer.error = function (error) {
-            let stack;
-            try {
-              stack = JSON.stringify(error, null, 2);
-            } catch (e) {
-              stack = error.message || error;
-            }
-            oldError.call(this, {
-              stack,
-              ...error,
-            });
-          };
+          setTimeout(() => {
+            // Without this timeout, this message doesn't display on the first
+            // subscription after the first render of the page.
+            observer.next('Waiting for subscription to yield data…');
+          }, 0);
 
           const subscription =
             POSTGRAPHILE_CONFIG.websockets === 'v0'
               ? client.request(graphQLParams).subscribe(observer)
-              // v1
-              : { unsubscribe: client.subscribe(graphQLParams, observer) };
+              : // v1
+                { unsubscribe: client.subscribe(graphQLParams, observer) };
           this.setState({ haveActiveSubscription: true });
           this.activeSubscription = subscription;
           return subscription;
@@ -447,6 +434,10 @@ class PostGraphiQL extends React.PureComponent {
     // Get the documentation explorer component from GraphiQL. Unfortunately
     // for them this looks like public API. Muwahahahaha.
     const { docExplorerComponent } = this.graphiql;
+    if (!docExplorerComponent) {
+      console.log('No docExplorerComponent, could not update navStack');
+      return;
+    }
     const { navStack } = docExplorerComponent.state;
 
     // If one type/field isn’t find this will be set to false and the
@@ -531,6 +522,34 @@ class PostGraphiQL extends React.PureComponent {
 
   getQueryEditor = () => {
     return this.graphiql.getQueryEditor();
+  };
+
+  handleEditQuery = query => {
+    this.setState({ query });
+  };
+
+  handleEditHeaders = headersText => {
+    this.setState(
+      {
+        headersText,
+        headersTextValid: isValidJSON(headersText),
+      },
+      () => {
+        if (this.state.headersTextValid && this.state.saveHeadersText) {
+          this._storage.set(STORAGE_KEYS.HEADERS_TEXT, this.state.headersText);
+        }
+        if (this.state.headersTextValid && this.subscriptionsClient) {
+          // Reconnect to websocket with new headers
+          if (POSTGRAPHILE_CONFIG.websockets === 'v0') {
+            this.subscriptionsClient.close(false, true);
+          } else {
+            // v1
+            this.subscriptionsClient.dispose();
+            this.subscriptionsClient = this.maybeSubscriptionsClient();
+          }
+        }
+      },
+    );
   };
 
   handlePrettifyQuery = () => {
@@ -686,18 +705,26 @@ class PostGraphiQL extends React.PureComponent {
           <GraphiQLExplorer
             schema={schema}
             query={this.state.query}
-            onEdit={this._onEditQuery}
+            onEdit={this.handleEditQuery}
             onRunOperation={operationName => this.graphiql.handleRunQuery(operationName)}
             explorerIsOpen={this.state.explorerIsOpen}
             onToggleExplorer={this.handleToggleExplorer}
             //getDefaultScalarArgValue={getDefaultScalarArgValue}
             //makeDefaultArg={makeDefaultArg}
           />
-          <GraphiQL onEditQuery={this._onEditQuery} query={this.state.query} {...sharedProps}>
+          <GraphiQL
+            onEditQuery={this.handleEditQuery}
+            query={this.state.query}
+            headerEditorEnabled
+            headers={this.state.headersText}
+            onEditHeaders={this.handleEditHeaders}
+            {...sharedProps}
+          >
             <GraphiQL.Logo>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div>
                   <img
+                    alt="PostGraphile logo"
                     src="https://www.graphile.org/images/postgraphile-tiny.optimized.svg"
                     width="32"
                     height="32"
@@ -724,15 +751,21 @@ class PostGraphiQL extends React.PureComponent {
                 label="History"
               />
               <GraphiQL.Button
-                label="Headers"
-                title="Modify the headers to be sent with the requests"
-                onClick={this.handleToggleHeaders}
-              />
-              <GraphiQL.Button
                 label="Explorer"
                 title="Construct a query with the GraphiQL explorer"
                 onClick={this.handleToggleExplorer}
               />
+              <GraphiQL.Button
+                onClick={this.graphiql && this.graphiql.handleMergeQuery}
+                title="Merge Query (Shift-Ctrl-M)"
+                label="Merge"
+              />
+              <GraphiQL.Button
+                onClick={this.graphiql && this.graphiql.handleCopyQuery}
+                title="Copy Query (Shift-Ctrl-C)"
+                label="Copy"
+              />
+
               {POSTGRAPHILE_CONFIG.allowExplain ? (
                 <GraphiQL.Button
                   label={this.state.explain ? 'Explain ON' : 'Explain disabled'}
@@ -740,6 +773,11 @@ class PostGraphiQL extends React.PureComponent {
                   onClick={this.handleToggleExplain}
                 />
               ) : null}
+              <GraphiQL.Button
+                label={'Headers ' + (this.state.saveHeadersText ? 'SAVED' : 'unsaved')}
+                title="Should we persist the headers to localStorage? Header editor is next to variable editor at the bottom."
+                onClick={this.handleToggleSaveHeaders}
+              />
             </GraphiQL.Toolbar>
             <GraphiQL.Footer>
               <div className="postgraphile-footer">
@@ -807,77 +845,10 @@ class PostGraphiQL extends React.PureComponent {
               </div>
             </GraphiQL.Footer>
           </GraphiQL>
-          <EditHeaders
-            open={this.state.showHeaderEditor}
-            value={this.state.headersText}
-            valid={this.state.headersTextValid}
-            toggleSaveHeaders={this.handleToggleSaveHeaders}
-            saveHeaders={this.state.saveHeadersText}
-            onChange={e =>
-              this.setState(
-                {
-                  headersText: e.target.value,
-                  headersTextValid: isValidJSON(e.target.value),
-                },
-                () => {
-                  if (this.state.headersTextValid && this.state.saveHeadersText) {
-                    this._storage.set(STORAGE_KEYS.HEADERS_TEXT, this.state.headersText);
-                  }
-                  if (this.state.headersTextValid && this.subscriptionsClient) {
-                    // Reconnect to websocket with new headers
-                    if (POSTGRAPHILE_CONFIG.websockets === 'v0') {
-                      this.subscriptionsClient.close(false, true);
-                    } else {
-                      // v1
-                      this.subscriptionsClient.dispose();
-                      this.subscriptionsClient = this.maybeSubscriptionsClient();
-                    }
-                  }
-                },
-              )
-            }
-          >
-            <div className="docExplorerHide" onClick={this.handleToggleHeaders}>
-              {'\u2715'}
-            </div>
-          </EditHeaders>
         </div>
       );
     }
   }
-}
-
-function EditHeaders({ children, open, value, onChange, valid, saveHeaders, toggleSaveHeaders }) {
-  return (
-    <div
-      className="graphiql-container not-really"
-      style={{
-        display: open ? 'block' : 'none',
-        width: '300px',
-        flexBasis: '300px',
-      }}
-    >
-      <div className="docExplorerWrap">
-        <div className="doc-explorer">
-          <div className="doc-explorer-title-bar">
-            <div className="doc-explorer-title">Edit Headers</div>
-            <div className="doc-explorer-rhs">{children}</div>
-          </div>
-          <div className="doc-explorer-contents">
-            <label>
-              <input type="checkbox" checked={saveHeaders} onChange={toggleSaveHeaders} />
-              Persist headers
-            </label>
-            <textarea
-              value={value}
-              onChange={onChange}
-              style={valid ? {} : { backgroundColor: '#fdd' }}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 }
 
 export default PostGraphiQL;
