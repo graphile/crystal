@@ -10,7 +10,15 @@ body,
 }
 
 /* Fix weird search alignment issue */
-.graphiql-container .search-box:before {
+.graphiql-container .search-box-icon {
   line-height: 1em;
   top: 1px;
+}
+
+.graphiql-container .history-contents li button.favorited {
+  display: inline-block;
+}
+
+.graphiql-container button:focus {
+  outline: none;
 }
