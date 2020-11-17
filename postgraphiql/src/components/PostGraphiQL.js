@@ -131,7 +131,7 @@ class PostGraphiQL extends React.PureComponent {
           // active subscriptions
           this.restartSubscriptionsClient = () => {
             if (socket.readyState === WebSocket.OPEN) {
-              socket.close(1012, 'Service Restart');
+              socket.close(4205, 'Client Restart');
             }
           };
 
