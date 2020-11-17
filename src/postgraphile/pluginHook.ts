@@ -30,7 +30,7 @@ export interface PostGraphileHTTPEnd {
   result: Record<string, any> | Array<Record<string, any>>;
 }
 export interface PostGraphilePlugin {
-  init?: HookFn<null>;
+  init?: HookFn<null, { version: string; graphql: typeof import('graphql') }>;
 
   pluginHook?: HookFn<PluginHookFn>;
 
