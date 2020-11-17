@@ -348,7 +348,26 @@ class PostGraphiQL extends React.PureComponent {
             observer.next('Waiting for subscription to yield data…');
           }, 0);
 
-          const unsubscribe = client.subscribe(graphQLParams, observer);
+          const unsubscribe = client.subscribe(graphQLParams, {
+            next: observer.next,
+            complete: observer.complete,
+            error: err => {
+              if (err instanceof Error) {
+                observer.error(err);
+              } else if (err instanceof CloseEvent) {
+                observer.error(
+                  new Error(
+                    `Socket closed with event ${err.code}` + err.reason
+                      ? `: ${err.reason}` // reason will be available on clean closes
+                      : '',
+                  ),
+                );
+              } else {
+                // GraphQLError[]
+                observer.error(new Error(err.map(({ message }) => message).join(', ')));
+              }
+            },
+          });
           this.disposableSubscription = unsubscribe;
           return { unsubscribe };
         },
