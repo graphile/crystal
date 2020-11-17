@@ -7,7 +7,6 @@ import './postgraphiql.css';
 import { buildClientSchema, introspectionQuery, isType, GraphQLObjectType } from 'graphql';
 import { createClient } from 'graphql-ws';
 import formatSQL from '../formatSQL';
-import { threadId } from 'worker_threads';
 
 const defaultQuery = `\
 # Welcome to PostGraphile's built-in GraphiQL IDE
