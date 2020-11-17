@@ -120,10 +120,6 @@ program
     'Enable GraphQL support for subscriptions (you still need a subscriptions plugin currently)',
   )
   .option(
-    '--websockets <string>',
-    "Choose the version of the websocket transport library. Defaults to 'v0' if `--subscriptions` was passed, 'none' otherwise",
-  )
-  .option(
     '--websocket-operations <operations>',
     "Toggle which GraphQL websocket transport operations are supported: 'subscriptions' or 'all'. Defaults to 'subscriptions'",
   )
@@ -433,7 +429,6 @@ const {
   connection: pgConnectionString,
   ownerConnection,
   subscriptions,
-  websockets = subscriptions ? 'v0' : 'none',
   live,
   watch: watchPg,
   schema: dbSchema,
@@ -525,20 +520,6 @@ if (!['omit', 'only', 'deprecated'].includes(rawLegacyRelations)) {
   );
 } else {
   legacyRelations = rawLegacyRelations;
-}
-
-// Validate websockets argument
-if (websockets) {
-  switch (websockets) {
-    case 'none':
-    case 'v0':
-    case 'v1':
-      break;
-    default:
-      exitWithErrorMessage(
-        `Invalid argument to '--websockets' - expected on of 'none', 'v0', 'v1'; but received '${websockets}'`,
-      );
-  }
 }
 
 const noServer = !yesServer;
@@ -814,7 +795,7 @@ if (noServer) {
       server.timeout = serverTimeout;
     }
 
-    if (websockets && websockets !== 'none') {
+    if (subscriptions || live) {
       enhanceHttpServerWithWebSockets(server, middleware);
     }
 
