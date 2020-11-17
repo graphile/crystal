@@ -119,16 +119,19 @@ class PostGraphiQL extends React.PureComponent {
       retryAttempts: Infinity, // keep retrying while the browser is open
       connectionParams: () => this.getHeaders() || {},
       on: {
-        connecting: ws => {
+        connecting: () => {
           this.setState({ socketStatus: 'connecting' });
+        },
+        connected: socket => {
+          this.setState({ socketStatus: 'connected', error: null });
 
           // restart client by simply closing the socket.
           // it will silenty reconnect. useful for picking
           // up the new connection parameters without losing
           // active subscriptions
           this.restartSubscriptionsClient = () => {
-            if (ws.readyState === ws.OPEN) {
-              ws.close(1012, 'Service Restart');
+            if (socket.readyState === WebSocket.OPEN) {
+              socket.close(1012, 'Service Restart');
             }
           };
 
@@ -138,9 +141,6 @@ class PostGraphiQL extends React.PureComponent {
             this.restartRequested = false;
             this.restartSubscriptionsClient();
           }
-        },
-        connected: () => {
-          this.setState({ socketStatus: 'connected', error: null });
         },
         closed: closeEvent => {
           this.setState({
