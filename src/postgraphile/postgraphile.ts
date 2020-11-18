@@ -29,7 +29,7 @@ export interface PostgraphileSchemaBuilder<
   _emitter: EventEmitter;
   getGraphQLSchema: () => Promise<GraphQLSchema>;
   options: PostGraphileOptions<Request, Response>;
-  cancelWatch: null | (() => Promise<void>);
+  releaseWatch: null | (() => Promise<void>);
 }
 
 /**
@@ -46,11 +46,11 @@ export function getPostgraphileSchemaBuilder<
   incomingOptions: PostGraphileOptions<Request, Response>,
   releasePgPool: null | (() => void) = null,
 ): PostgraphileSchemaBuilder {
-  let cancelWatchFn: null | (() => Promise<void>) = null;
-  async function cancelWatch() {
-    if (cancelWatchFn) {
-      await cancelWatchFn();
-      cancelWatchFn = null;
+  let releaseWatchFn: null | (() => Promise<void>) = null;
+  async function releaseWatch() {
+    if (releaseWatchFn) {
+      await releaseWatchFn();
+      releaseWatchFn = null;
     }
   }
 
@@ -62,9 +62,9 @@ export function getPostgraphileSchemaBuilder<
       );
     }
     released = true;
-    await cancelWatch();
+    await releaseWatch();
     if (releasePgPool) {
-      releasePgPool();
+      await releasePgPool();
     }
   }
   if (incomingOptions.live && incomingOptions.subscriptions == null) {
@@ -106,7 +106,7 @@ export function getPostgraphileSchemaBuilder<
     _emitter,
     getGraphQLSchema: () => (gqlSchema ? Promise.resolve(gqlSchema) : gqlSchemaPromise),
     options,
-    cancelWatch,
+    releaseWatch,
   };
 
   async function createGqlSchema(): Promise<GraphQLSchema> {
@@ -115,10 +115,10 @@ export function getPostgraphileSchemaBuilder<
     while (true) {
       try {
         if (options.watchPg) {
-          if (cancelWatchFn) {
-            throw new Error(`cancelWatchFn should not have been set at this point.`);
+          if (releaseWatchFn) {
+            throw new Error(`releaseWatchFn should not have been set at this point.`);
           }
-          cancelWatchFn = await watchPostGraphileSchema(pgPool, pgSchemas, options, newSchema => {
+          releaseWatchFn = await watchPostGraphileSchema(pgPool, pgSchemas, options, newSchema => {
             gqlSchema = newSchema;
             _emitter.emit('schemas:changed');
             exportGqlSchema(gqlSchema);
@@ -292,14 +292,14 @@ export default function postgraphile<
     debugPgClient(pgClient, !!options.allowExplain);
   });
 
-  const { getGraphQLSchema, options, _emitter, cancelWatch } = getPostgraphileSchemaBuilder<
+  const { getGraphQLSchema, options, _emitter, releaseWatch } = getPostgraphileSchemaBuilder<
     Request,
     Response
   >(pgPool, schema, incomingOptions, releasePgPool);
 
   async function release() {
-    if (cancelWatch) {
-      await cancelWatch();
+    if (releaseWatch) {
+      await releaseWatch();
     }
     if (releasePgPool) {
       await releasePgPool();
