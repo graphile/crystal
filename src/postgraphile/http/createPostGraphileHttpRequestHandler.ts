@@ -184,6 +184,7 @@ export default function createPostGraphileHttpRequestHandler(
     watchPg,
     disableQueryLog,
     enableQueryBatching,
+    websockets = subscriptions ? 'v0' : 'none',
   } = options;
   const live = !!options.live;
   const enhanceGraphiql =
@@ -200,6 +201,18 @@ export default function createPostGraphileHttpRequestHandler(
   let externalUrlBase = options.externalUrlBase;
   if (externalUrlBase && externalUrlBase.endsWith('/')) {
     throw new Error('externalUrlBase must not end with a slash (`/`)');
+  }
+
+  // Validate websockets argument
+  if (websockets) {
+    switch (websockets) {
+      case 'none':
+      case 'v0':
+      case 'v1':
+        break;
+      default:
+        throw new Error(`Invalid value for \`websockets\` option: '${websockets}'`);
+    }
   }
 
   const pluginHook = pluginHookFromOptions(options);
@@ -425,7 +438,7 @@ export default function createPostGraphileHttpRequestHandler(
               ? externalEventStreamRoute || `${externalUrlBase}${eventStreamRoute}`
               : null,
             enhanceGraphiql,
-            subscriptions,
+            websockets,
             allowExplain:
               typeof options.allowExplain === 'function'
                 ? ALLOW_EXPLAIN_PLACEHOLDER
@@ -435,7 +448,7 @@ export default function createPostGraphileHttpRequestHandler(
         )
       : null;
 
-    if (subscriptions || live) {
+    if (websockets && websockets !== 'none') {
       const server = req && req.connection && req.connection['server'];
       if (!server) {
         // tslint:disable-next-line no-console
