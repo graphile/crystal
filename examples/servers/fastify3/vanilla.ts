@@ -58,7 +58,7 @@ if (middleware.options.watchPg) {
 
 fastify.listen(port, (err, address) => {
   if (err) {
-    fastify.log.error(err);
+    fastify.log.error(String(err));
     process.exit(1);
   }
   fastify.log.info(`PostGraphiQL available at ${address}${middleware.graphiqlRoute} 🚀`);
