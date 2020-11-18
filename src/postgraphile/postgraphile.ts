@@ -297,7 +297,7 @@ export default function postgraphile<
     Response
   >(pgPool, schema, incomingOptions, releasePgPool);
 
-  async function close() {
+  async function release() {
     if (cancelWatch) {
       await cancelWatch();
     }
@@ -312,7 +312,7 @@ export default function postgraphile<
     getGqlSchema: getGraphQLSchema,
     pgPool,
     _emitter,
-    close,
+    release,
   });
 }
 
