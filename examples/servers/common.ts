@@ -64,6 +64,8 @@ export const options: PostGraphileOptions = {
   extendedErrors: ['hint', 'detail', 'errcode'],
   allowExplain: true,
   legacyRelations: 'omit',
+  exportGqlSchemaPath: `${__dirname}/schema.graphql`,
+  sortExport: true,
 };
 
 export const port: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
