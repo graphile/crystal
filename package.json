@@ -50,7 +50,7 @@
     "jest": "25.x",
     "lerna": "^3.18.4",
     "pg": ">=6.1.0 <9",
-    "postgraphile": "^4.4.4",
+    "postgraphile": "^4.10.0-alpha.0",
     "prettier": "^2.1.1",
     "typescript": "^4.0.2"
   },
