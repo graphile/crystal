@@ -1,6 +1,5 @@
 import { PassThrough, Stream } from 'stream';
 import type { IncomingMessage, ServerResponse } from 'http';
-import type { Http2ServerRequest, Http2ServerResponse } from 'http2';
 
 /******************************************************************************/
 // Really we want:
@@ -11,13 +10,13 @@ import type { Http2ServerRequest, Http2ServerResponse } from 'http2';
 // so we're going to do rough approximations of them. Care should be taken to
 // keep these compatible with the official fastify types.
 export type CompatFastifyReply = {
-  raw: ServerResponse | Http2ServerResponse;
+  raw: ServerResponse; // TODO:v5: | Http2ServerResponse;
   status(statusCode: number): CompatFastifyReply;
   headers(values: { [key: string]: any }): CompatFastifyReply;
   send(payload?: any): CompatFastifyReply;
 };
 export type CompatFastifyRequest = {
-  raw: IncomingMessage | Http2ServerRequest;
+  raw: IncomingMessage; // TODO:v5: | Http2ServerRequest;
   body: unknown;
   readonly headers: { [key: string]: unknown };
 };
@@ -47,6 +46,7 @@ declare module 'http' {
     originalUrl?: string;
   }
 }
+/* TODO:v5:
 declare module 'http2' {
   interface Http2ServerRequest {
     _koaCtx?: CompatKoaContext;
@@ -56,6 +56,7 @@ declare module 'http2' {
     originalUrl?: string;
   }
 }
+*/
 
 type Headers = { [header: string]: string };
 
@@ -135,8 +136,8 @@ export abstract class PostGraphileResponse {
   /**
    * Returns the `res` object that the underlying HTTP server would have.
    */
-  public abstract getNodeServerRequest(): IncomingMessage | Http2ServerRequest;
-  public abstract getNodeServerResponse(): ServerResponse | Http2ServerResponse;
+  public abstract getNodeServerRequest(): IncomingMessage; // TODO:v5: | Http2ServerRequest;
+  public abstract getNodeServerResponse(): ServerResponse; // TODO:v5: | Http2ServerResponse;
   public abstract setHeaders(statusCode: number, headers: Headers): void;
   public abstract setBody(body: Stream | Buffer | string | undefined): void;
 }
