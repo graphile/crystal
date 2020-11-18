@@ -29,7 +29,9 @@ export class ShutdownActions {
     // it yet.
     for (const promise of this.invoke()) {
       if (promise) {
-        await promise;
+        try {
+          await promise;
+        } catch (e) {} // eslint-disable-line no-empty
       }
     }
   }
