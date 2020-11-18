@@ -121,7 +121,8 @@ program
   )
   .option(
     '--websockets <string>',
-    "Choose the version of the websocket transport library. Defaults to 'v0' if `--subscriptions` was passed, 'none' otherwise",
+    "Choose which websocket transport libraries to use. Use commas to define multiple. Defaults to '[v0, v1]' if `--subscriptions` was passed, '[]' otherwise",
+    (option: string) => option.split(','),
   )
   .option(
     '--websocket-operations <operations>',
@@ -433,7 +434,7 @@ const {
   connection: pgConnectionString,
   ownerConnection,
   subscriptions,
-  websockets = subscriptions ? 'v0' : 'none',
+  websockets = subscriptions ? ['v0', 'v1'] : [],
   live,
   watch: watchPg,
   schema: dbSchema,
@@ -528,17 +529,17 @@ if (!['omit', 'only', 'deprecated'].includes(rawLegacyRelations)) {
 }
 
 // Validate websockets argument
-if (websockets) {
-  switch (websockets) {
-    case 'none':
-    case 'v0':
-    case 'v1':
-      break;
-    default:
-      exitWithErrorMessage(
-        `Invalid argument to '--websockets' - expected on of 'none', 'v0', 'v1'; but received '${websockets}'`,
-      );
-  }
+if (
+  // must be array
+  !Array.isArray(websockets) ||
+  // empty array = 'none'
+  !websockets.length ||
+  // array can only hold the versions
+  websockets.some(ver => !['v0', 'v1'].includes(ver))
+) {
+  exitWithErrorMessage(
+    `Invalid argument to '--websockets' - expected 'v0' and/or 'v1' (separated by comma); but received '${websockets}'`,
+  );
 }
 
 const noServer = !yesServer;
@@ -814,7 +815,7 @@ if (noServer) {
       server.timeout = serverTimeout;
     }
 
-    if (websockets && websockets !== 'none') {
+    if (websockets.length) {
       enhanceHttpServerWithWebSockets(server, middleware);
     }
 

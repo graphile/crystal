@@ -70,7 +70,7 @@ export interface PostGraphileOptions<
   // Enable GraphQL websocket transport support for subscriptions (you still need a subscriptions plugin currently)
   subscriptions?: boolean;
   // Choose the version of the websocket transport library. Defaults to `v0` if `subscriptions` is true, `none` otherwise.
-  websockets?: 'none' | 'v0' | 'v1';
+  websockets?: ('v0' | 'v1')[];
   // Toggle which GraphQL websocket transport operations are supported: 'subscriptions' or 'all'. Defaults to `subscriptions`
   websocketOperations?: 'all' | 'subscriptions';
   // [EXPERIMENTAL] Enables live-query support via GraphQL subscriptions (sends updated payload any time nested collections/records change)

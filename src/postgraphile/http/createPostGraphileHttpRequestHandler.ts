@@ -184,7 +184,7 @@ export default function createPostGraphileHttpRequestHandler(
     watchPg,
     disableQueryLog,
     enableQueryBatching,
-    websockets = subscriptions ? 'v0' : 'none',
+    websockets = subscriptions ? ['v0', 'v1'] : [],
   } = options;
   const live = !!options.live;
   const enhanceGraphiql =
@@ -204,15 +204,15 @@ export default function createPostGraphileHttpRequestHandler(
   }
 
   // Validate websockets argument
-  if (websockets) {
-    switch (websockets) {
-      case 'none':
-      case 'v0':
-      case 'v1':
-        break;
-      default:
-        throw new Error(`Invalid value for \`websockets\` option: '${websockets}'`);
-    }
+  if (
+    // must be array
+    !Array.isArray(websockets) ||
+    // empty array = 'none'
+    !websockets.length ||
+    // array can only hold the versions
+    websockets.some(ver => !['v0', 'v1'].includes(ver))
+  ) {
+    throw new Error(`Invalid value for \`websockets\` option: '${websockets}'`);
   }
 
   const pluginHook = pluginHookFromOptions(options);
@@ -438,7 +438,8 @@ export default function createPostGraphileHttpRequestHandler(
               ? externalEventStreamRoute || `${externalUrlBase}${eventStreamRoute}`
               : null,
             enhanceGraphiql,
-            websockets,
+            // if 'v1' websockets are included, use the v1 client always
+            websockets: !websockets.length ? 'none' : websockets.includes('v1') ? 'v1' : 'v0',
             allowExplain:
               typeof options.allowExplain === 'function'
                 ? ALLOW_EXPLAIN_PLACEHOLDER
@@ -448,7 +449,7 @@ export default function createPostGraphileHttpRequestHandler(
         )
       : null;
 
-    if (websockets && websockets !== 'none') {
+    if (websockets.length) {
       const server = req && req.connection && req.connection['server'];
       if (!server) {
         // tslint:disable-next-line no-console
