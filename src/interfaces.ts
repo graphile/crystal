@@ -320,6 +320,7 @@ export interface CreateRequestHandlerOptions extends PostGraphileOptions {
   // A Postgres client pool we use to connect Postgres clients.
   pgPool: Pool;
   _emitter: EventEmitter;
+  close: () => Promise<void>;
 }
 
 export interface GraphQLFormattedErrorExtended {
@@ -372,6 +373,7 @@ export interface HttpRequestHandler<
   faviconRouteHandler: ((res: PostGraphileResponse) => Promise<void>) | null;
   eventStreamRoute: string;
   eventStreamRouteHandler: ((res: PostGraphileResponse) => Promise<void>) | null;
+  close: Promise<void>;
 }
 
 /**

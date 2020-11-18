@@ -29,6 +29,7 @@ export interface PostgraphileSchemaBuilder<
   _emitter: EventEmitter;
   getGraphQLSchema: () => Promise<GraphQLSchema>;
   options: PostGraphileOptions<Request, Response>;
+  cancelWatch: null | (() => Promise<void>);
 }
 
 /**
@@ -43,18 +44,27 @@ export function getPostgraphileSchemaBuilder<
   pgPool: Pool,
   schema: string | Array<string>,
   incomingOptions: PostGraphileOptions<Request, Response>,
-  release: null | (() => void) = null,
+  releasePgPool: null | (() => void) = null,
 ): PostgraphileSchemaBuilder {
+  let cancelWatchFn: null | (() => Promise<void>) = null;
+  async function cancelWatch() {
+    if (cancelWatchFn) {
+      await cancelWatchFn();
+      cancelWatchFn = null;
+    }
+  }
+
   let released = false;
-  function releaseOnce() {
+  async function releaseOnce() {
     if (released) {
       throw new Error(
         'Already released this PostGraphile schema builder; should not have attempted a second release',
       );
     }
     released = true;
-    if (release) {
-      release();
+    await cancelWatch();
+    if (releasePgPool) {
+      releasePgPool();
     }
   }
   if (incomingOptions.live && incomingOptions.subscriptions == null) {
@@ -96,6 +106,7 @@ export function getPostgraphileSchemaBuilder<
     _emitter,
     getGraphQLSchema: () => (gqlSchema ? Promise.resolve(gqlSchema) : gqlSchemaPromise),
     options,
+    cancelWatch,
   };
 
   async function createGqlSchema(): Promise<GraphQLSchema> {
@@ -104,7 +115,10 @@ export function getPostgraphileSchemaBuilder<
     while (true) {
       try {
         if (options.watchPg) {
-          await watchPostGraphileSchema(pgPool, pgSchemas, options, newSchema => {
+          if (cancelWatchFn) {
+            throw new Error(`cancelWatchFn should not have been set at this point.`);
+          }
+          cancelWatchFn = await watchPostGraphileSchema(pgPool, pgSchemas, options, newSchema => {
             gqlSchema = newSchema;
             _emitter.emit('schemas:changed');
             exportGqlSchema(gqlSchema);
@@ -137,7 +151,7 @@ export function getPostgraphileSchemaBuilder<
             const diff = process.hrtime(start);
             const dur = diff[0] * 1e3 + diff[1] * 1e-6;
             if (!retry) {
-              releaseOnce();
+              await releaseOnce();
               throw error;
             } else {
               if (dur < 50) {
@@ -258,7 +272,7 @@ export default function postgraphile<
 
   // Do some things with `poolOrConfig` so that in the end, we actually get a
   // Postgres pool.
-  const { pgPool, release } = toPgPool(poolOrConfig);
+  const { pgPool, releasePgPool } = toPgPool(poolOrConfig);
 
   pgPool.on('error', err => {
     /*
@@ -278,18 +292,27 @@ export default function postgraphile<
     debugPgClient(pgClient, !!options.allowExplain);
   });
 
-  const { getGraphQLSchema, options, _emitter } = getPostgraphileSchemaBuilder<Request, Response>(
-    pgPool,
-    schema,
-    incomingOptions,
-    release,
-  );
+  const { getGraphQLSchema, options, _emitter, cancelWatch } = getPostgraphileSchemaBuilder<
+    Request,
+    Response
+  >(pgPool, schema, incomingOptions, releasePgPool);
+
+  async function close() {
+    if (cancelWatch) {
+      await cancelWatch();
+    }
+    if (releasePgPool) {
+      await releasePgPool();
+    }
+  }
+
   return createPostGraphileHttpRequestHandler({
     ...(typeof poolOrConfig === 'string' ? { ownerConnectionString: poolOrConfig } : {}),
     ...options,
     getGqlSchema: getGraphQLSchema,
     pgPool,
     _emitter,
+    close,
   });
 }
 
@@ -321,24 +344,24 @@ function constructorName(obj: mixed): string | null {
 }
 
 // tslint:disable-next-line no-any
-function toPgPool(poolOrConfig: any): { pgPool: Pool; release: null | (() => void) } {
+function toPgPool(poolOrConfig: any): { pgPool: Pool; releasePgPool: null | (() => void) } {
   if (quacksLikePgPool(poolOrConfig)) {
     // If it is already a `Pool`, just use it.
-    return { pgPool: poolOrConfig, release: null };
+    return { pgPool: poolOrConfig, releasePgPool: null };
   }
 
   if (typeof poolOrConfig === 'string') {
     // If it is a string, let us parse it to get a config to create a `Pool`.
     const pgPool = new Pool({ connectionString: poolOrConfig });
-    return { pgPool, release: () => pgPool.end() };
+    return { pgPool, releasePgPool: () => pgPool.end() };
   } else if (!poolOrConfig) {
     // Use an empty config and let the defaults take over.
     const pgPool = new Pool({});
-    return { pgPool, release: () => pgPool.end() };
+    return { pgPool, releasePgPool: () => pgPool.end() };
   } else if (isPlainObject(poolOrConfig)) {
     // The user handed over a configuration object, pass it through
     const pgPool = new Pool(poolOrConfig);
-    return { pgPool, release: () => pgPool.end() };
+    return { pgPool, releasePgPool: () => pgPool.end() };
   } else {
     throw new Error('Invalid connection string / Pool ');
   }
