@@ -4,7 +4,7 @@ import { getOperationAST, parse } from 'graphql';
 import GraphiQLExplorer from 'graphiql-explorer';
 import StorageAPI from 'graphiql/dist/utility/StorageAPI';
 import './postgraphiql.css';
-import { buildClientSchema, introspectionQuery, isType, GraphQLObjectType } from 'graphql';
+import { buildClientSchema, getIntrospectionQuery, isType, GraphQLObjectType } from 'graphql';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 import formatSQL from '../formatSQL';
 
@@ -357,7 +357,7 @@ class PostGraphiQL extends React.PureComponent {
     try {
       // Fetch the schema using our introspection query and report once that has
       // finished.
-      const { data } = await this.executeQuery({ query: introspectionQuery });
+      const { data } = await this.executeQuery({ query: getIntrospectionQuery() });
 
       // Use the data we got back from GraphQL to build a client schema (a
       // schema without resolvers).
