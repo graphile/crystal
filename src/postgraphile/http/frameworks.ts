@@ -67,8 +67,8 @@ type Headers = { [header: string]: string };
 export abstract class PostGraphileResponse {
   private _headers: Headers = {};
   private _body: Buffer | string | PassThrough | undefined;
-  private _setHeaders: boolean = false;
-  public statusCode: number = 200;
+  private _setHeaders = false;
+  public statusCode = 200;
 
   private _setHeadersOnce() {
     if (!this._setHeaders) {
