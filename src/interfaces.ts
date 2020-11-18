@@ -373,7 +373,7 @@ export interface HttpRequestHandler<
   faviconRouteHandler: ((res: PostGraphileResponse) => Promise<void>) | null;
   eventStreamRoute: string;
   eventStreamRouteHandler: ((res: PostGraphileResponse) => Promise<void>) | null;
-  release: Promise<void>;
+  release: () => Promise<void>;
 }
 
 /**
