@@ -75,7 +75,7 @@ export interface PostGraphileOptions<
   // may want to authenticate your users using sessions or similar. You can
   // pass some simple middlewares here that will be executed against the
   // websocket connection in order to perform authentication. We current only
-  // support express (not Koa) middlewares here.
+  // support Express (not Koa, Fastify, Restify, etc) middlewares here.
   /* @middlewareOnly */
   websocketMiddlewares?: Array<Middleware<Request, Response>>;
   // The default Postgres role to use. If no role was provided in a provided

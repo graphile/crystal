@@ -17,7 +17,6 @@ import { pluginHookFromOptions } from '../pluginHook';
 import { HttpRequestHandler, mixed, CreateRequestHandlerOptions } from '../../interfaces';
 import setupServerSentEvents from './setupServerSentEvents';
 import withPostGraphileContext from '../withPostGraphileContext';
-import { Context as KoaContext } from 'koa';
 import LRU from '@graphile/lru';
 
 import chalk from 'chalk';
@@ -54,7 +53,8 @@ import favicon from '../../assets/favicon.ico';
 import baseGraphiqlHtml from '../../assets/graphiql.html';
 import { enhanceHttpServerWithSubscriptions } from './subscriptions';
 import {
-  KoaNext,
+  CompatKoaContext,
+  CompatKoaNext,
   PostGraphileResponse,
   PostGraphileResponseKoa,
   PostGraphileResponseNode,
@@ -1066,8 +1066,8 @@ export default function createPostGraphileHttpRequestHandler(
     // `koa` middleware.
     if (isKoaApp(a, b)) {
       // Set the correct `koa` variable names…
-      const ctx = a as KoaContext;
-      const next = b as KoaNext;
+      const ctx = a as CompatKoaContext;
+      const next = b as CompatKoaNext;
       const responseHandler = new PostGraphileResponseKoa(ctx, next);
 
       // Execute our request handler. If an error is thrown, we don’t call
