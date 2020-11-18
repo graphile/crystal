@@ -120,6 +120,10 @@ export class PostGraphileResponseNode extends PostGraphileResponse {
     return this._res;
   }
 
+  getNextCallback() {
+    return this._next;
+  }
+
   setHeaders(statusCode: number, headers: Headers) {
     for (const key in headers) {
       if (Object.hasOwnProperty.call(headers, key)) {
@@ -222,6 +226,10 @@ export class PostGraphileResponseKoa extends PostGraphileResponse {
 
   getNodeServerResponse() {
     return this._ctx.res;
+  }
+
+  getNextCallback() {
+    return this._next;
   }
 
   setHeaders(statusCode: number, headers: Headers) {

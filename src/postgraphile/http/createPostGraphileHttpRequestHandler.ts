@@ -580,7 +580,20 @@ export default function createPostGraphileHttpRequestHandler(
     'eventStreamRouteHandler',
     async function eventStreamRouteHandler(res: PostGraphileResponse) {
       try {
-        const req = res.getNodeServerRequest();
+        // You can use this hook either to modify the incoming request or to tell
+        // PostGraphile not to handle the request further (return null). NOTE: if
+        // you return `null` from this hook then you are also responsible for
+        // terminating the request however your framework handles that (e.g.
+        // `res.send(...)` or `next()`).
+        const req = pluginHook(
+          'postgraphile:http:eventStreamRouteHandler',
+          res.getNodeServerRequest(),
+          { options, response: res },
+        );
+        if (req == null) {
+          return;
+        }
+
         // Add our CORS headers to be good web citizens (there are perf
         // implications though so be careful!)
         //
@@ -606,7 +619,19 @@ export default function createPostGraphileHttpRequestHandler(
   const faviconRouteHandler = neverReject('faviconRouteHandler', async function faviconRouteHandler(
     res: PostGraphileResponse,
   ) {
-    const req = res.getNodeServerRequest();
+    // You can use this hook either to modify the incoming request or to tell
+    // PostGraphile not to handle the request further (return null). NOTE: if
+    // you return `null` from this hook then you are also responsible for
+    // terminating the request however your framework handles that (e.g.
+    // `res.send(...)` or `next()`).
+    const req = pluginHook('postgraphile:http:faviconRouteHandler', res.getNodeServerRequest(), {
+      options,
+      response: res,
+    });
+    if (req == null) {
+      return;
+    }
+
     // If this is the wrong method, we should let the client know.
     if (!(req.method === 'GET' || req.method === 'HEAD')) {
       res.statusCode = req.method === 'OPTIONS' ? 200 : 405;
@@ -632,7 +657,19 @@ export default function createPostGraphileHttpRequestHandler(
   const graphiqlRouteHandler = neverReject(
     'graphiqlRouteHandler',
     async function graphiqlRouteHandler(res: PostGraphileResponse) {
-      const req = res.getNodeServerRequest();
+      // You can use this hook either to modify the incoming request or to tell
+      // PostGraphile not to handle the request further (return null). NOTE: if
+      // you return `null` from this hook then you are also responsible for
+      // terminating the request however your framework handles that (e.g.
+      // `res.send(...)` or `next()`).
+      const req = pluginHook('postgraphile:http:graphiqlRouteHandler', res.getNodeServerRequest(), {
+        options,
+        response: res,
+      });
+      if (req == null) {
+        return;
+      }
+
       if (firstRequestHandler) firstRequestHandler(req);
 
       // If using the incorrect method, let the user know.
@@ -671,7 +708,19 @@ export default function createPostGraphileHttpRequestHandler(
   const graphqlRouteHandler = neverReject('graphqlRouteHandler', async function graphqlRouteHandler(
     res: PostGraphileResponse,
   ) {
-    const req = res.getNodeServerRequest();
+    // You can use this hook either to modify the incoming request or to tell
+    // PostGraphile not to handle the request further (return null). NOTE: if
+    // you return `null` from this hook then you are also responsible for
+    // terminating the request however your framework handles that (e.g.
+    // `res.send(...)` or `next()`).
+    const req = pluginHook('postgraphile:http:graphqlRouteHandler', res.getNodeServerRequest(), {
+      options,
+      response: res,
+    });
+    if (req == null) {
+      return;
+    }
+
     if (firstRequestHandler) firstRequestHandler(req);
 
     // Add our CORS headers to be good web citizens (there are perf
