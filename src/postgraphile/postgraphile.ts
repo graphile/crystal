@@ -9,6 +9,7 @@ import { pluginHookFromOptions } from './pluginHook';
 import { PostGraphileOptions, mixed, HttpRequestHandler } from '../interfaces';
 import chalk from 'chalk';
 import { debugPgClient } from './withPostGraphileContext';
+import { ShutdownActions } from './shutdownActions';
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -270,9 +271,14 @@ export default function postgraphile<
     );
   }
 
+  const shutdownActions = new ShutdownActions();
+
   // Do some things with `poolOrConfig` so that in the end, we actually get a
   // Postgres pool.
   const { pgPool, releasePgPool } = toPgPool(poolOrConfig);
+  if (releasePgPool) {
+    shutdownActions.add(releasePgPool);
+  }
 
   pgPool.on('error', err => {
     /*
@@ -296,14 +302,8 @@ export default function postgraphile<
     Request,
     Response
   >(pgPool, schema, incomingOptions, releasePgPool);
-
-  async function release() {
-    if (releaseWatch) {
-      await releaseWatch();
-    }
-    if (releasePgPool) {
-      await releasePgPool();
-    }
+  if (releaseWatch) {
+    shutdownActions.add(releaseWatch);
   }
 
   return createPostGraphileHttpRequestHandler({
@@ -312,7 +312,7 @@ export default function postgraphile<
     getGqlSchema: getGraphQLSchema,
     pgPool,
     _emitter,
-    release,
+    release: async () => await shutdownActions.invokeAll(),
   });
 }
 
