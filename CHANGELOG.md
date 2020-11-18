@@ -3,7 +3,14 @@
 We use PostGraphile's GitHub releases tab to log our changes in detail, but
 this auto-generated changelog helps us to produce that list, and it may be
 helpful to you also.
-# [](https://github.com/graphile/graphile-engine/compare/v4.9.2...v) (2020-10-23)
+# [](https://github.com/graphile/graphile-engine/compare/v4.9.2...v) (2020-11-18)
+
+
+### Features
+
+* **deps:** support for GraphQL v15 ([#689](https://github.com/graphile/graphile-engine/issues/689)) ([3e7f98f](https://github.com/graphile/graphile-engine/commit/3e7f98f8f9582501344bab7ac2d20fc1af065ce7))
+* **pg:** support domain constrained composite types ([#615](https://github.com/graphile/graphile-engine/issues/615)) ([215f5cf](https://github.com/graphile/graphile-engine/commit/215f5cf22b53fd979ea62c0ef3a25aec6846e1ee))
+* **pubsub:** add maxListeners to subscription eventEmitter ([#688](https://github.com/graphile/graphile-engine/issues/688)) ([576177f](https://github.com/graphile/graphile-engine/commit/576177f7f85e4462c330f5d3f1e37421dedf8f5a))
 
 
 
