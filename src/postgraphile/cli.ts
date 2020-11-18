@@ -529,17 +529,19 @@ if (!['omit', 'only', 'deprecated'].includes(rawLegacyRelations)) {
 }
 
 // Validate websockets argument
-if (
-  // must be array
-  !Array.isArray(websockets) ||
-  // empty array = 'none'
-  !websockets.length ||
-  // array can only hold the versions
-  websockets.some(ver => !['v0', 'v1'].includes(ver))
-) {
-  exitWithErrorMessage(
-    `Invalid argument to '--websockets' - expected 'v0' and/or 'v1' (separated by comma); but received '${websockets}'`,
-  );
+if (websockets) {
+  if (
+    // must be array
+    !Array.isArray(websockets) ||
+    // empty array = 'none'
+    !websockets.length ||
+    // array can only hold the versions
+    websockets.some(ver => !['v0', 'v1'].includes(ver))
+  ) {
+    exitWithErrorMessage(
+      `Invalid argument to '--websockets' - expected 'v0' and/or 'v1' (separated by comma); but received '${websockets}'`,
+    );
+  }
 }
 
 const noServer = !yesServer;
@@ -815,7 +817,7 @@ if (noServer) {
       server.timeout = serverTimeout;
     }
 
-    if (websockets.length) {
+    if (websockets?.length) {
       enhanceHttpServerWithWebSockets(server, middleware);
     }
 
