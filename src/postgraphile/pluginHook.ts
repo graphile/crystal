@@ -9,6 +9,7 @@ import { WithPostGraphileContextFn } from './withPostGraphileContext';
 import { version } from '../../package.json';
 import * as graphql from 'graphql';
 import * as graphqlWs from 'graphql-ws';
+import { Extra as GraphQLWSContextExtra } from 'graphql-ws/lib/use/ws';
 import { ExecutionParams } from 'subscriptions-transport-ws';
 
 // tslint:disable-next-line no-any
@@ -65,7 +66,7 @@ export interface PostGraphilePlugin {
       document: graphql.DocumentNode | null; // optional for persisted query support
     },
     {
-      context: graphqlWs.Context;
+      context: graphqlWs.Context<GraphQLWSContextExtra>;
       message: graphqlWs.SubscribeMessage;
       options: CreateRequestHandlerOptions;
     }
