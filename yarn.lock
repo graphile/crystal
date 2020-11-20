@@ -4770,12 +4770,10 @@ graphql-parse-resolve-info@4.9.0:
     debug "^4.1.1"
     tslib "^2.0.1"
 
-graphql-ws@^1.14.0:
-  version "1.14.0"
-  resolved "https://registry.yarnpkg.com/graphql-ws/-/graphql-ws-1.14.0.tgz#80f4ccadfd637fa3a9db2d6058165140b278c03f"
-  integrity sha512-cZ7ly3m6Wj1PiP8dydEqy9X5QO8UxeqvHDAAEGBRWZWHVGPmIoDWAT9Lj3uFXP+H9bTfmt8K6qIu0fsUDb3kHQ==
-  dependencies:
-    ws "^7.4.0"
+graphql-ws@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/graphql-ws/-/graphql-ws-2.0.0.tgz#77905589c3b4b13c66d07ba0345d864b4e79f545"
+  integrity sha512-8mueXeT7PswGeh/LObzKSYij+uD0FMGrvanHNaHuuUaiCfzqzc1ReflhEhzpS6bo4rxzK8L4aZtJ9Ci3hFQnIw==
 
 "graphql@>=0.9 <0.14 || ^14.0.2", "graphql@^0.6.0 || ^0.7.0 || ^0.8.0-b || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.2":
   version "14.7.0"
@@ -9947,11 +9945,6 @@ ws@^6.1.3:
   integrity sha512-GIyAXC2cB7LjvpgMt9EKS2ldqr0MTrORaleiOno6TweZ6r3TKtoFQWay/2PceJ3RuBasOHzXNn5Lrw1X0bEjqA==
   dependencies:
     async-limiter "~1.0.0"
-
-ws@^7.4.0:
-  version "7.4.0"
-  resolved "https://registry.yarnpkg.com/ws/-/ws-7.4.0.tgz#a5dd76a24197940d4a8bb9e0e152bb4503764da7"
-  integrity sha512-kyFwXuV/5ymf+IXhS6f0+eAFvydbaBW3zjpT6hUdAh/hbVjTIB5EHBGi0bPoCLSK2wcuz3BrEkB9LrYv1Nm4NQ==
 
 xdg-basedir@^4.0.0:
   version "4.0.0"

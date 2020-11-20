@@ -13,7 +13,7 @@ import {
 } from 'graphql';
 import * as WebSocket from 'ws';
 import { SubscriptionServer, ConnectionContext, ExecutionParams } from 'subscriptions-transport-ws';
-import { createServer } from 'graphql-ws';
+import { useServer } from 'graphql-ws/lib/use/ws';
 import parseUrl = require('parseurl');
 import { pluginHookFromOptions } from '../pluginHook';
 import { isEmpty } from './createPostGraphileHttpRequestHandler';
@@ -325,7 +325,7 @@ export async function enhanceHttpServerWithWebSockets<
     } else {
       // v1
       v1Wss = new WebSocket.Server({ noServer: true });
-      createServer(
+      useServer(
         {
           schema,
           execute:
@@ -336,12 +336,12 @@ export async function enhanceHttpServerWithWebSockets<
                 },
           subscribe: options.live ? liveSubscribe : graphqlSubscribe,
           onConnect(ctx) {
-            const { socket, request, connectionParams } = ctx;
+            const { socket, request } = ctx.extra;
             socket['postgraphileId'] = ++socketId;
             socket['__postgraphileReq'] = request;
 
-            const normalizedConnectionParams = lowerCaseKeys(connectionParams || {});
-            request['connectionParams'] = connectionParams || {};
+            const normalizedConnectionParams = lowerCaseKeys(ctx.connectionParams || {});
+            request['connectionParams'] = ctx.connectionParams || {};
             request['normalizedConnectionParams'] = normalizedConnectionParams;
 
             if (!request.headers.authorization && normalizedConnectionParams['authorization']) {
@@ -362,7 +362,7 @@ export async function enhanceHttpServerWithWebSockets<
             };
           },
           async onSubscribe(ctx, msg) {
-            const context = await getContext(ctx.socket, msg.id);
+            const context = await getContext(ctx.extra.socket, msg.id);
 
             // Override schema (for --watch)
             const schema = await getGraphQLSchema();
@@ -400,7 +400,7 @@ export async function enhanceHttpServerWithWebSockets<
             // You are strongly encouraged to use
             // `postgraphile:validationRules:static` if possible - you should
             // only use this one if you need access to variables.
-            const { req, res } = await reqResFromSocket(ctx.socket);
+            const { req, res } = await reqResFromSocket(ctx.extra.socket);
             const moreValidationRules = pluginHook('postgraphile:validationRules', [], {
               options,
               req,
@@ -426,20 +426,20 @@ export async function enhanceHttpServerWithWebSockets<
           },
           async onError(ctx, msg, errors) {
             // errors returned from onSubscribe
-            releaseContextForSocketAndOpId(ctx.socket, msg.id);
-            const { req, res } = await reqResFromSocket(ctx.socket);
+            releaseContextForSocketAndOpId(ctx.extra.socket, msg.id);
+            const { req, res } = await reqResFromSocket(ctx.extra.socket);
             return handleErrors(errors, req, res);
           },
           async onNext(ctx, _msg, _args, result) {
             if (result.errors) {
               // operation execution errors
-              const { req, res } = await reqResFromSocket(ctx.socket);
+              const { req, res } = await reqResFromSocket(ctx.extra.socket);
               result.errors = handleErrors(result.errors, req, res);
               return result;
             }
           },
-          onComplete({ socket }, msg) {
-            releaseContextForSocketAndOpId(socket, msg.id);
+          onComplete(ctx, msg) {
+            releaseContextForSocketAndOpId(ctx.extra.socket, msg.id);
           },
         },
         v1Wss,
