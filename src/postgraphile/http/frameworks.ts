@@ -9,17 +9,17 @@ import type { IncomingMessage, ServerResponse } from 'http';
 // however, we don't want people to have to install fastify to get these types,
 // so we're going to do rough approximations of them. Care should be taken to
 // keep these compatible with the official fastify types.
-export type CompatFastifyReply = {
+export interface CompatFastifyReply {
   raw: ServerResponse; // TODO:v5: | Http2ServerResponse;
   status(statusCode: number): CompatFastifyReply;
   headers(values: { [key: string]: any }): CompatFastifyReply;
   send(payload?: any): CompatFastifyReply;
-};
-export type CompatFastifyRequest = {
+}
+export interface CompatFastifyRequest {
   raw: IncomingMessage; // TODO:v5: | Http2ServerRequest;
   body: unknown;
   readonly headers: { [key: string]: unknown };
-};
+}
 /******************************************************************************/
 
 /******************************************************************************/
@@ -30,11 +30,11 @@ export type CompatFastifyRequest = {
 // however, we don't want people to have to install koa to get these types,
 // so we're going to do rough approximations of them. Care should be taken to
 // keep these compatible with the official koa types.
-export type CompatKoaContext = {
+export interface CompatKoaContext {
   [key: string]: any;
   req: IncomingMessage;
   res: ServerResponse;
-};
+}
 /******************************************************************************/
 
 declare module 'http' {
