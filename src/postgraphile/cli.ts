@@ -10,6 +10,7 @@
  */
 import config from './postgraphilerc';
 
+import * as os from 'os';
 import { createServer } from 'http';
 import chalk from 'chalk';
 import program = require('commander');
@@ -854,7 +855,7 @@ if (noServer) {
                 postgraphileOptions.live ||
                 postgraphileOptions.subscriptions
                   ? ''
-                  : ` (enhance with '--enhance-graphiql')`),
+                  : ` (${chalk.bold('RECOMMENDATION')}: add '--enhance-graphiql')`),
             `Postgres connection: ${chalk.underline.magenta(safeConnectionString)}${
               postgraphileOptions.watchPg ? ' (watching)' : ''
             }`,
@@ -862,6 +863,7 @@ if (noServer) {
             `Documentation:       ${chalk.underline(
               `https://graphile.org/postgraphile/introduction/`,
             )}`,
+            `Node.js version:     ${process.version} on ${os.platform()} ${os.arch()}`,
             extractedPlugins.length === 0
               ? `Join ${chalk.bold(
                   sponsor,
