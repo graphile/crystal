@@ -13,6 +13,7 @@ import {
 } from 'graphql';
 import * as WebSocket from 'ws';
 import { SubscriptionServer, ConnectionContext, ExecutionParams } from 'subscriptions-transport-ws';
+import { GRAPHQL_TRANSPORT_WS_PROTOCOL } from 'graphql-ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
 import parseUrl = require('parseurl');
 import { pluginHookFromOptions } from '../pluginHook';
@@ -465,15 +466,15 @@ export async function enhanceHttpServerWithWebSockets<
       const protocols = Array.isArray(protocol)
         ? protocol
         : protocol?.split(',').map(p => p.trim());
-      if (v0Wss && protocols?.includes('graphql-ws')) {
-        const wss = v0Wss;
-        wss.handleUpgrade(req, socket, head, ws => {
-          wss.emit('connection', ws, req);
-        });
-      } else if (v1Wss) {
-        // v1 will welcome its own subprotocol `graphql-transport-ws`
-        // and gracefully reject invalid ones
-        const wss = v1Wss;
+
+      const wss =
+        protocols?.includes('graphql-ws') && !protocols.includes(GRAPHQL_TRANSPORT_WS_PROTOCOL)
+          ? v0Wss
+          : // v1 will welcome its own subprotocol `graphql-transport-ws`
+            // and gracefully reject invalid ones. if the client supports
+            // both v0 and v1, v1 will prevail
+            v1Wss;
+      if (wss) {
         wss.handleUpgrade(req, socket, head, ws => {
           wss.emit('connection', ws, req);
         });
