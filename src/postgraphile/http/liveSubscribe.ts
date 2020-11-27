@@ -25,7 +25,7 @@ type mixed = any;
 
 export default function liveSubscribe(
   argsOrSchema: any | GraphQLSchema,
-  document: DocumentNode,
+  document?: DocumentNode,
   rootValue?: any,
   contextValue?: any,
   variableValues?: { [key: string]: any },
@@ -48,7 +48,7 @@ export default function liveSubscribe(
       )
     : liveSubscribeImpl(
         argsOrSchema,
-        document,
+        document as DocumentNode,
         rootValue,
         contextValue,
         variableValues,

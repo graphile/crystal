@@ -25,7 +25,7 @@ import debugFactory = require('debug');
 import { mixed } from '../interfaces';
 import * as manifest from '../../package.json';
 import sponsors = require('../../sponsors.json');
-import { enhanceHttpServerWithSubscriptions } from './http/subscriptions';
+import { enhanceHttpServerWithWebSockets } from './http/subscriptions';
 import { existsSync } from 'fs';
 
 const tagsFile = process.cwd() + '/postgraphile.tags.json5';
@@ -118,7 +118,16 @@ program
   )
   .option(
     '-S, --subscriptions',
-    'Enable GraphQL websocket transport support for subscriptions (you still need a subscriptions plugin currently)',
+    'Enable GraphQL support for subscriptions (you still need a subscriptions plugin currently)',
+  )
+  .option(
+    '--websockets <string>',
+    "Choose which websocket transport libraries to use. Use commas to define multiple. Defaults to '[v0, v1]' if `--subscriptions` was passed, '[]' otherwise",
+    (option: string) => option.split(','),
+  )
+  .option(
+    '--websocket-operations <operations>',
+    "Toggle which GraphQL websocket transport operations are supported: 'subscriptions' or 'all'. Defaults to 'subscriptions'",
   )
   .option(
     '-L, --live',
@@ -426,6 +435,7 @@ const {
   connection: pgConnectionString,
   ownerConnection,
   subscriptions,
+  websockets = subscriptions ? ['v0', 'v1'] : [],
   live,
   watch: watchPg,
   schema: dbSchema,
@@ -517,6 +527,20 @@ if (!['omit', 'only', 'deprecated'].includes(rawLegacyRelations)) {
   );
 } else {
   legacyRelations = rawLegacyRelations;
+}
+
+// Validate websockets argument
+if (
+  // must be array
+  !Array.isArray(websockets) ||
+  // empty array = 'none'
+  (websockets.length &&
+    // array can only hold the versions
+    websockets.some(ver => !['v0', 'v1'].includes(ver)))
+) {
+  exitWithErrorMessage(
+    `Invalid argument to '--websockets' - expected 'v0' and/or 'v1' (separated by comma); but received '${websockets}'`,
+  );
 }
 
 const noServer = !yesServer;
@@ -792,8 +816,8 @@ if (noServer) {
       server.timeout = serverTimeout;
     }
 
-    if (postgraphileOptions.subscriptions) {
-      enhanceHttpServerWithSubscriptions(server, middleware);
+    if (websockets.length) {
+      enhanceHttpServerWithWebSockets(server, middleware);
     }
 
     pluginHook('cli:server:created', server, {

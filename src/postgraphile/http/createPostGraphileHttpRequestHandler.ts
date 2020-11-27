@@ -51,7 +51,7 @@ import favicon from '../../assets/favicon.ico';
  * will use a regular expression to replace some variables.
  */
 import baseGraphiqlHtml from '../../assets/graphiql.html';
-import { enhanceHttpServerWithSubscriptions } from './subscriptions';
+import { enhanceHttpServerWithWebSockets } from './subscriptions';
 import {
   CompatKoaContext,
   CompatKoaNext,
@@ -172,6 +172,7 @@ export default function createPostGraphileHttpRequestHandler(
   options: CreateRequestHandlerOptions,
 ): HttpRequestHandler {
   const MEGABYTE = 1024 * 1024;
+  const subscriptions = !!options.subscriptions;
   const {
     getGqlSchema,
     pgPool,
@@ -183,8 +184,8 @@ export default function createPostGraphileHttpRequestHandler(
     watchPg,
     disableQueryLog,
     enableQueryBatching,
+    websockets = subscriptions ? ['v0', 'v1'] : [],
   } = options;
-  const subscriptions = !!options.subscriptions;
   const live = !!options.live;
   const enhanceGraphiql =
     options.enhanceGraphiql === false ? false : !!options.enhanceGraphiql || subscriptions || live;
@@ -200,6 +201,18 @@ export default function createPostGraphileHttpRequestHandler(
   let externalUrlBase = options.externalUrlBase;
   if (externalUrlBase && externalUrlBase.endsWith('/')) {
     throw new Error('externalUrlBase must not end with a slash (`/`)');
+  }
+
+  // Validate websockets argument
+  if (
+    // must be array
+    !Array.isArray(websockets) ||
+    // empty array = 'none'
+    (websockets.length &&
+      // array can only hold the versions
+      websockets.some(ver => !['v0', 'v1'].includes(ver)))
+  ) {
+    throw new Error(`Invalid value for \`websockets\` option: '${websockets}'`);
   }
 
   const pluginHook = pluginHookFromOptions(options);
@@ -425,7 +438,8 @@ export default function createPostGraphileHttpRequestHandler(
               ? externalEventStreamRoute || `${externalUrlBase}${eventStreamRoute}`
               : null,
             enhanceGraphiql,
-            subscriptions,
+            // if 'v1' websockets are included, use the v1 client always
+            websockets: !websockets.length ? 'none' : websockets.includes('v1') ? 'v1' : 'v0',
             allowExplain:
               typeof options.allowExplain === 'function'
                 ? ALLOW_EXPLAIN_PLACEHOLDER
@@ -435,17 +449,19 @@ export default function createPostGraphileHttpRequestHandler(
         )
       : null;
 
-    if (subscriptions) {
+    if (websockets.length) {
       const server = req && req.connection && req.connection['server'];
       if (!server) {
         // tslint:disable-next-line no-console
         console.warn(
-          "Failed to find server to add websocket listener to, you'll need to call `enhanceHttpServerWithSubscriptions` manually",
+          "Failed to find server to add websocket listener to, you'll need to call `enhanceHttpServerWithWebSockets` manually",
         );
       } else {
         // Relying on this means that a normal request must come in before an
         // upgrade attempt. It's better to call it manually.
-        enhanceHttpServerWithSubscriptions(server, middleware, { graphqlRoute: graphqlRouteForWs });
+        enhanceHttpServerWithWebSockets(server, middleware, {
+          graphqlRoute: graphqlRouteForWs,
+        });
       }
     }
   };
