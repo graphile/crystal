@@ -16,7 +16,7 @@ const middleware = postgraphile(database, schemas, {
     return {
       'graphile.test.x-user-id':
         // In GraphiQL, open console and enter `document.cookie = "userId=3"` to become user 3.
-        req._fastifyRequest?.cookies.userId ||
+        (req._fastifyRequest as FastifyRequest)?.cookies.userId ||
         // `normalizedConnectionParams` comes from websocket connections, where
         // the headers often cannot be customized by the client.
         (req as any).normalizedConnectionParams?.['x-user-id'],
@@ -85,7 +85,7 @@ if (middleware.options.watchPg) {
 
 fastify.listen(port, (err, address) => {
   if (err) {
-    fastify.log.error(err);
+    fastify.log.error(String(err));
     process.exit(1);
   }
   fastify.log.info(`PostGraphiQL available at ${address}${middleware.graphiqlRoute} 🚀`);

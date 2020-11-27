@@ -1,9 +1,9 @@
 import { AddFlagFn } from './cli';
 import { Server, IncomingMessage } from 'http';
 import {
+  CreateRequestHandlerOptions,
   HttpRequestHandler,
   PostGraphileOptions,
-  CreateRequestHandlerOptions,
 } from '../interfaces';
 import { WithPostGraphileContextFn } from './withPostGraphileContext';
 import { version } from '../../package.json';
@@ -11,6 +11,7 @@ import * as graphql from 'graphql';
 import * as graphqlWs from 'graphql-ws';
 import { Extra as GraphQLWSContextExtra } from 'graphql-ws/lib/use/ws';
 import { ExecutionParams } from 'subscriptions-transport-ws';
+import { PostGraphileResponse } from './http/frameworks';
 
 // tslint:disable-next-line no-any
 export type HookFn<TArg, TContext = any> = (arg: TArg, context: TContext) => TArg;
@@ -31,7 +32,7 @@ export interface PostGraphileHTTPEnd {
   result: Record<string, any> | Array<Record<string, any>>;
 }
 export interface PostGraphilePlugin {
-  init?: HookFn<null>;
+  init?: HookFn<null, { version: string; graphql: typeof import('graphql') }>;
 
   pluginHook?: HookFn<PluginHookFn>;
 
@@ -54,12 +55,38 @@ export interface PostGraphilePlugin {
   'postgraphile:options'?: HookFn<PostGraphileOptions>;
   'postgraphile:validationRules:static'?: HookFn<typeof graphql.specifiedRules>;
   'postgraphile:graphiql:html'?: HookFn<string>;
+
+  // Wrap the middleware:
+  'postgraphile:middleware'?: HookFn<HttpRequestHandler>;
+
+  // Inside the middleware:
   'postgraphile:http:handler'?: HookFn<IncomingMessage>;
+
+  // Inside the route handlers (including via middleware):
+  'postgraphile:http:eventStreamRouteHandler'?: HookFn<
+    IncomingMessage,
+    { options: CreateRequestHandlerOptions; response: PostGraphileResponse }
+  >;
+  'postgraphile:http:faviconRouteHandler'?: HookFn<
+    IncomingMessage,
+    { options: CreateRequestHandlerOptions; response: PostGraphileResponse }
+  >;
+  'postgraphile:http:graphiqlRouteHandler'?: HookFn<
+    IncomingMessage,
+    { options: CreateRequestHandlerOptions; response: PostGraphileResponse }
+  >;
+  'postgraphile:http:graphqlRouteHandler'?: HookFn<
+    IncomingMessage,
+    { options: CreateRequestHandlerOptions; response: PostGraphileResponse }
+  >;
+
+  // Deep inside the graphqlRouteHandler (including via middleware)
   'postgraphile:http:result'?: HookFn<PostGraphileHTTPResult>;
   'postgraphile:http:end'?: HookFn<PostGraphileHTTPEnd>;
   'postgraphile:httpParamsList'?: HookFn<Array<Record<string, any>>>;
+
   'postgraphile:validationRules'?: HookFn<typeof graphql.specifiedRules>; // AVOID THIS where possible; use 'postgraphile:validationRules:static' instead.
-  'postgraphile:middleware'?: HookFn<HttpRequestHandler>;
+
   'postgraphile:ws:onOperation'?: HookFn<ExecutionParams>;
   'postgraphile:ws:onSubscribe'?: HookFn<
     graphql.ExecutionArgs & {

@@ -1,17 +1,62 @@
-import { IncomingMessage, ServerResponse } from 'http';
 import { PassThrough, Stream } from 'stream';
-import type { Context as KoaContext } from 'koa';
-import type { FastifyReply, FastifyRequest } from 'fastify';
+import type { IncomingMessage, ServerResponse } from 'http';
+
+/******************************************************************************/
+// Really we want:
+//
+//    import type { FastifyReply, FastifyRequest } from 'fastify';
+//
+// however, we don't want people to have to install fastify to get these types,
+// so we're going to do rough approximations of them. Care should be taken to
+// keep these compatible with the official fastify types.
+export interface CompatFastifyReply {
+  raw: ServerResponse; // TODO:v5: | Http2ServerResponse;
+  status(statusCode: number): CompatFastifyReply;
+  headers(values: { [key: string]: any }): CompatFastifyReply;
+  send(payload?: any): CompatFastifyReply;
+}
+export interface CompatFastifyRequest {
+  raw: IncomingMessage; // TODO:v5: | Http2ServerRequest;
+  body: unknown;
+  readonly headers: { [key: string]: unknown };
+}
+/******************************************************************************/
+
+/******************************************************************************/
+// Really we want:
+//
+//     import type { Context as KoaContext } from 'koa';
+//
+// however, we don't want people to have to install koa to get these types,
+// so we're going to do rough approximations of them. Care should be taken to
+// keep these compatible with the official koa types.
+export interface CompatKoaContext {
+  [key: string]: any;
+  req: IncomingMessage;
+  res: ServerResponse;
+}
+/******************************************************************************/
 
 declare module 'http' {
   interface IncomingMessage {
-    _koaCtx?: KoaContext;
-    _fastifyRequest?: FastifyRequest;
+    _koaCtx?: CompatKoaContext;
+    _fastifyRequest?: CompatFastifyRequest;
     _body?: boolean;
     body?: any;
     originalUrl?: string;
   }
 }
+/* TODO:v5:
+declare module 'http2' {
+  interface Http2ServerRequest {
+    _koaCtx?: CompatKoaContext;
+    _fastifyRequest?: CompatFastifyRequest;
+    _body?: boolean;
+    body?: any;
+    originalUrl?: string;
+  }
+}
+*/
 
 type Headers = { [header: string]: string };
 
@@ -22,8 +67,8 @@ type Headers = { [header: string]: string };
 export abstract class PostGraphileResponse {
   private _headers: Headers = {};
   private _body: Buffer | string | PassThrough | undefined;
-  private _setHeaders: boolean = false;
-  public statusCode: number = 200;
+  private _setHeaders = false;
+  public statusCode = 200;
 
   private _setHeadersOnce() {
     if (!this._setHeaders) {
@@ -91,8 +136,8 @@ export abstract class PostGraphileResponse {
   /**
    * Returns the `res` object that the underlying HTTP server would have.
    */
-  public abstract getNodeServerRequest(): IncomingMessage;
-  public abstract getNodeServerResponse(): ServerResponse;
+  public abstract getNodeServerRequest(): IncomingMessage; // TODO:v5: | Http2ServerRequest;
+  public abstract getNodeServerResponse(): ServerResponse; // TODO:v5: | Http2ServerResponse;
   public abstract setHeaders(statusCode: number, headers: Headers): void;
   public abstract setBody(body: Stream | Buffer | string | undefined): void;
 }
@@ -118,6 +163,10 @@ export class PostGraphileResponseNode extends PostGraphileResponse {
 
   getNodeServerResponse() {
     return this._res;
+  }
+
+  getNextCallback() {
+    return this._next;
   }
 
   setHeaders(statusCode: number, headers: Headers) {
@@ -187,16 +236,16 @@ export class PostGraphileResponseNode extends PostGraphileResponse {
   }
 }
 
-export type KoaNext = (error?: Error) => Promise<any>;
+export type CompatKoaNext = (error?: Error) => Promise<any>;
 
 /**
  * Suitable for Koa.
  */
 export class PostGraphileResponseKoa extends PostGraphileResponse {
-  private _ctx: KoaContext;
-  private _next: KoaNext;
+  private _ctx: CompatKoaContext;
+  private _next: CompatKoaNext;
 
-  constructor(ctx: KoaContext, next: KoaNext) {
+  constructor(ctx: CompatKoaContext, next: CompatKoaNext) {
     super();
     this._ctx = ctx;
     this._next = next;
@@ -222,6 +271,10 @@ export class PostGraphileResponseKoa extends PostGraphileResponse {
 
   getNodeServerResponse() {
     return this._ctx.res;
+  }
+
+  getNextCallback() {
+    return this._next;
   }
 
   setHeaders(statusCode: number, headers: Headers) {
@@ -251,10 +304,10 @@ export class PostGraphileResponseKoa extends PostGraphileResponse {
  * approach for Fastify v2)
  */
 export class PostGraphileResponseFastify3 extends PostGraphileResponse {
-  private _request: FastifyRequest;
-  private _reply: FastifyReply;
+  private _request: CompatFastifyRequest;
+  private _reply: CompatFastifyReply;
 
-  constructor(request: FastifyRequest, reply: FastifyReply) {
+  constructor(request: CompatFastifyRequest, reply: CompatFastifyReply) {
     super();
     this._request = request;
     this._reply = reply;

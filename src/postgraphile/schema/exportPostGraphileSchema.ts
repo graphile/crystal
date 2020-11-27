@@ -1,13 +1,13 @@
 import { readFile as origReadFile, writeFile as origWriteFile } from 'fs';
-import {
-  graphql,
-  GraphQLSchema,
-  introspectionQuery,
-  printSchema,
-  lexicographicSortSchema,
-} from 'graphql';
+import { graphql, GraphQLSchema, printSchema, lexicographicSortSchema } from 'graphql';
+import * as GQL from 'graphql';
 import { PostGraphileOptions } from '../../interfaces';
 import { promisify } from 'util';
+
+const introspectionQuery =
+  typeof GQL.getIntrospectionQuery === 'function'
+    ? GQL.getIntrospectionQuery()
+    : (GQL as any).introspectionQuery;
 
 const readFile = promisify(origReadFile);
 const writeFile = promisify(origWriteFile);

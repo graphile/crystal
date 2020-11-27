@@ -8,6 +8,33 @@ to you also.
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
+# [4.10.0](https://github.com/graphile/postgraphile/compare/v4.10.0-alpha.0...v4.10.0) (2020-11-27)
+
+### Bug Fixes
+
+- **types:** use interface to enable declaration merging ([#1404](https://github.com/graphile/postgraphile/issues/1404)) ([06d4196](https://github.com/graphile/postgraphile/commit/06d4196f52599a8aa557863a27e17157df1205d2))
+
+### Features
+
+- add Node version info and clarify enhance-graphiql ([#1401](https://github.com/graphile/postgraphile/issues/1401)) ([aa7f4f9](https://github.com/graphile/postgraphile/commit/aa7f4f9f34561d79cc12882e3913323c372accb6))
+
+# [4.10.0-alpha.0](https://github.com/graphile/postgraphile/compare/v4.9.2...v4.10.0-alpha.0) (2020-11-18)
+
+### Bug Fixes
+
+- **types:** replace explicit framework types with stubs ([#1391](https://github.com/graphile/postgraphile/issues/1391)) ([219a318](https://github.com/graphile/postgraphile/commit/219a31891ee07a3c2a112291060328a19b230c4d))
+- don't compress event stream in Fastify ([#1374](https://github.com/graphile/postgraphile/issues/1374)) ([1f3919f](https://github.com/graphile/postgraphile/commit/1f3919fa94e5f23d68a1971e495de7bf8974f7b7))
+- remove optional chaining ([#1376](https://github.com/graphile/postgraphile/issues/1376)) ([7dde41d](https://github.com/graphile/postgraphile/commit/7dde41da9204bbd381c20e5783439118650fccd2))
+
+### Features
+
+- **deps:** GraphQL 15 support; upgrade engine ([#1393](https://github.com/graphile/postgraphile/issues/1393)) ([eb1d1a6](https://github.com/graphile/postgraphile/commit/eb1d1a61de6f4fcae3032eeebe484a9ecf28e4d0))
+- hooks for route handlers ([#1389](https://github.com/graphile/postgraphile/issues/1389)) ([aeb41de](https://github.com/graphile/postgraphile/commit/aeb41de19037e2cc44a0ce7b15a41cd1e957983f))
+- **graphiql:** add configurable credentials behavior ([#1388](https://github.com/graphile/postgraphile/issues/1388)) ([61da7e3](https://github.com/graphile/postgraphile/commit/61da7e3ee25479aae769c5d524d7878bab1f1505))
+- allow access to Fastify request from Node request ([#1385](https://github.com/graphile/postgraphile/issues/1385)) ([a3cd8b8](https://github.com/graphile/postgraphile/commit/a3cd8b8f3a8d91401b47832c1f202b43f1f5aa57))
+- HTTP server overhaul, improved framework support ([#1361](https://github.com/graphile/postgraphile/issues/1361)) ([317aa40](https://github.com/graphile/postgraphile/commit/317aa40db1ffff7304110e6d377ef6462cb48215))
+- upgrade GraphiQL/GraphiQL Explorer ([#1377](https://github.com/graphile/postgraphile/issues/1377)) ([0152244](https://github.com/graphile/postgraphile/commit/01522447342ff01f33c1c604c7b5d9b1b161eb2b))
+
 ## [4.9.2](https://github.com/graphile/postgraphile/compare/v4.9.1...v4.9.2) (2020-10-23)
 
 ### Bug Fixes
