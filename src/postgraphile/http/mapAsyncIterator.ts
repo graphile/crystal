@@ -62,7 +62,7 @@ export default function mapAsyncIterator<T, U>(
       }
       return Promise.reject(error).catch(abruptClose);
     },
-    // @ts-expect-error: `$$asyncIterator` will use `Symbol.asyncIterator` if supported
+    // @ts-ignore TypeScript doesn't seem to understand that this is really `Symbol.asyncIterator`
     [$$asyncIterator]() {
       return this;
     },
