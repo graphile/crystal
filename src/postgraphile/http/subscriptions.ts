@@ -443,7 +443,16 @@ export async function enhanceHttpServerWithWebSockets<
           },
         },
         v1Wss,
-        subscriptionServerOptions?.keepAlive,
+        /*
+         * Heroku times out after 55s:
+         *   https://devcenter.heroku.com/articles/error-codes#h15-idle-connection
+         *
+         * GraphQL Playground times out after 20s:
+         *   https://github.com/prisma/graphql-playground/blob/fa91e1b6d0488e6b5563d8b472682fe728ee0431/packages/graphql-playground-react/src/state/sessions/fetchingSagas.ts#L81
+         *
+         * Pick a number under these ceilings.
+         */
+        subscriptionServerOptions?.keepAlive, // default is 12 seconds
       );
     }
   }
