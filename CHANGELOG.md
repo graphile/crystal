@@ -8,6 +8,16 @@ to you also.
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
+# [4.10.0](https://github.com/graphile/postgraphile/compare/v4.10.0-alpha.0...v4.10.0) (2020-11-27)
+
+### Bug Fixes
+
+- **types:** use interface to enable declaration merging ([#1404](https://github.com/graphile/postgraphile/issues/1404)) ([06d4196](https://github.com/graphile/postgraphile/commit/06d4196f52599a8aa557863a27e17157df1205d2))
+
+### Features
+
+- add Node version info and clarify enhance-graphiql ([#1401](https://github.com/graphile/postgraphile/issues/1401)) ([aa7f4f9](https://github.com/graphile/postgraphile/commit/aa7f4f9f34561d79cc12882e3913323c372accb6))
+
 # [4.10.0-alpha.0](https://github.com/graphile/postgraphile/compare/v4.9.2...v4.10.0-alpha.0) (2020-11-18)
 
 ### Bug Fixes
