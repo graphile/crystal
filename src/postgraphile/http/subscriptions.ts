@@ -468,7 +468,7 @@ export async function enhanceHttpServerWithWebSockets<
         : protocol?.split(',').map(p => p.trim());
 
       const wss =
-        protocols?.includes('graphql-ws') && !protocols.includes(GRAPHQL_TRANSPORT_WS_PROTOCOL)
+        v0Wss && protocols?.includes('graphql-ws') && !protocols.includes(GRAPHQL_TRANSPORT_WS_PROTOCOL)
           ? v0Wss
           : // v1 will welcome its own subprotocol `graphql-transport-ws`
             // and gracefully reject invalid ones. if the client supports
