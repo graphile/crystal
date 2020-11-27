@@ -234,6 +234,7 @@ export interface PostGraphileOptions<
   // the `Authorization` header, and signing JWT tokens you return in
   // procedures.
   jwtSecret?: jwt.Secret;
+  // The public key to verify the JWT when signed with RS265 or ES256 algorithms.
   jwtPublicKey?: jwt.Secret | jwt.GetPublicKeyOrSecret;
   // Options with which to perform JWT verification - see
   // https://github.com/auth0/node-jsonwebtoken#jwtverifytoken-secretorpublickey-options-callback
