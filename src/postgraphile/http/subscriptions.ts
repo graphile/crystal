@@ -443,6 +443,7 @@ export async function enhanceHttpServerWithWebSockets<
           },
         },
         v1Wss,
+        subscriptionServerOptions?.keepAlive,
       );
     }
   }
