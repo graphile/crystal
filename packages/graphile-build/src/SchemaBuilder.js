@@ -488,13 +488,21 @@ class SchemaBuilder extends EventEmitter {
           isSchema: true,
         }
       );
-      this._generatedSchema = this.applyHooks(
+      const hookedSchema = this.applyHooks(
         build,
         "finalize",
         schema,
         {},
         "Finalising GraphQL schema"
       );
+      const errors = build.graphql.validateSchema(hookedSchema);
+      if (errors && errors.length) {
+        throw new Error(
+          "GraphQL schema is invalid:\n" +
+            errors.map(e => `- ` + e.message.replace(/\n/g, "\n  ")).join("\n")
+        );
+      }
+      this._generatedSchema = hookedSchema;
     }
     if (!this._generatedSchema) {
       throw new Error("Schema generation failed");
