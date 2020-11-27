@@ -47,7 +47,6 @@ export default function mapAsyncIterator<T, U>(
     mapReject = (error: any) => asyncMapValue(error, reject).then(iteratorResult, abruptClose);
   }
 
-  // @ts-expect-error: TypeScript doesn't seem to understand that this is really `Symbol.asyncIterator`
   const mappedIterator: AsyncIterableIterator<U> = {
     next() {
       return iterator.next().then(mapResult, mapReject);
@@ -63,6 +62,7 @@ export default function mapAsyncIterator<T, U>(
       }
       return Promise.reject(error).catch(abruptClose);
     },
+    // @ts-expect-error: `$$asyncIterator` will use `Symbol.asyncIterator` if supported
     [$$asyncIterator]() {
       return this;
     },
