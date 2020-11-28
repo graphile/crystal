@@ -8,6 +8,12 @@ to you also.
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
+# [4.11.0-alpha.0](https://github.com/graphile/postgraphile/compare/v4.10.0...v4.11.0-alpha.0) (2020-11-28)
+
+### Features
+
+- **subscriptions:** support `graphql-ws` and all operations over websockets ([#1338](https://github.com/graphile/postgraphile/issues/1338)) ([c04d670](https://github.com/graphile/postgraphile/commit/c04d6703c602bd0b023dc083f0741779b713fbd0))
+
 # [4.10.0](https://github.com/graphile/postgraphile/compare/v4.10.0-alpha.0...v4.10.0) (2020-11-27)
 
 ### Bug Fixes
