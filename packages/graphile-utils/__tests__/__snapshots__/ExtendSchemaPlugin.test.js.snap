@@ -393,3 +393,77 @@ Object {
   },
 }
 `;
+
+exports[`supports interfaces and unions 1`] = `
+"""The root query type which gives access points into the data universe."""
+type Query {
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+  abc: [ABC!]
+  named: [Named!]
+}
+
+union ABC = A | B | C
+
+type A implements Named {
+  name: String!
+  a: Int!
+  nameLanguage: String
+}
+
+interface Named {
+  name: String!
+  nameLanguage: String
+}
+
+type B implements Named {
+  name(suffix: String): String!
+  b: Int!
+  nameLanguage: String
+}
+
+type C {
+  c: Int!
+}
+
+`;
+
+exports[`supports interfaces and unions 2`] = `
+Object {
+  "abc": Array [
+    Object {
+      "__typename": "A",
+      "a": 1,
+      "name": "A-one",
+      "nameLanguage": "en",
+    },
+    Object {
+      "__typename": "B",
+      "b": 2,
+      "name": "B-two",
+      "nameLanguage": "en",
+    },
+    Object {
+      "__typename": "C",
+      "c": 3,
+    },
+  ],
+  "named": Array [
+    Object {
+      "__typename": "A",
+      "a": 1,
+      "name": "A-one",
+      "nameLanguage": "en",
+    },
+    Object {
+      "__typename": "B",
+      "b": 2,
+      "name": "B-two",
+      "nameLanguage": "en",
+    },
+  ],
+}
+`;

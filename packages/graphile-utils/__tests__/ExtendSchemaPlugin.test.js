@@ -795,3 +795,109 @@ it("supports defining a simple subscription", async () => {
   expect(done).toBeTruthy();
   expect(value).toBe(undefined);
 });
+
+it("supports interfaces and unions", async () => {
+  const schema = await buildSchema([
+    ...simplePlugins,
+    makeExtendSchemaPlugin(_build => ({
+      typeDefs: gql`
+        interface Named {
+          name: String!
+        }
+
+        type A implements Named {
+          name: String!
+          a: Int!
+        }
+        type B implements Named {
+          name(suffix: String): String!
+          b: Int!
+        }
+        type C {
+          c: Int!
+        }
+
+        union ABC = A | B | C
+        extend type Query {
+          abc: [ABC!]
+          named: [Named!]
+        }
+
+        extend interface Named {
+          nameLanguage: String
+        }
+        extend type A {
+          nameLanguage: String
+        }
+        extend type B {
+          nameLanguage: String
+        }
+      `,
+      resolvers: {
+        Query: {
+          abc: () => [
+            { name: "A-one", a: 1, nameLanguage: "en" },
+            { name: "B-two", b: 2, nameLanguage: "en" },
+            { c: 3 },
+          ],
+          named: () => [
+            { name: "A-one", a: 1, nameLanguage: "en" },
+            { name: "B-two", b: 2, nameLanguage: "en" },
+          ],
+        },
+        ABC: {
+          __resolveType(obj) {
+            if (obj.a != null) return "A";
+            if (obj.b != null) return "B";
+            if (obj.c != null) return "C";
+            return null;
+          },
+        },
+        Named: {
+          __resolveType(obj) {
+            if (obj.a != null) return "A";
+            if (obj.b != null) return "B";
+            return null;
+          },
+        },
+      },
+    })),
+  ]);
+  expect(schema).toMatchSnapshot();
+  const { data, errors } = await graphql(
+    schema,
+    `
+      query {
+        abc {
+          __typename
+          ... on A {
+            name
+            nameLanguage
+            a
+          }
+          ... on B {
+            name
+            nameLanguage
+            b
+          }
+          ... on C {
+            c
+          }
+        }
+        named {
+          __typename
+          name
+          nameLanguage
+          ... on A {
+            a
+          }
+          ... on B {
+            b
+          }
+        }
+      }
+    `
+  );
+  expect(errors).toBeFalsy();
+  expect(data).toMatchSnapshot();
+});

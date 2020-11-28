@@ -231,6 +231,19 @@ class SchemaBuilder extends EventEmitter {
       // - 'GraphQLUnionType:types' to add additional types to this union
       GraphQLUnionType: [],
       "GraphQLUnionType:types": [],
+
+      // When creating a GraphQLInterfaceType via `newWithHooks`, we'll
+      // execute, the following hooks:
+      // - 'GraphQLInterfaceType' to add any root-level attributes, e.g. add a description
+      // - 'GraphQLInterfaceType:fields' to add additional fields to this interface type (is
+      //   ran asynchronously and gets a reference to the final GraphQL Interface as
+      //   `Self` in the context)
+      // - 'GraphQLInterfaceType:fields:field' to customise an individual field from above
+      // - 'GraphQLInterfaceType:fields:field:args' to customize the arguments to a field
+      GraphQLInterfaceType: [],
+      "GraphQLInterfaceType:fields": [],
+      "GraphQLInterfaceType:fields:field": [],
+      "GraphQLInterfaceType:fields:field:args": [],
     };
   }
 

@@ -36,9 +36,10 @@ import {
   GraphQLList,
   GraphQLEnumType,
   GraphQLDirective,
+  InputObjectTypeExtensionNode,
+  InterfaceTypeExtensionNode,
 } from "graphql";
 import { GraphileEmbed } from "./gql";
-import { InputObjectTypeExtensionNode } from "graphql/language/ast";
 
 import { GraphileHelpers, makeFieldHelpers } from "./fieldHelpers";
 
@@ -114,6 +115,7 @@ export default function makeExtendSchemaPlugin(
         GraphQLScalarType,
         GraphQLDirective,
         GraphQLUnionType,
+        GraphQLInterfaceType,
       } = graphql;
       const { typeDefs, resolvers = {} } =
         typeof generator === "function"
@@ -141,6 +143,7 @@ export default function makeExtendSchemaPlugin(
         },
         GraphQLInputObjectType: {},
         GraphQLObjectType: {},
+        GraphQLInterfaceType: {},
       };
       const newTypes: Array<NewTypeDef> = [];
       mergedTypeDefinitions.forEach(definition => {
@@ -161,6 +164,12 @@ export default function makeExtendSchemaPlugin(
             typeExtensions.GraphQLInputObjectType[name] = [];
           }
           typeExtensions.GraphQLInputObjectType[name].push(definition);
+        } else if (definition.kind === "InterfaceTypeExtension") {
+          const name = getName(definition.name);
+          if (!typeExtensions.GraphQLInterfaceType[name]) {
+            typeExtensions.GraphQLInterfaceType[name] = [];
+          }
+          typeExtensions.GraphQLInterfaceType[name].push(definition);
         } else if (definition.kind === "ObjectTypeDefinition") {
           newTypes.push({
             type: GraphQLObjectType,
@@ -174,6 +183,11 @@ export default function makeExtendSchemaPlugin(
         } else if (definition.kind === "UnionTypeDefinition") {
           newTypes.push({
             type: GraphQLUnionType,
+            definition,
+          });
+        } else if (definition.kind === "InterfaceTypeDefinition") {
+          newTypes.push({
+            type: GraphQLInterfaceType,
             definition,
           });
         } else if (definition.kind === "DirectiveDefinition") {
@@ -230,6 +244,7 @@ export default function makeExtendSchemaPlugin(
           GraphQLObjectType,
           GraphQLInputObjectType,
           GraphQLUnionType,
+          GraphQLInterfaceType,
           GraphQLScalarType,
           GraphQLDirective,
           Kind,
@@ -372,6 +387,42 @@ export default function makeExtendSchemaPlugin(
             },
             scope
           );
+        } else if (type === GraphQLInterfaceType) {
+          // https://graphql.org/graphql-js/type/#graphqluniontype
+          const name = getName(definition.name);
+          const description = getDescription(definition.description);
+          const directives = getDirectives(definition.directives);
+          const scope = {
+            __origin: `makeExtendSchemaPlugin`,
+            directives,
+            ...(directives.scope || {}),
+          };
+          const resolveType = resolvers[name] && resolvers[name].__resolveType;
+          newWithHooks(
+            type,
+            {
+              name,
+              ...(resolveType ? { resolveType } : null),
+              ...(description ? { description } : null),
+              fields: (fieldsContext: {
+                Self: typeof type;
+                fieldWithHooks: any;
+              }) =>
+                getFields(
+                  fieldsContext.Self,
+                  definition.fields,
+                  {}, // Interface doesn't need resolvers
+                  fieldsContext,
+                  build
+                ),
+              ...(description
+                ? {
+                    description,
+                  }
+                : null),
+            },
+            scope
+          );
         } else if (type === GraphQLScalarType) {
           const name = getName(definition.name);
           const description = getDescription(definition.description);
@@ -488,6 +539,40 @@ export default function makeExtendSchemaPlugin(
         return fields;
       }
     });
+
+    builder.hook(
+      "GraphQLInterfaceType:fields",
+      (fields, build, context: any) => {
+        const {
+          extend,
+          [`ExtendSchemaPlugin_${uniqueId}_typeExtensions`]: typeExtensions,
+        } = build;
+        const { Self } = context;
+        if (typeExtensions.GraphQLInterfaceType[Self.name]) {
+          const newFields = typeExtensions.GraphQLInterfaceType[
+            Self.name
+          ].reduce(
+            (
+              memo: GraphQLFieldConfigMap<any, any>,
+              extension: InterfaceTypeExtensionNode
+            ) => {
+              const moreFields = getFields(
+                Self,
+                extension.fields,
+                {}, // No resolvers for interfaces
+                context,
+                build
+              );
+              return extend(memo, moreFields);
+            },
+            {}
+          );
+          return extend(fields, newFields);
+        } else {
+          return fields;
+        }
+      }
+    );
   };
 
   function getName(name: NameNode) {
@@ -531,14 +616,9 @@ export default function makeExtendSchemaPlugin(
 
   function getInterfaces(
     interfaces: ReadonlyArray<NamedTypeNode>,
-    _build: Build
+    build: Build
   ) {
-    if (interfaces.length) {
-      throw new Error(
-        `We don't support interfaces via makeExtendSchemaPlugin yet; PRs welcome!`
-      );
-    }
-    return [];
+    return interfaces.map(i => build.getTypeByName(i.name.value));
   }
 
   function getValue(

@@ -860,6 +860,126 @@ export default function makeNewBuild(builder: SchemaBuilder): { ...Build } {
             );
           },
         };
+      } else if (Type === GraphQLInterfaceType) {
+        const commonContext = {
+          type: "GraphQLInterfaceType",
+          scope,
+        };
+        newSpec = builder.applyHooks(
+          this,
+          "GraphQLInterfaceType",
+          newSpec,
+          commonContext,
+          `|${newSpec.name}`
+        );
+
+        const rawSpec = newSpec;
+        newSpec = {
+          ...newSpec,
+          fields: () => {
+            const processedFields = [];
+            const fieldsContext = {
+              ...commonContext,
+              Self,
+              GraphQLInterfaceType: rawSpec,
+              fieldWithHooks: ((fieldName, spec, fieldScope) => {
+                if (!isString(fieldName)) {
+                  throw new Error(
+                    "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is currently necessary."
+                  );
+                }
+                if (!fieldScope) {
+                  throw new Error(
+                    "All calls to `fieldWithHooks` must specify a `fieldScope` " +
+                      "argument that gives additional context about the field so " +
+                      "that further plugins may more easily understand the field. " +
+                      "Keys within this object should contain the phrase 'field' " +
+                      "since they will be merged into the parent objects scope and " +
+                      "are not allowed to clash. If you really have no additional " +
+                      "information to give, please just pass `{}`."
+                  );
+                }
+
+                let newSpec = spec;
+                const context = {
+                  ...commonContext,
+                  Self,
+                  scope: extend(
+                    extend(
+                      { ...scope },
+                      {
+                        fieldName,
+                      },
+                      `Within context for GraphQLInterfaceType '${rawSpec.name}'`
+                    ),
+                    fieldScope,
+                    `Extending scope for field '${fieldName}' within context for GraphQLInterfaceType '${rawSpec.name}'`
+                  ),
+                };
+                if (typeof newSpec === "function") {
+                  newSpec = newSpec(context);
+                }
+                newSpec = builder.applyHooks(
+                  this,
+                  "GraphQLInterfaceType:fields:field",
+                  newSpec,
+                  context,
+                  `|${getNameFromType(Self)}.fields.${fieldName}`
+                );
+                newSpec.args = newSpec.args || {};
+                newSpec = {
+                  ...newSpec,
+                  args: builder.applyHooks(
+                    this,
+                    "GraphQLInterfaceType:fields:field:args",
+                    newSpec.args,
+                    {
+                      ...context,
+                      field: newSpec,
+                      returnType: newSpec.type,
+                    },
+                    `|${getNameFromType(Self)}.fields.${fieldName}`
+                  ),
+                };
+                const finalSpec = newSpec;
+                processedFields.push(finalSpec);
+                return finalSpec;
+              }: FieldWithHooksFunction),
+            };
+            let rawFields = rawSpec.fields || {};
+            if (typeof rawFields === "function") {
+              rawFields = rawFields(fieldsContext);
+            }
+            const fieldsSpec = builder.applyHooks(
+              this,
+              "GraphQLInterfaceType:fields",
+              this.extend(
+                {},
+                rawFields,
+                `Default field included in newWithHooks call for '${
+                  rawSpec.name
+                }'. ${inScope.__origin || ""}`
+              ),
+              fieldsContext,
+              `|${rawSpec.name}`
+            );
+            // Finally, check through all the fields that they've all been processed; any that have not we should do so now.
+            for (const fieldName in fieldsSpec) {
+              const fieldSpec = fieldsSpec[fieldName];
+              if (processedFields.indexOf(fieldSpec) < 0) {
+                // We've not processed this yet; process it now!
+                fieldsSpec[fieldName] = fieldsContext.fieldWithHooks(
+                  fieldName,
+                  fieldSpec,
+                  {
+                    autoField: true, // We don't have any additional information
+                  }
+                );
+              }
+            }
+            return fieldsSpec;
+          },
+        };
       }
 
       const finalSpec: ConfigType = newSpec;

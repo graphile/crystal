@@ -14,6 +14,7 @@ import {
   GraphQLInputFieldConfigMap,
   GraphQLInputFieldConfig,
   GraphQLUnionTypeConfig,
+  GraphQLInterfaceTypeConfig,
 } from "graphql";
 import { EventEmitter } from "events";
 
@@ -178,6 +179,34 @@ export default class SchemaBuilder extends EventEmitter {
   hook(
     hookName: "GraphQLUnionType:types",
     fn: Hook<Array<GraphQLObjectType>>,
+    provides?: Array<string>,
+    before?: Array<string>,
+    after?: Array<string>
+  ): void;
+  hook<TSource, TContext>(
+    hookName: "GraphQLInterfaceType",
+    fn: Hook<GraphQLInterfaceTypeConfig<TSource, TContext>>,
+    provides?: Array<string>,
+    before?: Array<string>,
+    after?: Array<string>
+  ): void;
+  hook<TSource, TContext>(
+    hookName: "GraphQLInterfaceType:fields",
+    fn: Hook<GraphQLFieldConfigMap<TSource, TContext>>,
+    provides?: Array<string>,
+    before?: Array<string>,
+    after?: Array<string>
+  ): void;
+  hook<TSource, TContext>(
+    hookName: "GraphQLInterfaceType:fields:field",
+    fn: Hook<GraphQLFieldConfig<TSource, TContext>>,
+    provides?: Array<string>,
+    before?: Array<string>,
+    after?: Array<string>
+  ): void;
+  hook(
+    hookName: "GraphQLInterfaceType:fields:field:args",
+    fn: Hook<GraphQLFieldConfigArgumentMap>,
     provides?: Array<string>,
     before?: Array<string>,
     after?: Array<string>
