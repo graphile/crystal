@@ -8,6 +8,13 @@ to you also.
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
+# [4.11.0-alpha.1](https://github.com/graphile/postgraphile/compare/v4.11.0-alpha.0...v4.11.0-alpha.1) (2020-12-11)
+
+### Bug Fixes
+
+- **docker:** remove GRAPHILE_TURBO ([#1407](https://github.com/graphile/postgraphile/issues/1407)) ([af39c3d](https://github.com/graphile/postgraphile/commit/af39c3dcea40646c9217785fa93a9601612c2b83))
+- **ws:** fix missing websockets config on CLI ([#1417](https://github.com/graphile/postgraphile/issues/1417)) ([4e58a0e](https://github.com/graphile/postgraphile/commit/4e58a0e2c38a27712849c4f81f3975bfa536abe0))
+
 # [4.11.0-alpha.0](https://github.com/graphile/postgraphile/compare/v4.10.0...v4.11.0-alpha.0) (2020-11-28)
 
 ### Features
