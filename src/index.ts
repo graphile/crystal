@@ -9,6 +9,8 @@ export {
   GraphQLErrorExtended,
   HttpRequestHandler,
   WithPostGraphileContextOptions,
+  PromiseOrDirect,
+  DirectOrCallback,
 } from './interfaces';
 
 export {
