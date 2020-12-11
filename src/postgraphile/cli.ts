@@ -122,7 +122,7 @@ program
   )
   .option(
     '--websockets <string>',
-    "Choose which websocket transport libraries to use. Use commas to define multiple. Defaults to '[v0, v1]' if `--subscriptions` was passed, '[]' otherwise",
+    "Choose which websocket transport libraries to use. Use commas to define multiple. Defaults to 'v0,v1' if `--subscriptions` or `--live` were passed, '[]' otherwise",
     (option: string) => option.split(','),
   )
   .option(
@@ -435,8 +435,8 @@ const {
   connection: pgConnectionString,
   ownerConnection,
   subscriptions,
-  websockets = subscriptions ? ['v0', 'v1'] : [],
   live,
+  websockets = subscriptions || live ? ['v0', 'v1'] : [],
   watch: watchPg,
   schema: dbSchema,
   host: hostname = 'localhost',
@@ -695,6 +695,7 @@ const postgraphileOptions = pluginHook(
     retryOnInitFail,
     pgDefaultRole,
     subscriptions: subscriptions || live,
+    websockets,
     live,
     watchPg,
     showErrorStack,

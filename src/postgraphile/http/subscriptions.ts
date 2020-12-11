@@ -73,10 +73,11 @@ export async function enhanceHttpServerWithWebSockets<
   const graphqlRoute =
     (subscriptionServerOptions && subscriptionServerOptions.graphqlRoute) ||
     (options.externalUrlBase || '') + (options.graphqlRoute || '/graphql');
+  const { subscriptions, live, websockets = subscriptions || live ? ['v0', 'v1'] : [] } = options;
 
   // enhance with WebSockets shouldnt be called if there are no websocket versions
-  if (!options.websockets?.length) {
-    throw new Error(`Invalid value for \`websockets\` option: '${options.websockets}'`);
+  if (!websockets?.length) {
+    throw new Error(`Invalid value for \`websockets\` option: '${JSON.stringify(websockets)}'`);
   }
 
   const schema = await getGraphQLSchema();
@@ -185,7 +186,7 @@ export async function enhanceHttpServerWithWebSockets<
   let socketId = 0;
 
   let v0Wss: WebSocket.Server | null = null;
-  if (options.websockets.includes('v0')) {
+  if (websockets.includes('v0')) {
     v0Wss = new WebSocket.Server({ noServer: true });
     SubscriptionServer.create(
       {
@@ -324,7 +325,7 @@ export async function enhanceHttpServerWithWebSockets<
   }
 
   let v1Wss: WebSocket.Server | null = null;
-  if (options.websockets.includes('v1')) {
+  if (websockets.includes('v1')) {
     v1Wss = new WebSocket.Server({ noServer: true });
     useServer(
       {
