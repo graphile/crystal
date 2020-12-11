@@ -695,6 +695,7 @@ const postgraphileOptions = pluginHook(
     retryOnInitFail,
     pgDefaultRole,
     subscriptions: subscriptions || live,
+    websockets,
     live,
     watchPg,
     showErrorStack,
