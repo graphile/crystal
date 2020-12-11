@@ -8,8 +8,8 @@ import jwt = require('jsonwebtoken');
 import { EventEmitter } from 'events';
 import { PostGraphileResponse } from './postgraphile/http/frameworks';
 
-type PromiseOrDirect<T> = T | Promise<T>;
-type DirectOrCallback<Request, T> = T | ((req: Request) => PromiseOrDirect<T>);
+export type PromiseOrDirect<T> = T | Promise<T>;
+export type DirectOrCallback<Request, T> = T | ((req: Request) => PromiseOrDirect<T>);
 
 /**
  * A narrower type than `any` that won’t swallow errors from assumptions about
