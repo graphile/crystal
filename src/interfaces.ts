@@ -69,12 +69,12 @@ export interface PostGraphileOptions<
   ownerConnectionString?: string;
   // Enable GraphQL websocket transport support for subscriptions (you still need a subscriptions plugin currently)
   subscriptions?: boolean;
-  // Choose which websocket transport libraries to use. Use commas to define multiple. Defaults to '[v0, v1]' if `--subscriptions` was passed, '[]' otherwise
+  // [EXPERIMENTAL] Enables live-query support via GraphQL subscriptions (sends updated payload any time nested collections/records change)
+  live?: boolean;
+  // Choose which websocket transport libraries to use. Use commas to define multiple. Defaults to `['v0', 'v1']` if `subscriptions` or `live` are true, `[]` otherwise
   websockets?: ('v0' | 'v1')[];
   // Toggle which GraphQL websocket transport operations are supported: 'subscriptions' or 'all'. Defaults to `subscriptions`
   websocketOperations?: 'all' | 'subscriptions';
-  // [EXPERIMENTAL] Enables live-query support via GraphQL subscriptions (sends updated payload any time nested collections/records change)
-  live?: boolean;
   // [EXPERIMENTAL] If you're using websockets (subscriptions || live) then you
   // may want to authenticate your users using sessions or similar. You can
   // pass some simple middlewares here that will be executed against the

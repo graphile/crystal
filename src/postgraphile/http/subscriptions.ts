@@ -73,7 +73,7 @@ export async function enhanceHttpServerWithWebSockets<
   const graphqlRoute =
     (subscriptionServerOptions && subscriptionServerOptions.graphqlRoute) ||
     (options.externalUrlBase || '') + (options.graphqlRoute || '/graphql');
-  const { subscriptions, websockets = subscriptions ? ['v0', 'v1'] : [] } = options;
+  const { subscriptions, live, websockets = subscriptions || live ? ['v0', 'v1'] : [] } = options;
 
   // enhance with WebSockets shouldnt be called if there are no websocket versions
   if (!websockets?.length) {

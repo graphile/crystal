@@ -184,7 +184,7 @@ export default function createPostGraphileHttpRequestHandler(
     watchPg,
     disableQueryLog,
     enableQueryBatching,
-    websockets = subscriptions ? ['v0', 'v1'] : [],
+    websockets = options.subscriptions || options.live ? ['v0', 'v1'] : [],
   } = options;
   const live = !!options.live;
   const enhanceGraphiql =
