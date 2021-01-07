@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/graphile/graphile-build.git"
+    "url": "git+https://github.com/graphile/graphile-engine.git"
   },
   "keywords": [
     "graphile",
@@ -26,7 +26,7 @@
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/graphile/graphile-build/issues"
+    "url": "https://github.com/graphile/graphile-engine/issues"
   },
   "homepage": "https://graphile.org/graphile-build/",
   "dependencies": {

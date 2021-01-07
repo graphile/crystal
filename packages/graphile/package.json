@@ -10,11 +10,11 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/graphile/graphile-build.git"
+    "url": "git+https://github.com/graphile/graphile-engine.git"
   },
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "bugs": {
-    "url": "https://github.com/graphile/graphile-build/issues"
+    "url": "https://github.com/graphile/graphile-engine/issues"
   },
   "homepage": "https://www.graphile.org",
   "files": [

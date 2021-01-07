@@ -56,7 +56,7 @@ export function preventEmptyResult<
           `Inflector for '${key}' returned '${String(
             result
           )}'; expected non-empty string\n` +
-            `See: https://github.com/graphile/graphile-build/blob/master/packages/graphile-build-pg/src/plugins/PgBasicsPlugin.js\n` +
+            `See: https://github.com/graphile/graphile-engine/blob/master/packages/graphile-build-pg/src/plugins/PgBasicsPlugin.js\n` +
             `Arguments passed to ${key}:\n${stringifiedArgs}`
         );
       }

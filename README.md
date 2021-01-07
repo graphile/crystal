@@ -93,7 +93,7 @@ discord chat](http://discord.gg/graphile) on the #core-development channel.
 ### Working with Docker
 
 If you want to work in a Docker environment you can follow
-[the instructions on the wiki](https://github.com/graphile/graphile-build/wiki/Development-with-docker-compose).
+[the instructions on the wiki](https://github.com/graphile/graphile-engine/wiki/Development-with-docker-compose).
 
 [postgraphile]: https://github.com/graphile/postgraphile
 [lerna]: https://github.com/lerna/lerna
