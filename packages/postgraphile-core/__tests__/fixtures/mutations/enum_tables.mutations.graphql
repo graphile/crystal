@@ -3,12 +3,14 @@ mutation {
     letterDescription {
       id
       letter
+      letterViaView
     }
   }
   createLetterDescription(
     input: {
       letterDescription: {
         letter: C
+        letterViaView: C
         description: "One does like to see the letter C"
       }
     }
@@ -16,6 +18,7 @@ mutation {
     letterDescription {
       id
       letter
+      letterViaView
       description
     }
   }

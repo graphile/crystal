@@ -3,6 +3,7 @@
     nodes {
       id
       letter
+      letterViaView
       description
     }
   }
@@ -10,18 +11,43 @@
     nodes {
       id
       letter
+      letterViaView
+      description
+    }
+  }
+  reverseView: allLetterDescriptions(orderBy: [LETTER_VIA_VIEW_DESC]) {
+    nodes {
+      id
+      letter
+      letterViaView
       description
     }
   }
   b: letterDescriptionByLetter(letter: B) {
     id
     letter
+    letterViaView
+    description
+  }
+  bView: letterDescriptionByLetterViaView(letterViaView: B) {
+    id
+    letter
+    letterViaView
     description
   }
   letterC: allLetterDescriptions(condition: { letter: C }) {
     nodes {
       id
       letter
+      letterViaView
+      description
+    }
+  }
+  letterCView: allLetterDescriptions(condition: { letterViaView: C }) {
+    nodes {
+      id
+      letter
+      letterViaView
       description
     }
   }

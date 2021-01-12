@@ -276,11 +276,11 @@ insert into named_query_builder.toy_categories(toy_id, category_id, approved) va
 
 --------------------------------------------------------------------------------
 alter sequence enum_tables.letter_descriptions_id_seq restart with 101;
-insert into enum_tables.letter_descriptions(letter, description) values
-  ('A', 'The first letter in the alphabet'),
-  ('B', 'Following closely behind the first letter, this is a popular choice'),
-  ('C', 'Pronounced like ''sea'''),
-  ('D', 'The first letter omitted from the ''ABC'' phrase');
+insert into enum_tables.letter_descriptions(letter, letter_via_view, description) values
+  ('A', 'A', 'The first letter in the alphabet'),
+  ('B', 'B', 'Following closely behind the first letter, this is a popular choice'),
+  ('C', 'C', 'Pronounced like ''sea'''),
+  ('D', 'D', 'The first letter omitted from the ''ABC'' phrase');
 
 alter sequence enum_tables.referencing_table_id_seq restart with 432;
 insert into enum_tables.referencing_table(enum_1, enum_2, enum_3) values

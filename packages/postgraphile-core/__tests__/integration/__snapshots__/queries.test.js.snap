@@ -1581,21 +1581,25 @@ Object {
           "description": "The first letter in the alphabet",
           "id": 101,
           "letter": "A",
+          "letterViaView": "A",
         },
         Object {
           "description": "Following closely behind the first letter, this is a popular choice",
           "id": 102,
           "letter": "B",
+          "letterViaView": "B",
         },
         Object {
           "description": "Pronounced like 'sea'",
           "id": 103,
           "letter": "C",
+          "letterViaView": "C",
         },
         Object {
           "description": "The first letter omitted from the 'ABC' phrase",
           "id": 104,
           "letter": "D",
+          "letterViaView": "D",
         },
       ],
     },
@@ -1603,6 +1607,13 @@ Object {
       "description": "Following closely behind the first letter, this is a popular choice",
       "id": 102,
       "letter": "B",
+      "letterViaView": "B",
+    },
+    "bView": Object {
+      "description": "Following closely behind the first letter, this is a popular choice",
+      "id": 102,
+      "letter": "B",
+      "letterViaView": "B",
     },
     "letterC": Object {
       "nodes": Array [
@@ -1610,6 +1621,17 @@ Object {
           "description": "Pronounced like 'sea'",
           "id": 103,
           "letter": "C",
+          "letterViaView": "C",
+        },
+      ],
+    },
+    "letterCView": Object {
+      "nodes": Array [
+        Object {
+          "description": "Pronounced like 'sea'",
+          "id": 103,
+          "letter": "C",
+          "letterViaView": "C",
         },
       ],
     },
@@ -1619,21 +1641,53 @@ Object {
           "description": "The first letter omitted from the 'ABC' phrase",
           "id": 104,
           "letter": "D",
+          "letterViaView": "D",
         },
         Object {
           "description": "Pronounced like 'sea'",
           "id": 103,
           "letter": "C",
+          "letterViaView": "C",
         },
         Object {
           "description": "Following closely behind the first letter, this is a popular choice",
           "id": 102,
           "letter": "B",
+          "letterViaView": "B",
         },
         Object {
           "description": "The first letter in the alphabet",
           "id": 101,
           "letter": "A",
+          "letterViaView": "A",
+        },
+      ],
+    },
+    "reverseView": Object {
+      "nodes": Array [
+        Object {
+          "description": "The first letter omitted from the 'ABC' phrase",
+          "id": 104,
+          "letter": "D",
+          "letterViaView": "D",
+        },
+        Object {
+          "description": "Pronounced like 'sea'",
+          "id": 103,
+          "letter": "C",
+          "letterViaView": "C",
+        },
+        Object {
+          "description": "Following closely behind the first letter, this is a popular choice",
+          "id": 102,
+          "letter": "B",
+          "letterViaView": "B",
+        },
+        Object {
+          "description": "The first letter in the alphabet",
+          "id": 101,
+          "letter": "A",
+          "letterViaView": "A",
         },
       ],
     },

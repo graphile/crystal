@@ -68,12 +68,14 @@ Object {
         "description": "One does like to see the letter C",
         "id": 105,
         "letter": "C",
+        "letterViaView": "C",
       },
     },
     "deleteLetterDescriptionByLetter": Object {
       "letterDescription": Object {
         "id": 103,
         "letter": "C",
+        "letterViaView": "C",
       },
     },
     "referencingTableMutation": Object {

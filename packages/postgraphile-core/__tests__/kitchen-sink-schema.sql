@@ -1143,11 +1143,17 @@ create table enum_tables.abcd (letter text primary key, description text);
 comment on column enum_tables.abcd.description is E'@enumDescription';
 comment on table enum_tables.abcd is E'@enum\n@enumName LetterAToD';
 
+create view enum_tables.abcd_view as (select * from enum_tables.abcd);
+comment on view enum_tables.abcd_view is E'@primaryKey letter\n@enum\n@enumName LetterAToDViaView';
+
 create table enum_tables.letter_descriptions(
   id serial primary key,
   letter text not null references enum_tables.abcd unique,
+  letter_via_view text not null unique,
   description text
 );
+
+comment on table enum_tables.letter_descriptions is '@foreignKey (letter_via_view) references enum_tables.abcd_view';
 
 create table enum_tables.lots_of_enums (
   id serial primary key,
