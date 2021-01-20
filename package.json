@@ -147,7 +147,6 @@
     "setupFiles": [
       "<rootDir>/resources/jest-setup.js"
     ],
-    "browser": false,
     "testEnvironment": "node",
     "roots": [
       "<rootDir>/src"
