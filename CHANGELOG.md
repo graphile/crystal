@@ -3,7 +3,19 @@
 We use PostGraphile's GitHub releases tab to log our changes in detail, but
 this auto-generated changelog helps us to produce that list, and it may be
 helpful to you also.
-# [](https://github.com/graphile/graphile-engine/compare/v4.10.0...v) (2020-11-18)
+# [](https://github.com/graphile/graphile-engine/compare/v4.10.0...v) (2021-01-20)
+
+
+### Bug Fixes
+
+* **graphql:** ensure buildSchema fails on invalid GraphQL schema ([#695](https://github.com/graphile/graphile-engine/issues/695)) ([c837e09](https://github.com/graphile/graphile-engine/commit/c837e0968e8e98f1461cec47e4e48ede020a766c))
+* **pg-sql2:** use same placeholder for same sql.value node ([#705](https://github.com/graphile/graphile-engine/issues/705)) ([969d923](https://github.com/graphile/graphile-engine/commit/969d92313f5e86e7a115726bedc197795a63b97c))
+
+
+### Features
+
+* **enum:** enum views ([#704](https://github.com/graphile/graphile-engine/issues/704)) ([d2770a5](https://github.com/graphile/graphile-engine/commit/d2770a5e847b9839e0ac3bd2848817fd2d53bcfb))
+* **utils:** makeExtendSchemaPlugin interfaces support ([#696](https://github.com/graphile/graphile-engine/issues/696)) ([8af9ed5](https://github.com/graphile/graphile-engine/commit/8af9ed5afa14817e3a682d3ef4e71d90d3e77dd8))
 
 
 
