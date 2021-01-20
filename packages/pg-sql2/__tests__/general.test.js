@@ -94,10 +94,43 @@ describe("sql.compile", () => {
     expect(sql.compile(node)).toEqual({ text: "select 1", values: [] });
   });
 
-  it("with values", () => {
+  it("with value", () => {
     const node = sql.query`select ${sql.value(1)}::integer`;
     expect(sql.compile(node)).toEqual({
       text: "select $1::integer",
+      values: [1],
+    });
+  });
+
+  it("with two values", () => {
+    const node = sql.query`select ${sql.value(1)}::integer + ${sql.value(
+      2
+    )}::integer`;
+    expect(sql.compile(node)).toEqual({
+      text: "select $1::integer + $2::integer",
+      values: [1, 2],
+    });
+  });
+
+  it("with similar value twice", () => {
+    // This _should not_ use the same placeholder as it makes the compiled SQL
+    // dependent on the values used; better for the SQL to be stable.
+    const node = sql.query`select ${sql.value(1)}::integer + ${sql.value(
+      1
+    )}::integer`;
+    expect(sql.compile(node)).toEqual({
+      text: "select $1::integer + $2::integer",
+      values: [1, 1],
+    });
+  });
+
+  it("with exact same value node twice", () => {
+    // This _should_ use the same placeholder because we've explicitly used the
+    // same `sql.value` node.
+    const sqlValue = sql.value(1);
+    const node = sql.query`select ${sqlValue}::integer + ${sqlValue}::integer`;
+    expect(sql.compile(node)).toEqual({
+      text: "select $1::integer + $1::integer",
       values: [1],
     });
   });

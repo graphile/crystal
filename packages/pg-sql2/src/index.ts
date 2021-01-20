@@ -102,6 +102,10 @@ export function compile(sql: SQLQuery | SQLNode): QueryConfig {
   // compile time.
   const values = [];
 
+  // If we use the exact same `sql.value` node more than once, we should use
+  // the same placeholder for both (for performance and efficiency)
+  const valueNodeToPlaceholder = new Map();
+
   // When we come accross a symbol in our identifier, we create a unique
   // alias for it that shouldn’t be in the users schema. This helps maintain
   // sanity when constructing large Sql queries with many aliases.
@@ -145,10 +149,19 @@ export function compile(sql: SQLQuery | SQLNode): QueryConfig {
         );
         break;
       }
-      case "VALUE":
-        values.push(item.value);
-        sqlFragments.push(`$${values.length}`);
+      case "VALUE": {
+        let placeholder = valueNodeToPlaceholder.get(item);
+
+        // If there's no placeholder for this value node, create one
+        if (!placeholder) {
+          values.push(item.value);
+          placeholder = `$${values.length}`;
+          valueNodeToPlaceholder.set(item, placeholder);
+        }
+
+        sqlFragments.push(placeholder);
         break;
+      }
       default:
       // This cannot happen
     }
