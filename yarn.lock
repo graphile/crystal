@@ -4835,7 +4835,7 @@ graphile-build@4.11.0:
     pluralize "^7.0.0"
     semver "^6.0.0"
 
-graphile-utils@^4.11.0:
+graphile-utils@^4.11.1:
   version "4.11.1"
   resolved "https://registry.yarnpkg.com/graphile-utils/-/graphile-utils-4.11.1.tgz#c3bbb543785eafb4e257719c8e64f12a9b6fef34"
   integrity sha512-Q2bqBEi3Hgx08ql05szqgHPwG9q0hfgL1Xc1rsxsTa1/O/mQiRwXtihCSjmYGMzh9LJMIb+tV+HO5hbVUbEFjw==
