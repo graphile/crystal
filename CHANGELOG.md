@@ -3,7 +3,12 @@
 We use PostGraphile's GitHub releases tab to log our changes in detail, but
 this auto-generated changelog helps us to produce that list, and it may be
 helpful to you also.
-# [](https://github.com/graphile/graphile-engine/compare/v4.11.0...v) (2021-01-20)
+# [](https://github.com/graphile/graphile-engine/compare/v4.11.0...v) (2021-01-22)
+
+
+### Bug Fixes
+
+* **compat:** make utils compatible with older engine ([#707](https://github.com/graphile/graphile-engine/issues/707)) ([bd3161d](https://github.com/graphile/graphile-engine/commit/bd3161d242ec0a049ba84e3e6c0f1eaf90f1f05b))
 
 
 
