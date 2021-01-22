@@ -14,7 +14,7 @@ TAG="${1:-next}"
 # Only shift if there's something to shift
 if [ "x$1" != "x" ]; then shift; fi;
 
-npx lerna publish --exact --npm-tag="$TAG" "$@"
+npx lerna publish --exact --dist-tag="$TAG" "$@"
 yarn run changelog
 git add CHANGELOG.md
 git commit -m"chore: update CHANGELOG"
