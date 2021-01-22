@@ -113,7 +113,7 @@ export async function enhanceHttpServerWithWebSockets<
   ): Promise<void> => {
     for (const middleware of middlewares) {
       // TODO: add Koa support
-      await new Promise((resolve, reject): void => {
+      await new Promise<void>((resolve, reject): void => {
         middleware(req, res, err => (err ? reject(err) : resolve()));
       });
     }
