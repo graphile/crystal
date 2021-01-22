@@ -8,6 +8,12 @@ to you also.
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
+# [4.11.0-rc.0](https://github.com/graphile/postgraphile/compare/v4.11.0-alpha.1...v4.11.0-rc.0) (2021-01-22)
+
+### Bug Fixes
+
+- **turbo:** warn users that Node v14 is required ([#1411](https://github.com/graphile/postgraphile/issues/1411)) ([36481db](https://github.com/graphile/postgraphile/commit/36481db7ab49de589ef0294e6f6002fdeca74f17))
+
 # [4.11.0-alpha.1](https://github.com/graphile/postgraphile/compare/v4.11.0-alpha.0...v4.11.0-alpha.1) (2020-12-11)
 
 ### Bug Fixes
