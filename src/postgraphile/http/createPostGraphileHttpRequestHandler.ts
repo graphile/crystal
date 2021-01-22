@@ -316,7 +316,7 @@ export default function createPostGraphileHttpRequestHandler(
 
   // And we really want that function to be await-able
   const parseBody = (req: IncomingMessage, res: PostGraphileResponse) =>
-    new Promise((resolve, reject) => {
+    new Promise<void>((resolve, reject) => {
       bodyParserMiddlewaresComposed(
         req,
         // Note: middleware here doesn't actually use the response, but we pass
