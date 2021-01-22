@@ -540,39 +540,45 @@ export default function makeExtendSchemaPlugin(
       }
     });
 
-    builder.hook(
-      "GraphQLInterfaceType:fields",
-      (fields, build, context: any) => {
-        const {
-          extend,
-          [`ExtendSchemaPlugin_${uniqueId}_typeExtensions`]: typeExtensions,
-        } = build;
-        const { Self } = context;
-        if (typeExtensions.GraphQLInterfaceType[Self.name]) {
-          const newFields = typeExtensions.GraphQLInterfaceType[
-            Self.name
-          ].reduce(
-            (
-              memo: GraphQLFieldConfigMap<any, any>,
-              extension: InterfaceTypeExtensionNode
-            ) => {
-              const moreFields = getFields(
-                Self,
-                extension.fields,
-                {}, // No resolvers for interfaces
-                context,
-                build
-              );
-              return extend(memo, moreFields);
-            },
-            {}
-          );
-          return extend(fields, newFields);
-        } else {
-          return fields;
+    try {
+      builder.hook(
+        "GraphQLInterfaceType:fields",
+        (fields, build, context: any) => {
+          const {
+            extend,
+            [`ExtendSchemaPlugin_${uniqueId}_typeExtensions`]: typeExtensions,
+          } = build;
+          const { Self } = context;
+          if (typeExtensions.GraphQLInterfaceType[Self.name]) {
+            const newFields = typeExtensions.GraphQLInterfaceType[
+              Self.name
+            ].reduce(
+              (
+                memo: GraphQLFieldConfigMap<any, any>,
+                extension: InterfaceTypeExtensionNode
+              ) => {
+                const moreFields = getFields(
+                  Self,
+                  extension.fields,
+                  {}, // No resolvers for interfaces
+                  context,
+                  build
+                );
+                return extend(memo, moreFields);
+              },
+              {}
+            );
+            return extend(fields, newFields);
+          } else {
+            return fields;
+          }
         }
-      }
-    );
+      );
+    } catch (e) {
+      console.warn(
+        "Please update your version of PostGraphile/Graphile Engine, the version you're using does not support the GraphQLInterfaceType:fields hook"
+      );
+    }
   };
 
   function getName(name: NameNode) {
