@@ -13,6 +13,7 @@ import {
   PgConnectionPlan,
 } from "./fetchers";
 import sql from "../../pg-sql2/dist";
+import {FutureDependencies} from "../src/interfaces";
 
 const { enforceCrystal } = require("../src");
 
@@ -57,8 +58,8 @@ const Message = new GraphQLObjectType({
       extensions: {
         graphile: {
           dependencies: ["author_id"],
-          plan($deps) {
-            const plan = userLoader.fetchById($deps.toSQL(["author_id"]));
+          plan($deps: FutureDependencies<string>) {
+            const plan = userLoader.fetchById($deps); //.toSQL(["author_id"]));
             return plan;
           },
         },

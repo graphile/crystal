@@ -21,7 +21,7 @@ import { TrackedObject } from "./trackedObject";
  */
 interface Info {
   pathIdentity: PathIdentity;
-  graphile: GraphileEngine.GraphQLObjectTypeGraphileExtension | null;
+  graphile: GraphileEngine.GraphQLFieldGraphileExtension | null;
   plan: Plan;
 }
 

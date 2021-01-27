@@ -45,7 +45,7 @@ class PgSelectPlan extends Plan {
     this.whereClauses = [];
   }
 
-  select(field) {
+  select(field: string) {
     this.selections.push(sql.identifier(this.aliasSymbol, field));
   }
 
@@ -176,7 +176,7 @@ export const userLoader = {
   fetchMany() {
     return new PgSelectPlan("users");
   },
-  fetchById($id: FutureValue) {
+  fetchById($id: FutureValue<any>) {
     const plan = new PgSelectPlan("users");
     plan.select("id");
     plan.where(sql`${plan.alias}.id in (${toSQL($id)})`);
@@ -190,6 +190,7 @@ export const userLoader = {
         select genre_id from "@trackByTrackId"
       )
     */
+    return plan;
   },
 };
 

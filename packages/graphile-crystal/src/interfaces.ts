@@ -118,21 +118,31 @@ type Dependencies<
 
 declare global {
   namespace GraphileEngine {
-    interface GraphQLObjectTypeGraphileExtension<
+    // GraphQLObjectTypeGraphileExtension
+    interface GraphQLFieldGraphileExtension<
       TPlan extends Plan = Plan,
-      TDependencyKeys extends string = never
+      TDependencyKeys extends string = string
     > {
       dependencies?: TDependencyKeys[];
       plan?: PlanResolver<TPlan, TDependencyKeys>;
     }
 
-    interface GraphQLFieldGraphileExtension<
+    interface GraphQLArgumentGraphileExtension<
       TPlan extends Plan = Plan,
-      TDependencyKeys extends string = never,
+      TDependencyKeys extends string = string,
       TOutputPlan extends Plan = Plan
     > {
       dependencies?: TDependencyKeys[];
       argPlan?: InputPlanResolver<TPlan, TDependencyKeys, TOutputPlan>;
     }
+  }
+}
+
+declare module 'graphql' {
+  interface GraphQLFieldExtensions<TSource, TContext, TArgs = { [argName: string]: any}> {
+    graphile: GraphileEngine.GraphQLFieldGraphileExtension;
+  }
+  interface GraphQLArgumentExtensions {
+    graphile: GraphileEngine.GraphQLArgumentGraphileExtension;
   }
 }

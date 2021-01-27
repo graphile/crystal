@@ -183,7 +183,7 @@ function processObjectField(
   const namedResultType: GraphQLNamedType = unwrappedType;
 
   const graphile:
-    | GraphileEngine.GraphQLObjectTypeGraphileExtension
+    | GraphileEngine.GraphQLFieldGraphileExtension
     | undefined = field.extensions?.graphile;
   console.dir(field.extensions);
 
