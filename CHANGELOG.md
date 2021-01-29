@@ -3,7 +3,12 @@
 We use PostGraphile's GitHub releases tab to log our changes in detail, but
 this auto-generated changelog helps us to produce that list, and it may be
 helpful to you also.
-# [](https://github.com/graphile/graphile-engine/compare/v4.11.1...v) (2021-01-22)
+# [](https://github.com/graphile/graphile-engine/compare/v4.11.1...v) (2021-01-29)
+
+
+### Bug Fixes
+
+* **watch:** fix pool leak on unexpected connection termination ([#711](https://github.com/graphile/graphile-engine/issues/711)) ([b2fbc21](https://github.com/graphile/graphile-engine/commit/b2fbc21aa28829929eca7cb9f3cf59ace2dad799))
 
 
 
