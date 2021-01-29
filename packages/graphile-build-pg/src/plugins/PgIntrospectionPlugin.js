@@ -1204,9 +1204,7 @@ Original error: ${e.message}
 
     _handleClientError: (e: Error) => void;
     _handleClientError(e) {
-      // Client is already cleaned up
-      this.client = null;
-      this._reallyReleaseClient = null;
+      this._releaseClient(false);
       this._reconnect(e);
     }
     async _reconnect(e) {
@@ -1265,25 +1263,32 @@ Original error: ${e.message}
 
     async stop() {
       this.stopped = true;
+      this._handleChange.cancel();
       await this._releaseClient();
     }
 
-    async _releaseClient() {
+    /**
+     * Only pass `false` to this function if you know the client is going to be
+     * terminated; otherwise we risk leaving listeners running.
+     */
+    async _releaseClient(clientIsStillViable = true) {
       // $FlowFixMe
-      this._handleChange.cancel();
       const pgClient = this.client;
       const reallyReleaseClient = this._reallyReleaseClient;
       this.client = null;
       this._reallyReleaseClient = null;
       if (pgClient) {
-        pgClient.query("unlisten postgraphile_watch").catch(e => {
-          debug(`Error occurred trying to unlisten watch: ${e}`);
-        });
+        // Don't attempt to run a query after a client has errored.
+        if (clientIsStillViable) {
+          pgClient.query("unlisten postgraphile_watch").catch(e => {
+            debug(`Error occurred trying to unlisten watch: ${e}`);
+          });
+        }
         pgClient.removeListener("notification", this._listener);
         pgClient.removeListener("error", this._handleClientError);
-        if (reallyReleaseClient) {
-          await reallyReleaseClient();
-        }
+      }
+      if (reallyReleaseClient) {
+        await reallyReleaseClient();
       }
     }
   }
