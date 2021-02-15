@@ -8,6 +8,8 @@ to you also.
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
+# [4.12.0-alpha.0](https://github.com/graphile/postgraphile/compare/v4.11.0...v4.12.0-alpha.0) (2021-02-15)
+
 # [4.11.0](https://github.com/graphile/postgraphile/compare/v4.11.0-rc.0...v4.11.0) (2021-01-29)
 
 ### Bug Fixes
