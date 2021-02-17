@@ -538,7 +538,9 @@ export function debugPgClient(pgClient: PoolClient, allowExplain = false): PoolC
                 query,
                 result: pgClient[$$pgClientOrigQuery]
                   .call(this, explain, values)
-                  .then((data: any) => data.rows),
+                  .then((data: any) => data.rows)
+                  // swallow errors during explain
+                  .catch(() => null),
               });
             }
           }
