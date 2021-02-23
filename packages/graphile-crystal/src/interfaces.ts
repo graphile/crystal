@@ -3,8 +3,9 @@ import { TrackedObject } from "./trackedObject";
 import { Plan } from "./plan";
 import { FutureValue } from "./future";
 
+
 export type GraphQLRootValue = any;
-export type GraphQLContext = object;
+export interface GraphQLContext {};
 export type GraphQLVariables = { [key: string]: unknown };
 export type GraphQLArguments = { [key: string]: unknown };
 
@@ -32,22 +33,22 @@ export type FutureDependencies<TKeys extends string> = FutureValue<
 >;
 
 /**
- * Plan resolver is called on the field of an Object Type; it's passed the
- * "future dependencies" that were returned by it's `dependencies` callback (if
- * any) and returns a Plan. It cannot use any property of the parent object
- * that was not requested via dependencies.
- *
- * @returns a plan for this field.
- *
- * @remarks
- * We're using TrackedObject<...> so we can later consider caching these
- * executions.
+ ! Plan resolver is called on the field of an Object Type; it's passed the
+ ! "future dependencies" that were returned by it's `dependencies` callback (if
+ ! any) and returns a Plan. It cannot use any property of the parent object
+ ! that was not requested via dependencies.
+ !
+ ! @returns a plan for this field.
+ !
+ ! @remarks
+ ! We're using TrackedObject<...> so we can later consider caching these
+ ! executions.
  */
-export type PlanResolver<TPlan extends Plan, TDependencyKeys extends string> = (
-  $deps: FutureDependencies<TDependencyKeys>,
-  args: TrackedObject<GraphQLArguments>,
-  context: TrackedObject<object>,
-) => TPlan;
+export type PlanResolver<TContext extends GraphQLContext, TSource extends Plan, TResult extends Plan, TArgs extends GraphQLArguments> = (
+  $parentPlan: TSource,
+  args: TrackedObject<TArgs>,
+  context: TrackedObject<TContext>,
+) => TResult;
 
 /**
  * Arg plan resolver is called on an argument to a field of an Object Type;
