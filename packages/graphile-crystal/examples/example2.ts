@@ -150,10 +150,14 @@ function objectSpec<
   return modifiedSpec;
 }
 
+class PgPlan<TData> extends Plan<TData> {
+  TData!: TData;
+}
+
 class PgColumnSelectPlan<
   TDataSource extends PgDataSource<any>,
   TColumn extends keyof TDataSource["TTable"]
-> extends Plan<TDataSource["TTable"][TColumn]> {
+> extends PgPlan<TDataSource["TTable"][TColumn]> {
   constructor(
     public table: PgClassSelectPlan<TDataSource>,
     public attr: TColumn,
@@ -162,7 +166,7 @@ class PgColumnSelectPlan<
   }
 }
 
-class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
+class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends PgPlan<
   Opaque<TDataSource["TTable"]>
 > {
   symbol: symbol;
@@ -201,6 +205,10 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
       this.colPlans[attr] = new PgColumnSelectPlan(this, attr);
     }
     return this.colPlans[attr]!;
+  }
+
+  cursor() {
+    return this.get("TODO_cursor_here");
   }
 }
 
@@ -277,24 +285,6 @@ class ConnectionPlan<TSubplan extends Plan<any>> extends Plan<Opaque<any>> {
   */
 }
 
-class PgEdgePlan<
-  TNodePlan extends Plan<any>,
-  TCursorPlan extends Plan<any>
-> extends Plan<Opaque<any>> {
-  constructor(
-    public readonly nodePlan: TNodePlan,
-    public readonly cursorPlan: TCursorPlan,
-  ) {
-    super();
-  }
-  node(): TNodePlan {
-    return this.nodePlan;
-  }
-  cursor(): TCursorPlan {
-    return this.cursorPlan;
-  }
-}
-
 class PgConnectionPlan<
   TSubplan extends /* PgPlan? */ Plan<any>
 > extends ConnectionPlan<TSubplan> {
@@ -302,34 +292,25 @@ class PgConnectionPlan<
     super(subplan);
   }
 
-  edges(): PgEdgePlan<TSubplan, Plan<any /* cursor */>> {
-    // TODO: when optimising this plan we should be able to detect the children
-    // are equivalent and merge them.
-    return new PgEdgePlan(this.subplan, this.cursorPlan);
-  }
-
   nodes(): TSubplan {
-    return this.subplan;
+    return this.subplan.clone();
   }
 }
 
 const MessageEdge = new GraphQLObjectType(
-  objectSpec<
-    GraphileResolverContext,
-    PgEdgePlan<MessagePlan, Plan<any /* cursor */>>
-  >({
+  objectSpec<GraphileResolverContext, MessagePlan>({
     name: "MessageEdge",
     fields: {
       cursor: {
         type: GraphQLString,
-        plan($edge) {
-          return $edge.cursor();
+        plan($node) {
+          return $node.cursor();
         },
       },
       node: {
         type: Message,
-        plan($edge) {
-          return $edge.node();
+        plan($node) {
+          return $node;
         },
       },
     },
@@ -343,7 +324,7 @@ const MessagesConnection = new GraphQLObjectType(
       edges: {
         type: new GraphQLList(MessageEdge),
         plan($connection) {
-          return $connection.edges();
+          return $connection.nodes();
         },
       },
       nodes: {
@@ -386,7 +367,15 @@ const Forum = new GraphQLObjectType(
             ["forum_id"],
             true, // many
           );
-          return new PgConnectionPlan($messages);
+          // $messages.leftJoin(...);
+          // $messages.innerJoin(...);
+          // $messages.relation('fk_messages_author_id')
+          // $messages.where(...);
+          const $connectionPlan = new PgConnectionPlan($messages);
+          // $connectionPlan.orderBy... ?
+          // DEFINITELY NOT $messages.orderBy BECAUSE we don't want that applied to aggregates.
+          // DEFINITELY NOT $messages.limit BECAUSE we don't want those limits applied to aggregates or page info.
+          return $connectionPlan;
         },
       },
     },
