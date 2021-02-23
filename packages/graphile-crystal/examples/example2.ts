@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion */
 /*
  * Regular forum. Except, some forums are private.
  *
@@ -27,6 +27,20 @@ import sql, { SQL } from "../../pg-sql2/dist";
 import { TrackedObject } from "../src/trackedObject";
 import { enforceCrystal } from "../src";
 
+/*+--------------------------------------------------------------------------+
+  |                            TYPESCRIPT STUFF                              |
+  +--------------------------------------------------------------------------+*/
+
+/**
+ * It's going to be a TObj, but only containing the things that were actually
+ * requested. We should never need to refer to it directly.
+ */
+type Opaque<TObj extends { [key: string]: any }> = Partial<TObj>;
+
+/*+--------------------------------------------------------------------------+
+  |                             GRAPHQL STUFF                                |
+  +--------------------------------------------------------------------------+*/
+
 // These are what the generics extend from
 export type BaseGraphQLRootValue = any;
 export interface BaseGraphQLContext {}
@@ -37,11 +51,34 @@ export interface BaseGraphQLArguments {
   [key: string]: unknown;
 }
 
+// This is the actual runtime context; we should not use a global for this.
+interface GraphileResolverContext extends BaseGraphQLContext {}
+
 /*+--------------------------------------------------------------------------+
   |                               DATA SOURCES                               |
   +--------------------------------------------------------------------------+*/
+
+/**
+ * PG data source represents a PostgreSQL data source. This could be a table,
+ * view, materialized view, function call, join, etc. Anything table-like.
+ */
 class PgDataSource<TTable extends { [key: string]: any }> {
-  TTable!: TTable; // TypeScript hack
+  /**
+   * TypeScript hack so that we can retrieve the TTable type from a data source
+   * at a later time - needed so we can have strong typing on `.get()` and
+   * similar methods.
+   *
+   * @internal
+   */
+  TTable!: TTable;
+
+  /**
+   * @param tableIdentifier - the SQL for the `FROM` clause (without any
+   * aliasing). If this is a subquery don't forget to wrap it in parens.
+   * @param name - a nickname for this data source. Doesn't need to be unique
+   * (but should be). Used for making the SQL query and debug messages easier
+   * to understand.
+   */
   constructor(public tableIdentifier: SQL, public name: string) {}
 }
 
@@ -64,19 +101,27 @@ const forumSource = new PgDataSource<{
   name: string;
 }>(sql`app_public.forums`, "forums");
 
+// Convenience so we don't have to type these out each time. These used to be
+// separate plans, but required too much maintenance.
 type MessagePlan = PgClassSelectPlan<typeof userSource>;
 type UserPlan = PgClassSelectPlan<typeof userSource>;
 type ForumPlan = PgClassSelectPlan<typeof forumSource>;
 
 /*+--------------------------------------------------------------------------+
-  |                               STUFFS                                     |
+  |                               THE REST                                   |
   +--------------------------------------------------------------------------+*/
 
-// This is the actual runtime context; we should not use a global for this.
-interface GraphileResolverContext extends BaseGraphQLContext {}
-
-type Opaque<TObj extends { [key: string]: any }> = Partial<TObj>;
-
+/**
+ * Plan resolvers are like regular resolvers except they're called beforehand,
+ * they return plans rather than values, and they only run once for lists
+ * rather than for each item in the list.
+ *
+ * The idea is that the plan resolver returns a plan object which later will
+ * process the data and feed that into the actual resolver functions
+ * (preferably using the default resolver function?).
+ *
+ * They are stored onto `<field>.extensions.graphile.plan`
+ */
 export type PlanResolver<
   TContext extends BaseGraphQLContext,
   TSource extends Plan<any>,
@@ -88,6 +133,11 @@ export type PlanResolver<
   context: TrackedObject<TContext>,
 ) => TResult;
 
+/**
+ * A plan represents a method to fetch a "future value". Plans are mutable,
+ * they may be mutated directly (via the methods they expose), or indirectly
+ * (e.g. the optimisation phase might squash plans together, etc).
+ */
 export abstract class Plan<TResult> {
   // @ts-ignore
   eval(): Promise<TResult> {
@@ -95,6 +145,9 @@ export abstract class Plan<TResult> {
   }
 }
 
+/**
+ * Basically GraphQLFieldConfig but with an easy to access `plan` method.
+ */
 type GraphileCrystalFieldConfig<
   TContext extends BaseGraphQLContext,
   TSource extends Plan<any>,
@@ -150,10 +203,20 @@ function objectSpec<
   return modifiedSpec;
 }
 
+/**
+ * Not really sure about this... Added it with the intent of maybe adding a
+ * `.toSQL()` method to it or something... But currently it's just a proxy for
+ * Plan except it makes the `TData` available.
+ */
 class PgPlan<TData> extends Plan<TData> {
   TData!: TData;
 }
 
+/**
+ * A plan for selecting a column. Keep in mind that a column might not be a
+ * scalar (could be a list, compound type, JSON, geometry, etc), so this might
+ * not be a "leaf"; it might be used as the input of another layer of plan.
+ */
 class PgColumnSelectPlan<
   TDataSource extends PgDataSource<any>,
   TColumn extends keyof TDataSource["TTable"]
@@ -166,37 +229,86 @@ class PgColumnSelectPlan<
   }
 }
 
+/**
+ * This represents selecting from a class-like entity (table, view, etc); i.e.
+ * it represents `SELECT <columns>, <cursor?> FROM <table>`.  It's not
+ * currently clear if it also includes `WHERE <conditions>`,
+ * `ORDER BY <order>`, `LEFT JOIN <join>`, etc within its scope. `GROUP BY` is
+ * definitely not in scope, because that would invalidate the identifiers.
+ *
+ * I currently don't expect this to be used to select sets of scalars, but it
+ * could be used for that purpose so long as we name the scalars (i.e. create
+ * records from them).
+ */
 class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends PgPlan<
   Opaque<TDataSource["TTable"]>
 > {
   symbol: symbol;
+
+  /** = sql.identifier(this.symbol) */
   alias: SQL;
+
+  /**
+   * The data source from which we are selecting: table, view, etc
+   */
+  dataSource: TDataSource;
+
+  /**
+   * Since this is effectively like a DataLoader it processes the data for many
+   * different resolvers at once. This list of (hopefully scalar) plans is used
+   * to identify which records in the result set should be returned to which
+   * GraphQL resolvers.
+   */
+  identifiers: Array<Plan<any>>;
+
+  /**
+   * This is the list of SQL fragments in the result that are compared to the
+   * above `identifiers` to determine if there's a match or not. Typically this
+   * will be a list of columns (e.g. primary or foreign keys on the table).
+   */
   identifierMatches: SQL[];
 
+  /**
+   * If true, we're expecting each identifier to have 0-n results (i.e. a
+   * list).  If false, we're expecting each identifier to get one result (or
+   * null).
+   */
+  many: boolean;
+
   constructor(
-    public dataSource: TDataSource,
-    public identifiers: Plan<any>[],
-    identifierMatches: string[],
-    public many = false,
+    dataSource: TDataSource,
+    identifiers: Plan<any>[],
+    identifierMatchesThunk: (alias: SQL) => SQL[],
+    many = false,
   ) {
     super();
+    this.dataSource = dataSource;
     this.symbol = Symbol(dataSource.name);
     this.alias = sql.identifier(this.symbol);
-    this.identifierMatches = identifierMatches.map(
-      (colName) => sql`${this.alias}.${sql.identifier(colName)}`,
-    );
+    this.identifiers = identifiers;
+    this.identifierMatches = identifierMatchesThunk(this.alias);
     if (this.identifiers.length !== this.identifierMatches.length) {
       throw new Error(
         `'identifiers' and 'identifierMatches' lengths must match (${this.identifiers.length} != ${this.identifierMatches.length})`,
       );
     }
+    this.many = many;
     return this;
   }
 
+  /**
+   * We only want to fetch each column once (since columns don't accept any
+   * parameters), so this memo keeps track of which columns we've selected so
+   * their plans can be easily reused.
+   */
   colPlans: {
     [key in keyof TDataSource["TTable"]]?: PgColumnSelectPlan<TDataSource, key>;
   } = {};
 
+  /**
+   * Returns a plan representing a named attribute (e.g. column) from the class
+   * (e.g. table).
+   */
   get<TAttr extends keyof TDataSource["TTable"]>(
     attr: TAttr,
   ): PgColumnSelectPlan<TDataSource, TAttr> {
@@ -207,6 +319,12 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends PgPlan<
     return this.colPlans[attr]!;
   }
 
+  /**
+   * Not sure about this at all. When selecting a connection we need to be able
+   * to get the cursor. The cursor is built from the values of the `ORDER BY`
+   * clause so that we can find nodes before/after it. This may or may not be
+   * the right place for this.
+   */
   cursor() {
     return this.get("TODO_cursor_here");
   }
@@ -258,7 +376,7 @@ const Message = new GraphQLObjectType(
           const $user = new PgClassSelectPlan(
             userSource,
             [$message.get("author_id")],
-            ["id"],
+            (alias) => [sql`${alias}.id`],
             false, // just one
           );
           return $user;
@@ -364,7 +482,7 @@ const Forum = new GraphQLObjectType(
           const $messages = new PgClassSelectPlan(
             messageSource,
             [$forum.get("id")],
-            ["forum_id"],
+            (alias) => [sql`${alias}.forum_id`],
             true, // many
           );
           // $messages.leftJoin(...);
@@ -391,7 +509,12 @@ const Query = new GraphQLObjectType(
       forums: {
         type: new GraphQLList(Forum),
         plan() {
-          const $forums = new PgClassSelectPlan(forumSource, [], [], true);
+          const $forums = new PgClassSelectPlan(
+            forumSource,
+            [],
+            () => [],
+            true,
+          );
           return $forums;
         },
       },
