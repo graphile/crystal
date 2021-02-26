@@ -23,9 +23,12 @@ import {
   GraphQLFieldConfig,
   GraphQLFieldConfigMap,
 } from "graphql";
+import { inspect } from "util";
 import sql, { SQL } from "../../pg-sql2/dist";
 import { TrackedObject } from "../src/trackedObject";
 import { enforceCrystal } from "../src";
+
+const isDev = process.env.NODE_ENV === "development";
 
 /*+--------------------------------------------------------------------------+
   |                            TYPESCRIPT STUFF                              |
@@ -36,6 +39,83 @@ import { enforceCrystal } from "../src";
  * requested. We should never need to refer to it directly.
  */
 type Opaque<TObj extends { [key: string]: any }> = Partial<TObj>;
+
+interface POJOList extends Array<POJOValue> {}
+interface POJORecord {
+  [key: string]: POJOValue;
+}
+type POJOValue =
+  | undefined
+  | null
+  | boolean
+  | number
+  | string
+  | POJOList
+  | POJORecord;
+
+/**
+ * Clones a POJO. Equivalent to `JSON.parse(JSON.stringify(value))`, but
+ * hopefully faster for small objects?
+ *
+ * TODO: benchmark.
+ */
+function deepClone<TValue extends POJOValue>(value: TValue): TValue {
+  const type = typeof value;
+  if (
+    value == null ||
+    type === "boolean" ||
+    type === "string" ||
+    type === "number"
+  ) {
+    return value;
+  } else if (Array.isArray(value)) {
+    return value.map(deepClone) as TValue;
+  } else if (type === "object" /* already asserted value isn't null-ish */) {
+    const replacement: Partial<TValue> = {};
+    for (const key in value) {
+      const keyValue = value[key];
+      // @ts-ignore s'all good.
+      replacement[key] = deepClone(keyValue);
+    }
+    return replacement as TValue;
+  } else {
+    throw new Error(
+      `The plan object contains disallowed values; expected boolean | string | number | array | object; received ${inspect(
+        value,
+      )}`,
+    );
+  }
+}
+
+/**
+ * Deep freezes a POJO. Expensive, only do during development.
+ */
+function deepFreeze<TValue extends POJOValue>(value: TValue): void {
+  const type = typeof value;
+  if (
+    value == null ||
+    type === "boolean" ||
+    type === "string" ||
+    type === "number"
+  ) {
+    /* noop */
+  } else if (Array.isArray(value)) {
+    Object.freeze(value);
+    value.map(deepFreeze);
+  } else if (type === "object" /* already asserted value isn't null-ish */) {
+    Object.freeze(value);
+    for (const key in value) {
+      const keyValue = value[key];
+      deepFreeze((keyValue as unknown) as POJOValue);
+    }
+  } else {
+    throw new Error(
+      `The plan object contains disallowed values; expected boolean | string | number | array | object; received ${inspect(
+        value,
+      )}`,
+    );
+  }
+}
 
 /*+--------------------------------------------------------------------------+
   |                             GRAPHQL STUFF                                |
@@ -108,7 +188,40 @@ type UserPlan = PgClassSelectPlan<typeof userSource>;
 type ForumPlan = PgClassSelectPlan<typeof forumSource>;
 
 /*+--------------------------------------------------------------------------+
-  |                               THE REST                                   |
+  |                            PLANS SPECS                                   |
+  +--------------------------------------------------------------------------+*/
+
+/**
+ * This is the serializable format of the plan. Note it has to be JSON
+ * compatible, so no recursion! Note that we cannot always fully plan an
+ * operation without variable values, for example `@skip` / `@include`
+ * directives may affect the plan. So we need variables to build the first
+ * plan, but we can track these variables so we know which ones affect the plan
+ * and we can then re-use these plans if future relevant variables match. Note
+ * these are typically booleans, so we don't typically have many combinations.
+ * Theoretically we could serialize these plans to `redis` or disk or whatever
+ * and share them between instances for distributed optimisation.
+ */
+interface PlanPOJO<TOperation extends keyof Operations> {
+  /** The operation this plan relates to */
+  operation: TOperation;
+
+  /**
+   * The list of plans this plan is dependent on; the internal identifier may
+   * be used inside `data` so must be preserved and not edited; however the
+   * external identifier (the value) may be manipulated (e.g. as part of
+   * merging plans/optimisation).
+   */
+  dependencies: {
+    [internalIdentifier: string]: string;
+  };
+
+  /** Data specific to the operation (each operation has it's own representation) */
+  data: OperationData[TOperation];
+}
+
+/*+--------------------------------------------------------------------------+
+  |                          GRAPHQL HELPERS                                 |
   +--------------------------------------------------------------------------+*/
 
 /**
@@ -132,18 +245,6 @@ export type PlanResolver<
   args: TrackedObject<TArgs>,
   context: TrackedObject<TContext>,
 ) => TResult;
-
-/**
- * A plan represents a method to fetch a "future value". Plans are mutable,
- * they may be mutated directly (via the methods they expose), or indirectly
- * (e.g. the optimisation phase might squash plans together, etc).
- */
-export abstract class Plan<TResult> {
-  // @ts-ignore
-  eval(): Promise<TResult> {
-    /* TODO */
-  }
-}
 
 /**
  * Basically GraphQLFieldConfig but with an easy to access `plan` method.
@@ -203,24 +304,184 @@ function objectSpec<
   return modifiedSpec;
 }
 
+/*+--------------------------------------------------------------------------+
+  |                           BASE OPERATIONS                                |
+  +--------------------------------------------------------------------------+*/
+
+class Operation {}
+
+/**
+ * The root operation is the plan for the root of a query, mutation or
+ * subscription operation. It's a NOOP.
+ */
+class RootOperation extends Operation {}
+
+/**
+ * (Global) registry for operations (interface to allow declaration merging).
+ *
+ * `{ [key: string]: Operation<key> }`
+ */
+interface Operations {
+  RootOperation: typeof RootOperation;
+}
+
+/**
+ * (Global) registry for operation data definitions (interface to allow declaration merging).
+ *
+ * `{ [key in keyof Operations]: { ...data definition here... } }`
+ */
+interface OperationData {
+  RootOperation: {};
+}
+
+/**
+ * (Global) registry for operations (the actual implementations).
+ */
+export const operations: Partial<Operations> = {
+  RootOperation,
+};
+
+/*+--------------------------------------------------------------------------+
+  |                          CUSTOM OPERATIONS                               |
+  +--------------------------------------------------------------------------+*/
+
+class PgClassSelectOperation extends Operation {}
+interface Operations {
+  PgClassSelectOperation: PgClassSelectOperation;
+}
+interface OperationData {
+  PgClassSelectOperation: {
+    /* TODO */
+  };
+}
+operations.PgClassSelectOperation = PgClassSelectOperation;
+
+// TODO:
+// assertIsOperations(operations); // Turn `Partial<Operations>` to `Operations`
+
+/*+--------------------------------------------------------------------------+
+  |                                PLANS                                     |
+  +--------------------------------------------------------------------------+*/
+
+interface ExportHelpers {
+  idForPlan(plan: Plan<any>): string;
+}
+
+/**
+ * A plan represents a method to fetch a "future value". Plans are mutable,
+ * they may be mutated directly (via the methods they expose), or indirectly
+ * (e.g. the optimisation phase might squash plans together, etc). They must
+ * not be mutated after they are finalized.
+ *
+ * **IMPORTANT**: Plans must **ONLY** store data within `this.data`.
+ * **IMPORTANT**: `this.data` must be a POJO with no cycles.
+ */
+export abstract class Plan<TOperation extends keyof Operations> {
+  protected readonly operation: TOperation;
+  protected readonly data: OperationData[TOperation];
+  private finalized = false;
+  private dependencyCounter = 0;
+  private dependencies: {
+    [internalIdentifier: string]: Plan<any>;
+  } = {};
+
+  constructor(operation: TOperation, data: OperationData[TOperation] = {}) {
+    this.operation = operation;
+    this.data = data;
+  }
+
+  /**
+   * Adds this plan as a dependency, returning an internal identifier (that
+   * will not be rewritten) which we can use to refer to this plan.
+   */
+  protected addDependency(plan: Plan<any>): string {
+    this.assertNotFinalized();
+    const id = String(this.dependencyCounter++);
+    this.dependencies[id] = plan;
+    return id;
+  }
+
+  /**
+   * Throws an error if the plan is already finalized. All subclasses must call
+   * this before mutating the plan.
+   */
+  protected assertNotFinalized() {
+    if (this.finalized) {
+      throw new Error("Plan is already finalized, it cannot be modified");
+    }
+  }
+
+  /**
+   * Prevents any further modifications to this plan; use before cloning,
+   * exporting, etc.
+   */
+  protected finalize() {
+    if (!this.finalized) {
+      this.finalized = true;
+      Object.freeze(this.dependencies);
+      Object.freeze(this.data);
+      if (isDev) {
+        deepFreeze(this.data);
+      }
+    }
+  }
+
+  /**
+   * Clones this plan.
+   */
+  public clone() {
+    // Proof of ts-ignore:
+    // ```js
+    // class A { constructor() {this.meaning = 42;} clone() {return new this.constructor()}}
+    // class B extends A { constructor() {super(); this.life = true;} }
+    // console.dir(new B().clone().life); // true
+    // ```
+    // @ts-ignore Constructing via this.constructor is fine. Leave me alone.
+    return new this.constructor(this.operation, deepClone(this.data));
+  }
+
+  /**
+   * Exports the plan in a format suitable for writing to disk or similar storage via JSON.
+   */
+  public export({ idForPlan }: ExportHelpers): PlanPOJO<TOperation> {
+    this.finalize();
+    return {
+      operation: this.operation,
+      dependencies: Object.keys(this.dependencies).reduce((memo, depName) => {
+        memo[depName] = idForPlan(this.dependencies[depName]);
+        return memo;
+      }, {}),
+      data: this.data /* Shouldn't be necessary to clone this (frozen) */,
+    };
+  }
+}
+
+class RootPlan extends Plan<"RootOperation"> {}
+
 /**
  * Not really sure about this... Added it with the intent of maybe adding a
  * `.toSQL()` method to it or something... But currently it's just a proxy for
  * Plan except it makes the `TData` available.
  */
+/*
 class PgPlan<TData> extends Plan<TData> {
   TData!: TData;
 }
+*/
 
 /**
  * A plan for selecting a column. Keep in mind that a column might not be a
  * scalar (could be a list, compound type, JSON, geometry, etc), so this might
  * not be a "leaf"; it might be used as the input of another layer of plan.
  */
+/*
+DISABLED BECAUSE: there's no operation associated with this? It's just a
+FutureValue?
+
 class PgColumnSelectPlan<
   TDataSource extends PgDataSource<any>,
   TColumn extends keyof TDataSource["TTable"]
-> extends PgPlan<TDataSource["TTable"][TColumn]> {
+> extends Plan<"PgColumnSelectOperation"> {
   constructor(
     public table: PgClassSelectPlan<TDataSource>,
     public attr: TColumn,
@@ -228,6 +489,7 @@ class PgColumnSelectPlan<
     super();
   }
 }
+*/
 
 /**
  * This represents selecting from a class-like entity (table, view, etc); i.e.
@@ -240,8 +502,8 @@ class PgColumnSelectPlan<
  * could be used for that purpose so long as we name the scalars (i.e. create
  * records from them).
  */
-class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends PgPlan<
-  Opaque<TDataSource["TTable"]>
+class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
+  "PgClassSelectOperation"
 > {
   symbol: symbol;
 
@@ -330,6 +592,39 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends PgPlan<
   }
 }
 
+class ConnectionPlan<TSubplan extends Plan<any>> extends Plan<Opaque<any>> {
+  constructor(public readonly subplan: TSubplan) {
+    super();
+  }
+
+  /*
+  executeWith(deps: any) {
+    /*
+     * Connection doesn't do anything itself; so `connection { __typename }` is
+     * basically a no-op. However subfields will need access to the deps so
+     * that they may determine which fetched rows relate to them.
+     * /
+    return { ...deps };
+  }
+  */
+}
+
+class PgConnectionPlan<
+  TSubplan extends /* PgPlan? */ Plan<any>
+> extends ConnectionPlan<TSubplan> {
+  constructor(public readonly subplan: TSubplan) {
+    super(subplan);
+  }
+
+  nodes(): TSubplan {
+    return this.subplan.clone();
+  }
+}
+
+/*+--------------------------------------------------------------------------+
+  |                             THE EXAMPLE                                  |
+  +--------------------------------------------------------------------------+*/
+
 const User = new GraphQLObjectType(
   objectSpec<GraphileResolverContext, UserPlan>({
     name: "User",
@@ -385,35 +680,6 @@ const Message = new GraphQLObjectType(
     },
   }),
 );
-
-class ConnectionPlan<TSubplan extends Plan<any>> extends Plan<Opaque<any>> {
-  constructor(public readonly subplan: TSubplan) {
-    super();
-  }
-
-  /*
-  executeWith(deps: any) {
-    /*
-     * Connection doesn't do anything itself; so `connection { __typename }` is
-     * basically a no-op. However subfields will need access to the deps so
-     * that they may determine which fetched rows relate to them.
-     * /
-    return { ...deps };
-  }
-  */
-}
-
-class PgConnectionPlan<
-  TSubplan extends /* PgPlan? */ Plan<any>
-> extends ConnectionPlan<TSubplan> {
-  constructor(public readonly subplan: TSubplan) {
-    super(subplan);
-  }
-
-  nodes(): TSubplan {
-    return this.subplan.clone();
-  }
-}
 
 const MessageEdge = new GraphQLObjectType(
   objectSpec<GraphileResolverContext, MessagePlan>({
@@ -499,8 +765,6 @@ const Forum = new GraphQLObjectType(
     },
   }),
 );
-
-class RootPlan extends Plan<unknown> {}
 
 const Query = new GraphQLObjectType(
   objectSpec<GraphileResolverContext, RootPlan>({
