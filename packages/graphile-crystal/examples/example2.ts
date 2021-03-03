@@ -40,83 +40,6 @@ const isDev = process.env.NODE_ENV === "development";
  */
 type Opaque<TObj extends { [key: string]: any }> = Partial<TObj>;
 
-interface POJOList extends Array<POJOValue> {}
-interface POJORecord {
-  [key: string]: POJOValue;
-}
-type POJOValue =
-  | undefined
-  | null
-  | boolean
-  | number
-  | string
-  | POJOList
-  | POJORecord;
-
-/**
- * Clones a POJO. Equivalent to `JSON.parse(JSON.stringify(value))`, but
- * hopefully faster for small objects?
- *
- * TODO: benchmark.
- */
-function deepClone<TValue extends POJOValue>(value: TValue): TValue {
-  const type = typeof value;
-  if (
-    value == null ||
-    type === "boolean" ||
-    type === "string" ||
-    type === "number"
-  ) {
-    return value;
-  } else if (Array.isArray(value)) {
-    return value.map(deepClone) as TValue;
-  } else if (type === "object" /* already asserted value isn't null-ish */) {
-    const replacement: Partial<TValue> = {};
-    for (const key in value) {
-      const keyValue = value[key];
-      // @ts-ignore s'all good.
-      replacement[key] = deepClone(keyValue);
-    }
-    return replacement as TValue;
-  } else {
-    throw new Error(
-      `The plan object contains disallowed values; expected boolean | string | number | array | object; received ${inspect(
-        value,
-      )}`,
-    );
-  }
-}
-
-/**
- * Deep freezes a POJO. Expensive, only do during development.
- */
-function deepFreeze<TValue extends POJOValue>(value: TValue): void {
-  const type = typeof value;
-  if (
-    value == null ||
-    type === "boolean" ||
-    type === "string" ||
-    type === "number"
-  ) {
-    /* noop */
-  } else if (Array.isArray(value)) {
-    Object.freeze(value);
-    value.map(deepFreeze);
-  } else if (type === "object" /* already asserted value isn't null-ish */) {
-    Object.freeze(value);
-    for (const key in value) {
-      const keyValue = value[key];
-      deepFreeze((keyValue as unknown) as POJOValue);
-    }
-  } else {
-    throw new Error(
-      `The plan object contains disallowed values; expected boolean | string | number | array | object; received ${inspect(
-        value,
-      )}`,
-    );
-  }
-}
-
 /*+--------------------------------------------------------------------------+
   |                             GRAPHQL STUFF                                |
   +--------------------------------------------------------------------------+*/
@@ -305,61 +228,6 @@ function objectSpec<
 }
 
 /*+--------------------------------------------------------------------------+
-  |                           BASE OPERATIONS                                |
-  +--------------------------------------------------------------------------+*/
-
-class Operation {}
-
-/**
- * The root operation is the plan for the root of a query, mutation or
- * subscription operation. It's a NOOP.
- */
-class RootOperation extends Operation {}
-
-/**
- * (Global) registry for operations (interface to allow declaration merging).
- *
- * `{ [key: string]: Operation<key> }`
- */
-interface Operations {
-  RootOperation: typeof RootOperation;
-}
-
-/**
- * (Global) registry for operation data definitions (interface to allow declaration merging).
- *
- * `{ [key in keyof Operations]: { ...data definition here... } }`
- */
-interface OperationData {
-  RootOperation: {};
-}
-
-/**
- * (Global) registry for operations (the actual implementations).
- */
-export const operations: Partial<Operations> = {
-  RootOperation,
-};
-
-/*+--------------------------------------------------------------------------+
-  |                          CUSTOM OPERATIONS                               |
-  +--------------------------------------------------------------------------+*/
-
-class PgClassSelectOperation extends Operation {}
-interface Operations {
-  PgClassSelectOperation: PgClassSelectOperation;
-}
-interface OperationData {
-  PgClassSelectOperation: {
-    /* TODO */
-  };
-}
-operations.PgClassSelectOperation = PgClassSelectOperation;
-
-// TODO:
-// assertIsOperations(operations); // Turn `Partial<Operations>` to `Operations`
-
-/*+--------------------------------------------------------------------------+
   |                                PLANS                                     |
   +--------------------------------------------------------------------------+*/
 
@@ -372,29 +240,21 @@ interface ExportHelpers {
  * they may be mutated directly (via the methods they expose), or indirectly
  * (e.g. the optimisation phase might squash plans together, etc). They must
  * not be mutated after they are finalized.
- *
- * **IMPORTANT**: Plans must **ONLY** store data within `this.data`.
- * **IMPORTANT**: `this.data` must be a POJO with no cycles.
  */
-export abstract class Plan<TOperation extends keyof Operations> {
-  protected readonly operation: TOperation;
-  protected readonly data: OperationData[TOperation];
+export abstract class Plan<TData> {
   private finalized = false;
   private dependencyCounter = 0;
   private dependencies: {
-    [internalIdentifier: string]: Plan<any>;
+    [internalIdentifier: string]: Plan;
   } = {};
 
-  constructor(operation: TOperation, data: OperationData[TOperation] = {}) {
-    this.operation = operation;
-    this.data = data;
-  }
+  constructor() {}
 
   /**
    * Adds this plan as a dependency, returning an internal identifier (that
    * will not be rewritten) which we can use to refer to this plan.
    */
-  protected addDependency(plan: Plan<any>): string {
+  protected addDependency(plan: Plan): string {
     this.assertNotFinalized();
     const id = String(this.dependencyCounter++);
     this.dependencies[id] = plan;
@@ -419,69 +279,27 @@ export abstract class Plan<TOperation extends keyof Operations> {
     if (!this.finalized) {
       this.finalized = true;
       Object.freeze(this.dependencies);
-      Object.freeze(this.data);
-      if (isDev) {
-        deepFreeze(this.data);
-      }
     }
   }
 
-  /**
-   * Clones this plan.
-   */
-  public clone() {
-    // Proof of ts-ignore:
-    // ```js
-    // class A { constructor() {this.meaning = 42;} clone() {return new this.constructor()}}
-    // class B extends A { constructor() {super(); this.life = true;} }
-    // console.dir(new B().clone().life); // true
-    // ```
-    // @ts-ignore Constructing via this.constructor is fine. Leave me alone.
-    return new this.constructor(this.operation, deepClone(this.data));
-  }
-
-  /**
-   * Exports the plan in a format suitable for writing to disk or similar storage via JSON.
-   */
-  public export({ idForPlan }: ExportHelpers): PlanPOJO<TOperation> {
-    this.finalize();
-    return {
-      operation: this.operation,
-      dependencies: Object.keys(this.dependencies).reduce((memo, depName) => {
-        memo[depName] = idForPlan(this.dependencies[depName]);
-        return memo;
-      }, {}),
-      data: this.data /* Shouldn't be necessary to clone this (frozen) */,
-    };
-  }
+  public abstract eval(): TData;
 }
-
-class RootPlan extends Plan<"RootOperation"> {}
 
 /**
- * Not really sure about this... Added it with the intent of maybe adding a
- * `.toSQL()` method to it or something... But currently it's just a proxy for
- * Plan except it makes the `TData` available.
+ * Represents the root of an operation (query, mutation, subscription); is a
+ * no-op.
  */
-/*
-class PgPlan<TData> extends Plan<TData> {
-  TData!: TData;
-}
-*/
+class RootPlan extends Plan {}
 
 /**
  * A plan for selecting a column. Keep in mind that a column might not be a
  * scalar (could be a list, compound type, JSON, geometry, etc), so this might
  * not be a "leaf"; it might be used as the input of another layer of plan.
  */
-/*
-DISABLED BECAUSE: there's no operation associated with this? It's just a
-FutureValue?
-
 class PgColumnSelectPlan<
   TDataSource extends PgDataSource<any>,
   TColumn extends keyof TDataSource["TTable"]
-> extends Plan<"PgColumnSelectOperation"> {
+> extends Plan {
   constructor(
     public table: PgClassSelectPlan<TDataSource>,
     public attr: TColumn,
@@ -489,7 +307,6 @@ class PgColumnSelectPlan<
     super();
   }
 }
-*/
 
 /**
  * This represents selecting from a class-like entity (table, view, etc); i.e.
@@ -502,9 +319,7 @@ class PgColumnSelectPlan<
  * could be used for that purpose so long as we name the scalars (i.e. create
  * records from them).
  */
-class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
-  "PgClassSelectOperation"
-> {
+class PgClassSelectPlan<TDataSource extends PgDataSource<any>> implements Plan {
   symbol: symbol;
 
   /** = sql.identifier(this.symbol) */
