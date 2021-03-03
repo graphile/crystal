@@ -5,20 +5,13 @@ import {
   GraphQLResolveInfo,
   GraphQLObjectType,
   FragmentDefinitionNode,
-  GraphQLField,
-  GraphQLOutputType,
-  GraphQLUnionType,
-  GraphQLInterfaceType,
-  GraphQLNamedType,
   SelectionSetNode,
 } from "graphql";
 import {
   GraphQLRootValue,
   GraphQLVariables,
   PathIdentity,
-  PlanResolver,
   GraphQLContext,
-  InputPlanResolver,
 } from "./interfaces";
 import { Aether } from "./aether";
 import { parseDoc, FieldDigest } from "./parseDoc";

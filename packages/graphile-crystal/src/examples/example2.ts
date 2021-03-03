@@ -24,66 +24,21 @@ import {
   GraphQLFieldConfigMap,
 } from "graphql";
 import sql, { SQL } from "../../../pg-sql2/dist";
-import { TrackedObject } from "../trackedObject";
 import { enforceCrystal } from "..";
+import {
+  PlanResolver,
+  BaseGraphQLContext,
+  BaseGraphQLArguments,
+  GraphileResolverContext,
+  Opaque,
+} from "../interfaces";
+import { Plan, CrystalContext, DataSource } from "../plan";
 
 const isDev = process.env.NODE_ENV === "development";
 
 /*+--------------------------------------------------------------------------+
-  |                            TYPESCRIPT STUFF                              |
-  +--------------------------------------------------------------------------+*/
-
-/**
- * It's going to be a TObj, but only containing the things that were actually
- * requested. We should never need to refer to it directly.
- */
-type Opaque<TObj extends { [key: string]: any }> = Partial<TObj>;
-
-/*+--------------------------------------------------------------------------+
-  |                             GRAPHQL STUFF                                |
-  +--------------------------------------------------------------------------+*/
-
-// These are what the generics extend from
-export type BaseGraphQLRootValue = any;
-export interface BaseGraphQLContext {}
-export interface BaseGraphQLVariables {
-  [key: string]: unknown;
-}
-export interface BaseGraphQLArguments {
-  [key: string]: unknown;
-}
-
-// This is the actual runtime context; we should not use a global for this.
-interface GraphileResolverContext extends BaseGraphQLContext {}
-
-/*+--------------------------------------------------------------------------+
   |                               DATA SOURCES                               |
   +--------------------------------------------------------------------------+*/
-
-abstract class DataSource<
-  TQuery extends Record<string, any>,
-  TData extends { [key: string]: any }
-> {
-  /**
-   * TypeScript hack so that we can retrieve the TQuery type from a data source
-   * at a later time - needed so we can have strong typing on
-   * `executeQueryWithDataSource` and similar methods.
-   *
-   * @internal
-   */
-  TQuery!: TQuery;
-
-  /**
-   * TypeScript hack so that we can retrieve the TData type from a data source
-   * at a later time - needed so we can have strong typing on `.get()` and
-   * similar methods.
-   *
-   * @internal
-   */
-  TData!: TData;
-
-  constructor() {}
-}
 
 /**
  * PG data source represents a PostgreSQL data source. This could be a table,
@@ -151,37 +106,15 @@ type ForumPlan = PgClassSelectPlan<typeof forumSource>;
   +--------------------------------------------------------------------------+*/
 
 /**
- * Plan resolvers are like regular resolvers except they're called beforehand,
- * they return plans rather than values, and they only run once for lists
- * rather than for each item in the list.
- *
- * The idea is that the plan resolver returns a plan object which later will
- * process the data and feed that into the actual resolver functions
- * (preferably using the default resolver function?).
- *
- * They are stored onto `<field>.extensions.graphile.plan`
- */
-export type PlanResolver<
-  TContext extends BaseGraphQLContext,
-  TSource extends Plan<any>,
-  TResult extends Plan<any>,
-  TArgs extends BaseGraphQLArguments
-> = (
-  $parentPlan: TSource,
-  args: TrackedObject<TArgs>,
-  context: TrackedObject<TContext>,
-) => TResult;
-
-/**
  * Basically GraphQLFieldConfig but with an easy to access `plan` method.
  */
 type GraphileCrystalFieldConfig<
   TContext extends BaseGraphQLContext,
-  TSource extends Plan<any>,
-  TResult extends Plan<any> = Plan<any>,
-  TArgs extends BaseGraphQLArguments = BaseGraphQLArguments
+  TParentPlan extends Plan<any>,
+  TResultPlan extends Plan<any>,
+  TArgs extends BaseGraphQLArguments
 > = GraphQLFieldConfig<any, any> & {
-  plan?: PlanResolver<TContext, TSource, TResult, TArgs>;
+  plan?: PlanResolver<TContext, TArgs, TParentPlan, TResultPlan>;
 };
 
 /**
@@ -193,7 +126,7 @@ function objectFieldSpec<
   TResult extends Plan<any> = Plan<any>,
   TArgs extends BaseGraphQLArguments = BaseGraphQLArguments
 >(
-  graphileSpec: GraphileCrystalFieldConfig<TContext, TSource, TResult>,
+  graphileSpec: GraphileCrystalFieldConfig<TContext, TSource, TResult, TArgs>,
 ): GraphQLFieldConfig<any, TContext, TArgs> {
   const { plan, ...spec } = graphileSpec;
   return {
@@ -211,16 +144,21 @@ function objectFieldSpec<
  */
 function objectSpec<
   TContext extends BaseGraphQLContext,
-  TSource extends Plan<any>
+  TParentPlan extends Plan<any>
 >(
   spec: GraphQLObjectTypeConfig<any, TContext> & {
     fields: {
-      [key: string]: GraphileCrystalFieldConfig<TContext, TSource>;
+      [key: string]: GraphileCrystalFieldConfig<
+        TContext,
+        TParentPlan,
+        any,
+        any
+      >;
     };
   },
 ): GraphQLObjectTypeConfig<any, TContext> {
   const modifiedFields = Object.keys(spec.fields).reduce((o, key) => {
-    o[key] = objectFieldSpec<TContext, TSource>(spec.fields[key]);
+    o[key] = objectFieldSpec<TContext, TParentPlan>(spec.fields[key]);
     return o;
   }, {} as GraphQLFieldConfigMap<any, TContext>);
   const modifiedSpec: GraphQLObjectTypeConfig<any, TContext> = {
@@ -228,67 +166,6 @@ function objectSpec<
     fields: modifiedFields,
   };
   return modifiedSpec;
-}
-
-interface CrystalContext {
-  executeQueryWithDataSource<TDataSource extends DataSource<any, any>>(
-    dataSource: TDataSource,
-    query: TDataSource["TQuery"],
-  ): Promise<{ values: TDataSource["TData"][] }>;
-}
-
-/*+--------------------------------------------------------------------------+
-  |                                PLANS                                     |
-  +--------------------------------------------------------------------------+*/
-
-/**
- * A plan represents a method to fetch a "future value". Plans are mutable,
- * they may be mutated directly (via the methods they expose), or indirectly
- * (e.g. the optimisation phase might squash plans together, etc). They must
- * not be mutated after they are finalized.
- */
-export abstract class Plan<TOutput> {
-  private finalized = false;
-  private dependencyCounter = 0;
-  private dependencies: {
-    [internalIdentifier: string]: Plan<any>;
-  } = {};
-
-  constructor() {}
-
-  /**
-   * Adds this plan as a dependency, returning an internal identifier (that
-   * will not be rewritten) which we can use to refer to this plan.
-   */
-  protected addDependency(plan: Plan<any>): string {
-    this.assertNotFinalized();
-    const id = String(this.dependencyCounter++);
-    this.dependencies[id] = plan;
-    return id;
-  }
-
-  /**
-   * Throws an error if the plan is already finalized. All subclasses must call
-   * this before mutating the plan.
-   */
-  protected assertNotFinalized() {
-    if (this.finalized) {
-      throw new Error("Plan is  it cannot be modified");
-    }
-  }
-
-  /**
-   * Prevents any further modifications to this plan; use before cloning,
-   * exporting, etc. Calling finalize multiple times is perfectly safe, it is
-   * idempotent.
-   */
-  protected finalize() {
-    if (!this.finalized) {
-      this.finalized = true;
-    }
-  }
-
-  public abstract eval(context: CrystalContext): TOutput | Promise<TOutput>;
 }
 
 /**
@@ -636,6 +513,7 @@ class PgConnectionPlan<TDataSource extends PgDataSource<any>> extends Plan<
 
   eval() {
     // TODO
+    return {};
   }
 }
 

@@ -5,7 +5,7 @@ import { memoize, pick } from "lodash";
  * will in future. Can turn it into intermediary representations that can be
  * used in other plans, e.g. `.toSQL()`?
  */
-export abstract class FutureValue<TEntry extends {[key: string]: any}= unknown> {
+export abstract class FutureValue<TEntry extends { [key: string]: any }> {
   constructor(protected selection: Array<keyof TEntry>) {}
 
   keys(): ReadonlyArray<keyof TEntry> {

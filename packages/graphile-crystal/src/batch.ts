@@ -2,7 +2,6 @@ import { GraphQLResolveInfo } from "graphql";
 import {
   GraphQLArguments,
   CrystalResult,
-  FutureDependencies,
   PathIdentity,
   $$path,
   $$batch,
@@ -13,7 +12,6 @@ import { getPathIdentityFromResolveInfo } from "./utils";
 import { Plan } from "./plan";
 import { isCrystalResult } from "./crystalResult";
 import { Aether } from "./aether";
-import { future } from "./future";
 import { TrackedObject } from "./trackedObject";
 
 /**
@@ -21,8 +19,13 @@ import { TrackedObject } from "./trackedObject";
  */
 interface Info {
   pathIdentity: PathIdentity;
-  graphile: GraphileEngine.GraphQLFieldGraphileExtension | null;
-  plan: Plan;
+  graphile: GraphileEngine.GraphQLFieldGraphileExtension<
+    any,
+    any,
+    any,
+    any
+  > | null;
+  plan: Plan<any>;
 }
 
 /**
@@ -85,8 +88,8 @@ export class Batch {
       const trackedContext = new TrackedObject(context);
       // TODO
       // $deps represents the set of arguments that will be fed into this plan; e.g. for `userById(id: 8)` it'd be the set `[{id: 8}]`.
-      const $deps: FutureDependencies<any> = future();
-      const plan = digest?.plan($deps, trackedArgs, trackedContext);
+      //const $deps: FutureDependencies<any> = future();
+      const plan = digest?.plan(parent, trackedArgs, trackedContext);
 
       // TODO: apply the args here
       /*

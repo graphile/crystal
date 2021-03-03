@@ -1,13 +1,51 @@
-import { Batch } from "./batch";
-import { TrackedObject } from "./trackedObject";
-import { Plan } from "./plan";
-import { FutureValue } from "./future";
+import type { Batch } from "./batch";
+import type { Plan } from "./plan";
+import type { TrackedObject } from "./trackedObject";
+//import { Plan } from "./plan";
 
+/*+--------------------------------------------------------------------------+
+  |                            TYPESCRIPT STUFF                              |
+  +--------------------------------------------------------------------------+*/
 
-export type GraphQLRootValue = any;
-export interface GraphQLContext {};
-export type GraphQLVariables = { [key: string]: unknown };
-export type GraphQLArguments = { [key: string]: unknown };
+/**
+ * It's going to be a TObj, but only containing the things that were actually
+ * requested. We should never need to refer to it directly.
+ */
+export type Opaque<TObj extends { [key: string]: any }> = Partial<TObj>;
+
+/*+--------------------------------------------------------------------------+
+  |                             GRAPHQL STUFF                                |
+  +--------------------------------------------------------------------------+*/
+
+// These are what the generics extend from
+export type BaseGraphQLRootValue = any;
+export interface BaseGraphQLContext {}
+export interface BaseGraphQLVariables {
+  [key: string]: unknown;
+}
+export interface BaseGraphQLArguments {
+  [key: string]: any;
+}
+
+/** @deprecated */
+export type GraphQLRootValue = BaseGraphQLRootValue;
+/** @deprecated */
+export type GraphQLContext = BaseGraphQLContext;
+/** @deprecated */
+export type GraphQLVariables = BaseGraphQLVariables;
+/** @deprecated */
+export type GraphQLArguments = BaseGraphQLArguments;
+
+/*+--------------------------------------------------------------------------+
+  |                                PLANS                                     |
+  +--------------------------------------------------------------------------+*/
+
+/*+--------------------------------------------------------------------------+
+  |                           EVERYTHING ELSE                                |
+  +--------------------------------------------------------------------------+*/
+
+// This is the actual runtime context; we should not use a global for this.
+export interface GraphileResolverContext extends BaseGraphQLContext {}
 
 export const $$plan = Symbol("plan");
 export const $$data = Symbol("data");
@@ -26,29 +64,33 @@ export interface CrystalResult {
   [$$path]: PathIdentity;
 }
 
-export type FutureDependencies<TKeys extends string> = FutureValue<
-  {
-    [key in TKeys]: unknown;
-  }
->;
-
 /**
- ! Plan resolver is called on the field of an Object Type; it's passed the
- ! "future dependencies" that were returned by it's `dependencies` callback (if
- ! any) and returns a Plan. It cannot use any property of the parent object
- ! that was not requested via dependencies.
- !
- ! @returns a plan for this field.
- !
- ! @remarks
- ! We're using TrackedObject<...> so we can later consider caching these
- ! executions.
+ * Plan resolvers are like regular resolvers except they're called beforehand,
+ * they return plans rather than values, and they only run once for lists
+ * rather than for each item in the list.
+ *
+ * The idea is that the plan resolver returns a plan object which later will
+ * process the data and feed that into the actual resolver functions
+ * (preferably using the default resolver function?).
+ *
+ * They are stored onto `<field>.extensions.graphile.plan`
+ *
+ * @returns a plan for this field.
+ *
+ * @remarks
+ * We're using TrackedObject<...> so we can later consider caching these
+ * executions.
  */
-export type PlanResolver<TContext extends GraphQLContext, TSource extends Plan, TResult extends Plan, TArgs extends GraphQLArguments> = (
-  $parentPlan: TSource,
+export type PlanResolver<
+  TContext extends BaseGraphQLContext,
+  TArgs extends BaseGraphQLArguments,
+  TParentPlan extends Plan<any>,
+  TResultPlan extends Plan<any>
+> = (
+  $parentPlan: TParentPlan,
   args: TrackedObject<TArgs>,
   context: TrackedObject<TContext>,
-) => TResult;
+) => TResultPlan;
 
 /**
  * Arg plan resolver is called on an argument to a field of an Object Type;
@@ -63,18 +105,17 @@ export type PlanResolver<TContext extends GraphQLContext, TSource extends Plan, 
  * object fields, useful for building a conditions tree with OR/AND/etc. These
  * plans are special in that they don't resolve to runtime data, they're just
  * used to augment the root plan.
- */
 export type InputPlanResolver<
-  TPlan extends Plan,
+  TPlan extends Plan<any>,
   TDependencyKeys extends string,
-  TOutputPlan extends Plan
+  TOutputPlan extends Plan<any>
 > = (
   plan: TPlan,
   arg: unknown,
-  $deps: FutureDependencies<TDependencyKeys>,
   args: TrackedObject<GraphQLArguments>,
   context: TrackedObject<object>,
 ) => TOutputPlan | null;
+ */
 
 /*
 
@@ -117,6 +158,7 @@ type Dependencies<
 
  */
 
+/*
 declare global {
   namespace GraphileEngine {
     // GraphQLObjectTypeGraphileExtension
@@ -125,7 +167,6 @@ declare global {
       TDependencyKeys extends string = string
     > {
       dependencies?: TDependencyKeys[];
-      plan?: PlanResolver<TPlan, TDependencyKeys>;
     }
 
     interface GraphQLArgumentGraphileExtension<
@@ -145,5 +186,52 @@ declare module 'graphql' {
   }
   interface GraphQLArgumentExtensions {
     graphile: GraphileEngine.GraphQLArgumentGraphileExtension;
+  }
+}
+*/
+
+declare global {
+  namespace GraphileEngine {
+    // GraphQLObjectTypeGraphileExtension
+    interface GraphQLFieldGraphileExtension<
+      TContext,
+      TArgs,
+      TParentPlan extends Plan<any>,
+      TResultPlan extends Plan<any>
+    > {
+      plan?: PlanResolver<TContext, TArgs, TParentPlan, TResultPlan>;
+    }
+
+    interface GraphQLArgumentGraphileExtension<
+      TContext,
+      TInput,
+      TParentPlan extends Plan<any>,
+      TResultPlan extends Plan<any>
+    > {
+      argPlan?: PlanResolver<TContext, TInput, TParentPlan, TResultPlan>;
+    }
+  }
+}
+
+declare module "graphql" {
+  interface GraphQLFieldExtensions<
+    TSource,
+    TContext,
+    TArgs = { [argName: string]: any }
+  > {
+    graphile: GraphileEngine.GraphQLFieldGraphileExtension<
+      TContext,
+      TArgs,
+      any,
+      any
+    >;
+  }
+  interface GraphQLArgumentExtensions {
+    graphile: GraphileEngine.GraphQLArgumentGraphileExtension<
+      any,
+      any,
+      any,
+      any
+    >;
   }
 }

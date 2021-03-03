@@ -21,7 +21,7 @@ import {
   GraphQLVariables,
   PathIdentity,
   PlanResolver,
-  InputPlanResolver,
+  // InputPlanResolver,
 } from "./interfaces";
 import { Doc } from "./doc";
 import { shouldSkip } from "./parseDocHelpers";
@@ -31,7 +31,7 @@ import { shouldSkip } from "./parseDocHelpers";
  * an argument (or another input field).
  */
 interface InputDigest {
-  inputPlan?: InputPlanResolver<any, any, any>;
+  // inputPlan?: InputPlanResolver<any, any, any>;
   dependencies: string[];
   inputFields: {
     [inputFieldName: string]: InputDigest;
@@ -53,7 +53,7 @@ export interface FieldDigest {
   /**
    * The plan resolver from extensions.graphile
    */
-  plan?: PlanResolver<any, any>;
+  plan?: PlanResolver<any, any, any, any>;
 
   /**
    * This isn't all the field arguments, it's the ones reachable based on the
@@ -183,7 +183,7 @@ function processObjectField(
   const namedResultType: GraphQLNamedType = unwrappedType;
 
   const graphile:
-    | GraphileEngine.GraphQLFieldGraphileExtension
+    | GraphileEngine.GraphQLFieldGraphileExtension<any, any, any, any>
     | undefined = field.extensions?.graphile;
   console.dir(field.extensions);
 
@@ -240,7 +240,7 @@ function processFragment(
   typeCondition: NamedTypeNode | undefined,
   selectionSet: SelectionSetNode,
   parentType: GraphQLObjectType | GraphQLUnionType | GraphQLInterfaceType,
-  path: string = "",
+  path = "",
   map: Map<PathIdentity, FieldDigest> = new Map(),
 ): void {
   if (
@@ -271,7 +271,7 @@ function processSelectionSet(
   variables: TrackedObject<GraphQLVariables>,
   selectionSet: SelectionSetNode,
   parentType: GraphQLObjectType | GraphQLUnionType | GraphQLInterfaceType,
-  path: string = "",
+  path = "",
   map: Map<PathIdentity, FieldDigest> = new Map(),
 ): Map<PathIdentity, FieldDigest> {
   for (const selection of selectionSet.selections) {
