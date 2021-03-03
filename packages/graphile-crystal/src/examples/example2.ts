@@ -31,10 +31,16 @@ import {
   BaseGraphQLArguments,
   GraphileResolverContext,
   Opaque,
+  DataSource,
+  CrystalContext,
 } from "../interfaces";
-import { Plan, CrystalContext, DataSource } from "../plan";
+import { Plan } from "../plan";
+
+import { Pool } from "pg";
 
 const isDev = process.env.NODE_ENV === "development";
+
+const testPool = new Pool({ connectionString: "graphile_crystal" });
 
 /*+--------------------------------------------------------------------------+
   |                               DATA SOURCES                               |
@@ -45,7 +51,7 @@ const isDev = process.env.NODE_ENV === "development";
  * view, materialized view, function call, join, etc. Anything table-like.
  */
 class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
-  { query: SQL },
+  { text: string; values?: any[] },
   TData
 > {
   /**
@@ -55,8 +61,25 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
    * (but should be). Used for making the SQL query and debug messages easier
    * to understand.
    */
-  constructor(public tableIdentifier: SQL, public name: string) {
+  constructor(
+    public tableIdentifier: SQL,
+    public name: string,
+    public readonly pool: Pool = testPool,
+  ) {
     super();
+  }
+
+  async execute(
+    context: any,
+    op: { text: string; values?: any[] },
+  ): Promise<{ values: any[] }> {
+    const { text, values } = op;
+    const result = await this.pool.query({
+      text,
+      values,
+      rowMode: "array",
+    });
+    return { values: result.rows };
   }
 }
 
@@ -64,6 +87,7 @@ const messageSource = new PgDataSource<{
   id: string;
   body: string;
   author_id: string;
+  forum_id: string;
   created_at: Date;
 }>(sql`app_public.messages`, "messages");
 
@@ -196,7 +220,7 @@ class PgColumnSelectPlan<
     super();
   }
 
-  eval(crystalContext: CrystalContext) {
+  eval(context: CrystalContext, values: unknown[]) {
     // TODO: return `attrIndex` from the parent record. Or something.
   }
 }
@@ -414,8 +438,13 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
    * `eval` will always run as a root-level query. In future we'll implement a
    * `toSQL` method that allows embedding this plan within another SQL plan...
    * But that's a problem for later.
+   *
+   * Crystal takes care of the batching for us, so `eval` is called with all
+   * the values from the batch, it then runs the query for every list in the
+   * values, and then returns an array of results where each entry in the
+   * results relates to the entry in the incoming values.
    */
-  async eval(crystal: CrystalContext) {
+  async eval(crystal: CrystalContext, values: unknown[]) {
     this.finalize();
 
     // TODO: can some of this be moved to finalize?
@@ -462,15 +491,44 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
       : sql.blank;
     const query = sql`${select}${from}${join}${where}${orderBy}`;
 
-    const result = await crystal.executeQueryWithDataSource(this.dataSource, {
-      query,
+    const { text, values: rawSqlValues } = sql.compile(query);
+
+    const sqlValues = rawSqlValues.map((v) => {
+      // THIS IS A DELIBERATE HACK - we are replacing this symbol with a value
+      // before executing the query.
+      if ((v as any) === this.identifierSymbol) {
+        // TODO: this should be the identifier arrays
+        return "[]";
+      } else {
+        return v;
+      }
     });
-    // TODO: regroup, like DataLoader; also evaluate one versus many.
-    return result.values;
-    /*
-    const spec = sql.compile(query);
-    return result.rows;
-    */
+
+    // TODO: replace placeholder values
+
+    const results = await crystal.executeQueryWithDataSource(this.dataSource, {
+      text,
+      values: sqlValues,
+    });
+
+    if (this.identifierIndex) {
+      const groups = {};
+      for (const result of results.values) {
+        const groupKey = result[this.identifierIndex];
+        if (!groups[groupKey]) {
+          groups[groupKey] = [result];
+        } else {
+          groups[groupKey].push(result);
+        }
+      }
+      return values.map((_, idx) =>
+        this.many ? groups[idx] : groups[idx]?.[0],
+      );
+    } else {
+      // There's no identifiers, so everyone gets the same results.
+      const result = this.many ? [results] : [results[0]];
+      return values.map(() => result);
+    }
   }
 
   /**

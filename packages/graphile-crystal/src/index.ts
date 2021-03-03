@@ -13,7 +13,7 @@ export { Plan } from "./plan";
 /**
  * Ensures that all resolvers in `schema` are wrapped with a crystal resolver wrapper.
  */
-export function enforceCrystal(schema: GraphQLSchema) {
+export function enforceCrystal(schema: GraphQLSchema): GraphQLSchema {
   const types = Object.values(schema.getTypeMap());
   const crystalWrapResolver = makeCrystalWrapResolver();
   for (const type of types) {

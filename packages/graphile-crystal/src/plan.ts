@@ -1,34 +1,4 @@
-export interface CrystalContext {
-  executeQueryWithDataSource<TDataSource extends DataSource<any, any>>(
-    dataSource: TDataSource,
-    query: TDataSource["TQuery"],
-  ): Promise<{ values: TDataSource["TData"][] }>;
-}
-
-export abstract class DataSource<
-  TQuery extends Record<string, any>,
-  TData extends { [key: string]: any }
-> {
-  /**
-   * TypeScript hack so that we can retrieve the TQuery type from a data source
-   * at a later time - needed so we can have strong typing on
-   * `executeQueryWithDataSource` and similar methods.
-   *
-   * @internal
-   */
-  TQuery!: TQuery;
-
-  /**
-   * TypeScript hack so that we can retrieve the TData type from a data source
-   * at a later time - needed so we can have strong typing on `.get()` and
-   * similar methods.
-   *
-   * @internal
-   */
-  TData!: TData;
-
-  constructor() {}
-}
+import { CrystalContext } from "./interfaces";
 
 /**
  * A plan represents a method to fetch a "future value". Plans are mutable,
@@ -78,5 +48,8 @@ export abstract class Plan<TOutput> {
     return this;
   }
 
-  public abstract eval(context: CrystalContext): TOutput | Promise<TOutput>;
+  public abstract eval(
+    crystal: CrystalContext,
+    values: unknown[],
+  ): TOutput | Promise<TOutput>;
 }

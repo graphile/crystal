@@ -94,7 +94,7 @@ function graphileWrapN(listDepth: number) {
 
 export function makeCrystalWrapResolver() {
   // Cached on a per-schema basis, so no need for a WeakMap
-  let typeToWrapperMap = new Map<GraphQLOutputType, any>();
+  const typeToWrapperMap = new Map<GraphQLOutputType, any>();
 
   function makeResultWrapper(type: GraphQLOutputType) {
     const wrapper = typeToWrapperMap.get(type);
@@ -127,7 +127,7 @@ export function makeCrystalWrapResolver() {
     if (isScalarType(unwrappedType)) {
       // We never wrap resolver results of scalars
       newWrapper = identityWrapper;
-    } else if (!unwrappedType?.extensions?.graphile) {
+    } else if (!unwrappedType?.extensions?.graphile?.plan) {
       // Non-graphile types don't have our `resolver`-wrapper, so don't wrap
       // the data being fed to them otherwise we risk them getting confused.
       newWrapper = identityWrapper;
@@ -162,7 +162,7 @@ export function makeCrystalWrapResolver() {
       TArgs
     > = defaultFieldResolver,
   ): GraphQLFieldResolver<TSource, TContext, TArgs> {
-    let realResolver = resolve || defaultFieldResolver;
+    const realResolver = resolve || defaultFieldResolver;
 
     const wrapResult = makeResultWrapper(type);
     const crystalResolver: GraphQLFieldResolver<
@@ -178,7 +178,7 @@ export function makeCrystalWrapResolver() {
         info,
       );
 
-      let { [$$data]: data, ...meta } = await executionResult;
+      const { [$$data]: data, ...meta } = await executionResult;
       const result = await realResolver(data as any, args, context, info);
       return wrapResult(meta, result);
     };

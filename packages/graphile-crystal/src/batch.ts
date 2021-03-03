@@ -7,6 +7,8 @@ import {
   $$batch,
   $$data,
   GraphQLContext,
+  $$plan,
+  CrystalContext,
 } from "./interfaces";
 import { getPathIdentityFromResolveInfo } from "./utils";
 import { Plan } from "./plan";
@@ -14,18 +16,70 @@ import { isCrystalResult } from "./crystalResult";
 import { Aether } from "./aether";
 import { TrackedObject } from "./trackedObject";
 
+interface Deferred<T> extends Promise<T> {
+  resolve: (input?: T | PromiseLike<T> | undefined) => void;
+  reject: (error: Error) => void;
+}
+
+function deferred<T = void>(): Deferred<T> {
+  let resolve: (input?: T | PromiseLike<T> | undefined) => void;
+  let reject: (error: Error) => void;
+  const promise = new Promise<T>((_resolve, _reject): void => {
+    resolve = _resolve;
+    reject = _reject;
+  });
+  // tslint:disable-next-line prefer-object-spread
+  return Object.assign(promise, {
+    // @ts-ignore This isn't used before being defined.
+    resolve,
+    // @ts-ignore This isn't used before being defined.
+    reject,
+  });
+}
+
+class Loader<TResultData = unknown> {
+  executed = false;
+  timeout: NodeJS.Timeout | null = null;
+  batch: unknown[] = [];
+  promises: Deferred<TResultData>[] = [];
+  constructor(private context: CrystalContext, private info: Info) {}
+
+  async load(parent: unknown): Promise<unknown> {
+    if (this.executed) {
+      // TODO: re-evaluate this. Shouldn't be necessary.
+      throw new Error("Cannot load data from an already executed loader");
+    }
+    const promise = deferred<TResultData>();
+    this.batch.push(parent);
+    this.promises.push(promise);
+    if (this.timeout === null) {
+      this.timeout = setTimeout(() => this.execute(), 0);
+    }
+    return promise;
+  }
+
+  async execute(): Promise<void> {
+    let results: TResultData[];
+    try {
+      this.executed = true;
+      // Don't use this again.
+      this.info.loader = undefined;
+      results = await this.info.plan.eval(this.context, this.batch);
+    } catch (e) {
+      this.promises.map((deferred) => deferred.reject(e));
+    }
+    this.promises.map((deferred, idx) => deferred.resolve(results[idx]));
+  }
+}
+
 /**
  * What a Batch knows about a particular PathIdentity
  */
 interface Info {
   pathIdentity: PathIdentity;
-  graphile: GraphileEngine.GraphQLFieldGraphileExtension<
-    any,
-    any,
-    any,
-    any
-  > | null;
   plan: Plan<any>;
+  memo: Map<any, any>;
+  loader?: Loader;
 }
 
 /**
@@ -43,8 +97,8 @@ interface Info {
  * so using the PathIdentity of the batch root.
  */
 export class Batch {
-  private infoByPathIdentity: Map<PathIdentity, Info>;
-  private plan: any;
+  private crystalInfoByPathIdentity: Map<PathIdentity, Info>;
+  private crystalContext: CrystalContext;
 
   constructor(
     public readonly aether: Aether,
@@ -53,28 +107,36 @@ export class Batch {
     context: GraphQLContext,
     info: GraphQLResolveInfo,
   ) {
-    this.infoByPathIdentity = new Map();
+    this.crystalContext = {
+      executeQueryWithDataSource(dataSource, op) {
+        return dataSource.execute(context, op);
+      },
+    };
+    this.crystalInfoByPathIdentity = new Map();
     this.prepare(parent, args, context, info);
   }
 
   /**
-   * Populates infoByPathIdentity **synchronously**.
+   * Populates crystalInfoByPathIdentity **synchronously**.
    */
   prepare(
     parent: unknown,
     args: GraphQLArguments,
     context: GraphQLContext,
     info: GraphQLResolveInfo,
-  ) {
+  ): void {
     /*
      * NOTE: although we have access to 'parent' here, we're only using it for
      * meta-data (path, batch, etc); we must not use the *actual* data in it
      * here, that's for `getResultFor` below.
      */
 
+    const parentCrystalResult: CrystalResult | null = isCrystalResult(parent)
+      ? parent
+      : null;
     const pathIdentity = getPathIdentityFromResolveInfo(
       info,
-      isCrystalResult(parent) ? parent[$$path] : undefined,
+      parentCrystalResult ? parentCrystalResult[$$path] : undefined,
     );
     const digest = this.aether.doc.digestForPath(
       pathIdentity,
@@ -86,10 +148,10 @@ export class Batch {
     if (digest?.plan) {
       const trackedArgs = new TrackedObject(args);
       const trackedContext = new TrackedObject(context);
-      // TODO
-      // $deps represents the set of arguments that will be fed into this plan; e.g. for `userById(id: 8)` it'd be the set `[{id: 8}]`.
-      //const $deps: FutureDependencies<any> = future();
-      const plan = digest?.plan(parent, trackedArgs, trackedContext);
+      const parentPlan = parentCrystalResult
+        ? parentCrystalResult[$$plan]
+        : null;
+      const plan = digest?.plan(parentPlan, trackedArgs, trackedContext);
 
       // TODO: apply the args here
       /*
@@ -117,14 +179,19 @@ export class Batch {
       // TODO (somewhere else): selection set fields' dependencies
       // TODO (somewhere else): selection set fields' args' dependencies (e.g. includeArchived: 'inherit')
 
-      this.plan = plan.finalize();
+      plan.finalize();
+      this.crystalInfoByPathIdentity.set(pathIdentity, {
+        plan,
+        pathIdentity,
+        memo: new Map(),
+      });
     } else {
-      return null;
+      return;
     }
   }
 
   appliesTo(pathIdentity: PathIdentity): boolean {
-    return !!this.infoByPathIdentity.get(pathIdentity);
+    return !!this.crystalInfoByPathIdentity.get(pathIdentity);
   }
 
   async getResultFor(
@@ -132,21 +199,25 @@ export class Batch {
     info: GraphQLResolveInfo,
   ): Promise<CrystalResult> {
     // TODO: should be able to return this synchronously (no `async`)
+    const parentCrystalResult: CrystalResult | null = isCrystalResult(parent)
+      ? parent
+      : null;
     const pathIdentity = getPathIdentityFromResolveInfo(
       info,
-      isCrystalResult(parent) ? parent[$$path] : undefined,
+      parentCrystalResult ? parentCrystalResult[$$path] : undefined,
     );
-    if (!this.plan) {
+    const crystalInfo = this.crystalInfoByPathIdentity.get(pathIdentity);
+    if (!crystalInfo || !crystalInfo.plan) {
       console.log(
         `There's no plan for ${info.parentType.name}.${info.fieldName}`,
       );
       return {
         [$$batch]: this,
-        [$$data]: isCrystalResult(parent) ? parent[$$data] : parent,
+        [$$data]: parentCrystalResult ? parentCrystalResult[$$data] : parent,
         [$$path]: pathIdentity,
       };
     }
-    const data = await this.plan.executeWith(parent);
+    const data = await this.load(crystalInfo, parent);
     console.log("EXECUTED PLAN");
     console.dir(data);
     return {
@@ -154,5 +225,12 @@ export class Batch {
       [$$data]: data,
       [$$path]: pathIdentity,
     };
+  }
+
+  load(crystalInfo: Info, parent: unknown): Promise<any> {
+    if (!crystalInfo.loader) {
+      crystalInfo.loader = new Loader(this.crystalContext, crystalInfo);
+    }
+    return crystalInfo.loader.load(parent);
   }
 }
