@@ -19,8 +19,22 @@ create table app_public.forums (
 
 create table app_public.messages (
   id uuid primary key default gen_random_uuid(),
-  body text not null,
   forum_id uuid not null references app_public.forums,
   author_id uuid not null references app_public.users,
+  body text not null,
   created_at timestamptz not null default now()
 );
+
+insert into app_public.users (username) values
+  ('Alice'),
+  ('Bob'),
+  ('Carrie');
+
+insert into app_public.forums (name) values
+  ('Cats'),
+  ('Dogs'),
+  ('Postgres');
+
+insert into app_public.messages (forum_id, author_id, body)
+  select forums.id, users.id, forums.name || ' = awesome -- ' || users.username
+  from app_public.users, app_public.forums;
