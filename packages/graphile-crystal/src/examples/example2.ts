@@ -691,54 +691,58 @@ const schema = enforceCrystal(
 async function main() {
   //console.log(printSchema(schema));
 
-  const query = /* GraphQL */ `
-    {
-      forums {
-        name
+  {
+    const query = /* GraphQL */ `
+      {
+        forums {
+          name
+        }
       }
-    }
-  `;
+    `;
 
-  const query2 = /* GraphQL */ `
-    {
-      forums {
-        name
-        messagesConnection(
-          limit: 5
-          condition: { active: true }
-          includeArchived: INHERIT
-        ) {
-          nodes {
-            body
-            author {
-              username
-              gravatarUrl
+    const result = await graphql({
+      schema,
+      source: query,
+      variableValues: {},
+      contextValue: {},
+      rootValue: null,
+    });
+
+    console.dir(result);
+  }
+
+  if (Math.random() > 2) {
+    const query = /* GraphQL */ `
+      {
+        forums {
+          name
+          messagesConnection(
+            limit: 5
+            condition: { active: true }
+            includeArchived: INHERIT
+          ) {
+            nodes {
+              body
+              author {
+                username
+                gravatarUrl
+              }
             }
           }
         }
       }
-    }
-  `;
+    `;
 
-  const result = await graphql({
-    schema,
-    source: query,
-    variableValues: {},
-    contextValue: {},
-    rootValue: null,
-  });
+    const result = await graphql({
+      schema,
+      source: query,
+      variableValues: {},
+      contextValue: {},
+      rootValue: null,
+    });
 
-  console.dir(result);
-
-  const result2 = await graphql({
-    schema,
-    source: query2,
-    variableValues: {},
-    contextValue: {},
-    rootValue: null,
-  });
-
-  console.dir(result2);
+    console.dir(result);
+  }
 }
 
 main().catch((e) => {
