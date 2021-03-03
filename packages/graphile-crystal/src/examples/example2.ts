@@ -23,10 +23,9 @@ import {
   GraphQLFieldConfig,
   GraphQLFieldConfigMap,
 } from "graphql";
-import { inspect } from "util";
-import sql, { SQL } from "../../pg-sql2/dist";
-import { TrackedObject } from "../src/trackedObject";
-import { enforceCrystal } from "../src";
+import sql, { SQL } from "../../../pg-sql2/dist";
+import { TrackedObject } from "../trackedObject";
+import { enforceCrystal } from "..";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -61,20 +60,39 @@ interface GraphileResolverContext extends BaseGraphQLContext {}
   |                               DATA SOURCES                               |
   +--------------------------------------------------------------------------+*/
 
-/**
- * PG data source represents a PostgreSQL data source. This could be a table,
- * view, materialized view, function call, join, etc. Anything table-like.
- */
-class PgDataSource<TTable extends { [key: string]: any }> {
+abstract class DataSource<
+  TQuery extends Record<string, any>,
+  TData extends { [key: string]: any }
+> {
   /**
-   * TypeScript hack so that we can retrieve the TTable type from a data source
+   * TypeScript hack so that we can retrieve the TQuery type from a data source
+   * at a later time - needed so we can have strong typing on
+   * `executeQueryWithDataSource` and similar methods.
+   *
+   * @internal
+   */
+  TQuery!: TQuery;
+
+  /**
+   * TypeScript hack so that we can retrieve the TData type from a data source
    * at a later time - needed so we can have strong typing on `.get()` and
    * similar methods.
    *
    * @internal
    */
-  TTable!: TTable;
+  TData!: TData;
 
+  constructor() {}
+}
+
+/**
+ * PG data source represents a PostgreSQL data source. This could be a table,
+ * view, materialized view, function call, join, etc. Anything table-like.
+ */
+class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
+  { query: SQL },
+  TData
+> {
   /**
    * @param tableIdentifier - the SQL for the `FROM` clause (without any
    * aliasing). If this is a subquery don't forget to wrap it in parens.
@@ -82,7 +100,9 @@ class PgDataSource<TTable extends { [key: string]: any }> {
    * (but should be). Used for making the SQL query and debug messages easier
    * to understand.
    */
-  constructor(public tableIdentifier: SQL, public name: string) {}
+  constructor(public tableIdentifier: SQL, public name: string) {
+    super();
+  }
 }
 
 const messageSource = new PgDataSource<{
@@ -104,44 +124,27 @@ const forumSource = new PgDataSource<{
   name: string;
 }>(sql`app_public.forums`, "forums");
 
+/** TODO: permissions
+ *
+ * Permissions are probably part of the datasource; but how we apply them is
+ * not clear. Perhaps via executeQueryWithDataSource? May need to add
+ * additional where clauses/joins/etc? What does this mean for cacheability?
+ * Can we do this earlier? If the data is requested through a route where
+ * security is already enforced (e.g. `currentUser{postsByAuthorId{ ... }}`)
+ * can we bypass adding the checks? Can the checks get merged via plan
+ * optimisation? Are the security checks part of the plan itself?
+ */
+
 // Convenience so we don't have to type these out each time. These used to be
 // separate plans, but required too much maintenance.
-type MessagePlan = PgClassSelectPlan<typeof userSource>;
+type MessagePlan = PgClassSelectPlan<typeof messageSource>;
+type MessageConnectionPlan = PgConnectionPlan<typeof messageSource>;
 type UserPlan = PgClassSelectPlan<typeof userSource>;
 type ForumPlan = PgClassSelectPlan<typeof forumSource>;
 
 /*+--------------------------------------------------------------------------+
   |                            PLANS SPECS                                   |
   +--------------------------------------------------------------------------+*/
-
-/**
- * This is the serializable format of the plan. Note it has to be JSON
- * compatible, so no recursion! Note that we cannot always fully plan an
- * operation without variable values, for example `@skip` / `@include`
- * directives may affect the plan. So we need variables to build the first
- * plan, but we can track these variables so we know which ones affect the plan
- * and we can then re-use these plans if future relevant variables match. Note
- * these are typically booleans, so we don't typically have many combinations.
- * Theoretically we could serialize these plans to `redis` or disk or whatever
- * and share them between instances for distributed optimisation.
- */
-interface PlanPOJO<TOperation extends keyof Operations> {
-  /** The operation this plan relates to */
-  operation: TOperation;
-
-  /**
-   * The list of plans this plan is dependent on; the internal identifier may
-   * be used inside `data` so must be preserved and not edited; however the
-   * external identifier (the value) may be manipulated (e.g. as part of
-   * merging plans/optimisation).
-   */
-  dependencies: {
-    [internalIdentifier: string]: string;
-  };
-
-  /** Data specific to the operation (each operation has it's own representation) */
-  data: OperationData[TOperation];
-}
 
 /*+--------------------------------------------------------------------------+
   |                          GRAPHQL HELPERS                                 |
@@ -227,13 +230,16 @@ function objectSpec<
   return modifiedSpec;
 }
 
+interface CrystalContext {
+  executeQueryWithDataSource<TDataSource extends DataSource<any, any>>(
+    dataSource: TDataSource,
+    query: TDataSource["TQuery"],
+  ): Promise<{ values: TDataSource["TData"][] }>;
+}
+
 /*+--------------------------------------------------------------------------+
   |                                PLANS                                     |
   +--------------------------------------------------------------------------+*/
-
-interface ExportHelpers {
-  idForPlan(plan: Plan<any>): string;
-}
 
 /**
  * A plan represents a method to fetch a "future value". Plans are mutable,
@@ -241,11 +247,11 @@ interface ExportHelpers {
  * (e.g. the optimisation phase might squash plans together, etc). They must
  * not be mutated after they are finalized.
  */
-export abstract class Plan<TData> {
+export abstract class Plan<TOutput> {
   private finalized = false;
   private dependencyCounter = 0;
   private dependencies: {
-    [internalIdentifier: string]: Plan;
+    [internalIdentifier: string]: Plan<any>;
   } = {};
 
   constructor() {}
@@ -254,7 +260,7 @@ export abstract class Plan<TData> {
    * Adds this plan as a dependency, returning an internal identifier (that
    * will not be rewritten) which we can use to refer to this plan.
    */
-  protected addDependency(plan: Plan): string {
+  protected addDependency(plan: Plan<any>): string {
     this.assertNotFinalized();
     const id = String(this.dependencyCounter++);
     this.dependencies[id] = plan;
@@ -267,29 +273,33 @@ export abstract class Plan<TData> {
    */
   protected assertNotFinalized() {
     if (this.finalized) {
-      throw new Error("Plan is already finalized, it cannot be modified");
+      throw new Error("Plan is  it cannot be modified");
     }
   }
 
   /**
    * Prevents any further modifications to this plan; use before cloning,
-   * exporting, etc.
+   * exporting, etc. Calling finalize multiple times is perfectly safe, it is
+   * idempotent.
    */
   protected finalize() {
     if (!this.finalized) {
       this.finalized = true;
-      Object.freeze(this.dependencies);
     }
   }
 
-  public abstract eval(): TData;
+  public abstract eval(context: CrystalContext): TOutput | Promise<TOutput>;
 }
 
 /**
  * Represents the root of an operation (query, mutation, subscription); is a
  * no-op.
  */
-class RootPlan extends Plan {}
+class RootPlan extends Plan<Record<string, never>> {
+  eval() {
+    return {};
+  }
+}
 
 /**
  * A plan for selecting a column. Keep in mind that a column might not be a
@@ -298,13 +308,19 @@ class RootPlan extends Plan {}
  */
 class PgColumnSelectPlan<
   TDataSource extends PgDataSource<any>,
-  TColumn extends keyof TDataSource["TTable"]
-> extends Plan {
+  TColumn extends keyof TDataSource["TData"]
+> extends Plan<TDataSource["TData"][TColumn]> {
   constructor(
     public table: PgClassSelectPlan<TDataSource>,
     public attr: TColumn,
+    // This is the numeric index the parent PgClassSelectPlan gave us to represent this value
+    private attrIndex: number,
   ) {
     super();
+  }
+
+  eval(crystalContext: CrystalContext) {
+    // TODO: return `attrIndex` from the parent record. Or something.
   }
 }
 
@@ -317,9 +333,11 @@ class PgColumnSelectPlan<
  *
  * I currently don't expect this to be used to select sets of scalars, but it
  * could be used for that purpose so long as we name the scalars (i.e. create
- * records from them).
+ * records from them `{a: 1},{a: 2},{a:3}`).
  */
-class PgClassSelectPlan<TDataSource extends PgDataSource<any>> implements Plan {
+class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
+  TDataSource["TData"]
+> {
   symbol: symbol;
 
   /** = sql.identifier(this.symbol) */
@@ -339,11 +357,29 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> implements Plan {
   identifiers: Array<Plan<any>>;
 
   /**
+   * So we can clone.
+   */
+  identifierMatchesThunk: (alias: SQL) => SQL[];
+
+  /**
    * This is the list of SQL fragments in the result that are compared to the
    * above `identifiers` to determine if there's a match or not. Typically this
    * will be a list of columns (e.g. primary or foreign keys on the table).
    */
   identifierMatches: SQL[];
+
+  /**
+   * If this plan has identifiers, which `select` result is associated with
+   * the the index of the relevant identifier to group by.
+   */
+  identifierIndex: number | null;
+
+  /**
+   * If this plan has identifiers, we must feed the identifiers into the values
+   * to feed into the SQL statement after compiling the query; we'll use this
+   * symbol as the placeholder to replace.
+   */
+  identifierSymbol: symbol;
 
   /**
    * If true, we're expecting each identifier to have 0-n results (i.e. a
@@ -357,19 +393,61 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> implements Plan {
     identifiers: Plan<any>[],
     identifierMatchesThunk: (alias: SQL) => SQL[],
     many = false,
+    cloneFrom: PgClassSelectPlan<TDataSource> | null = null,
   ) {
     super();
     this.dataSource = dataSource;
-    this.symbol = Symbol(dataSource.name);
-    this.alias = sql.identifier(this.symbol);
     this.identifiers = identifiers;
-    this.identifierMatches = identifierMatchesThunk(this.alias);
-    if (this.identifiers.length !== this.identifierMatches.length) {
-      throw new Error(
-        `'identifiers' and 'identifierMatches' lengths must match (${this.identifiers.length} != ${this.identifierMatches.length})`,
-      );
-    }
+    this.identifierMatchesThunk = identifierMatchesThunk;
     this.many = many;
+
+    this.colPlans = cloneFrom ? { ...cloneFrom.colPlans } : {};
+    this.identifierSymbol = cloneFrom
+      ? cloneFrom.identifierSymbol
+      : Symbol(dataSource.name + "_identifier_values");
+    this.symbol = cloneFrom ? cloneFrom.symbol : Symbol(dataSource.name);
+    this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
+    this.identifierMatches = cloneFrom
+      ? cloneFrom.identifierMatches
+      : identifierMatchesThunk(this.alias);
+    this.joins = cloneFrom ? [...cloneFrom.joins] : [];
+    this.selects = cloneFrom ? [...cloneFrom.selects] : [];
+    this.identifierIndex = cloneFrom ? cloneFrom.identifierIndex : null;
+
+    if (!cloneFrom) {
+      if (this.identifiers.length !== this.identifierMatches.length) {
+        throw new Error(
+          `'identifiers' and 'identifierMatches' lengths must match (${this.identifiers.length} != ${this.identifierMatches.length})`,
+        );
+      }
+      if (this.identifiers.length) {
+        const alias = sql.identifier(Symbol(dataSource.name + "_identifiers"));
+        // TODO: this should not be here; when we add toSQL support this will
+        // need to be a different subquery.
+        this.joins.push({
+          type: "inner",
+          source: sql`(select ids.ordinality as idx, ${sql.join(
+            this.identifiers.map(
+              (_, idx) =>
+                sql`ids.value->>${sql.literal(idx)} as ${sql.identifier(
+                  `id${idx}`,
+                )}`,
+            ),
+            ", ",
+          )} from json_array_elements(${sql.value(
+            // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
+            // a value before executing the query.
+            this.identifierSymbol as any,
+          )}) with ordinality as ids)`,
+          alias,
+          conditions: this.identifierMatches.map(
+            (frag, idx) =>
+              sql`${frag} = ${alias}.${sql.identifier(`id${idx}`)}`,
+          ),
+        });
+        this.identifierIndex = this.selects.push(sql`${alias}.idx`);
+      }
+    }
     return this;
   }
 
@@ -379,19 +457,37 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> implements Plan {
    * their plans can be easily reused.
    */
   colPlans: {
-    [key in keyof TDataSource["TTable"]]?: PgColumnSelectPlan<TDataSource, key>;
-  } = {};
+    [key in keyof TDataSource["TData"]]?: PgColumnSelectPlan<TDataSource, key>;
+  };
+
+  /**
+   * The list of things we're selecting
+   */
+  selects: SQL[];
+
+  /**
+   * Select an SQL fragment, returning the index the result will have.
+   */
+  private select(fragment: SQL): number {
+    this.selects.push(fragment);
+    return this.selects.length - 1;
+  }
 
   /**
    * Returns a plan representing a named attribute (e.g. column) from the class
    * (e.g. table).
    */
-  get<TAttr extends keyof TDataSource["TTable"]>(
+  get<TAttr extends keyof TDataSource["TData"]>(
     attr: TAttr,
   ): PgColumnSelectPlan<TDataSource, TAttr> {
     // Only one plan per column
     if (!this.colPlans[attr]) {
-      this.colPlans[attr] = new PgColumnSelectPlan(this, attr);
+      // TODO: where do we do the SQL conversion, e.g. to_json for dates to
+      // enforce ISO8601? Perhaps this should be the datasource itself, and
+      // `attr` should be an SQL expression? This would allow for computed
+      // fields/etc too (admittedly those without arguments).
+      const index = this.select(sql.identifier(this.symbol, String(attr)));
+      this.colPlans[attr] = new PgColumnSelectPlan(this, attr, index);
     }
     return this.colPlans[attr]!;
   }
@@ -405,8 +501,110 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> implements Plan {
   cursor() {
     return this.get("TODO_cursor_here");
   }
+
+  joins: Array<
+    | {
+        type: "cross";
+        source: SQL;
+        alias: SQL;
+      }
+    | {
+        type: "inner" | "left" | "right" | "full";
+        source: SQL;
+        alias: SQL;
+        conditions: SQL[];
+      }
+  >;
+
+  /**
+   * Finalizes this instance and returns a mutable clone; useful for
+   * connections/etc (e.g. copying `where` conditions but adding more, or
+   * pagination, or grouping, aggregates, etc
+   */
+  clone(): PgClassSelectPlan<TDataSource> {
+    this.finalize();
+    const clone = new PgClassSelectPlan(
+      this.dataSource,
+      this.identifiers,
+      this.identifierMatchesThunk,
+      this.many,
+      this,
+    );
+    return clone;
+  }
+
+  /**
+   * `eval` will always run as a root-level query. In future we'll implement a
+   * `toSQL` method that allows embedding this plan within another SQL plan...
+   * But that's a problem for later.
+   */
+  async eval(crystal: CrystalContext) {
+    this.finalize();
+
+    // TODO: can some of this be moved to finalize?
+
+    const conditions: SQL[] = [];
+    const orders: SQL[] = [];
+    const joins: SQL[] = this.joins.map((j) => {
+      const conditions =
+        j.type === "cross"
+          ? []
+          : j.conditions.length
+          ? sql`(${sql.join(j.conditions, ") AND (")})`
+          : sql.true;
+      const joinCondition =
+        j.type !== "cross" ? sql`\non (${conditions})` : sql.blank;
+      const join: SQL =
+        j.type === "inner"
+          ? sql`inner join`
+          : j.type === "left"
+          ? sql`left outer join`
+          : j.type === "right"
+          ? sql`right outer join`
+          : j.type === "full"
+          ? sql`full outer join`
+          : j.type === "cross"
+          ? sql`cross join`
+          : (sql.blank as never);
+
+      return sql`${join} ${j.source} as ${j.alias}${joinCondition}`;
+    });
+
+    const fragmentsWithAliases = this.selects.map(
+      (frag, idx) => sql`${frag} as ${sql.identifier(String(idx))}`,
+    );
+    const selection = sql.join(fragmentsWithAliases, ",\n  ");
+    const select = sql`select\n  ${selection}`;
+    const from = sql`\nfrom ${this.dataSource.tableIdentifier} as ${this.alias}`;
+    const join = joins.length ? sql`\n${sql.join(joins, "\n")}` : sql.blank;
+    const where = conditions.length
+      ? sql`\nwhere (\n  ${sql.join(conditions, "\n) and (\n  ")}\n)`
+      : sql.blank;
+    const orderBy = orders.length
+      ? sql`\norder by ${sql.join(orders, ", ")}`
+      : sql.blank;
+    const query = sql`${select}${from}${join}${where}${orderBy}`;
+
+    const result = await crystal.executeQueryWithDataSource(this.dataSource, {
+      query,
+    });
+    // TODO: regroup, like DataLoader; also evaluate one versus many.
+    return result.values;
+    /*
+    const spec = sql.compile(query);
+    return result.rows;
+    */
+  }
+
+  /**
+   * This'll turn this plan into SQL that can be embedded into a different SQL
+   * plan as an optimisation. IMPORTANT: we must ensure that the datasources
+   * are compatible (e.g. represent the same database) before inlining a plan.
+   */
+  toSQL() {}
 }
 
+/*
 class ConnectionPlan<TSubplan extends Plan<any>> extends Plan<Opaque<any>> {
   constructor(public readonly subplan: TSubplan) {
     super();
@@ -421,18 +619,23 @@ class ConnectionPlan<TSubplan extends Plan<any>> extends Plan<Opaque<any>> {
      * /
     return { ...deps };
   }
-  */
+  * /
 }
+*/
 
-class PgConnectionPlan<
-  TSubplan extends /* PgPlan? */ Plan<any>
-> extends ConnectionPlan<TSubplan> {
-  constructor(public readonly subplan: TSubplan) {
-    super(subplan);
+class PgConnectionPlan<TDataSource extends PgDataSource<any>> extends Plan<
+  Opaque<any>
+> {
+  constructor(public readonly subplan: PgClassSelectPlan<TDataSource>) {
+    super();
   }
 
-  nodes(): TSubplan {
+  nodes(): PgClassSelectPlan<TDataSource> {
     return this.subplan.clone();
+  }
+
+  eval() {
+    // TODO
   }
 }
 
@@ -517,7 +720,7 @@ const MessageEdge = new GraphQLObjectType(
 );
 
 const MessagesConnection = new GraphQLObjectType(
-  objectSpec<GraphileResolverContext, PgConnectionPlan<MessagePlan>>({
+  objectSpec<GraphileResolverContext, MessageConnectionPlan>({
     name: "MessagesConnection",
     fields: {
       edges: {
@@ -587,7 +790,7 @@ const Query = new GraphQLObjectType(
     fields: {
       forums: {
         type: new GraphQLList(Forum),
-        plan() {
+        plan(_$root) {
           const $forums = new PgClassSelectPlan(
             forumSource,
             [],
