@@ -518,14 +518,18 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
 
     // TODO: replace placeholder values
 
-    const results = await crystal.executeQueryWithDataSource(this.dataSource, {
-      text,
-      values: sqlValues,
-    });
+    const executionResult = await crystal.executeQueryWithDataSource(
+      this.dataSource,
+      {
+        text,
+        values: sqlValues,
+      },
+    );
+    const resultValues = executionResult.values;
 
     if (this.identifierIndex) {
       const groups = {};
-      for (const result of results.values) {
+      for (const result of resultValues) {
         const groupKey = result[this.identifierIndex];
         if (!groups[groupKey]) {
           groups[groupKey] = [result];
@@ -538,7 +542,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
       );
     } else {
       // There's no identifiers, so everyone gets the same results.
-      const result = this.many ? [results] : [results[0]];
+      const result = this.many ? resultValues : resultValues[0];
       return values.map(() => result);
     }
   }
