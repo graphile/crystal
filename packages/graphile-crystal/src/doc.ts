@@ -38,7 +38,7 @@ interface PathDigestVariant {
 
 function isDigestValidAgainstVariables(variables: GraphQLVariables) {
   // TODO: optimise this with a JIT or something?
-  return (digest: PathDigestVariant) => {
+  return (digest: PathDigestVariant): boolean => {
     // NOTE: null and undefined are deliberately treated as separate values.
     // NOTE: variables may define more values than matchesVariables; that
     // shouldn't affect the match.
@@ -103,7 +103,7 @@ export class Doc {
    * If these values are the same, then it's expected that it's the same
    * individual GraphQL operation execution (or at least compatible ones!).
    */
-  getAether(context: GraphQLContext, resolveInfo: GraphQLResolveInfo) {
+  getAether(context: GraphQLContext, resolveInfo: GraphQLResolveInfo): Aether {
     // IMPORTANT: all fallback values MUST be global constants, otherwise we might
     // make multiple Aethers for the same operation.
     const rootValue = resolveInfo.rootValue || WEAK_MAP_FALLBACK_KEY;
@@ -159,7 +159,7 @@ export class Doc {
     const trackedVariables = new TrackedObject(variables);
 
     // TODO: memoize
-    const parseResult = parseDoc(this, trackedVariables);
+    const parseResult = parseDoc(this.schema, this, trackedVariables);
 
     const matchesVariables = {};
     for (const key of trackedVariables.accessedKeys) {

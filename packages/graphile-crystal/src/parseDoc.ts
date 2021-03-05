@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import { TrackedObject } from "./trackedObject";
 import assert from "assert";
 import {
@@ -16,6 +17,8 @@ import {
   GraphQLField,
   GraphQLOutputType,
   GraphQLNamedType,
+  DirectiveNode,
+  GraphQLSchema,
 } from "graphql";
 import {
   GraphQLVariables,
@@ -36,6 +39,23 @@ interface InputDigest {
   inputFields: {
     [inputFieldName: string]: InputDigest;
   } | null;
+}
+
+/**
+ * All the selections made on a field within a GraphQL document.
+ *
+ * TODO: should this include details about `@skip`/`@include`?
+ *
+ * TODO: will this work for `@stream`?
+ *
+ * TODO: will this work for `@defer`? Possibly not, because defer is on a
+ * _fragment_.
+ */
+export interface FieldDigestSelection {
+  type: GraphQLObjectType;
+  fields: {
+    [fieldName: string]: FieldDigest;
+  };
 }
 
 /**
@@ -79,17 +99,15 @@ export interface FieldDigest {
    * to their concrete object types.
    *
    * NOTE: for unions with a lot of members, this might end up in a *lot* of
-   * sub-selections.
+   * sub-selections. (Note to self: did I mean 'interfaces' rather than
+   * 'unions' here? I suspect so, since with interfaces we'd have to check all
+   * the types, whereas with unions we'd only check the types the fragments
+   * actually reference.)
    *
    * Will be null if the return type does not support selection sets (i.e. is a
    * scalar).
    */
-  selections: Array<{
-    type: GraphQLObjectType;
-    fields: {
-      [fieldName: string]: FieldDigest;
-    };
-  }> | null;
+  selections: Array<FieldDigestSelection> | null;
 
   // TODO:
   //subplans?: SubplanResolver<any, any>;
@@ -134,6 +152,7 @@ interface FieldDigest {
  * optimized reference describing the document for use by the lookahead system.
  */
 export function parseDoc(
+  schema: GraphQLSchema,
   doc: Doc,
   variables: TrackedObject<GraphQLVariables>,
 ): DocumentDigest {
@@ -142,6 +161,7 @@ export function parseDoc(
   return {
     name: doc.document.name?.value ?? null,
     fieldDigestByPath: processSelectionSet(
+      schema,
       doc,
       variables,
       selectionSet,
@@ -151,6 +171,7 @@ export function parseDoc(
 }
 
 function processObjectField(
+  schema: GraphQLSchema,
   doc: Doc,
   variables: TrackedObject<GraphQLVariables>,
   map: Map<PathIdentity, FieldDigest> = new Map(),
@@ -213,9 +234,8 @@ function processObjectField(
         : null,
     };
     map.set(pathIdentity, fieldDigest);
+    // TODO: multiple fields (across different fragments) might augment this meta
   }
-  // TODO: multiple fields (across different fragments) might augment this meta
-
   if (selection.selectionSet) {
     assert(
       isObjectType(unwrappedType) ||
@@ -224,6 +244,7 @@ function processObjectField(
       "Cannot have a selection set on this type",
     );
     processSelectionSet(
+      schema,
       doc,
       variables,
       selection.selectionSet,
@@ -235,6 +256,7 @@ function processObjectField(
 }
 
 function processFragment(
+  schema: GraphQLSchema,
   doc: Doc,
   variables: TrackedObject<GraphQLVariables>,
   typeCondition: NamedTypeNode | undefined,
@@ -248,7 +270,15 @@ function processFragment(
     (typeCondition && typeCondition.name.value === parentType.name)
   ) {
     // Redundant fragment `{ ... { [...] } }` or `{ ... on SameType { [...] } }`
-    processSelectionSet(doc, variables, selectionSet, parentType, path, map);
+    processSelectionSet(
+      schema,
+      doc,
+      variables,
+      selectionSet,
+      parentType,
+      path,
+      map,
+    );
     return;
   }
   const fragmentType = doc.schema.getType(typeCondition.name.value);
@@ -263,10 +293,19 @@ function processFragment(
   // narrower type.
   // TODO: implement all forms of narrower types
   const narrowerType = isObjectType(parentType) ? parentType : fragmentType;
-  processSelectionSet(doc, variables, selectionSet, narrowerType, path, map);
+  processSelectionSet(
+    schema,
+    doc,
+    variables,
+    selectionSet,
+    narrowerType,
+    path,
+    map,
+  );
 }
 
 function processSelectionSet(
+  schema: GraphQLSchema,
   doc: Doc,
   variables: TrackedObject<GraphQLVariables>,
   selectionSet: SelectionSetNode,
@@ -295,6 +334,7 @@ function processSelectionSet(
           const pathIdentity =
             path + (path ? ">" : "") + `${parentType.name}.${alias}`;
           processObjectField(
+            schema,
             doc,
             variables,
             map,
@@ -308,6 +348,7 @@ function processSelectionSet(
             const pathIdentity =
               path + (path ? ">" : "") + `${possibleType.name}.${alias}`;
             processObjectField(
+              schema,
               doc,
               variables,
               map,
@@ -323,6 +364,7 @@ function processSelectionSet(
       }
       case "InlineFragment": {
         processFragment(
+          schema,
           doc,
           variables,
           selection.typeCondition,
@@ -340,6 +382,7 @@ function processSelectionSet(
         assert(fragment, `Expected to have a fragment named '${fragmentName}'`);
         // TODO: we'll need to handle fragment.variableDefinitions at some point
         processFragment(
+          schema,
           doc,
           variables,
           fragment.typeCondition,
