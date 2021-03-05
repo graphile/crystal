@@ -218,8 +218,9 @@ export class Batch {
       };
     }
     const data = await this.load(crystalInfo, parent);
-    console.log("EXECUTED PLAN");
-    console.dir(data);
+    console.log(
+      `EXECUTED PLAN; received results: ${JSON.stringify(data, null, 2)}`,
+    );
     return {
       [$$batch]: this,
       [$$data]: data,

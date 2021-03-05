@@ -79,6 +79,16 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
       values,
       rowMode: "array",
     });
+    console.log("👇".repeat(30));
+    console.log(`# SQL QUERY:`);
+    console.log(text);
+    console.log();
+    console.log(`# PLACEHOLDERS:`);
+    console.log(JSON.stringify(values, null, 2));
+    console.log();
+    console.log(`# RESULT:`);
+    console.log(JSON.stringify(result.rows, null, 2));
+    console.log("👆".repeat(30));
     return { values: result.rows };
   }
 }
@@ -479,8 +489,10 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     const fragmentsWithAliases = this.selects.map(
       (frag, idx) => sql`${frag} as ${sql.identifier(String(idx))}`,
     );
-    const selection = sql.join(fragmentsWithAliases, ",\n  ");
-    const select = sql`select\n  ${selection}`;
+    const selection = fragmentsWithAliases.length
+      ? sql`\n  ${sql.join(fragmentsWithAliases, ",\n  ")}`
+      : sql` /* NOTHING?! */`;
+    const select = sql`select${selection}`;
     const from = sql`\nfrom ${this.dataSource.tableIdentifier} as ${this.alias}`;
     const join = joins.length ? sql`\n${sql.join(joins, "\n")}` : sql.blank;
     const where = conditions.length
@@ -766,7 +778,8 @@ async function main() {
       rootValue: null,
     });
 
-    console.dir(result);
+    console.log("GraphQL result:");
+    console.log(JSON.stringify(result, null, 2));
   }
 
   if (Math.random() > 2) {
@@ -799,7 +812,8 @@ async function main() {
       rootValue: null,
     });
 
-    console.dir(result);
+    console.log("GraphQL result:");
+    console.log(JSON.stringify(result, null, 2));
   }
 }
 
