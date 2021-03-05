@@ -9,12 +9,14 @@ import {
   GraphQLContext,
   $$plan,
   CrystalContext,
+  BaseGraphQLContext,
 } from "./interfaces";
 import { getPathIdentityFromResolveInfo } from "./utils";
 import { Plan } from "./plan";
 import { isCrystalResult } from "./crystalResult";
 import { Aether } from "./aether";
 import { TrackedObject } from "./trackedObject";
+import { FieldDigest } from "./parseDoc";
 
 interface Deferred<T> extends Promise<T> {
   resolve: (input?: T | PromiseLike<T> | undefined) => void;
@@ -145,15 +147,25 @@ export class Batch {
       pathIdentity,
       info.variableValues,
     );
+    const trackedContext = new TrackedObject(context);
+    const parentPlan = parentCrystalResult ? parentCrystalResult[$$plan] : null;
+    // Recursively walk the document digest from this point
+    this.processDigest(parentPlan, digest, pathIdentity, trackedContext);
+  }
+
+  processDigest(
+    parentPlan: Plan<any>,
+    digest: FieldDigest,
+    pathIdentity: PathIdentity,
+    trackedContext: TrackedObject<BaseGraphQLContext>,
+  ): void {
     console.log("Digest:");
     console.dir(digest);
 
     if (digest?.plan) {
-      const trackedArgs = new TrackedObject(args);
-      const trackedContext = new TrackedObject(context);
-      const parentPlan = parentCrystalResult
-        ? parentCrystalResult[$$plan]
-        : null;
+      // TODO: digest.args might not be quite the right thing.
+      const trackedArgs = new TrackedObject(digest.args);
+
       const plan = digest?.plan(parentPlan, trackedArgs, trackedContext);
 
       // TODO: apply the args here
@@ -179,14 +191,25 @@ export class Batch {
         }
       }
       */
-      // TODO (somewhere else): selection set fields' dependencies
-      // TODO (somewhere else): selection set fields' args' dependencies (e.g. includeArchived: 'inherit')
 
       plan.finalize();
       this.crystalInfoByPathIdentity.set(pathIdentity, {
         plan,
         pathIdentity,
         memo: new Map(),
+      });
+
+      digest.selections?.forEach((s) => {
+        // TODO: WHAT DOES THIS MEAN FOR UNIONS/INTERFACES?
+        const { type, fields } = s;
+        for (const fieldName in fields) {
+          this.processDigest(
+            plan,
+            fields[fieldName],
+            pathIdentity + `>${type.name}.${fieldName}`,
+            trackedContext,
+          );
+        }
       });
     } else {
       return;
