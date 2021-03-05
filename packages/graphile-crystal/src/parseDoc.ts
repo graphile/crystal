@@ -236,6 +236,8 @@ function processObjectField(
     map.set(pathIdentity, fieldDigest);
     // TODO: multiple fields (across different fragments) might augment this meta
   }
+
+  // Whether or not there was a plan, keep populating the rest of the document.
   if (selection.selectionSet) {
     assert(
       isObjectType(unwrappedType) ||
