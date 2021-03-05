@@ -22,6 +22,7 @@ import {
   GraphQLObjectTypeConfig,
   GraphQLFieldConfig,
   GraphQLFieldConfigMap,
+  ExecutionResult,
 } from "graphql";
 import sql, { SQL } from "../../../pg-sql2/dist";
 import { enforceCrystal } from "..";
@@ -37,6 +38,7 @@ import {
 import { Plan } from "../plan";
 
 import { Pool } from "pg";
+import { resolve } from "path";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -762,8 +764,45 @@ const schema = enforceCrystal(
   }),
 );
 
+// Polyfill replaceAll
+function regexpEscape(str: string): string {
+  return str.replace(/[\\^$.*+?()[\]{}|]/g, "\\$&");
+}
+declare global {
+  interface String {
+    replaceAll: (matcher: string | RegExp, replacement: string) => string;
+  }
+}
+if (!String.prototype.replaceAll) {
+  String.prototype.replaceAll = function (
+    matcher: string | RegExp,
+    replacement: string,
+  ) {
+    if (typeof matcher === "object" && matcher) {
+      // TODO: need to ensure matcher is `/g`
+      return this.replace(matcher, replacement);
+    }
+    return this.replace(new RegExp(regexpEscape(matcher), "g"), replacement);
+  };
+}
+
 async function main() {
   //console.log(printSchema(schema));
+  function logGraphQLResult(result: ExecutionResult<any>): void {
+    const { data, errors } = result;
+    const nicerErrors = errors?.map((e) => {
+      return {
+        message: e.message,
+        path: e.path?.join("."),
+        locs: e.locations?.map((l) => `${l.line}:${l.column}`).join(", "),
+        stack: e.stack
+          ?.replaceAll(resolve(process.cwd()), ".")
+          .replaceAll(/(?:\/[^\s\/]+)*\/node_modules\//g, "~/")
+          .split("\n"),
+      };
+    });
+    console.log(JSON.stringify({ errors: nicerErrors, data }, null, 2));
+  }
 
   {
     const query = /* GraphQL */ `
@@ -783,7 +822,7 @@ async function main() {
     });
 
     console.log("GraphQL result:");
-    console.log(JSON.stringify(result, null, 2));
+    logGraphQLResult(result);
   }
 
   if (Math.random() > 2) {
@@ -817,7 +856,7 @@ async function main() {
     });
 
     console.log("GraphQL result:");
-    console.log(JSON.stringify(result, null, 2));
+    logGraphQLResult(result);
   }
 }
 
