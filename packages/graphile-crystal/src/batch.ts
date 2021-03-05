@@ -59,14 +59,16 @@ class Loader<TResultData = unknown> {
   }
 
   async execute(): Promise<void> {
+    // Don't use this again.
+    this.info.loader = undefined;
+    this.executed = true;
+
     let results: TResultData[];
     try {
-      this.executed = true;
-      // Don't use this again.
-      this.info.loader = undefined;
       results = await this.info.plan.eval(this.context, this.batch);
     } catch (e) {
       this.promises.map((deferred) => deferred.reject(e));
+      return;
     }
     this.promises.map((deferred, idx) => deferred.resolve(results[idx]));
   }
