@@ -15,11 +15,13 @@ import { Path } from "graphql/jsutils/Path";
  * differences, the different selection sets would affect how our plan
  * executes. If we pin based on the path, then interfaces/unions could get us
  * into trouble, as the selection set may differ even when the path is the
- * same. We might thing that we could use the path and the parent type, but
+ * same. We might think that we could use the path and the parent type, but
  * again this would fall down if something closer to the root were a union or
  * interface. So: we must use the parent type and alias/field name at every
  * step in the path, or have another way of uniquely identifying this specific
  * field resolution.
+ *
+ * IMPORTANT: the path does not indicate if a type is a list or not.
  *
  * An example identifier might look like:
  *
@@ -30,12 +32,22 @@ export function getPathIdentityFromResolveInfo(
   parentPath?: PathIdentity,
 ): PathIdentity {
   if (parentPath) {
-    return parentPath + `>${resolveInfo.path.typename}.${resolveInfo.path.key}`;
+    if (!resolveInfo.path.typename) {
+      // If there's no type name (e.g. for lists) then the path is unchanged
+      return parentPath;
+    } else {
+      return (
+        parentPath + `>${resolveInfo.path.typename}.${resolveInfo.path.key}`
+      );
+    }
   } else {
     const path = [];
     let currentPath: Path | undefined = resolveInfo.path;
     while (currentPath) {
-      path.push(`${currentPath.typename}.${currentPath.key}`);
+      // If there's no type name (e.g. for lists) then the path is unchanged
+      if (currentPath.typename) {
+        path.push(`${currentPath.typename}.${currentPath.key}`);
+      }
       currentPath = currentPath.prev;
     }
     return path.reverse().join(">");
