@@ -183,7 +183,7 @@ export class Doc {
     return newDigest.fieldDigest;
   }
 
-  /** 
+  /*
   private parseDocument(
     trackedVariables: TrackedObject<GraphQLVariables>,
   ): ParsedDocument {
