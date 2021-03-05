@@ -26,6 +26,7 @@ export function enforceCrystal(schema: GraphQLSchema): GraphQLSchema {
         ) {
           const field = fields[fieldName];
           if (!field.resolve || !field.resolve[$$crystalWrappedResolver]) {
+            console.log(`Wrapping ${type.name}.${fieldName} in crystals`);
             field.resolve = crystalWrapResolver(field.type, field.resolve);
           }
         }

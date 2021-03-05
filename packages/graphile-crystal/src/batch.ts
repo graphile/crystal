@@ -70,6 +70,7 @@ class Loader<TResultData = unknown> {
       this.promises.map((deferred) => deferred.reject(e));
       return;
     }
+    console.log(`EXECUTION RESULT: ${JSON.stringify(results)}`);
     this.promises.map((deferred, idx) => deferred.resolve(results[idx]));
   }
 }
@@ -208,6 +209,7 @@ export class Batch {
       info,
       parentCrystalResult ? parentCrystalResult[$$path] : undefined,
     );
+    console.log(`Getting info for ${pathIdentity}`);
     const crystalInfo = this.crystalInfoByPathIdentity.get(pathIdentity);
     if (!crystalInfo || !crystalInfo.plan) {
       console.log(

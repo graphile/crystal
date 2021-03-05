@@ -544,6 +544,11 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
       );
     } else {
       // There's no identifiers, so everyone gets the same results.
+      console.log(
+        `RESULTS: ${JSON.stringify(resultValues)} (many ${
+          this.many ? "yes" : "no"
+        })`,
+      );
       const result = this.many ? resultValues : resultValues[0];
       return values.map(() => result);
     }

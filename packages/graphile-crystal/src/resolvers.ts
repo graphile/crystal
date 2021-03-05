@@ -170,6 +170,9 @@ export function makeCrystalWrapResolver() {
       TContext,
       TArgs
     > = async function (graphileParent: any, args, context, info) {
+      console.log(
+        `In Crystal wrapped resolver for ${info.parentType.name}.${info.fieldName}`,
+      );
       // TODO: this function should not be async; it may be able to resolve sync sometimes.
       const executionResult = executePlanFromResolver(
         graphileParent,
