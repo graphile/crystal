@@ -179,7 +179,9 @@ export function makeCrystalWrapResolver() {
       );
 
       const { [$$data]: data, ...meta } = await executionResult;
-      const result = await realResolver(data as any, args, context, info);
+      // Default resolver expects the data to be on a field with the same name; adhere to that.
+      const fakeParent = { [info.fieldName]: data };
+      const result = await realResolver(fakeParent as any, args, context, info);
       return wrapResult(meta, result);
     };
     Object.defineProperty(crystalResolver, $$crystalWrappedResolver, {
