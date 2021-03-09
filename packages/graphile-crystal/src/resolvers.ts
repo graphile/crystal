@@ -96,7 +96,9 @@ export function makeCrystalWrapResolver() {
   // Cached on a per-schema basis, so no need for a WeakMap
   const typeToWrapperMap = new Map<GraphQLOutputType, any>();
 
-  function makeResultWrapper(type: GraphQLOutputType) {
+  function makeResultWrapper(
+    type: GraphQLOutputType,
+  ): (meta: WrapMeta, data: any) => any {
     const wrapper = typeToWrapperMap.get(type);
     if (wrapper) {
       return wrapper;
@@ -170,18 +172,23 @@ export function makeCrystalWrapResolver() {
         `In Crystal wrapped resolver for ${info.parentType.name}.${info.fieldName}`,
       );
       // TODO: this function should not be async; it may be able to resolve sync sometimes.
-      const executionResult = executePlanFromResolver(
+      const executionResultOrPromise = executePlanFromResolver(
         graphileParent,
         args,
         context,
         info,
       );
 
-      const { [$$data]: data, ...meta } = await executionResult;
+      const executionResult = await executionResultOrPromise;
+      const {
+        [$$data]: data,
+        [$$batch]: batch,
+        [$$path]: path,
+      } = executionResult;
       // Default resolver expects the data to be on a field with the same name; adhere to that.
       const fakeParent = { [info.fieldName]: data };
       const result = await realResolver(fakeParent as any, args, context, info);
-      return wrapResult(meta, result);
+      return wrapResult({ batch, path }, result);
     };
     Object.defineProperty(crystalResolver, $$crystalWrappedResolver, {
       enumerable: false,
