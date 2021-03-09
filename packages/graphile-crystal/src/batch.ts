@@ -73,6 +73,14 @@ class Loader<TResultData = unknown> {
       return;
     }
     console.log(`EXECUTION RESULT: ${JSON.stringify(results)}`);
+    if (!results) {
+      this.promises.map((deferred) =>
+        deferred.reject(
+          new Error("Internal Graphile Crystal error: results should be set."),
+        ),
+      );
+      return;
+    }
     this.promises.map((deferred, idx) => deferred.resolve(results[idx]));
   }
 }
