@@ -23,6 +23,10 @@ import {
   GraphQLFieldConfig,
   GraphQLFieldConfigMap,
   ExecutionResult,
+  GraphQLEnumType,
+  GraphQLInt,
+  GraphQLBoolean,
+  GraphQLInputObjectType,
 } from "graphql";
 import sql, { SQL } from "../../../pg-sql2/dist";
 import { enforceCrystal } from "..";
@@ -710,6 +714,30 @@ const MessagesConnection = new GraphQLObjectType(
   }),
 );
 
+const IncludeArchived = new GraphQLEnumType({
+  name: "IncludeArchived",
+  values: {
+    INHERIT: {
+      value: "INHERIT",
+    },
+    YES: {
+      value: "YES",
+    },
+    NO: {
+      value: "NO",
+    },
+  },
+});
+
+const MessageCondition = new GraphQLInputObjectType({
+  name: "MessageCondition",
+  fields: {
+    active: {
+      type: GraphQLBoolean,
+    },
+  },
+});
+
 const Forum = new GraphQLObjectType(
   objectSpec<GraphileResolverContext, ForumPlan>({
     name: "Forum",
@@ -722,6 +750,15 @@ const Forum = new GraphQLObjectType(
       },
       messagesConnection: {
         type: MessagesConnection,
+        args: {
+          limit: {
+            type: GraphQLInt,
+          },
+          condition: {
+            type: MessageCondition,
+          },
+          includeArchived: { type: IncludeArchived },
+        },
         plan($forum) {
           const $messages = new PgClassSelectPlan(
             messageSource,
