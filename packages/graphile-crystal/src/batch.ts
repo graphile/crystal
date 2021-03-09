@@ -199,18 +199,22 @@ export class Batch {
         memo: new Map(),
       });
 
-      digest.selections?.forEach((s) => {
+      if (digest.selections) {
         // TODO: WHAT DOES THIS MEAN FOR UNIONS/INTERFACES?
-        const { type, fields } = s;
-        for (const fieldName in fields) {
-          this.processDigest(
-            plan,
-            fields[fieldName],
-            pathIdentity + `>${type.name}.${fieldName}`,
-            trackedContext,
-          );
+        // digest.selections has null prototype, so this is safe.
+        for (const typeName in digest.selections) {
+          const fieldSelections = digest.selections[typeName];
+          for (const fieldName in fieldSelections) {
+            const digest = fieldSelections[fieldName];
+            this.processDigest(
+              plan,
+              digest,
+              pathIdentity + `>${typeName}.${fieldName}`,
+              trackedContext,
+            );
+          }
         }
-      });
+      }
     } else {
       return;
     }

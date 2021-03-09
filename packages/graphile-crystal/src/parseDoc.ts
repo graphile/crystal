@@ -51,11 +51,8 @@ interface InputDigest {
  * TODO: will this work for `@defer`? Possibly not, because defer is on a
  * _fragment_.
  */
-export interface FieldDigestSelection {
-  type: GraphQLObjectType;
-  fields: {
-    [fieldName: string]: FieldDigest;
-  };
+export interface FieldDigestSelections {
+  [typeName: string]: { [fieldAlias: string]: FieldDigest };
 }
 
 /**
@@ -68,6 +65,12 @@ export interface FieldDigest {
   parentType: GraphQLObjectType;
   field: GraphQLField<any, any, any>;
   resultType: GraphQLOutputType;
+  /**
+   * How many arrays is `resultType` wrapped in?
+   *
+   * @internal
+   */
+  listDepth: number;
   namedResultType: GraphQLNamedType;
 
   /**
@@ -107,7 +110,8 @@ export interface FieldDigest {
    * Will be null if the return type does not support selection sets (i.e. is a
    * scalar).
    */
-  selections: Array<FieldDigestSelection> | null;
+  selections: FieldDigestSelections | null;
+  //selections: Array<FieldDigestSelection> | null;
 
   // TODO:
   //subplans?: SubplanResolver<any, any>;
@@ -158,6 +162,7 @@ export function parseDoc(
 ): DocumentDigest {
   const selectionSet = doc.document.selectionSet;
   const parentType = doc.rootType;
+  const map: Map<PathIdentity, FieldDigest> = new Map();
   return {
     name: doc.document.name?.value ?? null,
     fieldDigestByPath: processSelectionSet(
@@ -166,10 +171,24 @@ export function parseDoc(
       variables,
       selectionSet,
       parentType,
+      "",
+      map,
     ),
   };
 }
 
+/**
+ * Processes when a field is requested on a particular object type at a
+ * particular point in the query.
+ *
+ * NOTE: when querying a field on an interface we'll do this for each possible
+ * type (this could be expensive).
+ *
+ * NOTE: because selection sets can overlap, this may be called multiple times
+ * for the same path identity. If this occurs, we still have to process it
+ * again because the selection set may differ; however some of the logic won't
+ * change (e.g. the expected return type of the field, the plan, etc).
+ */
 function processObjectField(
   schema: GraphQLSchema,
   doc: Doc,
@@ -177,47 +196,56 @@ function processObjectField(
   map: Map<PathIdentity, FieldDigest> = new Map(),
   selection: FieldNode,
   parentType: GraphQLObjectType,
-  pathIdentity: PathIdentity,
-): void {
+  parentPathIdentity: PathIdentity,
+  parentFieldDigest: FieldDigest | undefined,
+): FieldDigest {
   const fieldName = selection.name.value;
-  const field = parentType.getFields()[fieldName];
-  const resultType = field.type;
-  let unwrappedType = resultType;
-  let listDepth = 0;
-  while ("ofType" in unwrappedType && unwrappedType.ofType) {
-    if (isListType(unwrappedType)) {
-      listDepth++;
-    } else if (isNonNullType(unwrappedType)) {
-      // ignore
-    } else {
-      throw new Error("Wrapping type not understood.");
-    }
-    unwrappedType = unwrappedType.ofType;
-  }
-  assert(
-    isNamedType(unwrappedType),
-    "Expected unwrappedType to be a named type",
-  );
-
-  // This variable alias appeases TypeScript in the fieldDigest object below
-  // (the cast isn't required).
-  const namedResultType: GraphQLNamedType = unwrappedType;
-
-  const graphile:
-    | GraphileEngine.GraphQLFieldGraphileExtension<any, any, any, any>
-    | undefined = field.extensions?.graphile;
-  console.dir(field.extensions);
-
-  const dependencies: string[] = [
-    /* TODO */
-  ];
+  const alias = selection.alias?.value;
+  const key = alias || fieldName;
+  const pathIdentity = parentPathIdentity
+    ? `${parentPathIdentity}>${parentType.name}.${key}`
+    : `${parentType.name}.${key}`;
 
   let fieldDigest = map.get(pathIdentity);
+  // NOTE: this function could be called with the same pathIdentity multiple times, but different selection sets.
   if (!fieldDigest) {
+    const fieldName = selection.name.value;
+    const field = parentType.getFields()[fieldName];
+    const resultType = field.type;
+    let unwrappedType = resultType;
+    let listDepth = 0;
+    while ("ofType" in unwrappedType && unwrappedType.ofType) {
+      if (isListType(unwrappedType)) {
+        listDepth++;
+      } else if (isNonNullType(unwrappedType)) {
+        // ignore
+      } else {
+        throw new Error("Wrapping type not understood.");
+      }
+      unwrappedType = unwrappedType.ofType;
+    }
+    assert(
+      isNamedType(unwrappedType),
+      "Expected unwrappedType to be a named type",
+    );
+
+    // This variable alias appeases TypeScript in the fieldDigest object below
+    // (the cast isn't required).
+    const namedResultType: GraphQLNamedType = unwrappedType;
+
+    const graphile:
+      | GraphileEngine.GraphQLFieldGraphileExtension<any, any, any, any>
+      | undefined = field.extensions?.graphile;
+
+    const dependencies: string[] = [
+      /* TODO */
+    ];
+
     fieldDigest = {
       parentType,
       field,
       resultType,
+      listDepth,
       namedResultType,
       dependencies,
       pathIdentity,
@@ -227,22 +255,18 @@ function processObjectField(
       args: {
         /* TODO */
       },
-      selections: selection.selectionSet
-        ? [
-            /* TODO */
-          ]
-        : null,
+      selections: selection.selectionSet ? Object.create(null) : null,
     };
     map.set(pathIdentity, fieldDigest);
-    // TODO: multiple fields (across different fragments) might augment this meta
   }
 
   // Whether or not there was a plan, keep populating the rest of the document.
   if (selection.selectionSet) {
+    const { namedResultType } = fieldDigest;
     assert(
-      isObjectType(unwrappedType) ||
-        isUnionType(unwrappedType) ||
-        isInterfaceType(unwrappedType),
+      isObjectType(namedResultType) ||
+        isUnionType(namedResultType) ||
+        isInterfaceType(namedResultType),
       "Cannot have a selection set on this type",
     );
     processSelectionSet(
@@ -250,11 +274,33 @@ function processObjectField(
       doc,
       variables,
       selection.selectionSet,
-      unwrappedType,
+      namedResultType,
       pathIdentity,
       map,
     );
   }
+
+  if (parentFieldDigest) {
+    assert(
+      parentFieldDigest.selections,
+      "Invalid query? Mixture of selection sets and no-selection sets for same field.",
+    );
+    if (!parentFieldDigest.selections[parentType.name]) {
+      parentFieldDigest.selections[parentType.name] = Object.create(null);
+    }
+    if (!parentFieldDigest.selections[parentType.name][key]) {
+      parentFieldDigest.selections[parentType.name][key] = fieldDigest;
+    } else {
+      // TODO: can compile this out of production bundle.
+      assert.equal(
+        parentFieldDigest.selections[parentType.name][key],
+        fieldDigest,
+        "All references to the same field on the same type at the same path should be the same FieldDigest.",
+      );
+    }
+  }
+
+  return fieldDigest;
 }
 
 function processFragment(
@@ -312,9 +358,10 @@ function processSelectionSet(
   variables: TrackedObject<GraphQLVariables>,
   selectionSet: SelectionSetNode,
   parentType: GraphQLObjectType | GraphQLUnionType | GraphQLInterfaceType,
-  path = "",
-  map: Map<PathIdentity, FieldDigest> = new Map(),
+  path: string,
+  map: Map<PathIdentity, FieldDigest>,
 ): Map<PathIdentity, FieldDigest> {
+  const parentFieldDigest = map.get(path);
   for (const selection of selectionSet.selections) {
     if (shouldSkip(selection, variables)) {
       continue;
@@ -329,12 +376,7 @@ function processSelectionSet(
           !isUnionType(parentType),
           "Cannot select fields on a union type",
         );
-        const alias = selection.alias
-          ? selection.alias.value
-          : selection.name.value;
         if (isObjectType(parentType)) {
-          const pathIdentity =
-            path + (path ? ">" : "") + `${parentType.name}.${alias}`;
           processObjectField(
             schema,
             doc,
@@ -342,13 +384,12 @@ function processSelectionSet(
             map,
             selection,
             parentType,
-            pathIdentity,
+            path,
+            parentFieldDigest,
           );
         } else if (isInterfaceType(parentType)) {
           const possibleTypes = doc.schema.getPossibleTypes(parentType);
           for (const possibleType of possibleTypes) {
-            const pathIdentity =
-              path + (path ? ">" : "") + `${possibleType.name}.${alias}`;
             processObjectField(
               schema,
               doc,
@@ -356,7 +397,8 @@ function processSelectionSet(
               map,
               selection,
               possibleType,
-              pathIdentity,
+              path,
+              parentFieldDigest,
             );
           }
         } else {
