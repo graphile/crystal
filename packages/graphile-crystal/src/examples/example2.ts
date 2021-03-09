@@ -34,6 +34,7 @@ import {
   Opaque,
   DataSource,
   CrystalContext,
+  $$data,
 } from "../interfaces";
 import { Plan } from "../plan";
 
@@ -233,7 +234,7 @@ class PgColumnSelectPlan<
   }
 
   eval(context: CrystalContext, values: unknown[]) {
-    // TODO: return `attrIndex` from the parent record. Or something.
+    return values.map((v: any) => v[$$data][this.attrIndex]);
   }
 }
 
