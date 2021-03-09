@@ -127,10 +127,6 @@ export function makeCrystalWrapResolver() {
     if (isScalarType(unwrappedType)) {
       // We never wrap resolver results of scalars
       newWrapper = identityWrapper;
-    } else if (!unwrappedType?.extensions?.graphile?.plan) {
-      // Non-graphile types don't have our `resolver`-wrapper, so don't wrap
-      // the data being fed to them otherwise we risk them getting confused.
-      newWrapper = identityWrapper;
     } else {
       switch (listDepth) {
         case 0:
