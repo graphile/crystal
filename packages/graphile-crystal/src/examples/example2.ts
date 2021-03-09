@@ -44,6 +44,7 @@ import { Plan } from "../plan";
 
 import { Pool } from "pg";
 import { resolve } from "path";
+import { inspect } from "util";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -597,7 +598,10 @@ class PgConnectionPlan<TDataSource extends PgDataSource<any>> extends Plan<
     return this.subplan.clone();
   }
 
-  eval() {
+  eval(context: CrystalContext, values: unknown[]) {
+    console.log(
+      `PgConnectionPlan eval; values: ${inspect(values, { colors: true })}`,
+    );
     // TODO
     return {};
   }

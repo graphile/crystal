@@ -1,3 +1,4 @@
+import { inspect } from "util";
 import {
   GraphQLFieldResolver,
   defaultFieldResolver,
@@ -169,7 +170,11 @@ export function makeCrystalWrapResolver() {
       TArgs
     > = async function (graphileParent: any, args, context, info) {
       console.log(
-        `In Crystal wrapped resolver for ${info.parentType.name}.${info.fieldName}`,
+        `${info.parentType.name}.${
+          info.fieldName
+        } crystal wrapped resolver; parent: ${inspect(graphileParent, {
+          colors: true,
+        })}`,
       );
       // TODO: this function should not be async; it may be able to resolve sync sometimes.
       const executionResultOrPromise = executePlanFromResolver(
@@ -188,7 +193,15 @@ export function makeCrystalWrapResolver() {
       // Default resolver expects the data to be on a field with the same name; adhere to that.
       const fakeParent = { [info.fieldName]: data };
       const result = await realResolver(fakeParent as any, args, context, info);
-      return wrapResult({ batch, path }, result);
+      const wrappedResult = wrapResult({ batch, path }, result);
+      console.log(
+        `${info.parentType.name}.${
+          info.fieldName
+        } crystal wrapped resolver; result: ${inspect(wrappedResult, {
+          colors: true,
+        })}`,
+      );
+      return wrappedResult;
     };
     Object.defineProperty(crystalResolver, $$crystalWrappedResolver, {
       enumerable: false,

@@ -72,7 +72,9 @@ class Loader<TResultData = unknown> {
       this.promises.map((deferred) => deferred.reject(e));
       return;
     }
-    console.log(`EXECUTION RESULT: ${JSON.stringify(results)}`);
+    console.log(
+      `Loader result @ ${this.info.pathIdentity}: ${JSON.stringify(results)}`,
+    );
     if (!results) {
       this.promises.map((deferred) =>
         deferred.reject(
@@ -167,8 +169,7 @@ export class Batch {
     pathIdentity: PathIdentity,
     trackedContext: TrackedObject<BaseGraphQLContext>,
   ): void {
-    console.log("Digest:");
-    console.dir(digest);
+    console.log(`Process digest for ${digest.pathIdentity}`);
 
     if (digest?.plan) {
       // TODO: digest.args might not be quite the right thing.
@@ -257,14 +258,19 @@ export class Batch {
       };
     }
     const data = await this.load(crystalInfo, parent);
-    console.log(
-      `EXECUTED PLAN; received results: ${JSON.stringify(data, null, 2)}`,
-    );
-    return {
+    const result = {
       [$$batch]: this,
       [$$data]: data,
       [$$path]: pathIdentity,
     };
+    console.log(
+      `Executed plan @ ${pathIdentity}; results: ${JSON.stringify(
+        data,
+        null,
+        2,
+      )}`,
+    );
+    return result;
   }
 
   load(crystalInfo: Info, parent: unknown): Promise<any> {
