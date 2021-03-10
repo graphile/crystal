@@ -20,6 +20,7 @@ import {
 } from "./interfaces";
 import { getDoc } from "./doc";
 import { Batch } from "./batch";
+import { isCrystalResult } from "./crystalResult";
 
 export const makeCrystalObjectExtension = () => ({});
 export const makeCrystalObjectFieldExtension = () => ({});
@@ -194,12 +195,29 @@ export function makeCrystalWrapResolver() {
       const fakeParent = { [info.fieldName]: data };
       const result = await realResolver(fakeParent as any, args, context, info);
       const wrappedResult = wrapResult({ batch, path }, result);
+      function output(wrappedResult: any, prefix = ""): string {
+        if (isCrystalResult(wrappedResult)) {
+          return `wrapped(${inspect(wrappedResult[$$data], {
+            colors: true,
+          })})`.replace(/\n/g, `\n${prefix}`);
+        } else if (Array.isArray(wrappedResult)) {
+          return (
+            `\n${prefix}- ` +
+            wrappedResult
+              .map((v) => output(v, prefix + "  "))
+              .join(`\n${prefix}- `)
+          );
+        } else {
+          return inspect(wrappedResult, { colors: true }).replace(
+            /\n/g,
+            `\n${prefix}`,
+          );
+        }
+      }
       console.log(
         `👈 CRYSTAL RESOLVER(${info.parentType.name}.${
           info.fieldName
-        }); result data: ${inspect(wrappedResult?.[$$data], {
-          colors: true,
-        })}`,
+        }); result data: ${output(wrappedResult, "  ")}`,
       );
       return wrappedResult;
     };
