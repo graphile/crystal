@@ -578,7 +578,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     if (this.identifierIndex !== null) {
       const identifierValuesByIdentifierIndex = await Promise.all(
         this.identifiers.map(({ plan: identifierPlan }) => {
-          return identifierPlan.eval(crystal, values);
+          return Promise.all(crystal.batch.loadAll(identifierPlan, values));
         }),
       );
       let counter = -1;

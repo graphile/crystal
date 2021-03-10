@@ -242,6 +242,7 @@ declare module "graphql" {
 }
 
 export interface CrystalContext {
+  batch: Batch,
   executeQueryWithDataSource<TDataSource extends DataSource<any, any>>(
     dataSource: TDataSource,
     query: TDataSource["TQuery"],

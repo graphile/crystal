@@ -156,6 +156,7 @@ export class Batch {
       executeQueryWithDataSource(dataSource, op) {
         return dataSource.execute(context, op);
       },
+      batch: this,
     };
     this.crystalInfoByPathIdentity = new Map();
     this.prepare(parent, args, context, info);
@@ -315,15 +316,25 @@ export class Batch {
     return result;
   }
 
-  load<TResultData = unknown, TInputData = unknown>(
+  loadAll<TResultData = unknown, TInputData = unknown>(
     plan: Plan<TResultData>,
-    parent: CrystalWrappedData<TInputData>,
-  ): Promise<TResultData> {
+    parents: Array<CrystalWrappedData<TInputData>>,
+  ): Array<Promise<TResultData>> {
     let loader = this.planLoaderMap.get(plan);
     if (!loader) {
       loader = new Loader(this.crystalContext, plan);
       this.planLoaderMap.set(plan, loader);
     }
-    return loader.load(parent);
+    // TSH: TypeScript hack; in this case to confirm that it's definitely set.
+    const loaderTSH = loader;
+    return parents.map(parent => loaderTSH.load(parent));
   }
+
+  async load<TResultData = unknown, TInputData = unknown>(
+    plan: Plan<TResultData>,
+    parent: CrystalWrappedData<TInputData>,
+  ): Promise<TResultData> {
+    return (await this.loadAll(plan, [parent])[0])
+  }
+
 }
