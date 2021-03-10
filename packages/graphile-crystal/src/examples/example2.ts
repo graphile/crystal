@@ -363,7 +363,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
         // need to be a different subquery.
         this.joins.push({
           type: "inner",
-          source: sql`(select ids.ordinality as idx, ${sql.join(
+          source: sql`(select ids.ordinality - 1 as idx, ${sql.join(
             this.identifiers.map(
               (_, idx) =>
                 sql`ids.value->>${sql.literal(idx)} as ${sql.identifier(
