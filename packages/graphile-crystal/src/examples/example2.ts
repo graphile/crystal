@@ -98,7 +98,7 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
     console.log(text);
     console.log();
     console.log(`# PLACEHOLDERS:`);
-    console.log(JSON.stringify(values, null, 2));
+    console.log(inspect(values, {colors: true}));
     console.log();
     if (error) {
       console.log(`# ERROR:`);
@@ -253,6 +253,9 @@ class PgColumnSelectPlan<
   }
 
   eval(context: CrystalContext, values: CrystalWrappedData<any[]>[]) {
+    // TODO: return `attrIndex` from the parent record. Or something.
+    console.log("In PgColumnSelectPlan eval");
+    console.dir(values);
     return values.map((v) => v[$$data][this.attrIndex]);
   }
 }
@@ -347,6 +350,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     this.selects = cloneFrom ? [...cloneFrom.selects] : [];
     this.identifierIndex = cloneFrom ? cloneFrom.identifierIndex : null;
 
+    console.log(`PgClassSelectPlan(${this.dataSource.name}) constructor`);
     if (!cloneFrom) {
       if (this.identifiers.length !== this.identifierMatches.length) {
         throw new Error(
@@ -562,6 +566,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
 
     if (this.identifierIndex !== null) {
       const groups = {};
+      console.log(`Result values: ${inspect(resultValues, { colors: true })}`);
       for (const result of resultValues) {
         const groupKey = result[this.identifierIndex];
         if (!groups[groupKey]) {
@@ -570,9 +575,20 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
           groups[groupKey].push(result);
         }
       }
-      return values.map((_, idx) =>
+      console.log(
+        `Groups (${this.identifierIndex}): ${inspect(groups, {
+          colors: true,
+        })}`,
+      );
+      const result = values.map((_, idx) =>
         this.many ? groups[idx] : groups[idx]?.[0],
       );
+      console.log(
+        `RESULTS: ${JSON.stringify(resultValues)} (many ${
+          this.many ? "yes" : "no"
+        })`,
+      );
+      return result;
     } else {
       // There's no identifiers, so everyone gets the same results.
       console.log(
