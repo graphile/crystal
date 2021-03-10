@@ -290,7 +290,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
    * to identify which records in the result set should be returned to which
    * GraphQL resolvers.
    */
-  identifiers: Array<Plan<any>>;
+  identifiers: Array<{ plan: Plan<any>; type: SQL }>;
 
   /**
    * So we can clone.
@@ -326,7 +326,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
 
   constructor(
     dataSource: TDataSource,
-    identifiers: Plan<any>[],
+    identifiers: Array<{ plan: Plan<any>; type: SQL }>,
     identifierMatchesThunk: (alias: SQL) => SQL[],
     many = false,
     cloneFrom: PgClassSelectPlan<TDataSource> | null = null,
@@ -364,12 +364,11 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
         this.joins.push({
           type: "inner",
           source: sql`(select ids.ordinality - 1 as idx, ${sql.join(
-            this.identifiers.map(
-              (_, idx) =>
-                sql`ids.value->>${sql.literal(idx)} as ${sql.identifier(
-                  `id${idx}`,
-                )}`,
-            ),
+            this.identifiers.map(({ type }, idx) => {
+              return sql`(ids.value->>${sql.literal(
+                idx,
+              )})::${type} as ${sql.identifier(`id${idx}`)}`;
+            }),
             ", ",
           )} from json_array_elements(${sql.value(
             // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
@@ -535,7 +534,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     let sqlValues = rawSqlValues;
     if (this.identifierIndex !== null) {
       const identifierValuesByIdentifierIndex = await Promise.all(
-        this.identifiers.map((identifierPlan) => {
+        this.identifiers.map(({ plan: identifierPlan }) => {
           return identifierPlan.eval(crystal, values);
         }),
       );
@@ -701,7 +700,7 @@ const Message = new GraphQLObjectType(
         plan($message) {
           const $user = new PgClassSelectPlan(
             userSource,
-            [$message.get("author_id")],
+            [{ plan: $message.get("author_id"), type: sql`uuid` }],
             (alias) => [sql`${alias}.id`],
             false, // just one
           );
@@ -811,7 +810,7 @@ const Forum = new GraphQLObjectType(
         plan($forum) {
           const $messages = new PgClassSelectPlan(
             messageSource,
-            [$forum.get("id")],
+            [{ plan: $forum.get("id"), type: sql`uuid` }],
             (alias) => [sql`${alias}.forum_id`],
             true, // many
           );
@@ -837,7 +836,7 @@ const Forum = new GraphQLObjectType(
         plan($forum) {
           const $messages = new PgClassSelectPlan(
             messageSource,
-            [$forum.get("id")],
+            [{ plan: $forum.get("id"), type: sql`uuid` }],
             (alias) => [sql`${alias}.forum_id`],
             true, // many
           );
