@@ -529,7 +529,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     const { text, values: rawSqlValues } = sql.compile(query);
 
     let sqlValues = rawSqlValues;
-    if (this.identifierIndex) {
+    if (this.identifierIndex !== null) {
       const identifiersValue = JSON.stringify(
         await Promise.all(
           this.identifiers.map((identifierPlan) => {
@@ -560,7 +560,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     );
     const resultValues = executionResult.values;
 
-    if (this.identifierIndex) {
+    if (this.identifierIndex !== null) {
       const groups = {};
       for (const result of resultValues) {
         const groupKey = result[this.identifierIndex];
