@@ -532,24 +532,40 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     const { text, values: rawSqlValues } = sql.compile(query);
 
     let sqlValues = rawSqlValues;
+    const valueIndexToResultIndex: number[] = [];
     if (this.identifierIndex !== null) {
       const identifierValuesByIdentifierIndex = await Promise.all(
         this.identifiers.map(({ plan: identifierPlan }) => {
           return identifierPlan.eval(crystal, values);
         }),
       );
-      const identifiersValue = values.map((_, valueIndex) =>
-        this.identifiers.map(
+      let counter = -1;
+      const jsonToCounter: { [key: string]: number } = {};
+      for (
+        let valueIndex = 0, valueCount = values.length;
+        valueIndex < valueCount;
+        valueIndex++
+      ) {
+        const identifiers = this.identifiers.map(
           (_, identifierIndex) =>
             identifierValuesByIdentifierIndex[identifierIndex][valueIndex],
-        ),
-      );
+        );
+        const identifiersJSON = JSON.stringify(identifiers); // TODO: Canonical? Manual for perf?
+        const idx = jsonToCounter[identifiersJSON];
+        if (idx != null) {
+          valueIndexToResultIndex[valueIndex] = idx;
+        } else {
+          valueIndexToResultIndex[valueIndex] = ++counter;
+          jsonToCounter[identifiersJSON] = counter;
+        }
+      }
 
       sqlValues = sqlValues.map((v) => {
         // THIS IS A DELIBERATE HACK - we are replacing this symbol with a value
         // before executing the query.
         if ((v as any) === this.identifierSymbol) {
-          return JSON.stringify(identifiersValue);
+          // Manual JSON-ing
+          return "[" + Object.keys(jsonToCounter).join(",") + "]";
         } else {
           return v;
         }
@@ -583,9 +599,10 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
           colors: true,
         })}`,
       );
-      const result = values.map((_, idx) =>
-        this.many ? groups[idx] ?? [] : groups[idx]?.[0] ?? null,
-      );
+      const result = values.map((_, valueIdx) => {
+        const idx = valueIndexToResultIndex[valueIdx];
+        return this.many ? groups[idx] ?? [] : groups[idx]?.[0] ?? null;
+      });
       console.log(
         `RESULTS: ${JSON.stringify(resultValues)} (many ${
           this.many ? "yes" : "no"
