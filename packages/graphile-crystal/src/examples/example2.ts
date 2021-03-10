@@ -39,6 +39,7 @@ import {
   DataSource,
   CrystalContext,
   $$data,
+  CrystalWrappedData,
 } from "../interfaces";
 import { Plan } from "../plan";
 
@@ -228,8 +229,8 @@ function objectSpec<
  * no-op.
  */
 class RootPlan extends Plan<Record<string, never>> {
-  eval() {
-    return {};
+  eval(_context: CrystalContext, batch: CrystalWrappedData[]) {
+    return batch.map(() => ({}));
   }
 }
 
@@ -251,8 +252,8 @@ class PgColumnSelectPlan<
     super();
   }
 
-  eval(context: CrystalContext, values: unknown[]) {
-    return values.map((v: any) => v[$$data][this.attrIndex]);
+  eval(context: CrystalContext, values: CrystalWrappedData<any[]>[]) {
+    return values.map((v) => v[$$data][this.attrIndex]);
   }
 }
 
@@ -470,12 +471,12 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
    * `toSQL` method that allows embedding this plan within another SQL plan...
    * But that's a problem for later.
    *
-   * Crystal takes care of the batching for us, so `eval` is called with all
-   * the values from the batch, it then runs the query for every list in the
-   * values, and then returns an array of results where each entry in the
-   * results relates to the entry in the incoming values.
+   * This runs the query for every list in the values (since PostgreSQL results
+   * are represented as arrays (tuples) rather than objects for efficiency),
+   * and then returns an array of results where each entry in the results
+   * relates to the entry in the incoming values.
    */
-  async eval(crystal: CrystalContext, values: unknown[]) {
+  async eval(crystal: CrystalContext, values: CrystalWrappedData<any[]>[]) {
     this.finalize();
 
     // TODO: can some of this be moved to finalize?
@@ -611,7 +612,7 @@ class PgConnectionPlan<TDataSource extends PgDataSource<any>> extends Plan<
     return this.subplan.clone();
   }
 
-  eval(context: CrystalContext, values: unknown[]) {
+  eval(context: CrystalContext, values: CrystalWrappedData[]) {
     console.log(
       `PgConnectionPlan eval; values: ${inspect(values, { colors: true })}`,
     );

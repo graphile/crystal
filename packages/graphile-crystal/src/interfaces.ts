@@ -58,9 +58,14 @@ export const $$path = Symbol("path");
  */
 export type PathIdentity = string;
 
-export interface CrystalResult {
+export interface CrystalWrappedData<TData = unknown> {
+  [$$batch]: Batch | null;
+  [$$data]: TData;
+  [$$path]: PathIdentity | null;
+}
+
+export interface CrystalResult<TData = unknown> extends CrystalWrappedData<TData> {
   [$$batch]: Batch;
-  [$$data]: unknown;
   [$$path]: PathIdentity;
 }
 

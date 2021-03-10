@@ -48,8 +48,14 @@ export abstract class Plan<TOutput> {
     return this;
   }
 
+  /**
+   * Crystal takes care of the batching; `eval` is then called with all the
+   * values from the batch, and must return an array of results where each
+   * entry in the results relates to the entry in the incoming values. In this
+   * way, it's similar to DataLoader.
+   */
   public abstract eval(
     crystal: CrystalContext,
     values: unknown[],
-  ): TOutput | Promise<TOutput>;
+  ): Array<TOutput> | Promise<Array<TOutput>> | Array<Promise<TOutput>> | Promise<Array<Promise<TOutput>>>;
 }

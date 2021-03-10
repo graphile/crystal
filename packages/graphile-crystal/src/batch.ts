@@ -10,6 +10,7 @@ import {
   $$plan,
   CrystalContext,
   BaseGraphQLContext,
+  CrystalWrappedData,
 } from "./interfaces";
 import { getPathIdentityFromResolveInfo } from "./utils";
 import { Plan } from "./plan";
@@ -39,14 +40,14 @@ function deferred<T = void>(): Deferred<T> {
   });
 }
 
-class Loader<TResultData = unknown> {
+class Loader<TResultData = unknown, TInputData = unknown> {
   executed = false;
   timeout: NodeJS.Timeout | null = null;
-  batch: unknown[] = [];
+  batch: CrystalWrappedData<TInputData>[] = [];
   promises: Deferred<TResultData>[] = [];
-  constructor(private context: CrystalContext, private info: Info) {}
+  constructor(private context: CrystalContext, private info: Info<TResultData, TInputData>) {}
 
-  async load(parent: unknown): Promise<unknown> {
+  async load(parent: CrystalWrappedData<TInputData>): Promise<TResultData> {
     if (this.executed) {
       // TODO: re-evaluate this. Shouldn't be necessary.
       throw new Error("Cannot load data from an already executed loader");
@@ -90,11 +91,11 @@ class Loader<TResultData = unknown> {
 /**
  * What a Batch knows about a particular PathIdentity
  */
-interface Info {
+interface Info<TResultData = unknown, TInputData = unknown> {
   pathIdentity: PathIdentity;
-  plan: Plan<any>;
+  plan: Plan<TResultData>;
   memo: Map<any, any>;
-  loader?: Loader;
+  loader?: Loader<TResultData, TInputData>;
 }
 
 /**
@@ -257,7 +258,8 @@ export class Batch {
         [$$path]: pathIdentity,
       };
     }
-    const data = await this.load(crystalInfo, parent);
+    const parentAsCrystalWrapped: CrystalResult | CrystalWrappedData = parentCrystalResult || {[$$data]: parent, [$$batch]: null, [$$path]: null};
+    const data = await this.load(crystalInfo, parentAsCrystalWrapped);
     const result = {
       [$$batch]: this,
       [$$data]: data,
@@ -273,7 +275,7 @@ export class Batch {
     return result;
   }
 
-  load(crystalInfo: Info, parent: unknown): Promise<any> {
+  load<TResultData = unknown, TInputData = unknown>(crystalInfo: Info<TResultData, TInputData>, parent: CrystalWrappedData<TInputData>): Promise<TResultData> {
     if (!crystalInfo.loader) {
       crystalInfo.loader = new Loader(this.crystalContext, crystalInfo);
     }
