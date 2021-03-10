@@ -378,7 +378,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
               sql`${frag} = ${alias}.${sql.identifier(`id${idx}`)}`,
           ),
         });
-        this.identifierIndex = this.selects.push(sql`${alias}.idx`);
+        this.identifierIndex = this.select(sql`${alias}.idx`);
       }
     }
     return this;
@@ -402,8 +402,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
    * Select an SQL fragment, returning the index the result will have.
    */
   private select(fragment: SQL): number {
-    this.selects.push(fragment);
-    return this.selects.length - 1;
+    return this.selects.push(fragment) - 1;
   }
 
   /**
