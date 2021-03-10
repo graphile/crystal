@@ -51,6 +51,8 @@ const isDev = process.env.NODE_ENV === "development";
 
 const testPool = new Pool({ connectionString: "graphile_crystal" });
 
+const $$CURSOR = Symbol("connection-cursor");
+
 /*+--------------------------------------------------------------------------+
   |                               DATA SOURCES                               |
   +--------------------------------------------------------------------------+*/
@@ -166,7 +168,7 @@ type ForumPlan = PgClassSelectPlan<typeof forumSource>;
  */
 type GraphileCrystalFieldConfig<
   TContext extends BaseGraphQLContext,
-  TParentPlan extends Plan<any>,
+  TParentPlan extends Plan<any> | null,
   TResultPlan extends Plan<any>,
   TArgs extends BaseGraphQLArguments
 > = GraphQLFieldConfig<any, any> & {
@@ -261,6 +263,21 @@ class PgColumnSelectPlan<
 }
 
 /**
+ * A plan for selecting a column. Keep in mind that a column might not be a
+ * scalar (could be a list, compound type, JSON, geometry, etc), so this might
+ * not be a "leaf"; it might be used as the input of another layer of plan.
+ */
+class PgAttributeSelectPlan extends Plan<any> {
+  constructor(private attrIndex: number) {
+    super();
+  }
+
+  eval(context: CrystalContext, values: CrystalWrappedData<any[]>[]) {
+    return values.map((v) => v[$$data][this.attrIndex]);
+  }
+}
+
+/**
  * This represents selecting from a class-like entity (table, view, etc); i.e.
  * it represents `SELECT <columns>, <cursor?> FROM <table>`.  It's not
  * currently clear if it also includes `WHERE <conditions>`,
@@ -324,6 +341,25 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
    */
   many: boolean;
 
+  /**
+   * We only want to fetch each column once (since columns don't accept any
+   * parameters), so this memo keeps track of which columns we've selected so
+   * their plans can be easily reused.
+   */
+  colPlans: {
+    [key in keyof TDataSource["TData"]]?: PgColumnSelectPlan<TDataSource, key>;
+  };
+
+  /**
+   * The list of things we're selecting
+   */
+  selects: Array<SQL | symbol>;
+
+  /**
+   * If a cursor was requested, what plan returns it?
+   */
+  cursorPlan: Plan<any> | null;
+
   constructor(
     dataSource: TDataSource,
     identifiers: Array<{ plan: Plan<any>; type: SQL }>,
@@ -349,6 +385,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     this.joins = cloneFrom ? [...cloneFrom.joins] : [];
     this.selects = cloneFrom ? [...cloneFrom.selects] : [];
     this.identifierIndex = cloneFrom ? cloneFrom.identifierIndex : null;
+    this.cursorPlan = cloneFrom ? cloneFrom.cursorPlan : null;
 
     console.log(`PgClassSelectPlan(${this.dataSource.name}) constructor`);
     if (!cloneFrom) {
@@ -388,23 +425,9 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
   }
 
   /**
-   * We only want to fetch each column once (since columns don't accept any
-   * parameters), so this memo keeps track of which columns we've selected so
-   * their plans can be easily reused.
-   */
-  colPlans: {
-    [key in keyof TDataSource["TData"]]?: PgColumnSelectPlan<TDataSource, key>;
-  };
-
-  /**
-   * The list of things we're selecting
-   */
-  selects: SQL[];
-
-  /**
    * Select an SQL fragment, returning the index the result will have.
    */
-  private select(fragment: SQL): number {
+  private select(fragment: SQL | symbol): number {
     return this.selects.push(fragment) - 1;
   }
 
@@ -434,7 +457,10 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
    * the right place for this.
    */
   cursor() {
-    return this.get("TODO_cursor_here");
+    if (this.cursorPlan == null) {
+      this.cursorPlan = new PgAttributeSelectPlan(this.select($$CURSOR));
+    }
+    return this.cursorPlan;
   }
 
   joins: Array<
@@ -512,9 +538,25 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
       return sql`${join} ${j.source} as ${j.alias}${joinCondition}`;
     });
 
-    const fragmentsWithAliases = this.selects.map(
-      (frag, idx) => sql`${frag} as ${sql.identifier(String(idx))}`,
-    );
+    const resolveSymbol = (symbol: symbol): SQL => {
+      switch (symbol) {
+        case $$CURSOR:
+          return sql`1`;
+        default: {
+          throw new Error(
+            `Unrecognised special select symbol: ${inspect(symbol)}`,
+          );
+        }
+      }
+    };
+
+    const fragmentsWithAliases = this.selects.map((fragOrSymbol, idx) => {
+      const frag =
+        typeof fragOrSymbol === "symbol"
+          ? resolveSymbol(fragOrSymbol)
+          : fragOrSymbol;
+      return sql`${frag} as ${sql.identifier(String(idx))}`;
+    });
     const selection = fragmentsWithAliases.length
       ? sql`\n  ${sql.join(fragmentsWithAliases, ",\n  ")}`
       : sql` /* NOTHING?! */`;

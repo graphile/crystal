@@ -1,4 +1,4 @@
-import * as assert from 'assert';
+import * as assert from "assert";
 import { GraphQLResolveInfo } from "graphql";
 import {
   GraphQLArguments,
@@ -19,6 +19,7 @@ import { isCrystalResult } from "./crystalResult";
 import { Aether } from "./aether";
 import { TrackedObject } from "./trackedObject";
 import { FieldDigest } from "./parseDoc";
+import { inspect } from "util";
 
 interface Deferred<T> extends Promise<T> {
   resolve: (input?: T | PromiseLike<T> | undefined) => void;
@@ -26,7 +27,12 @@ interface Deferred<T> extends Promise<T> {
 }
 
 function isPromise<T>(t: T | Promise<T>): t is Promise<T> {
-  return typeof t === 'object' && t !== null && typeof (t as any).then === 'function' && typeof (t as any).catch === 'function';
+  return (
+    typeof t === "object" &&
+    t !== null &&
+    typeof (t as any).then === "function" &&
+    typeof (t as any).catch === "function"
+  );
 }
 
 function deferred<T = void>(): Deferred<T> {
@@ -50,7 +56,10 @@ class Loader<TResultData = unknown, TInputData = unknown> {
   timeout: NodeJS.Timeout | null = null;
   batch: CrystalWrappedData<TInputData>[] = [];
   promises: Deferred<TResultData>[] = [];
-  constructor(private context: CrystalContext, private info: Info<TResultData, TInputData>) {}
+  constructor(
+    private context: CrystalContext,
+    private info: Info<TResultData, TInputData>,
+  ) {}
 
   async load(parent: CrystalWrappedData<TInputData>): Promise<TResultData> {
     if (this.executed) {
@@ -94,7 +103,11 @@ class Loader<TResultData = unknown, TInputData = unknown> {
       return;
     }
     assert.ok(Array.isArray(results), "`eval` must return an array of results");
-    assert.equal(results.length, this.batch.length, "`eval` must return a result for each entry in `values`");
+    assert.equal(
+      results.length,
+      this.batch.length,
+      "`eval` must return a result for each entry in `values`",
+    );
     this.promises.map((deferred, idx) => deferred.resolve(results[idx]));
   }
 }
@@ -213,6 +226,12 @@ export class Batch {
       }
       */
 
+      assert.ok(
+        plan instanceof Plan,
+        `Expected a Plan at '${pathIdentity}'; instead received '${inspect(
+          plan,
+        )}'`,
+      );
       plan.finalize();
       this.crystalInfoByPathIdentity.set(pathIdentity, {
         plan,
@@ -269,7 +288,13 @@ export class Batch {
         [$$path]: pathIdentity,
       };
     }
-    const parentAsCrystalWrapped: CrystalResult | CrystalWrappedData = parentCrystalResult || {[$$data]: parent, [$$batch]: null, [$$path]: null};
+    const parentAsCrystalWrapped:
+      | CrystalResult
+      | CrystalWrappedData = parentCrystalResult || {
+      [$$data]: parent,
+      [$$batch]: null,
+      [$$path]: null,
+    };
     const data = await this.load(crystalInfo, parentAsCrystalWrapped);
     const result = {
       [$$batch]: this,
@@ -286,7 +311,10 @@ export class Batch {
     return result;
   }
 
-  load<TResultData = unknown, TInputData = unknown>(crystalInfo: Info<TResultData, TInputData>, parent: CrystalWrappedData<TInputData>): Promise<TResultData> {
+  load<TResultData = unknown, TInputData = unknown>(
+    crystalInfo: Info<TResultData, TInputData>,
+    parent: CrystalWrappedData<TInputData>,
+  ): Promise<TResultData> {
     if (!crystalInfo.loader) {
       crystalInfo.loader = new Loader(this.crystalContext, crystalInfo);
     }
