@@ -107,7 +107,7 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
       console.dir(error);
     } else {
       console.log(`# RESULT:`);
-      console.log(JSON.stringify(result.rows, null, 2));
+      console.log(inspect(result.rows,{colors: true}));
     }
     console.log("👆".repeat(30));
     if (error) {
@@ -255,9 +255,6 @@ class PgColumnSelectPlan<
   }
 
   eval(context: CrystalContext, values: CrystalWrappedData<any[]>[]) {
-    // TODO: return `attrIndex` from the parent record. Or something.
-    console.log("In PgColumnSelectPlan eval");
-    console.dir(values);
     return values.map((v) => v[$$data][this.attrIndex]);
   }
 }
@@ -627,7 +624,6 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
 
     if (this.identifierIndex !== null) {
       const groups = {};
-      console.log(`Result values: ${inspect(resultValues, { colors: true })}`);
       for (const result of resultValues) {
         const groupKey = result[this.identifierIndex];
         if (!groups[groupKey]) {
@@ -645,19 +641,9 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
         const idx = valueIndexToResultIndex[valueIdx];
         return this.many ? groups[idx] ?? [] : groups[idx]?.[0] ?? null;
       });
-      console.log(
-        `RESULTS: ${JSON.stringify(resultValues)} (many ${
-          this.many ? "yes" : "no"
-        })`,
-      );
       return result;
     } else {
       // There's no identifiers, so everyone gets the same results.
-      console.log(
-        `RESULTS: ${JSON.stringify(resultValues)} (many ${
-          this.many ? "yes" : "no"
-        })`,
-      );
       const result = this.many ? resultValues : resultValues[0];
       return values.map(() => result);
     }

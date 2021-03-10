@@ -170,9 +170,9 @@ export function makeCrystalWrapResolver() {
       TArgs
     > = async function (graphileParent: any, args, context, info) {
       console.log(
-        `${info.parentType.name}.${
+        `👉 CRYSTAL RESOLVER (${info.parentType.name}.${
           info.fieldName
-        } crystal wrapped resolver; parent: ${inspect(graphileParent, {
+        }); parent data: ${inspect(graphileParent?.[$$data], {
           colors: true,
         })}`,
       );
@@ -195,9 +195,9 @@ export function makeCrystalWrapResolver() {
       const result = await realResolver(fakeParent as any, args, context, info);
       const wrappedResult = wrapResult({ batch, path }, result);
       console.log(
-        `${info.parentType.name}.${
+        `👈 CRYSTAL RESOLVER(${info.parentType.name}.${
           info.fieldName
-        } crystal wrapped resolver; result: ${inspect(wrappedResult, {
+        }); result data: ${inspect(wrappedResult?.[$$data], {
           colors: true,
         })}`,
       );

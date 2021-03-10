@@ -68,7 +68,7 @@ async function loaderExecute<TResultData = unknown, TInputData = unknown>(
     promises.map((deferred) => deferred.reject(e));
     return;
   }
-  console.log(`Loader result: ${JSON.stringify(results)}`);
+  // console.log(`Loader result: ${JSON.stringify(results)}`);
   if (!results) {
     promises.map((deferred) =>
       deferred.reject(
@@ -281,7 +281,7 @@ export class Batch {
       info,
       parentCrystalResult ? parentCrystalResult[$$path] : undefined,
     );
-    console.log(`Getting info for ${pathIdentity}`);
+    // console.log(`Getting info for ${pathIdentity}`);
     const crystalInfo = this.crystalInfoByPathIdentity.get(pathIdentity);
     if (!crystalInfo || !crystalInfo.plan) {
       console.log(
@@ -307,10 +307,9 @@ export class Batch {
       [$$path]: pathIdentity,
     };
     console.log(
-      `Executed plan @ ${pathIdentity}; results: ${JSON.stringify(
+      `Executed plan @ ${pathIdentity}; results: ${inspect(
         data,
-        null,
-        2,
+        {colors: true}
       )}`,
     );
     return result;
