@@ -529,16 +529,26 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
 
     const { text, values: rawSqlValues } = sql.compile(query);
 
-    const sqlValues = rawSqlValues.map((v) => {
-      // THIS IS A DELIBERATE HACK - we are replacing this symbol with a value
-      // before executing the query.
-      if ((v as any) === this.identifierSymbol) {
-        // TODO: this should be the identifier arrays
-        return "[]";
-      } else {
-        return v;
-      }
-    });
+    let sqlValues = rawSqlValues;
+    if (this.identifierIndex) {
+      const identifiersValue = JSON.stringify(
+        await Promise.all(
+          this.identifiers.map((identifierPlan) => {
+            return identifierPlan.eval(crystal, values);
+          }),
+        ),
+      );
+
+      sqlValues = sqlValues.map((v) => {
+        // THIS IS A DELIBERATE HACK - we are replacing this symbol with a value
+        // before executing the query.
+        if ((v as any) === this.identifierSymbol) {
+          return identifiersValue;
+        } else {
+          return v;
+        }
+      });
+    }
 
     // TODO: replace placeholder values
 
