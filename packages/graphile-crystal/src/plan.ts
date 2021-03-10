@@ -57,5 +57,9 @@ export abstract class Plan<TOutput> {
   public abstract eval(
     crystal: CrystalContext,
     values: CrystalWrappedData[],
-  ): Array<TOutput> | Promise<Array<TOutput>> | Array<Promise<TOutput>> | Promise<Array<Promise<TOutput>>>;
+  ):
+    | Array<TOutput>
+    | Promise<Array<TOutput>>
+    | Array<Promise<TOutput>>
+    | Promise<Array<Promise<TOutput>>>;
 }

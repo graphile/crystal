@@ -107,7 +107,7 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
       console.dir(error);
     } else {
       console.log(`# RESULT:`);
-      console.log(inspect(result.rows,{colors: true}));
+      console.log(inspect(result.rows, { colors: true }));
     }
     console.log("👆".repeat(30));
     if (error) {

@@ -64,7 +64,8 @@ export interface CrystalWrappedData<TData = unknown> {
   [$$path]: PathIdentity | null;
 }
 
-export interface CrystalResult<TData = unknown> extends CrystalWrappedData<TData> {
+export interface CrystalResult<TData = unknown>
+  extends CrystalWrappedData<TData> {
   [$$batch]: Batch;
   [$$path]: PathIdentity;
 }
@@ -242,7 +243,7 @@ declare module "graphql" {
 }
 
 export interface CrystalContext {
-  batch: Batch,
+  batch: Batch;
   executeQueryWithDataSource<TDataSource extends DataSource<any, any>>(
     dataSource: TDataSource,
     query: TDataSource["TQuery"],

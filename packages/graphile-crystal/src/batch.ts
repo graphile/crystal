@@ -307,10 +307,9 @@ export class Batch {
       [$$path]: pathIdentity,
     };
     console.log(
-      `Executed plan @ ${pathIdentity}; results: ${inspect(
-        data,
-        {colors: true}
-      )}`,
+      `Executed plan @ ${pathIdentity}; results: ${inspect(data, {
+        colors: true,
+      })}`,
     );
     return result;
   }
@@ -326,14 +325,13 @@ export class Batch {
     }
     // TSH: TypeScript hack; in this case to confirm that it's definitely set.
     const loaderTSH = loader;
-    return parents.map(parent => loaderTSH.load(parent));
+    return parents.map((parent) => loaderTSH.load(parent));
   }
 
   async load<TResultData = unknown, TInputData = unknown>(
     plan: Plan<TResultData>,
     parent: CrystalWrappedData<TInputData>,
   ): Promise<TResultData> {
-    return (await this.loadAll(plan, [parent])[0])
+    return await this.loadAll(plan, [parent])[0];
   }
-
 }
