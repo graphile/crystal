@@ -51,75 +51,79 @@ function deferred<T = void>(): Deferred<T> {
   });
 }
 
+async function loaderExecute<TResultData = unknown, TInputData = unknown>(
+  context: CrystalContext,
+  plan: Plan<TResultData>,
+  batch: Array<CrystalWrappedData<TInputData>>,
+  promises: Deferred<TResultData>[],
+): Promise<void> {
+  let results: Array<TResultData | Promise<TResultData>>;
+  try {
+    let tmp1 = plan.eval(context, batch);
+    if (isPromise(tmp1)) {
+      tmp1 = await tmp1;
+    }
+    results = tmp1;
+  } catch (e) {
+    promises.map((deferred) => deferred.reject(e));
+    return;
+  }
+  console.log(`Loader result: ${JSON.stringify(results)}`);
+  if (!results) {
+    promises.map((deferred) =>
+      deferred.reject(
+        new Error("Internal Graphile Crystal error: results should be set."),
+      ),
+    );
+    return;
+  }
+  assert.ok(Array.isArray(results), "`eval` must return an array of results");
+  assert.equal(
+    results.length,
+    batch.length,
+    "`eval` must return a result for each entry in `values`",
+  );
+  promises.map((deferred, idx) => deferred.resolve(results[idx]));
+}
+
 class Loader<TResultData = unknown, TInputData = unknown> {
-  executed = false;
   timeout: NodeJS.Timeout | null = null;
   batch: CrystalWrappedData<TInputData>[] = [];
   promises: Deferred<TResultData>[] = [];
   constructor(
     private context: CrystalContext,
-    private info: Info<TResultData, TInputData>,
+    private plan: Plan<TResultData>,
   ) {}
 
   async load(parent: CrystalWrappedData<TInputData>): Promise<TResultData> {
-    if (this.executed) {
-      // TODO: re-evaluate this. Shouldn't be necessary.
-      throw new Error("Cannot load data from an already executed loader");
-    }
     const promise = deferred<TResultData>();
     this.batch.push(parent);
     this.promises.push(promise);
     if (this.timeout === null) {
-      this.timeout = setTimeout(() => this.execute(), 0);
+      this.timeout = setTimeout(() => {
+        this.timeout = null;
+
+        // Take a copy of the batch/promises and then reset them
+        const batch = this.batch;
+        this.batch = [];
+        const promises = this.promises;
+        this.promises = [];
+
+        // This function must not reference `this.*`, it used to be a method
+        // but that made it error-prone.
+        loaderExecute(this.context, this.plan, batch, promises);
+      }, 0);
     }
     return promise;
-  }
-
-  async execute(): Promise<void> {
-    // Don't use this again.
-    this.info.loader = undefined;
-    this.executed = true;
-
-    let results: Array<TResultData | Promise<TResultData>>;
-    try {
-      let tmp1 = this.info.plan.eval(this.context, this.batch);
-      if (isPromise(tmp1)) {
-        tmp1 = await tmp1;
-      }
-      results = tmp1;
-    } catch (e) {
-      this.promises.map((deferred) => deferred.reject(e));
-      return;
-    }
-    console.log(
-      `Loader result @ ${this.info.pathIdentity}: ${JSON.stringify(results)}`,
-    );
-    if (!results) {
-      this.promises.map((deferred) =>
-        deferred.reject(
-          new Error("Internal Graphile Crystal error: results should be set."),
-        ),
-      );
-      return;
-    }
-    assert.ok(Array.isArray(results), "`eval` must return an array of results");
-    assert.equal(
-      results.length,
-      this.batch.length,
-      "`eval` must return a result for each entry in `values`",
-    );
-    this.promises.map((deferred, idx) => deferred.resolve(results[idx]));
   }
 }
 
 /**
  * What a Batch knows about a particular PathIdentity
  */
-interface Info<TResultData = unknown, TInputData = unknown> {
+interface Info<TResultData = unknown> {
   pathIdentity: PathIdentity;
   plan: Plan<TResultData>;
-  memo: Map<any, any>;
-  loader?: Loader<TResultData, TInputData>;
 }
 
 /**
@@ -139,6 +143,7 @@ interface Info<TResultData = unknown, TInputData = unknown> {
 export class Batch {
   private crystalInfoByPathIdentity: Map<PathIdentity, Info>;
   private crystalContext: CrystalContext;
+  private planLoaderMap: Map<Plan<any>, Loader<any>> = new Map();
 
   constructor(
     public readonly aether: Aether,
@@ -236,7 +241,6 @@ export class Batch {
       this.crystalInfoByPathIdentity.set(pathIdentity, {
         plan,
         pathIdentity,
-        memo: new Map(),
       });
 
       if (digest.selections) {
@@ -295,7 +299,7 @@ export class Batch {
       [$$batch]: null,
       [$$path]: null,
     };
-    const data = await this.load(crystalInfo, parentAsCrystalWrapped);
+    const data = await this.load(crystalInfo.plan, parentAsCrystalWrapped);
     const result = {
       [$$batch]: this,
       [$$data]: data,
@@ -312,12 +316,14 @@ export class Batch {
   }
 
   load<TResultData = unknown, TInputData = unknown>(
-    crystalInfo: Info<TResultData, TInputData>,
+    plan: Plan<TResultData>,
     parent: CrystalWrappedData<TInputData>,
   ): Promise<TResultData> {
-    if (!crystalInfo.loader) {
-      crystalInfo.loader = new Loader(this.crystalContext, crystalInfo);
+    let loader = this.planLoaderMap.get(plan);
+    if (!loader) {
+      loader = new Loader(this.crystalContext, plan);
+      this.planLoaderMap.set(plan, loader);
     }
-    return crystalInfo.loader.load(parent);
+    return loader.load(parent);
   }
 }
