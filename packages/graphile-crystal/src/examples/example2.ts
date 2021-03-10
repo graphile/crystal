@@ -98,7 +98,7 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
     console.log(text);
     console.log();
     console.log(`# PLACEHOLDERS:`);
-    console.log(inspect(values, {colors: true}));
+    console.log(inspect(values, { colors: true }));
     console.log();
     if (error) {
       console.log(`# ERROR:`);
@@ -534,11 +534,15 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
 
     let sqlValues = rawSqlValues;
     if (this.identifierIndex !== null) {
-      const identifiersValue = JSON.stringify(
-        await Promise.all(
-          this.identifiers.map((identifierPlan) => {
-            return identifierPlan.eval(crystal, values);
-          }),
+      const identifierValuesByIdentifierIndex = await Promise.all(
+        this.identifiers.map((identifierPlan) => {
+          return identifierPlan.eval(crystal, values);
+        }),
+      );
+      const identifiersValue = values.map((_, valueIndex) =>
+        this.identifiers.map(
+          (_, identifierIndex) =>
+            identifierValuesByIdentifierIndex[identifierIndex][valueIndex],
         ),
       );
 
@@ -546,7 +550,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
         // THIS IS A DELIBERATE HACK - we are replacing this symbol with a value
         // before executing the query.
         if ((v as any) === this.identifierSymbol) {
-          return identifiersValue;
+          return JSON.stringify(identifiersValue);
         } else {
           return v;
         }
@@ -581,7 +585,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
         })}`,
       );
       const result = values.map((_, idx) =>
-        this.many ? groups[idx] : groups[idx]?.[0],
+        this.many ? groups[idx] ?? [] : groups[idx]?.[0] ?? null,
       );
       console.log(
         `RESULTS: ${JSON.stringify(resultValues)} (many ${
