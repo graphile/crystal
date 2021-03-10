@@ -471,12 +471,14 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
    * `toSQL` method that allows embedding this plan within another SQL plan...
    * But that's a problem for later.
    *
-   * This runs the query for every list in the values (since PostgreSQL results
-   * are represented as arrays (tuples) rather than objects for efficiency),
-   * and then returns an array of results where each entry in the results
-   * relates to the entry in the incoming values.
+   * This runs the query for every entry in the values, and then returns an
+   * array of results where each entry in the results relates to the entry in
+   * the incoming values.
+   *
+   * NOTE: we don't know what the values being fed in are, we must feed them to
+   * the plans stored in this.identifiers to get actual values we can use.
    */
-  async eval(crystal: CrystalContext, values: CrystalWrappedData<any[]>[]) {
+  async eval(crystal: CrystalContext, values: CrystalWrappedData<unknown>[]) {
     this.finalize();
 
     // TODO: can some of this be moved to finalize?
@@ -617,7 +619,7 @@ class PgConnectionPlan<TDataSource extends PgDataSource<any>> extends Plan<
       `PgConnectionPlan eval; values: ${inspect(values, { colors: true })}`,
     );
     // TODO
-    return {};
+    return values.map(() => ({}));
   }
 }
 

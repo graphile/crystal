@@ -1,3 +1,4 @@
+import * as assert from 'assert';
 import { GraphQLResolveInfo } from "graphql";
 import {
   GraphQLArguments,
@@ -22,6 +23,10 @@ import { FieldDigest } from "./parseDoc";
 interface Deferred<T> extends Promise<T> {
   resolve: (input?: T | PromiseLike<T> | undefined) => void;
   reject: (error: Error) => void;
+}
+
+function isPromise<T>(t: T | Promise<T>): t is Promise<T> {
+  return typeof t === 'object' && t !== null && typeof (t as any).then === 'function' && typeof (t as any).catch === 'function';
 }
 
 function deferred<T = void>(): Deferred<T> {
@@ -66,9 +71,13 @@ class Loader<TResultData = unknown, TInputData = unknown> {
     this.info.loader = undefined;
     this.executed = true;
 
-    let results: TResultData[];
+    let results: Array<TResultData | Promise<TResultData>>;
     try {
-      results = await this.info.plan.eval(this.context, this.batch);
+      let tmp1 = this.info.plan.eval(this.context, this.batch);
+      if (isPromise(tmp1)) {
+        tmp1 = await tmp1;
+      }
+      results = tmp1;
     } catch (e) {
       this.promises.map((deferred) => deferred.reject(e));
       return;
@@ -84,6 +93,8 @@ class Loader<TResultData = unknown, TInputData = unknown> {
       );
       return;
     }
+    assert.ok(Array.isArray(results), "`eval` must return an array of results");
+    assert.equal(results.length, this.batch.length, "`eval` must return a result for each entry in `values`");
     this.promises.map((deferred, idx) => deferred.resolve(results[idx]));
   }
 }
