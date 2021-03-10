@@ -82,11 +82,16 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
     op: { text: string; values?: any[] },
   ): Promise<{ values: any[] }> {
     const { text, values } = op;
-    const result = await this.pool.query({
-      text,
-      values,
-      rowMode: "array",
-    });
+    let result: any, error: any;
+    try {
+      result = await this.pool.query({
+        text,
+        values,
+        rowMode: "array",
+      });
+    } catch (e) {
+      error = e;
+    }
     console.log("👇".repeat(30));
     console.log(`# SQL QUERY:`);
     console.log(text);
@@ -94,9 +99,17 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
     console.log(`# PLACEHOLDERS:`);
     console.log(JSON.stringify(values, null, 2));
     console.log();
-    console.log(`# RESULT:`);
-    console.log(JSON.stringify(result.rows, null, 2));
+    if (error) {
+      console.log(`# ERROR:`);
+      console.dir(error);
+    } else {
+      console.log(`# RESULT:`);
+      console.log(JSON.stringify(result.rows, null, 2));
+    }
     console.log("👆".repeat(30));
+    if (error) {
+      return Promise.reject(error);
+    }
     return { values: result.rows };
   }
 }
