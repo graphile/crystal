@@ -664,7 +664,7 @@ class PgConnectionPlan<TDataSource extends PgDataSource<any>> extends Plan<
       `PgConnectionPlan eval; values: ${inspect(values, { colors: true })}`,
     );
     // TODO
-    return values.map((v) => (v[$$data]));
+    return values.map((v) => v[$$data]);
   }
 }
 
@@ -1008,6 +1008,16 @@ async function main() {
               author {
                 username
                 gravatarUrl
+              }
+            }
+            edges {
+              cursor
+              node {
+                body
+                author {
+                  username
+                  gravatarUrl
+                }
               }
             }
           }
