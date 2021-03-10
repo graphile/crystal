@@ -935,7 +935,9 @@ async function main() {
           .split("\n"),
       };
     });
-    console.log(JSON.stringify({ errors: nicerErrors, data }, null, 2));
+    console.log(
+      inspect({ data, errors: nicerErrors }, { colors: true, depth: Infinity }),
+    );
   }
 
   if (Math.random() > 2) {
