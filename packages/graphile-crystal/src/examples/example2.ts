@@ -938,7 +938,7 @@ async function main() {
     console.log(JSON.stringify({ errors: nicerErrors, data }, null, 2));
   }
 
-  {
+  if (Math.random() > 2) {
     const query = /* GraphQL */ `
       {
         forums {
@@ -959,7 +959,7 @@ async function main() {
     logGraphQLResult(result);
   }
 
-  if (Math.random() < 2) {
+  if (Math.random() > 2) {
     const query = /* GraphQL */ `
       {
         forums {
@@ -991,7 +991,7 @@ async function main() {
     logGraphQLResult(result);
   }
 
-  if (Math.random() > 2) {
+  if (Math.random() < 2) {
     const query = /* GraphQL */ `
       {
         forums {
