@@ -765,6 +765,32 @@ const Forum = new GraphQLObjectType(
           return $forum.get("name");
         },
       },
+      messagesList: {
+        type: new GraphQLList(Message),
+        args: {
+          limit: {
+            type: GraphQLInt,
+          },
+          condition: {
+            type: MessageCondition,
+          },
+          includeArchived: { type: IncludeArchived },
+        },
+        plan($forum) {
+          const $messages = new PgClassSelectPlan(
+            messageSource,
+            [$forum.get("id")],
+            (alias) => [sql`${alias}.forum_id`],
+            true, // many
+          );
+          // $messages.leftJoin(...);
+          // $messages.innerJoin(...);
+          // $messages.relation('fk_messages_author_id')
+          // $messages.where(...);
+          // $messages.orderBy(...);
+          return $messages;
+        },
+      },
       messagesConnection: {
         type: MessagesConnection,
         args: {
@@ -869,6 +895,38 @@ async function main() {
       {
         forums {
           name
+        }
+      }
+    `;
+
+    const result = await graphql({
+      schema,
+      source: query,
+      variableValues: {},
+      contextValue: {},
+      rootValue: null,
+    });
+
+    console.log("GraphQL result:");
+    logGraphQLResult(result);
+  }
+
+  if (Math.random() < 2) {
+    const query = /* GraphQL */ `
+      {
+        forums {
+          name
+          messagesList(
+            limit: 5
+            condition: { active: true }
+            includeArchived: INHERIT
+          ) {
+            body
+            author {
+              username
+              gravatarUrl
+            }
+          }
         }
       }
     `;
