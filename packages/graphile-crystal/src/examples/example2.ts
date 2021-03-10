@@ -649,7 +649,7 @@ class ConnectionPlan<TSubplan extends Plan<any>> extends Plan<Opaque<any>> {
 */
 
 class PgConnectionPlan<TDataSource extends PgDataSource<any>> extends Plan<
-  Opaque<any>
+  unknown
 > {
   constructor(public readonly subplan: PgClassSelectPlan<TDataSource>) {
     super();
@@ -664,7 +664,7 @@ class PgConnectionPlan<TDataSource extends PgDataSource<any>> extends Plan<
       `PgConnectionPlan eval; values: ${inspect(values, { colors: true })}`,
     );
     // TODO
-    return values.map(() => ({}));
+    return values.map((v) => (v[$$data]));
   }
 }
 

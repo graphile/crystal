@@ -1,4 +1,4 @@
-import { CrystalContext } from "./interfaces";
+import { CrystalContext, CrystalWrappedData } from "./interfaces";
 
 /**
  * A plan represents a method to fetch a "future value". Plans are mutable,
@@ -56,6 +56,6 @@ export abstract class Plan<TOutput> {
    */
   public abstract eval(
     crystal: CrystalContext,
-    values: unknown[],
+    values: CrystalWrappedData[],
   ): Array<TOutput> | Promise<Array<TOutput>> | Array<Promise<TOutput>> | Promise<Array<Promise<TOutput>>>;
 }
