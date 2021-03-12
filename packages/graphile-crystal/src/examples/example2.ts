@@ -1028,7 +1028,7 @@ async function main() {
   }
 
   if (Math.random() > 2) {
-    test(/* GraphQL */ `
+    await test(/* GraphQL */ `
       {
         forums {
           name
@@ -1038,7 +1038,7 @@ async function main() {
   }
 
   if (Math.random() > 2) {
-    test(/* GraphQL */ `
+    await test(/* GraphQL */ `
       {
         forums {
           name
@@ -1059,7 +1059,7 @@ async function main() {
   }
 
   if (Math.random() < 2) {
-    test(/* GraphQL */ `
+    await test(/* GraphQL */ `
       {
         allMessagesConnection {
           edges {
@@ -1078,7 +1078,7 @@ async function main() {
   }
 
   if (Math.random() > 2) {
-    test(/* GraphQL */ `
+    await test(/* GraphQL */ `
       {
         forums {
           name
