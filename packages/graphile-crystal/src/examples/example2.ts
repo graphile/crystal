@@ -916,6 +916,35 @@ const Query = new GraphQLObjectType(
           return $forums;
         },
       },
+      allMessagesConnection: {
+        type: MessagesConnection,
+        args: {
+          limit: {
+            type: GraphQLInt,
+          },
+          condition: {
+            type: MessageCondition,
+          },
+          includeArchived: { type: IncludeArchived },
+        },
+        plan() {
+          const $messages = new PgClassSelectPlan(
+            messageSource,
+            [],
+            (_alias) => [],
+            true, // many
+          );
+          // $messages.leftJoin(...);
+          // $messages.innerJoin(...);
+          // $messages.relation('fk_messages_author_id')
+          // $messages.where(...);
+          const $connectionPlan = new PgConnectionPlan($messages);
+          // $connectionPlan.orderBy... ?
+          // DEFINITELY NOT $messages.orderBy BECAUSE we don't want that applied to aggregates.
+          // DEFINITELY NOT $messages.limit BECAUSE we don't want those limits applied to aggregates or page info.
+          return $connectionPlan;
+        },
+      },
     },
   }),
 );
@@ -966,33 +995,50 @@ async function main() {
           };
     });
     console.log(
-      inspect({ data, errors: nicerErrors }, { colors: true, depth: Infinity }),
+      inspect(
+        {
+          ...(data !== undefined ? { data } : null),
+          ...(nicerErrors !== undefined ? { errors: nicerErrors } : null),
+        },
+        { colors: true, depth: Infinity },
+      ),
     );
   }
 
+  async function test(source: string, variableValues = {}) {
+    console.log();
+    console.log();
+    console.log("=".repeat(80));
+    console.log();
+    try {
+      const result = await graphql({
+        schema,
+        source,
+        variableValues,
+        contextValue: {},
+        rootValue: null,
+      });
+
+      console.log("GraphQL result:");
+      logGraphQLResult(result);
+    } catch (e) {
+      console.error("GraphQL execution failed:");
+      console.error(e);
+    }
+  }
+
   if (Math.random() > 2) {
-    const query = /* GraphQL */ `
+    test(/* GraphQL */ `
       {
         forums {
           name
         }
       }
-    `;
-
-    const result = await graphql({
-      schema,
-      source: query,
-      variableValues: {},
-      contextValue: {},
-      rootValue: null,
-    });
-
-    console.log("GraphQL result:");
-    logGraphQLResult(result);
+    `);
   }
 
   if (Math.random() > 2) {
-    const query = /* GraphQL */ `
+    test(/* GraphQL */ `
       {
         forums {
           name
@@ -1009,22 +1055,30 @@ async function main() {
           }
         }
       }
-    `;
-
-    const result = await graphql({
-      schema,
-      source: query,
-      variableValues: {},
-      contextValue: {},
-      rootValue: null,
-    });
-
-    console.log("GraphQL result:");
-    logGraphQLResult(result);
+    `);
   }
 
   if (Math.random() < 2) {
-    const query = /* GraphQL */ `
+    test(/* GraphQL */ `
+      {
+        allMessagesConnection {
+          edges {
+            cursor
+            node {
+              body
+              author {
+                username
+                gravatarUrl
+              }
+            }
+          }
+        }
+      }
+    `);
+  }
+
+  if (Math.random() > 2) {
+    test(/* GraphQL */ `
       {
         forums {
           name
@@ -1053,18 +1107,7 @@ async function main() {
           }
         }
       }
-    `;
-
-    const result = await graphql({
-      schema,
-      source: query,
-      variableValues: {},
-      contextValue: {},
-      rootValue: null,
-    });
-
-    console.log("GraphQL result:");
-    logGraphQLResult(result);
+    `);
   }
 }
 
