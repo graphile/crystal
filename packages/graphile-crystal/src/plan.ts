@@ -1,5 +1,8 @@
 import { CrystalContext, CrystalWrappedData } from "./interfaces";
 
+// TODO: remove this before release.
+let planCounter = 0;
+
 /**
  * A plan represents a method to fetch a "future value". Plans are mutable,
  * they may be mutated directly (via the methods they expose), or indirectly
@@ -7,6 +10,7 @@ import { CrystalContext, CrystalWrappedData } from "./interfaces";
  * not be mutated after they are finalized.
  */
 export abstract class Plan<TOutput> {
+  public id = ++planCounter;
   private finalized = false;
   private dependencyCounter = 0;
   private dependencies: {

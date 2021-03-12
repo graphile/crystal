@@ -200,13 +200,14 @@ export class Batch {
     pathIdentity: PathIdentity,
     trackedContext: TrackedObject<BaseGraphQLContext>,
   ): void {
-    console.log(`Process digest for ${digest.pathIdentity}`);
-
     if (digest?.plan) {
       // TODO: digest.args might not be quite the right thing.
       const trackedArgs = new TrackedObject(digest.args);
 
       const plan = digest?.plan(parentPlan, trackedArgs, trackedContext);
+      console.log(
+        `Process digest for ${digest.pathIdentity}; plan: ${plan.id}`,
+      );
 
       // TODO: apply the args here
       /*
@@ -261,6 +262,7 @@ export class Batch {
         }
       }
     } else {
+      console.log(`No plan for digest at ${digest.pathIdentity}`);
       return;
     }
   }
@@ -307,7 +309,9 @@ export class Batch {
       [$$path]: pathIdentity,
     };
     console.log(
-      `Executed plan @ ${pathIdentity}; results: ${inspect(data, {
+      `Executed plan ${
+        crystalInfo.plan.id
+      } @ ${pathIdentity}; results: ${inspect(data, {
         colors: true,
       })}`,
     );

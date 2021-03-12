@@ -252,6 +252,9 @@ class PgColumnSelectPlan<
     private attrIndex: number,
   ) {
     super();
+    console.log(
+      `Plan ${this.id}: PgColumnSelectPlan(${attr} @ ${attrIndex}) constructor`,
+    );
   }
 
   eval(context: CrystalContext, values: CrystalWrappedData<any[]>[]) {
@@ -267,6 +270,9 @@ class PgColumnSelectPlan<
 class PgAttributeSelectPlan extends Plan<any> {
   constructor(private attrIndex: number) {
     super();
+    console.log(
+      `Plan ${this.id}: PgAttributeSelectPlan(${attrIndex}) constructor`,
+    );
   }
 
   eval(context: CrystalContext, values: CrystalWrappedData<any[]>[]) {
@@ -384,11 +390,6 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     this.identifierIndex = cloneFrom ? cloneFrom.identifierIndex : null;
     this.cursorPlan = cloneFrom ? cloneFrom.cursorPlan : null;
 
-    console.log(
-      `PgClassSelectPlan(${this.dataSource.name}) constructor (${
-        cloneFrom ? "clone" : "original"
-      })`,
-    );
     if (!cloneFrom) {
       if (this.identifiers.length !== this.identifierMatches.length) {
         throw new Error(
@@ -422,6 +423,11 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
         this.identifierIndex = this.select(sql`${alias}.idx`);
       }
     }
+    console.log(
+      `Plan ${this.id}: PgClassSelectPlan(${
+        this.dataSource.name
+      }) constructor (${cloneFrom ? "clone" : "original"})`,
+    );
     return this;
   }
 
@@ -685,6 +691,9 @@ class PgConnectionPlan<TDataSource extends PgDataSource<any>> extends Plan<
 > {
   constructor(public readonly subplan: PgClassSelectPlan<TDataSource>) {
     super();
+    console.log(
+      `Plan ${this.id}: PgConnectionPlan(around ${subplan.id}) constructor`,
+    );
   }
 
   nodes(): PgClassSelectPlan<TDataSource> {
@@ -693,7 +702,9 @@ class PgConnectionPlan<TDataSource extends PgDataSource<any>> extends Plan<
 
   eval(context: CrystalContext, values: CrystalWrappedData[]) {
     console.log(
-      `PgConnectionPlan eval; values: ${inspect(values, { colors: true })}`,
+      `Plan ${this.id}: PgConnectionPlan eval; values: ${inspect(values, {
+        colors: true,
+      })}`,
     );
     // TODO
     return values.map((v) => ({}));
