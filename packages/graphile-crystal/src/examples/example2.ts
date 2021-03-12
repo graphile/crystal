@@ -952,16 +952,18 @@ async function main() {
   //console.log(printSchema(schema));
   function logGraphQLResult(result: ExecutionResult<any>): void {
     const { data, errors } = result;
-    const nicerErrors = errors?.map((e) => {
-      return {
-        message: e.message,
-        path: e.path?.join("."),
-        locs: e.locations?.map((l) => `${l.line}:${l.column}`).join(", "),
-        stack: e.stack
-          ?.replaceAll(resolve(process.cwd()), ".")
-          .replaceAll(/(?:\/[^\s\/]+)*\/node_modules\//g, "~/")
-          .split("\n"),
-      };
+    const nicerErrors = errors?.map((e, idx) => {
+      return idx > 0
+        ? e.message // Flatten all but first error
+        : {
+            message: e.message,
+            path: e.path?.join("."),
+            locs: e.locations?.map((l) => `${l.line}:${l.column}`).join(", "),
+            stack: e.stack
+              ?.replaceAll(resolve(process.cwd()), ".")
+              .replaceAll(/(?:\/[^\s\/]+)*\/node_modules\//g, "~/")
+              .split("\n"),
+          };
     });
     console.log(
       inspect({ data, errors: nicerErrors }, { colors: true, depth: Infinity }),
