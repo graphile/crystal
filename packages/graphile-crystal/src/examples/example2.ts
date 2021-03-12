@@ -384,7 +384,11 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     this.identifierIndex = cloneFrom ? cloneFrom.identifierIndex : null;
     this.cursorPlan = cloneFrom ? cloneFrom.cursorPlan : null;
 
-    console.log(`PgClassSelectPlan(${this.dataSource.name}) constructor`);
+    console.log(
+      `PgClassSelectPlan(${this.dataSource.name}) constructor (${
+        cloneFrom ? "clone" : "original"
+      })`,
+    );
     if (!cloneFrom) {
       if (this.identifiers.length !== this.identifierMatches.length) {
         throw new Error(
