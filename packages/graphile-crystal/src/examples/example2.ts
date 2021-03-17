@@ -80,6 +80,12 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
     super();
   }
 
+  applyAuthorizationChecksToPlan($plan: PgClassSelectPlan<this>) {
+    $plan.where(sql`true`);
+    // e.g. $plan.where(sql`user_id = ${me}`);
+    return;
+  }
+
   async execute(
     context: any,
     op: { text: string; values?: any[] },
@@ -345,6 +351,12 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
   many: boolean;
 
   /**
+   * If true, we don't need to add any of the security checks from the data
+   * source; otherwise we must do so.
+   */
+  trusted: boolean;
+
+  /**
    * We only want to fetch each column once (since columns don't accept any
    * parameters), so this memo keeps track of which columns we've selected so
    * their plans can be easily reused.
@@ -368,6 +380,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     identifiers: Array<{ plan: Plan<any>; type: SQL }>,
     identifierMatchesThunk: (alias: SQL) => SQL[],
     many = false,
+    trusted = false,
     cloneFrom: PgClassSelectPlan<TDataSource> | null = null,
   ) {
     super();
@@ -375,6 +388,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     this.identifiers = identifiers;
     this.identifierMatchesThunk = identifierMatchesThunk;
     this.many = many;
+    this.trusted = trusted;
 
     this.colPlans = cloneFrom ? { ...cloneFrom.colPlans } : {};
     this.identifierSymbol = cloneFrom
@@ -422,6 +436,9 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
         });
         this.identifierIndex = this.select(sql`${alias}.idx`);
       }
+    }
+    if (!this.trusted) {
+      this.dataSource.applyAuthorizationChecksToPlan(this);
     }
     console.log(
       `Plan ${this.id}: PgClassSelectPlan(${
@@ -496,9 +513,15 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
       this.identifiers,
       this.identifierMatchesThunk,
       this.many,
+      this.trusted,
       this,
     );
     return clone;
+  }
+
+  where(condition: SQL) {
+    // e.g. this.conditions.push(condition);
+    // TODO
   }
 
   /**
@@ -873,6 +896,7 @@ const Forum = new GraphQLObjectType(
             [{ plan: $forum.get("id"), type: sql`uuid` }],
             (alias) => [sql`${alias}.forum_id`],
             true, // many
+            true, // trusted: if you can see forum, you can see message
           );
           // $messages.leftJoin(...);
           // $messages.innerJoin(...);
@@ -899,6 +923,7 @@ const Forum = new GraphQLObjectType(
             [{ plan: $forum.get("id"), type: sql`uuid` }],
             (alias) => [sql`${alias}.forum_id`],
             true, // many
+            true, // trusted: if you can see forum, you can see message
           );
           // $messages.leftJoin(...);
           // $messages.innerJoin(...);
@@ -948,6 +973,7 @@ const Query = new GraphQLObjectType(
             [],
             (_alias) => [],
             true, // many
+            false, // untrusted
           );
           // $messages.leftJoin(...);
           // $messages.innerJoin(...);
