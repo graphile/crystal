@@ -147,14 +147,16 @@ PlanAetherSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSeq
 - Assert: {objectType} is an object type.
 - Let {groupedFieldSet} be the result of {graphql.CollectFields(objectType, selectionSet, aether.trackedVariables)}.
 - For each {groupedFieldSet} as {responseKey} and {fields}:
-  - Let {fieldName} be the name of the first entry in {fields}. Note: This value is unaffected if an alias is used.
-  - Let {pathIdentity} be {path + ">" + objectType.name + "." + fieldName}.
+  - Let {pathIdentity} be {path + ">" + objectType.name + "." + responseKey}.
+  - Let {field} be the first entry in {fields}.
+  - Let {fieldName} be the name of {field}. Note: This value is unaffected if an alias is used.
+  - Let {fieldType} be the return type defined for the field {fieldName} of {objectType}.
+  - Let {planResolver} be {field.extensions.graphile.subscribePlan}.
   - If {planResolver} is not {null}:
     - Let {plan} be {Plan(aether, parentPlan, planResolver)}.
     - Set {plan} as the value for {pathIdentity} in {aether.planByPathIdentity}.
   - Otherwise:
     - Let {plan} be {ValuePlan()}.
-  - Let {fieldType} be the return type defined for the field {fieldName} of {objectType}.
   - Let {unwrappedFieldType} be the named type of {fieldType}.
   - TODO: what do list types mean for plans?
   - If {unwrappedFieldType} is an Object, Interface or Union type:
