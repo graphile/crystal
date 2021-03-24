@@ -17,9 +17,13 @@ you may use the same aether for different variables assuming those different var
 "plan execution phase" and not during the "planning phase".
 
 Note: where `graphql.Something` is referenced below it means use a very similar algorithm as in the GraphQL spec,
-however you will be given a {TrackingProxy()} rather than the direct {variable}, {context} and {rootValue} values; so
+however you will be given a {TrackedObject()} rather than the direct {variable}, {context} and {rootValue} values; so
 you need to access the properties using `.get` or `.is`. To reduce noise, we've not yet included these updated
 algorithms in this spec.
+
+The first thing we need to do is call {EstablishAether()} to get the aether within which the operation will execute;
+this will also involve performing the planning if it hasn't already been done. Once we have the aether we can move on to
+the execution phase.
 
 EstablishAether(cache, schema, document, operationName, variables, context, rootValue):
 
@@ -78,15 +82,25 @@ NewAether(schema, document, operationName, variables, context, rootValue):
 - Let {aether.document} be {document}.
 - Let {aether.operationName} be {operationName}.
 - Let {aether.operation} be the result of {graphql.GetOperation(document, operationName)}.
+
+- Let {aether.variablePlan} be {ValuePlan(aether)}.
 - Let {aether.variableConstraints} be an empty object.
-- Let {aether.trackedVariables} be {TrackingProxy(variables, aether.variableConstraints)}.
+- Let {aether.trackedVariables} be {TrackedObject(variables, aether.variableConstraints, aether.variablePlan)}.
+
+- Let {aether.contextPlan} be {ValuePlan(aether)}.
 - Let {aether.contextConstraints} be an empty object.
-- Let {aether.trackedContext} be {TrackingProxy(context, aether.contextConstraints)}.
+- Let {aether.trackedContext} be {TrackedObject(context, aether.contextConstraints, aether.contextPlan)}.
+
+- Let {aether.rootValuePlan} be {ValuePlan(aether)}.
 - Let {aether.rootValueConstraints} be an empty object.
-- Let {aether.trackedRootValue} be {TrackingProxy(rootValue, aether.rootValueConstraints)}.
+- Let {aether.trackedRootValue} be {TrackedObject(rootValue, aether.rootValueConstraints, aether.rootValuePlan)}.
+
 - Let {aether.subscribePlan} be {null}.
-- Let {aether.planByPathIdentity} be an empty object.
+
 - Let {aether.rootPlan} be {TrackedValuePlan(trackedRootValue)}.
+
+- Let {aether.planByPathIdentity} be an empty object.
+
 - If {aether.operation} is a query operation:
   - Let {aether.operationType} be {"query"}.
   - Call {PlanAetherQuery(aether)}.
@@ -100,14 +114,54 @@ NewAether(schema, document, operationName, variables, context, rootValue):
   - Raise unknown operation type error.
 - Return {aether}.
 
-TrackingProxy(object, constraints):
+TrackedObject(object, constraints, plan):
 
-- Return a proxy {p} over {object}, such that:
-  - {p.get(attr)} adds `{type:'value',value:object[attr]}` to {constraints} and returns the property {object[attr]}.
-  - {p.is(attr, value)} adds `{type:'equal',value:value,pass:value===object[attr]}` to {constraints} and returns
-    {value===object[attr]}.
+- Return an object {p}, such that:
+  - Calls to {p.get(attr)}:
+    - Return {plan.get(attr)}.
+  - Calls to {p.evalGet(attr)}:
+    - Add `{type:'value',value:object[attr]}` to {constraints}.
+    - Return the property {object[attr]}.
+  - Calls to {p.evalIs(attr, value)}:
+    - Add `{type:'equal',value:value,pass:value===object[attr]}` to {constraints}.
+    - Return {value===object[attr]}.
 
-ValuePlan():
+TrackedArguments(aether, objectType, field):
+
+- Let {argumentValues} be the result of {graphql.CoerceArgumentValues(objectType, field, aether.trackedVariables)}.
+- Return an object {p}, such that:
+  - Calls to {p.get(attr)}:
+    - Let {argumentValue} be the value provided in {argumentValues} for the name {attr}.
+    - If {argumentValue} is a {Variable}:
+      - Let {variableName} be the name of {argumentValue}.
+      - Return {aether.variablePlan.get(variableName)}.
+    - Otherwise:
+      - Return {StaticPlan(aether, argumentValues[attr])}
+  - Calls to {p.evalGet(attr)}:
+    - Let {argumentValue} be the value provided in {argumentValues} for the name {attr}.
+    - If {argumentValue} is a {Variable}:
+      - Let {variableName} be the name of {argumentValue}.
+      - Call {aether.trackedVariables.get(variableName)} (note: this is just to track the access, we don't use the
+        result).
+    - Return the property {argumentValues[attr]}.
+  - Calls to {p.evalIs(attr, value)}:
+    - Let {argumentValue} be the value provided in {argumentValues} for the name {attr}.
+    - If {argumentValue} is a {Variable}:
+      - Let {variableName} be the name of {argumentValue}.
+      - Call {aether.trackedVariables.is(variableName, value)} (note: this is just to track the access, we don't use the
+        result).
+    - Return {value===argumentValues[attr]}.
+
+Note: arguments to a field are either static (in which case they're part of the document and will never change within
+the same aether) or they are provided via variables. We want to track direct access to the variable type arguments via
+{aether.trackedVariables}, but access to static arguments does not require any tracking at all.
+
+StaticPlan(aether, value):
+
+- TODO: this represents a static value, but will return it via a plan. The plan will always evaluate to the same value.
+  `.get(attrName)` will resolve to a static plan representing the relevant property of the value (if appropriate).
+
+ValuePlan(aether):
 
 - TODO: this represents a concrete object value that'll be passed later; e.g. the result of the parent resolver when the
   parent resolver does not return a plan. Like all plans it actually represents a batch of values; you can
@@ -136,7 +190,9 @@ PlanAetherSubscription(aether):
 - Let {field} be the field named {fieldName} on {rootType}.
 - Let {subscriptionPlanResolver} be {field.extensions.graphile.subscribePlan}.
 - If {subscriptionPlanResolver} exists:
-  - Let {aether.subscribePlan} be {Plan(aether, aether.rootPlan, subscriptionPlanResolver)}.
+  - Let {trackedArguments} be {TrackedArguments(aether, rootType, field)}.
+  - Let {aether.subscribePlan} be {ExecutePlanResolver(aether, subscriptionPlanResolver, aether.rootPlan,
+    trackedArguments)}.
 - Call {PlanAetherSelectionSet(aether, "", aether.subscribePlan, rootType, selectionSet)}.
 
 TODO: should we be passing aether.subscribePlan here? Something else?
@@ -153,10 +209,12 @@ PlanAetherSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSeq
   - Let {fieldType} be the return type defined for the field {fieldName} of {objectType}.
   - Let {planResolver} be {field.extensions.graphile.subscribePlan}.
   - If {planResolver} is not {null}:
-    - Let {plan} be {Plan(aether, parentPlan, planResolver)}.
+    - Let {trackedArguments} be {TrackedArguments(aether, objectType, field)}.
+    - Let {plan} be {ExecutePlanResolver(aether, planResolver, parentPlan, trackedArguments)}.
     - Set {plan} as the value for {pathIdentity} in {aether.planByPathIdentity}.
+    - TODO: plan arguments here.
   - Otherwise:
-    - Let {plan} be {ValuePlan()}.
+    - Let {plan} be {ValuePlan(aether)}.
   - Let {unwrappedFieldType} be the named type of {fieldType}.
   - TODO: what do list types mean for plans?
   - If {unwrappedFieldType} is an Object, Interface or Union type:
@@ -180,5 +238,10 @@ PlanAetherSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSeq
           compatible with {unwrappedFieldType}.
         - For each {objectType} in {possibleObjectTypes}:
           - Call {PlanAetherSelectionSet(aether, pathIdentity, plan, objectType, subSelectionSet, false).
+  - Return.
 
-Plan(aether, parentPlan, planResolver):
+ExecutePlanResolver(aether, planResolver, parentPlan, trackedArguments):
+
+- Let {plan} be the result of calling {planResolver}, providing {parentPlan}, {trackedArguments},
+  {aether.trackedContext}.
+- Return {plan}.
