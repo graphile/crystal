@@ -83,6 +83,9 @@ NewAether(schema, document, operationName, variables, context, rootValue):
 - Let {aether.operationName} be {operationName}.
 - Let {aether.operation} be the result of {graphql.GetOperation(document, operationName)}.
 
+- Let {aether.plans} be an empty list.
+- Let {aether.planByPathIdentity} be an empty object.
+
 - Let {aether.variablePlan} be {ValuePlan(aether)}.
 - Let {aether.variableConstraints} be an empty object.
 - Let {aether.trackedVariables} be {TrackedObject(variables, aether.variableConstraints, aether.variablePlan)}.
@@ -96,10 +99,7 @@ NewAether(schema, document, operationName, variables, context, rootValue):
 - Let {aether.trackedRootValue} be {TrackedObject(rootValue, aether.rootValueConstraints, aether.rootValuePlan)}.
 
 - Let {aether.subscribePlan} be {null}.
-
 - Let {aether.rootPlan} be {TrackedValuePlan(trackedRootValue)}.
-
-- Let {aether.planByPathIdentity} be an empty object.
 
 - If {aether.operation} is a query operation:
   - Let {aether.operationType} be {"query"}.
@@ -126,43 +126,116 @@ TrackedObject(object, constraints, plan):
     - Add `{type:'equal',value:value,pass:value===object[attr]}` to {constraints}.
     - Return {value===object[attr]}.
 
+InputPlan(aether, inputType, inputValue):
+
+- If {inputValue} is a {Variable}:
+  - Let {variableName} be the name of {inputValue}.
+  - Return {aether.variablePlan.get(variableName)}.
+- If {inputType} is a non-null type:
+  - Let {innerType} be the inner type of {inputType}.
+  - Return {InputPlan(aether, innerType, inputValue)}.
+- If {inputType} is a List type:
+  - Let {innerType} be the inner type of {inputType}.
+  - Return {InputListPlan(aether, innerType, inputValue}.
+- If {inputType} is a leaf type:
+  - Return {StaticInputLeafPlan(aether, inputValue)}
+- Assert {inputType} is an input object type.
+- Return {InputObjectPlan(aether, innerType, inputValue)}.
+
+InputListPlan(aether, inputType, inputValue):
+
+- Assert {inputType} is a list type.
+- Let {innerType} be the inner type of {inputType}.
+- If {innerType} is a non-null type:
+  - Return InputListPlan(aether, innerType, inputValue).
+- Return an object {p}, such that:
+  - Calls to {p.at(index)}:
+    - TODO: similar to InputObjectPlan.get
+  - Calls to {p.evalAt(index)}:
+    - TODO: similar to InputObjectPlan.evalGet
+  - Calls to {p.evalLength()}:
+    - TODO: similar to InputObjectPlan.evalIs
+
+InputObjectPlan(aether, inputType, inputValue):
+
+- Return an object {p}, such that:
+  - Calls to {p.get(inputFieldName)}:
+    - Let {inputFieldValue} be the value provided in {inputValue} for the name {inputFieldName}.
+    - Let {inputFieldDefinition} be the input field defined by {inputType} with the input field name {inputFieldName}.
+    - Let {argumentType} be the expected type of {inputFieldDefinition}.
+    - Return {InputPlan(aether, argumentType, inputFieldValue)
+  - Calls to {p.evalGet(inputFieldName)}:
+    - Let {inputFieldValue} be the value provided in {inputValue} for the name {inputFieldName}.
+    - If {inputFieldValue} is a {Variable}:
+      - Let {variableName} be the name of {inputFieldValue}.
+      - Call {aether.trackedVariables.get(variableName)} (note: this is just to track the access, we don't use the
+        result).
+    - Otherwise:
+      - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
+    - Return the property {inputValue[inputFieldName]}.
+  - Calls to {p.evalIs(inputFieldName, value)}:
+    - Let {inputFieldValue} be the value provided in {inputValue} for the name {inputFieldName}.
+    - If {inputFieldValue} is a {Variable}:
+      - Let {variableName} be the name of {inputFieldValue}.
+      - Call {aether.trackedVariables.is(variableName, value)} (note: this is just to track the access, we don't use the
+        result).
+    - Otherwise:
+      - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
+    - Return {value===inputValue[inputFieldName]}.
+
 TrackedArguments(aether, objectType, field):
 
 - Let {argumentValues} be the result of {graphql.CoerceArgumentValues(objectType, field, aether.trackedVariables)}.
 - Return an object {p}, such that:
-  - Calls to {p.get(attr)}:
-    - Let {argumentValue} be the value provided in {argumentValues} for the name {attr}.
-    - If {argumentValue} is a {Variable}:
-      - Let {variableName} be the name of {argumentValue}.
-      - Return {aether.variablePlan.get(variableName)}.
-    - Otherwise:
-      - Return {StaticPlan(aether, argumentValues[attr])}
-  - Calls to {p.evalGet(attr)}:
-    - Let {argumentValue} be the value provided in {argumentValues} for the name {attr}.
+  - Calls to {p.get(argumentName)}:
+    - Let {argumentValue} be the value provided in {argumentValues} for the name {argumentName}.
+    - Let {argumentDefinition} be the argument defined by {field} with the argument name {argumentName}.
+    - Let {argumentType} be the expected type of {argumentDefinition}.
+    - Return {InputPlan(aether, argumentType, argumentValue)
+  - Calls to {p.evalGet(argumentName)}:
+    - Let {argumentValue} be the value provided in {argumentValues} for the name {argumentName}.
     - If {argumentValue} is a {Variable}:
       - Let {variableName} be the name of {argumentValue}.
       - Call {aether.trackedVariables.get(variableName)} (note: this is just to track the access, we don't use the
         result).
-    - Return the property {argumentValues[attr]}.
-  - Calls to {p.evalIs(attr, value)}:
-    - Let {argumentValue} be the value provided in {argumentValues} for the name {attr}.
+    - Otherwise:
+      - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
+    - Return the property {argumentValues[argumentName]}.
+  - Calls to {p.evalIs(argumentName, value)}:
+    - Let {argumentValue} be the value provided in {argumentValues} for the name {argumentName}.
     - If {argumentValue} is a {Variable}:
       - Let {variableName} be the name of {argumentValue}.
       - Call {aether.trackedVariables.is(variableName, value)} (note: this is just to track the access, we don't use the
         result).
-    - Return {value===argumentValues[attr]}.
+    - Otherwise:
+      - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
+    - Return {value===argumentValues[argumentName]}.
 
 Note: arguments to a field are either static (in which case they're part of the document and will never change within
 the same aether) or they are provided via variables. We want to track direct access to the variable type arguments via
 {aether.trackedVariables}, but access to static arguments does not require any tracking at all.
 
-StaticPlan(aether, value):
+Note: this recurses - values that are static input objects can contain variables within their descendent fields. If
+input object, do recursion, otherwise StaticLeafPlan.
 
-- TODO: this represents a static value, but will return it via a plan. The plan will always evaluate to the same value.
-  `.get(attrName)` will resolve to a static plan representing the relevant property of the value (if appropriate).
+Plan(aether):
+
+- Let {plan} be an empty object.
+- Let {plan.dependencies} be an empty list.
+- Let {plan.finalized} be {false}.
+- Let {plan.id} be the length of {aether.plans}.
+- Push {plan} onto {aether.plans} (Note: it will have {plan.id} as its index within {aether.plans}).
+- Return {plan}.
+
+StaticInputLeafPlan(aether, value):
+
+- Let {plan} be a new {Plan(aether)}.
+- TODO: this represents a static "leaf" value, but will return it via a plan. The plan will always evaluate to the same
+  value.
 
 ValuePlan(aether):
 
+- Let {plan} be a new {Plan(aether)}.
 - TODO: this represents a concrete object value that'll be passed later; e.g. the result of the parent resolver when the
   parent resolver does not return a plan. Like all plans it actually represents a batch of values; you can
   `.get(attrName)` to get a plan that resolves to the relevant attribute value from the value plan.
@@ -171,13 +244,13 @@ PlanAetherQuery(aether):
 
 - Let {rootType} be the root Query type in {aether.schema}.
 - Let {selectionSet} be the top level Selection Set in {aether.operation}.
-- Call {PlanAetherSelectionSet(aether, "", aether.rootPlan, rootType, selectionSet)}.
+- Call {PlanSelectionSet(aether, "", aether.rootPlan, rootType, selectionSet)}.
 
 PlanAetherMutation(aether):
 
 - Let {rootType} be the root Mutation type in {aether.schema}.
 - Let {selectionSet} be the top level Selection Set in {aether.operation}.
-- Call {PlanAetherSelectionSet(aether, "", aether.rootPlan, rootType, selectionSet, true)}.
+- Call {PlanSelectionSet(aether, "", aether.rootPlan, rootType, selectionSet, true)}.
 
 PlanAetherSubscription(aether):
 
@@ -193,11 +266,12 @@ PlanAetherSubscription(aether):
   - Let {trackedArguments} be {TrackedArguments(aether, rootType, field)}.
   - Let {aether.subscribePlan} be {ExecutePlanResolver(aether, subscriptionPlanResolver, aether.rootPlan,
     trackedArguments)}.
-- Call {PlanAetherSelectionSet(aether, "", aether.subscribePlan, rootType, selectionSet)}.
+  - Call {PlanFieldArguments(aether, field, trackedArguments, aether.subscribePlan)}.
+- Call {PlanSelectionSet(aether, "", aether.subscribePlan, rootType, selectionSet)}.
 
 TODO: should we be passing aether.subscribePlan here? Something else?
 
-PlanAetherSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequential):
+PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequential):
 
 - If {isSequential} is not provided, initialize it to {false}.
 - Assert: {objectType} is an object type.
@@ -212,7 +286,7 @@ PlanAetherSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSeq
     - Let {trackedArguments} be {TrackedArguments(aether, objectType, field)}.
     - Let {plan} be {ExecutePlanResolver(aether, planResolver, parentPlan, trackedArguments)}.
     - Set {plan} as the value for {pathIdentity} in {aether.planByPathIdentity}.
-    - TODO: plan arguments here.
+    - Call {PlanFieldArguments(aether, field, trackedArguments, plan)}.
   - Otherwise:
     - Let {plan} be {ValuePlan(aether)}.
   - Let {unwrappedFieldType} be the named type of {fieldType}.
@@ -220,28 +294,65 @@ PlanAetherSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSeq
   - If {unwrappedFieldType} is an Object, Interface or Union type:
     - Let {subSelectionSet} be the result of calling {graphql.MergeSelectionSets(fields)}.
     - If {unwrappedFieldType} is an object type:
-      - Call {PlanAetherSelectionSet(aether, pathIdentity, plan, unwrappedFieldType, subSelectionSet, false).
+      - Call {PlanSelectionSet(aether, pathIdentity, plan, unwrappedFieldType, subSelectionSet, false).
     - Otherwise, if {unwrappedFieldType} is a union type:
       - Let {possibleObjectTypes} be all the object types that can be accessed in {subSelectionSet} that are compatible
         with {unwrappedFieldType}.
       - For each {objectType} in {possibleObjectTypes}:
-        - Call {PlanAetherSelectionSet(aether, pathIdentity, plan, objectType, subSelectionSet, false).
+        - Call {PlanSelectionSet(aether, pathIdentity, plan, objectType, subSelectionSet, false).
     - Otherwise:
       - Assert: {unwrappedFieldType} is an interface type.
       - If any non-introspection field in {subSelectionSet} is selected on the interface type itself:
         - Let {possibleObjectTypes} be all the object types that implement the {unwrappedFieldType} interface.
         - For each {objectType} in {possibleObjectTypes}:
-          - Call {PlanAetherSelectionSet(aether, pathIdentity, plan, objectType, subSelectionSet, false).
+          - Call {PlanSelectionSet(aether, pathIdentity, plan, objectType, subSelectionSet, false).
       - Otherwise:
         - Note: this is the same approach as for union types.
         - Let {possibleObjectTypes} be all the object types that can be accessed in {subSelectionSet} that are
           compatible with {unwrappedFieldType}.
         - For each {objectType} in {possibleObjectTypes}:
-          - Call {PlanAetherSelectionSet(aether, pathIdentity, plan, objectType, subSelectionSet, false).
+          - Call {PlanSelectionSet(aether, pathIdentity, plan, objectType, subSelectionSet, false).
   - Return.
+
+PlanFieldArguments(aether, field, trackedArguments, fieldPlan):
+
+- TODO: ... then call PlanInputFields as appropriate
+
+PlanInputFields(aether, inputObjectType, trackedValues, parentPlan):
+
+- TODO
 
 ExecutePlanResolver(aether, planResolver, parentPlan, trackedArguments):
 
 - Let {plan} be the result of calling {planResolver}, providing {parentPlan}, {trackedArguments},
   {aether.trackedContext}.
 - Return {plan}.
+
+## Step 2: execution phase
+
+We're in a GraphQL resolver. We don't know what's going on, but we've been given a parent object (which may or may not
+be crystal-related), arguments (which will be identical for all of our counterparts), context (which will be identical
+for all of our counterparts) and details of the GraphQL schema, the document and operationName being executed, the
+variables provided, the rootValue provided, and our position within the operation.
+
+The first thing we need to do is figure out our aether, {aether}, via {EstablishAether()}.
+
+Next we figure out our path identity, {pathIdentity}, within the operation.
+
+Next we find the plan for ourself, {plan}, by looking for the {pathIdentity} entry in {aether.planByPathIdentity}.
+
+If there's no plan, we just call through to the underlying resolver and we're done. Otherwise...
+
+If we're a "plan root" (that is to say, our parent field doesn't have a plan) then... Nothing special happens? Just
+continue as normal.
+
+We must execute the plan passing the relevant information. Note that, if we have any, our counterparts will be doing
+this too, in parallel, and the plan should bundle all these calls together so that only one request needs to be made to
+the underlying data store.
+
+If executing the plan results in an error, throw the error. Otherwise we should wrap the result up into a object
+(keeping track of all the previous values too (see the parent object), perhaps using their plan id?) which we then pass
+through to the underlying resolver.
+
+NOTE: in a divergence from GraphQL proper, _sibling_ resolvers will not receive the same parent object - each resolver
+receives data customised to that specific field.
