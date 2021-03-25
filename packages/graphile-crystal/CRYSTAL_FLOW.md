@@ -377,44 +377,46 @@ argumentValues, pathIdentity):
 - Otherwise:
   - Let {batch} be {GetBatch(aether, pathIdentity)}.
   - Let {id} be a new unique id.
-  - If {parentObject} is a crystalObject:
-    - Let {crystalObject} be {parentObject}.
+  - If {parentObject} is a crystal object:
+    - Let {parentCrystalObject} be {parentObject}.
   - Otherwise:
-    - Let {crystalObject} be {NewCrystalObject(... parentObject ...)}.
-  - Let {result} be {GetBatchResult(batch, crystalObject)} (note: could be asynchronous).
-  - Return {CrystalWrap(resultType, parentObject, pathIdentity, id, result)}.
+    - Let {parentId} be a new unique id.
+    - Let {parentPathIdentity} be the parent path for {pathIdentity}.
+    - Let {parentPlan} be the value for key {parentPathIdentity} within {aether.planByPathIdentity}.
+    - Let {parentCrystalObject} be {NewCrystalObject(aether, parentPathIdentity, id, null)}.
+    - Set the value for key {id} for key {parentPlan} in {parentCrystalObject.resultByIdByPlan} to {parentObject} (note:
+      this fakes execution of this "plan").
+  - Let {result} be {GetBatchResult(batch, parentCrystalObject)} (note: could be asynchronous).
+  - Set {result} as the value for key {id} for key {plan} in {parentCrystalObject.resultByIdByPlan}.
+  - Return {CrystalWrap(resultType, parentCrystalObject, pathIdentity, id, result)}.
 
-CrystalWrap(resultType, parentObject, pathIdentity, id, data):
+CrystalWrap(resultType, parentCrystalObject, pathIdentity, id, data):
 
 - If {data} is {null}:
   - Return {null}.
 - Otherwise, if {resultType} is a non-null type:
   - Let {innerType} be the inner type of {resultType}.
-  - Return {CrystalWrap(innerType, parentObject, pathIdentity, id, data)}.
+  - Return {CrystalWrap(innerType, parentCrystalObject, pathIdentity, id, data)}.
 - Otherwise, if {resultType} is a list type:
   - Let {innerType} be the inner type of {resultType}.
   - Let {result} be an empty list.
   - For each {entry} in {data}:
-    - Let {wrappedEntry} be {CrystalWrap(innerType, parentObject, pathIdentity, id, entry)}.
+    - Let {wrappedEntry} be {CrystalWrap(innerType, parentCrystalObject, pathIdentity, id, entry)}.
     - Push {wrappedEntry} onto {result}.
   - Return {result}.
 - Otherwise:
-  - Let {crystalObject} be {NewCrystalObject(aether, pathIdentity, parentObject, id)}.
+  - Let {crystalObject} be {NewCrystalObject(aether, pathIdentity, id, parentCrystalObject)}.
   - Return {crystalObject}.
 
-NewCrystalObject(aether, pathIdentity, parentObject, id):
+NewCrystalObject(aether, pathIdentity, id, parentCrystalObject):
 
 - Let {crystalObject} be an empty object.
-- If {parentObject} is a crystal object:
-  - Let {crystalObject.resultByIdByPlan} be a reference to {parentObject.resultByIdByPlan}.
-  - Let {crystalObject.idByPathIdentity} be a copy of {parentObject.idByPathIdentity}.
+- If {parentCrystalObject} is a crystal object:
+  - Let {crystalObject.resultByIdByPlan} be a reference to {parentCrystalObject.resultByIdByPlan}.
+  - Let {crystalObject.idByPathIdentity} be a copy of {parentCrystalObject.idByPathIdentity}.
 - Otherwise:
   - Let {crystalObject.resultByIdByPlan} be an empty map.
   - Let {crystalObject.idByPathIdentity} be an empty map.
-  - Let {parentPathIdentity} be the parent path for {pathIdentity}.
-  - Let {parentPlan} be the value for key {parentPathIdentity} within {aether.planByPathIdentity}.
-  - Set the value for key {id} for key {parentPlan} in {crystalObject.resultByIdByPlan} to {parentObject} (note: this
-    fakes execution of this "plan").
 - Set {id} as the value for key {pathIdentity} within {crystalObject.idByPathIdentity}.
 - Return {crystalObject}.
 
@@ -448,8 +450,8 @@ ExecuteBatch(aether, batch):
   - Resolve {deferredResult} with the {i}th entry in {results}.
 - Return.
 
-GetBatchResult(batch, parentCrystalObject, id):
+GetBatchResult(batch, parentCrystalObject):
 
 - Let {deferredResult} be a new {Defer}.
-- Push the tuple {[parentCrystalObject, id, deferredResult]} onto {batch.entries}.
+- Push the tuple {[parentCrystalObject, deferredResult]} onto {batch.entries}.
 - Return {deferredResult}.
