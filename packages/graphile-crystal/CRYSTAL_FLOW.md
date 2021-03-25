@@ -86,7 +86,6 @@ NewAether(schema, document, operationName, variables, context, rootValue):
 - Let {aether.operation} be the result of {graphql.GetOperation(document, operationName)}.
 
 - Let {aether.plans} be an empty list.
-- Let {aether.parentPlanByPathIdentity} be an empty object.
 - Let {aether.planByPathIdentity} be an empty object.
 
 - Let {aether.variablePlan} be {ValuePlan(aether)}.
@@ -288,10 +287,10 @@ PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequentia
   - If {planResolver} is not {null}:
     - Let {trackedArguments} be {TrackedArguments(aether, objectType, field)}.
     - Let {plan} be {ExecutePlanResolver(aether, planResolver, parentPlan, trackedArguments)}.
-    - Set {plan} as the value for {pathIdentity} in {aether.planByPathIdentity}.
     - Call {PlanFieldArguments(aether, field, trackedArguments, plan)}.
   - Otherwise:
     - Let {plan} be {ValuePlan(aether)}.
+  - Set {plan} as the value for {pathIdentity} in {aether.planByPathIdentity}.
   - Let {unwrappedFieldType} be the named type of {fieldType}.
   - TODO: what do list types mean for plans?
   - If {unwrappedFieldType} is an Object, Interface or Union type:
@@ -412,7 +411,8 @@ NewCrystalObject(aether, pathIdentity, parentObject, id):
 - Otherwise:
   - Let {crystalObject.resultByIdByPlan} be an empty map.
   - Let {crystalObject.idByPathIdentity} be an empty map.
-  - Set the value for key {pathIdentity} within {aether.parentPlanByPathIdentity} to {parentPlan}.
+  - Let {parentPathIdentity} be the parent path for {pathIdentity}.
+  - Let {parentPlan} be the value for key {parentPathIdentity} within {aether.planByPathIdentity}.
   - Set the value for key {id} for key {parentPlan} in {crystalObject.resultByIdByPlan} to {parentObject} (note: this
     fakes execution of this "plan").
 - Set {id} as the value for key {pathIdentity} within {crystalObject.idByPathIdentity}.
