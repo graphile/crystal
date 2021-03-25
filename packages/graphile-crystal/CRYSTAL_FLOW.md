@@ -86,6 +86,7 @@ NewAether(schema, document, operationName, variables, context, rootValue):
 - Let {aether.operation} be the result of {graphql.GetOperation(document, operationName)}.
 
 - Let {aether.plans} be an empty list.
+- Let {aether.parentPlanByPathIdentity} be an empty object.
 - Let {aether.planByPathIdentity} be an empty object.
 
 - Let {aether.variablePlan} be {ValuePlan(aether)}.
@@ -377,23 +378,43 @@ argumentValues, pathIdentity):
 - Otherwise:
   - Let {batch} be {GetBatch(aether, pathIdentity)}.
   - Let {id} be a new unique id.
-  - Let {result} be {GetBatchResult(batch, parentObject, id)}.
-  - Let {crystalObject} be {NewCrystalObject(aether, pathIdentity, parentObject)}.
-  - If list...
+  - If {parentObject} is a crystalObject:
+    - Let {crystalObject} be {parentObject}.
+  - Otherwise:
+    - Let {crystalObject} be {NewCrystalObject(... parentObject ...)}.
+  - Let {result} be {GetBatchResult(batch, crystalObject)} (note: could be asynchronous).
+  - Return {CrystalWrap(resultType, parentObject, pathIdentity, id, result)}.
 
-NewCrystalObject(aether, pathIdentity, parentObject):
+CrystalWrap(resultType, parentObject, pathIdentity, id, data):
+
+- If {data} is {null}:
+  - Return {null}.
+- Otherwise, if {resultType} is a non-null type:
+  - Let {innerType} be the inner type of {resultType}.
+  - Return {CrystalWrap(innerType, parentObject, pathIdentity, id, data)}.
+- Otherwise, if {resultType} is a list type:
+  - Let {innerType} be the inner type of {resultType}.
+  - Let {result} be an empty list.
+  - For each {entry} in {data}:
+    - Let {wrappedEntry} be {CrystalWrap(innerType, parentObject, pathIdentity, id, entry)}.
+    - Push {wrappedEntry} onto {result}.
+  - Return {result}.
+- Otherwise:
+  - Let {crystalObject} be {NewCrystalObject(aether, pathIdentity, parentObject, id)}.
+  - Return {crystalObject}.
+
+NewCrystalObject(aether, pathIdentity, parentObject, id):
 
 - Let {crystalObject} be an empty object.
-- Let {id} be a new unique id.
 - If {parentObject} is a crystal object:
   - Let {crystalObject.resultByIdByPlan} be a reference to {parentObject.resultByIdByPlan}.
   - Let {crystalObject.idByPathIdentity} be a copy of {parentObject.idByPathIdentity}.
 - Otherwise:
   - Let {crystalObject.resultByIdByPlan} be an empty map.
   - Let {crystalObject.idByPathIdentity} be an empty map.
-  - Let {parentPlan} be the value for key {pathIdentity} within {aether.parentPlanByPathIdentity}.
-  - Let {parentObject} be the value for key {id} for key {parentPlan} in {crystalObject.resultByIdByPlan} (note: this
-    fakes execution of this plan).
+  - Set the value for key {pathIdentity} within {aether.parentPlanByPathIdentity} to {parentPlan}.
+  - Set the value for key {id} for key {parentPlan} in {crystalObject.resultByIdByPlan} to {parentObject} (note: this
+    fakes execution of this "plan").
 - Set {id} as the value for key {pathIdentity} within {crystalObject.idByPathIdentity}.
 - Return {crystalObject}.
 
@@ -427,8 +448,8 @@ ExecuteBatch(aether, batch):
   - Resolve {deferredResult} with the {i}th entry in {results}.
 - Return.
 
-GetBatchResult(batch, crystalObject):
+GetBatchResult(batch, parentCrystalObject, id):
 
 - Let {deferredResult} be a new {Defer}.
-- Push the tuple {[crystalObject, deferredResult]} onto {batch.entries}.
+- Push the tuple {[parentCrystalObject, id, deferredResult]} onto {batch.entries}.
 - Return {deferredResult}.
