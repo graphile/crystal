@@ -383,11 +383,12 @@ argumentValues, pathIdentity):
     - Let {parentId} be a new unique id.
     - Let {parentPathIdentity} be the parent path for {pathIdentity}.
     - Let {parentPlan} be the value for key {parentPathIdentity} within {aether.planByPathIdentity}.
-    - Let {parentCrystalObject} be {NewCrystalObject(aether, parentPathIdentity, id, null)}.
-    - Set the value for key {id} for key {parentPlan} in {parentCrystalObject.resultByIdByPlan} to {parentObject} (note:
-      this fakes execution of this "plan").
+    - Let {parentCrystalObject} be {NewCrystalObject(parentPlan, parentPathIdentity, parentId, parentObject, null)}.
   - Let {result} be {GetBatchResult(batch, parentCrystalObject)} (note: could be asynchronous).
-  - Set {result} as the value for key {id} for key {plan} in {parentCrystalObject.resultByIdByPlan}.
+  - (Note: this field execution is identified as 'id', even if it's a nested list. Crystal abstracts away the list for
+    you, so the crystal object received will always have a non-list value stored under 'id', but each entry in the
+    returned results will have a different crystal object, all with the same 'id'. It's possible that 'id' is not the
+    right name to give this property since there will be many with the same value.)
   - Return {CrystalWrap(resultType, parentCrystalObject, pathIdentity, id, result)}.
 
 CrystalWrap(resultType, parentCrystalObject, pathIdentity, id, data):
@@ -405,19 +406,20 @@ CrystalWrap(resultType, parentCrystalObject, pathIdentity, id, data):
     - Push {wrappedEntry} onto {result}.
   - Return {result}.
 - Otherwise:
-  - Let {crystalObject} be {NewCrystalObject(aether, pathIdentity, id, parentCrystalObject)}.
+  - Let {crystalObject} be {NewCrystalObject(plan, pathIdentity, id, data, parentCrystalObject)}.
   - Return {crystalObject}.
 
-NewCrystalObject(aether, pathIdentity, id, parentCrystalObject):
+NewCrystalObject(plan, pathIdentity, id, data, parentCrystalObject):
 
 - Let {crystalObject} be an empty object.
 - If {parentCrystalObject} is a crystal object:
   - Let {crystalObject.resultByIdByPlan} be a reference to {parentCrystalObject.resultByIdByPlan}.
-  - Let {crystalObject.idByPathIdentity} be a copy of {parentCrystalObject.idByPathIdentity}.
+  - Let {crystalObject.idByPathIdentity} be an independent copy of {parentCrystalObject.idByPathIdentity}.
 - Otherwise:
   - Let {crystalObject.resultByIdByPlan} be an empty map.
   - Let {crystalObject.idByPathIdentity} be an empty map.
 - Set {id} as the value for key {pathIdentity} within {crystalObject.idByPathIdentity}.
+- Set the value for key {id} for key {plan} in {crystalObject.resultByIdByPlan} to {data}.
 - Return {crystalObject}.
 
 GetBatch(aether, pathIdentity):
