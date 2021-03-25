@@ -376,6 +376,7 @@ argumentValues, pathIdentity):
   - Return {graphql.ResolveFieldValue(objectType, objectValue, fieldName, argumentValues)}.
 - Otherwise:
   - Let {batch} be {GetBatch(aether, pathIdentity)}.
+  - Let {plan} be {batch.plan}.
   - Let {id} be a new unique id.
   - If {parentObject} is a crystal object:
     - Let {parentCrystalObject} be {parentObject}.
@@ -389,20 +390,20 @@ argumentValues, pathIdentity):
     you, so the crystal object received will always have a non-list value stored under 'id', but each entry in the
     returned results will have a different crystal object, all with the same 'id'. It's possible that 'id' is not the
     right name to give this property since there will be many with the same value.)
-  - Return {CrystalWrap(resultType, parentCrystalObject, pathIdentity, id, result)}.
+  - Return {CrystalWrap(plan, resultType, parentCrystalObject, pathIdentity, id, result)}.
 
-CrystalWrap(resultType, parentCrystalObject, pathIdentity, id, data):
+CrystalWrap(plan, resultType, parentCrystalObject, pathIdentity, id, data):
 
 - If {data} is {null}:
   - Return {null}.
 - Otherwise, if {resultType} is a non-null type:
   - Let {innerType} be the inner type of {resultType}.
-  - Return {CrystalWrap(innerType, parentCrystalObject, pathIdentity, id, data)}.
+  - Return {CrystalWrap(plan, innerType, parentCrystalObject, pathIdentity, id, data)}.
 - Otherwise, if {resultType} is a list type:
   - Let {innerType} be the inner type of {resultType}.
   - Let {result} be an empty list.
   - For each {entry} in {data}:
-    - Let {wrappedEntry} be {CrystalWrap(innerType, parentCrystalObject, pathIdentity, id, entry)}.
+    - Let {wrappedEntry} be {CrystalWrap(plan, innerType, parentCrystalObject, pathIdentity, id, entry)}.
     - Push {wrappedEntry} onto {result}.
   - Return {result}.
 - Otherwise:
