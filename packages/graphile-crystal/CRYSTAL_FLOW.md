@@ -29,13 +29,13 @@ EstablishAether(cache, schema, document, operationName, variables, context, root
 
 - Let {matchingAethers} be all the Aethers in {cache}.
 - For each {possibleAether} in {matchingAethers}:
-  - If {IsEatherCompatible(possibleAether, schema, document, operationName, variables, context, rootValue)}:
+  - If {IsAetherCompatible(possibleAether, schema, document, operationName, variables, context, rootValue)}:
     - Return {possibleAether}.
 - Let {aether} be the result of calling {NewAether(schema, document, operationName, variables, context, rootValue)}.
 - Store {aether} into {cache} (temporarily).
 - Return {aether}.
 
-IsEatherCompatible(aether, schema, document, operationName, variables, context, rootValue):
+IsAetherCompatible(aether, schema, document, operationName, variables, context, rootValue):
 
 - If {aether.schema} is not equal to {schema}:
   - Return {false}.
@@ -347,8 +347,8 @@ If we're a "plan root" (that is to say, our parent field doesn't have a plan) th
 continue as normal.
 
 We must execute the plan passing the relevant information. Note that, if we have any, our counterparts will be doing
-this too, in parallel, and the plan should bundle all these calls together so that only one request needs to be made to
-the underlying data store.
+this too, in parallel, and the plan should batch all these calls together into a `Batch` so that only one request needs
+to be made to the underlying data store.
 
 If executing the plan results in an error, throw the error. Otherwise we should wrap the result up into a object
 (keeping track of all the previous values too (see the parent object), perhaps using their plan id?) which we then pass

@@ -49,20 +49,29 @@ function isDigestValidAgainstVariables(variables: GraphQLVariables) {
 }
 
 /**
- * The Doc represents a GraphQL Document (query, mutation, subscription) within
+ * The Doc represents a GraphQL operation (query, mutation, subscription) within
  * a GraphQL schema. It's used for determining the Aether that different
  * resolver calls belong within, and in turn calculating/caching Batch entries
  * during GraphQL execution.
  *
  * This mechanism allows us to do work up front such that following requests
- * for the same document can reuse existing plans/work.
+ * for the same operation can reuse existing plans/work.
  *
- * If the schema or document changes, then a different Doc should be
- * used since the fields/plans/etc will differ. For the same schema/document,
+ * If the schema or operation changes, then a different Doc should be
+ * used since the fields/plans/etc will differ. For the same schema/operation,
  * the plans may be affected by variables, context, rootValue; we handle this
  * via the {@link Aether}.
  *
+ * Note: "operation" here refers to the combination of the "document" and
+ * "operationName" which together should uniquely identify a GraphQL operation
+ * (query/mutation/subscription).
+ *
+ * Note: this class encompasses the `cache`, `schema`, `document` and
+ * `operationName` arguments to the `EstablishAether` algorithm.
+ *
  * See {@link getDoc} for additional details.
+ *
+ * TODO: rename this to `Operation`?
  */
 export class Doc {
   private aetherByVariablesByContextByRootValue: WeakMap<
@@ -73,23 +82,29 @@ export class Doc {
   private digestsByPathIdentity: Map<PathIdentity, PathDigestVariant[]>;
 
   public readonly rootType: GraphQLObjectType;
+  /** @deprecated Use `operation` instead. */
+  public readonly document: OperationDefinitionNode;
 
   constructor(
     public readonly schema: GraphQLSchema,
-    public readonly document: OperationDefinitionNode,
+    public readonly operation: OperationDefinitionNode,
     public readonly fragments: {
       [key: string]: FragmentDefinitionNode;
     },
   ) {
+    // For backwards compatibility.
+    // TODO: remove this.
+    this.document = operation;
+
     this.aetherByVariablesByContextByRootValue = new WeakMap();
     this.digestsByPathIdentity = new Map();
 
     const rootType =
-      document.operation === "query"
+      operation.operation === "query"
         ? schema.getQueryType()
-        : document.operation === "mutation"
+        : operation.operation === "mutation"
         ? schema.getMutationType()
-        : document.operation === "subscription"
+        : operation.operation === "subscription"
         ? schema.getSubscriptionType()
         : null;
     if (!rootType) {
@@ -106,8 +121,8 @@ export class Doc {
   getAether(context: GraphQLContext, resolveInfo: GraphQLResolveInfo): Aether {
     // IMPORTANT: all fallback values MUST be global constants, otherwise we might
     // make multiple Aethers for the same operation.
-    const rootValue = resolveInfo.rootValue || WEAK_MAP_FALLBACK_KEY;
     const variables = resolveInfo.variableValues || WEAK_MAP_FALLBACK_KEY;
+    const rootValue = resolveInfo.rootValue || WEAK_MAP_FALLBACK_KEY;
 
     // This is an unrolled loop because it's extremely hot.
     // TODO: would be less error-prone to do this with a macro; fortunately
@@ -129,7 +144,19 @@ export class Doc {
     }
     let aether = aetherByVariables.get(variables);
     if (!aether) {
-      aether = new Aether(this, context);
+      // TODO: search for appropriate aether that passes all the variable,
+      // context and rootValue constraints. See `IsAetherCompatible`.
+      aether = undefined /* TODO: search */;
+      if (!aether) {
+        // None found, create new Aether:
+        aether = new Aether(
+          this /* schema, document, operationName */,
+          variables,
+          context,
+          rootValue,
+        );
+      }
+      // Make next lookup for these same variables more efficient
       aetherByVariables.set(variables, aether);
     }
     return aether;
@@ -188,10 +215,10 @@ export class Doc {
     trackedVariables: TrackedObject<GraphQLVariables>,
   ): ParsedDocument {
     const pd: ParsedDocument = {
-      name: this.document.name?.value ?? null,
+      name: this.operation.name?.value ?? null,
       fields: this.collectFields(
         this.rootType,
-        this.document.selectionSet,
+        this.operation.selectionSet,
         trackedVariables,
       ),
     };
@@ -216,7 +243,7 @@ export class Doc {
  *
  * @internal
  */
-const docByFragmentsByDocumentBySchema = new WeakMap<
+const docByFragmentsByOperationBySchema = new WeakMap<
   GraphQLSchema,
   WeakMap<
     OperationDefinitionNode,
@@ -231,30 +258,31 @@ const docByFragmentsByDocumentBySchema = new WeakMap<
 
 /**
  * Returns the {@link Doc} for the given resolveInfo. Really this only depends
- * on the schema, the document (query, mutation, subscription) and the
- * fragments.
+ * on the schema, the operation (query, mutation, subscription) and the
+ * fragments. It accounts for the `cache`, `schema`, `document` and
+ * `operationName` arguments of the `EstablishAether` algorithm.
  */
 export function getDoc(resolveInfo: GraphQLResolveInfo): Doc {
   const schema = resolveInfo.schema;
-  const document = resolveInfo.operation;
+  const operation = resolveInfo.operation;
   const fragments = resolveInfo.fragments;
 
   // This is an unrolled loop because it's extremely hot.
   // TODO: would be less error-prone to do this with a macro; fortunately
   // TypeScript catches most of the issues.
-  let docByFragmentsByDocument = docByFragmentsByDocumentBySchema.get(schema);
-  if (!docByFragmentsByDocument) {
-    docByFragmentsByDocument = new WeakMap();
-    docByFragmentsByDocumentBySchema.set(schema, docByFragmentsByDocument);
+  let docByFragmentsByOperation = docByFragmentsByOperationBySchema.get(schema);
+  if (!docByFragmentsByOperation) {
+    docByFragmentsByOperation = new WeakMap();
+    docByFragmentsByOperationBySchema.set(schema, docByFragmentsByOperation);
   }
-  let docByFragments = docByFragmentsByDocument.get(document);
+  let docByFragments = docByFragmentsByOperation.get(operation);
   if (!docByFragments) {
     docByFragments = new WeakMap();
-    docByFragmentsByDocument.set(document, docByFragments);
+    docByFragmentsByOperation.set(operation, docByFragments);
   }
   let doc = docByFragments.get(fragments);
   if (!doc) {
-    doc = new Doc(schema, document, fragments);
+    doc = new Doc(schema, operation, fragments);
     docByFragments.set(fragments, doc);
   }
 

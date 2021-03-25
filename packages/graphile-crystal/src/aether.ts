@@ -23,25 +23,33 @@ import { isCrystalResult } from "./crystalResult";
  * we consider: what things could cause a plan to have a different outcome?
  *
  * - schema: different schema, everything's different
- * - document: different operation, different plan dependencies/etc
- * - rootValue: rarely passed, but if it is, it probably defines a different
+ * - document/operationName: different operation, different plan dependencies/etc
+ * - rootValue: rarely passed, but if it is, it may define a different
  *   runtime context
  * - context: if the context differs, then things like user authentication
- *   could differ, so we can't reuse previous values
- * - variables: if the variables differ, the plans differ
+ *   could differ, so we may not be able to reuse previous values
+ * - variables: if the variables differ, the plans may differ
  *
- * If any of the above change, we need a new Aether. But within a single
- * operation execution, we'd expect all of these to be consistent.
+ * If the schema, document or operationName change, we need a new Aether.
+ * Within a single operation execution, we'd expect all of these to be
+ * consistent.
  *
- * Interestingly, this also catches the case where a `graphql(...)` execution
- * occurs within a resolver; in that case the document would differ so we'd
- * define a new aether for it. I believe this is desired.
- * The Aether represents a single operation execut
- *  It's used for calculating/caching Batch entries
- * during GraphQL execution.
+ * For `rootValue`, `context` and `variables` it's a little more subtle; we
+ * only care about changes to these that affect planning - if there are any
+ * diferences that do this then we should use a separate Aether. But if these
+ * values are _compatible_ (even if they're not the same) we can use the same
+ * aether.
  *
- * Aether's exist within a `Doc`, so `schema` and `document` are handled
- * already; and the Doc's `getAether` method handles the other concerns.
+ * Interestingly, this catches the case where a `graphql(...)` execution occurs
+ * within a resolver; in that case the operation would differ so we'd define a
+ * new aether for it. I believe this is desired.
+ *
+ * The Aether is used for calculating/caching Batch entries during GraphQL
+ * execution.
+ *
+ * Aether's exist within a `Doc`, so `schema` and `document`/`operationName`
+ * are handled already; and the Doc's `getAether` method handles the other
+ * concerns.
  *
  * See {@link Doc.getAether} for additional details.
  *
@@ -52,7 +60,9 @@ export class Aether {
 
   constructor(
     public readonly doc: Doc,
+    public readonly variables: { [key: string]: any },
     public readonly context: GraphQLContext,
+    public readonly rootValue: any,
   ) {
     this.batches = new Map();
   }
@@ -68,7 +78,7 @@ export class Aether {
    *   will be the same.
    * @param context - As with args, will be the same for all entries in the
    *   batch.
-   * @param info - Required to determine the Aether in which the batch runs.
+   * @param info - Mostly needed for the path identity.
    */
   getBatch(
     parent: unknown,

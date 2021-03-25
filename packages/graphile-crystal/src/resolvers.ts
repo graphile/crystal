@@ -245,8 +245,10 @@ function executePlanFromResolver(
   context: GraphQLContext,
   info: GraphQLResolveInfo,
 ): CrystalResult | Promise<CrystalResult> {
-  const doc = getDoc(info);
-  const aether = doc.getAether(context, info);
+  // doc and aether together form the algorithm for `EstablishAether`.
+  const doc = getDoc(info); // schema, document, operationName
+  const aether = doc.getAether(context, info); // variables, context, rootValue
+
   const batch = aether.getBatch(parent, args, context, info);
   return batch.getResultFor(parent, info);
 }
