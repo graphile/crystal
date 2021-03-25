@@ -25,14 +25,16 @@ The first thing we need to do is call {EstablishAether()} to get the aether with
 this will also involve performing the planning if it hasn't already been done. Once we have the aether we can move on to
 the execution phase.
 
-EstablishAether(cache, schema, document, operationName, variables, context, rootValue):
+{globalCache} is a global cache for performance.
 
-- Let {matchingAethers} be all the Aethers in {cache}.
+EstablishAether(schema, document, operationName, variables, context, rootValue):
+
+- Let {matchingAethers} be all the Aethers in {globalCache}.
 - For each {possibleAether} in {matchingAethers}:
   - If {IsAetherCompatible(possibleAether, schema, document, operationName, variables, context, rootValue)}:
     - Return {possibleAether}.
 - Let {aether} be the result of calling {NewAether(schema, document, operationName, variables, context, rootValue)}.
-- Store {aether} into {cache} (temporarily).
+- Store {aether} into {globalCache} (temporarily).
 - Return {aether}.
 
 IsAetherCompatible(aether, schema, document, operationName, variables, context, rootValue):
@@ -356,3 +358,77 @@ through to the underlying resolver.
 
 NOTE: in a divergence from GraphQL proper, _sibling_ resolvers will not receive the same parent object - each resolver
 receives data customised to that specific field.
+
+ResolveFieldValueCrystal(schema, document, operationName, variables, context, rootValue, field, alias, parentObject,
+argumentValues, pathIdentity):
+
+- Let {fieldName} be the name of {field}.
+- Let {objectType} be the object type on which {field} is defined.
+- Let {resultType} be the expected type of {field}.
+- Let {aether} be {EstablishAether(schema, document, operationName, variables, context, rootValue)}.
+- Let {plan} be the plan for {pathIdentity} within {aether.planByPathIdentity}.
+- If {plan} is null:
+  - If {parentObject} is a crystal wrapped value:
+    - Let {data} be the data within {parentObject}.
+    - Let {objectValue} be an object containing one key {fieldName} with the value {data}.
+  - Otherwise:
+    - Let {objectValue} be {parentObject}.
+  - Return {graphql.ResolveFieldValue(objectType, objectValue, fieldName, argumentValues)}.
+- Otherwise:
+  - Let {batch} be {GetBatch(aether, pathIdentity)}.
+  - Let {id} be a new unique id.
+  - Let {result} be {GetBatchResult(batch, parentObject, id)}.
+  - Let {crystalObject} be {NewCrystalObject(aether, pathIdentity, parentObject)}.
+  - If list...
+
+NewCrystalObject(aether, pathIdentity, parentObject):
+
+- Let {crystalObject} be an empty object.
+- Let {id} be a new unique id.
+- If {parentObject} is a crystal object:
+  - Let {crystalObject.resultByIdByPlan} be a reference to {parentObject.resultByIdByPlan}.
+  - Let {crystalObject.idByPathIdentity} be a copy of {parentObject.idByPathIdentity}.
+- Otherwise:
+  - Let {crystalObject.resultByIdByPlan} be an empty map.
+  - Let {crystalObject.idByPathIdentity} be an empty map.
+  - Let {parentPlan} be the value for key {pathIdentity} within {aether.parentPlanByPathIdentity}.
+  - Let {parentObject} be the value for key {id} for key {parentPlan} in {crystalObject.resultByIdByPlan} (note: this
+    fakes execution of this plan).
+- Set {id} as the value for key {pathIdentity} within {crystalObject.idByPathIdentity}.
+- Return {crystalObject}.
+
+GetBatch(aether, pathIdentity):
+
+- Let {batch} be the value for key {pathIdentity} within {aether.batchByPathIdentity}.
+- If {batch} is null:
+  - Let {batch} be {NewBatch(aether, pathIdentity)}.
+  - Set {batch} as the value for key {pathIdentity} within {aether.batchByPathIdentity}.
+- Return {batch}.
+
+NewBatch(aether, pathIdentity):
+
+- Let {batch} be an empty object.
+- Let {batch.pathIdentity} be {pathIdentity}.
+- Let {batch.plan} be the value for key {pathIdentity} within {aether.planByPathIdentity}.
+- Let {batch.entries} be an empty list.
+- Schedule {ExecuteBatch(aether, batch)} to occur soon (but asynchronously).
+- Return {batch}.
+
+ExecuteBatch(aether, batch):
+
+- Delete the value for key {batch.pathIdentity} within {aether.batchByPathIdentity} (Note: this means a new batch will
+  be used for later calls).
+- Let {crystalObjects} be the first entry in each tuple within {batch.entries}.
+- Let {deferredResults} be the second entry in each tuple within {batch.entries}.
+- Let {results} be the result of calling (asynchronously if necessary) {ExecutePlan(aether, batch.plan,
+  crystalObjects)}.
+- Assert that the length of {results} matches the length of {deferredResults}.
+- For each {deferredResult} with index {i} in {deferredResults}:
+  - Resolve {deferredResult} with the {i}th entry in {results}.
+- Return.
+
+GetBatchResult(batch, crystalObject):
+
+- Let {deferredResult} be a new {Defer}.
+- Push the tuple {[crystalObject, deferredResult]} onto {batch.entries}.
+- Return {deferredResult}.
