@@ -375,16 +375,18 @@ argumentValues, pathIdentity):
     - Let {objectValue} be {parentObject}.
   - Return {graphql.ResolveFieldValue(objectType, objectValue, fieldName, argumentValues)}.
 - Otherwise:
-  - Let {batch} be {GetBatch(aether, pathIdentity)}.
-  - Let {plan} be {batch.plan}.
   - Let {id} be a new unique id.
+  - Let {batch} be {GetBatch(aether, pathIdentity, parentCrystalObject)}.
+  - Let {resultByIdByPlan} be {batch.resultByIdByPlan}.
+  - Let {plan} be {batch.plan}.
   - If {parentObject} is a crystal object:
     - Let {parentCrystalObject} be {parentObject}.
   - Otherwise:
     - Let {parentId} be a new unique id.
     - Let {parentPathIdentity} be the parent path for {pathIdentity}.
     - Let {parentPlan} be the value for key {parentPathIdentity} within {aether.planByPathIdentity}.
-    - Let {parentCrystalObject} be {NewCrystalObject(parentPlan, parentPathIdentity, parentId, parentObject, null)}.
+    - Let {parentCrystalObject} be {NewCrystalObject(parentPlan, parentPathIdentity, parentId, parentObject,
+      resultByIdByPlan)}.
   - Let {result} be {GetBatchResult(batch, parentCrystalObject)} (note: could be asynchronous).
   - (Note: this field execution is identified as 'id', even if it's a nested list. Crystal abstracts away the list for
     you, so the crystal object received will always have a non-list value stored under 'id', but each entry in the
@@ -407,47 +409,45 @@ CrystalWrap(plan, resultType, parentCrystalObject, pathIdentity, id, data):
     - Push {wrappedEntry} onto {result}.
   - Return {result}.
 - Otherwise:
-  - Let {crystalObject} be {NewCrystalObject(plan, pathIdentity, id, data, parentCrystalObject)}.
+  - Let {crystalObject} be {NewCrystalObject(plan, pathIdentity, id, data, resultByIdByPlan, idByPathIdentity)}.
   - Return {crystalObject}.
 
-NewCrystalObject(plan, pathIdentity, id, data, parentCrystalObject):
+NewCrystalObject(plan, pathIdentity, id, data, resultByIdByPlan, idByPathIdentity):
 
+- If {resultByIdByPlan} is not set, initialize it to an empty map.
 - Let {crystalObject} be an empty object.
-- If {parentCrystalObject} is a crystal object:
-  - Let {crystalObject.resultByIdByPlan} be a reference to {parentCrystalObject.resultByIdByPlan}.
-  - Let {crystalObject.idByPathIdentity} be an independent copy of {parentCrystalObject.idByPathIdentity}.
-- Otherwise:
-  - Let {crystalObject.resultByIdByPlan} be an empty map.
-  - Let {crystalObject.idByPathIdentity} be an empty map.
+- Let {crystalObject.resultByIdByPlan} be a reference to {resultByIdByPlan}.
+- Let {crystalObject.idByPathIdentity} be an independent copy of {idByPathIdentity}.
 - Set {id} as the value for key {pathIdentity} within {crystalObject.idByPathIdentity}.
-- Set the value for key {id} for key {plan} in {crystalObject.resultByIdByPlan} to {data}.
+- Set the value for key {id} for key {plan} in {crystalObject.resultByIdByPlan} to {data}. // TODO: this mutation cannot
+  be allowed.
 - Return {crystalObject}.
 
-GetBatch(aether, pathIdentity):
+GetBatch(aether, pathIdentity, resultByIdByPlan):
 
 - Let {batch} be the value for key {pathIdentity} within {aether.batchByPathIdentity}.
 - If {batch} is null:
-  - Let {batch} be {NewBatch(aether, pathIdentity)}.
+  - Let {batch} be {NewBatch(aether, pathIdentity, resultByIdByPlan)}.
   - Set {batch} as the value for key {pathIdentity} within {aether.batchByPathIdentity}.
 - Return {batch}.
 
-NewBatch(aether, pathIdentity):
+NewBatch(aether, pathIdentity, resultByIdByPlan):
 
 - Let {batch} be an empty object.
 - Let {batch.pathIdentity} be {pathIdentity}.
 - Let {batch.plan} be the value for key {pathIdentity} within {aether.planByPathIdentity}.
 - Let {batch.entries} be an empty list.
-- Schedule {ExecuteBatch(aether, batch)} to occur soon (but asynchronously).
+- Schedule {ExecuteBatch(aether, batch, resultByIdByPlan)} to occur soon (but asynchronously).
 - Return {batch}.
 
-ExecuteBatch(aether, batch):
+ExecuteBatch(aether, batch, resultByIdByPlan):
 
 - Delete the value for key {batch.pathIdentity} within {aether.batchByPathIdentity} (Note: this means a new batch will
   be used for later calls).
 - Let {crystalObjects} be the first entry in each tuple within {batch.entries}.
 - Let {deferredResults} be the second entry in each tuple within {batch.entries}.
 - Let {results} be the result of calling (asynchronously if necessary) {ExecutePlan(aether, batch.plan,
-  crystalObjects)}.
+  resultByIdByPlan, crystalObjects)}.
 - Assert that the length of {results} matches the length of {deferredResults}.
 - For each {deferredResult} with index {i} in {deferredResults}:
   - Resolve {deferredResult} with the {i}th entry in {results}.
@@ -458,3 +458,9 @@ GetBatchResult(batch, parentCrystalObject):
 - Let {deferredResult} be a new {Defer}.
 - Push the tuple {[parentCrystalObject, deferredResult]} onto {batch.entries}.
 - Return {deferredResult}.
+
+ExecutePlan(aether, plan, resultByIdByPlan, crystalObjects):
+
+- For {dependencyPlan} in {plan.dependencies}:
+  - Call {ExecutePlan(aether, dependencyPlan, resultByIdByPlan, crystalObjects)}.
+- TODO: execute
