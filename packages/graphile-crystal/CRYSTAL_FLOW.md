@@ -385,17 +385,19 @@ argumentValues, pathIdentity):
     - Let {parentId} be a new unique id.
     - Let {parentPathIdentity} be the parent path for {pathIdentity}.
     - Let {parentPlan} be the value for key {parentPathIdentity} within {aether.planByPathIdentity}.
-    - Let {parentCrystalObject} be {NewCrystalObject(parentPlan, parentPathIdentity, parentId, parentObject,
+    - Let {parentCrystalObject} be {NewCrystalObject(parentPlan, parentPathIdentity, parentId, [], parentObject,
       resultByIdByPlan)}.
   - Let {result} be {GetBatchResult(batch, parentCrystalObject)} (note: could be asynchronous).
-  - (Note: this field execution is identified as 'id', even if it's a nested list. Crystal abstracts away the list for
+  - Set the value for key {id} for key {plan} in {resultByIdByPlan} to {result}.
+  - ~~(Note: this field execution is identified as 'id', even if it's a nested list. Crystal abstracts away the list for
     you, so the crystal object received will always have a non-list value stored under 'id', but each entry in the
     returned results will have a different crystal object, all with the same 'id'. It's possible that 'id' is not the
-    right name to give this property since there will be many with the same value.)
+    right name to give this property since there will be many with the same value.)~~
   - Return {CrystalWrap(plan, resultType, parentCrystalObject, pathIdentity, id, result)}.
 
-CrystalWrap(plan, resultType, parentCrystalObject, pathIdentity, id, data):
+CrystalWrap(plan, resultType, parentCrystalObject, pathIdentity, id, data, indexes):
 
+- If {indexes} is not set, initialize it to an empty list.
 - If {data} is {null}:
   - Return {null}.
 - Otherwise, if {resultType} is a non-null type:
@@ -404,23 +406,26 @@ CrystalWrap(plan, resultType, parentCrystalObject, pathIdentity, id, data):
 - Otherwise, if {resultType} is a list type:
   - Let {innerType} be the inner type of {resultType}.
   - Let {result} be an empty list.
-  - For each {entry} in {data}:
-    - Let {wrappedEntry} be {CrystalWrap(plan, innerType, parentCrystalObject, pathIdentity, id, entry)}.
+  - For each {entry} with index {index} in {data}:
+    - Let {wrappedIndexes} be a list composed of everything in {indexes} followed by {index}.
+    - Let {wrappedEntry} be {CrystalWrap(plan, innerType, parentCrystalObject, pathIdentity, id, entry, indexes)}.
     - Push {wrappedEntry} onto {result}.
   - Return {result}.
 - Otherwise:
-  - Let {crystalObject} be {NewCrystalObject(plan, pathIdentity, id, data, resultByIdByPlan, idByPathIdentity)}.
+  - Let {crystalObject} be {NewCrystalObject(plan, pathIdentity, id, indexes, data, resultByIdByPlan, idByPathIdentity,
+    indexesByPathIdentity)}.
   - Return {crystalObject}.
 
-NewCrystalObject(plan, pathIdentity, id, data, resultByIdByPlan, idByPathIdentity):
+NewCrystalObject(plan, pathIdentity, id, indexes, data, resultByIdByPlan, idByPathIdentity, indexesByPathIdentity):
 
-- If {resultByIdByPlan} is not set, initialize it to an empty map.
+- If {idByPathIdentity} is not set, initialize it to an empty map.
+- If {indexesByPathIdentity} is not set, initialize it to an empty map.
 - Let {crystalObject} be an empty object.
 - Let {crystalObject.resultByIdByPlan} be a reference to {resultByIdByPlan}.
 - Let {crystalObject.idByPathIdentity} be an independent copy of {idByPathIdentity}.
+- Let {crystalObject.indexesByPathIdentity} be an independent copy of {indexesByPathIdentity}.
 - Set {id} as the value for key {pathIdentity} within {crystalObject.idByPathIdentity}.
-- Set the value for key {id} for key {plan} in {crystalObject.resultByIdByPlan} to {data}. // TODO: this mutation cannot
-  be allowed.
+- Set {indexes} as the value for key {pathIdentity} within {crystalObject.indexesByPathIdentity}.
 - Return {crystalObject}.
 
 GetBatch(aether, pathIdentity, resultByIdByPlan):
