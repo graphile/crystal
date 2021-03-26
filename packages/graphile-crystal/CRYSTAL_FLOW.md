@@ -380,9 +380,6 @@ If executing the plan results in an error, throw the error. Otherwise we should 
 (keeping track of all the previous values too (see the parent object), perhaps using their plan id?) which we then pass
 through to the underlying resolver.
 
-NOTE: in a divergence from GraphQL proper, _sibling_ resolvers will not receive the same parent object - each resolver
-receives data customised to that specific field.
-
 ResolveFieldValueCrystal(schema, document, operationName, variables, context, rootValue, field, alias, parentObject,
 argumentValues, pathIdentity):
 
@@ -393,8 +390,7 @@ argumentValues, pathIdentity):
 - Let {plan} be the plan for {pathIdentity} within {aether}.{planByPathIdentity}.
 - If {plan} is null:
   - If {parentObject} is a crystal wrapped value:
-    - Let {data} be the data within {parentObject}.
-    - Let {objectValue} be an object containing one key {fieldName} with the value {data}.
+    - Let {objectValue} be the data within {parentObject}.
   - Otherwise:
     - Let {objectValue} be {parentObject}.
   - Return {graphqlResolveFieldValue(objectType, objectValue, fieldName, argumentValues)}.
