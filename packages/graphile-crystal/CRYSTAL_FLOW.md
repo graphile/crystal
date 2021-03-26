@@ -114,7 +114,14 @@ NewAether(schema, document, operationName, variables, context, rootValue):
   - Call {PlanAetherSubscription(aether)}.
 - Otherwise:
   - Raise unknown operation type error.
+- Call {OptimizePlans(aether)}.
 - Return {aether}.
+
+OptimizePlans(aether):
+
+- Return.
+
+TODO: merge similar plans, replace them in the tree, etc.
 
 TrackedObject(object, constraints, plan):
 
@@ -377,18 +384,21 @@ argumentValues, pathIdentity):
 - Otherwise:
   - Let {id} be a new unique id.
   - Let {batch} be {GetBatch(aether, pathIdentity, parentCrystalObject)}.
-  - Let {resultByIdByPlan} be {batch.resultByIdByPlan}.
+  - Let {crystalContext} be {batch.crystalContext}.
   - Let {plan} be {batch.plan}.
   - If {parentObject} is a crystal object:
-    - Let {parentCrystalObject} be {parentObject}.
+    - Let {parentCrystalObject} be {parentObject}. (Note: for the most optimal execution, `rootValue` passed to graphql
+      should be a crystal object, this allows using {crystalContext} across the entire operation if plans are used
+      everywhere. Even more optimised would be if we can share the same {crystalContext} across multiple `rootValue`s
+      for multiple parallel executions (must be within the same aether) - e.g. as a result of multiple identical
+      subscription operations.)
   - Otherwise:
     - Let {parentId} be a new unique id.
     - Let {parentPathIdentity} be the parent path for {pathIdentity}.
     - Let {parentPlan} be the value for key {parentPathIdentity} within {aether.planByPathIdentity}.
     - Let {parentCrystalObject} be {NewCrystalObject(parentPlan, parentPathIdentity, parentId, [], parentObject,
-      resultByIdByPlan)}.
+      crystalContext)}.
   - Let {result} be {GetBatchResult(batch, parentCrystalObject)} (note: could be asynchronous).
-  - Set the value for key {id} for key {plan} in {resultByIdByPlan} to {result}.
   - ~~(Note: this field execution is identified as 'id', even if it's a nested list. Crystal abstracts away the list for
     you, so the crystal object received will always have a non-list value stored under 'id', but each entry in the
     returned results will have a different crystal object, all with the same 'id'. It's possible that 'id' is not the
@@ -412,50 +422,64 @@ CrystalWrap(plan, resultType, parentCrystalObject, pathIdentity, id, data, index
     - Push {wrappedEntry} onto {result}.
   - Return {result}.
 - Otherwise:
-  - Let {crystalObject} be {NewCrystalObject(plan, pathIdentity, id, indexes, data, resultByIdByPlan, idByPathIdentity,
+  - Let {crystalObject} be {NewCrystalObject(plan, pathIdentity, id, indexes, data, crystalContext, idByPathIdentity,
     indexesByPathIdentity)}.
   - Return {crystalObject}.
 
-NewCrystalObject(plan, pathIdentity, id, indexes, data, resultByIdByPlan, idByPathIdentity, indexesByPathIdentity):
+NewCrystalObject(plan, pathIdentity, id, indexes, data, crystalContext, idByPathIdentity, indexesByPathIdentity):
 
 - If {idByPathIdentity} is not set, initialize it to an empty map.
 - If {indexesByPathIdentity} is not set, initialize it to an empty map.
 - Let {crystalObject} be an empty object.
-- Let {crystalObject.resultByIdByPlan} be a reference to {resultByIdByPlan}.
+- Let {crystalObject.crystalContext} be a reference to {crystalContext}.
 - Let {crystalObject.idByPathIdentity} be an independent copy of {idByPathIdentity}.
 - Let {crystalObject.indexesByPathIdentity} be an independent copy of {indexesByPathIdentity}.
 - Set {id} as the value for key {pathIdentity} within {crystalObject.idByPathIdentity}.
 - Set {indexes} as the value for key {pathIdentity} within {crystalObject.indexesByPathIdentity}.
 - Return {crystalObject}.
 
-GetBatch(aether, pathIdentity, resultByIdByPlan):
+NewCrystalContext():
+
+- Let {crystalContext} be an empty object.
+- Let {crystalContext.resultByIdByPlan} be an empty map.
+- Let {crystalContext.metaByPlan} be an empty map.
+- Return {crystalContext}.
+
+GetBatch(aether, pathIdentity, parentCrystalObject):
 
 - Let {batch} be the value for key {pathIdentity} within {aether.batchByPathIdentity}.
 - If {batch} is null:
-  - Let {batch} be {NewBatch(aether, pathIdentity, resultByIdByPlan)}.
+  - If {parentCrystalObject} is not null:
+    - Let {crystalContext} be {parentCrystalObject.crystalContext}.
+  - Otherwise:
+    - Let {crystalContext} be {NewCrystalContext()}.
+  - Let {batch} be {NewBatch(aether, pathIdentity, crystalContext)}.
   - Set {batch} as the value for key {pathIdentity} within {aether.batchByPathIdentity}.
+  - Schedule {ExecuteBatch(aether, batch, crystalContext)} to occur soon (but asynchronously). (Note: when batch is
+    executed it will delete itself from aether.batchByPathIdentity.)
 - Return {batch}.
 
-NewBatch(aether, pathIdentity, resultByIdByPlan):
+NewBatch(aether, pathIdentity, crystalContext):
 
 - Let {batch} be an empty object.
 - Let {batch.pathIdentity} be {pathIdentity}.
+- Let {batch.crystalContext} be {crystalContext}.
 - Let {batch.plan} be the value for key {pathIdentity} within {aether.planByPathIdentity}.
 - Let {batch.entries} be an empty list.
-- Schedule {ExecuteBatch(aether, batch, resultByIdByPlan)} to occur soon (but asynchronously).
 - Return {batch}.
 
-ExecuteBatch(aether, batch, resultByIdByPlan):
+ExecuteBatch(aether, batch, crystalContext):
 
 - Delete the value for key {batch.pathIdentity} within {aether.batchByPathIdentity} (Note: this means a new batch will
   be used for later calls).
 - Let {crystalObjects} be the first entry in each tuple within {batch.entries}.
 - Let {deferredResults} be the second entry in each tuple within {batch.entries}.
-- Let {results} be the result of calling (asynchronously if necessary) {ExecutePlan(aether, batch.plan,
-  resultByIdByPlan, crystalObjects)}.
+- Let {results} be the result of calling (asynchronously if necessary) {ExecutePlan(aether, batch.plan, crystalContext,
+  crystalObjects)}.
 - Assert that the length of {results} matches the length of {deferredResults}.
 - For each {deferredResult} with index {i} in {deferredResults}:
-  - Resolve {deferredResult} with the {i}th entry in {results}.
+  - Let {result} be the {i}th entry in {results}.
+  - Resolve {deferredResult} with {result}.
 - Return.
 
 GetBatchResult(batch, parentCrystalObject):
@@ -464,8 +488,41 @@ GetBatchResult(batch, parentCrystalObject):
 - Push the tuple {[parentCrystalObject, deferredResult]} onto {batch.entries}.
 - Return {deferredResult}.
 
-ExecutePlan(aether, plan, resultByIdByPlan, crystalObjects):
+ExecutePlan(aether, plan, crystalContext, crystalObjects, visitedPlans):
 
-- For {dependencyPlan} in {plan.dependencies}:
-  - Call {ExecutePlan(aether, dependencyPlan, resultByIdByPlan, crystalObjects)}.
-- TODO: execute
+- If {visitedPlans} is not provided, initialize it to an empty list.
+- If {visitedPlans} contains {plan} throw new recursion error.
+- Push {plan} into {visitedPlans}.
+- Let {pendingCrystalObjects} be an empty list.
+- Let {result} be a list with the same length as {crystalObjects}.
+- For each {crystalObject} with index {i} in {crystalObjects}:
+  - Let {previousResult} be the entry for key {crystalObject.id} for key {plan} in {crystalContext.resultByIdByPlan}.
+  - If {previousResult} does exists:
+    - Set {previousResult} as the {i}th indexed value of {result}.
+  - Otherwise:
+    - Push {crystalObject} onto {pendingCrystalObjects}.
+- If {pendingCrystalObjects} is not empty:
+  - Let {dependencyValuesList} be an empty list.
+  - For {dependencyPlan} in {plan.dependencies}:
+    - Let {dependencyResult} be {ExecutePlan(aether, dependencyPlan, crystalContext, pendingCrystalObjects,
+      visitedPlans)}.
+    - Push {dependencyResult} onto {dependencyValuesList}.
+  - Let {values} be an empty list.
+  - For each index {i} in {pendingCrystalObjects}:
+    - Let {entry} be an empty list.
+    - For each {dependencyValues} in {dependencyValuesList}:
+      - Let {dependencyValue} be the {i}th entry in {dependencyValues}.
+      - Push {dependencyValue} onto {entry}.
+    - Push {entry} onto {values}.
+  - Let {eval} be the internal function provided by {plan} for evaluating the plan.
+  - Let {meta} be the entry for {plan} within {crystalContext.metaByPlan}.
+  - Let {pendingResult} be the result of calling {eval}, providing {values} and {meta}. (Note: the `eval` method on
+    plans is responsible for memoizing results into {meta}.)
+  - Assert the length of {pendingResult} should match the length of {pendingCrystalObjects}.
+  - For each {pendingCrystalObject} with index {i} in {pendingCrystalObjects}:
+    - Let {pendingResult} be the {i}th value in {pendingResult}.
+    - Let {j} be the index of {pendingCrystalObject} within {crystalObjects}.
+    - Set the value for key {pendingCrystalObject.id} for key {plan} in {crystalContext.resultByIdByPlan} to
+      {pendingResult}.
+    - Set {pendingResult} as the {j}th value of {result}.
+- Return {result}.
