@@ -91,7 +91,7 @@ NewAether(schema, document, operationName, variables, context, rootValue):
 - Let {aether}.{operation} be the result of {graphqlGetOperation(document, operationName)}.
 
 - Let {aether}.{plans} be an empty list.
-- Let {aether}.{planByPathIdentity} be an empty object.
+- Let {aether}.{planIdByPathIdentity} be an empty map.
 
 - Let {variablePlan} be {ValuePlan(aether)}.
 - Let {variableConstraints} be an empty object.
@@ -126,13 +126,57 @@ NewAether(schema, document, operationName, variables, context, rootValue):
 - Otherwise:
   - Raise unknown operation type error.
 - Call {OptimizePlans(aether)}.
+- Call {TreeShakePlans(aether)}.
+- Call {FinalizePlans(aether)}.
 - Return {aether}.
 
 OptimizePlans(aether):
 
+- For each {plan} with index {i} in {aether}.{plans} in reverse order:
+  - Let {optimizedPlan} be {OptimizePlan(aether, plan)}.
+  - Let the {i}th entry in {aether}.{plans} be {optimizedPlan}.
 - Return.
 
-TODO: merge similar plans, replace them in the tree, etc.
+OptimizePlan(aether, plan):
+
+- Return plan.
+
+TODO: merge similar plans, etc.
+
+TreeShakePlans(aether):
+
+- For each key {pathIdentity} and value {planId} in {aether}.{planIdByPathIdentity}:
+  - Let {plan} be the plan at index {id} within {aether}.{plans}.
+  - Call {MarkPlanActive(plan)}.
+- For each {inactivePlan} with index {i} in {aether}.{plans} where {inactivePlan}.{active} is {false}:
+  - Replace the {i}th entry in {aether}.{plans} with {null}.
+
+Note: Replacing inactive plans with null is not strictly necessary, but it may help catch bugs earlier. Maybe only do
+this in development. Maybe don't do it if it makes the TypeScript too annoying.
+
+MarkPlanActive(plan, visitedPlans):
+
+- If {visitedPlans} is not set, initialize it to an empty list.
+- If {plan} is within {visitedPlans} throw an infinite recursion error.
+- Add {plan} to {visitedPlans}.
+- Let {plan}.{active} be {true}.
+- For each {dependencyPlan} in {plan}.{dependencies}:
+  - Call {MarkPlanActive(dependencyPlan)}.
+
+FinalizePlans(aether):
+
+- Let {activePlans} be the _distinct_ active plans within {aether}.{plans}.
+- For each {activePlan} in {activePlans} in reverse order:
+  - Call {FinalizePlan(aether, activePlan)}.
+
+Note: FinalizePlans is the stage at which the SQL, GraphQL, etc query may be built; before this time it's not clear what
+the selection will be as intermediate plans may have been discarded.
+
+FinalizePlan(aether, plan):
+
+- Let {finalize} be the internal function provided by {plan} for finalizing the plan.
+- Calling {finalize}.
+- Let {plan}.{finalized} be {true}.
 
 TrackedObject(object, constraints, plan):
 
@@ -314,7 +358,7 @@ PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequentia
     - Call {PlanFieldArguments(aether, field, trackedArguments, plan)}.
   - Otherwise:
     - Let {plan} be {ValuePlan(aether)}.
-  - Set {plan} as the value for {pathIdentity} in {aether}.{planByPathIdentity}.
+  - Set {plan}.{id} as the value for {pathIdentity} in {aether}.{planIdByPathIdentity}.
   - Let {unwrappedFieldType} be the named type of {fieldType}.
   - TODO: what do list types mean for plans?
   - If {unwrappedFieldType} is an Object, Interface or Union type:
@@ -365,7 +409,8 @@ The first thing we need to do is figure out our aether, {aether}, via {Establish
 
 Next we figure out our path identity, {pathIdentity}, within the operation.
 
-Next we find the plan for ourself, {plan}, by looking for the {pathIdentity} entry in {aether}.{planByPathIdentity}.
+Next we find the plan for ourself, {plan}, by looking for the {plan}.{id} stored in the {pathIdentity} entry in
+{aether}.{planIdByPathIdentity}.
 
 If there's no plan, we just call through to the underlying resolver and we're done. Otherwise...
 
@@ -387,7 +432,8 @@ argumentValues, pathIdentity):
 - Let {objectType} be the object type on which {field} is defined.
 - Let {resultType} be the expected type of {field}.
 - Let {aether} be {EstablishAether(schema, document, operationName, variables, context, rootValue)}.
-- Let {plan} be the plan for {pathIdentity} within {aether}.{planByPathIdentity}.
+- Let {id} be the value for {pathIdentity} within {aether}.{planIdByPathIdentity}.
+- Let {plan} be the plan at index {id} within {aether}.{plans}.
 - If {plan} is null:
   - If {parentObject} is a crystal wrapped value:
     - Let {objectValue} be the data within {parentObject}.
@@ -408,7 +454,8 @@ argumentValues, pathIdentity):
   - Otherwise:
     - Let {parentId} be a new unique id.
     - Let {parentPathIdentity} be the parent path for {pathIdentity}.
-    - Let {parentPlan} be the value for key {parentPathIdentity} within {aether}.{planByPathIdentity}.
+    - Let {parentPlanId} be the value for key {parentPathIdentity} within {aether}.{planIdByPathIdentity}.
+    - Let {parentPlan} be the plan at index {parentPlanId} within {aether}.{planIdByPathIdentity}.
     - Let {indexes} be an empty list.
     - Let {parentCrystalObject} be {NewCrystalObject(parentPlan, parentPathIdentity, parentId, indexes, parentObject,
       crystalContext)}.
@@ -478,7 +525,9 @@ NewBatch(aether, pathIdentity, crystalContext):
 - Let {batch} be an empty object.
 - Let {batch}.{pathIdentity} be {pathIdentity}.
 - Let {batch}.{crystalContext} be {crystalContext}.
-- Let {batch}.{plan} be the value for key {pathIdentity} within {aether}.{planByPathIdentity}.
+- Let {planId} be the value for key {pathIdentity} within {aether}.{planIdByPathIdentity}.
+- Let {plan} be the plan at index {id} within {aether}.{plans}.
+- Let {batch}.{plan} be {plan}.
 - Let {batch}.{entries} be an empty list.
 - Return {batch}.
 
@@ -519,7 +568,7 @@ ExecutePlan(aether, plan, crystalContext, crystalObjects, visitedPlans):
     - Push {crystalObject} onto {pendingCrystalObjects}.
 - If {pendingCrystalObjects} is not empty:
   - Let {dependencyValuesList} be an empty list.
-  - For {dependencyPlan} in {plan}.{dependencies}:
+  - For each {dependencyPlan} in {plan}.{dependencies}:
     - Let {dependencyResult} be {ExecutePlan(aether, dependencyPlan, crystalContext, pendingCrystalObjects,
       visitedPlans)}.
     - Push {dependencyResult} onto {dependencyValuesList}.
