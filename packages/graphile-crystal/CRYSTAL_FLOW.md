@@ -11,14 +11,14 @@ Sharing Aethers across GraphQL requests also allows us to batch execution of cer
 massively improved performance - especially for subscription operations which may result in thousands of concurrent
 GraphQL selection set executions all triggered at the same moment from the same pub/sub event.
 
-Note that the plans in the Aether may differ from other Aethers in subtle ways, for example due to directives such as
-`@skip`, `@include`, `@defer` and `@stream`. Use of these directives may cause plans to branch in different ways, and
-thus separate Aethers are required to represent them. Variables that control these directives would be evaluated at
-"planning time" (during aether construction), so different values will result in different aethers; however despite this
-you may use the same aether for different variables assuming those different variables are **only** used during the
-"plan execution phase" and not during the "planning phase".
+It's important to note that the plans in the Aether may differ from other Aethers in subtle ways, for example due to
+directives such as `@skip`, `@include`, `@defer` and `@stream`. Use of these directives may cause plans to branch in
+different ways, and thus separate Aethers are required to represent them. Variables that control these directives would
+be evaluated at "planning time" (during aether construction), so different values will result in different aethers;
+however despite this you may use the same aether for different variables assuming those different variables are **only**
+used during the "plan execution phase" and not during the "planning phase".
 
-Note: where `graphqlSomething` is referenced below it means use a very similar algorithm as in the GraphQL spec, however
+Note: Where `graphqlSomething` is referenced below it means use a very similar algorithm as in the GraphQL spec, however
 you will be given a {TrackedObject()} rather than the direct {variable}, {context} and {rootValue} values; so you need
 to access the properties using `.get` or `.is`. To reduce noise, we've not yet included these updated algorithms in this
 spec.
@@ -76,7 +76,7 @@ MatchesConstraint(constraint, value):
   - Return {constraint}.{pass} if {value} is {constraint}.{value}, otherwise not {constraint}.{pass}.
 - Raise unknown constraint error.
 
-Note: we don't just use 'value' for {true}/{false} because booleans are trinary ({true}, {false}, {null}, or even not
+Note: We don't just use 'value' for {true}/{false} because booleans are trinary ({true}, {false}, {null}, or even not
 specified), and when we evaluate `@skip(if: $var)` or `@include(if: $var)` we only care if `$var` is {true} or not
 {true} respectively, all other values are "bundled together" into a separate branch. This means that for queries
 involving one instance of a nullable `@skip(if: $var)` only two Aether's would be required to represent all states of
@@ -232,11 +232,11 @@ TrackedArguments(aether, objectType, field):
       - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
     - Return `value===argumentValues[argumentName]`.
 
-Note: arguments to a field are either static (in which case they're part of the document and will never change within
+Note: Arguments to a field are either static (in which case they're part of the document and will never change within
 the same aether) or they are provided via variables. We want to track direct access to the variable type arguments via
 {aether}.{trackedVariables}, but access to static arguments does not require any tracking at all.
 
-Note: this recurses - values that are static input objects can contain variables within their descendent fields. If
+Note: This recurses - values that are static input objects can contain variables within their descendent fields. If
 input object, do recursion, otherwise StaticLeafPlan.
 
 Plan(aether):
