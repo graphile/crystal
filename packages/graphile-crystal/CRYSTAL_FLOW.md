@@ -180,13 +180,13 @@ FinalizePlan(aether, plan):
 
 TrackedObject(object, constraints, plan):
 
-- Return an object {p}, such that:
-  - Calls to `p.get(attr)`:
+- Return an object {trackedObject}, such that:
+  - Calls to `trackedObject.get(attr)`:
     - Return `plan.get(attr)`.
-  - Calls to `p.evalGet(attr)`:
+  - Calls to `trackedObject.evalGet(attr)`:
     - Add `{type:'value',value:object[attr]}` to {constraints}.
     - Return the property `object[attr]`.
-  - Calls to `p.evalIs(attr, value)`:
+  - Calls to `trackedObject.evalIs(attr, value)`:
     - Add `{type:'equal',value:value,pass:value===object[attr]}` to {constraints}.
     - Return `value===object[attr]`.
 
@@ -212,23 +212,26 @@ InputListPlan(aether, inputType, inputValue):
 - Let {innerType} be the inner type of {inputType}.
 - If {innerType} is a non-null type:
   - Return InputListPlan(aether, innerType, inputValue).
-- Return an object {p}, such that:
-  - Calls to `p.at(index)`:
+- Let {plan} be {NewPlan(aether)}.
+- Augment {plan} such that:
+  - Calls to `plan.at(index)`:
     - TODO: similar to InputObjectPlan.get
-  - Calls to `p.evalAt(index)`:
+  - Calls to `plan.evalAt(index)`:
     - TODO: similar to InputObjectPlan.evalGet
-  - Calls to `p.evalLength()`:
+  - Calls to `plan.evalLength()`:
     - TODO: similar to InputObjectPlan.evalIs
+- Return {plan}.
 
 InputObjectPlan(aether, inputType, inputValue):
 
-- Return an object {p}, such that:
-  - Calls to `p.get(inputFieldName)`:
+- Let {plan} be {NewPlan(aether)}.
+- Augment {plan} such that:
+  - Calls to `plan.get(inputFieldName)`:
     - Let {inputFieldValue} be the value provided in {inputValue} for the name {inputFieldName}.
     - Let {inputFieldDefinition} be the input field defined by {inputType} with the input field name {inputFieldName}.
     - Let {argumentType} be the expected type of {inputFieldDefinition}.
     - Return {InputPlan(aether, argumentType, inputFieldValue)}.
-  - Calls to `p.evalGet(inputFieldName)`:
+  - Calls to `plan.evalGet(inputFieldName)`:
     - Let {inputFieldValue} be the value provided in {inputValue} for the name {inputFieldName}.
     - If {inputFieldValue} is a {Variable}:
       - Let {variableName} be the name of {inputFieldValue}.
@@ -237,7 +240,7 @@ InputObjectPlan(aether, inputType, inputValue):
     - Otherwise:
       - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
     - Return the property `inputValue[inputFieldName]`.
-  - Calls to `p.evalIs(inputFieldName, value)`:
+  - Calls to `plan.evalIs(inputFieldName, value)`:
     - Let {inputFieldValue} be the value provided in {inputValue} for the name {inputFieldName}.
     - If {inputFieldValue} is a {Variable}:
       - Let {variableName} be the name of {inputFieldValue}.
@@ -246,18 +249,19 @@ InputObjectPlan(aether, inputType, inputValue):
     - Otherwise:
       - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
     - Return `value===inputValue[inputFieldName]`.
+- Return {plan}.
 
 TrackedArguments(aether, objectType, field):
 
 - Let {trackedVariables} be {aether}.{trackedVariables}.
 - Let {argumentValues} be the result of {graphqlCoerceArgumentValues(objectType, field, trackedVariables)}.
-- Return an object {p}, such that:
-  - Calls to `p.get(argumentName)`:
+- Return an object {trackedObject}, such that:
+  - Calls to `trackedObject.get(argumentName)`:
     - Let {argumentValue} be the value provided in {argumentValues} for the name {argumentName}.
     - Let {argumentDefinition} be the argument defined by {field} with the argument name {argumentName}.
     - Let {argumentType} be the expected type of {argumentDefinition}.
     - Return {InputPlan(aether, argumentType, argumentValue)}.
-  - Calls to `p.evalGet(argumentName)`:
+  - Calls to `trackedObject.evalGet(argumentName)`:
     - Let {argumentValue} be the value provided in {argumentValues} for the name {argumentName}.
     - If {argumentValue} is a {Variable}:
       - Let {variableName} be the name of {argumentValue}.
@@ -266,7 +270,7 @@ TrackedArguments(aether, objectType, field):
     - Otherwise:
       - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
     - Return the property `argumentValues[argumentName]`.
-  - Calls to `p.evalIs(argumentName, value)`:
+  - Calls to `trackedObject.evalIs(argumentName, value)`:
     - Let {argumentValue} be the value provided in {argumentValues} for the name {argumentName}.
     - If {argumentValue} is a {Variable}:
       - Let {variableName} be the name of {argumentValue}.
