@@ -90,6 +90,8 @@ NewAether(schema, document, operationName, variables, context, rootValue):
 - Let {aether}.{operationName} be {operationName}.
 - Let {aether}.{operation} be the result of {graphqlGetOperation(document, operationName)}.
 
+- Let {aether}.{maxGroupId} be {0}.
+- Let {aether}.{groupId} be {aether}.{maxGroupId}.
 - Let {aether}.{plans} be an empty list.
 - Let {aether}.{planIdByPathIdentity} be an empty map.
 
@@ -292,6 +294,7 @@ NewPlan(aether):
 - Let {plan} be an empty object.
 - Let {plan}.{dependencies} be an empty list.
 - Let {plan}.{finalized} be {false}.
+- Let {plan}.{groupId} be {aether}.{groupId}.
 - Let {plan}.{id} be the length of {aether}.{plans}.
 - Push {plan} onto {aether}.{plans} (Note: it will have {plan}.{id} as its index within {aether}.{plans}).
 - Return {plan}.
@@ -349,10 +352,15 @@ PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequentia
 - If {isSequential} is not provided, initialize it to {false}.
 - Assert: {objectType} is an object type.
 - Let {trackedVariables} be {aether}.{trackedVariables}.
+- TODO: factor `groupId` in here, based on fragments with `@defer`... Maybe need to use a different grouping algorithm?
 - Let {groupedFieldSet} be the result of {graphqlCollectFields(objectType, selectionSet, trackedVariables)}.
 - For each {groupedFieldSet} as {responseKey} and {fields}:
   - Let {pathIdentity} be `path + ">" + objectType.name + "." + responseKey`.
   - Let {field} be the first entry in {fields}.
+  - If {field} provides the directive `@stream`:
+    - Let {oldGroupId} be {aether}.{groupId}.
+    - Increment {aether}.{maxGroupId}.
+    - Let {aether}.{groupId} be {aether}.{maxGroupId}.
   - Let {fieldName} be the name of {field}. Note: This value is unaffected if an alias is used.
   - Let {fieldType} be the return type defined for the field {fieldName} of {objectType}.
   - Let {planResolver} be `field.extensions.graphile.subscribePlan`.
@@ -386,7 +394,8 @@ PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequentia
           compatible with {unwrappedFieldType}.
         - For each {objectType} in {possibleObjectTypes}:
           - Call {PlanSelectionSet(aether, pathIdentity, plan, objectType, subSelectionSet, false)}.
-  - Return.
+  - Let {aether}.{groupId} be {oldGroupId}.
+- Return.
 
 PlanFieldArguments(aether, field, trackedArguments, fieldPlan):
 
