@@ -283,7 +283,7 @@ the same aether) or they are provided via variables. We want to track direct acc
 Note: This recurses - values that are static input objects can contain variables within their descendent fields. If
 input object, do recursion, otherwise StaticLeafPlan.
 
-Plan(aether):
+NewPlan(aether):
 
 - Let {plan} be an empty object.
 - Let {plan}.{dependencies} be an empty list.
@@ -294,13 +294,13 @@ Plan(aether):
 
 StaticInputLeafPlan(aether, value):
 
-- Let {plan} be a new {Plan(aether)}.
+- Let {plan} be {NewPlan(aether)}.
 - TODO: this represents a static "leaf" value, but will return it via a plan. The plan will always evaluate to the same
   value.
 
 ValuePlan(aether):
 
-- Let {plan} be a new {Plan(aether)}.
+- Let {plan} be {NewPlan(aether)}.
 - TODO: this represents a concrete object value that'll be passed later; e.g. the result of the parent resolver when the
   parent resolver does not return a plan. Like all plans it actually represents a batch of values; you can
   `.get(attrName)` to get a plan that resolves to the relevant attribute value from the value plan.
