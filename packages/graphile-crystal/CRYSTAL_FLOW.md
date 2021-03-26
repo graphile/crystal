@@ -1,4 +1,6 @@
-## Step 1: Planning phase
+# Graphile Crystal
+
+# Step 1. Planning phase
 
 Before we can execute our plans we must first establish a context in which to create the plans. We call this context the
 "Aether." Aethers may be shared between multiple GraphQL requests so long as they meet the relevant requirements (based
@@ -16,10 +18,10 @@ thus separate Aethers are required to represent them. Variables that control the
 you may use the same aether for different variables assuming those different variables are **only** used during the
 "plan execution phase" and not during the "planning phase".
 
-Note: where `graphql.Something` is referenced below it means use a very similar algorithm as in the GraphQL spec,
-however you will be given a {TrackedObject()} rather than the direct {variable}, {context} and {rootValue} values; so
-you need to access the properties using `.get` or `.is`. To reduce noise, we've not yet included these updated
-algorithms in this spec.
+Note: where `graphqlSomething` is referenced below it means use a very similar algorithm as in the GraphQL spec, however
+you will be given a {TrackedObject()} rather than the direct {variable}, {context} and {rootValue} values; so you need
+to access the properties using `.get` or `.is`. To reduce noise, we've not yet included these updated algorithms in this
+spec.
 
 The first thing we need to do is call {EstablishAether()} to get the aether within which the operation will execute;
 this will also involve performing the planning if it hasn't already been done. Once we have the aether we can move on to
@@ -39,17 +41,20 @@ EstablishAether(schema, document, operationName, variables, context, rootValue):
 
 IsAetherCompatible(aether, schema, document, operationName, variables, context, rootValue):
 
-- If {aether.schema} is not equal to {schema}:
+- If {aether}.{schema} is not equal to {schema}:
   - Return {false}.
-- If {aether.document} is not equal to {document}:
+- If {aether}.{document} is not equal to {document}:
   - Return {false}.
-- If {aether.operationName} is not equal to {operationName}:
+- If {aether}.{operationName} is not equal to {operationName}:
   - Return {false}.
-- If not {MatchesConstraints(aether.variableConstraints, variables)}:
+- Let {variableConstraints} be {aether}.{variableConstraints}.
+- Let {contextConstraints} be {aether}.{contextConstraints}.
+- Let {rootValueConstraints} be {aether}.{rootValueConstraints}.
+- If not {MatchesConstraints(variableConstraints, variables)}:
   - Return {false}.
-- If not {MatchesConstraints(aether.contextConstraints, context)}:
+- If not {MatchesConstraints(contextConstraints, context)}:
   - Return {false}.
-- If not {MatchesConstraints(aether.rootValueConstraints, rootValue)}:
+- If not {MatchesConstraints(rootValueConstraints, rootValue)}:
   - Return {false}.
 - Return {true}.
 
@@ -65,10 +70,10 @@ MatchesConstraints(constraints, object):
 
 MatchesConstraint(constraint, value):
 
-- If {constraint.type} is {'value'}:
-  - Return {true} if {value} is equal to {constraint.value}, otherwise {false}.
-- If {constraint.type} is {'equal'}:
-  - Return {constraint.pass} if {value} is {constraint.value}, otherwise not {constraint.pass}.
+- If {constraint}.{type} is {'value'}:
+  - Return {true} if {value} is equal to {constraint}.{value}, otherwise {false}.
+- If {constraint}.{type} is {'equal'}:
+  - Return {constraint}.{pass} if {value} is {constraint}.{value}, otherwise not {constraint}.{pass}.
 - Raise unknown constraint error.
 
 Note: we don't just use 'value' for {true}/{false} because booleans are trinary ({true}, {false}, {null}, or even not
@@ -80,37 +85,43 @@ involving one instance of a nullable `@skip(if: $var)` only two Aether's would b
 NewAether(schema, document, operationName, variables, context, rootValue):
 
 - Let {aether} be an empty object.
-- Let {aether.schema} be {schema}.
-- Let {aether.document} be {document}.
-- Let {aether.operationName} be {operationName}.
-- Let {aether.operation} be the result of {graphql.GetOperation(document, operationName)}.
+- Let {aether}.{schema} be {schema}.
+- Let {aether}.{document} be {document}.
+- Let {aether}.{operationName} be {operationName}.
+- Let {aether}.{operation} be the result of {graphqlGetOperation(document, operationName)}.
 
-- Let {aether.plans} be an empty list.
-- Let {aether.planByPathIdentity} be an empty object.
+- Let {aether}.{plans} be an empty list.
+- Let {aether}.{planByPathIdentity} be an empty object.
 
-- Let {aether.variablePlan} be {ValuePlan(aether)}.
-- Let {aether.variableConstraints} be an empty object.
-- Let {aether.trackedVariables} be {TrackedObject(variables, aether.variableConstraints, aether.variablePlan)}.
+- Let {variablePlan} be {ValuePlan(aether)}.
+- Let {variableConstraints} be an empty object.
+- Let {aether}.{variablePlan} be {variablePlan}.
+- Let {aether}.{variableConstraints} be {variableConstraints}.
+- Let {aether}.{trackedVariables} be {TrackedObject(variables, variableConstraints, variablePlan)}.
 
-- Let {aether.contextPlan} be {ValuePlan(aether)}.
-- Let {aether.contextConstraints} be an empty object.
-- Let {aether.trackedContext} be {TrackedObject(context, aether.contextConstraints, aether.contextPlan)}.
+- Let {contextPlan} be {ValuePlan(aether)}.
+- Let {contextConstraints} be an empty object.
+- Let {aether}.{contextPlan} be {contextPlan}.
+- Let {aether}.{contextConstraints} be {contextConstraints}.
+- Let {aether}.{trackedContext} be {TrackedObject(context, contextConstraints, contextPlan)}.
 
-- Let {aether.rootValuePlan} be {ValuePlan(aether)}.
-- Let {aether.rootValueConstraints} be an empty object.
-- Let {aether.trackedRootValue} be {TrackedObject(rootValue, aether.rootValueConstraints, aether.rootValuePlan)}.
+- Let {rootValuePlan} be {ValuePlan(aether)}.
+- Let {rootValueConstraints} be an empty object.
+- Let {aether}.{rootValuePlan} be {rootValuePlan}.
+- Let {aether}.{rootValueConstraints} be {rootValueConstraints}.
+- Let {aether}.{trackedRootValue} be {TrackedObject(rootValue, rootValueConstraints, rootValuePlan)}.
 
-- Let {aether.subscribePlan} be {null}.
-- Let {aether.rootPlan} be {TrackedValuePlan(trackedRootValue)}.
+- Let {aether}.{subscribePlan} be {null}.
+- Let {aether}.{rootPlan} be {TrackedValuePlan(trackedRootValue)}.
 
-- If {aether.operation} is a query operation:
-  - Let {aether.operationType} be {"query"}.
+- If {aether}.{operation} is a query operation:
+  - Let {aether}.{operationType} be {"query"}.
   - Call {PlanAetherQuery(aether)}.
-- Otherwise, if {aether.operation} is a mutation operation:
-  - Let {aether.operationType} be {"mutation"}.
+- Otherwise, if {aether}.{operation} is a mutation operation:
+  - Let {aether}.{operationType} be {"mutation"}.
   - Call {PlanAetherMutation(aether)}.
-- Otherwise, if {aether.operation} is a subscription operation:
-  - Let {aether.operationType} be {"subscription"}.
+- Otherwise, if {aether}.{operation} is a subscription operation:
+  - Let {aether}.{operationType} be {"subscription"}.
   - Call {PlanAetherSubscription(aether)}.
 - Otherwise:
   - Raise unknown operation type error.
@@ -126,26 +137,26 @@ TODO: merge similar plans, replace them in the tree, etc.
 TrackedObject(object, constraints, plan):
 
 - Return an object {p}, such that:
-  - Calls to {p.get(attr)}:
-    - Return {plan.get(attr)}.
-  - Calls to {p.evalGet(attr)}:
+  - Calls to `p.get(attr)`:
+    - Return `plan.get(attr)`.
+  - Calls to `p.evalGet(attr)`:
     - Add `{type:'value',value:object[attr]}` to {constraints}.
-    - Return the property {object[attr]}.
-  - Calls to {p.evalIs(attr, value)}:
+    - Return the property `object[attr]`.
+  - Calls to `p.evalIs(attr, value)`:
     - Add `{type:'equal',value:value,pass:value===object[attr]}` to {constraints}.
-    - Return {value===object[attr]}.
+    - Return `value===object[attr]`.
 
 InputPlan(aether, inputType, inputValue):
 
 - If {inputValue} is a {Variable}:
   - Let {variableName} be the name of {inputValue}.
-  - Return {aether.variablePlan.get(variableName)}.
+  - Return `aether.variablePlan.get(variableName)`.
 - If {inputType} is a non-null type:
   - Let {innerType} be the inner type of {inputType}.
   - Return {InputPlan(aether, innerType, inputValue)}.
 - If {inputType} is a List type:
   - Let {innerType} be the inner type of {inputType}.
-  - Return {InputListPlan(aether, innerType, inputValue}.
+  - Return {InputListPlan(aether, innerType, inputValue)}.
 - If {inputType} is a leaf type:
   - Return {StaticInputLeafPlan(aether, inputValue)}
 - Assert {inputType} is an input object type.
@@ -158,71 +169,72 @@ InputListPlan(aether, inputType, inputValue):
 - If {innerType} is a non-null type:
   - Return InputListPlan(aether, innerType, inputValue).
 - Return an object {p}, such that:
-  - Calls to {p.at(index)}:
+  - Calls to `p.at(index)`:
     - TODO: similar to InputObjectPlan.get
-  - Calls to {p.evalAt(index)}:
+  - Calls to `p.evalAt(index)`:
     - TODO: similar to InputObjectPlan.evalGet
-  - Calls to {p.evalLength()}:
+  - Calls to `p.evalLength()`:
     - TODO: similar to InputObjectPlan.evalIs
 
 InputObjectPlan(aether, inputType, inputValue):
 
 - Return an object {p}, such that:
-  - Calls to {p.get(inputFieldName)}:
+  - Calls to `p.get(inputFieldName)`:
     - Let {inputFieldValue} be the value provided in {inputValue} for the name {inputFieldName}.
     - Let {inputFieldDefinition} be the input field defined by {inputType} with the input field name {inputFieldName}.
     - Let {argumentType} be the expected type of {inputFieldDefinition}.
-    - Return {InputPlan(aether, argumentType, inputFieldValue)
-  - Calls to {p.evalGet(inputFieldName)}:
+    - Return {InputPlan(aether, argumentType, inputFieldValue)}.
+  - Calls to `p.evalGet(inputFieldName)`:
     - Let {inputFieldValue} be the value provided in {inputValue} for the name {inputFieldName}.
     - If {inputFieldValue} is a {Variable}:
       - Let {variableName} be the name of {inputFieldValue}.
-      - Call {aether.trackedVariables.get(variableName)} (note: this is just to track the access, we don't use the
+      - Call `aether.trackedVariables.get(variableName)` (note: this is just to track the access, we don't use the
         result).
     - Otherwise:
       - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
-    - Return the property {inputValue[inputFieldName]}.
-  - Calls to {p.evalIs(inputFieldName, value)}:
+    - Return the property `inputValue[inputFieldName]`.
+  - Calls to `p.evalIs(inputFieldName, value)`:
     - Let {inputFieldValue} be the value provided in {inputValue} for the name {inputFieldName}.
     - If {inputFieldValue} is a {Variable}:
       - Let {variableName} be the name of {inputFieldValue}.
-      - Call {aether.trackedVariables.is(variableName, value)} (note: this is just to track the access, we don't use the
+      - Call `aether.trackedVariables.is(variableName, value)` (note: this is just to track the access, we don't use the
         result).
     - Otherwise:
       - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
-    - Return {value===inputValue[inputFieldName]}.
+    - Return `value===inputValue[inputFieldName]`.
 
 TrackedArguments(aether, objectType, field):
 
-- Let {argumentValues} be the result of {graphql.CoerceArgumentValues(objectType, field, aether.trackedVariables)}.
+- Let {trackedVariables} be {aether}.{trackedVariables}.
+- Let {argumentValues} be the result of {graphqlCoerceArgumentValues(objectType, field, trackedVariables)}.
 - Return an object {p}, such that:
-  - Calls to {p.get(argumentName)}:
+  - Calls to `p.get(argumentName)`:
     - Let {argumentValue} be the value provided in {argumentValues} for the name {argumentName}.
     - Let {argumentDefinition} be the argument defined by {field} with the argument name {argumentName}.
     - Let {argumentType} be the expected type of {argumentDefinition}.
-    - Return {InputPlan(aether, argumentType, argumentValue)
-  - Calls to {p.evalGet(argumentName)}:
+    - Return {InputPlan(aether, argumentType, argumentValue)}.
+  - Calls to `p.evalGet(argumentName)`:
     - Let {argumentValue} be the value provided in {argumentValues} for the name {argumentName}.
     - If {argumentValue} is a {Variable}:
       - Let {variableName} be the name of {argumentValue}.
-      - Call {aether.trackedVariables.get(variableName)} (note: this is just to track the access, we don't use the
+      - Call `aether.trackedVariables.get(variableName)` (note: this is just to track the access, we don't use the
         result).
     - Otherwise:
       - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
-    - Return the property {argumentValues[argumentName]}.
-  - Calls to {p.evalIs(argumentName, value)}:
+    - Return the property `argumentValues[argumentName]`.
+  - Calls to `p.evalIs(argumentName, value)`:
     - Let {argumentValue} be the value provided in {argumentValues} for the name {argumentName}.
     - If {argumentValue} is a {Variable}:
       - Let {variableName} be the name of {argumentValue}.
-      - Call {aether.trackedVariables.is(variableName, value)} (note: this is just to track the access, we don't use the
+      - Call `aether.trackedVariables.is(variableName, value)` (note: this is just to track the access, we don't use the
         result).
     - Otherwise:
       - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
-    - Return {value===argumentValues[argumentName]}.
+    - Return `value===argumentValues[argumentName]`.
 
 Note: arguments to a field are either static (in which case they're part of the document and will never change within
 the same aether) or they are provided via variables. We want to track direct access to the variable type arguments via
-{aether.trackedVariables}, but access to static arguments does not require any tracking at all.
+{aether}.{trackedVariables}, but access to static arguments does not require any tracking at all.
 
 Note: this recurses - values that are static input objects can contain variables within their descendent fields. If
 input object, do recursion, otherwise StaticLeafPlan.
@@ -230,10 +242,10 @@ input object, do recursion, otherwise StaticLeafPlan.
 Plan(aether):
 
 - Let {plan} be an empty object.
-- Let {plan.dependencies} be an empty list.
-- Let {plan.finalized} be {false}.
-- Let {plan.id} be the length of {aether.plans}.
-- Push {plan} onto {aether.plans} (Note: it will have {plan.id} as its index within {aether.plans}).
+- Let {plan}.{dependencies} be an empty list.
+- Let {plan}.{finalized} be {false}.
+- Let {plan}.{id} be the length of {aether}.{plans}.
+- Push {plan} onto {aether}.{plans} (Note: it will have {plan}.{id} as its index within {aether}.{plans}).
 - Return {plan}.
 
 StaticInputLeafPlan(aether, value):
@@ -251,32 +263,36 @@ ValuePlan(aether):
 
 PlanAetherQuery(aether):
 
-- Let {rootType} be the root Query type in {aether.schema}.
-- Let {selectionSet} be the top level Selection Set in {aether.operation}.
-- Call {PlanSelectionSet(aether, "", aether.rootPlan, rootType, selectionSet)}.
+- Let {rootType} be the root Query type in {aether}.{schema}.
+- Let {selectionSet} be the top level Selection Set in {aether}.{operation}.
+- Let {rootPlan} be {aether}.{rootPlan}.
+- Call {PlanSelectionSet(aether, "", rootPlan, rootType, selectionSet)}.
 
 PlanAetherMutation(aether):
 
-- Let {rootType} be the root Mutation type in {aether.schema}.
-- Let {selectionSet} be the top level Selection Set in {aether.operation}.
-- Call {PlanSelectionSet(aether, "", aether.rootPlan, rootType, selectionSet, true)}.
+- Let {rootType} be the root Mutation type in {aether}.{schema}.
+- Let {selectionSet} be the top level Selection Set in {aether}.{operation}.
+- Let {rootPlan} be {aether}.{rootPlan}.
+- Call {PlanSelectionSet(aether, "", rootPlan, rootType, selectionSet, true)}.
 
 PlanAetherSubscription(aether):
 
-- Let {rootType} be the root Subscription type in {aether.schema}.
-- Let {selectionSet} be the top level Selection Set in {aether.operation}.
-- Let {groupedFieldSet} be the result of {graphql.CollectFields(rootType, selectionSet, aether.trackedVariables)}.
+- Let {rootType} be the root Subscription type in {aether}.{schema}.
+- Let {selectionSet} be the top level Selection Set in {aether}.{operation}.
+- Let {trackedVariables} be {aether}.{trackedVariables}.
+- Let {groupedFieldSet} be the result of {graphqlCollectFields(rootType, selectionSet, trackedVariables)}.
 - If {groupedFieldSet} does not have exactly one entry, throw a query error.
 - Let {fields} be the value of the first entry in {groupedFieldSet}.
 - Let {fieldName} be the name of the first entry in {fields}. Note: This value is unaffected if an alias is used.
 - Let {field} be the field named {fieldName} on {rootType}.
-- Let {subscriptionPlanResolver} be {field.extensions.graphile.subscribePlan}.
+- Let {subscriptionPlanResolver} be `field.extensions.graphile.subscribePlan`.
+- Let {subscribePlan} be {aether}.{subscribePlan}.
 - If {subscriptionPlanResolver} exists:
   - Let {trackedArguments} be {TrackedArguments(aether, rootType, field)}.
-  - Let {aether.subscribePlan} be {ExecutePlanResolver(aether, subscriptionPlanResolver, aether.rootPlan,
-    trackedArguments)}.
-  - Call {PlanFieldArguments(aether, field, trackedArguments, aether.subscribePlan)}.
-- Call {PlanSelectionSet(aether, "", aether.subscribePlan, rootType, selectionSet)}.
+  - Let {rootPlan} be {aether}.{rootPlan}.
+  - Let {aether}.{subscribePlan} be {ExecutePlanResolver(aether, subscriptionPlanResolver, rootPlan, trackedArguments)}.
+  - Call {PlanFieldArguments(aether, field, trackedArguments, subscribePlan)}.
+- Call {PlanSelectionSet(aether, "", subscribePlan, rootType, selectionSet)}.
 
 TODO: should we be passing aether.subscribePlan here? Something else?
 
@@ -284,43 +300,44 @@ PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequentia
 
 - If {isSequential} is not provided, initialize it to {false}.
 - Assert: {objectType} is an object type.
-- Let {groupedFieldSet} be the result of {graphql.CollectFields(objectType, selectionSet, aether.trackedVariables)}.
+- Let {trackedVariables} be {aether}.{trackedVariables}.
+- Let {groupedFieldSet} be the result of {graphqlCollectFields(objectType, selectionSet, trackedVariables)}.
 - For each {groupedFieldSet} as {responseKey} and {fields}:
-  - Let {pathIdentity} be {path + ">" + objectType.name + "." + responseKey}.
+  - Let {pathIdentity} be `path + ">" + objectType.name + "." + responseKey`.
   - Let {field} be the first entry in {fields}.
   - Let {fieldName} be the name of {field}. Note: This value is unaffected if an alias is used.
   - Let {fieldType} be the return type defined for the field {fieldName} of {objectType}.
-  - Let {planResolver} be {field.extensions.graphile.subscribePlan}.
+  - Let {planResolver} be `field.extensions.graphile.subscribePlan`.
   - If {planResolver} is not {null}:
     - Let {trackedArguments} be {TrackedArguments(aether, objectType, field)}.
     - Let {plan} be {ExecutePlanResolver(aether, planResolver, parentPlan, trackedArguments)}.
     - Call {PlanFieldArguments(aether, field, trackedArguments, plan)}.
   - Otherwise:
     - Let {plan} be {ValuePlan(aether)}.
-  - Set {plan} as the value for {pathIdentity} in {aether.planByPathIdentity}.
+  - Set {plan} as the value for {pathIdentity} in {aether}.{planByPathIdentity}.
   - Let {unwrappedFieldType} be the named type of {fieldType}.
   - TODO: what do list types mean for plans?
   - If {unwrappedFieldType} is an Object, Interface or Union type:
-    - Let {subSelectionSet} be the result of calling {graphql.MergeSelectionSets(fields)}.
+    - Let {subSelectionSet} be the result of calling {graphqlMergeSelectionSets(fields)}.
     - If {unwrappedFieldType} is an object type:
-      - Call {PlanSelectionSet(aether, pathIdentity, plan, unwrappedFieldType, subSelectionSet, false).
+      - Call {PlanSelectionSet(aether, pathIdentity, plan, unwrappedFieldType, subSelectionSet, false)}.
     - Otherwise, if {unwrappedFieldType} is a union type:
       - Let {possibleObjectTypes} be all the object types that can be accessed in {subSelectionSet} that are compatible
         with {unwrappedFieldType}.
       - For each {objectType} in {possibleObjectTypes}:
-        - Call {PlanSelectionSet(aether, pathIdentity, plan, objectType, subSelectionSet, false).
+        - Call {PlanSelectionSet(aether, pathIdentity, plan, objectType, subSelectionSet, false)}.
     - Otherwise:
       - Assert: {unwrappedFieldType} is an interface type.
       - If any non-introspection field in {subSelectionSet} is selected on the interface type itself:
         - Let {possibleObjectTypes} be all the object types that implement the {unwrappedFieldType} interface.
         - For each {objectType} in {possibleObjectTypes}:
-          - Call {PlanSelectionSet(aether, pathIdentity, plan, objectType, subSelectionSet, false).
+          - Call {PlanSelectionSet(aether, pathIdentity, plan, objectType, subSelectionSet, false)}.
       - Otherwise:
         - Note: this is the same approach as for union types.
         - Let {possibleObjectTypes} be all the object types that can be accessed in {subSelectionSet} that are
           compatible with {unwrappedFieldType}.
         - For each {objectType} in {possibleObjectTypes}:
-          - Call {PlanSelectionSet(aether, pathIdentity, plan, objectType, subSelectionSet, false).
+          - Call {PlanSelectionSet(aether, pathIdentity, plan, objectType, subSelectionSet, false)}.
   - Return.
 
 PlanFieldArguments(aether, field, trackedArguments, fieldPlan):
@@ -334,10 +351,10 @@ PlanInputFields(aether, inputObjectType, trackedValues, parentPlan):
 ExecutePlanResolver(aether, planResolver, parentPlan, trackedArguments):
 
 - Let {plan} be the result of calling {planResolver}, providing {parentPlan}, {trackedArguments},
-  {aether.trackedContext}.
+  {aether}.{trackedContext}.
 - Return {plan}.
 
-## Step 2: execution phase
+# Step 2: execution phase
 
 We're in a GraphQL resolver. We don't know what's going on, but we've been given a parent object (which may or may not
 be crystal-related), arguments (which will be identical for all of our counterparts), context (which will be identical
@@ -348,7 +365,7 @@ The first thing we need to do is figure out our aether, {aether}, via {Establish
 
 Next we figure out our path identity, {pathIdentity}, within the operation.
 
-Next we find the plan for ourself, {plan}, by looking for the {pathIdentity} entry in {aether.planByPathIdentity}.
+Next we find the plan for ourself, {plan}, by looking for the {pathIdentity} entry in {aether}.{planByPathIdentity}.
 
 If there's no plan, we just call through to the underlying resolver and we're done. Otherwise...
 
@@ -373,19 +390,19 @@ argumentValues, pathIdentity):
 - Let {objectType} be the object type on which {field} is defined.
 - Let {resultType} be the expected type of {field}.
 - Let {aether} be {EstablishAether(schema, document, operationName, variables, context, rootValue)}.
-- Let {plan} be the plan for {pathIdentity} within {aether.planByPathIdentity}.
+- Let {plan} be the plan for {pathIdentity} within {aether}.{planByPathIdentity}.
 - If {plan} is null:
   - If {parentObject} is a crystal wrapped value:
     - Let {data} be the data within {parentObject}.
     - Let {objectValue} be an object containing one key {fieldName} with the value {data}.
   - Otherwise:
     - Let {objectValue} be {parentObject}.
-  - Return {graphql.ResolveFieldValue(objectType, objectValue, fieldName, argumentValues)}.
+  - Return {graphqlResolveFieldValue(objectType, objectValue, fieldName, argumentValues)}.
 - Otherwise:
   - Let {id} be a new unique id.
   - Let {batch} be {GetBatch(aether, pathIdentity, parentCrystalObject)}.
-  - Let {crystalContext} be {batch.crystalContext}.
-  - Let {plan} be {batch.plan}.
+  - Let {crystalContext} be {batch}.{crystalContext}.
+  - Let {plan} be {batch}.{plan}.
   - If {parentObject} is a crystal object:
     - Let {parentCrystalObject} be {parentObject}. (Note: for the most optimal execution, `rootValue` passed to graphql
       should be a crystal object, this allows using {crystalContext} across the entire operation if plans are used
@@ -395,8 +412,9 @@ argumentValues, pathIdentity):
   - Otherwise:
     - Let {parentId} be a new unique id.
     - Let {parentPathIdentity} be the parent path for {pathIdentity}.
-    - Let {parentPlan} be the value for key {parentPathIdentity} within {aether.planByPathIdentity}.
-    - Let {parentCrystalObject} be {NewCrystalObject(parentPlan, parentPathIdentity, parentId, [], parentObject,
+    - Let {parentPlan} be the value for key {parentPathIdentity} within {aether}.{planByPathIdentity}.
+    - Let {indexes} be an empty list.
+    - Let {parentCrystalObject} be {NewCrystalObject(parentPlan, parentPathIdentity, parentId, indexes, parentObject,
       crystalContext)}.
   - Let {result} be {GetBatchResult(batch, parentCrystalObject)} (note: could be asynchronous).
   - ~~(Note: this field execution is identified as 'id', even if it's a nested list. Crystal abstracts away the list for
@@ -431,30 +449,30 @@ NewCrystalObject(plan, pathIdentity, id, indexes, data, crystalContext, idByPath
 - If {idByPathIdentity} is not set, initialize it to an empty map.
 - If {indexesByPathIdentity} is not set, initialize it to an empty map.
 - Let {crystalObject} be an empty object.
-- Let {crystalObject.crystalContext} be a reference to {crystalContext}.
-- Let {crystalObject.idByPathIdentity} be an independent copy of {idByPathIdentity}.
-- Let {crystalObject.indexesByPathIdentity} be an independent copy of {indexesByPathIdentity}.
-- Set {id} as the value for key {pathIdentity} within {crystalObject.idByPathIdentity}.
-- Set {indexes} as the value for key {pathIdentity} within {crystalObject.indexesByPathIdentity}.
+- Let {crystalObject}.{crystalContext} be a reference to {crystalContext}.
+- Let {crystalObject}.{idByPathIdentity} be an independent copy of {idByPathIdentity}.
+- Let {crystalObject}.{indexesByPathIdentity} be an independent copy of {indexesByPathIdentity}.
+- Set {id} as the value for key {pathIdentity} within {crystalObject}.{idByPathIdentity}.
+- Set {indexes} as the value for key {pathIdentity} within {crystalObject}.{indexesByPathIdentity}.
 - Return {crystalObject}.
 
 NewCrystalContext():
 
 - Let {crystalContext} be an empty object.
-- Let {crystalContext.resultByIdByPlan} be an empty map.
-- Let {crystalContext.metaByPlan} be an empty map.
+- Let {crystalContext}.{resultByIdByPlan} be an empty map.
+- Let {crystalContext}.{metaByPlan} be an empty map.
 - Return {crystalContext}.
 
 GetBatch(aether, pathIdentity, parentCrystalObject):
 
-- Let {batch} be the value for key {pathIdentity} within {aether.batchByPathIdentity}.
+- Let {batch} be the value for key {pathIdentity} within {aether}.{batchByPathIdentity}.
 - If {batch} is null:
   - If {parentCrystalObject} is not null:
-    - Let {crystalContext} be {parentCrystalObject.crystalContext}.
+    - Let {crystalContext} be {parentCrystalObject}.{crystalContext}.
   - Otherwise:
     - Let {crystalContext} be {NewCrystalContext()}.
   - Let {batch} be {NewBatch(aether, pathIdentity, crystalContext)}.
-  - Set {batch} as the value for key {pathIdentity} within {aether.batchByPathIdentity}.
+  - Set {batch} as the value for key {pathIdentity} within {aether}.{batchByPathIdentity}.
   - Schedule {ExecuteBatch(aether, batch, crystalContext)} to occur soon (but asynchronously). (Note: when batch is
     executed it will delete itself from aether.batchByPathIdentity.)
 - Return {batch}.
@@ -462,19 +480,20 @@ GetBatch(aether, pathIdentity, parentCrystalObject):
 NewBatch(aether, pathIdentity, crystalContext):
 
 - Let {batch} be an empty object.
-- Let {batch.pathIdentity} be {pathIdentity}.
-- Let {batch.crystalContext} be {crystalContext}.
-- Let {batch.plan} be the value for key {pathIdentity} within {aether.planByPathIdentity}.
-- Let {batch.entries} be an empty list.
+- Let {batch}.{pathIdentity} be {pathIdentity}.
+- Let {batch}.{crystalContext} be {crystalContext}.
+- Let {batch}.{plan} be the value for key {pathIdentity} within {aether}.{planByPathIdentity}.
+- Let {batch}.{entries} be an empty list.
 - Return {batch}.
 
 ExecuteBatch(aether, batch, crystalContext):
 
-- Delete the value for key {batch.pathIdentity} within {aether.batchByPathIdentity} (Note: this means a new batch will
-  be used for later calls).
-- Let {crystalObjects} be the first entry in each tuple within {batch.entries}.
-- Let {deferredResults} be the second entry in each tuple within {batch.entries}.
-- Let {results} be the result of calling (asynchronously if necessary) {ExecutePlan(aether, batch.plan, crystalContext,
+- Delete the value for key {batch}.{pathIdentity} within {aether}.{batchByPathIdentity} (Note: this means a new batch
+  will be used for later calls).
+- Let {crystalObjects} be the first entry in each tuple within {batch}.{entries}.
+- Let {deferredResults} be the second entry in each tuple within {batch}.{entries}.
+- Let {plan} be {batch}.{plan}.
+- Let {results} be the result of calling (asynchronously if necessary) {ExecutePlan(aether, plan, crystalContext,
   crystalObjects)}.
 - Assert that the length of {results} matches the length of {deferredResults}.
 - For each {deferredResult} with index {i} in {deferredResults}:
@@ -485,7 +504,7 @@ ExecuteBatch(aether, batch, crystalContext):
 GetBatchResult(batch, parentCrystalObject):
 
 - Let {deferredResult} be a new {Defer}.
-- Push the tuple {[parentCrystalObject, deferredResult]} onto {batch.entries}.
+- Push the tuple `[parentCrystalObject, deferredResult]` onto {batch}.{entries}.
 - Return {deferredResult}.
 
 ExecutePlan(aether, plan, crystalContext, crystalObjects, visitedPlans):
@@ -496,14 +515,15 @@ ExecutePlan(aether, plan, crystalContext, crystalObjects, visitedPlans):
 - Let {pendingCrystalObjects} be an empty list.
 - Let {result} be a list with the same length as {crystalObjects}.
 - For each {crystalObject} with index {i} in {crystalObjects}:
-  - Let {previousResult} be the entry for key {crystalObject.id} for key {plan} in {crystalContext.resultByIdByPlan}.
+  - Let {previousResult} be the entry for key {crystalObject}.{id} for key {plan} in
+    {crystalContext}.{resultByIdByPlan}.
   - If {previousResult} does exists:
     - Set {previousResult} as the {i}th indexed value of {result}.
   - Otherwise:
     - Push {crystalObject} onto {pendingCrystalObjects}.
 - If {pendingCrystalObjects} is not empty:
   - Let {dependencyValuesList} be an empty list.
-  - For {dependencyPlan} in {plan.dependencies}:
+  - For {dependencyPlan} in {plan}.{dependencies}:
     - Let {dependencyResult} be {ExecutePlan(aether, dependencyPlan, crystalContext, pendingCrystalObjects,
       visitedPlans)}.
     - Push {dependencyResult} onto {dependencyValuesList}.
@@ -515,14 +535,14 @@ ExecutePlan(aether, plan, crystalContext, crystalObjects, visitedPlans):
       - Push {dependencyValue} onto {entry}.
     - Push {entry} onto {values}.
   - Let {eval} be the internal function provided by {plan} for evaluating the plan.
-  - Let {meta} be the entry for {plan} within {crystalContext.metaByPlan}.
+  - Let {meta} be the entry for {plan} within {crystalContext}.{metaByPlan}.
   - Let {pendingResult} be the result of calling {eval}, providing {values} and {meta}. (Note: the `eval` method on
     plans is responsible for memoizing results into {meta}.)
   - Assert the length of {pendingResult} should match the length of {pendingCrystalObjects}.
   - For each {pendingCrystalObject} with index {i} in {pendingCrystalObjects}:
     - Let {pendingResult} be the {i}th value in {pendingResult}.
     - Let {j} be the index of {pendingCrystalObject} within {crystalObjects}.
-    - Set the value for key {pendingCrystalObject.id} for key {plan} in {crystalContext.resultByIdByPlan} to
+    - Set the value for key {pendingCrystalObject}.{id} for key {plan} in {crystalContext}.{resultByIdByPlan} to
       {pendingResult}.
     - Set {pendingResult} as the {j}th value of {result}.
 - Return {result}.

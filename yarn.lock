@@ -5161,6 +5161,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"clipboard@npm:^2.0.0":
+  version: 2.0.8
+  resolution: "clipboard@npm:2.0.8"
+  dependencies:
+    good-listener: ^1.2.2
+    select: ^1.1.2
+    tiny-emitter: ^2.0.0
+  checksum: 3/8eab011ad8cf2dc794b717483f913550c1be1298c84550917f99734b8c5d6674ab86fe6c074234a9597bf60efddffa2ca11ce0df0f78f7c64c4e6a64302437f8
+  languageName: node
+  linkType: hard
+
 "cliui@npm:^4.0.0":
   version: 4.1.0
   resolution: "cliui@npm:4.1.0"
@@ -6594,6 +6605,13 @@ __metadata:
   version: 1.0.0
   resolution: "delayed-stream@npm:1.0.0"
   checksum: 3/d9dfb0a7c79fd308fada9db2cf29d1ff22047ceb50dd78f7e3c173567909b438f418259cb76a6d9c9f513e88ef41d3a14154f618741ec8368c3efeff616d0c9f
+  languageName: node
+  linkType: hard
+
+"delegate@npm:^3.1.2":
+  version: 3.2.0
+  resolution: "delegate@npm:3.2.0"
+  checksum: 3/ccbbf29eb436719e4ffef06a1df2635a150f229f8ae549f4b6e118e940b17917e063c939541c6e23f38675d30acf424ecca9a8d1cca2a874d63fa0c257b0811f
   languageName: node
   linkType: hard
 
@@ -8691,6 +8709,15 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"good-listener@npm:^1.2.2":
+  version: 1.2.2
+  resolution: "good-listener@npm:1.2.2"
+  dependencies:
+    delegate: ^3.1.2
+  checksum: 3/640a1627e528ceb3337595a8020f44d09455f284c18c765eaf9ce5dcdf1799810e7b11ca2b61582a5a4db20aad0b7e6b820235864822d84df541d74383bcd01c
+  languageName: node
+  linkType: hard
+
 "got@npm:^9.6.0":
   version: 9.6.0
   resolution: "got@npm:9.6.0"
@@ -8793,6 +8820,7 @@ fsevents@^1.2.7:
     lodash: ^4.17.15
     nodemon: ^2.0.7
     pg-sql2: 4.7.0
+    spec-md: ^2.0.2
     ts-node: ^9.1.1
     tslib: ^2.0.0
     typescript: ^3.9.2
@@ -15318,6 +15346,18 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"prismjs@npm:^1.23.0":
+  version: 1.23.0
+  resolution: "prismjs@npm:1.23.0"
+  dependencies:
+    clipboard: ^2.0.0
+  dependenciesMeta:
+    clipboard:
+      optional: true
+  checksum: 3/9d55785f1ea68e2a2e6b0a5ea1241811ed986182af76053ecf50245521414597d70b17dc5804a7ad961dfd459e6883a89ad3f86bb064ac3484e3ef24b7891f4f
+  languageName: node
+  linkType: hard
+
 "private@npm:^0.1.8":
   version: 0.1.8
   resolution: "private@npm:0.1.8"
@@ -16752,6 +16792,13 @@ resolve@~1.12.0:
   languageName: node
   linkType: hard
 
+"select@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "select@npm:1.1.2"
+  checksum: 3/66be63b7cf0973af48cebcca47909d0ba703bb7f01373f9ebf19880dc8fe9c97f41e2ebdefee144f60bbf416cafbf77dfb98cd1776e62d7afc336b843f1009b1
+  languageName: node
+  linkType: hard
+
 "selfsigned@npm:^1.10.7":
   version: 1.10.7
   resolution: "selfsigned@npm:1.10.7"
@@ -17292,6 +17339,17 @@ resolve@~1.12.0:
     select-hose: ^2.0.0
     spdy-transport: ^3.0.0
   checksum: 3/388d39324d706a0a73d1d16fa93397029b3eb47ff2aaa3ad58c3d9c7682ce53eb847795560dc08190b7e3f8404e8bf4814ff3fd74cf0c849796310f1cd8a5f92
+  languageName: node
+  linkType: hard
+
+"spec-md@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "spec-md@npm:2.0.2"
+  dependencies:
+    prismjs: ^1.23.0
+  bin:
+    spec-md: bin/spec-md
+  checksum: 3/0c9011474e5bc96aa1e512f4f8d815fdb016c46e847623568fbc71b21e12184834a75b0bcd49724b64c3cb139e145e9db2facbf7a5d95d3bbdca58fc85596c2e
   languageName: node
   linkType: hard
 
@@ -18129,6 +18187,13 @@ resolve@~1.12.0:
   version: 0.3.0
   resolution: "timsort@npm:0.3.0"
   checksum: 3/d8300c3ecf1a3751413de82b04ad283b461ab6fb1041820c825d13b4ae74526e2101ab5fb84c57a0c6e1f4d7f67173b5d8754ed8bb7447c6a9ce1db8562eb82c
+  languageName: node
+  linkType: hard
+
+"tiny-emitter@npm:^2.0.0":
+  version: 2.1.0
+  resolution: "tiny-emitter@npm:2.1.0"
+  checksum: 3/0055509c72e5fe35d6ab66fa6339342e0f29129e77ed2086e475fdf80be43a8651f2517be76513b46a042c8356396f4da5a35e2e23457252176808d5a892036a
   languageName: node
   linkType: hard
 
