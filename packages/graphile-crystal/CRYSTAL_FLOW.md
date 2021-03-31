@@ -374,7 +374,7 @@ PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequentia
     - Let {plan} be {ExecutePlanResolver(aether, planResolver, parentPlan, trackedArguments)}.
     - Call {PlanFieldArguments(aether, field, trackedArguments, plan)}.
   - Otherwise:
-    - Let {plan} be {ValuePlan(aether)}. (Note: this is populated in {PopulateValuePlan}.)
+    - Let {plan} be {ValuePlan(aether)}. (Note: this is populated in {GetValuePlanId}.)
   - Set {plan}.{id} as the value for {pathIdentity} in {aether}.{planIdByPathIdentity}.
   - Let {unwrappedFieldType} be the named type of {fieldType}.
   - TODO: what do list types mean for plans?
@@ -443,7 +443,7 @@ If executing the plan results in an error, throw the error. Otherwise we should 
 (keeping track of all the previous values too (see the parent object), perhaps using their plan id?) which we then pass
 through to the underlying resolver.
 
-PopulateValuePlan(aether, valuePlan, object):
+GetValuePlanId(aether, valuePlan, object):
 
 - Assert: {valuePlan} is a {ValuePlan}.
 - Let {valueIdByObject} be the map for {valuePlan.id} within the map {aether}.{valueIdByObjectByPlanId} (creating the
@@ -453,8 +453,8 @@ PopulateValuePlan(aether, valuePlan, object):
   - Return {valueId}.
 - Otherwise:
   - Let {valueId} be a new unique id.
-  - Set {object} as the value for entry {valueId} for entry {valuePlan} in {crystalContext}.{resultByIdByPlan}. (Note:
-    this populates the {ValuePlan} for this specific parent.)
+  - Call {PopulateValuePlan(crystalContext, valuePlan, valueId, object)}. (Note: this populates the {ValuePlan} for this
+    specific parent.)
   - Set {valueId} as the value for {object} in {valueIdByObject}.
   - Return {valueId}.
 
@@ -475,7 +475,7 @@ argumentValues, pathIdentity):
   - Return {graphqlResolveFieldValue(objectType, objectValue, fieldName, argumentValues)}.
 - Otherwise:
   - Let {id} be a new unique id.
-  - Let {batch} be {GetBatch(aether, pathIdentity, parentCrystalObject)}.
+  - Let {batch} be {GetBatch(aether, pathIdentity, parentCrystalObject, variables, context, rootValue)}.
   - Let {crystalContext} be {batch}.{crystalContext}.
   - Let {plan} be {batch}.{plan}.
   - If {parentObject} is a crystal object:
@@ -491,10 +491,7 @@ argumentValues, pathIdentity):
     - Let {parentPathIdentity} be the parent path for {pathIdentity}.
     - Let {parentPlanId} be the value for key {parentPathIdentity} within {aether}.{planIdByPathIdentity}.
     - Let {parentPlan} be the plan at index {parentPlanId} within {aether}.{plans}.
-    - Let {parentId} be {PopulateValuePlan(aether, parentPlan, parentObject)}.
-    - Call {PopulateValuePlan(aether, aether.variablesPlan, variables)}.
-    - Call {PopulateValuePlan(aether, aether.contextPlan, context)}.
-    - Call {PopulateValuePlan(aether, aether.rootValuePlan, rootValue)}.
+    - Let {parentId} be {GetValuePlanId(aether, parentPlan, parentObject)}.
     - Let {indexes} be an empty list.
     - Let {parentCrystalObject} be {NewCrystalObject(parentPlan, parentPathIdentity, parentId, indexes, parentObject,
       crystalContext)}.
@@ -532,8 +529,8 @@ CrystalWrap(plan, resultType, parentCrystalObject, pathIdentity, id, data, index
 
 NewCrystalObject(plan, pathIdentity, id, indexes, data, crystalContext, idByPathIdentity, indexesByPathIdentity):
 
-- If {idByPathIdentity} is not set, initialize it to an empty map.
-- If {indexesByPathIdentity} is not set, initialize it to an empty map.
+- If {idByPathIdentity} is not set, initialize it to a map containing value {crystalContext.rootId} for key `""`.
+- If {indexesByPathIdentity} is not set, initialize it to a map containing an empty list value for key `""`.
 - Let {crystalObject} be an empty object.
 - Let {crystalObject}.{crystalContext} be a reference to {crystalContext}.
 - Let {crystalObject}.{idByPathIdentity} be an independent copy of {idByPathIdentity}.
@@ -542,21 +539,33 @@ NewCrystalObject(plan, pathIdentity, id, indexes, data, crystalContext, idByPath
 - Set {indexes} as the value for key {pathIdentity} within {crystalObject}.{indexesByPathIdentity}.
 - Return {crystalObject}.
 
-NewCrystalContext():
+NewCrystalContext(aether, variables, context, rootValue):
 
 - Let {crystalContext} be an empty object.
 - Let {crystalContext}.{resultByIdByPlan} be an empty map.
 - Let {crystalContext}.{metaByPlan} be an empty map.
+- Let {rootId} be a new unique id.
+- Let {crystalContext}.{rootId} be {rootId}.
+- Let {variablesPlan} be {aether}.{variablesPlan}.
+- Call {PopulateValuePlan(crystalContext, variablesPlan, rootId, variables)}.
+- Let {contextPlan} be {aether}.{contextPlan}.
+- Call {PopulateValuePlan(crystalContext, contextPlan, rootId, context)}.
+- Let {rootValuePlan} be {aether}.{rootValuePlan}.
+- Call {PopulateValuePlan(crystalContext, rootValuePlan, rootId, rootValue)}.
 - Return {crystalContext}.
 
-GetBatch(aether, pathIdentity, parentCrystalObject):
+PopulateValuePlan(crystalContext, valuePlan, valueId, object):
+
+- Set {object} as the value for entry {valueId} for entry {valuePlan} in {crystalContext}.{resultByIdByPlan}.
+
+GetBatch(aether, pathIdentity, parentCrystalObject, variables, context, rootValue):
 
 - Let {batch} be the value for key {pathIdentity} within {aether}.{batchByPathIdentity}.
 - If {batch} is null:
   - If {parentCrystalObject} is not null:
     - Let {crystalContext} be {parentCrystalObject}.{crystalContext}.
   - Otherwise:
-    - Let {crystalContext} be {NewCrystalContext()}.
+    - Let {crystalContext} be {NewCrystalContext(aether, variables, context, rootValue)}.
   - Let {batch} be {NewBatch(aether, pathIdentity, crystalContext)}.
   - Set {batch} as the value for key {pathIdentity} within {aether}.{batchByPathIdentity}.
   - Schedule {ExecuteBatch(aether, batch, crystalContext)} to occur soon (but asynchronously). (Note: when batch is
