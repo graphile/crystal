@@ -10,7 +10,7 @@ export class ShutdownActions {
 
   invoke(): Array<Promise<void> | void> {
     if (this.didInvoke) {
-      return [];
+      throw new Error("release() has already been called.");
     }
     this.didInvoke = true;
     // Invoke in parallel.
