@@ -1,10 +1,10 @@
 export type Action = () => void | Promise<void>;
 
 export class ShutdownActions {
-  private readonly actions: Action[] = [];
+  private actions: Action[] = [];
   private didInvoke = false;
 
-  add(action: () => void | Promise<void>): void {
+  add(action: Action): void {
     this.actions.push(action);
   }
 
@@ -18,7 +18,7 @@ export class ShutdownActions {
 
   invoke(): Array<Promise<void> | void> {
     if (this.didInvoke) {
-      throw new Error("release() has already been called.");
+      throw new Error('release() has already been called.');
     }
     this.didInvoke = true;
     // Invoke in parallel.
@@ -37,6 +37,6 @@ export class ShutdownActions {
   async invokeAll(): Promise<void> {
     // This would be better if it used `Promise.allSettled()` but we can't use
     // it yet.
-    return Promise.all(this.invoke());
+    await Promise.all(this.invoke());
   }
 }
