@@ -19,9 +19,9 @@ however despite this you may use the same aether for different variables assumin
 used during the "plan execution phase" and not during the "planning phase".
 
 Note: Where `graphqlSomething` is referenced below it means use a very similar algorithm as in the GraphQL spec, however
-you will be given a {TrackedObject()} rather than the direct {variable}, {context} and {rootValue} values; so you need
-to access the properties using `.get` or `.is`. To reduce noise, we've not yet included these updated algorithms in this
-spec.
+you will be given a {TrackedObjectPlan()} rather than the direct {variable}, {context} and {rootValue} values; so you
+need to access the properties using `.get` or `.is`. To reduce noise, we've not yet included these updated algorithms in
+this spec.
 
 The first thing we need to do is call {EstablishAether()} to get the aether within which the operation will execute;
 this will also involve performing the planning if it hasn't already been done. Once we have the aether we can move on to
@@ -96,26 +96,19 @@ NewAether(schema, document, operationName, variables, context, rootValue):
 - Let {aether}.{planIdByPathIdentity} be an empty map.
 - Let {aether}.{valueIdByObjectByPlanId} be an empty map.
 
-- Let {variablesPlan} be {\_\_ValuePlan(aether)}.
 - Let {variablesConstraints} be an empty object.
-- Let {aether}.{variablesPlan} be {variablesPlan}.
 - Let {aether}.{variablesConstraints} be {variablesConstraints}.
-- Let {aether}.{trackedVariables} be {TrackedObject(variables, variablesConstraints, variablesPlan)}.
+- Let {aether}.{variablesPlan} be {TrackedObjectPlan(aether, variables, variablesConstraints)}.
 
-- Let {contextPlan} be {\_\_ValuePlan(aether)}.
 - Let {contextConstraints} be an empty object.
-- Let {aether}.{contextPlan} be {contextPlan}.
 - Let {aether}.{contextConstraints} be {contextConstraints}.
-- Let {aether}.{trackedContext} be {TrackedObject(context, contextConstraints, contextPlan)}.
+- Let {aether}.{contextPlan} be {TrackedObjectPlan(aether, context, contextConstraints)}.
 
-- Let {rootValuePlan} be {\_\_ValuePlan(aether)}.
 - Let {rootValueConstraints} be an empty object.
-- Let {aether}.{rootValuePlan} be {rootValuePlan}.
 - Let {aether}.{rootValueConstraints} be {rootValueConstraints}.
-- Let {aether}.{trackedRootValue} be {TrackedObject(rootValue, rootValueConstraints, rootValuePlan)}.
+- Let {aether}.{rootValuePlan} be {TrackedObjectPlan(aether, rootValue, rootValueConstraints)}.
 
 - Let {aether}.{subscribePlan} be {null}.
-- Let {aether}.{rootPlan} be {TrackedValuePlan(trackedRootValue)}.
 
 - If {aether}.{operation} is a query operation:
   - Let {aether}.{operationType} be {"query"}.
@@ -185,30 +178,51 @@ FinalizePlan(aether, plan):
 - Calling {finalize}.
 - Let {plan}.{finalized} be {true}.
 
-TrackedObject(object, constraints, plan):
+TrackedObjectPlan(aether, object, constraints, path):
 
-- Return an object {trackedObject}, such that:
-  - Calls to `trackedObject.get(attr)`:
-    - Return `plan.get(attr)`.
-  - Calls to `trackedObject.evalGet(attr)`:
-    - Add `{type:'value',attr:attr,value:object[attr]}` to {constraints}.
-    - Return the property `object[attr]`.
-  - Calls to `trackedObject.evalIs(attr, value)`:
-    - Add `{type:'equal',attr:attr,value:value,pass:value===object[attr]}` to {constraints}.
-    - Return `value===object[attr]`.
-  - Calls to `trackedObject.evalHas(attr)`:
-    - Add `{type:'exists',attr:attr}` to {constraints}.
-    - Return whether the property `object[attr]` exists ({null} exists, {undefined} does not).
+- If {path} is not provided, initialize it to an empty list.
+- Let {plan} be {\_\_ValuePlan(aether)}.
+- Augment {plan} such that:
+  - Calls to `plan.get(attr)`:
+    - Let {newPath} be a copy of {path} with {attr} appended.
+    - Let {value} be `object[attr]`.
+    - Return {TrackedObjectPlan(aether, value, constraints, newPath)}.
+  - Calls to `plan.evalGet(attr)`:
+    - Let {newPath} be a copy of {path} with {attr} appended.
+    - Let {value} be `object[attr]`.
+    - Add `{type: 'value', path: newPath, value: value}` to {constraints}.
+    - Return {value}.
+  - Calls to `plan.evalIs(attr, expectedValue)`:
+    - Let {newPath} be a copy of {path} with {attr} appended.
+    - Let {value} be `object[attr]`.
+    - Let {pass} be `value === expectedValue`.
+    - Add `{type: 'equal', path: newPath, expectedValue: expectedValue, pass: pass}` to {constraints}.
+    - Return {pass}.
+  - Calls to `plan.evalHas(attr)`:
+    - Let {newPath} be a copy of {path} with {attr} appended.
+    - Let {exists} be whether the property `object[attr]` exists ({null} exists, {undefined} does not).
+    - Add `{type: 'exists', path: newPath, exists: exists}` to {constraints}.
+    - Return {exists}.
   - TODO: split array stuff into separate thing?
-  - Calls to `trackedObject.at(idx)`:
-    - Return `plan.at(idx)`.
-  - Calls to `trackedObject.evalAt(idx)`:
-    - Add `{type:'value',idx:idx,value:object[idx]}` to {constraints}.
-    - Return the property `object[idx]`.
-  - Calls to `trackedObject.evalLength()`:
+  - Calls to `plan.at(idx)`:
+    - Let {newPath} be a copy of {path} with {idx} appended.
+    - Let {value} be `object[idx]`.
+    - Return {TrackedObjectPlan(aether, value, constraints, newPath)}.
+  - Calls to `plan.evalAt(idx)`:
+    - Let {newPath} be a copy of {path} with {idx} appended.
+    - Let {value} be `object[idx]`.
+    - Add `{type: 'value', path: newPath, value: value}` to {constraints}.
+    - Return {value}.
+  - Calls to `plan.evalLength()`:
     - Assert: {object} is an array.
-    - Add `{type:'length',value:object.length}` to {constraints}.
-    - Return `object.length`.
+    - Let {length} be the length of the array {object}.
+    - Add `{type: 'length', expectedLength: length}` to {constraints}.
+    - Return {length}.
+- Return {plan}.
+
+Note: a {TrackedObjectPlan()} is a {ValuePlan()} with extra `eval` methods that allow branching the plan formation
+during planning. No other plans allow this kind of plan-time branching because planning is synchronous, and
+{TrackedObjectPlan()} is the only type that represents these synchronous pieces of data.
 
 InputPlan(aether, inputType, inputValue):
 
@@ -255,8 +269,7 @@ InputObjectPlan(aether, inputType, inputValue):
     - Let {inputFieldValue} be the value provided in {inputValue} for the name {inputFieldName}.
     - If {inputFieldValue} is a {Variable}:
       - Let {variableName} be the name of {inputFieldValue}.
-      - Call `aether.trackedVariables.get(variableName)` (note: this is just to track the access, we don't use the
-        result).
+      - Call `aether.variablesPlan.get(variableName)` (note: this is just to track the access, we don't use the result).
     - Otherwise:
       - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
     - Return the property `inputValue[inputFieldName]`.
@@ -264,7 +277,7 @@ InputObjectPlan(aether, inputType, inputValue):
     - Let {inputFieldValue} be the value provided in {inputValue} for the name {inputFieldName}.
     - If {inputFieldValue} is a {Variable}:
       - Let {variableName} be the name of {inputFieldValue}.
-      - Call `aether.trackedVariables.is(variableName, value)` (note: this is just to track the access, we don't use the
+      - Call `aether.variablesPlan.is(variableName, value)` (note: this is just to track the access, we don't use the
         result).
     - Otherwise:
       - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
@@ -273,8 +286,8 @@ InputObjectPlan(aether, inputType, inputValue):
 
 TrackedArguments(aether, objectType, field):
 
-- Let {trackedVariables} be {aether}.{trackedVariables}.
-- Let {argumentValues} be the result of {graphqlCoerceArgumentValues(objectType, field, trackedVariables)}.
+- Let {variablesPlan} be {aether}.{variablesPlan}.
+- Let {argumentValues} be the result of {graphqlCoerceArgumentValues(objectType, field, variablesPlan)}.
 - Return an object {trackedObject}, such that:
   - Calls to `trackedObject.get(argumentName)`:
     - Let {argumentValue} be the value provided in {argumentValues} for the name {argumentName}.
@@ -285,24 +298,22 @@ TrackedArguments(aether, objectType, field):
     - Let {argumentValue} be the value provided in {argumentValues} for the name {argumentName}.
     - If {argumentValue} is a {Variable}:
       - Let {variableName} be the name of {argumentValue}.
-      - Call `aether.trackedVariables.get(variableName)` (note: this is just to track the access, we don't use the
-        result).
+      - Return `aether.variablesPlan.evalGet(variableName)`.
     - Otherwise:
       - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
-    - Return the property `argumentValues[argumentName]`.
+      - Return the property `argumentValues[argumentName]`.
   - Calls to `trackedObject.evalIs(argumentName, value)`:
     - Let {argumentValue} be the value provided in {argumentValues} for the name {argumentName}.
     - If {argumentValue} is a {Variable}:
       - Let {variableName} be the name of {argumentValue}.
-      - Call `aether.trackedVariables.is(variableName, value)` (note: this is just to track the access, we don't use the
-        result).
+      - Return `aether.variablesPlan.evalIs(variableName, value)`.
     - Otherwise:
       - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
-    - Return `value===argumentValues[argumentName]`.
+      - Return `value===argumentValues[argumentName]`.
 
 Note: Arguments to a field are either static (in which case they're part of the document and will never change within
 the same aether) or they are provided via variables. We want to track direct access to the variable type arguments via
-{aether}.{trackedVariables}, but access to static arguments does not require any tracking at all.
+{aether}.{variablesPlan}, but access to static arguments does not require any tracking at all.
 
 Note: This recurses - values that are static input objects can contain variables within their descendent fields. If
 input object, do recursion, otherwise StaticLeafPlan.
@@ -355,22 +366,22 @@ PlanAetherQuery(aether):
 
 - Let {rootType} be the root Query type in {aether}.{schema}.
 - Let {selectionSet} be the top level Selection Set in {aether}.{operation}.
-- Let {rootPlan} be {aether}.{rootPlan}.
-- Call {PlanSelectionSet(aether, "", rootPlan, rootType, selectionSet)}.
+- Let {rootValuePlan} be {aether}.{rootValuePlan}.
+- Call {PlanSelectionSet(aether, "", rootValuePlan, rootType, selectionSet)}.
 
 PlanAetherMutation(aether):
 
 - Let {rootType} be the root Mutation type in {aether}.{schema}.
 - Let {selectionSet} be the top level Selection Set in {aether}.{operation}.
-- Let {rootPlan} be {aether}.{rootPlan}.
-- Call {PlanSelectionSet(aether, "", rootPlan, rootType, selectionSet, true)}.
+- Let {rootValuePlan} be {aether}.{rootValuePlan}.
+- Call {PlanSelectionSet(aether, "", rootValuePlan, rootType, selectionSet, true)}.
 
 PlanAetherSubscription(aether):
 
 - Let {rootType} be the root Subscription type in {aether}.{schema}.
 - Let {selectionSet} be the top level Selection Set in {aether}.{operation}.
-- Let {trackedVariables} be {aether}.{trackedVariables}.
-- Let {groupedFieldSet} be the result of {graphqlCollectFields(rootType, selectionSet, trackedVariables)}.
+- Let {variablesPlan} be {aether}.{variablesPlan}.
+- Let {groupedFieldSet} be the result of {graphqlCollectFields(rootType, selectionSet, variablesPlan)}.
 - If {groupedFieldSet} does not have exactly one entry, throw a query error.
 - Let {fields} be the value of the first entry in {groupedFieldSet}.
 - Let {fieldName} be the name of the first entry in {fields}. Note: This value is unaffected if an alias is used.
@@ -378,8 +389,8 @@ PlanAetherSubscription(aether):
 - Let {subscriptionPlanResolver} be `field.extensions.graphile.subscribePlan`.
 - If {subscriptionPlanResolver} exists:
   - Let {trackedArguments} be {TrackedArguments(aether, rootType, field)}.
-  - Let {rootPlan} be {aether}.{rootPlan}.
-  - Let {subscribePlan} be {ExecutePlanResolver(aether, subscriptionPlanResolver, rootPlan, trackedArguments)}.
+  - Let {rootValuePlan} be {aether}.{rootValuePlan}.
+  - Let {subscribePlan} be {ExecutePlanResolver(aether, subscriptionPlanResolver, rootValuePlan, trackedArguments)}.
   - Call {PlanFieldArguments(aether, field, trackedArguments, subscribePlan)}.
 - Otherwise:
   - Let {subscribePlan} be {aether}.{rootValuePlan}.
@@ -390,9 +401,9 @@ PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequentia
 
 - If {isSequential} is not provided, initialize it to {false}.
 - Assert: {objectType} is an object type.
-- Let {trackedVariables} be {aether}.{trackedVariables}.
-- Let {groupedFieldSet} be the result of {graphqlCollectFields(objectType, selectionSet, trackedVariables)} with
-  modified algorithm to factor `groupId`/`maxGroupId` in (based on fragments with `@defer`, `@stream`, etc).
+- Let {variablesPlan} be {aether}.{variablesPlan}.
+- Let {groupedFieldSet} be the result of {graphqlCollectFields(objectType, selectionSet, variablesPlan)} with modified
+  algorithm to factor `groupId`/`maxGroupId` in (based on fragments with `@defer`, `@stream`, etc).
 - For each {groupedFieldSet} as {responseKey} and {fields}:
   - Let {pathIdentity} be `path + ">" + objectType.name + "." + responseKey`.
   - Let {field} be the first entry in {fields}.
@@ -446,60 +457,60 @@ PlanFieldArguments(aether, field, trackedArguments, fieldPlan):
     - Call {PlanFieldArgument(aether, argument, trackedArgumentValue, fieldPlan)}.
 - Return.
 
-PlanFieldArgument(aether, argument, trackedValue, fieldPlan):
+PlanFieldArgument(aether, argument, trackedValuePlan, fieldPlan):
 
 - Let {planResolver} be `argument.extensions.graphile.plan`.
 - If {planResolver} exists:
-  - Let {argumentPlan} be {ExecutePlanResolver(aether, planResolver, fieldPlan, trackedValue)}.
+  - Let {argumentPlan} be {ExecutePlanResolver(aether, planResolver, fieldPlan, trackedValuePlan)}.
   - If {argumentPlan} is not {null}:
     - Let {argumentType} be the expected type of {argument}.
-    - Call {PlanInput(aether, argumentType, trackedValue, argumentPlan)}.
+    - Call {PlanInput(aether, argumentType, trackedValuePlan, argumentPlan)}.
 - Return.
 
-PlanInput(aether, inputType, trackedValue, parentPlan):
+PlanInput(aether, inputType, trackedValuePlan, parentPlan):
 
 - If {inputType} is a non-null type:
   - Let {innerInputType} be the inner type of {inputType}.
-  - Call {PlanInput(aether, innerInputType, trackedValue, parentPlan)}.
+  - Call {PlanInput(aether, innerInputType, trackedValuePlan, parentPlan)}.
   - Return.
 - Otherwise, if {inputType} is a list type:
-  - If {trackedValue} {evalIs} {null}:
+  - If {trackedValuePlan} {evalIs} {null}:
     - Call {parentPlan}.{null()}.
     - Return.
   - Let {innerInputType} be the inner type of {inputType}.
   - Let {length} be {trackedArguments}.{evalLength}.
   - For {i} from {0...length-1}:
     - Let {listItemParentPlan} be the result of calling {parentPlan}.{itemPlan()}.
-    - Let {trackedListValue} be {trackedValue}.{at(i)}.
+    - Let {trackedListValue} be {trackedValuePlan}.{at(i)}.
     - Call {PlanInput(aether, innerInputType, trackedListValue, listItemParentPlan)}.
   - Return.
 - Otherwise, if {inputType} is an input object type:
-  - If {trackedValue} {evalIs} {null}:
+  - If {trackedValuePlan} {evalIs} {null}:
     - TODO: should we indicate to the parent that this is null as opposed to an empty object?
     - Return.
-  - Call {PlanInputFields(aether, inputType, trackedValue, parentPlan)}.
+  - Call {PlanInputFields(aether, inputType, trackedValuePlan, parentPlan)}.
 - Otherwise, raise an invalid plan error.
 
 Note: we are only expecting to {PlanInput()} for objects or lists thereof, not scalars.
 
-PlanInputFields(aether, inputObjectType, trackedValue, parentPlan):
+PlanInputFields(aether, inputObjectType, trackedValuePlan, parentPlan):
 
 - For each input field {inputField} in {inputObjectType}:
   - Let {fieldName} be the name of {inputField}.
-  - If {trackedValue} {evalHas} {fieldName}:
-    - Let {trackedFieldValue} be {trackedValue}.{get(fieldName)}.
+  - If {trackedValuePlan} {evalHas} {fieldName}:
+    - Let {trackedFieldValue} be {trackedValuePlan}.{get(fieldName)}.
     - Call {PlanInputField(aether, inputField, trackedFieldValue, fieldPlan)}.
 - Return.
 
-PlanInputField(aether, inputField, trackedValue, parentPlan):
+PlanInputField(aether, inputField, trackedValuePlan, parentPlan):
 
 - Let {planResolver} be `inputField.extensions.graphile.plan`.
 - Assert: {planResolver} exists.
-- Let {inputFieldPlan} be {ExecutePlanResolver(aether, planResolver, parentPlan, trackedValue)}.
+- Let {inputFieldPlan} be {ExecutePlanResolver(aether, planResolver, parentPlan, trackedValuePlan)}.
 - If {inputFieldPlan} is not {null}:
   - Let {inputFieldType} be the expected type of {inputField}.
   - Note: the unwrapped type of {inputFieldType} must be an input object.
-  - Call {PlanInput(aether, inputFieldType, trackedValue, inputFieldPlan)}.
+  - Call {PlanInput(aether, inputFieldType, trackedValuePlan, inputFieldPlan)}.
 - Return.
 
 ExecutePlanResolver(aether, planResolver, parentPlan, trackedArguments):
