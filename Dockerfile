@@ -44,7 +44,6 @@ FROM node:12-alpine
 LABEL description="Instant extensible high-performance GraphQL API for your PostgreSQL database https://graphile.org/postgraphile"
 
 EXPOSE 5000
-ENV GRAPHILE_TURBO=1
 WORKDIR /postgraphile/
 ENTRYPOINT ["./cli.js"]
 

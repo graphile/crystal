@@ -6,6 +6,7 @@ import StorageAPI from 'graphiql/dist/utility/StorageAPI';
 import './postgraphiql.css';
 import { buildClientSchema, getIntrospectionQuery, isType, GraphQLObjectType } from 'graphql';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
+import { createClient } from 'graphql-ws';
 import formatSQL from '../formatSQL';
 
 const defaultQuery = `\
@@ -54,7 +55,7 @@ const {
     graphqlUrl: 'http://localhost:5000/graphql',
     streamUrl: 'http://localhost:5000/graphql/stream',
     enhanceGraphiql: true,
-    subscriptions: true,
+    websockets: 'none', // 'none' | 'v0' | 'v1'
     allowExplain: true,
     credentials: 'same-origin',
   },
@@ -103,17 +104,105 @@ class PostGraphiQL extends React.PureComponent {
     headersTextValid: true,
     explorerIsOpen: this._storage.get('explorerIsOpen') === 'false' ? false : true,
     haveActiveSubscription: false,
-    socketStatus:
-      POSTGRAPHILE_CONFIG.enhanceGraphiql && POSTGRAPHILE_CONFIG.subscriptions ? 'pending' : null,
+    socketStatus: POSTGRAPHILE_CONFIG.websockets === 'none' ? null : 'pending',
   };
 
-  subscriptionsClient =
-    POSTGRAPHILE_CONFIG.enhanceGraphiql && POSTGRAPHILE_CONFIG.subscriptions
-      ? new SubscriptionClient(websocketUrl, {
+  restartRequested = false;
+  restartSubscriptionsClient = () => {
+    // implementation will be replaced...
+    this.restartRequested = true;
+  };
+
+  maybeSubscriptionsClient = () => {
+    switch (POSTGRAPHILE_CONFIG.websockets) {
+      case 'none':
+        return;
+      case 'v0':
+        const client = new SubscriptionClient(websocketUrl, {
           reconnect: true,
           connectionParams: () => this.getHeaders() || {},
-        })
-      : null;
+        });
+        const unlisten1 = client.on('connected', () => {
+          this.setState({ socketStatus: 'connected', error: null });
+        });
+        const unlisten2 = client.on('disconnected', () => {
+          this.setState({ socketStatus: 'closed', error: new Error('Socket disconnected') });
+        });
+        const unlisten3 = client.on('connecting', () => {
+          this.setState({ socketStatus: 'connecting' });
+        });
+        const unlisten4 = client.on('reconnected', () => {
+          this.setState({ socketStatus: 'connected', error: null });
+        });
+        const unlisten5 = client.on('reconnecting', () => {
+          this.setState({ socketStatus: 'connecting' });
+        });
+        const unlisten6 = client.on('error', error => {
+          // tslint:disable-next-line no-console
+          console.error('Client connection error', error);
+          this.setState({ error: new Error('Subscriptions client connection error') });
+        });
+        this.unlistenV0SubscriptionsClient = () => {
+          unlisten1();
+          unlisten2();
+          unlisten3();
+          unlisten4();
+          unlisten5();
+          unlisten6();
+        };
+
+        // restart by closing the socket which should trigger a silent reconnect
+        this.restartSubscriptionsClient = () => {
+          this.subscriptionsClient.close(false, true);
+        };
+
+        // if any restarts were missed during the connection
+        // phase, restart and reset the request
+        if (this.restartRequested) {
+          this.restartRequested = false;
+          this.restartSubscriptionsClient();
+        }
+
+        return client;
+      case 'v1':
+        return createClient({
+          url: websocketUrl,
+          lazy: false,
+          retryAttempts: Infinity, // keep retrying while the browser is open
+          connectionParams: () => this.getHeaders() || {},
+          on: {
+            connecting: () => {
+              this.setState({ socketStatus: 'connecting' });
+            },
+            connected: socket => {
+              this.setState({ socketStatus: 'connected', error: null });
+
+              // restart by closing the socket which will trigger a silent reconnect
+              this.restartSubscriptionsClient = () => {
+                if (socket.readyState === WebSocket.OPEN) {
+                  socket.close(4205, 'Client Restart');
+                }
+              };
+
+              // if any restarts were missed during the connection
+              // phase, restart and reset the request
+              if (this.restartRequested) {
+                this.restartRequested = false;
+                this.restartSubscriptionsClient();
+              }
+            },
+            closed: closeEvent => {
+              this.setState({
+                socketStatus: 'closed',
+                error: new Error(`Socket closed with ${closeEvent.code} ${closeEvent.reason}`),
+              });
+            },
+          },
+        });
+      default:
+        throw new Error(`Invalid websockets argument ${POSTGRAPHILE_CONFIG.websockets}`);
+    }
+  };
 
   activeSubscription = null;
 
@@ -121,41 +210,8 @@ class PostGraphiQL extends React.PureComponent {
     // Update the schema for the first time. Log an error if we fail.
     this.updateSchema();
 
-    if (this.subscriptionsClient) {
-      const unlisten1 = this.subscriptionsClient.on('connected', () => {
-        this.setState({ socketStatus: 'connected', error: null });
-      });
-      const unlisten2 = this.subscriptionsClient.on('disconnected', () => {
-        this.setState({ socketStatus: 'disconnected' });
-      });
-      const unlisten3 = this.subscriptionsClient.on('connecting', () => {
-        this.setState({ socketStatus: 'connecting' });
-      });
-      const unlisten4 = this.subscriptionsClient.on('reconnected', () => {
-        this.setState({ socketStatus: 'reconnected', error: null });
-        setTimeout(() => {
-          this.setState(state =>
-            state.socketStatus === 'reconnected' ? { socketStatus: 'connected' } : {},
-          );
-        }, 5000);
-      });
-      const unlisten5 = this.subscriptionsClient.on('reconnecting', () => {
-        this.setState({ socketStatus: 'reconnecting' });
-      });
-      const unlisten6 = this.subscriptionsClient.on('error', error => {
-        // tslint:disable-next-line no-console
-        console.error('Client connection error', error);
-        this.setState({ error: new Error('Subscriptions client connection error') });
-      });
-      this.unlistenSubscriptionsClient = () => {
-        unlisten1();
-        unlisten2();
-        unlisten3();
-        unlisten4();
-        unlisten5();
-        unlisten6();
-      };
-    }
+    // Connect socket if should connect
+    this.subscriptionsClient = this.maybeSubscriptionsClient();
 
     // If we were given a `streamUrl`, we want to construct an `EventSource`
     // and add listeners.
@@ -207,7 +263,17 @@ class PostGraphiQL extends React.PureComponent {
   }
 
   componentWillUnmount() {
-    if (this.unlistenSubscriptionsClient) this.unlistenSubscriptionsClient();
+    // Dispose of connection if available
+    if (this.subscriptionsClient) {
+      if (this.unlistenV0SubscriptionsClient) {
+        // v0
+        this.unlistenV0SubscriptionsClient();
+      } else {
+        // v1
+        this.subscriptionsClient.dispose();
+      }
+      this.subscriptionsClient = null;
+    }
     // Close out our event source so we get no more events.
     this._eventSource.close();
     this._eventSource = null;
@@ -329,6 +395,7 @@ class PostGraphiQL extends React.PureComponent {
   fetcher = graphQLParams => {
     this.cancelSubscription();
     if (isSubscription(graphQLParams) && this.subscriptionsClient) {
+      const client = this.subscriptionsClient;
       return {
         subscribe: observer => {
           setTimeout(() => {
@@ -337,7 +404,32 @@ class PostGraphiQL extends React.PureComponent {
             observer.next('Waiting for subscription to yield data…');
           }, 0);
 
-          const subscription = this.subscriptionsClient.request(graphQLParams).subscribe(observer);
+          const subscription =
+            POSTGRAPHILE_CONFIG.websockets === 'v0'
+              ? client.request(graphQLParams).subscribe(observer)
+              : // v1
+                {
+                  unsubscribe: client.subscribe(graphQLParams, {
+                    next: observer.next,
+                    complete: observer.complete,
+                    error: err => {
+                      if (err instanceof Error) {
+                        observer.error(err);
+                      } else if (err instanceof CloseEvent) {
+                        observer.error(
+                          new Error(
+                            `Socket closed with event ${err.code}` + err.reason
+                              ? `: ${err.reason}` // reason will be available on clean closes
+                              : '',
+                          ),
+                        );
+                      } else {
+                        // GraphQLError[]
+                        observer.error(new Error(err.map(({ message }) => message).join(', ')));
+                      }
+                    },
+                  }),
+                };
           this.setState({ haveActiveSubscription: true });
           this.activeSubscription = subscription;
           return subscription;
@@ -502,7 +594,7 @@ class PostGraphiQL extends React.PureComponent {
         }
         if (this.state.headersTextValid && this.subscriptionsClient) {
           // Reconnect to websocket with new headers
-          this.subscriptionsClient.close(false, true);
+          this.restartSubscriptionsClient();
         }
       },
     );
@@ -579,10 +671,8 @@ class PostGraphiQL extends React.PureComponent {
     const icon =
       {
         connecting: '🤔',
-        reconnecting: '😓',
         connected: '😀',
-        reconnected: '😅',
-        disconnected: '☹️',
+        closed: '☹️',
       }[socketStatus] || '😐';
     const tick = (
       <path fill="transparent" stroke="white" d="M30,50 L45,65 L70,30" strokeWidth="8" />
@@ -593,18 +683,14 @@ class PostGraphiQL extends React.PureComponent {
     const decoration =
       {
         connecting: null,
-        reconnecting: null,
         connected: tick,
-        reconnected: tick,
-        disconnected: cross,
+        closed: cross,
       }[socketStatus] || null;
     const color =
       {
         connected: 'green',
-        reconnected: 'green',
         connecting: 'orange',
-        reconnecting: 'orange',
-        disconnected: 'red',
+        closed: 'red',
       }[socketStatus] || 'gray';
     const svg = (
       <svg width="25" height="25" viewBox="0 0 100 100" style={{ marginTop: 4 }}>

@@ -30,13 +30,14 @@ export {
   createPostGraphileSchema,
   watchPostGraphileSchema,
   withPostGraphileContext,
-  enhanceHttpServerWithSubscriptions,
+  enhanceHttpServerWithWebSockets,
   debugPgClient,
-  // Backwards compatability
+  // Backwards compatibility
   postgraphile as postgraphql,
   createPostGraphileSchema as createPostGraphQLSchema,
   watchPostGraphileSchema as watchPostGraphQLSchema,
   withPostGraphileContext as withPostGraphQLContext,
+  enhanceHttpServerWithWebSockets as enhanceHttpServerWithSubscriptions,
 } from './postgraphile';
 
 export {

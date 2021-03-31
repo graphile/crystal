@@ -10,6 +10,7 @@
  */
 import config from './postgraphilerc';
 
+import * as os from 'os';
 import { createServer } from 'http';
 import chalk from 'chalk';
 import program = require('commander');
@@ -24,7 +25,7 @@ import debugFactory = require('debug');
 import { mixed } from '../interfaces';
 import * as manifest from '../../package.json';
 import sponsors = require('../../sponsors.json');
-import { enhanceHttpServerWithSubscriptions } from './http/subscriptions';
+import { enhanceHttpServerWithWebSockets } from './http/subscriptions';
 import { existsSync } from 'fs';
 
 const tagsFile = process.cwd() + '/postgraphile.tags.json5';
@@ -117,7 +118,16 @@ program
   )
   .option(
     '-S, --subscriptions',
-    'Enable GraphQL websocket transport support for subscriptions (you still need a subscriptions plugin currently)',
+    'Enable GraphQL support for subscriptions (you still need a subscriptions plugin currently)',
+  )
+  .option(
+    '--websockets <string>',
+    "Choose which websocket transport libraries to use. Use commas to define multiple. Defaults to 'v0,v1' if `--subscriptions` or `--live` were passed, '[]' otherwise",
+    (option: string) => option.split(','),
+  )
+  .option(
+    '--websocket-operations <operations>',
+    "Toggle which GraphQL websocket transport operations are supported: 'subscriptions' or 'all'. Defaults to 'subscriptions'",
   )
   .option(
     '-L, --live',
@@ -426,6 +436,7 @@ const {
   ownerConnection,
   subscriptions,
   live,
+  websockets = subscriptions || live ? ['v0', 'v1'] : [],
   watch: watchPg,
   schema: dbSchema,
   host: hostname = 'localhost',
@@ -516,6 +527,20 @@ if (!['omit', 'only', 'deprecated'].includes(rawLegacyRelations)) {
   );
 } else {
   legacyRelations = rawLegacyRelations;
+}
+
+// Validate websockets argument
+if (
+  // must be array
+  !Array.isArray(websockets) ||
+  // empty array = 'none'
+  (websockets.length &&
+    // array can only hold the versions
+    websockets.some(ver => !['v0', 'v1'].includes(ver)))
+) {
+  exitWithErrorMessage(
+    `Invalid argument to '--websockets' - expected 'v0' and/or 'v1' (separated by comma); but received '${websockets}'`,
+  );
 }
 
 const noServer = !yesServer;
@@ -670,6 +695,7 @@ const postgraphileOptions = pluginHook(
     retryOnInitFail,
     pgDefaultRole,
     subscriptions: subscriptions || live,
+    websockets,
     live,
     watchPg,
     showErrorStack,
@@ -791,8 +817,8 @@ if (noServer) {
       server.timeout = serverTimeout;
     }
 
-    if (postgraphileOptions.subscriptions) {
-      enhanceHttpServerWithSubscriptions(server, middleware);
+    if (websockets.length) {
+      enhanceHttpServerWithWebSockets(server, middleware);
     }
 
     pluginHook('cli:server:created', server, {
@@ -854,7 +880,7 @@ if (noServer) {
                 postgraphileOptions.live ||
                 postgraphileOptions.subscriptions
                   ? ''
-                  : ` (enhance with '--enhance-graphiql')`),
+                  : ` (${chalk.bold('RECOMMENDATION')}: add '--enhance-graphiql')`),
             `Postgres connection: ${chalk.underline.magenta(safeConnectionString)}${
               postgraphileOptions.watchPg ? ' (watching)' : ''
             }`,
@@ -862,6 +888,7 @@ if (noServer) {
             `Documentation:       ${chalk.underline(
               `https://graphile.org/postgraphile/introduction/`,
             )}`,
+            `Node.js version:     ${process.version} on ${os.platform()} ${os.arch()}`,
             extractedPlugins.length === 0
               ? `Join ${chalk.bold(
                   sponsor,

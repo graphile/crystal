@@ -9,41 +9,53 @@ sponsor](https://graphile.org/sponsor/).
 - Chad Furman
 - Storyscript
 - Postlight
+- Surge.io
+- Sterblue
+- Politics Rewired
 
 ## Leaders
 
 - Joe Dennis
-- domonda
-- James Allain
-- Jack Dinker
-- Robert Claypool
 - Qwick
-- Nigel Taylor
+- domonda
+- Jack Dinker
 - DocIQ
-- Principia Mentis
-- Partners in School Innovation
-- OpenLaw NZ
-- Sterblue
+- Robert Claypool
+- Nigel Taylor
 - HR-ON
-- Ian Stewart
 - Dovetail
+- Ian Stewart
 - Jacob Gillespie
+- Cameron Ellis
+- Luxor Labs
+- sunroominc
+- Qloo
 
 ## Supporters
 
-- Daniel Einspanjer
-- Sam Levin
 - stlbucket
+- Simon Elliott
+- Sam Levin
 - Matt Bretl
+- Daniel Einspanjer
 - Chris Watland
-- Mark Rapoza
+- Mark
 - innovation.rocks
-- purge
 - Daniel Woelfel
-- Bjørn Michelsen
 - Philipp Litzenberger
-- CJ
 - apoland
-- Cameron Ellis
+- James Rascoe
+- Bjørn Michelsen
+- CJ
 - Mansoor Razzaq
-- rcy
+- Ryan Yeske
+- Keith Layne
+- Olli Selamaa
+- qoby
+- Paul Melnikow
+- Stéphane Klein
+- Dani Kenan
+- Vinzenz Weber
+- Jimmy Liu
+- Splitgraph
+- Zippr.io

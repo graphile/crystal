@@ -8,6 +8,8 @@ import {
 import { WithPostGraphileContextFn } from './withPostGraphileContext';
 import { version } from '../../package.json';
 import * as graphql from 'graphql';
+import * as graphqlWs from 'graphql-ws';
+import { Extra as GraphQLWSContextExtra } from 'graphql-ws/lib/use/ws';
 import { ExecutionParams } from 'subscriptions-transport-ws';
 import { PostGraphileResponse } from './http/frameworks';
 
@@ -86,6 +88,16 @@ export interface PostGraphilePlugin {
   'postgraphile:validationRules'?: HookFn<typeof graphql.specifiedRules>; // AVOID THIS where possible; use 'postgraphile:validationRules:static' instead.
 
   'postgraphile:ws:onOperation'?: HookFn<ExecutionParams>;
+  'postgraphile:ws:onSubscribe'?: HookFn<
+    graphql.ExecutionArgs & {
+      document: graphql.DocumentNode | null; // optional for persisted query support
+    },
+    {
+      context: graphqlWs.Context<GraphQLWSContextExtra>;
+      message: graphqlWs.SubscribeMessage;
+      options: CreateRequestHandlerOptions;
+    }
+  >;
 
   withPostGraphileContext?: HookFn<WithPostGraphileContextFn>;
 }

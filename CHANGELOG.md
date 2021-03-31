@@ -8,6 +8,43 @@ to you also.
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
+# [4.12.0-alpha.0](https://github.com/graphile/postgraphile/compare/v4.11.0...v4.12.0-alpha.0) (2021-02-15)
+
+# [4.11.0](https://github.com/graphile/postgraphile/compare/v4.11.0-rc.0...v4.11.0) (2021-01-29)
+
+### Bug Fixes
+
+- **deps:** upgrade Graphile Engine ([#1434](https://github.com/graphile/postgraphile/issues/1434)) ([06deeee](https://github.com/graphile/postgraphile/commit/06deeeec2eb3ac194063230510b8047d56f3866b))
+
+# [4.11.0-rc.0](https://github.com/graphile/postgraphile/compare/v4.11.0-alpha.1...v4.11.0-rc.0) (2021-01-22)
+
+### Bug Fixes
+
+- **turbo:** warn users that Node v14 is required ([#1411](https://github.com/graphile/postgraphile/issues/1411)) ([36481db](https://github.com/graphile/postgraphile/commit/36481db7ab49de589ef0294e6f6002fdeca74f17))
+
+# [4.11.0-alpha.1](https://github.com/graphile/postgraphile/compare/v4.11.0-alpha.0...v4.11.0-alpha.1) (2020-12-11)
+
+### Bug Fixes
+
+- **docker:** remove GRAPHILE_TURBO ([#1407](https://github.com/graphile/postgraphile/issues/1407)) ([af39c3d](https://github.com/graphile/postgraphile/commit/af39c3dcea40646c9217785fa93a9601612c2b83))
+- **ws:** fix missing websockets config on CLI ([#1417](https://github.com/graphile/postgraphile/issues/1417)) ([4e58a0e](https://github.com/graphile/postgraphile/commit/4e58a0e2c38a27712849c4f81f3975bfa536abe0))
+
+# [4.11.0-alpha.0](https://github.com/graphile/postgraphile/compare/v4.10.0...v4.11.0-alpha.0) (2020-11-28)
+
+### Features
+
+- **subscriptions:** support `graphql-ws` and all operations over websockets ([#1338](https://github.com/graphile/postgraphile/issues/1338)) ([c04d670](https://github.com/graphile/postgraphile/commit/c04d6703c602bd0b023dc083f0741779b713fbd0))
+
+# [4.10.0](https://github.com/graphile/postgraphile/compare/v4.10.0-alpha.0...v4.10.0) (2020-11-27)
+
+### Bug Fixes
+
+- **types:** use interface to enable declaration merging ([#1404](https://github.com/graphile/postgraphile/issues/1404)) ([06d4196](https://github.com/graphile/postgraphile/commit/06d4196f52599a8aa557863a27e17157df1205d2))
+
+### Features
+
+- add Node version info and clarify enhance-graphiql ([#1401](https://github.com/graphile/postgraphile/issues/1401)) ([aa7f4f9](https://github.com/graphile/postgraphile/commit/aa7f4f9f34561d79cc12882e3913323c372accb6))
+
 # [4.10.0-alpha.0](https://github.com/graphile/postgraphile/compare/v4.9.2...v4.10.0-alpha.0) (2020-11-18)
 
 ### Bug Fixes
