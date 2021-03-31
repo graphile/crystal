@@ -148,7 +148,7 @@ TODO: merge similar plans, etc.
 TreeShakePlans(aether):
 
 - For each key {pathIdentity} and value {planId} in {aether}.{planIdByPathIdentity}:
-  - Let {plan} be the plan at index {id} within {aether}.{plans}.
+  - Let {plan} be the plan at index {planId} within {aether}.{plans}.
   - Call {MarkPlanActive(plan)}.
 - For each {inactivePlan} with index {i} in {aether}.{plans} where {inactivePlan}.{active} is {false}:
   - Replace the {i}th entry in {aether}.{plans} with {null}.
@@ -302,8 +302,11 @@ NewPlan(aether):
 StaticInputLeafPlan(aether, value):
 
 - Let {plan} be {NewPlan(aether)}.
-- TODO: this represents a static "leaf" value, but will return it via a plan. The plan will always evaluate to the same
-  value.
+- Let the internal function provided by {plan} for evaluating the plan, {eval}, be a function that returns {value} for
+  each input crystal object.
+- Return {plan}.
+
+This represents a static "leaf" value, but will return it via a plan. The plan will always evaluate to the same value.
 
 ValuePlan(aether):
 
@@ -311,6 +314,7 @@ ValuePlan(aether):
 - TODO: this represents a concrete object value that'll be passed later; e.g. the result of the parent resolver when the
   parent resolver does not return a plan. Like all plans it actually represents a batch of values; you can
   `.get(attrName)` to get a plan that resolves to the relevant attribute value from the value plan.
+- Return {plan}.
 
 PlanAetherQuery(aether):
 
@@ -363,13 +367,13 @@ PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequentia
     - Let {aether}.{groupId} be {aether}.{maxGroupId}.
   - Let {fieldName} be the name of {field}. Note: This value is unaffected if an alias is used.
   - Let {fieldType} be the return type defined for the field {fieldName} of {objectType}.
-  - Let {planResolver} be `field.extensions.graphile.subscribePlan`.
+  - Let {planResolver} be `field.extensions.graphile.plan`.
   - If {planResolver} is not {null}:
     - Let {trackedArguments} be {TrackedArguments(aether, objectType, field)}.
     - Let {plan} be {ExecutePlanResolver(aether, planResolver, parentPlan, trackedArguments)}.
     - Call {PlanFieldArguments(aether, field, trackedArguments, plan)}.
   - Otherwise:
-    - Let {plan} be {ValuePlan(aether)}.
+    - Let {plan} be {ValuePlan(aether)}. (Note: this is populated in {GetParentId}.)
   - Set {plan}.{id} as the value for {pathIdentity} in {aether}.{planIdByPathIdentity}.
   - Let {unwrappedFieldType} be the named type of {fieldType}.
   - TODO: what do list types mean for plans?
@@ -438,6 +442,22 @@ If executing the plan results in an error, throw the error. Otherwise we should 
 (keeping track of all the previous values too (see the parent object), perhaps using their plan id?) which we then pass
 through to the underlying resolver.
 
+GetParentId(aether, parentPathIdentity, parentObject):
+
+- Let {valueIdByParentObject} be the map for {parentPathIdentity} within the map
+  {aether}.{valueIdByParentObjectByParentPathIdentity}.
+- Let {parentId} be the value for {parentObject} within the map {valueIdByParentObject}.
+- If {parentId} is set:
+  - Return {parentId}.
+- Otherwise:
+  - Let {parentPlanId} be the value for key {parentPathIdentity} within {aether}.{planIdByPathIdentity}.
+  - Let {parentPlan} be the plan at index {parentPlanId} within {aether}.{plans}.
+  - Assert: {parentPlan} is a {ValuePlan}.
+  - Let {parentId} be a new unique id.
+  - Set {parentObject} as the value for entry {parentId} for entry {parentPlan} in {crystalContext}.{resultByIdByPlan}.
+    (Note: this populates the {ValuePlan} for this specific parent.)
+  - Return {parentId}.
+
 ResolveFieldValueCrystal(schema, document, operationName, variables, context, rootValue, field, alias, parentObject,
 argumentValues, pathIdentity):
 
@@ -445,8 +465,8 @@ argumentValues, pathIdentity):
 - Let {objectType} be the object type on which {field} is defined.
 - Let {resultType} be the expected type of {field}.
 - Let {aether} be {EstablishAether(schema, document, operationName, variables, context, rootValue)}.
-- Let {id} be the value for {pathIdentity} within {aether}.{planIdByPathIdentity}.
-- Let {plan} be the plan at index {id} within {aether}.{plans}.
+- Let {planId} be the value for key {pathIdentity} within {aether}.{planIdByPathIdentity}.
+- Let {plan} be the plan at index {planId} within {aether}.{plans}.
 - If {plan} is null:
   - If {parentObject} is a crystal wrapped value:
     - Let {objectValue} be the data within {parentObject}.
@@ -465,10 +485,11 @@ argumentValues, pathIdentity):
       for multiple parallel executions (must be within the same aether) - e.g. as a result of multiple identical
       subscription operations.)
   - Otherwise:
-    - Let {parentId} be a new unique id.
+    - (Note: we need to "fake" that the parent was a plan. Because we may have lots of resolvers all called for the same
+      parent object, we use a map. This happens to mean that multiple values in the graph being the same object will be
+      merged automatically.)
     - Let {parentPathIdentity} be the parent path for {pathIdentity}.
-    - Let {parentPlanId} be the value for key {parentPathIdentity} within {aether}.{planIdByPathIdentity}.
-    - Let {parentPlan} be the plan at index {parentPlanId} within {aether}.{planIdByPathIdentity}.
+    - Let {parentId} be {GetParentId(aether, parentPathIdentity, parentObject)}.
     - Let {indexes} be an empty list.
     - Let {parentCrystalObject} be {NewCrystalObject(parentPlan, parentPathIdentity, parentId, indexes, parentObject,
       crystalContext)}.
@@ -496,6 +517,10 @@ CrystalWrap(plan, resultType, parentCrystalObject, pathIdentity, id, data, index
     - Push {wrappedEntry} onto {result}.
   - Return {result}.
 - Otherwise:
+  - If {parentCrystalObject} is provided:
+    - Let {crystalContext} be a reference to {parentCrystalObject}'s {crystalContext}.
+    - Let {idByPathIdentity} be a reference to {parentCrystalObject}'s {idByPathIdentity}.
+    - Let {indexesByPathIdentity} be a reference to {parentCrystalObject}'s {indexesByPathIdentity}.
   - Let {crystalObject} be {NewCrystalObject(plan, pathIdentity, id, indexes, data, crystalContext, idByPathIdentity,
     indexesByPathIdentity)}.
   - Return {crystalObject}.
@@ -539,7 +564,7 @@ NewBatch(aether, pathIdentity, crystalContext):
 - Let {batch}.{pathIdentity} be {pathIdentity}.
 - Let {batch}.{crystalContext} be {crystalContext}.
 - Let {planId} be the value for key {pathIdentity} within {aether}.{planIdByPathIdentity}.
-- Let {plan} be the plan at index {id} within {aether}.{plans}.
+- Let {plan} be the plan at index {planId} within {aether}.{plans}.
 - Let {batch}.{plan} be {plan}.
 - Let {batch}.{entries} be an empty list.
 - Return {batch}.
