@@ -29,12 +29,6 @@ export class ShutdownActions {
   async invokeAll(): Promise<void> {
     // This would be better if it used `Promise.allSettled()` but we can't use
     // it yet.
-    for (const promise of this.invoke()) {
-      if (promise) {
-        try {
-          await promise;
-        } catch (e) {} // eslint-disable-line no-empty
-      }
-    }
+    return Promise.all(this.invoke());
   }
 }
