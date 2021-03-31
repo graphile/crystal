@@ -314,7 +314,7 @@ export default function postgraphile<
     getGqlSchema: getGraphQLSchema,
     pgPool,
     _emitter,
-    release: async () => await shutdownActions.invokeAll(),
+    release: (): Promise<void> => shutdownActions.invokeAll(),
   });
 }
 
