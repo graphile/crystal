@@ -153,7 +153,8 @@ export function getPostgraphileSchemaBuilder<
             const diff = process.hrtime(start);
             const dur = diff[0] * 1e3 + diff[1] * 1e-6;
             if (!retry) {
-              await releaseOnce();
+              // Swallow new error so old error is still thrown
+              await releaseOnce().catch(e => {console.error(e)});
               throw error;
             } else {
               if (dur < 50) {
