@@ -94,12 +94,13 @@ NewAether(schema, document, operationName, variables, context, rootValue):
 - Let {aether}.{groupId} be {aether}.{maxGroupId}.
 - Let {aether}.{plans} be an empty list.
 - Let {aether}.{planIdByPathIdentity} be an empty map.
+- Let {aether}.{valueIdByObjectByPlanId} be an empty map.
 
-- Let {variablePlan} be {ValuePlan(aether)}.
-- Let {variableConstraints} be an empty object.
-- Let {aether}.{variablePlan} be {variablePlan}.
-- Let {aether}.{variableConstraints} be {variableConstraints}.
-- Let {aether}.{trackedVariables} be {TrackedObject(variables, variableConstraints, variablePlan)}.
+- Let {variablesPlan} be {ValuePlan(aether)}.
+- Let {variablesConstraints} be an empty object.
+- Let {aether}.{variablesPlan} be {variablesPlan}.
+- Let {aether}.{variablesConstraints} be {variablesConstraints}.
+- Let {aether}.{trackedVariables} be {TrackedObject(variables, variablesConstraints, variablesPlan)}.
 
 - Let {contextPlan} be {ValuePlan(aether)}.
 - Let {contextConstraints} be an empty object.
@@ -196,7 +197,7 @@ InputPlan(aether, inputType, inputValue):
 
 - If {inputValue} is a {Variable}:
   - Let {variableName} be the name of {inputValue}.
-  - Return `aether.variablePlan.get(variableName)`.
+  - Return `aether.variablesPlan.get(variableName)`.
 - If {inputType} is a non-null type:
   - Let {innerType} be the inner type of {inputType}.
   - Return {InputPlan(aether, innerType, inputValue)}.
@@ -373,7 +374,7 @@ PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequentia
     - Let {plan} be {ExecutePlanResolver(aether, planResolver, parentPlan, trackedArguments)}.
     - Call {PlanFieldArguments(aether, field, trackedArguments, plan)}.
   - Otherwise:
-    - Let {plan} be {ValuePlan(aether)}. (Note: this is populated in {GetParentId}.)
+    - Let {plan} be {ValuePlan(aether)}. (Note: this is populated in {PopulateValuePlan}.)
   - Set {plan}.{id} as the value for {pathIdentity} in {aether}.{planIdByPathIdentity}.
   - Let {unwrappedFieldType} be the named type of {fieldType}.
   - TODO: what do list types mean for plans?
@@ -442,21 +443,20 @@ If executing the plan results in an error, throw the error. Otherwise we should 
 (keeping track of all the previous values too (see the parent object), perhaps using their plan id?) which we then pass
 through to the underlying resolver.
 
-GetParentId(aether, parentPathIdentity, parentObject):
+PopulateValuePlan(aether, valuePlan, object):
 
-- Let {valueIdByParentObject} be the map for {parentPathIdentity} within the map
-  {aether}.{valueIdByParentObjectByParentPathIdentity}.
-- Let {parentId} be the value for {parentObject} within the map {valueIdByParentObject}.
-- If {parentId} is set:
-  - Return {parentId}.
+- Assert: {valuePlan} is a {ValuePlan}.
+- Let {valueIdByObject} be the map for {valuePlan.id} within the map {aether}.{valueIdByObjectByPlanId} (creating the
+  entry if necessary).
+- Let {parentId} be the value for {object} within the map {valueIdByObject}.
+- If {valueId} is set:
+  - Return {valueId}.
 - Otherwise:
-  - Let {parentPlanId} be the value for key {parentPathIdentity} within {aether}.{planIdByPathIdentity}.
-  - Let {parentPlan} be the plan at index {parentPlanId} within {aether}.{plans}.
-  - Assert: {parentPlan} is a {ValuePlan}.
-  - Let {parentId} be a new unique id.
-  - Set {parentObject} as the value for entry {parentId} for entry {parentPlan} in {crystalContext}.{resultByIdByPlan}.
-    (Note: this populates the {ValuePlan} for this specific parent.)
-  - Return {parentId}.
+  - Let {valueId} be a new unique id.
+  - Set {object} as the value for entry {valueId} for entry {valuePlan} in {crystalContext}.{resultByIdByPlan}. (Note:
+    this populates the {ValuePlan} for this specific parent.)
+  - Set {valueId} as the value for {object} in {valueIdByObject}.
+  - Return {valueId}.
 
 ResolveFieldValueCrystal(schema, document, operationName, variables, context, rootValue, field, alias, parentObject,
 argumentValues, pathIdentity):
@@ -489,7 +489,12 @@ argumentValues, pathIdentity):
       parent object, we use a map. This happens to mean that multiple values in the graph being the same object will be
       merged automatically.)
     - Let {parentPathIdentity} be the parent path for {pathIdentity}.
-    - Let {parentId} be {GetParentId(aether, parentPathIdentity, parentObject)}.
+    - Let {parentPlanId} be the value for key {parentPathIdentity} within {aether}.{planIdByPathIdentity}.
+    - Let {parentPlan} be the plan at index {parentPlanId} within {aether}.{plans}.
+    - Let {parentId} be {PopulateValuePlan(aether, parentPlan, parentObject)}.
+    - Call {PopulateValuePlan(aether, aether.variablesPlan, variables)}.
+    - Call {PopulateValuePlan(aether, aether.contextPlan, context)}.
+    - Call {PopulateValuePlan(aether, aether.rootValuePlan, rootValue)}.
     - Let {indexes} be an empty list.
     - Let {parentCrystalObject} be {NewCrystalObject(parentPlan, parentPathIdentity, parentId, indexes, parentObject,
       crystalContext)}.
