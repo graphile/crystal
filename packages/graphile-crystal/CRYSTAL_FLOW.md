@@ -167,6 +167,8 @@ MarkPlanActive(plan, visitedPlans):
 - Let {plan}.{active} be {true}.
 - For each {dependencyPlan} in {plan}.{dependencies}:
   - Call {MarkPlanActive(dependencyPlan)}.
+- For each {childPlan} in {plan}.{children}:
+  - Call {MarkPlanActive(dependencyPlan)}.
 
 FinalizePlans(aether):
 
@@ -308,7 +310,10 @@ input object, do recursion, otherwise StaticLeafPlan.
 NewPlan(aether):
 
 - Let {plan} be an empty object.
-- Let {plan}.{dependencies} be an empty list.
+- Let {plan}.{dependencies} be an empty list. (Note: this is plans this plan will need the data from in order to
+  execute.)
+- Let {plan}.{children} be an empty list. (Note: this is plans that this plan might execute; currently it's the expected
+  way that {BranchPlan()} might work.)
 - Let {plan}.{finalized} be {false}.
 - Let {plan}.{groupId} be {aether}.{groupId}.
 - Let {plan}.{id} be the length of {aether}.{plans}.
@@ -339,6 +344,12 @@ Note: `__ValuePlan` has an underscore prefix since users should never use it; it
 
 Note: this plan is never executed; it's purely internal - we populate the value as part of the algorithm - see
 {GetValuePlanId} and {PopulateValuePlan}.
+
+BranchPlan(aether):
+
+- TODO: this'll allow branching between multiple other plans, e.g. in the case of a union/interface, but also based on
+  custom user logic (e.g. fetching different things depending on your billing level, or only showing certain things if
+  your authorization allows that).
 
 PlanAetherQuery(aether):
 
