@@ -187,11 +187,24 @@ TrackedObject(object, constraints, plan):
   - Calls to `trackedObject.get(attr)`:
     - Return `plan.get(attr)`.
   - Calls to `trackedObject.evalGet(attr)`:
-    - Add `{type:'value',value:object[attr]}` to {constraints}.
+    - Add `{type:'value',attr:attr,value:object[attr]}` to {constraints}.
     - Return the property `object[attr]`.
   - Calls to `trackedObject.evalIs(attr, value)`:
-    - Add `{type:'equal',value:value,pass:value===object[attr]}` to {constraints}.
+    - Add `{type:'equal',attr:attr,value:value,pass:value===object[attr]}` to {constraints}.
     - Return `value===object[attr]`.
+  - Calls to `trackedObject.evalHas(attr)`:
+    - Add `{type:'exists',attr:attr}` to {constraints}.
+    - Return whether the property `object[attr]` exists ({null} exists, {undefined} does not).
+  - TODO: split array stuff into separate thing?
+  - Calls to `trackedObject.at(idx)`:
+    - Return `plan.at(idx)`.
+  - Calls to `trackedObject.evalAt(idx)`:
+    - Add `{type:'value',idx:idx,value:object[idx]}` to {constraints}.
+    - Return the property `object[idx]`.
+  - Calls to `trackedObject.evalLength()`:
+    - Assert: {object} is an array.
+    - Add `{type:'length',value:object.length}` to {constraints}.
+    - Return `object.length`.
 
 InputPlan(aether, inputType, inputValue):
 
@@ -350,23 +363,23 @@ PlanAetherSubscription(aether):
 - Let {fieldName} be the name of the first entry in {fields}. Note: This value is unaffected if an alias is used.
 - Let {field} be the field named {fieldName} on {rootType}.
 - Let {subscriptionPlanResolver} be `field.extensions.graphile.subscribePlan`.
-- Let {subscribePlan} be {aether}.{subscribePlan}.
 - If {subscriptionPlanResolver} exists:
   - Let {trackedArguments} be {TrackedArguments(aether, rootType, field)}.
   - Let {rootPlan} be {aether}.{rootPlan}.
-  - Let {aether}.{subscribePlan} be {ExecutePlanResolver(aether, subscriptionPlanResolver, rootPlan, trackedArguments)}.
+  - Let {subscribePlan} be {ExecutePlanResolver(aether, subscriptionPlanResolver, rootPlan, trackedArguments)}.
   - Call {PlanFieldArguments(aether, field, trackedArguments, subscribePlan)}.
+- Otherwise:
+  - Let {subscribePlan} be {aether}.{rootValuePlan}.
+- Let {aether}.{subscribePlan} be {subscribePlan}.
 - Call {PlanSelectionSet(aether, "", subscribePlan, rootType, selectionSet)}.
-
-TODO: should we be passing aether.subscribePlan here? Something else?
 
 PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequential):
 
 - If {isSequential} is not provided, initialize it to {false}.
 - Assert: {objectType} is an object type.
 - Let {trackedVariables} be {aether}.{trackedVariables}.
-- TODO: factor `groupId` in here, based on fragments with `@defer`... Maybe need to use a different grouping algorithm?
-- Let {groupedFieldSet} be the result of {graphqlCollectFields(objectType, selectionSet, trackedVariables)}.
+- Let {groupedFieldSet} be the result of {graphqlCollectFields(objectType, selectionSet, trackedVariables)} with
+  modified algorithm to factor `groupId`/`maxGroupId` in (based on fragments with `@defer`, `@stream`, etc).
 - For each {groupedFieldSet} as {responseKey} and {fields}:
   - Let {pathIdentity} be `path + ">" + objectType.name + "." + responseKey`.
   - Let {field} be the first entry in {fields}.
@@ -385,7 +398,8 @@ PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequentia
     - Let {plan} be {\_\_ValuePlan(aether)}. (Note: this is populated in {GetValuePlanId}.)
   - Set {plan}.{id} as the value for {pathIdentity} in {aether}.{planIdByPathIdentity}.
   - Let {unwrappedFieldType} be the named type of {fieldType}.
-  - TODO: what do list types mean for plans?
+  - (Note: when implementing types, we should see the list depth of fieldType and assert that the data to be returned
+    has the same depth if we can.)
   - If {unwrappedFieldType} is an Object, Interface or Union type:
     - Let {subSelectionSet} be the result of calling {graphqlMergeSelectionSets(fields)}.
     - If {unwrappedFieldType} is an object type:
@@ -412,11 +426,68 @@ PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequentia
 
 PlanFieldArguments(aether, field, trackedArguments, fieldPlan):
 
-- TODO: ... then call PlanInputFields as appropriate
+- For each argument {argument} in {field}:
+  - Let {argumentName} be the name of {argument}.
+  - If {trackedArguments} {evalHas} {argumentName}:
+    - Let {trackedArgumentValue} be {trackedArguments}.{get(argumentName)}.
+    - Call {PlanFieldArgument(aether, argument, trackedArgumentValue, fieldPlan)}.
+- Return.
 
-PlanInputFields(aether, inputObjectType, trackedValues, parentPlan):
+PlanFieldArgument(aether, argument, trackedValue, fieldPlan):
 
-- TODO
+- Let {planResolver} be `argument.extensions.graphile.plan`.
+- If {planResolver} exists:
+  - Let {argumentPlan} be {ExecutePlanResolver(aether, planResolver, fieldPlan, trackedValue)}.
+  - If {argumentPlan} is not {null}:
+    - Let {argumentType} be the expected type of {argument}.
+    - Call {PlanInput(aether, argumentType, trackedValue, argumentPlan)}.
+- Return.
+
+PlanInput(aether, inputType, trackedValue, parentPlan):
+
+- If {inputType} is a non-null type:
+  - Let {innerInputType} be the inner type of {inputType}.
+  - Call {PlanInput(aether, innerInputType, trackedValue, parentPlan)}.
+  - Return.
+- Otherwise, if {inputType} is a list type:
+  - If {trackedValue} {evalIs} {null}:
+    - Call {parentPlan}.{null()}.
+    - Return.
+  - Let {innerInputType} be the inner type of {inputType}.
+  - Let {length} be {trackedArguments}.{evalLength}.
+  - For {i} from {0...length-1}:
+    - Let {listItemParentPlan} be the result of calling {parentPlan}.{itemPlan()}.
+    - Let {trackedListValue} be {trackedValue}.{at(i)}.
+    - Call {PlanInput(aether, innerInputType, trackedListValue, listItemParentPlan)}.
+  - Return.
+- Otherwise, if {inputType} is an input object type:
+  - If {trackedValue} {evalIs} {null}:
+    - TODO: should we indicate to the parent that this is null as opposed to an empty object?
+    - Return.
+  - Call {PlanInputFields(aether, inputType, trackedValue, parentPlan)}.
+- Otherwise, raise an invalid plan error.
+
+Note: we are only expecting to {PlanInput()} for objects or lists thereof, not scalars.
+
+PlanInputFields(aether, inputObjectType, trackedValue, parentPlan):
+
+- For each input field {inputField} in {inputObjectType}:
+  - Let {fieldName} be the name of {inputField}.
+  - If {trackedValue} {evalHas} {fieldName}:
+    - Let {trackedFieldValue} be {trackedValue}.{get(fieldName)}.
+    - Call {PlanInputField(aether, inputField, trackedFieldValue, fieldPlan)}.
+- Return.
+
+PlanInputField(aether, inputField, trackedValue, parentPlan):
+
+- Let {planResolver} be `inputField.extensions.graphile.plan`.
+- Assert: {planResolver} exists.
+- Let {inputFieldPlan} be {ExecutePlanResolver(aether, planResolver, parentPlan, trackedValue)}.
+- If {inputFieldPlan} is not {null}:
+  - Let {inputFieldType} be the expected type of {inputField}.
+  - Note: the unwrapped type of {inputFieldType} must be an input object.
+  - Call {PlanInput(aether, inputFieldType, trackedValue, inputFieldPlan)}.
+- Return.
 
 ExecutePlanResolver(aether, planResolver, parentPlan, trackedArguments):
 
