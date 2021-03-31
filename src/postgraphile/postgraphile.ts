@@ -50,8 +50,9 @@ export function getPostgraphileSchemaBuilder<
   let releaseWatchFn: null | (() => Promise<void>) = null;
   async function releaseWatch() {
     if (releaseWatchFn) {
-      await releaseWatchFn();
+      const fn = releaseWatchFn;
       releaseWatchFn = null;
+      await fn();
     }
   }
 
