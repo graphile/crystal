@@ -8,6 +8,14 @@ export class ShutdownActions {
     this.actions.push(action);
   }
 
+  remove(action: Action): void {
+    const index = this.actions.indexOf(action);
+    if (index === -1) {
+      throw Error('The specified shutdown action was not found.');
+    }
+    this.actions.splice(index, 1);
+  }
+
   invoke(): Array<Promise<void> | void> {
     if (this.didInvoke) {
       throw new Error("release() has already been called.");
