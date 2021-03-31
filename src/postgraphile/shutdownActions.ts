@@ -14,7 +14,9 @@ export class ShutdownActions {
     }
     this.didInvoke = true;
     // Invoke in parallel.
-    return this.actions.map(fn => {
+    const actions = this.actions;
+    this.actions = [];
+    return actions.map(fn => {
       // Ensure that all actions are called, even if a previous action throws an error
       try {
         return fn();
