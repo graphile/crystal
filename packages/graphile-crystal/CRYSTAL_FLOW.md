@@ -96,19 +96,19 @@ NewAether(schema, document, operationName, variables, context, rootValue):
 - Let {aether}.{planIdByPathIdentity} be an empty map.
 - Let {aether}.{valueIdByObjectByPlanId} be an empty map.
 
-- Let {variablesPlan} be {ValuePlan(aether)}.
+- Let {variablesPlan} be {\_\_ValuePlan(aether)}.
 - Let {variablesConstraints} be an empty object.
 - Let {aether}.{variablesPlan} be {variablesPlan}.
 - Let {aether}.{variablesConstraints} be {variablesConstraints}.
 - Let {aether}.{trackedVariables} be {TrackedObject(variables, variablesConstraints, variablesPlan)}.
 
-- Let {contextPlan} be {ValuePlan(aether)}.
+- Let {contextPlan} be {\_\_ValuePlan(aether)}.
 - Let {contextConstraints} be an empty object.
 - Let {aether}.{contextPlan} be {contextPlan}.
 - Let {aether}.{contextConstraints} be {contextConstraints}.
 - Let {aether}.{trackedContext} be {TrackedObject(context, contextConstraints, contextPlan)}.
 
-- Let {rootValuePlan} be {ValuePlan(aether)}.
+- Let {rootValuePlan} be {\_\_ValuePlan(aether)}.
 - Let {rootValueConstraints} be an empty object.
 - Let {aether}.{rootValuePlan} be {rootValuePlan}.
 - Let {aether}.{rootValueConstraints} be {rootValueConstraints}.
@@ -309,13 +309,21 @@ StaticInputLeafPlan(aether, value):
 
 This represents a static "leaf" value, but will return it via a plan. The plan will always evaluate to the same value.
 
-ValuePlan(aether):
+\_\_ValuePlan(aether):
 
 - Let {plan} be {NewPlan(aether)}.
-- TODO: this represents a concrete object value that'll be passed later; e.g. the result of the parent resolver when the
-  parent resolver does not return a plan. Like all plans it actually represents a batch of values; you can
-  `.get(attrName)` to get a plan that resolves to the relevant attribute value from the value plan.
+- Let the internal function provided by {plan} for evaluating the plan, {eval}, be a function that throws an internal
+  consistency error.
 - Return {plan}.
+
+This represents a concrete object value that'll be passed later; e.g. the result of the parent resolver when the parent
+resolver does not return a plan. Like all plans it actually represents a batch of values; you can `.get(attrName)` to
+get a plan that resolves to the relevant attribute value from the value plan.
+
+Note: `__ValuePlan` has an underscore prefix since users should never use it; it's an internal plan.
+
+Note: this plan is never executed; it's purely internal - we populate the value as part of the algorithm - see
+{GetValuePlanId} and {PopulateValuePlan}.
 
 PlanAetherQuery(aether):
 
@@ -374,7 +382,7 @@ PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequentia
     - Let {plan} be {ExecutePlanResolver(aether, planResolver, parentPlan, trackedArguments)}.
     - Call {PlanFieldArguments(aether, field, trackedArguments, plan)}.
   - Otherwise:
-    - Let {plan} be {ValuePlan(aether)}. (Note: this is populated in {GetValuePlanId}.)
+    - Let {plan} be {\_\_ValuePlan(aether)}. (Note: this is populated in {GetValuePlanId}.)
   - Set {plan}.{id} as the value for {pathIdentity} in {aether}.{planIdByPathIdentity}.
   - Let {unwrappedFieldType} be the named type of {fieldType}.
   - TODO: what do list types mean for plans?
@@ -445,7 +453,7 @@ through to the underlying resolver.
 
 GetValuePlanId(aether, valuePlan, object):
 
-- Assert: {valuePlan} is a {ValuePlan}.
+- Assert: {valuePlan} is a {\_\_ValuePlan}.
 - Let {valueIdByObject} be the map for {valuePlan.id} within the map {aether}.{valueIdByObjectByPlanId} (creating the
   entry if necessary).
 - Let {parentId} be the value for {object} within the map {valueIdByObject}.
@@ -453,8 +461,8 @@ GetValuePlanId(aether, valuePlan, object):
   - Return {valueId}.
 - Otherwise:
   - Let {valueId} be a new unique id.
-  - Call {PopulateValuePlan(crystalContext, valuePlan, valueId, object)}. (Note: this populates the {ValuePlan} for this
-    specific parent.)
+  - Call {PopulateValuePlan(crystalContext, valuePlan, valueId, object)}. (Note: this populates the {\_\_ValuePlan} for
+    this specific parent.)
   - Set {valueId} as the value for {object} in {valueIdByObject}.
   - Return {valueId}.
 
