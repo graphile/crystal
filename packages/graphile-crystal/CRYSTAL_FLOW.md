@@ -146,6 +146,8 @@ OptimizePlan(aether, plan):
 
 TODO: merge similar plans, etc.
 
+Note: we must never optimise {\_\_ValuePlan()} plans.
+
 TreeShakePlans(aether):
 
 - For each key {pathIdentity} and value {planId} in {aether}.{planIdByPathIdentity}:
@@ -525,7 +527,7 @@ through to the underlying resolver.
 GetValuePlanId(aether, valuePlan, object):
 
 - Assert: {valuePlan} is a {\_\_ValuePlan}.
-- Let {valueIdByObject} be the map for {valuePlan.id} within the map {aether}.{valueIdByObjectByPlanId} (creating the
+- Let {valueIdByObject} be the map for {valuePlan}.{id} within the map {aether}.{valueIdByObjectByPlanId} (creating the
   entry if necessary).
 - Let {parentId} be the value for {object} within the map {valueIdByObject}.
 - If {valueId} is set:
@@ -608,7 +610,7 @@ CrystalWrap(plan, resultType, parentCrystalObject, pathIdentity, id, data, index
 
 NewCrystalObject(plan, pathIdentity, id, indexes, data, crystalContext, idByPathIdentity, indexesByPathIdentity):
 
-- If {idByPathIdentity} is not set, initialize it to a map containing value {crystalContext.rootId} for key `""`.
+- If {idByPathIdentity} is not set, initialize it to a map containing value {crystalContext}.{rootId} for key `""`.
 - If {indexesByPathIdentity} is not set, initialize it to a map containing an empty list value for key `""`.
 - Let {crystalObject} be an empty object.
 - Let {crystalObject}.{crystalContext} be a reference to {crystalContext}.
