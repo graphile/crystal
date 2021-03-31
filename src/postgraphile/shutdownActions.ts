@@ -21,9 +21,9 @@ export class ShutdownActions {
       throw new Error('release() has already been called.');
     }
     this.didInvoke = true;
-    // Invoke in parallel.
     const actions = this.actions;
     this.actions = [];
+    // Invoke in parallel.
     return actions.map(fn => {
       // Ensure that all actions are called, even if a previous action throws an error
       try {
