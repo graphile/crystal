@@ -61,15 +61,14 @@ IsAetherCompatible(aether, schema, document, operationName, variableValues, cont
 
 MatchesConstraints(constraints, object):
 
-- For each key {key} in object {constraints}:
-  - Let {keyConstraints} be the value of {constraints} stored under key {key}.
-  - Let {keyValue} be the value of {object} stored under key {key}.
-  - For each entry {constraint} in {keyConstraints}:
-    - If not {MatchesConstraint(constraint, keyValue)}:
-      - Return {false}.
+- For each {constraint} in {constraints}:
+  - If not {MatchesConstraint(constraint, object)}:
+    - Return {false}.
 - Return {true}.
 
 MatchesConstraint(constraint, value):
+
+- TODO: update this to match new constraints logic (constraint contains a path to navigate through the value).
 
 - If {constraint}.{type} is {'value'}:
   - Return {true} if {value} is equal to {constraint}.{value}, otherwise {false}.
@@ -97,15 +96,15 @@ NewAether(schema, document, operationName, variableValues, context, rootValue):
 - Let {aether}.{planIdByPathIdentity} be an empty map.
 - Let {aether}.{valueIdByObjectByPlanId} be an empty map.
 
-- Let {variablesConstraints} be an empty object.
-- Let {aether}.{variablesConstraints} be {variablesConstraints}.
-- Let {aether}.{variablesPlan} be {TrackedObjectPlan(aether, variableValues, variablesConstraints)}.
+- Let {variableValuesConstraints} be an empty list.
+- Let {aether}.{variableValuesConstraints} be {variableValuesConstraints}.
+- Let {aether}.{variablesPlan} be {TrackedObjectPlan(aether, variableValues, variableValuesConstraints)}.
 
-- Let {contextConstraints} be an empty object.
+- Let {contextConstraints} be an empty list.
 - Let {aether}.{contextConstraints} be {contextConstraints}.
 - Let {aether}.{contextPlan} be {TrackedObjectPlan(aether, context, contextConstraints)}.
 
-- Let {rootValueConstraints} be an empty object.
+- Let {rootValueConstraints} be an empty list.
 - Let {aether}.{rootValueConstraints} be {rootValueConstraints}.
 - Let {aether}.{rootValuePlan} be {TrackedObjectPlan(aether, rootValue, rootValueConstraints)}.
 
