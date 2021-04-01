@@ -566,7 +566,7 @@ argumentValues, pathIdentity):
 
 - Let {fieldName} be the name of {field}.
 - Let {objectType} be the object type on which {field} is defined.
-- Let {resultType} be the expected type of {field}.
+- Let {returnType} be the expected type of {field}.
 - Let {aether} be {EstablishAether(schema, document, operationName, variables, context, rootValue)}.
 - Let {planId} be the value for key {pathIdentity} within {aether}.{planIdByPathIdentity}.
 - Let {plan} be the plan at index {planId} within {aether}.{plans}.
@@ -603,18 +603,18 @@ argumentValues, pathIdentity):
     you, so the crystal object received will always have a non-list value stored under 'id', but each entry in the
     returned results will have a different crystal object, all with the same 'id'. It's possible that 'id' is not the
     right name to give this property since there will be many with the same value.)~~
-  - Return {CrystalWrap(plan, resultType, parentCrystalObject, pathIdentity, id, result)}.
+  - Return {CrystalWrap(plan, returnType, parentCrystalObject, pathIdentity, id, result)}.
 
-CrystalWrap(plan, resultType, parentCrystalObject, pathIdentity, id, data, indexes):
+CrystalWrap(plan, returnType, parentCrystalObject, pathIdentity, id, data, indexes):
 
 - If {indexes} is not set, initialize it to an empty list.
 - If {data} is {null}:
   - Return {null}.
-- Otherwise, if {resultType} is a non-null type:
-  - Let {innerType} be the inner type of {resultType}.
+- Otherwise, if {returnType} is a non-null type:
+  - Let {innerType} be the inner type of {returnType}.
   - Return {CrystalWrap(plan, innerType, parentCrystalObject, pathIdentity, id, data)}.
-- Otherwise, if {resultType} is a list type:
-  - Let {innerType} be the inner type of {resultType}.
+- Otherwise, if {returnType} is a list type:
+  - Let {innerType} be the inner type of {returnType}.
   - Let {result} be an empty list.
   - For each {entry} with index {index} in {data}:
     - Let {wrappedIndexes} be a list composed of everything in {indexes} followed by {index}.
