@@ -1,10 +1,13 @@
+import * as assert from "assert";
 import { Constraint } from "./constraints";
 import {
   GraphQLSchema,
   OperationDefinitionNode,
   FragmentDefinitionNode,
+  GraphQLField,
 } from "graphql";
 import { Plan, TrackedObjectPlan, assertFinalized } from "./plan";
+import { graphqlCollectFields } from "./graphqlCollectFields";
 
 /**
  * Implements the `MarkPlanActive` algorithm.
@@ -141,12 +144,40 @@ export class Aether {
     const selectionSet = this.operation.selectionSet;
     const variableValuesPlan = this.variableValuesPlan;
     const groupedFieldSet = graphqlCollectFields(
+      this,
       rootType,
       selectionSet,
       variableValuesPlan,
     );
-    // TODO: continue
-    // this.planSelectionSet("", this.rootValuePlan, rootType, selectionSet, true);
+    let firstKey: string | undefined = undefined;
+    for (const key of groupedFieldSet.keys()) {
+      if (firstKey !== undefined) {
+        throw new Error("subscriptions may only have one top-level field");
+      }
+      firstKey = key;
+    }
+    assert.ok(firstKey != null, "selection set cannot be empty");
+    const fields = groupedFieldSet.get(firstKey);
+    if (!fields) {
+      throw new Error("Consistency error.");
+    }
+    const fieldSelection = fields[0];
+    const fieldName = fieldSelection.name.value; // Unaffected by alias.
+    const rootTypeFields = rootType.getFields();
+    const field: GraphQLField<any, any> = rootTypeFields[fieldName];
+    const subscriptionPlanResolver = field.extensions?.graphile?.subscribePlan;
+    if (subscriptionPlanResolver) {
+      const trackedArguments = this.getTrackedArguments(rootType, field);
+      const subscribePlan = this.executePlanResolver(
+        subscriptionPlanResolver,
+        this.rootValuePlan,
+        trackedArguments,
+      );
+      this.planFieldArguments(field, trackedArguments, subscribePlan);
+      this.planSelectionSet("", subscribePlan, rootType, selectionSet);
+    } else {
+      this.planSelectionSet("", this.rootValuePlan, rootType, selectionSet);
+    }
   }
 
   /**
