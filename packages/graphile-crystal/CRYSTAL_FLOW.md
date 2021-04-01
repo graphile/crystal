@@ -98,7 +98,7 @@ NewAether(schema, document, operationName, variableValues, context, rootValue):
 
 - Let {variableValuesConstraints} be an empty list.
 - Let {aether}.{variableValuesConstraints} be {variableValuesConstraints}.
-- Let {aether}.{variablesPlan} be {TrackedObjectPlan(aether, variableValues, variableValuesConstraints)}.
+- Let {aether}.{variableValuesPlan} be {TrackedObjectPlan(aether, variableValues, variableValuesConstraints)}.
 
 - Let {contextConstraints} be an empty list.
 - Let {aether}.{contextConstraints} be {contextConstraints}.
@@ -108,23 +108,21 @@ NewAether(schema, document, operationName, variableValues, context, rootValue):
 - Let {aether}.{rootValueConstraints} be {rootValueConstraints}.
 - Let {aether}.{rootValuePlan} be {TrackedObjectPlan(aether, rootValue, rootValueConstraints)}.
 
-- Let {aether}.{subscribePlan} be {null}.
-
-- If {aether}.{operation} is a query operation:
+* If {aether}.{operation} is a query operation:
   - Let {aether}.{operationType} be {"query"}.
   - Call {PlanAetherQuery(aether)}.
-- Otherwise, if {aether}.{operation} is a mutation operation:
+* Otherwise, if {aether}.{operation} is a mutation operation:
   - Let {aether}.{operationType} be {"mutation"}.
   - Call {PlanAetherMutation(aether)}.
-- Otherwise, if {aether}.{operation} is a subscription operation:
+* Otherwise, if {aether}.{operation} is a subscription operation:
   - Let {aether}.{operationType} be {"subscription"}.
   - Call {PlanAetherSubscription(aether)}.
-- Otherwise:
+* Otherwise:
   - Raise unknown operation type error.
-- Call {OptimizePlans(aether)}.
-- Call {TreeShakePlans(aether)}.
-- Call {FinalizePlans(aether)}.
-- Return {aether}.
+* Call {OptimizePlans(aether)}.
+* Call {TreeShakePlans(aether)}.
+* Call {FinalizePlans(aether)}.
+* Return {aether}.
 
 OptimizePlans(aether):
 
@@ -228,7 +226,7 @@ InputPlan(aether, inputType, inputValue):
 
 - If {inputValue} is a {Variable}:
   - Let {variableName} be the name of {inputValue}.
-  - Return `aether.variablesPlan.get(variableName)`.
+  - Return `aether.variableValuesPlan.get(variableName)`.
 - If {inputType} is a non-null type:
   - Let {innerType} be the inner type of {inputType}.
   - Return {InputPlan(aether, innerType, inputValue)}.
@@ -269,7 +267,8 @@ InputObjectPlan(aether, inputType, inputValue):
     - Let {inputFieldValue} be the value provided in {inputValue} for the name {inputFieldName}.
     - If {inputFieldValue} is a {Variable}:
       - Let {variableName} be the name of {inputFieldValue}.
-      - Call `aether.variablesPlan.get(variableName)` (note: this is just to track the access, we don't use the result).
+      - Call `aether.variableValuesPlan.get(variableName)` (note: this is just to track the access, we don't use the
+        result).
     - Otherwise:
       - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
     - Return the property `inputValue[inputFieldName]`.
@@ -277,8 +276,8 @@ InputObjectPlan(aether, inputType, inputValue):
     - Let {inputFieldValue} be the value provided in {inputValue} for the name {inputFieldName}.
     - If {inputFieldValue} is a {Variable}:
       - Let {variableName} be the name of {inputFieldValue}.
-      - Call `aether.variablesPlan.is(variableName, value)` (note: this is just to track the access, we don't use the
-        result).
+      - Call `aether.variableValuesPlan.is(variableName, value)` (note: this is just to track the access, we don't use
+        the result).
     - Otherwise:
       - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
     - Return `value===inputValue[inputFieldName]`.
@@ -286,8 +285,8 @@ InputObjectPlan(aether, inputType, inputValue):
 
 TrackedArguments(aether, objectType, field):
 
-- Let {variablesPlan} be {aether}.{variablesPlan}.
-- Let {argumentValues} be the result of {graphqlCoerceArgumentValues(objectType, field, variablesPlan)}.
+- Let {variableValuesPlan} be {aether}.{variableValuesPlan}.
+- Let {argumentValues} be the result of {graphqlCoerceArgumentValues(objectType, field, variableValuesPlan)}.
 - Return an object {trackedObject}, such that:
   - Calls to `trackedObject.get(argumentName)`:
     - Let {argumentValue} be the value provided in {argumentValues} for the name {argumentName}.
@@ -298,7 +297,7 @@ TrackedArguments(aether, objectType, field):
     - Let {argumentValue} be the value provided in {argumentValues} for the name {argumentName}.
     - If {argumentValue} is a {Variable}:
       - Let {variableName} be the name of {argumentValue}.
-      - Return `aether.variablesPlan.evalGet(variableName)`.
+      - Return `aether.variableValuesPlan.evalGet(variableName)`.
     - Otherwise:
       - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
       - Return the property `argumentValues[argumentName]`.
@@ -306,14 +305,14 @@ TrackedArguments(aether, objectType, field):
     - Let {argumentValue} be the value provided in {argumentValues} for the name {argumentName}.
     - If {argumentValue} is a {Variable}:
       - Let {variableName} be the name of {argumentValue}.
-      - Return `aether.variablesPlan.evalIs(variableName, value)`.
+      - Return `aether.variableValuesPlan.evalIs(variableName, value)`.
     - Otherwise:
       - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
       - Return `value===argumentValues[argumentName]`.
 
 Note: Arguments to a field are either static (in which case they're part of the document and will never change within
 the same aether) or they are provided via variables. We want to track direct access to the variable type arguments via
-{aether}.{variablesPlan}, but access to static arguments does not require any tracking at all.
+{aether}.{variableValuesPlan}, but access to static arguments does not require any tracking at all.
 
 Note: This recurses - values that are static input objects can contain variables within their descendent fields. If
 input object, do recursion, otherwise StaticLeafPlan.
@@ -380,8 +379,8 @@ PlanAetherSubscription(aether):
 
 - Let {rootType} be the root Subscription type in {aether}.{schema}.
 - Let {selectionSet} be the top level Selection Set in {aether}.{operation}.
-- Let {variablesPlan} be {aether}.{variablesPlan}.
-- Let {groupedFieldSet} be the result of {graphqlCollectFields(rootType, selectionSet, variablesPlan)}.
+- Let {variableValuesPlan} be {aether}.{variableValuesPlan}.
+- Let {groupedFieldSet} be the result of {graphqlCollectFields(rootType, selectionSet, variableValuesPlan)}.
 - If {groupedFieldSet} does not have exactly one entry, throw a query error.
 - Let {fields} be the value of the first entry in {groupedFieldSet}.
 - Let {fieldName} be the name of the first entry in {fields}. Note: This value is unaffected if an alias is used.
@@ -394,16 +393,15 @@ PlanAetherSubscription(aether):
   - Call {PlanFieldArguments(aether, field, trackedArguments, subscribePlan)}.
 - Otherwise:
   - Let {subscribePlan} be {aether}.{rootValuePlan}.
-- Let {aether}.{subscribePlan} be {subscribePlan}.
 - Call {PlanSelectionSet(aether, "", subscribePlan, rootType, selectionSet)}.
 
 PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequential):
 
 - If {isSequential} is not provided, initialize it to {false}.
 - Assert: {objectType} is an object type.
-- Let {variablesPlan} be {aether}.{variablesPlan}.
-- Let {groupedFieldSet} be the result of {graphqlCollectFields(objectType, selectionSet, variablesPlan)} with modified
-  algorithm to factor `groupId`/`maxGroupId` in (based on fragments with `@defer`, `@stream`, etc).
+- Let {variableValuesPlan} be {aether}.{variableValuesPlan}.
+- Let {groupedFieldSet} be the result of {graphqlCollectFields(objectType, selectionSet, variableValuesPlan)} with
+  modified algorithm to factor `groupId`/`maxGroupId` in (based on fragments with `@defer`, `@stream`, etc).
 - For each {groupedFieldSet} as {responseKey} and {fields}:
   - Let {pathIdentity} be `path + ">" + objectType.name + "." + responseKey`.
   - Let {field} be the first entry in {fields}.
@@ -649,8 +647,8 @@ NewCrystalContext(aether, variableValues, context, rootValue):
 - Let {crystalContext}.{metaByPlan} be an empty map.
 - Let {rootId} be a new unique id.
 - Let {crystalContext}.{rootId} be {rootId}.
-- Let {variablesPlan} be {aether}.{variablesPlan}.
-- Call {PopulateValuePlan(crystalContext, variablesPlan, rootId, variableValues)}.
+- Let {variableValuesPlan} be {aether}.{variableValuesPlan}.
+- Call {PopulateValuePlan(crystalContext, variableValuesPlan, rootId, variableValues)}.
 - Let {contextPlan} be {aether}.{contextPlan}.
 - Call {PopulateValuePlan(crystalContext, contextPlan, rootId, context)}.
 - Let {rootValuePlan} be {aether}.{rootValuePlan}.
