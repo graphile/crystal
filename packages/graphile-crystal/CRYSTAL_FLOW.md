@@ -31,8 +31,8 @@ the execution phase.
 
 EstablishAether(schema, document, operationName, variableValues, context, rootValue):
 
-- Let {matchingAethers} be all the Aethers in {globalCache}.
-- For each {possibleAether} in {matchingAethers}:
+- Let {possibleAethers} be all the Aethers in {globalCache}.
+- For each {possibleAether} in {possibleAethers}:
   - If {IsAetherCompatible(possibleAether, schema, document, operationName, variableValues, context, rootValue)}:
     - Return {possibleAether}.
 - Let {aether} be the result of calling {NewAether(schema, document, operationName, variableValues, context,
@@ -48,10 +48,10 @@ IsAetherCompatible(aether, schema, document, operationName, variableValues, cont
   - Return {false}.
 - If {aether}.{operationName} is not equal to {operationName}:
   - Return {false}.
-- Let {variableConstraints} be {aether}.{variableConstraints}.
+- Let {variableValuesConstraints} be {aether}.{variableValuesConstraints}.
 - Let {contextConstraints} be {aether}.{contextConstraints}.
 - Let {rootValueConstraints} be {aether}.{rootValueConstraints}.
-- If not {MatchesConstraints(variableConstraints, variableValues)}:
+- If not {MatchesConstraints(variableValuesConstraints, variableValues)}:
   - Return {false}.
 - If not {MatchesConstraints(contextConstraints, context)}:
   - Return {false}.
