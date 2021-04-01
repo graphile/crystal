@@ -141,25 +141,25 @@ Note: we must never optimise {\_\_ValuePlan()} plans.
 
 TreeShakePlans(aether):
 
+- Let {activePlans} be an empty list.
 - For each key {pathIdentity} and value {planId} in {aether}.{planIdByPathIdentity}:
   - Let {plan} be the plan at index {planId} within {aether}.{plans}.
-  - Call {MarkPlanActive(plan)}.
-- For each {inactivePlan} with index {i} in {aether}.{plans} where {inactivePlan}.{active} is {false}:
+  - Call {MarkPlanActive(plan, activePlans)}.
+- For each {inactivePlan} with index {i} in {aether}.{plans} where {inactivePlan} isn't in {activePlans}:
   - Replace the {i}th entry in {aether}.{plans} with {null}.
 
 Note: Replacing inactive plans with null is not strictly necessary, but it may help catch bugs earlier. Maybe only do
 this in development. Maybe don't do it if it makes the TypeScript too annoying.
 
-MarkPlanActive(plan, visitedPlans):
+MarkPlanActive(plan, activePlans):
 
-- If {visitedPlans} is not set, initialize it to an empty list.
-- If {plan} is within {visitedPlans} throw an infinite recursion error.
-- Add {plan} to {visitedPlans}.
-- Let {plan}.{active} be {true}.
+- If {plan} is within {activePlans}:
+  - Return.
+- Add {plan} to {activePlans}.
 - For each {dependencyPlan} in {plan}.{dependencies}:
-  - Call {MarkPlanActive(dependencyPlan)}.
+  - Call {MarkPlanActive(dependencyPlan, activePlans)}.
 - For each {childPlan} in {plan}.{children}:
-  - Call {MarkPlanActive(dependencyPlan)}.
+  - Call {MarkPlanActive(dependencyPlan, activePlans)}.
 
 FinalizePlans(aether):
 
