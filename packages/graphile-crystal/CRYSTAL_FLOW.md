@@ -216,7 +216,7 @@ TrackedObjectPlan(aether, object, constraints, path):
   - Calls to `plan.evalLength()`:
     - Assert: {object} is an array.
     - Let {length} be the length of the array {object}.
-    - Add `{type: 'length', expectedLength: length}` to {constraints}.
+    - Add `{type: 'length', path: path, expectedLength: length}` to {constraints}.
     - Return {length}.
 - Return {plan}.
 
@@ -551,7 +551,7 @@ GetValuePlanId(aether, valuePlan, object):
 - Assert: {valuePlan} is a {\_\_ValuePlan}.
 - Let {valueIdByObject} be the map for {valuePlan}.{id} within the map {aether}.{valueIdByObjectByPlanId} (creating the
   entry if necessary).
-- Let {parentId} be the value for {object} within the map {valueIdByObject}.
+- Let {valueId} be the value for {object} within the map {valueIdByObject}.
 - If {valueId} is set:
   - Return {valueId}.
 - Otherwise:
