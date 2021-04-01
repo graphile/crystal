@@ -6,7 +6,7 @@ import {
 import debugFactory from "debug";
 import { Aether } from "./aether";
 import { matchesConstraints } from "./constraints";
-import LRU from "@graphile/lru";
+import { isDev, noop } from "./dev";
 
 const debug = debugFactory("crystal:establishAether");
 type Fragments = {
@@ -29,10 +29,6 @@ interface Cache {
 }
 type CacheByOperation = WeakMap<OperationDefinitionNode, Cache>;
 const cacheByOperationBySchema = new WeakMap<GraphQLSchema, CacheByOperation>();
-
-const isDev = process.env.GRAPHILE_ENV === "development";
-
-function noop(): void {}
 
 function reallyAssertFragmentsMatch(
   oldFragments: Fragments,

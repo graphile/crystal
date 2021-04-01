@@ -4,7 +4,23 @@ import {
   OperationDefinitionNode,
   FragmentDefinitionNode,
 } from "graphql";
-import { Plan, TrackedObjectPlan } from "./plan";
+import { Plan, TrackedObjectPlan, assertFinalized } from "./plan";
+
+/**
+ * Implements the `MarkPlanActive` algorithm.
+ */
+function markPlanActive(plan: Plan, activePlans: Set<Plan>): void {
+  if (activePlans.has(plan)) {
+    return;
+  }
+  activePlans.add(plan);
+  for (let i = 0, l = plan.dependencies.length; i < l; i++) {
+    markPlanActive(plan.dependencies[i], activePlans);
+  }
+  for (let i = 0, l = plan.children.length; i < l; i++) {
+    markPlanActive(plan.children[i], activePlans);
+  }
+}
 
 /**
  * Implements the `NewAether` algorithm.
@@ -13,10 +29,12 @@ export class Aether {
   public maxGroupId = 0;
   public groupId = this.maxGroupId;
   public readonly plans: Plan[] = [];
-  public readonly planIdByPathIdentity: { [pathIdentity: string]: number } = {};
+  public readonly planIdByPathIdentity: {
+    [pathIdentity: string]: number;
+  } = Object.create(null);
   public readonly valueIdByObjectByPlanId: {
     [planId: number]: WeakMap<object, symbol>;
-  } = {};
+  } = Object.create(null);
   public readonly variableValuesConstraints: Constraint[] = [];
   public readonly variableValuesPlan: TrackedObjectPlan;
   public readonly contextConstraints: Constraint[] = [];
@@ -145,5 +163,50 @@ export class Aether {
    */
   optimizePlan(plan: Plan): Plan {
     return plan;
+  }
+
+  /**
+   * Implements the `TreeShakePlans` algorithm.
+   */
+  treeShakePlans(): void {
+    const activePlans = new Set<Plan>();
+
+    for (const pathIdentity in this.planIdByPathIdentity) {
+      const planId = this.planIdByPathIdentity[pathIdentity];
+      const plan = this.plans[planId];
+      markPlanActive(plan, activePlans);
+    }
+
+    for (let i = 0, l = this.plans.length; i < l; i++) {
+      const plan = this.plans[i];
+      if (!activePlans.has(plan)) {
+        // We're going to delete this plan. Theoretically nothing can reference
+        // it, so it should not cause any issues. If it does, it's due to a
+        // programming bug somewhere where we're referencing a plan that hasn't
+        // been added to the relevant dependencies/children. As such; I'm going
+        // to bypass TypeScript here and delete the node whilst still letting
+        // TypeScript guarantee it exists - better that the user gets a runtime
+        // error trying to use it rather than using a nonsense plan.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        this.plans[i] = null as any;
+      }
+    }
+  }
+
+  /**
+   * Implements the `FinalizePlans` and `FinalizePlan` algorithms.
+   */
+  finalizePlans(): void {
+    const distinctActivePlansInReverseOrder = new Set<Plan>();
+    for (let i = this.plans.length - 1; i >= 0; i--) {
+      const plan = this.plans[i];
+      if (plan !== null && !distinctActivePlansInReverseOrder.has(plan)) {
+        distinctActivePlansInReverseOrder.add(plan);
+      }
+    }
+    for (const plan of distinctActivePlansInReverseOrder) {
+      plan.finalize();
+      assertFinalized(plan);
+    }
   }
 }
