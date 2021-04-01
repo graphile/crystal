@@ -562,8 +562,8 @@ GetValuePlanId(aether, valuePlan, object):
   - Set {valueId} as the value for {object} in {valueIdByObject}.
   - Return {valueId}.
 
-ResolveFieldValueCrystal(schema, document, operationName, variableValues, context, rootValue, field, alias,
-parentObject, argumentValues, pathIdentity):
+ResolveFieldValueCrystal(schema, document, operationName, variableValues, context, rootValue, field, parentObject,
+argumentValues, pathIdentity):
 
 - Let {fieldName} be the name of {field}.
 - Let {objectType} be the object type on which {field} is defined.
