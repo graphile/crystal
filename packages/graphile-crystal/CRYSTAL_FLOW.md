@@ -5,7 +5,7 @@
 Before we can execute our plans we must first establish a context in which to create the plans. We call this context the
 "Aether." Aethers may be shared between multiple GraphQL requests so long as they meet the relevant requirements (based
 on matching {schema}, {document} and {operationName}, and passing relevant tests on the values that they have referenced
-within {variables} / {context} / {rootValue}).
+within {variableValues} / {context} / {rootValue}).
 
 Sharing Aethers across GraphQL requests also allows us to batch execution of certain plans across requests, leading to
 massively improved performance - especially for subscription operations which may result in thousands of concurrent
@@ -29,17 +29,18 @@ the execution phase.
 
 {globalCache} is a global cache for performance.
 
-EstablishAether(schema, document, operationName, variables, context, rootValue):
+EstablishAether(schema, document, operationName, variableValues, context, rootValue):
 
 - Let {matchingAethers} be all the Aethers in {globalCache}.
 - For each {possibleAether} in {matchingAethers}:
-  - If {IsAetherCompatible(possibleAether, schema, document, operationName, variables, context, rootValue)}:
+  - If {IsAetherCompatible(possibleAether, schema, document, operationName, variableValues, context, rootValue)}:
     - Return {possibleAether}.
-- Let {aether} be the result of calling {NewAether(schema, document, operationName, variables, context, rootValue)}.
+- Let {aether} be the result of calling {NewAether(schema, document, operationName, variableValues, context,
+  rootValue)}.
 - Store {aether} into {globalCache} (temporarily).
 - Return {aether}.
 
-IsAetherCompatible(aether, schema, document, operationName, variables, context, rootValue):
+IsAetherCompatible(aether, schema, document, operationName, variableValues, context, rootValue):
 
 - If {aether}.{schema} is not equal to {schema}:
   - Return {false}.
@@ -50,7 +51,7 @@ IsAetherCompatible(aether, schema, document, operationName, variables, context, 
 - Let {variableConstraints} be {aether}.{variableConstraints}.
 - Let {contextConstraints} be {aether}.{contextConstraints}.
 - Let {rootValueConstraints} be {aether}.{rootValueConstraints}.
-- If not {MatchesConstraints(variableConstraints, variables)}:
+- If not {MatchesConstraints(variableConstraints, variableValues)}:
   - Return {false}.
 - If not {MatchesConstraints(contextConstraints, context)}:
   - Return {false}.
@@ -82,7 +83,7 @@ specified), and when we evaluate `@skip(if: $var)` or `@include(if: $var)` we on
 involving one instance of a nullable `@skip(if: $var)` only two Aether's would be required to represent all states of
 `$var` (one for {true}; and one for {false}, {null} and undefined) rather than 4.
 
-NewAether(schema, document, operationName, variables, context, rootValue):
+NewAether(schema, document, operationName, variableValues, context, rootValue):
 
 - Let {aether} be an empty object.
 - Let {aether}.{schema} be {schema}.
@@ -98,7 +99,7 @@ NewAether(schema, document, operationName, variables, context, rootValue):
 
 - Let {variablesConstraints} be an empty object.
 - Let {aether}.{variablesConstraints} be {variablesConstraints}.
-- Let {aether}.{variablesPlan} be {TrackedObjectPlan(aether, variables, variablesConstraints)}.
+- Let {aether}.{variablesPlan} be {TrackedObjectPlan(aether, variableValues, variablesConstraints)}.
 
 - Let {contextConstraints} be an empty object.
 - Let {aether}.{contextConstraints} be {contextConstraints}.
@@ -561,13 +562,13 @@ GetValuePlanId(aether, valuePlan, object):
   - Set {valueId} as the value for {object} in {valueIdByObject}.
   - Return {valueId}.
 
-ResolveFieldValueCrystal(schema, document, operationName, variables, context, rootValue, field, alias, parentObject,
-argumentValues, pathIdentity):
+ResolveFieldValueCrystal(schema, document, operationName, variableValues, context, rootValue, field, alias,
+parentObject, argumentValues, pathIdentity):
 
 - Let {fieldName} be the name of {field}.
 - Let {objectType} be the object type on which {field} is defined.
 - Let {returnType} be the expected type of {field}.
-- Let {aether} be {EstablishAether(schema, document, operationName, variables, context, rootValue)}.
+- Let {aether} be {EstablishAether(schema, document, operationName, variableValues, context, rootValue)}.
 - Let {planId} be the value for key {pathIdentity} within {aether}.{planIdByPathIdentity}.
 - Let {plan} be the plan at index {planId} within {aether}.{plans}.
 - If {plan} is null:
@@ -578,7 +579,7 @@ argumentValues, pathIdentity):
   - Return {graphqlResolveFieldValue(objectType, objectValue, fieldName, argumentValues)}.
 - Otherwise:
   - Let {id} be a new unique id.
-  - Let {batch} be {GetBatch(aether, pathIdentity, parentCrystalObject, variables, context, rootValue)}.
+  - Let {batch} be {GetBatch(aether, pathIdentity, parentCrystalObject, variableValues, context, rootValue)}.
   - Let {crystalContext} be {batch}.{crystalContext}.
   - Let {plan} be {batch}.{plan}.
   - If {parentObject} is a crystal object:
@@ -642,7 +643,7 @@ NewCrystalObject(plan, pathIdentity, id, indexes, data, crystalContext, idByPath
 - Set {indexes} as the value for key {pathIdentity} within {crystalObject}.{indexesByPathIdentity}.
 - Return {crystalObject}.
 
-NewCrystalContext(aether, variables, context, rootValue):
+NewCrystalContext(aether, variableValues, context, rootValue):
 
 - Let {crystalContext} be an empty object.
 - Let {crystalContext}.{resultByIdByPlan} be an empty map.
@@ -650,7 +651,7 @@ NewCrystalContext(aether, variables, context, rootValue):
 - Let {rootId} be a new unique id.
 - Let {crystalContext}.{rootId} be {rootId}.
 - Let {variablesPlan} be {aether}.{variablesPlan}.
-- Call {PopulateValuePlan(crystalContext, variablesPlan, rootId, variables)}.
+- Call {PopulateValuePlan(crystalContext, variablesPlan, rootId, variableValues)}.
 - Let {contextPlan} be {aether}.{contextPlan}.
 - Call {PopulateValuePlan(crystalContext, contextPlan, rootId, context)}.
 - Let {rootValuePlan} be {aether}.{rootValuePlan}.
@@ -661,14 +662,14 @@ PopulateValuePlan(crystalContext, valuePlan, valueId, object):
 
 - Set {object} as the value for entry {valueId} for entry {valuePlan} in {crystalContext}.{resultByIdByPlan}.
 
-GetBatch(aether, pathIdentity, parentCrystalObject, variables, context, rootValue):
+GetBatch(aether, pathIdentity, parentCrystalObject, variableValues, context, rootValue):
 
 - Let {batch} be the value for key {pathIdentity} within {aether}.{batchByPathIdentity}.
 - If {batch} is null:
   - If {parentCrystalObject} is not null:
     - Let {crystalContext} be {parentCrystalObject}.{crystalContext}.
   - Otherwise:
-    - Let {crystalContext} be {NewCrystalContext(aether, variables, context, rootValue)}.
+    - Let {crystalContext} be {NewCrystalContext(aether, variableValues, context, rootValue)}.
   - Let {batch} be {NewBatch(aether, pathIdentity, crystalContext)}.
   - Set {batch} as the value for key {pathIdentity} within {aether}.{batchByPathIdentity}.
   - Schedule {ExecuteBatch(aether, batch, crystalContext)} to occur soon (but asynchronously). (Note: when batch is
