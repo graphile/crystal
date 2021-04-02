@@ -384,8 +384,9 @@ PlanAetherSubscription(aether):
 - If {groupedFieldSet} does not have exactly one entry, throw a query error.
 - Let {fields} be the value of the first entry in {groupedFieldSet}.
 - Let {fieldName} be the name of the first entry in {fields}. Note: This value is unaffected if an alias is used.
-- Let {field} be the field named {fieldName} on {rootType}.
-- Let {subscriptionPlanResolver} be `field.extensions.graphile.subscribePlan`.
+- Let {field} be the first entry in {fields}.
+- Let {fieldSpec} be the field named {fieldName} on {rootType}.
+- Let {subscriptionPlanResolver} be `fieldSpec.extensions.graphile.subscribePlan`.
 - If {subscriptionPlanResolver} exists:
   - Let {trackedArguments} be {TrackedArguments(aether, rootType, field)}.
   - Let {rootValuePlan} be {aether}.{rootValuePlan}.
