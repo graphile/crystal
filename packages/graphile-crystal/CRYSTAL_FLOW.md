@@ -222,100 +222,212 @@ Note: a {TrackedObjectPlan()} is a {ValuePlan()} with extra `eval` methods that 
 during planning. No other plans allow this kind of plan-time branching because planning is synchronous, and
 {TrackedObjectPlan()} is the only type that represents these synchronous pieces of data.
 
-InputPlan(aether, inputType, inputValue):
+InputPlan(aether, inputType, inputValue, defaultValue):
 
+- If {defaultValue} exists:
+  - Let {innerPlan} be {InputPlan(aether, inputType, inputValue)}.
+  - Return {InputDefaultPlan(aether, inputType, innerPlan, defaultValue)}.
 - If {inputValue} is a {Variable}:
   - Let {variableName} be the name of {inputValue}.
-  - Return `aether.variableValuesPlan.get(variableName)`.
+  - Let {variablePlan} be `aether.variableValuesPlan.get(variableName)`.
+  - Return {InputCoercionPlan(aether, inputType, variablePlan)}.
 - If {inputType} is a non-null type:
   - Let {innerType} be the inner type of {inputType}.
-  - Return {InputPlan(aether, innerType, inputValue)}.
+  - Let {valuePlan} be {InputPlan(aether, innerType, inputValue)}.
+  - Return {InputNonNullPlan(aether, valuePlan)}.
 - If {inputType} is a List type:
   - Let {innerType} be the inner type of {inputType}.
   - Return {InputListPlan(aether, innerType, inputValue)}.
 - If {inputType} is a leaf type:
-  - Return {StaticInputLeafPlan(aether, inputValue)}
+  - Return {InputStaticLeafPlan(aether, innerType, inputValue)}
 - Assert {inputType} is an input object type.
 - Return {InputObjectPlan(aether, innerType, inputValue)}.
 
-InputListPlan(aether, inputType, inputValue):
+InputCoercionPlan(aether, inputType, innerPlan):
+
+- Let {plan} be {NewPlan(aether)}.
+- Add {innerPlan} to {plan}.{dependencies}.
+- Let the internal function provided by {plan} for executing the plan, {execute}, be a function that:
+  - Let {results} be an empty list.
+  - For each input crystal object {crystalObject}:
+    - Let {innerValue} be the value associated with {innerPlan} within {crystalObject}.
+    - Let {coercedValue} be the result of coercing {innerValue} according to the input coercion rules of {inputType}.
+    - Add {coercedValue} to {results}.
+  - Return {results}.
+- Augment {plan} such that:
+  - Calls to `plan.eval()`:
+    - Let {innerValue} be the result of calling `innerPlan.eval()`.
+    - Let {coercedValue} be the result of coercing {innerValue} according to the input coercion rules of {inputType}.
+    - Return {coercedValue}.
+- Return {plan}.
+
+InputNonNullPlan(aether, innerPlan):
+
+- Let {plan} be {NewPlan(aether)}.
+- Add {innerPlan} to {plan}.{dependencies}.
+- Let the internal function provided by {plan} for executing the plan, {execute}, be a function that:
+  - Let {results} be an empty list.
+  - For each input crystal object {crystalObject}:
+    - Let {innerValue} be the value associated with {innerPlan} within {crystalObject}.
+    - If {innerValue} is {null} or does not exist:
+      - Add a non-null error to {results}.
+    - Otherwise:
+      - Add {innerValue} to {results}.
+  - Return {results}.
+- Augment {plan} such that:
+  - Calls to `plan.eval()`:
+    - Let {innerValue} be the result of calling `innerPlan.eval()`.
+    - If {innerValue} is {null} or does not exist:
+      - Throw a non-null error.
+    - Otherwise:
+      - Return {innerValue}.
+- Return {plan}.
+
+InputDefaultPlan(aether, inputType, innerPlan, defaultValue):
+
+- Let {plan} be {NewPlan(aether)}.
+- Add {innerPlan} to {plan}.{dependencies}.
+- Let {coercedDefaultValue} be the result of coercing {defaultValue} according to the input coercion rules of
+  {inputType}.
+- Let the internal function provided by {plan} for executing the plan, {execute}, be a function that:
+  - Let {results} be an empty list.
+  - For each input crystal object {crystalObject}:
+    - Let {innerValue} be the value associated with {innerPlan} within {crystalObject}.
+    - If {innerValue} exists (including {null}):
+      - Add {innerValue} to {results}.
+    - Otherwise:
+      - Add {coercedDefaultValue} to {results}.
+  - Return {results}.
+- Augment {plan} such that:
+  - Calls to `plan.eval()`:
+    - Let {innerValue} be the result of calling `innerPlan.eval()`.
+    - If {innerValue} exists (including {null}):
+      - Return {innerValue}.
+    - Otherwise:
+      - Return {coercedDefaultValue}.
+  - TODO: `plan.evalIs(value)`
+- Return {plan}.
+
+InputListPlan(aether, inputType, inputValues):
 
 - Assert {inputType} is a list type.
 - Let {innerType} be the inner type of {inputType}.
-- If {innerType} is a non-null type:
-  - Return InputListPlan(aether, innerType, inputValue).
 - Let {plan} be {NewPlan(aether)}.
+- Let {itemPlans} be an empty list.
+- If {inputValues} is a list, for each {inputValue} in {inputValues}:
+  - Let {innerPlan} be {InputPlan(aether, innerType, inputValue)}.
+  - Add {innerPlan} to {itemPlans}.
+- Let {outOfBoundsPlan} be {InputPlan(aether, innerType, undefined)}.
+- Let the internal function provided by {plan} for executing the plan, {execute}, be a function that:
+  - Let {results} be an empty list.
+  - For each input crystal object {crystalObject}:
+    - If {inputValues} is the {null} literal:
+      - Add {null} to {results}.
+    - Otherwise:
+      - Let {list} be an empty list.
+      - For {itemPlan} in {itemPlans}:
+        - Let {value} be `itemPlan.eval()`.
+        - Add {value} to {list}.
+      - Add {list} to {results}.
+  - Return {results}.
 - Augment {plan} such that:
   - Calls to `plan.at(index)`:
-    - TODO: similar to InputObjectPlan.get
-  - Calls to `plan.evalAt(index)`:
-    - TODO: similar to InputObjectPlan.evalGet
-  - Calls to `plan.evalLength()`:
-    - TODO: similar to InputObjectPlan.evalIs
+    - Let {itemPlan} be the {index}th plan in {itemPlans}, or {outOfBoundsPlan} if {index} is out of bounds.
+    - Return {itemPlan}.
+  - Calls to `plan.eval()`:
+    - If {inputValues} is the {null} literal:
+      - Return {null}.
+    - Otherwise:
+      - Let {list} be an empty list.
+      - For {itemPlan} in {itemPlans}:
+        - Let {value} be `itemPlan.eval()`.
+        - Add {value} to {list}.
+      - Return {list}.
 - Return {plan}.
 
-InputObjectPlan(aether, inputType, inputValue):
+Note: though this may have variables for values within the list, it is not a variable itself (it has a known length in
+the AST) thus we can return different plans for different elements in the list.
+
+InputStaticLeafPlan(aether, inputType, value):
 
 - Let {plan} be {NewPlan(aether)}.
+- Let {coercedValue} be the result of coercing {value} according to the input coercion rules of {inputType}.
+- Let the internal function provided by {plan} for executing the plan, {execute}, be a function that returns
+  {coercedValue} for each input crystal object.
+- Augment {plan} such that:
+  - Calls to `plan.eval()`:
+    - Return {coercedValue}.
+- Return {plan}.
+
+This represents a static "leaf" value, but will return it via a plan. The plan will always evaluate to the same value.
+
+InputObjectPlan(aether, inputObjectType, inputValues):
+
+- Let {plan} be {NewPlan(aether)}.
+- Let {inputFieldDefinitions} be the input fields defined by {inputObjectType}.
+- Let {inputFieldPlans} be an empty map.
+- For each {inputFieldDefinition} in {inputFieldDefinitions}:
+  - Let {inputFieldName} be the name of {inputFieldDefinition}.
+  - Let {inputFieldType} be the expected type of {inputFieldDefinition}.
+  - Let {defaultValue} be the default value for {inputFieldDefinition}.
+  - Let {inputFieldValue} be the value in {inputValues} for key {inputFieldName}.
+  - Let {inputFieldPlan} be {InputPlan(aether, inputFieldType, inputFieldValue, defaultValue)}.
+  - Set {inputFieldPlan} as the value for key {inputFieldName} in {inputFieldPlans}.
+  - Add {inputFieldPlan} to {plan}.{dependencies}.
+- Let the internal function provided by {plan} for executing the plan, {execute}, be a function that:
+  - Let {results} be an empty list.
+  - For each input crystal object {crystalObject}:
+    - If {inputValues} is the {null} literal:
+      - Add {null} to {results}.
+    - Otherwise:
+      - Let {values} be an empty map.
+      - For each key {inputFieldName} and value {inputFieldPlan} in {inputFieldPlans}:
+        - Let {value} be the value associated with {inputFieldPlan} within {crystalObject}.
+        - Set {value} as the value for key {inputFieldName} in {values}.
+      - Add {values} to {results}.
+  - Return {results}.
 - Augment {plan} such that:
   - Calls to `plan.get(inputFieldName)`:
-    - Let {inputFieldValue} be the value provided in {inputValue} for the name {inputFieldName}.
-    - Let {inputFieldDefinition} be the input field defined by {inputType} with the input field name {inputFieldName}.
-    - Let {argumentType} be the expected type of {inputFieldDefinition}.
-    - Return {InputPlan(aether, argumentType, inputFieldValue)}.
-  - Calls to `plan.evalGet(inputFieldName)`:
-    - Let {inputFieldValue} be the value provided in {inputValue} for the name {inputFieldName}.
-    - If {inputFieldValue} is a {Variable}:
-      - Let {variableName} be the name of {inputFieldValue}.
-      - Call `aether.variableValuesPlan.get(variableName)` (note: this is just to track the access, we don't use the
-        result).
-    - Otherwise:
-      - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
-    - Return the property `inputValue[inputFieldName]`.
-  - Calls to `plan.evalIs(inputFieldName, value)`:
-    - Let {inputFieldValue} be the value provided in {inputValue} for the name {inputFieldName}.
-    - If {inputFieldValue} is a {Variable}:
-      - Let {variableName} be the name of {inputFieldValue}.
-      - Call `aether.variableValuesPlan.is(variableName, value)` (note: this is just to track the access, we don't use
-        the result).
-    - Otherwise:
-      - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
-    - Return `value===inputValue[inputFieldName]`.
+    - Let {inputFieldPlan} be the value for key {inputFieldName} in {inputFieldPlans}.
+    - Return {inputFieldPlan}.
+  - Calls to `plan.eval()`:
+    - If {inputValues} is the {null} literal:
+      - Return {null}.
+    - Let {values} be an empty map.
+    - For each key {inputFieldName} and value {inputFieldPlan} in {inputFieldPlans}:
+      - Let {value} be `inputFieldPlan.eval()`.
+      - Set {value} as the value for key {inputFieldName} in {values}.
+    - Return {values}.
 - Return {plan}.
+
+Note: This algorithm is very similar to {TrackedArguments()}.
 
 TrackedArguments(aether, objectType, field):
 
-- Let {variableValuesPlan} be {aether}.{variableValuesPlan}.
-- Let {argumentValues} be the result of {graphqlCoerceArgumentValues(objectType, field, variableValuesPlan)}.
-- Return an object {trackedObject}, such that:
-  - Calls to `trackedObject.get(argumentName)`:
-    - Let {argumentValue} be the value provided in {argumentValues} for the name {argumentName}.
-    - Let {argumentDefinition} be the argument defined by {field} with the argument name {argumentName}.
-    - Let {argumentType} be the expected type of {argumentDefinition}.
-    - Return {InputPlan(aether, argumentType, argumentValue)}.
-  - Calls to `trackedObject.evalGet(argumentName)`:
-    - Let {argumentValue} be the value provided in {argumentValues} for the name {argumentName}.
-    - If {argumentValue} is a {Variable}:
-      - Let {variableName} be the name of {argumentValue}.
-      - Return `aether.variableValuesPlan.evalGet(variableName)`.
-    - Otherwise:
-      - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
-      - Return the property `argumentValues[argumentName]`.
-  - Calls to `trackedObject.evalIs(argumentName, value)`:
-    - Let {argumentValue} be the value provided in {argumentValues} for the name {argumentName}.
-    - If {argumentValue} is a {Variable}:
-      - Let {variableName} be the name of {argumentValue}.
-      - Return `aether.variableValuesPlan.evalIs(variableName, value)`.
-    - Otherwise:
-      - TODO: if it's an input object (or list thereof), recurse through all layers looking for variables to track.
-      - Return `value===argumentValues[argumentName]`.
+- Let {trackedArgumentValues} be an empty unordered map.
+- Let {argumentValues} be the argument values provided in {field}.
+- Let {fieldName} be the name of {field}.
+- Let {argumentDefinitions} be the arguments defined by {objectType} for the field named {fieldName}.
+- For each {argumentDefinition} in {argumentDefinitions}:
+  - Let {argumentName} be the name of {argumentDefinition}.
+  - Let {argumentType} be the expected type of {argumentDefinition}.
+  - Let {defaultValue} be the default value for {argumentDefinition}.
+  - Let {argumentValue} be the value in {argumentValues} for key {argumentName}.
+  - Let {argumentPlan} be {InputPlan(aether, argumentType, argumentValue, defaultValue)}.
+  - Set {argumentPlan} as the value for key {argumentName} in {trackedArgumentValues}.
+- Return {trackedArgumentValues}.
+
+Note: This algorithm is a replacement for
+[CoerceArgumentValues](<https://spec.graphql.org/draft/#CoerceArgumentValues()>) in the GraphQL Spec.
+
+Note: This algorithm is very similar to {InputObjectPlan()}.
 
 Note: Arguments to a field are either static (in which case they're part of the document and will never change within
 the same aether) or they are provided via variables. We want to track direct access to the variable type arguments via
 {aether}.{variableValuesPlan}, but access to static arguments does not require any tracking at all.
 
-Note: This recurses - values that are static input objects can contain variables within their descendent fields. If
-input object, do recursion, otherwise StaticLeafPlan.
+Note: This recurses - values that are static input objects can contain variables within their descendent fields. This
+recursion is handled via {InputPlan} which results in {InputStaticLeafPlan} for static values.
 
 NewPlan(aether):
 
@@ -330,19 +442,10 @@ NewPlan(aether):
 - Push {plan} onto {aether}.{plans} (Note: it will have {plan}.{id} as its index within {aether}.{plans}).
 - Return {plan}.
 
-StaticInputLeafPlan(aether, value):
-
-- Let {plan} be {NewPlan(aether)}.
-- Let the internal function provided by {plan} for evaluating the plan, {eval}, be a function that returns {value} for
-  each input crystal object.
-- Return {plan}.
-
-This represents a static "leaf" value, but will return it via a plan. The plan will always evaluate to the same value.
-
 \_\_ValuePlan(aether):
 
 - Let {plan} be {NewPlan(aether)}.
-- Let the internal function provided by {plan} for evaluating the plan, {eval}, be a function that throws an internal
+- Let the internal function provided by {plan} for executing the plan, {execute}, be a function that throws an internal
   consistency error.
 - Return {plan}.
 
@@ -733,10 +836,10 @@ ExecutePlan(aether, plan, crystalContext, crystalObjects, visitedPlans):
       - Let {dependencyValue} be the {i}th entry in {dependencyValues}.
       - Push {dependencyValue} onto {entry}.
     - Push {entry} onto {values}.
-  - Let {eval} be the internal function provided by {plan} for evaluating the plan.
+  - Let {execute} be the internal function provided by {plan} for executing the plan.
   - Let {meta} be the entry for {plan} within {crystalContext}.{metaByPlan}.
-  - Let {pendingResult} be the result of calling {eval}, providing {values} and {meta}. (Note: the `eval` method on
-    plans is responsible for memoizing results into {meta}.)
+  - Let {pendingResult} be the result of calling {execute}, providing {values} and {meta}. (Note: the `execute` method
+    on plans is responsible for memoizing results into {meta}.)
   - Assert the length of {pendingResult} should match the length of {pendingCrystalObjects}.
   - For each {pendingCrystalObject} with index {i} in {pendingCrystalObjects}:
     - Let {pendingResult} be the {i}th value in {pendingResult}.
