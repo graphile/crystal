@@ -226,8 +226,13 @@ InputPlan(aether, inputType, inputValue, defaultValue):
 
 - If {inputValue} is a {Variable}:
   - Let {variableName} be the name of {inputValue}.
-  - Let {variablePlan} be `aether.variableValuesPlan.get(variableName)`.
-  - Return {InputCoercionPlan(aether, inputType, variablePlan, defaultValue)}.
+  - Let {variableType} be the expected input type for variable {variableName} in {aether}.{operation}.
+  - (TODO: define the new aether properties.)
+  - Let {variableValuePlan} be the value for key {variableName} in {aether}.{variableValuePlanByVariableName}.
+  - Let {variableValueConstraints} be the value for key {variableName} in
+    {aether}.{variableValueConstraintsByVariableName}.
+  - Return {InputVariablePlan(aether, variableValuePlan, variableValueConstraints, variableType, inputType,
+    defaultValue)}.
 - (Note: past here, we know whether {defaultValue} will be used or not because we know {inputValue} is not a variable.)
 - If {inputValue} does not exist:
   - Let {inputValue} be {defaultValue}.
@@ -244,6 +249,24 @@ InputPlan(aether, inputType, inputValue, defaultValue):
   - Return {InputObjectPlan(aether, innerType, inputValue)}.
 - Otherwise:
   - Raise an unsupported input type error.
+
+InputVariablePlan(aether, variableValuePlan, constraints, variableType, inputType, defaultValue):
+
+- If {variableType} is a non-null type and {inputType} is not a non-null type:
+  - Let {unwrappedVariableType} be the inner type of {variableType}.
+  - Return {InputVariablePlan(aether, variableValuePlan, constraints, unwrappedVariableType, inputType, defaultValue)}.
+- Assert: {variableType} is equal to {inputType}.
+- If {defaultValue} does not exist or NOT {variableValuePlan}.{evalIs(undefined)}:
+  - Return {variableValuePlan}.
+- Otherwise:
+  - (Note: we're going to pretend no value was passed instead of the variable, so defaultValue should be used.)
+  - Return {InputPlan(aether, inputType, undefined, defaultValue)}.
+
+Note: GraphQL validation will ensure that the type of the variable and input type are "compatible"; so the only
+difference allowed is that the variable might be non-null when the input type is not.
+
+Note: The GraphQL algorithm {CoerceVariableValues} will ensure that the contents of the variables adhere to the expected
+types, so we do not need to perform coercion ourselves.
 
 InputCoercionPlan(aether, inputType, innerPlan):
 
@@ -262,6 +285,9 @@ InputCoercionPlan(aether, inputType, innerPlan):
     - Let {coercedValue} be the result of coercing {innerValue} according to the input coercion rules of {inputType}.
     - Return {coercedValue}.
 - Return {plan}.
+
+TODO: delete this plan? Leaves are already coerced; we coerce lists implicitly, maybe we don't need it? Really comes
+down to variables, methinks.
 
 InputNonNullPlan(aether, innerPlan):
 
