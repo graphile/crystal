@@ -224,24 +224,26 @@ during planning. No other plans allow this kind of plan-time branching because p
 
 InputPlan(aether, inputType, inputValue, defaultValue):
 
-- If {defaultValue} exists:
-  - Let {innerPlan} be {InputPlan(aether, inputType, inputValue)}.
-  - Return {InputDefaultPlan(aether, inputType, innerPlan, defaultValue)}.
 - If {inputValue} is a {Variable}:
   - Let {variableName} be the name of {inputValue}.
   - Let {variablePlan} be `aether.variableValuesPlan.get(variableName)`.
-  - Return {InputCoercionPlan(aether, inputType, variablePlan)}.
+  - Return {InputCoercionPlan(aether, inputType, variablePlan, defaultValue)}.
+- (Note: past here, we know whether {defaultValue} will be used or not because we know {inputValue} is not a variable.)
+- If {inputValue} does not exist:
+  - Let {inputValue} be {defaultValue}.
 - If {inputType} is a non-null type:
   - Let {innerType} be the inner type of {inputType}.
   - Let {valuePlan} be {InputPlan(aether, innerType, inputValue)}.
   - Return {InputNonNullPlan(aether, valuePlan)}.
-- If {inputType} is a List type:
+- Otherwise, if {inputType} is a List type:
   - Let {innerType} be the inner type of {inputType}.
   - Return {InputListPlan(aether, innerType, inputValue)}.
-- If {inputType} is a leaf type:
+- Otherwise, if {inputType} is a leaf type:
   - Return {InputStaticLeafPlan(aether, innerType, inputValue)}
-- Assert {inputType} is an input object type.
-- Return {InputObjectPlan(aether, innerType, inputValue)}.
+- Otherwise, if {inputType} is an input object type:
+  - Return {InputObjectPlan(aether, innerType, inputValue)}.
+- Otherwise:
+  - Raise an unsupported input type error.
 
 InputCoercionPlan(aether, inputType, innerPlan):
 
@@ -281,31 +283,6 @@ InputNonNullPlan(aether, innerPlan):
       - Throw a non-null error.
     - Otherwise:
       - Return {innerValue}.
-- Return {plan}.
-
-InputDefaultPlan(aether, inputType, innerPlan, defaultValue):
-
-- Let {plan} be {NewPlan(aether)}.
-- Add {innerPlan} to {plan}.{dependencies}.
-- Let {coercedDefaultValue} be the result of coercing {defaultValue} according to the input coercion rules of
-  {inputType}.
-- Let the internal function provided by {plan} for executing the plan, {execute}, be a function that:
-  - Let {results} be an empty list.
-  - For each input crystal object {crystalObject}:
-    - Let {innerValue} be the value associated with {innerPlan} within {crystalObject}.
-    - If {innerValue} exists (including {null}):
-      - Add {innerValue} to {results}.
-    - Otherwise:
-      - Add {coercedDefaultValue} to {results}.
-  - Return {results}.
-- Augment {plan} such that:
-  - Calls to `plan.eval()`:
-    - Let {innerValue} be the result of calling `innerPlan.eval()`.
-    - If {innerValue} exists (including {null}):
-      - Return {innerValue}.
-    - Otherwise:
-      - Return {coercedDefaultValue}.
-  - TODO: `plan.evalIs(value)`
 - Return {plan}.
 
 InputListPlan(aether, inputType, inputValues):
