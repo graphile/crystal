@@ -1126,6 +1126,7 @@ export default function createPostGraphileHttpRequestHandler(
 
   const hookedMiddleware = pluginHook('postgraphile:middleware', middleware, {
     options,
+    shutdownActions,
   });
   // Sanity check:
   if (!hookedMiddleware.getGraphQLSchema) {
