@@ -326,7 +326,7 @@ export interface CreateRequestHandlerOptions extends PostGraphileOptions {
   // A Postgres client pool we use to connect Postgres clients.
   pgPool: Pool;
   _emitter: EventEmitter;
-  shutdownActions: ShutdownActions
+  shutdownActions: ShutdownActions;
 }
 
 export interface GraphQLFormattedErrorExtended {

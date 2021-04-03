@@ -1122,7 +1122,7 @@ export default function createPostGraphileHttpRequestHandler(
   middleware.eventStreamRoute = eventStreamRoute;
   middleware.eventStreamRouteHandler = watchPg ? eventStreamRouteHandler : null;
   middleware.shutdownActions = shutdownActions;
-  middleware.release = (): Promise<void> => shutdownActions.invokeAll()
+  middleware.release = (): Promise<void> => shutdownActions.invokeAll();
 
   const hookedMiddleware = pluginHook('postgraphile:middleware', middleware, {
     options,
