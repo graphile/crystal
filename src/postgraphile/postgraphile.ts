@@ -30,7 +30,6 @@ export interface PostgraphileSchemaBuilder<
   _emitter: EventEmitter;
   getGraphQLSchema: () => Promise<GraphQLSchema>;
   options: PostGraphileOptions<Request, Response>;
-  releaseWatch: null | (() => Promise<void>);
 }
 
 /**
@@ -45,30 +44,8 @@ export function getPostgraphileSchemaBuilder<
   pgPool: Pool,
   schema: string | Array<string>,
   incomingOptions: PostGraphileOptions<Request, Response>,
-  releasePgPool: null | (() => void) = null,
+  shutdownActions: ShutdownActions = new ShutdownActions(),
 ): PostgraphileSchemaBuilder {
-  let releaseWatchFn: null | (() => Promise<void>) = null;
-  async function releaseWatch() {
-    if (releaseWatchFn) {
-      const fn = releaseWatchFn;
-      releaseWatchFn = null;
-      await fn();
-    }
-  }
-
-  let released = false;
-  async function releaseOnce() {
-    if (released) {
-      throw new Error(
-        'Already released this PostGraphile schema builder; should not have attempted a second release',
-      );
-    }
-    released = true;
-    await releaseWatch();
-    if (releasePgPool) {
-      await releasePgPool();
-    }
-  }
   if (incomingOptions.live && incomingOptions.subscriptions == null) {
     // live implies subscriptions
     incomingOptions.subscriptions = true;
@@ -108,7 +85,6 @@ export function getPostgraphileSchemaBuilder<
     _emitter,
     getGraphQLSchema: () => (gqlSchema ? Promise.resolve(gqlSchema) : gqlSchemaPromise),
     options,
-    releaseWatch,
   };
 
   async function createGqlSchema(): Promise<GraphQLSchema> {
@@ -117,14 +93,17 @@ export function getPostgraphileSchemaBuilder<
     while (true) {
       try {
         if (options.watchPg) {
-          if (releaseWatchFn) {
-            throw new Error(`releaseWatchFn should not have been set at this point.`);
-          }
-          releaseWatchFn = await watchPostGraphileSchema(pgPool, pgSchemas, options, newSchema => {
-            gqlSchema = newSchema;
-            _emitter.emit('schemas:changed');
-            exportGqlSchema(gqlSchema);
-          });
+          const releaseWatchFn = await watchPostGraphileSchema(
+            pgPool,
+            pgSchemas,
+            options,
+            newSchema => {
+              gqlSchema = newSchema;
+              _emitter.emit('schemas:changed');
+              exportGqlSchema(gqlSchema);
+            },
+          );
+          shutdownActions.add(releaseWatchFn);
           if (!gqlSchema) {
             throw new Error(
               "Consistency error: watchPostGraphileSchema promises to call the callback before the promise resolves; but this hasn't happened",
@@ -154,7 +133,7 @@ export function getPostgraphileSchemaBuilder<
             const dur = diff[0] * 1e3 + diff[1] * 1e-6;
             if (!retry) {
               // Swallow new error so old error is still thrown
-              await releaseOnce().catch(e => {
+              await shutdownActions.invokeAll().catch(e => {
                 console.error(e);
               });
               throw error;
@@ -302,21 +281,19 @@ export default function postgraphile<
     debugPgClient(pgClient, !!options.allowExplain);
   });
 
-  const { getGraphQLSchema, options, _emitter, releaseWatch } = getPostgraphileSchemaBuilder<
-    Request,
-    Response
-  >(pgPool, schema, incomingOptions, releasePgPool);
-  if (releaseWatch) {
-    shutdownActions.add(releaseWatch);
-  }
-
+  const { getGraphQLSchema, options, _emitter } = getPostgraphileSchemaBuilder<Request, Response>(
+    pgPool,
+    schema,
+    incomingOptions,
+    shutdownActions,
+  );
   return createPostGraphileHttpRequestHandler({
     ...(typeof poolOrConfig === 'string' ? { ownerConnectionString: poolOrConfig } : {}),
     ...options,
     getGqlSchema: getGraphQLSchema,
     pgPool,
     _emitter,
-    release: (): Promise<void> => shutdownActions.invokeAll(),
+    shutdownActions,
   });
 }
 
