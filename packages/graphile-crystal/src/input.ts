@@ -7,6 +7,8 @@ import {
   isLeafType,
   GraphQLInputObjectType,
   isInputType,
+  coerceInputValue,
+  GraphQLLeafType,
 } from "graphql";
 import { Aether } from "./aether";
 import {
@@ -90,7 +92,7 @@ export function inputPlan(
   } else if (inputType instanceof GraphQLList) {
     return new InputListPlan(aether, inputType, inputValue);
   } else if (isLeafType(inputType)) {
-    return inputStaticLeafPlan(aether, inputType, inputValue);
+    return new InputStaticLeafPlan(aether, inputType, inputValue);
   } else if (inputType instanceof GraphQLInputObjectType) {
     return inputObjectPlan(aether, inputType, inputValue);
   } else {
@@ -234,5 +236,30 @@ class InputListPlan extends Plan {
       list[itemPlanIndex] = value;
     }
     return list;
+  }
+}
+
+class InputStaticLeafPlan extends Plan {
+  private readonly coercedValue: any;
+  constructor(
+    aether: Aether,
+    inputType: GraphQLLeafType,
+    value: ArgumentNode | undefined,
+  ) {
+    super(aether);
+    // `coerceInputValue` throws on coercion failure.
+    this.coercedValue = coerceInputValue(value, inputType);
+  }
+
+  execute(values: any[][]): any[] {
+    return new Array(values.length).fill(this.coercedValue);
+  }
+
+  eval(): any {
+    return this.coercedValue;
+  }
+
+  evalIs(expectedValue: any): boolean {
+    return this.coercedValue === expectedValue;
   }
 }

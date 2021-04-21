@@ -447,7 +447,7 @@ the AST) thus we can return different plans for different elements in the list.
 
 ### Input static leaf plan
 
-Status: pending.
+Status: complete.
 
 InputStaticLeafPlan(aether, inputType, value):
 
