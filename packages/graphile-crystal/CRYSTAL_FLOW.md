@@ -236,7 +236,7 @@ FinalizePlan(aether, plan):
 
 ### Tracked object plan
 
-Status: in progress.
+Status: complete.
 
 {\_\_TrackedObjectPlan} will have its values provided at runtime via the supplied {\_\_ValuePlan}. It is also supplied
 with the original values (the ones the Aether was created with) which will be used via the `eval*` methods to narrow the

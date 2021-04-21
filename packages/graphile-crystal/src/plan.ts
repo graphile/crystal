@@ -323,6 +323,11 @@ export class __TrackedObjectPlan extends Plan {
     this.path = path;
   }
 
+  execute(values: any[][]): any[] {
+    // We have only one dependency, return the value of that.
+    return values.map((v) => v[0]);
+  }
+
   /**
    * Get the named property of an object.
    */
