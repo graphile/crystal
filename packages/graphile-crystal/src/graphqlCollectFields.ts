@@ -83,8 +83,8 @@ function graphqlDoesFragmentTypeApply(
 }
 
 /**
- * Implements the `CollectFields` algorithm from the GraphQL spec, but modified
- * such that access to variables is tracked.
+ * Implements the `GraphQLCollectFields` algorithm - like `CollectFields` the
+ * GraphQL spec, but modified such that access to variables is tracked.
  *
  * @see https://spec.graphql.org/draft/#CollectFields()
  *

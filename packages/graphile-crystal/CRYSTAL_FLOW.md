@@ -582,13 +582,15 @@ PlanAetherMutation(aether):
 
 ### Plan aether subscription
 
+Status: complete.
+
 PlanAetherSubscription(aether):
 
 - Let {rootType} be the root Subscription type in {aether}.{schema}.
 - Assert {rootType} exists.
 - Let {selectionSet} be the top level Selection Set in {aether}.{operation}.
 - Let {trackedVariableValuesPlan} be {aether}.{trackedVariableValuesPlan}.
-- Let {groupedFieldSet} be the result of {graphqlCollectFields(rootType, selectionSet, trackedVariableValuesPlan)}.
+- Let {groupedFieldSet} be the result of {GraphQLCollectFields(rootType, selectionSet, trackedVariableValuesPlan)}.
 - If {groupedFieldSet} does not have exactly one entry, throw a query error.
 - Let {fields} be the value of the first entry in {groupedFieldSet}.
 - Let {fieldName} be the name of the first entry in {fields}. Note: This value is unaffected if an alias is used.
@@ -612,7 +614,7 @@ PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequentia
 - If {isSequential} is not provided, initialize it to {false}.
 - Assert: {objectType} is an object type.
 - Let {trackedVariableValuesPlan} be {aether}.{trackedVariableValuesPlan}.
-- Let {groupedFieldSet} be the result of {graphqlCollectFields(objectType, selectionSet, trackedVariableValuesPlan)}
+- Let {groupedFieldSet} be the result of {GraphQLCollectFields(objectType, selectionSet, trackedVariableValuesPlan)}
   with modified algorithm to factor `groupId`/`maxGroupId` in (based on fragments with `@defer`, `@stream`, etc).
 - For each {groupedFieldSet} as {responseKey} and {fields}:
   - Let {pathIdentity} be `path + ">" + objectType.name + "." + responseKey`.
@@ -657,6 +659,13 @@ PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequentia
           - Call {PlanSelectionSet(aether, pathIdentity, plan, objectType, subSelectionSet, false)}.
   - Let {aether}.{groupId} be {oldGroupId}.
 - Return.
+
+### GraphQL collect fields
+
+Status: in progress.
+
+As with the GraphQL {CollectFields()} algorithm, but with "tracked" access to variables via {\_\_TrackedObjectPlan()}
+rather than direct access.
 
 ### Plan field arguments
 

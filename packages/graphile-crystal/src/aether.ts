@@ -161,12 +161,12 @@ export class Aether {
       throw new Error("No subscription type found in schema");
     }
     const selectionSet = this.operation.selectionSet;
-    const variableValuesPlan = this.variableValuesPlan;
+    const trackedVariableValuesPlan = this.trackedVariableValuesPlan;
     const groupedFieldSet = graphqlCollectFields(
       this,
       rootType,
       selectionSet,
-      variableValuesPlan,
+      trackedVariableValuesPlan,
     );
     let firstKey: string | undefined = undefined;
     for (const key of groupedFieldSet.keys()) {
@@ -190,13 +190,14 @@ export class Aether {
       const trackedArguments = this.getTrackedArguments(rootType, field);
       const subscribePlan = this.executePlanResolver(
         subscriptionPlanResolver,
-        this.rootValuePlan,
+        this.trackedRootValuePlan,
         trackedArguments,
       );
       this.planFieldArguments(field, trackedArguments, subscribePlan);
       this.planSelectionSet("", subscribePlan, rootType, selectionSet);
     } else {
-      this.planSelectionSet("", this.rootValuePlan, rootType, selectionSet);
+      const subscribePlan = this.trackedRootValuePlan;
+      this.planSelectionSet("", subscribePlan, rootType, selectionSet);
     }
   }
 
