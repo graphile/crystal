@@ -5,6 +5,8 @@ import {
   OperationDefinitionNode,
   FragmentDefinitionNode,
   GraphQLField,
+  FieldNode,
+  GraphQLObjectType,
 } from "graphql";
 import { Plan, TrackedObjectPlan, assertFinalized } from "./plan";
 import { graphqlCollectFields } from "./graphqlCollectFields";
@@ -161,11 +163,12 @@ export class Aether {
     if (!fields) {
       throw new Error("Consistency error.");
     }
-    const fieldSelection = fields[0];
-    const fieldName = fieldSelection.name.value; // Unaffected by alias.
+    const field = fields[0];
+    const fieldName = field.name.value; // Unaffected by alias.
     const rootTypeFields = rootType.getFields();
-    const field: GraphQLField<any, any> = rootTypeFields[fieldName];
-    const subscriptionPlanResolver = field.extensions?.graphile?.subscribePlan;
+    const fieldSpec: GraphQLField<any, any> = rootTypeFields[fieldName];
+    const subscriptionPlanResolver =
+      fieldSpec.extensions?.graphile?.subscribePlan;
     if (subscriptionPlanResolver) {
       const trackedArguments = this.getTrackedArguments(rootType, field);
       const subscribePlan = this.executePlanResolver(
@@ -178,6 +181,21 @@ export class Aether {
     } else {
       this.planSelectionSet("", this.rootValuePlan, rootType, selectionSet);
     }
+  }
+
+  /**
+   * Implements the `TrackedArguments` algorithm.
+   */
+  getTrackedArguments(
+    objectType: GraphQLObjectType,
+    field: FieldNode,
+  ): TrackedArguments {
+    const { variableValuesPlan } = this;
+    const argumentValues = graphqlCoerceArgumentValues(
+      objectType,
+      field,
+      variableValuesPlan,
+    );
   }
 
   /**
@@ -231,7 +249,9 @@ export class Aether {
     const distinctActivePlansInReverseOrder = new Set<Plan>();
     for (let i = this.plans.length - 1; i >= 0; i--) {
       const plan = this.plans[i];
-      if (plan !== null && !distinctActivePlansInReverseOrder.has(plan)) {
+      if (plan !== null) {
+        // checking the following would be redundant:
+        // if (!distinctActivePlansInReverseOrder.has(plan))
         distinctActivePlansInReverseOrder.add(plan);
       }
     }
