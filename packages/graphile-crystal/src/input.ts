@@ -4,7 +4,6 @@ import {
   GraphQLList,
   GraphQLNonNull,
   GraphQLType,
-  isScalarType,
   isLeafType,
   GraphQLInputObjectType,
 } from "graphql";
@@ -16,13 +15,13 @@ import {
   ListTypeNode,
   NonNullTypeNode,
 } from "graphql";
+import { __TrackedObjectPlan } from "./plan";
 
 export type InputPlan =
-  | InputVariablePlan
-  | InputNonNullPlan
-  | InputListPlan
-  | InputStaticLeafPlan
-  | InputObjectPlan;
+  | __TrackedObjectPlan // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength()
+  | InputListPlan // .at(), .eval(), .evalLength()
+  | InputStaticLeafPlan // .eval(), .evalIs()
+  | InputObjectPlan; // .get(), .eval(), .evalHas()
 
 function graphqlGetTypeForNode(
   aether: Aether,
@@ -140,4 +139,11 @@ function inputVariablePlan(
     // that no value was passed in the first place (instead of the variable):
     return inputPlan(aether, inputType, undefined, defaultValue);
   }
+}
+
+/**
+ * Implements `InputNonNullPlan`.
+ */
+function inputNonNullPlan(aether: Aether, innerPlan: InputPlan): InputPlan {
+  return innerPlan;
 }

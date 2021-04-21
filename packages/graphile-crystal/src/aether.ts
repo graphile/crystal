@@ -75,6 +75,7 @@ export class Aether {
     public readonly rootValue: unknown,
   ) {
     this.variableValuesPlan = new __ValuePlan(this);
+    // TODO: this should use a more intelligent tracked object plan since the variables are strongly typed (unlike context/rootValue).
     this.trackedVariableValuesPlan = new __TrackedObjectPlan(
       this,
       variableValues,

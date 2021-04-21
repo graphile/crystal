@@ -124,6 +124,8 @@ NewAether(schema, document, operationName, variableValues, context, rootValue):
 - Let {variableValuesPlan} be {\_\_ValuePlan(aether)}.
 - Let {aether}.{variableValuesConstraints} be {variableValuesConstraints}.
 - Let {aether}.{variableValuesPlan} be {variableValuesPlan}.
+- (TODO: this should use a more intelligent tracked object plan since the variables are strongly typed (unlike
+  context/rootValue).)
 - Let {aether}.{trackedVariableValuesPlan} be {\_\_TrackedObjectPlan(aether, variableValuesPlan, variableValues,
   variableValuesConstraints)}.
 
@@ -363,7 +365,19 @@ down to variables, methinks.
 
 ### Input non-null plan
 
+Status: complete.
+
 InputNonNullPlan(aether, innerPlan):
+
+- Return {innerPlan}.
+
+Note: We rely on GraphQL to validate the inputs fully; this does mean that we rely on the
+[default values fix](https://github.com/graphql/graphql-spec/pull/793), but this is a concern of the schema designer -
+so long as the defaults are fully specified the client cannot cause issues here.
+
+The following old implementation is not to be used:
+
+OldInputNonNullPlan(aether, innerPlan):
 
 - Let {plan} be {NewPlan(aether)}.
 - Add {innerPlan} to {plan}.{dependencies}.
