@@ -683,10 +683,14 @@ PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequentia
 
 ### GraphQL collect fields
 
-Status: in progress.
+Status: pending.
 
 As with the GraphQL {CollectFields()} algorithm, but with "tracked" access to variables via {\_\_TrackedObjectPlan()}
 rather than direct access.
+
+GraphQLCollectFields(objectType, selectionSet, trackedVariableValuesPlan):
+
+- TODO.
 
 ### Plan field arguments
 
