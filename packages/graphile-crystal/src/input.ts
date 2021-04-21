@@ -6,6 +6,7 @@ import {
   GraphQLType,
   isLeafType,
   GraphQLInputObjectType,
+  isInputType,
 } from "graphql";
 import { Aether } from "./aether";
 import {
@@ -68,6 +69,9 @@ export function inputPlan(
       throw new Error(`No definition for variable '${variableName}' found`);
     }
     const variableType = graphqlGetTypeForNode(aether, variableDefinition.type);
+    if (!isInputType(variableType)) {
+      throw new Error(`Expected varible type to be an input type`);
+    }
     return inputVariablePlan(
       aether,
       variableName,
@@ -84,8 +88,7 @@ export function inputPlan(
     const valuePlan = inputPlan(aether, innerType, inputValue);
     return inputNonNullPlan(aether, valuePlan);
   } else if (inputType instanceof GraphQLList) {
-    const innerType: GraphQLInputType = inputType.ofType;
-    return inputListPlan(aether, innerType, inputValue);
+    return new InputListPlan(aether, inputType, inputValue);
   } else if (isLeafType(inputType)) {
     return inputStaticLeafPlan(aether, inputType, inputValue);
   } else if (inputType instanceof GraphQLInputObjectType) {
