@@ -287,17 +287,14 @@ formation during planning. No other plans allow this kind of plan-time branching
 
 ### Input plan
 
+Status: in progress.
+
 InputPlan(aether, inputType, inputValue, defaultValue):
 
 - If {inputValue} is a {Variable}:
   - Let {variableName} be the name of {inputValue}.
   - Let {variableType} be the expected input type for variable {variableName} in {aether}.{operation}.
-  - (TODO: define the new aether properties.)
-  - Let {variableValuePlan} be the value for key {variableName} in {aether}.{variableValuePlanByVariableName}.
-  - Let {variableValueConstraints} be the value for key {variableName} in
-    {aether}.{variableValueConstraintsByVariableName}.
-  - Return {InputVariablePlan(aether, variableValuePlan, variableValueConstraints, variableType, inputType,
-    defaultValue)}.
+  - Return {InputVariablePlan(aether, variableName, variableType, inputType, defaultValue)}.
 - (Note: past here, we know whether {defaultValue} will be used or not because we know {inputValue} is not a variable.)
 - If {inputValue} does not exist:
   - Let {inputValue} be {defaultValue}.
@@ -317,12 +314,13 @@ InputPlan(aether, inputType, inputValue, defaultValue):
 
 ### Input variable plan
 
-InputVariablePlan(aether, variableValuePlan, constraints, variableType, inputType, defaultValue):
+InputVariablePlan(aether, variableName, variableType, inputType, defaultValue):
 
 - If {variableType} is a non-null type and {inputType} is not a non-null type:
   - Let {unwrappedVariableType} be the inner type of {variableType}.
-  - Return {InputVariablePlan(aether, variableValuePlan, constraints, unwrappedVariableType, inputType, defaultValue)}.
+  - Return {InputVariablePlan(aether, variableName, unwrappedVariableType, inputType, defaultValue)}.
 - Assert: {variableType} is equal to {inputType}.
+- Let {variableValuePlan} be {aether}.{trackedVariableValuesPlan}.{get(variableName)}.
 - If {defaultValue} does not exist or NOT {variableValuePlan}.{evalIs(undefined)}:
   - Return {variableValuePlan}.
 - Otherwise:
