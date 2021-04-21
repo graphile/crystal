@@ -8,7 +8,12 @@ import {
   FieldNode,
   GraphQLObjectType,
 } from "graphql";
-import { Plan, TrackedObjectPlan, assertFinalized } from "./plan";
+import {
+  Plan,
+  __TrackedObjectPlan,
+  __ValuePlan,
+  assertFinalized,
+} from "./plan";
 import { graphqlCollectFields } from "./graphqlCollectFields";
 
 /**
@@ -41,11 +46,14 @@ export class Aether {
     [planId: number]: WeakMap<object, symbol>;
   } = Object.create(null);
   public readonly variableValuesConstraints: Constraint[] = [];
-  public readonly variableValuesPlan: TrackedObjectPlan;
+  public readonly variableValuesPlan: __ValuePlan;
+  public readonly trackedVariableValuesPlan: __TrackedObjectPlan;
   public readonly contextConstraints: Constraint[] = [];
-  public readonly contextPlan: TrackedObjectPlan;
+  public readonly contextPlan: __ValuePlan;
+  public readonly trackedContextPlan: __TrackedObjectPlan;
   public readonly rootValueConstraints: Constraint[] = [];
-  public readonly rootValuePlan: TrackedObjectPlan;
+  public readonly rootValuePlan: __ValuePlan;
+  public readonly trackedRootValuePlan: __TrackedObjectPlan;
   public readonly operationType: "query" | "mutation" | "subscription";
 
   constructor(
@@ -65,19 +73,25 @@ export class Aether {
     },
     public readonly rootValue: unknown,
   ) {
-    this.variableValuesPlan = new TrackedObjectPlan(
+    this.variableValuesPlan = new __ValuePlan(this);
+    this.trackedVariableValuesPlan = new __TrackedObjectPlan(
       this,
       variableValues,
+      this.variableValuesPlan,
       this.variableValuesConstraints,
     );
-    this.contextPlan = new TrackedObjectPlan(
+    this.contextPlan = new __ValuePlan(this);
+    this.trackedContextPlan = new __TrackedObjectPlan(
       this,
       context,
+      this.contextPlan,
       this.contextConstraints,
     );
-    this.rootValuePlan = new TrackedObjectPlan(
+    this.rootValuePlan = new __ValuePlan(this);
+    this.trackedRootValuePlan = new __TrackedObjectPlan(
       this,
       rootValue,
+      this.rootValuePlan,
       this.rootValueConstraints,
     );
     this.operationType = operation.operation;

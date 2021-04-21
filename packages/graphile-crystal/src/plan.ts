@@ -290,17 +290,35 @@ export class __TrackedObjectPlan extends Plan {
    * entries such as `pgClient`.
    */
   private readonly value: unknown;
+
+  /**
+   * For runtime (not plan-time) access to the value.
+   */
+  private readonly valuePlan: __ValuePlan | AccessPlan;
+
+  /**
+   * A reference to the relevant
+   * aether.variableValuesConstraints/contextConstraints/rootValueConstraints.
+   */
   private readonly constraints: Constraint[];
+
+  /**
+   * The path that we are through the original value (the one that
+   * `constraints` relates to).
+   */
   private readonly path: Array<string | number>;
 
   constructor(
     aether: Aether,
     value: unknown,
+    valuePlan: __ValuePlan | AccessPlan,
     constraints: Constraint[],
     path: Array<string | number> = [],
   ) {
     super(aether);
+    this.dependencies.push(valuePlan);
     this.value = value;
+    this.valuePlan = valuePlan;
     this.constraints = constraints;
     this.path = path;
   }
@@ -311,8 +329,15 @@ export class __TrackedObjectPlan extends Plan {
   get(attrName: string): __TrackedObjectPlan {
     const { aether, value, path, constraints } = this;
     const newValue = (value as any)?.[attrName];
+    const newValuePlan = this.valuePlan.get(attrName);
     const newPath = [...path, attrName];
-    return new __TrackedObjectPlan(aether, newValue, constraints, newPath);
+    return new __TrackedObjectPlan(
+      aether,
+      newValue,
+      newValuePlan,
+      constraints,
+      newPath,
+    );
   }
 
   /**
@@ -321,8 +346,15 @@ export class __TrackedObjectPlan extends Plan {
   at(index: number): __TrackedObjectPlan {
     const { aether, value, path, constraints } = this;
     const newValue = (value as any)?.[index];
+    const newValuePlan = this.valuePlan.at(index);
     const newPath = [...path, index];
-    return new __TrackedObjectPlan(aether, newValue, constraints, newPath);
+    return new __TrackedObjectPlan(
+      aether,
+      newValue,
+      newValuePlan,
+      constraints,
+      newPath,
+    );
   }
 
   /**

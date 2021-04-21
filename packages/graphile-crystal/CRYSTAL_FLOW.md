@@ -104,7 +104,7 @@ involving one instance of a nullable `@skip(if: $var)` only two Aether's would b
 
 ### New Aether
 
-Status: in progress.
+Status: complete.
 
 NewAether(schema, document, operationName, variableValues, context, rootValue):
 
