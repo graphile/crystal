@@ -558,18 +558,24 @@ BranchPlan(aether):
 
 ### Plan aether query
 
+Status: complete.
+
 PlanAetherQuery(aether):
 
 - Let {rootType} be the root Query type in {aether}.{schema}.
+- Assert {rootType} exists.
 - Let {selectionSet} be the top level Selection Set in {aether}.{operation}.
 - Let {trackedRootValuePlan} be {aether}.{trackedRootValuePlan}.
 - Call {PlanSelectionSet(aether, "", trackedRootValuePlan, rootType, selectionSet)}.
 
 ### Plan aether mutation
 
+Status: complete.
+
 PlanAetherMutation(aether):
 
 - Let {rootType} be the root Mutation type in {aether}.{schema}.
+- Assert {rootType} exists.
 - Let {selectionSet} be the top level Selection Set in {aether}.{operation}.
 - Let {trackedRootValuePlan} be {aether}.{trackedRootValuePlan}.
 - Call {PlanSelectionSet(aether, "", trackedRootValuePlan, rootType, selectionSet, true)}.
@@ -579,6 +585,7 @@ PlanAetherMutation(aether):
 PlanAetherSubscription(aether):
 
 - Let {rootType} be the root Subscription type in {aether}.{schema}.
+- Assert {rootType} exists.
 - Let {selectionSet} be the top level Selection Set in {aether}.{operation}.
 - Let {trackedVariableValuesPlan} be {aether}.{trackedVariableValuesPlan}.
 - Let {groupedFieldSet} be the result of {graphqlCollectFields(rootType, selectionSet, trackedVariableValuesPlan)}.

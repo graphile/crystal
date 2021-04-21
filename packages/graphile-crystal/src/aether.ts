@@ -124,9 +124,12 @@ export class Aether {
    */
   planQuery(): void {
     const rootType = this.schema.getQueryType();
+    if (!rootType) {
+      throw new Error("No query type found in schema");
+    }
     this.planSelectionSet(
       "",
-      this.rootValuePlan,
+      this.trackedRootValuePlan,
       rootType,
       this.operation.selectionSet,
     );
@@ -138,11 +141,11 @@ export class Aether {
   planMutation(): void {
     const rootType = this.schema.getMutationType();
     if (!rootType) {
-      return;
+      throw new Error("No mutation type found in schema");
     }
     this.planSelectionSet(
       "",
-      this.rootValuePlan,
+      this.trackedRootValuePlan,
       rootType,
       this.operation.selectionSet,
       true,
@@ -155,7 +158,7 @@ export class Aether {
   planSubscription(): void {
     const rootType = this.schema.getSubscriptionType();
     if (!rootType) {
-      return;
+      throw new Error("No subscription type found in schema");
     }
     const selectionSet = this.operation.selectionSet;
     const variableValuesPlan = this.variableValuesPlan;
