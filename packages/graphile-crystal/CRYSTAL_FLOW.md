@@ -104,7 +104,7 @@ involving one instance of a nullable `@skip(if: $var)` only two Aether's would b
 
 ### New Aether
 
-Status: complete.
+Status: in progress.
 
 NewAether(schema, document, operationName, variableValues, context, rootValue):
 
@@ -121,16 +121,24 @@ NewAether(schema, document, operationName, variableValues, context, rootValue):
 - Let {aether}.{valueIdByObjectByPlanId} be an empty map.
 
 - Let {variableValuesConstraints} be an empty list.
+- Let {variableValuesPlan} be {\_\_ValuePlan(aether)}.
 - Let {aether}.{variableValuesConstraints} be {variableValuesConstraints}.
-- Let {aether}.{variableValuesPlan} be {\_\_TrackedObjectPlan(aether, variableValues, variableValuesConstraints)}.
+- Let {aether}.{variableValuesPlan} be {variableValuesPlan}.
+- Let {aether}.{trackedVariableValuesPlan} be {\_\_TrackedObjectPlan(aether, variableValuesPlan, variableValues,
+  variableValuesConstraints)}.
 
 - Let {contextConstraints} be an empty list.
+- Let {contextPlan} be {\_\_ValuePlan(aether)}.
 - Let {aether}.{contextConstraints} be {contextConstraints}.
-- Let {aether}.{contextPlan} be {\_\_TrackedObjectPlan(aether, context, contextConstraints)}.
+- Let {aether}.{contextPlan} be {contextPlan}.
+- Let {aether}.{trackedContextPlan} be {\_\_TrackedObjectPlan(aether, contextPlan, context, contextConstraints)}.
 
 - Let {rootValueConstraints} be an empty list.
+- Let {rootValuePlan} be {\_\_ValuePlan(aether)}.
 - Let {aether}.{rootValueConstraints} be {rootValueConstraints}.
-- Let {aether}.{rootValuePlan} be {\_\_TrackedObjectPlan(aether, rootValue, rootValueConstraints)}.
+- Let {aether}.{rootValuePlan} be {rootValuePlan}.
+- Let {aether}.{trackedRootValuePlan} be {\_\_TrackedObjectPlan(aether, rootValuePlan, rootValue,
+  rootValueConstraints)}.
 
 * If {aether}.{operation} is a query operation:
   - Let {aether}.{operationType} be {"query"}.
@@ -228,17 +236,25 @@ FinalizePlan(aether, plan):
 
 ### Tracked object plan
 
-Status: TODO.
+Status: in progress.
 
-\_\_TrackedObjectPlan(aether, value, constraints, path):
+{\_\_TrackedObjectPlan} will have its values provided at runtime via the supplied {\_\_ValuePlan}. It is also supplied
+with the original values (the ones the Aether was created with) which will be used via the `eval*` methods to narrow the
+scope of the Aether.
+
+\_\_TrackedObjectPlan(aether, valuePlan, value, constraints, path):
 
 - If {path} is not provided, initialize it to an empty list.
 - Let {plan} be {NewPlan(aether)}.
+- Add {valuePlan} to {plan}'s {dependencies}.
+- Let the internal function provided by {plan} for executing the plan, {execute}, be a function that returns the value
+  from {valuePlan}.
 - Augment {plan} such that:
   - Calls to `plan.get(attr)`:
     - Let {newPath} be a copy of {path} with {attr} appended.
     - Let {subValue} be `value[attr]`.
-    - Return {\_\_TrackedObjectPlan(aether, subValue, constraints, newPath)}.
+    - Let {subValuePlan} be {valuePlan}.{get(attr)}.
+    - Return {\_\_TrackedObjectPlan(aether, subValuePlan, subValue, constraints, newPath)}.
   - Calls to `plan.eval()`:
     - Add `{type: 'value', path: path, value: value}` to {constraints}.
     - Return {value}.
@@ -255,7 +271,8 @@ Status: TODO.
   - Calls to `plan.at(idx)`:
     - Let {newPath} be a copy of {path} with {idx} appended.
     - Let {subValue} be `value[idx]`.
-    - Return {\_\_TrackedObjectPlan(aether, subValue, constraints, newPath)}.
+    - Let {subValuePlan} be {valuePlan}.{at(idx)}.
+    - Return {\_\_TrackedObjectPlan(aether, subValuePlan, subValue, constraints, newPath)}.
   - Calls to `plan.evalLength()`:
     - Assert: {value} is an array.
     - Let {length} be the length of the array {value}.
@@ -489,7 +506,7 @@ Note: This algorithm is very similar to {InputObjectPlan()}.
 
 Note: Arguments to a field are either static (in which case they're part of the document and will never change within
 the same aether) or they are provided via variables. We want to track direct access to the variable type arguments via
-{aether}.{variableValuesPlan}, but access to static arguments does not require any tracking at all.
+{aether}.{trackedVariableValuesPlan}, but access to static arguments does not require any tracking at all.
 
 Note: This recurses - values that are static input objects can contain variables within their descendent fields. This
 recursion is handled via {InputPlan} which results in {InputStaticLeafPlan} for static values.
@@ -563,8 +580,8 @@ PlanAetherSubscription(aether):
 
 - Let {rootType} be the root Subscription type in {aether}.{schema}.
 - Let {selectionSet} be the top level Selection Set in {aether}.{operation}.
-- Let {variableValuesPlan} be {aether}.{variableValuesPlan}.
-- Let {groupedFieldSet} be the result of {graphqlCollectFields(rootType, selectionSet, variableValuesPlan)}.
+- Let {trackedVariableValuesPlan} be {aether}.{trackedVariableValuesPlan}.
+- Let {groupedFieldSet} be the result of {graphqlCollectFields(rootType, selectionSet, trackedVariableValuesPlan)}.
 - If {groupedFieldSet} does not have exactly one entry, throw a query error.
 - Let {fields} be the value of the first entry in {groupedFieldSet}.
 - Let {fieldName} be the name of the first entry in {fields}. Note: This value is unaffected if an alias is used.
@@ -586,9 +603,9 @@ PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequentia
 
 - If {isSequential} is not provided, initialize it to {false}.
 - Assert: {objectType} is an object type.
-- Let {variableValuesPlan} be {aether}.{variableValuesPlan}.
-- Let {groupedFieldSet} be the result of {graphqlCollectFields(objectType, selectionSet, variableValuesPlan)} with
-  modified algorithm to factor `groupId`/`maxGroupId` in (based on fragments with `@defer`, `@stream`, etc).
+- Let {trackedVariableValuesPlan} be {aether}.{trackedVariableValuesPlan}.
+- Let {groupedFieldSet} be the result of {graphqlCollectFields(objectType, selectionSet, trackedVariableValuesPlan)}
+  with modified algorithm to factor `groupId`/`maxGroupId` in (based on fragments with `@defer`, `@stream`, etc).
 - For each {groupedFieldSet} as {responseKey} and {fields}:
   - Let {pathIdentity} be `path + ">" + objectType.name + "." + responseKey`.
   - Let {field} be the first entry in {fields}.
