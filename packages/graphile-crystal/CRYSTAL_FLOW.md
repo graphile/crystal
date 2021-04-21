@@ -484,6 +484,8 @@ Note: This algorithm is very similar to {TrackedArguments()}.
 
 ### Tracked arguments
 
+Status: complete
+
 TrackedArguments(aether, objectType, field):
 
 - Let {trackedArgumentValues} be an empty unordered map.

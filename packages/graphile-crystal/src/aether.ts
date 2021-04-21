@@ -202,18 +202,39 @@ export class Aether {
   }
 
   /**
-   * Implements the `TrackedArguments` algorithm.
+   * Implements the `TrackedArguments` algorithm, a replacement for GraphQL's
+   * `CoerceArgumentValues` that factors in tracked variables.
+   *
+   * @see https://spec.graphql.org/draft/#CoerceArgumentValues()
    */
   getTrackedArguments(
     objectType: GraphQLObjectType,
     field: FieldNode,
-  ): TrackedArguments {
-    const { variableValuesPlan } = this;
-    const argumentValues = graphqlCoerceArgumentValues(
-      objectType,
-      field,
-      variableValuesPlan,
-    );
+  ): { [key: string]: InputPlan } {
+    const trackedArgumentValues = {};
+    if (field.arguments) {
+      const argumentValues = field.arguments;
+      const fieldName = field.name.value;
+      const fieldSpec = objectType.getFields()[fieldName];
+      const argumentDefinitions = fieldSpec.args;
+
+      for (const argumentName in argumentDefinitions) {
+        const argumentDefinition = argumentDefinitions[argumentName];
+        const argumentType = argumentDefinition.type;
+        const defaultValue = argumentDefinition.defaultValue;
+        const argumentValue = argumentValues.find(
+          (v) => v.name.value === argumentName,
+        );
+        const argumentPlan = inputPlan(
+          this,
+          argumentType,
+          argumentValue,
+          defaultValue,
+        );
+        trackedArgumentValues[argumentName] = argumentPlan;
+      }
+    }
+    return trackedArgumentValues;
   }
 
   /**
