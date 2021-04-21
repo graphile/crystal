@@ -562,8 +562,8 @@ PlanAetherQuery(aether):
 
 - Let {rootType} be the root Query type in {aether}.{schema}.
 - Let {selectionSet} be the top level Selection Set in {aether}.{operation}.
-- Let {rootValuePlan} be {aether}.{rootValuePlan}.
-- Call {PlanSelectionSet(aether, "", rootValuePlan, rootType, selectionSet)}.
+- Let {trackedRootValuePlan} be {aether}.{trackedRootValuePlan}.
+- Call {PlanSelectionSet(aether, "", trackedRootValuePlan, rootType, selectionSet)}.
 
 ### Plan aether mutation
 
@@ -571,8 +571,8 @@ PlanAetherMutation(aether):
 
 - Let {rootType} be the root Mutation type in {aether}.{schema}.
 - Let {selectionSet} be the top level Selection Set in {aether}.{operation}.
-- Let {rootValuePlan} be {aether}.{rootValuePlan}.
-- Call {PlanSelectionSet(aether, "", rootValuePlan, rootType, selectionSet, true)}.
+- Let {trackedRootValuePlan} be {aether}.{trackedRootValuePlan}.
+- Call {PlanSelectionSet(aether, "", trackedRootValuePlan, rootType, selectionSet, true)}.
 
 ### Plan aether subscription
 
@@ -590,11 +590,12 @@ PlanAetherSubscription(aether):
 - Let {subscriptionPlanResolver} be `fieldSpec.extensions.graphile.subscribePlan`.
 - If {subscriptionPlanResolver} exists:
   - Let {trackedArguments} be {TrackedArguments(aether, rootType, field)}.
-  - Let {rootValuePlan} be {aether}.{rootValuePlan}.
-  - Let {subscribePlan} be {ExecutePlanResolver(aether, subscriptionPlanResolver, rootValuePlan, trackedArguments)}.
+  - Let {trackedRootValuePlan} be {aether}.{trackedRootValuePlan}.
+  - Let {subscribePlan} be {ExecutePlanResolver(aether, subscriptionPlanResolver, trackedRootValuePlan,
+    trackedArguments)}.
   - Call {PlanFieldArguments(aether, field, trackedArguments, subscribePlan)}.
 - Otherwise:
-  - Let {subscribePlan} be {aether}.{rootValuePlan}.
+  - Let {subscribePlan} be {aether}.{trackedRootValuePlan}.
 - Call {PlanSelectionSet(aether, "", subscribePlan, rootType, selectionSet)}.
 
 ### Plan selection set
