@@ -8820,7 +8820,7 @@ fsevents@^1.2.7:
     lodash: ^4.17.15
     nodemon: ^2.0.7
     pg-sql2: 4.7.0
-    spec-md: ^2.0.2
+    spec-md: ^3.0.2
     ts-node: ^9.1.1
     tslib: ^2.0.0
     typescript: ^3.9.2
@@ -17342,14 +17342,14 @@ resolve@~1.12.0:
   languageName: node
   linkType: hard
 
-"spec-md@npm:^2.0.2":
-  version: 2.0.2
-  resolution: "spec-md@npm:2.0.2"
+"spec-md@npm:^3.0.2":
+  version: 3.0.2
+  resolution: "spec-md@npm:3.0.2"
   dependencies:
     prismjs: ^1.23.0
   bin:
     spec-md: bin/spec-md
-  checksum: 3/0c9011474e5bc96aa1e512f4f8d815fdb016c46e847623568fbc71b21e12184834a75b0bcd49724b64c3cb139e145e9db2facbf7a5d95d3bbdca58fc85596c2e
+  checksum: 3/a66070d0e940a9ab605aa572454e7688f4faa8b0831bdc5cad8c8e3def09b60aa93d2dc5a0d7418a0e16b09a5bab442da9ee550e9fe608594d807d3b633f30f2
   languageName: node
   linkType: hard
 

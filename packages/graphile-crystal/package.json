@@ -6,7 +6,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest -i",
-    "prepack": "tsc -b"
+    "prepack": "tsc -b",
+    "md": "spec-md CRYSTAL_FLOW.md > CRYSTAL_FLOW.html"
   },
   "repository": {
     "type": "git",
@@ -40,10 +41,7 @@
   "peerDependencies": {
     "graphql": "^15.3.0"
   },
-  "files": [
-    "dist",
-    "index.js"
-  ],
+  "files": ["dist", "index.js"],
   "devDependencies": {
     "@types/jest": "^25.2.3",
     "@types/lodash": "^4.14.151",
@@ -52,7 +50,7 @@
     "jest": "^26.0.1",
     "nodemon": "^2.0.7",
     "pg-sql2": "4.7.0",
-    "spec-md": "^2.0.2",
+    "spec-md": "^3.0.2",
     "ts-node": "^9.1.1",
     "typescript": "^3.9.2"
   }
