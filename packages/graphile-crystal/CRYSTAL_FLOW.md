@@ -287,7 +287,7 @@ formation during planning. No other plans allow this kind of plan-time branching
 
 ### Input plan
 
-Status: in progress.
+Status: complete.
 
 InputPlan(aether, inputType, inputValue, defaultValue):
 
@@ -306,9 +306,9 @@ InputPlan(aether, inputType, inputValue, defaultValue):
   - Let {innerType} be the inner type of {inputType}.
   - Return {InputListPlan(aether, innerType, inputValue)}.
 - Otherwise, if {inputType} is a leaf type:
-  - Return {InputStaticLeafPlan(aether, innerType, inputValue)}
+  - Return {InputStaticLeafPlan(aether, inputType, inputValue)}
 - Otherwise, if {inputType} is an input object type:
-  - Return {InputObjectPlan(aether, innerType, inputValue)}.
+  - Return {InputObjectPlan(aether, inputType, inputValue)}.
 - Otherwise:
   - Raise an unsupported input type error.
 

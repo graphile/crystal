@@ -15,6 +15,7 @@ import {
   assertFinalized,
 } from "./plan";
 import { graphqlCollectFields } from "./graphqlCollectFields";
+import { InputPlan } from "./input";
 
 /**
  * Implements the `MarkPlanActive` algorithm.
