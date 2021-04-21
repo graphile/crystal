@@ -2,9 +2,11 @@
 
 # Step 1. Planning phase
 
-Before we can execute our plans we must first establish a context in which to create the plans. We call this context the
-"Aether." Aethers may be shared between multiple GraphQL requests so long as they meet the relevant requirements (based
-on matching {schema}, {document} and {operationName}, and passing relevant tests on the values that they have referenced
+:: Before we can execute our plans we must first establish a context in which to create the plans. We call this context
+the _Aether_.
+
+*Aether*s may be shared between multiple GraphQL requests so long as they meet the relevant requirements (based on
+matching {schema}, {document} and {operationName}, and passing relevant tests on the values that they have referenced
 within {variableValues} / {context} / {rootValue}).
 
 Sharing Aethers across GraphQL requests also allows us to batch execution of certain plans across requests, leading to
@@ -19,26 +21,36 @@ however despite this you may use the same aether for different variables assumin
 used during the "plan execution phase" and not during the "planning phase".
 
 Note: Where `graphqlSomething` is referenced below it means use a very similar algorithm as in the GraphQL spec, however
-you will be given a {TrackedObjectPlan()} rather than the direct {variable}, {context} and {rootValue} values; so you
-need to access the properties using `.get` or `.is`. To reduce noise, we've not yet included these updated algorithms in
-this spec.
+you will be given a {\_\_TrackedObjectPlan()} rather than the direct {variable}, {context} and {rootValue} values; so
+you need to access the properties using `.get` or `.is`. To reduce noise, we've not yet included these updated
+algorithms in this spec.
 
 The first thing we need to do is call {EstablishAether()} to get the aether within which the operation will execute;
 this will also involve performing the planning if it hasn't already been done. Once we have the aether we can move on to
 the execution phase.
 
-{globalCache} is a global cache for performance.
+### Global cache
+
+:: _globalCache_ is a global cache for performance.
+
+### Establish Aether
+
+Status: complete.
 
 EstablishAether(schema, document, operationName, variableValues, context, rootValue):
 
-- Let {possibleAethers} be all the Aethers in {globalCache}.
+- Let {possibleAethers} be all the Aethers in _globalCache_.
 - For each {possibleAether} in {possibleAethers}:
   - If {IsAetherCompatible(possibleAether, schema, document, operationName, variableValues, context, rootValue)}:
     - Return {possibleAether}.
 - Let {aether} be the result of calling {NewAether(schema, document, operationName, variableValues, context,
   rootValue)}.
-- Store {aether} into {globalCache} (temporarily).
+- Store {aether} into _globalCache_ (temporarily).
 - Return {aether}.
+
+### Is Aether compatible?
+
+Status: complete.
 
 IsAetherCompatible(aether, schema, document, operationName, variableValues, context, rootValue):
 
@@ -59,12 +71,20 @@ IsAetherCompatible(aether, schema, document, operationName, variableValues, cont
   - Return {false}.
 - Return {true}.
 
+### Matches constraints
+
+Status: complete.
+
 MatchesConstraints(constraints, object):
 
 - For each {constraint} in {constraints}:
   - If not {MatchesConstraint(constraint, object)}:
     - Return {false}.
 - Return {true}.
+
+### Matches constraint
+
+Status: complete.
 
 MatchesConstraint(constraint, value):
 
@@ -82,6 +102,10 @@ specified), and when we evaluate `@skip(if: $var)` or `@include(if: $var)` we on
 involving one instance of a nullable `@skip(if: $var)` only two Aether's would be required to represent all states of
 `$var` (one for {true}; and one for {false}, {null} and undefined) rather than 4.
 
+### New Aether
+
+Status: complete.
+
 NewAether(schema, document, operationName, variableValues, context, rootValue):
 
 - Let {aether} be an empty object.
@@ -98,15 +122,15 @@ NewAether(schema, document, operationName, variableValues, context, rootValue):
 
 - Let {variableValuesConstraints} be an empty list.
 - Let {aether}.{variableValuesConstraints} be {variableValuesConstraints}.
-- Let {aether}.{variableValuesPlan} be {TrackedObjectPlan(aether, variableValues, variableValuesConstraints)}.
+- Let {aether}.{variableValuesPlan} be {\_\_TrackedObjectPlan(aether, variableValues, variableValuesConstraints)}.
 
 - Let {contextConstraints} be an empty list.
 - Let {aether}.{contextConstraints} be {contextConstraints}.
-- Let {aether}.{contextPlan} be {TrackedObjectPlan(aether, context, contextConstraints)}.
+- Let {aether}.{contextPlan} be {\_\_TrackedObjectPlan(aether, context, contextConstraints)}.
 
 - Let {rootValueConstraints} be an empty list.
 - Let {aether}.{rootValueConstraints} be {rootValueConstraints}.
-- Let {aether}.{rootValuePlan} be {TrackedObjectPlan(aether, rootValue, rootValueConstraints)}.
+- Let {aether}.{rootValuePlan} be {\_\_TrackedObjectPlan(aether, rootValue, rootValueConstraints)}.
 
 * If {aether}.{operation} is a query operation:
   - Let {aether}.{operationType} be {"query"}.
@@ -124,12 +148,20 @@ NewAether(schema, document, operationName, variableValues, context, rootValue):
 * Call {FinalizePlans(aether)}.
 * Return {aether}.
 
+### Optimize plans
+
+Status: complete.
+
 OptimizePlans(aether):
 
 - For each {plan} with index {i} in {aether}.{plans} in reverse order:
   - Let {optimizedPlan} be {OptimizePlan(aether, plan)}.
   - Let the {i}th entry in {aether}.{plans} be {optimizedPlan}.
 - Return.
+
+### Optimize plan
+
+Status: stubbed.
 
 OptimizePlan(aether, plan):
 
@@ -138,6 +170,10 @@ OptimizePlan(aether, plan):
 TODO: merge similar plans, etc.
 
 Note: we must never optimise {\_\_ValuePlan()} plans.
+
+### Tree shake plans
+
+Status: complete.
 
 TreeShakePlans(aether):
 
@@ -151,6 +187,10 @@ TreeShakePlans(aether):
 Note: Replacing inactive plans with null is not strictly necessary, but it may help catch bugs earlier. Maybe only do
 this in development. Maybe don't do it if it makes the TypeScript too annoying.
 
+### Mark plan active
+
+Status: complete.
+
 MarkPlanActive(plan, activePlans):
 
 - If {plan} is within {activePlans}:
@@ -161,6 +201,10 @@ MarkPlanActive(plan, activePlans):
 - For each {childPlan} in {plan}.{children}:
   - Call {MarkPlanActive(dependencyPlan, activePlans)}.
 
+### Finalize plans
+
+Status: complete.
+
 FinalizePlans(aether):
 
 - Let {activePlans} be the _distinct_ active plans within {aether}.{plans}.
@@ -170,57 +214,61 @@ FinalizePlans(aether):
 Note: FinalizePlans is the stage at which the SQL, GraphQL, etc query may be built; before this time it's not clear what
 the selection will be as intermediate plans may have been discarded.
 
+This is where the SQL generation would occur.
+
+### Finalize plan
+
+Status: complete.
+
 FinalizePlan(aether, plan):
 
 - Let {finalize} be the internal function provided by {plan} for finalizing the plan.
 - Calling {finalize}.
 - Let {plan}.{finalized} be {true}.
 
-TrackedObjectPlan(aether, object, constraints, path):
+### Tracked object plan
+
+Status: TODO.
+
+\_\_TrackedObjectPlan(aether, value, constraints, path):
 
 - If {path} is not provided, initialize it to an empty list.
-- Let {plan} be {\_\_ValuePlan(aether)}.
+- Let {plan} be {NewPlan(aether)}.
 - Augment {plan} such that:
   - Calls to `plan.get(attr)`:
     - Let {newPath} be a copy of {path} with {attr} appended.
-    - Let {value} be `object[attr]`.
-    - Return {TrackedObjectPlan(aether, value, constraints, newPath)}.
-  - Calls to `plan.evalGet(attr)`:
-    - Let {newPath} be a copy of {path} with {attr} appended.
-    - Let {value} be `object[attr]`.
-    - Add `{type: 'value', path: newPath, value: value}` to {constraints}.
+    - Let {subValue} be `value[attr]`.
+    - Return {\_\_TrackedObjectPlan(aether, subValue, constraints, newPath)}.
+  - Calls to `plan.eval()`:
+    - Add `{type: 'value', path: path, value: value}` to {constraints}.
     - Return {value}.
-  - Calls to `plan.evalIs(attr, expectedValue)`:
-    - Let {newPath} be a copy of {path} with {attr} appended.
-    - Let {value} be `object[attr]`.
+  - Calls to `plan.evalIs(expectedValue)`:
     - Let {pass} be `value === expectedValue`.
-    - Add `{type: 'equal', path: newPath, expectedValue: expectedValue, pass: pass}` to {constraints}.
+    - Add `{type: 'equal', path: path, expectedValue: expectedValue, pass: pass}` to {constraints}.
     - Return {pass}.
   - Calls to `plan.evalHas(attr)`:
     - Let {newPath} be a copy of {path} with {attr} appended.
-    - Let {exists} be whether the property `object[attr]` exists ({null} exists, {undefined} does not).
+    - Let {exists} be whether the property `value[attr]` exists ({null} exists, {undefined} does not).
     - Add `{type: 'exists', path: newPath, exists: exists}` to {constraints}.
     - Return {exists}.
   - TODO: split array stuff into separate thing?
   - Calls to `plan.at(idx)`:
     - Let {newPath} be a copy of {path} with {idx} appended.
-    - Let {value} be `object[idx]`.
-    - Return {TrackedObjectPlan(aether, value, constraints, newPath)}.
-  - Calls to `plan.evalAt(idx)`:
-    - Let {newPath} be a copy of {path} with {idx} appended.
-    - Let {value} be `object[idx]`.
-    - Add `{type: 'value', path: newPath, value: value}` to {constraints}.
-    - Return {value}.
+    - Let {subValue} be `value[idx]`.
+    - Return {\_\_TrackedObjectPlan(aether, subValue, constraints, newPath)}.
   - Calls to `plan.evalLength()`:
-    - Assert: {object} is an array.
-    - Let {length} be the length of the array {object}.
+    - Assert: {value} is an array.
+    - Let {length} be the length of the array {value}.
     - Add `{type: 'length', path: path, expectedLength: length}` to {constraints}.
     - Return {length}.
+  - (In future, maybe `plan.evalContains(childValue)` e.g. for JWT scopes?)
 - Return {plan}.
 
-Note: a {TrackedObjectPlan()} is a {ValuePlan()} with extra `eval` methods that allow branching the plan formation
-during planning. No other plans allow this kind of plan-time branching because planning is synchronous, and
-{TrackedObjectPlan()} is the only type that represents these synchronous pieces of data.
+Note: A {\_\_TrackedObjectPlan()} is like {ValuePlan()} but with extra `eval` methods that allow branching the plan
+formation during planning. No other plans allow this kind of plan-time branching because planning is synchronous, and
+{\_\_TrackedObjectPlan()} is the only type that represents these synchronous pieces of data.
+
+### Input plan
 
 InputPlan(aether, inputType, inputValue, defaultValue):
 
@@ -250,6 +298,8 @@ InputPlan(aether, inputType, inputValue, defaultValue):
 - Otherwise:
   - Raise an unsupported input type error.
 
+### Input variable plan
+
 InputVariablePlan(aether, variableValuePlan, constraints, variableType, inputType, defaultValue):
 
 - If {variableType} is a non-null type and {inputType} is not a non-null type:
@@ -267,6 +317,8 @@ difference allowed is that the variable might be non-null when the input type is
 
 Note: The GraphQL algorithm {CoerceVariableValues} will ensure that the contents of the variables adhere to the expected
 types, so we do not need to perform coercion ourselves.
+
+### Input coercion plan
 
 InputCoercionPlan(aether, inputType, innerPlan):
 
@@ -289,6 +341,8 @@ InputCoercionPlan(aether, inputType, innerPlan):
 TODO: delete this plan? Leaves are already coerced; we coerce lists implicitly, maybe we don't need it? Really comes
 down to variables, methinks.
 
+### Input non-null plan
+
 InputNonNullPlan(aether, innerPlan):
 
 - Let {plan} be {NewPlan(aether)}.
@@ -310,6 +364,8 @@ InputNonNullPlan(aether, innerPlan):
     - Otherwise:
       - Return {innerValue}.
 - Return {plan}.
+
+### Input list plan
 
 InputListPlan(aether, inputType, inputValues):
 
@@ -351,6 +407,8 @@ InputListPlan(aether, inputType, inputValues):
 Note: though this may have variables for values within the list, it is not a variable itself (it has a known length in
 the AST) thus we can return different plans for different elements in the list.
 
+### Input static leaf plan
+
 InputStaticLeafPlan(aether, inputType, value):
 
 - Let {plan} be {NewPlan(aether)}.
@@ -363,6 +421,8 @@ InputStaticLeafPlan(aether, inputType, value):
 - Return {plan}.
 
 This represents a static "leaf" value, but will return it via a plan. The plan will always evaluate to the same value.
+
+### Input object plan
 
 InputObjectPlan(aether, inputObjectType, inputValues):
 
@@ -405,6 +465,8 @@ InputObjectPlan(aether, inputObjectType, inputValues):
 
 Note: This algorithm is very similar to {TrackedArguments()}.
 
+### Tracked arguments
+
 TrackedArguments(aether, objectType, field):
 
 - Let {trackedArgumentValues} be an empty unordered map.
@@ -432,6 +494,10 @@ the same aether) or they are provided via variables. We want to track direct acc
 Note: This recurses - values that are static input objects can contain variables within their descendent fields. This
 recursion is handled via {InputPlan} which results in {InputStaticLeafPlan} for static values.
 
+### New plan
+
+Status: complete.
+
 NewPlan(aether):
 
 - Let {plan} be an empty object.
@@ -445,6 +511,14 @@ NewPlan(aether):
 - Push {plan} onto {aether}.{plans} (Note: it will have {plan}.{id} as its index within {aether}.{plans}).
 - Return {plan}.
 
+### Value plan
+
+Status: complete.
+
+This represents a concrete object value that'll be passed later; e.g. the result of the parent resolver when the parent
+resolver does not return a plan. Like all plans it actually represents a batch of values; you can `.get(attrName)` to
+get a plan that resolves to the relevant attribute value from the value plan.
+
 \_\_ValuePlan(aether):
 
 - Let {plan} be {NewPlan(aether)}.
@@ -452,20 +526,20 @@ NewPlan(aether):
   consistency error.
 - Return {plan}.
 
-This represents a concrete object value that'll be passed later; e.g. the result of the parent resolver when the parent
-resolver does not return a plan. Like all plans it actually represents a batch of values; you can `.get(attrName)` to
-get a plan that resolves to the relevant attribute value from the value plan.
-
 Note: `__ValuePlan` has an underscore prefix since users should never use it; it's an internal plan.
 
-Note: this plan is never executed; it's purely internal - we populate the value as part of the algorithm - see
+Note: This plan is never executed; it's purely internal - we populate the value as part of the algorithm - see
 {GetValuePlanId} and {PopulateValuePlan}.
+
+### Branch plan
 
 BranchPlan(aether):
 
 - TODO: this'll allow branching between multiple other plans, e.g. in the case of a union/interface, but also based on
   custom user logic (e.g. fetching different things depending on your billing level, or only showing certain things if
   your authorization allows that).
+
+### Plan aether query
 
 PlanAetherQuery(aether):
 
@@ -474,12 +548,16 @@ PlanAetherQuery(aether):
 - Let {rootValuePlan} be {aether}.{rootValuePlan}.
 - Call {PlanSelectionSet(aether, "", rootValuePlan, rootType, selectionSet)}.
 
+### Plan aether mutation
+
 PlanAetherMutation(aether):
 
 - Let {rootType} be the root Mutation type in {aether}.{schema}.
 - Let {selectionSet} be the top level Selection Set in {aether}.{operation}.
 - Let {rootValuePlan} be {aether}.{rootValuePlan}.
 - Call {PlanSelectionSet(aether, "", rootValuePlan, rootType, selectionSet, true)}.
+
+### Plan aether subscription
 
 PlanAetherSubscription(aether):
 
@@ -501,6 +579,8 @@ PlanAetherSubscription(aether):
 - Otherwise:
   - Let {subscribePlan} be {aether}.{rootValuePlan}.
 - Call {PlanSelectionSet(aether, "", subscribePlan, rootType, selectionSet)}.
+
+### Plan selection set
 
 PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequential):
 
@@ -553,6 +633,8 @@ PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequentia
   - Let {aether}.{groupId} be {oldGroupId}.
 - Return.
 
+### Plan field arguments
+
 PlanFieldArguments(aether, field, trackedArguments, fieldPlan):
 
 - For each argument {argument} in {field}:
@@ -561,6 +643,8 @@ PlanFieldArguments(aether, field, trackedArguments, fieldPlan):
     - Let {trackedArgumentValue} be {trackedArguments}.{get(argumentName)}.
     - Call {PlanFieldArgument(aether, argument, trackedArgumentValue, fieldPlan)}.
 - Return.
+
+### Plan field argument
 
 PlanFieldArgument(aether, argument, trackedValuePlan, fieldPlan):
 
@@ -571,6 +655,8 @@ PlanFieldArgument(aether, argument, trackedValuePlan, fieldPlan):
     - Let {argumentType} be the expected type of {argument}.
     - Call {PlanInput(aether, argumentType, trackedValuePlan, argumentPlan)}.
 - Return.
+
+### Plan input
 
 PlanInput(aether, inputType, trackedValuePlan, parentPlan):
 
@@ -598,6 +684,8 @@ PlanInput(aether, inputType, trackedValuePlan, parentPlan):
 
 Note: we are only expecting to {PlanInput()} for objects or lists thereof, not scalars.
 
+### Plan input fields
+
 PlanInputFields(aether, inputObjectType, trackedValuePlan, parentPlan):
 
 - For each input field {inputField} in {inputObjectType}:
@@ -606,6 +694,8 @@ PlanInputFields(aether, inputObjectType, trackedValuePlan, parentPlan):
     - Let {trackedFieldValue} be {trackedValuePlan}.{get(fieldName)}.
     - Call {PlanInputField(aether, inputField, trackedFieldValue, fieldPlan)}.
 - Return.
+
+### Plan input field
 
 PlanInputField(aether, inputField, trackedValuePlan, parentPlan):
 
@@ -617,6 +707,8 @@ PlanInputField(aether, inputField, trackedValuePlan, parentPlan):
   - Note: the unwrapped type of {inputFieldType} must be an input object.
   - Call {PlanInput(aether, inputFieldType, trackedValuePlan, inputFieldPlan)}.
 - Return.
+
+### Execute plan resolver
 
 ExecutePlanResolver(aether, planResolver, parentPlan, trackedArguments):
 
@@ -651,6 +743,8 @@ If executing the plan results in an error, throw the error. Otherwise we should 
 (keeping track of all the previous values too (see the parent object), perhaps using their plan id?) which we then pass
 through to the underlying resolver.
 
+### Get value plan id
+
 GetValuePlanId(aether, valuePlan, object):
 
 - Assert: {valuePlan} is a {\_\_ValuePlan}.
@@ -665,6 +759,8 @@ GetValuePlanId(aether, valuePlan, object):
     this specific parent.)
   - Set {valueId} as the value for {object} in {valueIdByObject}.
   - Return {valueId}.
+
+### Resolve field value crystal
 
 ResolveFieldValueCrystal(schema, document, operationName, variableValues, context, rootValue, field, parentObject,
 argumentValues, pathIdentity):
@@ -710,6 +806,8 @@ argumentValues, pathIdentity):
     right name to give this property since there will be many with the same value.)~~
   - Return {CrystalWrap(plan, returnType, parentCrystalObject, pathIdentity, id, result)}.
 
+### Crystal wrap
+
 CrystalWrap(plan, returnType, parentCrystalObject, pathIdentity, id, data, indexes):
 
 - If {indexes} is not set, initialize it to an empty list.
@@ -735,6 +833,8 @@ CrystalWrap(plan, returnType, parentCrystalObject, pathIdentity, id, data, index
     indexesByPathIdentity)}.
   - Return {crystalObject}.
 
+### New crystal object
+
 NewCrystalObject(plan, pathIdentity, id, indexes, data, crystalContext, idByPathIdentity, indexesByPathIdentity):
 
 - If {idByPathIdentity} is not set, initialize it to a map containing value {crystalContext}.{rootId} for key `""`.
@@ -746,6 +846,8 @@ NewCrystalObject(plan, pathIdentity, id, indexes, data, crystalContext, idByPath
 - Set {id} as the value for key {pathIdentity} within {crystalObject}.{idByPathIdentity}.
 - Set {indexes} as the value for key {pathIdentity} within {crystalObject}.{indexesByPathIdentity}.
 - Return {crystalObject}.
+
+### New crystal context
 
 NewCrystalContext(aether, variableValues, context, rootValue):
 
@@ -762,9 +864,13 @@ NewCrystalContext(aether, variableValues, context, rootValue):
 - Call {PopulateValuePlan(crystalContext, rootValuePlan, rootId, rootValue)}.
 - Return {crystalContext}.
 
+### Populate value plan
+
 PopulateValuePlan(crystalContext, valuePlan, valueId, object):
 
 - Set {object} as the value for entry {valueId} for entry {valuePlan} in {crystalContext}.{resultByIdByPlan}.
+
+### Get batch
 
 GetBatch(aether, pathIdentity, parentCrystalObject, variableValues, context, rootValue):
 
@@ -780,6 +886,8 @@ GetBatch(aether, pathIdentity, parentCrystalObject, variableValues, context, roo
     executed it will delete itself from aether.batchByPathIdentity.)
 - Return {batch}.
 
+### New batch
+
 NewBatch(aether, pathIdentity, crystalContext):
 
 - Let {batch} be an empty object.
@@ -790,6 +898,8 @@ NewBatch(aether, pathIdentity, crystalContext):
 - Let {batch}.{plan} be {plan}.
 - Let {batch}.{entries} be an empty list.
 - Return {batch}.
+
+### Execute batch
 
 ExecuteBatch(aether, batch, crystalContext):
 
@@ -806,11 +916,15 @@ ExecuteBatch(aether, batch, crystalContext):
   - Resolve {deferredResult} with {result}.
 - Return.
 
+### Get batch result
+
 GetBatchResult(batch, parentCrystalObject):
 
 - Let {deferredResult} be a new {Defer}.
 - Push the tuple `[parentCrystalObject, deferredResult]` onto {batch}.{entries}.
 - Return {deferredResult}.
+
+### Execute plan
 
 ExecutePlan(aether, plan, crystalContext, crystalObjects, visitedPlans):
 
