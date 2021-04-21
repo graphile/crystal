@@ -27,6 +27,7 @@ module.exports = {
     "@typescript-eslint/no-empty-interface": "off",
     // We need this for our `GraphileEngine` namespace
     "@typescript-eslint/no-namespace": "off",
+    "@typescript-eslint/no-use-before-define": "off",
     "@typescript-eslint/no-var-requires": "off",
     "@typescript-eslint/no-unused-vars": [
       "error",
@@ -47,7 +48,6 @@ module.exports = {
     "tsdoc/syntax": 2,
 
     // Rules that we should enable:
-    "@typescript-eslint/no-use-before-define": "warn",
     "@typescript-eslint/no-inferrable-types": "warn",
     "no-inner-declarations": "warn",
   },
