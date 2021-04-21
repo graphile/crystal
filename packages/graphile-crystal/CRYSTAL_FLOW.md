@@ -342,6 +342,8 @@ types, so we do not need to perform coercion ourselves.
 
 ### Input coercion plan
 
+Status: pending.
+
 InputCoercionPlan(aether, inputType, innerPlan):
 
 - Let {plan} be {NewPlan(aether)}.
@@ -445,6 +447,8 @@ the AST) thus we can return different plans for different elements in the list.
 
 ### Input static leaf plan
 
+Status: pending.
+
 InputStaticLeafPlan(aether, inputType, value):
 
 - Let {plan} be {NewPlan(aether)}.
@@ -459,6 +463,8 @@ InputStaticLeafPlan(aether, inputType, value):
 This represents a static "leaf" value, but will return it via a plan. The plan will always evaluate to the same value.
 
 ### Input object plan
+
+Status: pending.
 
 InputObjectPlan(aether, inputObjectType, inputValues):
 
@@ -571,6 +577,8 @@ Note: This plan is never executed; it's purely internal - we populate the value 
 
 ### Branch plan
 
+Status: pending.
+
 BranchPlan(aether):
 
 - TODO: this'll allow branching between multiple other plans, e.g. in the case of a union/interface, but also based on
@@ -629,6 +637,8 @@ PlanAetherSubscription(aether):
 - Call {PlanSelectionSet(aether, "", subscribePlan, rootType, selectionSet)}.
 
 ### Plan selection set
+
+Status: pending.
 
 PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequential):
 
@@ -694,6 +704,8 @@ GraphQLCollectFields(objectType, selectionSet, trackedVariableValuesPlan):
 
 ### Plan field arguments
 
+Status: pending.
+
 PlanFieldArguments(aether, field, trackedArguments, fieldPlan):
 
 - For each argument {argument} in {field}:
@@ -704,6 +716,8 @@ PlanFieldArguments(aether, field, trackedArguments, fieldPlan):
 - Return.
 
 ### Plan field argument
+
+Status: pending.
 
 PlanFieldArgument(aether, argument, trackedValuePlan, fieldPlan):
 
@@ -716,6 +730,8 @@ PlanFieldArgument(aether, argument, trackedValuePlan, fieldPlan):
 - Return.
 
 ### Plan input
+
+Status: pending.
 
 PlanInput(aether, inputType, trackedValuePlan, parentPlan):
 
@@ -745,6 +761,8 @@ Note: we are only expecting to {PlanInput()} for objects or lists thereof, not s
 
 ### Plan input fields
 
+Status: pending.
+
 PlanInputFields(aether, inputObjectType, trackedValuePlan, parentPlan):
 
 - For each input field {inputField} in {inputObjectType}:
@@ -755,6 +773,8 @@ PlanInputFields(aether, inputObjectType, trackedValuePlan, parentPlan):
 - Return.
 
 ### Plan input field
+
+Status: pending.
 
 PlanInputField(aether, inputField, trackedValuePlan, parentPlan):
 
@@ -768,6 +788,8 @@ PlanInputField(aether, inputField, trackedValuePlan, parentPlan):
 - Return.
 
 ### Execute plan resolver
+
+Status: pending.
 
 ExecutePlanResolver(aether, planResolver, parentPlan, trackedArguments):
 
@@ -804,6 +826,8 @@ through to the underlying resolver.
 
 ### Get value plan id
 
+Status: pending.
+
 GetValuePlanId(aether, valuePlan, object):
 
 - Assert: {valuePlan} is a {\_\_ValuePlan}.
@@ -820,6 +844,8 @@ GetValuePlanId(aether, valuePlan, object):
   - Return {valueId}.
 
 ### Resolve field value crystal
+
+Status: pending.
 
 ResolveFieldValueCrystal(schema, document, operationName, variableValues, context, rootValue, field, parentObject,
 argumentValues, pathIdentity):
@@ -867,6 +893,8 @@ argumentValues, pathIdentity):
 
 ### Crystal wrap
 
+Status: pending.
+
 CrystalWrap(plan, returnType, parentCrystalObject, pathIdentity, id, data, indexes):
 
 - If {indexes} is not set, initialize it to an empty list.
@@ -894,6 +922,8 @@ CrystalWrap(plan, returnType, parentCrystalObject, pathIdentity, id, data, index
 
 ### New crystal object
 
+Status: pending.
+
 NewCrystalObject(plan, pathIdentity, id, indexes, data, crystalContext, idByPathIdentity, indexesByPathIdentity):
 
 - If {idByPathIdentity} is not set, initialize it to a map containing value {crystalContext}.{rootId} for key `""`.
@@ -907,6 +937,8 @@ NewCrystalObject(plan, pathIdentity, id, indexes, data, crystalContext, idByPath
 - Return {crystalObject}.
 
 ### New crystal context
+
+Status: pending.
 
 NewCrystalContext(aether, variableValues, context, rootValue):
 
@@ -925,11 +957,15 @@ NewCrystalContext(aether, variableValues, context, rootValue):
 
 ### Populate value plan
 
+Status: pending.
+
 PopulateValuePlan(crystalContext, valuePlan, valueId, object):
 
 - Set {object} as the value for entry {valueId} for entry {valuePlan} in {crystalContext}.{resultByIdByPlan}.
 
 ### Get batch
+
+Status: pending.
 
 GetBatch(aether, pathIdentity, parentCrystalObject, variableValues, context, rootValue):
 
@@ -947,6 +983,8 @@ GetBatch(aether, pathIdentity, parentCrystalObject, variableValues, context, roo
 
 ### New batch
 
+Status: pending.
+
 NewBatch(aether, pathIdentity, crystalContext):
 
 - Let {batch} be an empty object.
@@ -959,6 +997,8 @@ NewBatch(aether, pathIdentity, crystalContext):
 - Return {batch}.
 
 ### Execute batch
+
+Status: pending.
 
 ExecuteBatch(aether, batch, crystalContext):
 
@@ -977,6 +1017,8 @@ ExecuteBatch(aether, batch, crystalContext):
 
 ### Get batch result
 
+Status: pending.
+
 GetBatchResult(batch, parentCrystalObject):
 
 - Let {deferredResult} be a new {Defer}.
@@ -984,6 +1026,8 @@ GetBatchResult(batch, parentCrystalObject):
 - Return {deferredResult}.
 
 ### Execute plan
+
+Status: pending.
 
 ExecutePlan(aether, plan, crystalContext, crystalObjects, visitedPlans):
 
