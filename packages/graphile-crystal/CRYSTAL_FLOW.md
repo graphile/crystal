@@ -314,6 +314,8 @@ InputPlan(aether, inputType, inputValue, defaultValue):
 
 ### Input variable plan
 
+Status: complete.
+
 InputVariablePlan(aether, variableName, variableType, inputType, defaultValue):
 
 - If {variableType} is a non-null type and {inputType} is not a non-null type:
@@ -321,11 +323,14 @@ InputVariablePlan(aether, variableName, variableType, inputType, defaultValue):
   - Return {InputVariablePlan(aether, variableName, unwrappedVariableType, inputType, defaultValue)}.
 - Assert: {variableType} is equal to {inputType}.
 - Let {variableValuePlan} be {aether}.{trackedVariableValuesPlan}.{get(variableName)}.
-- If {defaultValue} does not exist or NOT {variableValuePlan}.{evalIs(undefined)}:
+- If {defaultValue} does not exist:
   - Return {variableValuePlan}.
-- Otherwise:
+- Otherwise, if {variableValuePlan}.{evalIs(undefined)}:
   - (Note: we're going to pretend no value was passed instead of the variable, so defaultValue should be used.)
   - Return {InputPlan(aether, inputType, undefined, defaultValue)}.
+- Otherwise:
+  - (Note: {variableValuePlan} would eval to something other than {undefined}, so {defaultValue} will not be used.)
+  - Return {variableValuePlan}.
 
 Note: GraphQL validation will ensure that the type of the variable and input type are "compatible"; so the only
 difference allowed is that the variable might be non-null when the input type is not.

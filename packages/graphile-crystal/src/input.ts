@@ -1,3 +1,4 @@
+import * as assert from "assert";
 import { inspect } from "util";
 import {
   GraphQLList,
@@ -93,5 +94,50 @@ export function inputPlan(
   } else {
     const never: never = inputType;
     throw new Error(`Unsupported type in inputPlan: '${inspect(never)}'`);
+  }
+}
+
+function doTypesMatch(a: GraphQLInputType, b: GraphQLInputType): boolean {
+  if (a instanceof GraphQLNonNull && b instanceof GraphQLNonNull) {
+    return doTypesMatch(a.ofType, b.ofType);
+  } else if (a instanceof GraphQLList && b instanceof GraphQLList) {
+    return doTypesMatch(a.ofType, b.ofType);
+  } else {
+    return a === b;
+  }
+}
+
+function inputVariablePlan(
+  aether: Aether,
+  variableName: string,
+  variableType: GraphQLInputType,
+  inputType: GraphQLInputType,
+  defaultValue: any = undefined,
+): InputPlan {
+  if (
+    variableType instanceof GraphQLNonNull &&
+    !(inputType instanceof GraphQLNonNull)
+  ) {
+    const unwrappedVariableType = variableType.ofType;
+    return inputVariablePlan(
+      aether,
+      variableName,
+      unwrappedVariableType,
+      inputType,
+      defaultValue,
+    );
+  }
+  const typesMatch = doTypesMatch(variableType, inputType);
+  assert.ok(typesMatch, "Expected variable and input types to match");
+  const variableValuePlan = aether.trackedVariableValuesPlan.get(variableName);
+  if (defaultValue === undefined || !variableValuePlan.evalIs(undefined)) {
+    // There's no default value, or we know for sure that our variable will be
+    // set (even if null) and thus the default will not be used; use the variable.
+    return variableValuePlan;
+  } else {
+    // `defaultValue` is NOT undefined, and we know variableValue is
+    // `undefined` (and always will be); we're going to loop back and pretend
+    // that no value was passed in the first place (instead of the variable):
+    return inputPlan(aether, inputType, undefined, defaultValue);
   }
 }
