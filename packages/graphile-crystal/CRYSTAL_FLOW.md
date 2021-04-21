@@ -401,6 +401,8 @@ OldInputNonNullPlan(aether, innerPlan):
 
 ### Input list plan
 
+Status: complete.
+
 InputListPlan(aether, inputType, inputValues):
 
 - Assert {inputType} is a list type.
@@ -438,7 +440,7 @@ InputListPlan(aether, inputType, inputValues):
       - Return {list}.
 - Return {plan}.
 
-Note: though this may have variables for values within the list, it is not a variable itself (it has a known length in
+Note: Though this may have variables for values within the list, it is not a variable itself (it has a known length in
 the AST) thus we can return different plans for different elements in the list.
 
 ### Input static leaf plan

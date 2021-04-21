@@ -15,7 +15,7 @@ import {
   ListTypeNode,
   NonNullTypeNode,
 } from "graphql";
-import { __TrackedObjectPlan } from "./plan";
+import { __TrackedObjectPlan, Plan } from "./plan";
 
 export type InputPlan =
   | __TrackedObjectPlan // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength()
@@ -84,7 +84,7 @@ export function inputPlan(
     const valuePlan = inputPlan(aether, innerType, inputValue);
     return inputNonNullPlan(aether, valuePlan);
   } else if (inputType instanceof GraphQLList) {
-    const innerType = inputType.ofType;
+    const innerType: GraphQLInputType = inputType.ofType;
     return inputListPlan(aether, innerType, inputValue);
   } else if (isLeafType(inputType)) {
     return inputStaticLeafPlan(aether, inputType, inputValue);
@@ -146,4 +146,90 @@ function inputVariablePlan(
  */
 function inputNonNullPlan(aether: Aether, innerPlan: InputPlan): InputPlan {
   return innerPlan;
+}
+
+/**
+ * Implements `InputListPlan`.
+ */
+class InputListPlan extends Plan {
+  private itemPlans: InputPlan[] = [];
+  private outOfBoundsPlan: InputPlan;
+
+  constructor(
+    aether: Aether,
+    inputType: GraphQLList<GraphQLInputType>,
+    private readonly inputValues: ArgumentNode | undefined,
+  ) {
+    super(aether);
+    assert.ok(
+      inputType instanceof GraphQLList,
+      "Expected inputType to be a List",
+    );
+    const innerType = inputType.ofType;
+    if (inputValues && inputValues.value.kind === "ListValue") {
+      const values = inputValues.value.values;
+      for (
+        let inputValueIndex = 0, inputValuesLength = values.length;
+        inputValueIndex < inputValuesLength;
+        inputValueIndex++
+      ) {
+        const inputValue = inputValues[inputValueIndex];
+        const innerPlan = inputPlan(aether, innerType, inputValue);
+        this.itemPlans.push(innerPlan);
+      }
+    }
+    // TODO: is `outOfBoundsPlan` safe? Maybe it was before we simplified
+    // `InputNonNullPlan`, but maybe it's not safe any more?
+    this.outOfBoundsPlan = inputPlan(aether, innerType, undefined);
+  }
+
+  execute(values: any[][]): any[] {
+    const { inputValues } = this;
+
+    /**
+     * All the results will be the same, so generate them once and then share
+     * them with everyone.
+     */
+    let eachResult;
+    if (inputValues?.value.kind === "NullValue") {
+      eachResult = null;
+    } else {
+      const itemPlansLength = this.itemPlans.length;
+      const list = new Array(itemPlansLength);
+      for (
+        let itemPlanIndex = 0;
+        itemPlanIndex < itemPlansLength;
+        itemPlanIndex++
+      ) {
+        const itemPlan = this.itemPlans[itemPlanIndex];
+        const value = itemPlan.eval();
+        list[itemPlanIndex] = value;
+      }
+      eachResult = list;
+    }
+
+    return new Array(values.length).fill(eachResult);
+  }
+
+  at(index: number): InputPlan {
+    return this.itemPlans[index] || this.outOfBoundsPlan;
+  }
+
+  eval(): any[] | null {
+    if (this.inputValues?.value.kind === "NullValue") {
+      return null;
+    }
+    const itemPlansLength = this.itemPlans.length;
+    const list = new Array(itemPlansLength);
+    for (
+      let itemPlanIndex = 0;
+      itemPlanIndex < itemPlansLength;
+      itemPlanIndex++
+    ) {
+      const itemPlan = this.itemPlans[itemPlanIndex];
+      const value = itemPlan.eval();
+      list[itemPlanIndex] = value;
+    }
+    return list;
+  }
 }
