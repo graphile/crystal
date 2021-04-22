@@ -277,14 +277,14 @@ class InputStaticLeafPlan extends Plan {
  * Implements `InputObjectPlan`
  */
 class InputObjectPlan extends Plan {
+  private inputFieldPlans: { [fieldName: string]: InputPlan } = {};
   constructor(
     aether: Aether,
-    inputObjectType: GraphQLInputObjectType,
-    inputValues: ValueNode | undefined,
+    private inputObjectType: GraphQLInputObjectType,
+    private inputValues: ValueNode | undefined,
   ) {
     super(aether);
     const inputFieldDefinitions = inputObjectType.getFields();
-    const inputFieldPlans = [];
     const inputFields =
       inputValues?.kind === "ObjectValue" ? inputValues.fields : undefined;
     for (const inputFieldName in inputFieldDefinitions) {
@@ -303,6 +303,50 @@ class InputObjectPlan extends Plan {
         inputFieldValue?.value,
         defaultValue,
       );
+      // TODO: this is unsafe; we should store the plan ID instead?
+      this.inputFieldPlans[inputFieldName] = inputFieldPlan;
+      this.dependencies.push(inputFieldPlan);
     }
+  }
+
+  execute(values: any[][]): any[] {
+    if (this.inputValues?.kind === "NullValue") {
+      return new Array(values.length).fill(null);
+    }
+    return values.map((planResults) => {
+      const resultValues = {};
+      for (const inputFieldName in this.inputFieldPlans) {
+        const inputFieldPlan = this.inputFieldPlans[inputFieldName];
+        const dependencyIndex = this.dependencies.indexOf(inputFieldPlan);
+        if (dependencyIndex === -1) {
+          throw new Error("inputFieldPlan has gone missing.");
+        }
+        const value = planResults[dependencyIndex];
+        resultValues[inputFieldName] = value;
+      }
+      return resultValues;
+    });
+  }
+
+  get(attrName: string): InputPlan {
+    const plan = this.inputFieldPlans[attrName];
+    if (plan === undefined) {
+      throw new Error(
+        `Tried to '.get("${attrName}")', but no such attribute exists on ${this.inputObjectType.name}`,
+      );
+    }
+    return plan;
+  }
+
+  eval(): any {
+    if (this.inputValues?.kind === "NullValue") {
+      return null;
+    }
+    const resultValues = {};
+    for (const inputFieldName in this.inputFieldPlans) {
+      const inputFieldPlan = this.inputFieldPlans[inputFieldName];
+      resultValues[inputFieldName] = inputFieldPlan.eval();
+    }
+    return resultValues;
   }
 }
