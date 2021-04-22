@@ -342,7 +342,7 @@ types, so we do not need to perform coercion ourselves.
 
 ### Input coercion plan
 
-Status: pending.
+Status: probably not needed; evaluate later.
 
 InputCoercionPlan(aether, inputType, innerPlan):
 

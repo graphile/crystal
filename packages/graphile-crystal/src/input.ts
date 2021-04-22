@@ -150,7 +150,7 @@ function inputVariablePlan(
 /**
  * Implements `InputNonNullPlan`.
  */
-function inputNonNullPlan(aether: Aether, innerPlan: InputPlan): InputPlan {
+function inputNonNullPlan(_aether: Aether, innerPlan: InputPlan): InputPlan {
   return innerPlan;
 }
 
