@@ -9,6 +9,7 @@ import {
   isInputType,
   coerceInputValue,
   GraphQLLeafType,
+  ValueNode,
 } from "graphql";
 import { Aether } from "./aether";
 import {
@@ -56,12 +57,12 @@ function graphqlGetTypeForNode(
 export function inputPlan(
   aether: Aether,
   inputType: GraphQLInputType,
-  rawInputValue: ArgumentNode | undefined,
+  rawInputValue: ValueNode | undefined,
   defaultValue: any = undefined,
 ): InputPlan {
   let inputValue = rawInputValue;
-  if (inputValue?.value.kind === "Variable") {
-    const variableName = inputValue.value.name.value;
+  if (inputValue?.kind === "Variable") {
+    const variableName = inputValue.name.value;
     const variableDefinition = aether.operation.variableDefinitions?.find(
       (def) => def.variable.name.value === variableName,
     );
@@ -94,7 +95,7 @@ export function inputPlan(
   } else if (isLeafType(inputType)) {
     return new InputStaticLeafPlan(aether, inputType, inputValue);
   } else if (inputType instanceof GraphQLInputObjectType) {
-    return inputObjectPlan(aether, inputType, inputValue);
+    return new InputObjectPlan(aether, inputType, inputValue);
   } else {
     const never: never = inputType;
     throw new Error(`Unsupported type in inputPlan: '${inspect(never)}'`);
@@ -163,7 +164,7 @@ class InputListPlan extends Plan {
   constructor(
     aether: Aether,
     inputType: GraphQLList<GraphQLInputType>,
-    private readonly inputValues: ArgumentNode | undefined,
+    private readonly inputValues: ValueNode | undefined,
   ) {
     super(aether);
     assert.ok(
@@ -171,14 +172,15 @@ class InputListPlan extends Plan {
       "Expected inputType to be a List",
     );
     const innerType = inputType.ofType;
-    if (inputValues && inputValues.value.kind === "ListValue") {
-      const values = inputValues.value.values;
+    // TODO: should we coerce to list here?
+    if (inputValues && inputValues.kind === "ListValue") {
+      const values = inputValues.values;
       for (
         let inputValueIndex = 0, inputValuesLength = values.length;
         inputValueIndex < inputValuesLength;
         inputValueIndex++
       ) {
-        const inputValue = inputValues[inputValueIndex];
+        const inputValue = values[inputValueIndex];
         const innerPlan = inputPlan(aether, innerType, inputValue);
         this.itemPlans.push(innerPlan);
       }
@@ -196,7 +198,7 @@ class InputListPlan extends Plan {
      * them with everyone.
      */
     let eachResult;
-    if (inputValues?.value.kind === "NullValue") {
+    if (inputValues?.kind === "NullValue") {
       eachResult = null;
     } else {
       const itemPlansLength = this.itemPlans.length;
@@ -221,7 +223,7 @@ class InputListPlan extends Plan {
   }
 
   eval(): any[] | null {
-    if (this.inputValues?.value.kind === "NullValue") {
+    if (this.inputValues?.kind === "NullValue") {
       return null;
     }
     const itemPlansLength = this.itemPlans.length;
@@ -239,15 +241,21 @@ class InputListPlan extends Plan {
   }
 }
 
+/**
+ * Implements `InputStaticLeafPlan`
+ */
 class InputStaticLeafPlan extends Plan {
   private readonly coercedValue: any;
   constructor(
     aether: Aether,
     inputType: GraphQLLeafType,
-    value: ArgumentNode | undefined,
+    value: ValueNode | undefined,
   ) {
     super(aether);
-    // `coerceInputValue` throws on coercion failure.
+    // `coerceInputValue` throws on coercion failure. NOTE: it's only safe for
+    // us to call coerceInputValue because we already know this is a scalar and
+    // *not* a variable. Otherwise we'd need to process it via
+    // aether.trackedVariableValuesPlan.
     this.coercedValue = coerceInputValue(value, inputType);
   }
 
@@ -261,5 +269,36 @@ class InputStaticLeafPlan extends Plan {
 
   evalIs(expectedValue: any): boolean {
     return this.coercedValue === expectedValue;
+  }
+}
+
+/**
+ * Implements `InputObjectPlan`
+ */
+class InputObjectPlan extends Plan {
+  constructor(
+    aether: Aether,
+    inputObjectType: GraphQLInputObjectType,
+    inputValues: ValueNode | undefined,
+  ) {
+    super(aether);
+    const inputFieldDefinitions = inputObjectType.getFields();
+    const inputFieldPlans = [];
+    const inputFields =
+      inputValues?.kind === "ObjectValue" ? inputValues.fields : undefined;
+    for (const inputFieldName in inputFieldDefinitions) {
+      const inputFieldDefinition = inputFieldDefinitions[inputFieldName];
+      const inputFieldType = inputFieldDefinition.type;
+      const defaultValue = inputFieldDefinition.defaultValue;
+      const inputFieldValue = inputFields?.find(
+        (val) => val.name.value === inputFieldName,
+      );
+      const inputFieldPlan = inputPlan(
+        aether,
+        inputFieldType,
+        inputFieldValue?.value,
+        defaultValue,
+      );
+    }
   }
 }

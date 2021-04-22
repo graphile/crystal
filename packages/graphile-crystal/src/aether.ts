@@ -15,7 +15,7 @@ import {
   assertFinalized,
 } from "./plan";
 import { graphqlCollectFields } from "./graphqlCollectFields";
-import { InputPlan } from "./input";
+import { InputPlan, inputPlan } from "./input";
 
 /**
  * Implements the `MarkPlanActive` algorithm.
@@ -230,7 +230,7 @@ export class Aether {
         const argumentPlan = inputPlan(
           this,
           argumentType,
-          argumentValue,
+          argumentValue?.value,
           defaultValue,
         );
         trackedArgumentValues[argumentName] = argumentPlan;

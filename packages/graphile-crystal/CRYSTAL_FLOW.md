@@ -464,7 +464,7 @@ This represents a static "leaf" value, but will return it via a plan. The plan w
 
 ### Input object plan
 
-Status: pending.
+Status: in progress.
 
 InputObjectPlan(aether, inputObjectType, inputValues):
 
