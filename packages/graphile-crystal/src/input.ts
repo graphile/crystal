@@ -14,7 +14,6 @@ import {
 import { Aether } from "./aether";
 import {
   GraphQLInputType,
-  ArgumentNode,
   NamedTypeNode,
   ListTypeNode,
   NonNullTypeNode,
@@ -349,4 +348,6 @@ class InputObjectPlan extends Plan {
     }
     return resultValues;
   }
+
+  // TODO: evalHas(attrName: string): boolean
 }
