@@ -20,6 +20,7 @@ import {
   NonNullTypeNode,
 } from "graphql";
 import { __TrackedObjectPlan, Plan } from "./plan";
+import { defaultValueToValueNode } from "./utils";
 
 export type InputPlan =
   | __TrackedObjectPlan // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength()
@@ -58,7 +59,7 @@ export function inputPlan(
   aether: Aether,
   inputType: GraphQLInputType,
   rawInputValue: ValueNode | undefined,
-  defaultValue: any = undefined,
+  defaultValue: ValueNode | undefined = undefined,
 ): InputPlan {
   let inputValue = rawInputValue;
   if (inputValue?.kind === "Variable") {
@@ -117,7 +118,7 @@ function inputVariablePlan(
   variableName: string,
   variableType: GraphQLInputType,
   inputType: GraphQLInputType,
-  defaultValue: any = undefined,
+  defaultValue: ValueNode | undefined = undefined,
 ): InputPlan {
   if (
     variableType instanceof GraphQLNonNull &&
@@ -289,7 +290,10 @@ class InputObjectPlan extends Plan {
     for (const inputFieldName in inputFieldDefinitions) {
       const inputFieldDefinition = inputFieldDefinitions[inputFieldName];
       const inputFieldType = inputFieldDefinition.type;
-      const defaultValue = inputFieldDefinition.defaultValue;
+      const defaultValue = defaultValueToValueNode(
+        inputFieldType,
+        inputFieldDefinition.defaultValue,
+      );
       const inputFieldValue = inputFields?.find(
         (val) => val.name.value === inputFieldName,
       );

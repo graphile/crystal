@@ -16,6 +16,7 @@ import {
 } from "./plan";
 import { graphqlCollectFields } from "./graphqlCollectFields";
 import { InputPlan, inputPlan } from "./input";
+import { defaultValueToValueNode } from "./utils";
 
 /**
  * Implements the `MarkPlanActive` algorithm.
@@ -223,7 +224,10 @@ export class Aether {
       for (const argumentName in argumentDefinitions) {
         const argumentDefinition = argumentDefinitions[argumentName];
         const argumentType = argumentDefinition.type;
-        const defaultValue = argumentDefinition.defaultValue;
+        const defaultValue = defaultValueToValueNode(
+          argumentType,
+          argumentDefinition.defaultValue,
+        );
         const argumentValue = argumentValues.find(
           (v) => v.name.value === argumentName,
         );

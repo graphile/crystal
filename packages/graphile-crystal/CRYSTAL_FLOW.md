@@ -299,7 +299,7 @@ InputPlan(aether, inputType, inputValue, defaultValue):
   - Return {InputVariablePlan(aether, variableName, variableType, inputType, defaultValue)}.
 - (Note: past here, we know whether {defaultValue} will be used or not because we know {inputValue} is not a variable.)
 - If {inputValue} does not exist:
-  - Let {inputValue} be {defaultValue}.
+  - Let {inputValue} be an AST representation of {defaultValue}.
 - If {inputType} is a non-null type:
   - Let {innerType} be the inner type of {inputType}.
   - Let {valuePlan} be {InputPlan(aether, innerType, inputValue)}.
@@ -474,7 +474,7 @@ InputObjectPlan(aether, inputObjectType, inputValues):
 - For each {inputFieldDefinition} in {inputFieldDefinitions}:
   - Let {inputFieldName} be the name of {inputFieldDefinition}.
   - Let {inputFieldType} be the expected type of {inputFieldDefinition}.
-  - Let {defaultValue} be the default value for {inputFieldDefinition}.
+  - Let {defaultValue} be an AST representation of the default value for {inputFieldDefinition}.
   - Let {inputFieldValue} be the value in {inputValues} for key {inputFieldName}.
   - Let {inputFieldPlan} be {InputPlan(aether, inputFieldType, inputFieldValue, defaultValue)}.
   - Set {inputFieldPlan} as the value for key {inputFieldName} in {inputFieldPlans}.
@@ -520,7 +520,7 @@ TrackedArguments(aether, objectType, field):
 - For each {argumentDefinition} in {argumentDefinitions}:
   - Let {argumentName} be the name of {argumentDefinition}.
   - Let {argumentType} be the expected type of {argumentDefinition}.
-  - Let {defaultValue} be the default value for {argumentDefinition}.
+  - Let {defaultValue} be an AST representation of the default value for {argumentDefinition}.
   - Let {argumentValue} be the value in {argumentValues} for key {argumentName}.
   - Let {argumentPlan} be {InputPlan(aether, argumentType, argumentValue, defaultValue)}.
   - Set {argumentPlan} as the value for key {argumentName} in {trackedArgumentValues}.
