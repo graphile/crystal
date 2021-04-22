@@ -94,17 +94,21 @@ export function graphqlCollectFields(
   aether: Aether,
   objectType: GraphQLObjectType,
   selectionSet: SelectionSetNode,
-  variableValuesPlan: TrackedObjectPlan,
   visitedFragments = new Set<string>(),
   groupedFields = new Map<string, FieldNode[]>(),
 ): Map<string, FieldNode[]> {
+  const trackedVariableValuesPlan = aether.trackedVariableValuesPlan;
   for (let i = 0, l = selectionSet.selections.length; i < l; i++) {
     const selection = selectionSet.selections[i];
-    if (getDirectiveArg(selection, "skip", "if", variableValuesPlan) === true) {
+    if (
+      getDirectiveArg(selection, "skip", "if", trackedVariableValuesPlan) ===
+      true
+    ) {
       continue;
     }
     if (
-      getDirectiveArg(selection, "include", "if", variableValuesPlan) === false
+      getDirectiveArg(selection, "include", "if", trackedVariableValuesPlan) ===
+      false
     ) {
       continue;
     }
@@ -148,7 +152,6 @@ export function graphqlCollectFields(
           aether,
           objectType,
           fragmentSelectionSet,
-          variableValuesPlan,
           visitedFragments,
           groupedFields,
         );
@@ -172,7 +175,6 @@ export function graphqlCollectFields(
           aether,
           objectType,
           fragmentSelectionSet,
-          variableValuesPlan,
           visitedFragments,
           groupedFields,
         );

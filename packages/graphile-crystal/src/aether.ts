@@ -164,13 +164,7 @@ export class Aether {
       throw new Error("No subscription type found in schema");
     }
     const selectionSet = this.operation.selectionSet;
-    const trackedVariableValuesPlan = this.trackedVariableValuesPlan;
-    const groupedFieldSet = graphqlCollectFields(
-      this,
-      rootType,
-      selectionSet,
-      trackedVariableValuesPlan,
-    );
+    const groupedFieldSet = graphqlCollectFields(this, rootType, selectionSet);
     let firstKey: string | undefined = undefined;
     for (const key of groupedFieldSet.keys()) {
       if (firstKey !== undefined) {
