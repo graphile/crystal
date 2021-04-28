@@ -673,33 +673,33 @@ PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequentia
     - If {unwrappedFieldType} is an object type:
       - Call {PlanSelectionSet(aether, pathIdentity, plan, unwrappedFieldType, subSelectionSet, false)}.
     - Otherwise, if {unwrappedFieldType} is a union type:
-      - Assert {plan} is a {BranchPlan}.
+      - Assert {plan} is a {BranchPlan()}.
       - Let {possibleObjectTypes} be all the object types that can be accessed in {subSelectionSet} that are compatible
         with {unwrappedFieldType}.
       - For each {possibleObjectType} in {possibleObjectTypes}:
-        - Let {subPlan} be the plan for {possibleObjectType} inside the BranchPlan {plan}.
+        - Let {subPlan} be the plan for {possibleObjectType} inside the {BranchPlan()} {plan}.
         - Call {PlanSelectionSet(aether, pathIdentity, subPlan, possibleObjectType, subSelectionSet, false)}.
     - Otherwise:
       - Assert {unwrappedFieldType} is an interface type.
-      - Assert {plan} is a {BranchPlan}.
+      - Assert {plan} is a {BranchPlan()}.
       - If any non-introspection field in {subSelectionSet} is selected on the interface type itself, or any of the
         interfaces it implements:
         - Let {possibleObjectTypes} be all the object types that implement the {unwrappedFieldType} interface.
         - For each {possibleObjectType} in {possibleObjectTypes}:
-          - Let {subPlan} be the plan for {possibleObjectType} inside the BranchPlan {plan}.
+          - Let {subPlan} be the plan for {possibleObjectType} inside the {BranchPlan()} {plan}.
           - Call {PlanSelectionSet(aether, pathIdentity, subPlan, possibleObjectType, subSelectionSet, false)}.
       - Otherwise:
         - Note: this is the same approach as for union types.
         - Let {possibleObjectTypes} be all the object types that can be accessed in {subSelectionSet} that are
           compatible with {unwrappedFieldType}.
         - For each {possibleObjectType} in {possibleObjectTypes}:
-          - Let {subPlan} be the plan for {possibleObjectType} inside the BranchPlan {plan}.
+          - Let {subPlan} be the plan for {possibleObjectType} inside the {BranchPlan()} {plan}.
           - Call {PlanSelectionSet(aether, pathIdentity, subPlan, possibleObjectType, subSelectionSet, false)}.
   - Let {aether}.{groupId} be {oldGroupId}.
 - Return.
 
 **TODO**: what happens if a interface/union field does NOT have a plan? In this case the plan is a {\_\_ValuePlan} which
-is not a {BranchPlan} so the assertions will fail.
+is not a {BranchPlan()} so the assertions will fail.
 
 ### GraphQL collect fields
 
