@@ -97,9 +97,7 @@ export function isAetherCompatible(
  * instead accept operation and fragments since they're easier to get a hold of
  * in GraphQL.js.
  */
-export function establishAether<
-  TContext extends { [key: string]: unknown }
->(details: {
+export function establishAether<TContext extends object>(details: {
   schema: GraphQLSchema;
   operation: OperationDefinitionNode;
   fragments: Fragments;

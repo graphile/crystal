@@ -7,8 +7,24 @@ import {
 } from "graphql";
 // import { getAliasFromResolveInfo } from "graphql-parse-resolve-info";
 import debugFactory from "debug";
+import { establishAether } from "./establishAether";
+import { Path } from "graphql/jsutils/Path";
+
+const uid = ((): (() => number) => {
+  let _uidCounter = 0;
+  return function uid(): number {
+    return ++_uidCounter;
+  };
+})();
 
 const debug = debugFactory("crystal:resolvers");
+
+function pathToPathIdentity(path: Path): string {
+  return (
+    (path.prev ? pathToPathIdentity(path.prev) : "") +
+    `>${path.typename}.${path.key}`
+  );
+}
 
 export const $$crystalWrapped = Symbol("crystalWrapped");
 
@@ -65,12 +81,14 @@ export function crystalWrapResolve<
       fragments,
       variableValues,
       rootValue,
+      path,
     } = info;
+    const pathIdentity = pathToPathIdentity(path);
     // const alias = getAliasFromResolveInfo(info);
     debug(
       `👉 CRYSTAL RESOLVER (${info.parentType.name}.${
         info.fieldName
-      }); parent: ${inspect(parentObject, {
+      } @ ${pathIdentity}); parent: ${inspect(parentObject, {
         colors: true,
       })}`,
     );
@@ -82,7 +100,64 @@ export function crystalWrapResolve<
       context,
       rootValue,
     });
-    // TODO: continue implementing ResolveFieldValueCrystal
+    const planId = aether.planIdByPathIdentity[pathIdentity];
+    const plan = aether.plans[planId];
+    if (plan == null) {
+      const objectValue = isCrystalWrappedValue(parentObject)
+        ? parentObject[$$data]
+        : parentObject;
+      return graphqlResolveFieldValue(
+        parentType,
+        objectValue,
+        fieldName,
+        argumentValues,
+      );
+    }
+    const id = uid();
+    const batch = aether.getBatch(
+      pathIdentity,
+      parentObject,
+      variableValues,
+      context,
+      rootValue,
+    );
+    const crystalContext = batch.crystalContext;
+    const plan = batch.plan;
+    let parentCrystalObject: CrystalWrappedValue;
+    if (isCrystalWrappedValue(parentObject)) {
+      // Note: for the most optimal execution, `rootValue` passed to graphql
+      // should be a crystal object, this allows using {crystalContext} across
+      // the entire operation if plans are used everywhere. Even more optimised
+      // would be if we can share the same {crystalContext} across multiple
+      // `rootValue`s for multiple parallel executions (must be within the same
+      // aether) - e.g. as a result of multiple identical subscription
+      // operations.
+      parentCrystalObject = parentObject;
+    } else {
+      // Note: we need to "fake" that the parent was a plan. Because we may have lots of resolvers all called for the same parent object, we use a map. This happens to mean that multiple values in the graph being the same object will be merged automatically.
+      const parentPathIdentity = pathToPathIdentity(path.prev);
+      const parentPlanId = aether.planIdByPathIdentity[parentPathIdentity];
+      const parentPlan = aether.plans[parentPlanId];
+      const parentId = aether.getValuePlanId(parentPlan, parentObject);
+      const indexes: number[] = [];
+      parentCrystalObject = new CrystalObject(
+        parentPlan,
+        parentPathIdentity,
+        parentId,
+        indexes,
+        parentObject,
+        crystalContext,
+      );
+    }
+    const result = batch.getResult(parentCrystalObject);
+    return crystalWrap(
+      plan,
+      returnType,
+      parentCrystalObject,
+      pathIdentity,
+      id,
+      result,
+    );
   };
   Object.defineProperty(crystalResolver, $$crystalWrapped, {
     enumerable: false,

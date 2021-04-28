@@ -858,13 +858,13 @@ GetValuePlanId(aether, valuePlan, object):
 
 ### Resolve field value crystal
 
-Status: pending.
+Status: complete.
 
 ResolveFieldValueCrystal(schema, document, operationName, variableValues, context, rootValue, field, parentObject,
 argumentValues, pathIdentity):
 
 - Let {fieldName} be the name of {field}.
-- Let {objectType} be the object type on which {field} is defined.
+- Let {parentType} be the object type on which {field} is defined.
 - Let {returnType} be the expected type of {field}.
 - Let {aether} be {EstablishAether(schema, document, operationName, variableValues, context, rootValue)}.
 - Let {planId} be the value for key {pathIdentity} within {aether}.{planIdByPathIdentity}.
@@ -874,10 +874,10 @@ argumentValues, pathIdentity):
     - Let {objectValue} be the data within {parentObject}.
   - Otherwise:
     - Let {objectValue} be {parentObject}.
-  - Return {graphqlResolveFieldValue(objectType, objectValue, fieldName, argumentValues)}.
+  - Return {graphqlResolveFieldValue(parentType, objectValue, fieldName, argumentValues)}.
 - Otherwise:
   - Let {id} be a new unique id.
-  - Let {batch} be {GetBatch(aether, pathIdentity, parentCrystalObject, variableValues, context, rootValue)}.
+  - Let {batch} be {GetBatch(aether, pathIdentity, parentObject, variableValues, context, rootValue)}.
   - Let {crystalContext} be {batch}.{crystalContext}.
   - Let {plan} be {batch}.{plan}.
   - If {parentObject} is a crystal object:
@@ -980,11 +980,11 @@ PopulateValuePlan(crystalContext, valuePlan, valueId, object):
 
 Status: pending.
 
-GetBatch(aether, pathIdentity, parentCrystalObject, variableValues, context, rootValue):
+GetBatch(aether, pathIdentity, parentObject, variableValues, context, rootValue):
 
 - Let {batch} be the value for key {pathIdentity} within {aether}.{batchByPathIdentity}.
 - If {batch} is null:
-  - If {parentCrystalObject} is not null:
+  - If {parentCrystalObject} is a crystal object:
     - Let {crystalContext} be {parentCrystalObject}.{crystalContext}.
   - Otherwise:
     - Let {crystalContext} be {NewCrystalContext(aether, variableValues, context, rootValue)}.
