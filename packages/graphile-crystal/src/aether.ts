@@ -18,6 +18,7 @@ import {
   isListType,
   isInputObjectType,
   GraphQLInputObjectType,
+  GraphQLInputField,
 } from "graphql";
 import {
   Plan,
@@ -486,6 +487,29 @@ export class Aether {
         const trackedFieldValue = trackedValuePlan.get(fieldName);
         this.planInputField(inputFieldSpec, trackedFieldValue, parentPlan);
       }
+    }
+  }
+
+  /**
+   * Implements `PlanInputField` algorithm.
+   */
+  planInputField(
+    inputField: GraphQLInputField,
+    trackedValuePlan: InputPlan,
+    parentPlan: ArgumentPlan,
+  ): void {
+    const planResolver = inputField.extensions?.graphile?.plan;
+    assert.equal(typeof planResolver, "function");
+    const inputFieldPlan = planResolver(
+      parentPlan,
+      trackedValuePlan,
+      this.trackedContextPlan,
+    );
+    if (typeof inputFieldPlan === "function") {
+      const inputFieldType = inputField.type;
+      // Note: the unwrapped type of inputFieldType must be an input object.
+      // TODO: assert this?
+      this.planInput(inputFieldType, trackedValuePlan, inputFieldPlan);
     }
   }
 
