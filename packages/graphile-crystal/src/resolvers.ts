@@ -1,9 +1,12 @@
+import * as assert from "assert";
 import { inspect } from "util";
 import {
   GraphQLFieldResolver,
   GraphQLOutputType,
   GraphQLObjectType,
   defaultFieldResolver,
+  isNonNullType,
+  isListType,
 } from "graphql";
 // import { getAliasFromResolveInfo } from "graphql-parse-resolve-info";
 import debugFactory from "debug";
@@ -26,7 +29,7 @@ function pathToPathIdentity(path: Path): string {
   );
 }
 
-export const $$crystalWrapped = Symbol("crystalWrapped");
+export const $$crystalWrapped = Symbol("crystalWrappedResolver");
 
 /**
  * Given a `resolve` function, wraps the function so that it can perform the
@@ -140,7 +143,7 @@ export function crystalWrapResolve<
       const parentPlan = aether.plans[parentPlanId];
       const parentId = aether.getValuePlanId(parentPlan, parentObject);
       const indexes: number[] = [];
-      parentCrystalObject = new CrystalObject(
+      parentCrystalObject = newCrystalObject(
         parentPlan,
         parentPathIdentity,
         parentId,
@@ -182,4 +185,64 @@ export function crystalWrapSubscribe<
   // For now wrapping subscribe and resolve are equivalent; but this might not
   // always be the case.
   return crystalWrapResolve(subscribe);
+}
+
+function crystalWrap(
+  plan: Plan,
+  returnType: GraphQLOutputType,
+  parentCrystalObject: CrystalWrappedValue | undefined,
+  pathIdentity: string,
+  id: number,
+  data: any,
+  indexes: number[] = [],
+): CrystalWrappedValue {
+  if (data == null) {
+    return null;
+  }
+  if (isNonNullType(returnType)) {
+    return crystalWrap(
+      plan,
+      returnType.ofType,
+      parentCrystalObject,
+      pathIdentity,
+      id,
+      data,
+    );
+  }
+  if (isListType(returnType)) {
+    assert.ok(Array.isArray(data));
+    const l = data.length;
+    const result = new Array(l);
+    for (let index = 0; index < l; index++) {
+      const entry = data[index];
+      const wrappedIndexes = [...indexes, index];
+      result[index] = crystalWrap(
+        plan,
+        returnType.ofType,
+        parentCrystalObject,
+        pathIdentity,
+        id,
+        entry,
+        wrappedIndexes,
+      );
+    }
+    return result;
+  }
+  if (parentCrystalObject) {
+    const crystalContext = parentCrystalObject[$$context];
+    const idByPathIdentity = parentCrystalObject[$$idByPathIdentity];
+    const indexesByPathIdentity = parentCrystalObject[$$indexesByPathIdentity];
+    return newCrystalObject(
+      plan,
+      pathIdentity,
+      id,
+      indexes,
+      data,
+      crystalContext,
+      idByPathIdentity,
+      indexesByPathIdentity,
+    );
+  } else {
+    return newCrystalObject(plan, pathIdentity, id, indexes, data);
+  }
 }

@@ -906,7 +906,7 @@ argumentValues, pathIdentity):
 
 ### Crystal wrap
 
-Status: pending.
+Status: complete.
 
 CrystalWrap(plan, returnType, parentCrystalObject, pathIdentity, id, data, indexes):
 
@@ -921,7 +921,8 @@ CrystalWrap(plan, returnType, parentCrystalObject, pathIdentity, id, data, index
   - Let {result} be an empty list.
   - For each {entry} with index {index} in {data}:
     - Let {wrappedIndexes} be a list composed of everything in {indexes} followed by {index}.
-    - Let {wrappedEntry} be {CrystalWrap(plan, innerType, parentCrystalObject, pathIdentity, id, entry, indexes)}.
+    - Let {wrappedEntry} be {CrystalWrap(plan, innerType, parentCrystalObject, pathIdentity, id, entry,
+      wrappedIndexes)}.
     - Push {wrappedEntry} onto {result}.
   - Return {result}.
 - Otherwise:
