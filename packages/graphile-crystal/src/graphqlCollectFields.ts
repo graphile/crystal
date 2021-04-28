@@ -8,9 +8,24 @@ import {
   isObjectType,
   isInterfaceType,
   isUnionType,
+  DirectiveNode,
 } from "graphql";
 import { Aether } from "./aether";
 import { TrackedObjectPlan } from "./plan";
+
+/**
+ * Given a selection, finds the first directive named `directiveName`.
+ *
+ * @internal
+ *
+ * TODO: inline.
+ */
+export function getDirective(
+  selection: SelectionNode,
+  directiveName: string,
+): DirectiveNode | undefined {
+  return selection.directives?.find((d) => d.name.value === directiveName);
+}
 
 /**
  * Given a selection, finds the first directive named `directiveName` and, if
@@ -23,15 +38,13 @@ import { TrackedObjectPlan } from "./plan";
  *
  * TODO: inline.
  */
-function getDirectiveArg(
+export function getDirectiveArg(
   selection: SelectionNode,
   directiveName: string,
   argumentName: string,
   variableValuesPlan: TrackedObjectPlan,
 ): unknown {
-  const directive = selection.directives?.find(
-    (d) => d.name.value === directiveName,
-  );
+  const directive = getDirective(selection, directiveName);
   const argument = directive?.arguments?.find(
     (a) => a.name.value === argumentName,
   );
@@ -97,6 +110,7 @@ export function graphqlCollectFields(
   visitedFragments = new Set<string>(),
   groupedFields = new Map<string, FieldNode[]>(),
 ): Map<string, FieldNode[]> {
+  // TODO: factor in @defer / @stream via groupId / maxGroupId
   const trackedVariableValuesPlan = aether.trackedVariableValuesPlan;
   for (let i = 0, l = selectionSet.selections.length; i < l; i++) {
     const selection = selectionSet.selections[i];
