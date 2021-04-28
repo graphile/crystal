@@ -11,7 +11,6 @@ import {
   getNamedType,
   GraphQLInterfaceType,
   GraphQLUnionType,
-  SelectionSetNode,
   assertListType,
   SelectionNode,
 } from "graphql";
@@ -213,15 +212,15 @@ export class Aether {
     const field = fields[0];
     const fieldName = field.name.value; // Unaffected by alias.
     const rootTypeFields = rootType.getFields();
-    const fieldSpec: GraphQLField<any, any> = rootTypeFields[fieldName];
+    const fieldSpec: GraphQLField<unknown, unknown> = rootTypeFields[fieldName];
     const subscriptionPlanResolver =
       fieldSpec.extensions?.graphile?.subscribePlan;
     if (subscriptionPlanResolver) {
       const trackedArguments = this.getTrackedArguments(rootType, field);
-      const subscribePlan = this.executePlanResolver(
-        subscriptionPlanResolver,
+      const subscribePlan = subscriptionPlanResolver(
         this.trackedRootValuePlan,
         trackedArguments,
+        this.trackedContextPlan,
       );
       this.planFieldArguments(
         rootType,
@@ -282,10 +281,10 @@ export class Aether {
       let plan: Plan | PolymorphicPlan;
       if (typeof planResolver === "function") {
         const trackedArguments = this.getTrackedArguments(objectType, field);
-        plan = this.executePlanResolver(
-          planResolver,
+        plan = planResolver(
           parentPlan,
           trackedArguments,
+          this.trackedContextPlan,
         );
         this.planFieldArguments(
           objectType,
@@ -383,7 +382,7 @@ export class Aether {
    */
   planFieldArguments(
     _objectType: GraphQLObjectType,
-    fieldSpec: GraphQLField<any, any>,
+    fieldSpec: GraphQLField<unknown, unknown>,
     _field: FieldNode,
     trackedArguments: TrackedArguments,
     fieldPlan: Plan,
@@ -395,10 +394,10 @@ export class Aether {
       if (trackedArgumentValuePlan !== undefined) {
         const planResolver = argSpec.extensions?.graphile?.plan;
         if (typeof planResolver === "function") {
-          const argPlan = this.executePlanResolver(
-            planResolver,
+          const argPlan = planResolver(
             fieldPlan,
             trackedArgumentValuePlan,
+            this.trackedContextPlan,
           );
           if (argPlan != null) {
             this.planInput(argSpec.type, trackedArgumentValuePlan, argPlan);
@@ -445,26 +444,6 @@ export class Aether {
       }
     }
     return trackedArgumentValues;
-  }
-
-  /**
-   * Implements the `ExecutePlanResolver` algorithm.
-   */
-  executePlanResolver(
-    planResolver: (
-      plan: Plan,
-      trackedArguments: TrackedArguments,
-      trackedContextPlan: typeof __TrackedObjectPlan,
-    ) => Plan,
-    parentPlan: Plan,
-    trackedArguments: TrackedArguments,
-  ): Plan {
-    const plan = planResolver(
-      parentPlan,
-      trackedArguments,
-      this.trackedContextPlan,
-    );
-    return plan;
   }
 
   /**

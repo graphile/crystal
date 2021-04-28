@@ -631,8 +631,8 @@ PlanAetherSubscription(aether):
 - If {subscriptionPlanResolver} exists:
   - Let {trackedArguments} be {TrackedArguments(aether, rootType, field)}.
   - Let {trackedRootValuePlan} be {aether}.{trackedRootValuePlan}.
-  - Let {subscribePlan} be {ExecutePlanResolver(aether, subscriptionPlanResolver, trackedRootValuePlan,
-    trackedArguments)}.
+  - Let {subscribePlan} be the result of calling {subscriptionPlanResolver}, providing {trackedRootValuePlan},
+    {trackedArguments}, {aether}.{trackedContextPlan}.
   - Call {PlanFieldArguments(aether, field, trackedArguments, subscribePlan)}.
 - Otherwise:
   - Let {subscribePlan} be {aether}.{trackedRootValuePlan}.
@@ -662,7 +662,8 @@ PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequentia
   - Let {planResolver} be `field.extensions.graphile.plan`.
   - If {planResolver} is not {null}:
     - Let {trackedArguments} be {TrackedArguments(aether, objectType, field)}.
-    - Let {plan} be {ExecutePlanResolver(aether, planResolver, parentPlan, trackedArguments)}.
+    - Let {plan} be the result of calling {planResolver}, providing {parentPlan}, {trackedArguments},
+      {aether}.{trackedContextPlan}.
     - Call {PlanFieldArguments(aether, objectType, field, trackedArguments, plan)}.
   - Otherwise:
     - Let {plan} be {\_\_ValuePlan(aether)}. (Note: this is populated in {GetValuePlanId}.)
@@ -742,7 +743,8 @@ PlanFieldArgument(aether, objectType, field, argument, trackedArgumentValuePlan,
 - Let {argumentSpec} be the argument named {argumentName} on {fieldSpec}.
 - Let {planResolver} be `argumentSpec.extensions.graphile.plan`.
 - If {planResolver} exists:
-  - Let {argumentPlan} be {ExecutePlanResolver(aether, planResolver, fieldPlan, trackedArgumentValuePlan)}.
+  - Let {argumentPlan} be the result of calling {planResolver}, providing {fieldPlan}, {trackedArgumentValuePlan},
+    {aether}.{trackedContextPlan}.
   - If {argumentPlan} is not {null}:
     - Let {argumentType} be the expected type of {argument}.
     - Call {PlanInput(aether, argumentType, trackedArgumentValuePlan, argumentPlan)}.
@@ -799,22 +801,13 @@ PlanInputField(aether, inputField, trackedValuePlan, parentPlan):
 
 - Let {planResolver} be `inputField.extensions.graphile.plan`.
 - Assert: {planResolver} exists.
-- Let {inputFieldPlan} be {ExecutePlanResolver(aether, planResolver, parentPlan, trackedValuePlan)}.
+- Let {inputFieldPlan} be the result of calling {planResolver}, providing {parentPlan}, {trackedValuePlan},
+  {aether}.{trackedContextPlan}.
 - If {inputFieldPlan} is not {null}:
   - Let {inputFieldType} be the expected type of {inputField}.
   - Note: the unwrapped type of {inputFieldType} must be an input object.
   - Call {PlanInput(aether, inputFieldType, trackedValuePlan, inputFieldPlan)}.
 - Return.
-
-### Execute plan resolver
-
-Status: complete.
-
-ExecutePlanResolver(aether, planResolver, parentPlan, trackedArguments):
-
-- Let {plan} be the result of calling {planResolver}, providing {parentPlan}, {trackedArguments},
-  {aether}.{trackedContextPlan}.
-- Return {plan}.
 
 # Step 2: execution phase
 
