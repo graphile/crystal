@@ -13,6 +13,7 @@ import debugFactory from "debug";
 import { establishAether } from "./establishAether";
 import { Path } from "graphql/jsutils/Path";
 import { Plan } from "./plan";
+import { CrystalObject } from "./interfaces";
 
 const uid = ((): (() => number) => {
   let _uidCounter = 0;
@@ -257,18 +258,6 @@ function crystalWrap<TData>(
       crystalContext,
     );
   }
-}
-
-const $$crystalContext = Symbol("context");
-const $$idByPathIdentity = Symbol("idByPathIdentity");
-const $$indexesByPathIdentity = Symbol("indexesByPathIdentity");
-const $$data = Symbol("data");
-
-interface CrystalObject<TData> {
-  [$$crystalContext]: CrystalContext;
-  [$$idByPathIdentity]: { [pathIdentity: string]: number };
-  [$$indexesByPathIdentity]: { [pathIdentity: string]: number[] };
-  [$$data]: TData;
 }
 
 function newCrystalObject<TData>(

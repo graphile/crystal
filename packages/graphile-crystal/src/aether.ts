@@ -36,6 +36,7 @@ import {
   typesUsedInSelections,
   interfaceTypeHasNonIntrospectionFieldQueriedInSelections,
 } from "./graphqlMergeSelectionSets";
+import { Batch } from "./interfaces";
 
 type TrackedArguments = { [key: string]: InputPlan };
 
@@ -613,5 +614,19 @@ export class Aether {
       plan.finalize();
       assertFinalized(plan);
     }
+  }
+
+  //----------------------------------------
+
+  newBatch(pathIdentity: string, crystalContext: CrystalContext): Batch {
+    const planId = this.planIdByPathIdentity[pathIdentity];
+    const plan = this.plans[planId];
+    const batch: Batch = {
+      pathIdentity,
+      crystalContext,
+      plan,
+      entries: [],
+    };
+    return batch;
   }
 }

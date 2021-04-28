@@ -997,7 +997,7 @@ GetBatch(aether, pathIdentity, parentObject, variableValues, context, rootValue)
 
 ### New batch
 
-Status: pending.
+Status: complete.
 
 NewBatch(aether, pathIdentity, crystalContext):
 
