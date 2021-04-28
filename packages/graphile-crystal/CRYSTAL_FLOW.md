@@ -706,7 +706,7 @@ is not a polymorphic plan so the assertions will fail.
 
 ### GraphQL collect fields
 
-Status: initial implementation (sans @stream/@defer) exists; not specified.
+Status: completed initial implementation (sans @stream/@defer); not specified.
 
 As with the GraphQL {CollectFields()} algorithm, but with "tracked" access to variables via {\_\_TrackedObjectPlan()}
 rather than direct access, and we must be careful to manipulate groupId/maxGroupId as appropriate when there are
@@ -783,7 +783,7 @@ Note: we are only expecting to {PlanInput()} for objects or lists thereof, not s
 
 ### Plan input fields
 
-Status: pending.
+Status: complete.
 
 PlanInputFields(aether, inputObjectType, trackedValuePlan, parentPlan):
 
@@ -796,7 +796,7 @@ PlanInputFields(aether, inputObjectType, trackedValuePlan, parentPlan):
 
 ### Plan input field
 
-Status: pending.
+Status: complete.
 
 PlanInputField(aether, inputField, trackedValuePlan, parentPlan):
 
