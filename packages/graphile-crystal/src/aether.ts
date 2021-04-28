@@ -20,6 +20,7 @@ import {
   __TrackedObjectPlan,
   __ValuePlan,
   assertFinalized,
+  PolymorphicPlan,
 } from "./plan";
 import { graphqlCollectFields, getDirective } from "./graphqlCollectFields";
 import { InputPlan, inputPlan } from "./input";
@@ -44,6 +45,20 @@ function markPlanActive(plan: Plan, activePlans: Set<Plan>): void {
   for (let i = 0, l = plan.children.length; i < l; i++) {
     markPlanActive(plan.children[i], activePlans);
   }
+}
+
+function assertPolymorphicPlan(
+  plan: Plan | PolymorphicPlan,
+): asserts plan is PolymorphicPlan {
+  assert.ok(
+    "planForType" in plan,
+    "Expected plan for interface field to be polymorphic.",
+  );
+  assert.equal(
+    typeof plan.planForType,
+    "function",
+    "Expected property `planForType` for interface field plan to be a function.",
+  );
 }
 
 /**
@@ -224,6 +239,10 @@ export class Aether {
     }
   }
 
+  /**
+   * Implements the `PlanSelectionSet` algorithm, and also
+   * `GetPolymorphicObjectPlanForType`.
+   */
   planSelectionSet(
     path: string,
     parentPlan: Plan,
@@ -252,7 +271,7 @@ export class Aether {
       }
 
       const planResolver = objectField.extensions?.graphile?.plan;
-      let plan;
+      let plan: Plan | PolymorphicPlan;
       if (typeof planResolver === "function") {
         const trackedArguments = this.getTrackedArguments(objectType, field);
         plan = this.executePlanResolver(
@@ -274,21 +293,6 @@ export class Aether {
       const isUnionType = unwrappedFieldType instanceof GraphQLUnionType;
       if (isObjectType || isInterfaceType || isUnionType) {
         const subSelectionSet = graphqlMergeSelectionSets(fields);
-        const planPossibleObjectTypes = (
-          possibleObjectTypes: readonly GraphQLObjectType[],
-        ): void => {
-          for (let i = 0, l = possibleObjectTypes.length; i < l; i++) {
-            const possibleObjectType = possibleObjectTypes[i];
-            const subPlan = plan.if(possibleObjectType);
-            this.planSelectionSet(
-              pathIdentity,
-              subPlan,
-              possibleObjectType,
-              subSelectionSet,
-              false,
-            );
-          }
-        };
         if (isObjectType) {
           this.planSelectionSet(
             pathIdentity,
@@ -297,43 +301,62 @@ export class Aether {
             subSelectionSet,
             false,
           );
-        } else if (isUnionType) {
-          // TODO: assert plan is a BranchPlan
-          const unionType = unwrappedFieldType as GraphQLUnionType;
-          const possibleObjectTypes = typesUsedInSelections(
-            this,
-            unionType.getTypes(),
-            subSelectionSet,
-          );
-          /*@__INLINE__*/ planPossibleObjectTypes(possibleObjectTypes);
         } else {
-          assert.ok(
-            isInterfaceType,
-            "Impossible. isObjectType and isUnionType are false so isInterfaceType must be true",
-          );
-          // TODO: assert plan is a BranchPlan
-          const interfaceType = unwrappedFieldType as GraphQLInterfaceType;
-          // If we reference non-introspection fields on the interface type (or
-          // any of the interface types it implements) then we need to plan for
-          // every single object type that implements this interface; otherwise
-          // we only need to plan the reachable types.
-          const implementations = this.schema.getImplementations(interfaceType)
-            .objects;
-          if (
-            interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
-              this,
-              interfaceType,
-              subSelectionSet,
-            )
-          ) {
-            /*@__INLINE__*/ planPossibleObjectTypes(implementations);
-          } else {
+          assertPolymorphicPlan(plan);
+          const polymorphicPlan = plan;
+          const planPossibleObjectTypes = (
+            possibleObjectTypes: readonly GraphQLObjectType[],
+          ): void => {
+            for (let i = 0, l = possibleObjectTypes.length; i < l; i++) {
+              const possibleObjectType = possibleObjectTypes[i];
+              // This line implements `GetPolymorphicObjectPlanForType`.
+              const subPlan = polymorphicPlan.planForType(possibleObjectType);
+              this.planSelectionSet(
+                pathIdentity,
+                subPlan,
+                possibleObjectType,
+                subSelectionSet,
+                false,
+              );
+            }
+          };
+          if (isUnionType) {
+            const unionType = unwrappedFieldType as GraphQLUnionType;
             const possibleObjectTypes = typesUsedInSelections(
               this,
-              implementations,
+              unionType.getTypes(),
               subSelectionSet,
             );
             /*@__INLINE__*/ planPossibleObjectTypes(possibleObjectTypes);
+          } else {
+            assert.ok(
+              isInterfaceType,
+              "Impossible. isObjectType and isUnionType are false so isInterfaceType must be true",
+            );
+            const interfaceType = unwrappedFieldType as GraphQLInterfaceType;
+            // If we reference non-introspection fields on the interface type (or
+            // any of the interface types it implements) then we need to plan for
+            // every single object type that implements this interface; otherwise
+            // we only need to plan the reachable types.
+            const implementations = this.schema.getImplementations(
+              interfaceType,
+            ).objects;
+            if (
+              interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
+                this,
+                interfaceType,
+                subSelectionSet,
+              )
+            ) {
+              /*@__INLINE__*/ planPossibleObjectTypes(implementations);
+            } else {
+              const possibleObjectTypes = typesUsedInSelections(
+                this,
+                implementations,
+                subSelectionSet,
+              );
+              /*@__INLINE__*/ planPossibleObjectTypes(possibleObjectTypes);
+            }
           }
         }
       }

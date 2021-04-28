@@ -3,6 +3,7 @@ import { Aether } from "./aether";
 import { Constraint } from "./constraints";
 import { isDev, noop } from "./dev";
 import { inspect } from "util";
+import { GraphQLObjectType } from "graphql";
 
 function reallyAssertFinalized(plan: Plan): void {
   if (!plan.isFinalized) {
@@ -59,6 +60,10 @@ export abstract class Plan {
     this.isFinalized = true;
   }
 }
+
+export type PolymorphicPlan = Plan & {
+  planForType(objectType: GraphQLObjectType): Plan;
+};
 
 /**
  * Returns true for values of 'blah' that you can do `foo.blah` with.

@@ -548,7 +548,7 @@ NewPlan(aether):
 - Let {plan}.{dependencies} be an empty list. (Note: this is plans this plan will need the data from in order to
   execute.)
 - Let {plan}.{children} be an empty list. (Note: this is plans that this plan might execute; currently it's the expected
-  way that {BranchPlan()} might work.)
+  way that polymorphic plans (see {GetPolymorphicObjectPlanForType()}) might work.)
 - Let {plan}.{finalized} be {false}.
 - Let {plan}.{groupId} be {aether}.{groupId}.
 - Let {plan}.{id} be the length of {aether}.{plans}.
@@ -575,15 +575,17 @@ Note: `__ValuePlan` has an underscore prefix since users should never use it; it
 Note: This plan is never executed; it's purely internal - we populate the value as part of the algorithm - see
 {GetValuePlanId} and {PopulateValuePlan}.
 
-### Branch plan
+### Get polymorphic object plan for type
 
-Status: not yet designed.
+Status: complete.
 
-BranchPlan(aether):
+GetPolymorphicObjectPlanForType(aether, polymorphicPlan, objectType):
 
-- TODO: this'll allow branching between multiple other plans, e.g. in the case of a union/interface, but also based on
-  custom user logic (e.g. fetching different things depending on your billing level, or only showing certain things if
-  your authorization allows that).
+- Note: {polymorphicPlan} represents an interface or union.
+- Let {planForType} be the internal function provided by {polymorphicPlan} to return a plan for a given object type.
+- Assert {planForType} is not {null}.
+- Let {objectPlan} be the result of calling {planForType}, passing {aether}, {polymorphicPlan} and {objectType}.
+- Return {objectPlan}.
 
 ### Plan aether query
 
@@ -673,33 +675,33 @@ PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequentia
     - If {unwrappedFieldType} is an object type:
       - Call {PlanSelectionSet(aether, pathIdentity, plan, unwrappedFieldType, subSelectionSet, false)}.
     - Otherwise, if {unwrappedFieldType} is a union type:
-      - Assert {plan} is a {BranchPlan()}.
+      - Assert {plan} is a polymorphic plan.
       - Let {possibleObjectTypes} be all the object types that can be accessed in {subSelectionSet} that are compatible
         with {unwrappedFieldType}.
       - For each {possibleObjectType} in {possibleObjectTypes}:
-        - Let {subPlan} be the plan for {possibleObjectType} inside the {BranchPlan()} {plan}.
+        - Let {subPlan} be {GetPolymorphicObjectPlanForType(aether, plan, possibleObjectType)}.
         - Call {PlanSelectionSet(aether, pathIdentity, subPlan, possibleObjectType, subSelectionSet, false)}.
     - Otherwise:
       - Assert {unwrappedFieldType} is an interface type.
-      - Assert {plan} is a {BranchPlan()}.
+      - Assert {plan} is a polymorphic plan.
       - If any non-introspection field in {subSelectionSet} is selected on the interface type itself, or any of the
         interfaces it implements:
         - Let {possibleObjectTypes} be all the object types that implement the {unwrappedFieldType} interface.
         - For each {possibleObjectType} in {possibleObjectTypes}:
-          - Let {subPlan} be the plan for {possibleObjectType} inside the {BranchPlan()} {plan}.
+          - Let {subPlan} be {GetPolymorphicObjectPlanForType(aether, plan, possibleObjectType)}.
           - Call {PlanSelectionSet(aether, pathIdentity, subPlan, possibleObjectType, subSelectionSet, false)}.
       - Otherwise:
         - Note: this is the same approach as for union types.
         - Let {possibleObjectTypes} be all the object types that can be accessed in {subSelectionSet} that are
           compatible with {unwrappedFieldType}.
         - For each {possibleObjectType} in {possibleObjectTypes}:
-          - Let {subPlan} be the plan for {possibleObjectType} inside the {BranchPlan()} {plan}.
+          - Let {subPlan} be {GetPolymorphicObjectPlanForType(aether, plan, possibleObjectType)}.
           - Call {PlanSelectionSet(aether, pathIdentity, subPlan, possibleObjectType, subSelectionSet, false)}.
   - Let {aether}.{groupId} be {oldGroupId}.
 - Return.
 
 **TODO**: what happens if a interface/union field does NOT have a plan? In this case the plan is a {\_\_ValuePlan} which
-is not a {BranchPlan()} so the assertions will fail.
+is not a polymorphic plan so the assertions will fail.
 
 ### GraphQL collect fields
 
