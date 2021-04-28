@@ -808,12 +808,12 @@ PlanInputField(aether, inputField, trackedValuePlan, parentPlan):
 
 ### Execute plan resolver
 
-Status: pending.
+Status: complete.
 
 ExecutePlanResolver(aether, planResolver, parentPlan, trackedArguments):
 
 - Let {plan} be the result of calling {planResolver}, providing {parentPlan}, {trackedArguments},
-  {aether}.{trackedContext}.
+  {aether}.{trackedContextPlan}.
 - Return {plan}.
 
 # Step 2: execution phase

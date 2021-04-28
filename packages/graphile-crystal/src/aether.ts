@@ -31,6 +31,8 @@ import {
   interfaceTypeHasNonIntrospectionFieldQueriedInSelections,
 } from "./graphqlMergeSelectionSets";
 
+type TrackedArguments = { [key: string]: InputPlan };
+
 /**
  * Implements the `MarkPlanActive` algorithm.
  */
@@ -383,9 +385,7 @@ export class Aether {
     _objectType: GraphQLObjectType,
     fieldSpec: GraphQLField<any, any>,
     _field: FieldNode,
-    trackedArguments: {
-      [key: string]: InputPlan;
-    },
+    trackedArguments: TrackedArguments,
     fieldPlan: Plan,
   ): void {
     for (let i = 0, l = fieldSpec.args.length; i < l; i++) {
@@ -417,7 +417,7 @@ export class Aether {
   getTrackedArguments(
     objectType: GraphQLObjectType,
     field: FieldNode,
-  ): { [key: string]: InputPlan } {
+  ): TrackedArguments {
     const trackedArgumentValues = {};
     if (field.arguments) {
       const argumentValues = field.arguments;
@@ -445,6 +445,26 @@ export class Aether {
       }
     }
     return trackedArgumentValues;
+  }
+
+  /**
+   * Implements the `ExecutePlanResolver` algorithm.
+   */
+  executePlanResolver(
+    planResolver: (
+      plan: Plan,
+      trackedArguments: TrackedArguments,
+      trackedContextPlan: typeof __TrackedObjectPlan,
+    ) => Plan,
+    parentPlan: Plan,
+    trackedArguments: TrackedArguments,
+  ): Plan {
+    const plan = planResolver(
+      parentPlan,
+      trackedArguments,
+      this.trackedContextPlan,
+    );
+    return plan;
   }
 
   /**
