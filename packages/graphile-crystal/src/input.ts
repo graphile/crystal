@@ -287,7 +287,7 @@ class InputStaticLeafPlan extends Plan {
 /**
  * Implements `InputObjectPlan`
  */
-class InputObjectPlan extends Plan {
+export class InputObjectPlan extends Plan {
   private inputFieldPlans: { [fieldName: string]: InputPlan } = {};
   constructor(
     aether: Aether,
@@ -373,5 +373,17 @@ class InputObjectPlan extends Plan {
     }
   }
 
-  // TODO: evalHas(attrName: string): boolean
+  // Written without consulting spec.
+  evalHas(attrName: string): boolean {
+    if (!this.inputValues) {
+      return false;
+    }
+    if (this.inputValues.kind === "NullValue") {
+      return false;
+    }
+    if (!(attrName in this.inputFieldPlans)) {
+      return false;
+    }
+    return !this.inputFieldPlans[attrName].evalIs(undefined);
+  }
 }

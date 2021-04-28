@@ -17,6 +17,7 @@ import {
   isNonNullType,
   isListType,
   isInputObjectType,
+  GraphQLInputObjectType,
 } from "graphql";
 import {
   Plan,
@@ -27,7 +28,7 @@ import {
   ArgumentPlan,
 } from "./plan";
 import { graphqlCollectFields, getDirective } from "./graphqlCollectFields";
-import { InputPlan, inputPlan } from "./input";
+import { InputPlan, inputPlan, InputObjectPlan } from "./input";
 import { defaultValueToValueNode } from "./utils";
 import {
   graphqlMergeSelectionSets,
@@ -464,6 +465,28 @@ export class Aether {
       this.planInputFields(inputType, trackedValuePlan, parentPlan);
     }
     throw new Error("Invalid plan; planInput called for unsupported type.");
+  }
+
+  /**
+   * Implements `PlanInputFields` algorithm.
+   */
+  planInputFields(
+    inputObjectType: GraphQLInputObjectType,
+    trackedValuePlan: InputPlan,
+    parentPlan: ArgumentPlan,
+  ): void {
+    assert.ok(
+      trackedValuePlan instanceof InputObjectPlan,
+      "Expected trackedValuePlan to be an InputObjectPlan",
+    );
+    const inputFieldSpecs = inputObjectType.getFields();
+    for (const fieldName in inputFieldSpecs) {
+      const inputFieldSpec = inputFieldSpecs[fieldName];
+      if (trackedValuePlan.evalHas(fieldName)) {
+        const trackedFieldValue = trackedValuePlan.get(fieldName);
+        this.planInputField(inputFieldSpec, trackedFieldValue, parentPlan);
+      }
+    }
   }
 
   /**

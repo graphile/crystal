@@ -791,7 +791,7 @@ PlanInputFields(aether, inputObjectType, trackedValuePlan, parentPlan):
   - Let {fieldName} be the name of {inputField}.
   - If {trackedValuePlan} {evalHas} {fieldName}:
     - Let {trackedFieldValue} be {trackedValuePlan}.{get(fieldName)}.
-    - Call {PlanInputField(aether, inputField, trackedFieldValue, fieldPlan)}.
+    - Call {PlanInputField(aether, inputField, trackedFieldValue, parentPlan)}.
 - Return.
 
 ### Plan input field
