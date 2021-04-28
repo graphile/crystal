@@ -12,6 +12,7 @@ import {
 import debugFactory from "debug";
 import { establishAether } from "./establishAether";
 import { Path } from "graphql/jsutils/Path";
+import { Plan } from "./plan";
 
 const uid = ((): (() => number) => {
   let _uidCounter = 0;
@@ -71,7 +72,7 @@ export function crystalWrapResolve<
     context,
     info,
   ) {
-    const parentObject: TSource | CrystalWrappedValue<any> = source;
+    const parentObject: TSource | CrystalObject<any> = source;
     // Note: in the ResolveFieldValueCrystal algorithm it uses `document` and
     // `operationName`; however all it really needs is the `operation` and
     // `fragments`, so that's what we extract here.
@@ -126,7 +127,7 @@ export function crystalWrapResolve<
     );
     const crystalContext = batch.crystalContext;
     const plan = batch.plan;
-    let parentCrystalObject: CrystalWrappedValue;
+    let parentCrystalObject: CrystalObject<any>;
     if (isCrystalWrappedValue(parentObject)) {
       // Note: for the most optimal execution, `rootValue` passed to graphql
       // should be a crystal object, this allows using {crystalContext} across
@@ -188,16 +189,17 @@ export function crystalWrapSubscribe<
   return crystalWrapResolve(subscribe);
 }
 
-function crystalWrap(
+function crystalWrap<TData>(
   crystalContext: CrystalContext,
   plan: Plan,
   returnType: GraphQLOutputType,
-  parentCrystalObject: CrystalWrappedValue | undefined,
+  parentCrystalObject: CrystalObject<any> | undefined,
   pathIdentity: string,
   id: number,
-  data: any,
+  data: TData,
   indexes: number[] = [],
-): CrystalWrappedValue {
+): any {
+  // This is an `any` because typing it is way too hard; it could be an infinitely nested list for example.
   if (data == null) {
     return null;
   }
@@ -260,29 +262,32 @@ function crystalWrap(
 const $$crystalContext = Symbol("context");
 const $$idByPathIdentity = Symbol("idByPathIdentity");
 const $$indexesByPathIdentity = Symbol("indexesByPathIdentity");
+const $$data = Symbol("data");
 
-interface CrystalObject {
+interface CrystalObject<TData> {
   [$$crystalContext]: CrystalContext;
   [$$idByPathIdentity]: { [pathIdentity: string]: number };
   [$$indexesByPathIdentity]: { [pathIdentity: string]: number[] };
+  [$$data]: TData;
 }
 
-function newCrystalObject(
+function newCrystalObject<TData>(
   plan: Plan,
   pathIdentity: string,
   id: number,
   indexes: number[],
-  data: any,
+  data: TData,
   crystalContext: CrystalContext,
   idByPathIdentity: { [pathIdentity: string]: number } = {
     "": crystalContext.rootId,
   },
   indexesByPathIdentity: { [pathIdentity: string]: number[] } = { "": [] },
-): CrystalObject {
+): CrystalObject<TData> {
   const crystalObject = {
     [$$crystalContext]: crystalContext,
     [$$idByPathIdentity]: idByPathIdentity,
     [$$indexesByPathIdentity]: indexesByPathIdentity,
+    [$$data]: data,
   };
   crystalObject[$$idByPathIdentity][pathIdentity] = id;
   crystalObject[$$indexesByPathIdentity][pathIdentity] = indexes;

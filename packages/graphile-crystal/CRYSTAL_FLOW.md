@@ -945,6 +945,7 @@ NewCrystalObject(plan, pathIdentity, id, indexes, data, crystalContext, idByPath
 - Let {crystalObject}.{crystalContext} be a reference to {crystalContext}.
 - Let {crystalObject}.{idByPathIdentity} be an independent copy of {idByPathIdentity}.
 - Let {crystalObject}.{indexesByPathIdentity} be an independent copy of {indexesByPathIdentity}.
+- Let {crystalObject}.{data} be {data}.
 - Set {id} as the value for key {pathIdentity} within {crystalObject}.{idByPathIdentity}.
 - Set {indexes} as the value for key {pathIdentity} within {crystalObject}.{indexesByPathIdentity}.
 - Return {crystalObject}.
