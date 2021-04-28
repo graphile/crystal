@@ -663,7 +663,7 @@ PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequentia
   - If {planResolver} is not {null}:
     - Let {trackedArguments} be {TrackedArguments(aether, objectType, field)}.
     - Let {plan} be {ExecutePlanResolver(aether, planResolver, parentPlan, trackedArguments)}.
-    - Call {PlanFieldArguments(aether, field, trackedArguments, plan)}.
+    - Call {PlanFieldArguments(aether, objectType, field, trackedArguments, plan)}.
   - Otherwise:
     - Let {plan} be {\_\_ValuePlan(aether)}. (Note: this is populated in {GetValuePlanId}.)
   - Set {plan}.{id} as the value for {pathIdentity} in {aether}.{planIdByPathIdentity}.
@@ -717,29 +717,35 @@ GraphQLCollectFields(objectType, selectionSet, trackedVariableValuesPlan):
 
 ### Plan field arguments
 
-Status: pending.
+Status: complete.
 
-PlanFieldArguments(aether, field, trackedArguments, fieldPlan):
+PlanFieldArguments(aether, objectType, field, trackedArguments, fieldPlan):
 
-- For each argument {argument} in {field}:
+- Let {fieldName} be the name of {field}.
+- Let {fieldSpec} be the field named {fieldName} on {objectType}.
+- For each argument {argumentSpec} in {fieldSpec}:
   - Let {argumentName} be the name of {argument}.
-  - If {trackedArguments} {evalHas} {argumentName}:
-    - Let {trackedArgumentValue} be {trackedArguments}.{get(argumentName)}.
-    - Call {PlanFieldArgument(aether, argument, trackedArgumentValue, fieldPlan)}.
+  - Let {trackedArgumentValuePlan} be the value for {argumentName} within {trackedArguments}.
+  - If {trackedArgumentValuePlan} is defined (including {null}):
+    - Call {PlanFieldArgument(aether, objectType, field, argument, trackedArgumentValuePlan, fieldPlan)}.
 - Return.
 
 ### Plan field argument
 
-Status: pending.
+Status: complete.
 
-PlanFieldArgument(aether, argument, trackedValuePlan, fieldPlan):
+PlanFieldArgument(aether, objectType, field, argument, trackedArgumentValuePlan, fieldPlan):
 
-- Let {planResolver} be `argument.extensions.graphile.plan`.
+- Let {fieldName} be the name of {field}.
+- Let {argumentName} be the name of {argument}.
+- Let {fieldSpec} be the field named {fieldName} on {objectType}.
+- Let {argumentSpec} be the argument named {argumentName} on {fieldSpec}.
+- Let {planResolver} be `argumentSpec.extensions.graphile.plan`.
 - If {planResolver} exists:
-  - Let {argumentPlan} be {ExecutePlanResolver(aether, planResolver, fieldPlan, trackedValuePlan)}.
+  - Let {argumentPlan} be {ExecutePlanResolver(aether, planResolver, fieldPlan, trackedArgumentValuePlan)}.
   - If {argumentPlan} is not {null}:
     - Let {argumentType} be the expected type of {argument}.
-    - Call {PlanInput(aether, argumentType, trackedValuePlan, argumentPlan)}.
+    - Call {PlanInput(aether, argumentType, trackedArgumentValuePlan, argumentPlan)}.
 - Return.
 
 ### Plan input

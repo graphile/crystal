@@ -221,7 +221,13 @@ export class Aether {
         this.trackedRootValuePlan,
         trackedArguments,
       );
-      this.planFieldArguments(field, trackedArguments, subscribePlan);
+      this.planFieldArguments(
+        rootType,
+        fieldSpec,
+        field,
+        trackedArguments,
+        subscribePlan,
+      );
       this.planSelectionSet(
         "",
         subscribePlan,
@@ -279,7 +285,13 @@ export class Aether {
           parentPlan,
           trackedArguments,
         );
-        this.planFieldArguments(field, trackedArguments, plan);
+        this.planFieldArguments(
+          objectType,
+          objectField,
+          field,
+          trackedArguments,
+          plan,
+        );
       } else {
         // Note: this is populated in GetValuePlanId
         plan = new __ValuePlan(this);
@@ -361,6 +373,38 @@ export class Aether {
         }
       }
       this.groupId = oldGroupId;
+    }
+  }
+
+  /**
+   * Implements the `PlanFieldArguments` and `PlanFieldArgument` algorithms.
+   */
+  planFieldArguments(
+    _objectType: GraphQLObjectType,
+    fieldSpec: GraphQLField<any, any>,
+    _field: FieldNode,
+    trackedArguments: {
+      [key: string]: InputPlan;
+    },
+    fieldPlan: Plan,
+  ): void {
+    for (let i = 0, l = fieldSpec.args.length; i < l; i++) {
+      const argSpec = fieldSpec.args[i];
+      const argName = argSpec.name;
+      const trackedArgumentValuePlan = trackedArguments[argName];
+      if (trackedArgumentValuePlan !== undefined) {
+        const planResolver = argSpec.extensions?.graphile?.plan;
+        if (typeof planResolver === "function") {
+          const argPlan = this.executePlanResolver(
+            planResolver,
+            fieldPlan,
+            trackedArgumentValuePlan,
+          );
+          if (argPlan != null) {
+            this.planInput(argSpec.type, trackedArgumentValuePlan, argPlan);
+          }
+        }
+      }
     }
   }
 
