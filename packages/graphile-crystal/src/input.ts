@@ -23,9 +23,9 @@ import { defaultValueToValueNode } from "./utils";
 
 export type InputPlan =
   | __TrackedObjectPlan // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength()
-  | InputListPlan // .at(), .eval(), .evalLength()
+  | InputListPlan // .at(), .eval(), .evalLength(), .evalIs(null)
   | InputStaticLeafPlan // .eval(), .evalIs()
-  | InputObjectPlan; // .get(), .eval(), .evalHas()
+  | InputObjectPlan; // .get(), .eval(), .evalHas(), .evalIs(null)
 
 function graphqlGetTypeForNode(
   aether: Aether,
@@ -239,6 +239,18 @@ class InputListPlan extends Plan {
     }
     return list;
   }
+
+  evalIs(value: null | undefined): boolean {
+    if (value === undefined) {
+      return this.inputValues === value;
+    } else if (value === null) {
+      return this.inputValues?.kind === "NullValue";
+    } else {
+      throw new Error(
+        "InputListPlan cannot evalIs values other than null and undefined currently",
+      );
+    }
+  }
 }
 
 /**
@@ -347,6 +359,18 @@ class InputObjectPlan extends Plan {
       resultValues[inputFieldName] = inputFieldPlan.eval();
     }
     return resultValues;
+  }
+
+  evalIs(value: null | undefined): boolean {
+    if (value === undefined) {
+      return this.inputValues === value;
+    } else if (value === null) {
+      return this.inputValues?.kind === "NullValue";
+    } else {
+      throw new Error(
+        "InputObjectPlan cannot evalIs values other than null and undefined currently",
+      );
+    }
   }
 
   // TODO: evalHas(attrName: string): boolean

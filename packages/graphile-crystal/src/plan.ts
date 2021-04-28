@@ -65,6 +65,10 @@ export type PolymorphicPlan = Plan & {
   planForType(objectType: GraphQLObjectType): Plan;
 };
 
+export type ArgumentPlan = Plan & {
+  null(): void;
+};
+
 /**
  * Returns true for values of 'blah' that you can do `foo.blah` with.
  * Extremely conservative.

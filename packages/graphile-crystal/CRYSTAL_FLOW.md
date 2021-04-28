@@ -746,13 +746,14 @@ PlanFieldArgument(aether, objectType, field, argument, trackedArgumentValuePlan,
   - Let {argumentPlan} be the result of calling {planResolver}, providing {fieldPlan}, {trackedArgumentValuePlan},
     {aether}.{trackedContextPlan}.
   - If {argumentPlan} is not {null}:
+    - Assert {argumentPlan} is an argument plan.
     - Let {argumentType} be the expected type of {argument}.
     - Call {PlanInput(aether, argumentType, trackedArgumentValuePlan, argumentPlan)}.
 - Return.
 
 ### Plan input
 
-Status: pending.
+Status: complete, but badly typed.
 
 PlanInput(aether, inputType, trackedValuePlan, parentPlan):
 

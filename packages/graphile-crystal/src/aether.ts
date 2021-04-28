@@ -13,6 +13,10 @@ import {
   GraphQLUnionType,
   assertListType,
   SelectionNode,
+  GraphQLInputType,
+  isNonNullType,
+  isListType,
+  isInputObjectType,
 } from "graphql";
 import {
   Plan,
@@ -20,6 +24,7 @@ import {
   __ValuePlan,
   assertFinalized,
   PolymorphicPlan,
+  ArgumentPlan,
 } from "./plan";
 import { graphqlCollectFields, getDirective } from "./graphqlCollectFields";
 import { InputPlan, inputPlan } from "./input";
@@ -59,6 +64,20 @@ function assertPolymorphicPlan(
     typeof plan.planForType,
     "function",
     "Expected property `planForType` for interface field plan to be a function.",
+  );
+}
+
+function assertArgumentPlan(
+  plan: Plan | ArgumentPlan,
+): asserts plan is ArgumentPlan {
+  assert.ok(
+    "null" in plan,
+    "Expected plan for argument to be compatible with ArgumentPlan.",
+  );
+  assert.equal(
+    typeof plan.null,
+    "function",
+    "Expected property `null` for argument plan to be a function.",
   );
 }
 
@@ -399,12 +418,52 @@ export class Aether {
             trackedArgumentValuePlan,
             this.trackedContextPlan,
           );
+          assertArgumentPlan(argPlan);
           if (argPlan != null) {
             this.planInput(argSpec.type, trackedArgumentValuePlan, argPlan);
           }
         }
       }
     }
+  }
+
+  /**
+   * Implements the `PlanInput` algorithm.
+   *
+   * Note: we are only expecting to {PlanInput()} for objects or lists thereof, not scalars.
+   */
+  planInput(
+    inputType: GraphQLInputType,
+    trackedValuePlan: InputPlan,
+    parentPlan: ArgumentPlan,
+  ): void {
+    if (isNonNullType(inputType)) {
+      this.planInput(inputType.ofType, trackedValuePlan, parentPlan);
+      return;
+    }
+    if (isListType(inputType)) {
+      if (trackedValuePlan.evalIs(null)) {
+        parentPlan.null();
+        return;
+      }
+      const innerInputType = inputType.ofType;
+      // TODO: assert trackedValuePlan represents a list
+      const length = (trackedValuePlan as any).evalLength?.();
+      for (let i = 0; i < length; i++) {
+        const listItemParentPlan = (parentPlan as any).itemPlan();
+        const trackedListValue = (trackedValuePlan as any).at(i);
+        this.planInput(innerInputType, trackedListValue, listItemParentPlan);
+      }
+      return;
+    }
+    if (isInputObjectType(inputType)) {
+      if (trackedValuePlan.evalIs(null)) {
+        // TODO: should we indicate to the parent that this is null as opposed to an empty object?
+        return;
+      }
+      this.planInputFields(inputType, trackedValuePlan, parentPlan);
+    }
+    throw new Error("Invalid plan; planInput called for unsupported type.");
   }
 
   /**
