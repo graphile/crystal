@@ -763,7 +763,7 @@ PlanInput(aether, inputType, trackedValuePlan, parentPlan):
     - Call {parentPlan}.{null()}.
     - Return.
   - Let {innerInputType} be the inner type of {inputType}.
-  - Let {length} be {trackedArguments}.{evalLength}.
+  - Let {length} be {trackedValuePlan}.{evalLength()}.
   - For {i} from {0...length-1}:
     - Let {listItemParentPlan} be the result of calling {parentPlan}.{itemPlan()}.
     - Let {trackedListValue} be {trackedValuePlan}.{at(i)}.
