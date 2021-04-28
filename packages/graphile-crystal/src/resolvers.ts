@@ -154,6 +154,7 @@ export function crystalWrapResolve<
     }
     const result = batch.getResult(parentCrystalObject);
     return crystalWrap(
+      crystalContext,
       plan,
       returnType,
       parentCrystalObject,
@@ -188,6 +189,7 @@ export function crystalWrapSubscribe<
 }
 
 function crystalWrap(
+  crystalContext: CrystalContext,
   plan: Plan,
   returnType: GraphQLOutputType,
   parentCrystalObject: CrystalWrappedValue | undefined,
@@ -201,6 +203,7 @@ function crystalWrap(
   }
   if (isNonNullType(returnType)) {
     return crystalWrap(
+      crystalContext,
       plan,
       returnType.ofType,
       parentCrystalObject,
@@ -217,6 +220,7 @@ function crystalWrap(
       const entry = data[index];
       const wrappedIndexes = [...indexes, index];
       result[index] = crystalWrap(
+        crystalContext,
         plan,
         returnType.ofType,
         parentCrystalObject,
@@ -229,7 +233,6 @@ function crystalWrap(
     return result;
   }
   if (parentCrystalObject) {
-    const crystalContext = parentCrystalObject[$$context];
     const idByPathIdentity = parentCrystalObject[$$idByPathIdentity];
     const indexesByPathIdentity = parentCrystalObject[$$indexesByPathIdentity];
     return newCrystalObject(
@@ -243,6 +246,45 @@ function crystalWrap(
       indexesByPathIdentity,
     );
   } else {
-    return newCrystalObject(plan, pathIdentity, id, indexes, data);
+    return newCrystalObject(
+      plan,
+      pathIdentity,
+      id,
+      indexes,
+      data,
+      crystalContext,
+    );
   }
+}
+
+const $$crystalContext = Symbol("context");
+const $$idByPathIdentity = Symbol("idByPathIdentity");
+const $$indexesByPathIdentity = Symbol("indexesByPathIdentity");
+
+interface CrystalObject {
+  [$$crystalContext]: CrystalContext;
+  [$$idByPathIdentity]: { [pathIdentity: string]: number };
+  [$$indexesByPathIdentity]: { [pathIdentity: string]: number[] };
+}
+
+function newCrystalObject(
+  plan: Plan,
+  pathIdentity: string,
+  id: number,
+  indexes: number[],
+  data: any,
+  crystalContext: CrystalContext,
+  idByPathIdentity: { [pathIdentity: string]: number } = {
+    "": crystalContext.rootId,
+  },
+  indexesByPathIdentity: { [pathIdentity: string]: number[] } = { "": [] },
+): CrystalObject {
+  const crystalObject = {
+    [$$crystalContext]: crystalContext,
+    [$$idByPathIdentity]: idByPathIdentity,
+    [$$indexesByPathIdentity]: indexesByPathIdentity,
+  };
+  crystalObject[$$idByPathIdentity][pathIdentity] = id;
+  crystalObject[$$indexesByPathIdentity][pathIdentity] = indexes;
+  return crystalObject;
 }

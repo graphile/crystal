@@ -902,32 +902,31 @@ argumentValues, pathIdentity):
     you, so the crystal object received will always have a non-list value stored under 'id', but each entry in the
     returned results will have a different crystal object, all with the same 'id'. It's possible that 'id' is not the
     right name to give this property since there will be many with the same value.)~~
-  - Return {CrystalWrap(plan, returnType, parentCrystalObject, pathIdentity, id, result)}.
+  - Return {CrystalWrap(crystalContext, plan, returnType, parentCrystalObject, pathIdentity, id, result)}.
 
 ### Crystal wrap
 
 Status: complete.
 
-CrystalWrap(plan, returnType, parentCrystalObject, pathIdentity, id, data, indexes):
+CrystalWrap(crystalContext, plan, returnType, parentCrystalObject, pathIdentity, id, data, indexes):
 
 - If {indexes} is not set, initialize it to an empty list.
 - If {data} is {null}:
   - Return {null}.
 - Otherwise, if {returnType} is a non-null type:
   - Let {innerType} be the inner type of {returnType}.
-  - Return {CrystalWrap(plan, innerType, parentCrystalObject, pathIdentity, id, data)}.
+  - Return {CrystalWrap(crystalContext, plan, innerType, parentCrystalObject, pathIdentity, id, data)}.
 - Otherwise, if {returnType} is a list type:
   - Let {innerType} be the inner type of {returnType}.
   - Let {result} be an empty list.
   - For each {entry} with index {index} in {data}:
     - Let {wrappedIndexes} be a list composed of everything in {indexes} followed by {index}.
-    - Let {wrappedEntry} be {CrystalWrap(plan, innerType, parentCrystalObject, pathIdentity, id, entry,
+    - Let {wrappedEntry} be {CrystalWrap(crystalContext, plan, innerType, parentCrystalObject, pathIdentity, id, entry,
       wrappedIndexes)}.
     - Push {wrappedEntry} onto {result}.
   - Return {result}.
 - Otherwise:
   - If {parentCrystalObject} is provided:
-    - Let {crystalContext} be a reference to {parentCrystalObject}'s {crystalContext}.
     - Let {idByPathIdentity} be a reference to {parentCrystalObject}'s {idByPathIdentity}.
     - Let {indexesByPathIdentity} be a reference to {parentCrystalObject}'s {indexesByPathIdentity}.
   - Let {crystalObject} be {NewCrystalObject(plan, pathIdentity, id, indexes, data, crystalContext, idByPathIdentity,
@@ -936,7 +935,7 @@ CrystalWrap(plan, returnType, parentCrystalObject, pathIdentity, id, data, index
 
 ### New crystal object
 
-Status: pending.
+Status: complete.
 
 NewCrystalObject(plan, pathIdentity, id, indexes, data, crystalContext, idByPathIdentity, indexesByPathIdentity):
 
