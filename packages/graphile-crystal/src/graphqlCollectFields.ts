@@ -106,14 +106,14 @@ function graphqlDoesFragmentTypeApply(
 export function graphqlCollectFields(
   aether: Aether,
   objectType: GraphQLObjectType,
-  selectionSet: SelectionSetNode,
+  selections: ReadonlyArray<SelectionNode>,
   visitedFragments = new Set<string>(),
   groupedFields = new Map<string, FieldNode[]>(),
 ): Map<string, FieldNode[]> {
   // TODO: factor in @defer / @stream via groupId / maxGroupId
   const trackedVariableValuesPlan = aether.trackedVariableValuesPlan;
-  for (let i = 0, l = selectionSet.selections.length; i < l; i++) {
-    const selection = selectionSet.selections[i];
+  for (let i = 0, l = selections.length; i < l; i++) {
+    const selection = selections[i];
     if (
       getDirectiveArg(selection, "skip", "if", trackedVariableValuesPlan) ===
       true
@@ -165,7 +165,7 @@ export function graphqlCollectFields(
         graphqlCollectFields(
           aether,
           objectType,
-          fragmentSelectionSet,
+          fragmentSelectionSet.selections,
           visitedFragments,
           groupedFields,
         );
@@ -188,7 +188,7 @@ export function graphqlCollectFields(
         graphqlCollectFields(
           aether,
           objectType,
-          fragmentSelectionSet,
+          fragmentSelectionSet.selections,
           visitedFragments,
           groupedFields,
         );

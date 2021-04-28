@@ -577,7 +577,7 @@ Note: This plan is never executed; it's purely internal - we populate the value 
 
 ### Branch plan
 
-Status: pending.
+Status: not yet designed.
 
 BranchPlan(aether):
 
@@ -638,7 +638,7 @@ PlanAetherSubscription(aether):
 
 ### Plan selection set
 
-Status: pending.
+Status: complete (with caveats).
 
 PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequential):
 
@@ -650,12 +650,13 @@ PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequentia
 - For each {groupedFieldSet} as {responseKey} and {fields}:
   - Let {pathIdentity} be `path + ">" + objectType.name + "." + responseKey`.
   - Let {field} be the first entry in {fields}.
+  - Let {fieldName} be the name of {field}. Note: This value is unaffected if an alias is used.
+  - Let {fieldType} be the return type defined for the field {fieldName} of {objectType}.
   - If {field} provides the directive `@stream`:
+    - Assert {fieldType} is a List type.
     - Let {oldGroupId} be {aether}.{groupId}.
     - Increment {aether}.{maxGroupId}.
     - Let {aether}.{groupId} be {aether}.{maxGroupId}.
-  - Let {fieldName} be the name of {field}. Note: This value is unaffected if an alias is used.
-  - Let {fieldType} be the return type defined for the field {fieldName} of {objectType}.
   - Let {planResolver} be `field.extensions.graphile.plan`.
   - If {planResolver} is not {null}:
     - Let {trackedArguments} be {TrackedArguments(aether, objectType, field)}.
@@ -672,31 +673,41 @@ PlanSelectionSet(aether, path, parentPlan, objectType, selectionSet, isSequentia
     - If {unwrappedFieldType} is an object type:
       - Call {PlanSelectionSet(aether, pathIdentity, plan, unwrappedFieldType, subSelectionSet, false)}.
     - Otherwise, if {unwrappedFieldType} is a union type:
+      - Assert {plan} is a {BranchPlan}.
       - Let {possibleObjectTypes} be all the object types that can be accessed in {subSelectionSet} that are compatible
         with {unwrappedFieldType}.
-      - For each {objectType} in {possibleObjectTypes}:
-        - Call {PlanSelectionSet(aether, pathIdentity, plan, objectType, subSelectionSet, false)}.
+      - For each {possibleObjectType} in {possibleObjectTypes}:
+        - Let {subPlan} be the plan for {possibleObjectType} inside the BranchPlan {plan}.
+        - Call {PlanSelectionSet(aether, pathIdentity, subPlan, possibleObjectType, subSelectionSet, false)}.
     - Otherwise:
-      - Assert: {unwrappedFieldType} is an interface type.
-      - If any non-introspection field in {subSelectionSet} is selected on the interface type itself:
+      - Assert {unwrappedFieldType} is an interface type.
+      - Assert {plan} is a {BranchPlan}.
+      - If any non-introspection field in {subSelectionSet} is selected on the interface type itself, or any of the
+        interfaces it implements:
         - Let {possibleObjectTypes} be all the object types that implement the {unwrappedFieldType} interface.
-        - For each {objectType} in {possibleObjectTypes}:
-          - Call {PlanSelectionSet(aether, pathIdentity, plan, objectType, subSelectionSet, false)}.
+        - For each {possibleObjectType} in {possibleObjectTypes}:
+          - Let {subPlan} be the plan for {possibleObjectType} inside the BranchPlan {plan}.
+          - Call {PlanSelectionSet(aether, pathIdentity, subPlan, possibleObjectType, subSelectionSet, false)}.
       - Otherwise:
         - Note: this is the same approach as for union types.
         - Let {possibleObjectTypes} be all the object types that can be accessed in {subSelectionSet} that are
           compatible with {unwrappedFieldType}.
-        - For each {objectType} in {possibleObjectTypes}:
-          - Call {PlanSelectionSet(aether, pathIdentity, plan, objectType, subSelectionSet, false)}.
+        - For each {possibleObjectType} in {possibleObjectTypes}:
+          - Let {subPlan} be the plan for {possibleObjectType} inside the BranchPlan {plan}.
+          - Call {PlanSelectionSet(aether, pathIdentity, subPlan, possibleObjectType, subSelectionSet, false)}.
   - Let {aether}.{groupId} be {oldGroupId}.
 - Return.
 
+**TODO**: what happens if a interface/union field does NOT have a plan? In this case the plan is a {\_\_ValuePlan} which
+is not a {BranchPlan} so the assertions will fail.
+
 ### GraphQL collect fields
 
-Status: pending.
+Status: initial implementation (sans @stream/@defer) exists; not specified.
 
 As with the GraphQL {CollectFields()} algorithm, but with "tracked" access to variables via {\_\_TrackedObjectPlan()}
-rather than direct access.
+rather than direct access, and we must be careful to manipulate groupId/maxGroupId as appropriate when there are
+`@stream` / `@defer` directives.
 
 GraphQLCollectFields(objectType, selectionSet, trackedVariableValuesPlan):
 

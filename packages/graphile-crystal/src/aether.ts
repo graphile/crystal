@@ -7,6 +7,13 @@ import {
   GraphQLField,
   FieldNode,
   GraphQLObjectType,
+  assertObjectType,
+  getNamedType,
+  GraphQLInterfaceType,
+  GraphQLUnionType,
+  SelectionSetNode,
+  assertListType,
+  SelectionNode,
 } from "graphql";
 import {
   Plan,
@@ -14,9 +21,14 @@ import {
   __ValuePlan,
   assertFinalized,
 } from "./plan";
-import { graphqlCollectFields } from "./graphqlCollectFields";
+import { graphqlCollectFields, getDirective } from "./graphqlCollectFields";
 import { InputPlan, inputPlan } from "./input";
 import { defaultValueToValueNode } from "./utils";
+import {
+  graphqlMergeSelectionSets,
+  typesUsedInSelections,
+  interfaceTypeHasNonIntrospectionFieldQueriedInSelections,
+} from "./graphqlMergeSelectionSets";
 
 /**
  * Implements the `MarkPlanActive` algorithm.
@@ -134,7 +146,7 @@ export class Aether {
       "",
       this.trackedRootValuePlan,
       rootType,
-      this.operation.selectionSet,
+      this.operation.selectionSet.selections,
     );
   }
 
@@ -150,7 +162,7 @@ export class Aether {
       "",
       this.trackedRootValuePlan,
       rootType,
-      this.operation.selectionSet,
+      this.operation.selectionSet.selections,
       true,
     );
   }
@@ -164,7 +176,11 @@ export class Aether {
       throw new Error("No subscription type found in schema");
     }
     const selectionSet = this.operation.selectionSet;
-    const groupedFieldSet = graphqlCollectFields(this, rootType, selectionSet);
+    const groupedFieldSet = graphqlCollectFields(
+      this,
+      rootType,
+      selectionSet.selections,
+    );
     let firstKey: string | undefined = undefined;
     for (const key of groupedFieldSet.keys()) {
       if (firstKey !== undefined) {
@@ -191,10 +207,137 @@ export class Aether {
         trackedArguments,
       );
       this.planFieldArguments(field, trackedArguments, subscribePlan);
-      this.planSelectionSet("", subscribePlan, rootType, selectionSet);
+      this.planSelectionSet(
+        "",
+        subscribePlan,
+        rootType,
+        selectionSet.selections,
+      );
     } else {
       const subscribePlan = this.trackedRootValuePlan;
-      this.planSelectionSet("", subscribePlan, rootType, selectionSet);
+      this.planSelectionSet(
+        "",
+        subscribePlan,
+        rootType,
+        selectionSet.selections,
+      );
+    }
+  }
+
+  planSelectionSet(
+    path: string,
+    parentPlan: Plan,
+    objectType: GraphQLObjectType,
+    selections: ReadonlyArray<SelectionNode>,
+    isSequential = false,
+  ): void {
+    assertObjectType(objectType);
+    const groupedFieldSet = graphqlCollectFields(this, objectType, selections);
+    const objectTypeFields = objectType.getFields();
+    for (const [responseKey, fields] of groupedFieldSet.entries()) {
+      const oldGroupId = this.groupId;
+      const pathIdentity = `${path}>${objectType.name}.${responseKey}`;
+      const field = fields[0];
+      const fieldName = field.name.value;
+
+      // This is presumed to exist because the operation passed validation.
+      const objectField = objectTypeFields[fieldName];
+      const fieldType = objectTypeFields[fieldName].type;
+
+      // Note we don't have "defer" here, since "defer" only applies to fragments.
+      const stream = getDirective(field, "stream");
+      if (stream) {
+        assertListType(fieldType);
+        this.groupId = ++this.maxGroupId;
+      }
+
+      const planResolver = objectField.extensions?.graphile?.plan;
+      let plan;
+      if (typeof planResolver === "function") {
+        const trackedArguments = this.getTrackedArguments(objectType, field);
+        plan = this.executePlanResolver(
+          planResolver,
+          parentPlan,
+          trackedArguments,
+        );
+        this.planFieldArguments(field, trackedArguments, plan);
+      } else {
+        // Note: this is populated in GetValuePlanId
+        plan = new __ValuePlan(this);
+      }
+      this.planIdByPathIdentity[pathIdentity] = plan.id;
+      const unwrappedFieldType = getNamedType(fieldType);
+      // TODO:  see the list depth of fieldType and assert that the data to be returned has the same depth if we can.
+      const isObjectType = unwrappedFieldType instanceof GraphQLObjectType;
+      const isInterfaceType =
+        unwrappedFieldType instanceof GraphQLInterfaceType;
+      const isUnionType = unwrappedFieldType instanceof GraphQLUnionType;
+      if (isObjectType || isInterfaceType || isUnionType) {
+        const subSelectionSet = graphqlMergeSelectionSets(fields);
+        const planPossibleObjectTypes = (
+          possibleObjectTypes: readonly GraphQLObjectType[],
+        ): void => {
+          for (let i = 0, l = possibleObjectTypes.length; i < l; i++) {
+            const possibleObjectType = possibleObjectTypes[i];
+            const subPlan = plan.if(possibleObjectType);
+            this.planSelectionSet(
+              pathIdentity,
+              subPlan,
+              possibleObjectType,
+              subSelectionSet,
+              false,
+            );
+          }
+        };
+        if (isObjectType) {
+          this.planSelectionSet(
+            pathIdentity,
+            plan,
+            unwrappedFieldType as GraphQLObjectType,
+            subSelectionSet,
+            false,
+          );
+        } else if (isUnionType) {
+          // TODO: assert plan is a BranchPlan
+          const unionType = unwrappedFieldType as GraphQLUnionType;
+          const possibleObjectTypes = typesUsedInSelections(
+            this,
+            unionType.getTypes(),
+            subSelectionSet,
+          );
+          /*@__INLINE__*/ planPossibleObjectTypes(possibleObjectTypes);
+        } else {
+          assert.ok(
+            isInterfaceType,
+            "Impossible. isObjectType and isUnionType are false so isInterfaceType must be true",
+          );
+          // TODO: assert plan is a BranchPlan
+          const interfaceType = unwrappedFieldType as GraphQLInterfaceType;
+          // If we reference non-introspection fields on the interface type (or
+          // any of the interface types it implements) then we need to plan for
+          // every single object type that implements this interface; otherwise
+          // we only need to plan the reachable types.
+          const implementations = this.schema.getImplementations(interfaceType)
+            .objects;
+          if (
+            interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
+              this,
+              interfaceType,
+              subSelectionSet,
+            )
+          ) {
+            /*@__INLINE__*/ planPossibleObjectTypes(implementations);
+          } else {
+            const possibleObjectTypes = typesUsedInSelections(
+              this,
+              implementations,
+              subSelectionSet,
+            );
+            /*@__INLINE__*/ planPossibleObjectTypes(possibleObjectTypes);
+          }
+        }
+      }
+      this.groupId = oldGroupId;
     }
   }
 
