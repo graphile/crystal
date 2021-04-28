@@ -293,3 +293,15 @@ function newCrystalObject<TData>(
   crystalObject[$$indexesByPathIdentity][pathIdentity] = indexes;
   return crystalObject;
 }
+
+/**
+ * Implements `PopulateValuePlan`
+ */
+function populateValuePlan(
+  crystalContext: CrystalContext,
+  valuePlan: Plan,
+  valueId: number,
+  object: any,
+): void {
+  crystalContext.resultByIdByPlanId[valuePlan.id][valueId] = object;
+}

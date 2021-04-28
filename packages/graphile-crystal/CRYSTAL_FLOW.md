@@ -971,7 +971,7 @@ NewCrystalContext(aether, variableValues, context, rootValue):
 
 ### Populate value plan
 
-Status: pending.
+Status: complete.
 
 PopulateValuePlan(crystalContext, valuePlan, valueId, object):
 
