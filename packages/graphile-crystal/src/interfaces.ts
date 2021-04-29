@@ -1,5 +1,6 @@
 import { Plan } from "./plan";
 import { UniqueId } from "./utils";
+import { Deferred } from "./deferred";
 
 export const $$crystalContext = Symbol("context");
 export const $$idByPathIdentity = Symbol("idByPathIdentity");
@@ -17,7 +18,7 @@ export interface Batch {
   pathIdentity: string;
   crystalContext: CrystalContext;
   plan: Plan;
-  entries: Array<[CrystalObject<any>, DeferredResult]>;
+  entries: Array<[CrystalObject<any>, Deferred<any>]>;
 }
 
 export interface CrystalContext {

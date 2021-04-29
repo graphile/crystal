@@ -30,13 +30,15 @@ import {
 } from "./plan";
 import { graphqlCollectFields, getDirective } from "./graphqlCollectFields";
 import { InputPlan, inputPlan, InputObjectPlan } from "./input";
-import { defaultValueToValueNode, uid, UniqueId } from "./utils";
+import { defaultValueToValueNode, uid, UniqueId, isPromise } from "./utils";
 import {
   graphqlMergeSelectionSets,
   typesUsedInSelections,
   interfaceTypeHasNonIntrospectionFieldQueriedInSelections,
 } from "./graphqlMergeSelectionSets";
-import { Batch, CrystalContext } from "./interfaces";
+import { Batch, CrystalContext, CrystalObject } from "./interfaces";
+import { isDev } from "./dev";
+import { Deferred } from "./deferred";
 
 type TrackedArguments = { [key: string]: InputPlan };
 
@@ -701,6 +703,48 @@ export class Aether {
       setTimeout(() => this.executeBatch(batch, crystalContext), 0);
     }
     return batch;
+  }
+
+  /**
+   * Implements `ExecuteBatch`.
+   *
+   * TODO: we can optimise this to not be `async` (only return a promise when
+   * necessary).
+   */
+  async executeBatch(batch: Batch, crystalContext: CrystalContext): void {
+    // This guarantees nothing else will be added to the batch
+    delete this.batchByPathIdentity[batch.pathIdentity];
+    const { entries, plan } = batch;
+    const l = entries.length;
+    const crystalObjects: CrystalObject<any>[] = new Array(l);
+    const deferredResults: Deferred<any>[] = new Array(l);
+    for (let i = 0; i < l; i++) {
+      const [crystalObject, deferredResult] = entries[i];
+      crystalObjects[i] = crystalObject;
+      deferredResults[i] = deferredResult;
+    }
+    const resultsPromise = this.executePlan(
+      plan,
+      crystalContext,
+      crystalObjects,
+    );
+    const results = isPromise(resultsPromise)
+      ? await resultsPromise
+      : resultsPromise;
+    if (isDev) {
+      assert.ok(
+        Array.isArray(results),
+        "Expected plan execution to return an array",
+      );
+      assert.equal(
+        results.length,
+        l,
+        "Expected plan execution result to have same length as input objects",
+      );
+    }
+    for (let i = 0; i < l; i++) {
+      deferredResults[i].resolve(results[i]);
+    }
   }
 }
 

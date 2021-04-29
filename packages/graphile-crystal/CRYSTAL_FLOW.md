@@ -1013,7 +1013,7 @@ NewBatch(aether, pathIdentity, crystalContext):
 
 ### Execute batch
 
-Status: pending.
+Status: complete.
 
 ExecuteBatch(aether, batch, crystalContext):
 

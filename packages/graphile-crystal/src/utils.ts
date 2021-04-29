@@ -241,3 +241,12 @@ export const uid = ((): (() => UniqueId) => {
     return `${prefix}${fastCounter}`;
   };
 })();
+
+export function isPromise<T>(t: T | Promise<T>): t is Promise<T> {
+  return (
+    typeof t === "object" &&
+    t !== null &&
+    typeof (t as any).then === "function" &&
+    typeof (t as any).catch === "function"
+  );
+}
