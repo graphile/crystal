@@ -100,7 +100,7 @@ export class Aether {
     [pathIdentity: string]: number;
   } = Object.create(null);
   public readonly valueIdByObjectByPlanId: {
-    [planId: number]: WeakMap<object, symbol>;
+    [planId: number]: WeakMap<object, UniqueId>;
   } = Object.create(null);
   public readonly variableValuesConstraints: Constraint[] = [];
   public readonly variableValuesPlan: __ValuePlan;
@@ -826,6 +826,28 @@ export class Aether {
       }
     }
     return result;
+  }
+
+  /**
+   * Implements `GetValuePlanId`.
+   */
+  getValuePlanId(
+    crystalContext: CrystalContext,
+    valuePlan: __ValuePlan,
+    object: any,
+  ): UniqueId {
+    assert.ok(
+      valuePlan instanceof __ValuePlan,
+      "Expected getValuePlanId to be called with a __ValuePlan",
+    );
+    const valueIdByObject = this.valueIdByObjectByPlanId[valuePlan.id];
+    let valueId = valueIdByObject.get(object);
+    if (valueId === undefined) {
+      valueId = uid();
+      valueIdByObject.set(object, valueId);
+      populateValuePlan(crystalContext, valuePlan, valueId, object);
+    }
+    return valueId;
   }
 }
 

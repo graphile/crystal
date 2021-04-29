@@ -143,10 +143,14 @@ export function crystalWrapResolve<
       parentCrystalObject = parentObject;
     } else {
       // Note: we need to "fake" that the parent was a plan. Because we may have lots of resolvers all called for the same parent object, we use a map. This happens to mean that multiple values in the graph being the same object will be merged automatically.
-      const parentPathIdentity = pathToPathIdentity(path.prev);
+      const parentPathIdentity = path.prev ? pathToPathIdentity(path.prev) : "";
       const parentPlanId = aether.planIdByPathIdentity[parentPathIdentity];
       const parentPlan = aether.plans[parentPlanId];
-      const parentId = aether.getValuePlanId(parentPlan, parentObject);
+      const parentId = aether.getValuePlanId(
+        crystalContext,
+        parentPlan,
+        parentObject,
+      );
       const indexes: number[] = [];
       parentCrystalObject = newCrystalObject(
         parentPlan,

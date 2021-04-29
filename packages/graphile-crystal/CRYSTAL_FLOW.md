@@ -840,9 +840,9 @@ through to the underlying resolver.
 
 ### Get value plan id
 
-Status: pending.
+Status: complete.
 
-GetValuePlanId(aether, valuePlan, object):
+GetValuePlanId(aether, crystalContext, valuePlan, object):
 
 - Assert: {valuePlan} is a {\_\_ValuePlan}.
 - Let {valueIdByObject} be the map for {valuePlan}.{id} within the map {aether}.{valueIdByObjectByPlanId} (creating the
@@ -894,7 +894,7 @@ argumentValues, pathIdentity):
     - Let {parentPathIdentity} be the parent path for {pathIdentity}.
     - Let {parentPlanId} be the value for key {parentPathIdentity} within {aether}.{planIdByPathIdentity}.
     - Let {parentPlan} be the plan at index {parentPlanId} within {aether}.{plans}.
-    - Let {parentId} be {GetValuePlanId(aether, parentPlan, parentObject)}.
+    - Let {parentId} be {GetValuePlanId(aether, crystalContext, parentPlan, parentObject)}.
     - Let {indexes} be an empty list.
     - Let {parentCrystalObject} be {NewCrystalObject(parentPlan, parentPathIdentity, parentId, indexes, parentObject,
       crystalContext)}.
