@@ -647,9 +647,7 @@ export class Aether {
     variableValues: {
       [variableName: string]: unknown;
     },
-    context: {
-      [key: string]: unknown;
-    },
+    context: object,
     rootValue: unknown,
   ): CrystalContext {
     const rootId = uid();

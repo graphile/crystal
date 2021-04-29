@@ -25,9 +25,7 @@ export interface Batch {
 
 export interface CrystalContext {
   resultByIdByPlanId: {
-    [planId: number]: {
-      [id: /* UniqueId */ symbol]: any;
-    };
+    [planId: number]: Record<UniqueId, any>;
   };
   metaByPlanId: {
     [planId: number]: object;
