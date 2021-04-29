@@ -11,7 +11,7 @@ import {
   DirectiveNode,
 } from "graphql";
 import { Aether } from "./aether";
-import { TrackedObjectPlan } from "./plan";
+import { __TrackedObjectPlan } from "./plan";
 
 /**
  * Given a selection, finds the first directive named `directiveName`.
@@ -42,7 +42,7 @@ export function getDirectiveArg(
   selection: SelectionNode,
   directiveName: string,
   argumentName: string,
-  variableValuesPlan: TrackedObjectPlan,
+  variableValuesPlan: __TrackedObjectPlan,
 ): unknown {
   const directive = getDirective(selection, directiveName);
   const argument = directive?.arguments?.find(
@@ -52,7 +52,7 @@ export function getDirectiveArg(
     const value = argument.value;
     switch (value.kind) {
       case "Variable": {
-        return variableValuesPlan.evalGet(value.name.value);
+        return variableValuesPlan.get(value.name.value).eval();
       }
       case "BooleanValue": {
         return value.value;

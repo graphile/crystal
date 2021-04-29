@@ -103,7 +103,7 @@ function rawValueToValueNode(
         "defaultValue contained invalid value at a position expecting int",
       );
     }
-    return { kind: "IntValue", value: String(parseInt(value, 10)) };
+    return { kind: "IntValue", value: String(parseInt(String(value), 10)) };
   }
   if (type === GraphQLFloat) {
     if (typeof value !== "number") {

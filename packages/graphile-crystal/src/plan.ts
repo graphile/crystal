@@ -54,7 +54,7 @@ export abstract class Plan {
    * add attributes to meta for each purpose (e.g. use `meta.cache` for
    * memoizing results) so that you can expand your usage of meta in future.
    */
-  abstract execute(values: any[][], meta: {}): any[];
+  abstract execute(values: any[][], meta: {}): Promise<any[]> | any[];
 
   finalize(): void {
     this.isFinalized = true;
@@ -122,6 +122,8 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
  * incoming object. If possible it will return a dynamically constructed
  * function which will enable V8 to optimise the function over time via the
  * JIT.
+ *
+ * TODO: this is security critical! Be hyper vigilant when reviewing it.
  */
 function constructDestructureFunction(
   path: (string | number)[],

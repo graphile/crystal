@@ -11,7 +11,7 @@ import {
 import debugFactory from "debug";
 import { establishAether } from "./establishAether";
 import { Path } from "graphql/jsutils/Path";
-import { Plan } from "./plan";
+import { Plan, __ValuePlan } from "./plan";
 import {
   CrystalObject,
   CrystalContext,
@@ -111,7 +111,7 @@ export function crystalWrapResolve<
     const planId = aether.planIdByPathIdentity[pathIdentity];
     const plan = aether.plans[planId];
     if (plan == null) {
-      const objectValue = isCrystalWrappedValue(parentObject)
+      const objectValue = isCrystalObject(parentObject)
         ? parentObject[$$data]
         : parentObject;
       return graphqlResolveFieldValue(
@@ -130,9 +130,8 @@ export function crystalWrapResolve<
       rootValue,
     );
     const crystalContext = batch.crystalContext;
-    const plan = batch.plan;
     let parentCrystalObject: CrystalObject<any>;
-    if (isCrystalWrappedValue(parentObject)) {
+    if (isCrystalObject(parentObject)) {
       // Note: for the most optimal execution, `rootValue` passed to graphql
       // should be a crystal object, this allows using {crystalContext} across
       // the entire operation if plans are used everywhere. Even more optimised
@@ -145,7 +144,13 @@ export function crystalWrapResolve<
       // Note: we need to "fake" that the parent was a plan. Because we may have lots of resolvers all called for the same parent object, we use a map. This happens to mean that multiple values in the graph being the same object will be merged automatically.
       const parentPathIdentity = path.prev ? pathToPathIdentity(path.prev) : "";
       const parentPlanId = aether.planIdByPathIdentity[parentPathIdentity];
-      const parentPlan = aether.plans[parentPlanId];
+
+      const parentPlan = aether.plans[parentPlanId]; // TODO: assert that this is handled for us
+      assert.ok(
+        parentPlan instanceof __ValuePlan,
+        "Expected parent field (which returned non-crystal object) to be a valuePlan)",
+      );
+
       const parentId = aether.getValuePlanId(
         crystalContext,
         parentPlan,
@@ -292,6 +297,10 @@ function newCrystalObject<TData>(
   crystalObject[$$idByPathIdentity][pathIdentity] = id;
   crystalObject[$$indexesByPathIdentity][pathIdentity] = indexes;
   return crystalObject;
+}
+
+export function isCrystalObject(input: any): input is CrystalObject<any> {
+  return typeof input === "object" && input && $$data in input;
 }
 
 /**

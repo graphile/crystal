@@ -36,9 +36,16 @@ import {
   typesUsedInSelections,
   interfaceTypeHasNonIntrospectionFieldQueriedInSelections,
 } from "./graphqlMergeSelectionSets";
-import { Batch, CrystalContext, CrystalObject, $$id } from "./interfaces";
+import {
+  Batch,
+  CrystalContext,
+  CrystalObject,
+  $$id,
+  $$crystalContext,
+} from "./interfaces";
 import { isDev } from "./dev";
 import { Deferred } from "./deferred";
+import { isCrystalObject } from "./resolvers";
 
 type TrackedArguments = { [key: string]: InputPlan };
 
@@ -125,9 +132,7 @@ export class Aether {
     public readonly variableValues: {
       [variableName: string]: unknown;
     },
-    public readonly context: {
-      [key: string]: unknown;
-    },
+    public readonly context: object,
     public readonly rootValue: unknown,
   ) {
     this.variableValuesPlan = new __ValuePlan(this);
@@ -438,7 +443,7 @@ export class Aether {
   /**
    * Implements the `PlanInput` algorithm.
    *
-   * Note: we are only expecting to {PlanInput()} for objects or lists thereof, not scalars.
+   * Note: we are only expecting to `PlanInput()` for objects or lists thereof, not scalars.
    */
   planInput(
     inputType: GraphQLInputType,
@@ -687,14 +692,12 @@ export class Aether {
     variableValues: {
       [variableName: string]: unknown;
     },
-    context: {
-      [key: string]: unknown;
-    },
+    context: object,
     rootValue: unknown,
   ): Batch {
     const batch = this.batchByPathIdentity[pathIdentity];
     if (!batch) {
-      const crystalContext = isCrystalWrappedValue(parentObject)
+      const crystalContext = isCrystalObject(parentObject)
         ? parentObject[$$crystalContext]
         : this.newCrystalContext(variableValues, context, rootValue);
       const batch = this.newBatch(pathIdentity, crystalContext);
@@ -711,7 +714,10 @@ export class Aether {
    * TODO: we can optimise this to not be `async` (only return a promise when
    * necessary).
    */
-  async executeBatch(batch: Batch, crystalContext: CrystalContext): void {
+  async executeBatch(
+    batch: Batch,
+    crystalContext: CrystalContext,
+  ): Promise<void> {
     // This guarantees nothing else will be added to the batch
     delete this.batchByPathIdentity[batch.pathIdentity];
     const { entries, plan } = batch;
@@ -755,7 +761,7 @@ export class Aether {
     crystalContext: CrystalContext,
     crystalObjects: CrystalObject<any>[],
     visitedPlans = new Set<Plan>(),
-  ) {
+  ): Promise<any[]> {
     if (visitedPlans.has(plan)) {
       throw new Error("Plan execution recursion error");
     }
