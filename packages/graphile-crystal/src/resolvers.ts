@@ -82,8 +82,8 @@ export function crystalWrapResolve<
     // `fragments`, so that's what we extract here.
     const {
       schema,
-      fieldName,
-      parentType,
+      // fieldName,
+      // parentType,
       returnType,
       operation,
       fragments,
@@ -114,12 +114,7 @@ export function crystalWrapResolve<
       const objectValue = isCrystalObject(parentObject)
         ? parentObject[$$data]
         : parentObject;
-      return graphqlResolveFieldValue(
-        parentType,
-        objectValue,
-        fieldName,
-        argumentValues,
-      );
+      return realResolver(objectValue, argumentValues, context, info);
     }
     const id = uid();
     const batch = aether.getBatch(
