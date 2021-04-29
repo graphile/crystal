@@ -30,13 +30,13 @@ import {
 } from "./plan";
 import { graphqlCollectFields, getDirective } from "./graphqlCollectFields";
 import { InputPlan, inputPlan, InputObjectPlan } from "./input";
-import { defaultValueToValueNode } from "./utils";
+import { defaultValueToValueNode, uid, UniqueId } from "./utils";
 import {
   graphqlMergeSelectionSets,
   typesUsedInSelections,
   interfaceTypeHasNonIntrospectionFieldQueriedInSelections,
 } from "./graphqlMergeSelectionSets";
-import { Batch } from "./interfaces";
+import { Batch, CrystalContext } from "./interfaces";
 
 type TrackedArguments = { [key: string]: InputPlan };
 
@@ -629,4 +629,56 @@ export class Aether {
     };
     return batch;
   }
+
+  newCrystalContext(
+    variableValues: {
+      [variableName: string]: unknown;
+    },
+    context: {
+      [key: string]: unknown;
+    },
+    rootValue: unknown,
+  ): CrystalContext {
+    const rootId = uid();
+    const crystalContext: CrystalContext = {
+      resultByIdByPlanId: {
+        // TODO: maybe we should populate the initial values here rather than
+        // calling populateValuePlan? Will need to research V8 HiddenClass
+        // performance again.
+      },
+      metaByPlanId: {},
+      rootId,
+    };
+    /*@__INLINE__*/ populateValuePlan(
+      crystalContext,
+      this.variableValuesPlan,
+      rootId,
+      variableValues,
+    );
+    /*@__INLINE__*/ populateValuePlan(
+      crystalContext,
+      this.contextPlan,
+      rootId,
+      context,
+    );
+    /*@__INLINE__*/ populateValuePlan(
+      crystalContext,
+      this.rootValuePlan,
+      rootId,
+      rootValue,
+    );
+    return crystalContext;
+  }
+}
+
+/**
+ * Implements `PopulateValuePlan`
+ */
+function populateValuePlan(
+  crystalContext: CrystalContext,
+  valuePlan: Plan,
+  valueId: UniqueId,
+  object: any,
+): void {
+  crystalContext.resultByIdByPlanId[valuePlan.id][valueId] = object;
 }

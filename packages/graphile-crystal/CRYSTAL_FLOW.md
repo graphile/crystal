@@ -952,7 +952,7 @@ NewCrystalObject(plan, pathIdentity, id, indexes, data, crystalContext, idByPath
 
 ### New crystal context
 
-Status: pending.
+Status: complete.
 
 NewCrystalContext(aether, variableValues, context, rootValue):
 

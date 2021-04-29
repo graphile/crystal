@@ -3,7 +3,6 @@ import { inspect } from "util";
 import {
   GraphQLFieldResolver,
   GraphQLOutputType,
-  GraphQLObjectType,
   defaultFieldResolver,
   isNonNullType,
   isListType,
@@ -13,14 +12,15 @@ import debugFactory from "debug";
 import { establishAether } from "./establishAether";
 import { Path } from "graphql/jsutils/Path";
 import { Plan } from "./plan";
-import { CrystalObject } from "./interfaces";
-
-const uid = ((): (() => number) => {
-  let _uidCounter = 0;
-  return function uid(): number {
-    return ++_uidCounter;
-  };
-})();
+import {
+  CrystalObject,
+  CrystalContext,
+  $$idByPathIdentity,
+  $$indexesByPathIdentity,
+  $$crystalContext,
+  $$data,
+} from "./interfaces";
+import { uid, UniqueId } from "./utils";
 
 const debug = debugFactory("crystal:resolvers");
 
@@ -196,7 +196,7 @@ function crystalWrap<TData>(
   returnType: GraphQLOutputType,
   parentCrystalObject: CrystalObject<any> | undefined,
   pathIdentity: string,
-  id: number,
+  id: UniqueId,
   data: TData,
   indexes: number[] = [],
 ): any {
@@ -263,11 +263,11 @@ function crystalWrap<TData>(
 function newCrystalObject<TData>(
   plan: Plan,
   pathIdentity: string,
-  id: number,
+  id: UniqueId,
   indexes: number[],
   data: TData,
   crystalContext: CrystalContext,
-  idByPathIdentity: { [pathIdentity: string]: number } = {
+  idByPathIdentity: { [pathIdentity: string]: UniqueId } = {
     "": crystalContext.rootId,
   },
   indexesByPathIdentity: { [pathIdentity: string]: number[] } = { "": [] },
@@ -281,16 +281,4 @@ function newCrystalObject<TData>(
   crystalObject[$$idByPathIdentity][pathIdentity] = id;
   crystalObject[$$indexesByPathIdentity][pathIdentity] = indexes;
   return crystalObject;
-}
-
-/**
- * Implements `PopulateValuePlan`
- */
-function populateValuePlan(
-  crystalContext: CrystalContext,
-  valuePlan: Plan,
-  valueId: number,
-  object: any,
-): void {
-  crystalContext.resultByIdByPlanId[valuePlan.id][valueId] = object;
 }

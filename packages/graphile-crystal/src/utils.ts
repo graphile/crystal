@@ -206,3 +206,38 @@ export function defaultValueToValueNode(
   }
   return rawValueToValueNode(type, defaultValue);
 }
+
+// We might change this to number in future for optimisation reasons.
+export type UniqueId = string;
+
+/**
+ * The internal `fastCounter` is safe up to Number.MAX_SAFE_INTEGER; if we were
+ * to generate 100 million unique ids per second every second (a significant
+ * over-estimate), it would take us 1042 days to exhaust the safe range for
+ * this.
+ *
+ * Even calling this in the hottest of loops only generates about half a
+ * billion per second, which is safe for ~200 days:
+ *
+ * `let i=0;console.time('loop');for(;i<500_000_000;i++);console.timeEnd('loop');`
+ *
+ * Nonetheless, out of an abundance of caution, I've decided to let this loop
+ * tick over by using a prefix once we hit this max limit. This now means that
+ * this is safe over roughly 360,000 times the age of the universe.
+ *
+ * (I considered starting at `-Number.MAX_SAFE_INTEGER` rather than zero in
+ * order to quadruple the range, but decided against it on aesthetic grounds.)
+ */
+export const uid = ((): (() => UniqueId) => {
+  // Hide counter in this scope so it can't be fiddled with.
+  let prefix = "";
+  let prefixCounter = 0;
+  let fastCounter = 0;
+  return function uid(): UniqueId {
+    if (++fastCounter === Number.MAX_SAFE_INTEGER) {
+      prefix = `${++prefixCounter}|`;
+      fastCounter = 0;
+    }
+    return `${prefix}${fastCounter}`;
+  };
+})();
