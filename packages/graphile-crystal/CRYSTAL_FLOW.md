@@ -117,6 +117,7 @@ NewAether(schema, document, operationName, variableValues, context, rootValue):
 - Let {aether}.{maxGroupId} be {0}.
 - Let {aether}.{groupId} be {aether}.{maxGroupId}.
 - Let {aether}.{plans} be an empty list.
+- Let {aether}.{batchByPathIdentity} be an empty map.
 - Let {aether}.{planIdByPathIdentity} be an empty map.
 - Let {aether}.{valueIdByObjectByPlanId} be an empty map.
 
@@ -979,7 +980,7 @@ PopulateValuePlan(crystalContext, valuePlan, valueId, object):
 
 ### Get batch
 
-Status: pending.
+Status: complete.
 
 GetBatch(aether, pathIdentity, parentObject, variableValues, context, rootValue):
 

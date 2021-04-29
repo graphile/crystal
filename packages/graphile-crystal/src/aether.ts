@@ -91,6 +91,9 @@ export class Aether {
   public maxGroupId = 0;
   public groupId = this.maxGroupId;
   public readonly plans: Plan[] = [];
+  public readonly batchByPathIdentity: {
+    [pathIdentity: string]: Batch;
+  } = Object.create(null);
   public readonly planIdByPathIdentity: {
     [pathIdentity: string]: number;
   } = Object.create(null);
@@ -630,6 +633,9 @@ export class Aether {
     return batch;
   }
 
+  /**
+   * Implements `NewCrystalContext`.
+   */
   newCrystalContext(
     variableValues: {
       [variableName: string]: unknown;
@@ -668,6 +674,33 @@ export class Aether {
       rootValue,
     );
     return crystalContext;
+  }
+
+  /**
+   * Implements `GetBatch`.
+   */
+  getBatch(
+    pathIdentity: string,
+    parentObject: unknown,
+    variableValues: {
+      [variableName: string]: unknown;
+    },
+    context: {
+      [key: string]: unknown;
+    },
+    rootValue: unknown,
+  ): Batch {
+    const batch = this.batchByPathIdentity[pathIdentity];
+    if (!batch) {
+      const crystalContext = isCrystalWrappedValue(parentObject)
+        ? parentObject[$$crystalContext]
+        : this.newCrystalContext(variableValues, context, rootValue);
+      const batch = this.newBatch(pathIdentity, crystalContext);
+      this.batchByPathIdentity[pathIdentity] = batch;
+      // (Note: when batch is executed it will delete itself from aether.batchByPathIdentity.)
+      setTimeout(() => this.executeBatch(batch, crystalContext), 0);
+    }
+    return batch;
   }
 }
 
