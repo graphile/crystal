@@ -208,7 +208,7 @@ export function defaultValueToValueNode(
 }
 
 // We might change this to number in future for optimisation reasons.
-export type UniqueId = string;
+export type UniqueId = symbol;
 
 /**
  * The internal `fastCounter` is safe up to Number.MAX_SAFE_INTEGER; if we were
@@ -228,19 +228,23 @@ export type UniqueId = string;
  * (I considered starting at `-Number.MAX_SAFE_INTEGER` rather than zero in
  * order to quadruple the range, but decided against it on aesthetic grounds.)
  */
-export const uid = ((): (() => UniqueId) => {
+const developmentUid = ((): (() => UniqueId) => {
   // Hide counter in this scope so it can't be fiddled with.
   let prefix = "";
   let prefixCounter = 0;
   let fastCounter = 0;
-  return function uid(): UniqueId {
+  return function developmentUid(): UniqueId {
     if (++fastCounter === Number.MAX_SAFE_INTEGER) {
       prefix = `${++prefixCounter}|`;
       fastCounter = 0;
     }
-    return `${prefix}${fastCounter}`;
+    return Symbol(`${prefix}${fastCounter}`);
   };
 })();
+
+const productionUid = (): UniqueId => Symbol();
+
+export const uid = isDev ? developmentUid : productionUid;
 
 export function isPromise<T>(t: T | Promise<T>): t is Promise<T> {
   return (
