@@ -36,7 +36,7 @@ import {
   typesUsedInSelections,
   interfaceTypeHasNonIntrospectionFieldQueriedInSelections,
 } from "./graphqlMergeSelectionSets";
-import { Batch, CrystalContext, CrystalObject } from "./interfaces";
+import { Batch, CrystalContext, CrystalObject, $$id } from "./interfaces";
 import { isDev } from "./dev";
 import { Deferred } from "./deferred";
 
@@ -745,6 +745,87 @@ export class Aether {
     for (let i = 0; i < l; i++) {
       deferredResults[i].resolve(results[i]);
     }
+  }
+
+  /**
+   * Implements `ExecutePlan`.
+   */
+  async executePlan(
+    plan: Plan,
+    crystalContext: CrystalContext,
+    crystalObjects: CrystalObject<any>[],
+    visitedPlans = new Set<Plan>(),
+  ) {
+    if (visitedPlans.has(plan)) {
+      throw new Error("Plan execution recursion error");
+    }
+    visitedPlans.add(plan);
+    const pendingCrystalObjects = []; // Length unknown
+    const pendingCrystalObjectsIndexes = []; // Same length as pendingCrystalObjects
+    const crystalObjectCount = crystalObjects.length;
+    const result = new Array(crystalObjectCount);
+    for (let i = 0; i < crystalObjectCount; i++) {
+      const crystalObject = crystalObjects[i];
+      const previousResult =
+        crystalContext.resultByIdByPlanId[plan.id][crystalObject[$$id]];
+      if (previousResult !== undefined) {
+        result[i] = previousResult;
+      } else {
+        pendingCrystalObjects.push(crystalObject);
+        pendingCrystalObjectsIndexes.push(i);
+      }
+    }
+    const pendingCrystalObjectsLength = pendingCrystalObjects.length;
+    if (pendingCrystalObjectsLength > 0) {
+      const dependenciesCount = pendingCrystalObjects.length;
+      const dependencyValuesList = new Array(dependenciesCount);
+      for (let i = 0; i < dependenciesCount; i++) {
+        const dependencyPlan = plan.dependencies[i];
+        const dependencyResult = await this.executePlan(
+          dependencyPlan,
+          crystalContext,
+          pendingCrystalObjects,
+          visitedPlans,
+        );
+        dependencyValuesList[i] = dependencyResult;
+      }
+      const values = new Array(pendingCrystalObjectsLength);
+      for (let i = 0; i < pendingCrystalObjectsLength; i++) {
+        const entry = new Array(dependenciesCount);
+        for (let j = 0; j < dependenciesCount; j++) {
+          const dependencyValues = dependencyValuesList[j];
+          entry[j] = dependencyValues[i];
+        }
+        values[i] = entry;
+      }
+      let meta = crystalContext.metaByPlanId[plan.id];
+      if (!meta) {
+        crystalContext.metaByPlanId[plan.id] = meta = Object.create(null);
+      }
+      // Note: the `execute` method on plans is responsible for memoizing
+      // results into `meta`.
+      const pendingResults = await plan.execute(values, meta);
+      if (isDev) {
+        assert.ok(
+          Array.isArray(pendingResults),
+          "Expected plan execution to return a list",
+        );
+        assert.equal(
+          pendingResults.length,
+          pendingCrystalObjectsLength,
+          "Expected plan execution to return same number of results as inputs",
+        );
+      }
+      for (let i = 0; i < pendingCrystalObjectsLength; i++) {
+        const pendingCrystalObject = pendingCrystalObjects[i];
+        const pendingResult = pendingResults[i];
+        const j = pendingCrystalObjectsIndexes[i];
+        crystalContext.resultByIdByPlanId[plan.id][
+          pendingCrystalObject[$$id]
+        ] = result[j] = pendingResult;
+      }
+    }
+    return result;
   }
 }
 

@@ -943,6 +943,7 @@ NewCrystalObject(plan, pathIdentity, id, indexes, data, crystalContext, idByPath
 - If {idByPathIdentity} is not set, initialize it to a map containing value {crystalContext}.{rootId} for key `""`.
 - If {indexesByPathIdentity} is not set, initialize it to a map containing an empty list value for key `""`.
 - Let {crystalObject} be an empty object.
+- Let {crystalObject}.{id} be {id}.
 - Let {crystalObject}.{crystalContext} be a reference to {crystalContext}.
 - Let {crystalObject}.{idByPathIdentity} be an independent copy of {idByPathIdentity}.
 - Let {crystalObject}.{indexesByPathIdentity} be an independent copy of {indexesByPathIdentity}.
@@ -1042,7 +1043,7 @@ GetBatchResult(batch, parentCrystalObject):
 
 ### Execute plan
 
-Status: pending.
+Status: complete.
 
 ExecutePlan(aether, plan, crystalContext, crystalObjects, visitedPlans):
 
@@ -1073,11 +1074,11 @@ ExecutePlan(aether, plan, crystalContext, crystalObjects, visitedPlans):
     - Push {entry} onto {values}.
   - Let {execute} be the internal function provided by {plan} for executing the plan.
   - Let {meta} be the entry for {plan} within {crystalContext}.{metaByPlan}.
-  - Let {pendingResult} be the result of calling {execute}, providing {values} and {meta}. (Note: the `execute` method
+  - Let {pendingResults} be the result of calling {execute}, providing {values} and {meta}. (Note: the `execute` method
     on plans is responsible for memoizing results into {meta}.)
-  - Assert the length of {pendingResult} should match the length of {pendingCrystalObjects}.
+  - Assert the length of {pendingResults} should match the length of {pendingCrystalObjects}.
   - For each {pendingCrystalObject} with index {i} in {pendingCrystalObjects}:
-    - Let {pendingResult} be the {i}th value in {pendingResult}.
+    - Let {pendingResult} be the {i}th value in {pendingResults}.
     - Let {j} be the index of {pendingCrystalObject} within {crystalObjects}.
     - Set the value for key {pendingCrystalObject}.{id} for key {plan} in {crystalContext}.{resultByIdByPlan} to
       {pendingResult}.

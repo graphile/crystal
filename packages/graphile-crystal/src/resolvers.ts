@@ -19,6 +19,7 @@ import {
   $$indexesByPathIdentity,
   $$crystalContext,
   $$data,
+  $$id,
 } from "./interfaces";
 import { uid, UniqueId } from "./utils";
 
@@ -272,11 +273,12 @@ function newCrystalObject<TData>(
   },
   indexesByPathIdentity: { [pathIdentity: string]: number[] } = { "": [] },
 ): CrystalObject<TData> {
-  const crystalObject = {
+  const crystalObject: CrystalObject<TData> = {
+    [$$id]: id,
+    [$$data]: data,
     [$$crystalContext]: crystalContext,
     [$$idByPathIdentity]: idByPathIdentity,
     [$$indexesByPathIdentity]: indexesByPathIdentity,
-    [$$data]: data,
   };
   crystalObject[$$idByPathIdentity][pathIdentity] = id;
   crystalObject[$$indexesByPathIdentity][pathIdentity] = indexes;
