@@ -91,11 +91,11 @@ export function inputPlan(
     const valuePlan = inputPlan(aether, innerType, inputValue);
     return inputNonNullPlan(aether, valuePlan);
   } else if (inputType instanceof GraphQLList) {
-    return new InputListPlan(aether, inputType, inputValue);
+    return new InputListPlan(inputType, inputValue);
   } else if (isLeafType(inputType)) {
-    return new InputStaticLeafPlan(aether, inputType, inputValue);
+    return new InputStaticLeafPlan(inputType, inputValue);
   } else if (inputType instanceof GraphQLInputObjectType) {
-    return new InputObjectPlan(aether, inputType, inputValue);
+    return new InputObjectPlan(inputType, inputValue);
   } else {
     const never: never = inputType;
     throw new Error(`Unsupported type in inputPlan: '${inspect(never)}'`);
@@ -162,11 +162,10 @@ class InputListPlan extends Plan {
   private outOfBoundsPlan: InputPlan;
 
   constructor(
-    aether: Aether,
     inputType: GraphQLList<GraphQLInputType>,
     private readonly inputValues: ValueNode | undefined,
   ) {
-    super(aether);
+    super();
     assert.ok(
       inputType instanceof GraphQLList,
       "Expected inputType to be a List",
@@ -181,13 +180,13 @@ class InputListPlan extends Plan {
         inputValueIndex++
       ) {
         const inputValue = values[inputValueIndex];
-        const innerPlan = inputPlan(aether, innerType, inputValue);
+        const innerPlan = inputPlan(this.aether, innerType, inputValue);
         this.itemPlans.push(innerPlan);
       }
     }
     // TODO: is `outOfBoundsPlan` safe? Maybe it was before we simplified
     // `InputNonNullPlan`, but maybe it's not safe any more?
-    this.outOfBoundsPlan = inputPlan(aether, innerType, undefined);
+    this.outOfBoundsPlan = inputPlan(this.aether, innerType, undefined);
   }
 
   execute(values: any[][]): any[] {
@@ -258,12 +257,8 @@ class InputListPlan extends Plan {
  */
 class InputStaticLeafPlan extends Plan {
   private readonly coercedValue: any;
-  constructor(
-    aether: Aether,
-    inputType: GraphQLLeafType,
-    value: ValueNode | undefined,
-  ) {
-    super(aether);
+  constructor(inputType: GraphQLLeafType, value: ValueNode | undefined) {
+    super();
     // `coerceInputValue` throws on coercion failure. NOTE: it's only safe for
     // us to call coerceInputValue because we already know this is a scalar and
     // *not* a variable. Otherwise we'd need to process it via
@@ -290,11 +285,10 @@ class InputStaticLeafPlan extends Plan {
 export class InputObjectPlan extends Plan {
   private inputFieldPlans: { [fieldName: string]: InputPlan } = {};
   constructor(
-    aether: Aether,
     private inputObjectType: GraphQLInputObjectType,
     private inputValues: ValueNode | undefined,
   ) {
-    super(aether);
+    super();
     const inputFieldDefinitions = inputObjectType.getFields();
     const inputFields =
       inputValues?.kind === "ObjectValue" ? inputValues.fields : undefined;
@@ -309,7 +303,7 @@ export class InputObjectPlan extends Plan {
         (val) => val.name.value === inputFieldName,
       );
       const inputFieldPlan = inputPlan(
-        aether,
+        this.aether,
         inputFieldType,
         inputFieldValue?.value,
         defaultValue,

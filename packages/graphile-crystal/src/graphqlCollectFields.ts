@@ -1,5 +1,4 @@
 import {
-  SelectionSetNode,
   FieldNode,
   SelectionNode,
   GraphQLObjectType,

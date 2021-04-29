@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/class-name-casing */
-import { Aether } from "./aether";
+import { Aether, getCurrentAether } from "./aether";
 import { Constraint } from "./constraints";
 import { isDev, noop } from "./dev";
 import { inspect } from "util";
@@ -16,7 +16,7 @@ function reallyAssertFinalized(plan: Plan): void {
 // Optimise this away in production.
 export const assertFinalized = !isDev ? noop : reallyAssertFinalized;
 
-export abstract class Plan {
+export abstract class Plan<TData = any> {
   /**
    * Plans this plan will need data from in order to execute.
    */
@@ -27,11 +27,14 @@ export abstract class Plan {
    */
   readonly children: Plan[] = [];
 
+  public readonly aether: Aether;
   public isFinalized = false;
   public readonly id: number;
   public readonly groupId: number;
 
-  constructor(public readonly aether: Aether) {
+  constructor() {
+    const aether = getCurrentAether();
+    this.aether = aether;
     this.groupId = aether.groupId;
     this.id = aether.plans.push(this) - 1;
   }
@@ -54,7 +57,7 @@ export abstract class Plan {
    * add attributes to meta for each purpose (e.g. use `meta.cache` for
    * memoizing results) so that you can expand your usage of meta in future.
    */
-  abstract execute(values: any[][], meta: {}): Promise<any[]> | any[];
+  abstract execute(values: any[][], meta: {}): Promise<TData[]> | TData[];
 
   finalize(): void {
     this.isFinalized = true;
@@ -220,11 +223,10 @@ export class AccessPlan extends Plan {
   private destructure: (value: any) => any;
 
   constructor(
-    aether: Aether,
     private readonly parentPlan: Plan,
     public readonly path: (string | number)[],
   ) {
-    super(aether);
+    super();
     this.dependencies.push(parentPlan);
     this.destructure = constructDestructureFunction(path);
   }
@@ -233,17 +235,14 @@ export class AccessPlan extends Plan {
    * Get the named property of an object.
    */
   get(attrName: string): AccessPlan {
-    return new AccessPlan(this.aether, this.parentPlan, [
-      ...this.path,
-      attrName,
-    ]);
+    return new AccessPlan(this.parentPlan, [...this.path, attrName]);
   }
 
   /**
    * Get the entry at the given index in an array.
    */
   at(index: number): AccessPlan {
-    return new AccessPlan(this.aether, this.parentPlan, [...this.path, index]);
+    return new AccessPlan(this.parentPlan, [...this.path, index]);
   }
 
   execute(values: any[][]): any[] {
@@ -268,11 +267,11 @@ export class __ValuePlan extends Plan {
   }
 
   get(attrName: string): AccessPlan {
-    return new AccessPlan(this.aether, this, [attrName]);
+    return new AccessPlan(this, [attrName]);
   }
 
   at(index: number): AccessPlan {
-    return new AccessPlan(this.aether, this, [index]);
+    return new AccessPlan(this, [index]);
   }
 }
 
@@ -295,12 +294,12 @@ export class __ValuePlan extends Plan {
  * change the query plan, but it can also be used within plan resolvers to
  * branch the logic of a plan based on something in these entities.
  */
-export class __TrackedObjectPlan extends Plan {
+export class __TrackedObjectPlan<TData = any> extends Plan {
   /**
    * Could be anything. In the case of context it could even have exotic
    * entries such as `pgClient`.
    */
-  private readonly value: unknown;
+  private readonly value: TData;
 
   /**
    * For runtime (not plan-time) access to the value.
@@ -320,13 +319,12 @@ export class __TrackedObjectPlan extends Plan {
   private readonly path: Array<string | number>;
 
   constructor(
-    aether: Aether,
-    value: unknown,
+    value: TData,
     valuePlan: __ValuePlan | AccessPlan,
     constraints: Constraint[],
     path: Array<string | number> = [],
   ) {
-    super(aether);
+    super();
     this.dependencies.push(valuePlan);
     this.value = value;
     this.valuePlan = valuePlan;
@@ -342,13 +340,16 @@ export class __TrackedObjectPlan extends Plan {
   /**
    * Get the named property of an object.
    */
-  get(attrName: string): __TrackedObjectPlan {
-    const { aether, value, path, constraints } = this;
+  get<TAttribute extends string>(
+    attrName: TAttribute,
+  ): __TrackedObjectPlan<
+    TData extends { [key in TAttribute]: infer U } ? U : any
+  > {
+    const { value, path, constraints } = this;
     const newValue = (value as any)?.[attrName];
     const newValuePlan = this.valuePlan.get(attrName);
     const newPath = [...path, attrName];
     return new __TrackedObjectPlan(
-      aether,
       newValue,
       newValuePlan,
       constraints,
@@ -359,13 +360,12 @@ export class __TrackedObjectPlan extends Plan {
   /**
    * Get the entry at the given index in an array.
    */
-  at(index: number): __TrackedObjectPlan {
-    const { aether, value, path, constraints } = this;
+  at(index: number): __TrackedObjectPlan<TData extends (infer U)[] ? U : any> {
+    const { value, path, constraints } = this;
     const newValue = (value as any)?.[index];
     const newValuePlan = this.valuePlan.at(index);
     const newPath = [...path, index];
     return new __TrackedObjectPlan(
-      aether,
       newValue,
       newValuePlan,
       constraints,
@@ -382,7 +382,7 @@ export class __TrackedObjectPlan extends Plan {
    *
    * **WARNING**: this is the most expensive eval, if you need to eval, prefer evalIs, evalHas, etc instead.
    */
-  eval(): any {
+  eval(): TData {
     const { path, value } = this;
     this.constraints.push({
       type: "value",
@@ -401,7 +401,7 @@ export class __TrackedObjectPlan extends Plan {
    *
    * **WARNING**: avoid using this where possible, it causes Aethers to split.
    */
-  evalIs(expectedValue: any): any {
+  evalIs(expectedValue: any): boolean {
     const { value, path } = this;
     const pass = value === expectedValue;
     this.constraints.push({
@@ -420,7 +420,7 @@ export class __TrackedObjectPlan extends Plan {
    *
    * **WARNING**: avoid using this where possible, it causes Aethers to split.
    */
-  evalHas(key: string): any {
+  evalHas(key: string): boolean {
     const { value, path } = this;
     const newPath = [...path, key];
 
@@ -445,7 +445,7 @@ export class __TrackedObjectPlan extends Plan {
    *
    * **WARNING**: avoid using this where possible, it causes Aethers to split.
    */
-  evalLength(): any {
+  evalLength(): number | null {
     const { value, path } = this;
     const length = Array.isArray(value) ? value.length : null;
     this.constraints.push({

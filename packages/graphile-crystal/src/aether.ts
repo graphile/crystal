@@ -47,6 +47,26 @@ import { isDev } from "./dev";
 import { Deferred } from "./deferred";
 import { isCrystalObject } from "./resolvers";
 
+const globalState = {
+  aether: null as Aether | null,
+};
+
+/**
+ * Since plan functions are called synchronously _by us_ we don't need to pass
+ * around a reference to Aether that users then have to pass back to us;
+ * instead we can pull it from this global state. This is not dissimilar to how
+ * React's hooks work.
+ */
+export function getCurrentAether(): Aether {
+  const aether = globalState.aether;
+  if (!aether) {
+    throw new Error(
+      "You have broken the rules of Graphile Crystal Plans; they must only be created synchronously from inside the relevant `plan` function.",
+    );
+  }
+  return aether;
+}
+
 type TrackedArguments = { [key: string]: InputPlan };
 
 /**
@@ -135,24 +155,22 @@ export class Aether {
     public readonly context: object,
     public readonly rootValue: unknown,
   ) {
-    this.variableValuesPlan = new __ValuePlan(this);
+    globalState.aether = this;
+    this.variableValuesPlan = new __ValuePlan();
     // TODO: this should use a more intelligent tracked object plan since the variables are strongly typed (unlike context/rootValue).
     this.trackedVariableValuesPlan = new __TrackedObjectPlan(
-      this,
       variableValues,
       this.variableValuesPlan,
       this.variableValuesConstraints,
     );
-    this.contextPlan = new __ValuePlan(this);
+    this.contextPlan = new __ValuePlan();
     this.trackedContextPlan = new __TrackedObjectPlan(
-      this,
       context,
       this.contextPlan,
       this.contextConstraints,
     );
-    this.rootValuePlan = new __ValuePlan(this);
+    this.rootValuePlan = new __ValuePlan();
     this.trackedRootValuePlan = new __TrackedObjectPlan(
-      this,
       rootValue,
       this.rootValuePlan,
       this.rootValueConstraints,
@@ -180,6 +198,7 @@ export class Aether {
     this.optimizePlans();
     this.treeShakePlans();
     this.finalizePlans();
+    globalState.aether = null;
   }
 
   /**
@@ -327,7 +346,7 @@ export class Aether {
         );
       } else {
         // Note: this is populated in GetValuePlanId
-        plan = new __ValuePlan(this);
+        plan = new __ValuePlan();
       }
       this.planIdByPathIdentity[pathIdentity] = plan.id;
       const unwrappedFieldType = getNamedType(fieldType);
