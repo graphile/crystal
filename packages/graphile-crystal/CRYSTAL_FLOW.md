@@ -1033,7 +1033,7 @@ ExecuteBatch(aether, batch, crystalContext):
 
 ### Get batch result
 
-Status: pending.
+Status: complete.
 
 GetBatchResult(batch, parentCrystalObject):
 

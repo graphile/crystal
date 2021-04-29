@@ -20,8 +20,10 @@ import {
   $$crystalContext,
   $$data,
   $$id,
+  Batch,
 } from "./interfaces";
 import { uid, UniqueId } from "./utils";
+import { defer, Deferred } from "./deferred";
 
 const debug = debugFactory("crystal:resolvers");
 
@@ -155,7 +157,7 @@ export function crystalWrapResolve<
         crystalContext,
       );
     }
-    const result = batch.getResult(parentCrystalObject);
+    const result = getBatchResult(batch, parentCrystalObject);
     return crystalWrap(
       crystalContext,
       plan,
@@ -261,6 +263,9 @@ function crystalWrap<TData>(
   }
 }
 
+/**
+ * Implements `NewCrystalObject`
+ */
 function newCrystalObject<TData>(
   plan: Plan,
   pathIdentity: string,
@@ -283,4 +288,16 @@ function newCrystalObject<TData>(
   crystalObject[$$idByPathIdentity][pathIdentity] = id;
   crystalObject[$$indexesByPathIdentity][pathIdentity] = indexes;
   return crystalObject;
+}
+
+/**
+ * Implements `GetBatchResult`.
+ */
+function getBatchResult(
+  batch: Batch,
+  parentCrystalObject: CrystalObject<any>,
+): Deferred<any> {
+  const deferred = defer();
+  batch.entries.push([parentCrystalObject, deferred]);
+  return deferred;
 }

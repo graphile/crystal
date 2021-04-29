@@ -3,7 +3,7 @@ export interface Deferred<T> extends Promise<T> {
   reject: (error: Error) => void;
 }
 
-export function deferred<T = void>(): Deferred<T> {
+export function defer<T = void>(): Deferred<T> {
   let resolve: (input?: T | PromiseLike<T> | undefined) => void;
   let reject: (error: Error) => void;
   const promise = new Promise<T>((_resolve, _reject): void => {
