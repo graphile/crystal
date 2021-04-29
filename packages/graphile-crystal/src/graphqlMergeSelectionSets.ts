@@ -90,7 +90,7 @@ export function interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
           (t) => t.name === typeCondition.name.value,
         );
         if (matchingInterfaceType && fragment.selectionSet.selections) {
-          const result = interfaceTypesWithNonIntrospectionFieldsQueriedInSelections(
+          const result = interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
             aether,
             matchingInterfaceType,
             fragment.selectionSet.selections,
@@ -108,7 +108,7 @@ export function interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
             (t) => t.name === typeCondition.name.value,
           );
           if (matchingInterfaceType && selection.selectionSet.selections) {
-            const result = interfaceTypesWithNonIntrospectionFieldsQueriedInSelections(
+            const result = interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
               aether,
               matchingInterfaceType,
               selection.selectionSet.selections,
