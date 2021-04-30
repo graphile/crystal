@@ -133,7 +133,7 @@ export class Aether {
   } = Object.create(null);
   public readonly planIdByPathIdentity: {
     [pathIdentity: string]: number | undefined;
-  } = Object.create(null);
+  };
   public readonly valueIdByObjectByPlanId: {
     [planId: number]: WeakMap<object, UniqueId> | undefined;
   } = Object.create(null);
@@ -183,6 +183,9 @@ export class Aether {
       this.rootValuePlan,
       this.rootValueConstraints,
     );
+    this.planIdByPathIdentity = Object.assign(Object.create(null), {
+      "": this.rootValuePlan.id,
+    });
     this.operationType = operation.operation;
     switch (this.operationType) {
       case "query": {
@@ -615,10 +618,13 @@ export class Aether {
     for (const pathIdentity in this.planIdByPathIdentity) {
       const planId = this.planIdByPathIdentity[pathIdentity];
       assert.ok(
-        planId,
+        planId != null,
         `Could not find the planId for path identity '${pathIdentity}'`,
       );
       const plan = this.plans[planId];
+      if (isDev) {
+        assert.ok(plan, `Could not find plan for identifier '${planId}'`);
+      }
       markPlanActive(plan, activePlans);
     }
 
@@ -662,7 +668,7 @@ export class Aether {
   newBatch(pathIdentity: string, crystalContext: CrystalContext): Batch {
     const planId = this.planIdByPathIdentity[pathIdentity];
     assert.ok(
-      planId,
+      planId != null,
       `Could not find the planId for path identity '${pathIdentity}'`,
     );
     const plan = this.plans[planId];

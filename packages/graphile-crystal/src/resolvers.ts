@@ -109,7 +109,10 @@ export function crystalWrapResolve<
       rootValue,
     });
     const planId = aether.planIdByPathIdentity[pathIdentity];
-    assert.ok(planId, `Could not find a plan id for path '${pathIdentity}'`);
+    assert.ok(
+      planId != null,
+      `Could not find a plan id for path '${pathIdentity}'`,
+    );
     const plan = aether.plans[planId];
     if (plan == null) {
       const objectValue = isCrystalObject(parentObject)
@@ -141,8 +144,8 @@ export function crystalWrapResolve<
       const parentPathIdentity = path.prev ? pathToPathIdentity(path.prev) : "";
       const parentPlanId = aether.planIdByPathIdentity[parentPathIdentity];
       assert.ok(
-        parentPlanId,
-        `Could not find a plan id for (parent) path '${pathIdentity}'`,
+        parentPlanId != null,
+        `Could not find a planId for (parent) path '${parentPathIdentity}'`,
       );
       const parentPlan = aether.plans[parentPlanId]; // TODO: assert that this is handled for us
       assert.ok(
