@@ -847,7 +847,8 @@ GetValuePlanId(aether, crystalContext, valuePlan, object):
 - Assert: {valuePlan} is a {\_\_ValuePlan}.
 - Let {valueIdByObject} be the map for {valuePlan}.{id} within the map {aether}.{valueIdByObjectByPlanId} (creating the
   entry if necessary).
-- Let {valueId} be the value for {object} within the map {valueIdByObject}.
+- Let {valueId} be the value for {object} within the map {valueIdByObject} (note: object might be {null} or {undefined}
+  for root resolvers only).
 - If {valueId} is set:
   - Return {valueId}.
 - Otherwise:

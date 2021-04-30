@@ -47,6 +47,14 @@ import { isDev } from "./dev";
 import { Deferred } from "./deferred";
 import { isCrystalObject } from "./resolvers";
 
+/**
+ * The parent object is used as the key in `GetValuePlanId()`; for root level
+ * fields it's possible that the parent will be null/undefined (in all other
+ * cases it will be an object), so we need a value that can be the key in a
+ * WeakMap to represent the root.
+ */
+const ROOT_VALUE_OBJECT = Object.freeze(Object.create(null));
+
 const globalState = {
   aether: null as Aether | null,
 };
@@ -870,7 +878,7 @@ export class Aether {
   getValuePlanId(
     crystalContext: CrystalContext,
     valuePlan: __ValuePlan,
-    object: any,
+    object: object | null | undefined,
   ): UniqueId {
     assert.ok(
       valuePlan instanceof __ValuePlan,
@@ -881,10 +889,11 @@ export class Aether {
       valueIdByObject = new WeakMap();
       this.valueIdByObjectByPlanId[valuePlan.id] = valueIdByObject;
     }
-    let valueId = valueIdByObject.get(object);
+    const key = object || ROOT_VALUE_OBJECT;
+    let valueId = valueIdByObject.get(key);
     if (valueId === undefined) {
       valueId = uid();
-      valueIdByObject.set(object, valueId);
+      valueIdByObject.set(key, valueId);
       populateValuePlan(crystalContext, valuePlan, valueId, object);
     }
     return valueId;

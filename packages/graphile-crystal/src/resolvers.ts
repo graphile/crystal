@@ -43,7 +43,7 @@ export const $$crystalWrapped = Symbol("crystalWrappedResolver");
  * @param resolve - The resolver function.
  */
 export function crystalWrapResolve<
-  TSource,
+  TSource extends object | null | undefined,
   TContext extends object,
   TArgs = { [argName: string]: any }
 >(
@@ -190,7 +190,7 @@ export function crystalWrapResolve<
  * @param subscribe - The subscribe function.
  */
 export function crystalWrapSubscribe<
-  TSource,
+  TSource extends object | null | undefined,
   TContext extends object,
   TArgs = { [argName: string]: any }
 >(
