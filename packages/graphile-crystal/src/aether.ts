@@ -121,13 +121,13 @@ export class Aether {
   public groupId = this.maxGroupId;
   public readonly plans: Plan[] = [];
   public readonly batchByPathIdentity: {
-    [pathIdentity: string]: Batch;
+    [pathIdentity: string]: Batch | undefined;
   } = Object.create(null);
   public readonly planIdByPathIdentity: {
-    [pathIdentity: string]: number;
+    [pathIdentity: string]: number | undefined;
   } = Object.create(null);
   public readonly valueIdByObjectByPlanId: {
-    [planId: number]: WeakMap<object, UniqueId>;
+    [planId: number]: WeakMap<object, UniqueId> | undefined;
   } = Object.create(null);
   public readonly variableValuesConstraints: Constraint[] = [];
   public readonly variableValuesPlan: __ValuePlan;
@@ -606,6 +606,10 @@ export class Aether {
 
     for (const pathIdentity in this.planIdByPathIdentity) {
       const planId = this.planIdByPathIdentity[pathIdentity];
+      assert.ok(
+        planId,
+        `Could not find the planId for path identity '${pathIdentity}'`,
+      );
       const plan = this.plans[planId];
       markPlanActive(plan, activePlans);
     }
@@ -649,6 +653,10 @@ export class Aether {
 
   newBatch(pathIdentity: string, crystalContext: CrystalContext): Batch {
     const planId = this.planIdByPathIdentity[pathIdentity];
+    assert.ok(
+      planId,
+      `Could not find the planId for path identity '${pathIdentity}'`,
+    );
     const plan = this.plans[planId];
     const batch: Batch = {
       pathIdentity,
@@ -671,12 +679,12 @@ export class Aether {
   ): CrystalContext {
     const rootId = uid();
     const crystalContext: CrystalContext = {
-      resultByIdByPlanId: {
+      resultByIdByPlanId: Object.assign(Object.create(null), {
         // TODO: maybe we should populate the initial values here rather than
         // calling populateValuePlan? Will need to research V8 HiddenClass
         // performance again.
-      },
-      metaByPlanId: {},
+      }),
+      metaByPlanId: Object.create(null),
       rootId,
     };
     /*@__INLINE__*/ populateValuePlan(
@@ -712,15 +720,17 @@ export class Aether {
     context: object,
     rootValue: unknown,
   ): Batch {
-    const batch = this.batchByPathIdentity[pathIdentity];
+    let batch = this.batchByPathIdentity[pathIdentity];
     if (!batch) {
       const crystalContext = isCrystalObject(parentObject)
         ? parentObject[$$crystalContext]
         : this.newCrystalContext(variableValues, context, rootValue);
-      const batch = this.newBatch(pathIdentity, crystalContext);
-      this.batchByPathIdentity[pathIdentity] = batch;
+      batch = this.newBatch(pathIdentity, crystalContext);
+      // TypeScript hack
+      const definitelyBatch: Batch = batch;
+      this.batchByPathIdentity[pathIdentity] = definitelyBatch;
       // (Note: when batch is executed it will delete itself from aether.batchByPathIdentity.)
-      setTimeout(() => this.executeBatch(batch, crystalContext), 0);
+      setTimeout(() => this.executeBatch(definitelyBatch, crystalContext), 0);
     }
     return batch;
   }
@@ -783,14 +793,18 @@ export class Aether {
       throw new Error("Plan execution recursion error");
     }
     visitedPlans.add(plan);
+    let resultById = crystalContext.resultByIdByPlanId[plan.id];
+    if (!resultById) {
+      resultById = Object.create(null) as Record<symbol, any>;
+      crystalContext.resultByIdByPlanId[plan.id] = resultById;
+    }
     const pendingCrystalObjects = []; // Length unknown
     const pendingCrystalObjectsIndexes = []; // Same length as pendingCrystalObjects
     const crystalObjectCount = crystalObjects.length;
     const result = new Array(crystalObjectCount);
     for (let i = 0; i < crystalObjectCount; i++) {
       const crystalObject = crystalObjects[i];
-      const previousResult =
-        crystalContext.resultByIdByPlanId[plan.id][crystalObject[$$id]];
+      const previousResult = resultById[crystalObject[$$id]];
       if (previousResult !== undefined) {
         result[i] = previousResult;
       } else {
@@ -823,7 +837,8 @@ export class Aether {
       }
       let meta = crystalContext.metaByPlanId[plan.id];
       if (!meta) {
-        crystalContext.metaByPlanId[plan.id] = meta = Object.create(null);
+        meta = Object.create(null) as object;
+        crystalContext.metaByPlanId[plan.id] = meta;
       }
       // Note: the `execute` method on plans is responsible for memoizing
       // results into `meta`.
@@ -843,9 +858,7 @@ export class Aether {
         const pendingCrystalObject = pendingCrystalObjects[i];
         const pendingResult = pendingResults[i];
         const j = pendingCrystalObjectsIndexes[i];
-        crystalContext.resultByIdByPlanId[plan.id][
-          pendingCrystalObject[$$id]
-        ] = result[j] = pendingResult;
+        resultById[pendingCrystalObject[$$id]] = result[j] = pendingResult;
       }
     }
     return result;
@@ -863,7 +876,11 @@ export class Aether {
       valuePlan instanceof __ValuePlan,
       "Expected getValuePlanId to be called with a __ValuePlan",
     );
-    const valueIdByObject = this.valueIdByObjectByPlanId[valuePlan.id];
+    let valueIdByObject = this.valueIdByObjectByPlanId[valuePlan.id];
+    if (!valueIdByObject) {
+      valueIdByObject = new WeakMap();
+      this.valueIdByObjectByPlanId[valuePlan.id] = valueIdByObject;
+    }
     let valueId = valueIdByObject.get(object);
     if (valueId === undefined) {
       valueId = uid();
@@ -883,5 +900,10 @@ function populateValuePlan(
   valueId: UniqueId,
   object: any,
 ): void {
-  crystalContext.resultByIdByPlanId[valuePlan.id][valueId] = object;
+  let resultById = crystalContext.resultByIdByPlanId[valuePlan.id];
+  if (!resultById) {
+    resultById = Object.create(null) as Record<symbol, any>;
+    crystalContext.resultByIdByPlanId[valuePlan.id] = resultById;
+  }
+  resultById[valueId] = object;
 }

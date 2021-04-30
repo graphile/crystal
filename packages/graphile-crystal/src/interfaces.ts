@@ -11,8 +11,8 @@ export const $$indexesByPathIdentity = Symbol("indexesByPathIdentity");
 export interface CrystalObject<TData> {
   [$$id]: UniqueId;
   [$$crystalContext]: CrystalContext;
-  [$$idByPathIdentity]: { [pathIdentity: string]: UniqueId };
-  [$$indexesByPathIdentity]: { [pathIdentity: string]: number[] };
+  [$$idByPathIdentity]: { [pathIdentity: string]: UniqueId | undefined };
+  [$$indexesByPathIdentity]: { [pathIdentity: string]: number[] | undefined };
   [$$data]: TData;
 }
 
@@ -25,10 +25,10 @@ export interface Batch {
 
 export interface CrystalContext {
   resultByIdByPlanId: {
-    [planId: number]: Record<UniqueId, any>;
+    [planId: number]: Record<UniqueId, any> | undefined;
   };
   metaByPlanId: {
-    [planId: number]: object;
+    [planId: number]: object | undefined;
   };
   rootId: UniqueId;
 }

@@ -109,6 +109,7 @@ export function crystalWrapResolve<
       rootValue,
     });
     const planId = aether.planIdByPathIdentity[pathIdentity];
+    assert.ok(planId, `Could not find a plan id for path '${pathIdentity}'`);
     const plan = aether.plans[planId];
     if (plan == null) {
       const objectValue = isCrystalObject(parentObject)
@@ -139,7 +140,10 @@ export function crystalWrapResolve<
       // Note: we need to "fake" that the parent was a plan. Because we may have lots of resolvers all called for the same parent object, we use a map. This happens to mean that multiple values in the graph being the same object will be merged automatically.
       const parentPathIdentity = path.prev ? pathToPathIdentity(path.prev) : "";
       const parentPlanId = aether.planIdByPathIdentity[parentPathIdentity];
-
+      assert.ok(
+        parentPlanId,
+        `Could not find a plan id for (parent) path '${pathIdentity}'`,
+      );
       const parentPlan = aether.plans[parentPlanId]; // TODO: assert that this is handled for us
       assert.ok(
         parentPlan instanceof __ValuePlan,
@@ -277,10 +281,12 @@ function newCrystalObject<TData>(
   indexes: number[],
   data: TData,
   crystalContext: CrystalContext,
-  idByPathIdentity: { [pathIdentity: string]: UniqueId } = {
+  idByPathIdentity: { [pathIdentity: string]: UniqueId | undefined } = {
     "": crystalContext.rootId,
   },
-  indexesByPathIdentity: { [pathIdentity: string]: number[] } = { "": [] },
+  indexesByPathIdentity: { [pathIdentity: string]: number[] | undefined } = {
+    "": [],
+  },
 ): CrystalObject<TData> {
   const crystalObject: CrystalObject<TData> = {
     [$$id]: id,
