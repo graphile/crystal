@@ -310,7 +310,7 @@ export class InputObjectPlan extends Plan {
       );
       // TODO: this is unsafe; we should store the plan ID instead?
       this.inputFieldPlans[inputFieldName] = inputFieldPlan;
-      this.dependencies.push(inputFieldPlan);
+      this.addDependency(inputFieldPlan);
     }
   }
 

@@ -1,3 +1,4 @@
+import { inspect } from "util";
 import * as assert from "assert";
 import { Constraint } from "./constraints";
 import {
@@ -672,6 +673,10 @@ export class Aether {
       `Could not find the planId for path identity '${pathIdentity}'`,
     );
     const plan = this.plans[planId];
+    assert.ok(
+      plan,
+      `Could not find the plan with id '${planId}' at '${pathIdentity}'`,
+    );
     const batch: Batch = {
       pathIdentity,
       crystalContext,
@@ -744,7 +749,16 @@ export class Aether {
       const definitelyBatch: Batch = batch;
       this.batchByPathIdentity[pathIdentity] = definitelyBatch;
       // (Note: when batch is executed it will delete itself from aether.batchByPathIdentity.)
-      setTimeout(() => this.executeBatch(definitelyBatch, crystalContext), 0);
+      setTimeout(
+        () =>
+          this.executeBatch(definitelyBatch, crystalContext).catch((e) => {
+            // This should not be able to happen because executeBatch contains the try/catch.
+            console.error(
+              `GraphileInternalError<cd7c157b-9f20-432d-8716-7ff052acd1fd>: ${e.message}`,
+            );
+          }),
+        0,
+      );
     }
     return batch;
   }
@@ -770,27 +784,34 @@ export class Aether {
       crystalObjects[i] = crystalObject;
       deferredResults[i] = deferredResult;
     }
-    const resultsPromise = this.executePlan(
-      plan,
-      crystalContext,
-      crystalObjects,
-    );
-    const results = isPromise(resultsPromise)
-      ? await resultsPromise
-      : resultsPromise;
-    if (isDev) {
-      assert.ok(
-        Array.isArray(results),
-        "Expected plan execution to return an array",
+    try {
+      assert.ok(plan, "No plan in batch?!");
+      const resultsPromise = this.executePlan(
+        plan,
+        crystalContext,
+        crystalObjects,
       );
-      assert.equal(
-        results.length,
-        l,
-        "Expected plan execution result to have same length as input objects",
-      );
-    }
-    for (let i = 0; i < l; i++) {
-      deferredResults[i].resolve(results[i]);
+      const results = isPromise(resultsPromise)
+        ? await resultsPromise
+        : resultsPromise;
+      if (isDev) {
+        assert.ok(
+          Array.isArray(results),
+          "Expected plan execution to return an array",
+        );
+        assert.equal(
+          results.length,
+          l,
+          "Expected plan execution result to have same length as input objects",
+        );
+      }
+      for (let i = 0; i < l; i++) {
+        deferredResults[i].resolve(results[i]);
+      }
+    } catch (e) {
+      for (let i = 0; i < l; i++) {
+        deferredResults[i].reject(e);
+      }
     }
   }
 
@@ -803,6 +824,14 @@ export class Aether {
     crystalObjects: CrystalObject<any>[],
     visitedPlans = new Set<Plan>(),
   ): Promise<any[]> {
+    if (isDev) {
+      assert.ok(
+        plan,
+        `executePlan was called but it was not passed a plan to execute, instead '${inspect(
+          plan,
+        )}'`,
+      );
+    }
     if (visitedPlans.has(plan)) {
       throw new Error("Plan execution recursion error");
     }
@@ -828,10 +857,18 @@ export class Aether {
     }
     const pendingCrystalObjectsLength = pendingCrystalObjects.length;
     if (pendingCrystalObjectsLength > 0) {
-      const dependenciesCount = pendingCrystalObjects.length;
+      const dependenciesCount = plan.dependencies.length;
       const dependencyValuesList = new Array(dependenciesCount);
       for (let i = 0; i < dependenciesCount; i++) {
         const dependencyPlan = plan.dependencies[i];
+        if (isDev) {
+          assert.ok(
+            dependencyPlan,
+            `Expected plan dependency '${i}' for '${
+              plan.constructor.name
+            }' to be a plan, instead found '${inspect(dependencyPlan)}'`,
+          );
+        }
         const dependencyResult = await this.executePlan(
           dependencyPlan,
           crystalContext,

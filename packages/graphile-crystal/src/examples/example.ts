@@ -13,6 +13,7 @@
  * column, but shows integration of external data into query planning.)
  */
 
+import * as assert from "assert";
 import {
   GraphQLSchema,
   GraphQLObjectType,
@@ -30,12 +31,12 @@ import {
 } from "graphql";
 import sql, { SQL } from "../../../pg-sql2/dist";
 import { crystalEnforce } from "..";
-import { CrystalContext, $$data, CrystalObject } from "../interfaces";
 import { Plan, __TrackedObjectPlan, __ValuePlan } from "../plan";
 
 import { Pool } from "pg";
 import { resolve } from "path";
 import { inspect } from "util";
+import { isDev } from "../dev";
 
 const testPool = new Pool({ connectionString: "graphile_crystal" });
 
@@ -437,8 +438,8 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     super();
     this.dataSource = dataSource;
     this.identifiers = identifiers;
-    this.identifierIds = identifiers.map(
-      ({ plan }) => this.dependencies.push(plan) - 1,
+    this.identifierIds = identifiers.map(({ plan }) =>
+      this.addDependency(plan),
     );
     this.identifierMatchesThunk = identifierMatchesThunk;
     this.many = many;

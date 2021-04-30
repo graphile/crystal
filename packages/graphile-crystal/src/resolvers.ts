@@ -28,6 +28,14 @@ import { defer, Deferred } from "./deferred";
 const debug = debugFactory("crystal:resolvers");
 
 function pathToPathIdentity(path: Path): string {
+  // Skip over list keys.
+  if (!path.typename) {
+    assert.ok(
+      path.prev,
+      "Path has no `typename` and no `prev`; seems like an invalid Path?",
+    );
+    return pathToPathIdentity(path.prev);
+  }
   return (
     (path.prev ? pathToPathIdentity(path.prev) : "") +
     `>${path.typename}.${path.key}`
@@ -168,7 +176,7 @@ export function crystalWrapResolve<
         crystalContext,
       );
     }
-    const result = getBatchResult(batch, parentCrystalObject);
+    const result = await getBatchResult(batch, parentCrystalObject);
     return crystalWrap(
       crystalContext,
       plan,
@@ -204,6 +212,14 @@ export function crystalWrapSubscribe<
   return crystalWrapResolve(subscribe);
 }
 
+type CrystalWrapResult =
+  | null
+  | CrystalObject<any>
+  | CrystalObjectMultidimensionalList;
+type CrystalObjectMultidimensionalList = CrystalObjectMultidimensionalArray;
+interface CrystalObjectMultidimensionalArray
+  extends Array<CrystalObjectMultidimensionalArray | CrystalObject<any>> {}
+
 function crystalWrap<TData>(
   crystalContext: CrystalContext,
   plan: Plan,
@@ -213,7 +229,7 @@ function crystalWrap<TData>(
   id: UniqueId,
   data: TData,
   indexes: number[] = [],
-): any {
+): CrystalWrapResult {
   // This is an `any` because typing it is way too hard; it could be an infinitely nested list for example.
   if (data == null) {
     return null;
@@ -230,7 +246,12 @@ function crystalWrap<TData>(
     );
   }
   if (isListType(returnType)) {
-    assert.ok(Array.isArray(data));
+    assert.ok(
+      Array.isArray(data),
+      `The field at '${pathIdentity}' returned a value incompatible with '${returnType.toString()}': '${inspect(
+        data,
+      )}'`,
+    );
     const l = data.length;
     const result = new Array(l);
     for (let index = 0; index < l; index++) {

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/class-name-casing */
+import * as assert from "assert";
 import { Aether, getCurrentAether } from "./aether";
 import { Constraint } from "./constraints";
 import { isDev, noop } from "./dev";
@@ -19,8 +20,15 @@ export const assertFinalized = !isDev ? noop : reallyAssertFinalized;
 export abstract class Plan<TData = any> {
   /**
    * Plans this plan will need data from in order to execute.
+   *
+   * @internal
    */
-  readonly dependencies: Plan[] = [];
+  private readonly _dependencies: Plan[] = [];
+
+  /**
+   * Plans this plan will need data from in order to execute.
+   */
+  public readonly dependencies: ReadonlyArray<Plan> = this._dependencies;
 
   /**
    * Plans this plan might execute; e.g. in `BranchPlan`.
@@ -37,6 +45,18 @@ export abstract class Plan<TData = any> {
     this.aether = aether;
     this.groupId = aether.groupId;
     this.id = aether.plans.push(this) - 1;
+  }
+
+  addDependency(plan: Plan): number {
+    if (isDev) {
+      assert.ok(
+        plan instanceof Plan,
+        `Error occurred when adding dependency for '${
+          this.constructor.name
+        }', value passed was not a plan, it was '${inspect(plan)}'`,
+      );
+    }
+    return this._dependencies.push(plan) - 1;
   }
 
   /**
@@ -227,7 +247,7 @@ export class AccessPlan extends Plan {
     public readonly path: (string | number)[],
   ) {
     super();
-    this.dependencies.push(parentPlan);
+    this.addDependency(parentPlan);
     this.destructure = constructDestructureFunction(path);
   }
 
@@ -325,7 +345,7 @@ export class __TrackedObjectPlan<TData = any> extends Plan {
     path: Array<string | number> = [],
   ) {
     super();
-    this.dependencies.push(valuePlan);
+    this.addDependency(valuePlan);
     this.value = value;
     this.valuePlan = valuePlan;
     this.constraints = constraints;
