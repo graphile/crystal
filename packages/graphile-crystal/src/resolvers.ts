@@ -179,7 +179,7 @@ export function crystalWrapResolve<
     }
     const result = await getBatchResult(batch, parentCrystalObject);
     debug(
-      `👈 CRYSTAL RESOLVER (%s.%s @ %s); object %o; result: %o`,
+      `👈 CRYSTAL RESOLVER (%s.%s @ %s); object %c; result: %o`,
       info.parentType.name,
       info.fieldName,
       pathIdentity,

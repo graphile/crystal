@@ -854,15 +854,15 @@ export class Aether {
       const previousResult = resultById[crystalObject[$$id]];
       if (previousResult !== undefined) {
         debug(
-          `ExecutePlan[%s/%o] result for id '%s' was present`,
+          `ExecutePlan[%s/%o] result for id '%c' was present`,
           plan.constructor.name,
           plan.id,
-          crystalObject[$$id].description,
+          crystalObject[$$id],
         );
         result[i] = previousResult;
       } else {
         debug(
-          `ExecutePlan[%s/%o] no result for id %o`,
+          `ExecutePlan[%s/%o] no result for id %c`,
           plan.constructor.name,
           plan.id,
           crystalObject[$$id],
@@ -931,7 +931,7 @@ export class Aether {
         resultById[pendingCrystalObject[$$id]] = result[j] = pendingResult;
       }
       debug(
-        `ExecutePlan[%s/%o]: wrote results for ids %o: %o`,
+        `ExecutePlan[%s/%o]: wrote results for ids %c: %o`,
         plan.constructor.name,
         plan.id,
         pendingCrystalObjects.map((crystalObject) => crystalObject[$$id]),

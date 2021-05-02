@@ -3,24 +3,27 @@ import chalk from "chalk";
 
 const COLORS = [
   //"black",
-  "red",
   "green",
   "yellow",
   "blue",
   "magenta",
   "cyan",
+  "red",
   //"white",
   //"blackBright",
-  "redBright",
   "greenBright",
   "yellowBright",
   "blueBright",
   "magentaBright",
   "cyanBright",
+  "redBright",
   //"whiteBright",
 ] as const;
 
-debugFactory.formatters.c = (symbol: symbol) => {
+debugFactory.formatters.c = (symbol: symbol | symbol[]): string => {
+  if (Array.isArray(symbol)) {
+    return chalk.green(`[${symbol.map(debugFactory.formatters.c).join(", ")}]`);
+  }
   if (!symbol.description) {
     return chalk.green("Symbol()");
   }
