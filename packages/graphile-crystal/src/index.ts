@@ -26,17 +26,14 @@ debugFactory.formatters.c = (symbol: symbol | symbol[]): string => {
     return `[${symbol.map(debugFactory.formatters.c).join(", ")}]`;
   }
   if (typeof symbol === "object" && symbol) {
-    return `${chalk.green("{")}${[
-      ...Object.keys(symbol),
-      ...Object.getOwnPropertySymbols(symbol),
-    ]
+    return `{${[...Object.keys(symbol), ...Object.getOwnPropertySymbols(symbol)]
       .map(
         (key) =>
           `${debugFactory.formatters.c(key)}: ${debugFactory.formatters.c(
             symbol[key],
           )}`,
       )
-      .join(", ")}${chalk.green("}")}`;
+      .join(", ")}}`;
   }
   if (typeof symbol !== "symbol") {
     return inspect(symbol, { colors: true });
