@@ -308,16 +308,11 @@ class PgColumnSelectPlan<
   ) {
     super();
     this.tableId = this.addDependency(table);
-    debug(
-      `Plan %s: PgColumnSelectPlan(%s @ %s) constructor`,
-      this.id,
-      attr,
-      attrIndex,
-    );
+    debug(`%s (%s @ %s) constructor`, this, attr, attrIndex);
   }
 
   execute(values: any[][]) {
-    debug("PgColumnSelectPlan values: %o", values);
+    debug("%s values: %o", this, values);
     return values.map((v) => v[this.tableId][this.attrIndex]);
   }
 }
@@ -330,7 +325,7 @@ class PgColumnSelectPlan<
 class PgAttributeSelectPlan extends Plan<any> {
   constructor(private attrIndex: number) {
     super();
-    debug(`Plan %s: PgAttributeSelectPlan(%s) constructor`, this.id, attrIndex);
+    debug(`%s (%s) constructor`, this, attrIndex);
   }
 
   execute(values: any[][]) {
@@ -502,8 +497,8 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
       this.dataSource.applyAuthorizationChecksToPlan(this);
     }
     debug(
-      `Plan %s: PgClassSelectPlan(%s) constructor (%s)`,
-      this.id,
+      `%s (%s) constructor (%s)`,
+      this,
       this.dataSource.name,
       cloneFrom ? "clone" : "original",
     );
@@ -762,11 +757,7 @@ class PgConnectionPlan<TDataSource extends PgDataSource<any>> extends Plan<
 > {
   constructor(public readonly subplan: PgClassSelectPlan<TDataSource>) {
     super();
-    debug(
-      `Plan %s: PgConnectionPlan(around %s) constructor`,
-      this.id,
-      subplan.id,
-    );
+    debug(`%s (around %s) constructor`, this, subplan);
   }
 
   nodes(): PgClassSelectPlan<TDataSource> {
@@ -774,7 +765,7 @@ class PgConnectionPlan<TDataSource extends PgDataSource<any>> extends Plan<
   }
 
   execute(values: any[][]) {
-    debug(`Plan %s: PgConnectionPlan execute; values: %o`, this.id, values);
+    debug(`%s: execute; values: %o`, this.id, values);
     // TODO
     return values.map((v) => ({}));
   }
