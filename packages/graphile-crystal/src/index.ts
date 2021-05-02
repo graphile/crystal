@@ -23,7 +23,7 @@ const COLORS = [
 
 debugFactory.formatters.c = (symbol: symbol | symbol[]): string => {
   if (Array.isArray(symbol)) {
-    return chalk.green(`[${symbol.map(debugFactory.formatters.c).join(", ")}]`);
+    return `[${symbol.map(debugFactory.formatters.c).join(", ")}]`;
   }
   if (typeof symbol === "object" && symbol) {
     return `${chalk.green("{")}${[
@@ -32,13 +32,13 @@ debugFactory.formatters.c = (symbol: symbol | symbol[]): string => {
     ]
       .map(
         (key) =>
-          `${debugFactory.formatters.c(key)}: ${inspect(symbol[key], {
-            colors: true,
-          })}`,
+          `${debugFactory.formatters.c(key)}: ${debugFactory.formatters.c(
+            symbol[key],
+          )}`,
       )
       .join(", ")}${chalk.green("}")}`;
   }
-  if (!symbol) {
+  if (typeof symbol !== "symbol") {
     return inspect(symbol, { colors: true });
   }
   if (!symbol.description) {
