@@ -103,7 +103,7 @@ export function crystalWrapResolve<
     const pathIdentity = pathToPathIdentity(path);
     // const alias = getAliasFromResolveInfo(info);
     debug(
-      `👉 CRYSTAL RESOLVER (%s.%s @ %s); parent: %o`,
+      `👉 CRYSTAL RESOLVER (%s.%s @ %s); parent: %c`,
       info.parentType.name,
       info.fieldName,
       pathIdentity,

@@ -931,7 +931,7 @@ export class Aether {
         resultById[pendingCrystalObject[$$id]] = result[j] = pendingResult;
       }
       debug(
-        `ExecutePlan[%s/%o]: wrote results for ids %c: %o`,
+        `ExecutePlan[%s/%o]: wrote results for ids %c: %c`,
         plan.constructor.name,
         plan.id,
         pendingCrystalObjects.map((crystalObject) => crystalObject[$$id]),
