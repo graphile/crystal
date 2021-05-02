@@ -43,8 +43,12 @@ debugFactory.formatters.c = (symbol: symbol | symbol[]): string => {
   }
   const nStr = symbol.description?.replace(/[^0-9]/g, "") || "";
   const n = parseInt(nStr, 10) || 0;
-  const color = COLORS[n % COLORS.length];
-  return chalk[color](symbol.description);
+  if (n > 0) {
+    const color = COLORS[n % COLORS.length];
+    return chalk[color](symbol.description);
+  } else {
+    return chalk.cyan(`$$${symbol.description}`);
+  }
 };
 
 export { crystalEnforce } from "./enforceCrystal";
