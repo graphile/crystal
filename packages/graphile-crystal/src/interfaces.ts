@@ -5,11 +5,15 @@ import { Deferred } from "./deferred";
 export const $$crystalContext = Symbol("context");
 export const $$data = Symbol("data");
 export const $$id = Symbol("id");
+export const $$indexes = Symbol("indexes");
+export const $$pathIdentity = Symbol("pathIdentity");
 export const $$idByPathIdentity = Symbol("idByPathIdentity");
 export const $$indexesByPathIdentity = Symbol("indexesByPathIdentity");
 
 export interface CrystalObject<TData> {
   [$$id]: UniqueId;
+  [$$pathIdentity]: string;
+  [$$indexes]: number[];
   [$$crystalContext]: CrystalContext;
   [$$idByPathIdentity]: { [pathIdentity: string]: UniqueId | undefined };
   [$$indexesByPathIdentity]: { [pathIdentity: string]: number[] | undefined };

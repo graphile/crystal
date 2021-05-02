@@ -1,6 +1,7 @@
 import { inspect } from "util";
 import * as assert from "assert";
-import { isDev } from "./dev";
+import chalk from "chalk";
+import debugFactory from "debug";
 import {
   GraphQLInputType,
   ValueNode,
@@ -16,6 +17,26 @@ import {
   GraphQLEnumType,
   GraphQLScalarType,
 } from "graphql";
+import { isDev } from "./dev";
+
+const COLORS = [
+  //"black",
+  "green",
+  "yellow",
+  "blue",
+  "magenta",
+  //"cyan",
+  "red",
+  //"white",
+  //"blackBright",
+  "greenBright",
+  "yellowBright",
+  "blueBright",
+  "magentaBright",
+  "cyanBright",
+  "redBright",
+  //"whiteBright",
+] as const;
 
 export function assertNullPrototype(object: {}, description: string): void {
   if (isDev) {
@@ -253,4 +274,36 @@ export function isPromise<T>(t: T | Promise<T>): t is Promise<T> {
     typeof (t as any).then === "function" &&
     typeof (t as any).catch === "function"
   );
+}
+
+export function crystalPrint(
+  symbol: symbol | symbol[] | Record<symbol, any>,
+): string {
+  if (Array.isArray(symbol)) {
+    return `[${symbol.map(debugFactory.formatters.c).join(", ")}]`;
+  }
+  if (typeof symbol === "object" && symbol) {
+    return `{${[...Object.keys(symbol), ...Object.getOwnPropertySymbols(symbol)]
+      .map(
+        (key) =>
+          `${debugFactory.formatters.c(key)}: ${debugFactory.formatters.c(
+            symbol[key],
+          )}`,
+      )
+      .join(", ")}}`;
+  }
+  if (typeof symbol !== "symbol") {
+    return inspect(symbol, { colors: true });
+  }
+  if (!symbol.description) {
+    return chalk.green("Symbol()");
+  }
+  const nStr = symbol.description?.replace(/[^0-9]/g, "") || "";
+  const n = parseInt(nStr, 10) || 0;
+  if (n > 0) {
+    const color = COLORS[n % COLORS.length];
+    return chalk[color](symbol.description);
+  } else {
+    return chalk.cyan(`$$${symbol.description}`);
+  }
 }

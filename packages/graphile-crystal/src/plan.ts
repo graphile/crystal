@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/class-name-casing */
 import * as assert from "assert";
+import chalk from "chalk";
 import { Aether, getCurrentAether } from "./aether";
 import { Constraint } from "./constraints";
 import { isDev, noop } from "./dev";
@@ -47,13 +48,19 @@ export abstract class Plan<TData = any> {
     this.id = aether.plans.push(this) - 1;
   }
 
+  toString(): string {
+    return chalk.bold.blue(
+      `${this.constructor.name}[${inspect(this.id, { colors: true })}]`,
+    );
+  }
+
   addDependency(plan: Plan): number {
     if (isDev) {
       assert.ok(
         plan instanceof Plan,
-        `Error occurred when adding dependency for '${
-          this.constructor.name
-        }', value passed was not a plan, it was '${inspect(plan)}'`,
+        `Error occurred when adding dependency for '${this}', value passed was not a plan, it was '${inspect(
+          plan,
+        )}'`,
       );
     }
     return this._dependencies.push(plan) - 1;

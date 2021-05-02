@@ -21,8 +21,10 @@ import {
   $$data,
   $$id,
   Batch,
+  $$pathIdentity,
+  $$indexes,
 } from "./interfaces";
-import { uid, UniqueId } from "./utils";
+import { uid, UniqueId, crystalPrint } from "./utils";
 import { defer, Deferred } from "./deferred";
 import { isDev } from "./dev";
 
@@ -103,11 +105,13 @@ export function crystalWrapResolve<
     const pathIdentity = pathToPathIdentity(path);
     // const alias = getAliasFromResolveInfo(info);
     debug(
-      `👉 CRYSTAL RESOLVER (%s.%s @ %s); parent: %c`,
+      `👉 CRYSTAL RESOLVER (%s.%s @ %s); parent: %o`,
       info.parentType.name,
       info.fieldName,
       pathIdentity,
-      parentObject,
+      isCrystalObject(parentObject)
+        ? `${parentObject[$$pathIdentity]}.${parentObject[$$indexes].join(".")}`
+        : parentObject,
     );
     const aether = establishAether({
       schema,
@@ -322,22 +326,23 @@ function newCrystalObject<TData>(
   },
 ): CrystalObject<TData> {
   const crystalObject: CrystalObject<TData> = {
+    [$$pathIdentity]: pathIdentity,
     [$$id]: id,
     [$$data]: data,
+    [$$indexes]: indexes, // Shortcut to $$indexesByPathIdentity[$$pathIdentity]
     [$$crystalContext]: crystalContext,
     [$$idByPathIdentity]: idByPathIdentity,
     [$$indexesByPathIdentity]: indexesByPathIdentity,
+    // @ts-ignore
+    toString() {
+      const p = indexes.length ? `.${indexes.join(".")}` : ``;
+      return `CrystalObject(${pathIdentity}${p}/${crystalPrint(id)})`;
+    },
   };
   crystalObject[$$idByPathIdentity][pathIdentity] = id;
   crystalObject[$$indexesByPathIdentity][pathIdentity] = indexes;
   if (isDev) {
-    debug(
-      `Crystal object @ '%s'%s (id: %c) / %o`,
-      pathIdentity,
-      ["", ...indexes].join("."),
-      id,
-      data,
-    );
+    debug(`Constructed %s with data %o`, crystalObject, data);
   }
   return crystalObject;
 }

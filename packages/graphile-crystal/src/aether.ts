@@ -854,19 +854,13 @@ export class Aether {
       const previousResult = resultById[crystalObject[$$id]];
       if (previousResult !== undefined) {
         debug(
-          `ExecutePlan[%s/%o] result for id '%c' was present`,
-          plan.constructor.name,
-          plan.id,
+          `ExecutePlan(%s) result for id '%c' was present`,
+          plan,
           crystalObject[$$id],
         );
         result[i] = previousResult;
       } else {
-        debug(
-          `ExecutePlan[%s/%o] no result for id %c`,
-          plan.constructor.name,
-          plan.id,
-          crystalObject[$$id],
-        );
+        debug(`ExecutePlan(%s) no result for id %c`, plan, crystalObject[$$id]);
         pendingCrystalObjects.push(crystalObject);
         pendingCrystalObjectsIndexes.push(i);
       }
@@ -880,9 +874,9 @@ export class Aether {
         if (isDev) {
           assert.ok(
             dependencyPlan,
-            `Expected plan dependency '${i}' for '${
-              plan.constructor.name
-            }' to be a plan, instead found '${inspect(dependencyPlan)}'`,
+            `Expected plan dependency '${i}' for '${plan}' to be a plan, instead found '${inspect(
+              dependencyPlan,
+            )}'`,
           );
         }
         const dependencyResult = await this.executePlan(
@@ -931,20 +925,14 @@ export class Aether {
         resultById[pendingCrystalObject[$$id]] = result[j] = pendingResult;
       }
       debug(
-        `ExecutePlan[%s/%o]: wrote results for ids %c: %c`,
-        plan.constructor.name,
-        plan.id,
+        `ExecutePlan(%s): wrote results for ids %c: %c`,
+        plan,
         pendingCrystalObjects.map((crystalObject) => crystalObject[$$id]),
         resultById,
       );
     }
     if (isDev) {
-      debug(
-        `Executed plan %s[%s]; results: %o`,
-        plan.constructor.name,
-        plan.id,
-        result,
-      );
+      debug(`ExecutePlan(%s): complete; results: %o`, plan, result);
     }
     return result;
   }
