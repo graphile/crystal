@@ -141,7 +141,7 @@ function assertArgumentPlan(
 function atIndexes(data: any, indexes: ReadonlyArray<number>): any {
   let o = data;
   for (let i = 0, l = indexes.length; i < l; i++) {
-    o = o?.[i];
+    o = o?.[indexes[i]];
   }
   return o;
 }
@@ -882,8 +882,9 @@ export class Aether {
         if (previousResult !== undefined) {
           result[i] = atIndexes(previousResult, indexes);
           debug(
-            `ExecutePlan(%s) result for %s (using id: %c/%s) was found: %o`,
+            `ExecutePlan(%s) result %s for %s (using id: %c/%s) was found: %o (%o)`,
             plan,
+            i,
             crystalObject,
             id,
             indexes,

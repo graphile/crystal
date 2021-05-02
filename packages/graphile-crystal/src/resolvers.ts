@@ -132,6 +132,12 @@ export function crystalWrapResolve<
       const objectValue = isCrystalObject(parentObject)
         ? parentObject[$$data]
         : parentObject;
+      debug(
+        "Calling real resolver for %s.%s with %o",
+        info.parentType.name,
+        info.fieldName,
+        objectValue,
+      );
       return realResolver(objectValue, argumentValues, context, info);
     }
     const id = uid();
