@@ -7,6 +7,8 @@ import {
   defaultFieldResolver,
   isNonNullType,
   isListType,
+  isLeafType,
+  getNamedType,
 } from "graphql";
 // import { getAliasFromResolveInfo } from "graphql-parse-resolve-info";
 import debugFactory from "debug";
@@ -198,15 +200,27 @@ export function crystalWrapResolve<
       parentCrystalObject[$$id],
       result,
     );
-    return crystalWrap(
-      crystalContext,
-      plan,
-      returnType,
-      parentCrystalObject,
-      pathIdentity,
-      id,
-      result,
-    );
+    if (isLeafType(getNamedType(info.returnType))) {
+      const valueForResolver: any = { [info.fieldName]: result };
+      debug(
+        "Calling real resolver for %s.%s with %o",
+        info.parentType.name,
+        info.fieldName,
+        valueForResolver,
+      );
+      return realResolver(valueForResolver, argumentValues, context, info);
+    } else {
+      const crystalResults = crystalWrap(
+        crystalContext,
+        plan,
+        returnType,
+        parentCrystalObject,
+        pathIdentity,
+        id,
+        result,
+      );
+      return crystalResults;
+    }
   };
   Object.defineProperty(crystalResolver, $$crystalWrapped, {
     enumerable: false,
