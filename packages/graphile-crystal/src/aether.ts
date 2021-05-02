@@ -962,6 +962,18 @@ export class Aether {
         // and thinks it must execute the plan again.
         resultById[pendingCrystalObject[$$id]] = result[j] = pendingResult;
       }
+      // TODO: HERE'S THE BUG!
+      //
+      //   crystal:aether ExecutePlan(PgClassSelectPlan[6@>Query.forums]): complete;
+      //     results: [ [ 'Cats', 'ca700000-0000-0000-0000-000000000ca7' ], [ 'Dogs', 'd0900000-0000-0000-0000-000000000d09' ], [ 'Postgres', 'bae00000-0000-0000-0000-000000000bae' ] ] +0ms
+      //   crystal:example PgColumnSelectPlan[7@>Query.forums>Forum.name] values:
+      //     [ [ [ 'Cats', 'ca700000-0000-0000-0000-000000000ca7' ] ], [ [ 'Dogs', 'd0900000-0000-0000-0000-000000000d09' ] ], [ [ 'Postgres', 'bae00000-0000-0000-0000-000000000bae' ] ] ] +10ms
+      //   crystal:aether ExecutePlan(PgColumnSelectPlan[7@>Query.forums>Forum.name]): wrote results
+      //     for CrystalObject(>Query.forums.0/u7), CrystalObject(>Query.forums.1/u7), CrystalObject(>Query.forums.2/u7):
+      //     {u7: 'Postgres'} +1ms
+      //
+      // Note the very last line compresses everything to 'Postgres' - it isn't respecting the indexes.
+
       debug(
         `ExecutePlan(%s): wrote results for %s: %c`,
         plan,
