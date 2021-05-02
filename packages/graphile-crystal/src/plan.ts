@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/class-name-casing */
 import * as assert from "assert";
 import chalk from "chalk";
-import { Aether, getCurrentAether } from "./aether";
+import { Aether, getCurrentAether, getCurrentPathIdentity } from "./aether";
 import { Constraint } from "./constraints";
 import { isDev, noop } from "./dev";
 import { inspect } from "util";
@@ -40,17 +40,26 @@ export abstract class Plan<TData = any> {
   public isFinalized = false;
   public readonly id: number;
   public readonly groupId: number;
+  public readonly pathIdentity: string;
+  public readonly parentPathIdentity: string;
 
   constructor() {
     const aether = getCurrentAether();
     this.aether = aether;
     this.groupId = aether.groupId;
+    this.pathIdentity = getCurrentPathIdentity();
+    this.parentPathIdentity = this.pathIdentity.substr(
+      0,
+      this.pathIdentity.lastIndexOf(">"),
+    );
     this.id = aether.plans.push(this) - 1;
   }
 
   toString(): string {
     return chalk.bold.blue(
-      `${this.constructor.name}[${inspect(this.id, { colors: true })}]`,
+      `${this.constructor.name}[${inspect(this.id, { colors: true })}@${
+        this.pathIdentity || "root"
+      }]`,
     );
   }
 

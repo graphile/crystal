@@ -43,6 +43,9 @@ import {
   CrystalObject,
   $$id,
   $$crystalContext,
+  $$idByPathIdentity,
+  $$indexes,
+  $$indexesByPathIdentity,
 } from "./interfaces";
 import { isDev } from "./dev";
 import { Deferred } from "./deferred";
@@ -62,6 +65,7 @@ const ROOT_VALUE_OBJECT = Object.freeze(Object.create(null));
 
 const globalState = {
   aether: null as Aether | null,
+  pathIdentity: "" as string,
 };
 
 /**
@@ -78,6 +82,14 @@ export function getCurrentAether(): Aether {
     );
   }
   return aether;
+}
+
+/**
+ * Like with `getCurrentAether`, since plan functions are called synchronously
+ * _by us_ we can pull the current pathIdentity from global state.
+ */
+export function getCurrentPathIdentity(): string {
+  return globalState.pathIdentity;
 }
 
 type TrackedArguments = { [key: string]: InputPlan };
@@ -124,6 +136,14 @@ function assertArgumentPlan(
     "function",
     "Expected property `null` for argument plan to be a function.",
   );
+}
+
+function atIndexes(data: any, indexes: ReadonlyArray<number>): any {
+  let o = data;
+  for (let i = 0, l = indexes.length; i < l; i++) {
+    o = o?.[i];
+  }
+  return o;
 }
 
 /**
@@ -330,6 +350,7 @@ export class Aether {
     for (const [responseKey, fields] of groupedFieldSet.entries()) {
       const oldGroupId = this.groupId;
       const pathIdentity = `${path}>${objectType.name}.${responseKey}`;
+      globalState.pathIdentity = pathIdentity;
       const field = fields[0];
       const fieldName = field.name.value;
 
@@ -603,7 +624,9 @@ export class Aether {
    */
   optimizePlans(): void {
     for (let i = this.plans.length - 1; i >= 0; i--) {
-      this.plans[i] = this.optimizePlan(this.plans[i]);
+      const plan = this.plans[i];
+      globalState.pathIdentity = plan.pathIdentity;
+      this.plans[i] = this.optimizePlan(plan);
     }
   }
 
@@ -657,6 +680,7 @@ export class Aether {
     for (let i = this.plans.length - 1; i >= 0; i--) {
       const plan = this.plans[i];
       if (plan !== null) {
+        globalState.pathIdentity = plan.pathIdentity;
         // checking the following would be redundant:
         // if (!distinctActivePlansInReverseOrder.has(plan))
         distinctActivePlansInReverseOrder.add(plan);
@@ -851,19 +875,32 @@ export class Aether {
     const result = new Array(crystalObjectCount);
     for (let i = 0; i < crystalObjectCount; i++) {
       const crystalObject = crystalObjects[i];
-      const previousResult = resultById[crystalObject[$$id]];
-      if (previousResult !== undefined) {
-        debug(
-          `ExecutePlan(%s) result for id '%c' was present`,
-          plan,
-          crystalObject[$$id],
-        );
-        result[i] = previousResult;
-      } else {
-        debug(`ExecutePlan(%s) no result for id %c`, plan, crystalObject[$$id]);
-        pendingCrystalObjects.push(crystalObject);
-        pendingCrystalObjectsIndexes.push(i);
+      const id = crystalObject[$$idByPathIdentity][plan.parentPathIdentity];
+      const indexes = crystalObject[$$indexesByPathIdentity][plan.pathIdentity];
+      if (id && indexes) {
+        const previousResult = resultById[id];
+        if (previousResult !== undefined) {
+          result[i] = atIndexes(previousResult, indexes);
+          debug(
+            `ExecutePlan(%s) result for %s (using id: %c/%s) was found: %o`,
+            plan,
+            crystalObject,
+            id,
+            indexes,
+            result[i],
+          );
+          continue;
+        }
       }
+      debug(
+        `ExecutePlan(%s) no result for %s (using id: %c) (%o)`,
+        plan,
+        crystalObject,
+        id,
+        resultById,
+      );
+      pendingCrystalObjects.push(crystalObject);
+      pendingCrystalObjectsIndexes.push(i);
     }
     const pendingCrystalObjectsLength = pendingCrystalObjects.length;
     if (pendingCrystalObjectsLength > 0) {
@@ -925,9 +962,9 @@ export class Aether {
         resultById[pendingCrystalObject[$$id]] = result[j] = pendingResult;
       }
       debug(
-        `ExecutePlan(%s): wrote results for ids %c: %c`,
+        `ExecutePlan(%s): wrote results for %s: %c`,
         plan,
-        pendingCrystalObjects.map((crystalObject) => crystalObject[$$id]),
+        pendingCrystalObjects.join(", "),
         resultById,
       );
     }

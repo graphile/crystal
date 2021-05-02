@@ -13,10 +13,12 @@ export const $$indexesByPathIdentity = Symbol("indexesByPathIdentity");
 export interface CrystalObject<TData> {
   [$$id]: UniqueId;
   [$$pathIdentity]: string;
-  [$$indexes]: number[];
+  [$$indexes]: ReadonlyArray<number>;
   [$$crystalContext]: CrystalContext;
   [$$idByPathIdentity]: { [pathIdentity: string]: UniqueId | undefined };
-  [$$indexesByPathIdentity]: { [pathIdentity: string]: number[] | undefined };
+  [$$indexesByPathIdentity]: {
+    [pathIdentity: string]: ReadonlyArray<number> | undefined;
+  };
   [$$data]: TData;
 }
 

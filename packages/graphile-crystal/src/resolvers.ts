@@ -1,4 +1,5 @@
 import * as assert from "assert";
+import chalk from "chalk";
 import { inspect } from "util";
 import {
   GraphQLFieldResolver,
@@ -183,7 +184,8 @@ export function crystalWrapResolve<
     }
     const result = await getBatchResult(batch, parentCrystalObject);
     debug(
-      `👈 CRYSTAL RESOLVER (%s.%s @ %s); object %c; result: %o`,
+      `👈 CRYSTAL RESOLVER %c (%s.%s @ %s); object %c; result: %o`,
+      id,
       info.parentType.name,
       info.fieldName,
       pathIdentity,
@@ -241,7 +243,7 @@ function crystalWrap<TData>(
   pathIdentity: string,
   id: UniqueId,
   data: TData,
-  indexes: number[] = [],
+  indexes: ReadonlyArray<number> = [],
 ): CrystalWrapResult {
   // This is an `any` because typing it is way too hard; it could be an infinitely nested list for example.
   if (data == null) {
@@ -284,8 +286,10 @@ function crystalWrap<TData>(
     return result;
   }
   if (parentCrystalObject) {
-    const idByPathIdentity = parentCrystalObject[$$idByPathIdentity];
-    const indexesByPathIdentity = parentCrystalObject[$$indexesByPathIdentity];
+    const idByPathIdentity = { ...parentCrystalObject[$$idByPathIdentity] };
+    const indexesByPathIdentity = {
+      ...parentCrystalObject[$$indexesByPathIdentity],
+    };
     return newCrystalObject(
       plan,
       pathIdentity,
@@ -315,13 +319,15 @@ function newCrystalObject<TData>(
   plan: Plan,
   pathIdentity: string,
   id: UniqueId,
-  indexes: number[],
+  indexes: ReadonlyArray<number>,
   data: TData,
   crystalContext: CrystalContext,
   idByPathIdentity: { [pathIdentity: string]: UniqueId | undefined } = {
     "": crystalContext.rootId,
   },
-  indexesByPathIdentity: { [pathIdentity: string]: number[] | undefined } = {
+  indexesByPathIdentity: {
+    [pathIdentity: string]: ReadonlyArray<number> | undefined;
+  } = {
     "": [],
   },
 ): CrystalObject<TData> {
@@ -331,16 +337,22 @@ function newCrystalObject<TData>(
     [$$data]: data,
     [$$indexes]: indexes, // Shortcut to $$indexesByPathIdentity[$$pathIdentity]
     [$$crystalContext]: crystalContext,
-    [$$idByPathIdentity]: idByPathIdentity,
-    [$$indexesByPathIdentity]: indexesByPathIdentity,
+    [$$idByPathIdentity]: Object.freeze({
+      ...idByPathIdentity,
+      [pathIdentity]: id,
+    }),
+    [$$indexesByPathIdentity]: Object.freeze({
+      ...indexesByPathIdentity,
+      [pathIdentity]: indexes,
+    }),
     // @ts-ignore
     toString() {
       const p = indexes.length ? `.${indexes.join(".")}` : ``;
-      return `CrystalObject(${pathIdentity}${p}/${crystalPrint(id)})`;
+      return chalk.bold.blue(
+        `CrystalObject(${pathIdentity}${p}/${crystalPrint(id)})`,
+      );
     },
   };
-  crystalObject[$$idByPathIdentity][pathIdentity] = id;
-  crystalObject[$$indexesByPathIdentity][pathIdentity] = indexes;
   if (isDev) {
     debug(`Constructed %s with data %o`, crystalObject, data);
   }
