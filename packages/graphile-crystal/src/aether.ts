@@ -48,6 +48,10 @@ import { isDev } from "./dev";
 import { Deferred } from "./deferred";
 import { isCrystalObject } from "./resolvers";
 
+import debugFactory from "debug";
+
+const debug = debugFactory("crystal:aether");
+
 /**
  * The parent object is used as the key in `GetValuePlanId()`; for root level
  * fields it's possible that the parent will be null/undefined (in all other
@@ -849,8 +853,20 @@ export class Aether {
       const crystalObject = crystalObjects[i];
       const previousResult = resultById[crystalObject[$$id]];
       if (previousResult !== undefined) {
+        debug(
+          `ExecutePlan[%s/%o] result for id '%s' was present`,
+          plan.constructor.name,
+          plan.id,
+          crystalObject[$$id].description,
+        );
         result[i] = previousResult;
       } else {
+        debug(
+          `ExecutePlan[%s/%o] no result for id %o`,
+          plan.constructor.name,
+          plan.id,
+          crystalObject[$$id],
+        );
         pendingCrystalObjects.push(crystalObject);
         pendingCrystalObjectsIndexes.push(i);
       }
@@ -909,8 +925,26 @@ export class Aether {
         const pendingCrystalObject = pendingCrystalObjects[i];
         const pendingResult = pendingResults[i];
         const j = pendingCrystalObjectsIndexes[i];
+        // TODO: there's a race condition here, the results are written AFTER
+        // the GraphQL resolver completes, so the next run cannot use the value
+        // and thinks it must execute the plan again.
         resultById[pendingCrystalObject[$$id]] = result[j] = pendingResult;
       }
+      debug(
+        `ExecutePlan[%s/%o]: wrote results for ids %o: %o`,
+        plan.constructor.name,
+        plan.id,
+        pendingCrystalObjects.map((crystalObject) => crystalObject[$$id]),
+        resultById,
+      );
+    }
+    if (isDev) {
+      debug(
+        `Executed plan %s[%s]; results: %o`,
+        plan.constructor.name,
+        plan.id,
+        result,
+      );
     }
     return result;
   }

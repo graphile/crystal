@@ -238,7 +238,7 @@ const developmentUid = ((): (() => UniqueId) => {
       prefix = `${++prefixCounter}|`;
       fastCounter = 0;
     }
-    return Symbol(`${prefix}${fastCounter}`);
+    return Symbol(`u${prefix}${fastCounter}`);
   };
 })();
 

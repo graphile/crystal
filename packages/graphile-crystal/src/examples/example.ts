@@ -36,7 +36,9 @@ import { Plan, __TrackedObjectPlan, __ValuePlan } from "../plan";
 import { Pool } from "pg";
 import { resolve } from "path";
 import { inspect } from "util";
-import { isDev } from "../dev";
+import debugFactory from "debug";
+
+const debug = debugFactory("crystal:example");
 
 const testPool = new Pool({ connectionString: "graphile_crystal" });
 
@@ -297,6 +299,7 @@ class PgColumnSelectPlan<
   TDataSource extends PgDataSource<any>,
   TColumn extends keyof TDataSource["TData"]
 > extends Plan<TDataSource["TData"][TColumn]> {
+  private tableId: number;
   constructor(
     public table: PgClassSelectPlan<TDataSource>,
     public attr: TColumn,
@@ -304,13 +307,18 @@ class PgColumnSelectPlan<
     private attrIndex: number,
   ) {
     super();
-    console.log(
-      `Plan ${this.id}: PgColumnSelectPlan(${attr} @ ${attrIndex}) constructor`,
+    this.tableId = this.addDependency(table);
+    debug(
+      `Plan %s: PgColumnSelectPlan(%s @ %s) constructor`,
+      this.id,
+      attr,
+      attrIndex,
     );
   }
 
   execute(values: any[][]) {
-    return values.map((v) => v[this.attrIndex]);
+    debug("PgColumnSelectPlan values: %o", values);
+    return values.map((v) => v[this.tableId][this.attrIndex]);
   }
 }
 
@@ -322,9 +330,7 @@ class PgColumnSelectPlan<
 class PgAttributeSelectPlan extends Plan<any> {
   constructor(private attrIndex: number) {
     super();
-    console.log(
-      `Plan ${this.id}: PgAttributeSelectPlan(${attrIndex}) constructor`,
-    );
+    debug(`Plan %s: PgAttributeSelectPlan(%s) constructor`, this.id, attrIndex);
   }
 
   execute(values: any[][]) {
@@ -495,10 +501,11 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     if (!this.trusted) {
       this.dataSource.applyAuthorizationChecksToPlan(this);
     }
-    console.log(
-      `Plan ${this.id}: PgClassSelectPlan(${
-        this.dataSource.name
-      }) constructor (${cloneFrom ? "clone" : "original"})`,
+    debug(
+      `Plan %s: PgClassSelectPlan(%s) constructor (%s)`,
+      this.id,
+      this.dataSource.name,
+      cloneFrom ? "clone" : "original",
     );
     return this;
   }
@@ -710,11 +717,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
           groups[groupKey].push(result);
         }
       }
-      console.log(
-        `Groups (${this.identifierIndex}): ${inspect(groups, {
-          colors: true,
-        })}`,
-      );
+      debug(`Groups (%s): %o`, this.identifierIndex, groups);
       const result = values.map((_, valueIdx) => {
         const idx = valueIndexToResultIndex[valueIdx];
         return this.many ? groups[idx] ?? [] : groups[idx]?.[0] ?? null;
@@ -759,8 +762,10 @@ class PgConnectionPlan<TDataSource extends PgDataSource<any>> extends Plan<
 > {
   constructor(public readonly subplan: PgClassSelectPlan<TDataSource>) {
     super();
-    console.log(
-      `Plan ${this.id}: PgConnectionPlan(around ${subplan.id}) constructor`,
+    debug(
+      `Plan %s: PgConnectionPlan(around %s) constructor`,
+      this.id,
+      subplan.id,
     );
   }
 
@@ -769,11 +774,7 @@ class PgConnectionPlan<TDataSource extends PgDataSource<any>> extends Plan<
   }
 
   execute(values: any[][]) {
-    console.log(
-      `Plan ${this.id}: PgConnectionPlan eval; values: ${inspect(values, {
-        colors: true,
-      })}`,
-    );
+    debug(`Plan %s: PgConnectionPlan execute; values: %o`, this.id, values);
     // TODO
     return values.map((v) => ({}));
   }
@@ -1113,7 +1114,7 @@ async function main() {
     }
   }
 
-  if (Math.random() > 2) {
+  if (Math.random() < 2) {
     await test(/* GraphQL */ `
       {
         forums {
@@ -1144,7 +1145,7 @@ async function main() {
     `);
   }
 
-  if (Math.random() < 2) {
+  if (Math.random() > 2) {
     await test(/* GraphQL */ `
       {
         allMessagesConnection {
