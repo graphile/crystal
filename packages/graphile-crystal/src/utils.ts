@@ -20,22 +20,41 @@ import {
 import { isDev } from "./dev";
 
 const COLORS = [
-  //"black",
-  "yellow",
-  "magenta",
-  //"cyan",
-  "red",
-  //"white",
-  //"blackBright",
-  "greenBright",
-  "yellowBright",
-  "blueBright",
-  "magentaBright",
-  "cyanBright",
-  "redBright",
-  "blue",
-  "green",
-  //"whiteBright",
+  //chalk.black,
+  chalk.yellow,
+  chalk.magenta,
+  //chalk.cyan,
+  chalk.red,
+  //chalk.white,
+  //chalk.blackBright,
+  chalk.greenBright,
+  chalk.yellowBright,
+  chalk.blueBright,
+  chalk.magentaBright,
+  chalk.cyanBright,
+  chalk.redBright,
+  chalk.blue,
+  chalk.green,
+  //chalk.whiteBright,
+] as const;
+
+const BG_COLORS = [
+  //chalk.bgBlack,
+  //chalk.bgRed,
+  chalk.bgGreen,
+  chalk.bgYellow,
+  chalk.bgBlue,
+  chalk.bgMagenta,
+  chalk.bgCyan,
+  chalk.bgWhite,
+  chalk.bgGrey,
+  chalk.bgRedBright,
+  chalk.bgGreenBright,
+  chalk.bgYellowBright,
+  chalk.bgBlueBright,
+  chalk.bgMagentaBright,
+  chalk.bgCyanBright,
+  //chalk.bgWhiteBright,
 ] as const;
 
 export function assertNullPrototype(object: {}, description: string): void {
@@ -282,7 +301,7 @@ export function crystalPrint(
   if (Array.isArray(symbol)) {
     return `[${symbol
       .map((value, i) =>
-        chalk[COLORS[i % COLORS.length]](debugFactory.formatters.c(value)),
+        BG_COLORS[i % BG_COLORS.length](debugFactory.formatters.c(value)),
       )
       .join(", ")}]`;
   }
@@ -296,7 +315,7 @@ export function crystalPrint(
   if (typeof symbol === "object" && symbol) {
     return `{${[...Object.keys(symbol), ...Object.getOwnPropertySymbols(symbol)]
       .map((key, i) =>
-        chalk[COLORS[i % COLORS.length]](
+        BG_COLORS[i % BG_COLORS.length](
           `${debugFactory.formatters.c(key)}: ${debugFactory.formatters.c(
             symbol[key],
           )}`,
@@ -314,7 +333,7 @@ export function crystalPrint(
   const n = parseInt(nStr, 10) || 0;
   if (n > 0) {
     const color = COLORS[n % COLORS.length];
-    return chalk[color](symbol.description);
+    return color(symbol.description);
   } else {
     return chalk.cyan(`$$${symbol.description}`);
   }
