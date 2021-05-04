@@ -779,7 +779,8 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     ) {
       let t: PgClassSelectPlan<any> | null = null;
       for (let i = 0, l = this.dependencies.length; i < l; i++) {
-        const dep = this.dependencies[i];
+        const depId = this.dependencies[i];
+        const dep = this.aether.plans[depId];
         if (!(dep instanceof PgColumnSelectPlan)) {
           t = null;
           break;
@@ -821,7 +822,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
           actualIndexByDesiredIndex[idx] = t?._select(fragOrSymbol);
         });
         //t.select();
-        // return map(t, actualIndexByDesiredIndex);
+        return map(t, actualIndexByDesiredIndex);
       }
     }
 

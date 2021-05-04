@@ -283,7 +283,9 @@ class InputStaticLeafPlan extends Plan {
  * Implements `InputObjectPlan`
  */
 export class InputObjectPlan extends Plan {
-  private inputFieldPlans: { [fieldName: string]: InputPlan } = {};
+  private inputFields: {
+    [fieldName: string]: { dependencyIndex: number; plan: InputPlan };
+  } = {};
   constructor(
     private inputObjectType: GraphQLInputObjectType,
     private inputValues: ValueNode | undefined,
@@ -302,15 +304,16 @@ export class InputObjectPlan extends Plan {
       const inputFieldValue = inputFields?.find(
         (val) => val.name.value === inputFieldName,
       );
-      const inputFieldPlan = inputPlan(
+      const plan = inputPlan(
         this.aether,
         inputFieldType,
         inputFieldValue?.value,
         defaultValue,
       );
-      // TODO: this is unsafe; we should store the plan ID instead?
-      this.inputFieldPlans[inputFieldName] = inputFieldPlan;
-      this.addDependency(inputFieldPlan);
+      this.inputFields[inputFieldName] = {
+        plan,
+        dependencyIndex: this.addDependency(plan),
+      };
     }
   }
 
@@ -320,10 +323,9 @@ export class InputObjectPlan extends Plan {
     }
     return values.map((planResults) => {
       const resultValues = {};
-      for (const inputFieldName in this.inputFieldPlans) {
-        const inputFieldPlan = this.inputFieldPlans[inputFieldName];
-        const dependencyIndex = this.dependencies.indexOf(inputFieldPlan);
-        if (dependencyIndex === -1) {
+      for (const inputFieldName in this.inputFields) {
+        const { dependencyIndex } = this.inputFields[inputFieldName];
+        if (dependencyIndex == null) {
           throw new Error("inputFieldPlan has gone missing.");
         }
         const value = planResults[dependencyIndex];
@@ -334,7 +336,7 @@ export class InputObjectPlan extends Plan {
   }
 
   get(attrName: string): InputPlan {
-    const plan = this.inputFieldPlans[attrName];
+    const plan = this.inputFields[attrName]?.plan;
     if (plan === undefined) {
       throw new Error(
         `Tried to '.get("${attrName}")', but no such attribute exists on ${this.inputObjectType.name}`,
@@ -348,8 +350,8 @@ export class InputObjectPlan extends Plan {
       return null;
     }
     const resultValues = {};
-    for (const inputFieldName in this.inputFieldPlans) {
-      const inputFieldPlan = this.inputFieldPlans[inputFieldName];
+    for (const inputFieldName in this.inputFields) {
+      const inputFieldPlan = this.inputFields[inputFieldName].plan;
       resultValues[inputFieldName] = inputFieldPlan.eval();
     }
     return resultValues;
@@ -375,9 +377,9 @@ export class InputObjectPlan extends Plan {
     if (this.inputValues.kind === "NullValue") {
       return false;
     }
-    if (!(attrName in this.inputFieldPlans)) {
+    if (!(attrName in this.inputFields)) {
       return false;
     }
-    return !this.inputFieldPlans[attrName].evalIs(undefined);
+    return !this.inputFields[attrName].plan.evalIs(undefined);
   }
 }

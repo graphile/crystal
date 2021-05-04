@@ -21,21 +21,30 @@ export const assertFinalized = !isDev ? noop : reallyAssertFinalized;
 
 export abstract class Plan<TData = any> {
   /**
-   * Plans this plan will need data from in order to execute.
+   * The ids for plans this plan will need data from in order to execute. NOTE:
+   * it's important we use the id and not the plan here otherwise when we swap
+   * out plans during optimisation things will go awry.
    *
    * @internal
    */
-  private readonly _dependencies: Plan[] = [];
+  private readonly _dependencies: number[] = [];
 
   /**
-   * Plans this plan will need data from in order to execute.
+   * The ids for plans this plan will need data from in order to execute.
    */
-  public readonly dependencies: ReadonlyArray<Plan> = this._dependencies;
+  public readonly dependencies: ReadonlyArray<number> = this._dependencies;
 
   /**
-   * Plans this plan might execute; e.g. in `BranchPlan`.
+   * The ids for plans this plan might execute; e.g. in `BranchPlan`.  NOTE: it's important
+   * we use the id and not the plan here otherwise when we swap out plans
+   * during optimisation things will go awry.
    */
-  readonly children: Plan[] = [];
+  private readonly _children: number[] = [];
+
+  /**
+   * The ids for plans this plan might execute; e.g. in `BranchPlan`.
+   */
+  public readonly children: ReadonlyArray<number> = this._children;
 
   public readonly aether: Aether;
   public isFinalized = false;
@@ -73,7 +82,7 @@ export abstract class Plan<TData = any> {
         )}'`,
       );
     }
-    return this._dependencies.push(plan) - 1;
+    return this._dependencies.push(plan.id) - 1;
   }
 
   /**

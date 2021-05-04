@@ -94,22 +94,6 @@ export function getCurrentPathIdentity(): string {
 
 type TrackedArguments = { [key: string]: InputPlan };
 
-/**
- * Implements the `MarkPlanActive` algorithm.
- */
-function markPlanActive(plan: Plan, activePlans: Set<Plan>): void {
-  if (activePlans.has(plan)) {
-    return;
-  }
-  activePlans.add(plan);
-  for (let i = 0, l = plan.dependencies.length; i < l; i++) {
-    markPlanActive(plan.dependencies[i], activePlans);
-  }
-  for (let i = 0, l = plan.children.length; i < l; i++) {
-    markPlanActive(plan.children[i], activePlans);
-  }
-}
-
 function assertPolymorphicPlan(
   plan: Plan | PolymorphicPlan,
 ): asserts plan is PolymorphicPlan {
@@ -144,24 +128,6 @@ function atIndexes(data: any, indexes: ReadonlyArray<number>): any {
     o = o?.[indexes[i]];
   }
   return o;
-}
-
-function isPeer(planA: Plan, planB: Plan): boolean {
-  // Can only merge if plan is of same type.
-  if (planA.constructor !== planB.constructor) {
-    return false;
-  }
-
-  // Can only merge if the dependencies are the same.
-  // TODO: can we soften this?
-  if (
-    planA.dependencies.length !== planB.dependencies.length ||
-    planA.dependencies.some((dep, i) => dep !== planB.dependencies[i])
-  ) {
-    return false;
-  }
-
-  return true;
 }
 
 /**
@@ -258,7 +224,7 @@ export class Aether {
   /**
    * Implements the `PlanAetherQuery` algorithm.
    */
-  planQuery(): void {
+  private planQuery(): void {
     const rootType = this.schema.getQueryType();
     if (!rootType) {
       throw new Error("No query type found in schema");
@@ -274,7 +240,7 @@ export class Aether {
   /**
    * Implements the `PlanAetherMutation` algorithm.
    */
-  planMutation(): void {
+  private planMutation(): void {
     const rootType = this.schema.getMutationType();
     if (!rootType) {
       throw new Error("No mutation type found in schema");
@@ -291,7 +257,7 @@ export class Aether {
   /**
    * Implements the `PlanAetherSubscription` algorithm.
    */
-  planSubscription(): void {
+  private planSubscription(): void {
     const rootType = this.schema.getSubscriptionType();
     if (!rootType) {
       throw new Error("No subscription type found in schema");
@@ -355,7 +321,7 @@ export class Aether {
    * Implements the `PlanSelectionSet` algorithm, and also
    * `GetPolymorphicObjectPlanForType`.
    */
-  planSelectionSet(
+  private planSelectionSet(
     path: string,
     parentPlan: Plan,
     objectType: GraphQLObjectType,
@@ -486,7 +452,7 @@ export class Aether {
   /**
    * Implements the `PlanFieldArguments` and `PlanFieldArgument` algorithms.
    */
-  planFieldArguments(
+  private planFieldArguments(
     _objectType: GraphQLObjectType,
     fieldSpec: GraphQLField<unknown, unknown>,
     _field: FieldNode,
@@ -519,7 +485,7 @@ export class Aether {
    *
    * Note: we are only expecting to `PlanInput()` for objects or lists thereof, not scalars.
    */
-  planInput(
+  private planInput(
     inputType: GraphQLInputType,
     trackedValuePlan: InputPlan,
     parentPlan: ArgumentPlan,
@@ -556,7 +522,7 @@ export class Aether {
   /**
    * Implements `PlanInputFields` algorithm.
    */
-  planInputFields(
+  private planInputFields(
     inputObjectType: GraphQLInputObjectType,
     trackedValuePlan: InputPlan,
     parentPlan: ArgumentPlan,
@@ -578,7 +544,7 @@ export class Aether {
   /**
    * Implements `PlanInputField` algorithm.
    */
-  planInputField(
+  private planInputField(
     inputField: GraphQLInputField,
     trackedValuePlan: InputPlan,
     parentPlan: ArgumentPlan,
@@ -604,7 +570,7 @@ export class Aether {
    *
    * @see https://spec.graphql.org/draft/#CoerceArgumentValues()
    */
-  getTrackedArguments(
+  private getTrackedArguments(
     objectType: GraphQLObjectType,
     field: FieldNode,
   ): TrackedArguments {
@@ -643,7 +609,7 @@ export class Aether {
    * latest plans we can make sure that we know all our dependent's needs
    * before we optimise ourself.
    */
-  optimizePlans(): void {
+  private optimizePlans(): void {
     for (let i = this.plans.length - 1; i >= 0; i--) {
       const plan = this.plans[i];
       globalState.pathIdentity = plan.pathIdentity;
@@ -651,21 +617,59 @@ export class Aether {
     }
   }
 
+  private isPeer(planA: Plan, planB: Plan): boolean {
+    // Can only merge if plan is of same type.
+    if (planA.constructor !== planB.constructor) {
+      return false;
+    }
+
+    // Can only merge if the dependencies are the same.
+    // TODO: can we soften this?
+    if (
+      planA.dependencies.length !== planB.dependencies.length ||
+      planA.dependencies.some(
+        (depId, i) => this.plans[depId] !== this.plans[planB.dependencies[i]],
+      )
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
   /**
    * Implements the `OptimizePlan` algorithm.
    */
-  optimizePlan(plan: Plan): Plan {
+  private optimizePlan(plan: Plan): Plan {
     const peers = this.plans.filter(
       (potentialPeer) =>
-        potentialPeer.id !== plan.id && isPeer(plan, potentialPeer),
+        potentialPeer.id !== plan.id && this.isPeer(plan, potentialPeer),
     );
     return plan.optimize(peers);
   }
 
   /**
+   * Implements the `MarkPlanActive` algorithm.
+   */
+  private markPlanActive(plan: Plan, activePlans: Set<Plan>): void {
+    if (activePlans.has(plan)) {
+      return;
+    }
+    activePlans.add(plan);
+    for (let i = 0, l = plan.dependencies.length; i < l; i++) {
+      const id = plan.dependencies[i];
+      this.markPlanActive(this.plans[id], activePlans);
+    }
+    for (let i = 0, l = plan.children.length; i < l; i++) {
+      const id = plan.children[i];
+      this.markPlanActive(this.plans[id], activePlans);
+    }
+  }
+
+  /**
    * Implements the `TreeShakePlans` algorithm.
    */
-  treeShakePlans(): void {
+  private treeShakePlans(): void {
     const activePlans = new Set<Plan>();
 
     for (const pathIdentity in this.planIdByPathIdentity) {
@@ -678,7 +682,7 @@ export class Aether {
       if (isDev) {
         assert.ok(plan, `Could not find plan for identifier '${planId}'`);
       }
-      markPlanActive(plan, activePlans);
+      this.markPlanActive(plan, activePlans);
     }
 
     for (let i = 0, l = this.plans.length; i < l; i++) {
@@ -700,7 +704,7 @@ export class Aether {
   /**
    * Implements the `FinalizePlans` and `FinalizePlan` algorithms.
    */
-  finalizePlans(): void {
+  private finalizePlans(): void {
     const distinctActivePlansInReverseOrder = new Set<Plan>();
     for (let i = this.plans.length - 1; i >= 0; i--) {
       const plan = this.plans[i];
@@ -719,7 +723,7 @@ export class Aether {
 
   //----------------------------------------
 
-  newBatch(pathIdentity: string, crystalContext: CrystalContext): Batch {
+  public newBatch(pathIdentity: string, crystalContext: CrystalContext): Batch {
     const planId = this.planIdByPathIdentity[pathIdentity];
     assert.ok(
       planId != null,
@@ -742,7 +746,7 @@ export class Aether {
   /**
    * Implements `NewCrystalContext`.
    */
-  newCrystalContext(
+  public newCrystalContext(
     variableValues: {
       [variableName: string]: unknown;
     },
@@ -783,7 +787,7 @@ export class Aether {
   /**
    * Implements `GetBatch`.
    */
-  getBatch(
+  public getBatch(
     pathIdentity: string,
     parentObject: unknown,
     variableValues: {
@@ -822,7 +826,7 @@ export class Aether {
    * TODO: we can optimise this to not be `async` (only return a promise when
    * necessary).
    */
-  async executeBatch(
+  public async executeBatch(
     batch: Batch,
     crystalContext: CrystalContext,
   ): Promise<void> {
@@ -871,7 +875,7 @@ export class Aether {
   /**
    * Implements `ExecutePlan`.
    */
-  async executePlan(
+  private async executePlan(
     plan: Plan,
     crystalContext: CrystalContext,
     crystalObjects: CrystalObject<any>[],
@@ -985,7 +989,8 @@ export class Aether {
       const dependenciesCount = plan.dependencies.length;
       const dependencyValuesList = new Array(dependenciesCount);
       for (let i = 0; i < dependenciesCount; i++) {
-        const dependencyPlan = plan.dependencies[i];
+        const dependencyPlanId = plan.dependencies[i];
+        const dependencyPlan = this.plans[dependencyPlanId];
         if (isDev) {
           assert.ok(
             dependencyPlan,
