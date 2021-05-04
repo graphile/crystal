@@ -374,69 +374,71 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
    * to identify which records in the result set should be returned to which
    * GraphQL resolvers.
    */
-  identifiers: Array<{ plan: Plan<any>; type: SQL }>;
+  private identifiers: Array<{ plan: Plan<any>; type: SQL }>;
 
   /**
    * This is an array with the same length as identifiers that returns the
    * index in this.dependencies for the relevant plan.
    */
-  identifierIds: number[];
+  private identifierIds: number[];
 
   /**
    * So we can clone.
    */
-  identifierMatchesThunk: (alias: SQL) => SQL[];
+  private identifierMatchesThunk: (alias: SQL) => SQL[];
 
   /**
    * This is the list of SQL fragments in the result that are compared to the
    * above `identifiers` to determine if there's a match or not. Typically this
    * will be a list of columns (e.g. primary or foreign keys on the table).
    */
-  identifierMatches: SQL[];
+  private identifierMatches: SQL[];
 
   /**
    * If this plan has identifiers, what's the alias for the identifiers 'table'.
    */
-  identifiersAlias: SQL | null;
+  private identifiersAlias: SQL | null;
 
   /**
    * If this plan has identifiers, we must feed the identifiers into the values
    * to feed into the SQL statement after compiling the query; we'll use this
    * symbol as the placeholder to replace.
    */
-  identifierSymbol: symbol;
+  private identifierSymbol: symbol;
 
   /**
    * If true, we're expecting each identifier to have 0-n results (i.e. a
    * list).  If false, we're expecting each identifier to get one result (or
    * null).
    */
-  many: boolean;
+  private many: boolean;
 
   /**
    * If true, we don't need to add any of the security checks from the data
    * source; otherwise we must do so.
    */
-  trusted: boolean;
+  private trusted: boolean;
 
   /**
    * We only want to fetch each column once (since columns don't accept any
    * parameters), so this memo keeps track of which columns we've selected so
    * their plans can be easily reused.
    */
-  colPlans: {
+  private colPlans: {
     [key in keyof TDataSource["TData"]]?: PgColumnSelectPlan<TDataSource, key>;
   };
 
   /**
    * The list of things we're selecting
    */
-  selects: Array<SQL | symbol>;
+  private selects: Array<SQL | symbol>;
 
   /**
    * If a cursor was requested, what plan returns it?
    */
-  cursorPlan: Plan<any> | null;
+  private cursorPlan: Plan<any> | null;
+
+  private canInline = true;
 
   constructor(
     dataSource: TDataSource,
@@ -491,6 +493,10 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
       cloneFrom ? "clone" : "original",
     );
     return this;
+  }
+
+  public forbidInlining() {
+    this.canInline = false;
   }
 
   /**
@@ -775,6 +781,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
 
     // Inline ourself into our parent if we can.
     if (
+      this.canInline &&
       !this
         .many /* TODO: && !this.groupBy && !this.having && !this.limit && !this.order && !this.offset && ... */
     ) {
@@ -922,6 +929,7 @@ const Message = new GraphQLObjectType(
             (alias) => [sql`${alias}.id`],
             false, // just one
           );
+          // $user.forbidInlining();
           return $user;
         },
       },
