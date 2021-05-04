@@ -324,7 +324,7 @@ class PgColumnSelectPlan<
  * scalar (could be a list, compound type, JSON, geometry, etc), so this might
  * not be a "leaf"; it might be used as the input of another layer of plan.
  */
-class PgAttributeSelectPlan extends Plan<any> {
+class PgAttributeSelectPlan<TData = any> extends Plan<any> {
   private parentPlanIndex: number;
   constructor(parentPlan: PgClassSelectPlan<any>, private attrIndex: number) {
     super();
@@ -332,7 +332,7 @@ class PgAttributeSelectPlan extends Plan<any> {
     debug(`%s (%s) constructor`, this, attrIndex);
   }
 
-  execute(values: any[][]) {
+  execute(values: any[][]): TData[] {
     return values.map((v) => v[this.parentPlanIndex][this.attrIndex]);
   }
 }
