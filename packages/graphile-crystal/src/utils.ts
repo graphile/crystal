@@ -39,22 +39,11 @@ const COLORS = [
 ] as const;
 
 const BG_COLORS = [
-  //chalk.bgBlack,
-  //chalk.bgRed,
-  chalk.bgGreen,
-  chalk.bgYellow,
-  chalk.bgBlue,
-  chalk.bgMagenta,
-  chalk.bgCyan,
-  chalk.bgWhite,
-  chalk.bgGrey,
-  chalk.bgRedBright,
-  chalk.bgGreenBright,
-  chalk.bgYellowBright,
-  chalk.bgBlueBright,
-  chalk.bgMagentaBright,
-  chalk.bgCyanBright,
-  //chalk.bgWhiteBright,
+  // chalk.bgRgb(53, 0, 0),
+  // chalk.bgRgb(0, 53, 0),
+  // chalk.bgRgb(0, 0, 53),
+  chalk.visible,
+  chalk.underline,
 ] as const;
 
 export function assertNullPrototype(object: {}, description: string): void {
