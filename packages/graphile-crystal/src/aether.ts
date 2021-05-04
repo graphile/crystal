@@ -876,11 +876,57 @@ export class Aether {
     for (let i = 0; i < crystalObjectCount; i++) {
       const crystalObject = crystalObjects[i];
       const id = crystalObject[$$idByPathIdentity][plan.parentPathIdentity];
-      const indexes = crystalObject[$$indexesByPathIdentity][plan.pathIdentity];
+      const indexes =
+        crystalObject[$$indexesByPathIdentity][plan.parentPathIdentity];
       if (id && indexes) {
-        const previousResult = resultById[id];
+        const previousResult = resultById[id]?.get(indexes);
         if (previousResult !== undefined) {
-          result[i] = atIndexes(previousResult, indexes);
+          const innerIndexes =
+            crystalObject[$$indexesByPathIdentity][plan.pathIdentity];
+
+          /*
+           * ### What does it mean if innerIndexes is not set?
+           *
+           * We get `$$indexesByPathIdentity` from the _parent_ crystal object,
+           * so it represents only the parent details. Consider a query such as
+           *
+           * ```graphql
+           * { forums { messages { body } } }
+           * ```
+           *
+           * Imagine the plan for `body` was quite complex:
+           *
+           * ```ts
+           * body: {
+           *   type: GraphQLString,
+           *   plan($message) {
+           *     const $id = $message.get('id');
+           *     const $revision = new PgClassSelectPlan(messageRevisions, ... $id ..., single=true);
+           *     const $text = $revision.get('body');
+           *     const $formatted = new FancyAsynchronousFormatterPlan($text);
+           *     return $formatted;
+           *   },
+           * }
+           * ```
+           *
+           * These plans are dependent on each other, but they're all executed
+           * in the context of the current field. Since `crystalObject`
+           * represents the parent field (i.e. `$message` above represents the
+           * nth entry in the list returned from the `messages` field), it does
+           * not contain an `$$indexesByPathIdentity` entry for the current
+           * `pathIdentity`.
+           *
+           * It turns out this is not a concern. All of these plans depend on
+           * the full result of the previous plan - not a specific index within
+           * it - the only plan where the indexes matter is the one that the
+           * plan function returns. Thus we just skip calling `atIndexes` if
+           * the indexes for the pathIdentity are not known, and everything
+           * works as designed.
+           */
+          result[i] = innerIndexes
+            ? atIndexes(previousResult, innerIndexes)
+            : previousResult;
+
           debug(
             `ExecutePlan(%s) result %s for %s (using id: %c/%s) was found: %o`,
             plan,
@@ -891,15 +937,21 @@ export class Aether {
             result[i],
           );
           continue;
+        } else {
+          debug(
+            `ExecutePlan(%s) no result for %s (using id: %c/%s) (%c)`,
+            plan,
+            crystalObject,
+            id,
+            indexes,
+            resultById,
+          );
         }
+      } else {
+        throw new Error(
+          `Crystal error: could not find id/indexes for ${plan.parentPathIdentity} in ${crystalObject}`,
+        );
       }
-      debug(
-        `ExecutePlan(%s) no result for %s (using id: %c) (%c)`,
-        plan,
-        crystalObject,
-        id,
-        resultById,
-      );
       pendingCrystalObjects.push(crystalObject);
       pendingCrystalObjectsIndexes.push(i);
     }
@@ -954,25 +1006,33 @@ export class Aether {
         );
       }
       for (let i = 0; i < pendingCrystalObjectsLength; i++) {
-        const pendingCrystalObject = pendingCrystalObjects[i];
+        const crystalObject = pendingCrystalObjects[i];
         const pendingResult = pendingResults[i];
         const j = pendingCrystalObjectsIndexes[i];
-        // TODO: there's a race condition here, the results are written AFTER
-        // the GraphQL resolver completes, so the next run cannot use the value
-        // and thinks it must execute the plan again.
-        resultById[pendingCrystalObject[$$id]] = result[j] = pendingResult;
+
+        const id = crystalObject[$$idByPathIdentity][plan.parentPathIdentity];
+        const indexes =
+          crystalObject[$$indexesByPathIdentity][plan.parentPathIdentity];
+        if (!id || !indexes) {
+          throw new Error(
+            `Crystal error: could not find id/indexes for ${plan.parentPathIdentity} in ${crystalObject}`,
+          );
+        }
+
+        const innerIndexes =
+          crystalObject[$$indexesByPathIdentity][plan.pathIdentity];
+
+        // To understand this, see the comment about atIndexes earlier within
+        // `executePlan`.
+        result[j] = innerIndexes
+          ? atIndexes(pendingResult, innerIndexes)
+          : pendingResult;
+
+        if (!resultById[id]) {
+          resultById[id] = new Map();
+        }
+        resultById[id].set(indexes, result[j]);
       }
-      // TODO: HERE'S THE BUG!
-      //
-      //   crystal:aether ExecutePlan(PgClassSelectPlan[6@>Query.forums]): complete;
-      //     results: [ [ 'Cats', 'ca700000-0000-0000-0000-000000000ca7' ], [ 'Dogs', 'd0900000-0000-0000-0000-000000000d09' ], [ 'Postgres', 'bae00000-0000-0000-0000-000000000bae' ] ] +0ms
-      //   crystal:example PgColumnSelectPlan[7@>Query.forums>Forum.name] values:
-      //     [ [ [ 'Cats', 'ca700000-0000-0000-0000-000000000ca7' ] ], [ [ 'Dogs', 'd0900000-0000-0000-0000-000000000d09' ] ], [ [ 'Postgres', 'bae00000-0000-0000-0000-000000000bae' ] ] ] +10ms
-      //   crystal:aether ExecutePlan(PgColumnSelectPlan[7@>Query.forums>Forum.name]): wrote results
-      //     for CrystalObject(>Query.forums.0/u7), CrystalObject(>Query.forums.1/u7), CrystalObject(>Query.forums.2/u7):
-      //     {u7: 'Postgres'} +1ms
-      //
-      // Note the very last line compresses everything to 'Postgres' - it isn't respecting the indexes.
 
       debug(
         `ExecutePlan(%s): wrote results for %s: %c`,

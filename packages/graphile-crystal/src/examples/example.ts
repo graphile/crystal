@@ -313,8 +313,9 @@ class PgColumnSelectPlan<
   }
 
   execute(values: any[][]) {
-    debug("%s values: %o", this, values);
-    return values.map((v) => v[this.tableId][this.attrIndex]);
+    const result = values.map((v) => v[this.tableId][this.attrIndex]);
+    debug("%s values: %o, result: %o", this, values, result);
+    return result;
   }
 }
 

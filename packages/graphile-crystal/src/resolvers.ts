@@ -306,10 +306,6 @@ function crystalWrap<TData>(
     return result;
   }
   if (parentCrystalObject) {
-    const idByPathIdentity = { ...parentCrystalObject[$$idByPathIdentity] };
-    const indexesByPathIdentity = {
-      ...parentCrystalObject[$$indexesByPathIdentity],
-    };
     return newCrystalObject(
       plan,
       pathIdentity,
@@ -317,8 +313,8 @@ function crystalWrap<TData>(
       indexes,
       data,
       crystalContext,
-      idByPathIdentity,
-      indexesByPathIdentity,
+      parentCrystalObject[$$idByPathIdentity],
+      parentCrystalObject[$$indexesByPathIdentity],
     );
   } else {
     return newCrystalObject(
