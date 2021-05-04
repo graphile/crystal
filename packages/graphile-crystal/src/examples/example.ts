@@ -1091,7 +1091,14 @@ async function main() {
   async function test(source: string, variableValues = {}) {
     console.log();
     console.log();
+    console.log();
     console.log("=".repeat(80));
+    console.log();
+    console.log();
+    console.log();
+    console.log(prettier.format(source, { parser: "graphql" }));
+    console.log();
+    console.log();
     console.log();
     try {
       const result = await graphql({
