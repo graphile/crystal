@@ -38,6 +38,7 @@ import { Pool } from "pg";
 import { resolve } from "path";
 import { inspect } from "util";
 import debugFactory from "debug";
+import { map } from "../plans";
 
 const debug = debugFactory("crystal:example");
 
@@ -303,19 +304,24 @@ class PgColumnSelectPlan<
   private tableId: number;
   constructor(
     public table: PgClassSelectPlan<TDataSource>,
-    public attr: TColumn,
     // This is the numeric index the parent PgClassSelectPlan gave us to represent this value
     private attrIndex: number,
+    private attr: TColumn,
+    private expression: SQL,
   ) {
     super();
     this.tableId = this.addDependency(table);
-    debug(`%s (%s @ %s) constructor`, this, attr, attrIndex);
+    debug(`%s (%s @ %s) constructor`, this, this.attr, attrIndex);
   }
 
   execute(values: any[][]) {
     const result = values.map((v) => v[this.tableId][this.attrIndex]);
     debug("%s values: %o, result: %o", this, values, result);
     return result;
+  }
+
+  toSQL(): SQL {
+    return this.expression;
   }
 }
 
@@ -516,8 +522,14 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
       // enforce ISO8601? Perhaps this should be the datasource itself, and
       // `attr` should be an SQL expression? This would allow for computed
       // fields/etc too (admittedly those without arguments).
-      const index = this._select(sql.identifier(this.symbol, String(attr)));
-      this.colPlans[attr] = new PgColumnSelectPlan(this, attr, index);
+      const expression = sql.identifier(this.symbol, String(attr));
+      const index = this._select(expression);
+      this.colPlans[attr] = new PgColumnSelectPlan(
+        this,
+        index,
+        attr,
+        expression,
+      );
     }
     return this.colPlans[attr]!;
   }
@@ -750,7 +762,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
    */
   toSQL() {}
 
-  optimize(_plans: PgClassSelectPlan<any>[]) {
+  optimize(_plans: PgClassSelectPlan<any>[]): Plan {
     // TODO: if FROM, JOIN, WHERE, ORDER, GROUP BY, HAVING, LIMIT, OFFSET all
     // match with one of our peers then we can replace ourself with one of our
     // peers, merging the relevant SELECTs. We should return a transform that
@@ -759,6 +771,59 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     // TODO: we should serialize our `SELECT` clauses and then if any are
     // identical we should omit the later copies and have them link back to the
     // earliest version (resolve this in `execute` via mapping).
+
+    // Inline ourself into our parent if we can.
+    if (
+      !this
+        .many /* TODO: && !this.groupBy && !this.having && !this.limit && !this.order && !this.offset && ... */
+    ) {
+      let t: PgClassSelectPlan<any> | null = null;
+      for (let i = 0, l = this.dependencies.length; i < l; i++) {
+        const dep = this.dependencies[i];
+        if (!(dep instanceof PgColumnSelectPlan)) {
+          t = null;
+          break;
+        }
+        if (i === 0) {
+          t = dep.table;
+        } else if (dep.table !== t) {
+          t = null;
+          break;
+        }
+      }
+      if (t != null) {
+        // Looks feasible.
+        t.joins.push(
+          {
+            type: "left",
+            source: this.dataSource.tableIdentifier,
+            alias: this.alias,
+            conditions: [
+              ...this.identifiers.map((id, i) => {
+                const plan = id.plan as PgColumnSelectPlan<any, any>;
+                return sql`${plan.toSQL()}::${id.type} = ${
+                  this.identifierMatches[i]
+                }`;
+              }),
+              // TODO: ...this.conditions - these are part of the JOIN
+              // condition (since it's a LEFT JOIN) - not part of the WHERE!
+            ],
+          },
+          ...this.joins,
+        );
+        const actualIndexByDesiredIndex = {};
+        this.selects.forEach((fragOrSymbol, idx) => {
+          if (typeof fragOrSymbol === "symbol") {
+            throw new Error(
+              "Cannot inline query that uses a symbol like this.",
+            );
+          }
+          actualIndexByDesiredIndex[idx] = t?._select(fragOrSymbol);
+        });
+        //t.select();
+        // return map(t, actualIndexByDesiredIndex);
+      }
+    }
 
     return this;
   }
@@ -1204,13 +1269,13 @@ async function main() {
             condition: { active: true }
             includeArchived: INHERIT
           ) {
-            nodes {
-              body
-              author {
-                username
-                gravatarUrl
-              }
-            }
+            # nodes {
+            #   body
+            #   author {
+            #     username
+            #     gravatarUrl
+            #   }
+            # }
             edges {
               cursor
               node {

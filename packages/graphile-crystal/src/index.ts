@@ -5,3 +5,4 @@ debugFactory.formatters.c = crystalPrint;
 
 export { crystalEnforce } from "./enforceCrystal";
 export { crystalWrapResolve, $$crystalWrapped } from "./resolvers";
+export * from "./plans";
