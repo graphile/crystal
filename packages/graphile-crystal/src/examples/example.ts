@@ -14,6 +14,7 @@
  */
 
 import * as assert from "assert";
+import chalk from "chalk";
 import {
   GraphQLSchema,
   GraphQLObjectType,
@@ -136,7 +137,7 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
     }
     console.log("👇".repeat(30));
     console.log(`# SQL QUERY:`);
-    console.log(text);
+    console.log(formatSQLForDebugging(text));
     console.log();
     console.log(`# PLACEHOLDERS:`);
     console.log(inspect(values, { colors: true }));
@@ -1150,6 +1151,38 @@ if (!String.prototype.replaceAll) {
     }
     return this.replace(new RegExp(regexpEscape(matcher), "g"), replacement);
   };
+}
+
+// A simplified version of formatSQLForDebugging from graphile-build-pg
+function formatSQLForDebugging(sql: string) {
+  let colourIndex = 0;
+  const allowedColours = [
+    chalk.red,
+    chalk.green,
+    chalk.yellow,
+    chalk.blue,
+    chalk.magenta,
+    chalk.cyan,
+    chalk.white,
+    chalk.black,
+  ];
+
+  function nextColor() {
+    colourIndex = (colourIndex + 1) % allowedColours.length;
+    return allowedColours[colourIndex];
+  }
+  const colours = {};
+
+  /* Yep - that's `colour` from English and `ize` from American */
+  function colourize(str: string) {
+    if (!colours[str]) {
+      colours[str] = nextColor();
+    }
+    return colours[str].bold.call(null, str);
+  }
+
+  const colouredSql = sql.replace(/__[a-z0-9_]+_[0-9]+(?:__)?/g, colourize);
+  return colouredSql;
 }
 
 async function main() {

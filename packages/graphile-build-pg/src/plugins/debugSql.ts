@@ -63,7 +63,7 @@ export function formatSQLForDebugging(sql: string) {
     .replace(/\(\s*([A-Za-z0-9_."' =]{1,50})\s*\)/g, "($1)")
     .replace(/\(\s*(\([A-Za-z0-9_."' =]{1,50}\))\s*\)/g, "($1)")
     .replace(/\n\s*and \(TRUE\)/g, chalk.gray(" and (TRUE)"));
-  const colouredSql = tidySql.replace(/__[a-z0-9_]+_[0-9]+__/g, colourize);
+  const colouredSql = tidySql.replace(/__[a-z0-9_]+_[0-9]+(?:__)?/g, colourize);
   return colouredSql;
 }
 

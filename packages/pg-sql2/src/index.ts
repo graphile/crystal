@@ -232,7 +232,7 @@ export function compile(
 
               // NOTE: we don't omit number for the first instance because
               // safeDesc might end in, e.g., `_2` and cause conflicts later.
-              identifierForSymbol = `__${safeDesc}_${number}__`;
+              identifierForSymbol = `__${safeDesc}_${number}`;
 
               // Store so this symbol gets the same identifier next time
               symbolToIdentifier.set(symbol, identifierForSymbol);
