@@ -6,6 +6,7 @@ import { Constraint } from "./constraints";
 import { isDev, noop } from "./dev";
 import { inspect } from "util";
 import { GraphQLObjectType } from "graphql";
+import { compressedPathIdentity } from "./utils";
 
 function reallyAssertFinalized(plan: Plan): void {
   if (!plan.isFinalized) {
@@ -58,7 +59,7 @@ export abstract class Plan<TData = any> {
   toString(): string {
     return chalk.bold.blue(
       `${this.constructor.name}[${inspect(this.id, { colors: true })}@${
-        this.pathIdentity || "root"
+        compressedPathIdentity(this.pathIdentity) || "root"
       }]`,
     );
   }

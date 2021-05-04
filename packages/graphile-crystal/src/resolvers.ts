@@ -27,7 +27,7 @@ import {
   $$pathIdentity,
   $$indexes,
 } from "./interfaces";
-import { uid, UniqueId, crystalPrint } from "./utils";
+import { uid, UniqueId, crystalPrint, compressedPathIdentity } from "./utils";
 import { defer, Deferred } from "./deferred";
 import { isDev } from "./dev";
 
@@ -203,7 +203,7 @@ export function crystalWrapResolve<
     if (isLeafType(getNamedType(info.returnType))) {
       const valueForResolver: any = { [info.fieldName]: result };
       debug(
-        "Calling real resolver for %s.%s with %o",
+        "   Calling real resolver for %s.%s with %o",
         info.parentType.name,
         info.fieldName,
         valueForResolver,
@@ -369,7 +369,7 @@ function newCrystalObject<TData>(
     toString() {
       const p = indexes.length ? `.${indexes.join(".")}` : ``;
       return chalk.bold.blue(
-        `CrystalObject(${pathIdentity}${p}/${crystalPrint(id)})`,
+        `C(${compressedPathIdentity(pathIdentity)}${p}/${crystalPrint(id)})`,
       );
     },
   };

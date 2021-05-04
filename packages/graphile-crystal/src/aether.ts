@@ -882,7 +882,7 @@ export class Aether {
         if (previousResult !== undefined) {
           result[i] = atIndexes(previousResult, indexes);
           debug(
-            `ExecutePlan(%s) result %s for %s (using id: %c/%s) was found: %o (%o)`,
+            `ExecutePlan(%s) result %s for %s (using id: %c/%s) was found: %o`,
             plan,
             i,
             crystalObject,
@@ -894,7 +894,7 @@ export class Aether {
         }
       }
       debug(
-        `ExecutePlan(%s) no result for %s (using id: %c) (%o)`,
+        `ExecutePlan(%s) no result for %s (using id: %c) (%c)`,
         plan,
         crystalObject,
         id,

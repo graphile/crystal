@@ -32,6 +32,7 @@ import {
 import sql, { SQL } from "../../../pg-sql2/dist";
 import { crystalEnforce } from "..";
 import { Plan, __TrackedObjectPlan, __ValuePlan } from "../plan";
+import prettier from "prettier";
 
 import { Pool } from "pg";
 import { resolve } from "path";
@@ -1072,14 +1073,15 @@ async function main() {
               .split("\n"),
           };
     });
+    const formattedResult = {
+      ...(data !== undefined ? { data } : null),
+      ...(nicerErrors !== undefined ? { errors: nicerErrors } : null),
+    };
     console.log(
-      inspect(
-        {
-          ...(data !== undefined ? { data } : null),
-          ...(nicerErrors !== undefined ? { errors: nicerErrors } : null),
-        },
-        { colors: true, depth: Infinity },
-      ),
+      prettier.format(JSON.stringify(formattedResult), {
+        parser: "json5",
+        printWidth: 200,
+      }),
     );
   }
 

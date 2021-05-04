@@ -307,3 +307,7 @@ export function crystalPrint(
     return chalk.cyan(`$$${symbol.description}`);
   }
 }
+
+export function compressedPathIdentity(pathIdentity: string): string {
+  return pathIdentity.replace(/>[A-Za-z0-9]+\./g, ">").slice(1);
+}
