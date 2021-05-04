@@ -58,9 +58,9 @@ export abstract class Plan<TData = any> {
 
   toString(): string {
     return chalk.bold.blue(
-      `${this.constructor.name}[${inspect(this.id, { colors: true })}@${
-        compressedPathIdentity(this.pathIdentity) || "root"
-      }]`,
+      `${this.constructor.name}[${inspect(this.id, {
+        colors: true,
+      })}@${compressedPathIdentity(this.pathIdentity)}]`,
     );
   }
 

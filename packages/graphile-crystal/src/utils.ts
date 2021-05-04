@@ -21,9 +21,7 @@ import { isDev } from "./dev";
 
 const COLORS = [
   //"black",
-  "green",
   "yellow",
-  "blue",
   "magenta",
   //"cyan",
   "red",
@@ -35,6 +33,8 @@ const COLORS = [
   "magentaBright",
   "cyanBright",
   "redBright",
+  "blue",
+  "green",
   //"whiteBright",
 ] as const;
 
@@ -277,18 +277,30 @@ export function isPromise<T>(t: T | Promise<T>): t is Promise<T> {
 }
 
 export function crystalPrint(
-  symbol: symbol | symbol[] | Record<symbol, any>,
+  symbol: symbol | symbol[] | Record<symbol, any> | Map<any, any>,
 ): string {
   if (Array.isArray(symbol)) {
-    return `[${symbol.map(debugFactory.formatters.c).join(", ")}]`;
+    return `[${symbol
+      .map((value, i) =>
+        chalk[COLORS[i % COLORS.length]](debugFactory.formatters.c(value)),
+      )
+      .join(", ")}]`;
+  }
+  if (symbol instanceof Map) {
+    const obj = Object.create(null);
+    for (const [k, v] of symbol.entries()) {
+      obj[k] = v;
+    }
+    return "Map" + crystalPrint(obj);
   }
   if (typeof symbol === "object" && symbol) {
     return `{${[...Object.keys(symbol), ...Object.getOwnPropertySymbols(symbol)]
-      .map(
-        (key) =>
+      .map((key, i) =>
+        chalk[COLORS[i % COLORS.length]](
           `${debugFactory.formatters.c(key)}: ${debugFactory.formatters.c(
             symbol[key],
           )}`,
+        ),
       )
       .join(", ")}}`;
   }
@@ -309,5 +321,5 @@ export function crystalPrint(
 }
 
 export function compressedPathIdentity(pathIdentity: string): string {
-  return pathIdentity.replace(/>[A-Za-z0-9]+\./g, ">").slice(1);
+  return pathIdentity.replace(/>[A-Za-z0-9]+\./g, ">").slice(1) || "ROOT";
 }

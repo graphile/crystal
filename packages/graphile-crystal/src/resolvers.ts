@@ -108,13 +108,11 @@ export function crystalWrapResolve<
     const pathIdentity = pathToPathIdentity(path);
     // const alias = getAliasFromResolveInfo(info);
     debug(
-      `👉 CRYSTAL RESOLVER (%s.%s @ %s); parent: %o`,
+      `👉 CRYSTAL RESOLVER (%s.%s @ %s); parent: %s`,
       info.parentType.name,
       info.fieldName,
       pathIdentity,
-      isCrystalObject(parentObject)
-        ? `${parentObject[$$pathIdentity]}.${parentObject[$$indexes].join(".")}`
-        : parentObject,
+      isCrystalObject(parentObject) ? parentObject : inspect(parentObject),
     );
     const aether = establishAether({
       schema,
@@ -192,12 +190,12 @@ export function crystalWrapResolve<
     }
     const result = await getBatchResult(batch, parentCrystalObject);
     debug(
-      `👈 CRYSTAL RESOLVER %c (%s.%s @ %s); object %c; result: %o`,
+      `👈 CRYSTAL RESOLVER %c (%s.%s @ %s); object %s; result: %o`,
       id,
       info.parentType.name,
       info.fieldName,
       pathIdentity,
-      parentCrystalObject[$$id],
+      parentCrystalObject,
       result,
     );
     if (isLeafType(getNamedType(info.returnType))) {
@@ -365,7 +363,7 @@ function newCrystalObject<TData>(
     toString() {
       const p = indexes.length ? `.${indexes.join(".")}` : ``;
       return chalk.bold.blue(
-        `C(${compressedPathIdentity(pathIdentity)}${p}/${crystalPrint(id)})`,
+        `C(${compressedPathIdentity(pathIdentity)}/${crystalPrint(id)}${p})`,
       );
     },
   };
