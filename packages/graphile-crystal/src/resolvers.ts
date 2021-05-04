@@ -108,10 +108,8 @@ export function crystalWrapResolve<
     const pathIdentity = pathToPathIdentity(path);
     // const alias = getAliasFromResolveInfo(info);
     debug(
-      `👉 CRYSTAL RESOLVER (%s.%s @ %s); parent: %s`,
-      info.parentType.name,
-      info.fieldName,
-      pathIdentity,
+      `👉 CRYSTAL RESOLVER @%s; parent: %s`,
+      compressedPathIdentity(pathIdentity),
       isCrystalObject(parentObject) ? parentObject : inspect(parentObject),
     );
     const aether = establishAether({
@@ -190,11 +188,9 @@ export function crystalWrapResolve<
     }
     const result = await getBatchResult(batch, parentCrystalObject);
     debug(
-      `👈 CRYSTAL RESOLVER %c (%s.%s @ %s); object %s; result: %o`,
+      `👈 CRYSTAL RESOLVER %c @ %s; object %s; result: %o`,
       id,
-      info.parentType.name,
-      info.fieldName,
-      pathIdentity,
+      compressedPathIdentity(pathIdentity),
       parentCrystalObject,
       result,
     );

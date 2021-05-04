@@ -717,7 +717,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
           groups[groupKey].push(result);
         }
       }
-      debug(`Groups (%s): %o`, this.identifierIndex, groups);
+      debug(`%s execute; groups (%s): %c`, this, this.identifierIndex, groups);
       const result = values.map((_, valueIdx) => {
         const idx = valueIndexToResultIndex[valueIdx];
         return this.many ? groups[idx] ?? [] : groups[idx]?.[0] ?? null;
