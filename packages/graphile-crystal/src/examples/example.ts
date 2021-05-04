@@ -1118,7 +1118,7 @@ async function main() {
     `);
   }
 
-  if (Math.random() > 2) {
+  if (Math.random() < 2) {
     await test(/* GraphQL */ `
       {
         forums {
@@ -1139,7 +1139,7 @@ async function main() {
     `);
   }
 
-  if (Math.random() > 2) {
+  if (Math.random() < 2) {
     await test(/* GraphQL */ `
       {
         allMessagesConnection {
@@ -1147,10 +1147,10 @@ async function main() {
             cursor
             node {
               body
-              #author {
-              #  username
-              #  gravatarUrl
-              #}
+              author {
+                username
+                gravatarUrl
+              }
             }
           }
         }
