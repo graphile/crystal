@@ -325,13 +325,15 @@ class PgColumnSelectPlan<
  * not be a "leaf"; it might be used as the input of another layer of plan.
  */
 class PgAttributeSelectPlan extends Plan<any> {
-  constructor(private attrIndex: number) {
+  private parentPlanIndex: number;
+  constructor(parentPlan: PgClassSelectPlan<any>, private attrIndex: number) {
     super();
+    this.parentPlanIndex = this.addDependency(parentPlan);
     debug(`%s (%s) constructor`, this, attrIndex);
   }
 
   execute(values: any[][]) {
-    return values.map((v) => v[this.attrIndex]);
+    return values.map((v) => v[this.parentPlanIndex][this.attrIndex]);
   }
 }
 
@@ -541,7 +543,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
    */
   cursor() {
     if (this.cursorPlan == null) {
-      this.cursorPlan = new PgAttributeSelectPlan(this.select($$CURSOR));
+      this.cursorPlan = new PgAttributeSelectPlan(this, this.select($$CURSOR));
     }
     return this.cursorPlan;
   }
