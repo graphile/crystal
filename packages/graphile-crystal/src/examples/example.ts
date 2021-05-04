@@ -388,10 +388,9 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
   identifierMatches: SQL[];
 
   /**
-   * If this plan has identifiers, which `select` result is associated with
-   * the the index of the relevant identifier to group by.
+   * If this plan has identifiers, what's the alias for the identifiers 'table'.
    */
-  identifierIndex: number | null;
+  identifiersAlias: SQL | null;
 
   /**
    * If this plan has identifiers, we must feed the identifiers into the values
@@ -461,40 +460,18 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
       : identifierMatchesThunk(this.alias);
     this.joins = cloneFrom ? [...cloneFrom.joins] : [];
     this.selects = cloneFrom ? [...cloneFrom.selects] : [];
-    this.identifierIndex = cloneFrom ? cloneFrom.identifierIndex : null;
     this.cursorPlan = cloneFrom ? cloneFrom.cursorPlan : null;
+    this.identifiersAlias = cloneFrom
+      ? cloneFrom.identifiersAlias
+      : this.identifiers.length
+      ? sql.identifier(Symbol(this.dataSource.name + "_identifiers"))
+      : null;
 
     if (!cloneFrom) {
       if (this.identifiers.length !== this.identifierMatches.length) {
         throw new Error(
           `'identifiers' and 'identifierMatches' lengths must match (${this.identifiers.length} != ${this.identifierMatches.length})`,
         );
-      }
-      if (this.identifiers.length) {
-        const alias = sql.identifier(Symbol(dataSource.name + "_identifiers"));
-        // TODO: this should not be here; when we add toSQL support this will
-        // need to be a different subquery.
-        this.joins.push({
-          type: "inner",
-          source: sql`(select ids.ordinality - 1 as idx, ${sql.join(
-            this.identifiers.map(({ type }, idx) => {
-              return sql`(ids.value->>${sql.literal(
-                idx,
-              )})::${type} as ${sql.identifier(`id${idx}`)}`;
-            }),
-            ", ",
-          )} from json_array_elements(${sql.value(
-            // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
-            // a value before executing the query.
-            this.identifierSymbol as any,
-          )}) with ordinality as ids)`,
-          alias,
-          conditions: this.identifierMatches.map(
-            (frag, idx) =>
-              sql`${frag} = ${alias}.${sql.identifier(`id${idx}`)}`,
-          ),
-        });
-        this.identifierIndex = this.select(sql`${alias}.idx`);
       }
     }
     if (!this.trusted) {
@@ -512,8 +489,18 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
   /**
    * Select an SQL fragment, returning the index the result will have.
    */
-  private select(fragment: SQL | symbol): number {
+  private _select(fragment: SQL | symbol): number {
     return this.selects.push(fragment) - 1;
+  }
+
+  /**
+   * Select an SQL fragment, returning a plan.
+   */
+  public select<TData = any>(
+    fragment: SQL | symbol,
+  ): PgAttributeSelectPlan<TData> {
+    const attrIndex = this._select(fragment);
+    return new PgAttributeSelectPlan(this, attrIndex);
   }
 
   /**
@@ -529,7 +516,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
       // enforce ISO8601? Perhaps this should be the datasource itself, and
       // `attr` should be an SQL expression? This would allow for computed
       // fields/etc too (admittedly those without arguments).
-      const index = this.select(sql.identifier(this.symbol, String(attr)));
+      const index = this._select(sql.identifier(this.symbol, String(attr)));
       this.colPlans[attr] = new PgColumnSelectPlan(this, attr, index);
     }
     return this.colPlans[attr]!;
@@ -543,7 +530,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
    */
   cursor() {
     if (this.cursorPlan == null) {
-      this.cursorPlan = new PgAttributeSelectPlan(this, this.select($$CURSOR));
+      this.cursorPlan = new PgAttributeSelectPlan(this, this._select($$CURSOR));
     }
     return this.cursorPlan;
   }
@@ -602,6 +589,32 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
 
     const conditions: SQL[] = [];
     const orders: SQL[] = [];
+    let identifierIndex: number | null = null;
+
+    if (this.identifiers.length && this.identifiersAlias) {
+      const alias = this.identifiersAlias;
+      this.joins.push({
+        type: "inner",
+        source: sql`(select ids.ordinality - 1 as idx, ${sql.join(
+          this.identifiers.map(({ type }, idx) => {
+            return sql`(ids.value->>${sql.literal(
+              idx,
+            )})::${type} as ${sql.identifier(`id${idx}`)}`;
+          }),
+          ", ",
+        )} from json_array_elements(${sql.value(
+          // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
+          // a value before executing the query.
+          this.identifierSymbol as any,
+        )}) with ordinality as ids)`,
+        alias,
+        conditions: this.identifierMatches.map(
+          (frag, idx) => sql`${frag} = ${alias}.${sql.identifier(`id${idx}`)}`,
+        ),
+      });
+      identifierIndex = this._select(sql`${alias}.idx`);
+    }
+
     const joins: SQL[] = this.joins.map((j) => {
       const conditions =
         j.type === "cross"
@@ -665,7 +678,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
 
     let sqlValues = rawSqlValues;
     const valueIndexToResultIndex: number[] = [];
-    if (this.identifierIndex !== null) {
+    if (identifierIndex !== null) {
       let counter = -1;
       const jsonToCounter: { [key: string]: number } = {};
       for (
@@ -707,17 +720,17 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     });
     const resultValues = executionResult.values;
 
-    if (this.identifierIndex !== null) {
+    if (identifierIndex !== null) {
       const groups = {};
       for (const result of resultValues) {
-        const groupKey = result[this.identifierIndex];
+        const groupKey = result[identifierIndex];
         if (!groups[groupKey]) {
           groups[groupKey] = [result];
         } else {
           groups[groupKey].push(result);
         }
       }
-      debug(`%s execute; groups (%s): %c`, this, this.identifierIndex, groups);
+      debug(`%s execute; groups (%s): %c`, this, identifierIndex, groups);
       const result = values.map((_, valueIdx) => {
         const idx = valueIndexToResultIndex[valueIdx];
         return this.many ? groups[idx] ?? [] : groups[idx]?.[0] ?? null;
