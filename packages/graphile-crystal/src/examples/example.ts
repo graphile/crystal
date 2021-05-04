@@ -736,6 +736,19 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
    * are compatible (e.g. represent the same database) before inlining a plan.
    */
   toSQL() {}
+
+  optimize(_plans: PgClassSelectPlan<any>[]) {
+    // TODO: if FROM, JOIN, WHERE, ORDER, GROUP BY, HAVING, LIMIT, OFFSET all
+    // match with one of our peers then we can replace ourself with one of our
+    // peers, merging the relevant SELECTs. We should return a transform that
+    // maps the expected attribute ids.
+
+    // TODO: we should serialize our `SELECT` clauses and then if any are
+    // identical we should omit the later copies and have them link back to the
+    // earliest version (resolve this in `execute` via mapping).
+
+    return this;
+  }
 }
 
 /*

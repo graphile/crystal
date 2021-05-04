@@ -146,6 +146,24 @@ function atIndexes(data: any, indexes: ReadonlyArray<number>): any {
   return o;
 }
 
+function isPeer(planA: Plan, planB: Plan): boolean {
+  // Can only merge if plan is of same type.
+  if (planA.constructor !== planB.constructor) {
+    return false;
+  }
+
+  // Can only merge if the dependencies are the same.
+  // TODO: can we soften this?
+  if (
+    planA.dependencies.length !== planB.dependencies.length ||
+    planA.dependencies.some((dep, i) => dep !== planB.dependencies[i])
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
 /**
  * Implements the `NewAether` algorithm.
  */
@@ -620,7 +638,10 @@ export class Aether {
   }
 
   /**
-   * Implements the `OptimizePlans` algorithm.
+   * Implements the `OptimizePlans` algorithm. Note that we loop backwards
+   * since later plans are dependent on earlier plans, so by starting at the
+   * latest plans we can make sure that we know all our dependent's needs
+   * before we optimise ourself.
    */
   optimizePlans(): void {
     for (let i = this.plans.length - 1; i >= 0; i--) {
@@ -634,7 +655,11 @@ export class Aether {
    * Implements the `OptimizePlan` algorithm.
    */
   optimizePlan(plan: Plan): Plan {
-    return plan;
+    const peers = this.plans.filter(
+      (potentialPeer) =>
+        potentialPeer.id !== plan.id && isPeer(plan, potentialPeer),
+    );
+    return plan.optimize(peers);
   }
 
   /**

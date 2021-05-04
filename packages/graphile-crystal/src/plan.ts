@@ -56,7 +56,7 @@ export abstract class Plan<TData = any> {
     this.id = aether.plans.push(this) - 1;
   }
 
-  toString(): string {
+  public toString(): string {
     return chalk.bold.blue(
       `${this.constructor.name}[${inspect(this.id, {
         colors: true,
@@ -64,7 +64,7 @@ export abstract class Plan<TData = any> {
     );
   }
 
-  addDependency(plan: Plan): number {
+  protected addDependency(plan: Plan): number {
     if (isDev) {
       assert.ok(
         plan instanceof Plan,
@@ -94,9 +94,20 @@ export abstract class Plan<TData = any> {
    * add attributes to meta for each purpose (e.g. use `meta.cache` for
    * memoizing results) so that you can expand your usage of meta in future.
    */
-  abstract execute(values: any[][], meta: {}): Promise<TData[]> | TData[];
+  public abstract execute(
+    values: any[][],
+    meta: {},
+  ): Promise<TData[]> | TData[];
 
-  finalize(): void {
+  /**
+   * Our chance to replace ourself with one of our peers, or otherwise optimise
+   * the plan.
+   */
+  public optimize(_peers: Plan[]): Plan {
+    return this;
+  }
+
+  public finalize(): void {
     this.isFinalized = true;
   }
 }
