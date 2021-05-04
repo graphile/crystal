@@ -630,7 +630,8 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     const resolveSymbol = (symbol: symbol): SQL => {
       switch (symbol) {
         case $$CURSOR:
-          return sql`1`;
+          // TODO: figure out what the cursor should be
+          return sql`424242 /* TODO: CURSOR */`;
         default: {
           throw new Error(
             `Unrecognised special select symbol: ${inspect(symbol)}`,
