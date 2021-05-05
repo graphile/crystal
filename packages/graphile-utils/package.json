@@ -29,10 +29,10 @@
   },
   "homepage": "https://github.com/graphile/graphile-build/tree/master/packages/graphile-utils",
   "dependencies": {
-    "@types/node": "^14.0.1",
+    "@types/node": "^14.14.44",
     "debug": "^4.2.0",
     "graphql": "^15.3.0",
-    "tslib": "^2.0.0"
+    "tslib": "^2.2.0"
   },
   "engines": {
     "node": ">=12.16"
@@ -46,8 +46,8 @@
     "jest": "^26.0.1",
     "pg": "^8.2.1",
     "postgraphile-core": "4.7.0",
-    "ts-node": "^8.10.1",
-    "typescript": "^3.9.2"
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
   },
   "peerDependencies": {
     "graphile-build": "4.7.0",

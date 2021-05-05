@@ -30,7 +30,7 @@
   "homepage": "https://graphile.org/graphile-build/",
   "dependencies": {
     "@graphile/lru": "4.6.0-alpha.0",
-    "@types/node": "^14.0.1",
+    "@types/node": "^14.14.44",
     "@types/pluralize": "^0.0.29",
     "@types/semver": "^7.2.0",
     "chalk": "^4.0.0",
@@ -41,7 +41,7 @@
     "lodash": "^4.17.15",
     "pluralize": "^7.0.0",
     "semver": "^7.3.2",
-    "tslib": "^2.0.0"
+    "tslib": "^2.2.0"
   },
   "engines": {
     "node": ">=12.16"
@@ -59,7 +59,7 @@
     "@types/lodash": "^4.14.151",
     "graphql": "^15.3.0",
     "jest": "^26.0.1",
-    "ts-node": "^8.10.1",
-    "typescript": "^3.9.2"
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
   }
 }

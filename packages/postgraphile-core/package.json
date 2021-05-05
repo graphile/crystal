@@ -22,15 +22,15 @@
     "graphile-build": "4.7.0",
     "graphile-build-pg": "4.7.0",
     "graphql-parse-resolve-info": "4.7.0",
-    "tslib": "^2.0.0"
+    "tslib": "^2.2.0"
   },
   "devDependencies": {
     "@graphile/subscriptions-lds": "4.7.0",
     "@types/debug": "^4.1.5",
     "@types/jest": "^25.2.3",
-    "@types/json5": "0.0.30",
+    "@types/json5": "2.2.0",
     "@types/mock-fs": "^4.10.0",
-    "@types/node": "^14.0.1",
+    "@types/node": "^14.14.44",
     "@types/pg": "^7.14.3",
     "debug": "^4.2.0",
     "graphile-utils": "4.7.0",
@@ -41,8 +41,8 @@
     "mock-fs": "^4.12.0",
     "pg": "^8.2.1",
     "pg-connection-string": "^2.2.3",
-    "ts-node": "^8.10.1",
-    "typescript": "^3.9.2"
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
   },
   "peerDependencies": {
     "graphql": "^14.6.0",
