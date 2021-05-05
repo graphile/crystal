@@ -41,6 +41,7 @@ import { inspect } from "util";
 import debugFactory from "debug";
 import { map } from "../plans";
 import LRU from "@graphile/lru";
+import { Deferred, defer } from "../deferred";
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
 const EMPTY_ARRAY = Object.freeze([]);
@@ -102,7 +103,10 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
   { text: string; values?: any[] },
   TData
 > {
-  private cache: WeakMap<object, LRU<string, Map<string, any>>> = new WeakMap();
+  private cache: WeakMap<
+    object,
+    LRU<string, Map<string, Deferred<any[]>>>
+  > = new WeakMap();
 
   /**
    * @param tableIdentifier - the SQL for the `FROM` clause (without any
@@ -172,7 +176,10 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
     let counter = -1;
     const jsonToCounter: { [key: string]: number } = {};
     const identifiersCount = identifiers.length;
-    const results: any[][] = new Array(identifiersCount).fill([]);
+
+    // Concurrent requests to the same identifiers should result in the same value/execution.
+    const results: Deferred<any[]>[] = new Array(identifiersCount);
+    const unresolvedDefers: Set<Deferred<any[]>> = new Set();
     for (let resultIndex = 0; resultIndex < identifiersCount; resultIndex++) {
       const identifiersJSON = JSON.stringify(identifiers[resultIndex]); // TODO: Canonical? Manual for perf?
       const existingResult = scopedCache.get(identifiersJSON);
@@ -193,6 +200,9 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
           jsonToCounter[identifiersJSON] = valueIndex;
           valueIndexToResultIndex[resultIndex] = valueIndex;
         }
+        const pendingResult = defer<any[]>(); // CRITICAL: this MUST resolve later
+        unresolvedDefers.add(pendingResult);
+        results[resultIndex] = pendingResult;
       }
     }
 
@@ -220,6 +230,9 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
       }
       let queryResult: any, error: any;
       try {
+        // TODO: we could probably make this more efficient by grouping the
+        // deferreds further, DataLoader-style, and running one SQL query for
+        // everything.
         queryResult = await this.pool.query({
           text,
           values: sqlValues,
@@ -250,26 +263,32 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
       if (error) {
         return Promise.reject(error);
       }
+      const groups: { [valueIndex: number]: any[] } = Object.create(null);
       for (const result of queryResult.rows) {
         const valueIndex =
           identifierIndex != null ? result[identifierIndex] : 0;
-        const resultIndex = valueIndexToResultIndex[valueIndex];
-        if (results[resultIndex].length === 0) {
-          const identifiersJSON = remaining[valueIndex];
-          const obj = [result];
-          scopedCache.set(identifiersJSON, obj);
-          results[resultIndex] = obj;
+        if (!groups[valueIndex]) {
+          groups[valueIndex] = [result];
         } else {
-          results[resultIndex].push(result);
+          groups[valueIndex].push(result);
         }
+      }
+      for (const valueIndex in groups) {
+        const resultIndex = valueIndexToResultIndex[valueIndex];
+        const deferred = results[resultIndex];
+        deferred.resolve(groups[valueIndex]);
+        unresolvedDefers.delete(deferred);
+      }
+      for (const unresolvedDefer of unresolvedDefers) {
+        unresolvedDefer.resolve([]);
       }
     }
     if (!many) {
       return {
-        values: results.map((r) => (r ? r[0] : null)),
+        values: Promise.all(results.map(async (r) => (await r)?.[0] ?? null)),
       };
     } else {
-      return { values: results };
+      return { values: Promise.all(results) };
     }
   }
 }
