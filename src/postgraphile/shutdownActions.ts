@@ -5,7 +5,17 @@ export class ShutdownActions {
   private didInvoke = false;
 
   add(action: Action): void {
-    this.actions.push(action);
+    if (this.didInvoke) {
+      console.warn("WARNING: shutdown action added after shutdown actions were invoked; we'll call it now but your program may have already moved on.");
+      setImmediate(() => {
+        action().catch(e => {
+          console.error("Error occurred calling shutdown action after invoke:");
+          console.error(e);
+        });
+      });
+    } else {
+      this.actions.push(action);
+    }
   }
 
   remove(action: Action): void {
