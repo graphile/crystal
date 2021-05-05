@@ -152,7 +152,6 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
       identifiers,
       identifierSymbol,
     } = op;
-    const valueIndexToResultIndexes: number[][] = [];
     let sqlValues = rawSqlValues;
     assert.ok(
       identifiers != null,
@@ -173,13 +172,12 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
 
     const scopedCache = cacheForQuery;
 
-    let counter = -1;
-    const jsonToCounter: { [key: string]: number } = {};
+    const remaining: string[] = [];
+    const remainingDeferreds: Array<Deferred<any[]>> = [];
     const identifiersCount = identifiers.length;
 
     // Concurrent requests to the same identifiers should result in the same value/execution.
     const results: Deferred<any[]>[] = new Array(identifiersCount);
-    const unresolvedDefers: Set<Deferred<any[]>> = new Set();
     for (let resultIndex = 0; resultIndex < identifiersCount; resultIndex++) {
       const identifiersJSON = JSON.stringify(identifiers[resultIndex]); // TODO: Canonical? Manual for perf?
       const existingResult = scopedCache.get(identifiersJSON);
@@ -192,22 +190,18 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
         );
         results[resultIndex] = existingResult;
       } else {
-        let valueIndex = jsonToCounter[identifiersJSON];
-        if (valueIndex != null) {
-          valueIndexToResultIndexes[valueIndex].push(resultIndex);
-        } else {
-          valueIndex = ++counter;
-          jsonToCounter[identifiersJSON] = valueIndex;
-          valueIndexToResultIndexes[valueIndex] = [resultIndex];
-        }
+        assert.ok(
+          remaining.includes(identifiersJSON) === false,
+          "Should only fetch each identifiersJSON once, future entries in the loop should receive previous deferred",
+        );
         const pendingResult = defer<any[]>(); // CRITICAL: this MUST resolve later
-        unresolvedDefers.add(pendingResult);
         results[resultIndex] = pendingResult;
         scopedCache.set(identifiersJSON, pendingResult);
+        remaining.push(identifiersJSON) - 1;
+        remainingDeferreds.push(pendingResult);
       }
     }
 
-    const remaining = Object.keys(jsonToCounter);
     if (remaining.length) {
       if (identifierIndex != null) {
         assert.ok(identifierSymbol != null);
@@ -264,8 +258,10 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
       if (error) {
         return Promise.reject(error);
       }
+      const { rows } = queryResult;
       const groups: { [valueIndex: number]: any[] } = Object.create(null);
-      for (const result of queryResult.rows) {
+      for (let i = 0, l = rows.length; i < l; i++) {
+        const result = rows[i];
         const valueIndex =
           identifierIndex != null ? result[identifierIndex] : 0;
         if (!groups[valueIndex]) {
@@ -274,17 +270,10 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
           groups[valueIndex].push(result);
         }
       }
-      for (const valueIndex in groups) {
-        const resultIndexes = valueIndexToResultIndexes[valueIndex];
-        for (let i = 0, l = resultIndexes.length; i < l; i++) {
-          const resultIndex = resultIndexes[i];
-          const deferred = results[resultIndex];
-          deferred.resolve(groups[valueIndex]);
-          unresolvedDefers.delete(deferred);
-        }
-      }
-      for (const unresolvedDefer of unresolvedDefers) {
-        unresolvedDefer.resolve([]);
+      for (let i = 0, l = remainingDeferreds.length; i < l; i++) {
+        const remainingDeferred = remainingDeferreds[i];
+        const value = groups[i] ?? [];
+        remainingDeferred.resolve(value);
       }
     }
     if (!many) {
