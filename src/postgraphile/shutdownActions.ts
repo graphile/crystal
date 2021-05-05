@@ -8,7 +8,7 @@ export class ShutdownActions {
     if (this.didInvoke) {
       console.warn("WARNING: shutdown action added after shutdown actions were invoked; we'll call it now but your program may have already moved on.");
       setImmediate(() => {
-        action().catch(e => {
+        Promise.resolve(action()).catch(e => {
           console.error("Error occurred calling shutdown action after invoke:");
           console.error(e);
         });
