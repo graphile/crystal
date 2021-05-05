@@ -128,8 +128,8 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
   }
 
   applyAuthorizationChecksToPlan($plan: PgClassSelectPlan<this>) {
-    $plan.where(sql`true`);
     // e.g. $plan.where(sql`user_id = ${me}`);
+    $plan.where(sql`true /* authorization checks */`);
     return;
   }
 
