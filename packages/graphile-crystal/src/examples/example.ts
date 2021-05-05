@@ -152,7 +152,7 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
       identifiers,
       identifierSymbol,
     } = op;
-    const valueIndexToResultIndex: number[] = [];
+    const valueIndexToResultIndexes: number[][] = [];
     let sqlValues = rawSqlValues;
     assert.ok(
       identifiers != null,
@@ -194,15 +194,16 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
       } else {
         let valueIndex = jsonToCounter[identifiersJSON];
         if (valueIndex != null) {
-          valueIndexToResultIndex[valueIndex] = resultIndex;
+          valueIndexToResultIndexes[valueIndex].push(resultIndex);
         } else {
           valueIndex = ++counter;
           jsonToCounter[identifiersJSON] = valueIndex;
-          valueIndexToResultIndex[resultIndex] = valueIndex;
+          valueIndexToResultIndexes[valueIndex] = [resultIndex];
         }
         const pendingResult = defer<any[]>(); // CRITICAL: this MUST resolve later
         unresolvedDefers.add(pendingResult);
         results[resultIndex] = pendingResult;
+        scopedCache.set(identifiersJSON, pendingResult);
       }
     }
 
@@ -274,21 +275,26 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
         }
       }
       for (const valueIndex in groups) {
-        const resultIndex = valueIndexToResultIndex[valueIndex];
-        const deferred = results[resultIndex];
-        deferred.resolve(groups[valueIndex]);
-        unresolvedDefers.delete(deferred);
+        const resultIndexes = valueIndexToResultIndexes[valueIndex];
+        for (let i = 0, l = resultIndexes.length; i < l; i++) {
+          const resultIndex = resultIndexes[i];
+          const deferred = results[resultIndex];
+          deferred.resolve(groups[valueIndex]);
+          unresolvedDefers.delete(deferred);
+        }
       }
       for (const unresolvedDefer of unresolvedDefers) {
         unresolvedDefer.resolve([]);
       }
     }
     if (!many) {
-      return {
-        values: Promise.all(results.map(async (r) => (await r)?.[0] ?? null)),
-      };
+      const values = await Promise.all(
+        results.map(async (r) => (await r)?.[0] ?? null),
+      );
+      return { values };
     } else {
-      return { values: Promise.all(results) };
+      const values = await Promise.all(results);
+      return { values };
     }
   }
 }
