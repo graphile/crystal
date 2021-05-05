@@ -164,10 +164,11 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
       this.cache.set(context, cacheForContext);
     }
 
-    let cacheForQuery = cacheForContext.get(text);
+    const textAndValues = `${text}\n${JSON.stringify(rawSqlValues)}`;
+    let cacheForQuery = cacheForContext.get(textAndValues);
     if (!cacheForQuery) {
       cacheForQuery = new Map();
-      cacheForContext.set(text, cacheForQuery);
+      cacheForContext.set(textAndValues, cacheForQuery);
     }
 
     const scopedCache = cacheForQuery;
