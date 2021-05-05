@@ -387,6 +387,7 @@ export interface HttpRequestHandler<
  */
 export interface WithPostGraphileContextOptions {
   pgPool: Pool;
+  shutdownActions: ShutdownActions;
   jwtToken?: string;
   jwtSecret?: jwt.Secret;
   jwtPublicKey?: jwt.Secret | jwt.GetPublicKeyOrSecret;
