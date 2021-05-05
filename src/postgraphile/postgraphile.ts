@@ -93,7 +93,7 @@ export function getPostgraphileSchemaBuilder<
     while (true) {
       try {
         if (options.watchPg) {
-          const releaseWatchFn = await watchPostGraphileSchema(
+          const releaseWatchFnPromise = watchPostGraphileSchema(
             pgPool,
             pgSchemas,
             options,
@@ -103,7 +103,13 @@ export function getPostgraphileSchemaBuilder<
               exportGqlSchema(gqlSchema);
             },
           );
-          shutdownActions.add(releaseWatchFn);
+          // We must register the shutdown action immediately to avoid a race condition.
+          shutdownActions.add(async () => {
+            const releaseWatchFn = await releaseWatchFnPromise;
+            releaseWatchFn();
+          });
+          // Wait for the watch to be set up before progressing.
+          await releaseWatchFnPromise;
           if (!gqlSchema) {
             throw new Error(
               "Consistency error: watchPostGraphileSchema promises to call the callback before the promise resolves; but this hasn't happened",
@@ -134,6 +140,7 @@ export function getPostgraphileSchemaBuilder<
             if (!retry) {
               // Swallow new error so old error is still thrown
               await shutdownActions.invokeAll().catch(e => {
+                console.error("An additional error occured whilst calling shutdownActions.invokeAll():");
                 console.error(e);
               });
               throw error;

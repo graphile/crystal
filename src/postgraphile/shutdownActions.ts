@@ -11,7 +11,7 @@ export class ShutdownActions {
   remove(action: Action): void {
     const index = this.actions.indexOf(action);
     if (index === -1) {
-      throw Error('The specified shutdown action was not found.');
+      throw new Error('The specified shutdown action was not found.');
     }
     this.actions.splice(index, 1);
   }
@@ -35,8 +35,8 @@ export class ShutdownActions {
   }
 
   async invokeAll(): Promise<void> {
-    // This would be better if it used `Promise.allSettled()` but we can't use
-    // it yet.
+    // TODO:v5: This would be better if it used `Promise.allSettled()` but we can't
+    // use it yet.
     await Promise.all(this.invoke());
   }
 }
