@@ -6,10 +6,12 @@ export class ShutdownActions {
 
   add(action: Action): void {
     if (this.didInvoke) {
-      console.warn("WARNING: shutdown action added after shutdown actions were invoked; we'll call it now but your program may have already moved on.");
+      console.warn(
+        "WARNING: shutdown action added after shutdown actions were invoked; we'll call it now but your program may have already moved on.",
+      );
       setImmediate(() => {
         Promise.resolve(action()).catch(e => {
-          console.error("Error occurred calling shutdown action after invoke:");
+          console.error('Error occurred calling shutdown action after invoke:');
           console.error(e);
         });
       });

@@ -140,7 +140,9 @@ export function getPostgraphileSchemaBuilder<
             if (!retry) {
               // Swallow new error so old error is still thrown
               await shutdownActions.invokeAll().catch(e => {
-                console.error("An additional error occured whilst calling shutdownActions.invokeAll():");
+                console.error(
+                  'An additional error occured whilst calling shutdownActions.invokeAll():',
+                );
                 console.error(e);
               });
               throw error;
