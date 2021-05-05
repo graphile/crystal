@@ -40,7 +40,10 @@ import { resolve } from "path";
 import { inspect } from "util";
 import debugFactory from "debug";
 import { map } from "../plans";
+import LRU from "@graphile/lru";
 
+const EMPTY_OBJECT = Object.freeze(Object.create(null));
+const EMPTY_ARRAY = Object.freeze([]);
 const debug = debugFactory("crystal:example");
 
 const testPool = new Pool({ connectionString: "graphile_crystal" });
@@ -99,6 +102,8 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
   { text: string; values?: any[] },
   TData
 > {
+  private cache: WeakMap<object, LRU<string, Map<string, any>>> = new WeakMap();
+
   /**
    * @param tableIdentifier - the SQL for the `FROM` clause (without any
    * aliasing). If this is a subquery don't forget to wrap it in parens.
@@ -114,6 +119,10 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
     super();
   }
 
+  toString() {
+    return chalk.bold.blue(`PgDataSource(${this.name})`);
+  }
+
   applyAuthorizationChecksToPlan($plan: PgClassSelectPlan<this>) {
     $plan.where(sql`true`);
     // e.g. $plan.where(sql`user_id = ${me}`);
@@ -121,24 +130,15 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
   }
 
   async execute(
-    _context: any,
-    op:
-      | {
-          text: string;
-          rawSqlValues?: any[];
-          many: boolean;
-          identifierIndex?: null;
-          identifiers?: null;
-          identifierSymbol?: null;
-        }
-      | {
-          text: string;
-          rawSqlValues: any[];
-          many: boolean;
-          identifierIndex: number;
-          identifiers: any[];
-          identifierSymbol: symbol;
-        },
+    context: object,
+    op: {
+      text: string;
+      rawSqlValues: any[];
+      many: boolean;
+      identifiers: any[];
+      identifierIndex?: number | null;
+      identifierSymbol?: symbol | null;
+    },
   ): Promise<{ values: any }> {
     const {
       text,
@@ -151,103 +151,125 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
     const valueIndexToResultIndex: number[] = [];
     let sqlValues = rawSqlValues;
     assert.ok(
-      (identifierIndex == null) === (identifiers == null),
-      "Expected identifierIndex and identifiers to either both be null or neither be null",
+      identifiers != null,
+      "Identifiers must always be set; we use it for caching.",
     );
-    if (identifierIndex != null && identifiers != null) {
-      assert.ok(
-        identifierSymbol != null,
-        "If identifiers are in use, identifierSymbol must not be null",
-      );
-      assert.ok(
-        sqlValues != null,
-        "If identifiers are in use, sqlValues must not be null",
-      );
-      let counter = -1;
-      const jsonToCounter: { [key: string]: number } = {};
-      for (
-        let valueIndex = 0, valueCount = identifiers.length;
-        valueIndex < valueCount;
-        valueIndex++
-      ) {
-        const identifiersJSON = JSON.stringify(identifiers); // TODO: Canonical? Manual for perf?
-        const idx = jsonToCounter[identifiersJSON];
-        if (idx != null) {
-          valueIndexToResultIndex[valueIndex] = idx;
-        } else {
-          valueIndexToResultIndex[valueIndex] = ++counter;
-          jsonToCounter[identifiersJSON] = counter;
-        }
-      }
 
-      let found = false;
-      sqlValues = sqlValues.map((v) => {
-        // THIS IS A DELIBERATE HACK - we are replacing this symbol with a value
-        // before executing the query.
-        if ((v as any) === identifierSymbol) {
-          found = true;
-          // Manual JSON-ing
-          return "[" + Object.keys(jsonToCounter).join(",") + "]";
-        } else {
-          return v;
-        }
-      });
-      if (!found) {
-        throw new Error(
-          "Query with identifiers was executed, but no identifier reference was found in the values passed",
+    let cacheForContext = this.cache.get(context);
+    if (!cacheForContext) {
+      cacheForContext = new LRU({ maxLength: 500 /* SQL queries */ });
+      this.cache.set(context, cacheForContext);
+    }
+
+    let cacheForQuery = cacheForContext.get(text);
+    if (!cacheForQuery) {
+      cacheForQuery = new Map();
+      cacheForContext.set(text, cacheForQuery);
+    }
+
+    const scopedCache = cacheForQuery;
+
+    let counter = -1;
+    const jsonToCounter: { [key: string]: number } = {};
+    const identifiersCount = identifiers.length;
+    const results: any[][] = new Array(identifiersCount).fill([]);
+    for (let resultIndex = 0; resultIndex < identifiersCount; resultIndex++) {
+      const identifiersJSON = JSON.stringify(identifiers[resultIndex]); // TODO: Canonical? Manual for perf?
+      const existingResult = scopedCache.get(identifiersJSON);
+      if (existingResult) {
+        debug(
+          "%s served %s from cache: %o",
+          this,
+          identifiersJSON,
+          existingResult,
         );
-      }
-    }
-    let queryResult: any, error: any;
-    try {
-      queryResult = await this.pool.query({
-        text,
-        values: sqlValues,
-        rowMode: "array",
-      });
-    } catch (e) {
-      error = e;
-    }
-    console.log();
-    console.log();
-    console.log(chalk.bgWhite("👇".repeat(30)));
-    console.log(`# SQL QUERY:`);
-    console.log(formatSQLForDebugging(text));
-    console.log();
-    console.log(`# PLACEHOLDERS:`);
-    console.log(inspect(sqlValues, { colors: true }));
-    console.log();
-    if (error) {
-      console.log(`# ERROR:`);
-      console.dir(error);
-    } else {
-      console.log(`# RESULT:`);
-      console.log(inspect(queryResult.rows, { colors: true }));
-    }
-    console.log(chalk.bgWhite("👆".repeat(30)));
-    console.log();
-    console.log();
-    if (error) {
-      return Promise.reject(error);
-    }
-    if (identifierIndex != null && identifiers != null) {
-      const groups = {};
-      for (const result of queryResult.rows) {
-        const groupKey = result[identifierIndex];
-        if (!groups[groupKey]) {
-          groups[groupKey] = [result];
+        results[resultIndex] = existingResult;
+      } else {
+        let valueIndex = jsonToCounter[identifiersJSON];
+        if (valueIndex != null) {
+          valueIndexToResultIndex[valueIndex] = resultIndex;
         } else {
-          groups[groupKey].push(result);
+          valueIndex = ++counter;
+          jsonToCounter[identifiersJSON] = valueIndex;
+          valueIndexToResultIndex[resultIndex] = valueIndex;
         }
       }
-      const result = identifiers.map((_, valueIdx) => {
-        const idx = valueIndexToResultIndex[valueIdx];
-        return many ? groups[idx] ?? [] : groups[idx]?.[0] ?? null;
-      });
-      return { values: result };
+    }
+
+    const remaining = Object.keys(jsonToCounter);
+    if (remaining.length) {
+      if (identifierIndex != null) {
+        assert.ok(identifierSymbol != null);
+        let found = false;
+        sqlValues = sqlValues.map((v) => {
+          // THIS IS A DELIBERATE HACK - we are replacing this symbol with a value
+          // before executing the query.
+          if ((v as any) === identifierSymbol) {
+            found = true;
+            // Manual JSON-ing
+            return "[" + remaining.join(",") + "]";
+          } else {
+            return v;
+          }
+        });
+        if (!found) {
+          throw new Error(
+            "Query with identifiers was executed, but no identifier reference was found in the values passed",
+          );
+        }
+      }
+      let queryResult: any, error: any;
+      try {
+        queryResult = await this.pool.query({
+          text,
+          values: sqlValues,
+          rowMode: "array",
+        });
+      } catch (e) {
+        error = e;
+      }
+      console.log();
+      console.log();
+      console.log(chalk.bgWhite("👇".repeat(30)));
+      console.log(`# SQL QUERY:`);
+      console.log(formatSQLForDebugging(text));
+      console.log();
+      console.log(`# PLACEHOLDERS:`);
+      console.log(inspect(sqlValues, { colors: true }));
+      console.log();
+      if (error) {
+        console.log(`# ERROR:`);
+        console.dir(error);
+      } else {
+        console.log(`# RESULT:`);
+        console.log(inspect(queryResult.rows, { colors: true }));
+      }
+      console.log(chalk.bgWhite("👆".repeat(30)));
+      console.log();
+      console.log();
+      if (error) {
+        return Promise.reject(error);
+      }
+      for (const result of queryResult.rows) {
+        const valueIndex =
+          identifierIndex != null ? result[identifierIndex] : 0;
+        const resultIndex = valueIndexToResultIndex[valueIndex];
+        if (results[resultIndex].length === 0) {
+          const identifiersJSON = remaining[valueIndex];
+          const obj = [result];
+          scopedCache.set(identifiersJSON, obj);
+          results[resultIndex] = obj;
+        } else {
+          results[resultIndex].push(result);
+        }
+      }
+    }
+    if (!many) {
+      return {
+        values: results.map((r) => (r ? r[0] : null)),
+      };
     } else {
-      const result = many ? queryResult.rows : queryResult.rows[0];
-      return { values: result };
+      return { values: results };
     }
   }
 }
@@ -790,34 +812,23 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
 
     const { text, values: rawSqlValues } = sql.compile(query);
 
-    const obj =
-      identifierIndex !== null
-        ? {
-            text,
-            rawSqlValues,
-            many: this.many,
-            identifierIndex,
-            identifiers: values.flatMap((value) =>
-              this.identifierIds.map((id) => value[id]),
-            ),
-            identifierSymbol: this.identifierSymbol,
-          }
-        : {
-            text,
-            rawSqlValues,
-            many: this.many,
-          };
-
     // TODO: IMPORTANT: how to handle different connections with different claims?
-    const executionResult = await this.dataSource.execute({}, obj);
+    const scope = EMPTY_OBJECT;
+    const executionResult = await this.dataSource.execute(scope, {
+      text,
+      rawSqlValues,
+      many: this.many,
+      identifierIndex,
+      identifiers: values.map((value) =>
+        identifierIndex
+          ? this.identifierIds.map((id) => value[id])
+          : EMPTY_ARRAY,
+      ),
+      identifierSymbol: this.identifierSymbol,
+    });
     debug("%s; result: %o", this, executionResult);
 
-    if (identifierIndex !== null) {
-      return executionResult.values;
-    } else {
-      // There's no identifiers, so everyone gets the same results.
-      return values.map(() => executionResult.values);
-    }
+    return executionResult.values;
   }
 
   /**
