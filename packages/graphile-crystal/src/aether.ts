@@ -31,7 +31,13 @@ import {
 } from "./plan";
 import { graphqlCollectFields, getDirective } from "./graphqlCollectFields";
 import { InputPlan, inputPlan, InputObjectPlan } from "./input";
-import { defaultValueToValueNode, uid, UniqueId, isPromise } from "./utils";
+import {
+  defaultValueToValueNode,
+  uid,
+  UniqueId,
+  isPromise,
+  ROOT_VALUE_OBJECT,
+} from "./utils";
 import {
   graphqlMergeSelectionSets,
   typesUsedInSelections,
@@ -53,15 +59,9 @@ import { isCrystalObject } from "./resolvers";
 
 import debugFactory from "debug";
 
-const debug = debugFactory("crystal:aether");
+const EMPTY_INDEXES = Object.freeze([] as number[]);
 
-/**
- * The parent object is used as the key in `GetValuePlanId()`; for root level
- * fields it's possible that the parent will be null/undefined (in all other
- * cases it will be an object), so we need a value that can be the key in a
- * WeakMap to represent the root.
- */
-const ROOT_VALUE_OBJECT = Object.freeze(Object.create(null));
+const debug = debugFactory("crystal:aether");
 
 const globalState = {
   aether: null as Aether | null,
@@ -174,24 +174,33 @@ export class Aether {
   ) {
     globalState.aether = this;
     this.variableValuesPlan = new __ValuePlan();
+    debug("Constructed variableValuesPlan %s", this.variableValuesPlan);
     // TODO: this should use a more intelligent tracked object plan since the variables are strongly typed (unlike context/rootValue).
     this.trackedVariableValuesPlan = new __TrackedObjectPlan(
       variableValues,
       this.variableValuesPlan,
       this.variableValuesConstraints,
     );
+    debug(
+      "Constructed trackedVariableValuesPlan %s",
+      this.trackedVariableValuesPlan,
+    );
     this.contextPlan = new __ValuePlan();
+    debug("Constructed contextPlan %s", this.contextPlan);
     this.trackedContextPlan = new __TrackedObjectPlan(
       context,
       this.contextPlan,
       this.contextConstraints,
     );
+    debug("Constructed trackedContextPlan %s", this.trackedContextPlan);
     this.rootValuePlan = new __ValuePlan();
+    debug("Constructed rootValuePlan %s", this.rootValuePlan);
     this.trackedRootValuePlan = new __TrackedObjectPlan(
       rootValue,
       this.rootValuePlan,
       this.rootValueConstraints,
     );
+    debug("Constructed trackedRootValuePlan %s", this.trackedRootValuePlan);
     this.planIdByPathIdentity = Object.assign(Object.create(null), {
       "": this.rootValuePlan.id,
     });
@@ -754,6 +763,7 @@ export class Aether {
     rootValue: unknown,
   ): CrystalContext {
     const rootId = uid();
+    debug("Root id is %c", rootId);
     const crystalContext: CrystalContext = {
       resultByIdByPlanId: Object.assign(Object.create(null), {
         // TODO: maybe we should populate the initial values here rather than
@@ -767,19 +777,25 @@ export class Aether {
       crystalContext,
       this.variableValuesPlan,
       rootId,
+      EMPTY_INDEXES,
       variableValues,
+      "variableValues",
     );
     /*@__INLINE__*/ populateValuePlan(
       crystalContext,
       this.contextPlan,
       rootId,
+      EMPTY_INDEXES,
       context,
+      "context",
     );
     /*@__INLINE__*/ populateValuePlan(
       crystalContext,
       this.rootValuePlan,
       rootId,
+      EMPTY_INDEXES,
       rootValue,
+      "rootValue",
     );
     return crystalContext;
   }
@@ -908,8 +924,16 @@ export class Aether {
       const indexes =
         crystalObject[$$indexesByPathIdentity][plan.parentPathIdentity];
       if (id && indexes) {
-        const previousResult = resultById[id]?.get(indexes);
-        if (previousResult !== undefined) {
+        const indexesStr = indexes.join(",");
+        debug(
+          "Looking for id %c, indexes %c for plan %c in resultById %c",
+          id,
+          indexes,
+          plan.id,
+          resultById,
+        );
+        if (resultById[id]?.has(indexesStr)) {
+          const previousResult = resultById[id].get(indexesStr);
           const innerIndexes =
             crystalObject[$$indexesByPathIdentity][plan.pathIdentity];
 
@@ -1061,7 +1085,7 @@ export class Aether {
         if (!resultById[id]) {
           resultById[id] = new Map();
         }
-        resultById[id].set(indexes, result[j]);
+        resultById[id].set(indexes.join(), result[j]);
       }
 
       debug(
@@ -1083,23 +1107,43 @@ export class Aether {
   getValuePlanId(
     crystalContext: CrystalContext,
     valuePlan: __ValuePlan,
-    object: object | null | undefined,
+    object: object,
+    pathIdentity: string,
   ): UniqueId {
     assert.ok(
       valuePlan instanceof __ValuePlan,
       "Expected getValuePlanId to be called with a __ValuePlan",
     );
+    assert.ok(
+      object != null,
+      "object passed to getValuePlanId cannot be null; consider using ROOT_VALUE_OBJECT",
+    );
     let valueIdByObject = this.valueIdByObjectByPlanId[valuePlan.id];
     if (!valueIdByObject) {
       valueIdByObject = new WeakMap();
+      valueIdByObject.set(ROOT_VALUE_OBJECT, crystalContext.rootId);
       this.valueIdByObjectByPlanId[valuePlan.id] = valueIdByObject;
     }
-    const key = object || ROOT_VALUE_OBJECT;
+    const key = object;
     let valueId = valueIdByObject.get(key);
     if (valueId === undefined) {
       valueId = uid();
+      debug(
+        "No id for object %c (parent object of %s) against plan %s, generated %c",
+        key,
+        pathIdentity,
+        valuePlan,
+        valueId,
+      );
       valueIdByObject.set(key, valueId);
-      populateValuePlan(crystalContext, valuePlan, valueId, object);
+      populateValuePlan(
+        crystalContext,
+        valuePlan,
+        valueId,
+        EMPTY_INDEXES, // TODO: this seems wrong
+        key,
+        "parent",
+      );
     }
     return valueId;
   }
@@ -1112,12 +1156,16 @@ function populateValuePlan(
   crystalContext: CrystalContext,
   valuePlan: Plan,
   valueId: UniqueId,
+  indexes: readonly number[],
   object: any,
+  label: string,
 ): void {
   let resultById = crystalContext.resultByIdByPlanId[valuePlan.id];
   if (!resultById) {
     resultById = Object.create(null) as Record<symbol, any>;
     crystalContext.resultByIdByPlanId[valuePlan.id] = resultById;
   }
-  resultById[valueId] = object;
+  resultById[valueId] = new Map<string, any>();
+  resultById[valueId].set(indexes.join(), object ?? ROOT_VALUE_OBJECT);
+  debug("Populated value plan for %s: %c", label, resultById);
 }

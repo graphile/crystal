@@ -1357,20 +1357,18 @@ async function main() {
     console.log();
     console.log();
     console.log();
-    try {
-      const result = await graphql({
-        schema,
-        source,
-        variableValues,
-        contextValue: {},
-        rootValue: null,
-      });
+    const result = await graphql({
+      schema,
+      source,
+      variableValues,
+      contextValue: {},
+      rootValue: null,
+    });
 
-      console.log("GraphQL result:");
-      logGraphQLResult(result);
-    } catch (e) {
-      console.error("GraphQL execution failed:");
-      console.error(e);
+    console.log("GraphQL result:");
+    logGraphQLResult(result);
+    if (result.errors) {
+      throw new Error("Aborting due to errors");
     }
   }
 

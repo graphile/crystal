@@ -19,6 +19,14 @@ import {
 } from "graphql";
 import { isDev } from "./dev";
 
+/**
+ * The parent object is used as the key in `GetValuePlanId()`; for root level
+ * fields it's possible that the parent will be null/undefined (in all other
+ * cases it will be an object), so we need a value that can be the key in a
+ * WeakMap to represent the root.
+ */
+export const ROOT_VALUE_OBJECT = Object.freeze(Object.create(null));
+
 const COLORS = [
   //chalk.black,
   chalk.yellow,
@@ -287,6 +295,9 @@ export function isPromise<T>(t: T | Promise<T>): t is Promise<T> {
 export function crystalPrint(
   symbol: symbol | symbol[] | Record<symbol, any> | Map<any, any>,
 ): string {
+  if (symbol === ROOT_VALUE_OBJECT) {
+    return chalk.gray`(blank)`;
+  }
   if (Array.isArray(symbol)) {
     return `[${symbol
       .map((value, i) =>

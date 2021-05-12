@@ -53,7 +53,9 @@ export interface CrystalContext {
    *
    */
   resultByIdByPlanId: {
-    [planId: number]: Record<UniqueId, Map<number[], any>> | undefined;
+    [planId: number]:
+      | Record<UniqueId, Map<string /* indexes, joined with commas */, any>>
+      | undefined;
   };
 
   metaByPlanId: {

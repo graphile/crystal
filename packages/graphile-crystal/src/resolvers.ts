@@ -27,7 +27,13 @@ import {
   $$pathIdentity,
   $$indexes,
 } from "./interfaces";
-import { uid, UniqueId, crystalPrint, compressedPathIdentity } from "./utils";
+import {
+  uid,
+  UniqueId,
+  crystalPrint,
+  compressedPathIdentity,
+  ROOT_VALUE_OBJECT,
+} from "./utils";
 import { defer, Deferred } from "./deferred";
 import { isDev } from "./dev";
 
@@ -90,7 +96,9 @@ export function crystalWrapResolve<
     context,
     info,
   ) {
-    const parentObject: TSource | CrystalObject<any> = source;
+    const parentObject:
+      | Exclude<TSource, null | undefined>
+      | CrystalObject<any> = source ?? ROOT_VALUE_OBJECT;
     // Note: in the ResolveFieldValueCrystal algorithm it uses `document` and
     // `operationName`; however all it really needs is the `operation` and
     // `fragments`, so that's what we extract here.
@@ -139,6 +147,7 @@ export function crystalWrapResolve<
       return realResolver(objectValue, argumentValues, context, info);
     }
     const id = uid();
+    debug("id for resolver at %s is %c", pathIdentity, id);
     const batch = aether.getBatch(
       pathIdentity,
       parentObject,
@@ -175,6 +184,7 @@ export function crystalWrapResolve<
         crystalContext,
         parentPlan,
         parentObject,
+        pathIdentity,
       );
       const indexes: number[] = [];
       parentCrystalObject = newCrystalObject(
@@ -364,7 +374,7 @@ function newCrystalObject<TData>(
     },
   };
   if (isDev) {
-    debug(`Constructed %s with data %o`, crystalObject, data);
+    debug(`Constructed %s with data %c`, crystalObject, data);
   }
   return crystalObject;
 }
