@@ -80,7 +80,7 @@ class ObjectPlan<TData extends { [key: string]: any }> extends Plan<TData> {
   }
 
   execute(values: Array<Array<TData[keyof TData]>>): Array<TData> {
-    return values.map(this.tupleToObject);
+    return values.map(this.tupleToObject.bind(this));
   }
 }
 
@@ -90,54 +90,58 @@ export function object<TData extends { [key: string]: any }>(
   return new ObjectPlan<TData>(obj);
 }
 
-/*
-class ListPlan<TData extends any[]> extends Plan<[...TData]> {
-  private results: Array<TData> = [];
-  constructor(obj: [...Plan<TData>]) {
+type UnwrapPlanTuple<TPlanTuple extends readonly Plan<any>[]> = [
+  ...(TPlanTuple extends readonly Plan<infer U>[] ? readonly U[] : never)
+];
+
+class ListPlan<TPlanTuple extends readonly Plan<any>[]> extends Plan<
+  UnwrapPlanTuple<TPlanTuple>
+> {
+  private results: Array<UnwrapPlanTuple<TPlanTuple>> = [];
+  constructor(list: readonly [...TPlanTuple]) {
     super();
-    for (let i = 0, l = this.keys.length; i < l; i++) {
-      this.addDependency(obj[this.keys[i]]);
+    for (let i = 0, l = list.length; i < l; i++) {
+      this.addDependency(list[i]);
     }
   }
 
-  // TODO: JIT this function
-  tupleToObject(tuple: Array<TData[keyof TData]>): TData {
+  tupleToTuple(
+    tuple: UnwrapPlanTuple<TPlanTuple>,
+  ): UnwrapPlanTuple<TPlanTuple> {
+    const tupleLength = tuple.length;
     // Note: `outerloop` is a JavaScript "label". They are not very common.
     // First look for an existing match:
     outerloop: for (let i = 0, l = this.results.length; i < l; i++) {
-      const [values, obj] = this.results[i];
+      const existingTuple = this.results[i];
       // Shortcut for identical tuples (unlikely).
-      if (values === tuple) {
-        return obj;
+      if (existingTuple === tuple) {
+        return existingTuple;
       }
       // Slow loop over each value in the tuples; this is not expected to be a
       // particularly big loop, typically only 2-5 keys.
-      for (let j = 0, m = this.keys.length; j < m; j++) {
-        if (values[j] !== tuple[j]) {
+      for (let j = 0; j < tupleLength; j++) {
+        if (existingTuple[j] !== tuple[j]) {
           // This isn't a match; try the next record in the outer loop
           continue outerloop;
         }
       }
-      return obj;
+      return existingTuple;
     }
 
-    // That failed; create a new object.
-    const newObj = this.keys.reduce((memo, key, i) => {
-      memo[key] = tuple[i];
-      return memo;
-    }, {} as Partial<TData>) as TData;
-
-    // Cache newObj so the same tuple values result in the exact same object.
-    this.results.push([tuple, newObj]);
-    return newObj;
+    // That failed; store this tuple so the same tuple values result in the exact same array.
+    this.results.push(tuple);
+    return tuple;
   }
 
-  execute(values: Array<Array<TData[keyof TData]>>): Array<TData> {
-    return values.map(this.tupleToObject);
+  execute(
+    values: Array<UnwrapPlanTuple<TPlanTuple>>,
+  ): Array<UnwrapPlanTuple<TPlanTuple>> {
+    return values.map(this.tupleToTuple.bind(this));
   }
 }
 
-export function list<TData extends any>(list: any): ListPlan<TData> {
-  return new ListPlan<TData>(list);
+export function list<TPlanTuple extends Plan<any>[]>(
+  list: TPlanTuple,
+): ListPlan<TPlanTuple> {
+  return new ListPlan(list);
 }
-*/
