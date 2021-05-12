@@ -67,11 +67,11 @@ export const getPgClientAndReleaserFromConfig = async (
       debug("pgClient error occurred: %s", e);
     });
     releasePgClient = () =>
-      new Promise<undefined>((resolve, reject) =>
+      new Promise<void>((resolve, reject) =>
         client.end((err) => (err ? reject(err) : resolve())),
       );
 
-    await new Promise((resolve, reject) =>
+    await new Promise<void>((resolve, reject) =>
       client.connect((err) => (err ? reject(err) : resolve())),
     );
   } else {

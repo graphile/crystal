@@ -30,7 +30,7 @@ import {
   GraphQLBoolean,
   GraphQLInputObjectType,
 } from "graphql";
-import sql, { SQL } from "../../../pg-sql2/dist";
+import sql, { SQL } from "pg-sql2";
 import { crystalEnforce } from "..";
 import { Plan, __TrackedObjectPlan, __ValuePlan } from "../plan";
 import prettier from "prettier";
@@ -39,12 +39,13 @@ import { Pool } from "pg";
 import { resolve } from "path";
 import { inspect } from "util";
 import debugFactory from "debug";
-import { map } from "../plans";
+import { map, object, aether } from "../plans";
 import LRU from "@graphile/lru";
 import { Deferred, defer } from "../deferred";
+import { Aether } from "../aether";
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
-const EMPTY_ARRAY = Object.freeze([]);
+const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 const debug = debugFactory("crystal:example");
 
 const testPool = new Pool({ connectionString: "graphile_crystal" });
@@ -104,8 +105,11 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
   TData
 > {
   private cache: WeakMap<
-    object,
-    LRU<string, Map<string, Deferred<any[]>>>
+    object /* context */,
+    LRU<
+      string /* query and variables */,
+      Map<string /* identifiers (JSON) */, Deferred<any[]>>
+    >
   > = new WeakMap();
 
   /**
@@ -127,6 +131,11 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
     return chalk.bold.blue(`PgDataSource(${this.name})`);
   }
 
+  context() {
+    const a: Aether = aether();
+    return object({ pgSettings: a.contextPlan.get("pgSettings") });
+  }
+
   applyAuthorizationChecksToPlan($plan: PgClassSelectPlan<this>) {
     // e.g. $plan.where(sql`user_id = ${me}`);
     $plan.where(sql`true /* authorization checks */`);
@@ -134,12 +143,11 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
   }
 
   async execute(
-    context: object,
-    op: {
+    values: ReadonlyArray<{ context: any; identifiers: ReadonlyArray<any> }>,
+    common: {
       text: string;
-      rawSqlValues: any[];
+      rawSqlValues: Array<any>;
       many: boolean;
-      identifiers: any[];
       identifierIndex?: number | null;
       identifierSymbol?: symbol | null;
     },
@@ -149,134 +157,158 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
       rawSqlValues,
       many,
       identifierIndex,
-      identifiers,
       identifierSymbol,
-    } = op;
+    } = common;
     let sqlValues = rawSqlValues;
-    assert.ok(
-      identifiers != null,
-      "Identifiers must always be set; we use it for caching.",
-    );
 
-    let cacheForContext = this.cache.get(context);
-    if (!cacheForContext) {
-      cacheForContext = new LRU({ maxLength: 500 /* SQL queries */ });
-      this.cache.set(context, cacheForContext);
-    }
+    const valuesCount = values.length;
+    const results: Deferred<any[]>[] = new Array(valuesCount);
 
-    const textAndValues = `${text}\n${JSON.stringify(rawSqlValues)}`;
-    let cacheForQuery = cacheForContext.get(textAndValues);
-    if (!cacheForQuery) {
-      cacheForQuery = new Map();
-      cacheForContext.set(textAndValues, cacheForQuery);
-    }
-
-    const scopedCache = cacheForQuery;
-
-    const remaining: string[] = [];
-    const remainingDeferreds: Array<Deferred<any[]>> = [];
-    const identifiersCount = identifiers.length;
-
-    // Concurrent requests to the same identifiers should result in the same value/execution.
-    const results: Deferred<any[]>[] = new Array(identifiersCount);
-    for (let resultIndex = 0; resultIndex < identifiersCount; resultIndex++) {
-      const identifiersJSON = JSON.stringify(identifiers[resultIndex]); // TODO: Canonical? Manual for perf?
-      const existingResult = scopedCache.get(identifiersJSON);
-      if (existingResult) {
-        debug(
-          "%s served %s from cache: %o",
-          this,
-          identifiersJSON,
-          existingResult,
-        );
-        results[resultIndex] = existingResult;
-      } else {
-        assert.ok(
-          remaining.includes(identifiersJSON) === false,
-          "Should only fetch each identifiersJSON once, future entries in the loop should receive previous deferred",
-        );
-        const pendingResult = defer<any[]>(); // CRITICAL: this MUST resolve later
-        results[resultIndex] = pendingResult;
-        scopedCache.set(identifiersJSON, pendingResult);
-        remaining.push(identifiersJSON) - 1;
-        remainingDeferreds.push(pendingResult);
+    // Group by context
+    const groupMap = new Map();
+    for (
+      let resultIndex = 0, l = values.length;
+      resultIndex < l;
+      resultIndex++
+    ) {
+      const { context, identifiers } = values[resultIndex];
+      if (!groupMap.get(context)) {
+        groupMap.set(context, []);
       }
+      groupMap.get(context).push({ identifiers, resultIndex });
     }
 
-    if (remaining.length) {
-      if (identifierIndex != null) {
-        assert.ok(identifierSymbol != null);
-        let found = false;
-        sqlValues = sqlValues.map((v) => {
-          // THIS IS A DELIBERATE HACK - we are replacing this symbol with a value
-          // before executing the query.
-          if ((v as any) === identifierSymbol) {
-            found = true;
-            // Manual JSON-ing
-            return "[" + remaining.join(",") + "]";
-          } else {
-            return v;
+    // For each context, run the relevant fetches
+    const promises: Promise<void>[] = [];
+    for (const [context, batch] of groupMap.entries()) {
+      promises.push(
+        (async () => {
+          let cacheForContext = this.cache.get(context);
+          if (!cacheForContext) {
+            cacheForContext = new LRU({ maxLength: 500 /* SQL queries */ });
+            this.cache.set(context, cacheForContext);
           }
-        });
-        if (!found) {
-          throw new Error(
-            "Query with identifiers was executed, but no identifier reference was found in the values passed",
-          );
-        }
-      }
-      let queryResult: any, error: any;
-      try {
-        // TODO: we could probably make this more efficient by grouping the
-        // deferreds further, DataLoader-style, and running one SQL query for
-        // everything.
-        queryResult = await this.pool.query({
-          text,
-          values: sqlValues,
-          rowMode: "array",
-        });
-      } catch (e) {
-        error = e;
-      }
-      console.log();
-      console.log();
-      console.log(chalk.bgWhite("👇".repeat(30)));
-      console.log(`# SQL QUERY:`);
-      console.log(formatSQLForDebugging(text));
-      console.log();
-      console.log(`# PLACEHOLDERS:`);
-      console.log(inspect(sqlValues, { colors: true }));
-      console.log();
-      if (error) {
-        console.log(`# ERROR:`);
-        console.dir(error);
-      } else {
-        console.log(`# RESULT:`);
-        console.log(inspect(queryResult.rows, { colors: true }));
-      }
-      console.log(chalk.bgWhite("👆".repeat(30)));
-      console.log();
-      console.log();
-      if (error) {
-        return Promise.reject(error);
-      }
-      const { rows } = queryResult;
-      const groups: { [valueIndex: number]: any[] } = Object.create(null);
-      for (let i = 0, l = rows.length; i < l; i++) {
-        const result = rows[i];
-        const valueIndex =
-          identifierIndex != null ? result[identifierIndex] : 0;
-        if (!groups[valueIndex]) {
-          groups[valueIndex] = [result];
-        } else {
-          groups[valueIndex].push(result);
-        }
-      }
-      for (let i = 0, l = remainingDeferreds.length; i < l; i++) {
-        const remainingDeferred = remainingDeferreds[i];
-        const value = groups[i] ?? [];
-        remainingDeferred.resolve(value);
-      }
+
+          const textAndValues = `${text}\n${JSON.stringify(rawSqlValues)}`;
+          let cacheForQuery = cacheForContext.get(textAndValues);
+          if (!cacheForQuery) {
+            cacheForQuery = new Map();
+            cacheForContext.set(textAndValues, cacheForQuery);
+          }
+
+          const scopedCache = cacheForQuery;
+
+          const remaining: string[] = [];
+          const remainingDeferreds: Array<Deferred<any[]>> = [];
+
+          // Concurrent requests to the same identifiers should result in the same value/execution.
+          const batchSize = batch.length;
+          for (let batchIndex = 0; batchIndex < batchSize; batchIndex++) {
+            const { identifiers, resultIndex } = batch[batchIndex];
+            const identifiersJSON = JSON.stringify(identifiers); // TODO: Canonical? Manual for perf?
+            const existingResult = scopedCache.get(identifiersJSON);
+            if (existingResult) {
+              debug(
+                "%s served %s from cache: %o",
+                this,
+                identifiersJSON,
+                existingResult,
+              );
+              results[resultIndex] = existingResult;
+            } else {
+              assert.ok(
+                remaining.includes(identifiersJSON) === false,
+                "Should only fetch each identifiersJSON once, future entries in the loop should receive previous deferred",
+              );
+              const pendingResult = defer<any[]>(); // CRITICAL: this MUST resolve later
+              results[resultIndex] = pendingResult;
+              scopedCache.set(identifiersJSON, pendingResult);
+              remaining.push(identifiersJSON) - 1;
+              remainingDeferreds.push(pendingResult);
+            }
+          }
+
+          if (remaining.length) {
+            if (identifierIndex != null) {
+              assert.ok(identifierSymbol != null);
+              let found = false;
+              sqlValues = sqlValues.map((v) => {
+                // THIS IS A DELIBERATE HACK - we are replacing this symbol with a value
+                // before executing the query.
+                if ((v as any) === identifierSymbol) {
+                  found = true;
+                  // Manual JSON-ing
+                  return "[" + remaining.join(",") + "]";
+                } else {
+                  return v;
+                }
+              });
+              if (!found) {
+                throw new Error(
+                  "Query with identifiers was executed, but no identifier reference was found in the values passed",
+                );
+              }
+            }
+            let queryResult: any, error: any;
+            try {
+              // TODO: we could probably make this more efficient by grouping the
+              // deferreds further, DataLoader-style, and running one SQL query for
+              // everything.
+              queryResult = await this.pool.query({
+                text,
+                values: sqlValues,
+                rowMode: "array",
+              });
+            } catch (e) {
+              error = e;
+            }
+            console.log();
+            console.log();
+            console.log(chalk.bgWhite("👇".repeat(30)));
+            console.log(`# SQL QUERY:`);
+            console.log(formatSQLForDebugging(text));
+            console.log();
+            console.log(`# PLACEHOLDERS:`);
+            console.log(inspect(sqlValues, { colors: true }));
+            console.log();
+            if (error) {
+              console.log(`# ERROR:`);
+              console.dir(error);
+            } else {
+              console.log(`# RESULT:`);
+              console.log(inspect(queryResult.rows, { colors: true }));
+            }
+            console.log(chalk.bgWhite("👆".repeat(30)));
+            console.log();
+            console.log();
+            if (error) {
+              remainingDeferreds.forEach((d) => d.reject(error));
+              return Promise.reject(error);
+            }
+            const { rows } = queryResult;
+            const groups: { [valueIndex: number]: any[] } = Object.create(null);
+            for (let i = 0, l = rows.length; i < l; i++) {
+              const result = rows[i];
+              const valueIndex =
+                identifierIndex != null ? result[identifierIndex] : 0;
+              if (!groups[valueIndex]) {
+                groups[valueIndex] = [result];
+              } else {
+                groups[valueIndex].push(result);
+              }
+            }
+            for (let i = 0, l = remainingDeferreds.length; i < l; i++) {
+              const remainingDeferred = remainingDeferreds[i];
+              const value = groups[i] ?? [];
+              remainingDeferred.resolve(value);
+            }
+          }
+        })(),
+      );
     }
+
+    await Promise.all(promises);
+
     if (!many) {
       const values = await Promise.all(
         results.map(async (r) => (await r)?.[0] ?? null),
@@ -571,6 +603,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
   private cursorPlan: Plan<any> | null;
 
   private canInline = true;
+  private contextId: number;
 
   constructor(
     dataSource: TDataSource,
@@ -582,6 +615,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
   ) {
     super();
     this.dataSource = dataSource;
+    this.contextId = this.addDependency(this.dataSource.context());
     this.identifiers = identifiers;
     this.identifierIds = identifiers.map(({ plan }) =>
       this.addDependency(plan),
@@ -829,18 +863,23 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
 
     // TODO: IMPORTANT: how to handle different connections with different claims?
     const scope = EMPTY_OBJECT;
-    const executionResult = await this.dataSource.execute(scope, {
-      text,
-      rawSqlValues,
-      many: this.many,
-      identifierIndex,
-      identifiers: values.map((value) =>
-        identifierIndex
-          ? this.identifierIds.map((id) => value[id])
-          : EMPTY_ARRAY,
-      ),
-      identifierSymbol: this.identifierSymbol,
-    });
+    const executionResult = await this.dataSource.execute(
+      values.map((value) => {
+        return {
+          context: value[this.contextId],
+          identifiers: identifierIndex
+            ? this.identifierIds.map((id) => value[id])
+            : EMPTY_ARRAY,
+        };
+      }),
+      {
+        text,
+        rawSqlValues,
+        many: this.many,
+        identifierIndex,
+        identifierSymbol: this.identifierSymbol,
+      },
+    );
     debug("%s; result: %o", this, executionResult);
 
     return executionResult.values;

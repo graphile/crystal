@@ -27,9 +27,10 @@ export default (function PgBackwardRelationPlugin(
 ) {
   const legacyRelationMode =
     {
+      omit: OMIT,
       only: ONLY,
       deprecated: DEPRECATED,
-    }[pgLegacyRelations || ""] || OMIT;
+    }[pgLegacyRelations || "omit"] || OMIT;
   builder.hook(
     "GraphQLObjectType:fields",
     (fields, build, context) => {

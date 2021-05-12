@@ -18,13 +18,13 @@ export default function callbackToAsyncIterator<CallbackInput, ReturnVal>(
   } = {},
 ): AsyncIterableIterator<CallbackInput> {
   const { onError = defaultOnError, buffering = true, onClose } = options;
-  let pullQueue: ((result?: IteratorResult<CallbackInput, any>) => void)[] = [];
+  let pullQueue: ((result: IteratorResult<CallbackInput, any>) => void)[] = [];
   let pushQueue: CallbackInput[] = [];
   let listening = true;
   let listenerReturnValue: ReturnVal | null | undefined;
 
   function pushValue(value: CallbackInput) {
-    if (pullQueue.length !== 0) {
+    if (pullQueue.length > 0) {
       pullQueue.shift()!({ value, done: false });
     } else if (buffering === true) {
       pushQueue.push(value);

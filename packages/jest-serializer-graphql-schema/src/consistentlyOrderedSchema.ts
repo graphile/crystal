@@ -18,6 +18,10 @@ import {
 
 type Maybe<T> = null | undefined | T;
 
+function isNotNullish<T>(v: T): v is T extends null | undefined ? never : T {
+  return v != null;
+}
+
 /**
  * This function is heavily based on
  * {@link https://github.com/graphql/graphql-js/blob/0eb088b3d1228ac60568912c705401341f3b769d/src/utilities/lexicographicSortSchema.js | `lexicographicSortSchema` from `graphql`}
@@ -36,7 +40,7 @@ export function consistentlyOrderedSchema(
 
   return new GraphQLSchema({
     ...schemaConfig,
-    types: Object.values(typeMap),
+    types: Object.values(typeMap).filter(isNotNullish),
     directives: sortByName(schemaConfig.directives).map(sortDirective),
     query: replaceMaybeType(schemaConfig.query),
     mutation: replaceMaybeType(schemaConfig.mutation),

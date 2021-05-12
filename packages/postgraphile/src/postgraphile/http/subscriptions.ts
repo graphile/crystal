@@ -26,7 +26,7 @@ import { isEmpty } from "./createPostGraphileHttpRequestHandler";
 import liveSubscribe from "./liveSubscribe";
 
 interface Deferred<T> extends Promise<T> {
-  resolve: (input?: T | PromiseLike<T> | undefined) => void;
+  resolve: (input: T | PromiseLike<T>) => void;
   reject: (error: Error) => void;
 }
 
@@ -38,7 +38,7 @@ function lowerCaseKeys(obj: object): object {
 }
 
 function deferred<T = void>(): Deferred<T> {
-  let resolve: (input?: T | PromiseLike<T> | undefined) => void;
+  let resolve: (input: T | PromiseLike<T>) => void;
   let reject: (error: Error) => void;
   const promise = new Promise<T>((_resolve, _reject): void => {
     resolve = _resolve;
@@ -116,7 +116,7 @@ export async function enhanceHttpServerWithSubscriptions<
   ): Promise<void> => {
     for (const middleware of middlewares) {
       // TODO: add Koa support
-      await new Promise((resolve, reject): void => {
+      await new Promise<void>((resolve, reject): void => {
         middleware(req, res, (err) => (err ? reject(err) : resolve()));
       });
     }
@@ -143,7 +143,7 @@ export async function enhanceHttpServerWithSubscriptions<
       dummyRes.writeHead = function (
         this: Response,
         statusCode: number,
-        _statusMessage?: OutgoingHttpHeaders | string | undefined,
+        _reasonPhrase?: OutgoingHttpHeaders | string | undefined,
         headers?: OutgoingHttpHeaders | undefined,
       ): Response {
         if (statusCode && statusCode > 200) {
@@ -160,7 +160,7 @@ export async function enhanceHttpServerWithSubscriptions<
           socket.close();
         }
         return this;
-      };
+      } as any;
       await applyMiddleware(options.websocketMiddlewares, req, dummyRes);
 
       // reqResFromSocket is only called once per socket, so there's no race condition here
