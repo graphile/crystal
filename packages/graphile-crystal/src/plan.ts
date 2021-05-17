@@ -54,7 +54,9 @@ export abstract class Plan<TData = any> {
   public isFinalized = false;
   public readonly id: number;
   public readonly groupId: number;
+  /** @deprecated Only __ItemPlan should need access to this */
   public readonly pathIdentity: string;
+  /** @deprecated Only __ItemPlan should need access to this */
   public readonly parentPathIdentity: string;
 
   constructor() {
