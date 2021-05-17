@@ -29,6 +29,7 @@ import {
   GraphQLInt,
   GraphQLBoolean,
   GraphQLInputObjectType,
+  Thunk,
 } from "graphql";
 import sql, { SQL } from "pg-sql2";
 import { crystalEnforce } from "..";
@@ -438,24 +439,28 @@ function objectSpec<
   TContext extends BaseGraphQLContext,
   TParentPlan extends Plan<any>
 >(
-  spec: GraphQLObjectTypeConfig<any, TContext> & {
-    fields: {
+  spec: Omit<GraphQLObjectTypeConfig<any, TContext>, "fields"> & {
+    fields: Thunk<{
       [key: string]: GraphileCrystalFieldConfig<
         TContext,
         TParentPlan,
         any,
         any
       >;
-    };
+    }>;
   },
 ): GraphQLObjectTypeConfig<any, TContext> {
-  const modifiedFields = Object.keys(spec.fields).reduce((o, key) => {
-    o[key] = objectFieldSpec<TContext, TParentPlan>(spec.fields[key]);
-    return o;
-  }, {} as GraphQLFieldConfigMap<any, TContext>);
   const modifiedSpec: GraphQLObjectTypeConfig<any, TContext> = {
     ...spec,
-    fields: modifiedFields,
+    fields: () => {
+      const fields =
+        typeof spec.fields === "function" ? spec.fields() : spec.fields;
+      const modifiedFields = Object.keys(fields).reduce((o, key) => {
+        o[key] = objectFieldSpec<TContext, TParentPlan>(fields[key]);
+        return o;
+      }, {} as GraphQLFieldConfigMap<any, TContext>);
+      return modifiedFields;
+    },
   };
   return modifiedSpec;
 }
@@ -1250,14 +1255,29 @@ const MessageCondition = new GraphQLInputObjectType({
   },
 });
 
-const Forum = new GraphQLObjectType(
+const Forum: GraphQLObjectType<
+  any,
+  GraphileResolverContext
+> = new GraphQLObjectType(
   objectSpec<GraphileResolverContext, ForumPlan>({
     name: "Forum",
-    fields: {
+    fields: () => ({
+      id: {
+        type: GraphQLString,
+        plan($forum) {
+          return $forum.get("id");
+        },
+      },
       name: {
         type: GraphQLString,
         plan($forum) {
           return $forum.get("name");
+        },
+      },
+      self: {
+        type: Forum,
+        plan($forum) {
+          return $forum;
         },
       },
       messagesList: {
@@ -1315,7 +1335,7 @@ const Forum = new GraphQLObjectType(
           return $connectionPlan;
         },
       },
-    },
+    }),
   }),
 );
 
@@ -1483,6 +1503,20 @@ async function main() {
       {
         forums {
           name
+        }
+      }
+    `);
+  }
+
+  if (Math.random() < 2) {
+    await test(/* GraphQL */ `
+      {
+        forums {
+          name
+          self {
+            id
+            name
+          }
         }
       }
     `);

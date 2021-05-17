@@ -1064,9 +1064,10 @@ export class Aether {
     if (pendingCrystalObjectsLength > 0) {
       const dependenciesCount = plan.dependencies.length;
       const dependencyValuesList = new Array(dependenciesCount);
+
       for (let i = 0; i < dependenciesCount; i++) {
         const dependencyPlanId = plan.dependencies[i];
-        const dependencyPlan = this.plans[dependencyPlanId];
+        let dependencyPlan = this.plans[dependencyPlanId];
         if (isDev) {
           assert.ok(
             dependencyPlan,
@@ -1075,15 +1076,52 @@ export class Aether {
             )}'`,
           );
         }
+        let listDepth = 0;
+        while (dependencyPlan instanceof __ListItemPlan) {
+          listDepth++;
+          dependencyPlan = this.plans[dependencyPlan.dependencies[0]];
+        }
         const dependencyResult = await this.executePlan(
           dependencyPlan,
           crystalContext,
           pendingCrystalObjects,
           visitedPlans,
         );
-        dependencyValuesList[i] = dependencyResult;
+        if (listDepth > 0) {
+          const arr = new Array(pendingCrystalObjectsLength);
+          for (
+            let pendingCrystalObjectIndex = 0;
+            pendingCrystalObjectIndex < pendingCrystalObjectsLength;
+            pendingCrystalObjectIndex++
+          ) {
+            const pendingCrystalObject =
+              pendingCrystalObjects[pendingCrystalObjectIndex];
+            const indexes =
+              pendingCrystalObject[$$indexesByPathIdentity][
+                dependencyPlan.pathIdentity
+              ];
+            if (!indexes) {
+              throw new Error(
+                "Attempted to access __ListItemPlan with unknown indexes",
+              );
+            }
+            if (indexes.length !== listDepth) {
+              throw new Error(
+                `Attempted to access __ListItemPlan with incorrect list depth (${indexes.length} != ${listDepth})`,
+              );
+            }
+            const item = /*!__INLINE__*/ atIndexes(dependencyResult, indexes);
+            arr[pendingCrystalObjectIndex] = item;
+          }
+          dependencyValuesList[i] = arr;
+        } else {
+          // Optimisation
+          dependencyValuesList[i] = dependencyResult;
+        }
       }
+
       const values = new Array(pendingCrystalObjectsLength);
+
       for (let i = 0; i < pendingCrystalObjectsLength; i++) {
         const entry = new Array(dependenciesCount);
         for (let j = 0; j < dependenciesCount; j++) {
@@ -1092,6 +1130,7 @@ export class Aether {
         }
         values[i] = entry;
       }
+
       let meta = crystalContext.metaByPlanId[plan.id];
       if (!meta) {
         meta = Object.create(null) as object;
@@ -1099,13 +1138,18 @@ export class Aether {
       }
       // Note: the `execute` method on plans is responsible for memoizing
       // results into `meta`.
+      if (plan instanceof __ListItemPlan) {
+        throw new Error(
+          "Should never attempt to execute __ListItemPlan; that should be handled whilst evaluating dependencies",
+        );
+      }
       const pendingResults = await plan.execute(values, meta);
       if (isDev) {
         assert.ok(
           Array.isArray(pendingResults),
           "Expected plan execution to return a list",
         );
-        assert.equal(
+        assert.strictEqual(
           pendingResults.length,
           pendingCrystalObjectsLength,
           "Expected plan execution to return same number of results as inputs",
