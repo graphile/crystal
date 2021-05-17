@@ -1,5 +1,6 @@
 import { Plan } from "./plan";
 import { getCurrentAether, Aether } from "./aether";
+import { CrystalResultsList, CrystalValuesList } from "./interfaces";
 
 class MapPlan extends Plan {
   private mapper: (obj: object) => object;
@@ -144,4 +145,27 @@ export function list<TPlanTuple extends Plan<any>[]>(
   list: TPlanTuple,
 ): ListPlan<TPlanTuple> {
   return new ListPlan(list);
+}
+
+class FirstPlan<TData> extends Plan<TData> {
+  constructor(parentPlan: Plan<ReadonlyArray<TData>>) {
+    super();
+    this.addDependency(parentPlan);
+  }
+
+  execute(
+    values: CrystalValuesList<[ReadonlyArray<TData>]>,
+  ): CrystalResultsList<TData> {
+    return values.map((tuple) => tuple[0]?.[0]);
+  }
+}
+
+/**
+ * A plan that resolves to the first entry in the list returned by the given
+ * plan.
+ */
+export function first<TPlan extends Plan<ReadonlyArray<any>>>(
+  plan: TPlan,
+): FirstPlan<TPlan extends Plan<ReadonlyArray<infer U>> ? U : never> {
+  return new FirstPlan(plan);
 }

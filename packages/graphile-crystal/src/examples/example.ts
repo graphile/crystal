@@ -32,14 +32,19 @@ import {
 } from "graphql";
 import sql, { SQL } from "pg-sql2";
 import { crystalEnforce } from "..";
-import { Plan, __TrackedObjectPlan, __ValuePlan } from "../plan";
+import {
+  Plan,
+  __TrackedObjectPlan,
+  __ValuePlan,
+  __ListItemPlan,
+} from "../plan";
 import prettier from "prettier";
 
 import { Pool } from "pg";
 import { resolve } from "path";
 import { inspect } from "util";
 import debugFactory from "debug";
-import { map, object, aether } from "../plans";
+import { map, object, aether, first } from "../plans";
 import LRU from "@graphile/lru";
 import { Deferred, defer } from "../deferred";
 import { Aether } from "../aether";
@@ -1005,12 +1010,12 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
    * does currently). Beware: if you call this and the database might actually
    * return more than one record then you're potentially in for a Bad Time.
    */
-  single() {
+  single(): PgClassSelectSinglePlan<TDataSource> {
     this.setUnique(true);
     // TODO: should this be on a clone plan? I don't currently think so since
     // PgClassSelectSinglePlan does not allow for `.where` divergence (since it
     // does not support `.where`).
-    return new PgClassSelectSinglePlan(this, true);
+    return new PgClassSelectSinglePlan(this, first(this));
   }
 
   /**
@@ -1026,8 +1031,10 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
    * IMPORTANT: do not call `.listItem` from user code; it's only intended to
    * be called by Graphile Crystal.
    */
-  listItem() {
-    return new PgClassSelectSinglePlan(this);
+  listItem(
+    itemPlan: __ListItemPlan<PgClassSelectPlan<TDataSource>>,
+  ): PgClassSelectSinglePlan<TDataSource> {
+    return new PgClassSelectSinglePlan(this, itemPlan);
   }
 }
 
@@ -1042,14 +1049,14 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
 class PgClassSelectSinglePlan<
   TDataSource extends PgDataSource<any>
 > extends Plan<TDataSource["TRow"]> {
-  private classPlanId: number;
+  private itemPlanId: number;
 
   constructor(
     public readonly classPlan: PgClassSelectPlan<TDataSource>,
-    private selectFirst: boolean = false,
+    itemPlan: Plan<TDataSource["TRow"]>,
   ) {
     super();
-    this.classPlanId = this.addDependency(classPlan);
+    this.itemPlanId = this.addDependency(itemPlan);
   }
 
   /**
@@ -1063,16 +1070,9 @@ class PgClassSelectSinglePlan<
     this.classPlan.cursor();
 
   execute(
-    values: CrystalValuesList<
-      [
-        /* if this.selectFirst, then: */ | ReadonlyArray<TDataSource["TRow"]>
-        | /* otherwise: */ TDataSource["TRow"],
-      ]
-    >,
+    values: CrystalValuesList<[TDataSource["TRow"]]>,
   ): CrystalResultsList<TDataSource["TRow"]> {
-    return values.map((value) =>
-      this.selectFirst ? value[this.classPlanId]?.[0] : value[this.classPlanId],
-    );
+    return values.map((value) => value[this.itemPlanId]);
   }
 }
 

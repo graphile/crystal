@@ -20,6 +20,9 @@ import {
   isInputObjectType,
   GraphQLInputObjectType,
   GraphQLInputField,
+  GraphQLOutputType,
+  GraphQLList,
+  GraphQLNonNull,
 } from "graphql";
 import {
   Plan,
@@ -28,6 +31,7 @@ import {
   assertFinalized,
   PolymorphicPlan,
   ArgumentPlan,
+  __ListItemPlan,
 } from "./plan";
 import { graphqlCollectFields, getDirective } from "./graphqlCollectFields";
 import { InputPlan, inputPlan, InputObjectPlan } from "./input";
@@ -67,6 +71,21 @@ const globalState = {
   aether: null as Aether | null,
   pathIdentity: "" as string,
 };
+
+interface ListCapablePlan<TData> extends Plan<TData> {
+  listItem(itemPlan: __ListItemPlan<Plan<ReadonlyArray<TData>>>): Plan<TData>;
+}
+
+function assertListCapablePlan<TData>(
+  plan: Plan<TData>,
+  pathIdentity: string,
+): asserts plan is ListCapablePlan<TData> {
+  if (!("listItem" in plan) || typeof (plan as any).listItem !== "function") {
+    throw new Error(
+      `The plan returned from '${pathIdentity}' should be a list capable plan, but it does not implement the 'listItem' method.`,
+    );
+  }
+}
 
 /**
  * Since plan functions are called synchronously _by us_ we don't need to pass
@@ -379,82 +398,115 @@ export class Aether {
         plan = new __ValuePlan();
       }
       this.planIdByPathIdentity[pathIdentity] = plan.id;
-      const unwrappedFieldType = getNamedType(fieldType);
-      // TODO:  see the list depth of fieldType and assert that the data to be returned has the same depth if we can.
-      const isObjectType = unwrappedFieldType instanceof GraphQLObjectType;
-      const isInterfaceType =
-        unwrappedFieldType instanceof GraphQLInterfaceType;
-      const isUnionType = unwrappedFieldType instanceof GraphQLUnionType;
-      if (isObjectType || isInterfaceType || isUnionType) {
-        const subSelectionSet = graphqlMergeSelectionSets(fields);
-        if (isObjectType) {
-          this.planSelectionSet(
-            pathIdentity,
-            plan,
-            unwrappedFieldType as GraphQLObjectType,
+
+      this.planSelectionSetForType(fieldType, fields, pathIdentity, plan);
+      this.groupId = oldGroupId;
+    }
+  }
+
+  /**
+   * This algorithm wasn't originally planned, but we should not have jumped
+   * straight to getNamedType in the plan. This method lets us walk the type
+   * tree and add in `__ListItemPlan`s in the relevant places so that we can
+   * refer to indexes when referencing the relevant values.
+   */
+  planSelectionSetForType(
+    fieldType: GraphQLOutputType,
+    fields: FieldNode[],
+    pathIdentity: string,
+    plan: Plan<any>,
+  ): void {
+    if (fieldType instanceof GraphQLNonNull) {
+      // TODO: we could implement a __NonNullPlan in future; currently we just
+      // defer that to GraphQL.js
+      this.planSelectionSetForType(
+        fieldType.ofType,
+        fields,
+        pathIdentity,
+        plan,
+      );
+      return;
+    } else if (fieldType instanceof GraphQLList) {
+      assertListCapablePlan(plan, pathIdentity);
+      const listItemPlan = plan.listItem(new __ListItemPlan(plan));
+      this.planSelectionSetForType(
+        fieldType.ofType,
+        fields,
+        pathIdentity,
+        listItemPlan,
+      );
+      return;
+    }
+    const isObjectType = fieldType instanceof GraphQLObjectType;
+    const isInterfaceType = fieldType instanceof GraphQLInterfaceType;
+    const isUnionType = fieldType instanceof GraphQLUnionType;
+    if (isObjectType || isInterfaceType || isUnionType) {
+      const subSelectionSet = graphqlMergeSelectionSets(fields);
+      if (isObjectType) {
+        this.planSelectionSet(
+          pathIdentity,
+          plan,
+          fieldType as GraphQLObjectType,
+          subSelectionSet,
+          false,
+        );
+      } else {
+        assertPolymorphicPlan(plan);
+        const polymorphicPlan = plan;
+        const planPossibleObjectTypes = (
+          possibleObjectTypes: readonly GraphQLObjectType[],
+        ): void => {
+          for (let i = 0, l = possibleObjectTypes.length; i < l; i++) {
+            const possibleObjectType = possibleObjectTypes[i];
+            // This line implements `GetPolymorphicObjectPlanForType`.
+            const subPlan = polymorphicPlan.planForType(possibleObjectType);
+            this.planSelectionSet(
+              pathIdentity,
+              subPlan,
+              possibleObjectType,
+              subSelectionSet,
+              false,
+            );
+          }
+        };
+        if (isUnionType) {
+          const unionType = fieldType as GraphQLUnionType;
+          const possibleObjectTypes = typesUsedInSelections(
+            this,
+            unionType.getTypes(),
             subSelectionSet,
-            false,
           );
+          /*@__INLINE__*/ planPossibleObjectTypes(possibleObjectTypes);
         } else {
-          assertPolymorphicPlan(plan);
-          const polymorphicPlan = plan;
-          const planPossibleObjectTypes = (
-            possibleObjectTypes: readonly GraphQLObjectType[],
-          ): void => {
-            for (let i = 0, l = possibleObjectTypes.length; i < l; i++) {
-              const possibleObjectType = possibleObjectTypes[i];
-              // This line implements `GetPolymorphicObjectPlanForType`.
-              const subPlan = polymorphicPlan.planForType(possibleObjectType);
-              this.planSelectionSet(
-                pathIdentity,
-                subPlan,
-                possibleObjectType,
-                subSelectionSet,
-                false,
-              );
-            }
-          };
-          if (isUnionType) {
-            const unionType = unwrappedFieldType as GraphQLUnionType;
+          assert.ok(
+            isInterfaceType,
+            "Impossible. isObjectType and isUnionType are false so isInterfaceType must be true",
+          );
+          const interfaceType = fieldType as GraphQLInterfaceType;
+          // If we reference non-introspection fields on the interface type (or
+          // any of the interface types it implements) then we need to plan for
+          // every single object type that implements this interface; otherwise
+          // we only need to plan the reachable types.
+          const implementations = this.schema.getImplementations(interfaceType)
+            .objects;
+          if (
+            interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
+              this,
+              interfaceType,
+              subSelectionSet,
+            )
+          ) {
+            /*@__INLINE__*/ planPossibleObjectTypes(implementations);
+          } else {
             const possibleObjectTypes = typesUsedInSelections(
               this,
-              unionType.getTypes(),
+              implementations,
               subSelectionSet,
             );
             /*@__INLINE__*/ planPossibleObjectTypes(possibleObjectTypes);
-          } else {
-            assert.ok(
-              isInterfaceType,
-              "Impossible. isObjectType and isUnionType are false so isInterfaceType must be true",
-            );
-            const interfaceType = unwrappedFieldType as GraphQLInterfaceType;
-            // If we reference non-introspection fields on the interface type (or
-            // any of the interface types it implements) then we need to plan for
-            // every single object type that implements this interface; otherwise
-            // we only need to plan the reachable types.
-            const implementations = this.schema.getImplementations(
-              interfaceType,
-            ).objects;
-            if (
-              interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
-                this,
-                interfaceType,
-                subSelectionSet,
-              )
-            ) {
-              /*@__INLINE__*/ planPossibleObjectTypes(implementations);
-            } else {
-              const possibleObjectTypes = typesUsedInSelections(
-                this,
-                implementations,
-                subSelectionSet,
-              );
-              /*@__INLINE__*/ planPossibleObjectTypes(possibleObjectTypes);
-            }
           }
         }
       }
-      this.groupId = oldGroupId;
     }
   }
 
