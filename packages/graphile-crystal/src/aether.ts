@@ -1166,6 +1166,7 @@ function populateValuePlan(
     crystalContext.resultByIdByPlanId[valuePlan.id] = resultById;
   }
   resultById[valueId] = new Map<string, any>();
-  resultById[valueId].set(indexes.join(), object ?? ROOT_VALUE_OBJECT);
+  const map = resultById[valueId];
+  map.set(indexes.join(), object ?? ROOT_VALUE_OBJECT);
   debug("Populated value plan for %s: %c", label, resultById);
 }

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/class-name-casing */
 import * as assert from "assert";
 import chalk from "chalk";
 import { Aether, getCurrentAether, getCurrentPathIdentity } from "./aether";
@@ -7,6 +6,11 @@ import { isDev, noop } from "./dev";
 import { inspect } from "util";
 import { GraphQLObjectType } from "graphql";
 import { compressedPathIdentity } from "./utils";
+import {
+  CrystalValuesList,
+  CrystalResultsList,
+  PromiseOrDirect,
+} from "./interfaces";
 
 function reallyAssertFinalized(plan: Plan): void {
   if (!plan.isFinalized) {
@@ -104,9 +108,9 @@ export abstract class Plan<TData = any> {
    * memoizing results) so that you can expand your usage of meta in future.
    */
   public abstract execute(
-    values: any[][],
+    values: CrystalValuesList<ReadonlyArray<any>>,
     meta: {},
-  ): Promise<TData[]> | TData[];
+  ): PromiseOrDirect<CrystalResultsList<TData>>;
 
   /**
    * Our chance to replace ourself with one of our peers, or otherwise optimise

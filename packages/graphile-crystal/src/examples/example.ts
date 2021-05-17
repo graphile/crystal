@@ -43,8 +43,9 @@ import { map, object, aether } from "../plans";
 import LRU from "@graphile/lru";
 import { Deferred, defer } from "../deferred";
 import { Aether } from "../aether";
+import { CrystalValuesList, CrystalResultsList } from "../interfaces";
 
-const EMPTY_OBJECT = Object.freeze(Object.create(null));
+//const EMPTY_OBJECT = Object.freeze(Object.create(null));
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 const debug = debugFactory("crystal:example");
 
@@ -70,18 +71,10 @@ export interface GraphileResolverContext extends BaseGraphQLContext {}
   +--------------------------------------------------------------------------+*/
 
 export abstract class DataSource<
-  TQuery extends Record<string, any>,
-  TData extends { [key: string]: any }
+  TData extends any,
+  TInput extends any,
+  TOptions extends { [key: string]: any }
 > {
-  /**
-   * TypeScript hack so that we can retrieve the TQuery type from a data source
-   * at a later time - needed so we can have strong typing on
-   * `executeQueryWithDataSource` and similar methods.
-   *
-   * @internal
-   */
-  TQuery!: TQuery;
-
   /**
    * TypeScript hack so that we can retrieve the TData type from a data source
    * at a later time - needed so we can have strong typing on `.get()` and
@@ -93,19 +86,40 @@ export abstract class DataSource<
 
   constructor() {}
 
-  abstract execute(context: any, op: TQuery): Promise<{ values: TData[] }>;
+  abstract execute(
+    values: ReadonlyArray<TInput>,
+    options: TOptions,
+  ): Promise<{ values: ReadonlyArray<TData> }>;
 }
+
+type PgDataSourceInput = { context: any; identifiers: ReadonlyArray<any> };
+type PgDataSourceExecuteOptions = {
+  text: string;
+  rawSqlValues: Array<any>;
+  identifierIndex?: number | null;
+  identifierSymbol?: symbol | null;
+};
 
 /**
  * PG data source represents a PostgreSQL data source. This could be a table,
  * view, materialized view, function call, join, etc. Anything table-like.
  */
-class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
-  { text: string; values?: any[] },
-  TData
+class PgDataSource<TRow extends { [key: string]: any }> extends DataSource<
+  ReadonlyArray<TRow>,
+  PgDataSourceInput,
+  PgDataSourceExecuteOptions
 > {
+  /**
+   * TypeScript hack so that we can retrieve the TRow type from a Postgres data
+   * source at a later time - needed so we can have strong typing on `.get()`
+   * and similar methods.
+   *
+   * @internal
+   */
+  TRow!: TRow;
+
   private cache: WeakMap<
-    object /* context */,
+    Record<string, unknown> /* context */,
     LRU<
       string /* query and variables */,
       Map<string /* identifiers (JSON) */, Deferred<any[]>>
@@ -143,26 +157,14 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
   }
 
   async execute(
-    values: ReadonlyArray<{ context: any; identifiers: ReadonlyArray<any> }>,
-    common: {
-      text: string;
-      rawSqlValues: Array<any>;
-      many: boolean;
-      identifierIndex?: number | null;
-      identifierSymbol?: symbol | null;
-    },
-  ): Promise<{ values: any }> {
-    const {
-      text,
-      rawSqlValues,
-      many,
-      identifierIndex,
-      identifierSymbol,
-    } = common;
+    values: CrystalValuesList<PgDataSourceInput>,
+    common: PgDataSourceExecuteOptions,
+  ): Promise<{ values: CrystalValuesList<ReadonlyArray<TRow>> }> {
+    const { text, rawSqlValues, identifierIndex, identifierSymbol } = common;
     let sqlValues = rawSqlValues;
 
     const valuesCount = values.length;
-    const results: Deferred<any[]>[] = new Array(valuesCount);
+    const results: Deferred<Array<TRow>>[] = new Array(valuesCount);
 
     // Group by context
     const groupMap = new Map();
@@ -309,15 +311,8 @@ class PgDataSource<TData extends { [key: string]: any }> extends DataSource<
 
     await Promise.all(promises);
 
-    if (!many) {
-      const values = await Promise.all(
-        results.map(async (r) => (await r)?.[0] ?? null),
-      );
-      return { values };
-    } else {
-      const values = await Promise.all(results);
-      return { values };
-    }
+    const finalResults = await Promise.all(results);
+    return { values: finalResults };
   }
 }
 
@@ -354,10 +349,13 @@ const forumSource = new PgDataSource<{
 
 // Convenience so we don't have to type these out each time. These used to be
 // separate plans, but required too much maintenance.
-type MessagePlan = PgClassSelectPlan<typeof messageSource>;
+type MessagesPlan = PgClassSelectPlan<typeof messageSource>;
 type MessageConnectionPlan = PgConnectionPlan<typeof messageSource>;
-type UserPlan = PgClassSelectPlan<typeof userSource>;
-type ForumPlan = PgClassSelectPlan<typeof forumSource>;
+// type MessagePlan = PgClassSelectSinglePlan<typeof messageSource>;
+// type UsersPlan = PgClassSelectPlan<typeof userSource>;
+type UserPlan = PgClassSelectSinglePlan<typeof userSource>;
+// type ForumsPlan = PgClassSelectPlan<typeof forumSource>;
+type ForumPlan = PgClassSelectSinglePlan<typeof forumSource>;
 
 /*+--------------------------------------------------------------------------+
   |                            PLANS SPECS                                   |
@@ -464,8 +462,8 @@ function objectSpec<
  */
 class PgColumnSelectPlan<
   TDataSource extends PgDataSource<any>,
-  TColumn extends keyof TDataSource["TData"]
-> extends Plan<TDataSource["TData"][TColumn]> {
+  TColumn extends keyof TDataSource["TRow"]
+> extends Plan<TDataSource["TRow"][TColumn]> {
   private tableId: number;
   constructor(
     public table: PgClassSelectPlan<TDataSource>,
@@ -503,7 +501,9 @@ class PgAttributeSelectPlan<TData = any> extends Plan<any> {
     debug(`%s (%s) constructor`, this, attrIndex);
   }
 
-  execute(values: any[][]): TData[] {
+  execute(
+    values: CrystalValuesList<ReadonlyArray<any>>,
+  ): CrystalResultsList<TData> {
     return values.map((v) => v[this.parentPlanIndex][this.attrIndex]);
   }
 }
@@ -520,7 +520,7 @@ class PgAttributeSelectPlan<TData = any> extends Plan<any> {
  * records from them `{a: 1},{a: 2},{a:3}`).
  */
 class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
-  TDataSource["TData"]
+  ReadonlyArray<TDataSource["TRow"]>
 > {
   symbol: symbol;
 
@@ -571,17 +571,22 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
   private identifierSymbol: symbol;
 
   /**
-   * If true, we're expecting each identifier to have 0-n results (i.e. a
-   * list).  If false, we're expecting each identifier to get one result (or
-   * null).
+   * If true, we don't need to add any of the security checks from the data
+   * source; otherwise we must do so. Default false.
    */
-  private many: boolean;
+  private isTrusted: boolean;
 
   /**
-   * If true, we don't need to add any of the security checks from the data
-   * source; otherwise we must do so.
+   * If true, we know at most one result can be matched for each identifier, so
+   * it's safe to do a `LEFT JOIN` without risk of returning duplicates. Default false.
    */
-  private trusted: boolean;
+  private isUnique: boolean;
+
+  /**
+   * If true, we will not attempt to inline this into the parent query.
+   * Default false.
+   */
+  private isInliningForbidden = false;
 
   /**
    * We only want to fetch each column once (since columns don't accept any
@@ -589,7 +594,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
    * their plans can be easily reused.
    */
   private colPlans: {
-    [key in keyof TDataSource["TData"]]?: PgColumnSelectPlan<TDataSource, key>;
+    [key in keyof TDataSource["TRow"]]?: PgColumnSelectPlan<TDataSource, key>;
   };
 
   /**
@@ -602,15 +607,12 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
    */
   private cursorPlan: Plan<any> | null;
 
-  private canInline = true;
   private contextId: number;
 
   constructor(
     dataSource: TDataSource,
     identifiers: Array<{ plan: Plan<any>; type: SQL }>,
     identifierMatchesThunk: (alias: SQL) => SQL[],
-    many = false,
-    trusted = false,
     cloneFrom: PgClassSelectPlan<TDataSource> | null = null,
   ) {
     super();
@@ -621,8 +623,6 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
       this.addDependency(plan),
     );
     this.identifierMatchesThunk = identifierMatchesThunk;
-    this.many = many;
-    this.trusted = trusted;
 
     this.colPlans = cloneFrom ? { ...cloneFrom.colPlans } : {};
     this.identifierSymbol = cloneFrom
@@ -641,6 +641,11 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
       : this.identifiers.length
       ? sql.identifier(Symbol(this.dataSource.name + "_identifiers"))
       : null;
+    this.isTrusted = cloneFrom ? cloneFrom.isTrusted : false;
+    this.isUnique = cloneFrom ? cloneFrom.isUnique : false;
+    this.isInliningForbidden = cloneFrom
+      ? cloneFrom.isInliningForbidden
+      : false;
 
     if (!cloneFrom) {
       if (this.identifiers.length !== this.identifierMatches.length) {
@@ -648,9 +653,6 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
           `'identifiers' and 'identifierMatches' lengths must match (${this.identifiers.length} != ${this.identifierMatches.length})`,
         );
       }
-    }
-    if (!this.trusted) {
-      this.dataSource.applyAuthorizationChecksToPlan(this);
     }
     debug(
       `%s (%s) constructor (%s)`,
@@ -661,8 +663,37 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     return this;
   }
 
-  public forbidInlining() {
-    this.canInline = false;
+  public setInliningForbidden(newInliningForbidden = true) {
+    this.isInliningForbidden = newInliningForbidden;
+    return this;
+  }
+
+  public inliningForbidden() {
+    return this.isInliningForbidden;
+  }
+
+  public setTrusted(newIsTrusted = true) {
+    this.isTrusted = newIsTrusted;
+    return this;
+  }
+
+  public trusted() {
+    return this.isTrusted;
+  }
+
+  /**
+   * Set this true ONLY if there can be at most one match for each of the
+   * identifiers. If you set this true when this is not the case then you may
+   * get unexpected results during inlining; if in doubt leave it at the
+   * default.
+   */
+  public setUnique(newUnique = true) {
+    this.isUnique = newUnique;
+    return this;
+  }
+
+  public unique() {
+    return this.isUnique;
   }
 
   /**
@@ -682,11 +713,14 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     return new PgAttributeSelectPlan(this, attrIndex);
   }
 
+  // TODO: rename this item from `.get` to something more subtle (`._itemGet`
+  // or similar) since you wouldn't normally call `.get` on a list - only on an
+  // item of that list via PgClassSelectSinglePlan.
   /**
    * Returns a plan representing a named attribute (e.g. column) from the class
    * (e.g. table).
    */
-  get<TAttr extends keyof TDataSource["TData"]>(
+  get<TAttr extends keyof TDataSource["TRow"]>(
     attr: TAttr,
   ): PgColumnSelectPlan<TDataSource, TAttr> {
     // Only one plan per column
@@ -745,8 +779,6 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
       this.dataSource,
       this.identifiers,
       this.identifierMatchesThunk,
-      this.many,
-      this.trusted,
       this,
     );
     return clone;
@@ -769,7 +801,9 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
    * NOTE: we don't know what the values being fed in are, we must feed them to
    * the plans stored in this.identifiers to get actual values we can use.
    */
-  async execute(values: any[][]) {
+  async execute(
+    values: CrystalValuesList<any[]>,
+  ): Promise<CrystalResultsList<ReadonlyArray<TDataSource["TRow"]>>> {
     // TODO: can some of this be moved to finalize?
 
     const conditions: SQL[] = [];
@@ -861,11 +895,10 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
 
     const { text, values: rawSqlValues } = sql.compile(query);
 
-    // TODO: IMPORTANT: how to handle different connections with different claims?
-    const scope = EMPTY_OBJECT;
     const executionResult = await this.dataSource.execute(
       values.map((value) => {
         return {
+          // The context is how we'd handle different connections with different claims
           context: value[this.contextId],
           identifiers: identifierIndex
             ? this.identifierIds.map((id) => value[id])
@@ -875,7 +908,6 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
       {
         text,
         rawSqlValues,
-        many: this.many,
         identifierIndex,
         identifierSymbol: this.identifierSymbol,
       },
@@ -892,6 +924,13 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
    */
   toSQL() {}
 
+  finalize() {
+    if (!this.isTrusted) {
+      this.dataSource.applyAuthorizationChecksToPlan(this);
+    }
+    super.finalize();
+  }
+
   optimize(_plans: PgClassSelectPlan<any>[]): Plan {
     // TODO: if FROM, JOIN, WHERE, ORDER, GROUP BY, HAVING, LIMIT, OFFSET all
     // match with one of our peers then we can replace ourself with one of our
@@ -904,9 +943,9 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
 
     // Inline ourself into our parent if we can.
     if (
-      this.canInline &&
+      this.isUnique &&
       !this
-        .many /* TODO: && !this.groupBy && !this.having && !this.limit && !this.order && !this.offset && ... */
+        .isInliningForbidden /* TODO: && !this.groupBy && !this.having && !this.limit && !this.order && !this.offset && ... */
     ) {
       let t: PgClassSelectPlan<any> | null = null;
       for (let i = 0, l = this.dependencies.length; i < l; i++) {
@@ -959,6 +998,82 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
 
     return this;
   }
+
+  /**
+   * If this plan may only return one record, you can use `.single()` to return
+   * a plan that resolves to that record (rather than a list of records as it
+   * does currently). Beware: if you call this and the database might actually
+   * return more than one record then you're potentially in for a Bad Time.
+   */
+  single() {
+    this.setUnique(true);
+    // TODO: should this be on a clone plan? I don't currently think so since
+    // PgClassSelectSinglePlan does not allow for `.where` divergence (since it
+    // does not support `.where`).
+    return new PgClassSelectSinglePlan(this, true);
+  }
+
+  /**
+   * When you return a plan in a situation where GraphQL is expecting a
+   * GraphQLList, it must implement the `.listItem()` method to return a plan
+   * for an individual item within this list. Graphile Crystal will
+   * automatically call this (possibly recursively) to pass to the plan
+   * resolvers on the children of this field.
+   *
+   * NOTE: Graphile Crystal handles the list indexes for you, so your list item
+   * plan should process just the single input list item.
+   *
+   * IMPORTANT: do not call `.listItem` from user code; it's only intended to
+   * be called by Graphile Crystal.
+   */
+  listItem() {
+    return new PgClassSelectSinglePlan(this);
+  }
+}
+
+/**
+ * Represents the single result of a unique PgClassSelectPlan. This might be
+ * retrieved explicitly by PgClassSelectPlan.single(), or implicitly (via
+ * Graphile Crystal) by PgClassSelectPlan.item(). Since this is the result of a
+ * fetch it does not make sense to support changing `.where` or similar;
+ * however methods such as `.get` and `.cursor` are proxied back to the
+ * PgClassSelectPlan.
+ */
+class PgClassSelectSinglePlan<
+  TDataSource extends PgDataSource<any>
+> extends Plan<TDataSource["TRow"]> {
+  private classPlanId: number;
+
+  constructor(
+    public readonly classPlan: PgClassSelectPlan<TDataSource>,
+    private selectFirst: boolean = false,
+  ) {
+    super();
+    this.classPlanId = this.addDependency(classPlan);
+  }
+
+  /**
+   * Returns a plan representing a named attribute (e.g. column) from the class
+   * (e.g. table).
+   */
+  get: typeof PgClassSelectPlan.prototype.get = (attr) =>
+    this.classPlan.get(attr);
+
+  cursor: typeof PgClassSelectPlan.prototype.cursor = () =>
+    this.classPlan.cursor();
+
+  execute(
+    values: CrystalValuesList<
+      [
+        /* if this.selectFirst, then: */ | ReadonlyArray<TDataSource["TRow"]>
+        | /* otherwise: */ TDataSource["TRow"],
+      ]
+    >,
+  ): CrystalResultsList<TDataSource["TRow"]> {
+    return values.map((value) =>
+      this.selectFirst ? value[this.classPlanId]?.[0] : value[this.classPlanId],
+    );
+  }
 }
 
 /*
@@ -992,10 +1107,12 @@ class PgConnectionPlan<TDataSource extends PgDataSource<any>> extends Plan<
     return this.subplan.clone();
   }
 
-  execute(values: any[][]) {
+  execute(
+    values: CrystalValuesList<any[]>,
+  ): CrystalResultsList<Record<string, never>> {
     debug(`%s: execute; values: %o`, this.id, values);
     // TODO
-    return values.map((v) => ({}));
+    return values.map(() => ({}));
   }
 }
 
@@ -1050,9 +1167,7 @@ const Message = new GraphQLObjectType(
             userSource,
             [{ plan: $message.get("author_id"), type: sql`uuid` }],
             (alias) => [sql`${alias}.id`],
-            false, // just one
-          );
-          // $user.forbidInlining();
+          ).single();
           return $user;
         },
       },
@@ -1061,7 +1176,7 @@ const Message = new GraphQLObjectType(
 );
 
 const MessageEdge = new GraphQLObjectType(
-  objectSpec<GraphileResolverContext, MessagePlan>({
+  objectSpec<GraphileResolverContext, MessagesPlan>({
     name: "MessageEdge",
     fields: {
       cursor: {
@@ -1161,9 +1276,8 @@ const Forum = new GraphQLObjectType(
             messageSource,
             [{ plan: $forum.get("id"), type: sql`uuid` }],
             (alias) => [sql`${alias}.forum_id`],
-            true, // many
-            true, // trusted: if you can see forum, you can see message
           );
+          $messages.setTrusted();
           // $messages.leftJoin(...);
           // $messages.innerJoin(...);
           // $messages.relation('fk_messages_author_id')
@@ -1188,9 +1302,8 @@ const Forum = new GraphQLObjectType(
             messageSource,
             [{ plan: $forum.get("id"), type: sql`uuid` }],
             (alias) => [sql`${alias}.forum_id`],
-            true, // many
-            true, // trusted: if you can see forum, you can see message
           );
+          $messages.setTrusted();
           // $messages.leftJoin(...);
           // $messages.innerJoin(...);
           // $messages.relation('fk_messages_author_id')
@@ -1213,12 +1326,7 @@ const Query = new GraphQLObjectType(
       forums: {
         type: new GraphQLList(Forum),
         plan(_$root) {
-          const $forums = new PgClassSelectPlan(
-            forumSource,
-            [],
-            () => [],
-            true,
-          );
+          const $forums = new PgClassSelectPlan(forumSource, [], () => []);
           return $forums;
         },
       },
@@ -1238,8 +1346,6 @@ const Query = new GraphQLObjectType(
             messageSource,
             [],
             (_alias) => [],
-            true, // many
-            false, // untrusted
           );
           // $messages.leftJoin(...);
           // $messages.innerJoin(...);
@@ -1432,13 +1538,13 @@ async function main() {
             condition: { active: true }
             includeArchived: INHERIT
           ) {
-            # nodes {
-            #   body
-            #   author {
-            #     username
-            #     gravatarUrl
-            #   }
-            # }
+            nodes {
+              body
+              author {
+                username
+                gravatarUrl
+              }
+            }
             edges {
               cursor
               node {

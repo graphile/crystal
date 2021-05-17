@@ -64,3 +64,8 @@ export interface CrystalContext {
 
   rootId: UniqueId;
 }
+
+// These values are just to make reading the code a little clearer
+export type CrystalValuesList<T> = ReadonlyArray<T>;
+export type CrystalResultsList<T> = ReadonlyArray<T>;
+export type PromiseOrDirect<T> = Promise<T> | T;

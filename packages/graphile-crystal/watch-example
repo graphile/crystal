@@ -1,1 +1,1 @@
-GRAPHILE_ENV=development DEBUG="crystal:*" yarn nodemon --watch dist dist/examples/example.js
+GRAPHILE_ENV=development DEBUG="crystal:*" yarn nodemon -x 'node --enable-source-maps' --watch dist dist/examples/example.js
