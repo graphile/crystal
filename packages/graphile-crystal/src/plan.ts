@@ -5,12 +5,12 @@ import { Constraint } from "./constraints";
 import { isDev, noop } from "./dev";
 import { inspect } from "util";
 import { GraphQLObjectType } from "graphql";
-import { compressedPathIdentity } from "./utils";
 import {
   CrystalValuesList,
   CrystalResultsList,
   PromiseOrDirect,
 } from "./interfaces";
+import { crystalPrintPathIdentity } from "./utils";
 
 function reallyAssertFinalized(plan: Plan): void {
   if (!plan.isFinalized) {
@@ -75,7 +75,7 @@ export abstract class Plan<TData = any> {
     return chalk.bold.blue(
       `${this.constructor.name}[${inspect(this.id, {
         colors: true,
-      })}@${compressedPathIdentity(this.pathIdentity)}]`,
+      })}@${crystalPrintPathIdentity(this.pathIdentity)}]`,
     );
   }
 

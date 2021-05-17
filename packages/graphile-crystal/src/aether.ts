@@ -159,7 +159,23 @@ export class Aether {
   public readonly batchByPathIdentity: {
     [pathIdentity: string]: Batch | undefined;
   } = Object.create(null);
+
+  /**
+   * The plan by path identity is the plan that will return the results that
+   * the resolver at that plan identity should return.
+   */
   public readonly planIdByPathIdentity: {
+    [pathIdentity: string]: number | undefined;
+  };
+
+  /**
+   * The itemPlan by path identity is like planIdByPathIdentity **except** it
+   * factors in list indexes, i.e. it's the plan for the value that child
+   * fields would receive as their parent object. If the parent returned an
+   * object it'll be the same as planIdByPathIdentity but if the parent
+   * returned a list of objects it would be a `__ListItemPlan`.
+   */
+  public readonly itemPlanIdByPathIdentity: {
     [pathIdentity: string]: number | undefined;
   };
   public readonly valueIdByObjectByPlanId: {
@@ -221,6 +237,9 @@ export class Aether {
     );
     debug("Constructed trackedRootValuePlan %s", this.trackedRootValuePlan);
     this.planIdByPathIdentity = Object.assign(Object.create(null), {
+      "": this.rootValuePlan.id,
+    });
+    this.itemPlanIdByPathIdentity = Object.assign(Object.create(null), {
       "": this.rootValuePlan.id,
     });
     this.operationType = operation.operation;
@@ -397,9 +416,17 @@ export class Aether {
         // Note: this is populated in GetValuePlanId
         plan = new __ValuePlan();
       }
+
       this.planIdByPathIdentity[pathIdentity] = plan.id;
 
-      this.planSelectionSetForType(fieldType, fields, pathIdentity, plan);
+      const itemPlan = this.planSelectionSetForType(
+        fieldType,
+        fields,
+        pathIdentity,
+        plan,
+      );
+      this.itemPlanIdByPathIdentity[pathIdentity] = itemPlan.id;
+
       this.groupId = oldGroupId;
     }
   }
@@ -415,7 +442,7 @@ export class Aether {
     fields: FieldNode[],
     pathIdentity: string,
     plan: Plan<any>,
-  ): void {
+  ): Plan<any> {
     if (fieldType instanceof GraphQLNonNull) {
       // TODO: we could implement a __NonNullPlan in future; currently we just
       // defer that to GraphQL.js
@@ -425,7 +452,7 @@ export class Aether {
         pathIdentity,
         plan,
       );
-      return;
+      return plan;
     } else if (fieldType instanceof GraphQLList) {
       assertListCapablePlan(plan, pathIdentity);
       const listItemPlan = plan.listItem(new __ListItemPlan(plan));
@@ -435,7 +462,7 @@ export class Aether {
         pathIdentity,
         listItemPlan,
       );
-      return;
+      return listItemPlan;
     }
     const isObjectType = fieldType instanceof GraphQLObjectType;
     const isInterfaceType = fieldType instanceof GraphQLInterfaceType;
@@ -508,6 +535,7 @@ export class Aether {
         }
       }
     }
+    return plan;
   }
 
   /**
@@ -733,8 +761,10 @@ export class Aether {
   private treeShakePlans(): void {
     const activePlans = new Set<Plan>();
 
-    for (const pathIdentity in this.planIdByPathIdentity) {
-      const planId = this.planIdByPathIdentity[pathIdentity];
+    // NOTE: every plan referenced in this.planIdByPathIdentity is included in
+    // this.itemPlanIdByPathIdentity, but the reverse is not true.
+    for (const pathIdentity in this.itemPlanIdByPathIdentity) {
+      const planId = this.itemPlanIdByPathIdentity[pathIdentity];
       assert.ok(
         planId != null,
         `Could not find the planId for path identity '${pathIdentity}'`,
@@ -911,6 +941,7 @@ export class Aether {
     }
     try {
       assert.ok(plan, "No plan in batch?!");
+      debug("Batch executing plan %c with %c", plan, crystalObjects);
       const resultsPromise = this.executePlan(
         plan,
         crystalContext,
@@ -973,88 +1004,38 @@ export class Aether {
     for (let i = 0; i < crystalObjectCount; i++) {
       const crystalObject = crystalObjects[i];
       const id = crystalObject[$$idByPathIdentity][plan.parentPathIdentity];
-      const indexes =
-        crystalObject[$$indexesByPathIdentity][plan.parentPathIdentity];
-      if (id && indexes) {
-        const indexesStr = indexes.join(",");
+      if (id) {
         debug(
-          "Looking for id %c, indexes %c for plan %c in resultById %c",
+          "Looking for id %c for plan %c in resultById %c",
           id,
-          indexes,
-          plan.id,
+          plan,
           resultById,
         );
-        if (resultById[id]?.has(indexesStr)) {
-          const previousResult = resultById[id].get(indexesStr);
-          const innerIndexes =
-            crystalObject[$$indexesByPathIdentity][plan.pathIdentity];
-
-          /*
-           * ### What does it mean if innerIndexes is not set?
-           *
-           * We get `$$indexesByPathIdentity` from the _parent_ crystal object,
-           * so it represents only the parent details. Consider a query such as
-           *
-           * ```graphql
-           * { forums { messages { body } } }
-           * ```
-           *
-           * Imagine the plan for `body` was quite complex:
-           *
-           * ```ts
-           * body: {
-           *   type: GraphQLString,
-           *   plan($message) {
-           *     const $id = $message.get('id');
-           *     const $revision = new PgClassSelectPlan(messageRevisions, ... $id ..., single=true);
-           *     const $text = $revision.get('body');
-           *     const $formatted = new FancyAsynchronousFormatterPlan($text);
-           *     return $formatted;
-           *   },
-           * }
-           * ```
-           *
-           * These plans are dependent on each other, but they're all executed
-           * in the context of the current field. Since `crystalObject`
-           * represents the parent field (i.e. `$message` above represents the
-           * nth entry in the list returned from the `messages` field), it does
-           * not contain an `$$indexesByPathIdentity` entry for the current
-           * `pathIdentity`.
-           *
-           * It turns out this is not a concern. All of these plans depend on
-           * the full result of the previous plan - not a specific index within
-           * it - the only plan where the indexes matter is the one that the
-           * plan function returns. Thus we just skip calling `atIndexes` if
-           * the indexes for the pathIdentity are not known, and everything
-           * works as designed.
-           */
-          result[i] = innerIndexes
-            ? atIndexes(previousResult, innerIndexes)
-            : previousResult;
+        if (id in resultById) {
+          const previousResult = resultById[id];
+          result[i] = previousResult;
 
           debug(
-            `ExecutePlan(%s) result %s for %s (using id: %c/%s) was found: %o`,
+            `ExecutePlan(%s) result[%s] (for %s using id: %c) found: %o`,
             plan,
             i,
             crystalObject,
             id,
-            indexes,
             result[i],
           );
           continue;
         } else {
           debug(
-            `ExecutePlan(%s) no result for %s (using id: %c/%s) (%c)`,
+            `ExecutePlan(%s) no result for %s (using id: %c) (%c)`,
             plan,
             crystalObject,
             id,
-            indexes,
             resultById,
           );
         }
       } else {
         throw new Error(
-          `Crystal error: could not find id/indexes for ${plan.parentPathIdentity} in ${crystalObject}`,
+          `Crystal error: could not find id for ${plan.parentPathIdentity} in ${crystalObject}`,
         );
       }
       pendingCrystalObjects.push(crystalObject);
@@ -1161,38 +1142,24 @@ export class Aether {
         const j = pendingCrystalObjectsIndexes[i];
 
         const id = crystalObject[$$idByPathIdentity][plan.parentPathIdentity];
-        const indexes =
-          crystalObject[$$indexesByPathIdentity][plan.parentPathIdentity];
-        if (!id || !indexes) {
+        if (!id) {
           throw new Error(
-            `Crystal error: could not find id/indexes for ${plan.parentPathIdentity} in ${crystalObject}`,
+            `Crystal error: could not find id for ${plan.parentPathIdentity} in ${crystalObject}`,
           );
         }
 
-        const innerIndexes =
-          crystalObject[$$indexesByPathIdentity][plan.pathIdentity];
-
-        // To understand this, see the comment about atIndexes earlier within
-        // `executePlan`.
-        result[j] = innerIndexes
-          ? atIndexes(pendingResult, innerIndexes)
-          : pendingResult;
-
-        if (!resultById[id]) {
-          resultById[id] = new Map();
-        }
-        resultById[id].set(indexes.join(), result[j]);
+        resultById[id] = result[j] = pendingResult;
       }
 
       debug(
-        `ExecutePlan(%s): wrote results for %s: %c`,
+        `ExecutePlan(%s): wrote results for [%s]: %c`,
         plan,
         pendingCrystalObjects.join(", "),
         resultById,
       );
     }
     if (isDev) {
-      debug(`ExecutePlan(%s): complete; results: %o`, plan, result);
+      debug(`ExecutePlan(%s): complete; results: %c`, plan, result);
     }
     return result;
   }

@@ -18,6 +18,9 @@ import {
   GraphQLScalarType,
 } from "graphql";
 import { isDev } from "./dev";
+import { isCrystalObject } from "./resolvers";
+import { CrystalObject } from "./interfaces";
+import { Plan } from "./plan";
 
 /**
  * The parent object is used as the key in `GetValuePlanId()`; for root level
@@ -292,32 +295,57 @@ export function isPromise<T>(t: T | Promise<T>): t is Promise<T> {
   );
 }
 
-export function crystalPrint(
-  symbol: symbol | symbol[] | Record<symbol, any> | Map<any, any>,
+export function _crystalPrint(
+  symbol:
+    | symbol
+    | symbol[]
+    | Record<symbol, any>
+    | Map<any, any>
+    | CrystalObject<any>,
+  seen: Set<any>,
 ): string {
   if (symbol === ROOT_VALUE_OBJECT) {
     return chalk.gray`(blank)`;
   }
+  if (isCrystalObject(symbol)) {
+    return String(symbol);
+  }
+  if (symbol instanceof Plan) {
+    return String(symbol);
+  }
   if (Array.isArray(symbol)) {
+    if (seen.has(symbol)) {
+      return chalk.gray`(loop)`;
+    }
+    seen.add(symbol);
     return `[${symbol
       .map((value, i) =>
-        BG_COLORS[i % BG_COLORS.length](debugFactory.formatters.c(value)),
+        BG_COLORS[i % BG_COLORS.length](_crystalPrint(value, new Set(seen))),
       )
       .join(", ")}]`;
   }
   if (symbol instanceof Map) {
+    if (seen.has(symbol)) {
+      return chalk.gray`(loop)`;
+    }
+    seen.add(symbol);
     const obj = Object.create(null);
     for (const [k, v] of symbol.entries()) {
       obj[k] = v;
     }
-    return "Map" + crystalPrint(obj);
+    return "Map" + _crystalPrint(obj, new Set(seen));
   }
   if (typeof symbol === "object" && symbol) {
+    if (seen.has(symbol)) {
+      return chalk.gray`(loop)`;
+    }
+    seen.add(symbol);
     return `{${[...Object.keys(symbol), ...Object.getOwnPropertySymbols(symbol)]
       .map((key, i) =>
         BG_COLORS[i % BG_COLORS.length](
-          `${debugFactory.formatters.c(key)}: ${debugFactory.formatters.c(
+          `${_crystalPrint(key, new Set(seen))}: ${_crystalPrint(
             symbol[key],
+            new Set(seen),
           )}`,
         ),
       )
@@ -338,7 +366,19 @@ export function crystalPrint(
     return chalk.cyan(`$$${symbol.description}`);
   }
 }
+export function crystalPrint(
+  symbol:
+    | symbol
+    | symbol[]
+    | Record<symbol, any>
+    | Map<any, any>
+    | CrystalObject<any>,
+): string {
+  return _crystalPrint(symbol, new Set());
+}
 
-export function compressedPathIdentity(pathIdentity: string): string {
-  return pathIdentity.replace(/>[A-Za-z0-9]+\./g, ">").slice(1) || "ROOT";
+export function crystalPrintPathIdentity(pathIdentity: string): string {
+  const short = pathIdentity.replace(/>[A-Za-z0-9]+\./g, ">").slice(1);
+  if (!short) return chalk.bold.yellow("~");
+  return chalk.bold.yellow(short.replace(/\./g, chalk.gray(".")));
 }

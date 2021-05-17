@@ -31,7 +31,7 @@ import {
   uid,
   UniqueId,
   crystalPrint,
-  compressedPathIdentity,
+  crystalPrintPathIdentity,
   ROOT_VALUE_OBJECT,
 } from "./utils";
 import { defer, Deferred } from "./deferred";
@@ -115,10 +115,12 @@ export function crystalWrapResolve<
     } = info;
     const pathIdentity = pathToPathIdentity(path);
     // const alias = getAliasFromResolveInfo(info);
+    const id = uid();
     debug(
-      `👉 CRYSTAL RESOLVER @%s; parent: %s`,
-      compressedPathIdentity(pathIdentity),
-      isCrystalObject(parentObject) ? parentObject : inspect(parentObject),
+      `👉 CRYSTAL RESOLVER @ %p; id: %c; parent: %c`,
+      pathIdentity,
+      id,
+      parentObject,
     );
     const aether = establishAether({
       schema,
@@ -146,8 +148,13 @@ export function crystalWrapResolve<
       );
       return realResolver(objectValue, argumentValues, context, info);
     }
-    const id = uid();
-    debug("id for resolver at %s is %c", pathIdentity, id);
+    /*
+    debug(
+      "   id for resolver at %p is %c",
+      pathIdentity,
+      id,
+    );
+    */
     const batch = aether.getBatch(
       pathIdentity,
       parentObject,
@@ -167,9 +174,12 @@ export function crystalWrapResolve<
       // operations.
       parentCrystalObject = parentObject;
     } else {
-      // Note: we need to "fake" that the parent was a plan. Because we may have lots of resolvers all called for the same parent object, we use a map. This happens to mean that multiple values in the graph being the same object will be merged automatically.
+      // Note: we need to "fake" that the parent was a plan. Because we may
+      // have lots of resolvers all called for the same parent object, we use a
+      // map. This happens to mean that multiple values in the graph being the
+      // same object will be merged automatically.
       const parentPathIdentity = path.prev ? pathToPathIdentity(path.prev) : "";
-      const parentPlanId = aether.planIdByPathIdentity[parentPathIdentity];
+      const parentPlanId = aether.itemPlanIdByPathIdentity[parentPathIdentity];
       assert.ok(
         parentPlanId != null,
         `Could not find a planId for (parent) path '${parentPathIdentity}'`,
@@ -186,6 +196,7 @@ export function crystalWrapResolve<
         parentObject,
         pathIdentity,
       );
+      // TODO: this should extract the true indexes from resolveInfo?
       const indexes: number[] = [];
       parentCrystalObject = newCrystalObject(
         parentPlan,
@@ -195,12 +206,17 @@ export function crystalWrapResolve<
         parentObject,
         crystalContext,
       );
+      debug(
+        "   Created a new crystal object to represent the parent of %p: %c",
+        pathIdentity,
+        parentCrystalObject,
+      );
     }
     const result = await getBatchResult(batch, parentCrystalObject);
     debug(
-      `👈 CRYSTAL RESOLVER %c @ %s; object %s; result: %o`,
+      `👈 CRYSTAL RESOLVER %c @ %p; object %s; result: %o`,
       id,
-      compressedPathIdentity(pathIdentity),
+      pathIdentity,
       parentCrystalObject,
       result,
     );
@@ -369,7 +385,7 @@ function newCrystalObject<TData>(
     toString() {
       const p = indexes.length ? `.${indexes.join(".")}` : ``;
       return chalk.bold.blue(
-        `C(${compressedPathIdentity(pathIdentity)}/${crystalPrint(id)}${p})`,
+        `CO(${crystalPrintPathIdentity(pathIdentity)}/${crystalPrint(id)}${p})`,
       );
     },
   };
