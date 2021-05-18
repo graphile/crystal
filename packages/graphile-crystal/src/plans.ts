@@ -1,5 +1,6 @@
 import { Plan } from "./plan";
-import { getCurrentAether, Aether } from "./aether";
+import { Aether } from "./aether";
+import { getCurrentAether, globalState } from "./global";
 import { CrystalResultsList, CrystalValuesList } from "./interfaces";
 import debugFactory from "debug";
 
@@ -201,4 +202,11 @@ export function first<TPlan extends Plan<ReadonlyArray<any>>>(
   plan: TPlan,
 ): FirstPlan<TPlan extends Plan<ReadonlyArray<infer U>> ? U : never> {
   return new FirstPlan(plan);
+}
+
+export function debugPlans<T>(callback: () => T): T {
+  globalState.debug = true;
+  const result = callback();
+  globalState.debug = false;
+  return result;
 }

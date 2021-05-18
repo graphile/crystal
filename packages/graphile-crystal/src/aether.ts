@@ -57,6 +57,7 @@ import {
 import { isDev } from "./dev";
 import { Deferred } from "./deferred";
 import { isCrystalObject, newCrystalObject } from "./resolvers";
+import { globalState } from "./global";
 
 import debugFactory from "debug";
 
@@ -65,11 +66,6 @@ const EMPTY_INDEXES = Object.freeze([] as number[]);
 const debugAether = debugFactory("crystal:aether");
 const debug = debugAether.extend("regular");
 const debugVerbose = debugAether.extend("verbose");
-
-const globalState = {
-  aether: null as Aether | null,
-  parentPathIdentity: "" as string,
-};
 
 interface ListCapablePlan<TData> extends Plan<TData> {
   listItem(itemPlan: __ListItemPlan<Plan<ReadonlyArray<TData>>>): Plan<TData>;
@@ -84,30 +80,6 @@ function assertListCapablePlan<TData>(
       `The plan returned from '${pathIdentity}' should be a list capable plan, but it does not implement the 'listItem' method.`,
     );
   }
-}
-
-/**
- * Since plan functions are called synchronously _by us_ we don't need to pass
- * around a reference to Aether that users then have to pass back to us;
- * instead we can pull it from this global state. This is not dissimilar to how
- * React's hooks work.
- */
-export function getCurrentAether(): Aether {
-  const aether = globalState.aether;
-  if (!aether) {
-    throw new Error(
-      "You have broken the rules of Graphile Crystal Plans; they must only be created synchronously from inside the relevant `plan` function.",
-    );
-  }
-  return aether;
-}
-
-/**
- * Like with `getCurrentAether`, since plan functions are called synchronously
- * _by us_ we can pull the current parentPathIdentity from global state.
- */
-export function getCurrentParentPathIdentity(): string {
-  return globalState.parentPathIdentity;
 }
 
 type TrackedArguments = { [key: string]: InputPlan };
@@ -1212,6 +1184,17 @@ export class Aether {
         );
       }
       const pendingResults = await plan.execute(values, meta);
+      if (plan.debug) {
+        console.log(
+          `debugPlans(${plan}): called with: ${inspect(values, {
+            colors: true,
+            depth: 6,
+          })}; returned: ${inspect(pendingResults, {
+            colors: true,
+            depth: 6,
+          })}`,
+        );
+      }
       if (isDev) {
         assert.ok(
           Array.isArray(pendingResults),

@@ -1,10 +1,11 @@
 import * as assert from "assert";
 import chalk from "chalk";
+import { Aether } from "./aether";
 import {
-  Aether,
   getCurrentAether,
   getCurrentParentPathIdentity,
-} from "./aether";
+  globalState,
+} from "./global";
 import { Constraint } from "./constraints";
 import { isDev, noop } from "./dev";
 import { inspect } from "util";
@@ -63,6 +64,7 @@ export abstract class Plan<TData = any> {
   public readonly groupId: number;
   public parentPathIdentity: string;
   private createdWithParentPathIdentity: string;
+  public debug = globalState.debug;
 
   constructor() {
     const aether = getCurrentAether();
