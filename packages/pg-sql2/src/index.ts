@@ -1,5 +1,8 @@
+import * as assert from "assert";
 import LRU from "@graphile/lru";
 import { inspect } from "util";
+
+const isDev = process.env.GRAPHILE_ENV === "development";
 
 /**
  * This is the secret to our safety; since this is a symbol it cannot be faked
@@ -44,8 +47,21 @@ export interface SQLValueNode {
   [$$trusted]: true;
 }
 
+/**
+ * Represents that the SQL inside this should be indented when pretty printed.
+ */
+export interface SQLIndentNode {
+  content: SQL;
+  type: "INDENT";
+  [$$trusted]: true;
+}
+
 /** @internal */
-export type SQLNode = SQLRawNode | SQLValueNode | SQLIdentifierNode;
+export type SQLNode =
+  | SQLRawNode
+  | SQLValueNode
+  | SQLIdentifierNode
+  | SQLIndentNode;
 /** @internal */
 export type SQLQuery = Array<SQLNode>;
 
@@ -145,6 +161,10 @@ function makeValueNode(rawValue: SQLRawValue): SQLValueNode {
   return Object.freeze({ type: "VALUE", value: rawValue, [$$trusted]: true });
 }
 
+function makeIndentNode(content: SQL): SQLIndentNode {
+  return Object.freeze({ type: "INDENT", content, [$$trusted]: true });
+}
+
 function isSQLNode(node: unknown): node is SQLNode {
   return typeof node === "object" && node !== null && node[$$trusted] === true;
 }
@@ -170,21 +190,12 @@ export function compile(
   text: string;
   values: SQLRawValue[];
 } {
-  const items: Array<SQLNode> = Array.isArray(sql) ? sql : [sql];
-
-  const itemCount = items.length;
-
-  /**
-   * Join this to generate the SQL query
-   */
-  const sqlFragments: string[] = [];
-
   /**
    * Values hold the JavaScript values that are represented in the query string
    * by placeholders. They are eager because they were provided before compile
    * time.
    */
-  const values: SQLRawValue = [];
+  const values: SQLRawValue[] = [];
   let valueCount = 0;
 
   /**
@@ -203,73 +214,105 @@ export function compile(
     [description: string]: number;
   } = {};
 
-  for (let itemIndex = 0; itemIndex < itemCount; itemIndex++) {
-    const item = enforceValidNode(items[itemIndex]);
-    switch (item.type) {
-      case "RAW":
-        sqlFragments.push(item.text);
-        break;
-      case "IDENTIFIER": {
-        const nameCount = item.names.length;
-        const mappedNames = [];
-        for (const name of item.names) {
-          if (typeof name === "string") {
-            // This was escaped inside of `sql.identifier`
-            mappedNames.push(name);
-          } else if (name.s) {
-            // Get the correct identifier string for this symbol.
-            // NOTE: we cannot use `SymbolAndName` as the key as a symbol may may
-            // generate multiple SymbolAndName objects.
-            let identifierForSymbol = symbolToIdentifier.get(name.s);
+  function print(inItems: SQL, indent = 0) {
+    /**
+     * Join this to generate the SQL query
+     */
+    const sqlFragments: string[] = [];
 
-            // If there is no identifier, create one and set it.
-            if (!identifierForSymbol) {
-              const { s: symbol, n: safeDesc } = name;
-              if (!descCounter[safeDesc]) {
-                descCounter[safeDesc] = 0;
+    const items: Array<SQLNode> = Array.isArray(inItems) ? inItems : [inItems];
+    const itemCount = items.length;
+
+    for (let itemIndex = 0; itemIndex < itemCount; itemIndex++) {
+      const item = enforceValidNode(items[itemIndex]);
+      switch (item.type) {
+        case "RAW": {
+          sqlFragments.push(
+            isDev
+              ? item.text.replace(/\n/g, "\n" + "  ".repeat(indent))
+              : item.text,
+          );
+          break;
+        }
+        case "IDENTIFIER": {
+          const nameCount = item.names.length;
+          const mappedNames = [];
+          for (const name of item.names) {
+            if (typeof name === "string") {
+              // This was escaped inside of `sql.identifier`
+              mappedNames.push(name);
+            } else if (name.s) {
+              // Get the correct identifier string for this symbol.
+              // NOTE: we cannot use `SymbolAndName` as the key as a symbol may may
+              // generate multiple SymbolAndName objects.
+              let identifierForSymbol = symbolToIdentifier.get(name.s);
+
+              // If there is no identifier, create one and set it.
+              if (!identifierForSymbol) {
+                const { s: symbol, n: safeDesc } = name;
+                if (!descCounter[safeDesc]) {
+                  descCounter[safeDesc] = 0;
+                }
+                const number = ++descCounter[safeDesc];
+
+                // NOTE: we don't omit number for the first instance because
+                // safeDesc might end in, e.g., `_2` and cause conflicts later.
+                identifierForSymbol = `__${safeDesc}_${number}`;
+
+                // Store so this symbol gets the same identifier next time
+                symbolToIdentifier.set(symbol, identifierForSymbol);
               }
-              const number = ++descCounter[safeDesc];
 
-              // NOTE: we don't omit number for the first instance because
-              // safeDesc might end in, e.g., `_2` and cause conflicts later.
-              identifierForSymbol = `__${safeDesc}_${number}`;
-
-              // Store so this symbol gets the same identifier next time
-              symbolToIdentifier.set(symbol, identifierForSymbol);
+              // Return the identifier. Since we create it, we won’t have to
+              // escape it because we know all of the characters are safe.
+              mappedNames.push(identifierForSymbol);
+            } else {
+              throw new Error(
+                `[pg-sql2] Invalid IDENTIFIER node, expected string or SymbolAndName, received '${inspect(
+                  name,
+                )}' - this could be a bug in pg-sql2, please report it.`,
+              );
             }
-
-            // Return the identifier. Since we create it, we won’t have to
-            // escape it because we know all of the characters are safe.
-            mappedNames.push(identifierForSymbol);
-          } else {
+          }
+          sqlFragments.push(
+            nameCount === 1 ? mappedNames[0] : mappedNames.join("."),
+          );
+          break;
+        }
+        case "VALUE": {
+          valueCount++;
+          if (valueCount > 65535) {
             throw new Error(
-              `[pg-sql2] Invalid IDENTIFIER node, expected string or SymbolAndName, received '${inspect(
-                name,
-              )}' - this could be a bug in pg-sql2, please report it.`,
+              "[pg-sql2] This SQL statement would contain too many placeholders; PostgreSQL supports at most 65535 placeholders. To solve this, consider refactoring the query to use arrays/unnest where possible, or split it into multiple queries.",
             );
           }
+          values[valueCount - 1] = item.value;
+          sqlFragments.push(`$${valueCount}`);
+          break;
         }
-        sqlFragments.push(
-          nameCount === 1 ? mappedNames[0] : mappedNames.join("."),
-        );
-        break;
-      }
-      case "VALUE":
-        valueCount++;
-        if (valueCount > 65535) {
-          throw new Error(
-            "[pg-sql2] This SQL statement would contain too many placeholders; PostgreSQL supports at most 65535 placeholders. To solve this, consider refactoring the query to use arrays/unnest where possible, or split it into multiple queries.",
+        case "INDENT": {
+          assert.ok(isDev, "INDENT nodes only allowed in development mode");
+          sqlFragments.push(
+            "\n" +
+              "  ".repeat(indent + 1) +
+              print(item.content, indent + 1) +
+              "\n" +
+              "  ".repeat(indent),
           );
+          break;
         }
-        values[valueCount - 1] = item.value;
-        sqlFragments.push(`$${valueCount}`);
-        break;
-      default:
-      // This cannot happen
+        default: {
+          const never: never = item;
+          // This cannot happen
+          throw new Error(`Unsupported node found in SQL: ${inspect(never)}`);
+        }
+      }
     }
+    return sqlFragments.join("");
   }
+  const text = isDev ? print(sql).replace(/\n\s*\n/g, "\n") : print(sql);
+  console.dir({ text, sql });
 
-  const text = sqlFragments.join("");
   return {
     text,
     values,
@@ -483,6 +526,10 @@ export function join(
   return currentItems;
 }
 
+export function indent(fragment: SQL): SQL {
+  return isDev ? makeIndentNode(fragment) : fragment;
+}
+
 export {
   query as fragment,
   trueNode as true,
@@ -500,6 +547,7 @@ export interface PgSQL {
   value: typeof value;
   literal: typeof literal;
   join: typeof join;
+  indent: typeof indent;
   blank: typeof blank;
   fragment: typeof query;
   true: typeof trueNode;
@@ -516,6 +564,7 @@ const pgSql: PgSQL = Object.assign(query, {
   value,
   literal,
   join,
+  indent,
   blank,
   fragment: query,
   true: trueNode,
