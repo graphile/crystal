@@ -236,6 +236,7 @@ export class Aether {
       }
     }
 
+    this.validatePlans();
     this.optimizePlans();
     this.treeShakePlans();
     this.finalizePlans();
@@ -666,6 +667,32 @@ export class Aether {
       }
     }
     return trackedArgumentValues;
+  }
+
+  private validatePlans(): void {
+    const errors: Error[] = [];
+    for (let i = 0, l = this.plans.length; i < l; i++) {
+      const plan = this.plans[i];
+      const referencingPlanIsAllowed =
+        // Required so that we can access the underlying value plan.
+        plan instanceof __TrackedObjectPlan;
+      if (!referencingPlanIsAllowed) {
+        for (const key in plan) {
+          const val = plan[key];
+          if (val instanceof Plan) {
+            errors.push(
+              new Error(
+                `ERROR: Plan ${plan} has illegal reference via property '${key}' to plan ${val}. You must not reference plans directly, instead use the plan id to reference the plan, and look the plan up in \`this.aether.plans[planId]\`. Failure to comply could result in subtle breakage during optimisation.`,
+              ),
+            );
+          }
+        }
+      }
+    }
+    if (errors.length > 0) {
+      console.error(errors.map((e) => e.message).join("\n"));
+      throw errors[0];
+    }
   }
 
   /**
