@@ -623,7 +623,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     dataSource: TDataSource,
     identifiers: Array<{ plan: Plan<any>; type: SQL }>,
     identifierMatchesThunk: (alias: SQL) => SQL[],
-    cloneFrom: PgClassSelectPlan<TDataSource> | null = null,
+    private cloneFrom: PgClassSelectPlan<TDataSource> | null = null,
   ) {
     super();
     this.dataSource = dataSource;
@@ -813,9 +813,10 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
         return {
           // The context is how we'd handle different connections with different claims
           context: value[this.contextId],
-          identifiers: identifierIndex
-            ? this.identifierIds.map((id) => value[id])
-            : EMPTY_ARRAY,
+          identifiers:
+            identifierIndex != null
+              ? this.identifierIds.map((id) => value[id])
+              : EMPTY_ARRAY,
         };
       }),
       {
@@ -839,7 +840,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
 
   finalize() {
     if (!this.isFinalized) {
-      if (!this.isTrusted) {
+      if (!this.isTrusted && (!this.cloneFrom || this.cloneFrom.isTrusted)) {
         this.dataSource.applyAuthorizationChecksToPlan(this);
       }
 
@@ -847,33 +848,40 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
       const orders: SQL[] = [];
       let identifierIndex: number | null = null;
 
-      const thisJoins = [...this.joins];
-      if (this.identifiers.length && this.identifiersAlias) {
-        const alias = this.identifiersAlias;
-        thisJoins.push({
-          type: "inner",
-          source: sql`(select ids.ordinality - 1 as idx, ${sql.join(
-            this.identifiers.map(({ type }, idx) => {
-              return sql`(ids.value->>${sql.literal(
-                idx,
-              )})::${type} as ${sql.identifier(`id${idx}`)}`;
-            }),
-            ", ",
-          )} from json_array_elements(${sql.value(
-            // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
-            // a value before executing the query.
-            this.identifierSymbol as any,
-          )}) with ordinality as ids)`,
-          alias,
-          conditions: this.identifierMatches.map(
-            (frag, idx) =>
-              sql`${frag} = ${alias}.${sql.identifier(`id${idx}`)}`,
-          ),
-        });
-        identifierIndex = this.select(sql`${alias}.idx`);
+      // We only want to add the identifiers once, so don't add them to clones.
+      if (this.cloneFrom) {
+        if (!this.cloneFrom.finalizeResults) {
+          throw new Error("Clone source wasn't finalized?!");
+        }
+        identifierIndex = this.cloneFrom.finalizeResults.identifierIndex;
+      } else {
+        if (this.identifiers.length && this.identifiersAlias) {
+          const alias = this.identifiersAlias;
+          this.joins.push({
+            type: "inner",
+            source: sql`(select ids.ordinality - 1 as idx, ${sql.join(
+              this.identifiers.map(({ type }, idx) => {
+                return sql`(ids.value->>${sql.literal(
+                  idx,
+                )})::${type} as ${sql.identifier(`id${idx}`)}`;
+              }),
+              ", ",
+            )} from json_array_elements(${sql.value(
+              // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
+              // a value before executing the query.
+              this.identifierSymbol as any,
+            )}) with ordinality as ids)`,
+            alias,
+            conditions: this.identifierMatches.map(
+              (frag, idx) =>
+                sql`${frag} = ${alias}.${sql.identifier(`id${idx}`)}`,
+            ),
+          });
+          identifierIndex = this.select(sql`${alias}.idx`);
+        }
       }
 
-      const joins: SQL[] = thisJoins.map((j) => {
+      const joins: SQL[] = this.joins.map((j) => {
         const conditions =
           j.type === "cross"
             ? []
