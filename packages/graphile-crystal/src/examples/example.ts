@@ -845,110 +845,113 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
    */
   toSQL() {}
 
+  private buildQuery(): { query: SQL; identifierIndex: number | null } {
+    if (!this.isTrusted && (!this.cloneFrom || this.cloneFrom.isTrusted)) {
+      this.dataSource.applyAuthorizationChecksToPlan(this);
+    }
+
+    const conditions: SQL[] = [];
+    const orders: SQL[] = [];
+    let identifierIndex: number | null = null;
+
+    // We only want to add the identifiers once, so don't add them to clones.
+    if (this.cloneFrom) {
+      if (!this.cloneFrom.finalizeResults) {
+        throw new Error("Clone source wasn't finalized?!");
+      }
+      identifierIndex = this.cloneFrom.finalizeResults.identifierIndex;
+    } else {
+      if (this.identifiers.length && this.identifiersAlias) {
+        const alias = this.identifiersAlias;
+        this.joins.push({
+          type: "inner",
+          source: sql`(select ids.ordinality - 1 as idx, ${sql.join(
+            this.identifiers.map(({ type }, idx) => {
+              return sql`(ids.value->>${sql.literal(
+                idx,
+              )})::${type} as ${sql.identifier(`id${idx}`)}`;
+            }),
+            ", ",
+          )} from json_array_elements(${sql.value(
+            // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
+            // a value before executing the query.
+            this.identifierSymbol as any,
+          )}) with ordinality as ids)`,
+          alias,
+          conditions: this.identifierMatches.map(
+            (frag, idx) =>
+              sql`${frag} = ${alias}.${sql.identifier(`id${idx}`)}`,
+          ),
+        });
+        identifierIndex = this.select(sql`${alias}.idx`);
+      }
+    }
+
+    const joins: SQL[] = this.joins.map((j) => {
+      const conditions =
+        j.type === "cross"
+          ? []
+          : j.conditions.length
+          ? sql`(${sql.join(j.conditions, ") AND (")})`
+          : sql.true;
+      const joinCondition =
+        j.type !== "cross" ? sql`\non (${conditions})` : sql.blank;
+      const join: SQL =
+        j.type === "inner"
+          ? sql`inner join`
+          : j.type === "left"
+          ? sql`left outer join`
+          : j.type === "right"
+          ? sql`right outer join`
+          : j.type === "full"
+          ? sql`full outer join`
+          : j.type === "cross"
+          ? sql`cross join`
+          : (sql.blank as never);
+
+      return sql`${join} ${j.source} as ${j.alias}${joinCondition}`;
+    });
+
+    const resolveSymbol = (symbol: symbol): SQL => {
+      switch (symbol) {
+        case $$CURSOR:
+          // TODO: figure out what the cursor should be
+          return sql`424242 /* TODO: CURSOR */`;
+        default: {
+          throw new Error(
+            `Unrecognised special select symbol: ${inspect(symbol)}`,
+          );
+        }
+      }
+    };
+
+    const fragmentsWithAliases = this.selects.map((fragOrSymbol, idx) => {
+      const frag =
+        typeof fragOrSymbol === "symbol"
+          ? resolveSymbol(fragOrSymbol)
+          : fragOrSymbol;
+      return sql`${frag} as ${sql.identifier(String(idx))}`;
+    });
+    const selection = fragmentsWithAliases.length
+      ? sql`\n  ${sql.join(fragmentsWithAliases, ",\n  ")}`
+      : sql` /* NOTHING?! */`;
+    const select = sql`select${selection}`;
+    const from = sql`\nfrom ${this.dataSource.tableIdentifier} as ${this.alias}`;
+    const join = joins.length ? sql`\n${sql.join(joins, "\n")}` : sql.blank;
+    const where = conditions.length
+      ? sql`\nwhere (\n  ${sql.join(conditions, "\n) and (\n  ")}\n)`
+      : sql.blank;
+    const orderBy = orders.length
+      ? sql`\norder by ${sql.join(orders, ", ")}`
+      : sql.blank;
+    const query = sql`${select}${from}${join}${where}${orderBy}`;
+    return { query, identifierIndex };
+  }
+
   finalize() {
     if (!this.isFinalized) {
-      if (!this.isTrusted && (!this.cloneFrom || this.cloneFrom.isTrusted)) {
-        this.dataSource.applyAuthorizationChecksToPlan(this);
-      }
-
-      const conditions: SQL[] = [];
-      const orders: SQL[] = [];
-      let identifierIndex: number | null = null;
-
-      // We only want to add the identifiers once, so don't add them to clones.
-      if (this.cloneFrom) {
-        if (!this.cloneFrom.finalizeResults) {
-          throw new Error("Clone source wasn't finalized?!");
-        }
-        identifierIndex = this.cloneFrom.finalizeResults.identifierIndex;
-      } else {
-        if (this.identifiers.length && this.identifiersAlias) {
-          const alias = this.identifiersAlias;
-          this.joins.push({
-            type: "inner",
-            source: sql`(select ids.ordinality - 1 as idx, ${sql.join(
-              this.identifiers.map(({ type }, idx) => {
-                return sql`(ids.value->>${sql.literal(
-                  idx,
-                )})::${type} as ${sql.identifier(`id${idx}`)}`;
-              }),
-              ", ",
-            )} from json_array_elements(${sql.value(
-              // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
-              // a value before executing the query.
-              this.identifierSymbol as any,
-            )}) with ordinality as ids)`,
-            alias,
-            conditions: this.identifierMatches.map(
-              (frag, idx) =>
-                sql`${frag} = ${alias}.${sql.identifier(`id${idx}`)}`,
-            ),
-          });
-          identifierIndex = this.select(sql`${alias}.idx`);
-        }
-      }
-
-      const joins: SQL[] = this.joins.map((j) => {
-        const conditions =
-          j.type === "cross"
-            ? []
-            : j.conditions.length
-            ? sql`(${sql.join(j.conditions, ") AND (")})`
-            : sql.true;
-        const joinCondition =
-          j.type !== "cross" ? sql`\non (${conditions})` : sql.blank;
-        const join: SQL =
-          j.type === "inner"
-            ? sql`inner join`
-            : j.type === "left"
-            ? sql`left outer join`
-            : j.type === "right"
-            ? sql`right outer join`
-            : j.type === "full"
-            ? sql`full outer join`
-            : j.type === "cross"
-            ? sql`cross join`
-            : (sql.blank as never);
-
-        return sql`${join} ${j.source} as ${j.alias}${joinCondition}`;
-      });
-
-      const resolveSymbol = (symbol: symbol): SQL => {
-        switch (symbol) {
-          case $$CURSOR:
-            // TODO: figure out what the cursor should be
-            return sql`424242 /* TODO: CURSOR */`;
-          default: {
-            throw new Error(
-              `Unrecognised special select symbol: ${inspect(symbol)}`,
-            );
-          }
-        }
-      };
-
-      const fragmentsWithAliases = this.selects.map((fragOrSymbol, idx) => {
-        const frag =
-          typeof fragOrSymbol === "symbol"
-            ? resolveSymbol(fragOrSymbol)
-            : fragOrSymbol;
-        return sql`${frag} as ${sql.identifier(String(idx))}`;
-      });
-      const selection = fragmentsWithAliases.length
-        ? sql`\n  ${sql.join(fragmentsWithAliases, ",\n  ")}`
-        : sql` /* NOTHING?! */`;
-      const select = sql`select${selection}`;
-      const from = sql`\nfrom ${this.dataSource.tableIdentifier} as ${this.alias}`;
-      const join = joins.length ? sql`\n${sql.join(joins, "\n")}` : sql.blank;
-      const where = conditions.length
-        ? sql`\nwhere (\n  ${sql.join(conditions, "\n) and (\n  ")}\n)`
-        : sql.blank;
-      const orderBy = orders.length
-        ? sql`\norder by ${sql.join(orders, ", ")}`
-        : sql.blank;
-      const query = sql`${select}${from}${join}${where}${orderBy}`;
-
+      const { query, identifierIndex } = this.buildQuery();
       const { text, values: rawSqlValues } = sql.compile(query);
-
       this.finalizeResults = { text, rawSqlValues, identifierIndex };
     }
 
@@ -967,27 +970,27 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
 
     if (!this.isInliningForbidden) {
       // Inline ourself into our parent if we can.
-      if (
-        this.isUnique
-        /* TODO: && !this.groupBy && !this.having && !this.limit && !this.order && !this.offset && ... */
-      ) {
-        let t: PgClassSelectPlan<any> | null = null;
-        for (let i = 0, l = this.dependencies.length; i < l; i++) {
-          const depId = this.dependencies[i];
-          const dep = this.aether.plans[depId];
-          if (!(dep instanceof PgColumnSelectPlan)) {
-            t = null;
-            break;
-          }
-          if (i === 0) {
-            t = dep.table.classPlan;
-          } else if (dep.table.classPlan !== t) {
-            t = null;
-            break;
-          }
+      let t: PgClassSelectPlan<any> | null = null;
+      for (let i = 0, l = this.dependencies.length; i < l; i++) {
+        const depId = this.dependencies[i];
+        const dep = this.aether.plans[depId];
+        if (!(dep instanceof PgColumnSelectPlan)) {
+          t = null;
+          break;
         }
-        if (t != null) {
-          // Looks feasible.
+        if (i === 0) {
+          t = dep.table.classPlan;
+        } else if (dep.table.classPlan !== t) {
+          t = null;
+          break;
+        }
+      }
+      if (t != null) {
+        // Looks feasible.
+        if (
+          this.isUnique
+          /* TODO: && !this.groupBy && !this.having && !this.limit && !this.order && !this.offset && ... */
+        ) {
           t.joins.push(
             {
               type: "left",
@@ -1017,6 +1020,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
           });
           //t.select();
           return map(t, actualIndexByDesiredIndex);
+        } else {
         }
       }
     }
