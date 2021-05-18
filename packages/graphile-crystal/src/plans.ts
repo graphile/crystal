@@ -12,6 +12,7 @@ class MapPlan extends Plan {
   ) {
     super();
     this.addDependency(parentPlan);
+    // TODO: JIT this.
     this.mapper = (obj: object): object => {
       return Object.keys(actualKeyByDesiredKey).reduce((memo, desiredKey) => {
         memo[desiredKey] = obj[actualKeyByDesiredKey[desiredKey]];

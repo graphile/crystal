@@ -150,6 +150,10 @@ export abstract class Plan<TData = any> {
   public finalize(): void {
     if (!this.isFinalized) {
       this.isFinalized = true;
+    } else {
+      throw new Error(
+        `Plan ${this} has already been finalized - do not call finalize from user code!`,
+      );
     }
   }
 }

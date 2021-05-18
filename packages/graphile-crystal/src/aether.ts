@@ -1122,13 +1122,12 @@ export class Aether {
                 dependencyPathIdentity
               ];
             debugVerbose(
-              `%s Evaluating indexes for object %c plan %c(%c) => %c (all indexes: %c)`,
+              `%s Evaluating indexes for object %c plan %c(%c) => %c`,
               follow,
               pendingCrystalObject,
               originalDependencyPlan,
               dependencyPlan,
               indexes,
-              pendingCrystalObject[$$indexesByPathIdentity],
             );
             if (!indexes) {
               throw new Error(
@@ -1146,10 +1145,9 @@ export class Aether {
             );
             arr[pendingCrystalObjectIndex] = item;
             debugVerbose(
-              `  %s result at indexes %c of %c = %c`,
+              `  %s result at indexes %c = %c`,
               follow,
               indexes,
-              dependencyResultForPendingCrystalObject,
               item,
             );
           }
