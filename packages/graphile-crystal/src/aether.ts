@@ -803,7 +803,7 @@ export class Aether {
       const plan = this.plans[i];
       if (plan !== null) {
         globalState.parentPathIdentity = plan.parentPathIdentity;
-        // checking the following would be redundant:
+        // NOTE: checking the following would be redundant:
         // if (!distinctActivePlansInReverseOrder.has(plan))
         distinctActivePlansInReverseOrder.add(plan);
       }
