@@ -319,7 +319,8 @@ ${"👆".repeat(30)}
       );
     }
 
-    await Promise.all(promises);
+    // Avoids UnhandledPromiseRejection error.
+    await Promise.allSettled(promises);
 
     const finalResults = await Promise.all(results);
     return { values: finalResults };
