@@ -58,13 +58,15 @@ export abstract class Plan<TData = any> {
   public isFinalized = false;
   public readonly id: number;
   public readonly groupId: number;
-  public readonly parentPathIdentity: string;
+  public parentPathIdentity: string;
+  private createdWithParentPathIdentity: string;
 
   constructor() {
     const aether = getCurrentAether();
     this.aether = aether;
     this.groupId = aether.groupId;
-    this.parentPathIdentity = getCurrentParentPathIdentity();
+    this.parentPathIdentity = "";
+    this.createdWithParentPathIdentity = getCurrentParentPathIdentity();
     this.id = aether.plans.push(this) - 1;
   }
 
@@ -77,6 +79,11 @@ export abstract class Plan<TData = any> {
   }
 
   protected addDependency(plan: Plan): number {
+    if (this.isFinalized) {
+      throw new Error(
+        "You cannot add a dependency after the plan is finalized.",
+      );
+    }
     if (isDev) {
       assert.ok(
         plan instanceof Plan,
@@ -84,6 +91,22 @@ export abstract class Plan<TData = any> {
           plan,
         )}'`,
       );
+    }
+    /*
+     * We set our actual parentPathIdentity to be the shortest parentPathIdentity of all
+     * of our dependencies; this effectively means that we only care about list
+     * boundaries (since __ListItemPlan opts out of this) which allows us to
+     * optimise more plans.
+     */
+    if (plan.parentPathIdentity.length > this.parentPathIdentity.length) {
+      this.parentPathIdentity = plan.parentPathIdentity;
+      if (
+        !this.createdWithParentPathIdentity.startsWith(this.parentPathIdentity)
+      ) {
+        throw new Error(
+          `${this} was created in '${this.createdWithParentPathIdentity}' but we have a dependency on '${this.parentPathIdentity}' which is outside of this path.`,
+        );
+      }
     }
     return this._dependencies.push(plan.id) - 1;
   }
@@ -120,7 +143,9 @@ export abstract class Plan<TData = any> {
   }
 
   public finalize(): void {
-    this.isFinalized = true;
+    if (!this.isFinalized) {
+      this.isFinalized = true;
+    }
   }
 }
 
@@ -130,6 +155,7 @@ export class __ListItemPlan<
   constructor(parentPlan: TParentPlan) {
     super();
     this.addDependency(parentPlan);
+    this.parentPathIdentity = getCurrentParentPathIdentity();
   }
 
   execute(): never {
