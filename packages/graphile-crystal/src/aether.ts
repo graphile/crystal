@@ -65,8 +65,9 @@ import debugFactory from "debug";
 
 const EMPTY_INDEXES = Object.freeze([] as number[]);
 
-const debug = debugFactory("crystal:aether");
-const debugVerbose = debug.extend("verbose");
+const debugAether = debugFactory("crystal:aether");
+const debug = debugAether.extend("regular");
+const debugVerbose = debugAether.extend("verbose");
 
 const globalState = {
   aether: null as Aether | null,

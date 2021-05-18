@@ -1,6 +1,7 @@
 import { Plan } from "./plan";
 import { getCurrentAether, Aether } from "./aether";
 import { CrystalResultsList, CrystalValuesList } from "./interfaces";
+import debugFactory from "debug";
 
 class MapPlan extends Plan {
   private mapper: (obj: object) => object;
@@ -45,6 +46,8 @@ export function aether(): Aether {
   return getCurrentAether();
 }
 
+const debugObjectPlan = debugFactory("crystal:ObjectPlan");
+const debugObjectPlanVerbose = debugObjectPlan.extend("verbose");
 class ObjectPlan<TData extends { [key: string]: any }> extends Plan<TData> {
   private keys: Array<keyof TData>;
   private results: Array<[Array<TData[keyof TData]>, TData]> = [];
@@ -78,6 +81,12 @@ class ObjectPlan<TData extends { [key: string]: any }> extends Plan<TData> {
     }
 
     // That failed; create a new object.
+    debugObjectPlanVerbose(
+      "%s: Could not find cache for keys %c values %c, constructing new object",
+      this,
+      this.keys,
+      tuple,
+    );
     const newObj = this.keys.reduce((memo, key, i) => {
       memo[key] = tuple[i];
       return memo;

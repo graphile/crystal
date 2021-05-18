@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 export GRAPHILE_ENV="development"
-export DEBUG="crystal:*,-*:verbose"
-export DEBUG="crystal:*"
+export DEFAULT_DEBUG="crystal:*,-*:verbose"
+export DEBUG="${DEBUG:-$DEFAULT_DEBUG}"
 yarn nodemon -x 'node --enable-source-maps' --watch dist dist/examples/example.js
