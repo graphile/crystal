@@ -66,6 +66,7 @@ import debugFactory from "debug";
 const EMPTY_INDEXES = Object.freeze([] as number[]);
 
 const debug = debugFactory("crystal:aether");
+const debugVerbose = debug.extend("verbose");
 
 const globalState = {
   aether: null as Aether | null,
@@ -216,7 +217,7 @@ export class Aether {
       this.variableValuesPlan,
       this.variableValuesConstraints,
     );
-    debug(
+    debugVerbose(
       "Constructed trackedVariableValuesPlan %s",
       this.trackedVariableValuesPlan,
     );
@@ -227,7 +228,7 @@ export class Aether {
       this.contextPlan,
       this.contextConstraints,
     );
-    debug("Constructed trackedContextPlan %s", this.trackedContextPlan);
+    debugVerbose("Constructed trackedContextPlan %s", this.trackedContextPlan);
     this.rootValuePlan = new __ValuePlan();
     debug("Constructed rootValuePlan %s", this.rootValuePlan);
     this.trackedRootValuePlan = new __TrackedObjectPlan(
@@ -235,7 +236,10 @@ export class Aether {
       this.rootValuePlan,
       this.rootValueConstraints,
     );
-    debug("Constructed trackedRootValuePlan %s", this.trackedRootValuePlan);
+    debugVerbose(
+      "Constructed trackedRootValuePlan %s",
+      this.trackedRootValuePlan,
+    );
     this.planIdByPathIdentity = Object.assign(Object.create(null), {
       "": this.rootValuePlan.id,
     });
@@ -847,7 +851,7 @@ export class Aether {
     rootValue: unknown,
   ): CrystalContext {
     const rootId = uid("root");
-    debug("Root id is %c", rootId);
+    debugVerbose("Root id is %c", rootId);
     const crystalContext: CrystalContext = {
       resultByCrystalObjectByPlanId: new Map(),
       metaByPlanId: Object.create(null),
@@ -1015,13 +1019,18 @@ export class Aether {
     const pendingCrystalObjectsIndexes = []; // Same length as pendingCrystalObjects
     const crystalObjectCount = crystalObjects.length;
     const result = new Array(crystalObjectCount);
-    debug("%sExecutePlan(%c)", indent, plan);
+    debug(
+      "%sExecutePlan(%c): executing with %o crystal objects",
+      indent,
+      plan,
+      crystalObjectCount,
+    );
     for (let i = 0; i < crystalObjectCount; i++) {
       const crystalObject = crystalObjects[i];
       const planCrystalObject =
         crystalObject[$$crystalObjectByPathIdentity][plan.parentPathIdentity];
       if (planCrystalObject) {
-        debug(
+        debugVerbose(
           "%s Looking for result for %c (for %c) in resultByCrystalObject %c",
           follow,
           planCrystalObject,
@@ -1032,7 +1041,7 @@ export class Aether {
           const previousResult = resultByCrystalObject.get(planCrystalObject);
           result[i] = previousResult;
 
-          debug(
+          debugVerbose(
             `  %s result[%o] for %c found: %c`,
             follow,
             i,
@@ -1041,7 +1050,7 @@ export class Aether {
           );
           continue;
         } else {
-          debug(
+          debugVerbose(
             `  %s no result for %c (%c)`,
             follow,
             planCrystalObject,
@@ -1103,7 +1112,7 @@ export class Aether {
               pendingCrystalObject[$$indexesByPathIdentity][
                 dependencyPathIdentity
               ];
-            debug(
+            debugVerbose(
               `%s Evaluating indexes for object %c plan %c(%c) => %c (all indexes: %c)`,
               follow,
               pendingCrystalObject,
@@ -1127,7 +1136,7 @@ export class Aether {
               indexes,
             );
             arr[pendingCrystalObjectIndex] = item;
-            debug(
+            debugVerbose(
               `  %s result at indexes %c of %c = %c`,
               follow,
               indexes,
@@ -1194,7 +1203,7 @@ export class Aether {
         resultByCrystalObject.set(planCrystalObject, result[j]);
       }
 
-      debug(
+      debugVerbose(
         `%sExecutePlan(%s): wrote results for [%s]: %c`,
         indent,
         plan,

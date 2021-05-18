@@ -1172,7 +1172,7 @@ class PgConnectionPlan<TDataSource extends PgDataSource<any>> extends Plan<
   execute(
     values: CrystalValuesList<any[]>,
   ): CrystalResultsList<Record<string, never>> {
-    debug(`%s: execute; values: %o`, this.id, values);
+    debug(`%c: execute; values: %o`, this, values);
     // TODO
     return values.map(() => ({}));
   }
