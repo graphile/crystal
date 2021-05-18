@@ -9,7 +9,6 @@ import {
   FieldNode,
   GraphQLObjectType,
   assertObjectType,
-  getNamedType,
   GraphQLInterfaceType,
   GraphQLUnionType,
   assertListType,
@@ -51,9 +50,7 @@ import {
   Batch,
   CrystalContext,
   CrystalObject,
-  $$id,
   $$crystalContext,
-  $$indexes,
   $$indexesByPathIdentity,
   $$crystalObjectByPathIdentity,
 } from "./interfaces";
