@@ -217,7 +217,7 @@ class PgDataSource<TRow extends { [key: string]: any }> extends DataSource<
             const existingResult = scopedCache.get(identifiersJSON);
             if (existingResult) {
               debug(
-                "%s served %s from cache: %o",
+                "%s served %o from cache: %c",
                 this,
                 identifiersJSON,
                 existingResult,

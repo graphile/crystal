@@ -1,1 +1,5 @@
-GRAPHILE_ENV=development DEBUG="crystal:*,-*:verbose" yarn nodemon -x 'node --enable-source-maps' --watch dist dist/examples/example.js
+#!/usr/bin/env bash
+export GRAPHILE_ENV="development"
+export DEBUG="crystal:*,-*:verbose"
+export DEBUG="crystal:*"
+yarn nodemon -x 'node --enable-source-maps' --watch dist dist/examples/example.js

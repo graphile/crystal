@@ -1071,11 +1071,10 @@ export class Aether {
         crystalObject[$$crystalObjectByPathIdentity][plan.parentPathIdentity];
       if (planCrystalObject) {
         debugVerbose(
-          "%s Looking for result for %c (for %c) in resultByCrystalObject %c",
+          "%s Looking for result for %c (for %c)",
           follow,
           planCrystalObject,
           plan,
-          resultByCrystalObject,
         );
         if (resultByCrystalObject.has(planCrystalObject)) {
           const previousResult = resultByCrystalObject.get(planCrystalObject);
@@ -1252,7 +1251,16 @@ export class Aether {
       );
     }
     if (isDev) {
-      debug(`%sExecutePlan(%s): complete; results: %c`, indent, plan, result);
+      if (debugVerbose.enabled) {
+        debugVerbose(
+          `%sExecutePlan(%s): complete; results: %c`,
+          indent,
+          plan,
+          result,
+        );
+      } else {
+        debug(`%sExecutePlan(%s): complete`, indent, plan);
+      }
     }
     return result;
   }

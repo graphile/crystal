@@ -21,6 +21,7 @@ import { isDev } from "./dev";
 import { isCrystalObject } from "./resolvers";
 import { CrystalObject } from "./interfaces";
 import { Plan } from "./plan";
+import { Deferred } from "./deferred";
 
 /**
  * The parent object is used as the key in `GetValuePlanId()`; for root level
@@ -295,6 +296,16 @@ export function isPromise<T>(t: T | Promise<T>): t is Promise<T> {
   );
 }
 
+export function isDeferred<T>(
+  t: T | Promise<T> | Deferred<T>,
+): t is Deferred<T> {
+  return (
+    isPromise(t) &&
+    typeof (t as any).resolve === "function" &&
+    typeof (t as any).reject === "function"
+  );
+}
+
 export function _crystalPrint(
   symbol:
     | symbol
@@ -304,6 +315,12 @@ export function _crystalPrint(
     | CrystalObject<any>,
   seen: Set<any>,
 ): string {
+  if (isDeferred(symbol)) {
+    return chalk.gray`<Deferred>`;
+  }
+  if (isPromise(symbol)) {
+    return chalk.gray`<Promise>`;
+  }
   if (symbol === ROOT_VALUE_OBJECT) {
     return chalk.gray`(blank)`;
   }
