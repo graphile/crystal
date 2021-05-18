@@ -1,6 +1,10 @@
 import * as assert from "assert";
 import chalk from "chalk";
-import { Aether, getCurrentAether, getCurrentPathIdentity } from "./aether";
+import {
+  Aether,
+  getCurrentAether,
+  getCurrentParentPathIdentity,
+} from "./aether";
 import { Constraint } from "./constraints";
 import { isDev, noop } from "./dev";
 import { inspect } from "util";
@@ -54,20 +58,13 @@ export abstract class Plan<TData = any> {
   public isFinalized = false;
   public readonly id: number;
   public readonly groupId: number;
-  /** @deprecated Only __ItemPlan should need access to this */
-  public readonly pathIdentity: string;
-  /** @deprecated Only __ItemPlan should need access to this */
   public readonly parentPathIdentity: string;
 
   constructor() {
     const aether = getCurrentAether();
     this.aether = aether;
     this.groupId = aether.groupId;
-    this.pathIdentity = getCurrentPathIdentity();
-    this.parentPathIdentity = this.pathIdentity.substr(
-      0,
-      this.pathIdentity.lastIndexOf(">"),
-    );
+    this.parentPathIdentity = getCurrentParentPathIdentity();
     this.id = aether.plans.push(this) - 1;
   }
 
@@ -75,7 +72,7 @@ export abstract class Plan<TData = any> {
     return chalk.bold.blue(
       `${this.constructor.name}[${inspect(this.id, {
         colors: true,
-      })}@${crystalPrintPathIdentity(this.pathIdentity)}]`,
+      })}@${crystalPrintPathIdentity(this.parentPathIdentity)}]`,
     );
   }
 

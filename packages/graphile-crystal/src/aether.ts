@@ -53,13 +53,13 @@ import {
   CrystalObject,
   $$id,
   $$crystalContext,
-  $$idByPathIdentity,
   $$indexes,
   $$indexesByPathIdentity,
+  $$crystalObjectByPathIdentity,
 } from "./interfaces";
 import { isDev } from "./dev";
 import { Deferred } from "./deferred";
-import { isCrystalObject } from "./resolvers";
+import { isCrystalObject, newCrystalObject } from "./resolvers";
 
 import debugFactory from "debug";
 
@@ -69,7 +69,7 @@ const debug = debugFactory("crystal:aether");
 
 const globalState = {
   aether: null as Aether | null,
-  pathIdentity: "" as string,
+  parentPathIdentity: "" as string,
 };
 
 interface ListCapablePlan<TData> extends Plan<TData> {
@@ -105,10 +105,10 @@ export function getCurrentAether(): Aether {
 
 /**
  * Like with `getCurrentAether`, since plan functions are called synchronously
- * _by us_ we can pull the current pathIdentity from global state.
+ * _by us_ we can pull the current parentPathIdentity from global state.
  */
-export function getCurrentPathIdentity(): string {
-  return globalState.pathIdentity;
+export function getCurrentParentPathIdentity(): string {
+  return globalState.parentPathIdentity;
 }
 
 type TrackedArguments = { [key: string]: InputPlan };
@@ -381,7 +381,7 @@ export class Aether {
     for (const [responseKey, fields] of groupedFieldSet.entries()) {
       const oldGroupId = this.groupId;
       const pathIdentity = `${path}>${objectType.name}.${responseKey}`;
-      globalState.pathIdentity = pathIdentity;
+      globalState.parentPathIdentity = path;
       const field = fields[0];
       const fieldName = field.name.value;
 
@@ -419,6 +419,8 @@ export class Aether {
 
       this.planIdByPathIdentity[pathIdentity] = plan.id;
 
+      // Now we're building the child plans, the parentPathIdentity becomes actually our identity.
+      globalState.parentPathIdentity = pathIdentity;
       const itemPlan = this.planSelectionSetForType(
         fieldType,
         fields,
@@ -701,7 +703,7 @@ export class Aether {
   private optimizePlans(): void {
     for (let i = this.plans.length - 1; i >= 0; i--) {
       const plan = this.plans[i];
-      globalState.pathIdentity = plan.pathIdentity;
+      globalState.parentPathIdentity = plan.parentPathIdentity;
       this.plans[i] = this.optimizePlan(plan);
     }
   }
@@ -800,7 +802,7 @@ export class Aether {
     for (let i = this.plans.length - 1; i >= 0; i--) {
       const plan = this.plans[i];
       if (plan !== null) {
-        globalState.pathIdentity = plan.pathIdentity;
+        globalState.parentPathIdentity = plan.parentPathIdentity;
         // checking the following would be redundant:
         // if (!distinctActivePlansInReverseOrder.has(plan))
         distinctActivePlansInReverseOrder.add(plan);
@@ -847,35 +849,39 @@ export class Aether {
     const rootId = uid("root");
     debug("Root id is %c", rootId);
     const crystalContext: CrystalContext = {
-      resultByIdByPlanId: Object.assign(Object.create(null), {
-        // TODO: maybe we should populate the initial values here rather than
-        // calling populateValuePlan? Will need to research V8 HiddenClass
-        // performance again.
-      }),
+      resultByCrystalObjectByPlanId: new Map(),
       metaByPlanId: Object.create(null),
       rootId,
+      // @ts-ignore We'll set this in just a moment...
+      rootCrystalObject: null,
     };
+    const rootCrystalObject = newCrystalObject(
+      null,
+      "",
+      rootId,
+      EMPTY_INDEXES,
+      rootValue,
+      crystalContext,
+    );
+    crystalContext.rootCrystalObject = rootCrystalObject;
     /*@__INLINE__*/ populateValuePlan(
       crystalContext,
       this.variableValuesPlan,
-      rootId,
-      EMPTY_INDEXES,
+      rootCrystalObject,
       variableValues,
       "variableValues",
     );
     /*@__INLINE__*/ populateValuePlan(
       crystalContext,
       this.contextPlan,
-      rootId,
-      EMPTY_INDEXES,
+      rootCrystalObject,
       context,
       "context",
     );
     /*@__INLINE__*/ populateValuePlan(
       crystalContext,
       this.rootValuePlan,
-      rootId,
-      EMPTY_INDEXES,
+      rootCrystalObject,
       rootValue,
       "rootValue",
     );
@@ -979,7 +985,10 @@ export class Aether {
     crystalContext: CrystalContext,
     crystalObjects: CrystalObject<any>[],
     visitedPlans = new Set<Plan>(),
+    depth = 0,
   ): Promise<any[]> {
+    const indent = "    ".repeat(depth);
+    const follow = indent + "  ⮞";
     if (isDev) {
       assert.ok(
         plan,
@@ -992,45 +1001,51 @@ export class Aether {
       throw new Error("Plan execution recursion error");
     }
     visitedPlans.add(plan);
-    let resultById = crystalContext.resultByIdByPlanId[plan.id];
-    if (!resultById) {
-      resultById = Object.create(null) as Record<symbol, any>;
-      crystalContext.resultByIdByPlanId[plan.id] = resultById;
+    let resultByCrystalObject = crystalContext.resultByCrystalObjectByPlanId.get(
+      plan.id,
+    );
+    if (!resultByCrystalObject) {
+      resultByCrystalObject = new Map();
+      crystalContext.resultByCrystalObjectByPlanId.set(
+        plan.id,
+        resultByCrystalObject,
+      );
     }
     const pendingCrystalObjects = []; // Length unknown
     const pendingCrystalObjectsIndexes = []; // Same length as pendingCrystalObjects
     const crystalObjectCount = crystalObjects.length;
     const result = new Array(crystalObjectCount);
+    debug("%sExecutePlan(%c)", indent, plan);
     for (let i = 0; i < crystalObjectCount; i++) {
       const crystalObject = crystalObjects[i];
-      const id = crystalObject[$$idByPathIdentity][plan.parentPathIdentity];
-      if (id) {
+      const planCrystalObject =
+        crystalObject[$$crystalObjectByPathIdentity][plan.parentPathIdentity];
+      if (planCrystalObject) {
         debug(
-          "Looking for id %c for plan %c in resultById %c",
-          id,
+          "%s Looking for result for %c (for %c) in resultByCrystalObject %c",
+          follow,
+          planCrystalObject,
           plan,
-          resultById,
+          resultByCrystalObject,
         );
-        if (id in resultById) {
-          const previousResult = resultById[id];
+        if (resultByCrystalObject.has(planCrystalObject)) {
+          const previousResult = resultByCrystalObject.get(planCrystalObject);
           result[i] = previousResult;
 
           debug(
-            `ExecutePlan(%s) result[%s] (for %s using id: %c) found: %o`,
-            plan,
+            `  %s result[%o] for %c found: %c`,
+            follow,
             i,
-            crystalObject,
-            id,
+            planCrystalObject,
             result[i],
           );
           continue;
         } else {
           debug(
-            `ExecutePlan(%s) no result for %s (using id: %c) (%c)`,
-            plan,
-            crystalObject,
-            id,
-            resultById,
+            `  %s no result for %c (%c)`,
+            follow,
+            planCrystalObject,
+            resultByCrystalObject,
           );
         }
       } else {
@@ -1045,10 +1060,12 @@ export class Aether {
     if (pendingCrystalObjectsLength > 0) {
       const dependenciesCount = plan.dependencies.length;
       const dependencyValuesList = new Array(dependenciesCount);
+      debug("%s Executing %o dependencies", follow, dependenciesCount);
 
       for (let i = 0; i < dependenciesCount; i++) {
         const dependencyPlanId = plan.dependencies[i];
-        let dependencyPlan = this.plans[dependencyPlanId];
+        const originalDependencyPlan = this.plans[dependencyPlanId];
+        let dependencyPlan = originalDependencyPlan;
         if (isDev) {
           assert.ok(
             dependencyPlan,
@@ -1058,15 +1075,18 @@ export class Aether {
           );
         }
         let listDepth = 0;
+        const dependencyPathIdentity =
+          originalDependencyPlan.parentPathIdentity;
         while (dependencyPlan instanceof __ListItemPlan) {
           listDepth++;
           dependencyPlan = this.plans[dependencyPlan.dependencies[0]];
         }
-        const dependencyResult = await this.executePlan(
+        const allDependencyResults = await this.executePlan(
           dependencyPlan,
           crystalContext,
           pendingCrystalObjects,
           visitedPlans,
+          depth + 1,
         );
         if (listDepth > 0) {
           const arr = new Array(pendingCrystalObjectsLength);
@@ -1075,12 +1095,23 @@ export class Aether {
             pendingCrystalObjectIndex < pendingCrystalObjectsLength;
             pendingCrystalObjectIndex++
           ) {
+            const dependencyResultForPendingCrystalObject =
+              allDependencyResults[pendingCrystalObjectIndex];
             const pendingCrystalObject =
               pendingCrystalObjects[pendingCrystalObjectIndex];
             const indexes =
               pendingCrystalObject[$$indexesByPathIdentity][
-                dependencyPlan.pathIdentity
+                dependencyPathIdentity
               ];
+            debug(
+              `%s Evaluating indexes for object %c plan %c(%c) => %c (all indexes: %c)`,
+              follow,
+              pendingCrystalObject,
+              originalDependencyPlan,
+              dependencyPlan,
+              indexes,
+              pendingCrystalObject[$$indexesByPathIdentity],
+            );
             if (!indexes) {
               throw new Error(
                 "Attempted to access __ListItemPlan with unknown indexes",
@@ -1091,13 +1122,23 @@ export class Aether {
                 `Attempted to access __ListItemPlan with incorrect list depth (${indexes.length} != ${listDepth})`,
               );
             }
-            const item = /*!__INLINE__*/ atIndexes(dependencyResult, indexes);
+            const item = /*!__INLINE__*/ atIndexes(
+              dependencyResultForPendingCrystalObject,
+              indexes,
+            );
             arr[pendingCrystalObjectIndex] = item;
+            debug(
+              `  %s result at indexes %c of %c = %c`,
+              follow,
+              indexes,
+              dependencyResultForPendingCrystalObject,
+              item,
+            );
           }
           dependencyValuesList[i] = arr;
         } else {
           // Optimisation
-          dependencyValuesList[i] = dependencyResult;
+          dependencyValuesList[i] = allDependencyResults;
         }
       }
 
@@ -1141,38 +1182,42 @@ export class Aether {
         const pendingResult = pendingResults[i];
         const j = pendingCrystalObjectsIndexes[i];
 
-        const id = crystalObject[$$idByPathIdentity][plan.parentPathIdentity];
-        if (!id) {
+        const planCrystalObject =
+          crystalObject[$$crystalObjectByPathIdentity][plan.parentPathIdentity];
+        if (!planCrystalObject) {
           throw new Error(
-            `Crystal error: could not find id for ${plan.parentPathIdentity} in ${crystalObject}`,
+            `Crystal error: could not find crystalObject for ${plan.parentPathIdentity} in ${crystalObject}`,
           );
         }
 
-        resultById[id] = result[j] = pendingResult;
+        result[j] = pendingResult;
+        resultByCrystalObject.set(planCrystalObject, result[j]);
       }
 
       debug(
-        `ExecutePlan(%s): wrote results for [%s]: %c`,
+        `%sExecutePlan(%s): wrote results for [%s]: %c`,
+        indent,
         plan,
         pendingCrystalObjects.join(", "),
-        resultById,
+        resultByCrystalObject,
       );
     }
     if (isDev) {
-      debug(`ExecutePlan(%s): complete; results: %c`, plan, result);
+      debug(`%sExecutePlan(%s): complete; results: %c`, indent, plan, result);
     }
     return result;
   }
 
   /**
-   * Implements `GetValuePlanId`.
+   * Used to implement `GetValuePlanId`, but was rewritten to factor in that we
+   * now key by crystal objects rather than id and indexes.
    */
   getValuePlanId(
     crystalContext: CrystalContext,
     valuePlan: __ValuePlan,
     object: object,
     pathIdentity: string,
-  ): UniqueId {
+  ): { valueId: UniqueId; existed: boolean } {
     assert.ok(
       valuePlan instanceof __ValuePlan,
       "Expected getValuePlanId to be called with a __ValuePlan",
@@ -1199,37 +1244,33 @@ export class Aether {
         valueId,
       );
       valueIdByObject.set(key, valueId);
-      populateValuePlan(
-        crystalContext,
-        valuePlan,
-        valueId,
-        EMPTY_INDEXES, // TODO: this seems wrong
-        key,
-        "parent",
-      );
+      // populateValuePlan used to be here, but now it lives in resolvers.ts
+      return { valueId, existed: false };
     }
-    return valueId;
+    return { valueId, existed: true };
   }
 }
 
 /**
  * Implements `PopulateValuePlan`
  */
-function populateValuePlan(
+export function populateValuePlan(
   crystalContext: CrystalContext,
   valuePlan: Plan,
-  valueId: UniqueId,
-  indexes: readonly number[],
+  valueCrystalObject: CrystalObject<any>,
   object: any,
   label: string,
 ): void {
-  let resultById = crystalContext.resultByIdByPlanId[valuePlan.id];
-  if (!resultById) {
-    resultById = Object.create(null) as Record<symbol, any>;
-    crystalContext.resultByIdByPlanId[valuePlan.id] = resultById;
+  let resultByCrystalObject = crystalContext.resultByCrystalObjectByPlanId.get(
+    valuePlan.id,
+  );
+  if (!resultByCrystalObject) {
+    resultByCrystalObject = new Map();
+    crystalContext.resultByCrystalObjectByPlanId.set(
+      valuePlan.id,
+      resultByCrystalObject,
+    );
   }
-  resultById[valueId] = new Map<string, any>();
-  const map = resultById[valueId];
-  map.set(indexes.join(), object ?? ROOT_VALUE_OBJECT);
-  debug("Populated value plan for %s: %c", label, resultById);
+  resultByCrystalObject.set(valueCrystalObject, object ?? ROOT_VALUE_OBJECT);
+  debug("Populated value plan for %s: %c", label, resultByCrystalObject);
 }

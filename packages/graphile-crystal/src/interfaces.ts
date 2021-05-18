@@ -7,7 +7,9 @@ export const $$data = Symbol("data");
 export const $$id = Symbol("id");
 export const $$indexes = Symbol("indexes");
 export const $$pathIdentity = Symbol("pathIdentity");
-export const $$idByPathIdentity = Symbol("idByPathIdentity");
+export const $$crystalObjectByPathIdentity = Symbol(
+  "crystalObjectByPathIdentity",
+);
 export const $$indexesByPathIdentity = Symbol("indexesByPathIdentity");
 
 export interface CrystalObject<TData> {
@@ -15,7 +17,9 @@ export interface CrystalObject<TData> {
   [$$pathIdentity]: string;
   [$$indexes]: ReadonlyArray<number>;
   [$$crystalContext]: CrystalContext;
-  [$$idByPathIdentity]: { [pathIdentity: string]: UniqueId | undefined };
+  [$$crystalObjectByPathIdentity]: {
+    [pathIdentity: string]: CrystalObject<any> | undefined;
+  };
   [$$indexesByPathIdentity]: {
     [pathIdentity: string]: ReadonlyArray<number> | undefined;
   };
@@ -41,28 +45,21 @@ export interface CrystalContext {
    * - First is the plan ID; note that a plan is always created within the
    *   context of a specific field within a specific operation, so it has an
    *   inherent path identity.
-   * - Next is the unique ID for the parent field instance (if the parent field
-   *   was part of a list then each instance of this parent field within the list
-   *   will have a different unique id).
-   * - Next is the indexes of the current field instance within the parent
-   *   field instance - if the parent field does not return a list then this will
-   *   be an empty array, if the parent field returns a list (or list of lists,
-   *   or list of list of lists, ...) then this will be an array of the indicies
-   *   within these lists.
+   * - Next is the crystal object that represents the parent field instance (if
+   *   the parent field was part of a list then each value within this list will
+   *   have a different, unique, crystal object).
    * - Finally we have the plan result data. Note that this could be anything.
    *
    */
-  resultByIdByPlanId: {
-    [planId: number]:
-      | Record<UniqueId, Map<string /* indexes, joined with commas */, any>>
-      | undefined;
-  };
+  resultByCrystalObjectByPlanId: Map<number, Map<CrystalObject<any>, any>>;
 
   metaByPlanId: {
     [planId: number]: object | undefined;
   };
 
   rootId: UniqueId;
+
+  rootCrystalObject: CrystalObject<any>;
 }
 
 // These values are just to make reading the code a little clearer

@@ -18,7 +18,7 @@ import { Plan, __ValuePlan } from "./plan";
 import {
   CrystalObject,
   CrystalContext,
-  $$idByPathIdentity,
+  $$crystalObjectByPathIdentity,
   $$indexesByPathIdentity,
   $$crystalContext,
   $$data,
@@ -36,6 +36,7 @@ import {
 } from "./utils";
 import { defer, Deferred } from "./deferred";
 import { isDev } from "./dev";
+import { populateValuePlan } from "./aether";
 
 const debug = debugFactory("crystal:resolvers");
 
@@ -173,6 +174,9 @@ export function crystalWrapResolve<
       // aether) - e.g. as a result of multiple identical subscription
       // operations.
       parentCrystalObject = parentObject;
+    } else if (!path.prev) {
+      // Special workaround for the root object.
+      parentCrystalObject = crystalContext.rootCrystalObject;
     } else {
       // Note: we need to "fake" that the parent was a plan. Because we may
       // have lots of resolvers all called for the same parent object, we use a
@@ -190,7 +194,7 @@ export function crystalWrapResolve<
         "Expected parent field (which returned non-crystal object) to be a valuePlan)",
       );
 
-      const parentId = aether.getValuePlanId(
+      const { valueId: parentId, existed } = aether.getValuePlanId(
         crystalContext,
         parentPlan,
         parentObject,
@@ -206,6 +210,15 @@ export function crystalWrapResolve<
         parentObject,
         crystalContext,
       );
+      if (!existed) {
+        populateValuePlan(
+          crystalContext,
+          parentPlan,
+          parentCrystalObject,
+          parentObject,
+          "parent",
+        );
+      }
       debug(
         "   Created a new crystal object to represent the parent of %p: %c",
         pathIdentity,
@@ -333,7 +346,7 @@ function crystalWrap<TData>(
       indexes,
       data,
       crystalContext,
-      parentCrystalObject[$$idByPathIdentity],
+      parentCrystalObject[$$crystalObjectByPathIdentity],
       parentCrystalObject[$$indexesByPathIdentity],
     );
   } else {
@@ -351,15 +364,17 @@ function crystalWrap<TData>(
 /**
  * Implements `NewCrystalObject`
  */
-function newCrystalObject<TData>(
-  plan: Plan,
+export function newCrystalObject<TData>(
+  plan: Plan | null, // TODO: delete this line
   pathIdentity: string,
   id: UniqueId,
   indexes: ReadonlyArray<number>,
   data: TData,
   crystalContext: CrystalContext,
-  idByPathIdentity: { [pathIdentity: string]: UniqueId | undefined } = {
-    "": crystalContext.rootId,
+  crystalObjectByPathIdentity: {
+    [pathIdentity: string]: CrystalObject<any> | undefined;
+  } = {
+    "": crystalContext.rootCrystalObject,
   },
   indexesByPathIdentity: {
     [pathIdentity: string]: ReadonlyArray<number> | undefined;
@@ -373,14 +388,16 @@ function newCrystalObject<TData>(
     [$$data]: data,
     [$$indexes]: indexes, // Shortcut to $$indexesByPathIdentity[$$pathIdentity]
     [$$crystalContext]: crystalContext,
-    [$$idByPathIdentity]: Object.freeze({
-      ...idByPathIdentity,
-      [pathIdentity]: id,
-    }),
-    [$$indexesByPathIdentity]: Object.freeze({
-      ...indexesByPathIdentity,
-      [pathIdentity]: indexes,
-    }),
+    [$$crystalObjectByPathIdentity]: Object.assign(
+      Object.create(null),
+      crystalObjectByPathIdentity,
+    ),
+    [$$indexesByPathIdentity]: Object.freeze(
+      Object.assign(Object.create(null), {
+        ...indexesByPathIdentity,
+        [pathIdentity]: indexes,
+      }),
+    ),
     // @ts-ignore
     toString() {
       const p = indexes.length ? `.${indexes.join(".")}` : ``;
@@ -389,6 +406,8 @@ function newCrystalObject<TData>(
       );
     },
   };
+  crystalObject[$$crystalObjectByPathIdentity][pathIdentity] = crystalObject;
+  Object.freeze(crystalObject[$$crystalObjectByPathIdentity]);
   if (isDev) {
     debug(`Constructed %s with data %c`, crystalObject, data);
   }
