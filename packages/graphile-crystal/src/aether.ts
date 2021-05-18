@@ -729,6 +729,7 @@ export class Aether {
       }
       loops++;
     } while (replacements > 0);
+    debug("Plan optimisation complete after %o loops", loops);
   }
 
   private isPeer(planA: Plan, planB: Plan): boolean {
@@ -760,11 +761,26 @@ export class Aether {
    * Implements the `OptimizePlan` algorithm.
    */
   private optimizePlan(plan: Plan): Plan {
-    const peers = this.plans.filter(
-      (potentialPeer) =>
-        potentialPeer.id !== plan.id && this.isPeer(plan, potentialPeer),
-    );
-    return plan.optimize(peers);
+    const seenIds = new Set([plan.id]);
+    const peers = this.plans.filter((potentialPeer) => {
+      if (!seenIds.has(potentialPeer.id) && this.isPeer(plan, potentialPeer)) {
+        seenIds.add(potentialPeer.id);
+        return true;
+      }
+      return false;
+    });
+    const replacementPlan = plan.optimize(peers);
+    if (replacementPlan !== plan) {
+      debugVerbose(
+        "Optimized %c with peers %c => %c",
+        plan,
+        peers,
+        replacementPlan,
+      );
+    } else {
+      debugVerbose("Optimized %c with peers %c", plan, peers);
+    }
+    return replacementPlan;
   }
 
   /**

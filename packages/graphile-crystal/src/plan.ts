@@ -15,6 +15,9 @@ import {
   PromiseOrDirect,
 } from "./interfaces";
 import { crystalPrintPathIdentity } from "./utils";
+import debugFactory from "debug";
+
+const debug = debugFactory("crystal:plans");
 
 function reallyAssertFinalized(plan: Plan): void {
   if (!plan.isFinalized) {
@@ -310,6 +313,8 @@ function constructDestructureFunction(
   }
 }
 
+const debugAccessPlan = debug.extend("AccessPlan");
+const debugAccessPlanVerbose = debugAccessPlan.extend("verbose");
 /**
  * Accesses a (potentially nested) property from the result of a plan.
  *
@@ -353,7 +358,16 @@ export class AccessPlan extends Plan {
   }
 
   optimize(peers: AccessPlan[]): AccessPlan {
-    const peersWithSamePath = peers.filter((p) => p.path === this.path);
+    const myPath = JSON.stringify(this.path);
+    const peersWithSamePath = peers.filter(
+      (p) => JSON.stringify(p.path) === myPath,
+    );
+    debugAccessPlanVerbose(
+      "%c optimize: peers with same path %o = %c",
+      this,
+      this.path,
+      peersWithSamePath,
+    );
     return peersWithSamePath.length > 0 ? peersWithSamePath[0] : this;
   }
 }
