@@ -351,6 +351,11 @@ export class AccessPlan extends Plan {
   finalize(): void {
     super.finalize();
   }
+
+  optimize(peers: AccessPlan[]): AccessPlan {
+    const peersWithSamePath = peers.filter((p) => p.path === this.path);
+    return peersWithSamePath.length > 0 ? peersWithSamePath[0] : this;
+  }
 }
 
 /**

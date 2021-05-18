@@ -705,16 +705,40 @@ export class Aether {
    * before we optimise ourself.
    */
   private optimizePlans(): void {
-    for (let i = this.plans.length - 1; i >= 0; i--) {
-      const plan = this.plans[i];
-      globalState.parentPathIdentity = plan.parentPathIdentity;
-      this.plans[i] = this.optimizePlan(plan);
-    }
+    let replacements = 0;
+    let loops = 0;
+    let lastOptimizedPlan;
+
+    // Keep optimising plans until there's no more replacements to be made.
+    do {
+      if (loops > 10000) {
+        throw new Error(
+          `optimizePlans has looped ${loops} times and is still substituting out plans; the plan.optimize method on ${lastOptimizedPlan} might be buggy.`,
+        );
+      }
+      replacements = 0;
+      for (let i = this.plans.length - 1; i >= 0; i--) {
+        const plan = this.plans[i];
+        globalState.parentPathIdentity = plan.parentPathIdentity;
+        const replacementPlan = this.optimizePlan(plan);
+        if (replacementPlan !== plan) {
+          lastOptimizedPlan = replacementPlan;
+          replacements++;
+          this.plans[i] = replacementPlan;
+        }
+      }
+      loops++;
+    } while (replacements > 0);
   }
 
   private isPeer(planA: Plan, planB: Plan): boolean {
     // Can only merge if plan is of same type.
     if (planA.constructor !== planB.constructor) {
+      return false;
+    }
+
+    // Can only merge if the plans exist at the same level.
+    if (planA.parentPathIdentity !== planB.parentPathIdentity) {
       return false;
     }
 

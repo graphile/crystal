@@ -6,7 +6,7 @@ class MapPlan extends Plan {
   private mapper: (obj: object) => object;
   constructor(
     parentPlan: Plan,
-    actualKeyByDesiredKey: { [desiredKey: string]: string },
+    private actualKeyByDesiredKey: { [desiredKey: string]: string },
   ) {
     super();
     this.addDependency(parentPlan);
@@ -23,6 +23,14 @@ class MapPlan extends Plan {
       const previous = value[0];
       return this.mapper(previous);
     });
+  }
+
+  optimize(peers: MapPlan[]): MapPlan {
+    const myMap = JSON.stringify(this.actualKeyByDesiredKey);
+    const peersWithSameMap = peers.filter(
+      (p) => JSON.stringify(p.actualKeyByDesiredKey) === myMap,
+    );
+    return peersWithSameMap.length > 0 ? peersWithSameMap[0] : this;
   }
 }
 
@@ -83,6 +91,14 @@ class ObjectPlan<TData extends { [key: string]: any }> extends Plan<TData> {
   execute(values: Array<Array<TData[keyof TData]>>): Array<TData> {
     return values.map(this.tupleToObject.bind(this));
   }
+
+  optimize(peers: ObjectPlan<TData>[]): ObjectPlan<TData> {
+    const myKeys = JSON.stringify(this.keys);
+    const peersWithSameKeys = peers.filter(
+      (p) => JSON.stringify(p.keys) === myKeys,
+    );
+    return peersWithSameKeys.length > 0 ? peersWithSameKeys[0] : this;
+  }
 }
 
 export function object<TData extends { [key: string]: any }>(
@@ -139,6 +155,10 @@ class ListPlan<TPlanTuple extends readonly Plan<any>[]> extends Plan<
   ): Array<UnwrapPlanTuple<TPlanTuple>> {
     return values.map(this.tupleToTuple.bind(this));
   }
+
+  optimize(peers: ListPlan<TPlanTuple>[]): ListPlan<TPlanTuple> {
+    return peers.length > 0 ? peers[0] : this;
+  }
 }
 
 export function list<TPlanTuple extends Plan<any>[]>(
@@ -157,6 +177,10 @@ class FirstPlan<TData> extends Plan<TData> {
     values: CrystalValuesList<[ReadonlyArray<TData>]>,
   ): CrystalResultsList<TData> {
     return values.map((tuple) => tuple[0]?.[0]);
+  }
+
+  optimize(peers: FirstPlan<TData>[]): FirstPlan<TData> {
+    return peers.length > 0 ? peers[0] : this;
   }
 }
 
