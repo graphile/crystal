@@ -54,6 +54,7 @@ import { CrystalValuesList, CrystalResultsList } from "../interfaces";
 //const EMPTY_OBJECT = Object.freeze(Object.create(null));
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 const debug = debugFactory("crystal:example");
+const debugVerbose = debug.extend("verbose");
 
 const testPool = new Pool({ connectionString: "graphile_crystal" });
 
@@ -216,7 +217,7 @@ class PgDataSource<TRow extends { [key: string]: any }> extends DataSource<
             const identifiersJSON = JSON.stringify(identifiers); // TODO: Canonical? Manual for perf?
             const existingResult = scopedCache.get(identifiersJSON);
             if (existingResult) {
-              debug(
+              debugVerbose(
                 "%s served %o from cache: %c",
                 this,
                 identifiersJSON,
@@ -224,6 +225,12 @@ class PgDataSource<TRow extends { [key: string]: any }> extends DataSource<
               );
               results[resultIndex] = existingResult;
             } else {
+              debugVerbose(
+                "%s no entry for %o in cache %c",
+                this,
+                identifiersJSON,
+                scopedCache,
+              );
               assert.ok(
                 remaining.includes(identifiersJSON) === false,
                 "Should only fetch each identifiersJSON once, future entries in the loop should receive previous deferred",
