@@ -18,7 +18,8 @@ import {
   ListTypeNode,
   NonNullTypeNode,
 } from "graphql";
-import { __TrackedObjectPlan, Plan } from "./plan";
+import { Plan } from "./plan";
+import { __TrackedObjectPlan } from "./plans";
 import { defaultValueToValueNode } from "./utils";
 
 export type InputPlan =

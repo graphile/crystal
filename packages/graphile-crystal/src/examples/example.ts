@@ -33,20 +33,15 @@ import {
 } from "graphql";
 import sql, { SQL, SQLRawValue } from "pg-sql2";
 import { crystalEnforce } from "..";
-import {
-  Plan,
-  __TrackedObjectPlan,
-  __ValuePlan,
-  __ListItemPlan,
-  AccessPlan,
-} from "../plan";
+import { Plan, __ListItemPlan } from "../plan";
+import { __TrackedObjectPlan, __ValuePlan } from "../plans";
 import prettier from "prettier";
 
 import { Pool } from "pg";
 import { resolve } from "path";
 import { inspect } from "util";
 import debugFactory from "debug";
-import { map, object, aether, first, debugPlans } from "../plans";
+import { map, object, aether, first, access } from "../plans";
 import LRU from "@graphile/lru";
 import { Deferred, defer } from "../deferred";
 import { Aether } from "../aether";
@@ -1174,7 +1169,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
           debugVerbose("Optimising %c (via %c and %c)", this, table, parent2);
           //console.dir(this.dependencies.map((id) => this.aether.plans[id]));
           parent2.debug = true;
-          return debugPlans(() => new AccessPlan(parent2, [selfIndex]));
+          return access(parent2, [selfIndex]);
         }
 
         table.locked = tableWasLocked;

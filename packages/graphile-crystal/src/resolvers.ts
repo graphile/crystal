@@ -14,7 +14,8 @@ import {
 import debugFactory from "debug";
 import { establishAether } from "./establishAether";
 import { Path } from "graphql/jsutils/Path";
-import { Plan, __ValuePlan } from "./plan";
+import { Plan } from "./plan";
+import { __ValuePlan } from "./plans";
 import {
   CrystalObject,
   CrystalContext,

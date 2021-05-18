@@ -25,13 +25,12 @@ import {
 } from "graphql";
 import {
   Plan,
-  __TrackedObjectPlan,
-  __ValuePlan,
   assertFinalized,
   PolymorphicPlan,
   ArgumentPlan,
   __ListItemPlan,
 } from "./plan";
+import { __TrackedObjectPlan, __ValuePlan } from "./plans";
 import { graphqlCollectFields, getDirective } from "./graphqlCollectFields";
 import { InputPlan, inputPlan, InputObjectPlan } from "./input";
 import {

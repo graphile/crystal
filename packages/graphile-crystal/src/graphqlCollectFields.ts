@@ -10,7 +10,7 @@ import {
   DirectiveNode,
 } from "graphql";
 import { Aether } from "./aether";
-import { __TrackedObjectPlan } from "./plan";
+import { __TrackedObjectPlan } from "./plans";
 
 /**
  * Given a selection, finds the first directive named `directiveName`.
