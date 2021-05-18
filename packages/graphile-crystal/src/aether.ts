@@ -23,14 +23,8 @@ import {
   GraphQLList,
   GraphQLNonNull,
 } from "graphql";
-import {
-  Plan,
-  assertFinalized,
-  PolymorphicPlan,
-  ArgumentPlan,
-  __ListItemPlan,
-} from "./plan";
-import { __TrackedObjectPlan, __ValuePlan } from "./plans";
+import { Plan, assertFinalized, PolymorphicPlan, ArgumentPlan } from "./plan";
+import { __TrackedObjectPlan, __ValuePlan, __ListItemPlan } from "./plans";
 import { graphqlCollectFields, getDirective } from "./graphqlCollectFields";
 import { InputPlan, inputPlan, InputObjectPlan } from "./input";
 import {

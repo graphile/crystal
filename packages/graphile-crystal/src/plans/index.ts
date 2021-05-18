@@ -19,5 +19,6 @@ export { map, MapPlan } from "./map";
 export { access, AccessPlan } from "./access";
 
 // Internal plans
+export { __ListItemPlan } from "./__listItem";
 export { __ValuePlan } from "./__value";
 export { __TrackedObjectPlan } from "./__trackedObject";

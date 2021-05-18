@@ -33,8 +33,8 @@ import {
 } from "graphql";
 import sql, { SQL, SQLRawValue } from "pg-sql2";
 import { crystalEnforce } from "..";
-import { Plan, __ListItemPlan } from "../plan";
-import { __TrackedObjectPlan, __ValuePlan } from "../plans";
+import { Plan } from "../plan";
+import { __TrackedObjectPlan, __ValuePlan, __ListItemPlan } from "../plans";
 import prettier from "prettier";
 
 import { Pool } from "pg";
