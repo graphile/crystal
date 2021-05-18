@@ -229,10 +229,22 @@ export class Aether {
       }
     }
 
+    // Helpfully check plans don't do forbidden things.
     this.validatePlans();
-    this.optimizePlans();
+
+    // Get rid of temporary plans
     this.treeShakePlans();
+
+    // Replace/inline/optimise plans
+    this.optimizePlans();
+
+    // Get rid of plans that are no longer needed after optimising
+    this.treeShakePlans();
+
+    // Plans are expected to execute later; they may take steps here to prepare
+    // themselves (e.g. compiling SQL queries ahead of time).
     this.finalizePlans();
+
     globalState.aether = null;
   }
 
@@ -709,6 +721,9 @@ export class Aether {
       replacements = 0;
       for (let i = this.plans.length - 1; i >= 0; i--) {
         const plan = this.plans[i];
+        if (!plan) {
+          continue;
+        }
         globalState.parentPathIdentity = plan.parentPathIdentity;
         const replacementPlan = this.optimizePlan(plan);
         if (replacementPlan !== plan) {
@@ -753,7 +768,11 @@ export class Aether {
   private optimizePlan(plan: Plan): Plan {
     const seenIds = new Set([plan.id]);
     const peers = this.plans.filter((potentialPeer) => {
-      if (!seenIds.has(potentialPeer.id) && this.isPeer(plan, potentialPeer)) {
+      if (
+        potentialPeer &&
+        !seenIds.has(potentialPeer.id) &&
+        this.isPeer(plan, potentialPeer)
+      ) {
         seenIds.add(potentialPeer.id);
         return true;
       }
