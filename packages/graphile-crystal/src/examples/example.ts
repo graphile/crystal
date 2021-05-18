@@ -489,7 +489,7 @@ class PgColumnSelectPlan<
 > extends Plan<TDataSource["TRow"][TColumn]> {
   public readonly tableId: number;
   constructor(
-    public table: PgClassSelectSinglePlan<TDataSource>,
+    table: PgClassSelectSinglePlan<TDataSource>,
     // This is the numeric index the parent PgClassSelectPlan gave us to represent this value
     private attrIndex: number,
     private attr: TColumn,
@@ -498,6 +498,12 @@ class PgColumnSelectPlan<
     super();
     this.tableId = this.addDependency(table);
     debug(`%s (%s = .%s) constructor`, this, attrIndex, this.attr);
+  }
+
+  getTable(): PgClassSelectSinglePlan<TDataSource> {
+    return this.aether.plans[
+      this.dependencies[this.tableId]
+    ] as PgClassSelectSinglePlan<TDataSource>;
   }
 
   execute(values: any[][]) {
@@ -630,12 +636,13 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
   private conditions: SQL[];
   private orders: SQL[];
   private locked = false;
+  private cloneIdentifierIndex: number | null | undefined;
 
   constructor(
     dataSource: TDataSource,
     identifiers: Array<{ plan: Plan<any>; type: SQL }>,
     identifierMatchesThunk: (alias: SQL) => SQL[],
-    private cloneFrom: PgClassSelectPlan<TDataSource> | null = null,
+    cloneFrom: PgClassSelectPlan<TDataSource> | null = null,
   ) {
     super();
     this.dataSource = dataSource;
@@ -669,6 +676,9 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
       : false;
     this.conditions = cloneFrom ? cloneFrom.conditions : [];
     this.orders = cloneFrom ? cloneFrom.orders : [];
+    this.cloneIdentifierIndex = cloneFrom
+      ? cloneFrom.finalizeResults?.identifierIndex
+      : undefined;
 
     if (!cloneFrom) {
       if (this.identifiers.length !== this.identifierMatches.length) {
@@ -895,7 +905,12 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
         ? sql` array[${sql.indent(
             sql.join(fragmentsWithAliases, ",\n"),
           )}]::text[]`
-        : sql` array['' /* NOTHING?! */]::text[]`;
+        : /*
+           * In the case where our array is empty, we must add something or
+           * PostgreSQL will fail with 'ERROR:  2202E: cannot accumulate empty
+           * arrays'
+           */
+          sql` array['' /* NOTHING?! */]::text[]`;
 
       return sql`select${selection}`;
     } else {
@@ -984,7 +999,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
   }
 
   private buildQuery(options: { asArray?: boolean } = {}): SQL {
-    if (!this.isTrusted && (!this.cloneFrom || this.cloneFrom.isTrusted)) {
+    if (!this.isTrusted) {
       this.dataSource.applyAuthorizationChecksToPlan(this);
     }
 
@@ -1011,8 +1026,8 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
       let identifierIndex: number | null = null;
 
       // We only want to add the identifiers once
-      if (this.cloneFrom && this.cloneFrom.finalizeResults) {
-        identifierIndex = this.cloneFrom.finalizeResults.identifierIndex;
+      if (this.cloneIdentifierIndex !== undefined) {
+        identifierIndex = this.cloneIdentifierIndex;
       } else {
         identifierIndex = this.addIdentifiers();
       }
@@ -1064,7 +1079,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
           break;
         }
         const p2 = this.aether.plans[dep.dependencies[dep.tableId]];
-        const t2 = dep.table.classPlan;
+        const t2 = dep.getTable().getClassPlan();
         if (t === undefined && p === undefined) {
           p = p2;
           t = t2;
@@ -1233,16 +1248,25 @@ class PgClassSelectSinglePlan<
   /**
    * If a cursor was requested, what plan returns it?
    */
-  private cursorPlan: Plan<any> | null;
+  private cursorPlanId: number | null;
+
+  private classPlanId: number;
 
   constructor(
-    public readonly classPlan: PgClassSelectPlan<TDataSource>,
+    classPlan: PgClassSelectPlan<TDataSource>,
     itemPlan: Plan<TDataSource["TRow"]>,
   ) {
     super();
+    this.classPlanId = classPlan.id;
     this.itemPlanId = this.addDependency(itemPlan);
     this.colPlans = {}; // TODO: think about cloning
-    this.cursorPlan = null;
+    this.cursorPlanId = null;
+  }
+
+  getClassPlan(): PgClassSelectPlan<TDataSource> {
+    return this.aether.plans[this.classPlanId] as PgClassSelectPlan<
+      TDataSource
+    >;
   }
 
   /**
@@ -1254,14 +1278,12 @@ class PgClassSelectSinglePlan<
   ): PgColumnSelectPlan<TDataSource, TAttr> {
     // Only one plan per column
     if (!this.colPlans[attr]) {
+      const classPlan = this.getClassPlan();
       // TODO: where do we do the SQL conversion, e.g. to_json for dates to
       // enforce ISO8601? Perhaps this should be the datasource itself, and
       // `attr` should be an SQL expression? This would allow for computed
       // fields/etc too (admittedly those without arguments).
-      const expression = sql`${sql.identifier(
-        this.classPlan.symbol,
-        String(attr),
-      )}`;
+      const expression = sql`${sql.identifier(classPlan.symbol, String(attr))}`;
 
       /*
        * Only cast to `::text` during select; we want to use it uncasted in
@@ -1273,7 +1295,7 @@ class PgClassSelectSinglePlan<
        *   mangle the data in unexpected ways - we take responsibility for
        *   decoding these string values.
        */
-      const index = this.classPlan.select(sql`${expression}::text`);
+      const index = classPlan.select(sql`${expression}::text`);
 
       this.colPlans[attr] = new PgColumnSelectPlan(
         this,
@@ -1292,13 +1314,15 @@ class PgClassSelectSinglePlan<
    * the right place for this.
    */
   cursor() {
-    if (this.cursorPlan == null) {
-      this.cursorPlan = new PgAttributeSelectPlan(
+    if (this.cursorPlanId == null) {
+      const cursorPlan = new PgAttributeSelectPlan(
         this,
-        this.classPlan.select($$CURSOR),
+        this.getClassPlan().select($$CURSOR),
       );
+      this.cursorPlanId = cursorPlan.id;
+      return cursorPlan;
     }
-    return this.cursorPlan;
+    return this.aether.plans[this.cursorPlanId];
   }
 
   execute(
@@ -1330,13 +1354,20 @@ class ConnectionPlan<TSubplan extends Plan<any>> extends Plan<Opaque<any>> {
 class PgConnectionPlan<TDataSource extends PgDataSource<any>> extends Plan<
   unknown
 > {
-  constructor(public readonly subplan: PgClassSelectPlan<TDataSource>) {
+  private subplanId: number;
+
+  constructor(subplan: PgClassSelectPlan<TDataSource>) {
     super();
+    this.subplanId = subplan.id;
     debug(`%s (around %s) constructor`, this, subplan);
   }
 
+  getSubplan(): PgClassSelectPlan<TDataSource> {
+    return this.aether.plans[this.subplanId] as PgClassSelectPlan<TDataSource>;
+  }
+
   nodes(): PgClassSelectPlan<TDataSource> {
-    return this.subplan.clone();
+    return this.getSubplan().clone();
   }
 
   execute(

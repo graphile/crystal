@@ -331,13 +331,12 @@ const debugAccessPlanVerbose = debugAccessPlan.extend("verbose");
  */
 export class AccessPlan extends Plan {
   private destructure: (value: any) => any;
+  private parentPlanId: number;
 
-  constructor(
-    private readonly parentPlan: Plan,
-    public readonly path: (string | number)[],
-  ) {
+  constructor(parentPlan: Plan, public readonly path: (string | number)[]) {
     super();
     this.addDependency(parentPlan);
+    this.parentPlanId = parentPlan.id;
     this.destructure = constructDestructureFunction(path);
   }
 
@@ -345,14 +344,20 @@ export class AccessPlan extends Plan {
    * Get the named property of an object.
    */
   get(attrName: string): AccessPlan {
-    return new AccessPlan(this.parentPlan, [...this.path, attrName]);
+    return new AccessPlan(this.aether.plans[this.parentPlanId], [
+      ...this.path,
+      attrName,
+    ]);
   }
 
   /**
    * Get the entry at the given index in an array.
    */
   at(index: number): AccessPlan {
-    return new AccessPlan(this.parentPlan, [...this.path, index]);
+    return new AccessPlan(this.aether.plans[this.parentPlanId], [
+      ...this.path,
+      index,
+    ]);
   }
 
   execute(values: any[][]): any[] {
