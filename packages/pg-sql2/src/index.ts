@@ -311,7 +311,6 @@ export function compile(
     return sqlFragments.join("");
   }
   const text = isDev ? print(sql).replace(/\n\s*\n/g, "\n") : print(sql);
-  console.dir({ text, sql });
 
   return {
     text,
