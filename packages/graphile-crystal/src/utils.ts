@@ -268,21 +268,21 @@ export type UniqueId = symbol;
  * (I considered starting at `-Number.MAX_SAFE_INTEGER` rather than zero in
  * order to quadruple the range, but decided against it on aesthetic grounds.)
  */
-const developmentUid = ((): (() => UniqueId) => {
+const developmentUid = ((): ((label?: string) => UniqueId) => {
   // Hide counter in this scope so it can't be fiddled with.
   let prefix = "";
   let prefixCounter = 0;
   let fastCounter = 0;
-  return function developmentUid(): UniqueId {
+  return function developmentUid(label?: string): UniqueId {
     if (++fastCounter === Number.MAX_SAFE_INTEGER) {
       prefix = `${++prefixCounter}|`;
       fastCounter = 0;
     }
-    return Symbol(`u${prefix}${fastCounter}`);
+    return Symbol(`u${prefix}${fastCounter}${label ? `_${label}` : ""}`);
   };
 })();
 
-const productionUid = (): UniqueId => Symbol();
+const productionUid = (label?: string): UniqueId => Symbol(label);
 
 export const uid = isDev ? developmentUid : productionUid;
 
@@ -329,11 +329,20 @@ export function _crystalPrint(
       return chalk.gray`(loop)`;
     }
     seen.add(symbol);
-    const obj = Object.create(null);
-    for (const [k, v] of symbol.entries()) {
-      obj[k] = v;
+    const pairs: string[] = [];
+    let i = 0;
+    for (const [key, value] of symbol.entries()) {
+      pairs.push(
+        BG_COLORS[i % BG_COLORS.length](
+          `${_crystalPrint(key, new Set(seen))}: ${_crystalPrint(
+            value,
+            new Set(seen),
+          )}`,
+        ),
+      );
+      i++;
     }
-    return "Map" + _crystalPrint(obj, new Set(seen));
+    return `Map{${pairs.join(", ")}}`;
   }
   if (typeof symbol === "object" && symbol) {
     if (seen.has(symbol)) {

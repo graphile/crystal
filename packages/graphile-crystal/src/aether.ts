@@ -844,7 +844,7 @@ export class Aether {
     context: object,
     rootValue: unknown,
   ): CrystalContext {
-    const rootId = uid();
+    const rootId = uid("root");
     debug("Root id is %c", rootId);
     const crystalContext: CrystalContext = {
       resultByIdByPlanId: Object.assign(Object.create(null), {
@@ -1190,7 +1190,7 @@ export class Aether {
     const key = object;
     let valueId = valueIdByObject.get(key);
     if (valueId === undefined) {
-      valueId = uid();
+      valueId = uid("val");
       debug(
         "No id for object %c (parent object of %s) against plan %s, generated %c",
         key,

@@ -488,7 +488,7 @@ class PgColumnSelectPlan<
   ) {
     super();
     this.tableId = this.addDependency(table);
-    debug(`%s (%s @ %s) constructor`, this, this.attr, attrIndex);
+    debug(`%s (%s = .%s) constructor`, this, attrIndex, this.attr);
   }
 
   execute(values: any[][]) {

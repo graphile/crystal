@@ -115,13 +115,6 @@ export function crystalWrapResolve<
     } = info;
     const pathIdentity = pathToPathIdentity(path);
     // const alias = getAliasFromResolveInfo(info);
-    const id = uid();
-    debug(
-      `👉 CRYSTAL RESOLVER @ %p; id: %c; parent: %c`,
-      pathIdentity,
-      id,
-      parentObject,
-    );
     const aether = establishAether({
       schema,
       operation,
@@ -161,6 +154,13 @@ export function crystalWrapResolve<
       variableValues,
       context,
       rootValue,
+    );
+    const id = uid(info.fieldName);
+    debug(
+      `👉 CRYSTAL RESOLVER @ %p; id: %c; parent: %c`,
+      pathIdentity,
+      id,
+      parentObject,
     );
     const crystalContext = batch.crystalContext;
     let parentCrystalObject: CrystalObject<any>;
