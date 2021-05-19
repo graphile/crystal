@@ -41,7 +41,7 @@ import { Pool } from "pg";
 import { resolve } from "path";
 import { inspect } from "util";
 import debugFactory from "debug";
-import { map, object, aether, first, access } from "../plans";
+import { map, object, aether, first, access, each, makeMapper } from "../plans";
 import LRU from "@graphile/lru";
 import { Deferred, defer } from "../deferred";
 import { Aether } from "../aether";
@@ -535,6 +535,19 @@ class PgAttributeSelectPlan<TData = any> extends Plan<any> {
   }
 }
 
+type PgClassSelectPlanJoin =
+  | {
+      type: "cross";
+      source: SQL;
+      alias: SQL;
+    }
+  | {
+      type: "inner" | "left" | "right" | "full";
+      source: SQL;
+      alias: SQL;
+      conditions: SQL[];
+    };
+
 /**
  * This represents selecting from a class-like entity (table, view, etc); i.e.
  * it represents `SELECT <columns>, <cursor?> FROM <table>`.  It's not
@@ -549,6 +562,8 @@ class PgAttributeSelectPlan<TData = any> extends Plan<any> {
 class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
   ReadonlyArray<TDataSource["TRow"]>
 > {
+  // FROM
+
   symbol: symbol;
 
   /** = sql.identifier(this.symbol) */
@@ -558,6 +573,28 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
    * The data source from which we are selecting: table, view, etc
    */
   dataSource: TDataSource;
+
+  // JOIN
+
+  joins: Array<PgClassSelectPlanJoin>;
+
+  // WHERE
+
+  private conditions: SQL[];
+
+  // ORDER BY
+
+  private orders: SQL[];
+
+  // LIMIT
+
+  private limit: number | null;
+
+  // OFFSET
+
+  private offset: number | null;
+
+  // --------------------
 
   /**
    * Since this is effectively like a DataLoader it processes the data for many
@@ -628,8 +665,6 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     identifierIndex: number | null;
   } | null = null;
 
-  private conditions: SQL[];
-  private orders: SQL[];
   private locked = false;
   private cloneIdentifierIndex: number | null | undefined;
 
@@ -671,6 +706,8 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
       : false;
     this.conditions = cloneFrom ? cloneFrom.conditions : [];
     this.orders = cloneFrom ? cloneFrom.orders : [];
+    this.limit = cloneFrom ? cloneFrom.limit : null;
+    this.offset = cloneFrom ? cloneFrom.offset : null;
     this.cloneIdentifierIndex = cloneFrom
       ? cloneFrom.finalizeResults?.identifierIndex
       : undefined;
@@ -741,6 +778,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     if (this.locked) {
       throw new Error(`${this}: cannot add selections once plan is locked`);
     }
+    // TODO: optimise this by first seeing if we can find an identical fragment to return.
     return this.selects.push(fragment) - 1;
   }
 
@@ -784,20 +822,6 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     return this.colPlans[attr]!;
   }
   */
-
-  joins: Array<
-    | {
-        type: "cross";
-        source: SQL;
-        alias: SQL;
-      }
-    | {
-        type: "inner" | "left" | "right" | "full";
-        source: SQL;
-        alias: SQL;
-        conditions: SQL[];
-      }
-  >;
 
   /**
    * Finalizes this instance and returns a mutable clone; useful for
@@ -1037,12 +1061,82 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     super.finalize();
   }
 
-  deduplicate(): Plan {
-    // TODO: if FROM, JOIN, WHERE, ORDER, GROUP BY, HAVING, LIMIT, OFFSET all
-    // match with one of our peers then we can replace ourself with one of our
-    // peers, merging the relevant SELECTs. We should return a transform that
-    // maps the expected attribute ids.
+  deduplicate(peers: PgClassSelectPlan<any>[]): Plan {
+    const identical = peers.find((p) => {
+      // If FROM, JOIN, WHERE, ORDER, GROUP BY, HAVING, LIMIT, OFFSET all
+      // match with one of our peers then we can replace ourself with one of our
+      // peers, merging the relevant SELECTs.
+
+      // Check FROM matches
+      if (p.dataSource !== this.dataSource) {
+        return false;
+      }
+
+      // Check JOINs match
+      if (!arraysMatch(this.joins, p.joins, joinMatches)) {
+        return false;
+      }
+
+      // Check WHEREs match
+      if (!arraysMatch(this.conditions, p.conditions, sqlIsEquivalent)) {
+        return false;
+      }
+
+      // Check IDENTIFIERs match
+      if (
+        !arraysMatch(
+          this.identifierMatches,
+          p.identifierMatches,
+          sqlIsEquivalent,
+        )
+      ) {
+        return false;
+      }
+
+      // Check ORDERs match
+      if (!arraysMatch(this.orders, p.orders, sqlIsEquivalent)) {
+        return false;
+      }
+
+      // GROUP BY is not supported
+      // HAVING is not supported
+
+      // Check LIMIT matches
+      if (this.limit !== p.limit) {
+        return false;
+      }
+
+      // Check OFFSET matches
+      if (this.offset !== p.offset) {
+        return false;
+      }
+
+      debug("Found that %c and %c are equivalent!", this, p);
+
+      return true;
+    });
+    if (identical) {
+      // Move the selects across and then replace ourself with a transform that
+      // maps the expected attribute ids from the `identical` plan.
+      const actualKeyByDesiredKey = this.mergeWith(identical);
+      const mapper = makeMapper(actualKeyByDesiredKey);
+      return each(identical, mapper);
+    }
     return this;
+  }
+
+  mergeWith(
+    otherPlan: PgClassSelectPlan<TDataSource>,
+  ): { [desiredIndex: string]: string } {
+    const actualKeyByDesiredKey = {};
+    this.selects.forEach((fragOrSymbol, idx) => {
+      if (typeof fragOrSymbol === "symbol") {
+        throw new Error("Cannot inline query that uses a symbol like this.");
+      }
+      actualKeyByDesiredKey[idx] = otherPlan.select(fragOrSymbol);
+    });
+    console.dir(actualKeyByDesiredKey);
+    return actualKeyByDesiredKey;
   }
 
   optimize(): Plan {
@@ -1146,17 +1240,8 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
             },
             ...this.joins,
           );
-          const actualIndexByDesiredIndex = {};
-          this.selects.forEach((fragOrSymbol, idx) => {
-            if (typeof fragOrSymbol === "symbol") {
-              throw new Error(
-                "Cannot inline query that uses a symbol like this.",
-              );
-            }
-            actualIndexByDesiredIndex[idx] = table?.select(fragOrSymbol);
-          });
-          //table.select();
-          return map(table, actualIndexByDesiredIndex);
+          const actualKeyByDesiredKey = this.mergeWith(table);
+          return map(table, actualKeyByDesiredKey);
         } else if (parent instanceof PgClassSelectSinglePlan) {
           const parent2 = this.aether.plans[
             parent.dependencies[parent.itemPlanId]
@@ -1849,6 +1934,103 @@ async function main() {
         }
       }
     `);
+  }
+}
+
+function arraysMatch<T>(
+  array1: ReadonlyArray<T>,
+  array2: ReadonlyArray<T>,
+  comparator: (val1: T, val2: T) => boolean = (v1, v2) => v1 === v2,
+): boolean {
+  const l = array1.length;
+  if (l !== array2.length) {
+    return false;
+  }
+  for (let i = 0; i < l; i++) {
+    if (!comparator(array1[i], array2[i])) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function sqlIsEquivalent(sql1: SQL, sql2: SQL): boolean {
+  if (Array.isArray(sql1)) {
+    if (!Array.isArray(sql2)) {
+      return false;
+    }
+    if (sql1.length !== sql2.length) {
+      return false;
+    }
+    return sql1.every((s, i) => sqlIsEquivalent(s, sql2[i]));
+  } else if (Array.isArray(sql2)) {
+    return false;
+  } else {
+    switch (sql1.type) {
+      case "RAW": {
+        if (sql2.type !== sql1.type) {
+          return false;
+        }
+        return sql1.text === sql2.text;
+      }
+      case "VALUE": {
+        if (sql2.type !== sql1.type) {
+          return false;
+        }
+        return sql1.value === sql2.value;
+      }
+      case "INDENT": {
+        if (sql2.type !== sql1.type) {
+          return false;
+        }
+        return sqlIsEquivalent(sql1.content, sql2.content);
+      }
+      case "IDENTIFIER": {
+        if (sql2.type !== sql1.type) {
+          return false;
+        }
+        // TODO: allow for alias symbol divergence? This has complexities
+        // when cascading through the tree.
+        return arraysMatch(sql1.names, sql2.names);
+      }
+      default: {
+        const never: never = sql1;
+        console.error(`Unhandled node type: ${inspect(never)}`);
+        return false;
+      }
+    }
+  }
+}
+
+function joinMatches(
+  j1: PgClassSelectPlanJoin,
+  j2: PgClassSelectPlanJoin,
+): boolean {
+  if (j1.type === "cross") {
+    if (j2.type !== j1.type) {
+      return false;
+    }
+    if (!sqlIsEquivalent(j1.source, j2.source)) {
+      return false;
+    }
+    if (!sqlIsEquivalent(j1.alias, j2.alias)) {
+      return false;
+    }
+    return true;
+  } else {
+    if (j2.type !== j1.type) {
+      return false;
+    }
+    if (!sqlIsEquivalent(j1.source, j2.source)) {
+      return false;
+    }
+    if (!sqlIsEquivalent(j1.alias, j2.alias)) {
+      return false;
+    }
+    if (!arraysMatch(j1.conditions, j2.conditions, sqlIsEquivalent)) {
+      return false;
+    }
+    return true;
   }
 }
 

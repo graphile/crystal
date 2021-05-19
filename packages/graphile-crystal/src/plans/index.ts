@@ -15,10 +15,15 @@ export function debugPlans<T>(callback: () => T): T {
 export { list, ListPlan } from "./list";
 export { first, FirstPlan } from "./first";
 export { object, ObjectPlan } from "./object";
-export { map, MapPlan } from "./map";
+export { map, MapPlan, makeMapper } from "./map";
 export { access, AccessPlan } from "./access";
+export { each, EachPlan } from "./each";
 
 // Internal plans
-export { __ListItemPlan } from "./__listItem";
+export {
+  __ListItemPlan,
+  ListCapablePlan,
+  assertListCapablePlan,
+} from "./__listItem";
 export { __ValuePlan } from "./__value";
 export { __TrackedObjectPlan } from "./__trackedObject";

@@ -24,7 +24,12 @@ import {
   GraphQLNonNull,
 } from "graphql";
 import { Plan, assertFinalized, PolymorphicPlan, ArgumentPlan } from "./plan";
-import { __TrackedObjectPlan, __ValuePlan, __ListItemPlan } from "./plans";
+import {
+  __TrackedObjectPlan,
+  __ValuePlan,
+  __ListItemPlan,
+  assertListCapablePlan,
+} from "./plans";
 import { graphqlCollectFields, getDirective } from "./graphqlCollectFields";
 import { InputPlan, inputPlan, InputObjectPlan } from "./input";
 import {
@@ -59,21 +64,6 @@ const EMPTY_INDEXES = Object.freeze([] as number[]);
 const debugAether = debugFactory("crystal:aether");
 const debug = debugAether.extend("regular");
 const debugVerbose = debugAether.extend("verbose");
-
-interface ListCapablePlan<TData> extends Plan<TData> {
-  listItem(itemPlan: __ListItemPlan<Plan<ReadonlyArray<TData>>>): Plan<TData>;
-}
-
-function assertListCapablePlan<TData>(
-  plan: Plan<TData>,
-  pathIdentity: string,
-): asserts plan is ListCapablePlan<TData> {
-  if (!("listItem" in plan) || typeof (plan as any).listItem !== "function") {
-    throw new Error(
-      `The plan returned from '${pathIdentity}' should be a list capable plan, but it does not implement the 'listItem' method.`,
-    );
-  }
-}
 
 type TrackedArguments = { [key: string]: InputPlan };
 

@@ -1,20 +1,26 @@
 import { Plan } from "../plan";
 
+type ActualKeyByDesiredKey = { [desiredKey: string]: string };
+
+export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
+  // TODO: JIT this.
+  return (obj: object): object => {
+    return Object.keys(actualKeyByDesiredKey).reduce((memo, desiredKey) => {
+      memo[desiredKey] = obj[actualKeyByDesiredKey[desiredKey]];
+      return memo;
+    }, {} as object);
+  };
+}
+
 export class MapPlan extends Plan {
   private mapper: (obj: object) => object;
   constructor(
     parentPlan: Plan,
-    private actualKeyByDesiredKey: { [desiredKey: string]: string },
+    private actualKeyByDesiredKey: ActualKeyByDesiredKey,
   ) {
     super();
     this.addDependency(parentPlan);
-    // TODO: JIT this.
-    this.mapper = (obj: object): object => {
-      return Object.keys(actualKeyByDesiredKey).reduce((memo, desiredKey) => {
-        memo[desiredKey] = obj[actualKeyByDesiredKey[desiredKey]];
-        return memo;
-      }, {} as object);
-    };
+    this.mapper = makeMapper(actualKeyByDesiredKey);
   }
 
   execute(values: any[][]): any[] {
