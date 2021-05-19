@@ -13,11 +13,9 @@ test('When the handler is created using a Pool object, it can be released withou
 });
 
 test('When the handler is created using Pool config, it releases the pool it creates', async () => {
-  let handler;
-  try {
-    handler = postgraphile(poolConfig, COMMON_OPTIONS);
-  } catch (e) {
-    // console.error(e)
-  }
+  let handler = postgraphile(poolConfig, COMMON_OPTIONS);
+  let { pgPool } = handler;
+  expect(pgPool).toHaveProperty('ended', false);
   await handler.release();
+  expect(pgPool).toHaveProperty('ended', true);
 });

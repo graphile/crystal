@@ -128,7 +128,7 @@ export function getPostgraphileSchemaBuilder<
           // rejected before signaling shutdown is complete. If it rejected,
           // don't propagate the error.
           shutdownActions.add(async () => {
-            await gqlSchemaPromise.catch();
+            await gqlSchemaPromise.catch(() => null);
           });
           gqlSchema = await gqlSchemaPromise;
           exportGqlSchema(gqlSchema);
@@ -147,11 +147,11 @@ export function getPostgraphileSchemaBuilder<
         const delay = Math.min(100 * Math.pow(attempts, 2), 30000);
         if (isShuttingDown) {
           console.error(
-            'An error occurred whilst building the schema, however the server was shutting down, which might have caused the error, so the error was ignored.',
+            'An error occurred whilst building the schema. However, the server was shutting down, which might have caused it.',
           );
           console.error(error);
           // TODO: Hmm, do we need to throw an error here?
-          return undefined;
+          throw error;
         } else if (typeof options.retryOnInitFail === 'function') {
           const start = process.hrtime();
           try {
