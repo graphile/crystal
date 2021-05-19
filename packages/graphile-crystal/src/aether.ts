@@ -706,14 +706,41 @@ export class Aether {
     }
   }
 
+  /**
+   * Processes the plans making sure to process the leaves of the plan DAG
+   * first and then working our way back up the graph to the root nodes.
+   */
   private processPlans(callback: (plan: Plan<any>) => Plan<any>): void {
-    for (let i = this.plans.length - 1; i >= 0; i--) {
+    const replacements = new Map<Plan, number>();
+    const processed = new Set();
+    const process = (i: number): void => {
       const plan = this.plans[i];
       if (!plan) {
-        continue;
+        return;
+      }
+      const replacementId = replacements.get(plan);
+      if (replacementId != null) {
+        this.plans[i] = this.plans[replacementId];
+        return;
+      }
+      if (processed.has(plan)) {
+        return;
+      }
+      // Process dependencies first
+      for (let i = 0, l = plan.dependencies.length; i < l; i++) {
+        const depId = plan.dependencies[i];
+        process(depId);
       }
       globalState.parentPathIdentity = plan.parentPathIdentity;
-      this.plans[i] = callback(plan);
+      const replacementPlan = callback(plan);
+      this.plans[i] = replacementPlan;
+      if (replacementPlan != plan) {
+        replacements.set(plan, replacementPlan.id);
+      }
+      processed.add(plan);
+    };
+    for (let i = this.plans.length - 1; i >= 0; i--) {
+      process(i);
     }
   }
 
