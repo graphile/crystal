@@ -1073,6 +1073,16 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
       // match with one of our peers then we can replace ourself with one of our
       // peers, merging the relevant SELECTs.
 
+      // Check trusted matches
+      if (p.trusted !== this.trusted) {
+        return false;
+      }
+
+      // Check inliningForbidden matches
+      if (p.inliningForbidden !== this.inliningForbidden) {
+        return false;
+      }
+
       // Check FROM matches
       if (p.dataSource !== this.dataSource) {
         return false;
