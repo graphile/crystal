@@ -96,7 +96,7 @@ export function getPostgraphileSchemaBuilder<
     // eslint-disable-next-line no-constant-condition
     while (true) {
       if (isShuttingDown) {
-        break;
+        throw new Error('Postgraphile is shutting down');
       }
       try {
         if (options.watchPg) {
