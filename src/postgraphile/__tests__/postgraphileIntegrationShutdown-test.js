@@ -19,3 +19,11 @@ test('When the handler is created using Pool config, it releases the pool it cre
   await handler.release();
   expect(pgPool).toHaveProperty('ended', true);
 });
+
+test('When the handler is created in watch mode using Pool config, it releases the pool it creates', async () => {
+  let handler = postgraphile(poolConfig, { ...COMMON_OPTIONS, watchPg: true });
+  let { pgPool } = handler;
+  expect(pgPool).toHaveProperty('ended', false);
+  await handler.release();
+  expect(pgPool).toHaveProperty('ended', true);
+});

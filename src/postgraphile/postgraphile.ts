@@ -112,8 +112,12 @@ export function getPostgraphileSchemaBuilder<
           );
           // We must register the shutdown action immediately to avoid a race condition.
           shutdownActions.add(async () => {
-            const releaseWatchFn = await releaseWatchFnPromise;
-            return releaseWatchFn();
+            try {
+              const releaseWatchFn = await releaseWatchFnPromise;
+              await releaseWatchFn();
+            } catch (e) {
+              // Ignore errors during shutdown.
+            }
           });
           // Wait for the watch to be set up before progressing.
           await releaseWatchFnPromise;
