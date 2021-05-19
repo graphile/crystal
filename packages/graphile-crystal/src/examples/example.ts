@@ -1037,18 +1037,21 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     super.finalize();
   }
 
-  optimize(_plans: PgClassSelectPlan<any>[]): Plan {
+  deduplicate(): Plan {
+    // TODO: if FROM, JOIN, WHERE, ORDER, GROUP BY, HAVING, LIMIT, OFFSET all
+    // match with one of our peers then we can replace ourself with one of our
+    // peers, merging the relevant SELECTs. We should return a transform that
+    // maps the expected attribute ids.
+    return this;
+  }
+
+  optimize(): Plan {
     // In case we have any lock actions in future:
     this.lock();
 
     // Now we need to be able to mess with ourself, but be sure to lock again
     // at the end.
     this.locked = false;
-
-    // TODO: if FROM, JOIN, WHERE, ORDER, GROUP BY, HAVING, LIMIT, OFFSET all
-    // match with one of our peers then we can replace ourself with one of our
-    // peers, merging the relevant SELECTs. We should return a transform that
-    // maps the expected attribute ids.
 
     // TODO: we should serialize our `SELECT` clauses and then if any are
     // identical we should omit the later copies and have them link back to the

@@ -235,6 +235,12 @@ export class Aether {
     // Get rid of temporary plans
     this.treeShakePlans();
 
+    // Squish plans together
+    this.deduplicatePlans();
+
+    // Get rid of unneeded plans
+    this.treeShakePlans();
+
     // Replace/inline/optimise plans
     this.optimizePlans();
 
@@ -700,13 +706,29 @@ export class Aether {
     }
   }
 
+  private processPlans(callback: (plan: Plan<any>) => Plan<any>): void {
+    for (let i = this.plans.length - 1; i >= 0; i--) {
+      const plan = this.plans[i];
+      if (!plan) {
+        continue;
+      }
+      globalState.parentPathIdentity = plan.parentPathIdentity;
+      this.plans[i] = callback(plan);
+    }
+  }
+
   /**
-   * Implements the `OptimizePlans` algorithm. Note that we loop backwards
-   * since later plans are dependent on earlier plans, so by starting at the
-   * latest plans we can make sure that we know all our dependent's needs
-   * before we optimise ourself.
+   * We split this out from optimizePlans, this gives us a chance to replace
+   * nearly-duplicate plans with other existing plans (and adding the necessary
+   * transforms); this means that by the time we come to optimize the plan tree
+   * should already be simpler. For example if you have two plans at the same
+   * level that both request row data from the same database table with the
+   * same identifiers, `WHERE`, `LIMIT`, `OFFSET` and `ORDER BY`, but different
+   * `SELECT`s we could merge the two plans together by replacing the latter
+   * with the former and having the former SELECT additional fields, then
+   * transform the results back to what our child plans would be expecting.
    */
-  private optimizePlans(): void {
+  private deduplicatePlans(): void {
     let replacements = 0;
     let loops = 0;
     let lastOptimizedPlan;
@@ -715,26 +737,31 @@ export class Aether {
     do {
       if (loops > 10000) {
         throw new Error(
-          `optimizePlans has looped ${loops} times and is still substituting out plans; the plan.optimize method on ${lastOptimizedPlan} might be buggy.`,
+          `deduplicatePlans has looped ${loops} times and is still substituting out plans; the plan.optimize method on ${lastOptimizedPlan} might be buggy.`,
         );
       }
       replacements = 0;
-      for (let i = this.plans.length - 1; i >= 0; i--) {
-        const plan = this.plans[i];
-        if (!plan) {
-          continue;
-        }
-        globalState.parentPathIdentity = plan.parentPathIdentity;
-        const replacementPlan = this.optimizePlan(plan);
+      this.processPlans((plan) => {
+        const replacementPlan = this.deduplicatePlan(plan);
         if (replacementPlan !== plan) {
           lastOptimizedPlan = replacementPlan;
           replacements++;
-          this.plans[i] = replacementPlan;
         }
-      }
+        return replacementPlan;
+      });
       loops++;
     } while (replacements > 0);
-    debug("Plan optimisation complete after %o loops", loops);
+    debug("Plan deduplication complete after %o loops", loops);
+  }
+
+  /**
+   * Implements the `OptimizePlans` algorithm. Note that we loop backwards
+   * since later plans are dependent on earlier plans, so by starting at the
+   * latest plans we can make sure that we know all our dependent's needs
+   * before we optimise ourself.
+   */
+  private optimizePlans(): void {
+    this.processPlans((plan) => this.optimizePlan(plan));
   }
 
   private isPeer(planA: Plan, planB: Plan): boolean {
@@ -763,9 +790,10 @@ export class Aether {
   }
 
   /**
-   * Implements the `OptimizePlan` algorithm.
+   * Finds suitable peers and passes them to the plan's deduplicate method (if
+   * any found).
    */
-  private optimizePlan(plan: Plan): Plan {
+  private deduplicatePlan(plan: Plan): Plan {
     const seenIds = new Set([plan.id]);
     const peers = this.plans.filter((potentialPeer) => {
       if (
@@ -778,16 +806,36 @@ export class Aether {
       }
       return false;
     });
-    const replacementPlan = plan.optimize(peers);
+    if (peers.length === 0) {
+      return plan;
+    }
+    const replacementPlan = plan.deduplicate(peers);
     if (replacementPlan !== plan) {
       debugVerbose(
-        "Optimized %c with peers %c => %c",
+        "Deduplicated %c with peers %c => %c",
         plan,
         peers,
         replacementPlan,
       );
     } else {
-      debugVerbose("Optimized %c with peers %c", plan, peers);
+      debugVerbose("Didn't deduplicate %c with peers %c", plan, peers);
+    }
+    return replacementPlan;
+  }
+
+  /**
+   * Implements the `OptimizePlan` algorithm.
+   */
+  private optimizePlan(plan: Plan): Plan {
+    const replacementPlan = plan.optimize();
+    if (replacementPlan !== plan) {
+      debugVerbose(
+        "Replaced %c with %c during optimization",
+        plan,
+        replacementPlan,
+      );
+    } else {
+      debugVerbose("Optimized %c (same plan)", plan);
     }
     return replacementPlan;
   }

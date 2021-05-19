@@ -136,10 +136,17 @@ export abstract class Plan<TData = any> {
   ): PromiseOrDirect<CrystalResultsList<TData>>;
 
   /**
-   * Our chance to replace ourself with one of our peers, or otherwise optimise
-   * the plan.
+   * Our chance to replace ourself with one of our peers.
    */
-  public optimize(_peers: Plan[]): Plan {
+  public deduplicate(_peers: Plan[]): Plan {
+    return this;
+  }
+
+  /**
+   * Our chance to optimise the plan (which could go as far as to inline the
+   * plan into the parent plan).
+   */
+  public optimize(): Plan {
     return this;
   }
 

@@ -24,7 +24,7 @@ export class MapPlan extends Plan {
     });
   }
 
-  optimize(peers: MapPlan[]): MapPlan {
+  deduplicate(peers: MapPlan[]): MapPlan {
     const myMap = JSON.stringify(this.actualKeyByDesiredKey);
     const peersWithSameMap = peers.filter(
       (p) => JSON.stringify(p.actualKeyByDesiredKey) === myMap,

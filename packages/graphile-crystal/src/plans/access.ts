@@ -190,7 +190,7 @@ export class AccessPlan extends Plan {
     super.finalize();
   }
 
-  optimize(peers: AccessPlan[]): AccessPlan {
+  deduplicate(peers: AccessPlan[]): AccessPlan {
     const myPath = JSON.stringify(this.path);
     const peersWithSamePath = peers.filter(
       (p) => JSON.stringify(p.path) === myPath,

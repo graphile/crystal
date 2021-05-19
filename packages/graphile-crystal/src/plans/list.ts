@@ -49,7 +49,7 @@ export class ListPlan<TPlanTuple extends readonly Plan<any>[]> extends Plan<
     return values.map(this.tupleToTuple.bind(this));
   }
 
-  optimize(peers: ListPlan<TPlanTuple>[]): ListPlan<TPlanTuple> {
+  deduplicate(peers: ListPlan<TPlanTuple>[]): ListPlan<TPlanTuple> {
     return peers.length > 0 ? peers[0] : this;
   }
 }

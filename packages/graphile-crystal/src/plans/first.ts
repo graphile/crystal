@@ -13,7 +13,7 @@ export class FirstPlan<TData> extends Plan<TData> {
     return values.map((tuple) => tuple[0]?.[0]);
   }
 
-  optimize(peers: FirstPlan<TData>[]): FirstPlan<TData> {
+  deduplicate(peers: FirstPlan<TData>[]): FirstPlan<TData> {
     return peers.length > 0 ? peers[0] : this;
   }
 }

@@ -59,7 +59,7 @@ export class ObjectPlan<TData extends { [key: string]: any }> extends Plan<
     return values.map(this.tupleToObject.bind(this));
   }
 
-  optimize(peers: ObjectPlan<TData>[]): ObjectPlan<TData> {
+  deduplicate(peers: ObjectPlan<TData>[]): ObjectPlan<TData> {
     const myKeys = JSON.stringify(this.keys);
     const peersWithSameKeys = peers.filter(
       (p) => JSON.stringify(p.keys) === myKeys,
