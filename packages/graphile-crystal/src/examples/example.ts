@@ -31,7 +31,7 @@ import {
   GraphQLInputObjectType,
   Thunk,
 } from "graphql";
-import sql, { SQL, SQLRawValue } from "pg-sql2";
+import sql, { SQL, SQLIdentifierNode, SQLRawValue } from "pg-sql2";
 import { crystalEnforce } from "..";
 import { Plan } from "../plan";
 import { __TrackedObjectPlan, __ValuePlan, __ListItemPlan } from "../plans";
@@ -778,7 +778,13 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     if (this.locked) {
       throw new Error(`${this}: cannot add selections once plan is locked`);
     }
-    // TODO: optimise this by first seeing if we can find an identical fragment to return.
+    // Optimisation: if we're already selecting this fragment, return the existing one.
+    const index = this.selects.findIndex((frag) =>
+      sqlIsEquivalent(frag, fragment),
+    );
+    if (index >= 0) {
+      return index;
+    }
     return this.selects.push(fragment) - 1;
   }
 
@@ -1954,15 +1960,17 @@ function arraysMatch<T>(
   return true;
 }
 
-function sqlIsEquivalent(sql1: SQL, sql2: SQL): boolean {
+function sqlIsEquivalent(sql1: SQL | symbol, sql2: SQL | symbol): boolean {
+  if (typeof sql1 === "symbol") {
+    return sql2 === sql1;
+  } else if (typeof sql2 === "symbol") {
+    return false;
+  }
   if (Array.isArray(sql1)) {
     if (!Array.isArray(sql2)) {
       return false;
     }
-    if (sql1.length !== sql2.length) {
-      return false;
-    }
-    return sql1.every((s, i) => sqlIsEquivalent(s, sql2[i]));
+    return arraysMatch(sql1, sql2, sqlIsEquivalent);
   } else if (Array.isArray(sql2)) {
     return false;
   } else {
@@ -1991,7 +1999,7 @@ function sqlIsEquivalent(sql1: SQL, sql2: SQL): boolean {
         }
         // TODO: allow for alias symbol divergence? This has complexities
         // when cascading through the tree.
-        return arraysMatch(sql1.names, sql2.names);
+        return arraysMatch(sql1.names, sql2.names, identifiersAreEquivalent);
       }
       default: {
         const never: never = sql1;
@@ -2000,6 +2008,21 @@ function sqlIsEquivalent(sql1: SQL, sql2: SQL): boolean {
       }
     }
   }
+}
+
+type IdentifierName = SQLIdentifierNode["names"] extends ReadonlyArray<infer U>
+  ? U
+  : never;
+function identifiersAreEquivalent(
+  ids1: IdentifierName,
+  ids2: IdentifierName,
+): boolean {
+  if (typeof ids1 === "string") {
+    return ids2 === ids1;
+  } else if (typeof ids2 === "string") {
+    return false;
+  }
+  return ids1.n === ids2.n && ids1.s === ids2.s;
 }
 
 function joinMatches(
