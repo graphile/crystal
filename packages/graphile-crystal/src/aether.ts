@@ -716,9 +716,12 @@ export class Aether {
       if (processed.has(plan)) {
         return;
       }
-      // Process dependencies first
-      for (let i = 0, l = plan.dependencies.length; i < l; i++) {
-        const depId = plan.dependencies[i];
+      // Process dependents first
+      const dependents = this.plans.filter(
+        (dependent) => dependent && dependent.dependencies.includes(plan.id),
+      );
+      for (let i = 0, l = dependents.length; i < l; i++) {
+        const depId = dependents[i].id;
         process(depId);
       }
       globalState.parentPathIdentity = plan.parentPathIdentity;
