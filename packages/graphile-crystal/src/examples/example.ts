@@ -1217,10 +1217,12 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
         const tsContext = this.aether.plans[t.dependencies[t.contextId]];
         if (myContext != tsContext) {
           debugVerbose(
-            "Refusing to optimise %c due to own context dependency %c differing from tables context dependency %c",
+            "Refusing to optimise %c due to own context dependency %c differing from tables context dependency %c (%c, %c)",
             this,
             myContext,
             tsContext,
+            t.dependencies[t.contextId],
+            t,
           );
           t = null;
         }
@@ -1649,9 +1651,10 @@ const Forum: GraphQLObjectType<
           includeArchived: { type: IncludeArchived },
         },
         plan($forum) {
+          const $forumId = $forum.get("id");
           const $messages = new PgClassSelectPlan(
             messageSource,
-            [{ plan: $forum.get("id"), type: sql`uuid` }],
+            [{ plan: $forumId, type: sql`uuid` }],
             (alias) => [sql`${alias}.forum_id`],
           );
           $messages.setTrusted();
