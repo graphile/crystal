@@ -89,8 +89,15 @@ export function getPostgraphileSchemaBuilder<
 
   async function createGqlSchema(): Promise<GraphQLSchema> {
     let attempts = 0;
+    let isShuttingDown = false;
+    shutdownActions.add(async () => {
+      isShuttingDown = true;
+    });
     // eslint-disable-next-line no-constant-condition
     while (true) {
+      if (isShuttingDown) {
+        break;
+      }
       try {
         if (options.watchPg) {
           const releaseWatchFnPromise = watchPostGraphileSchema(
@@ -116,7 +123,14 @@ export function getPostgraphileSchemaBuilder<
             );
           }
         } else {
-          gqlSchema = await createPostGraphileSchema(pgPool, pgSchemas, options);
+          const gqlSchemaPromise = createPostGraphileSchema(pgPool, pgSchemas, options);
+          // If the server shuts down, make sure the schema has resolved or
+          // rejected before signaling shutdown is complete. If it rejected,
+          // don't propagate the error.
+          shutdownActions.add(async () => {
+            await gqlSchemaPromise.catch();
+          });
+          gqlSchema = await gqlSchemaPromise;
           exportGqlSchema(gqlSchema);
         }
         if (attempts > 0) {
@@ -131,7 +145,14 @@ export function getPostgraphileSchemaBuilder<
       } catch (error) {
         attempts++;
         const delay = Math.min(100 * Math.pow(attempts, 2), 30000);
-        if (typeof options.retryOnInitFail === 'function') {
+        if (isShuttingDown) {
+          console.error(
+            'An error occurred whilst building the schema, however the server was shutting down, which might have caused the error, so the error was ignored.',
+          );
+          console.error(error);
+          // TODO: Hmm, do we need to throw an error here?
+          return undefined;
+        } else if (typeof options.retryOnInitFail === 'function') {
           const start = process.hrtime();
           try {
             const retry = await options.retryOnInitFail(error, attempts);
