@@ -38,6 +38,7 @@ import {
   UniqueId,
   isPromise,
   ROOT_VALUE_OBJECT,
+  arraysMatch,
 } from "./utils";
 import {
   graphqlMergeSelectionSets,
@@ -808,17 +809,18 @@ export class Aether {
       return false;
     }
 
-    // Can only merge if the plans exist at the same level.
+    // Can only merge if the plans exist at the same level (this can exit early
+    // if the dependencies are significantly different).
     if (planA.parentPathIdentity !== planB.parentPathIdentity) {
       return false;
     }
 
     // Can only merge if the dependencies are the same.
-    // TODO: can we soften this?
     if (
-      planA.dependencies.length !== planB.dependencies.length ||
-      planA.dependencies.some(
-        (depId, i) => this.plans[depId] !== this.plans[planB.dependencies[i]],
+      !arraysMatch(
+        planA.dependencies,
+        planB.dependencies,
+        (depA, depB) => this.plans[depA] === this.plans[depB],
       )
     ) {
       return false;
@@ -849,6 +851,11 @@ export class Aether {
     }
     const replacementPlan = plan.deduplicate(peers);
     if (replacementPlan !== plan) {
+      if (!peers.includes(replacementPlan)) {
+        throw new Error(
+          `deduplicatePlan error: Expected to replace plan ${plan} with one of its (identical) peers; instead found ${replacementPlan}. This is currently forbidden because it could cause confusion during the optimization process, instead apply this change in 'optimize', or make sure that any child selections aren't applied until the optimize/finalize phase so that no mapping is required during deduplicate.`,
+        );
+      }
       debugVerbose(
         "Deduplicated %c with peers %c => %c",
         plan,

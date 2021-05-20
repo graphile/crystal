@@ -408,3 +408,20 @@ export function crystalPrintPathIdentity(pathIdentity: string): string {
   if (!short) return chalk.bold.yellow("~");
   return chalk.bold.yellow(short.replace(/\./g, chalk.gray(".")));
 }
+
+export function arraysMatch<T>(
+  array1: ReadonlyArray<T>,
+  array2: ReadonlyArray<T>,
+  comparator: (val1: T, val2: T) => boolean = (v1, v2) => v1 === v2,
+): boolean {
+  const l = array1.length;
+  if (l !== array2.length) {
+    return false;
+  }
+  for (let i = 0; i < l; i++) {
+    if (!comparator(array1[i], array2[i])) {
+      return false;
+    }
+  }
+  return true;
+}

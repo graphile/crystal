@@ -47,6 +47,7 @@ import { Deferred, defer } from "../deferred";
 import { Aether } from "../aether";
 import { CrystalValuesList, CrystalResultsList } from "../interfaces";
 import { stripAnsi } from "../stripAnsi";
+import { arraysMatch } from "../utils";
 
 //const EMPTY_OBJECT = Object.freeze(Object.create(null));
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
@@ -1070,9 +1071,13 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
 
   deduplicate(peers: PgClassSelectPlan<any>[]): Plan {
     const identical = peers.find((p) => {
-      // If FROM, JOIN, WHERE, ORDER, GROUP BY, HAVING, LIMIT, OFFSET all
-      // match with one of our peers then we can replace ourself with one of our
-      // peers, merging the relevant SELECTs.
+      // If SELECT, FROM, JOIN, WHERE, ORDER, GROUP BY, HAVING, LIMIT, OFFSET
+      // all match with one of our peers then we can replace ourself with one
+      // of our peers. NOTE: we do _not_ merge SELECTs at this stage because
+      // that would require mapping, and mapping should not be done during
+      // deduplicate because it would interfere with optimize. So, instead,
+      // we try to ensure that as few selects as possible exist in the plan
+      // at this stage.
 
       // Check trusted matches
       if (p.trusted !== this.trusted) {
@@ -1081,6 +1086,11 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
 
       // Check inliningForbidden matches
       if (p.inliningForbidden !== this.inliningForbidden) {
+        return false;
+      }
+
+      // Check SELECT matches
+      if (!arraysMatch(this.selects, p.selects, sqlIsEquivalent)) {
         return false;
       }
 
@@ -1957,23 +1967,6 @@ async function main() {
       }
     `);
   }
-}
-
-function arraysMatch<T>(
-  array1: ReadonlyArray<T>,
-  array2: ReadonlyArray<T>,
-  comparator: (val1: T, val2: T) => boolean = (v1, v2) => v1 === v2,
-): boolean {
-  const l = array1.length;
-  if (l !== array2.length) {
-    return false;
-  }
-  for (let i = 0; i < l; i++) {
-    if (!comparator(array1[i], array2[i])) {
-      return false;
-    }
-  }
-  return true;
 }
 
 function sqlIsEquivalent(sql1: SQL | symbol, sql2: SQL | symbol): boolean {
