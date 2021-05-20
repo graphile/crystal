@@ -1,7 +1,6 @@
 import { inspect } from "util";
 import * as assert from "assert";
 import chalk from "chalk";
-import debugFactory from "debug";
 import {
   GraphQLInputType,
   ValueNode,
@@ -404,8 +403,24 @@ export function crystalPrint(
 }
 
 export function crystalPrintPathIdentity(pathIdentity: string): string {
-  const short = pathIdentity.replace(/>[A-Za-z0-9]+\./g, ">").slice(1);
+  let short = pathIdentity.replace(/>[A-Za-z0-9]+\./g, ">").slice(1);
   if (!short) return chalk.bold.yellow("~");
+  if (isDev) {
+    const segments = short.split(">");
+    const shortenedSegments = segments.map((s, i) => {
+      if (i >= segments.length - 1) {
+        // Don't compress last one
+        return s;
+      }
+      if (s.length < 5) {
+        // Don't compress short ones
+        return s;
+      }
+      return `${s[0]}…${s[s.length - 1]}`;
+    });
+
+    short = shortenedSegments.join(">");
+  }
   return chalk.bold.yellow(short.replace(/\./g, chalk.gray(".")));
 }
 
