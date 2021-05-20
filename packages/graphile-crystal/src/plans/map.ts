@@ -25,7 +25,11 @@ export class MapPlan extends Plan {
   }
 
   toStringMeta(): string {
-    return chalk.bold.yellow(String(this.dependencies[0]));
+    return (
+      chalk.bold.yellow(String(this.dependencies[0])) +
+      ":" +
+      JSON.stringify(this.actualKeyByDesiredKey)
+    );
   }
 
   execute(values: any[][]): any[] {

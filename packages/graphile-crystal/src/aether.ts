@@ -272,6 +272,9 @@ export class Aether {
     // themselves (e.g. compiling SQL queries ahead of time).
     this.finalizePlans();
 
+    // Log the plan now we're all done
+    this.logPlansByPath();
+
     globalState.aether = null;
   }
 
@@ -1489,7 +1492,7 @@ export class Aether {
           return plan
             ? `- ${id}: ${
                 plan.id !== id
-                  ? plan.id
+                  ? `->${chalk.bold.yellow(String(plan.id))}`
                   : (optimized ? "!!" : "  ") +
                     plan.toString() +
                     ` (deps: ${plan.dependencies.map((depId) =>
@@ -1501,6 +1504,35 @@ export class Aether {
         .filter(isNotNullish)
         .join("\n"),
     );
+  }
+
+  logPlansByPath(): void {
+    this.logPlans();
+    const pathIdentities = Object.keys(this.planIdByPathIdentity).sort(
+      (a, z) => a.length - z.length,
+    );
+    const printed = new Set<string>();
+    let depth = 0;
+    const print = (pathIdentity: string) => {
+      if (printed.has(pathIdentity)) {
+        return;
+      }
+      printed.add(pathIdentity);
+      const plan = this.plans[this.planIdByPathIdentity[pathIdentity]!];
+      console.log("  ".repeat(depth) + `${pathIdentity}: ${plan}`);
+      depth++;
+      for (const childPathIdentity of pathIdentities) {
+        if (childPathIdentity.startsWith(pathIdentity)) {
+          print(childPathIdentity);
+        }
+      }
+      depth--;
+    };
+    for (const pathIdentity of pathIdentities) {
+      print(pathIdentity);
+    }
+
+    console.log(this.planIdByPathIdentity);
   }
 }
 

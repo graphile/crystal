@@ -511,7 +511,10 @@ class PgColumnSelectPlan<
   }
 
   toStringMeta() {
-    return `${this.dataSource.name}.${this.attr}`;
+    return (
+      `${this.dataSource.name}.${this.attr}` +
+      (this.attrIndex != null ? `[${this.attrIndex}]` : "")
+    );
   }
 
   getClassSinglePlan(): PgClassSelectSinglePlan<TDataSource> {
