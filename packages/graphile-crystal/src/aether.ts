@@ -868,10 +868,15 @@ export class Aether {
     return replacementPlan;
   }
 
+  private optimizedPlans = new Set<Plan>();
   /**
    * Implements the `OptimizePlan` algorithm.
    */
   private optimizePlan(plan: Plan): Plan {
+    if (this.optimizedPlans.has(plan)) {
+      throw new Error("Must not optimize plan twice");
+    }
+    this.optimizedPlans.add(plan);
     const replacementPlan = plan.optimize();
     if (replacementPlan !== plan) {
       debugVerbose(

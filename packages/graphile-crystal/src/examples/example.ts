@@ -485,32 +485,66 @@ class PgColumnSelectPlan<
   TColumn extends keyof TDataSource["TRow"]
 > extends Plan<TDataSource["TRow"][TColumn]> {
   public readonly tableId: number;
+
+  /**
+   * This is the numeric index of this expression within the grandparent
+   * PgClassSelectPlan's selection.
+   */
+  private attrIndex: number | null = null;
+
   constructor(
     table: PgClassSelectSinglePlan<TDataSource>,
-    // This is the numeric index the parent PgClassSelectPlan gave us to represent this value
-    private attrIndex: number,
     private attr: TColumn,
     private expression: SQL,
   ) {
     super();
     this.tableId = this.addDependency(table);
-    debug(`%s (%s = .%s) constructor`, this, attrIndex, this.attr);
+    debug(`%s.%s constructor`, this, this.attr);
   }
 
-  getTable(): PgClassSelectSinglePlan<TDataSource> {
-    return this.aether.plans[
-      this.dependencies[this.tableId]
-    ] as PgClassSelectSinglePlan<TDataSource>;
+  toString() {
+    return super.toString() + `.${this.attr}`;
+  }
+
+  getClassSinglePlan(): PgClassSelectSinglePlan<TDataSource> {
+    const plan = this.aether.plans[this.dependencies[this.tableId]];
+    if (!(plan instanceof PgClassSelectSinglePlan)) {
+      throw new Error(`Expected ${plan} to be a PgClassSelectSinglePlan`);
+    }
+    return plan;
+  }
+
+  optimize() {
+    this.attrIndex = this.getClassSinglePlan()
+      .getClassPlan()
+      .select(sql`${this.expression}::text`);
+    return this;
   }
 
   execute(values: any[][]) {
-    const result = values.map((v) => v[this.tableId][this.attrIndex]);
-    debug("%s values: %c, result: %c", this, values, result);
-    return result;
+    const { attrIndex, tableId } = this;
+    if (attrIndex != null) {
+      const result = values.map((v) => v[tableId][attrIndex]);
+      debug("%s values: %c, result: %c", this, values, result);
+      return result;
+    } else {
+      throw new Error(
+        "Cannot execute PgColumnSelectPlan without first optimizing it",
+      );
+    }
   }
 
   toSQL(): SQL {
     return this.expression;
+  }
+
+  deduplicate(
+    peers: Array<PgColumnSelectPlan<TDataSource, any>>,
+  ): PgColumnSelectPlan<TDataSource, TColumn> {
+    const equivalentPeer = peers.find((p) =>
+      sqlIsEquivalent(this.expression, p.expression),
+    );
+    return equivalentPeer ?? this;
   }
 }
 
@@ -519,21 +553,66 @@ class PgColumnSelectPlan<
  * scalar (could be a list, compound type, JSON, geometry, etc), so this might
  * not be a "leaf"; it might be used as the input of another layer of plan.
  */
-class PgAttributeSelectPlan<TData = any> extends Plan<any> {
-  private parentPlanIndex: number;
+class PgAttributeSelectPlan<
+  TDataSource extends PgDataSource<any>,
+  TData = any
+> extends Plan<TData> {
+  private tableId: number;
+
+  /**
+   * This is the numeric index of this expression within the grandparent
+   * PgClassSelectPlan's selection.
+   */
+  private attrIndex: number | null = null;
+
   constructor(
-    parentPlan: PgClassSelectSinglePlan<any>,
-    private attrIndex: number,
+    parentPlan: PgClassSelectSinglePlan<TDataSource>,
+    private expression: SQL | symbol,
   ) {
     super();
-    this.parentPlanIndex = this.addDependency(parentPlan);
-    debug(`%s (%s) constructor`, this, attrIndex);
+    this.tableId = this.addDependency(parentPlan);
+    debug(`%s (%c) constructor`, this, expression);
+  }
+
+  getClassSinglePlan(): PgClassSelectSinglePlan<TDataSource> {
+    const plan = this.aether.plans[this.dependencies[this.tableId]];
+    if (!(plan instanceof PgClassSelectSinglePlan)) {
+      throw new Error(`Expected ${plan} to be a PgClassSelectSinglePlan`);
+    }
+    return plan;
+  }
+
+  optimize() {
+    this.attrIndex = this.getClassSinglePlan()
+      .getClassPlan()
+      .select(this.expression);
+    return this;
   }
 
   execute(
     values: CrystalValuesList<ReadonlyArray<any>>,
   ): CrystalResultsList<TData> {
-    return values.map((v) => v[this.parentPlanIndex][this.attrIndex]);
+    const { attrIndex, tableId } = this;
+    if (attrIndex != null) {
+      return values.map((v) => v[tableId][attrIndex]);
+    } else {
+      throw new Error(
+        "Cannot execute PgAttributeSelectPlan without first optimizing it",
+      );
+    }
+  }
+
+  toSQL(): SQL | symbol {
+    return this.expression;
+  }
+
+  deduplicate(
+    peers: Array<PgAttributeSelectPlan<TDataSource, any>>,
+  ): PgAttributeSelectPlan<TDataSource, TData> {
+    const equivalentPeer = peers.find((p) =>
+      sqlIsEquivalent(this.expression, p.expression),
+    );
+    return equivalentPeer ?? this;
   }
 }
 
@@ -1089,6 +1168,11 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
         return false;
       }
 
+      // Check symbol matches
+      if (p.symbol !== this.symbol || p.alias !== this.alias) {
+        return false;
+      }
+
       // Check SELECT matches
       if (!arraysMatch(this.selects, p.selects, sqlIsEquivalent)) {
         return false;
@@ -1143,11 +1227,16 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
       return true;
     });
     if (identical) {
-      // Move the selects across and then replace ourself with a transform that
-      // maps the expected attribute ids from the `identical` plan.
-      const actualKeyByDesiredKey = this.mergeWith(identical);
-      const mapper = makeMapper(actualKeyByDesiredKey);
-      return each(identical, mapper);
+      return identical;
+      /* The following is now forbidden.
+
+        // Move the selects across and then replace ourself with a transform that
+        // maps the expected attribute ids from the `identical` plan.
+        const actualKeyByDesiredKey = this.mergeWith(identical);
+        const mapper = makeMapper(actualKeyByDesiredKey);
+        return each(identical, mapper);
+
+      */
     }
     return this;
   }
@@ -1198,7 +1287,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
           break;
         }
         const p2 = this.aether.plans[dep.dependencies[dep.tableId]];
-        const t2 = dep.getTable().getClassPlan();
+        const t2 = dep.getClassSinglePlan().getClassPlan();
         if (t === undefined && p === undefined) {
           p = p2;
           t = t2;
@@ -1354,7 +1443,7 @@ class PgClassSelectSinglePlan<
    * their plans can be easily reused.
    */
   private colPlans: {
-    [key in keyof TDataSource["TRow"]]?: PgColumnSelectPlan<TDataSource, key>;
+    [key in keyof TDataSource["TRow"]]?: number;
   };
 
   /**
@@ -1376,9 +1465,11 @@ class PgClassSelectSinglePlan<
   }
 
   getClassPlan(): PgClassSelectPlan<TDataSource> {
-    return this.aether.plans[this.classPlanId] as PgClassSelectPlan<
-      TDataSource
-    >;
+    const plan = this.aether.plans[this.classPlanId];
+    if (!(plan instanceof PgClassSelectPlan)) {
+      throw new Error(`Expected ${plan} to be a PgClassSelectPlan`);
+    }
+    return plan;
   }
 
   /**
@@ -1389,7 +1480,8 @@ class PgClassSelectSinglePlan<
     attr: TAttr,
   ): PgColumnSelectPlan<TDataSource, TAttr> {
     // Only one plan per column
-    if (!this.colPlans[attr]) {
+    const planId: number | undefined = this.colPlans[attr];
+    if (planId == null) {
       const classPlan = this.getClassPlan();
       // TODO: where do we do the SQL conversion, e.g. to_json for dates to
       // enforce ISO8601? Perhaps this should be the datasource itself, and
@@ -1407,30 +1499,27 @@ class PgClassSelectSinglePlan<
        *   mangle the data in unexpected ways - we take responsibility for
        *   decoding these string values.
        */
-      const index = classPlan.select(sql`${expression}::text`);
 
-      this.colPlans[attr] = new PgColumnSelectPlan(
-        this,
-        index,
-        attr,
-        expression,
-      );
+      const colPlan = new PgColumnSelectPlan(this, attr, expression);
+      this.colPlans[attr] = colPlan.id;
+      return colPlan;
+    } else {
+      const plan = this.aether.plans[planId];
+      if (!(plan instanceof PgColumnSelectPlan)) {
+        throw new Error(`Expected ${plan} to be a PgColumnSelectPlan`);
+      }
+      return plan;
     }
-    return this.colPlans[attr]!;
   }
 
   /**
-   * Not sure about this at all. When selecting a connection we need to be able
-   * to get the cursor. The cursor is built from the values of the `ORDER BY`
-   * clause so that we can find nodes before/after it. This may or may not be
-   * the right place for this.
+   * When selecting a connection we need to be able to get the cursor. The
+   * cursor is built from the values of the `ORDER BY` clause so that we can
+   * find nodes before/after it.
    */
   cursor() {
     if (this.cursorPlanId == null) {
-      const cursorPlan = new PgAttributeSelectPlan(
-        this,
-        this.getClassPlan().select($$CURSOR),
-      );
+      const cursorPlan = new PgAttributeSelectPlan(this, $$CURSOR);
       this.cursorPlanId = cursorPlan.id;
       return cursorPlan;
     }
