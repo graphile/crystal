@@ -17,6 +17,10 @@ export class ObjectPlan<TData extends { [key: string]: any }> extends Plan<
     }
   }
 
+  toStringMeta(): string {
+    return "{" + this.keys.join(",") + "}";
+  }
+
   // TODO: JIT this function
   tupleToObject(tuple: Array<TData[keyof TData]>): TData {
     // Note: `outerloop` is a JavaScript "label". They are not very common.

@@ -162,6 +162,10 @@ export class AccessPlan extends Plan {
     this.destructure = constructDestructureFunction(path);
   }
 
+  toStringMeta(): string {
+    return this.path.join(".");
+  }
+
   /**
    * Get the named property of an object.
    */
@@ -196,7 +200,7 @@ export class AccessPlan extends Plan {
       (p) => JSON.stringify(p.path) === myPath,
     );
     debugAccessPlanVerbose(
-      "%c optimize: peers with same path %o = %c",
+      "%c deduplicate: peers with same path %o = %c",
       this,
       this.path,
       peersWithSamePath,

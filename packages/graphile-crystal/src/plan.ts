@@ -72,11 +72,21 @@ export abstract class Plan<TData = any> {
   }
 
   public toString(): string {
+    const meta = this.toStringMeta();
     return chalk.bold.blue(
-      `${this.constructor.name}[${inspect(this.id, {
+      `${this.constructor.name.replace(/Plan$/, "")}${
+        meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""
+      }[${inspect(this.id, {
         colors: true,
       })}@${crystalPrintPathIdentity(this.parentPathIdentity)}]`,
     );
+  }
+
+  /**
+   * This metadata will be merged into toString when referencing this plan.
+   */
+  public toStringMeta(): string | null {
+    return null;
   }
 
   protected addDependency(plan: Plan): number {

@@ -9,6 +9,19 @@ import { access, AccessPlan } from "./access";
  * @internal
  */
 export class __ValuePlan extends Plan {
+  toStringMeta(): string | null {
+    switch (this) {
+      case this.aether.rootValuePlan:
+        return "rootValue";
+      case this.aether.variableValuesPlan:
+        return "variableValues";
+      case this.aether.contextPlan:
+        return "context";
+      default:
+        return null;
+    }
+  }
+
   execute(): never {
     throw new Error("__ValuePlan must never execute");
   }

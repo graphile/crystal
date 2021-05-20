@@ -492,18 +492,21 @@ class PgColumnSelectPlan<
    */
   private attrIndex: number | null = null;
 
+  public readonly dataSource: TDataSource;
+
   constructor(
     table: PgClassSelectSinglePlan<TDataSource>,
     private attr: TColumn,
     private expression: SQL,
   ) {
     super();
+    this.dataSource = table.dataSource;
     this.tableId = this.addDependency(table);
     debug(`%s.%s constructor`, this, this.attr);
   }
 
-  toString() {
-    return super.toString() + `.${this.attr}`;
+  toStringMeta() {
+    return `${this.dataSource.name}.${this.attr}`;
   }
 
   getClassSinglePlan(): PgClassSelectSinglePlan<TDataSource> {
@@ -645,19 +648,19 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
 > {
   // FROM
 
-  symbol: symbol;
+  public readonly symbol: symbol;
 
   /** = sql.identifier(this.symbol) */
-  alias: SQL;
+  public readonly alias: SQL;
 
   /**
    * The data source from which we are selecting: table, view, etc
    */
-  dataSource: TDataSource;
+  public readonly dataSource: TDataSource;
 
   // JOIN
 
-  joins: Array<PgClassSelectPlanJoin>;
+  private joins: Array<PgClassSelectPlanJoin>;
 
   // WHERE
 
@@ -807,6 +810,10 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
       cloneFrom ? "clone" : "original",
     );
     return this;
+  }
+
+  toStringMeta() {
+    return this.dataSource.name;
   }
 
   public lock() {
@@ -1452,16 +1459,22 @@ class PgClassSelectSinglePlan<
   private cursorPlanId: number | null;
 
   private classPlanId: number;
+  public readonly dataSource: TDataSource;
 
   constructor(
     classPlan: PgClassSelectPlan<TDataSource>,
     itemPlan: Plan<TDataSource["TRow"]>,
   ) {
     super();
+    this.dataSource = classPlan.dataSource;
     this.classPlanId = classPlan.id;
     this.itemPlanId = this.addDependency(itemPlan);
     this.colPlans = {}; // TODO: think about cloning
     this.cursorPlanId = null;
+  }
+
+  toStringMeta() {
+    return this.dataSource.name;
   }
 
   getClassPlan(): PgClassSelectPlan<TDataSource> {
@@ -1557,10 +1570,17 @@ class PgConnectionPlan<TDataSource extends PgDataSource<any>> extends Plan<
 > {
   private subplanId: number;
 
+  private readonly dataSource: TDataSource;
+
   constructor(subplan: PgClassSelectPlan<TDataSource>) {
     super();
+    this.dataSource = subplan.dataSource;
     this.subplanId = subplan.id;
     debug(`%s (around %s) constructor`, this, subplan);
+  }
+
+  toStringMeta() {
+    return this.dataSource.name;
   }
 
   getSubplan(): PgClassSelectPlan<TDataSource> {
