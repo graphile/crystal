@@ -250,6 +250,9 @@ export class Aether {
     // Helpfully check plans don't do forbidden things.
     this.validatePlans();
 
+    // Log the initial plan map
+    this.logPlansByPath();
+
     // Get rid of temporary plans
     this.treeShakePlans();
 
@@ -260,7 +263,7 @@ export class Aether {
     this.treeShakePlans();
 
     // Log the plan map after deduplication
-    this.logPlans();
+    this.logPlansByPath();
 
     // Replace/inline/optimise plans
     this.optimizePlans();
@@ -1489,24 +1492,25 @@ export class Aether {
     }
     const { plans } = this;
     debugVerbose(
-      "%s",
-      plans
-        .map((plan, id) => {
-          const optimized = this.optimizedPlans.has(plan);
-          return plan
-            ? `- ${id}: ${
-                plan.id !== id
-                  ? `->${chalk.bold.yellow(String(plan.id))}`
-                  : (optimized ? "!!" : "  ") +
-                    plan.toString() +
-                    ` (deps: ${plan.dependencies.map((depId) =>
-                      chalk.bold.yellow(String(depId)),
-                    )})`
-              }`
-            : null;
-        })
-        .filter(isNotNullish)
-        .join("\n"),
+      "Plans: %s",
+      "\n" +
+        plans
+          .map((plan, id) => {
+            const optimized = this.optimizedPlans.has(plan);
+            return plan
+              ? `- ${id}: ${
+                  plan.id !== id
+                    ? `->${chalk.bold.yellow(String(plan.id))}`
+                    : (optimized ? "!!" : "  ") +
+                      plan.toString() +
+                      ` (deps: ${plan.dependencies.map((depId) =>
+                        chalk.bold.yellow(String(depId)),
+                      )})`
+                }`
+              : null;
+          })
+          .filter(isNotNullish)
+          .join("\n"),
     );
   }
 
@@ -1544,7 +1548,7 @@ export class Aether {
       print(pathIdentity);
     }
 
-    debugVerbose("%s", lines.join("\n"));
+    debugVerbose("Plans by path: %s", "\n" + lines.join("\n"));
   }
 }
 
