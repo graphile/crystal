@@ -80,9 +80,17 @@ export const GLOBAL_PATH = "";
  */
 export const ROOT_PATH = "~";
 
+// For logging indentation
+let depth = 0;
+
 const debugAether = debugFactory("crystal:aether");
 const debug = debugAether.extend("regular");
-const debugVerbose = debugAether.extend("verbose");
+const debugVerbose_ = debugAether.extend("verbose");
+
+const debugVerbose = Object.assign(
+  (t: string, ...args: any[]) => debugVerbose_("  ".repeat(depth) + t, ...args),
+  debugVerbose_,
+);
 
 type TrackedArguments = { [key: string]: InputPlan };
 
@@ -727,9 +735,9 @@ export class Aether {
     order: "dependents-first" | "dependencies-first",
     callback: (plan: Plan<any>) => Plan<any>,
   ): void {
+    depth = 0;
     const processed = new Set<Plan>();
-    const process = (i: number): void => {
-      const plan = this.plans[i];
+    const process = (plan: Plan): void => {
       if (!plan) {
         return;
       }
@@ -737,18 +745,38 @@ export class Aether {
         return;
       }
       // Process dependents first
-      const first =
-        order === "dependents-first"
-          ? this.plans
-              .filter(
-                (dependent) =>
-                  dependent && dependent.dependencies.includes(plan.id),
-              )
-              .map((p) => p.id)
-          : plan.dependencies.map((depId) => depId);
-      for (let i = 0, l = first.length; i < l; i++) {
-        const depId = first[i];
-        process(depId);
+      const first = new Set<number>();
+      if (order === "dependents-first") {
+        this.plans.forEach((possibleDependent) => {
+          if (!possibleDependent) {
+            return;
+          }
+          // Cannot just use the number since the number could be an alias
+          const dependencies = possibleDependent.dependencies.map(
+            (depId) => this.plans[depId],
+          );
+          if (dependencies.includes(plan)) {
+            first.add(possibleDependent.id);
+          }
+        });
+      } else {
+        plan.dependencies.forEach((depId) => {
+          const dependency = this.plans[depId];
+          first.add(dependency.id);
+        });
+      }
+      for (const depId of first) {
+        const depPlan = this.plans[depId];
+        if (depPlan && !processed.has(depPlan)) {
+          debugVerbose(
+            `Before we can process %c we must process %c`,
+            plan,
+            depPlan,
+          );
+          depth++;
+          process(depPlan);
+          depth--;
+        }
       }
       globalState.parentPathIdentity = plan.parentPathIdentity;
       let replacementPlan: Plan;
@@ -776,7 +804,7 @@ export class Aether {
     // ascending and we must re-evaluate this.plans.length on each loop
     // iteration.
     for (let i = 0; i < this.plans.length; i++) {
-      process(i);
+      process(this.plans[i]);
     }
   }
 
@@ -904,7 +932,7 @@ export class Aether {
     this.optimizedPlans.add(plan);
     if (replacementPlan !== plan) {
       debugVerbose(
-        "Replaced %c with %c during optimization",
+        "Optimized %c into %c (replaced plan)",
         plan,
         replacementPlan,
       );
@@ -1212,7 +1240,7 @@ export class Aether {
           result[i] = previousResult;
 
           debugVerbose(
-            `  %s result[%o] for %c found: %c`,
+            "  %s result[%o] for %c found: %c",
             follow,
             i,
             planCrystalObject,
@@ -1221,7 +1249,7 @@ export class Aether {
           continue;
         } else {
           debugVerbose(
-            `  %s no result for %c (%c)`,
+            "  %s no result for %c (%c)",
             follow,
             planCrystalObject,
             resultByCrystalObject,
