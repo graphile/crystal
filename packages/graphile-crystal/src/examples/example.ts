@@ -2145,6 +2145,10 @@ function sqlIsEquivalent(sql1: SQL | symbol, sql2: SQL | symbol): boolean {
         // when cascading through the tree.
         return arraysMatch(sql1.names, sql2.names, identifiersAreEquivalent);
       }
+      case "SYMBOL_ALIAS": {
+        // TODO
+        return false;
+      }
       default: {
         const never: never = sql1;
         console.error(`Unhandled node type: ${inspect(never)}`);

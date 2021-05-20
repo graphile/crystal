@@ -56,12 +56,23 @@ export interface SQLIndentNode {
   [$$trusted]: true;
 }
 
+/**
+ * Informs pg-sql2 to treat symbol2 as if it were the same as symbol1
+ */
+export interface SQLSymbolAliasNode {
+  a: SymbolAndName;
+  b: SymbolAndName;
+  type: "SYMBOL_ALIAS";
+  [$$trusted]: true;
+}
+
 /** @internal */
 export type SQLNode =
   | SQLRawNode
   | SQLValueNode
   | SQLIdentifierNode
-  | SQLIndentNode;
+  | SQLIndentNode
+  | SQLSymbolAliasNode;
 /** @internal */
 export type SQLQuery = Array<SQLNode>;
 
@@ -165,6 +176,15 @@ function makeIndentNode(content: SQL): SQLIndentNode {
   return Object.freeze({ type: "INDENT", content, [$$trusted]: true });
 }
 
+function makeSymbolAliasNode(a: symbol, b: symbol): SQLSymbolAliasNode {
+  return Object.freeze({
+    type: "SYMBOL_ALIAS",
+    a: getSymbolAndName(a),
+    b: getSymbolAndName(b),
+    [$$trusted]: true,
+  });
+}
+
 function isSQLNode(node: unknown): node is SQLNode {
   return typeof node === "object" && node !== null && node[$$trusted] === true;
 }
@@ -214,6 +234,25 @@ export function compile(
     [description: string]: number;
   } = {};
 
+  /**
+   * Makes a friendly name to use in the query for the given SymbolAndName.
+   */
+  function makeIdentifierForSymbol(name: SymbolAndName) {
+    const { s: symbol, n: safeDesc } = name;
+    if (!descCounter[safeDesc]) {
+      descCounter[safeDesc] = 0;
+    }
+    const number = ++descCounter[safeDesc];
+
+    // NOTE: we don't omit number for the first instance because
+    // safeDesc might end in, e.g., `_2` and cause conflicts later.
+    const identifierForSymbol = `__${safeDesc}_${number}`;
+
+    // Store so this symbol gets the same identifier next time
+    symbolToIdentifier.set(symbol, identifierForSymbol);
+    return identifierForSymbol;
+  }
+
   function print(inItems: SQL, indent = 0) {
     /**
      * Join this to generate the SQL query
@@ -249,18 +288,7 @@ export function compile(
 
               // If there is no identifier, create one and set it.
               if (!identifierForSymbol) {
-                const { s: symbol, n: safeDesc } = name;
-                if (!descCounter[safeDesc]) {
-                  descCounter[safeDesc] = 0;
-                }
-                const number = ++descCounter[safeDesc];
-
-                // NOTE: we don't omit number for the first instance because
-                // safeDesc might end in, e.g., `_2` and cause conflicts later.
-                identifierForSymbol = `__${safeDesc}_${number}`;
-
-                // Store so this symbol gets the same identifier next time
-                symbolToIdentifier.set(symbol, identifierForSymbol);
+                identifierForSymbol = makeIdentifierForSymbol(name);
               }
 
               // Return the identifier. Since we create it, we won’t have to
@@ -299,6 +327,27 @@ export function compile(
               "\n" +
               "  ".repeat(indent),
           );
+          break;
+        }
+        case "SYMBOL_ALIAS": {
+          const symbol1 = item.a.s;
+          const symbol2 = item.b.s;
+          const name1 = symbolToIdentifier.get(symbol1);
+          const name2 = symbolToIdentifier.get(symbol2);
+          if (name1 && name2 && name1 !== name2) {
+            throw new Error(
+              "ERROR: sql.symbolAlias was used after the symbols were used, they already have (non-matching) aliases",
+            );
+          }
+          if (name1) {
+            symbolToIdentifier.set(symbol2, name1);
+          } else if (name2) {
+            symbolToIdentifier.set(symbol1, name2);
+          } else {
+            const identifierForSymbol = makeIdentifierForSymbol(item.a);
+            symbolToIdentifier.set(symbol1, identifierForSymbol);
+            symbolToIdentifier.set(symbol2, identifierForSymbol);
+          }
           break;
         }
         default: {
@@ -529,6 +578,10 @@ export function indent(fragment: SQL): SQL {
   return isDev ? makeIndentNode(fragment) : fragment;
 }
 
+export function symbolAlias(symbol1: symbol, symbol2: symbol): SQL {
+  return makeSymbolAliasNode(symbol1, symbol2);
+}
+
 export {
   query as fragment,
   trueNode as true,
@@ -547,6 +600,7 @@ export interface PgSQL {
   literal: typeof literal;
   join: typeof join;
   indent: typeof indent;
+  symbolAlias: typeof symbolAlias;
   blank: typeof blank;
   fragment: typeof query;
   true: typeof trueNode;
@@ -564,6 +618,7 @@ const pgSql: PgSQL = Object.assign(query, {
   literal,
   join,
   indent,
+  symbolAlias,
   blank,
   fragment: query,
   true: trueNode,
