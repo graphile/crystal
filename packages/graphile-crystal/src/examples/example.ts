@@ -39,6 +39,7 @@ import {
   __ValuePlan,
   __ListItemPlan,
   AccessPlan,
+  list,
 } from "../plans";
 import prettier from "prettier";
 
@@ -1374,7 +1375,8 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
             ...this.joins,
           );
           const actualKeyByDesiredKey = this.mergeWith(table);
-          return map(table, actualKeyByDesiredKey);
+          // We return a list here because our children are going to use a `first` plan on us
+          return list([map(parent, actualKeyByDesiredKey)]);
         } else if (parent instanceof PgClassSelectSinglePlan) {
           const parent2 = this.aether.plans[
             parent.dependencies[parent.itemPlanId]
