@@ -46,6 +46,7 @@ import LRU from "@graphile/lru";
 import { Deferred, defer } from "../deferred";
 import { Aether } from "../aether";
 import { CrystalValuesList, CrystalResultsList } from "../interfaces";
+import { stripAnsi } from "../stripAnsi";
 
 //const EMPTY_OBJECT = Object.freeze(Object.create(null));
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
@@ -1810,13 +1811,15 @@ async function main() {
       return idx > 0
         ? e.message // Flatten all but first error
         : {
-            message: e.message,
+            message: stripAnsi(e.message),
             path: e.path?.join("."),
             locs: e.locations?.map((l) => `${l.line}:${l.column}`).join(", "),
             stack: e.stack
-              ?.replaceAll(resolve(process.cwd()), ".")
-              .replaceAll(/(?:\/[^\s\/]+)*\/node_modules\//g, "~/")
-              .split("\n"),
+              ? stripAnsi(e.stack)
+                  .replaceAll(resolve(process.cwd()), ".")
+                  .replaceAll(/(?:\/[^\s\/]+)*\/node_modules\//g, "~/")
+                  .split("\n")
+              : e.stack,
           };
     });
     const formattedResult = {
