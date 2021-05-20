@@ -39,6 +39,7 @@ import {
   __ValuePlan,
   __ListItemPlan,
   AccessPlan,
+  debugPlans,
   list,
 } from "../plans";
 import prettier from "prettier";
@@ -1261,13 +1262,19 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
     otherPlan: PgClassSelectPlan<TDataSource>,
   ): { [desiredIndex: string]: string } {
     const actualKeyByDesiredKey = {};
+    //console.log(`Other ${otherPlan} selects:`);
+    //console.dir(otherPlan.selects, { depth: 8 });
+    //console.log(`My ${this} selects:`);
+    //console.dir(this.selects, { depth: 8 });
     this.selects.forEach((fragOrSymbol, idx) => {
       if (typeof fragOrSymbol === "symbol") {
         throw new Error("Cannot inline query that uses a symbol like this.");
       }
       actualKeyByDesiredKey[idx] = otherPlan.select(fragOrSymbol);
     });
-    console.dir(actualKeyByDesiredKey);
+    //console.dir(actualKeyByDesiredKey);
+    //console.log(`Other ${otherPlan} selects now:`);
+    //console.dir(otherPlan.selects, { depth: 8 });
     return actualKeyByDesiredKey;
   }
 
@@ -1374,6 +1381,7 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
             },
             ...this.joins,
           );
+          debugVerbose(`Merging ${this} into ${table} (via ${parent})`);
           const actualKeyByDesiredKey = this.mergeWith(table);
           // We return a list here because our children are going to use a `first` plan on us
           return list([map(parent, actualKeyByDesiredKey)]);

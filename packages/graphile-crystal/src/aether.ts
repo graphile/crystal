@@ -1484,8 +1484,12 @@ export class Aether {
    * @internal
    */
   logPlans(): void {
+    if (!debugVerbose.enabled) {
+      return;
+    }
     const { plans } = this;
-    console.log(
+    debugVerbose(
+      "%s",
       plans
         .map((plan, id) => {
           const optimized = this.optimizedPlans.has(plan);
@@ -1507,19 +1511,27 @@ export class Aether {
   }
 
   logPlansByPath(): void {
+    if (!debugVerbose.enabled) {
+      return;
+    }
     this.logPlans();
     const pathIdentities = Object.keys(this.planIdByPathIdentity).sort(
       (a, z) => a.length - z.length,
     );
     const printed = new Set<string>();
     let depth = 0;
+    const lines: string[] = [];
     const print = (pathIdentity: string) => {
       if (printed.has(pathIdentity)) {
         return;
       }
       printed.add(pathIdentity);
-      const plan = this.plans[this.planIdByPathIdentity[pathIdentity]!];
-      console.log("  ".repeat(depth) + `${pathIdentity}: ${plan}`);
+      const planId = this.planIdByPathIdentity[pathIdentity];
+      if (!planId) {
+        throw new Error(`Corrupted plan, no id found for '${pathIdentity}'`);
+      }
+      const plan = this.plans[planId];
+      lines.push("  ".repeat(depth) + `${pathIdentity}: ${plan}`);
       depth++;
       for (const childPathIdentity of pathIdentities) {
         if (childPathIdentity.startsWith(pathIdentity)) {
@@ -1532,7 +1544,7 @@ export class Aether {
       print(pathIdentity);
     }
 
-    console.log(this.planIdByPathIdentity);
+    debugVerbose("%s", lines.join("\n"));
   }
 }
 
