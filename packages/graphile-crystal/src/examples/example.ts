@@ -1363,21 +1363,27 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
           this.isUnique
           /* TODO: && !this.groupBy && !this.having && !this.limit && !this.order && !this.offset && ... */
         ) {
+          const where = this.buildWhere();
+          const conditions = [
+            ...this.identifiers.map((id, i) => {
+              const plan = id.plan;
+              if (!(plan instanceof PgColumnSelectPlan)) {
+                throw new Error(`Expected ${plan} to be a PgColumnSelectPlan`);
+              }
+              return sql`${plan.toSQL()}::${id.type} = ${
+                this.identifierMatches[i]
+              }`;
+            }),
+            // Note the WHERE is now part of the JOIN condition (since
+            // it's a LEFT JOIN).
+            ...(where !== sql.blank ? [where] : []),
+          ];
           table.joins.push(
             {
               type: "left",
               source: this.dataSource.tableIdentifier,
               alias: this.alias,
-              conditions: [
-                ...this.identifiers.map((id, i) => {
-                  const plan = id.plan as PgColumnSelectPlan<any, any>;
-                  return sql`${plan.toSQL()}::${id.type} = ${
-                    this.identifierMatches[i]
-                  }`;
-                }),
-                // TODO: ...this.conditions - these are part of the JOIN
-                // condition (since it's a LEFT JOIN) - not part of the WHERE!
-              ],
+              conditions,
             },
             ...this.joins,
           );
