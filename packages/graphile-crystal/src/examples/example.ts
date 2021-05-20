@@ -1079,7 +1079,6 @@ class PgClassSelectPlan<TDataSource extends PgDataSource<any>> extends Plan<
   }
 
   private buildWhere() {
-    // TODO!!
     const conditions = this.conditions;
     return conditions.length
       ? sql`\nwhere (\n  ${sql.join(conditions, "\n) and (\n  ")}\n)`
