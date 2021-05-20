@@ -1,9 +1,9 @@
-import { Aether } from "./aether";
+import { Aether, GLOBAL_PATH } from "./aether";
 
 export const globalState = {
   debug: false as boolean,
   aether: null as Aether | null,
-  parentPathIdentity: "" as string,
+  parentPathIdentity: GLOBAL_PATH as string,
 };
 
 /**

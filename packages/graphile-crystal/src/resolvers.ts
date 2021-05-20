@@ -37,7 +37,7 @@ import {
 } from "./utils";
 import { defer, Deferred } from "./deferred";
 import { isDev } from "./dev";
-import { populateValuePlan } from "./aether";
+import { GLOBAL_PATH, populateValuePlan, ROOT_PATH } from "./aether";
 
 const debug = debugFactory("crystal:resolvers");
 
@@ -51,7 +51,7 @@ function pathToPathIdentity(path: Path): string {
     return pathToPathIdentity(path.prev);
   }
   return (
-    (path.prev ? pathToPathIdentity(path.prev) : "") +
+    (path.prev ? pathToPathIdentity(path.prev) : ROOT_PATH) +
     `>${path.typename}.${path.key}`
   );
 }
@@ -158,12 +158,7 @@ export function crystalWrapResolve<
       rootValue,
     );
     const id = uid(info.fieldName);
-    debug(
-      `👉 CRYSTAL RESOLVER @ %p; id: %c; parent: %c`,
-      pathIdentity,
-      id,
-      parentObject,
-    );
+    debug(`👉 %p/%c for %c`, pathIdentity, id, parentObject);
     const crystalContext = batch.crystalContext;
     let parentCrystalObject: CrystalObject<any>;
     if (isCrystalObject(parentObject)) {
@@ -228,9 +223,9 @@ export function crystalWrapResolve<
     }
     const result = await getBatchResult(batch, parentCrystalObject);
     debug(
-      `👈 CRYSTAL RESOLVER %c @ %p; object %s; result: %o`,
-      id,
+      `👈 %p/%c for %s; result: %o`,
       pathIdentity,
+      id,
       parentCrystalObject,
       result,
     );
@@ -375,12 +370,12 @@ export function newCrystalObject<TData>(
   crystalObjectByPathIdentity: {
     [pathIdentity: string]: CrystalObject<any> | undefined;
   } = {
-    "": crystalContext.rootCrystalObject,
+    [GLOBAL_PATH]: crystalContext.rootCrystalObject,
   },
   indexesByPathIdentity: {
     [pathIdentity: string]: ReadonlyArray<number> | undefined;
   } = {
-    "": [],
+    [GLOBAL_PATH]: [],
   },
 ): CrystalObject<TData> {
   const crystalObject: CrystalObject<TData> = {

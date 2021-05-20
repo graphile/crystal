@@ -1,6 +1,6 @@
 import * as assert from "assert";
 import chalk from "chalk";
-import { Aether } from "./aether";
+import { Aether, GLOBAL_PATH, ROOT_PATH } from "./aether";
 import {
   getCurrentAether,
   getCurrentParentPathIdentity,
@@ -66,7 +66,7 @@ export abstract class Plan<TData = any> {
     const aether = getCurrentAether();
     this.aether = aether;
     this.groupId = aether.groupId;
-    this.parentPathIdentity = "";
+    this.parentPathIdentity = GLOBAL_PATH;
     this.createdWithParentPathIdentity = getCurrentParentPathIdentity();
     this.id = aether.plans.push(this) - 1;
   }

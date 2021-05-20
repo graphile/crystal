@@ -61,6 +61,23 @@ import debugFactory from "debug";
 
 const EMPTY_INDEXES = Object.freeze([] as number[]);
 
+/**
+ * The pathIdentity that represents things without a path identity. Making this
+ * non-string would be a PITA right now... But maybe that's what we should do
+ * long term. This is used for things like plans for
+ * context/rootValue/variableValues which don't apply to a path.
+ *
+ * IMPORTANT: this must be shorter than EVERY OTHER path identity.
+ */
+export const GLOBAL_PATH = "";
+
+/**
+ * The pathIdentity that represents the root of the operation. All other paths
+ * flow from this so it should be short, but it must be longer than
+ * GLOBAL_PATH.
+ */
+export const ROOT_PATH = "~";
+
 const debugAether = debugFactory("crystal:aether");
 const debug = debugAether.extend("regular");
 const debugVerbose = debugAether.extend("verbose");
@@ -162,6 +179,7 @@ export class Aether {
     public readonly rootValue: unknown,
   ) {
     globalState.aether = this;
+    globalState.parentPathIdentity = GLOBAL_PATH;
     this.variableValuesPlan = new __ValuePlan();
     debug("Constructed variableValuesPlan %s", this.variableValuesPlan);
     // TODO: this should use a more intelligent tracked object plan since the variables are strongly typed (unlike context/rootValue).
@@ -194,10 +212,10 @@ export class Aether {
       this.trackedRootValuePlan,
     );
     this.planIdByPathIdentity = Object.assign(Object.create(null), {
-      "": this.rootValuePlan.id,
+      [ROOT_PATH]: this.rootValuePlan.id,
     });
     this.itemPlanIdByPathIdentity = Object.assign(Object.create(null), {
-      "": this.rootValuePlan.id,
+      [ROOT_PATH]: this.rootValuePlan.id,
     });
     this.operationType = operation.operation;
     switch (this.operationType) {
@@ -253,7 +271,7 @@ export class Aether {
       throw new Error("No query type found in schema");
     }
     this.planSelectionSet(
-      "",
+      ROOT_PATH,
       this.trackedRootValuePlan,
       rootType,
       this.operation.selectionSet.selections,
@@ -269,7 +287,7 @@ export class Aether {
       throw new Error("No mutation type found in schema");
     }
     this.planSelectionSet(
-      "",
+      ROOT_PATH,
       this.trackedRootValuePlan,
       rootType,
       this.operation.selectionSet.selections,
@@ -324,7 +342,7 @@ export class Aether {
         subscribePlan,
       );
       this.planSelectionSet(
-        "",
+        ROOT_PATH,
         subscribePlan,
         rootType,
         selectionSet.selections,
@@ -332,7 +350,7 @@ export class Aether {
     } else {
       const subscribePlan = this.trackedRootValuePlan;
       this.planSelectionSet(
-        "",
+        ROOT_PATH,
         subscribePlan,
         rootType,
         selectionSet.selections,
@@ -352,12 +370,12 @@ export class Aether {
     isSequential = false,
   ): void {
     assertObjectType(objectType);
+    globalState.parentPathIdentity = path;
     const groupedFieldSet = graphqlCollectFields(this, objectType, selections);
     const objectTypeFields = objectType.getFields();
     for (const [responseKey, fields] of groupedFieldSet.entries()) {
       const oldGroupId = this.groupId;
       const pathIdentity = `${path}>${objectType.name}.${responseKey}`;
-      globalState.parentPathIdentity = path;
       const field = fields[0];
       const fieldName = field.name.value;
 
@@ -978,7 +996,7 @@ export class Aether {
     };
     const rootCrystalObject = newCrystalObject(
       null,
-      "",
+      GLOBAL_PATH, // TODO: this should be ROOT_PATH I think?
       rootId,
       EMPTY_INDEXES,
       rootValue,
@@ -1175,7 +1193,7 @@ export class Aether {
         }
       } else {
         throw new Error(
-          `Crystal error: could not find id for ${plan.parentPathIdentity} in ${crystalObject}`,
+          `Crystal error: could not find id for '${plan.parentPathIdentity}' in ${crystalObject}`,
         );
       }
       pendingCrystalObjects.push(crystalObject);
