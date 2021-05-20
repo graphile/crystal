@@ -1,6 +1,7 @@
 import debugFactory from "debug";
 import { inspect } from "util";
 import { Plan } from "../plan";
+import chalk from "chalk";
 
 // NOTE: this runs at startup so it will NOT notice values that pollute the
 // Object prototype after startup. It is assumed that you are running Node in
@@ -163,7 +164,9 @@ export class AccessPlan extends Plan {
   }
 
   toStringMeta(): string {
-    return this.path.join(".");
+    return `${chalk.bold.yellow(String(this.dependencies[0]))}.${this.path.join(
+      ".",
+    )}`;
   }
 
   /**

@@ -57,6 +57,7 @@ import { isDev } from "./dev";
 import { Deferred } from "./deferred";
 import { isCrystalObject, newCrystalObject } from "./resolvers";
 import { globalState } from "./global";
+import chalk from "chalk";
 
 import debugFactory from "debug";
 
@@ -249,6 +250,9 @@ export class Aether {
 
     // Get rid of unneeded plans
     this.treeShakePlans();
+
+    // Log the plan map after deduplication
+    this.logPlans();
 
     // Replace/inline/optimise plans
     this.optimizePlans();
@@ -719,39 +723,59 @@ export class Aether {
    * Processes the plans making sure to process the leaves of the plan DAG
    * first and then working our way back up the graph to the root nodes.
    */
-  private processPlans(callback: (plan: Plan<any>) => Plan<any>): void {
-    const replacements = new Map<Plan, number>();
-    const processed = new Set();
+  private processPlans(
+    order: "dependents-first" | "dependencies-first",
+    callback: (plan: Plan<any>) => Plan<any>,
+  ): void {
+    const processed = new Set<Plan>();
     const process = (i: number): void => {
       const plan = this.plans[i];
       if (!plan) {
-        return;
-      }
-      const replacementId = replacements.get(plan);
-      if (replacementId != null) {
-        this.plans[i] = this.plans[replacementId];
         return;
       }
       if (processed.has(plan)) {
         return;
       }
       // Process dependents first
-      const dependents = this.plans.filter(
-        (dependent) => dependent && dependent.dependencies.includes(plan.id),
-      );
-      for (let i = 0, l = dependents.length; i < l; i++) {
-        const depId = dependents[i].id;
+      const first =
+        order === "dependents-first"
+          ? this.plans
+              .filter(
+                (dependent) =>
+                  dependent && dependent.dependencies.includes(plan.id),
+              )
+              .map((p) => p.id)
+          : plan.dependencies.map((depId) => depId);
+      for (let i = 0, l = first.length; i < l; i++) {
+        const depId = first[i];
         process(depId);
       }
       globalState.parentPathIdentity = plan.parentPathIdentity;
-      const replacementPlan = callback(plan);
-      this.plans[i] = replacementPlan;
+      let replacementPlan: Plan;
+      try {
+        replacementPlan = callback(plan);
+      } catch (e) {
+        this.logPlans();
+        console.error(
+          `Error occurred whilst processing ${plan} in ${order} mode`,
+        );
+        throw e;
+      }
       if (replacementPlan != plan) {
-        replacements.set(plan, replacementPlan.id);
+        // Replace all references to `plan` with `replacementPlan`
+        for (let j = 0, m = this.plans.length; j < m; j++) {
+          if (this.plans[j] && this.plans[j].id === plan.id) {
+            this.plans[j] = replacementPlan;
+          }
+        }
       }
       processed.add(plan);
     };
-    for (let i = this.plans.length - 1; i >= 0; i--) {
+
+    // NOTE: whilst processing plans new plans may be added, thus we must loop
+    // ascending and we must re-evaluate this.plans.length on each loop
+    // iteration.
+    for (let i = 0; i < this.plans.length; i++) {
       process(i);
     }
   }
@@ -780,7 +804,7 @@ export class Aether {
         );
       }
       replacements = 0;
-      this.processPlans((plan) => {
+      this.processPlans("dependencies-first", (plan) => {
         const replacementPlan = this.deduplicatePlan(plan);
         if (replacementPlan !== plan) {
           lastOptimizedPlan = replacementPlan;
@@ -800,7 +824,7 @@ export class Aether {
    * before we optimise ourself.
    */
   private optimizePlans(): void {
-    this.processPlans((plan) => this.optimizePlan(plan));
+    this.processPlans("dependents-first", (plan) => this.optimizePlan(plan));
   }
 
   private isPeer(planA: Plan, planB: Plan): boolean {
@@ -876,8 +900,8 @@ export class Aether {
     if (this.optimizedPlans.has(plan)) {
       throw new Error("Must not optimize plan twice");
     }
-    this.optimizedPlans.add(plan);
     const replacementPlan = plan.optimize();
+    this.optimizedPlans.add(plan);
     if (replacementPlan !== plan) {
       debugVerbose(
         "Replaced %c with %c during optimization",
@@ -1422,6 +1446,34 @@ export class Aether {
     }
     return { valueId, existed: true };
   }
+
+  /**
+   * For debugging.
+   *
+   * @internal
+   */
+  logPlans(): void {
+    const { plans } = this;
+    console.log(
+      plans
+        .map((plan, id) => {
+          const optimized = this.optimizedPlans.has(plan);
+          return plan
+            ? `- ${id}: ${
+                plan.id !== id
+                  ? plan.id
+                  : (optimized ? "!!" : "  ") +
+                    plan.toString() +
+                    ` (deps: ${plan.dependencies.map((depId) =>
+                      chalk.bold.yellow(String(depId)),
+                    )})`
+              }`
+            : null;
+        })
+        .filter(isNotNullish)
+        .join("\n"),
+    );
+  }
 }
 
 /**
@@ -1446,4 +1498,8 @@ export function populateValuePlan(
   }
   resultByCrystalObject.set(valueCrystalObject, object ?? ROOT_VALUE_OBJECT);
   debug("Populated value plan for %s: %c", label, resultByCrystalObject);
+}
+
+function isNotNullish<T>(a: T | null | undefined): a is T {
+  return a != null;
 }

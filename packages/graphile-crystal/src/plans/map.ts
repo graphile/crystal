@@ -1,4 +1,5 @@
 import { Plan } from "../plan";
+import chalk from "chalk";
 
 type ActualKeyByDesiredKey = { [desiredKey: string]: string };
 
@@ -21,6 +22,10 @@ export class MapPlan extends Plan {
     super();
     this.addDependency(parentPlan);
     this.mapper = makeMapper(actualKeyByDesiredKey);
+  }
+
+  toStringMeta(): string {
+    return chalk.bold.yellow(String(this.dependencies[0]));
   }
 
   execute(values: any[][]): any[] {

@@ -34,7 +34,12 @@ import {
 import sql, { SQL, SQLIdentifierNode, SQLRawValue } from "pg-sql2";
 import { crystalEnforce } from "..";
 import { Plan } from "../plan";
-import { __TrackedObjectPlan, __ValuePlan, __ListItemPlan } from "../plans";
+import {
+  __TrackedObjectPlan,
+  __ValuePlan,
+  __ListItemPlan,
+  AccessPlan,
+} from "../plans";
 import prettier from "prettier";
 
 import { Pool } from "pg";
@@ -1480,7 +1485,9 @@ class PgClassSelectSinglePlan<
   getClassPlan(): PgClassSelectPlan<TDataSource> {
     const plan = this.aether.plans[this.classPlanId];
     if (!(plan instanceof PgClassSelectPlan)) {
-      throw new Error(`Expected ${plan} to be a PgClassSelectPlan`);
+      throw new Error(
+        `Expected ${this.classPlanId} (${plan}) to be a PgClassSelectPlan`,
+      );
     }
     return plan;
   }

@@ -1,5 +1,6 @@
 import { getCurrentParentPathIdentity } from "../global";
 import { Plan } from "../plan";
+import chalk from "chalk";
 
 export class __ListItemPlan<
   TParentPlan extends Plan<ReadonlyArray<any>>
@@ -8,6 +9,10 @@ export class __ListItemPlan<
     super();
     this.addDependency(parentPlan);
     this.parentPathIdentity = getCurrentParentPathIdentity();
+  }
+
+  toStringMeta(): string {
+    return chalk.bold.yellow(String(this.dependencies[0]));
   }
 
   execute(): never {
