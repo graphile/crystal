@@ -1,6 +1,5 @@
-import QueryBuilder from "../QueryBuilder";
 import type { SQL } from "../QueryBuilder";
-
+import type QueryBuilder from "../QueryBuilder";
 import { getComputedColumnDetails } from "./PgComputedColumnsPlugin";
 import type { PgProc } from "./PgIntrospectionPlugin";
 import { PgEntityKind } from "./PgIntrospectionPlugin";
