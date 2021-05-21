@@ -265,9 +265,10 @@ export class PgClassSelectPlan<
    * Select an SQL fragment, returning the index the result will have.
    */
   public select(fragment: SQL | symbol): number {
-    if (this.locked) {
-      throw new Error(`${this}: cannot add selections once plan is locked`);
-    }
+    // NOTE: it's okay to add selections after the plan is "locked" - lock only
+    // applies to which rows are being selected, not what is being queried
+    // about the rows.
+
     // Optimisation: if we're already selecting this fragment, return the existing one.
     const index = this.selects.findIndex((frag) =>
       sql.isEquivalent(frag, fragment),
@@ -275,6 +276,7 @@ export class PgClassSelectPlan<
     if (index >= 0) {
       return index;
     }
+
     return this.selects.push(fragment) - 1;
   }
 
