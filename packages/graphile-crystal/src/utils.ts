@@ -489,7 +489,7 @@ export function objectSpec<
 /**
  * Saves us having to write `extensions: {graphile: {...}}` everywhere.
  */
-function objectFieldSpec<
+export function objectFieldSpec<
   TContext extends BaseGraphQLContext,
   TSource extends Plan<any>,
   TResult extends Plan<any> = Plan<any>,

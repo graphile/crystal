@@ -1,8 +1,9 @@
 import debugFactory from "debug";
 import {
-  makeCrystalObjectExtension,
-  makeCrystalObjectFieldExtension,
-  makeCrystalWrapResolver,
+  crystalWrapResolve,
+  crystalWrapSubscribe,
+  objectFieldSpec,
+  objectSpec,
 } from "graphile-crystal";
 import * as graphql from "graphql";
 import type { ResolveTree } from "graphql-parse-resolve-info";
@@ -151,7 +152,6 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
     { [fieldName: string]: GraphileEngine.ArgDataGeneratorFunction[] }
   >();
 
-  const wrapResolver = makeCrystalWrapResolver();
   const newWithHooks: any = function newWithHooks<
     T extends
       | graphql.GraphQLSchema
@@ -329,13 +329,6 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
         scope,
       };
 
-      const objectSpec: GraphileEngine.GraphileObjectTypeConfig<any, any> = {
-        ...newSpec,
-        extensions: {
-          ...newSpec.extensions,
-          graphile: makeCrystalObjectExtension(),
-        },
-      };
       const objectContext: GraphileEngine.ContextGraphQLObjectType = {
         ...commonContext,
         addDataGeneratorForField,
@@ -344,7 +337,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
       newSpec = builder.applyHooks(
         this,
         "GraphQLObjectType",
-        objectSpec,
+        objectSpec(newSpec),
         objectContext,
 
         `|${newSpec.name}`,
@@ -501,17 +494,10 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
             if (typeof newSpec === "function") {
               newSpec = newSpec(context);
             }
-            newSpec = {
-              ...newSpec,
-              extensions: {
-                ...newSpec.extensions,
-                graphile: makeCrystalObjectFieldExtension(),
-              },
-            };
             newSpec = builder.applyHooks(
               this,
               "GraphQLObjectType:fields:field",
-              newSpec,
+              objectFieldSpec(newSpec),
               context,
               `|${getNameFromType(Self)}.fields.${fieldName}`,
             );
@@ -584,10 +570,11 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
 
           // Perform the Graphile Crystal magic
           for (const fieldName in fieldsSpec) {
-            fieldsSpec[fieldName].resolve = wrapResolver(
-              fieldsSpec[fieldName].type,
-              fieldsSpec[fieldName].resolve,
-            );
+            const { subscribe, resolve } = fieldsSpec[fieldName];
+            fieldsSpec[fieldName].resolve = crystalWrapResolve(resolve);
+            if (subscribe) {
+              fieldsSpec[fieldName].subscribe = crystalWrapSubscribe(subscribe);
+            }
 
             // IMPORTANT: **nothing** can modify the resolver from here - i.e.
             // graphql-shield and friends may cause problems

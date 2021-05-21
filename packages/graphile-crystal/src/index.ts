@@ -42,5 +42,9 @@ export {
   object,
   ObjectPlan,
 } from "./plans";
-export { $$crystalWrapped, crystalWrapResolve } from "./resolvers";
-export { arraysMatch, objectSpec } from "./utils";
+export {
+  $$crystalWrapped,
+  crystalWrapResolve,
+  crystalWrapSubscribe,
+} from "./resolvers";
+export { arraysMatch, objectFieldSpec, objectSpec } from "./utils";
