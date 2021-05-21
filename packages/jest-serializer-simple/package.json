@@ -26,7 +26,8 @@
   "homepage": "https://github.com/graphile/graphile-engine/tree/master/packages/jest-serializer-simple#readme",
   "dependencies": {
     "@types/json5": "^2.2.0",
-    "json5": "^2.2.0"
+    "json5": "^2.2.0",
+    "prettier": "^2.0.5"
   },
   "devDependencies": {
     "@types/jest": "^25.2.3",

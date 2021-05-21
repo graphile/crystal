@@ -11843,6 +11843,7 @@ fsevents@^1.2.7:
     "@types/json5": ^2.2.0
     jest: ^26.0.1
     json5: ^2.2.0
+    prettier: ^2.0.5
     pretty-format: ^26.0.1
     ts-node: ^9.1.1
     tslib: ^2.2.0

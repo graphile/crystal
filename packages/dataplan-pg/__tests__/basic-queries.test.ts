@@ -81,21 +81,9 @@ it("{forums{name}}", async () => {
   `);
   expect(data.forums[0].name).toEqual("Cats");
   expect(data.forums[2].name).toEqual("Postgres");
-  expect({ __: data }).toMatchInlineSnapshot(`
-    {
-      forums: [
-        {
-          name: 'Cats',
-        },
-        {
-          name: 'Dogs',
-        },
-        {
-          name: 'Postgres',
-        },
-      ],
-    }
-  `);
+  expect({ __: data }).toMatchInlineSnapshot(
+    `{ forums: [{ name: "Cats" }, { name: "Dogs" }, { name: "Postgres" }] }`,
+  );
   expect({
     __: queries.map((q) => q.text).join("\n\n"),
   }).toMatchInlineSnapshot(`
@@ -124,27 +112,9 @@ it("{forums{name self{id name}}}", async () => {
   expect({ __: data }).toMatchInlineSnapshot(`
     {
       forums: [
-        {
-          name: 'Cats',
-          self: {
-            id: 'ca700000-0000-0000-0000-000000000ca7',
-            name: 'Cats',
-          },
-        },
-        {
-          name: 'Dogs',
-          self: {
-            id: 'd0900000-0000-0000-0000-000000000d09',
-            name: 'Dogs',
-          },
-        },
-        {
-          name: 'Postgres',
-          self: {
-            id: 'bae00000-0000-0000-0000-000000000bae',
-            name: 'Postgres',
-          },
-        },
+        { name: "Cats", self: { id: "ca700000-0000-0000-0000-000000000ca7", name: "Cats" } },
+        { name: "Dogs", self: { id: "d0900000-0000-0000-0000-000000000d09", name: "Dogs" } },
+        { name: "Postgres", self: { id: "bae00000-0000-0000-0000-000000000bae", name: "Postgres" } },
       ],
     }
   `);
@@ -185,81 +155,27 @@ it("{forums{name messagesList(limit,condition,includeArchived){body author{usern
     {
       forums: [
         {
-          name: 'Cats',
+          name: "Cats",
           messagesList: [
-            {
-              body: 'Cats = awesome -- Alice',
-              author: {
-                username: 'Alice',
-                gravatarUrl: null,
-              },
-            },
-            {
-              body: 'Cats = awesome -- Bob',
-              author: {
-                username: 'Bob',
-                gravatarUrl: null,
-              },
-            },
-            {
-              body: 'Cats = awesome -- Cecilia',
-              author: {
-                username: 'Cecilia',
-                gravatarUrl: null,
-              },
-            },
+            { body: "Cats = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+            { body: "Cats = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+            { body: "Cats = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
           ],
         },
         {
-          name: 'Dogs',
+          name: "Dogs",
           messagesList: [
-            {
-              body: 'Dogs = awesome -- Alice',
-              author: {
-                username: 'Alice',
-                gravatarUrl: null,
-              },
-            },
-            {
-              body: 'Dogs = awesome -- Bob',
-              author: {
-                username: 'Bob',
-                gravatarUrl: null,
-              },
-            },
-            {
-              body: 'Dogs = awesome -- Cecilia',
-              author: {
-                username: 'Cecilia',
-                gravatarUrl: null,
-              },
-            },
+            { body: "Dogs = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+            { body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+            { body: "Dogs = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
           ],
         },
         {
-          name: 'Postgres',
+          name: "Postgres",
           messagesList: [
-            {
-              body: 'Postgres = awesome -- Alice',
-              author: {
-                username: 'Alice',
-                gravatarUrl: null,
-              },
-            },
-            {
-              body: 'Postgres = awesome -- Bob',
-              author: {
-                username: 'Bob',
-                gravatarUrl: null,
-              },
-            },
-            {
-              body: 'Postgres = awesome -- Cecilia',
-              author: {
-                username: 'Cecilia',
-                gravatarUrl: null,
-              },
-            },
+            { body: "Postgres = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+            { body: "Postgres = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+            { body: "Postgres = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
           ],
         },
       ],
@@ -314,95 +230,26 @@ it("{allMessagesConnection{edges{cursor node{body author{username gravatarUrl}}}
     {
       allMessagesConnection: {
         edges: [
+          { cursor: "424242", node: { body: "Cats = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } } },
+          { cursor: "424242", node: { body: "Cats = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } } },
           {
-            cursor: '424242',
-            node: {
-              body: 'Cats = awesome -- Alice',
-              author: {
-                username: 'Alice',
-                gravatarUrl: null,
-              },
-            },
+            cursor: "424242",
+            node: { body: "Cats = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
+          },
+          { cursor: "424242", node: { body: "Dogs = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } } },
+          { cursor: "424242", node: { body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } } },
+          {
+            cursor: "424242",
+            node: { body: "Dogs = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
           },
           {
-            cursor: '424242',
-            node: {
-              body: 'Cats = awesome -- Bob',
-              author: {
-                username: 'Bob',
-                gravatarUrl: null,
-              },
-            },
+            cursor: "424242",
+            node: { body: "Postgres = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
           },
+          { cursor: "424242", node: { body: "Postgres = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } } },
           {
-            cursor: '424242',
-            node: {
-              body: 'Cats = awesome -- Cecilia',
-              author: {
-                username: 'Cecilia',
-                gravatarUrl: null,
-              },
-            },
-          },
-          {
-            cursor: '424242',
-            node: {
-              body: 'Dogs = awesome -- Alice',
-              author: {
-                username: 'Alice',
-                gravatarUrl: null,
-              },
-            },
-          },
-          {
-            cursor: '424242',
-            node: {
-              body: 'Dogs = awesome -- Bob',
-              author: {
-                username: 'Bob',
-                gravatarUrl: null,
-              },
-            },
-          },
-          {
-            cursor: '424242',
-            node: {
-              body: 'Dogs = awesome -- Cecilia',
-              author: {
-                username: 'Cecilia',
-                gravatarUrl: null,
-              },
-            },
-          },
-          {
-            cursor: '424242',
-            node: {
-              body: 'Postgres = awesome -- Alice',
-              author: {
-                username: 'Alice',
-                gravatarUrl: null,
-              },
-            },
-          },
-          {
-            cursor: '424242',
-            node: {
-              body: 'Postgres = awesome -- Bob',
-              author: {
-                username: 'Bob',
-                gravatarUrl: null,
-              },
-            },
-          },
-          {
-            cursor: '424242',
-            node: {
-              body: 'Postgres = awesome -- Cecilia',
-              author: {
-                username: 'Cecilia',
-                gravatarUrl: null,
-              },
-            },
+            cursor: "424242",
+            node: { body: "Postgres = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
           },
         ],
       },
@@ -462,181 +309,67 @@ it("{forums{name messagesConnection(...){nodes{body author{...}} edges{cursor no
     {
       forums: [
         {
-          name: 'Cats',
+          name: "Cats",
           messagesConnection: {
             nodes: [
-              {
-                body: 'Cats = awesome -- Alice',
-                author: {
-                  username: 'Alice',
-                  gravatarUrl: null,
-                },
-              },
-              {
-                body: 'Cats = awesome -- Bob',
-                author: {
-                  username: 'Bob',
-                  gravatarUrl: null,
-                },
-              },
-              {
-                body: 'Cats = awesome -- Cecilia',
-                author: {
-                  username: 'Cecilia',
-                  gravatarUrl: null,
-                },
-              },
+              { body: "Cats = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+              { body: "Cats = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+              { body: "Cats = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
             ],
             edges: [
               {
-                cursor: '424242',
-                node: {
-                  body: 'Cats = awesome -- Alice',
-                  author: {
-                    username: 'Alice',
-                    gravatarUrl: null,
-                  },
-                },
+                cursor: "424242",
+                node: { body: "Cats = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
               },
+              { cursor: "424242", node: { body: "Cats = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } } },
               {
-                cursor: '424242',
-                node: {
-                  body: 'Cats = awesome -- Bob',
-                  author: {
-                    username: 'Bob',
-                    gravatarUrl: null,
-                  },
-                },
-              },
-              {
-                cursor: '424242',
-                node: {
-                  body: 'Cats = awesome -- Cecilia',
-                  author: {
-                    username: 'Cecilia',
-                    gravatarUrl: null,
-                  },
-                },
+                cursor: "424242",
+                node: { body: "Cats = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
               },
             ],
           },
         },
         {
-          name: 'Dogs',
+          name: "Dogs",
           messagesConnection: {
             nodes: [
-              {
-                body: 'Dogs = awesome -- Alice',
-                author: {
-                  username: 'Alice',
-                  gravatarUrl: null,
-                },
-              },
-              {
-                body: 'Dogs = awesome -- Bob',
-                author: {
-                  username: 'Bob',
-                  gravatarUrl: null,
-                },
-              },
-              {
-                body: 'Dogs = awesome -- Cecilia',
-                author: {
-                  username: 'Cecilia',
-                  gravatarUrl: null,
-                },
-              },
+              { body: "Dogs = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+              { body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+              { body: "Dogs = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
             ],
             edges: [
               {
-                cursor: '424242',
-                node: {
-                  body: 'Dogs = awesome -- Alice',
-                  author: {
-                    username: 'Alice',
-                    gravatarUrl: null,
-                  },
-                },
+                cursor: "424242",
+                node: { body: "Dogs = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
               },
+              { cursor: "424242", node: { body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } } },
               {
-                cursor: '424242',
-                node: {
-                  body: 'Dogs = awesome -- Bob',
-                  author: {
-                    username: 'Bob',
-                    gravatarUrl: null,
-                  },
-                },
-              },
-              {
-                cursor: '424242',
-                node: {
-                  body: 'Dogs = awesome -- Cecilia',
-                  author: {
-                    username: 'Cecilia',
-                    gravatarUrl: null,
-                  },
-                },
+                cursor: "424242",
+                node: { body: "Dogs = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
               },
             ],
           },
         },
         {
-          name: 'Postgres',
+          name: "Postgres",
           messagesConnection: {
             nodes: [
-              {
-                body: 'Postgres = awesome -- Alice',
-                author: {
-                  username: 'Alice',
-                  gravatarUrl: null,
-                },
-              },
-              {
-                body: 'Postgres = awesome -- Bob',
-                author: {
-                  username: 'Bob',
-                  gravatarUrl: null,
-                },
-              },
-              {
-                body: 'Postgres = awesome -- Cecilia',
-                author: {
-                  username: 'Cecilia',
-                  gravatarUrl: null,
-                },
-              },
+              { body: "Postgres = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+              { body: "Postgres = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+              { body: "Postgres = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
             ],
             edges: [
               {
-                cursor: '424242',
-                node: {
-                  body: 'Postgres = awesome -- Alice',
-                  author: {
-                    username: 'Alice',
-                    gravatarUrl: null,
-                  },
-                },
+                cursor: "424242",
+                node: { body: "Postgres = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
               },
               {
-                cursor: '424242',
-                node: {
-                  body: 'Postgres = awesome -- Bob',
-                  author: {
-                    username: 'Bob',
-                    gravatarUrl: null,
-                  },
-                },
+                cursor: "424242",
+                node: { body: "Postgres = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
               },
               {
-                cursor: '424242',
-                node: {
-                  body: 'Postgres = awesome -- Cecilia',
-                  author: {
-                    username: 'Cecilia',
-                    gravatarUrl: null,
-                  },
-                },
+                cursor: "424242",
+                node: { body: "Postgres = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
               },
             ],
           },
