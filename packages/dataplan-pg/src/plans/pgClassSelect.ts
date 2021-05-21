@@ -143,15 +143,32 @@ export class PgClassSelectPlan<
    */
   private selects: Array<SQL | symbol>;
 
+  /**
+   * The id for the PostgreSQL context plan.
+   */
   private contextId: number;
 
+  /**
+   * When finalized, we build the SQL query, values, and note where to feed in
+   * the identifiers. This saves repeating this work at execution time.
+   */
   private finalizeResults: {
     text: string;
     rawSqlValues: (SQLRawValue | symbol)[];
     identifierIndex: number | null;
   } | null = null;
 
+  /**
+   * Determines if the PgClassSelectPlan is "locked" - i.e. its
+   * FROM,JOINs,WHERE,ORDER BY,LIMIT,OFFSET cannot be changed. Note this does
+   * not prevent adding more SELECTs
+   */
   private locked = false;
+
+  /**
+   * If we were cloned and our clone source was finalized, the identifierIndex
+   * from the clone source. Needed for when we finalize ourself.
+   */
   private cloneIdentifierIndex: number | null | undefined;
 
   constructor(
