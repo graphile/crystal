@@ -35,7 +35,7 @@
     "tslib": "^2.2.0"
   },
   "engines": {
-    "node": ">=12.16"
+    "node": ">=14.17"
   },
   "devDependencies": {
     "@types/jest": "^25.2.3",

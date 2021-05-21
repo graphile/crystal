@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/graphile/graphile-build/tree/master/packages/lru",
   "engines": {
-    "node": ">=12.16"
+    "node": ">=14.17"
   },
   "files": [
     "dist"

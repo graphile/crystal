@@ -36,7 +36,7 @@
     "tslib": "^2.2.0"
   },
   "engines": {
-    "node": ">=12.16"
+    "node": ">=14.17"
   },
   "peerDependencies": {
     "graphql": "^15.3.0"
