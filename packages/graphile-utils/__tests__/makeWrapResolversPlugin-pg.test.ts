@@ -3,7 +3,7 @@ import { graphql } from "graphql";
 import pg, { Pool } from "pg";
 import { createPostGraphileSchema } from "postgraphile-core";
 
-import { makeChangeNullabilityPlugin,makeWrapResolversPlugin } from "../";
+import { makeChangeNullabilityPlugin, makeWrapResolversPlugin } from "../";
 
 let pgPool: Pool;
 

@@ -1,4 +1,4 @@
-import { GraphQLSchema,lexicographicSortSchema } from "graphql";
+import { GraphQLSchema, lexicographicSortSchema } from "graphql";
 import { PoolClient } from "pg";
 
 import { createPostGraphileSchema } from "../../..";

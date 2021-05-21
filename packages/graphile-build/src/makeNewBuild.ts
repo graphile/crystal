@@ -7,7 +7,9 @@ import * as graphql from "graphql";
 import {
   getAliasFromResolveInfo as rawGetAliasFromResolveInfo,
   parseResolveInfo,
- ResolveTree,  simplifyParsedResolveInfoFragmentWithType } from "graphql-parse-resolve-info";
+  ResolveTree,
+  simplifyParsedResolveInfoFragmentWithType,
+} from "graphql-parse-resolve-info";
 import pluralize from "pluralize";
 import * as semver from "semver";
 
@@ -19,7 +21,7 @@ import { makeNewWithHooks } from "./newWithHooks";
 import resolveNode from "./resolveNode";
 import SchemaBuilder from "./SchemaBuilder";
 import swallowError from "./swallowError";
-import { camelCase, constantCase,upperCamelCase } from "./utils";
+import { camelCase, constantCase, upperCamelCase } from "./utils";
 
 const makeInitialInflection = () => ({
   pluralize,

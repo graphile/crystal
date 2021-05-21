@@ -8,7 +8,7 @@ import {
   StandardTypesPlugin,
   SubscriptionPlugin,
 } from "graphile-build";
-import { graphql, parse,subscribe } from "graphql";
+import { graphql, parse, subscribe } from "graphql";
 import { $$asyncIterator } from "iterall";
 
 import {

@@ -29,7 +29,7 @@ export {
 
 export { SchemaBuilder };
 
-export { LiveCoordinator,LiveMonitor, LiveProvider, LiveSource } from "./Live";
+export { LiveCoordinator, LiveMonitor, LiveProvider, LiveSource } from "./Live";
 
 export const getBuilder = async (
   plugins: Array<GraphileEngine.Plugin>,

@@ -3,7 +3,7 @@ import {
   introspectionQuery as INTROSPECTION_QUERY,
 } from "graphql";
 import { Pool, PoolClient } from "pg";
-import { makePluginHook,postgraphile } from "postgraphile";
+import { makePluginHook, postgraphile } from "postgraphile";
 
 import PgPubsub from "../src";
 import { runQuery, TestCtx } from "./runQuery";

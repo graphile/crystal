@@ -1,11 +1,11 @@
 import { promises as fsp } from "fs";
-import { gql,makeExtendSchemaPlugin } from "graphile-utils";
+import { gql, makeExtendSchemaPlugin } from "graphile-utils";
 import { graphql } from "graphql";
 import JSON5 from "json5";
 import { basename } from "path";
 
 import { createPostGraphileSchema } from "../../..";
-import { getServerVersionNum,withPgClient } from "../../helpers";
+import { getServerVersionNum, withPgClient } from "../../helpers";
 import ToyCategoriesPlugin from "../ToyCategoriesPlugin";
 
 const QueryExtendedPlugin = makeExtendSchemaPlugin({

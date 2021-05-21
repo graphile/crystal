@@ -3,12 +3,14 @@ import * as assert from "assert";
 import chalk from "chalk";
 import debugFactory from "debug";
 import {
-Aether,  aether,
+  Aether,
+  aether,
   CrystalValuesList,
   defer,
   Deferred,
   object,
- Plan  } from "graphile-crystal";
+  Plan,
+} from "graphile-crystal";
 import { Pool } from "pg";
 import sql, { SQL, SQLRawValue } from "pg-sql2";
 import { inspect } from "util";

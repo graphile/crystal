@@ -3,7 +3,7 @@ module.exports = {
   proseWrap: "always",
   overrides: [
     {
-      files: "*.md",
+      files: "CRYSTAL_FLOW.md",
       options: {
         printWidth: 120,
       },

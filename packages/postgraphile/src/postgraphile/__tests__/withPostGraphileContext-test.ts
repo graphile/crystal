@@ -1,6 +1,6 @@
 // tslint:disable no-empty
 
-import { readFile,readFileSync } from "fs";
+import { readFile, readFileSync } from "fs";
 import jwt from "jsonwebtoken";
 import { Pool, PoolClient } from "pg";
 

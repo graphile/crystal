@@ -1,5 +1,5 @@
 import { SchemaBuilder } from "graphile-build";
-import { PgClass, PgEntityKind,QueryBuilder } from "graphile-build-pg";
+import { PgClass, PgEntityKind, QueryBuilder } from "graphile-build-pg";
 import { InputObjectTypeExtensionNode } from "graphql/language/ast";
 
 import { GraphileHelpers, makeFieldHelpers } from "./fieldHelpers";

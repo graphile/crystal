@@ -4,7 +4,7 @@ import JSON5 from "json5";
 import { basename } from "path";
 
 import { createPostGraphileSchema } from "../../..";
-import { getServerVersionNum,withPgClient } from "../../helpers";
+import { getServerVersionNum, withPgClient } from "../../helpers";
 
 const kitchenSinkData = () =>
   fsp.readFile(`${__dirname}/../../kitchen-sink-data.sql`, "utf8");

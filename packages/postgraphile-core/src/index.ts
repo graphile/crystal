@@ -6,10 +6,10 @@ import {
   formatSQLForDebugging,
   PgAttribute,
 } from "graphile-build-pg";
-import { Secret,SignOptions } from "jsonwebtoken";
+import { Secret, SignOptions } from "jsonwebtoken";
 import { Pool, PoolClient } from "pg";
 
-export { formatSQLForDebugging,SchemaBuilder };
+export { formatSQLForDebugging, SchemaBuilder };
 
 export type mixed = {} | string | number | boolean | undefined | null;
 

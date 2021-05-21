@@ -8,7 +8,7 @@ debugFactory.formatters.p = crystalPrintPathIdentity;
 export { Aether } from "./aether";
 export { defer, Deferred } from "./deferred";
 export { crystalEnforce } from "./enforceCrystal";
-export { CrystalResultsList,CrystalValuesList } from "./interfaces";
+export { CrystalResultsList, CrystalValuesList } from "./interfaces";
 export { Plan } from "./plan";
 export {
   // --- INTERNAL ---
@@ -43,5 +43,5 @@ export {
   object,
   ObjectPlan,
 } from "./plans";
-export { $$crystalWrapped,crystalWrapResolve } from "./resolvers";
+export { $$crystalWrapped, crystalWrapResolve } from "./resolvers";
 export { arraysMatch } from "./utils";

@@ -5,7 +5,6 @@ import sql, { SQL } from "pg-sql2";
 
 import QueryBuilder, { QueryBuilderOptions } from "./QueryBuilder";
 
-
 type QueryBuilderCallback = (
   queryBuilder: QueryBuilder,
   resolveData: GraphileEngine.ResolvedLookAhead,

@@ -1,5 +1,5 @@
 import createDebugger from "debug";
-import { ExecutionResult, Kind,OperationDefinitionNode } from "graphql";
+import { ExecutionResult, Kind, OperationDefinitionNode } from "graphql";
 import jwt from "jsonwebtoken";
 import { Pool, PoolClient, QueryConfig, QueryResult } from "pg";
 import sql, { SQL } from "pg-sql2";

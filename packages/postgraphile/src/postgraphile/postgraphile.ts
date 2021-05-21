@@ -8,7 +8,7 @@ import {
   watchPostGraphileSchema,
 } from "postgraphile-core";
 
-import { HttpRequestHandler,mixed } from "../interfaces";
+import { HttpRequestHandler, mixed } from "../interfaces";
 import createPostGraphileHttpRequestHandler from "./http/createPostGraphileHttpRequestHandler";
 import { pluginHookFromOptions } from "./pluginHook";
 import exportPostGraphileSchema from "./schema/exportPostGraphileSchema";

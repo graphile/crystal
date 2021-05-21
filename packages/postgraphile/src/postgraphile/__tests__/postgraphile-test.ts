@@ -3,7 +3,7 @@ jest.mock("pg-connection-string");
 jest.mock("postgraphile-core");
 jest.mock("../http/createPostGraphileHttpRequestHandler");
 
-import { GraphQLInt,GraphQLObjectType, GraphQLSchema } from "graphql";
+import { GraphQLInt, GraphQLObjectType, GraphQLSchema } from "graphql";
 import { Pool } from "pg";
 
 import { createPostGraphileSchema, watchPostGraphileSchema } from "..";

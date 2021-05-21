@@ -1,6 +1,6 @@
 jest.unmock("postgraphile-core");
 
-import { existsSync,readFileSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import mockFs from "mock-fs";
 
 import withPgClient from "../../__tests__/utils/withPgClient";

@@ -30,4 +30,4 @@ export default (appOrCallback: http.Server | http.RequestListener): Test => {
   return obj;
 };
 
-export { agent,Test };
+export { agent, Test };

@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-restricted-imports
-import { ASTNode, DefinitionNode,DocumentNode, parse, visit } from "graphql";
+import { ASTNode, DefinitionNode, DocumentNode, parse, visit } from "graphql";
 const $$embed = Symbol("graphile-embed");
 
 export interface GraphileEmbed<T = any> {

@@ -9,7 +9,7 @@ import * as WebSocket from "ws";
 
 // @ts-ignore
 import { version } from "../../package.json";
-import { CreateRequestHandlerOptions,HttpRequestHandler } from "../interfaces";
+import { CreateRequestHandlerOptions, HttpRequestHandler } from "../interfaces";
 import { AddFlagFn } from "./cli";
 import { WithPostGraphileContextFn } from "./withPostGraphileContext";
 

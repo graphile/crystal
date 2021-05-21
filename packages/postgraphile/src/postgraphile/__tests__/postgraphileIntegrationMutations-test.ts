@@ -1,6 +1,6 @@
 jest.unmock("postgraphile-core");
 
-import { readdirSync,readFile } from "fs";
+import { readdirSync, readFile } from "fs";
 import { graphql } from "graphql";
 import { resolve as resolvePath } from "path";
 

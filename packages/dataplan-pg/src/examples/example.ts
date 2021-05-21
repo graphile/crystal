@@ -13,10 +13,12 @@
  * column, but shows integration of external data into query planning.)
  */
 
-import {   __ListItemPlan,
+import {
+  __ListItemPlan,
   __TrackedObjectPlan,
   __ValuePlan,
-crystalEnforce , Plan ,
+  crystalEnforce,
+  Plan,
 } from "graphile-crystal";
 import {
   ExecutionResult,

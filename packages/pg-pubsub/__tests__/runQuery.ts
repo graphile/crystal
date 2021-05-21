@@ -1,5 +1,5 @@
 // @ts-ignore
-import { ClientRequest,ServerResponse } from "http";
+import { ClientRequest, ServerResponse } from "http";
 import MockReq from "mock-req";
 // @ts-ignore
 import MockRes from "mock-res";

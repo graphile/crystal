@@ -1,6 +1,6 @@
-import { base64,nullableIf } from "../utils";
+import { base64, nullableIf } from "../utils";
 import { PgTypeModifier } from "./PgBasicsPlugin";
-import { PgAttribute,PgType } from "./PgIntrospectionPlugin";
+import { PgAttribute, PgType } from "./PgIntrospectionPlugin";
 
 declare global {
   namespace GraphileEngine {

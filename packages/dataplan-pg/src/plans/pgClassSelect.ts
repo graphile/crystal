@@ -9,7 +9,7 @@ import {
   map,
   Plan,
 } from "graphile-crystal";
-import sql, { arraysMatch,SQL, SQLRawValue } from "pg-sql2";
+import sql, { arraysMatch, SQL, SQLRawValue } from "pg-sql2";
 import { inspect } from "util";
 
 import { PgDataSource } from "../datasource";
