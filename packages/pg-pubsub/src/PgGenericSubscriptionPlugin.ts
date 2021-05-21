@@ -208,9 +208,8 @@ const PgGenericSubscriptionPlugin: GraphileEngine.Plugin = function (
                 }
                 if (unsubscribeTopic) {
                   // Subscribe to event revoking subscription
-                  const unsubscribeIterator = pubsub.asyncIterator(
-                    unsubscribeTopic,
-                  );
+                  const unsubscribeIterator =
+                    pubsub.asyncIterator(unsubscribeTopic);
                   unsubscribeIterator.next().then(() => {
                     debug(
                       "Unsubscribe triggered on channel %s",

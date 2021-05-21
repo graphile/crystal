@@ -99,7 +99,7 @@ export type PlanResolver<
   TContext extends BaseGraphQLContext,
   TArgs extends BaseGraphQLArguments,
   TParentPlan extends Plan<any> | null,
-  TResultPlan extends Plan<any>
+  TResultPlan extends Plan<any>,
 > = (
   $parentPlan: TParentPlan,
   args: __TrackedObjectPlan<TArgs>,
@@ -113,7 +113,7 @@ export type GraphileCrystalFieldConfig<
   TContext extends BaseGraphQLContext,
   TParentPlan extends Plan<any> | null,
   TResultPlan extends Plan<any>,
-  TArgs extends BaseGraphQLArguments
+  TArgs extends BaseGraphQLArguments,
 > = GraphQLFieldConfig<any, any> & {
   plan?: PlanResolver<TContext, TArgs, TParentPlan, TResultPlan>;
 };

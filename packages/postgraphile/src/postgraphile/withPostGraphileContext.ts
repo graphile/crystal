@@ -164,33 +164,34 @@ const withDefaultPostGraphileContext = async <TResult = ExecutionResult>(
     (operationType !== "query" && operationType !== "subscription");
 
   // Now we've caught as many errors as we can at this stage, let's create a DB connection.
-  const withAuthenticatedPgClient: WithAuthenticatedPgClientFunction = !needTransaction
-    ? simpleWithPgClient(pgPool)
-    : async (cb) => {
-        // Connect a new Postgres client
-        const pgClient = await pgPool.connect();
+  const withAuthenticatedPgClient: WithAuthenticatedPgClientFunction =
+    !needTransaction
+      ? simpleWithPgClient(pgPool)
+      : async (cb) => {
+          // Connect a new Postgres client
+          const pgClient = await pgPool.connect();
 
-        // Begin our transaction
-        await pgClient.query("begin");
+          // Begin our transaction
+          await pgClient.query("begin");
 
-        try {
-          // If there is at least one local setting, load it into the database.
-          if (sqlSettingsQuery) {
-            await pgClient.query(sqlSettingsQuery);
-          }
-
-          // Use the client, wait for it to be finished with, then go to 'finally'
-          return await cb(pgClient);
-        } finally {
-          // Cleanup our Postgres client by ending the transaction and releasing
-          // the client back to the pool. Always do this even if the query fails.
           try {
-            await pgClient.query("commit");
+            // If there is at least one local setting, load it into the database.
+            if (sqlSettingsQuery) {
+              await pgClient.query(sqlSettingsQuery);
+            }
+
+            // Use the client, wait for it to be finished with, then go to 'finally'
+            return await cb(pgClient);
           } finally {
-            pgClient.release();
+            // Cleanup our Postgres client by ending the transaction and releasing
+            // the client back to the pool. Always do this even if the query fails.
+            try {
+              await pgClient.query("commit");
+            } finally {
+              pgClient.release();
+            }
           }
-        }
-      };
+        };
 
   if (singleStatement) {
     // TODO:v5: remove this workaround

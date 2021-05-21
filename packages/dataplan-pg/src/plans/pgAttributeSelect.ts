@@ -19,7 +19,7 @@ const debugPlanVerbose = debugPlan.extend("verbose");
  */
 export class PgAttributeSelectPlan<
   TDataSource extends PgDataSource<any>,
-  TData = any
+  TData = any,
 > extends Plan<TData> {
   private tableId: number;
 

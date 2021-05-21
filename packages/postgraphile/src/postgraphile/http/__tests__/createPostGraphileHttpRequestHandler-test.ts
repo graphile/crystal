@@ -623,8 +623,7 @@ for (const { name, createServerFromHandler, subpath = "" } of toTest) {
         ["begin"],
         [
           {
-            text:
-              "select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true), set_config($13, $14, true), set_config($15, $16, true), set_config($17, $18, true)",
+            text: "select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true), set_config($13, $14, true), set_config($15, $16, true), set_config($17, $18, true)",
             values: [
               "role",
               "johndoe",

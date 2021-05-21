@@ -22,7 +22,7 @@ export default async function resolveNode<T = unknown>(
     graphql: { getNamedType },
   } = build;
   if (nodeId === "query") {
-    return ($$isQuery as unknown) as T;
+    return $$isQuery as unknown as T;
   }
   try {
     const { Type, identifiers } = getTypeAndIdentifiersFromNodeId(nodeId);
@@ -53,7 +53,7 @@ export default async function resolveNode<T = unknown>(
       value: Type,
     });
 
-    return (node as unknown) as T;
+    return node as unknown as T;
   } catch (e) {
     return null;
   }

@@ -330,21 +330,17 @@ describe("wrapping resolvers matching a filter", () => {
     };
     const before: any[] = [];
     const after: any[] = [];
-    const rule: ResolverWrapperFilterRule<any> = ({ scope }) => async (
-      resolver,
-      user,
-      args,
-      _context,
-      _resolveInfo,
-    ) => {
-      before.push([
-        `Mutation '${scope.fieldName}' starting with arguments:`,
-        args,
-      ]);
-      const result = await resolver();
-      after.push([`Mutation '${scope.fieldName}' result:`, result]);
-      return result;
-    };
+    const rule: ResolverWrapperFilterRule<any> =
+      ({ scope }) =>
+      async (resolver, user, args, _context, _resolveInfo) => {
+        before.push([
+          `Mutation '${scope.fieldName}' starting with arguments:`,
+          args,
+        ]);
+        const result = await resolver();
+        after.push([`Mutation '${scope.fieldName}' result:`, result]);
+        return result;
+      };
     const schema = await makeSchemaWithSpyAndPlugins(null, [
       makeExtendSchemaPlugin({
         typeDefs: gql`

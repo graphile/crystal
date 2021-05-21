@@ -140,7 +140,7 @@ if (skipLDSTests) {
           await liveTest(
             simpleCollection
               ? gql`
-                  subscription($todoId: Int!, $userId: Int!) {
+                  subscription ($todoId: Int!, $userId: Int!) {
                     log: todosLogByTodoIdAndUserId(
                       todoId: $todoId
                       userId: $userId
@@ -153,7 +153,7 @@ if (skipLDSTests) {
                   }
                 `
               : gql`
-                  subscription($todoId: Int!, $userId: Int!) {
+                  subscription ($todoId: Int!, $userId: Int!) {
                     log: todosLogByTodoIdAndUserId(
                       todoId: $todoId
                       userId: $userId
@@ -208,7 +208,7 @@ if (skipLDSTests) {
           await liveTest(
             simpleCollection
               ? gql`
-                  subscription($id: Int!) {
+                  subscription ($id: Int!) {
                     user: userById(id: $id) {
                       id
                       name
@@ -221,7 +221,7 @@ if (skipLDSTests) {
                   }
                 `
               : gql`
-                  subscription($id: Int!) {
+                  subscription ($id: Int!) {
                     user: userById(id: $id) {
                       id
                       name
@@ -286,7 +286,7 @@ if (skipLDSTests) {
           await liveTest(
             simpleCollection
               ? gql`
-                  subscription($id: Int!) {
+                  subscription ($id: Int!) {
                     user: userById(id: $id) {
                       id
                       name
@@ -299,7 +299,7 @@ if (skipLDSTests) {
                   }
                 `
               : gql`
-                  subscription($id: Int!) {
+                  subscription ($id: Int!) {
                     user: userById(id: $id) {
                       id
                       name
@@ -353,7 +353,7 @@ if (skipLDSTests) {
           await liveTest(
             simpleCollection
               ? gql`
-                  subscription($id: Int!) {
+                  subscription ($id: Int!) {
                     user: userById(id: $id) {
                       id
                       name
@@ -366,7 +366,7 @@ if (skipLDSTests) {
                   }
                 `
               : gql`
-                  subscription($id: Int!) {
+                  subscription ($id: Int!) {
                     user: userById(id: $id) {
                       id
                       name

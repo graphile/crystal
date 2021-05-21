@@ -179,13 +179,15 @@ export default (function PgBackwardRelationPlugin(
                       return {
                         pgQuery: (queryBuilder) => {
                           queryBuilder.select(() => {
-                            const resolveData = getDataFromParsedResolveInfoFragment(
-                              parsedResolveInfoFragment,
-                              gqlTableType,
-                            );
+                            const resolveData =
+                              getDataFromParsedResolveInfoFragment(
+                                parsedResolveInfoFragment,
+                                gqlTableType,
+                              );
 
                             const tableAlias = sql.identifier(Symbol());
-                            const foreignTableAlias = queryBuilder.getTableAlias();
+                            const foreignTableAlias =
+                              queryBuilder.getTableAlias();
                             const query = queryFromResolveData(
                               sqlFrom,
                               tableAlias,
@@ -198,7 +200,8 @@ export default (function PgBackwardRelationPlugin(
                               },
 
                               (innerQueryBuilder) => {
-                                innerQueryBuilder.parentQueryBuilder = queryBuilder;
+                                innerQueryBuilder.parentQueryBuilder =
+                                  queryBuilder;
                                 if (
                                   subscriptions &&
                                   table.primaryKeyConstraint
@@ -231,9 +234,8 @@ export default (function PgBackwardRelationPlugin(
                       type: gqlTableType,
                       args: {},
                       resolve: (data, _args, _resolveContext, resolveInfo) => {
-                        const safeAlias = getSafeAliasFromResolveInfo(
-                          resolveInfo,
-                        );
+                        const safeAlias =
+                          getSafeAliasFromResolveInfo(resolveInfo);
 
                         const record = data[safeAlias];
                         const liveRecord =
@@ -299,20 +301,23 @@ export default (function PgBackwardRelationPlugin(
                       return {
                         pgQuery: (queryBuilder) => {
                           queryBuilder.select(() => {
-                            const resolveData = getDataFromParsedResolveInfoFragment(
-                              parsedResolveInfoFragment,
-                              isConnection ? ConnectionType : TableType,
-                            );
+                            const resolveData =
+                              getDataFromParsedResolveInfoFragment(
+                                parsedResolveInfoFragment,
+                                isConnection ? ConnectionType : TableType,
+                              );
 
                             const tableAlias = sql.identifier(Symbol());
-                            const foreignTableAlias = queryBuilder.getTableAlias();
+                            const foreignTableAlias =
+                              queryBuilder.getTableAlias();
                             const query = queryFromResolveData(
                               sqlFrom,
                               tableAlias,
                               resolveData,
                               queryOptions,
                               (innerQueryBuilder) => {
-                                innerQueryBuilder.parentQueryBuilder = queryBuilder;
+                                innerQueryBuilder.parentQueryBuilder =
+                                  queryBuilder;
                                 if (subscriptions) {
                                   innerQueryBuilder.makeLiveCollection(table);
                                   innerQueryBuilder.addLiveCondition(
@@ -426,9 +431,8 @@ export default (function PgBackwardRelationPlugin(
                           ),
                       args: {},
                       resolve: (data, _args, _resolveContext, resolveInfo) => {
-                        const safeAlias = getSafeAliasFromResolveInfo(
-                          resolveInfo,
-                        );
+                        const safeAlias =
+                          getSafeAliasFromResolveInfo(resolveInfo);
                         const liveCollection =
                           resolveInfo.rootValue &&
                           resolveInfo.rootValue.liveCollection;

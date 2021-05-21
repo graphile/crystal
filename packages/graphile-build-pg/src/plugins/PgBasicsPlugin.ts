@@ -583,9 +583,9 @@ function makePgBaseInflectors(): Partial<GraphileEngine.Inflection> {
         return foreignFieldName;
       }
       return this.camelCase(
-        `${this.pluralize(
-          this._singularizedTableName(table),
-        )}-by-${detailedKeys.map((key) => this.column(key)).join("-and-")}`,
+        `${this.pluralize(this._singularizedTableName(table))}-by-${detailedKeys
+          .map((key) => this.column(key))
+          .join("-and-")}`,
       );
     },
     manyRelationByKeysSimple(
@@ -607,9 +607,7 @@ function makePgBaseInflectors(): Partial<GraphileEngine.Inflection> {
         return foreignFieldName;
       }
       return this.camelCase(
-        `${this.pluralize(
-          this._singularizedTableName(table),
-        )}-by-${detailedKeys
+        `${this.pluralize(this._singularizedTableName(table))}-by-${detailedKeys
           .map((key) => this.column(key))
           .join("-and-")}-list`,
       );
@@ -641,9 +639,9 @@ function makePgBaseInflectors(): Partial<GraphileEngine.Inflection> {
         return updateFieldName;
       }
       return this.camelCase(
-        `update-${this._singularizedTableName(
-          table,
-        )}-by-${detailedKeys.map((key) => this.column(key)).join("-and-")}`,
+        `update-${this._singularizedTableName(table)}-by-${detailedKeys
+          .map((key) => this.column(key))
+          .join("-and-")}`,
       );
     },
     deleteByKeys(
@@ -657,9 +655,9 @@ function makePgBaseInflectors(): Partial<GraphileEngine.Inflection> {
         return deleteFieldName;
       }
       return this.camelCase(
-        `delete-${this._singularizedTableName(
-          table,
-        )}-by-${detailedKeys.map((key) => this.column(key)).join("-and-")}`,
+        `delete-${this._singularizedTableName(table)}-by-${detailedKeys
+          .map((key) => this.column(key))
+          .join("-and-")}`,
       );
     },
     updateByKeysInputType(
@@ -673,9 +671,7 @@ function makePgBaseInflectors(): Partial<GraphileEngine.Inflection> {
         return this.upperCamelCase(`${updateFieldName}-input`);
       }
       return this.upperCamelCase(
-        `update-${this._singularizedTableName(
-          table,
-        )}-by-${detailedKeys
+        `update-${this._singularizedTableName(table)}-by-${detailedKeys
           .map((key) => this.column(key))
           .join("-and-")}-input`,
       );
@@ -691,9 +687,7 @@ function makePgBaseInflectors(): Partial<GraphileEngine.Inflection> {
         return this.upperCamelCase(`${deleteFieldName}-input`);
       }
       return this.upperCamelCase(
-        `delete-${this._singularizedTableName(
-          table,
-        )}-by-${detailedKeys
+        `delete-${this._singularizedTableName(table)}-by-${detailedKeys
           .map((key) => this.column(key))
           .join("-and-")}-input`,
       );
@@ -800,116 +794,120 @@ export function preventEmptyResult<O>(obj: O): O {
   }, {}) as O;
 }
 
-const omitWithRBACChecks = (omit: typeof baseOmit): typeof baseOmit => (
-  entity: PgProc | PgClass | PgAttribute | PgConstraint,
-  permission: string,
-) => {
-  const ORDINARY_TABLE = "r";
-  const VIEW = "v";
-  const MATERIALIZED_VIEW = "m";
-  const isTableLike = (entity: PgEntity) =>
-    entity &&
-    entity.kind === "class" &&
-    (entity.classKind === ORDINARY_TABLE ||
-      entity.classKind === VIEW ||
-      entity.classKind === MATERIALIZED_VIEW);
-  if (entity.kind === "procedure") {
-    if (permission === EXECUTE && !entity.aclExecutable) {
-      return true;
-    }
-  } else if (entity.kind === "class" && isTableLike(entity)) {
-    const tableEntity: PgClass = entity;
-    if (
-      (permission === READ || permission === ALL || permission === MANY) &&
-      !tableEntity.aclSelectable &&
-      !tableEntity.attributes.some((attr) => attr.aclSelectable)
-    ) {
-      return true;
-    } else if (
-      permission === CREATE &&
-      !tableEntity.aclInsertable &&
-      !tableEntity.attributes.some((attr) => attr.aclInsertable)
-    ) {
-      return true;
-    } else if (
-      permission === UPDATE &&
-      !tableEntity.aclUpdatable &&
-      !tableEntity.attributes.some((attr) => attr.aclUpdatable)
-    ) {
-      return true;
-    } else if (permission === DELETE && !tableEntity.aclDeletable) {
-      return true;
-    }
-  } else if (entity.kind === "attribute" && isTableLike(entity.class)) {
-    const attributeEntity: PgAttribute = entity;
-
-    const klass = attributeEntity.class;
-    // Have we got *any* permissions on the table?
-    if (
-      klass.aclSelectable ||
-      klass.attributes.some((attr) => attr.aclSelectable)
-    ) {
-      // Yes; this is a regular table; omit if RBAC permissions tell us to.
+const omitWithRBACChecks =
+  (omit: typeof baseOmit): typeof baseOmit =>
+  (
+    entity: PgProc | PgClass | PgAttribute | PgConstraint,
+    permission: string,
+  ) => {
+    const ORDINARY_TABLE = "r";
+    const VIEW = "v";
+    const MATERIALIZED_VIEW = "m";
+    const isTableLike = (entity: PgEntity) =>
+      entity &&
+      entity.kind === "class" &&
+      (entity.classKind === ORDINARY_TABLE ||
+        entity.classKind === VIEW ||
+        entity.classKind === MATERIALIZED_VIEW);
+    if (entity.kind === "procedure") {
+      if (permission === EXECUTE && !entity.aclExecutable) {
+        return true;
+      }
+    } else if (entity.kind === "class" && isTableLike(entity)) {
+      const tableEntity: PgClass = entity;
       if (
-        (permission === READ ||
-          permission === FILTER ||
-          permission === ORDER) &&
-        !attributeEntity.aclSelectable
+        (permission === READ || permission === ALL || permission === MANY) &&
+        !tableEntity.aclSelectable &&
+        !tableEntity.attributes.some((attr) => attr.aclSelectable)
       ) {
         return true;
-      } else if (permission === CREATE && !attributeEntity.aclInsertable) {
+      } else if (
+        permission === CREATE &&
+        !tableEntity.aclInsertable &&
+        !tableEntity.attributes.some((attr) => attr.aclInsertable)
+      ) {
         return true;
-      } else if (permission === UPDATE && !attributeEntity.aclUpdatable) {
+      } else if (
+        permission === UPDATE &&
+        !tableEntity.aclUpdatable &&
+        !tableEntity.attributes.some((attr) => attr.aclUpdatable)
+      ) {
+        return true;
+      } else if (permission === DELETE && !tableEntity.aclDeletable) {
         return true;
       }
-    } else {
-      // No permissions on the table at all, so normal connections will skip
-      // over it. Thus we must be being exposed via a security definer function
-      // or similar, so we should expose all fields except those that are
-      // explicitly @omit-ed.
-    }
-  }
-  return omit(entity, permission);
-};
+    } else if (entity.kind === "attribute" && isTableLike(entity.class)) {
+      const attributeEntity: PgAttribute = entity;
 
-const omitUnindexed = (omit: typeof baseOmit, hideIndexWarnings: boolean) => (
-  entity: PgProc | PgClass | PgAttribute | PgConstraint,
-  permission: string,
-) => {
-  if (
-    entity.kind === "attribute" &&
-    !entity.isIndexed &&
-    (permission === "filter" || permission === "order")
-  ) {
-    return true;
-  }
-  if (
-    entity.kind === "constraint" &&
-    entity.type === "f" &&
-    !entity.isIndexed &&
-    permission === "read"
-  ) {
-    const klass = entity.class;
-    if (klass) {
-      const shouldOutputWarning =
-        !entity["_omitUnindexedReadWarningGiven"] && !hideIndexWarnings;
-      if (shouldOutputWarning) {
-        entity["_omitUnindexedReadWarningGiven"] = true;
-        // eslint-disable-next-line no-console
-        console.warn(
-          "%s",
-          `Disabled 'read' permission for ${describePgEntity(
-            entity,
-          )} because it isn't indexed. For more information see https://graphile.org/postgraphile/best-practices/ To fix, perform\n\n  CREATE INDEX ON ${`"${klass.namespaceName}"."${klass.name}"`}("${entity.keyAttributes
-            .map((a) => a.name)
-            .join('", "')}");`,
-        );
+      const klass = attributeEntity.class;
+      // Have we got *any* permissions on the table?
+      if (
+        klass.aclSelectable ||
+        klass.attributes.some((attr) => attr.aclSelectable)
+      ) {
+        // Yes; this is a regular table; omit if RBAC permissions tell us to.
+        if (
+          (permission === READ ||
+            permission === FILTER ||
+            permission === ORDER) &&
+          !attributeEntity.aclSelectable
+        ) {
+          return true;
+        } else if (permission === CREATE && !attributeEntity.aclInsertable) {
+          return true;
+        } else if (permission === UPDATE && !attributeEntity.aclUpdatable) {
+          return true;
+        }
+      } else {
+        // No permissions on the table at all, so normal connections will skip
+        // over it. Thus we must be being exposed via a security definer function
+        // or similar, so we should expose all fields except those that are
+        // explicitly @omit-ed.
       }
     }
-    return true;
-  }
-  return omit(entity, permission);
-};
+    return omit(entity, permission);
+  };
+
+const omitUnindexed =
+  (omit: typeof baseOmit, hideIndexWarnings: boolean) =>
+  (
+    entity: PgProc | PgClass | PgAttribute | PgConstraint,
+    permission: string,
+  ) => {
+    if (
+      entity.kind === "attribute" &&
+      !entity.isIndexed &&
+      (permission === "filter" || permission === "order")
+    ) {
+      return true;
+    }
+    if (
+      entity.kind === "constraint" &&
+      entity.type === "f" &&
+      !entity.isIndexed &&
+      permission === "read"
+    ) {
+      const klass = entity.class;
+      if (klass) {
+        const shouldOutputWarning =
+          !entity["_omitUnindexedReadWarningGiven"] && !hideIndexWarnings;
+        if (shouldOutputWarning) {
+          entity["_omitUnindexedReadWarningGiven"] = true;
+          // eslint-disable-next-line no-console
+          console.warn(
+            "%s",
+            `Disabled 'read' permission for ${describePgEntity(
+              entity,
+            )} because it isn't indexed. For more information see https://graphile.org/postgraphile/best-practices/ To fix, perform\n\n  CREATE INDEX ON ${`"${klass.namespaceName}"."${klass.name}"`}("${entity.keyAttributes
+              .map((a) => a.name)
+              .join('", "')}");`,
+          );
+        }
+      }
+      return true;
+    }
+    return omit(entity, permission);
+  };
 
 export function describePgEntity(
   entity: PgEntity,

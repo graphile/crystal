@@ -261,9 +261,8 @@ returning *`;
                   fields: ({ fieldWithHooks }) => {
                     const tableName = inflection.tableFieldName(table);
                     // TODO:v5: this should really be `-node-id` but for compatibility with PostGraphQL v3 we haven't made that change.
-                    const deletedNodeIdFieldName = inflection.deletedNodeId(
-                      table,
-                    );
+                    const deletedNodeIdFieldName =
+                      inflection.deletedNodeId(table);
 
                     return Object.assign(
                       {
@@ -292,9 +291,10 @@ returning *`;
                             [deletedNodeIdFieldName]: fieldWithHooks(
                               deletedNodeIdFieldName,
                               ({ addDataGenerator }) => {
-                                const fieldDataGeneratorsByTableType = fieldDataGeneratorsByFieldNameByType.get(
-                                  TableType,
-                                );
+                                const fieldDataGeneratorsByTableType =
+                                  fieldDataGeneratorsByFieldNameByType.get(
+                                    TableType,
+                                  );
 
                                 const gens =
                                   fieldDataGeneratorsByTableType &&
@@ -353,9 +353,10 @@ returning *`;
                 if (nodeIdFieldName && primaryKeyConstraint) {
                   const primaryKeys =
                     primaryKeyConstraint && primaryKeyConstraint.keyAttributes;
-                  const fieldName = inflection[
-                    mode === "update" ? "updateNode" : "deleteNode"
-                  ](table);
+                  const fieldName =
+                    inflection[mode === "update" ? "updateNode" : "deleteNode"](
+                      table,
+                    );
                   const InputType = newWithHooks(
                     GraphQLInputObjectType,
                     {
@@ -430,9 +431,8 @@ returning *`;
                       [fieldName]: fieldWithHooks(
                         fieldName,
                         (context) => {
-                          const {
-                            getDataFromParsedResolveInfoFragment,
-                          } = context;
+                          const { getDataFromParsedResolveInfoFragment } =
+                            context;
                           return {
                             description:
                               mode === "update"
@@ -455,10 +455,8 @@ returning *`;
                               const { pgClient } = resolveContext;
                               const nodeId = input[nodeIdFieldName];
                               try {
-                                const {
-                                  Type,
-                                  identifiers,
-                                } = getTypeAndIdentifiersFromNodeId(nodeId);
+                                const { Type, identifiers } =
+                                  getTypeAndIdentifiersFromNodeId(nodeId);
                                 if (Type !== TableType) {
                                   throw new Error("Mismatched type");
                                 }
@@ -614,9 +612,8 @@ returning *`;
                       [fieldName]: fieldWithHooks(
                         fieldName,
                         (context) => {
-                          const {
-                            getDataFromParsedResolveInfoFragment,
-                          } = context;
+                          const { getDataFromParsedResolveInfoFragment } =
+                            context;
                           return {
                             description:
                               mode === "update"

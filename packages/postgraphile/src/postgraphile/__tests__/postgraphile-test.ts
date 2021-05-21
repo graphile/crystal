@@ -18,9 +18,10 @@ const mockedCreatePostGraphileSchema = createPostGraphileSchema as MockHack<
 const mockedWatchPostGraphileSchema = watchPostGraphileSchema as MockHack<
   typeof watchPostGraphileSchema
 >;
-const mockedCreatePostGraphileHttpRequestHandler = createPostGraphileHttpRequestHandler as MockHack<
-  typeof createPostGraphileHttpRequestHandler
->;
+const mockedCreatePostGraphileHttpRequestHandler =
+  createPostGraphileHttpRequestHandler as MockHack<
+    typeof createPostGraphileHttpRequestHandler
+  >;
 
 const blankSchema = new GraphQLSchema({
   query: new GraphQLObjectType({

@@ -60,13 +60,14 @@ it("allows adding a custom single field to PG schema", async () => {
           resolvers: {
             Query: {
               async randomUser(_query, args, context, resolveInfo) {
-                const rows = await resolveInfo.graphile.selectGraphQLResultFromTable(
-                  sql`graphile_utils.users`,
-                  (tableAlias, sqlBuilder) => {
-                    sqlBuilder.orderBy(sql`random()`);
-                    sqlBuilder.limit(1);
-                  },
-                );
+                const rows =
+                  await resolveInfo.graphile.selectGraphQLResultFromTable(
+                    sql`graphile_utils.users`,
+                    (tableAlias, sqlBuilder) => {
+                      sqlBuilder.orderBy(sql`random()`);
+                      sqlBuilder.limit(1);
+                    },
+                  );
                 return rows[0];
               },
             },
@@ -123,13 +124,14 @@ it("allows adding a custom field returning a list to PG schema", async () => {
           resolvers: {
             Query: {
               async randomUsers(_query, args, context, resolveInfo) {
-                const rows = await resolveInfo.graphile.selectGraphQLResultFromTable(
-                  sql`graphile_utils.users`,
-                  (tableAlias, sqlBuilder) => {
-                    sqlBuilder.orderBy(sql`random()`);
-                    sqlBuilder.limit(3);
-                  },
-                );
+                const rows =
+                  await resolveInfo.graphile.selectGraphQLResultFromTable(
+                    sql`graphile_utils.users`,
+                    (tableAlias, sqlBuilder) => {
+                      sqlBuilder.orderBy(sql`random()`);
+                      sqlBuilder.limit(3);
+                    },
+                  );
                 return rows;
               },
             },
@@ -206,16 +208,15 @@ it("allows adding a simple mutation field to PG schema", async () => {
                     `insert into graphile_utils.users(name, email, bio) values ($1, $2, $3) returning *`,
                     [args.input.name, args.input.email, args.input.bio],
                   );
-                  const [
-                    row,
-                  ] = await resolveInfo.graphile.selectGraphQLResultFromTable(
-                    sql`graphile_utils.users`,
-                    (tableAlias, sqlBuilder) => {
-                      sqlBuilder.where(
-                        sql`${tableAlias}.id = ${sql.value(user.id)}`,
-                      );
-                    },
-                  );
+                  const [row] =
+                    await resolveInfo.graphile.selectGraphQLResultFromTable(
+                      sql`graphile_utils.users`,
+                      (tableAlias, sqlBuilder) => {
+                        sqlBuilder.where(
+                          sql`${tableAlias}.id = ${sql.value(user.id)}`,
+                        );
+                      },
+                    );
                   await mockSendEmail(
                     args.input.email,
                     "Welcome to my site",

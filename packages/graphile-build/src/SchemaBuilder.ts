@@ -592,9 +592,8 @@ class SchemaBuilder extends EventEmitter {
     try {
       debug(`${INDENT.repeat(this.depth)}[${hookName}${debugStr}]: Running...`);
 
-      const hooks: Array<GraphileEngine.Hook<TConfig, TContext>> = this.hooks[
-        hookName
-      ];
+      const hooks: Array<GraphileEngine.Hook<TConfig, TContext>> =
+        this.hooks[hookName];
       if (!hooks) {
         throw new Error(`Sorry, '${hookName}' is not a registered hook`);
       }

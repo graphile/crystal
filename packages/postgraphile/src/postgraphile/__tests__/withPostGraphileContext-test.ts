@@ -34,9 +34,9 @@ function expectHttpError(
 function makePool() {
   const query = jest.fn();
   const release = jest.fn();
-  const pgClient = ({ query, release } as any) as PoolClient;
+  const pgClient = { query, release } as any as PoolClient;
   const connect = jest.fn(() => pgClient);
-  const pgPool = ({ connect } as any) as Pool;
+  const pgPool = { connect } as any as Pool;
   return { query, release, connect, pgClient, pgPool };
 }
 
@@ -259,8 +259,7 @@ test("will add extra claims as available", async () => {
     ["begin"],
     [
       {
-        text:
-          "select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true)",
+        text: "select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true)",
         values: [
           "jwt.claims.aud",
           "postgraphile",
@@ -323,8 +322,7 @@ test("will add extra settings as available", async () => {
     ["begin"],
     [
       {
-        text:
-          "select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true)",
+        text: "select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true)",
         values: [
           "foo.bar",
           "test1",
@@ -368,8 +366,7 @@ test("undefined and null extra settings are ignored while 0 is converted to a st
     ["begin"],
     [
       {
-        text:
-          "select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true), set_config($13, $14, true), set_config($15, $16, true)",
+        text: "select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true), set_config($13, $14, true), set_config($15, $16, true)",
         values: [
           "foo.bar",
           "test1",
@@ -483,8 +480,7 @@ test("will set the default role if no other role was provided in the JWT", async
     ["begin"],
     [
       {
-        text:
-          "select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true)",
+        text: "select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true)",
         values: [
           "role",
           "test_default_role",
@@ -523,8 +519,7 @@ test("will set a role provided in the JWT", async () => {
     ["begin"],
     [
       {
-        text:
-          "select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true)",
+        text: "select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true)",
         values: [
           "role",
           "test_jwt_role",
@@ -566,8 +561,7 @@ test("will set a role provided in the JWT superceding the default role", async (
     ["begin"],
     [
       {
-        text:
-          "select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true)",
+        text: "select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true)",
         values: [
           "role",
           "test_jwt_role",
@@ -613,8 +607,7 @@ test("will set a role provided in the JWT (deep role)", async () => {
     ["begin"],
     [
       {
-        text:
-          "select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true)",
+        text: "select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true)",
         values: [
           "role",
           "test_deep_role",
@@ -663,8 +656,7 @@ test('if same settings are set by pgSettings and JWT, JWT will "win", except for
     ["begin"],
     [
       {
-        text:
-          "select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true), set_config($13, $14, true)",
+        text: "select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true), set_config($13, $14, true)",
         values: [
           "jwt.claims.d",
           "96",
@@ -713,8 +705,7 @@ test("will set a role provided in the JWT superceding the default role (deep rol
     ["begin"],
     [
       {
-        text:
-          "select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true)",
+        text: "select set_config($1, $2, true), set_config($3, $4, true), set_config($5, $6, true), set_config($7, $8, true), set_config($9, $10, true), set_config($11, $12, true)",
         values: [
           "role",
           "test_deep_role",

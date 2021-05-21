@@ -67,7 +67,7 @@ export const $$crystalWrapped = Symbol("crystalWrappedResolver");
 export function crystalWrapResolve<
   TSource extends object | null | undefined,
   TContext extends object,
-  TArgs = { [argName: string]: any }
+  TArgs = { [argName: string]: any },
 >(
   resolve: GraphQLFieldResolver<
     TSource,
@@ -87,170 +87,170 @@ export function crystalWrapResolve<
   /**
    * Implements the `ResolveFieldValueCrystal` algorithm.
    */
-  const crystalResolver: GraphQLFieldResolver<
-    TSource,
-    TContext,
-    TArgs
-  > = async function (
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    source: any,
-    argumentValues,
-    context,
-    info,
-  ) {
-    const parentObject:
-      | Exclude<TSource, null | undefined>
-      | CrystalObject<any> = source ?? ROOT_VALUE_OBJECT;
-    // Note: in the ResolveFieldValueCrystal algorithm it uses `document` and
-    // `operationName`; however all it really needs is the `operation` and
-    // `fragments`, so that's what we extract here.
-    const {
-      schema,
-      // fieldName,
-      // parentType,
-      returnType,
-      operation,
-      fragments,
-      variableValues,
-      rootValue,
-      path,
-    } = info;
-    const pathIdentity = pathToPathIdentity(path);
-    // const alias = getAliasFromResolveInfo(info);
-    const aether = establishAether({
-      schema,
-      operation,
-      fragments,
-      variableValues,
+  const crystalResolver: GraphQLFieldResolver<TSource, TContext, TArgs> =
+    async function (
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      source: any,
+      argumentValues,
       context,
-      rootValue,
-    });
-    const planId = aether.planIdByPathIdentity[pathIdentity];
-    assert.ok(
-      planId != null,
-      `Could not find a plan id for path '${pathIdentity}'`,
-    );
-    const plan = aether.plans[planId];
-    if (plan == null) {
-      const objectValue = isCrystalObject(parentObject)
-        ? parentObject[$$data]
-        : parentObject;
-      debug(
-        "Calling real resolver for %s.%s with %o",
-        info.parentType.name,
-        info.fieldName,
-        objectValue,
+      info,
+    ) {
+      const parentObject:
+        | Exclude<TSource, null | undefined>
+        | CrystalObject<any> = source ?? ROOT_VALUE_OBJECT;
+      // Note: in the ResolveFieldValueCrystal algorithm it uses `document` and
+      // `operationName`; however all it really needs is the `operation` and
+      // `fragments`, so that's what we extract here.
+      const {
+        schema,
+        // fieldName,
+        // parentType,
+        returnType,
+        operation,
+        fragments,
+        variableValues,
+        rootValue,
+        path,
+      } = info;
+      const pathIdentity = pathToPathIdentity(path);
+      // const alias = getAliasFromResolveInfo(info);
+      const aether = establishAether({
+        schema,
+        operation,
+        fragments,
+        variableValues,
+        context,
+        rootValue,
+      });
+      const planId = aether.planIdByPathIdentity[pathIdentity];
+      assert.ok(
+        planId != null,
+        `Could not find a plan id for path '${pathIdentity}'`,
       );
-      return realResolver(objectValue, argumentValues, context, info);
-    }
-    /*
+      const plan = aether.plans[planId];
+      if (plan == null) {
+        const objectValue = isCrystalObject(parentObject)
+          ? parentObject[$$data]
+          : parentObject;
+        debug(
+          "Calling real resolver for %s.%s with %o",
+          info.parentType.name,
+          info.fieldName,
+          objectValue,
+        );
+        return realResolver(objectValue, argumentValues, context, info);
+      }
+      /*
     debug(
       "   id for resolver at %p is %c",
       pathIdentity,
       id,
     );
     */
-    const batch = aether.getBatch(
-      pathIdentity,
-      parentObject,
-      variableValues,
-      context,
-      rootValue,
-    );
-    const id = uid(info.fieldName);
-    debug(`👉 %p/%c for %c`, pathIdentity, id, parentObject);
-    const crystalContext = batch.crystalContext;
-    let parentCrystalObject: CrystalObject<any>;
-    if (isCrystalObject(parentObject)) {
-      // Note: for the most optimal execution, `rootValue` passed to graphql
-      // should be a crystal object, this allows using {crystalContext} across
-      // the entire operation if plans are used everywhere. Even more optimised
-      // would be if we can share the same {crystalContext} across multiple
-      // `rootValue`s for multiple parallel executions (must be within the same
-      // aether) - e.g. as a result of multiple identical subscription
-      // operations.
-      parentCrystalObject = parentObject;
-    } else if (!path.prev) {
-      // Special workaround for the root object.
-      parentCrystalObject = crystalContext.rootCrystalObject;
-    } else {
-      // Note: we need to "fake" that the parent was a plan. Because we may
-      // have lots of resolvers all called for the same parent object, we use a
-      // map. This happens to mean that multiple values in the graph being the
-      // same object will be merged automatically.
-      const parentPathIdentity = path.prev ? pathToPathIdentity(path.prev) : "";
-      const parentPlanId = aether.itemPlanIdByPathIdentity[parentPathIdentity];
-      assert.ok(
-        parentPlanId != null,
-        `Could not find a planId for (parent) path '${parentPathIdentity}'`,
-      );
-      const parentPlan = aether.plans[parentPlanId]; // TODO: assert that this is handled for us
-      assert.ok(
-        parentPlan instanceof __ValuePlan,
-        "Expected parent field (which returned non-crystal object) to be a valuePlan)",
-      );
-
-      const { valueId: parentId, existed } = aether.getValuePlanId(
-        crystalContext,
-        parentPlan,
-        parentObject,
+      const batch = aether.getBatch(
         pathIdentity,
-      );
-      // TODO: this should extract the true indexes from resolveInfo?
-      const indexes: number[] = [];
-      parentCrystalObject = newCrystalObject(
-        parentPlan,
-        parentPathIdentity,
-        parentId,
-        indexes,
         parentObject,
-        crystalContext,
+        variableValues,
+        context,
+        rootValue,
       );
-      if (!existed) {
-        populateValuePlan(
+      const id = uid(info.fieldName);
+      debug(`👉 %p/%c for %c`, pathIdentity, id, parentObject);
+      const crystalContext = batch.crystalContext;
+      let parentCrystalObject: CrystalObject<any>;
+      if (isCrystalObject(parentObject)) {
+        // Note: for the most optimal execution, `rootValue` passed to graphql
+        // should be a crystal object, this allows using {crystalContext} across
+        // the entire operation if plans are used everywhere. Even more optimised
+        // would be if we can share the same {crystalContext} across multiple
+        // `rootValue`s for multiple parallel executions (must be within the same
+        // aether) - e.g. as a result of multiple identical subscription
+        // operations.
+        parentCrystalObject = parentObject;
+      } else if (!path.prev) {
+        // Special workaround for the root object.
+        parentCrystalObject = crystalContext.rootCrystalObject;
+      } else {
+        // Note: we need to "fake" that the parent was a plan. Because we may
+        // have lots of resolvers all called for the same parent object, we use a
+        // map. This happens to mean that multiple values in the graph being the
+        // same object will be merged automatically.
+        const parentPathIdentity = path.prev
+          ? pathToPathIdentity(path.prev)
+          : "";
+        const parentPlanId =
+          aether.itemPlanIdByPathIdentity[parentPathIdentity];
+        assert.ok(
+          parentPlanId != null,
+          `Could not find a planId for (parent) path '${parentPathIdentity}'`,
+        );
+        const parentPlan = aether.plans[parentPlanId]; // TODO: assert that this is handled for us
+        assert.ok(
+          parentPlan instanceof __ValuePlan,
+          "Expected parent field (which returned non-crystal object) to be a valuePlan)",
+        );
+
+        const { valueId: parentId, existed } = aether.getValuePlanId(
           crystalContext,
           parentPlan,
-          parentCrystalObject,
           parentObject,
-          "parent",
+          pathIdentity,
+        );
+        // TODO: this should extract the true indexes from resolveInfo?
+        const indexes: number[] = [];
+        parentCrystalObject = newCrystalObject(
+          parentPlan,
+          parentPathIdentity,
+          parentId,
+          indexes,
+          parentObject,
+          crystalContext,
+        );
+        if (!existed) {
+          populateValuePlan(
+            crystalContext,
+            parentPlan,
+            parentCrystalObject,
+            parentObject,
+            "parent",
+          );
+        }
+        debug(
+          "   Created a new crystal object to represent the parent of %p: %c",
+          pathIdentity,
+          parentCrystalObject,
         );
       }
+      const result = await getBatchResult(batch, parentCrystalObject);
       debug(
-        "   Created a new crystal object to represent the parent of %p: %c",
-        pathIdentity,
-        parentCrystalObject,
-      );
-    }
-    const result = await getBatchResult(batch, parentCrystalObject);
-    debug(
-      `👈 %p/%c for %s; result: %o`,
-      pathIdentity,
-      id,
-      parentCrystalObject,
-      result,
-    );
-    if (isLeafType(getNamedType(info.returnType))) {
-      const valueForResolver: any = { [info.fieldName]: result };
-      debug(
-        "   Calling real resolver for %s.%s with %o",
-        info.parentType.name,
-        info.fieldName,
-        valueForResolver,
-      );
-      return realResolver(valueForResolver, argumentValues, context, info);
-    } else {
-      const crystalResults = crystalWrap(
-        crystalContext,
-        plan,
-        returnType,
-        parentCrystalObject,
+        `👈 %p/%c for %s; result: %o`,
         pathIdentity,
         id,
+        parentCrystalObject,
         result,
       );
-      return crystalResults;
-    }
-  };
+      if (isLeafType(getNamedType(info.returnType))) {
+        const valueForResolver: any = { [info.fieldName]: result };
+        debug(
+          "   Calling real resolver for %s.%s with %o",
+          info.parentType.name,
+          info.fieldName,
+          valueForResolver,
+        );
+        return realResolver(valueForResolver, argumentValues, context, info);
+      } else {
+        const crystalResults = crystalWrap(
+          crystalContext,
+          plan,
+          returnType,
+          parentCrystalObject,
+          pathIdentity,
+          id,
+          result,
+        );
+        return crystalResults;
+      }
+    };
   Object.defineProperty(crystalResolver, $$crystalWrapped, {
     enumerable: false,
     configurable: false,
@@ -267,7 +267,7 @@ export function crystalWrapResolve<
 export function crystalWrapSubscribe<
   TSource extends object | null | undefined,
   TContext extends object,
-  TArgs = { [argName: string]: any }
+  TArgs = { [argName: string]: any },
 >(
   subscribe: GraphQLFieldResolver<TSource, TContext, TArgs>,
 ): GraphQLFieldResolver<TSource, TContext, TArgs> {

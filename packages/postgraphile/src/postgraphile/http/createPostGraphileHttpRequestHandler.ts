@@ -340,9 +340,8 @@ export default function createPostGraphileHttpRequestHandler(
   // We only need to calculate the graphiql HTML once; but we need to receive the first request to do so.
   let graphiqlHtml: string | null;
 
-  const withPostGraphileContextFromReqRes = withPostGraphileContextFromReqResGenerator(
-    options,
-  );
+  const withPostGraphileContextFromReqRes =
+    withPostGraphileContextFromReqResGenerator(options);
 
   const staticValidationRules = pluginHook(
     "postgraphile:validationRules:static",
@@ -1005,7 +1004,8 @@ export default function createPostGraphileHttpRequestHandler(
   middleware.getGraphQLSchema = getGqlSchema;
   middleware.formatError = formatError;
   middleware.pgPool = pgPool;
-  middleware.withPostGraphileContextFromReqRes = withPostGraphileContextFromReqRes;
+  middleware.withPostGraphileContextFromReqRes =
+    withPostGraphileContextFromReqRes;
   middleware.handleErrors = handleErrors;
   middleware.options = options;
 

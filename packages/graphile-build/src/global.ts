@@ -54,9 +54,10 @@ declare global {
     type InitObject = {};
 
     interface Plugin {
-      (builder: SchemaBuilder, options: GraphileBuildOptions): Promise<
-        void
-      > | void;
+      (
+        builder: SchemaBuilder,
+        options: GraphileBuildOptions,
+      ): Promise<void> | void;
       displayName?: string;
     }
 
@@ -310,9 +311,7 @@ declare global {
         Type: import("graphql").GraphQLType,
         ...identifiers: Array<unknown>
       ) => string;
-      getTypeAndIdentifiersFromNodeId: (
-        nodeId: string,
-      ) => {
+      getTypeAndIdentifiersFromNodeId: (nodeId: string) => {
         Type: import("graphql").GraphQLType;
         identifiers: Array<unknown>;
       };

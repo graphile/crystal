@@ -46,7 +46,7 @@ type PgClassSelectPlanJoin =
  * records from them `{a: 1},{a: 2},{a:3}`).
  */
 export class PgClassSelectPlan<
-  TDataSource extends PgDataSource<any>
+  TDataSource extends PgDataSource<any>,
 > extends Plan<ReadonlyArray<TDataSource["TRow"]>> {
   // FROM
 
@@ -642,9 +642,9 @@ export class PgClassSelectPlan<
     return this;
   }
 
-  mergeWith(
-    otherPlan: PgClassSelectPlan<TDataSource>,
-  ): { [desiredIndex: string]: string } {
+  mergeWith(otherPlan: PgClassSelectPlan<TDataSource>): {
+    [desiredIndex: string]: string;
+  } {
     const actualKeyByDesiredKey = {};
     //console.log(`Other ${otherPlan} selects:`);
     //console.dir(otherPlan.selects, { depth: 8 });
@@ -776,9 +776,8 @@ export class PgClassSelectPlan<
           // We return a list here because our children are going to use a `first` plan on us
           return list([map(parent, actualKeyByDesiredKey)]);
         } else if (parent instanceof PgClassSelectSinglePlan) {
-          const parent2 = this.aether.plans[
-            parent.dependencies[parent.itemPlanId]
-          ];
+          const parent2 =
+            this.aether.plans[parent.dependencies[parent.itemPlanId]];
           this.identifiers.forEach((id, i) => {
             const plan = id.plan as PgColumnSelectPlan<any, any>;
             return this.where(

@@ -13,7 +13,7 @@ const recurseDataGeneratorsWorkaroundFieldByType = new Map();
 export type AugmentedGraphQLFieldResolver<
   TSource,
   TContext,
-  TArgs = { [argName: string]: any }
+  TArgs = { [argName: string]: any },
 > = (
   parent: TSource,
   args: TArgs,
@@ -251,42 +251,44 @@ export default function makeExtendSchemaPlugin(
           const description = getDescription(definition.description);
           const directives = getDirectives(definition.directives);
           const relevantResolver = resolvers[name] || {};
-          const values: import("graphql").GraphQLEnumValueConfigMap = definition.values.reduce(
-            (
-              memo: import("graphql").GraphQLEnumValueConfigMap,
-              value: import("graphql").EnumValueDefinitionNode,
-            ) => {
-              const valueName = getName(value.name);
-              const valueDescription = getDescription(value.description);
-              const valueDirectives = getDirectives(value.directives);
+          const values: import("graphql").GraphQLEnumValueConfigMap =
+            definition.values.reduce(
+              (
+                memo: import("graphql").GraphQLEnumValueConfigMap,
+                value: import("graphql").EnumValueDefinitionNode,
+              ) => {
+                const valueName = getName(value.name);
+                const valueDescription = getDescription(value.description);
+                const valueDirectives = getDirectives(value.directives);
 
-              // Value cannot be expressed via SDL, so we grab the value from the resolvers instead.
-              // resolvers = {
-              //   MyEnum: {
-              //     MY_ENUM_VALUE1: 'value1',
-              //     MY_ENUM_VALUE2: 'value2',
-              //   }
-              // }
-              // Ref: https://github.com/graphql/graphql-js/issues/525#issuecomment-255834625
-              const valueValue =
-                relevantResolver[valueName] !== undefined
-                  ? relevantResolver[valueName]
-                  : valueName;
+                // Value cannot be expressed via SDL, so we grab the value from the resolvers instead.
+                // resolvers = {
+                //   MyEnum: {
+                //     MY_ENUM_VALUE1: 'value1',
+                //     MY_ENUM_VALUE2: 'value2',
+                //   }
+                // }
+                // Ref: https://github.com/graphql/graphql-js/issues/525#issuecomment-255834625
+                const valueValue =
+                  relevantResolver[valueName] !== undefined
+                    ? relevantResolver[valueName]
+                    : valueName;
 
-              const valueDeprecationReason =
-                valueDirectives.deprecated && valueDirectives.deprecated.reason;
-              return {
-                ...memo,
-                [valueName]: {
-                  value: valueValue,
-                  deprecationReason: valueDeprecationReason,
-                  description: valueDescription,
-                  directives: valueDirectives,
-                },
-              };
-            },
-            {},
-          );
+                const valueDeprecationReason =
+                  valueDirectives.deprecated &&
+                  valueDirectives.deprecated.reason;
+                return {
+                  ...memo,
+                  [valueName]: {
+                    value: valueValue,
+                    deprecationReason: valueDeprecationReason,
+                    description: valueDescription,
+                    directives: valueDirectives,
+                  },
+                };
+              },
+              {},
+            );
           const scope: GraphileEngine.ScopeGraphQLEnumType = {
             directives,
             ...(directives.scope || {}),
@@ -599,9 +601,8 @@ export default function makeExtendSchemaPlugin(
         );
       }
       const enumValueName = value.value;
-      const enumType:
-        | import("graphql").GraphQLEnumType
-        | null = graphql.isEnumType(type) ? type : null;
+      const enumType: import("graphql").GraphQLEnumType | null =
+        graphql.isEnumType(type) ? type : null;
       if (!enumType) {
         throw new Error(
           `Tried to interpret an EnumValue for non-enum type ${type}`,
@@ -738,39 +739,38 @@ export default function makeExtendSchemaPlugin(
         }
         return val;
       };
-      const newResolver: import("graphql").GraphQLFieldResolver<
-        TSource,
-        any
-      > = async (parent, args, context, resolveInfo) => {
-        const graphileHelpers: GraphileHelpers = makeFieldHelpers(
-          build,
-          fieldContext,
-          context,
-          resolveInfo,
-        );
-        const result = await resolver(
-          parent,
-          args,
-          context,
-          {
-            ...resolveInfo,
-            graphile: graphileHelpers,
-          },
-          graphileHelpers,
-        );
-        const recurseDataGeneratorsWorkaroundField = getRecurseDataGeneratorsWorkaroundField();
-        if (
-          result != null &&
-          !result.data &&
-          recurseDataGeneratorsWorkaroundField
-        ) {
-          return {
-            ...result,
-            data: result[recurseDataGeneratorsWorkaroundField],
-          };
-        }
-        return result;
-      };
+      const newResolver: import("graphql").GraphQLFieldResolver<TSource, any> =
+        async (parent, args, context, resolveInfo) => {
+          const graphileHelpers: GraphileHelpers = makeFieldHelpers(
+            build,
+            fieldContext,
+            context,
+            resolveInfo,
+          );
+          const result = await resolver(
+            parent,
+            args,
+            context,
+            {
+              ...resolveInfo,
+              graphile: graphileHelpers,
+            },
+            graphileHelpers,
+          );
+          const recurseDataGeneratorsWorkaroundField =
+            getRecurseDataGeneratorsWorkaroundField();
+          if (
+            result != null &&
+            !result.data &&
+            recurseDataGeneratorsWorkaroundField
+          ) {
+            return {
+              ...result,
+              data: result[recurseDataGeneratorsWorkaroundField],
+            };
+          }
+          return result;
+        };
       return newResolver;
     }
     if (fields && fields.length) {
@@ -782,9 +782,8 @@ export default function makeExtendSchemaPlugin(
           const type = getType(field.type, build);
           const nullableType = build.graphql.getNullableType(type);
           const namedType = build.graphql.getNamedType(type);
-          const typeScope = (scopeByType.get(namedType) || {}) as Partial<
-            GraphileEngine.ScopeGraphQLObjectType
-          >;
+          const typeScope = (scopeByType.get(namedType) ||
+            {}) as Partial<GraphileEngine.ScopeGraphQLObjectType>;
           const directives = getDirectives(field.directives);
           const scope: Omit<
             GraphileEngine.ScopeGraphQLObjectTypeFieldsField,
@@ -838,9 +837,8 @@ export default function makeExtendSchemaPlugin(
                 _resolveContext: any,
                 resolveInfo: any,
               ) => {
-                const safeAlias = build.getSafeAliasFromResolveInfo(
-                  resolveInfo,
-                );
+                const safeAlias =
+                  build.getSafeAliasFromResolveInfo(resolveInfo);
                 const liveRecord =
                   resolveInfo.rootValue && resolveInfo.rootValue.liveRecord;
                 if (isConnection) {
@@ -969,10 +967,11 @@ export default function makeExtendSchemaPlugin(
                               )
                             : directives.pgQuery.source;
                         queryBuilder.select(() => {
-                          const resolveData = fieldContext.getDataFromParsedResolveInfoFragment(
-                            parsedResolveInfoFragment,
-                            namedType as import("graphql").GraphQLOutputType,
-                          );
+                          const resolveData =
+                            fieldContext.getDataFromParsedResolveInfoFragment(
+                              parsedResolveInfoFragment,
+                              namedType as import("graphql").GraphQLOutputType,
+                            );
                           const tableAlias = sql.identifier(Symbol());
                           const query = build.pgQueryFromResolveData(
                             source,
@@ -986,7 +985,8 @@ export default function makeExtendSchemaPlugin(
                               addNullCase: !isConnection,
                             },
                             (innerQueryBuilder: QueryBuilder) => {
-                              innerQueryBuilder.parentQueryBuilder = queryBuilder;
+                              innerQueryBuilder.parentQueryBuilder =
+                                queryBuilder;
                               if (
                                 build.options.subscriptions &&
                                 table.primaryKeyConstraint

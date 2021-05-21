@@ -9,7 +9,7 @@ import {
 export type ResolverWrapperFn<
   TSource = any,
   TContext = any,
-  TArgs = { [argName: string]: any }
+  TArgs = { [argName: string]: any },
 > = (
   //resolve: import("graphql").GraphQLFieldResolver<TSource, TContext, TArgs>,
   resolve: (

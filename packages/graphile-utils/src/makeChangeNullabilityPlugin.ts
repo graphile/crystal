@@ -29,7 +29,7 @@ export default function makeChangeNullabilityPlugin(
         | import("graphql").GraphQLFieldConfig<any, any>,
       Context extends
         | GraphileEngine.ContextGraphQLInputObjectTypeFieldsField
-        | GraphileEngine.ContextGraphQLObjectTypeFieldsField
+        | GraphileEngine.ContextGraphQLObjectTypeFieldsField,
     >(
       field: Field,
       build: GraphileEngine.Build,

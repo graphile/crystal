@@ -142,10 +142,11 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
                     return {
                       pgQuery: (queryBuilder) => {
                         queryBuilder.select(() => {
-                          const resolveData = getDataFromParsedResolveInfoFragment(
-                            parsedResolveInfoFragment,
-                            gqlForeignTableType,
-                          );
+                          const resolveData =
+                            getDataFromParsedResolveInfoFragment(
+                              parsedResolveInfoFragment,
+                              gqlForeignTableType,
+                            );
 
                           const foreignTableAlias = sql.identifier(Symbol());
                           const query = queryFromResolveData(
@@ -162,7 +163,8 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
                             },
 
                             (innerQueryBuilder) => {
-                              innerQueryBuilder.parentQueryBuilder = queryBuilder;
+                              innerQueryBuilder.parentQueryBuilder =
+                                queryBuilder;
                               if (subscriptions && table.primaryKeyConstraint) {
                                 queryBuilder.selectIdentifiers(table);
                               }
@@ -201,9 +203,8 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
                     resolve: (rawData, _args, _resolveContext, resolveInfo) => {
                       const data = isMutationPayload ? rawData.data : rawData;
                       if (!data) return null;
-                      const safeAlias = getSafeAliasFromResolveInfo(
-                        resolveInfo,
-                      );
+                      const safeAlias =
+                        getSafeAliasFromResolveInfo(resolveInfo);
 
                       const record = data[safeAlias];
                       const liveRecord =

@@ -151,12 +151,10 @@ interface PostGraphileHooks {
 }
 
 export type HookName = keyof PostGraphileHooks;
-export type HookType<
-  THookName extends HookName
-> = PostGraphileHooks[THookName][0];
-export type HookContext<
-  THookName extends HookName
-> = PostGraphileHooks[THookName][1];
+export type HookType<THookName extends HookName> =
+  PostGraphileHooks[THookName][0];
+export type HookContext<THookName extends HookName> =
+  PostGraphileHooks[THookName][1];
 
 export type PluginHookFn = <THookName extends HookName>(
   hookName: THookName,
@@ -311,7 +309,7 @@ export function makePluginHook(
 
 export function pluginHookFromOptions<
   Request extends IncomingMessage = IncomingMessage,
-  Response extends ServerResponse = ServerResponse
+  Response extends ServerResponse = ServerResponse,
 >(
   options: GraphileEngine.PostGraphileOptions<Request, Response>,
 ): PluginHookFn {

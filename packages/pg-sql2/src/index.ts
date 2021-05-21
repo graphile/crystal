@@ -204,9 +204,7 @@ function enforceValidNode(node: unknown): SQLNode {
  * Accepts an sql`...` expression and compiles it out to SQL text with
  * placeholders, and the values to substitute for these values.
  */
-export function compile(
-  sql: SQL,
-): {
+export function compile(sql: SQL): {
   text: string;
   values: SQLRawValue[];
 } {

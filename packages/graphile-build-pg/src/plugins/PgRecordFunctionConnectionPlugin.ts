@@ -178,9 +178,8 @@ export default (function PgRecordFunctionConnectionPlugin(
                     ),
 
                     resolve(data, _args, _context, resolveInfo) {
-                      const safeAlias = getSafeAliasFromResolveInfo(
-                        resolveInfo,
-                      );
+                      const safeAlias =
+                        getSafeAliasFromResolveInfo(resolveInfo);
 
                       return data.data.map(
                         (entry: object & { __cursor?: string }) => ({

@@ -5,9 +5,9 @@ import { Plan } from "../plan";
 const debugObjectPlan = debugFactory("crystal:ObjectPlan");
 const debugObjectPlanVerbose = debugObjectPlan.extend("verbose");
 
-export class ObjectPlan<TData extends { [key: string]: any }> extends Plan<
-  TData
-> {
+export class ObjectPlan<
+  TData extends { [key: string]: any },
+> extends Plan<TData> {
   private keys: Array<keyof TData>;
   private results: Array<[Array<TData[keyof TData]>, TData]> = [];
   constructor(obj: { [key in keyof TData]: Plan<TData[key]> }) {

@@ -110,14 +110,8 @@ export function establishAether<TContext extends object>(details: {
     [key: string]: unknown;
   };
 }): Aether {
-  const {
-    schema,
-    operation,
-    fragments,
-    variableValues,
-    context,
-    rootValue,
-  } = details;
+  const { schema, operation, fragments, variableValues, context, rootValue } =
+    details;
   let cacheByOperation = cacheByOperationBySchema.get(schema);
   let cache = cacheByOperation?.get(operation);
   if (cache) {

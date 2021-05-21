@@ -37,19 +37,20 @@ export default (function PgColumnsPlugin(builder) {
       if (!sql || !queryFromResolveData || !pgTweakFragmentForTypeAndModifier) {
         throw new Error("Required Build properties were not present");
       }
-      const getSelectValueForFieldAndTypeAndModifier: PgGetSelectValueForFieldAndTypeAndModifier = (
-        ReturnType,
-        fieldContext,
-        parsedResolveInfoFragment,
-        sqlFullName,
-        type,
-        typeModifier,
-        parentQueryBuilder,
-      ) => {
-        const { getDataFromParsedResolveInfoFragment } = fieldContext;
-        if (type.isPgArray && type.arrayItemType) {
-          const ident = sql.identifier(Symbol());
-          return sql`(\
+      const getSelectValueForFieldAndTypeAndModifier: PgGetSelectValueForFieldAndTypeAndModifier =
+        (
+          ReturnType,
+          fieldContext,
+          parsedResolveInfoFragment,
+          sqlFullName,
+          type,
+          typeModifier,
+          parentQueryBuilder,
+        ) => {
+          const { getDataFromParsedResolveInfoFragment } = fieldContext;
+          if (type.isPgArray && type.arrayItemType) {
+            const ident = sql.identifier(Symbol());
+            return sql`(\
 case
 when ${sqlFullName} is null then null
 when coalesce(array_length(${sqlFullName}, 1), 0) = 0 then '[]'::json
@@ -66,44 +67,45 @@ else (
 )
 end
 )`;
-        } else {
-          const resolveData = getDataFromParsedResolveInfoFragment(
-            parsedResolveInfoFragment,
-            ReturnType,
-          );
-
-          if (type.type === "c") {
-            const isDefinitelyNotATable =
-              type.class && !type.class.isSelectable;
-            const jsonBuildObject = queryFromResolveData(
-              sql.identifier(Symbol()), // Ignore!
-              sqlFullName,
-              resolveData,
-              {
-                onlyJsonField: true,
-                addNullCase: !isDefinitelyNotATable,
-                addNotDistinctFromNullCase: !!isDefinitelyNotATable,
-              },
-              null,
-              parentQueryBuilder ? parentQueryBuilder.context : (null as any),
-              parentQueryBuilder ? parentQueryBuilder.rootValue : null,
-            );
-
-            return jsonBuildObject;
           } else {
-            return pgTweakFragmentForTypeAndModifier(
-              sqlFullName,
-              type,
-              typeModifier,
-              resolveData,
+            const resolveData = getDataFromParsedResolveInfoFragment(
+              parsedResolveInfoFragment,
+              ReturnType,
             );
+
+            if (type.type === "c") {
+              const isDefinitelyNotATable =
+                type.class && !type.class.isSelectable;
+              const jsonBuildObject = queryFromResolveData(
+                sql.identifier(Symbol()), // Ignore!
+                sqlFullName,
+                resolveData,
+                {
+                  onlyJsonField: true,
+                  addNullCase: !isDefinitelyNotATable,
+                  addNotDistinctFromNullCase: !!isDefinitelyNotATable,
+                },
+                null,
+                parentQueryBuilder ? parentQueryBuilder.context : (null as any),
+                parentQueryBuilder ? parentQueryBuilder.rootValue : null,
+              );
+
+              return jsonBuildObject;
+            } else {
+              return pgTweakFragmentForTypeAndModifier(
+                sqlFullName,
+                type,
+                typeModifier,
+                resolveData,
+              );
+            }
           }
-        }
-      };
+        };
       return build.extend(
         build,
         {
-          pgGetSelectValueForFieldAndTypeAndModifier: getSelectValueForFieldAndTypeAndModifier,
+          pgGetSelectValueForFieldAndTypeAndModifier:
+            getSelectValueForFieldAndTypeAndModifier,
         },
         "Adding pgGetSelectValueForFieldAndTypeAndModifier in PgColumnsPlugin",
       );
@@ -125,7 +127,8 @@ end
         pgColumnFilter,
         inflection,
         pgOmit: omit,
-        pgGetSelectValueForFieldAndTypeAndModifier: getSelectValueForFieldAndTypeAndModifier,
+        pgGetSelectValueForFieldAndTypeAndModifier:
+          getSelectValueForFieldAndTypeAndModifier,
         describePgEntity,
         sqlCommentByAddingTags,
       } = build;

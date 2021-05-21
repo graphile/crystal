@@ -24,8 +24,8 @@ export default (function PgOrderComputedColumnsPlugin(builder) {
         return values;
       }
 
-      const compatibleComputedColumns = introspectionResultsByKind.procedure.reduce(
-        (memo, proc) => {
+      const compatibleComputedColumns =
+        introspectionResultsByKind.procedure.reduce((memo, proc) => {
           /* ALSO SEE PgConditionComputedColumnPlugin */
           // Must be marked @sortable
           if (!proc.tags.sortable) return memo;
@@ -67,9 +67,7 @@ export default (function PgOrderComputedColumnsPlugin(builder) {
           // Looks good
           memo.push({ proc, pseudoColumnName });
           return memo;
-        },
-        [] as { proc: PgProc; pseudoColumnName: string }[],
-      );
+        }, [] as { proc: PgProc; pseudoColumnName: string }[]);
 
       return extend(
         values,

@@ -288,9 +288,8 @@ const DummyConnectionPlugin: GraphileEngine.Plugin = async (builder) => {
                 },
               },
               resolve(data, args, context, resolveInfo) {
-                const parsedResolveInfoFragment = parseResolveInfo(
-                  resolveInfo,
-                )!;
+                const parsedResolveInfoFragment =
+                  parseResolveInfo(resolveInfo)!;
                 parsedResolveInfoFragment.args = args; // Allow overriding via makeWrapResolversPlugin
                 const resolveData = getDataFromParsedResolveInfoFragment(
                   parsedResolveInfoFragment,

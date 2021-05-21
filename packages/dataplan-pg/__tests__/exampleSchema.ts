@@ -208,90 +208,88 @@ const MessageCondition = new GraphQLInputObjectType({
   },
 });
 
-const Forum: GraphQLObjectType<
-  any,
-  GraphileResolverContext
-> = new GraphQLObjectType(
-  objectSpec<GraphileResolverContext, ForumPlan>({
-    name: "Forum",
-    fields: () => ({
-      id: {
-        type: GraphQLString,
-        plan($forum) {
-          return $forum.get("id");
-        },
-      },
-      name: {
-        type: GraphQLString,
-        plan($forum) {
-          return $forum.get("name");
-        },
-      },
-      self: {
-        type: Forum,
-        plan($forum) {
-          return $forum;
-        },
-      },
-      messagesList: {
-        type: new GraphQLList(Message),
-        args: {
-          limit: {
-            type: GraphQLInt,
+const Forum: GraphQLObjectType<any, GraphileResolverContext> =
+  new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, ForumPlan>({
+      name: "Forum",
+      fields: () => ({
+        id: {
+          type: GraphQLString,
+          plan($forum) {
+            return $forum.get("id");
           },
-          condition: {
-            type: MessageCondition,
+        },
+        name: {
+          type: GraphQLString,
+          plan($forum) {
+            return $forum.get("name");
           },
-          includeArchived: { type: IncludeArchived },
         },
-        plan($forum) {
-          const $forumId = $forum.get("id");
-          const $messages = new PgClassSelectPlan(
-            messageSource,
-            [{ plan: $forumId, type: sql`uuid` }],
-            (alias) => [sql`${alias}.forum_id`],
-          );
-          $messages.setTrusted();
-          // $messages.leftJoin(...);
-          // $messages.innerJoin(...);
-          // $messages.relation('fk_messages_author_id')
-          // $messages.where(...);
-          // $messages.orderBy(...);
-          return $messages;
-        },
-      },
-      messagesConnection: {
-        type: MessagesConnection,
-        args: {
-          limit: {
-            type: GraphQLInt,
+        self: {
+          type: Forum,
+          plan($forum) {
+            return $forum;
           },
-          condition: {
-            type: MessageCondition,
+        },
+        messagesList: {
+          type: new GraphQLList(Message),
+          args: {
+            limit: {
+              type: GraphQLInt,
+            },
+            condition: {
+              type: MessageCondition,
+            },
+            includeArchived: { type: IncludeArchived },
           },
-          includeArchived: { type: IncludeArchived },
+          plan($forum) {
+            const $forumId = $forum.get("id");
+            const $messages = new PgClassSelectPlan(
+              messageSource,
+              [{ plan: $forumId, type: sql`uuid` }],
+              (alias) => [sql`${alias}.forum_id`],
+            );
+            $messages.setTrusted();
+            // $messages.leftJoin(...);
+            // $messages.innerJoin(...);
+            // $messages.relation('fk_messages_author_id')
+            // $messages.where(...);
+            // $messages.orderBy(...);
+            return $messages;
+          },
         },
-        plan($forum) {
-          const $messages = new PgClassSelectPlan(
-            messageSource,
-            [{ plan: $forum.get("id"), type: sql`uuid` }],
-            (alias) => [sql`${alias}.forum_id`],
-          );
-          $messages.setTrusted();
-          // $messages.leftJoin(...);
-          // $messages.innerJoin(...);
-          // $messages.relation('fk_messages_author_id')
-          // $messages.where(...);
-          const $connectionPlan = new PgConnectionPlan($messages);
-          // $connectionPlan.orderBy... ?
-          // DEFINITELY NOT $messages.orderBy BECAUSE we don't want that applied to aggregates.
-          // DEFINITELY NOT $messages.limit BECAUSE we don't want those limits applied to aggregates or page info.
-          return $connectionPlan;
+        messagesConnection: {
+          type: MessagesConnection,
+          args: {
+            limit: {
+              type: GraphQLInt,
+            },
+            condition: {
+              type: MessageCondition,
+            },
+            includeArchived: { type: IncludeArchived },
+          },
+          plan($forum) {
+            const $messages = new PgClassSelectPlan(
+              messageSource,
+              [{ plan: $forum.get("id"), type: sql`uuid` }],
+              (alias) => [sql`${alias}.forum_id`],
+            );
+            $messages.setTrusted();
+            // $messages.leftJoin(...);
+            // $messages.innerJoin(...);
+            // $messages.relation('fk_messages_author_id')
+            // $messages.where(...);
+            const $connectionPlan = new PgConnectionPlan($messages);
+            // $connectionPlan.orderBy... ?
+            // DEFINITELY NOT $messages.orderBy BECAUSE we don't want that applied to aggregates.
+            // DEFINITELY NOT $messages.limit BECAUSE we don't want those limits applied to aggregates or page info.
+            return $connectionPlan;
+          },
         },
-      },
+      }),
     }),
-  }),
-);
+  );
 
 const Query = new GraphQLObjectType(
   objectSpec<GraphileResolverContext, __ValuePlan<BaseGraphQLRootValue>>({

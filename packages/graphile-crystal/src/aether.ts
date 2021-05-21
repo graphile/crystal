@@ -129,7 +129,7 @@ function atIndexes(data: any, indexes: ReadonlyArray<number>): any {
 export class Aether<
   TVariables extends BaseGraphQLVariables = BaseGraphQLVariables,
   TContext extends BaseGraphQLContext = BaseGraphQLContext,
-  TRootValue extends BaseGraphQLRootValue = BaseGraphQLRootValue
+  TRootValue extends BaseGraphQLRootValue = BaseGraphQLRootValue,
 > {
   public maxGroupId = 0;
   public groupId = this.maxGroupId;
@@ -524,8 +524,8 @@ export class Aether<
           // any of the interface types it implements) then we need to plan for
           // every single object type that implements this interface; otherwise
           // we only need to plan the reachable types.
-          const implementations = this.schema.getImplementations(interfaceType)
-            .objects;
+          const implementations =
+            this.schema.getImplementations(interfaceType).objects;
           if (
             interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
               this,
@@ -1209,9 +1209,8 @@ export class Aether<
       );
     }
     visitedPlans.add(plan);
-    let resultByCrystalObject = crystalContext.resultByCrystalObjectByPlanId.get(
-      plan.id,
-    );
+    let resultByCrystalObject =
+      crystalContext.resultByCrystalObjectByPlanId.get(plan.id);
     if (!resultByCrystalObject) {
       resultByCrystalObject = new Map();
       crystalContext.resultByCrystalObjectByPlanId.set(

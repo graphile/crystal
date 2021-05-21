@@ -34,7 +34,7 @@ export const base64 = (str: string) =>
 
 export const nullableIf = <
   TCond extends boolean,
-  TType extends import("graphql").GraphQLNullableType
+  TType extends import("graphql").GraphQLNullableType,
 >(
   GraphQLNonNull: typeof import("graphql").GraphQLNonNull,
   condition: TCond,

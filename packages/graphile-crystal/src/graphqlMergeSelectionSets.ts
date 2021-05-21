@@ -91,11 +91,12 @@ export function interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
           (t) => t.name === typeCondition.name.value,
         );
         if (matchingInterfaceType && fragment.selectionSet.selections) {
-          const result = interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
-            aether,
-            matchingInterfaceType,
-            fragment.selectionSet.selections,
-          );
+          const result =
+            interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
+              aether,
+              matchingInterfaceType,
+              fragment.selectionSet.selections,
+            );
           if (result) {
             return true;
           }
@@ -109,11 +110,12 @@ export function interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
             (t) => t.name === typeCondition.name.value,
           );
           if (matchingInterfaceType && selection.selectionSet.selections) {
-            const result = interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
-              aether,
-              matchingInterfaceType,
-              selection.selectionSet.selections,
-            );
+            const result =
+              interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
+                aether,
+                matchingInterfaceType,
+                selection.selectionSet.selections,
+              );
             if (result) {
               return true;
             }

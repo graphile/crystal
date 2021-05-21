@@ -370,9 +370,11 @@ function smartCommentConstraints(
           `@primaryKey configuration of '${klass.namespaceName}.${klass.name}' is invalid; please specify just once "@primaryKey col1,col2"`,
         );
       }
-      const { spec: pkSpec, tags, description } = parseConstraintSpec(
-        klass.tags.primaryKey,
-      );
+      const {
+        spec: pkSpec,
+        tags,
+        description,
+      } = parseConstraintSpec(klass.tags.primaryKey);
 
       const columns: string[] = parseSqlColumnArray(pkSpec);
       const attributes = attributesByNames(
@@ -438,9 +440,11 @@ function smartCommentConstraints(
             `Invalid foreign key spec (${index}) on '${klass.namespaceName}.${klass.name}'`,
           );
         }
-        const { spec: fkSpec, tags, description } = parseConstraintSpec(
-          fkSpecRaw,
-        );
+        const {
+          spec: fkSpec,
+          tags,
+          description,
+        } = parseConstraintSpec(fkSpecRaw);
 
         const matches = fkSpec.match(
           /^\(([^()]+)\) references ([^().]+)(?:\.([^().]+))?(?:\s*\(([^()]+)\))?$/i,
@@ -923,8 +927,8 @@ export default (async function PgIntrospectionPlugin(
       }
       const { foreignClass } = constraint;
       if (constraint.foreignKeyAttributeNums && foreignClass) {
-        constraint.foreignKeyAttributes = constraint.foreignKeyAttributeNums.map(
-          (nr) => {
+        constraint.foreignKeyAttributes =
+          constraint.foreignKeyAttributeNums.map((nr) => {
             const attr = foreignClass.attributes.find(
               (attr) => attr.num === nr,
             );
@@ -936,8 +940,7 @@ export default (async function PgIntrospectionPlugin(
               );
             }
             return attr;
-          },
-        );
+          });
       } else {
         constraint.foreignKeyAttributes = [];
       }
@@ -1023,10 +1026,8 @@ export default (async function PgIntrospectionPlugin(
       }
       // Connect to DB
       try {
-        const {
-          pgClient,
-          releasePgClient,
-        } = await getPgClientAndReleaserFromConfig(pgConfig);
+        const { pgClient, releasePgClient } =
+          await getPgClientAndReleaserFromConfig(pgConfig);
         this.client = pgClient;
         // $FlowFixMe: hack property
         this._reallyReleaseClient = releasePgClient;

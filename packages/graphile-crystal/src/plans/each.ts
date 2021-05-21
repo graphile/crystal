@@ -5,7 +5,8 @@ import { isListCapablePlan } from "./__listItem";
 
 export class EachPlan<TData = any, TResult = any>
   extends Plan<ReadonlyArray<TResult>>
-  implements ListCapablePlan<TResult> {
+  implements ListCapablePlan<TResult>
+{
   listPlanId: number;
 
   constructor(

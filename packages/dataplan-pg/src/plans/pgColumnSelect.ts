@@ -19,7 +19,7 @@ const debugExecuteVerbose = debugExecute.extend("verbose");
  */
 export class PgColumnSelectPlan<
   TDataSource extends PgDataSource<any>,
-  TColumn extends keyof TDataSource["TRow"]
+  TColumn extends keyof TDataSource["TRow"],
 > extends Plan<TDataSource["TRow"][TColumn]> {
   public readonly tableId: number;
 

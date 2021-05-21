@@ -31,7 +31,7 @@ declare global {
     // Only comments written beginning with `//` will be put in the docs.
     interface PostGraphileOptions<
       Request extends IncomingMessage = IncomingMessage,
-      Response extends ServerResponse = ServerResponse
+      Response extends ServerResponse = ServerResponse,
     > extends PostGraphileCoreOptions {
       // When true, PostGraphile will update the GraphQL API whenever your database
       // schema changes. This feature requires some changes to your database in the
@@ -307,7 +307,7 @@ export type mixed = {} | string | number | boolean | undefined | null;
 
 export type Middleware<
   Request extends IncomingMessage = IncomingMessage,
-  Response extends ServerResponse = ServerResponse
+  Response extends ServerResponse = ServerResponse,
 > = (req: Request, res: Response, next: (err?: Error) => void) => void;
 
 export interface CreateRequestHandlerOptions
@@ -343,7 +343,7 @@ export type GraphQLErrorExtended = GraphQLError & {
  */
 export interface HttpRequestHandler<
   Request extends IncomingMessage = IncomingMessage,
-  Response extends ServerResponse = ServerResponse
+  Response extends ServerResponse = ServerResponse,
 > {
   (req: Request, res: Response, next?: (error?: mixed) => void): Promise<void>;
   (ctx: { req: Request; res: Response }, next: () => void): Promise<void>;

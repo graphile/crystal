@@ -56,10 +56,8 @@ const plugin: PostGraphilePlugin = {
 
   ["postgraphile:options"](incomingOptions, { pgPool }) {
     const eventEmitter = new EventEmitter();
-    const {
-      simpleSubscriptions,
-      subscriptionAuthorizationFunction,
-    } = incomingOptions;
+    const { simpleSubscriptions, subscriptionAuthorizationFunction } =
+      incomingOptions;
     const pubsub = new PubSub({
       eventEmitter,
     });

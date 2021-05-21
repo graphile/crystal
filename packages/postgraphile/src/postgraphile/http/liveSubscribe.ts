@@ -115,11 +115,11 @@ function liveSubscribeImpl(
       // Note: Flow can't refine isAsyncIterable, so explicit casts are used.
       isAsyncIterable(resultOrStream)
         ? mapAsyncIterator(
-            (resultOrStream as any) as AsyncIterable<mixed>,
+            resultOrStream as any as AsyncIterable<mixed>,
             mapSourceToResponse,
             reportGraphQLError,
           )
-        : ((resultOrStream as any) as ExecutionResult),
+        : (resultOrStream as any as ExecutionResult),
     reportGraphQLError,
   );
 }

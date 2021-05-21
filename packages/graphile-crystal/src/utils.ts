@@ -458,7 +458,7 @@ export function arraysMatch<T>(
  */
 export function objectSpec<
   TContext extends BaseGraphQLContext,
-  TParentPlan extends Plan<any>
+  TParentPlan extends Plan<any>,
 >(
   spec: Omit<GraphQLObjectTypeConfig<any, TContext>, "fields"> & {
     fields: Thunk<{
@@ -493,7 +493,7 @@ function objectFieldSpec<
   TContext extends BaseGraphQLContext,
   TSource extends Plan<any>,
   TResult extends Plan<any> = Plan<any>,
-  TArgs extends BaseGraphQLArguments = BaseGraphQLArguments
+  TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
 >(
   graphileSpec: GraphileCrystalFieldConfig<TContext, TSource, TResult, TArgs>,
 ): GraphQLFieldConfig<any, TContext, TArgs> {

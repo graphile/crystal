@@ -48,7 +48,7 @@ export function consistentlyOrderedSchema(
   });
 
   function replaceNamedType<T extends GraphQLNamedType>(type: T): T {
-    return (typeMap[type.name] as any) as T;
+    return typeMap[type.name] as any as T;
   }
 
   function replaceMaybeType<T extends GraphQLNamedType>(maybeType: Maybe<T>) {

@@ -95,7 +95,9 @@ beforeAll(() => {
 
   // Flatten out the query results promise.
   queryResults = queryFileNames.map(async (_, i) => {
-    return await (await queryResultsPromise)[i];
+    return await (
+      await queryResultsPromise
+    )[i];
   });
 });
 

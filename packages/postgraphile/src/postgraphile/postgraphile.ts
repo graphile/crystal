@@ -30,7 +30,7 @@ function isPlainObject(obj: any) {
 
 export interface PostgraphileSchemaBuilder<
   Request extends IncomingMessage = IncomingMessage,
-  Response extends ServerResponse = ServerResponse
+  Response extends ServerResponse = ServerResponse,
 > {
   _emitter: EventEmitter;
   getGraphQLSchema: () => Promise<GraphQLSchema>;
@@ -44,7 +44,7 @@ export interface PostgraphileSchemaBuilder<
  */
 export function getPostgraphileSchemaBuilder<
   Request extends IncomingMessage = IncomingMessage,
-  Response extends ServerResponse = ServerResponse
+  Response extends ServerResponse = ServerResponse,
 >(
   pgPool: Pool,
   schema: string | Array<string>,
@@ -170,7 +170,7 @@ export function getPostgraphileSchemaBuilder<
 }
 export default function postgraphile<
   Request extends IncomingMessage = IncomingMessage,
-  Response extends ServerResponse = ServerResponse
+  Response extends ServerResponse = ServerResponse,
 >(
   poolOrConfig?: Pool | PoolConfig | string,
   schema?: string | Array<string>,
@@ -178,14 +178,14 @@ export default function postgraphile<
 ): HttpRequestHandler;
 export default function postgraphile<
   Request extends IncomingMessage = IncomingMessage,
-  Response extends ServerResponse = ServerResponse
+  Response extends ServerResponse = ServerResponse,
 >(
   poolOrConfig?: Pool | PoolConfig | string,
   options?: GraphileEngine.PostGraphileOptions<Request, Response>,
 ): HttpRequestHandler;
 export default function postgraphile<
   Request extends IncomingMessage = IncomingMessage,
-  Response extends ServerResponse = ServerResponse
+  Response extends ServerResponse = ServerResponse,
 >(
   poolOrConfig?: Pool | PoolConfig | string,
   schemaOrOptions?:

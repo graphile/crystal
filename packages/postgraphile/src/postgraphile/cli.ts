@@ -53,9 +53,7 @@ const debugCli = debugFactory("postgraphile:cli");
 // TODO: Demo Postgres database
 const DEMO_PG_URL = null;
 
-function extractPlugins(
-  rawArgv: Array<string>,
-): {
+function extractPlugins(rawArgv: Array<string>): {
   argv: Array<string>;
   plugins: Array<PostGraphilePlugin>;
 } {

@@ -164,7 +164,9 @@ beforeAll(() => {
 
   // Flatten out the query results promise.
   queryResults = tests.map(async (_, i) => {
-    return await (await queryResultsPromise)[i];
+    return await (
+      await queryResultsPromise
+    )[i];
   });
 });
 

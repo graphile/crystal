@@ -771,9 +771,8 @@ export default (function PgTypesPlugin(
         if (!gqlInputTypeByTypeIdAndModifier[type.id][typeModifierKey]) {
           const gqlInputType = oidInputLookup[type.id];
           if (gqlInputType) {
-            gqlInputTypeByTypeIdAndModifier[type.id][
-              typeModifierKey
-            ] = gqlInputType;
+            gqlInputTypeByTypeIdAndModifier[type.id][typeModifierKey] =
+              gqlInputType;
           }
         }
         // Enums
@@ -834,9 +833,8 @@ export default (function PgTypesPlugin(
             existingRange && existingRange instanceof GraphQLObjectType
               ? existingRange
               : null;
-          let RangeInput:
-            | import("graphql").GraphQLInputObjectType
-            | null = null;
+          let RangeInput: import("graphql").GraphQLInputObjectType | null =
+            null;
           if (!Range) {
             const rangeBoundSpec: GraphileEngine.GraphileObjectTypeConfig<
               any,
@@ -876,23 +874,24 @@ export default (function PgTypesPlugin(
               );
             }
 
-            const rangeBoundInputSpec: GraphileEngine.GraphileInputObjectTypeConfig = {
-              name: inflection.inputType(RangeBound.name),
-              description:
-                "The value at one end of a range. A range can either include this value, or not.",
-              fields: {
-                value: {
-                  description: "The value at one end of our range.",
-                  type: new GraphQLNonNull(gqlRangeInputSubType),
-                },
+            const rangeBoundInputSpec: GraphileEngine.GraphileInputObjectTypeConfig =
+              {
+                name: inflection.inputType(RangeBound.name),
+                description:
+                  "The value at one end of a range. A range can either include this value, or not.",
+                fields: {
+                  value: {
+                    description: "The value at one end of our range.",
+                    type: new GraphQLNonNull(gqlRangeInputSubType),
+                  },
 
-                inclusive: {
-                  description:
-                    "Whether or not the value of this bound is included in the range.",
-                  type: new GraphQLNonNull(GraphQLBoolean),
+                  inclusive: {
+                    description:
+                      "Whether or not the value of this bound is included in the range.",
+                    type: new GraphQLNonNull(GraphQLBoolean),
+                  },
                 },
-              },
-            };
+              };
             const RangeBoundInput = newWithHooks(
               GraphQLInputObjectType,
               rangeBoundInputSpec,
@@ -910,24 +909,22 @@ export default (function PgTypesPlugin(
               );
             }
 
-            const rangeSpec: GraphileEngine.GraphileObjectTypeConfig<
-              any,
-              any
-            > = {
-              name: inflection.rangeType(gqlRangeSubType.name),
-              description: `A range of \`${gqlRangeSubType.name}\`.`,
-              fields: {
-                start: {
-                  description: "The starting bound of our range.",
-                  type: RangeBound,
-                },
+            const rangeSpec: GraphileEngine.GraphileObjectTypeConfig<any, any> =
+              {
+                name: inflection.rangeType(gqlRangeSubType.name),
+                description: `A range of \`${gqlRangeSubType.name}\`.`,
+                fields: {
+                  start: {
+                    description: "The starting bound of our range.",
+                    type: RangeBound,
+                  },
 
-                end: {
-                  description: "The ending bound of our range.",
-                  type: RangeBound,
+                  end: {
+                    description: "The ending bound of our range.",
+                    type: RangeBound,
+                  },
                 },
-              },
-            };
+              };
             const rangeScope: GraphileEngine.ScopeGraphQLObjectType = {
               isPgRangeType: true,
               pgIntrospection: type,
@@ -941,21 +938,22 @@ export default (function PgTypesPlugin(
               );
             }
 
-            const rangeInputSpec: GraphileEngine.GraphileInputObjectTypeConfig = {
-              name: inflection.inputType(Range.name),
-              description: `A range of \`${gqlRangeSubType.name}\`.`,
-              fields: {
-                start: {
-                  description: "The starting bound of our range.",
-                  type: RangeBoundInput,
-                },
+            const rangeInputSpec: GraphileEngine.GraphileInputObjectTypeConfig =
+              {
+                name: inflection.inputType(Range.name),
+                description: `A range of \`${gqlRangeSubType.name}\`.`,
+                fields: {
+                  start: {
+                    description: "The starting bound of our range.",
+                    type: RangeBoundInput,
+                  },
 
-                end: {
-                  description: "The ending bound of our range.",
-                  type: RangeBoundInput,
+                  end: {
+                    description: "The ending bound of our range.",
+                    type: RangeBoundInput,
+                  },
                 },
-              },
-            };
+              };
             RangeInput = newWithHooks(
               GraphQLInputObjectType,
               rangeInputSpec,
@@ -982,9 +980,8 @@ export default (function PgTypesPlugin(
             throw new Error("Could not find or generate range input type");
           }
           gqlTypeByTypeIdAndModifier[type.id][typeModifierKey] = Range;
-          gqlInputTypeByTypeIdAndModifier[type.id][
-            typeModifierKey
-          ] = RangeInput;
+          gqlInputTypeByTypeIdAndModifier[type.id][typeModifierKey] =
+            RangeInput;
           if (pgTweaksByTypeIdAndModifier[type.id] === undefined) {
             pgTweaksByTypeIdAndModifier[type.id] = {};
           }
@@ -1060,17 +1057,16 @@ end`;
           );
 
           if (baseInputType && baseInputType !== baseType) {
-            gqlInputTypeByTypeIdAndModifier[type.id][
-              typeModifierKey
-            ] = Object.assign(Object.create(baseInputType), {
-              name: inflection.inputType(
-                getNamedType(
-                  gqlTypeByTypeIdAndModifier[type.id][typeModifierKey],
-                ).name,
-              ),
+            gqlInputTypeByTypeIdAndModifier[type.id][typeModifierKey] =
+              Object.assign(Object.create(baseInputType), {
+                name: inflection.inputType(
+                  getNamedType(
+                    gqlTypeByTypeIdAndModifier[type.id][typeModifierKey],
+                  ).name,
+                ),
 
-              description: type.description,
-            });
+                description: type.description,
+              });
           }
         }
 
@@ -1088,9 +1084,8 @@ end`;
             throw new Error("Could not determine type for array element");
           }
 
-          gqlTypeByTypeIdAndModifier[type.id][
-            typeModifierKey
-          ] = new GraphQLList(arrayEntryOutputType);
+          gqlTypeByTypeIdAndModifier[type.id][typeModifierKey] =
+            new GraphQLList(arrayEntryOutputType);
           if (!disableIssue390Fix) {
             const arrayEntryInputType = getGqlInputTypeByTypeIdAndModifier(
               type.arrayItemTypeId,
@@ -1098,9 +1093,8 @@ end`;
             );
 
             if (arrayEntryInputType) {
-              gqlInputTypeByTypeIdAndModifier[type.id][
-                typeModifierKey
-              ] = new GraphQLList(arrayEntryInputType);
+              gqlInputTypeByTypeIdAndModifier[type.id][typeModifierKey] =
+                new GraphQLList(arrayEntryInputType);
             }
           }
         }
@@ -1239,9 +1233,8 @@ end`;
                   `Callback and return types differ when defining type for '${type.id}'`,
                 );
               }
-              gqlInputTypeByTypeIdAndModifier[type.id][
-                typeModifierKey
-              ] = result;
+              gqlInputTypeByTypeIdAndModifier[type.id][typeModifierKey] =
+                result;
             }
           }
         }
@@ -1346,7 +1339,8 @@ end`;
         pgRegisterGqlTypeByTypeId: registerGqlTypeByTypeId,
         pgRegisterGqlInputTypeByTypeId: registerGqlInputTypeByTypeId,
         pgGetGqlTypeByTypeIdAndModifier: getGqlTypeByTypeIdAndModifier,
-        pgGetGqlInputTypeByTypeIdAndModifier: getGqlInputTypeByTypeIdAndModifier,
+        pgGetGqlInputTypeByTypeIdAndModifier:
+          getGqlInputTypeByTypeIdAndModifier,
         pg2GqlMapper,
         pg2gql,
         pg2gqlForType,

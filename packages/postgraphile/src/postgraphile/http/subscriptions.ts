@@ -50,7 +50,7 @@ function deferred<T = void>(): Deferred<T> {
 
 export async function enhanceHttpServerWithSubscriptions<
   Request extends IncomingMessage = IncomingMessage,
-  Response extends ServerResponse = ServerResponse
+  Response extends ServerResponse = ServerResponse,
 >(
   websocketServer: Server,
   postgraphileMiddleware: HttpRequestHandler,
@@ -271,7 +271,7 @@ export async function enhanceHttpServerWithSubscriptions<
         const { req, res } = await reqResFromSocket(socket);
         const meta = {};
         const formatResponse = <
-          TExecutionResult extends ExecutionResult = ExecutionResult
+          TExecutionResult extends ExecutionResult = ExecutionResult,
         >(
           response: TExecutionResult,
         ): TExecutionResult => {

@@ -25,7 +25,7 @@ const debugVerbose = debug.extend("verbose");
 abstract class DataSource<
   TData extends any,
   TInput extends any,
-  TOptions extends { [key: string]: any }
+  TOptions extends { [key: string]: any },
 > {
   /**
    * TypeScript hack so that we can retrieve the TData type from a data source
@@ -87,7 +87,7 @@ export type PgDataSourceContext<TSettings = any> = {
  * view, materialized view, function call, join, etc. Anything table-like.
  */
 export class PgDataSource<
-  TRow extends { [key: string]: any }
+  TRow extends { [key: string]: any },
 > extends DataSource<
   ReadonlyArray<TRow>,
   PgDataSourceInput,

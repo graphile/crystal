@@ -48,9 +48,8 @@ export default (function PgJWTPlugin(
           "pgJwtTypeIdentifier was specified without pgJwtSecret",
         );
       }
-      const { namespaceName, entityName: typeName } = parseIdentifier(
-        pgJwtTypeIdentifier,
-      );
+      const { namespaceName, entityName: typeName } =
+        parseIdentifier(pgJwtTypeIdentifier);
 
       const compositeClass = introspectionResultsByKind.class.find(
         (table) =>

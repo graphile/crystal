@@ -57,9 +57,8 @@ function mergeData(
   ReturnType: graphql.GraphQLOutputType,
   arg: any,
 ): void {
-  const results: Array<GraphileEngine.ResolvedLookAhead> | void = ensureArray<
-    GraphileEngine.ResolvedLookAhead
-  >(gen(arg, ReturnType, data));
+  const results: Array<GraphileEngine.ResolvedLookAhead> | void =
+    ensureArray<GraphileEngine.ResolvedLookAhead>(gen(arg, ReturnType, data));
 
   if (!results) {
     return;
@@ -112,10 +111,8 @@ function ensureArray<T>(val: undefined | null | T | Array<T>): void | Array<T> {
 }
 
 // eslint-disable-next-line no-unused-vars
-let ensureName: (fn: {
-  (...args: any[]): any;
-  displayName?: string;
-}) => void = (_fn) => {};
+let ensureName: (fn: { (...args: any[]): any; displayName?: string }) => void =
+  (_fn) => {};
 if (["development", "test"].indexOf(process.env.NODE_ENV || "") >= 0) {
   ensureName = (fn) => {
     // $FlowFixMe: displayName
@@ -163,7 +160,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
       | graphql.GraphQLInterfaceType
       | graphql.GraphQLUnionType
       | graphql.GraphQLEnumType
-      | graphql.GraphQLInputObjectType
+      | graphql.GraphQLInputObjectType,
   >(
     this: GraphileEngine.Build,
     Type: { new (...args: any[]): T },
@@ -210,7 +207,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
       newSpec = builder.applyHooks(
         this,
         "GraphQLSchema",
-        (newSpec as unknown) as graphql.GraphQLSchemaConfig,
+        newSpec as unknown as graphql.GraphQLSchemaConfig,
         context,
       );
     } else if (Type === GraphQLObjectType) {
@@ -261,13 +258,13 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
           if (!StrippedType) {
             throw new Error("Could not determine GraphQL type");
           }
-          const fieldDataGeneratorsByFieldName = fieldDataGeneratorsByFieldNameByType.get(
-            StrippedType,
-          );
+          const fieldDataGeneratorsByFieldName =
+            fieldDataGeneratorsByFieldNameByType.get(StrippedType);
 
-          const argDataGeneratorsForSelfByFieldName = fieldArgDataGeneratorsByFieldNameByType.get(
-            Self as graphql.GraphQLObjectType,
-          );
+          const argDataGeneratorsForSelfByFieldName =
+            fieldArgDataGeneratorsByFieldNameByType.get(
+              Self as graphql.GraphQLObjectType,
+            );
 
           if (argDataGeneratorsForSelfByFieldName) {
             const argDataGenerators =
@@ -357,11 +354,12 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
       newSpec = {
         ...newSpec,
         interfaces: () => {
-          const interfacesContext: GraphileEngine.ContextGraphQLObjectTypeInterfaces = {
-            ...commonContext,
-            Self: Self as graphql.GraphQLObjectType,
-            GraphQLObjectType: rawSpec,
-          };
+          const interfacesContext: GraphileEngine.ContextGraphQLObjectTypeInterfaces =
+            {
+              ...commonContext,
+              Self: Self as graphql.GraphQLObjectType,
+              GraphQLObjectType: rawSpec,
+            };
 
           let rawInterfaces = rawSpec.interfaces || [];
           if (typeof rawInterfaces === "function") {
@@ -399,106 +397,106 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
               );
             }
 
-            const argDataGenerators: GraphileEngine.ArgDataGeneratorFunction[] = [];
+            const argDataGenerators: GraphileEngine.ArgDataGeneratorFunction[] =
+              [];
             fieldArgDataGeneratorsByFieldName[fieldName] = argDataGenerators;
 
             let newSpec = spec;
-            const scopeWithFieldName: GraphileEngine.ScopeGraphQLObjectTypeFieldsFieldWithFieldName = this.extend(
+            const scopeWithFieldName: GraphileEngine.ScopeGraphQLObjectTypeFieldsFieldWithFieldName =
               this.extend(
-                { ...scope },
-                {
-                  fieldName,
+                this.extend(
+                  { ...scope },
+                  {
+                    fieldName,
+                  },
+
+                  `Within context for GraphQLObjectType '${rawSpec.name}'`,
+                ),
+
+                fieldScope,
+                `Extending scope for field '${fieldName}' within context for GraphQLObjectType '${rawSpec.name}'`,
+              );
+            const context: GraphileEngine.ContextGraphQLObjectTypeFieldsField =
+              {
+                ...commonContext,
+                Self: Self as graphql.GraphQLObjectType,
+                addDataGenerator(fn) {
+                  return addDataGeneratorForField(fieldName, fn);
                 },
-
-                `Within context for GraphQLObjectType '${rawSpec.name}'`,
-              ),
-
-              fieldScope,
-              `Extending scope for field '${fieldName}' within context for GraphQLObjectType '${rawSpec.name}'`,
-            );
-            const context: GraphileEngine.ContextGraphQLObjectTypeFieldsField = {
-              ...commonContext,
-              Self: Self as graphql.GraphQLObjectType,
-              addDataGenerator(fn) {
-                return addDataGeneratorForField(fieldName, fn);
-              },
-              addArgDataGenerator(fn) {
-                ensureName(fn);
-                argDataGenerators.push(fn);
-              },
-              getDataFromParsedResolveInfoFragment: (
-                parsedResolveInfoFragment,
-                ReturnType,
-              ): GraphileEngine.ResolvedLookAhead => {
-                const Type = getNamedType(ReturnType as graphql.GraphQLType);
-                const data: GraphileEngine.ResolvedLookAhead = {};
-
-                const {
-                  fields,
-                  args,
-                } = this.simplifyParsedResolveInfoFragmentWithType(
+                addArgDataGenerator(fn) {
+                  ensureName(fn);
+                  argDataGenerators.push(fn);
+                },
+                getDataFromParsedResolveInfoFragment: (
                   parsedResolveInfoFragment,
                   ReturnType,
-                );
+                ): GraphileEngine.ResolvedLookAhead => {
+                  const Type = getNamedType(ReturnType as graphql.GraphQLType);
+                  const data: GraphileEngine.ResolvedLookAhead = {};
 
-                // Args -> argDataGenerators
-                for (
-                  let dgIndex = 0, dgCount = argDataGenerators.length;
-                  dgIndex < dgCount;
-                  dgIndex++
-                ) {
-                  const gen = argDataGenerators[dgIndex];
-                  try {
-                    mergeData(data, gen, ReturnType, args);
-                  } catch (e) {
-                    debug(
-                      "Failed to execute argDataGenerator '%s' on %s of %s",
-                      gen.displayName || gen.name || "anonymous",
-                      fieldName,
-                      getNameFromType(Self),
+                  const { fields, args } =
+                    this.simplifyParsedResolveInfoFragmentWithType(
+                      parsedResolveInfoFragment,
+                      ReturnType,
                     );
 
-                    throw e;
-                  }
-                }
-
-                // finalSpec.type -> fieldData
-                if (!finalSpec) {
-                  throw new Error(
-                    "It's too early to call this! Call from within resolve",
-                  );
-                }
-                const fieldDataGeneratorsByFieldName = fieldDataGeneratorsByFieldNameByType.get(
-                  Type,
-                );
-
-                if (
-                  fieldDataGeneratorsByFieldName &&
-                  isCompositeType(Type) &&
-                  !isAbstractType(Type)
-                ) {
-                  const typeFields = Type.getFields();
-                  const keys = Object.keys(fields);
+                  // Args -> argDataGenerators
                   for (
-                    let keyIndex = 0, keyCount = keys.length;
-                    keyIndex < keyCount;
-                    keyIndex++
+                    let dgIndex = 0, dgCount = argDataGenerators.length;
+                    dgIndex < dgCount;
+                    dgIndex++
                   ) {
-                    const alias = keys[keyIndex];
-                    const field = fields[alias];
-                    const gens = fieldDataGeneratorsByFieldName[field.name];
-                    if (gens) {
-                      const FieldReturnType = typeFields[field.name].type;
-                      for (let i = 0, l = gens.length; i < l; i++) {
-                        mergeData(data, gens[i], FieldReturnType, field);
+                    const gen = argDataGenerators[dgIndex];
+                    try {
+                      mergeData(data, gen, ReturnType, args);
+                    } catch (e) {
+                      debug(
+                        "Failed to execute argDataGenerator '%s' on %s of %s",
+                        gen.displayName || gen.name || "anonymous",
+                        fieldName,
+                        getNameFromType(Self),
+                      );
+
+                      throw e;
+                    }
+                  }
+
+                  // finalSpec.type -> fieldData
+                  if (!finalSpec) {
+                    throw new Error(
+                      "It's too early to call this! Call from within resolve",
+                    );
+                  }
+                  const fieldDataGeneratorsByFieldName =
+                    fieldDataGeneratorsByFieldNameByType.get(Type);
+
+                  if (
+                    fieldDataGeneratorsByFieldName &&
+                    isCompositeType(Type) &&
+                    !isAbstractType(Type)
+                  ) {
+                    const typeFields = Type.getFields();
+                    const keys = Object.keys(fields);
+                    for (
+                      let keyIndex = 0, keyCount = keys.length;
+                      keyIndex < keyCount;
+                      keyIndex++
+                    ) {
+                      const alias = keys[keyIndex];
+                      const field = fields[alias];
+                      const gens = fieldDataGeneratorsByFieldName[field.name];
+                      if (gens) {
+                        const FieldReturnType = typeFields[field.name].type;
+                        for (let i = 0, l = gens.length; i < l; i++) {
+                          mergeData(data, gens[i], FieldReturnType, field);
+                        }
                       }
                     }
                   }
-                }
-                return data;
-              },
-              scope: scopeWithFieldName,
-            };
+                  return data;
+                },
+                scope: scopeWithFieldName,
+              };
 
             if (typeof newSpec === "function") {
               newSpec = newSpec(context);
@@ -519,11 +517,12 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
             );
 
             newSpec.args = newSpec.args || {};
-            const argsContext: GraphileEngine.ContextGraphQLObjectTypeFieldsFieldArgs = {
-              ...context,
-              field: newSpec,
-              returnType: newSpec.type,
-            };
+            const argsContext: GraphileEngine.ContextGraphQLObjectTypeFieldsFieldArgs =
+              {
+                ...context,
+                field: newSpec,
+                returnType: newSpec.type,
+              };
             newSpec = {
               ...newSpec,
               args: builder.applyHooks(
@@ -628,24 +627,26 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
                 "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is current necessary.",
               );
             }
-            const finalFieldScope: GraphileEngine.ScopeGraphQLInputObjectTypeFieldsFieldWithFieldName = this.extend(
+            const finalFieldScope: GraphileEngine.ScopeGraphQLInputObjectTypeFieldsFieldWithFieldName =
               this.extend(
-                { ...scope },
-                {
-                  fieldName,
-                },
+                this.extend(
+                  { ...scope },
+                  {
+                    fieldName,
+                  },
 
-                `Within context for GraphQLInputObjectType '${rawSpec.name}'`,
-              ),
+                  `Within context for GraphQLInputObjectType '${rawSpec.name}'`,
+                ),
 
-              fieldScope,
-              `Extending scope for field '${fieldName}' within context for GraphQLInputObjectType '${rawSpec.name}'`,
-            );
-            const context: GraphileEngine.ContextGraphQLInputObjectTypeFieldsField = {
-              ...commonContext,
-              Self: Self as graphql.GraphQLInputObjectType,
-              scope: finalFieldScope,
-            };
+                fieldScope,
+                `Extending scope for field '${fieldName}' within context for GraphQLInputObjectType '${rawSpec.name}'`,
+              );
+            const context: GraphileEngine.ContextGraphQLInputObjectTypeFieldsField =
+              {
+                ...commonContext,
+                Self: Self as graphql.GraphQLInputObjectType,
+                scope: finalFieldScope,
+              };
 
             let newSpec = spec;
             if (typeof newSpec === "function") {
@@ -663,12 +664,13 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
             processedFields.push(finalSpec);
             return finalSpec;
           };
-          const fieldsContext: GraphileEngine.ContextGraphQLInputObjectTypeFields = {
-            ...commonContext,
-            Self: Self as graphql.GraphQLInputObjectType,
-            GraphQLInputObjectType: rawSpec,
-            fieldWithHooks,
-          };
+          const fieldsContext: GraphileEngine.ContextGraphQLInputObjectTypeFields =
+            {
+              ...commonContext,
+              Self: Self as graphql.GraphQLInputObjectType,
+              GraphQLInputObjectType: rawSpec,
+              fieldWithHooks,
+            };
 
           let rawFields = rawSpec.fields;
           if (typeof rawFields === "function") {
