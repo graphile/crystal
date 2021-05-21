@@ -1193,7 +1193,11 @@ export class Aether {
       );
     }
     if (visitedPlans.has(plan)) {
-      throw new Error("Plan execution recursion error");
+      throw new Error(
+        `Plan execution recursion error: attempted to execute ${plan} again (crystal objects: ${crystalObjects.join(
+          ", ",
+        )})`,
+      );
     }
     visitedPlans.add(plan);
     let resultByCrystalObject = crystalContext.resultByCrystalObjectByPlanId.get(
@@ -1284,7 +1288,9 @@ export class Aether {
           dependencyPlan,
           crystalContext,
           pendingCrystalObjects,
-          visitedPlans,
+          // This is to detect loops, so we don't want changes made inside to
+          // cascade back outside -> clone.
+          new Set([...visitedPlans]),
           depth + 1,
         );
         if (listDepth > 0) {
