@@ -77,13 +77,18 @@ const EMPTY_INDEXES = Object.freeze([] as number[]);
 let depth = 0;
 
 const debugAether = debugFactory("crystal:aether");
-const debug = debugAether.extend("regular");
-const debugVerbose_ = debugAether.extend("verbose");
+const debugPlan = debugAether.extend("plan");
+const debugPlanVerbose_ = debugPlan.extend("verbose");
+const debugExecute = debugAether.extend("plan");
+const debugExecuteVerbose_ = debugPlan.extend("verbose");
 
-const debugVerbose = Object.assign(
-  (t: string, ...args: any[]) => debugVerbose_("  ".repeat(depth) + t, ...args),
-  debugVerbose_,
-);
+const depthWrap = (debugFn: debugFactory.Debugger) =>
+  Object.assign(
+    (t: string, ...args: any[]) => debugFn("  ".repeat(depth) + t, ...args),
+    debugFn,
+  );
+const debugPlanVerbose = depthWrap(debugPlanVerbose_);
+const debugExecuteVerbose = depthWrap(debugExecuteVerbose_);
 
 type TrackedArguments = { [key: string]: InputPlan };
 
@@ -186,33 +191,36 @@ export class Aether<
     globalState.aether = this;
     globalState.parentPathIdentity = GLOBAL_PATH;
     this.variableValuesPlan = new __ValuePlan();
-    debug("Constructed variableValuesPlan %s", this.variableValuesPlan);
+    debugPlan("Constructed variableValuesPlan %s", this.variableValuesPlan);
     // TODO: this should use a more intelligent tracked object plan since the variables are strongly typed (unlike context/rootValue).
     this.trackedVariableValuesPlan = new __TrackedObjectPlan(
       variableValues,
       this.variableValuesPlan,
       this.variableValuesConstraints,
     );
-    debugVerbose(
+    debugPlanVerbose(
       "Constructed trackedVariableValuesPlan %s",
       this.trackedVariableValuesPlan,
     );
     this.contextPlan = new __ValuePlan();
-    debug("Constructed contextPlan %s", this.contextPlan);
+    debugPlan("Constructed contextPlan %s", this.contextPlan);
     this.trackedContextPlan = new __TrackedObjectPlan(
       context,
       this.contextPlan,
       this.contextConstraints,
     );
-    debugVerbose("Constructed trackedContextPlan %s", this.trackedContextPlan);
+    debugPlanVerbose(
+      "Constructed trackedContextPlan %s",
+      this.trackedContextPlan,
+    );
     this.rootValuePlan = new __ValuePlan();
-    debug("Constructed rootValuePlan %s", this.rootValuePlan);
+    debugPlan("Constructed rootValuePlan %s", this.rootValuePlan);
     this.trackedRootValuePlan = new __TrackedObjectPlan(
       rootValue,
       this.rootValuePlan,
       this.rootValueConstraints,
     );
-    debugVerbose(
+    debugPlanVerbose(
       "Constructed trackedRootValuePlan %s",
       this.trackedRootValuePlan,
     );
@@ -769,7 +777,7 @@ export class Aether<
       for (const depId of first) {
         const depPlan = this.plans[depId];
         if (depPlan && !processed.has(depPlan)) {
-          debugVerbose(
+          debugPlanVerbose(
             `Before we can process %c we must process %c`,
             plan,
             depPlan,
@@ -843,7 +851,7 @@ export class Aether<
       });
       loops++;
     } while (replacements > 0);
-    debug("Plan deduplication complete after %o loops", loops);
+    debugPlan("Plan deduplication complete after %o loops", loops);
   }
 
   /**
@@ -909,14 +917,14 @@ export class Aether<
           `deduplicatePlan error: Expected to replace plan ${plan} with one of its (identical) peers; instead found ${replacementPlan}. This is currently forbidden because it could cause confusion during the optimization process, instead apply this change in 'optimize', or make sure that any child selections aren't applied until the optimize/finalize phase so that no mapping is required during deduplicate.`,
         );
       }
-      debugVerbose(
+      debugPlanVerbose(
         "Deduplicated %c with peers %c => %c",
         plan,
         peers,
         replacementPlan,
       );
     } else {
-      debugVerbose("Didn't deduplicate %c with peers %c", plan, peers);
+      debugPlanVerbose("Didn't deduplicate %c with peers %c", plan, peers);
     }
     return replacementPlan;
   }
@@ -932,13 +940,13 @@ export class Aether<
     const replacementPlan = plan.optimize();
     this.optimizedPlans.add(plan);
     if (replacementPlan !== plan) {
-      debugVerbose(
+      debugPlanVerbose(
         "Optimized %c into %c (replaced plan)",
         plan,
         replacementPlan,
       );
     } else {
-      debugVerbose("Optimized %c (same plan)", plan);
+      debugPlanVerbose("Optimized %c (same plan)", plan);
     }
     return replacementPlan;
   }
@@ -1051,7 +1059,7 @@ export class Aether<
     rootValue: unknown,
   ): CrystalContext {
     const rootId = uid("root");
-    debugVerbose("Root id is %c", rootId);
+    debugExecuteVerbose("Root id is %c", rootId);
     const crystalContext: CrystalContext = {
       resultByCrystalObjectByPlanId: new Map(),
       metaByPlanId: Object.create(null),
@@ -1151,7 +1159,11 @@ export class Aether<
     }
     try {
       assert.ok(plan, "No plan in batch?!");
-      debug("Batch executing plan %c with %c", plan, crystalObjects);
+      debugExecuteVerbose(
+        "Batch executing plan %c with %c",
+        plan,
+        crystalObjects,
+      );
       const resultsPromise = this.executePlan(
         plan,
         crystalContext,
@@ -1222,7 +1234,7 @@ export class Aether<
     const pendingCrystalObjectsIndexes = []; // Same length as pendingCrystalObjects
     const crystalObjectCount = crystalObjects.length;
     const result = new Array(crystalObjectCount);
-    debug(
+    debugExecute(
       "%sExecutePlan(%c): executing with %o crystal objects",
       indent,
       plan,
@@ -1233,7 +1245,7 @@ export class Aether<
       const planCrystalObject =
         crystalObject[$$crystalObjectByPathIdentity][plan.parentPathIdentity];
       if (planCrystalObject) {
-        debugVerbose(
+        debugExecuteVerbose(
           "%s Looking for result for %c (for %c)",
           follow,
           planCrystalObject,
@@ -1243,7 +1255,7 @@ export class Aether<
           const previousResult = resultByCrystalObject.get(planCrystalObject);
           result[i] = previousResult;
 
-          debugVerbose(
+          debugExecuteVerbose(
             "  %s result[%o] for %c found: %c",
             follow,
             i,
@@ -1252,7 +1264,7 @@ export class Aether<
           );
           continue;
         } else {
-          debugVerbose(
+          debugExecuteVerbose(
             "  %s no result for %c (%c)",
             follow,
             planCrystalObject,
@@ -1271,7 +1283,7 @@ export class Aether<
     if (pendingCrystalObjectsLength > 0) {
       const dependenciesCount = plan.dependencies.length;
       const dependencyValuesList = new Array(dependenciesCount);
-      debug("%s Executing %o dependencies", follow, dependenciesCount);
+      debugExecute("%s Executing %o dependencies", follow, dependenciesCount);
 
       for (let i = 0; i < dependenciesCount; i++) {
         const dependencyPlanId = plan.dependencies[i];
@@ -1316,7 +1328,7 @@ export class Aether<
               pendingCrystalObject[$$indexesByPathIdentity][
                 dependencyPathIdentity
               ];
-            debugVerbose(
+            debugExecuteVerbose(
               `%s Evaluating indexes for object %c plan %c(%c) => %c`,
               follow,
               pendingCrystalObject,
@@ -1339,7 +1351,7 @@ export class Aether<
               indexes,
             );
             arr[pendingCrystalObjectIndex] = item;
-            debugVerbose(
+            debugExecuteVerbose(
               `  %s result at indexes %c = %c`,
               follow,
               indexes,
@@ -1416,7 +1428,7 @@ export class Aether<
         resultByCrystalObject.set(planCrystalObject, result[j]);
       }
 
-      debugVerbose(
+      debugExecuteVerbose(
         `%sExecutePlan(%s): wrote results for [%s]: %c`,
         indent,
         plan,
@@ -1425,15 +1437,15 @@ export class Aether<
       );
     }
     if (isDev) {
-      if (debugVerbose.enabled) {
-        debugVerbose(
+      if (debugExecuteVerbose.enabled) {
+        debugExecuteVerbose(
           `%sExecutePlan(%s): complete; results: %c`,
           indent,
           plan,
           result,
         );
       } else {
-        debug(`%sExecutePlan(%s): complete`, indent, plan);
+        debugExecute(`%sExecutePlan(%s): complete`, indent, plan);
       }
     }
     return result;
@@ -1467,7 +1479,7 @@ export class Aether<
     let valueId = valueIdByObject.get(key);
     if (valueId === undefined) {
       valueId = uid("val");
-      debug(
+      debugExecute(
         "No id for object %c (parent object of %s) against plan %s, generated %c",
         key,
         pathIdentity,
@@ -1487,11 +1499,11 @@ export class Aether<
    * @internal
    */
   logPlans(): void {
-    if (!debugVerbose.enabled) {
+    if (!debugPlanVerbose.enabled) {
       return;
     }
     const { plans } = this;
-    debugVerbose(
+    debugPlanVerbose(
       "Plans: %s",
       "\n" +
         plans
@@ -1515,7 +1527,7 @@ export class Aether<
   }
 
   logPlansByPath(): void {
-    if (!debugVerbose.enabled) {
+    if (!debugPlanVerbose.enabled) {
       return;
     }
     this.logPlans();
@@ -1548,7 +1560,7 @@ export class Aether<
       print(pathIdentity);
     }
 
-    debugVerbose("Plans by path: %s", "\n" + lines.join("\n"));
+    debugPlanVerbose("Plans by path: %s", "\n" + lines.join("\n"));
   }
 }
 
@@ -1573,7 +1585,7 @@ export function populateValuePlan(
     );
   }
   resultByCrystalObject.set(valueCrystalObject, object ?? ROOT_VALUE_OBJECT);
-  debug("Populated value plan for %s: %c", label, resultByCrystalObject);
+  debugExecute("Populated value plan for %s: %c", label, resultByCrystalObject);
 }
 
 function isNotNullish<T>(a: T | null | undefined): a is T {
