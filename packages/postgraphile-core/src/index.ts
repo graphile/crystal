@@ -1,15 +1,15 @@
+import * as assert from "assert";
 import * as fs from "fs";
 import { defaultPlugins, getBuilder, SchemaBuilder } from "graphile-build";
 import {
   defaultPlugins as pgDefaultPlugins,
-  PgAttribute,
   formatSQLForDebugging,
+  PgAttribute,
 } from "graphile-build-pg";
+import { Secret,SignOptions } from "jsonwebtoken";
 import { Pool, PoolClient } from "pg";
-import { SignOptions, Secret } from "jsonwebtoken";
-import * as assert from "assert";
 
-export { SchemaBuilder, formatSQLForDebugging };
+export { formatSQLForDebugging,SchemaBuilder };
 
 export type mixed = {} | string | number | boolean | undefined | null;
 

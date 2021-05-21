@@ -1,9 +1,9 @@
 /* eslint-disable no-console,curly */
-import PgLogicalDecoding, {
-  changeToRecord,
-  changeToPk,
-} from "./pg-logical-decoding";
 import FatalError from "./fatal-error";
+import PgLogicalDecoding, {
+  changeToPk,
+  changeToRecord,
+} from "./pg-logical-decoding";
 
 export interface Options {
   slotName?: string;

@@ -1,11 +1,11 @@
 jest.unmock("postgraphile-core");
 
-import "mock-fs";
+import { existsSync,readFileSync } from "fs";
+import mockFs from "mock-fs";
+
 import withPgClient from "../../__tests__/utils/withPgClient";
 import { createPostGraphileSchema } from "..";
 import exportPostGraphileSchema from "../schema/exportPostGraphileSchema";
-import mockFs from "mock-fs";
-import { readFileSync, existsSync } from "fs";
 
 // When running jest from the root of the monorepo, the directory is the
 // repository root, so all the file paths are incorrect. I couldn't find a way

@@ -1,65 +1,65 @@
-import { inspect } from "util";
 import * as assert from "assert";
-import { Constraint } from "./constraints";
+import chalk from "chalk";
+import debugFactory from "debug";
 import {
-  GraphQLSchema,
-  OperationDefinitionNode,
+  assertListType,
+  assertObjectType,
+  FieldNode,
   FragmentDefinitionNode,
   GraphQLField,
-  FieldNode,
-  GraphQLObjectType,
-  assertObjectType,
-  GraphQLInterfaceType,
-  GraphQLUnionType,
-  assertListType,
-  SelectionNode,
-  GraphQLInputType,
-  isNonNullType,
-  isListType,
-  isInputObjectType,
-  GraphQLInputObjectType,
   GraphQLInputField,
-  GraphQLOutputType,
+  GraphQLInputObjectType,
+  GraphQLInputType,
+  GraphQLInterfaceType,
   GraphQLList,
   GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLOutputType,
+  GraphQLSchema,
+  GraphQLUnionType,
+  isInputObjectType,
+  isListType,
+  isNonNullType,
+  OperationDefinitionNode,
+  SelectionNode,
 } from "graphql";
-import { Plan, assertFinalized, PolymorphicPlan, ArgumentPlan } from "./plan";
-import {
-  __TrackedObjectPlan,
-  __ValuePlan,
-  __ListItemPlan,
-  assertListCapablePlan,
-} from "./plans";
-import { graphqlCollectFields, getDirective } from "./graphqlCollectFields";
-import { InputPlan, inputPlan, InputObjectPlan } from "./input";
-import {
-  defaultValueToValueNode,
-  uid,
-  UniqueId,
-  isPromise,
-  ROOT_VALUE_OBJECT,
-  arraysMatch,
-} from "./utils";
+import { inspect } from "util";
+
+import { Constraint } from "./constraints";
+import { Deferred } from "./deferred";
+import { isDev } from "./dev";
+import { globalState } from "./global";
+import { getDirective,graphqlCollectFields } from "./graphqlCollectFields";
 import {
   graphqlMergeSelectionSets,
-  typesUsedInSelections,
   interfaceTypeHasNonIntrospectionFieldQueriedInSelections,
+  typesUsedInSelections,
 } from "./graphqlMergeSelectionSets";
+import { InputObjectPlan,InputPlan, inputPlan } from "./input";
 import {
+  $$crystalContext,
+  $$crystalObjectByPathIdentity,
+  $$indexesByPathIdentity,
   Batch,
   CrystalContext,
   CrystalObject,
-  $$crystalContext,
-  $$indexesByPathIdentity,
-  $$crystalObjectByPathIdentity,
 } from "./interfaces";
-import { isDev } from "./dev";
-import { Deferred } from "./deferred";
+import { ArgumentPlan,assertFinalized, Plan, PolymorphicPlan } from "./plan";
+import {
+  __ListItemPlan,
+  __TrackedObjectPlan,
+  __ValuePlan,
+  assertListCapablePlan,
+} from "./plans";
 import { isCrystalObject, newCrystalObject } from "./resolvers";
-import { globalState } from "./global";
-import chalk from "chalk";
-
-import debugFactory from "debug";
+import {
+  arraysMatch,
+  defaultValueToValueNode,
+  isPromise,
+  ROOT_VALUE_OBJECT,
+  uid,
+  UniqueId,
+} from "./utils";
 
 const EMPTY_INDEXES = Object.freeze([] as number[]);
 

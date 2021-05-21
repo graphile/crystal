@@ -1,5 +1,6 @@
-import { GetDataFromParsedResolveInfoFragmentFunction } from "graphile-build";
 import debugFactory from "debug";
+import { GetDataFromParsedResolveInfoFragmentFunction } from "graphile-build";
+
 import { SQL } from "../QueryBuilder";
 import { PgAttribute } from "./PgIntrospectionPlugin";
 

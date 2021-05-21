@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /* eslint-disable no-console,curly */
-import subscribeToLogicalDecoding, { AnnounceCallback } from "./index";
 import WebSocket from "ws";
+
+import subscribeToLogicalDecoding, { AnnounceCallback } from "./index";
 
 const CONNECTION_STRING = process.env.LD_DATABASE_URL;
 const TABLE_PATTERN = process.env.LD_TABLE_PATTERN || "*.*";

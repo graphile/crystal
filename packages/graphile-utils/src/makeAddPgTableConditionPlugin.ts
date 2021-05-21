@@ -1,6 +1,7 @@
 // BELOW HERE, IMPORTS ARE ONLY TYPES (not values)
 import "graphile-build";
-import { SQL, sql as sqlType, QueryBuilder } from "graphile-build-pg";
+
+import { QueryBuilder,SQL, sql as sqlType } from "graphile-build-pg";
 
 declare global {
   namespace GraphileEngine {

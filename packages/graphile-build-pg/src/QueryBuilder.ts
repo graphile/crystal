@@ -1,9 +1,10 @@
-import sql, { SQL, SQLRawValue } from "pg-sql2";
-import isSafeInteger from "lodash/isSafeInteger";
 import chunk from "lodash/chunk";
+import isSafeInteger from "lodash/isSafeInteger";
+import sql, { SQL, SQLRawValue } from "pg-sql2";
+
 import { PgClass, PgType } from "./plugins/PgIntrospectionPlugin";
 
-export { sql, SQL, SQLRawValue };
+export { SQL, sql, SQLRawValue };
 
 const isDev = process.env.POSTGRAPHILE_ENV === "development";
 

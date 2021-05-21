@@ -1,8 +1,9 @@
 jest.mock("graphile-build");
 jest.setTimeout(20000);
 
-import mockFs from "mock-fs";
 import * as graphileBuild from "graphile-build";
+import mockFs from "mock-fs";
+
 import { getPostGraphileBuilder } from "../..";
 
 type MockHack<T extends (...args: any[]) => any> = jest.Mock<ReturnType<T>>;

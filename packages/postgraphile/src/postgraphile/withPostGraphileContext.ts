@@ -1,16 +1,17 @@
 import createDebugger from "debug";
+import { ExecutionResult, Kind,OperationDefinitionNode } from "graphql";
 import jwt from "jsonwebtoken";
 import { Pool, PoolClient, QueryConfig, QueryResult } from "pg";
-import { ExecutionResult, OperationDefinitionNode, Kind } from "graphql";
 import sql, { SQL } from "pg-sql2";
-import { $$pgClient } from "../postgres/inventory/pgClientFromContext";
-import { pluginHookFromOptions } from "./pluginHook";
+import { formatSQLForDebugging } from "postgraphile-core";
+
 import {
+  GraphileClaims,
   mixed,
   WithPostGraphileContextOptions,
-  GraphileClaims,
 } from "../interfaces";
-import { formatSQLForDebugging } from "postgraphile-core";
+import { $$pgClient } from "../postgres/inventory/pgClientFromContext";
+import { pluginHookFromOptions } from "./pluginHook";
 
 const undefinedIfEmpty = (
   o?: Array<string | RegExp> | string | RegExp,

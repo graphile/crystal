@@ -1,19 +1,20 @@
+import assert from "assert";
+import {
+  graphql,
+  GraphQLInt,
+  GraphQLList,
+  GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLScalarType,
+  GraphQLSchema,
+  GraphQLString,
+} from "graphql";
+import { Kind } from "graphql/language";
+
 import {
   parseResolveInfo,
   simplifyParsedResolveInfoFragmentWithType,
 } from "../src";
-import {
-  graphql,
-  GraphQLObjectType,
-  GraphQLNonNull,
-  GraphQLString,
-  GraphQLInt,
-  GraphQLList,
-  GraphQLScalarType,
-  GraphQLSchema,
-} from "graphql";
-import { Kind } from "graphql/language";
-import assert from "assert";
 
 const query = `
   query Test($include: Boolean!, $exclude: Boolean!) {

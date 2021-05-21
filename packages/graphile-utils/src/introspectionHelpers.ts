@@ -1,12 +1,13 @@
 import {
-  PgClass,
-  PgEntityKind,
-  PgConstraint,
   PgAttribute,
+  PgClass,
+  PgConstraint,
   PgEntity,
+  PgEntityKind,
   PgProc,
   RawishIntrospectionResults,
 } from "graphile-build-pg";
+
 import parseIdentifierParts from "./parseIdentifierParts";
 
 export type BuildWithIntrospection = GraphileEngine.BuildBase &

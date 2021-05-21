@@ -1,14 +1,15 @@
-import makeGraphQLJSONType from "../GraphQLJSON";
-import rawParseInterval from "postgres-interval";
 import LRU from "@graphile/lru";
+import rawParseInterval from "postgres-interval";
+
+import makeGraphQLJSONType from "../GraphQLJSON";
+import { SQL } from "../QueryBuilder";
+import { PgTypeModifier } from "./PgBasicsPlugin";
 import {
-  PgEntity,
   PgClass,
   PgConstraint,
+  PgEntity,
   PgType,
 } from "./PgIntrospectionPlugin";
-import { PgTypeModifier } from "./PgBasicsPlugin";
-import { SQL } from "../QueryBuilder";
 
 interface GqlTypeByTypeIdAndModifier {
   [typeId: string]: {

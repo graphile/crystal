@@ -1,10 +1,10 @@
 import { readFile as origReadFile, writeFile as origWriteFile } from "fs";
 import {
+  getIntrospectionQuery,
   graphql,
   GraphQLSchema,
-  getIntrospectionQuery,
-  printSchema,
   lexicographicSortSchema,
+  printSchema,
 } from "graphql";
 import { promisify } from "util";
 

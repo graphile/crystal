@@ -1,26 +1,27 @@
 import debugFactory from "debug";
-import makeNewBuild, { InflectionBase } from "./makeNewBuild";
-import { bindAll } from "./utils";
+import { EventEmitter } from "events";
 import {
-  /* ONLY IMPORT TYPES HERE! */
-  GraphQLObjectTypeConfig,
-  GraphQLSchema,
-  GraphQLSchemaConfig,
-  GraphQLObjectType,
-  GraphQLInputObjectTypeConfig,
-  GraphQLScalarTypeConfig,
-  GraphQLInterfaceTypeConfig,
-  GraphQLUnionTypeConfig,
   GraphQLEnumTypeConfig,
-  GraphQLFieldConfigMap,
+  GraphQLEnumValueConfig,
+  GraphQLEnumValueConfigMap,
   GraphQLFieldConfig,
   GraphQLFieldConfigArgumentMap,
-  GraphQLInputFieldConfigMap,
+  GraphQLFieldConfigMap,
   GraphQLInputFieldConfig,
-  GraphQLEnumValueConfigMap,
-  GraphQLEnumValueConfig,
+  GraphQLInputFieldConfigMap,
+  GraphQLInputObjectTypeConfig,
+  GraphQLInterfaceTypeConfig,
+  GraphQLObjectType,
+  /* ONLY IMPORT TYPES HERE! */
+  GraphQLObjectTypeConfig,
+  GraphQLScalarTypeConfig,
+  GraphQLSchema,
+  GraphQLSchemaConfig,
+  GraphQLUnionTypeConfig,
 } from "graphql";
-import { EventEmitter } from "events";
+
+import makeNewBuild, { InflectionBase } from "./makeNewBuild";
+import { bindAll } from "./utils";
 
 const debug = debugFactory("graphile-builder");
 

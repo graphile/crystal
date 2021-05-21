@@ -1,14 +1,15 @@
 import {
   graphql,
-  GraphQLObjectType,
   GraphQLEnumType,
   GraphQLInt,
-  GraphQLString,
-  GraphQLNonNull,
   GraphQLList,
+  GraphQLNonNull,
+  GraphQLObjectType,
   GraphQLObjectTypeConfig,
   GraphQLScalarType,
+  GraphQLString,
 } from "graphql";
+
 import { buildSchema, defaultPlugins } from "../src";
 
 type ArrayOrNot<T> = T | T[];

@@ -1,14 +1,15 @@
 import {
-  FieldNode,
-  SelectionNode,
-  GraphQLObjectType,
-  GraphQLInterfaceType,
-  GraphQLUnionType,
-  isObjectType,
-  isInterfaceType,
-  isUnionType,
   DirectiveNode,
+  FieldNode,
+  GraphQLInterfaceType,
+  GraphQLObjectType,
+  GraphQLUnionType,
+  isInterfaceType,
+  isObjectType,
+  isUnionType,
+  SelectionNode,
 } from "graphql";
+
 import { Aether } from "./aether";
 import { __TrackedObjectPlan } from "./plans";
 

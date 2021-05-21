@@ -1,12 +1,13 @@
-import * as graphql from "graphql";
 import debugFactory from "debug";
-import { ResolveTree } from "graphql-parse-resolve-info";
-import SchemaBuilder from "../SchemaBuilder";
 import {
-  makeCrystalWrapResolver,
   makeCrystalObjectExtension,
   makeCrystalObjectFieldExtension,
+  makeCrystalWrapResolver,
 } from "graphile-crystal";
+import * as graphql from "graphql";
+import { ResolveTree } from "graphql-parse-resolve-info";
+
+import SchemaBuilder from "../SchemaBuilder";
 
 let recurseDataGeneratorsForFieldWarned = false;
 

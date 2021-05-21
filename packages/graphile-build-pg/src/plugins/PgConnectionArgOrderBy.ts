@@ -1,4 +1,5 @@
 import isString from "lodash/isString";
+
 import { SQL } from "../QueryBuilder";
 import { PgEntityKind } from "./PgIntrospectionPlugin";
 

@@ -1,12 +1,13 @@
 import {
-  PgEntityKind,
-  PgEntity,
   PgAugmentIntrospectionResultsFn,
+  PgEntity,
+  PgEntityKind,
 } from "graphile-build-pg";
 import { inspect } from "util";
+
 import {
-  entityIsIdentifiedBy,
   BuildWithIntrospection,
+  entityIsIdentifiedBy,
 } from "./introspectionHelpers";
 
 export type PgSmartTagFilterFunction<T> = (

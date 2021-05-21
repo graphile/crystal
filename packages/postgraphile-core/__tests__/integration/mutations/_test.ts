@@ -1,9 +1,10 @@
-import { createPostGraphileSchema } from "../../..";
-import { basename } from "path";
-import { withPgClient, getServerVersionNum } from "../../helpers";
 import { promises as fsp } from "fs";
 import { graphql } from "graphql";
 import JSON5 from "json5";
+import { basename } from "path";
+
+import { createPostGraphileSchema } from "../../..";
+import { getServerVersionNum,withPgClient } from "../../helpers";
 
 const kitchenSinkData = () =>
   fsp.readFile(`${__dirname}/../../kitchen-sink-data.sql`, "utf8");

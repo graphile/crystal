@@ -1,6 +1,7 @@
+import chalk from "chalk";
+
 import { getCurrentParentPathIdentity } from "../global";
 import { Plan } from "../plan";
-import chalk from "chalk";
 
 export class __ListItemPlan<
   TParentPlan extends Plan<ReadonlyArray<any>>

@@ -1,8 +1,8 @@
 import {
-  PgProc,
-  PgClass,
   PgAttribute,
+  PgClass,
   PgConstraint,
+  PgProc,
   SmartTagValue,
 } from "./plugins/PgIntrospectionPlugin";
 

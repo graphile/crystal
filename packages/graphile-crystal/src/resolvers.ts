@@ -1,43 +1,44 @@
 import * as assert from "assert";
 import chalk from "chalk";
-import { inspect } from "util";
-import {
-  GraphQLFieldResolver,
-  GraphQLOutputType,
-  defaultFieldResolver,
-  isNonNullType,
-  isListType,
-  isLeafType,
-  getNamedType,
-} from "graphql";
 // import { getAliasFromResolveInfo } from "graphql-parse-resolve-info";
 import debugFactory from "debug";
-import { establishAether } from "./establishAether";
+import {
+  defaultFieldResolver,
+  getNamedType,
+  GraphQLFieldResolver,
+  GraphQLOutputType,
+  isLeafType,
+  isListType,
+  isNonNullType,
+} from "graphql";
 import { Path } from "graphql/jsutils/Path";
+import { inspect } from "util";
+
+import { GLOBAL_PATH, populateValuePlan, ROOT_PATH } from "./aether";
+import { defer, Deferred } from "./deferred";
+import { isDev } from "./dev";
+import { establishAether } from "./establishAether";
+import {
+  $$crystalContext,
+  $$crystalObjectByPathIdentity,
+  $$data,
+  $$id,
+  $$indexes,
+  $$indexesByPathIdentity,
+  $$pathIdentity,
+  Batch,
+  CrystalContext,
+  CrystalObject,
+} from "./interfaces";
 import { Plan } from "./plan";
 import { __ValuePlan } from "./plans";
 import {
-  CrystalObject,
-  CrystalContext,
-  $$crystalObjectByPathIdentity,
-  $$indexesByPathIdentity,
-  $$crystalContext,
-  $$data,
-  $$id,
-  Batch,
-  $$pathIdentity,
-  $$indexes,
-} from "./interfaces";
-import {
-  uid,
-  UniqueId,
   crystalPrint,
   crystalPrintPathIdentity,
   ROOT_VALUE_OBJECT,
+  uid,
+  UniqueId,
 } from "./utils";
-import { defer, Deferred } from "./deferred";
-import { isDev } from "./dev";
-import { GLOBAL_PATH, populateValuePlan, ROOT_PATH } from "./aether";
 
 const debug = debugFactory("crystal:resolvers");
 

@@ -1,5 +1,5 @@
-import { Plan } from "../plan";
 import { CrystalResultsList, CrystalValuesList } from "../interfaces";
+import { Plan } from "../plan";
 
 export class FirstPlan<TData> extends Plan<TData> {
   constructor(parentPlan: Plan<ReadonlyArray<TData>>) {

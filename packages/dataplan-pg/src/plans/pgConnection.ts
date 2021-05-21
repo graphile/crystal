@@ -1,7 +1,8 @@
+import debugFactory from "debug";
 import { CrystalResultsList, CrystalValuesList, Plan } from "graphile-crystal";
+
 import { PgDataSource } from "../datasource";
 import { PgClassSelectPlan } from "./pgClassSelect";
-import debugFactory from "debug";
 
 const debugPlan = debugFactory("datasource:pg:PgConnectionPlan:plan");
 const debugExecute = debugFactory("datasource:pg:PgConnectionPlan:execute");

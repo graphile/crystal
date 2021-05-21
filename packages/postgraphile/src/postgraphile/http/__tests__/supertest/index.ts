@@ -1,7 +1,8 @@
 // tslint:disable no-any
 import * as http from "http";
-import Test from "./lib/test";
+
 import agent from "./lib/agent";
+import Test from "./lib/test";
 
 const methods = http.METHODS.map((m) => m.toLowerCase());
 
@@ -29,4 +30,4 @@ export default (appOrCallback: http.Server | http.RequestListener): Test => {
   return obj;
 };
 
-export { Test, agent };
+export { agent,Test };

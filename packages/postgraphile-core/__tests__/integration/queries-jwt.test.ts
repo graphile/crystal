@@ -1,11 +1,12 @@
-import { graphql } from "graphql";
-import { withPgClient } from "../helpers";
-import { createPostGraphileSchema } from "../..";
 import { promises as fsp } from "fs";
+import { graphql } from "graphql";
 //import { printSchema } from "graphql/utilities";
 //import debugFactory from "debug";
 //const debug = debugFactory("graphile-build:schema");
 import jwt from "jsonwebtoken";
+
+import { createPostGraphileSchema } from "../..";
+import { withPgClient } from "../helpers";
 
 let queryResults: any[] = [];
 

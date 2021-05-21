@@ -1,6 +1,7 @@
 import { PoolClient } from "pg";
-import pgPool from "./pgPool";
+
 import kitchenSinkSchemaSql from "./kitchenSinkSchemaSql";
+import pgPool from "./pgPool";
 
 /**
  * Takes a function implementation of a test, and provides it a Postgres

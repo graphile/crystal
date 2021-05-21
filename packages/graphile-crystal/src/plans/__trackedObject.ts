@@ -1,8 +1,7 @@
 import { Constraint } from "../constraints";
-import { AccessPlan } from "./access";
-import { __ValuePlan } from "./__value";
-
 import { Plan } from "../plan";
+import { __ValuePlan } from "./__value";
+import { AccessPlan } from "./access";
 /**
  * Implements the `__TrackedObjectPlan(aether, object, constraints, path)`
  * algorithm used to allow runtime AND plan-time access to the three special

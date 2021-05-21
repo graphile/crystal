@@ -1,5 +1,5 @@
-import upperFirstAll from "lodash/upperFirst";
 import camelCaseAll from "lodash/camelCase";
+import upperFirstAll from "lodash/upperFirst";
 import plz from "pluralize";
 
 const bindAll = (obj: {}, keys: Array<string>) => {

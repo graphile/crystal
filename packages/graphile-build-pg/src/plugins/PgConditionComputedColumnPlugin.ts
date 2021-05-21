@@ -1,5 +1,6 @@
-import { getComputedColumnDetails } from "./PgComputedColumnsPlugin";
 import assert from "assert";
+
+import { getComputedColumnDetails } from "./PgComputedColumnsPlugin";
 import { PgClass, PgProc, PgType } from "./PgIntrospectionPlugin";
 
 function getCompatibleComputedColumns(

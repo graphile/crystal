@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
-import { Pool, PoolClient } from "pg";
 import { EventEmitter } from "events";
+import { Pool, PoolClient } from "pg";
+
 import FatalError from "./fatal-error";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

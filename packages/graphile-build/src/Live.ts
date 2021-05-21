@@ -1,5 +1,6 @@
-import callbackToAsyncIterator from "./callbackToAsyncIterator";
 import { throttle } from "lodash";
+
+import callbackToAsyncIterator from "./callbackToAsyncIterator";
 
 export type LiveSubscriptionReleaser = () => void;
 export type LiveSubscriptionCallback = () => void;

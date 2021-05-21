@@ -1,6 +1,7 @@
 import isString from "lodash/isString";
+
 import { SQL } from "../QueryBuilder";
-import { OrderByValue, OrderBySpec } from "./PgConnectionArgOrderBy";
+import { OrderBySpec,OrderByValue } from "./PgConnectionArgOrderBy";
 import { PgEntityKind } from "./PgIntrospectionPlugin";
 
 declare global {

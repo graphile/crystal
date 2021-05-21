@@ -1,7 +1,8 @@
-import { graphql, GraphQLSchema } from "graphql";
-import { withPgClient } from "../helpers";
-import { createPostGraphileSchema } from "../..";
 import assert from "assert";
+import { graphql, GraphQLSchema } from "graphql";
+
+import { createPostGraphileSchema } from "../..";
+import { withPgClient } from "../helpers";
 
 let schema: GraphQLSchema;
 

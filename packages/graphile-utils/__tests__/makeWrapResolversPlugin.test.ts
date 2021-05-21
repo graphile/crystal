@@ -1,21 +1,22 @@
-import {
-  gql,
-  makeWrapResolversPlugin,
-  makeExtendSchemaPlugin,
-  ResolverWrapperFn,
-  ResolverWrapperFilterRule,
-} from "../src";
+import assert from "assert";
 import {
   buildSchema,
+  MutationPayloadQueryPlugin,
+  MutationPlugin,
+  QueryPlugin,
   // defaultPlugins,
   StandardTypesPlugin,
-  QueryPlugin,
-  MutationPlugin,
   SubscriptionPlugin,
-  MutationPayloadQueryPlugin,
 } from "graphile-build";
 import { graphql, GraphQLFieldResolver } from "graphql";
-import assert from "assert";
+
+import {
+  gql,
+  makeExtendSchemaPlugin,
+  makeWrapResolversPlugin,
+  ResolverWrapperFilterRule,
+  ResolverWrapperFn,
+} from "../src";
 
 declare global {
   namespace GraphileEngine {

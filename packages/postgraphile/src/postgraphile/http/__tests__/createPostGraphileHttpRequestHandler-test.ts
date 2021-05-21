@@ -1,21 +1,22 @@
-import { GraphQLSchema, GraphQLObjectType, GraphQLString } from "graphql";
+import connect from "connect";
+import { EventEmitter } from "events";
+import express from "express";
+import fastify, { ServerFactoryFunction } from "fastify";
+import { GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql";
+import * as http from "http";
+import * as http2 from "http2";
+import koa from "koa";
+import compress from "koa-compress";
+import koaMount from "koa-mount";
+import { Pool } from "pg";
+
+import {
+  CreateRequestHandlerOptions,
+  GraphQLErrorExtended,
+} from "../../../interfaces";
 import { $$pgClient } from "../../../postgres/inventory/pgClientFromContext";
 import createPostGraphileHttpRequestHandler from "../createPostGraphileHttpRequestHandler";
 import request from "./supertest";
-import * as http from "http";
-import * as http2 from "http2";
-import connect from "connect";
-import express from "express";
-import compress from "koa-compress";
-import koa from "koa";
-import koaMount from "koa-mount";
-import fastify, { ServerFactoryFunction } from "fastify";
-import { EventEmitter } from "events";
-import { Pool } from "pg";
-import {
-  GraphQLErrorExtended,
-  CreateRequestHandlerOptions,
-} from "../../../interfaces";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 

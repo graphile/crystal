@@ -12,18 +12,18 @@ export function debugPlans<T>(callback: () => T): T {
   return result;
 }
 
-export { list, ListPlan } from "./list";
-export { first, FirstPlan } from "./first";
-export { object, ObjectPlan } from "./object";
-export { map, MapPlan, makeMapper } from "./map";
 export { access, AccessPlan } from "./access";
 export { each, EachPlan } from "./each";
+export { first, FirstPlan } from "./first";
+export { list, ListPlan } from "./list";
+export { makeMapper,map, MapPlan } from "./map";
+export { object, ObjectPlan } from "./object";
 
 // Internal plans
 export {
   __ListItemPlan,
-  ListCapablePlan,
   assertListCapablePlan,
+  ListCapablePlan,
 } from "./__listItem";
-export { __ValuePlan } from "./__value";
 export { __TrackedObjectPlan } from "./__trackedObject";
+export { __ValuePlan } from "./__value";

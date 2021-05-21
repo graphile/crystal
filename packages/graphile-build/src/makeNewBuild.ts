@@ -1,28 +1,25 @@
 import "./global";
-import * as graphql from "graphql";
-import {
-  parseResolveInfo,
-  simplifyParsedResolveInfoFragmentWithType,
-  getAliasFromResolveInfo as rawGetAliasFromResolveInfo,
-} from "graphql-parse-resolve-info";
-import { ResolveTree } from "graphql-parse-resolve-info";
-import pluralize from "pluralize";
+
 import LRU from "@graphile/lru";
-import * as semver from "semver";
-import { upperCamelCase, camelCase, constantCase } from "./utils";
-import swallowError from "./swallowError";
-import resolveNode from "./resolveNode";
-import { LiveCoordinator } from "./Live";
-
-import SchemaBuilder from "./SchemaBuilder";
-
-import extend, { indent } from "./extend";
 import chalk from "chalk";
 import { createHash } from "crypto";
+import * as graphql from "graphql";
+import {
+  getAliasFromResolveInfo as rawGetAliasFromResolveInfo,
+  parseResolveInfo,
+ ResolveTree,  simplifyParsedResolveInfoFragmentWithType } from "graphql-parse-resolve-info";
+import pluralize from "pluralize";
+import * as semver from "semver";
 
 // @ts-ignore
 import { version } from "../package.json";
+import extend, { indent } from "./extend";
+import { LiveCoordinator } from "./Live";
 import { makeNewWithHooks } from "./newWithHooks";
+import resolveNode from "./resolveNode";
+import SchemaBuilder from "./SchemaBuilder";
+import swallowError from "./swallowError";
+import { camelCase, constantCase,upperCamelCase } from "./utils";
 
 const makeInitialInflection = () => ({
   pluralize,

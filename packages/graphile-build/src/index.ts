@@ -1,34 +1,35 @@
 import "./global";
+
 import util from "util";
-import SchemaBuilder from "./SchemaBuilder";
+
 import {
-  SwallowErrorsPlugin,
-  StandardTypesPlugin,
-  NodePlugin,
-  QueryPlugin,
-  MutationPlugin,
-  SubscriptionPlugin,
+  AddQueriesToSubscriptionsPlugin,
   ClientMutationIdDescriptionPlugin,
   MutationPayloadQueryPlugin,
-  AddQueriesToSubscriptionsPlugin,
+  MutationPlugin,
+  NodePlugin,
+  QueryPlugin,
+  StandardTypesPlugin,
+  SubscriptionPlugin,
+  SwallowErrorsPlugin,
 } from "./plugins";
 import resolveNode from "./resolveNode";
+import SchemaBuilder from "./SchemaBuilder";
 export { GetDataFromParsedResolveInfoFragmentFunction } from "./makeNewBuild";
-
 export {
-  constantCaseAll,
-  formatInsideUnderscores,
-  upperFirst,
   camelCase,
   constantCase,
-  upperCamelCase,
+  constantCaseAll,
+  formatInsideUnderscores,
   pluralize,
   singularize,
+  upperCamelCase,
+  upperFirst,
 } from "./utils";
 
 export { SchemaBuilder };
 
-export { LiveSource, LiveProvider, LiveMonitor, LiveCoordinator } from "./Live";
+export { LiveCoordinator,LiveMonitor, LiveProvider, LiveSource } from "./Live";
 
 export const getBuilder = async (
   plugins: Array<GraphileEngine.Plugin>,
@@ -73,15 +74,15 @@ export const defaultPlugins: Array<GraphileEngine.Plugin> = [
 ];
 
 export {
-  SwallowErrorsPlugin,
-  StandardTypesPlugin,
-  NodePlugin,
-  QueryPlugin,
-  MutationPlugin,
-  SubscriptionPlugin,
+  AddQueriesToSubscriptionsPlugin,
   ClientMutationIdDescriptionPlugin,
   MutationPayloadQueryPlugin,
-  AddQueriesToSubscriptionsPlugin,
+  MutationPlugin,
+  NodePlugin,
+  QueryPlugin,
   // resolveNode: EXPERIMENTAL, API might change!
   resolveNode,
+  StandardTypesPlugin,
+  SubscriptionPlugin,
+  SwallowErrorsPlugin,
 };

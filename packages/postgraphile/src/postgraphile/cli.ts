@@ -8,26 +8,26 @@
  * (e.g. sourcing modules that affect global state, like dotenv) before any of
  * our other require()s occur.
  */
-import config from "./postgraphilerc";
-
-import { createServer } from "http";
 import chalk from "chalk";
-import program from "commander";
-import jwt from "jsonwebtoken";
-import { parse as parsePgConnectionString } from "pg-connection-string";
-import postgraphile, { getPostgraphileSchemaBuilder } from "./postgraphile";
-import { makePgSmartTagsFromFilePlugin } from "../plugins";
-import { Pool, PoolConfig } from "pg";
 import cluster from "cluster";
-import { makePluginHook, PostGraphilePlugin } from "./pluginHook";
+import program from "commander";
 import debugFactory from "debug";
-import { mixed } from "../interfaces";
+import { existsSync } from "fs";
+import { createServer } from "http";
+import jwt from "jsonwebtoken";
+import { Pool, PoolConfig } from "pg";
+import { parse as parsePgConnectionString } from "pg-connection-string";
+
 // @ts-ignore
 import * as manifest from "../../package.json";
 // @ts-ignore
 import sponsors from "../../sponsors.json";
+import { mixed } from "../interfaces";
+import { makePgSmartTagsFromFilePlugin } from "../plugins";
 import { enhanceHttpServerWithSubscriptions } from "./http/subscriptions";
-import { existsSync } from "fs";
+import { makePluginHook, PostGraphilePlugin } from "./pluginHook";
+import postgraphile, { getPostgraphileSchemaBuilder } from "./postgraphile";
+import config from "./postgraphilerc";
 
 const tagsFile = process.cwd() + "/postgraphile.tags.json5";
 /*

@@ -1,4 +1,5 @@
 import { LiveProvider } from "graphile-build";
+
 import { PgClass } from "./plugins/PgIntrospectionPlugin";
 
 export default class PgLiveProvider extends LiveProvider {

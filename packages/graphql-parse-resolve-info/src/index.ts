@@ -1,24 +1,24 @@
 import assert from "assert";
+import debugFactory from "debug";
 import {
-  getNamedType,
-  isCompositeType,
-  GraphQLObjectType,
-  GraphQLUnionType,
-  GraphQLResolveInfo,
-  GraphQLField,
-  GraphQLCompositeType,
-  GraphQLInterfaceType,
-  GraphQLType,
-  GraphQLNamedType,
   ASTNode,
   FieldNode,
-  SelectionNode,
   FragmentSpreadNode,
+  getNamedType,
+  GraphQLCompositeType,
+  GraphQLField,
+  GraphQLInterfaceType,
+  GraphQLNamedType,
+  GraphQLObjectType,
+  GraphQLResolveInfo,
+  GraphQLType,
+  GraphQLUnionType,
   InlineFragmentNode,
+  isCompositeType,
   NamedTypeNode,
+  SelectionNode,
 } from "graphql";
 import { getArgumentValues } from "graphql/execution/values";
-import debugFactory from "debug";
 
 export interface FieldsByTypeName {
   [str: string]: {

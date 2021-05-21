@@ -1,5 +1,6 @@
-import { Plan } from "../plan";
 import debugFactory from "debug";
+
+import { Plan } from "../plan";
 
 const debugObjectPlan = debugFactory("crystal:ObjectPlan");
 const debugObjectPlanVerbose = debugObjectPlan.extend("verbose");

@@ -1,9 +1,9 @@
 import { CrystalResultsList, CrystalValuesList } from "../interfaces";
 import { Plan } from "../plan";
 import {
-  ListCapablePlan,
-  isListCapablePlan,
   __ListItemPlan,
+  isListCapablePlan,
+  ListCapablePlan,
 } from "./__listItem";
 
 export class EachPlan<TData = any, TResult = any>

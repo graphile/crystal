@@ -1,10 +1,11 @@
-import { PgProc, PgType, SmartTags } from "./PgIntrospectionPlugin";
-import { SQL } from "pg-sql2";
-import debugSql from "./debugSql";
 import chalk from "chalk";
 import { ResolveTree } from "graphql-parse-resolve-info";
+import { SQL } from "pg-sql2";
+
 import QueryBuilder from "../QueryBuilder";
 import { nullableIf } from "../utils";
+import debugSql from "./debugSql";
+import { PgProc, PgType, SmartTags } from "./PgIntrospectionPlugin";
 
 declare global {
   namespace GraphileEngine {

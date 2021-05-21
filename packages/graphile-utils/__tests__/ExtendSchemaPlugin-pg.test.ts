@@ -1,10 +1,11 @@
-import pg, { Pool, Query } from "pg";
-import { graphql } from "graphql";
-import { createPostGraphileSchema } from "postgraphile-core";
-import { makeExtendSchemaPlugin, gql, embed } from "../";
-import { ExecutionResultDataDefault } from "graphql/execution/execute";
 import assert from "assert";
+import { graphql } from "graphql";
+import { ExecutionResultDataDefault } from "graphql/execution/execute";
+import pg, { Pool, Query } from "pg";
+import { createPostGraphileSchema } from "postgraphile-core";
+
 import { QueryBuilder } from "../../../.yarn/$$virtual/graphile-build-pg-virtual-92e0f683b8/1/packages/graphile-build-pg/dist";
+import { embed,gql, makeExtendSchemaPlugin } from "../";
 
 const clean = (data: any): any => {
   if (Array.isArray(data)) {

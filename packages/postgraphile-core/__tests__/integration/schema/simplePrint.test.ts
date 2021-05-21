@@ -1,5 +1,5 @@
-import { withPgClient } from "../../helpers";
 import { createPostGraphileSchema } from "../../..";
+import { withPgClient } from "../../helpers";
 
 test("Simple schema print (no ordering)", () =>
   withPgClient(async (client) => {

@@ -10,16 +10,17 @@
 
 /* tslint:disable no-any */
 import {
-  DocumentNode,
-  GraphQLSchema,
-  GraphQLFieldResolver,
   createSourceEventStream,
+  DocumentNode,
   execute,
-  GraphQLError,
   ExecutionResult,
+  GraphQLError,
+  GraphQLFieldResolver,
+  GraphQLSchema,
 } from "graphql";
-import mapAsyncIterator from "./mapAsyncIterator";
 import { isAsyncIterable } from "iterall";
+
+import mapAsyncIterator from "./mapAsyncIterator";
 
 type mixed = any;
 

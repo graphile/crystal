@@ -1,8 +1,9 @@
-import { makeWrapResolversPlugin, makeChangeNullabilityPlugin } from "../";
-import { graphql } from "graphql";
-import { createPostGraphileSchema } from "postgraphile-core";
-import pg, { Pool } from "pg";
 import assert from "assert";
+import { graphql } from "graphql";
+import pg, { Pool } from "pg";
+import { createPostGraphileSchema } from "postgraphile-core";
+
+import { makeChangeNullabilityPlugin,makeWrapResolversPlugin } from "../";
 
 let pgPool: Pool;
 

@@ -1,6 +1,7 @@
-import pg, { Pool, PoolClient } from "pg";
 import { graphql } from "graphql";
+import pg, { Pool, PoolClient } from "pg";
 import { createPostGraphileSchema } from "postgraphile-core";
+
 import { makeJSONPgSmartTagsPlugin } from "../dist";
 
 let pgPool: Pool;

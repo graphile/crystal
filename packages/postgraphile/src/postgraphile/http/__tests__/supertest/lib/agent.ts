@@ -3,8 +3,9 @@
  * Module dependencies.
  */
 
-import { agent as Agent } from "superagent";
 import * as http from "http";
+import { agent as Agent } from "superagent";
+
 import Test from "./test";
 
 const methods = http.METHODS.map((m) => m.toLowerCase());

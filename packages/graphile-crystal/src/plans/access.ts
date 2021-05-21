@@ -1,7 +1,8 @@
+import chalk from "chalk";
 import debugFactory from "debug";
 import { inspect } from "util";
+
 import { Plan } from "../plan";
-import chalk from "chalk";
 
 // NOTE: this runs at startup so it will NOT notice values that pollute the
 // Object prototype after startup. It is assumed that you are running Node in

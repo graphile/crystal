@@ -1,6 +1,7 @@
-import * as core from "./core";
 import { GraphQLObjectType } from "graphql";
 import { PoolClient } from "pg";
+
+import * as core from "./core";
 
 // WARNING: this function is not guaranteed to be SQL injection safe.
 const offerViewComment = (comment: string) => (pgClient: PoolClient) =>

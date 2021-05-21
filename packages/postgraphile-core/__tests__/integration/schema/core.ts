@@ -1,7 +1,8 @@
-import { lexicographicSortSchema, GraphQLSchema } from "graphql";
-import { withPgClient } from "../../helpers";
-import { createPostGraphileSchema } from "../../..";
+import { GraphQLSchema,lexicographicSortSchema } from "graphql";
 import { PoolClient } from "pg";
+
+import { createPostGraphileSchema } from "../../..";
+import { withPgClient } from "../../helpers";
 
 export const test = (
   schemas: string | string[],

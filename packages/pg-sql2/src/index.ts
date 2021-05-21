@@ -1,5 +1,5 @@
-import * as assert from "assert";
 import LRU from "@graphile/lru";
+import * as assert from "assert";
 import { inspect } from "util";
 
 const isDev = process.env.GRAPHILE_ENV === "development";
@@ -667,10 +667,10 @@ function identifiersAreEquivalent(
 }
 
 export {
-  query as fragment,
-  trueNode as true,
   falseNode as false,
+  query as fragment,
   nullNode as null,
+  trueNode as true,
 };
 
 export interface PgSQL {

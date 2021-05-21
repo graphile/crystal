@@ -1,4 +1,4 @@
-import { parse, buildASTSchema, GraphQLSchema } from "graphql";
+import { buildASTSchema, GraphQLSchema,parse } from "graphql";
 import { printSchema } from "graphql/utilities";
 
 export default function printSchemaOrdered(originalSchema: GraphQLSchema) {

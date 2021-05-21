@@ -1,5 +1,5 @@
-import debugFactory from "debug";
 import chalk from "chalk";
+import debugFactory from "debug";
 
 export function formatSQLForDebugging(sql: string) {
   let colourIndex = 0;

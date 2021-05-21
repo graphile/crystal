@@ -1,9 +1,10 @@
-import { GraphQLSchema, isObjectType } from "graphql";
 import debugFactory from "debug";
+import { GraphQLSchema, isObjectType } from "graphql";
+
 import {
+  $$crystalWrapped,
   crystalWrapResolve,
   crystalWrapSubscribe,
-  $$crystalWrapped,
 } from "./resolvers";
 
 const debug = debugFactory("crystal:enforce");

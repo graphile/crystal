@@ -1,13 +1,14 @@
-import pg, { Pool } from "pg";
-import { graphql } from "graphql";
-import { createPostGraphileSchema } from "postgraphile-core";
-import {
-  makeExtendSchemaPlugin,
-  gql,
-  embed,
-  makeAddPgTableConditionPlugin,
-} from "../dist";
 import assert from "assert";
+import { graphql } from "graphql";
+import pg, { Pool } from "pg";
+import { createPostGraphileSchema } from "postgraphile-core";
+
+import {
+  embed,
+  gql,
+  makeAddPgTableConditionPlugin,
+  makeExtendSchemaPlugin,
+} from "../dist";
 
 const clean = (data: any): any => {
   if (Array.isArray(data)) {

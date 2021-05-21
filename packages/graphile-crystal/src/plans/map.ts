@@ -1,5 +1,6 @@
-import { Plan } from "../plan";
 import chalk from "chalk";
+
+import { Plan } from "../plan";
 
 type ActualKeyByDesiredKey = { [desiredKey: string]: string };
 

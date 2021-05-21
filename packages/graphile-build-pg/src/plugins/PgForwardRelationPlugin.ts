@@ -1,4 +1,5 @@
 import debugFactory from "debug";
+
 import { stringTag } from "./PgBasicsPlugin";
 
 declare global {

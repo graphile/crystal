@@ -1,10 +1,11 @@
-import { PubSub } from "graphql-subscriptions";
-import { EventEmitter } from "events";
 import createDebugger from "debug";
+import { EventEmitter } from "events";
+import { PubSub } from "graphql-subscriptions";
+import { PoolClient } from "pg";
 import { PostGraphilePlugin } from "postgraphile";
+
 import PgGenericSubscriptionPlugin from "./PgGenericSubscriptionPlugin";
 import PgSubscriptionResolverPlugin from "./PgSubscriptionResolverPlugin";
-import { PoolClient } from "pg";
 
 const RECONNECT_BASE_DELAY = 100;
 const RECONNECT_MAX_DELAY = 30000;

@@ -1,16 +1,19 @@
-import React from "react";
-import GraphiQL from "graphiql";
-import { getOperationAST, parse } from "graphql";
-import GraphiQLExplorer from "graphiql-explorer";
-import StorageAPI from "graphiql/dist/utility/StorageAPI";
 import "./postgraphiql.css";
+
+import GraphiQL from "graphiql";
+import StorageAPI from "graphiql/dist/utility/StorageAPI";
+import GraphiQLExplorer from "graphiql-explorer";
 import {
   buildClientSchema,
+  getOperationAST,
+  GraphQLObjectType,
   introspectionQuery,
   isType,
-  GraphQLObjectType,
+  parse,
 } from "graphql";
+import React from "react";
 import { SubscriptionClient } from "subscriptions-transport-ws";
+
 import formatSQL from "../formatSQL";
 
 const defaultQuery = `\

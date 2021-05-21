@@ -1,16 +1,17 @@
-import { Pool, PoolConfig } from "pg";
-import { IncomingMessage, ServerResponse } from "http";
-import { GraphQLSchema } from "graphql";
+import chalk from "chalk";
 import { EventEmitter } from "events";
+import { GraphQLSchema } from "graphql";
+import { IncomingMessage, ServerResponse } from "http";
+import { Pool, PoolConfig } from "pg";
 import {
   createPostGraphileSchema,
   watchPostGraphileSchema,
 } from "postgraphile-core";
+
+import { HttpRequestHandler,mixed } from "../interfaces";
 import createPostGraphileHttpRequestHandler from "./http/createPostGraphileHttpRequestHandler";
-import exportPostGraphileSchema from "./schema/exportPostGraphileSchema";
 import { pluginHookFromOptions } from "./pluginHook";
-import { mixed, HttpRequestHandler } from "../interfaces";
-import chalk from "chalk";
+import exportPostGraphileSchema from "./schema/exportPostGraphileSchema";
 import { debugPgClient } from "./withPostGraphileContext";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

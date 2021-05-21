@@ -1,5 +1,6 @@
 import { PoolClient } from "pg";
 import sql, { SQL } from "pg-sql2";
+
 import debugSql from "./debugSql";
 
 /*

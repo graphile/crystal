@@ -1,8 +1,9 @@
 jest.unmock("postgraphile-core");
 
-import { resolve as resolvePath } from "path";
-import { readFile, readdirSync } from "fs";
+import { readdirSync,readFile } from "fs";
 import { graphql } from "graphql";
+import { resolve as resolvePath } from "path";
+
 import withPgClient from "../../__tests__/utils/withPgClient";
 import { $$pgClient } from "../../postgres/inventory/pgClientFromContext";
 import { createPostGraphileSchema } from "..";

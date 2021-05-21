@@ -1,21 +1,21 @@
+import AddQueriesToSubscriptionsPlugin from "./AddQueriesToSubscriptionsPlugin";
 import ClientMutationIdDescriptionPlugin from "./ClientMutationIdDescriptionPlugin";
 import MutationPayloadQueryPlugin from "./MutationPayloadQueryPlugin";
 import MutationPlugin from "./MutationPlugin";
-import SubscriptionPlugin from "./SubscriptionPlugin";
 import NodePlugin from "./NodePlugin";
 import QueryPlugin from "./QueryPlugin";
 import StandardTypesPlugin from "./StandardTypesPlugin";
+import SubscriptionPlugin from "./SubscriptionPlugin";
 import SwallowErrorsPlugin from "./SwallowErrorsPlugin";
-import AddQueriesToSubscriptionsPlugin from "./AddQueriesToSubscriptionsPlugin";
 
 export {
+  AddQueriesToSubscriptionsPlugin,
   ClientMutationIdDescriptionPlugin,
   MutationPayloadQueryPlugin,
   MutationPlugin,
-  SubscriptionPlugin,
   NodePlugin,
   QueryPlugin,
   StandardTypesPlugin,
+  SubscriptionPlugin,
   SwallowErrorsPlugin,
-  AddQueriesToSubscriptionsPlugin,
 };

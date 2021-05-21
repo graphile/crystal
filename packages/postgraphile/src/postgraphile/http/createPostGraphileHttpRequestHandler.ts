@@ -1,36 +1,36 @@
 /* eslint-disable @typescript-eslint/no-explicit-any,require-atomic-updates */
+import LRU from "@graphile/lru";
+import bodyParser from "body-parser";
+import chalk from "chalk";
+import crypto from "crypto";
+import Debugger from "debug"; // tslint:disable-line variable-name
+import finalHandler from "finalhandler";
 import {
-  Source,
-  parse as parseGraphql,
-  validate as validateGraphql,
+  DocumentNode,
   execute as executeGraphql,
   formatError as defaultFormatError,
   GraphQLError,
   GraphQLSchema,
+  parse as parseGraphql,
   print as printGraphql,
+  Source,
   specifiedRules,
-  DocumentNode,
+  validate as validateGraphql,
 } from "graphql";
-import { extendedFormatError } from "../extendedFormatError";
 import { IncomingMessage, ServerResponse } from "http";
-import { isKoaApp, middleware as koaMiddleware } from "./koaMiddleware";
-import { pluginHookFromOptions } from "../pluginHook";
-import {
-  HttpRequestHandler,
-  CreateRequestHandlerOptions,
-} from "../../interfaces";
-import setupServerSentEvents from "./setupServerSentEvents";
-import withPostGraphileContext from "../withPostGraphileContext";
-import { Context as KoaContext } from "koa";
-import LRU from "@graphile/lru";
-
-import chalk from "chalk";
-import Debugger from "debug"; // tslint:disable-line variable-name
 import httpError from "http-errors";
+import { Context as KoaContext } from "koa";
 import parseUrl from "parseurl";
-import finalHandler from "finalhandler";
-import bodyParser from "body-parser";
-import crypto from "crypto";
+
+import {
+  CreateRequestHandlerOptions,
+  HttpRequestHandler,
+} from "../../interfaces";
+import { extendedFormatError } from "../extendedFormatError";
+import { pluginHookFromOptions } from "../pluginHook";
+import withPostGraphileContext from "../withPostGraphileContext";
+import { isKoaApp, middleware as koaMiddleware } from "./koaMiddleware";
+import setupServerSentEvents from "./setupServerSentEvents";
 
 const ALLOW_EXPLAIN_PLACEHOLDER = "__SHOULD_ALLOW_EXPLAIN__";
 const noop = () => {
@@ -44,7 +44,6 @@ const { createHash } = crypto;
  * client.
  */
 import favicon from "../../assets/favicon.ico";
-
 /**
  * The GraphiQL HTML file as a string. We need it to be a string, because we
  * will use a regular expression to replace some variables.

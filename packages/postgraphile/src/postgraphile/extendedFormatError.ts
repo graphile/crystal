@@ -1,8 +1,9 @@
 import { GraphQLError } from "graphql";
+
 import {
-  mixed,
   GraphQLErrorExtended,
   GraphQLFormattedErrorExtended,
+  mixed,
 } from "../interfaces";
 
 /**

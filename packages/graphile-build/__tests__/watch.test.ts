@@ -1,17 +1,18 @@
+import { EventEmitter } from "events";
 import {
   graphql,
-  GraphQLObjectType,
   GraphQLInt,
   GraphQLNonNull,
-  printSchema,
+  GraphQLObjectType,
   GraphQLSchema,
+  printSchema,
 } from "graphql";
+
 import {
-  getBuilder,
   defaultPlugins as allDefaultPlugins,
+  getBuilder,
   MutationPlugin,
 } from "../src";
-import { EventEmitter } from "events";
 
 const options = {};
 

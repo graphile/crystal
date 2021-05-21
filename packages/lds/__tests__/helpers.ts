@@ -1,4 +1,5 @@
-import { PoolClient, Pool } from "pg";
+import { Pool,PoolClient } from "pg";
+
 import PgLogicalDecoding from "../src/pg-logical-decoding";
 
 export const DATABASE_URL = process.env.LDS_TEST_DATABASE_URL || "lds_test";

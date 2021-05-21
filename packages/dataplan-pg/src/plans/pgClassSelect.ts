@@ -1,20 +1,21 @@
-import { PgDataSource } from "../datasource";
+import debugFactory from "debug";
 import {
+  __ListItemPlan,
+  access,
   CrystalResultsList,
   CrystalValuesList,
-  access,
+  first,
   list,
   map,
   Plan,
-  first,
-  __ListItemPlan,
 } from "graphile-crystal";
-import sql, { SQL, SQLRawValue, arraysMatch } from "pg-sql2";
-import debugFactory from "debug";
+import sql, { arraysMatch,SQL, SQLRawValue } from "pg-sql2";
 import { inspect } from "util";
+
+import { PgDataSource } from "../datasource";
 import { $$CURSOR } from "../symbols";
-import { PgColumnSelectPlan } from "./pgColumnSelect";
 import { PgClassSelectSinglePlan } from "./pgClassSelectSingle";
+import { PgColumnSelectPlan } from "./pgColumnSelect";
 
 const debugPlan = debugFactory("datasource:pg:PgClassSelectPlan:plan");
 const debugExecute = debugFactory("datasource:pg:PgClassSelectPlan:execute");

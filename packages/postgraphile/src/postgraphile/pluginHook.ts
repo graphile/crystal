@@ -1,16 +1,17 @@
-import { AddFlagFn } from "./cli";
-import { Server, IncomingMessage, ServerResponse } from "http";
-import { HttpRequestHandler, CreateRequestHandlerOptions } from "../interfaces";
-import { WithPostGraphileContextFn } from "./withPostGraphileContext";
-// @ts-ignore
-import { version } from "../../package.json";
-import * as graphql from "graphql";
-import { ExecutionParams } from "subscriptions-transport-ws";
 import * as assert from "assert";
-import * as WebSocket from "ws";
+import chalk from "chalk";
+import * as graphql from "graphql";
+import { IncomingMessage, Server, ServerResponse } from "http";
 import httpError from "http-errors";
 import { Pool } from "pg";
-import chalk from "chalk";
+import { ExecutionParams } from "subscriptions-transport-ws";
+import * as WebSocket from "ws";
+
+// @ts-ignore
+import { version } from "../../package.json";
+import { CreateRequestHandlerOptions,HttpRequestHandler } from "../interfaces";
+import { AddFlagFn } from "./cli";
+import { WithPostGraphileContextFn } from "./withPostGraphileContext";
 
 // tslint:disable-next-line no-any
 interface PostGraphileHooks {

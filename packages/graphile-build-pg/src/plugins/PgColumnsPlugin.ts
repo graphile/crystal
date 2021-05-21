@@ -1,8 +1,9 @@
 import { ResolveTree } from "graphql-parse-resolve-info";
-import { PgTypeModifier } from "./PgBasicsPlugin";
-import { PgType } from "./PgIntrospectionPlugin";
+
 import QueryBuilder, { SQL } from "../QueryBuilder";
 import { nullableIf } from "../utils";
+import { PgTypeModifier } from "./PgBasicsPlugin";
+import { PgType } from "./PgIntrospectionPlugin";
 
 type PgGetSelectValueForFieldAndTypeAndModifier = (
   ReturnType: import("graphql").GraphQLOutputType,

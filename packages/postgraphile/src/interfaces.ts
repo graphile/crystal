@@ -1,15 +1,16 @@
 /* tslint:disable:no-any */
+import { EventEmitter } from "events";
 import {
+  DocumentNode,
   GraphQLError,
   GraphQLSchema,
   SourceLocation,
-  DocumentNode,
 } from "graphql";
 import { IncomingMessage, ServerResponse } from "http";
-import { PluginHookFn } from "./postgraphile/pluginHook";
-import { Pool, PoolClient } from "pg";
 import jwt from "jsonwebtoken";
-import { EventEmitter } from "events";
+import { Pool, PoolClient } from "pg";
+
+import { PluginHookFn } from "./postgraphile/pluginHook";
 
 export interface GraphileClaims {
   [claimName: string]: undefined | null | string | number | boolean;

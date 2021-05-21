@@ -1,11 +1,12 @@
 /* eslint-disable no-console */
 import "graphile-build";
 import "graphile-build-pg";
-import WebSocket from "ws";
+
 import subscribeToLogicalDecoding, {
   Announcement,
   LDSubscription,
 } from "@graphile/lds";
+import WebSocket from "ws";
 
 declare global {
   namespace GraphileEngine {

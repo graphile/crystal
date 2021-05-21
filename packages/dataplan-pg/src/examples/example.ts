@@ -13,41 +13,39 @@
  * column, but shows integration of external data into query planning.)
  */
 
-import {
-  GraphQLSchema,
-  GraphQLObjectType,
-  GraphQLList,
-  graphql,
-  GraphQLString,
-  GraphQLObjectTypeConfig,
-  GraphQLFieldConfig,
-  GraphQLFieldConfigMap,
-  ExecutionResult,
-  GraphQLEnumType,
-  GraphQLInt,
-  GraphQLBoolean,
-  GraphQLInputObjectType,
-  Thunk,
-} from "graphql";
-import sql from "pg-sql2";
-import { crystalEnforce } from "graphile-crystal";
-import { Plan } from "graphile-crystal";
-import {
+import {   __ListItemPlan,
   __TrackedObjectPlan,
   __ValuePlan,
-  __ListItemPlan,
+crystalEnforce , Plan ,
 } from "graphile-crystal";
+import {
+  ExecutionResult,
+  graphql,
+  GraphQLBoolean,
+  GraphQLEnumType,
+  GraphQLFieldConfig,
+  GraphQLFieldConfigMap,
+  GraphQLInputObjectType,
+  GraphQLInt,
+  GraphQLList,
+  GraphQLObjectType,
+  GraphQLObjectTypeConfig,
+  GraphQLSchema,
+  GraphQLString,
+  Thunk,
+} from "graphql";
+import { resolve } from "path";
+import { Pool } from "pg";
+import sql from "pg-sql2";
 import prettier from "prettier";
 
-import { Pool } from "pg";
-import { resolve } from "path";
-import { stripAnsi } from "../stripAnsi";
 import {
-  PgDataSource,
   PgClassSelectPlan,
-  PgConnectionPlan,
   PgClassSelectSinglePlan,
+  PgConnectionPlan,
+  PgDataSource,
 } from "..";
+import { stripAnsi } from "../stripAnsi";
 
 const testPool = new Pool({ connectionString: "graphile_crystal" });
 

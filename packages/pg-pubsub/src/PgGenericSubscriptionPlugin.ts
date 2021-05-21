@@ -1,6 +1,7 @@
+import "graphile-build-pg"; // For the types
+
 import debugFactory from "debug";
 import { PubSub } from "graphql-subscriptions";
-import "graphile-build-pg"; // For the types
 
 declare global {
   namespace GraphileEngine {

@@ -1,30 +1,26 @@
-export * from "graphile-utils";
-
 export {
-  mixed,
-  Middleware,
   CreateRequestHandlerOptions,
-  GraphQLFormattedErrorExtended,
   GraphQLErrorExtended,
+  GraphQLFormattedErrorExtended,
   HttpRequestHandler,
+  Middleware,
+  mixed,
   WithPostGraphileContextOptions,
 } from "./interfaces";
-
 export {
-  SchemaBuilder,
-  PostGraphileInflectionPlugin,
-  PostGraphileClassicIdsInflectionPlugin,
-} from "postgraphile-core";
-
-export {
-  postgraphile,
   createPostGraphileSchema,
+  enhanceHttpServerWithSubscriptions,
+  postgraphile,
   watchPostGraphileSchema,
   withPostGraphileContext,
-  enhanceHttpServerWithSubscriptions,
 } from "./postgraphile";
-
 export { makePluginHook, PostGraphilePlugin } from "./postgraphile/pluginHook";
+export * from "graphile-utils";
+export {
+  PostGraphileClassicIdsInflectionPlugin,
+  PostGraphileInflectionPlugin,
+  SchemaBuilder,
+} from "postgraphile-core";
 
 import { postgraphile } from "./postgraphile";
 export default postgraphile;

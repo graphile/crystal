@@ -1,18 +1,18 @@
-import { Client, PoolClient } from "pg";
-import withPgClient, {
-  getPgClientAndReleaserFromConfig,
-} from "../withPgClient";
-import { parseTags } from "../utils";
-import { readFile as rawReadFile } from "fs";
-import debugFactory from "debug";
 import chalk from "chalk";
-import throttle from "lodash/throttle";
+import debugFactory from "debug";
+import { readFile as rawReadFile } from "fs";
 import flatMap from "lodash/flatMap";
-import { makeIntrospectionQuery } from "./introspectionQuery";
-import { describePgEntity } from "./PgBasicsPlugin";
+import throttle from "lodash/throttle";
+import { Client, PoolClient } from "pg";
 
 // @ts-ignore
 import { version } from "../../package.json";
+import { parseTags } from "../utils";
+import withPgClient, {
+  getPgClientAndReleaserFromConfig,
+} from "../withPgClient";
+import { makeIntrospectionQuery } from "./introspectionQuery";
+import { describePgEntity } from "./PgBasicsPlugin";
 
 const debug = debugFactory("graphile-build-pg");
 const WATCH_FIXTURES_PATH = `${__dirname}/../../res/watch-fixtures.sql`;

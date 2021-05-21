@@ -1,35 +1,36 @@
-import SchemaBuilder from "./SchemaBuilder";
 import {
-  InflectionBase,
-  GetDataFromParsedResolveInfoFragmentFunction,
-} from "./makeNewBuild";
-import {
-  /* ONLY IMPORT TYPES HERE! */
-  GraphQLType,
-  GraphQLNamedType,
-  GraphQLInterfaceType,
-  GraphQLObjectTypeConfig,
-  GraphQLSchema,
-  GraphQLResolveInfo,
-  GraphQLSchemaConfig,
-  GraphQLObjectType,
-  GraphQLInputObjectType,
-  GraphQLInputObjectTypeConfig,
-  GraphQLScalarType,
-  GraphQLScalarTypeConfig,
-  GraphQLInterfaceTypeConfig,
-  GraphQLUnionType,
-  GraphQLUnionTypeConfig,
   GraphQLEnumType,
   GraphQLEnumTypeConfig,
-  GraphQLFieldConfigMap,
   GraphQLFieldConfig,
+  GraphQLFieldConfigMap,
   GraphQLInputFieldConfigMap,
+  GraphQLInputObjectType,
+  GraphQLInputObjectTypeConfig,
+  GraphQLInterfaceType,
+  GraphQLInterfaceTypeConfig,
+  GraphQLNamedType,
+  GraphQLObjectType,
+  GraphQLObjectTypeConfig,
   GraphQLOutputType,
+  GraphQLResolveInfo,
+  GraphQLScalarType,
+  GraphQLScalarTypeConfig,
+  GraphQLSchema,
+  GraphQLSchemaConfig,
+  /* ONLY IMPORT TYPES HERE! */
+  GraphQLType,
+  GraphQLUnionType,
+  GraphQLUnionTypeConfig,
 } from "graphql";
-import { LiveCoordinator } from "./Live";
 import { ResolveTree } from "graphql-parse-resolve-info";
+
+import { LiveCoordinator } from "./Live";
+import {
+  GetDataFromParsedResolveInfoFragmentFunction,
+  InflectionBase,
+} from "./makeNewBuild";
 import { NodeFetcher } from "./plugins/NodePlugin";
+import SchemaBuilder from "./SchemaBuilder";
 
 declare global {
   namespace GraphileEngine {

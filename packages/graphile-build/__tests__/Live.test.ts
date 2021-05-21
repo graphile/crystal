@@ -1,11 +1,11 @@
 import {
-  LiveSource,
   LiveCoordinator,
-  LiveProvider,
-  makeAsyncIteratorFromMonitor,
-  LiveSubscriptionCallback,
   LivePredicate,
+  LiveProvider,
+  LiveSource,
+  LiveSubscriptionCallback,
   LiveSubscriptionReleaser,
+  makeAsyncIteratorFromMonitor,
 } from "../src/Live";
 
 // TODO: this file needs a *lot* more tests!

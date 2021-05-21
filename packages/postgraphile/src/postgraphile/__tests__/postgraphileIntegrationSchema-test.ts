@@ -3,11 +3,12 @@
 
 jest.unmock("postgraphile-core");
 
+import { GraphQLSchema } from "graphql";
+import { PoolClient } from "pg";
+
 import printSchemaOrdered from "../../__tests__/utils/printSchemaOrdered";
 import withPgClient from "../../__tests__/utils/withPgClient";
 import { createPostGraphileSchema } from "..";
-import { PoolClient } from "pg";
-import { GraphQLSchema } from "graphql";
 
 // When running jest from the root of the monorepo, the directory is the
 // repository root, so all the file paths are incorrect. I couldn't find a way

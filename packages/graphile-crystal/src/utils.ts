@@ -1,26 +1,27 @@
-import { inspect } from "util";
 import * as assert from "assert";
 import chalk from "chalk";
 import {
-  GraphQLInputType,
-  ValueNode,
-  GraphQLNonNull,
-  GraphQLList,
-  GraphQLInputObjectType,
-  ObjectFieldNode,
-  GraphQLInt,
-  GraphQLString,
-  GraphQLFloat,
-  GraphQLID,
   GraphQLBoolean,
   GraphQLEnumType,
+  GraphQLFloat,
+  GraphQLID,
+  GraphQLInputObjectType,
+  GraphQLInputType,
+  GraphQLInt,
+  GraphQLList,
+  GraphQLNonNull,
   GraphQLScalarType,
+  GraphQLString,
+  ObjectFieldNode,
+  ValueNode,
 } from "graphql";
+import { inspect } from "util";
+
+import { Deferred } from "./deferred";
 import { isDev } from "./dev";
-import { isCrystalObject } from "./resolvers";
 import { CrystalObject } from "./interfaces";
 import { Plan } from "./plan";
-import { Deferred } from "./deferred";
+import { isCrystalObject } from "./resolvers";
 
 /**
  * The parent object is used as the key in `GetValuePlanId()`; for root level

@@ -1,6 +1,6 @@
-import { getComputedColumnDetails } from "./PgComputedColumnsPlugin";
-import { PgProc, PgEntityKind } from "./PgIntrospectionPlugin";
 import QueryBuilder, { SQL } from "../QueryBuilder";
+import { getComputedColumnDetails } from "./PgComputedColumnsPlugin";
+import { PgEntityKind,PgProc } from "./PgIntrospectionPlugin";
 
 export default (function PgOrderComputedColumnsPlugin(builder) {
   builder.hook(

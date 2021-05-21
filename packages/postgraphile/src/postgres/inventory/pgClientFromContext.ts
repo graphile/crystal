@@ -1,6 +1,7 @@
 // TODO: Refactor this module, it has code smell…
-import { mixed } from "../../interfaces";
 import { ClientBase, PoolClient } from "pg";
+
+import { mixed } from "../../interfaces";
 
 export const $$pgClient = "pgClient";
 

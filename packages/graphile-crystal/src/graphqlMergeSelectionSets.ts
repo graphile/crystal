@@ -1,10 +1,11 @@
-import { inspect } from "util";
 import {
   FieldNode,
-  SelectionNode,
-  GraphQLObjectType,
   GraphQLInterfaceType,
+  GraphQLObjectType,
+  SelectionNode,
 } from "graphql";
+import { inspect } from "util";
+
 import { Aether } from "./aether";
 
 /**

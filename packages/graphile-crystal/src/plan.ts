@@ -1,17 +1,18 @@
 import * as assert from "assert";
 import chalk from "chalk";
+import { GraphQLObjectType } from "graphql";
+import { inspect } from "util";
+
 import { Aether, GLOBAL_PATH, ROOT_PATH } from "./aether";
+import { isDev, noop } from "./dev";
 import {
   getCurrentAether,
   getCurrentParentPathIdentity,
   globalState,
 } from "./global";
-import { isDev, noop } from "./dev";
-import { inspect } from "util";
-import { GraphQLObjectType } from "graphql";
 import {
-  CrystalValuesList,
   CrystalResultsList,
+  CrystalValuesList,
   PromiseOrDirect,
 } from "./interfaces";
 import { crystalPrintPathIdentity } from "./utils";

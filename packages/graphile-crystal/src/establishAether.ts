@@ -1,9 +1,10 @@
+import debugFactory from "debug";
 import {
-  GraphQLSchema,
   FragmentDefinitionNode,
+  GraphQLSchema,
   OperationDefinitionNode,
 } from "graphql";
-import debugFactory from "debug";
+
 import { Aether } from "./aether";
 import { matchesConstraints } from "./constraints";
 import { isDev, noop } from "./dev";

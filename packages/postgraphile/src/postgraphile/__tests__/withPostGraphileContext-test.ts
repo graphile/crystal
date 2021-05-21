@@ -1,10 +1,11 @@
 // tslint:disable no-empty
 
-import { $$pgClient } from "../../postgres/inventory/pgClientFromContext";
-import withPostGraphileContext from "../withPostGraphileContext";
-import { readFileSync, readFile } from "fs";
+import { readFile,readFileSync } from "fs";
 import jwt from "jsonwebtoken";
 import { Pool, PoolClient } from "pg";
+
+import { $$pgClient } from "../../postgres/inventory/pgClientFromContext";
+import withPostGraphileContext from "../withPostGraphileContext";
 
 beforeEach(() => {
   jest.restoreAllMocks();

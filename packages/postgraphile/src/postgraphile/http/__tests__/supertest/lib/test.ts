@@ -2,12 +2,12 @@
  * Module dependencies.
  */
 
-import * as request from "superagent";
-import * as util from "util";
+import * as assert from "assert";
 import * as http from "http";
 import * as https from "https";
-import * as assert from "assert";
 import { AddressInfo } from "net";
+import * as request from "superagent";
+import * as util from "util";
 
 // @ts-ignore
 const Request: any = request.Request;

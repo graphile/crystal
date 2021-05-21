@@ -1,14 +1,15 @@
-import { makeProcessSchemaPlugin } from "../";
 import {
   buildSchema,
+  MutationPayloadQueryPlugin,
+  MutationPlugin,
+  QueryPlugin,
   // defaultPlugins,
   StandardTypesPlugin,
-  QueryPlugin,
-  MutationPlugin,
   SubscriptionPlugin,
-  MutationPayloadQueryPlugin,
 } from "graphile-build";
-import { GraphQLSchema, GraphQLObjectType, GraphQLString } from "graphql";
+import { GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql";
+
+import { makeProcessSchemaPlugin } from "../";
 
 const makeSchemaWithSpy = (spy: any) =>
   buildSchema(

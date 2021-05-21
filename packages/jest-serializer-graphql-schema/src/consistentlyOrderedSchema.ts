@@ -1,19 +1,19 @@
 import {
-  GraphQLSchema,
-  GraphQLNamedType,
   GraphQLDirective,
-  GraphQLInputObjectType,
   GraphQLEnumType,
-  GraphQLUnionType,
+  GraphQLInputObjectType,
   GraphQLInterfaceType,
+  GraphQLNamedType,
   GraphQLObjectType,
-  isObjectType,
-  isScalarType,
-  isIntrospectionType,
-  isInterfaceType,
-  isUnionType,
+  GraphQLSchema,
+  GraphQLUnionType,
   isEnumType,
   isInputObjectType,
+  isInterfaceType,
+  isIntrospectionType,
+  isObjectType,
+  isScalarType,
+  isUnionType,
 } from "graphql";
 
 type Maybe<T> = null | undefined | T;
