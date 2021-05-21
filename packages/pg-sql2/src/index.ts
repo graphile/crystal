@@ -597,9 +597,17 @@ export function arraysMatch<T>(
   return true;
 }
 
-export function isEquivalent(sql1: SQL | symbol, sql2: SQL | symbol): boolean {
+export function isEquivalent(
+  sql1: SQL | symbol,
+  sql2: SQL | symbol,
+  symbolSubstitutes?: Map<symbol, symbol>,
+): boolean {
   if (typeof sql1 === "symbol") {
-    return sql2 === sql1;
+    if (symbolSubstitutes?.has(sql1)) {
+      return symbolSubstitutes.get(sql1) === sql2;
+    } else {
+      return sql2 === sql1;
+    }
   } else if (typeof sql2 === "symbol") {
     return false;
   }
@@ -607,7 +615,9 @@ export function isEquivalent(sql1: SQL | symbol, sql2: SQL | symbol): boolean {
     if (!Array.isArray(sql2)) {
       return false;
     }
-    return arraysMatch(sql1, sql2, isEquivalent);
+    return arraysMatch(sql1, sql2, (a, b) =>
+      isEquivalent(a, b, symbolSubstitutes),
+    );
   } else if (Array.isArray(sql2)) {
     return false;
   } else {
@@ -628,13 +638,15 @@ export function isEquivalent(sql1: SQL | symbol, sql2: SQL | symbol): boolean {
         if (sql2.type !== sql1.type) {
           return false;
         }
-        return isEquivalent(sql1.content, sql2.content);
+        return isEquivalent(sql1.content, sql2.content, symbolSubstitutes);
       }
       case "IDENTIFIER": {
         if (sql2.type !== sql1.type) {
           return false;
         }
-        return arraysMatch(sql1.names, sql2.names, identifiersAreEquivalent);
+        return arraysMatch(sql1.names, sql2.names, (a, b) =>
+          identifiersAreEquivalent(a, b, symbolSubstitutes),
+        );
       }
       case "SYMBOL_ALIAS": {
         // TODO
@@ -655,13 +667,18 @@ type IdentifierName = SQLIdentifierNode["names"] extends ReadonlyArray<infer U>
 function identifiersAreEquivalent(
   ids1: IdentifierName,
   ids2: IdentifierName,
+  symbolSubstitutes?: Map<symbol, symbol>,
 ): boolean {
   if (typeof ids1 === "string") {
     return ids2 === ids1;
   } else if (typeof ids2 === "string") {
     return false;
   }
-  return ids1.n === ids2.n && ids1.s === ids2.s;
+  const namesMatch = ids1.n === ids2.n;
+  const symbolsMatch = symbolSubstitutes?.has(ids1.s)
+    ? symbolSubstitutes.get(ids1.s) === ids2.s
+    : ids1.s === ids2.s;
+  return namesMatch && symbolsMatch;
 }
 
 export {
