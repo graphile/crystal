@@ -26,9 +26,9 @@ import { inspect } from "util";
 import type { Deferred } from "./deferred";
 import { isDev } from "./dev";
 import type {
-  CrystalObject,
-  BaseGraphQLContext,
   BaseGraphQLArguments,
+  BaseGraphQLContext,
+  CrystalObject,
   GraphileCrystalFieldConfig,
 } from "./interfaces";
 import { Plan } from "./plan";

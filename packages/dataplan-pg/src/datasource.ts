@@ -3,13 +3,13 @@ import * as assert from "assert";
 import chalk from "chalk";
 import debugFactory from "debug";
 import type {
+  __ValuePlan,
   Aether,
   BaseGraphQLContext,
   CrystalValuesList,
   Deferred,
   ObjectPlan,
   Plan,
-  __ValuePlan,
 } from "graphile-crystal";
 import { aether, defer, object } from "graphile-crystal";
 import type { Pool } from "pg";

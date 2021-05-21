@@ -1,7 +1,7 @@
 import type { Aether } from "../aether";
 import { getCurrentAether, globalState } from "../global";
-import { BaseGraphQLContext } from "../interfaces";
-import { __ValuePlan } from "./__value";
+import type { BaseGraphQLContext } from "../interfaces";
+import type { __ValuePlan } from "./__value";
 
 export function aether(): Aether {
   return getCurrentAether();

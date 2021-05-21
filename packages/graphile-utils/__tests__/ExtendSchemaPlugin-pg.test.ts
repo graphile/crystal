@@ -1,7 +1,7 @@
 import assert from "assert";
+import type { QueryBuilder } from "graphile-build-pg";
 import { graphql } from "graphql";
 import { ExecutionResultDataDefault } from "graphql/execution/execute";
-import type { QueryBuilder } from "graphile-build-pg";
 import type { Pool } from "pg";
 import pg, { Query } from "pg";
 import { createPostGraphileSchema } from "postgraphile-core";

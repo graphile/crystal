@@ -1,4 +1,9 @@
-import sql from "pg-sql2";
+import type {
+  __ValuePlan,
+  BaseGraphQLContext,
+  BaseGraphQLRootValue,
+} from "graphile-crystal";
+import { context, crystalEnforce, object, objectSpec } from "graphile-crystal";
 import {
   GraphQLBoolean,
   GraphQLEnumType,
@@ -9,22 +14,11 @@ import {
   GraphQLSchema,
   GraphQLString,
 } from "graphql";
-import {
-  PgDataSource,
-  PgClassSelectPlan,
-  PgConnectionPlan,
-  PgClassSelectSinglePlan,
-} from "../src";
-import {
-  crystalEnforce,
-  context,
-  object,
-  objectSpec,
-  __ValuePlan,
-  BaseGraphQLRootValue,
-} from "graphile-crystal";
-import type { BaseGraphQLContext } from "graphile-crystal";
-import { PgDataSourceContext, WithPgClient } from "../src/datasource";
+import sql from "pg-sql2";
+
+import type { PgClassSelectSinglePlan } from "../src";
+import { PgClassSelectPlan, PgConnectionPlan, PgDataSource } from "../src";
+import type { PgDataSourceContext, WithPgClient } from "../src/datasource";
 
 // These are what the generics extend from
 

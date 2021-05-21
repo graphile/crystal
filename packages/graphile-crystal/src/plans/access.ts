@@ -1,8 +1,8 @@
 import chalk from "chalk";
 import debugFactory from "debug";
 import { inspect } from "util";
-import { CrystalResultsList, CrystalValuesList } from "../interfaces";
 
+import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
 import { Plan } from "../plan";
 
 // NOTE: this runs at startup so it will NOT notice values that pollute the

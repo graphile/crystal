@@ -14,9 +14,9 @@
  */
 
 import type {
-  BaseGraphQLContext,
   __TrackedObjectPlan,
   __ValuePlan,
+  BaseGraphQLContext,
 } from "graphile-crystal";
 import { __ListItemPlan } from "graphile-crystal";
 import type { ExecutionResult } from "graphql";
@@ -24,8 +24,8 @@ import { graphql } from "graphql";
 import { resolve } from "path";
 import { Pool } from "pg";
 import prettier from "prettier";
-import { WithPgClient } from "../src/datasource";
 
+import type { WithPgClient } from "../src/datasource";
 import { stripAnsi } from "../src/stripAnsi";
 import { schema } from "./exampleSchema";
 

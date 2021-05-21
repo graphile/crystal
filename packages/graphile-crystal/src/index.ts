@@ -9,14 +9,14 @@ export { Aether } from "./aether";
 export { defer, Deferred } from "./deferred";
 export { crystalEnforce } from "./enforceCrystal";
 export {
+  BaseGraphQLArguments,
+  BaseGraphQLContext,
+  BaseGraphQLRootValue,
+  BaseGraphQLVariables,
   CrystalResultsList,
   CrystalValuesList,
-  PlanResolver,
   GraphileCrystalFieldConfig,
-  BaseGraphQLContext,
-  BaseGraphQLArguments,
-  BaseGraphQLVariables,
-  BaseGraphQLRootValue,
+  PlanResolver,
 } from "./interfaces";
 export { Plan } from "./plan";
 export {
@@ -26,8 +26,8 @@ export {
   access,
   AccessPlan,
   aether,
-  context,
   assertListCapablePlan,
+  context,
   debugPlans,
   each,
   EachPlan,

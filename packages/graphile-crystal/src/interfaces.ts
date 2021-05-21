@@ -1,7 +1,8 @@
-import { GraphQLFieldConfig } from "graphql";
+import type { GraphQLFieldConfig } from "graphql";
+
 import type { Deferred } from "./deferred";
 import type { Plan } from "./plan";
-import { __TrackedObjectPlan } from "./plans";
+import type { __TrackedObjectPlan } from "./plans";
 import type { UniqueId } from "./utils";
 
 export const $$crystalContext = Symbol("context");

@@ -27,6 +27,7 @@ import {
 } from "graphql";
 import { inspect } from "util";
 
+import { GLOBAL_PATH, ROOT_PATH } from "./constants";
 import type { Constraint } from "./constraints";
 import type { Deferred } from "./deferred";
 import { isDev } from "./dev";
@@ -69,7 +70,6 @@ import {
   ROOT_VALUE_OBJECT,
   uid,
 } from "./utils";
-import { GLOBAL_PATH, ROOT_PATH } from "./constants";
 
 const EMPTY_INDEXES = Object.freeze([] as number[]);
 
