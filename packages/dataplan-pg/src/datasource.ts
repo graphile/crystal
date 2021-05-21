@@ -60,17 +60,19 @@ export type WithPgClient = <T>(
   callback: (client: PgClient) => T | Promise<T>,
 ) => Promise<T>;
 
+export interface PgClientQuery {
+  /** The query string */
+  text: string;
+  /** The values to put in the placeholders */
+  values?: Array<any>;
+  /** An optimisation, to avoid you having to decode column names */
+  arrayMode?: boolean;
+  /** For prepared statements */
+  name?: string;
+}
+
 export interface PgClient {
-  query<TData>(opts: {
-    /** The query string */
-    text: string;
-    /** The values to put in the placeholders */
-    values?: Array<any>;
-    /** An optimisation, to avoid you having to decode column names */
-    arrayMode?: boolean;
-    /** For prepared statements */
-    name?: string;
-  }): Promise<{ rows: TData[] }>;
+  query<TData>(opts: PgClientQuery): Promise<{ rows: readonly TData[] }>;
 
   // TODO: add transaction support
 }
@@ -260,9 +262,9 @@ export class PgDataSource<
             } catch (e) {
               error = e;
             }
-            console.log();
-            console.log();
-            console.log(`\
+            debugVerbose(`\
+
+
 ${"👇".repeat(30)}
 # SQL QUERY:
 ${formatSQLForDebugging(text)}
@@ -280,9 +282,9 @@ ${inspect(error, { colors: true })}`
 ${inspect(queryResult.rows, { colors: true, depth: 6 })}`
 }
 ${"👆".repeat(30)}
+
+
 `);
-            console.log();
-            console.log();
             if (error) {
               remainingDeferreds.forEach((d) => d.reject(error));
               return Promise.reject(error);

@@ -24,7 +24,7 @@ import { graphql } from "graphql";
 import { resolve } from "path";
 import { Pool } from "pg";
 import prettier from "prettier";
-import { PgClient, WithPgClient } from "../src/datasource";
+import { WithPgClient } from "../src/datasource";
 
 import { stripAnsi } from "../src/stripAnsi";
 import { schema } from "./exampleSchema";
