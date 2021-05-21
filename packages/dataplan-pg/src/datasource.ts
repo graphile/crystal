@@ -4,9 +4,12 @@ import chalk from "chalk";
 import debugFactory from "debug";
 import type {
   Aether,
+  BaseGraphQLContext,
   CrystalValuesList,
   Deferred,
+  ObjectPlan,
   Plan,
+  __ValuePlan,
 } from "graphile-crystal";
 import { aether, defer, object } from "graphile-crystal";
 import type { Pool } from "pg";
@@ -19,7 +22,7 @@ import type { PgClassSelectPlan } from "./plans/pgClassSelect";
 const debug = debugFactory("datasource:pg:PgDataSource");
 const debugVerbose = debug.extend("verbose");
 
-export abstract class DataSource<
+abstract class DataSource<
   TData extends any,
   TInput extends any,
   TOptions extends { [key: string]: any }
@@ -41,12 +44,40 @@ export abstract class DataSource<
   ): Promise<{ values: ReadonlyArray<TData> }>;
 }
 
-type PgDataSourceInput = { context: any; identifiers: ReadonlyArray<any> };
-type PgDataSourceExecuteOptions = {
+export type PgDataSourceInput = {
+  context: PgDataSourceContext;
+  identifiers: ReadonlyArray<any>;
+};
+export type PgDataSourceExecuteOptions = {
   text: string;
   rawSqlValues: Array<SQLRawValue | symbol>;
   identifierIndex?: number | null;
   identifierSymbol?: symbol | null;
+};
+
+export type WithPgClient = <T>(
+  pgSettings: { [key: string]: string },
+  callback: (client: PgClient) => T | Promise<T>,
+) => Promise<T>;
+
+export interface PgClient {
+  query<TData>(opts: {
+    /** The query string */
+    text: string;
+    /** The values to put in the placeholders */
+    values?: Array<any>;
+    /** An optimisation, to avoid you having to decode column names */
+    arrayMode?: boolean;
+    /** For prepared statements */
+    name?: string;
+  }): Promise<{ rows: TData[] }>;
+
+  // TODO: add transaction support
+}
+
+export type PgDataSourceContext<TSettings = any> = {
+  pgSettings: TSettings;
+  withPgClient: WithPgClient;
 };
 
 /**
@@ -87,7 +118,7 @@ export class PgDataSource<
   constructor(
     public tableIdentifier: SQL,
     public name: string,
-    public readonly pool: Pool,
+    private contextCallback: () => ObjectPlan<PgDataSourceContext>,
   ) {
     super();
   }
@@ -97,8 +128,7 @@ export class PgDataSource<
   }
 
   public context(): Plan<any> {
-    const a: Aether = aether();
-    return object({ pgSettings: a.contextPlan.get("pgSettings") });
+    return this.contextCallback();
   }
 
   public applyAuthorizationChecksToPlan($plan: PgClassSelectPlan<this>): void {
@@ -118,17 +148,22 @@ export class PgDataSource<
     const results: Deferred<Array<TRow>>[] = new Array(valuesCount);
 
     // Group by context
-    const groupMap = new Map();
+    const groupMap = new Map<
+      PgDataSourceContext,
+      Array<{ identifiers: readonly any[]; resultIndex: number }>
+    >();
     for (
       let resultIndex = 0, l = values.length;
       resultIndex < l;
       resultIndex++
     ) {
       const { context, identifiers } = values[resultIndex];
-      if (!groupMap.get(context)) {
-        groupMap.set(context, []);
+      let entry = groupMap.get(context);
+      if (!entry) {
+        entry = [];
+        groupMap.set(context, entry);
       }
-      groupMap.get(context).push({ identifiers, resultIndex });
+      entry.push({ identifiers, resultIndex });
     }
 
     // For each context, run the relevant fetches
@@ -213,11 +248,15 @@ export class PgDataSource<
               // TODO: we could probably make this more efficient by grouping the
               // deferreds further, DataLoader-style, and running one SQL query for
               // everything.
-              queryResult = await this.pool.query({
-                text,
-                values: sqlValues,
-                rowMode: "array",
-              });
+              queryResult = await context.withPgClient(
+                context.pgSettings,
+                (client) =>
+                  client.query({
+                    text,
+                    values: sqlValues,
+                    arrayMode: true,
+                  }),
+              );
             } catch (e) {
               error = e;
             }
