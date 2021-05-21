@@ -88,8 +88,8 @@ it("{forums{name}}", async () => {
     __: queries.map((q) => q.text).join("\n\n"),
   }).toMatchInlineSnapshot(`
     select 
-      __forums_1."name"::text as "0"
-    from app_public.forums as __forums_1
+      __forums__."name"::text as "0"
+    from app_public.forums as __forums__
     where (
       true /* authorization checks */
     )
@@ -121,8 +121,8 @@ it("{forums{a:name b:name}}", async () => {
     __: queries.map((q) => q.text).join("\n\n"),
   }).toMatchInlineSnapshot(`
     select 
-      __forums_1."name"::text as "0"
-    from app_public.forums as __forums_1
+      __forums__."name"::text as "0"
+    from app_public.forums as __forums__
     where (
       true /* authorization checks */
     )
@@ -163,8 +163,8 @@ it("{a:forums{a:name b:name}b:forums{a:name b:name}}", async () => {
     __: queries.map((q) => q.text).join("\n\n"),
   }).toMatchInlineSnapshot(`
     select 
-      __forums_1."name"::text as "0"
-    from app_public.forums as __forums_1
+      __forums__."name"::text as "0"
+    from app_public.forums as __forums__
     where (
       true /* authorization checks */
     )
@@ -206,9 +206,9 @@ it("{a:forums{id a:name b:name}b:forums{a:name b:name}}", async () => {
     __: queries.map((q) => q.text).join("\n\n"),
   }).toMatchInlineSnapshot(`
     select 
-      __forums_1."id"::text as "0",
-      __forums_1."name"::text as "1"
-    from app_public.forums as __forums_1
+      __forums__."id"::text as "0",
+      __forums__."name"::text as "1"
+    from app_public.forums as __forums__
     where (
       true /* authorization checks */
     )
@@ -241,9 +241,9 @@ it("{forums{name self{id name}}}", async () => {
     __: queries.map((q) => q.text).join("\n\n"),
   }).toMatchInlineSnapshot(`
     select 
-      __forums_1."name"::text as "0",
-      __forums_1."id"::text as "1"
-    from app_public.forums as __forums_1
+      __forums__."name"::text as "0",
+      __forums__."id"::text as "1"
+    from app_public.forums as __forums__
     where (
       true /* authorization checks */
     )
@@ -304,23 +304,23 @@ it("{forums{name messagesList(limit,condition,includeArchived){body author{usern
     __: queries.map((q) => q.text).join("\n\n"),
   }).toMatchInlineSnapshot(`
     select 
-      __forums_1."name"::text as "0",
+      __forums__."name"::text as "0",
       array(
         select array[
-          __messages_1."body"::text,
-          __users_1."username"::text,
-          __users_1."gravatar_url"::text,
-          __messages_1."author_id"::text
+          __messages__."body"::text,
+          __users__."username"::text,
+          __users__."gravatar_url"::text,
+          __messages__."author_id"::text
         ]::text[]
-        from app_public.messages as __messages_1
-        left outer join app_public.users as __users_1
-        on ((__messages_1."author_id"::uuid = __users_1.id))
+        from app_public.messages as __messages__
+        left outer join app_public.users as __users__
+        on ((__messages__."author_id"::uuid = __users__.id))
         where (
-          __forums_1."id"::uuid = __messages_1.forum_id
+          __forums__."id"::uuid = __messages__.forum_id
         )
       ) as "1",
-      __forums_1."id"::text as "2"
-    from app_public.forums as __forums_1
+      __forums__."id"::text as "2"
+    from app_public.forums as __forums__
     where (
       true /* authorization checks */
     )
@@ -379,13 +379,13 @@ it("{allMessagesConnection{edges{cursor node{body author{username gravatarUrl}}}
   }).toMatchInlineSnapshot(`
     select 
       424242 /* TODO: CURSOR */ as "0",
-      __messages_1."body"::text as "1",
-      __users_1."username"::text as "2",
-      __users_1."gravatar_url"::text as "3",
-      __messages_1."author_id"::text as "4"
-    from app_public.messages as __messages_1
-    left outer join app_public.users as __users_1
-    on ((__messages_1."author_id"::uuid = __users_1.id))
+      __messages__."body"::text as "1",
+      __users__."username"::text as "2",
+      __users__."gravatar_url"::text as "3",
+      __messages__."author_id"::text as "4"
+    from app_public.messages as __messages__
+    left outer join app_public.users as __users__
+    on ((__messages__."author_id"::uuid = __users__.id))
     where (
       true /* authorization checks */
     )
@@ -500,28 +500,28 @@ it("{forums{name messagesConnection(...){nodes{body author{...}} edges{cursor no
     __: queries.map((q) => q.text).join("\n\n"),
   }).toMatchInlineSnapshot(`
     select 
-      __forums_1."name"::text as "0",
+      __forums__."name"::text as "0",
       array(
         select array[
-          __messages_1."body"::text,
-          __users_1."username"::text,
-          __users_1."gravatar_url"::text,
-          __messages_1."author_id"::text,
+          __messages__."body"::text,
+          __users__."username"::text,
+          __users__."gravatar_url"::text,
+          __messages__."author_id"::text,
           424242 /* TODO: CURSOR */,
           __users_2."username"::text,
           __users_2."gravatar_url"::text
         ]::text[]
-        from app_public.messages as __messages_1
-        left outer join app_public.users as __users_1
-        on ((__messages_1."author_id"::uuid = __users_1.id))
+        from app_public.messages as __messages__
+        left outer join app_public.users as __users__
+        on ((__messages__."author_id"::uuid = __users__.id))
         left outer join app_public.users as __users_2
-        on ((__messages_1."author_id"::uuid = __users_2.id))
+        on ((__messages__."author_id"::uuid = __users_2.id))
         where (
-          __forums_1."id"::uuid = __messages_1.forum_id
+          __forums__."id"::uuid = __messages__.forum_id
         )
       ) as "1",
-      __forums_1."id"::text as "2"
-    from app_public.forums as __forums_1
+      __forums__."id"::text as "2"
+    from app_public.forums as __forums__
     where (
       true /* authorization checks */
     )

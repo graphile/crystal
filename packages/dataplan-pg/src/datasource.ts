@@ -347,6 +347,6 @@ function formatSQLForDebugging(sql: string) {
     return colours[str].bold.call(null, str);
   }
 
-  const colouredSql = sql.replace(/__[a-z0-9_]+_[0-9]+(?:__)?/g, colourize);
+  const colouredSql = sql.replace(/__[a-z0-9_]+(?:_[0-9]+|__)/g, colourize);
   return colouredSql;
 }

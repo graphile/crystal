@@ -242,9 +242,10 @@ export function compile(sql: SQL): {
     }
     const number = ++descCounter[safeDesc];
 
-    // NOTE: we don't omit number for the first instance because
-    // safeDesc might end in, e.g., `_2` and cause conflicts later.
-    const identifierForSymbol = `__${safeDesc}_${number}`;
+    // NOTE: we don't omit the suffix for the first instance because safeDesc
+    // might end in, e.g., `_1` and cause conflicts later; however we do
+    // replace `_1` with `__`.
+    const identifierForSymbol = `__${safeDesc}_${number === 1 ? "_" : number}`;
 
     // Store so this symbol gets the same identifier next time
     symbolToIdentifier.set(symbol, identifierForSymbol);
