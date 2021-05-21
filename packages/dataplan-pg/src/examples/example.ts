@@ -13,7 +13,6 @@
  * column, but shows integration of external data into query planning.)
  */
 
-import chalk from "chalk";
 import {
   GraphQLSchema,
   GraphQLObjectType,
