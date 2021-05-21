@@ -4,9 +4,7 @@ import type { Plugin } from "pretty-format";
 
 import { consistentlyOrderedSchema } from "./consistentlyOrderedSchema";
 
-export const test: Plugin["test"] = (val: any) => {
-  return isSchema(val);
-};
-export const serialize = (schema: GraphQLSchema) => {
+export const test: Plugin["test"] = (val) => isSchema(val);
+export const serialize = (schema: GraphQLSchema): string => {
   return printSchema(consistentlyOrderedSchema(schema));
 };

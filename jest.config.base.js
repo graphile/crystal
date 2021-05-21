@@ -15,6 +15,7 @@ module.exports = (dir) => {
     roots: [`<rootDir>`],
     snapshotSerializers: [
       `${__dirname}/packages/jest-serializer-graphql-schema`,
+      `${__dirname}/packages/jest-serializer-simple`,
     ],
 
     rootDir: dir,

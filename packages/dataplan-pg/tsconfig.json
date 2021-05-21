@@ -6,5 +6,9 @@
     "outDir": "./dist"
   },
   "include": ["src"],
-  "references": [{ "path": "../graphile-crystal" }, { "path": "../pg-sql2" }]
+  "references": [
+    { "path": "../graphile-crystal" },
+    { "path": "../pg-sql2" },
+    { "path": "../jest-serializer-simple" }
+  ]
 }
