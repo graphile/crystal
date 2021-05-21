@@ -13,7 +13,8 @@ import {
 import type { Path } from "graphql/jsutils/Path";
 import { inspect } from "util";
 
-import { GLOBAL_PATH, populateValuePlan, ROOT_PATH } from "./aether";
+import { populateValuePlan } from "./aether";
+import { GLOBAL_PATH, ROOT_PATH } from "./constants";
 import type { Deferred } from "./deferred";
 import { defer } from "./deferred";
 import { isDev } from "./dev";

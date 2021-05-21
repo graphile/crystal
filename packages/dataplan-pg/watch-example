@@ -2,4 +2,4 @@
 export GRAPHILE_ENV="development"
 export DEFAULT_DEBUG="crystal:*,-*:verbose"
 export DEBUG="${DEBUG:-$DEFAULT_DEBUG}"
-yarn nodemon -x 'node --enable-source-maps' --watch dist dist/examples/example.js
+yarn nodemon -x 'node --enable-source-maps' --watch dist --watch ../graphile-crystal/dist dist/examples/example.js

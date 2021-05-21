@@ -4,7 +4,7 @@ import type { GraphQLObjectType } from "graphql";
 import { inspect } from "util";
 
 import type { Aether } from "./aether";
-import { GLOBAL_PATH } from "./aether";
+import { GLOBAL_PATH, ROOT_PATH } from "./constants";
 import { isDev, noop } from "./dev";
 import {
   getCurrentAether,

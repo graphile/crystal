@@ -1,5 +1,5 @@
 import type { Aether } from "./aether";
-import { GLOBAL_PATH } from "./aether";
+import { GLOBAL_PATH } from "./constants";
 
 export const globalState = {
   debug: false as boolean,
