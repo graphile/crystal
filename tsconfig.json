@@ -40,6 +40,8 @@
     { "path": "packages/postgraphile-core" },
     { "path": "packages/postgraphile" },
     { "path": "packages/subscriptions-lds" },
-    { "path": "packages/pg-pubsub" }
+    { "path": "packages/pg-pubsub" },
+    { "path": "packages/graphile-crystal" },
+    { "path": "packages/dataplan-pg" }
   ]
 }

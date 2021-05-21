@@ -1827,6 +1827,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@dataplan/pg@workspace:packages/dataplan-pg":
+  version: 0.0.0-use.local
+  resolution: "@dataplan/pg@workspace:packages/dataplan-pg"
+  dependencies:
+    "@graphile/lru": 4.6.0-alpha.0
+    "@types/jest": ^25.2.3
+    "@types/node": ^14.14.44
+    "@types/nodemon": 1.19.0
+    graphile-crystal: 4.7.0
+    graphql: ^15.3.0
+    jest: ^26.0.1
+    nodemon: ^2.0.7
+    pg-sql2: 4.7.0
+    ts-node: ^9.1.1
+    tslib: ^2.2.0
+    typescript: ^4.2.4
+  peerDependencies:
+    graphql: ^15.3.0
+  languageName: unknown
+  linkType: soft
+
 "@graphile/lds@4.7.0, @graphile/lds@workspace:packages/lds":
   version: 0.0.0-use.local
   resolution: "@graphile/lds@workspace:packages/lds"

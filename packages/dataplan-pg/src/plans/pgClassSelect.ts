@@ -1,0 +1,875 @@
+import { PgDataSource } from "../datasource";
+import {
+  CrystalResultsList,
+  CrystalValuesList,
+  access,
+  list,
+  map,
+  Plan,
+  first,
+  __ListItemPlan,
+} from "graphile-crystal";
+import sql, { SQL, SQLRawValue, arraysMatch } from "pg-sql2";
+import debugFactory from "debug";
+import { inspect } from "util";
+import { $$CURSOR } from "../symbols";
+import { PgColumnSelectPlan } from "./pgColumnSelect";
+import { PgClassSelectSinglePlan } from "./pgClassSelectSingle";
+
+const debugPlan = debugFactory("datasource:pg:PgClassSelectPlan:plan");
+const debugExecute = debugFactory("datasource:pg:PgClassSelectPlan:execute");
+const debugPlanVerbose = debugPlan.extend("verbose");
+// const debugExecuteVerbose = debugExecute.extend("verbose");
+
+const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
+
+type PgClassSelectPlanJoin =
+  | {
+      type: "cross";
+      source: SQL;
+      alias: SQL;
+    }
+  | {
+      type: "inner" | "left" | "right" | "full";
+      source: SQL;
+      alias: SQL;
+      conditions: SQL[];
+    };
+
+/**
+ * This represents selecting from a class-like entity (table, view, etc); i.e.
+ * it represents `SELECT <columns>, <cursor?> FROM <table>`.  It's not
+ * currently clear if it also includes `WHERE <conditions>`,
+ * `ORDER BY <order>`, `LEFT JOIN <join>`, etc within its scope. `GROUP BY` is
+ * definitely not in scope, because that would invalidate the identifiers.
+ *
+ * I currently don't expect this to be used to select sets of scalars, but it
+ * could be used for that purpose so long as we name the scalars (i.e. create
+ * records from them `{a: 1},{a: 2},{a:3}`).
+ */
+export class PgClassSelectPlan<
+  TDataSource extends PgDataSource<any>
+> extends Plan<ReadonlyArray<TDataSource["TRow"]>> {
+  // FROM
+
+  public readonly symbol: symbol;
+
+  /** = sql.identifier(this.symbol) */
+  public readonly alias: SQL;
+
+  /**
+   * The data source from which we are selecting: table, view, etc
+   */
+  public readonly dataSource: TDataSource;
+
+  // JOIN
+
+  private joins: Array<PgClassSelectPlanJoin>;
+
+  // WHERE
+
+  private conditions: SQL[];
+
+  // ORDER BY
+
+  private orders: SQL[];
+
+  // LIMIT
+
+  private limit: number | null;
+
+  // OFFSET
+
+  private offset: number | null;
+
+  // --------------------
+
+  /**
+   * Since this is effectively like a DataLoader it processes the data for many
+   * different resolvers at once. This list of (hopefully scalar) plans is used
+   * to identify which records in the result set should be returned to which
+   * GraphQL resolvers.
+   */
+  private identifiers: Array<{ plan: Plan<any>; type: SQL }>;
+
+  /**
+   * This is an array with the same length as identifiers that returns the
+   * index in this.dependencies for the relevant plan.
+   */
+  private identifierIds: number[];
+
+  /**
+   * So we can clone.
+   */
+  private identifierMatchesThunk: (alias: SQL) => SQL[];
+
+  /**
+   * This is the list of SQL fragments in the result that are compared to the
+   * above `identifiers` to determine if there's a match or not. Typically this
+   * will be a list of columns (e.g. primary or foreign keys on the table).
+   */
+  private identifierMatches: SQL[];
+
+  /**
+   * If this plan has identifiers, what's the alias for the identifiers 'table'.
+   */
+  private identifiersAlias: SQL | null;
+
+  /**
+   * If this plan has identifiers, we must feed the identifiers into the values
+   * to feed into the SQL statement after compiling the query; we'll use this
+   * symbol as the placeholder to replace.
+   */
+  private identifierSymbol: symbol;
+
+  /**
+   * If true, we don't need to add any of the security checks from the data
+   * source; otherwise we must do so. Default false.
+   */
+  private isTrusted: boolean;
+
+  /**
+   * If true, we know at most one result can be matched for each identifier, so
+   * it's safe to do a `LEFT JOIN` without risk of returning duplicates. Default false.
+   */
+  private isUnique: boolean;
+
+  /**
+   * If true, we will not attempt to inline this into the parent query.
+   * Default false.
+   */
+  private isInliningForbidden = false;
+
+  /**
+   * The list of things we're selecting
+   */
+  private selects: Array<SQL | symbol>;
+
+  private contextId: number;
+
+  private finalizeResults: {
+    text: string;
+    rawSqlValues: (SQLRawValue | symbol)[];
+    identifierIndex: number | null;
+  } | null = null;
+
+  private locked = false;
+  private cloneIdentifierIndex: number | null | undefined;
+
+  constructor(
+    dataSource: TDataSource,
+    identifiers: Array<{ plan: Plan<any>; type: SQL }>,
+    identifierMatchesThunk: (alias: SQL) => SQL[],
+    cloneFrom: PgClassSelectPlan<TDataSource> | null = null,
+  ) {
+    super();
+    this.dataSource = dataSource;
+    this.contextId = this.addDependency(this.dataSource.context());
+    this.identifiers = identifiers;
+    this.identifierIds = identifiers.map(({ plan }) =>
+      this.addDependency(plan),
+    );
+    this.identifierMatchesThunk = identifierMatchesThunk;
+
+    this.identifierSymbol = cloneFrom
+      ? cloneFrom.identifierSymbol
+      : Symbol(dataSource.name + "_identifier_values");
+    this.symbol = cloneFrom ? cloneFrom.symbol : Symbol(dataSource.name);
+    this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
+    this.identifierMatches = cloneFrom
+      ? cloneFrom.identifierMatches
+      : identifierMatchesThunk(this.alias);
+    this.joins = cloneFrom ? [...cloneFrom.joins] : [];
+    this.selects = cloneFrom ? [...cloneFrom.selects] : [];
+    // this.cursorPlan = cloneFrom ? cloneFrom.cursorPlan : null;
+    this.identifiersAlias = cloneFrom
+      ? cloneFrom.identifiersAlias
+      : this.identifiers.length
+      ? sql.identifier(Symbol(this.dataSource.name + "_identifiers"))
+      : null;
+    this.isTrusted = cloneFrom ? cloneFrom.isTrusted : false;
+    this.isUnique = cloneFrom ? cloneFrom.isUnique : false;
+    this.isInliningForbidden = cloneFrom
+      ? cloneFrom.isInliningForbidden
+      : false;
+    this.conditions = cloneFrom ? cloneFrom.conditions : [];
+    this.orders = cloneFrom ? cloneFrom.orders : [];
+    this.limit = cloneFrom ? cloneFrom.limit : null;
+    this.offset = cloneFrom ? cloneFrom.offset : null;
+    this.cloneIdentifierIndex = cloneFrom
+      ? cloneFrom.finalizeResults?.identifierIndex
+      : undefined;
+
+    if (!cloneFrom) {
+      if (this.identifiers.length !== this.identifierMatches.length) {
+        throw new Error(
+          `'identifiers' and 'identifierMatches' lengths must match (${this.identifiers.length} != ${this.identifierMatches.length})`,
+        );
+      }
+    }
+    debugPlan(
+      `%s (%s) constructor (%s)`,
+      this,
+      this.dataSource.name,
+      cloneFrom ? "clone" : "original",
+    );
+    return this;
+  }
+
+  toStringMeta(): string {
+    return this.dataSource.name;
+  }
+
+  public lock(): void {
+    this.locked = true;
+  }
+
+  public setInliningForbidden(newInliningForbidden = true): this {
+    this.isInliningForbidden = newInliningForbidden;
+    return this;
+  }
+
+  public inliningForbidden(): boolean {
+    return this.isInliningForbidden;
+  }
+
+  public setTrusted(newIsTrusted = true): this {
+    if (this.locked) {
+      throw new Error(`${this}: cannot toggle trusted once plan is locked`);
+    }
+    this.isTrusted = newIsTrusted;
+    return this;
+  }
+
+  public trusted(): boolean {
+    return this.isTrusted;
+  }
+
+  /**
+   * Set this true ONLY if there can be at most one match for each of the
+   * identifiers. If you set this true when this is not the case then you may
+   * get unexpected results during inlining; if in doubt leave it at the
+   * default.
+   */
+  public setUnique(newUnique = true): this {
+    if (this.locked) {
+      throw new Error(`${this}: cannot toggle unique once plan is locked`);
+    }
+    this.isUnique = newUnique;
+    return this;
+  }
+
+  public unique(): boolean {
+    return this.isUnique;
+  }
+
+  /**
+   * Select an SQL fragment, returning the index the result will have.
+   */
+  public select(fragment: SQL | symbol): number {
+    if (this.locked) {
+      throw new Error(`${this}: cannot add selections once plan is locked`);
+    }
+    // Optimisation: if we're already selecting this fragment, return the existing one.
+    const index = this.selects.findIndex((frag) =>
+      sql.isEquivalent(frag, fragment),
+    );
+    if (index >= 0) {
+      return index;
+    }
+    return this.selects.push(fragment) - 1;
+  }
+
+  /*
+   * Select an SQL fragment, returning a plan.
+   * /
+  public select<TData = any>(
+    fragment: SQL | symbol,
+  ): PgAttributeSelectPlan<TData> {
+    const attrIndex = this._select(fragment);
+    return new PgAttributeSelectPlan(this, attrIndex);
+  }
+  */
+
+  /*
+  // TODO: rename this item from `.get` to something more subtle (`._itemGet`
+  // or similar) since you wouldn't normally call `.get` on a list - only on an
+  // item of that list via PgClassSelectSinglePlan.
+  /**
+   * Returns a plan representing a named attribute (e.g. column) from the class
+   * (e.g. table).
+   * /
+  get<TAttr extends keyof TDataSource["TRow"]>(
+    attr: TAttr,
+  ): PgColumnSelectPlan<TDataSource, TAttr> {
+    // Only one plan per column
+    if (!this.colPlans[attr]) {
+      // TODO: where do we do the SQL conversion, e.g. to_json for dates to
+      // enforce ISO8601? Perhaps this should be the datasource itself, and
+      // `attr` should be an SQL expression? This would allow for computed
+      // fields/etc too (admittedly those without arguments).
+      const expression = sql.identifier(this.symbol, String(attr));
+      const index = this._select(expression);
+      this.colPlans[attr] = new PgColumnSelectPlan(
+        this,
+        index,
+        attr,
+        expression,
+      );
+    }
+    return this.colPlans[attr]!;
+  }
+  */
+
+  /**
+   * Finalizes this instance and returns a mutable clone; useful for
+   * connections/etc (e.g. copying `where` conditions but adding more, or
+   * pagination, or grouping, aggregates, etc
+   */
+  clone(): PgClassSelectPlan<TDataSource> {
+    this.lock();
+    const clone = new PgClassSelectPlan(
+      this.dataSource,
+      this.identifiers,
+      this.identifierMatchesThunk,
+      this,
+    );
+    return clone;
+  }
+
+  where(condition: SQL): void {
+    if (this.locked) {
+      throw new Error(`${this}: cannot add conditions once plan is locked`);
+    }
+    this.conditions.push(condition);
+  }
+
+  /**
+   * `execute` will always run as a root-level query. In future we'll implement a
+   * `toSQL` method that allows embedding this plan within another SQL plan...
+   * But that's a problem for later.
+   *
+   * This runs the query for every entry in the values, and then returns an
+   * array of results where each entry in the results relates to the entry in
+   * the incoming values.
+   *
+   * NOTE: we don't know what the values being fed in are, we must feed them to
+   * the plans stored in this.identifiers to get actual values we can use.
+   */
+  async execute(
+    values: CrystalValuesList<any[]>,
+  ): Promise<CrystalResultsList<ReadonlyArray<TDataSource["TRow"]>>> {
+    if (!this.finalizeResults) {
+      throw new Error("Cannot execute PgClassSelectPlan before finalizing it.");
+    }
+    const { text, rawSqlValues, identifierIndex } = this.finalizeResults;
+
+    const executionResult = await this.dataSource.execute(
+      values.map((value) => {
+        return {
+          // The context is how we'd handle different connections with different claims
+          context: value[this.contextId],
+          identifiers:
+            identifierIndex != null
+              ? this.identifierIds.map((id) => value[id])
+              : EMPTY_ARRAY,
+        };
+      }),
+      {
+        text,
+        rawSqlValues,
+        identifierIndex,
+        identifierSymbol: this.identifierSymbol,
+      },
+    );
+    debugExecute("%s; result: %c", this, executionResult);
+
+    return executionResult.values;
+  }
+
+  private buildSelect(options: { asArray?: boolean } = {}) {
+    const { asArray = false } = options;
+    const resolveSymbol = (symbol: symbol): SQL => {
+      switch (symbol) {
+        case $$CURSOR:
+          // TODO: figure out what the cursor should be
+          return sql`424242 /* TODO: CURSOR */`;
+        default: {
+          throw new Error(
+            `Unrecognised special select symbol: ${inspect(symbol)}`,
+          );
+        }
+      }
+    };
+
+    const fragmentsWithAliases = this.selects.map((fragOrSymbol, idx) => {
+      const frag =
+        typeof fragOrSymbol === "symbol"
+          ? resolveSymbol(fragOrSymbol)
+          : fragOrSymbol;
+      return asArray ? frag : sql`${frag} as ${sql.identifier(String(idx))}`;
+    });
+
+    if (asArray) {
+      const selection = fragmentsWithAliases.length
+        ? sql` array[${sql.indent(
+            sql.join(fragmentsWithAliases, ",\n"),
+          )}]::text[]`
+        : /*
+           * In the case where our array is empty, we must add something or
+           * PostgreSQL will fail with 'ERROR:  2202E: cannot accumulate empty
+           * arrays'
+           */
+          sql` array['' /* NOTHING?! */]::text[]`;
+
+      return sql`select${selection}`;
+    } else {
+      const selection = fragmentsWithAliases.length
+        ? sql` ${sql.indent(sql.join(fragmentsWithAliases, ",\n"))}`
+        : sql` /* NOTHING?! */`;
+
+      return sql`select${selection}`;
+    }
+  }
+
+  private buildFrom() {
+    return sql`\nfrom ${this.dataSource.tableIdentifier} as ${this.alias}`;
+  }
+
+  private buildJoin() {
+    const joins: SQL[] = this.joins.map((j) => {
+      const conditions =
+        j.type === "cross"
+          ? []
+          : j.conditions.length
+          ? sql`(${sql.join(j.conditions, ") AND (")})`
+          : sql.true;
+      const joinCondition =
+        j.type !== "cross" ? sql`\non (${conditions})` : sql.blank;
+      const join: SQL =
+        j.type === "inner"
+          ? sql`inner join`
+          : j.type === "left"
+          ? sql`left outer join`
+          : j.type === "right"
+          ? sql`right outer join`
+          : j.type === "full"
+          ? sql`full outer join`
+          : j.type === "cross"
+          ? sql`cross join`
+          : (sql.blank as never);
+
+      return sql`${join} ${j.source} as ${j.alias}${joinCondition}`;
+    });
+
+    return joins.length ? sql`\n${sql.join(joins, "\n")}` : sql.blank;
+  }
+
+  private buildWhere() {
+    const conditions = this.conditions;
+    return conditions.length
+      ? sql`\nwhere (\n  ${sql.join(conditions, "\n) and (\n  ")}\n)`
+      : sql.blank;
+  }
+
+  private buildOrderBy() {
+    // TODO!!
+    const orders = this.orders;
+    return orders.length
+      ? sql`\norder by ${sql.join(orders, ", ")}`
+      : sql.blank;
+  }
+
+  private addIdentifiers() {
+    if (this.identifiers.length && this.identifiersAlias) {
+      const alias = this.identifiersAlias;
+      this.joins.push({
+        type: "inner",
+        source: sql`(select ids.ordinality - 1 as idx, ${sql.join(
+          this.identifiers.map(({ type }, idx) => {
+            return sql`(ids.value->>${sql.literal(
+              idx,
+            )})::${type} as ${sql.identifier(`id${idx}`)}`;
+          }),
+          ", ",
+        )} from json_array_elements(${sql.value(
+          // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
+          // a value before executing the query.
+          this.identifierSymbol as any,
+        )}) with ordinality as ids)`,
+        alias,
+        conditions: this.identifierMatches.map(
+          (frag, idx) => sql`${frag} = ${alias}.${sql.identifier(`id${idx}`)}`,
+        ),
+      });
+      return this.select(sql`${alias}.idx`);
+    }
+    return null;
+  }
+
+  private buildQuery(options: { asArray?: boolean } = {}): SQL {
+    if (!this.isTrusted) {
+      this.dataSource.applyAuthorizationChecksToPlan(this);
+    }
+
+    const select = this.buildSelect(options);
+    const from = this.buildFrom();
+    const join = this.buildJoin();
+    const where = this.buildWhere();
+    const orderBy = this.buildOrderBy();
+
+    const query = sql`${select}${from}${join}${where}${orderBy}`;
+
+    return query;
+  }
+
+  public finalize(): void {
+    // In case we have any lock actions in future:
+    this.lock();
+
+    // Now we need to be able to mess with ourself, but be sure to lock again
+    // at the end.
+    this.locked = false;
+
+    if (!this.isFinalized) {
+      let identifierIndex: number | null = null;
+
+      // We only want to add the identifiers once
+      if (this.cloneIdentifierIndex !== undefined) {
+        identifierIndex = this.cloneIdentifierIndex;
+      } else {
+        identifierIndex = this.addIdentifiers();
+      }
+
+      const query = this.buildQuery();
+      const { text, values: rawSqlValues } = sql.compile(query);
+      this.finalizeResults = { text, rawSqlValues, identifierIndex };
+    }
+
+    this.locked = true;
+
+    super.finalize();
+  }
+
+  deduplicate(peers: PgClassSelectPlan<any>[]): Plan {
+    const identical = peers.find((p) => {
+      // If SELECT, FROM, JOIN, WHERE, ORDER, GROUP BY, HAVING, LIMIT, OFFSET
+      // all match with one of our peers then we can replace ourself with one
+      // of our peers. NOTE: we do _not_ merge SELECTs at this stage because
+      // that would require mapping, and mapping should not be done during
+      // deduplicate because it would interfere with optimize. So, instead,
+      // we try to ensure that as few selects as possible exist in the plan
+      // at this stage.
+
+      // Check trusted matches
+      if (p.trusted !== this.trusted) {
+        return false;
+      }
+
+      // Check inliningForbidden matches
+      if (p.inliningForbidden !== this.inliningForbidden) {
+        return false;
+      }
+
+      // Check symbol matches
+      if (p.symbol !== this.symbol || p.alias !== this.alias) {
+        return false;
+      }
+
+      // Check SELECT matches
+      if (!arraysMatch(this.selects, p.selects, sql.isEquivalent)) {
+        return false;
+      }
+
+      // Check FROM matches
+      if (p.dataSource !== this.dataSource) {
+        return false;
+      }
+
+      // Check JOINs match
+      if (!arraysMatch(this.joins, p.joins, joinMatches)) {
+        return false;
+      }
+
+      // Check WHEREs match
+      if (!arraysMatch(this.conditions, p.conditions, sql.isEquivalent)) {
+        return false;
+      }
+
+      // Check IDENTIFIERs match
+      if (
+        !arraysMatch(
+          this.identifierMatches,
+          p.identifierMatches,
+          sql.isEquivalent,
+        )
+      ) {
+        return false;
+      }
+
+      // Check ORDERs match
+      if (!arraysMatch(this.orders, p.orders, sql.isEquivalent)) {
+        return false;
+      }
+
+      // GROUP BY is not supported
+      // HAVING is not supported
+
+      // Check LIMIT matches
+      if (this.limit !== p.limit) {
+        return false;
+      }
+
+      // Check OFFSET matches
+      if (this.offset !== p.offset) {
+        return false;
+      }
+
+      debugPlan("Found that %c and %c are equivalent!", this, p);
+
+      return true;
+    });
+    if (identical) {
+      return identical;
+      /* The following is now forbidden.
+
+        // Move the selects across and then replace ourself with a transform that
+        // maps the expected attribute ids from the `identical` plan.
+        const actualKeyByDesiredKey = this.mergeWith(identical);
+        const mapper = makeMapper(actualKeyByDesiredKey);
+        return each(identical, mapper);
+
+      */
+    }
+    return this;
+  }
+
+  mergeWith(
+    otherPlan: PgClassSelectPlan<TDataSource>,
+  ): { [desiredIndex: string]: string } {
+    const actualKeyByDesiredKey = {};
+    //console.log(`Other ${otherPlan} selects:`);
+    //console.dir(otherPlan.selects, { depth: 8 });
+    //console.log(`My ${this} selects:`);
+    //console.dir(this.selects, { depth: 8 });
+    this.selects.forEach((fragOrSymbol, idx) => {
+      if (typeof fragOrSymbol === "symbol") {
+        throw new Error("Cannot inline query that uses a symbol like this.");
+      }
+      actualKeyByDesiredKey[idx] = otherPlan.select(fragOrSymbol);
+    });
+    //console.dir(actualKeyByDesiredKey);
+    //console.log(`Other ${otherPlan} selects now:`);
+    //console.dir(otherPlan.selects, { depth: 8 });
+    return actualKeyByDesiredKey;
+  }
+
+  optimize(): Plan {
+    // In case we have any lock actions in future:
+    this.lock();
+
+    // Now we need to be able to mess with ourself, but be sure to lock again
+    // at the end.
+    this.locked = false;
+
+    // TODO: we should serialize our `SELECT` clauses and then if any are
+    // identical we should omit the later copies and have them link back to the
+    // earliest version (resolve this in `execute` via mapping).
+
+    if (!this.isInliningForbidden) {
+      // Inline ourself into our parent if we can.
+      let t: PgClassSelectPlan<any> | null | undefined = undefined;
+      let p: Plan<any> | undefined = undefined;
+      for (let i = 0, l = this.dependencies.length; i < l; i++) {
+        if (i === this.contextId) {
+          continue;
+        }
+        const depId = this.dependencies[i];
+        const dep = this.aether.plans[depId];
+        if (!(dep instanceof PgColumnSelectPlan)) {
+          debugPlanVerbose(
+            "Refusing to optimise %c due to dependency %c",
+            this,
+            dep,
+          );
+          t = null;
+          break;
+        }
+        const p2 = this.aether.plans[dep.dependencies[dep.tableId]];
+        const t2 = dep.getClassSinglePlan().getClassPlan();
+        if (t === undefined && p === undefined) {
+          p = p2;
+          t = t2;
+        } else if (t2 !== t) {
+          debugPlanVerbose(
+            "Refusing to optimise %c due to dependency %c depending on different class (%c != %c)",
+            this,
+            dep,
+            t2,
+            t,
+          );
+          t = null;
+          break;
+        } else if (p2 !== p) {
+          debugPlanVerbose(
+            "Refusing to optimise %c due to parent dependency mismatch: %c != %c",
+            this,
+            p2,
+            p,
+          );
+          t = null;
+          break;
+        }
+      }
+      if (t != null && p != null) {
+        const myContext = this.aether.plans[this.dependencies[this.contextId]];
+        const tsContext = this.aether.plans[t.dependencies[t.contextId]];
+        if (myContext != tsContext) {
+          debugPlanVerbose(
+            "Refusing to optimise %c due to own context dependency %c differing from tables context dependency %c (%c, %c)",
+            this,
+            myContext,
+            tsContext,
+            t.dependencies[t.contextId],
+            t,
+          );
+          t = null;
+        }
+      }
+      if (t != null && p != null) {
+        // Looks feasible.
+
+        const table = t;
+        const parent = p;
+
+        const tableWasLocked = table.locked;
+        table.locked = false;
+
+        if (
+          this.isUnique
+          /* TODO: && !this.groupBy && !this.having && !this.limit && !this.order && !this.offset && ... */
+        ) {
+          const where = this.buildWhere();
+          const conditions = [
+            ...this.identifiers.map((id, i) => {
+              const plan = id.plan;
+              if (!(plan instanceof PgColumnSelectPlan)) {
+                throw new Error(`Expected ${plan} to be a PgColumnSelectPlan`);
+              }
+              return sql`${plan.toSQL()}::${id.type} = ${
+                this.identifierMatches[i]
+              }`;
+            }),
+            // Note the WHERE is now part of the JOIN condition (since
+            // it's a LEFT JOIN).
+            ...(where !== sql.blank ? [where] : []),
+          ];
+          table.joins.push(
+            {
+              type: "left",
+              source: this.dataSource.tableIdentifier,
+              alias: this.alias,
+              conditions,
+            },
+            ...this.joins,
+          );
+          debugPlanVerbose(`Merging ${this} into ${table} (via ${parent})`);
+          const actualKeyByDesiredKey = this.mergeWith(table);
+          // We return a list here because our children are going to use a `first` plan on us
+          return list([map(parent, actualKeyByDesiredKey)]);
+        } else if (parent instanceof PgClassSelectSinglePlan) {
+          const parent2 = this.aether.plans[
+            parent.dependencies[parent.itemPlanId]
+          ];
+          this.identifiers.forEach((id, i) => {
+            const plan = id.plan as PgColumnSelectPlan<any, any>;
+            return this.where(
+              sql`${plan.toSQL()}::${id.type} = ${this.identifierMatches[i]}`,
+            );
+          });
+          const query = this.buildQuery({ asArray: true });
+          const selfIndex = table.select(sql`array(${sql.indent(query)})`);
+          debugPlanVerbose(
+            "Optimising %c (via %c and %c)",
+            this,
+            table,
+            parent2,
+          );
+          //console.dir(this.dependencies.map((id) => this.aether.plans[id]));
+          return access(parent2, [selfIndex]);
+        }
+
+        table.locked = tableWasLocked;
+      }
+    }
+
+    this.locked = true;
+
+    return this;
+  }
+
+  /**
+   * If this plan may only return one record, you can use `.single()` to return
+   * a plan that resolves to that record (rather than a list of records as it
+   * does currently). Beware: if you call this and the database might actually
+   * return more than one record then you're potentially in for a Bad Time.
+   */
+  single(): PgClassSelectSinglePlan<TDataSource> {
+    this.setUnique(true);
+    // TODO: should this be on a clone plan? I don't currently think so since
+    // PgClassSelectSinglePlan does not allow for `.where` divergence (since it
+    // does not support `.where`).
+    return new PgClassSelectSinglePlan(this, first(this));
+  }
+
+  /**
+   * When you return a plan in a situation where GraphQL is expecting a
+   * GraphQLList, it must implement the `.listItem()` method to return a plan
+   * for an individual item within this list. Graphile Crystal will
+   * automatically call this (possibly recursively) to pass to the plan
+   * resolvers on the children of this field.
+   *
+   * NOTE: Graphile Crystal handles the list indexes for you, so your list item
+   * plan should process just the single input list item.
+   *
+   * IMPORTANT: do not call `.listItem` from user code; it's only intended to
+   * be called by Graphile Crystal.
+   */
+  listItem(
+    itemPlan: __ListItemPlan<PgClassSelectPlan<TDataSource>>,
+  ): PgClassSelectSinglePlan<TDataSource> {
+    return new PgClassSelectSinglePlan(this, itemPlan);
+  }
+}
+
+function joinMatches(
+  j1: PgClassSelectPlanJoin,
+  j2: PgClassSelectPlanJoin,
+): boolean {
+  if (j1.type === "cross") {
+    if (j2.type !== j1.type) {
+      return false;
+    }
+    if (!sql.isEquivalent(j1.source, j2.source)) {
+      return false;
+    }
+    if (!sql.isEquivalent(j1.alias, j2.alias)) {
+      return false;
+    }
+    return true;
+  } else {
+    if (j2.type !== j1.type) {
+      return false;
+    }
+    if (!sql.isEquivalent(j1.source, j2.source)) {
+      return false;
+    }
+    if (!sql.isEquivalent(j1.alias, j2.alias)) {
+      return false;
+    }
+    if (!arraysMatch(j1.conditions, j2.conditions, sql.isEquivalent)) {
+      return false;
+    }
+    return true;
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "name": "@dataplan/pg",
+  "version": "4.7.0",
+  "description": "PostgreSQL data plans for Graphile Crystal",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "jest -i",
+    "prepack": "tsc -b"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/graphile/graphile-build.git"
+  },
+  "keywords": [
+    "graphile",
+    "graphql",
+    "crystal",
+    "postgresql",
+    "postgres",
+    "pg",
+    "dataplan",
+    "build",
+    "extension"
+  ],
+  "author": "Benjie Gillam <code@benjiegillam.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/graphile/crystal/issues"
+  },
+  "homepage": "https://github.com/graphile/crystal/tree/main/packages/dataplan-pg",
+  "dependencies": {
+    "@graphile/lru": "4.6.0-alpha.0",
+    "@types/node": "^14.14.44",
+    "graphile-crystal": "4.7.0",
+    "pg-sql2": "4.7.0",
+    "tslib": "^2.2.0"
+  },
+  "engines": {
+    "node": ">=12.16"
+  },
+  "peerDependencies": {
+    "graphql": "^15.3.0"
+  },
+  "files": [
+    "dist",
+    "index.js"
+  ],
+  "devDependencies": {
+    "@types/jest": "^25.2.3",
+    "@types/nodemon": "1.19.0",
+    "graphql": "^15.3.0",
+    "jest": "^26.0.1",
+    "nodemon": "^2.0.7",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
+  }
+}

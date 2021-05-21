@@ -582,6 +582,90 @@ export function symbolAlias(symbol1: symbol, symbol2: symbol): SQL {
   return makeSymbolAliasNode(symbol1, symbol2);
 }
 
+export function arraysMatch<T>(
+  array1: ReadonlyArray<T>,
+  array2: ReadonlyArray<T>,
+  comparator: (val1: T, val2: T) => boolean = (v1, v2) => v1 === v2,
+): boolean {
+  const l = array1.length;
+  if (l !== array2.length) {
+    return false;
+  }
+  for (let i = 0; i < l; i++) {
+    if (!comparator(array1[i], array2[i])) {
+      return false;
+    }
+  }
+  return true;
+}
+
+export function isEquivalent(sql1: SQL | symbol, sql2: SQL | symbol): boolean {
+  if (typeof sql1 === "symbol") {
+    return sql2 === sql1;
+  } else if (typeof sql2 === "symbol") {
+    return false;
+  }
+  if (Array.isArray(sql1)) {
+    if (!Array.isArray(sql2)) {
+      return false;
+    }
+    return arraysMatch(sql1, sql2, isEquivalent);
+  } else if (Array.isArray(sql2)) {
+    return false;
+  } else {
+    switch (sql1.type) {
+      case "RAW": {
+        if (sql2.type !== sql1.type) {
+          return false;
+        }
+        return sql1.text === sql2.text;
+      }
+      case "VALUE": {
+        if (sql2.type !== sql1.type) {
+          return false;
+        }
+        return sql1.value === sql2.value;
+      }
+      case "INDENT": {
+        if (sql2.type !== sql1.type) {
+          return false;
+        }
+        return isEquivalent(sql1.content, sql2.content);
+      }
+      case "IDENTIFIER": {
+        if (sql2.type !== sql1.type) {
+          return false;
+        }
+        return arraysMatch(sql1.names, sql2.names, identifiersAreEquivalent);
+      }
+      case "SYMBOL_ALIAS": {
+        // TODO
+        return false;
+      }
+      default: {
+        const never: never = sql1;
+        console.error(`Unhandled node type: ${inspect(never)}`);
+        return false;
+      }
+    }
+  }
+}
+
+type IdentifierName = SQLIdentifierNode["names"] extends ReadonlyArray<infer U>
+  ? U
+  : never;
+function identifiersAreEquivalent(
+  ids1: IdentifierName,
+  ids2: IdentifierName,
+): boolean {
+  if (typeof ids1 === "string") {
+    return ids2 === ids1;
+  } else if (typeof ids2 === "string") {
+    return false;
+  }
+  return ids1.n === ids2.n && ids1.s === ids2.s;
+}
+
 export {
   query as fragment,
   trueNode as true,
@@ -593,6 +677,7 @@ export interface PgSQL {
   (strings: TemplateStringsArray, ...values: Array<SQL>): SQL;
   escapeSqlIdentifier: typeof escapeSqlIdentifier;
   compile: typeof compile;
+  isEquivalent: typeof isEquivalent;
   query: typeof query;
   raw: typeof raw;
   identifier: typeof identifier;
@@ -611,6 +696,7 @@ export interface PgSQL {
 const pgSql: PgSQL = Object.assign(query, {
   escapeSqlIdentifier,
   compile,
+  isEquivalent,
   query,
   raw,
   identifier,
