@@ -39,7 +39,14 @@ import {
 } from "./graphqlMergeSelectionSets";
 import type { InputPlan } from "./input";
 import { InputObjectPlan, inputPlan } from "./input";
-import type { Batch, CrystalContext, CrystalObject } from "./interfaces";
+import type {
+  BaseGraphQLContext,
+  BaseGraphQLRootValue,
+  BaseGraphQLVariables,
+  Batch,
+  CrystalContext,
+  CrystalObject,
+} from "./interfaces";
 import {
   $$crystalContext,
   $$crystalObjectByPathIdentity,
@@ -119,7 +126,11 @@ function atIndexes(data: any, indexes: ReadonlyArray<number>): any {
 /**
  * Implements the `NewAether` algorithm.
  */
-export class Aether {
+export class Aether<
+  TVariables extends BaseGraphQLVariables = BaseGraphQLVariables,
+  TContext extends BaseGraphQLContext = BaseGraphQLContext,
+  TRootValue extends BaseGraphQLRootValue = BaseGraphQLRootValue
+> {
   public maxGroupId = 0;
   public groupId = this.maxGroupId;
   public readonly plans: Plan[] = [];
@@ -149,14 +160,14 @@ export class Aether {
     [planId: number]: WeakMap<object, UniqueId> | undefined;
   } = Object.create(null);
   public readonly variableValuesConstraints: Constraint[] = [];
-  public readonly variableValuesPlan: __ValuePlan;
-  public readonly trackedVariableValuesPlan: __TrackedObjectPlan;
+  public readonly variableValuesPlan: __ValuePlan<TVariables>;
+  public readonly trackedVariableValuesPlan: __TrackedObjectPlan<TVariables>;
   public readonly contextConstraints: Constraint[] = [];
-  public readonly contextPlan: __ValuePlan;
-  public readonly trackedContextPlan: __TrackedObjectPlan;
+  public readonly contextPlan: __ValuePlan<TContext>;
+  public readonly trackedContextPlan: __TrackedObjectPlan<TContext>;
   public readonly rootValueConstraints: Constraint[] = [];
-  public readonly rootValuePlan: __ValuePlan;
-  public readonly trackedRootValuePlan: __TrackedObjectPlan;
+  public readonly rootValuePlan: __ValuePlan<TRootValue>;
+  public readonly trackedRootValuePlan: __TrackedObjectPlan<TRootValue>;
   public readonly operationType: "query" | "mutation" | "subscription";
 
   constructor(
@@ -168,11 +179,9 @@ export class Aether {
     public readonly fragments: {
       [fragmentName: string]: FragmentDefinitionNode;
     },
-    public readonly variableValues: {
-      [variableName: string]: unknown;
-    },
-    public readonly context: object,
-    public readonly rootValue: unknown,
+    public readonly variableValues: TVariables,
+    public readonly context: TContext,
+    public readonly rootValue: TRootValue,
   ) {
     globalState.aether = this;
     globalState.parentPathIdentity = GLOBAL_PATH;
@@ -1435,10 +1444,10 @@ export class Aether {
    * Used to implement `GetValuePlanId`, but was rewritten to factor in that we
    * now key by crystal objects rather than id and indexes.
    */
-  getValuePlanId(
+  getValuePlanId<TData extends object>(
     crystalContext: CrystalContext,
-    valuePlan: __ValuePlan,
-    object: object,
+    valuePlan: __ValuePlan<TData>,
+    object: TData,
     pathIdentity: string,
   ): { valueId: UniqueId; existed: boolean } {
     assert.ok(

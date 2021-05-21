@@ -1,6 +1,14 @@
 import * as assert from "assert";
 import chalk from "chalk";
-import type { GraphQLInputType, ObjectFieldNode, ValueNode } from "graphql";
+import type {
+  GraphQLFieldConfig,
+  GraphQLFieldConfigMap,
+  GraphQLInputType,
+  GraphQLObjectTypeConfig,
+  ObjectFieldNode,
+  Thunk,
+  ValueNode,
+} from "graphql";
 import {
   GraphQLBoolean,
   GraphQLEnumType,
@@ -17,7 +25,12 @@ import { inspect } from "util";
 
 import type { Deferred } from "./deferred";
 import { isDev } from "./dev";
-import type { CrystalObject } from "./interfaces";
+import type {
+  CrystalObject,
+  BaseGraphQLContext,
+  BaseGraphQLArguments,
+  GraphileCrystalFieldConfig,
+} from "./interfaces";
 import { Plan } from "./plan";
 import { isCrystalObject } from "./resolvers";
 
@@ -438,4 +451,59 @@ export function arraysMatch<T>(
     }
   }
   return true;
+}
+
+/**
+ * Saves us having to write `extensions: {graphile: {...}}` everywhere.
+ */
+export function objectSpec<
+  TContext extends BaseGraphQLContext,
+  TParentPlan extends Plan<any>
+>(
+  spec: Omit<GraphQLObjectTypeConfig<any, TContext>, "fields"> & {
+    fields: Thunk<{
+      [key: string]: GraphileCrystalFieldConfig<
+        TContext,
+        TParentPlan,
+        any,
+        any
+      >;
+    }>;
+  },
+): GraphQLObjectTypeConfig<any, TContext> {
+  const modifiedSpec: GraphQLObjectTypeConfig<any, TContext> = {
+    ...spec,
+    fields: () => {
+      const fields =
+        typeof spec.fields === "function" ? spec.fields() : spec.fields;
+      const modifiedFields = Object.keys(fields).reduce((o, key) => {
+        o[key] = objectFieldSpec<TContext, TParentPlan>(fields[key]);
+        return o;
+      }, {} as GraphQLFieldConfigMap<any, TContext>);
+      return modifiedFields;
+    },
+  };
+  return modifiedSpec;
+}
+
+/**
+ * Saves us having to write `extensions: {graphile: {...}}` everywhere.
+ */
+function objectFieldSpec<
+  TContext extends BaseGraphQLContext,
+  TSource extends Plan<any>,
+  TResult extends Plan<any> = Plan<any>,
+  TArgs extends BaseGraphQLArguments = BaseGraphQLArguments
+>(
+  graphileSpec: GraphileCrystalFieldConfig<TContext, TSource, TResult, TArgs>,
+): GraphQLFieldConfig<any, TContext, TArgs> {
+  const { plan, ...spec } = graphileSpec;
+  return {
+    ...spec,
+    extensions: {
+      graphile: {
+        plan,
+      },
+    },
+  };
 }

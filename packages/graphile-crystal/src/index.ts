@@ -8,40 +8,39 @@ debugFactory.formatters.p = crystalPrintPathIdentity;
 export { Aether } from "./aether";
 export { defer, Deferred } from "./deferred";
 export { crystalEnforce } from "./enforceCrystal";
-export { CrystalResultsList, CrystalValuesList } from "./interfaces";
+export {
+  CrystalResultsList,
+  CrystalValuesList,
+  PlanResolver,
+  GraphileCrystalFieldConfig,
+  BaseGraphQLContext,
+  BaseGraphQLArguments,
+  BaseGraphQLVariables,
+  BaseGraphQLRootValue,
+} from "./interfaces";
 export { Plan } from "./plan";
 export {
-  // --- INTERNAL ---
-  // __ListItem
   __ListItemPlan,
-  // __TrackedObjectPlan
   __TrackedObjectPlan,
-  // __ValuePlan
   __ValuePlan,
-  // Access
   access,
   AccessPlan,
-  // Helpers
   aether,
+  context,
   assertListCapablePlan,
   debugPlans,
-  // Each
   each,
   EachPlan,
-  // First
   first,
   FirstPlan,
-  // List
   list,
   ListCapablePlan,
   ListPlan,
   makeMapper,
-  // Map
   map,
   MapPlan,
-  // Object
   object,
   ObjectPlan,
 } from "./plans";
 export { $$crystalWrapped, crystalWrapResolve } from "./resolvers";
-export { arraysMatch } from "./utils";
+export { arraysMatch, objectSpec } from "./utils";

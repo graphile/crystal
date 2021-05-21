@@ -1,5 +1,7 @@
+import { GraphQLFieldConfig } from "graphql";
 import type { Deferred } from "./deferred";
 import type { Plan } from "./plan";
+import { __TrackedObjectPlan } from "./plans";
 import type { UniqueId } from "./utils";
 
 export const $$crystalContext = Symbol("context");
@@ -66,3 +68,52 @@ export interface CrystalContext {
 export type CrystalValuesList<T> = ReadonlyArray<T>;
 export type CrystalResultsList<T> = ReadonlyArray<T>;
 export type PromiseOrDirect<T> = Promise<T> | T;
+
+export type BaseGraphQLRootValue = any;
+export interface BaseGraphQLContext {}
+export interface BaseGraphQLVariables {
+  [key: string]: unknown;
+}
+export interface BaseGraphQLArguments {
+  [key: string]: any;
+}
+
+/**
+ * Plan resolvers are like regular resolvers except they're called beforehand,
+ * they return plans rather than values, and they only run once for lists
+ * rather than for each item in the list.
+ *
+ * The idea is that the plan resolver returns a plan object which later will
+ * process the data and feed that into the actual resolver functions
+ * (preferably using the default resolver function?).
+ *
+ * They are stored onto `<field>.extensions.graphile.plan`
+ *
+ * @returns a plan for this field.
+ *
+ * @remarks
+ * We're using `TrackedObject<...>` so we can later consider caching these
+ * executions.
+ */
+export type PlanResolver<
+  TContext extends BaseGraphQLContext,
+  TArgs extends BaseGraphQLArguments,
+  TParentPlan extends Plan<any> | null,
+  TResultPlan extends Plan<any>
+> = (
+  $parentPlan: TParentPlan,
+  args: __TrackedObjectPlan<TArgs>,
+  context: __TrackedObjectPlan<TContext>,
+) => TResultPlan;
+
+/**
+ * Basically GraphQLFieldConfig but with an easy to access `plan` method.
+ */
+export type GraphileCrystalFieldConfig<
+  TContext extends BaseGraphQLContext,
+  TParentPlan extends Plan<any> | null,
+  TResultPlan extends Plan<any>,
+  TArgs extends BaseGraphQLArguments
+> = GraphQLFieldConfig<any, any> & {
+  plan?: PlanResolver<TContext, TArgs, TParentPlan, TResultPlan>;
+};

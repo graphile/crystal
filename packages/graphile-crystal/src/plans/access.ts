@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import debugFactory from "debug";
 import { inspect } from "util";
+import { CrystalResultsList, CrystalValuesList } from "../interfaces";
 
 import { Plan } from "../plan";
 
@@ -145,6 +146,7 @@ function constructDestructureFunction(
 
 const debugAccessPlan = debugFactory("crystal:AccessPlan");
 const debugAccessPlanVerbose = debugAccessPlan.extend("verbose");
+
 /**
  * Accesses a (potentially nested) property from the result of a plan.
  *
@@ -153,11 +155,14 @@ const debugAccessPlanVerbose = debugAccessPlan.extend("verbose");
  * preferably where the objects have null prototypes, and be sure to adhere to
  * the naming conventions detailed in assertSafeToAccessViaBraces.
  */
-export class AccessPlan extends Plan {
+export class AccessPlan<TData> extends Plan<TData> {
   private destructure: (value: any) => any;
   private parentPlanId: number;
 
-  constructor(parentPlan: Plan, public readonly path: (string | number)[]) {
+  constructor(
+    parentPlan: Plan<any>,
+    public readonly path: (string | number)[],
+  ) {
     super();
     this.addDependency(parentPlan);
     this.parentPlanId = parentPlan.id;
@@ -173,7 +178,9 @@ export class AccessPlan extends Plan {
   /**
    * Get the named property of an object.
    */
-  get(attrName: string): AccessPlan {
+  get<TAttr extends string>(
+    attrName: TAttr,
+  ): AccessPlan<TData extends { [key: string]: any } ? TData[TAttr] : never> {
     return new AccessPlan(this.aether.plans[this.parentPlanId], [
       ...this.path,
       attrName,
@@ -183,14 +190,16 @@ export class AccessPlan extends Plan {
   /**
    * Get the entry at the given index in an array.
    */
-  at(index: number): AccessPlan {
+  at<TIndex extends number>(
+    index: TIndex,
+  ): AccessPlan<TData extends Array<any> ? TData[TIndex] : never> {
     return new AccessPlan(this.aether.plans[this.parentPlanId], [
       ...this.path,
       index,
     ]);
   }
 
-  execute(values: any[][]): any[] {
+  execute(values: CrystalValuesList<[any]>): CrystalResultsList<TData> {
     return values.map(this.destructure);
   }
 
@@ -198,7 +207,7 @@ export class AccessPlan extends Plan {
     super.finalize();
   }
 
-  deduplicate(peers: AccessPlan[]): AccessPlan {
+  deduplicate(peers: AccessPlan<any>[]): AccessPlan<TData> {
     const myPath = JSON.stringify(this.path);
     const peersWithSamePath = peers.filter(
       (p) => JSON.stringify(p.path) === myPath,
@@ -213,9 +222,9 @@ export class AccessPlan extends Plan {
   }
 }
 
-export function access(
-  parentPlan: Plan,
+export function access<TData>(
+  parentPlan: Plan<any>,
   path: (string | number)[],
-): AccessPlan {
-  return new AccessPlan(parentPlan, path);
+): AccessPlan<TData> {
+  return new AccessPlan<TData>(parentPlan, path);
 }

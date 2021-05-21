@@ -2,6 +2,7 @@ import type { Constraint } from "../constraints";
 import { Plan } from "../plan";
 import type { __ValuePlan } from "./__value";
 import type { AccessPlan } from "./access";
+
 /**
  * Implements the `__TrackedObjectPlan(aether, object, constraints, path)`
  * algorithm used to allow runtime AND plan-time access to the three special
@@ -21,7 +22,7 @@ import type { AccessPlan } from "./access";
  * change the query plan, but it can also be used within plan resolvers to
  * branch the logic of a plan based on something in these entities.
  */
-export class __TrackedObjectPlan<TData = any> extends Plan {
+export class __TrackedObjectPlan<TData = any> extends Plan<TData> {
   /**
    * Could be anything. In the case of context it could even have exotic
    * entries such as `pgClient`.
@@ -31,7 +32,7 @@ export class __TrackedObjectPlan<TData = any> extends Plan {
   /**
    * For runtime (not plan-time) access to the value.
    */
-  private readonly valuePlan: __ValuePlan | AccessPlan;
+  private readonly valuePlan: __ValuePlan<TData> | AccessPlan<TData>;
 
   /**
    * A reference to the relevant
@@ -47,7 +48,7 @@ export class __TrackedObjectPlan<TData = any> extends Plan {
 
   constructor(
     value: TData,
-    valuePlan: __ValuePlan | AccessPlan,
+    valuePlan: __ValuePlan<TData> | AccessPlan<TData>,
     constraints: Constraint[],
     path: Array<string | number> = [],
   ) {
