@@ -8,10 +8,12 @@ module.exports = {
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
     //'plugin:@typescript-eslint/recommended-requiring-type-checking',
+    "plugin:import/errors",
+    "plugin:import/typescript",
     "prettier",
     "prettier/@typescript-eslint",
   ],
-  plugins: ["jest", "graphql", "tsdoc"],
+  plugins: ["jest", "graphql", "tsdoc", "simple-import-sort", "import"],
   env: {
     jest: true,
     node: true,
@@ -50,6 +52,18 @@ module.exports = {
     // Rules that we should enable:
     "@typescript-eslint/no-inferrable-types": "warn",
     "no-inner-declarations": "warn",
+
+    /*
+     * simple-import-sort seems to be the most stable import sorting currently,
+     * disable others
+     */
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
+    "sort-imports": "off",
+    "import/order": "off",
+
+    "import/no-deprecated": "warn",
+    "import/no-duplicates": "error",
   },
   overrides: [
     // Rules for plugins
