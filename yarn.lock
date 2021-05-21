@@ -1838,6 +1838,7 @@ __metadata:
     graphile-crystal: 4.7.0
     graphql: ^15.3.0
     jest: ^26.0.1
+    jest-serializer-simple: 4.6.0
     nodemon: ^2.0.7
     pg-sql2: 4.7.0
     ts-node: ^9.1.1
@@ -2872,7 +2873,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/json5@npm:2.2.0":
+"@types/json5@npm:2.2.0, @types/json5@npm:^2.2.0":
   version: 2.2.0
   resolution: "@types/json5@npm:2.2.0"
   dependencies:
@@ -11831,6 +11832,21 @@ fsevents@^1.2.7:
     typescript: ^4.2.4
   peerDependencies:
     graphql: ^14.6.0
+  languageName: unknown
+  linkType: soft
+
+"jest-serializer-simple@4.6.0, jest-serializer-simple@workspace:packages/jest-serializer-simple":
+  version: 0.0.0-use.local
+  resolution: "jest-serializer-simple@workspace:packages/jest-serializer-simple"
+  dependencies:
+    "@types/jest": ^25.2.3
+    "@types/json5": ^2.2.0
+    jest: ^26.0.1
+    json5: ^2.2.0
+    pretty-format: ^26.0.1
+    ts-node: ^9.1.1
+    tslib: ^2.2.0
+    typescript: ^4.2.4
   languageName: unknown
   linkType: soft
 

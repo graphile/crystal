@@ -30,6 +30,7 @@
     { "path": "packages/graphile-utils" },
     { "path": "packages/graphql-parse-resolve-info" },
     { "path": "packages/jest-serializer-graphql-schema" },
+    { "path": "packages/jest-serializer-simple" },
     { "path": "packages/lds" },
     { "path": "packages/lru" },
     { "path": "packages/pg-sql2" },
