@@ -1,4 +1,4 @@
-import { PgType } from "./PgIntrospectionPlugin";
+import type { PgType } from "./PgIntrospectionPlugin";
 
 export default (function PgQueryProceduresPlugin(
   builder,

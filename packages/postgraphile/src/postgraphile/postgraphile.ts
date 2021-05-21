@@ -1,14 +1,15 @@
 import chalk from "chalk";
 import { EventEmitter } from "events";
-import { GraphQLSchema } from "graphql";
-import { IncomingMessage, ServerResponse } from "http";
-import { Pool, PoolConfig } from "pg";
+import type { GraphQLSchema } from "graphql";
+import type { IncomingMessage, ServerResponse } from "http";
+import type { PoolConfig } from "pg";
+import { Pool } from "pg";
 import {
   createPostGraphileSchema,
   watchPostGraphileSchema,
 } from "postgraphile-core";
 
-import { HttpRequestHandler, mixed } from "../interfaces";
+import type { HttpRequestHandler, mixed } from "../interfaces";
 import createPostGraphileHttpRequestHandler from "./http/createPostGraphileHttpRequestHandler";
 import { pluginHookFromOptions } from "./pluginHook";
 import exportPostGraphileSchema from "./schema/exportPostGraphileSchema";

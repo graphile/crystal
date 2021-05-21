@@ -9,15 +9,13 @@
  */
 
 /* tslint:disable no-any */
-import {
-  createSourceEventStream,
+import type {
   DocumentNode,
-  execute,
   ExecutionResult,
-  GraphQLError,
   GraphQLFieldResolver,
   GraphQLSchema,
 } from "graphql";
+import { createSourceEventStream, execute, GraphQLError } from "graphql";
 import { isAsyncIterable } from "iterall";
 
 import mapAsyncIterator from "./mapAsyncIterator";

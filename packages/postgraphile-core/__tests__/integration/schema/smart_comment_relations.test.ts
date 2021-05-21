@@ -1,5 +1,5 @@
-import { GraphQLObjectType } from "graphql";
-import { PoolClient } from "pg";
+import type { GraphQLObjectType } from "graphql";
+import type { PoolClient } from "pg";
 
 import * as core from "./core";
 

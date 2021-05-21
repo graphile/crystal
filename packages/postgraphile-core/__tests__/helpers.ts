@@ -1,5 +1,6 @@
 import { promises as fsp } from "fs";
-import pg, { PoolClient, QueryResult } from "pg";
+import type { PoolClient, QueryResult } from "pg";
+import pg from "pg";
 
 // Reduce throttling on CI
 process.env.LIVE_THROTTLE = "100";

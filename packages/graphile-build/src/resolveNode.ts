@@ -1,5 +1,5 @@
-import { GetDataFromParsedResolveInfoFragmentFunction } from "./makeNewBuild";
-import { NodeFetcher } from "./plugins/NodePlugin";
+import type { GetDataFromParsedResolveInfoFragmentFunction } from "./makeNewBuild";
+import type { NodeFetcher } from "./plugins/NodePlugin";
 
 export default async function resolveNode<T = unknown>(
   nodeId: string,

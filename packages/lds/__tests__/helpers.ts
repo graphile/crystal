@@ -1,4 +1,5 @@
-import { Pool, PoolClient } from "pg";
+import type { PoolClient } from "pg";
+import { Pool } from "pg";
 
 import PgLogicalDecoding from "../src/pg-logical-decoding";
 

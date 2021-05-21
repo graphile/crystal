@@ -5,24 +5,22 @@ import chalk from "chalk";
 import crypto from "crypto";
 import Debugger from "debug"; // tslint:disable-line variable-name
 import finalHandler from "finalhandler";
+import type { DocumentNode, GraphQLError, GraphQLSchema } from "graphql";
 import {
-  DocumentNode,
   execute as executeGraphql,
   formatError as defaultFormatError,
-  GraphQLError,
-  GraphQLSchema,
   parse as parseGraphql,
   print as printGraphql,
   Source,
   specifiedRules,
   validate as validateGraphql,
 } from "graphql";
-import { IncomingMessage, ServerResponse } from "http";
+import type { IncomingMessage, ServerResponse } from "http";
 import httpError from "http-errors";
-import { Context as KoaContext } from "koa";
+import type { Context as KoaContext } from "koa";
 import parseUrl from "parseurl";
 
-import {
+import type {
   CreateRequestHandlerOptions,
   HttpRequestHandler,
 } from "../../interfaces";

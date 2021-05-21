@@ -1,10 +1,10 @@
 import { EventEmitter } from "events";
+import type { GraphQLSchema } from "graphql";
 import {
   graphql,
   GraphQLInt,
   GraphQLNonNull,
   GraphQLObjectType,
-  GraphQLSchema,
   printSchema,
 } from "graphql";
 

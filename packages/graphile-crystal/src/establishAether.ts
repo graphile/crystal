@@ -1,5 +1,5 @@
 import debugFactory from "debug";
-import {
+import type {
   FragmentDefinitionNode,
   GraphQLSchema,
   OperationDefinitionNode,

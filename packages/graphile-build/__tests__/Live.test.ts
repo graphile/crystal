@@ -1,10 +1,12 @@
-import {
-  LiveCoordinator,
+import type {
   LivePredicate,
-  LiveProvider,
-  LiveSource,
   LiveSubscriptionCallback,
   LiveSubscriptionReleaser,
+} from "../src/Live";
+import {
+  LiveCoordinator,
+  LiveProvider,
+  LiveSource,
   makeAsyncIteratorFromMonitor,
 } from "../src/Live";
 

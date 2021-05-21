@@ -1,7 +1,7 @@
 import assert from "assert";
 
 import { getComputedColumnDetails } from "./PgComputedColumnsPlugin";
-import { PgClass, PgProc, PgType } from "./PgIntrospectionPlugin";
+import type { PgClass, PgProc, PgType } from "./PgIntrospectionPlugin";
 
 function getCompatibleComputedColumns(
   build: GraphileEngine.Build,

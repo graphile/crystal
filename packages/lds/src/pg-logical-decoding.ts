@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import { EventEmitter } from "events";
-import { Pool, PoolClient } from "pg";
+import type { PoolClient } from "pg";
+import { Pool } from "pg";
 
 import FatalError from "./fatal-error";
 

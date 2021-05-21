@@ -1,6 +1,6 @@
 import debugFactory from "debug";
 import { EventEmitter } from "events";
-import {
+import type {
   GraphQLEnumTypeConfig,
   GraphQLEnumValueConfig,
   GraphQLEnumValueConfigMap,
@@ -15,12 +15,13 @@ import {
   /* ONLY IMPORT TYPES HERE! */
   GraphQLObjectTypeConfig,
   GraphQLScalarTypeConfig,
-  GraphQLSchema,
   GraphQLSchemaConfig,
   GraphQLUnionTypeConfig,
 } from "graphql";
+import { GraphQLSchema } from "graphql";
 
-import makeNewBuild, { InflectionBase } from "./makeNewBuild";
+import type { InflectionBase } from "./makeNewBuild";
+import makeNewBuild from "./makeNewBuild";
 import { bindAll } from "./utils";
 
 const debug = debugFactory("graphile-builder");

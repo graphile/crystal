@@ -1,11 +1,13 @@
 import createDebugger from "debug";
-import { ExecutionResult, Kind, OperationDefinitionNode } from "graphql";
+import type { ExecutionResult, OperationDefinitionNode } from "graphql";
+import { Kind } from "graphql";
 import jwt from "jsonwebtoken";
-import { Pool, PoolClient, QueryConfig, QueryResult } from "pg";
-import sql, { SQL } from "pg-sql2";
+import type { Pool, PoolClient, QueryConfig, QueryResult } from "pg";
+import type { SQL } from "pg-sql2";
+import sql from "pg-sql2";
 import { formatSQLForDebugging } from "postgraphile-core";
 
-import {
+import type {
   GraphileClaims,
   mixed,
   WithPostGraphileContextOptions,

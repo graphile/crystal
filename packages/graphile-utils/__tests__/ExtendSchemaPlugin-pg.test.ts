@@ -1,10 +1,11 @@
 import assert from "assert";
 import { graphql } from "graphql";
 import { ExecutionResultDataDefault } from "graphql/execution/execute";
-import pg, { Pool, Query } from "pg";
+import type { QueryBuilder } from "graphile-build-pg";
+import type { Pool } from "pg";
+import pg, { Query } from "pg";
 import { createPostGraphileSchema } from "postgraphile-core";
 
-import { QueryBuilder } from "../../../.yarn/$$virtual/graphile-build-pg-virtual-92e0f683b8/1/packages/graphile-build-pg/dist";
 import { embed, gql, makeExtendSchemaPlugin } from "../";
 
 const clean = (data: any): any => {

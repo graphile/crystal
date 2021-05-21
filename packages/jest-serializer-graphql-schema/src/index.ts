@@ -1,5 +1,6 @@
-import { GraphQLSchema, isSchema, printSchema } from "graphql";
-import { Plugin } from "pretty-format";
+import type { GraphQLSchema } from "graphql";
+import { isSchema, printSchema } from "graphql";
+import type { Plugin } from "pretty-format";
 
 import { consistentlyOrderedSchema } from "./consistentlyOrderedSchema";
 

@@ -1,5 +1,7 @@
-import { readFile, readFileSync, Stats, unwatchFile, watchFile } from "fs";
-import { JSONPgSmartTags, makeJSONPgSmartTagsPlugin } from "graphile-utils";
+import type { Stats } from "fs";
+import { readFile, readFileSync, unwatchFile, watchFile } from "fs";
+import type { JSONPgSmartTags } from "graphile-utils";
+import { makeJSONPgSmartTagsPlugin } from "graphile-utils";
 import * as JSON5 from "json5";
 
 export const makePgSmartTagsFromFilePlugin = (

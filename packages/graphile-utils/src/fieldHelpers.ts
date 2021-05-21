@@ -1,4 +1,4 @@
-import { QueryBuilder, SQL } from "graphile-build-pg";
+import type { QueryBuilder, SQL } from "graphile-build-pg";
 
 export type SelectGraphQLResultFromTable = (
   tableFragment: SQL,

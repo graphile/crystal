@@ -1,6 +1,6 @@
-import { GraphQLError } from "graphql";
+import type { GraphQLError } from "graphql";
 
-import {
+import type {
   GraphQLErrorExtended,
   GraphQLFormattedErrorExtended,
   mixed,

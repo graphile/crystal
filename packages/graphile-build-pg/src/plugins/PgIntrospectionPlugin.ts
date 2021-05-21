@@ -3,7 +3,7 @@ import debugFactory from "debug";
 import { readFile as rawReadFile } from "fs";
 import flatMap from "lodash/flatMap";
 import throttle from "lodash/throttle";
-import { Client, PoolClient } from "pg";
+import type { Client, PoolClient } from "pg";
 
 // @ts-ignore
 import { version } from "../../package.json";

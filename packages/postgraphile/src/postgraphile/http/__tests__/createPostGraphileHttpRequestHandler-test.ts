@@ -1,16 +1,17 @@
 import connect from "connect";
 import { EventEmitter } from "events";
 import express from "express";
-import fastify, { ServerFactoryFunction } from "fastify";
+import type { ServerFactoryFunction } from "fastify";
+import fastify from "fastify";
 import { GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql";
 import * as http from "http";
 import * as http2 from "http2";
 import koa from "koa";
 import compress from "koa-compress";
 import koaMount from "koa-mount";
-import { Pool } from "pg";
+import type { Pool } from "pg";
 
-import {
+import type {
   CreateRequestHandlerOptions,
   GraphQLErrorExtended,
 } from "../../../interfaces";

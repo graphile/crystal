@@ -1,4 +1,4 @@
-import QueryBuilder from "../QueryBuilder";
+import type QueryBuilder from "../QueryBuilder";
 import debugSql from "./debugSql";
 
 declare global {

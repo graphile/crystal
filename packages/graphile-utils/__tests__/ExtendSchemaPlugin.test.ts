@@ -11,13 +11,12 @@ import {
 import { graphql, parse, subscribe } from "graphql";
 import { $$asyncIterator } from "iterall";
 
+import type { ObjectResolver, Resolvers } from "../";
 import {
   embed,
   gql,
   makeAddInflectorsPlugin,
   makeExtendSchemaPlugin,
-  ObjectResolver,
-  Resolvers,
 } from "../";
 
 declare global {

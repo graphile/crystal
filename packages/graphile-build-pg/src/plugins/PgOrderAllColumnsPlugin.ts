@@ -1,4 +1,4 @@
-import { OrderByValue } from "./PgConnectionArgOrderBy";
+import type { OrderByValue } from "./PgConnectionArgOrderBy";
 
 export default (function PgOrderAllColumnsPlugin(builder) {
   builder.hook(

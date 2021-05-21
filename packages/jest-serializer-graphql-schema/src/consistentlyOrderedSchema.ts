@@ -1,9 +1,9 @@
+import type { GraphQLNamedType } from "graphql";
 import {
   GraphQLDirective,
   GraphQLEnumType,
   GraphQLInputObjectType,
   GraphQLInterfaceType,
-  GraphQLNamedType,
   GraphQLObjectType,
   GraphQLSchema,
   GraphQLUnionType,

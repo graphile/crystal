@@ -1,5 +1,6 @@
 import debugFactory from "debug";
-import { PubSub, withFilter } from "graphql-subscriptions";
+import type { PubSub } from "graphql-subscriptions";
+import { withFilter } from "graphql-subscriptions";
 
 const debug = debugFactory("pg-pubsub");
 

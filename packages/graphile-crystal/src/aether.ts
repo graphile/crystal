@@ -1,32 +1,34 @@
 import * as assert from "assert";
 import chalk from "chalk";
 import debugFactory from "debug";
-import {
-  assertListType,
-  assertObjectType,
+import type {
   FieldNode,
   FragmentDefinitionNode,
   GraphQLField,
   GraphQLInputField,
   GraphQLInputObjectType,
   GraphQLInputType,
+  GraphQLOutputType,
+  GraphQLSchema,
+  OperationDefinitionNode,
+  SelectionNode,
+} from "graphql";
+import {
+  assertListType,
+  assertObjectType,
   GraphQLInterfaceType,
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
-  GraphQLOutputType,
-  GraphQLSchema,
   GraphQLUnionType,
   isInputObjectType,
   isListType,
   isNonNullType,
-  OperationDefinitionNode,
-  SelectionNode,
 } from "graphql";
 import { inspect } from "util";
 
-import { Constraint } from "./constraints";
-import { Deferred } from "./deferred";
+import type { Constraint } from "./constraints";
+import type { Deferred } from "./deferred";
 import { isDev } from "./dev";
 import { globalState } from "./global";
 import { getDirective, graphqlCollectFields } from "./graphqlCollectFields";
@@ -35,16 +37,16 @@ import {
   interfaceTypeHasNonIntrospectionFieldQueriedInSelections,
   typesUsedInSelections,
 } from "./graphqlMergeSelectionSets";
-import { InputObjectPlan, InputPlan, inputPlan } from "./input";
+import type { InputPlan } from "./input";
+import { InputObjectPlan, inputPlan } from "./input";
+import type { Batch, CrystalContext, CrystalObject } from "./interfaces";
 import {
   $$crystalContext,
   $$crystalObjectByPathIdentity,
   $$indexesByPathIdentity,
-  Batch,
-  CrystalContext,
-  CrystalObject,
 } from "./interfaces";
-import { ArgumentPlan, assertFinalized, Plan, PolymorphicPlan } from "./plan";
+import type { ArgumentPlan, PolymorphicPlan } from "./plan";
+import { assertFinalized, Plan } from "./plan";
 import {
   __ListItemPlan,
   __TrackedObjectPlan,
@@ -52,13 +54,13 @@ import {
   assertListCapablePlan,
 } from "./plans";
 import { isCrystalObject, newCrystalObject } from "./resolvers";
+import type { UniqueId } from "./utils";
 import {
   arraysMatch,
   defaultValueToValueNode,
   isPromise,
   ROOT_VALUE_OBJECT,
   uid,
-  UniqueId,
 } from "./utils";
 
 const EMPTY_INDEXES = Object.freeze([] as number[]);

@@ -1,4 +1,4 @@
-import { PoolClient } from "pg";
+import type { PoolClient } from "pg";
 
 import kitchenSinkSchemaSql from "./kitchenSinkSchemaSql";
 import pgPool from "./pgPool";

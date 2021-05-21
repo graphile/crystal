@@ -1,5 +1,6 @@
-import { GraphQLSchema, lexicographicSortSchema } from "graphql";
-import { PoolClient } from "pg";
+import type { GraphQLSchema } from "graphql";
+import { lexicographicSortSchema } from "graphql";
+import type { PoolClient } from "pg";
 
 import { createPostGraphileSchema } from "../../..";
 import { withPgClient } from "../../helpers";

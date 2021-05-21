@@ -2,22 +2,23 @@ import * as assert from "assert";
 import chalk from "chalk";
 // import { getAliasFromResolveInfo } from "graphql-parse-resolve-info";
 import debugFactory from "debug";
+import type { GraphQLFieldResolver, GraphQLOutputType } from "graphql";
 import {
   defaultFieldResolver,
   getNamedType,
-  GraphQLFieldResolver,
-  GraphQLOutputType,
   isLeafType,
   isListType,
   isNonNullType,
 } from "graphql";
-import { Path } from "graphql/jsutils/Path";
+import type { Path } from "graphql/jsutils/Path";
 import { inspect } from "util";
 
 import { GLOBAL_PATH, populateValuePlan, ROOT_PATH } from "./aether";
-import { defer, Deferred } from "./deferred";
+import type { Deferred } from "./deferred";
+import { defer } from "./deferred";
 import { isDev } from "./dev";
 import { establishAether } from "./establishAether";
+import type { Batch, CrystalContext, CrystalObject } from "./interfaces";
 import {
   $$crystalContext,
   $$crystalObjectByPathIdentity,
@@ -26,18 +27,15 @@ import {
   $$indexes,
   $$indexesByPathIdentity,
   $$pathIdentity,
-  Batch,
-  CrystalContext,
-  CrystalObject,
 } from "./interfaces";
-import { Plan } from "./plan";
+import type { Plan } from "./plan";
 import { __ValuePlan } from "./plans";
+import type { UniqueId } from "./utils";
 import {
   crystalPrint,
   crystalPrintPathIdentity,
   ROOT_VALUE_OBJECT,
   uid,
-  UniqueId,
 } from "./utils";
 
 const debug = debugFactory("crystal:resolvers");

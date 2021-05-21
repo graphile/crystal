@@ -1,5 +1,5 @@
 import debugSql from "./debugSql";
-import { PgClass } from "./PgIntrospectionPlugin";
+import type { PgClass } from "./PgIntrospectionPlugin";
 
 declare global {
   namespace GraphileEngine {

@@ -14,18 +14,20 @@ import program from "commander";
 import debugFactory from "debug";
 import { existsSync } from "fs";
 import { createServer } from "http";
-import jwt from "jsonwebtoken";
-import { Pool, PoolConfig } from "pg";
+import type jwt from "jsonwebtoken";
+import type { PoolConfig } from "pg";
+import { Pool } from "pg";
 import { parse as parsePgConnectionString } from "pg-connection-string";
 
 // @ts-ignore
 import * as manifest from "../../package.json";
 // @ts-ignore
 import sponsors from "../../sponsors.json";
-import { mixed } from "../interfaces";
+import type { mixed } from "../interfaces";
 import { makePgSmartTagsFromFilePlugin } from "../plugins";
 import { enhanceHttpServerWithSubscriptions } from "./http/subscriptions";
-import { makePluginHook, PostGraphilePlugin } from "./pluginHook";
+import type { PostGraphilePlugin } from "./pluginHook";
+import { makePluginHook } from "./pluginHook";
 import postgraphile, { getPostgraphileSchemaBuilder } from "./postgraphile";
 import config from "./postgraphilerc";
 

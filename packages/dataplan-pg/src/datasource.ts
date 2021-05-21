@@ -2,20 +2,19 @@ import LRU from "@graphile/lru";
 import * as assert from "assert";
 import chalk from "chalk";
 import debugFactory from "debug";
-import {
+import type {
   Aether,
-  aether,
   CrystalValuesList,
-  defer,
   Deferred,
-  object,
   Plan,
 } from "graphile-crystal";
-import { Pool } from "pg";
-import sql, { SQL, SQLRawValue } from "pg-sql2";
+import { aether, defer, object } from "graphile-crystal";
+import type { Pool } from "pg";
+import type { SQL, SQLRawValue } from "pg-sql2";
+import sql from "pg-sql2";
 import { inspect } from "util";
 
-import { PgClassSelectPlan } from "./plans/pgClassSelect";
+import type { PgClassSelectPlan } from "./plans/pgClassSelect";
 
 const debug = debugFactory("datasource:pg:PgDataSource");
 const debugVerbose = debug.extend("verbose");

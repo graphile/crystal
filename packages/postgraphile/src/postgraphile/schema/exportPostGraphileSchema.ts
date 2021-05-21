@@ -1,8 +1,8 @@
 import { readFile as origReadFile, writeFile as origWriteFile } from "fs";
+import type { GraphQLSchema } from "graphql";
 import {
   getIntrospectionQuery,
   graphql,
-  GraphQLSchema,
   lexicographicSortSchema,
   printSchema,
 } from "graphql";

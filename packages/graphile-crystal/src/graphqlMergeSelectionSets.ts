@@ -1,4 +1,4 @@
-import {
+import type {
   FieldNode,
   GraphQLInterfaceType,
   GraphQLObjectType,
@@ -6,7 +6,7 @@ import {
 } from "graphql";
 import { inspect } from "util";
 
-import { Aether } from "./aether";
+import type { Aether } from "./aether";
 
 /**
  * Implements the `MergeSelectionSets` algorithm from the GraphQL spec.

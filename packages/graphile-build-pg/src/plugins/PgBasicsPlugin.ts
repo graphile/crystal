@@ -1,7 +1,8 @@
 import chalk from "chalk";
 import pickBy from "lodash/pickBy";
-import { PoolClient } from "pg";
-import sql, { PgSQL } from "pg-sql2";
+import type { PoolClient } from "pg";
+import type { PgSQL } from "pg-sql2";
+import sql from "pg-sql2";
 import { inspect } from "util";
 
 // @ts-ignore
@@ -24,7 +25,7 @@ import queryFromResolveDataFactory from "../queryFromResolveDataFactory";
 import addStartEndCursor from "./addStartEndCursor";
 import makeProcField from "./makeProcField";
 import pgField from "./pgField";
-import {
+import type {
   PgAttribute,
   PgClass,
   PgConstraint,

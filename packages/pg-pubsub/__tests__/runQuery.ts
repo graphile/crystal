@@ -1,10 +1,10 @@
 // @ts-ignore
-import { ClientRequest, ServerResponse } from "http";
+import type { ClientRequest, ServerResponse } from "http";
 import MockReq from "mock-req";
 // @ts-ignore
 import MockRes from "mock-res";
-import { Pool } from "pg";
-import { HttpRequestHandler } from "postgraphile";
+import type { Pool } from "pg";
+import type { HttpRequestHandler } from "postgraphile";
 
 function sanitise<TInput>(json: TInput): TInput {
   if (Array.isArray(json)) {

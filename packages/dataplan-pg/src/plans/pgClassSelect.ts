@@ -1,18 +1,15 @@
 import debugFactory from "debug";
-import {
+import type {
   __ListItemPlan,
-  access,
   CrystalResultsList,
   CrystalValuesList,
-  first,
-  list,
-  map,
-  Plan,
 } from "graphile-crystal";
-import sql, { arraysMatch, SQL, SQLRawValue } from "pg-sql2";
+import { access, first, list, map, Plan } from "graphile-crystal";
+import type { SQL, SQLRawValue } from "pg-sql2";
+import sql, { arraysMatch } from "pg-sql2";
 import { inspect } from "util";
 
-import { PgDataSource } from "../datasource";
+import type { PgDataSource } from "../datasource";
 import { $$CURSOR } from "../symbols";
 import { PgClassSelectSinglePlan } from "./pgClassSelectSingle";
 import { PgColumnSelectPlan } from "./pgColumnSelect";

@@ -1,4 +1,5 @@
-import { PgClass, PgEntityKind, PgProc, PgType } from "./PgIntrospectionPlugin";
+import type { PgClass, PgProc, PgType } from "./PgIntrospectionPlugin";
+import { PgEntityKind } from "./PgIntrospectionPlugin";
 
 // This interface is not official yet, don't rely on it.
 export const getComputedColumnDetails = (

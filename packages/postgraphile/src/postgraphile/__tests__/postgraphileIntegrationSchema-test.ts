@@ -3,8 +3,8 @@
 
 jest.unmock("postgraphile-core");
 
-import { GraphQLSchema } from "graphql";
-import { PoolClient } from "pg";
+import type { GraphQLSchema } from "graphql";
+import type { PoolClient } from "pg";
 
 import printSchemaOrdered from "../../__tests__/utils/printSchemaOrdered";
 import withPgClient from "../../__tests__/utils/withPgClient";

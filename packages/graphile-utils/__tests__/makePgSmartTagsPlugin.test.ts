@@ -1,5 +1,6 @@
 import { graphql } from "graphql";
-import pg, { Pool, PoolClient } from "pg";
+import type { Pool, PoolClient } from "pg";
+import pg from "pg";
 import { createPostGraphileSchema } from "postgraphile-core";
 
 import { makeJSONPgSmartTagsPlugin } from "../dist";

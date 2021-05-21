@@ -2,10 +2,8 @@
 import "graphile-build";
 import "graphile-build-pg";
 
-import subscribeToLogicalDecoding, {
-  Announcement,
-  LDSubscription,
-} from "@graphile/lds";
+import type { Announcement, LDSubscription } from "@graphile/lds";
+import subscribeToLogicalDecoding from "@graphile/lds";
 import WebSocket from "ws";
 
 declare global {

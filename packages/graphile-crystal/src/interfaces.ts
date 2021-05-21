@@ -1,6 +1,6 @@
-import { Deferred } from "./deferred";
-import { Plan } from "./plan";
-import { UniqueId } from "./utils";
+import type { Deferred } from "./deferred";
+import type { Plan } from "./plan";
+import type { UniqueId } from "./utils";
 
 export const $$crystalContext = Symbol("context");
 export const $$data = Symbol("data");

@@ -1,4 +1,4 @@
-import { CrystalResultsList, CrystalValuesList } from "../interfaces";
+import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
 import { Plan } from "../plan";
 
 export class FirstPlan<TData> extends Plan<TData> {

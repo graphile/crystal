@@ -1,4 +1,4 @@
-import SchemaBuilder from "../SchemaBuilder";
+import type SchemaBuilder from "../SchemaBuilder";
 
 export default (function ClientMutationIdDescriptionPlugin(
   builder: SchemaBuilder,

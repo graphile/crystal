@@ -1,4 +1,4 @@
-import { Aether } from "../aether";
+import type { Aether } from "../aether";
 import { getCurrentAether, globalState } from "../global";
 
 export function aether(): Aether {

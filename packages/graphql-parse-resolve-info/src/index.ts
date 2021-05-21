@@ -1,22 +1,24 @@
 import assert from "assert";
 import debugFactory from "debug";
-import {
+import type {
   ASTNode,
   FieldNode,
   FragmentSpreadNode,
-  getNamedType,
   GraphQLCompositeType,
   GraphQLField,
   GraphQLInterfaceType,
   GraphQLNamedType,
-  GraphQLObjectType,
   GraphQLResolveInfo,
   GraphQLType,
-  GraphQLUnionType,
   InlineFragmentNode,
-  isCompositeType,
   NamedTypeNode,
   SelectionNode,
+} from "graphql";
+import {
+  getNamedType,
+  GraphQLObjectType,
+  GraphQLUnionType,
+  isCompositeType,
 } from "graphql";
 import { getArgumentValues } from "graphql/execution/values";
 

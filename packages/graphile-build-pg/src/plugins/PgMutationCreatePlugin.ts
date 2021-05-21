@@ -1,6 +1,6 @@
 import debugFactory from "debug";
 
-import { SQL } from "../QueryBuilder";
+import type { SQL } from "../QueryBuilder";
 
 const debug = debugFactory("graphile-build-pg");
 

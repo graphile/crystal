@@ -1,8 +1,8 @@
 import createDebugger from "debug";
 import { EventEmitter } from "events";
 import { PubSub } from "graphql-subscriptions";
-import { PoolClient } from "pg";
-import { PostGraphilePlugin } from "postgraphile";
+import type { PoolClient } from "pg";
+import type { PostGraphilePlugin } from "postgraphile";
 
 import PgGenericSubscriptionPlugin from "./PgGenericSubscriptionPlugin";
 import PgSubscriptionResolverPlugin from "./PgSubscriptionResolverPlugin";

@@ -1,13 +1,13 @@
 import * as assert from "assert";
 import * as fs from "fs";
 import { defaultPlugins, getBuilder, SchemaBuilder } from "graphile-build";
+import type { PgAttribute } from "graphile-build-pg";
 import {
   defaultPlugins as pgDefaultPlugins,
   formatSQLForDebugging,
-  PgAttribute,
 } from "graphile-build-pg";
-import { Secret, SignOptions } from "jsonwebtoken";
-import { Pool, PoolClient } from "pg";
+import type { Secret, SignOptions } from "jsonwebtoken";
+import type { Pool, PoolClient } from "pg";
 
 export { formatSQLForDebugging, SchemaBuilder };
 

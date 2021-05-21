@@ -1,4 +1,4 @@
-import {
+import type {
   GraphQLEnumType,
   GraphQLEnumTypeConfig,
   GraphQLFieldConfig,
@@ -22,15 +22,15 @@ import {
   GraphQLUnionType,
   GraphQLUnionTypeConfig,
 } from "graphql";
-import { ResolveTree } from "graphql-parse-resolve-info";
+import type { ResolveTree } from "graphql-parse-resolve-info";
 
-import { LiveCoordinator } from "./Live";
-import {
+import type { LiveCoordinator } from "./Live";
+import type {
   GetDataFromParsedResolveInfoFragmentFunction,
   InflectionBase,
 } from "./makeNewBuild";
-import { NodeFetcher } from "./plugins/NodePlugin";
-import SchemaBuilder from "./SchemaBuilder";
+import type { NodeFetcher } from "./plugins/NodePlugin";
+import type SchemaBuilder from "./SchemaBuilder";
 
 declare global {
   namespace GraphileEngine {

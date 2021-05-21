@@ -1,8 +1,8 @@
 /* tslint:disable:no-any */
-import { IncomingMessage, ServerResponse } from "http";
+import type { IncomingMessage, ServerResponse } from "http";
 import { PassThrough } from "stream";
 
-import { CreateRequestHandlerOptions } from "../../interfaces";
+import type { CreateRequestHandlerOptions } from "../../interfaces";
 
 export default function setupServerSentEvents(
   req: IncomingMessage,

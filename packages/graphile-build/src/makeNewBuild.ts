@@ -4,10 +4,10 @@ import LRU from "@graphile/lru";
 import chalk from "chalk";
 import { createHash } from "crypto";
 import * as graphql from "graphql";
+import type { ResolveTree } from "graphql-parse-resolve-info";
 import {
   getAliasFromResolveInfo as rawGetAliasFromResolveInfo,
   parseResolveInfo,
-  ResolveTree,
   simplifyParsedResolveInfoFragmentWithType,
 } from "graphql-parse-resolve-info";
 import pluralize from "pluralize";
@@ -19,7 +19,7 @@ import extend, { indent } from "./extend";
 import { LiveCoordinator } from "./Live";
 import { makeNewWithHooks } from "./newWithHooks";
 import resolveNode from "./resolveNode";
-import SchemaBuilder from "./SchemaBuilder";
+import type SchemaBuilder from "./SchemaBuilder";
 import swallowError from "./swallowError";
 import { camelCase, constantCase, upperCamelCase } from "./utils";
 

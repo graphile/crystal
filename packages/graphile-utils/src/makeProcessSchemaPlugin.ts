@@ -1,4 +1,4 @@
-import { SchemaBuilder } from "graphile-build";
+import type { SchemaBuilder } from "graphile-build";
 
 type ProcessSchemaFunction = (
   schema: import("graphql").GraphQLSchema,

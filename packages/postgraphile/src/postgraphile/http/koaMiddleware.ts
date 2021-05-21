@@ -1,6 +1,6 @@
 /* tslint:disable:no-any */
-import { IncomingMessage, ServerResponse } from "http";
-import { Context as KoaContext } from "koa";
+import type { IncomingMessage, ServerResponse } from "http";
+import type { Context as KoaContext } from "koa";
 
 export const isKoaApp = (a: any, b: any) =>
   a.req && a.res && typeof b === "function";

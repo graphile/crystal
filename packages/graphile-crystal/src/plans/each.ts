@@ -1,10 +1,7 @@
-import { CrystalResultsList, CrystalValuesList } from "../interfaces";
+import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
 import { Plan } from "../plan";
-import {
-  __ListItemPlan,
-  isListCapablePlan,
-  ListCapablePlan,
-} from "./__listItem";
+import type { __ListItemPlan, ListCapablePlan } from "./__listItem";
+import { isListCapablePlan } from "./__listItem";
 
 export class EachPlan<TData = any, TResult = any>
   extends Plan<ReadonlyArray<TResult>>

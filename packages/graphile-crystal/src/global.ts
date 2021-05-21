@@ -1,4 +1,5 @@
-import { Aether, GLOBAL_PATH } from "./aether";
+import type { Aether } from "./aether";
+import { GLOBAL_PATH } from "./aether";
 
 export const globalState = {
   debug: false as boolean,

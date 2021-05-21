@@ -40,6 +40,7 @@ module.exports = {
         ignoreRestSiblings: true,
       },
     ],
+    "@typescript-eslint/consistent-type-imports": "error",
     "no-confusing-arrow": 0,
     "no-else-return": 0,
     "no-underscore-dangle": 0,

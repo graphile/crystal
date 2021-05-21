@@ -2,9 +2,9 @@ import LRU from "@graphile/lru";
 import rawParseInterval from "postgres-interval";
 
 import makeGraphQLJSONType from "../GraphQLJSON";
-import { SQL } from "../QueryBuilder";
-import { PgTypeModifier } from "./PgBasicsPlugin";
-import {
+import type { SQL } from "../QueryBuilder";
+import type { PgTypeModifier } from "./PgBasicsPlugin";
+import type {
   PgClass,
   PgConstraint,
   PgEntity,

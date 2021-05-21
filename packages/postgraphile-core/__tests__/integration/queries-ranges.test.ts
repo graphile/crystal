@@ -1,5 +1,6 @@
 import assert from "assert";
-import { graphql, GraphQLSchema } from "graphql";
+import type { GraphQLSchema } from "graphql";
+import { graphql } from "graphql";
 
 import { createPostGraphileSchema } from "../..";
 import { withPgClient } from "../helpers";

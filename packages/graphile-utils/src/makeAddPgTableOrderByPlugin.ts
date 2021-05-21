@@ -1,5 +1,5 @@
 // BELOW HERE, IMPORTS ARE ONLY TYPES (not values)
-import { SQL } from "graphile-build-pg";
+import type { SQL } from "graphile-build-pg";
 
 type OrderSpec = [string | SQL, boolean] | [string | SQL, boolean, boolean];
 export interface MakeAddPgTableOrderByPluginOrders {

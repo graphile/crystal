@@ -1,5 +1,6 @@
 import { Plan } from "../plan";
-import { access, AccessPlan } from "./access";
+import type { AccessPlan } from "./access";
+import { access } from "./access";
 
 /**
  * Implements `__ValuePlan(aether)` which is never executed; it's purely

@@ -13,40 +13,33 @@
  * column, but shows integration of external data into query planning.)
  */
 
-import {
-  __ListItemPlan,
-  __TrackedObjectPlan,
-  __ValuePlan,
-  crystalEnforce,
-  Plan,
-} from "graphile-crystal";
-import {
+import type { __TrackedObjectPlan, __ValuePlan, Plan } from "graphile-crystal";
+import { __ListItemPlan, crystalEnforce } from "graphile-crystal";
+import type {
   ExecutionResult,
+  GraphQLFieldConfig,
+  GraphQLFieldConfigMap,
+  GraphQLObjectTypeConfig,
+  Thunk,
+} from "graphql";
+import {
   graphql,
   GraphQLBoolean,
   GraphQLEnumType,
-  GraphQLFieldConfig,
-  GraphQLFieldConfigMap,
   GraphQLInputObjectType,
   GraphQLInt,
   GraphQLList,
   GraphQLObjectType,
-  GraphQLObjectTypeConfig,
   GraphQLSchema,
   GraphQLString,
-  Thunk,
 } from "graphql";
 import { resolve } from "path";
 import { Pool } from "pg";
 import sql from "pg-sql2";
 import prettier from "prettier";
 
-import {
-  PgClassSelectPlan,
-  PgClassSelectSinglePlan,
-  PgConnectionPlan,
-  PgDataSource,
-} from "..";
+import type { PgClassSelectSinglePlan } from "..";
+import { PgClassSelectPlan, PgConnectionPlan, PgDataSource } from "..";
 import { stripAnsi } from "../stripAnsi";
 
 const testPool = new Pool({ connectionString: "graphile_crystal" });

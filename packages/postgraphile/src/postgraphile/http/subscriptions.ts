@@ -1,27 +1,21 @@
+import type { DocumentNode, ExecutionResult, GraphQLError } from "graphql";
 import {
-  DocumentNode,
-  ExecutionResult,
-  GraphQLError,
   parse,
   specifiedRules,
   subscribe as graphqlSubscribe,
   validate,
 } from "graphql";
-import {
-  IncomingMessage,
-  OutgoingHttpHeaders,
-  Server,
-  ServerResponse,
-} from "http";
+import type { IncomingMessage, OutgoingHttpHeaders, Server } from "http";
+import { ServerResponse } from "http";
 import parseUrl from "parseurl";
-import {
+import type {
   ConnectionContext,
   ExecutionParams,
-  SubscriptionServer,
 } from "subscriptions-transport-ws";
+import { SubscriptionServer } from "subscriptions-transport-ws";
 import * as WebSocket from "ws";
 
-import { HttpRequestHandler, Middleware } from "../../interfaces";
+import type { HttpRequestHandler, Middleware } from "../../interfaces";
 import { pluginHookFromOptions } from "../pluginHook";
 import { isEmpty } from "./createPostGraphileHttpRequestHandler";
 import liveSubscribe from "./liveSubscribe";

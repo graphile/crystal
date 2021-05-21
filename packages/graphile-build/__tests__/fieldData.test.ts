@@ -1,3 +1,4 @@
+import type { GraphQLScalarType } from "graphql";
 import {
   graphql,
   GraphQLEnumType,
@@ -6,7 +7,6 @@ import {
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLObjectTypeConfig,
-  GraphQLScalarType,
   GraphQLString,
 } from "graphql";
 

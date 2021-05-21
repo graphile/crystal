@@ -2,11 +2,13 @@ import {
   buildClientSchema,
   introspectionQuery as INTROSPECTION_QUERY,
 } from "graphql";
-import { Pool, PoolClient } from "pg";
+import type { PoolClient } from "pg";
+import { Pool } from "pg";
 import { makePluginHook, postgraphile } from "postgraphile";
 
 import PgPubsub from "../src";
-import { runQuery, TestCtx } from "./runQuery";
+import type { TestCtx } from "./runQuery";
+import { runQuery } from "./runQuery";
 
 let ctx: TestCtx | null = null;
 const CLI_DEFAULTS = {};

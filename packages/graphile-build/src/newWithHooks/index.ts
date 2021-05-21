@@ -5,9 +5,9 @@ import {
   makeCrystalWrapResolver,
 } from "graphile-crystal";
 import * as graphql from "graphql";
-import { ResolveTree } from "graphql-parse-resolve-info";
+import type { ResolveTree } from "graphql-parse-resolve-info";
 
-import SchemaBuilder from "../SchemaBuilder";
+import type SchemaBuilder from "../SchemaBuilder";
 
 let recurseDataGeneratorsForFieldWarned = false;
 

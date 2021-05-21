@@ -8,15 +8,11 @@ import {
   StandardTypesPlugin,
   SubscriptionPlugin,
 } from "graphile-build";
-import { graphql, GraphQLFieldResolver } from "graphql";
+import type { GraphQLFieldResolver } from "graphql";
+import { graphql } from "graphql";
 
-import {
-  gql,
-  makeExtendSchemaPlugin,
-  makeWrapResolversPlugin,
-  ResolverWrapperFilterRule,
-  ResolverWrapperFn,
-} from "../src";
+import type { ResolverWrapperFilterRule, ResolverWrapperFn } from "../src";
+import { gql, makeExtendSchemaPlugin, makeWrapResolversPlugin } from "../src";
 
 declare global {
   namespace GraphileEngine {

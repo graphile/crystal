@@ -1,17 +1,20 @@
 import * as assert from "assert";
-import chalk from "chalk";
+import type chalk from "chalk";
 import * as graphql from "graphql";
-import { IncomingMessage, Server, ServerResponse } from "http";
-import httpError from "http-errors";
-import { Pool } from "pg";
-import { ExecutionParams } from "subscriptions-transport-ws";
-import * as WebSocket from "ws";
+import type { IncomingMessage, Server, ServerResponse } from "http";
+import type httpError from "http-errors";
+import type { Pool } from "pg";
+import type { ExecutionParams } from "subscriptions-transport-ws";
+import type * as WebSocket from "ws";
 
 // @ts-ignore
 import { version } from "../../package.json";
-import { CreateRequestHandlerOptions, HttpRequestHandler } from "../interfaces";
-import { AddFlagFn } from "./cli";
-import { WithPostGraphileContextFn } from "./withPostGraphileContext";
+import type {
+  CreateRequestHandlerOptions,
+  HttpRequestHandler,
+} from "../interfaces";
+import type { AddFlagFn } from "./cli";
+import type { WithPostGraphileContextFn } from "./withPostGraphileContext";
 
 // tslint:disable-next-line no-any
 interface PostGraphileHooks {

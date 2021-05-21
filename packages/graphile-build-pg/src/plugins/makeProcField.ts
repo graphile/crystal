@@ -1,11 +1,11 @@
 import chalk from "chalk";
-import { ResolveTree } from "graphql-parse-resolve-info";
-import { SQL } from "pg-sql2";
+import type { ResolveTree } from "graphql-parse-resolve-info";
+import type { SQL } from "pg-sql2";
 
-import QueryBuilder from "../QueryBuilder";
+import type QueryBuilder from "../QueryBuilder";
 import { nullableIf } from "../utils";
 import debugSql from "./debugSql";
-import { PgProc, PgType, SmartTags } from "./PgIntrospectionPlugin";
+import type { PgProc, PgType, SmartTags } from "./PgIntrospectionPlugin";
 
 declare global {
   namespace GraphileEngine {

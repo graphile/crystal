@@ -1,5 +1,6 @@
 import debugFactory from "debug";
-import { GraphQLSchema, isObjectType } from "graphql";
+import type { GraphQLSchema } from "graphql";
+import { isObjectType } from "graphql";
 
 import {
   $$crystalWrapped,

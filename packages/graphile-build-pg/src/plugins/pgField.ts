@@ -1,8 +1,10 @@
-import { ResolveTree } from "graphql-parse-resolve-info";
+import type { ResolveTree } from "graphql-parse-resolve-info";
 
-import QueryBuilder, { SQL } from "../QueryBuilder";
-import { PgTypeModifier } from "./PgBasicsPlugin";
-import { PgType } from "./PgIntrospectionPlugin";
+import QueryBuilder from "../QueryBuilder";
+import type { SQL } from "../QueryBuilder";
+
+import type { PgTypeModifier } from "./PgBasicsPlugin";
+import type { PgType } from "./PgIntrospectionPlugin";
 
 interface PgFieldOptions {
   pgType?: PgType;

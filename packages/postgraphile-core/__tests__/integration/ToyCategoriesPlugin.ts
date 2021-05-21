@@ -1,5 +1,5 @@
 import assert from "assert";
-import { GraphQLObjectType } from "graphql";
+import type { GraphQLObjectType } from "graphql";
 
 const plugin: GraphileEngine.Plugin = (builder) => {
   // This hook adds the 'Toy.categories' field

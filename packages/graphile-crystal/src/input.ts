@@ -1,24 +1,26 @@
 import * as assert from "assert";
-import {
-  coerceInputValue,
-  GraphQLInputObjectType,
+import type {
   GraphQLInputType,
   GraphQLLeafType,
-  GraphQLList,
-  GraphQLNonNull,
   GraphQLType,
-  isInputType,
-  isLeafType,
   ListTypeNode,
   NamedTypeNode,
   NonNullTypeNode,
   ValueNode,
 } from "graphql";
+import {
+  coerceInputValue,
+  GraphQLInputObjectType,
+  GraphQLList,
+  GraphQLNonNull,
+  isInputType,
+  isLeafType,
+} from "graphql";
 import { inspect } from "util";
 
-import { Aether } from "./aether";
+import type { Aether } from "./aether";
 import { Plan } from "./plan";
-import { __TrackedObjectPlan } from "./plans";
+import type { __TrackedObjectPlan } from "./plans";
 import { defaultValueToValueNode } from "./utils";
 
 export type InputPlan =

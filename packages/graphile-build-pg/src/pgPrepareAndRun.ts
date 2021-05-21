@@ -1,6 +1,6 @@
 import LRU from "@graphile/lru";
 import { createHash } from "crypto";
-import { PoolClient } from "pg";
+import type { PoolClient } from "pg";
 
 const POSTGRAPHILE_PREPARED_STATEMENT_CACHE_SIZE =
   parseInt(process.env.POSTGRAPHILE_PREPARED_STATEMENT_CACHE_SIZE || "", 10) ||

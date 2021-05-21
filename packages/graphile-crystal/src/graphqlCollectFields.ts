@@ -1,17 +1,15 @@
+import type { DirectiveNode, FieldNode, SelectionNode } from "graphql";
 import {
-  DirectiveNode,
-  FieldNode,
   GraphQLInterfaceType,
   GraphQLObjectType,
   GraphQLUnionType,
   isInterfaceType,
   isObjectType,
   isUnionType,
-  SelectionNode,
 } from "graphql";
 
-import { Aether } from "./aether";
-import { __TrackedObjectPlan } from "./plans";
+import type { Aether } from "./aether";
+import type { __TrackedObjectPlan } from "./plans";
 
 /**
  * Given a selection, finds the first directive named `directiveName`.

@@ -1,12 +1,12 @@
-import {
+import type {
   PgAttribute,
   PgClass,
   PgConstraint,
   PgEntity,
-  PgEntityKind,
   PgProc,
   RawishIntrospectionResults,
 } from "graphile-build-pg";
+import { PgEntityKind } from "graphile-build-pg";
 
 import parseIdentifierParts from "./parseIdentifierParts";
 

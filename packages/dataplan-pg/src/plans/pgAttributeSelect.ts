@@ -1,8 +1,10 @@
 import debugFactory from "debug";
-import { CrystalResultsList, CrystalValuesList, Plan } from "graphile-crystal";
-import sql, { SQL } from "pg-sql2";
+import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
+import { Plan } from "graphile-crystal";
+import type { SQL } from "pg-sql2";
+import sql from "pg-sql2";
 
-import { PgDataSource } from "../datasource";
+import type { PgDataSource } from "../datasource";
 import { PgClassSelectSinglePlan } from "./pgClassSelectSingle";
 
 const debugPlan = debugFactory("datasource:pg:PgAttributeSelectPlan:plan");

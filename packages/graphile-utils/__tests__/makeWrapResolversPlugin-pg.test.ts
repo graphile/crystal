@@ -1,6 +1,7 @@
 import assert from "assert";
 import { graphql } from "graphql";
-import pg, { Pool } from "pg";
+import type { Pool } from "pg";
+import pg from "pg";
 import { createPostGraphileSchema } from "postgraphile-core";
 
 import { makeChangeNullabilityPlugin, makeWrapResolversPlugin } from "../";

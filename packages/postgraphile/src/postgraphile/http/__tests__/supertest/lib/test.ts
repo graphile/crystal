@@ -5,7 +5,7 @@
 import * as assert from "assert";
 import * as http from "http";
 import * as https from "https";
-import { AddressInfo } from "net";
+import type { AddressInfo } from "net";
 import * as request from "superagent";
 import * as util from "util";
 

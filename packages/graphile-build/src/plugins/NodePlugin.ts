@@ -1,4 +1,4 @@
-import { ResolveTree } from "graphql-parse-resolve-info";
+import type { ResolveTree } from "graphql-parse-resolve-info";
 
 const base64 = (str: string) => Buffer.from(String(str)).toString("base64");
 const base64Decode = (str: string) =>

@@ -1,5 +1,6 @@
 import debugFactory from "debug";
-import { Client, Pool, PoolClient } from "pg";
+import type { PoolClient } from "pg";
+import { Client, Pool } from "pg";
 
 const debug = debugFactory("graphile-build-pg");
 

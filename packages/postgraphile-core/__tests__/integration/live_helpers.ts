@@ -1,6 +1,7 @@
 import SubscriptionsLDS from "@graphile/subscriptions-lds";
-import { DocumentNode, GraphQLSchema, subscribe, validate } from "graphql";
-import { PoolClient } from "pg";
+import type { DocumentNode, GraphQLSchema } from "graphql";
+import { subscribe, validate } from "graphql";
+import type { PoolClient } from "pg";
 
 import { createPostGraphileSchema } from "../..";
 import { withTransactionlessPgClient } from "../helpers";

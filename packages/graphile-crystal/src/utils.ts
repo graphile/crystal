@@ -1,25 +1,23 @@
 import * as assert from "assert";
 import chalk from "chalk";
+import type { GraphQLInputType, ObjectFieldNode, ValueNode } from "graphql";
 import {
   GraphQLBoolean,
   GraphQLEnumType,
   GraphQLFloat,
   GraphQLID,
   GraphQLInputObjectType,
-  GraphQLInputType,
   GraphQLInt,
   GraphQLList,
   GraphQLNonNull,
   GraphQLScalarType,
   GraphQLString,
-  ObjectFieldNode,
-  ValueNode,
 } from "graphql";
 import { inspect } from "util";
 
-import { Deferred } from "./deferred";
+import type { Deferred } from "./deferred";
 import { isDev } from "./dev";
-import { CrystalObject } from "./interfaces";
+import type { CrystalObject } from "./interfaces";
 import { Plan } from "./plan";
 import { isCrystalObject } from "./resolvers";
 

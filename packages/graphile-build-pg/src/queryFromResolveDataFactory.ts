@@ -1,9 +1,11 @@
 import assert from "assert";
 import flatten from "lodash/flatten";
 import isSafeInteger from "lodash/isSafeInteger";
-import sql, { SQL } from "pg-sql2";
+import type { SQL } from "pg-sql2";
+import sql from "pg-sql2";
 
-import QueryBuilder, { QueryBuilderOptions } from "./QueryBuilder";
+import type { QueryBuilderOptions } from "./QueryBuilder";
+import QueryBuilder from "./QueryBuilder";
 
 type QueryBuilderCallback = (
   queryBuilder: QueryBuilder,

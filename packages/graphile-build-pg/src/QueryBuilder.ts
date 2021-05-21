@@ -2,7 +2,7 @@ import chunk from "lodash/chunk";
 import isSafeInteger from "lodash/isSafeInteger";
 import sql, { SQL, SQLRawValue } from "pg-sql2";
 
-import { PgClass, PgType } from "./plugins/PgIntrospectionPlugin";
+import type { PgClass, PgType } from "./plugins/PgIntrospectionPlugin";
 
 export { SQL, sql, SQLRawValue };
 

@@ -1,9 +1,11 @@
-import { SchemaBuilder } from "graphile-build";
-import { PgClass, PgEntityKind, QueryBuilder } from "graphile-build-pg";
-import { InputObjectTypeExtensionNode } from "graphql/language/ast";
+import type { SchemaBuilder } from "graphile-build";
+import type { PgClass, QueryBuilder } from "graphile-build-pg";
+import { PgEntityKind } from "graphile-build-pg";
+import type { InputObjectTypeExtensionNode } from "graphql/language/ast";
 
-import { GraphileHelpers, makeFieldHelpers } from "./fieldHelpers";
-import { GraphileEmbed } from "./gql";
+import type { GraphileHelpers } from "./fieldHelpers";
+import { makeFieldHelpers } from "./fieldHelpers";
+import type { GraphileEmbed } from "./gql";
 
 // TODO:v5: Remove
 const recurseDataGeneratorsWorkaroundFieldByType = new Map();
