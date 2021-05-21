@@ -259,7 +259,8 @@ export class Aether<
     // Get rid of temporary plans
     this.treeShakePlans();
 
-    // Squish plans together
+    // Squish plans together; this should result in no changes because plans
+    // are deduplicated during creation.
     this.deduplicatePlans();
 
     // Get rid of unneeded plans
@@ -415,6 +416,7 @@ export class Aether<
       const planResolver = objectField.extensions?.graphile?.plan;
       let plan: Plan | PolymorphicPlan;
       if (typeof planResolver === "function") {
+        const oldPlansLength = this.plans.length;
         const trackedArguments = this.getTrackedArguments(objectType, field);
         plan = planResolver(
           parentPlan,
@@ -428,6 +430,17 @@ export class Aether<
           trackedArguments,
           plan,
         );
+        const newPlansLength = this.plans.length;
+        debugPlanVerbose(
+          "Created %o new plans whilst processing %p",
+          newPlansLength - oldPlansLength,
+          pathIdentity,
+        );
+
+        // Now that the field has been planned (including arguments, but NOT
+        // including selection set) we can deduplicate it to see if any of its
+        // peers are identical.
+        this.deduplicatePlans(oldPlansLength);
       } else {
         // Note: this is populated in GetValuePlanId
         plan = new __ValuePlan();
@@ -743,6 +756,7 @@ export class Aether<
   private processPlans(
     order: "dependents-first" | "dependencies-first",
     callback: (plan: Plan<any>) => Plan<any>,
+    startingAtPlanId = 0,
   ): void {
     depth = 0;
     const processed = new Set<Plan>();
@@ -812,7 +826,7 @@ export class Aether<
     // NOTE: whilst processing plans new plans may be added, thus we must loop
     // ascending and we must re-evaluate this.plans.length on each loop
     // iteration.
-    for (let i = 0; i < this.plans.length; i++) {
+    for (let i = startingAtPlanId; i < this.plans.length; i++) {
       process(this.plans[i]);
     }
   }
@@ -828,7 +842,7 @@ export class Aether<
    * with the former and having the former SELECT additional fields, then
    * transform the results back to what our child plans would be expecting.
    */
-  private deduplicatePlans(): void {
+  private deduplicatePlans(startingAtPlanId = 0): void {
     let replacements = 0;
     let loops = 0;
     let lastOptimizedPlan;
@@ -841,14 +855,18 @@ export class Aether<
         );
       }
       replacements = 0;
-      this.processPlans("dependencies-first", (plan) => {
-        const replacementPlan = this.deduplicatePlan(plan);
-        if (replacementPlan !== plan) {
-          lastOptimizedPlan = replacementPlan;
-          replacements++;
-        }
-        return replacementPlan;
-      });
+      this.processPlans(
+        "dependencies-first",
+        (plan) => {
+          const replacementPlan = this.deduplicatePlan(plan);
+          if (replacementPlan !== plan) {
+            lastOptimizedPlan = replacementPlan;
+            replacements++;
+          }
+          return replacementPlan;
+        },
+        startingAtPlanId,
+      );
       loops++;
     } while (replacements > 0);
     debugPlan("Plan deduplication complete after %o loops", loops);

@@ -129,6 +129,7 @@ it("{forums{a:name b:name}}", async () => {
   `);
   expect(queries).toHaveLength(1);
 });
+
 it("{a:forums{a:name b:name}b:forums{a:name b:name}}", async () => {
   const data = await test(/* GraphQL */ `
     {
@@ -163,6 +164,50 @@ it("{a:forums{a:name b:name}b:forums{a:name b:name}}", async () => {
   }).toMatchInlineSnapshot(`
     select 
       __forums_1."name"::text as "0"
+    from app_public.forums as __forums_1
+    where (
+      true /* authorization checks */
+    )
+  `);
+  expect(queries).toHaveLength(1);
+});
+
+it("{a:forums{id a:name b:name}b:forums{a:name b:name}}", async () => {
+  const data = await test(/* GraphQL */ `
+    {
+      a: forums {
+        id
+        a: name
+        b: name
+      }
+      b: forums {
+        a: name
+        b: name
+      }
+    }
+  `);
+  expect(data.a[0].a).toEqual("Cats");
+  expect(data.b[2].b).toEqual("Postgres");
+  expect({ __: data }).toMatchInlineSnapshot(`
+    {
+      a: [
+        { id: "ca700000-0000-0000-0000-000000000ca7", a: "Cats", b: "Cats" },
+        { id: "d0900000-0000-0000-0000-000000000d09", a: "Dogs", b: "Dogs" },
+        { id: "bae00000-0000-0000-0000-000000000bae", a: "Postgres", b: "Postgres" },
+      ],
+      b: [
+        { a: "Cats", b: "Cats" },
+        { a: "Dogs", b: "Dogs" },
+        { a: "Postgres", b: "Postgres" },
+      ],
+    }
+  `);
+  expect({
+    __: queries.map((q) => q.text).join("\n\n"),
+  }).toMatchInlineSnapshot(`
+    select 
+      __forums_1."id"::text as "0",
+      __forums_1."name"::text as "1"
     from app_public.forums as __forums_1
     where (
       true /* authorization checks */

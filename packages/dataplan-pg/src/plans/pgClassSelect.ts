@@ -559,6 +559,19 @@ export class PgClassSelectPlan<
       // we try to ensure that as few selects as possible exist in the plan
       // at this stage.
 
+      // Check FROM matches
+      if (p.dataSource !== this.dataSource) {
+        return false;
+      }
+
+      // Since deduplicate runs before we have children, we do not need to
+      // check the symbol or alias matches. We do need to factor the different
+      // symbols into SQL equivalency checks though.
+      const symbolSubstitutes = new Map<symbol, symbol>();
+      symbolSubstitutes.set(this.symbol, p.symbol);
+      const sqlIsEquivalent = (a: SQL | symbol, b: SQL | symbol) =>
+        sql.isEquivalent(a, b, symbolSubstitutes);
+
       // Check trusted matches
       if (p.trusted !== this.trusted) {
         return false;
@@ -569,28 +582,22 @@ export class PgClassSelectPlan<
         return false;
       }
 
-      // Check symbol matches
-      if (p.symbol !== this.symbol || p.alias !== this.alias) {
-        return false;
-      }
-
       // Check SELECT matches
-      if (!arraysMatch(this.selects, p.selects, sql.isEquivalent)) {
-        return false;
-      }
-
-      // Check FROM matches
-      if (p.dataSource !== this.dataSource) {
+      if (!arraysMatch(this.selects, p.selects, sqlIsEquivalent)) {
         return false;
       }
 
       // Check JOINs match
-      if (!arraysMatch(this.joins, p.joins, joinMatches)) {
+      if (
+        !arraysMatch(this.joins, p.joins, (a, b) =>
+          joinMatches(a, b, sqlIsEquivalent),
+        )
+      ) {
         return false;
       }
 
       // Check WHEREs match
-      if (!arraysMatch(this.conditions, p.conditions, sql.isEquivalent)) {
+      if (!arraysMatch(this.conditions, p.conditions, sqlIsEquivalent)) {
         return false;
       }
 
@@ -599,14 +606,14 @@ export class PgClassSelectPlan<
         !arraysMatch(
           this.identifierMatches,
           p.identifierMatches,
-          sql.isEquivalent,
+          sqlIsEquivalent,
         )
       ) {
         return false;
       }
 
       // Check ORDERs match
-      if (!arraysMatch(this.orders, p.orders, sql.isEquivalent)) {
+      if (!arraysMatch(this.orders, p.orders, sqlIsEquivalent)) {
         return false;
       }
 
@@ -771,7 +778,7 @@ export class PgClassSelectPlan<
             },
             ...this.joins,
           );
-          debugPlanVerbose(`Merging ${this} into ${table} (via ${parent})`);
+          debugPlanVerbose("Merging %c into %c (via %c)", this, table, parent);
           const actualKeyByDesiredKey = this.mergeWith(table);
           // We return a list here because our children are going to use a `first` plan on us
           return list([map(parent, actualKeyByDesiredKey)]);
@@ -842,15 +849,16 @@ export class PgClassSelectPlan<
 function joinMatches(
   j1: PgClassSelectPlanJoin,
   j2: PgClassSelectPlanJoin,
+  sqlIsEquivalent: (a: SQL, b: SQL) => boolean,
 ): boolean {
   if (j1.type === "cross") {
     if (j2.type !== j1.type) {
       return false;
     }
-    if (!sql.isEquivalent(j1.source, j2.source)) {
+    if (!sqlIsEquivalent(j1.source, j2.source)) {
       return false;
     }
-    if (!sql.isEquivalent(j1.alias, j2.alias)) {
+    if (!sqlIsEquivalent(j1.alias, j2.alias)) {
       return false;
     }
     return true;
@@ -858,13 +866,13 @@ function joinMatches(
     if (j2.type !== j1.type) {
       return false;
     }
-    if (!sql.isEquivalent(j1.source, j2.source)) {
+    if (!sqlIsEquivalent(j1.source, j2.source)) {
       return false;
     }
-    if (!sql.isEquivalent(j1.alias, j2.alias)) {
+    if (!sqlIsEquivalent(j1.alias, j2.alias)) {
       return false;
     }
-    if (!arraysMatch(j1.conditions, j2.conditions, sql.isEquivalent)) {
+    if (!arraysMatch(j1.conditions, j2.conditions, sqlIsEquivalent)) {
       return false;
     }
     return true;
