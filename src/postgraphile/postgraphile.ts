@@ -89,52 +89,73 @@ export function getPostgraphileSchemaBuilder<
 
   async function createGqlSchema(): Promise<GraphQLSchema> {
     let attempts = 0;
+
     let isShuttingDown = false;
     shutdownActions.add(async () => {
       isShuttingDown = true;
     });
+    /*
+     * This function should be called after every `await` in the try{} block
+     * below so that if a shutdown occurs whilst we're awaiting something else
+     * we immediately clean up.
+     */
+    const assertAlive = () => {
+      if (isShuttingDown) {
+        throw Object.assign(new Error('PostGraphile is shutting down'), { isShutdownAction: true });
+      }
+    };
+
+    // If we're in watch mode, cancel watch mode on shutdown
+    let releaseWatchFnPromise: Promise<() => void> | null = null;
+    shutdownActions.add(async () => {
+      if (releaseWatchFnPromise) {
+        try {
+          const releaseWatchFn = await releaseWatchFnPromise;
+          await releaseWatchFn();
+        } catch (e) {
+          // Ignore errors during shutdown.
+        }
+      }
+    });
+
+    // If the server shuts down, make sure the schema has resolved or
+    // rejected before signaling shutdown is complete. If it rejected,
+    // don't propagate the error.
+    let gqlSchemaPromise: Promise<GraphQLSchema> | null = null;
+    shutdownActions.add(async () => {
+      if (gqlSchemaPromise) {
+        await gqlSchemaPromise.catch(() => null);
+      }
+    });
+
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      if (isShuttingDown) {
-        throw new Error('Postgraphile is shutting down');
-      }
+      assertAlive();
       try {
         if (options.watchPg) {
-          const releaseWatchFnPromise = watchPostGraphileSchema(
-            pgPool,
-            pgSchemas,
-            options,
-            newSchema => {
-              gqlSchema = newSchema;
-              _emitter.emit('schemas:changed');
-              exportGqlSchema(gqlSchema);
-            },
-          );
-          // We must register the shutdown action immediately to avoid a race condition.
-          shutdownActions.add(async () => {
-            try {
-              const releaseWatchFn = await releaseWatchFnPromise;
-              await releaseWatchFn();
-            } catch (e) {
-              // Ignore errors during shutdown.
-            }
+          // We must register the value used by the shutdown action immediately to avoid a race condition.
+          releaseWatchFnPromise = watchPostGraphileSchema(pgPool, pgSchemas, options, newSchema => {
+            gqlSchema = newSchema;
+            _emitter.emit('schemas:changed');
+            exportGqlSchema(gqlSchema);
           });
+
           // Wait for the watch to be set up before progressing.
           await releaseWatchFnPromise;
+          assertAlive();
+
           if (!gqlSchema) {
             throw new Error(
               "Consistency error: watchPostGraphileSchema promises to call the callback before the promise resolves; but this hasn't happened",
             );
           }
         } else {
-          const gqlSchemaPromise = createPostGraphileSchema(pgPool, pgSchemas, options);
-          // If the server shuts down, make sure the schema has resolved or
-          // rejected before signaling shutdown is complete. If it rejected,
-          // don't propagate the error.
-          shutdownActions.add(async () => {
-            await gqlSchemaPromise.catch(() => null);
-          });
+          // We must register the value used by the shutdown action immediately to avoid a race condition.
+          gqlSchemaPromise = createPostGraphileSchema(pgPool, pgSchemas, options);
+
           gqlSchema = await gqlSchemaPromise;
+          assertAlive();
+
           exportGqlSchema(gqlSchema);
         }
         if (attempts > 0) {
@@ -147,22 +168,26 @@ export function getPostgraphileSchemaBuilder<
         }
         return gqlSchema;
       } catch (error) {
+        releaseWatchFnPromise = null;
+        gqlSchemaPromise = null;
         attempts++;
         const delay = Math.min(100 * Math.pow(attempts, 2), 30000);
-        if (isShuttingDown) {
+        if (error.isShutdownAction) {
+          throw error;
+        } else if (isShuttingDown) {
           console.error(
             'An error occurred whilst building the schema. However, the server was shutting down, which might have caused it.',
           );
           console.error(error);
-          // TODO: Hmm, do we need to throw an error here?
           throw error;
         } else if (typeof options.retryOnInitFail === 'function') {
-          const start = process.hrtime();
           try {
+            const start = process.hrtime();
             const retry = await options.retryOnInitFail(error, attempts);
             const diff = process.hrtime(start);
             const dur = diff[0] * 1e3 + diff[1] * 1e-6;
-            if (!retry) {
+
+            if (!retry || isShuttingDown) {
               // Swallow new error so old error is still thrown
               await shutdownActions.invokeAll().catch(e => {
                 console.error(
@@ -170,6 +195,7 @@ export function getPostgraphileSchemaBuilder<
                 );
                 console.error(e);
               });
+
               throw error;
             } else {
               if (dur < 50) {
