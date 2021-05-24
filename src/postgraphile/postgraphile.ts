@@ -187,8 +187,10 @@ export function getPostgraphileSchemaBuilder<
             const diff = process.hrtime(start);
             const dur = diff[0] * 1e3 + diff[1] * 1e-6;
 
-            if (!retry || isShuttingDown) {
-              // Swallow new error so old error is still thrown
+            if (isShuttingDown) {
+              throw error;
+            } else if (!retry) {
+              // Trigger a shutdown, and swallow any new errors so old error is still thrown
               await shutdownActions.invokeAll().catch(e => {
                 console.error(
                   'An additional error occured whilst calling shutdownActions.invokeAll():',
