@@ -10,6 +10,8 @@ const COMMON_OPTIONS = {
 test('When the handler is created using a Pool object, it can be released without triggering an error', async () => {
   let handler = postgraphile(pgPool, COMMON_OPTIONS);
   await handler.release();
+  // This would throw an error if the pool was released, it not throwing is what passes the test.
+  await pgPool.query("select 'Pool is still valid';");
 });
 
 test('When the handler is created using Pool config, it releases the pool it creates', async () => {
