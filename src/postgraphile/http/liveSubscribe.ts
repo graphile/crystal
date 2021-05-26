@@ -32,10 +32,12 @@ type mixed = any;
  *
  * @internal
  */
-export function makeLiveSubscribe(_params: {
+export function makeLiveSubscribe(params: {
   options: CreateRequestHandlerOptions;
   pluginHook: PluginHookFn;
 }): typeof subscribe {
+  const { pluginHook } = params;
+
   return function liveSubscribe(
     argsOrSchema: any | GraphQLSchema,
     document?: DocumentNode,
@@ -106,7 +108,7 @@ export function makeLiveSubscribe(_params: {
        * that it can clean up old listeners; we do this with the `finally` block.
        */
       try {
-        return await execute(
+        const executionResult = execute(
           schema,
           document,
           payload,
@@ -115,6 +117,23 @@ export function makeLiveSubscribe(_params: {
           operationName,
           fieldResolver,
         );
+
+        const hookedExecutionResult = pluginHook(
+          'postgraphile:liveSubscribe:executionResult',
+          executionResult,
+          {
+            schema,
+            document,
+            rootValue,
+            contextValue,
+            variableValues,
+            operationName,
+            fieldResolver,
+            subscribeFieldResolver,
+          },
+        );
+
+        return await hookedExecutionResult;
       } finally {
         if (payload && typeof payload.release === 'function') {
           payload.release();

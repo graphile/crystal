@@ -13,6 +13,8 @@ import { Extra as GraphQLWSContextExtra } from 'graphql-ws/lib/use/ws';
 import { ExecutionParams } from 'subscriptions-transport-ws';
 import { PostGraphileResponse } from './http/frameworks';
 
+type PromiseOrValue<T> = T | Promise<T>;
+
 // tslint:disable-next-line no-any
 export type HookFn<TArg, TContext = any> = (arg: TArg, context: TContext) => TArg;
 export type PluginHookFn = <TArgument, TContext = Record<string, any>>(
@@ -96,6 +98,31 @@ export interface PostGraphilePlugin {
       context: graphqlWs.Context<GraphQLWSContextExtra>;
       message: graphqlWs.SubscribeMessage;
       options: CreateRequestHandlerOptions;
+    }
+  >;
+
+  'postgraphile:liveSubscribe:executionResult'?: HookFn<
+    PromiseOrValue<
+      graphql.ExecutionResult<
+        {
+          [key: string]: any;
+        },
+        {
+          [key: string]: any;
+        }
+      >
+    >,
+    {
+      schema: graphql.GraphQLSchema;
+      document: graphql.DocumentNode;
+      rootValue: any;
+      contextValue: any;
+      variableValues: { [key: string]: any } | undefined;
+      operationName: string | undefined;
+      fieldResolver: graphql.GraphQLFieldResolver<any, any, { [argName: string]: any }> | undefined;
+      subscribeFieldResolver:
+        | graphql.GraphQLFieldResolver<any, any, { [argName: string]: any }>
+        | undefined;
     }
   >;
 
