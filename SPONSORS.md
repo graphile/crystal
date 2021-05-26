@@ -54,8 +54,10 @@ sponsor](https://graphile.org/sponsor/).
 - qoby
 - Paul Melnikow
 - Stéphane Klein
+- Kadi Kraman
 - Dani Kenan
 - Vinzenz Weber
 - Jimmy Liu
+- OnThisSpot
 - Splitgraph
 - Zippr.io
