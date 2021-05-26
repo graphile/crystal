@@ -7,6 +7,7 @@ import { Plugin, PostGraphileCoreOptions } from 'postgraphile-core';
 import jwt = require('jsonwebtoken');
 import { EventEmitter } from 'events';
 import { PostGraphileResponse } from './postgraphile/http/frameworks';
+import { ShutdownActions } from './postgraphile/shutdownActions';
 
 type PromiseOrDirect<T> = T | Promise<T>;
 type DirectOrCallback<Request, T> = T | ((req: Request) => PromiseOrDirect<T>);
@@ -325,6 +326,7 @@ export interface CreateRequestHandlerOptions extends PostGraphileOptions {
   // A Postgres client pool we use to connect Postgres clients.
   pgPool: Pool;
   _emitter: EventEmitter;
+  shutdownActions: ShutdownActions;
 }
 
 export interface GraphQLFormattedErrorExtended {
@@ -377,6 +379,8 @@ export interface HttpRequestHandler<
   faviconRouteHandler: ((res: PostGraphileResponse) => Promise<void>) | null;
   eventStreamRoute: string;
   eventStreamRouteHandler: ((res: PostGraphileResponse) => Promise<void>) | null;
+  /** Experimental! */
+  release: () => Promise<void>;
 }
 
 /**
@@ -384,6 +388,7 @@ export interface HttpRequestHandler<
  */
 export interface WithPostGraphileContextOptions {
   pgPool: Pool;
+  shutdownActions: ShutdownActions;
   jwtToken?: string;
   jwtSecret?: jwt.Secret;
   jwtPublicKey?: jwt.Secret | jwt.GetPublicKeyOrSecret;

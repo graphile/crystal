@@ -50,6 +50,7 @@ test('will use a created GraphQL schema to create the HTTP request handler and p
     'getGqlSchema',
     'pgPool',
     '_emitter',
+    'shutdownActions',
   ]);
   expect(createPostGraphileHttpRequestHandler.mock.calls[0][0].pgPool).toBe(pgPool);
   expect(createPostGraphileHttpRequestHandler.mock.calls[0][0].a).toBe(options.a);

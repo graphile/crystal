@@ -178,6 +178,7 @@ export default function createPostGraphileHttpRequestHandler(
     pgPool,
     pgSettings,
     pgDefaultRole,
+    shutdownActions,
     queryCacheMaxSize = 50 * MEGABYTE,
     extendedErrors,
     showErrorStack,
@@ -1120,9 +1121,14 @@ export default function createPostGraphileHttpRequestHandler(
   middleware.faviconRouteHandler = graphiql ? faviconRouteHandler : null;
   middleware.eventStreamRoute = eventStreamRoute;
   middleware.eventStreamRouteHandler = watchPg ? eventStreamRouteHandler : null;
+  middleware.shutdownActions = shutdownActions;
+  // Experimental
+  middleware.release = (): Promise<void> => shutdownActions.invokeAll();
 
   const hookedMiddleware = pluginHook('postgraphile:middleware', middleware, {
     options,
+    // Experimental
+    shutdownActions,
   });
   // Sanity check:
   if (!hookedMiddleware.getGraphQLSchema) {

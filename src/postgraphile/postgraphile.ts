@@ -9,6 +9,7 @@ import { pluginHookFromOptions } from './pluginHook';
 import { PostGraphileOptions, mixed, HttpRequestHandler } from '../interfaces';
 import chalk from 'chalk';
 import { debugPgClient } from './withPostGraphileContext';
+import { ShutdownActions } from './shutdownActions';
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -43,20 +44,8 @@ export function getPostgraphileSchemaBuilder<
   pgPool: Pool,
   schema: string | Array<string>,
   incomingOptions: PostGraphileOptions<Request, Response>,
-  release: null | (() => void) = null,
+  shutdownActions: ShutdownActions = new ShutdownActions(),
 ): PostgraphileSchemaBuilder {
-  let released = false;
-  function releaseOnce() {
-    if (released) {
-      throw new Error(
-        'Already released this PostGraphile schema builder; should not have attempted a second release',
-      );
-    }
-    released = true;
-    if (release) {
-      release();
-    }
-  }
   if (incomingOptions.live && incomingOptions.subscriptions == null) {
     // live implies subscriptions
     incomingOptions.subscriptions = true;
@@ -100,22 +89,73 @@ export function getPostgraphileSchemaBuilder<
 
   async function createGqlSchema(): Promise<GraphQLSchema> {
     let attempts = 0;
+
+    let isShuttingDown = false;
+    shutdownActions.add(async () => {
+      isShuttingDown = true;
+    });
+    /*
+     * This function should be called after every `await` in the try{} block
+     * below so that if a shutdown occurs whilst we're awaiting something else
+     * we immediately clean up.
+     */
+    const assertAlive = () => {
+      if (isShuttingDown) {
+        throw Object.assign(new Error('PostGraphile is shutting down'), { isShutdownAction: true });
+      }
+    };
+
+    // If we're in watch mode, cancel watch mode on shutdown
+    let releaseWatchFnPromise: Promise<() => void> | null = null;
+    shutdownActions.add(async () => {
+      if (releaseWatchFnPromise) {
+        try {
+          const releaseWatchFn = await releaseWatchFnPromise;
+          await releaseWatchFn();
+        } catch (e) {
+          // Ignore errors during shutdown.
+        }
+      }
+    });
+
+    // If the server shuts down, make sure the schema has resolved or
+    // rejected before signaling shutdown is complete. If it rejected,
+    // don't propagate the error.
+    let gqlSchemaPromise: Promise<GraphQLSchema> | null = null;
+    shutdownActions.add(async () => {
+      if (gqlSchemaPromise) {
+        await gqlSchemaPromise.catch(() => null);
+      }
+    });
+
     // eslint-disable-next-line no-constant-condition
     while (true) {
+      assertAlive();
       try {
         if (options.watchPg) {
-          await watchPostGraphileSchema(pgPool, pgSchemas, options, newSchema => {
+          // We must register the value used by the shutdown action immediately to avoid a race condition.
+          releaseWatchFnPromise = watchPostGraphileSchema(pgPool, pgSchemas, options, newSchema => {
             gqlSchema = newSchema;
             _emitter.emit('schemas:changed');
             exportGqlSchema(gqlSchema);
           });
+
+          // Wait for the watch to be set up before progressing.
+          await releaseWatchFnPromise;
+          assertAlive();
+
           if (!gqlSchema) {
             throw new Error(
               "Consistency error: watchPostGraphileSchema promises to call the callback before the promise resolves; but this hasn't happened",
             );
           }
         } else {
-          gqlSchema = await createPostGraphileSchema(pgPool, pgSchemas, options);
+          // We must register the value used by the shutdown action immediately to avoid a race condition.
+          gqlSchemaPromise = createPostGraphileSchema(pgPool, pgSchemas, options);
+
+          gqlSchema = await gqlSchemaPromise;
+          assertAlive();
+
           exportGqlSchema(gqlSchema);
         }
         if (attempts > 0) {
@@ -128,16 +168,36 @@ export function getPostgraphileSchemaBuilder<
         }
         return gqlSchema;
       } catch (error) {
+        releaseWatchFnPromise = null;
+        gqlSchemaPromise = null;
         attempts++;
         const delay = Math.min(100 * Math.pow(attempts, 2), 30000);
-        if (typeof options.retryOnInitFail === 'function') {
-          const start = process.hrtime();
+        if (error.isShutdownAction) {
+          throw error;
+        } else if (isShuttingDown) {
+          console.error(
+            'An error occurred whilst building the schema. However, the server was shutting down, which might have caused it.',
+          );
+          console.error(error);
+          throw error;
+        } else if (typeof options.retryOnInitFail === 'function') {
           try {
+            const start = process.hrtime();
             const retry = await options.retryOnInitFail(error, attempts);
             const diff = process.hrtime(start);
             const dur = diff[0] * 1e3 + diff[1] * 1e-6;
-            if (!retry) {
-              releaseOnce();
+
+            if (isShuttingDown) {
+              throw error;
+            } else if (!retry) {
+              // Trigger a shutdown, and swallow any new errors so old error is still thrown
+              await shutdownActions.invokeAll().catch(e => {
+                console.error(
+                  'An additional error occured whilst calling shutdownActions.invokeAll():',
+                );
+                console.error(e);
+              });
+
               throw error;
             } else {
               if (dur < 50) {
@@ -256,9 +316,14 @@ export default function postgraphile<
     );
   }
 
+  const shutdownActions = new ShutdownActions();
+
   // Do some things with `poolOrConfig` so that in the end, we actually get a
   // Postgres pool.
-  const { pgPool, release } = toPgPool(poolOrConfig);
+  const { pgPool, releasePgPool } = toPgPool(poolOrConfig);
+  if (releasePgPool) {
+    shutdownActions.add(releasePgPool);
+  }
 
   pgPool.on('error', err => {
     /*
@@ -282,7 +347,7 @@ export default function postgraphile<
     pgPool,
     schema,
     incomingOptions,
-    release,
+    shutdownActions,
   );
   return createPostGraphileHttpRequestHandler({
     ...(typeof poolOrConfig === 'string' ? { ownerConnectionString: poolOrConfig } : {}),
@@ -290,6 +355,7 @@ export default function postgraphile<
     getGqlSchema: getGraphQLSchema,
     pgPool,
     _emitter,
+    shutdownActions,
   });
 }
 
@@ -321,24 +387,24 @@ function constructorName(obj: mixed): string | null {
 }
 
 // tslint:disable-next-line no-any
-function toPgPool(poolOrConfig: any): { pgPool: Pool; release: null | (() => void) } {
+function toPgPool(poolOrConfig: any): { pgPool: Pool; releasePgPool: null | (() => void) } {
   if (quacksLikePgPool(poolOrConfig)) {
     // If it is already a `Pool`, just use it.
-    return { pgPool: poolOrConfig, release: null };
+    return { pgPool: poolOrConfig, releasePgPool: null };
   }
 
   if (typeof poolOrConfig === 'string') {
     // If it is a string, let us parse it to get a config to create a `Pool`.
     const pgPool = new Pool({ connectionString: poolOrConfig });
-    return { pgPool, release: () => pgPool.end() };
+    return { pgPool, releasePgPool: () => pgPool.end() };
   } else if (!poolOrConfig) {
     // Use an empty config and let the defaults take over.
     const pgPool = new Pool({});
-    return { pgPool, release: () => pgPool.end() };
+    return { pgPool, releasePgPool: () => pgPool.end() };
   } else if (isPlainObject(poolOrConfig)) {
     // The user handed over a configuration object, pass it through
     const pgPool = new Pool(poolOrConfig);
-    return { pgPool, release: () => pgPool.end() };
+    return { pgPool, releasePgPool: () => pgPool.end() };
   } else {
     throw new Error('Invalid connection string / Pool ');
   }
