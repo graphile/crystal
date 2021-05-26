@@ -18,7 +18,7 @@ import { useServer } from 'graphql-ws/lib/use/ws';
 import parseUrl = require('parseurl');
 import { pluginHookFromOptions } from '../pluginHook';
 import { isEmpty } from './createPostGraphileHttpRequestHandler';
-import liveSubscribe from './liveSubscribe';
+import { makeLiveSubscribe } from './liveSubscribe';
 
 interface Deferred<T> extends Promise<T> {
   resolve: (input?: T | PromiseLike<T> | undefined) => void;
@@ -70,6 +70,7 @@ export async function enhanceHttpServerWithWebSockets<
     handleErrors,
   } = postgraphileMiddleware;
   const pluginHook = pluginHookFromOptions(options);
+  const liveSubscribe = makeLiveSubscribe({ pluginHook, options });
   const graphqlRoute =
     (subscriptionServerOptions && subscriptionServerOptions.graphqlRoute) ||
     (options.externalUrlBase || '') + (options.graphqlRoute || '/graphql');
