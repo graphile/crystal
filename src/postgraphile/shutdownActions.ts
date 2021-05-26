@@ -11,6 +11,9 @@ export type Action = () => void | Promise<void>;
  * `.release()`d (such as a timer, interval, network connection, filesystem
  * monitoring, or similar activity) then you should register an action via
  * `shutdownActions` to clean it up.
+ * 
+ * This class currently has "experimental" status, it may have breaking
+ * changes in future semver minor releases.
  */
 export class ShutdownActions {
   private actions: Action[] = [];
