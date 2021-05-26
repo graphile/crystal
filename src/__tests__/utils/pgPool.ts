@@ -10,6 +10,8 @@ export const poolConfig = {
 };
 
 const pgPool = new Pool(poolConfig);
-pgPool.on('error', () => {/* swallow error */});
+pgPool.on('error', () => {
+  /* swallow error */
+});
 
 export default pgPool;
