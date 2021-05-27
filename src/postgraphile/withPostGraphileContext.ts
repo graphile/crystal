@@ -606,22 +606,22 @@ function isPgSettingValid(pgSetting: mixed): boolean {
   );
 }
 // tslint:enable no-any
-interface PgNotice extends Error {
-  name: 'notice';
-  message: string;
+interface PgNotice {
+  readonly name: 'notice';
+  readonly message: string | undefined;
   length: number;
-  severity: string;
-  code: string;
-  detail: string | void;
-  hint: string | void;
-  where: string | void;
-  schema: string | void;
-  table: string | void;
-  column: string | void;
-  constraint: string | void;
-  file: string;
-  line: string;
-  routine: string;
+  severity: string | undefined;
+  code: string | undefined;
+  detail: string | undefined;
+  hint: string | undefined;
+  where: string | undefined;
+  schema: string | undefined;
+  table: string | undefined;
+  column: string | undefined;
+  constraint: string | undefined;
+  file: string | undefined;
+  line: string | undefined;
+  routine: string | undefined;
   /*
   Not sure what these are:
 
