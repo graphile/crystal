@@ -20,6 +20,7 @@
     "noUnusedLocals": false,
     "lib": ["es2017", "esnext.asynciterable"]
   },
+  "include": ["src"],
   "exclude": [
     "index.js",
     "plugins.d.ts",
