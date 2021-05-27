@@ -6,7 +6,7 @@ import {
   PostGraphileOptions,
 } from '../interfaces';
 import { WithPostGraphileContextFn } from './withPostGraphileContext';
-// @ts-ignore
+// @ts-ignore Allow importing JSON
 import { version } from '../../package.json';
 import * as graphql from 'graphql';
 import * as graphqlWs from 'graphql-ws';

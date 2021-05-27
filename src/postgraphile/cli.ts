@@ -23,9 +23,9 @@ import cluster = require('cluster');
 import { makePluginHook, PostGraphilePlugin } from './pluginHook';
 import debugFactory = require('debug');
 import { mixed } from '../interfaces';
-// @ts-ignore
+// @ts-ignore Allow importing JSON
 import * as manifest from '../../package.json';
-// @ts-ignore
+// @ts-ignore Allow importing JSON
 import sponsors = require('../../sponsors.json');
 import { enhanceHttpServerWithWebSockets } from './http/subscriptions';
 import { existsSync } from 'fs';
