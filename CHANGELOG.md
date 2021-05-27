@@ -8,6 +8,18 @@ to you also.
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
+# [4.12.0](https://github.com/graphile/postgraphile/compare/v4.12.0-alpha.0...v4.12.0) (2021-05-27)
+
+### Bug Fixes
+
+- **explain:** fix 'unhandled' promise rejection ([#1442](https://github.com/graphile/postgraphile/issues/1442)) ([716efb0](https://github.com/graphile/postgraphile/commit/716efb07941429cc41cc182955d1cef2fee934bb))
+
+### Features
+
+- upgrade Graphile Engine ([#1485](https://github.com/graphile/postgraphile/issues/1485)) ([bdd5a66](https://github.com/graphile/postgraphile/commit/bdd5a6627d2046d9ec7da8e8c938b3b0cd835e59))
+- **hooks:** add postgraphile:liveSubscribe:executionResult hook ([#1483](https://github.com/graphile/postgraphile/issues/1483)) ([73fe801](https://github.com/graphile/postgraphile/commit/73fe8011d902f14c7ba29771e162bde81d6ce5b0))
+- **middleware:** add a `release()` function ([#1396](https://github.com/graphile/postgraphile/issues/1396)) ([818dad6](https://github.com/graphile/postgraphile/commit/818dad61a4d44d6a9aebdd8901ba58d104e1f562))
+
 # [4.12.0-alpha.0](https://github.com/graphile/postgraphile/compare/v4.11.0...v4.12.0-alpha.0) (2021-02-15)
 
 # [4.11.0](https://github.com/graphile/postgraphile/compare/v4.11.0-rc.0...v4.11.0) (2021-01-29)
