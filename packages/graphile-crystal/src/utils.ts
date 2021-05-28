@@ -5,6 +5,7 @@ import type {
   GraphQLFieldConfigMap,
   GraphQLInputType,
   GraphQLObjectTypeConfig,
+  GraphQLOutputType,
   ObjectFieldNode,
   Thunk,
   ValueNode,
@@ -463,6 +464,7 @@ export function objectSpec<
   spec: Omit<GraphQLObjectTypeConfig<any, TContext>, "fields"> & {
     fields: Thunk<{
       [key: string]: GraphileCrystalFieldConfig<
+        GraphQLOutputType,
         TContext,
         TParentPlan,
         any,
@@ -495,7 +497,13 @@ export function objectFieldSpec<
   TResult extends Plan<any> = Plan<any>,
   TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
 >(
-  graphileSpec: GraphileCrystalFieldConfig<TContext, TSource, TResult, TArgs>,
+  graphileSpec: GraphileCrystalFieldConfig<
+    GraphQLOutputType,
+    TContext,
+    TSource,
+    TResult,
+    TArgs
+  >,
 ): GraphQLFieldConfig<any, TContext, TArgs> {
   const { plan, ...spec } = graphileSpec;
   return {

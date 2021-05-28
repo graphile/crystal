@@ -1,8 +1,16 @@
-import type { GraphQLFieldConfig } from "graphql";
+import type {
+  GraphQLArgumentConfig,
+  GraphQLEnumType,
+  GraphQLFieldConfig,
+  GraphQLList,
+  GraphQLNonNull,
+  GraphQLOutputType,
+  GraphQLScalarType,
+} from "graphql";
 
 import type { Deferred } from "./deferred";
 import type { Plan } from "./plan";
-import type { __TrackedObjectPlan } from "./plans";
+import type { __TrackedObjectPlan, ListCapablePlan } from "./plans";
 import type { UniqueId } from "./utils";
 
 export const $$crystalContext = Symbol("context");
@@ -78,6 +86,7 @@ export interface BaseGraphQLVariables {
 export interface BaseGraphQLArguments {
   [key: string]: any;
 }
+export type BaseGraphQLInputObject = BaseGraphQLArguments;
 
 /**
  * Plan resolvers are like regular resolvers except they're called beforehand,
@@ -107,14 +116,35 @@ export type PlanResolver<
   context: __TrackedObjectPlan<TContext>,
 ) => TResultPlan;
 
+type PlanForType<TType extends GraphQLOutputType> = TType extends GraphQLList<
+  infer U
+>
+  ? U extends GraphQLOutputType
+    ? ListCapablePlan<PlanForType<U>>
+    : never
+  : TType extends GraphQLNonNull<infer V>
+  ? V extends GraphQLOutputType
+    ? PlanForType<V>
+    : never
+  : TType extends GraphQLScalarType | GraphQLEnumType
+  ? Plan<boolean | number | string>
+  : Plan<{ [key: string]: any }>;
+
 /**
  * Basically GraphQLFieldConfig but with an easy to access `plan` method.
  */
 export type GraphileCrystalFieldConfig<
+  TType extends GraphQLOutputType,
   TContext extends BaseGraphQLContext,
   TParentPlan extends Plan<any> | null,
-  TResultPlan extends Plan<any>,
+  TResultPlan extends PlanForType<TType>,
   TArgs extends BaseGraphQLArguments,
-> = GraphQLFieldConfig<any, any> & {
+> = Omit<GraphQLFieldConfig<any, any>, "args" | "type"> & {
+  type: TType;
   plan?: PlanResolver<TContext, TArgs, TParentPlan, TResultPlan>;
+  args?: {
+    [key: string]: GraphQLArgumentConfig & {
+      plan?: (plan: TResultPlan) => void;
+    };
+  };
 };
