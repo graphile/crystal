@@ -81,15 +81,12 @@ export type PgDataSourceContext<TSettings = any> = {
 };
 
 type PgDataSourceColumns = {
-  [columnName: string]: PgDataSourceColumn<any, any>;
+  [columnName: string]: PgDataSourceColumn<any>;
 };
 
-export interface PgDataSourceColumn<
-  TPostgres extends string,
-  TGraphQL extends any,
-> {
-  gql2pg: (graphqlValue: TGraphQL) => SQL;
-  pg2gql: (postgresValue: TPostgres) => TGraphQL;
+export interface PgDataSourceColumn<TData extends any> {
+  gql2pg: (graphqlValue: TData) => SQL;
+  pg2gql: (postgresValue: unknown) => TData;
   notNull: boolean;
   type: SQL;
 }
@@ -103,7 +100,7 @@ type TuplePlanMap<
   TTuple extends ReadonlyArray<keyof TColumns>,
 > = {
   [Index in keyof TTuple]: {
-    [key in TTuple[number]]: Plan<PgDataSourceRow<TColumns>[key]>;
+    [key in TTuple[number]]: Plan<ReturnType<TColumns[key]["pg2gql"]>>;
   };
 };
 

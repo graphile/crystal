@@ -57,15 +57,38 @@ function getPgDataSourceContext() {
   });
 }
 
-const col = <TPostgres extends string, TGraphQL extends any>(options: {
-  notNull?: boolean;
-  type: string;
-}): PgDataSourceColumn<TPostgres, TGraphQL> => {
+/**
+ * Expand this interface with your own types.
+ */
+export interface GraphQLTypeFromPostgresType {
+  text: string;
+  citext: string;
+  uuid: string;
+  timestamptz: string;
+  int: number;
+  float: number;
+}
+
+type NullableUnless<TCondition extends boolean | undefined, TType> =
+  TCondition extends true ? TType : TType | null | undefined;
+
+const col = <
+  TOptions extends {
+    notNull?: boolean;
+    type: keyof GraphQLTypeFromPostgresType;
+  },
+>(
+  options: TOptions,
+): PgDataSourceColumn<
+  NullableUnless<
+    TOptions["notNull"],
+    GraphQLTypeFromPostgresType[TOptions["type"]]
+  >
+> => {
   const { notNull, type } = options;
   return {
-    gql2pg: (value: TGraphQL) =>
-      sql`${sql.value(value as any)}::${sql.identifier(type)}`,
-    pg2gql: (value: TPostgres): TGraphQL => value as any,
+    gql2pg: (value) => sql`${sql.value(value as any)}::${sql.identifier(type)}`,
+    pg2gql: (value) => value as any,
     notNull: !!notNull,
     type: sql.identifier(type),
   };
