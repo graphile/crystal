@@ -116,6 +116,17 @@ export type PlanResolver<
   context: __TrackedObjectPlan<TContext>,
 ) => TResultPlan;
 
+export type InputPlanResolver<
+  TContext extends BaseGraphQLContext,
+  TInput extends any,
+  TParentPlan extends Plan<any> | null,
+  TResultPlan extends Plan<any> | null,
+> = (
+  $parentPlan: TParentPlan,
+  $input: __TrackedObjectPlan<TInput>,
+  context: __TrackedObjectPlan<TContext>,
+) => TResultPlan;
+
 type PlanForType<TType extends GraphQLOutputType> = TType extends GraphQLList<
   infer U
 >
@@ -130,6 +141,39 @@ type PlanForType<TType extends GraphQLOutputType> = TType extends GraphQLList<
   ? Plan<boolean | number | string>
   : Plan<{ [key: string]: any }>;
 
+/* Disabled due to TypeScript "Type instantiation is excessively deep and
+ * possibly infinite".
+
+type InputPlanForType<TType extends GraphQLInputType> =
+  TType extends GraphQLList<infer U>
+    ? U extends GraphQLInputType
+      ? InputPlanForType<U>
+      : never
+    : TType extends GraphQLNonNull<infer V>
+    ? V extends GraphQLInputType
+      ? InputPlanForType<V>
+      : never
+    : TType extends GraphQLScalarType | GraphQLEnumType
+    ? null
+    : Plan<{ [key: string]: any }> | null;
+
+type InputTypeFor<TType extends GraphQLInputType> = TType extends GraphQLList<
+  infer U
+>
+  ? U extends GraphQLInputType
+    ? InputTypeFor<U>
+    : never
+  : TType extends GraphQLNonNull<infer V>
+  ? V extends GraphQLInputType
+    ? InputTypeFor<V>
+    : never
+  : TType extends GraphQLInt | GraphQLFloat
+  ? number
+  : TType extends GraphQLString | GraphQLID
+  ? string
+  : any;
+*/
+
 /**
  * Basically GraphQLFieldConfig but with an easy to access `plan` method.
  */
@@ -137,14 +181,27 @@ export type GraphileCrystalFieldConfig<
   TType extends GraphQLOutputType,
   TContext extends BaseGraphQLContext,
   TParentPlan extends Plan<any> | null,
-  TResultPlan extends PlanForType<TType>,
+  TResultPlan extends Plan<any>, // PlanForType<TType>,
   TArgs extends BaseGraphQLArguments,
 > = Omit<GraphQLFieldConfig<any, any>, "args" | "type"> & {
   type: TType;
   plan?: PlanResolver<TContext, TArgs, TParentPlan, TResultPlan>;
   args?: {
-    [key: string]: GraphQLArgumentConfig & {
-      plan?: (plan: TResultPlan) => void;
-    };
+    [key: string]: GraphileCrystalArgumentConfig<
+      GraphQLInputType,
+      TContext,
+      TResultPlan
+    >;
   };
+};
+
+export type GraphileCrystalArgumentConfig<
+  TInputType extends GraphQLInputType,
+  TContext extends BaseGraphQLContext,
+  TParentPlan extends Plan<any>,
+  TResultPlan extends Plan<any> | null, // InputPlanForType<TInputType>
+  TInput extends any, // InputTypeFor<TInputType>,
+> = Omit<GraphQLArgumentConfig, "type"> & {
+  type: TInputType;
+  plan?: InputPlanResolver<TContext, TInput, TParentPlan, TResultPlan>;
 };

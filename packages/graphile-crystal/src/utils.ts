@@ -494,8 +494,8 @@ export function objectSpec<
 export function objectFieldSpec<
   TContext extends BaseGraphQLContext,
   TSource extends Plan<any>,
-  TResult extends Plan<any> = Plan<any>,
-  TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
+  TResult extends Plan<any>,
+  TArgs extends BaseGraphQLArguments,
 >(
   graphileSpec: GraphileCrystalFieldConfig<
     GraphQLOutputType,
