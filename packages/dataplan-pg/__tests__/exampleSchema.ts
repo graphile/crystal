@@ -14,7 +14,6 @@ import {
   GraphQLSchema,
   GraphQLString,
 } from "graphql";
-import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type { PgClassSelectSinglePlan } from "../src";
@@ -147,16 +146,6 @@ const User = new GraphQLObjectType(
         plan($user) {
           return $user.get("gravatar_url");
         },
-        /*
-        resolve(parent) {
-          return parent.gravatar_url;
-        },
-        extensions: {
-          graphile: {
-            dependencies: ["gravatar_url"],
-          },
-        },
-        */
       },
     },
   }),
@@ -175,15 +164,7 @@ const Message = new GraphQLObjectType(
       author: {
         type: User,
         plan($message) {
-          const $user = userSource.get({ id: $message.get("author_id") });
-          /*
-          const $user = new PgClassSelectPlan(
-            userSource,
-            [{ plan: $message.get("author_id"), type: sql`uuid` }],
-            (alias) => [sql`${alias}.id`],
-          ).single();
-          */
-          return $user;
+          return userSource.get({ id: $message.get("author_id") });
         },
       },
     },
@@ -225,17 +206,6 @@ const MessagesConnection = new GraphQLObjectType(
         plan($connection) {
           return $connection.nodes();
         },
-        /*
-      extensions: {
-        graphile: {
-          plan($deps) {
-            // This already contains identity information
-            const plan = $deps.collection({ pagination: true, cursors: false });
-            return plan;
-          },
-        },
-      },
-      */
       },
     },
   }),
@@ -301,11 +271,7 @@ const Forum: GraphQLObjectType<any, GraphileResolverContext> =
           },
           plan($forum) {
             const $forumId = $forum.get("id");
-            const $messages = new PgClassSelectPlan(
-              messageSource,
-              [{ plan: $forumId, type: sql`uuid` }],
-              (alias) => [sql`${alias}.forum_id`],
-            );
+            const $messages = messageSource.find({ forum_id: $forumId });
             $messages.setTrusted();
             // $messages.leftJoin(...);
             // $messages.innerJoin(...);
@@ -330,13 +296,6 @@ const Forum: GraphQLObjectType<any, GraphileResolverContext> =
             const $messages = messageSource.find({
               forum_id: $forum.get("id"),
             });
-            /*
-            const $messages = new PgClassSelectPlan(
-              messageSource,
-              [{ plan: $forum.get("id"), type: sql`uuid` }],
-              (alias) => [sql`${alias}.forum_id`],
-            );
-            */
             $messages.setTrusted();
             // $messages.leftJoin(...);
             // $messages.innerJoin(...);
@@ -361,9 +320,6 @@ const Query = new GraphQLObjectType(
         type: new GraphQLList(Forum),
         plan(_$root) {
           const $forums = forumSource.find();
-          /*
-          const $forums = new PgClassSelectPlan(forumSource, [], () => []);
-          */
           return $forums;
         },
       },
@@ -379,11 +335,7 @@ const Query = new GraphQLObjectType(
           includeArchived: { type: IncludeArchived },
         },
         plan() {
-          const $messages = new PgClassSelectPlan(
-            messageSource,
-            [],
-            (_alias) => [],
-          );
+          const $messages = messageSource.find();
           // $messages.leftJoin(...);
           // $messages.innerJoin(...);
           // $messages.relation('fk_messages_author_id')
