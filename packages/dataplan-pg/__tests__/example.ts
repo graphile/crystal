@@ -253,6 +253,35 @@ async function main() {
       }
     `);
   }
+
+  if (Math.random() < 2) {
+    await test(/* GraphQL */ `
+      {
+        forums(limit: 2) {
+          name
+          messagesConnection(limit: 2) {
+            nodes {
+              body
+              author {
+                username
+                gravatarUrl
+              }
+            }
+            edges {
+              cursor
+              node {
+                body
+                author {
+                  username
+                  gravatarUrl
+                }
+              }
+            }
+          }
+        }
+      }
+    `);
+  }
 }
 
 main()
