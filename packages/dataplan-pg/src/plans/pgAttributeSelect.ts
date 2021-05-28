@@ -18,7 +18,7 @@ const debugPlanVerbose = debugPlan.extend("verbose");
  * not be a "leaf"; it might be used as the input of another layer of plan.
  */
 export class PgAttributeSelectPlan<
-  TDataSource extends PgDataSource<any>,
+  TDataSource extends PgDataSource<any, any>,
   TData = any,
 > extends Plan<TData> {
   private tableId: number;

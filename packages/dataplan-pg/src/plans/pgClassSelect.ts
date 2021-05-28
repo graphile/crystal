@@ -46,7 +46,7 @@ type PgClassSelectPlanJoin =
  * records from them `{a: 1},{a: 2},{a:3}`).
  */
 export class PgClassSelectPlan<
-  TDataSource extends PgDataSource<any>,
+  TDataSource extends PgDataSource<any, any>,
 > extends Plan<ReadonlyArray<TDataSource["TRow"]>> {
   // FROM
 
@@ -450,7 +450,7 @@ export class PgClassSelectPlan<
   }
 
   private buildFrom() {
-    return sql`\nfrom ${this.dataSource.tableIdentifier} as ${this.alias}`;
+    return sql`\nfrom ${this.dataSource.source} as ${this.alias}`;
   }
 
   private buildJoin() {
@@ -791,7 +791,7 @@ export class PgClassSelectPlan<
           table.joins.push(
             {
               type: "left",
-              source: this.dataSource.tableIdentifier,
+              source: this.dataSource.source,
               alias: this.alias,
               conditions,
             },

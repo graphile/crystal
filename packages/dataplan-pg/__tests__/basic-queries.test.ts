@@ -314,7 +314,7 @@ it("{forums{name messagesList(limit,condition,includeArchived){body author{usern
         ]::text[]
         from app_public.messages as __messages__
         left outer join app_public.users as __users__
-        on ((__messages__."author_id"::uuid = __users__.id))
+        on ((__messages__."author_id"::"uuid" = __users__."id"))
         where (
           __forums__."id"::uuid = __messages__.forum_id
         )
@@ -385,7 +385,7 @@ it("{allMessagesConnection{edges{cursor node{body author{username gravatarUrl}}}
       __messages__."author_id"::text as "4"
     from app_public.messages as __messages__
     left outer join app_public.users as __users__
-    on ((__messages__."author_id"::uuid = __users__.id))
+    on ((__messages__."author_id"::"uuid" = __users__."id"))
     where (
       true /* authorization checks */
     )
@@ -513,11 +513,11 @@ it("{forums{name messagesConnection(...){nodes{body author{...}} edges{cursor no
         ]::text[]
         from app_public.messages as __messages__
         left outer join app_public.users as __users__
-        on ((__messages__."author_id"::uuid = __users__.id))
+        on ((__messages__."author_id"::"uuid" = __users__."id"))
         left outer join app_public.users as __users_2
-        on ((__messages__."author_id"::uuid = __users_2.id))
+        on ((__messages__."author_id"::"uuid" = __users_2."id"))
         where (
-          __forums__."id"::uuid = __messages__.forum_id
+          __forums__."id"::"uuid" = __messages__."forum_id"
         )
       ) as "1",
       __forums__."id"::text as "2"

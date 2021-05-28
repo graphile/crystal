@@ -14,11 +14,16 @@ import {
   GraphQLSchema,
   GraphQLString,
 } from "graphql";
+import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type { PgClassSelectSinglePlan } from "../src";
 import { PgClassSelectPlan, PgConnectionPlan, PgDataSource } from "../src";
-import type { PgDataSourceContext, WithPgClient } from "../src/datasource";
+import type {
+  PgDataSourceColumn,
+  PgDataSourceContext,
+  WithPgClient,
+} from "../src/datasource";
 
 // These are what the generics extend from
 
@@ -52,25 +57,57 @@ function getPgDataSourceContext() {
   });
 }
 
-const messageSource = new PgDataSource<{
-  id: string;
-  body: string;
-  author_id: string;
-  forum_id: string;
-  created_at: Date;
-}>(sql`app_public.messages`, "messages", getPgDataSourceContext);
+const col = <TPostgres extends string, TGraphQL extends any>(options: {
+  notNull?: boolean;
+  type: string;
+}): PgDataSourceColumn<TPostgres, TGraphQL> => {
+  const { notNull, type } = options;
+  return {
+    gql2pg: (value: TGraphQL) =>
+      sql`${sql.value(value as any)}::${sql.identifier(type)}`,
+    pg2gql: (value: TPostgres): TGraphQL => value as any,
+    notNull: !!notNull,
+    type: sql.identifier(type),
+  };
+};
 
-const userSource = new PgDataSource<{
-  id: string;
-  username: string;
-  gravatar_url?: string;
-  created_at: Date;
-}>(sql`app_public.users`, "users", getPgDataSourceContext);
+const messageSource = new PgDataSource({
+  source: sql`app_public.messages`,
+  name: "messages",
+  context: getPgDataSourceContext,
+  columns: {
+    id: col({ notNull: true, type: `uuid` }),
+    body: col({ notNull: true, type: `text` }),
+    author_id: col({ notNull: true, type: `uuid` }),
+    forum_id: col({ notNull: true, type: `uuid` }),
+    created_at: col({ notNull: true, type: `timestamptz` }),
+  },
+  uniques: [],
+});
 
-const forumSource = new PgDataSource<{
-  id: string;
-  name: string;
-}>(sql`app_public.forums`, "forums", getPgDataSourceContext);
+const userSource = new PgDataSource({
+  source: sql`app_public.users`,
+  name: "users",
+  context: getPgDataSourceContext,
+  columns: {
+    id: col({ notNull: true, type: `uuid` }),
+    username: col({ notNull: true, type: `citext` }),
+    gravatar_url: col({ type: `text` }),
+    created_at: col({ notNull: true, type: `timestamptz` }),
+  },
+  uniques: [["id"], ["username"]],
+});
+
+const forumSource = new PgDataSource({
+  source: sql`app_public.forums`,
+  name: "forums",
+  context: getPgDataSourceContext,
+  columns: {
+    id: col({ notNull: true, type: `uuid` }),
+    name: col({ notNull: true, type: `citext` }),
+  },
+  uniques: [["id"]],
+});
 
 const User = new GraphQLObjectType(
   objectSpec<GraphileResolverContext, UserPlan>({
@@ -115,11 +152,14 @@ const Message = new GraphQLObjectType(
       author: {
         type: User,
         plan($message) {
+          const $user = userSource.get({ id: $message.get("author_id") });
+          /*
           const $user = new PgClassSelectPlan(
             userSource,
             [{ plan: $message.get("author_id"), type: sql`uuid` }],
             (alias) => [sql`${alias}.id`],
           ).single();
+          */
           return $user;
         },
       },
@@ -264,11 +304,16 @@ const Forum: GraphQLObjectType<any, GraphileResolverContext> =
             includeArchived: { type: IncludeArchived },
           },
           plan($forum) {
+            const $messages = messageSource.find({
+              forum_id: $forum.get("id"),
+            });
+            /*
             const $messages = new PgClassSelectPlan(
               messageSource,
               [{ plan: $forum.get("id"), type: sql`uuid` }],
               (alias) => [sql`${alias}.forum_id`],
             );
+            */
             $messages.setTrusted();
             // $messages.leftJoin(...);
             // $messages.innerJoin(...);
@@ -292,7 +337,10 @@ const Query = new GraphQLObjectType(
       forums: {
         type: new GraphQLList(Forum),
         plan(_$root) {
+          const $forums = forumSource.find();
+          /*
           const $forums = new PgClassSelectPlan(forumSource, [], () => []);
+          */
           return $forums;
         },
       },

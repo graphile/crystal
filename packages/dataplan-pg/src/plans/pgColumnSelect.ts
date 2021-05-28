@@ -18,7 +18,7 @@ const debugExecuteVerbose = debugExecute.extend("verbose");
  * not be a "leaf"; it might be used as the input of another layer of plan.
  */
 export class PgColumnSelectPlan<
-  TDataSource extends PgDataSource<any>,
+  TDataSource extends PgDataSource<any, any>,
   TColumn extends keyof TDataSource["TRow"],
 > extends Plan<TDataSource["TRow"][TColumn]> {
   public readonly tableId: number;

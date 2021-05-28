@@ -4,20 +4,18 @@ import chalk from "chalk";
 import debugFactory from "debug";
 import type {
   __ValuePlan,
-  Aether,
-  BaseGraphQLContext,
   CrystalValuesList,
   Deferred,
   ObjectPlan,
   Plan,
 } from "graphile-crystal";
-import { aether, defer, object } from "graphile-crystal";
-import type { Pool } from "pg";
+import { defer } from "graphile-crystal";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 import { inspect } from "util";
 
-import type { PgClassSelectPlan } from "./plans/pgClassSelect";
+import { PgClassSelectPlan } from "./plans/pgClassSelect";
+import type { PgClassSelectSinglePlan } from "./plans/pgClassSelectSingle";
 
 const debug = debugFactory("datasource:pg:PgDataSource");
 const debugVerbose = debug.extend("verbose");
@@ -82,14 +80,47 @@ export type PgDataSourceContext<TSettings = any> = {
   withPgClient: WithPgClient;
 };
 
+type PgDataSourceColumns = {
+  [columnName: string]: PgDataSourceColumn<any, any>;
+};
+
+export interface PgDataSourceColumn<
+  TPostgres extends string,
+  TGraphQL extends any,
+> {
+  gql2pg: (graphqlValue: TGraphQL) => SQL;
+  pg2gql: (postgresValue: TPostgres) => TGraphQL;
+  notNull: boolean;
+  type: SQL;
+}
+
+type PgDataSourceRow<TColumns extends PgDataSourceColumns> = {
+  [key in keyof TColumns]: ReturnType<TColumns[key]["pg2gql"]>;
+};
+
+type TuplePlanMap<
+  TColumns extends { [column: string]: any },
+  TTuple extends ReadonlyArray<keyof TColumns>,
+> = {
+  [Index in keyof TTuple]: {
+    [key in TTuple[number]]: Plan<PgDataSourceRow<TColumns>[key]>;
+  };
+};
+
+type PlanByUniques<
+  TColumns extends { [column: string]: any },
+  TCols extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+> = TuplePlanMap<TColumns, TCols[number]>[number];
+
 /**
  * PG data source represents a PostgreSQL data source. This could be a table,
  * view, materialized view, function call, join, etc. Anything table-like.
  */
 export class PgDataSource<
-  TRow extends { [key: string]: any },
+  TColumns extends PgDataSourceColumns,
+  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
 > extends DataSource<
-  ReadonlyArray<TRow>,
+  ReadonlyArray<PgDataSourceRow<TColumns>>,
   PgDataSourceInput,
   PgDataSourceExecuteOptions
 > {
@@ -100,7 +131,7 @@ export class PgDataSource<
    *
    * @internal
    */
-  TRow!: TRow;
+  TRow!: PgDataSourceRow<TColumns>;
 
   private cache: WeakMap<
     Record<string, unknown> /* context */,
@@ -110,19 +141,33 @@ export class PgDataSource<
     >
   > = new WeakMap();
 
+  public source: SQL;
+  public name: string;
+  private contextCallback: () => ObjectPlan<PgDataSourceContext>;
+  public columns: TColumns;
+  public uniques: TUniques;
+
   /**
-   * @param tableIdentifier - the SQL for the `FROM` clause (without any
+   * @param source - the SQL for the `FROM` clause (without any
    * aliasing). If this is a subquery don't forget to wrap it in parens.
    * @param name - a nickname for this data source. Doesn't need to be unique
    * (but should be). Used for making the SQL query and debug messages easier
    * to understand.
    */
-  constructor(
-    public tableIdentifier: SQL,
-    public name: string,
-    private contextCallback: () => ObjectPlan<PgDataSourceContext>,
-  ) {
+  constructor(options: {
+    name: string;
+    source: SQL;
+    context: () => ObjectPlan<PgDataSourceContext>;
+    columns: TColumns;
+    uniques: TUniques;
+  }) {
     super();
+    const { context, source, name, columns, uniques } = options;
+    this.source = source;
+    this.name = name;
+    this.contextCallback = context;
+    this.columns = columns;
+    this.uniques = uniques;
   }
 
   public toString(): string {
@@ -131,6 +176,56 @@ export class PgDataSource<
 
   public context(): Plan<any> {
     return this.contextCallback();
+  }
+
+  public get(
+    spec: PlanByUniques<TColumns, TUniques>,
+  ): PgClassSelectSinglePlan<this> {
+    const keys: ReadonlyArray<keyof TColumns> = Object.keys(spec);
+    if (!this.uniques.some((uniq) => uniq.every((key) => keys.includes(key)))) {
+      throw new Error(
+        `Attempted to call ${this}.get({${keys.join(
+          ", ",
+        )}}) but that combination of columns is not unique. Did you mean to call .find() instead?`,
+      );
+    }
+    return this.find(spec).single();
+  }
+
+  public find(
+    spec: { [key in keyof TColumns]?: Plan } = {},
+  ): PgClassSelectPlan<this> {
+    const keys: ReadonlyArray<keyof TColumns> = Object.keys(spec);
+    const invalidKeys = keys.filter((key) => this.columns[key] == null);
+    if (invalidKeys.length > 0) {
+      throw new Error(
+        `Attempted to call ${this}.get({${keys.join(
+          ", ",
+        )}}) but that request included columns that we don't know about: '${invalidKeys.join(
+          "', '",
+        )}'`,
+      );
+    }
+
+    const identifiers = keys.map((key) => {
+      const column = this.columns[key];
+      const { type } = column;
+      const plan: Plan | undefined = spec[key];
+      if (plan == undefined) {
+        throw new Error(
+          `Attempted to call ${this}.get({${keys.join(
+            ", ",
+          )}}) but failed to provide a plan for '${key}'`,
+        );
+      }
+      return {
+        plan,
+        type,
+      };
+    });
+    const identifiersMatchesThunk = (alias: SQL) =>
+      keys.map((key) => sql`${alias}.${sql.identifier(key as string)}`);
+    return new PgClassSelectPlan(this, identifiers, identifiersMatchesThunk);
   }
 
   public applyAuthorizationChecksToPlan($plan: PgClassSelectPlan<this>): void {
@@ -142,12 +237,16 @@ export class PgDataSource<
   public async execute(
     values: CrystalValuesList<PgDataSourceInput>,
     common: PgDataSourceExecuteOptions,
-  ): Promise<{ values: CrystalValuesList<ReadonlyArray<TRow>> }> {
+  ): Promise<{
+    values: CrystalValuesList<ReadonlyArray<PgDataSourceRow<TColumns>>>;
+  }> {
     const { text, rawSqlValues, identifierIndex, identifierSymbol } = common;
     let sqlValues = rawSqlValues;
 
     const valuesCount = values.length;
-    const results: Deferred<Array<TRow>>[] = new Array(valuesCount);
+    const results: Deferred<Array<PgDataSourceRow<TColumns>>>[] = new Array(
+      valuesCount,
+    );
 
     // Group by context
     const groupMap = new Map<

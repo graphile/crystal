@@ -24,7 +24,7 @@ import { PgColumnSelectPlan } from "./pgColumnSelect";
  * expressions.
  */
 export class PgClassSelectSinglePlan<
-  TDataSource extends PgDataSource<any>,
+  TDataSource extends PgDataSource<any, any>,
 > extends Plan<TDataSource["TRow"]> {
   public readonly itemPlanId: number;
 
