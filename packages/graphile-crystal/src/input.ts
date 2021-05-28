@@ -8,6 +8,7 @@ import type {
   NonNullTypeNode,
   ValueNode,
 } from "graphql";
+import { valueFromAST } from "graphql";
 import {
   coerceInputValue,
   GraphQLInputObjectType,
@@ -265,7 +266,7 @@ class InputStaticLeafPlan extends Plan {
     // us to call coerceInputValue because we already know this is a scalar and
     // *not* a variable. Otherwise we'd need to process it via
     // aether.trackedVariableValuesPlan.
-    this.coercedValue = coerceInputValue(value, inputType);
+    this.coercedValue = value != null ? valueFromAST(value, inputType) : value;
   }
 
   execute(values: any[][]): any[] {

@@ -494,8 +494,8 @@ export function objectSpec<
 export function objectFieldSpec<
   TContext extends BaseGraphQLContext,
   TSource extends Plan<any>,
-  TResult extends Plan<any>,
-  TArgs extends BaseGraphQLArguments,
+  TResult extends Plan<any> = Plan<any>,
+  TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
 >(
   graphileSpec: GraphileCrystalFieldConfig<
     GraphQLOutputType,
@@ -505,9 +505,26 @@ export function objectFieldSpec<
     TArgs
   >,
 ): GraphQLFieldConfig<any, TContext, TArgs> {
-  const { plan, ...spec } = graphileSpec;
+  const { plan, args, ...spec } = graphileSpec;
+
+  const argsWithExtensions = args
+    ? Object.keys(args).reduce((memo, argName) => {
+        const { plan, ...argSpec } = args[argName];
+        memo[argName] = {
+          ...argSpec,
+          extensions: {
+            graphile: {
+              plan,
+            },
+          },
+        };
+        return memo;
+      }, {})
+    : {};
+
   return {
     ...spec,
+    args: argsWithExtensions,
     extensions: {
       graphile: {
         plan,

@@ -591,8 +591,8 @@ export class Aether<
             trackedArgumentValuePlan,
             this.trackedContextPlan,
           );
-          assertArgumentPlan(argPlan);
           if (argPlan != null) {
+            assertArgumentPlan(argPlan);
             this.planInput(argSpec.type, trackedArgumentValuePlan, argPlan);
           }
         }
@@ -701,8 +701,15 @@ export class Aether<
       const fieldSpec = objectType.getFields()[fieldName];
       const argumentDefinitions = fieldSpec.args;
 
-      for (const argumentName in argumentDefinitions) {
-        const argumentDefinition = argumentDefinitions[argumentName];
+      const seenNames = new Set();
+      for (const argumentDefinition of argumentDefinitions) {
+        const argumentName = argumentDefinition.name;
+        if (seenNames.has(argumentName)) {
+          throw new Error(
+            `Argument name '${argumentName}' seen twice; aborting.`,
+          );
+        }
+        seenNames.add(argumentName);
         const argumentType = argumentDefinition.type;
         const defaultValue = defaultValueToValueNode(
           argumentType,

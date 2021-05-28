@@ -16,8 +16,8 @@ import {
 } from "graphql";
 import sql from "pg-sql2";
 
-import type { PgClassSelectSinglePlan } from "../src";
-import { PgClassSelectPlan, PgConnectionPlan, PgDataSource } from "../src";
+import type { PgClassSelectPlan, PgClassSelectSinglePlan } from "../src";
+import { PgConnectionPlan, PgDataSource } from "../src";
 import type {
   PgDataSourceColumn,
   PgDataSourceContext,
@@ -263,6 +263,10 @@ const Forum: GraphQLObjectType<any, GraphileResolverContext> =
           args: {
             limit: {
               type: GraphQLInt,
+              plan($messages: PgClassSelectPlan<typeof messageSource>, $value) {
+                $messages.setLimit($value.eval());
+                return null;
+              },
             },
             condition: {
               type: MessageCondition,
@@ -286,6 +290,14 @@ const Forum: GraphQLObjectType<any, GraphileResolverContext> =
           args: {
             limit: {
               type: GraphQLInt,
+              plan(
+                $connection: PgConnectionPlan<typeof messageSource>,
+                $value,
+              ) {
+                const $messages = $connection.getSubplan();
+                $messages.setLimit($value.eval());
+                return null;
+              },
             },
             condition: {
               type: MessageCondition,
@@ -322,12 +334,26 @@ const Query = new GraphQLObjectType(
           const $forums = forumSource.find();
           return $forums;
         },
+        args: {
+          limit: {
+            type: GraphQLInt,
+            plan($forums: PgClassSelectPlan<typeof forumSource>, $value) {
+              $forums.setLimit($value.eval());
+              return null;
+            },
+          },
+        },
       },
       allMessagesConnection: {
         type: MessagesConnection,
         args: {
           limit: {
             type: GraphQLInt,
+            plan($connection: PgConnectionPlan<typeof messageSource>, $value) {
+              const $messages = $connection.getSubplan();
+              $messages.setLimit($value.eval());
+              return null;
+            },
           },
           condition: {
             type: MessageCondition,

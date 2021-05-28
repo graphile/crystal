@@ -2,6 +2,7 @@ import type {
   GraphQLArgumentConfig,
   GraphQLEnumType,
   GraphQLFieldConfig,
+  GraphQLInputType,
   GraphQLList,
   GraphQLNonNull,
   GraphQLOutputType,
@@ -190,7 +191,9 @@ export type GraphileCrystalFieldConfig<
     [key: string]: GraphileCrystalArgumentConfig<
       GraphQLInputType,
       TContext,
-      TResultPlan
+      TResultPlan,
+      any,
+      any
     >;
   };
 };

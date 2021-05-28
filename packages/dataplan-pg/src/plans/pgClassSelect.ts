@@ -260,6 +260,22 @@ export class PgClassSelectPlan<
     return this.isTrusted;
   }
 
+  public setLimit(limit: number | null | undefined): this {
+    if (this.locked) {
+      throw new Error(`${this}: cannot change limit when locked`);
+    }
+    this.limit = limit ?? null;
+    return this;
+  }
+
+  public setOffset(offset: number | null | undefined): this {
+    if (this.locked) {
+      throw new Error(`${this}: cannot change offset when locked`);
+    }
+    this.offset = offset ?? null;
+    return this;
+  }
+
   /**
    * Set this true ONLY if there can be at most one match for each of the
    * identifiers. If you set this true when this is not the case then you may
@@ -497,6 +513,18 @@ export class PgClassSelectPlan<
       : sql.blank;
   }
 
+  private buildLimit() {
+    return this.limit != null
+      ? sql`\nlimit ${sql.literal(this.limit)}`
+      : sql.blank;
+  }
+
+  private buildOffset() {
+    return this.offset != null
+      ? sql`\noffset ${sql.literal(this.offset)}`
+      : sql.blank;
+  }
+
   private addIdentifiers() {
     if (this.identifiers.length && this.identifiersAlias) {
       const alias = this.identifiersAlias;
@@ -534,8 +562,10 @@ export class PgClassSelectPlan<
     const join = this.buildJoin();
     const where = this.buildWhere();
     const orderBy = this.buildOrderBy();
+    const limit = this.buildLimit();
+    const offset = this.buildOffset();
 
-    const query = sql`${select}${from}${join}${where}${orderBy}`;
+    const query = sql`${select}${from}${join}${where}${orderBy}${limit}${offset}`;
 
     return query;
   }
