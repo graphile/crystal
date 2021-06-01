@@ -8,6 +8,12 @@ to you also.
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
+## [4.12.2](https://github.com/graphile/postgraphile/compare/v4.12.1...v4.12.2) (2021-06-01)
+
+### Bug Fixes
+
+- **types:** WithPostGraphileContextOptions doesn't need shutdownActions ([#1492](https://github.com/graphile/postgraphile/issues/1492)) ([336f54f](https://github.com/graphile/postgraphile/commit/336f54ff3a74f2316ec37a174ec6d17be7a70a15))
+
 ## [4.12.1](https://github.com/graphile/postgraphile/compare/v4.12.0...v4.12.1) (2021-05-27)
 
 # [4.12.0](https://github.com/graphile/postgraphile/compare/v4.12.0-alpha.0...v4.12.0) (2021-05-27)
