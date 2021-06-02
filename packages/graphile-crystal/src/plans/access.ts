@@ -3,7 +3,7 @@ import debugFactory from "debug";
 import { inspect } from "util";
 
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
-import { Plan } from "../plan";
+import { ExecutablePlan } from "../plan";
 
 // NOTE: this runs at startup so it will NOT notice values that pollute the
 // Object prototype after startup. It is assumed that you are running Node in
@@ -155,12 +155,12 @@ const debugAccessPlanVerbose = debugAccessPlan.extend("verbose");
  * preferably where the objects have null prototypes, and be sure to adhere to
  * the naming conventions detailed in assertSafeToAccessViaBraces.
  */
-export class AccessPlan<TData> extends Plan<TData> {
+export class AccessPlan<TData> extends ExecutablePlan<TData> {
   private destructure: (value: any) => any;
   private parentPlanId: number;
 
   constructor(
-    parentPlan: Plan<any>,
+    parentPlan: ExecutablePlan<any>,
     public readonly path: (string | number)[],
   ) {
     super();
@@ -223,7 +223,7 @@ export class AccessPlan<TData> extends Plan<TData> {
 }
 
 export function access<TData>(
-  parentPlan: Plan<any>,
+  parentPlan: ExecutablePlan<any>,
   path: (string | number)[],
 ): AccessPlan<TData> {
   return new AccessPlan<TData>(parentPlan, path);

@@ -1,10 +1,10 @@
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
-import { Plan } from "../plan";
+import { ExecutablePlan } from "../plan";
 import type { __ListItemPlan, ListCapablePlan } from "./__listItem";
 import { isListCapablePlan } from "./__listItem";
 
 export class EachPlan<TData = any, TResult = any>
-  extends Plan<ReadonlyArray<TResult>>
+  extends ExecutablePlan<ReadonlyArray<TResult>>
   implements ListCapablePlan<TResult>
 {
   listPlanId: number;
@@ -23,8 +23,8 @@ export class EachPlan<TData = any, TResult = any>
   }
 
   listItem(
-    _itemPlan: __ListItemPlan<Plan<ReadonlyArray<TData>>>,
-  ): Plan<TResult> {
+    _itemPlan: __ListItemPlan<ExecutablePlan<ReadonlyArray<TData>>>,
+  ): ExecutablePlan<TResult> {
     throw new Error("Each can currently only be used during optimization");
     /*
     const originalListItem = (this.aether.plans[

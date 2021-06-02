@@ -1,5 +1,5 @@
 import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
-import { Plan } from "graphile-crystal";
+import { ExecutablePlan } from "graphile-crystal";
 import sql from "pg-sql2";
 
 import type { PgDataSource } from "../datasource";
@@ -25,7 +25,7 @@ import { PgColumnSelectPlan } from "./pgColumnSelect";
  */
 export class PgClassSelectSinglePlan<
   TDataSource extends PgDataSource<any, any>,
-> extends Plan<TDataSource["TRow"]> {
+> extends ExecutablePlan<TDataSource["TRow"]> {
   public readonly itemPlanId: number;
 
   // TODO: should we move this back to PgClassSelectPlan to help avoid
@@ -49,7 +49,7 @@ export class PgClassSelectSinglePlan<
 
   constructor(
     classPlan: PgClassSelectPlan<TDataSource>,
-    itemPlan: Plan<TDataSource["TRow"]>,
+    itemPlan: ExecutablePlan<TDataSource["TRow"]>,
   ) {
     super();
     this.dataSource = classPlan.dataSource;

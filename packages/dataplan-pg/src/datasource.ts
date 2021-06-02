@@ -6,8 +6,8 @@ import type {
   __ValuePlan,
   CrystalValuesList,
   Deferred,
+  ExecutablePlan,
   ObjectPlan,
-  Plan,
 } from "graphile-crystal";
 import { defer } from "graphile-crystal";
 import type { SQL, SQLRawValue } from "pg-sql2";
@@ -100,7 +100,9 @@ type TuplePlanMap<
   TTuple extends ReadonlyArray<keyof TColumns>,
 > = {
   [Index in keyof TTuple]: {
-    [key in TTuple[number]]: Plan<ReturnType<TColumns[key]["pg2gql"]>>;
+    [key in TTuple[number]]: ExecutablePlan<
+      ReturnType<TColumns[key]["pg2gql"]>
+    >;
   };
 };
 
@@ -171,7 +173,7 @@ export class PgDataSource<
     return chalk.bold.blue(`PgDataSource(${this.name})`);
   }
 
-  public context(): Plan<any> {
+  public context(): ExecutablePlan<any> {
     return this.contextCallback();
   }
 
@@ -190,7 +192,7 @@ export class PgDataSource<
   }
 
   public find(
-    spec: { [key in keyof TColumns]?: Plan } = {},
+    spec: { [key in keyof TColumns]?: ExecutablePlan } = {},
   ): PgClassSelectPlan<this> {
     const keys: ReadonlyArray<keyof TColumns> = Object.keys(spec);
     const invalidKeys = keys.filter((key) => this.columns[key] == null);
@@ -207,7 +209,7 @@ export class PgDataSource<
     const identifiers = keys.map((key) => {
       const column = this.columns[key];
       const { type } = column;
-      const plan: Plan | undefined = spec[key];
+      const plan: ExecutablePlan | undefined = spec[key];
       if (plan == undefined) {
         throw new Error(
           `Attempted to call ${this}.get({${keys.join(

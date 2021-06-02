@@ -10,7 +10,7 @@ import type {
 } from "graphql";
 
 import type { Deferred } from "./deferred";
-import type { Plan } from "./plan";
+import type { ExecutablePlan, ModifierPlan } from "./plan";
 import type { __TrackedObjectPlan, ListCapablePlan } from "./plans";
 import type { UniqueId } from "./utils";
 
@@ -41,7 +41,7 @@ export interface CrystalObject<TData> {
 export interface Batch {
   pathIdentity: string;
   crystalContext: CrystalContext;
-  plan: Plan;
+  plan: ExecutablePlan;
   entries: Array<[CrystalObject<any>, Deferred<any>]>;
 }
 
@@ -66,7 +66,7 @@ export interface CrystalContext {
   resultByCrystalObjectByPlanId: Map<number, Map<CrystalObject<any>, any>>;
 
   metaByPlanId: {
-    [planId: number]: object | undefined;
+    [planId: number]: Record<string, unknown> | undefined;
   };
 
   rootId: UniqueId;
@@ -106,22 +106,22 @@ export type BaseGraphQLInputObject = BaseGraphQLArguments;
  * We're using `TrackedObject<...>` so we can later consider caching these
  * executions.
  */
-export type PlanResolver<
+export type ExecutablePlanResolver<
   TContext extends BaseGraphQLContext,
   TArgs extends BaseGraphQLArguments,
-  TParentPlan extends Plan<any> | null,
-  TResultPlan extends Plan<any>,
+  TParentPlan extends ExecutablePlan<any> | null,
+  TResultPlan extends ExecutablePlan<any>,
 > = (
   $parentPlan: TParentPlan,
   args: __TrackedObjectPlan<TArgs>,
   context: __TrackedObjectPlan<TContext>,
 ) => TResultPlan;
 
-export type InputPlanResolver<
+export type ModifierPlanResolver<
   TContext extends BaseGraphQLContext,
   TInput extends any,
-  TParentPlan extends Plan<any> | null,
-  TResultPlan extends Plan<any> | null,
+  TParentPlan extends ExecutablePlan<any> | ModifierPlan | null,
+  TResultPlan extends ModifierPlan | null,
 > = (
   $parentPlan: TParentPlan,
   $input: __TrackedObjectPlan<TInput>,
@@ -139,8 +139,8 @@ type PlanForType<TType extends GraphQLOutputType> = TType extends GraphQLList<
     ? PlanForType<V>
     : never
   : TType extends GraphQLScalarType | GraphQLEnumType
-  ? Plan<boolean | number | string>
-  : Plan<{ [key: string]: any }>;
+  ? ExecutablePlan<boolean | number | string>
+  : ExecutablePlan<{ [key: string]: any }>;
 
 /* Disabled due to TypeScript "Type instantiation is excessively deep and
  * possibly infinite".
@@ -156,7 +156,7 @@ type InputPlanForType<TType extends GraphQLInputType> =
       : never
     : TType extends GraphQLScalarType | GraphQLEnumType
     ? null
-    : Plan<{ [key: string]: any }> | null;
+    : ExecutablePlan<{ [key: string]: any }> | null;
 
 type InputTypeFor<TType extends GraphQLInputType> = TType extends GraphQLList<
   infer U
@@ -181,12 +181,12 @@ type InputTypeFor<TType extends GraphQLInputType> = TType extends GraphQLList<
 export type GraphileCrystalFieldConfig<
   TType extends GraphQLOutputType,
   TContext extends BaseGraphQLContext,
-  TParentPlan extends Plan<any> | null,
-  TResultPlan extends Plan<any>, // PlanForType<TType>,
+  TParentPlan extends ExecutablePlan<any> | null,
+  TResultPlan extends ExecutablePlan<any>, // PlanForType<TType>,
   TArgs extends BaseGraphQLArguments,
 > = Omit<GraphQLFieldConfig<any, any>, "args" | "type"> & {
   type: TType;
-  plan?: PlanResolver<TContext, TArgs, TParentPlan, TResultPlan>;
+  plan?: ExecutablePlanResolver<TContext, TArgs, TParentPlan, TResultPlan>;
   args?: {
     [key: string]: GraphileCrystalArgumentConfig<
       GraphQLInputType,
@@ -201,10 +201,10 @@ export type GraphileCrystalFieldConfig<
 export type GraphileCrystalArgumentConfig<
   TInputType extends GraphQLInputType,
   TContext extends BaseGraphQLContext,
-  TParentPlan extends Plan<any>,
-  TResultPlan extends Plan<any> | null, // InputPlanForType<TInputType>
+  TParentPlan extends ExecutablePlan<any>,
+  TResultPlan extends ModifierPlan | null, // InputPlanForType<TInputType>
   TInput extends any, // InputTypeFor<TInputType>,
 > = Omit<GraphQLArgumentConfig, "type"> & {
   type: TInputType;
-  plan?: InputPlanResolver<TContext, TInput, TParentPlan, TResultPlan>;
+  plan?: ModifierPlanResolver<TContext, TInput, TParentPlan, TResultPlan>;
 };

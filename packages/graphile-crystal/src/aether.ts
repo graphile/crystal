@@ -53,8 +53,13 @@ import {
   $$crystalObjectByPathIdentity,
   $$indexesByPathIdentity,
 } from "./interfaces";
-import type { ArgumentPlan, PolymorphicPlan } from "./plan";
-import { assertFinalized, Plan } from "./plan";
+import type { ModifierPlan, PolymorphicPlan } from "./plan";
+import {
+  assertExecutablePlan,
+  assertFinalized,
+  assertModifierPlan,
+  ExecutablePlan,
+} from "./plan";
 import {
   __ListItemPlan,
   __TrackedObjectPlan,
@@ -93,7 +98,7 @@ const debugExecuteVerbose = depthWrap(debugExecuteVerbose_);
 type TrackedArguments = { [key: string]: InputPlan };
 
 function assertPolymorphicPlan(
-  plan: Plan | PolymorphicPlan,
+  plan: ExecutablePlan | PolymorphicPlan,
 ): asserts plan is PolymorphicPlan {
   assert.ok(
     "planForType" in plan,
@@ -103,20 +108,6 @@ function assertPolymorphicPlan(
     typeof plan.planForType,
     "function",
     "Expected property `planForType` for interface field plan to be a function.",
-  );
-}
-
-function assertArgumentPlan(
-  plan: Plan | ArgumentPlan,
-): asserts plan is ArgumentPlan {
-  assert.ok(
-    "null" in plan,
-    "Expected plan for argument to be compatible with ArgumentPlan.",
-  );
-  assert.equal(
-    typeof plan.null,
-    "function",
-    "Expected property `null` for argument plan to be a function.",
   );
 }
 
@@ -138,7 +129,7 @@ export class Aether<
 > {
   public maxGroupId = 0;
   public groupId = this.maxGroupId;
-  public readonly plans: Plan[] = [];
+  public readonly plans: ExecutablePlan[] = [];
   public readonly batchByPathIdentity: {
     [pathIdentity: string]: Batch | undefined;
   } = Object.create(null);
@@ -387,7 +378,7 @@ export class Aether<
    */
   private planSelectionSet(
     path: string,
-    parentPlan: Plan,
+    parentPlan: ExecutablePlan,
     objectType: GraphQLObjectType,
     selections: ReadonlyArray<SelectionNode>,
     isSequential = false,
@@ -414,7 +405,7 @@ export class Aether<
       }
 
       const planResolver = objectField.extensions?.graphile?.plan;
-      let plan: Plan | PolymorphicPlan;
+      let plan: ExecutablePlan | PolymorphicPlan;
       if (typeof planResolver === "function") {
         const oldPlansLength = this.plans.length;
         const trackedArguments = this.getTrackedArguments(objectType, field);
@@ -423,6 +414,7 @@ export class Aether<
           trackedArguments,
           this.trackedContextPlan,
         );
+        assertExecutablePlan(plan, pathIdentity);
         this.planFieldArguments(
           objectType,
           objectField,
@@ -472,8 +464,8 @@ export class Aether<
     fieldType: GraphQLOutputType,
     fields: FieldNode[],
     pathIdentity: string,
-    plan: Plan<any>,
-  ): Plan<any> {
+    plan: ExecutablePlan<any>,
+  ): ExecutablePlan<any> {
     if (fieldType instanceof GraphQLNonNull) {
       // TODO: we could implement a __NonNullPlan in future; currently we just
       // defer that to GraphQL.js
@@ -577,8 +569,10 @@ export class Aether<
     fieldSpec: GraphQLField<unknown, unknown>,
     _field: FieldNode,
     trackedArguments: TrackedArguments,
-    fieldPlan: Plan,
+    fieldPlan: ExecutablePlan,
   ): void {
+    // Arguments are applied in the order that they are specified in the
+    // schema, NOT the order that they are specified in the request.
     for (let i = 0, l = fieldSpec.args.length; i < l; i++) {
       const argSpec = fieldSpec.args[i];
       const argName = argSpec.name;
@@ -592,8 +586,15 @@ export class Aether<
             this.trackedContextPlan,
           );
           if (argPlan != null) {
-            assertArgumentPlan(argPlan);
+            assertModifierPlan(
+              argPlan,
+              `${_objectType.name}.${fieldSpec.name}(${argName}:)`,
+            );
+
             this.planInput(argSpec.type, trackedArgumentValuePlan, argPlan);
+
+            // Now apply the plan
+            argPlan.apply();
           }
         }
       }
@@ -608,7 +609,7 @@ export class Aether<
   private planInput(
     inputType: GraphQLInputType,
     trackedValuePlan: InputPlan,
-    parentPlan: ArgumentPlan,
+    parentPlan: ExecutablePlan | ModifierPlan,
   ): void {
     if (isNonNullType(inputType)) {
       this.planInput(inputType.ofType, trackedValuePlan, parentPlan);
@@ -616,7 +617,7 @@ export class Aether<
     }
     if (isListType(inputType)) {
       if (trackedValuePlan.evalIs(null)) {
-        parentPlan.null();
+        // parentPlan.null();
         return;
       }
       const innerInputType = inputType.ofType;
@@ -645,13 +646,15 @@ export class Aether<
   private planInputFields(
     inputObjectType: GraphQLInputObjectType,
     trackedValuePlan: InputPlan,
-    parentPlan: ArgumentPlan,
+    parentPlan: ExecutablePlan | ModifierPlan,
   ): void {
     assert.ok(
       trackedValuePlan instanceof InputObjectPlan,
       "Expected trackedValuePlan to be an InputObjectPlan",
     );
     const inputFieldSpecs = inputObjectType.getFields();
+    // Input fields are applied in the order that they are specified in the
+    // schema, NOT the order that they are specified in the request.
     for (const fieldName in inputFieldSpecs) {
       const inputFieldSpec = inputFieldSpecs[fieldName];
       if (trackedValuePlan.evalHas(fieldName)) {
@@ -667,7 +670,7 @@ export class Aether<
   private planInputField(
     inputField: GraphQLInputField,
     trackedValuePlan: InputPlan,
-    parentPlan: ArgumentPlan,
+    parentPlan: ExecutablePlan | ModifierPlan,
   ): void {
     const planResolver = inputField.extensions?.graphile?.plan;
     assert.equal(typeof planResolver, "function");
@@ -676,11 +679,13 @@ export class Aether<
       trackedValuePlan,
       this.trackedContextPlan,
     );
-    if (typeof inputFieldPlan === "function") {
+    if (inputFieldPlan != null) {
       const inputFieldType = inputField.type;
       // Note: the unwrapped type of inputFieldType must be an input object.
       // TODO: assert this?
       this.planInput(inputFieldType, trackedValuePlan, inputFieldPlan);
+
+      inputFieldPlan.apply();
     }
   }
 
@@ -740,10 +745,10 @@ export class Aether<
       if (!referencingPlanIsAllowed) {
         for (const key in plan) {
           const val = plan[key];
-          if (val instanceof Plan) {
+          if (val instanceof ExecutablePlan) {
             errors.push(
               new Error(
-                `ERROR: Plan ${plan} has illegal reference via property '${key}' to plan ${val}. You must not reference plans directly, instead use the plan id to reference the plan, and look the plan up in \`this.aether.plans[planId]\`. Failure to comply could result in subtle breakage during optimisation.`,
+                `ERROR: ExecutablePlan ${plan} has illegal reference via property '${key}' to plan ${val}. You must not reference plans directly, instead use the plan id to reference the plan, and look the plan up in \`this.aether.plans[planId]\`. Failure to comply could result in subtle breakage during optimisation.`,
               ),
             );
           }
@@ -762,12 +767,12 @@ export class Aether<
    */
   private processPlans(
     order: "dependents-first" | "dependencies-first",
-    callback: (plan: Plan<any>) => Plan<any>,
+    callback: (plan: ExecutablePlan<any>) => ExecutablePlan<any>,
     startingAtPlanId = 0,
   ): void {
     depth = 0;
-    const processed = new Set<Plan>();
-    const process = (plan: Plan): void => {
+    const processed = new Set<ExecutablePlan>();
+    const process = (plan: ExecutablePlan): void => {
       if (!plan) {
         return;
       }
@@ -809,7 +814,7 @@ export class Aether<
         }
       }
       globalState.parentPathIdentity = plan.parentPathIdentity;
-      let replacementPlan: Plan;
+      let replacementPlan: ExecutablePlan;
       try {
         replacementPlan = callback(plan);
       } catch (e) {
@@ -876,7 +881,7 @@ export class Aether<
       );
       loops++;
     } while (replacements > 0);
-    debugPlan("Plan deduplication complete after %o loops", loops);
+    debugPlan("ExecutablePlan deduplication complete after %o loops", loops);
   }
 
   /**
@@ -889,7 +894,7 @@ export class Aether<
     this.processPlans("dependents-first", (plan) => this.optimizePlan(plan));
   }
 
-  private isPeer(planA: Plan, planB: Plan): boolean {
+  private isPeer(planA: ExecutablePlan, planB: ExecutablePlan): boolean {
     // Can only merge if plan is of same type.
     if (planA.constructor !== planB.constructor) {
       return false;
@@ -919,7 +924,7 @@ export class Aether<
    * Finds suitable peers and passes them to the plan's deduplicate method (if
    * any found).
    */
-  private deduplicatePlan(plan: Plan): Plan {
+  private deduplicatePlan(plan: ExecutablePlan): ExecutablePlan {
     const seenIds = new Set([plan.id]);
     const peers = this.plans.filter((potentialPeer) => {
       if (
@@ -954,11 +959,11 @@ export class Aether<
     return replacementPlan;
   }
 
-  private optimizedPlans = new Set<Plan>();
+  private optimizedPlans = new Set<ExecutablePlan>();
   /**
    * Implements the `OptimizePlan` algorithm.
    */
-  private optimizePlan(plan: Plan): Plan {
+  private optimizePlan(plan: ExecutablePlan): ExecutablePlan {
     if (this.optimizedPlans.has(plan)) {
       throw new Error("Must not optimize plan twice");
     }
@@ -979,7 +984,10 @@ export class Aether<
   /**
    * Implements the `MarkPlanActive` algorithm.
    */
-  private markPlanActive(plan: Plan, activePlans: Set<Plan>): void {
+  private markPlanActive(
+    plan: ExecutablePlan,
+    activePlans: Set<ExecutablePlan>,
+  ): void {
     if (activePlans.has(plan)) {
       return;
     }
@@ -998,7 +1006,7 @@ export class Aether<
    * Implements the `TreeShakePlans` algorithm.
    */
   private treeShakePlans(): void {
-    const activePlans = new Set<Plan>();
+    const activePlans = new Set<ExecutablePlan>();
 
     // NOTE: every plan referenced in this.planIdByPathIdentity is included in
     // this.itemPlanIdByPathIdentity, but the reverse is not true.
@@ -1035,7 +1043,7 @@ export class Aether<
    * Implements the `FinalizePlans` and `FinalizePlan` algorithms.
    */
   private finalizePlans(): void {
-    const distinctActivePlansInReverseOrder = new Set<Plan>();
+    const distinctActivePlansInReverseOrder = new Set<ExecutablePlan>();
     for (let i = this.plans.length - 1; i >= 0; i--) {
       const plan = this.plans[i];
       if (plan !== null) {
@@ -1222,10 +1230,10 @@ export class Aether<
    * Implements `ExecutePlan`.
    */
   private async executePlan(
-    plan: Plan,
+    plan: ExecutablePlan,
     crystalContext: CrystalContext,
     crystalObjects: CrystalObject<any>[],
-    visitedPlans = new Set<Plan>(),
+    visitedPlans = new Set<ExecutablePlan>(),
     depth = 0,
   ): Promise<any[]> {
     const indent = "    ".repeat(depth);
@@ -1240,7 +1248,7 @@ export class Aether<
     }
     if (visitedPlans.has(plan)) {
       throw new Error(
-        `Plan execution recursion error: attempted to execute ${plan} again (crystal objects: ${crystalObjects.join(
+        `ExecutablePlan execution recursion error: attempted to execute ${plan} again (crystal objects: ${crystalObjects.join(
           ", ",
         )})`,
       );
@@ -1403,7 +1411,7 @@ export class Aether<
 
       let meta = crystalContext.metaByPlanId[plan.id];
       if (!meta) {
-        meta = Object.create(null) as object;
+        meta = Object.create(null) as Record<string, undefined>;
         crystalContext.metaByPlanId[plan.id] = meta;
       }
       // Note: the `execute` method on plans is responsible for memoizing
@@ -1594,7 +1602,7 @@ export class Aether<
  */
 export function populateValuePlan(
   crystalContext: CrystalContext,
-  valuePlan: Plan,
+  valuePlan: ExecutablePlan,
   valueCrystalObject: CrystalObject<any>,
   object: any,
   label: string,

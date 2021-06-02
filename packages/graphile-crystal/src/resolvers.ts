@@ -29,7 +29,7 @@ import {
   $$indexesByPathIdentity,
   $$pathIdentity,
 } from "./interfaces";
-import type { Plan } from "./plan";
+import type { ExecutablePlan } from "./plan";
 import { __ValuePlan } from "./plans";
 import type { UniqueId } from "./utils";
 import {
@@ -286,7 +286,7 @@ interface CrystalObjectMultidimensionalArray
 
 function crystalWrap<TData>(
   crystalContext: CrystalContext,
-  plan: Plan,
+  plan: ExecutablePlan,
   returnType: GraphQLOutputType,
   parentCrystalObject: CrystalObject<any> | undefined,
   pathIdentity: string,
@@ -361,7 +361,7 @@ function crystalWrap<TData>(
  * Implements `NewCrystalObject`
  */
 export function newCrystalObject<TData>(
-  plan: Plan | null, // TODO: delete this line
+  plan: ExecutablePlan | null, // TODO: delete this line
   pathIdentity: string,
   id: UniqueId,
   indexes: ReadonlyArray<number>,

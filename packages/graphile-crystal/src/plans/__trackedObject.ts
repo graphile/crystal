@@ -1,5 +1,5 @@
 import type { Constraint } from "../constraints";
-import { Plan } from "../plan";
+import { ExecutablePlan } from "../plan";
 import type { __ValuePlan } from "./__value";
 import type { AccessPlan } from "./access";
 
@@ -8,7 +8,7 @@ import type { AccessPlan } from "./access";
  * algorithm used to allow runtime AND plan-time access to the three special
  * entities: `variableValues`, `rootValue` and `context`.
  *
- * Plan-time access can evaluate the `object` passed to the constructor, and
+ * ExecutablePlan-time access can evaluate the `object` passed to the constructor, and
  * will add constraints to the relevant aether.variableValuesConstraints,
  * aether.rootValueConstraints or aether.contextConstraints to ensure that all
  * future variableValues, rootValues and context will match the assumptions
@@ -22,7 +22,7 @@ import type { AccessPlan } from "./access";
  * change the query plan, but it can also be used within plan resolvers to
  * branch the logic of a plan based on something in these entities.
  */
-export class __TrackedObjectPlan<TData = any> extends Plan<TData> {
+export class __TrackedObjectPlan<TData = any> extends ExecutablePlan<TData> {
   /**
    * Could be anything. In the case of context it could even have exotic
    * entries such as `pgClient`.

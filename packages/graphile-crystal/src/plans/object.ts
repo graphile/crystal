@@ -1,16 +1,16 @@
 import debugFactory from "debug";
 
-import { Plan } from "../plan";
+import { ExecutablePlan } from "../plan";
 
 const debugObjectPlan = debugFactory("crystal:ObjectPlan");
 const debugObjectPlanVerbose = debugObjectPlan.extend("verbose");
 
 export class ObjectPlan<
   TData extends { [key: string]: any },
-> extends Plan<TData> {
+> extends ExecutablePlan<TData> {
   private keys: Array<keyof TData>;
   private results: Array<[Array<TData[keyof TData]>, TData]> = [];
-  constructor(obj: { [key in keyof TData]: Plan<TData[key]> }) {
+  constructor(obj: { [key in keyof TData]: ExecutablePlan<TData[key]> }) {
     super();
     this.keys = Object.keys(obj);
     for (let i = 0, l = this.keys.length; i < l; i++) {
@@ -74,7 +74,7 @@ export class ObjectPlan<
 }
 
 export function object<TData extends { [key: string]: any }>(
-  obj: { [key in keyof TData]: Plan<TData[key]> },
+  obj: { [key in keyof TData]: ExecutablePlan<TData[key]> },
 ): ObjectPlan<TData> {
   return new ObjectPlan<TData>(obj);
 }

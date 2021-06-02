@@ -40,7 +40,7 @@ import { schema } from "./exampleSchema";
   +--------------------------------------------------------------------------+*/
 
 /*
-class ConnectionPlan<TSubplan extends Plan<any>> extends Plan<Opaque<any>> {
+class ConnectionPlan<TSubplan extends ExecutablePlan<any>> extends ExecutablePlan<Opaque<any>> {
   constructor(public readonly subplan: TSubplan) {
     super();
   }

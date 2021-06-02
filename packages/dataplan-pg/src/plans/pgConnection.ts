@@ -1,6 +1,6 @@
 import debugFactory from "debug";
 import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
-import { Plan } from "graphile-crystal";
+import { ExecutablePlan } from "graphile-crystal";
 
 import type { PgDataSource } from "../datasource";
 import { PgClassSelectPlan } from "./pgClassSelect";
@@ -12,7 +12,7 @@ const debugExecuteVerbose = debugExecute.extend("verbose");
 
 export class PgConnectionPlan<
   TDataSource extends PgDataSource<any, any>,
-> extends Plan<unknown> {
+> extends ExecutablePlan<unknown> {
   private subplanId: number;
 
   private readonly dataSource: TDataSource;

@@ -1,6 +1,6 @@
 import chalk from "chalk";
 
-import { Plan } from "../plan";
+import { ExecutablePlan } from "../plan";
 
 type ActualKeyByDesiredKey = { [desiredKey: string]: string };
 
@@ -14,10 +14,10 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
   };
 }
 
-export class MapPlan extends Plan {
+export class MapPlan extends ExecutablePlan {
   private mapper: (obj: object) => object;
   constructor(
-    parentPlan: Plan,
+    parentPlan: ExecutablePlan,
     private actualKeyByDesiredKey: ActualKeyByDesiredKey,
   ) {
     super();
@@ -50,7 +50,7 @@ export class MapPlan extends Plan {
 }
 
 export function map(
-  p: Plan,
+  p: ExecutablePlan,
   actualKeyByDesiredKey: { [desiredKey: string]: string },
 ): MapPlan {
   return new MapPlan(p, actualKeyByDesiredKey);

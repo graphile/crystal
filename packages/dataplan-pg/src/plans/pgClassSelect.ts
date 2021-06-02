@@ -4,7 +4,7 @@ import type {
   CrystalResultsList,
   CrystalValuesList,
 } from "graphile-crystal";
-import { access, first, list, map, Plan } from "graphile-crystal";
+import { access, ExecutablePlan,first, list, map } from "graphile-crystal";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
 import { inspect } from "util";
@@ -47,7 +47,7 @@ type PgClassSelectPlanJoin =
  */
 export class PgClassSelectPlan<
   TDataSource extends PgDataSource<any, any>,
-> extends Plan<ReadonlyArray<TDataSource["TRow"]>> {
+> extends ExecutablePlan<ReadonlyArray<TDataSource["TRow"]>> {
   // FROM
 
   public readonly symbol: symbol;
@@ -88,7 +88,7 @@ export class PgClassSelectPlan<
    * to identify which records in the result set should be returned to which
    * GraphQL resolvers.
    */
-  private identifiers: Array<{ plan: Plan<any>; type: SQL }>;
+  private identifiers: Array<{ plan: ExecutablePlan<any>; type: SQL }>;
 
   /**
    * This is an array with the same length as identifiers that returns the
@@ -173,7 +173,7 @@ export class PgClassSelectPlan<
 
   constructor(
     dataSource: TDataSource,
-    identifiers: Array<{ plan: Plan<any>; type: SQL }>,
+    identifiers: Array<{ plan: ExecutablePlan<any>; type: SQL }>,
     identifierMatchesThunk: (alias: SQL) => SQL[],
     cloneFrom: PgClassSelectPlan<TDataSource> | null = null,
   ) {
@@ -598,7 +598,7 @@ export class PgClassSelectPlan<
     super.finalize();
   }
 
-  deduplicate(peers: PgClassSelectPlan<any>[]): Plan {
+  deduplicate(peers: PgClassSelectPlan<any>[]): ExecutablePlan {
     const identical = peers.find((p) => {
       // If SELECT, FROM, JOIN, WHERE, ORDER, GROUP BY, HAVING, LIMIT, OFFSET
       // all match with one of our peers then we can replace ourself with one
@@ -718,7 +718,7 @@ export class PgClassSelectPlan<
     return actualKeyByDesiredKey;
   }
 
-  optimize(): Plan {
+  optimize(): ExecutablePlan {
     // In case we have any lock actions in future:
     this.lock();
 
@@ -733,7 +733,7 @@ export class PgClassSelectPlan<
     if (!this.isInliningForbidden) {
       // Inline ourself into our parent if we can.
       let t: PgClassSelectPlan<any> | null | undefined = undefined;
-      let p: Plan<any> | undefined = undefined;
+      let p: ExecutablePlan<any> | undefined = undefined;
       for (let i = 0, l = this.dependencies.length; i < l; i++) {
         if (i === this.contextId) {
           continue;

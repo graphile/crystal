@@ -4,7 +4,7 @@ import type { GraphQLObjectType } from "graphql";
 import { inspect } from "util";
 
 import type { Aether } from "./aether";
-import { GLOBAL_PATH, ROOT_PATH } from "./constants";
+import { GLOBAL_PATH } from "./constants";
 import { isDev, noop } from "./dev";
 import {
   getCurrentAether,
@@ -18,7 +18,7 @@ import type {
 } from "./interfaces";
 import { crystalPrintPathIdentity } from "./utils";
 
-function reallyAssertFinalized(plan: Plan): void {
+function reallyAssertFinalized(plan: BasePlan): void {
   if (!plan.isFinalized) {
     throw new Error(
       "Plan is not finalized; did you forget to call super.finalize()?",
@@ -29,7 +29,67 @@ function reallyAssertFinalized(plan: Plan): void {
 // Optimise this away in production.
 export const assertFinalized = !isDev ? noop : reallyAssertFinalized;
 
-export abstract class Plan<TData = any> {
+/**
+ * The base abstract plan type; you should not extend this directly - instead
+ * use an ExecutablePlan (for use when planning output fields) or a
+ * ModifierPlan (for use when planning arguments/input fields).
+ *
+ * @remarks
+ *
+ * Though it might seem that ModifierPlan should be used for all inputs
+ * (arguments, input objects), this is not the case. When planning an output
+ * field, all inputs to it (including arguments, parent plan, context, etc)
+ * should be other executable plans. The only time that ModifierPlan is used is
+ * when writing specific plans as part of the argument or input field
+ * definitions themself; even in these cases the inputs to these plan resolvers
+ * will be ExecutablePlans.
+ */
+export abstract class BasePlan {
+  public readonly aether: Aether;
+  public isFinalized = false;
+  public debug = globalState.debug;
+  public parentPathIdentity: string;
+  protected readonly createdWithParentPathIdentity: string;
+
+  constructor() {
+    const aether = getCurrentAether();
+    this.aether = aether;
+    this.parentPathIdentity = GLOBAL_PATH;
+    this.createdWithParentPathIdentity = getCurrentParentPathIdentity();
+  }
+
+  public toString(): string {
+    const meta = this.toStringMeta();
+    return chalk.bold.blue(
+      `${this.constructor.name.replace(/Plan$/, "")}${
+        meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""
+      }@${crystalPrintPathIdentity(this.parentPathIdentity)}`,
+    );
+  }
+
+  /**
+   * This metadata will be merged into toString when referencing this plan.
+   */
+  public toStringMeta(): string | null {
+    return null;
+  }
+
+  public finalize(): void {
+    if (!this.isFinalized) {
+      this.isFinalized = true;
+    } else {
+      throw new Error(
+        `Plan ${this} has already been finalized - do not call finalize from user code!`,
+      );
+    }
+  }
+}
+
+/**
+ * Executable plans are the plans associated with leaves on the GraphQL tree,
+ * they must be able to execute to return values.
+ */
+export abstract class ExecutablePlan<TData = any> extends BasePlan {
   /**
    * The ids for plans this plan will need data from in order to execute. NOTE:
    * it's important we use the id and not the plan here otherwise when we swap
@@ -56,21 +116,13 @@ export abstract class Plan<TData = any> {
    */
   public readonly children: ReadonlyArray<number> = this._children;
 
-  public readonly aether: Aether;
-  public isFinalized = false;
   public readonly id: number;
   public readonly groupId: number;
-  public parentPathIdentity: string;
-  private createdWithParentPathIdentity: string;
-  public debug = globalState.debug;
 
   constructor() {
-    const aether = getCurrentAether();
-    this.aether = aether;
-    this.groupId = aether.groupId;
-    this.parentPathIdentity = GLOBAL_PATH;
-    this.createdWithParentPathIdentity = getCurrentParentPathIdentity();
-    this.id = aether.plans.push(this) - 1;
+    super();
+    this.groupId = this.aether.groupId;
+    this.id = this.aether.plans.push(this) - 1;
   }
 
   public toString(): string {
@@ -84,14 +136,7 @@ export abstract class Plan<TData = any> {
     );
   }
 
-  /**
-   * This metadata will be merged into toString when referencing this plan.
-   */
-  public toStringMeta(): string | null {
-    return null;
-  }
-
-  protected addDependency(plan: Plan): number {
+  protected addDependency(plan: ExecutablePlan): number {
     if (this.isFinalized) {
       throw new Error(
         "You cannot add a dependency after the plan is finalized.",
@@ -99,7 +144,7 @@ export abstract class Plan<TData = any> {
     }
     if (isDev) {
       assert.ok(
-        plan instanceof Plan,
+        plan instanceof ExecutablePlan,
         `Error occurred when adding dependency for '${this}', value passed was not a plan, it was '${inspect(
           plan,
         )}'`,
@@ -125,6 +170,21 @@ export abstract class Plan<TData = any> {
   }
 
   /**
+   * Our chance to replace ourself with one of our peers.
+   */
+  public deduplicate(_peers: ExecutablePlan[]): ExecutablePlan {
+    return this;
+  }
+
+  /**
+   * Our chance to optimise the plan (which could go as far as to inline the
+   * plan into the parent plan).
+   */
+  public optimize(): ExecutablePlan {
+    return this;
+  }
+
+  /**
    * This function will be called with a `values` list: an array of entries for
    * each incoming crystal object, where each entry in the array is a list of
    * the values retrieved from executing the plans in `this.dependencies` for
@@ -142,41 +202,56 @@ export abstract class Plan<TData = any> {
    * add attributes to meta for each purpose (e.g. use `meta.cache` for
    * memoizing results) so that you can expand your usage of meta in future.
    */
-  public abstract execute(
+  abstract execute(
     values: CrystalValuesList<ReadonlyArray<any>>,
-    meta: {},
+    meta: Record<string, unknown>,
   ): PromiseOrDirect<CrystalResultsList<TData>>;
+}
 
-  /**
-   * Our chance to replace ourself with one of our peers.
-   */
-  public deduplicate(_peers: Plan[]): Plan {
-    return this;
-  }
+export function isExecutablePlan<TData = any>(
+  plan: BasePlan,
+): plan is ExecutablePlan<TData> {
+  return "execute" in plan && typeof (plan as any).execute === "function";
+}
 
-  /**
-   * Our chance to optimise the plan (which could go as far as to inline the
-   * plan into the parent plan).
-   */
-  public optimize(): Plan {
-    return this;
-  }
-
-  public finalize(): void {
-    if (!this.isFinalized) {
-      this.isFinalized = true;
-    } else {
-      throw new Error(
-        `Plan ${this} has already been finalized - do not call finalize from user code!`,
-      );
-    }
+export function assertExecutablePlan<TData>(
+  plan: BasePlan,
+  pathIdentity: string,
+): asserts plan is ExecutablePlan<TData> {
+  if (!isExecutablePlan(plan)) {
+    throw new Error(
+      `The plan returned from '${pathIdentity}' should be an executable plan, but it does not implement the 'execute' method.`,
+    );
   }
 }
 
-export type PolymorphicPlan = Plan & {
-  planForType(objectType: GraphQLObjectType): Plan;
+export type PolymorphicPlan = ExecutablePlan & {
+  planForType(objectType: GraphQLObjectType): ExecutablePlan;
 };
 
-export type ArgumentPlan = Plan & {
-  null(): void;
-};
+/**
+ * Modifier plans modify their parent plan (which may be another ModifierPlan
+ * or an ExecutablePlan). First they gather all the requirements from their
+ * children (if any) being applied to them, then they apply themselves to their
+ * parent plan. This application is done through the `apply()` method.
+ *
+ * Modifier plans do not use dependencies.
+ */
+export abstract class ModifierPlan extends BasePlan {
+  abstract apply(): void;
+}
+
+export function isModifierPlan(plan: BasePlan): plan is ModifierPlan {
+  return "apply" in plan && typeof (plan as any).apply === "function";
+}
+
+export function assertModifierPlan(
+  plan: BasePlan,
+  pathIdentity: string,
+): asserts plan is ModifierPlan {
+  if (!isModifierPlan(plan)) {
+    throw new Error(
+      `The plan returned from '${pathIdentity}' should be an modifier plan, but it does not implement the 'apply' method.`,
+    );
+  }
+}

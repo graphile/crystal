@@ -32,7 +32,7 @@ import type {
   CrystalObject,
   GraphileCrystalFieldConfig,
 } from "./interfaces";
-import { Plan } from "./plan";
+import { ExecutablePlan } from "./plan";
 import { isCrystalObject } from "./resolvers";
 
 /**
@@ -339,7 +339,7 @@ export function _crystalPrint(
   if (isCrystalObject(symbol)) {
     return String(symbol);
   }
-  if (symbol instanceof Plan) {
+  if (symbol instanceof ExecutablePlan) {
     return String(symbol);
   }
   if (Array.isArray(symbol)) {
@@ -459,7 +459,7 @@ export function arraysMatch<T>(
  */
 export function objectSpec<
   TContext extends BaseGraphQLContext,
-  TParentPlan extends Plan<any>,
+  TParentPlan extends ExecutablePlan<any>,
 >(
   spec: Omit<GraphQLObjectTypeConfig<any, TContext>, "fields"> & {
     fields: Thunk<{
@@ -493,8 +493,8 @@ export function objectSpec<
  */
 export function objectFieldSpec<
   TContext extends BaseGraphQLContext,
-  TSource extends Plan<any>,
-  TResult extends Plan<any> = Plan<any>,
+  TSource extends ExecutablePlan<any>,
+  TResult extends ExecutablePlan<any> = ExecutablePlan<any>,
   TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
 >(
   graphileSpec: GraphileCrystalFieldConfig<

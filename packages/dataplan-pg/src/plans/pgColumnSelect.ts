@@ -1,6 +1,6 @@
 import debugFactory from "debug";
 import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
-import { Plan } from "graphile-crystal";
+import { ExecutablePlan } from "graphile-crystal";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
@@ -20,7 +20,7 @@ const debugExecuteVerbose = debugExecute.extend("verbose");
 export class PgColumnSelectPlan<
   TDataSource extends PgDataSource<any, any>,
   TColumn extends keyof TDataSource["TRow"],
-> extends Plan<TDataSource["TRow"][TColumn]> {
+> extends ExecutablePlan<TDataSource["TRow"][TColumn]> {
   public readonly tableId: number;
 
   /**

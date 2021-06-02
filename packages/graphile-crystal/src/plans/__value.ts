@@ -1,4 +1,4 @@
-import { Plan } from "../plan";
+import { ExecutablePlan } from "../plan";
 import type { AccessPlan } from "./access";
 import { access } from "./access";
 
@@ -7,7 +7,7 @@ import { access } from "./access";
  * internal - we populate the value as part of the algorithm - see
  * `GetValuePlanId` and `PopulateValuePlan`.
  */
-export class __ValuePlan<TData> extends Plan<TData> {
+export class __ValuePlan<TData> extends ExecutablePlan<TData> {
   toStringMeta(): string | null {
     switch (this) {
       case this.aether.rootValuePlan:
@@ -22,6 +22,7 @@ export class __ValuePlan<TData> extends Plan<TData> {
   }
 
   execute(): never {
+    // This is still an "executable plan"; we just side-step execution internally.
     throw new Error("__ValuePlan must never execute");
   }
 

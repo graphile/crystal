@@ -15,10 +15,17 @@ export {
   BaseGraphQLVariables,
   CrystalResultsList,
   CrystalValuesList,
+  ExecutablePlanResolver,
   GraphileCrystalFieldConfig,
-  PlanResolver,
+  ModifierPlanResolver,
 } from "./interfaces";
-export { Plan } from "./plan";
+export {
+  BasePlan,
+  ExecutablePlan,
+  isExecutablePlan,
+  isModifierPlan,
+  ModifierPlan,
+} from "./plan";
 export {
   __ListItemPlan,
   __TrackedObjectPlan,

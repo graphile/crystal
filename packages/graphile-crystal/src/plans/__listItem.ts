@@ -1,11 +1,13 @@
 import chalk from "chalk";
 
 import { getCurrentParentPathIdentity } from "../global";
-import { Plan } from "../plan";
+import { ExecutablePlan } from "../plan";
 
 export class __ListItemPlan<
-  TParentPlan extends Plan<ReadonlyArray<any>>,
-> extends Plan<TParentPlan extends Plan<ReadonlyArray<infer U>> ? U : never> {
+  TParentPlan extends ExecutablePlan<ReadonlyArray<any>>,
+> extends ExecutablePlan<
+  TParentPlan extends ExecutablePlan<ReadonlyArray<infer U>> ? U : never
+> {
   constructor(parentPlan: TParentPlan) {
     super();
     this.addDependency(parentPlan);
@@ -21,18 +23,21 @@ export class __ListItemPlan<
   }
 }
 
-export interface ListCapablePlan<TData> extends Plan<ReadonlyArray<TData>> {
-  listItem(itemPlan: __ListItemPlan<Plan<ReadonlyArray<TData>>>): Plan<TData>;
+export interface ListCapablePlan<TData>
+  extends ExecutablePlan<ReadonlyArray<TData>> {
+  listItem(
+    itemPlan: __ListItemPlan<ExecutablePlan<ReadonlyArray<TData>>>,
+  ): ExecutablePlan<TData>;
 }
 
 export function isListCapablePlan<TData>(
-  plan: Plan<ReadonlyArray<TData>>,
+  plan: ExecutablePlan<ReadonlyArray<TData>>,
 ): plan is ListCapablePlan<TData> {
   return "listItem" in plan && typeof (plan as any).listItem === "function";
 }
 
 export function assertListCapablePlan<TData>(
-  plan: Plan<ReadonlyArray<TData>>,
+  plan: ExecutablePlan<ReadonlyArray<TData>>,
   pathIdentity: string,
 ): asserts plan is ListCapablePlan<TData> {
   if (!isListCapablePlan(plan)) {

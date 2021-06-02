@@ -1,8 +1,8 @@
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
-import { Plan } from "../plan";
+import { ExecutablePlan } from "../plan";
 
-export class FirstPlan<TData> extends Plan<TData> {
-  constructor(parentPlan: Plan<ReadonlyArray<TData>>) {
+export class FirstPlan<TData> extends ExecutablePlan<TData> {
+  constructor(parentPlan: ExecutablePlan<ReadonlyArray<TData>>) {
     super();
     this.addDependency(parentPlan);
   }
@@ -22,8 +22,8 @@ export class FirstPlan<TData> extends Plan<TData> {
  * A plan that resolves to the first entry in the list returned by the given
  * plan.
  */
-export function first<TPlan extends Plan<ReadonlyArray<any>>>(
+export function first<TPlan extends ExecutablePlan<ReadonlyArray<any>>>(
   plan: TPlan,
-): FirstPlan<TPlan extends Plan<ReadonlyArray<infer U>> ? U : never> {
+): FirstPlan<TPlan extends ExecutablePlan<ReadonlyArray<infer U>> ? U : never> {
   return new FirstPlan(plan);
 }

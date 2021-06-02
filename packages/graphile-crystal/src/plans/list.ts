@@ -1,12 +1,14 @@
-import { Plan } from "../plan";
+import { ExecutablePlan } from "../plan";
 
-type UnwrapPlanTuple<TPlanTuple extends readonly Plan<any>[]> = [
-  ...(TPlanTuple extends readonly Plan<infer U>[] ? readonly U[] : never)
+type UnwrapPlanTuple<TPlanTuple extends readonly ExecutablePlan<any>[]> = [
+  ...(TPlanTuple extends readonly ExecutablePlan<infer U>[]
+    ? readonly U[]
+    : never)
 ];
 
-export class ListPlan<TPlanTuple extends readonly Plan<any>[]> extends Plan<
-  UnwrapPlanTuple<TPlanTuple>
-> {
+export class ListPlan<
+  TPlanTuple extends readonly ExecutablePlan<any>[],
+> extends ExecutablePlan<UnwrapPlanTuple<TPlanTuple>> {
   private results: Array<UnwrapPlanTuple<TPlanTuple>> = [];
   constructor(list: readonly [...TPlanTuple]) {
     super();
@@ -54,7 +56,7 @@ export class ListPlan<TPlanTuple extends readonly Plan<any>[]> extends Plan<
   }
 }
 
-export function list<TPlanTuple extends Plan<any>[]>(
+export function list<TPlanTuple extends ExecutablePlan<any>[]>(
   list: TPlanTuple,
 ): ListPlan<TPlanTuple> {
   return new ListPlan(list);

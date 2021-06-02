@@ -270,6 +270,9 @@ const Forum: GraphQLObjectType<any, GraphileResolverContext> =
             },
             condition: {
               type: MessageCondition,
+              // plan($messages: PgClassSelectPlan<typeof messageSource>) {
+              //   return new PgConditionPlan($messages);
+              // },
             },
             includeArchived: { type: IncludeArchived },
           },
@@ -301,6 +304,10 @@ const Forum: GraphQLObjectType<any, GraphileResolverContext> =
             },
             condition: {
               type: MessageCondition,
+              // plan($connection: PgConnectionPlan<typeof messageSource>) {
+              //   const $messages = $connection.getSubplan();
+              //   return new PgConditionPlan($messages);
+              // },
             },
             includeArchived: { type: IncludeArchived },
           },

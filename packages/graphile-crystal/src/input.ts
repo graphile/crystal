@@ -20,7 +20,7 @@ import {
 import { inspect } from "util";
 
 import type { Aether } from "./aether";
-import { Plan } from "./plan";
+import { ExecutablePlan } from "./plan";
 import type { __TrackedObjectPlan } from "./plans";
 import { defaultValueToValueNode } from "./utils";
 
@@ -160,7 +160,7 @@ function inputNonNullPlan(_aether: Aether, innerPlan: InputPlan): InputPlan {
 /**
  * Implements `InputListPlan`.
  */
-class InputListPlan extends Plan {
+class InputListPlan extends ExecutablePlan {
   private itemPlans: InputPlan[] = [];
   private outOfBoundsPlan: InputPlan;
 
@@ -258,7 +258,7 @@ class InputListPlan extends Plan {
 /**
  * Implements `InputStaticLeafPlan`
  */
-class InputStaticLeafPlan extends Plan {
+class InputStaticLeafPlan extends ExecutablePlan {
   private readonly coercedValue: any;
   constructor(inputType: GraphQLLeafType, value: ValueNode | undefined) {
     super();
@@ -285,7 +285,7 @@ class InputStaticLeafPlan extends Plan {
 /**
  * Implements `InputObjectPlan`
  */
-export class InputObjectPlan extends Plan {
+export class InputObjectPlan extends ExecutablePlan {
   private inputFields: {
     [fieldName: string]: { dependencyIndex: number; plan: InputPlan };
   } = {};
