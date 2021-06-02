@@ -8,8 +8,7 @@ import type {
   ExecutablePlan,
   ObjectPlan,
 } from "graphile-crystal";
-import { __ValuePlan, arraysMatch } from "graphile-crystal";
-import { defer } from "graphile-crystal";
+import { __ValuePlan, arraysMatch, defer } from "graphile-crystal";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 import { inspect } from "util";
