@@ -1,4 +1,3 @@
-import * as assert from "assert";
 import chalk from "chalk";
 import debugFactory from "debug";
 import type {
@@ -27,6 +26,7 @@ import {
 } from "graphql";
 import { inspect } from "util";
 
+import * as assert from "./assert";
 import { GLOBAL_PATH, ROOT_PATH } from "./constants";
 import type { Constraint } from "./constraints";
 import type { Deferred } from "./deferred";
@@ -104,7 +104,7 @@ function assertPolymorphicPlan(
     "planForType" in plan,
     "Expected plan for interface field to be polymorphic.",
   );
-  assert.equal(
+  assert.strictEqual(
     typeof plan.planForType,
     "function",
     "Expected property `planForType` for interface field plan to be a function.",
@@ -613,9 +613,7 @@ export class Aether<
   ): void {
     if (isNonNullType(inputType)) {
       this.planInput(inputType.ofType, trackedValuePlan, parentPlan);
-      return;
-    }
-    if (isListType(inputType)) {
+    } else if (isListType(inputType)) {
       if (trackedValuePlan.evalIs(null)) {
         // parentPlan.null();
         return;
@@ -628,16 +626,20 @@ export class Aether<
         const trackedListValue = (trackedValuePlan as any).at(i);
         this.planInput(innerInputType, trackedListValue, listItemParentPlan);
       }
-      return;
-    }
-    if (isInputObjectType(inputType)) {
+    } else if (isInputObjectType(inputType)) {
       if (trackedValuePlan.evalIs(null)) {
         // TODO: should we indicate to the parent that this is null as opposed to an empty object?
         return;
       }
       this.planInputFields(inputType, trackedValuePlan, parentPlan);
+      return;
+    } else {
+      throw new Error(
+        `Invalid plan; planInput called for unsupported type '${inspect(
+          inputType,
+        )}'.`,
+      );
     }
-    throw new Error("Invalid plan; planInput called for unsupported type.");
   }
 
   /**
@@ -659,7 +661,12 @@ export class Aether<
       const inputFieldSpec = inputFieldSpecs[fieldName];
       if (trackedValuePlan.evalHas(fieldName)) {
         const trackedFieldValue = trackedValuePlan.get(fieldName);
-        this.planInputField(inputFieldSpec, trackedFieldValue, parentPlan);
+        this.planInputField(
+          inputObjectType,
+          inputFieldSpec,
+          trackedFieldValue,
+          parentPlan,
+        );
       }
     }
   }
@@ -668,24 +675,37 @@ export class Aether<
    * Implements `PlanInputField` algorithm.
    */
   private planInputField(
+    inputObjectType: GraphQLInputObjectType,
     inputField: GraphQLInputField,
     trackedValuePlan: InputPlan,
     parentPlan: ExecutablePlan | ModifierPlan<any>,
   ): void {
     const planResolver = inputField.extensions?.graphile?.plan;
-    assert.equal(typeof planResolver, "function");
-    const inputFieldPlan = planResolver(
-      parentPlan,
-      trackedValuePlan,
-      this.trackedContextPlan,
-    );
-    if (inputFieldPlan != null) {
-      const inputFieldType = inputField.type;
-      // Note: the unwrapped type of inputFieldType must be an input object.
-      // TODO: assert this?
-      this.planInput(inputFieldType, trackedValuePlan, inputFieldPlan);
+    if (planResolver != null) {
+      assert.strictEqual(
+        typeof planResolver,
+        "function",
+        `Expected ${inputObjectType.name}.${inputField.name}'s 'extensions.graphile.plan' property to be a plan resolver function.`,
+      );
+      const inputFieldPlan = planResolver(
+        parentPlan,
+        trackedValuePlan,
+        this.trackedContextPlan,
+      );
+      if (inputFieldPlan != null) {
+        const inputFieldType = inputField.type;
+        // Note: the unwrapped type of inputFieldType must be an input object.
+        // TODO: assert this?
+        this.planInput(inputFieldType, trackedValuePlan, inputFieldPlan);
 
-      inputFieldPlan.apply();
+        inputFieldPlan.apply();
+      }
+    } else {
+      if (isDev) {
+        console.warn(
+          `Expected ${inputObjectType.name}.${inputField.name} to have an 'extensions.graphile.plan' function, but it does not.`,
+        );
+      }
     }
   }
 
@@ -1210,7 +1230,7 @@ export class Aether<
           Array.isArray(results),
           "Expected plan execution to return an array",
         );
-        assert.equal(
+        assert.strictEqual(
           results.length,
           l,
           "Expected plan execution result to have same length as input objects",

@@ -143,7 +143,7 @@ it("{forums{name messagesConnection(...){nodes{body author{...}} edges{cursor no
         name
         messagesConnection(
           limit: 5
-          condition: { active: true }
+          condition: { featured: true }
           includeArchived: INHERIT
         ) {
           nodes {
@@ -170,72 +170,17 @@ it("{forums{name messagesConnection(...){nodes{body author{...}} edges{cursor no
   expect({ __: data }).toMatchInlineSnapshot(`
     {
       forums: [
-        {
-          name: "Cats",
-          messagesConnection: {
-            nodes: [
-              { body: "Cats = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
-              { body: "Cats = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
-              { body: "Cats = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
-            ],
-            edges: [
-              {
-                cursor: "424242",
-                node: { body: "Cats = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
-              },
-              { cursor: "424242", node: { body: "Cats = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } } },
-              {
-                cursor: "424242",
-                node: { body: "Cats = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
-              },
-            ],
-          },
-        },
+        { name: "Cats", messagesConnection: { nodes: [], edges: [] } },
         {
           name: "Dogs",
           messagesConnection: {
-            nodes: [
-              { body: "Dogs = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
-              { body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
-              { body: "Dogs = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
-            ],
+            nodes: [{ body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } }],
             edges: [
-              {
-                cursor: "424242",
-                node: { body: "Dogs = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
-              },
               { cursor: "424242", node: { body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } } },
-              {
-                cursor: "424242",
-                node: { body: "Dogs = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
-              },
             ],
           },
         },
-        {
-          name: "Postgres",
-          messagesConnection: {
-            nodes: [
-              { body: "Postgres = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
-              { body: "Postgres = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
-              { body: "Postgres = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
-            ],
-            edges: [
-              {
-                cursor: "424242",
-                node: { body: "Postgres = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
-              },
-              {
-                cursor: "424242",
-                node: { body: "Postgres = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
-              },
-              {
-                cursor: "424242",
-                node: { body: "Postgres = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
-              },
-            ],
-          },
-        },
+        { name: "Postgres", messagesConnection: { nodes: [], edges: [] } },
       ],
     }
   `);
@@ -260,6 +205,8 @@ it("{forums{name messagesConnection(...){nodes{body author{...}} edges{cursor no
         left outer join app_public.users as __users_2
         on ((__messages__."author_id"::"uuid" = __users_2."id"))
         where (
+          (__messages__.featured = $1::boolean)
+        ) and (
           __forums__."id"::"uuid" = __messages__."forum_id"
         )
         limit 5

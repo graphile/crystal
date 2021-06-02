@@ -3,7 +3,13 @@ import type {
   BaseGraphQLContext,
   BaseGraphQLRootValue,
 } from "graphile-crystal";
-import { context, crystalEnforce, object, objectSpec } from "graphile-crystal";
+import {
+  context,
+  crystalEnforce,
+  inputObjectSpec,
+  object,
+  objectSpec,
+} from "graphile-crystal";
 import {
   GraphQLBoolean,
   GraphQLEnumType,
@@ -23,6 +29,7 @@ import type {
   PgDataSourceContext,
   WithPgClient,
 } from "../src/datasource";
+import type { PgConditionPlan } from "../src/plans/pgCondition";
 
 // These are what the generics extend from
 
@@ -226,14 +233,27 @@ const IncludeArchived = new GraphQLEnumType({
   },
 });
 
-const MessageCondition = new GraphQLInputObjectType({
-  name: "MessageCondition",
-  fields: {
-    active: {
-      type: GraphQLBoolean,
+const MessageCondition = new GraphQLInputObjectType(
+  inputObjectSpec({
+    name: "MessageCondition",
+    fields: {
+      featured: {
+        type: GraphQLBoolean,
+        plan($condition: PgConditionPlan<typeof messageSource>, $value) {
+          if ($value.evalIs(null)) {
+            $condition.where(sql`${$condition.tableAlias}.featured is null`);
+          } else {
+            $condition.where(
+              sql`${$condition.tableAlias}.featured = ${$condition.placeholder(
+                $value,
+              )}::boolean`,
+            );
+          }
+        },
+      },
     },
-  },
-});
+  }),
+);
 
 const Forum: GraphQLObjectType<any, GraphileResolverContext> =
   new GraphQLObjectType(
@@ -270,9 +290,9 @@ const Forum: GraphQLObjectType<any, GraphileResolverContext> =
             },
             condition: {
               type: MessageCondition,
-              // plan($messages: PgClassSelectPlan<typeof messageSource>) {
-              //   return new PgConditionPlan($messages);
-              // },
+              plan($messages: PgClassSelectPlan<typeof messageSource>) {
+                return $messages.wherePlan();
+              },
             },
             includeArchived: { type: IncludeArchived },
           },
@@ -304,10 +324,10 @@ const Forum: GraphQLObjectType<any, GraphileResolverContext> =
             },
             condition: {
               type: MessageCondition,
-              // plan($connection: PgConnectionPlan<typeof messageSource>) {
-              //   const $messages = $connection.getSubplan();
-              //   return new PgConditionPlan($messages);
-              // },
+              plan($connection: PgConnectionPlan<typeof messageSource>) {
+                const $messages = $connection.getSubplan();
+                return $messages.wherePlan();
+              },
             },
             includeArchived: { type: IncludeArchived },
           },

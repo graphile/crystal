@@ -8,14 +8,13 @@ import type {
   NonNullTypeNode,
   ValueNode,
 } from "graphql";
-import { valueFromAST } from "graphql";
 import {
-  coerceInputValue,
   GraphQLInputObjectType,
   GraphQLList,
   GraphQLNonNull,
   isInputType,
   isLeafType,
+  valueFromAST,
 } from "graphql";
 import { inspect } from "util";
 
@@ -24,6 +23,7 @@ import { ExecutablePlan } from "./plan";
 import type { __TrackedObjectPlan } from "./plans";
 import { defaultValueToValueNode } from "./utils";
 
+// TODO: should this have `__` prefix?
 export type InputPlan =
   | __TrackedObjectPlan // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength()
   | InputListPlan // .at(), .eval(), .evalLength(), .evalIs(null)
@@ -160,7 +160,7 @@ function inputNonNullPlan(_aether: Aether, innerPlan: InputPlan): InputPlan {
 /**
  * Implements `InputListPlan`.
  */
-class InputListPlan extends ExecutablePlan {
+export class InputListPlan extends ExecutablePlan {
   private itemPlans: InputPlan[] = [];
   private outOfBoundsPlan: InputPlan;
 
@@ -258,7 +258,7 @@ class InputListPlan extends ExecutablePlan {
 /**
  * Implements `InputStaticLeafPlan`
  */
-class InputStaticLeafPlan extends ExecutablePlan {
+export class InputStaticLeafPlan extends ExecutablePlan {
   private readonly coercedValue: any;
   constructor(inputType: GraphQLLeafType, value: ValueNode | undefined) {
     super();
@@ -266,6 +266,7 @@ class InputStaticLeafPlan extends ExecutablePlan {
     // us to call coerceInputValue because we already know this is a scalar and
     // *not* a variable. Otherwise we'd need to process it via
     // aether.trackedVariableValuesPlan.
+    // TODO: validate this is safe.
     this.coercedValue = value != null ? valueFromAST(value, inputType) : value;
   }
 

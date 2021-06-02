@@ -3,6 +3,8 @@ import { ExecutablePlan } from "../plan";
 import type { __ValuePlan } from "./__value";
 import type { AccessPlan } from "./access";
 
+// TODO: rename to __TrackedValuePlan? Seems to represent values as well as
+// objects.
 /**
  * Implements the `__TrackedObjectPlan(aether, object, constraints, path)`
  * algorithm used to allow runtime AND plan-time access to the three special

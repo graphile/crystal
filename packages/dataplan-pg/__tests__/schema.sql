@@ -22,6 +22,7 @@ create table app_public.messages (
   forum_id uuid not null references app_public.forums,
   author_id uuid not null references app_public.users,
   body text not null,
+  featured boolean not null default false,
   created_at timestamptz not null default now()
 );
 
@@ -35,6 +36,6 @@ insert into app_public.forums (id, name) values
   ('d0900000-0000-0000-0000-000000000d09', 'Dogs'),
   ('bae00000-0000-0000-0000-000000000bae', 'Postgres');
 
-insert into app_public.messages (forum_id, author_id, body)
-  select forums.id, users.id, forums.name || ' = awesome -- ' || users.username
+insert into app_public.messages (forum_id, author_id, body, featured)
+select forums.id, users.id, forums.name || ' = awesome -- ' || users.username, (forums.name = 'Dogs' and users.username = 'Bob')
   from app_public.users, app_public.forums;

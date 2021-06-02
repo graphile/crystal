@@ -2,6 +2,7 @@ import type {
   GraphQLArgumentConfig,
   GraphQLEnumType,
   GraphQLFieldConfig,
+  GraphQLInputFieldConfig,
   GraphQLInputType,
   GraphQLList,
   GraphQLNonNull,
@@ -207,6 +208,17 @@ export type GraphileCrystalArgumentConfig<
   TResultPlan extends ModifierPlan<TParentPlan> | null, // InputPlanForType<TInputType>
   TInput extends any, // InputTypeFor<TInputType>,
 > = Omit<GraphQLArgumentConfig, "type"> & {
+  type: TInputType;
+  plan?: ModifierPlanResolver<TContext, TInput, TParentPlan, TResultPlan>;
+};
+
+export type GraphileCrystalInputFieldConfig<
+  TInputType extends GraphQLInputType,
+  TContext extends BaseGraphQLContext,
+  TParentPlan extends ExecutablePlan<any> | ModifierPlan<any>,
+  TResultPlan extends ModifierPlan<TParentPlan> | null, // InputPlanForType<TInputType>
+  TInput extends any, // InputTypeFor<TInputType>,
+> = Omit<GraphQLInputFieldConfig, "type"> & {
   type: TInputType;
   plan?: ModifierPlanResolver<TContext, TInput, TParentPlan, TResultPlan>;
 };

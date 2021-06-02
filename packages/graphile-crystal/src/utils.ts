@@ -3,6 +3,9 @@ import chalk from "chalk";
 import type {
   GraphQLFieldConfig,
   GraphQLFieldConfigMap,
+  GraphQLInputFieldConfig,
+  GraphQLInputFieldConfigMap,
+  GraphQLInputObjectTypeConfig,
   GraphQLInputType,
   GraphQLObjectTypeConfig,
   GraphQLOutputType,
@@ -29,9 +32,12 @@ import { isDev } from "./dev";
 import type {
   BaseGraphQLArguments,
   BaseGraphQLContext,
+  BaseGraphQLInputObject,
   CrystalObject,
   GraphileCrystalFieldConfig,
+  GraphileCrystalInputFieldConfig,
 } from "./interfaces";
+import type { ModifierPlan } from "./plan";
 import { ExecutablePlan } from "./plan";
 import { isCrystalObject } from "./resolvers";
 
@@ -525,6 +531,66 @@ export function objectFieldSpec<
   return {
     ...spec,
     args: argsWithExtensions,
+    extensions: {
+      graphile: {
+        plan,
+      },
+    },
+  };
+}
+
+export function inputObjectSpec<
+  TContext extends BaseGraphQLContext,
+  TParentPlan extends ExecutablePlan<any> | ModifierPlan<any>,
+>(
+  spec: Omit<GraphQLInputObjectTypeConfig, "fields"> & {
+    fields: Thunk<{
+      [key: string]: GraphileCrystalInputFieldConfig<
+        GraphQLInputType,
+        TContext,
+        TParentPlan,
+        any,
+        any
+      >;
+    }>;
+  },
+): GraphQLInputObjectTypeConfig {
+  const modifiedSpec: GraphQLInputObjectTypeConfig = {
+    ...spec,
+    fields: () => {
+      const fields =
+        typeof spec.fields === "function" ? spec.fields() : spec.fields;
+      const modifiedFields = Object.keys(fields).reduce((o, key) => {
+        o[key] = inputObjectFieldSpec<TContext, TParentPlan>(fields[key]);
+        return o;
+      }, {} as GraphQLInputFieldConfigMap);
+      return modifiedFields;
+    },
+  };
+  return modifiedSpec;
+}
+
+/**
+ * Saves us having to write `extensions: {graphile: {...}}` everywhere.
+ */
+export function inputObjectFieldSpec<
+  TContext extends BaseGraphQLContext,
+  TSource extends ExecutablePlan<any> | ModifierPlan<any>,
+  TResult extends ModifierPlan<any> = ModifierPlan<any>,
+  TInput extends BaseGraphQLInputObject = BaseGraphQLInputObject,
+>(
+  graphileSpec: GraphileCrystalInputFieldConfig<
+    GraphQLInputType,
+    TContext,
+    TSource,
+    TResult,
+    TInput
+  >,
+): GraphQLInputFieldConfig {
+  const { plan, ...spec } = graphileSpec;
+
+  return {
+    ...spec,
     extensions: {
       graphile: {
         plan,

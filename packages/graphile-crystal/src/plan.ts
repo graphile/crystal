@@ -240,10 +240,13 @@ export type PolymorphicPlan = ExecutablePlan & {
 export abstract class ModifierPlan<
   TParentPlan extends ExecutablePlan | ModifierPlan<any>,
 > extends BasePlan {
-  constructor(protected readonly parent: TParentPlan) {
+  constructor(protected readonly $parent: TParentPlan) {
     super();
   }
 
+  /**
+   * In this method, you should apply the changes to your `this.$parent` plan
+   */
   abstract apply(): void;
 }
 

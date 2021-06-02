@@ -6,8 +6,15 @@ debugFactory.formatters.c = crystalPrint;
 debugFactory.formatters.p = crystalPrintPathIdentity;
 
 export { Aether } from "./aether";
+export { ROOT_PATH } from "./constants";
 export { defer, Deferred } from "./deferred";
 export { crystalEnforce } from "./enforceCrystal";
+export {
+  InputListPlan,
+  InputObjectPlan,
+  InputPlan,
+  InputStaticLeafPlan,
+} from "./input";
 export {
   BaseGraphQLArguments,
   BaseGraphQLContext,
@@ -54,4 +61,10 @@ export {
   crystalWrapResolve,
   crystalWrapSubscribe,
 } from "./resolvers";
-export { arraysMatch, objectFieldSpec, objectSpec } from "./utils";
+export {
+  arraysMatch,
+  inputObjectFieldSpec,
+  inputObjectSpec,
+  objectFieldSpec,
+  objectSpec,
+} from "./utils";

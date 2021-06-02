@@ -4,7 +4,17 @@ import type {
   CrystalResultsList,
   CrystalValuesList,
 } from "graphile-crystal";
-import { access, ExecutablePlan,first, list, map } from "graphile-crystal";
+import {
+  __TrackedObjectPlan,
+  access,
+  ExecutablePlan,
+  first,
+  InputListPlan,
+  InputObjectPlan,
+  InputStaticLeafPlan,
+  list,
+  map,
+} from "graphile-crystal";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
 import { inspect } from "util";
@@ -13,6 +23,7 @@ import type { PgDataSource } from "../datasource";
 import { $$CURSOR } from "../symbols";
 import { PgClassSelectSinglePlan } from "./pgClassSelectSingle";
 import { PgColumnSelectPlan } from "./pgColumnSelect";
+import { PgConditionPlan } from "./pgCondition";
 
 const debugPlan = debugFactory("datasource:pg:PgClassSelectPlan:plan");
 const debugExecute = debugFactory("datasource:pg:PgClassSelectPlan:execute");
@@ -121,6 +132,11 @@ export class PgClassSelectPlan<
   private identifierSymbol: symbol;
 
   /**
+   * Values used in this plan.
+   */
+  private placeholders: Array<{ planIndex: number; symbol: symbol }>;
+
+  /**
    * If true, we don't need to add any of the security checks from the data
    * source; otherwise we must do so. Default false.
    */
@@ -156,6 +172,8 @@ export class PgClassSelectPlan<
     text: string;
     rawSqlValues: (SQLRawValue | symbol)[];
     identifierIndex: number | null;
+    placeholderSymbols: symbol[];
+    placeholderIndexes: number[];
   } | null = null;
 
   /**
@@ -179,11 +197,26 @@ export class PgClassSelectPlan<
   ) {
     super();
     this.dataSource = dataSource;
-    this.contextId = this.addDependency(this.dataSource.context());
+    if (cloneFrom) {
+      if (this.dependencies.length !== 0) {
+        throw new Error("Should not have any dependencies yet");
+      }
+      cloneFrom.dependencies.forEach((depId, idx) => {
+        const myIdx = this.addDependency(this.aether.plans[depId]);
+        if (myIdx !== idx) {
+          throw new Error(
+            `Failed to clone ${cloneFrom}; dependency indexes did not match: ${myIdx} !== ${idx}`,
+          );
+        }
+      });
+    }
+    this.contextId = cloneFrom
+      ? cloneFrom.contextId
+      : this.addDependency(this.dataSource.context());
     this.identifiers = identifiers;
-    this.identifierIds = identifiers.map(({ plan }) =>
-      this.addDependency(plan),
-    );
+    this.identifierIds = cloneFrom
+      ? cloneFrom.identifierIds
+      : identifiers.map(({ plan }) => this.addDependency(plan));
     this.identifierMatchesThunk = identifierMatchesThunk;
 
     this.identifierSymbol = cloneFrom
@@ -194,6 +227,7 @@ export class PgClassSelectPlan<
     this.identifierMatches = cloneFrom
       ? cloneFrom.identifierMatches
       : identifierMatchesThunk(this.alias);
+    this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
     this.joins = cloneFrom ? [...cloneFrom.joins] : [];
     this.selects = cloneFrom ? [...cloneFrom.selects] : [];
     // this.cursorPlan = cloneFrom ? cloneFrom.cursorPlan : null;
@@ -294,6 +328,20 @@ export class PgClassSelectPlan<
     return this.isUnique;
   }
 
+  public placeholder($plan: ExecutablePlan<any>): SQL {
+    if (this.locked) {
+      throw new Error(`${this}: cannot add placeholders once plan is locked`);
+    }
+    const planIndex = this.addDependency($plan);
+    const symbol = Symbol("value_" + planIndex);
+    this.placeholders.push({ planIndex, symbol });
+    return sql.value(
+      // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
+      // a value before executing the query.
+      symbol as any,
+    );
+  }
+
   /**
    * Select an SQL fragment, returning the index the result will have.
    */
@@ -377,6 +425,10 @@ export class PgClassSelectPlan<
     this.conditions.push(condition);
   }
 
+  wherePlan(): PgConditionPlan<TDataSource> {
+    return new PgConditionPlan(this);
+  }
+
   /**
    * `execute` will always run as a root-level query. In future we'll implement a
    * `toSQL` method that allows embedding this plan within another SQL plan...
@@ -395,7 +447,13 @@ export class PgClassSelectPlan<
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgClassSelectPlan before finalizing it.");
     }
-    const { text, rawSqlValues, identifierIndex } = this.finalizeResults;
+    const {
+      text,
+      rawSqlValues,
+      identifierIndex,
+      placeholderSymbols,
+      placeholderIndexes,
+    } = this.finalizeResults;
 
     const executionResult = await this.dataSource.execute(
       values.map((value) => {
@@ -406,6 +464,10 @@ export class PgClassSelectPlan<
             identifierIndex != null
               ? this.identifierIds.map((id) => value[id])
               : EMPTY_ARRAY,
+          placeholders:
+            placeholderIndexes.length > 0
+              ? placeholderIndexes.map((planIndex) => value[planIndex])
+              : EMPTY_ARRAY,
         };
       }),
       {
@@ -413,6 +475,7 @@ export class PgClassSelectPlan<
         rawSqlValues,
         identifierIndex,
         identifierSymbol: this.identifierSymbol,
+        placeholderSymbols,
       },
     );
     debugExecute("%s; result: %c", this, executionResult);
@@ -590,7 +653,17 @@ export class PgClassSelectPlan<
 
       const query = this.buildQuery();
       const { text, values: rawSqlValues } = sql.compile(query);
-      this.finalizeResults = { text, rawSqlValues, identifierIndex };
+      const placeholderSymbols = this.placeholders.map(({ symbol }) => symbol);
+      const placeholderIndexes = this.placeholders.map(
+        ({ planIndex }) => planIndex,
+      );
+      this.finalizeResults = {
+        text,
+        rawSqlValues,
+        identifierIndex,
+        placeholderSymbols,
+        placeholderIndexes,
+      };
     }
 
     this.locked = true;
@@ -650,6 +723,15 @@ export class PgClassSelectPlan<
         return false;
       }
 
+      // Check PLACEHOLDERS match
+      if (
+        !arraysMatch(this.placeholders, p.placeholders, (a, b) => {
+          return a.symbol === b.symbol && a.planIndex === b.planIndex;
+        })
+      ) {
+        return false;
+      }
+
       // Check IDENTIFIERs match
       if (
         !arraysMatch(
@@ -689,7 +771,7 @@ export class PgClassSelectPlan<
 
         // Move the selects across and then replace ourself with a transform that
         // maps the expected attribute ids from the `identical` plan.
-        const actualKeyByDesiredKey = this.mergeWith(identical);
+        const actualKeyByDesiredKey = this.mergeSelectsWith(identical);
         const mapper = makeMapper(actualKeyByDesiredKey);
         return each(identical, mapper);
 
@@ -698,7 +780,7 @@ export class PgClassSelectPlan<
     return this;
   }
 
-  mergeWith(otherPlan: PgClassSelectPlan<TDataSource>): {
+  mergeSelectsWith(otherPlan: PgClassSelectPlan<TDataSource>): {
     [desiredIndex: string]: string;
   } {
     const actualKeyByDesiredKey = {};
@@ -716,6 +798,15 @@ export class PgClassSelectPlan<
     //console.log(`Other ${otherPlan} selects now:`);
     //console.dir(otherPlan.selects, { depth: 8 });
     return actualKeyByDesiredKey;
+  }
+
+  mergePlaceholdersInto(otherPlan: PgClassSelectPlan<TDataSource>): void {
+    for (const placeholder of this.placeholders) {
+      const { symbol, planIndex } = placeholder;
+      const dep = this.aether.plans[this.dependencies[planIndex]];
+      const newPlanIndex = otherPlan.addDependency(dep);
+      otherPlan.placeholders.push({ planIndex: newPlanIndex, symbol });
+    }
   }
 
   optimize(): ExecutablePlan {
@@ -736,10 +827,26 @@ export class PgClassSelectPlan<
       let p: ExecutablePlan<any> | undefined = undefined;
       for (let i = 0, l = this.dependencies.length; i < l; i++) {
         if (i === this.contextId) {
+          // We check myContext vs tsContext below; so lets assume it's fine
+          // for now.
           continue;
         }
         const depId = this.dependencies[i];
         const dep = this.aether.plans[depId];
+        if (dep instanceof __TrackedObjectPlan) {
+          // This has come from a variable, context or rootValue, therefore
+          // it's shared and thus safe.
+          continue;
+        }
+        if (
+          dep instanceof InputListPlan ||
+          dep instanceof InputStaticLeafPlan ||
+          dep instanceof InputObjectPlan
+        ) {
+          // This has come from a hard-coded input in the document, therefore
+          // it's shared and thus safe.
+          continue;
+        }
         if (!(dep instanceof PgColumnSelectPlan)) {
           debugPlanVerbose(
             "Refusing to optimise %c due to dependency %c",
@@ -827,8 +934,9 @@ export class PgClassSelectPlan<
             },
             ...this.joins,
           );
+          this.mergePlaceholdersInto(table);
           debugPlanVerbose("Merging %c into %c (via %c)", this, table, parent);
-          const actualKeyByDesiredKey = this.mergeWith(table);
+          const actualKeyByDesiredKey = this.mergeSelectsWith(table);
           // We return a list here because our children are going to use a `first` plan on us
           return list([map(parent, actualKeyByDesiredKey)]);
         } else if (parent instanceof PgClassSelectSinglePlan) {
@@ -840,6 +948,7 @@ export class PgClassSelectPlan<
               sql`${plan.toSQL()}::${id.type} = ${this.identifierMatches[i]}`,
             );
           });
+          this.mergePlaceholdersInto(table);
           const query = this.buildQuery({ asArray: true });
           const selfIndex = table.select(sql`array(${sql.indent(query)})`);
           debugPlanVerbose(
