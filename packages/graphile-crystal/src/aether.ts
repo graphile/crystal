@@ -609,7 +609,7 @@ export class Aether<
   private planInput(
     inputType: GraphQLInputType,
     trackedValuePlan: InputPlan,
-    parentPlan: ExecutablePlan | ModifierPlan,
+    parentPlan: ExecutablePlan | ModifierPlan<any>,
   ): void {
     if (isNonNullType(inputType)) {
       this.planInput(inputType.ofType, trackedValuePlan, parentPlan);
@@ -646,7 +646,7 @@ export class Aether<
   private planInputFields(
     inputObjectType: GraphQLInputObjectType,
     trackedValuePlan: InputPlan,
-    parentPlan: ExecutablePlan | ModifierPlan,
+    parentPlan: ExecutablePlan | ModifierPlan<any>,
   ): void {
     assert.ok(
       trackedValuePlan instanceof InputObjectPlan,
@@ -670,7 +670,7 @@ export class Aether<
   private planInputField(
     inputField: GraphQLInputField,
     trackedValuePlan: InputPlan,
-    parentPlan: ExecutablePlan | ModifierPlan,
+    parentPlan: ExecutablePlan | ModifierPlan<any>,
   ): void {
     const planResolver = inputField.extensions?.graphile?.plan;
     assert.equal(typeof planResolver, "function");

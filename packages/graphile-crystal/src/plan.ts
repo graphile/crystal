@@ -237,18 +237,28 @@ export type PolymorphicPlan = ExecutablePlan & {
  *
  * Modifier plans do not use dependencies.
  */
-export abstract class ModifierPlan extends BasePlan {
+export abstract class ModifierPlan<
+  TParentPlan extends ExecutablePlan | ModifierPlan<any>,
+> extends BasePlan {
+  constructor(protected readonly parent: TParentPlan) {
+    super();
+  }
+
   abstract apply(): void;
 }
 
-export function isModifierPlan(plan: BasePlan): plan is ModifierPlan {
+export function isModifierPlan<
+  TParentPlan extends ExecutablePlan | ModifierPlan<any>,
+>(plan: BasePlan): plan is ModifierPlan<TParentPlan> {
   return "apply" in plan && typeof (plan as any).apply === "function";
 }
 
-export function assertModifierPlan(
+export function assertModifierPlan<
+  TParentPlan extends ExecutablePlan | ModifierPlan<any>,
+>(
   plan: BasePlan,
   pathIdentity: string,
-): asserts plan is ModifierPlan {
+): asserts plan is ModifierPlan<TParentPlan> {
   if (!isModifierPlan(plan)) {
     throw new Error(
       `The plan returned from '${pathIdentity}' should be an modifier plan, but it does not implement the 'apply' method.`,

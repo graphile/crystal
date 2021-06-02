@@ -120,8 +120,10 @@ export type ExecutablePlanResolver<
 export type ModifierPlanResolver<
   TContext extends BaseGraphQLContext,
   TInput extends any,
-  TParentPlan extends ExecutablePlan<any> | ModifierPlan | null,
-  TResultPlan extends ModifierPlan | null,
+  TParentPlan extends ExecutablePlan<any> | ModifierPlan<any> | null,
+  TResultPlan extends ModifierPlan<
+    ExecutablePlan<any> | ModifierPlan<any>
+  > | null,
 > = (
   $parentPlan: TParentPlan,
   $input: __TrackedObjectPlan<TInput>,
@@ -202,7 +204,7 @@ export type GraphileCrystalArgumentConfig<
   TInputType extends GraphQLInputType,
   TContext extends BaseGraphQLContext,
   TParentPlan extends ExecutablePlan<any>,
-  TResultPlan extends ModifierPlan | null, // InputPlanForType<TInputType>
+  TResultPlan extends ModifierPlan<TParentPlan> | null, // InputPlanForType<TInputType>
   TInput extends any, // InputTypeFor<TInputType>,
 > = Omit<GraphQLArgumentConfig, "type"> & {
   type: TInputType;
