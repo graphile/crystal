@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "update-schema": "ts-node ./__tests__/exampleSchema.ts",
     "test": "jest -i",
     "prepack": "tsc -b"
   },

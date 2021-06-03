@@ -1,3 +1,4 @@
+import { writeFileSync } from "fs";
 import type {
   __TrackedObjectPlan,
   __ValuePlan,
@@ -22,8 +23,10 @@ import {
   GraphQLObjectType,
   GraphQLSchema,
   GraphQLString,
+  printSchema,
 } from "graphql";
 import sql from "pg-sql2";
+import prettier from "prettier";
 
 import type { PgClassSelectPlan } from "../src";
 import {
@@ -485,3 +488,21 @@ export const schema = crystalEnforce(
     query: Query,
   }),
 );
+
+async function main() {
+  const filePath = `${__dirname}/schema.graphql`;
+  writeFileSync(
+    filePath,
+    prettier.format(printSchema(schema), {
+      ...(await prettier.resolveConfig(filePath)),
+      parser: "graphql",
+    }),
+  );
+}
+
+if (require.main === module) {
+  main().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}
