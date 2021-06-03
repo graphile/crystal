@@ -1,0 +1,2 @@
+schema: "__tests__/schema.graphql"
+documents: "__tests__/queries/**/*.graphql"
