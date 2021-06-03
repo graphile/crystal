@@ -29,6 +29,7 @@ import { inspect } from "util";
 
 import type { Deferred } from "./deferred";
 import { isDev } from "./dev";
+import type { InputPlan } from "./input";
 import type {
   BaseGraphQLArguments,
   BaseGraphQLContext,
@@ -541,7 +542,7 @@ export function objectFieldSpec<
 
 export function inputObjectSpec<
   TContext extends BaseGraphQLContext,
-  TParentPlan extends ExecutablePlan<any> | ModifierPlan<any>,
+  TParentPlan extends ModifierPlan<any>,
 >(
   spec: Omit<GraphQLInputObjectTypeConfig, "fields"> & {
     fields: Thunk<{
@@ -575,14 +576,14 @@ export function inputObjectSpec<
  */
 export function inputObjectFieldSpec<
   TContext extends BaseGraphQLContext,
-  TSource extends ExecutablePlan<any> | ModifierPlan<any>,
-  TResult extends ModifierPlan<any> = ModifierPlan<any>,
-  TInput extends BaseGraphQLInputObject = BaseGraphQLInputObject,
+  TParent extends ModifierPlan<any>,
+  TResult extends ModifierPlan<TParent> = ModifierPlan<TParent>,
+  TInput extends InputPlan = InputPlan,
 >(
   graphileSpec: GraphileCrystalInputFieldConfig<
     GraphQLInputType,
     TContext,
-    TSource,
+    TParent,
     TResult,
     TInput
   >,

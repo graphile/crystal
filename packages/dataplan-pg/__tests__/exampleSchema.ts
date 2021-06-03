@@ -110,6 +110,7 @@ const messageSource = new PgDataSource({
     author_id: col({ notNull: true, type: `uuid` }),
     forum_id: col({ notNull: true, type: `uuid` }),
     created_at: col({ notNull: true, type: `timestamptz` }),
+    archived_at: col({ type: "timestamptz" }),
   },
   uniques: [],
 });
@@ -134,6 +135,7 @@ const forumSource = new PgDataSource({
   columns: {
     id: col({ notNull: true, type: `uuid` }),
     name: col({ notNull: true, type: `citext` }),
+    archived_at: col({ type: "timestamptz" }),
   },
   uniques: [["id"]],
 });
@@ -230,6 +232,9 @@ const IncludeArchived = new GraphQLEnumType({
     NO: {
       value: "NO",
     },
+    EXCLUSIVELY: {
+      value: "EXCLUSIVELY",
+    },
   },
 });
 
@@ -283,18 +288,49 @@ const Forum: GraphQLObjectType<any, GraphileResolverContext> =
           args: {
             limit: {
               type: GraphQLInt,
-              plan($messages: PgClassSelectPlan<typeof messageSource>, $value) {
+              plan(
+                _$forum,
+                $messages: PgClassSelectPlan<typeof messageSource>,
+                $value,
+              ) {
                 $messages.setLimit($value.eval());
                 return null;
               },
             },
             condition: {
               type: MessageCondition,
-              plan($messages: PgClassSelectPlan<typeof messageSource>) {
+              plan(
+                _$forum,
+                $messages: PgClassSelectPlan<typeof messageSource>,
+              ) {
                 return $messages.wherePlan();
               },
             },
-            includeArchived: { type: IncludeArchived },
+            includeArchived: {
+              type: IncludeArchived,
+              plan(
+                $forum,
+                $messages: PgClassSelectPlan<typeof messageSource>,
+                $value,
+              ) {
+                if ($value.evalIs("YES")) {
+                  // No restriction
+                  return;
+                } else if ($value.evalIs("EXCLUSIVELY")) {
+                  $messages.where(
+                    sql`${$messages.alias}.archived_at is not null`,
+                  );
+                  return;
+                } else if ($value.evalIs("INHERIT")) {
+                  $messages.where(
+                    sql`(${$messages.alias}.archived_at is not null) = (${$forum
+                      .get("archived_at")
+                      .toSQL()} is null)`,
+                  );
+                }
+                $messages.where(sql`${$messages.alias}.archived_at is null`);
+              },
+            },
           },
           plan($forum) {
             const $forumId = $forum.get("id");
@@ -314,6 +350,7 @@ const Forum: GraphQLObjectType<any, GraphileResolverContext> =
             limit: {
               type: GraphQLInt,
               plan(
+                _$forum,
                 $connection: PgConnectionPlan<typeof messageSource>,
                 $value,
               ) {
@@ -324,7 +361,10 @@ const Forum: GraphQLObjectType<any, GraphileResolverContext> =
             },
             condition: {
               type: MessageCondition,
-              plan($connection: PgConnectionPlan<typeof messageSource>) {
+              plan(
+                _$forum,
+                $connection: PgConnectionPlan<typeof messageSource>,
+              ) {
                 const $messages = $connection.getSubplan();
                 return $messages.wherePlan();
               },
@@ -364,7 +404,11 @@ const Query = new GraphQLObjectType(
         args: {
           limit: {
             type: GraphQLInt,
-            plan($forums: PgClassSelectPlan<typeof forumSource>, $value) {
+            plan(
+              _$root,
+              $forums: PgClassSelectPlan<typeof forumSource>,
+              $value,
+            ) {
               $forums.setLimit($value.eval());
               return null;
             },
@@ -376,7 +420,11 @@ const Query = new GraphQLObjectType(
         args: {
           limit: {
             type: GraphQLInt,
-            plan($connection: PgConnectionPlan<typeof messageSource>, $value) {
+            plan(
+              _$root,
+              $connection: PgConnectionPlan<typeof messageSource>,
+              $value,
+            ) {
               const $messages = $connection.getSubplan();
               $messages.setLimit($value.eval());
               return null;

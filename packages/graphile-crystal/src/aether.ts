@@ -47,6 +47,7 @@ import type {
   Batch,
   CrystalContext,
   CrystalObject,
+  TrackedArguments,
 } from "./interfaces";
 import {
   $$crystalContext,
@@ -94,8 +95,6 @@ const depthWrap = (debugFn: debugFactory.Debugger) =>
   );
 const debugPlanVerbose = depthWrap(debugPlanVerbose_);
 const debugExecuteVerbose = depthWrap(debugExecuteVerbose_);
-
-type TrackedArguments = { [key: string]: InputPlan };
 
 function assertPolymorphicPlan(
   plan: ExecutablePlan | PolymorphicPlan,
@@ -353,6 +352,7 @@ export class Aether<
         fieldSpec,
         field,
         trackedArguments,
+        this.trackedRootValuePlan,
         subscribePlan,
       );
       this.planSelectionSet(
@@ -420,6 +420,7 @@ export class Aether<
           objectField,
           field,
           trackedArguments,
+          parentPlan,
           plan,
         );
         const newPlansLength = this.plans.length;
@@ -569,6 +570,7 @@ export class Aether<
     fieldSpec: GraphQLField<unknown, unknown>,
     _field: FieldNode,
     trackedArguments: TrackedArguments,
+    parentPlan: ExecutablePlan,
     fieldPlan: ExecutablePlan,
   ): void {
     // Arguments are applied in the order that they are specified in the
@@ -581,6 +583,7 @@ export class Aether<
         const planResolver = argSpec.extensions?.graphile?.plan;
         if (typeof planResolver === "function") {
           const argPlan = planResolver(
+            parentPlan,
             fieldPlan,
             trackedArgumentValuePlan,
             this.trackedContextPlan,

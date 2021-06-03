@@ -14,7 +14,8 @@ create table app_public.users (
 
 create table app_public.forums (
   id uuid primary key default gen_random_uuid(),
-  name text not null
+  name text not null,
+  archived_at timestamptz
 );
 
 create table app_public.messages (
@@ -23,7 +24,8 @@ create table app_public.messages (
   author_id uuid not null references app_public.users,
   body text not null,
   featured boolean not null default false,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  archived_at timestamptz
 );
 
 insert into app_public.users (id, username) values

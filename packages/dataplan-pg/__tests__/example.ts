@@ -188,7 +188,7 @@ async function main() {
           name
           messagesList(
             limit: 5
-            condition: { active: true }
+            condition: { featured: true }
             includeArchived: INHERIT
           ) {
             body
@@ -228,7 +228,7 @@ async function main() {
           name
           messagesConnection(
             limit: 5
-            condition: { active: true }
+            condition: { featured: true }
             includeArchived: INHERIT
           ) {
             nodes {

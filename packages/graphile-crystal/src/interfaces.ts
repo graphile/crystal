@@ -11,9 +11,35 @@ import type {
 } from "graphql";
 
 import type { Deferred } from "./deferred";
+import type { InputPlan } from "./input";
 import type { ExecutablePlan, ModifierPlan } from "./plan";
 import type { __TrackedObjectPlan, ListCapablePlan } from "./plans";
 import type { UniqueId } from "./utils";
+
+declare module "graphql" {
+  interface GraphQLFieldExtensions<
+    TSource,
+    TContext,
+    TArgs = { [argName: string]: any },
+  > {
+    graphile?: {
+      plan?: ExecutablePlanResolver<any, any, any, any>;
+      subscribePlan?: ExecutablePlanResolver<any, any, any, any>;
+    };
+  }
+
+  interface GraphQLArgumentExtensions {
+    graphile?: {
+      plan?: ArgumentPlanResolver<any, any, any, any, any>;
+    };
+  }
+
+  interface GraphQLInputFieldExtensions {
+    graphile?: {
+      plan?: InputObjectFieldPlanResolver<any, any, any, any>;
+    };
+  }
+}
 
 export const $$crystalContext = Symbol("context");
 export const $$data = Symbol("data");
@@ -90,6 +116,7 @@ export interface BaseGraphQLArguments {
 }
 export type BaseGraphQLInputObject = BaseGraphQLArguments;
 
+// TODO: rename ExecutablePlanResolver to FieldPlanResolver?
 /**
  * Plan resolvers are like regular resolvers except they're called beforehand,
  * they return plans rather than values, and they only run once for lists
@@ -114,20 +141,35 @@ export type ExecutablePlanResolver<
   TResultPlan extends ExecutablePlan<any>,
 > = (
   $parentPlan: TParentPlan,
-  args: __TrackedObjectPlan<TArgs>,
+  args: TrackedArguments<TArgs>,
   context: __TrackedObjectPlan<TContext>,
 ) => TResultPlan;
 
-export type ModifierPlanResolver<
+export type InputObjectFieldPlanResolver<
   TContext extends BaseGraphQLContext,
-  TInput extends any,
-  TParentPlan extends ExecutablePlan<any> | ModifierPlan<any> | null,
+  TInput extends InputPlan,
+  TParentPlan extends ModifierPlan<any> | null,
   TResultPlan extends ModifierPlan<
     ExecutablePlan<any> | ModifierPlan<any>
   > | null,
 > = (
   $parentPlan: TParentPlan,
-  $input: __TrackedObjectPlan<TInput>,
+  $input: TInput,
+  context: __TrackedObjectPlan<TContext>,
+) => TResultPlan;
+
+export type ArgumentPlanResolver<
+  TContext extends BaseGraphQLContext,
+  TInput extends InputPlan,
+  TParentPlan extends ExecutablePlan<any> | null,
+  TFieldPlan extends ExecutablePlan<any> | null,
+  TResultPlan extends ModifierPlan<
+    ExecutablePlan<any> | ModifierPlan<any>
+  > | null,
+> = (
+  $parentPlan: TParentPlan,
+  $fieldPlan: TFieldPlan,
+  $input: TInput,
   context: __TrackedObjectPlan<TContext>,
 ) => TResultPlan;
 
@@ -185,16 +227,17 @@ export type GraphileCrystalFieldConfig<
   TType extends GraphQLOutputType,
   TContext extends BaseGraphQLContext,
   TParentPlan extends ExecutablePlan<any> | null,
-  TResultPlan extends ExecutablePlan<any>, // PlanForType<TType>,
+  TFieldPlan extends ExecutablePlan<any>, // PlanForType<TType>,
   TArgs extends BaseGraphQLArguments,
 > = Omit<GraphQLFieldConfig<any, any>, "args" | "type"> & {
   type: TType;
-  plan?: ExecutablePlanResolver<TContext, TArgs, TParentPlan, TResultPlan>;
+  plan?: ExecutablePlanResolver<TContext, TArgs, TParentPlan, TFieldPlan>;
   args?: {
     [key: string]: GraphileCrystalArgumentConfig<
       GraphQLInputType,
       TContext,
-      TResultPlan,
+      TParentPlan,
+      TFieldPlan,
       any,
       any
     >;
@@ -204,21 +247,43 @@ export type GraphileCrystalFieldConfig<
 export type GraphileCrystalArgumentConfig<
   TInputType extends GraphQLInputType,
   TContext extends BaseGraphQLContext,
-  TParentPlan extends ExecutablePlan<any>,
-  TResultPlan extends ModifierPlan<TParentPlan> | null, // InputPlanForType<TInputType>
-  TInput extends any, // InputTypeFor<TInputType>,
+  TParentPlan extends ExecutablePlan<any> | null,
+  TFieldPlan extends ExecutablePlan<TParentPlan> | null,
+  TArgumentPlan extends TFieldPlan extends ExecutablePlan<any>
+    ? ModifierPlan<TFieldPlan> | null
+    : null,
+  TInput extends InputPlan, // InputTypeFor<TInputType>,
 > = Omit<GraphQLArgumentConfig, "type"> & {
   type: TInputType;
-  plan?: ModifierPlanResolver<TContext, TInput, TParentPlan, TResultPlan>;
+  plan?: TParentPlan extends ExecutablePlan<any>
+    ? ArgumentPlanResolver<
+        TContext,
+        TInput,
+        TParentPlan,
+        TFieldPlan,
+        TArgumentPlan
+      >
+    : never;
 };
 
 export type GraphileCrystalInputFieldConfig<
   TInputType extends GraphQLInputType,
   TContext extends BaseGraphQLContext,
-  TParentPlan extends ExecutablePlan<any> | ModifierPlan<any>,
+  TParentPlan extends ModifierPlan<any>,
   TResultPlan extends ModifierPlan<TParentPlan> | null, // InputPlanForType<TInputType>
-  TInput extends any, // InputTypeFor<TInputType>,
+  TInput extends InputPlan, // InputTypeFor<TInputType>,
 > = Omit<GraphQLInputFieldConfig, "type"> & {
   type: TInputType;
-  plan?: ModifierPlanResolver<TContext, TInput, TParentPlan, TResultPlan>;
+  plan?: InputObjectFieldPlanResolver<
+    TContext,
+    TInput,
+    TParentPlan,
+    TResultPlan
+  >;
+};
+
+export type TrackedArguments<
+  TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
+> = {
+  [key in keyof TArgs]: InputPlan;
 };

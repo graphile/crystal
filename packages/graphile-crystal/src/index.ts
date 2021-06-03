@@ -16,6 +16,7 @@ export {
   InputStaticLeafPlan,
 } from "./input";
 export {
+  ArgumentPlanResolver,
   BaseGraphQLArguments,
   BaseGraphQLContext,
   BaseGraphQLRootValue,
@@ -24,7 +25,7 @@ export {
   CrystalValuesList,
   ExecutablePlanResolver,
   GraphileCrystalFieldConfig,
-  ModifierPlanResolver,
+  InputObjectFieldPlanResolver,
 } from "./interfaces";
 export {
   BasePlan,
