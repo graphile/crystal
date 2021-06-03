@@ -24,6 +24,7 @@ it("{forums{name}}", async () => {
     ) and (
       true /* authorization checks */
     )
+    order by __forums__."id" asc
   `);
   expect(queries).toHaveLength(1);
 });
@@ -58,6 +59,7 @@ it("{forums{a:name b:name}}", async () => {
     ) and (
       true /* authorization checks */
     )
+    order by __forums__."id" asc
   `);
   expect(queries).toHaveLength(1);
 });
@@ -100,6 +102,7 @@ it("{a:forums{a:name b:name}b:forums{a:name b:name}}", async () => {
     ) and (
       true /* authorization checks */
     )
+    order by __forums__."id" asc
   `);
   expect(queries).toHaveLength(1);
 });
@@ -124,7 +127,7 @@ it("{a:forums{id a:name b:name}b:forums{a:name b:name}}", async () => {
     {
       a: [
         { id: "ca700000-0000-0000-0000-000000000ca7", a: "Cats", b: "Cats" },
-        { id: "bae00000-0000-0000-0000-000000000bae", a: "Postgres", b: "Postgres" },
+        { id: "f1700000-0000-0000-0000-000000000f17", a: "Postgres", b: "Postgres" },
       ],
       b: [
         { a: "Cats", b: "Cats" },
@@ -144,6 +147,7 @@ it("{a:forums{id a:name b:name}b:forums{a:name b:name}}", async () => {
     ) and (
       true /* authorization checks */
     )
+    order by __forums__."id" asc
   `);
   expect(queries).toHaveLength(1);
 });
@@ -164,7 +168,7 @@ it("{forums{name self{id name}}}", async () => {
     {
       forums: [
         { name: "Cats", self: { id: "ca700000-0000-0000-0000-000000000ca7", name: "Cats" } },
-        { name: "Postgres", self: { id: "bae00000-0000-0000-0000-000000000bae", name: "Postgres" } },
+        { name: "Postgres", self: { id: "f1700000-0000-0000-0000-000000000f17", name: "Postgres" } },
       ],
     }
   `);
@@ -180,6 +184,7 @@ it("{forums{name self{id name}}}", async () => {
     ) and (
       true /* authorization checks */
     )
+    order by __forums__."id" asc
   `);
   expect(queries).toHaveLength(1);
 });
@@ -211,12 +216,6 @@ it("{allMessagesConnection{edges{cursor node{body author{username gravatarUrl}}}
             cursor: "424242",
             node: { body: "Cats = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
           },
-          { cursor: "424242", node: { body: "Dogs = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } } },
-          { cursor: "424242", node: { body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } } },
-          {
-            cursor: "424242",
-            node: { body: "Dogs = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
-          },
           {
             cursor: "424242",
             node: { body: "Postgres = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
@@ -243,8 +242,11 @@ it("{allMessagesConnection{edges{cursor node{body author{username gravatarUrl}}}
     left outer join app_public.users as __users__
     on ((__messages__."author_id"::"uuid" = __users__."id"))
     where (
+      __messages__.archived_at is null
+    ) and (
       true /* authorization checks */
     )
+    order by __messages__."id" asc
   `);
   expect(queries).toHaveLength(1);
 });

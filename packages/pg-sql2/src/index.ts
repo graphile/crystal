@@ -66,13 +66,24 @@ export interface SQLSymbolAliasNode {
   [$$trusted]: true;
 }
 
+/**
+ * Informs pg-sql2 to evaluate the callback function at compile time, merging
+ * the result into the query (recursively if necessary).
+ */
+export interface SQLCallbackNode {
+  callback: () => SQL;
+  type: "CALLBACK";
+  [$$trusted]: true;
+}
+
 /** @internal */
 export type SQLNode =
   | SQLRawNode
   | SQLValueNode
   | SQLIdentifierNode
   | SQLIndentNode
-  | SQLSymbolAliasNode;
+  | SQLSymbolAliasNode
+  | SQLCallbackNode;
 /** @internal */
 export type SQLQuery = Array<SQLNode>;
 
@@ -185,16 +196,26 @@ function makeSymbolAliasNode(a: symbol, b: symbol): SQLSymbolAliasNode {
   });
 }
 
+function makeCallbackNode(callback: () => SQL): SQLCallbackNode {
+  return Object.freeze({
+    type: "CALLBACK",
+    callback,
+    [$$trusted]: true,
+  });
+}
+
 function isSQLNode(node: unknown): node is SQLNode {
   return typeof node === "object" && node !== null && node[$$trusted] === true;
 }
 
-function enforceValidNode(node: unknown): SQLNode {
+function enforceValidNode(node: unknown, where = ""): SQLNode {
   if (isSQLNode(node)) {
     return node;
   }
   throw new Error(
-    `[pg-sql2] Invalid expression. Expected an SQL item but received '${inspect(
+    `[pg-sql2] Invalid expression. Expected an SQL item${
+      where ? ` at ${where}` : ""
+    } but received '${inspect(
       node,
     )}'. This may mean that there is an issue in the SQL expression where a dynamic value was not escaped via 'sql.value(...)', an identifier wasn't wrapped with 'sql.identifier(...)', or a SQL expression was added without using the \`sql\` tagged template literal.`,
   );
@@ -262,7 +283,7 @@ export function compile(sql: SQL): {
     const itemCount = items.length;
 
     for (let itemIndex = 0; itemIndex < itemCount; itemIndex++) {
-      const item = enforceValidNode(items[itemIndex]);
+      const item = enforceValidNode(items[itemIndex], `item ${itemIndex}`);
       switch (item.type) {
         case "RAW": {
           sqlFragments.push(
@@ -349,6 +370,10 @@ export function compile(sql: SQL): {
           }
           break;
         }
+        case "CALLBACK": {
+          sqlFragments.push(print(item.callback(), indent));
+          break;
+        }
         default: {
           const never: never = item;
           // This cannot happen
@@ -411,10 +436,15 @@ export function query(
       const val = values[i];
       if (Array.isArray(val)) {
         // Avoid allocating a new array by using forEach rather than map.
-        val.forEach(enforceValidNode);
+        val.forEach((v, j) =>
+          enforceValidNode(v, `template literal placeholder ${i} child ${j}`),
+        );
         items.push(...val);
       } else {
-        const node: SQLNode = enforceValidNode(val);
+        const node: SQLNode = enforceValidNode(
+          val,
+          `template literal placeholder ${i}`,
+        );
         items.push(node);
       }
     }
@@ -554,7 +584,9 @@ export function join(
     const addSeparator = i > 0 && hasSeparator;
     if (Array.isArray(nodeOrNodes)) {
       // Performance: we don't map here because we don't want to allocate a new array.
-      nodeOrNodes.forEach(enforceValidNode);
+      nodeOrNodes.forEach((n, j) =>
+        enforceValidNode(n, `join item ${i} child ${j}`),
+      );
       const nodes: Array<SQLNode> = nodeOrNodes;
       if (addSeparator) {
         currentItems.push(sepNode, ...nodes);
@@ -562,7 +594,7 @@ export function join(
         currentItems.push(...nodes);
       }
     } else {
-      const node: SQLNode = enforceValidNode(nodeOrNodes);
+      const node: SQLNode = enforceValidNode(nodeOrNodes, `join item ${i}`);
       if (addSeparator) {
         currentItems.push(sepNode, node);
       } else {
@@ -579,6 +611,10 @@ export function indent(fragment: SQL): SQL {
 
 export function symbolAlias(symbol1: symbol, symbol2: symbol): SQL {
   return makeSymbolAliasNode(symbol1, symbol2);
+}
+
+export function callback(callback: () => SQL): SQL {
+  return makeCallbackNode(callback);
 }
 
 export function arraysMatch<T>(
@@ -649,6 +685,16 @@ export function isEquivalent(
           identifiersAreEquivalent(a, b, symbolSubstitutes),
         );
       }
+      case "CALLBACK": {
+        if (sql2.type !== sql1.type) {
+          return false;
+        }
+        return isEquivalent(
+          sql1.callback(),
+          sql2.callback(),
+          symbolSubstitutes,
+        );
+      }
       case "SYMBOL_ALIAS": {
         // TODO
         return false;
@@ -702,6 +748,7 @@ export interface PgSQL {
   join: typeof join;
   indent: typeof indent;
   symbolAlias: typeof symbolAlias;
+  callback: typeof callback;
   blank: typeof blank;
   fragment: typeof query;
   true: typeof trueNode;
@@ -721,6 +768,7 @@ const pgSql: PgSQL = Object.assign(query, {
   join,
   indent,
   symbolAlias,
+  callback,
   blank,
   fragment: query,
   true: trueNode,

@@ -45,6 +45,8 @@ type PgClassSelectPlanJoin =
       conditions: SQL[];
     };
 
+type PgClassSelectPlaceholder = { planIndex: number; symbol: symbol; sql: SQL };
+
 /**
  * This represents selecting from a class-like entity (table, view, etc); i.e.
  * it represents `SELECT <columns>, <cursor?> FROM <table>`.  It's not
@@ -134,7 +136,7 @@ export class PgClassSelectPlan<
   /**
    * Values used in this plan.
    */
-  private placeholders: Array<{ planIndex: number; symbol: symbol }>;
+  private placeholders: Array<PgClassSelectPlaceholder>;
 
   /**
    * If true, we don't need to add any of the security checks from the data
@@ -334,12 +336,20 @@ export class PgClassSelectPlan<
     }
     const planIndex = this.addDependency($plan);
     const symbol = Symbol("value_" + planIndex);
-    this.placeholders.push({ planIndex, symbol });
-    return sql.value(
-      // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
-      // a value before executing the query.
-      symbol as any,
-    );
+    const p: PgClassSelectPlaceholder = {
+      planIndex,
+      symbol,
+      sql: sql.value(
+        // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
+        // a value before executing the query.
+
+        symbol as any,
+      ),
+    };
+    this.placeholders.push(p);
+    // This allows us to replace the SQL that will be compiled, for example
+    // when we're inlining this into a parent query.
+    return sql.callback(() => p.sql);
   }
 
   /**
@@ -569,8 +579,20 @@ export class PgClassSelectPlan<
   }
 
   private buildOrderBy() {
-    // TODO!!
-    const orders = this.orders;
+    const orders = [...this.orders];
+
+    // TODO: should we really apply a default order _here_ rather than in the calling code?
+    if (this.dataSource.uniques.length > 0) {
+      const ordersIsUnique = false; /* TODO */
+      if (!ordersIsUnique) {
+        const uniqueColumns: string[] = this.dataSource.uniques[0];
+        orders.push(
+          ...uniqueColumns.map(
+            (c) => sql`${this.alias}.${sql.identifier(c)} asc`,
+          ),
+        );
+      }
+    }
     return orders.length
       ? sql`\norder by ${sql.join(orders, ", ")}`
       : sql.blank;
@@ -802,10 +824,25 @@ export class PgClassSelectPlan<
 
   mergePlaceholdersInto(otherPlan: PgClassSelectPlan<TDataSource>): void {
     for (const placeholder of this.placeholders) {
-      const { symbol, planIndex } = placeholder;
+      const { symbol, planIndex, sql: sqlFrag } = placeholder;
       const dep = this.aether.plans[this.dependencies[planIndex]];
-      const newPlanIndex = otherPlan.addDependency(dep);
-      otherPlan.placeholders.push({ planIndex: newPlanIndex, symbol });
+      if (otherPlan.parentPathIdentity.startsWith(dep.parentPathIdentity)) {
+        const newPlanIndex = otherPlan.addDependency(dep);
+        otherPlan.placeholders.push({
+          planIndex: newPlanIndex,
+          symbol,
+          sql: sqlFrag,
+        });
+      } else {
+        if (dep instanceof PgColumnSelectPlan) {
+          // Replace with a reference
+          placeholder.sql = dep.toSQL();
+        } else {
+          throw new Error(
+            `Could not merge placeholder from unsupported plan type: ${dep}`,
+          );
+        }
+      }
     }
   }
 

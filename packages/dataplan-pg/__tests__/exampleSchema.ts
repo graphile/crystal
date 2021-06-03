@@ -4,7 +4,6 @@ import type {
   BaseGraphQLContext,
   BaseGraphQLRootValue,
   ExecutablePlan,
-  InputPlan,
   InputStaticLeafPlan,
 } from "graphile-crystal";
 import {
@@ -120,7 +119,7 @@ const messageSource = new PgDataSource({
     created_at: col({ notNull: true, type: `timestamptz` }),
     archived_at: col({ type: "timestamptz" }),
   },
-  uniques: [],
+  uniques: [["id"]],
 });
 
 const userSource = new PgDataSource({
@@ -246,14 +245,17 @@ const IncludeArchived = new GraphQLEnumType({
   },
 });
 
-function makeIncludeArchivedField() {
+function makeIncludeArchivedField<TFieldPlan>(
+  getClassPlan: ($fieldPlan: TFieldPlan) => PgClassSelectPlan<any>,
+) {
   return {
     type: IncludeArchived,
     plan(
       $parent: ExecutablePlan<any>,
-      $messages: PgClassSelectPlan<typeof messageSource>,
+      $field: TFieldPlan,
       $value: InputStaticLeafPlan | __TrackedObjectPlan,
     ) {
+      const $messages = getClassPlan($field);
       if ($value.evalIs("YES")) {
         // No restriction
       } else if ($value.evalIs("EXCLUSIVELY")) {
@@ -264,12 +266,12 @@ function makeIncludeArchivedField() {
         $parent instanceof PgClassSelectSinglePlan &&
         !!$parent.dataSource.columns.archived_at
       ) {
-        // TODO: this `.toSQL` can only work when the query is
-        // inlined; if $parent is not inlined then it cannot work.
         $messages.where(
-          sql`(${$messages.alias}.archived_at is null) = (${$parent
-            .get("archived_at")
-            .toSQL()} is null)`,
+          sql`(${
+            $messages.alias
+          }.archived_at is null) = (${$messages.placeholder(
+            $parent.get("archived_at"),
+          )} is null)`,
         );
       } else {
         $messages.where(sql`${$messages.alias}.archived_at is null`);
@@ -343,12 +345,13 @@ const Forum: GraphQLObjectType<any, GraphileResolverContext> =
               plan(
                 _$forum,
                 $messages: PgClassSelectPlan<typeof messageSource>,
-                $input,
               ) {
                 return $messages.wherePlan();
               },
             },
-            includeArchived: makeIncludeArchivedField(),
+            includeArchived: makeIncludeArchivedField<
+              PgClassSelectPlan<typeof messageSource>
+            >(($messages) => $messages),
           },
           plan($forum) {
             const $forumId = $forum.get("id");
@@ -387,7 +390,9 @@ const Forum: GraphQLObjectType<any, GraphileResolverContext> =
                 return $messages.wherePlan();
               },
             },
-            includeArchived: { type: IncludeArchived },
+            includeArchived: makeIncludeArchivedField<
+              PgConnectionPlan<typeof messageSource>
+            >(($connection) => $connection.getSubplan()),
           },
           plan($forum) {
             const $messages = messageSource.find({
@@ -431,7 +436,9 @@ const Query = new GraphQLObjectType(
               return null;
             },
           },
-          includeArchived: makeIncludeArchivedField(),
+          includeArchived: makeIncludeArchivedField<
+            PgClassSelectPlan<typeof forumSource>
+          >(($forums) => $forums),
         },
       },
       allMessagesConnection: {
@@ -452,7 +459,9 @@ const Query = new GraphQLObjectType(
           condition: {
             type: MessageCondition,
           },
-          includeArchived: { type: IncludeArchived },
+          includeArchived: makeIncludeArchivedField<
+            PgConnectionPlan<typeof messageSource>
+          >(($connection) => $connection.getSubplan()),
         },
         plan() {
           const $messages = messageSource.find();

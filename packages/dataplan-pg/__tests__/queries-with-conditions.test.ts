@@ -3,7 +3,7 @@ import { runTestQuery } from "./helpers";
 it("{forums{name messagesList(limit){body author{username gravatarUrl}}}}", async () => {
   const { data, queries } = await runTestQuery(/* GraphQL */ `
     {
-      forums {
+      forums(includeArchived: YES) {
         name
         messagesList(limit: 2) {
           body
@@ -23,6 +23,13 @@ it("{forums{name messagesList(limit){body author{username gravatarUrl}}}}", asyn
           messagesList: [
             { body: "Cats = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
             { body: "Cats = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+          ],
+        },
+        {
+          name: "Dogs",
+          messagesList: [
+            { body: "Dogs = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+            { body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
           ],
         },
         {
@@ -55,15 +62,16 @@ it("{forums{name messagesList(limit){body author{username gravatarUrl}}}}", asyn
         ) and (
           __forums__."id"::"uuid" = __messages__."forum_id"
         )
+        order by __messages__."id" asc
         limit 2
       ) as "1",
-      __forums__."id"::text as "2"
+      __forums__."id"::text as "2",
+      __forums__."archived_at"::text as "3"
     from app_public.forums as __forums__
     where (
-      __forums__.archived_at is null
-    ) and (
       true /* authorization checks */
     )
+    order by __forums__."id" asc
   `);
   expect(queries).toHaveLength(1);
 });
@@ -71,9 +79,9 @@ it("{forums{name messagesList(limit){body author{username gravatarUrl}}}}", asyn
 it("{forums(limit){name messagesList(limit){body author{username gravatarUrl}}}}", async () => {
   const { data, queries } = await runTestQuery(/* GraphQL */ `
     {
-      forums(limit: 2) {
+      forums(limit: 2, includeArchived: YES) {
         name
-        messagesList(limit: 2) {
+        messagesList(limit: 2, includeArchived: YES) {
           body
           author {
             username
@@ -94,10 +102,10 @@ it("{forums(limit){name messagesList(limit){body author{username gravatarUrl}}}}
           ],
         },
         {
-          name: "Postgres",
+          name: "Dogs",
           messagesList: [
-            { body: "Postgres = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
-            { body: "Postgres = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+            { body: "Dogs = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+            { body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
           ],
         },
       ],
@@ -119,19 +127,17 @@ it("{forums(limit){name messagesList(limit){body author{username gravatarUrl}}}}
         left outer join app_public.users as __users__
         on ((__messages__."author_id"::"uuid" = __users__."id"))
         where (
-          (__messages__.archived_at is null) = (__forums__."archived_at" is null)
-        ) and (
           __forums__."id"::"uuid" = __messages__."forum_id"
         )
+        order by __messages__."id" asc
         limit 2
       ) as "1",
       __forums__."id"::text as "2"
     from app_public.forums as __forums__
     where (
-      __forums__.archived_at is null
-    ) and (
       true /* authorization checks */
     )
+    order by __forums__."id" asc
     limit 2
   `);
   expect(queries).toHaveLength(1);
@@ -140,9 +146,9 @@ it("{forums(limit){name messagesList(limit){body author{username gravatarUrl}}}}
 it("{forums{name messagesConnection(limit,includeArchived){nodes{body author{...}} edges{cursor node{body author{...}}}}}}", async () => {
   const { data, queries } = await runTestQuery(/* GraphQL */ `
     {
-      forums {
+      forums(includeArchived: YES) {
         name
-        messagesConnection(limit: 5, includeArchived: INHERIT) {
+        messagesConnection(limit: 5, includeArchived: EXCLUSIVELY) {
           nodes {
             body
             author {
@@ -167,51 +173,29 @@ it("{forums{name messagesConnection(limit,includeArchived){nodes{body author{...
   expect({ __: data }).toMatchInlineSnapshot(`
     {
       forums: [
+        { name: "Cats", messagesConnection: { nodes: [], edges: [] } },
         {
-          name: "Cats",
+          name: "Dogs",
           messagesConnection: {
             nodes: [
-              { body: "Cats = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
-              { body: "Cats = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
-              { body: "Cats = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
+              { body: "Dogs = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+              { body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+              { body: "Dogs = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
             ],
             edges: [
               {
                 cursor: "424242",
-                node: { body: "Cats = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+                node: { body: "Dogs = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
               },
-              { cursor: "424242", node: { body: "Cats = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } } },
+              { cursor: "424242", node: { body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } } },
               {
                 cursor: "424242",
-                node: { body: "Cats = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
+                node: { body: "Dogs = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
               },
             ],
           },
         },
-        {
-          name: "Postgres",
-          messagesConnection: {
-            nodes: [
-              { body: "Postgres = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
-              { body: "Postgres = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
-              { body: "Postgres = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
-            ],
-            edges: [
-              {
-                cursor: "424242",
-                node: { body: "Postgres = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
-              },
-              {
-                cursor: "424242",
-                node: { body: "Postgres = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
-              },
-              {
-                cursor: "424242",
-                node: { body: "Postgres = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
-              },
-            ],
-          },
-        },
+        { name: "Postgres", messagesConnection: { nodes: [], edges: [] } },
       ],
     }
   `);
@@ -236,20 +220,23 @@ it("{forums{name messagesConnection(limit,includeArchived){nodes{body author{...
         left outer join app_public.users as __users_2
         on ((__messages__."author_id"::"uuid" = __users_2."id"))
         where (
+          __messages__.archived_at is not null
+        ) and (
           __forums__."id"::"uuid" = __messages__."forum_id"
         )
+        order by __messages__."id" asc
         limit 5
       ) as "1",
       __forums__."id"::text as "2"
     from app_public.forums as __forums__
     where (
-      __forums__.archived_at is null
-    ) and (
       true /* authorization checks */
     )
+    order by __forums__."id" asc
   `);
   expect(queries).toHaveLength(1);
 });
+
 it("{forums{name messagesConnection(...){nodes{body author{...}} edges{cursor node{body author{...}}}}}}", async () => {
   const { data, queries } = await runTestQuery(/* GraphQL */ `
     {
@@ -323,17 +310,22 @@ it("{forums{name messagesConnection(...){nodes{body author{...}} edges{cursor no
         where (
           (__messages__.featured = $1::boolean)
         ) and (
+          (__messages__.archived_at is null) = (__forums__."archived_at" is null)
+        ) and (
           __forums__."id"::"uuid" = __messages__."forum_id"
         )
+        order by __messages__."id" asc
         limit 5
       ) as "1",
-      __forums__."id"::text as "2"
+      __forums__."id"::text as "2",
+      __forums__."archived_at"::text as "3"
     from app_public.forums as __forums__
     where (
       __forums__.archived_at is null
     ) and (
       true /* authorization checks */
     )
+    order by __forums__."id" asc
   `);
   expect(queries).toHaveLength(1);
 });
