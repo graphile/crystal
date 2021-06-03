@@ -19,7 +19,7 @@ exports.process = (src, path) => {
       const key = line.substr(2, colon - 2).trim();
       const value = JSON5.parse(line.substr(colon + 1));
       config[key] = value;
-    } else if (line.startsWith("#!")) {
+    } else if (line.startsWith("##")) {
       assertions.push(line.substr(2));
     } else {
       documentLines.push(line);

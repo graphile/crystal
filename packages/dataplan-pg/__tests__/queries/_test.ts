@@ -7,14 +7,6 @@ import { runTestQuery } from "../helpers";
 
 const UPDATE_SNAPSHOTS = process.env.UPDATE_SNAPSHOTS === "1";
 
-async function exists(path: string) {
-  try {
-    await fsp.stat(path);
-  } catch (e) {
-    return false;
-  }
-}
-
 async function snapshot(actual: string, filePath: string) {
   let expected: string | null = null;
   try {
@@ -32,11 +24,7 @@ async function snapshot(actual: string, filePath: string) {
   }
 }
 
-export const testGraphQL = async ({
-  document,
-  path,
-  assertions,
-}: {
+export const testGraphQL = async (props: {
   document: string;
   path: string;
   assertions: (result: {
@@ -45,6 +33,7 @@ export const testGraphQL = async ({
   }) => Promise<void>;
   config: any;
 }): Promise<void> => {
+  const { document, path, assertions } = props;
   const sqlFileName = path + ".sql";
   const resultFileName = path + ".json5";
 
