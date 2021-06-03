@@ -1,0 +1,11 @@
+## expect(data.forums[1].name).toEqual(data.forums[1].self.name);
+## expect(queries).toHaveLength(1);
+{
+  forums {
+    name
+    self {
+      id
+      name
+    }
+  }
+}

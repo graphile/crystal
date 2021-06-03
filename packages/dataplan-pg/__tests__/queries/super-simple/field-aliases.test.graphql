@@ -1,5 +1,6 @@
 ## expect(data.forums[0].a).toEqual("Cats");
 ## expect(data.forums[1].b).toEqual("Postgres");
+## expect(queries).toHaveLength(1);
 {
   forums {
     a: name

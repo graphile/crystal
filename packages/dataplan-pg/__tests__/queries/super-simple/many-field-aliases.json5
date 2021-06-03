@@ -1,0 +1,10 @@
+{
+  a: [
+    { a: "Cats", b: "Cats" },
+    { a: "Postgres", b: "Postgres" },
+  ],
+  b: [
+    { a: "Cats", b: "Cats" },
+    { a: "Postgres", b: "Postgres" },
+  ],
+}

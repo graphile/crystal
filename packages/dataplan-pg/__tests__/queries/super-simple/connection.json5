@@ -1,0 +1,21 @@
+{
+  allMessagesConnection: {
+    edges: [
+      { cursor: "424242", node: { body: "Cats = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } } },
+      { cursor: "424242", node: { body: "Cats = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } } },
+      {
+        cursor: "424242",
+        node: { body: "Cats = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
+      },
+      {
+        cursor: "424242",
+        node: { body: "Postgres = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+      },
+      { cursor: "424242", node: { body: "Postgres = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } } },
+      {
+        cursor: "424242",
+        node: { body: "Postgres = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
+      },
+    ],
+  },
+}

@@ -1,0 +1,13 @@
+## expect(data.a[0].a).toEqual("Cats");
+## expect(data.b[1].b).toEqual("Postgres");
+## expect(queries).toHaveLength(1);
+{
+  a: forums {
+    a: name
+    b: name
+  }
+  b: forums {
+    a: name
+    b: name
+  }
+}

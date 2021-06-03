@@ -1,0 +1,15 @@
+## expect(queries).toHaveLength(1);
+{
+  allMessagesConnection {
+    edges {
+      cursor
+      node {
+        body
+        author {
+          username
+          gravatarUrl
+        }
+      }
+    }
+  }
+}

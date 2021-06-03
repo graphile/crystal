@@ -1,0 +1,6 @@
+{
+  forums: [
+    { name: "Cats", self: { id: "ca700000-0000-0000-0000-000000000ca7", name: "Cats" } },
+    { name: "Postgres", self: { id: "f1700000-0000-0000-0000-000000000f17", name: "Postgres" } },
+  ],
+}
