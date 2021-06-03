@@ -1,0 +1,25 @@
+## expect(queries).toHaveLength(1);
+{
+  forums(includeArchived: YES) {
+    name
+    messagesConnection(limit: 5, includeArchived: EXCLUSIVELY) {
+      nodes {
+        body
+        author {
+          username
+          gravatarUrl
+        }
+      }
+      edges {
+        cursor
+        node {
+          body
+          author {
+            username
+            gravatarUrl
+          }
+        }
+      }
+    }
+  }
+}

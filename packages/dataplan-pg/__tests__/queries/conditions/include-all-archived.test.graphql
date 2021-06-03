@@ -1,0 +1,13 @@
+## expect(queries).toHaveLength(1);
+{
+  forums(limit: 2, includeArchived: YES) {
+    name
+    messagesList(limit: 2, includeArchived: YES) {
+      body
+      author {
+        username
+        gravatarUrl
+      }
+    }
+  }
+}

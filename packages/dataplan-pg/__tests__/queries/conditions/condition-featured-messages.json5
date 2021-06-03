@@ -1,0 +1,17 @@
+{
+  forums: [
+    { name: "Cats", messagesConnection: { nodes: [], edges: [] } },
+    {
+      name: "Postgres",
+      messagesConnection: {
+        nodes: [{ body: "Postgres = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } }],
+        edges: [
+          {
+            cursor: "424242",
+            node: { body: "Postgres = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+          },
+        ],
+      },
+    },
+  ],
+}

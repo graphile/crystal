@@ -1,0 +1,25 @@
+{
+  forums: [
+    {
+      name: "Dogs",
+      messagesConnection: {
+        nodes: [
+          { body: "Dogs = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+          { body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+          { body: "Dogs = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
+        ],
+        edges: [
+          {
+            cursor: "424242",
+            node: { body: "Dogs = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+          },
+          { cursor: "424242", node: { body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } } },
+          {
+            cursor: "424242",
+            node: { body: "Dogs = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
+          },
+        ],
+      },
+    },
+  ],
+}
