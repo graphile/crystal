@@ -1,7 +1,11 @@
 import type {
+  __TrackedObjectPlan,
   __ValuePlan,
   BaseGraphQLContext,
   BaseGraphQLRootValue,
+  ExecutablePlan,
+  InputPlan,
+  InputStaticLeafPlan,
 } from "graphile-crystal";
 import {
   context,
@@ -22,8 +26,12 @@ import {
 } from "graphql";
 import sql from "pg-sql2";
 
-import type { PgClassSelectPlan, PgClassSelectSinglePlan } from "../src";
-import { PgConnectionPlan, PgDataSource } from "../src";
+import type { PgClassSelectPlan } from "../src";
+import {
+  PgClassSelectSinglePlan,
+  PgConnectionPlan,
+  PgDataSource,
+} from "../src";
 import type {
   PgDataSourceColumn,
   PgDataSourceContext,
@@ -238,6 +246,39 @@ const IncludeArchived = new GraphQLEnumType({
   },
 });
 
+function makeIncludeArchivedField() {
+  return {
+    type: IncludeArchived,
+    plan(
+      $parent: ExecutablePlan<any>,
+      $messages: PgClassSelectPlan<typeof messageSource>,
+      $value: InputStaticLeafPlan | __TrackedObjectPlan,
+    ) {
+      if ($value.evalIs("YES")) {
+        // No restriction
+      } else if ($value.evalIs("EXCLUSIVELY")) {
+        $messages.where(sql`${$messages.alias}.archived_at is not null`);
+      } else if (
+        $value.evalIs("INHERIT") &&
+        // INHERIT only works if the parent has an archived_at column.
+        $parent instanceof PgClassSelectSinglePlan &&
+        !!$parent.dataSource.columns.archived_at
+      ) {
+        // TODO: this `.toSQL` can only work when the query is
+        // inlined; if $parent is not inlined then it cannot work.
+        $messages.where(
+          sql`(${$messages.alias}.archived_at is null) = (${$parent
+            .get("archived_at")
+            .toSQL()} is null)`,
+        );
+      } else {
+        $messages.where(sql`${$messages.alias}.archived_at is null`);
+      }
+    },
+    defaultValue: "INHERIT",
+  };
+}
+
 const MessageCondition = new GraphQLInputObjectType(
   inputObjectSpec({
     name: "MessageCondition",
@@ -302,35 +343,12 @@ const Forum: GraphQLObjectType<any, GraphileResolverContext> =
               plan(
                 _$forum,
                 $messages: PgClassSelectPlan<typeof messageSource>,
+                $input,
               ) {
                 return $messages.wherePlan();
               },
             },
-            includeArchived: {
-              type: IncludeArchived,
-              plan(
-                $forum,
-                $messages: PgClassSelectPlan<typeof messageSource>,
-                $value,
-              ) {
-                if ($value.evalIs("YES")) {
-                  // No restriction
-                  return;
-                } else if ($value.evalIs("EXCLUSIVELY")) {
-                  $messages.where(
-                    sql`${$messages.alias}.archived_at is not null`,
-                  );
-                  return;
-                } else if ($value.evalIs("INHERIT")) {
-                  $messages.where(
-                    sql`(${$messages.alias}.archived_at is not null) = (${$forum
-                      .get("archived_at")
-                      .toSQL()} is null)`,
-                  );
-                }
-                $messages.where(sql`${$messages.alias}.archived_at is null`);
-              },
-            },
+            includeArchived: makeIncludeArchivedField(),
           },
           plan($forum) {
             const $forumId = $forum.get("id");
@@ -413,6 +431,7 @@ const Query = new GraphQLObjectType(
               return null;
             },
           },
+          includeArchived: makeIncludeArchivedField(),
         },
       },
       allMessagesConnection: {

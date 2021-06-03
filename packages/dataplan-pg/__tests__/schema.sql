@@ -33,11 +33,11 @@ insert into app_public.users (id, username) values
   ('b0b00000-0000-0000-0000-000000000b0b', 'Bob'),
   ('cec111a0-0000-0000-0000-00000cec111a', 'Cecilia');
 
-insert into app_public.forums (id, name) values
-  ('ca700000-0000-0000-0000-000000000ca7', 'Cats'),
-  ('d0900000-0000-0000-0000-000000000d09', 'Dogs'),
-  ('bae00000-0000-0000-0000-000000000bae', 'Postgres');
+insert into app_public.forums (id, name, archived_at) values
+  ('ca700000-0000-0000-0000-000000000ca7', 'Cats', null),
+  ('d0900000-0000-0000-0000-000000000d09', 'Dogs', now()),
+  ('bae00000-0000-0000-0000-000000000bae', 'Postgres', null);
 
-insert into app_public.messages (forum_id, author_id, body, featured)
-select forums.id, users.id, forums.name || ' = awesome -- ' || users.username, (forums.name = 'Dogs' and users.username = 'Bob')
+insert into app_public.messages (forum_id, author_id, body, featured, archived_at)
+select forums.id, users.id, forums.name || ' = awesome -- ' || users.username, (forums.name = 'Postgres' and users.username = 'Bob'), (case when forums.name = 'Dogs' then now() else null end)
   from app_public.users, app_public.forums;

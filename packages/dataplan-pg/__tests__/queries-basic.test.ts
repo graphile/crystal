@@ -9,9 +9,9 @@ it("{forums{name}}", async () => {
     }
   `);
   expect(data.forums[0].name).toEqual("Cats");
-  expect(data.forums[2].name).toEqual("Postgres");
+  expect(data.forums[1].name).toEqual("Postgres");
   expect({ __: data }).toMatchInlineSnapshot(
-    `{ forums: [{ name: "Cats" }, { name: "Dogs" }, { name: "Postgres" }] }`,
+    `{ forums: [{ name: "Cats" }, { name: "Postgres" }] }`,
   );
   expect({
     __: queries.map((q) => q.text).join("\n\n"),
@@ -20,6 +20,8 @@ it("{forums{name}}", async () => {
       __forums__."name"::text as "0"
     from app_public.forums as __forums__
     where (
+      __forums__.archived_at is null
+    ) and (
       true /* authorization checks */
     )
   `);
@@ -36,12 +38,11 @@ it("{forums{a:name b:name}}", async () => {
     }
   `);
   expect(data.forums[0].a).toEqual("Cats");
-  expect(data.forums[2].b).toEqual("Postgres");
+  expect(data.forums[1].b).toEqual("Postgres");
   expect({ __: data }).toMatchInlineSnapshot(`
     {
       forums: [
         { a: "Cats", b: "Cats" },
-        { a: "Dogs", b: "Dogs" },
         { a: "Postgres", b: "Postgres" },
       ],
     }
@@ -53,6 +54,8 @@ it("{forums{a:name b:name}}", async () => {
       __forums__."name"::text as "0"
     from app_public.forums as __forums__
     where (
+      __forums__.archived_at is null
+    ) and (
       true /* authorization checks */
     )
   `);
@@ -73,17 +76,15 @@ it("{a:forums{a:name b:name}b:forums{a:name b:name}}", async () => {
     }
   `);
   expect(data.a[0].a).toEqual("Cats");
-  expect(data.b[2].b).toEqual("Postgres");
+  expect(data.b[1].b).toEqual("Postgres");
   expect({ __: data }).toMatchInlineSnapshot(`
     {
       a: [
         { a: "Cats", b: "Cats" },
-        { a: "Dogs", b: "Dogs" },
         { a: "Postgres", b: "Postgres" },
       ],
       b: [
         { a: "Cats", b: "Cats" },
-        { a: "Dogs", b: "Dogs" },
         { a: "Postgres", b: "Postgres" },
       ],
     }
@@ -95,6 +96,8 @@ it("{a:forums{a:name b:name}b:forums{a:name b:name}}", async () => {
       __forums__."name"::text as "0"
     from app_public.forums as __forums__
     where (
+      __forums__.archived_at is null
+    ) and (
       true /* authorization checks */
     )
   `);
@@ -116,17 +119,15 @@ it("{a:forums{id a:name b:name}b:forums{a:name b:name}}", async () => {
     }
   `);
   expect(data.a[0].a).toEqual("Cats");
-  expect(data.b[2].b).toEqual("Postgres");
+  expect(data.b[1].b).toEqual("Postgres");
   expect({ __: data }).toMatchInlineSnapshot(`
     {
       a: [
         { id: "ca700000-0000-0000-0000-000000000ca7", a: "Cats", b: "Cats" },
-        { id: "d0900000-0000-0000-0000-000000000d09", a: "Dogs", b: "Dogs" },
         { id: "bae00000-0000-0000-0000-000000000bae", a: "Postgres", b: "Postgres" },
       ],
       b: [
         { a: "Cats", b: "Cats" },
-        { a: "Dogs", b: "Dogs" },
         { a: "Postgres", b: "Postgres" },
       ],
     }
@@ -139,6 +140,8 @@ it("{a:forums{id a:name b:name}b:forums{a:name b:name}}", async () => {
       __forums__."name"::text as "1"
     from app_public.forums as __forums__
     where (
+      __forums__.archived_at is null
+    ) and (
       true /* authorization checks */
     )
   `);
@@ -161,7 +164,6 @@ it("{forums{name self{id name}}}", async () => {
     {
       forums: [
         { name: "Cats", self: { id: "ca700000-0000-0000-0000-000000000ca7", name: "Cats" } },
-        { name: "Dogs", self: { id: "d0900000-0000-0000-0000-000000000d09", name: "Dogs" } },
         { name: "Postgres", self: { id: "bae00000-0000-0000-0000-000000000bae", name: "Postgres" } },
       ],
     }
@@ -174,6 +176,8 @@ it("{forums{name self{id name}}}", async () => {
       __forums__."id"::text as "1"
     from app_public.forums as __forums__
     where (
+      __forums__.archived_at is null
+    ) and (
       true /* authorization checks */
     )
   `);
