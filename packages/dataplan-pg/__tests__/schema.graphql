@@ -1,0 +1,55 @@
+type Query {
+  forums(limit: Int, includeArchived: IncludeArchived = INHERIT): [Forum]
+  allMessagesConnection(
+    limit: Int
+    condition: MessageCondition
+    includeArchived: IncludeArchived = INHERIT
+  ): MessagesConnection
+}
+
+type Forum {
+  id: String
+  name: String
+  self: Forum
+  messagesList(
+    limit: Int
+    condition: MessageCondition
+    includeArchived: IncludeArchived = INHERIT
+  ): [Message]
+  messagesConnection(
+    limit: Int
+    condition: MessageCondition
+    includeArchived: IncludeArchived = INHERIT
+  ): MessagesConnection
+}
+
+type Message {
+  body: String
+  author: User
+}
+
+type User {
+  username: String
+  gravatarUrl: String
+}
+
+input MessageCondition {
+  featured: Boolean
+}
+
+enum IncludeArchived {
+  INHERIT
+  YES
+  NO
+  EXCLUSIVELY
+}
+
+type MessagesConnection {
+  edges: [MessageEdge]
+  nodes: [Message]
+}
+
+type MessageEdge {
+  cursor: String
+  node: Message
+}
