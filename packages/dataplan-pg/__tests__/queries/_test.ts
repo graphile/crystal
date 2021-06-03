@@ -32,8 +32,12 @@ export const assertSnapshotsMatch = async (props: {
   config: any;
 }): Promise<void> => {
   const { path, result } = props;
-  const sqlFileName = path + ".sql";
-  const resultFileName = path + ".json5";
+  const basePath = path.replace(/\.test\.graphql$/, "");
+  if (basePath === path) {
+    throw new Error(`Failed to trim .test.graphql from '${path}'`);
+  }
+  const sqlFileName = basePath + ".sql";
+  const resultFileName = basePath + ".json5";
 
   const { data, queries } = await result;
 
