@@ -1,0 +1,6 @@
+{
+  forums: [
+    { a: "Cats", b: "Cats" },
+    { a: "Postgres", b: "Postgres" },
+  ],
+}

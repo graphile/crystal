@@ -28,19 +28,32 @@ exports.process = (src, path) => {
   const document = documentLines.join("\n");
 
   return `\
-const { testGraphQL } = require("../_test");
+const { assertSnapshotsMatch, runTestQuery } = require("../_test");
 
 const document = ${JSON.stringify(document)};
 const path = ${JSON.stringify(path)};
 
-it('execute', () => testGraphQL({
+let result;
+
+beforeAll(() => {
+  result = runTestQuery(document);
+  return result;
+});
+
+${assertions
+  .map((assertion) => {
+    return `\
+it(${JSON.stringify(assertion.trim())}, async () => {
+  const { data, queries } = await result;
+  ${assertion}
+});`;
+  })
+  .join("\n\n")}
+
+it('matches snapshots', () => assertSnapshotsMatch({
   document,
   path,
-  assertions: async (result) => {
-    const { data, queries } = result;
-    ${assertions.join("\n    ")}
-  },
-  config: ${JSON.stringify(config)},
+  result,
 }));
 `;
 };
