@@ -688,21 +688,20 @@ export class PgClassSelectPlan<
         identifierIndex = extraSelectIndexes[0];
 
         query = sql`select ${wrapperAlias}.*
-from (
-  select ids.ordinality - 1 as idx, ${sql.join(
-    this.identifiers.map(({ type }, idx) => {
-      return sql`(ids.value->>${sql.literal(idx)})::${type} as ${sql.identifier(
-        `id${idx}`,
-      )}`;
-    }),
-    ", ",
-  )}
-  from json_array_elements(${sql.value(
-    // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
-    // a value before executing the query.
-    this.identifierSymbol as any,
-  )}::json) with ordinality as ids
-) as ${alias},
+from (${sql.indent(sql`\
+select ids.ordinality - 1 as idx, ${sql.join(
+          this.identifiers.map(({ type }, idx) => {
+            return sql`(ids.value->>${sql.literal(
+              idx,
+            )})::${type} as ${sql.identifier(`id${idx}`)}`;
+          }),
+          ", ",
+        )}
+from json_array_elements(${sql.value(
+          // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
+          // a value before executing the query.
+          this.identifierSymbol as any,
+        )}::json) with ordinality as ids`)}) as ${alias},
 lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
       } else {
         ({ sql: query } = this.buildQuery());
