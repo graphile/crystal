@@ -281,7 +281,7 @@ export function makeExampleSchema(options: { deoptimize?: boolean } = {}) {
               $messages.alias
             }.archived_at is null) = (${$messages.placeholder(
               $parent.get("archived_at"),
-            )} is null)`,
+            )}::timestamptz is null)`,
           );
         } else {
           $messages.where(sql`${$messages.alias}.archived_at is null`);

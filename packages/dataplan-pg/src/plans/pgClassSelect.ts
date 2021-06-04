@@ -626,7 +626,7 @@ export class PgClassSelectPlan<
           // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
           // a value before executing the query.
           this.identifierSymbol as any,
-        )}) with ordinality as ids)`,
+        )}::json) with ordinality as ids)`,
         alias,
         conditions: this.identifierMatches.map(
           (frag, idx) => sql`${frag} = ${alias}.${sql.identifier(`id${idx}`)}`,
