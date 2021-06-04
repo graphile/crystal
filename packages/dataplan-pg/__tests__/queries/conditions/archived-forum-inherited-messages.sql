@@ -16,7 +16,7 @@ select
     left outer join app_public.users as __users_2
     on ((__messages__."author_id"::"uuid" = __users_2."id"))
     where (
-      (__messages__.archived_at is null) = (__forums__."archived_at" is null)
+      (__messages__.archived_at is null) = (__forums__."archived_at"::timestamptz is null)
     ) and (
       __forums__."id"::"uuid" = __messages__."forum_id"
     )
