@@ -12,7 +12,7 @@ order by __forums__."id" asc
 
 select __messages_result__.*
 from (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0"
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0", (ids.value->>1)::timestamptz as "id1"
   from json_array_elements($1::json) with ordinality as ids
 ) as __messages_identifiers__,
 lateral (
@@ -23,7 +23,7 @@ lateral (
     __messages_identifiers__.idx as "3"
   from app_public.messages as __messages__
   where (
-    (__messages__.archived_at is null) = ($2::timestamptz is null)
+    (__messages__.archived_at is null) = (__messages_identifiers__."id1" is null)
   ) and (
     __messages__."forum_id" = __messages_identifiers__."id0"
   )

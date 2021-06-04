@@ -281,7 +281,8 @@ export function makeExampleSchema(options: { deoptimize?: boolean } = {}) {
               $messages.alias
             }.archived_at is null) = (${$messages.placeholder(
               $parent.get("archived_at"),
-            )}::timestamptz is null)`,
+              sql`timestamptz`,
+            )} is null)`,
           );
         } else {
           $messages.where(sql`${$messages.alias}.archived_at is null`);
@@ -304,7 +305,7 @@ export function makeExampleSchema(options: { deoptimize?: boolean } = {}) {
               $condition.where(
                 sql`${
                   $condition.tableAlias
-                }.featured = ${$condition.placeholder($value)}::boolean`,
+                }.featured = ${$condition.placeholder($value, sql`boolean`)}`,
               );
             }
           },

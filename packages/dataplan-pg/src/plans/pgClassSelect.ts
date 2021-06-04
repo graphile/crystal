@@ -45,7 +45,13 @@ type PgClassSelectPlanJoin =
       conditions: SQL[];
     };
 
-type PgClassSelectPlaceholder = { planIndex: number; symbol: symbol; sql: SQL };
+type PgClassSelectPlaceholder = {
+  planIndex: number;
+  // This is a "ref" so that it can be merged into other objects whilst still
+  // allowing `placeholder.sqlRef.sql = ...` to work.
+  sqlRef: { sql: SQL };
+  type: SQL;
+};
 
 interface PgClassSelectIdentifierSpec {
   plan: ExecutablePlan<any>;
@@ -167,8 +173,6 @@ export class PgClassSelectPlan<
     text: string;
     rawSqlValues: (SQLRawValue | symbol)[];
     identifierIndex: number | null;
-    placeholderSymbols: symbol[];
-    placeholderIndexes: number[];
     identifierIds: number[];
   } | null = null;
 
@@ -319,26 +323,21 @@ export class PgClassSelectPlan<
     }));
   }
 
-  public placeholder($plan: ExecutablePlan<any>): SQL {
+  public placeholder($plan: ExecutablePlan<any>, type: SQL): SQL {
     if (this.locked) {
       throw new Error(`${this}: cannot add placeholders once plan is locked`);
     }
     const planIndex = this.addDependency($plan);
-    const symbol = Symbol("value_" + planIndex);
+    const sqlRef = { sql: sql`(1/0) /* ERROR! Unhandled placeholder! */` };
     const p: PgClassSelectPlaceholder = {
       planIndex,
-      symbol,
-      sql: sql.value(
-        // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
-        // a value before executing the query.
-
-        symbol as any,
-      ),
+      type,
+      sqlRef,
     };
     this.placeholders.push(p);
     // This allows us to replace the SQL that will be compiled, for example
     // when we're inlining this into a parent query.
-    return sql.callback(() => p.sql);
+    return sql.callback(() => sqlRef.sql);
   }
 
   /**
@@ -446,14 +445,8 @@ export class PgClassSelectPlan<
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgClassSelectPlan before finalizing it.");
     }
-    const {
-      text,
-      rawSqlValues,
-      identifierIndex,
-      placeholderSymbols,
-      placeholderIndexes,
-      identifierIds,
-    } = this.finalizeResults;
+    const { text, rawSqlValues, identifierIndex, identifierIds } =
+      this.finalizeResults;
 
     const executionResult = await this.dataSource.execute(
       values.map((value) => {
@@ -464,10 +457,6 @@ export class PgClassSelectPlan<
             identifierIndex != null
               ? identifierIds.map((depId) => value[depId])
               : EMPTY_ARRAY,
-          placeholders:
-            placeholderIndexes.length > 0
-              ? placeholderIndexes.map((planIndex) => value[planIndex])
-              : EMPTY_ARRAY,
         };
       }),
       {
@@ -475,7 +464,6 @@ export class PgClassSelectPlan<
         rawSqlValues,
         identifierIndex,
         identifierSymbol: this.identifierSymbol,
-        placeholderSymbols,
       },
     );
     debugExecute("%s; result: %c", this, executionResult);
@@ -657,10 +645,21 @@ export class PgClassSelectPlan<
     if (!this.isFinalized) {
       let query: SQL;
       let identifierIndex: number | null = null;
-      if (this.identifiers.length) {
+      if (this.identifiers.length || this.placeholders.length) {
         const alias = sql.identifier(
           Symbol(this.dataSource.name + "_identifiers"),
         );
+
+        this.placeholders.forEach((placeholder) => {
+          // NOTE: we're adding to `this.identifiers` but NOT to
+          // `this.identifierMatches`.
+          const idx =
+            this.identifiers.push({
+              depId: placeholder.planIndex,
+              type: placeholder.type,
+            }) - 1;
+          placeholder.sqlRef.sql = sql`${alias}.${sql.identifier(`id${idx}`)}`;
+        });
 
         const wrapperAlias = sql.identifier(
           Symbol(this.dataSource.name + "_result"),
@@ -711,10 +710,6 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
       }
 
       const { text, values: rawSqlValues } = sql.compile(query);
-      const placeholderSymbols = this.placeholders.map(({ symbol }) => symbol);
-      const placeholderIndexes = this.placeholders.map(
-        ({ planIndex }) => planIndex,
-      );
 
       // The most trivial of optimisations...
       const identifierIds = this.identifiers.map(({ depId }) => depId);
@@ -723,8 +718,6 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
         text,
         rawSqlValues,
         identifierIndex,
-        placeholderSymbols,
-        placeholderIndexes,
         identifierIds,
       };
     }
@@ -789,7 +782,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
       // Check PLACEHOLDERS match
       if (
         !arraysMatch(this.placeholders, p.placeholders, (a, b) => {
-          return a.symbol === b.symbol && a.planIndex === b.planIndex;
+          return a.type === b.type && a.planIndex === b.planIndex;
         })
       ) {
         return false;
@@ -865,19 +858,19 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
 
   mergePlaceholdersInto(otherPlan: PgClassSelectPlan<TDataSource>): void {
     for (const placeholder of this.placeholders) {
-      const { symbol, planIndex, sql: sqlFrag } = placeholder;
+      const { planIndex, sqlRef, type } = placeholder;
       const dep = this.aether.plans[this.dependencies[planIndex]];
       if (otherPlan.parentPathIdentity.startsWith(dep.parentPathIdentity)) {
         const newPlanIndex = otherPlan.addDependency(dep);
         otherPlan.placeholders.push({
           planIndex: newPlanIndex,
-          symbol,
-          sql: sqlFrag,
+          type,
+          sqlRef,
         });
       } else {
         if (dep instanceof PgColumnSelectPlan) {
           // Replace with a reference
-          placeholder.sql = dep.toSQL();
+          placeholder.sqlRef.sql = dep.toSQL();
         } else {
           throw new Error(
             `Could not merge placeholder from unsupported plan type: ${dep}`,

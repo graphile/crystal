@@ -23,8 +23,8 @@ export class PgConditionPlan<
     this.conditions.push(condition);
   }
 
-  placeholder($plan: ExecutablePlan<any>): SQL {
-    return this.$parent.placeholder($plan);
+  placeholder($plan: ExecutablePlan<any>, type: SQL): SQL {
+    return this.$parent.placeholder($plan, type);
   }
 
   apply(): void {

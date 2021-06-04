@@ -44,14 +44,12 @@ abstract class DataSource<
 export type PgDataSourceInput = {
   context: PgDataSourceContext;
   identifiers: ReadonlyArray<any>;
-  placeholders: ReadonlyArray<any>;
 };
 export type PgDataSourceExecuteOptions = {
   text: string;
   rawSqlValues: Array<SQLRawValue | symbol>;
   identifierIndex?: number | null;
   identifierSymbol?: symbol | null;
-  placeholderSymbols: symbol[];
 };
 
 export type WithPgClient = <T>(
@@ -240,181 +238,139 @@ export class PgDataSource<
   ): Promise<{
     values: CrystalValuesList<ReadonlyArray<PgDataSourceRow<TColumns>>>;
   }> {
-    const {
-      text,
-      rawSqlValues,
-      identifierIndex,
-      identifierSymbol,
-      placeholderSymbols,
-    } = common;
+    const { text, rawSqlValues, identifierIndex, identifierSymbol } = common;
 
     const valuesCount = values.length;
     const results: Deferred<Array<PgDataSourceRow<TColumns>>>[] = new Array(
       valuesCount,
     );
 
-    type Placeholders = readonly any[];
-
-    const cache: Array<readonly any[]> = [];
-    // Dedupes the placeholders
-    const findMatchingOrAdd = (
-      placeholders: readonly any[],
-    ): readonly any[] => {
-      for (let i = 0, l = cache.length; i < l; i++) {
-        if (arraysMatch(placeholders, cache[i])) {
-          return cache[i];
-        }
-      }
-      cache.push(placeholders);
-      return placeholders;
-    };
-
     // Group by context
     const groupMap = new Map<
       PgDataSourceContext,
-      Map<
-        Placeholders,
-        Array<{
-          identifiers: readonly any[];
-          resultIndex: number;
-        }>
-      >
+      Array<{
+        identifiers: readonly any[];
+        resultIndex: number;
+      }>
     >();
     for (
       let resultIndex = 0, l = values.length;
       resultIndex < l;
       resultIndex++
     ) {
-      const {
-        context,
-        identifiers,
-        placeholders: rawPlaceholders,
-      } = values[resultIndex];
-      const placeholders = findMatchingOrAdd(rawPlaceholders);
+      const { context, identifiers } = values[resultIndex];
 
-      let contextMap = groupMap.get(context);
-      if (!contextMap) {
-        contextMap = new Map();
-        groupMap.set(context, contextMap);
-      }
-      let entry = contextMap.get(placeholders);
+      let entry = groupMap.get(context);
       if (!entry) {
         entry = [];
-        contextMap.set(placeholders, entry);
+        groupMap.set(context, entry);
       }
       entry.push({ identifiers, resultIndex });
     }
 
     // For each context, run the relevant fetches
     const promises: Promise<void>[] = [];
-    for (const [context, placeholderMap] of groupMap.entries()) {
-      for (const [placeholders, batch] of placeholderMap.entries()) {
-        promises.push(
-          (async () => {
-            // TODO: cache must factor in placeholders.
-            let cacheForContext = this.cache.get(context);
-            if (!cacheForContext) {
-              cacheForContext = new LRU({ maxLength: 500 /* SQL queries */ });
-              this.cache.set(context, cacheForContext);
-            }
+    for (const [context, batch] of groupMap.entries()) {
+      promises.push(
+        (async () => {
+          // TODO: cache must factor in placeholders.
+          let cacheForContext = this.cache.get(context);
+          if (!cacheForContext) {
+            cacheForContext = new LRU({ maxLength: 500 /* SQL queries */ });
+            this.cache.set(context, cacheForContext);
+          }
 
-            const textAndValues = `${text}\n${JSON.stringify(rawSqlValues)}`;
-            let cacheForQuery = cacheForContext.get(textAndValues);
-            if (!cacheForQuery) {
-              cacheForQuery = new Map();
-              cacheForContext.set(textAndValues, cacheForQuery);
-            }
+          const textAndValues = `${text}\n${JSON.stringify(rawSqlValues)}`;
+          let cacheForQuery = cacheForContext.get(textAndValues);
+          if (!cacheForQuery) {
+            cacheForQuery = new Map();
+            cacheForContext.set(textAndValues, cacheForQuery);
+          }
 
-            const scopedCache = cacheForQuery;
+          const scopedCache = cacheForQuery;
 
-            const remaining: string[] = [];
-            const remainingDeferreds: Array<Deferred<any[]>> = [];
+          const remaining: string[] = [];
+          const remainingDeferreds: Array<Deferred<any[]>> = [];
 
-            try {
-              // Concurrent requests to the same identifiers should result in the same value/execution.
-              const batchSize = batch.length;
-              for (let batchIndex = 0; batchIndex < batchSize; batchIndex++) {
-                const { identifiers, resultIndex } = batch[batchIndex];
-                const identifiersJSON = JSON.stringify(identifiers); // TODO: Canonical? Manual for perf?
-                const existingResult = scopedCache.get(identifiersJSON);
-                if (existingResult) {
-                  debugVerbose(
-                    "%s served %o from cache: %c",
-                    this,
-                    identifiersJSON,
-                    existingResult,
-                  );
-                  results[resultIndex] = existingResult;
-                } else {
-                  debugVerbose(
-                    "%s no entry for %o in cache %c",
-                    this,
-                    identifiersJSON,
-                    scopedCache,
-                  );
-                  assert.ok(
-                    remaining.includes(identifiersJSON) === false,
-                    "Should only fetch each identifiersJSON once, future entries in the loop should receive previous deferred",
-                  );
-                  const pendingResult = defer<any[]>(); // CRITICAL: this MUST resolve later
-                  results[resultIndex] = pendingResult;
-                  scopedCache.set(identifiersJSON, pendingResult);
-                  remaining.push(identifiersJSON) - 1;
-                  remainingDeferreds.push(pendingResult);
-                }
+          try {
+            // Concurrent requests to the same identifiers should result in the same value/execution.
+            const batchSize = batch.length;
+            for (let batchIndex = 0; batchIndex < batchSize; batchIndex++) {
+              const { identifiers, resultIndex } = batch[batchIndex];
+              const identifiersJSON = JSON.stringify(identifiers); // TODO: Canonical? Manual for perf?
+              const existingResult = scopedCache.get(identifiersJSON);
+              if (existingResult) {
+                debugVerbose(
+                  "%s served %o from cache: %c",
+                  this,
+                  identifiersJSON,
+                  existingResult,
+                );
+                results[resultIndex] = existingResult;
+              } else {
+                debugVerbose(
+                  "%s no entry for %o in cache %c",
+                  this,
+                  identifiersJSON,
+                  scopedCache,
+                );
+                assert.ok(
+                  remaining.includes(identifiersJSON) === false,
+                  "Should only fetch each identifiersJSON once, future entries in the loop should receive previous deferred",
+                );
+                const pendingResult = defer<any[]>(); // CRITICAL: this MUST resolve later
+                results[resultIndex] = pendingResult;
+                scopedCache.set(identifiersJSON, pendingResult);
+                remaining.push(identifiersJSON) - 1;
+                remainingDeferreds.push(pendingResult);
               }
+            }
 
-              if (remaining.length) {
-                let found = false;
-                const sqlValues = rawSqlValues.map((v) => {
-                  // THIS IS A DELIBERATE HACK - we are replacing this symbol with a value
-                  // before executing the query.
-                  if (
-                    identifierIndex != null &&
-                    identifierSymbol != null &&
-                    (v as any) === identifierSymbol
-                  ) {
-                    found = true;
-                    // Manual JSON-ing
-                    return "[" + remaining.join(",") + "]";
-                  } else if (typeof v === "symbol") {
-                    const index = placeholderSymbols.indexOf(v);
-                    if (index >= 0) {
-                      return placeholders[index];
-                    } else {
-                      console.error(formatSQLForDebugging(text));
-                      console.error(placeholderSymbols);
-                      throw new Error(
-                        `Unhandled symbol when executing query: '${String(v)}'`,
-                      );
-                    }
-                  } else {
-                    return v;
-                  }
-                });
-                if (identifierIndex != null && !found) {
+            if (remaining.length) {
+              let found = false;
+              const sqlValues = rawSqlValues.map((v) => {
+                // THIS IS A DELIBERATE HACK - we are replacing this symbol with a value
+                // before executing the query.
+                if (
+                  identifierIndex != null &&
+                  identifierSymbol != null &&
+                  (v as any) === identifierSymbol
+                ) {
+                  found = true;
+                  // Manual JSON-ing
+                  return "[" + remaining.join(",") + "]";
+                } else if (typeof v === "symbol") {
+                  console.error(formatSQLForDebugging(text));
                   throw new Error(
-                    "Query with identifiers was executed, but no identifier reference was found in the values passed",
+                    `Unhandled symbol when executing query: '${String(v)}'`,
                   );
+                } else {
+                  return v;
                 }
-                let queryResult: any, error: any;
-                try {
-                  // TODO: we could probably make this more efficient by grouping the
-                  // deferreds further, DataLoader-style, and running one SQL query for
-                  // everything.
-                  queryResult = await context.withPgClient(
-                    context.pgSettings,
-                    (client) =>
-                      client.query({
-                        text,
-                        values: sqlValues,
-                        arrayMode: true,
-                      }),
-                  );
-                } catch (e) {
-                  error = e;
-                }
-                debugVerbose(`\
+              });
+              if (identifierIndex != null && !found) {
+                throw new Error(
+                  "Query with identifiers was executed, but no identifier reference was found in the values passed",
+                );
+              }
+              let queryResult: any, error: any;
+              try {
+                // TODO: we could probably make this more efficient by grouping the
+                // deferreds further, DataLoader-style, and running one SQL query for
+                // everything.
+                queryResult = await context.withPgClient(
+                  context.pgSettings,
+                  (client) =>
+                    client.query({
+                      text,
+                      values: sqlValues,
+                      arrayMode: true,
+                    }),
+                );
+              } catch (e) {
+                error = e;
+              }
+              debugVerbose(`\
 
 
 ${"👇".repeat(30)}
@@ -437,48 +393,47 @@ ${"👆".repeat(30)}
 
 
 `);
-                if (error) {
-                  throw error;
-                }
-                const { rows } = queryResult;
-                const groups: { [valueIndex: number]: any[] } =
-                  Object.create(null);
-                for (let i = 0, l = rows.length; i < l; i++) {
-                  const result = rows[i];
-                  const valueIndex =
-                    identifierIndex != null ? result[identifierIndex] : 0;
-                  if (!groups[valueIndex]) {
-                    groups[valueIndex] = [result];
-                  } else {
-                    groups[valueIndex].push(result);
-                  }
-                }
-                for (let i = 0, l = remainingDeferreds.length; i < l; i++) {
-                  const remainingDeferred = remainingDeferreds[i];
-                  const value = groups[i] ?? [];
-                  remainingDeferred.resolve(value);
+              if (error) {
+                throw error;
+              }
+              const { rows } = queryResult;
+              const groups: { [valueIndex: number]: any[] } =
+                Object.create(null);
+              for (let i = 0, l = rows.length; i < l; i++) {
+                const result = rows[i];
+                const valueIndex =
+                  identifierIndex != null ? result[identifierIndex] : 0;
+                if (!groups[valueIndex]) {
+                  groups[valueIndex] = [result];
+                } else {
+                  groups[valueIndex].push(result);
                 }
               }
-            } catch (e) {
-              // This block guarantees that all remainingDeferreds will be
-              // rejected - we don't want defers hanging around!
-              remainingDeferreds.forEach((d) => {
-                try {
-                  if (d) {
-                    d.reject(e);
-                  }
-                } catch (e2) {
-                  // Ignore error when rejecting
-                  console.error(
-                    `Encountered second error when rejecting deferred due to a different error; ignoring error: ${e2}`,
-                  );
-                }
-              });
-              return Promise.reject(e);
+              for (let i = 0, l = remainingDeferreds.length; i < l; i++) {
+                const remainingDeferred = remainingDeferreds[i];
+                const value = groups[i] ?? [];
+                remainingDeferred.resolve(value);
+              }
             }
-          })(),
-        );
-      }
+          } catch (e) {
+            // This block guarantees that all remainingDeferreds will be
+            // rejected - we don't want defers hanging around!
+            remainingDeferreds.forEach((d) => {
+              try {
+                if (d) {
+                  d.reject(e);
+                }
+              } catch (e2) {
+                // Ignore error when rejecting
+                console.error(
+                  `Encountered second error when rejecting deferred due to a different error; ignoring error: ${e2}`,
+                );
+              }
+            });
+            return Promise.reject(e);
+          }
+        })(),
+      );
     }
 
     // Avoids UnhandledPromiseRejection error.
