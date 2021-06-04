@@ -518,13 +518,18 @@ function formatSQLForDebugging(sql: string, error?: any) {
     }
     return colours[str].bold.call(null, str);
   }
+  function comment(str: string) {
+    return chalk.inverse(str);
+  }
 
   const lines = sql.split("\n");
   let start = 0;
   const output = [];
   for (const line of lines) {
     const end = start + line.length + 1;
-    const colouredSql = line.replace(/__[a-z0-9_]+(?:_[0-9]+|__)/g, colourize);
+    const colouredSql = line
+      .replace(/__[a-z0-9_]+(?:_[0-9]+|__)/g, colourize)
+      .replace(/(\/\*.*\*\/|--.*$)/g, comment);
     output.push(colouredSql);
     if (pos != null && pos >= start && pos < end) {
       output.push(
