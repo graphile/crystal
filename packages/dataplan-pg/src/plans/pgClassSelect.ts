@@ -108,12 +108,6 @@ export class PgClassSelectPlan<
   private identifiers: Array<{ depId: number; type: SQL }>;
 
   /**
-   * This is an array with the same length as identifiers that returns the
-   * index in this.dependencies for the relevant plan.
-   */
-  private identifierIds: number[];
-
-  /**
    * So we can clone.
    */
   private identifierMatchesThunk: (alias: SQL) => SQL[];
@@ -219,7 +213,6 @@ export class PgClassSelectPlan<
           depId: this.addDependency(plan),
           type,
         }));
-    this.identifierIds = this.identifiers.map(({ depId }) => depId);
     this.identifierMatchesThunk = identifierMatchesThunk;
 
     this.identifierSymbol = cloneFrom
@@ -477,7 +470,7 @@ export class PgClassSelectPlan<
           context: value[this.contextId],
           identifiers:
             identifierIndex != null
-              ? this.identifierIds.map((id) => value[id])
+              ? this.identifiers.map(({ depId }) => value[depId])
               : EMPTY_ARRAY,
           placeholders:
             placeholderIndexes.length > 0
