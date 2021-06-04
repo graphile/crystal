@@ -67,5 +67,5 @@ export const assertResultsMatch = async (
 ): Promise<void> => {
   const { data: data1 } = await result1;
   const { data: data2 } = await result2;
-  expect(data1).toEqual(data2);
+  expect(data2).toEqual(data1);
 };
