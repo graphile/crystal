@@ -247,7 +247,6 @@ export class PgDataSource<
       identifierSymbol,
       placeholderSymbols,
     } = common;
-    let sqlValues = rawSqlValues;
 
     const valuesCount = values.length;
     const results: Deferred<Array<PgDataSourceRow<TColumns>>>[] = new Array(
@@ -367,7 +366,7 @@ export class PgDataSource<
 
               if (remaining.length) {
                 let found = false;
-                sqlValues = sqlValues.map((v) => {
+                const sqlValues = rawSqlValues.map((v) => {
                   // THIS IS A DELIBERATE HACK - we are replacing this symbol with a value
                   // before executing the query.
                   if (
