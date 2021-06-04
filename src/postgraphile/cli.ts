@@ -556,6 +556,12 @@ const ownerConnectionString = ownerConnection || pgConnectionString || process.e
 
 // Work around type mismatches between parsePgConnectionString and PoolConfig
 const coerce = (o: ReturnType<typeof parsePgConnectionString>): PoolConfig => {
+  const port =
+    typeof o.port === 'number'
+      ? o.port
+      : typeof o.port === 'string'
+      ? parseInt(o.port, 10)
+      : undefined;
   return {
     ...o,
     application_name: o['application_name'] || undefined,
@@ -563,7 +569,7 @@ const coerce = (o: ReturnType<typeof parsePgConnectionString>): PoolConfig => {
     user: typeof o.user === 'string' ? o.user : undefined,
     database: typeof o.database === 'string' ? o.database : undefined,
     password: typeof o.password === 'string' ? o.password : undefined,
-    port: typeof o.port === 'number' ? o.port : undefined,
+    port: Number.isFinite(port) ? port : undefined,
     host: typeof o.host === 'string' ? o.host : undefined,
   };
 };
