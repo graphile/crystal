@@ -59,7 +59,14 @@ it(${JSON.stringify(assertion.trim())}, async () => {
   })
   .join("\n\n")}
 
-it('matches snapshots', () => assertSnapshotsMatch({
+it('matches SQL snapshots', () => assertSnapshotsMatch('sql', {
+  document,
+  path,
+  config,
+  result: result1,
+}));
+
+it('matches data snapshot', () => assertSnapshotsMatch('result', {
   document,
   path,
   config,
@@ -68,7 +75,7 @@ it('matches snapshots', () => assertSnapshotsMatch({
 
 it('returns same data for optimized vs deoptimized', () => assertResultsMatch(result1, result2));
 
-it('matches snapshots with inlining disabled', () => assertSnapshotsMatch({
+it('matches SQL snapshots with inlining disabled', () => assertSnapshotsMatch('sql', {
   document,
   path,
   config,
