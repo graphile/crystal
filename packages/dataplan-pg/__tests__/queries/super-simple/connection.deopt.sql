@@ -10,14 +10,21 @@ where (
 )
 order by __messages__."id" asc
 
-select 
-  __users__."username"::text as "0",
-  __users__."gravatar_url"::text as "1",
-  __users_identifiers__.idx as "2"
-from app_public.users as __users__
-inner join (select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0" from json_array_elements($1::json) with ordinality as ids) as __users_identifiers__
-on ((__users__."id" = __users_identifiers__."id0"))
-where (
-  true /* authorization checks */
-)
-order by __users__."id" asc
+select __identifier_wrapper__.*
+from (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0"
+  from json_array_elements($1::json) with ordinality as ids
+) as __users_identifiers__,
+lateral (
+  select 
+    __users__."username"::text as "0",
+    __users__."gravatar_url"::text as "1",
+    __users_identifiers__.idx as "2"
+  from app_public.users as __users__
+  where (
+    true /* authorization checks */
+  ) and (
+    __users__."id" = __users_identifiers__."id0"
+  )
+  order by __users__."id" asc
+) as __identifier_wrapper__

@@ -1,25 +1,10 @@
 {
   forums: [
-    {
-      name: "Cats",
-      messagesList: [
-        { body: "Cats = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
-        { body: "Cats = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
-      ],
-    },
-    {
-      name: "Dogs",
-      messagesList: [
-        { body: "Dogs = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
-        { body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
-      ],
-    },
+    { name: "Cats", messagesList: [{ body: "Cats = awesome -- Alice" }, { body: "Cats = awesome -- Bob" }] },
+    { name: "Dogs", messagesList: [{ body: "Dogs = awesome -- Alice" }, { body: "Dogs = awesome -- Bob" }] },
     {
       name: "Postgres",
-      messagesList: [
-        { body: "Postgres = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
-        { body: "Postgres = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
-      ],
+      messagesList: [{ body: "Postgres = awesome -- Alice" }, { body: "Postgres = awesome -- Bob" }],
     },
   ],
 }

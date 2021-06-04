@@ -1,13 +1,12 @@
 ## expect(queries).toHaveLength(1);
+## expect(data.forums[0].messagesList).toHaveLength(2);
+## expect(data.forums[1].messagesList).toHaveLength(2);
+## expect(data.forums[2].messagesList).toHaveLength(2);
 {
   forums(includeArchived: YES) {
     name
     messagesList(limit: 2) {
       body
-      author {
-        username
-        gravatarUrl
-      }
     }
   }
 }

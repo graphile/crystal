@@ -1,0 +1,25 @@
+{
+  forums: [
+    {
+      name: "Cats",
+      messagesList: [
+        { body: "Cats = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+        { body: "Cats = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+      ],
+    },
+    {
+      name: "Dogs",
+      messagesList: [
+        { body: "Dogs = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+        { body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+      ],
+    },
+    {
+      name: "Postgres",
+      messagesList: [
+        { body: "Postgres = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+        { body: "Postgres = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+      ],
+    },
+  ],
+}
