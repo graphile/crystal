@@ -120,11 +120,6 @@ export class PgClassSelectPlan<
   private identifierMatches: SQL[];
 
   /**
-   * If this plan has identifiers, what's the alias for the identifiers 'table'.
-   */
-  private identifiersAlias: SQL | null;
-
-  /**
    * If this plan has identifiers, we must feed the identifiers into the values
    * to feed into the SQL statement after compiling the query; we'll use this
    * symbol as the placeholder to replace.
@@ -228,11 +223,6 @@ export class PgClassSelectPlan<
     this.joins = cloneFrom ? [...cloneFrom.joins] : [];
     this.selects = cloneFrom ? [...cloneFrom.selects] : [];
     // this.cursorPlan = cloneFrom ? cloneFrom.cursorPlan : null;
-    this.identifiersAlias = cloneFrom
-      ? cloneFrom.identifiersAlias
-      : this.identifiers.length
-      ? sql.identifier(Symbol(this.dataSource.name + "_identifiers"))
-      : null;
     this.isTrusted = cloneFrom ? cloneFrom.isTrusted : false;
     this.isUnique = cloneFrom ? cloneFrom.isUnique : false;
     this.isInliningForbidden = cloneFrom
@@ -667,8 +657,11 @@ export class PgClassSelectPlan<
     if (!this.isFinalized) {
       let query: SQL;
       let identifierIndex: number | null = null;
-      if (this.identifiers.length && this.identifiersAlias) {
-        const alias = this.identifiersAlias;
+      if (this.identifiers.length) {
+        const alias = sql.identifier(
+          Symbol(this.dataSource.name + "_identifiers"),
+        );
+
         const wrapperAlias = sql.identifier(
           Symbol(this.dataSource.name + "_result"),
         );
