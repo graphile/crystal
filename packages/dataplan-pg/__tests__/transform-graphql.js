@@ -1,6 +1,5 @@
 // IMPORTANT: after editing this file, you must run `yarn jest --clearCache`
 // because the transformed code gets cached.
-const { basename } = require("path");
 const JSON5 = require("json5");
 
 exports.process = (src, path) => {
