@@ -8,7 +8,7 @@ where (
 )
 order by __forums__."id" asc
 
-select __identifier_wrapper__.*
+select __messages_result__.*
 from (
   select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0"
   from json_array_elements($1::json) with ordinality as ids
@@ -25,9 +25,9 @@ lateral (
   )
   order by __messages__."id" asc
   limit 2
-) as __identifier_wrapper__
+) as __messages_result__
 
-select __identifier_wrapper__.*
+select __messages_result__.*
 from (
   select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0"
   from json_array_elements($1::json) with ordinality as ids
@@ -44,4 +44,4 @@ lateral (
   )
   order by __messages__."id" asc
   limit 2
-) as __identifier_wrapper__
+) as __messages_result__

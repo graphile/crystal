@@ -669,7 +669,9 @@ export class PgClassSelectPlan<
       let identifierIndex: number | null = null;
       if (this.identifiers.length && this.identifiersAlias) {
         const alias = this.identifiersAlias;
-        const wrapperAlias = sql.identifier(Symbol("identifier_wrapper"));
+        const wrapperAlias = sql.identifier(
+          Symbol(this.dataSource.name + "_result"),
+        );
         const extraSelects: SQL[] = [];
         const extraWheres: SQL[] = [];
 
