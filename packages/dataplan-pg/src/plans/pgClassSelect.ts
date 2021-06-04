@@ -174,6 +174,7 @@ export class PgClassSelectPlan<
     identifierIndex: number | null;
     placeholderSymbols: symbol[];
     placeholderIndexes: number[];
+    identifierIds: number[];
   } | null = null;
 
   /**
@@ -461,6 +462,7 @@ export class PgClassSelectPlan<
       identifierIndex,
       placeholderSymbols,
       placeholderIndexes,
+      identifierIds,
     } = this.finalizeResults;
 
     const executionResult = await this.dataSource.execute(
@@ -470,7 +472,7 @@ export class PgClassSelectPlan<
           context: value[this.contextId],
           identifiers:
             identifierIndex != null
-              ? this.identifiers.map(({ depId }) => value[depId])
+              ? identifierIds.map((depId) => value[depId])
               : EMPTY_ARRAY,
           placeholders:
             placeholderIndexes.length > 0
@@ -718,12 +720,17 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
       const placeholderIndexes = this.placeholders.map(
         ({ planIndex }) => planIndex,
       );
+
+      // The most trivial of optimisations...
+      const identifierIds = this.identifiers.map(({ depId }) => depId);
+
       this.finalizeResults = {
         text,
         rawSqlValues,
         identifierIndex,
         placeholderSymbols,
         placeholderIndexes,
+        identifierIds,
       };
     }
 
