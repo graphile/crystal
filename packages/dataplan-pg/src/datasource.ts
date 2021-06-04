@@ -528,7 +528,7 @@ function formatSQLForDebugging(sql: string, error?: any) {
     output.push(colouredSql);
     if (pos != null && pos >= start && pos < end) {
       output.push(
-        chalk.red(" ".repeat(pos - start - 1) + "^ " + error.message),
+        chalk.red("-".repeat(pos - start - 1) + "^ " + error.message),
       );
     }
     start = end;
