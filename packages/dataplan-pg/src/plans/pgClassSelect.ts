@@ -47,6 +47,10 @@ type PgClassSelectPlanJoin =
 
 type PgClassSelectPlaceholder = { planIndex: number; symbol: symbol; sql: SQL };
 
+interface PgClassSelectIdentifierSpec {
+  plan: ExecutablePlan<any>;
+  type: SQL;
+}
 /**
  * This represents selecting from a class-like entity (table, view, etc); i.e.
  * it represents `SELECT <columns>, <cursor?> FROM <table>`.  It's not
@@ -101,7 +105,7 @@ export class PgClassSelectPlan<
    * to identify which records in the result set should be returned to which
    * GraphQL resolvers.
    */
-  private identifiers: Array<{ plan: ExecutablePlan<any>; type: SQL }>;
+  private identifiers: Array<{ depId: number; type: SQL }>;
 
   /**
    * This is an array with the same length as identifiers that returns the
@@ -185,15 +189,9 @@ export class PgClassSelectPlan<
    */
   private locked = false;
 
-  /**
-   * If we were cloned and our clone source was finalized, the identifierIndex
-   * from the clone source. Needed for when we finalize ourself.
-   */
-  private cloneIdentifierIndex: number | null | undefined;
-
   constructor(
     dataSource: TDataSource,
-    identifiers: Array<{ plan: ExecutablePlan<any>; type: SQL }>,
+    identifiers: Array<PgClassSelectIdentifierSpec>,
     identifierMatchesThunk: (alias: SQL) => SQL[],
     cloneFrom: PgClassSelectPlan<TDataSource> | null = null,
   ) {
@@ -203,8 +201,8 @@ export class PgClassSelectPlan<
       if (this.dependencies.length !== 0) {
         throw new Error("Should not have any dependencies yet");
       }
-      cloneFrom.dependencies.forEach((depId, idx) => {
-        const myIdx = this.addDependency(this.aether.plans[depId]);
+      cloneFrom.dependencies.forEach((planId, idx) => {
+        const myIdx = this.addDependency(this.aether.plans[planId]);
         if (myIdx !== idx) {
           throw new Error(
             `Failed to clone ${cloneFrom}; dependency indexes did not match: ${myIdx} !== ${idx}`,
@@ -215,10 +213,13 @@ export class PgClassSelectPlan<
     this.contextId = cloneFrom
       ? cloneFrom.contextId
       : this.addDependency(this.dataSource.context());
-    this.identifiers = identifiers;
-    this.identifierIds = cloneFrom
-      ? cloneFrom.identifierIds
-      : identifiers.map(({ plan }) => this.addDependency(plan));
+    this.identifiers = cloneFrom
+      ? [...cloneFrom.identifiers] // References indexes cloned above
+      : identifiers.map(({ plan, type }) => ({
+          depId: this.addDependency(plan),
+          type,
+        }));
+    this.identifierIds = this.identifiers.map(({ depId }) => depId);
     this.identifierMatchesThunk = identifierMatchesThunk;
 
     this.identifierSymbol = cloneFrom
@@ -247,9 +248,6 @@ export class PgClassSelectPlan<
     this.orders = cloneFrom ? cloneFrom.orders : [];
     this.limit = cloneFrom ? cloneFrom.limit : null;
     this.offset = cloneFrom ? cloneFrom.offset : null;
-    this.cloneIdentifierIndex = cloneFrom
-      ? cloneFrom.finalizeResults?.identifierIndex
-      : undefined;
 
     if (!cloneFrom) {
       if (this.identifiers.length !== this.identifierMatches.length) {
@@ -328,6 +326,13 @@ export class PgClassSelectPlan<
 
   public unique(): boolean {
     return this.isUnique;
+  }
+
+  private hydrateIdentifiers(): Array<PgClassSelectIdentifierSpec> {
+    return this.identifiers.map(({ depId, type }) => ({
+      plan: this.aether.plans[this.dependencies[depId]],
+      type,
+    }));
   }
 
   public placeholder($plan: ExecutablePlan<any>): SQL {
@@ -421,7 +426,7 @@ export class PgClassSelectPlan<
     this.lock();
     const clone = new PgClassSelectPlan(
       this.dataSource,
-      this.identifiers,
+      this.hydrateIdentifiers(),
       this.identifierMatchesThunk,
       this,
     );
@@ -903,14 +908,14 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
       // Inline ourself into our parent if we can.
       let t: PgClassSelectPlan<any> | null | undefined = undefined;
       let p: ExecutablePlan<any> | undefined = undefined;
-      for (let i = 0, l = this.dependencies.length; i < l; i++) {
-        if (i === this.contextId) {
+      for (let depId = 0, l = this.dependencies.length; depId < l; depId++) {
+        if (depId === this.contextId) {
           // We check myContext vs tsContext below; so lets assume it's fine
           // for now.
           continue;
         }
-        const depId = this.dependencies[i];
-        const dep = this.aether.plans[depId];
+        const planId = this.dependencies[depId];
+        const dep = this.aether.plans[planId];
         if (dep instanceof __TrackedObjectPlan) {
           // This has come from a variable, context or rootValue, therefore
           // it's shared and thus safe.
@@ -990,12 +995,14 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
         ) {
           const { sql: where } = this.buildWhere();
           const conditions = [
-            ...this.identifiers.map((id, i) => {
-              const plan = id.plan;
+            ...this.identifiers.map(({ depId, type }, i) => {
+              const plan = this.aether.plans[this.dependencies[depId]];
               if (!(plan instanceof PgColumnSelectPlan)) {
-                throw new Error(`Expected ${plan} to be a PgColumnSelectPlan`);
+                throw new Error(
+                  `Expected ${plan} (${i}th dependency of ${this}; plan with id ${depId}) to be a PgColumnSelectPlan`,
+                );
               }
-              return sql`${plan.toSQL()}::${id.type} = ${
+              return sql`${plan.toSQL()}::${type} = ${
                 this.identifierMatches[i]
               }`;
             }),
@@ -1020,10 +1027,15 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
         } else if (parent instanceof PgClassSelectSinglePlan) {
           const parent2 =
             this.aether.plans[parent.dependencies[parent.itemPlanId]];
-          this.identifiers.forEach((id, i) => {
-            const plan = id.plan as PgColumnSelectPlan<any, any>;
+          this.identifiers.forEach(({ depId, type }, i) => {
+            const plan = this.aether.plans[this.dependencies[depId]];
+            if (!(plan instanceof PgColumnSelectPlan)) {
+              throw new Error(
+                `Expected ${plan} (${i}th dependency of ${this}; plan with id ${depId}) to be a PgColumnSelectPlan`,
+              );
+            }
             return this.where(
-              sql`${plan.toSQL()}::${id.type} = ${this.identifierMatches[i]}`,
+              sql`${plan.toSQL()}::${type} = ${this.identifierMatches[i]}`,
             );
           });
           this.mergePlaceholdersInto(table);
