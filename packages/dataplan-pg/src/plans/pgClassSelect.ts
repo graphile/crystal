@@ -636,7 +636,7 @@ export class PgClassSelectPlan<
       extraWheres?: SQL[];
     } = {},
   ): {
-    query: SQL;
+    sql: SQL;
     extraSelectIndexes: number[];
   } {
     if (!this.isTrusted) {
@@ -653,7 +653,7 @@ export class PgClassSelectPlan<
 
     const query = sql`${select}${from}${join}${where}${orderBy}${limit}${offset}`;
 
-    return { query, extraSelectIndexes };
+    return { sql: query, extraSelectIndexes };
   }
 
   public finalize(): void {
@@ -681,7 +681,7 @@ export class PgClassSelectPlan<
               sql`${frag} = ${alias}.${sql.identifier(`id${idx}`)}`,
           ),
         );
-        const { query: baseQuery, extraSelectIndexes } = this.buildQuery({
+        const { sql: baseQuery, extraSelectIndexes } = this.buildQuery({
           extraSelects,
           extraWheres,
         });
@@ -705,7 +705,7 @@ from (
 ) as ${alias},
 lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
       } else {
-        ({ query } = this.buildQuery());
+        ({ sql: query } = this.buildQuery());
       }
 
       const { text, values: rawSqlValues } = sql.compile(query);
@@ -1020,7 +1020,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
             );
           });
           this.mergePlaceholdersInto(table);
-          const { query } = this.buildQuery({ asArray: true });
+          const { sql: query } = this.buildQuery({ asArray: true });
           const selfIndex = table.select(sql`array(${sql.indent(query)})`);
           debugPlanVerbose(
             "Optimising %c (via %c and %c)",
