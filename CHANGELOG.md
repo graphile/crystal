@@ -8,6 +8,12 @@ to you also.
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
+## [4.12.3](https://github.com/graphile/postgraphile/compare/v4.12.2...v4.12.3) (2021-06-04)
+
+### Bug Fixes
+
+- **cli:** fix parsing port number ([#1495](https://github.com/graphile/postgraphile/issues/1495)) ([940f16c](https://github.com/graphile/postgraphile/commit/940f16c213171a0c860a3f69c1288ec2e4fcf214))
+
 ## [4.12.2](https://github.com/graphile/postgraphile/compare/v4.12.1...v4.12.2) (2021-06-01)
 
 ### Bug Fixes
