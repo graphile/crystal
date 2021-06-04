@@ -419,7 +419,7 @@ export class PgDataSource<
 
 ${"👇".repeat(30)}
 # SQL QUERY:
-${formatSQLForDebugging(text)}
+${formatSQLForDebugging(text, error)}
 
 # PLACEHOLDERS:
 ${inspect(sqlValues, { colors: true })}
@@ -490,7 +490,9 @@ ${"👆".repeat(30)}
 }
 
 // A simplified version of formatSQLForDebugging from graphile-build-pg
-function formatSQLForDebugging(sql: string) {
+function formatSQLForDebugging(sql: string, error?: any) {
+  const pos = error.position ? parseInt(error.position, 10) : null;
+
   let colourIndex = 0;
   const allowedColours = [
     chalk.red,
@@ -517,6 +519,20 @@ function formatSQLForDebugging(sql: string) {
     return colours[str].bold.call(null, str);
   }
 
-  const colouredSql = sql.replace(/__[a-z0-9_]+(?:_[0-9]+|__)/g, colourize);
-  return colouredSql;
+  const lines = sql.split("\n");
+  let start = 0;
+  const output = [];
+  for (const line of lines) {
+    const end = start + line.length + 1;
+    const colouredSql = line.replace(/__[a-z0-9_]+(?:_[0-9]+|__)/g, colourize);
+    output.push(colouredSql);
+    if (pos != null && pos >= start && pos < end) {
+      output.push(
+        chalk.red(" ".repeat(pos - start - 1) + "^ " + error.message),
+      );
+    }
+    start = end;
+  }
+
+  return output.join("\n");
 }
