@@ -88,293 +88,377 @@ export interface GraphQLTypeFromPostgresType {
 type NullableUnless<TCondition extends boolean | undefined, TType> =
   TCondition extends true ? TType : TType | null | undefined;
 
-const col = <
-  TOptions extends {
-    notNull?: boolean;
-    type: keyof GraphQLTypeFromPostgresType;
-  },
->(
-  options: TOptions,
-): PgDataSourceColumn<
-  NullableUnless<
-    TOptions["notNull"],
-    GraphQLTypeFromPostgresType[TOptions["type"]]
-  >
-> => {
-  const { notNull, type } = options;
-  return {
-    gql2pg: (value) => sql`${sql.value(value as any)}::${sql.identifier(type)}`,
-    pg2gql: (value) => value as any,
-    notNull: !!notNull,
-    type: sql.identifier(type),
+export function makeExampleSchema(options: { deoptimize?: boolean } = {}) {
+  const col = <
+    TOptions extends {
+      notNull?: boolean;
+      type: keyof GraphQLTypeFromPostgresType;
+    },
+  >(
+    options: TOptions,
+  ): PgDataSourceColumn<
+    NullableUnless<
+      TOptions["notNull"],
+      GraphQLTypeFromPostgresType[TOptions["type"]]
+    >
+  > => {
+    const { notNull, type } = options;
+    return {
+      gql2pg: (value) =>
+        sql`${sql.value(value as any)}::${sql.identifier(type)}`,
+      pg2gql: (value) => value as any,
+      notNull: !!notNull,
+      type: sql.identifier(type),
+    };
   };
-};
 
-const messageSource = new PgDataSource({
-  source: sql`app_public.messages`,
-  name: "messages",
-  context: getPgDataSourceContext,
-  columns: {
-    id: col({ notNull: true, type: `uuid` }),
-    body: col({ notNull: true, type: `text` }),
-    author_id: col({ notNull: true, type: `uuid` }),
-    forum_id: col({ notNull: true, type: `uuid` }),
-    created_at: col({ notNull: true, type: `timestamptz` }),
-    archived_at: col({ type: "timestamptz" }),
-  },
-  uniques: [["id"]],
-});
-
-const userSource = new PgDataSource({
-  source: sql`app_public.users`,
-  name: "users",
-  context: getPgDataSourceContext,
-  columns: {
-    id: col({ notNull: true, type: `uuid` }),
-    username: col({ notNull: true, type: `citext` }),
-    gravatar_url: col({ type: `text` }),
-    created_at: col({ notNull: true, type: `timestamptz` }),
-  },
-  uniques: [["id"], ["username"]],
-});
-
-const forumSource = new PgDataSource({
-  source: sql`app_public.forums`,
-  name: "forums",
-  context: getPgDataSourceContext,
-  columns: {
-    id: col({ notNull: true, type: `uuid` }),
-    name: col({ notNull: true, type: `citext` }),
-    archived_at: col({ type: "timestamptz" }),
-  },
-  uniques: [["id"]],
-});
-
-const User = new GraphQLObjectType(
-  objectSpec<GraphileResolverContext, UserPlan>({
-    name: "User",
-    fields: {
-      username: {
-        type: GraphQLString,
-        plan($user) {
-          return $user.get("username");
-        },
-      },
-      gravatarUrl: {
-        type: GraphQLString,
-        plan($user) {
-          return $user.get("gravatar_url");
-        },
-      },
+  const messageSource = new PgDataSource({
+    source: sql`app_public.messages`,
+    name: "messages",
+    context: getPgDataSourceContext,
+    columns: {
+      id: col({ notNull: true, type: `uuid` }),
+      body: col({ notNull: true, type: `text` }),
+      author_id: col({ notNull: true, type: `uuid` }),
+      forum_id: col({ notNull: true, type: `uuid` }),
+      created_at: col({ notNull: true, type: `timestamptz` }),
+      archived_at: col({ type: "timestamptz" }),
     },
-  }),
-);
+    uniques: [["id"]],
+  });
 
-const Message = new GraphQLObjectType(
-  objectSpec<GraphileResolverContext, MessagePlan>({
-    name: "Message",
-    fields: {
-      body: {
-        type: GraphQLString,
-        plan($message) {
-          return $message.get("body");
-        },
-      },
-      author: {
-        type: User,
-        plan($message) {
-          return userSource.get({ id: $message.get("author_id") });
-        },
-      },
+  const userSource = new PgDataSource({
+    source: sql`app_public.users`,
+    name: "users",
+    context: getPgDataSourceContext,
+    columns: {
+      id: col({ notNull: true, type: `uuid` }),
+      username: col({ notNull: true, type: `citext` }),
+      gravatar_url: col({ type: `text` }),
+      created_at: col({ notNull: true, type: `timestamptz` }),
     },
-  }),
-);
+    uniques: [["id"], ["username"]],
+  });
 
-const MessageEdge = new GraphQLObjectType(
-  objectSpec<GraphileResolverContext, MessagePlan>({
-    name: "MessageEdge",
-    fields: {
-      cursor: {
-        type: GraphQLString,
-        plan($node) {
-          return $node.cursor();
-        },
-      },
-      node: {
-        type: Message,
-        plan($node) {
-          return $node;
-        },
-      },
+  const forumSource = new PgDataSource({
+    source: sql`app_public.forums`,
+    name: "forums",
+    context: getPgDataSourceContext,
+    columns: {
+      id: col({ notNull: true, type: `uuid` }),
+      name: col({ notNull: true, type: `citext` }),
+      archived_at: col({ type: "timestamptz" }),
     },
-  }),
-);
+    uniques: [["id"]],
+  });
 
-const MessagesConnection = new GraphQLObjectType(
-  objectSpec<GraphileResolverContext, MessageConnectionPlan>({
-    name: "MessagesConnection",
-    fields: {
-      edges: {
-        type: new GraphQLList(MessageEdge),
-        plan($connection) {
-          return $connection.nodes();
-        },
-      },
-      nodes: {
-        type: new GraphQLList(Message),
-        plan($connection) {
-          return $connection.nodes();
-        },
-      },
-    },
-  }),
-);
-
-const IncludeArchived = new GraphQLEnumType({
-  name: "IncludeArchived",
-  values: {
-    INHERIT: {
-      value: "INHERIT",
-    },
-    YES: {
-      value: "YES",
-    },
-    NO: {
-      value: "NO",
-    },
-    EXCLUSIVELY: {
-      value: "EXCLUSIVELY",
-    },
-  },
-});
-
-function makeIncludeArchivedField<TFieldPlan>(
-  getClassPlan: ($fieldPlan: TFieldPlan) => PgClassSelectPlan<any>,
-) {
-  return {
-    type: IncludeArchived,
-    plan(
-      $parent: ExecutablePlan<any>,
-      $field: TFieldPlan,
-      $value: InputStaticLeafPlan | __TrackedObjectPlan,
-    ) {
-      const $messages = getClassPlan($field);
-      if ($value.evalIs("YES")) {
-        // No restriction
-      } else if ($value.evalIs("EXCLUSIVELY")) {
-        $messages.where(sql`${$messages.alias}.archived_at is not null`);
-      } else if (
-        $value.evalIs("INHERIT") &&
-        // INHERIT only works if the parent has an archived_at column.
-        $parent instanceof PgClassSelectSinglePlan &&
-        !!$parent.dataSource.columns.archived_at
-      ) {
-        $messages.where(
-          sql`(${
-            $messages.alias
-          }.archived_at is null) = (${$messages.placeholder(
-            $parent.get("archived_at"),
-          )} is null)`,
-        );
-      } else {
-        $messages.where(sql`${$messages.alias}.archived_at is null`);
-      }
-    },
-    defaultValue: "INHERIT",
-  };
-}
-
-const MessageCondition = new GraphQLInputObjectType(
-  inputObjectSpec({
-    name: "MessageCondition",
-    fields: {
-      featured: {
-        type: GraphQLBoolean,
-        plan($condition: PgConditionPlan<typeof messageSource>, $value) {
-          if ($value.evalIs(null)) {
-            $condition.where(sql`${$condition.tableAlias}.featured is null`);
-          } else {
-            $condition.where(
-              sql`${$condition.tableAlias}.featured = ${$condition.placeholder(
-                $value,
-              )}::boolean`,
-            );
-          }
-        },
-      },
-    },
-  }),
-);
-
-const Forum: GraphQLObjectType<any, GraphileResolverContext> =
-  new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, ForumPlan>({
-      name: "Forum",
-      fields: () => ({
-        id: {
+  const User = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, UserPlan>({
+      name: "User",
+      fields: {
+        username: {
           type: GraphQLString,
-          plan($forum) {
-            return $forum.get("id");
+          plan($user) {
+            return $user.get("username");
           },
         },
-        name: {
+        gravatarUrl: {
           type: GraphQLString,
-          plan($forum) {
-            return $forum.get("name");
+          plan($user) {
+            return $user.get("gravatar_url");
           },
         },
-        self: {
-          type: Forum,
-          plan($forum) {
-            return $forum;
+      },
+    }),
+  );
+
+  const Message = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, MessagePlan>({
+      name: "Message",
+      fields: {
+        body: {
+          type: GraphQLString,
+          plan($message) {
+            return $message.get("body");
           },
         },
-        messagesList: {
+        author: {
+          type: User,
+          plan($message) {
+            return userSource.get({ id: $message.get("author_id") });
+          },
+        },
+      },
+    }),
+  );
+
+  const MessageEdge = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, MessagePlan>({
+      name: "MessageEdge",
+      fields: {
+        cursor: {
+          type: GraphQLString,
+          plan($node) {
+            return $node.cursor();
+          },
+        },
+        node: {
+          type: Message,
+          plan($node) {
+            return $node;
+          },
+        },
+      },
+    }),
+  );
+
+  const MessagesConnection = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, MessageConnectionPlan>({
+      name: "MessagesConnection",
+      fields: {
+        edges: {
+          type: new GraphQLList(MessageEdge),
+          plan($connection) {
+            return $connection.nodes();
+          },
+        },
+        nodes: {
           type: new GraphQLList(Message),
+          plan($connection) {
+            return $connection.nodes();
+          },
+        },
+      },
+    }),
+  );
+
+  const IncludeArchived = new GraphQLEnumType({
+    name: "IncludeArchived",
+    values: {
+      INHERIT: {
+        value: "INHERIT",
+      },
+      YES: {
+        value: "YES",
+      },
+      NO: {
+        value: "NO",
+      },
+      EXCLUSIVELY: {
+        value: "EXCLUSIVELY",
+      },
+    },
+  });
+
+  function makeIncludeArchivedField<TFieldPlan>(
+    getClassPlan: ($fieldPlan: TFieldPlan) => PgClassSelectPlan<any>,
+  ) {
+    return {
+      type: IncludeArchived,
+      plan(
+        $parent: ExecutablePlan<any>,
+        $field: TFieldPlan,
+        $value: InputStaticLeafPlan | __TrackedObjectPlan,
+      ) {
+        const $messages = getClassPlan($field);
+        if ($value.evalIs("YES")) {
+          // No restriction
+        } else if ($value.evalIs("EXCLUSIVELY")) {
+          $messages.where(sql`${$messages.alias}.archived_at is not null`);
+        } else if (
+          $value.evalIs("INHERIT") &&
+          // INHERIT only works if the parent has an archived_at column.
+          $parent instanceof PgClassSelectSinglePlan &&
+          !!$parent.dataSource.columns.archived_at
+        ) {
+          $messages.where(
+            sql`(${
+              $messages.alias
+            }.archived_at is null) = (${$messages.placeholder(
+              $parent.get("archived_at"),
+            )} is null)`,
+          );
+        } else {
+          $messages.where(sql`${$messages.alias}.archived_at is null`);
+        }
+      },
+      defaultValue: "INHERIT",
+    };
+  }
+
+  const MessageCondition = new GraphQLInputObjectType(
+    inputObjectSpec({
+      name: "MessageCondition",
+      fields: {
+        featured: {
+          type: GraphQLBoolean,
+          plan($condition: PgConditionPlan<typeof messageSource>, $value) {
+            if ($value.evalIs(null)) {
+              $condition.where(sql`${$condition.tableAlias}.featured is null`);
+            } else {
+              $condition.where(
+                sql`${
+                  $condition.tableAlias
+                }.featured = ${$condition.placeholder($value)}::boolean`,
+              );
+            }
+          },
+        },
+      },
+    }),
+  );
+
+  const Forum: GraphQLObjectType<any, GraphileResolverContext> =
+    new GraphQLObjectType(
+      objectSpec<GraphileResolverContext, ForumPlan>({
+        name: "Forum",
+        fields: () => ({
+          id: {
+            type: GraphQLString,
+            plan($forum) {
+              return $forum.get("id");
+            },
+          },
+          name: {
+            type: GraphQLString,
+            plan($forum) {
+              return $forum.get("name");
+            },
+          },
+          self: {
+            type: Forum,
+            plan($forum) {
+              return $forum;
+            },
+          },
+          messagesList: {
+            type: new GraphQLList(Message),
+            args: {
+              limit: {
+                type: GraphQLInt,
+                plan(
+                  _$forum,
+                  $messages: PgClassSelectPlan<typeof messageSource>,
+                  $value,
+                ) {
+                  $messages.setLimit($value.eval());
+                  return null;
+                },
+              },
+              condition: {
+                type: MessageCondition,
+                plan(
+                  _$forum,
+                  $messages: PgClassSelectPlan<typeof messageSource>,
+                ) {
+                  return $messages.wherePlan();
+                },
+              },
+              includeArchived: makeIncludeArchivedField<
+                PgClassSelectPlan<typeof messageSource>
+              >(($messages) => $messages),
+            },
+            plan($forum) {
+              const $forumId = $forum.get("id");
+              const $messages = messageSource.find({ forum_id: $forumId });
+              $messages.setTrusted();
+              // $messages.leftJoin(...);
+              // $messages.innerJoin(...);
+              // $messages.relation('fk_messages_author_id')
+              // $messages.where(...);
+              // $messages.orderBy(...);
+              return $messages;
+            },
+          },
+          messagesConnection: {
+            type: MessagesConnection,
+            args: {
+              limit: {
+                type: GraphQLInt,
+                plan(
+                  _$forum,
+                  $connection: PgConnectionPlan<typeof messageSource>,
+                  $value,
+                ) {
+                  const $messages = $connection.getSubplan();
+                  $messages.setLimit($value.eval());
+                  return null;
+                },
+              },
+              condition: {
+                type: MessageCondition,
+                plan(
+                  _$forum,
+                  $connection: PgConnectionPlan<typeof messageSource>,
+                ) {
+                  const $messages = $connection.getSubplan();
+                  return $messages.wherePlan();
+                },
+              },
+              includeArchived: makeIncludeArchivedField<
+                PgConnectionPlan<typeof messageSource>
+              >(($connection) => $connection.getSubplan()),
+            },
+            plan($forum) {
+              const $messages = messageSource.find({
+                forum_id: $forum.get("id"),
+              });
+              $messages.setTrusted();
+              if (options.deoptimize) {
+                $messages.setInliningForbidden();
+              }
+              // $messages.leftJoin(...);
+              // $messages.innerJoin(...);
+              // $messages.relation('fk_messages_author_id')
+              // $messages.where(...);
+              const $connectionPlan = new PgConnectionPlan($messages);
+              // $connectionPlan.orderBy... ?
+              // DEFINITELY NOT $messages.orderBy BECAUSE we don't want that applied to aggregates.
+              // DEFINITELY NOT $messages.limit BECAUSE we don't want those limits applied to aggregates or page info.
+              return $connectionPlan;
+            },
+          },
+        }),
+      }),
+    );
+
+  const Query = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, __ValuePlan<BaseGraphQLRootValue>>({
+      name: "Query",
+      fields: {
+        forums: {
+          type: new GraphQLList(Forum),
+          plan(_$root) {
+            const $forums = forumSource.find();
+            if (options.deoptimize) {
+              $forums.setInliningForbidden();
+            }
+            return $forums;
+          },
           args: {
             limit: {
               type: GraphQLInt,
               plan(
-                _$forum,
-                $messages: PgClassSelectPlan<typeof messageSource>,
+                _$root,
+                $forums: PgClassSelectPlan<typeof forumSource>,
                 $value,
               ) {
-                $messages.setLimit($value.eval());
+                $forums.setLimit($value.eval());
                 return null;
               },
             },
-            condition: {
-              type: MessageCondition,
-              plan(
-                _$forum,
-                $messages: PgClassSelectPlan<typeof messageSource>,
-              ) {
-                return $messages.wherePlan();
-              },
-            },
             includeArchived: makeIncludeArchivedField<
-              PgClassSelectPlan<typeof messageSource>
-            >(($messages) => $messages),
-          },
-          plan($forum) {
-            const $forumId = $forum.get("id");
-            const $messages = messageSource.find({ forum_id: $forumId });
-            $messages.setTrusted();
-            // $messages.leftJoin(...);
-            // $messages.innerJoin(...);
-            // $messages.relation('fk_messages_author_id')
-            // $messages.where(...);
-            // $messages.orderBy(...);
-            return $messages;
+              PgClassSelectPlan<typeof forumSource>
+            >(($forums) => $forums),
           },
         },
-        messagesConnection: {
+        allMessagesConnection: {
           type: MessagesConnection,
           args: {
             limit: {
               type: GraphQLInt,
               plan(
-                _$forum,
+                _$root,
                 $connection: PgConnectionPlan<typeof messageSource>,
                 $value,
               ) {
@@ -385,23 +469,16 @@ const Forum: GraphQLObjectType<any, GraphileResolverContext> =
             },
             condition: {
               type: MessageCondition,
-              plan(
-                _$forum,
-                $connection: PgConnectionPlan<typeof messageSource>,
-              ) {
-                const $messages = $connection.getSubplan();
-                return $messages.wherePlan();
-              },
             },
             includeArchived: makeIncludeArchivedField<
               PgConnectionPlan<typeof messageSource>
             >(($connection) => $connection.getSubplan()),
           },
-          plan($forum) {
-            const $messages = messageSource.find({
-              forum_id: $forum.get("id"),
-            });
-            $messages.setTrusted();
+          plan() {
+            const $messages = messageSource.find();
+            if (options.deoptimize) {
+              $messages.setInliningForbidden();
+            }
             // $messages.leftJoin(...);
             // $messages.innerJoin(...);
             // $messages.relation('fk_messages_author_id')
@@ -413,81 +490,18 @@ const Forum: GraphQLObjectType<any, GraphileResolverContext> =
             return $connectionPlan;
           },
         },
-      }),
+      },
     }),
   );
 
-const Query = new GraphQLObjectType(
-  objectSpec<GraphileResolverContext, __ValuePlan<BaseGraphQLRootValue>>({
-    name: "Query",
-    fields: {
-      forums: {
-        type: new GraphQLList(Forum),
-        plan(_$root) {
-          const $forums = forumSource.find();
-          return $forums;
-        },
-        args: {
-          limit: {
-            type: GraphQLInt,
-            plan(
-              _$root,
-              $forums: PgClassSelectPlan<typeof forumSource>,
-              $value,
-            ) {
-              $forums.setLimit($value.eval());
-              return null;
-            },
-          },
-          includeArchived: makeIncludeArchivedField<
-            PgClassSelectPlan<typeof forumSource>
-          >(($forums) => $forums),
-        },
-      },
-      allMessagesConnection: {
-        type: MessagesConnection,
-        args: {
-          limit: {
-            type: GraphQLInt,
-            plan(
-              _$root,
-              $connection: PgConnectionPlan<typeof messageSource>,
-              $value,
-            ) {
-              const $messages = $connection.getSubplan();
-              $messages.setLimit($value.eval());
-              return null;
-            },
-          },
-          condition: {
-            type: MessageCondition,
-          },
-          includeArchived: makeIncludeArchivedField<
-            PgConnectionPlan<typeof messageSource>
-          >(($connection) => $connection.getSubplan()),
-        },
-        plan() {
-          const $messages = messageSource.find();
-          // $messages.leftJoin(...);
-          // $messages.innerJoin(...);
-          // $messages.relation('fk_messages_author_id')
-          // $messages.where(...);
-          const $connectionPlan = new PgConnectionPlan($messages);
-          // $connectionPlan.orderBy... ?
-          // DEFINITELY NOT $messages.orderBy BECAUSE we don't want that applied to aggregates.
-          // DEFINITELY NOT $messages.limit BECAUSE we don't want those limits applied to aggregates or page info.
-          return $connectionPlan;
-        },
-      },
-    },
-  }),
-);
+  return crystalEnforce(
+    new GraphQLSchema({
+      query: Query,
+    }),
+  );
+}
 
-export const schema = crystalEnforce(
-  new GraphQLSchema({
-    query: Query,
-  }),
-);
+export const schema = makeExampleSchema();
 
 async function main() {
   const filePath = `${__dirname}/schema.graphql`;

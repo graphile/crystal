@@ -4,7 +4,9 @@ import type { PoolClient } from "pg";
 import { Pool } from "pg";
 
 import type { PgClient, PgClientQuery, WithPgClient } from "../src/datasource";
-import { schema } from "./exampleSchema";
+import { makeExampleSchema, schema as optimizedSchema } from "./exampleSchema";
+
+const deoptimizedSchema = makeExampleSchema({ deoptimize: true });
 
 let testPool: Pool | null = null;
 beforeAll(() => {
@@ -16,12 +18,7 @@ afterAll(() => {
   testPool = null;
 });
 
-let queries: PgClientQuery[] = [];
-beforeEach(() => {
-  queries = [];
-});
-
-function pg2pgclient(client: PoolClient): PgClient {
+function pg2pgclient(client: PoolClient, queries: PgClientQuery[]): PgClient {
   return {
     query<TData>(opts: PgClientQuery) {
       queries.push(opts);
@@ -46,15 +43,18 @@ function pg2pgclient(client: PoolClient): PgClient {
 export async function runTestQuery(
   source: string,
   variableValues?: { [key: string]: any },
+  options: { deoptimize?: boolean } = {},
 ): Promise<{
   data: { [key: string]: any };
   queries: PgClientQuery[];
 }> {
+  const queries: PgClientQuery[] = [];
+  const schema = options.deoptimize ? deoptimizedSchema : optimizedSchema;
   const withPgClient: WithPgClient = async (_pgSettings, callback) => {
     const client = await testPool.connect();
     try {
       // TODO: set pgSettings within a transaction
-      return callback(pg2pgclient(client));
+      return callback(pg2pgclient(client, queries));
     } finally {
       client.release();
     }
@@ -63,6 +63,7 @@ export async function runTestQuery(
     pgSettings: {},
     withPgClient,
   };
+
   const result = await graphql({
     schema,
     source,

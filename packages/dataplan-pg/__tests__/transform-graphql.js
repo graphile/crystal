@@ -27,24 +27,33 @@ exports.process = (src, path) => {
   }
   const document = documentLines.join("\n");
 
+  // NOTE: technically JSON.stringify is not safe for producing JavaScript
+  // code, this could be a security vulnerability in general. However, in this
+  // case all the data that we're converting to code is controlled by us, so
+  // we'd only be attacking ourselves, therefore we'll allow it rather than
+  // bringing in an extra dependency.
   return `\
-const { assertSnapshotsMatch, runTestQuery } = require("../_test");
+const { assertSnapshotsMatch, assertResultsMatch, runTestQuery } = require("../_test");
 
 const document = ${JSON.stringify(document)};
 const path = ${JSON.stringify(path)};
+const config = ${JSON.stringify(config)};
 
-let result;
+let result1;
+let result2;
 
 beforeAll(() => {
-  result = runTestQuery(document);
-  return result;
+  result1 = runTestQuery(document, config.variables, {});
+  result2 = runTestQuery(document, config.variables, { deoptimize: true });
+  // Wait for these promises to resolve, even if it's with errors.
+  return Promise.all([result1.catch(e => {}), result2.catch(e => {})]);
 });
 
 ${assertions
   .map((assertion) => {
     return `\
 it(${JSON.stringify(assertion.trim())}, async () => {
-  const { data, queries } = await result;
+  const { data, queries } = await result1;
   ${assertion}
 });`;
   })
@@ -53,7 +62,18 @@ it(${JSON.stringify(assertion.trim())}, async () => {
 it('matches snapshots', () => assertSnapshotsMatch({
   document,
   path,
-  result,
+  config,
+  result: result1,
+}));
+
+it('returns same data for optimized vs deoptimized', () => assertResultsMatch(result1, result2));
+
+it('matches snapshots with inlining disabled', () => assertSnapshotsMatch({
+  document,
+  path,
+  config,
+  result: result2,
+  ext: ".deopt",
 }));
 `;
 };
