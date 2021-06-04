@@ -111,10 +111,11 @@ export class PgClassSelectPlan<
   /**
    * Since this is effectively like a DataLoader it processes the data for many
    * different resolvers at once. This list of (hopefully scalar) plans is used
-   * to identify which records in the result set should be returned to which
-   * GraphQL resolvers.
+   * to represent queryValues the query will need such as identifiers for which
+   * records in the result set should be returned to which GraphQL resolvers,
+   * parameters for conditions or orders, etc.
    */
-  private identifiers: Array<{ dependencyIndex: number; type: SQL }>;
+  private queryValues: Array<{ dependencyIndex: number; type: SQL }>;
 
   /**
    * So we can clone.
@@ -122,18 +123,19 @@ export class PgClassSelectPlan<
   private identifierMatchesThunk: (alias: SQL) => SQL[];
 
   /**
-   * This is the list of SQL fragments in the result that are compared to the
-   * above `identifiers` to determine if there's a match or not. Typically this
-   * will be a list of columns (e.g. primary or foreign keys on the table).
+   * This is the list of SQL fragments in the result that are compared to some
+   * of the above `queryValues` to determine if there's a match or not. Typically
+   * this will be a list of columns (e.g. primary or foreign keys on the
+   * table).
    */
   private identifierMatches: SQL[];
 
   /**
-   * If this plan has identifiers, we must feed the identifiers into the values
-   * to feed into the SQL statement after compiling the query; we'll use this
+   * If this plan has queryValues, we must feed the queryValues into the placeholders to
+   * feed into the SQL statement after compiling the query; we'll use this
    * symbol as the placeholder to replace.
    */
-  private identifierSymbol: symbol;
+  private queryValuesSymbol: symbol;
 
   /**
    * Values used in this plan.
@@ -169,14 +171,22 @@ export class PgClassSelectPlan<
   private contextId: number;
 
   /**
-   * When finalized, we build the SQL query, values, and note where to feed in
-   * the identifiers. This saves repeating this work at execution time.
+   * When finalized, we build the SQL query, queryValues, and note where to feed in
+   * the relevant queryValues. This saves repeating this work at execution time.
    */
   private finalizeResults: {
+    // The SQL query text
     text: string;
+
+    // The values to feed into the query (or symbol placeholders)
     rawSqlValues: (SQLRawValue | symbol)[];
+
+    // The column on the result that indicates which group the result belongs to
     identifierIndex: number | null;
-    identifierIds: number[];
+
+    // The dependency index (i.e. index in the `values` object we'll receive
+    // during execution) in which each of the `queryValues` are identified.
+    queryValuesDependencyIndexes: number[];
   } | null = null;
 
   /**
@@ -210,16 +220,16 @@ export class PgClassSelectPlan<
     this.contextId = cloneFrom
       ? cloneFrom.contextId
       : this.addDependency(this.dataSource.context());
-    this.identifiers = cloneFrom
-      ? [...cloneFrom.identifiers] // References indexes cloned above
+    this.queryValues = cloneFrom
+      ? [...cloneFrom.queryValues] // References indexes cloned above
       : identifiers.map(({ plan, type }) => ({
           dependencyIndex: this.addDependency(plan),
           type,
         }));
     this.identifierMatchesThunk = identifierMatchesThunk;
 
-    this.identifierSymbol = cloneFrom
-      ? cloneFrom.identifierSymbol
+    this.queryValuesSymbol = cloneFrom
+      ? cloneFrom.queryValuesSymbol
       : Symbol(dataSource.name + "_identifier_values");
     this.symbol = cloneFrom ? cloneFrom.symbol : Symbol(dataSource.name);
     this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
@@ -241,9 +251,9 @@ export class PgClassSelectPlan<
     this.offset = cloneFrom ? cloneFrom.offset : null;
 
     if (!cloneFrom) {
-      if (this.identifiers.length !== this.identifierMatches.length) {
+      if (this.queryValues.length !== this.identifierMatches.length) {
         throw new Error(
-          `'identifiers' and 'identifierMatches' lengths must match (${this.identifiers.length} != ${this.identifierMatches.length})`,
+          `'queryValues' and 'identifierMatches' lengths must match (${this.queryValues.length} != ${this.identifierMatches.length})`,
         );
       }
     }
@@ -320,7 +330,7 @@ export class PgClassSelectPlan<
   }
 
   private hydrateIdentifiers(): Array<PgClassSelectIdentifierSpec> {
-    return this.identifiers.map(({ dependencyIndex, type }) => ({
+    return this.queryValues.map(({ dependencyIndex, type }) => ({
       plan: this.aether.plans[this.dependencies[dependencyIndex]],
       type,
     }));
@@ -448,17 +458,23 @@ export class PgClassSelectPlan<
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgClassSelectPlan before finalizing it.");
     }
-    const { text, rawSqlValues, identifierIndex, identifierIds } =
-      this.finalizeResults;
+    const {
+      text,
+      rawSqlValues,
+      identifierIndex,
+      queryValuesDependencyIndexes,
+    } = this.finalizeResults;
 
     const executionResult = await this.dataSource.execute(
       values.map((value) => {
         return {
           // The context is how we'd handle different connections with different claims
           context: value[this.contextId],
-          identifiers:
+          queryValues:
             identifierIndex != null
-              ? identifierIds.map((dependencyIndex) => value[dependencyIndex])
+              ? queryValuesDependencyIndexes.map(
+                  (dependencyIndex) => value[dependencyIndex],
+                )
               : EMPTY_ARRAY,
         };
       }),
@@ -466,7 +482,7 @@ export class PgClassSelectPlan<
         text,
         rawSqlValues,
         identifierIndex,
-        identifierSymbol: this.identifierSymbol,
+        queryValuesSymbol: this.queryValuesSymbol,
       },
     );
     debugExecute("%s; result: %c", this, executionResult);
@@ -648,7 +664,7 @@ export class PgClassSelectPlan<
     if (!this.isFinalized) {
       let query: SQL;
       let identifierIndex: number | null = null;
-      if (this.identifiers.length || this.placeholders.length) {
+      if (this.queryValues.length || this.placeholders.length) {
         const alias = sql.identifier(
           Symbol(this.dataSource.name + "_identifiers"),
         );
@@ -657,7 +673,7 @@ export class PgClassSelectPlan<
           // NOTE: we're adding to `this.identifiers` but NOT to
           // `this.identifierMatches`.
           const idx =
-            this.identifiers.push({
+            this.queryValues.push({
               dependencyIndex: placeholder.dependencyIndex,
               type: placeholder.type,
             }) - 1;
@@ -695,7 +711,7 @@ export class PgClassSelectPlan<
         query = sql`select ${wrapperAlias}.*
 from (${sql.indent(sql`\
 select ids.ordinality - 1 as idx, ${sql.join(
-          this.identifiers.map(({ type }, idx) => {
+          this.queryValues.map(({ type }, idx) => {
             return sql`(ids.value->>${sql.literal(
               idx,
             )})::${type} as ${sql.identifier(`id${idx}`)}`;
@@ -705,7 +721,7 @@ select ids.ordinality - 1 as idx, ${sql.join(
 from json_array_elements(${sql.value(
           // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
           // a value before executing the query.
-          this.identifierSymbol as any,
+          this.queryValuesSymbol as any,
         )}::json) with ordinality as ids`)}) as ${alias},
 lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
       } else {
@@ -715,7 +731,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
       const { text, values: rawSqlValues } = sql.compile(query);
 
       // The most trivial of optimisations...
-      const identifierIds = this.identifiers.map(
+      const queryValuesDependencyIndexes = this.queryValues.map(
         ({ dependencyIndex }) => dependencyIndex,
       );
 
@@ -723,7 +739,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
         text,
         rawSqlValues,
         identifierIndex,
-        identifierIds,
+        queryValuesDependencyIndexes,
       };
     }
 
@@ -992,7 +1008,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
         ) {
           const { sql: where } = this.buildWhere();
           const conditions = [
-            ...this.identifiers.map(({ dependencyIndex, type }, i) => {
+            ...this.queryValues.map(({ dependencyIndex, type }, i) => {
               const plan =
                 this.aether.plans[this.dependencies[dependencyIndex]];
               if (!(plan instanceof PgColumnSelectPlan)) {
@@ -1025,7 +1041,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
         } else if (parent instanceof PgClassSelectSinglePlan) {
           const parent2 =
             this.aether.plans[parent.dependencies[parent.itemPlanId]];
-          this.identifiers.forEach(({ dependencyIndex, type }, i) => {
+          this.queryValues.forEach(({ dependencyIndex, type }, i) => {
             const plan = this.aether.plans[this.dependencies[dependencyIndex]];
             if (!(plan instanceof PgColumnSelectPlan)) {
               throw new Error(

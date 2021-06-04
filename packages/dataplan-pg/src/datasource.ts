@@ -43,13 +43,13 @@ abstract class DataSource<
 
 export type PgDataSourceInput = {
   context: PgDataSourceContext;
-  identifiers: ReadonlyArray<any>;
+  queryValues: ReadonlyArray<any>;
 };
 export type PgDataSourceExecuteOptions = {
   text: string;
   rawSqlValues: Array<SQLRawValue | symbol>;
   identifierIndex?: number | null;
-  identifierSymbol?: symbol | null;
+  queryValuesSymbol?: symbol | null;
 };
 
 export type WithPgClient = <T>(
@@ -135,7 +135,7 @@ export class PgDataSource<
     Record<string, unknown> /* context */,
     LRU<
       string /* query and variables */,
-      Map<string /* identifiers (JSON) */, Deferred<any[]>>
+      Map<string /* queryValues (JSON) */, Deferred<any[]>>
     >
   > = new WeakMap();
 
@@ -238,7 +238,7 @@ export class PgDataSource<
   ): Promise<{
     values: CrystalValuesList<ReadonlyArray<PgDataSourceRow<TColumns>>>;
   }> {
-    const { text, rawSqlValues, identifierIndex, identifierSymbol } = common;
+    const { text, rawSqlValues, identifierIndex, queryValuesSymbol } = common;
 
     const valuesCount = values.length;
     const results: Deferred<Array<PgDataSourceRow<TColumns>>>[] = new Array(
@@ -249,7 +249,7 @@ export class PgDataSource<
     const groupMap = new Map<
       PgDataSourceContext,
       Array<{
-        identifiers: readonly any[];
+        queryValues: readonly any[];
         resultIndex: number;
       }>
     >();
@@ -258,14 +258,14 @@ export class PgDataSource<
       resultIndex < l;
       resultIndex++
     ) {
-      const { context, identifiers } = values[resultIndex];
+      const { context, queryValues } = values[resultIndex];
 
       let entry = groupMap.get(context);
       if (!entry) {
         entry = [];
         groupMap.set(context, entry);
       }
-      entry.push({ identifiers, resultIndex });
+      entry.push({ queryValues, resultIndex });
     }
 
     // For each context, run the relevant fetches
@@ -293,11 +293,11 @@ export class PgDataSource<
           const remainingDeferreds: Array<Deferred<any[]>> = [];
 
           try {
-            // Concurrent requests to the same identifiers should result in the same value/execution.
+            // Concurrent requests to the same queryValues should result in the same value/execution.
             const batchSize = batch.length;
             for (let batchIndex = 0; batchIndex < batchSize; batchIndex++) {
-              const { identifiers, resultIndex } = batch[batchIndex];
-              const identifiersJSON = JSON.stringify(identifiers); // TODO: Canonical? Manual for perf?
+              const { queryValues, resultIndex } = batch[batchIndex];
+              const identifiersJSON = JSON.stringify(queryValues); // TODO: Canonical? Manual for perf?
               const existingResult = scopedCache.get(identifiersJSON);
               if (existingResult) {
                 debugVerbose(
@@ -333,8 +333,8 @@ export class PgDataSource<
                 // before executing the query.
                 if (
                   identifierIndex != null &&
-                  identifierSymbol != null &&
-                  (v as any) === identifierSymbol
+                  queryValuesSymbol != null &&
+                  (v as any) === queryValuesSymbol
                 ) {
                   found = true;
                   // Manual JSON-ing
