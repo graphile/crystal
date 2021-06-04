@@ -57,12 +57,15 @@ interface PgClassSelectIdentifierSpec {
   plan: ExecutablePlan<any>;
   type: SQL;
 }
+
 /**
  * This represents selecting from a class-like entity (table, view, etc); i.e.
- * it represents `SELECT <columns>, <cursor?> FROM <table>`.  It's not
- * currently clear if it also includes `WHERE <conditions>`,
- * `ORDER BY <order>`, `LEFT JOIN <join>`, etc within its scope. `GROUP BY` is
- * definitely not in scope, because that would invalidate the identifiers.
+ * it represents `SELECT <columns>, <cursor?> FROM <table>`. You can also add
+ * `JOIN`, `WHERE`, `ORDER BY`, `LIMIT`, `OFFSET`. You cannot add `GROUP BY`
+ * because that would invalidate the identifiers; and as such you can't use
+ * `HAVING` or functions that implicitly turn the query into an aggregate. We
+ * don't allow `UNION`/`INTERSECT`/`EXCEPT`/`FOR UPDATE`/etc at this time,
+ * purely because it hasn't been sufficiently considered.
  *
  * I currently don't expect this to be used to select sets of scalars, but it
  * could be used for that purpose so long as we name the scalars (i.e. create
