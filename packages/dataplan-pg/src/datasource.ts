@@ -490,8 +490,12 @@ ${"👆".repeat(30)}
 }
 
 // A simplified version of formatSQLForDebugging from graphile-build-pg
-function formatSQLForDebugging(sql: string, error?: any) {
-  const pos = error.position ? parseInt(error.position, 10) : null;
+function formatSQLForDebugging(
+  sql: string,
+  error?: { position?: string | number; message?: string } | null,
+) {
+  const pos =
+    error?.position != null ? parseInt(String(error.position), 10) : null;
 
   let colourIndex = 0;
   const allowedColours = [
@@ -533,7 +537,7 @@ function formatSQLForDebugging(sql: string, error?: any) {
     output.push(colouredSql);
     if (pos != null && pos >= start && pos < end) {
       output.push(
-        chalk.red("-".repeat(pos - start - 1) + "^ " + error.message),
+        chalk.red("-".repeat(pos - start - 1) + "^ " + error?.message),
       );
     }
     start = end;
