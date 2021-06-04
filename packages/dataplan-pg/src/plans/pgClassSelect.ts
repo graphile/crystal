@@ -493,8 +493,10 @@ export class PgClassSelectPlan<
     return executionResult.values;
   }
 
-  private buildSelect(options: { asArray?: boolean } = {}) {
-    const { asArray = false } = options;
+  private buildSelect(
+    options: { asArray?: boolean; extraSelects?: readonly SQL[] } = {},
+  ) {
+    const { asArray = false, extraSelects = EMPTY_ARRAY } = options;
     const resolveSymbol = (symbol: symbol): SQL => {
       switch (symbol) {
         case $$CURSOR:
@@ -508,7 +510,11 @@ export class PgClassSelectPlan<
       }
     };
 
-    const fragmentsWithAliases = this.selects.map((fragOrSymbol, idx) => {
+    const selects = [...this.selects, ...extraSelects];
+    const l = this.selects.length;
+    const extraSelectIndexes = extraSelects.map((_, i) => i + l);
+
+    const fragmentsWithAliases = selects.map((fragOrSymbol, idx) => {
       const frag =
         typeof fragOrSymbol === "symbol"
           ? resolveSymbol(fragOrSymbol)
@@ -528,18 +534,18 @@ export class PgClassSelectPlan<
            */
           sql` array['' /* NOTHING?! */]::text[]`;
 
-      return sql`select${selection}`;
+      return { sql: sql`select${selection}`, extraSelectIndexes };
     } else {
       const selection = fragmentsWithAliases.length
         ? sql` ${sql.indent(sql.join(fragmentsWithAliases, ",\n"))}`
         : sql` /* NOTHING?! */`;
 
-      return sql`select${selection}`;
+      return { sql: sql`select${selection}`, extraSelectIndexes };
     }
   }
 
   private buildFrom() {
-    return sql`\nfrom ${this.dataSource.source} as ${this.alias}`;
+    return { sql: sql`\nfrom ${this.dataSource.source} as ${this.alias}` };
   }
 
   private buildJoin() {
@@ -568,14 +574,18 @@ export class PgClassSelectPlan<
       return sql`${join} ${j.source} as ${j.alias}${joinCondition}`;
     });
 
-    return joins.length ? sql`\n${sql.join(joins, "\n")}` : sql.blank;
+    return { sql: joins.length ? sql`\n${sql.join(joins, "\n")}` : sql.blank };
   }
 
-  private buildWhere() {
-    const conditions = this.conditions;
-    return conditions.length
-      ? sql`\nwhere (\n  ${sql.join(conditions, "\n) and (\n  ")}\n)`
-      : sql.blank;
+  private buildWhere(options: { extraWheres?: SQL[] } = {}) {
+    const conditions = options.extraWheres
+      ? [...this.conditions, ...options.extraWheres]
+      : this.conditions;
+    return {
+      sql: conditions.length
+        ? sql`\nwhere (\n  ${sql.join(conditions, "\n) and (\n  ")}\n)`
+        : sql.blank,
+    };
   }
 
   private buildOrderBy() {
@@ -593,66 +603,57 @@ export class PgClassSelectPlan<
         );
       }
     }
-    return orders.length
-      ? sql`\norder by ${sql.join(orders, ", ")}`
-      : sql.blank;
+    return {
+      sql: orders.length
+        ? sql`\norder by ${sql.join(orders, ", ")}`
+        : sql.blank,
+    };
   }
 
   private buildLimit() {
-    return this.limit != null
-      ? sql`\nlimit ${sql.literal(this.limit)}`
-      : sql.blank;
+    return {
+      sql:
+        this.limit != null
+          ? sql`\nlimit ${sql.literal(this.limit)}`
+          : sql.blank,
+    };
   }
 
   private buildOffset() {
-    return this.offset != null
-      ? sql`\noffset ${sql.literal(this.offset)}`
-      : sql.blank;
+    return {
+      sql:
+        this.offset != null
+          ? sql`\noffset ${sql.literal(this.offset)}`
+          : sql.blank,
+    };
   }
 
-  private addIdentifiers() {
-    if (this.identifiers.length && this.identifiersAlias) {
-      const alias = this.identifiersAlias;
-      this.joins.push({
-        type: "inner",
-        source: sql`(select ids.ordinality - 1 as idx, ${sql.join(
-          this.identifiers.map(({ type }, idx) => {
-            return sql`(ids.value->>${sql.literal(
-              idx,
-            )})::${type} as ${sql.identifier(`id${idx}`)}`;
-          }),
-          ", ",
-        )} from json_array_elements(${sql.value(
-          // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
-          // a value before executing the query.
-          this.identifierSymbol as any,
-        )}::json) with ordinality as ids)`,
-        alias,
-        conditions: this.identifierMatches.map(
-          (frag, idx) => sql`${frag} = ${alias}.${sql.identifier(`id${idx}`)}`,
-        ),
-      });
-      return this.select(sql`${alias}.idx`);
-    }
-    return null;
-  }
-
-  private buildQuery(options: { asArray?: boolean } = {}): SQL {
+  private buildQuery(
+    options: {
+      asArray?: boolean;
+      withIdentifiers?: boolean;
+      extraSelects?: SQL[];
+      extraWheres?: SQL[];
+    } = {},
+  ): {
+    query: SQL;
+    extraSelectIndexes: number[];
+  } {
     if (!this.isTrusted) {
       this.dataSource.applyAuthorizationChecksToPlan(this);
     }
 
-    const select = this.buildSelect(options);
-    const from = this.buildFrom();
-    const join = this.buildJoin();
-    const where = this.buildWhere();
-    const orderBy = this.buildOrderBy();
-    const limit = this.buildLimit();
-    const offset = this.buildOffset();
+    const { sql: select, extraSelectIndexes } = this.buildSelect(options);
+    const { sql: from } = this.buildFrom();
+    const { sql: join } = this.buildJoin();
+    const { sql: where } = this.buildWhere(options);
+    const { sql: orderBy } = this.buildOrderBy();
+    const { sql: limit } = this.buildLimit();
+    const { sql: offset } = this.buildOffset();
 
     const query = sql`${select}${from}${join}${where}${orderBy}${limit}${offset}`;
 
-    return query;
+    return { query, extraSelectIndexes };
   }
 
   public finalize(): void {
@@ -664,16 +665,49 @@ export class PgClassSelectPlan<
     this.locked = false;
 
     if (!this.isFinalized) {
+      let query: SQL;
       let identifierIndex: number | null = null;
+      if (this.identifiers.length && this.identifiersAlias) {
+        const alias = this.identifiersAlias;
+        const wrapperAlias = sql.identifier(Symbol("identifier_wrapper"));
+        const extraSelects: SQL[] = [];
+        const extraWheres: SQL[] = [];
 
-      // We only want to add the identifiers once
-      if (this.cloneIdentifierIndex !== undefined) {
-        identifierIndex = this.cloneIdentifierIndex;
+        extraSelects.push(sql`${alias}.idx`);
+
+        extraWheres.push(
+          ...this.identifierMatches.map(
+            (frag, idx) =>
+              sql`${frag} = ${alias}.${sql.identifier(`id${idx}`)}`,
+          ),
+        );
+        const { query: baseQuery, extraSelectIndexes } = this.buildQuery({
+          extraSelects,
+          extraWheres,
+        });
+        identifierIndex = extraSelectIndexes[0];
+
+        query = sql`select ${wrapperAlias}.*
+from (
+  select ids.ordinality - 1 as idx, ${sql.join(
+    this.identifiers.map(({ type }, idx) => {
+      return sql`(ids.value->>${sql.literal(idx)})::${type} as ${sql.identifier(
+        `id${idx}`,
+      )}`;
+    }),
+    ", ",
+  )}
+  from json_array_elements(${sql.value(
+    // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
+    // a value before executing the query.
+    this.identifierSymbol as any,
+  )}::json) with ordinality as ids
+) as ${alias},
+lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
       } else {
-        identifierIndex = this.addIdentifiers();
+        ({ query } = this.buildQuery());
       }
 
-      const query = this.buildQuery();
       const { text, values: rawSqlValues } = sql.compile(query);
       const placeholderSymbols = this.placeholders.map(({ symbol }) => symbol);
       const placeholderIndexes = this.placeholders.map(
@@ -947,7 +981,7 @@ export class PgClassSelectPlan<
           this.isUnique
           /* TODO: && !this.groupBy && !this.having && !this.limit && !this.order && !this.offset && ... */
         ) {
-          const where = this.buildWhere();
+          const { sql: where } = this.buildWhere();
           const conditions = [
             ...this.identifiers.map((id, i) => {
               const plan = id.plan;
@@ -986,7 +1020,7 @@ export class PgClassSelectPlan<
             );
           });
           this.mergePlaceholdersInto(table);
-          const query = this.buildQuery({ asArray: true });
+          const { query } = this.buildQuery({ asArray: true });
           const selfIndex = table.select(sql`array(${sql.indent(query)})`);
           debugPlanVerbose(
             "Optimising %c (via %c and %c)",
