@@ -687,6 +687,14 @@ export class PgClassSelectPlan<
         });
         identifierIndex = extraSelectIndexes[0];
 
+        // TODO: if the query does not have a limit/offset; should we use an
+        // `inner join` in a flattened query instead of a wrapped query with
+        // `lateral`?
+
+        /*
+         * This wrapper query is necessary so that queries that have a
+         * limit/offset get the limit/offset applied _per identifier group_.
+         */
         query = sql`select ${wrapperAlias}.*
 from (${sql.indent(sql`\
 select ids.ordinality - 1 as idx, ${sql.join(
