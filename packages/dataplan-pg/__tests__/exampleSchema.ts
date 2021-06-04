@@ -185,7 +185,12 @@ export function makeExampleSchema(options: { deoptimize?: boolean } = {}) {
         author: {
           type: User,
           plan($message) {
-            return userSource.get({ id: $message.get("author_id") });
+            const $user = userSource.get({ id: $message.get("author_id") });
+            if (options.deoptimize) {
+              $user.getClassPlan().setInliningForbidden();
+            }
+
+            return $user;
           },
         },
       },
@@ -361,6 +366,9 @@ export function makeExampleSchema(options: { deoptimize?: boolean } = {}) {
             plan($forum) {
               const $forumId = $forum.get("id");
               const $messages = messageSource.find({ forum_id: $forumId });
+              if (options.deoptimize) {
+                $messages.setInliningForbidden();
+              }
               $messages.setTrusted();
               // $messages.leftJoin(...);
               // $messages.innerJoin(...);
