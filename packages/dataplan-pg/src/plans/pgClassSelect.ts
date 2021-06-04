@@ -46,7 +46,7 @@ type PgClassSelectPlanJoin =
     };
 
 type PgClassSelectPlaceholder = {
-  planIndex: number;
+  dependencyIndex: number;
   // This is a "ref" so that it can be merged into other objects whilst still
   // allowing `placeholder.sqlRef.sql = ...` to work.
   sqlRef: { sql: SQL };
@@ -111,7 +111,7 @@ export class PgClassSelectPlan<
    * to identify which records in the result set should be returned to which
    * GraphQL resolvers.
    */
-  private identifiers: Array<{ depId: number; type: SQL }>;
+  private identifiers: Array<{ dependencyIndex: number; type: SQL }>;
 
   /**
    * So we can clone.
@@ -210,7 +210,7 @@ export class PgClassSelectPlan<
     this.identifiers = cloneFrom
       ? [...cloneFrom.identifiers] // References indexes cloned above
       : identifiers.map(({ plan, type }) => ({
-          depId: this.addDependency(plan),
+          dependencyIndex: this.addDependency(plan),
           type,
         }));
     this.identifierMatchesThunk = identifierMatchesThunk;
@@ -317,8 +317,8 @@ export class PgClassSelectPlan<
   }
 
   private hydrateIdentifiers(): Array<PgClassSelectIdentifierSpec> {
-    return this.identifiers.map(({ depId, type }) => ({
-      plan: this.aether.plans[this.dependencies[depId]],
+    return this.identifiers.map(({ dependencyIndex, type }) => ({
+      plan: this.aether.plans[this.dependencies[dependencyIndex]],
       type,
     }));
   }
@@ -327,10 +327,10 @@ export class PgClassSelectPlan<
     if (this.locked) {
       throw new Error(`${this}: cannot add placeholders once plan is locked`);
     }
-    const planIndex = this.addDependency($plan);
+    const dependencyIndex = this.addDependency($plan);
     const sqlRef = { sql: sql`(1/0) /* ERROR! Unhandled placeholder! */` };
     const p: PgClassSelectPlaceholder = {
-      planIndex,
+      dependencyIndex,
       type,
       sqlRef,
     };
@@ -455,7 +455,7 @@ export class PgClassSelectPlan<
           context: value[this.contextId],
           identifiers:
             identifierIndex != null
-              ? identifierIds.map((depId) => value[depId])
+              ? identifierIds.map((dependencyIndex) => value[dependencyIndex])
               : EMPTY_ARRAY,
         };
       }),
@@ -655,7 +655,7 @@ export class PgClassSelectPlan<
           // `this.identifierMatches`.
           const idx =
             this.identifiers.push({
-              depId: placeholder.planIndex,
+              dependencyIndex: placeholder.dependencyIndex,
               type: placeholder.type,
             }) - 1;
           placeholder.sqlRef.sql = sql`${alias}.${sql.identifier(`id${idx}`)}`;
@@ -712,7 +712,9 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
       const { text, values: rawSqlValues } = sql.compile(query);
 
       // The most trivial of optimisations...
-      const identifierIds = this.identifiers.map(({ depId }) => depId);
+      const identifierIds = this.identifiers.map(
+        ({ dependencyIndex }) => dependencyIndex,
+      );
 
       this.finalizeResults = {
         text,
@@ -782,7 +784,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
       // Check PLACEHOLDERS match
       if (
         !arraysMatch(this.placeholders, p.placeholders, (a, b) => {
-          return a.type === b.type && a.planIndex === b.planIndex;
+          return a.type === b.type && a.dependencyIndex === b.dependencyIndex;
         })
       ) {
         return false;
@@ -858,12 +860,12 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
 
   mergePlaceholdersInto(otherPlan: PgClassSelectPlan<TDataSource>): void {
     for (const placeholder of this.placeholders) {
-      const { planIndex, sqlRef, type } = placeholder;
-      const dep = this.aether.plans[this.dependencies[planIndex]];
+      const { dependencyIndex, sqlRef, type } = placeholder;
+      const dep = this.aether.plans[this.dependencies[dependencyIndex]];
       if (otherPlan.parentPathIdentity.startsWith(dep.parentPathIdentity)) {
         const newPlanIndex = otherPlan.addDependency(dep);
         otherPlan.placeholders.push({
-          planIndex: newPlanIndex,
+          dependencyIndex: newPlanIndex,
           type,
           sqlRef,
         });
@@ -896,13 +898,17 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
       // Inline ourself into our parent if we can.
       let t: PgClassSelectPlan<any> | null | undefined = undefined;
       let p: ExecutablePlan<any> | undefined = undefined;
-      for (let depId = 0, l = this.dependencies.length; depId < l; depId++) {
-        if (depId === this.contextId) {
+      for (
+        let dependencyIndex = 0, l = this.dependencies.length;
+        dependencyIndex < l;
+        dependencyIndex++
+      ) {
+        if (dependencyIndex === this.contextId) {
           // We check myContext vs tsContext below; so lets assume it's fine
           // for now.
           continue;
         }
-        const planId = this.dependencies[depId];
+        const planId = this.dependencies[dependencyIndex];
         const dep = this.aether.plans[planId];
         if (dep instanceof __TrackedObjectPlan) {
           // This has come from a variable, context or rootValue, therefore
@@ -983,11 +989,12 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
         ) {
           const { sql: where } = this.buildWhere();
           const conditions = [
-            ...this.identifiers.map(({ depId, type }, i) => {
-              const plan = this.aether.plans[this.dependencies[depId]];
+            ...this.identifiers.map(({ dependencyIndex, type }, i) => {
+              const plan =
+                this.aether.plans[this.dependencies[dependencyIndex]];
               if (!(plan instanceof PgColumnSelectPlan)) {
                 throw new Error(
-                  `Expected ${plan} (${i}th dependency of ${this}; plan with id ${depId}) to be a PgColumnSelectPlan`,
+                  `Expected ${plan} (${i}th dependency of ${this}; plan with id ${dependencyIndex}) to be a PgColumnSelectPlan`,
                 );
               }
               return sql`${plan.toSQL()}::${type} = ${
@@ -1015,11 +1022,11 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
         } else if (parent instanceof PgClassSelectSinglePlan) {
           const parent2 =
             this.aether.plans[parent.dependencies[parent.itemPlanId]];
-          this.identifiers.forEach(({ depId, type }, i) => {
-            const plan = this.aether.plans[this.dependencies[depId]];
+          this.identifiers.forEach(({ dependencyIndex, type }, i) => {
+            const plan = this.aether.plans[this.dependencies[dependencyIndex]];
             if (!(plan instanceof PgColumnSelectPlan)) {
               throw new Error(
-                `Expected ${plan} (${i}th dependency of ${this}; plan with id ${depId}) to be a PgColumnSelectPlan`,
+                `Expected ${plan} (${i}th dependency of ${this}; plan with id ${dependencyIndex}) to be a PgColumnSelectPlan`,
               );
             }
             return this.where(
