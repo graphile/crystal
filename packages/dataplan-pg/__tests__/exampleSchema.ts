@@ -96,10 +96,27 @@ export function makeExampleSchema(
   // type ForumsPlan = PgClassSelectPlan<typeof forumSource>;
   type ForumPlan = PgClassSelectSinglePlan<typeof forumSource>;
 
+  const pg2gqlForType = (type: string) => {
+    switch (type) {
+      case "boolean": {
+        return (value: any) => value === "true";
+      }
+      case "timestamptz":
+      case "timestamp": {
+        return (value: any) => new Date(Date.parse(value));
+      }
+      default: {
+        return (value: any) => value;
+      }
+    }
+  };
+
   const col = <
     TOptions extends {
       notNull?: boolean;
       type: keyof GraphQLTypeFromPostgresType;
+      pg2gql?: PgDataSourceColumn<any>["pg2gql"];
+      gql2pg?: PgDataSourceColumn<any>["gql2pg"];
     },
   >(
     options: TOptions,
@@ -109,11 +126,12 @@ export function makeExampleSchema(
       GraphQLTypeFromPostgresType[TOptions["type"]]
     >
   > => {
-    const { notNull, type } = options;
+    const { notNull, type, gql2pg, pg2gql } = options;
     return {
-      gql2pg: (value) =>
-        sql`${sql.value(value as any)}::${sql.identifier(type)}`,
-      pg2gql: (value) => value as any,
+      gql2pg:
+        gql2pg ||
+        ((value) => sql`${sql.value(value as any)}::${sql.identifier(type)}`),
+      pg2gql: pg2gql || pg2gqlForType(type),
       notNull: !!notNull,
       type: sql.identifier(type),
     };

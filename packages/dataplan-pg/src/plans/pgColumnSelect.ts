@@ -31,6 +31,12 @@ export class PgColumnSelectPlan<
 
   public readonly dataSource: TDataSource;
 
+  /**
+   * Converts the `::text` from PostgreSQL to whatever the relevant value that
+   * GraphQL and other plans would expect.
+   */
+  private pg2gql: (pgValue: any) => any;
+
   constructor(
     table: PgClassSelectSinglePlan<TDataSource>,
     private attr: TColumn,
@@ -39,6 +45,7 @@ export class PgColumnSelectPlan<
     super();
     this.dataSource = table.dataSource;
     this.tableId = this.addDependency(table);
+    this.pg2gql = this.dataSource.columns[this.attr].pg2gql;
     debugPlanVerbose(`%s.%s constructor`, this, this.attr);
   }
 
@@ -67,9 +74,16 @@ export class PgColumnSelectPlan<
   public execute(
     values: CrystalValuesList<any[]>,
   ): CrystalResultsList<TDataSource["TRow"][TColumn]> {
-    const { attrIndex, tableId } = this;
+    const { attrIndex, tableId, pg2gql } = this;
     if (attrIndex != null) {
-      const result = values.map((v) => v[tableId][attrIndex]);
+      const result = values.map((v) => {
+        const rawValue = v[tableId][attrIndex];
+        if (rawValue == null) {
+          return null;
+        } else {
+          return pg2gql(rawValue);
+        }
+      });
       debugExecuteVerbose("%s values: %c, result: %c", this, values, result);
       return result;
     } else {
