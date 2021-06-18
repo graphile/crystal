@@ -344,17 +344,7 @@ export function makeExampleSchema(
     }
 
     apply() {
-      if (this.conditions.length > 0) {
-        // Optimise the output syntax (reduce parenthesis)
-        const conditions =
-          this.conditions.length === 1
-            ? this.conditions[0]
-            : sql`(${sql.join(
-                this.conditions.map((c) => sql.indent(c)),
-                ") and (",
-              )})`;
-        this.$parent.where(conditions);
-      }
+      this.conditions.forEach((condition) => this.$parent.where(condition));
     }
   }
 
@@ -377,19 +367,7 @@ export function makeExampleSchema(
     }
 
     apply() {
-      if (this.conditions.length === 1) {
-        // Optimise output SQL
-        this.$parent.where(this.conditions[0]);
-      } else if (this.conditions.length > 1) {
-        this.$parent.where(
-          sql.indent(
-            sql`(${sql.join(
-              this.conditions.map((c) => sql.indent(c)),
-              ") and (",
-            )})`,
-          ),
-        );
-      }
+      this.conditions.forEach((condition) => this.$parent.where(condition));
     }
   }
 

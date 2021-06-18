@@ -31,15 +31,6 @@ export class PgConditionPlan<
   }
 
   apply(): void {
-    if (this.conditions.length === 1) {
-      this.$parent.where(this.conditions[0]);
-    } else if (this.conditions.length > 1) {
-      this.$parent.where(
-        sql`(${sql.join(
-          this.conditions.map((c) => sql.indent(c)),
-          ") and (",
-        )})`,
-      );
-    }
+    this.conditions.forEach((condition) => this.$parent.where(condition));
   }
 }
