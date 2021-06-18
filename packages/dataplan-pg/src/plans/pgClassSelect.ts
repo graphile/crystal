@@ -534,7 +534,7 @@ export class PgClassSelectPlan<
       return { sql: sql`select${selection}`, extraSelectIndexes };
     } else {
       const selection = fragmentsWithAliases.length
-        ? sql` ${sql.indent(sql.join(fragmentsWithAliases, ",\n"))}`
+        ? sql`\n${sql.indent(sql.join(fragmentsWithAliases, ",\n"))}`
         : sql` /* NOTHING?! */`;
 
       return { sql: sql`select${selection}`, extraSelectIndexes };
