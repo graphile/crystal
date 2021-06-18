@@ -37,7 +37,7 @@ export class PgConditionPlan<
       this.$parent.where(
         sql`(${sql.join(
           this.conditions.map((c) => sql.indent(c)),
-          ")\nand (",
+          ") and (",
         )})`,
       );
     }
