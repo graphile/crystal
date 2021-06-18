@@ -718,14 +718,16 @@ export class PgClassSelectPlan<
          */
         query = sql`select ${wrapperAlias}.*
 from (${sql.indent(sql`\
-select ids.ordinality - 1 as idx, ${sql.join(
-          this.queryValues.map(({ type }, idx) => {
-            return sql`(ids.value->>${sql.literal(
-              idx,
-            )})::${type} as ${sql.identifier(`id${idx}`)}`;
-          }),
-          ", ",
-        )}
+select\n${sql.indent(sql`\
+ids.ordinality - 1 as idx,
+${sql.join(
+  this.queryValues.map(({ type }, idx) => {
+    return sql`(ids.value->>${sql.literal(idx)})::${type} as ${sql.identifier(
+      `id${idx}`,
+    )}`;
+  }),
+  ",\n",
+)}`)}
 from json_array_elements(${sql.value(
           // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
           // a value before executing the query.
