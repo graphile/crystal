@@ -40,6 +40,11 @@ insert into app_public.forums (id, name, archived_at) values
   ('f1700000-0000-0000-0000-000000000f17', 'Postgres', null);
 
 insert into app_public.messages (forum_id, author_id, body, featured, archived_at)
-select forums.id, users.id, forums.name || ' = awesome -- ' || users.username, (forums.name = 'Postgres' and users.username = 'Bob'), (case when forums.name = 'Dogs' then now() else null end)
+  select
+    forums.id as forum_id,
+    users.id as author_id,
+    forums.name || ' = awesome -- ' || users.username as body,
+    (forums.name = 'Postgres' and users.username = 'Bob') as featured,
+    (case when forums.name = 'Dogs' then now() else null end) as archived_at
   from app_public.users, app_public.forums
   order by forums.id, users.id;

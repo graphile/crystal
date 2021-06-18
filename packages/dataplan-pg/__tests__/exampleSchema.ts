@@ -314,12 +314,13 @@ export function makeExampleSchema(
           type: GraphQLBoolean,
           plan($condition: PgConditionPlan<any>, $value) {
             if ($value.evalIs(null)) {
-              $condition.where(sql`${$condition.tableAlias}.featured is null`);
+              $condition.where(sql`${$condition.alias}.featured is null`);
             } else {
               $condition.where(
-                sql`${
-                  $condition.tableAlias
-                }.featured = ${$condition.placeholder($value, sql`boolean`)}`,
+                sql`${$condition.alias}.featured = ${$condition.placeholder(
+                  $value,
+                  sql`boolean`,
+                )}`,
               );
             }
           },
@@ -331,7 +332,7 @@ export function makeExampleSchema(
   class ClassFilterPlan extends ModifierPlan<PgConditionPlan<any>> {
     private conditions: SQL[] = [];
 
-    constructor(parent: PgConditionPlan<any>, public readonly tableAlias: SQL) {
+    constructor(parent: PgConditionPlan<any>, public readonly alias: SQL) {
       super(parent);
     }
 
@@ -421,7 +422,7 @@ export function makeExampleSchema(
             } else {
               return new BooleanFilterPlan(
                 $messageFilter,
-                sql`${$messageFilter.tableAlias}.featured`,
+                sql`${$messageFilter.alias}.featured`,
               );
             }
           },
@@ -438,10 +439,10 @@ export function makeExampleSchema(
           type: GraphQLString,
           plan($condition: PgConditionPlan<any>, $value) {
             if ($value.evalIs(null)) {
-              $condition.where(sql`${$condition.tableAlias}.name is null`);
+              $condition.where(sql`${$condition.alias}.name is null`);
             } else {
               $condition.where(
-                sql`${$condition.tableAlias}.name = ${$condition.placeholder(
+                sql`${$condition.alias}.name = ${$condition.placeholder(
                   $value,
                   sql`text`,
                 )}`,
@@ -486,12 +487,29 @@ export function makeExampleSchema(
     constructor(
       $parentFilterPlan: ClassFilterPlan,
       public childDataSource: TChildDataSource,
+      private myAttrs: string[],
+      private theirAttrs: string[],
     ) {
       super($parentFilterPlan);
+      if (myAttrs.length !== theirAttrs.length) {
+        throw new Error(
+          "Expected the local and remote attributes to have the same number of entries.",
+        );
+      }
     }
 
     some() {
       const $table = new TempTablePlan(this.$parent, this.childDataSource);
+
+      // Implement the relationship
+      this.myAttrs.forEach((attr, i) => {
+        $table.where(
+          sql`${this.$parent.alias}.${sql.identifier(attr)} = ${
+            $table.alias
+          }.${sql.identifier(this.theirAttrs[i])}`,
+        );
+      });
+
       const $filter = new ClassFilterPlan($table.wherePlan(), $table.alias);
       this.$some = $table;
       return $filter;
@@ -543,7 +561,12 @@ export function makeExampleSchema(
           type: ForumToManyMessageFilter,
           plan($condition: ClassFilterPlan, $value) {
             if (!$value.evalIs(null)) {
-              return new ManyFilterPlan($condition, messageSource);
+              return new ManyFilterPlan(
+                $condition,
+                messageSource,
+                ["id"],
+                ["forum_id"],
+              );
             }
           },
         },

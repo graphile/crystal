@@ -13,12 +13,11 @@ export class PgConditionPlan<
 > extends ModifierPlan<TParentPlan> {
   private conditions: SQL[] = [];
 
-  // TODO: rename this?
-  public readonly tableAlias: SQL;
+  public readonly alias: SQL;
 
   constructor($parent: TParentPlan) {
     super($parent);
-    this.tableAlias = $parent.alias;
+    this.alias = $parent.alias;
   }
 
   where(condition: SQL): void {
