@@ -720,8 +720,6 @@ export class Aether<
         // Note: the unwrapped type of inputFieldType must be an input object.
         // TODO: assert this?
         this.planInput(inputFieldType, trackedValuePlan, inputFieldPlan);
-
-        inputFieldPlan.apply();
       }
     } else {
       if (isDev) {

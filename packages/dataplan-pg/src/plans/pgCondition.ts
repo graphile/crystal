@@ -1,7 +1,6 @@
 import type { BasePlan, ExecutablePlan } from "graphile-crystal";
 import { ModifierPlan } from "graphile-crystal";
 import type { SQL } from "pg-sql2";
-import sql from "pg-sql2";
 
 export interface PgConditionCapableParentPlan extends BasePlan {
   alias: SQL;
