@@ -1,8 +1,14 @@
 type Query {
-  forums(limit: Int, includeArchived: IncludeArchived = INHERIT): [Forum]
+  forums(
+    limit: Int
+    includeArchived: IncludeArchived = INHERIT
+    condition: ForumCondition
+    filter: ForumFilter
+  ): [Forum]
   allMessagesConnection(
     limit: Int
     condition: MessageCondition
+    filter: MessageFilter
     includeArchived: IncludeArchived = INHERIT
   ): MessagesConnection
 }
@@ -14,16 +20,19 @@ type Forum {
   messagesList(
     limit: Int
     condition: MessageCondition
+    filter: MessageFilter
     includeArchived: IncludeArchived = INHERIT
   ): [Message]
   messagesConnection(
     limit: Int
     condition: MessageCondition
+    filter: MessageFilter
     includeArchived: IncludeArchived = INHERIT
   ): MessagesConnection
 }
 
 type Message {
+  featured: Boolean
   body: String
   author: User
 }
@@ -35,6 +44,15 @@ type User {
 
 input MessageCondition {
   featured: Boolean
+}
+
+input MessageFilter {
+  featured: BooleanFilter
+}
+
+input BooleanFilter {
+  equalTo: Boolean
+  notEqualTo: Boolean
 }
 
 enum IncludeArchived {
@@ -52,4 +70,16 @@ type MessagesConnection {
 type MessageEdge {
   cursor: String
   node: Message
+}
+
+input ForumCondition {
+  name: String
+}
+
+input ForumFilter {
+  messages: ForumToManyMessageFilter
+}
+
+input ForumToManyMessageFilter {
+  some: MessageFilter
 }

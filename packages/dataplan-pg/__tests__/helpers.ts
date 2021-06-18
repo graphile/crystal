@@ -74,7 +74,7 @@ export async function runTestQuery(
 
   const { data, errors } = result;
   if (errors) {
-    console.error(errors[0].originalError);
+    console.error(errors[0].originalError || errors[0]);
   }
   expect(errors).toBeFalsy();
   expect(data).toBeTruthy();

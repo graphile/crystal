@@ -129,6 +129,13 @@ export class Aether<
   public maxGroupId = 0;
   public groupId = this.maxGroupId;
   public readonly plans: ExecutablePlan[] = [];
+
+  /**
+   * This value is ethemeral, it only contains values whilst a specific field
+   * is being planned.
+   */
+  public readonly modifierPlans: ModifierPlan<any>[] = [];
+
   public readonly batchByPathIdentity: {
     [pathIdentity: string]: Batch | undefined;
   } = Object.create(null);
@@ -573,6 +580,12 @@ export class Aether<
     parentPlan: ExecutablePlan,
     fieldPlan: ExecutablePlan,
   ): void {
+    assert.strictEqual(
+      this.modifierPlans.length,
+      0,
+      "Expected Aether.modifierPlans to be empty",
+    );
+
     // Arguments are applied in the order that they are specified in the
     // schema, NOT the order that they are specified in the request.
     for (let i = 0, l = fieldSpec.args.length; i < l; i++) {
@@ -595,12 +608,19 @@ export class Aether<
             );
 
             this.planInput(argSpec.type, trackedArgumentValuePlan, argPlan);
-
-            // Now apply the plan
-            argPlan.apply();
           }
         }
       }
+    }
+
+    // Remove the modifier plans from aether and sort them ready for application.
+    const plansToApply = this.modifierPlans
+      .splice(0, this.modifierPlans.length)
+      .reverse();
+
+    // Apply the plans.
+    for (let i = 0, l = plansToApply.length; i < l; i++) {
+      plansToApply[i].apply();
     }
   }
 

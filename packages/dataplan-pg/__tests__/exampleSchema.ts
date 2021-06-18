@@ -7,6 +7,8 @@ import type {
   ExecutablePlan,
   InputStaticLeafPlan,
 } from "graphile-crystal";
+import { BasePlan } from "graphile-crystal";
+import { ModifierPlan } from "graphile-crystal";
 import {
   context,
   crystalEnforce,
@@ -25,6 +27,7 @@ import {
   GraphQLString,
   printSchema,
 } from "graphql";
+import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 import prettier from "prettier";
 
@@ -39,20 +42,13 @@ import type {
   PgDataSourceContext,
   WithPgClient,
 } from "../src/datasource";
-import type { PgConditionPlan } from "../src/plans/pgCondition";
+import type { PgConditionCapableParentPlan } from "../src/plans/pgCondition";
+import { PgConditionPlan } from "../src/plans/pgCondition";
 
 // These are what the generics extend from
 
 // This is the actual runtime context; we should not use a global for this.
 export interface GraphileResolverContext extends BaseGraphQLContext {}
-
-// type MessagesPlan = PgClassSelectPlan<typeof messageSource>;
-type MessageConnectionPlan = PgConnectionPlan<typeof messageSource>;
-type MessagePlan = PgClassSelectSinglePlan<typeof messageSource>;
-// type UsersPlan = PgClassSelectPlan<typeof userSource>;
-type UserPlan = PgClassSelectSinglePlan<typeof userSource>;
-// type ForumsPlan = PgClassSelectPlan<typeof forumSource>;
-type ForumPlan = PgClassSelectSinglePlan<typeof forumSource>;
 
 /*+--------------------------------------------------------------------------+
   |                               DATA SOURCES                               |
@@ -83,12 +79,23 @@ export interface GraphQLTypeFromPostgresType {
   timestamptz: string;
   int: number;
   float: number;
+  boolean: boolean;
 }
 
 type NullableUnless<TCondition extends boolean | undefined, TType> =
   TCondition extends true ? TType : TType | null | undefined;
 
-export function makeExampleSchema(options: { deoptimize?: boolean } = {}) {
+export function makeExampleSchema(
+  options: { deoptimize?: boolean } = {},
+): GraphQLSchema {
+  // type MessagesPlan = PgClassSelectPlan<typeof messageSource>;
+  type MessageConnectionPlan = PgConnectionPlan<typeof messageSource>;
+  type MessagePlan = PgClassSelectSinglePlan<typeof messageSource>;
+  // type UsersPlan = PgClassSelectPlan<typeof userSource>;
+  type UserPlan = PgClassSelectSinglePlan<typeof userSource>;
+  // type ForumsPlan = PgClassSelectPlan<typeof forumSource>;
+  type ForumPlan = PgClassSelectSinglePlan<typeof forumSource>;
+
   const col = <
     TOptions extends {
       notNull?: boolean;
@@ -123,6 +130,7 @@ export function makeExampleSchema(options: { deoptimize?: boolean } = {}) {
       forum_id: col({ notNull: true, type: `uuid` }),
       created_at: col({ notNull: true, type: `timestamptz` }),
       archived_at: col({ type: "timestamptz" }),
+      featured: col({ type: "boolean" }),
     },
     uniques: [["id"]],
   });
@@ -176,6 +184,12 @@ export function makeExampleSchema(options: { deoptimize?: boolean } = {}) {
     objectSpec<GraphileResolverContext, MessagePlan>({
       name: "Message",
       fields: {
+        featured: {
+          type: GraphQLBoolean,
+          plan($message) {
+            return $message.get("featured");
+          },
+        },
         body: {
           type: GraphQLString,
           plan($message) {
@@ -298,7 +312,7 @@ export function makeExampleSchema(options: { deoptimize?: boolean } = {}) {
       fields: {
         featured: {
           type: GraphQLBoolean,
-          plan($condition: PgConditionPlan<typeof messageSource>, $value) {
+          plan($condition: PgConditionPlan<any>, $value) {
             if ($value.evalIs(null)) {
               $condition.where(sql`${$condition.tableAlias}.featured is null`);
             } else {
@@ -307,6 +321,251 @@ export function makeExampleSchema(options: { deoptimize?: boolean } = {}) {
                   $condition.tableAlias
                 }.featured = ${$condition.placeholder($value, sql`boolean`)}`,
               );
+            }
+          },
+        },
+      },
+    }),
+  );
+
+  class ClassFilterPlan extends ModifierPlan<PgConditionPlan<any>> {
+    private conditions: SQL[] = [];
+
+    constructor(parent: PgConditionPlan<any>, public readonly tableAlias: SQL) {
+      super(parent);
+    }
+
+    where(condition: SQL) {
+      this.conditions.push(condition);
+    }
+
+    placeholder($plan: ExecutablePlan<any>, type: SQL): SQL {
+      return this.$parent.placeholder($plan, type);
+    }
+
+    apply() {
+      if (this.conditions.length > 0) {
+        // Optimise the output syntax (reduce parenthesis)
+        const conditions =
+          this.conditions.length === 1
+            ? this.conditions[0]
+            : sql`(${sql.join(
+                this.conditions.map((c) => sql.indent(c)),
+                ") and (",
+              )})`;
+        this.$parent.where(conditions);
+      }
+    }
+  }
+
+  class BooleanFilterPlan extends ModifierPlan<ClassFilterPlan> {
+    private conditions: SQL[] = [];
+
+    constructor(
+      $classFilterPlan: ClassFilterPlan,
+      public readonly expression: SQL,
+    ) {
+      super($classFilterPlan);
+    }
+
+    placeholder($plan: ExecutablePlan<any>, type: SQL): SQL {
+      return this.$parent.placeholder($plan, type);
+    }
+
+    where(condition: SQL) {
+      this.conditions.push(condition);
+    }
+
+    apply() {
+      if (this.conditions.length === 1) {
+        // Optimise output SQL
+        this.$parent.where(this.conditions[0]);
+      } else if (this.conditions.length > 1) {
+        this.$parent.where(
+          sql.indent(
+            sql`(${sql.join(
+              this.conditions.map((c) => sql.indent(c)),
+              ") and (",
+            )})`,
+          ),
+        );
+      }
+    }
+  }
+
+  const BooleanFilter = new GraphQLInputObjectType(
+    inputObjectSpec({
+      name: "BooleanFilter",
+      fields: {
+        equalTo: {
+          type: GraphQLBoolean,
+          plan($parent: BooleanFilterPlan, $value) {
+            if ($value.evalIs(null)) {
+              // Ignore
+            } else {
+              $parent.where(
+                sql`${$parent.expression} = ${$parent.placeholder(
+                  $value,
+                  sql`boolean`,
+                )}`,
+              );
+            }
+          },
+        },
+        notEqualTo: {
+          type: GraphQLBoolean,
+          plan($parent: BooleanFilterPlan, $value) {
+            if ($value.evalIs(null)) {
+              // Ignore
+            } else {
+              $parent.where(
+                sql`${$parent.expression} <> ${$parent.placeholder(
+                  $value,
+                  sql`boolean`,
+                )}`,
+              );
+            }
+          },
+        },
+      },
+    }),
+  );
+
+  const MessageFilter = new GraphQLInputObjectType(
+    inputObjectSpec({
+      name: "MessageFilter",
+      fields: {
+        featured: {
+          type: BooleanFilter,
+          plan($messageFilter: ClassFilterPlan, $value) {
+            if ($value.evalIs(null)) {
+              // Ignore
+            } else {
+              return new BooleanFilterPlan(
+                $messageFilter,
+                sql`${$messageFilter.tableAlias}.featured`,
+              );
+            }
+          },
+        },
+      },
+    }),
+  );
+
+  const ForumCondition = new GraphQLInputObjectType(
+    inputObjectSpec({
+      name: "ForumCondition",
+      fields: {
+        name: {
+          type: GraphQLString,
+          plan($condition: PgConditionPlan<any>, $value) {
+            if ($value.evalIs(null)) {
+              $condition.where(sql`${$condition.tableAlias}.name is null`);
+            } else {
+              $condition.where(
+                sql`${$condition.tableAlias}.name = ${$condition.placeholder(
+                  $value,
+                  sql`text`,
+                )}`,
+              );
+            }
+          },
+        },
+      },
+    }),
+  );
+
+  class TempTablePlan<TDataSource extends PgDataSource<any, any>>
+    extends BasePlan
+    implements PgConditionCapableParentPlan
+  {
+    public readonly alias: SQL;
+    public readonly conditions: SQL[] = [];
+    constructor(
+      public readonly $parent: ClassFilterPlan,
+      public readonly dataSource: TDataSource,
+    ) {
+      super();
+      this.alias = sql.identifier(Symbol(`${dataSource.name}_filter`));
+    }
+
+    placeholder($plan: ExecutablePlan<any>, type: SQL): SQL {
+      return this.$parent.placeholder($plan, type);
+    }
+
+    where(condition: SQL): void {
+      this.conditions.push(condition);
+    }
+    wherePlan() {
+      return new PgConditionPlan(this);
+    }
+  }
+
+  class ManyFilterPlan<
+    TChildDataSource extends PgDataSource<any, any>,
+  > extends ModifierPlan<ClassFilterPlan> {
+    public $some: TempTablePlan<TChildDataSource> | null = null;
+    constructor(
+      $parentFilterPlan: ClassFilterPlan,
+      public childDataSource: TChildDataSource,
+    ) {
+      super($parentFilterPlan);
+    }
+
+    some() {
+      const $table = new TempTablePlan(this.$parent, this.childDataSource);
+      const $filter = new ClassFilterPlan($table.wherePlan(), $table.alias);
+      this.$some = $table;
+      return $filter;
+    }
+
+    apply() {
+      if (this.$some) {
+        const conditions = this.$some.conditions;
+        const from = sql`\nfrom ${this.$some.dataSource.source} as ${this.$some.alias}`;
+        const where =
+          conditions.length === 1
+            ? sql`\nwhere ${conditions[0]}`
+            : conditions.length > 1
+            ? sql`\nwhere\n${sql.indent(
+                sql`(${sql.join(
+                  conditions.map((c) => sql.indent(c)),
+                  ") and (",
+                )})`,
+              )}`
+            : sql.blank;
+        this.$parent.where(
+          sql`exists(${sql.indent(sql`select 1${from}${where}`)})`,
+        );
+      }
+    }
+  }
+
+  const ForumToManyMessageFilter = new GraphQLInputObjectType(
+    inputObjectSpec({
+      name: "ForumToManyMessageFilter",
+      fields: {
+        some: {
+          type: MessageFilter,
+          plan($manyFilter: ManyFilterPlan<typeof messageSource>, $value) {
+            if (!$value.evalIs(null)) {
+              return $manyFilter.some();
+            }
+          },
+        },
+      },
+    }),
+  );
+
+  const ForumFilter = new GraphQLInputObjectType(
+    inputObjectSpec({
+      name: "ForumFilter",
+      fields: {
+        messages: {
+          type: ForumToManyMessageFilter,
+          plan($condition: ClassFilterPlan, $value) {
+            if (!$value.evalIs(null)) {
+              return new ManyFilterPlan($condition, messageSource);
             }
           },
         },
@@ -360,6 +619,18 @@ export function makeExampleSchema(options: { deoptimize?: boolean } = {}) {
                   return $messages.wherePlan();
                 },
               },
+              filter: {
+                type: MessageFilter,
+                plan(
+                  _$forum,
+                  $messages: PgClassSelectPlan<typeof messageSource>,
+                ) {
+                  return new ClassFilterPlan(
+                    $messages.wherePlan(),
+                    $messages.alias,
+                  );
+                },
+              },
               includeArchived: makeIncludeArchivedField<
                 PgClassSelectPlan<typeof messageSource>
               >(($messages) => $messages),
@@ -402,6 +673,19 @@ export function makeExampleSchema(options: { deoptimize?: boolean } = {}) {
                 ) {
                   const $messages = $connection.getSubplan();
                   return $messages.wherePlan();
+                },
+              },
+              filter: {
+                type: MessageFilter,
+                plan(
+                  _$forum,
+                  $connection: PgConnectionPlan<typeof messageSource>,
+                ) {
+                  const $messages = $connection.getSubplan();
+                  return new ClassFilterPlan(
+                    $messages.wherePlan(),
+                    $messages.alias,
+                  );
                 },
               },
               includeArchived: makeIncludeArchivedField<
@@ -459,6 +743,18 @@ export function makeExampleSchema(options: { deoptimize?: boolean } = {}) {
             includeArchived: makeIncludeArchivedField<
               PgClassSelectPlan<typeof forumSource>
             >(($forums) => $forums),
+            condition: {
+              type: ForumCondition,
+              plan(_$root, $forums: PgClassSelectPlan<typeof forumSource>) {
+                return $forums.wherePlan();
+              },
+            },
+            filter: {
+              type: ForumFilter,
+              plan(_$root, $forums: PgClassSelectPlan<typeof forumSource>) {
+                return new ClassFilterPlan($forums.wherePlan(), $forums.alias);
+              },
+            },
           },
         },
         allMessagesConnection: {
@@ -478,6 +774,26 @@ export function makeExampleSchema(options: { deoptimize?: boolean } = {}) {
             },
             condition: {
               type: MessageCondition,
+              plan(
+                _$root,
+                $connection: PgConnectionPlan<typeof messageSource>,
+              ) {
+                const $messages = $connection.getSubplan();
+                return $messages.wherePlan();
+              },
+            },
+            filter: {
+              type: MessageFilter,
+              plan(
+                _$root,
+                $connection: PgConnectionPlan<typeof messageSource>,
+              ) {
+                const $messages = $connection.getSubplan();
+                return new ClassFilterPlan(
+                  $messages.wherePlan(),
+                  $messages.alias,
+                );
+              },
             },
             includeArchived: makeIncludeArchivedField<
               PgConnectionPlan<typeof messageSource>

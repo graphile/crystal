@@ -238,10 +238,12 @@ export type PolymorphicPlan = ExecutablePlan & {
  * Modifier plans do not use dependencies.
  */
 export abstract class ModifierPlan<
-  TParentPlan extends ExecutablePlan | ModifierPlan<any>,
+  TParentPlan extends BasePlan,
 > extends BasePlan {
+  public readonly id: number;
   constructor(protected readonly $parent: TParentPlan) {
     super();
+    this.id = this.aether.modifierPlans.push(this) - 1;
   }
 
   /**

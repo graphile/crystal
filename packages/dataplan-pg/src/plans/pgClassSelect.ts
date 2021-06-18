@@ -436,7 +436,7 @@ export class PgClassSelectPlan<
     this.conditions.push(condition);
   }
 
-  wherePlan(): PgConditionPlan<TDataSource> {
+  wherePlan(): PgConditionPlan<this> {
     return new PgConditionPlan(this);
   }
 
@@ -579,9 +579,17 @@ export class PgClassSelectPlan<
       ? [...this.conditions, ...options.extraWheres]
       : this.conditions;
     return {
-      sql: conditions.length
-        ? sql`\nwhere (\n  ${sql.join(conditions, "\n) and (\n  ")}\n)`
-        : sql.blank,
+      sql:
+        conditions.length === 1
+          ? sql`\nwhere ${conditions[0]}`
+          : conditions.length > 1
+          ? sql`\nwhere\n${sql.indent(
+              sql`(${sql.join(
+                conditions.map((c) => sql.indent(c)),
+                ") and (",
+              )})`,
+            )}`
+          : sql.blank,
     };
   }
 
