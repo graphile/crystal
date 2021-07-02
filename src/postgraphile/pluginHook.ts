@@ -8,6 +8,7 @@ import {
 import { WithPostGraphileContextFn } from './withPostGraphileContext';
 // @ts-ignore Allow importing JSON
 import { version } from '../../package.json';
+import * as WebSocket from 'ws';
 import * as graphql from 'graphql';
 import * as graphqlWs from 'graphql-ws';
 import { Extra as GraphQLWSContextExtra } from 'graphql-ws/lib/use/ws';
@@ -90,8 +91,28 @@ export interface PostGraphilePlugin {
 
   'postgraphile:validationRules'?: HookFn<typeof graphql.specifiedRules>; // AVOID THIS where possible; use 'postgraphile:validationRules:static' instead.
 
-  'postgraphile:ws:graphqlWs:options'?: HookFn<graphqlWs.ServerOptions<GraphQLWSContextExtra>>;
-  'postgraphile:ws:subscriptionsTransportWs:options'?: HookFn<ServerOptions>;
+  'postgraphile:ws:graphqlWs:options'?: HookFn<
+    graphqlWs.ServerOptions<GraphQLWSContextExtra>,
+    {
+      websocketServer: WebSocket.Server;
+      postgraphileMiddleware: HttpRequestHandler;
+      subscriptionServerOptions?: {
+        keepAlive?: number;
+        graphqlRoute?: string;
+      };
+    }
+  >;
+  'postgraphile:ws:subscriptionsTransportWs:options'?: HookFn<
+    ServerOptions,
+    {
+      websocketServer: WebSocket.Server;
+      postgraphileMiddleware: HttpRequestHandler;
+      subscriptionServerOptions?: {
+        keepAlive?: number;
+        graphqlRoute?: string;
+      };
+    }
+  >;
 
   'postgraphile:ws:onOperation'?: HookFn<ExecutionParams>;
   'postgraphile:ws:onSubscribe'?: HookFn<
