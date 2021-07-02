@@ -12,9 +12,14 @@ import {
   execute,
 } from 'graphql';
 import * as WebSocket from 'ws';
-import { SubscriptionServer, ConnectionContext, ExecutionParams } from 'subscriptions-transport-ws';
-import { GRAPHQL_TRANSPORT_WS_PROTOCOL } from 'graphql-ws';
-import { useServer } from 'graphql-ws/lib/use/ws';
+import {
+  ServerOptions as SubTransWSServerOptions,
+  SubscriptionServer,
+  ConnectionContext,
+  ExecutionParams,
+} from 'subscriptions-transport-ws';
+import { ServerOptions as GraphQLWSServerOptions, GRAPHQL_TRANSPORT_WS_PROTOCOL } from 'graphql-ws';
+import { Extra as GraphQLWSExtra, useServer } from 'graphql-ws/lib/use/ws';
 import parseUrl = require('parseurl');
 import { pluginHookFromOptions } from '../pluginHook';
 import { isEmpty } from './createPostGraphileHttpRequestHandler';
@@ -190,7 +195,7 @@ export async function enhanceHttpServerWithWebSockets<
   if (websockets.includes('v0')) {
     v0Wss = new WebSocket.Server({ noServer: true });
     SubscriptionServer.create(
-      {
+      pluginHook<SubTransWSServerOptions>('postgraphile:ws:subscriptionsTransportWs:options', {
         schema,
         validationRules: staticValidationRules,
         execute:
@@ -320,7 +325,7 @@ export async function enhanceHttpServerWithWebSockets<
          */
         keepAlive: 15000,
         ...subscriptionServerOptions,
-      },
+      }),
       v0Wss,
     );
   }
@@ -329,7 +334,7 @@ export async function enhanceHttpServerWithWebSockets<
   if (websockets.includes('v1')) {
     v1Wss = new WebSocket.Server({ noServer: true });
     useServer(
-      {
+      pluginHook<GraphQLWSServerOptions<GraphQLWSExtra>>('postgraphile:ws:graphqlWs:options', {
         schema,
         execute:
           options.websocketOperations === 'all'
@@ -444,7 +449,7 @@ export async function enhanceHttpServerWithWebSockets<
         onComplete(ctx, msg) {
           releaseContextForSocketAndOpId(ctx.extra.socket, msg.id);
         },
-      },
+      }),
       v1Wss,
       /*
        * Heroku times out after 55s:

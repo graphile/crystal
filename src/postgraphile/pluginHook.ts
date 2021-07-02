@@ -11,7 +11,7 @@ import { version } from '../../package.json';
 import * as graphql from 'graphql';
 import * as graphqlWs from 'graphql-ws';
 import { Extra as GraphQLWSContextExtra } from 'graphql-ws/lib/use/ws';
-import { ExecutionParams } from 'subscriptions-transport-ws';
+import { ServerOptions, ExecutionParams } from 'subscriptions-transport-ws';
 import { PostGraphileResponse } from './http/frameworks';
 
 type PromiseOrValue<T> = T | Promise<T>;
@@ -89,6 +89,9 @@ export interface PostGraphilePlugin {
   'postgraphile:httpParamsList'?: HookFn<Array<Record<string, any>>>;
 
   'postgraphile:validationRules'?: HookFn<typeof graphql.specifiedRules>; // AVOID THIS where possible; use 'postgraphile:validationRules:static' instead.
+
+  'postgraphile:ws:graphqlWs:options'?: HookFn<graphqlWs.ServerOptions<GraphQLWSContextExtra>>;
+  'postgraphile:ws:subscriptionsTransportWs:options'?: HookFn<ServerOptions>;
 
   'postgraphile:ws:onOperation'?: HookFn<ExecutionParams>;
   'postgraphile:ws:onSubscribe'?: HookFn<
