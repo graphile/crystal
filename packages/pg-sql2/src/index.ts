@@ -22,7 +22,7 @@ const isDev = process.env.GRAPHILE_ENV === "development";
  * - A function call `schema.func(param)` - reason: `schema.func(param).*`
  *   should be `(schema.func(param)).*`
  * - A simple expression `1 = 2` - reason: `1 = 2 = false` is invalid; whereas
- *   `(1 = 2) = false` is fine.
+ *   `(1 = 2) = false` is fine. Similarly `1 = 2::text` differs from `(1 = 2)::text`.
  */
 function isParensSafe(expr: string): boolean {
   if (expr.match(/^\$[0-9]+$/)) {
