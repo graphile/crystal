@@ -482,6 +482,9 @@ export function query(
   const first = strings[0];
   // Reduce memory churn with a cache
   if (strings.length === 1) {
+    if (first === "") {
+      return blank;
+    }
     let node = CACHE_SIMPLE_FRAGMENTS.get(first);
     if (!node) {
       node = makeRawNode(first);
