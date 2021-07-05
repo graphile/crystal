@@ -43,7 +43,7 @@ export class PgExpressionPlan<
   constructor(
     table: PgClassSelectSinglePlan<TDataSource>,
     public readonly pgCodec: TCodec,
-    strings: ReadonlyArray<string>,
+    strings: TemplateStringsArray,
     dependencies: ReadonlyArray<PgTypedExecutablePlan<any> | SQL> = [],
   ) {
     super();
@@ -62,35 +62,30 @@ export class PgExpressionPlan<
     this.tableId = this.addDependency(table);
     const classPlan = table.getClassPlan();
 
-    // TODO: is there a safer way to do this than using sql.raw?
-    const fragments: SQL[] = strings[0].length ? [sql.raw(strings[0])] : [];
-
-    for (let i = 0, l = dependencies.length; i < l; i++) {
-      const plan = dependencies[i];
+    const fragments: SQL[] = dependencies.map((plan, i) => {
       if (!plan) {
         throw new Error(`Invalid plan at index ${i}`);
       }
       if (sql.isSQL(plan)) {
-        fragments.push(plan);
+        return plan;
       } else if (
         plan instanceof PgExpressionPlan &&
         plan.getClassSinglePlan() === table
       ) {
-        // TODO: when we defer placeholders until finalize we'll need to copy deps/etc
-        fragments.push(plan.expression);
+        // TODO: when we defer placeholders until finalize we'll need to copy
+        // deps/etc
+        return plan.expression;
       } else {
-        // TODO: when we defer placeholders until finalize we'll need to store deps/etc
+        // TODO: when we defer placeholders until finalize we'll need to store
+        // deps/etc
         const placeholder = classPlan.placeholder(plan);
-        fragments.push(placeholder);
+        return placeholder;
       }
+    });
 
-      const str = strings[i + 1];
-      if (str.length > 0) {
-        // TODO: is there a safer way to do this than using sql.raw?
-        fragments.push(sql.raw(str));
-      }
-    }
-    this.expression = sql.join(fragments, "");
+    // We're pretending we called `sql` directly by passing the template
+    // strings array.
+    this.expression = sql(strings, ...fragments);
   }
 
   public getClassSinglePlan(): PgClassSelectSinglePlan<TDataSource> {
