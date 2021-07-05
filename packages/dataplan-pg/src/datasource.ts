@@ -13,6 +13,7 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 import { inspect } from "util";
 
+import type { PgTypeCodec } from "./interfaces";
 import { PgClassSelectPlan } from "./plans/pgClassSelect";
 import type { PgClassSelectSinglePlan } from "./plans/pgClassSelectSingle";
 
@@ -83,17 +84,29 @@ type PgDataSourceColumns = {
   [columnName: string]: PgDataSourceColumn<any>;
 };
 
-export interface PgDataSourceColumn<TData extends any> {
-  gql2pg: (graphqlValue: TData) => SQL;
-  pg2gql: (postgresValue: unknown) => TData;
+export interface PgDataSourceColumn<TCanonical = any, TInput = TCanonical> {
+  /**
+   * How to translate to/from PG and how to cast.
+   */
+  codec: PgTypeCodec<TCanonical, TInput>;
+
+  /**
+   * Is the column/attribute guaranteed to not be null?
+   */
   notNull: boolean;
-  type: SQL;
-  /** For derivative columns */
+
+  /**
+   * The SQL expression for a derivative attributes, e.g.:
+   *
+   * ```js
+   * expression: (alias) => sql`${alias}.first_name || ' ' || ${alias}.last_name`
+   * ```
+   */
   expression?: (alias: SQL) => SQL;
 }
 
 type PgDataSourceRow<TColumns extends PgDataSourceColumns> = {
-  [key in keyof TColumns]: ReturnType<TColumns[key]["pg2gql"]>;
+  [key in keyof TColumns]: ReturnType<TColumns[key]["codec"]["fromPg"]>;
 };
 
 type TuplePlanMap<
@@ -209,7 +222,9 @@ export class PgDataSource<
 
     const identifiers = keys.map((key) => {
       const column = this.columns[key];
-      const { type } = column;
+      const {
+        codec: { sqlType: type },
+      } = column;
       const plan: ExecutablePlan | undefined = spec[key];
       if (plan == undefined) {
         throw new Error(

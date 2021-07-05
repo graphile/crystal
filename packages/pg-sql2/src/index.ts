@@ -208,6 +208,12 @@ function isSQLNode(node: unknown): node is SQLNode {
   return typeof node === "object" && node !== null && node[$$trusted] === true;
 }
 
+function isSQL(fragment: unknown): fragment is SQL {
+  return Array.isArray(fragment)
+    ? fragment.every((el) => isSQLNode(el))
+    : isSQLNode(fragment);
+}
+
 function enforceValidNode(node: unknown, where = ""): SQLNode {
   if (isSQLNode(node)) {
     return node;
@@ -731,6 +737,7 @@ function identifiersAreEquivalent(
 export {
   falseNode as false,
   query as fragment,
+  isSQL,
   nullNode as null,
   trueNode as true,
 };
@@ -754,6 +761,7 @@ export interface PgSQL {
   true: typeof trueNode;
   false: typeof falseNode;
   null: typeof nullNode;
+  isSQL: typeof isSQL;
 }
 
 const pgSql: PgSQL = Object.assign(query, {
@@ -774,6 +782,7 @@ const pgSql: PgSQL = Object.assign(query, {
   true: trueNode,
   false: falseNode,
   null: nullNode,
+  isSQL,
 });
 
 export default pgSql;

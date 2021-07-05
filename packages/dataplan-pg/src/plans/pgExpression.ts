@@ -5,12 +5,12 @@ import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type { PgDataSource } from "../datasource";
+import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
 import { PgClassSelectSinglePlan } from "./pgClassSelectSingle";
-import { PgColumnSelectPlan } from "./pgColumnSelect";
 
-const debugPlan = debugFactory("datasource:pg:PgExpressionPlan:plan");
+//const debugPlan = debugFactory("datasource:pg:PgExpressionPlan:plan");
 const debugExecute = debugFactory("datasource:pg:PgExpressionPlan:execute");
-const debugPlanVerbose = debugPlan.extend("verbose");
+//const debugPlanVerbose = debugPlan.extend("verbose");
 const debugExecuteVerbose = debugExecute.extend("verbose");
 
 /**
@@ -19,9 +19,12 @@ const debugExecuteVerbose = debugExecute.extend("verbose");
  * not be a "leaf"; it might be used as the input of another layer of plan.
  */
 export class PgExpressionPlan<
-  TDataSource extends PgDataSource<any, any>,
-  TResultType = any,
-> extends ExecutablePlan<any> {
+    TDataSource extends PgDataSource<any, any>,
+    TCodec extends PgTypeCodec,
+  >
+  extends ExecutablePlan<any>
+  implements PgTypedExecutablePlan<TCodec>
+{
   public readonly tableId: number;
 
   /**
@@ -32,12 +35,6 @@ export class PgExpressionPlan<
 
   public readonly dataSource: TDataSource;
 
-  /**
-   * Converts the `::text` from PostgreSQL to whatever the relevant value that
-   * GraphQL and other plans would expect.
-   */
-  private pg2gql: (pgValue: any) => any;
-
   public readonly expression: SQL;
 
   placeholders: symbol[] = [];
@@ -45,51 +42,53 @@ export class PgExpressionPlan<
 
   constructor(
     table: PgClassSelectSinglePlan<TDataSource>,
-    dependencies: ReadonlyArray<{ plan: ExecutablePlan<any>; type: SQL }>,
-    expressionGenerator: SQL | ((...planFragments: SQL[]) => SQL),
-    pg2gql: (pgValue: any) => any,
+    public readonly pgCodec: TCodec,
+    strings: ReadonlyArray<string>,
+    dependencies: ReadonlyArray<PgTypedExecutablePlan<any> | SQL> = [],
+    private canOmitParenthesis = false,
   ) {
     super();
+    if (strings.length !== dependencies.length + 1) {
+      throw new Error(
+        `Invalid call to PgExpressionPlan; should have exactly one more string (found ${strings.length}) than dependency (found ${dependencies.length}). Recommend using the tagged template literal helper pgExpression.`,
+      );
+    }
+    const badStringIndex = strings.findIndex((s) => typeof s !== "string");
+    if (badStringIndex >= 0) {
+      throw new Error(
+        `Received a non-string at index ${badStringIndex} to strings argument of ${this}.`,
+      );
+    }
     this.dataSource = table.dataSource;
     this.tableId = this.addDependency(table);
     const classPlan = table.getClassPlan();
-    this.pg2gql = pg2gql;
-    if (typeof expressionGenerator === "function") {
-      const fragments: SQL[] = [];
-      for (let i = 0, l = dependencies.length; i < l; i++) {
-        const { plan, type } = dependencies[i];
-        if (!plan) {
-          throw new Error(`Invalid plan at index ${i}`);
-        }
-        if (plan instanceof PgExpressionPlan) {
-          fragments.push(plan.expression);
-          this.placeholders.push(...plan.placeholders);
-          plan.placeholderIndexes.forEach((id) => {
-            const dep = this.aether.plans[plan.dependencies[id]];
-            if (!dep) {
-              throw new Error(
-                `Failed to find depenency plan ${id} ${plan.dependencies[id]}`,
-              );
-            }
-            const depId = this.addDependency(dep);
-            this.placeholderIndexes.push(depId);
-          });
-        } else if (plan instanceof PgColumnSelectPlan) {
-          fragments.push(plan.toSQL());
-        } else {
-          const placeholder = classPlan.placeholder(plan, type);
-          fragments.push(placeholder);
-        }
+
+    // TODO: is there a safer way to do this than using sql.raw?
+    const fragments: SQL[] = [sql.raw(strings[0])];
+
+    for (let i = 0, l = dependencies.length; i < l; i++) {
+      const plan = dependencies[i];
+      if (!plan) {
+        throw new Error(`Invalid plan at index ${i}`);
       }
-      this.expression = expressionGenerator(...fragments);
-    } else {
-      if (dependencies.length !== 0) {
-        throw new Error(
-          `PgExpressionPlan: Must not specify dependencies if expression is static`,
-        );
+      if (sql.isSQL(plan)) {
+        fragments.push(plan);
+      } else if (
+        plan instanceof PgExpressionPlan &&
+        plan.getClassSinglePlan() === table
+      ) {
+        // TODO: when we defer placeholders until finalize we'll need to copy deps/etc
+        fragments.push(plan.expression);
+      } else {
+        // TODO: when we defer placeholders until finalize we'll need to store deps/etc
+        const placeholder = classPlan.placeholder(plan);
+        fragments.push(placeholder);
       }
-      this.expression = expressionGenerator;
+
+      // TODO: is there a safer way to do this than using sql.raw?
+      fragments.push(sql.raw(strings[i + 1]));
     }
+    this.expression = sql.join(fragments, "");
   }
 
   public getClassSinglePlan(): PgClassSelectSinglePlan<TDataSource> {
@@ -103,14 +102,19 @@ export class PgExpressionPlan<
   public optimize(): this {
     this.attrIndex = this.getClassSinglePlan()
       .getClassPlan()
-      .select(sql`(${this.expression})::text`);
+      .select(
+        this.canOmitParenthesis
+          ? sql`${this.expression}::text`
+          : sql`(${this.expression})::text`,
+      );
     return this;
   }
 
   public execute(
     values: CrystalValuesList<any[]>,
-  ): CrystalResultsList<TResultType> {
-    const { attrIndex, tableId, pg2gql } = this;
+  ): CrystalResultsList<ReturnType<TCodec["fromPg"]>> {
+    const { attrIndex, tableId } = this;
+    const pg2gql = this.pgCodec.fromPg;
     if (attrIndex != null) {
       const result = values.map((v) => {
         const rawValue = v[tableId][attrIndex];
@@ -130,35 +134,40 @@ export class PgExpressionPlan<
   }
 
   public deduplicate(
-    peers: Array<PgExpressionPlan<TDataSource, TResultType>>,
-  ): PgExpressionPlan<TDataSource, TResultType> {
+    peers: Array<PgExpressionPlan<TDataSource, TCodec>>,
+  ): PgExpressionPlan<TDataSource, TCodec> {
     const equivalentPeer = peers.find(
-      (p) =>
-        sql.isEquivalent(this.expression, p.expression) &&
-        this.placeholders.length == p.placeholders.length &&
-        this.placeholders.every(
-          (placeholder, i) => placeholder === p.placeholders[i],
-        ),
+      (p) => sql.isEquivalent(this.expression, p.expression),
+      // TODO: when we defer placeholders until finalize we'll need to do additional comparison here
     );
     return equivalentPeer ?? this;
+  }
+
+  public toSQL(): SQL {
+    return this.expression;
   }
 }
 
 function pgExpression<
   TDataSource extends PgDataSource<any, any>,
-  TResultType = any,
+  TCodec extends PgTypeCodec,
 >(
   table: PgClassSelectSinglePlan<TDataSource>,
-  dependencies: ReadonlyArray<{ plan: ExecutablePlan<any>; type: SQL }>,
-  expressionGenerator: SQL | ((...planFragments: SQL[]) => SQL),
-  pg2gql: (pgValue: any) => any,
-): PgExpressionPlan<TDataSource, TResultType> {
-  return new PgExpressionPlan<TDataSource, TResultType>(
-    table,
-    dependencies,
-    expressionGenerator,
-    pg2gql,
-  );
+  codec: TCodec,
+  canOmitParenthesis = false,
+): (
+  strings: TemplateStringsArray,
+  ...dependencies: ReadonlyArray<PgTypedExecutablePlan | SQL>
+) => PgExpressionPlan<TDataSource, TCodec> {
+  return (strings, ...dependencies) => {
+    return new PgExpressionPlan(
+      table,
+      codec,
+      strings,
+      dependencies,
+      canOmitParenthesis,
+    );
+  };
 }
 
 export { pgExpression };

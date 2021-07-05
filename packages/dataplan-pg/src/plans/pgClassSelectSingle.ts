@@ -6,7 +6,7 @@ import type { PgDataSource } from "../datasource";
 import { $$CURSOR } from "../symbols";
 import { PgAttributeSelectPlan } from "./pgAttributeSelect";
 import { PgClassSelectPlan } from "./pgClassSelect";
-import { PgColumnSelectPlan } from "./pgColumnSelect";
+import { pgExpression, PgExpressionPlan } from "./pgExpression";
 // import debugFactory from "debug";
 
 // const debugPlan = debugFactory("datasource:pg:PgClassSelectSinglePlan:plan");
@@ -79,7 +79,7 @@ export class PgClassSelectSinglePlan<
    */
   get<TAttr extends keyof TDataSource["TRow"]>(
     attr: TAttr,
-  ): PgColumnSelectPlan<TDataSource, TAttr> {
+  ): PgExpressionPlan<TDataSource, TDataSource["columns"][TAttr]["codec"]> {
     // Only one plan per column
     const planId: number | undefined = this.colPlans[attr];
     if (planId == null) {
@@ -94,9 +94,6 @@ export class PgClassSelectSinglePlan<
           `${this.dataSource} does not define an attribute named '${attr}'`,
         );
       }
-      const expression =
-        dataSourceColumn.expression?.(classPlan.alias) ??
-        sql`${sql.identifier(classPlan.symbol, String(attr))}`;
 
       /*
        * Only cast to `::text` during select; we want to use it uncasted in
@@ -109,17 +106,22 @@ export class PgClassSelectSinglePlan<
        *   decoding these string values.
        */
 
-      const colPlan = new PgColumnSelectPlan<TDataSource, TAttr>(
-        this,
-        attr,
-        expression,
-      );
+      const colPlan = dataSourceColumn.expression
+        ? pgExpression(
+            this,
+            this.dataSource.columns[attr].codec,
+          )`${dataSourceColumn.expression(classPlan.alias)}`
+        : pgExpression(
+            this,
+            this.dataSource.columns[attr].codec,
+            true,
+          )`${sql.identifier(classPlan.symbol, String(attr))}`;
       this.colPlans[attr] = colPlan.id;
       return colPlan;
     } else {
       const plan = this.aether.plans[planId];
-      if (!(plan instanceof PgColumnSelectPlan)) {
-        throw new Error(`Expected ${plan} to be a PgColumnSelectPlan`);
+      if (!(plan instanceof PgExpressionPlan)) {
+        throw new Error(`Expected ${plan} to be a PgExpressionPlan`);
       }
       return plan;
     }

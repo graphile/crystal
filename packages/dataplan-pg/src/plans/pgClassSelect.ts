@@ -20,10 +20,11 @@ import sql, { arraysMatch } from "pg-sql2";
 import { inspect } from "util";
 
 import type { PgDataSource } from "../datasource";
+import type { PgTypedExecutablePlan } from "../interfaces";
 import { $$CURSOR } from "../symbols";
 import { PgClassSelectSinglePlan } from "./pgClassSelectSingle";
-import { PgColumnSelectPlan } from "./pgColumnSelect";
 import { PgConditionPlan } from "./pgCondition";
+import { PgExpressionPlan } from "./pgExpression";
 
 const debugPlan = debugFactory("datasource:pg:PgClassSelectPlan:plan");
 const debugExecute = debugFactory("datasource:pg:PgClassSelectPlan:execute");
@@ -336,9 +337,24 @@ export class PgClassSelectPlan<
     }));
   }
 
-  public placeholder($plan: ExecutablePlan<any>, type: SQL): SQL {
+  public placeholder($plan: PgTypedExecutablePlan<any>): SQL;
+  public placeholder($plan: ExecutablePlan<any>, type: SQL): SQL;
+  public placeholder(
+    $plan: ExecutablePlan<any> | PgTypedExecutablePlan<any>,
+    overrideType?: SQL,
+  ): SQL {
     if (this.locked) {
       throw new Error(`${this}: cannot add placeholders once plan is locked`);
+    }
+    const type =
+      overrideType ??
+      ("pgCodec" in $plan && $plan.pgCodec ? $plan.pgCodec.sqlType : null);
+
+    if (type === null) {
+      throw new Error(
+        `Plan ${$plan} does not contain pgCodec information, please wrap ` +
+          `it in \`pgCast\`. E.g. \`pgCast($plan, TYPES.boolean)\``,
+      );
     }
     const dependencyIndex = this.addDependency($plan);
     const sqlRef = { sql: sql`(1/0) /* ERROR! Unhandled placeholder! */` };
@@ -371,47 +387,6 @@ export class PgClassSelectPlan<
 
     return this.selects.push(fragment) - 1;
   }
-
-  /*
-   * Select an SQL fragment, returning a plan.
-   * /
-  public select<TData = any>(
-    fragment: SQL | symbol,
-  ): PgAttributeSelectPlan<TData> {
-    const attrIndex = this._select(fragment);
-    return new PgAttributeSelectPlan(this, attrIndex);
-  }
-  */
-
-  /*
-  // TODO: rename this item from `.get` to something more subtle (`._itemGet`
-  // or similar) since you wouldn't normally call `.get` on a list - only on an
-  // item of that list via PgClassSelectSinglePlan.
-  /**
-   * Returns a plan representing a named attribute (e.g. column) from the class
-   * (e.g. table).
-   * /
-  get<TAttr extends keyof TDataSource["TRow"]>(
-    attr: TAttr,
-  ): PgColumnSelectPlan<TDataSource, TAttr> {
-    // Only one plan per column
-    if (!this.colPlans[attr]) {
-      // TODO: where do we do the SQL conversion, e.g. to_json for dates to
-      // enforce ISO8601? Perhaps this should be the datasource itself, and
-      // `attr` should be an SQL expression? This would allow for computed
-      // fields/etc too (admittedly those without arguments).
-      const expression = sql.identifier(this.symbol, String(attr));
-      const index = this._select(expression);
-      this.colPlans[attr] = new PgColumnSelectPlan(
-        this,
-        index,
-        attr,
-        expression,
-      );
-    }
-    return this.colPlans[attr]!;
-  }
-  */
 
   /**
    * Finalizes this instance and returns a mutable clone; useful for
@@ -899,7 +874,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
           sqlRef,
         });
       } else {
-        if (dep instanceof PgColumnSelectPlan) {
+        if (dep instanceof PgExpressionPlan) {
           // Replace with a reference
           placeholder.sqlRef.sql = dep.toSQL();
         } else {
@@ -953,7 +928,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
           // it's shared and thus safe.
           continue;
         }
-        if (!(dep instanceof PgColumnSelectPlan)) {
+        if (!(dep instanceof PgExpressionPlan)) {
           debugPlanVerbose(
             "Refusing to optimise %c due to dependency %c",
             this,
@@ -1021,9 +996,9 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
             ...this.queryValues.map(({ dependencyIndex, type }, i) => {
               const plan =
                 this.aether.plans[this.dependencies[dependencyIndex]];
-              if (!(plan instanceof PgColumnSelectPlan)) {
+              if (!(plan instanceof PgExpressionPlan)) {
                 throw new Error(
-                  `Expected ${plan} (${i}th dependency of ${this}; plan with id ${dependencyIndex}) to be a PgColumnSelectPlan`,
+                  `Expected ${plan} (${i}th dependency of ${this}; plan with id ${dependencyIndex}) to be a PgExpressionPlan`,
                 );
               }
               return sql`${plan.toSQL()}::${type} = ${
@@ -1053,9 +1028,9 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
             this.aether.plans[parent.dependencies[parent.itemPlanId]];
           this.queryValues.forEach(({ dependencyIndex, type }, i) => {
             const plan = this.aether.plans[this.dependencies[dependencyIndex]];
-            if (!(plan instanceof PgColumnSelectPlan)) {
+            if (!(plan instanceof PgExpressionPlan)) {
               throw new Error(
-                `Expected ${plan} (${i}th dependency of ${this}; plan with id ${dependencyIndex}) to be a PgColumnSelectPlan`,
+                `Expected ${plan} (${i}th dependency of ${this}; plan with id ${dependencyIndex}) to be a PgExpressionPlan`,
               );
             }
             return this.where(

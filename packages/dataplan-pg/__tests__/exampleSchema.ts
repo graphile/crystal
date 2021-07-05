@@ -31,7 +31,7 @@ import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 import prettier from "prettier";
 
-import type { PgClassSelectPlan } from "../src";
+import type { PgClassSelectPlan, PgTypeCodec } from "../src";
 import {
   PgClassSelectSinglePlan,
   PgConnectionPlan,
@@ -123,28 +123,42 @@ export function makeExampleSchema(
     }
   };
 
+  function t<TCanonical = any, TInput = TCanonical>(
+    type: string,
+  ): PgTypeCodec<TCanonical, TInput> {
+    return {
+      sqlType: sql.identifier(...type.split(".")),
+      fromPg: pg2gqlForType(type),
+      toPg: gql2pgForType(type),
+    };
+  }
+
+  const TYPES = {
+    boolean: t<boolean>("boolean"),
+    int: t<number>("int"),
+    bigint: t<string>("bigint"),
+    float: t<number>("float"),
+    text: t<string>("text"),
+    citext: t<string>("citext"),
+    uuid: t<string>("uuid"),
+    timestamptz: t<Date, Date | string>("text"),
+  };
+
   const col = <
     TOptions extends {
+      codec: PgTypeCodec;
       notNull?: boolean;
-      type: keyof GraphQLTypeFromPostgresType;
-      pg2gql?: PgDataSourceColumn<any>["pg2gql"];
-      gql2pg?: PgDataSourceColumn<any>["gql2pg"];
       expression?: PgDataSourceColumn<any>["expression"];
     },
   >(
     options: TOptions,
   ): PgDataSourceColumn<
-    NullableUnless<
-      TOptions["notNull"],
-      GraphQLTypeFromPostgresType[TOptions["type"]]
-    >
+    NullableUnless<TOptions["notNull"], ReturnType<TOptions["codec"]["fromPg"]>>
   > => {
-    const { notNull, type, gql2pg, pg2gql, expression } = options;
+    const { notNull, codec, expression } = options;
     return {
-      gql2pg: gql2pg || gql2pgForType(type),
-      pg2gql: pg2gql || pg2gqlForType(type),
+      codec,
       notNull: !!notNull,
-      type: sql.identifier(type),
       expression,
     };
   };
@@ -154,16 +168,16 @@ export function makeExampleSchema(
     name: "messages",
     context: getPgDataSourceContext,
     columns: {
-      id: col({ notNull: true, type: `uuid` }),
-      body: col({ notNull: true, type: `text` }),
-      author_id: col({ notNull: true, type: `uuid` }),
-      forum_id: col({ notNull: true, type: `uuid` }),
-      created_at: col({ notNull: true, type: `timestamptz` }),
-      archived_at: col({ type: "timestamptz" }),
-      featured: col({ type: "boolean" }),
+      id: col({ notNull: true, codec: TYPES.uuid }),
+      body: col({ notNull: true, codec: TYPES.text }),
+      author_id: col({ notNull: true, codec: TYPES.uuid }),
+      forum_id: col({ notNull: true, codec: TYPES.uuid }),
+      created_at: col({ notNull: true, codec: TYPES.timestamptz }),
+      archived_at: col({ codec: TYPES.timestamptz }),
+      featured: col({ codec: TYPES.boolean }),
       is_archived: col({
-        type: "boolean",
-        expression: (alias) => sql`(${alias}.archived_at is not null)`,
+        codec: TYPES.boolean,
+        expression: (alias) => sql`${alias}.archived_at is not null`,
       }),
     },
     uniques: [["id"]],
@@ -174,10 +188,10 @@ export function makeExampleSchema(
     name: "users",
     context: getPgDataSourceContext,
     columns: {
-      id: col({ notNull: true, type: `uuid` }),
-      username: col({ notNull: true, type: `citext` }),
-      gravatar_url: col({ type: `text` }),
-      created_at: col({ notNull: true, type: `timestamptz` }),
+      id: col({ notNull: true, codec: TYPES.uuid }),
+      username: col({ notNull: true, codec: TYPES.citext }),
+      gravatar_url: col({ codec: TYPES.text }),
+      created_at: col({ notNull: true, codec: TYPES.timestamptz }),
     },
     uniques: [["id"], ["username"]],
   });
@@ -187,12 +201,12 @@ export function makeExampleSchema(
     name: "forums",
     context: getPgDataSourceContext,
     columns: {
-      id: col({ notNull: true, type: `uuid` }),
-      name: col({ notNull: true, type: `citext` }),
-      archived_at: col({ type: "timestamptz" }),
+      id: col({ notNull: true, codec: TYPES.uuid }),
+      name: col({ notNull: true, codec: TYPES.citext }),
+      archived_at: col({ codec: TYPES.timestamptz }),
       is_archived: col({
-        type: "boolean",
-        expression: (alias) => sql`(${alias}.archived_at is not null)`,
+        codec: TYPES.boolean,
+        expression: (alias) => sql`${alias}.archived_at is not null`,
       }),
     },
     uniques: [["id"]],
@@ -650,11 +664,9 @@ export function makeExampleSchema(
             plan($forum) {
               const $archivedAt = $forum.get("archived_at");
               return pgExpression(
-                $archivedAt.getClassSinglePlan(),
-                [{ plan: $archivedAt, type: sql`timestamptz` }],
-                (archivedAtFrag) => sql`${archivedAtFrag} is not null`,
-                pg2gqlForType(`boolean`),
-              );
+                $forum,
+                TYPES.boolean,
+              )`${$archivedAt} is not null`;
             },
           },
           self: {
