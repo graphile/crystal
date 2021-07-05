@@ -12,9 +12,9 @@ select
     ]::text[]
     from app_public.messages as __messages__
     left outer join app_public.users as __users__
-    on ((__messages__."author_id"::"uuid" = __users__."id"))
+    on (__messages__."author_id"::"uuid" = __users__."id")
     left outer join app_public.users as __users_2
-    on ((__messages__."author_id"::"uuid" = __users_2."id"))
+    on (__messages__."author_id"::"uuid" = __users_2."id")
     where
       (
         __messages__.archived_at is not null
@@ -26,5 +26,7 @@ select
   ) as "1",
   __forums__."id"::text as "2"
 from app_public.forums as __forums__
-where true /* authorization checks */
+where (
+  true /* authorization checks */
+)
 order by __forums__."id" asc

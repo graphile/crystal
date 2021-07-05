@@ -100,6 +100,7 @@ export interface SQLIndentNode {
 export interface SQLParensNode {
   content: SQL;
   type: "PARENS";
+  force: boolean;
   [$$trusted]: true;
 }
 
@@ -235,8 +236,8 @@ function makeIndentNode(content: SQL): SQLIndentNode {
   return Object.freeze({ type: "INDENT", content, [$$trusted]: true });
 }
 
-function makeParensNode(content: SQL): SQLParensNode {
-  return Object.freeze({ type: "PARENS", content, [$$trusted]: true });
+function makeParensNode(content: SQL, force = false): SQLParensNode {
+  return Object.freeze({ type: "PARENS", content, force, [$$trusted]: true });
 }
 
 function makeSymbolAliasNode(a: symbol, b: symbol): SQLSymbolAliasNode {
@@ -409,10 +410,10 @@ export function compile(sql: SQL): {
         }
         case "PARENS": {
           const inner = print(item.content, indent);
-          if (isParensSafe(inner)) {
-            sqlFragments.push(inner);
-          } else {
+          if (item.force || !isParensSafe(inner)) {
             sqlFragments.push(`(${inner})`);
+          } else {
+            sqlFragments.push(inner);
           }
           break;
         }
@@ -642,6 +643,25 @@ export function join(
       )}'`,
     );
   }
+
+  // Short circuit joins of size <= 1
+  if (items.length === 0) {
+    return [];
+  } else if (items.length === 1) {
+    const nodeOrNodes = items[0];
+    if (Array.isArray(nodeOrNodes)) {
+      // Performance: we don't map here because we don't want to allocate a new array.
+      nodeOrNodes.forEach((n, j) =>
+        enforceValidNode(n, `join item ${0} child ${j}`),
+      );
+      const nodes: Array<SQLNode> = nodeOrNodes;
+      return nodes;
+    } else {
+      const node: SQLNode = enforceValidNode(nodeOrNodes, `join item ${0}`);
+      return node;
+    }
+  }
+
   const hasSeparator = separator.length > 0;
   const sepNode = hasSeparator ? makeRawNode(separator) : blank;
 
@@ -676,8 +696,49 @@ export function indent(fragment: SQL): SQL {
   return isDev ? makeIndentNode(fragment) : fragment;
 }
 
-export function parens(fragment: SQL): SQL {
-  return makeParensNode(fragment);
+export function indentIf(condition: boolean, fragment: SQL): SQL {
+  return isDev && condition ? makeIndentNode(fragment) : fragment;
+}
+
+/**
+ * Wraps the given fragment in parens if necessary (or if forced, e.g. for a
+ * subquery or maybe stylistically a join condition).
+ */
+export function parens(fragment: SQL, force = false): SQL {
+  // No need to recursively wrap with parens
+  if (Array.isArray(fragment)) {
+    if (fragment.length === 1) {
+      // Pretend that the child was just a single node
+      return parens(fragment[0], force);
+    } else {
+      // Normal behaviour (fall through)
+    }
+  } else if (fragment.type === "PARENS") {
+    if (fragment.force || !force) {
+      // No change; use existing fragment
+      return fragment;
+    } else {
+      // Need to force parens on previous fragment content
+      return parens(fragment.content, true);
+    }
+  } else if (fragment.type === "INDENT") {
+    if (Array.isArray(fragment.content)) {
+      if (fragment.content.length === 1) {
+        const inner = fragment.content[0];
+        if (inner.type === "PARENS" && !inner.force) {
+          return makeParensNode(inner.content, force);
+        } else {
+          // Normal behaviour (fall through)
+        }
+      } else {
+        // Normal behaviour (fall through)
+      }
+    } else if (fragment.content.type === "PARENS" && !fragment.content.force) {
+      return makeParensNode(fragment.content.content, force);
+    }
+  }
+
+  return makeParensNode(fragment, force);
 }
 
 export function symbolAlias(symbol1: symbol, symbol2: symbol): SQL {
@@ -820,6 +881,7 @@ export interface PgSQL {
   literal: typeof literal;
   join: typeof join;
   indent: typeof indent;
+  indentIf: typeof indentIf;
   parens: typeof parens;
   symbolAlias: typeof symbolAlias;
   callback: typeof callback;
@@ -842,6 +904,7 @@ const pgSql: PgSQL = Object.assign(query, {
   literal,
   join,
   indent,
+  indentIf,
   parens,
   symbolAlias,
   callback,

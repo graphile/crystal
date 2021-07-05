@@ -9,7 +9,7 @@ select
     ]::text[]
     from app_public.messages as __messages__
     left outer join app_public.users as __users__
-    on ((__messages__."author_id"::"uuid" = __users__."id"))
+    on (__messages__."author_id"::"uuid" = __users__."id")
     where
       (
         (__messages__.archived_at is null) = (__forums__."archived_at" is null)
@@ -22,5 +22,7 @@ select
   __forums__."id"::text as "2",
   __forums__."archived_at"::text as "3"
 from app_public.forums as __forums__
-where true /* authorization checks */
+where (
+  true /* authorization checks */
+)
 order by __forums__."id" asc

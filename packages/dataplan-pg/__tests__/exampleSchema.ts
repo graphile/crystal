@@ -577,17 +577,16 @@ export function makeExampleSchema(
       if (this.$some) {
         const conditions = this.$some.conditions;
         const from = sql`\nfrom ${this.$some.dataSource.source} as ${this.$some.alias}`;
+        const sqlConditions = sql.join(
+          conditions.map((c) => sql.parens(sql.indent(c))),
+          " and ",
+        );
         const where =
-          conditions.length === 1
-            ? sql`\nwhere ${conditions[0]}`
-            : conditions.length > 1
-            ? sql`\nwhere\n${sql.indent(
-                sql`(${sql.join(
-                  conditions.map((c) => sql.indent(c)),
-                  ") and (",
-                )})`,
-              )}`
-            : sql.blank;
+          conditions.length === 0
+            ? sql.blank
+            : conditions.length === 1
+            ? sql`\nwhere ${sqlConditions}`
+            : sql`\nwhere\n${sql.indent(sqlConditions)}`;
         this.$parent.where(
           sql`exists(${sql.indent(sql`select 1${from}${where}`)})`,
         );

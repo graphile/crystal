@@ -108,7 +108,7 @@ export class PgClassSelectSinglePlan<
 
       const sqlExpr = pgExpression(this, this.dataSource.columns[attr].codec);
       const colPlan = dataSourceColumn.expression
-        ? sqlExpr`${dataSourceColumn.expression(classPlan.alias)}`
+        ? sqlExpr`${sql.parens(dataSourceColumn.expression(classPlan.alias))}`
         : sqlExpr`${sql.identifier(classPlan.symbol, String(attr))}`;
 
       this.colPlans[attr] = colPlan.id;

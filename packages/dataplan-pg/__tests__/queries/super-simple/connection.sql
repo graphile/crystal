@@ -6,7 +6,7 @@ select
   __messages__."author_id"::text as "4"
 from app_public.messages as __messages__
 left outer join app_public.users as __users__
-on ((__messages__."author_id"::"uuid" = __users__."id"))
+on (__messages__."author_id"::"uuid" = __users__."id")
 where
   (
     __messages__.archived_at is null

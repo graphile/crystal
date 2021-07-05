@@ -2,7 +2,9 @@ select
   __forums__."name"::text as "0",
   __forums__."id"::text as "1"
 from app_public.forums as __forums__
-where true /* authorization checks */
+where (
+  true /* authorization checks */
+)
 order by __forums__."id" asc
 limit 2
 
@@ -19,7 +21,9 @@ lateral (
     __messages__."author_id"::text as "1",
     __messages_identifiers__.idx as "2"
   from app_public.messages as __messages__
-  where __messages__."forum_id" = __messages_identifiers__."id0"
+  where (
+    __messages__."forum_id" = __messages_identifiers__."id0"
+  )
   order by __messages__."id" asc
   limit 2
 ) as __messages_result__

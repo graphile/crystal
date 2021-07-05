@@ -508,9 +508,10 @@ export class PgClassSelectPlan<
 
       return { sql: sql`select${selection}`, extraSelectIndexes };
     } else {
-      const selection = fragmentsWithAliases.length
-        ? sql`\n${sql.indent(sql.join(fragmentsWithAliases, ",\n"))}`
-        : sql` /* NOTHING?! */`;
+      const selection =
+        fragmentsWithAliases.length > 0
+          ? sql`\n${sql.indent(sql.join(fragmentsWithAliases, ",\n"))}`
+          : sql` /* NOTHING?! */`;
 
       return { sql: sql`select${selection}`, extraSelectIndexes };
     }
@@ -525,11 +526,20 @@ export class PgClassSelectPlan<
       const conditions =
         j.type === "cross"
           ? []
-          : j.conditions.length
-          ? sql`(${sql.join(j.conditions, ") AND (")})`
-          : sql.true;
+          : j.conditions.length === 0
+          ? sql.true
+          : j.conditions.length === 1
+          ? j.conditions[0]
+          : sql.join(
+              j.conditions.map((c) => sql.parens(sql.indent(c))),
+              " and ",
+            );
       const joinCondition =
-        j.type !== "cross" ? sql`\non (${conditions})` : sql.blank;
+        j.type !== "cross"
+          ? sql`\non ${sql.parens(
+              sql.indentIf(j.conditions.length > 1, conditions),
+            )}`
+          : sql.blank;
       const join: SQL =
         j.type === "inner"
           ? sql`inner join`
@@ -553,18 +563,17 @@ export class PgClassSelectPlan<
     const conditions = options.extraWheres
       ? [...this.conditions, ...options.extraWheres]
       : this.conditions;
+    const sqlConditions = sql.join(
+      conditions.map((c) => sql.parens(sql.indent(c))),
+      " and ",
+    );
     return {
       sql:
-        conditions.length === 1
-          ? sql`\nwhere ${conditions[0]}`
-          : conditions.length > 1
-          ? sql`\nwhere\n${sql.indent(
-              sql`(${sql.join(
-                conditions.map((c) => sql.indent(c)),
-                ") and (",
-              )})`,
-            )}`
-          : sql.blank,
+        conditions.length === 0
+          ? sql.blank
+          : conditions.length === 1
+          ? sql`\nwhere ${sqlConditions}`
+          : sql`\nwhere\n${sql.indent(sqlConditions)}`,
     };
   }
 
@@ -584,9 +593,10 @@ export class PgClassSelectPlan<
       }
     }
     return {
-      sql: orders.length
-        ? sql`\norder by ${sql.join(orders, ", ")}`
-        : sql.blank,
+      sql:
+        orders.length > 0
+          ? sql`\norder by ${sql.join(orders, ", ")}`
+          : sql.blank,
     };
   }
 
