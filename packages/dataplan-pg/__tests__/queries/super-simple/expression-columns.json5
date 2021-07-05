@@ -1,0 +1,7 @@
+{
+  forums: [
+    { name: "Cats", isArchived: false },
+    { name: "Dogs", isArchived: true },
+    { name: "Postgres", isArchived: false },
+  ],
+}

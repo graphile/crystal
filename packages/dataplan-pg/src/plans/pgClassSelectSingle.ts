@@ -88,7 +88,15 @@ export class PgClassSelectSinglePlan<
       // enforce ISO8601? Perhaps this should be the datasource itself, and
       // `attr` should be an SQL expression? This would allow for computed
       // fields/etc too (admittedly those without arguments).
-      const expression = sql`${sql.identifier(classPlan.symbol, String(attr))}`;
+      const dataSourceColumn = this.dataSource.columns[attr];
+      if (!dataSourceColumn) {
+        throw new Error(
+          `${this.dataSource} does not define an attribute named '${attr}'`,
+        );
+      }
+      const expression =
+        dataSourceColumn.expression?.(classPlan.alias) ??
+        sql`${sql.identifier(classPlan.symbol, String(attr))}`;
 
       /*
        * Only cast to `::text` during select; we want to use it uncasted in

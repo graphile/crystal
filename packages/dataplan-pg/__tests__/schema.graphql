@@ -35,6 +35,7 @@ type Message {
   featured: Boolean
   body: String
   author: User
+  isArchived: Boolean
 }
 
 type User {

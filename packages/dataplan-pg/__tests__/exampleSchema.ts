@@ -126,6 +126,7 @@ export function makeExampleSchema(
       type: keyof GraphQLTypeFromPostgresType;
       pg2gql?: PgDataSourceColumn<any>["pg2gql"];
       gql2pg?: PgDataSourceColumn<any>["gql2pg"];
+      expression?: PgDataSourceColumn<any>["expression"];
     },
   >(
     options: TOptions,
@@ -135,12 +136,13 @@ export function makeExampleSchema(
       GraphQLTypeFromPostgresType[TOptions["type"]]
     >
   > => {
-    const { notNull, type, gql2pg, pg2gql } = options;
+    const { notNull, type, gql2pg, pg2gql, expression } = options;
     return {
       gql2pg: gql2pg || gql2pgForType(type),
       pg2gql: pg2gql || pg2gqlForType(type),
       notNull: !!notNull,
       type: sql.identifier(type),
+      expression,
     };
   };
 
@@ -156,6 +158,10 @@ export function makeExampleSchema(
       created_at: col({ notNull: true, type: `timestamptz` }),
       archived_at: col({ type: "timestamptz" }),
       featured: col({ type: "boolean" }),
+      is_archived: col({
+        type: "boolean",
+        expression: (alias) => sql`(${alias}.archived_at is not null)`,
+      }),
     },
     uniques: [["id"]],
   });
@@ -181,6 +187,10 @@ export function makeExampleSchema(
       id: col({ notNull: true, type: `uuid` }),
       name: col({ notNull: true, type: `citext` }),
       archived_at: col({ type: "timestamptz" }),
+      is_archived: col({
+        type: "boolean",
+        expression: (alias) => sql`(${alias}.archived_at is not null)`,
+      }),
     },
     uniques: [["id"]],
   });
@@ -230,6 +240,12 @@ export function makeExampleSchema(
             }
 
             return $user;
+          },
+        },
+        isArchived: {
+          type: GraphQLBoolean,
+          plan($message) {
+            return $message.get("is_archived");
           },
         },
       },
@@ -614,6 +630,12 @@ export function makeExampleSchema(
             type: GraphQLString,
             plan($forum) {
               return $forum.get("name");
+            },
+          },
+          isArchived: {
+            type: GraphQLBoolean,
+            plan($forum) {
+              return $forum.get("is_archived");
             },
           },
           self: {

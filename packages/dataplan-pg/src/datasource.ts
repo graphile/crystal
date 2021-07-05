@@ -88,6 +88,8 @@ export interface PgDataSourceColumn<TData extends any> {
   pg2gql: (postgresValue: unknown) => TData;
   notNull: boolean;
   type: SQL;
+  /** For derivative columns */
+  expression?: (alias: SQL) => SQL;
 }
 
 type PgDataSourceRow<TColumns extends PgDataSourceColumns> = {

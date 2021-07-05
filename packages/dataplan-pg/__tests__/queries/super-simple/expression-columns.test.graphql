@@ -1,0 +1,13 @@
+## expect(data.forums[0].name).toEqual("Cats");
+## expect(data.forums[0].isArchived).toEqual(false);
+## expect(data.forums[1].name).toEqual("Dogs");
+## expect(data.forums[1].isArchived).toEqual(true);
+## expect(data.forums[2].name).toEqual("Postgres");
+## expect(data.forums[2].isArchived).toEqual(false);
+## expect(queries).toHaveLength(1);
+{
+  forums(includeArchived: YES) {
+    name
+    isArchived
+  }
+}
