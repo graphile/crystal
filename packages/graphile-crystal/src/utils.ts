@@ -76,9 +76,12 @@ const BG_COLORS = [
   chalk.underline,
 ] as const;
 
-export function assertNullPrototype(object: {}, description: string): void {
+export function assertNullPrototype(
+  object: Record<string, unknown>,
+  description: string,
+): void {
   if (isDev) {
-    assert.equal(
+    assert.strictEqual(
       Object.getPrototypeOf(object),
       null,
       `Expected ${description} to have a null prototype`,
