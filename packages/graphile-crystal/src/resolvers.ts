@@ -1,4 +1,3 @@
-import * as assert from "assert";
 import chalk from "chalk";
 // import { getAliasFromResolveInfo } from "graphql-parse-resolve-info";
 import debugFactory from "debug";
@@ -14,6 +13,7 @@ import type { Path } from "graphql/jsutils/Path";
 import { inspect } from "util";
 
 import { populateValuePlan } from "./aether";
+import * as assert from "./assert";
 import { GLOBAL_PATH, ROOT_PATH } from "./constants";
 import type { Deferred } from "./deferred";
 import { defer } from "./deferred";

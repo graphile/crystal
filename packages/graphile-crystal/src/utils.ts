@@ -1,4 +1,3 @@
-import * as assert from "assert";
 import chalk from "chalk";
 import type {
   GraphQLFieldConfig,
@@ -27,13 +26,13 @@ import {
 } from "graphql";
 import { inspect } from "util";
 
+import * as assert from "./assert";
 import type { Deferred } from "./deferred";
 import { isDev } from "./dev";
 import type { InputPlan } from "./input";
 import type {
   BaseGraphQLArguments,
   BaseGraphQLContext,
-  BaseGraphQLInputObject,
   CrystalObject,
   GraphileCrystalFieldConfig,
   GraphileCrystalInputFieldConfig,

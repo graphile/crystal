@@ -1,4 +1,3 @@
-import * as assert from "assert";
 import type {
   GraphQLInputType,
   GraphQLLeafType,
@@ -19,6 +18,7 @@ import {
 import { inspect } from "util";
 
 import type { Aether } from "./aether";
+import * as assert from "./assert";
 import { ExecutablePlan } from "./plan";
 import type { __TrackedObjectPlan } from "./plans";
 import { defaultValueToValueNode } from "./utils";

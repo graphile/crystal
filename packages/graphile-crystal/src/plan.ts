@@ -1,9 +1,9 @@
-import * as assert from "assert";
 import chalk from "chalk";
 import type { GraphQLObjectType } from "graphql";
 import { inspect } from "util";
 
 import type { Aether } from "./aether";
+import * as assert from "./assert";
 import { GLOBAL_PATH } from "./constants";
 import { isDev, noop } from "./dev";
 import {
