@@ -63,7 +63,7 @@ export class PgExpressionPlan<
     const classPlan = table.getClassPlan();
 
     // TODO: is there a safer way to do this than using sql.raw?
-    const fragments: SQL[] = [sql.raw(strings[0])];
+    const fragments: SQL[] = strings[0].length ? [sql.raw(strings[0])] : [];
 
     for (let i = 0, l = dependencies.length; i < l; i++) {
       const plan = dependencies[i];
@@ -84,8 +84,11 @@ export class PgExpressionPlan<
         fragments.push(placeholder);
       }
 
-      // TODO: is there a safer way to do this than using sql.raw?
-      fragments.push(sql.raw(strings[i + 1]));
+      const str = strings[i + 1];
+      if (str.length > 0) {
+        // TODO: is there a safer way to do this than using sql.raw?
+        fragments.push(sql.raw(str));
+      }
     }
     this.expression = sql.join(fragments, "");
   }
