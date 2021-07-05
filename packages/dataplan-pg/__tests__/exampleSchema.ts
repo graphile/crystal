@@ -44,6 +44,7 @@ import type {
 } from "../src/datasource";
 import type { PgConditionCapableParentPlan } from "../src/plans/pgCondition";
 import { PgConditionPlan } from "../src/plans/pgCondition";
+import { pgExpression } from "../src/plans/pgExpression";
 
 // These are what the generics extend from
 
@@ -96,7 +97,9 @@ export function makeExampleSchema(
   // type ForumsPlan = PgClassSelectPlan<typeof forumSource>;
   type ForumPlan = PgClassSelectSinglePlan<typeof forumSource>;
 
-  const pg2gqlForType = (type: string) => {
+  const pg2gqlForType = (
+    type: "boolean" | "timestamptz" | "timestamp" | string,
+  ) => {
     switch (type) {
       case "boolean": {
         return (value: any) => value === "true";
@@ -632,10 +635,26 @@ export function makeExampleSchema(
               return $forum.get("name");
             },
           },
+
+          // Expression column
           isArchived: {
             type: GraphQLBoolean,
             plan($forum) {
               return $forum.get("is_archived");
+            },
+          },
+
+          // Custom expression; actual column select shouldn't make it through to the generated query.
+          archivedAtIsNotNull: {
+            type: GraphQLBoolean,
+            plan($forum) {
+              const $archivedAt = $forum.get("archived_at");
+              return pgExpression(
+                $archivedAt.getClassSinglePlan(),
+                [{ plan: $archivedAt, type: sql`timestamptz` }],
+                (archivedAtFrag) => sql`${archivedAtFrag} is not null`,
+                pg2gqlForType(`boolean`),
+              );
             },
           },
           self: {
