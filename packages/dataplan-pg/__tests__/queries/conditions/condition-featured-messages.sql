@@ -1,10 +1,12 @@
 select __forums_result__.*
 from (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::boolean as "id0"
+  select
+    ids.ordinality - 1 as idx,
+    (ids.value->>0)::boolean as "id0"
   from json_array_elements($1::json) with ordinality as ids
 ) as __forums_identifiers__,
 lateral (
-  select 
+  select
     __forums__."name"::text as "0",
     array(
       select array[
@@ -21,13 +23,14 @@ lateral (
       on ((__messages__."author_id"::"uuid" = __users__."id"))
       left outer join app_public.users as __users_2
       on ((__messages__."author_id"::"uuid" = __users_2."id"))
-      where (
-        (__messages__.featured = __forums_identifiers__."id0")
-      ) and (
-        (__messages__.archived_at is null) = (__forums__."archived_at" is null)
-      ) and (
-        __forums__."id"::"uuid" = __messages__."forum_id"
-      )
+      where
+        (
+          (__messages__.archived_at is null) = (__forums__."archived_at" is null)
+        ) and (
+          __messages__.featured = __forums_identifiers__."id0"
+        ) and (
+          __forums__."id"::"uuid" = __messages__."forum_id"
+        )
       order by __messages__."id" asc
       limit 5
     ) as "1",
@@ -35,10 +38,11 @@ lateral (
     __forums__."archived_at"::text as "3",
     __forums_identifiers__.idx as "4"
   from app_public.forums as __forums__
-  where (
-    __forums__.archived_at is null
-  ) and (
-    true /* authorization checks */
-  )
+  where
+    (
+      __forums__.archived_at is null
+    ) and (
+      true /* authorization checks */
+    )
   order by __forums__."id" asc
 ) as __forums_result__
