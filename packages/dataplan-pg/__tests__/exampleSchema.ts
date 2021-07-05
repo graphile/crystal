@@ -7,12 +7,12 @@ import type {
   ExecutablePlan,
   InputStaticLeafPlan,
 } from "graphile-crystal";
-import { BasePlan } from "graphile-crystal";
-import { ModifierPlan } from "graphile-crystal";
 import {
+  BasePlan,
   context,
   crystalEnforce,
   inputObjectSpec,
+  ModifierPlan,
   object,
   objectSpec,
 } from "graphile-crystal";
