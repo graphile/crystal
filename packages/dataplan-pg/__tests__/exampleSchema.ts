@@ -663,10 +663,15 @@ export function makeExampleSchema(
             type: GraphQLBoolean,
             plan($forum) {
               const $archivedAt = $forum.get("archived_at");
-              return pgExpression(
+              const $expr1 = pgExpression(
                 $forum,
                 TYPES.boolean,
               )`${$archivedAt} is not null`;
+              const $expr2 = pgExpression(
+                $forum,
+                TYPES.boolean,
+              )`${$expr1} is true`;
+              return $expr2;
             },
           },
           self: {
