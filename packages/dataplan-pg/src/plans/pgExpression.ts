@@ -45,7 +45,6 @@ export class PgExpressionPlan<
     public readonly pgCodec: TCodec,
     strings: ReadonlyArray<string>,
     dependencies: ReadonlyArray<PgTypedExecutablePlan<any> | SQL> = [],
-    private canOmitParenthesis = false,
   ) {
     super();
     if (strings.length !== dependencies.length + 1) {
@@ -102,11 +101,7 @@ export class PgExpressionPlan<
   public optimize(): this {
     this.attrIndex = this.getClassSinglePlan()
       .getClassPlan()
-      .select(
-        this.canOmitParenthesis
-          ? sql`${this.expression}::text`
-          : sql`(${this.expression})::text`,
-      );
+      .select(sql`${sql.parens(this.expression)}::text`);
     return this;
   }
 
@@ -154,19 +149,12 @@ function pgExpression<
 >(
   table: PgClassSelectSinglePlan<TDataSource>,
   codec: TCodec,
-  canOmitParenthesis = false,
 ): (
   strings: TemplateStringsArray,
   ...dependencies: ReadonlyArray<PgTypedExecutablePlan | SQL>
 ) => PgExpressionPlan<TDataSource, TCodec> {
   return (strings, ...dependencies) => {
-    return new PgExpressionPlan(
-      table,
-      codec,
-      strings,
-      dependencies,
-      canOmitParenthesis,
-    );
+    return new PgExpressionPlan(table, codec, strings, dependencies);
   };
 }
 

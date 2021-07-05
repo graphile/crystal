@@ -106,16 +106,11 @@ export class PgClassSelectSinglePlan<
        *   decoding these string values.
        */
 
+      const sqlExpr = pgExpression(this, this.dataSource.columns[attr].codec);
       const colPlan = dataSourceColumn.expression
-        ? pgExpression(
-            this,
-            this.dataSource.columns[attr].codec,
-          )`${dataSourceColumn.expression(classPlan.alias)}`
-        : pgExpression(
-            this,
-            this.dataSource.columns[attr].codec,
-            true,
-          )`${sql.identifier(classPlan.symbol, String(attr))}`;
+        ? sqlExpr`${dataSourceColumn.expression(classPlan.alias)}`
+        : sqlExpr`${sql.identifier(classPlan.symbol, String(attr))}`;
+
       this.colPlans[attr] = colPlan.id;
       return colPlan;
     } else {

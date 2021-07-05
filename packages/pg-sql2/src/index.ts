@@ -5,6 +5,44 @@ import { inspect } from "util";
 const isDev = process.env.GRAPHILE_ENV === "development";
 
 /**
+ * Returns true if the given expression does not need parenthesis to be
+ * inserted into another expression, false if not wrapping in parenthesis could
+ * cause ambiguity. We're relying on the user to be sensible here, this is not
+ * fool-proof.
+ *
+ * @remarks The following are all parens safe:
+ *
+ * - A placeholder `$1`
+ * - A number `0.123456`
+ * - A string `'Foo bar'` / `E'Foo bar'`
+ * - An identifier `schema.table.column` / `"MyScHeMa"."MyTaBlE"."MyCoLuMn"`
+ *
+ * The following might seem but are not parens safe:
+ *
+ * - A function call `schema.func(param)` - reason: `schema.func(param).*`
+ *   should be `(schema.func(param)).*`
+ * - A simple expression `1 = 2` - reason: `1 = 2 = false` is invalid; whereas
+ *   `(1 = 2) = false` is fine.
+ */
+function isParensSafe(expr: string): boolean {
+  if (expr.match(/^\$[0-9]+$/)) {
+    return true;
+  } else if (expr.match(/^[0-9]+(?:\.[0-9]+)?$/) || expr.match(/^\.[0-9]+$/)) {
+    return true;
+  } else if (expr.match(/^'[^']+'$/)) {
+    return true;
+  } else {
+    // Identifiers
+    const parts = expr.split(".");
+    if (
+      parts.every((p) => p.match(/^"[^"]+"$/) || p.match(/^[a-zA-Z0-9_]+$/))
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+/**
  * This is the secret to our safety; since this is a symbol it cannot be faked
  * in a JSON payload and it cannot be constructed with a new Symbol (even with
  * the same argument), so external data cannot make itself trusted.
@@ -57,6 +95,15 @@ export interface SQLIndentNode {
 }
 
 /**
+ * Represents that the SQL inside this should be wrapped in parenthesis if necessary.
+ */
+export interface SQLParensNode {
+  content: SQL;
+  type: "PARENS";
+  [$$trusted]: true;
+}
+
+/**
  * Informs pg-sql2 to treat symbol2 as if it were the same as symbol1
  */
 export interface SQLSymbolAliasNode {
@@ -82,6 +129,7 @@ export type SQLNode =
   | SQLValueNode
   | SQLIdentifierNode
   | SQLIndentNode
+  | SQLParensNode
   | SQLSymbolAliasNode
   | SQLCallbackNode;
 /** @internal */
@@ -185,6 +233,10 @@ function makeValueNode(rawValue: SQLRawValue): SQLValueNode {
 
 function makeIndentNode(content: SQL): SQLIndentNode {
   return Object.freeze({ type: "INDENT", content, [$$trusted]: true });
+}
+
+function makeParensNode(content: SQL): SQLParensNode {
+  return Object.freeze({ type: "PARENS", content, [$$trusted]: true });
 }
 
 function makeSymbolAliasNode(a: symbol, b: symbol): SQLSymbolAliasNode {
@@ -353,6 +405,15 @@ export function compile(sql: SQL): {
               "\n" +
               "  ".repeat(indent),
           );
+          break;
+        }
+        case "PARENS": {
+          const inner = print(item.content, indent);
+          if (isParensSafe(inner)) {
+            sqlFragments.push(inner);
+          } else {
+            sqlFragments.push(`(${inner})`);
+          }
           break;
         }
         case "SYMBOL_ALIAS": {
@@ -615,6 +676,10 @@ export function indent(fragment: SQL): SQL {
   return isDev ? makeIndentNode(fragment) : fragment;
 }
 
+export function parens(fragment: SQL): SQL {
+  return makeParensNode(fragment);
+}
+
 export function symbolAlias(symbol1: symbol, symbol2: symbol): SQL {
   return makeSymbolAliasNode(symbol1, symbol2);
 }
@@ -677,7 +742,8 @@ export function isEquivalent(
         }
         return sql1.value === sql2.value;
       }
-      case "INDENT": {
+      case "INDENT":
+      case "PARENS": {
         if (sql2.type !== sql1.type) {
           return false;
         }
@@ -754,6 +820,7 @@ export interface PgSQL {
   literal: typeof literal;
   join: typeof join;
   indent: typeof indent;
+  parens: typeof parens;
   symbolAlias: typeof symbolAlias;
   callback: typeof callback;
   blank: typeof blank;
@@ -775,6 +842,7 @@ const pgSql: PgSQL = Object.assign(query, {
   literal,
   join,
   indent,
+  parens,
   symbolAlias,
   callback,
   blank,
