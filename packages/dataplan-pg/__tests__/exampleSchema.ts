@@ -111,6 +111,15 @@ export function makeExampleSchema(
     }
   };
 
+  const gql2pgForType = (type: string) => {
+    switch (type) {
+      default: {
+        return (value: any) =>
+          sql`${sql.value(value)}::${sql.identifier(type)}`;
+      }
+    }
+  };
+
   const col = <
     TOptions extends {
       notNull?: boolean;
@@ -128,9 +137,7 @@ export function makeExampleSchema(
   > => {
     const { notNull, type, gql2pg, pg2gql } = options;
     return {
-      gql2pg:
-        gql2pg ||
-        ((value) => sql`${sql.value(value as any)}::${sql.identifier(type)}`),
+      gql2pg: gql2pg || gql2pgForType(type),
       pg2gql: pg2gql || pg2gqlForType(type),
       notNull: !!notNull,
       type: sql.identifier(type),
