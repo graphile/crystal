@@ -17,11 +17,9 @@ import {
 } from "graphile-crystal";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
-import { inspect } from "util";
 
 import type { PgDataSource } from "../datasource";
-import type { PgTypedExecutablePlan } from "../interfaces";
-import { $$CURSOR } from "../symbols";
+import type { PgOrderSpec, PgTypedExecutablePlan } from "../interfaces";
 import { PgClassSelectSinglePlan } from "./pgClassSelectSingle";
 import { PgConditionPlan } from "./pgCondition";
 import { PgExpressionPlan } from "./pgExpression";
@@ -97,7 +95,7 @@ export class PgClassSelectPlan<
 
   // ORDER BY
 
-  private orders: SQL[];
+  private orders: Array<PgOrderSpec>;
 
   // LIMIT
 
@@ -162,14 +160,23 @@ export class PgClassSelectPlan<
   private isInliningForbidden = false;
 
   /**
-   * The list of things we're selecting
+   * The list of things we're selecting.
    */
-  private selects: Array<SQL | symbol>;
+  private selects: Array<SQL>;
 
   /**
    * The id for the PostgreSQL context plan.
    */
   private contextId: number;
+
+  /**
+   * When finalized with respect to arguments, we may tweak various things such
+   * as orders. These values may be useful to child plans (e.g. PgCursorPlan
+   * needs to know the final orders so it knows what to select).
+   */
+  private finalizeArgumentsResults: {
+    orders: typeof PgClassSelectPlan.prototype.orders;
+  } | null = null;
 
   /**
    * When finalized, we build the SQL query, queryValues, and note where to feed in
@@ -179,8 +186,8 @@ export class PgClassSelectPlan<
     // The SQL query text
     text: string;
 
-    // The values to feed into the query (or symbol placeholders)
-    rawSqlValues: (SQLRawValue | symbol)[];
+    // The values to feed into the query
+    rawSqlValues: SQLRawValue[];
 
     // The column on the result that indicates which group the result belongs to
     identifierIndex: number | null;
@@ -372,7 +379,7 @@ export class PgClassSelectPlan<
   /**
    * Select an SQL fragment, returning the index the result will have.
    */
-  public select(fragment: SQL | symbol): number {
+  public select(fragment: SQL): number {
     // NOTE: it's okay to add selections after the plan is "locked" - lock only
     // applies to which rows are being selected, not what is being queried
     // about the rows.
@@ -469,30 +476,15 @@ export class PgClassSelectPlan<
     options: { asArray?: boolean; extraSelects?: readonly SQL[] } = {},
   ) {
     const { asArray = false, extraSelects = EMPTY_ARRAY } = options;
-    const resolveSymbol = (symbol: symbol): SQL => {
-      switch (symbol) {
-        case $$CURSOR:
-          // TODO: figure out what the cursor should be
-          return sql`424242 /* TODO: CURSOR */`;
-        default: {
-          throw new Error(
-            `Unrecognised special select symbol: ${inspect(symbol)}`,
-          );
-        }
-      }
-    };
-
     const selects = [...this.selects, ...extraSelects];
     const l = this.selects.length;
     const extraSelectIndexes = extraSelects.map((_, i) => i + l);
 
-    const fragmentsWithAliases = selects.map((fragOrSymbol, idx) => {
-      const frag =
-        typeof fragOrSymbol === "symbol"
-          ? resolveSymbol(fragOrSymbol)
-          : fragOrSymbol;
-      return asArray ? frag : sql`${frag} as ${sql.identifier(String(idx))}`;
-    });
+    const fragmentsWithAliases = asArray
+      ? selects
+      : selects.map(
+          (frag, idx) => sql`${frag} as ${sql.identifier(String(idx))}`,
+        );
 
     if (asArray) {
       const selection = fragmentsWithAliases.length
@@ -577,25 +569,37 @@ export class PgClassSelectPlan<
     };
   }
 
-  private buildOrderBy() {
-    const orders = [...this.orders];
-
-    // TODO: should we really apply a default order _here_ rather than in the calling code?
-    if (this.dataSource.uniques.length > 0) {
-      const ordersIsUnique = false; /* TODO */
-      if (!ordersIsUnique) {
-        const uniqueColumns: string[] = this.dataSource.uniques[0];
-        orders.push(
-          ...uniqueColumns.map(
-            (c) => sql`${this.alias}.${sql.identifier(c)} asc`,
-          ),
-        );
-      }
+  public getOrderBy(): ReadonlyArray<PgOrderSpec> {
+    if (!this.finalizeArgumentsResults) {
+      throw new Error(
+        `Cannot ${this}.getOrderBy() before it has had its arguments finalized.`,
+      );
     }
+    return this.finalizeArgumentsResults.orders;
+  }
+
+  private buildOrderBy() {
+    if (!this.finalizeArgumentsResults) {
+      throw new Error("Cannot execute PgClassSelectPlan before finalizing it.");
+    }
+    const orders = [...this.finalizeArgumentsResults.orders];
+
     return {
       sql:
         orders.length > 0
-          ? sql`\norder by ${sql.join(orders, ", ")}`
+          ? sql`\norder by ${sql.join(
+              orders.map(
+                (o) =>
+                  sql`${o.fragment} ${o.ascending ? sql`asc` : sql`desc`}${
+                    o.nulls === "last"
+                      ? sql` nulls last`
+                      : o.nulls === "first"
+                      ? sql` nulls first`
+                      : sql.blank
+                  }`,
+              ),
+              ", ",
+            )}`
           : sql.blank,
     };
   }
@@ -644,6 +648,31 @@ export class PgClassSelectPlan<
     const query = sql`${select}${from}${join}${where}${orderBy}${limit}${offset}`;
 
     return { sql: query, extraSelectIndexes };
+  }
+
+  public finalizeArguments(): void {
+    if (!this.isArgumentsFinalized) {
+      const orders = [...this.orders];
+      // Apply a default order in case our default is not unique.
+      // TODO: should we really apply a default order _here_ rather than in the calling code?
+      if (this.dataSource.uniques.length > 0) {
+        const ordersIsUnique = false; /* TODO */
+        if (!ordersIsUnique) {
+          const uniqueColumns: string[] = this.dataSource.uniques[0];
+          orders.push(
+            ...uniqueColumns.map((c) => ({
+              fragment: sql`${this.alias}.${sql.identifier(c)}`,
+              codec: this.dataSource.columns[c].codec,
+              ascending: true,
+            })),
+          );
+        }
+      }
+      this.finalizeArgumentsResults = {
+        orders,
+      };
+    }
+    super.finalizeArguments();
   }
 
   public finalize(): void {
@@ -816,7 +845,16 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
       }
 
       // Check ORDERs match
-      if (!arraysMatch(this.orders, p.orders, sqlIsEquivalent)) {
+      if (
+        !arraysMatch(
+          this.orders,
+          p.orders,
+          (a, b) =>
+            a.ascending === b.ascending &&
+            a.nulls === b.nulls &&
+            sqlIsEquivalent(a.fragment, b.fragment),
+        )
+      ) {
         return false;
       }
 
@@ -860,11 +898,8 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
     //console.dir(otherPlan.selects, { depth: 8 });
     //console.log(`My ${this} selects:`);
     //console.dir(this.selects, { depth: 8 });
-    this.selects.forEach((fragOrSymbol, idx) => {
-      if (typeof fragOrSymbol === "symbol") {
-        throw new Error("Cannot inline query that uses a symbol like this.");
-      }
-      actualKeyByDesiredKey[idx] = otherPlan.select(fragOrSymbol);
+    this.selects.forEach((frag, idx) => {
+      actualKeyByDesiredKey[idx] = otherPlan.select(frag);
     });
     //console.dir(actualKeyByDesiredKey);
     //console.log(`Other ${otherPlan} selects now:`);

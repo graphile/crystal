@@ -21,13 +21,24 @@ import { crystalPrintPathIdentity } from "./utils";
 function reallyAssertFinalized(plan: BasePlan): void {
   if (!plan.isFinalized) {
     throw new Error(
-      "Plan is not finalized; did you forget to call super.finalize()?",
+      `Plan ${plan} is not finalized; did you forget to call \`super.finalize()\` from its \`finalize()\` method?`,
+    );
+  }
+}
+
+function reallyAssertArgumentsFinalized(plan: BasePlan): void {
+  if (!plan.isArgumentsFinalized) {
+    throw new Error(
+      `Plan ${plan} is not finalized with respect to arguments; did you forget to call \`super.finalizeArguments()\` from its \`finalizeArguments()\` method?`,
     );
   }
 }
 
 // Optimise this away in production.
 export const assertFinalized = !isDev ? noop : reallyAssertFinalized;
+export const assertArgumentsFinalized = !isDev
+  ? noop
+  : reallyAssertArgumentsFinalized;
 
 /**
  * The base abstract plan type; you should not extend this directly - instead
@@ -46,6 +57,7 @@ export const assertFinalized = !isDev ? noop : reallyAssertFinalized;
  */
 export abstract class BasePlan {
   public readonly aether: Aether;
+  public isArgumentsFinalized = false;
   public isFinalized = false;
   public debug = globalState.debug;
   public parentPathIdentity: string;
@@ -74,12 +86,22 @@ export abstract class BasePlan {
     return null;
   }
 
+  public finalizeArguments(): void {
+    if (!this.isArgumentsFinalized) {
+      this.isArgumentsFinalized = true;
+    } else {
+      throw new Error(
+        `Plan ${this} has already been finalized with respect to arguments - do not call \`finalizeArguments()\` from user code!`,
+      );
+    }
+  }
+
   public finalize(): void {
     if (!this.isFinalized) {
       this.isFinalized = true;
     } else {
       throw new Error(
-        `Plan ${this} has already been finalized - do not call finalize from user code!`,
+        `Plan ${this} has already been finalized - do not call \`finalize()\` from user code!`,
       );
     }
   }

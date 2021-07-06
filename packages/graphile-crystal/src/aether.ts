@@ -56,6 +56,7 @@ import {
 } from "./interfaces";
 import type { ModifierPlan, PolymorphicPlan } from "./plan";
 import {
+  assertArgumentsFinalized,
   assertExecutablePlan,
   assertFinalized,
   assertModifierPlan,
@@ -437,10 +438,23 @@ export class Aether<
           pathIdentity,
         );
 
+        const newPlans = new Set(
+          this.plans.slice(oldPlansLength).filter(isNotNullish),
+        );
+
         // Now that the field has been planned (including arguments, but NOT
         // including selection set) we can deduplicate it to see if any of its
         // peers are identical.
         this.deduplicatePlans(oldPlansLength);
+
+        for (const newPlan of newPlans) {
+          // If the newPlan still exists, finalize it with respect to arguments.
+          if (this.plans[newPlan.id] === newPlan) {
+            // TODO: rename finalizeArguments; maybe argumentsFinalized or lockParameters or lock?
+            newPlan.finalizeArguments();
+            assertArgumentsFinalized(newPlan);
+          }
+        }
       } else {
         // Note: this is populated in GetValuePlanId
         plan = new __ValuePlan();

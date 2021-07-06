@@ -1,11 +1,12 @@
 import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
 import { ExecutablePlan } from "graphile-crystal";
+import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type { PgDataSource } from "../datasource";
-import { $$CURSOR } from "../symbols";
-import { PgAttributeSelectPlan } from "./pgAttributeSelect";
+import type { PgTypeCodec } from "../interfaces";
 import { PgClassSelectPlan } from "./pgClassSelect";
+import { PgCursorPlan } from "./pgCursor";
 import { pgExpression, PgExpressionPlan } from "./pgExpression";
 // import debugFactory from "debug";
 
@@ -123,19 +124,29 @@ export class PgClassSelectSinglePlan<
   }
 
   /**
+   * Returns a plan representing the result of an expression.
+   */
+  expression<TCodec extends PgTypeCodec>(
+    expression: SQL,
+    codec: TCodec,
+  ): PgExpressionPlan<TDataSource, TCodec> {
+    return pgExpression(this, codec)`${expression}`;
+  }
+
+  /**
    * When selecting a connection we need to be able to get the cursor. The
    * cursor is built from the values of the `ORDER BY` clause so that we can
    * find nodes before/after it.
    */
-  public cursor(): PgAttributeSelectPlan<TDataSource> {
+  public cursor(): PgCursorPlan<TDataSource> {
     if (this.cursorPlanId == null) {
-      const cursorPlan = new PgAttributeSelectPlan(this, $$CURSOR);
+      const cursorPlan = new PgCursorPlan<TDataSource>(this);
       this.cursorPlanId = cursorPlan.id;
       return cursorPlan;
     }
     const plan = this.aether.plans[this.cursorPlanId];
-    if (!(plan instanceof PgAttributeSelectPlan)) {
-      throw new Error(`Expected ${plan} to be a PgAttributeSelectPlan`);
+    if (!(plan instanceof PgCursorPlan)) {
+      throw new Error(`Expected ${plan} to be a PgCursorPlan`);
     }
     return plan;
   }

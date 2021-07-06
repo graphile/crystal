@@ -36,3 +36,10 @@ export interface PgTypedExecutablePlan<TCanonical = any, TInput = TCanonical>
   extends ExecutablePlan<any> {
   pgCodec: PgTypeCodec<TCanonical, TInput>;
 }
+
+export interface PgOrderSpec {
+  fragment: SQL;
+  codec: PgTypeCodec;
+  ascending: boolean;
+  nulls?: "first" | "last" | null;
+}
