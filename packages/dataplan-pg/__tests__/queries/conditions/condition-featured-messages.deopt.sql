@@ -24,7 +24,7 @@ lateral (
   select
     __messages__."body"::text as "0",
     __messages__."author_id"::text as "1",
-    424242 /* TODO: CURSOR */ as "2",
+    __messages__."id"::text as "2",
     __messages_identifiers__.idx as "3"
   from app_public.messages as __messages__
   where

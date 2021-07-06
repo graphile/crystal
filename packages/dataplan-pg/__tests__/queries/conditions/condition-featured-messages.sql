@@ -14,7 +14,7 @@ lateral (
         __users__."username"::text,
         __users__."gravatar_url"::text,
         __messages__."author_id"::text,
-        424242 /* TODO: CURSOR */,
+        __messages__."id"::text,
         __users_2."username"::text,
         __users_2."gravatar_url"::text
       ]::text[]

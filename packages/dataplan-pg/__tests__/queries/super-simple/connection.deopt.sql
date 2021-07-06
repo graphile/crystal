@@ -1,5 +1,5 @@
 select
-  424242 /* TODO: CURSOR */ as "0",
+  __messages__."id"::text as "0",
   __messages__."body"::text as "1",
   __messages__."author_id"::text as "2"
 from app_public.messages as __messages__

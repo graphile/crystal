@@ -1,5 +1,5 @@
 select
-  424242 /* TODO: CURSOR */ as "0",
+  __messages__."id"::text as "0",
   __messages__."body"::text as "1",
   __users__."username"::text as "2",
   __users__."gravatar_url"::text as "3",

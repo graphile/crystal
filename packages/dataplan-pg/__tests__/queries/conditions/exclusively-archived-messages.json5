@@ -11,12 +11,15 @@
         ],
         edges: [
           {
-            cursor: "424242",
+            cursor: '["TODO","09098317-c472-11eb-b6b5-9fc0780db497"]',
             node: { body: "Dogs = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
           },
-          { cursor: "424242", node: { body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } } },
           {
-            cursor: "424242",
+            cursor: '["TODO","09098318-c472-11eb-b6b5-a3837d3992c6"]',
+            node: { body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+          },
+          {
+            cursor: '["TODO","09098319-c472-11eb-b6b5-93d3b2f00f33"]',
             node: { body: "Dogs = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
           },
         ],
