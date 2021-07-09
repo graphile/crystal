@@ -442,11 +442,6 @@ export class Aether<
           this.plans.slice(oldPlansLength).filter(isNotNullish),
         );
 
-        // Now that the field has been planned (including arguments, but NOT
-        // including selection set) we can deduplicate it to see if any of its
-        // peers are identical.
-        this.deduplicatePlans(oldPlansLength);
-
         for (const newPlan of newPlans) {
           // If the newPlan still exists, finalize it with respect to arguments.
           if (this.plans[newPlan.id] === newPlan) {
@@ -455,6 +450,11 @@ export class Aether<
             assertArgumentsFinalized(newPlan);
           }
         }
+
+        // Now that the field has been planned (including arguments, but NOT
+        // including selection set) we can deduplicate it to see if any of its
+        // peers are identical.
+        this.deduplicatePlans(oldPlansLength);
       } else {
         // Note: this is populated in GetValuePlanId
         plan = new __ValuePlan();
