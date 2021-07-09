@@ -208,11 +208,40 @@ export class PgClassSelectPlan<
     dataSource: TDataSource,
     identifiers: Array<PgClassSelectIdentifierSpec>,
     identifierMatchesThunk: (alias: SQL) => SQL[],
-    cloneFrom: PgClassSelectPlan<TDataSource> | null = null,
+  );
+  constructor(cloneFrom: PgClassSelectPlan<TDataSource>);
+  constructor(
+    dataSourceOrCloneFrom: TDataSource | PgClassSelectPlan<TDataSource>,
+    identifiersOrNot?: Array<PgClassSelectIdentifierSpec>,
+    identifierMatchesThunkOrNot?: (alias: SQL) => SQL[],
   ) {
     super();
+    const cloneFrom =
+      dataSourceOrCloneFrom instanceof PgClassSelectPlan
+        ? dataSourceOrCloneFrom
+        : null;
+    const { dataSource, identifiers, identifierMatchesThunk } = cloneFrom
+      ? {
+          dataSource: cloneFrom.dataSource,
+          identifiers: cloneFrom.hydrateIdentifiers(),
+          identifierMatchesThunk: cloneFrom.identifierMatchesThunk,
+        }
+      : {
+          dataSource: dataSourceOrCloneFrom as TDataSource,
+          identifiers: identifiersOrNot,
+          identifierMatchesThunk: identifierMatchesThunkOrNot,
+        };
+
+    if (!identifiers || !identifierMatchesThunk) {
+      throw new Error("Invalid construction of PgClassSelectPlan");
+    }
+
     this.dataSource = dataSource;
     if (cloneFrom) {
+      // Prevent any changes to our original to help avoid programming
+      // errors.
+      cloneFrom.lock();
+
       if (this.dependencies.length !== 0) {
         throw new Error("Should not have any dependencies yet");
       }
@@ -398,17 +427,10 @@ export class PgClassSelectPlan<
   /**
    * Finalizes this instance and returns a mutable clone; useful for
    * connections/etc (e.g. copying `where` conditions but adding more, or
-   * pagination, or grouping, aggregates, etc
+   * pagination, or grouping, aggregates, etc)
    */
   clone(): PgClassSelectPlan<TDataSource> {
-    this.lock();
-    const clone = new PgClassSelectPlan(
-      this.dataSource,
-      this.hydrateIdentifiers(),
-      this.identifierMatchesThunk,
-      this,
-    );
-    return clone;
+    return new PgClassSelectPlan(this);
   }
 
   where(condition: SQL): void {
