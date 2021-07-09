@@ -689,7 +689,7 @@ export function makeExampleSchema(
                   $messages: PgClassSelectPlan<typeof messageSource>,
                   $value,
                 ) {
-                  $messages.setLimit($value.eval());
+                  $messages.setFirst($value.eval());
                   return null;
                 },
               },
@@ -744,7 +744,7 @@ export function makeExampleSchema(
                   $value,
                 ) {
                   const $messages = $connection.getSubplan();
-                  $messages.setLimit($value.eval());
+                  $messages.setFirst($value.eval());
                   return null;
                 },
               },
@@ -819,7 +819,7 @@ export function makeExampleSchema(
                 $forums: PgClassSelectPlan<typeof forumSource>,
                 $value,
               ) {
-                $forums.setLimit($value.eval());
+                $forums.setFirst($value.eval());
                 return null;
               },
             },
@@ -877,7 +877,19 @@ export function makeExampleSchema(
                 $value,
               ) {
                 const $messages = $connection.getSubplan();
-                $messages.setLimit($value.eval());
+                $messages.setFirst($value.eval());
+                return null;
+              },
+            },
+            last: {
+              type: GraphQLInt,
+              plan(
+                _$root,
+                $connection: PgConnectionPlan<typeof messageSource>,
+                $value,
+              ) {
+                const $messages = $connection.getSubplan();
+                $messages.setLast($value.eval());
                 return null;
               },
             },

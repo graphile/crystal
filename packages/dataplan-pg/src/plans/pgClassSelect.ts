@@ -15,6 +15,8 @@ import {
   InputStaticLeafPlan,
   list,
   map,
+  reverse,
+  reverseArray,
 } from "graphile-crystal";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
@@ -28,7 +30,7 @@ import { PgExpressionPlan } from "./pgExpression";
 const isDev =
   process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
 
-type LockableParameter = "orderBy";
+type LockableParameter = "orderBy" | "first" | "last" | "offset";
 type LockCallback<
   TDataSource extends PgDataSource<any, any> = PgDataSource<any, any>,
 > = (plan: PgClassSelectPlan<TDataSource>) => void;
@@ -109,7 +111,8 @@ export class PgClassSelectPlan<
 
   // LIMIT
 
-  private limit: number | null;
+  private first: number | null;
+  private last: number | null;
 
   // OFFSET
 
@@ -196,6 +199,9 @@ export class PgClassSelectPlan<
     // The dependency index (i.e. index in the `values` object we'll receive
     // during execution) in which each of the `queryValues` are identified.
     queryValuesDependencyIndexes: number[];
+
+    // If last but not first, reverse order.
+    shouldReverseOrder: boolean;
   } | null = null;
 
   /**
@@ -211,18 +217,27 @@ export class PgClassSelectPlan<
     [a in LockableParameter]: Array<LockCallback>;
   } = {
     orderBy: [],
+    first: [],
+    last: [],
+    offset: [],
   };
 
   private _afterLock: {
     [a in LockableParameter]: Array<LockCallback>;
   } = {
     orderBy: [],
+    first: [],
+    last: [],
+    offset: [],
   };
 
   private _lockedParameter: {
     [a in LockableParameter]: false | true | string | undefined;
   } = {
     orderBy: false,
+    first: false,
+    last: false,
+    offset: false,
   };
 
   constructor(
@@ -310,7 +325,8 @@ export class PgClassSelectPlan<
     this.conditions = cloneFrom ? [...cloneFrom.conditions] : [];
     this.orders = cloneFrom ? [...cloneFrom.orders] : [];
     this.isOrderUnique = cloneFrom ? cloneFrom.isOrderUnique : false;
-    this.limit = cloneFrom ? cloneFrom.limit : null;
+    this.first = cloneFrom ? cloneFrom.first : null;
+    this.last = cloneFrom ? cloneFrom.last : null;
     this.offset = cloneFrom ? cloneFrom.offset : null;
 
     if (!cloneFrom) {
@@ -359,19 +375,31 @@ export class PgClassSelectPlan<
     return this.isTrusted;
   }
 
-  public setLimit(limit: number | null | undefined): this {
-    if (this.locked) {
-      throw new Error(`${this}: cannot change limit when locked`);
-    }
-    this.limit = limit ?? null;
+  public setFirst(first: number | null | undefined): this {
+    this._assertParameterUnlocked("first");
+    this.first = first ?? null;
+    this._lockParameter("first");
+    return this;
+  }
+
+  public setLast(last: number | null | undefined): this {
+    this._assertParameterUnlocked("orderBy");
+    this._assertParameterUnlocked("last");
+    this.last = last ?? null;
+    this._lockParameter("last");
     return this;
   }
 
   public setOffset(offset: number | null | undefined): this {
-    if (this.locked) {
-      throw new Error(`${this}: cannot change offset when locked`);
-    }
+    this._assertParameterUnlocked("offset");
     this.offset = offset ?? null;
+    if (this.offset !== null) {
+      this._lockParameter("last");
+      if (this.last != null) {
+        throw new Error("Cannot use 'offset' with 'last'");
+      }
+    }
+    this._lockParameter("offset");
     return this;
   }
 
@@ -575,6 +603,7 @@ export class PgClassSelectPlan<
       rawSqlValues,
       identifierIndex,
       queryValuesDependencyIndexes,
+      shouldReverseOrder,
     } = this.finalizeResults;
 
     const executionResult = await this.dataSource.execute(
@@ -599,7 +628,8 @@ export class PgClassSelectPlan<
     );
     debugExecute("%s; result: %c", this, executionResult);
 
-    return executionResult.values;
+    const vals = executionResult.values;
+    return shouldReverseOrder ? vals.map((arr) => reverseArray(arr)) : vals;
   }
 
   private buildSelect(
@@ -724,10 +754,19 @@ export class PgClassSelectPlan<
     return this.orders;
   }
 
+  /**
+   * If `last` is in use then we reverse the order from the database and then
+   * re-reverse it in JS-land.
+   */
+  private shouldReverseOrder() {
+    return this.first == null && this.last != null;
+  }
+
   private buildOrderBy() {
     this._lockParameter("orderBy");
-    const orders = this.orders;
-
+    const orders = this.shouldReverseOrder()
+      ? this.orders.map((o) => ({ ...o, ascending: !o.ascending }))
+      : this.orders;
     return {
       sql:
         orders.length > 0
@@ -749,10 +788,17 @@ export class PgClassSelectPlan<
   }
 
   private buildLimit() {
+    // NOTE: according to the EdgesToReturn algorithm in the GraphQL Cursor
+    // Connections Specification first is applied first, then last is applied.
+    // For us this means that if first is present we set the limit to this and
+    // then we do the last artificially later.
+    // https://relay.dev/graphql/connections.htm#EdgesToReturn()
     return {
       sql:
-        this.limit != null
-          ? sql`\nlimit ${sql.literal(this.limit)}`
+        this.first != null
+          ? sql`\nlimit ${sql.literal(this.first)}`
+          : this.last != null
+          ? sql`\nlimit ${sql.literal(this.last)}`
           : sql.blank,
     };
   }
@@ -888,6 +934,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
         rawSqlValues,
         identifierIndex,
         queryValuesDependencyIndexes,
+        shouldReverseOrder: this.shouldReverseOrder(),
       };
     }
 
@@ -986,7 +1033,10 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
       // HAVING is not supported
 
       // Check LIMIT matches
-      if (this.limit !== p.limit) {
+      if (this.first !== p.first) {
+        return false;
+      }
+      if (this.last !== p.last) {
         return false;
       }
 
@@ -1157,8 +1207,11 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
         table.locked = false;
 
         if (
-          this.isUnique
-          /* TODO: && !this.groupBy && !this.having && !this.limit && !this.order && !this.offset && ... */
+          this.isUnique &&
+          this.first == null &&
+          this.last == null &&
+          this.offset == null
+          /* TODO: && !this.groupBy && !this.having && !this.order && ... */
         ) {
           const { sql: where } = this.buildWhere();
           const conditions = [
@@ -1190,7 +1243,10 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
           this.mergePlaceholdersInto(table);
           debugPlanVerbose("Merging %c into %c (via %c)", this, table, parent);
           const actualKeyByDesiredKey = this.mergeSelectsWith(table);
-          // We return a list here because our children are going to use a `first` plan on us
+          // We return a list here because our children are going to use a
+          // `first` plan on us.
+          // NOTE: we don't need to reverse the list for relay pagination
+          // because it only contains one entry.
           return list([map(parent, actualKeyByDesiredKey)]);
         } else if (parent instanceof PgClassSelectSinglePlan) {
           const parent2 =
@@ -1216,7 +1272,12 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
             parent2,
           );
           //console.dir(this.dependencies.map((id) => this.aether.plans[id]));
-          return access(parent2, [selfIndex]);
+          const rowsPlan = access<any[]>(parent2, [selfIndex]);
+          if (this.shouldReverseOrder()) {
+            return reverse(rowsPlan);
+          } else {
+            return rowsPlan;
+          }
         }
 
         table.locked = tableWasLocked;
