@@ -719,9 +719,7 @@ export class PgClassSelectPlan<
   }
 
   public finalizeArguments(): void {
-    console.log("FINALIZE ARGUMENTS CALLED HERE");
     this._lockAllParameters();
-    console.log("FINALIZE ARGUMENTS COMPLETE");
     return super.finalizeArguments();
   }
 
@@ -1311,7 +1309,6 @@ function joinMatches(
  * Apply a default order in case our default is not unique.
  */
 function ensureOrderIsUnique(plan: PgClassSelectPlan<any>) {
-  console.log("ensureOrderIsUnique CALLED HERE");
   const uniqueColumns: string[] = plan.dataSource.uniques[0];
   if (uniqueColumns) {
     const ordersIsUnique = plan.orderIsUnique();
