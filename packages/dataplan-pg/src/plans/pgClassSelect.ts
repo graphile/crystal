@@ -127,7 +127,7 @@ export class PgClassSelectPlan<
    * this will be a list of columns (e.g. primary or foreign keys on the
    * table).
    */
-  private identifierMatches: SQL[];
+  private identifierMatches: readonly SQL[];
 
   /**
    * If this plan has queryValues, we must feed the queryValues into the placeholders to
@@ -271,7 +271,7 @@ export class PgClassSelectPlan<
     this.symbol = cloneFrom ? cloneFrom.symbol : Symbol(dataSource.name);
     this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
     this.identifierMatches = cloneFrom
-      ? cloneFrom.identifierMatches
+      ? Object.freeze(cloneFrom.identifierMatches)
       : identifierMatchesThunk(this.alias);
     this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
     this.joins = cloneFrom ? [...cloneFrom.joins] : [];
@@ -282,8 +282,8 @@ export class PgClassSelectPlan<
     this.isInliningForbidden = cloneFrom
       ? cloneFrom.isInliningForbidden
       : false;
-    this.conditions = cloneFrom ? cloneFrom.conditions : [];
-    this.orders = cloneFrom ? cloneFrom.orders : [];
+    this.conditions = cloneFrom ? [...cloneFrom.conditions] : [];
+    this.orders = cloneFrom ? [...cloneFrom.orders] : [];
     this.limit = cloneFrom ? cloneFrom.limit : null;
     this.offset = cloneFrom ? cloneFrom.offset : null;
 
