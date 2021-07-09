@@ -10,6 +10,7 @@ where
     true /* authorization checks */
   )
 order by __messages__."id" asc
+limit 3
 
 select __users_result__.*
 from (

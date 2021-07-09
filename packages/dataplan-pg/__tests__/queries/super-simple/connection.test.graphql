@@ -1,6 +1,7 @@
 ## expect(queries).toHaveLength(1);
+## expect(data.allMessagesConnection.edges).toHaveLength(3);
 {
-  allMessagesConnection {
+  allMessagesConnection(first: 3) {
     edges {
       cursor
       node {

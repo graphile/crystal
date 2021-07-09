@@ -14,3 +14,4 @@ where
     true /* authorization checks */
   )
 order by __messages__."id" asc
+limit 3
