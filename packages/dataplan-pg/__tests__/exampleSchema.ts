@@ -682,7 +682,7 @@ export function makeExampleSchema(
           messagesList: {
             type: new GraphQLList(Message),
             args: {
-              limit: {
+              first: {
                 type: GraphQLInt,
                 plan(
                   _$forum,
@@ -736,7 +736,7 @@ export function makeExampleSchema(
           messagesConnection: {
             type: MessagesConnection,
             args: {
-              limit: {
+              first: {
                 type: GraphQLInt,
                 plan(
                   _$forum,
@@ -812,7 +812,7 @@ export function makeExampleSchema(
             return $forums;
           },
           args: {
-            limit: {
+            first: {
               type: GraphQLInt,
               plan(
                 _$root,
@@ -843,7 +843,7 @@ export function makeExampleSchema(
         allMessagesConnection: {
           type: MessagesConnection,
           args: {
-            limit: {
+            first: {
               type: GraphQLInt,
               plan(
                 _$root,

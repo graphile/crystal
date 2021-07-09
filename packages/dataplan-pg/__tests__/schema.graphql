@@ -1,12 +1,12 @@
 type Query {
   forums(
-    limit: Int
+    first: Int
     includeArchived: IncludeArchived = INHERIT
     condition: ForumCondition
     filter: ForumFilter
   ): [Forum]
   allMessagesConnection(
-    limit: Int
+    first: Int
     condition: MessageCondition
     filter: MessageFilter
     includeArchived: IncludeArchived = INHERIT
@@ -16,15 +16,17 @@ type Query {
 type Forum {
   id: String
   name: String
+  isArchived: Boolean
+  archivedAtIsNotNull: Boolean
   self: Forum
   messagesList(
-    limit: Int
+    first: Int
     condition: MessageCondition
     filter: MessageFilter
     includeArchived: IncludeArchived = INHERIT
   ): [Message]
   messagesConnection(
-    limit: Int
+    first: Int
     condition: MessageCondition
     filter: MessageFilter
     includeArchived: IncludeArchived = INHERIT
