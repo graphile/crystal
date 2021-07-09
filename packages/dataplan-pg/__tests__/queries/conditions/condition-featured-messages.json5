@@ -7,7 +7,7 @@
         nodes: [{ body: "Postgres = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } }],
         edges: [
           {
-            cursor: '["TODO","0909831b-c472-11eb-b6b5-e3e0b3a2c8e9"]',
+            cursor: "WyJUT0RPIiwiMDkwOTgzMWItYzQ3Mi0xMWViLWI2YjUtZTNlMGIzYTJjOGU5Il0=",
             node: { body: "Postgres = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
           },
         ],

@@ -35,7 +35,10 @@ export class PgCursorPlan<
     values: CrystalValuesList<ReadonlyArray<any>>,
   ): CrystalResultsList<string> {
     return values.map((value) =>
-      JSON.stringify(["TODO", ...value[this.cursorValuesPlanId]]),
+      Buffer.from(
+        JSON.stringify(["TODO", ...value[this.cursorValuesPlanId]]),
+        "utf8",
+      ).toString("base64"),
     );
   }
 }
