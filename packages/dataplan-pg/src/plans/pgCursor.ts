@@ -1,6 +1,5 @@
 import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
-import { list, object } from "graphile-crystal";
-import { ExecutablePlan } from "graphile-crystal";
+import { ExecutablePlan, list } from "graphile-crystal";
 
 import type { PgDataSource } from "../datasource";
 import { PgClassSelectSinglePlan } from "./pgClassSelectSingle";
@@ -10,10 +9,13 @@ export class PgCursorPlan<
 > extends ExecutablePlan<any> {
   private cursorValuesPlanId: number;
   private classSinglePlanId: number;
+  private digest: string;
+
   constructor(itemPlan: PgClassSelectSinglePlan<any>) {
     super();
     const classPlan = itemPlan.getClassPlan();
     this.classSinglePlanId = itemPlan.id;
+    this.digest = classPlan.getOrderByDigest();
     const orders = classPlan.getOrderBy();
     const plan = list(
       orders.map((o) => itemPlan.expression(o.fragment, o.codec)),
@@ -36,7 +38,7 @@ export class PgCursorPlan<
   ): CrystalResultsList<string> {
     return values.map((value) =>
       Buffer.from(
-        JSON.stringify(["TODO", ...value[this.cursorValuesPlanId]]),
+        JSON.stringify([this.digest, ...value[this.cursorValuesPlanId]]),
         "utf8",
       ).toString("base64"),
     );

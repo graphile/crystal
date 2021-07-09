@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import debugFactory from "debug";
 import type {
   __ListItemPlan,
@@ -23,6 +24,13 @@ import type { PgOrderSpec, PgTypedExecutablePlan } from "../interfaces";
 import { PgClassSelectSinglePlan } from "./pgClassSelectSingle";
 import { PgConditionPlan } from "./pgCondition";
 import { PgExpressionPlan } from "./pgExpression";
+
+const isDev = process.env.NODE_ENV === "development";
+
+type LockableParameter = "orderBy";
+type BeforeLockCallback<
+  TDataSource extends PgDataSource<any, any> = PgDataSource<any, any>,
+> = (plan: PgClassSelectPlan<TDataSource>) => void;
 
 const debugPlan = debugFactory("datasource:pg:PgClassSelectPlan:plan");
 const debugExecute = debugFactory("datasource:pg:PgClassSelectPlan:execute");
@@ -96,6 +104,7 @@ export class PgClassSelectPlan<
   // ORDER BY
 
   private orders: Array<PgOrderSpec>;
+  private isOrderUnique: boolean;
 
   // LIMIT
 
@@ -170,15 +179,6 @@ export class PgClassSelectPlan<
   private contextId: number;
 
   /**
-   * When finalized with respect to arguments, we may tweak various things such
-   * as orders. These values may be useful to child plans (e.g. PgCursorPlan
-   * needs to know the final orders so it knows what to select).
-   */
-  private finalizeArgumentsResults: {
-    orders: typeof PgClassSelectPlan.prototype.orders;
-  } | null = null;
-
-  /**
    * When finalized, we build the SQL query, queryValues, and note where to feed in
    * the relevant queryValues. This saves repeating this work at execution time.
    */
@@ -203,6 +203,20 @@ export class PgClassSelectPlan<
    * not prevent adding more SELECTs
    */
   private locked = false;
+
+  // --------------------
+
+  private _beforeLock: {
+    [a in LockableParameter]: Array<BeforeLockCallback>;
+  } = {
+    orderBy: [],
+  };
+
+  private _lockedParameter: {
+    [a in LockableParameter]: false | true | string | undefined;
+  } = {
+    orderBy: false,
+  };
 
   constructor(
     dataSource: TDataSource,
@@ -253,7 +267,12 @@ export class PgClassSelectPlan<
           );
         }
       });
+    } else {
+      // Since we're applying this to the original it doesn't make sense to
+      // also apply it to the clones.
+      this.beforeLock("orderBy", ensureOrderIsUnique);
     }
+
     this.contextId = cloneFrom
       ? cloneFrom.contextId
       : this.addDependency(this.dataSource.context());
@@ -276,7 +295,6 @@ export class PgClassSelectPlan<
     this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
     this.joins = cloneFrom ? [...cloneFrom.joins] : [];
     this.selects = cloneFrom ? [...cloneFrom.selects] : [];
-    // this.cursorPlan = cloneFrom ? cloneFrom.cursorPlan : null;
     this.isTrusted = cloneFrom ? cloneFrom.isTrusted : false;
     this.isUnique = cloneFrom ? cloneFrom.isUnique : false;
     this.isInliningForbidden = cloneFrom
@@ -284,6 +302,7 @@ export class PgClassSelectPlan<
       : false;
     this.conditions = cloneFrom ? [...cloneFrom.conditions] : [];
     this.orders = cloneFrom ? [...cloneFrom.orders] : [];
+    this.isOrderUnique = cloneFrom ? cloneFrom.isOrderUnique : false;
     this.limit = cloneFrom ? cloneFrom.limit : null;
     this.offset = cloneFrom ? cloneFrom.offset : null;
 
@@ -308,6 +327,7 @@ export class PgClassSelectPlan<
   }
 
   public lock(): void {
+    this._lockAllParameters();
     this.locked = true;
   }
 
@@ -442,6 +462,18 @@ export class PgClassSelectPlan<
 
   wherePlan(): PgConditionPlan<this> {
     return new PgConditionPlan(this);
+  }
+
+  orderBy(order: PgOrderSpec): void {
+    this._assertParameterUnlocked("orderBy");
+    this.orders.push(order);
+  }
+
+  orderIsUnique(): boolean {
+    return this.isOrderUnique;
+  }
+  setOrderIsUnique(): void {
+    this.isOrderUnique = true;
   }
 
   /**
@@ -591,20 +623,34 @@ export class PgClassSelectPlan<
     };
   }
 
+  /**
+   * So we can quickly detect if cursors are invalid we use this digest,
+   * passing this check does not mean that the cursor is valid but it at least
+   * catches common user errors.
+   */
+  public getOrderByDigest() {
+    this._lockParameter("orderBy");
+    // The security of this hash is unimportant; the main aim is to protect the
+    // user from themself. If they bypass this, that's their problem (it will
+    // not introduce a security issue).
+    const hash = createHash("sha256");
+    hash.update(
+      JSON.stringify(
+        this.orders.map((o) => [sql.compile(o.fragment).text, o.ascending]),
+      ),
+    );
+    const digest = hash.digest("hex").substr(0, 10);
+    return digest;
+  }
+
   public getOrderBy(): ReadonlyArray<PgOrderSpec> {
-    if (!this.finalizeArgumentsResults) {
-      throw new Error(
-        `Cannot ${this}.getOrderBy() before it has had its arguments finalized.`,
-      );
-    }
-    return this.finalizeArgumentsResults.orders;
+    this._lockParameter("orderBy");
+    return this.orders;
   }
 
   private buildOrderBy() {
-    if (!this.finalizeArgumentsResults) {
-      throw new Error("Cannot execute PgClassSelectPlan before finalizing it.");
-    }
-    const orders = [...this.finalizeArgumentsResults.orders];
+    this._lockParameter("orderBy");
+    const orders = this.orders;
 
     return {
       sql:
@@ -673,28 +719,10 @@ export class PgClassSelectPlan<
   }
 
   public finalizeArguments(): void {
-    if (!this.isArgumentsFinalized) {
-      const orders = [...this.orders];
-      // Apply a default order in case our default is not unique.
-      // TODO: should we really apply a default order _here_ rather than in the calling code?
-      if (this.dataSource.uniques.length > 0) {
-        const ordersIsUnique = false; /* TODO */
-        if (!ordersIsUnique) {
-          const uniqueColumns: string[] = this.dataSource.uniques[0];
-          orders.push(
-            ...uniqueColumns.map((c) => ({
-              fragment: sql`${this.alias}.${sql.identifier(c)}`,
-              codec: this.dataSource.columns[c].codec,
-              ascending: true,
-            })),
-          );
-        }
-      }
-      this.finalizeArgumentsResults = {
-        orders,
-      };
-    }
-    super.finalizeArguments();
+    console.log("FINALIZE ARGUMENTS CALLED HERE");
+    this._lockAllParameters();
+    console.log("FINALIZE ARGUMENTS COMPLETE");
+    return super.finalizeArguments();
   }
 
   public finalize(): void {
@@ -1158,6 +1186,92 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
   ): PgClassSelectSinglePlan<TDataSource> {
     return new PgClassSelectSinglePlan(this, itemPlan);
   }
+
+  // --------------------
+
+  /**
+   * Performs the given call back just before the given LockableParameter is
+   * locked.
+   *
+   * @remarks To make sure we do things in the right order (e.g. ensure all the
+   * `order by` values are established before attempting to interpret a
+   * `cursor` for `before`/`after`) we need a locking system. This locking
+   * system allows for final actions to take place _just before_ the element is
+   * locked, for example _just before_ the order is locked we might want to
+   * check that the ordering is unique, and if it is not then we may want to
+   * add the primary key to the ordering.
+   */
+  public beforeLock(
+    type: LockableParameter,
+    callback: BeforeLockCallback,
+  ): void {
+    this._assertParameterUnlocked(type);
+    this._beforeLock[type].push(callback);
+  }
+
+  /**
+   * Calls all the beforeLock actions for the given parameter and then locks
+   * it.
+   */
+  private _lockParameter(type: LockableParameter): void {
+    if (this._lockedParameter[type] !== false) {
+      return;
+    }
+    const preLockCallbacks = this._beforeLock[type];
+    const l = preLockCallbacks.length;
+    if (l > 0) {
+      const callbacks = preLockCallbacks.splice(0, l);
+      for (let i = 0; i < l; i++) {
+        callbacks[i](this);
+      }
+      if (preLockCallbacks.length > 0) {
+        throw new Error(
+          `beforeLock callback for '${type}' caused more beforeLock callbacks to be registered`,
+        );
+      }
+    }
+    this._lockedParameter[type] = isDev
+      ? new Error("Initially locked here").stack
+      : true;
+  }
+
+  /**
+   * Throw a helpful error if you're trying to modify something that's already
+   * locked.
+   */
+  private _assertParameterUnlocked(type: LockableParameter): void {
+    const isLocked = this._lockedParameter[type];
+    if (isLocked !== false) {
+      if (typeof isLocked === "string") {
+        throw new Error(
+          `'${type}' has already been locked\n    ` +
+            isLocked.replace(/\n/g, "\n    ") +
+            "\n",
+        );
+      }
+      throw new Error(`'${type}' has already been locked`);
+    }
+  }
+
+  private _lockAllParameters() {
+    // // We must execute everything after `from` so we have the alias to reference
+    // this._lockParameter("from");
+    // this._lockParameter("join");
+    this._lockParameter("orderBy");
+    // // We must execute where after orderBy because cursor queries require all orderBy columns
+    // this._lockParameter("cursorComparator");
+    // this._lockParameter("whereBound");
+    // this._lockParameter("where");
+    // // 'where' -> 'whereBound' can affect 'offset'/'limit'
+    // this._lockParameter("offset");
+    // this._lockParameter("limit");
+    // this._lockParameter("first");
+    // this._lockParameter("last");
+    // // We must execute select after orderBy otherwise we cannot generate a cursor
+    // this._lockParameter("fixedSelectExpression");
+    // this._lockParameter("selectCursor");
+    // this._lockParameter("select");
+  }
 }
 
 function joinMatches(
@@ -1190,5 +1304,26 @@ function joinMatches(
       return false;
     }
     return true;
+  }
+}
+
+/**
+ * Apply a default order in case our default is not unique.
+ */
+function ensureOrderIsUnique(plan: PgClassSelectPlan<any>) {
+  console.log("ensureOrderIsUnique CALLED HERE");
+  const uniqueColumns: string[] = plan.dataSource.uniques[0];
+  if (uniqueColumns) {
+    const ordersIsUnique = plan.orderIsUnique();
+    if (!ordersIsUnique) {
+      uniqueColumns.forEach((c) => {
+        plan.orderBy({
+          fragment: sql`${plan.alias}.${sql.identifier(c)}`,
+          codec: plan.dataSource.columns[c].codec,
+          ascending: true,
+        });
+      });
+      plan.setOrderIsUnique();
+    }
   }
 }
