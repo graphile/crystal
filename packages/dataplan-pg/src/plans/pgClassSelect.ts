@@ -25,10 +25,11 @@ import { PgClassSelectSinglePlan } from "./pgClassSelectSingle";
 import { PgConditionPlan } from "./pgCondition";
 import { PgExpressionPlan } from "./pgExpression";
 
-const isDev = process.env.NODE_ENV === "development";
+const isDev =
+  process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
 
 type LockableParameter = "orderBy";
-type BeforeLockCallback<
+type LockCallback<
   TDataSource extends PgDataSource<any, any> = PgDataSource<any, any>,
 > = (plan: PgClassSelectPlan<TDataSource>) => void;
 
@@ -207,7 +208,13 @@ export class PgClassSelectPlan<
   // --------------------
 
   private _beforeLock: {
-    [a in LockableParameter]: Array<BeforeLockCallback>;
+    [a in LockableParameter]: Array<LockCallback>;
+  } = {
+    orderBy: [],
+  };
+
+  private _afterLock: {
+    [a in LockableParameter]: Array<LockCallback>;
   } = {
     orderBy: [],
   };
@@ -472,8 +479,77 @@ export class PgClassSelectPlan<
   orderIsUnique(): boolean {
     return this.isOrderUnique;
   }
+
   setOrderIsUnique(): void {
     this.isOrderUnique = true;
+  }
+
+  parseCursor(beforeOrAfter: "before" | "after", cursor: string | null): void {
+    if (cursor == null) {
+      return;
+    }
+    const digest = this.getOrderByDigest();
+    const orders = this.getOrderBy();
+    const orderCount = orders.length;
+    if (orderCount === 0 || !this.isOrderUnique) {
+      throw new Error(
+        `Can only use '${beforeOrAfter}' cursor when there is a unique defined order.`,
+      );
+    }
+    try {
+      const decoded = JSON.parse(
+        Buffer.from(cursor, "base64").toString("utf8"),
+      );
+      if (!Array.isArray(decoded)) {
+        throw new Error("Expected array");
+      }
+      const [cursorDigest, ...cursorParts] = decoded;
+      if (!cursorDigest || cursorDigest !== digest) {
+        throw new Error("Invalid cursor digest");
+      }
+      if (cursorParts.length !== orderCount) {
+        throw new Error("Invalid cursor length");
+      }
+      const condition = (i = 0): SQL => {
+        const order = orders[i];
+        // Codec is responsible for performing validation/coercion and throwing
+        // error if value is invalid.
+        // TODO: make sure this ^ is clear in the relevant places.
+        const sqlValue = order.codec.toPg(cursorParts[i]);
+        const gt =
+          (order.ascending && beforeOrAfter === "after") ||
+          (!order.ascending && beforeOrAfter === "before");
+
+        let fragment = sql`${order.fragment} ${
+          gt ? sql`>` : sql`<`
+        } ${sqlValue}`;
+
+        if (i < orderCount - 1) {
+          fragment = sql`(${fragment}) or (${
+            order.fragment
+          } = ${sqlValue} and ${condition(i + 1)})`;
+        }
+
+        return sql.parens(fragment);
+      };
+      this.where(condition());
+    } catch (e) {
+      if (isDev) {
+        console.error("Invalid cursor:");
+        console.error(e);
+      }
+      throw new Error(
+        `Invalid '${beforeOrAfter}' cursor - a cursor is only valid within a specific ordering, if you change the order then you'll need different cursors.`,
+      );
+    }
+  }
+
+  after(cursor: string): void {
+    this.parseCursor("after", cursor);
+  }
+
+  before(cursor: string): void {
+    this.parseCursor("before", cursor);
   }
 
   /**
@@ -1199,12 +1275,38 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
    * check that the ordering is unique, and if it is not then we may want to
    * add the primary key to the ordering.
    */
-  public beforeLock(
-    type: LockableParameter,
-    callback: BeforeLockCallback,
-  ): void {
+  public beforeLock(type: LockableParameter, callback: LockCallback): void {
     this._assertParameterUnlocked(type);
     this._beforeLock[type].push(callback);
+  }
+
+  /**
+   * Performs the given call back just after the given LockableParameter is
+   * locked.
+   */
+  public afterLock(type: LockableParameter, callback: LockCallback): void {
+    this._assertParameterUnlocked(type);
+    this._afterLock[type].push(callback);
+  }
+
+  private lockCallbacks(
+    phase: "beforeLock" | "afterLock",
+    type: LockableParameter,
+  ) {
+    const list = phase === "beforeLock" ? this._beforeLock : this._afterLock;
+    const callbacks = list[type];
+    const l = callbacks.length;
+    if (l > 0) {
+      const toCall = callbacks.splice(0, l);
+      for (let i = 0; i < l; i++) {
+        toCall[i](this);
+      }
+      if (callbacks.length > 0) {
+        throw new Error(
+          `beforeLock callback for '${type}' caused more beforeLock callbacks to be registered`,
+        );
+      }
+    }
   }
 
   /**
@@ -1215,22 +1317,11 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
     if (this._lockedParameter[type] !== false) {
       return;
     }
-    const preLockCallbacks = this._beforeLock[type];
-    const l = preLockCallbacks.length;
-    if (l > 0) {
-      const callbacks = preLockCallbacks.splice(0, l);
-      for (let i = 0; i < l; i++) {
-        callbacks[i](this);
-      }
-      if (preLockCallbacks.length > 0) {
-        throw new Error(
-          `beforeLock callback for '${type}' caused more beforeLock callbacks to be registered`,
-        );
-      }
-    }
+    this.lockCallbacks("beforeLock", type);
     this._lockedParameter[type] = isDev
       ? new Error("Initially locked here").stack
       : true;
+    this.lockCallbacks("afterLock", type);
   }
 
   /**

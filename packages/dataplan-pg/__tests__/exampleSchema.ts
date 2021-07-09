@@ -843,18 +843,6 @@ export function makeExampleSchema(
         allMessagesConnection: {
           type: MessagesConnection,
           args: {
-            first: {
-              type: GraphQLInt,
-              plan(
-                _$root,
-                $connection: PgConnectionPlan<typeof messageSource>,
-                $value,
-              ) {
-                const $messages = $connection.getSubplan();
-                $messages.setLimit($value.eval());
-                return null;
-              },
-            },
             condition: {
               type: MessageCondition,
               plan(
@@ -881,6 +869,46 @@ export function makeExampleSchema(
             includeArchived: makeIncludeArchivedField<
               PgConnectionPlan<typeof messageSource>
             >(($connection) => $connection.getSubplan()),
+            first: {
+              type: GraphQLInt,
+              plan(
+                _$root,
+                $connection: PgConnectionPlan<typeof messageSource>,
+                $value,
+              ) {
+                const $messages = $connection.getSubplan();
+                $messages.setLimit($value.eval());
+                return null;
+              },
+            },
+            after: {
+              type: GraphQLString,
+              plan(
+                _$root,
+                $connection: PgConnectionPlan<typeof messageSource>,
+                $value,
+              ) {
+                const $messages = $connection.getSubplan();
+                $messages.afterLock("orderBy", () => {
+                  $messages.after($value.eval());
+                });
+                return null;
+              },
+            },
+            before: {
+              type: GraphQLString,
+              plan(
+                _$root,
+                $connection: PgConnectionPlan<typeof messageSource>,
+                $value,
+              ) {
+                const $messages = $connection.getSubplan();
+                $messages.afterLock("orderBy", () => {
+                  $messages.before($value.eval());
+                });
+                return null;
+              },
+            },
           },
           plan() {
             const $messages = messageSource.find();

@@ -1,0 +1,14 @@
+{
+  allMessagesConnection: {
+    edges: [
+      {
+        cursor: "WyJiN2JhMDhiZTBmIiwiMDkwOTgzMTQtYzQ3Mi0xMWViLWI2YjUtZWJmMGM2ZGVkNmExIl0=",
+        node: { body: "Cats = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+      },
+      {
+        cursor: "WyJiN2JhMDhiZTBmIiwiMDkwOTgzMTUtYzQ3Mi0xMWViLWI2YjUtYWIwNGJhN2VjZDJlIl0=",
+        node: { body: "Cats = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+      },
+    ],
+  },
+}

@@ -1,0 +1,22 @@
+## expect(queries).toHaveLength(1);
+## expect(data.allMessagesConnection.edges).toHaveLength(2);
+## expect(data.allMessagesConnection.edges[0].cursor).toEqual("WyJiN2JhMDhiZTBmIiwiMDkwOTgzMTQtYzQ3Mi0xMWViLWI2YjUtZWJmMGM2ZGVkNmExIl0=");
+## expect(data.allMessagesConnection.edges[0].node.author.username).toEqual("Alice");
+## expect(data.allMessagesConnection.edges[1].node.author.username).toEqual("Bob");
+{
+  allMessagesConnection(
+    first: 3
+    before: "WyJiN2JhMDhiZTBmIiwiMDkwOTgzMTYtYzQ3Mi0xMWViLWI2YjUtOTc3ZmE1N2ExNjE3Il0="
+  ) {
+    edges {
+      cursor
+      node {
+        body
+        author {
+          username
+          gravatarUrl
+        }
+      }
+    }
+  }
+}
