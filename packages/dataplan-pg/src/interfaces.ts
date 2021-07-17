@@ -40,6 +40,6 @@ export interface PgTypedExecutablePlan<TCanonical = any, TInput = TCanonical>
 export interface PgOrderSpec {
   fragment: SQL;
   codec: PgTypeCodec;
-  ascending: boolean;
-  nulls?: "first" | "last" | null;
+  direction: "ASC" | "DESC";
+  nulls?: "FIRST" | "LAST" | null;
 }

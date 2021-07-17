@@ -250,7 +250,7 @@ export function makeExampleSchema(
           plan.orderBy({
             codec: TYPES.text,
             fragment: sql`${plan.alias}.body`,
-            ascending: true,
+            direction: "ASC",
           });
         },
       },
@@ -259,7 +259,7 @@ export function makeExampleSchema(
           plan.orderBy({
             codec: TYPES.text,
             fragment: sql`${plan.alias}.body`,
-            ascending: false,
+            direction: "DESC",
           });
         },
       },
@@ -269,7 +269,7 @@ export function makeExampleSchema(
           plan.orderBy({
             codec: TYPES.text,
             fragment: sql`${authorAlias}.username`,
-            ascending: true,
+            direction: "ASC",
           });
         },
       },
@@ -279,7 +279,7 @@ export function makeExampleSchema(
           plan.orderBy({
             codec: TYPES.text,
             fragment: sql`${authorAlias}.username`,
-            ascending: false,
+            direction: "DESC",
           });
         },
       },
