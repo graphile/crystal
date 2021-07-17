@@ -595,8 +595,8 @@ export class PgClassSelectPlan<
         // TODO: make sure this ^ is clear in the relevant places.
         const sqlValue = order.codec.toPg(cursorParts[i]);
         const gt =
-          (order.ascending && beforeOrAfter === "after") ||
-          (!order.ascending && beforeOrAfter === "before");
+          (order.direction === "ASC" && beforeOrAfter === "after") ||
+          (order.direction === "DESC" && beforeOrAfter === "before");
 
         let fragment = sql`${order.fragment} ${
           gt ? sql`>` : sql`<`
@@ -813,7 +813,10 @@ export class PgClassSelectPlan<
   private buildOrderBy() {
     this._lockParameter("orderBy");
     const orders = this.shouldReverseOrder()
-      ? this.orders.map((o) => ({ ...o, ascending: !o.ascending }))
+      ? this.orders.map((o) => ({
+          ...o,
+          direction: o.direction === "ASC" ? "DESC" : "ASC",
+        }))
       : this.orders;
     return {
       sql:
@@ -821,10 +824,12 @@ export class PgClassSelectPlan<
           ? sql`\norder by ${sql.join(
               orders.map(
                 (o) =>
-                  sql`${o.fragment} ${o.ascending ? sql`asc` : sql`desc`}${
-                    o.nulls === "last"
+                  sql`${o.fragment} ${
+                    o.direction === "ASC" ? sql`asc` : sql`desc`
+                  }${
+                    o.nulls === "LAST"
                       ? sql` nulls last`
-                      : o.nulls === "first"
+                      : o.nulls === "FIRST"
                       ? sql` nulls first`
                       : sql.blank
                   }`,
@@ -1069,7 +1074,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
           this.orders,
           p.orders,
           (a, b) =>
-            a.ascending === b.ascending &&
+            a.direction === b.direction &&
             a.nulls === b.nulls &&
             sqlIsEquivalent(a.fragment, b.fragment),
         )
@@ -1523,7 +1528,7 @@ function ensureOrderIsUnique(plan: PgClassSelectPlan<any>) {
         plan.orderBy({
           fragment: sql`${plan.alias}.${sql.identifier(c)}`,
           codec: plan.dataSource.columns[c].codec,
-          ascending: true,
+          direction: "ASC",
         });
       });
       plan.setOrderIsUnique();

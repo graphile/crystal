@@ -565,7 +565,7 @@ export function makeExampleSchema(
     }),
   );
 
-  class TempTablePlan<TDataSource extends PgDataSource<any, any>>
+  class TempTablePlan<TDataSource extends PgDataSource<any, any, any>>
     extends BasePlan
     implements PgConditionCapableParentPlan
   {
@@ -592,7 +592,7 @@ export function makeExampleSchema(
   }
 
   class ManyFilterPlan<
-    TChildDataSource extends PgDataSource<any, any>,
+    TChildDataSource extends PgDataSource<any, any, any>,
   > extends ModifierPlan<ClassFilterPlan> {
     public $some: TempTablePlan<TChildDataSource> | null = null;
     constructor(
