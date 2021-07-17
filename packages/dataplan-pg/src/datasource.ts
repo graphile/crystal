@@ -129,6 +129,7 @@ export interface PgDataSourceRelation {
   targetTable: SQL;
   localColumns: string[];
   remoteColumns: string[];
+  isUnique: boolean;
 }
 
 /**
@@ -527,9 +528,3 @@ function formatSQLForDebugging(
 
   return output.join("\n");
 }
-
-export type AnyPgDataSource = PgDataSource<
-  { [columnName: string]: PgDataSourceColumn<any> },
-  ReadonlyArray<ReadonlyArray<string>>,
-  { [identifier: string]: PgDataSourceRelation }
->;

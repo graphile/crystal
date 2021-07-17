@@ -21,11 +21,7 @@ import {
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
 
-import type {
-  AnyPgDataSource,
-  PgDataSource,
-  PgDataSourceRelation,
-} from "../datasource";
+import type { PgDataSource, PgDataSourceRelation } from "../datasource";
 import type { PgOrderSpec, PgTypedExecutablePlan } from "../interfaces";
 import { PgClassSelectSinglePlan } from "./pgClassSelectSingle";
 import { PgConditionPlan } from "./pgCondition";
@@ -35,7 +31,7 @@ const isDev =
   process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
 
 type LockableParameter = "orderBy" | "first" | "last" | "offset";
-type LockCallback<TDataSource extends AnyPgDataSource> = (
+type LockCallback<TDataSource extends PgDataSource<any, any, any>> = (
   plan: PgClassSelectPlan<TDataSource>,
 ) => void;
 
@@ -472,12 +468,19 @@ export class PgClassSelectPlan<
    * Join to a named relationship and return the alias that can be used in
    * SELECT, WHERE and ORDER BY.
    */
-  public joinRelation(relationIdentifier: keyof TDataSource["relations"]): SQL {
+  public singleRelation(
+    relationIdentifier: keyof TDataSource["relations"],
+  ): SQL {
     const relation: PgDataSourceRelation | undefined =
       this.dataSource.relations[relationIdentifier as string];
     if (!relation) {
       throw new Error(
         `${this.dataSource} does not have a relation named '${relationIdentifier}'`,
+      );
+    }
+    if (!relation.isUnique) {
+      throw new Error(
+        `${this.dataSource} relation '${relationIdentifier}' is not unique so cannot be used with singleRelation`,
       );
     }
     const { targetTable, localColumns, remoteColumns } = relation;
@@ -489,7 +492,7 @@ export class PgClassSelectPlan<
     }
     const alias = sql.identifier(Symbol(relationIdentifier as string));
     this.joins.push({
-      type: "inner",
+      type: "left",
       source: targetTable,
       alias,
       conditions: localColumns.map(

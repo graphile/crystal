@@ -22,6 +22,7 @@ import {
   GraphQLInputObjectType,
   GraphQLInt,
   GraphQLList,
+  GraphQLNonNull,
   GraphQLObjectType,
   GraphQLSchema,
   GraphQLString,
@@ -30,6 +31,7 @@ import {
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 import prettier from "prettier";
+import { inspect } from "util";
 
 import type { PgClassSelectPlan, PgTypeCodec } from "../src";
 import {
@@ -42,7 +44,6 @@ import type {
   PgDataSourceContext,
   WithPgClient,
 } from "../src/datasource";
-import { PgOrderSpec } from "../src/interfaces";
 import type { PgConditionCapableParentPlan } from "../src/plans/pgCondition";
 import { PgConditionPlan } from "../src/plans/pgCondition";
 import { pgExpression } from "../src/plans/pgExpression";
@@ -182,6 +183,14 @@ export function makeExampleSchema(
       }),
     },
     uniques: [["id"]],
+    relations: {
+      author: {
+        targetTable: sql`app_public.users`,
+        localColumns: [`author_id`],
+        remoteColumns: [`id`],
+        isUnique: true,
+      },
+    },
   });
 
   const userSource = new PgDataSource({
@@ -254,22 +263,22 @@ export function makeExampleSchema(
           });
         },
       },
-      AUTHOR_NAME_ASC: {
+      AUTHOR_USERNAME_ASC: {
         value: (plan: PgClassSelectPlan<typeof messageSource>) => {
-          const authorAlias = plan.belongsToRelation("users");
+          const authorAlias = plan.singleRelation("author");
           plan.orderBy({
             codec: TYPES.text,
-            fragment: sql`${authorAlias}.name`,
+            fragment: sql`${authorAlias}.username`,
             ascending: true,
           });
         },
       },
-      AUTHOR_NAME_DESC: {
+      AUTHOR_USERNAME_DESC: {
         value: (plan: PgClassSelectPlan<typeof messageSource>) => {
-          const authorAlias = plan.belongsToRelation("users");
+          const authorAlias = plan.singleRelation("author");
           plan.orderBy({
             codec: TYPES.text,
-            fragment: sql`${authorAlias}.name`,
+            fragment: sql`${authorAlias}.username`,
             ascending: false,
           });
         },
@@ -966,7 +975,7 @@ export function makeExampleSchema(
               },
             },
             orderBy: {
-              type: MessagesOrderBy,
+              type: new GraphQLList(new GraphQLNonNull(MessagesOrderBy)),
               plan(
                 _$root,
                 $connection: PgConnectionPlan<typeof messageSource>,
@@ -974,10 +983,25 @@ export function makeExampleSchema(
               ) {
                 const $messages = $connection.getSubplan();
                 const val = $value.eval();
-                if (typeof val !== "function") {
-                  throw new Error("Invalid orderBy configuration");
+                if (!val) {
+                  return null;
                 }
-                val($messages);
+                if (!Array.isArray(val)) {
+                  throw new Error("Invalid!");
+                }
+                val.forEach((order) => {
+                  if (typeof order !== "function") {
+                    console.error(
+                      `Internal server error: invalid orderBy configuration: expected function, but received ${inspect(
+                        order,
+                      )}`,
+                    );
+                    throw new Error(
+                      "Internal server error: invalid orderBy configuration",
+                    );
+                  }
+                  order($messages);
+                });
                 return null;
               },
             },

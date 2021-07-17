@@ -20,7 +20,7 @@ import { inspect } from "util";
 import type { Aether } from "./aether";
 import * as assert from "./assert";
 import { ExecutablePlan } from "./plan";
-import type { __TrackedObjectPlan } from "./plans";
+import { __TrackedObjectPlan } from "./plans";
 import { defaultValueToValueNode } from "./utils";
 
 // TODO: should this have `__` prefix?
@@ -29,6 +29,14 @@ export type InputPlan =
   | InputListPlan // .at(), .eval(), .evalLength(), .evalIs(null)
   | InputStaticLeafPlan // .eval(), .evalIs()
   | InputObjectPlan; // .get(), .eval(), .evalHas(), .evalIs(null)
+
+function assertInputPlan(itemPlan: unknown): asserts itemPlan is InputPlan {
+  if (itemPlan instanceof __TrackedObjectPlan) return;
+  if (itemPlan instanceof InputListPlan) return;
+  if (itemPlan instanceof InputStaticLeafPlan) return;
+  if (itemPlan instanceof InputObjectPlan) return;
+  throw new Error(`Expected an InputPlan, but found ${itemPlan}`);
+}
 
 function graphqlGetTypeForNode(
   aether: Aether,
@@ -161,8 +169,8 @@ function inputNonNullPlan(_aether: Aether, innerPlan: InputPlan): InputPlan {
  * Implements `InputListPlan`.
  */
 export class InputListPlan extends ExecutablePlan {
-  private itemPlans: InputPlan[] = [];
-  private outOfBoundsPlan: InputPlan;
+  private itemPlanIds: number[] = [];
+  private outOfBoundsPlanId: number;
 
   constructor(
     inputType: GraphQLList<GraphQLInputType>,
@@ -184,12 +192,12 @@ export class InputListPlan extends ExecutablePlan {
       ) {
         const inputValue = values[inputValueIndex];
         const innerPlan = inputPlan(this.aether, innerType, inputValue);
-        this.itemPlans.push(innerPlan);
+        this.itemPlanIds.push(innerPlan.id);
       }
     }
     // TODO: is `outOfBoundsPlan` safe? Maybe it was before we simplified
     // `InputNonNullPlan`, but maybe it's not safe any more?
-    this.outOfBoundsPlan = inputPlan(this.aether, innerType, undefined);
+    this.outOfBoundsPlanId = inputPlan(this.aether, innerType, undefined).id;
   }
 
   execute(values: any[][]): any[] {
@@ -203,14 +211,16 @@ export class InputListPlan extends ExecutablePlan {
     if (inputValues?.kind === "NullValue") {
       eachResult = null;
     } else {
-      const itemPlansLength = this.itemPlans.length;
+      const itemPlansLength = this.itemPlanIds.length;
       const list = new Array(itemPlansLength);
       for (
         let itemPlanIndex = 0;
         itemPlanIndex < itemPlansLength;
         itemPlanIndex++
       ) {
-        const itemPlan = this.itemPlans[itemPlanIndex];
+        const itemPlanId = this.itemPlanIds[itemPlanIndex];
+        const itemPlan = this.aether.plans[itemPlanId];
+        assertInputPlan(itemPlan);
         const value = itemPlan.eval();
         list[itemPlanIndex] = value;
       }
@@ -221,21 +231,29 @@ export class InputListPlan extends ExecutablePlan {
   }
 
   at(index: number): InputPlan {
-    return this.itemPlans[index] || this.outOfBoundsPlan;
+    const itemPlanId = this.itemPlanIds[index];
+    const outOfBoundsPlan = this.aether.plans[this.outOfBoundsPlanId];
+    const itemPlan = itemPlanId
+      ? this.aether.plans[itemPlanId]
+      : outOfBoundsPlan;
+    assertInputPlan(itemPlan);
+    return itemPlan;
   }
 
   eval(): any[] | null {
     if (this.inputValues?.kind === "NullValue") {
       return null;
     }
-    const itemPlansLength = this.itemPlans.length;
+    const itemPlansLength = this.itemPlanIds.length;
     const list = new Array(itemPlansLength);
     for (
       let itemPlanIndex = 0;
       itemPlanIndex < itemPlansLength;
       itemPlanIndex++
     ) {
-      const itemPlan = this.itemPlans[itemPlanIndex];
+      const itemPlanId = this.itemPlanIds[itemPlanIndex];
+      const itemPlan = this.aether.plans[itemPlanId];
+      assertInputPlan(itemPlan);
       const value = itemPlan.eval();
       list[itemPlanIndex] = value;
     }
