@@ -49,3 +49,43 @@ insert into app_public.messages (id, forum_id, author_id, body, featured, archiv
     (case when forums.name = 'Dogs' then now() else null end) as archived_at
   from app_public.users, app_public.forums
   order by forums.id, users.id;
+
+-- Custom queries
+create function app_public.unique_author_count(featured bool) returns int as $$
+  select count(distinct author_id)
+  from app_public.messages
+  where (unique_author_count.featured is null or unique_author_count.featured = messages.featured)
+$$ language sql stable;
+create function app_public.random_user() returns app_public.users as $$
+  select users.*
+  from app_public.users
+  order by random()
+  limit 1
+$$ language sql stable;
+create function app_public.featured_messages() returns setof app_public.messages as $$
+  select messages.*
+  from app_public.messages
+  where featured is true
+$$ language sql stable;
+
+-- Computed columns
+create function app_public.forums_unique_author_count(forum app_public.forums, featured bool) returns int as $$
+  select count(distinct author_id)
+  from app_public.messages
+  where forum_id = forum.id
+  and (forums_unique_author_count.featured is null or forums_unique_author_count.featured = messages.featured)
+$$ language sql stable;
+create function app_public.forums_random_user(forum app_public.forums) returns app_public.users as $$
+  select users.*
+  from app_public.users
+  inner join app_public.messages
+  on messages.forum_id = forum.id
+  order by random()
+  limit 1;
+$$ language sql stable;
+create function app_public.forums_featured_messages(forum app_public.forums) returns setof app_public.messages as $$
+  select messages.*
+  from app_public.messages
+  where featured is true
+  and messages.forum_id = forum.id
+$$ language sql stable;
