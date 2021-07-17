@@ -8,8 +8,10 @@ import type { PgDataSource } from "../datasource";
 import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
 import { PgClassSelectSinglePlan } from "./pgClassSelectSingle";
 
-//const debugPlan = debugFactory("datasource:pg:PgExpressionPlan:plan");
-const debugExecute = debugFactory("datasource:pg:PgExpressionPlan:execute");
+//const debugPlan = debugFactory("datasource:pg:PgClassExpressionPlan:plan");
+const debugExecute = debugFactory(
+  "datasource:pg:PgClassExpressionPlan:execute",
+);
 //const debugPlanVerbose = debugPlan.extend("verbose");
 const debugExecuteVerbose = debugExecute.extend("verbose");
 
@@ -18,7 +20,7 @@ const debugExecuteVerbose = debugExecute.extend("verbose");
  * scalar (could be a list, compound type, JSON, geometry, etc), so this might
  * not be a "leaf"; it might be used as the input of another layer of plan.
  */
-export class PgExpressionPlan<
+export class PgClassExpressionPlan<
     TDataSource extends PgDataSource<any, any, any>,
     TCodec extends PgTypeCodec,
   >
@@ -49,7 +51,7 @@ export class PgExpressionPlan<
     super();
     if (strings.length !== dependencies.length + 1) {
       throw new Error(
-        `Invalid call to PgExpressionPlan; should have exactly one more string (found ${strings.length}) than dependency (found ${dependencies.length}). Recommend using the tagged template literal helper pgExpression.`,
+        `Invalid call to PgClassExpressionPlan; should have exactly one more string (found ${strings.length}) than dependency (found ${dependencies.length}). Recommend using the tagged template literal helper pgClassExpression.`,
       );
     }
     const badStringIndex = strings.findIndex((s) => typeof s !== "string");
@@ -69,7 +71,7 @@ export class PgExpressionPlan<
       if (sql.isSQL(plan)) {
         return plan;
       } else if (
-        plan instanceof PgExpressionPlan &&
+        plan instanceof PgClassExpressionPlan &&
         plan.getClassSinglePlan() === table
       ) {
         // TODO: when we defer placeholders until finalize we'll need to copy
@@ -121,14 +123,14 @@ export class PgExpressionPlan<
       return result;
     } else {
       throw new Error(
-        "Cannot execute PgExpressionPlan without first optimizing it",
+        "Cannot execute PgClassExpressionPlan without first optimizing it",
       );
     }
   }
 
   public deduplicate(
-    peers: Array<PgExpressionPlan<TDataSource, TCodec>>,
-  ): PgExpressionPlan<TDataSource, TCodec> {
+    peers: Array<PgClassExpressionPlan<TDataSource, TCodec>>,
+  ): PgClassExpressionPlan<TDataSource, TCodec> {
     const equivalentPeer = peers.find(
       (p) => sql.isEquivalent(this.expression, p.expression),
       // TODO: when we defer placeholders until finalize we'll need to do additional comparison here
@@ -141,7 +143,7 @@ export class PgExpressionPlan<
   }
 }
 
-function pgExpression<
+function pgClassExpression<
   TDataSource extends PgDataSource<any, any, any>,
   TCodec extends PgTypeCodec,
 >(
@@ -150,10 +152,10 @@ function pgExpression<
 ): (
   strings: TemplateStringsArray,
   ...dependencies: ReadonlyArray<PgTypedExecutablePlan | SQL>
-) => PgExpressionPlan<TDataSource, TCodec> {
+) => PgClassExpressionPlan<TDataSource, TCodec> {
   return (strings, ...dependencies) => {
-    return new PgExpressionPlan(table, codec, strings, dependencies);
+    return new PgClassExpressionPlan(table, codec, strings, dependencies);
   };
 }
 
-export { pgExpression };
+export { pgClassExpression };

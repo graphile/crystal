@@ -5,9 +5,9 @@ import sql from "pg-sql2";
 
 import type { PgDataSource } from "../datasource";
 import type { PgTypeCodec } from "../interfaces";
+import { pgClassExpression, PgClassExpressionPlan } from "./pgClassExpression";
 import { PgClassSelectPlan } from "./pgClassSelect";
 import { PgCursorPlan } from "./pgCursor";
-import { pgExpression, PgExpressionPlan } from "./pgExpression";
 // import debugFactory from "debug";
 
 // const debugPlan = debugFactory("datasource:pg:PgClassSelectSinglePlan:plan");
@@ -80,7 +80,10 @@ export class PgClassSelectSinglePlan<
    */
   get<TAttr extends keyof TDataSource["TRow"]>(
     attr: TAttr,
-  ): PgExpressionPlan<TDataSource, TDataSource["columns"][TAttr]["codec"]> {
+  ): PgClassExpressionPlan<
+    TDataSource,
+    TDataSource["columns"][TAttr]["codec"]
+  > {
     // Only one plan per column
     const planId: number | undefined = this.colPlans[attr];
     if (planId == null) {
@@ -107,7 +110,7 @@ export class PgClassSelectSinglePlan<
        *   decoding these string values.
        */
 
-      const sqlExpr = pgExpression(
+      const sqlExpr = pgClassExpression(
         this,
         this.dataSource.columns[attr as string].codec,
       );
@@ -119,8 +122,8 @@ export class PgClassSelectSinglePlan<
       return colPlan;
     } else {
       const plan = this.aether.plans[planId];
-      if (!(plan instanceof PgExpressionPlan)) {
-        throw new Error(`Expected ${plan} to be a PgExpressionPlan`);
+      if (!(plan instanceof PgClassExpressionPlan)) {
+        throw new Error(`Expected ${plan} to be a PgClassExpressionPlan`);
       }
       return plan;
     }
@@ -132,8 +135,8 @@ export class PgClassSelectSinglePlan<
   expression<TCodec extends PgTypeCodec>(
     expression: SQL,
     codec: TCodec,
-  ): PgExpressionPlan<TDataSource, TCodec> {
-    return pgExpression(this, codec)`${expression}`;
+  ): PgClassExpressionPlan<TDataSource, TCodec> {
+    return pgClassExpression(this, codec)`${expression}`;
   }
 
   /**

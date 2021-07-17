@@ -23,9 +23,9 @@ import sql, { arraysMatch } from "pg-sql2";
 
 import type { PgDataSource, PgDataSourceRelation } from "../datasource";
 import type { PgOrderSpec, PgTypedExecutablePlan } from "../interfaces";
+import { PgClassExpressionPlan } from "./pgClassExpression";
 import { PgClassSelectSinglePlan } from "./pgClassSelectSingle";
 import { PgConditionPlan } from "./pgCondition";
-import { PgExpressionPlan } from "./pgExpression";
 
 const isDev =
   process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
@@ -1146,7 +1146,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
           sqlRef,
         });
       } else {
-        if (dep instanceof PgExpressionPlan) {
+        if (dep instanceof PgClassExpressionPlan) {
           // Replace with a reference
           placeholder.sqlRef.sql = dep.toSQL();
         } else {
@@ -1200,7 +1200,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
           // it's shared and thus safe.
           continue;
         }
-        if (!(dep instanceof PgExpressionPlan)) {
+        if (!(dep instanceof PgClassExpressionPlan)) {
           debugPlanVerbose(
             "Refusing to optimise %c due to dependency %c",
             this,
@@ -1271,9 +1271,9 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
             ...this.queryValues.map(({ dependencyIndex, type }, i) => {
               const plan =
                 this.aether.plans[this.dependencies[dependencyIndex]];
-              if (!(plan instanceof PgExpressionPlan)) {
+              if (!(plan instanceof PgClassExpressionPlan)) {
                 throw new Error(
-                  `Expected ${plan} (${i}th dependency of ${this}; plan with id ${dependencyIndex}) to be a PgExpressionPlan`,
+                  `Expected ${plan} (${i}th dependency of ${this}; plan with id ${dependencyIndex}) to be a PgClassExpressionPlan`,
                 );
               }
               return sql`${plan.toSQL()}::${type} = ${
@@ -1306,9 +1306,9 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
             this.aether.plans[parent.dependencies[parent.itemPlanId]];
           this.queryValues.forEach(({ dependencyIndex, type }, i) => {
             const plan = this.aether.plans[this.dependencies[dependencyIndex]];
-            if (!(plan instanceof PgExpressionPlan)) {
+            if (!(plan instanceof PgClassExpressionPlan)) {
               throw new Error(
-                `Expected ${plan} (${i}th dependency of ${this}; plan with id ${dependencyIndex}) to be a PgExpressionPlan`,
+                `Expected ${plan} (${i}th dependency of ${this}; plan with id ${dependencyIndex}) to be a PgClassExpressionPlan`,
               );
             }
             return this.where(
