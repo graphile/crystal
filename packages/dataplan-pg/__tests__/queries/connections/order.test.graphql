@@ -1,10 +1,10 @@
 ## expect(queries).toHaveLength(1);
-## expect(data.allMessagesConnection.edges).toHaveLength(6);
+## expect(data.allMessagesConnection.edges).toHaveLength(5);
 ## expect(data.allMessagesConnection.edges[0].cursor).toEqual("WyJmNjY3NTQyNDQyIiwiQ2VjaWxpYSIsIkNhdHMgPSBhd2Vzb21lIC0tIENlY2lsaWEiLCIwOTA5ODMxNi1jNDcyLTExZWItYjZiNS05NzdmYTU3YTE2MTciXQ==");
 ## expect(data.allMessagesConnection.edges[0].node.author.username).toEqual("Cecilia");
 ## expect(data.allMessagesConnection.edges[1].node.author.username).toEqual("Cecilia");
 {
-  allMessagesConnection(orderBy: [AUTHOR_USERNAME_DESC, BODY_ASC]) {
+  allMessagesConnection(orderBy: [AUTHOR_USERNAME_DESC, BODY_ASC], first: 5) {
     edges {
       cursor
       node {

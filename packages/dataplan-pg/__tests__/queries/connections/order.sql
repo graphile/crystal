@@ -18,3 +18,4 @@ where
     true /* authorization checks */
   )
 order by __author__.username desc, __messages__.body asc, __messages__."id" asc
+limit 5

@@ -21,10 +21,6 @@
         cursor: "WyJmNjY3NTQyNDQyIiwiQWxpY2UiLCJDYXRzID0gYXdlc29tZSAtLSBBbGljZSIsIjA5MDk4MzE0LWM0NzItMTFlYi1iNmI1LWViZjBjNmRlZDZhMSJd",
         node: { body: "Cats = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
       },
-      {
-        cursor: "WyJmNjY3NTQyNDQyIiwiQWxpY2UiLCJQb3N0Z3JlcyA9IGF3ZXNvbWUgLS0gQWxpY2UiLCIwOTA5ODMxYS1jNDcyLTExZWItYjZiNS1hM2Q0ZTE4YjdmZTUiXQ==",
-        node: { body: "Postgres = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
-      },
     ],
   },
 }
