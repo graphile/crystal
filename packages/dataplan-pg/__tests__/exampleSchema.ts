@@ -44,9 +44,9 @@ import type {
   PgDataSourceContext,
   WithPgClient,
 } from "../src/datasource";
+import { pgClassExpression } from "../src/plans/pgClassExpression";
 import type { PgConditionCapableParentPlan } from "../src/plans/pgCondition";
 import { PgConditionPlan } from "../src/plans/pgCondition";
-import { pgExpression } from "../src/plans/pgExpression";
 
 // These are what the generics extend from
 
@@ -715,11 +715,11 @@ export function makeExampleSchema(
             type: GraphQLBoolean,
             plan($forum) {
               const $archivedAt = $forum.get("archived_at");
-              const $expr1 = pgExpression(
+              const $expr1 = pgClassExpression(
                 $forum,
                 TYPES.boolean,
               )`${$archivedAt} is not null`;
-              const $expr2 = pgExpression(
+              const $expr2 = pgClassExpression(
                 $forum,
                 TYPES.boolean,
               )`${$expr1} is true`;
