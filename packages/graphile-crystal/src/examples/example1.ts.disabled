@@ -159,7 +159,7 @@ async function main() {
       forums {
         name
         messagesConnection(
-          limit: 5
+          first: 5
           condition: { active: true }
           includeArchived: INHERIT
         ) {

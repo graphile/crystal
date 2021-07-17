@@ -2,7 +2,7 @@
 {
   forums(includeArchived: YES) {
     name
-    messagesConnection(limit: 5, includeArchived: EXCLUSIVELY) {
+    messagesConnection(first: 5, includeArchived: EXCLUSIVELY) {
       nodes {
         body
         author {

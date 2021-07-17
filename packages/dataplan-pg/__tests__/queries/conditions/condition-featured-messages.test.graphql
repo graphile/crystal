@@ -3,7 +3,7 @@
   forums {
     name
     messagesConnection(
-      limit: 5
+      first: 5
       condition: { featured: true }
       includeArchived: INHERIT
     ) {

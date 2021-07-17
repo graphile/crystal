@@ -5,7 +5,7 @@
 {
   forums(includeArchived: YES) {
     name
-    messagesList(limit: 2) {
+    messagesList(first: 2) {
       body
     }
   }

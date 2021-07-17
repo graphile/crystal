@@ -533,10 +533,14 @@ export class PgClassSelectPlan<
       }
       const [cursorDigest, ...cursorParts] = decoded;
       if (!cursorDigest || cursorDigest !== digest) {
-        throw new Error("Invalid cursor digest");
+        throw new Error(
+          `Invalid cursor digest - '${cursorDigest}' !== '${digest}'`,
+        );
       }
       if (cursorParts.length !== orderCount) {
-        throw new Error("Invalid cursor length");
+        throw new Error(
+          `Invalid cursor length - ${cursorParts.length} !== ${orderCount}`,
+        );
       }
       const condition = (i = 0): SQL => {
         const order = orders[i];
@@ -741,9 +745,7 @@ export class PgClassSelectPlan<
     // not introduce a security issue).
     const hash = createHash("sha256");
     hash.update(
-      JSON.stringify(
-        this.orders.map((o) => [sql.compile(o.fragment).text, o.ascending]),
-      ),
+      JSON.stringify(this.orders.map((o) => sql.compile(o.fragment).text)),
     );
     const digest = hash.digest("hex").substr(0, 10);
     return digest;

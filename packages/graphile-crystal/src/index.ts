@@ -56,6 +56,9 @@ export {
   MapPlan,
   object,
   ObjectPlan,
+  reverse,
+  reverseArray,
+  ReversePlan,
 } from "./plans";
 export {
   $$crystalWrapped,

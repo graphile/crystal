@@ -1,12 +1,34 @@
-## expect(queries).toHaveLength(1);
+## expect(queries).toHaveLength(2);
 ## expect(data.allMessagesConnection.edges).toHaveLength(2);
-## expect(data.allMessagesConnection.edges[0].cursor).toEqual("WyJiN2JhMDhiZTBmIiwiMDkwOTgzMTQtYzQ3Mi0xMWViLWI2YjUtZWJmMGM2ZGVkNmExIl0=");
+## expect(data.allMessagesConnection.edges[0].cursor).toEqual("WyJmMGIyOGM5NGMxIiwiMDkwOTgzMTQtYzQ3Mi0xMWViLWI2YjUtZWJmMGM2ZGVkNmExIl0=");
 ## expect(data.allMessagesConnection.edges[0].node.author.username).toEqual("Alice");
 ## expect(data.allMessagesConnection.edges[1].node.author.username).toEqual("Bob");
+## expect(data.alboce.edges).toHaveLength(3);
+## expect(data.alboce.edges[0].cursor).toEqual("WyJmMGIyOGM5NGMxIiwiMDkwOTgzMTQtYzQ3Mi0xMWViLWI2YjUtZWJmMGM2ZGVkNmExIl0=");
+## expect(data.alboce.edges[0].node.author.username).toEqual("Alice");
+## expect(data.alboce.edges[1].node.author.username).toEqual("Bob");
+## expect(data.alboce.edges[2].node.author.username).toEqual("Cecilia");
 {
+  # Before "Cecilia / Cats" there's only two records
   allMessagesConnection(
     first: 3
-    before: "WyJiN2JhMDhiZTBmIiwiMDkwOTgzMTYtYzQ3Mi0xMWViLWI2YjUtOTc3ZmE1N2ExNjE3Il0="
+    before: "WyJmMGIyOGM5NGMxIiwiMDkwOTgzMTYtYzQ3Mi0xMWViLWI2YjUtOTc3ZmE1N2ExNjE3Il0="
+  ) {
+    edges {
+      cursor
+      node {
+        body
+        author {
+          username
+          gravatarUrl
+        }
+      }
+    }
+  }
+  # Even though the cursor is at the end (Cecilia / Postgres), we specified 'first' so we get the first 3 records.
+  alboce: allMessagesConnection(
+    first: 3
+    before: "WyJmMGIyOGM5NGMxIiwiMDkwOTgzMWMtYzQ3Mi0xMWViLWI2YjUtMmI0YzBjZThkZGViIl0="
   ) {
     edges {
       cursor

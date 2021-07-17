@@ -10,6 +10,19 @@ where
     true /* authorization checks */
   )
 order by __messages__."id" asc
+
+select
+  __messages__."id"::text as "0",
+  __messages__."body"::text as "1",
+  __messages__."author_id"::text as "2"
+from app_public.messages as __messages__
+where
+  (
+    __messages__.archived_at is null
+  ) and (
+    true /* authorization checks */
+  )
+order by __messages__."id" asc
 limit 3
 
 select __users_result__.*

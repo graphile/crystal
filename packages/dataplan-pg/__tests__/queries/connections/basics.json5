@@ -2,15 +2,43 @@
   allMessagesConnection: {
     edges: [
       {
-        cursor: "WyJiN2JhMDhiZTBmIiwiMDkwOTgzMTQtYzQ3Mi0xMWViLWI2YjUtZWJmMGM2ZGVkNmExIl0=",
+        cursor: "WyJmMGIyOGM5NGMxIiwiMDkwOTgzMTQtYzQ3Mi0xMWViLWI2YjUtZWJmMGM2ZGVkNmExIl0=",
         node: { body: "Cats = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
       },
       {
-        cursor: "WyJiN2JhMDhiZTBmIiwiMDkwOTgzMTUtYzQ3Mi0xMWViLWI2YjUtYWIwNGJhN2VjZDJlIl0=",
+        cursor: "WyJmMGIyOGM5NGMxIiwiMDkwOTgzMTUtYzQ3Mi0xMWViLWI2YjUtYWIwNGJhN2VjZDJlIl0=",
         node: { body: "Cats = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
       },
       {
-        cursor: "WyJiN2JhMDhiZTBmIiwiMDkwOTgzMTYtYzQ3Mi0xMWViLWI2YjUtOTc3ZmE1N2ExNjE3Il0=",
+        cursor: "WyJmMGIyOGM5NGMxIiwiMDkwOTgzMTYtYzQ3Mi0xMWViLWI2YjUtOTc3ZmE1N2ExNjE3Il0=",
+        node: { body: "Cats = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
+      },
+      {
+        cursor: "WyJmMGIyOGM5NGMxIiwiMDkwOTgzMWEtYzQ3Mi0xMWViLWI2YjUtYTNkNGUxOGI3ZmU1Il0=",
+        node: { body: "Postgres = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+      },
+      {
+        cursor: "WyJmMGIyOGM5NGMxIiwiMDkwOTgzMWItYzQ3Mi0xMWViLWI2YjUtZTNlMGIzYTJjOGU5Il0=",
+        node: { body: "Postgres = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+      },
+      {
+        cursor: "WyJmMGIyOGM5NGMxIiwiMDkwOTgzMWMtYzQ3Mi0xMWViLWI2YjUtMmI0YzBjZThkZGViIl0=",
+        node: { body: "Postgres = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
+      },
+    ],
+  },
+  first3: {
+    edges: [
+      {
+        cursor: "WyJmMGIyOGM5NGMxIiwiMDkwOTgzMTQtYzQ3Mi0xMWViLWI2YjUtZWJmMGM2ZGVkNmExIl0=",
+        node: { body: "Cats = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+      },
+      {
+        cursor: "WyJmMGIyOGM5NGMxIiwiMDkwOTgzMTUtYzQ3Mi0xMWViLWI2YjUtYWIwNGJhN2VjZDJlIl0=",
+        node: { body: "Cats = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+      },
+      {
+        cursor: "WyJmMGIyOGM5NGMxIiwiMDkwOTgzMTYtYzQ3Mi0xMWViLWI2YjUtOTc3ZmE1N2ExNjE3Il0=",
         node: { body: "Cats = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
       },
     ],

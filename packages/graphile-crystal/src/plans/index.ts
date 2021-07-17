@@ -24,6 +24,7 @@ export { first, FirstPlan } from "./first";
 export { list, ListPlan } from "./list";
 export { makeMapper, map, MapPlan } from "./map";
 export { object, ObjectPlan } from "./object";
+export { reverse, reverseArray, ReversePlan } from "./reverse";
 
 // Internal plans
 export {

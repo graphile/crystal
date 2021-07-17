@@ -187,7 +187,7 @@ async function main() {
         forums {
           name
           messagesList(
-            limit: 5
+            first: 5
             condition: { featured: true }
             includeArchived: INHERIT
           ) {
@@ -227,7 +227,7 @@ async function main() {
         forums {
           name
           messagesConnection(
-            limit: 5
+            first: 5
             condition: { featured: true }
             includeArchived: INHERIT
           ) {
@@ -257,9 +257,9 @@ async function main() {
   if (Math.random() < 2) {
     await test(/* GraphQL */ `
       {
-        forums(limit: 2) {
+        forums(first: 2) {
           name
-          messagesConnection(limit: 2) {
+          messagesConnection(first: 2) {
             nodes {
               body
               author {
