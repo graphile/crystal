@@ -177,6 +177,7 @@ export class PgClassSelectPlan<
    * The list of things we're selecting.
    */
   private selects: Array<SQL>;
+  private selectRecordIndex: number | null;
 
   /**
    * The id for the PostgreSQL context plan.
@@ -321,6 +322,7 @@ export class PgClassSelectPlan<
       : new Map();
     this.joins = cloneFrom ? [...cloneFrom.joins] : [];
     this.selects = cloneFrom ? [...cloneFrom.selects] : [];
+    this.selectRecordIndex = cloneFrom ? cloneFrom.selectRecordIndex : null;
     this.isTrusted = cloneFrom ? cloneFrom.isTrusted : false;
     this.isUnique = cloneFrom ? cloneFrom.isUnique : false;
     this.isInliningForbidden = cloneFrom
@@ -523,6 +525,13 @@ export class PgClassSelectPlan<
     }
 
     return this.selects.push(fragment) - 1;
+  }
+
+  public selectRecord(): number {
+    if (!this.selectRecordIndex) {
+      this.selectRecordIndex = this.select(sql`to_json(${this.alias})`);
+    }
+    return this.selectRecordIndex;
   }
 
   /**
