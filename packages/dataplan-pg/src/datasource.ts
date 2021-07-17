@@ -8,7 +8,7 @@ import type {
   ExecutablePlan,
   ObjectPlan,
 } from "graphile-crystal";
-import { __ValuePlan, arraysMatch, defer } from "graphile-crystal";
+import { __ValuePlan, defer } from "graphile-crystal";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 import { inspect } from "util";
@@ -80,7 +80,7 @@ export type PgDataSourceContext<TSettings = any> = {
   withPgClient: WithPgClient;
 };
 
-type PgDataSourceColumns = {
+export type PgDataSourceColumns = {
   [columnName: string]: PgDataSourceColumn<any>;
 };
 
@@ -125,6 +125,12 @@ type PlanByUniques<
   TCols extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
 > = TuplePlanMap<TColumns, TCols[number]>[number];
 
+export interface PgDataSourceRelation {
+  targetTable: SQL;
+  localColumns: string[];
+  remoteColumns: string[];
+}
+
 /**
  * PG data source represents a PostgreSQL data source. This could be a table,
  * view, materialized view, function call, join, etc. Anything table-like.
@@ -132,6 +138,7 @@ type PlanByUniques<
 export class PgDataSource<
   TColumns extends PgDataSourceColumns,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TRelations extends { [identifier: string]: PgDataSourceRelation },
 > extends DataSource<
   ReadonlyArray<PgDataSourceRow<TColumns>>,
   PgDataSourceInput,
@@ -159,6 +166,7 @@ export class PgDataSource<
   private contextCallback: () => ObjectPlan<PgDataSourceContext>;
   public columns: TColumns;
   public uniques: TUniques;
+  public relations: TRelations;
 
   /**
    * @param source - the SQL for the `FROM` clause (without any
@@ -173,14 +181,16 @@ export class PgDataSource<
     context: () => ObjectPlan<PgDataSourceContext>;
     columns: TColumns;
     uniques: TUniques;
+    relations?: TRelations;
   }) {
     super();
-    const { context, source, name, columns, uniques } = options;
+    const { context, source, name, columns, uniques, relations } = options;
     this.source = source;
     this.name = name;
     this.contextCallback = context;
     this.columns = columns;
     this.uniques = uniques;
+    this.relations = relations || ({} as TRelations);
   }
 
   public toString(): string {
@@ -517,3 +527,9 @@ function formatSQLForDebugging(
 
   return output.join("\n");
 }
+
+export type AnyPgDataSource = PgDataSource<
+  { [columnName: string]: PgDataSourceColumn<any> },
+  ReadonlyArray<ReadonlyArray<string>>,
+  { [identifier: string]: PgDataSourceRelation }
+>;

@@ -21,7 +21,11 @@ import {
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
 
-import type { PgDataSource } from "../datasource";
+import type {
+  AnyPgDataSource,
+  PgDataSource,
+  PgDataSourceRelation,
+} from "../datasource";
 import type { PgOrderSpec, PgTypedExecutablePlan } from "../interfaces";
 import { PgClassSelectSinglePlan } from "./pgClassSelectSingle";
 import { PgConditionPlan } from "./pgCondition";
@@ -31,9 +35,9 @@ const isDev =
   process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
 
 type LockableParameter = "orderBy" | "first" | "last" | "offset";
-type LockCallback<
-  TDataSource extends PgDataSource<any, any> = PgDataSource<any, any>,
-> = (plan: PgClassSelectPlan<TDataSource>) => void;
+type LockCallback<TDataSource extends AnyPgDataSource> = (
+  plan: PgClassSelectPlan<TDataSource>,
+) => void;
 
 const debugPlan = debugFactory("datasource:pg:PgClassSelectPlan:plan");
 const debugExecute = debugFactory("datasource:pg:PgClassSelectPlan:execute");
@@ -82,7 +86,7 @@ interface PgClassSelectIdentifierSpec {
  * records from them `{a: 1},{a: 2},{a:3}`).
  */
 export class PgClassSelectPlan<
-  TDataSource extends PgDataSource<any, any>,
+  TDataSource extends PgDataSource<any, any, any>,
 > extends ExecutablePlan<ReadonlyArray<TDataSource["TRow"]>> {
   // FROM
 
@@ -98,6 +102,7 @@ export class PgClassSelectPlan<
 
   // JOIN
 
+  private relationJoins: Map<keyof TDataSource["relations"], SQL>;
   private joins: Array<PgClassSelectPlanJoin>;
 
   // WHERE
@@ -214,7 +219,7 @@ export class PgClassSelectPlan<
   // --------------------
 
   private _beforeLock: {
-    [a in LockableParameter]: Array<LockCallback>;
+    [a in LockableParameter]: Array<LockCallback<TDataSource>>;
   } = {
     orderBy: [],
     first: [],
@@ -223,7 +228,7 @@ export class PgClassSelectPlan<
   };
 
   private _afterLock: {
-    [a in LockableParameter]: Array<LockCallback>;
+    [a in LockableParameter]: Array<LockCallback<TDataSource>>;
   } = {
     orderBy: [],
     first: [],
@@ -315,6 +320,9 @@ export class PgClassSelectPlan<
       ? Object.freeze(cloneFrom.identifierMatches)
       : identifierMatchesThunk(this.alias);
     this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
+    this.relationJoins = cloneFrom
+      ? new Map(cloneFrom.relationJoins)
+      : new Map();
     this.joins = cloneFrom ? [...cloneFrom.joins] : [];
     this.selects = cloneFrom ? [...cloneFrom.selects] : [];
     this.isTrusted = cloneFrom ? cloneFrom.isTrusted : false;
@@ -458,6 +466,41 @@ export class PgClassSelectPlan<
     // This allows us to replace the SQL that will be compiled, for example
     // when we're inlining this into a parent query.
     return sql.callback(() => sqlRef.sql);
+  }
+
+  /**
+   * Join to a named relationship and return the alias that can be used in
+   * SELECT, WHERE and ORDER BY.
+   */
+  public joinRelation(relationIdentifier: keyof TDataSource["relations"]): SQL {
+    const relation: PgDataSourceRelation | undefined =
+      this.dataSource.relations[relationIdentifier as string];
+    if (!relation) {
+      throw new Error(
+        `${this.dataSource} does not have a relation named '${relationIdentifier}'`,
+      );
+    }
+    const { targetTable, localColumns, remoteColumns } = relation;
+
+    // Join to this relation if we haven't already
+    const cachedAlias = this.relationJoins.get(relationIdentifier);
+    if (cachedAlias) {
+      return cachedAlias;
+    }
+    const alias = sql.identifier(Symbol(relationIdentifier as string));
+    this.joins.push({
+      type: "inner",
+      source: targetTable,
+      alias,
+      conditions: localColumns.map(
+        (col, i) =>
+          sql`${this.alias}.${sql.identifier(col)} = ${alias}.${sql.identifier(
+            remoteColumns[i],
+          )}`,
+      ),
+    });
+    this.relationJoins.set(relationIdentifier, alias);
+    return alias;
   }
 
   /**
@@ -1338,7 +1381,10 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
    * check that the ordering is unique, and if it is not then we may want to
    * add the primary key to the ordering.
    */
-  public beforeLock(type: LockableParameter, callback: LockCallback): void {
+  public beforeLock(
+    type: LockableParameter,
+    callback: LockCallback<TDataSource>,
+  ): void {
     this._assertParameterUnlocked(type);
     this._beforeLock[type].push(callback);
   }
@@ -1347,7 +1393,10 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
    * Performs the given call back just after the given LockableParameter is
    * locked.
    */
-  public afterLock(type: LockableParameter, callback: LockCallback): void {
+  public afterLock(
+    type: LockableParameter,
+    callback: LockCallback<TDataSource>,
+  ): void {
     this._assertParameterUnlocked(type);
     this._afterLock[type].push(callback);
   }

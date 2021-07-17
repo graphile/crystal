@@ -42,6 +42,7 @@ import type {
   PgDataSourceContext,
   WithPgClient,
 } from "../src/datasource";
+import { PgOrderSpec } from "../src/interfaces";
 import type { PgConditionCapableParentPlan } from "../src/plans/pgCondition";
 import { PgConditionPlan } from "../src/plans/pgCondition";
 import { pgExpression } from "../src/plans/pgExpression";
@@ -232,6 +233,49 @@ export function makeExampleSchema(
     }),
   );
 
+  const MessagesOrderBy = new GraphQLEnumType({
+    name: "MessagesOrderBy",
+    values: {
+      BODY_ASC: {
+        value: (plan: PgClassSelectPlan<typeof messageSource>) => {
+          plan.orderBy({
+            codec: TYPES.text,
+            fragment: sql`${plan.alias}.body`,
+            ascending: true,
+          });
+        },
+      },
+      BODY_DESC: {
+        value: (plan: PgClassSelectPlan<typeof messageSource>) => {
+          plan.orderBy({
+            codec: TYPES.text,
+            fragment: sql`${plan.alias}.body`,
+            ascending: false,
+          });
+        },
+      },
+      AUTHOR_NAME_ASC: {
+        value: (plan: PgClassSelectPlan<typeof messageSource>) => {
+          const authorAlias = plan.belongsToRelation("users");
+          plan.orderBy({
+            codec: TYPES.text,
+            fragment: sql`${authorAlias}.name`,
+            ascending: true,
+          });
+        },
+      },
+      AUTHOR_NAME_DESC: {
+        value: (plan: PgClassSelectPlan<typeof messageSource>) => {
+          const authorAlias = plan.belongsToRelation("users");
+          plan.orderBy({
+            codec: TYPES.text,
+            fragment: sql`${authorAlias}.name`,
+            ascending: false,
+          });
+        },
+      },
+    },
+  });
   const Message = new GraphQLObjectType(
     objectSpec<GraphileResolverContext, MessagePlan>({
       name: "Message",
@@ -918,6 +962,22 @@ export function makeExampleSchema(
                 $messages.afterLock("orderBy", () => {
                   $messages.before($value.eval());
                 });
+                return null;
+              },
+            },
+            orderBy: {
+              type: MessagesOrderBy,
+              plan(
+                _$root,
+                $connection: PgConnectionPlan<typeof messageSource>,
+                $value,
+              ) {
+                const $messages = $connection.getSubplan();
+                const val = $value.eval();
+                if (typeof val !== "function") {
+                  throw new Error("Invalid orderBy configuration");
+                }
+                val($messages);
                 return null;
               },
             },

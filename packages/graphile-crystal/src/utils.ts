@@ -1,5 +1,6 @@
 import chalk from "chalk";
 import type {
+  GraphQLEnumTypeConfig,
   GraphQLFieldConfig,
   GraphQLFieldConfigMap,
   GraphQLInputFieldConfig,

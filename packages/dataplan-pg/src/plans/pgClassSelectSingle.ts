@@ -25,7 +25,7 @@ import { pgExpression, PgExpressionPlan } from "./pgExpression";
  * expressions.
  */
 export class PgClassSelectSinglePlan<
-  TDataSource extends PgDataSource<any, any>,
+  TDataSource extends PgDataSource<any, any, any>,
 > extends ExecutablePlan<TDataSource["TRow"]> {
   public readonly itemPlanId: number;
 
@@ -89,7 +89,7 @@ export class PgClassSelectSinglePlan<
       // enforce ISO8601? Perhaps this should be the datasource itself, and
       // `attr` should be an SQL expression? This would allow for computed
       // fields/etc too (admittedly those without arguments).
-      const dataSourceColumn = this.dataSource.columns[attr];
+      const dataSourceColumn = this.dataSource.columns[attr as string];
       if (!dataSourceColumn) {
         throw new Error(
           `${this.dataSource} does not define an attribute named '${attr}'`,
@@ -107,7 +107,10 @@ export class PgClassSelectSinglePlan<
        *   decoding these string values.
        */
 
-      const sqlExpr = pgExpression(this, this.dataSource.columns[attr].codec);
+      const sqlExpr = pgExpression(
+        this,
+        this.dataSource.columns[attr as string].codec,
+      );
       const colPlan = dataSourceColumn.expression
         ? sqlExpr`${sql.parens(dataSourceColumn.expression(classPlan.alias))}`
         : sqlExpr`${sql.identifier(classPlan.symbol, String(attr))}`;
