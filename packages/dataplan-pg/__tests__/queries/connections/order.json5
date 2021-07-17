@@ -1,0 +1,30 @@
+{
+  allMessagesConnection: {
+    edges: [
+      {
+        cursor: "WyJmNjY3NTQyNDQyIiwiQ2VjaWxpYSIsIkNhdHMgPSBhd2Vzb21lIC0tIENlY2lsaWEiLCIwOTA5ODMxNi1jNDcyLTExZWItYjZiNS05NzdmYTU3YTE2MTciXQ==",
+        node: { body: "Cats = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
+      },
+      {
+        cursor: "WyJmNjY3NTQyNDQyIiwiQ2VjaWxpYSIsIlBvc3RncmVzID0gYXdlc29tZSAtLSBDZWNpbGlhIiwiMDkwOTgzMWMtYzQ3Mi0xMWViLWI2YjUtMmI0YzBjZThkZGViIl0=",
+        node: { body: "Postgres = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
+      },
+      {
+        cursor: "WyJmNjY3NTQyNDQyIiwiQm9iIiwiQ2F0cyA9IGF3ZXNvbWUgLS0gQm9iIiwiMDkwOTgzMTUtYzQ3Mi0xMWViLWI2YjUtYWIwNGJhN2VjZDJlIl0=",
+        node: { body: "Cats = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+      },
+      {
+        cursor: "WyJmNjY3NTQyNDQyIiwiQm9iIiwiUG9zdGdyZXMgPSBhd2Vzb21lIC0tIEJvYiIsIjA5MDk4MzFiLWM0NzItMTFlYi1iNmI1LWUzZTBiM2EyYzhlOSJd",
+        node: { body: "Postgres = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+      },
+      {
+        cursor: "WyJmNjY3NTQyNDQyIiwiQWxpY2UiLCJDYXRzID0gYXdlc29tZSAtLSBBbGljZSIsIjA5MDk4MzE0LWM0NzItMTFlYi1iNmI1LWViZjBjNmRlZDZhMSJd",
+        node: { body: "Cats = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+      },
+      {
+        cursor: "WyJmNjY3NTQyNDQyIiwiQWxpY2UiLCJQb3N0Z3JlcyA9IGF3ZXNvbWUgLS0gQWxpY2UiLCIwOTA5ODMxYS1jNDcyLTExZWItYjZiNS1hM2Q0ZTE4YjdmZTUiXQ==",
+        node: { body: "Postgres = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+      },
+    ],
+  },
+}
