@@ -24,8 +24,8 @@ import sql, { arraysMatch } from "pg-sql2";
 import type { PgSource, PgSourceRelation } from "../datasource";
 import type { PgOrderSpec, PgTypedExecutablePlan } from "../interfaces";
 import { PgClassExpressionPlan } from "./pgClassExpression";
-import { PgSelectSinglePlan } from "./pgSelectSingle";
 import { PgConditionPlan } from "./pgCondition";
+import { PgSelectSinglePlan } from "./pgSelectSingle";
 
 const isDev =
   process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
@@ -1277,7 +1277,8 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
         ) {
           const { sql: where } = this.buildWhere();
           const conditions = [
-            ...this.queryValues.map(({ dependencyIndex, type }, i) => {
+            ...this.identifierMatches.map((identifierMatch, i) => {
+              const { dependencyIndex, type } = this.queryValues[i];
               const plan =
                 this.aether.plans[this.dependencies[dependencyIndex]];
               if (!(plan instanceof PgClassExpressionPlan)) {
@@ -1285,9 +1286,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
                   `Expected ${plan} (${i}th dependency of ${this}; plan with id ${dependencyIndex}) to be a PgClassExpressionPlan`,
                 );
               }
-              return sql`${plan.toSQL()}::${type} = ${
-                this.identifierMatches[i]
-              }`;
+              return sql`${plan.toSQL()}::${type} = ${identifierMatch}`;
             }),
             // Note the WHERE is now part of the JOIN condition (since
             // it's a LEFT JOIN).
@@ -1313,7 +1312,8 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
         } else if (parent instanceof PgSelectSinglePlan) {
           const parent2 =
             this.aether.plans[parent.dependencies[parent.itemPlanId]];
-          this.queryValues.forEach(({ dependencyIndex, type }, i) => {
+          this.identifierMatches.forEach((identifierMatch, i) => {
+            const { dependencyIndex, type } = this.queryValues[i];
             const plan = this.aether.plans[this.dependencies[dependencyIndex]];
             if (!(plan instanceof PgClassExpressionPlan)) {
               throw new Error(
@@ -1321,7 +1321,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
               );
             }
             return this.where(
-              sql`${plan.toSQL()}::${type} = ${this.identifierMatches[i]}`,
+              sql`${plan.toSQL()}::${type} = ${identifierMatch}`,
             );
           });
           this.mergePlaceholdersInto(table);
