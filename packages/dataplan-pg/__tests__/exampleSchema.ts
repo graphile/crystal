@@ -752,19 +752,13 @@ export function makeExampleSchema(
               },
               condition: {
                 type: MessageCondition,
-                plan(
-                  _$forum,
-                  $messages: PgSelectPlan<typeof messageSource>,
-                ) {
+                plan(_$forum, $messages: PgSelectPlan<typeof messageSource>) {
                   return $messages.wherePlan();
                 },
               },
               filter: {
                 type: MessageFilter,
-                plan(
-                  _$forum,
-                  $messages: PgSelectPlan<typeof messageSource>,
-                ) {
+                plan(_$forum, $messages: PgSelectPlan<typeof messageSource>) {
                   return new ClassFilterPlan(
                     $messages.wherePlan(),
                     $messages.alias,
@@ -871,11 +865,7 @@ export function makeExampleSchema(
           args: {
             first: {
               type: GraphQLInt,
-              plan(
-                _$root,
-                $forums: PgSelectPlan<typeof forumSource>,
-                $value,
-              ) {
+              plan(_$root, $forums: PgSelectPlan<typeof forumSource>, $value) {
                 $forums.setFirst($value.eval());
                 return null;
               },
