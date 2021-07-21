@@ -37,11 +37,11 @@ import type { PgClassSelectPlan, PgTypeCodec } from "../src";
 import {
   PgClassSelectSinglePlan,
   PgConnectionPlan,
-  PgDataSource,
+  PgClassDataSource,
 } from "../src";
 import type {
-  PgDataSourceColumn,
-  PgDataSourceContext,
+  PgClassDataSourceColumn,
+  PgClassDataSourceContext,
   WithPgClient,
 } from "../src/datasource";
 import { pgClassExpression } from "../src/plans/pgClassExpression";
@@ -64,9 +64,9 @@ declare module "graphile-crystal" {
   }
 }
 
-function getPgDataSourceContext() {
+function getPgClassDataSourceContext() {
   const $context = context();
-  return object<PgDataSourceContext<BaseGraphQLContext["pgSettings"]>>({
+  return object<PgClassDataSourceContext<BaseGraphQLContext["pgSettings"]>>({
     pgSettings: $context.get("pgSettings"),
     withPgClient: $context.get("withPgClient"),
   });
@@ -150,11 +150,11 @@ export function makeExampleSchema(
     TOptions extends {
       codec: PgTypeCodec;
       notNull?: boolean;
-      expression?: PgDataSourceColumn<any>["expression"];
+      expression?: PgClassDataSourceColumn<any>["expression"];
     },
   >(
     options: TOptions,
-  ): PgDataSourceColumn<
+  ): PgClassDataSourceColumn<
     NullableUnless<TOptions["notNull"], ReturnType<TOptions["codec"]["fromPg"]>>
   > => {
     const { notNull, codec, expression } = options;
@@ -165,10 +165,10 @@ export function makeExampleSchema(
     };
   };
 
-  const messageSource = new PgDataSource({
+  const messageSource = new PgClassDataSource({
     source: sql`app_public.messages`,
     name: "messages",
-    context: getPgDataSourceContext,
+    context: getPgClassDataSourceContext,
     columns: {
       id: col({ notNull: true, codec: TYPES.uuid }),
       body: col({ notNull: true, codec: TYPES.text }),
@@ -193,10 +193,10 @@ export function makeExampleSchema(
     },
   });
 
-  const userSource = new PgDataSource({
+  const userSource = new PgClassDataSource({
     source: sql`app_public.users`,
     name: "users",
-    context: getPgDataSourceContext,
+    context: getPgClassDataSourceContext,
     columns: {
       id: col({ notNull: true, codec: TYPES.uuid }),
       username: col({ notNull: true, codec: TYPES.citext }),
@@ -206,10 +206,10 @@ export function makeExampleSchema(
     uniques: [["id"], ["username"]],
   });
 
-  const forumSource = new PgDataSource({
+  const forumSource = new PgClassDataSource({
     source: sql`app_public.forums`,
     name: "forums",
-    context: getPgDataSourceContext,
+    context: getPgClassDataSourceContext,
     columns: {
       id: col({ notNull: true, codec: TYPES.uuid }),
       name: col({ notNull: true, codec: TYPES.citext }),
@@ -565,7 +565,7 @@ export function makeExampleSchema(
     }),
   );
 
-  class TempTablePlan<TDataSource extends PgDataSource<any, any, any>>
+  class TempTablePlan<TDataSource extends PgClassDataSource<any, any, any>>
     extends BasePlan
     implements PgConditionCapableParentPlan
   {
@@ -592,7 +592,7 @@ export function makeExampleSchema(
   }
 
   class ManyFilterPlan<
-    TChildDataSource extends PgDataSource<any, any, any>,
+    TChildDataSource extends PgClassDataSource<any, any, any>,
   > extends ModifierPlan<ClassFilterPlan> {
     public $some: TempTablePlan<TChildDataSource> | null = null;
     constructor(

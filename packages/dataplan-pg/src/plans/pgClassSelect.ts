@@ -21,7 +21,7 @@ import {
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
 
-import type { PgDataSource, PgDataSourceRelation } from "../datasource";
+import type { PgClassDataSource, PgClassDataSourceRelation } from "../datasource";
 import type { PgOrderSpec, PgTypedExecutablePlan } from "../interfaces";
 import { PgClassExpressionPlan } from "./pgClassExpression";
 import { PgClassSelectSinglePlan } from "./pgClassSelectSingle";
@@ -31,7 +31,7 @@ const isDev =
   process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
 
 type LockableParameter = "orderBy" | "first" | "last" | "offset";
-type LockCallback<TDataSource extends PgDataSource<any, any, any>> = (
+type LockCallback<TDataSource extends PgClassDataSource<any, any, any>> = (
   plan: PgClassSelectPlan<TDataSource>,
 ) => void;
 
@@ -82,7 +82,7 @@ interface PgClassSelectIdentifierSpec {
  * records from them `{a: 1},{a: 2},{a:3}`).
  */
 export class PgClassSelectPlan<
-  TDataSource extends PgDataSource<any, any, any>,
+  TDataSource extends PgClassDataSource<any, any, any>,
 > extends ExecutablePlan<ReadonlyArray<TDataSource["TRow"]>> {
   // FROM
 
@@ -473,7 +473,7 @@ export class PgClassSelectPlan<
   public singleRelation(
     relationIdentifier: keyof TDataSource["relations"],
   ): SQL {
-    const relation: PgDataSourceRelation | undefined =
+    const relation: PgClassDataSourceRelation | undefined =
       this.dataSource.relations[relationIdentifier as string];
     if (!relation) {
       throw new Error(

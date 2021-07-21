@@ -3,7 +3,7 @@ import { ExecutablePlan } from "graphile-crystal";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { PgDataSource } from "../datasource";
+import type { PgClassDataSource } from "../datasource";
 import type { PgTypeCodec } from "../interfaces";
 import { pgClassExpression, PgClassExpressionPlan } from "./pgClassExpression";
 import { PgClassSelectPlan } from "./pgClassSelect";
@@ -25,7 +25,7 @@ import { PgCursorPlan } from "./pgCursor";
  * expressions.
  */
 export class PgClassSelectSinglePlan<
-  TDataSource extends PgDataSource<any, any, any>,
+  TDataSource extends PgClassDataSource<any, any, any>,
 > extends ExecutablePlan<TDataSource["TRow"]> {
   public readonly itemPlanId: number;
 

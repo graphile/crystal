@@ -17,7 +17,7 @@ import type { PgTypeCodec } from "./interfaces";
 import { PgClassSelectPlan } from "./plans/pgClassSelect";
 import type { PgClassSelectSinglePlan } from "./plans/pgClassSelectSingle";
 
-const debug = debugFactory("datasource:pg:PgDataSource");
+const debug = debugFactory("datasource:pg:PgClassDataSource");
 const debugVerbose = debug.extend("verbose");
 
 abstract class DataSource<
@@ -43,7 +43,7 @@ abstract class DataSource<
 }
 
 export type PgDataSourceInput = {
-  context: PgDataSourceContext;
+  context: PgClassDataSourceContext;
   queryValues: ReadonlyArray<any>;
 };
 export type PgDataSourceExecuteOptions = {
@@ -75,16 +75,19 @@ export interface PgClient {
   // TODO: add transaction support
 }
 
-export type PgDataSourceContext<TSettings = any> = {
+export type PgClassDataSourceContext<TSettings = any> = {
   pgSettings: TSettings;
   withPgClient: WithPgClient;
 };
 
-export type PgDataSourceColumns = {
-  [columnName: string]: PgDataSourceColumn<any>;
+export type PgClassDataSourceColumns = {
+  [columnName: string]: PgClassDataSourceColumn<any>;
 };
 
-export interface PgDataSourceColumn<TCanonical = any, TInput = TCanonical> {
+export interface PgClassDataSourceColumn<
+  TCanonical = any,
+  TInput = TCanonical,
+> {
   /**
    * How to translate to/from PG and how to cast.
    */
@@ -105,7 +108,7 @@ export interface PgDataSourceColumn<TCanonical = any, TInput = TCanonical> {
   expression?: (alias: SQL) => SQL;
 }
 
-type PgDataSourceRow<TColumns extends PgDataSourceColumns> = {
+type PgClassDataSourceRow<TColumns extends PgClassDataSourceColumns> = {
   [key in keyof TColumns]: ReturnType<TColumns[key]["codec"]["fromPg"]>;
 };
 
@@ -125,35 +128,20 @@ type PlanByUniques<
   TCols extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
 > = TuplePlanMap<TColumns, TCols[number]>[number];
 
-export interface PgDataSourceRelation {
+export interface PgClassDataSourceRelation {
   targetTable: SQL;
   localColumns: string[];
   remoteColumns: string[];
   isUnique: boolean;
 }
 
-/**
- * PG data source represents a PostgreSQL data source. This could be a table,
- * view, materialized view, function call, join, etc. Anything table-like.
- */
-export class PgDataSource<
-  TColumns extends PgDataSourceColumns,
-  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
-  TRelations extends { [identifier: string]: PgDataSourceRelation },
-> extends DataSource<
-  ReadonlyArray<PgDataSourceRow<TColumns>>,
+export class PgDataSource<TRow> extends DataSource<
+  ReadonlyArray<TRow>,
   PgDataSourceInput,
   PgDataSourceExecuteOptions
 > {
-  /**
-   * TypeScript hack so that we can retrieve the TRow type from a Postgres data
-   * source at a later time - needed so we can have strong typing on `.get()`
-   * and similar methods.
-   *
-   * @internal
-   */
-  TRow!: PgDataSourceRow<TColumns>;
-
+  public name: string;
+  private contextCallback: () => ObjectPlan<PgClassDataSourceContext>;
   private cache: WeakMap<
     Record<string, unknown> /* context */,
     LRU<
@@ -162,36 +150,14 @@ export class PgDataSource<
     >
   > = new WeakMap();
 
-  public source: SQL;
-  public name: string;
-  private contextCallback: () => ObjectPlan<PgDataSourceContext>;
-  public columns: TColumns;
-  public uniques: TUniques;
-  public relations: TRelations;
-
-  /**
-   * @param source - the SQL for the `FROM` clause (without any
-   * aliasing). If this is a subquery don't forget to wrap it in parens.
-   * @param name - a nickname for this data source. Doesn't need to be unique
-   * (but should be). Used for making the SQL query and debug messages easier
-   * to understand.
-   */
   constructor(options: {
     name: string;
-    source: SQL;
-    context: () => ObjectPlan<PgDataSourceContext>;
-    columns: TColumns;
-    uniques: TUniques;
-    relations?: TRelations;
+    context: () => ObjectPlan<PgClassDataSourceContext>;
   }) {
     super();
-    const { context, source, name, columns, uniques, relations } = options;
-    this.source = source;
+    const { name, context } = options;
     this.name = name;
     this.contextCallback = context;
-    this.columns = columns;
-    this.uniques = uniques;
-    this.relations = relations || ({} as TRelations);
   }
 
   public toString(): string {
@@ -202,80 +168,20 @@ export class PgDataSource<
     return this.contextCallback();
   }
 
-  public get(
-    spec: PlanByUniques<TColumns, TUniques>,
-  ): PgClassSelectSinglePlan<this> {
-    const keys: ReadonlyArray<keyof TColumns> = Object.keys(spec);
-    if (!this.uniques.some((uniq) => uniq.every((key) => keys.includes(key)))) {
-      throw new Error(
-        `Attempted to call ${this}.get({${keys.join(
-          ", ",
-        )}}) but that combination of columns is not unique. Did you mean to call .find() instead?`,
-      );
-    }
-    return this.find(spec).single();
-  }
-
-  public find(
-    spec: { [key in keyof TColumns]?: ExecutablePlan } = {},
-  ): PgClassSelectPlan<this> {
-    const keys: ReadonlyArray<keyof TColumns> = Object.keys(spec);
-    const invalidKeys = keys.filter((key) => this.columns[key] == null);
-    if (invalidKeys.length > 0) {
-      throw new Error(
-        `Attempted to call ${this}.get({${keys.join(
-          ", ",
-        )}}) but that request included columns that we don't know about: '${invalidKeys.join(
-          "', '",
-        )}'`,
-      );
-    }
-
-    const identifiers = keys.map((key) => {
-      const column = this.columns[key];
-      const {
-        codec: { sqlType: type },
-      } = column;
-      const plan: ExecutablePlan | undefined = spec[key];
-      if (plan == undefined) {
-        throw new Error(
-          `Attempted to call ${this}.get({${keys.join(
-            ", ",
-          )}}) but failed to provide a plan for '${key}'`,
-        );
-      }
-      return {
-        plan,
-        type,
-      };
-    });
-    const identifiersMatchesThunk = (alias: SQL) =>
-      keys.map((key) => sql`${alias}.${sql.identifier(key as string)}`);
-    return new PgClassSelectPlan(this, identifiers, identifiersMatchesThunk);
-  }
-
-  public applyAuthorizationChecksToPlan($plan: PgClassSelectPlan<this>): void {
-    // e.g. $plan.where(sql`user_id = ${me}`);
-    $plan.where(sql`true /* authorization checks */`);
-    return;
-  }
-
   public async execute(
     values: CrystalValuesList<PgDataSourceInput>,
     common: PgDataSourceExecuteOptions,
   ): Promise<{
-    values: CrystalValuesList<ReadonlyArray<PgDataSourceRow<TColumns>>>;
+    values: CrystalValuesList<ReadonlyArray<TRow>>;
   }> {
     const { text, rawSqlValues, identifierIndex, queryValuesSymbol } = common;
 
     const valuesCount = values.length;
-    const results: Deferred<Array<PgDataSourceRow<TColumns>>>[] = new Array(
-      valuesCount,
-    );
+    const results: Deferred<Array<TRow>>[] = new Array(valuesCount);
 
     // Group by context
     const groupMap = new Map<
-      PgDataSourceContext,
+      PgClassDataSourceContext,
       Array<{
         queryValues: readonly any[];
         resultIndex: number;
@@ -469,6 +375,115 @@ ${"👆".repeat(30)}
 
     const finalResults = await Promise.all(results);
     return { values: finalResults };
+  }
+}
+
+/**
+ * PG class data source represents a PostgreSQL data source. This could be a table,
+ * view, materialized view, setof function call, join, etc. Anything table-like.
+ */
+export class PgClassDataSource<
+  TColumns extends PgClassDataSourceColumns,
+  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TRelations extends { [identifier: string]: PgClassDataSourceRelation },
+> extends PgDataSource<PgClassDataSourceRow<TColumns>> {
+  /**
+   * TypeScript hack so that we can retrieve the TRow type from a Postgres data
+   * source at a later time - needed so we can have strong typing on `.get()`
+   * and similar methods.
+   *
+   * @internal
+   */
+  TRow!: PgClassDataSourceRow<TColumns>;
+
+  public source: SQL;
+  public columns: TColumns;
+  public uniques: TUniques;
+  public relations: TRelations;
+
+  /**
+   * @param source - the SQL for the `FROM` clause (without any
+   * aliasing). If this is a subquery don't forget to wrap it in parens.
+   * @param name - a nickname for this data source. Doesn't need to be unique
+   * (but should be). Used for making the SQL query and debug messages easier
+   * to understand.
+   */
+  constructor(options: {
+    name: string;
+    source: SQL;
+    context: () => ObjectPlan<PgClassDataSourceContext>;
+    columns: TColumns;
+    uniques: TUniques;
+    relations?: TRelations;
+  }) {
+    super({ name: options.name, context: options.context });
+    const { source, columns, uniques, relations } = options;
+    this.source = source;
+    this.columns = columns;
+    this.uniques = uniques;
+    this.relations = relations || ({} as TRelations);
+  }
+
+  public toString(): string {
+    return chalk.bold.blue(`PgClassDataSource(${this.name})`);
+  }
+
+  public get(
+    spec: PlanByUniques<TColumns, TUniques>,
+  ): PgClassSelectSinglePlan<this> {
+    const keys: ReadonlyArray<keyof TColumns> = Object.keys(spec);
+    if (!this.uniques.some((uniq) => uniq.every((key) => keys.includes(key)))) {
+      throw new Error(
+        `Attempted to call ${this}.get({${keys.join(
+          ", ",
+        )}}) but that combination of columns is not unique. Did you mean to call .find() instead?`,
+      );
+    }
+    return this.find(spec).single();
+  }
+
+  public find(
+    spec: { [key in keyof TColumns]?: ExecutablePlan } = {},
+  ): PgClassSelectPlan<this> {
+    const keys: ReadonlyArray<keyof TColumns> = Object.keys(spec);
+    const invalidKeys = keys.filter((key) => this.columns[key] == null);
+    if (invalidKeys.length > 0) {
+      throw new Error(
+        `Attempted to call ${this}.get({${keys.join(
+          ", ",
+        )}}) but that request included columns that we don't know about: '${invalidKeys.join(
+          "', '",
+        )}'`,
+      );
+    }
+
+    const identifiers = keys.map((key) => {
+      const column = this.columns[key];
+      const {
+        codec: { sqlType: type },
+      } = column;
+      const plan: ExecutablePlan | undefined = spec[key];
+      if (plan == undefined) {
+        throw new Error(
+          `Attempted to call ${this}.get({${keys.join(
+            ", ",
+          )}}) but failed to provide a plan for '${key}'`,
+        );
+      }
+      return {
+        plan,
+        type,
+      };
+    });
+    const identifiersMatchesThunk = (alias: SQL) =>
+      keys.map((key) => sql`${alias}.${sql.identifier(key as string)}`);
+    return new PgClassSelectPlan(this, identifiers, identifiersMatchesThunk);
+  }
+
+  public applyAuthorizationChecksToPlan($plan: PgClassSelectPlan<this>): void {
+    // e.g. $plan.where(sql`user_id = ${me}`);
+    $plan.where(sql`true /* authorization checks */`);
+    return;
   }
 }
 

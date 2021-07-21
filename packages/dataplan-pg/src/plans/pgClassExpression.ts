@@ -4,7 +4,7 @@ import { ExecutablePlan } from "graphile-crystal";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { PgDataSource } from "../datasource";
+import type { PgClassDataSource } from "../datasource";
 import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
 import { PgClassSelectSinglePlan } from "./pgClassSelectSingle";
 
@@ -21,7 +21,7 @@ const debugExecuteVerbose = debugExecute.extend("verbose");
  * not be a "leaf"; it might be used as the input of another layer of plan.
  */
 export class PgClassExpressionPlan<
-    TDataSource extends PgDataSource<any, any, any>,
+    TDataSource extends PgClassDataSource<any, any, any>,
     TCodec extends PgTypeCodec,
   >
   extends ExecutablePlan<any>
@@ -144,7 +144,7 @@ export class PgClassExpressionPlan<
 }
 
 function pgClassExpression<
-  TDataSource extends PgDataSource<any, any, any>,
+  TDataSource extends PgClassDataSource<any, any, any>,
   TCodec extends PgTypeCodec,
 >(
   table: PgClassSelectSinglePlan<TDataSource>,
