@@ -1,12 +1,13 @@
 ## expect(queries).toHaveLength(1);
 ## expect(data.allMessagesConnection.edges).toHaveLength(3);
-## expect(data.allMessagesConnection.edges[0].cursor).toEqual("WyJmMGIyOGM5NGMxIiwiMDkwOTgzMTUtYzQ3Mi0xMWViLWI2YjUtYWIwNGJhN2VjZDJlIl0=");
+## expect(data.allMessagesConnection.edges[0].cursor).toEqual("WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBjYTcwIl0=");
 ## expect(data.allMessagesConnection.edges[0].node.author.username).toEqual("Bob");
 ## expect(data.allMessagesConnection.edges[1].node.author.username).toEqual("Cecilia");
 {
+  # The last 3 records before Postgres/Bob
   allMessagesConnection(
     last: 3
-    before: "WyJmMGIyOGM5NGMxIiwiMDkwOTgzMWItYzQ3Mi0xMWViLWI2YjUtZTNlMGIzYTJjOGU5Il0="
+    before: "WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBmMTcwIl0="
   ) {
     edges {
       cursor

@@ -39,8 +39,9 @@ insert into app_public.forums (id, name, archived_at) values
   ('d0900000-0000-0000-0000-000000000d09', 'Dogs', now()),
   ('f1700000-0000-0000-0000-000000000f17', 'Postgres', null);
 
-insert into app_public.messages (forum_id, author_id, body, featured, archived_at)
+insert into app_public.messages (id, forum_id, author_id, body, featured, archived_at)
   select
+    (substring(forums.id::text from 1 for 4) || substring(forums.id::text from 1 for 4) || '-' || substring(forums.id::text from 5 for 4) || '-0000-0000-' || substring(users.id::text from 1 for 8) || substring(forums.id::text from 1 for 4))::uuid,
     forums.id as forum_id,
     users.id as author_id,
     forums.name || ' = awesome -- ' || users.username as body,

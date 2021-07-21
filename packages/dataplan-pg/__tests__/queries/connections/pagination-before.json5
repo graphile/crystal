@@ -2,11 +2,11 @@
   allMessagesConnection: {
     edges: [
       {
-        cursor: "WyJmMGIyOGM5NGMxIiwiMDkwOTgzMTQtYzQ3Mi0xMWViLWI2YjUtZWJmMGM2ZGVkNmExIl0=",
+        cursor: "WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtYTExY2UwMDBjYTcwIl0=",
         node: { body: "Cats = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
       },
       {
-        cursor: "WyJmMGIyOGM5NGMxIiwiMDkwOTgzMTUtYzQ3Mi0xMWViLWI2YjUtYWIwNGJhN2VjZDJlIl0=",
+        cursor: "WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBjYTcwIl0=",
         node: { body: "Cats = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
       },
     ],
@@ -14,15 +14,15 @@
   alboce: {
     edges: [
       {
-        cursor: "WyJmMGIyOGM5NGMxIiwiMDkwOTgzMTQtYzQ3Mi0xMWViLWI2YjUtZWJmMGM2ZGVkNmExIl0=",
+        cursor: "WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtYTExY2UwMDBjYTcwIl0=",
         node: { body: "Cats = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
       },
       {
-        cursor: "WyJmMGIyOGM5NGMxIiwiMDkwOTgzMTUtYzQ3Mi0xMWViLWI2YjUtYWIwNGJhN2VjZDJlIl0=",
+        cursor: "WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBjYTcwIl0=",
         node: { body: "Cats = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
       },
       {
-        cursor: "WyJmMGIyOGM5NGMxIiwiMDkwOTgzMTYtYzQ3Mi0xMWViLWI2YjUtOTc3ZmE1N2ExNjE3Il0=",
+        cursor: "WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtY2VjMTExYTBjYTcwIl0=",
         node: { body: "Cats = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
       },
     ],

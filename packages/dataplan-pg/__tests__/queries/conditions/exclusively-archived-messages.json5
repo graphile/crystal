@@ -11,15 +11,15 @@
         ],
         edges: [
           {
-            cursor: "WyJmMGIyOGM5NGMxIiwiMDkwOTgzMTctYzQ3Mi0xMWViLWI2YjUtOWZjMDc4MGRiNDk3Il0=",
+            cursor: "WyJmMGIyOGM5NGMxIiwiZDA5MGQwOTAtMDAwMC0wMDAwLTAwMDAtYTExY2UwMDBkMDkwIl0=",
             node: { body: "Dogs = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
           },
           {
-            cursor: "WyJmMGIyOGM5NGMxIiwiMDkwOTgzMTgtYzQ3Mi0xMWViLWI2YjUtYTM4MzdkMzk5MmM2Il0=",
+            cursor: "WyJmMGIyOGM5NGMxIiwiZDA5MGQwOTAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBkMDkwIl0=",
             node: { body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
           },
           {
-            cursor: "WyJmMGIyOGM5NGMxIiwiMDkwOTgzMTktYzQ3Mi0xMWViLWI2YjUtOTNkM2IyZjAwZjMzIl0=",
+            cursor: "WyJmMGIyOGM5NGMxIiwiZDA5MGQwOTAtMDAwMC0wMDAwLTAwMDAtY2VjMTExYTBkMDkwIl0=",
             node: { body: "Dogs = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
           },
         ],
