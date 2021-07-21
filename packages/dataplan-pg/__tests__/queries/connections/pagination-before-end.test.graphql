@@ -1,13 +1,14 @@
 ## expect(queries).toHaveLength(1);
-## expect(data.allMessagesConnection.edges).toHaveLength(2);
+## expect(data.allMessagesConnection.edges).toHaveLength(3);
 ## expect(data.allMessagesConnection.edges[0].cursor).toEqual("WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtYTExY2UwMDBjYTcwIl0=");
 ## expect(data.allMessagesConnection.edges[0].node.author.username).toEqual("Alice");
 ## expect(data.allMessagesConnection.edges[1].node.author.username).toEqual("Bob");
+## expect(data.allMessagesConnection.edges[2].node.author.username).toEqual("Cecilia");
 {
-  # Before "Cecilia / Cats" there's only two records
+  # Even though the cursor is at the end (Cecilia / Postgres), we specified 'first' so we get the first 3 records.
   allMessagesConnection(
     first: 3
-    before: "WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtY2VjMTExYTBjYTcwIl0="
+    before: "WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtY2VjMTExYTBmMTcwIl0="
   ) {
     edges {
       cursor

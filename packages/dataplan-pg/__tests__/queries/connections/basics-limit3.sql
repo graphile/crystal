@@ -10,7 +10,7 @@ on (__messages__."author_id"::"uuid" = __users__."id")
 where
   (
     __messages__.archived_at is null
-  ) and (__messages__."id" < $1::"uuid") and (
+  ) and (
     true /* authorization checks */
   )
 order by __messages__."id" asc
