@@ -33,15 +33,16 @@ import sql from "pg-sql2";
 import prettier from "prettier";
 import { inspect } from "util";
 
-import type { PgSelectPlan, PgTypeCodec } from "../src";
+import type { PgTypeCodec } from "../src";
 import {
-  PgSource,
-  PgSelectSinglePlan,
   PgConnectionPlan,
+  PgSelectPlan,
+  PgSelectSinglePlan,
+  PgSource,
 } from "../src";
 import type {
-  PgSourceColumn,
   PgExecutorContext,
+  PgSourceColumn,
   WithPgClient,
 } from "../src/datasource";
 import { PgExecutor } from "../src/executor";

@@ -22,10 +22,7 @@ export type PgSourceColumns = {
   [columnName: string]: PgSourceColumn<any>;
 };
 
-export interface PgSourceColumn<
-  TCanonical = any,
-  TInput = TCanonical,
-> {
+export interface PgSourceColumn<TCanonical = any, TInput = TCanonical> {
   /**
    * How to translate to/from PG and how to cast.
    */
@@ -73,6 +70,19 @@ export interface PgSourceRelation {
   isUnique: boolean;
 }
 
+export interface PgSourceOptions<
+  TColumns extends PgSourceColumns,
+  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TRelations extends { [identifier: string]: PgSourceRelation },
+> {
+  executor: PgExecutor;
+  name: string;
+  source: SQL;
+  columns: TColumns;
+  uniques: TUniques;
+  relations?: TRelations;
+}
+
 /**
  * PG class data source represents a PostgreSQL data source. This could be a table,
  * view, materialized view, setof function call, join, etc. Anything table-like.
@@ -81,6 +91,7 @@ export class PgSource<
   TColumns extends PgSourceColumns,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
   TRelations extends { [identifier: string]: PgSourceRelation },
+  // TParameters extends { [key: string]: any } | never = never,
 > {
   /**
    * TypeScript hack so that we can retrieve the TRow type from a Postgres data
@@ -105,14 +116,7 @@ export class PgSource<
    * (but should be). Used for making the SQL query and debug messages easier
    * to understand.
    */
-  constructor(options: {
-    executor: PgExecutor;
-    name: string;
-    source: SQL;
-    columns: TColumns;
-    uniques: TUniques;
-    relations?: TRelations;
-  }) {
+  constructor(options: PgSourceOptions<TColumns, TUniques, TRelations>) {
     const { executor, name, source, columns, uniques, relations } = options;
     this.executor = executor;
     this.name = name;
@@ -171,11 +175,10 @@ export class PgSource<
       return {
         plan,
         type,
+        matches: (alias: SQL) => sql`${alias}.${sql.identifier(key as string)}`,
       };
     });
-    const identifiersMatchesThunk = (alias: SQL) =>
-      keys.map((key) => sql`${alias}.${sql.identifier(key as string)}`);
-    return new PgSelectPlan(this, identifiers, identifiersMatchesThunk);
+    return new PgSelectPlan(this, identifiers);
   }
 
   public applyAuthorizationChecksToPlan($plan: PgSelectPlan<this>): void {

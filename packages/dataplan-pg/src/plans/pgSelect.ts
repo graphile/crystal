@@ -66,6 +66,19 @@ type PgSelectPlaceholder = {
 interface PgSelectIdentifierSpec {
   plan: ExecutablePlan<any>;
   type: SQL;
+  matches: (alias: SQL) => SQL;
+}
+
+interface PgSelectArgumentSpec {
+  plan: ExecutablePlan<any>;
+  type: SQL;
+  name?: string;
+}
+
+interface PgSelectArgumentDigest {
+  position?: number;
+  name?: string;
+  dependencyIndex: number;
 }
 
 /**
@@ -133,7 +146,7 @@ export class PgSelectPlan<
   /**
    * So we can clone.
    */
-  private identifierMatchesThunk: (alias: SQL) => SQL[];
+  private identifiers: Array<PgSelectIdentifierSpec | PgSelectArgumentSpec>;
 
   /**
    * This is the list of SQL fragments in the result that are compared to some
@@ -142,6 +155,11 @@ export class PgSelectPlan<
    * table).
    */
   private identifierMatches: readonly SQL[];
+
+  /**
+   * If the source is a function, this is the names of the arguments to pass
+   */
+  private arguments: ReadonlyArray<PgSelectArgumentDigest>;
 
   /**
    * If this plan has queryValues, we must feed the queryValues into the placeholders to
@@ -244,33 +262,29 @@ export class PgSelectPlan<
 
   constructor(
     dataSource: TDataSource,
-    identifiers: Array<PgSelectIdentifierSpec>,
-    identifierMatchesThunk: (alias: SQL) => SQL[],
+    identifiers: Array<PgSelectIdentifierSpec | PgSelectArgumentSpec>,
   );
   constructor(cloneFrom: PgSelectPlan<TDataSource>);
   constructor(
     dataSourceOrCloneFrom: TDataSource | PgSelectPlan<TDataSource>,
-    identifiersOrNot?: Array<PgSelectIdentifierSpec>,
-    identifierMatchesThunkOrNot?: (alias: SQL) => SQL[],
+    identifiersOrNot?: Array<PgSelectIdentifierSpec | PgSelectArgumentSpec>,
   ) {
     super();
     const cloneFrom =
       dataSourceOrCloneFrom instanceof PgSelectPlan
         ? dataSourceOrCloneFrom
         : null;
-    const { dataSource, identifiers, identifierMatchesThunk } = cloneFrom
+    const { dataSource, identifiers } = cloneFrom
       ? {
           dataSource: cloneFrom.dataSource,
           identifiers: cloneFrom.hydrateIdentifiers(),
-          identifierMatchesThunk: cloneFrom.identifierMatchesThunk,
         }
       : {
           dataSource: dataSourceOrCloneFrom as TDataSource,
           identifiers: identifiersOrNot,
-          identifierMatchesThunk: identifierMatchesThunkOrNot,
         };
 
-    if (!identifiers || !identifierMatchesThunk) {
+    if (!identifiers) {
       throw new Error("Invalid construction of PgSelectPlan");
     }
 
@@ -306,7 +320,7 @@ export class PgSelectPlan<
           dependencyIndex: this.addDependency(plan),
           type,
         }));
-    this.identifierMatchesThunk = identifierMatchesThunk;
+    this.identifiers = identifiers;
 
     this.queryValuesSymbol = cloneFrom
       ? cloneFrom.queryValuesSymbol
@@ -315,7 +329,40 @@ export class PgSelectPlan<
     this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
     this.identifierMatches = cloneFrom
       ? Object.freeze(cloneFrom.identifierMatches)
-      : identifierMatchesThunk(this.alias);
+      : this.identifiers
+          .filter(
+            (identifier): identifier is PgSelectIdentifierSpec =>
+              "matches" in identifier &&
+              typeof identifier.matches === "function",
+          )
+          .map((identifier) => identifier.matches(this.alias));
+    let argIndex: null | number = 0;
+    this.arguments = cloneFrom
+      ? Object.freeze(cloneFrom.arguments)
+      : this.identifiers
+          .filter(
+            (identifier): identifier is PgSelectArgumentSpec =>
+              !("matches" in identifier) || !identifier.matches,
+          )
+          .map((identifier, index): PgSelectArgumentDigest => {
+            if (identifier.name) {
+              argIndex = null;
+              return {
+                name: identifier.name,
+                dependencyIndex: this.queryValues[index].dependencyIndex,
+              };
+            } else {
+              if (argIndex === null) {
+                throw new Error(
+                  "Cannot have unnamed argument after named arguments",
+                );
+              }
+              return {
+                position: argIndex++,
+                dependencyIndex: this.queryValues[index].dependencyIndex,
+              };
+            }
+          });
     this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
     this.relationJoins = cloneFrom
       ? new Map(cloneFrom.relationJoins)
@@ -427,7 +474,9 @@ export class PgSelectPlan<
     return this.isUnique;
   }
 
-  private hydrateIdentifiers(): Array<PgSelectIdentifierSpec> {
+  private hydrateIdentifiers(): Array<
+    PgSelectIdentifierSpec | PgSelectArgumentSpec
+  > {
     return this.queryValues.map(({ dependencyIndex, type }) => ({
       plan: this.aether.plans[this.dependencies[dependencyIndex]],
       type,
