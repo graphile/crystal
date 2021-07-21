@@ -18,11 +18,11 @@ import type { PgTypeCodec } from "./interfaces";
 import { PgSelectPlan } from "./plans/pgSelect";
 import type { PgSelectSinglePlan } from "./plans/pgSelectSingle";
 
-export type PgClassDataSourceColumns = {
-  [columnName: string]: PgClassDataSourceColumn<any>;
+export type PgSourceColumns = {
+  [columnName: string]: PgSourceColumn<any>;
 };
 
-export interface PgClassDataSourceColumn<
+export interface PgSourceColumn<
   TCanonical = any,
   TInput = TCanonical,
 > {
@@ -46,7 +46,7 @@ export interface PgClassDataSourceColumn<
   expression?: (alias: SQL) => SQL;
 }
 
-type PgClassDataSourceRow<TColumns extends PgClassDataSourceColumns> = {
+type PgSourceRow<TColumns extends PgSourceColumns> = {
   [key in keyof TColumns]: ReturnType<TColumns[key]["codec"]["fromPg"]>;
 };
 
@@ -66,7 +66,7 @@ type PlanByUniques<
   TCols extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
 > = TuplePlanMap<TColumns, TCols[number]>[number];
 
-export interface PgClassDataSourceRelation {
+export interface PgSourceRelation {
   targetTable: SQL;
   localColumns: string[];
   remoteColumns: string[];
@@ -77,10 +77,10 @@ export interface PgClassDataSourceRelation {
  * PG class data source represents a PostgreSQL data source. This could be a table,
  * view, materialized view, setof function call, join, etc. Anything table-like.
  */
-export class PgClassDataSource<
-  TColumns extends PgClassDataSourceColumns,
+export class PgSource<
+  TColumns extends PgSourceColumns,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
-  TRelations extends { [identifier: string]: PgClassDataSourceRelation },
+  TRelations extends { [identifier: string]: PgSourceRelation },
 > {
   /**
    * TypeScript hack so that we can retrieve the TRow type from a Postgres data
@@ -89,7 +89,7 @@ export class PgClassDataSource<
    *
    * @internal
    */
-  TRow!: PgClassDataSourceRow<TColumns>;
+  TRow!: PgSourceRow<TColumns>;
 
   public readonly executor: PgExecutor;
   public readonly name: string;
@@ -123,7 +123,7 @@ export class PgClassDataSource<
   }
 
   public toString(): string {
-    return chalk.bold.blue(`PgClassDataSource(${this.name})`);
+    return chalk.bold.blue(`PgSource(${this.name})`);
   }
 
   public get(

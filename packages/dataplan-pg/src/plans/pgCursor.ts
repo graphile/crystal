@@ -1,11 +1,11 @@
 import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
 import { ExecutablePlan, list } from "graphile-crystal";
 
-import type { PgClassDataSource } from "../datasource";
+import type { PgSource } from "../datasource";
 import { PgSelectSinglePlan } from "./pgSelectSingle";
 
 export class PgCursorPlan<
-  TDataSource extends PgClassDataSource<any, any, any>,
+  TDataSource extends PgSource<any, any, any>,
 > extends ExecutablePlan<any> {
   private cursorValuesPlanId: number;
   private classSinglePlanId: number;

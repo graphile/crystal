@@ -35,12 +35,12 @@ import { inspect } from "util";
 
 import type { PgSelectPlan, PgTypeCodec } from "../src";
 import {
-  PgClassDataSource,
+  PgSource,
   PgSelectSinglePlan,
   PgConnectionPlan,
 } from "../src";
 import type {
-  PgClassDataSourceColumn,
+  PgSourceColumn,
   PgExecutorContext,
   WithPgClient,
 } from "../src/datasource";
@@ -143,11 +143,11 @@ export function makeExampleSchema(
     TOptions extends {
       codec: PgTypeCodec;
       notNull?: boolean;
-      expression?: PgClassDataSourceColumn<any>["expression"];
+      expression?: PgSourceColumn<any>["expression"];
     },
   >(
     options: TOptions,
-  ): PgClassDataSourceColumn<
+  ): PgSourceColumn<
     NullableUnless<TOptions["notNull"], ReturnType<TOptions["codec"]["fromPg"]>>
   > => {
     const { notNull, codec, expression } = options;
@@ -169,7 +169,7 @@ export function makeExampleSchema(
     },
   });
 
-  const messageSource = new PgClassDataSource({
+  const messageSource = new PgSource({
     source: sql`app_public.messages`,
     name: "messages",
     executor,
@@ -197,7 +197,7 @@ export function makeExampleSchema(
     },
   });
 
-  const userSource = new PgClassDataSource({
+  const userSource = new PgSource({
     source: sql`app_public.users`,
     name: "users",
     executor,
@@ -210,7 +210,7 @@ export function makeExampleSchema(
     uniques: [["id"], ["username"]],
   });
 
-  const forumSource = new PgClassDataSource({
+  const forumSource = new PgSource({
     source: sql`app_public.forums`,
     name: "forums",
     executor,
@@ -569,7 +569,7 @@ export function makeExampleSchema(
     }),
   );
 
-  class TempTablePlan<TDataSource extends PgClassDataSource<any, any, any>>
+  class TempTablePlan<TDataSource extends PgSource<any, any, any>>
     extends BasePlan
     implements PgConditionCapableParentPlan
   {
@@ -596,7 +596,7 @@ export function makeExampleSchema(
   }
 
   class ManyFilterPlan<
-    TChildDataSource extends PgClassDataSource<any, any, any>,
+    TChildDataSource extends PgSource<any, any, any>,
   > extends ModifierPlan<ClassFilterPlan> {
     public $some: TempTablePlan<TChildDataSource> | null = null;
     constructor(

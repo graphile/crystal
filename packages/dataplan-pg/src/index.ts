@@ -1,4 +1,4 @@
-export { PgClassDataSource } from "./datasource";
+export { PgSource } from "./datasource";
 export { PgTypeCodec } from "./interfaces";
 export {
   pgClassExpression,

@@ -53,7 +53,7 @@ export type PgExecutorOptions = {
 
 /**
  * Represents a PostgreSQL database connection, can be used for issuing queries
- * to the database. Used by PgClassDataSource but also directly by things like
+ * to the database. Used by PgSource but also directly by things like
  * PgSimpleFunctionCallPlan. Was once PgDataSource itself.
  */
 export class PgExecutor {
