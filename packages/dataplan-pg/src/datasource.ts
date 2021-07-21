@@ -1,84 +1,22 @@
-import LRU from "@graphile/lru";
-import * as assert from "assert";
 import chalk from "chalk";
-import debugFactory from "debug";
 import type {
   CrystalValuesList,
-  Deferred,
   ExecutablePlan,
   ObjectPlan,
 } from "graphile-crystal";
-import { __ValuePlan, defer } from "graphile-crystal";
-import type { SQL, SQLRawValue } from "pg-sql2";
+import { __ValuePlan } from "graphile-crystal";
+import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
-import { inspect } from "util";
 
+import type {
+  PgExecutor,
+  PgExecutorContext,
+  PgExecutorInput,
+  PgExecutorOptions,
+} from "./executor";
 import type { PgTypeCodec } from "./interfaces";
 import { PgClassSelectPlan } from "./plans/pgClassSelect";
 import type { PgClassSelectSinglePlan } from "./plans/pgClassSelectSingle";
-
-const debug = debugFactory("datasource:pg:PgClassDataSource");
-const debugVerbose = debug.extend("verbose");
-
-abstract class DataSource<
-  TData extends any,
-  TInput extends any,
-  TOptions extends { [key: string]: any },
-> {
-  /**
-   * TypeScript hack so that we can retrieve the TData type from a data source
-   * at a later time - needed so we can have strong typing on `.get()` and
-   * similar methods.
-   *
-   * @internal
-   */
-  TData!: TData;
-
-  constructor() {}
-
-  abstract execute(
-    values: ReadonlyArray<TInput>,
-    options: TOptions,
-  ): Promise<{ values: ReadonlyArray<TData> }>;
-}
-
-export type PgDataSourceInput = {
-  context: PgClassDataSourceContext;
-  queryValues: ReadonlyArray<any>;
-};
-export type PgDataSourceExecuteOptions = {
-  text: string;
-  rawSqlValues: Array<SQLRawValue | symbol>;
-  identifierIndex?: number | null;
-  queryValuesSymbol?: symbol | null;
-};
-
-export type WithPgClient = <T>(
-  pgSettings: { [key: string]: string },
-  callback: (client: PgClient) => T | Promise<T>,
-) => Promise<T>;
-
-export interface PgClientQuery {
-  /** The query string */
-  text: string;
-  /** The values to put in the placeholders */
-  values?: Array<any>;
-  /** An optimisation, to avoid you having to decode column names */
-  arrayMode?: boolean;
-  /** For prepared statements */
-  name?: string;
-}
-
-export interface PgClient {
-  query<TData>(opts: PgClientQuery): Promise<{ rows: readonly TData[] }>;
-
-  // TODO: add transaction support
-}
-
-export type PgClassDataSourceContext<TSettings = any> = {
-  pgSettings: TSettings;
-  withPgClient: WithPgClient;
-};
 
 export type PgClassDataSourceColumns = {
   [columnName: string]: PgClassDataSourceColumn<any>;
@@ -135,249 +73,6 @@ export interface PgClassDataSourceRelation {
   isUnique: boolean;
 }
 
-export class PgDataSource<TRow> extends DataSource<
-  ReadonlyArray<TRow>,
-  PgDataSourceInput,
-  PgDataSourceExecuteOptions
-> {
-  public name: string;
-  private contextCallback: () => ObjectPlan<PgClassDataSourceContext>;
-  private cache: WeakMap<
-    Record<string, unknown> /* context */,
-    LRU<
-      string /* query and variables */,
-      Map<string /* queryValues (JSON) */, Deferred<any[]>>
-    >
-  > = new WeakMap();
-
-  constructor(options: {
-    name: string;
-    context: () => ObjectPlan<PgClassDataSourceContext>;
-  }) {
-    super();
-    const { name, context } = options;
-    this.name = name;
-    this.contextCallback = context;
-  }
-
-  public toString(): string {
-    return chalk.bold.blue(`PgDataSource(${this.name})`);
-  }
-
-  public context(): ExecutablePlan<any> {
-    return this.contextCallback();
-  }
-
-  public async execute(
-    values: CrystalValuesList<PgDataSourceInput>,
-    common: PgDataSourceExecuteOptions,
-  ): Promise<{
-    values: CrystalValuesList<ReadonlyArray<TRow>>;
-  }> {
-    const { text, rawSqlValues, identifierIndex, queryValuesSymbol } = common;
-
-    const valuesCount = values.length;
-    const results: Deferred<Array<TRow>>[] = new Array(valuesCount);
-
-    // Group by context
-    const groupMap = new Map<
-      PgClassDataSourceContext,
-      Array<{
-        queryValues: readonly any[];
-        resultIndex: number;
-      }>
-    >();
-    for (
-      let resultIndex = 0, l = values.length;
-      resultIndex < l;
-      resultIndex++
-    ) {
-      const { context, queryValues } = values[resultIndex];
-
-      let entry = groupMap.get(context);
-      if (!entry) {
-        entry = [];
-        groupMap.set(context, entry);
-      }
-      entry.push({ queryValues, resultIndex });
-    }
-
-    // For each context, run the relevant fetches
-    const promises: Promise<void>[] = [];
-    for (const [context, batch] of groupMap.entries()) {
-      promises.push(
-        (async () => {
-          // TODO: cache must factor in placeholders.
-          let cacheForContext = this.cache.get(context);
-          if (!cacheForContext) {
-            cacheForContext = new LRU({ maxLength: 500 /* SQL queries */ });
-            this.cache.set(context, cacheForContext);
-          }
-
-          const textAndValues = `${text}\n${JSON.stringify(rawSqlValues)}`;
-          let cacheForQuery = cacheForContext.get(textAndValues);
-          if (!cacheForQuery) {
-            cacheForQuery = new Map();
-            cacheForContext.set(textAndValues, cacheForQuery);
-          }
-
-          const scopedCache = cacheForQuery;
-
-          const remaining: string[] = [];
-          const remainingDeferreds: Array<Deferred<any[]>> = [];
-
-          try {
-            // Concurrent requests to the same queryValues should result in the same value/execution.
-            const batchSize = batch.length;
-            for (let batchIndex = 0; batchIndex < batchSize; batchIndex++) {
-              const { queryValues, resultIndex } = batch[batchIndex];
-              const identifiersJSON = JSON.stringify(queryValues); // TODO: Canonical? Manual for perf?
-              const existingResult = scopedCache.get(identifiersJSON);
-              if (existingResult) {
-                debugVerbose(
-                  "%s served %o from cache: %c",
-                  this,
-                  identifiersJSON,
-                  existingResult,
-                );
-                results[resultIndex] = existingResult;
-              } else {
-                debugVerbose(
-                  "%s no entry for %o in cache %c",
-                  this,
-                  identifiersJSON,
-                  scopedCache,
-                );
-                assert.ok(
-                  remaining.includes(identifiersJSON) === false,
-                  "Should only fetch each identifiersJSON once, future entries in the loop should receive previous deferred",
-                );
-                const pendingResult = defer<any[]>(); // CRITICAL: this MUST resolve later
-                results[resultIndex] = pendingResult;
-                scopedCache.set(identifiersJSON, pendingResult);
-                remaining.push(identifiersJSON) - 1;
-                remainingDeferreds.push(pendingResult);
-              }
-            }
-
-            if (remaining.length) {
-              let found = false;
-              const sqlValues = rawSqlValues.map((v) => {
-                // THIS IS A DELIBERATE HACK - we are replacing this symbol with a value
-                // before executing the query.
-                if (
-                  identifierIndex != null &&
-                  queryValuesSymbol != null &&
-                  (v as any) === queryValuesSymbol
-                ) {
-                  found = true;
-                  // Manual JSON-ing
-                  return "[" + remaining.join(",") + "]";
-                } else if (typeof v === "symbol") {
-                  console.error(formatSQLForDebugging(text));
-                  throw new Error(
-                    `Unhandled symbol when executing query: '${String(v)}'`,
-                  );
-                } else {
-                  return v;
-                }
-              });
-              if (identifierIndex != null && !found) {
-                throw new Error(
-                  "Query with identifiers was executed, but no identifier reference was found in the values passed",
-                );
-              }
-              let queryResult: any, error: any;
-              try {
-                // TODO: we could probably make this more efficient by grouping the
-                // deferreds further, DataLoader-style, and running one SQL query for
-                // everything.
-                queryResult = await context.withPgClient(
-                  context.pgSettings,
-                  (client) =>
-                    client.query({
-                      text,
-                      values: sqlValues,
-                      arrayMode: true,
-                    }),
-                );
-              } catch (e) {
-                error = e;
-              }
-              debugVerbose(`\
-
-
-${"👇".repeat(30)}
-# SQL QUERY:
-${formatSQLForDebugging(text, error)}
-
-# PLACEHOLDERS:
-${inspect(sqlValues, { colors: true })}
-
-${
-  error
-    ? `\
-# ERROR:
-${inspect(error, { colors: true })}`
-    : `\
-# RESULT:
-${inspect(queryResult.rows, { colors: true, depth: 6 })}`
-}
-${"👆".repeat(30)}
-
-
-`);
-              if (error) {
-                throw error;
-              }
-              const { rows } = queryResult;
-              const groups: { [valueIndex: number]: any[] } =
-                Object.create(null);
-              for (let i = 0, l = rows.length; i < l; i++) {
-                const result = rows[i];
-                const valueIndex =
-                  identifierIndex != null ? result[identifierIndex] : 0;
-                if (!groups[valueIndex]) {
-                  groups[valueIndex] = [result];
-                } else {
-                  groups[valueIndex].push(result);
-                }
-              }
-              for (let i = 0, l = remainingDeferreds.length; i < l; i++) {
-                const remainingDeferred = remainingDeferreds[i];
-                const value = groups[i] ?? [];
-                remainingDeferred.resolve(value);
-              }
-            }
-          } catch (e) {
-            // This block guarantees that all remainingDeferreds will be
-            // rejected - we don't want defers hanging around!
-            remainingDeferreds.forEach((d) => {
-              try {
-                if (d) {
-                  d.reject(e);
-                }
-              } catch (e2) {
-                // Ignore error when rejecting
-                console.error(
-                  `Encountered second error when rejecting deferred due to a different error; ignoring error: ${e2}`,
-                );
-              }
-            });
-            return Promise.reject(e);
-          }
-        })(),
-      );
-    }
-
-    // Avoids UnhandledPromiseRejection error.
-    await Promise.allSettled(promises);
-
-    const finalResults = await Promise.all(results);
-    return { values: finalResults };
-  }
-}
-
 /**
  * PG class data source represents a PostgreSQL data source. This could be a table,
  * view, materialized view, setof function call, join, etc. Anything table-like.
@@ -386,7 +81,7 @@ export class PgClassDataSource<
   TColumns extends PgClassDataSourceColumns,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
   TRelations extends { [identifier: string]: PgClassDataSourceRelation },
-> extends PgDataSource<PgClassDataSourceRow<TColumns>> {
+> {
   /**
    * TypeScript hack so that we can retrieve the TRow type from a Postgres data
    * source at a later time - needed so we can have strong typing on `.get()`
@@ -396,10 +91,12 @@ export class PgClassDataSource<
    */
   TRow!: PgClassDataSourceRow<TColumns>;
 
-  public source: SQL;
-  public columns: TColumns;
-  public uniques: TUniques;
-  public relations: TRelations;
+  public readonly executor: PgExecutor;
+  public readonly name: string;
+  public readonly source: SQL;
+  public readonly columns: TColumns;
+  public readonly uniques: TUniques;
+  public readonly relations: TRelations;
 
   /**
    * @param source - the SQL for the `FROM` clause (without any
@@ -409,15 +106,16 @@ export class PgClassDataSource<
    * to understand.
    */
   constructor(options: {
+    executor: PgExecutor;
     name: string;
     source: SQL;
-    context: () => ObjectPlan<PgClassDataSourceContext>;
     columns: TColumns;
     uniques: TUniques;
     relations?: TRelations;
   }) {
-    super({ name: options.name, context: options.context });
-    const { source, columns, uniques, relations } = options;
+    const { executor, name, source, columns, uniques, relations } = options;
+    this.executor = executor;
+    this.name = name;
     this.source = source;
     this.columns = columns;
     this.uniques = uniques;
@@ -485,61 +183,15 @@ export class PgClassDataSource<
     $plan.where(sql`true /* authorization checks */`);
     return;
   }
-}
 
-// A simplified version of formatSQLForDebugging from graphile-build-pg
-function formatSQLForDebugging(
-  sql: string,
-  error?: { position?: string | number; message?: string } | null,
-) {
-  const pos =
-    error?.position != null ? parseInt(String(error.position), 10) : null;
-
-  let colourIndex = 0;
-  const allowedColours = [
-    chalk.red,
-    chalk.green,
-    chalk.yellow,
-    chalk.blue,
-    chalk.magenta,
-    chalk.cyan,
-    chalk.white,
-    chalk.black,
-  ];
-
-  function nextColor() {
-    colourIndex = (colourIndex + 1) % allowedColours.length;
-    return allowedColours[colourIndex];
-  }
-  const colours = {};
-
-  /* Yep - that's `colour` from English and `ize` from American */
-  function colourize(str: string) {
-    if (!colours[str]) {
-      colours[str] = nextColor();
-    }
-    return colours[str].bold.call(null, str);
-  }
-  function comment(str: string) {
-    return chalk.inverse(str);
+  public context(): ObjectPlan<PgExecutorContext> {
+    return this.executor.context();
   }
 
-  const lines = sql.split("\n");
-  let start = 0;
-  const output = [];
-  for (const line of lines) {
-    const end = start + line.length + 1;
-    const colouredSql = line
-      .replace(/__[a-z0-9_]+(?:_[0-9]+|__)/g, colourize)
-      .replace(/(\/\*.*\*\/|--.*$)/g, comment);
-    output.push(colouredSql);
-    if (pos != null && pos >= start && pos < end) {
-      output.push(
-        chalk.red("-".repeat(pos - start - 1) + "^ " + error?.message),
-      );
-    }
-    start = end;
+  public execute<TInput = any, TOutput = any>(
+    values: CrystalValuesList<PgExecutorInput<TInput>>,
+    options: PgExecutorOptions,
+  ): Promise<{ values: CrystalValuesList<ReadonlyArray<TOutput>> }> {
+    return this.executor.execute(values, options);
   }
-
-  return output.join("\n");
 }

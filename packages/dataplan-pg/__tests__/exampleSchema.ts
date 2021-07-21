@@ -35,15 +35,16 @@ import { inspect } from "util";
 
 import type { PgClassSelectPlan, PgTypeCodec } from "../src";
 import {
+  PgClassDataSource,
   PgClassSelectSinglePlan,
   PgConnectionPlan,
-  PgClassDataSource,
 } from "../src";
 import type {
   PgClassDataSourceColumn,
-  PgClassDataSourceContext,
+  PgExecutorContext,
   WithPgClient,
 } from "../src/datasource";
+import { PgExecutor } from "../src/executor";
 import { pgClassExpression } from "../src/plans/pgClassExpression";
 import type { PgConditionCapableParentPlan } from "../src/plans/pgCondition";
 import { PgConditionPlan } from "../src/plans/pgCondition";
@@ -62,14 +63,6 @@ declare module "graphile-crystal" {
     pgSettings: { [key: string]: string };
     withPgClient: WithPgClient;
   }
-}
-
-function getPgClassDataSourceContext() {
-  const $context = context();
-  return object<PgClassDataSourceContext<BaseGraphQLContext["pgSettings"]>>({
-    pgSettings: $context.get("pgSettings"),
-    withPgClient: $context.get("withPgClient"),
-  });
 }
 
 /**
@@ -165,10 +158,21 @@ export function makeExampleSchema(
     };
   };
 
+  const executor = new PgExecutor({
+    name: "default",
+    context: () => {
+      const $context = context();
+      return object<PgExecutorContext<BaseGraphQLContext["pgSettings"]>>({
+        pgSettings: $context.get("pgSettings"),
+        withPgClient: $context.get("withPgClient"),
+      });
+    },
+  });
+
   const messageSource = new PgClassDataSource({
     source: sql`app_public.messages`,
     name: "messages",
-    context: getPgClassDataSourceContext,
+    executor,
     columns: {
       id: col({ notNull: true, codec: TYPES.uuid }),
       body: col({ notNull: true, codec: TYPES.text }),
@@ -196,7 +200,7 @@ export function makeExampleSchema(
   const userSource = new PgClassDataSource({
     source: sql`app_public.users`,
     name: "users",
-    context: getPgClassDataSourceContext,
+    executor,
     columns: {
       id: col({ notNull: true, codec: TYPES.uuid }),
       username: col({ notNull: true, codec: TYPES.citext }),
@@ -209,7 +213,7 @@ export function makeExampleSchema(
   const forumSource = new PgClassDataSource({
     source: sql`app_public.forums`,
     name: "forums",
-    context: getPgClassDataSourceContext,
+    executor,
     columns: {
       id: col({ notNull: true, codec: TYPES.uuid }),
       name: col({ notNull: true, codec: TYPES.citext }),
