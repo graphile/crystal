@@ -6,7 +6,7 @@ import sql from "pg-sql2";
 
 import type { PgClassDataSource } from "../datasource";
 import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
-import { PgClassSelectSinglePlan } from "./pgClassSelectSingle";
+import { PgSelectSinglePlan } from "./pgSelectSingle";
 
 //const debugPlan = debugFactory("datasource:pg:PgClassExpressionPlan:plan");
 const debugExecute = debugFactory(
@@ -31,7 +31,7 @@ export class PgClassExpressionPlan<
 
   /**
    * This is the numeric index of this expression within the grandparent
-   * PgClassSelectPlan's selection.
+   * PgSelectPlan's selection.
    */
   private attrIndex: number | null = null;
 
@@ -43,7 +43,7 @@ export class PgClassExpressionPlan<
   placeholderIndexes: number[] = [];
 
   constructor(
-    table: PgClassSelectSinglePlan<TDataSource>,
+    table: PgSelectSinglePlan<TDataSource>,
     public readonly pgCodec: TCodec,
     strings: TemplateStringsArray,
     dependencies: ReadonlyArray<PgTypedExecutablePlan<any> | SQL> = [],
@@ -90,10 +90,10 @@ export class PgClassExpressionPlan<
     this.expression = sql(strings, ...fragments);
   }
 
-  public getClassSinglePlan(): PgClassSelectSinglePlan<TDataSource> {
+  public getClassSinglePlan(): PgSelectSinglePlan<TDataSource> {
     const plan = this.aether.plans[this.dependencies[this.tableId]];
-    if (!(plan instanceof PgClassSelectSinglePlan)) {
-      throw new Error(`Expected ${plan} to be a PgClassSelectSinglePlan`);
+    if (!(plan instanceof PgSelectSinglePlan)) {
+      throw new Error(`Expected ${plan} to be a PgSelectSinglePlan`);
     }
     return plan;
   }
@@ -147,7 +147,7 @@ function pgClassExpression<
   TDataSource extends PgClassDataSource<any, any, any>,
   TCodec extends PgTypeCodec,
 >(
-  table: PgClassSelectSinglePlan<TDataSource>,
+  table: PgSelectSinglePlan<TDataSource>,
   codec: TCodec,
 ): (
   strings: TemplateStringsArray,

@@ -3,7 +3,7 @@ import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
 import { ExecutablePlan } from "graphile-crystal";
 
 import type { PgClassDataSource } from "../datasource";
-import { PgClassSelectPlan } from "./pgClassSelect";
+import { PgSelectPlan } from "./pgSelect";
 
 const debugPlan = debugFactory("datasource:pg:PgConnectionPlan:plan");
 const debugExecute = debugFactory("datasource:pg:PgConnectionPlan:execute");
@@ -17,7 +17,7 @@ export class PgConnectionPlan<
 
   private readonly dataSource: TDataSource;
 
-  constructor(subplan: PgClassSelectPlan<TDataSource>) {
+  constructor(subplan: PgSelectPlan<TDataSource>) {
     super();
     this.dataSource = subplan.dataSource;
     this.subplanId = subplan.id;
@@ -28,15 +28,15 @@ export class PgConnectionPlan<
     return this.dataSource.name;
   }
 
-  public getSubplan(): PgClassSelectPlan<TDataSource> {
+  public getSubplan(): PgSelectPlan<TDataSource> {
     const plan = this.aether.plans[this.subplanId];
-    if (!(plan instanceof PgClassSelectPlan)) {
-      throw new Error(`Expected ${plan} to be a PgClassSelectPlan`);
+    if (!(plan instanceof PgSelectPlan)) {
+      throw new Error(`Expected ${plan} to be a PgSelectPlan`);
     }
     return plan;
   }
 
-  public nodes(): PgClassSelectPlan<TDataSource> {
+  public nodes(): PgSelectPlan<TDataSource> {
     return this.getSubplan().clone();
   }
 

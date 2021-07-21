@@ -15,8 +15,8 @@ import type {
   PgExecutorOptions,
 } from "./executor";
 import type { PgTypeCodec } from "./interfaces";
-import { PgClassSelectPlan } from "./plans/pgClassSelect";
-import type { PgClassSelectSinglePlan } from "./plans/pgClassSelectSingle";
+import { PgSelectPlan } from "./plans/pgSelect";
+import type { PgSelectSinglePlan } from "./plans/pgSelectSingle";
 
 export type PgClassDataSourceColumns = {
   [columnName: string]: PgClassDataSourceColumn<any>;
@@ -128,7 +128,7 @@ export class PgClassDataSource<
 
   public get(
     spec: PlanByUniques<TColumns, TUniques>,
-  ): PgClassSelectSinglePlan<this> {
+  ): PgSelectSinglePlan<this> {
     const keys: ReadonlyArray<keyof TColumns> = Object.keys(spec);
     if (!this.uniques.some((uniq) => uniq.every((key) => keys.includes(key)))) {
       throw new Error(
@@ -142,7 +142,7 @@ export class PgClassDataSource<
 
   public find(
     spec: { [key in keyof TColumns]?: ExecutablePlan } = {},
-  ): PgClassSelectPlan<this> {
+  ): PgSelectPlan<this> {
     const keys: ReadonlyArray<keyof TColumns> = Object.keys(spec);
     const invalidKeys = keys.filter((key) => this.columns[key] == null);
     if (invalidKeys.length > 0) {
@@ -175,10 +175,10 @@ export class PgClassDataSource<
     });
     const identifiersMatchesThunk = (alias: SQL) =>
       keys.map((key) => sql`${alias}.${sql.identifier(key as string)}`);
-    return new PgClassSelectPlan(this, identifiers, identifiersMatchesThunk);
+    return new PgSelectPlan(this, identifiers, identifiersMatchesThunk);
   }
 
-  public applyAuthorizationChecksToPlan($plan: PgClassSelectPlan<this>): void {
+  public applyAuthorizationChecksToPlan($plan: PgSelectPlan<this>): void {
     // e.g. $plan.where(sql`user_id = ${me}`);
     $plan.where(sql`true /* authorization checks */`);
     return;

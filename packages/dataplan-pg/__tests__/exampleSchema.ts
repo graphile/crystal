@@ -33,10 +33,10 @@ import sql from "pg-sql2";
 import prettier from "prettier";
 import { inspect } from "util";
 
-import type { PgClassSelectPlan, PgTypeCodec } from "../src";
+import type { PgSelectPlan, PgTypeCodec } from "../src";
 import {
   PgClassDataSource,
-  PgClassSelectSinglePlan,
+  PgSelectSinglePlan,
   PgConnectionPlan,
 } from "../src";
 import type {
@@ -84,13 +84,13 @@ type NullableUnless<TCondition extends boolean | undefined, TType> =
 export function makeExampleSchema(
   options: { deoptimize?: boolean } = {},
 ): GraphQLSchema {
-  // type MessagesPlan = PgClassSelectPlan<typeof messageSource>;
+  // type MessagesPlan = PgSelectPlan<typeof messageSource>;
   type MessageConnectionPlan = PgConnectionPlan<typeof messageSource>;
-  type MessagePlan = PgClassSelectSinglePlan<typeof messageSource>;
-  // type UsersPlan = PgClassSelectPlan<typeof userSource>;
-  type UserPlan = PgClassSelectSinglePlan<typeof userSource>;
-  // type ForumsPlan = PgClassSelectPlan<typeof forumSource>;
-  type ForumPlan = PgClassSelectSinglePlan<typeof forumSource>;
+  type MessagePlan = PgSelectSinglePlan<typeof messageSource>;
+  // type UsersPlan = PgSelectPlan<typeof userSource>;
+  type UserPlan = PgSelectSinglePlan<typeof userSource>;
+  // type ForumsPlan = PgSelectPlan<typeof forumSource>;
+  type ForumPlan = PgSelectSinglePlan<typeof forumSource>;
 
   const pg2gqlForType = (
     type: "boolean" | "timestamptz" | "timestamp" | string,
@@ -250,7 +250,7 @@ export function makeExampleSchema(
     name: "MessagesOrderBy",
     values: {
       BODY_ASC: {
-        value: (plan: PgClassSelectPlan<typeof messageSource>) => {
+        value: (plan: PgSelectPlan<typeof messageSource>) => {
           plan.orderBy({
             codec: TYPES.text,
             fragment: sql`${plan.alias}.body`,
@@ -259,7 +259,7 @@ export function makeExampleSchema(
         },
       },
       BODY_DESC: {
-        value: (plan: PgClassSelectPlan<typeof messageSource>) => {
+        value: (plan: PgSelectPlan<typeof messageSource>) => {
           plan.orderBy({
             codec: TYPES.text,
             fragment: sql`${plan.alias}.body`,
@@ -268,7 +268,7 @@ export function makeExampleSchema(
         },
       },
       AUTHOR_USERNAME_ASC: {
-        value: (plan: PgClassSelectPlan<typeof messageSource>) => {
+        value: (plan: PgSelectPlan<typeof messageSource>) => {
           const authorAlias = plan.singleRelation("author");
           plan.orderBy({
             codec: TYPES.text,
@@ -278,7 +278,7 @@ export function makeExampleSchema(
         },
       },
       AUTHOR_USERNAME_DESC: {
-        value: (plan: PgClassSelectPlan<typeof messageSource>) => {
+        value: (plan: PgSelectPlan<typeof messageSource>) => {
           const authorAlias = plan.singleRelation("author");
           plan.orderBy({
             codec: TYPES.text,
@@ -385,7 +385,7 @@ export function makeExampleSchema(
   });
 
   function makeIncludeArchivedField<TFieldPlan>(
-    getClassPlan: ($fieldPlan: TFieldPlan) => PgClassSelectPlan<any>,
+    getClassPlan: ($fieldPlan: TFieldPlan) => PgSelectPlan<any>,
   ) {
     return {
       type: IncludeArchived,
@@ -402,7 +402,7 @@ export function makeExampleSchema(
         } else if (
           $value.evalIs("INHERIT") &&
           // INHERIT only works if the parent has an archived_at column.
-          $parent instanceof PgClassSelectSinglePlan &&
+          $parent instanceof PgSelectSinglePlan &&
           !!$parent.dataSource.columns.archived_at
         ) {
           $messages.where(
@@ -743,7 +743,7 @@ export function makeExampleSchema(
                 type: GraphQLInt,
                 plan(
                   _$forum,
-                  $messages: PgClassSelectPlan<typeof messageSource>,
+                  $messages: PgSelectPlan<typeof messageSource>,
                   $value,
                 ) {
                   $messages.setFirst($value.eval());
@@ -754,7 +754,7 @@ export function makeExampleSchema(
                 type: MessageCondition,
                 plan(
                   _$forum,
-                  $messages: PgClassSelectPlan<typeof messageSource>,
+                  $messages: PgSelectPlan<typeof messageSource>,
                 ) {
                   return $messages.wherePlan();
                 },
@@ -763,7 +763,7 @@ export function makeExampleSchema(
                 type: MessageFilter,
                 plan(
                   _$forum,
-                  $messages: PgClassSelectPlan<typeof messageSource>,
+                  $messages: PgSelectPlan<typeof messageSource>,
                 ) {
                   return new ClassFilterPlan(
                     $messages.wherePlan(),
@@ -772,7 +772,7 @@ export function makeExampleSchema(
                 },
               },
               includeArchived: makeIncludeArchivedField<
-                PgClassSelectPlan<typeof messageSource>
+                PgSelectPlan<typeof messageSource>
               >(($messages) => $messages),
             },
             plan($forum) {
@@ -873,7 +873,7 @@ export function makeExampleSchema(
               type: GraphQLInt,
               plan(
                 _$root,
-                $forums: PgClassSelectPlan<typeof forumSource>,
+                $forums: PgSelectPlan<typeof forumSource>,
                 $value,
               ) {
                 $forums.setFirst($value.eval());
@@ -881,17 +881,17 @@ export function makeExampleSchema(
               },
             },
             includeArchived: makeIncludeArchivedField<
-              PgClassSelectPlan<typeof forumSource>
+              PgSelectPlan<typeof forumSource>
             >(($forums) => $forums),
             condition: {
               type: ForumCondition,
-              plan(_$root, $forums: PgClassSelectPlan<typeof forumSource>) {
+              plan(_$root, $forums: PgSelectPlan<typeof forumSource>) {
                 return $forums.wherePlan();
               },
             },
             filter: {
               type: ForumFilter,
-              plan(_$root, $forums: PgClassSelectPlan<typeof forumSource>) {
+              plan(_$root, $forums: PgSelectPlan<typeof forumSource>) {
                 return new ClassFilterPlan($forums.wherePlan(), $forums.alias);
               },
             },

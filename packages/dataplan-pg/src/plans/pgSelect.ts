@@ -24,7 +24,7 @@ import sql, { arraysMatch } from "pg-sql2";
 import type { PgClassDataSource, PgClassDataSourceRelation } from "../datasource";
 import type { PgOrderSpec, PgTypedExecutablePlan } from "../interfaces";
 import { PgClassExpressionPlan } from "./pgClassExpression";
-import { PgClassSelectSinglePlan } from "./pgClassSelectSingle";
+import { PgSelectSinglePlan } from "./pgSelectSingle";
 import { PgConditionPlan } from "./pgCondition";
 
 const isDev =
@@ -32,17 +32,17 @@ const isDev =
 
 type LockableParameter = "orderBy" | "first" | "last" | "offset";
 type LockCallback<TDataSource extends PgClassDataSource<any, any, any>> = (
-  plan: PgClassSelectPlan<TDataSource>,
+  plan: PgSelectPlan<TDataSource>,
 ) => void;
 
-const debugPlan = debugFactory("datasource:pg:PgClassSelectPlan:plan");
-const debugExecute = debugFactory("datasource:pg:PgClassSelectPlan:execute");
+const debugPlan = debugFactory("datasource:pg:PgSelectPlan:plan");
+const debugExecute = debugFactory("datasource:pg:PgSelectPlan:execute");
 const debugPlanVerbose = debugPlan.extend("verbose");
 // const debugExecuteVerbose = debugExecute.extend("verbose");
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 
-type PgClassSelectPlanJoin =
+type PgSelectPlanJoin =
   | {
       type: "cross";
       source: SQL;
@@ -55,7 +55,7 @@ type PgClassSelectPlanJoin =
       conditions: SQL[];
     };
 
-type PgClassSelectPlaceholder = {
+type PgSelectPlaceholder = {
   dependencyIndex: number;
   // This is a "ref" so that it can be merged into other objects whilst still
   // allowing `placeholder.sqlRef.sql = ...` to work.
@@ -63,7 +63,7 @@ type PgClassSelectPlaceholder = {
   type: SQL;
 };
 
-interface PgClassSelectIdentifierSpec {
+interface PgSelectIdentifierSpec {
   plan: ExecutablePlan<any>;
   type: SQL;
 }
@@ -81,7 +81,7 @@ interface PgClassSelectIdentifierSpec {
  * could be used for that purpose so long as we name the scalars (i.e. create
  * records from them `{a: 1},{a: 2},{a:3}`).
  */
-export class PgClassSelectPlan<
+export class PgSelectPlan<
   TDataSource extends PgClassDataSource<any, any, any>,
 > extends ExecutablePlan<ReadonlyArray<TDataSource["TRow"]>> {
   // FROM
@@ -99,7 +99,7 @@ export class PgClassSelectPlan<
   // JOIN
 
   private relationJoins: Map<keyof TDataSource["relations"], SQL>;
-  private joins: Array<PgClassSelectPlanJoin>;
+  private joins: Array<PgSelectPlanJoin>;
 
   // WHERE
 
@@ -153,7 +153,7 @@ export class PgClassSelectPlan<
   /**
    * Values used in this plan.
    */
-  private placeholders: Array<PgClassSelectPlaceholder>;
+  private placeholders: Array<PgSelectPlaceholder>;
 
   /**
    * If true, we don't need to add any of the security checks from the data
@@ -207,7 +207,7 @@ export class PgClassSelectPlan<
   } | null = null;
 
   /**
-   * Determines if the PgClassSelectPlan is "locked" - i.e. its
+   * Determines if the PgSelectPlan is "locked" - i.e. its
    * FROM,JOINs,WHERE,ORDER BY,LIMIT,OFFSET cannot be changed. Note this does
    * not prevent adding more SELECTs
    */
@@ -244,18 +244,18 @@ export class PgClassSelectPlan<
 
   constructor(
     dataSource: TDataSource,
-    identifiers: Array<PgClassSelectIdentifierSpec>,
+    identifiers: Array<PgSelectIdentifierSpec>,
     identifierMatchesThunk: (alias: SQL) => SQL[],
   );
-  constructor(cloneFrom: PgClassSelectPlan<TDataSource>);
+  constructor(cloneFrom: PgSelectPlan<TDataSource>);
   constructor(
-    dataSourceOrCloneFrom: TDataSource | PgClassSelectPlan<TDataSource>,
-    identifiersOrNot?: Array<PgClassSelectIdentifierSpec>,
+    dataSourceOrCloneFrom: TDataSource | PgSelectPlan<TDataSource>,
+    identifiersOrNot?: Array<PgSelectIdentifierSpec>,
     identifierMatchesThunkOrNot?: (alias: SQL) => SQL[],
   ) {
     super();
     const cloneFrom =
-      dataSourceOrCloneFrom instanceof PgClassSelectPlan
+      dataSourceOrCloneFrom instanceof PgSelectPlan
         ? dataSourceOrCloneFrom
         : null;
     const { dataSource, identifiers, identifierMatchesThunk } = cloneFrom
@@ -271,7 +271,7 @@ export class PgClassSelectPlan<
         };
 
     if (!identifiers || !identifierMatchesThunk) {
-      throw new Error("Invalid construction of PgClassSelectPlan");
+      throw new Error("Invalid construction of PgSelectPlan");
     }
 
     this.dataSource = dataSource;
@@ -427,7 +427,7 @@ export class PgClassSelectPlan<
     return this.isUnique;
   }
 
-  private hydrateIdentifiers(): Array<PgClassSelectIdentifierSpec> {
+  private hydrateIdentifiers(): Array<PgSelectIdentifierSpec> {
     return this.queryValues.map(({ dependencyIndex, type }) => ({
       plan: this.aether.plans[this.dependencies[dependencyIndex]],
       type,
@@ -455,7 +455,7 @@ export class PgClassSelectPlan<
     }
     const dependencyIndex = this.addDependency($plan);
     const sqlRef = { sql: sql`(1/0) /* ERROR! Unhandled placeholder! */` };
-    const p: PgClassSelectPlaceholder = {
+    const p: PgSelectPlaceholder = {
       dependencyIndex,
       type,
       sqlRef,
@@ -539,8 +539,8 @@ export class PgClassSelectPlan<
    * connections/etc (e.g. copying `where` conditions but adding more, or
    * pagination, or grouping, aggregates, etc)
    */
-  clone(): PgClassSelectPlan<TDataSource> {
-    return new PgClassSelectPlan(this);
+  clone(): PgSelectPlan<TDataSource> {
+    return new PgSelectPlan(this);
   }
 
   where(condition: SQL): void {
@@ -655,7 +655,7 @@ export class PgClassSelectPlan<
     values: CrystalValuesList<any[]>,
   ): Promise<CrystalResultsList<ReadonlyArray<TDataSource["TRow"]>>> {
     if (!this.finalizeResults) {
-      throw new Error("Cannot execute PgClassSelectPlan before finalizing it.");
+      throw new Error("Cannot execute PgSelectPlan before finalizing it.");
     }
     const {
       text,
@@ -1005,7 +1005,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
     super.finalize();
   }
 
-  deduplicate(peers: PgClassSelectPlan<any>[]): ExecutablePlan {
+  deduplicate(peers: PgSelectPlan<any>[]): ExecutablePlan {
     const identical = peers.find((p) => {
       // If SELECT, FROM, JOIN, WHERE, ORDER, GROUP BY, HAVING, LIMIT, OFFSET
       // all match with one of our peers then we can replace ourself with one
@@ -1126,7 +1126,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
     return this;
   }
 
-  mergeSelectsWith(otherPlan: PgClassSelectPlan<TDataSource>): {
+  mergeSelectsWith(otherPlan: PgSelectPlan<TDataSource>): {
     [desiredIndex: string]: string;
   } {
     const actualKeyByDesiredKey = {};
@@ -1143,7 +1143,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
     return actualKeyByDesiredKey;
   }
 
-  mergePlaceholdersInto(otherPlan: PgClassSelectPlan<TDataSource>): void {
+  mergePlaceholdersInto(otherPlan: PgSelectPlan<TDataSource>): void {
     for (const placeholder of this.placeholders) {
       const { dependencyIndex, sqlRef, type } = placeholder;
       const dep = this.aether.plans[this.dependencies[dependencyIndex]];
@@ -1181,7 +1181,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
 
     if (!this.isInliningForbidden) {
       // Inline ourself into our parent if we can.
-      let t: PgClassSelectPlan<any> | null | undefined = undefined;
+      let t: PgSelectPlan<any> | null | undefined = undefined;
       let p: ExecutablePlan<any> | undefined = undefined;
       for (
         let dependencyIndex = 0, l = this.dependencies.length;
@@ -1310,7 +1310,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
           // NOTE: we don't need to reverse the list for relay pagination
           // because it only contains one entry.
           return list([map(parent, actualKeyByDesiredKey)]);
-        } else if (parent instanceof PgClassSelectSinglePlan) {
+        } else if (parent instanceof PgSelectSinglePlan) {
           const parent2 =
             this.aether.plans[parent.dependencies[parent.itemPlanId]];
           this.queryValues.forEach(({ dependencyIndex, type }, i) => {
@@ -1357,12 +1357,12 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
    * does currently). Beware: if you call this and the database might actually
    * return more than one record then you're potentially in for a Bad Time.
    */
-  single(): PgClassSelectSinglePlan<TDataSource> {
+  single(): PgSelectSinglePlan<TDataSource> {
     this.setUnique(true);
     // TODO: should this be on a clone plan? I don't currently think so since
-    // PgClassSelectSinglePlan does not allow for `.where` divergence (since it
+    // PgSelectSinglePlan does not allow for `.where` divergence (since it
     // does not support `.where`).
-    return new PgClassSelectSinglePlan(this, first(this));
+    return new PgSelectSinglePlan(this, first(this));
   }
 
   /**
@@ -1379,9 +1379,9 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
    * be called by Graphile Crystal.
    */
   listItem(
-    itemPlan: __ListItemPlan<PgClassSelectPlan<TDataSource>>,
-  ): PgClassSelectSinglePlan<TDataSource> {
-    return new PgClassSelectSinglePlan(this, itemPlan);
+    itemPlan: __ListItemPlan<PgSelectPlan<TDataSource>>,
+  ): PgSelectSinglePlan<TDataSource> {
+    return new PgSelectSinglePlan(this, itemPlan);
   }
 
   // --------------------
@@ -1493,8 +1493,8 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
 }
 
 function joinMatches(
-  j1: PgClassSelectPlanJoin,
-  j2: PgClassSelectPlanJoin,
+  j1: PgSelectPlanJoin,
+  j2: PgSelectPlanJoin,
   sqlIsEquivalent: (a: SQL, b: SQL) => boolean,
 ): boolean {
   if (j1.type === "cross") {
@@ -1528,7 +1528,7 @@ function joinMatches(
 /**
  * Apply a default order in case our default is not unique.
  */
-function ensureOrderIsUnique(plan: PgClassSelectPlan<any>) {
+function ensureOrderIsUnique(plan: PgSelectPlan<any>) {
   const uniqueColumns: string[] = plan.dataSource.uniques[0];
   if (uniqueColumns) {
     const ordersIsUnique = plan.orderIsUnique();

@@ -2,7 +2,7 @@ import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
 import { ExecutablePlan, list } from "graphile-crystal";
 
 import type { PgClassDataSource } from "../datasource";
-import { PgClassSelectSinglePlan } from "./pgClassSelectSingle";
+import { PgSelectSinglePlan } from "./pgSelectSingle";
 
 export class PgCursorPlan<
   TDataSource extends PgClassDataSource<any, any, any>,
@@ -11,7 +11,7 @@ export class PgCursorPlan<
   private classSinglePlanId: number;
   private digest: string;
 
-  constructor(itemPlan: PgClassSelectSinglePlan<any>) {
+  constructor(itemPlan: PgSelectSinglePlan<any>) {
     super();
     const classPlan = itemPlan.getClassPlan();
     this.classSinglePlanId = itemPlan.id;
@@ -23,11 +23,11 @@ export class PgCursorPlan<
     this.cursorValuesPlanId = this.addDependency(plan);
   }
 
-  public getClassSinglePlan(): PgClassSelectSinglePlan<TDataSource> {
+  public getClassSinglePlan(): PgSelectSinglePlan<TDataSource> {
     const plan = this.aether.plans[this.classSinglePlanId];
-    if (!(plan instanceof PgClassSelectSinglePlan)) {
+    if (!(plan instanceof PgSelectSinglePlan)) {
       throw new Error(
-        `Expected ${this.classSinglePlanId} (${plan}) to be a PgClassSelectSinglePlan`,
+        `Expected ${this.classSinglePlanId} (${plan}) to be a PgSelectSinglePlan`,
       );
     }
     return plan;

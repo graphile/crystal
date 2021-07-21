@@ -6,30 +6,30 @@ import sql from "pg-sql2";
 import type { PgClassDataSource } from "../datasource";
 import type { PgTypeCodec } from "../interfaces";
 import { pgClassExpression, PgClassExpressionPlan } from "./pgClassExpression";
-import { PgClassSelectPlan } from "./pgClassSelect";
+import { PgSelectPlan } from "./pgSelect";
 import { PgCursorPlan } from "./pgCursor";
 // import debugFactory from "debug";
 
-// const debugPlan = debugFactory("datasource:pg:PgClassSelectSinglePlan:plan");
-// const debugExecute = debugFactory("datasource:pg:PgClassSelectSinglePlan:execute");
+// const debugPlan = debugFactory("datasource:pg:PgSelectSinglePlan:plan");
+// const debugExecute = debugFactory("datasource:pg:PgSelectSinglePlan:execute");
 // const debugPlanVerbose = debugPlan.extend("verbose");
 // const debugExecuteVerbose = debugExecute.extend("verbose");
 
 /**
- * Represents the single result of a unique PgClassSelectPlan. This might be
- * retrieved explicitly by PgClassSelectPlan.single(), or implicitly (via
- * Graphile Crystal) by PgClassSelectPlan.item(). Since this is the result of a
+ * Represents the single result of a unique PgSelectPlan. This might be
+ * retrieved explicitly by PgSelectPlan.single(), or implicitly (via
+ * Graphile Crystal) by PgSelectPlan.item(). Since this is the result of a
  * fetch it does not make sense to support changing `.where` or similar;
  * however we now add methods such as `.get` and `.cursor` which can receive
- * specific properties by telling the PgClassSelectPlan to select the relevant
+ * specific properties by telling the PgSelectPlan to select the relevant
  * expressions.
  */
-export class PgClassSelectSinglePlan<
+export class PgSelectSinglePlan<
   TDataSource extends PgClassDataSource<any, any, any>,
 > extends ExecutablePlan<TDataSource["TRow"]> {
   public readonly itemPlanId: number;
 
-  // TODO: should we move this back to PgClassSelectPlan to help avoid
+  // TODO: should we move this back to PgSelectPlan to help avoid
   // duplicate plans?
   /**
    * We only want to fetch each column once (since columns don't accept any
@@ -49,7 +49,7 @@ export class PgClassSelectSinglePlan<
   public readonly dataSource: TDataSource;
 
   constructor(
-    classPlan: PgClassSelectPlan<TDataSource>,
+    classPlan: PgSelectPlan<TDataSource>,
     itemPlan: ExecutablePlan<TDataSource["TRow"]>,
   ) {
     super();
@@ -64,11 +64,11 @@ export class PgClassSelectSinglePlan<
     return this.dataSource.name;
   }
 
-  public getClassPlan(): PgClassSelectPlan<TDataSource> {
+  public getClassPlan(): PgSelectPlan<TDataSource> {
     const plan = this.aether.plans[this.classPlanId];
-    if (!(plan instanceof PgClassSelectPlan)) {
+    if (!(plan instanceof PgSelectPlan)) {
       throw new Error(
-        `Expected ${this.classPlanId} (${plan}) to be a PgClassSelectPlan`,
+        `Expected ${this.classPlanId} (${plan}) to be a PgSelectPlan`,
       );
     }
     return plan;

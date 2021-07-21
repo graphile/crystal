@@ -4,6 +4,6 @@ export {
   pgClassExpression,
   PgClassExpressionPlan,
 } from "./plans/pgClassExpression";
-export { PgClassSelectPlan } from "./plans/pgClassSelect";
-export { PgClassSelectSinglePlan } from "./plans/pgClassSelectSingle";
+export { PgSelectPlan } from "./plans/pgSelect";
+export { PgSelectSinglePlan } from "./plans/pgSelectSingle";
 export { PgConnectionPlan } from "./plans/pgConnection";
