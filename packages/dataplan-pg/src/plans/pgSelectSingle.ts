@@ -6,8 +6,8 @@ import sql from "pg-sql2";
 import type { PgSource } from "../datasource";
 import type { PgTypeCodec } from "../interfaces";
 import { pgClassExpression, PgClassExpressionPlan } from "./pgClassExpression";
-import { PgSelectPlan } from "./pgSelect";
 import { PgCursorPlan } from "./pgCursor";
+import { PgSelectPlan } from "./pgSelect";
 // import debugFactory from "debug";
 
 // const debugPlan = debugFactory("datasource:pg:PgSelectSinglePlan:plan");
@@ -116,7 +116,7 @@ export class PgSelectSinglePlan<
       );
       const colPlan = dataSourceColumn.expression
         ? sqlExpr`${sql.parens(dataSourceColumn.expression(classPlan.alias))}`
-        : sqlExpr`${sql.identifier(classPlan.symbol, String(attr))}`;
+        : sqlExpr`${classPlan.alias}.${sql.identifier(String(attr))}`;
 
       this.colPlans[attr] = colPlan.id;
       return colPlan;

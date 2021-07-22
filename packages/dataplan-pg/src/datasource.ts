@@ -74,10 +74,12 @@ export interface PgSourceOptions<
   TColumns extends PgSourceColumns,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
   TRelations extends { [identifier: string]: PgSourceRelation },
+  TParameters extends { [key: string]: any } | never = never,
 > {
+  alias?: string;
   executor: PgExecutor;
   name: string;
-  source: SQL;
+  source: SQL | ((args: SQL[]) => SQL);
   columns: TColumns;
   uniques: TUniques;
   relations?: TRelations;
@@ -91,7 +93,7 @@ export class PgSource<
   TColumns extends PgSourceColumns,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
   TRelations extends { [identifier: string]: PgSourceRelation },
-  // TParameters extends { [key: string]: any } | never = never,
+  TParameters extends { [key: string]: any } | never = never,
 > {
   /**
    * TypeScript hack so that we can retrieve the TRow type from a Postgres data
@@ -102,9 +104,10 @@ export class PgSource<
    */
   TRow!: PgSourceRow<TColumns>;
 
+  public readonly alias: string | null;
   public readonly executor: PgExecutor;
   public readonly name: string;
-  public readonly source: SQL;
+  public readonly source: SQL | ((args: SQL[]) => SQL);
   public readonly columns: TColumns;
   public readonly uniques: TUniques;
   public readonly relations: TRelations;
@@ -116,8 +119,12 @@ export class PgSource<
    * (but should be). Used for making the SQL query and debug messages easier
    * to understand.
    */
-  constructor(options: PgSourceOptions<TColumns, TUniques, TRelations>) {
-    const { executor, name, source, columns, uniques, relations } = options;
+  constructor(
+    options: PgSourceOptions<TColumns, TUniques, TRelations, TParameters>,
+  ) {
+    const { alias, executor, name, source, columns, uniques, relations } =
+      options;
+    this.alias = alias ?? null;
     this.executor = executor;
     this.name = name;
     this.source = source;

@@ -94,10 +94,10 @@ export function makeExampleSchema(
   type ForumPlan = PgSelectSinglePlan<typeof forumSource>;
 
   const pg2gqlForType = (
-    type: "boolean" | "timestamptz" | "timestamp" | string,
+    type: "bool" | "timestamptz" | "timestamp" | string,
   ) => {
     switch (type) {
-      case "boolean": {
+      case "bool": {
         return (value: any) => value === "true";
       }
       case "timestamptz":
@@ -130,7 +130,7 @@ export function makeExampleSchema(
   }
 
   const TYPES = {
-    boolean: t<boolean>("boolean"),
+    boolean: t<boolean>("bool"),
     int: t<number>("int"),
     bigint: t<string>("bigint"),
     float: t<number>("float"),
@@ -168,6 +168,19 @@ export function makeExampleSchema(
         withPgClient: $context.get("withPgClient"),
       });
     },
+  });
+
+  const uniqueAuthorCountSource = new PgSource({
+    alias: "_",
+    source: (args: SQL[]) =>
+      sql`app_public.unique_author_count(${sql.join(args, ", ")})`,
+    name: "unique_author_count",
+    executor,
+    columns: {
+      _: col({ codec: TYPES.int }),
+    },
+    uniques: [],
+    relations: {},
   });
 
   const messageSource = new PgSource({
@@ -1015,6 +1028,30 @@ export function makeExampleSchema(
             // DEFINITELY NOT $messages.orderBy BECAUSE we don't want that applied to aggregates.
             // DEFINITELY NOT $messages.limit BECAUSE we don't want those limits applied to aggregates or page info.
             return $connectionPlan;
+          },
+        },
+        uniqueAuthorCount: {
+          type: GraphQLInt,
+          args: {
+            featured: {
+              type: GraphQLBoolean,
+            },
+          },
+          plan(_$root, args) {
+            const $featured = args.featured;
+            return new PgSelectPlan(
+              uniqueAuthorCountSource,
+              [
+                {
+                  plan: $featured,
+                  type: TYPES.boolean.sqlType,
+                  name: "featured",
+                },
+              ],
+              uniqueAuthorCountSource.alias,
+            )
+              .single()
+              .get("_");
           },
         },
       },

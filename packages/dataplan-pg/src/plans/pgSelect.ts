@@ -75,10 +75,21 @@ interface PgSelectArgumentSpec {
   name?: string;
 }
 
+function isPgSelectIdentifierSpec(
+  identifier: PgSelectIdentifierSpec | PgSelectArgumentSpec,
+): identifier is PgSelectIdentifierSpec {
+  return "matches" in identifier && typeof identifier.matches === "function";
+}
+
 interface PgSelectArgumentDigest {
   position?: number;
   name?: string;
+  placeholder: SQL;
+}
+
+interface QueryValue {
   dependencyIndex: number;
+  type: SQL;
 }
 
 /**
@@ -99,7 +110,11 @@ export class PgSelectPlan<
 > extends ExecutablePlan<ReadonlyArray<TDataSource["TRow"]>> {
   // FROM
 
-  public readonly symbol: symbol;
+  /**
+   * To be used as the table alias, we always use a symbol unless the calling
+   * code specifically indicates a string to use.
+   */
+  private readonly symbol: symbol | string;
 
   /** = sql.identifier(this.symbol) */
   public readonly alias: SQL;
@@ -141,7 +156,7 @@ export class PgSelectPlan<
    * records in the result set should be returned to which GraphQL resolvers,
    * parameters for conditions or orders, etc.
    */
-  private queryValues: Array<{ dependencyIndex: number; type: SQL }>;
+  private queryValues: Array<QueryValue>;
 
   /**
    * So we can clone.
@@ -263,11 +278,13 @@ export class PgSelectPlan<
   constructor(
     dataSource: TDataSource,
     identifiers: Array<PgSelectIdentifierSpec | PgSelectArgumentSpec>,
+    alias?: string,
   );
   constructor(cloneFrom: PgSelectPlan<TDataSource>);
   constructor(
     dataSourceOrCloneFrom: TDataSource | PgSelectPlan<TDataSource>,
     identifiersOrNot?: Array<PgSelectIdentifierSpec | PgSelectArgumentSpec>,
+    alias?: string,
   ) {
     super();
     const cloneFrom =
@@ -314,56 +331,59 @@ export class PgSelectPlan<
     this.contextId = cloneFrom
       ? cloneFrom.contextId
       : this.addDependency(this.dataSource.context());
-    this.queryValues = cloneFrom
-      ? [...cloneFrom.queryValues] // References indexes cloned above
-      : identifiers.map(({ plan, type }) => ({
-          dependencyIndex: this.addDependency(plan),
-          type,
-        }));
     this.identifiers = identifiers;
 
     this.queryValuesSymbol = cloneFrom
       ? cloneFrom.queryValuesSymbol
       : Symbol(dataSource.name + "_identifier_values");
-    this.symbol = cloneFrom ? cloneFrom.symbol : Symbol(dataSource.name);
+    this.symbol = cloneFrom
+      ? cloneFrom.symbol
+      : alias || Symbol(dataSource.name);
     this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
-    this.identifierMatches = cloneFrom
-      ? Object.freeze(cloneFrom.identifierMatches)
-      : this.identifiers
-          .filter(
-            (identifier): identifier is PgSelectIdentifierSpec =>
-              "matches" in identifier &&
-              typeof identifier.matches === "function",
-          )
-          .map((identifier) => identifier.matches(this.alias));
-    let argIndex: null | number = 0;
-    this.arguments = cloneFrom
-      ? Object.freeze(cloneFrom.arguments)
-      : this.identifiers
-          .filter(
-            (identifier): identifier is PgSelectArgumentSpec =>
-              !("matches" in identifier) || !identifier.matches,
-          )
-          .map((identifier, index): PgSelectArgumentDigest => {
-            if (identifier.name) {
-              argIndex = null;
-              return {
-                name: identifier.name,
-                dependencyIndex: this.queryValues[index].dependencyIndex,
-              };
-            } else {
-              if (argIndex === null) {
-                throw new Error(
-                  "Cannot have unnamed argument after named arguments",
-                );
-              }
-              return {
-                position: argIndex++,
-                dependencyIndex: this.queryValues[index].dependencyIndex,
-              };
-            }
-          });
     this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
+    if (cloneFrom) {
+      this.queryValues = [...cloneFrom.queryValues]; // References indexes cloned above
+      this.identifierMatches = Object.freeze(cloneFrom.identifierMatches);
+      this.arguments = Object.freeze(cloneFrom.arguments);
+    } else {
+      const queryValues: QueryValue[] = [];
+      const identifierMatches: SQL[] = [];
+      const args: PgSelectArgumentDigest[] = [];
+      let argIndex: null | number = 0;
+      identifiers.forEach((identifier) => {
+        if (isPgSelectIdentifierSpec(identifier)) {
+          const { plan, type, matches } = identifier;
+          queryValues.push({
+            dependencyIndex: this.addDependency(plan),
+            type,
+          });
+          identifierMatches.push(matches(this.alias));
+        } else {
+          const { plan, type, name } = identifier;
+          const placeholder = this.placeholder(plan, type);
+          if (name) {
+            argIndex = null;
+            args.push({
+              name,
+              placeholder,
+            });
+          } else {
+            if (argIndex === null) {
+              throw new Error(
+                "Cannot have unnamed argument after named arguments",
+              );
+            }
+            args.push({
+              position: argIndex++,
+              placeholder,
+            });
+          }
+        }
+      });
+      this.queryValues = queryValues;
+      this.identifierMatches = identifierMatches;
+      this.arguments = args;
+    }
     this.relationJoins = cloneFrom
       ? new Map(cloneFrom.relationJoins)
       : new Map();
@@ -382,13 +402,6 @@ export class PgSelectPlan<
     this.last = cloneFrom ? cloneFrom.last : null;
     this.offset = cloneFrom ? cloneFrom.offset : null;
 
-    if (!cloneFrom) {
-      if (this.queryValues.length !== this.identifierMatches.length) {
-        throw new Error(
-          `'queryValues' and 'identifierMatches' lengths must match (${this.queryValues.length} != ${this.identifierMatches.length})`,
-        );
-      }
-    }
     debugPlan(
       `%s (%s) constructor (%s)`,
       this,
@@ -777,8 +790,16 @@ export class PgSelectPlan<
     }
   }
 
+  private source(): SQL {
+    const source =
+      typeof this.dataSource.source === "function"
+        ? this.dataSource.source(this.arguments.map((arg) => arg.placeholder))
+        : this.dataSource.source;
+    return source;
+  }
+
   private buildFrom() {
-    return { sql: sql`\nfrom ${this.dataSource.source} as ${this.alias}` };
+    return { sql: sql`\nfrom ${this.source()} as ${this.alias}` };
   }
 
   private buildJoin() {
@@ -1073,7 +1094,9 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
       // check the symbol or alias matches. We do need to factor the different
       // symbols into SQL equivalency checks though.
       const symbolSubstitutes = new Map<symbol, symbol>();
-      symbolSubstitutes.set(this.symbol, p.symbol);
+      if (typeof this.symbol === "symbol" && typeof p.symbol === "symbol") {
+        symbolSubstitutes.set(this.symbol, p.symbol);
+      }
       const sqlIsEquivalent = (a: SQL | symbol, b: SQL | symbol) =>
         sql.isEquivalent(a, b, symbolSubstitutes);
 
@@ -1344,7 +1367,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
           table.joins.push(
             {
               type: "left",
-              source: this.dataSource.source,
+              source: this.source(),
               alias: this.alias,
               conditions,
             },
