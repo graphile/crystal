@@ -7,6 +7,8 @@ import type { PgSource } from "../datasource";
 import type { PgTypeCodec } from "../interfaces";
 import { pgClassExpression, PgClassExpressionPlan } from "./pgClassExpression";
 import { PgCursorPlan } from "./pgCursor";
+import { PgRecordPlan } from "./pgRecord";
+import { pgRecord } from "./pgRecord";
 import { PgSelectPlan } from "./pgSelect";
 // import debugFactory from "debug";
 
@@ -126,6 +128,21 @@ export class PgSelectSinglePlan<
         throw new Error(`Expected ${plan} to be a PgClassExpressionPlan`);
       }
       return plan;
+    }
+  }
+
+  private _recordPlanId: number | null = null;
+  record(): PgRecordPlan<TDataSource> {
+    if (this._recordPlanId != null) {
+      const _recordPlan = this.aether.plans[this._recordPlanId];
+      if (!(_recordPlan instanceof PgRecordPlan)) {
+        throw new Error(`Expected ${_recordPlan} to be a PgRecordPlan`);
+      }
+      return _recordPlan;
+    } else {
+      const _recordPlan = pgRecord(this);
+      this._recordPlanId = _recordPlan.id;
+      return _recordPlan;
     }
   }
 

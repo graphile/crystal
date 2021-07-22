@@ -93,6 +93,7 @@ create function app_public.forums_unique_author_count(forum app_public.forums, f
       select 1
       from app_public.messages m2
       where m2.author_id = messages.author_id
+      and forum_id = forum.id
       and m2.featured is true
     ))
   )

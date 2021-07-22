@@ -1,0 +1,10 @@
+## expect(data.forum.all).toEqual(3)
+## expect(data.forum.featured).toEqual(1)
+## expect(data.forum.unfeatured).toEqual(2)
+{
+  forum(id: "f1700000-0000-0000-0000-000000000f17") {
+    all: uniqueAuthorCount
+    featured: uniqueAuthorCount(featured: true)
+    unfeatured: uniqueAuthorCount(featured: false)
+  }
+}

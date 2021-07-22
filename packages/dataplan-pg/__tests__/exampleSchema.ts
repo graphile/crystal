@@ -40,11 +40,9 @@ import {
   PgSelectSinglePlan,
   PgSource,
 } from "../src";
-import type {
-  PgExecutorContext,
-  PgSourceColumn,
-  WithPgClient,
-} from "../src/datasource";
+import { TYPES } from "../src/codecs";
+import type { PgSourceColumn } from "../src/datasource";
+import type { PgExecutorContext, WithPgClient } from "../src/executor";
 import { PgExecutor } from "../src/executor";
 import { pgClassExpression } from "../src/plans/pgClassExpression";
 import type { PgConditionCapableParentPlan } from "../src/plans/pgCondition";
@@ -93,53 +91,6 @@ export function makeExampleSchema(
   // type ForumsPlan = PgSelectPlan<typeof forumSource>;
   type ForumPlan = PgSelectSinglePlan<typeof forumSource>;
 
-  const pg2gqlForType = (
-    type: "bool" | "timestamptz" | "timestamp" | string,
-  ) => {
-    switch (type) {
-      case "bool": {
-        return (value: any) => value === "true";
-      }
-      case "timestamptz":
-      case "timestamp": {
-        return (value: any) => new Date(Date.parse(value));
-      }
-      default: {
-        return (value: any) => value;
-      }
-    }
-  };
-
-  const gql2pgForType = (type: string) => {
-    switch (type) {
-      default: {
-        return (value: any) =>
-          sql`${sql.value(value)}::${sql.identifier(type)}`;
-      }
-    }
-  };
-
-  function t<TCanonical = any, TInput = TCanonical>(
-    type: string,
-  ): PgTypeCodec<TCanonical, TInput> {
-    return {
-      sqlType: sql.identifier(...type.split(".")),
-      fromPg: pg2gqlForType(type),
-      toPg: gql2pgForType(type),
-    };
-  }
-
-  const TYPES = {
-    boolean: t<boolean>("bool"),
-    int: t<number>("int"),
-    bigint: t<string>("bigint"),
-    float: t<number>("float"),
-    text: t<string>("text"),
-    citext: t<string>("citext"),
-    uuid: t<string>("uuid"),
-    timestamptz: t<Date, Date | string>("text"),
-  };
-
   const col = <
     TOptions extends {
       codec: PgTypeCodec;
@@ -180,7 +131,18 @@ export function makeExampleSchema(
       _: col({ codec: TYPES.int }),
     },
     uniques: [],
-    relations: {},
+  });
+
+  const forumsUniqueAuthorCountSource = new PgSource({
+    alias: "_",
+    source: (args: SQL[]) =>
+      sql`app_public.forums_unique_author_count(${sql.join(args, ", ")})`,
+    name: "forums_unique_author_count",
+    executor,
+    columns: {
+      _: col({ codec: TYPES.int }),
+    },
+    uniques: [],
   });
 
   const messageSource = new PgSource({
@@ -859,6 +821,33 @@ export function makeExampleSchema(
               return $connectionPlan;
             },
           },
+          uniqueAuthorCount: {
+            type: GraphQLInt,
+            args: {
+              featured: {
+                type: GraphQLBoolean,
+              },
+            },
+            plan($forum, args) {
+              const $featured = args.featured;
+              return new PgSelectPlan(
+                forumsUniqueAuthorCountSource,
+                [
+                  {
+                    plan: $forum.record(),
+                    type: sql`app_public.forums`,
+                  },
+                  {
+                    plan: $featured,
+                    type: TYPES.boolean.sqlType,
+                  },
+                ],
+                "_",
+              )
+                .single()
+                .get("_");
+            },
+          },
         }),
       }),
     );
@@ -898,6 +887,21 @@ export function makeExampleSchema(
               plan(_$root, $forums: PgSelectPlan<typeof forumSource>) {
                 return new ClassFilterPlan($forums.wherePlan(), $forums.alias);
               },
+            },
+          },
+        },
+        forum: {
+          type: Forum,
+          plan(_$root, args) {
+            const $forum = forumSource.get({ id: args.id });
+            if (options.deoptimize) {
+              $forum.getClassPlan().setInliningForbidden();
+            }
+            return $forum;
+          },
+          args: {
+            id: {
+              type: new GraphQLNonNull(GraphQLString),
             },
           },
         },
