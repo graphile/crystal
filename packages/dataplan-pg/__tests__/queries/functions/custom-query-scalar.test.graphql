@@ -1,4 +1,8 @@
-## expect(data.uniqueAuthorCount).toEqual(3)
+## expect(data.all).toEqual(3)
+## expect(data.featured).toEqual(2)
+## expect(data.unfeatured).toEqual(1)
 {
-  uniqueAuthorCount
+  all: uniqueAuthorCount
+  featured: uniqueAuthorCount(featured: true)
+  unfeatured: uniqueAuthorCount(featured: false)
 }

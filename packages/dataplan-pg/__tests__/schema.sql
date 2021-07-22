@@ -45,16 +45,27 @@ insert into app_public.messages (id, forum_id, author_id, body, featured, archiv
     forums.id as forum_id,
     users.id as author_id,
     forums.name || ' = awesome -- ' || users.username as body,
-    (forums.name = 'Postgres' and users.username = 'Bob') as featured,
+    ((forums.name = 'Postgres' and users.username = 'Bob') or (forums.name = 'Dogs' and users.username <> 'Alice')) as featured,
     (case when forums.name = 'Dogs' then now() else null end) as archived_at
   from app_public.users, app_public.forums
   order by forums.id, users.id;
 
 -- Custom queries
-create function app_public.unique_author_count(featured bool) returns int as $$
+create function app_public.unique_author_count(featured bool = null) returns int as $$
   select count(distinct author_id)
   from app_public.messages
-  where (unique_author_count.featured is null or unique_author_count.featured = messages.featured)
+  where (
+    unique_author_count.featured is null
+  or
+    (unique_author_count.featured is true and messages.featured is true)
+  or
+    (unique_author_count.featured is false and not exists (
+      select 1
+      from app_public.messages m2
+      where m2.author_id = messages.author_id
+      and m2.featured is true
+    ))
+  )
 $$ language sql stable;
 create function app_public.random_user() returns app_public.users as $$
   select users.*
@@ -69,11 +80,22 @@ create function app_public.featured_messages() returns setof app_public.messages
 $$ language sql stable;
 
 -- Computed columns
-create function app_public.forums_unique_author_count(forum app_public.forums, featured bool) returns int as $$
+create function app_public.forums_unique_author_count(forum app_public.forums, featured bool = null) returns int as $$
   select count(distinct author_id)
   from app_public.messages
   where forum_id = forum.id
-  and (forums_unique_author_count.featured is null or forums_unique_author_count.featured = messages.featured)
+  and (
+    forums_unique_author_count.featured is null
+  or
+    (forums_unique_author_count.featured is true and messages.featured is true)
+  or
+    (forums_unique_author_count.featured is false and not exists (
+      select 1
+      from app_public.messages m2
+      where m2.author_id = messages.author_id
+      and m2.featured is true
+    ))
+  )
 $$ language sql stable;
 create function app_public.forums_random_user(forum app_public.forums) returns app_public.users as $$
   select users.*
