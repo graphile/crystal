@@ -1,0 +1,9 @@
+## expect(queries).toHaveLength(1)
+## expect(data.forum.id).toEqual("f1700000-0000-0000-0000-000000000f17")
+## expect(data.forum.name).toEqual("Postgres")
+{
+  forum(id: "f1700000-0000-0000-0000-000000000f17") {
+    id
+    name
+  }
+}
