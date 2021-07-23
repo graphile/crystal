@@ -310,12 +310,13 @@ function crystalWrap<TData>(
     );
   }
   if (isListType(returnType)) {
-    assert.ok(
-      Array.isArray(data),
-      `The field at '${pathIdentity}' returned a value incompatible with '${returnType.toString()}': '${inspect(
-        data,
-      )}'`,
-    );
+    if (!Array.isArray(data)) {
+      throw new Error(
+        `The field at '${pathIdentity}' returned a value incompatible with '${returnType.toString()}': '${inspect(
+          data,
+        )}'`,
+      );
+    }
     const l = data.length;
     const result = new Array(l);
     for (let index = 0; index < l; index++) {

@@ -165,12 +165,13 @@ export abstract class ExecutablePlan<TData = any> extends BasePlan {
       );
     }
     if (isDev) {
-      assert.ok(
-        plan instanceof ExecutablePlan,
-        `Error occurred when adding dependency for '${this}', value passed was not a plan, it was '${inspect(
-          plan,
-        )}'`,
-      );
+      if (!(plan instanceof ExecutablePlan)) {
+        throw new Error(
+          `Error occurred when adding dependency for '${this}', value passed was not a plan, it was '${inspect(
+            plan,
+          )}'`,
+        );
+      }
     }
     /*
      * We set our actual parentPathIdentity to be the shortest parentPathIdentity of all

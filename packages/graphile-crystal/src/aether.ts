@@ -1294,12 +1294,13 @@ export class Aether<
     const indent = "    ".repeat(depth);
     const follow = indent + "  ⮞";
     if (isDev) {
-      assert.ok(
-        plan,
-        `executePlan was called but it was not passed a plan to execute, instead '${inspect(
-          plan,
-        )}'`,
-      );
+      if (!plan) {
+        throw new Error(
+          `executePlan was called but it was not passed a plan to execute, instead '${inspect(
+            plan,
+          )}'`,
+        );
+      }
     }
     if (visitedPlans.has(plan)) {
       throw new Error(
@@ -1378,12 +1379,13 @@ export class Aether<
         const originalDependencyPlan = this.plans[dependencyPlanId];
         let dependencyPlan = originalDependencyPlan;
         if (isDev) {
-          assert.ok(
-            dependencyPlan,
-            `Expected plan dependency '${i}' for '${plan}' to be a plan, instead found '${inspect(
-              dependencyPlan,
-            )}'`,
-          );
+          if (!dependencyPlan) {
+            throw new Error(
+              `Expected plan dependency '${i}' for '${plan}' to be a plan, instead found '${inspect(
+                dependencyPlan,
+              )}'`,
+            );
+          }
         }
         let listDepth = 0;
         const dependencyPathIdentity =
