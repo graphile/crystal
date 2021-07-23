@@ -112,3 +112,12 @@ create function app_public.forums_featured_messages(forum app_public.forums) ret
   where featured is true
   and messages.forum_id = forum.id
 $$ language sql stable;
+create function app_public.users_most_recent_forum(u app_public.users) returns app_public.forums as $$
+  select forums.*
+  from app_public.forums
+  inner join app_public.messages
+  on messages.forum_id = forums.id
+  where messages.author_id = u.id
+  order by messages.created_at desc
+  limit 1;
+$$ language sql stable;

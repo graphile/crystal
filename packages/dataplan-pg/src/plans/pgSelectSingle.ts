@@ -4,7 +4,7 @@ import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type { PgSource } from "../datasource";
-import type { PgTypeCodec } from "../interfaces";
+import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
 import { pgClassExpression, PgClassExpressionPlan } from "./pgClassExpression";
 import { PgCursorPlan } from "./pgCursor";
 import { PgRecordPlan } from "./pgRecord";
@@ -27,8 +27,12 @@ import { PgSelectPlan } from "./pgSelect";
  * expressions.
  */
 export class PgSelectSinglePlan<
-  TDataSource extends PgSource<any, any, any, any>,
-> extends ExecutablePlan<TDataSource["TRow"]> {
+    TDataSource extends PgSource<any, any, any, any>,
+  >
+  extends ExecutablePlan<TDataSource["TRow"]>
+  implements PgTypedExecutablePlan<TDataSource>
+{
+  public readonly pgCodec: TDataSource["codec"];
   public readonly itemPlanId: number;
 
   // TODO: should we move this back to PgSelectPlan to help avoid
@@ -56,6 +60,7 @@ export class PgSelectSinglePlan<
   ) {
     super();
     this.dataSource = classPlan.dataSource;
+    this.pgCodec = this.dataSource.codec;
     this.classPlanId = classPlan.id;
     this.itemPlanId = this.addDependency(itemPlan);
     this.colPlans = {}; // TODO: think about cloning

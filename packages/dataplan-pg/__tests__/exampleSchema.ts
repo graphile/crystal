@@ -110,6 +110,37 @@ export function makeExampleSchema(
     };
   };
 
+  const userColumns = {
+    id: col({ notNull: true, codec: TYPES.uuid }),
+    username: col({ notNull: true, codec: TYPES.citext }),
+    gravatar_url: col({ codec: TYPES.text }),
+    created_at: col({ notNull: true, codec: TYPES.timestamptz }),
+  };
+
+  const forumColumns = {
+    id: col({ notNull: true, codec: TYPES.uuid }),
+    name: col({ notNull: true, codec: TYPES.citext }),
+    archived_at: col({ codec: TYPES.timestamptz }),
+    is_archived: col({
+      codec: TYPES.boolean,
+      expression: (alias) => sql`${alias}.archived_at is not null`,
+    }),
+  };
+
+  const messageColumns = {
+    id: col({ notNull: true, codec: TYPES.uuid }),
+    body: col({ notNull: true, codec: TYPES.text }),
+    author_id: col({ notNull: true, codec: TYPES.uuid }),
+    forum_id: col({ notNull: true, codec: TYPES.uuid }),
+    created_at: col({ notNull: true, codec: TYPES.timestamptz }),
+    archived_at: col({ codec: TYPES.timestamptz }),
+    featured: col({ codec: TYPES.boolean }),
+    is_archived: col({
+      codec: TYPES.boolean,
+      expression: (alias) => sql`${alias}.archived_at is not null`,
+    }),
+  };
+
   const executor = new PgExecutor({
     name: "default",
     context: () => {
@@ -120,12 +151,7 @@ export function makeExampleSchema(
       });
     },
   });
-  const userColumns = {
-    id: col({ notNull: true, codec: TYPES.uuid }),
-    username: col({ notNull: true, codec: TYPES.citext }),
-    gravatar_url: col({ codec: TYPES.text }),
-    created_at: col({ notNull: true, codec: TYPES.timestamptz }),
-  };
+
   const uniqueAuthorCountSource = new PgSource({
     executor,
     codec: TYPES.int,
@@ -162,24 +188,30 @@ export function makeExampleSchema(
     columns: userColumns,
   });
 
+  const forumsFeaturedMessages = new PgSource({
+    executor,
+    codec: recordType(sql`app_public.messages`),
+    source: (args: SQL[]) =>
+      sql`app_public.forums_featured_messages(${sql.join(args, ", ")})`,
+    name: "forums_featured_messages",
+    columns: messageColumns,
+  });
+
+  const usersMostRecentForumSource = new PgSource({
+    executor,
+    codec: recordType(sql`app_public.forums`),
+    source: (args: SQL[]) =>
+      sql`app_public.users_most_recent_forum(${sql.join(args, ", ")})`,
+    name: "users_most_recent_forum",
+    columns: forumColumns,
+  });
+
   const messageSource = new PgSource({
     executor,
     codec: recordType(sql`app_public.messages`),
     source: sql`app_public.messages`,
     name: "messages",
-    columns: {
-      id: col({ notNull: true, codec: TYPES.uuid }),
-      body: col({ notNull: true, codec: TYPES.text }),
-      author_id: col({ notNull: true, codec: TYPES.uuid }),
-      forum_id: col({ notNull: true, codec: TYPES.uuid }),
-      created_at: col({ notNull: true, codec: TYPES.timestamptz }),
-      archived_at: col({ codec: TYPES.timestamptz }),
-      featured: col({ codec: TYPES.boolean }),
-      is_archived: col({
-        codec: TYPES.boolean,
-        expression: (alias) => sql`${alias}.archived_at is not null`,
-      }),
-    },
+    columns: messageColumns,
     uniques: [["id"]],
     relations: {
       author: {
@@ -205,22 +237,14 @@ export function makeExampleSchema(
     codec: recordType(sql`app_public.forums`),
     source: sql`app_public.forums`,
     name: "forums",
-    columns: {
-      id: col({ notNull: true, codec: TYPES.uuid }),
-      name: col({ notNull: true, codec: TYPES.citext }),
-      archived_at: col({ codec: TYPES.timestamptz }),
-      is_archived: col({
-        codec: TYPES.boolean,
-        expression: (alias) => sql`${alias}.archived_at is not null`,
-      }),
-    },
+    columns: forumColumns,
     uniques: [["id"]],
   });
 
   const User = new GraphQLObjectType(
     objectSpec<GraphileResolverContext, UserPlan>({
       name: "User",
-      fields: {
+      fields: () => ({
         username: {
           type: GraphQLString,
           plan($user) {
@@ -233,7 +257,15 @@ export function makeExampleSchema(
             return $user.get("gravatar_url");
           },
         },
-      },
+        mostRecentForum: {
+          type: Forum,
+          plan($user) {
+            return pgSelect(usersMostRecentForumSource, [
+              { plan: $user },
+            ]).single();
+          },
+        },
+      }),
     }),
   );
 
@@ -876,6 +908,17 @@ export function makeExampleSchema(
                   plan: $forum.record(),
                 },
               ]).single();
+            },
+          },
+
+          featuredMessages: {
+            type: new GraphQLList(Message),
+            plan($forum) {
+              return pgSelect(forumsFeaturedMessages, [
+                {
+                  plan: $forum.record(),
+                },
+              ]);
             },
           },
         }),
