@@ -5,6 +5,7 @@ type Query {
     condition: ForumCondition
     filter: ForumFilter
   ): [Forum]
+  forum(id: String!): Forum
   allMessagesConnection(
     condition: MessageCondition
     filter: MessageFilter
@@ -15,6 +16,8 @@ type Query {
     before: String
     orderBy: [MessagesOrderBy!]
   ): MessagesConnection
+  uniqueAuthorCount(featured: Boolean): Int
+  randomUser: User
 }
 
 type Forum {
@@ -35,6 +38,8 @@ type Forum {
     filter: MessageFilter
     includeArchived: IncludeArchived = INHERIT
   ): MessagesConnection
+  uniqueAuthorCount(featured: Boolean): Int
+  randomUser: User
 }
 
 type Message {

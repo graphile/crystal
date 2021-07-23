@@ -120,32 +120,53 @@ export function makeExampleSchema(
       });
     },
   });
-
+  const userColumns = {
+    id: col({ notNull: true, codec: TYPES.uuid }),
+    username: col({ notNull: true, codec: TYPES.citext }),
+    gravatar_url: col({ codec: TYPES.text }),
+    created_at: col({ notNull: true, codec: TYPES.timestamptz }),
+  };
   const uniqueAuthorCountSource = new PgSource({
+    executor,
     codec: TYPES.int,
     source: (args: SQL[]) =>
       sql`app_public.unique_author_count(${sql.join(args, ", ")})`,
     name: "unique_author_count",
-    executor,
-    columns: {},
-    uniques: [],
+    columns: null,
   });
 
   const forumsUniqueAuthorCountSource = new PgSource({
+    executor,
     codec: TYPES.int,
     source: (args: SQL[]) =>
       sql`app_public.forums_unique_author_count(${sql.join(args, ", ")})`,
     name: "forums_unique_author_count",
+    columns: null,
+  });
+
+  const randomUserSource = new PgSource({
     executor,
-    columns: {},
-    uniques: [],
+    codec: recordType(sql`app_public.users`),
+    source: (args: SQL[]) =>
+      sql`app_public.random_user(${sql.join(args, ", ")})`,
+    name: "random_user",
+    columns: userColumns,
+  });
+
+  const forumsRandomUserSource = new PgSource({
+    executor,
+    codec: recordType(sql`app_public.users`),
+    source: (args: SQL[]) =>
+      sql`app_public.forums_random_user(${sql.join(args, ", ")})`,
+    name: "forums_random_user",
+    columns: userColumns,
   });
 
   const messageSource = new PgSource({
+    executor,
     codec: recordType(sql`app_public.messages`),
     source: sql`app_public.messages`,
     name: "messages",
-    executor,
     columns: {
       id: col({ notNull: true, codec: TYPES.uuid }),
       body: col({ notNull: true, codec: TYPES.text }),
@@ -171,24 +192,19 @@ export function makeExampleSchema(
   });
 
   const userSource = new PgSource({
+    executor,
     codec: recordType(sql`app_public.users`),
     source: sql`app_public.users`,
     name: "users",
-    executor,
-    columns: {
-      id: col({ notNull: true, codec: TYPES.uuid }),
-      username: col({ notNull: true, codec: TYPES.citext }),
-      gravatar_url: col({ codec: TYPES.text }),
-      created_at: col({ notNull: true, codec: TYPES.timestamptz }),
-    },
+    columns: userColumns,
     uniques: [["id"], ["username"]],
   });
 
   const forumSource = new PgSource({
+    executor,
     codec: recordType(sql`app_public.forums`),
     source: sql`app_public.forums`,
     name: "forums",
-    executor,
     columns: {
       id: col({ notNull: true, codec: TYPES.uuid }),
       name: col({ notNull: true, codec: TYPES.citext }),
@@ -568,6 +584,15 @@ export function makeExampleSchema(
     wherePlan() {
       return new PgConditionPlan(this);
     }
+
+    source() {
+      const source = this.dataSource.source;
+      if (typeof source === "function") {
+        throw new Error("TempTablePlan doesn't support function sources yet.");
+      } else {
+        return source;
+      }
+    }
   }
 
   class ManyFilterPlan<
@@ -608,7 +633,7 @@ export function makeExampleSchema(
     apply() {
       if (this.$some) {
         const conditions = this.$some.conditions;
-        const from = sql`\nfrom ${this.$some.dataSource.source} as ${this.$some.alias}`;
+        const from = sql`\nfrom ${this.$some.source()} as ${this.$some.alias}`;
         const sqlConditions = sql.join(
           conditions.map((c) => sql.parens(sql.indent(c))),
           " and ",
@@ -842,6 +867,17 @@ export function makeExampleSchema(
                 .getSelfNamed();
             },
           },
+
+          randomUser: {
+            type: User,
+            plan($forum) {
+              return pgSelect(forumsRandomUserSource, [
+                {
+                  plan: $forum.record(),
+                },
+              ]).single();
+            },
+          },
         }),
       }),
     );
@@ -1028,6 +1064,7 @@ export function makeExampleSchema(
             return $connectionPlan;
           },
         },
+
         uniqueAuthorCount: {
           type: GraphQLInt,
           args: {
@@ -1046,6 +1083,13 @@ export function makeExampleSchema(
             ])
               .single()
               .getSelfNamed();
+          },
+        },
+
+        randomUser: {
+          type: User,
+          plan() {
+            return pgSelect(randomUserSource, []).single();
           },
         },
       },

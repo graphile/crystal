@@ -70,7 +70,7 @@ $$ language sql stable;
 create function app_public.random_user() returns app_public.users as $$
   select users.*
   from app_public.users
-  order by random()
+  where users.id = 'b0b00000-0000-0000-0000-000000000b0b' /* user chosen by a fair dice role - 1-2 Alice, 3-4 Bob, 5-6 Cecilia */
   limit 1
 $$ language sql stable;
 create function app_public.featured_messages() returns setof app_public.messages as $$
@@ -103,7 +103,7 @@ create function app_public.forums_random_user(forum app_public.forums) returns a
   from app_public.users
   inner join app_public.messages
   on messages.forum_id = forum.id
-  order by random()
+  where users.id = 'b0b00000-0000-0000-0000-000000000b0b' /* user chosen by a fair dice role - 1-2 Alice, 3-4 Bob, 5-6 Cecilia */
   limit 1;
 $$ language sql stable;
 create function app_public.forums_featured_messages(forum app_public.forums) returns setof app_public.messages as $$

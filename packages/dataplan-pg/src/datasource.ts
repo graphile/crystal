@@ -81,8 +81,8 @@ export interface PgSourceOptions<
   executor: PgExecutor;
   name: string;
   source: SQL | ((args: SQL[]) => SQL);
-  columns: TColumns;
-  uniques: TUniques;
+  columns: TColumns | null;
+  uniques?: TUniques;
   relations?: TRelations;
 }
 
@@ -136,8 +136,8 @@ export class PgSource<
     this.executor = executor;
     this.name = name;
     this.source = source;
-    this.columns = columns;
-    this.uniques = uniques;
+    this.columns = columns ?? ({} as TColumns);
+    this.uniques = uniques ?? ([] as any);
     this.relations = relations || ({} as TRelations);
   }
 

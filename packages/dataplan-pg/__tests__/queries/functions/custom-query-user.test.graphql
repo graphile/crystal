@@ -1,0 +1,9 @@
+## expect(queries).toHaveLength(1)
+## expect(data.randomUser).toBeTruthy()
+## expect(data.randomUser.username).toEqual("Bob")
+{
+  randomUser {
+    username
+    gravatarUrl
+  }
+}
