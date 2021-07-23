@@ -370,6 +370,16 @@ export class PgSelectPlan<
       const args: PgSelectArgumentDigest[] = [];
       let argIndex: null | number = 0;
       identifiers.forEach((identifier) => {
+        if (identifier.plan instanceof PgSelectPlan) {
+          throw new Error(
+            "You passed a PgSelectPlan as an identifier, perhaps you forgot to add `.record()`?",
+          );
+        }
+        if (identifier.plan instanceof PgSelectSinglePlan) {
+          throw new Error(
+            "You passed a PgSelectSinglePlan as an identifier, perhaps you forgot to add `.record()`?",
+          );
+        }
         if (isPgSelectIdentifierSpec(identifier)) {
           const { plan, matches } = identifier;
           const type =
