@@ -30,7 +30,7 @@ export class PgSelectSinglePlan<
     TDataSource extends PgSource<any, any, any, any>,
   >
   extends ExecutablePlan<TDataSource["TRow"]>
-  implements PgTypedExecutablePlan<TDataSource>
+  implements PgTypedExecutablePlan<TDataSource["codec"]>
 {
   public readonly pgCodec: TDataSource["codec"];
   public readonly itemPlanId: number;

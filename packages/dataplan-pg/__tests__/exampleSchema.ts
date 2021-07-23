@@ -83,6 +83,18 @@ type NullableUnless<TCondition extends boolean | undefined, TType> =
 export function makeExampleSchema(
   options: { deoptimize?: boolean } = {},
 ): GraphQLSchema {
+  const deoptimizeIfAppropriate = (
+    plan: PgSelectPlan<any> | PgSelectSinglePlan<any>,
+  ) => {
+    if (options.deoptimize) {
+      if ("getClassPlan" in plan) {
+        plan.getClassPlan().setInliningForbidden();
+      } else {
+        plan.setInliningForbidden();
+      }
+    }
+    return plan;
+  };
   // type MessagesPlan = PgSelectPlan<typeof messageSource>;
   type MessageConnectionPlan = PgConnectionPlan<typeof messageSource>;
   type MessagePlan = PgSelectSinglePlan<typeof messageSource>;
@@ -269,9 +281,11 @@ export function makeExampleSchema(
         mostRecentForum: {
           type: Forum,
           plan($user) {
-            return pgSelect(usersMostRecentForumSource, [
+            const $forum = pgSelect(usersMostRecentForumSource, [
               { plan: $user.record() },
             ]).single();
+            deoptimizeIfAppropriate($forum);
+            return $forum;
           },
         },
       }),
@@ -341,9 +355,7 @@ export function makeExampleSchema(
           type: User,
           plan($message) {
             const $user = userSource.get({ id: $message.get("author_id") });
-            if (options.deoptimize) {
-              $user.getClassPlan().setInliningForbidden();
-            }
+            deoptimizeIfAppropriate($user);
 
             return $user;
           },
@@ -813,9 +825,7 @@ export function makeExampleSchema(
             plan($forum) {
               const $forumId = $forum.get("id");
               const $messages = messageSource.find({ forum_id: $forumId });
-              if (options.deoptimize) {
-                $messages.setInliningForbidden();
-              }
+              deoptimizeIfAppropriate($messages);
               $messages.setTrusted();
               // $messages.leftJoin(...);
               // $messages.innerJoin(...);
@@ -872,9 +882,7 @@ export function makeExampleSchema(
                 forum_id: $forum.get("id"),
               });
               $messages.setTrusted();
-              if (options.deoptimize) {
-                $messages.setInliningForbidden();
-              }
+              deoptimizeIfAppropriate($messages);
               // $messages.leftJoin(...);
               // $messages.innerJoin(...);
               // $messages.relation('fk_messages_author_id')
@@ -912,22 +920,26 @@ export function makeExampleSchema(
           randomUser: {
             type: User,
             plan($forum) {
-              return pgSelect(forumsRandomUserSource, [
+              const $user = pgSelect(forumsRandomUserSource, [
                 {
                   plan: $forum.record(),
                 },
               ]).single();
+              deoptimizeIfAppropriate($user);
+              return $user;
             },
           },
 
           featuredMessages: {
             type: new GraphQLList(Message),
             plan($forum) {
-              return pgSelect(forumsFeaturedMessages, [
+              const $messages = pgSelect(forumsFeaturedMessages, [
                 {
                   plan: $forum.record(),
                 },
               ]);
+              deoptimizeIfAppropriate($messages);
+              return $messages;
             },
           },
         }),
@@ -942,9 +954,7 @@ export function makeExampleSchema(
           type: new GraphQLList(Forum),
           plan(_$root) {
             const $forums = forumSource.find();
-            if (options.deoptimize) {
-              $forums.setInliningForbidden();
-            }
+            deoptimizeIfAppropriate($forums);
             return $forums;
           },
           args: {
@@ -976,9 +986,7 @@ export function makeExampleSchema(
           type: Forum,
           plan(_$root, args) {
             const $forum = forumSource.get({ id: args.id });
-            if (options.deoptimize) {
-              $forum.getClassPlan().setInliningForbidden();
-            }
+            deoptimizeIfAppropriate($forum.getClassPlan());
             return $forum;
           },
           args: {
@@ -1102,9 +1110,7 @@ export function makeExampleSchema(
           },
           plan() {
             const $messages = messageSource.find();
-            if (options.deoptimize) {
-              $messages.setInliningForbidden();
-            }
+            deoptimizeIfAppropriate($messages);
             // $messages.leftJoin(...);
             // $messages.innerJoin(...);
             // $messages.relation('fk_messages_author_id')
@@ -1126,29 +1132,33 @@ export function makeExampleSchema(
           },
           plan(_$root, args) {
             const $featured = args.featured;
-            return pgSelect(uniqueAuthorCountSource, [
+            const $plan = pgSelect(uniqueAuthorCountSource, [
               {
                 plan: $featured,
                 type: TYPES.boolean.sqlType,
                 name: "featured",
               },
-            ])
-              .single()
-              .getSelfNamed();
+            ]);
+            deoptimizeIfAppropriate($plan);
+            return $plan.single().getSelfNamed();
           },
         },
 
         randomUser: {
           type: User,
           plan() {
-            return pgSelect(randomUserSource, []).single();
+            const $users = pgSelect(randomUserSource, []);
+            deoptimizeIfAppropriate($users);
+            return $users.single();
           },
         },
 
         featuredMessages: {
           type: new GraphQLList(Message),
           plan() {
-            return pgSelect(featuredMessages, []);
+            const $messages = pgSelect(featuredMessages, []);
+            deoptimizeIfAppropriate($messages);
+            return $messages;
           },
         },
       },
