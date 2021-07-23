@@ -90,6 +90,19 @@ export class PgClassExpressionPlan<
     this.expression = sql(strings, ...fragments);
   }
 
+  public toStringMeta(): string {
+    const expr = sql.compile(this.expression);
+    if (expr.text.length > 23) {
+      return (
+        expr.text.substr(0, 10) +
+        "..." +
+        expr.text.substr(expr.text.length - 10)
+      );
+    } else {
+      return expr.text;
+    }
+  }
+
   public getClassSinglePlan(): PgSelectSinglePlan<TDataSource> {
     const plan = this.aether.plans[this.dependencies[this.tableId]];
     if (!(plan instanceof PgSelectSinglePlan)) {
