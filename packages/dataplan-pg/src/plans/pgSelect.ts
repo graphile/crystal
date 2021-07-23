@@ -74,17 +74,29 @@ type PgSelectPlaceholder = {
   type: SQL;
 };
 
-interface PgSelectIdentifierSpec {
-  plan: ExecutablePlan<any>;
-  type: SQL;
-  matches: (alias: SQL) => SQL;
-}
+type PgSelectIdentifierSpec =
+  | {
+      plan: ExecutablePlan<any>;
+      type: SQL;
+      matches: (alias: SQL) => SQL;
+    }
+  | {
+      plan: PgTypedExecutablePlan;
+      type?: SQL;
+      matches: (alias: SQL) => SQL;
+    };
 
-interface PgSelectArgumentSpec {
-  plan: ExecutablePlan<any>;
-  type: SQL;
-  name?: string;
-}
+type PgSelectArgumentSpec =
+  | {
+      plan: ExecutablePlan<any>;
+      type: SQL;
+      name?: string;
+    }
+  | {
+      plan: PgTypedExecutablePlan;
+      type?: SQL;
+      name?: string;
+    };
 
 function isPgSelectIdentifierSpec(
   identifier: PgSelectIdentifierSpec | PgSelectArgumentSpec,
@@ -359,14 +371,19 @@ export class PgSelectPlan<
       let argIndex: null | number = 0;
       identifiers.forEach((identifier) => {
         if (isPgSelectIdentifierSpec(identifier)) {
-          const { plan, type, matches } = identifier;
+          const { plan, matches } = identifier;
+          const type =
+            identifier.type ||
+            (identifier.plan as PgTypedExecutablePlan).pgCodec.sqlType;
           queryValues.push({
             dependencyIndex: this.addDependency(plan),
             type,
           });
           identifierMatches.push(matches(this.alias));
         } else {
-          const { plan, type, name } = identifier;
+          const { plan, name } = identifier;
+          const type =
+            identifier.type || (plan as PgTypedExecutablePlan).pgCodec.sqlType;
           const placeholder = this.placeholder(plan, type);
           if (name) {
             argIndex = null;
@@ -503,10 +520,10 @@ export class PgSelectPlan<
     }));
   }
 
-  public placeholder($plan: PgTypedExecutablePlan<any>): SQL;
+  public placeholder($plan: PgTypedExecutablePlan): SQL;
   public placeholder($plan: ExecutablePlan<any>, type: SQL): SQL;
   public placeholder(
-    $plan: ExecutablePlan<any> | PgTypedExecutablePlan<any>,
+    $plan: ExecutablePlan<any> | PgTypedExecutablePlan,
     overrideType?: SQL,
   ): SQL {
     if (this.locked) {

@@ -32,9 +32,9 @@ export interface PgTypeCodec<TCanonical = any, TInput = TCanonical> {
   sqlType: SQL;
 }
 
-export interface PgTypedExecutablePlan<TCanonical = any, TInput = TCanonical>
+export interface PgTypedExecutablePlan<TCodec extends PgTypeCodec = PgTypeCodec>
   extends ExecutablePlan<any> {
-  pgCodec: PgTypeCodec<TCanonical, TInput>;
+  pgCodec: TCodec;
 }
 
 export interface PgOrderSpec {

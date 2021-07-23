@@ -5,7 +5,7 @@ import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type { PgSource } from "../datasource";
-import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
+import type { PgTypedExecutablePlan } from "../interfaces";
 import { PgSelectSinglePlan } from "./pgSelectSingle";
 
 //const debugPlan = debugFactory("datasource:pg:PgRecordPlan:plan");
@@ -13,9 +13,11 @@ const debugExecute = debugFactory("datasource:pg:PgRecordPlan:execute");
 //const debugPlanVerbose = debugPlan.extend("verbose");
 const debugExecuteVerbose = debugExecute.extend("verbose");
 
-export class PgRecordPlan<
-  TDataSource extends PgSource<any, any, any, any>,
-> extends ExecutablePlan<any> {
+export class PgRecordPlan<TDataSource extends PgSource<any, any, any, any>>
+  extends ExecutablePlan<any>
+  implements PgTypedExecutablePlan<TDataSource["codec"]>
+{
+  public readonly pgCodec: TDataSource["codec"];
   public readonly tableId: number;
 
   /**
@@ -32,6 +34,7 @@ export class PgRecordPlan<
   constructor(table: PgSelectSinglePlan<TDataSource>) {
     super();
     this.dataSource = table.dataSource;
+    this.pgCodec = this.dataSource.codec;
     this.tableId = this.addDependency(table);
   }
 

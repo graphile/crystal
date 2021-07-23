@@ -832,7 +832,6 @@ export function makeExampleSchema(
               return new PgSelectPlan(forumsUniqueAuthorCountSource, [
                 {
                   plan: $forum.record(),
-                  type: sql`app_public.forums`,
                 },
                 {
                   plan: $featured,
@@ -1038,17 +1037,13 @@ export function makeExampleSchema(
           },
           plan(_$root, args) {
             const $featured = args.featured;
-            return new PgSelectPlan(
-              uniqueAuthorCountSource,
-              [
-                {
-                  plan: $featured,
-                  type: TYPES.boolean.sqlType,
-                  name: "featured",
-                },
-              ],
-              uniqueAuthorCountSource.alias,
-            )
+            return new PgSelectPlan(uniqueAuthorCountSource, [
+              {
+                plan: $featured,
+                type: TYPES.boolean.sqlType,
+                name: "featured",
+              },
+            ])
               .single()
               .getSelfNamed();
           },

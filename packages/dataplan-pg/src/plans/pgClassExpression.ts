@@ -46,7 +46,7 @@ export class PgClassExpressionPlan<
     table: PgSelectSinglePlan<TDataSource>,
     public readonly pgCodec: TCodec,
     strings: TemplateStringsArray,
-    dependencies: ReadonlyArray<PgTypedExecutablePlan<any> | SQL> = [],
+    dependencies: ReadonlyArray<PgTypedExecutablePlan | SQL> = [],
   ) {
     super();
     if (strings.length !== dependencies.length + 1) {
