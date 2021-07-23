@@ -14,7 +14,7 @@ const debugExecute = debugFactory("datasource:pg:PgRecordPlan:execute");
 const debugExecuteVerbose = debugExecute.extend("verbose");
 
 export class PgRecordPlan<
-  TDataSource extends PgSource<any, any, any>,
+  TDataSource extends PgSource<any, any, any, any>,
 > extends ExecutablePlan<any> {
   public readonly tableId: number;
 
@@ -85,7 +85,7 @@ export class PgRecordPlan<
   }
 }
 
-function pgRecord<TDataSource extends PgSource<any, any, any>>(
+function pgRecord<TDataSource extends PgSource<any, any, any, any>>(
   table: PgSelectSinglePlan<TDataSource>,
 ): PgRecordPlan<TDataSource> {
   return new PgRecordPlan(table);

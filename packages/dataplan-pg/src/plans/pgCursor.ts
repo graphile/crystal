@@ -5,7 +5,7 @@ import type { PgSource } from "../datasource";
 import { PgSelectSinglePlan } from "./pgSelectSingle";
 
 export class PgCursorPlan<
-  TDataSource extends PgSource<any, any, any>,
+  TDataSource extends PgSource<any, any, any, any>,
 > extends ExecutablePlan<any> {
   private cursorValuesPlanId: number;
   private classSinglePlanId: number;

@@ -11,7 +11,7 @@ const debugPlanVerbose = debugPlan.extend("verbose");
 const debugExecuteVerbose = debugExecute.extend("verbose");
 
 export class PgConnectionPlan<
-  TDataSource extends PgSource<any, any, any>,
+  TDataSource extends PgSource<any, any, any, any>,
 > extends ExecutablePlan<unknown> {
   private subplanId: number;
 

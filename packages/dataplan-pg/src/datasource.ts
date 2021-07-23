@@ -71,12 +71,13 @@ export interface PgSourceRelation {
 }
 
 export interface PgSourceOptions<
+  TCodec extends PgTypeCodec<any, any>,
   TColumns extends PgSourceColumns,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
   TRelations extends { [identifier: string]: PgSourceRelation },
   TParameters extends { [key: string]: any } | never = never,
 > {
-  alias?: string;
+  codec: TCodec;
   executor: PgExecutor;
   name: string;
   source: SQL | ((args: SQL[]) => SQL);
@@ -90,6 +91,7 @@ export interface PgSourceOptions<
  * view, materialized view, setof function call, join, etc. Anything table-like.
  */
 export class PgSource<
+  TCodec extends PgTypeCodec<any, any>,
   TColumns extends PgSourceColumns,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
   TRelations extends { [identifier: string]: PgSourceRelation },
@@ -104,7 +106,7 @@ export class PgSource<
    */
   TRow!: PgSourceRow<TColumns>;
 
-  public readonly alias: string | null;
+  public readonly codec: TCodec;
   public readonly executor: PgExecutor;
   public readonly name: string;
   public readonly source: SQL | ((args: SQL[]) => SQL);
@@ -120,11 +122,17 @@ export class PgSource<
    * to understand.
    */
   constructor(
-    options: PgSourceOptions<TColumns, TUniques, TRelations, TParameters>,
+    options: PgSourceOptions<
+      TCodec,
+      TColumns,
+      TUniques,
+      TRelations,
+      TParameters
+    >,
   ) {
-    const { alias, executor, name, source, columns, uniques, relations } =
+    const { codec, executor, name, source, columns, uniques, relations } =
       options;
-    this.alias = alias ?? null;
+    this.codec = codec;
     this.executor = executor;
     this.name = name;
     this.source = source;

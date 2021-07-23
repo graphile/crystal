@@ -25,13 +25,24 @@ import type { PgSource, PgSourceRelation } from "../datasource";
 import type { PgOrderSpec, PgTypedExecutablePlan } from "../interfaces";
 import { PgClassExpressionPlan } from "./pgClassExpression";
 import { PgConditionPlan } from "./pgCondition";
+import { PgRecordPlan } from "./pgRecord";
 import { PgSelectSinglePlan } from "./pgSelectSingle";
 
 const isDev =
   process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
 
+function isStaticInputPlan(
+  dep: ExecutablePlan,
+): dep is InputListPlan | InputStaticLeafPlan | InputObjectPlan {
+  return (
+    dep instanceof InputListPlan ||
+    dep instanceof InputStaticLeafPlan ||
+    dep instanceof InputObjectPlan
+  );
+}
+
 type LockableParameter = "orderBy" | "first" | "last" | "offset";
-type LockCallback<TDataSource extends PgSource<any, any, any>> = (
+type LockCallback<TDataSource extends PgSource<any, any, any, any>> = (
   plan: PgSelectPlan<TDataSource>,
 ) => void;
 
@@ -106,7 +117,7 @@ interface QueryValue {
  * records from them `{a: 1},{a: 2},{a:3}`).
  */
 export class PgSelectPlan<
-  TDataSource extends PgSource<any, any, any>,
+  TDataSource extends PgSource<any, any, any, any>,
 > extends ExecutablePlan<ReadonlyArray<TDataSource["TRow"]>> {
   // FROM
 
@@ -278,13 +289,11 @@ export class PgSelectPlan<
   constructor(
     dataSource: TDataSource,
     identifiers: Array<PgSelectIdentifierSpec | PgSelectArgumentSpec>,
-    alias?: string,
   );
   constructor(cloneFrom: PgSelectPlan<TDataSource>);
   constructor(
     dataSourceOrCloneFrom: TDataSource | PgSelectPlan<TDataSource>,
     identifiersOrNot?: Array<PgSelectIdentifierSpec | PgSelectArgumentSpec>,
-    alias?: string,
   ) {
     super();
     const cloneFrom =
@@ -336,9 +345,7 @@ export class PgSelectPlan<
     this.queryValuesSymbol = cloneFrom
       ? cloneFrom.queryValuesSymbol
       : Symbol(dataSource.name + "_identifier_values");
-    this.symbol = cloneFrom
-      ? cloneFrom.symbol
-      : alias || Symbol(dataSource.name);
+    this.symbol = cloneFrom ? cloneFrom.symbol : Symbol(dataSource.name);
     this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
     this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
     if (cloneFrom) {
@@ -504,6 +511,11 @@ export class PgSelectPlan<
   ): SQL {
     if (this.locked) {
       throw new Error(`${this}: cannot add placeholders once plan is locked`);
+    }
+    if (this.placeholders.length >= 100000) {
+      throw new Error(
+        `There's already ${this.placeholders.length} placeholders; wanting more suggests there's a bug somewhere`,
+      );
     }
     const type =
       overrideType ??
@@ -1219,22 +1231,31 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
     for (const placeholder of this.placeholders) {
       const { dependencyIndex, sqlRef, type } = placeholder;
       const dep = this.aether.plans[this.dependencies[dependencyIndex]];
-      if (otherPlan.parentPathIdentity.startsWith(dep.parentPathIdentity)) {
+      if (
+        // I am uncertain on this code.
+        isStaticInputPlan(dep) ||
+        (otherPlan.parentPathIdentity.length > dep.parentPathIdentity.length &&
+          otherPlan.parentPathIdentity.startsWith(dep.parentPathIdentity))
+      ) {
+        // Either dep is a static input plan (which isn't dependent on anything
+        // else) or otherPlan is deeper than dep; either way we can use the dep
+        // directly within otherPlan.
         const newPlanIndex = otherPlan.addDependency(dep);
         otherPlan.placeholders.push({
           dependencyIndex: newPlanIndex,
           type,
           sqlRef,
         });
+      } else if (
+        dep instanceof PgClassExpressionPlan ||
+        dep instanceof PgRecordPlan
+      ) {
+        // Replace with a reference.
+        placeholder.sqlRef.sql = dep.toSQL();
       } else {
-        if (dep instanceof PgClassExpressionPlan) {
-          // Replace with a reference
-          placeholder.sqlRef.sql = dep.toSQL();
-        } else {
-          throw new Error(
-            `Could not merge placeholder from unsupported plan type: ${dep}`,
-          );
-        }
+        throw new Error(
+          `Could not merge placeholder from unsupported plan type: ${dep}`,
+        );
       }
     }
   }
@@ -1272,45 +1293,50 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
           // it's shared and thus safe.
           continue;
         }
-        if (
-          dep instanceof InputListPlan ||
-          dep instanceof InputStaticLeafPlan ||
-          dep instanceof InputObjectPlan
-        ) {
+        if (isStaticInputPlan(dep)) {
           // This has come from a hard-coded input in the document, therefore
           // it's shared and thus safe.
           continue;
         }
-        if (!(dep instanceof PgClassExpressionPlan)) {
+        if (
+          dep instanceof PgClassExpressionPlan ||
+          dep instanceof PgRecordPlan
+        ) {
+          const p2 = this.aether.plans[dep.dependencies[dep.tableId]];
+          const t2 = dep.getClassSinglePlan().getClassPlan();
+          if (t2 === this) {
+            throw new Error(
+              `Recursion error - record plan ${dep} is dependent on ${t2}, and ${this} is dependent on ${dep}`,
+            );
+          }
+          if (t === undefined && p === undefined) {
+            p = p2;
+            t = t2;
+          } else if (t2 !== t) {
+            debugPlanVerbose(
+              "Refusing to optimise %c due to dependency %c depending on different class (%c != %c)",
+              this,
+              dep,
+              t2,
+              t,
+            );
+            t = null;
+            break;
+          } else if (p2 !== p) {
+            debugPlanVerbose(
+              "Refusing to optimise %c due to parent dependency mismatch: %c != %c",
+              this,
+              p2,
+              p,
+            );
+            t = null;
+            break;
+          }
+        } else {
           debugPlanVerbose(
             "Refusing to optimise %c due to dependency %c",
             this,
             dep,
-          );
-          t = null;
-          break;
-        }
-        const p2 = this.aether.plans[dep.dependencies[dep.tableId]];
-        const t2 = dep.getClassSinglePlan().getClassPlan();
-        if (t === undefined && p === undefined) {
-          p = p2;
-          t = t2;
-        } else if (t2 !== t) {
-          debugPlanVerbose(
-            "Refusing to optimise %c due to dependency %c depending on different class (%c != %c)",
-            this,
-            dep,
-            t2,
-            t,
-          );
-          t = null;
-          break;
-        } else if (p2 !== p) {
-          debugPlanVerbose(
-            "Refusing to optimise %c due to parent dependency mismatch: %c != %c",
-            this,
-            p2,
-            p,
           );
           t = null;
           break;
@@ -1337,6 +1363,12 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
         const table = t;
         const parent = p;
 
+        if (table === this) {
+          throw new Error(
+            `Something's gone catastrophically wrong - ${this} is trying to merge with itself!`,
+          );
+        }
+
         const tableWasLocked = table.locked;
         table.locked = false;
 
@@ -1347,18 +1379,25 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
           this.offset == null
           /* TODO: && !this.groupBy && !this.having && !this.order && ... */
         ) {
+          debugPlanVerbose("Merging %c into %c (via %c)", this, table, parent);
           const { sql: where } = this.buildWhere();
           const conditions = [
             ...this.identifierMatches.map((identifierMatch, i) => {
               const { dependencyIndex, type } = this.queryValues[i];
               const plan =
                 this.aether.plans[this.dependencies[dependencyIndex]];
-              if (!(plan instanceof PgClassExpressionPlan)) {
+              if (plan instanceof PgClassExpressionPlan) {
+                return sql`${plan.toSQL()}::${type} = ${identifierMatch}`;
+              } else if (isStaticInputPlan(plan)) {
+                return sql`${this.placeholder(
+                  plan,
+                  type,
+                )} = ${identifierMatch}`;
+              } else {
                 throw new Error(
                   `Expected ${plan} (${i}th dependency of ${this}; plan with id ${dependencyIndex}) to be a PgClassExpressionPlan`,
                 );
               }
-              return sql`${plan.toSQL()}::${type} = ${identifierMatch}`;
             }),
             // Note the WHERE is now part of the JOIN condition (since
             // it's a LEFT JOIN).
@@ -1374,7 +1413,6 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
             ...this.joins,
           );
           this.mergePlaceholdersInto(table);
-          debugPlanVerbose("Merging %c into %c (via %c)", this, table, parent);
           const actualKeyByDesiredKey = this.mergeSelectsWith(table);
           // We return a list here because our children are going to use a
           // `first` plan on us.
@@ -1387,14 +1425,19 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
           this.identifierMatches.forEach((identifierMatch, i) => {
             const { dependencyIndex, type } = this.queryValues[i];
             const plan = this.aether.plans[this.dependencies[dependencyIndex]];
-            if (!(plan instanceof PgClassExpressionPlan)) {
+            if (plan instanceof PgClassExpressionPlan) {
+              return this.where(
+                sql`${plan.toSQL()}::${type} = ${identifierMatch}`,
+              );
+            } else if (isStaticInputPlan(plan)) {
+              return this.where(
+                sql`${this.placeholder(plan, type)} = ${identifierMatch}`,
+              );
+            } else {
               throw new Error(
                 `Expected ${plan} (${i}th dependency of ${this}; plan with id ${dependencyIndex}) to be a PgClassExpressionPlan`,
               );
             }
-            return this.where(
-              sql`${plan.toSQL()}::${type} = ${identifierMatch}`,
-            );
           });
           this.mergePlaceholdersInto(table);
           const { sql: query } = this.buildQuery({ asArray: true });

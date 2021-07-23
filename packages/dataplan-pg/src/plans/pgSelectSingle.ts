@@ -27,7 +27,7 @@ import { PgSelectPlan } from "./pgSelect";
  * expressions.
  */
 export class PgSelectSinglePlan<
-  TDataSource extends PgSource<any, any, any>,
+  TDataSource extends PgSource<any, any, any, any>,
 > extends ExecutablePlan<TDataSource["TRow"]> {
   public readonly itemPlanId: number;
 
@@ -76,6 +76,11 @@ export class PgSelectSinglePlan<
     return plan;
   }
 
+  getSelfNamed(): PgClassExpressionPlan<TDataSource, any> {
+    // Hack because I don't want to duplicate the code.
+    return this.get("" as any);
+  }
+
   /**
    * Returns a plan representing a named attribute (e.g. column) from the class
    * (e.g. table).
@@ -95,7 +100,7 @@ export class PgSelectSinglePlan<
       // `attr` should be an SQL expression? This would allow for computed
       // fields/etc too (admittedly those without arguments).
       const dataSourceColumn = this.dataSource.columns[attr as string];
-      if (!dataSourceColumn) {
+      if (!dataSourceColumn && attr !== "") {
         throw new Error(
           `${this.dataSource} does not define an attribute named '${attr}'`,
         );
@@ -114,12 +119,15 @@ export class PgSelectSinglePlan<
 
       const sqlExpr = pgClassExpression(
         this,
-        this.dataSource.columns[attr as string].codec,
+        attr === ""
+          ? this.dataSource.codec
+          : this.dataSource.columns[attr as string].codec,
       );
-      const colPlan = dataSourceColumn.expression
-        ? sqlExpr`${sql.parens(dataSourceColumn.expression(classPlan.alias))}`
-        : sqlExpr`${classPlan.alias}.${sql.identifier(String(attr))}`;
-
+      const colPlan = dataSourceColumn
+        ? dataSourceColumn.expression
+          ? sqlExpr`${sql.parens(dataSourceColumn.expression(classPlan.alias))}`
+          : sqlExpr`${classPlan.alias}.${sql.identifier(String(attr))}`
+        : sqlExpr`${classPlan.alias}.${classPlan.alias}`; /* self named */
       this.colPlans[attr] = colPlan.id;
       return colPlan;
     } else {

@@ -40,7 +40,7 @@ import {
   PgSelectSinglePlan,
   PgSource,
 } from "../src";
-import { TYPES } from "../src/codecs";
+import { recordType, TYPES } from "../src/codecs";
 import type { PgSourceColumn } from "../src/datasource";
 import type { PgExecutorContext, WithPgClient } from "../src/executor";
 import { PgExecutor } from "../src/executor";
@@ -122,30 +122,27 @@ export function makeExampleSchema(
   });
 
   const uniqueAuthorCountSource = new PgSource({
-    alias: "_",
+    codec: TYPES.int,
     source: (args: SQL[]) =>
       sql`app_public.unique_author_count(${sql.join(args, ", ")})`,
     name: "unique_author_count",
     executor,
-    columns: {
-      _: col({ codec: TYPES.int }),
-    },
+    columns: {},
     uniques: [],
   });
 
   const forumsUniqueAuthorCountSource = new PgSource({
-    alias: "_",
+    codec: TYPES.int,
     source: (args: SQL[]) =>
       sql`app_public.forums_unique_author_count(${sql.join(args, ", ")})`,
     name: "forums_unique_author_count",
     executor,
-    columns: {
-      _: col({ codec: TYPES.int }),
-    },
+    columns: {},
     uniques: [],
   });
 
   const messageSource = new PgSource({
+    codec: recordType(sql`app_public.messages`),
     source: sql`app_public.messages`,
     name: "messages",
     executor,
@@ -174,6 +171,7 @@ export function makeExampleSchema(
   });
 
   const userSource = new PgSource({
+    codec: recordType(sql`app_public.users`),
     source: sql`app_public.users`,
     name: "users",
     executor,
@@ -187,6 +185,7 @@ export function makeExampleSchema(
   });
 
   const forumSource = new PgSource({
+    codec: recordType(sql`app_public.forums`),
     source: sql`app_public.forums`,
     name: "forums",
     executor,
@@ -545,7 +544,7 @@ export function makeExampleSchema(
     }),
   );
 
-  class TempTablePlan<TDataSource extends PgSource<any, any, any>>
+  class TempTablePlan<TDataSource extends PgSource<any, any, any, any>>
     extends BasePlan
     implements PgConditionCapableParentPlan
   {
@@ -572,7 +571,7 @@ export function makeExampleSchema(
   }
 
   class ManyFilterPlan<
-    TChildDataSource extends PgSource<any, any, any>,
+    TChildDataSource extends PgSource<any, any, any, any>,
   > extends ModifierPlan<ClassFilterPlan> {
     public $some: TempTablePlan<TChildDataSource> | null = null;
     constructor(
@@ -830,22 +829,18 @@ export function makeExampleSchema(
             },
             plan($forum, args) {
               const $featured = args.featured;
-              return new PgSelectPlan(
-                forumsUniqueAuthorCountSource,
-                [
-                  {
-                    plan: $forum.record(),
-                    type: sql`app_public.forums`,
-                  },
-                  {
-                    plan: $featured,
-                    type: TYPES.boolean.sqlType,
-                  },
-                ],
-                "_",
-              )
+              return new PgSelectPlan(forumsUniqueAuthorCountSource, [
+                {
+                  plan: $forum.record(),
+                  type: sql`app_public.forums`,
+                },
+                {
+                  plan: $featured,
+                  type: TYPES.boolean.sqlType,
+                },
+              ])
                 .single()
-                .get("_");
+                .getSelfNamed();
             },
           },
         }),
@@ -1055,7 +1050,7 @@ export function makeExampleSchema(
               uniqueAuthorCountSource.alias,
             )
               .single()
-              .get("_");
+              .getSelfNamed();
           },
         },
       },

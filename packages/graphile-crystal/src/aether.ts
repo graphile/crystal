@@ -821,6 +821,7 @@ export class Aether<
    * first and then working our way back up the graph to the root nodes.
    */
   private processPlans(
+    actionDescription: string,
     order: "dependents-first" | "dependencies-first",
     callback: (plan: ExecutablePlan<any>) => ExecutablePlan<any>,
     startingAtPlanId = 0,
@@ -890,11 +891,27 @@ export class Aether<
       processed.add(plan);
     };
 
-    // NOTE: whilst processing plans new plans may be added, thus we must loop
-    // ascending and we must re-evaluate this.plans.length on each loop
-    // iteration.
-    for (let i = startingAtPlanId; i < this.plans.length; i++) {
+    let plansAdded = 0;
+    let l = this.plans.length;
+    for (let i = startingAtPlanId; i < l; i++) {
       process(this.plans[i]);
+
+      plansAdded += this.plans.length - l;
+
+      // NOTE: whilst processing plans new plans may be added, thus we must loop
+      // ascending and we must re-evaluate this.plans.length on each loop
+      // iteration.
+      if (isDev && plansAdded > 100000) {
+        throw new Error(
+          `Whilst processing plans as part of ${actionDescription}, ${plansAdded} new plans have been created... That seems like it's likely a bug in the relevant method of one of your plans. The last plan processed was ${
+            this.plans[i]
+          } and this created the following plans: ${this.plans
+            .slice(i + 1)
+            .join(",")}`,
+        );
+      }
+
+      l = this.plans.length;
     }
   }
 
@@ -923,6 +940,7 @@ export class Aether<
       }
       replacements = 0;
       this.processPlans(
+        "deduplicatePlans",
         "dependencies-first",
         (plan) => {
           const replacementPlan = this.deduplicatePlan(plan);
@@ -946,7 +964,9 @@ export class Aether<
    * before we optimise ourself.
    */
   private optimizePlans(): void {
-    this.processPlans("dependents-first", (plan) => this.optimizePlan(plan));
+    this.processPlans("optimizePlans", "dependents-first", (plan) =>
+      this.optimizePlan(plan),
+    );
   }
 
   private isPeer(planA: ExecutablePlan, planB: ExecutablePlan): boolean {
