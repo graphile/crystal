@@ -1,0 +1,11 @@
+## expect(queries).toHaveLength(1)
+## expect(data.forum.randomUser).toBeTruthy()
+## expect(data.forum.randomUser.username).toEqual("Bob")
+{
+  forum(id: "f1700000-0000-0000-0000-000000000f17") {
+    randomUser {
+      username
+      gravatarUrl
+    }
+  }
+}
