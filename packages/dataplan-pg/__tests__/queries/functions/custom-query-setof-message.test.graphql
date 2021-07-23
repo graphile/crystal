@@ -1,0 +1,13 @@
+## expect(queries).toHaveLength(1)
+## expect(data.featuredMessages).toHaveLength(3)
+## expect(data.featuredMessages[0].body).toMatch("Dogs")
+## expect(data.featuredMessages[0].body).toMatch("Bob")
+## expect(data.featuredMessages[1].body).toMatch("Dogs")
+## expect(data.featuredMessages[1].body).toMatch("Cecilia")
+## expect(data.featuredMessages[2].body).toMatch("Postgres")
+## expect(data.featuredMessages[2].body).toMatch("Bob")
+{
+  featuredMessages {
+    body
+  }
+}

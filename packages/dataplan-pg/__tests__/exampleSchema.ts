@@ -188,6 +188,15 @@ export function makeExampleSchema(
     columns: userColumns,
   });
 
+  const featuredMessages = new PgSource({
+    executor,
+    codec: recordType(sql`app_public.messages`),
+    source: (args: SQL[]) =>
+      sql`app_public.featured_messages(${sql.join(args, ", ")})`,
+    name: "featured_messages",
+    columns: messageColumns,
+  });
+
   const forumsFeaturedMessages = new PgSource({
     executor,
     codec: recordType(sql`app_public.messages`),
@@ -1133,6 +1142,13 @@ export function makeExampleSchema(
           type: User,
           plan() {
             return pgSelect(randomUserSource, []).single();
+          },
+        },
+
+        featuredMessages: {
+          type: new GraphQLList(Message),
+          plan() {
+            return pgSelect(featuredMessages, []);
           },
         },
       },

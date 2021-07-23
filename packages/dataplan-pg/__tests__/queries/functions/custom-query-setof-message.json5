@@ -1,0 +1,7 @@
+{
+  featuredMessages: [
+    { body: "Dogs = awesome -- Bob" },
+    { body: "Dogs = awesome -- Cecilia" },
+    { body: "Postgres = awesome -- Bob" },
+  ],
+}
