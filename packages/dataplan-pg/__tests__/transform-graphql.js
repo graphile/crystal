@@ -20,6 +20,10 @@ exports.process = (src, path) => {
       config[key] = value;
     } else if (line.startsWith("##")) {
       assertions.push(line.substr(2));
+    } else if (line.match(/^#\s*expect\(/)) {
+      throw new Error(
+        "Found line that looks like an assertion, but isn't in a '##' comment: '${line}'",
+      );
     } else {
       documentLines.push(line);
     }
