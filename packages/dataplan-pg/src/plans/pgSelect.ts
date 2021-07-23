@@ -1676,3 +1676,10 @@ function ensureOrderIsUnique(plan: PgSelectPlan<any>) {
     }
   }
 }
+
+export function pgSelect<TDataSource extends PgSource<any, any, any, any>>(
+  dataSource: TDataSource,
+  identifiers: Array<PgSelectIdentifierSpec | PgSelectArgumentSpec>,
+): PgSelectPlan<TDataSource> {
+  return new PgSelectPlan(dataSource, identifiers);
+}

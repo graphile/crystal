@@ -33,10 +33,10 @@ import sql from "pg-sql2";
 import prettier from "prettier";
 import { inspect } from "util";
 
-import type { PgTypeCodec } from "../src";
+import type { PgSelectPlan, PgTypeCodec } from "../src";
 import {
   PgConnectionPlan,
-  PgSelectPlan,
+  pgSelect,
   PgSelectSinglePlan,
   PgSource,
 } from "../src";
@@ -829,7 +829,7 @@ export function makeExampleSchema(
             },
             plan($forum, args) {
               const $featured = args.featured;
-              return new PgSelectPlan(forumsUniqueAuthorCountSource, [
+              return pgSelect(forumsUniqueAuthorCountSource, [
                 {
                   plan: $forum.record(),
                 },
@@ -1037,7 +1037,7 @@ export function makeExampleSchema(
           },
           plan(_$root, args) {
             const $featured = args.featured;
-            return new PgSelectPlan(uniqueAuthorCountSource, [
+            return pgSelect(uniqueAuthorCountSource, [
               {
                 plan: $featured,
                 type: TYPES.boolean.sqlType,
