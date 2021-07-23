@@ -270,7 +270,7 @@ export function makeExampleSchema(
           type: Forum,
           plan($user) {
             return pgSelect(usersMostRecentForumSource, [
-              { plan: $user },
+              { plan: $user.record() },
             ]).single();
           },
         },
