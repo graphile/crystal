@@ -39,14 +39,15 @@ insert into app_public.forums (id, name, archived_at) values
   ('d0900000-0000-0000-0000-000000000d09', 'Dogs', now()),
   ('f1700000-0000-0000-0000-000000000f17', 'Postgres', null);
 
-insert into app_public.messages (id, forum_id, author_id, body, featured, archived_at)
+insert into app_public.messages (id, forum_id, author_id, body, featured, archived_at, created_at)
   select
     (substring(forums.id::text from 1 for 4) || substring(forums.id::text from 1 for 4) || '-' || substring(forums.id::text from 5 for 4) || '-0000-0000-' || substring(users.id::text from 1 for 8) || substring(forums.id::text from 1 for 4))::uuid,
     forums.id as forum_id,
     users.id as author_id,
     forums.name || ' = awesome -- ' || users.username as body,
     ((forums.name = 'Postgres' and users.username = 'Bob') or (forums.name = 'Dogs' and users.username <> 'Alice')) as featured,
-    (case when forums.name = 'Dogs' then now() else null end) as archived_at
+    (case when forums.name = 'Dogs' then now() else null end) as archived_at,
+    '2000-01-01T00:00:00Z'::timestamptz + (row_number() over (order by forums.id, users.id)) * interval '1 minute'
   from app_public.users, app_public.forums
   order by forums.id, users.id;
 

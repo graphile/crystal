@@ -8,6 +8,9 @@
       gravatarUrl
       mostRecentForum {
         uniqueAuthorCount
+        featuredMessages {
+          body
+        }
       }
     }
   }

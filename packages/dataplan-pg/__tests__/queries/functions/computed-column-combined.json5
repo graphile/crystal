@@ -1,1 +1,9 @@
-{ forum: { randomUser: { username: "Bob", gravatarUrl: null, mostRecentForum: { uniqueAuthorCount: 3 } } } }
+{
+  forum: {
+    randomUser: {
+      username: "Bob",
+      gravatarUrl: null,
+      mostRecentForum: { uniqueAuthorCount: 3, featuredMessages: [{ body: "Postgres = awesome -- Bob" }] },
+    },
+  },
+}
