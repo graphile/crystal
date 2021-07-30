@@ -149,7 +149,7 @@ export class PgSelectPlan<
 
   // JOIN
 
-  private relationJoins: Map<keyof TDataSource["relations"], SQL>;
+  private relationJoins: Map<Parameters<TDataSource["getRelation"]>[0], SQL>;
   private joins: Array<PgSelectPlanJoin>;
 
   // WHERE
@@ -572,10 +572,10 @@ export class PgSelectPlan<
    * SELECT, WHERE and ORDER BY.
    */
   public singleRelation(
-    relationIdentifier: keyof TDataSource["relations"],
+    relationIdentifier: Parameters<TDataSource["getRelation"]>[0],
   ): SQL {
-    const relation: PgSourceRelation | undefined =
-      this.dataSource.relations[relationIdentifier as string];
+    const relation: PgSourceRelation<PgSource<any, any, any, any>> | undefined =
+      this.dataSource.getRelation(relationIdentifier as string);
     if (!relation) {
       throw new Error(
         `${this.dataSource} does not have a relation named '${relationIdentifier}'`,
@@ -586,7 +586,7 @@ export class PgSelectPlan<
         `${this.dataSource} relation '${relationIdentifier}' is not unique so cannot be used with singleRelation`,
       );
     }
-    const { targetTable, localColumns, remoteColumns } = relation;
+    const { source, localColumns, remoteColumns } = relation;
 
     // Join to this relation if we haven't already
     const cachedAlias = this.relationJoins.get(relationIdentifier);
@@ -594,9 +594,15 @@ export class PgSelectPlan<
       return cachedAlias;
     }
     const alias = sql.identifier(Symbol(relationIdentifier as string));
+    if (typeof source.source === "function") {
+      throw new Error(
+        "Callback sources not currently supported via singleRelation",
+      );
+    }
     this.joins.push({
       type: "left",
-      source: targetTable,
+      // TODO: `source.source` is confusing, rename one of these!
+      source: source.source,
       alias,
       conditions: localColumns.map(
         (col, i) =>

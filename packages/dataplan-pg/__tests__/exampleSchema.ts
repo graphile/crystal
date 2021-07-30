@@ -108,17 +108,21 @@ export function makeExampleSchema(
       codec: PgTypeCodec;
       notNull?: boolean;
       expression?: PgSourceColumn<any>["expression"];
+      // TODO: we could make TypeScript understand the relations on the object
+      // rather than just being string.
+      via?: string;
     },
   >(
     options: TOptions,
   ): PgSourceColumn<
     NullableUnless<TOptions["notNull"], ReturnType<TOptions["codec"]["fromPg"]>>
   > => {
-    const { notNull, codec, expression } = options;
+    const { notNull, codec, expression, via } = options;
     return {
       codec,
       notNull: !!notNull,
       expression,
+      via,
     };
   };
 
@@ -234,14 +238,14 @@ export function makeExampleSchema(
     name: "messages",
     columns: messageColumns,
     uniques: [["id"]],
-    relations: {
+    relations: () => ({
       author: {
-        targetTable: sql`app_public.users`,
+        source: userSource,
         localColumns: [`author_id`],
         remoteColumns: [`id`],
         isUnique: true,
       },
-    },
+    }),
   });
 
   const userSource = new PgSource({
@@ -260,6 +264,160 @@ export function makeExampleSchema(
     name: "forums",
     columns: forumColumns,
     uniques: [["id"]],
+  });
+
+  const singleTableItemsSource = new PgSource({
+    executor,
+    codec: recordType(sql`interfaces_and_unions.single_table_items`),
+    source: sql`interfaces_and_unions.single_table_items`,
+    name: "single_table_items",
+    columns: {
+      id: col({ codec: TYPES.int, notNull: true }),
+      type: col({ codec: TYPES.text /* TODO: enum? */, notNull: true }),
+
+      parent_id: col({ codec: TYPES.int, notNull: false }),
+      position: col({ codec: TYPES.bigint, notNull: true }),
+      created_at: col({ codec: TYPES.timestamptz, notNull: true }),
+      updated_at: col({ codec: TYPES.timestamptz, notNull: true }),
+      is_explicitly_archived: col({ codec: TYPES.boolean, notNull: true }),
+      archived_at: col({ codec: TYPES.timestamptz, notNull: false }),
+
+      title: col({ codec: TYPES.text, notNull: false }),
+      description: col({ codec: TYPES.text, notNull: false }),
+      note: col({ codec: TYPES.text, notNull: false }),
+      color: col({ codec: TYPES.text, notNull: false }),
+    },
+    uniques: [["id"]],
+  });
+
+  const relationalItemsSource = new PgSource({
+    executor,
+    codec: recordType(sql`interfaces_and_unions.relational_items`),
+    source: sql`interfaces_and_unions.relational_items`,
+    name: "relational_items",
+    columns: {
+      id: col({ codec: TYPES.int, notNull: true }),
+      type: col({ codec: TYPES.text /* TODO: enum? */, notNull: true }),
+
+      parent_id: col({ codec: TYPES.int, notNull: false }),
+      position: col({ codec: TYPES.bigint, notNull: true }),
+      created_at: col({ codec: TYPES.timestamptz, notNull: true }),
+      updated_at: col({ codec: TYPES.timestamptz, notNull: true }),
+      is_explicitly_archived: col({ codec: TYPES.boolean, notNull: true }),
+      archived_at: col({ codec: TYPES.timestamptz, notNull: false }),
+    },
+    uniques: [["id"]],
+  });
+
+  const itemColumns = {
+    parent_id: col({ codec: TYPES.int, notNull: false, via: "item" }),
+    // $topic.get("parent_id") -> $topic.singleRelation("item").get("parent_id")
+    position: col({ codec: TYPES.bigint, notNull: true, via: "item" }),
+    // $topic.get("position") -> $topic.singleRelation("item").get("position")
+    created_at: col({ codec: TYPES.timestamptz, notNull: true, via: "item" }),
+    updated_at: col({ codec: TYPES.timestamptz, notNull: true, via: "item" }),
+    is_explicitly_archived: col({
+      codec: TYPES.boolean,
+      notNull: true,
+      via: "item",
+    }),
+    archived_at: col({ codec: TYPES.timestamptz, notNull: false, via: "item" }),
+  };
+
+  const itemRelation = {
+    source: relationalItemsSource,
+    localColumns: [`id`],
+    remoteColumns: [`id`],
+    isUnique: true,
+  };
+
+  const relationalTopicsSource = new PgSource({
+    executor,
+    codec: recordType(sql`interfaces_and_unions.relational_topics`),
+    source: sql`interfaces_and_unions.relational_topics`,
+    name: "relational_topics",
+    columns: {
+      id: col({ codec: TYPES.int, notNull: true }),
+      title: col({ codec: TYPES.text, notNull: false }),
+
+      ...itemColumns,
+    },
+    uniques: [["id"]],
+    relations: {
+      item: itemRelation,
+    },
+  });
+
+  const relationalPostsSource = new PgSource({
+    executor,
+    codec: recordType(sql`interfaces_and_unions.relational_posts`),
+    source: sql`interfaces_and_unions.relational_posts`,
+    name: "relational_posts",
+    columns: {
+      id: col({ codec: TYPES.int, notNull: true }),
+      title: col({ codec: TYPES.text, notNull: false }),
+      description: col({ codec: TYPES.text, notNull: false }),
+      note: col({ codec: TYPES.text, notNull: false }),
+
+      ...itemColumns,
+    },
+    uniques: [["id"]],
+    relations: {
+      item: itemRelation,
+    },
+  });
+
+  const relationalDividersSource = new PgSource({
+    executor,
+    codec: recordType(sql`interfaces_and_unions.relational_dividers`),
+    source: sql`interfaces_and_unions.relational_dividers`,
+    name: "relational_dividers",
+    columns: {
+      id: col({ codec: TYPES.int, notNull: true }),
+      title: col({ codec: TYPES.text, notNull: false }),
+      color: col({ codec: TYPES.text, notNull: false }),
+
+      ...itemColumns,
+    },
+    uniques: [["id"]],
+    relations: {
+      item: itemRelation,
+    },
+  });
+
+  const relationalChecklistsSource = new PgSource({
+    executor,
+    codec: recordType(sql`interfaces_and_unions.relational_checklists`),
+    source: sql`interfaces_and_unions.relational_checklists`,
+    name: "relational_checklists",
+    columns: {
+      id: col({ codec: TYPES.int, notNull: true }),
+      title: col({ codec: TYPES.text, notNull: false }),
+
+      ...itemColumns,
+    },
+    uniques: [["id"]],
+    relations: {
+      item: itemRelation,
+    },
+  });
+
+  const relationalChecklistItemsSource = new PgSource({
+    executor,
+    codec: recordType(sql`interfaces_and_unions.relational_checklist_items`),
+    source: sql`interfaces_and_unions.relational_checklist_items`,
+    name: "relational_checklist_items",
+    columns: {
+      id: col({ codec: TYPES.int, notNull: true }),
+      description: col({ codec: TYPES.text, notNull: true }),
+      note: col({ codec: TYPES.text, notNull: false }),
+
+      ...itemColumns,
+    },
+    uniques: [["id"]],
+    relations: {
+      item: itemRelation,
+    },
   });
 
   const User = new GraphQLObjectType(

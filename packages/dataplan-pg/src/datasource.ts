@@ -41,6 +41,14 @@ export interface PgSourceColumn<TCanonical = any, TInput = TCanonical> {
    * ```
    */
   expression?: (alias: SQL) => SQL;
+
+  // TODO: we could make TypeScript understand the relations on the object
+  // rather than just being string.
+  /**
+   * If this column actually exists on a relation rather than locally, the name
+   * of the (unique) relation this column belongs to.
+   */
+  via?: string;
 }
 
 type PgSourceRow<TColumns extends PgSourceColumns> = {
@@ -63,8 +71,10 @@ type PlanByUniques<
   TCols extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
 > = TuplePlanMap<TColumns, TCols[number]>[number];
 
-export interface PgSourceRelation {
-  targetTable: SQL;
+export interface PgSourceRelation<
+  TSource extends PgSource<any, any, any, any, any>,
+> {
+  source: TSource;
   localColumns: string[];
   remoteColumns: string[];
   isUnique: boolean;
@@ -74,7 +84,7 @@ export interface PgSourceOptions<
   TCodec extends PgTypeCodec<any, any>,
   TColumns extends PgSourceColumns,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
-  TRelations extends { [identifier: string]: PgSourceRelation },
+  TRelations extends { [identifier: string]: PgSourceRelation<any> },
   TParameters extends { [key: string]: any } | never = never,
 > {
   codec: TCodec;
@@ -83,7 +93,7 @@ export interface PgSourceOptions<
   source: SQL | ((args: SQL[]) => SQL);
   columns: TColumns | null;
   uniques?: TUniques;
-  relations?: TRelations;
+  relations?: TRelations | (() => TRelations);
 }
 
 /**
@@ -94,7 +104,7 @@ export class PgSource<
   TCodec extends PgTypeCodec<any, any>,
   TColumns extends PgSourceColumns,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
-  TRelations extends { [identifier: string]: PgSourceRelation },
+  TRelations extends { [identifier: string]: PgSourceRelation<any> },
   TParameters extends { [key: string]: any } | never = never,
 > {
   /**
@@ -112,7 +122,7 @@ export class PgSource<
   public readonly source: SQL | ((args: SQL[]) => SQL);
   public readonly columns: TColumns;
   public readonly uniques: TUniques;
-  public readonly relations: TRelations;
+  private relations: TRelations | (() => TRelations);
 
   /**
    * @param source - the SQL for the `FROM` clause (without any
@@ -138,11 +148,25 @@ export class PgSource<
     this.source = source;
     this.columns = columns ?? ({} as TColumns);
     this.uniques = uniques ?? ([] as any);
-    this.relations = relations || ({} as TRelations);
+    this.relations =
+      typeof relations === "function"
+        ? () => {
+            this.relations = relations();
+            return this.relations;
+          }
+        : relations || ({} as TRelations);
   }
 
   public toString(): string {
     return chalk.bold.blue(`PgSource(${this.name})`);
+  }
+
+  public getRelation<TRelationName extends keyof TRelations>(
+    name: TRelationName,
+  ): TRelations[TRelationName] {
+    const r =
+      typeof this.relations === "function" ? this.relations() : this.relations;
+    return r[name];
   }
 
   public get(
