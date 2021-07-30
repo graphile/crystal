@@ -197,6 +197,29 @@ create table interfaces_and_unions.single_table_items (
 );
 comment on table interfaces_and_unions.single_table_items is E'@interface single_table type\n@type TOPIC title\n@type POST title,description,note\n@type DIVIDER title,color\n@type CHECKLIST title\n@type CHECKLIST_ITEM description,note';
 
+insert into interfaces_and_unions.single_table_items (id, type, parent_id, position, created_at, updated_at, is_explicitly_archived, archived_at, title, description, note, color) values
+  (1, 'TOPIC', null, 0, '2020-01-28T11:00:00Z', '2021-07-30T14:24:00Z', false, null, 'PostGraphile version 5', null, null, null),
+  (2, 'TOPIC', null, 0, '2020-03-26T13:00:00Z', '2020-03-26T14:00:00Z', true, '2020-03-26T14:00:00Z', 'Temporary test topic', null, null, null),
+  (3, 'DIVIDER', 1, 0, '2020-01-28T11:00:00Z', '2021-07-30T14:24:00Z', false, null, 'Headline features', null, null, 'green'),
+  (4, 'POST', 1, 1, '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false, null, 'Better planning', null, null, null),
+  (5, 'POST', 1, 2, '2020-01-28T11:02:00Z', '2021-07-30T14:24:00Z', false, null, 'Easier to code', null, null, null),
+  (6, 'POST', 1, 3, '2020-01-28T11:03:00Z', '2021-07-30T14:24:00Z', false, null, 'More features', 'E.g. interfaces and unions', 'Also things like querying from multiple databases', null),
+  (7, 'POST', 1, 4, '2020-01-28T11:04:00Z', '2021-07-30T14:24:00Z', false, null, 'Better performance', null, null, null),
+  (8, 'DIVIDER', 1, 5, '2020-01-28T11:05:00Z', '2021-07-30T14:24:00Z', false, null, 'Timescale', null, null, 'blue'),
+  (9, 'POST', 1, 6, '2020-01-28T11:06:00Z', '2021-07-30T14:24:00Z', false, null, 'When have I ever committed to a timescale?', ':D', 'It''ll be done when it''s done, I prefer longer development time and longer stable time than multiple major releases in a year or two.', null),
+  (10, 'TOPIC', 1, 7, '2020-01-28T11:07:00Z', '2021-07-30T14:24:00Z', false, null, 'Notes', null, null, null),
+  (11, 'TOPIC', 10, 0, '2020-01-28T11:08:00Z', '2021-07-30T14:24:00Z', false, null, 'Other aims', null, null, null),
+  (12, 'POST', 11, 0, '2020-01-28T11:09:00Z', '2021-07-30T14:24:00Z', false, null, 'Fix legacy issues', null, null, null),
+  (13, 'POST', 11, 1, '2020-01-28T11:10:00Z', '2021-07-30T14:24:00Z', false, null, 'Full TypeScript conversion', null, null, null),
+  (14, 'POST', 11, 2, '2020-01-28T11:11:00Z', '2021-07-30T14:24:00Z', false, null, 'Monorepo', null, null, null),
+  (15, 'POST', 2, 0, '2020-01-28T11:11:00Z', '2021-07-30T14:24:00Z', false, '2020-03-26T14:00:00Z', 'Just a test', null, null, null),
+  (16, 'CHECKLIST', 4, 0, '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false, null, 'Planning goals', null, null, null),
+  (17, 'CHECKLIST_ITEM', 16, 0, '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false, null, null, 'Follows pattern of GraphQL resolver flow', null, null),
+  (18, 'CHECKLIST_ITEM', 16, 1, '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false, null, null, 'Has an optimisation phase', null, null),
+  (19, 'CHECKLIST_ITEM', 16, 2, '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false, null, null, 'Plan deduplication at the field level', null, null),
+  (20, 'CHECKLIST_ITEM', 16, 3, '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false, null, null, 'Garbage-collection of unused plans', null, null),
+  (21, 'CHECKLIST_ITEM', 16, 4, '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false, null, null, 'Supports newest GraphQL features', null, null);
+
 --------------------------------------------------------------------------------
 
 -- In this solution there's a table (relational_items) that stores the common
@@ -244,6 +267,61 @@ create table interfaces_and_unions.relational_checklist_items (
 );
 comment on table interfaces_and_unions.relational_items is E'@interface relational type\n@type TOPIC relational_topics\n@type POST relational_posts\n@type DIVIDER relational_dividers\n@type CHECKLIST relational_checklists\n@type CHECKLIST_ITEM relational_checklist_items';
 
+insert into interfaces_and_unions.relational_items (id, type, parent_id, position, created_at, updated_at, is_explicitly_archived, archived_at) values
+  (1, 'TOPIC', null, 0, '2020-01-28T11:00:00Z', '2021-07-30T14:24:00Z', false, null),
+  (2, 'TOPIC', null, 0, '2020-03-26T13:00:00Z', '2020-03-26T14:00:00Z', true, '2020-03-26T14:00:00Z'),
+  (3, 'DIVIDER', 1, 0, '2020-01-28T11:00:00Z', '2021-07-30T14:24:00Z', false, null),
+  (4, 'POST', 1, 1, '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false, null),
+  (5, 'POST', 1, 2, '2020-01-28T11:02:00Z', '2021-07-30T14:24:00Z', false, null),
+  (6, 'POST', 1, 3, '2020-01-28T11:03:00Z', '2021-07-30T14:24:00Z', false, null),
+  (7, 'POST', 1, 4, '2020-01-28T11:04:00Z', '2021-07-30T14:24:00Z', false, null),
+  (8, 'DIVIDER', 1, 5, '2020-01-28T11:05:00Z', '2021-07-30T14:24:00Z', false, null),
+  (9, 'POST', 1, 6, '2020-01-28T11:06:00Z', '2021-07-30T14:24:00Z', false, null),
+  (10, 'TOPIC', 1, 7, '2020-01-28T11:07:00Z', '2021-07-30T14:24:00Z', false, null),
+  (11, 'TOPIC', 10, 0, '2020-01-28T11:08:00Z', '2021-07-30T14:24:00Z', false, null),
+  (12, 'POST', 11, 0, '2020-01-28T11:09:00Z', '2021-07-30T14:24:00Z', false, null),
+  (13, 'POST', 11, 1, '2020-01-28T11:10:00Z', '2021-07-30T14:24:00Z', false, null),
+  (14, 'POST', 11, 2, '2020-01-28T11:11:00Z', '2021-07-30T14:24:00Z', false, null),
+  (15, 'POST', 2, 0, '2020-01-28T11:11:00Z', '2021-07-30T14:24:00Z', false, '2020-03-26T14:00:00Z'),
+  (16, 'CHECKLIST', 4, 0, '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false, null),
+  (17, 'CHECKLIST_ITEM', 16, 0, '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false, null),
+  (18, 'CHECKLIST_ITEM', 16, 1, '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false, null),
+  (19, 'CHECKLIST_ITEM', 16, 2, '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false, null),
+  (20, 'CHECKLIST_ITEM', 16, 3, '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false, null),
+  (21, 'CHECKLIST_ITEM', 16, 4, '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false, null);
+
+
+insert into interfaces_and_unions.relational_topics (id, title)  values
+  (1, 'PostGraphile version 5'),
+  (2, 'Temporary test topic'),
+  (10, 'Notes'),
+  (11, 'Other aims');
+
+insert into interfaces_and_unions.relational_posts (id, title, description, note)  values
+  (4, 'Better planning', null, null),
+  (5, 'Easier to code', null, null),
+  (6, 'More features', 'E.g. interfaces and unions', 'Also things like querying from multiple databases'),
+  (7, 'Better performance', null, null),
+  (9, 'When have I ever committed to a timescale?', ':D', 'It''ll be done when it''s done, I prefer longer development time and longer stable time than multiple major releases in a year or two.'),
+  (12, 'Fix legacy issues', null, null),
+  (13, 'Full TypeScript conversion', null, null),
+  (14, 'Monorepo', null, null),
+  (15, 'Just a test', null, null);
+
+insert into interfaces_and_unions.relational_dividers (id, title, color)  values
+  (3, 'Headline features', 'green'),
+  (8, 'Timescale', 'blue');
+
+insert into interfaces_and_unions.relational_checklists (id, title)  values
+  (16, 'Planning goals');
+
+insert into interfaces_and_unions.relational_checklist_items (id, description, note)  values
+  (17, 'Follows pattern of GraphQL resolver flow', null),
+  (18, 'Has an optimisation phase', null),
+  (19, 'Plan deduplication at the field level', null),
+  (20, 'Garbage-collection of unused plans', null),
+  (21, 'Supports newest GraphQL features', null);
+
 -- We can also apply multiple interfaces to the same tables:
 
 create type interfaces_and_unions.commentable_type as enum (
@@ -258,9 +336,17 @@ create table interfaces_and_unions.relational_commentable (
   type interfaces_and_unions.commentable_type not null
 );
 
+insert into interfaces_and_unions.relational_commentable (id, type)
+  select id, 'POST'::interfaces_and_unions.commentable_type from interfaces_and_unions.relational_posts
+  union
+  select id, 'CHECKLIST'::interfaces_and_unions.commentable_type from interfaces_and_unions.relational_checklists
+  union
+  select id, 'CHECKLIST_ITEM'::interfaces_and_unions.commentable_type from interfaces_and_unions.relational_checklist_items;
+
 alter table interfaces_and_unions.relational_posts add constraint relational_posts_commentable_fkey foreign key (id) references interfaces_and_unions.relational_commentable;
 alter table interfaces_and_unions.relational_checklists add constraint relational_posts_commentable_fkey foreign key (id) references interfaces_and_unions.relational_commentable;
 alter table interfaces_and_unions.relational_checklist_items add constraint relational_posts_commentable_fkey foreign key (id) references interfaces_and_unions.relational_commentable;
+
 comment on table interfaces_and_unions.relational_commentable is E'@interface relational type\n@type POST relational_posts\n@type CHECKLIST relational_checklists\n@type CHECKLIST_ITEM relational_checklist_items';
 
 --------------------------------------------------------------------------------
