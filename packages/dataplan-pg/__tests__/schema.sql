@@ -209,7 +209,7 @@ create table interfaces_and_unions.relational_items (
   -- This column is used to tell us which table we need to join to
   type interfaces_and_unions.item_type not null default 'POST'::interfaces_and_unions.item_type,
 
-  -- Shared attributes:
+  -- Shared attributes (also 'id'):
   parent_id int references interfaces_and_unions.relational_items,
   position bigint not null default 0,
   created_at timestamptz not null default now(),
@@ -242,12 +242,32 @@ create table interfaces_and_unions.relational_checklist_items (
   description text not null,
   note text
 );
-comment on table interfaces_and_unions.single_table_items is E'@interface relational type\n@type TOPIC relational_topics\n@type POST relational_posts\n@type DIVIDER relational_dividers\n@type CHECKLIST relational_checklists\n@type CHECKLIST_ITEM relational_checklist_items';
+comment on table interfaces_and_unions.relational_items is E'@interface relational type\n@type TOPIC relational_topics\n@type POST relational_posts\n@type DIVIDER relational_dividers\n@type CHECKLIST relational_checklists\n@type CHECKLIST_ITEM relational_checklist_items';
+
+-- We can also apply multiple interfaces to the same tables:
+
+create type interfaces_and_unions.commentable_type as enum (
+  'POST',
+  'CHECKLIST',
+  'CHECKLIST_ITEM'
+);
+
+create table interfaces_and_unions.relational_commentable (
+  id serial primary key,
+
+  type interfaces_and_unions.commentable_type not null
+);
+
+alter table interfaces_and_unions.relational_posts add constraint relational_posts_commentable_fkey foreign key (id) references interfaces_and_unions.relational_commentable;
+alter table interfaces_and_unions.relational_checklists add constraint relational_posts_commentable_fkey foreign key (id) references interfaces_and_unions.relational_commentable;
+alter table interfaces_and_unions.relational_checklist_items add constraint relational_posts_commentable_fkey foreign key (id) references interfaces_and_unions.relational_commentable;
+comment on table interfaces_and_unions.relational_commentable is E'@interface relational type\n@type POST relational_posts\n@type CHECKLIST relational_checklists\n@type CHECKLIST_ITEM relational_checklist_items';
 
 --------------------------------------------------------------------------------
 
 -- The degenerate case of an interface, that is an interface with no shared
--- fields, is effectively a union.
+-- fields, is effectively a union. Here we ignore that the 'id' column is
+-- shared and mark the type as a union.
 
 create table interfaces_and_unions.union_items (
   id serial primary key,
