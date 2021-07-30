@@ -390,6 +390,62 @@ create table interfaces_and_unions.union_checklist_items (
 );
 comment on table interfaces_and_unions.union_items is E'@union relational type\n@type TOPIC union_topics\n@type POST union_posts\n@type DIVIDER union_dividers\n@type CHECKLIST union_checklists\n@type CHECKLIST_ITEM union_checklist_items';
 
+insert into interfaces_and_unions.union_items (id, type) values
+  (1, 'TOPIC'),
+  (2, 'TOPIC'),
+  (3, 'DIVIDER'),
+  (4, 'POST'),
+  (5, 'POST'),
+  (6, 'POST'),
+  (7, 'POST'),
+  (8, 'DIVIDER'),
+  (9, 'POST'),
+  (10, 'TOPIC'),
+  (11, 'TOPIC'),
+  (12, 'POST'),
+  (13, 'POST'),
+  (14, 'POST'),
+  (15, 'POST'),
+  (16, 'CHECKLIST'),
+  (17, 'CHECKLIST_ITEM'),
+  (18, 'CHECKLIST_ITEM'),
+  (19, 'CHECKLIST_ITEM'),
+  (20, 'CHECKLIST_ITEM'),
+  (21, 'CHECKLIST_ITEM');
+
+
+insert into interfaces_and_unions.union_topics (id, title)  values
+  (1, 'PostGraphile version 5'),
+  (2, 'Temporary test topic'),
+  (10, 'Notes'),
+  (11, 'Other aims');
+
+insert into interfaces_and_unions.union_posts (id, title, description, note)  values
+  (4, 'Better planning', null, null),
+  (5, 'Easier to code', null, null),
+  (6, 'More features', 'E.g. interfaces and unions', 'Also things like querying from multiple databases'),
+  (7, 'Better performance', null, null),
+  (9, 'When have I ever committed to a timescale?', ':D', 'It''ll be done when it''s done, I prefer longer development time and longer stable time than multiple major releases in a year or two.'),
+  (12, 'Fix legacy issues', null, null),
+  (13, 'Full TypeScript conversion', null, null),
+  (14, 'Monorepo', null, null),
+  (15, 'Just a test', null, null);
+
+insert into interfaces_and_unions.union_dividers (id, title, color)  values
+  (3, 'Headline features', 'green'),
+  (8, 'Timescale', 'blue');
+
+insert into interfaces_and_unions.union_checklists (id, title)  values
+  (16, 'Planning goals');
+
+insert into interfaces_and_unions.union_checklist_items (id, description, note)  values
+  (17, 'Follows pattern of GraphQL resolver flow', null),
+  (18, 'Has an optimisation phase', null),
+  (19, 'Plan deduplication at the field level', null),
+  (20, 'Garbage-collection of unused plans', null),
+  (21, 'Supports newest GraphQL features', null);
+
+
 --------------------------------------------------------------------------------
 
 create table interfaces_and_unions.people (
@@ -399,14 +455,42 @@ create table interfaces_and_unions.people (
 
 create table interfaces_and_unions.posts (
   post_id serial primary key,
+  author_id int not null references interfaces_and_unions.people on delete cascade,
   body text not null
 );
 
 create table interfaces_and_unions.comments (
   comment_id serial primary key,
+  author_id int not null references interfaces_and_unions.people on delete cascade,
   post_id int not null references interfaces_and_unions.posts on delete cascade,
   body text not null
 );
+
+insert into interfaces_and_unions.people (person_id, username) values
+  (1, 'Alice'),
+  (2, 'Benjie'),
+  (3, 'Caroline'),
+  (4, 'Dave'),
+  (5, 'Ellie'),
+  (6, 'Fred'),
+  (7, 'Georgina'),
+  (8, 'Harry');
+
+insert into interfaces_and_unions.posts (post_id, author_id, body) values
+  (1, 5, 'Dave do you fancy pizza?'),
+  (2, 4, 'Of course, I love pizza!'),
+  (3, 5, 'Sweet, I''ll order some Mighty Meaty'),
+  (4, 2, 'Sounds delicious; I''m in!'),
+  (5, 3, 'Let''s make a party of it!'),
+  (6, 3, 'Come round ours, we can hang out on the new patio'),
+  (7, 6, 'Socially distanced pizzas? Count us in too!');
+
+insert into interfaces_and_unions.comments (comment_id, author_id, post_id, body) values
+  (1, 2, 7, 'Yeah, that''s critical these days, right?'),
+  (2, 6, 7, 'Sucks, but it''s true.'),
+  (3, 3, 3, 'Can we have some vegan pizza for Sam?'),
+  (4, 5, 3, 'Of course; I''ll grab a selection. BYOB!');
+
 
 -- A union type like this is great because functions can return it and multiple
 -- tables can also have it be a column type. It only works well for single
@@ -444,6 +528,21 @@ create table interfaces_and_unions.person_likes (
   liked_entity interfaces_and_unions.union__entity not null
 );
 
+insert into interfaces_and_unions.person_bookmarks (id, person_id, bookmarked_entity) values
+  (1, 2, (null, 3, null)),
+  (2, 2, (null, null, 1)),
+  (3, 5, (3, null, null));
+
+insert into interfaces_and_unions.person_likes (id, person_id, liked_entity) values
+  (1, 2, (3, null, null)),
+  (2, 2, (4, null, null)),
+  (3, 2, (5, null, null)),
+  (4, 2, (null, 5, null)),
+  (5, 2, (null, 6, null)),
+  (6, 2, (null, 7, null)),
+  (7, 2, (null, null, 2)),
+  (8, 2, (null, null, 3));
+
 
 -- This alternative approach would construct an "ad-hoc" union for this table,
 -- but isn't useful for function returns nor other tables.
@@ -455,3 +554,14 @@ create table interfaces_and_unions.person_favourites (
   liked_comment_id int references interfaces_and_unions.comments on delete cascade
 );
 comment on table interfaces_and_unions.person_favourites is E'@union PersonFavouriteEntity favourite_person_id,favourite_post_id,favourite_comment_id';
+
+insert into interfaces_and_unions.person_favourites (id, person_id, liked_person_id, liked_post_id, liked_comment_id) values
+  (1, 2, 3, null, null),
+  (2, 2, 4, null, null),
+  (3, 2, 5, null, null),
+  (4, 2, null, 5, null),
+  (5, 2, null, 6, null),
+  (6, 2, null, 7, null),
+  (7, 2, null, null, 2),
+  (8, 2, null, null, 3);
+
