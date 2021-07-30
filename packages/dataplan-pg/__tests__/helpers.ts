@@ -10,7 +10,9 @@ const deoptimizedSchema = makeExampleSchema({ deoptimize: true });
 
 let testPool: Pool | null = null;
 beforeAll(() => {
-  testPool = new Pool({ connectionString: "graphile_crystal" });
+  testPool = new Pool({
+    connectionString: process.env.TEST_DATABASE_URL || "graphile_crystal",
+  });
 });
 
 afterAll(() => {
