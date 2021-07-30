@@ -307,6 +307,43 @@ export function makeExampleSchema(
       archived_at: col({ codec: TYPES.timestamptz, notNull: false }),
     },
     uniques: [["id"]],
+    relations: () => ({
+      topic: {
+        source: relationalTopicsSource,
+        localColumns: [`id`],
+        remoteColumns: [`id`],
+        isUnique: true,
+        // reciprocal: 'item',
+      },
+      post: {
+        source: relationalPostsSource,
+        localColumns: [`id`],
+        remoteColumns: [`id`],
+        isUnique: true,
+        // reciprocal: 'item',
+      },
+      divider: {
+        source: relationalDividersSource,
+        localColumns: [`id`],
+        remoteColumns: [`id`],
+        isUnique: true,
+        // reciprocal: 'item',
+      },
+      checklist: {
+        source: relationalChecklistsSource,
+        localColumns: [`id`],
+        remoteColumns: [`id`],
+        isUnique: true,
+        // reciprocal: 'item',
+      },
+      checklistItem: {
+        source: relationalChecklistItemsSource,
+        localColumns: [`id`],
+        remoteColumns: [`id`],
+        isUnique: true,
+        // reciprocal: 'item',
+      },
+    }),
   });
 
   const itemColumns = {
