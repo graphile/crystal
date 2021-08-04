@@ -59,7 +59,7 @@ export function recordType(identifier: SQL): PgTypeCodec<string, string> {
 
 export const TYPES = {
   boolean: t<boolean>("bool"),
-  int: t<number>("int"),
+  int: t<number>("int4"),
   bigint: t<string>("bigint"),
   float: t<number>("float"),
   text: t<string>("text"),
