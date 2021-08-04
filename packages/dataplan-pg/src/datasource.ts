@@ -15,7 +15,8 @@ import type {
   PgExecutorOptions,
 } from "./executor";
 import type { PgTypeCodec } from "./interfaces";
-import { PgSelectPlan } from "./plans/pgSelect";
+import type { PgSelectPlan } from "./plans/pgSelect";
+import { pgSelect } from "./plans/pgSelect";
 import type { PgSelectSinglePlan } from "./plans/pgSelectSingle";
 
 export type PgSourceColumns = {
@@ -217,7 +218,7 @@ export class PgSource<
         matches: (alias: SQL) => sql`${alias}.${sql.identifier(key as string)}`,
       };
     });
-    return new PgSelectPlan(this, identifiers);
+    return pgSelect(this, identifiers);
   }
 
   public applyAuthorizationChecksToPlan($plan: PgSelectPlan<this>): void {
