@@ -99,10 +99,11 @@ const debugExecuteVerbose = depthWrap(debugExecuteVerbose_);
 
 function assertPolymorphicPlan(
   plan: ExecutablePlan | PolymorphicPlan,
+  pathIdentity: string,
 ): asserts plan is PolymorphicPlan {
   assert.ok(
     "planForType" in plan,
-    "Expected plan for interface field to be polymorphic.",
+    `Expected plan for interface field to be polymorphic at '${pathIdentity}'.`,
   );
   assert.strictEqual(
     typeof plan.planForType,
@@ -400,6 +401,10 @@ export class Aether<
       const pathIdentity = `${path}>${objectType.name}.${responseKey}`;
       const field = fields[0];
       const fieldName = field.name.value;
+      if (fieldName.startsWith("__")) {
+        // Introspection field, skip
+        continue;
+      }
 
       // This is presumed to exist because the operation passed validation.
       const objectField = objectTypeFields[fieldName];
@@ -523,7 +528,7 @@ export class Aether<
           false,
         );
       } else {
-        assertPolymorphicPlan(plan);
+        assertPolymorphicPlan(plan, pathIdentity);
         const polymorphicPlan = plan;
         const planPossibleObjectTypes = (
           possibleObjectTypes: readonly GraphQLObjectType[],
