@@ -574,8 +574,9 @@ export class PgSelectPlan<
   public singleRelation(
     relationIdentifier: Parameters<TDataSource["getRelation"]>[0],
   ): SQL {
-    const relation: PgSourceRelation<PgSource<any, any, any, any>> | undefined =
-      this.dataSource.getRelation(relationIdentifier as string);
+    const relation:
+      | PgSourceRelation<PgSource<any, any, any, any>, TDataSource["columns"]>
+      | undefined = this.dataSource.getRelation(relationIdentifier as string);
     if (!relation) {
       throw new Error(
         `${this.dataSource} does not have a relation named '${relationIdentifier}'`,
@@ -606,9 +607,9 @@ export class PgSelectPlan<
       alias,
       conditions: localColumns.map(
         (col, i) =>
-          sql`${this.alias}.${sql.identifier(col)} = ${alias}.${sql.identifier(
-            remoteColumns[i],
-          )}`,
+          sql`${this.alias}.${sql.identifier(
+            col as string,
+          )} = ${alias}.${sql.identifier(remoteColumns[i])}`,
       ),
     });
     this.relationJoins.set(relationIdentifier, alias);
@@ -1526,9 +1527,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
    * IMPORTANT: do not call `.listItem` from user code; it's only intended to
    * be called by Graphile Crystal.
    */
-  listItem(
-    itemPlan: __ListItemPlan<PgSelectPlan<TDataSource>>,
-  ): PgSelectSinglePlan<TDataSource> {
+  listItem(itemPlan: __ListItemPlan<this>): PgSelectSinglePlan<TDataSource> {
     return new PgSelectSinglePlan(this, itemPlan);
   }
 

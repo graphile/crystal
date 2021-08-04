@@ -177,7 +177,7 @@ type PlanForType<TType extends GraphQLOutputType> = TType extends GraphQLList<
   infer U
 >
   ? U extends GraphQLOutputType
-    ? ListCapablePlan<PlanForType<U>>
+    ? ListCapablePlan<any, PlanForType<U>>
     : never
   : TType extends GraphQLNonNull<infer V>
   ? V extends GraphQLOutputType

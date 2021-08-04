@@ -103,12 +103,12 @@ function assertPolymorphicPlan(
 ): asserts plan is PolymorphicPlan {
   assert.ok(
     "planForType" in plan,
-    `Expected plan for interface field to be polymorphic at '${pathIdentity}'.`,
+    `Expected plan for interface field to be polymorphic at ${pathIdentity}, found ${plan}.`,
   );
   assert.strictEqual(
     typeof plan.planForType,
     "function",
-    "Expected property `planForType` for interface field plan to be a function.",
+    `Expected property 'planForType' for interface field plan ${plan} to be a function at ${pathIdentity}.`,
   );
 }
 

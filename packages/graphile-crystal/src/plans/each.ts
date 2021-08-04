@@ -1,17 +1,22 @@
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
 import { ExecutablePlan } from "../plan";
 import type { __ListItemPlan, ListCapablePlan } from "./__listItem";
-import { isListCapablePlan } from "./__listItem";
+import { assertListCapablePlan, isListCapablePlan } from "./__listItem";
 
-export class EachPlan<TData = any, TResult = any>
-  extends ExecutablePlan<ReadonlyArray<TResult>>
-  implements ListCapablePlan<TResult>
+export class EachPlan<
+    TSourceData,
+    TOutputData,
+    TSourceItemPlan extends ExecutablePlan<TSourceData> = ExecutablePlan<TSourceData>,
+    TResultItemPlan extends ExecutablePlan<TOutputData> = ExecutablePlan<TOutputData>,
+  >
+  extends ExecutablePlan<ReadonlyArray<TSourceData>>
+  implements ListCapablePlan<TOutputData>
 {
   listPlanId: number;
 
   constructor(
-    listPlan: ListCapablePlan<TData>,
-    private mapper: (item: TData) => TResult,
+    listPlan: ListCapablePlan<TSourceData, TSourceItemPlan>,
+    private mapper: (itemPlan: TSourceItemPlan) => TResultItemPlan,
   ) {
     super();
     if (!isListCapablePlan(listPlan)) {
@@ -22,39 +27,41 @@ export class EachPlan<TData = any, TResult = any>
     this.listPlanId = this.addDependency(listPlan);
   }
 
-  listItem(
-    _itemPlan: __ListItemPlan<ExecutablePlan<ReadonlyArray<TData>>>,
-  ): ExecutablePlan<TResult> {
-    throw new Error("Each can currently only be used during optimization");
-    /*
-    const originalListItem = (this.aether.plans[
-      this.dependencies[this.listPlanId]
-    ] as ListCapablePlan<TData>).listItem(itemPlan);
+  originalListPlan(): ListCapablePlan<TSourceData, TSourceItemPlan> {
+    const plan = this.aether.plans[this.dependencies[this.listPlanId]];
+    assertListCapablePlan(plan, this.createdWithParentPathIdentity);
+    return plan as ListCapablePlan<TSourceData, TSourceItemPlan>;
+  }
+
+  listItem(itemPlan: __ListItemPlan<this>): TResultItemPlan {
+    const originalListItem = this.originalListPlan().listItem(itemPlan);
     const mappedPlan = this.mapper(originalListItem);
     console.log(
       `RETURNING MAPPED LIST ITEM PLAN ${mappedPlan} DEPENDENT ON ${itemPlan} via ${originalListItem}`,
     );
     return mappedPlan;
-    */
   }
 
-  execute(values: CrystalValuesList<[TData[]]>): CrystalResultsList<TResult[]> {
-    console.log("EACH");
-    console.dir(values, { depth: 8 });
-    return values.map((v) => {
-      const list = v[this.listPlanId];
-      if (Array.isArray(list)) {
-        return list.map(this.mapper);
-      } else {
-        return list;
-      }
-    });
+  execute(
+    values: CrystalValuesList<[TSourceData[]]>,
+  ): CrystalResultsList<TSourceData[]> {
+    return values.map((v) => v[this.listPlanId]);
   }
 }
 
-export function each<TData = any, TResult = any>(
-  listPlan: ListCapablePlan<TData>,
-  mapper: (item: TData) => TResult,
-): EachPlan<TData, TResult> {
-  return new EachPlan(listPlan, mapper);
+export function each<
+  TSourceData,
+  TOutputData,
+  TSourceItemPlan extends ExecutablePlan<TSourceData> = ExecutablePlan<TSourceData>,
+  TResultItemPlan extends ExecutablePlan<TOutputData> = ExecutablePlan<TOutputData>,
+>(
+  listPlan: ListCapablePlan<TSourceData, TSourceItemPlan>,
+  mapper: (itemPlan: TSourceItemPlan) => TResultItemPlan,
+): EachPlan<TSourceData, TOutputData, TSourceItemPlan, TResultItemPlan> {
+  return new EachPlan<
+    TSourceData,
+    TOutputData,
+    TSourceItemPlan,
+    TResultItemPlan
+  >(listPlan, mapper);
 }

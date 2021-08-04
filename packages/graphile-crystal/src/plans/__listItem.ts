@@ -23,23 +23,29 @@ export class __ListItemPlan<
   }
 }
 
-export interface ListCapablePlan<TData>
-  extends ExecutablePlan<ReadonlyArray<TData>> {
-  listItem(
-    itemPlan: __ListItemPlan<ExecutablePlan<ReadonlyArray<TData>>>,
-  ): ExecutablePlan<TData>;
+export interface ListCapablePlan<
+  TOutputData extends any,
+  TItemPlan extends ExecutablePlan<TOutputData> = ExecutablePlan<TOutputData>,
+> extends ExecutablePlan<ReadonlyArray<any>> {
+  listItem(itemPlan: __ListItemPlan<this>): TItemPlan;
 }
 
-export function isListCapablePlan<TData>(
+export function isListCapablePlan<
+  TData,
+  TItemPlan extends ExecutablePlan<TData>,
+>(
   plan: ExecutablePlan<ReadonlyArray<TData>>,
-): plan is ListCapablePlan<TData> {
+): plan is ListCapablePlan<TData, TItemPlan> {
   return "listItem" in plan && typeof (plan as any).listItem === "function";
 }
 
-export function assertListCapablePlan<TData>(
+export function assertListCapablePlan<
+  TData,
+  TItemPlan extends ExecutablePlan<TData>,
+>(
   plan: ExecutablePlan<ReadonlyArray<TData>>,
   pathIdentity: string,
-): asserts plan is ListCapablePlan<TData> {
+): asserts plan is ListCapablePlan<TData, TItemPlan> {
   if (!isListCapablePlan(plan)) {
     throw new Error(
       `The plan returned from '${pathIdentity}' should be a list capable plan, but it does not implement the 'listItem' method.`,

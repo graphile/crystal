@@ -4,23 +4,29 @@ import type {
   __ValuePlan,
   BaseGraphQLContext,
   BaseGraphQLRootValue,
-  ExecutablePlan,
+  CrystalResultsList,
+  CrystalValuesList,
   InputStaticLeafPlan,
+  PolymorphicPlan,
 } from "graphile-crystal";
+import { each } from "graphile-crystal";
 import {
   BasePlan,
   context,
   crystalEnforce,
+  ExecutablePlan,
   inputObjectSpec,
   ModifierPlan,
   object,
   objectSpec,
 } from "graphile-crystal";
+import type { GraphQLOutputType } from "graphql";
 import {
   GraphQLBoolean,
   GraphQLEnumType,
   GraphQLInputObjectType,
   GraphQLInt,
+  GraphQLInterfaceType,
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
@@ -102,6 +108,9 @@ export function makeExampleSchema(
   type UserPlan = PgSelectSinglePlan<typeof userSource>;
   // type ForumsPlan = PgSelectPlan<typeof forumSource>;
   type ForumPlan = PgSelectSinglePlan<typeof forumSource>;
+  type PersonPlan = PgSelectSinglePlan<typeof personSource>;
+  type SingleTableItemsPlan = PgSelectPlan<typeof singleTableItemsSource>;
+  type SingleTableItemPlan = PgSelectSinglePlan<typeof singleTableItemsSource>;
 
   const col = <
     TOptions extends {
@@ -266,6 +275,93 @@ export function makeExampleSchema(
     uniques: [["id"]],
   });
 
+  const personSource = new PgSource({
+    executor,
+    codec: recordType(sql`interfaces_and_unions.people`),
+    source: sql`interfaces_and_unions.people`,
+    name: "people",
+    columns: {
+      person_id: col({ codec: TYPES.int, notNull: true }),
+      username: col({ codec: TYPES.text, notNull: true }),
+    },
+    uniques: [["person_id"], ["username"]],
+    relations: () => ({
+      singleTableItems: {
+        source: singleTableItemsSource,
+        isUnique: false,
+        localColumns: ["person_id"],
+        remoteColumns: ["author_id"],
+      },
+      posts: {
+        source: postSource,
+        isUnique: false,
+        localColumns: ["person_id"],
+        remoteColumns: ["author_id"],
+      },
+      comments: {
+        source: postSource,
+        isUnique: false,
+        localColumns: ["person_id"],
+        remoteColumns: ["author_id"],
+      },
+    }),
+  });
+
+  const postSource = new PgSource({
+    executor,
+    codec: recordType(sql`interfaces_and_unions.posts`),
+    source: sql`interfaces_and_unions.posts`,
+    name: "posts",
+    columns: {
+      post_id: col({ codec: TYPES.int, notNull: true }),
+      author_id: col({ codec: TYPES.int, notNull: true }),
+      body: col({ codec: TYPES.text, notNull: true }),
+    },
+    uniques: [["post_id"]],
+    relations: () => ({
+      author: {
+        source: personSource,
+        isUnique: true,
+        localColumns: ["author_id"],
+        remoteColumns: ["person_id"],
+      },
+      comments: {
+        source: commentSource,
+        isUnique: false,
+        localColumns: ["post_id"],
+        remoteColumns: ["post_id"],
+      },
+    }),
+  });
+
+  const commentSource = new PgSource({
+    executor,
+    codec: recordType(sql`interfaces_and_unions.comments`),
+    source: sql`interfaces_and_unions.comments`,
+    name: "comments",
+    columns: {
+      comment_id: col({ codec: TYPES.int, notNull: true }),
+      author_id: col({ codec: TYPES.int, notNull: true }),
+      post_id: col({ codec: TYPES.int, notNull: true }),
+      body: col({ codec: TYPES.text, notNull: true }),
+    },
+    uniques: [["comment_id"]],
+    relations: () => ({
+      author: {
+        source: personSource,
+        isUnique: true,
+        localColumns: ["author_id"],
+        remoteColumns: ["person_id"],
+      },
+      post: {
+        source: postSource,
+        isUnique: true,
+        localColumns: ["post_id"],
+        remoteColumns: ["post_id"],
+      },
+    }),
+  });
+
   const singleTableItemsSource = new PgSource({
     executor,
     codec: recordType(sql`interfaces_and_unions.single_table_items`),
@@ -276,6 +372,7 @@ export function makeExampleSchema(
       type: col({ codec: TYPES.text /* TODO: enum? */, notNull: true }),
 
       parent_id: col({ codec: TYPES.int, notNull: false }),
+      author_id: col({ codec: TYPES.int, notNull: true }),
       position: col({ codec: TYPES.bigint, notNull: true }),
       created_at: col({ codec: TYPES.timestamptz, notNull: true }),
       updated_at: col({ codec: TYPES.timestamptz, notNull: true }),
@@ -288,6 +385,26 @@ export function makeExampleSchema(
       color: col({ codec: TYPES.text, notNull: false }),
     },
     uniques: [["id"]],
+    relations: () => ({
+      parent: {
+        source: singleTableItemsSource,
+        isUnique: true,
+        localColumns: ["parent_id"],
+        remoteColumns: ["id"],
+      },
+      children: {
+        source: singleTableItemsSource,
+        isUnique: false,
+        localColumns: ["id"],
+        remoteColumns: ["parent_id"],
+      },
+      author: {
+        source: personSource,
+        isUnique: true,
+        localColumns: ["author_id"],
+        remoteColumns: ["person_id"],
+      },
+    }),
   });
 
   const relationalItemsSource = new PgSource({
@@ -300,6 +417,7 @@ export function makeExampleSchema(
       type: col({ codec: TYPES.text /* TODO: enum? */, notNull: true }),
 
       parent_id: col({ codec: TYPES.int, notNull: false }),
+      author_id: col({ codec: TYPES.int, notNull: true }),
       position: col({ codec: TYPES.bigint, notNull: true }),
       created_at: col({ codec: TYPES.timestamptz, notNull: true }),
       updated_at: col({ codec: TYPES.timestamptz, notNull: true }),
@@ -308,38 +426,90 @@ export function makeExampleSchema(
     },
     uniques: [["id"]],
     relations: () => ({
+      parent: {
+        source: relationalItemsSource,
+        isUnique: true,
+        localColumns: ["parent_id"] as const,
+        remoteColumns: ["id"] as const,
+      },
+      children: {
+        source: relationalItemsSource,
+        isUnique: false,
+        localColumns: ["id"] as const,
+        remoteColumns: ["parent_id"] as const,
+      },
+      author: {
+        source: personSource,
+        isUnique: true,
+        localColumns: ["author_id"] as const,
+        remoteColumns: ["person_id"] as const,
+      },
       topic: {
         source: relationalTopicsSource,
-        localColumns: [`id`],
-        remoteColumns: [`id`],
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
         isUnique: true,
         // reciprocal: 'item',
       },
       post: {
         source: relationalPostsSource,
-        localColumns: [`id`],
-        remoteColumns: [`id`],
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
         isUnique: true,
         // reciprocal: 'item',
       },
       divider: {
         source: relationalDividersSource,
-        localColumns: [`id`],
-        remoteColumns: [`id`],
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
         isUnique: true,
         // reciprocal: 'item',
       },
       checklist: {
         source: relationalChecklistsSource,
-        localColumns: [`id`],
-        remoteColumns: [`id`],
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
         isUnique: true,
         // reciprocal: 'item',
       },
       checklistItem: {
         source: relationalChecklistItemsSource,
-        localColumns: [`id`],
-        remoteColumns: [`id`],
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
+        isUnique: true,
+        // reciprocal: 'item',
+      },
+    }),
+  });
+
+  const relationalCommentableSource = new PgSource({
+    executor,
+    codec: recordType(sql`interfaces_and_unions.relational_commentables`),
+    source: sql`interfaces_and_unions.relational_commentables`,
+    name: "relational_commentables",
+    columns: {
+      id: col({ codec: TYPES.int, notNull: true }),
+      type: col({ codec: TYPES.text /* TODO: enum? */, notNull: true }),
+    },
+    relations: () => ({
+      post: {
+        source: relationalPostsSource,
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
+        isUnique: true,
+        // reciprocal: 'item',
+      },
+      checklist: {
+        source: relationalChecklistsSource,
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
+        isUnique: true,
+        // reciprocal: 'item',
+      },
+      checklistItem: {
+        source: relationalChecklistItemsSource,
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
         isUnique: true,
         // reciprocal: 'item',
       },
@@ -363,8 +533,15 @@ export function makeExampleSchema(
 
   const itemRelation = {
     source: relationalItemsSource,
-    localColumns: [`id`],
-    remoteColumns: [`id`],
+    localColumns: [`id`] as const,
+    remoteColumns: [`id`] as const,
+    isUnique: true,
+  };
+
+  const commentableRelation = {
+    source: relationalCommentableSource,
+    localColumns: [`id`] as const,
+    remoteColumns: [`id`] as const,
     isUnique: true,
   };
 
@@ -401,6 +578,7 @@ export function makeExampleSchema(
     uniques: [["id"]],
     relations: {
       item: itemRelation,
+      commentable: commentableRelation,
     },
   });
 
@@ -436,6 +614,7 @@ export function makeExampleSchema(
     uniques: [["id"]],
     relations: {
       item: itemRelation,
+      commentable: commentableRelation,
     },
   });
 
@@ -454,25 +633,76 @@ export function makeExampleSchema(
     uniques: [["id"]],
     relations: {
       item: itemRelation,
+      commentable: commentableRelation,
     },
   });
+
+  // TODO: interfaces_and_unions.union_items/_topics/etc
+  //
+  // TODO: interfaces_and_unions.union__entity
+
+  function attrField<TDataSource extends PgSource<any, any, any, any>>(
+    attrName: keyof TDataSource["columns"],
+    type: GraphQLOutputType,
+  ) {
+    return {
+      type,
+      plan($entity: PgSelectSinglePlan<TDataSource>) {
+        return $entity.get(attrName);
+      },
+    };
+  }
+
+  function mapValues<
+    TKey extends string,
+    TValue extends any,
+    TNewValue extends any,
+  >(
+    obj: { [key in TKey]: TValue },
+    mapper: (val: TValue, key: TKey) => TNewValue,
+  ): { [key in TKey]: TNewValue } {
+    let o: { [key in TKey]?: TNewValue } = {};
+    const keys = Object.keys(obj) as TKey[];
+    for (const key of keys) {
+      o[key] = mapper(obj[key], key);
+    }
+    return o as { [key in TKey]: TNewValue };
+  }
+
+  function singleRelationField<
+    TMyDataSource extends PgSource<any, any, any, any>,
+    TTheirDataSource extends PgSource<any, any, any, any>,
+    TMatch extends {
+      [key in keyof TTheirDataSource["columns"]]: keyof TMyDataSource["columns"];
+    },
+  >(
+    source: TTheirDataSource,
+    match: TMatch,
+    type: GraphQLOutputType,
+    { isInterface = false }: { isInterface?: boolean } = {},
+  ) {
+    return {
+      type,
+      plan($entity: PgSelectSinglePlan<TMyDataSource>) {
+        const matchObject = mapValues(match, (attrName) =>
+          $entity.get(attrName),
+        );
+        const $plan = source.get(matchObject);
+        if (isInterface) {
+          return new SingleTableInterfacePlan($plan);
+        } else {
+          return $plan;
+        }
+      },
+    };
+  }
 
   const User = new GraphQLObjectType(
     objectSpec<GraphileResolverContext, UserPlan>({
       name: "User",
       fields: () => ({
-        username: {
-          type: GraphQLString,
-          plan($user) {
-            return $user.get("username");
-          },
-        },
-        gravatarUrl: {
-          type: GraphQLString,
-          plan($user) {
-            return $user.get("gravatar_url");
-          },
-        },
+        username: attrField("username", GraphQLString),
+        gravatarUrl: attrField("gravatar_url", GraphQLString),
         mostRecentForum: {
           type: Forum,
           plan($user) {
@@ -534,18 +764,8 @@ export function makeExampleSchema(
     objectSpec<GraphileResolverContext, MessagePlan>({
       name: "Message",
       fields: {
-        featured: {
-          type: GraphQLBoolean,
-          plan($message) {
-            return $message.get("featured");
-          },
-        },
-        body: {
-          type: GraphQLString,
-          plan($message) {
-            return $message.get("body");
-          },
-        },
+        featured: attrField("featured", GraphQLBoolean),
+        body: attrField("body", GraphQLString),
         author: {
           type: User,
           plan($message) {
@@ -555,12 +775,7 @@ export function makeExampleSchema(
             return $user;
           },
         },
-        isArchived: {
-          type: GraphQLBoolean,
-          plan($message) {
-            return $message.get("is_archived");
-          },
-        },
+        isArchived: attrField("is_archived", GraphQLBoolean),
       },
     }),
   );
@@ -941,26 +1156,11 @@ export function makeExampleSchema(
       objectSpec<GraphileResolverContext, ForumPlan>({
         name: "Forum",
         fields: () => ({
-          id: {
-            type: GraphQLString,
-            plan($forum) {
-              return $forum.get("id");
-            },
-          },
-          name: {
-            type: GraphQLString,
-            plan($forum) {
-              return $forum.get("name");
-            },
-          },
+          id: attrField("id", GraphQLBoolean),
+          name: attrField("name", GraphQLBoolean),
 
           // Expression column
-          isArchived: {
-            type: GraphQLBoolean,
-            plan($forum) {
-              return $forum.get("is_archived");
-            },
-          },
+          isArchived: attrField("is_archived", GraphQLBoolean),
 
           // Custom expression; actual column select shouldn't make it through to the generated query.
           archivedAtIsNotNull: {
@@ -1140,6 +1340,104 @@ export function makeExampleSchema(
         }),
       }),
     );
+
+  class SingleTableInterfacePlan<
+      TDataSource extends PgSource<any, any, any, any, any>,
+    >
+    extends ExecutablePlan<any>
+    implements PolymorphicPlan
+  {
+    private rowPlanId: number;
+
+    constructor($rowPlan: PgSelectSinglePlan<TDataSource>) {
+      super();
+      this.rowPlanId = this.addDependency($rowPlan);
+    }
+
+    private rowPlan() {
+      return this.aether.plans[this.dependencies[this.rowPlanId]];
+    }
+
+    planForType(_type: GraphQLObjectType) {
+      return this.rowPlan();
+    }
+
+    async execute(
+      values: CrystalValuesList<any[]>,
+    ): Promise<CrystalResultsList<ReadonlyArray<TDataSource["TRow"]>>> {
+      return values.map((v) => v[this.rowPlanId]);
+    }
+  }
+
+  const Person: GraphQLObjectType<any, GraphileResolverContext> =
+    new GraphQLObjectType(
+      objectSpec<GraphileResolverContext, PersonPlan>({
+        name: "Person",
+        fields: () => ({
+          personId: attrField("person_id", GraphQLInt),
+          username: attrField("username", GraphQLString),
+          singleTableItemsList: {
+            type: new GraphQLList(SingleTableItem),
+            plan($person) {
+              const $personId = $person.get("person_id");
+              const $items: SingleTableItemsPlan = singleTableItemsSource.find({
+                author_id: $personId,
+              });
+              deoptimizeIfAppropriate($items);
+              return each(
+                $items,
+                ($item) => new SingleTableInterfacePlan($item),
+              );
+            },
+          },
+        }),
+      }),
+    );
+
+  const SingleTableItem: GraphQLInterfaceType = new GraphQLInterfaceType({
+    name: "SingleTableItem",
+    fields: () => ({
+      parent: { type: SingleTableItem },
+      author: { type: Person },
+      position: { type: GraphQLString },
+      createdAt: { type: GraphQLString },
+      updatedAt: { type: GraphQLString },
+      isExplicitlyArchived: { type: GraphQLBoolean },
+      archivedAt: { type: GraphQLString },
+    }),
+  });
+
+  const commonSingleTableItemFields = {
+    parent: singleRelationField(
+      singleTableItemsSource,
+      { id: "parent_id" },
+      SingleTableItem,
+      { isInterface: true },
+    ),
+    author: singleRelationField(
+      personSource,
+      { person_id: "author_id" },
+      Person,
+    ),
+    position: attrField("position", GraphQLString),
+    createdAt: attrField("created_at", GraphQLString),
+    updatedAt: attrField("updated_at", GraphQLString),
+    isExplicitlyArchived: attrField("is_explicitly_archived", GraphQLBoolean),
+    archivedAt: attrField("archived_at", GraphQLString),
+  };
+
+  const SingleTablePost = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, SingleTableItemPlan>({
+      name: "SingleTablePost",
+      interfaces: [SingleTableItem],
+      fields: () => ({
+        ...commonSingleTableItemFields,
+        title: attrField("title", GraphQLString),
+        description: attrField("description", GraphQLString),
+        note: attrField("note", GraphQLString),
+      }),
+    }),
+  );
 
   const Query = new GraphQLObjectType(
     objectSpec<GraphileResolverContext, __ValuePlan<BaseGraphQLRootValue>>({
@@ -1356,6 +1654,14 @@ export function makeExampleSchema(
             return $messages;
           },
         },
+        people: {
+          type: new GraphQLList(Person),
+          plan() {
+            const $people = personSource.find();
+            deoptimizeIfAppropriate($people);
+            return $people;
+          },
+        },
       },
     }),
   );
@@ -1363,6 +1669,11 @@ export function makeExampleSchema(
   return crystalEnforce(
     new GraphQLSchema({
       query: Query,
+      types: [
+        // Don't forget to add all types that implement interfaces here
+        // otherwise they _might_ not show up in the schema.
+        SingleTablePost,
+      ],
     }),
   );
 }

@@ -33,6 +33,7 @@ export {
   isExecutablePlan,
   isModifierPlan,
   ModifierPlan,
+  PolymorphicPlan,
 } from "./plan";
 export {
   __ListItemPlan,
@@ -72,3 +73,6 @@ export {
   objectFieldSpec,
   objectSpec,
 } from "./utils";
+
+// Handy for debugging
+export { getCurrentParentPathIdentity } from "./global";

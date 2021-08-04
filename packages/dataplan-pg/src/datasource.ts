@@ -4,7 +4,7 @@ import type {
   ExecutablePlan,
   ObjectPlan,
 } from "graphile-crystal";
-import { __ValuePlan } from "graphile-crystal";
+import { __ValuePlan, getCurrentParentPathIdentity } from "graphile-crystal";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
@@ -74,10 +74,14 @@ type PlanByUniques<
 
 export interface PgSourceRelation<
   TSource extends PgSource<any, any, any, any, any>,
+  TLocalColumns extends PgSourceColumns,
 > {
   source: TSource;
-  localColumns: string[];
-  remoteColumns: string[];
+  localColumns: readonly (keyof TLocalColumns)[];
+
+  // TODO: why is remoteColumns validation boiling down to `string[]` and not catching errors?
+  // NOTE: added `& string` so the type wasn't `(string | number | symbol)[]`.
+  remoteColumns: readonly (keyof TSource["columns"] & string)[];
   isUnique: boolean;
 }
 
@@ -85,7 +89,7 @@ export interface PgSourceOptions<
   TCodec extends PgTypeCodec<any, any>,
   TColumns extends PgSourceColumns,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
-  TRelations extends { [identifier: string]: PgSourceRelation<any> },
+  TRelations extends { [identifier: string]: PgSourceRelation<any, TColumns> },
   TParameters extends { [key: string]: any } | never = never,
 > {
   codec: TCodec;
@@ -105,7 +109,7 @@ export class PgSource<
   TCodec extends PgTypeCodec<any, any>,
   TColumns extends PgSourceColumns,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
-  TRelations extends { [identifier: string]: PgSourceRelation<any> },
+  TRelations extends { [identifier: string]: PgSourceRelation<any, TColumns> },
   TParameters extends { [key: string]: any } | never = never,
 > {
   /**
@@ -175,10 +179,13 @@ export class PgSource<
   ): PgSelectSinglePlan<this> {
     const keys: ReadonlyArray<keyof TColumns> = Object.keys(spec);
     if (!this.uniques.some((uniq) => uniq.every((key) => keys.includes(key)))) {
+      debugger;
       throw new Error(
         `Attempted to call ${this}.get({${keys.join(
           ", ",
-        )}}) but that combination of columns is not unique. Did you mean to call .find() instead?`,
+        )}}) at '${getCurrentParentPathIdentity()}' but that combination of columns is not unique (uniques: ${JSON.stringify(
+          this.uniques,
+        )}). Did you mean to call .find() instead?`,
       );
     }
     return this.find(spec).single();

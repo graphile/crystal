@@ -1,0 +1,25 @@
+{
+  people {
+    __typename
+    singleTableItemsList {
+      __typename
+      parent {
+        __typename
+        ...Item
+      }
+      ...Item
+    }
+  }
+}
+
+fragment Item on SingleTableItem {
+  author {
+    __typename
+    username
+  }
+  position
+  createdAt
+  updatedAt
+  isExplicitlyArchived
+  archivedAt
+}
