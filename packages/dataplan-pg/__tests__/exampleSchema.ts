@@ -1151,8 +1151,8 @@ export function makeExampleSchema(
       objectSpec<GraphileResolverContext, ForumPlan>({
         name: "Forum",
         fields: () => ({
-          id: attrField("id", GraphQLBoolean),
-          name: attrField("name", GraphQLBoolean),
+          id: attrField("id", GraphQLString),
+          name: attrField("name", GraphQLString),
 
           // Expression column
           isArchived: attrField("is_archived", GraphQLBoolean),
