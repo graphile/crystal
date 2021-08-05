@@ -1151,19 +1151,30 @@ export class Aether<
 
   public newBatch(pathIdentity: string, crystalContext: CrystalContext): Batch {
     const planId = this.planIdByPathIdentity[pathIdentity];
+    const itemPlanId = this.itemPlanIdByPathIdentity[pathIdentity];
     assert.ok(
       planId != null,
       `Could not find the planId for path identity '${pathIdentity}'`,
     );
+    assert.ok(
+      itemPlanId != null,
+      `Could not find the itemPlanId for path identity '${pathIdentity}'`,
+    );
     const plan = this.plans[planId];
+    const itemPlan = this.plans[itemPlanId];
     assert.ok(
       plan,
       `Could not find the plan with id '${planId}' at '${pathIdentity}'`,
+    );
+    assert.ok(
+      itemPlan,
+      `Could not find the itemPlan with id '${itemPlanId}' at '${pathIdentity}'`,
     );
     const batch: Batch = {
       pathIdentity,
       crystalContext,
       plan,
+      itemPlan,
       entries: [],
     };
     return batch;
@@ -1270,7 +1281,8 @@ export class Aether<
   ): Promise<void> {
     // This guarantees nothing else will be added to the batch
     delete this.batchByPathIdentity[batch.pathIdentity];
-    const { entries, plan } = batch;
+
+    const { entries, plan, itemPlan } = batch;
     const l = entries.length;
     const crystalObjects: CrystalObject<any>[] = new Array(l);
     const deferredResults: Deferred<any>[] = new Array(l);

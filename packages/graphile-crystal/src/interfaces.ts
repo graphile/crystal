@@ -77,6 +77,7 @@ export interface Batch {
   pathIdentity: string;
   crystalContext: CrystalContext;
   plan: ExecutablePlan;
+  itemPlan: ExecutablePlan;
   entries: Array<[CrystalObject<any>, Deferred<any>]>;
 }
 

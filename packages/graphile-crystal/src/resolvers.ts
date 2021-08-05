@@ -2,13 +2,15 @@ import chalk from "chalk";
 // import { getAliasFromResolveInfo } from "graphql-parse-resolve-info";
 import debugFactory from "debug";
 import type { GraphQLFieldResolver, GraphQLOutputType } from "graphql";
-import { assertObjectType, isInterfaceType, isUnionType } from "graphql";
 import {
+  assertObjectType,
   defaultFieldResolver,
   getNamedType,
+  isInterfaceType,
   isLeafType,
   isListType,
   isNonNullType,
+  isUnionType,
 } from "graphql";
 import type { Path } from "graphql/jsutils/Path";
 import { inspect } from "util";
@@ -21,8 +23,9 @@ import { defer } from "./deferred";
 import { isDev } from "./dev";
 import { establishAether } from "./establishAether";
 import type { Batch, CrystalContext, CrystalObject } from "./interfaces";
-import { $$concreteData, $$concreteType } from "./interfaces";
 import {
+  $$concreteData,
+  $$concreteType,
   $$crystalContext,
   $$crystalObjectByPathIdentity,
   $$data,
