@@ -1741,3 +1741,30 @@ class __TypePlan extends ExecutablePlan<any> {
     return values.map((v) => ({ type: this.typeName, data: v[this.planId] }));
   }
 }
+
+/**
+ * Finds a (the?) path from ancestorPlan to descendentPlan. Semi-expensive; try
+ * and only use this at planning time, not execution time. Useful for tracking
+ * down all the __ListItemPlans.
+ */
+function findPath(
+  aether: Aether,
+  ancestorPlan: ExecutablePlan<any>,
+  descendentPlan: ExecutablePlan<any>,
+): Array<ExecutablePlan<any>> | null {
+  if (ancestorPlan === descendentPlan) {
+    return [];
+  }
+  for (let i = 0, l = descendentPlan.dependencies.length; i < l; i++) {
+    const depPlan = aether.plans[descendentPlan.dependencies[i]];
+    // Optimisation
+    if (depPlan === ancestorPlan) {
+      return [depPlan];
+    }
+    const p = findPath(aether, ancestorPlan, depPlan);
+    if (p) {
+      return [...p, depPlan];
+    }
+  }
+  return null;
+}
