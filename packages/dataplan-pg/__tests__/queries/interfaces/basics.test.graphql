@@ -3,23 +3,11 @@
     __typename
     singleTableItemsList {
       __typename
-      parent {
-        __typename
-        ...Item
-      }
-      ...Item
+      position
+      createdAt
+      updatedAt
+      isExplicitlyArchived
+      archivedAt
     }
   }
-}
-
-fragment Item on SingleTableItem {
-  author {
-    __typename
-    username
-  }
-  position
-  createdAt
-  updatedAt
-  isExplicitlyArchived
-  archivedAt
 }
