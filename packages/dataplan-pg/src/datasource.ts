@@ -179,7 +179,6 @@ export class PgSource<
   ): PgSelectSinglePlan<this> {
     const keys: ReadonlyArray<keyof TColumns> = Object.keys(spec);
     if (!this.uniques.some((uniq) => uniq.every((key) => keys.includes(key)))) {
-      debugger;
       throw new Error(
         `Attempted to call ${this}.get({${keys.join(
           ", ",

@@ -2,6 +2,7 @@ import chalk from "chalk";
 // import { getAliasFromResolveInfo } from "graphql-parse-resolve-info";
 import debugFactory from "debug";
 import type { GraphQLFieldResolver, GraphQLOutputType } from "graphql";
+import { assertObjectType, isInterfaceType, isUnionType } from "graphql";
 import {
   defaultFieldResolver,
   getNamedType,
@@ -20,6 +21,7 @@ import { defer } from "./deferred";
 import { isDev } from "./dev";
 import { establishAether } from "./establishAether";
 import type { Batch, CrystalContext, CrystalObject } from "./interfaces";
+import { $$concreteData, $$concreteType } from "./interfaces";
 import {
   $$crystalContext,
   $$crystalObjectByPathIdentity,
@@ -31,6 +33,7 @@ import {
 } from "./interfaces";
 import type { ExecutablePlan } from "./plan";
 import { __ValuePlan } from "./plans";
+import { assertPolymorphicData } from "./polymorphic";
 import type { UniqueId } from "./utils";
 import {
   crystalPrint,
@@ -104,7 +107,7 @@ export function crystalWrapResolve<
       const {
         schema,
         // fieldName,
-        // parentType,
+        parentType,
         returnType,
         operation,
         fragments,
@@ -201,6 +204,7 @@ export function crystalWrapResolve<
         parentCrystalObject = newCrystalObject(
           parentPlan,
           parentPathIdentity,
+          parentType.name,
           parentId,
           indexes,
           parentObject,
@@ -335,13 +339,25 @@ function crystalWrap<TData>(
     }
     return result;
   }
+  let typeName: string;
+  let innerData: any;
+  if (isUnionType(returnType) || isInterfaceType(returnType)) {
+    assertPolymorphicData(data);
+    ({ [$$concreteType]: typeName, [$$concreteData]: innerData } = data);
+  } else {
+    // TODO: is it okay that scalars would throw here?
+    assertObjectType(returnType);
+    typeName = returnType.name;
+    innerData = data;
+  }
   if (parentCrystalObject) {
     return newCrystalObject(
       plan,
       pathIdentity,
+      typeName,
       id,
       indexes,
-      data,
+      innerData,
       crystalContext,
       parentCrystalObject[$$crystalObjectByPathIdentity],
       parentCrystalObject[$$indexesByPathIdentity],
@@ -350,9 +366,10 @@ function crystalWrap<TData>(
     return newCrystalObject(
       plan,
       pathIdentity,
+      typeName,
       id,
       indexes,
-      data,
+      innerData,
       crystalContext,
     );
   }
@@ -364,6 +381,7 @@ function crystalWrap<TData>(
 export function newCrystalObject<TData>(
   plan: ExecutablePlan | null, // TODO: delete this line
   pathIdentity: string,
+  typeName: string,
   id: UniqueId,
   indexes: ReadonlyArray<number>,
   data: TData,
@@ -381,6 +399,7 @@ export function newCrystalObject<TData>(
 ): CrystalObject<TData> {
   const crystalObject: CrystalObject<TData> = {
     [$$pathIdentity]: pathIdentity,
+    [$$concreteType]: typeName,
     [$$id]: id,
     [$$data]: data,
     [$$indexes]: indexes, // Shortcut to $$indexesByPathIdentity[$$pathIdentity]

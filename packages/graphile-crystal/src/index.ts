@@ -26,6 +26,7 @@ export {
   ExecutablePlanResolver,
   GraphileCrystalFieldConfig,
   InputObjectFieldPlanResolver,
+  PolymorphicData,
 } from "./interfaces";
 export {
   BasePlan,
@@ -49,6 +50,8 @@ export {
   EachPlan,
   first,
   FirstPlan,
+  lambda,
+  LambdaPlan,
   list,
   ListCapablePlan,
   ListPlan,
@@ -61,6 +64,7 @@ export {
   reverseArray,
   ReversePlan,
 } from "./plans";
+export { polymorphicWrap, resolveType } from "./polymorphic";
 export {
   $$crystalWrapped,
   crystalWrapResolve,

@@ -7,18 +7,22 @@ import type {
   CrystalResultsList,
   CrystalValuesList,
   InputStaticLeafPlan,
+  PolymorphicData,
   PolymorphicPlan,
 } from "graphile-crystal";
-import { each } from "graphile-crystal";
 import {
   BasePlan,
   context,
   crystalEnforce,
+  each,
   ExecutablePlan,
   inputObjectSpec,
+  lambda,
   ModifierPlan,
   object,
   objectSpec,
+  polymorphicWrap,
+  resolveType,
 } from "graphile-crystal";
 import type { GraphQLOutputType } from "graphql";
 import {
@@ -675,12 +679,7 @@ export function makeExampleSchema(
     TMatch extends {
       [key in keyof TTheirDataSource["columns"]]: keyof TMyDataSource["columns"];
     },
-  >(
-    source: TTheirDataSource,
-    match: TMatch,
-    type: GraphQLOutputType,
-    { isInterface = false }: { isInterface?: boolean } = {},
-  ) {
+  >(source: TTheirDataSource, match: TMatch, type: GraphQLOutputType) {
     return {
       type,
       plan($entity: PgSelectSinglePlan<TMyDataSource>) {
@@ -688,11 +687,7 @@ export function makeExampleSchema(
           $entity.get(attrName),
         );
         const $plan = source.get(matchObject);
-        if (isInterface) {
-          return new SingleTableInterfacePlan($plan);
-        } else {
-          return $plan;
-        }
+        return $plan;
       },
     };
   }
@@ -1347,10 +1342,15 @@ export function makeExampleSchema(
     extends ExecutablePlan<any>
     implements PolymorphicPlan
   {
+    private typePlanId: number;
     private rowPlanId: number;
 
-    constructor($rowPlan: PgSelectSinglePlan<TDataSource>) {
+    constructor(
+      $typePlan: ExecutablePlan<string>,
+      $rowPlan: PgSelectSinglePlan<TDataSource>,
+    ) {
       super();
+      this.typePlanId = this.addDependency($typePlan);
       this.rowPlanId = this.addDependency($rowPlan);
     }
 
@@ -1359,15 +1359,39 @@ export function makeExampleSchema(
     }
 
     planForType(_type: GraphQLObjectType) {
+      // TODO: need to include the `_type` information so we know what type it
+      // is. Can we wrap it?
       return this.rowPlan();
     }
 
     async execute(
       values: CrystalValuesList<any[]>,
-    ): Promise<CrystalResultsList<ReadonlyArray<TDataSource["TRow"]>>> {
-      return values.map((v) => v[this.rowPlanId]);
+    ): Promise<
+      CrystalResultsList<
+        PolymorphicData<string, ReadonlyArray<TDataSource["TRow"]>>
+      >
+    > {
+      return values.map((v) =>
+        polymorphicWrap(v[this.typePlanId], v[this.rowPlanId]),
+      );
     }
   }
+
+  const singleTableTypeName = ($entity: SingleTableItemPlan) => {
+    const $type = $entity.get("type");
+    const $typeName = lambda(
+      $type,
+      (v) =>
+        ({
+          TOPIC: "SingleTableTopic",
+          POST: "SingleTablePost",
+          DIVIDER: "SingleTableDivider",
+          CHECKLIST: "SingleTableChecklist",
+          CHECKLIST_ITEM: "SingleTableChecklistItem",
+        }[v]),
+    );
+    return $typeName;
+  };
 
   const Person: GraphQLObjectType<any, GraphileResolverContext> =
     new GraphQLObjectType(
@@ -1384,10 +1408,12 @@ export function makeExampleSchema(
                 author_id: $personId,
               });
               deoptimizeIfAppropriate($items);
-              return each(
-                $items,
-                ($item) => new SingleTableInterfacePlan($item),
-              );
+              return each($items, ($item) => {
+                return new SingleTableInterfacePlan(
+                  singleTableTypeName($item),
+                  $item,
+                );
+              });
             },
           },
         }),
@@ -1405,15 +1431,22 @@ export function makeExampleSchema(
       isExplicitlyArchived: { type: GraphQLBoolean },
       archivedAt: { type: GraphQLString },
     }),
+    resolveType,
   });
 
   const commonSingleTableItemFields = {
-    parent: singleRelationField(
-      singleTableItemsSource,
-      { id: "parent_id" },
-      SingleTableItem,
-      { isInterface: true },
-    ),
+    parent: {
+      type: SingleTableItem,
+      plan($entity: SingleTableItemPlan) {
+        const $plan = singleTableItemsSource.get({
+          id: $entity.get("parent_id"),
+        });
+        return new SingleTableInterfacePlan(
+          singleTableTypeName($entity),
+          $plan,
+        );
+      },
+    },
     author: singleRelationField(
       personSource,
       { person_id: "author_id" },
@@ -1426,6 +1459,17 @@ export function makeExampleSchema(
     archivedAt: attrField("archived_at", GraphQLString),
   };
 
+  const SingleTableTopic = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, SingleTableItemPlan>({
+      name: "SingleTableTopic",
+      interfaces: [SingleTableItem],
+      fields: () => ({
+        ...commonSingleTableItemFields,
+        title: attrField("title", GraphQLString),
+      }),
+    }),
+  );
+
   const SingleTablePost = new GraphQLObjectType(
     objectSpec<GraphileResolverContext, SingleTableItemPlan>({
       name: "SingleTablePost",
@@ -1433,6 +1477,41 @@ export function makeExampleSchema(
       fields: () => ({
         ...commonSingleTableItemFields,
         title: attrField("title", GraphQLString),
+        description: attrField("description", GraphQLString),
+        note: attrField("note", GraphQLString),
+      }),
+    }),
+  );
+
+  const SingleTableDivider = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, SingleTableItemPlan>({
+      name: "SingleTableDivider",
+      interfaces: [SingleTableItem],
+      fields: () => ({
+        ...commonSingleTableItemFields,
+        title: attrField("title", GraphQLString),
+        color: attrField("color", GraphQLString),
+      }),
+    }),
+  );
+
+  const SingleTableChecklist = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, SingleTableItemPlan>({
+      name: "SingleTableChecklist",
+      interfaces: [SingleTableItem],
+      fields: () => ({
+        ...commonSingleTableItemFields,
+        title: attrField("title", GraphQLString),
+      }),
+    }),
+  );
+
+  const SingleTableChecklistItem = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, SingleTableItemPlan>({
+      name: "SingleTableChecklistItem",
+      interfaces: [SingleTableItem],
+      fields: () => ({
+        ...commonSingleTableItemFields,
         description: attrField("description", GraphQLString),
         note: attrField("note", GraphQLString),
       }),
@@ -1672,7 +1751,11 @@ export function makeExampleSchema(
       types: [
         // Don't forget to add all types that implement interfaces here
         // otherwise they _might_ not show up in the schema.
+        SingleTableTopic,
         SingleTablePost,
+        SingleTableDivider,
+        SingleTableChecklist,
+        SingleTableChecklistItem,
       ],
     }),
   );

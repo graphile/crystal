@@ -50,10 +50,18 @@ export const $$crystalObjectByPathIdentity = Symbol(
   "crystalObjectByPathIdentity",
 );
 export const $$indexesByPathIdentity = Symbol("indexesByPathIdentity");
+export const $$concreteType = Symbol("concreteType");
+export const $$concreteData = Symbol("concreteData");
+
+export interface PolymorphicData<TType extends string = string, TData = any> {
+  [$$concreteType]: TType;
+  [$$concreteData]: TData;
+}
 
 export interface CrystalObject<TData> {
   [$$id]: UniqueId;
   [$$pathIdentity]: string;
+  [$$concreteType]: string;
   [$$indexes]: ReadonlyArray<number>;
   [$$crystalContext]: CrystalContext;
   [$$crystalObjectByPathIdentity]: {

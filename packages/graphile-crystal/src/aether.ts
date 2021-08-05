@@ -173,6 +173,7 @@ export class Aether<
   public readonly rootValuePlan: __ValuePlan<TRootValue>;
   public readonly trackedRootValuePlan: __TrackedObjectPlan<TRootValue>;
   public readonly operationType: "query" | "mutation" | "subscription";
+  public readonly queryTypeName: string;
 
   constructor(
     public readonly schema: GraphQLSchema,
@@ -187,6 +188,13 @@ export class Aether<
     public readonly context: TContext,
     public readonly rootValue: TRootValue,
   ) {
+    const queryType = this.schema.getQueryType();
+    if (!queryType) {
+      throw new Error(
+        "This GraphQL schema does not support queries, it cannot be used.",
+      );
+    }
+    this.queryTypeName = queryType.name;
     globalState.aether = this;
     globalState.parentPathIdentity = GLOBAL_PATH;
     this.variableValuesPlan = new __ValuePlan();
@@ -1183,6 +1191,7 @@ export class Aether<
     const rootCrystalObject = newCrystalObject(
       null,
       GLOBAL_PATH, // TODO: this should be ROOT_PATH I think?
+      this.queryTypeName,
       rootId,
       EMPTY_INDEXES,
       rootValue,
@@ -1705,4 +1714,18 @@ export function populateValuePlan(
 
 function isNotNullish<T>(a: T | null | undefined): a is T {
   return a != null;
+}
+
+class __TypePlan extends ExecutablePlan<any> {
+  private planId: number;
+  private typeName: string;
+  constructor(type: GraphQLObjectType, plan: ExecutablePlan<any>) {
+    super();
+    this.planId = this.addDependency(plan);
+    this.typeName = type.name;
+  }
+
+  execute(values: any[][]): any[] {
+    return values.map((v) => ({ type: this.typeName, data: v[this.planId] }));
+  }
 }
