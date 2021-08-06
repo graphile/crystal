@@ -18,6 +18,19 @@ export class __ListItemPlan<
     return chalk.bold.yellow(String(this.dependencies[0]));
   }
 
+  /**
+   * Don't mess with this, it's internal.
+   *
+   * @internal
+   */
+  protected _getListItemPlanIds(): ReadonlyArray<number> {
+    const ids = super._getListItemPlanIds();
+    if (!ids.includes(this.id)) {
+      return [...ids, this.id].sort((a, z) => a - z);
+    }
+    return ids;
+  }
+
   execute(): never {
     throw new Error("__ListItemPlan must never execute");
   }

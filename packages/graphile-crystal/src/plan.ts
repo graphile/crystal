@@ -3,7 +3,6 @@ import type { GraphQLObjectType } from "graphql";
 import { inspect } from "util";
 
 import type { Aether } from "./aether";
-import * as assert from "./assert";
 import { GLOBAL_PATH } from "./constants";
 import { isDev, noop } from "./dev";
 import {
@@ -122,6 +121,14 @@ export abstract class ExecutablePlan<TData = any> extends BasePlan {
   private readonly _dependencies: number[] = [];
 
   /**
+   * The planIds for all of the (recursive) dependencies that are
+   * `__ListItemPlan`. Don't rely on this, it's internal.
+   *
+   * @internal
+   */
+  public _listItemPlanIds: ReadonlyArray<number> = [];
+
+  /**
    * The ids for plans this plan will need data from in order to execute.
    */
   public readonly dependencies: ReadonlyArray<number> = this._dependencies;
@@ -205,6 +212,38 @@ export abstract class ExecutablePlan<TData = any> extends BasePlan {
    */
   public optimize(): ExecutablePlan {
     return this;
+  }
+
+  public finalize(): void {
+    if (!this.isFinalized) {
+      this._listItemPlanIds = this._getListItemPlanIds();
+    }
+    super.finalize();
+  }
+
+  /**
+   * Don't mess with this, it's internal.
+   *
+   * @internal
+   */
+  protected _getListItemPlanIds(): ReadonlyArray<number> {
+    if (this.isFinalized) {
+      return this._listItemPlanIds;
+    }
+    const itemPlanIds: number[] = [];
+
+    for (const dependencyId of this.dependencies) {
+      const dependency = this.aether.plans[dependencyId];
+      const dependencyItemPlanIds = dependency._getListItemPlanIds();
+      for (const id of dependencyItemPlanIds) {
+        if (!itemPlanIds.includes(id)) {
+          itemPlanIds.push(id);
+        }
+      }
+    }
+    itemPlanIds.sort((a, z) => a - z);
+
+    return itemPlanIds;
   }
 
   /**

@@ -274,7 +274,7 @@ export function crystalWrapResolve<
           populateValuePlan(
             crystalContext,
             parentPlan,
-            indexes,
+            parentCrystalObject[$$indexByListItemPlanId],
             parentObject,
             "parent",
           );

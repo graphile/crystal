@@ -50,6 +50,7 @@ import type {
   CrystalContext,
   CrystalLayerObject,
   CrystalObject,
+  IndexByListItemPlanId,
   TrackedArguments,
 } from "./interfaces";
 import {
@@ -1299,10 +1300,10 @@ export class Aether<
 
     const { entries, plan, itemPlan, returnType } = batch;
     const namedReturnType = getNamedType(returnType);
-    const l = entries.length;
-    const crystalObjects: CrystalObject<any>[] = new Array(l);
-    const deferredResults: Deferred<any>[] = new Array(l);
-    for (let i = 0; i < l; i++) {
+    const entriesLength = entries.length;
+    const crystalObjects: CrystalObject<any>[] = new Array(entriesLength);
+    const deferredResults: Deferred<any>[] = new Array(entriesLength);
+    for (let i = 0; i < entriesLength; i++) {
       const [crystalObject, deferredResult] = entries[i];
       crystalObjects[i] = crystalObject;
       deferredResults[i] = deferredResult;
@@ -1370,6 +1371,7 @@ export class Aether<
         // CrystalObjects, otherwise we're expecting arrays which we will then
         // process through another layer of executeLayers.
         const [layerPlan, ...rest] = layers;
+        const valuesLength = values.length;
 
         debugExecuteVerbose(
           "Batch executing plan %c with %c",
@@ -1390,7 +1392,7 @@ export class Aether<
           );
           assert.strictEqual(
             layerResults.length,
-            l,
+            valuesLength,
             "Expected plan execution result to have same length as input objects",
           );
         }
@@ -1496,11 +1498,11 @@ export class Aether<
         })),
       );
 
-      for (let i = 0; i < l; i++) {
+      for (let i = 0; i < entriesLength; i++) {
         deferredResults[i].resolve(results[i]);
       }
     } catch (e) {
-      for (let i = 0; i < l; i++) {
+      for (let i = 0; i < entriesLength; i++) {
         deferredResults[i].reject(e);
       }
     }
@@ -1557,6 +1559,7 @@ export class Aether<
       });
     }
     let resultByIndexes = crystalContext.resultByIndexesByPlanId.get(plan.id);
+    const listItemPlanIds = plan._listItemPlanIds;
     if (!resultByIndexes) {
       resultByIndexes = new Map();
       crystalContext.resultByIndexesByPlanId.set(plan.id, resultByIndexes);
@@ -1573,7 +1576,10 @@ export class Aether<
     );
     for (let i = 0; i < crystalObjectCount; i++) {
       const crystalLayerObject = crystalLayerObjects[i];
-      const { indexes } = crystalLayerObject;
+      const { indexByListItemPlanId } = crystalLayerObject;
+      const indexes = listItemPlanIds.map(
+        (planId) => indexByListItemPlanId[planId],
+      );
       const indexesString = indexes.join();
       debugExecuteVerbose(
         "%s Looking for result for %c (for %c)",
@@ -1741,7 +1747,10 @@ export class Aether<
         const j = pendingCrystalLayerObjectsIndexes[i];
 
         result[j] = pendingResult;
-        const { indexes } = crystalLayerObject;
+        const { indexByListItemPlanId } = crystalLayerObject;
+        const indexes = listItemPlanIds.map(
+          (planId) => indexByListItemPlanId[planId],
+        );
         const indexesString = indexes.join();
         resultByIndexes.set(indexesString, result[j]);
       }
@@ -1888,8 +1897,8 @@ export class Aether<
 export function populateValuePlan(
   crystalContext: CrystalContext,
   valuePlan: ExecutablePlan,
-  indexes: readonly number[],
-  object: any,
+  indexByListItemPlanId: IndexByListItemPlanId,
+  object: unknown,
   label: string,
 ): void {
   let resultByIndexes = crystalContext.resultByIndexesByPlanId.get(
@@ -1899,6 +1908,10 @@ export function populateValuePlan(
     resultByIndexes = new Map();
     crystalContext.resultByIndexesByPlanId.set(valuePlan.id, resultByIndexes);
   }
+  const listItemPlanIds = valuePlan._listItemPlanIds;
+  const indexes = listItemPlanIds.map(
+    (planId) => indexByListItemPlanId[planId],
+  );
   const indexesString = indexes.join();
   resultByIndexes.set(indexesString, object ?? ROOT_VALUE_OBJECT);
   debugExecute("Populated value plan for %s: %c", label, resultByIndexes);

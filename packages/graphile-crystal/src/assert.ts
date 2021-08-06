@@ -17,6 +17,6 @@ export function strictEqual<T>(
   message: string,
 ): asserts actual is T {
   if (actual !== expected) {
-    throw new Error(message);
+    throw new Error(message + ` (${actual} !== ${expected})`);
   }
 }
