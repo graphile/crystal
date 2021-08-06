@@ -170,17 +170,23 @@ export function graphqlCollectFields(
         break;
       }
       case "InlineFragment": {
-        const fragmentType = selection.typeCondition;
-        if (
-          fragmentType != null &&
-          (!(
-            isObjectType(fragmentType) ||
-            isInterfaceType(fragmentType) ||
-            isUnionType(fragmentType)
-          ) ||
-            !graphqlDoesFragmentTypeApply(objectType, fragmentType))
-        ) {
-          continue;
+        const fragmentTypeAst = selection.typeCondition;
+        if (fragmentTypeAst != null) {
+          const fragmentTypeName = fragmentTypeAst.name.value;
+          const fragmentType = aether.schema.getType(fragmentTypeName);
+          if (fragmentType == null) {
+            throw new Error(`We don't have a type named '${fragmentTypeName}'`);
+          }
+          if (
+            !(
+              isObjectType(fragmentType) ||
+              isInterfaceType(fragmentType) ||
+              isUnionType(fragmentType)
+            ) ||
+            !graphqlDoesFragmentTypeApply(objectType, fragmentType)
+          ) {
+            continue;
+          }
         }
         const fragmentSelectionSet = selection.selectionSet;
         graphqlCollectFields(
