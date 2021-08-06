@@ -72,28 +72,20 @@ function pathToPathIdentityRecursive(path: Path): string {
 */
 
 function pathToPathIdentity(initialPath: Path): string {
-  const parts: string[] = [];
+  /**
+   * We're building the pathIdentity from the end backwards, so this represents
+   * the tail.
+   */
+  let tailPathIdentity = "";
   let path: Path | undefined = initialPath;
   while (path) {
-    if (!path.typename) {
-      // Skip over list keys.
-      path = path.prev;
-    } else {
-      parts.push(`>${path.typename}.${path.key}`);
-      path = path.prev;
+    // Skip over list keys.
+    if (path.typename) {
+      tailPathIdentity = `>${path.typename}.${path.key}${tailPathIdentity}`;
     }
+    path = path.prev;
   }
-  let pathIdentity = ROOT_PATH;
-
-  // `unshift` is much slower than `push`, so we push to the array and then
-  // loop backwards through it to generate the string. We could also do this
-  // with `parts.reverse().join('')` and we should definitely benchmark to see
-  // which is faster.
-  for (let i = parts.length - 1; i >= 0; i--) {
-    pathIdentity += parts[i];
-  }
-
-  return pathIdentity;
+  return `${ROOT_PATH}${tailPathIdentity}`;
 }
 
 export const $$crystalWrapped = Symbol("crystalWrappedResolver");
