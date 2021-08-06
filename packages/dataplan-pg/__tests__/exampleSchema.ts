@@ -1431,6 +1431,8 @@ export function makeExampleSchema(
   const SingleTableItem: GraphQLInterfaceType = new GraphQLInterfaceType({
     name: "SingleTableItem",
     fields: () => ({
+      id: { type: GraphQLInt },
+      type: { type: GraphQLString },
       parent: { type: SingleTableItem },
       author: { type: Person },
       position: { type: GraphQLString },
@@ -1443,16 +1445,15 @@ export function makeExampleSchema(
   });
 
   const commonSingleTableItemFields = {
+    id: attrField("id", GraphQLInt),
+    type: attrField("type", GraphQLString),
     parent: {
       type: SingleTableItem,
       plan($entity: SingleTableItemPlan) {
         const $plan = singleTableItemsSource.get({
           id: $entity.get("parent_id"),
         });
-        return new SingleTableInterfacePlan(
-          singleTableTypeName($entity),
-          $plan,
-        );
+        return new SingleTableInterfacePlan(singleTableTypeName($plan), $plan);
       },
     },
     author: singleRelationField(
