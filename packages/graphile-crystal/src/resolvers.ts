@@ -51,7 +51,11 @@ import {
 
 const debug = debugFactory("crystal:resolvers");
 
-function pathToPathIdentity(path: Path): string {
+/*
+ * This was the original, simple implementation. Below we rewrote this to avoid
+ * recursion for performance reasons.
+ *
+function pathToPathIdentityRecursive(path: Path): string {
   // Skip over list keys.
   if (!path.typename) {
     assert.ok(
@@ -64,6 +68,32 @@ function pathToPathIdentity(path: Path): string {
     (path.prev ? pathToPathIdentity(path.prev) : ROOT_PATH) +
     `>${path.typename}.${path.key}`
   );
+}
+*/
+
+function pathToPathIdentity(initialPath: Path): string {
+  const parts: string[] = [];
+  let path: Path | undefined = initialPath;
+  while (path) {
+    if (!path.typename) {
+      // Skip over list keys.
+      path = path.prev;
+    } else {
+      parts.push(`>${path.typename}.${path.key}`);
+      path = path.prev;
+    }
+  }
+  let pathIdentity = ROOT_PATH;
+
+  // `unshift` is much slower than `push`, so we push to the array and then
+  // loop backwards through it to generate the string. We could also do this
+  // with `parts.reverse().join('')` and we should definitely benchmark to see
+  // which is faster.
+  for (let i = parts.length - 1; i >= 0; i--) {
+    pathIdentity += parts[i];
+  }
+
+  return pathIdentity;
 }
 
 export const $$crystalWrapped = Symbol("crystalWrappedResolver");
