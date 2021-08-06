@@ -1,8 +1,11 @@
 {
   people {
     __typename
+    username
     singleTableItemsList {
       __typename
+      id
+      type
       position
       createdAt
       updatedAt

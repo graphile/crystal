@@ -2,9 +2,12 @@
   people: [
     {
       __typename: "Person",
+      username: "Alice",
       singleTableItemsList: [
         {
           __typename: "SingleTableTopic",
+          id: 2,
+          type: "TOPIC",
           position: "0",
           createdAt: "2020-03-26 13:00:00+00",
           updatedAt: "2020-03-26 14:00:00+00",
@@ -13,6 +16,8 @@
         },
         {
           __typename: "SingleTablePost",
+          id: 15,
+          type: "POST",
           position: "0",
           createdAt: "2020-01-28 11:11:00+00",
           updatedAt: "2021-07-30 15:24:00+01",
@@ -21,6 +26,8 @@
         },
         {
           __typename: "SingleTableChecklistItem",
+          id: 21,
+          type: "CHECKLIST_ITEM",
           position: "4",
           createdAt: "2020-01-28 11:01:00+00",
           updatedAt: "2021-07-30 15:24:00+01",
@@ -31,9 +38,12 @@
     },
     {
       __typename: "Person",
+      username: "Benjie",
       singleTableItemsList: [
         {
           __typename: "SingleTableTopic",
+          id: 1,
+          type: "TOPIC",
           position: "0",
           createdAt: "2020-01-28 11:00:00+00",
           updatedAt: "2021-07-30 15:24:00+01",
@@ -42,6 +52,8 @@
         },
         {
           __typename: "SingleTableDivider",
+          id: 3,
+          type: "DIVIDER",
           position: "0",
           createdAt: "2020-01-28 11:00:00+00",
           updatedAt: "2021-07-30 15:24:00+01",
@@ -50,6 +62,8 @@
         },
         {
           __typename: "SingleTablePost",
+          id: 4,
+          type: "POST",
           position: "1",
           createdAt: "2020-01-28 11:01:00+00",
           updatedAt: "2021-07-30 15:24:00+01",
@@ -58,6 +72,8 @@
         },
         {
           __typename: "SingleTablePost",
+          id: 5,
+          type: "POST",
           position: "2",
           createdAt: "2020-01-28 11:02:00+00",
           updatedAt: "2021-07-30 15:24:00+01",
@@ -66,6 +82,8 @@
         },
         {
           __typename: "SingleTablePost",
+          id: 6,
+          type: "POST",
           position: "3",
           createdAt: "2020-01-28 11:03:00+00",
           updatedAt: "2021-07-30 15:24:00+01",
@@ -74,6 +92,8 @@
         },
         {
           __typename: "SingleTablePost",
+          id: 7,
+          type: "POST",
           position: "4",
           createdAt: "2020-01-28 11:04:00+00",
           updatedAt: "2021-07-30 15:24:00+01",
@@ -82,6 +102,8 @@
         },
         {
           __typename: "SingleTableDivider",
+          id: 8,
+          type: "DIVIDER",
           position: "5",
           createdAt: "2020-01-28 11:05:00+00",
           updatedAt: "2021-07-30 15:24:00+01",
@@ -90,6 +112,8 @@
         },
         {
           __typename: "SingleTablePost",
+          id: 9,
+          type: "POST",
           position: "6",
           createdAt: "2020-01-28 11:06:00+00",
           updatedAt: "2021-07-30 15:24:00+01",
@@ -98,6 +122,8 @@
         },
         {
           __typename: "SingleTableTopic",
+          id: 10,
+          type: "TOPIC",
           position: "7",
           createdAt: "2020-01-28 11:07:00+00",
           updatedAt: "2021-07-30 15:24:00+01",
@@ -106,6 +132,8 @@
         },
         {
           __typename: "SingleTableTopic",
+          id: 11,
+          type: "TOPIC",
           position: "0",
           createdAt: "2020-01-28 11:08:00+00",
           updatedAt: "2021-07-30 15:24:00+01",
@@ -114,6 +142,8 @@
         },
         {
           __typename: "SingleTablePost",
+          id: 12,
+          type: "POST",
           position: "0",
           createdAt: "2020-01-28 11:09:00+00",
           updatedAt: "2021-07-30 15:24:00+01",
@@ -122,6 +152,8 @@
         },
         {
           __typename: "SingleTablePost",
+          id: 13,
+          type: "POST",
           position: "1",
           createdAt: "2020-01-28 11:10:00+00",
           updatedAt: "2021-07-30 15:24:00+01",
@@ -130,6 +162,8 @@
         },
         {
           __typename: "SingleTablePost",
+          id: 14,
+          type: "POST",
           position: "2",
           createdAt: "2020-01-28 11:11:00+00",
           updatedAt: "2021-07-30 15:24:00+01",
@@ -138,6 +172,8 @@
         },
         {
           __typename: "SingleTableChecklist",
+          id: 16,
+          type: "CHECKLIST",
           position: "0",
           createdAt: "2020-01-28 11:01:00+00",
           updatedAt: "2021-07-30 15:24:00+01",
@@ -146,6 +182,8 @@
         },
         {
           __typename: "SingleTableChecklistItem",
+          id: 17,
+          type: "CHECKLIST_ITEM",
           position: "0",
           createdAt: "2020-01-28 11:01:00+00",
           updatedAt: "2021-07-30 15:24:00+01",
@@ -154,6 +192,8 @@
         },
         {
           __typename: "SingleTableChecklistItem",
+          id: 19,
+          type: "CHECKLIST_ITEM",
           position: "2",
           createdAt: "2020-01-28 11:01:00+00",
           updatedAt: "2021-07-30 15:24:00+01",
@@ -162,6 +202,8 @@
         },
         {
           __typename: "SingleTableChecklistItem",
+          id: 20,
+          type: "CHECKLIST_ITEM",
           position: "3",
           createdAt: "2020-01-28 11:01:00+00",
           updatedAt: "2021-07-30 15:24:00+01",
@@ -172,9 +214,12 @@
     },
     {
       __typename: "Person",
+      username: "Caroline",
       singleTableItemsList: [
         {
           __typename: "SingleTableChecklistItem",
+          id: 18,
+          type: "CHECKLIST_ITEM",
           position: "1",
           createdAt: "2020-01-28 11:01:00+00",
           updatedAt: "2021-07-30 15:24:00+01",
@@ -183,10 +228,10 @@
         },
       ],
     },
-    { __typename: "Person", singleTableItemsList: null },
-    { __typename: "Person", singleTableItemsList: null },
-    { __typename: "Person", singleTableItemsList: null },
-    { __typename: "Person", singleTableItemsList: null },
-    { __typename: "Person", singleTableItemsList: null },
+    { __typename: "Person", username: "Dave", singleTableItemsList: [] },
+    { __typename: "Person", username: "Ellie", singleTableItemsList: [] },
+    { __typename: "Person", username: "Fred", singleTableItemsList: [] },
+    { __typename: "Person", username: "Georgina", singleTableItemsList: [] },
+    { __typename: "Person", username: "Harry", singleTableItemsList: [] },
   ],
 }

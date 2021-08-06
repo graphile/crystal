@@ -1,5 +1,6 @@
 select
-  __people__."person_id"::text as "0"
+  __people__."username"::text as "0",
+  __people__."person_id"::text as "1"
 from interfaces_and_unions.people as __people__
 where (
   true /* authorization checks */
@@ -16,12 +17,13 @@ from (
 lateral (
   select
     __single_table_items__."type"::text as "0",
-    __single_table_items__."position"::text as "1",
-    __single_table_items__."created_at"::text as "2",
-    __single_table_items__."updated_at"::text as "3",
-    __single_table_items__."is_explicitly_archived"::text as "4",
-    __single_table_items__."archived_at"::text as "5",
-    __single_table_items_identifiers__.idx as "6"
+    __single_table_items__."id"::text as "1",
+    __single_table_items__."position"::text as "2",
+    __single_table_items__."created_at"::text as "3",
+    __single_table_items__."updated_at"::text as "4",
+    __single_table_items__."is_explicitly_archived"::text as "5",
+    __single_table_items__."archived_at"::text as "6",
+    __single_table_items_identifiers__.idx as "7"
   from interfaces_and_unions.single_table_items as __single_table_items__
   where
     (

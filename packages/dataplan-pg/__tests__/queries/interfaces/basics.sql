@@ -1,7 +1,9 @@
 select
+  __people__."username"::text as "0",
   array(
     select array[
       __single_table_items__."type"::text,
+      __single_table_items__."id"::text,
       __single_table_items__."position"::text,
       __single_table_items__."created_at"::text,
       __single_table_items__."updated_at"::text,
@@ -16,8 +18,8 @@ select
         true /* authorization checks */
       )
     order by __single_table_items__."id" asc
-  ) as "0",
-  __people__."person_id"::text as "1"
+  ) as "1",
+  __people__."person_id"::text as "2"
 from interfaces_and_unions.people as __people__
 where (
   true /* authorization checks */
