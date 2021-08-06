@@ -1398,6 +1398,7 @@ export class Aether<
         }
         const valueIndexByNewValuesIndex: number[] = [];
         if (rest.length) {
+          const results = new Array(valuesLength).fill(null);
           // We're expecting to be handling arrays still; there's another layer to come...
           const newValues = values.flatMap((value, valueIndex) => {
             const { crystalObject, indexByListItemPlanId } = value;
@@ -1413,6 +1414,7 @@ export class Aether<
               // Stops here
               return [];
             }
+            results[valueIndex] = [];
             return layerResult.map(
               (_layerIndividualResult, layerResultIndex) => {
                 valueIndexByNewValuesIndex.push(valueIndex);
@@ -1429,7 +1431,6 @@ export class Aether<
               },
             );
           });
-          const results = new Array(values.length).fill(null);
           const newValuesResults = await executeLayers(
             rest,
             newValues,
@@ -1442,9 +1443,6 @@ export class Aether<
           );
           for (let i = 0, l = newValuesResults.length; i < l; i++) {
             const valueIndex = valueIndexByNewValuesIndex[i];
-            if (!results[valueIndex]) {
-              results[valueIndex] = [];
-            }
             results[valueIndex].push(newValuesResults[i]);
           }
           return results;
