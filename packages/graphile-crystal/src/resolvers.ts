@@ -88,6 +88,20 @@ function pathToPathIdentity(initialPath: Path): string {
   return `${ROOT_PATH}${tailPathIdentity}`;
 }
 
+function pathToIndexes(initialPath: Path): ReadonlyArray<number> {
+  const indexes: number[] = [];
+  let path: Path | undefined = initialPath;
+  while (path && !path.typename) {
+    assert.ok(
+      typeof path.key === "number",
+      "Expected un-typenamed path entry to be a numeric index",
+    );
+    indexes.unshift(path.key);
+    path = path.prev;
+  }
+  return indexes;
+}
+
 export const $$crystalWrapped = Symbol("crystalWrappedResolver");
 
 /**
@@ -240,8 +254,7 @@ export function crystalWrapResolve<
           parentObject,
           pathIdentity,
         );
-        // TODO: this should extract the true indexes from resolveInfo?
-        const indexes: number[] = [];
+        const indexes = pathToIndexes(path);
         parentCrystalObject = newCrystalObject(
           parentPlan,
           parentPathIdentity,
