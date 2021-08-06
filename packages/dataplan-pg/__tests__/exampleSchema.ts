@@ -199,6 +199,14 @@ export function makeExampleSchema(
     columns: null,
   });
 
+  const forumNamesSource = new PgSource({
+    executor,
+    codec: TYPES.int,
+    source: sql`app_public.forum_names()`,
+    name: "forum_names",
+    columns: null,
+  });
+
   const randomUserSource = new PgSource({
     executor,
     codec: recordType(sql`app_public.users`),
@@ -1713,6 +1721,26 @@ export function makeExampleSchema(
             ]);
             deoptimizeIfAppropriate($plan);
             return $plan.single().getSelfNamed();
+          },
+        },
+
+        forumNames: {
+          type: new GraphQLList(GraphQLString),
+          plan(_$root) {
+            const $plan = pgSelect(forumNamesSource, []);
+            return each($plan, ($name) => $name.getSelfNamed());
+          },
+        },
+
+        FORUM_NAMES: {
+          type: new GraphQLList(GraphQLString),
+          description:
+            "Like forumNames, only we convert them all to upper case",
+          plan(_$root) {
+            const $plan = pgSelect(forumNamesSource, []);
+            return each($plan, ($name) =>
+              lambda($name.getSelfNamed(), (name) => name.toUpperCase()),
+            );
           },
         },
 
