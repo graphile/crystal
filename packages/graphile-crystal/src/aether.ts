@@ -1239,7 +1239,7 @@ export class Aether<
    */
   public getBatch(
     pathIdentity: string,
-    parentObject: unknown,
+    parentCrystalObject: CrystalObject<any> | null,
     variableValues: {
       [variableName: string]: unknown;
     },
@@ -1248,8 +1248,8 @@ export class Aether<
   ): Batch {
     let batch = this.batchByPathIdentity[pathIdentity];
     if (!batch) {
-      const crystalContext = isCrystalObject(parentObject)
-        ? parentObject[$$crystalContext]
+      const crystalContext = parentCrystalObject
+        ? parentCrystalObject[$$crystalContext]
         : this.newCrystalContext(variableValues, context, rootValue);
       batch = this.newBatch(pathIdentity, crystalContext);
       // TypeScript hack

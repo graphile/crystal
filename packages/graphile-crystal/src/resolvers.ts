@@ -134,21 +134,28 @@ export function crystalWrapResolve<
       const parentObject:
         | Exclude<TSource, null | undefined>
         | CrystalObject<any> = source ?? ROOT_VALUE_OBJECT;
+      let parentCrystalObject: CrystalObject<any> | null = null;
 
-      const aether = isCrystalObject(parentObject)
-        ? parentObject[$$crystalContext].aether
+      // Note: for the most optimal execution, `rootValue` passed to graphql
+      // should be a crystal object, this allows using {crystalContext} across
+      // the entire operation if plans are used everywhere. Even more optimised
+      // would be if we can share the same {crystalContext} across multiple
+      // `rootValue`s for multiple parallel executions (must be within the same
+      // aether) - e.g. as a result of multiple identical subscription
+      // operations.
+      if (isCrystalObject(parentObject)) {
+        parentCrystalObject = parentObject;
+      }
+
+      const aether = parentCrystalObject
+        ? parentCrystalObject[$$crystalContext].aether
         : getAetherFromResolver(context, info);
       const { path, parentType, returnType, variableValues, rootValue } = info;
       const pathIdentity = pathToPathIdentity(path);
       const planId = aether.planIdByPathIdentity[pathIdentity];
-      assert.ok(
-        planId != null,
-        `Could not find a plan id for path '${pathIdentity}'`,
-      );
-      const plan = aether.plans[planId];
-      if (plan == null) {
-        const objectValue = isCrystalObject(parentObject)
-          ? parentObject[$$data]
+      if (planId == null) {
+        const objectValue = parentCrystalObject
+          ? parentCrystalObject[$$data]
           : parentObject;
         debug(
           "Calling real resolver for %s.%s with %o",
@@ -158,16 +165,21 @@ export function crystalWrapResolve<
         );
         return realResolver(objectValue, argumentValues, context, info);
       }
+      const plan = aether.plans[planId];
+      assert.ok(
+        plan != null,
+        `Could not find plan with id '${planId}' for path '${pathIdentity}'`,
+      );
       /*
-    debug(
-      "   id for resolver at %p is %c",
-      pathIdentity,
-      id,
-    );
-    */
+      debug(
+        "   id for resolver at %p is %c",
+        pathIdentity,
+        id,
+      );
+      */
       const batch = aether.getBatch(
         pathIdentity,
-        parentObject,
+        parentCrystalObject,
         variableValues,
         context,
         rootValue,
@@ -175,16 +187,8 @@ export function crystalWrapResolve<
       const id = uid(info.fieldName);
       debug(`👉 %p/%c for %c`, pathIdentity, id, parentObject);
       const crystalContext = batch.crystalContext;
-      let parentCrystalObject: CrystalObject<any>;
-      if (isCrystalObject(parentObject)) {
-        // Note: for the most optimal execution, `rootValue` passed to graphql
-        // should be a crystal object, this allows using {crystalContext} across
-        // the entire operation if plans are used everywhere. Even more optimised
-        // would be if we can share the same {crystalContext} across multiple
-        // `rootValue`s for multiple parallel executions (must be within the same
-        // aether) - e.g. as a result of multiple identical subscription
-        // operations.
-        parentCrystalObject = parentObject;
+      if (parentCrystalObject) {
+        /* noop */
       } else if (!path.prev) {
         // Special workaround for the root object.
         parentCrystalObject = crystalContext.rootCrystalObject;
