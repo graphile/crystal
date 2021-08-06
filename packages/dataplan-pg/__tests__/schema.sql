@@ -75,7 +75,7 @@ create function app_public.unique_author_count(featured bool = null) returns int
   )
 $$ language sql stable;
 create function app_public.forum_names() returns setof text as $$
-  select name from app_public.forums;
+  select name from app_public.forums order by name asc;
 $$ language sql stable;
 create function app_public.random_user() returns app_public.users as $$
   select users.*
