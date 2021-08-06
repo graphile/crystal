@@ -8,7 +8,7 @@ export class __ListItemPlan<
 > extends ExecutablePlan<
   TParentPlan extends ExecutablePlan<ReadonlyArray<infer U>> ? U : never
 > {
-  constructor(parentPlan: TParentPlan) {
+  constructor(parentPlan: TParentPlan, public readonly depth: number) {
     super();
     this.addDependency(parentPlan);
     this.parentPathIdentity = getCurrentParentPathIdentity();

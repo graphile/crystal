@@ -21,21 +21,24 @@ import { inspect } from "util";
 
 import { populateValuePlan } from "./aether";
 import * as assert from "./assert";
-import { GLOBAL_PATH, ROOT_PATH } from "./constants";
+import { ROOT_PATH } from "./constants";
 import type { Deferred } from "./deferred";
 import { defer } from "./deferred";
 import { isDev } from "./dev";
 import { establishAether } from "./establishAether";
-import type { Batch, CrystalContext, CrystalObject } from "./interfaces";
+import type {
+  Batch,
+  CrystalContext,
+  CrystalObject,
+  IndexByListItemPlanId,
+} from "./interfaces";
 import {
   $$concreteData,
   $$concreteType,
   $$crystalContext,
-  $$crystalObjectByPathIdentity,
   $$data,
   $$id,
-  $$indexes,
-  $$indexesByPathIdentity,
+  $$indexByListItemPlanId,
   $$pathIdentity,
 } from "./interfaces";
 import type { ExecutablePlan } from "./plan";
@@ -215,11 +218,13 @@ export function crystalWrapResolve<
       */
       const batch = aether.getBatch(
         pathIdentity,
+        returnType,
         parentCrystalObject,
         variableValues,
         context,
         rootValue,
       );
+      // TODO: we're not actually using id below
       const id = uid(info.fieldName);
       debug(`👉 %p/%c for %c`, pathIdentity, id, parentObject);
       const crystalContext = batch.crystalContext;
@@ -263,12 +268,13 @@ export function crystalWrapResolve<
           indexes,
           parentObject,
           crystalContext,
+          {},
         );
         if (!existed) {
           populateValuePlan(
             crystalContext,
             parentPlan,
-            parentCrystalObject,
+            indexes,
             parentObject,
             "parent",
           );
@@ -297,6 +303,8 @@ export function crystalWrapResolve<
         );
         return realResolver(valueForResolver, argumentValues, context, info);
       } else {
+        return result;
+        /*
         const crystalResults = crystalWrap(
           crystalContext,
           plan,
@@ -307,6 +315,7 @@ export function crystalWrapResolve<
           result,
         );
         return crystalResults;
+        */
       }
     };
   Object.defineProperty(crystalResolver, $$crystalWrapped, {
@@ -413,8 +422,7 @@ function crystalWrap<TData>(
       indexes,
       innerData,
       crystalContext,
-      parentCrystalObject[$$crystalObjectByPathIdentity],
-      parentCrystalObject[$$indexesByPathIdentity],
+      parentCrystalObject[$$indexByListItemPlanId],
     );
   } else {
     return newCrystalObject(
@@ -425,6 +433,7 @@ function crystalWrap<TData>(
       indexes,
       innerData,
       crystalContext,
+      {},
     );
   }
 }
@@ -440,34 +449,15 @@ export function newCrystalObject<TData>(
   indexes: ReadonlyArray<number>,
   data: TData,
   crystalContext: CrystalContext,
-  crystalObjectByPathIdentity: {
-    [pathIdentity: string]: CrystalObject<any> | undefined;
-  } = {
-    [GLOBAL_PATH]: crystalContext.rootCrystalObject,
-  },
-  indexesByPathIdentity: {
-    [pathIdentity: string]: ReadonlyArray<number> | undefined;
-  } = {
-    [GLOBAL_PATH]: [],
-  },
+  indexByListItemPlanId: IndexByListItemPlanId,
 ): CrystalObject<TData> {
   const crystalObject: CrystalObject<TData> = {
     [$$pathIdentity]: pathIdentity,
     [$$concreteType]: typeName,
     [$$id]: id,
     [$$data]: data,
-    [$$indexes]: indexes, // Shortcut to $$indexesByPathIdentity[$$pathIdentity]
     [$$crystalContext]: crystalContext,
-    [$$crystalObjectByPathIdentity]: Object.assign(
-      Object.create(null),
-      crystalObjectByPathIdentity,
-    ),
-    [$$indexesByPathIdentity]: Object.freeze(
-      Object.assign(Object.create(null), {
-        ...indexesByPathIdentity,
-        [pathIdentity]: indexes,
-      }),
-    ),
+    [$$indexByListItemPlanId]: indexByListItemPlanId,
     // @ts-ignore
     toString() {
       const p = indexes.length ? `.${indexes.join(".")}` : ``;
@@ -476,8 +466,6 @@ export function newCrystalObject<TData>(
       );
     },
   };
-  crystalObject[$$crystalObjectByPathIdentity][pathIdentity] = crystalObject;
-  Object.freeze(crystalObject[$$crystalObjectByPathIdentity]);
   if (isDev) {
     debug(`Constructed %s with data %c`, crystalObject, data);
   }

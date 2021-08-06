@@ -23,7 +23,9 @@ export class __ValuePlan<TData> extends ExecutablePlan<TData> {
 
   execute(): never {
     // This is still an "executable plan"; we just side-step execution internally.
-    throw new Error("__ValuePlan must never execute");
+    throw new Error(
+      `GraphileInternalError<7696a514-f452-4d47-92d3-85aeb5b23f48>: ${this} is a __ValuePlan and thus must never execute`,
+    );
   }
 
   get<TAttr extends string>(

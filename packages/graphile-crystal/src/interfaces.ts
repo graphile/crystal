@@ -45,12 +45,8 @@ declare module "graphql" {
 export const $$crystalContext = Symbol("context");
 export const $$data = Symbol("data");
 export const $$id = Symbol("id");
-export const $$indexes = Symbol("indexes");
 export const $$pathIdentity = Symbol("pathIdentity");
-export const $$crystalObjectByPathIdentity = Symbol(
-  "crystalObjectByPathIdentity",
-);
-export const $$indexesByPathIdentity = Symbol("indexesByPathIdentity");
+export const $$indexByListItemPlanId = Symbol("indexByListItemPlanId");
 export const $$concreteType = Symbol("concreteType");
 export const $$concreteData = Symbol("concreteData");
 
@@ -59,19 +55,24 @@ export interface PolymorphicData<TType extends string = string, TData = any> {
   [$$concreteData]: TData;
 }
 
+export interface IndexByListItemPlanId {
+  [listItemPlanId: number]: number;
+}
+
 export interface CrystalObject<TData> {
   [$$id]: UniqueId;
   [$$pathIdentity]: string;
   [$$concreteType]: string;
-  [$$indexes]: ReadonlyArray<number>;
   [$$crystalContext]: CrystalContext;
-  [$$crystalObjectByPathIdentity]: {
-    [pathIdentity: string]: CrystalObject<any> | undefined;
-  };
-  [$$indexesByPathIdentity]: {
-    [pathIdentity: string]: ReadonlyArray<number> | undefined;
-  };
+  [$$indexByListItemPlanId]: IndexByListItemPlanId;
   [$$data]: TData;
+}
+
+export interface CrystalLayerObject {
+  crystalObject: CrystalObject<any>;
+  indexByListItemPlanId: {
+    [listItemPlanId: number]: number;
+  };
 }
 
 export interface Batch {
@@ -80,6 +81,7 @@ export interface Batch {
   plan: ExecutablePlan;
   itemPlan: ExecutablePlan;
   entries: Array<[CrystalObject<any>, Deferred<any>]>;
+  returnType: GraphQLOutputType;
 }
 
 export interface CrystalContext {
@@ -96,13 +98,13 @@ export interface CrystalContext {
    * - First is the plan ID; note that a plan is always created within the
    *   context of a specific field within a specific operation, so it has an
    *   inherent path identity.
-   * - Next is the crystal object that represents the parent field instance (if
-   *   the parent field was part of a list then each value within this list will
-   *   have a different, unique, crystal object).
+   * - Next represents the parent field instance (if the parent field was part
+   *   of a list then each value within this list will have a different,
+   *   unique, set of indexes) - this is the indexes joined with a `,`.
    * - Finally we have the plan result data. Note that this could be anything.
    *
    */
-  resultByCrystalObjectByPlanId: Map<number, Map<CrystalObject<any>, any>>;
+  resultByIndexesByPlanId: Map<number, Map<string, any>>;
 
   metaByPlanId: {
     [planId: number]: Record<string, unknown> | undefined;
