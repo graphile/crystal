@@ -13,6 +13,8 @@
 }
 
 fragment Item on SingleTableItem {
+  id
+  type
   author {
     __typename
     username
