@@ -1193,6 +1193,7 @@ export class Aether<
     const rootId = uid("root");
     debugExecuteVerbose("Root id is %c", rootId);
     const crystalContext: CrystalContext = {
+      aether: this,
       resultByCrystalObjectByPlanId: new Map(),
       metaByPlanId: Object.create(null),
       rootId,

@@ -10,6 +10,7 @@ import type {
   GraphQLScalarType,
 } from "graphql";
 
+import type { Aether } from "./aether";
 import type { Deferred } from "./deferred";
 import type { InputPlan } from "./input";
 import type { ExecutablePlan, ModifierPlan } from "./plan";
@@ -82,6 +83,8 @@ export interface Batch {
 }
 
 export interface CrystalContext {
+  aether: Aether;
+
   /**
    * This is the plan result cache. Plans can be executed more than once due to
    * parts of the tree being delayed (possibly due to @stream/@defer, possibly

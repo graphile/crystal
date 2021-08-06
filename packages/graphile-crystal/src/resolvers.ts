@@ -1,7 +1,11 @@
 import chalk from "chalk";
 // import { getAliasFromResolveInfo } from "graphql-parse-resolve-info";
 import debugFactory from "debug";
-import type { GraphQLFieldResolver, GraphQLOutputType } from "graphql";
+import type {
+  GraphQLFieldResolver,
+  GraphQLOutputType,
+  GraphQLResolveInfo,
+} from "graphql";
 import {
   assertObjectType,
   defaultFieldResolver,
@@ -88,6 +92,32 @@ export function crystalWrapResolve<
       { code: "ETOOMUCHBLING" },
     );
   }
+  const getAetherFromResolver = (
+    context: TContext,
+    info: GraphQLResolveInfo,
+  ) => {
+    // Note: in the ResolveFieldValueCrystal algorithm it uses `document` and
+    // `operationName`; however all it really needs is the `operation` and
+    // `fragments`, so that's what we extract here.
+    const {
+      schema,
+      // fieldName,
+      operation,
+      fragments,
+      variableValues,
+      rootValue,
+    } = info;
+    // const alias = getAliasFromResolveInfo(info);
+    const aether = establishAether({
+      schema,
+      operation,
+      fragments,
+      variableValues,
+      context,
+      rootValue,
+    });
+    return aether;
+  };
 
   //const wrapResult = makeResultWrapper(type);
   /**
@@ -104,30 +134,12 @@ export function crystalWrapResolve<
       const parentObject:
         | Exclude<TSource, null | undefined>
         | CrystalObject<any> = source ?? ROOT_VALUE_OBJECT;
-      // Note: in the ResolveFieldValueCrystal algorithm it uses `document` and
-      // `operationName`; however all it really needs is the `operation` and
-      // `fragments`, so that's what we extract here.
-      const {
-        schema,
-        // fieldName,
-        parentType,
-        returnType,
-        operation,
-        fragments,
-        variableValues,
-        rootValue,
-        path,
-      } = info;
+
+      const aether = isCrystalObject(parentObject)
+        ? parentObject[$$crystalContext].aether
+        : getAetherFromResolver(context, info);
+      const { path, parentType, returnType, variableValues, rootValue } = info;
       const pathIdentity = pathToPathIdentity(path);
-      // const alias = getAliasFromResolveInfo(info);
-      const aether = establishAether({
-        schema,
-        operation,
-        fragments,
-        variableValues,
-        context,
-        rootValue,
-      });
       const planId = aether.planIdByPathIdentity[pathIdentity];
       assert.ok(
         planId != null,
