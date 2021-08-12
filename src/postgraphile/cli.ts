@@ -604,6 +604,12 @@ const loadPlugins = (rawNames: mixed) => {
     }
     const name = String(rawName);
     const parts = name.split(':');
+    if (process.platform === 'win32' && parts[0].length === 1 && ['\\', '/'].includes(name[2])) {
+      // Assume this is a windows path `C:/path/to/module.js` or `C:\path\to\module.js`
+      const driveLetter = parts.shift();
+      // Add the drive part back onto the path
+      parts[0] = `${driveLetter}:${parts[0]}`;
+    }
     let root;
     try {
       root = require(String(parts.shift()));
