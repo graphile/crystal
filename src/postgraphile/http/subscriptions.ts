@@ -166,15 +166,31 @@ export async function enhanceHttpServerWithWebSockets<
     return { req, res: dummyRes };
   };
 
-  const getContext = (socket: WebSocket, opId: string): Promise<mixed> => {
+  const getContext = (
+    socket: WebSocket,
+    opId: string,
+    queryDocumentAst: DocumentNode,
+    variables: any,
+    operationName: string | null | undefined,
+  ): Promise<mixed> => {
     return new Promise((resolve, reject): void => {
       reqResFromSocket(socket)
         .then(({ req, res }) =>
-          withPostGraphileContextFromReqRes(req, res, { singleStatement: true }, context => {
-            const promise = addContextForSocketAndOpId(context, socket, opId);
-            resolve(promise['context']);
-            return promise;
-          }),
+          withPostGraphileContextFromReqRes(
+            req,
+            res,
+            {
+              singleStatement: true,
+              queryDocumentAst,
+              variables,
+              operationName,
+            },
+            context => {
+              const promise = addContextForSocketAndOpId(context, socket, opId);
+              resolve(promise['context']);
+              return promise;
+            },
+          ),
         )
         .then(null, reject);
     });
@@ -234,12 +250,9 @@ export async function enhanceHttpServerWithWebSockets<
         // tslint:disable-next-line no-any
         async onOperation(message: any, params: ExecutionParams, socket: WebSocket) {
           const opId = message.id;
-          const context = await getContext(socket, opId);
 
           // Override schema (for --watch)
           params.schema = await getGraphQLSchema();
-
-          Object.assign(params.context, context);
 
           const { req, res } = await reqResFromSocket(socket);
           const meta = {};
@@ -299,6 +312,14 @@ export async function enhanceHttpServerWithWebSockets<
               return Promise.reject(error);
             }
           }
+          const context = await getContext(
+            socket,
+            opId,
+            finalParams.query,
+            finalParams.variables,
+            finalParams.operationName,
+          );
+          Object.assign(finalParams.context, context);
 
           return finalParams;
         },
@@ -365,15 +386,13 @@ export async function enhanceHttpServerWithWebSockets<
           };
         },
         async onSubscribe(ctx, msg) {
-          const context = await getContext(ctx.extra.socket, msg.id);
-
           // Override schema (for --watch)
           const schema = await getGraphQLSchema();
 
           const { payload } = msg;
           const args = {
             schema,
-            contextValue: context,
+            contextValue: {},
             operationName: payload.operationName,
             document: payload.query ? parse(payload.query) : null, // parse if there is something to parse
             variableValues: payload.variables,
@@ -388,6 +407,15 @@ export async function enhanceHttpServerWithWebSockets<
                 options,
               })
             : args) as ExecutionArgs;
+
+          const context = await getContext(
+            ctx.extra.socket,
+            msg.id,
+            hookedArgs.document,
+            hookedArgs.variableValues,
+            hookedArgs.operationName,
+          );
+          Object.assign(hookedArgs.contextValue, context);
 
           // when supplying custom execution args from the
           // onSubscribe, you're trusted to do the validation
