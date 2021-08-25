@@ -138,6 +138,7 @@ export class PgSelectPlan<
    * code specifically indicates a string to use.
    */
   private readonly symbol: symbol | string;
+  private readonly _symbolAliases: Array<[symbol, symbol]>;
 
   /** = sql.identifier(this.symbol) */
   public readonly alias: SQL;
@@ -358,6 +359,7 @@ export class PgSelectPlan<
       ? cloneFrom.queryValuesSymbol
       : Symbol(dataSource.name + "_identifier_values");
     this.symbol = cloneFrom ? cloneFrom.symbol : Symbol(dataSource.name);
+    this._symbolAliases = cloneFrom ? [...cloneFrom._symbolAliases] : [];
     this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
     this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
     if (cloneFrom) {
@@ -813,6 +815,12 @@ export class PgSelectPlan<
           (frag, idx) => sql`${frag} as ${sql.identifier(String(idx))}`,
         );
 
+    const sqlAliases: SQL[] = [];
+    for (const [a, b] of this._symbolAliases) {
+      sqlAliases.push(sql.symbolAlias(a, b));
+    }
+    const aliases = sql.join(sqlAliases, "");
+
     if (asArray) {
       const selection = fragmentsWithAliases.length
         ? sql` array[${sql.indent(
@@ -825,14 +833,14 @@ export class PgSelectPlan<
            */
           sql` array['' /* NOTHING?! */]::text[]`;
 
-      return { sql: sql`select${selection}`, extraSelectIndexes };
+      return { sql: sql`${aliases}select${selection}`, extraSelectIndexes };
     } else {
       const selection =
         fragmentsWithAliases.length > 0
           ? sql`\n${sql.indent(sql.join(fragmentsWithAliases, ",\n"))}`
           : sql` /* NOTHING?! */`;
 
-      return { sql: sql`select${selection}`, extraSelectIndexes };
+      return { sql: sql`${aliases}select${selection}`, extraSelectIndexes };
     }
   }
 
@@ -1142,6 +1150,8 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
       const symbolSubstitutes = new Map<symbol, symbol>();
       if (typeof this.symbol === "symbol" && typeof p.symbol === "symbol") {
         symbolSubstitutes.set(this.symbol, p.symbol);
+      } else if (this.symbol !== p.symbol) {
+        return false;
       }
       const sqlIsEquivalent = (a: SQL | symbol, b: SQL | symbol) =>
         sql.isEquivalent(a, b, symbolSubstitutes);
@@ -1230,6 +1240,13 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
       return true;
     });
     if (identical) {
+      if (
+        typeof this.symbol === "symbol" &&
+        typeof identical.symbol === "symbol"
+      ) {
+        identical._symbolAliases.push([this.symbol, identical.symbol]);
+      }
+
       return identical;
       /* The following is now forbidden.
 
@@ -1447,6 +1464,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
             ...this.joins,
           );
           this.mergePlaceholdersInto(table);
+          table._symbolAliases.push(...this._symbolAliases);
           const actualKeyByDesiredKey = this.mergeSelectsWith(table);
           // We return a list here because our children are going to use a
           // `first` plan on us.
