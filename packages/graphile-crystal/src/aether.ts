@@ -1880,7 +1880,7 @@ export class Aether<
     const printed = new Set<string>();
     let depth = 0;
     const lines: string[] = [];
-    const print = (pathIdentity: string) => {
+    const print = (pathIdentity: string, parentPathIdentity: string) => {
       if (printed.has(pathIdentity)) {
         return;
       }
@@ -1890,17 +1890,20 @@ export class Aether<
         throw new Error(`Corrupted plan, no id found for '${pathIdentity}'`);
       }
       const plan = this.plans[planId];
-      lines.push("  ".repeat(depth) + `${pathIdentity}: ${plan}`);
+      lines.push(
+        "  ".repeat(depth) +
+          `${pathIdentity.substr(parentPathIdentity.length)}: ${plan}`,
+      );
       depth++;
       for (const childPathIdentity of pathIdentities) {
         if (childPathIdentity.startsWith(pathIdentity)) {
-          print(childPathIdentity);
+          print(childPathIdentity, pathIdentity);
         }
       }
       depth--;
     };
     for (const pathIdentity of pathIdentities) {
-      print(pathIdentity);
+      print(pathIdentity, "");
     }
 
     debugPlanVerbose("Plans by path: %s", "\n" + lines.join("\n"));
