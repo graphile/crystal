@@ -5,9 +5,10 @@ import sql from "pg-sql2";
 
 import type { PgSource } from "../datasource";
 import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
-import { pgClassExpression, PgClassExpressionPlan } from "./pgClassExpression";
+import type { PgClassExpressionPlan } from "./pgClassExpression";
+import { pgClassExpression } from "./pgClassExpression";
 import { PgCursorPlan } from "./pgCursor";
-import { PgRecordPlan } from "./pgRecord";
+import type { PgRecordPlan } from "./pgRecord";
 import { pgRecord } from "./pgRecord";
 import { PgSelectPlan } from "./pgSelect";
 // import debugFactory from "debug";
@@ -34,23 +35,6 @@ export class PgSelectSinglePlan<
 {
   public readonly pgCodec: TDataSource["codec"];
   public readonly itemPlanId: number;
-
-  // TODO: should we move this back to PgSelectPlan to help avoid
-  // duplicate plans?
-  /**
-   * We only want to fetch each column once (since columns don't accept any
-   * parameters), so this memo keeps track of which columns we've selected so
-   * their plans can be easily reused.
-   */
-  private colPlans: {
-    [key in keyof TDataSource["TRow"]]?: number;
-  };
-
-  /**
-   * If a cursor was requested, what plan returns it?
-   */
-  private cursorPlanId: number | null;
-
   private classPlanId: number;
   public readonly dataSource: TDataSource;
 
@@ -63,8 +47,6 @@ export class PgSelectSinglePlan<
     this.pgCodec = this.dataSource.codec;
     this.classPlanId = classPlan.id;
     this.itemPlanId = this.addDependency(itemPlan);
-    this.colPlans = {}; // TODO: think about cloning
-    this.cursorPlanId = null;
   }
 
   public toStringMeta(): string {
@@ -78,6 +60,11 @@ export class PgSelectSinglePlan<
         `Expected ${this.classPlanId} (${plan}) to be a PgSelectPlan`,
       );
     }
+    return plan;
+  }
+
+  private getItemPlan(): ExecutablePlan<TDataSource["TRow"]> {
+    const plan = this.aether.plans[this.dependencies[this.itemPlanId]];
     return plan;
   }
 
@@ -96,67 +83,45 @@ export class PgSelectSinglePlan<
     TDataSource,
     TDataSource["columns"][TAttr]["codec"]
   > {
-    // Only one plan per column
-    const planId: number | undefined = this.colPlans[attr];
-    if (planId == null) {
-      const classPlan = this.getClassPlan();
-      // TODO: where do we do the SQL conversion, e.g. to_json for dates to
-      // enforce ISO8601? Perhaps this should be the datasource itself, and
-      // `attr` should be an SQL expression? This would allow for computed
-      // fields/etc too (admittedly those without arguments).
-      const dataSourceColumn = this.dataSource.columns[attr as string];
-      if (!dataSourceColumn && attr !== "") {
-        throw new Error(
-          `${this.dataSource} does not define an attribute named '${attr}'`,
-        );
-      }
-
-      /*
-       * Only cast to `::text` during select; we want to use it uncasted in
-       * conditions/etc. The reasons we cast to ::text include:
-       *
-       * - to make return values consistent whether they're direct or in nested
-       *   arrays
-       * - to make sure that that various PostgreSQL clients we support do not
-       *   mangle the data in unexpected ways - we take responsibility for
-       *   decoding these string values.
-       */
-
-      const sqlExpr = pgClassExpression(
-        this,
-        attr === ""
-          ? this.dataSource.codec
-          : this.dataSource.columns[attr as string].codec,
+    const classPlan = this.getClassPlan();
+    // TODO: where do we do the SQL conversion, e.g. to_json for dates to
+    // enforce ISO8601? Perhaps this should be the datasource itself, and
+    // `attr` should be an SQL expression? This would allow for computed
+    // fields/etc too (admittedly those without arguments).
+    const dataSourceColumn = this.dataSource.columns[attr as string];
+    if (!dataSourceColumn && attr !== "") {
+      throw new Error(
+        `${this.dataSource} does not define an attribute named '${attr}'`,
       );
-      const colPlan = dataSourceColumn
-        ? dataSourceColumn.expression
-          ? sqlExpr`${sql.parens(dataSourceColumn.expression(classPlan.alias))}`
-          : sqlExpr`${classPlan.alias}.${sql.identifier(String(attr))}`
-        : sqlExpr`${classPlan.alias}.${classPlan.alias}`; /* self named */
-      this.colPlans[attr] = colPlan.id;
-      return colPlan;
-    } else {
-      const plan = this.aether.plans[planId];
-      if (!(plan instanceof PgClassExpressionPlan)) {
-        throw new Error(`Expected ${plan} to be a PgClassExpressionPlan`);
-      }
-      return plan;
     }
+
+    /*
+     * Only cast to `::text` during select; we want to use it uncasted in
+     * conditions/etc. The reasons we cast to ::text include:
+     *
+     * - to make return values consistent whether they're direct or in nested
+     *   arrays
+     * - to make sure that that various PostgreSQL clients we support do not
+     *   mangle the data in unexpected ways - we take responsibility for
+     *   decoding these string values.
+     */
+
+    const sqlExpr = pgClassExpression(
+      this,
+      attr === ""
+        ? this.dataSource.codec
+        : this.dataSource.columns[attr as string].codec,
+    );
+    const colPlan = dataSourceColumn
+      ? dataSourceColumn.expression
+        ? sqlExpr`${sql.parens(dataSourceColumn.expression(classPlan.alias))}`
+        : sqlExpr`${classPlan.alias}.${sql.identifier(String(attr))}`
+      : sqlExpr`${classPlan.alias}.${classPlan.alias}`; /* self named */
+    return colPlan;
   }
 
-  private _recordPlanId: number | null = null;
   record(): PgRecordPlan<TDataSource> {
-    if (this._recordPlanId != null) {
-      const _recordPlan = this.aether.plans[this._recordPlanId];
-      if (!(_recordPlan instanceof PgRecordPlan)) {
-        throw new Error(`Expected ${_recordPlan} to be a PgRecordPlan`);
-      }
-      return _recordPlan;
-    } else {
-      const _recordPlan = pgRecord(this);
-      this._recordPlanId = _recordPlan.id;
-      return _recordPlan;
-    }
+    return pgRecord(this);
   }
 
   /**
@@ -175,16 +140,32 @@ export class PgSelectSinglePlan<
    * find nodes before/after it.
    */
   public cursor(): PgCursorPlan<TDataSource> {
-    if (this.cursorPlanId == null) {
-      const cursorPlan = new PgCursorPlan<TDataSource>(this);
-      this.cursorPlanId = cursorPlan.id;
-      return cursorPlan;
+    const cursorPlan = new PgCursorPlan<TDataSource>(this);
+    return cursorPlan;
+  }
+
+  deduplicate(
+    peers: PgSelectSinglePlan<any>[],
+  ): PgSelectSinglePlan<TDataSource> {
+    const identicalPeer = peers.find((peer) => {
+      if (peer.dataSource !== this.dataSource) {
+        return false;
+      }
+      if (peer.getClassPlan() !== this.getClassPlan()) {
+        return false;
+      }
+      if (peer.getItemPlan() !== this.getItemPlan()) {
+        return false;
+      }
+      return true;
+    });
+    if (identicalPeer) {
+      // We've been careful to not store anything locally so we shouldn't
+      // need to move anything across to the peer.
+      return identicalPeer;
+    } else {
+      return this;
     }
-    const plan = this.aether.plans[this.cursorPlanId];
-    if (!(plan instanceof PgCursorPlan)) {
-      throw new Error(`Expected ${plan} to be a PgCursorPlan`);
-    }
-    return plan;
   }
 
   execute(
