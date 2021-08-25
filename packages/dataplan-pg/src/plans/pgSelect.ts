@@ -138,7 +138,13 @@ export class PgSelectPlan<
    * code specifically indicates a string to use.
    */
   private readonly symbol: symbol | string;
-  private readonly _symbolAliases: Array<[symbol, symbol]>;
+  /**
+   * When SELECTs get merged, symbols also need to be merged. The keys in this
+   * map are the symbols of PgSelects that don't exist any more, the values are
+   * symbols of the PgSelects that they were replaced with (which might also not
+   * exist in future, but we follow the chain so it's fine).
+   */
+  private readonly _symbolSubstitutes: Map<symbol, symbol>;
 
   /** = sql.identifier(this.symbol) */
   public readonly alias: SQL;
@@ -359,7 +365,9 @@ export class PgSelectPlan<
       ? cloneFrom.queryValuesSymbol
       : Symbol(dataSource.name + "_identifier_values");
     this.symbol = cloneFrom ? cloneFrom.symbol : Symbol(dataSource.name);
-    this._symbolAliases = cloneFrom ? [...cloneFrom._symbolAliases] : [];
+    this._symbolSubstitutes = cloneFrom
+      ? new Map(cloneFrom._symbolSubstitutes)
+      : new Map();
     this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
     this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
     if (cloneFrom) {
@@ -628,7 +636,7 @@ export class PgSelectPlan<
 
     // Optimisation: if we're already selecting this fragment, return the existing one.
     const index = this.selects.findIndex((frag) =>
-      sql.isEquivalent(frag, fragment),
+      sql.isEquivalent(frag, fragment, this._symbolSubstitutes),
     );
     if (index >= 0) {
       return index;
@@ -816,7 +824,7 @@ export class PgSelectPlan<
         );
 
     const sqlAliases: SQL[] = [];
-    for (const [a, b] of this._symbolAliases) {
+    for (const [a, b] of this._symbolSubstitutes.entries()) {
       sqlAliases.push(sql.symbolAlias(a, b));
     }
     const aliases = sql.join(sqlAliases, "");
@@ -1244,7 +1252,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
         typeof this.symbol === "symbol" &&
         typeof identical.symbol === "symbol"
       ) {
-        identical._symbolAliases.push([this.symbol, identical.symbol]);
+        identical._symbolSubstitutes.set(this.symbol, identical.symbol);
       }
 
       return identical;
@@ -1464,7 +1472,19 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
             ...this.joins,
           );
           this.mergePlaceholdersInto(table);
-          table._symbolAliases.push(...this._symbolAliases);
+          for (const [a, b] of this._symbolSubstitutes.entries()) {
+            if (isDev) {
+              if (
+                table._symbolSubstitutes.has(a) &&
+                table._symbolSubstitutes.get(a) !== b
+              ) {
+                throw new Error(
+                  `Conflict when setting a substitute whilst merging ${this} into ${table}; symbol already has a substitute, and it's different.`,
+                );
+              }
+            }
+            table._symbolSubstitutes.set(a, b);
+          }
           const actualKeyByDesiredKey = this.mergeSelectsWith(table);
           // We return a list here because our children are going to use a
           // `first` plan on us.
