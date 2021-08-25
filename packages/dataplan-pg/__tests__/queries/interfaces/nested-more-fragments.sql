@@ -16,13 +16,9 @@ select
       __single_table_items__."description"::text,
       __single_table_items__."note"::text,
       __single_table_items__."color"::text,
-      __people_3."username"::text,
-      __people_4."username"::text,
-      __people_5."username"::text,
-      __people_6."username"::text,
       __single_table_items_2."parent_id"::text,
       __single_table_items_2."id"::text,
-      __people_7."username"::text,
+      __people_3."username"::text,
       __single_table_items_2."author_id"::text,
       __single_table_items_2."position"::text,
       __single_table_items_2."created_at"::text,
@@ -40,15 +36,7 @@ select
     left outer join interfaces_and_unions.people as __people_2
     on (__single_table_items__."author_id"::"int4" = __people_2."person_id")
     left outer join interfaces_and_unions.people as __people_3
-    on (__single_table_items__."author_id"::"int4" = __people_3."person_id")
-    left outer join interfaces_and_unions.people as __people_4
-    on (__single_table_items__."author_id"::"int4" = __people_4."person_id")
-    left outer join interfaces_and_unions.people as __people_5
-    on (__single_table_items__."author_id"::"int4" = __people_5."person_id")
-    left outer join interfaces_and_unions.people as __people_6
-    on (__single_table_items__."author_id"::"int4" = __people_6."person_id")
-    left outer join interfaces_and_unions.people as __people_7
-    on (__single_table_items_2."author_id"::"int4" = __people_7."person_id")
+    on (__single_table_items_2."author_id"::"int4" = __people_3."person_id")
     where
       (
         __people__."person_id"::"int4" = __single_table_items_2."author_id"
