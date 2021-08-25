@@ -22,6 +22,7 @@ import { inspect } from "util";
 import { populateValuePlan } from "./aether";
 import * as assert from "./assert";
 import { ROOT_PATH } from "./constants";
+import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint";
 import type { Deferred } from "./deferred";
 import { defer } from "./deferred";
 import { isDev } from "./dev";
@@ -45,12 +46,7 @@ import type { ExecutablePlan } from "./plan";
 import { __ValuePlan } from "./plans";
 import { assertPolymorphicData } from "./polymorphic";
 import type { UniqueId } from "./utils";
-import {
-  crystalPrint,
-  crystalPrintPathIdentity,
-  ROOT_VALUE_OBJECT,
-  uid,
-} from "./utils";
+import { ROOT_VALUE_OBJECT, uid } from "./utils";
 
 const debug = debugFactory("crystal:resolvers");
 

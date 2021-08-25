@@ -1,6 +1,6 @@
 import debugFactory from "debug";
 
-import { crystalPrint, crystalPrintPathIdentity } from "./utils";
+import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint";
 
 debugFactory.formatters.c = crystalPrint;
 debugFactory.formatters.p = crystalPrintPathIdentity;

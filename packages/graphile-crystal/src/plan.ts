@@ -4,6 +4,7 @@ import { inspect } from "util";
 
 import type { Aether } from "./aether";
 import { GLOBAL_PATH } from "./constants";
+import { crystalPrintPathIdentity } from "./crystalPrint";
 import { isDev, noop } from "./dev";
 import {
   getCurrentAether,
@@ -15,7 +16,6 @@ import type {
   CrystalValuesList,
   PromiseOrDirect,
 } from "./interfaces";
-import { crystalPrintPathIdentity } from "./utils";
 
 function reallyAssertFinalized(plan: BasePlan): void {
   if (!plan.isFinalized) {
