@@ -1157,7 +1157,11 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
       // symbols into SQL equivalency checks though.
       const symbolSubstitutes = new Map<symbol, symbol>();
       if (typeof this.symbol === "symbol" && typeof p.symbol === "symbol") {
-        symbolSubstitutes.set(this.symbol, p.symbol);
+        if (this.symbol !== p.symbol) {
+          symbolSubstitutes.set(this.symbol, p.symbol);
+        } else {
+          // Fine :)
+        }
       } else if (this.symbol !== p.symbol) {
         return false;
       }
@@ -1252,7 +1256,11 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
         typeof this.symbol === "symbol" &&
         typeof identical.symbol === "symbol"
       ) {
-        identical._symbolSubstitutes.set(this.symbol, identical.symbol);
+        if (this.symbol !== identical.symbol) {
+          identical._symbolSubstitutes.set(this.symbol, identical.symbol);
+        } else {
+          // Fine :)
+        }
       }
 
       return identical;

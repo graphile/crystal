@@ -862,7 +862,7 @@ function getSubstitute(
     if (depth > 1000) {
       throw new Error("Substitute depth is too deep and possibly infinite");
     }
-    return getSubstitute(sub, symbolSubstitutes, depth++);
+    return getSubstitute(sub, symbolSubstitutes, depth + 1);
   } else {
     return symbol;
   }
@@ -883,7 +883,7 @@ function identifiersAreEquivalent(
   }
   const namesMatch = ids1.n === ids2.n;
   const symbol1 = getSubstitute(ids1.s, symbolSubstitutes);
-  const symbol2 = getSubstitute(ids1.s, symbolSubstitutes);
+  const symbol2 = getSubstitute(ids2.s, symbolSubstitutes);
   const symbolsMatch = symbol1 === symbol2;
   return namesMatch && symbolsMatch;
 }
