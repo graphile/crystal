@@ -1846,23 +1846,40 @@ export class Aether<
       return;
     }
     const { plans } = this;
+    const printDep = (depId: number) => {
+      const actualDepId = this.plans[depId].id;
+      if (actualDepId !== depId) {
+        return (
+          chalk.bold.gray.strikethrough(String(depId)) +
+          " " +
+          chalk.bold.yellow(String(actualDepId))
+        );
+      } else {
+        return chalk.bold.yellow(String(actualDepId));
+      }
+    };
     debugPlanVerbose(
       "Plans: %s",
       "\n" +
         plans
           .map((plan, id) => {
             const optimized = this.optimizedPlans.has(plan);
-            return plan
-              ? `- ${id}: ${
-                  plan.id !== id
-                    ? `->${chalk.bold.yellow(String(plan.id))}`
-                    : (optimized ? "!!" : "  ") +
-                      plan.toString() +
-                      ` (deps: ${plan.dependencies.map((depId) =>
-                        chalk.bold.yellow(String(depId)),
-                      )})`
-                }`
-              : null;
+            if (!plan) {
+              return null;
+            } else if (plan.id !== id) {
+              // return `- ${id}: ->${chalk.bold.yellow(String(plan.id))}`;
+              return null;
+            } else {
+              return `- ${id}: ${
+                (optimized ? "!!" : "  ") +
+                plan.toString() +
+                (plan.dependencies.length
+                  ? ` (deps: ${plan.dependencies
+                      .map((depId) => printDep(depId))
+                      .join(", ")})`
+                  : "")
+              }`;
+            }
           })
           .filter(isNotNullish)
           .join("\n"),
