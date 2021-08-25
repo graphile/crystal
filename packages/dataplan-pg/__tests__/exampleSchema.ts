@@ -695,6 +695,7 @@ export function makeExampleSchema(
           $entity.get(attrName),
         );
         const $plan = source.get(matchObject);
+        deoptimizeIfAppropriate($plan);
         return $plan;
       },
     };
