@@ -1,3 +1,5 @@
+Error.stackTraceLimit = Infinity;
+
 import type { BaseGraphQLContext } from "graphile-crystal";
 import { graphql } from "graphql";
 import type { PoolClient } from "pg";
