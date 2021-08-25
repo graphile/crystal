@@ -855,14 +855,25 @@ export function isEquivalent(
 function getSubstitute(
   symbol: symbol,
   symbolSubstitutes?: Map<symbol, symbol>,
-  depth = 0,
+  path: symbol[] = [],
 ): symbol {
+  if (path.includes(symbol)) {
+    throw new Error(
+      `symbolSubstitute cycle detected: ${path
+        .map((s) => inspect(s))
+        .join(" -> ")} -> ${inspect(symbol)}`,
+    );
+  }
   const sub = symbolSubstitutes?.get(symbol);
+  if (sub === symbol) {
+    throw new Error(
+      `Invalid symbolSubstitutes - a symbol cannot be an alias for itself! Symbol: ${inspect(
+        symbol,
+      )}`,
+    );
+  }
   if (sub) {
-    if (depth > 1000) {
-      throw new Error("Substitute depth is too deep and possibly infinite");
-    }
-    return getSubstitute(sub, symbolSubstitutes, depth + 1);
+    return getSubstitute(sub, symbolSubstitutes, [...path, symbol]);
   } else {
     return symbol;
   }
