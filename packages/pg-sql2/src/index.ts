@@ -852,6 +852,22 @@ export function isEquivalent(
   }
 }
 
+function getSubstitute(
+  symbol: symbol,
+  symbolSubstitutes?: Map<symbol, symbol>,
+  depth = 0,
+): symbol {
+  const sub = symbolSubstitutes?.get(symbol);
+  if (sub) {
+    if (depth > 1000) {
+      throw new Error("Substitute depth is too deep and possibly infinite");
+    }
+    return getSubstitute(sub, symbolSubstitutes, depth++);
+  } else {
+    return symbol;
+  }
+}
+
 type IdentifierName = SQLIdentifierNode["names"] extends ReadonlyArray<infer U>
   ? U
   : never;
@@ -866,9 +882,9 @@ function identifiersAreEquivalent(
     return false;
   }
   const namesMatch = ids1.n === ids2.n;
-  const symbolsMatch = symbolSubstitutes?.has(ids1.s)
-    ? symbolSubstitutes.get(ids1.s) === ids2.s
-    : ids1.s === ids2.s;
+  const symbol1 = getSubstitute(ids1.s, symbolSubstitutes);
+  const symbol2 = getSubstitute(ids1.s, symbolSubstitutes);
+  const symbolsMatch = symbol1 === symbol2;
   return namesMatch && symbolsMatch;
 }
 
