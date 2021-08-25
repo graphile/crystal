@@ -1,0 +1,143 @@
+{
+  people: [
+    {
+      __typename: "Person",
+      username: "Alice",
+      singleTableItemsList: [
+        { __typename: "SingleTableTopic", parent: null, id: 2, type: "TOPIC" },
+        {
+          __typename: "SingleTablePost",
+          parent: { __typename: "SingleTableTopic", id: 2, type: "TOPIC" },
+          id: 15,
+          type: "POST",
+        },
+        {
+          __typename: "SingleTableChecklistItem",
+          parent: { __typename: "SingleTableChecklist", id: 16, type: "CHECKLIST" },
+          id: 21,
+          type: "CHECKLIST_ITEM",
+        },
+      ],
+    },
+    {
+      __typename: "Person",
+      username: "Benjie",
+      singleTableItemsList: [
+        { __typename: "SingleTableTopic", parent: null, id: 1, type: "TOPIC" },
+        {
+          __typename: "SingleTableDivider",
+          parent: { __typename: "SingleTableTopic", id: 1, type: "TOPIC" },
+          id: 3,
+          type: "DIVIDER",
+        },
+        {
+          __typename: "SingleTablePost",
+          parent: { __typename: "SingleTableTopic", id: 1, type: "TOPIC" },
+          id: 4,
+          type: "POST",
+        },
+        {
+          __typename: "SingleTablePost",
+          parent: { __typename: "SingleTableTopic", id: 1, type: "TOPIC" },
+          id: 5,
+          type: "POST",
+        },
+        {
+          __typename: "SingleTablePost",
+          parent: { __typename: "SingleTableTopic", id: 1, type: "TOPIC" },
+          id: 6,
+          type: "POST",
+        },
+        {
+          __typename: "SingleTablePost",
+          parent: { __typename: "SingleTableTopic", id: 1, type: "TOPIC" },
+          id: 7,
+          type: "POST",
+        },
+        {
+          __typename: "SingleTableDivider",
+          parent: { __typename: "SingleTableTopic", id: 1, type: "TOPIC" },
+          id: 8,
+          type: "DIVIDER",
+        },
+        {
+          __typename: "SingleTablePost",
+          parent: { __typename: "SingleTableTopic", id: 1, type: "TOPIC" },
+          id: 9,
+          type: "POST",
+        },
+        {
+          __typename: "SingleTableTopic",
+          parent: { __typename: "SingleTableTopic", id: 1, type: "TOPIC" },
+          id: 10,
+          type: "TOPIC",
+        },
+        {
+          __typename: "SingleTableTopic",
+          parent: { __typename: "SingleTableTopic", id: 10, type: "TOPIC" },
+          id: 11,
+          type: "TOPIC",
+        },
+        {
+          __typename: "SingleTablePost",
+          parent: { __typename: "SingleTableTopic", id: 11, type: "TOPIC" },
+          id: 12,
+          type: "POST",
+        },
+        {
+          __typename: "SingleTablePost",
+          parent: { __typename: "SingleTableTopic", id: 11, type: "TOPIC" },
+          id: 13,
+          type: "POST",
+        },
+        {
+          __typename: "SingleTablePost",
+          parent: { __typename: "SingleTableTopic", id: 11, type: "TOPIC" },
+          id: 14,
+          type: "POST",
+        },
+        {
+          __typename: "SingleTableChecklist",
+          parent: { __typename: "SingleTablePost", id: 4, type: "POST" },
+          id: 16,
+          type: "CHECKLIST",
+        },
+        {
+          __typename: "SingleTableChecklistItem",
+          parent: { __typename: "SingleTableChecklist", id: 16, type: "CHECKLIST" },
+          id: 17,
+          type: "CHECKLIST_ITEM",
+        },
+        {
+          __typename: "SingleTableChecklistItem",
+          parent: { __typename: "SingleTableChecklist", id: 16, type: "CHECKLIST" },
+          id: 19,
+          type: "CHECKLIST_ITEM",
+        },
+        {
+          __typename: "SingleTableChecklistItem",
+          parent: { __typename: "SingleTableChecklist", id: 16, type: "CHECKLIST" },
+          id: 20,
+          type: "CHECKLIST_ITEM",
+        },
+      ],
+    },
+    {
+      __typename: "Person",
+      username: "Caroline",
+      singleTableItemsList: [
+        {
+          __typename: "SingleTableChecklistItem",
+          parent: { __typename: "SingleTableChecklist", id: 16, type: "CHECKLIST" },
+          id: 18,
+          type: "CHECKLIST_ITEM",
+        },
+      ],
+    },
+    { __typename: "Person", username: "Dave", singleTableItemsList: [] },
+    { __typename: "Person", username: "Ellie", singleTableItemsList: [] },
+    { __typename: "Person", username: "Fred", singleTableItemsList: [] },
+    { __typename: "Person", username: "Georgina", singleTableItemsList: [] },
+    { __typename: "Person", username: "Harry", singleTableItemsList: [] },
+  ],
+}

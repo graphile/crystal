@@ -6,23 +6,11 @@
       __typename
       parent {
         __typename
-        ...Item
+        id
+        type
       }
-      ...Item
+      id
+      type
     }
   }
-}
-
-fragment Item on SingleTableItem {
-  id
-  type
-  author {
-    __typename
-    username
-  }
-  position
-  createdAt
-  updatedAt
-  isExplicitlyArchived
-  archivedAt
 }
