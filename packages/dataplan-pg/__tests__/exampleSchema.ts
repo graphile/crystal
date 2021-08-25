@@ -1773,6 +1773,24 @@ export function makeExampleSchema(
             return $people;
           },
         },
+
+        singleTableItemById: {
+          type: SingleTableItem,
+          args: {
+            id: {
+              type: GraphQLInt,
+            },
+          },
+          plan(_$root, args) {
+            const $item: SingleTableItemPlan = singleTableItemsSource.get({
+              id: args.id,
+            });
+            return new SingleTableInterfacePlan(
+              singleTableTypeName($item),
+              $item,
+            );
+          },
+        },
       },
     }),
   );

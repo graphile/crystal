@@ -1,18 +1,14 @@
 {
-  people {
+  singleTableItemById(id: 15) {
     __typename
-    username
-    singleTableItemsList {
+    parent {
       __typename
-      parent {
-        __typename
-        id
-        author {
-          __typename
-          username
-        }
-      }
       id
+      author {
+        __typename
+        username
+      }
     }
+    id
   }
 }
