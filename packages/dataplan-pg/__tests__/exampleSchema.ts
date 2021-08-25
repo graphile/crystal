@@ -1380,7 +1380,9 @@ export function makeExampleSchema(
       >
     > {
       return values.map((v) =>
-        polymorphicWrap(v[this.typePlanId], v[this.rowPlanId]),
+        v[this.typePlanId]
+          ? polymorphicWrap(v[this.typePlanId], v[this.rowPlanId])
+          : null,
       );
     }
   }

@@ -1461,6 +1461,9 @@ export class Aether<
             const { indexByListItemPlanId } = value;
             const layerResult = layerResults[valueIndex];
             const data = layerResult;
+            if (data == null) {
+              return null;
+            }
             let typeName: string;
             let innerData: any;
             if (isPolymorphic) {

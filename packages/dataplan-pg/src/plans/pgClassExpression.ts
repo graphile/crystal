@@ -125,6 +125,9 @@ export class PgClassExpressionPlan<
     const pg2gql = this.pgCodec.fromPg;
     if (attrIndex != null) {
       const result = values.map((v) => {
+        if (!v[tableId]) {
+          return null;
+        }
         const rawValue = v[tableId][attrIndex];
         if (rawValue == null) {
           return null;
