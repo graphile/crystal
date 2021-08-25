@@ -1453,6 +1453,7 @@ export function makeExampleSchema(
         const $plan = singleTableItemsSource.get({
           id: $entity.get("parent_id"),
         });
+        deoptimizeIfAppropriate($plan);
         return new SingleTableInterfacePlan(singleTableTypeName($plan), $plan);
       },
     },
