@@ -108,6 +108,10 @@ export function _crystalPrint(
   if (typeof symbol !== "symbol") {
     return inspect(symbol, { colors: true });
   }
+  return crystalPrintSymbol(symbol);
+}
+
+function _crystalSymbolDescription(symbol: symbol): string {
   if (!symbol.description) {
     return chalk.green("Symbol()");
   }
@@ -119,6 +123,33 @@ export function _crystalPrint(
   } else {
     return chalk.cyan(`$$${symbol.description}`);
   }
+}
+
+const symbolsByAlias = new Map<string, symbol[]>();
+let symbolClear: NodeJS.Timer | null = null;
+
+function crystalPrintSymbol(symbol: symbol): string {
+  const description = _crystalSymbolDescription(symbol);
+  if (!symbolClear) {
+    // Only cache symbols for a few milliseconds, we don't want a memory leak!
+    symbolClear = setTimeout(() => {
+      symbolClear = null;
+      symbolsByAlias.clear();
+    }, 200);
+  }
+  const symbols = symbolsByAlias.get(description);
+  if (!symbols) {
+    symbolsByAlias.set(description, [symbol]);
+    return description;
+  }
+  let idx = symbols.indexOf(symbol);
+  if (idx === 0) {
+    return description;
+  }
+  if (idx < 0) {
+    idx = symbols.push(symbol) - 1;
+  }
+  return `${description}${chalk.gray(`:${idx + 1}`)}`;
 }
 
 export function crystalPrint(
