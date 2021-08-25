@@ -1,0 +1,47 @@
+{
+  people {
+    __typename
+    username
+    singleTableItemsList {
+      __typename
+      parent {
+        __typename
+        ...Item
+      }
+      ...Item
+    }
+  }
+}
+
+fragment Item on SingleTableItem {
+  id
+  type
+  author {
+    __typename
+    username
+  }
+  position
+  createdAt
+  updatedAt
+  isExplicitlyArchived
+  archivedAt
+  ... on SingleTableTopic {
+    title
+  }
+  ... on SingleTablePost {
+    title
+    description
+    note
+  }
+  ... on SingleTableDivider {
+    title
+    color
+  }
+  ... on SingleTableChecklist {
+    title
+  }
+  ... on SingleTableChecklistItem {
+    description
+    note
+  }
+}

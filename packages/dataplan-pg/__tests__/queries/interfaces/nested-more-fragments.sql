@@ -12,6 +12,10 @@ select
       __single_table_items__."updated_at"::text,
       __single_table_items__."is_explicitly_archived"::text,
       __single_table_items__."archived_at"::text,
+      __single_table_items__."title"::text,
+      __single_table_items__."description"::text,
+      __single_table_items__."note"::text,
+      __single_table_items__."color"::text,
       __people_3."username"::text,
       __people_4."username"::text,
       __people_5."username"::text,
@@ -24,7 +28,11 @@ select
       __single_table_items_2."created_at"::text,
       __single_table_items_2."updated_at"::text,
       __single_table_items_2."is_explicitly_archived"::text,
-      __single_table_items_2."archived_at"::text
+      __single_table_items_2."archived_at"::text,
+      __single_table_items_2."title"::text,
+      __single_table_items_2."description"::text,
+      __single_table_items_2."note"::text,
+      __single_table_items_2."color"::text
     ]::text[]
     from interfaces_and_unions.single_table_items as __single_table_items_2
     left outer join interfaces_and_unions.single_table_items as __single_table_items__

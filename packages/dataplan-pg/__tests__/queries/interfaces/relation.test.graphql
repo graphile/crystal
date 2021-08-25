@@ -1,0 +1,18 @@
+{
+  people {
+    __typename
+    username
+    singleTableItemsList {
+      __typename
+      parent {
+        __typename
+        id
+        author {
+          __typename
+          username
+        }
+      }
+      id
+    }
+  }
+}

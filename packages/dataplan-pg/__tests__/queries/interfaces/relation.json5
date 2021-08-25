@@ -1,0 +1,124 @@
+{
+  people: [
+    {
+      __typename: "Person",
+      username: "Alice",
+      singleTableItemsList: [
+        { __typename: "SingleTableTopic", parent: null, id: 2 },
+        {
+          __typename: "SingleTablePost",
+          parent: { __typename: "SingleTableTopic", id: 2, author: { __typename: "Person", username: "Alice" } },
+          id: 15,
+        },
+        {
+          __typename: "SingleTableChecklistItem",
+          parent: { __typename: "SingleTableChecklist", id: 16, author: { __typename: "Person", username: "Benjie" } },
+          id: 21,
+        },
+      ],
+    },
+    {
+      __typename: "Person",
+      username: "Benjie",
+      singleTableItemsList: [
+        { __typename: "SingleTableTopic", parent: null, id: 1 },
+        {
+          __typename: "SingleTableDivider",
+          parent: { __typename: "SingleTableTopic", id: 1, author: { __typename: "Person", username: "Benjie" } },
+          id: 3,
+        },
+        {
+          __typename: "SingleTablePost",
+          parent: { __typename: "SingleTableTopic", id: 1, author: { __typename: "Person", username: "Benjie" } },
+          id: 4,
+        },
+        {
+          __typename: "SingleTablePost",
+          parent: { __typename: "SingleTableTopic", id: 1, author: { __typename: "Person", username: "Benjie" } },
+          id: 5,
+        },
+        {
+          __typename: "SingleTablePost",
+          parent: { __typename: "SingleTableTopic", id: 1, author: { __typename: "Person", username: "Benjie" } },
+          id: 6,
+        },
+        {
+          __typename: "SingleTablePost",
+          parent: { __typename: "SingleTableTopic", id: 1, author: { __typename: "Person", username: "Benjie" } },
+          id: 7,
+        },
+        {
+          __typename: "SingleTableDivider",
+          parent: { __typename: "SingleTableTopic", id: 1, author: { __typename: "Person", username: "Benjie" } },
+          id: 8,
+        },
+        {
+          __typename: "SingleTablePost",
+          parent: { __typename: "SingleTableTopic", id: 1, author: { __typename: "Person", username: "Benjie" } },
+          id: 9,
+        },
+        {
+          __typename: "SingleTableTopic",
+          parent: { __typename: "SingleTableTopic", id: 1, author: { __typename: "Person", username: "Benjie" } },
+          id: 10,
+        },
+        {
+          __typename: "SingleTableTopic",
+          parent: { __typename: "SingleTableTopic", id: 10, author: { __typename: "Person", username: "Benjie" } },
+          id: 11,
+        },
+        {
+          __typename: "SingleTablePost",
+          parent: { __typename: "SingleTableTopic", id: 11, author: { __typename: "Person", username: "Benjie" } },
+          id: 12,
+        },
+        {
+          __typename: "SingleTablePost",
+          parent: { __typename: "SingleTableTopic", id: 11, author: { __typename: "Person", username: "Benjie" } },
+          id: 13,
+        },
+        {
+          __typename: "SingleTablePost",
+          parent: { __typename: "SingleTableTopic", id: 11, author: { __typename: "Person", username: "Benjie" } },
+          id: 14,
+        },
+        {
+          __typename: "SingleTableChecklist",
+          parent: { __typename: "SingleTablePost", id: 4, author: { __typename: "Person", username: "Benjie" } },
+          id: 16,
+        },
+        {
+          __typename: "SingleTableChecklistItem",
+          parent: { __typename: "SingleTableChecklist", id: 16, author: { __typename: "Person", username: "Benjie" } },
+          id: 17,
+        },
+        {
+          __typename: "SingleTableChecklistItem",
+          parent: { __typename: "SingleTableChecklist", id: 16, author: { __typename: "Person", username: "Benjie" } },
+          id: 19,
+        },
+        {
+          __typename: "SingleTableChecklistItem",
+          parent: { __typename: "SingleTableChecklist", id: 16, author: { __typename: "Person", username: "Benjie" } },
+          id: 20,
+        },
+      ],
+    },
+    {
+      __typename: "Person",
+      username: "Caroline",
+      singleTableItemsList: [
+        {
+          __typename: "SingleTableChecklistItem",
+          parent: { __typename: "SingleTableChecklist", id: 16, author: { __typename: "Person", username: "Benjie" } },
+          id: 18,
+        },
+      ],
+    },
+    { __typename: "Person", username: "Dave", singleTableItemsList: [] },
+    { __typename: "Person", username: "Ellie", singleTableItemsList: [] },
+    { __typename: "Person", username: "Fred", singleTableItemsList: [] },
+    { __typename: "Person", username: "Georgina", singleTableItemsList: [] },
+    { __typename: "Person", username: "Harry", singleTableItemsList: [] },
+  ],
+}
