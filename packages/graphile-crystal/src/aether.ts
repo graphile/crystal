@@ -83,6 +83,22 @@ import {
   uid,
 } from "./utils";
 
+function newCrystalLayerObject(
+  crystalObject: CrystalObject<any>,
+  indexByListItemPlanId: {
+    [listItemPlanId: number]: number;
+  },
+): CrystalLayerObject {
+  return {
+    // @ts-ignore
+    toString(): string {
+      return chalk.bold.green(`CLO<${crystalObject}>`);
+    },
+    crystalObject,
+    indexByListItemPlanId,
+  };
+}
+
 const EMPTY_INDEXES = Object.freeze([] as number[]);
 
 // For logging indentation
@@ -1418,16 +1434,13 @@ export class Aether<
             return layerResult.map(
               (_layerIndividualResult, layerResultIndex) => {
                 valueIndexByNewValuesIndex.push(valueIndex);
-                return {
-                  crystalObject,
-                  indexByListItemPlanId: {
-                    ...indexByListItemPlanId,
-                    // TODO: when we implement `@stream` then this
-                    // might not actually be the right index, we might
-                    // need to add an offset?
-                    [listItemPlanIdAtDepth[depth]]: layerResultIndex,
-                  },
-                };
+                return newCrystalLayerObject(crystalObject, {
+                  ...indexByListItemPlanId,
+                  // TODO: when we implement `@stream` then this
+                  // might not actually be the right index, we might
+                  // need to add an offset?
+                  [listItemPlanIdAtDepth[depth]]: layerResultIndex,
+                });
               },
             );
           });
@@ -1493,10 +1506,12 @@ export class Aether<
 
       const results = await executeLayers(
         layers,
-        crystalObjects.map((crystalObject) => ({
-          crystalObject,
-          indexByListItemPlanId: crystalObject[$$indexByListItemPlanId],
-        })),
+        crystalObjects.map((crystalObject) =>
+          newCrystalLayerObject(
+            crystalObject,
+            crystalObject[$$indexByListItemPlanId],
+          ),
+        ),
       );
 
       for (let i = 0; i < entriesLength; i++) {
