@@ -806,9 +806,17 @@ export function isEquivalent(
         }
         return sql1.value === sql2.value;
       }
-      case "INDENT":
+      case "INDENT": {
+        if (sql2.type !== sql1.type) {
+          return false;
+        }
+        return isEquivalent(sql1.content, sql2.content, symbolSubstitutes);
+      }
       case "PARENS": {
         if (sql2.type !== sql1.type) {
+          return false;
+        }
+        if (sql2.force !== sql1.force) {
           return false;
         }
         return isEquivalent(sql1.content, sql2.content, symbolSubstitutes);
