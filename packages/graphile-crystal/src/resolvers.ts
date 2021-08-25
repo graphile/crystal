@@ -283,7 +283,7 @@ export function crystalWrapResolve<
       }
       const result = await getBatchResult(batch, parentCrystalObject);
       debug(
-        `👈 %p/%c for %s; result: %o`,
+        `👈 %p/%c for %s; result: %c`,
         pathIdentity,
         id,
         parentCrystalObject,
