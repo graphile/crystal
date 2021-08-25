@@ -859,12 +859,12 @@ function getSubstitute(
   initialSymbol: symbol,
   symbolSubstitutes?: Map<symbol, symbol>,
 ): symbol {
-  const seen = new Set<symbol>();
+  const path: symbol[] = [];
   let symbol = initialSymbol;
   for (let i = 0; i < 1000; i++) {
-    if (seen.has(symbol)) {
+    if (path.includes(symbol)) {
       throw new Error(
-        `symbolSubstitute cycle detected: ${[...seen.values()]
+        `symbolSubstitute cycle detected: ${path
           .map((s) => inspect(s))
           .join(" -> ")} -> ${inspect(symbol)}`,
       );
@@ -877,7 +877,7 @@ function getSubstitute(
         )}`,
       );
     } else if (sub) {
-      seen.add(symbol);
+      path.push(symbol);
       symbol = sub;
     } else {
       return symbol;
