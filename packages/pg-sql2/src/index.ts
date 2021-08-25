@@ -852,31 +852,38 @@ export function isEquivalent(
   }
 }
 
+/**
+ * @internal
+ */
 function getSubstitute(
-  symbol: symbol,
+  initialSymbol: symbol,
   symbolSubstitutes?: Map<symbol, symbol>,
-  path: symbol[] = [],
 ): symbol {
-  if (path.includes(symbol)) {
-    throw new Error(
-      `symbolSubstitute cycle detected: ${path
-        .map((s) => inspect(s))
-        .join(" -> ")} -> ${inspect(symbol)}`,
-    );
+  const seen = new Set<symbol>();
+  let symbol = initialSymbol;
+  for (let i = 0; i < 1000; i++) {
+    if (seen.has(symbol)) {
+      throw new Error(
+        `symbolSubstitute cycle detected: ${[...seen.values()]
+          .map((s) => inspect(s))
+          .join(" -> ")} -> ${inspect(symbol)}`,
+      );
+    }
+    const sub = symbolSubstitutes?.get(symbol);
+    if (sub === symbol) {
+      throw new Error(
+        `Invalid symbolSubstitutes - a symbol cannot be an alias for itself! Symbol: ${inspect(
+          symbol,
+        )}`,
+      );
+    } else if (sub) {
+      seen.add(symbol);
+      symbol = sub;
+    } else {
+      return symbol;
+    }
   }
-  const sub = symbolSubstitutes?.get(symbol);
-  if (sub === symbol) {
-    throw new Error(
-      `Invalid symbolSubstitutes - a symbol cannot be an alias for itself! Symbol: ${inspect(
-        symbol,
-      )}`,
-    );
-  }
-  if (sub) {
-    return getSubstitute(sub, symbolSubstitutes, [...path, symbol]);
-  } else {
-    return symbol;
-  }
+  throw new Error("symbolSubstitutes depth too deep");
 }
 
 type IdentifierName = SQLIdentifierNode["names"] extends ReadonlyArray<infer U>
