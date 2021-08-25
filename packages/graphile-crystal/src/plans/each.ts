@@ -36,9 +36,6 @@ export class EachPlan<
   listItem(itemPlan: __ListItemPlan<this>): TResultItemPlan {
     const originalListItem = this.originalListPlan().listItem(itemPlan);
     const mappedPlan = this.mapper(originalListItem);
-    console.log(
-      `RETURNING MAPPED LIST ITEM PLAN ${mappedPlan} DEPENDENT ON ${itemPlan} via ${originalListItem}`,
-    );
     return mappedPlan;
   }
 
