@@ -1,0 +1,7 @@
+{
+  item: {
+    __typename: "SingleTablePost",
+    parent: { __typename: "SingleTableTopic", id: 2, author: { __typename: "Person", username: "Alice" } },
+    id: 15,
+  },
+}
