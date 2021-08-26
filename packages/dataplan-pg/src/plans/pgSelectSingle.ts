@@ -3,7 +3,7 @@ import { ExecutablePlan } from "graphile-crystal";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { PgSource, PgSourceColumn } from "../datasource";
+import type { PgSource, PgSourceColumn, PgSourceRelation } from "../datasource";
 import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
 import type { PgClassExpressionPlan } from "./pgClassExpression";
 import { pgClassExpression } from "./pgClassExpression";
@@ -17,6 +17,14 @@ import { PgSelectPlan } from "./pgSelect";
 // const debugExecute = debugFactory("datasource:pg:PgSelectSinglePlan:execute");
 // const debugPlanVerbose = debugPlan.extend("verbose");
 // const debugExecuteVerbose = debugExecute.extend("verbose");
+
+interface RelationalShortcuts {
+  [key: string]: PgSelectSinglePlan<any>;
+}
+
+export interface PgSelectSinglePlanOptions {
+  relationalShortcuts?: RelationalShortcuts;
+}
 
 /**
  * Represents the single result of a unique PgSelectPlan. This might be
@@ -41,6 +49,7 @@ export class PgSelectSinglePlan<
   constructor(
     classPlan: PgSelectPlan<TDataSource>,
     itemPlan: ExecutablePlan<TDataSource["TRow"]>,
+    private options: PgSelectSinglePlanOptions = {},
   ) {
     super();
     this.dataSource = classPlan.dataSource;
@@ -128,6 +137,11 @@ export class PgSelectSinglePlan<
   public singleRelation<
     TRelationName extends Parameters<TDataSource["getRelation"]>[0],
   >(relationIdentifier: TRelationName): PgSelectSinglePlan<any> {
+    const shortcut =
+      this.options.relationalShortcuts?.[relationIdentifier as string];
+    if (shortcut) {
+      return shortcut;
+    }
     const relation = this.dataSource.getRelation(relationIdentifier as string);
     if (!relation || !relation.isUnique) {
       throw new Error(
@@ -137,11 +151,27 @@ export class PgSelectSinglePlan<
     const source = relation.source as PgSource<any, any, any, any, any>;
     const remoteColumns = relation.remoteColumns as string[];
     const localColumns = relation.remoteColumns as string[];
+
+    const reciprocal = source.getReciprocal(
+      this.dataSource,
+      relationIdentifier,
+    );
+    const options: PgSelectSinglePlanOptions = {};
+    if (reciprocal) {
+      const reciprocalRelation: PgSourceRelation<typeof source, any> =
+        reciprocal[1];
+      if (reciprocalRelation.isUnique) {
+        options.relationalShortcuts = {
+          [reciprocal[0]]: this,
+        };
+      }
+    }
     return source.get(
       remoteColumns.reduce((memo, remoteColumn, columnIndex) => {
         memo[remoteColumn] = this.get(localColumns[columnIndex]);
         return memo;
       }, Object.create(null)),
+      options,
     );
   }
 

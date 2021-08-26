@@ -26,7 +26,11 @@ import type { PgOrderSpec, PgTypedExecutablePlan } from "../interfaces";
 import { PgClassExpressionPlan } from "./pgClassExpression";
 import { PgConditionPlan } from "./pgCondition";
 import { PgRecordPlan } from "./pgRecord";
-import { PgSelectSinglePlan } from "./pgSelectSingle";
+import type {
+  PgSelectSinglePlanOptions} from "./pgSelectSingle";
+import {
+  PgSelectSinglePlan
+} from "./pgSelectSingle";
 
 const isDev =
   process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
@@ -1552,12 +1556,12 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
    * does currently). Beware: if you call this and the database might actually
    * return more than one record then you're potentially in for a Bad Time.
    */
-  single(): PgSelectSinglePlan<TDataSource> {
+  single(options?: PgSelectSinglePlanOptions): PgSelectSinglePlan<TDataSource> {
     this.setUnique(true);
     // TODO: should this be on a clone plan? I don't currently think so since
     // PgSelectSinglePlan does not allow for `.where` divergence (since it
     // does not support `.where`).
-    return new PgSelectSinglePlan(this, first(this));
+    return new PgSelectSinglePlan(this, first(this), options);
   }
 
   /**

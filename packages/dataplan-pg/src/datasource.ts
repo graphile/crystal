@@ -4,6 +4,7 @@ import type {
   ExecutablePlan,
   ObjectPlan,
 } from "graphile-crystal";
+import { arraysMatch } from "graphile-crystal";
 import { __ValuePlan, getCurrentParentPathIdentity } from "graphile-crystal";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
@@ -17,7 +18,10 @@ import type {
 import type { PgTypeCodec } from "./interfaces";
 import type { PgSelectPlan } from "./plans/pgSelect";
 import { pgSelect } from "./plans/pgSelect";
-import type { PgSelectSinglePlan } from "./plans/pgSelectSingle";
+import type {
+  PgSelectSinglePlan,
+  PgSelectSinglePlanOptions,
+} from "./plans/pgSelectSingle";
 
 export type PgSourceColumns = {
   [columnName: string]: PgSourceColumn<any>;
@@ -127,7 +131,8 @@ export class PgSource<
   public readonly source: SQL | ((args: SQL[]) => SQL);
   public readonly columns: TColumns;
   public readonly uniques: TUniques;
-  private relations: TRelations | (() => TRelations);
+  private relationsThunk: (() => TRelations) | null;
+  private _relations: TRelations | null = null;
 
   /**
    * @param source - the SQL for the `FROM` clause (without any
@@ -153,29 +158,65 @@ export class PgSource<
     this.source = source;
     this.columns = columns ?? ({} as TColumns);
     this.uniques = uniques ?? ([] as any);
-    this.relations =
-      typeof relations === "function"
-        ? () => {
-            this.relations = relations();
-            return this.relations;
-          }
-        : relations || ({} as TRelations);
+    this.relationsThunk = typeof relations === "function" ? relations : null;
+    if (typeof relations !== "function") {
+      this._relations = relations || ({} as TRelations);
+    }
   }
 
   public toString(): string {
     return chalk.bold.blue(`PgSource(${this.name})`);
   }
 
+  private getRelations(): TRelations {
+    if (typeof this.relationsThunk === "function") {
+      this._relations = this.relationsThunk();
+      this.relationsThunk = null;
+    }
+    if (!this._relations) {
+      throw new Error("PgSource relations must not be null");
+    }
+    return this._relations;
+  }
+
   public getRelation<TRelationName extends keyof TRelations>(
     name: TRelationName,
   ): TRelations[TRelationName] {
-    const r =
-      typeof this.relations === "function" ? this.relations() : this.relations;
-    return r[name];
+    return this.getRelations()[name];
+  }
+
+  public getReciprocal<
+    TOtherDataSource extends PgSource<any, any, any, any, any>,
+    TOtherRelationName extends Parameters<TOtherDataSource["getRelation"]>[0],
+  >(
+    otherDataSource: TOtherDataSource,
+    otherRelationName: TOtherRelationName,
+  ): [keyof TRelations, TRelations[keyof TRelations]] | null {
+    const otherRelation: PgSourceRelation<TOtherDataSource, any> =
+      otherDataSource.getRelation(otherRelationName);
+    const relations = this.getRelations();
+    const reciprocal = (
+      Object.entries(relations) as Array<
+        [keyof TRelations, TRelations[keyof TRelations]]
+      >
+    ).find(([_relationName, relation]) => {
+      if (relation.source !== otherDataSource) {
+        return false;
+      }
+      if (!arraysMatch(relation.localColumns, otherRelation.remoteColumns)) {
+        return false;
+      }
+      if (!arraysMatch(relation.remoteColumns, otherRelation.localColumns)) {
+        return false;
+      }
+      return true;
+    });
+    return reciprocal || null;
   }
 
   public get(
     spec: PlanByUniques<TColumns, TUniques>,
+    options?: PgSelectSinglePlanOptions,
   ): PgSelectSinglePlan<this> {
     const keys: ReadonlyArray<keyof TColumns> = Object.keys(spec);
     if (!this.uniques.some((uniq) => uniq.every((key) => keys.includes(key)))) {
@@ -187,7 +228,7 @@ export class PgSource<
         )}). Did you mean to call .find() instead?`,
       );
     }
-    return this.find(spec).single();
+    return this.find(spec).single(options);
   }
 
   public find(
