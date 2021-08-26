@@ -13,6 +13,12 @@ const debugExecute = debugFactory("datasource:pg:PgRecordPlan:execute");
 //const debugPlanVerbose = debugPlan.extend("verbose");
 const debugExecuteVerbose = debugExecute.extend("verbose");
 
+/**
+ * This plan resolves to an entire record (e.g. a row from a table); useful for
+ * example when you need to feed an entire record into something in Postgres,
+ * for example into the first argument to a PostGraphile-style computed column
+ * function.
+ */
 export class PgRecordPlan<TDataSource extends PgSource<any, any, any, any>>
   extends ExecutablePlan<any>
   implements PgTypedExecutablePlan<TDataSource["codec"]>
