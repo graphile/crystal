@@ -30,7 +30,7 @@ interface RelationalShortcuts {
 }
 
 export interface PgSelectSinglePlanOptions {
-  relationalShortcuts?: RelationalShortcuts;
+  fromRelation?: [PgSelectSinglePlan<any>, string];
 }
 
 /**
@@ -150,9 +150,11 @@ export class PgSelectSinglePlan<
         dataSourceColumn.identicalVia,
         attr as string,
       );
-      if (this.options.relationalShortcuts?.[relation]) {
+
+      const $existingPlan = this.existingSingleRelation(relation);
+      if ($existingPlan) {
         // Relation exists already; load it from there for efficiency
-        return this.singleRelation(relation).get(attribute);
+        return $existingPlan.get(attribute);
       } else {
         // Load it from ourself instead
       }
@@ -183,13 +185,35 @@ export class PgSelectSinglePlan<
     return colPlan;
   }
 
+  private existingSingleRelation<
+    TRelationName extends Parameters<TDataSource["getRelation"]>[0],
+  >(relationIdentifier: TRelationName): PgSelectSinglePlan<any> | null {
+    if (this.options.fromRelation) {
+      const [$fromPlan, fromRelationName] = this.options.fromRelation;
+      // check to see if we already came via this relationship
+      const reciprocal = this.dataSource.getReciprocal(
+        $fromPlan.dataSource,
+        fromRelationName,
+      );
+      if (reciprocal) {
+        const reciprocalRelationName = reciprocal[0] as string;
+        if (reciprocalRelationName === relationIdentifier) {
+          const reciprocalRelation: PgSourceRelation<any, any> = reciprocal[1];
+          if (reciprocalRelation.isUnique) {
+            return $fromPlan;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
   public singleRelation<
     TRelationName extends Parameters<TDataSource["getRelation"]>[0],
   >(relationIdentifier: TRelationName): PgSelectSinglePlan<any> {
-    const shortcut =
-      this.options.relationalShortcuts?.[relationIdentifier as string];
-    if (shortcut) {
-      return shortcut;
+    const $existingPlan = this.existingSingleRelation(relationIdentifier);
+    if ($existingPlan) {
+      return $existingPlan;
     }
     const relation = this.dataSource.getRelation(relationIdentifier as string);
     if (!relation || !relation.isUnique) {
@@ -201,20 +225,9 @@ export class PgSelectSinglePlan<
     const remoteColumns = relation.remoteColumns as string[];
     const localColumns = relation.localColumns as string[];
 
-    const reciprocal = source.getReciprocal(
-      this.dataSource,
-      relationIdentifier,
-    );
-    const options: PgSelectSinglePlanOptions = {};
-    if (reciprocal) {
-      const reciprocalRelation: PgSourceRelation<typeof source, any> =
-        reciprocal[1];
-      if (reciprocalRelation.isUnique) {
-        options.relationalShortcuts = {
-          [reciprocal[0]]: this,
-        };
-      }
-    }
+    const options: PgSelectSinglePlanOptions = {
+      fromRelation: [this, relationIdentifier as string],
+    };
     return source.get(
       remoteColumns.reduce((memo, remoteColumn, columnIndex) => {
         memo[remoteColumn] = this.get(localColumns[columnIndex]);
