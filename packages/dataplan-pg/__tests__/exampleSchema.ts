@@ -39,24 +39,24 @@ import prettier from "prettier";
 import { inspect } from "util";
 
 import type {
-  PgSelectPlan,
-  PgTypeCodec,
-  PgSourceColumn,
-  PgExecutorContext,
-  WithPgClient,
   PgConditionCapableParentPlan,
+  PgExecutorContext,
+  PgSelectPlan,
+  PgSourceColumn,
+  PgTypeCodec,
+  WithPgClient,
 } from "../src";
 import {
-  pgSingleTableInterface,
+  pgClassExpression,
+  PgConditionPlan,
   PgConnectionPlan,
+  PgExecutor,
   pgSelect,
   PgSelectSinglePlan,
+  pgSingleTableInterface,
   PgSource,
   recordType,
   TYPES,
-  PgExecutor,
-  pgClassExpression,
-  PgConditionPlan,
 } from "../src";
 
 // These are what the generics extend from
