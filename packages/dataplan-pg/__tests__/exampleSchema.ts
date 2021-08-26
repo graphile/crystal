@@ -281,6 +281,12 @@ export function makeExampleSchema(
         remoteColumns: [`id`],
         isUnique: true,
       },
+      forum: {
+        source: forumSource,
+        localColumns: ["forum_id"],
+        remoteColumns: ["id"],
+        isUnique: true,
+      },
     }),
   });
 
@@ -822,9 +828,11 @@ export function makeExampleSchema(
   const Message = new GraphQLObjectType(
     objectSpec<GraphileResolverContext, MessagePlan>({
       name: "Message",
-      fields: {
+      fields: () => ({
+        id: attrField("id", GraphQLString),
         featured: attrField("featured", GraphQLBoolean),
         body: attrField("body", GraphQLString),
+        forum: singleRelationField("forum", Forum),
         author: {
           type: User,
           plan($message) {
@@ -835,7 +843,7 @@ export function makeExampleSchema(
           },
         },
         isArchived: attrField("is_archived", GraphQLBoolean),
-      },
+      }),
     }),
   );
 
@@ -1712,8 +1720,21 @@ export function makeExampleSchema(
           type: Forum,
           plan(_$root, args) {
             const $forum = forumSource.get({ id: args.id });
-            deoptimizeIfAppropriate($forum.getClassPlan());
+            deoptimizeIfAppropriate($forum);
             return $forum;
+          },
+          args: {
+            id: {
+              type: new GraphQLNonNull(GraphQLString),
+            },
+          },
+        },
+        message: {
+          type: Message,
+          plan(_$root, args) {
+            const $message = messageSource.get({ id: args.id });
+            deoptimizeIfAppropriate($message);
+            return $message;
           },
           args: {
             id: {
