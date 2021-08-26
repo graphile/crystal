@@ -12,7 +12,12 @@ function sqlPrint(fragment: SQL): string {
 debugFactory.formatters.S = sqlPrint;
 
 export { recordType, TYPES } from "./codecs";
-export { PgSource, PgSourceColumn } from "./datasource";
+export {
+  PgSource,
+  PgSourceColumn,
+  PgSourceColumns,
+  PgSourceColumnVia,
+} from "./datasource";
 export {
   PgClient,
   PgClientQuery,

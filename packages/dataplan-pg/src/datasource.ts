@@ -27,6 +27,10 @@ export type PgSourceColumns = {
   [columnName: string]: PgSourceColumn<any>;
 };
 
+export type PgSourceColumnVia =
+  | string
+  | { relation: string; attribute: string };
+
 export interface PgSourceColumn<TCanonical = any, TInput = TCanonical> {
   /**
    * How to translate to/from PG and how to cast.
@@ -53,14 +57,34 @@ export interface PgSourceColumn<TCanonical = any, TInput = TCanonical> {
    * If this column actually exists on a relation rather than locally, the name
    * of the (unique) relation this column belongs to.
    */
-  via?: string | { relation: string; attribute: string };
+  via?: PgSourceColumnVia;
 
   /**
    * If the column exists identically on a relation and locally (e.g.
    * `posts.author_id` and `users.id` have exactly the same value due to a
    * foreign key reference) then the plans can choose which one to grab.
+   *
+   * @remarks
+   *
+   * ```
+   * create table users (id serial primary key);
+   * create table posts (id serial primary key, author_id int references users);
+   * create table comments (id serial primary key, user_id int references users);
+   * create table pets (id serial primary key, owner_id int references users);
+   * ```
+   *
+   * Here:
+   * - posts.author_id *identical via* 'author.id'
+   * - comments.user_id *identical via* 'user.id'
+   * - pets.owner_id *identical via* 'owner.id'
+   *
+   * Note however that `users.id` is not *identical via* anything, because
+   * these are all plural relationships. So identicalVia is generally one-way
+   * (except in 1-to-1 relationships).
    */
-  identicalVia?: string | { relation: string; attribute: string };
+  identicalVia?: PgSourceColumnVia;
+  // TODO: can identicalVia be plural? Is that useful? Maybe a column that has
+  // multiple foreign key references?
 }
 
 type PgSourceRow<TColumns extends PgSourceColumns> = {

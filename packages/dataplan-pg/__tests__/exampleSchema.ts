@@ -43,15 +43,16 @@ import type {
   PgExecutorContext,
   PgSelectPlan,
   PgSourceColumn,
+  PgSourceColumnVia,
   PgTypeCodec,
   WithPgClient,
 } from "../src";
-import { pgRelationalInterface } from "../src";
 import {
   pgClassExpression,
   PgConditionPlan,
   PgConnectionPlan,
   PgExecutor,
+  pgRelationalInterface,
   pgSelect,
   PgSelectSinglePlan,
   pgSingleTableInterface,
@@ -59,7 +60,6 @@ import {
   recordType,
   TYPES,
 } from "../src";
-import type { PgSourceColumns } from "../src/datasource";
 
 // These are what the generics extend from
 
@@ -128,8 +128,8 @@ export function makeExampleSchema(
       expression?: PgSourceColumn<any>["expression"];
       // TODO: we could make TypeScript understand the relations on the object
       // rather than just being string.
-      via?: string | { relation: string; attribute: string };
-      identicalVia?: string | { relation: string; attribute: string };
+      via?: PgSourceColumnVia;
+      identicalVia?: PgSourceColumnVia;
     },
   >(
     options: TOptions,
