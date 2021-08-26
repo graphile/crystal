@@ -4,24 +4,19 @@ import type {
   __ValuePlan,
   BaseGraphQLContext,
   BaseGraphQLRootValue,
-  CrystalResultsList,
-  CrystalValuesList,
+  ExecutablePlan,
   InputStaticLeafPlan,
-  PolymorphicData,
-  PolymorphicPlan,
 } from "graphile-crystal";
 import {
   BasePlan,
   context,
   crystalEnforce,
   each,
-  ExecutablePlan,
   inputObjectSpec,
   lambda,
   ModifierPlan,
   object,
   objectSpec,
-  polymorphicWrap,
   resolveType,
 } from "graphile-crystal";
 import type { GraphQLOutputType } from "graphql";
@@ -43,20 +38,26 @@ import sql from "pg-sql2";
 import prettier from "prettier";
 import { inspect } from "util";
 
-import { PgSelectPlan, pgSingleTableInterface, PgTypeCodec } from "../src";
+import type {
+  PgSelectPlan,
+  PgTypeCodec,
+  PgSourceColumn,
+  PgExecutorContext,
+  WithPgClient,
+  PgConditionCapableParentPlan,
+} from "../src";
 import {
+  pgSingleTableInterface,
   PgConnectionPlan,
   pgSelect,
   PgSelectSinglePlan,
   PgSource,
+  recordType,
+  TYPES,
+  PgExecutor,
+  pgClassExpression,
+  PgConditionPlan,
 } from "../src";
-import { recordType, TYPES } from "../src/codecs";
-import type { PgSourceColumn } from "../src/datasource";
-import type { PgExecutorContext, WithPgClient } from "../src/executor";
-import { PgExecutor } from "../src/executor";
-import { pgClassExpression } from "../src/plans/pgClassExpression";
-import type { PgConditionCapableParentPlan } from "../src/plans/pgCondition";
-import { PgConditionPlan } from "../src/plans/pgCondition";
 
 // These are what the generics extend from
 

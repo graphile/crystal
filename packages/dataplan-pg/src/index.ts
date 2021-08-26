@@ -11,12 +11,18 @@ function sqlPrint(fragment: SQL): string {
 
 debugFactory.formatters.S = sqlPrint;
 
-export { PgSource } from "./datasource";
+export { recordType, TYPES } from "./codecs";
+export { PgSource, PgSourceColumn } from "./datasource";
+export { PgExecutor, PgExecutorContext, WithPgClient } from "./executor";
 export { PgTypeCodec } from "./interfaces";
 export {
   pgClassExpression,
   PgClassExpressionPlan,
 } from "./plans/pgClassExpression";
+export {
+  PgConditionCapableParentPlan,
+  PgConditionPlan,
+} from "./plans/pgCondition";
 export { PgConnectionPlan } from "./plans/pgConnection";
 export { pgSelect, PgSelectPlan } from "./plans/pgSelect";
 export { PgSelectSinglePlan } from "./plans/pgSelectSingle";
