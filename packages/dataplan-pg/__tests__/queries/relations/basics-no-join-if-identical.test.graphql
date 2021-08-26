@@ -1,0 +1,9 @@
+{
+  message(id: "ca70ca70-0000-0000-0000-cec111a0ca70") {
+    id
+    body
+    forum {
+      id # This is identical to message.forum_id so we shouldn't need to query it
+    }
+  }
+}
