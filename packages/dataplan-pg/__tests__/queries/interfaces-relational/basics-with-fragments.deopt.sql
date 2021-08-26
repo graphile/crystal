@@ -43,9 +43,8 @@ from (
 ) as __relational_topics_identifiers__,
 lateral (
   select
-    __relational_topics__."id"::text as "0",
-    __relational_topics__."title"::text as "1",
-    __relational_topics_identifiers__.idx as "2"
+    __relational_topics__."title"::text as "0",
+    __relational_topics_identifiers__.idx as "1"
   from interfaces_and_unions.relational_topics as __relational_topics__
   where
     (
@@ -65,11 +64,10 @@ from (
 ) as __relational_posts_identifiers__,
 lateral (
   select
-    __relational_posts__."id"::text as "0",
-    __relational_posts__."title"::text as "1",
-    __relational_posts__."description"::text as "2",
-    __relational_posts__."note"::text as "3",
-    __relational_posts_identifiers__.idx as "4"
+    __relational_posts__."title"::text as "0",
+    __relational_posts__."description"::text as "1",
+    __relational_posts__."note"::text as "2",
+    __relational_posts_identifiers__.idx as "3"
   from interfaces_and_unions.relational_posts as __relational_posts__
   where
     (
@@ -89,10 +87,9 @@ from (
 ) as __relational_checklist_items_identifiers__,
 lateral (
   select
-    __relational_checklist_items__."id"::text as "0",
-    __relational_checklist_items__."description"::text as "1",
-    __relational_checklist_items__."note"::text as "2",
-    __relational_checklist_items_identifiers__.idx as "3"
+    __relational_checklist_items__."description"::text as "0",
+    __relational_checklist_items__."note"::text as "1",
+    __relational_checklist_items_identifiers__.idx as "2"
   from interfaces_and_unions.relational_checklist_items as __relational_checklist_items__
   where
     (
@@ -112,10 +109,9 @@ from (
 ) as __relational_dividers_identifiers__,
 lateral (
   select
-    __relational_dividers__."id"::text as "0",
-    __relational_dividers__."title"::text as "1",
-    __relational_dividers__."color"::text as "2",
-    __relational_dividers_identifiers__.idx as "3"
+    __relational_dividers__."title"::text as "0",
+    __relational_dividers__."color"::text as "1",
+    __relational_dividers_identifiers__.idx as "2"
   from interfaces_and_unions.relational_dividers as __relational_dividers__
   where
     (
@@ -135,9 +131,8 @@ from (
 ) as __relational_checklists_identifiers__,
 lateral (
   select
-    __relational_checklists__."id"::text as "0",
-    __relational_checklists__."title"::text as "1",
-    __relational_checklists_identifiers__.idx as "2"
+    __relational_checklists__."title"::text as "0",
+    __relational_checklists_identifiers__.idx as "1"
   from interfaces_and_unions.relational_checklists as __relational_checklists__
   where
     (

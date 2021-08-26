@@ -3,18 +3,13 @@ select
   array(
     select array[
       __relational_items__."type"::text,
-      __relational_topics__."id"::text,
       __relational_topics__."title"::text,
-      __relational_posts__."id"::text,
       __relational_posts__."title"::text,
       __relational_posts__."description"::text,
       __relational_posts__."note"::text,
-      __relational_dividers__."id"::text,
       __relational_dividers__."title"::text,
       __relational_dividers__."color"::text,
-      __relational_checklists__."id"::text,
       __relational_checklists__."title"::text,
-      __relational_checklist_items__."id"::text,
       __relational_checklist_items__."description"::text,
       __relational_checklist_items__."note"::text,
       __relational_items__."id"::text,

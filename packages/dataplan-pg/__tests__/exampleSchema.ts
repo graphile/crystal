@@ -128,19 +128,21 @@ export function makeExampleSchema(
       expression?: PgSourceColumn<any>["expression"];
       // TODO: we could make TypeScript understand the relations on the object
       // rather than just being string.
-      via?: string;
+      via?: string | { relation: string; attribute: string };
+      identicalVia?: string | { relation: string; attribute: string };
     },
   >(
     options: TOptions,
   ): PgSourceColumn<
     NullableUnless<TOptions["notNull"], ReturnType<TOptions["codec"]["fromPg"]>>
   > => {
-    const { notNull, codec, expression, via } = options;
+    const { notNull, codec, expression, via, identicalVia } = options;
     return {
       codec,
       notNull: !!notNull,
       expression,
       via,
+      identicalVia,
     };
   };
 
@@ -533,7 +535,8 @@ export function makeExampleSchema(
     }),
   });
 
-  const itemColumns: PgSourceColumns = {
+  const itemColumns = {
+    id: col({ codec: TYPES.int, notNull: true, identicalVia: "item" }),
     type: col({ codec: TYPES.text, notNull: true, via: "item" }),
     parent_id: col({ codec: TYPES.int, notNull: false, via: "item" }),
     author_id: col({ codec: TYPES.int, notNull: true, via: "item" }),
@@ -568,7 +571,6 @@ export function makeExampleSchema(
     source: sql`interfaces_and_unions.relational_topics`,
     name: "relational_topics",
     columns: {
-      id: col({ codec: TYPES.int, notNull: true }),
       title: col({ codec: TYPES.text, notNull: false }),
 
       ...itemColumns,
@@ -585,7 +587,6 @@ export function makeExampleSchema(
     source: sql`interfaces_and_unions.relational_posts`,
     name: "relational_posts",
     columns: {
-      id: col({ codec: TYPES.int, notNull: true }),
       title: col({ codec: TYPES.text, notNull: false }),
       description: col({ codec: TYPES.text, notNull: false }),
       note: col({ codec: TYPES.text, notNull: false }),
@@ -605,7 +606,6 @@ export function makeExampleSchema(
     source: sql`interfaces_and_unions.relational_dividers`,
     name: "relational_dividers",
     columns: {
-      id: col({ codec: TYPES.int, notNull: true }),
       title: col({ codec: TYPES.text, notNull: false }),
       color: col({ codec: TYPES.text, notNull: false }),
 
@@ -623,7 +623,6 @@ export function makeExampleSchema(
     source: sql`interfaces_and_unions.relational_checklists`,
     name: "relational_checklists",
     columns: {
-      id: col({ codec: TYPES.int, notNull: true }),
       title: col({ codec: TYPES.text, notNull: false }),
 
       ...itemColumns,
@@ -641,7 +640,6 @@ export function makeExampleSchema(
     source: sql`interfaces_and_unions.relational_checklist_items`,
     name: "relational_checklist_items",
     columns: {
-      id: col({ codec: TYPES.int, notNull: true }),
       description: col({ codec: TYPES.text, notNull: true }),
       note: col({ codec: TYPES.text, notNull: false }),
 
