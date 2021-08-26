@@ -5,7 +5,7 @@
       username: "Alice",
       items: [
         {
-          __typename: "SingleTableTopic",
+          __typename: "RelationalTopic",
           parent: null,
           id: 2,
           type: "TOPIC",
@@ -17,9 +17,9 @@
           archivedAt: "2020-03-26 14:00:00+00",
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 2,
             type: "TOPIC",
             author: { __typename: "Person", username: "Alice" },
@@ -39,9 +39,9 @@
           archivedAt: "2020-03-26 14:00:00+00",
         },
         {
-          __typename: "SingleTableChecklistItem",
+          __typename: "RelationalChecklistItem",
           parent: {
-            __typename: "SingleTableChecklist",
+            __typename: "RelationalChecklist",
             id: 16,
             type: "CHECKLIST",
             author: { __typename: "Person", username: "Benjie" },
@@ -67,7 +67,7 @@
       username: "Benjie",
       items: [
         {
-          __typename: "SingleTableTopic",
+          __typename: "RelationalTopic",
           parent: null,
           id: 1,
           type: "TOPIC",
@@ -79,9 +79,9 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTableDivider",
+          __typename: "RelationalDivider",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 1,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -101,9 +101,9 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 1,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -123,9 +123,9 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 1,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -145,9 +145,9 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 1,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -167,9 +167,9 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 1,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -189,9 +189,9 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTableDivider",
+          __typename: "RelationalDivider",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 1,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -211,9 +211,9 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 1,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -233,9 +233,9 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTableTopic",
+          __typename: "RelationalTopic",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 1,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -255,9 +255,9 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTableTopic",
+          __typename: "RelationalTopic",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 10,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -277,9 +277,9 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 11,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -299,9 +299,9 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 11,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -321,9 +321,9 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 11,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -343,9 +343,9 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTableChecklist",
+          __typename: "RelationalChecklist",
           parent: {
-            __typename: "SingleTablePost",
+            __typename: "RelationalPost",
             id: 4,
             type: "POST",
             author: { __typename: "Person", username: "Benjie" },
@@ -365,9 +365,9 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTableChecklistItem",
+          __typename: "RelationalChecklistItem",
           parent: {
-            __typename: "SingleTableChecklist",
+            __typename: "RelationalChecklist",
             id: 16,
             type: "CHECKLIST",
             author: { __typename: "Person", username: "Benjie" },
@@ -387,9 +387,9 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTableChecklistItem",
+          __typename: "RelationalChecklistItem",
           parent: {
-            __typename: "SingleTableChecklist",
+            __typename: "RelationalChecklist",
             id: 16,
             type: "CHECKLIST",
             author: { __typename: "Person", username: "Benjie" },
@@ -409,9 +409,9 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTableChecklistItem",
+          __typename: "RelationalChecklistItem",
           parent: {
-            __typename: "SingleTableChecklist",
+            __typename: "RelationalChecklist",
             id: 16,
             type: "CHECKLIST",
             author: { __typename: "Person", username: "Benjie" },
@@ -437,9 +437,9 @@
       username: "Caroline",
       items: [
         {
-          __typename: "SingleTableChecklistItem",
+          __typename: "RelationalChecklistItem",
           parent: {
-            __typename: "SingleTableChecklist",
+            __typename: "RelationalChecklist",
             id: 16,
             type: "CHECKLIST",
             author: { __typename: "Person", username: "Benjie" },

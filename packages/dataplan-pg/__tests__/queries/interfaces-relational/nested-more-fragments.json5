@@ -5,7 +5,7 @@
       username: "Alice",
       items: [
         {
-          __typename: "SingleTableTopic",
+          __typename: "RelationalTopic",
           parent: null,
           id: 2,
           type: "TOPIC",
@@ -18,9 +18,9 @@
           title: "Temporary test topic",
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 2,
             type: "TOPIC",
             author: { __typename: "Person", username: "Alice" },
@@ -44,9 +44,9 @@
           note: null,
         },
         {
-          __typename: "SingleTableChecklistItem",
+          __typename: "RelationalChecklistItem",
           parent: {
-            __typename: "SingleTableChecklist",
+            __typename: "RelationalChecklist",
             id: 16,
             type: "CHECKLIST",
             author: { __typename: "Person", username: "Benjie" },
@@ -75,7 +75,7 @@
       username: "Benjie",
       items: [
         {
-          __typename: "SingleTableTopic",
+          __typename: "RelationalTopic",
           parent: null,
           id: 1,
           type: "TOPIC",
@@ -88,9 +88,9 @@
           title: "PostGraphile version 5",
         },
         {
-          __typename: "SingleTableDivider",
+          __typename: "RelationalDivider",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 1,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -113,9 +113,9 @@
           color: "green",
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 1,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -139,9 +139,9 @@
           note: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 1,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -165,9 +165,9 @@
           note: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 1,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -191,9 +191,9 @@
           note: "Also things like querying from multiple databases",
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 1,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -217,9 +217,9 @@
           note: null,
         },
         {
-          __typename: "SingleTableDivider",
+          __typename: "RelationalDivider",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 1,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -242,9 +242,9 @@
           color: "blue",
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 1,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -268,9 +268,9 @@
           note: "It'll be done when it's done, I prefer longer development time and longer stable time than multiple major releases in a year or two.",
         },
         {
-          __typename: "SingleTableTopic",
+          __typename: "RelationalTopic",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 1,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -292,9 +292,9 @@
           title: "Notes",
         },
         {
-          __typename: "SingleTableTopic",
+          __typename: "RelationalTopic",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 10,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -316,9 +316,9 @@
           title: "Other aims",
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 11,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -342,9 +342,9 @@
           note: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 11,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -368,9 +368,9 @@
           note: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           parent: {
-            __typename: "SingleTableTopic",
+            __typename: "RelationalTopic",
             id: 11,
             type: "TOPIC",
             author: { __typename: "Person", username: "Benjie" },
@@ -394,9 +394,9 @@
           note: null,
         },
         {
-          __typename: "SingleTableChecklist",
+          __typename: "RelationalChecklist",
           parent: {
-            __typename: "SingleTablePost",
+            __typename: "RelationalPost",
             id: 4,
             type: "POST",
             author: { __typename: "Person", username: "Benjie" },
@@ -420,9 +420,9 @@
           title: "Planning goals",
         },
         {
-          __typename: "SingleTableChecklistItem",
+          __typename: "RelationalChecklistItem",
           parent: {
-            __typename: "SingleTableChecklist",
+            __typename: "RelationalChecklist",
             id: 16,
             type: "CHECKLIST",
             author: { __typename: "Person", username: "Benjie" },
@@ -445,9 +445,9 @@
           note: null,
         },
         {
-          __typename: "SingleTableChecklistItem",
+          __typename: "RelationalChecklistItem",
           parent: {
-            __typename: "SingleTableChecklist",
+            __typename: "RelationalChecklist",
             id: 16,
             type: "CHECKLIST",
             author: { __typename: "Person", username: "Benjie" },
@@ -470,9 +470,9 @@
           note: null,
         },
         {
-          __typename: "SingleTableChecklistItem",
+          __typename: "RelationalChecklistItem",
           parent: {
-            __typename: "SingleTableChecklist",
+            __typename: "RelationalChecklist",
             id: 16,
             type: "CHECKLIST",
             author: { __typename: "Person", username: "Benjie" },
@@ -501,9 +501,9 @@
       username: "Caroline",
       items: [
         {
-          __typename: "SingleTableChecklistItem",
+          __typename: "RelationalChecklistItem",
           parent: {
-            __typename: "SingleTableChecklist",
+            __typename: "RelationalChecklist",
             id: 16,
             type: "CHECKLIST",
             author: { __typename: "Person", username: "Benjie" },

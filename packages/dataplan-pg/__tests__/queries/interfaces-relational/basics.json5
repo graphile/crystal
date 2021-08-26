@@ -5,7 +5,7 @@
       username: "Alice",
       items: [
         {
-          __typename: "SingleTableTopic",
+          __typename: "RelationalTopic",
           id: 2,
           type: "TOPIC",
           position: "0",
@@ -15,7 +15,7 @@
           archivedAt: "2020-03-26 14:00:00+00",
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           id: 15,
           type: "POST",
           position: "0",
@@ -25,7 +25,7 @@
           archivedAt: "2020-03-26 14:00:00+00",
         },
         {
-          __typename: "SingleTableChecklistItem",
+          __typename: "RelationalChecklistItem",
           id: 21,
           type: "CHECKLIST_ITEM",
           position: "4",
@@ -41,7 +41,7 @@
       username: "Benjie",
       items: [
         {
-          __typename: "SingleTableTopic",
+          __typename: "RelationalTopic",
           id: 1,
           type: "TOPIC",
           position: "0",
@@ -51,7 +51,7 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTableDivider",
+          __typename: "RelationalDivider",
           id: 3,
           type: "DIVIDER",
           position: "0",
@@ -61,7 +61,7 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           id: 4,
           type: "POST",
           position: "1",
@@ -71,7 +71,7 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           id: 5,
           type: "POST",
           position: "2",
@@ -81,7 +81,7 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           id: 6,
           type: "POST",
           position: "3",
@@ -91,7 +91,7 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           id: 7,
           type: "POST",
           position: "4",
@@ -101,7 +101,7 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTableDivider",
+          __typename: "RelationalDivider",
           id: 8,
           type: "DIVIDER",
           position: "5",
@@ -111,7 +111,7 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           id: 9,
           type: "POST",
           position: "6",
@@ -121,7 +121,7 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTableTopic",
+          __typename: "RelationalTopic",
           id: 10,
           type: "TOPIC",
           position: "7",
@@ -131,7 +131,7 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTableTopic",
+          __typename: "RelationalTopic",
           id: 11,
           type: "TOPIC",
           position: "0",
@@ -141,7 +141,7 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           id: 12,
           type: "POST",
           position: "0",
@@ -151,7 +151,7 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           id: 13,
           type: "POST",
           position: "1",
@@ -161,7 +161,7 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           id: 14,
           type: "POST",
           position: "2",
@@ -171,7 +171,7 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTableChecklist",
+          __typename: "RelationalChecklist",
           id: 16,
           type: "CHECKLIST",
           position: "0",
@@ -181,7 +181,7 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTableChecklistItem",
+          __typename: "RelationalChecklistItem",
           id: 17,
           type: "CHECKLIST_ITEM",
           position: "0",
@@ -191,7 +191,7 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTableChecklistItem",
+          __typename: "RelationalChecklistItem",
           id: 19,
           type: "CHECKLIST_ITEM",
           position: "2",
@@ -201,7 +201,7 @@
           archivedAt: null,
         },
         {
-          __typename: "SingleTableChecklistItem",
+          __typename: "RelationalChecklistItem",
           id: 20,
           type: "CHECKLIST_ITEM",
           position: "3",
@@ -217,7 +217,7 @@
       username: "Caroline",
       items: [
         {
-          __typename: "SingleTableChecklistItem",
+          __typename: "RelationalChecklistItem",
           id: 18,
           type: "CHECKLIST_ITEM",
           position: "1",

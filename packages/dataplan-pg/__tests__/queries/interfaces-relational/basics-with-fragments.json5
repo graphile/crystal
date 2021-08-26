@@ -5,7 +5,7 @@
       username: "Alice",
       items: [
         {
-          __typename: "SingleTableTopic",
+          __typename: "RelationalTopic",
           id: 2,
           type: "TOPIC",
           position: "0",
@@ -16,7 +16,7 @@
           title: "Temporary test topic",
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           id: 15,
           type: "POST",
           position: "0",
@@ -29,7 +29,7 @@
           note: null,
         },
         {
-          __typename: "SingleTableChecklistItem",
+          __typename: "RelationalChecklistItem",
           id: 21,
           type: "CHECKLIST_ITEM",
           position: "4",
@@ -47,7 +47,7 @@
       username: "Benjie",
       items: [
         {
-          __typename: "SingleTableTopic",
+          __typename: "RelationalTopic",
           id: 1,
           type: "TOPIC",
           position: "0",
@@ -58,7 +58,7 @@
           title: "PostGraphile version 5",
         },
         {
-          __typename: "SingleTableDivider",
+          __typename: "RelationalDivider",
           id: 3,
           type: "DIVIDER",
           position: "0",
@@ -70,7 +70,7 @@
           color: "green",
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           id: 4,
           type: "POST",
           position: "1",
@@ -83,7 +83,7 @@
           note: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           id: 5,
           type: "POST",
           position: "2",
@@ -96,7 +96,7 @@
           note: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           id: 6,
           type: "POST",
           position: "3",
@@ -109,7 +109,7 @@
           note: "Also things like querying from multiple databases",
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           id: 7,
           type: "POST",
           position: "4",
@@ -122,7 +122,7 @@
           note: null,
         },
         {
-          __typename: "SingleTableDivider",
+          __typename: "RelationalDivider",
           id: 8,
           type: "DIVIDER",
           position: "5",
@@ -134,7 +134,7 @@
           color: "blue",
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           id: 9,
           type: "POST",
           position: "6",
@@ -147,7 +147,7 @@
           note: "It'll be done when it's done, I prefer longer development time and longer stable time than multiple major releases in a year or two.",
         },
         {
-          __typename: "SingleTableTopic",
+          __typename: "RelationalTopic",
           id: 10,
           type: "TOPIC",
           position: "7",
@@ -158,7 +158,7 @@
           title: "Notes",
         },
         {
-          __typename: "SingleTableTopic",
+          __typename: "RelationalTopic",
           id: 11,
           type: "TOPIC",
           position: "0",
@@ -169,7 +169,7 @@
           title: "Other aims",
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           id: 12,
           type: "POST",
           position: "0",
@@ -182,7 +182,7 @@
           note: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           id: 13,
           type: "POST",
           position: "1",
@@ -195,7 +195,7 @@
           note: null,
         },
         {
-          __typename: "SingleTablePost",
+          __typename: "RelationalPost",
           id: 14,
           type: "POST",
           position: "2",
@@ -208,7 +208,7 @@
           note: null,
         },
         {
-          __typename: "SingleTableChecklist",
+          __typename: "RelationalChecklist",
           id: 16,
           type: "CHECKLIST",
           position: "0",
@@ -219,7 +219,7 @@
           title: "Planning goals",
         },
         {
-          __typename: "SingleTableChecklistItem",
+          __typename: "RelationalChecklistItem",
           id: 17,
           type: "CHECKLIST_ITEM",
           position: "0",
@@ -231,7 +231,7 @@
           note: null,
         },
         {
-          __typename: "SingleTableChecklistItem",
+          __typename: "RelationalChecklistItem",
           id: 19,
           type: "CHECKLIST_ITEM",
           position: "2",
@@ -243,7 +243,7 @@
           note: null,
         },
         {
-          __typename: "SingleTableChecklistItem",
+          __typename: "RelationalChecklistItem",
           id: 20,
           type: "CHECKLIST_ITEM",
           position: "3",
@@ -261,7 +261,7 @@
       username: "Caroline",
       items: [
         {
-          __typename: "SingleTableChecklistItem",
+          __typename: "RelationalChecklistItem",
           id: 18,
           type: "CHECKLIST_ITEM",
           position: "1",
