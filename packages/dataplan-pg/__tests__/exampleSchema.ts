@@ -595,11 +595,25 @@ export function makeExampleSchema(
     archived_at: col({ codec: TYPES.timestamptz, notNull: false, via: "item" }),
   };
 
-  const itemRelation = {
-    source: relationalItemsSource,
-    localColumns: [`id`] as const,
-    remoteColumns: [`id`] as const,
-    isUnique: true,
+  const itemRelations = {
+    item: {
+      source: relationalItemsSource,
+      localColumns: [`id`] as const,
+      remoteColumns: [`id`] as const,
+      isUnique: true,
+    },
+    parent: {
+      source: relationalItemsSource,
+      localColumns: [`parent_id`] as const,
+      remoteColumns: [`id`] as const,
+      isUnique: true,
+    },
+    author: {
+      source: personSource,
+      localColumns: [`author_id`] as const,
+      remoteColumns: [`person_id`] as const,
+      isUnique: true,
+    },
   };
 
   const commentableRelation = {
@@ -621,7 +635,7 @@ export function makeExampleSchema(
     },
     uniques: [["id"]],
     relations: {
-      item: itemRelation,
+      ...itemRelations,
     },
   });
 
@@ -639,7 +653,7 @@ export function makeExampleSchema(
     },
     uniques: [["id"]],
     relations: {
-      item: itemRelation,
+      ...itemRelations,
       commentable: commentableRelation,
     },
   });
@@ -657,7 +671,7 @@ export function makeExampleSchema(
     },
     uniques: [["id"]],
     relations: {
-      item: itemRelation,
+      ...itemRelations,
     },
   });
 
@@ -673,7 +687,7 @@ export function makeExampleSchema(
     },
     uniques: [["id"]],
     relations: {
-      item: itemRelation,
+      ...itemRelations,
       commentable: commentableRelation,
     },
   });
@@ -691,7 +705,7 @@ export function makeExampleSchema(
     },
     uniques: [["id"]],
     relations: {
-      item: itemRelation,
+      ...itemRelations,
       commentable: commentableRelation,
     },
   });
@@ -730,18 +744,12 @@ export function makeExampleSchema(
 
   function singleRelationField<
     TMyDataSource extends PgSource<any, any, any, any>,
-    TTheirDataSource extends PgSource<any, any, any, any>,
-    TMatch extends {
-      [key in keyof TTheirDataSource["columns"]]: keyof TMyDataSource["columns"];
-    },
-  >(source: TTheirDataSource, match: TMatch, type: GraphQLOutputType) {
+    TRelationName extends Parameters<TMyDataSource["getRelation"]>[0],
+  >(relation: TRelationName, type: GraphQLOutputType) {
     return {
       type,
       plan($entity: PgSelectSinglePlan<TMyDataSource>) {
-        const matchObject = mapValues(match, (attrName) =>
-          $entity.get(attrName),
-        );
-        const $plan = source.get(matchObject);
+        const $plan = $entity.singleRelation(relation);
         deoptimizeIfAppropriate($plan);
         return $plan;
       },
@@ -820,7 +828,7 @@ export function makeExampleSchema(
         author: {
           type: User,
           plan($message) {
-            const $user = userSource.get({ id: $message.get("author_id") });
+            const $user = $message.singleRelation("author");
             deoptimizeIfAppropriate($user);
 
             return $user;
@@ -1494,18 +1502,12 @@ export function makeExampleSchema(
     parent: {
       type: SingleTableItem,
       plan($entity: SingleTableItemPlan) {
-        const $plan = singleTableItemsSource.get({
-          id: $entity.get("parent_id"),
-        });
+        const $plan = $entity.singleRelation("parent");
         deoptimizeIfAppropriate($plan);
         return singleTableItemInterface($plan);
       },
     },
-    author: singleRelationField(
-      personSource,
-      { person_id: "author_id" },
-      Person,
-    ),
+    author: singleRelationField("author", Person),
     position: attrField("position", GraphQLString),
     createdAt: attrField("created_at", GraphQLString),
     updatedAt: attrField("updated_at", GraphQLString),
@@ -1596,18 +1598,12 @@ export function makeExampleSchema(
     parent: {
       type: RelationalItem,
       plan($entity: RelationalItemPlan) {
-        const $plan = relationalItemsSource.get({
-          id: $entity.get("parent_id"),
-        });
+        const $plan = $entity.singleRelation("parent");
         deoptimizeIfAppropriate($plan);
         return relationalItemInterface($plan);
       },
     },
-    author: singleRelationField(
-      personSource,
-      { person_id: "author_id" },
-      Person,
-    ),
+    author: singleRelationField("author", Person),
     position: attrField("position", GraphQLString),
     createdAt: attrField("created_at", GraphQLString),
     updatedAt: attrField("updated_at", GraphQLString),
