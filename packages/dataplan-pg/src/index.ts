@@ -13,7 +13,13 @@ debugFactory.formatters.S = sqlPrint;
 
 export { recordType, TYPES } from "./codecs";
 export { PgSource, PgSourceColumn } from "./datasource";
-export { PgExecutor, PgExecutorContext, WithPgClient } from "./executor";
+export {
+  PgClient,
+  PgClientQuery,
+  PgExecutor,
+  PgExecutorContext,
+  WithPgClient,
+} from "./executor";
 export { PgTypeCodec } from "./interfaces";
 export {
   pgClassExpression,

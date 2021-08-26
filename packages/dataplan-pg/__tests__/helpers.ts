@@ -5,7 +5,7 @@ import { graphql } from "graphql";
 import type { PoolClient } from "pg";
 import { Pool } from "pg";
 
-import type { PgClient, PgClientQuery, WithPgClient } from "../src/datasource";
+import type { PgClient, PgClientQuery, WithPgClient } from "../src";
 import { makeExampleSchema, schema as optimizedSchema } from "./exampleSchema";
 
 const deoptimizedSchema = makeExampleSchema({ deoptimize: true });
