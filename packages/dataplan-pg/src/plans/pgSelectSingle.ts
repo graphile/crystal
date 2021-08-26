@@ -106,7 +106,22 @@ export class PgSelectSinglePlan<
     }
 
     if (dataSourceColumn?.via) {
-      return this.singleRelation(dataSourceColumn.via).get(attr);
+      const via = dataSourceColumn.via;
+      const { relation, attribute } =
+        typeof via === "string" ? { relation: via, attribute: attr } : via;
+      return this.singleRelation(relation).get(attribute);
+    }
+
+    if (dataSourceColumn?.identicalVia) {
+      const via = dataSourceColumn.identicalVia;
+      const { relation, attribute } =
+        typeof via === "string" ? { relation: via, attribute: attr } : via;
+      if (this.options.relationalShortcuts?.[relation]) {
+        // Relation exists already; load it from there for efficiency
+        return this.singleRelation(relation).get(attribute);
+      } else {
+        // Load it from ourself instead
+      }
     }
 
     /*

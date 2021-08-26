@@ -53,7 +53,14 @@ export interface PgSourceColumn<TCanonical = any, TInput = TCanonical> {
    * If this column actually exists on a relation rather than locally, the name
    * of the (unique) relation this column belongs to.
    */
-  via?: string;
+  via?: string | { relation: string; attribute: string };
+
+  /**
+   * If the column exists identically on a relation and locally (e.g.
+   * `posts.author_id` and `users.id` have exactly the same value due to a
+   * foreign key reference) then the plans can choose which one to grab.
+   */
+  identicalVia?: string | { relation: string; attribute: string };
 }
 
 type PgSourceRow<TColumns extends PgSourceColumns> = {
