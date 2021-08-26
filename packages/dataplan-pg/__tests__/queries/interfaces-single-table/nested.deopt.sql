@@ -40,8 +40,7 @@ from (
 lateral (
   select
     __single_table_items__."type"::text as "0",
-    __single_table_items__."id"::text as "1",
-    __single_table_items_identifiers__.idx as "2"
+    __single_table_items_identifiers__.idx as "1"
   from interfaces_and_unions.single_table_items as __single_table_items__
   where
     (
@@ -62,8 +61,7 @@ from (
 lateral (
   select
     __single_table_items__."type"::text as "0",
-    __single_table_items__."id"::text as "1",
-    __single_table_items_identifiers__.idx as "2"
+    __single_table_items_identifiers__.idx as "1"
   from interfaces_and_unions.single_table_items as __single_table_items__
   where
     (
@@ -84,8 +82,7 @@ from (
 lateral (
   select
     __single_table_items__."type"::text as "0",
-    __single_table_items__."id"::text as "1",
-    __single_table_items_identifiers__.idx as "2"
+    __single_table_items_identifiers__.idx as "1"
   from interfaces_and_unions.single_table_items as __single_table_items__
   where
     (
@@ -106,8 +103,7 @@ from (
 lateral (
   select
     __single_table_items__."type"::text as "0",
-    __single_table_items__."id"::text as "1",
-    __single_table_items_identifiers__.idx as "2"
+    __single_table_items_identifiers__.idx as "1"
   from interfaces_and_unions.single_table_items as __single_table_items__
   where
     (

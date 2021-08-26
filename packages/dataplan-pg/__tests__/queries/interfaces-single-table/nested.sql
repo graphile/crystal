@@ -4,7 +4,6 @@ select
     select array[
       __single_table_items_2."type"::text,
       __single_table_items__."type"::text,
-      __single_table_items__."id"::text,
       __single_table_items_2."parent_id"::text,
       __single_table_items_2."id"::text
     ]::text[]

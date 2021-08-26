@@ -135,6 +135,29 @@ export class PgSelectSinglePlan<
       }
     }
 
+    if (this.options.fromRelation) {
+      const [$fromPlan, fromRelationName] = this.options.fromRelation;
+      const matchingColumn = (
+        Object.entries($fromPlan.dataSource.columns) as Array<
+          [string, PgSourceColumn]
+        >
+      ).find(([name, col]) => {
+        if (col.identicalVia) {
+          const { relation, attribute } = $fromPlan.dataSource.resolveVia(
+            col.identicalVia,
+            name,
+          );
+          if (attribute === attr && relation === fromRelationName) {
+            return true;
+          }
+        }
+        return false;
+      });
+      if (matchingColumn) {
+        return $fromPlan.get(matchingColumn[0]);
+      }
+    }
+
     /*
      * Only cast to `::text` during select; we want to use it uncasted in
      * conditions/etc. The reasons we cast to ::text include:
