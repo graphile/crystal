@@ -20,3 +20,7 @@ export {
 export { PgConnectionPlan } from "./plans/pgConnection";
 export { pgSelect, PgSelectPlan } from "./plans/pgSelect";
 export { PgSelectSinglePlan } from "./plans/pgSelectSingle";
+export {
+  pgSingleTableInterface,
+  PgSingleTableInterfacePlan,
+} from "./plans/pgSingleTableInterface";

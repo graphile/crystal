@@ -43,7 +43,7 @@ import sql from "pg-sql2";
 import prettier from "prettier";
 import { inspect } from "util";
 
-import type { PgSelectPlan, PgTypeCodec } from "../src";
+import { PgSelectPlan, pgSingleTableInterface, PgTypeCodec } from "../src";
 import {
   PgConnectionPlan,
   pgSelect,
@@ -1345,49 +1345,6 @@ export function makeExampleSchema(
       }),
     );
 
-  class SingleTableInterfacePlan<
-      TDataSource extends PgSource<any, any, any, any, any>,
-    >
-    extends ExecutablePlan<any>
-    implements PolymorphicPlan
-  {
-    private typePlanId: number;
-    private rowPlanId: number;
-
-    constructor(
-      $typePlan: ExecutablePlan<string>,
-      $rowPlan: PgSelectSinglePlan<TDataSource>,
-    ) {
-      super();
-      this.typePlanId = this.addDependency($typePlan);
-      this.rowPlanId = this.addDependency($rowPlan);
-    }
-
-    private rowPlan() {
-      return this.aether.plans[this.dependencies[this.rowPlanId]];
-    }
-
-    planForType(_type: GraphQLObjectType) {
-      // TODO: need to include the `_type` information so we know what type it
-      // is. Can we wrap it?
-      return this.rowPlan();
-    }
-
-    async execute(
-      values: CrystalValuesList<any[]>,
-    ): Promise<
-      CrystalResultsList<
-        PolymorphicData<string, ReadonlyArray<TDataSource["TRow"]>>
-      >
-    > {
-      return values.map((v) =>
-        v[this.typePlanId]
-          ? polymorphicWrap(v[this.typePlanId], v[this.rowPlanId])
-          : null,
-      );
-    }
-  }
-
   const singleTableTypeName = ($entity: SingleTableItemPlan) => {
     const $type = $entity.get("type");
     const $typeName = lambda(
@@ -1420,7 +1377,7 @@ export function makeExampleSchema(
               });
               deoptimizeIfAppropriate($items);
               return each($items, ($item) => {
-                return new SingleTableInterfacePlan(
+                return pgSingleTableInterface(
                   singleTableTypeName($item),
                   $item,
                 );
@@ -1457,7 +1414,7 @@ export function makeExampleSchema(
           id: $entity.get("parent_id"),
         });
         deoptimizeIfAppropriate($plan);
-        return new SingleTableInterfacePlan(singleTableTypeName($plan), $plan);
+        return pgSingleTableInterface(singleTableTypeName($plan), $plan);
       },
     },
     author: singleRelationField(
@@ -1786,10 +1743,7 @@ export function makeExampleSchema(
             const $item: SingleTableItemPlan = singleTableItemsSource.get({
               id: args.id,
             });
-            return new SingleTableInterfacePlan(
-              singleTableTypeName($item),
-              $item,
-            );
+            return pgSingleTableInterface(singleTableTypeName($item), $item);
           },
         },
       },
