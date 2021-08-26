@@ -215,6 +215,31 @@ export class PgSource<
     return this.getRelations()[name];
   }
 
+  public resolveVia(
+    via: PgSourceColumnVia,
+    attr: string,
+  ): PgSourceColumnViaExplicit {
+    if (!via) {
+      throw new Error("No via to resolve");
+    }
+    if (typeof via === "string") {
+      // Check
+      const relation: PgSourceRelation<PgSource<any, any, any, any, any>, any> =
+        this.getRelation(via);
+      if (!relation) {
+        throw new Error(`Unknown relation '${via}' in ${this}`);
+      }
+      if (!relation.source.columns[attr]) {
+        throw new Error(
+          `${this} relation '${via}' does not have column '${attr}'`,
+        );
+      }
+      return { relation: via, attribute: attr };
+    } else {
+      return via;
+    }
+  }
+
   public getReciprocal<
     TOtherDataSource extends PgSource<any, any, any, any, any>,
     TOtherRelationName extends Parameters<TOtherDataSource["getRelation"]>[0],

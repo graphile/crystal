@@ -89,31 +89,6 @@ export class PgSelectSinglePlan<
     return this.get("" as any);
   }
 
-  private resolveVia(
-    via: PgSourceColumnVia,
-    attr: string,
-  ): PgSourceColumnViaExplicit {
-    if (!via) {
-      throw new Error("No via to resolve");
-    }
-    if (typeof via === "string") {
-      // Check
-      const relation: PgSourceRelation<PgSource<any, any, any, any, any>, any> =
-        this.dataSource.getRelation(via);
-      if (!relation) {
-        throw new Error(`Unknown relation '${via}' in ${this}`);
-      }
-      if (!relation.source.columns[attr]) {
-        throw new Error(
-          `${this} relation '${via}' does not have column '${attr}'`,
-        );
-      }
-      return { relation: via, attribute: attr };
-    } else {
-      return via;
-    }
-  }
-
   /**
    * Returns a plan representing a named attribute (e.g. column) from the class
    * (e.g. table).
@@ -138,7 +113,7 @@ export class PgSelectSinglePlan<
     }
 
     if (dataSourceColumn?.via) {
-      const { relation, attribute } = this.resolveVia(
+      const { relation, attribute } = this.dataSource.resolveVia(
         dataSourceColumn.via,
         attr as string,
       );
@@ -146,7 +121,7 @@ export class PgSelectSinglePlan<
     }
 
     if (dataSourceColumn?.identicalVia) {
-      const { relation, attribute } = this.resolveVia(
+      const { relation, attribute } = this.dataSource.resolveVia(
         dataSourceColumn.identicalVia,
         attr as string,
       );
