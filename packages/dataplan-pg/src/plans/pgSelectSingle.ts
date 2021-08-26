@@ -199,7 +199,7 @@ export class PgSelectSinglePlan<
     }
     const source = relation.source as PgSource<any, any, any, any, any>;
     const remoteColumns = relation.remoteColumns as string[];
-    const localColumns = relation.remoteColumns as string[];
+    const localColumns = relation.localColumns as string[];
 
     const reciprocal = source.getReciprocal(
       this.dataSource,
