@@ -12,8 +12,6 @@ lateral (
     __messages__."forum_id"::text as "2",
     __messages_identifiers__.idx as "3"
   from app_public.messages as __messages__
-  left outer join app_public.forums as __forums__
-  on (__messages__."forum_id"::"uuid" = __forums__."id")
   where
     (
       true /* authorization checks */

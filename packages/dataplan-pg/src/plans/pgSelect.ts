@@ -26,11 +26,8 @@ import type { PgOrderSpec, PgTypedExecutablePlan } from "../interfaces";
 import { PgClassExpressionPlan } from "./pgClassExpression";
 import { PgConditionPlan } from "./pgCondition";
 import { PgRecordPlan } from "./pgRecord";
-import type {
-  PgSelectSinglePlanOptions} from "./pgSelectSingle";
-import {
-  PgSelectSinglePlan
-} from "./pgSelectSingle";
+import type { PgSelectSinglePlanOptions } from "./pgSelectSingle";
+import { PgSelectSinglePlan } from "./pgSelectSingle";
 
 const isDev =
   process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
@@ -1450,59 +1447,76 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
           this.offset == null
           /* TODO: && !this.groupBy && !this.having && !this.order && ... */
         ) {
-          debugPlanVerbose("Merging %c into %c (via %c)", this, table, parent);
-          const { sql: where } = this.buildWhere();
-          const conditions = [
-            ...this.identifierMatches.map((identifierMatch, i) => {
-              const { dependencyIndex, type } = this.queryValues[i];
-              const plan =
-                this.aether.plans[this.dependencies[dependencyIndex]];
-              if (plan instanceof PgClassExpressionPlan) {
-                return sql`${plan.toSQL()}::${type} = ${identifierMatch}`;
-              } else if (isStaticInputPlan(plan)) {
-                return sql`${this.placeholder(
-                  plan,
-                  type,
-                )} = ${identifierMatch}`;
-              } else {
-                throw new Error(
-                  `Expected ${plan} (${i}th dependency of ${this}; plan with id ${dependencyIndex}) to be a PgClassExpressionPlan`,
-                );
+          if (this.selects.length > 0) {
+            debugPlanVerbose(
+              "Merging %c into %c (via %c)",
+              this,
+              table,
+              parent,
+            );
+            const { sql: where } = this.buildWhere();
+            const conditions = [
+              ...this.identifierMatches.map((identifierMatch, i) => {
+                const { dependencyIndex, type } = this.queryValues[i];
+                const plan =
+                  this.aether.plans[this.dependencies[dependencyIndex]];
+                if (plan instanceof PgClassExpressionPlan) {
+                  return sql`${plan.toSQL()}::${type} = ${identifierMatch}`;
+                } else if (isStaticInputPlan(plan)) {
+                  return sql`${this.placeholder(
+                    plan,
+                    type,
+                  )} = ${identifierMatch}`;
+                } else {
+                  throw new Error(
+                    `Expected ${plan} (${i}th dependency of ${this}; plan with id ${dependencyIndex}) to be a PgClassExpressionPlan`,
+                  );
+                }
+              }),
+              // Note the WHERE is now part of the JOIN condition (since
+              // it's a LEFT JOIN).
+              ...(where !== sql.blank ? [where] : []),
+            ];
+            table.joins.push(
+              {
+                type: "left",
+                source: this.source(),
+                alias: this.alias,
+                conditions,
+              },
+              ...this.joins,
+            );
+            this.mergePlaceholdersInto(table);
+            for (const [a, b] of this._symbolSubstitutes.entries()) {
+              if (isDev) {
+                if (
+                  table._symbolSubstitutes.has(a) &&
+                  table._symbolSubstitutes.get(a) !== b
+                ) {
+                  throw new Error(
+                    `Conflict when setting a substitute whilst merging ${this} into ${table}; symbol already has a substitute, and it's different.`,
+                  );
+                }
               }
-            }),
-            // Note the WHERE is now part of the JOIN condition (since
-            // it's a LEFT JOIN).
-            ...(where !== sql.blank ? [where] : []),
-          ];
-          table.joins.push(
-            {
-              type: "left",
-              source: this.source(),
-              alias: this.alias,
-              conditions,
-            },
-            ...this.joins,
-          );
-          this.mergePlaceholdersInto(table);
-          for (const [a, b] of this._symbolSubstitutes.entries()) {
-            if (isDev) {
-              if (
-                table._symbolSubstitutes.has(a) &&
-                table._symbolSubstitutes.get(a) !== b
-              ) {
-                throw new Error(
-                  `Conflict when setting a substitute whilst merging ${this} into ${table}; symbol already has a substitute, and it's different.`,
-                );
-              }
+              table._symbolSubstitutes.set(a, b);
             }
-            table._symbolSubstitutes.set(a, b);
+            const actualKeyByDesiredKey = this.mergeSelectsWith(table);
+            // We return a list here because our children are going to use a
+            // `first` plan on us.
+            // NOTE: we don't need to reverse the list for relay pagination
+            // because it only contains one entry.
+            return list([map(parent, actualKeyByDesiredKey)]);
+          } else {
+            debugPlanVerbose(
+              "Skipping merging %c into %c (via %c) due to no columns being selected",
+              this,
+              table,
+              parent,
+            );
+            // We return a list here because our children are going to use a
+            // `first` plan on us.
+            return list([parent]);
           }
-          const actualKeyByDesiredKey = this.mergeSelectsWith(table);
-          // We return a list here because our children are going to use a
-          // `first` plan on us.
-          // NOTE: we don't need to reverse the list for relay pagination
-          // because it only contains one entry.
-          return list([map(parent, actualKeyByDesiredKey)]);
         } else if (parent instanceof PgSelectSinglePlan) {
           const parent2 =
             this.aether.plans[parent.dependencies[parent.itemPlanId]];
