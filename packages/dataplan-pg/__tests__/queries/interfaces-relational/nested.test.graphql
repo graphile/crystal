@@ -2,7 +2,7 @@
   people {
     __typename
     username
-    relationalItemsList {
+    items: relationalItemsList {
       __typename
       parent {
         __typename

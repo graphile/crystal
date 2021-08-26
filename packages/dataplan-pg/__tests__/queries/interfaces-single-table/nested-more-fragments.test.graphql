@@ -2,7 +2,7 @@
   people {
     __typename
     username
-    singleTableItemsList {
+    items: singleTableItemsList {
       __typename
       parent {
         __typename

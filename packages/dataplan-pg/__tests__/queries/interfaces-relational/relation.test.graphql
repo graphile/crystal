@@ -1,5 +1,5 @@
 {
-  relationalItemById(id: 15) {
+  item: relationalItemById(id: 15) {
     __typename
     parent {
       __typename

@@ -3,7 +3,7 @@
     {
       __typename: "Person",
       username: "Alice",
-      singleTableItemsList: [
+      items: [
         { __typename: "SingleTableTopic", parent: null, id: 2, type: "TOPIC" },
         {
           __typename: "SingleTablePost",
@@ -22,7 +22,7 @@
     {
       __typename: "Person",
       username: "Benjie",
-      singleTableItemsList: [
+      items: [
         { __typename: "SingleTableTopic", parent: null, id: 1, type: "TOPIC" },
         {
           __typename: "SingleTableDivider",
@@ -125,7 +125,7 @@
     {
       __typename: "Person",
       username: "Caroline",
-      singleTableItemsList: [
+      items: [
         {
           __typename: "SingleTableChecklistItem",
           parent: { __typename: "SingleTableChecklist", id: 16, type: "CHECKLIST" },
@@ -134,10 +134,10 @@
         },
       ],
     },
-    { __typename: "Person", username: "Dave", singleTableItemsList: [] },
-    { __typename: "Person", username: "Ellie", singleTableItemsList: [] },
-    { __typename: "Person", username: "Fred", singleTableItemsList: [] },
-    { __typename: "Person", username: "Georgina", singleTableItemsList: [] },
-    { __typename: "Person", username: "Harry", singleTableItemsList: [] },
+    { __typename: "Person", username: "Dave", items: [] },
+    { __typename: "Person", username: "Ellie", items: [] },
+    { __typename: "Person", username: "Fred", items: [] },
+    { __typename: "Person", username: "Georgina", items: [] },
+    { __typename: "Person", username: "Harry", items: [] },
   ],
 }
