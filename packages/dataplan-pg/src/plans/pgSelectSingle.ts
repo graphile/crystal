@@ -3,7 +3,7 @@ import { ExecutablePlan } from "graphile-crystal";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { PgSource } from "../datasource";
+import type { PgSource, PgSourceColumn } from "../datasource";
 import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
 import type { PgClassExpressionPlan } from "./pgClassExpression";
 import { pgClassExpression } from "./pgClassExpression";
@@ -88,11 +88,16 @@ export class PgSelectSinglePlan<
     // enforce ISO8601? Perhaps this should be the datasource itself, and
     // `attr` should be an SQL expression? This would allow for computed
     // fields/etc too (admittedly those without arguments).
-    const dataSourceColumn = this.dataSource.columns[attr as string];
+    const dataSourceColumn: PgSourceColumn =
+      this.dataSource.columns[attr as string];
     if (!dataSourceColumn && attr !== "") {
       throw new Error(
         `${this.dataSource} does not define an attribute named '${attr}'`,
       );
+    }
+
+    if (dataSourceColumn?.via) {
+      return this.singleRelation(dataSourceColumn.via).get(attr);
     }
 
     /*
@@ -118,6 +123,26 @@ export class PgSelectSinglePlan<
         : sqlExpr`${classPlan.alias}.${sql.identifier(String(attr))}`
       : sqlExpr`${classPlan.alias}.${classPlan.alias}`; /* self named */
     return colPlan;
+  }
+
+  public singleRelation<
+    TRelationName extends Parameters<TDataSource["getRelation"]>[0],
+  >(relationIdentifier: TRelationName): PgSelectSinglePlan<any> {
+    const relation = this.dataSource.getRelation(relationIdentifier as string);
+    if (!relation || !relation.isUnique) {
+      throw new Error(
+        `${relationIdentifier} is not a unique relation on ${this.dataSource}`,
+      );
+    }
+    const source = relation.source as PgSource<any, any, any, any, any>;
+    const remoteColumns = relation.remoteColumns as string[];
+    const localColumns = relation.remoteColumns as string[];
+    return source.get(
+      remoteColumns.reduce((memo, remoteColumn, columnIndex) => {
+        memo[remoteColumn] = this.get(localColumns[columnIndex]);
+        return memo;
+      }, Object.create(null)),
+    );
   }
 
   record(): PgRecordPlan<TDataSource> {

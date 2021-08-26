@@ -46,6 +46,7 @@ import type {
   PgTypeCodec,
   WithPgClient,
 } from "../src";
+import { pgRelationalInterface } from "../src";
 import {
   pgClassExpression,
   PgConditionPlan,
@@ -58,6 +59,7 @@ import {
   recordType,
   TYPES,
 } from "../src";
+import type { PgSourceColumns } from "../src/datasource";
 
 // These are what the generics extend from
 
@@ -116,6 +118,8 @@ export function makeExampleSchema(
   type PersonPlan = PgSelectSinglePlan<typeof personSource>;
   type SingleTableItemsPlan = PgSelectPlan<typeof singleTableItemsSource>;
   type SingleTableItemPlan = PgSelectSinglePlan<typeof singleTableItemsSource>;
+  type RelationalItemsPlan = PgSelectPlan<typeof relationalItemsSource>;
+  type RelationalItemPlan = PgSelectSinglePlan<typeof relationalItemsSource>;
 
   const col = <
     TOptions extends {
@@ -529,11 +533,11 @@ export function makeExampleSchema(
     }),
   });
 
-  const itemColumns = {
+  const itemColumns: PgSourceColumns = {
+    type: col({ codec: TYPES.text, notNull: true, via: "item" }),
     parent_id: col({ codec: TYPES.int, notNull: false, via: "item" }),
-    // $topic.get("parent_id") -> $topic.singleRelation("item").get("parent_id")
+    author_id: col({ codec: TYPES.int, notNull: true, via: "item" }),
     position: col({ codec: TYPES.bigint, notNull: true, via: "item" }),
-    // $topic.get("position") -> $topic.singleRelation("item").get("position")
     created_at: col({ codec: TYPES.timestamptz, notNull: true, via: "item" }),
     updated_at: col({ codec: TYPES.timestamptz, notNull: true, via: "item" }),
     is_explicitly_archived: col({
@@ -1362,6 +1366,50 @@ export function makeExampleSchema(
     return $typeName;
   };
 
+  const singleTableItemInterface = ($item: SingleTableItemPlan) =>
+    pgSingleTableInterface(singleTableTypeName($item), $item);
+
+  const relationalItemInterface = ($item: RelationalItemPlan) =>
+    pgRelationalInterface($item, $item.get("type"), {
+      RelationalTopic: {
+        match: (t) => t === "TOPIC",
+        plan: () =>
+          deoptimizeIfAppropriate(
+            relationalTopicsSource.get({ id: $item.get("id") }),
+          ),
+      },
+      RelationalPost: {
+        match: (t) => t === "POST",
+        plan: () =>
+          deoptimizeIfAppropriate(
+            relationalPostsSource.get({ id: $item.get("id") }),
+          ),
+      },
+      RelationalDivider: {
+        match: (t) => t === "DIVIDER",
+        plan: () =>
+          deoptimizeIfAppropriate(
+            relationalDividersSource.get({ id: $item.get("id") }),
+          ),
+      },
+      RelationalChecklist: {
+        match: (t) => t === "CHECKLIST",
+        plan: () =>
+          deoptimizeIfAppropriate(
+            relationalChecklistsSource.get({ id: $item.get("id") }),
+          ),
+      },
+      RelationalChecklistItem: {
+        match: (t) => t === "CHECKLIST_ITEM",
+        plan: () =>
+          deoptimizeIfAppropriate(
+            relationalChecklistItemsSource.get({
+              id: $item.get("id"),
+            }),
+          ),
+      },
+    });
+
   const Person: GraphQLObjectType<any, GraphileResolverContext> =
     new GraphQLObjectType(
       objectSpec<GraphileResolverContext, PersonPlan>({
@@ -1377,17 +1425,26 @@ export function makeExampleSchema(
                 author_id: $personId,
               });
               deoptimizeIfAppropriate($items);
-              return each($items, ($item) => {
-                return pgSingleTableInterface(
-                  singleTableTypeName($item),
-                  $item,
-                );
+              return each($items, ($item) => singleTableItemInterface($item));
+            },
+          },
+
+          relationalItemsList: {
+            type: new GraphQLList(RelationalItem),
+            plan($person) {
+              const $personId = $person.get("person_id");
+              const $items: RelationalItemsPlan = relationalItemsSource.find({
+                author_id: $personId,
               });
+              deoptimizeIfAppropriate($items);
+              return each($items, ($item) => relationalItemInterface($item));
             },
           },
         }),
       }),
     );
+
+  ////////////////////////////////////////
 
   const SingleTableItem: GraphQLInterfaceType = new GraphQLInterfaceType({
     name: "SingleTableItem",
@@ -1415,7 +1472,7 @@ export function makeExampleSchema(
           id: $entity.get("parent_id"),
         });
         deoptimizeIfAppropriate($plan);
-        return pgSingleTableInterface(singleTableTypeName($plan), $plan);
+        return singleTableItemInterface($plan);
       },
     },
     author: singleRelationField(
@@ -1488,6 +1545,110 @@ export function makeExampleSchema(
       }),
     }),
   );
+
+  ////////////////////////////////////////
+
+  const RelationalItem: GraphQLInterfaceType = new GraphQLInterfaceType({
+    name: "RelationalItem",
+    fields: () => ({
+      id: { type: GraphQLInt },
+      type: { type: GraphQLString },
+      parent: { type: RelationalItem },
+      author: { type: Person },
+      position: { type: GraphQLString },
+      createdAt: { type: GraphQLString },
+      updatedAt: { type: GraphQLString },
+      isExplicitlyArchived: { type: GraphQLBoolean },
+      archivedAt: { type: GraphQLString },
+    }),
+    resolveType,
+  });
+
+  const commonRelationalItemFields = {
+    id: attrField("id", GraphQLInt),
+    type: attrField("type", GraphQLString),
+    parent: {
+      type: RelationalItem,
+      plan($entity: RelationalItemPlan) {
+        const $plan = relationalItemsSource.get({
+          id: $entity.get("parent_id"),
+        });
+        deoptimizeIfAppropriate($plan);
+        return relationalItemInterface($plan);
+      },
+    },
+    author: singleRelationField(
+      personSource,
+      { person_id: "author_id" },
+      Person,
+    ),
+    position: attrField("position", GraphQLString),
+    createdAt: attrField("created_at", GraphQLString),
+    updatedAt: attrField("updated_at", GraphQLString),
+    isExplicitlyArchived: attrField("is_explicitly_archived", GraphQLBoolean),
+    archivedAt: attrField("archived_at", GraphQLString),
+  };
+
+  const RelationalTopic = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, RelationalItemPlan>({
+      name: "RelationalTopic",
+      interfaces: [RelationalItem],
+      fields: () => ({
+        ...commonRelationalItemFields,
+        title: attrField("title", GraphQLString),
+      }),
+    }),
+  );
+
+  const RelationalPost = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, RelationalItemPlan>({
+      name: "RelationalPost",
+      interfaces: [RelationalItem],
+      fields: () => ({
+        ...commonRelationalItemFields,
+        title: attrField("title", GraphQLString),
+        description: attrField("description", GraphQLString),
+        note: attrField("note", GraphQLString),
+      }),
+    }),
+  );
+
+  const RelationalDivider = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, RelationalItemPlan>({
+      name: "RelationalDivider",
+      interfaces: [RelationalItem],
+      fields: () => ({
+        ...commonRelationalItemFields,
+        title: attrField("title", GraphQLString),
+        color: attrField("color", GraphQLString),
+      }),
+    }),
+  );
+
+  const RelationalChecklist = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, RelationalItemPlan>({
+      name: "RelationalChecklist",
+      interfaces: [RelationalItem],
+      fields: () => ({
+        ...commonRelationalItemFields,
+        title: attrField("title", GraphQLString),
+      }),
+    }),
+  );
+
+  const RelationalChecklistItem = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, RelationalItemPlan>({
+      name: "RelationalChecklistItem",
+      interfaces: [RelationalItem],
+      fields: () => ({
+        ...commonRelationalItemFields,
+        description: attrField("description", GraphQLString),
+        note: attrField("note", GraphQLString),
+      }),
+    }),
+  );
+
+  ////////////////////////////////////////
 
   const Query = new GraphQLObjectType(
     objectSpec<GraphileResolverContext, __ValuePlan<BaseGraphQLRootValue>>({
@@ -1744,7 +1905,22 @@ export function makeExampleSchema(
             const $item: SingleTableItemPlan = singleTableItemsSource.get({
               id: args.id,
             });
-            return pgSingleTableInterface(singleTableTypeName($item), $item);
+            return singleTableItemInterface($item);
+          },
+        },
+
+        relationalItemById: {
+          type: RelationalItem,
+          args: {
+            id: {
+              type: GraphQLInt,
+            },
+          },
+          plan(_$root, args) {
+            const $item: RelationalItemPlan = relationalItemsSource.get({
+              id: args.id,
+            });
+            return relationalItemInterface($item);
           },
         },
       },
@@ -1757,11 +1933,18 @@ export function makeExampleSchema(
       types: [
         // Don't forget to add all types that implement interfaces here
         // otherwise they _might_ not show up in the schema.
+
         SingleTableTopic,
         SingleTablePost,
         SingleTableDivider,
         SingleTableChecklist,
         SingleTableChecklistItem,
+
+        RelationalTopic,
+        RelationalPost,
+        RelationalDivider,
+        RelationalChecklist,
+        RelationalChecklistItem,
       ],
     }),
   );
