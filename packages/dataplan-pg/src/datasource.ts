@@ -27,9 +27,8 @@ export type PgSourceColumns = {
   [columnName: string]: PgSourceColumn<any>;
 };
 
-export type PgSourceColumnVia =
-  | string
-  | { relation: string; attribute: string };
+export type PgSourceColumnViaExplicit = { relation: string; attribute: string };
+export type PgSourceColumnVia = string | PgSourceColumnViaExplicit;
 
 export interface PgSourceColumn<TCanonical = any, TInput = TCanonical> {
   /**

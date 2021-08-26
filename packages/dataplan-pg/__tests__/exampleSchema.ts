@@ -166,8 +166,16 @@ export function makeExampleSchema(
   const messageColumns = {
     id: col({ notNull: true, codec: TYPES.uuid }),
     body: col({ notNull: true, codec: TYPES.text }),
-    author_id: col({ notNull: true, codec: TYPES.uuid }),
-    forum_id: col({ notNull: true, codec: TYPES.uuid }),
+    author_id: col({
+      notNull: true,
+      codec: TYPES.uuid,
+      identicalVia: { relation: "author", attribute: "person_id" },
+    }),
+    forum_id: col({
+      notNull: true,
+      codec: TYPES.uuid,
+      identicalVia: { relation: "forum", attribute: "id" },
+    }),
     created_at: col({ notNull: true, codec: TYPES.timestamptz }),
     archived_at: col({ codec: TYPES.timestamptz }),
     featured: col({ codec: TYPES.boolean }),
@@ -333,7 +341,11 @@ export function makeExampleSchema(
     name: "posts",
     columns: {
       post_id: col({ codec: TYPES.int, notNull: true }),
-      author_id: col({ codec: TYPES.int, notNull: true }),
+      author_id: col({
+        codec: TYPES.int,
+        notNull: true,
+        identicalVia: { relation: "author", attribute: "person_id" },
+      }),
       body: col({ codec: TYPES.text, notNull: true }),
     },
     uniques: [["post_id"]],
@@ -360,8 +372,16 @@ export function makeExampleSchema(
     name: "comments",
     columns: {
       comment_id: col({ codec: TYPES.int, notNull: true }),
-      author_id: col({ codec: TYPES.int, notNull: true }),
-      post_id: col({ codec: TYPES.int, notNull: true }),
+      author_id: col({
+        codec: TYPES.int,
+        notNull: true,
+        identicalVia: { relation: "author", attribute: "person_id" },
+      }),
+      post_id: col({
+        codec: TYPES.int,
+        notNull: true,
+        identicalVia: { relation: "post", attribute: "id" },
+      }),
       body: col({ codec: TYPES.text, notNull: true }),
     },
     uniques: [["comment_id"]],
@@ -390,8 +410,16 @@ export function makeExampleSchema(
       id: col({ codec: TYPES.int, notNull: true }),
       type: col({ codec: TYPES.text /* TODO: enum? */, notNull: true }),
 
-      parent_id: col({ codec: TYPES.int, notNull: false }),
-      author_id: col({ codec: TYPES.int, notNull: true }),
+      parent_id: col({
+        codec: TYPES.int,
+        notNull: false,
+        identicalVia: { relation: "parent", attribute: "id" },
+      }),
+      author_id: col({
+        codec: TYPES.int,
+        notNull: true,
+        identicalVia: { relation: "author", attribute: "person_id" },
+      }),
       position: col({ codec: TYPES.bigint, notNull: true }),
       created_at: col({ codec: TYPES.timestamptz, notNull: true }),
       updated_at: col({ codec: TYPES.timestamptz, notNull: true }),
@@ -435,8 +463,16 @@ export function makeExampleSchema(
       id: col({ codec: TYPES.int, notNull: true }),
       type: col({ codec: TYPES.text /* TODO: enum? */, notNull: true }),
 
-      parent_id: col({ codec: TYPES.int, notNull: false }),
-      author_id: col({ codec: TYPES.int, notNull: true }),
+      parent_id: col({
+        codec: TYPES.int,
+        notNull: false,
+        identicalVia: { relation: "parent", attribute: "id" },
+      }),
+      author_id: col({
+        codec: TYPES.int,
+        notNull: true,
+        identicalVia: { relation: "author", attribute: "person_id" },
+      }),
       position: col({ codec: TYPES.bigint, notNull: true }),
       created_at: col({ codec: TYPES.timestamptz, notNull: true }),
       updated_at: col({ codec: TYPES.timestamptz, notNull: true }),
@@ -538,8 +574,16 @@ export function makeExampleSchema(
   const itemColumns = {
     id: col({ codec: TYPES.int, notNull: true, identicalVia: "item" }),
     type: col({ codec: TYPES.text, notNull: true, via: "item" }),
-    parent_id: col({ codec: TYPES.int, notNull: false, via: "item" }),
-    author_id: col({ codec: TYPES.int, notNull: true, via: "item" }),
+    parent_id: col({
+      codec: TYPES.int,
+      notNull: false,
+      via: "item",
+    }),
+    author_id: col({
+      codec: TYPES.int,
+      notNull: true,
+      via: "item",
+    }),
     position: col({ codec: TYPES.bigint, notNull: true, via: "item" }),
     created_at: col({ codec: TYPES.timestamptz, notNull: true, via: "item" }),
     updated_at: col({ codec: TYPES.timestamptz, notNull: true, via: "item" }),
@@ -1371,38 +1415,24 @@ export function makeExampleSchema(
     pgRelationalInterface($item, $item.get("type"), {
       RelationalTopic: {
         match: (t) => t === "TOPIC",
-        plan: () =>
-          deoptimizeIfAppropriate(
-            $item.singleRelation("topic"),
-          ),
+        plan: () => deoptimizeIfAppropriate($item.singleRelation("topic")),
       },
       RelationalPost: {
         match: (t) => t === "POST",
-        plan: () =>
-          deoptimizeIfAppropriate(
-            $item.singleRelation("post"),
-          ),
+        plan: () => deoptimizeIfAppropriate($item.singleRelation("post")),
       },
       RelationalDivider: {
         match: (t) => t === "DIVIDER",
-        plan: () =>
-          deoptimizeIfAppropriate(
-            $item.singleRelation("divider"),
-          ),
+        plan: () => deoptimizeIfAppropriate($item.singleRelation("divider")),
       },
       RelationalChecklist: {
         match: (t) => t === "CHECKLIST",
-        plan: () =>
-          deoptimizeIfAppropriate(
-            $item.singleRelation("checklist"),
-          ),
+        plan: () => deoptimizeIfAppropriate($item.singleRelation("checklist")),
       },
       RelationalChecklistItem: {
         match: (t) => t === "CHECKLIST_ITEM",
         plan: () =>
-          deoptimizeIfAppropriate(
-            $item.singleRelation("checklistItem"),
-          ),
+          deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
       },
     });
 

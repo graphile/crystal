@@ -2,8 +2,15 @@ import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
 import { ExecutablePlan } from "graphile-crystal";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
+import { inspect } from "util";
 
-import type { PgSource, PgSourceColumn, PgSourceRelation } from "../datasource";
+import type {
+  PgSource,
+  PgSourceColumn,
+  PgSourceColumnVia,
+  PgSourceColumnViaExplicit,
+  PgSourceRelation,
+} from "../datasource";
 import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
 import type { PgClassExpressionPlan } from "./pgClassExpression";
 import { pgClassExpression } from "./pgClassExpression";
@@ -82,6 +89,31 @@ export class PgSelectSinglePlan<
     return this.get("" as any);
   }
 
+  private resolveVia(
+    via: PgSourceColumnVia,
+    attr: string,
+  ): PgSourceColumnViaExplicit {
+    if (!via) {
+      throw new Error("No via to resolve");
+    }
+    if (typeof via === "string") {
+      // Check
+      const relation: PgSourceRelation<PgSource<any, any, any, any, any>, any> =
+        this.dataSource.getRelation(via);
+      if (!relation) {
+        throw new Error(`Unknown relation '${via}' in ${this}`);
+      }
+      if (!relation.source.columns[attr]) {
+        throw new Error(
+          `${this} relation '${via}' does not have column '${attr}'`,
+        );
+      }
+      return { relation: via, attribute: attr };
+    } else {
+      return via;
+    }
+  }
+
   /**
    * Returns a plan representing a named attribute (e.g. column) from the class
    * (e.g. table).
@@ -106,16 +138,18 @@ export class PgSelectSinglePlan<
     }
 
     if (dataSourceColumn?.via) {
-      const via = dataSourceColumn.via;
-      const { relation, attribute } =
-        typeof via === "string" ? { relation: via, attribute: attr } : via;
+      const { relation, attribute } = this.resolveVia(
+        dataSourceColumn.via,
+        attr as string,
+      );
       return this.singleRelation(relation).get(attribute);
     }
 
     if (dataSourceColumn?.identicalVia) {
-      const via = dataSourceColumn.identicalVia;
-      const { relation, attribute } =
-        typeof via === "string" ? { relation: via, attribute: attr } : via;
+      const { relation, attribute } = this.resolveVia(
+        dataSourceColumn.identicalVia,
+        attr as string,
+      );
       if (this.options.relationalShortcuts?.[relation]) {
         // Relation exists already; load it from there for efficiency
         return this.singleRelation(relation).get(attribute);

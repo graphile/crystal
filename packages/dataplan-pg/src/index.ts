@@ -17,6 +17,7 @@ export {
   PgSourceColumn,
   PgSourceColumns,
   PgSourceColumnVia,
+  PgSourceColumnViaExplicit,
 } from "./datasource";
 export {
   PgClient,
