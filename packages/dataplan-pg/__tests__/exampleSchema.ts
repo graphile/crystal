@@ -1375,37 +1375,35 @@ export function makeExampleSchema(
         match: (t) => t === "TOPIC",
         plan: () =>
           deoptimizeIfAppropriate(
-            relationalTopicsSource.get({ id: $item.get("id") }),
+            $item.singleRelation("topic"),
           ),
       },
       RelationalPost: {
         match: (t) => t === "POST",
         plan: () =>
           deoptimizeIfAppropriate(
-            relationalPostsSource.get({ id: $item.get("id") }),
+            $item.singleRelation("post"),
           ),
       },
       RelationalDivider: {
         match: (t) => t === "DIVIDER",
         plan: () =>
           deoptimizeIfAppropriate(
-            relationalDividersSource.get({ id: $item.get("id") }),
+            $item.singleRelation("divider"),
           ),
       },
       RelationalChecklist: {
         match: (t) => t === "CHECKLIST",
         plan: () =>
           deoptimizeIfAppropriate(
-            relationalChecklistsSource.get({ id: $item.get("id") }),
+            $item.singleRelation("checklist"),
           ),
       },
       RelationalChecklistItem: {
         match: (t) => t === "CHECKLIST_ITEM",
         plan: () =>
           deoptimizeIfAppropriate(
-            relationalChecklistItemsSource.get({
-              id: $item.get("id"),
-            }),
+            $item.singleRelation("checklistItem"),
           ),
       },
     });
