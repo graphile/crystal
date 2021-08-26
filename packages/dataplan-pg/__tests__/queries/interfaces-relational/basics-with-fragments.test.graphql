@@ -1,0 +1,39 @@
+{
+  people {
+    __typename
+    username
+    relationalItemsList {
+      ...Item
+    }
+  }
+}
+
+fragment Item on RelationalItem {
+  __typename
+  id
+  type
+  position
+  createdAt
+  updatedAt
+  isExplicitlyArchived
+  archivedAt
+  ... on RelationalTopic {
+    title
+  }
+  ... on RelationalPost {
+    title
+    description
+    note
+  }
+  ... on RelationalDivider {
+    title
+    color
+  }
+  ... on RelationalChecklist {
+    title
+  }
+  ... on RelationalChecklistItem {
+    description
+    note
+  }
+}

@@ -1,0 +1,16 @@
+{
+  people {
+    __typename
+    username
+    relationalItemsList {
+      __typename
+      parent {
+        __typename
+        id
+        type
+      }
+      id
+      type
+    }
+  }
+}

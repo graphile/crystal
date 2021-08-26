@@ -1,0 +1,14 @@
+{
+  relationalItemById(id: 15) {
+    __typename
+    parent {
+      __typename
+      id
+      author {
+        __typename
+        username
+      }
+    }
+    id
+  }
+}

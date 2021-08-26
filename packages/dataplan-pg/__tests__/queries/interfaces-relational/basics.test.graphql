@@ -1,0 +1,16 @@
+{
+  people {
+    __typename
+    username
+    relationalItemsList {
+      __typename
+      id
+      type
+      position
+      createdAt
+      updatedAt
+      isExplicitlyArchived
+      archivedAt
+    }
+  }
+}
