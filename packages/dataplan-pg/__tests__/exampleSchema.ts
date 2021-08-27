@@ -55,7 +55,7 @@ import {
   PgConditionPlan,
   PgConnectionPlan,
   PgExecutor,
-  pgRelationalPolymorphic,
+  pgPolymorphic,
   pgSelect,
   PgSelectSinglePlan,
   pgSingleTablePolymorphic,
@@ -1583,7 +1583,7 @@ export function makeExampleSchema(
     pgSingleTablePolymorphic(singleTableTypeName($item), $item);
 
   const relationalItemInterface = ($item: RelationalItemPlan) =>
-    pgRelationalPolymorphic($item, $item.get("type"), {
+    pgPolymorphic($item, $item.get("type"), {
       RelationalTopic: {
         match: (t) => t === "TOPIC",
         plan: () => deoptimizeIfAppropriate($item.singleRelation("topic")),
@@ -1608,7 +1608,7 @@ export function makeExampleSchema(
     });
 
   const unionItemUnion = ($item: UnionItemPlan) =>
-    pgRelationalPolymorphic($item, $item.get("type"), {
+    pgPolymorphic($item, $item.get("type"), {
       UnionTopic: {
         match: (t) => t === "TOPIC",
         plan: () => deoptimizeIfAppropriate($item.singleRelation("topic")),
@@ -1633,7 +1633,7 @@ export function makeExampleSchema(
     });
 
   const relationalCommentableInterface = ($item: RelationalCommentablePlan) =>
-    pgRelationalPolymorphic($item, $item.get("type"), {
+    pgPolymorphic($item, $item.get("type"), {
       RelationalPost: {
         match: (t) => t === "POST",
         plan: () => deoptimizeIfAppropriate($item.singleRelation("post")),
@@ -2380,7 +2380,7 @@ export function makeExampleSchema(
             ]);
             deoptimizeIfAppropriate($plan);
             return each($plan, ($item) =>
-              pgRelationalPolymorphic(
+              pgPolymorphic(
                 $item,
                 list([
                   $item.get("person_id"),
@@ -2390,12 +2390,8 @@ export function makeExampleSchema(
                 {
                   Person: {
                     match: (v) => v[0] != null,
-                    plan: ($list) => {
-                      console.dir($list);
-                      const $personId = $list.at(0);
-                      console.dir($personId);
-                      return personSource.get({ person_id: $personId });
-                    },
+                    plan: ($list) =>
+                      personSource.get({ person_id: $list.at(0) }),
                   },
                   Post: {
                     match: (v) => v[1] != null,

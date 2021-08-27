@@ -12,7 +12,7 @@ import { inspect } from "util";
 import type { PgSource } from "../datasource";
 import type { PgSelectSinglePlan } from "./pgSelectSingle";
 
-interface PgRelationalPolymorphicTypeMap<
+interface PgPolymorphicTypeMap<
   TTypeSpecifier extends any,
   TTypeSpecifierPlan extends ExecutablePlan<TTypeSpecifier>,
 > {
@@ -22,7 +22,7 @@ interface PgRelationalPolymorphicTypeMap<
   };
 }
 
-export class PgRelationalPolymorphicPlan<
+export class PgPolymorphicPlan<
     TDataSource extends PgSource<any, any, any, any, any>,
     TTypeSpecifier extends any,
     TTypeSpecifierPlan extends ExecutablePlan<TTypeSpecifier> = ExecutablePlan<TTypeSpecifier>,
@@ -37,7 +37,7 @@ export class PgRelationalPolymorphicPlan<
   constructor(
     $itemPlan: PgSelectSinglePlan<TDataSource>,
     $typeSpecifierPlan: TTypeSpecifierPlan,
-    private possibleTypes: PgRelationalPolymorphicTypeMap<
+    private possibleTypes: PgPolymorphicTypeMap<
       TTypeSpecifier,
       TTypeSpecifierPlan
     >,
@@ -104,25 +104,18 @@ export class PgRelationalPolymorphicPlan<
   }
 }
 
-export function pgRelationalPolymorphic<
+export function pgPolymorphic<
   TDataSource extends PgSource<any, any, any, any, any>,
   TTypeSpecifier extends any,
   TTypeSpecifierPlan extends ExecutablePlan<TTypeSpecifier> = ExecutablePlan<TTypeSpecifier>,
 >(
   $itemPlan: PgSelectSinglePlan<TDataSource>,
   $typeSpecifierPlan: TTypeSpecifierPlan,
-  possibleTypes: PgRelationalPolymorphicTypeMap<
-    TTypeSpecifier,
-    TTypeSpecifierPlan
-  >,
-): PgRelationalPolymorphicPlan<
-  TDataSource,
-  TTypeSpecifier,
-  TTypeSpecifierPlan
-> {
-  return new PgRelationalPolymorphicPlan<
-    TDataSource,
-    TTypeSpecifier,
-    TTypeSpecifierPlan
-  >($itemPlan, $typeSpecifierPlan, possibleTypes);
+  possibleTypes: PgPolymorphicTypeMap<TTypeSpecifier, TTypeSpecifierPlan>,
+): PgPolymorphicPlan<TDataSource, TTypeSpecifier, TTypeSpecifierPlan> {
+  return new PgPolymorphicPlan<TDataSource, TTypeSpecifier, TTypeSpecifierPlan>(
+    $itemPlan,
+    $typeSpecifierPlan,
+    possibleTypes,
+  );
 }
