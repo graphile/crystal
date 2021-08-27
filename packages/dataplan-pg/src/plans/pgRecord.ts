@@ -1,3 +1,5 @@
+// TODO: delete this entire plan; it can be completely replaced with pgClassExpression
+
 import debugFactory from "debug";
 import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
 import { ExecutablePlan } from "graphile-crystal";
