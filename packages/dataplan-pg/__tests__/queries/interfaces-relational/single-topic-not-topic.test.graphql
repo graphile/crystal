@@ -1,0 +1,13 @@
+{
+  relationalTopicById(id: 12) {
+    __typename
+    id
+    type
+    position
+    createdAt
+    updatedAt
+    isExplicitlyArchived
+    archivedAt
+    title
+  }
+}
