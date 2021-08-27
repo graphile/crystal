@@ -1,6 +1,8 @@
 import debugFactory from "debug";
 
 import { ExecutablePlan } from "../plan";
+import type { AccessPlan } from "./access";
+import { access } from "./access";
 
 const debugObjectPlan = debugFactory("crystal:ObjectPlan");
 const debugObjectPlanVerbose = debugObjectPlan.extend("verbose");
@@ -70,6 +72,10 @@ export class ObjectPlan<
       (p) => JSON.stringify(p.keys) === myKeys,
     );
     return peersWithSameKeys.length > 0 ? peersWithSameKeys[0] : this;
+  }
+
+  get(key: keyof TData): AccessPlan<TData[typeof key]> {
+    return access(this, [key as string]);
   }
 }
 

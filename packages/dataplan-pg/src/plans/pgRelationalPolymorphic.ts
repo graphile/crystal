@@ -12,16 +12,20 @@ import { inspect } from "util";
 import type { PgSource } from "../datasource";
 import type { PgSelectSinglePlan } from "./pgSelectSingle";
 
-interface PgRelationalPolymorphicTypeMap<TTypeSpecifier extends any> {
+interface PgRelationalPolymorphicTypeMap<
+  TTypeSpecifier extends any,
+  TTypeSpecifierPlan extends ExecutablePlan<TTypeSpecifier>,
+> {
   [typeName: string]: {
     match(specifier: TTypeSpecifier): boolean;
-    plan(): ExecutablePlan<any>;
+    plan($specifier: TTypeSpecifierPlan): ExecutablePlan<any>;
   };
 }
 
 export class PgRelationalPolymorphicPlan<
     TDataSource extends PgSource<any, any, any, any, any>,
     TTypeSpecifier extends any,
+    TTypeSpecifierPlan extends ExecutablePlan<TTypeSpecifier> = ExecutablePlan<TTypeSpecifier>,
   >
   extends ExecutablePlan<any>
   implements PolymorphicPlan
@@ -32,13 +36,23 @@ export class PgRelationalPolymorphicPlan<
 
   constructor(
     $itemPlan: PgSelectSinglePlan<TDataSource>,
-    $typeSpecifierPlan: ExecutablePlan<TTypeSpecifier>,
-    private possibleTypes: PgRelationalPolymorphicTypeMap<TTypeSpecifier>,
+    $typeSpecifierPlan: TTypeSpecifierPlan,
+    private possibleTypes: PgRelationalPolymorphicTypeMap<
+      TTypeSpecifier,
+      TTypeSpecifierPlan
+    >,
   ) {
     super();
     this.itemPlanId = this.addDependency($itemPlan);
     this.typeSpecifierPlanId = this.addDependency($typeSpecifierPlan);
     this.types = Object.keys(possibleTypes);
+  }
+
+  typeSpecifierPlan(): TTypeSpecifierPlan {
+    const plan = this.aether.plans[
+      this.dependencies[this.itemPlanId]
+    ] as TTypeSpecifierPlan;
+    return plan;
   }
 
   planForType(type: GraphQLObjectType): ExecutablePlan {
@@ -52,7 +66,7 @@ export class PgRelationalPolymorphicPlan<
         ).join("', '")}'`,
       );
     }
-    return spec.plan();
+    return spec.plan(this.typeSpecifierPlan());
   }
 
   private getTypeNameFromSpecifier(specifier: TTypeSpecifier) {
@@ -93,14 +107,22 @@ export class PgRelationalPolymorphicPlan<
 export function pgRelationalPolymorphic<
   TDataSource extends PgSource<any, any, any, any, any>,
   TTypeSpecifier extends any,
+  TTypeSpecifierPlan extends ExecutablePlan<TTypeSpecifier> = ExecutablePlan<TTypeSpecifier>,
 >(
   $itemPlan: PgSelectSinglePlan<TDataSource>,
-  $typeSpecifierPlan: ExecutablePlan<TTypeSpecifier>,
-  possibleTypes: PgRelationalPolymorphicTypeMap<TTypeSpecifier>,
-): PgRelationalPolymorphicPlan<TDataSource, TTypeSpecifier> {
-  return new PgRelationalPolymorphicPlan<TDataSource, TTypeSpecifier>(
-    $itemPlan,
-    $typeSpecifierPlan,
-    possibleTypes,
-  );
+  $typeSpecifierPlan: TTypeSpecifierPlan,
+  possibleTypes: PgRelationalPolymorphicTypeMap<
+    TTypeSpecifier,
+    TTypeSpecifierPlan
+  >,
+): PgRelationalPolymorphicPlan<
+  TDataSource,
+  TTypeSpecifier,
+  TTypeSpecifierPlan
+> {
+  return new PgRelationalPolymorphicPlan<
+    TDataSource,
+    TTypeSpecifier,
+    TTypeSpecifierPlan
+  >($itemPlan, $typeSpecifierPlan, possibleTypes);
 }

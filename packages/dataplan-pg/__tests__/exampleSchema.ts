@@ -7,6 +7,7 @@ import type {
   ExecutablePlan,
   InputStaticLeafPlan,
 } from "graphile-crystal";
+import { first, list } from "graphile-crystal";
 import {
   BasePlan,
   context,
@@ -118,6 +119,8 @@ export function makeExampleSchema(
   // type ForumsPlan = PgSelectPlan<typeof forumSource>;
   type ForumPlan = PgSelectSinglePlan<typeof forumSource>;
   type PersonPlan = PgSelectSinglePlan<typeof personSource>;
+  type PostPlan = PgSelectSinglePlan<typeof postSource>;
+  type CommentPlan = PgSelectSinglePlan<typeof commentSource>;
   type SingleTableItemsPlan = PgSelectPlan<typeof singleTableItemsSource>;
   type SingleTableItemPlan = PgSelectSinglePlan<typeof singleTableItemsSource>;
   type RelationalItemsPlan = PgSelectPlan<typeof relationalItemsSource>;
@@ -853,6 +856,21 @@ export function makeExampleSchema(
       note: col({ codec: TYPES.text, notNull: false }),
     },
     uniques: [["id"]],
+  });
+
+  const unionEntityColumns = {
+    person_id: col({ codec: TYPES.int, notNull: false }),
+    post_id: col({ codec: TYPES.int, notNull: false }),
+    comment_id: col({ codec: TYPES.int, notNull: false }),
+  };
+
+  const entitySearchSource = new PgSource({
+    executor,
+    codec: recordType(sql`interfaces_and_unions.union__entity`),
+    source: (args: SQL[]) =>
+      sql`interfaces_and_unions.search(${sql.join(args, ", ")})`,
+    name: "entity_search",
+    columns: unionEntityColumns,
   });
 
   // TODO: interfaces_and_unions.union__entity
@@ -1665,6 +1683,31 @@ export function makeExampleSchema(
       }),
     );
 
+  const Post: GraphQLObjectType<any, GraphileResolverContext> =
+    new GraphQLObjectType(
+      objectSpec<GraphileResolverContext, PostPlan>({
+        name: "Post",
+        fields: () => ({
+          postId: attrField("post_id", GraphQLInt),
+          body: attrField("body", GraphQLString),
+          author: singleRelationField("author", Person),
+        }),
+      }),
+    );
+
+  const Comment: GraphQLObjectType<any, GraphileResolverContext> =
+    new GraphQLObjectType(
+      objectSpec<GraphileResolverContext, CommentPlan>({
+        name: "Comment",
+        fields: () => ({
+          commentId: attrField("comment_id", GraphQLInt),
+          author: singleRelationField("author", Person),
+          post: singleRelationField("post", Person),
+          body: attrField("body", GraphQLString),
+        }),
+      }),
+    );
+
   ////////////////////////////////////////
 
   const SingleTableItem: GraphQLInterfaceType = new GraphQLInterfaceType({
@@ -1933,6 +1976,14 @@ export function makeExampleSchema(
       }),
     }),
   );
+
+  ////////////////////////////////////////
+
+  const Entity: GraphQLUnionType = new GraphQLUnionType({
+    name: "Entity",
+    resolveType,
+    types: () => [Person, Post, Comment],
+  });
 
   ////////////////////////////////////////
 
@@ -2308,6 +2359,52 @@ export function makeExampleSchema(
               direction: "ASC",
             });
             return each($items, ($item) => unionItemUnion($item));
+          },
+        },
+
+        searchEntities: {
+          type: new GraphQLList(new GraphQLNonNull(Entity)),
+          args: {
+            query: {
+              type: new GraphQLNonNull(GraphQLString),
+            },
+          },
+          plan(_$root, args) {
+            const $query = args.query;
+            const $plan = pgSelect(entitySearchSource, [
+              {
+                plan: $query,
+                type: TYPES.text.sqlType,
+                name: "query",
+              },
+            ]);
+            deoptimizeIfAppropriate($plan);
+            return each($plan, ($item) =>
+              pgRelationalPolymorphic(
+                $item,
+                list([
+                  $item.get("person_id"),
+                  $item.get("post_id"),
+                  $item.get("comment_id"),
+                ]),
+                {
+                  Person: {
+                    match: (v) => v[0] != null,
+                    plan: ($list) =>
+                      personSource.get({ person_id: $list.at(0) }),
+                  },
+                  Post: {
+                    match: (v) => v[1] != null,
+                    plan: ($list) => postSource.get({ person_id: $list.at(1) }),
+                  },
+                  Comment: {
+                    match: (v) => v[2] != null,
+                    plan: ($list) =>
+                      commentSource.get({ person_id: $list.at(2) }),
+                  },
+                },
+              ),
+            );
           },
         },
       },
