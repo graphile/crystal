@@ -2197,7 +2197,7 @@ export function makeExampleSchema(
           type: SingleTableItem,
           args: {
             id: {
-              type: GraphQLInt,
+              type: new GraphQLNonNull(GraphQLInt),
             },
           },
           plan(_$root, args) {
@@ -2212,7 +2212,7 @@ export function makeExampleSchema(
           type: SingleTableTopic,
           args: {
             id: {
-              type: GraphQLInt,
+              type: new GraphQLNonNull(GraphQLInt),
             },
           },
           plan(_$root, args) {
@@ -2228,7 +2228,7 @@ export function makeExampleSchema(
           type: RelationalItem,
           args: {
             id: {
-              type: GraphQLInt,
+              type: new GraphQLNonNull(GraphQLInt),
             },
           },
           plan(_$root, args) {
@@ -2243,7 +2243,7 @@ export function makeExampleSchema(
           type: RelationalTopic,
           args: {
             id: {
-              type: GraphQLInt,
+              type: new GraphQLNonNull(GraphQLInt),
             },
           },
           plan(_$root, args) {
@@ -2273,7 +2273,7 @@ export function makeExampleSchema(
           type: UnionItem,
           args: {
             id: {
-              type: GraphQLInt,
+              type: new GraphQLNonNull(GraphQLInt),
             },
           },
           plan(_$root, args) {
@@ -2288,7 +2288,7 @@ export function makeExampleSchema(
           type: UnionTopic,
           args: {
             id: {
-              type: GraphQLInt,
+              type: new GraphQLNonNull(GraphQLInt),
             },
           },
           plan(_$root, args) {
