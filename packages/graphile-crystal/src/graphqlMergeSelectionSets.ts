@@ -61,11 +61,14 @@ export function typesUsedInSelections(
     }
   }
   // Return types with matching names, or where they have an interface with a
-  // matching name.
+  // matching name, or where they belong to a union with a matching name
   return types.filter(
     (t) =>
       typeNamesMap[t.name] ||
-      t.getInterfaces().some((i) => typeNamesMap[i.name]),
+      t.getInterfaces().some((i) => typeNamesMap[i.name]) ||
+      aether.unionsContainingObjectType[t.name].some(
+        (u) => typeNamesMap[u.name],
+      ),
   );
 }
 

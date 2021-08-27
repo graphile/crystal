@@ -25,6 +25,7 @@ import {
   isInterfaceType,
   isListType,
   isNonNullType,
+  isObjectType,
   isScalarType,
   isUnionType,
 } from "graphql";
@@ -197,6 +198,9 @@ export class Aether<
   public readonly trackedRootValuePlan: __TrackedObjectPlan<TRootValue>;
   public readonly operationType: "query" | "mutation" | "subscription";
   public readonly queryTypeName: string;
+  public readonly unionsContainingObjectType: {
+    [objectTypeName: string]: ReadonlyArray<GraphQLUnionType>;
+  };
 
   constructor(
     public readonly schema: GraphQLSchema,
@@ -218,6 +222,18 @@ export class Aether<
       );
     }
     this.queryTypeName = queryType.name;
+
+    // Unions are a pain, let's cache some things up front to make them easier.
+    const allTypes = Object.values(schema.getTypeMap());
+    const allUnions = allTypes.filter(isUnionType);
+    const allObjectTypes = allTypes.filter(isObjectType);
+    this.unionsContainingObjectType = Object.create(null);
+    for (const objectType of allObjectTypes) {
+      this.unionsContainingObjectType[objectType.name] = allUnions.filter((u) =>
+        u.getTypes().includes(objectType),
+      );
+    }
+
     globalState.aether = this;
     globalState.parentPathIdentity = GLOBAL_PATH;
     this.variableValuesPlan = new __ValuePlan();
