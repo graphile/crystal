@@ -1913,7 +1913,7 @@ export class Aether<
       );
       depth++;
       for (const childPathIdentity of pathIdentities) {
-        if (childPathIdentity.startsWith(pathIdentity)) {
+        if (childPathIdentity.startsWith(pathIdentity + ">")) {
           print(childPathIdentity, pathIdentity);
         }
       }
