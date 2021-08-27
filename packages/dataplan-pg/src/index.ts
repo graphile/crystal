@@ -37,12 +37,12 @@ export {
 } from "./plans/pgCondition";
 export { PgConnectionPlan } from "./plans/pgConnection";
 export {
-  pgRelationalInterface,
-  PgRelationalInterfacePlan,
-} from "./plans/pgRelationalInterface";
+  pgRelationalPolymorphic,
+  PgRelationalPolymorphicPlan,
+} from "./plans/pgRelationalPolymorphic";
 export { pgSelect, PgSelectPlan } from "./plans/pgSelect";
 export { PgSelectSinglePlan } from "./plans/pgSelectSingle";
 export {
-  pgSingleTableInterface,
-  PgSingleTableInterfacePlan,
-} from "./plans/pgSingleTableInterface";
+  pgSingleTablePolymorphic,
+  PgSingleTablePolymorphicPlan,
+} from "./plans/pgSingleTablePolymorphic";

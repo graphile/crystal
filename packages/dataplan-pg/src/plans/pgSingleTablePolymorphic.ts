@@ -10,7 +10,7 @@ import type { GraphQLObjectType } from "graphql";
 import type { PgSource } from "../datasource";
 import type { PgSelectSinglePlan } from "./pgSelectSingle";
 
-export class PgSingleTableInterfacePlan<
+export class PgSingleTablePolymorphicPlan<
     TDataSource extends PgSource<any, any, any, any, any>,
   >
   extends ExecutablePlan<any>
@@ -54,11 +54,11 @@ export class PgSingleTableInterfacePlan<
   }
 }
 
-export function pgSingleTableInterface<
+export function pgSingleTablePolymorphic<
   TDataSource extends PgSource<any, any, any, any, any>,
 >(
   $typePlan: ExecutablePlan<string>,
   $rowPlan: PgSelectSinglePlan<TDataSource>,
-): PgSingleTableInterfacePlan<TDataSource> {
-  return new PgSingleTableInterfacePlan<TDataSource>($typePlan, $rowPlan);
+): PgSingleTablePolymorphicPlan<TDataSource> {
+  return new PgSingleTablePolymorphicPlan<TDataSource>($typePlan, $rowPlan);
 }

@@ -54,10 +54,10 @@ import {
   PgConditionPlan,
   PgConnectionPlan,
   PgExecutor,
-  pgRelationalInterface,
+  pgRelationalPolymorphic,
   pgSelect,
   PgSelectSinglePlan,
-  pgSingleTableInterface,
+  pgSingleTablePolymorphic,
   PgSource,
   recordType,
   TYPES,
@@ -1562,10 +1562,10 @@ export function makeExampleSchema(
   };
 
   const singleTableItemInterface = ($item: SingleTableItemPlan) =>
-    pgSingleTableInterface(singleTableTypeName($item), $item);
+    pgSingleTablePolymorphic(singleTableTypeName($item), $item);
 
   const relationalItemInterface = ($item: RelationalItemPlan) =>
-    pgRelationalInterface($item, $item.get("type"), {
+    pgRelationalPolymorphic($item, $item.get("type"), {
       RelationalTopic: {
         match: (t) => t === "TOPIC",
         plan: () => deoptimizeIfAppropriate($item.singleRelation("topic")),
@@ -1590,7 +1590,7 @@ export function makeExampleSchema(
     });
 
   const unionItemUnion = ($item: UnionItemPlan) =>
-    pgRelationalInterface($item, $item.get("type"), {
+    pgRelationalPolymorphic($item, $item.get("type"), {
       UnionTopic: {
         match: (t) => t === "TOPIC",
         plan: () => deoptimizeIfAppropriate($item.singleRelation("topic")),
@@ -1615,7 +1615,7 @@ export function makeExampleSchema(
     });
 
   const relationalCommentableInterface = ($item: RelationalCommentablePlan) =>
-    pgRelationalInterface($item, $item.get("type"), {
+    pgRelationalPolymorphic($item, $item.get("type"), {
       RelationalPost: {
         match: (t) => t === "POST",
         plan: () => deoptimizeIfAppropriate($item.singleRelation("post")),

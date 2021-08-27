@@ -12,14 +12,14 @@ import { inspect } from "util";
 import type { PgSource } from "../datasource";
 import type { PgSelectSinglePlan } from "./pgSelectSingle";
 
-interface PgRelationalInterfaceTypeMap<TTypeSpecifier extends any> {
+interface PgRelationalPolymorphicTypeMap<TTypeSpecifier extends any> {
   [typeName: string]: {
     match(specifier: TTypeSpecifier): boolean;
     plan(): ExecutablePlan<any>;
   };
 }
 
-export class PgRelationalInterfacePlan<
+export class PgRelationalPolymorphicPlan<
     TDataSource extends PgSource<any, any, any, any, any>,
     TTypeSpecifier extends any,
   >
@@ -33,7 +33,7 @@ export class PgRelationalInterfacePlan<
   constructor(
     $itemPlan: PgSelectSinglePlan<TDataSource>,
     $typeSpecifierPlan: ExecutablePlan<TTypeSpecifier>,
-    private possibleTypes: PgRelationalInterfaceTypeMap<TTypeSpecifier>,
+    private possibleTypes: PgRelationalPolymorphicTypeMap<TTypeSpecifier>,
   ) {
     super();
     this.itemPlanId = this.addDependency($itemPlan);
@@ -90,15 +90,15 @@ export class PgRelationalInterfacePlan<
   }
 }
 
-export function pgRelationalInterface<
+export function pgRelationalPolymorphic<
   TDataSource extends PgSource<any, any, any, any, any>,
   TTypeSpecifier extends any,
 >(
   $itemPlan: PgSelectSinglePlan<TDataSource>,
   $typeSpecifierPlan: ExecutablePlan<TTypeSpecifier>,
-  possibleTypes: PgRelationalInterfaceTypeMap<TTypeSpecifier>,
-): PgRelationalInterfacePlan<TDataSource, TTypeSpecifier> {
-  return new PgRelationalInterfacePlan<TDataSource, TTypeSpecifier>(
+  possibleTypes: PgRelationalPolymorphicTypeMap<TTypeSpecifier>,
+): PgRelationalPolymorphicPlan<TDataSource, TTypeSpecifier> {
+  return new PgRelationalPolymorphicPlan<TDataSource, TTypeSpecifier>(
     $itemPlan,
     $typeSpecifierPlan,
     possibleTypes,
