@@ -41,6 +41,7 @@ import prettier from "prettier";
 import { inspect } from "util";
 
 import type {
+  PgClassExpressionPlan,
   PgConditionCapableParentPlan,
   PgExecutorContext,
   PgSelectPlan,
@@ -1759,9 +1760,16 @@ export function makeExampleSchema(
     });
 
   const entityUnion = <
-    TDataSource extends PgSource<any, typeof unionEntityColumns, any, any, any>,
+    TPlan extends
+      | PgSelectSinglePlan<
+          PgSource<any, typeof unionEntityColumns, any, any, any>
+        >
+      | PgClassExpressionPlan<
+          any,
+          PgTypeCodec<any, any, typeof unionEntityColumns>
+        >,
   >(
-    $item: PgSelectSinglePlan<TDataSource>,
+    $item: TPlan,
   ) =>
     pgPolymorphic(
       $item,
@@ -2540,6 +2548,18 @@ export function makeExampleSchema(
             ]);
             deoptimizeIfAppropriate($plan);
             return each($plan, entityUnion);
+          },
+        },
+
+        personByPersonId: {
+          type: Person,
+          args: {
+            personId: {
+              type: new GraphQLNonNull(GraphQLInt),
+            },
+          },
+          plan(_$root, args) {
+            return personSource.get({ person_id: args.personId });
           },
         },
       },
