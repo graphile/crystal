@@ -1649,6 +1649,34 @@ export function makeExampleSchema(
       },
     });
 
+  const entityUnion = <
+    TDataSource extends PgSource<any, typeof unionEntityColumns, any, any, any>,
+  >(
+    $item: PgSelectSinglePlan<TDataSource>,
+  ) =>
+    pgPolymorphic(
+      $item,
+      list([
+        $item.get("person_id"),
+        $item.get("post_id"),
+        $item.get("comment_id"),
+      ]),
+      {
+        Person: {
+          match: (v) => v[0] != null,
+          plan: ($list) => personSource.get({ person_id: $list.at(0) }),
+        },
+        Post: {
+          match: (v) => v[1] != null,
+          plan: ($list) => postSource.get({ post_id: $list.at(1) }),
+        },
+        Comment: {
+          match: (v) => v[2] != null,
+          plan: ($list) => commentSource.get({ comment_id: $list.at(2) }),
+        },
+      },
+    );
+
   const Person: GraphQLObjectType<any, GraphileResolverContext> =
     new GraphQLObjectType(
       objectSpec<GraphileResolverContext, PersonPlan>({
@@ -2370,41 +2398,15 @@ export function makeExampleSchema(
             },
           },
           plan(_$root, args) {
-            const $query = args.query;
             const $plan = pgSelect(entitySearchSource, [
               {
-                plan: $query,
+                plan: args.query,
                 type: TYPES.text.sqlType,
                 name: "query",
               },
             ]);
             deoptimizeIfAppropriate($plan);
-            return each($plan, ($item) =>
-              pgPolymorphic(
-                $item,
-                list([
-                  $item.get("person_id"),
-                  $item.get("post_id"),
-                  $item.get("comment_id"),
-                ]),
-                {
-                  Person: {
-                    match: (v) => v[0] != null,
-                    plan: ($list) =>
-                      personSource.get({ person_id: $list.at(0) }),
-                  },
-                  Post: {
-                    match: (v) => v[1] != null,
-                    plan: ($list) => postSource.get({ post_id: $list.at(1) }),
-                  },
-                  Comment: {
-                    match: (v) => v[2] != null,
-                    plan: ($list) =>
-                      commentSource.get({ comment_id: $list.at(2) }),
-                  },
-                },
-              ),
-            );
+            return each($plan, entityUnion);
           },
         },
       },
