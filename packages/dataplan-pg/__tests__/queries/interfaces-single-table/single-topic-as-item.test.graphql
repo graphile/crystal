@@ -1,0 +1,38 @@
+# This should have identical SQL queries and results to
+# single-topic.test.graphql since crystal should automatically filter out the
+# unreachable fragment spreads.
+{
+  singleTableTopicById(id: 10) {
+    ...Item
+  }
+}
+
+fragment Item on SingleTableItem {
+  __typename
+  id
+  type
+  position
+  createdAt
+  updatedAt
+  isExplicitlyArchived
+  archivedAt
+  ... on SingleTableTopic {
+    title
+  }
+  ... on SingleTablePost {
+    title
+    description
+    note
+  }
+  ... on SingleTableDivider {
+    title
+    color
+  }
+  ... on SingleTableChecklist {
+    title
+  }
+  ... on SingleTableChecklistItem {
+    description
+    note
+  }
+}
