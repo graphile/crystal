@@ -1962,6 +1962,22 @@ export function makeExampleSchema(
           },
         },
 
+        singleTableTopicById: {
+          type: SingleTableTopic,
+          args: {
+            id: {
+              type: GraphQLInt,
+            },
+          },
+          plan(_$root, args) {
+            const $item: SingleTableItemPlan = singleTableItemsSource.get({
+              id: args.id,
+              type: "TOPIC",
+            });
+            return $item;
+          },
+        },
+
         relationalItemById: {
           type: RelationalItem,
           args: {

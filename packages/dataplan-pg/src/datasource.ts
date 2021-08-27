@@ -1,10 +1,7 @@
 import chalk from "chalk";
-import type {
-  CrystalValuesList,
-  ExecutablePlan,
-  ObjectPlan,
-} from "graphile-crystal";
-import { arraysMatch } from "graphile-crystal";
+import type { CrystalValuesList, ObjectPlan } from "graphile-crystal";
+import { constant } from "graphile-crystal";
+import { arraysMatch, ExecutablePlan } from "graphile-crystal";
 import { __ValuePlan, getCurrentParentPathIdentity } from "graphile-crystal";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
@@ -90,21 +87,21 @@ type PgSourceRow<TColumns extends PgSourceColumns> = {
   [key in keyof TColumns]: ReturnType<TColumns[key]["codec"]["fromPg"]>;
 };
 
-type TuplePlanMap<
+type TuplePlanOrConstantMap<
   TColumns extends { [column: string]: any },
   TTuple extends ReadonlyArray<keyof TColumns>,
 > = {
   [Index in keyof TTuple]: {
-    [key in TTuple[number]]: ExecutablePlan<
-      ReturnType<TColumns[key]["pg2gql"]>
-    >;
+    [key in TTuple[number]]:
+      | ExecutablePlan<ReturnType<TColumns[key]["pg2gql"]>>
+      | ReturnType<TColumns[key]["pg2gql"]>;
   };
 };
 
 type PlanByUniques<
   TColumns extends { [column: string]: any },
   TCols extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
-> = TuplePlanMap<TColumns, TCols[number]>[number];
+> = TuplePlanOrConstantMap<TColumns, TCols[number]>[number];
 
 export interface PgSourceRelation<
   TSource extends PgSource<any, any, any, any, any>,
@@ -287,7 +284,7 @@ export class PgSource<
   }
 
   public find(
-    spec: { [key in keyof TColumns]?: ExecutablePlan } = {},
+    spec: { [key in keyof TColumns]?: ExecutablePlan | string | number } = {},
   ): PgSelectPlan<this> {
     const keys: ReadonlyArray<keyof TColumns> = Object.keys(spec);
     const invalidKeys = keys.filter((key) => this.columns[key] == null);
@@ -303,21 +300,31 @@ export class PgSource<
 
     const identifiers = keys.map((key) => {
       const column = this.columns[key];
+      if (column.via) {
+        throw new Error(
+          `Attribute '${key}' is defined with a 'via' and thus cannot be used as an identifier for '.find()' or '.get()' calls (requested keys: '${keys.join(
+            "', '",
+          )}').`,
+        );
+      }
       const {
         codec: { sqlType: type },
       } = column;
-      const plan: ExecutablePlan | undefined = spec[key];
+      const plan = spec[key];
       if (plan == undefined) {
         throw new Error(
-          `Attempted to call ${this}.get({${keys.join(
+          `Attempted to call ${this}.find({${keys.join(
             ", ",
           )}}) but failed to provide a plan for '${key}'`,
         );
       }
       return {
-        plan,
+        plan: plan instanceof ExecutablePlan ? plan : constant(plan),
         type,
-        matches: (alias: SQL) => sql`${alias}.${sql.identifier(key as string)}`,
+        matches: (alias: SQL) =>
+          typeof column.expression === "function"
+            ? column.expression(alias)
+            : sql`${alias}.${sql.identifier(key as string)}`,
       };
     });
     return pgSelect(this, identifiers);
