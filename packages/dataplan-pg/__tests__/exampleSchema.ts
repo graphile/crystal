@@ -119,6 +119,7 @@ export function makeExampleSchema(
   // type ForumsPlan = PgSelectPlan<typeof forumSource>;
   type ForumPlan = PgSelectSinglePlan<typeof forumSource>;
   type PersonPlan = PgSelectSinglePlan<typeof personSource>;
+  type PersonBookmarkPlan = PgSelectSinglePlan<typeof personBookmarkSource>;
   type PostPlan = PgSelectSinglePlan<typeof postSource>;
   type CommentPlan = PgSelectSinglePlan<typeof commentSource>;
   type SingleTableItemsPlan = PgSelectPlan<typeof singleTableItemsSource>;
@@ -334,6 +335,38 @@ export function makeExampleSchema(
     comment_id: col({ codec: TYPES.int, notNull: false }),
   };
 
+  const personBookmarkColumns = {
+    id: col({ codec: TYPES.int, notNull: true }),
+    person_id: col({
+      codec: TYPES.int,
+      notNull: true,
+      identicalVia: { relation: "person", attribute: "id" },
+    }),
+    bookmarked_entity: col({
+      codec: recordType(
+        sql`interfaces_and_unions.union__entity`,
+        unionEntityColumns,
+      ),
+      notNull: true,
+    }),
+  };
+  const personBookmarksSource = new PgSource({
+    executor,
+    codec: recordType(sql`app_public.person_bookmarks`, personBookmarkColumns),
+    source: sql`app_public.person_bookmarks`,
+    name: "person_bookmarks",
+    columns: personBookmarkColumns,
+    uniques: [["id"]],
+    relations: () => ({
+      person: {
+        source: personSource,
+        isUnique: true,
+        localColumns: ["person_id"],
+        remoteColumns: ["id"],
+      },
+    }),
+  });
+
   const personColumns = {
     person_id: col({ codec: TYPES.int, notNull: true }),
     username: col({ codec: TYPES.text, notNull: true }),
@@ -364,6 +397,12 @@ export function makeExampleSchema(
         isUnique: false,
         localColumns: ["person_id"],
         remoteColumns: ["author_id"],
+      },
+      personBookmarks: {
+        source: personBookmarksSource,
+        isUnique: false,
+        localColumns: ["person_id"],
+        remoteColumns: ["person_id"],
       },
     }),
   });
@@ -1744,6 +1783,23 @@ export function makeExampleSchema(
       },
     );
 
+  const PersonBookmark: GraphQLObjectType<any, GraphileResolverContext> =
+    new GraphQLObjectType(
+      objectSpec<GraphileResolverContext, PersonBookmarkPlan>({
+        name: "PersonBookmark",
+        fields: () => ({
+          id: attrField("id", GraphQLInt),
+          person: singleRelationField("person", Person),
+          bookmarkedEntity: {
+            type: Entity,
+            plan($person) {
+              return entityUnion($person.get("bookmarked_entity"));
+            },
+          },
+        }),
+      }),
+    );
+
   const Person: GraphQLObjectType<any, GraphileResolverContext> =
     new GraphQLObjectType(
       objectSpec<GraphileResolverContext, PersonPlan>({
@@ -1772,6 +1828,13 @@ export function makeExampleSchema(
               });
               deoptimizeIfAppropriate($items);
               return each($items, ($item) => relationalItemInterface($item));
+            },
+          },
+
+          bookmarks: {
+            type: new GraphQLList(PersonBookmark),
+            plan($person) {
+              return $person.manyRelation("personBookmarks");
             },
           },
         }),
