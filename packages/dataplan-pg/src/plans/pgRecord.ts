@@ -57,10 +57,10 @@ export class PgRecordPlan<TDataSource extends PgSource<any, any, any, any>>
     return plan;
   }
 
-  public finalize(): void {
+  public optimize(): this {
     const $table = this.getClassSinglePlan().getClassPlan();
     this.attrIndex = $table.select(sql`${this.expression}::text`);
-    super.finalize();
+    return this;
   }
 
   public execute(

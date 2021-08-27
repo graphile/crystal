@@ -70,6 +70,9 @@ export class PgSelectSinglePlan<
   }
 
   public getClassPlan(): PgSelectPlan<TDataSource> {
+    if (this.aether.isOptimized(this)) {
+      throw new Error(`Cannot ${this}.getClassPlan() after we're optimized.`);
+    }
     const plan = this.aether.plans[this.classPlanId];
     if (!(plan instanceof PgSelectPlan)) {
       throw new Error(
