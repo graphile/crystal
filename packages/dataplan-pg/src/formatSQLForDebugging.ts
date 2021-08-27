@@ -24,7 +24,7 @@ export function formatSQLForDebugging(
     colourIndex = (colourIndex + 1) % allowedColours.length;
     return allowedColours[colourIndex];
   }
-  const colours = {};
+  const colours = Object.create(null);
 
   /* Yep - that's `colour` from English and `ize` from American */
   function colourize(str: string) {

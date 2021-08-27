@@ -47,7 +47,7 @@ function pg2pgclient(client: PoolClient, queries: PgClientQuery[]): PgClient {
 export async function runTestQuery(
   source: string,
   variableValues?: { [key: string]: any },
-  options: { deoptimize?: boolean } = {},
+  options: { deoptimize?: boolean } = Object.create(null),
 ): Promise<{
   data: { [key: string]: any };
   queries: PgClientQuery[];

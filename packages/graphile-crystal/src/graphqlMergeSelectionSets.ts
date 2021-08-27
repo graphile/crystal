@@ -37,7 +37,7 @@ export function typesUsedInSelections(
   types: ReadonlyArray<GraphQLObjectType>,
   selections: ReadonlyArray<SelectionNode>,
 ): GraphQLObjectType[] {
-  const typeNamesMap: { [typeName: string]: true } = {};
+  const typeNamesMap: { [typeName: string]: true } = Object.create(null);
   for (let i = 0, l = selections.length; i < l; i++) {
     const selection = selections[i];
     switch (selection.kind) {

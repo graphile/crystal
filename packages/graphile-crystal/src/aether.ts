@@ -813,7 +813,7 @@ export class Aether<
     objectType: GraphQLObjectType,
     field: FieldNode,
   ): TrackedArguments {
-    const trackedArgumentValues = {};
+    const trackedArgumentValues = Object.create(null);
     if (field.arguments) {
       const argumentValues = field.arguments;
       const fieldName = field.name.value;

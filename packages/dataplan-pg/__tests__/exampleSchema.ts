@@ -96,7 +96,7 @@ type NullableUnless<TCondition extends boolean | undefined, TType> =
   TCondition extends true ? TType : TType | null | undefined;
 
 export function makeExampleSchema(
-  options: { deoptimize?: boolean } = {},
+  options: { deoptimize?: boolean } = Object.create(null),
 ): GraphQLSchema {
   const deoptimizeIfAppropriate = (
     plan: PgSelectPlan<any> | PgSelectSinglePlan<any>,
@@ -877,7 +877,7 @@ export function makeExampleSchema(
     obj: { [key in TKey]: TValue },
     mapper: (val: TValue, key: TKey) => TNewValue,
   ): { [key in TKey]: TNewValue } {
-    let o: { [key in TKey]?: TNewValue } = {};
+    let o: { [key in TKey]?: TNewValue } = Object.create(null);
     const keys = Object.keys(obj) as TKey[];
     for (const key of keys) {
       o[key] = mapper(obj[key], key);

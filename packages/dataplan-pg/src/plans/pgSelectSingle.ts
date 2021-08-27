@@ -56,7 +56,7 @@ export class PgSelectSinglePlan<
   constructor(
     classPlan: PgSelectPlan<TDataSource>,
     itemPlan: ExecutablePlan<TDataSource["TRow"]>,
-    private options: PgSelectSinglePlanOptions = {},
+    private options: PgSelectSinglePlanOptions = Object.create(null),
   ) {
     super();
     this.dataSource = classPlan.dataSource;

@@ -307,7 +307,7 @@ export class InputStaticLeafPlan extends ExecutablePlan {
 export class InputObjectPlan extends ExecutablePlan {
   private inputFields: {
     [fieldName: string]: { dependencyIndex: number; plan: InputPlan };
-  } = {};
+  } = Object.create(null);
   constructor(
     private inputObjectType: GraphQLInputObjectType,
     private inputValues: ValueNode | undefined,
@@ -344,7 +344,7 @@ export class InputObjectPlan extends ExecutablePlan {
       return new Array(values.length).fill(null);
     }
     return values.map((planResults) => {
-      const resultValues = {};
+      const resultValues = Object.create(null);
       for (const inputFieldName in this.inputFields) {
         const { dependencyIndex } = this.inputFields[inputFieldName];
         if (dependencyIndex == null) {
@@ -371,7 +371,7 @@ export class InputObjectPlan extends ExecutablePlan {
     if (this.inputValues?.kind === "NullValue") {
       return null;
     }
-    const resultValues = {};
+    const resultValues = Object.create(null);
     for (const inputFieldName in this.inputFields) {
       const inputFieldPlan = this.inputFields[inputFieldName].plan;
       resultValues[inputFieldName] = inputFieldPlan.eval();

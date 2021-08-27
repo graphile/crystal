@@ -4,7 +4,7 @@ const JSON5 = require("json5");
 
 exports.process = (src, path) => {
   const lines = src.split("\n");
-  const config = {};
+  const config = Object.create(null);
   const assertions = [];
   const documentLines = [];
   for (const line of lines) {

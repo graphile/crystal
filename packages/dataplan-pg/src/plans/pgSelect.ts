@@ -811,7 +811,10 @@ export class PgSelectPlan<
   }
 
   private buildSelect(
-    options: { asArray?: boolean; extraSelects?: readonly SQL[] } = {},
+    options: {
+      asArray?: boolean;
+      extraSelects?: readonly SQL[];
+    } = Object.create(null),
   ) {
     const { asArray = false, extraSelects = EMPTY_ARRAY } = options;
     const selects = [...this.selects, ...extraSelects];
@@ -903,7 +906,7 @@ export class PgSelectPlan<
     return { sql: joins.length ? sql`\n${sql.join(joins, "\n")}` : sql.blank };
   }
 
-  private buildWhere(options: { extraWheres?: SQL[] } = {}) {
+  private buildWhere(options: { extraWheres?: SQL[] } = Object.create(null)) {
     const conditions = options.extraWheres
       ? [...this.conditions, ...options.extraWheres]
       : this.conditions;
@@ -1013,7 +1016,7 @@ export class PgSelectPlan<
       withIdentifiers?: boolean;
       extraSelects?: SQL[];
       extraWheres?: SQL[];
-    } = {},
+    } = Object.create(null),
   ): {
     sql: SQL;
     extraSelectIndexes: number[];
@@ -1281,7 +1284,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
   mergeSelectsWith(otherPlan: PgSelectPlan<TDataSource>): {
     [desiredIndex: string]: string;
   } {
-    const actualKeyByDesiredKey = {};
+    const actualKeyByDesiredKey = Object.create(null);
     //console.log(`Other ${otherPlan} selects:`);
     //console.dir(otherPlan.selects, { depth: 8 });
     //console.log(`My ${this} selects:`);

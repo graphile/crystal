@@ -285,7 +285,9 @@ export class PgSource<
   }
 
   public find(
-    spec: { [key in keyof TColumns]?: ExecutablePlan | string | number } = {},
+    spec: {
+      [key in keyof TColumns]?: ExecutablePlan | string | number;
+    } = Object.create(null),
   ): PgSelectPlan<this> {
     const keys: ReadonlyArray<keyof TColumns> = Object.keys(spec);
     const invalidKeys = keys.filter((key) => this.columns[key] == null);

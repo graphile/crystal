@@ -117,7 +117,7 @@ async function main() {
     );
   }
 
-  async function test(source: string, variableValues = {}) {
+  async function test(source: string, variableValues = Object.create(null)) {
     const withPgClient: WithPgClient = async (_pgSettings, callback) => {
       const client = await testPool.connect();
       try {
