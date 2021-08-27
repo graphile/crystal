@@ -1115,6 +1115,10 @@ export class Aether<
     return replacementPlan;
   }
 
+  public isOptimized(plan: ExecutablePlan): boolean {
+    return this.optimizedPlans.has(plan);
+  }
+
   /**
    * Implements the `MarkPlanActive` algorithm.
    */
