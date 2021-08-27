@@ -119,7 +119,7 @@ export function makeExampleSchema(
   // type ForumsPlan = PgSelectPlan<typeof forumSource>;
   type ForumPlan = PgSelectSinglePlan<typeof forumSource>;
   type PersonPlan = PgSelectSinglePlan<typeof personSource>;
-  type PersonBookmarkPlan = PgSelectSinglePlan<typeof personBookmarkSource>;
+  type PersonBookmarkPlan = PgSelectSinglePlan<typeof personBookmarksSource>;
   type PostPlan = PgSelectSinglePlan<typeof postSource>;
   type CommentPlan = PgSelectSinglePlan<typeof commentSource>;
   type SingleTableItemsPlan = PgSelectPlan<typeof singleTableItemsSource>;
@@ -352,8 +352,11 @@ export function makeExampleSchema(
   };
   const personBookmarksSource = new PgSource({
     executor,
-    codec: recordType(sql`app_public.person_bookmarks`, personBookmarkColumns),
-    source: sql`app_public.person_bookmarks`,
+    codec: recordType(
+      sql`interfaces_and_unions.person_bookmarks`,
+      personBookmarkColumns,
+    ),
+    source: sql`interfaces_and_unions.person_bookmarks`,
     name: "person_bookmarks",
     columns: personBookmarkColumns,
     uniques: [["id"]],
@@ -362,7 +365,7 @@ export function makeExampleSchema(
         source: personSource,
         isUnique: true,
         localColumns: ["person_id"],
-        remoteColumns: ["id"],
+        remoteColumns: ["person_id"],
       },
     }),
   });
@@ -1831,7 +1834,7 @@ export function makeExampleSchema(
             },
           },
 
-          bookmarks: {
+          personBookmarksList: {
             type: new GraphQLList(PersonBookmark),
             plan($person) {
               return $person.manyRelation("personBookmarks");
