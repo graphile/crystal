@@ -1,6 +1,7 @@
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
+import type { PgSourceColumns } from "./datasource";
 import type { PgTypeCodec } from "./interfaces";
 
 const pg2gqlForType = (type: "bool" | "timestamptz" | "timestamp" | string) => {
@@ -45,7 +46,10 @@ function t<TCanonical = any, TInput = TCanonical>(
   };
 }
 
-export function recordType(identifier: SQL): PgTypeCodec<string, string> {
+export function recordType(
+  identifier: SQL,
+  columns: PgSourceColumns,
+): PgTypeCodec<string, string> {
   return {
     sqlType: identifier,
     fromPg(value) {
@@ -54,6 +58,7 @@ export function recordType(identifier: SQL): PgTypeCodec<string, string> {
     toPg(value) {
       return sql`${sql.value(value)}::${identifier}`;
     },
+    columns,
   };
 }
 

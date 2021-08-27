@@ -1,6 +1,8 @@
 import type { ExecutablePlan } from "graphile-crystal";
 import type { SQL } from "pg-sql2";
 
+import type { PgSourceColumns } from "./datasource";
+
 /**
  * Given a value of type TInput, returns an `SQL` value to insert into an SQL
  * statement.
@@ -30,6 +32,11 @@ export interface PgTypeCodec<TCanonical = any, TInput = TCanonical> {
    * explicit.
    */
   sqlType: SQL;
+
+  /**
+   * If this is a composite type, the columns it supports.
+   */
+  columns?: PgSourceColumns;
 }
 
 export interface PgTypedExecutablePlan<TCodec extends PgTypeCodec = PgTypeCodec>

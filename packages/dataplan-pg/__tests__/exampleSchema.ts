@@ -7,7 +7,6 @@ import type {
   ExecutablePlan,
   InputStaticLeafPlan,
 } from "graphile-crystal";
-import { first, list } from "graphile-crystal";
 import {
   BasePlan,
   context,
@@ -15,6 +14,7 @@ import {
   each,
   inputObjectSpec,
   lambda,
+  list,
   ModifierPlan,
   object,
   objectSpec,
@@ -244,7 +244,7 @@ export function makeExampleSchema(
 
   const randomUserSource = new PgSource({
     executor,
-    codec: recordType(sql`app_public.users`),
+    codec: recordType(sql`app_public.users`, userColumns),
     source: (args: SQL[]) =>
       sql`app_public.random_user(${sql.join(args, ", ")})`,
     name: "random_user",
@@ -253,7 +253,7 @@ export function makeExampleSchema(
 
   const forumsRandomUserSource = new PgSource({
     executor,
-    codec: recordType(sql`app_public.users`),
+    codec: recordType(sql`app_public.users`, userColumns),
     source: (args: SQL[]) =>
       sql`app_public.forums_random_user(${sql.join(args, ", ")})`,
     name: "forums_random_user",
@@ -262,7 +262,7 @@ export function makeExampleSchema(
 
   const featuredMessages = new PgSource({
     executor,
-    codec: recordType(sql`app_public.messages`),
+    codec: recordType(sql`app_public.messages`, messageColumns),
     source: (args: SQL[]) =>
       sql`app_public.featured_messages(${sql.join(args, ", ")})`,
     name: "featured_messages",
@@ -271,7 +271,7 @@ export function makeExampleSchema(
 
   const forumsFeaturedMessages = new PgSource({
     executor,
-    codec: recordType(sql`app_public.messages`),
+    codec: recordType(sql`app_public.messages`, messageColumns),
     source: (args: SQL[]) =>
       sql`app_public.forums_featured_messages(${sql.join(args, ", ")})`,
     name: "forums_featured_messages",
@@ -280,7 +280,7 @@ export function makeExampleSchema(
 
   const usersMostRecentForumSource = new PgSource({
     executor,
-    codec: recordType(sql`app_public.forums`),
+    codec: recordType(sql`app_public.forums`, forumColumns),
     source: (args: SQL[]) =>
       sql`app_public.users_most_recent_forum(${sql.join(args, ", ")})`,
     name: "users_most_recent_forum",
@@ -289,7 +289,7 @@ export function makeExampleSchema(
 
   const messageSource = new PgSource({
     executor,
-    codec: recordType(sql`app_public.messages`),
+    codec: recordType(sql`app_public.messages`, messageColumns),
     source: sql`app_public.messages`,
     name: "messages",
     columns: messageColumns,
@@ -312,7 +312,7 @@ export function makeExampleSchema(
 
   const userSource = new PgSource({
     executor,
-    codec: recordType(sql`app_public.users`),
+    codec: recordType(sql`app_public.users`, userColumns),
     source: sql`app_public.users`,
     name: "users",
     columns: userColumns,
@@ -321,22 +321,30 @@ export function makeExampleSchema(
 
   const forumSource = new PgSource({
     executor,
-    codec: recordType(sql`app_public.forums`),
+    codec: recordType(sql`app_public.forums`, forumColumns),
     source: sql`app_public.forums`,
     name: "forums",
     columns: forumColumns,
     uniques: [["id"]],
   });
 
+  const unionEntityColumns = {
+    person_id: col({ codec: TYPES.int, notNull: false }),
+    post_id: col({ codec: TYPES.int, notNull: false }),
+    comment_id: col({ codec: TYPES.int, notNull: false }),
+  };
+
+  const personColumns = {
+    person_id: col({ codec: TYPES.int, notNull: true }),
+    username: col({ codec: TYPES.text, notNull: true }),
+  };
+
   const personSource = new PgSource({
     executor,
-    codec: recordType(sql`interfaces_and_unions.people`),
+    codec: recordType(sql`interfaces_and_unions.people`, personColumns),
     source: sql`interfaces_and_unions.people`,
     name: "people",
-    columns: {
-      person_id: col({ codec: TYPES.int, notNull: true }),
-      username: col({ codec: TYPES.text, notNull: true }),
-    },
+    columns: personColumns,
     uniques: [["person_id"], ["username"]],
     relations: () => ({
       singleTableItems: {
@@ -360,20 +368,22 @@ export function makeExampleSchema(
     }),
   });
 
+  const postColumns = {
+    post_id: col({ codec: TYPES.int, notNull: true }),
+    author_id: col({
+      codec: TYPES.int,
+      notNull: true,
+      identicalVia: { relation: "author", attribute: "person_id" },
+    }),
+    body: col({ codec: TYPES.text, notNull: true }),
+  };
+
   const postSource = new PgSource({
     executor,
-    codec: recordType(sql`interfaces_and_unions.posts`),
+    codec: recordType(sql`interfaces_and_unions.posts`, postColumns),
     source: sql`interfaces_and_unions.posts`,
     name: "posts",
-    columns: {
-      post_id: col({ codec: TYPES.int, notNull: true }),
-      author_id: col({
-        codec: TYPES.int,
-        notNull: true,
-        identicalVia: { relation: "author", attribute: "person_id" },
-      }),
-      body: col({ codec: TYPES.text, notNull: true }),
-    },
+    columns: postColumns,
     uniques: [["post_id"]],
     relations: () => ({
       author: {
@@ -391,25 +401,27 @@ export function makeExampleSchema(
     }),
   });
 
+  const commentColumns = {
+    comment_id: col({ codec: TYPES.int, notNull: true }),
+    author_id: col({
+      codec: TYPES.int,
+      notNull: true,
+      identicalVia: { relation: "author", attribute: "person_id" },
+    }),
+    post_id: col({
+      codec: TYPES.int,
+      notNull: true,
+      identicalVia: { relation: "post", attribute: "id" },
+    }),
+    body: col({ codec: TYPES.text, notNull: true }),
+  };
+
   const commentSource = new PgSource({
     executor,
-    codec: recordType(sql`interfaces_and_unions.comments`),
+    codec: recordType(sql`interfaces_and_unions.comments`, commentColumns),
     source: sql`interfaces_and_unions.comments`,
     name: "comments",
-    columns: {
-      comment_id: col({ codec: TYPES.int, notNull: true }),
-      author_id: col({
-        codec: TYPES.int,
-        notNull: true,
-        identicalVia: { relation: "author", attribute: "person_id" },
-      }),
-      post_id: col({
-        codec: TYPES.int,
-        notNull: true,
-        identicalVia: { relation: "post", attribute: "id" },
-      }),
-      body: col({ codec: TYPES.text, notNull: true }),
-    },
+    columns: commentColumns,
     uniques: [["comment_id"]],
     relations: () => ({
       author: {
@@ -427,39 +439,43 @@ export function makeExampleSchema(
     }),
   });
 
+  const singleTableItemColumns = {
+    id: col({ codec: TYPES.int, notNull: true }),
+    type: col({
+      codec: enumType(sql`interfaces_and_unions.item_type`),
+      notNull: true,
+    }),
+
+    parent_id: col({
+      codec: TYPES.int,
+      notNull: false,
+      identicalVia: { relation: "parent", attribute: "id" },
+    }),
+    author_id: col({
+      codec: TYPES.int,
+      notNull: true,
+      identicalVia: { relation: "author", attribute: "person_id" },
+    }),
+    position: col({ codec: TYPES.bigint, notNull: true }),
+    created_at: col({ codec: TYPES.timestamptz, notNull: true }),
+    updated_at: col({ codec: TYPES.timestamptz, notNull: true }),
+    is_explicitly_archived: col({ codec: TYPES.boolean, notNull: true }),
+    archived_at: col({ codec: TYPES.timestamptz, notNull: false }),
+
+    title: col({ codec: TYPES.text, notNull: false }),
+    description: col({ codec: TYPES.text, notNull: false }),
+    note: col({ codec: TYPES.text, notNull: false }),
+    color: col({ codec: TYPES.text, notNull: false }),
+  };
   const singleTableItemsSource = new PgSource({
     executor,
-    codec: recordType(sql`interfaces_and_unions.single_table_items`),
+    codec: recordType(
+      sql`interfaces_and_unions.single_table_items`,
+      singleTableItemColumns,
+    ),
     source: sql`interfaces_and_unions.single_table_items`,
     name: "single_table_items",
-    columns: {
-      id: col({ codec: TYPES.int, notNull: true }),
-      type: col({
-        codec: enumType(sql`interfaces_and_unions.item_type`),
-        notNull: true,
-      }),
-
-      parent_id: col({
-        codec: TYPES.int,
-        notNull: false,
-        identicalVia: { relation: "parent", attribute: "id" },
-      }),
-      author_id: col({
-        codec: TYPES.int,
-        notNull: true,
-        identicalVia: { relation: "author", attribute: "person_id" },
-      }),
-      position: col({ codec: TYPES.bigint, notNull: true }),
-      created_at: col({ codec: TYPES.timestamptz, notNull: true }),
-      updated_at: col({ codec: TYPES.timestamptz, notNull: true }),
-      is_explicitly_archived: col({ codec: TYPES.boolean, notNull: true }),
-      archived_at: col({ codec: TYPES.timestamptz, notNull: false }),
-
-      title: col({ codec: TYPES.text, notNull: false }),
-      description: col({ codec: TYPES.text, notNull: false }),
-      note: col({ codec: TYPES.text, notNull: false }),
-      color: col({ codec: TYPES.text, notNull: false }),
-    },
+    columns: singleTableItemColumns,
     uniques: [["id"]],
     relations: () => ({
       parent: {
@@ -483,34 +499,39 @@ export function makeExampleSchema(
     }),
   });
 
+  const relationalItemColumns = {
+    id: col({ codec: TYPES.int, notNull: true }),
+    type: col({
+      codec: enumType(sql`interfaces_and_unions.item_type`),
+      notNull: true,
+    }),
+
+    parent_id: col({
+      codec: TYPES.int,
+      notNull: false,
+      identicalVia: { relation: "parent", attribute: "id" },
+    }),
+    author_id: col({
+      codec: TYPES.int,
+      notNull: true,
+      identicalVia: { relation: "author", attribute: "person_id" },
+    }),
+    position: col({ codec: TYPES.bigint, notNull: true }),
+    created_at: col({ codec: TYPES.timestamptz, notNull: true }),
+    updated_at: col({ codec: TYPES.timestamptz, notNull: true }),
+    is_explicitly_archived: col({ codec: TYPES.boolean, notNull: true }),
+    archived_at: col({ codec: TYPES.timestamptz, notNull: false }),
+  };
+
   const relationalItemsSource = new PgSource({
     executor,
-    codec: recordType(sql`interfaces_and_unions.relational_items`),
+    codec: recordType(
+      sql`interfaces_and_unions.relational_items`,
+      relationalItemColumns,
+    ),
     source: sql`interfaces_and_unions.relational_items`,
     name: "relational_items",
-    columns: {
-      id: col({ codec: TYPES.int, notNull: true }),
-      type: col({
-        codec: enumType(sql`interfaces_and_unions.item_type`),
-        notNull: true,
-      }),
-
-      parent_id: col({
-        codec: TYPES.int,
-        notNull: false,
-        identicalVia: { relation: "parent", attribute: "id" },
-      }),
-      author_id: col({
-        codec: TYPES.int,
-        notNull: true,
-        identicalVia: { relation: "author", attribute: "person_id" },
-      }),
-      position: col({ codec: TYPES.bigint, notNull: true }),
-      created_at: col({ codec: TYPES.timestamptz, notNull: true }),
-      updated_at: col({ codec: TYPES.timestamptz, notNull: true }),
-      is_explicitly_archived: col({ codec: TYPES.boolean, notNull: true }),
-      archived_at: col({ codec: TYPES.timestamptz, notNull: false }),
-    },
+    columns: relationalItemColumns,
     uniques: [["id"]],
     relations: () => ({
       parent: {
@@ -569,18 +590,23 @@ export function makeExampleSchema(
     }),
   });
 
+  const relationalCommentableColumns = {
+    id: col({ codec: TYPES.int, notNull: true }),
+    type: col({
+      codec: enumType(sql`interfaces_and_unions.item_type`),
+      notNull: true,
+    }),
+  };
+
   const relationalCommentableSource = new PgSource({
     executor,
-    codec: recordType(sql`interfaces_and_unions.relational_commentables`),
+    codec: recordType(
+      sql`interfaces_and_unions.relational_commentables`,
+      relationalCommentableColumns,
+    ),
     source: sql`interfaces_and_unions.relational_commentables`,
     name: "relational_commentables",
-    columns: {
-      id: col({ codec: TYPES.int, notNull: true }),
-      type: col({
-        codec: enumType(sql`interfaces_and_unions.item_type`),
-        notNull: true,
-      }),
-    },
+    columns: relationalCommentableColumns,
     relations: () => ({
       post: {
         source: relationalPostsSource,
@@ -658,34 +684,42 @@ export function makeExampleSchema(
     isUnique: true,
   };
 
+  const relationalTopicsColumns = {
+    title: col({ codec: TYPES.text, notNull: false }),
+
+    ...itemColumns,
+  };
   const relationalTopicsSource = new PgSource({
     executor,
-    codec: recordType(sql`interfaces_and_unions.relational_topics`),
+    codec: recordType(
+      sql`interfaces_and_unions.relational_topics`,
+      relationalTopicsColumns,
+    ),
     source: sql`interfaces_and_unions.relational_topics`,
     name: "relational_topics",
-    columns: {
-      title: col({ codec: TYPES.text, notNull: false }),
-
-      ...itemColumns,
-    },
+    columns: relationalTopicsColumns,
     uniques: [["id"]],
     relations: {
       ...itemRelations,
     },
   });
 
+  const relationalPostsColumns = {
+    title: col({ codec: TYPES.text, notNull: false }),
+    description: col({ codec: TYPES.text, notNull: false }),
+    note: col({ codec: TYPES.text, notNull: false }),
+
+    ...itemColumns,
+  };
   const relationalPostsSource = new PgSource({
     executor,
-    codec: recordType(sql`interfaces_and_unions.relational_posts`),
+    codec: recordType(
+      sql`interfaces_and_unions.relational_posts`,
+      relationalPostsColumns,
+    ),
     source: sql`interfaces_and_unions.relational_posts`,
     name: "relational_posts",
-    columns: {
-      title: col({ codec: TYPES.text, notNull: false }),
-      description: col({ codec: TYPES.text, notNull: false }),
-      note: col({ codec: TYPES.text, notNull: false }),
-
-      ...itemColumns,
-    },
+    columns: relationalPostsColumns,
     uniques: [["id"]],
     relations: {
       ...itemRelations,
@@ -693,33 +727,41 @@ export function makeExampleSchema(
     },
   });
 
+  const relationalDividersColumns = {
+    title: col({ codec: TYPES.text, notNull: false }),
+    color: col({ codec: TYPES.text, notNull: false }),
+
+    ...itemColumns,
+  };
   const relationalDividersSource = new PgSource({
     executor,
-    codec: recordType(sql`interfaces_and_unions.relational_dividers`),
+    codec: recordType(
+      sql`interfaces_and_unions.relational_dividers`,
+      relationalDividersColumns,
+    ),
     source: sql`interfaces_and_unions.relational_dividers`,
     name: "relational_dividers",
-    columns: {
-      title: col({ codec: TYPES.text, notNull: false }),
-      color: col({ codec: TYPES.text, notNull: false }),
-
-      ...itemColumns,
-    },
+    columns: relationalDividersColumns,
     uniques: [["id"]],
     relations: {
       ...itemRelations,
     },
   });
 
+  const relationalChecklistsColumns = {
+    title: col({ codec: TYPES.text, notNull: false }),
+
+    ...itemColumns,
+  };
   const relationalChecklistsSource = new PgSource({
     executor,
-    codec: recordType(sql`interfaces_and_unions.relational_checklists`),
+    codec: recordType(
+      sql`interfaces_and_unions.relational_checklists`,
+      relationalChecklistsColumns,
+    ),
     source: sql`interfaces_and_unions.relational_checklists`,
     name: "relational_checklists",
-    columns: {
-      title: col({ codec: TYPES.text, notNull: false }),
-
-      ...itemColumns,
-    },
+    columns: relationalChecklistsColumns,
     uniques: [["id"]],
     relations: {
       ...itemRelations,
@@ -727,17 +769,21 @@ export function makeExampleSchema(
     },
   });
 
+  const relationalChecklistItemsColumns = {
+    description: col({ codec: TYPES.text, notNull: true }),
+    note: col({ codec: TYPES.text, notNull: false }),
+
+    ...itemColumns,
+  };
   const relationalChecklistItemsSource = new PgSource({
     executor,
-    codec: recordType(sql`interfaces_and_unions.relational_checklist_items`),
+    codec: recordType(
+      sql`interfaces_and_unions.relational_checklist_items`,
+      relationalChecklistItemsColumns,
+    ),
     source: sql`interfaces_and_unions.relational_checklist_items`,
     name: "relational_checklist_items",
-    columns: {
-      description: col({ codec: TYPES.text, notNull: true }),
-      note: col({ codec: TYPES.text, notNull: false }),
-
-      ...itemColumns,
-    },
+    columns: relationalChecklistItemsColumns,
     uniques: [["id"]],
     relations: {
       ...itemRelations,
@@ -747,18 +793,22 @@ export function makeExampleSchema(
 
   ////////////////////////////////////////
 
+  const unionItemsColumns = {
+    id: col({ codec: TYPES.int, notNull: true }),
+    type: col({
+      codec: enumType(sql`interfaces_and_unions.item_type`),
+      notNull: true,
+    }),
+  };
   const unionItemsSource = new PgSource({
     executor,
-    codec: recordType(sql`interfaces_and_unions.union_items`),
+    codec: recordType(
+      sql`interfaces_and_unions.union_items`,
+      unionItemsColumns,
+    ),
     source: sql`interfaces_and_unions.union_items`,
     name: "union_items",
-    columns: {
-      id: col({ codec: TYPES.int, notNull: true }),
-      type: col({
-        codec: enumType(sql`interfaces_and_unions.item_type`),
-        notNull: true,
-      }),
-    },
+    columns: unionItemsColumns,
     uniques: [["id"]],
     relations: () => ({
       topic: {
@@ -794,79 +844,96 @@ export function makeExampleSchema(
     }),
   });
 
+  const unionTopicsColumns = {
+    id: col({ codec: TYPES.int, notNull: true }),
+    title: col({ codec: TYPES.text, notNull: false }),
+  };
   const unionTopicsSource = new PgSource({
     executor,
-    codec: recordType(sql`interfaces_and_unions.union_topics`),
+    codec: recordType(
+      sql`interfaces_and_unions.union_topics`,
+      unionTopicsColumns,
+    ),
     source: sql`interfaces_and_unions.union_topics`,
     name: "union_topics",
-    columns: {
-      id: col({ codec: TYPES.int, notNull: true }),
-      title: col({ codec: TYPES.text, notNull: false }),
-    },
+    columns: unionTopicsColumns,
     uniques: [["id"]],
   });
 
+  const unionPostsColumns = {
+    id: col({ codec: TYPES.int, notNull: true }),
+    title: col({ codec: TYPES.text, notNull: false }),
+    description: col({ codec: TYPES.text, notNull: false }),
+    note: col({ codec: TYPES.text, notNull: false }),
+  };
   const unionPostsSource = new PgSource({
     executor,
-    codec: recordType(sql`interfaces_and_unions.union_posts`),
+    codec: recordType(
+      sql`interfaces_and_unions.union_posts`,
+      unionPostsColumns,
+    ),
     source: sql`interfaces_and_unions.union_posts`,
     name: "union_posts",
-    columns: {
-      id: col({ codec: TYPES.int, notNull: true }),
-      title: col({ codec: TYPES.text, notNull: false }),
-      description: col({ codec: TYPES.text, notNull: false }),
-      note: col({ codec: TYPES.text, notNull: false }),
-    },
+    columns: unionPostsColumns,
     uniques: [["id"]],
   });
 
+  const unionDividersColumns = {
+    id: col({ codec: TYPES.int, notNull: true }),
+    title: col({ codec: TYPES.text, notNull: false }),
+    color: col({ codec: TYPES.text, notNull: false }),
+  };
   const unionDividersSource = new PgSource({
     executor,
-    codec: recordType(sql`interfaces_and_unions.union_dividers`),
+    codec: recordType(
+      sql`interfaces_and_unions.union_dividers`,
+      unionDividersColumns,
+    ),
     source: sql`interfaces_and_unions.union_dividers`,
     name: "union_dividers",
-    columns: {
-      id: col({ codec: TYPES.int, notNull: true }),
-      title: col({ codec: TYPES.text, notNull: false }),
-      color: col({ codec: TYPES.text, notNull: false }),
-    },
+    columns: unionDividersColumns,
     uniques: [["id"]],
   });
 
+  const unionChecklistsColumns = {
+    id: col({ codec: TYPES.int, notNull: true }),
+    title: col({ codec: TYPES.text, notNull: false }),
+  };
   const unionChecklistsSource = new PgSource({
     executor,
-    codec: recordType(sql`interfaces_and_unions.union_checklists`),
+    codec: recordType(
+      sql`interfaces_and_unions.union_checklists`,
+      unionChecklistsColumns,
+    ),
     source: sql`interfaces_and_unions.union_checklists`,
     name: "union_checklists",
-    columns: {
-      id: col({ codec: TYPES.int, notNull: true }),
-      title: col({ codec: TYPES.text, notNull: false }),
-    },
+    columns: unionChecklistsColumns,
     uniques: [["id"]],
   });
 
+  const unionChecklistItemsColumns = {
+    id: col({ codec: TYPES.int, notNull: true }),
+    description: col({ codec: TYPES.text, notNull: true }),
+    note: col({ codec: TYPES.text, notNull: false }),
+  };
   const unionChecklistItemsSource = new PgSource({
     executor,
-    codec: recordType(sql`interfaces_and_unions.union_checklist_items`),
+    codec: recordType(
+      sql`interfaces_and_unions.union_checklist_items`,
+      unionChecklistItemsColumns,
+    ),
     source: sql`interfaces_and_unions.union_checklist_items`,
     name: "union_checklist_items",
-    columns: {
-      id: col({ codec: TYPES.int, notNull: true }),
-      description: col({ codec: TYPES.text, notNull: true }),
-      note: col({ codec: TYPES.text, notNull: false }),
-    },
+    columns: unionChecklistItemsColumns,
     uniques: [["id"]],
   });
-
-  const unionEntityColumns = {
-    person_id: col({ codec: TYPES.int, notNull: false }),
-    post_id: col({ codec: TYPES.int, notNull: false }),
-    comment_id: col({ codec: TYPES.int, notNull: false }),
-  };
 
   const entitySearchSource = new PgSource({
     executor,
-    codec: recordType(sql`interfaces_and_unions.union__entity`),
+    codec: recordType(
+      sql`interfaces_and_unions.union__entity`,
+      unionEntityColumns,
+    ),
     source: (args: SQL[]) =>
       sql`interfaces_and_unions.search(${sql.join(args, ", ")})`,
     name: "entity_search",
