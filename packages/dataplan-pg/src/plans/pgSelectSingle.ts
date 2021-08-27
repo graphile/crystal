@@ -235,6 +235,27 @@ export class PgSelectSinglePlan<
     );
   }
 
+  public manyRelation<
+    TRelationName extends Parameters<TDataSource["getRelation"]>[0],
+  >(relationIdentifier: TRelationName): PgSelectPlan<any> {
+    const relation = this.dataSource.getRelation(relationIdentifier as string);
+    if (!relation) {
+      throw new Error(
+        `${relationIdentifier} is not a relation on ${this.dataSource}`,
+      );
+    }
+    const source = relation.source as PgSource<any, any, any, any, any>;
+    const remoteColumns = relation.remoteColumns as string[];
+    const localColumns = relation.localColumns as string[];
+
+    return source.find(
+      remoteColumns.reduce((memo, remoteColumn, columnIndex) => {
+        memo[remoteColumn] = this.get(localColumns[columnIndex]);
+        return memo;
+      }, Object.create(null)),
+    );
+  }
+
   record(): PgRecordPlan<TDataSource> {
     return pgRecord(this);
   }
