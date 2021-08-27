@@ -1,0 +1,26 @@
+{
+  searchEntities(query: "Dave") {
+    ... on Person {
+      personId
+      username
+    }
+    ... on Post {
+      postId
+      author {
+        username
+      }
+      body
+    }
+    ... on Comment {
+      commentId
+      author {
+        username
+      }
+      post {
+        postId
+        body
+      }
+      body
+    }
+  }
+}
