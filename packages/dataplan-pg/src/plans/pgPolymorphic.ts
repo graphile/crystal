@@ -10,6 +10,8 @@ import type { GraphQLObjectType } from "graphql";
 import { inspect } from "util";
 
 import type { PgSource } from "../datasource";
+import type { PgTypeCodec } from "../interfaces";
+import type { PgClassExpressionPlan } from "./pgClassExpression";
 import type { PgSelectSinglePlan } from "./pgSelectSingle";
 
 interface PgPolymorphicTypeMap<
@@ -23,7 +25,7 @@ interface PgPolymorphicTypeMap<
 }
 
 export class PgPolymorphicPlan<
-    TDataSource extends PgSource<any, any, any, any, any>,
+    TCodec extends PgTypeCodec,
     TTypeSpecifier extends any,
     TTypeSpecifierPlan extends ExecutablePlan<TTypeSpecifier> = ExecutablePlan<TTypeSpecifier>,
   >
@@ -35,7 +37,9 @@ export class PgPolymorphicPlan<
   private types: string[];
 
   constructor(
-    $itemPlan: PgSelectSinglePlan<TDataSource>,
+    $itemPlan:
+      | PgSelectSinglePlan<PgSource<TCodec, any, any, any, any>>
+      | PgClassExpressionPlan<any, TCodec>,
     $typeSpecifierPlan: TTypeSpecifierPlan,
     private possibleTypes: PgPolymorphicTypeMap<
       TTypeSpecifier,
@@ -84,12 +88,10 @@ export class PgPolymorphicPlan<
     return t;
   }
 
-  async execute(
-    values: CrystalValuesList<any[]>,
-  ): Promise<
+  async execute(values: CrystalValuesList<any[]>): Promise<
     CrystalResultsList<PolymorphicData<
       string,
-      ReadonlyArray<TDataSource["TRow"]>
+      ReadonlyArray<any> // TODO: something to do with TCodec
     > | null>
   > {
     return values.map((v) => {
@@ -105,15 +107,17 @@ export class PgPolymorphicPlan<
 }
 
 export function pgPolymorphic<
-  TDataSource extends PgSource<any, any, any, any, any>,
+  TCodec extends PgTypeCodec,
   TTypeSpecifier extends any,
   TTypeSpecifierPlan extends ExecutablePlan<TTypeSpecifier> = ExecutablePlan<TTypeSpecifier>,
 >(
-  $itemPlan: PgSelectSinglePlan<TDataSource>,
+  $itemPlan:
+    | PgSelectSinglePlan<PgSource<TCodec, any, any, any, any>>
+    | PgClassExpressionPlan<any, TCodec>,
   $typeSpecifierPlan: TTypeSpecifierPlan,
   possibleTypes: PgPolymorphicTypeMap<TTypeSpecifier, TTypeSpecifierPlan>,
-): PgPolymorphicPlan<TDataSource, TTypeSpecifier, TTypeSpecifierPlan> {
-  return new PgPolymorphicPlan<TDataSource, TTypeSpecifier, TTypeSpecifierPlan>(
+): PgPolymorphicPlan<TCodec, TTypeSpecifier, TTypeSpecifierPlan> {
+  return new PgPolymorphicPlan<TCodec, TTypeSpecifier, TTypeSpecifierPlan>(
     $itemPlan,
     $typeSpecifierPlan,
     possibleTypes,
