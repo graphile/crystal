@@ -57,6 +57,18 @@ export function recordType(identifier: SQL): PgTypeCodec<string, string> {
   };
 }
 
+export function enumType(identifier: SQL): PgTypeCodec<string, string> {
+  return {
+    sqlType: identifier,
+    fromPg(value) {
+      return value;
+    },
+    toPg(value) {
+      return sql`${sql.value(value)}::${identifier}`;
+    },
+  };
+}
+
 export const TYPES = {
   boolean: t<boolean>("bool"),
   int: t<number>("int4"),

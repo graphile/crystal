@@ -375,24 +375,18 @@ insert into interfaces_and_unions.relational_checklist_items (id, description, n
 
 -- We can also apply multiple interfaces to the same tables:
 
-create type interfaces_and_unions.commentable_type as enum (
-  'POST',
-  'CHECKLIST',
-  'CHECKLIST_ITEM'
-);
-
 create table interfaces_and_unions.relational_commentables (
   id serial primary key,
 
-  type interfaces_and_unions.commentable_type not null
+  type interfaces_and_unions.item_type not null check (type in ('POST', 'CHECKLIST', 'CHECKLIST_ITEM'))
 );
 
 insert into interfaces_and_unions.relational_commentables (id, type)
-  select id, 'POST'::interfaces_and_unions.commentable_type from interfaces_and_unions.relational_posts
+  select id, 'POST'::interfaces_and_unions.item_type from interfaces_and_unions.relational_posts
   union
-  select id, 'CHECKLIST'::interfaces_and_unions.commentable_type from interfaces_and_unions.relational_checklists
+  select id, 'CHECKLIST'::interfaces_and_unions.item_type from interfaces_and_unions.relational_checklists
   union
-  select id, 'CHECKLIST_ITEM'::interfaces_and_unions.commentable_type from interfaces_and_unions.relational_checklist_items;
+  select id, 'CHECKLIST_ITEM'::interfaces_and_unions.item_type from interfaces_and_unions.relational_checklist_items;
 
 alter table interfaces_and_unions.relational_posts add constraint relational_posts_commentable_fkey foreign key (id) references interfaces_and_unions.relational_commentables;
 alter table interfaces_and_unions.relational_checklists add constraint relational_posts_commentable_fkey foreign key (id) references interfaces_and_unions.relational_commentables;

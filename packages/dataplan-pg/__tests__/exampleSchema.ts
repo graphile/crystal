@@ -48,6 +48,7 @@ import type {
   WithPgClient,
 } from "../src";
 import {
+  enumType,
   pgClassExpression,
   PgConditionPlan,
   PgConnectionPlan,
@@ -414,7 +415,10 @@ export function makeExampleSchema(
     name: "single_table_items",
     columns: {
       id: col({ codec: TYPES.int, notNull: true }),
-      type: col({ codec: TYPES.text /* TODO: enum? */, notNull: true }),
+      type: col({
+        codec: enumType(sql`interfaces_and_unions.item_type`),
+        notNull: true,
+      }),
 
       parent_id: col({
         codec: TYPES.int,
@@ -467,7 +471,10 @@ export function makeExampleSchema(
     name: "relational_items",
     columns: {
       id: col({ codec: TYPES.int, notNull: true }),
-      type: col({ codec: TYPES.text /* TODO: enum? */, notNull: true }),
+      type: col({
+        codec: enumType(sql`interfaces_and_unions.item_type`),
+        notNull: true,
+      }),
 
       parent_id: col({
         codec: TYPES.int,
@@ -550,7 +557,10 @@ export function makeExampleSchema(
     name: "relational_commentables",
     columns: {
       id: col({ codec: TYPES.int, notNull: true }),
-      type: col({ codec: TYPES.text /* TODO: enum? */, notNull: true }),
+      type: col({
+        codec: enumType(sql`interfaces_and_unions.item_type`),
+        notNull: true,
+      }),
     },
     relations: () => ({
       post: {

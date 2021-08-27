@@ -11,7 +11,7 @@ function sqlPrint(fragment: SQL): string {
 
 debugFactory.formatters.S = sqlPrint;
 
-export { recordType, TYPES } from "./codecs";
+export { enumType, recordType, TYPES } from "./codecs";
 export {
   PgSource,
   PgSourceColumn,
