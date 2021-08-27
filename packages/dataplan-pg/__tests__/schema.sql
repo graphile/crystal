@@ -303,8 +303,7 @@ create table interfaces_and_unions.relational_posts (
 create table interfaces_and_unions.relational_dividers (
   id int primary key references interfaces_and_unions.relational_items,
   title text,
-  color text,
-  note text
+  color text
 );
 create table interfaces_and_unions.relational_checklists (
   id int primary key references interfaces_and_unions.relational_items,
@@ -421,8 +420,7 @@ create table interfaces_and_unions.union_posts (
 create table interfaces_and_unions.union_dividers (
   id int primary key references interfaces_and_unions.union_items,
   title text,
-  color text,
-  note text
+  color text
 );
 create table interfaces_and_unions.union_checklists (
   id int primary key references interfaces_and_unions.union_items,
