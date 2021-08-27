@@ -12,19 +12,21 @@ import type {
   OperationDefinitionNode,
   SelectionNode,
 } from "graphql";
-import { getNamedType, isObjectType, isScalarType } from "graphql";
-import { isInterfaceType, isUnionType } from "graphql";
 import {
   assertListType,
   assertObjectType,
+  getNamedType,
   GraphQLInterfaceType,
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLUnionType,
   isInputObjectType,
+  isInterfaceType,
   isListType,
   isNonNullType,
+  isScalarType,
+  isUnionType,
 } from "graphql";
 import { inspect } from "util";
 
@@ -546,12 +548,16 @@ export class Aether<
       );
       return listItemPlan;
     }
-    const isObjectType = fieldType instanceof GraphQLObjectType;
-    const isInterfaceType = fieldType instanceof GraphQLInterfaceType;
-    const isUnionType = fieldType instanceof GraphQLUnionType;
-    if (isObjectType || isInterfaceType || isUnionType) {
+    const fieldTypeIsObjectType = fieldType instanceof GraphQLObjectType;
+    const fieldTypeIsInterfaceType = fieldType instanceof GraphQLInterfaceType;
+    const fieldTypeIsUnionType = fieldType instanceof GraphQLUnionType;
+    if (
+      fieldTypeIsObjectType ||
+      fieldTypeIsInterfaceType ||
+      fieldTypeIsUnionType
+    ) {
       const subSelectionSet = graphqlMergeSelectionSets(fields);
-      if (isObjectType) {
+      if (fieldTypeIsObjectType) {
         this.planSelectionSet(
           pathIdentity,
           plan,
@@ -578,7 +584,7 @@ export class Aether<
             );
           }
         };
-        if (isUnionType) {
+        if (fieldTypeIsUnionType) {
           const unionType = fieldType as GraphQLUnionType;
           const possibleObjectTypes = typesUsedInSelections(
             this,
@@ -588,8 +594,8 @@ export class Aether<
           /*@__INLINE__*/ planPossibleObjectTypes(possibleObjectTypes);
         } else {
           assert.ok(
-            isInterfaceType,
-            "Impossible. isObjectType and isUnionType are false so isInterfaceType must be true",
+            fieldTypeIsInterfaceType,
+            "Impossible. fieldTypeIsObjectType and fieldTypeIsUnionType are false so fieldTypeIsInterfaceType must be true",
           );
           const interfaceType = fieldType as GraphQLInterfaceType;
           // If we reference non-introspection fields on the interface type (or
