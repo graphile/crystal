@@ -1,0 +1,23 @@
+{
+  personByPersonId: {
+    personId: 2,
+    username: "Benjie",
+    personBookmarksList: [
+      {
+        id: 1,
+        person: { username: "Benjie" },
+        bookmarkedEntity: { postId: 3, author: { username: "Ellie" }, body: "Sweet, I'll order some Mighty Meaty" },
+      },
+      {
+        id: 2,
+        person: { username: "Benjie" },
+        bookmarkedEntity: {
+          commentId: 1,
+          author: { username: "Benjie" },
+          post: { body: "Socially distanced pizzas? Count us in too!" },
+          body: "Yeah, that's critical these days, right?",
+        },
+      },
+    ],
+  },
+}

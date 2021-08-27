@@ -1,0 +1,35 @@
+{
+  personByPersonId(personId: 2) {
+    personId
+    username
+    personBookmarksList {
+      id
+      person {
+        username
+      }
+      bookmarkedEntity {
+        ... on Person {
+          personId
+          username
+        }
+        ... on Post {
+          postId
+          author {
+            username
+          }
+          body
+        }
+        ... on Comment {
+          commentId
+          author {
+            username
+          }
+          post {
+            body
+          }
+          body
+        }
+      }
+    }
+  }
+}
