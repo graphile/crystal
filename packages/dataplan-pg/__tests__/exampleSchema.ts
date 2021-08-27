@@ -121,6 +121,12 @@ export function makeExampleSchema(
   type SingleTableItemPlan = PgSelectSinglePlan<typeof singleTableItemsSource>;
   type RelationalItemsPlan = PgSelectPlan<typeof relationalItemsSource>;
   type RelationalItemPlan = PgSelectSinglePlan<typeof relationalItemsSource>;
+  type RelationalCommentablesPlan = PgSelectPlan<
+    typeof relationalCommentableSource
+  >;
+  type RelationalCommentablePlan = PgSelectSinglePlan<
+    typeof relationalCommentableSource
+  >;
 
   const col = <
     TOptions extends {
@@ -1462,6 +1468,23 @@ export function makeExampleSchema(
       },
     });
 
+  const relationalCommentableInterface = ($item: RelationalCommentablePlan) =>
+    pgRelationalInterface($item, $item.get("type"), {
+      RelationalPost: {
+        match: (t) => t === "POST",
+        plan: () => deoptimizeIfAppropriate($item.singleRelation("post")),
+      },
+      RelationalChecklist: {
+        match: (t) => t === "CHECKLIST",
+        plan: () => deoptimizeIfAppropriate($item.singleRelation("checklist")),
+      },
+      RelationalChecklistItem: {
+        match: (t) => t === "CHECKLIST_ITEM",
+        plan: () =>
+          deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
+      },
+    });
+
   const Person: GraphQLObjectType<any, GraphileResolverContext> =
     new GraphQLObjectType(
       objectSpec<GraphileResolverContext, PersonPlan>({
@@ -1610,6 +1633,15 @@ export function makeExampleSchema(
     resolveType,
   });
 
+  const RelationalCommentable: GraphQLInterfaceType = new GraphQLInterfaceType({
+    name: "RelationalCommentable",
+    fields: () => ({
+      id: { type: GraphQLInt },
+      type: { type: GraphQLString },
+    }),
+    resolveType,
+  });
+
   const commonRelationalItemFields = {
     id: attrField("id", GraphQLInt),
     type: attrField("type", GraphQLString),
@@ -1643,7 +1675,7 @@ export function makeExampleSchema(
   const RelationalPost = new GraphQLObjectType(
     objectSpec<GraphileResolverContext, RelationalItemPlan>({
       name: "RelationalPost",
-      interfaces: [RelationalItem],
+      interfaces: [RelationalItem, RelationalCommentable],
       fields: () => ({
         ...commonRelationalItemFields,
         title: attrField("title", GraphQLString),
@@ -1668,7 +1700,7 @@ export function makeExampleSchema(
   const RelationalChecklist = new GraphQLObjectType(
     objectSpec<GraphileResolverContext, RelationalItemPlan>({
       name: "RelationalChecklist",
-      interfaces: [RelationalItem],
+      interfaces: [RelationalItem, RelationalCommentable],
       fields: () => ({
         ...commonRelationalItemFields,
         title: attrField("title", GraphQLString),
@@ -1679,7 +1711,7 @@ export function makeExampleSchema(
   const RelationalChecklistItem = new GraphQLObjectType(
     objectSpec<GraphileResolverContext, RelationalItemPlan>({
       name: "RelationalChecklistItem",
-      interfaces: [RelationalItem],
+      interfaces: [RelationalItem, RelationalCommentable],
       fields: () => ({
         ...commonRelationalItemFields,
         description: attrField("description", GraphQLString),
@@ -2004,6 +2036,22 @@ export function makeExampleSchema(
             return relationalTopicsSource.get({
               id: args.id,
             });
+          },
+        },
+
+        allRelationalCommentablesList: {
+          type: new GraphQLList(new GraphQLNonNull(RelationalCommentable)),
+          plan() {
+            const $commentables: RelationalCommentablesPlan =
+              relationalCommentableSource.find();
+            $commentables.orderBy({
+              codec: TYPES.int,
+              fragment: sql`${$commentables.alias}.id`,
+              direction: "ASC",
+            });
+            return each($commentables, ($commentable) =>
+              relationalCommentableInterface($commentable),
+            );
           },
         },
       },

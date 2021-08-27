@@ -1,0 +1,33 @@
+{
+  allRelationalCommentablesList {
+    ...Item
+  }
+}
+
+fragment Item on RelationalItem {
+  __typename
+  id
+  type
+  position
+  ... on RelationalTopic {
+    # Should never fire - not compatible with RelationalCommentable
+    title
+  }
+  ... on RelationalPost {
+    title
+    description
+    note
+  }
+  ... on RelationalDivider {
+    # Should never fire - not compatible with RelationalCommentable
+    title
+    color
+  }
+  ... on RelationalChecklist {
+    title
+  }
+  ... on RelationalChecklistItem {
+    description
+    note
+  }
+}
