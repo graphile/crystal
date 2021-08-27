@@ -44,6 +44,8 @@ export {
   AccessPlan,
   aether,
   assertListCapablePlan,
+  constant,
+  ConstantPlan,
   context,
   debugPlans,
   each,

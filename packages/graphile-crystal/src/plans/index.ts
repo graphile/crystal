@@ -19,6 +19,7 @@ export function debugPlans<T>(callback: () => T): T {
 }
 
 export { access, AccessPlan } from "./access";
+export { constant, ConstantPlan } from "./constant";
 export { each, EachPlan } from "./each";
 export { first, FirstPlan } from "./first";
 export { lambda, LambdaPlan } from "./lambda";
