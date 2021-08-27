@@ -4,7 +4,7 @@ import { ExecutablePlan } from "graphile-crystal";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { PgSource } from "../datasource";
+import type { PgSource, PgSourceColumn } from "../datasource";
 import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
 import { PgSelectSinglePlan } from "./pgSelectSingle";
 
@@ -101,6 +101,44 @@ export class PgClassExpressionPlan<
     } else {
       return expr.text;
     }
+  }
+
+  public get<TAttr extends keyof TCodec["columns"]>(
+    attributeName: TAttr,
+  ): PgClassExpressionPlan<
+    TDataSource,
+    TCodec["columns"][TAttr] extends PgSourceColumn
+      ? TCodec["columns"][TAttr]["codec"]
+      : never
+  > {
+    const columns = this.pgCodec.columns;
+    if (!columns) {
+      throw new Error(
+        `Cannot call ${this}.get('${attributeName}') because this does not represent a composite type (check your pgCodec).`,
+      );
+    }
+    const column = columns[attributeName as string];
+    if (!column) {
+      throw new Error(
+        `Cannot call ${this}.get('${attributeName}') because this does not have that column; supported columns: '${Object.keys(
+          columns,
+        ).join("', '")}'.`,
+      );
+    }
+    if (column.via) {
+      throw new Error(
+        `Cannot call ${this}.get('${attributeName}') because 'via' is not yet supported here - please raise an issue (or, even better, a pull request!).`,
+      );
+    }
+    if (column.expression) {
+      throw new Error(
+        `Cannot call ${this}.get('${attributeName}') because 'expression' is not yet supported here - please raise an issue (or, even better, a pull request!).`,
+      );
+    }
+    const sqlExpr = pgClassExpression(this.getClassSinglePlan(), column.codec);
+    return sqlExpr`${sql.parens(this.expression, true)}.${sql.identifier(
+      attributeName as string,
+    )}` as any;
   }
 
   public getClassSinglePlan(): PgSelectSinglePlan<TDataSource> {
