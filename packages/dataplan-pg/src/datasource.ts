@@ -268,7 +268,8 @@ export class PgSource<
 
   public get(
     spec: PlanByUniques<TColumns, TUniques>,
-    options?: PgSelectSinglePlanOptions,
+    // This is internal, it's an optimisation we can use but you shouldn't.
+    _internalOptionsDoNotPass?: PgSelectSinglePlanOptions,
   ): PgSelectSinglePlan<this> {
     const keys: ReadonlyArray<keyof TColumns> = Object.keys(spec);
     if (!this.uniques.some((uniq) => uniq.every((key) => keys.includes(key)))) {
@@ -280,7 +281,7 @@ export class PgSource<
         )}). Did you mean to call .find() instead?`,
       );
     }
-    return this.find(spec).single(options);
+    return this.find(spec).single(_internalOptionsDoNotPass);
   }
 
   public find(
