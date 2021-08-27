@@ -1,0 +1,38 @@
+# This should have identical SQL queries and results to
+# single-topic.test.graphql since crystal should automatically filter out the
+# unreachable fragment spreads.
+{
+  relationalTopicById(id: 10) {
+    ...Item
+  }
+}
+
+fragment Item on RelationalItem {
+  __typename
+  id
+  type
+  position
+  createdAt
+  updatedAt
+  isExplicitlyArchived
+  archivedAt
+  ... on RelationalTopic {
+    title
+  }
+  ... on RelationalPost {
+    title
+    description
+    note
+  }
+  ... on RelationalDivider {
+    title
+    color
+  }
+  ... on RelationalChecklist {
+    title
+  }
+  ... on RelationalChecklistItem {
+    description
+    note
+  }
+}

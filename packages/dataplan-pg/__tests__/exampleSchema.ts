@@ -1966,6 +1966,20 @@ export function makeExampleSchema(
             return relationalItemInterface($item);
           },
         },
+
+        relationalTopicById: {
+          type: RelationalTopic,
+          args: {
+            id: {
+              type: GraphQLInt,
+            },
+          },
+          plan(_$root, args) {
+            return relationalTopicsSource.get({
+              id: args.id,
+            });
+          },
+        },
       },
     }),
   );
