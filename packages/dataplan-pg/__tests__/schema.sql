@@ -187,7 +187,7 @@ insert into interfaces_and_unions.comments (comment_id, author_id, post_id, body
   (1, 2, 7, 'Yeah, that''s critical these days, right?'),
   (2, 6, 7, 'Sucks, but it''s true.'),
   (3, 3, 3, 'Can we have some vegan pizza for Sam?'),
-  (4, 5, 3, 'Of course; I''ll grab a selection. BYOB!');
+  (4, 5, 3, 'Of course; I''ll grab a selection. Dave: BYOB!');
 
 /*
 
@@ -507,11 +507,17 @@ create function interfaces_and_unions.search(query text) returns setof interface
 -- of the function is unimportant in these tests, but you should not put this
 -- into your own codebase thinking it's a good idea. Instead use PostgreSQL's
 -- full text search (tsvector, tsquery) features.
-select (person_id, null, null)::interfaces_and_unions.union__entity from interfaces_and_unions.people where username like '%' || query || '%'
+  select (person_id, null, null)::interfaces_and_unions.union__entity
+  from interfaces_and_unions.people
+  where username like '%' || query || '%'
 union all
-select (null, post_id, null)::interfaces_and_unions.union__entity from interfaces_and_unions.posts where body like '%' || query || '%'
+  select (null, post_id, null)::interfaces_and_unions.union__entity
+  from interfaces_and_unions.posts
+  where body like '%' || query || '%'
 union all
-select (null, null, comment_id)::interfaces_and_unions.union__entity from interfaces_and_unions.comments where body like '%' || query || '%'
+  select (null, null, comment_id)::interfaces_and_unions.union__entity
+  from interfaces_and_unions.comments
+  where body like '%' || query || '%'
 $$ language sql stable;
 
 create table interfaces_and_unions.person_bookmarks (

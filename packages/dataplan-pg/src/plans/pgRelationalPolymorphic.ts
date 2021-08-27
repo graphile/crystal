@@ -50,7 +50,7 @@ export class PgRelationalPolymorphicPlan<
 
   typeSpecifierPlan(): TTypeSpecifierPlan {
     const plan = this.aether.plans[
-      this.dependencies[this.itemPlanId]
+      this.dependencies[this.typeSpecifierPlanId]
     ] as TTypeSpecifierPlan;
     return plan;
   }

@@ -1702,7 +1702,7 @@ export function makeExampleSchema(
         fields: () => ({
           commentId: attrField("comment_id", GraphQLInt),
           author: singleRelationField("author", Person),
-          post: singleRelationField("post", Person),
+          post: singleRelationField("post", Post),
           body: attrField("body", GraphQLString),
         }),
       }),
@@ -2390,17 +2390,21 @@ export function makeExampleSchema(
                 {
                   Person: {
                     match: (v) => v[0] != null,
-                    plan: ($list) =>
-                      personSource.get({ person_id: $list.at(0) }),
+                    plan: ($list) => {
+                      console.dir($list);
+                      const $personId = $list.at(0);
+                      console.dir($personId);
+                      return personSource.get({ person_id: $personId });
+                    },
                   },
                   Post: {
                     match: (v) => v[1] != null,
-                    plan: ($list) => postSource.get({ person_id: $list.at(1) }),
+                    plan: ($list) => postSource.get({ post_id: $list.at(1) }),
                   },
                   Comment: {
                     match: (v) => v[2] != null,
                     plan: ($list) =>
-                      commentSource.get({ person_id: $list.at(2) }),
+                      commentSource.get({ comment_id: $list.at(2) }),
                   },
                 },
               ),
