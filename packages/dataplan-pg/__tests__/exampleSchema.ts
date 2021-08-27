@@ -31,6 +31,7 @@ import {
   GraphQLObjectType,
   GraphQLSchema,
   GraphQLString,
+  GraphQLUnionType,
   printSchema,
 } from "graphql";
 import type { SQL } from "pg-sql2";
@@ -121,6 +122,15 @@ export function makeExampleSchema(
   type SingleTableItemPlan = PgSelectSinglePlan<typeof singleTableItemsSource>;
   type RelationalItemsPlan = PgSelectPlan<typeof relationalItemsSource>;
   type RelationalItemPlan = PgSelectSinglePlan<typeof relationalItemsSource>;
+  type UnionItemsPlan = PgSelectPlan<typeof unionItemsSource>;
+  type UnionItemPlan = PgSelectSinglePlan<typeof unionItemsSource>;
+  type UnionTopicPlan = PgSelectSinglePlan<typeof unionTopicsSource>;
+  type UnionPostPlan = PgSelectSinglePlan<typeof unionPostsSource>;
+  type UnionDividerPlan = PgSelectSinglePlan<typeof unionDividersSource>;
+  type UnionChecklistPlan = PgSelectSinglePlan<typeof unionChecklistsSource>;
+  type UnionChecklistItemPlan = PgSelectSinglePlan<
+    typeof unionChecklistItemsSource
+  >;
   type RelationalCommentablesPlan = PgSelectPlan<
     typeof relationalCommentableSource
   >;
@@ -732,8 +742,119 @@ export function makeExampleSchema(
     },
   });
 
-  // TODO: interfaces_and_unions.union_items/_topics/etc
-  //
+  ////////////////////////////////////////
+
+  const unionItemsSource = new PgSource({
+    executor,
+    codec: recordType(sql`interfaces_and_unions.union_items`),
+    source: sql`interfaces_and_unions.union_items`,
+    name: "union_items",
+    columns: {
+      id: col({ codec: TYPES.int, notNull: true }),
+      type: col({
+        codec: enumType(sql`interfaces_and_unions.item_type`),
+        notNull: true,
+      }),
+    },
+    uniques: [["id"]],
+    relations: () => ({
+      topic: {
+        source: unionTopicsSource,
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
+        isUnique: true,
+      },
+      post: {
+        source: unionPostsSource,
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
+        isUnique: true,
+      },
+      divider: {
+        source: unionDividersSource,
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
+        isUnique: true,
+      },
+      checklist: {
+        source: unionChecklistsSource,
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
+        isUnique: true,
+      },
+      checklistItem: {
+        source: unionChecklistItemsSource,
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
+        isUnique: true,
+      },
+    }),
+  });
+
+  const unionTopicsSource = new PgSource({
+    executor,
+    codec: recordType(sql`interfaces_and_unions.union_topics`),
+    source: sql`interfaces_and_unions.union_topics`,
+    name: "union_topics",
+    columns: {
+      id: col({ codec: TYPES.int, notNull: true }),
+      title: col({ codec: TYPES.text, notNull: false }),
+    },
+    uniques: [["id"]],
+  });
+
+  const unionPostsSource = new PgSource({
+    executor,
+    codec: recordType(sql`interfaces_and_unions.union_posts`),
+    source: sql`interfaces_and_unions.union_posts`,
+    name: "union_posts",
+    columns: {
+      id: col({ codec: TYPES.int, notNull: true }),
+      title: col({ codec: TYPES.text, notNull: false }),
+      description: col({ codec: TYPES.text, notNull: false }),
+      note: col({ codec: TYPES.text, notNull: false }),
+    },
+    uniques: [["id"]],
+  });
+
+  const unionDividersSource = new PgSource({
+    executor,
+    codec: recordType(sql`interfaces_and_unions.union_dividers`),
+    source: sql`interfaces_and_unions.union_dividers`,
+    name: "union_dividers",
+    columns: {
+      id: col({ codec: TYPES.int, notNull: true }),
+      title: col({ codec: TYPES.text, notNull: false }),
+      color: col({ codec: TYPES.text, notNull: false }),
+    },
+    uniques: [["id"]],
+  });
+
+  const unionChecklistsSource = new PgSource({
+    executor,
+    codec: recordType(sql`interfaces_and_unions.union_checklists`),
+    source: sql`interfaces_and_unions.union_checklists`,
+    name: "union_checklists",
+    columns: {
+      id: col({ codec: TYPES.int, notNull: true }),
+      title: col({ codec: TYPES.text, notNull: false }),
+    },
+    uniques: [["id"]],
+  });
+
+  const unionChecklistItemsSource = new PgSource({
+    executor,
+    codec: recordType(sql`interfaces_and_unions.union_checklist_items`),
+    source: sql`interfaces_and_unions.union_checklist_items`,
+    name: "union_checklist_items",
+    columns: {
+      id: col({ codec: TYPES.int, notNull: true }),
+      description: col({ codec: TYPES.text, notNull: true }),
+      note: col({ codec: TYPES.text, notNull: false }),
+    },
+    uniques: [["id"]],
+  });
+
   // TODO: interfaces_and_unions.union__entity
 
   function attrField<TDataSource extends PgSource<any, any, any, any>>(
@@ -1468,6 +1589,31 @@ export function makeExampleSchema(
       },
     });
 
+  const unionItemUnion = ($item: UnionItemPlan) =>
+    pgRelationalInterface($item, $item.get("type"), {
+      UnionTopic: {
+        match: (t) => t === "TOPIC",
+        plan: () => deoptimizeIfAppropriate($item.singleRelation("topic")),
+      },
+      UnionPost: {
+        match: (t) => t === "POST",
+        plan: () => deoptimizeIfAppropriate($item.singleRelation("post")),
+      },
+      UnionDivider: {
+        match: (t) => t === "DIVIDER",
+        plan: () => deoptimizeIfAppropriate($item.singleRelation("divider")),
+      },
+      UnionChecklist: {
+        match: (t) => t === "CHECKLIST",
+        plan: () => deoptimizeIfAppropriate($item.singleRelation("checklist")),
+      },
+      UnionChecklistItem: {
+        match: (t) => t === "CHECKLIST_ITEM",
+        plan: () =>
+          deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
+      },
+    });
+
   const relationalCommentableInterface = ($item: RelationalCommentablePlan) =>
     pgRelationalInterface($item, $item.get("type"), {
       RelationalPost: {
@@ -1714,6 +1860,74 @@ export function makeExampleSchema(
       interfaces: [RelationalItem, RelationalCommentable],
       fields: () => ({
         ...commonRelationalItemFields,
+        description: attrField("description", GraphQLString),
+        note: attrField("note", GraphQLString),
+      }),
+    }),
+  );
+
+  ////////////////////////////////////////
+
+  const UnionItem: GraphQLUnionType = new GraphQLUnionType({
+    name: "UnionItem",
+    resolveType,
+    types: () => [
+      UnionTopic,
+      UnionPost,
+      UnionDivider,
+      UnionChecklist,
+      UnionChecklistItem,
+    ],
+  });
+
+  const UnionTopic = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, UnionTopicPlan>({
+      name: "UnionTopic",
+      fields: () => ({
+        id: attrField("id", GraphQLInt),
+        title: attrField("title", GraphQLString),
+      }),
+    }),
+  );
+
+  const UnionPost = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, UnionPostPlan>({
+      name: "UnionPost",
+      fields: () => ({
+        id: attrField("id", GraphQLInt),
+        title: attrField("title", GraphQLString),
+        description: attrField("description", GraphQLString),
+        note: attrField("note", GraphQLString),
+      }),
+    }),
+  );
+
+  const UnionDivider = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, UnionDividerPlan>({
+      name: "UnionDivider",
+      fields: () => ({
+        id: attrField("id", GraphQLInt),
+        title: attrField("title", GraphQLString),
+        color: attrField("color", GraphQLString),
+      }),
+    }),
+  );
+
+  const UnionChecklist = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, UnionChecklistPlan>({
+      name: "UnionChecklist",
+      fields: () => ({
+        id: attrField("id", GraphQLInt),
+        title: attrField("title", GraphQLString),
+      }),
+    }),
+  );
+
+  const UnionChecklistItem = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, UnionChecklistItemPlan>({
+      name: "UnionChecklistItem",
+      fields: () => ({
+        id: attrField("id", GraphQLInt),
         description: attrField("description", GraphQLString),
         note: attrField("note", GraphQLString),
       }),
@@ -2052,6 +2266,48 @@ export function makeExampleSchema(
             return each($commentables, ($commentable) =>
               relationalCommentableInterface($commentable),
             );
+          },
+        },
+
+        unionItemById: {
+          type: UnionItem,
+          args: {
+            id: {
+              type: GraphQLInt,
+            },
+          },
+          plan(_$root, args) {
+            const $item: UnionItemPlan = unionItemsSource.get({
+              id: args.id,
+            });
+            return unionItemUnion($item);
+          },
+        },
+
+        unionTopicById: {
+          type: UnionTopic,
+          args: {
+            id: {
+              type: GraphQLInt,
+            },
+          },
+          plan(_$root, args) {
+            return unionTopicsSource.get({
+              id: args.id,
+            });
+          },
+        },
+
+        allUnionItemsList: {
+          type: new GraphQLList(new GraphQLNonNull(UnionItem)),
+          plan() {
+            const $items: UnionItemsPlan = unionItemsSource.find();
+            $items.orderBy({
+              codec: TYPES.int,
+              fragment: sql`${$items.alias}.id`,
+              direction: "ASC",
+            });
+            return each($items, ($item) => unionItemUnion($item));
           },
         },
       },
