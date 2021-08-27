@@ -2,7 +2,12 @@ import LRU from "@graphile/lru";
 import * as assert from "assert";
 import chalk from "chalk";
 import debugFactory from "debug";
-import type { CrystalValuesList, Deferred, ObjectPlan } from "graphile-crystal";
+import type {
+  CrystalValuesList,
+  Deferred,
+  ExecutablePlan,
+  ObjectPlan,
+} from "graphile-crystal";
 import { defer } from "graphile-crystal";
 import type { SQLRawValue } from "pg-sql2";
 import { inspect } from "util";
@@ -39,6 +44,12 @@ export type PgExecutorContext<TSettings = any> = {
   withPgClient: WithPgClient;
 };
 
+export type PgExecutorContextPlans<TSettings = any> = {
+  [key in keyof PgExecutorContext<TSettings>]: ExecutablePlan<
+    PgExecutorContext<TSettings>[key]
+  >;
+};
+
 export type PgExecutorInput<TInput> = {
   context: PgExecutorContext;
   queryValues: ReadonlyArray<TInput>;
@@ -58,7 +69,7 @@ export type PgExecutorOptions = {
  */
 export class PgExecutor {
   public name: string;
-  private contextCallback: () => ObjectPlan<PgExecutorContext>;
+  private contextCallback: () => ObjectPlan<PgExecutorContextPlans>;
   private cache: WeakMap<
     Record<string, unknown> /* context */,
     LRU<
@@ -69,7 +80,7 @@ export class PgExecutor {
 
   constructor(options: {
     name: string;
-    context: () => ObjectPlan<PgExecutorContext>;
+    context: () => ObjectPlan<PgExecutorContextPlans>;
   }) {
     const { name, context } = options;
     this.name = name;
@@ -81,7 +92,7 @@ export class PgExecutor {
   }
 
   // public context(): ExecutablePlan<any>
-  public context(): ObjectPlan<PgExecutorContext> {
+  public context(): ObjectPlan<PgExecutorContextPlans> {
     return this.contextCallback();
   }
 

@@ -57,10 +57,15 @@ export class ListPlan<
     return peers.length > 0 ? peers[0] : this;
   }
 
+  /**
+   * Get the original plan at the given index back again.
+   */
   public at<TIndex extends keyof TPlanTuple>(
     index: TIndex,
-  ): AccessPlan<TPlanTuple[TIndex]> {
-    return access(this, [index as number]);
+  ): TPlanTuple[TIndex] {
+    return this.aether.plans[
+      this.dependencies[index as number]
+    ] as TPlanTuple[TIndex];
   }
 }
 

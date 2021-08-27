@@ -7,12 +7,21 @@ import { access } from "./access";
 const debugObjectPlan = debugFactory("crystal:ObjectPlan");
 const debugObjectPlanVerbose = debugObjectPlan.extend("verbose");
 
+type DataFromPlan<TPlan extends ExecutablePlan<any>> =
+  TPlan extends ExecutablePlan<infer TData> ? TData : never;
+
+type DataFromPlans<TPlans extends { [key: string]: ExecutablePlan<any> }> = {
+  [key in keyof TPlans]: DataFromPlan<TPlans[key]>;
+};
+
 export class ObjectPlan<
-  TData extends { [key: string]: any },
-> extends ExecutablePlan<TData> {
-  private keys: Array<keyof TData>;
-  private results: Array<[Array<TData[keyof TData]>, TData]> = [];
-  constructor(obj: { [key in keyof TData]: ExecutablePlan<TData[key]> }) {
+  TPlans extends { [key: string]: ExecutablePlan<any> },
+> extends ExecutablePlan<DataFromPlans<TPlans>> {
+  private keys: Array<keyof TPlans>;
+  private results: Array<
+    [Array<DataFromPlans<TPlans>[keyof TPlans]>, DataFromPlans<TPlans>]
+  > = [];
+  constructor(obj: TPlans) {
     super();
     this.keys = Object.keys(obj);
     for (let i = 0, l = this.keys.length; i < l; i++) {
@@ -25,7 +34,9 @@ export class ObjectPlan<
   }
 
   // TODO: JIT this function
-  tupleToObject(tuple: Array<TData[keyof TData]>): TData {
+  tupleToObject(
+    tuple: Array<DataFromPlans<TPlans>[keyof TPlans]>,
+  ): DataFromPlans<TPlans> {
     // Note: `outerloop` is a JavaScript "label". They are not very common.
     // First look for an existing match:
     outerloop: for (let i = 0, l = this.results.length; i < l; i++) {
@@ -55,18 +66,20 @@ export class ObjectPlan<
     const newObj = this.keys.reduce((memo, key, i) => {
       memo[key] = tuple[i];
       return memo;
-    }, {} as Partial<TData>) as TData;
+    }, {} as Partial<DataFromPlans<TPlans>>) as DataFromPlans<TPlans>;
 
     // Cache newObj so the same tuple values result in the exact same object.
     this.results.push([tuple, newObj]);
     return newObj;
   }
 
-  execute(values: Array<Array<TData[keyof TData]>>): Array<TData> {
+  execute(
+    values: Array<Array<DataFromPlans<TPlans>[keyof TPlans]>>,
+  ): Array<DataFromPlans<TPlans>> {
     return values.map(this.tupleToObject.bind(this));
   }
 
-  deduplicate(peers: ObjectPlan<TData>[]): ObjectPlan<TData> {
+  deduplicate(peers: ObjectPlan<TPlans>[]): ObjectPlan<TPlans> {
     const myKeys = JSON.stringify(this.keys);
     const peersWithSameKeys = peers.filter(
       (p) => JSON.stringify(p.keys) === myKeys,
@@ -74,13 +87,24 @@ export class ObjectPlan<
     return peersWithSameKeys.length > 0 ? peersWithSameKeys[0] : this;
   }
 
-  get(key: keyof TData): AccessPlan<TData[typeof key]> {
-    return access(this, [key as string]);
+  /**
+   * Get the original plan with the given key back again.
+   */
+  get<TKey extends keyof TPlans>(key: TKey): TPlans[TKey] {
+    const index = this.keys.indexOf(key);
+    if (index < 0) {
+      throw new Error(
+        `This ObjectPlan doesn't have key '${key}'; supported keys: '${this.keys.join(
+          "', '",
+        )}'`,
+      );
+    }
+    return this.aether.plans[this.dependencies[index]] as TPlans[TKey];
   }
 }
 
-export function object<TData extends { [key: string]: any }>(
-  obj: { [key in keyof TData]: ExecutablePlan<TData[key]> },
-): ObjectPlan<TData> {
-  return new ObjectPlan<TData>(obj);
+export function object<TPlans extends { [key: string]: ExecutablePlan<any> }>(
+  obj: TPlans,
+): ObjectPlan<TPlans> {
+  return new ObjectPlan<TPlans>(obj);
 }

@@ -9,6 +9,7 @@ import sql from "pg-sql2";
 import type {
   PgExecutor,
   PgExecutorContext,
+  PgExecutorContextPlans,
   PgExecutorInput,
   PgExecutorOptions,
 } from "./executor";
@@ -339,7 +340,7 @@ export class PgSource<
     return;
   }
 
-  public context(): ObjectPlan<PgExecutorContext> {
+  public context(): ObjectPlan<PgExecutorContextPlans> {
     return this.executor.context();
   }
 
