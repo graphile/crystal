@@ -5,7 +5,7 @@ import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type { PgSource } from "../datasource";
-import type { PgTypedExecutablePlan } from "../interfaces";
+import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
 import { PgSelectSinglePlan } from "./pgSelectSingle";
 
 //const debugPlan = debugFactory("datasource:pg:PgRecordPlan:plan");
@@ -24,6 +24,7 @@ export class PgRecordPlan<TDataSource extends PgSource<any, any, any, any>>
   implements PgTypedExecutablePlan<TDataSource["codec"]>
 {
   public readonly pgCodec: TDataSource["codec"];
+  public readonly expression: SQL;
   public readonly tableId: number;
 
   /**
@@ -34,13 +35,15 @@ export class PgRecordPlan<TDataSource extends PgSource<any, any, any, any>>
 
   public readonly dataSource: TDataSource;
 
-  placeholders: symbol[] = [];
-  placeholderIndexes: number[] = [];
-
-  constructor(table: PgSelectSinglePlan<TDataSource>) {
+  constructor(
+    table: PgSelectSinglePlan<TDataSource>,
+    pgCodec: PgTypeCodec,
+    expression: SQL,
+  ) {
     super();
     this.dataSource = table.dataSource;
-    this.pgCodec = this.dataSource.codec;
+    this.pgCodec = pgCodec;
+    this.expression = expression;
     this.tableId = this.addDependency(table);
   }
 
@@ -54,7 +57,7 @@ export class PgRecordPlan<TDataSource extends PgSource<any, any, any, any>>
 
   public finalize(): void {
     const $table = this.getClassSinglePlan().getClassPlan();
-    this.attrIndex = $table.select(sql`${$table.alias}::text`);
+    this.attrIndex = $table.select(sql`${this.expression}::text`);
     super.finalize();
   }
 
@@ -83,21 +86,25 @@ export class PgRecordPlan<TDataSource extends PgSource<any, any, any, any>>
   public deduplicate(
     peers: Array<PgRecordPlan<TDataSource>>,
   ): PgRecordPlan<TDataSource> {
-    // We're equivalent to any peer that has the same dependencies as us.
-    const equivalentPeer = peers[0];
+    const equivalentPeer = peers.find(
+      (peer) =>
+        peer.pgCodec === this.pgCodec &&
+        sql.isEquivalent(peer.expression, this.expression),
+    );
     return equivalentPeer ?? this;
   }
 
   public toSQL(): SQL {
-    const $table = this.getClassSinglePlan().getClassPlan();
-    return $table.alias;
+    return this.expression;
   }
 }
 
 function pgRecord<TDataSource extends PgSource<any, any, any, any>>(
   table: PgSelectSinglePlan<TDataSource>,
+  pgCodec: PgTypeCodec,
+  expression: SQL,
 ): PgRecordPlan<TDataSource> {
-  return new PgRecordPlan(table);
+  return new PgRecordPlan(table, pgCodec, expression);
 }
 
 export { pgRecord };

@@ -257,7 +257,7 @@ export class PgSelectSinglePlan<
   }
 
   record(): PgRecordPlan<TDataSource> {
-    return pgRecord(this);
+    return pgRecord(this, this.dataSource.codec, this.getClassPlan().alias);
   }
 
   /**
