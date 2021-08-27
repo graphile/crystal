@@ -1,5 +1,6 @@
 {
   relationalTopicById: {
+    __typename: "RelationalTopic",
     id: 10,
     type: "TOPIC",
     position: "7",

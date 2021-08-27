@@ -1,5 +1,6 @@
 {
   singleTableTopicById: {
+    __typename: "SingleTableTopic",
     id: 10,
     type: "TOPIC",
     position: "7",

@@ -1,5 +1,6 @@
 {
   relationalTopicById(id: 10) {
+    __typename
     id
     type
     position
