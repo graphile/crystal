@@ -14,7 +14,11 @@ export type PgEncode<TInput> = (value: TInput) => SQL;
  */
 export type PgDecode<TCanonical> = (value: string) => TCanonical;
 
-export interface PgTypeCodec<TCanonical = any, TInput = TCanonical> {
+export interface PgTypeCodec<
+  TCanonical = any,
+  TInput = TCanonical,
+  TColumns extends PgSourceColumns | undefined = any,
+> {
   /**
    * Given a value of type TInput, returns an `SQL` value to insert into an SQL
    * statement.
@@ -36,7 +40,7 @@ export interface PgTypeCodec<TCanonical = any, TInput = TCanonical> {
   /**
    * If this is a composite type, the columns it supports.
    */
-  columns?: PgSourceColumns;
+  columns?: TColumns;
 }
 
 export interface PgTypedExecutablePlan<TCodec extends PgTypeCodec = PgTypeCodec>
