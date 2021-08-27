@@ -1,0 +1,34 @@
+## expect(data.item1.id).toEqual(1);
+## expect(data.item1.title).toEqual('PostGraphile version 5');
+{
+  item1: unionItemById(id: 1) {
+    ...Item
+  }
+}
+
+fragment Item on UnionItem {
+  ... on UnionTopic {
+    id
+    title
+  }
+  ... on UnionPost {
+    id
+    title
+    description
+    note
+  }
+  ... on UnionDivider {
+    id
+    title
+    color
+  }
+  ... on UnionChecklist {
+    id
+    title
+  }
+  ... on UnionChecklistItem {
+    id
+    description
+    note
+  }
+}
