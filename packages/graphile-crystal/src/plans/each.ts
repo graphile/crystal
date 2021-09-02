@@ -28,7 +28,7 @@ export class EachPlan<
   }
 
   originalListPlan(): ListCapablePlan<TSourceData, TSourceItemPlan> {
-    const plan = this.aether.plans[this.dependencies[this.listPlanId]];
+    const plan = this.aether.getPlan(this.dependencies[this.listPlanId]);
     assertListCapablePlan(plan, this.createdWithParentPathIdentity);
     return plan as ListCapablePlan<TSourceData, TSourceItemPlan>;
   }

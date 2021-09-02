@@ -219,7 +219,7 @@ export class InputListPlan extends ExecutablePlan {
         itemPlanIndex++
       ) {
         const itemPlanId = this.itemPlanIds[itemPlanIndex];
-        const itemPlan = this.aether.plans[itemPlanId];
+        const itemPlan = this.aether.getPlan(itemPlanId);
         assertInputPlan(itemPlan);
         const value = itemPlan.eval();
         list[itemPlanIndex] = value;
@@ -232,9 +232,9 @@ export class InputListPlan extends ExecutablePlan {
 
   at(index: number): InputPlan {
     const itemPlanId = this.itemPlanIds[index];
-    const outOfBoundsPlan = this.aether.plans[this.outOfBoundsPlanId];
+    const outOfBoundsPlan = this.aether.getPlan(this.outOfBoundsPlanId);
     const itemPlan = itemPlanId
-      ? this.aether.plans[itemPlanId]
+      ? this.aether.getPlan(itemPlanId)
       : outOfBoundsPlan;
     assertInputPlan(itemPlan);
     return itemPlan;
@@ -252,7 +252,7 @@ export class InputListPlan extends ExecutablePlan {
       itemPlanIndex++
     ) {
       const itemPlanId = this.itemPlanIds[itemPlanIndex];
-      const itemPlan = this.aether.plans[itemPlanId];
+      const itemPlan = this.aether.getPlan(itemPlanId);
       assertInputPlan(itemPlan);
       const value = itemPlan.eval();
       list[itemPlanIndex] = value;

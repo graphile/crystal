@@ -53,9 +53,9 @@ export class PgPolymorphicPlan<
   }
 
   typeSpecifierPlan(): TTypeSpecifierPlan {
-    const plan = this.aether.plans[
-      this.dependencies[this.typeSpecifierPlanId]
-    ] as TTypeSpecifierPlan;
+    const plan = this.aether.getPlan(
+      this.dependencies[this.typeSpecifierPlanId],
+    ) as TTypeSpecifierPlan;
     return plan;
   }
 

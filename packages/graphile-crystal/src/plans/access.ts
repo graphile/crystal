@@ -181,7 +181,7 @@ export class AccessPlan<TData> extends ExecutablePlan<TData> {
   get<TAttr extends string>(
     attrName: TAttr,
   ): AccessPlan<TData extends { [key: string]: any } ? TData[TAttr] : never> {
-    return new AccessPlan(this.aether.plans[this.parentPlanId], [
+    return new AccessPlan(this.aether.getPlan(this.parentPlanId), [
       ...this.path,
       attrName,
     ]);
@@ -193,7 +193,7 @@ export class AccessPlan<TData> extends ExecutablePlan<TData> {
   at<TIndex extends number>(
     index: TIndex,
   ): AccessPlan<TData extends Array<any> ? TData[TIndex] : never> {
-    return new AccessPlan(this.aether.plans[this.parentPlanId], [
+    return new AccessPlan(this.aether.getPlan(this.parentPlanId), [
       ...this.path,
       index,
     ]);

@@ -151,7 +151,7 @@ export abstract class ExecutablePlan<TData = any> extends BasePlan {
   constructor() {
     super();
     this.groupId = this.aether.groupId;
-    this.id = this.aether.plans.push(this) - 1;
+    this.id = this.aether._addPlan(this);
   }
 
   public toString(): string {
@@ -233,7 +233,7 @@ export abstract class ExecutablePlan<TData = any> extends BasePlan {
     const itemPlanIds: number[] = [];
 
     for (const dependencyId of this.dependencies) {
-      const dependency = this.aether.plans[dependencyId];
+      const dependency = this.aether.getPlan(dependencyId);
       const dependencyItemPlanIds = dependency._getListItemPlanIds();
       for (const id of dependencyItemPlanIds) {
         if (!itemPlanIds.includes(id)) {

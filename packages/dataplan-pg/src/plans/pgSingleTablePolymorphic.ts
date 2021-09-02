@@ -29,7 +29,7 @@ export class PgSingleTablePolymorphicPlan<
   }
 
   private rowPlan() {
-    return this.aether.plans[this.dependencies[this.rowPlanId]];
+    return this.aether.getPlan(this.dependencies[this.rowPlanId]);
   }
 
   planForType(_type: GraphQLObjectType): ExecutablePlan {

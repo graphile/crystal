@@ -24,7 +24,7 @@ export class PgCursorPlan<
   }
 
   public getClassSinglePlan(): PgSelectSinglePlan<TDataSource> {
-    const plan = this.aether.plans[this.classSinglePlanId];
+    const plan = this.aether.getPlan(this.classSinglePlanId);
     if (!(plan instanceof PgSelectSinglePlan)) {
       throw new Error(
         `Expected ${this.classSinglePlanId} (${plan}) to be a PgSelectSinglePlan`,

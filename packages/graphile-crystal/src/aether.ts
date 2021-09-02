@@ -154,7 +154,7 @@ export class Aether<
 > {
   public maxGroupId = 0;
   public groupId = this.maxGroupId;
-  public readonly plans: ExecutablePlan[] = [];
+  private readonly plans: ExecutablePlan[] = [];
 
   /**
    * This value is ethemeral, it only contains values whilst a specific field
@@ -329,6 +329,37 @@ export class Aether<
     this.logPlansByPath();
 
     globalState.aether = null;
+  }
+
+  public getPlan: (id: number) => ExecutablePlan = isDev
+    ? (id) => {
+        // TODO: check that the caller is allowed to get plans
+        const plan = this.plans[id];
+        if (plan == null) {
+          throw new Error(
+            `Programming error: plan with id '${id}' no longer exists`,
+          );
+        }
+        return plan;
+      }
+    : (id) => {
+        const plan = this.plans[id];
+        if (plan == null) {
+          throw new Error(
+            `Programming error: plan with id '${id}' no longer exists`,
+          );
+        }
+        return plan;
+      };
+
+  /**
+   * Adds a plan to the known plans and returns the number to use as the plan
+   * id. ONLY to be used from Plan, user code should never call this directly.
+   *
+   * @internal
+   */
+  public _addPlan(plan: ExecutablePlan): number {
+    return this.plans.push(plan) - 1;
   }
 
   /**
@@ -2011,7 +2042,7 @@ function findPath(
     return [];
   }
   for (let i = 0, l = descendentPlan.dependencies.length; i < l; i++) {
-    const depPlan = aether.plans[descendentPlan.dependencies[i]];
+    const depPlan = aether.getPlan(descendentPlan.dependencies[i]);
     // Optimisation
     if (depPlan === ancestorPlan) {
       return [descendentPlan];

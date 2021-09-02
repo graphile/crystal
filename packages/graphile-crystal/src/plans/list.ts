@@ -63,9 +63,9 @@ export class ListPlan<
   public at<TIndex extends keyof TPlanTuple>(
     index: TIndex,
   ): TPlanTuple[TIndex] {
-    return this.aether.plans[
-      this.dependencies[index as number]
-    ] as TPlanTuple[TIndex];
+    return this.aether.getPlan(
+      this.dependencies[index as number],
+    ) as TPlanTuple[TIndex];
   }
 }
 
