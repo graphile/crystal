@@ -925,7 +925,16 @@ export class Aether<
     actionDescription: string,
     order: "dependents-first" | "dependencies-first",
     callback: (plan: ExecutablePlan<any>) => ExecutablePlan<any>,
-    startingAtPlanId = 0,
+    {
+      onPlanReplacement,
+      startingAtPlanId = 0,
+    }: {
+      onPlanReplacement?: (
+        originalPlan: ExecutablePlan,
+        replacementPlan: ExecutablePlan,
+      ) => void;
+      startingAtPlanId?: number;
+    } = {},
   ): void {
     depth = 0;
     const processed = new Set<ExecutablePlan>();
@@ -936,6 +945,17 @@ export class Aether<
       if (processed.has(plan)) {
         return;
       }
+      const shouldAbort = () => {
+        if (!this.plans[plan.id]) {
+          debugPlanVerbose(
+            "%c is no longer needed; aborting %s",
+            plan,
+            actionDescription,
+          );
+          return true;
+        }
+        return false;
+      };
       // Process dependents first
       const first = new Set<number>();
       if (order === "dependents-first") {
@@ -970,6 +990,9 @@ export class Aether<
           depth++;
           process(depPlan);
           depth--;
+          if (shouldAbort()) {
+            return;
+          }
         }
       }
       globalState.parentPathIdentity = plan.parentPathIdentity;
@@ -990,6 +1013,8 @@ export class Aether<
             this.plans[j] = replacementPlan;
           }
         }
+
+        onPlanReplacement?.(plan, replacementPlan);
       }
       processed.add(plan);
     };
@@ -1053,7 +1078,7 @@ export class Aether<
           }
           return replacementPlan;
         },
-        startingAtPlanId,
+        { startingAtPlanId },
       );
       loops++;
     } while (replacements > 0);
@@ -1067,8 +1092,17 @@ export class Aether<
    * before we optimise ourself.
    */
   private optimizePlans(): void {
-    this.processPlans("optimize", "dependents-first", (plan) =>
-      this.optimizePlan(plan),
+    this.processPlans(
+      "optimize",
+      "dependents-first",
+      (plan) => this.optimizePlan(plan),
+      {
+        // TODO: we should be able to optimize this - we know the new and old
+        // plan so we should be able to look at just the original plan's
+        // dependencies and see if they're needed any more or not.
+        onPlanReplacement: (_originalPlan, _replacementPlan) =>
+          this.treeShakePlans(),
+      },
     );
   }
 
@@ -1207,7 +1241,10 @@ export class Aether<
 
     for (let i = 0, l = this.plans.length; i < l; i++) {
       const plan = this.plans[i];
-      if (!activePlans.has(plan)) {
+      if (plan && !activePlans.has(plan)) {
+        if (plan.id === i) {
+          debugPlanVerbose(`Deleting plan %c during tree shaking`, plan);
+        }
         // We're going to delete this plan. Theoretically nothing can reference
         // it, so it should not cause any issues. If it does, it's due to a
         // programming bug somewhere where we're referencing a plan that hasn't
