@@ -5,7 +5,6 @@ select
       __messages__."body"::text,
       __users__."username"::text,
       __users__."gravatar_url"::text,
-      __messages__."author_id"::text,
       __messages__."id"::text,
       __users_2."username"::text,
       __users_2."gravatar_url"::text
@@ -22,9 +21,7 @@ select
         __forums__."id"::"uuid" = __messages__."forum_id"
       )
     order by __messages__."id" asc
-  ) as "1",
-  __forums__."id"::text as "2",
-  __forums__."archived_at"::text as "3"
+  ) as "1"
 from app_public.forums as __forums__
 where
   (

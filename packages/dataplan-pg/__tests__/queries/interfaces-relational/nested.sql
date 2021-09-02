@@ -5,8 +5,7 @@ select
       __relational_items_2."type"::text,
       __relational_items_2."id"::text,
       __relational_items__."type"::text,
-      __relational_items__."id"::text,
-      __relational_items_2."parent_id"::text
+      __relational_items__."id"::text
     ]::text[]
     from interfaces_and_unions.relational_items as __relational_items_2
     left outer join interfaces_and_unions.relational_items as __relational_items__
@@ -18,8 +17,7 @@ select
         true /* authorization checks */
       )
     order by __relational_items_2."id" asc
-  ) as "1",
-  __people__."person_id"::text as "2"
+  ) as "1"
 from interfaces_and_unions.people as __people__
 where (
   true /* authorization checks */

@@ -12,9 +12,7 @@ lateral (
     __relational_items__."type"::text as "2",
     __relational_items__."id"::text as "3",
     __people__."username"::text as "4",
-    __relational_items__."author_id"::text as "5",
-    __relational_items_2."parent_id"::text as "6",
-    __relational_items_identifiers__.idx as "7"
+    __relational_items_identifiers__.idx as "5"
   from interfaces_and_unions.relational_items as __relational_items_2
   left outer join interfaces_and_unions.relational_items as __relational_items__
   on (__relational_items_2."parent_id"::"int4" = __relational_items__."id")

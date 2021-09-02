@@ -4,8 +4,7 @@ select
     select array[
       __messages__."body"::text,
       __users__."username"::text,
-      __users__."gravatar_url"::text,
-      __messages__."author_id"::text
+      __users__."gravatar_url"::text
     ]::text[]
     from app_public.messages as __messages__
     left outer join app_public.users as __users__
@@ -18,9 +17,7 @@ select
       )
     order by __messages__."id" asc
     limit 2
-  ) as "1",
-  __forums__."id"::text as "2",
-  __forums__."archived_at"::text as "3"
+  ) as "1"
 from app_public.forums as __forums__
 where (
   true /* authorization checks */

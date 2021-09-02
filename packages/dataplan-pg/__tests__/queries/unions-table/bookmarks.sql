@@ -11,21 +11,17 @@ lateral (
       select array[
         __person_bookmarks__."id"::text,
         __people__."username"::text,
-        __person_bookmarks__."person_id"::text,
         __person_bookmarks__."bookmarked_entity"::text,
         __people_2."person_id"::text,
         __people_2."username"::text,
         ((__person_bookmarks__."bookmarked_entity")."person_id")::text,
         __posts__."post_id"::text,
         __people_3."username"::text,
-        __posts__."author_id"::text,
         __posts__."body"::text,
         ((__person_bookmarks__."bookmarked_entity")."post_id")::text,
         __comments__."comment_id"::text,
         __people_4."username"::text,
-        __comments__."author_id"::text,
         __posts_2."body"::text,
-        __comments__."post_id"::text,
         __comments__."body"::text,
         ((__person_bookmarks__."bookmarked_entity")."comment_id")::text
       ]::text[]

@@ -25,9 +25,7 @@ lateral (
         )
       order by __messages__."id" asc
     ) as "1",
-    __forums__."id"::text as "2",
-    __forums__."archived_at"::text as "3",
-    __forums_identifiers__.idx as "4"
+    __forums_identifiers__.idx as "2"
   from app_public.forums as __forums__
   where
     (

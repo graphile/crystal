@@ -22,8 +22,7 @@ lateral (
     __union_checklist_items__."id"::text as "12",
     __union_checklist_items__."description"::text as "13",
     __union_checklist_items__."note"::text as "14",
-    __union_items__."id"::text as "15",
-    __union_items_identifiers__.idx as "16"
+    __union_items_identifiers__.idx as "15"
   from interfaces_and_unions.union_items as __union_items__
   left outer join interfaces_and_unions.union_topics as __union_topics__
   on (__union_items__."id"::"int4" = __union_topics__."id")

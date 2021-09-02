@@ -12,18 +12,15 @@ lateral (
     __entity_search__."person_id"::text as "2",
     __posts__."post_id"::text as "3",
     __people_2."username"::text as "4",
-    __posts__."author_id"::text as "5",
-    __posts__."body"::text as "6",
-    __entity_search__."post_id"::text as "7",
-    __comments__."comment_id"::text as "8",
-    __people_3."username"::text as "9",
-    __comments__."author_id"::text as "10",
-    __posts_2."post_id"::text as "11",
-    __posts_2."body"::text as "12",
-    __comments__."post_id"::text as "13",
-    __comments__."body"::text as "14",
-    __entity_search__."comment_id"::text as "15",
-    __entity_search_identifiers__.idx as "16"
+    __posts__."body"::text as "5",
+    __entity_search__."post_id"::text as "6",
+    __comments__."comment_id"::text as "7",
+    __people_3."username"::text as "8",
+    __posts_2."post_id"::text as "9",
+    __posts_2."body"::text as "10",
+    __comments__."body"::text as "11",
+    __entity_search__."comment_id"::text as "12",
+    __entity_search_identifiers__.idx as "13"
   from interfaces_and_unions.search(__entity_search_identifiers__."id0") as __entity_search__
   left outer join interfaces_and_unions.people as __people__
   on (__entity_search__."person_id"::"int4" = __people__."person_id")

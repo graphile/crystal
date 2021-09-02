@@ -13,9 +13,7 @@ select
       )
     order by __messages__."id" asc
     limit 2
-  ) as "1",
-  __forums__."id"::text as "2",
-  __forums__."archived_at"::text as "3"
+  ) as "1"
 from app_public.forums as __forums__
 where (
   true /* authorization checks */

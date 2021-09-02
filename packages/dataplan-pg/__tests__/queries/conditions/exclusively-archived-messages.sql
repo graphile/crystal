@@ -5,7 +5,6 @@ select
       __messages__."body"::text,
       __users__."username"::text,
       __users__."gravatar_url"::text,
-      __messages__."author_id"::text,
       __messages__."id"::text,
       __users_2."username"::text,
       __users_2."gravatar_url"::text
@@ -23,8 +22,7 @@ select
       )
     order by __messages__."id" asc
     limit 5
-  ) as "1",
-  __forums__."id"::text as "2"
+  ) as "1"
 from app_public.forums as __forums__
 where (
   true /* authorization checks */

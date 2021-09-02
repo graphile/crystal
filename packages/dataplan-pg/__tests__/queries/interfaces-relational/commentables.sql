@@ -14,8 +14,7 @@ select
   __relational_items_3."position"::text as "12",
   __relational_checklist_items__."id"::text as "13",
   __relational_checklist_items__."description"::text as "14",
-  __relational_checklist_items__."note"::text as "15",
-  __relational_commentables__."id"::text as "16"
+  __relational_checklist_items__."note"::text as "15"
 from interfaces_and_unions.relational_commentables as __relational_commentables__
 left outer join interfaces_and_unions.relational_posts as __relational_posts__
 on (__relational_commentables__."id"::"int4" = __relational_posts__."id")
