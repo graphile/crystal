@@ -99,7 +99,7 @@ export class ObjectPlan<
         )}'`,
       );
     }
-    return this.aether.getPlan(this.dependencies[index]) as TPlans[TKey];
+    return this.getPlan(this.dependencies[index]) as TPlans[TKey];
   }
 }
 

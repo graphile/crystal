@@ -200,7 +200,7 @@ export function crystalWrapResolve<
         );
         return realResolver(objectValue, argumentValues, context, info);
       }
-      const plan = aether.getPlan(planId);
+      const plan = aether.dangerouslyGetPlan(planId);
       assert.ok(
         plan != null,
         `Could not find plan with id '${planId}' for path '${pathIdentity}'`,
@@ -243,7 +243,7 @@ export function crystalWrapResolve<
           parentPlanId != null,
           `Could not find a planId for (parent) path '${parentPathIdentity}'`,
         );
-        const parentPlan = aether.getPlan(parentPlanId); // TODO: assert that this is handled for us
+        const parentPlan = aether.dangerouslyGetPlan(parentPlanId); // TODO: assert that this is handled for us
         assert.ok(
           parentPlan instanceof __ValuePlan,
           "Expected parent field (which returned non-crystal object) to be a valuePlan)",

@@ -154,6 +154,14 @@ export abstract class ExecutablePlan<TData = any> extends BasePlan {
     this.id = this.aether._addPlan(this);
   }
 
+  protected getPlan(id: number): ExecutablePlan {
+    return this.aether.getPlan(id, this);
+  }
+
+  protected getDep(depId: number): ExecutablePlan {
+    return this.getPlan(this.dependencies[depId]);
+  }
+
   public toString(): string {
     const meta = this.toStringMeta();
     return chalk.bold.blue(
@@ -233,7 +241,7 @@ export abstract class ExecutablePlan<TData = any> extends BasePlan {
     const itemPlanIds: number[] = [];
 
     for (const dependencyId of this.dependencies) {
-      const dependency = this.aether.getPlan(dependencyId);
+      const dependency = this.getPlan(dependencyId);
       const dependencyItemPlanIds = dependency._getListItemPlanIds();
       for (const id of dependencyItemPlanIds) {
         if (!itemPlanIds.includes(id)) {

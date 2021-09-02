@@ -344,7 +344,7 @@ export class PgSelectPlan<
         throw new Error("Should not have any dependencies yet");
       }
       cloneFrom.dependencies.forEach((planId, idx) => {
-        const myIdx = this.addDependency(this.aether.getPlan(planId));
+        const myIdx = this.addDependency(this.getPlan(planId));
         if (myIdx !== idx) {
           throw new Error(
             `Failed to clone ${cloneFrom}; dependency indexes did not match: ${myIdx} !== ${idx}`,
@@ -536,7 +536,7 @@ export class PgSelectPlan<
     PgSelectIdentifierSpec | PgSelectArgumentSpec
   > {
     return this.queryValues.map(({ dependencyIndex, type }) => ({
-      plan: this.aether.getPlan(this.dependencies[dependencyIndex]),
+      plan: this.getPlan(this.dependencies[dependencyIndex]),
       type,
     }));
   }
@@ -1301,7 +1301,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
   mergePlaceholdersInto(otherPlan: PgSelectPlan<TDataSource>): void {
     for (const placeholder of this.placeholders) {
       const { dependencyIndex, sqlRef, type } = placeholder;
-      const dep = this.aether.getPlan(this.dependencies[dependencyIndex]);
+      const dep = this.getPlan(this.dependencies[dependencyIndex]);
       if (
         // I am uncertain on this code.
         isStaticInputPlan(dep) ||
@@ -1358,7 +1358,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
           continue;
         }
         const planId = this.dependencies[dependencyIndex];
-        const dep = this.aether.getPlan(planId);
+        const dep = this.getPlan(planId);
         if (dep instanceof __TrackedObjectPlan) {
           // This has come from a variable, context or rootValue, therefore
           // it's shared and thus safe.
@@ -1373,7 +1373,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
           dep instanceof PgClassExpressionPlan ||
           dep instanceof PgRecordPlan
         ) {
-          const p2 = this.aether.getPlan(dep.dependencies[dep.tableId]);
+          const p2 = this.getPlan(dep.dependencies[dep.tableId]);
           const t2 = dep.getClassSinglePlan().getClassPlan();
           if (t2 === this) {
             throw new Error(
@@ -1414,8 +1414,8 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
         }
       }
       if (t != null && p != null) {
-        const myContext = this.aether.getPlan(this.dependencies[this.contextId]);
-        const tsContext = this.aether.getPlan(t.dependencies[t.contextId]);
+        const myContext = this.getPlan(this.dependencies[this.contextId]);
+        const tsContext = this.getPlan(t.dependencies[t.contextId]);
         if (myContext != tsContext) {
           debugPlanVerbose(
             "Refusing to optimise %c due to own context dependency %c differing from tables context dependency %c (%c, %c)",
@@ -1462,7 +1462,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
               ...this.identifierMatches.map((identifierMatch, i) => {
                 const { dependencyIndex, type } = this.queryValues[i];
                 const plan =
-                  this.aether.getPlan(this.dependencies[dependencyIndex]);
+                  this.getPlan(this.dependencies[dependencyIndex]);
                 if (plan instanceof PgClassExpressionPlan) {
                   return sql`${plan.toSQL()}::${type} = ${identifierMatch}`;
                 } else if (isStaticInputPlan(plan)) {
@@ -1522,10 +1522,10 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
           }
         } else if (parent instanceof PgSelectSinglePlan) {
           const parent2 =
-            this.aether.getPlan(parent.dependencies[parent.itemPlanId]);
+            this.getPlan(parent.dependencies[parent.itemPlanId]);
           this.identifierMatches.forEach((identifierMatch, i) => {
             const { dependencyIndex, type } = this.queryValues[i];
-            const plan = this.aether.getPlan(this.dependencies[dependencyIndex]);
+            const plan = this.getPlan(this.dependencies[dependencyIndex]);
             if (plan instanceof PgClassExpressionPlan) {
               return this.where(
                 sql`${plan.toSQL()}::${type} = ${identifierMatch}`,
@@ -1549,7 +1549,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
             table,
             parent2,
           );
-          //console.dir(this.dependencies.map((id) => this.aether.getPlan(id)));
+          //console.dir(this.dependencies.map((id) => this.getPlan(id)));
           const rowsPlan = access<any[]>(parent2, [selfIndex]);
           if (this.shouldReverseOrder()) {
             return reverse(rowsPlan);

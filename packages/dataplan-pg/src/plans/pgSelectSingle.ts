@@ -73,7 +73,7 @@ export class PgSelectSinglePlan<
     if (this.aether.isOptimized(this)) {
       throw new Error(`Cannot ${this}.getClassPlan() after we're optimized.`);
     }
-    const plan = this.aether.getPlan(this.classPlanId);
+    const plan = this.getPlan(this.classPlanId);
     if (!(plan instanceof PgSelectPlan)) {
       throw new Error(
         `Expected ${this.classPlanId} (${plan}) to be a PgSelectPlan`,
@@ -83,7 +83,7 @@ export class PgSelectSinglePlan<
   }
 
   private getItemPlan(): ExecutablePlan<TDataSource["TRow"]> {
-    const plan = this.aether.getPlan(this.dependencies[this.itemPlanId]);
+    const plan = this.getPlan(this.dependencies[this.itemPlanId]);
     return plan;
   }
 

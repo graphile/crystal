@@ -142,7 +142,7 @@ export class PgClassExpressionPlan<
   }
 
   public getClassSinglePlan(): PgSelectSinglePlan<TDataSource> {
-    const plan = this.aether.getPlan(this.dependencies[this.tableId]);
+    const plan = this.getPlan(this.dependencies[this.tableId]);
     if (!(plan instanceof PgSelectSinglePlan)) {
       throw new Error(`Expected ${plan} to be a PgSelectSinglePlan`);
     }

@@ -29,7 +29,7 @@ export class PgConnectionPlan<
   }
 
   public getSubplan(): PgSelectPlan<TDataSource> {
-    const plan = this.aether.getPlan(this.subplanId);
+    const plan = this.getPlan(this.subplanId);
     if (!(plan instanceof PgSelectPlan)) {
       throw new Error(`Expected ${plan} to be a PgSelectPlan`);
     }

@@ -354,6 +354,16 @@ export class Aether<
     : (id, _requestingPlan) => this.plans[id];
 
   /**
+   * Get a plan without specifying who requested it; this disables all the
+   * caller checks. Only intended to be called from internal code.
+   *
+   * @internal
+   */
+  public dangerouslyGetPlan(id: number): ExecutablePlan {
+    return this.plans[id];
+  }
+
+  /**
    * Adds a plan to the known plans and returns the number to use as the plan
    * id. ONLY to be used from Plan, user code should never call this directly.
    *
@@ -1360,6 +1370,32 @@ export class Aether<
   }
 
   /**
+   * Finds a (the?) path from ancestorPlan to descendentPlan. Semi-expensive; try
+   * and only use this at planning time, not execution time. Useful for tracking
+   * down all the __ListItemPlans.
+   */
+  private findPath(
+    ancestorPlan: ExecutablePlan<any>,
+    descendentPlan: ExecutablePlan<any>,
+  ): Array<ExecutablePlan<any>> | null {
+    if (ancestorPlan === descendentPlan) {
+      return [];
+    }
+    for (let i = 0, l = descendentPlan.dependencies.length; i < l; i++) {
+      const depPlan = this.plans[descendentPlan.dependencies[i]];
+      // Optimisation
+      if (depPlan === ancestorPlan) {
+        return [descendentPlan];
+      }
+      const p = this.findPath(ancestorPlan, depPlan);
+      if (p) {
+        return [...p, descendentPlan];
+      }
+    }
+    return null;
+  }
+
+  /**
    * Implements `ExecuteBatch`.
    *
    * TODO: we can optimise this to not be `async` (only return a promise when
@@ -1387,7 +1423,7 @@ export class Aether<
       assert.ok(plan, "No plan in batch?!");
       assert.ok(itemPlan, "No itemPlan in batch?!");
 
-      const path = findPath(this, plan, itemPlan);
+      const path = this.findPath(plan, itemPlan);
       if (!path) {
         throw new Error(
           `Item plan ${itemPlan} for field plan ${plan} seem to be unrelated.`,
@@ -2027,31 +2063,4 @@ class __TypePlan extends ExecutablePlan<any> {
   execute(values: any[][]): any[] {
     return values.map((v) => ({ type: this.typeName, data: v[this.planId] }));
   }
-}
-
-/**
- * Finds a (the?) path from ancestorPlan to descendentPlan. Semi-expensive; try
- * and only use this at planning time, not execution time. Useful for tracking
- * down all the __ListItemPlans.
- */
-function findPath(
-  aether: Aether,
-  ancestorPlan: ExecutablePlan<any>,
-  descendentPlan: ExecutablePlan<any>,
-): Array<ExecutablePlan<any>> | null {
-  if (ancestorPlan === descendentPlan) {
-    return [];
-  }
-  for (let i = 0, l = descendentPlan.dependencies.length; i < l; i++) {
-    const depPlan = aether.getPlan(descendentPlan.dependencies[i]);
-    // Optimisation
-    if (depPlan === ancestorPlan) {
-      return [descendentPlan];
-    }
-    const p = findPath(aether, ancestorPlan, depPlan);
-    if (p) {
-      return [...p, descendentPlan];
-    }
-  }
-  return null;
 }
