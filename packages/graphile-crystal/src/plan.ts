@@ -241,7 +241,7 @@ export abstract class ExecutablePlan<TData = any> extends BasePlan {
     const itemPlanIds: number[] = [];
 
     for (const dependencyId of this.dependencies) {
-      const dependency = this.getPlan(dependencyId);
+      const dependency = this.aether.dangerouslyGetPlan(dependencyId);
       const dependencyItemPlanIds = dependency._getListItemPlanIds();
       for (const id of dependencyItemPlanIds) {
         if (!itemPlanIds.includes(id)) {
