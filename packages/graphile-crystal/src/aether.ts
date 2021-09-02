@@ -300,7 +300,7 @@ export class Aether<
     this.validatePlans();
 
     // Log the initial plan map
-    this.logPlansByPath();
+    this.logPlansByPath("initial");
 
     // Get rid of temporary plans
     this.treeShakePlans();
@@ -313,7 +313,7 @@ export class Aether<
     this.treeShakePlans();
 
     // Log the plan map after deduplication
-    this.logPlansByPath();
+    this.logPlansByPath("after deduplication");
 
     // Replace/inline/optimise plans
     this.optimizePlans();
@@ -326,7 +326,7 @@ export class Aether<
     this.finalizePlans();
 
     // Log the plan now we're all done
-    this.logPlansByPath();
+    this.logPlansByPath("after optimization and finalization");
 
     globalState.aether = null;
   }
@@ -961,8 +961,10 @@ export class Aether<
         const depPlan = this.plans[depId];
         if (depPlan && !processed.has(depPlan)) {
           debugPlanVerbose(
-            `Before we can process %c we must process %c`,
+            `Before we can %s %c we must %s %c`,
+            actionDescription,
             plan,
+            actionDescription,
             depPlan,
           );
           depth++;
@@ -1004,7 +1006,7 @@ export class Aether<
       // iteration.
       if (isDev && plansAdded > 100000) {
         throw new Error(
-          `Whilst processing plans as part of ${actionDescription}, ${plansAdded} new plans have been created... That seems like it's likely a bug in the relevant method of one of your plans. The last plan processed was ${
+          `Whilst processing plans as part of ${actionDescription}Plans, ${plansAdded} new plans have been created... That seems like it's likely a bug in the relevant method of one of your plans. The last plan processed was ${
             this.plans[i]
           } and this created the following plans: ${this.plans
             .slice(i + 1)
@@ -1041,7 +1043,7 @@ export class Aether<
       }
       replacements = 0;
       this.processPlans(
-        "deduplicatePlans",
+        "deduplicate",
         "dependencies-first",
         (plan) => {
           const replacementPlan = this.deduplicatePlan(plan);
@@ -1065,7 +1067,7 @@ export class Aether<
    * before we optimise ourself.
    */
   private optimizePlans(): void {
-    this.processPlans("optimizePlans", "dependents-first", (plan) =>
+    this.processPlans("optimize", "dependents-first", (plan) =>
       this.optimizePlan(plan),
     );
   }
@@ -1935,7 +1937,7 @@ export class Aether<
    *
    * @internal
    */
-  logPlans(): void {
+  logPlans(why?: string): void {
     if (!debugPlanVerbose.enabled) {
       return;
     }
@@ -1953,7 +1955,8 @@ export class Aether<
       }
     };
     debugPlanVerbose(
-      "Plans: %s",
+      "Plans%s: %s",
+      why ? ` ${why}` : "",
       "\n" +
         plans
           .map((plan, id) => {
@@ -1980,11 +1983,11 @@ export class Aether<
     );
   }
 
-  logPlansByPath(): void {
+  logPlansByPath(why?: string): void {
     if (!debugPlanVerbose.enabled) {
       return;
     }
-    this.logPlans();
+    this.logPlans(why);
     const pathIdentities = Object.keys(this.planIdByPathIdentity).sort(
       (a, z) => a.length - z.length,
     );
@@ -2017,7 +2020,11 @@ export class Aether<
       print(pathIdentity, "");
     }
 
-    debugPlanVerbose("Plans by path: %s", "\n" + lines.join("\n"));
+    debugPlanVerbose(
+      `Plans by path%s: %s`,
+      why ? ` ${why}` : "",
+      "\n" + lines.join("\n"),
+    );
   }
 }
 
