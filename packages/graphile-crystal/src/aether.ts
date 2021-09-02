@@ -331,9 +331,18 @@ export class Aether<
     globalState.aether = null;
   }
 
-  public getPlan: (id: number) => ExecutablePlan = isDev
-    ? (id) => {
-        // TODO: check that the caller is allowed to get plans
+  public getPlan: (
+    id: number,
+    requestingPlan: ExecutablePlan,
+  ) => ExecutablePlan = isDev
+    ? (id, requestingPlan) => {
+        // TODO: check that requestingPlan is allowed to get plans
+        if (this.optimizedPlans.has(requestingPlan)) {
+          throw new Error(
+            `Optimized plan ${requestingPlan} is not permitted to request other plans (requested '${id}')`,
+          );
+        }
+
         const plan = this.plans[id];
         if (plan == null) {
           throw new Error(
@@ -342,15 +351,7 @@ export class Aether<
         }
         return plan;
       }
-    : (id) => {
-        const plan = this.plans[id];
-        if (plan == null) {
-          throw new Error(
-            `Programming error: plan with id '${id}' no longer exists`,
-          );
-        }
-        return plan;
-      };
+    : (id, _requestingPlan) => this.plans[id];
 
   /**
    * Adds a plan to the known plans and returns the number to use as the plan
