@@ -619,7 +619,7 @@ export class PgSelectPlan<
         (col, i) =>
           sql`${this.alias}.${sql.identifier(
             col as string,
-          )} = ${alias}.${sql.identifier(remoteColumns[i])}`,
+          )} = ${alias}.${sql.identifier(remoteColumns[i] as string)}`,
       ),
     });
     this.relationJoins.set(relationIdentifier, alias);

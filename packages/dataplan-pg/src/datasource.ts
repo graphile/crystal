@@ -105,15 +105,19 @@ type PlanByUniques<
 > = TuplePlanOrConstantMap<TColumns, TCols[number]>[number];
 
 export interface PgSourceRelation<
-  TSource extends PgSource<any, any, any, any, any>,
+  TSource extends
+    | PgSourceBuilder<any, PgSourceColumns, any, any>
+    | PgSource<any, PgSourceColumns, any, any, any>,
   TLocalColumns extends PgSourceColumns,
 > {
   source: TSource;
   localColumns: readonly (keyof TLocalColumns)[];
 
-  // TODO: why is remoteColumns validation boiling down to `string[]` and not catching errors?
-  // NOTE: added `& string` so the type wasn't `(string | number | symbol)[]`.
-  remoteColumns: readonly (keyof TSource["columns"] & string)[];
+  remoteColumns: TSource extends PgSourceBuilder<any, infer U, any, any>
+    ? ReadonlyArray<keyof U>
+    : TSource extends PgSource<any, infer U, any, any, any>
+    ? ReadonlyArray<keyof U>
+    : never;
   isUnique: boolean;
 }
 
@@ -131,6 +135,83 @@ export interface PgSourceOptions<
   columns: TColumns | null;
   uniques?: TUniques;
   relations?: TRelations | (() => TRelations);
+}
+
+/**
+ * This class hacks around TypeScript inference issues by allowing us to define
+ * the relations at a later step to avoid circular references.
+ */
+export class PgSourceBuilder<
+  TCodec extends PgTypeCodec<any, any>,
+  TColumns extends PgSourceColumns,
+  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TParameters extends { [key: string]: any } | never = never,
+> {
+  private built: PgSource<TCodec, TColumns, TUniques, any, TParameters> | null =
+    null;
+  public codec: TCodec;
+  public columns: TColumns | null;
+  public uniques: TUniques | undefined;
+  constructor(
+    private options: Omit<
+      PgSourceOptions<TCodec, TColumns, TUniques, any, TParameters>,
+      "relations"
+    >,
+  ) {
+    this.codec = options.codec;
+    this.columns = options.columns;
+    this.uniques = options.uniques;
+  }
+
+  build<
+    TRelations extends {
+      [identifier: string]: PgSourceRelation<
+        | PgSourceBuilder<any, PgSourceColumns, any, any>
+        | PgSource<any, PgSourceColumns, any, any>,
+        TColumns
+      >;
+    },
+  >({
+    relations,
+  }: {
+    relations?: TRelations;
+  }): PgSource<TCodec, TColumns, TUniques, TRelations, TParameters> {
+    if (this.built) {
+      throw new Error("This builder has already been built!");
+    }
+    this.built = new PgSource({
+      ...this.options,
+      ...(relations
+        ? {
+            relations: () => {
+              // Replace the PgSourceBuilders with PgSources
+              return Object.keys(relations).reduce((memo, key) => {
+                const spec = relations[key];
+                if (spec.source instanceof PgSourceBuilder) {
+                  const { source: sourceBuilder, ...rest } = spec;
+                  const source = sourceBuilder.get();
+                  memo[key] = {
+                    source,
+                    ...rest,
+                  };
+                } else {
+                  memo[key] = spec;
+                }
+                return memo;
+              }, {});
+            },
+          }
+        : null),
+    });
+    return this.built;
+  }
+
+  get(): PgSource<TCodec, TColumns, TUniques, any, TParameters> {
+    if (!this.built) {
+      throw new Error("This builder has not been built!");
+    }
+    return this.built;
+  }
 }
 
 /**

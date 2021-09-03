@@ -14,16 +14,19 @@ debugFactory.formatters.S = sqlPrint;
 export { enumType, recordType, TYPES } from "./codecs";
 export {
   PgSource,
+  PgSourceBuilder,
   PgSourceColumn,
   PgSourceColumns,
   PgSourceColumnVia,
   PgSourceColumnViaExplicit,
+  PgSourceRelation,
 } from "./datasource";
 export {
   PgClient,
   PgClientQuery,
   PgExecutor,
   PgExecutorContext,
+  PgExecutorContextPlans,
   WithPgClient,
 } from "./executor";
 export { PgTypeCodec } from "./interfaces";

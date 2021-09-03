@@ -43,10 +43,12 @@ import { inspect } from "util";
 import type {
   PgClassExpressionPlan,
   PgConditionCapableParentPlan,
-  PgExecutorContext,
+  PgExecutorContextPlans,
   PgSelectPlan,
   PgSourceColumn,
+  PgSourceColumns,
   PgSourceColumnVia,
+  PgSourceRelation,
   PgTypeCodec,
   WithPgClient,
 } from "../src";
@@ -61,6 +63,7 @@ import {
   PgSelectSinglePlan,
   pgSingleTablePolymorphic,
   PgSource,
+  PgSourceBuilder,
   recordType,
   TYPES,
 } from "../src";
@@ -211,7 +214,7 @@ export function makeExampleSchema(
     name: "default",
     context: () => {
       const $context = context();
-      return object<PgExecutorContext<BaseGraphQLContext["pgSettings"]>>({
+      return object<PgExecutorContextPlans<BaseGraphQLContext["pgSettings"]>>({
         pgSettings: $context.get("pgSettings"),
         withPgClient: $context.get("withPgClient"),
       });
@@ -289,27 +292,13 @@ export function makeExampleSchema(
     columns: forumColumns,
   });
 
-  const messageSource = new PgSource({
+  const messageSourceBuilder = new PgSourceBuilder({
     executor,
     codec: recordType(sql`app_public.messages`, messageColumns),
     source: sql`app_public.messages`,
     name: "messages",
     columns: messageColumns,
     uniques: [["id"]],
-    relations: () => ({
-      author: {
-        source: userSource,
-        localColumns: [`author_id`],
-        remoteColumns: [`id`],
-        isUnique: true,
-      },
-      forum: {
-        source: forumSource,
-        localColumns: ["forum_id"],
-        remoteColumns: ["id"],
-        isUnique: true,
-      },
-    }),
   });
 
   const userSource = new PgSource({
@@ -328,6 +317,23 @@ export function makeExampleSchema(
     name: "forums",
     columns: forumColumns,
     uniques: [["id"]],
+  });
+
+  const messageSource = messageSourceBuilder.build({
+    relations: {
+      author: {
+        source: userSource,
+        localColumns: [`author_id`],
+        remoteColumns: [`id`],
+        isUnique: true,
+      },
+      forum: {
+        source: forumSource,
+        localColumns: ["forum_id"],
+        remoteColumns: ["id"],
+        isUnique: true,
+      },
+    },
   });
 
   const unionEntityColumns = {
@@ -351,7 +357,7 @@ export function makeExampleSchema(
       notNull: true,
     }),
   };
-  const personBookmarksSource = new PgSource({
+  const personBookmarksSourceBuilder = new PgSourceBuilder({
     executor,
     codec: recordType(
       sql`interfaces_and_unions.person_bookmarks`,
@@ -361,14 +367,6 @@ export function makeExampleSchema(
     name: "person_bookmarks",
     columns: personBookmarkColumns,
     uniques: [["id"]],
-    relations: () => ({
-      person: {
-        source: personSource,
-        isUnique: true,
-        localColumns: ["person_id"],
-        remoteColumns: ["person_id"],
-      },
-    }),
   });
 
   const personColumns = {
@@ -376,39 +374,13 @@ export function makeExampleSchema(
     username: col({ codec: TYPES.text, notNull: true }),
   };
 
-  const personSource = new PgSource({
+  const personSourceBuilder = new PgSourceBuilder({
     executor,
     codec: recordType(sql`interfaces_and_unions.people`, personColumns),
     source: sql`interfaces_and_unions.people`,
     name: "people",
     columns: personColumns,
     uniques: [["person_id"], ["username"]],
-    relations: () => ({
-      singleTableItems: {
-        source: singleTableItemsSource,
-        isUnique: false,
-        localColumns: ["person_id"],
-        remoteColumns: ["author_id"],
-      },
-      posts: {
-        source: postSource,
-        isUnique: false,
-        localColumns: ["person_id"],
-        remoteColumns: ["author_id"],
-      },
-      comments: {
-        source: postSource,
-        isUnique: false,
-        localColumns: ["person_id"],
-        remoteColumns: ["author_id"],
-      },
-      personBookmarks: {
-        source: personBookmarksSource,
-        isUnique: false,
-        localColumns: ["person_id"],
-        remoteColumns: ["person_id"],
-      },
-    }),
   });
 
   const postColumns = {
@@ -421,27 +393,13 @@ export function makeExampleSchema(
     body: col({ codec: TYPES.text, notNull: true }),
   };
 
-  const postSource = new PgSource({
+  const postSourceBuilder = new PgSourceBuilder({
     executor,
     codec: recordType(sql`interfaces_and_unions.posts`, postColumns),
     source: sql`interfaces_and_unions.posts`,
     name: "posts",
     columns: postColumns,
     uniques: [["post_id"]],
-    relations: () => ({
-      author: {
-        source: personSource,
-        isUnique: true,
-        localColumns: ["author_id"],
-        remoteColumns: ["person_id"],
-      },
-      comments: {
-        source: commentSource,
-        isUnique: false,
-        localColumns: ["post_id"],
-        remoteColumns: ["post_id"],
-      },
-    }),
   });
 
   const commentColumns = {
@@ -459,27 +417,13 @@ export function makeExampleSchema(
     body: col({ codec: TYPES.text, notNull: true }),
   };
 
-  const commentSource = new PgSource({
+  const commentSourceBuilder = new PgSourceBuilder({
     executor,
     codec: recordType(sql`interfaces_and_unions.comments`, commentColumns),
     source: sql`interfaces_and_unions.comments`,
     name: "comments",
     columns: commentColumns,
     uniques: [["comment_id"]],
-    relations: () => ({
-      author: {
-        source: personSource,
-        isUnique: true,
-        localColumns: ["author_id"],
-        remoteColumns: ["person_id"],
-      },
-      post: {
-        source: postSource,
-        isUnique: true,
-        localColumns: ["post_id"],
-        remoteColumns: ["post_id"],
-      },
-    }),
   });
 
   const singleTableItemColumns = {
@@ -510,7 +454,7 @@ export function makeExampleSchema(
     note: col({ codec: TYPES.text, notNull: false }),
     color: col({ codec: TYPES.text, notNull: false }),
   };
-  const singleTableItemsSource = new PgSource({
+  const singleTableItemsSourceBuilder = new PgSourceBuilder({
     executor,
     codec: recordType(
       sql`interfaces_and_unions.single_table_items`,
@@ -520,15 +464,92 @@ export function makeExampleSchema(
     name: "single_table_items",
     columns: singleTableItemColumns,
     uniques: [["id"]],
-    relations: () => ({
+  });
+
+  const personBookmarksSource = personBookmarksSourceBuilder.build({
+    relations: {
+      person: {
+        source: personSourceBuilder,
+        isUnique: true,
+        localColumns: ["person_id"],
+        remoteColumns: ["person_id"],
+      },
+    },
+  });
+
+  const personSource = personSourceBuilder.build({
+    relations: {
+      singleTableItems: {
+        source: singleTableItemsSourceBuilder,
+        isUnique: false,
+        localColumns: ["person_id"],
+        remoteColumns: ["author_id"],
+      },
+      posts: {
+        source: postSourceBuilder,
+        isUnique: false,
+        localColumns: ["person_id"],
+        remoteColumns: ["author_id"],
+      },
+      comments: {
+        source: postSourceBuilder,
+        isUnique: false,
+        localColumns: ["person_id"],
+        remoteColumns: ["author_id"],
+      },
+      personBookmarks: {
+        source: personBookmarksSource,
+        isUnique: false,
+        localColumns: ["person_id"],
+        remoteColumns: ["person_id"],
+      },
+    },
+  });
+
+  const postSource = postSourceBuilder.build({
+    relations: {
+      author: {
+        source: personSource,
+        isUnique: true,
+        localColumns: ["author_id"],
+        remoteColumns: ["person_id"],
+      },
+      comments: {
+        source: commentSourceBuilder,
+        isUnique: false,
+        localColumns: ["post_id"],
+        remoteColumns: ["post_id"],
+      },
+    },
+  });
+
+  const commentSource = commentSourceBuilder.build({
+    relations: {
+      author: {
+        source: personSource,
+        isUnique: true,
+        localColumns: ["author_id"],
+        remoteColumns: ["person_id"],
+      },
+      post: {
+        source: postSource,
+        isUnique: true,
+        localColumns: ["post_id"],
+        remoteColumns: ["post_id"],
+      },
+    },
+  });
+
+  const singleTableItemsSource = singleTableItemsSourceBuilder.build({
+    relations: {
       parent: {
-        source: singleTableItemsSource,
+        source: singleTableItemsSourceBuilder,
         isUnique: true,
         localColumns: ["parent_id"],
         remoteColumns: ["id"],
       },
       children: {
-        source: singleTableItemsSource,
+        source: singleTableItemsSourceBuilder,
         isUnique: false,
         localColumns: ["id"],
         remoteColumns: ["parent_id"],
@@ -539,7 +560,7 @@ export function makeExampleSchema(
         localColumns: ["author_id"],
         remoteColumns: ["person_id"],
       },
-    }),
+    },
   });
 
   const relationalItemColumns = {
@@ -566,7 +587,7 @@ export function makeExampleSchema(
     archived_at: col({ codec: TYPES.timestamptz, notNull: false }),
   };
 
-  const relationalItemsSource = new PgSource({
+  const relationalItemsSourceBuilder = new PgSourceBuilder({
     executor,
     codec: recordType(
       sql`interfaces_and_unions.relational_items`,
@@ -576,61 +597,6 @@ export function makeExampleSchema(
     name: "relational_items",
     columns: relationalItemColumns,
     uniques: [["id"]],
-    relations: () => ({
-      parent: {
-        source: relationalItemsSource,
-        isUnique: true,
-        localColumns: ["parent_id"] as const,
-        remoteColumns: ["id"] as const,
-      },
-      children: {
-        source: relationalItemsSource,
-        isUnique: false,
-        localColumns: ["id"] as const,
-        remoteColumns: ["parent_id"] as const,
-      },
-      author: {
-        source: personSource,
-        isUnique: true,
-        localColumns: ["author_id"] as const,
-        remoteColumns: ["person_id"] as const,
-      },
-      topic: {
-        source: relationalTopicsSource,
-        localColumns: [`id`] as const,
-        remoteColumns: [`id`] as const,
-        isUnique: true,
-        // reciprocal: 'item',
-      },
-      post: {
-        source: relationalPostsSource,
-        localColumns: [`id`] as const,
-        remoteColumns: [`id`] as const,
-        isUnique: true,
-        // reciprocal: 'item',
-      },
-      divider: {
-        source: relationalDividersSource,
-        localColumns: [`id`] as const,
-        remoteColumns: [`id`] as const,
-        isUnique: true,
-        // reciprocal: 'item',
-      },
-      checklist: {
-        source: relationalChecklistsSource,
-        localColumns: [`id`] as const,
-        remoteColumns: [`id`] as const,
-        isUnique: true,
-        // reciprocal: 'item',
-      },
-      checklistItem: {
-        source: relationalChecklistItemsSource,
-        localColumns: [`id`] as const,
-        remoteColumns: [`id`] as const,
-        isUnique: true,
-        // reciprocal: 'item',
-      },
-    }),
   });
 
   const relationalCommentableColumns = {
@@ -641,7 +607,7 @@ export function makeExampleSchema(
     }),
   };
 
-  const relationalCommentableSource = new PgSource({
+  const relationalCommentableSourceBuilder = new PgSourceBuilder({
     executor,
     codec: recordType(
       sql`interfaces_and_unions.relational_commentables`,
@@ -650,29 +616,6 @@ export function makeExampleSchema(
     source: sql`interfaces_and_unions.relational_commentables`,
     name: "relational_commentables",
     columns: relationalCommentableColumns,
-    relations: () => ({
-      post: {
-        source: relationalPostsSource,
-        localColumns: [`id`] as const,
-        remoteColumns: [`id`] as const,
-        isUnique: true,
-        // reciprocal: 'item',
-      },
-      checklist: {
-        source: relationalChecklistsSource,
-        localColumns: [`id`] as const,
-        remoteColumns: [`id`] as const,
-        isUnique: true,
-        // reciprocal: 'item',
-      },
-      checklistItem: {
-        source: relationalChecklistItemsSource,
-        localColumns: [`id`] as const,
-        remoteColumns: [`id`] as const,
-        isUnique: true,
-        // reciprocal: 'item',
-      },
-    }),
   });
 
   const itemColumns = {
@@ -701,13 +644,13 @@ export function makeExampleSchema(
 
   const itemRelations = {
     item: {
-      source: relationalItemsSource,
+      source: relationalItemsSourceBuilder,
       localColumns: [`id`] as const,
       remoteColumns: [`id`] as const,
       isUnique: true,
     },
     parent: {
-      source: relationalItemsSource,
+      source: relationalItemsSourceBuilder,
       localColumns: [`parent_id`] as const,
       remoteColumns: [`id`] as const,
       isUnique: true,
@@ -721,7 +664,7 @@ export function makeExampleSchema(
   };
 
   const commentableRelation = {
-    source: relationalCommentableSource,
+    source: relationalCommentableSourceBuilder,
     localColumns: [`id`] as const,
     remoteColumns: [`id`] as const,
     isUnique: true,
@@ -732,7 +675,7 @@ export function makeExampleSchema(
 
     ...itemColumns,
   };
-  const relationalTopicsSource = new PgSource({
+  const relationalTopicsSourceBuilder = new PgSourceBuilder({
     executor,
     codec: recordType(
       sql`interfaces_and_unions.relational_topics`,
@@ -742,9 +685,6 @@ export function makeExampleSchema(
     name: "relational_topics",
     columns: relationalTopicsColumns,
     uniques: [["id"]],
-    relations: {
-      ...itemRelations,
-    },
   });
 
   const relationalPostsColumns = {
@@ -754,7 +694,7 @@ export function makeExampleSchema(
 
     ...itemColumns,
   };
-  const relationalPostsSource = new PgSource({
+  const relationalPostsSourceBuilder = new PgSourceBuilder({
     executor,
     codec: recordType(
       sql`interfaces_and_unions.relational_posts`,
@@ -764,10 +704,6 @@ export function makeExampleSchema(
     name: "relational_posts",
     columns: relationalPostsColumns,
     uniques: [["id"]],
-    relations: {
-      ...itemRelations,
-      commentable: commentableRelation,
-    },
   });
 
   const relationalDividersColumns = {
@@ -776,7 +712,7 @@ export function makeExampleSchema(
 
     ...itemColumns,
   };
-  const relationalDividersSource = new PgSource({
+  const relationalDividersSourceBuilder = new PgSourceBuilder({
     executor,
     codec: recordType(
       sql`interfaces_and_unions.relational_dividers`,
@@ -786,9 +722,6 @@ export function makeExampleSchema(
     name: "relational_dividers",
     columns: relationalDividersColumns,
     uniques: [["id"]],
-    relations: {
-      ...itemRelations,
-    },
   });
 
   const relationalChecklistsColumns = {
@@ -796,7 +729,7 @@ export function makeExampleSchema(
 
     ...itemColumns,
   };
-  const relationalChecklistsSource = new PgSource({
+  const relationalChecklistsSourceBuilder = new PgSourceBuilder({
     executor,
     codec: recordType(
       sql`interfaces_and_unions.relational_checklists`,
@@ -806,10 +739,6 @@ export function makeExampleSchema(
     name: "relational_checklists",
     columns: relationalChecklistsColumns,
     uniques: [["id"]],
-    relations: {
-      ...itemRelations,
-      commentable: commentableRelation,
-    },
   });
 
   const relationalChecklistItemsColumns = {
@@ -818,7 +747,7 @@ export function makeExampleSchema(
 
     ...itemColumns,
   };
-  const relationalChecklistItemsSource = new PgSource({
+  const relationalChecklistItemsSourceBuilder = new PgSourceBuilder({
     executor,
     codec: recordType(
       sql`interfaces_and_unions.relational_checklist_items`,
@@ -828,11 +757,117 @@ export function makeExampleSchema(
     name: "relational_checklist_items",
     columns: relationalChecklistItemsColumns,
     uniques: [["id"]],
+  });
+
+  const relationalItemsSource = relationalItemsSourceBuilder.build({
+    relations: {
+      parent: {
+        source: relationalItemsSourceBuilder,
+        isUnique: true,
+        localColumns: ["parent_id"] as const,
+        remoteColumns: ["id"] as const,
+      },
+      children: {
+        source: relationalItemsSourceBuilder,
+        isUnique: false,
+        localColumns: ["id"] as const,
+        remoteColumns: ["parent_id"] as const,
+      },
+      author: {
+        source: personSource,
+        isUnique: true,
+        localColumns: ["author_id"] as const,
+        remoteColumns: ["person_id"] as const,
+      },
+      topic: {
+        source: relationalTopicsSourceBuilder,
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
+        isUnique: true,
+        // reciprocal: 'item',
+      },
+      post: {
+        source: relationalPostsSourceBuilder,
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
+        isUnique: true,
+        // reciprocal: 'item',
+      },
+      divider: {
+        source: relationalDividersSourceBuilder,
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
+        isUnique: true,
+        // reciprocal: 'item',
+      },
+      checklist: {
+        source: relationalChecklistsSourceBuilder,
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
+        isUnique: true,
+        // reciprocal: 'item',
+      },
+      checklistItem: {
+        source: relationalChecklistItemsSourceBuilder,
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
+        isUnique: true,
+        // reciprocal: 'item',
+      },
+    },
+  });
+
+  const relationalCommentableSource = relationalCommentableSourceBuilder.build({
+    relations: {
+      post: {
+        source: relationalPostsSourceBuilder,
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
+        isUnique: true,
+        // reciprocal: 'item',
+      },
+      checklist: {
+        source: relationalChecklistsSourceBuilder,
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
+        isUnique: true,
+        // reciprocal: 'item',
+      },
+      checklistItem: {
+        source: relationalChecklistItemsSourceBuilder,
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
+        isUnique: true,
+        // reciprocal: 'item',
+      },
+    },
+  });
+
+  const relationalTopicsSource = relationalTopicsSourceBuilder.build({
+    relations: itemRelations,
+  });
+  const relationalPostsSource = relationalPostsSourceBuilder.build({
     relations: {
       ...itemRelations,
       commentable: commentableRelation,
     },
   });
+  const relationalDividersSource = relationalDividersSourceBuilder.build({
+    relations: itemRelations,
+  });
+  const relationalChecklistsSource = relationalChecklistsSourceBuilder.build({
+    relations: {
+      ...itemRelations,
+      commentable: commentableRelation,
+    },
+  });
+  const relationalChecklistItemsSource =
+    relationalChecklistItemsSourceBuilder.build({
+      relations: {
+        ...itemRelations,
+        commentable: commentableRelation,
+      },
+    });
 
   ////////////////////////////////////////
 
@@ -843,7 +878,7 @@ export function makeExampleSchema(
       notNull: true,
     }),
   };
-  const unionItemsSource = new PgSource({
+  const unionItemsSourceBuilder = new PgSourceBuilder({
     executor,
     codec: recordType(
       sql`interfaces_and_unions.union_items`,
@@ -853,38 +888,6 @@ export function makeExampleSchema(
     name: "union_items",
     columns: unionItemsColumns,
     uniques: [["id"]],
-    relations: () => ({
-      topic: {
-        source: unionTopicsSource,
-        localColumns: [`id`] as const,
-        remoteColumns: [`id`] as const,
-        isUnique: true,
-      },
-      post: {
-        source: unionPostsSource,
-        localColumns: [`id`] as const,
-        remoteColumns: [`id`] as const,
-        isUnique: true,
-      },
-      divider: {
-        source: unionDividersSource,
-        localColumns: [`id`] as const,
-        remoteColumns: [`id`] as const,
-        isUnique: true,
-      },
-      checklist: {
-        source: unionChecklistsSource,
-        localColumns: [`id`] as const,
-        remoteColumns: [`id`] as const,
-        isUnique: true,
-      },
-      checklistItem: {
-        source: unionChecklistItemsSource,
-        localColumns: [`id`] as const,
-        remoteColumns: [`id`] as const,
-        isUnique: true,
-      },
-    }),
   });
 
   const unionTopicsColumns = {
@@ -981,6 +984,41 @@ export function makeExampleSchema(
       sql`interfaces_and_unions.search(${sql.join(args, ", ")})`,
     name: "entity_search",
     columns: unionEntityColumns,
+  });
+
+  const unionItemsSource = unionItemsSourceBuilder.build({
+    relations: {
+      topic: {
+        source: unionTopicsSource,
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
+        isUnique: true,
+      },
+      post: {
+        source: unionPostsSource,
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
+        isUnique: true,
+      },
+      divider: {
+        source: unionDividersSource,
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
+        isUnique: true,
+      },
+      checklist: {
+        source: unionChecklistsSource,
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
+        isUnique: true,
+      },
+      checklistItem: {
+        source: unionChecklistItemsSource,
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
+        isUnique: true,
+      },
+    },
   });
 
   // TODO: interfaces_and_unions.union__entity
