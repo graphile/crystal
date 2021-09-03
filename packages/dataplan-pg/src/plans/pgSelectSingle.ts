@@ -2,21 +2,12 @@ import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
 import { ExecutablePlan } from "graphile-crystal";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
-import { inspect } from "util";
 
-import type {
-  PgSource,
-  PgSourceColumn,
-  PgSourceColumnVia,
-  PgSourceColumnViaExplicit,
-  PgSourceRelation,
-} from "../datasource";
+import type { PgSource, PgSourceColumn, PgSourceRelation } from "../datasource";
 import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
 import type { PgClassExpressionPlan } from "./pgClassExpression";
 import { pgClassExpression } from "./pgClassExpression";
 import { PgCursorPlan } from "./pgCursor";
-import type { PgRecordPlan } from "./pgRecord";
-import { pgRecord } from "./pgRecord";
 import { PgSelectPlan } from "./pgSelect";
 // import debugFactory from "debug";
 
@@ -24,10 +15,6 @@ import { PgSelectPlan } from "./pgSelect";
 // const debugExecute = debugFactory("datasource:pg:PgSelectSinglePlan:execute");
 // const debugPlanVerbose = debugPlan.extend("verbose");
 // const debugExecuteVerbose = debugExecute.extend("verbose");
-
-interface RelationalShortcuts {
-  [key: string]: PgSelectSinglePlan<any>;
-}
 
 export interface PgSelectSinglePlanOptions {
   fromRelation?: [PgSelectSinglePlan<any>, string];
@@ -259,8 +246,10 @@ export class PgSelectSinglePlan<
     );
   }
 
-  record(): PgRecordPlan<TDataSource> {
-    return pgRecord(this, this.dataSource.codec, this.getClassPlan().alias);
+  record(): PgClassExpressionPlan<TDataSource, TDataSource["codec"]> {
+    return pgClassExpression(this, this.dataSource.codec)`${
+      this.getClassPlan().alias
+    }`;
   }
 
   /**

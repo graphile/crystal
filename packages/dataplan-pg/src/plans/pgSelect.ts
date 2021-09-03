@@ -25,7 +25,6 @@ import type { PgSource, PgSourceRelation } from "../datasource";
 import type { PgOrderSpec, PgTypedExecutablePlan } from "../interfaces";
 import { PgClassExpressionPlan } from "./pgClassExpression";
 import { PgConditionPlan } from "./pgCondition";
-import { PgRecordPlan } from "./pgRecord";
 import type { PgSelectSinglePlanOptions } from "./pgSelectSingle";
 import { PgSelectSinglePlan } from "./pgSelectSingle";
 
@@ -1317,10 +1316,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
           type,
           sqlRef,
         });
-      } else if (
-        dep instanceof PgClassExpressionPlan ||
-        dep instanceof PgRecordPlan
-      ) {
+      } else if (dep instanceof PgClassExpressionPlan) {
         // Replace with a reference.
         placeholder.sqlRef.sql = dep.toSQL();
       } else {
@@ -1369,10 +1365,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
           // it's shared and thus safe.
           continue;
         }
-        if (
-          dep instanceof PgClassExpressionPlan ||
-          dep instanceof PgRecordPlan
-        ) {
+        if (dep instanceof PgClassExpressionPlan) {
           const p2 = this.getPlan(dep.dependencies[dep.tableId]);
           const t2 = dep.getClassSinglePlan().getClassPlan();
           if (t2 === this) {
@@ -1461,8 +1454,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
             const conditions = [
               ...this.identifierMatches.map((identifierMatch, i) => {
                 const { dependencyIndex, type } = this.queryValues[i];
-                const plan =
-                  this.getPlan(this.dependencies[dependencyIndex]);
+                const plan = this.getPlan(this.dependencies[dependencyIndex]);
                 if (plan instanceof PgClassExpressionPlan) {
                   return sql`${plan.toSQL()}::${type} = ${identifierMatch}`;
                 } else if (isStaticInputPlan(plan)) {
@@ -1521,8 +1513,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
             return list([parent]);
           }
         } else if (parent instanceof PgSelectSinglePlan) {
-          const parent2 =
-            this.getPlan(parent.dependencies[parent.itemPlanId]);
+          const parent2 = this.getPlan(parent.dependencies[parent.itemPlanId]);
           this.identifierMatches.forEach((identifierMatch, i) => {
             const { dependencyIndex, type } = this.queryValues[i];
             const plan = this.getPlan(this.dependencies[dependencyIndex]);
