@@ -86,6 +86,15 @@ import {
   uid,
 } from "./utils";
 
+type AetherPhase =
+  | "init"
+  | "plan"
+  | "validate"
+  | "deduplicate"
+  | "optimize"
+  | "finalize"
+  | "ready";
+
 function newCrystalLayerObject(
   crystalObject: CrystalObject<any>,
   indexByListItemPlanId: {
@@ -152,6 +161,8 @@ export class Aether<
   TContext extends BaseGraphQLContext = BaseGraphQLContext,
   TRootValue extends BaseGraphQLRootValue = BaseGraphQLRootValue,
 > {
+  private phase: AetherPhase = "init";
+
   public maxGroupId = 0;
   public groupId = this.maxGroupId;
   private readonly plans: ExecutablePlan[] = [];
@@ -234,6 +245,7 @@ export class Aether<
       );
     }
 
+    this.phase = "plan";
     globalState.aether = this;
     globalState.parentPathIdentity = GLOBAL_PATH;
     this.variableValuesPlan = new __ValuePlan();
@@ -296,6 +308,8 @@ export class Aether<
       }
     }
 
+    this.phase = "validate";
+
     // Helpfully check plans don't do forbidden things.
     this.validatePlans();
 
@@ -304,6 +318,8 @@ export class Aether<
 
     // Get rid of temporary plans
     this.treeShakePlans();
+
+    this.phase = "deduplicate";
 
     // Squish plans together; this should result in no changes because plans
     // are deduplicated during creation.
@@ -315,11 +331,15 @@ export class Aether<
     // Log the plan map after deduplication
     this.logPlansByPath("after deduplication");
 
+    this.phase = "optimize";
+
     // Replace/inline/optimise plans
     this.optimizePlans();
 
     // Get rid of plans that are no longer needed after optimising
     this.treeShakePlans();
+
+    this.phase = "finalize";
 
     // Plans are expected to execute later; they may take steps here to prepare
     // themselves (e.g. compiling SQL queries ahead of time).
@@ -327,6 +347,8 @@ export class Aether<
 
     // Log the plan now we're all done
     this.logPlansByPath("after optimization and finalization");
+
+    this.phase = "ready";
 
     globalState.aether = null;
   }
@@ -336,6 +358,14 @@ export class Aether<
     requestingPlan: ExecutablePlan,
   ) => ExecutablePlan = isDev
     ? (id, requestingPlan) => {
+        if (
+          !["plan", "validate", "deduplicate", "optimize"].includes(this.phase)
+        ) {
+          throw new Error(
+            `Getting a plan during the '${this.phase}' phase is forbidden - please do so before or during the optimize phase.`,
+          );
+        }
+
         // TODO: check that requestingPlan is allowed to get plans
         if (this.optimizedPlans.has(requestingPlan)) {
           throw new Error(
@@ -370,6 +400,11 @@ export class Aether<
    * @internal
    */
   public _addPlan(plan: ExecutablePlan): number {
+    if (!["plan", "validate", "deduplicate", "optimize"].includes(this.phase)) {
+      throw new Error(
+        `Creating a plan during the '${this.phase}' phase is forbidden.`,
+      );
+    }
     return this.plans.push(plan) - 1;
   }
 
