@@ -353,61 +353,6 @@ export class Aether<
     globalState.aether = null;
   }
 
-  public getPlan: (
-    id: number,
-    requestingPlan: ExecutablePlan,
-  ) => ExecutablePlan = isDev
-    ? (id, requestingPlan) => {
-        if (
-          !["plan", "validate", "deduplicate", "optimize"].includes(this.phase)
-        ) {
-          throw new Error(
-            `Getting a plan during the '${this.phase}' phase is forbidden - please do so before or during the optimize phase.`,
-          );
-        }
-
-        // TODO: check that requestingPlan is allowed to get plans
-        if (this.optimizedPlans.has(requestingPlan)) {
-          throw new Error(
-            `Optimized plan ${requestingPlan} is not permitted to request other plans (requested '${id}')`,
-          );
-        }
-
-        const plan = this.plans[id];
-        if (plan == null) {
-          throw new Error(
-            `Programming error: plan with id '${id}' no longer exists`,
-          );
-        }
-        return plan;
-      }
-    : (id, _requestingPlan) => this.plans[id];
-
-  /**
-   * Get a plan without specifying who requested it; this disables all the
-   * caller checks. Only intended to be called from internal code.
-   *
-   * @internal
-   */
-  public dangerouslyGetPlan(id: number): ExecutablePlan {
-    return this.plans[id];
-  }
-
-  /**
-   * Adds a plan to the known plans and returns the number to use as the plan
-   * id. ONLY to be used from Plan, user code should never call this directly.
-   *
-   * @internal
-   */
-  public _addPlan(plan: ExecutablePlan): number {
-    if (!["plan", "validate", "deduplicate", "optimize"].includes(this.phase)) {
-      throw new Error(
-        `Creating a plan during the '${this.phase}' phase is forbidden.`,
-      );
-    }
-    return this.plans.push(plan) - 1;
-  }
-
   /**
    * Implements the `PlanAetherQuery` algorithm.
    */
@@ -611,7 +556,7 @@ export class Aether<
    * tree and add in `__ListItemPlan`s in the relevant places so that we can
    * refer to indexes when referencing the relevant values.
    */
-  planSelectionSetForType(
+  private planSelectionSetForType(
     fieldType: GraphQLOutputType,
     fields: FieldNode[],
     pathIdentity: string,
@@ -1228,10 +1173,6 @@ export class Aether<
     return replacementPlan;
   }
 
-  public isOptimized(plan: ExecutablePlan): boolean {
-    return this.optimizedPlans.has(plan);
-  }
-
   /**
    * Implements the `MarkPlanActive` algorithm.
    */
@@ -1313,136 +1254,6 @@ export class Aether<
     }
   }
 
-  //----------------------------------------
-
-  public newBatch(
-    pathIdentity: string,
-    returnType: GraphQLOutputType,
-    crystalContext: CrystalContext,
-  ): Batch {
-    const planId = this.planIdByPathIdentity[pathIdentity];
-    const itemPlanId = this.itemPlanIdByPathIdentity[pathIdentity];
-    assert.ok(
-      planId != null,
-      `Could not find the planId for path identity '${pathIdentity}'`,
-    );
-    assert.ok(
-      itemPlanId != null,
-      `Could not find the itemPlanId for path identity '${pathIdentity}'`,
-    );
-    const plan = this.plans[planId];
-    const itemPlan = this.plans[itemPlanId];
-    assert.ok(
-      plan,
-      `Could not find the plan with id '${planId}' at '${pathIdentity}'`,
-    );
-    assert.ok(
-      itemPlan,
-      `Could not find the itemPlan with id '${itemPlanId}' at '${pathIdentity}'`,
-    );
-    const batch: Batch = {
-      pathIdentity,
-      crystalContext,
-      plan,
-      itemPlan,
-      entries: [],
-      returnType,
-    };
-    return batch;
-  }
-
-  /**
-   * Implements `NewCrystalContext`.
-   */
-  public newCrystalContext(
-    variableValues: {
-      [variableName: string]: unknown;
-    },
-    context: object,
-    rootValue: unknown,
-  ): CrystalContext {
-    const rootId = uid("root");
-    debugExecuteVerbose("Root id is %c", rootId);
-    const crystalContext: CrystalContext = {
-      aether: this,
-      resultByIndexesByPlanId: new Map(),
-      metaByPlanId: Object.create(null),
-      rootId,
-      // @ts-ignore We'll set this in just a moment...
-      rootCrystalObject: null,
-    };
-    const rootCrystalObject = newCrystalObject(
-      null,
-      GLOBAL_PATH, // TODO: this should be ROOT_PATH I think?
-      this.queryTypeName,
-      rootId,
-      EMPTY_INDEXES,
-      rootValue,
-      crystalContext,
-      {},
-    );
-    crystalContext.rootCrystalObject = rootCrystalObject;
-    /*@__INLINE__*/ populateValuePlan(
-      crystalContext,
-      this.variableValuesPlan,
-      [],
-      variableValues,
-      "variableValues",
-    );
-    /*@__INLINE__*/ populateValuePlan(
-      crystalContext,
-      this.contextPlan,
-      [],
-      context,
-      "context",
-    );
-    /*@__INLINE__*/ populateValuePlan(
-      crystalContext,
-      this.rootValuePlan,
-      [],
-      rootValue,
-      "rootValue",
-    );
-    return crystalContext;
-  }
-
-  /**
-   * Implements `GetBatch`.
-   */
-  public getBatch(
-    pathIdentity: string,
-    returnType: GraphQLOutputType,
-    parentCrystalObject: CrystalObject<any> | null,
-    variableValues: {
-      [variableName: string]: unknown;
-    },
-    context: object,
-    rootValue: unknown,
-  ): Batch {
-    let batch = this.batchByPathIdentity[pathIdentity];
-    if (!batch) {
-      const crystalContext = parentCrystalObject
-        ? parentCrystalObject[$$crystalContext]
-        : this.newCrystalContext(variableValues, context, rootValue);
-      batch = this.newBatch(pathIdentity, returnType, crystalContext);
-      // TypeScript hack
-      const definitelyBatch: Batch = batch;
-      this.batchByPathIdentity[pathIdentity] = definitelyBatch;
-      // (Note: when batch is executed it will delete itself from aether.batchByPathIdentity.)
-      setTimeout(
-        () =>
-          this.executeBatch(definitelyBatch, crystalContext).catch((e) => {
-            // This should not be able to happen because executeBatch contains the try/catch.
-            console.error(
-              `GraphileInternalError<cd7c157b-9f20-432d-8716-7ff052acd1fd>: ${e.message}`,
-            );
-          }),
-        0,
-      );
-    }
-    return batch;
-  }
-
   /**
    * Finds a (the?) path from ancestorPlan to descendentPlan. Semi-expensive; try
    * and only use this at planning time, not execution time. Useful for tracking
@@ -1467,229 +1278,6 @@ export class Aether<
       }
     }
     return null;
-  }
-
-  /**
-   * Implements `ExecuteBatch`.
-   *
-   * TODO: we can optimise this to not be `async` (only return a promise when
-   * necessary).
-   */
-  public async executeBatch(
-    batch: Batch,
-    crystalContext: CrystalContext,
-  ): Promise<void> {
-    // This guarantees nothing else will be added to the batch
-    delete this.batchByPathIdentity[batch.pathIdentity];
-
-    const { entries, plan, itemPlan, returnType } = batch;
-    const namedReturnType = getNamedType(returnType);
-    const entriesLength = entries.length;
-    const crystalObjects: CrystalObject<any>[] = new Array(entriesLength);
-    const deferredResults: Deferred<any>[] = new Array(entriesLength);
-    for (let i = 0; i < entriesLength; i++) {
-      const [crystalObject, deferredResult] = entries[i];
-      crystalObjects[i] = crystalObject;
-      deferredResults[i] = deferredResult;
-    }
-
-    try {
-      assert.ok(plan, "No plan in batch?!");
-      assert.ok(itemPlan, "No itemPlan in batch?!");
-
-      const path = this.findPath(plan, itemPlan);
-      if (!path) {
-        throw new Error(
-          `Item plan ${itemPlan} for field plan ${plan} seem to be unrelated.`,
-        );
-      }
-
-      /**
-       * We'll always have at least one layer, but for itemPlans that depend on
-       * `__ListItemPlan`s we'll have one additional layer for each
-       * `__ListItemPlan`.
-       */
-      const layers: Array<ExecutablePlan<any>> = [plan];
-
-      /**
-       * If there are no __ListItemPlans then this will be empty, otherwise
-       * it'll be the plan id for each __ListItemPlan.
-       */
-      const listItemPlanIdAtDepth: number[] = [];
-
-      // This block to define a new scope for the mutable `depth` variable. (No shadowing.)
-      {
-        let depth = 0;
-        // Walk through the subplans, each time we find a `__ListItemPlan` we
-        // add a new layer and record the listItemPlanIdAtDepth.
-        for (const subPlan of path) {
-          if (subPlan instanceof __ListItemPlan) {
-            listItemPlanIdAtDepth[depth] = subPlan.id;
-            assert.strictEqual(
-              subPlan.depth,
-              depth,
-              `Expected ${subPlan}'s depth to match our locally tracked depth`,
-            );
-            depth++;
-            // null means no need to transform the data; we might replace this in further iterations
-          } else if (depth === 0) {
-            // This should never happen
-            throw new Error(
-              `Unexpected plan structure: did not expect to find plan ${subPlan} between ${plan} and the first '__ListItemPlan' leading to ${itemPlan}.`,
-            );
-          } else {
-            // We don't need to execute each individual plan manually because
-            // `executePlan` handles dependencies for us; so just walk forward
-            // until we hit another __ListItemPlan.
-          }
-          layers[depth] = subPlan;
-        }
-      }
-
-      const executeLayers = async (
-        layers: Array<ExecutablePlan<any>>,
-        values: Array<CrystalLayerObject>,
-        depth = 0,
-      ): Promise<any[]> => {
-        // If `rest` is empty then we're expecting to turn the results into
-        // CrystalObjects, otherwise we're expecting arrays which we will then
-        // process through another layer of executeLayers.
-        const [layerPlan, ...rest] = layers;
-        const valuesLength = values.length;
-
-        debugExecuteVerbose(
-          "Batch executing plan %c with %c",
-          layerPlan,
-          crystalObjects,
-        );
-
-        const layerResults = await this.executePlan(
-          layerPlan,
-          crystalContext,
-          values,
-        );
-
-        if (isDev) {
-          assert.ok(
-            Array.isArray(layerResults),
-            "Expected plan execution to return an array",
-          );
-          assert.strictEqual(
-            layerResults.length,
-            valuesLength,
-            "Expected plan execution result to have same length as input objects",
-          );
-        }
-        const valueIndexByNewValuesIndex: number[] = [];
-        if (rest.length) {
-          const results = new Array(valuesLength).fill(null);
-          // We're expecting to be handling arrays still; there's another layer to come...
-          const newValues = values.flatMap((value, valueIndex) => {
-            const { crystalObject, indexByListItemPlanId } = value;
-            const layerResult = layerResults[valueIndex];
-            if (!Array.isArray(layerResult)) {
-              if (layerResult != null) {
-                console.error(
-                  `Expected layerResult to be an array, found ${inspect(
-                    layerResult,
-                  )}`,
-                );
-              }
-              // Stops here
-              return [];
-            }
-            results[valueIndex] = [];
-            return layerResult.map(
-              (_layerIndividualResult, layerResultIndex) => {
-                valueIndexByNewValuesIndex.push(valueIndex);
-                return newCrystalLayerObject(crystalObject, {
-                  ...indexByListItemPlanId,
-                  // TODO: when we implement `@stream` then this
-                  // might not actually be the right index, we might
-                  // need to add an offset?
-                  [listItemPlanIdAtDepth[depth]]: layerResultIndex,
-                });
-              },
-            );
-          });
-          const newValuesResults = await executeLayers(
-            rest,
-            newValues,
-            depth + 1,
-          );
-          assert.strictEqual(
-            newValuesResults.length,
-            newValues.length,
-            "Expected newValuesResults and newValues to have the same length",
-          );
-          for (let i = 0, l = newValuesResults.length; i < l; i++) {
-            const valueIndex = valueIndexByNewValuesIndex[i];
-            results[valueIndex].push(newValuesResults[i]);
-          }
-          return results;
-        } else {
-          // This was the final layer, so it's time to make the crystal objects.
-          if (isScalarType(namedReturnType)) {
-            // No crystal objects for scalars; just return the results directly.
-            return layerResults;
-          }
-          const isPolymorphic =
-            isUnionType(namedReturnType) || isInterfaceType(namedReturnType);
-          if (!isPolymorphic) {
-            assertObjectType(namedReturnType);
-          }
-          return values.map((value, valueIndex) => {
-            const { indexByListItemPlanId } = value;
-            const layerResult = layerResults[valueIndex];
-            const data = layerResult;
-            if (data == null) {
-              return null;
-            }
-            let typeName: string;
-            let innerData: any;
-            if (isPolymorphic) {
-              assertPolymorphicData(data);
-              ({ [$$concreteType]: typeName, [$$concreteData]: innerData } =
-                data);
-            } else {
-              typeName = namedReturnType.name;
-              innerData = data;
-            }
-            const crystalObject = newCrystalObject(
-              layerPlan,
-              batch.pathIdentity,
-              typeName,
-              uid(batch.pathIdentity),
-              listItemPlanIdAtDepth.map(
-                (planId) => indexByListItemPlanId[planId],
-              ),
-              innerData,
-              crystalContext,
-              indexByListItemPlanId,
-            );
-            return crystalObject;
-          });
-        }
-      };
-
-      const results = await executeLayers(
-        layers,
-        crystalObjects.map((crystalObject) =>
-          newCrystalLayerObject(
-            crystalObject,
-            crystalObject[$$indexByListItemPlanId],
-          ),
-        ),
-      );
-
-      for (let i = 0; i < entriesLength; i++) {
-        deferredResults[i].resolve(results[i]);
-      }
-    } catch (e) {
-      for (let i = 0; i < entriesLength; i++) {
-        deferredResults[i].reject(e);
-      }
-    }
   }
 
   /**
@@ -1962,11 +1550,15 @@ export class Aether<
     return result;
   }
 
+  //----------------------------------------
+
   /**
    * Used to implement `GetValuePlanId`, but was rewritten to factor in that we
    * now key by crystal objects rather than id and indexes.
+   *
+   * @internal
    */
-  getValuePlanId<TData extends object>(
+  public getValuePlanId<TData extends object>(
     crystalContext: CrystalContext,
     valuePlan: __ValuePlan<TData>,
     object: TData,
@@ -2005,11 +1597,396 @@ export class Aether<
   }
 
   /**
+   * Get a plan without specifying who requested it; this disables all the
+   * caller checks. Only intended to be called from internal code.
+   *
+   * @internal
+   */
+  public dangerouslyGetPlan(id: number): ExecutablePlan {
+    return this.plans[id];
+  }
+
+  /**
+   * Adds a plan to the known plans and returns the number to use as the plan
+   * id. ONLY to be used from Plan, user code should never call this directly.
+   *
+   * @internal
+   */
+  public _addPlan(plan: ExecutablePlan): number {
+    if (!["plan", "validate", "deduplicate", "optimize"].includes(this.phase)) {
+      throw new Error(
+        `Creating a plan during the '${this.phase}' phase is forbidden.`,
+      );
+    }
+    return this.plans.push(plan) - 1;
+  }
+
+  /**
+   * @internal
+   */
+  public newBatch(
+    pathIdentity: string,
+    returnType: GraphQLOutputType,
+    crystalContext: CrystalContext,
+  ): Batch {
+    const planId = this.planIdByPathIdentity[pathIdentity];
+    const itemPlanId = this.itemPlanIdByPathIdentity[pathIdentity];
+    assert.ok(
+      planId != null,
+      `Could not find the planId for path identity '${pathIdentity}'`,
+    );
+    assert.ok(
+      itemPlanId != null,
+      `Could not find the itemPlanId for path identity '${pathIdentity}'`,
+    );
+    const plan = this.plans[planId];
+    const itemPlan = this.plans[itemPlanId];
+    assert.ok(
+      plan,
+      `Could not find the plan with id '${planId}' at '${pathIdentity}'`,
+    );
+    assert.ok(
+      itemPlan,
+      `Could not find the itemPlan with id '${itemPlanId}' at '${pathIdentity}'`,
+    );
+    const batch: Batch = {
+      pathIdentity,
+      crystalContext,
+      plan,
+      itemPlan,
+      entries: [],
+      returnType,
+    };
+    return batch;
+  }
+
+  /**
+   * Implements `NewCrystalContext`.
+   *
+   * @internal
+   */
+  public newCrystalContext(
+    variableValues: {
+      [variableName: string]: unknown;
+    },
+    context: object,
+    rootValue: unknown,
+  ): CrystalContext {
+    const rootId = uid("root");
+    debugExecuteVerbose("Root id is %c", rootId);
+    const crystalContext: CrystalContext = {
+      aether: this,
+      resultByIndexesByPlanId: new Map(),
+      metaByPlanId: Object.create(null),
+      rootId,
+      // @ts-ignore We'll set this in just a moment...
+      rootCrystalObject: null,
+    };
+    const rootCrystalObject = newCrystalObject(
+      null,
+      GLOBAL_PATH, // TODO: this should be ROOT_PATH I think?
+      this.queryTypeName,
+      rootId,
+      EMPTY_INDEXES,
+      rootValue,
+      crystalContext,
+      {},
+    );
+    crystalContext.rootCrystalObject = rootCrystalObject;
+    /*@__INLINE__*/ populateValuePlan(
+      crystalContext,
+      this.variableValuesPlan,
+      [],
+      variableValues,
+      "variableValues",
+    );
+    /*@__INLINE__*/ populateValuePlan(
+      crystalContext,
+      this.contextPlan,
+      [],
+      context,
+      "context",
+    );
+    /*@__INLINE__*/ populateValuePlan(
+      crystalContext,
+      this.rootValuePlan,
+      [],
+      rootValue,
+      "rootValue",
+    );
+    return crystalContext;
+  }
+
+  /**
+   * Implements `GetBatch`.
+   *
+   * @internal
+   */
+  public getBatch(
+    pathIdentity: string,
+    returnType: GraphQLOutputType,
+    parentCrystalObject: CrystalObject<any> | null,
+    variableValues: {
+      [variableName: string]: unknown;
+    },
+    context: object,
+    rootValue: unknown,
+  ): Batch {
+    let batch = this.batchByPathIdentity[pathIdentity];
+    if (!batch) {
+      const crystalContext = parentCrystalObject
+        ? parentCrystalObject[$$crystalContext]
+        : this.newCrystalContext(variableValues, context, rootValue);
+      batch = this.newBatch(pathIdentity, returnType, crystalContext);
+      // TypeScript hack
+      const definitelyBatch: Batch = batch;
+      this.batchByPathIdentity[pathIdentity] = definitelyBatch;
+      // (Note: when batch is executed it will delete itself from aether.batchByPathIdentity.)
+      setTimeout(
+        () =>
+          this.executeBatch(definitelyBatch, crystalContext).catch((e) => {
+            // This should not be able to happen because executeBatch contains the try/catch.
+            console.error(
+              `GraphileInternalError<cd7c157b-9f20-432d-8716-7ff052acd1fd>: ${e.message}`,
+            );
+          }),
+        0,
+      );
+    }
+    return batch;
+  }
+
+  /**
+   * Implements `ExecuteBatch`.
+   *
+   * TODO: we can optimise this to not be `async` (only return a promise when
+   * necessary).
+   *
+   * @internal
+   */
+  public async executeBatch(
+    batch: Batch,
+    crystalContext: CrystalContext,
+  ): Promise<void> {
+    // This guarantees nothing else will be added to the batch
+    delete this.batchByPathIdentity[batch.pathIdentity];
+
+    const { entries, plan, itemPlan, returnType } = batch;
+    const namedReturnType = getNamedType(returnType);
+    const entriesLength = entries.length;
+    const crystalObjects: CrystalObject<any>[] = new Array(entriesLength);
+    const deferredResults: Deferred<any>[] = new Array(entriesLength);
+    for (let i = 0; i < entriesLength; i++) {
+      const [crystalObject, deferredResult] = entries[i];
+      crystalObjects[i] = crystalObject;
+      deferredResults[i] = deferredResult;
+    }
+
+    try {
+      assert.ok(plan, "No plan in batch?!");
+      assert.ok(itemPlan, "No itemPlan in batch?!");
+
+      const path = this.findPath(plan, itemPlan);
+      if (!path) {
+        throw new Error(
+          `Item plan ${itemPlan} for field plan ${plan} seem to be unrelated.`,
+        );
+      }
+
+      /**
+       * We'll always have at least one layer, but for itemPlans that depend on
+       * `__ListItemPlan`s we'll have one additional layer for each
+       * `__ListItemPlan`.
+       */
+      const layers: Array<ExecutablePlan<any>> = [plan];
+
+      /**
+       * If there are no __ListItemPlans then this will be empty, otherwise
+       * it'll be the plan id for each __ListItemPlan.
+       */
+      const listItemPlanIdAtDepth: number[] = [];
+
+      // This block to define a new scope for the mutable `depth` variable. (No shadowing.)
+      {
+        let depth = 0;
+        // Walk through the subplans, each time we find a `__ListItemPlan` we
+        // add a new layer and record the listItemPlanIdAtDepth.
+        for (const subPlan of path) {
+          if (subPlan instanceof __ListItemPlan) {
+            listItemPlanIdAtDepth[depth] = subPlan.id;
+            assert.strictEqual(
+              subPlan.depth,
+              depth,
+              `Expected ${subPlan}'s depth to match our locally tracked depth`,
+            );
+            depth++;
+            // null means no need to transform the data; we might replace this in further iterations
+          } else if (depth === 0) {
+            // This should never happen
+            throw new Error(
+              `Unexpected plan structure: did not expect to find plan ${subPlan} between ${plan} and the first '__ListItemPlan' leading to ${itemPlan}.`,
+            );
+          } else {
+            // We don't need to execute each individual plan manually because
+            // `executePlan` handles dependencies for us; so just walk forward
+            // until we hit another __ListItemPlan.
+          }
+          layers[depth] = subPlan;
+        }
+      }
+
+      const executeLayers = async (
+        layers: Array<ExecutablePlan<any>>,
+        values: Array<CrystalLayerObject>,
+        depth = 0,
+      ): Promise<any[]> => {
+        // If `rest` is empty then we're expecting to turn the results into
+        // CrystalObjects, otherwise we're expecting arrays which we will then
+        // process through another layer of executeLayers.
+        const [layerPlan, ...rest] = layers;
+        const valuesLength = values.length;
+
+        debugExecuteVerbose(
+          "Batch executing plan %c with %c",
+          layerPlan,
+          crystalObjects,
+        );
+
+        const layerResults = await this.executePlan(
+          layerPlan,
+          crystalContext,
+          values,
+        );
+
+        if (isDev) {
+          assert.ok(
+            Array.isArray(layerResults),
+            "Expected plan execution to return an array",
+          );
+          assert.strictEqual(
+            layerResults.length,
+            valuesLength,
+            "Expected plan execution result to have same length as input objects",
+          );
+        }
+        const valueIndexByNewValuesIndex: number[] = [];
+        if (rest.length) {
+          const results = new Array(valuesLength).fill(null);
+          // We're expecting to be handling arrays still; there's another layer to come...
+          const newValues = values.flatMap((value, valueIndex) => {
+            const { crystalObject, indexByListItemPlanId } = value;
+            const layerResult = layerResults[valueIndex];
+            if (!Array.isArray(layerResult)) {
+              if (layerResult != null) {
+                console.error(
+                  `Expected layerResult to be an array, found ${inspect(
+                    layerResult,
+                  )}`,
+                );
+              }
+              // Stops here
+              return [];
+            }
+            results[valueIndex] = [];
+            return layerResult.map(
+              (_layerIndividualResult, layerResultIndex) => {
+                valueIndexByNewValuesIndex.push(valueIndex);
+                return newCrystalLayerObject(crystalObject, {
+                  ...indexByListItemPlanId,
+                  // TODO: when we implement `@stream` then this
+                  // might not actually be the right index, we might
+                  // need to add an offset?
+                  [listItemPlanIdAtDepth[depth]]: layerResultIndex,
+                });
+              },
+            );
+          });
+          const newValuesResults = await executeLayers(
+            rest,
+            newValues,
+            depth + 1,
+          );
+          assert.strictEqual(
+            newValuesResults.length,
+            newValues.length,
+            "Expected newValuesResults and newValues to have the same length",
+          );
+          for (let i = 0, l = newValuesResults.length; i < l; i++) {
+            const valueIndex = valueIndexByNewValuesIndex[i];
+            results[valueIndex].push(newValuesResults[i]);
+          }
+          return results;
+        } else {
+          // This was the final layer, so it's time to make the crystal objects.
+          if (isScalarType(namedReturnType)) {
+            // No crystal objects for scalars; just return the results directly.
+            return layerResults;
+          }
+          const isPolymorphic =
+            isUnionType(namedReturnType) || isInterfaceType(namedReturnType);
+          if (!isPolymorphic) {
+            assertObjectType(namedReturnType);
+          }
+          return values.map((value, valueIndex) => {
+            const { indexByListItemPlanId } = value;
+            const layerResult = layerResults[valueIndex];
+            const data = layerResult;
+            if (data == null) {
+              return null;
+            }
+            let typeName: string;
+            let innerData: any;
+            if (isPolymorphic) {
+              assertPolymorphicData(data);
+              ({ [$$concreteType]: typeName, [$$concreteData]: innerData } =
+                data);
+            } else {
+              typeName = namedReturnType.name;
+              innerData = data;
+            }
+            const crystalObject = newCrystalObject(
+              layerPlan,
+              batch.pathIdentity,
+              typeName,
+              uid(batch.pathIdentity),
+              listItemPlanIdAtDepth.map(
+                (planId) => indexByListItemPlanId[planId],
+              ),
+              innerData,
+              crystalContext,
+              indexByListItemPlanId,
+            );
+            return crystalObject;
+          });
+        }
+      };
+
+      const results = await executeLayers(
+        layers,
+        crystalObjects.map((crystalObject) =>
+          newCrystalLayerObject(
+            crystalObject,
+            crystalObject[$$indexByListItemPlanId],
+          ),
+        ),
+      );
+
+      for (let i = 0; i < entriesLength; i++) {
+        deferredResults[i].resolve(results[i]);
+      }
+    } catch (e) {
+      for (let i = 0; i < entriesLength; i++) {
+        deferredResults[i].reject(e);
+      }
+    }
+  }
+
+  /**
    * For debugging.
    *
    * @internal
    */
-  logPlans(why?: string): void {
+  public logPlans(why?: string): void {
     if (!debugPlanVerbose.enabled) {
       return;
     }
@@ -2055,7 +2032,10 @@ export class Aether<
     );
   }
 
-  logPlansByPath(why?: string): void {
+  /**
+   * @internal
+   */
+  public logPlansByPath(why?: string): void {
     if (!debugPlanVerbose.enabled) {
       return;
     }
@@ -2097,6 +2077,42 @@ export class Aether<
       why ? ` ${why}` : "",
       "\n" + lines.join("\n"),
     );
+  }
+
+  //----------------------------------------
+
+  public getPlan: (
+    id: number,
+    requestingPlan: ExecutablePlan,
+  ) => ExecutablePlan = isDev
+    ? (id, requestingPlan) => {
+        if (
+          !["plan", "validate", "deduplicate", "optimize"].includes(this.phase)
+        ) {
+          throw new Error(
+            `Getting a plan during the '${this.phase}' phase is forbidden - please do so before or during the optimize phase.`,
+          );
+        }
+
+        // TODO: check that requestingPlan is allowed to get plans
+        if (this.optimizedPlans.has(requestingPlan)) {
+          throw new Error(
+            `Optimized plan ${requestingPlan} is not permitted to request other plans (requested '${id}')`,
+          );
+        }
+
+        const plan = this.plans[id];
+        if (plan == null) {
+          throw new Error(
+            `Programming error: plan with id '${id}' no longer exists`,
+          );
+        }
+        return plan;
+      }
+    : (id, _requestingPlan) => this.plans[id];
+
+  public isOptimized(plan: ExecutablePlan): boolean {
+    return this.optimizedPlans.has(plan);
   }
 }
 
