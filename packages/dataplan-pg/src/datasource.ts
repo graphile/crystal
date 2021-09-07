@@ -412,7 +412,7 @@ export class PgSource<
             : sql`${alias}.${sql.identifier(key as string)}`,
       };
     });
-    return pgSelect(this, identifiers);
+    return pgSelect({ source: this, identifiers });
   }
 
   public applyAuthorizationChecksToPlan($plan: PgSelectPlan<this>): void {

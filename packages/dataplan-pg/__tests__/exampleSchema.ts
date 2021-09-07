@@ -1056,11 +1056,11 @@ export function makeExampleSchema(
         mostRecentForum: {
           type: Forum,
           plan($user) {
-            const $forum = pgSelect(
-              usersMostRecentForumSource,
-              [],
-              [{ plan: $user.record() }],
-            ).single();
+            const $forum = pgSelect({
+              source: usersMostRecentForumSource,
+              args: [{ plan: $user.record() }],
+              identifiers: [],
+            }).single();
             deoptimizeIfAppropriate($forum);
             return $forum;
           },
@@ -1211,7 +1211,7 @@ export function makeExampleSchema(
           $value.evalIs("INHERIT") &&
           // INHERIT only works if the parent has an archived_at column.
           $parent instanceof PgSelectSinglePlan &&
-          !!$parent.dataSource.columns.archived_at
+          !!$parent.source.columns.archived_at
         ) {
           $messages.where(
             sql`(${
@@ -1385,10 +1385,10 @@ export function makeExampleSchema(
     public readonly conditions: SQL[] = [];
     constructor(
       public readonly $parent: ClassFilterPlan,
-      public readonly dataSource: TDataSource,
+      public readonly source: TDataSource,
     ) {
       super();
-      this.alias = sql.identifier(Symbol(`${dataSource.name}_filter`));
+      this.alias = sql.identifier(Symbol(`${source.name}_filter`));
     }
 
     placeholder($plan: ExecutablePlan<any>, type: SQL): SQL {
@@ -1402,8 +1402,8 @@ export function makeExampleSchema(
       return new PgConditionPlan(this);
     }
 
-    source() {
-      const source = this.dataSource.source;
+    fromExpression() {
+      const source = this.source.source;
       if (typeof source === "function") {
         throw new Error("TempTablePlan doesn't support function sources yet.");
       } else {
@@ -1450,7 +1450,9 @@ export function makeExampleSchema(
     apply() {
       if (this.$some) {
         const conditions = this.$some.conditions;
-        const from = sql`\nfrom ${this.$some.source()} as ${this.$some.alias}`;
+        const from = sql`\nfrom ${this.$some.fromExpression()} as ${
+          this.$some.alias
+        }`;
         const sqlConditions = sql.join(
           conditions.map((c) => sql.parens(sql.indent(c))),
           " and ",
@@ -1652,10 +1654,10 @@ export function makeExampleSchema(
             },
             plan($forum, args) {
               const $featured = args.featured;
-              return pgSelect(
-                forumsUniqueAuthorCountSource,
-                [],
-                [
+              return pgSelect({
+                source: forumsUniqueAuthorCountSource,
+                identifiers: [],
+                args: [
                   {
                     plan: $forum.record(),
                   },
@@ -1664,7 +1666,7 @@ export function makeExampleSchema(
                     type: TYPES.boolean.sqlType,
                   },
                 ],
-              )
+              })
                 .single()
                 .getSelfNamed();
             },
@@ -1673,18 +1675,18 @@ export function makeExampleSchema(
           randomUser: {
             type: User,
             plan($forum) {
-              const $user = pgSelect(
-                userSource,
-                [],
-                [
+              const $user = pgSelect({
+                source: userSource,
+                identifiers: [],
+                args: [
                   {
                     plan: $forum.record(),
                   },
                 ],
-                (args: SQL[]) =>
+                from: (args: SQL[]) =>
                   sql`app_public.forums_random_user(${sql.join(args, ", ")})`,
-                "forums_random_user",
-              ).single();
+                name: "forums_random_user",
+              }).single();
               deoptimizeIfAppropriate($user);
               return $user;
             },
@@ -1693,15 +1695,15 @@ export function makeExampleSchema(
           featuredMessages: {
             type: new GraphQLList(Message),
             plan($forum) {
-              const $messages = pgSelect(
-                forumsFeaturedMessages,
-                [],
-                [
+              const $messages = pgSelect({
+                source: forumsFeaturedMessages,
+                identifiers: [],
+                args: [
                   {
                     plan: $forum.record(),
                   },
                 ],
-              );
+              });
               deoptimizeIfAppropriate($messages);
               return $messages;
             },
@@ -2392,17 +2394,17 @@ export function makeExampleSchema(
           },
           plan(_$root, args) {
             const $featured = args.featured;
-            const $plan = pgSelect(
-              uniqueAuthorCountSource,
-              [],
-              [
+            const $plan = pgSelect({
+              source: uniqueAuthorCountSource,
+              identifiers: [],
+              args: [
                 {
                   plan: $featured,
                   type: TYPES.boolean.sqlType,
                   name: "featured",
                 },
               ],
-            );
+            });
             deoptimizeIfAppropriate($plan);
             return $plan.single().getSelfNamed();
           },
@@ -2411,13 +2413,12 @@ export function makeExampleSchema(
         forumNames: {
           type: new GraphQLList(GraphQLString),
           plan(_$root) {
-            const $plan = pgSelect(
-              scalarTextSource,
-              [],
-              [],
-              sql`app_public.forum_names()`,
-              "forum_names",
-            );
+            const $plan = pgSelect({
+              source: scalarTextSource,
+              identifiers: [],
+              from: sql`app_public.forum_names()`,
+              name: "forum_names",
+            });
             return each($plan, ($name) => $name.getSelfNamed());
           },
         },
@@ -2427,13 +2428,12 @@ export function makeExampleSchema(
           description:
             "Like forumNames, only we convert them all to upper case",
           plan(_$root) {
-            const $plan = pgSelect(
-              scalarTextSource,
-              [],
-              [],
-              sql`app_public.forum_names()`,
-              "forum_names",
-            );
+            const $plan = pgSelect({
+              source: scalarTextSource,
+              identifiers: [],
+              from: sql`app_public.forum_names()`,
+              name: "forum_names",
+            });
             return each($plan, ($name) =>
               lambda($name.getSelfNamed(), (name) => name.toUpperCase()),
             );
@@ -2443,13 +2443,12 @@ export function makeExampleSchema(
         randomUser: {
           type: User,
           plan() {
-            const $users = pgSelect(
-              userSource,
-              [],
-              [],
-              sql`app_public.random_user()`,
-              "random_user",
-            );
+            const $users = pgSelect({
+              source: userSource,
+              identifiers: [],
+              from: sql`app_public.random_user()`,
+              name: "random_user",
+            });
             deoptimizeIfAppropriate($users);
             return $users.single();
           },
@@ -2458,7 +2457,10 @@ export function makeExampleSchema(
         featuredMessages: {
           type: new GraphQLList(Message),
           plan() {
-            const $messages = pgSelect(featuredMessages, []);
+            const $messages = pgSelect({
+              source: featuredMessages,
+              identifiers: [],
+            });
             deoptimizeIfAppropriate($messages);
             return $messages;
           },
@@ -2598,17 +2600,17 @@ export function makeExampleSchema(
             },
           },
           plan(_$root, args) {
-            const $plan = pgSelect(
-              entitySearchSource,
-              [],
-              [
+            const $plan = pgSelect({
+              source: entitySearchSource,
+              identifiers: [],
+              args: [
                 {
                   plan: args.query,
                   type: TYPES.text.sqlType,
                   name: "query",
                 },
               ],
-            );
+            });
             deoptimizeIfAppropriate($plan);
             return each($plan, entityUnion);
           },

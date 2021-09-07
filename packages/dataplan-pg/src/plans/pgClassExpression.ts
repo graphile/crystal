@@ -35,7 +35,7 @@ export class PgClassExpressionPlan<
    */
   private attrIndex: number | null = null;
 
-  public readonly dataSource: TDataSource;
+  public readonly source: TDataSource;
 
   public readonly expression: SQL;
 
@@ -60,7 +60,7 @@ export class PgClassExpressionPlan<
         `Received a non-string at index ${badStringIndex} to strings argument of ${this}.`,
       );
     }
-    this.dataSource = table.dataSource;
+    this.source = table.source;
     this.tableId = this.addDependency(table);
     const classPlan = table.getClassPlan();
 

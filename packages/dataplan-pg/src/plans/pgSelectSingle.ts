@@ -38,7 +38,7 @@ export class PgSelectSinglePlan<
   public readonly pgCodec: TDataSource["codec"];
   public readonly itemPlanId: number;
   private classPlanId: number;
-  public readonly dataSource: TDataSource;
+  public readonly source: TDataSource;
 
   constructor(
     classPlan: PgSelectPlan<TDataSource>,
@@ -46,14 +46,14 @@ export class PgSelectSinglePlan<
     private options: PgSelectSinglePlanOptions = Object.create(null),
   ) {
     super();
-    this.dataSource = classPlan.dataSource;
-    this.pgCodec = this.dataSource.codec;
+    this.source = classPlan.source;
+    this.pgCodec = this.source.codec;
     this.classPlanId = classPlan.id;
     this.itemPlanId = this.addDependency(itemPlan);
   }
 
   public toStringMeta(): string {
-    return this.dataSource.name;
+    return this.source.name;
   }
 
   public getClassPlan(): PgSelectPlan<TDataSource> {
@@ -95,15 +95,15 @@ export class PgSelectSinglePlan<
     // `attr` should be an SQL expression? This would allow for computed
     // fields/etc too (admittedly those without arguments).
     const dataSourceColumn: PgSourceColumn =
-      this.dataSource.columns[attr as string];
+      this.source.columns[attr as string];
     if (!dataSourceColumn && attr !== "") {
       throw new Error(
-        `${this.dataSource} does not define an attribute named '${attr}'`,
+        `${this.source} does not define an attribute named '${attr}'`,
       );
     }
 
     if (dataSourceColumn?.via) {
-      const { relation, attribute } = this.dataSource.resolveVia(
+      const { relation, attribute } = this.source.resolveVia(
         dataSourceColumn.via,
         attr as string,
       );
@@ -111,7 +111,7 @@ export class PgSelectSinglePlan<
     }
 
     if (dataSourceColumn?.identicalVia) {
-      const { relation, attribute } = this.dataSource.resolveVia(
+      const { relation, attribute } = this.source.resolveVia(
         dataSourceColumn.identicalVia,
         attr as string,
       );
@@ -128,12 +128,12 @@ export class PgSelectSinglePlan<
     if (this.options.fromRelation) {
       const [$fromPlan, fromRelationName] = this.options.fromRelation;
       const matchingColumn = (
-        Object.entries($fromPlan.dataSource.columns) as Array<
+        Object.entries($fromPlan.source.columns) as Array<
           [string, PgSourceColumn]
         >
       ).find(([name, col]) => {
         if (col.identicalVia) {
-          const { relation, attribute } = $fromPlan.dataSource.resolveVia(
+          const { relation, attribute } = $fromPlan.source.resolveVia(
             col.identicalVia,
             name,
           );
@@ -162,8 +162,8 @@ export class PgSelectSinglePlan<
     const sqlExpr = pgClassExpression(
       this,
       attr === ""
-        ? this.dataSource.codec
-        : this.dataSource.columns[attr as string].codec,
+        ? this.source.codec
+        : this.source.columns[attr as string].codec,
     );
     const colPlan = dataSourceColumn
       ? dataSourceColumn.expression
@@ -179,8 +179,8 @@ export class PgSelectSinglePlan<
     if (this.options.fromRelation) {
       const [$fromPlan, fromRelationName] = this.options.fromRelation;
       // check to see if we already came via this relationship
-      const reciprocal = this.dataSource.getReciprocal(
-        $fromPlan.dataSource,
+      const reciprocal = this.source.getReciprocal(
+        $fromPlan.source,
         fromRelationName,
       );
       if (reciprocal) {
@@ -203,20 +203,20 @@ export class PgSelectSinglePlan<
     if ($existingPlan) {
       return $existingPlan;
     }
-    const relation = this.dataSource.getRelation(relationIdentifier as string);
+    const relation = this.source.getRelation(relationIdentifier as string);
     if (!relation || !relation.isUnique) {
       throw new Error(
-        `${relationIdentifier} is not a unique relation on ${this.dataSource}`,
+        `${relationIdentifier} is not a unique relation on ${this.source}`,
       );
     }
-    const source = relation.source as PgSource<any, any, any, any, any>;
+    const relationSource = relation.source as PgSource<any, any, any, any, any>;
     const remoteColumns = relation.remoteColumns as string[];
     const localColumns = relation.localColumns as string[];
 
     const options: PgSelectSinglePlanOptions = {
       fromRelation: [this, relationIdentifier as string],
     };
-    return source.get(
+    return relationSource.get(
       remoteColumns.reduce((memo, remoteColumn, columnIndex) => {
         memo[remoteColumn] = this.get(localColumns[columnIndex]);
         return memo;
@@ -228,17 +228,17 @@ export class PgSelectSinglePlan<
   public manyRelation<
     TRelationName extends Parameters<TDataSource["getRelation"]>[0],
   >(relationIdentifier: TRelationName): PgSelectPlan<any> {
-    const relation = this.dataSource.getRelation(relationIdentifier as string);
+    const relation = this.source.getRelation(relationIdentifier as string);
     if (!relation) {
       throw new Error(
-        `${relationIdentifier} is not a relation on ${this.dataSource}`,
+        `${relationIdentifier} is not a relation on ${this.source}`,
       );
     }
-    const source = relation.source as PgSource<any, any, any, any, any>;
+    const relationSource = relation.source as PgSource<any, any, any, any, any>;
     const remoteColumns = relation.remoteColumns as string[];
     const localColumns = relation.localColumns as string[];
 
-    return source.find(
+    return relationSource.find(
       remoteColumns.reduce((memo, remoteColumn, columnIndex) => {
         memo[remoteColumn] = this.get(localColumns[columnIndex]);
         return memo;
@@ -247,7 +247,7 @@ export class PgSelectSinglePlan<
   }
 
   record(): PgClassExpressionPlan<TDataSource, TDataSource["codec"]> {
-    return pgClassExpression(this, this.dataSource.codec)`${
+    return pgClassExpression(this, this.source.codec)`${
       this.getClassPlan().alias
     }`;
   }
@@ -276,7 +276,7 @@ export class PgSelectSinglePlan<
     peers: PgSelectSinglePlan<any>[],
   ): PgSelectSinglePlan<TDataSource> {
     const identicalPeer = peers.find((peer) => {
-      if (peer.dataSource !== this.dataSource) {
+      if (peer.source !== this.source) {
         return false;
       }
       if (peer.getClassPlan() !== this.getClassPlan()) {

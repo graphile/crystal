@@ -15,17 +15,17 @@ export class PgConnectionPlan<
 > extends ExecutablePlan<unknown> {
   private subplanId: number;
 
-  private readonly dataSource: TDataSource;
+  private readonly source: TDataSource;
 
   constructor(subplan: PgSelectPlan<TDataSource>) {
     super();
-    this.dataSource = subplan.dataSource;
+    this.source = subplan.source;
     this.subplanId = subplan.id;
     debugPlanVerbose(`%s (around %s) constructor`, this, subplan);
   }
 
   public toStringMeta(): string {
-    return this.dataSource.name;
+    return this.source.name;
   }
 
   public getSubplan(): PgSelectPlan<TDataSource> {

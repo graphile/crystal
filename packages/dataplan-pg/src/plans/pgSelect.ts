@@ -128,6 +128,47 @@ function assertSensible(plan: ExecutablePlan): void {
   }
 }
 
+interface PgSelectOptions<TDataSource> {
+  /**
+   * Tells us what we're dealing with - data type, columns, where to get it
+   * from, what it's called, etc. Many of these details can be overridden
+   * below.
+   */
+  source: TDataSource;
+
+  /**
+   * The identifiers to limit the results down to just the row(s) you care
+   * about.
+   *
+   * NOTE: this is required because it's a big footgun to omit it by accident,
+   * if you truly do not need it (e.g. if you're calling a function with
+   * limited results or you really want everything) then you can specify it as
+   * an empty array `[]`.
+   */
+  identifiers: Array<PgSelectIdentifierSpec>;
+
+  /**
+   * If your `from` (or source.source if omitted) is a function, the arguments
+   * to pass to the function.
+   */
+  args?: Array<PgSelectArgumentSpec>;
+
+  /**
+   * If you want to build the data in a custom way (e.g. calling a function,
+   * selecting from a view, building a complex query, etc) then you can
+   * override the `source.source` here with your own from code. Defaults to
+   * `source.source`.
+   */
+  from?: SQL | ((args: SQL[]) => SQL);
+
+  /**
+   * If you pass a custom `from` (or otherwise want to aid in debugging),
+   * passing a custom name can make it easier to follow the SQL/etc that is
+   * generated.
+   */
+  name?: string;
+}
+
 /**
  * This represents selecting from a class-like entity (table, view, etc); i.e.
  * it represents `SELECT <columns>, <cursor?> FROM <table>`. You can also add
@@ -148,7 +189,7 @@ export class PgSelectPlan<
   private readonly from: SQL | ((args: SQL[]) => SQL);
 
   /**
-   * This defaults to the name of the dataSource but you can override it. Aids
+   * This defaults to the name of the source but you can override it. Aids
    * in debugging.
    */
   private readonly name: string;
@@ -171,7 +212,7 @@ export class PgSelectPlan<
   /**
    * The data source from which we are selecting: table, view, etc
    */
-  public readonly dataSource: TDataSource;
+  public readonly source: TDataSource;
 
   // JOIN
 
@@ -319,36 +360,44 @@ export class PgSelectPlan<
     offset: false,
   };
 
-  constructor(
-    dataSource: TDataSource,
-    identifiers: Array<PgSelectIdentifierSpec>,
-    args?: Array<PgSelectArgumentSpec>,
-    customFrom?: SQL | ((args: SQL[]) => SQL),
-    customName?: string,
-  );
+  constructor(options: PgSelectOptions<TDataSource>);
   constructor(cloneFrom: PgSelectPlan<TDataSource>);
   constructor(
-    dataSourceOrCloneFrom: TDataSource | PgSelectPlan<TDataSource>,
-    inIdentifiers?: Array<PgSelectIdentifierSpec>,
-    inArgs?: Array<PgSelectArgumentSpec>,
-    inCustomFrom?: SQL | ((args: SQL[]) => SQL),
-    customName?: string,
+    optionsOrCloneFrom:
+      | PgSelectPlan<TDataSource>
+      | {
+          source: TDataSource;
+          identifiers?: Array<PgSelectIdentifierSpec>;
+          args?: Array<PgSelectArgumentSpec>;
+          from?: SQL | ((args: SQL[]) => SQL);
+          name?: string;
+        },
   ) {
     super();
-    const cloneFrom =
-      dataSourceOrCloneFrom instanceof PgSelectPlan
-        ? dataSourceOrCloneFrom
-        : null;
-    const dataSource = cloneFrom
-      ? cloneFrom.dataSource
-      : (dataSourceOrCloneFrom as TDataSource);
+    const [
+      cloneFrom,
+      {
+        source,
+        identifiers,
+        args: inArgs,
+        from: inFrom = null,
+        name: customName,
+      },
+    ] =
+      optionsOrCloneFrom instanceof PgSelectPlan
+        ? [
+            optionsOrCloneFrom,
+            {
+              source: optionsOrCloneFrom.source,
+              identifiers: null,
+              from: optionsOrCloneFrom.from,
+              args: null,
+              name: optionsOrCloneFrom.name,
+            },
+          ]
+        : [null, optionsOrCloneFrom];
 
-    const identifiers = cloneFrom ? null : inIdentifiers;
-
-    const customFrom = cloneFrom ? cloneFrom.from : inCustomFrom ?? null;
-
-    this.dataSource = dataSource;
-    this.from = customFrom ?? dataSource.source;
+    this.source = source;
     if (cloneFrom) {
       // Prevent any changes to our original to help avoid programming
       // errors.
@@ -373,9 +422,9 @@ export class PgSelectPlan<
 
     this.contextId = cloneFrom
       ? cloneFrom.contextId
-      : this.addDependency(this.dataSource.context());
+      : this.addDependency(this.source.context());
 
-    this.name = customName ?? dataSource.name;
+    this.name = customName ?? source.name;
     this.queryValuesSymbol = cloneFrom
       ? cloneFrom.queryValuesSymbol
       : Symbol(this.name + "_identifier_values");
@@ -384,6 +433,7 @@ export class PgSelectPlan<
       ? new Map(cloneFrom._symbolSubstitutes)
       : new Map();
     this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
+    this.from = inFrom ?? source.source;
     this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
     if (cloneFrom) {
       this.queryValues = [...cloneFrom.queryValues]; // References indexes cloned above
@@ -592,18 +642,18 @@ export class PgSelectPlan<
   ): SQL {
     const relation:
       | PgSourceRelation<PgSource<any, any, any, any>, TDataSource["columns"]>
-      | undefined = this.dataSource.getRelation(relationIdentifier as string);
+      | undefined = this.source.getRelation(relationIdentifier as string);
     if (!relation) {
       throw new Error(
-        `${this.dataSource} does not have a relation named '${relationIdentifier}'`,
+        `${this.source} does not have a relation named '${relationIdentifier}'`,
       );
     }
     if (!relation.isUnique) {
       throw new Error(
-        `${this.dataSource} relation '${relationIdentifier}' is not unique so cannot be used with singleRelation`,
+        `${this.source} relation '${relationIdentifier}' is not unique so cannot be used with singleRelation`,
       );
     }
-    const { source, localColumns, remoteColumns } = relation;
+    const { source: relationSource, localColumns, remoteColumns } = relation;
 
     // Join to this relation if we haven't already
     const cachedAlias = this.relationJoins.get(relationIdentifier);
@@ -611,7 +661,7 @@ export class PgSelectPlan<
       return cachedAlias;
     }
     const alias = sql.identifier(Symbol(relationIdentifier as string));
-    if (typeof source.source === "function") {
+    if (typeof relationSource.source === "function") {
       throw new Error(
         "Callback sources not currently supported via singleRelation",
       );
@@ -619,7 +669,7 @@ export class PgSelectPlan<
     this.joins.push({
       type: "left",
       // TODO: `source.source` is confusing, rename one of these!
-      source: source.source,
+      source: relationSource.source,
       alias,
       conditions: localColumns.map(
         (col, i) =>
@@ -789,7 +839,7 @@ export class PgSelectPlan<
       shouldReverseOrder,
     } = this.finalizeResults;
 
-    const executionResult = await this.dataSource.execute(
+    const executionResult = await this.source.execute(
       values.map((value) => {
         return {
           // The context is how we'd handle different connections with different claims
@@ -861,7 +911,7 @@ export class PgSelectPlan<
     }
   }
 
-  private source(): SQL {
+  private fromExpression(): SQL {
     const source =
       typeof this.from === "function"
         ? this.from(this.arguments.map((arg) => arg.placeholder))
@@ -870,7 +920,7 @@ export class PgSelectPlan<
   }
 
   private buildFrom() {
-    return { sql: sql`\nfrom ${this.source()} as ${this.alias}` };
+    return { sql: sql`\nfrom ${this.fromExpression()} as ${this.alias}` };
   }
 
   private buildJoin() {
@@ -1027,7 +1077,7 @@ export class PgSelectPlan<
     extraSelectIndexes: number[];
   } {
     if (!this.isTrusted) {
-      this.dataSource.applyAuthorizationChecksToPlan(this);
+      this.source.applyAuthorizationChecksToPlan(this);
     }
 
     const { sql: select, extraSelectIndexes } = this.buildSelect(options);
@@ -1153,7 +1203,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
       // at this stage.
 
       // Check FROM matches
-      if (p.dataSource !== this.dataSource) {
+      if (p.source !== this.source) {
         return false;
       }
 
@@ -1477,7 +1527,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
             table.joins.push(
               {
                 type: "left",
-                source: this.source(),
+                source: this.fromExpression(),
                 alias: this.alias,
                 conditions,
               },
@@ -1736,14 +1786,14 @@ function joinMatches(
  * Apply a default order in case our default is not unique.
  */
 function ensureOrderIsUnique(plan: PgSelectPlan<any>) {
-  const uniqueColumns: string[] = plan.dataSource.uniques[0];
+  const uniqueColumns: string[] = plan.source.uniques[0];
   if (uniqueColumns) {
     const ordersIsUnique = plan.orderIsUnique();
     if (!ordersIsUnique) {
       uniqueColumns.forEach((c) => {
         plan.orderBy({
           fragment: sql`${plan.alias}.${sql.identifier(c)}`,
-          codec: plan.dataSource.columns[c].codec,
+          codec: plan.source.columns[c].codec,
           direction: "ASC",
         });
       });
@@ -1753,17 +1803,7 @@ function ensureOrderIsUnique(plan: PgSelectPlan<any>) {
 }
 
 export function pgSelect<TDataSource extends PgSource<any, any, any, any>>(
-  dataSource: TDataSource,
-  identifiers: Array<PgSelectIdentifierSpec>,
-  args?: Array<PgSelectArgumentSpec>,
-  customFrom?: SQL | ((args: SQL[]) => SQL),
-  customName?: string,
+  options: PgSelectOptions<TDataSource>,
 ): PgSelectPlan<TDataSource> {
-  return new PgSelectPlan(
-    dataSource,
-    identifiers,
-    args,
-    customFrom,
-    customName,
-  );
+  return new PgSelectPlan(options);
 }
