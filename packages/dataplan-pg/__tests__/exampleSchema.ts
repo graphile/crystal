@@ -1074,9 +1074,11 @@ export function makeExampleSchema(
         mostRecentForum: {
           type: Forum,
           plan($user) {
-            const $forum = pgSelect(usersMostRecentForumSource, [
-              { plan: $user.record() },
-            ]).single();
+            const $forum = pgSelect(
+              usersMostRecentForumSource,
+              [],
+              [{ plan: $user.record() }],
+            ).single();
             deoptimizeIfAppropriate($forum);
             return $forum;
           },
@@ -1668,15 +1670,19 @@ export function makeExampleSchema(
             },
             plan($forum, args) {
               const $featured = args.featured;
-              return pgSelect(forumsUniqueAuthorCountSource, [
-                {
-                  plan: $forum.record(),
-                },
-                {
-                  plan: $featured,
-                  type: TYPES.boolean.sqlType,
-                },
-              ])
+              return pgSelect(
+                forumsUniqueAuthorCountSource,
+                [],
+                [
+                  {
+                    plan: $forum.record(),
+                  },
+                  {
+                    plan: $featured,
+                    type: TYPES.boolean.sqlType,
+                  },
+                ],
+              )
                 .single()
                 .getSelfNamed();
             },
@@ -1685,11 +1691,15 @@ export function makeExampleSchema(
           randomUser: {
             type: User,
             plan($forum) {
-              const $user = pgSelect(forumsRandomUserSource, [
-                {
-                  plan: $forum.record(),
-                },
-              ]).single();
+              const $user = pgSelect(
+                forumsRandomUserSource,
+                [],
+                [
+                  {
+                    plan: $forum.record(),
+                  },
+                ],
+              ).single();
               deoptimizeIfAppropriate($user);
               return $user;
             },
@@ -1698,11 +1708,15 @@ export function makeExampleSchema(
           featuredMessages: {
             type: new GraphQLList(Message),
             plan($forum) {
-              const $messages = pgSelect(forumsFeaturedMessages, [
-                {
-                  plan: $forum.record(),
-                },
-              ]);
+              const $messages = pgSelect(
+                forumsFeaturedMessages,
+                [],
+                [
+                  {
+                    plan: $forum.record(),
+                  },
+                ],
+              );
               deoptimizeIfAppropriate($messages);
               return $messages;
             },
@@ -2393,13 +2407,17 @@ export function makeExampleSchema(
           },
           plan(_$root, args) {
             const $featured = args.featured;
-            const $plan = pgSelect(uniqueAuthorCountSource, [
-              {
-                plan: $featured,
-                type: TYPES.boolean.sqlType,
-                name: "featured",
-              },
-            ]);
+            const $plan = pgSelect(
+              uniqueAuthorCountSource,
+              [],
+              [
+                {
+                  plan: $featured,
+                  type: TYPES.boolean.sqlType,
+                  name: "featured",
+                },
+              ],
+            );
             deoptimizeIfAppropriate($plan);
             return $plan.single().getSelfNamed();
           },
@@ -2577,13 +2595,17 @@ export function makeExampleSchema(
             },
           },
           plan(_$root, args) {
-            const $plan = pgSelect(entitySearchSource, [
-              {
-                plan: args.query,
-                type: TYPES.text.sqlType,
-                name: "query",
-              },
-            ]);
+            const $plan = pgSelect(
+              entitySearchSource,
+              [],
+              [
+                {
+                  plan: args.query,
+                  type: TYPES.text.sqlType,
+                  name: "query",
+                },
+              ],
+            );
             deoptimizeIfAppropriate($plan);
             return each($plan, entityUnion);
           },
