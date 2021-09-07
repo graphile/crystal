@@ -115,6 +115,19 @@ interface QueryValue {
   type: SQL;
 }
 
+function assertSensible(plan: ExecutablePlan): void {
+  if (plan instanceof PgSelectPlan) {
+    throw new Error(
+      "You passed a PgSelectPlan as an identifier, perhaps you forgot to add `.record()`?",
+    );
+  }
+  if (plan instanceof PgSelectSinglePlan) {
+    throw new Error(
+      "You passed a PgSelectSinglePlan as an identifier, perhaps you forgot to add `.record()`?",
+    );
+  }
+}
+
 /**
  * This represents selecting from a class-like entity (table, view, etc); i.e.
  * it represents `SELECT <columns>, <cursor?> FROM <table>`. You can also add
@@ -132,6 +145,7 @@ export class PgSelectPlan<
   TDataSource extends PgSource<any, any, any, any>,
 > extends ExecutablePlan<ReadonlyArray<TDataSource["TRow"]>> {
   // FROM
+  private readonly from: SQL | ((args: SQL[]) => SQL) | null;
 
   /**
    * To be used as the table alias, we always use a symbol unless the calling
@@ -302,12 +316,16 @@ export class PgSelectPlan<
 
   constructor(
     dataSource: TDataSource,
-    identifiers: Array<PgSelectIdentifierSpec | PgSelectArgumentSpec>,
+    identifiers: Array<PgSelectIdentifierSpec>,
+    customFrom?: SQL | ((args: SQL[]) => SQL),
+    args?: Array<PgSelectArgumentSpec>,
   );
   constructor(cloneFrom: PgSelectPlan<TDataSource>);
   constructor(
     dataSourceOrCloneFrom: TDataSource | PgSelectPlan<TDataSource>,
-    identifiersOrNot?: Array<PgSelectIdentifierSpec | PgSelectArgumentSpec>,
+    inIdentifiers?: Array<PgSelectIdentifierSpec>,
+    inCustomFrom?: SQL | ((args: SQL[]) => SQL),
+    inArgs?: Array<PgSelectArgumentSpec>,
   ) {
     super();
     const cloneFrom =
@@ -318,9 +336,12 @@ export class PgSelectPlan<
       ? cloneFrom.dataSource
       : (dataSourceOrCloneFrom as TDataSource);
 
-    const identifiers = cloneFrom ? null : identifiersOrNot;
+    const identifiers = cloneFrom ? null : inIdentifiers;
+
+    const customFrom = cloneFrom ? cloneFrom.from : inCustomFrom ?? null;
 
     this.dataSource = dataSource;
+    this.from = customFrom ?? dataSource.source;
     if (cloneFrom) {
       // Prevent any changes to our original to help avoid programming
       // errors.
@@ -369,27 +390,24 @@ export class PgSelectPlan<
       const args: PgSelectArgumentDigest[] = [];
       let argIndex: null | number = 0;
       identifiers.forEach((identifier) => {
-        if (identifier.plan instanceof PgSelectPlan) {
-          throw new Error(
-            "You passed a PgSelectPlan as an identifier, perhaps you forgot to add `.record()`?",
-          );
+        if (isDev) {
+          assertSensible(identifier.plan);
         }
-        if (identifier.plan instanceof PgSelectSinglePlan) {
-          throw new Error(
-            "You passed a PgSelectSinglePlan as an identifier, perhaps you forgot to add `.record()`?",
-          );
-        }
-        if (isPgSelectIdentifierSpec(identifier)) {
-          const { plan, matches } = identifier;
-          const type =
-            identifier.type ||
-            (identifier.plan as PgTypedExecutablePlan).pgCodec.sqlType;
-          queryValues.push({
-            dependencyIndex: this.addDependency(plan),
-            type,
-          });
-          identifierMatches.push(matches(this.alias));
-        } else {
+        const { plan, matches } = identifier;
+        const type =
+          identifier.type ||
+          (identifier.plan as PgTypedExecutablePlan).pgCodec.sqlType;
+        queryValues.push({
+          dependencyIndex: this.addDependency(plan),
+          type,
+        });
+        identifierMatches.push(matches(this.alias));
+      });
+      if (inArgs) {
+        inArgs.forEach((identifier) => {
+          if (isDev) {
+            assertSensible(identifier.plan);
+          }
           const { plan, name } = identifier;
           const type =
             identifier.type || (plan as PgTypedExecutablePlan).pgCodec.sqlType;
@@ -411,8 +429,8 @@ export class PgSelectPlan<
               placeholder,
             });
           }
-        }
-      });
+        });
+      }
       this.queryValues = queryValues;
       this.identifierMatches = identifierMatches;
       this.arguments = args;
@@ -836,11 +854,20 @@ export class PgSelectPlan<
   }
 
   private source(): SQL {
-    const source =
-      typeof this.dataSource.source === "function"
-        ? this.dataSource.source(this.arguments.map((arg) => arg.placeholder))
-        : this.dataSource.source;
-    return source;
+    if (this.from) {
+      console.log("OVERRIDE SOURCE");
+      const source =
+        typeof this.from === "function"
+          ? this.from(this.arguments.map((arg) => arg.placeholder))
+          : this.from;
+      return source;
+    } else {
+      const source =
+        typeof this.dataSource.source === "function"
+          ? this.dataSource.source(this.arguments.map((arg) => arg.placeholder))
+          : this.dataSource.source;
+      return source;
+    }
   }
 
   private buildFrom() {
@@ -1732,7 +1759,9 @@ function ensureOrderIsUnique(plan: PgSelectPlan<any>) {
 
 export function pgSelect<TDataSource extends PgSource<any, any, any, any>>(
   dataSource: TDataSource,
-  identifiers: Array<PgSelectIdentifierSpec | PgSelectArgumentSpec>,
+  identifiers: Array<PgSelectIdentifierSpec>,
+  customFrom?: SQL | ((args: SQL[]) => SQL),
+  args?: Array<PgSelectArgumentSpec>,
 ): PgSelectPlan<TDataSource> {
-  return new PgSelectPlan(dataSource, identifiers);
+  return new PgSelectPlan(dataSource, identifiers, customFrom, args);
 }
