@@ -319,6 +319,7 @@ export class PgSelectPlan<
     identifiers: Array<PgSelectIdentifierSpec>,
     args?: Array<PgSelectArgumentSpec>,
     customFrom?: SQL | ((args: SQL[]) => SQL),
+    customAlias?: string,
   );
   constructor(cloneFrom: PgSelectPlan<TDataSource>);
   constructor(
@@ -326,6 +327,7 @@ export class PgSelectPlan<
     inIdentifiers?: Array<PgSelectIdentifierSpec>,
     inArgs?: Array<PgSelectArgumentSpec>,
     inCustomFrom?: SQL | ((args: SQL[]) => SQL),
+    customAlias?: string,
   ) {
     super();
     const cloneFrom =
@@ -371,7 +373,9 @@ export class PgSelectPlan<
     this.queryValuesSymbol = cloneFrom
       ? cloneFrom.queryValuesSymbol
       : Symbol(dataSource.name + "_identifier_values");
-    this.symbol = cloneFrom ? cloneFrom.symbol : Symbol(dataSource.name);
+    this.symbol = cloneFrom
+      ? cloneFrom.symbol
+      : Symbol(customAlias ?? dataSource.name);
     this._symbolSubstitutes = cloneFrom
       ? new Map(cloneFrom._symbolSubstitutes)
       : new Map();
@@ -1753,6 +1757,13 @@ export function pgSelect<TDataSource extends PgSource<any, any, any, any>>(
   identifiers: Array<PgSelectIdentifierSpec>,
   args?: Array<PgSelectArgumentSpec>,
   customFrom?: SQL | ((args: SQL[]) => SQL),
+  customAlias?: string,
 ): PgSelectPlan<TDataSource> {
-  return new PgSelectPlan(dataSource, identifiers, args, customFrom);
+  return new PgSelectPlan(
+    dataSource,
+    identifiers,
+    args,
+    customFrom,
+    customAlias,
+  );
 }

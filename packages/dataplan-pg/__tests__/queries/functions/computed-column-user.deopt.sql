@@ -28,12 +28,12 @@ from (
 ) as __users_identifiers__,
 lateral (
   select
-    __users__."username"::text as "0",
-    __users__."gravatar_url"::text as "1",
+    __forums_random_user__."username"::text as "0",
+    __forums_random_user__."gravatar_url"::text as "1",
     __users_identifiers__.idx as "2"
-  from app_public.forums_random_user(__users_identifiers__."id0") as __users__
+  from app_public.forums_random_user(__users_identifiers__."id0") as __forums_random_user__
   where (
     true /* authorization checks */
   )
-  order by __users__."id" asc
+  order by __forums_random_user__."id" asc
 ) as __users_result__

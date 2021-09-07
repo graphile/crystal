@@ -239,11 +239,11 @@ export function makeExampleSchema(
     columns: null,
   });
 
-  const forumNamesSource = new PgSource({
+  const scalarTextSource = new PgSource({
     executor,
-    codec: TYPES.int,
-    source: sql`app_public.forum_names()`,
-    name: "forum_names",
+    codec: TYPES.text,
+    source: sql`(select '')`,
+    name: "text",
     columns: null,
   });
 
@@ -1683,6 +1683,7 @@ export function makeExampleSchema(
                 ],
                 (args: SQL[]) =>
                   sql`app_public.forums_random_user(${sql.join(args, ", ")})`,
+                "forums_random_user",
               ).single();
               deoptimizeIfAppropriate($user);
               return $user;
@@ -2410,7 +2411,13 @@ export function makeExampleSchema(
         forumNames: {
           type: new GraphQLList(GraphQLString),
           plan(_$root) {
-            const $plan = pgSelect(forumNamesSource, []);
+            const $plan = pgSelect(
+              scalarTextSource,
+              [],
+              [],
+              sql`app_public.forum_names()`,
+              "forum_names",
+            );
             return each($plan, ($name) => $name.getSelfNamed());
           },
         },
@@ -2420,7 +2427,13 @@ export function makeExampleSchema(
           description:
             "Like forumNames, only we convert them all to upper case",
           plan(_$root) {
-            const $plan = pgSelect(forumNamesSource, []);
+            const $plan = pgSelect(
+              scalarTextSource,
+              [],
+              [],
+              sql`app_public.forum_names()`,
+              "forum_names",
+            );
             return each($plan, ($name) =>
               lambda($name.getSelfNamed(), (name) => name.toUpperCase()),
             );
@@ -2435,6 +2448,7 @@ export function makeExampleSchema(
               [],
               [],
               sql`app_public.random_user()`,
+              "random_user",
             );
             deoptimizeIfAppropriate($users);
             return $users.single();
