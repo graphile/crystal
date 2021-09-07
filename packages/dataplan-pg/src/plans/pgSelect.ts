@@ -843,7 +843,7 @@ export class PgSelectPlan<
       shouldReverseOrder,
     } = this.finalizeResults;
 
-    const executionResult = await this.source.execute(
+    const executionResult = await this.source.executeWithCache(
       values.map((value) => {
         return {
           // The context is how we'd handle different connections with different claims

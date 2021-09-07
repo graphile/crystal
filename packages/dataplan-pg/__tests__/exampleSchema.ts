@@ -7,6 +7,7 @@ import type {
   ExecutablePlan,
   InputStaticLeafPlan,
 } from "graphile-crystal";
+import { constant } from "graphile-crystal";
 import {
   BasePlan,
   context,
@@ -130,6 +131,7 @@ export function makeExampleSchema(
   type SingleTableItemPlan = PgSelectSinglePlan<typeof singleTableItemsSource>;
   type RelationalItemsPlan = PgSelectPlan<typeof relationalItemsSource>;
   type RelationalItemPlan = PgSelectSinglePlan<typeof relationalItemsSource>;
+  type RelationalPostPlan = PgSelectSinglePlan<typeof relationalPostsSource>;
   type UnionItemsPlan = PgSelectPlan<typeof unionItemsSource>;
   type UnionItemPlan = PgSelectSinglePlan<typeof unionItemsSource>;
   type UnionTopicPlan = PgSelectSinglePlan<typeof unionTopicsSource>;
@@ -2631,9 +2633,77 @@ export function makeExampleSchema(
     }),
   );
 
+  const CreateRelationalPostInput = new GraphQLInputObjectType(
+    inputObjectSpec({
+      name: "CreateRelationalPostInput",
+      fields: {
+        title: {
+          type: new GraphQLNonNull(GraphQLString),
+        },
+        description: {
+          type: GraphQLString,
+        },
+        note: {
+          type: GraphQLString,
+        },
+      },
+    }),
+  );
+
+  const CreateRelationalPostPayload = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, RelationalPostPlan>({
+      name: "CreateRelationalPostPayload",
+      fields: {
+        post: {
+          type: RelationalPost,
+          plan($post) {
+            return relationalPostsSource.get({ id: $post.get("id") });
+          },
+        },
+        id: {
+          type: GraphQLInt,
+          plan($post) {
+            return $post.get("id");
+          },
+        },
+      },
+    }),
+  );
+
+  const Mutation = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, __ValuePlan<BaseGraphQLRootValue>>({
+      name: "Mutation",
+      fields: {
+        createRelationalPost: {
+          args: {
+            input: {
+              type: new GraphQLNonNull(CreateRelationalPostInput),
+            },
+          },
+          type: CreateRelationalPostPayload,
+          plan(_$root, args) {
+            const $item = pgInsert(relationalItemsSource, {
+              type: constant`POST`,
+              authorId: constant(2),
+            });
+            const $itemId = $item.get("id");
+            const $post = pgInsert(relationalPostsSource, {
+              id: $itemId,
+              title: args.title,
+              description: args.description,
+              note: args.note,
+            });
+            return $post;
+          },
+        },
+      },
+    }),
+  );
+
   return crystalEnforce(
     new GraphQLSchema({
       query: Query,
+      mutation: Mutation,
       types: [
         // Don't forget to add all types that implement interfaces here
         // otherwise they _might_ not show up in the schema.

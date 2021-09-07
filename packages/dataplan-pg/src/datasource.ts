@@ -425,10 +425,10 @@ export class PgSource<
     return this.executor.context();
   }
 
-  public execute<TInput = any, TOutput = any>(
+  public executeWithCache<TInput = any, TOutput = any>(
     values: CrystalValuesList<PgExecutorInput<TInput>>,
     options: PgExecutorOptions,
   ): Promise<{ values: CrystalValuesList<ReadonlyArray<TOutput>> }> {
-    return this.executor.execute(values, options);
+    return this.executor.executeWithCache(values, options);
   }
 }

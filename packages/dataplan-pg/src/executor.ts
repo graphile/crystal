@@ -96,7 +96,7 @@ export class PgExecutor {
     return this.contextCallback();
   }
 
-  public async execute<TInput = any, TOutput = any>(
+  public async executeWithCache<TInput = any, TOutput = any>(
     values: CrystalValuesList<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
   ): Promise<{
