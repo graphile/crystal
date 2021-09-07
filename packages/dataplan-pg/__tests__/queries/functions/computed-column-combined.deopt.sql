@@ -19,25 +19,25 @@ lateral (
   order by __forums__."id" asc
 ) as __forums_result__
 
-select __users_result__.*
+select __forums_random_user_result__.*
 from (
   select
     ids.ordinality - 1 as idx,
     (ids.value->>0)::app_public.forums as "id0"
   from json_array_elements($1::json) with ordinality as ids
-) as __users_identifiers__,
+) as __forums_random_user_identifiers__,
 lateral (
   select
     __forums_random_user__."username"::text as "0",
     __forums_random_user__."gravatar_url"::text as "1",
     __forums_random_user__::text as "2",
-    __users_identifiers__.idx as "3"
-  from app_public.forums_random_user(__users_identifiers__."id0") as __forums_random_user__
+    __forums_random_user_identifiers__.idx as "3"
+  from app_public.forums_random_user(__forums_random_user_identifiers__."id0") as __forums_random_user__
   where (
     true /* authorization checks */
   )
   order by __forums_random_user__."id" asc
-) as __users_result__
+) as __forums_random_user_result__
 
 select __users_most_recent_forum_result__.*
 from (

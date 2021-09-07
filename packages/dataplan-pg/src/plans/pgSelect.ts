@@ -148,6 +148,11 @@ export class PgSelectPlan<
   private readonly from: SQL | ((args: SQL[]) => SQL);
 
   /**
+   * This defaults to the name of the dataSource but you can override it. Aids
+   * in debugging.
+   */
+  private readonly name: string;
+  /**
    * To be used as the table alias, we always use a symbol unless the calling
    * code specifically indicates a string to use.
    */
@@ -319,7 +324,7 @@ export class PgSelectPlan<
     identifiers: Array<PgSelectIdentifierSpec>,
     args?: Array<PgSelectArgumentSpec>,
     customFrom?: SQL | ((args: SQL[]) => SQL),
-    customAlias?: string,
+    customName?: string,
   );
   constructor(cloneFrom: PgSelectPlan<TDataSource>);
   constructor(
@@ -327,7 +332,7 @@ export class PgSelectPlan<
     inIdentifiers?: Array<PgSelectIdentifierSpec>,
     inArgs?: Array<PgSelectArgumentSpec>,
     inCustomFrom?: SQL | ((args: SQL[]) => SQL),
-    customAlias?: string,
+    customName?: string,
   ) {
     super();
     const cloneFrom =
@@ -370,12 +375,11 @@ export class PgSelectPlan<
       ? cloneFrom.contextId
       : this.addDependency(this.dataSource.context());
 
+    this.name = customName ?? dataSource.name;
     this.queryValuesSymbol = cloneFrom
       ? cloneFrom.queryValuesSymbol
-      : Symbol(dataSource.name + "_identifier_values");
-    this.symbol = cloneFrom
-      ? cloneFrom.symbol
-      : Symbol(customAlias ?? dataSource.name);
+      : Symbol(this.name + "_identifier_values");
+    this.symbol = cloneFrom ? cloneFrom.symbol : Symbol(this.name);
     this._symbolSubstitutes = cloneFrom
       ? new Map(cloneFrom._symbolSubstitutes)
       : new Map();
@@ -460,14 +464,14 @@ export class PgSelectPlan<
     debugPlan(
       `%s (%s) constructor (%s)`,
       this,
-      this.dataSource.name,
+      this.name,
       cloneFrom ? "clone" : "original",
     );
     return this;
   }
 
   toStringMeta(): string {
-    return this.dataSource.name;
+    return this.name;
   }
 
   public lock(): void {
@@ -1056,9 +1060,7 @@ export class PgSelectPlan<
       let query: SQL;
       let identifierIndex: number | null = null;
       if (this.queryValues.length || this.placeholders.length) {
-        const alias = sql.identifier(
-          Symbol(this.dataSource.name + "_identifiers"),
-        );
+        const alias = sql.identifier(Symbol(this.name + "_identifiers"));
 
         this.placeholders.forEach((placeholder) => {
           // NOTE: we're adding to `this.identifiers` but NOT to
@@ -1071,9 +1073,7 @@ export class PgSelectPlan<
           placeholder.sqlRef.sql = sql`${alias}.${sql.identifier(`id${idx}`)}`;
         });
 
-        const wrapperAlias = sql.identifier(
-          Symbol(this.dataSource.name + "_result"),
-        );
+        const wrapperAlias = sql.identifier(Symbol(this.name + "_result"));
         const extraSelects: SQL[] = [];
         const extraWheres: SQL[] = [];
 
@@ -1757,13 +1757,13 @@ export function pgSelect<TDataSource extends PgSource<any, any, any, any>>(
   identifiers: Array<PgSelectIdentifierSpec>,
   args?: Array<PgSelectArgumentSpec>,
   customFrom?: SQL | ((args: SQL[]) => SQL),
-  customAlias?: string,
+  customName?: string,
 ): PgSelectPlan<TDataSource> {
   return new PgSelectPlan(
     dataSource,
     identifiers,
     args,
     customFrom,
-    customAlias,
+    customName,
   );
 }
