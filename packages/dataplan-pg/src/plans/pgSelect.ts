@@ -317,15 +317,15 @@ export class PgSelectPlan<
   constructor(
     dataSource: TDataSource,
     identifiers: Array<PgSelectIdentifierSpec>,
-    customFrom?: SQL | ((args: SQL[]) => SQL),
     args?: Array<PgSelectArgumentSpec>,
+    customFrom?: SQL | ((args: SQL[]) => SQL),
   );
   constructor(cloneFrom: PgSelectPlan<TDataSource>);
   constructor(
     dataSourceOrCloneFrom: TDataSource | PgSelectPlan<TDataSource>,
     inIdentifiers?: Array<PgSelectIdentifierSpec>,
-    inCustomFrom?: SQL | ((args: SQL[]) => SQL),
     inArgs?: Array<PgSelectArgumentSpec>,
+    inCustomFrom?: SQL | ((args: SQL[]) => SQL),
   ) {
     super();
     const cloneFrom =
@@ -1760,8 +1760,8 @@ function ensureOrderIsUnique(plan: PgSelectPlan<any>) {
 export function pgSelect<TDataSource extends PgSource<any, any, any, any>>(
   dataSource: TDataSource,
   identifiers: Array<PgSelectIdentifierSpec>,
-  customFrom?: SQL | ((args: SQL[]) => SQL),
   args?: Array<PgSelectArgumentSpec>,
+  customFrom?: SQL | ((args: SQL[]) => SQL),
 ): PgSelectPlan<TDataSource> {
-  return new PgSelectPlan(dataSource, identifiers, customFrom, args);
+  return new PgSelectPlan(dataSource, identifiers, args, customFrom);
 }
