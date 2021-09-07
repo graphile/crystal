@@ -776,7 +776,11 @@ export class PgSelectPlan<
         // Codec is responsible for performing validation/coercion and throwing
         // error if value is invalid.
         // TODO: make sure this ^ is clear in the relevant places.
-        const sqlValue = order.codec.toPg(cursorParts[i]);
+        const sqlValue = sql`${sql.value(
+          (void 0 /* forbid relying on `this` */, order.codec.toPg)(
+            cursorParts[i],
+          ),
+        )}::${order.codec.sqlType}`;
         const gt =
           (order.direction === "ASC" && beforeOrAfter === "after") ||
           (order.direction === "DESC" && beforeOrAfter === "before");

@@ -23,15 +23,17 @@ const pg2gqlForType = (type: "bool" | "timestamptz" | "timestamp" | string) => {
   }
 };
 
-const gql2pgForType = (type: string) => {
+// TODO: optimisation: `identity` can be shortcut
+const identity = <T>(value: T): T => value;
+
+const gql2pgForType = (type: string): PgTypeCodec["toPg"] => {
   switch (type) {
     case "jsonb":
     case "json": {
-      return (value: any) =>
-        sql`${sql.value(JSON.stringify(value))}::${sql.identifier(type)}`;
+      return (value) => JSON.stringify(value);
     }
     default: {
-      return (value: any) => sql`${sql.value(value)}::${sql.identifier(type)}`;
+      return identity;
     }
   }
 };
@@ -52,12 +54,8 @@ export function recordType(
 ): PgTypeCodec<string, string> {
   return {
     sqlType: identifier,
-    fromPg(value) {
-      return value;
-    },
-    toPg(value) {
-      return sql`${sql.value(value)}::${identifier}`;
-    },
+    fromPg: identity,
+    toPg: identity,
     columns,
   };
 }
@@ -65,12 +63,8 @@ export function recordType(
 export function enumType(identifier: SQL): PgTypeCodec<string, string> {
   return {
     sqlType: identifier,
-    fromPg(value) {
-      return value;
-    },
-    toPg(value) {
-      return sql`${sql.value(value)}::${identifier}`;
-    },
+    fromPg: identity,
+    toPg: identity,
   };
 }
 

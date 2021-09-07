@@ -13,7 +13,7 @@ import type {
   PgExecutorInput,
   PgExecutorOptions,
 } from "./executor";
-import type { PgTypeCodec } from "./interfaces";
+import type { PgTypeCodec, PgTypedExecutablePlan } from "./interfaces";
 import type { PgSelectPlan } from "./plans/pgSelect";
 import { pgSelect } from "./plans/pgSelect";
 import type {

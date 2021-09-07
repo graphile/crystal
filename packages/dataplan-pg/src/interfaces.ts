@@ -4,10 +4,22 @@ import type { SQL } from "pg-sql2";
 import type { PgSourceColumns } from "./datasource";
 
 /**
+ * Most notably SQLCapableValue cannot be an object (e.g. a JSON object) - you
+ * must convert it into something `pg` can use first. E.g. for JSON you could
+ * use `JSON.stringify` via the `toPg` converter.
+ */
+export type SQLCapableValue =
+  | null
+  | boolean
+  | number
+  | string
+  | Array<SQLCapableValue>;
+
+/**
  * Given a value of type TInput, returns an `SQL` value to insert into an SQL
  * statement.
  */
-export type PgEncode<TInput> = (value: TInput) => SQL;
+export type PgEncode<TInput> = (value: TInput) => SQLCapableValue;
 
 /**
  * Given a text value from PostgreSQL, returns the value cast to TCanonical.
