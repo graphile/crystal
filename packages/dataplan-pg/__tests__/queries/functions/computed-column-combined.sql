@@ -8,8 +8,8 @@ from (
 ) as __forums_identifiers__,
 lateral (
   select
-    __forums_random_user__."username"::text as "0",
-    __forums_random_user__."gravatar_url"::text as "1",
+    __users__."username"::text as "0",
+    __users__."gravatar_url"::text as "1",
     __forums_unique_author_count__.__forums_unique_author_count__::text as "2",
     array(
       select array[
@@ -22,9 +22,9 @@ lateral (
     ) as "3",
     __forums_identifiers__.idx as "4"
   from app_public.forums as __forums__
-  left outer join app_public.forums_random_user(__forums__) as __forums_random_user__
+  left outer join app_public.forums_random_user(__forums__) as __users__
   on TRUE
-  left outer join app_public.users_most_recent_forum(__forums_random_user__) as __users_most_recent_forum__
+  left outer join app_public.users_most_recent_forum(__users__) as __users_most_recent_forum__
   on TRUE
   left outer join app_public.forums_unique_author_count(__users_most_recent_forum__, __forums_identifiers__."id1") as __forums_unique_author_count__
   on TRUE

@@ -247,24 +247,6 @@ export function makeExampleSchema(
     columns: null,
   });
 
-  const randomUserSource = new PgSource({
-    executor,
-    codec: recordType(sql`app_public.users`, userColumns),
-    source: (args: SQL[]) =>
-      sql`app_public.random_user(${sql.join(args, ", ")})`,
-    name: "random_user",
-    columns: userColumns,
-  });
-
-  const forumsRandomUserSource = new PgSource({
-    executor,
-    codec: recordType(sql`app_public.users`, userColumns),
-    source: (args: SQL[]) =>
-      sql`app_public.forums_random_user(${sql.join(args, ", ")})`,
-    name: "forums_random_user",
-    columns: userColumns,
-  });
-
   const featuredMessages = new PgSource({
     executor,
     codec: recordType(sql`app_public.messages`, messageColumns),
@@ -1692,13 +1674,15 @@ export function makeExampleSchema(
             type: User,
             plan($forum) {
               const $user = pgSelect(
-                forumsRandomUserSource,
+                userSource,
                 [],
                 [
                   {
                     plan: $forum.record(),
                   },
                 ],
+                (args: SQL[]) =>
+                  sql`app_public.forums_random_user(${sql.join(args, ", ")})`,
               ).single();
               deoptimizeIfAppropriate($user);
               return $user;
@@ -2446,7 +2430,12 @@ export function makeExampleSchema(
         randomUser: {
           type: User,
           plan() {
-            const $users = pgSelect(randomUserSource, []);
+            const $users = pgSelect(
+              userSource,
+              [],
+              [],
+              sql`app_public.random_user()`,
+            );
             deoptimizeIfAppropriate($users);
             return $users.single();
           },
