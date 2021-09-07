@@ -189,11 +189,6 @@ export class PgSelectPlan<
   private queryValues: Array<QueryValue>;
 
   /**
-   * So we can clone.
-   */
-  private identifiers: Array<PgSelectIdentifierSpec | PgSelectArgumentSpec>;
-
-  /**
    * This is the list of SQL fragments in the result that are compared to some
    * of the above `queryValues` to determine if there's a match or not. Typically
    * this will be a list of columns (e.g. primary or foreign keys on the
@@ -319,19 +314,11 @@ export class PgSelectPlan<
       dataSourceOrCloneFrom instanceof PgSelectPlan
         ? dataSourceOrCloneFrom
         : null;
-    const { dataSource, identifiers } = cloneFrom
-      ? {
-          dataSource: cloneFrom.dataSource,
-          identifiers: cloneFrom.hydrateIdentifiers(),
-        }
-      : {
-          dataSource: dataSourceOrCloneFrom as TDataSource,
-          identifiers: identifiersOrNot,
-        };
+    const dataSource = cloneFrom
+      ? cloneFrom.dataSource
+      : (dataSourceOrCloneFrom as TDataSource);
 
-    if (!identifiers) {
-      throw new Error("Invalid construction of PgSelectPlan");
-    }
+    const identifiers = cloneFrom ? null : identifiersOrNot;
 
     this.dataSource = dataSource;
     if (cloneFrom) {
@@ -359,7 +346,6 @@ export class PgSelectPlan<
     this.contextId = cloneFrom
       ? cloneFrom.contextId
       : this.addDependency(this.dataSource.context());
-    this.identifiers = identifiers;
 
     this.queryValuesSymbol = cloneFrom
       ? cloneFrom.queryValuesSymbol
@@ -375,6 +361,9 @@ export class PgSelectPlan<
       this.identifierMatches = Object.freeze(cloneFrom.identifierMatches);
       this.arguments = Object.freeze(cloneFrom.arguments);
     } else {
+      if (!identifiers) {
+        throw new Error("Invalid construction of PgSelectPlan");
+      }
       const queryValues: QueryValue[] = [];
       const identifierMatches: SQL[] = [];
       const args: PgSelectArgumentDigest[] = [];
@@ -529,15 +518,6 @@ export class PgSelectPlan<
 
   public unique(): boolean {
     return this.isUnique;
-  }
-
-  private hydrateIdentifiers(): Array<
-    PgSelectIdentifierSpec | PgSelectArgumentSpec
-  > {
-    return this.queryValues.map(({ dependencyIndex, type }) => ({
-      plan: this.getPlan(this.dependencies[dependencyIndex]),
-      type,
-    }));
   }
 
   public placeholder($plan: PgTypedExecutablePlan): SQL;
