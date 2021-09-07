@@ -145,7 +145,7 @@ export class PgSelectPlan<
   TDataSource extends PgSource<any, any, any, any>,
 > extends ExecutablePlan<ReadonlyArray<TDataSource["TRow"]>> {
   // FROM
-  private readonly from: SQL | ((args: SQL[]) => SQL) | null;
+  private readonly from: SQL | ((args: SQL[]) => SQL);
 
   /**
    * To be used as the table alias, we always use a symbol unless the calling
@@ -854,20 +854,11 @@ export class PgSelectPlan<
   }
 
   private source(): SQL {
-    if (this.from) {
-      console.log("OVERRIDE SOURCE");
-      const source =
-        typeof this.from === "function"
-          ? this.from(this.arguments.map((arg) => arg.placeholder))
-          : this.from;
-      return source;
-    } else {
-      const source =
-        typeof this.dataSource.source === "function"
-          ? this.dataSource.source(this.arguments.map((arg) => arg.placeholder))
-          : this.dataSource.source;
-      return source;
-    }
+    const source =
+      typeof this.from === "function"
+        ? this.from(this.arguments.map((arg) => arg.placeholder))
+        : this.from;
+    return source;
   }
 
   private buildFrom() {
