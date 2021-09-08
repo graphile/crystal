@@ -134,6 +134,13 @@ export class PgInsertPlan<
       }
       this.columns.push({ name, depId, pgCodec });
     } else {
+      if (!(value.plan instanceof ExecutablePlan)) {
+        throw new Error(
+          `Expected a PgTypedExecutablePlan or {plan: ExecutablePlan, pgCodec: PgCodec}; instead received '${value}' (${inspect(
+            value,
+          )})`,
+        );
+      }
       const depId = this.addDependency(value.plan);
       const pgCodec = value.pgCodec;
       this.columns.push({ name, depId, pgCodec });
