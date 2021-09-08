@@ -5,6 +5,7 @@ import type {
   BaseGraphQLContext,
   BaseGraphQLRootValue,
   ExecutablePlan,
+  InputObjectPlan,
   InputStaticLeafPlan,
 } from "graphile-crystal";
 import { constant } from "graphile-crystal";
@@ -2682,15 +2683,23 @@ export function makeExampleSchema(
           type: CreateRelationalPostPayload,
           plan(_$root, args) {
             const $item = pgInsert(relationalItemsSource, {
-              type: { plan: constant`POST`, pgCodec: TYPES.text },
+              type: {
+                plan: constant`POST`,
+                pgCodec: enumType(sql`interfaces_and_unions.item_type`),
+              },
               author_id: { plan: constant(2), pgCodec: TYPES.int },
             });
             const $itemId = $item.get("id");
+            // TODO: make this TypeScript stuff automatic
+            const $input = args.input as InputObjectPlan;
             const $post = pgInsert(relationalPostsSource, {
               id: $itemId,
-              title: { plan: args.title, pgCodec: TYPES.text },
-              description: { plan: args.description, pgCodec: TYPES.text },
-              note: { plan: args.note, pgCodec: TYPES.text },
+              title: { plan: $input.get("title"), pgCodec: TYPES.text },
+              description: {
+                plan: $input.get("description"),
+                pgCodec: TYPES.text,
+              },
+              note: { plan: $input.get("note"), pgCodec: TYPES.text },
             });
             return $post;
           },
