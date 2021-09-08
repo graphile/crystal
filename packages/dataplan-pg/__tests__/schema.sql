@@ -387,9 +387,34 @@ insert into interfaces_and_unions.relational_commentables (id, type)
   union
   select id, 'CHECKLIST_ITEM'::interfaces_and_unions.item_type from interfaces_and_unions.relational_checklist_items;
 
-alter table interfaces_and_unions.relational_posts add constraint relational_posts_commentable_fkey foreign key (id) references interfaces_and_unions.relational_commentables;
-alter table interfaces_and_unions.relational_checklists add constraint relational_posts_commentable_fkey foreign key (id) references interfaces_and_unions.relational_commentables;
-alter table interfaces_and_unions.relational_checklist_items add constraint relational_posts_commentable_fkey foreign key (id) references interfaces_and_unions.relational_commentables;
+alter table interfaces_and_unions.relational_posts add constraint relational_posts_commentable_fkey foreign key (id) references interfaces_and_unions.relational_commentables deferrable initially deferred;
+alter table interfaces_and_unions.relational_checklists add constraint relational_posts_commentable_fkey foreign key (id) references interfaces_and_unions.relational_commentables deferrable initially deferred;
+alter table interfaces_and_unions.relational_checklist_items add constraint relational_posts_commentable_fkey foreign key (id) references interfaces_and_unions.relational_commentables deferrable initially deferred;
+
+create function interfaces_and_unions.tg__relational_commentable() returns trigger as $$
+begin
+  insert into interfaces_and_unions.relational_commentables (id, type)
+    select id, TG_ARGV[0]::interfaces_and_unions.item_type
+    from new_table;
+  return NULL;
+end;
+$$ language plpgsql volatile;
+
+create trigger _500_commentable
+  after insert on interfaces_and_unions.relational_posts
+  referencing new table as new_table
+  for each statement
+  execute function interfaces_and_unions.tg__relational_commentable('POST');
+create trigger _500_commentable
+  after insert on interfaces_and_unions.relational_checklists
+  referencing new table as new_table
+  for each statement
+  execute function interfaces_and_unions.tg__relational_commentable('CHECKLIST');
+create trigger _500_commentable
+  after insert on interfaces_and_unions.relational_checklist_items
+  referencing new table as new_table
+  for each statement
+  execute function interfaces_and_unions.tg__relational_commentable('CHECKLIST_ITEM');
 
 comment on table interfaces_and_unions.relational_commentables is E'@interface relational type\n@type POST relational_posts\n@type CHECKLIST relational_checklists\n@type CHECKLIST_ITEM relational_checklist_items';
 
