@@ -4,6 +4,9 @@ import sql from "pg-sql2";
 import type { PgSourceColumns } from "./datasource";
 import type { PgTypeCodec } from "./interfaces";
 
+// TODO: optimisation: `identity` can be shortcut
+const identity = <T>(value: T): T => value;
+
 const pg2gqlForType = (type: "bool" | "timestamptz" | "timestamp" | string) => {
   switch (type) {
     case "bool": {
@@ -18,13 +21,10 @@ const pg2gqlForType = (type: "bool" | "timestamptz" | "timestamp" | string) => {
       return (value: any) => JSON.parse(value);
     }
     default: {
-      return (value: any) => value;
+      return identity;
     }
   }
 };
-
-// TODO: optimisation: `identity` can be shortcut
-const identity = <T>(value: T): T => value;
 
 const gql2pgForType = (type: string): PgTypeCodec["toPg"] => {
   switch (type) {
