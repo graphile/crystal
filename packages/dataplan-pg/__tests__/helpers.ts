@@ -1,9 +1,9 @@
 Error.stackTraceLimit = Infinity;
-
 import type { BaseGraphQLContext } from "graphile-crystal";
 import { graphql } from "graphql";
 import type { PoolClient } from "pg";
 import { Pool } from "pg";
+import { inspect } from "util";
 
 import type { PgClient, PgClientQuery, WithPgClient } from "../src";
 import { makeExampleSchema, schema as optimizedSchema } from "./exampleSchema";
@@ -22,27 +22,102 @@ afterAll(() => {
   testPool = null;
 });
 
-function pg2pgclient(client: PoolClient, queries: PgClientQuery[]): PgClient {
-  return {
-    query<TData>(opts: PgClientQuery) {
-      queries.push(opts);
-      const { text, values, arrayMode, name } = opts;
+type ClientAndRelease = {
+  count: number;
+  client: PgClient;
+  release: () => void;
+  rawPoolClient: PoolClient;
+};
+const clientMap = new Map<any, Promise<ClientAndRelease>>();
+/**
+ * Must **not** be an async function, otherwise we'll get race conditions
+ */
+function clientForSettings(
+  pgSettings: { [key: string]: string },
+  queries: PgClientQuery[],
+): Promise<ClientAndRelease> {
+  let clientAndReleasePromise = clientMap.get(pgSettings);
+  if (clientAndReleasePromise) {
+    clientAndReleasePromise.then(
+      (clientAndRelease) => clientAndRelease.count++,
+    );
+    return clientAndReleasePromise;
+  }
 
-      return arrayMode
-        ? client.query<TData extends Array<any> ? TData : never>({
-            text,
-            values,
-            name,
-            rowMode: "array",
-          })
-        : client.query<TData>({
-            text,
-            values,
-            name,
-          });
-    },
-  };
+  clientAndReleasePromise = (async () => {
+    const poolClient = await testPool.connect();
+    poolClient.query("begin");
+
+    // Set the claims
+    const setCalls: string[] = [];
+    const setValues: string[] = [];
+    Object.entries(pgSettings).map(([key, value]) => {
+      const i = setValues.push(key);
+      const j = setValues.push(value);
+      setCalls.push(`set_config($${i}, $${j}, true)`);
+    });
+    if (setCalls.length) {
+      const query = `select ${setCalls.join(", ")}`;
+      await poolClient.query(query, setValues);
+    }
+
+    const clientAndRelease: ClientAndRelease = {
+      rawPoolClient: poolClient,
+      count: 1,
+      client: {
+        query<TData>(opts: PgClientQuery) {
+          queries.push(opts);
+          const { text, values, arrayMode, name } = opts;
+
+          return arrayMode
+            ? poolClient.query<TData extends Array<any> ? TData : never>({
+                text,
+                values,
+                name,
+                rowMode: "array",
+              })
+            : poolClient.query<TData>({
+                text,
+                values,
+                name,
+              });
+        },
+        async startTransaction() {
+          await poolClient.query("savepoint tx");
+        },
+        async commitTransaction() {
+          await poolClient.query("release savepoint tx");
+        },
+        async rollbackTransaction() {
+          await poolClient.query("rollback to savepoint tx");
+        },
+      },
+      release() {
+        this.count--;
+        if (this.count < 0) {
+          throw new Error("Released client too many times");
+        }
+      },
+    };
+    return clientAndRelease;
+  })();
+  clientMap.set(pgSettings, clientAndReleasePromise);
+  return clientAndReleasePromise;
 }
+
+async function releaseClients() {
+  for (const clientAndReleasePromise of clientMap.values()) {
+    const clientAndRelease = await clientAndReleasePromise;
+    await clientAndRelease.rawPoolClient.query(`rollback`);
+    clientAndRelease.rawPoolClient.release();
+    if (clientAndRelease.count !== 0) {
+      throw new Error("Client wasn't released right number of times");
+    }
+  }
+  clientMap.clear();
+}
+
+afterEach(releaseClients);
 
 export async function runTestQuery(
   source: string,
@@ -52,15 +127,19 @@ export async function runTestQuery(
   data: { [key: string]: any };
   queries: PgClientQuery[];
 }> {
+  // Do not allow queries to run in parallel during these tests, we need
+  // reproducibility (and we don't want to mess with the transactions, see
+  // releaseClients below).
+  await releaseClients();
+
   const queries: PgClientQuery[] = [];
   const schema = options.deoptimize ? deoptimizedSchema : optimizedSchema;
   const withPgClient: WithPgClient = async (_pgSettings, callback) => {
-    const client = await testPool.connect();
+    const o = await clientForSettings(_pgSettings, queries);
     try {
-      // TODO: set pgSettings within a transaction
-      return callback(pg2pgclient(client, queries));
+      return await callback(o.client);
     } finally {
-      client.release();
+      o.release();
     }
   };
   const contextValue: BaseGraphQLContext = {

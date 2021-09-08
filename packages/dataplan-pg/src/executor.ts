@@ -35,7 +35,9 @@ export interface PgClientResult<TData> {
 export interface PgClient {
   query<TData>(opts: PgClientQuery): Promise<PgClientResult<TData>>;
 
-  // TODO: add transaction support
+  startTransaction(): Promise<void>;
+  commitTransaction(): Promise<void>;
+  rollbackTransaction(): Promise<void>;
 }
 
 export type WithPgClient = <T>(

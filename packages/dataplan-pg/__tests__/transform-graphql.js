@@ -46,8 +46,12 @@ let result1;
 let result2;
 
 beforeAll(() => {
-  result1 = runTestQuery(document, config.variables, {});
-  result2 = runTestQuery(document, config.variables, { deoptimize: true });
+  result1 =
+    runTestQuery(document, config.variables, {});
+  // Always run result2 after result1 finishes
+  result2 = result1.then(() => {}, () => {}).then(() =>
+    runTestQuery(document, config.variables, { deoptimize: true })
+  );
   // Wait for these promises to resolve, even if it's with errors.
   return Promise.all([result1.catch(e => {}), result2.catch(e => {})]);
 });
