@@ -79,6 +79,7 @@ import {
 import { assertPolymorphicData } from "./polymorphic";
 import { newCrystalObject } from "./resolvers";
 import type { UniqueId } from "./utils";
+import { isPromise } from "./utils";
 import {
   arraysMatch,
   defaultValueToValueNode,
@@ -1462,10 +1463,17 @@ export class Aether<
       }
       for (let i = 0; i < pendingCrystalObjectsLength; i++) {
         const crystalLayerObject = pendingCrystalLayerObjects[i];
-        const pendingResult = pendingResults[i];
+        const rawPendingResult = pendingResults[i];
         const j = pendingCrystalLayerObjectsIndexes[i];
-
-        result[j] = pendingResult;
+        if (isPromise(rawPendingResult)) {
+          try {
+            result[j] = await rawPendingResult;
+          } catch (e) {
+            result[j] = new CrystalError(e);
+          }
+        } else {
+          result[j] = rawPendingResult;
+        }
         const { indexByListItemPlanId } = crystalLayerObject;
         const indexes = listItemPlanIds.map(
           (planId) => indexByListItemPlanId[planId],
@@ -2104,5 +2112,16 @@ class __TypePlan extends ExecutablePlan<any> {
 
   execute(values: any[][]): any[] {
     return values.map((v) => ({ type: this.typeName, data: v[this.planId] }));
+  }
+}
+
+// IMPORTANT: this WILL NOT WORK when compiled down to ES5. It requires ES6+
+// native class support.
+class CrystalError extends Error {
+  public readonly originalError: Error;
+  constructor(originalError: Error) {
+    const message = originalError?.message;
+    super(message ? `CrystalError: ${message}` : `CrystalError`);
+    this.originalError = originalError;
   }
 }
