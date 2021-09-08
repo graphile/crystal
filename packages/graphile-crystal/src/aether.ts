@@ -1400,58 +1400,6 @@ export class Aether<
             );
           }
         }
-        /*
-        if (dependencyPlan instanceof __ListItemPlan) {
-          const parentPlan = this.plans[dependencyPlan.dependencies[0]];
-          // execute the parent plan, then get the result at the given index.
-          const arr = new Array(pendingCrystalObjectsLength);
-          const dependencyPathIdentity = dependencyPlan.parentPathIdentity;
-          for (
-            let pendingCrystalObjectIndex = 0;
-            pendingCrystalObjectIndex < pendingCrystalObjectsLength;
-            pendingCrystalObjectIndex++
-          ) {
-            const dependencyResultForPendingCrystalObject =
-              allDependencyResults[pendingCrystalObjectIndex];
-            const pendingCrystalObject =
-              pendingCrystalLayerObjects[pendingCrystalObjectIndex];
-            const indexes =
-              pendingCrystalObject[$$indexesByPathIdentity][
-                dependencyPathIdentity
-              ];
-            debugExecuteVerbose(
-              `%s Evaluating indexes for object %c plan %c(%c) => %c`,
-              follow,
-              pendingCrystalObject,
-              dependencyPlan,
-              dependencyPlan,
-              indexes,
-            );
-            if (!indexes) {
-              throw new Error(
-                "Attempted to access __ListItemPlan with unknown indexes",
-              );
-            }
-            if (indexes.length !== listDepth) {
-              throw new Error(
-                `Attempted to access __ListItemPlan with incorrect list depth (${indexes.length} != ${listDepth})`,
-              );
-            }
-            const item = / *!__INLINE__* / atIndexes(
-              dependencyResultForPendingCrystalObject,
-              indexes,
-            );
-            arr[pendingCrystalObjectIndex] = item;
-            debugExecuteVerbose(
-              `  %s result at indexes %c = %c`,
-              follow,
-              indexes,
-              item,
-            );
-          }
-          dependencyValuesList[i] = arr;
-        } else {
-        */
         const allDependencyResults = await this.executePlan(
           dependencyPlan,
           crystalContext,
@@ -1462,9 +1410,6 @@ export class Aether<
           depth + 1,
         );
         dependencyValuesList[i] = allDependencyResults;
-        /*
-        }
-        */
       }
 
       const values = new Array(pendingCrystalObjectsLength);
