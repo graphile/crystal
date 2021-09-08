@@ -119,6 +119,9 @@ async function releaseClients() {
     }
   }
   clientMap.clear();
+  await testPool.query(
+    await fsp.readFile(`${__dirname}/sequence_reset.sql`, "utf8"),
+  );
 }
 
 afterEach(releaseClients);

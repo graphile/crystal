@@ -594,12 +594,4 @@ insert into interfaces_and_unions.person_favourites (id, person_id, liked_person
   (7, 2, null, null, 2),
   (8, 2, null, null, 3);
 
-alter sequence interfaces_and_unions.people_person_id_seq restart with 1000000;
-alter sequence interfaces_and_unions.posts_post_id_seq restart with 1000000;
-alter sequence interfaces_and_unions.comments_comment_id_seq restart with 1000000;
-alter sequence interfaces_and_unions.single_table_items_id_seq restart with 1000000;
-alter sequence interfaces_and_unions.relational_items_id_seq restart with 1000000;
-alter sequence interfaces_and_unions.relational_commentables_id_seq restart with 1000000;
-alter sequence interfaces_and_unions.union_items_id_seq restart with 1000000;
-alter sequence interfaces_and_unions.person_bookmarks_id_seq restart with 1000000;
-alter sequence interfaces_and_unions.person_likes_id_seq restart with 1000000;
+-- see also sequence_reset.sql
