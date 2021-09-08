@@ -1,0 +1,18 @@
+{
+  p1: {
+    id: 1000000,
+    post: { id: 1000000, title: "My Relational Post", description: "A post, innit?", note: "Such a great post." },
+  },
+  p2: {
+    id: 1000001,
+    post: { id: 1000001, title: "My Relational Post 2", description: "A post, innit? 2", note: "Such a great post. 2" },
+  },
+  p3: {
+    id: 1000002,
+    post: { id: 1000002, title: "My Relational Post 3", description: "A post, innit? 3", note: "Such a great post. 3" },
+  },
+  p4: {
+    id: 1000003,
+    post: { id: 1000003, title: "My Relational Post 4", description: "A post, innit? 4", note: "Such a great post. 4" },
+  },
+}
