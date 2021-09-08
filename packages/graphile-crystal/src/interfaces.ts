@@ -117,8 +117,8 @@ export interface CrystalContext {
 
 // These values are just to make reading the code a little clearer
 export type CrystalValuesList<T> = ReadonlyArray<T>;
-export type CrystalResultsList<T> = ReadonlyArray<T>;
 export type PromiseOrDirect<T> = Promise<T> | T;
+export type CrystalResultsList<T> = ReadonlyArray<PromiseOrDirect<T>>;
 
 export type BaseGraphQLRootValue = any;
 export interface BaseGraphQLContext {}
