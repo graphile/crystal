@@ -1,25 +1,23 @@
 import type { ExecutablePlan } from "graphile-crystal";
-import type { SQL } from "pg-sql2";
+import type { SQL, SQLRawValue } from "pg-sql2";
 
-import type { PgSourceColumns } from "./datasource";
+import type { PgSource, PgSourceColumns } from "./datasource";
+import type { PgInsertPlan } from "./plans/pgInsert";
+import type { PgSelectSinglePlan } from "./plans/pgSelectSingle";
 
 /**
- * Most notably SQLCapableValue cannot be an object (e.g. a JSON object) - you
- * must convert it into something `pg` can use first. E.g. for JSON you could
- * use `JSON.stringify` via the `toPg` converter.
+ * A class-like source of information - could be from `SELECT`-ing a row, or
+ * `INSERT...RETURNING` or similar. *ALWAYS* represents a single row (or null).
  */
-export type SQLCapableValue =
-  | null
-  | boolean
-  | number
-  | string
-  | Array<SQLCapableValue>;
+export type PgClassSinglePlan<
+  TDataSource extends PgSource<any, any, any, any, any>,
+> = PgSelectSinglePlan<TDataSource> | PgInsertPlan<TDataSource>;
 
 /**
  * Given a value of type TInput, returns an `SQL` value to insert into an SQL
  * statement.
  */
-export type PgEncode<TInput> = (value: TInput) => SQLCapableValue;
+export type PgEncode<TInput> = (value: TInput) => SQLRawValue;
 
 /**
  * Given a text value from PostgreSQL, returns the value cast to TCanonical.

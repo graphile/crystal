@@ -173,6 +173,20 @@ export class PgSelectSinglePlan<
     return colPlan;
   }
 
+  public select(fragment: SQL): number {
+    return this.getClassPlan().select(fragment);
+  }
+
+  public placeholder($plan: PgTypedExecutablePlan): SQL;
+  public placeholder($plan: ExecutablePlan<any>, type: SQL): SQL;
+  public placeholder(
+    $plan: ExecutablePlan<any> | PgTypedExecutablePlan,
+    overrideType?: SQL,
+  ): SQL {
+    // @ts-ignore
+    return this.getClassPlan().placeholder($plan, overrideType);
+  }
+
   private existingSingleRelation<
     TRelationName extends Parameters<TDataSource["getRelation"]>[0],
   >(relationIdentifier: TRelationName): PgSelectSinglePlan<any> | null {

@@ -47,12 +47,11 @@ import type {
   PgExecutorContextPlans,
   PgSelectPlan,
   PgSourceColumn,
-  PgSourceColumns,
   PgSourceColumnVia,
-  PgSourceRelation,
   PgTypeCodec,
   WithPgClient,
 } from "../src";
+import { pgInsert, PgSourceColumns, PgSourceRelation } from "../src";
 import {
   enumType,
   pgClassExpression,
@@ -2683,15 +2682,15 @@ export function makeExampleSchema(
           type: CreateRelationalPostPayload,
           plan(_$root, args) {
             const $item = pgInsert(relationalItemsSource, {
-              type: constant`POST`,
-              authorId: constant(2),
+              type: { plan: constant`POST`, pgCodec: TYPES.text },
+              author_id: { plan: constant(2), pgCodec: TYPES.int },
             });
             const $itemId = $item.get("id");
             const $post = pgInsert(relationalPostsSource, {
               id: $itemId,
-              title: args.title,
-              description: args.description,
-              note: args.note,
+              title: { plan: args.title, pgCodec: TYPES.text },
+              description: { plan: args.description, pgCodec: TYPES.text },
+              note: { plan: args.note, pgCodec: TYPES.text },
             });
             return $post;
           },

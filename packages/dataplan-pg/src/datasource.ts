@@ -7,10 +7,12 @@ import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type {
+  PgClientResult,
   PgExecutor,
   PgExecutorContext,
   PgExecutorContextPlans,
   PgExecutorInput,
+  PgExecutorMutationOptions,
   PgExecutorOptions,
 } from "./executor";
 import type { PgTypeCodec, PgTypedExecutablePlan } from "./interfaces";
@@ -430,5 +432,11 @@ export class PgSource<
     options: PgExecutorOptions,
   ): Promise<{ values: CrystalValuesList<ReadonlyArray<TOutput>> }> {
     return this.executor.executeWithCache(values, options);
+  }
+
+  public executeMutation<TData>(
+    options: PgExecutorMutationOptions,
+  ): Promise<PgClientResult<TData>> {
+    return this.executor.executeMutation<TData>(options);
   }
 }

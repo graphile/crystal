@@ -28,8 +28,12 @@ export interface PgClientQuery {
   name?: string;
 }
 
+export interface PgClientResult<TData> {
+  rows: readonly TData[];
+}
+
 export interface PgClient {
-  query<TData>(opts: PgClientQuery): Promise<{ rows: readonly TData[] }>;
+  query<TData>(opts: PgClientQuery): Promise<PgClientResult<TData>>;
 
   // TODO: add transaction support
 }
@@ -60,6 +64,12 @@ export type PgExecutorOptions = {
   rawSqlValues: Array<SQLRawValue | symbol>;
   identifierIndex?: number | null;
   queryValuesSymbol?: symbol | null;
+};
+
+export type PgExecutorMutationOptions = {
+  context: PgExecutorContext;
+  text: string;
+  values: ReadonlyArray<SQLRawValue>;
 };
 
 /**
@@ -94,6 +104,60 @@ export class PgExecutor {
   // public context(): ExecutablePlan<any>
   public context(): ObjectPlan<PgExecutorContextPlans> {
     return this.contextCallback();
+  }
+
+  private async _execute<TData>(
+    context: PgExecutorContext,
+    text: string,
+    values: ReadonlyArray<SQLRawValue>,
+  ) {
+    let queryResult: PgClientResult<TData> | null = null,
+      error: any = null;
+    try {
+      // TODO: we could probably make this more efficient by grouping the
+      // deferreds further, DataLoader-style, and running one SQL query for
+      // everything.
+      queryResult = await context.withPgClient(context.pgSettings, (client) =>
+        client.query({
+          text,
+          values: values as SQLRawValue[],
+          arrayMode: true,
+        }),
+      );
+    } catch (e) {
+      error = e;
+    }
+    debugVerbose(`\
+
+
+${"👇".repeat(30)}
+# SQL QUERY:
+${formatSQLForDebugging(text, error)}
+
+# PLACEHOLDERS:
+${inspect(values, { colors: true })}
+
+${
+  error
+    ? `\
+# ERROR:
+${inspect(error, { colors: true })}`
+    : `\
+# RESULT:
+${inspect(queryResult?.rows, { colors: true, depth: 6 })}`
+}
+${"👆".repeat(30)}
+
+
+`);
+    if (error) {
+      throw error;
+    }
+    if (!queryResult) {
+      // Appease TypeScript
+      throw new Error("No query result and no error? Impossible.");
+    }
+    return queryResult;
   }
 
   public async executeWithCache<TInput = any, TOutput = any>(
@@ -215,49 +279,14 @@ export class PgExecutor {
                   "Query with identifiers was executed, but no identifier reference was found in the values passed",
                 );
               }
-              let queryResult: any, error: any;
-              try {
-                // TODO: we could probably make this more efficient by grouping the
-                // deferreds further, DataLoader-style, and running one SQL query for
-                // everything.
-                queryResult = await context.withPgClient(
-                  context.pgSettings,
-                  (client) =>
-                    client.query({
-                      text,
-                      values: sqlValues,
-                      arrayMode: true,
-                    }),
-                );
-              } catch (e) {
-                error = e;
-              }
-              debugVerbose(`\
-
-
-${"👇".repeat(30)}
-# SQL QUERY:
-${formatSQLForDebugging(text, error)}
-
-# PLACEHOLDERS:
-${inspect(sqlValues, { colors: true })}
-
-${
-  error
-    ? `\
-# ERROR:
-${inspect(error, { colors: true })}`
-    : `\
-# RESULT:
-${inspect(queryResult.rows, { colors: true, depth: 6 })}`
-}
-${"👆".repeat(30)}
-
-
-`);
-              if (error) {
-                throw error;
-              }
+              // TODO: we could probably make this more efficient by grouping the
+              // deferreds further, DataLoader-style, and running one SQL query for
+              // everything.
+              const queryResult = await this._execute<TOutput>(
+                context,
+                text,
+                sqlValues,
+              );
               const { rows } = queryResult;
               const groups: { [valueIndex: number]: any[] } =
                 Object.create(null);
@@ -303,5 +332,19 @@ ${"👆".repeat(30)}
 
     const finalResults = await Promise.all(results);
     return { values: finalResults };
+  }
+
+  public async executeMutation<TData>(
+    options: PgExecutorMutationOptions,
+  ): Promise<PgClientResult<TData>> {
+    const { context, text, values } = options;
+
+    const queryResult = await this._execute<TData>(context, text, values);
+
+    // TODO: we could probably make this more efficient rather than blowing away the entire cache!
+    // Wipe the cache since a mutation succeeded.
+    this.cache.get(context)?.reset();
+
+    return queryResult;
   }
 }

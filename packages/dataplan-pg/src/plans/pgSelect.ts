@@ -1423,7 +1423,11 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
         }
         if (dep instanceof PgClassExpressionPlan) {
           const p2 = this.getPlan(dep.dependencies[dep.tableId]);
-          const t2 = dep.getClassSinglePlan().getClassPlan();
+          const t2Parent = dep.getParentPlan();
+          if (!(t2Parent instanceof PgSelectSinglePlan)) {
+            continue;
+          }
+          const t2 = t2Parent.getClassPlan();
           if (t2 === this) {
             throw new Error(
               `Recursion error - record plan ${dep} is dependent on ${t2}, and ${this} is dependent on ${dep}`,

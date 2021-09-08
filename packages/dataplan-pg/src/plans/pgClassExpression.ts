@@ -5,7 +5,12 @@ import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type { PgSource, PgSourceColumn } from "../datasource";
-import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
+import type {
+  PgClassSinglePlan,
+  PgTypeCodec,
+  PgTypedExecutablePlan,
+} from "../interfaces";
+import { PgInsertPlan } from "./pgInsert";
 import { PgSelectSinglePlan } from "./pgSelectSingle";
 
 //const debugPlan = debugFactory("datasource:pg:PgClassExpressionPlan:plan");
@@ -27,6 +32,13 @@ export class PgClassExpressionPlan<
   extends ExecutablePlan<any>
   implements PgTypedExecutablePlan<TCodec>
 {
+  // TODO: rename to 'row'?
+  /**
+   * The dependency id of the parent table row (from SELECT,
+   * INSERT...RETURNING, etc).
+   *
+   * @internal
+   */
   public readonly tableId: number;
 
   /**
@@ -43,7 +55,7 @@ export class PgClassExpressionPlan<
   placeholderIndexes: number[] = [];
 
   constructor(
-    table: PgSelectSinglePlan<TDataSource>,
+    table: PgClassSinglePlan<TDataSource>,
     public readonly pgCodec: TCodec,
     strings: TemplateStringsArray,
     dependencies: ReadonlyArray<PgTypedExecutablePlan | SQL> = [],
@@ -62,7 +74,6 @@ export class PgClassExpressionPlan<
     }
     this.source = table.source;
     this.tableId = this.addDependency(table);
-    const classPlan = table.getClassPlan();
 
     const fragments: SQL[] = dependencies.map((plan, i) => {
       if (!plan) {
@@ -72,16 +83,18 @@ export class PgClassExpressionPlan<
         return plan;
       } else if (
         plan instanceof PgClassExpressionPlan &&
-        plan.getClassSinglePlan() === table
+        plan.getParentPlan() === table
       ) {
         // TODO: when we defer placeholders until finalize we'll need to copy
         // deps/etc
         return plan.expression;
-      } else {
+      } else if (table instanceof PgSelectSinglePlan) {
         // TODO: when we defer placeholders until finalize we'll need to store
         // deps/etc
-        const placeholder = classPlan.placeholder(plan);
+        const placeholder = table.placeholder(plan);
         return placeholder;
+      } else {
+        throw new Error(`Cannot use placeholders when parent plan is ${table}`);
       }
     });
 
@@ -135,24 +148,29 @@ export class PgClassExpressionPlan<
         `Cannot call ${this}.get('${attributeName}') because 'expression' is not yet supported here - please raise an issue (or, even better, a pull request!).`,
       );
     }
-    const sqlExpr = pgClassExpression(this.getClassSinglePlan(), column.codec);
+    const sqlExpr = pgClassExpression(this.getParentPlan(), column.codec);
     return sqlExpr`${sql.parens(this.expression, true)}.${sql.identifier(
       attributeName as string,
     )}` as any;
   }
 
-  public getClassSinglePlan(): PgSelectSinglePlan<TDataSource> {
+  public getParentPlan(): PgClassSinglePlan<TDataSource> {
     const plan = this.getPlan(this.dependencies[this.tableId]);
-    if (!(plan instanceof PgSelectSinglePlan)) {
-      throw new Error(`Expected ${plan} to be a PgSelectSinglePlan`);
+    if (
+      !(plan instanceof PgSelectSinglePlan) &&
+      !(plan instanceof PgInsertPlan)
+    ) {
+      throw new Error(
+        `Expected ${plan} to be a PgSelectSinglePlan | PgInsertPlan`,
+      );
     }
     return plan;
   }
 
   public optimize(): this {
-    this.attrIndex = this.getClassSinglePlan()
-      .getClassPlan()
-      .select(sql`${sql.parens(this.expression)}::text`);
+    this.attrIndex = this.getParentPlan().select(
+      sql`${sql.parens(this.expression)}::text`,
+    );
     return this;
   }
 
@@ -201,7 +219,7 @@ function pgClassExpression<
   TDataSource extends PgSource<any, any, any, any>,
   TCodec extends PgTypeCodec,
 >(
-  table: PgSelectSinglePlan<TDataSource>,
+  table: PgClassSinglePlan<TDataSource>,
   codec: TCodec,
 ): (
   strings: TemplateStringsArray,
