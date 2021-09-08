@@ -1283,8 +1283,8 @@ export class Aether<
   /**
    * Implements `ExecutePlan`.
    */
-  private async executePlan(
-    plan: ExecutablePlan,
+  private async executePlan<T>(
+    plan: ExecutablePlan<T>,
     crystalContext: CrystalContext,
     crystalLayerObjects: CrystalLayerObject[],
     visitedPlans = new Set<ExecutablePlan>(),
@@ -1311,9 +1311,11 @@ export class Aether<
     visitedPlans.add(plan);
     if (plan instanceof __ListItemPlan) {
       // Shortcut evaluation because __ListItemPlan cannot be executed.
-      const parentPlan = this.plans[plan.dependencies[0]];
+      const parentPlan = this.plans[plan.dependencies[0]] as ExecutablePlan<
+        any[]
+      >;
       // Evaluate parentPlan and then return the relevant index
-      const parentResults = await this.executePlan(
+      const parentResults = await this.executePlan<any[]>(
         parentPlan,
         crystalContext,
         crystalLayerObjects,
