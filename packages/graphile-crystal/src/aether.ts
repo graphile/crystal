@@ -1216,6 +1216,14 @@ export class Aether<
       this.markPlanActive(plan, activePlans);
     }
 
+    // Mark all plans with side effects as active.
+    for (let i = 0, l = this.plans.length; i < l; i++) {
+      const plan = this.plans[i];
+      if (plan && !activePlans.has(plan) && plan.hasSideEffects) {
+        this.markPlanActive(plan, activePlans);
+      }
+    }
+
     for (let i = 0, l = this.plans.length; i < l; i++) {
       const plan = this.plans[i];
       if (plan && !activePlans.has(plan)) {

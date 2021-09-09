@@ -35,6 +35,8 @@ interface PgInsertPlanFinalizeResults {
 export class PgInsertPlan<
   TDataSource extends PgSource<any, any, any, any, any>,
 > extends ExecutablePlan<TDataSource["TRow"]> {
+  hasSideEffects = true;
+
   /**
    * Tells us what we're dealing with - data type, columns, where to insert it,
    * what it's called, etc.

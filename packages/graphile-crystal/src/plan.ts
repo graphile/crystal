@@ -62,6 +62,12 @@ export abstract class BasePlan {
   public parentPathIdentity: string;
   protected readonly createdWithParentPathIdentity: string;
 
+  /**
+   * Set this true for plans that implement mutations; this will prevent them
+   * from being tree-shaken.
+   */
+  public readonly hasSideEffects: boolean = false;
+
   constructor() {
     const aether = getCurrentAether();
     this.aether = aether;
