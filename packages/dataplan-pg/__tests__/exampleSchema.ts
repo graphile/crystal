@@ -2697,10 +2697,17 @@ export function makeExampleSchema(
             const $input = args.input as InputObjectPlan;
             const $post = pgInsert(relationalPostsSource, {
               id: $itemId,
-              title: $input.get("title"),
-              description: $input.get("description"),
-              note: $input.get("note"),
             });
+            for (const key of ["title", "description", "note"] as Array<
+              keyof typeof relationalPostsSource.columns
+            >) {
+              const $value = $input.get(key);
+              // TODO: test that we differentiate between value set to null and
+              // value not being present
+              if (!$value.evalIs(undefined)) {
+                $post.set(key, $value);
+              }
+            }
             return $post;
           },
         },
