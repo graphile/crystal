@@ -14,6 +14,11 @@ mutation {
       description
       note
       titleLower
+      isExplicitlyArchived
+      author {
+        personId
+        username
+      }
     }
   }
 }
