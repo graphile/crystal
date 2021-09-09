@@ -29,7 +29,16 @@ export interface PgClientQuery {
 }
 
 export interface PgClientResult<TData> {
+  /**
+   * For `SELECT` or `INSERT/UPDATE/DELETE ... RETURNING` this will be the list
+   * of rows returned.
+   */
   rows: readonly TData[];
+  /**
+   * For `INSERT/UPDATE/DELETE` without `RETURNING`, this will be the number of
+   * rows created/updated/deleted.
+   */
+  rowCount: number;
 }
 
 export interface PgClient {
