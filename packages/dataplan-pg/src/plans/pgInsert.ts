@@ -94,7 +94,7 @@ export class PgInsertPlan<
     columns?: {
       [key in keyof TDataSource["columns"]]?:
         | PgTypedExecutablePlan<TDataSource["columns"][key]["codec"]>
-        | { plan: ExecutablePlan<any>; pgCodec: PgTypeCodec };
+        | ExecutablePlan<any>;
     },
   ) {
     super();
@@ -105,7 +105,9 @@ export class PgInsertPlan<
     this.contextId = this.addDependency(this.source.context());
     if (columns) {
       Object.entries(columns).forEach(([key, value]) => {
-        this.set(key, value);
+        if (value) {
+          this.set(key, value);
+        }
       });
     }
   }
@@ -114,7 +116,7 @@ export class PgInsertPlan<
     name: TKey,
     value:
       | PgTypedExecutablePlan<TDataSource["columns"][TKey]["codec"]>
-      | { plan: ExecutablePlan<any>; pgCodec: PgTypeCodec },
+      | ExecutablePlan<any>,
   ): void {
     if (this.locked) {
       throw new Error("Cannot set after plan is locked.");
@@ -126,27 +128,9 @@ export class PgInsertPlan<
         );
       }
     }
-    if (value instanceof ExecutablePlan) {
-      const depId = this.addDependency(value);
-      const pgCodec = value.pgCodec;
-      if (!pgCodec) {
-        throw new Error(
-          `Expected a PgTypedExecutablePlan; perhaps you meant to pass '{plan: ${value}, pgCodec: ...}' to ${this}.set(...)`,
-        );
-      }
-      this.columns.push({ name, depId, pgCodec });
-    } else {
-      if (!(value.plan instanceof ExecutablePlan)) {
-        throw new Error(
-          `Expected a PgTypedExecutablePlan or {plan: ExecutablePlan, pgCodec: PgCodec}; instead received '${value}' (${inspect(
-            value,
-          )})`,
-        );
-      }
-      const depId = this.addDependency(value.plan);
-      const pgCodec = value.pgCodec;
-      this.columns.push({ name, depId, pgCodec });
-    }
+    const { codec: pgCodec } = this.source.columns[name] as PgSourceColumn;
+    const depId = this.addDependency(value);
+    this.columns.push({ name, depId, pgCodec });
   }
 
   /**
@@ -351,7 +335,7 @@ export function pgInsert<TDataSource extends PgSource<any, any, any, any, any>>(
   columns?: {
     [key in keyof TDataSource["columns"]]?:
       | PgTypedExecutablePlan<TDataSource["columns"][key]["codec"]>
-      | { plan: ExecutablePlan<any>; pgCodec: PgTypeCodec };
+      | ExecutablePlan<any>;
   },
 ): PgInsertPlan<TDataSource> {
   return new PgInsertPlan(source, columns);

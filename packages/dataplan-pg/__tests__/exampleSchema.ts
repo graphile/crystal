@@ -52,13 +52,13 @@ import type {
   PgTypeCodec,
   WithPgClient,
 } from "../src";
-import { pgInsert, PgSourceColumns, PgSourceRelation } from "../src";
 import {
   enumType,
   pgClassExpression,
   PgConditionPlan,
   PgConnectionPlan,
   PgExecutor,
+  pgInsert,
   pgPolymorphic,
   pgSelect,
   PgSelectSinglePlan,
@@ -2689,23 +2689,17 @@ export function makeExampleSchema(
           type: CreateRelationalPostPayload,
           plan(_$root, args) {
             const $item = pgInsert(relationalItemsSource, {
-              type: {
-                plan: constant`POST`,
-                pgCodec: enumType(sql`interfaces_and_unions.item_type`),
-              },
-              author_id: { plan: constant(2), pgCodec: TYPES.int },
+              type: constant`POST`,
+              author_id: constant(2),
             });
             const $itemId = $item.get("id");
             // TODO: make this TypeScript stuff automatic
             const $input = args.input as InputObjectPlan;
             const $post = pgInsert(relationalPostsSource, {
               id: $itemId,
-              title: { plan: $input.get("title"), pgCodec: TYPES.text },
-              description: {
-                plan: $input.get("description"),
-                pgCodec: TYPES.text,
-              },
-              note: { plan: $input.get("note"), pgCodec: TYPES.text },
+              title: $input.get("title"),
+              description: $input.get("description"),
+              note: $input.get("note"),
             });
             return $post;
           },
@@ -2721,24 +2715,15 @@ export function makeExampleSchema(
             let $post: ExecutablePlan;
             for (let i = 0; i < 3; i++) {
               const $item = pgInsert(relationalItemsSource, {
-                type: {
-                  plan: constant`POST`,
-                  pgCodec: enumType(sql`interfaces_and_unions.item_type`),
-                },
-                author_id: { plan: constant(2), pgCodec: TYPES.int },
+                type: constant`POST`,
+                author_id: constant(2),
               });
               const $itemId = $item.get("id");
               $post = pgInsert(relationalPostsSource, {
                 id: $itemId,
-                title: {
-                  plan: constant(`Post #${i + 1}`),
-                  pgCodec: TYPES.text,
-                },
-                description: {
-                  plan: constant(`Desc ${i + 1}`),
-                  pgCodec: TYPES.text,
-                },
-                note: { plan: constant(null), pgCodec: TYPES.text },
+                title: constant(`Post #${i + 1}`),
+                description: constant(`Desc ${i + 1}`),
+                note: constant(null),
               });
             }
             return $post;
