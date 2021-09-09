@@ -1,0 +1,19 @@
+{
+  p1: { __typename: "CreateRelationalPostPayload" },
+  p2: {
+    __typename: "CreateRelationalPostPayload",
+    query: {
+      i1: { id: 1000000, title: "My Relational Post 1", description: "A post, innit? 1", note: "Such a great post. 1" },
+      i2: { id: 1000001, title: "My Relational Post 2", description: "A post, innit? 2", note: "Such a great post. 2" },
+      i3: null,
+    },
+  },
+  p3: {
+    __typename: "CreateRelationalPostPayload",
+    query: {
+      i1: { id: 1000000, title: "My Relational Post 1", description: "A post, innit? 1", note: "Such a great post. 1" },
+      i2: { id: 1000001, title: "My Relational Post 2", description: "A post, innit? 2", note: "Such a great post. 2" },
+      i3: { id: 1000002, title: "My Relational Post 3", description: "A post, innit? 3", note: "Such a great post. 3" },
+    },
+  },
+}

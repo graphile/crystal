@@ -1,0 +1,89 @@
+## expect(data.p2.query.i2.title).toEqual("My Relational Post 2");
+## expect(data.p2.query.i3).toBe(null);
+## expect(data.p3.query.i2.title).toEqual("My Relational Post 2");
+## expect(data.p3.query.i3.title).toBe("My Relational Post 3");
+mutation {
+  p1: createRelationalPost(
+    input: {
+      title: "My Relational Post 1"
+      description: "A post, innit? 1"
+      note: "Such a great post. 1"
+    }
+  ) {
+    # CRITICALLY: we're not directly querying the mutation result here
+    __typename
+  }
+  p2: createRelationalPost(
+    input: {
+      title: "My Relational Post 2"
+      description: "A post, innit? 2"
+      note: "Such a great post. 2"
+    }
+  ) {
+    # CRITICALLY: we're not directly querying the mutation result here
+    __typename
+    query {
+      i1: relationalItemById(id: 1000000) {
+        id
+        ... on RelationalPost {
+          title
+          description
+          note
+        }
+      }
+      i2: relationalItemById(id: 1000001) {
+        id
+        ... on RelationalPost {
+          title
+          description
+          note
+        }
+      }
+      # This should be null because the record shouldn't exist yet.
+      i3: relationalItemById(id: 1000002) {
+        id
+        ... on RelationalPost {
+          title
+          description
+          note
+        }
+      }
+    }
+  }
+  p3: createRelationalPost(
+    input: {
+      title: "My Relational Post 3"
+      description: "A post, innit? 3"
+      note: "Such a great post. 3"
+    }
+  ) {
+    # CRITICALLY: we're not directly querying the mutation result here
+    __typename
+    query {
+      i1: relationalItemById(id: 1000000) {
+        id
+        ... on RelationalPost {
+          title
+          description
+          note
+        }
+      }
+      i2: relationalItemById(id: 1000001) {
+        id
+        ... on RelationalPost {
+          title
+          description
+          note
+        }
+      }
+      i3: relationalItemById(id: 1000002) {
+        id
+        ... on RelationalPost {
+          title
+          description
+          note
+        }
+      }
+    }
+  }
+}
