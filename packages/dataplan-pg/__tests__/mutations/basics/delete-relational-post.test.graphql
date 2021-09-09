@@ -1,0 +1,29 @@
+## expect(errors).toBeFalsy()
+## expect(data.d1.post.id).toEqual(4)
+## expect(data.d1.post.title).toEqual('Better planning')
+## expect(data.d1.post.description).toEqual(null)
+## expect(data.d1.post.note).toEqual(null)
+
+## expect(data.d2).toBe(null)
+## expect(errors).toBeFalsy()
+
+mutation {
+  d1: deleteRelationalPostById(input: { id: 4 }) {
+    ...Result
+  }
+
+  # Try and delete a record that doesn't exist
+  d2: deleteRelationalPostById(input: { id: 3141592 }) {
+    ...Result
+  }
+}
+
+fragment Result on DeleteRelationalPostByIdPayload {
+  id
+  post {
+    id
+    title
+    description
+    note
+  }
+}
