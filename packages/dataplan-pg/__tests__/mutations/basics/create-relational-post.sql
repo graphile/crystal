@@ -19,8 +19,11 @@ lateral (
     __relational_posts__."title"::text as "1",
     __relational_posts__."description"::text as "2",
     __relational_posts__."note"::text as "3",
-    __relational_posts_identifiers__.idx as "4"
+    __relational_posts_title_lower__.__relational_posts_title_lower__::text as "4",
+    __relational_posts_identifiers__.idx as "5"
   from interfaces_and_unions.relational_posts as __relational_posts__
+  left outer join interfaces_and_unions.relational_posts_title_lower(__relational_posts__) as __relational_posts_title_lower__
+  on TRUE
   where
     (
       true /* authorization checks */

@@ -44,5 +44,6 @@ fragment Result on UpdateRelationalPostByIdPayload {
     title
     description
     note
+    titleLower
   }
 }

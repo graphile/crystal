@@ -25,5 +25,6 @@ fragment Result on DeleteRelationalPostByIdPayload {
     title
     description
     note
+    titleLower
   }
 }

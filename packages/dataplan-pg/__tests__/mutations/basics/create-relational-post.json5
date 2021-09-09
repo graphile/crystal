@@ -1,6 +1,12 @@
 {
   createRelationalPost: {
     id: 1000000,
-    post: { id: 1000000, title: "My Relational Post", description: "A post, innit?", note: "Such a great post." },
+    post: {
+      id: 1000000,
+      title: "My Relational Post",
+      description: "A post, innit?",
+      note: "Such a great post.",
+      titleLower: "my relational post",
+    },
   },
 }

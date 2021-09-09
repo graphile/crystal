@@ -1,6 +1,21 @@
 {
-  u1: { id: 4, post: { id: 4, title: "Better planning", description: "A description", note: null } },
-  u2: { id: 4, post: { id: 4, title: "Better planning", description: "A description", note: "A note" } },
-  u3: { id: 4, post: { id: 4, title: "Better planning", description: null, note: "A note" } },
+  u1: {
+    id: 4,
+    post: { id: 4, title: "Better planning", description: "A description", note: null, titleLower: "better planning" },
+  },
+  u2: {
+    id: 4,
+    post: {
+      id: 4,
+      title: "Better planning",
+      description: "A description",
+      note: "A note",
+      titleLower: "better planning",
+    },
+  },
+  u3: {
+    id: 4,
+    post: { id: 4, title: "Better planning", description: null, note: "A note", titleLower: "better planning" },
+  },
   u4: null,
 }
