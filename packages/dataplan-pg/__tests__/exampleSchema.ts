@@ -232,7 +232,7 @@ export function makeExampleSchema(
   const uniqueAuthorCountSource = new PgSource({
     executor,
     codec: TYPES.int,
-    source: (args: SQL[]) =>
+    source: (...args: SQL[]) =>
       sql`app_public.unique_author_count(${sql.join(args, ", ")})`,
     name: "unique_author_count",
     columns: null,
@@ -241,7 +241,7 @@ export function makeExampleSchema(
   const forumsUniqueAuthorCountSource = new PgSource({
     executor,
     codec: TYPES.int,
-    source: (args: SQL[]) =>
+    source: (...args: SQL[]) =>
       sql`app_public.forums_unique_author_count(${sql.join(args, ", ")})`,
     name: "forums_unique_author_count",
     columns: null,
@@ -258,7 +258,7 @@ export function makeExampleSchema(
   const featuredMessages = new PgSource({
     executor,
     codec: recordType(sql`app_public.messages`, messageColumns),
-    source: (args: SQL[]) =>
+    source: (...args: SQL[]) =>
       sql`app_public.featured_messages(${sql.join(args, ", ")})`,
     name: "featured_messages",
     columns: messageColumns,
@@ -267,7 +267,7 @@ export function makeExampleSchema(
   const forumsFeaturedMessages = new PgSource({
     executor,
     codec: recordType(sql`app_public.messages`, messageColumns),
-    source: (args: SQL[]) =>
+    source: (...args: SQL[]) =>
       sql`app_public.forums_featured_messages(${sql.join(args, ", ")})`,
     name: "forums_featured_messages",
     columns: messageColumns,
@@ -276,7 +276,7 @@ export function makeExampleSchema(
   const usersMostRecentForumSource = new PgSource({
     executor,
     codec: recordType(sql`app_public.forums`, forumColumns),
-    source: (args: SQL[]) =>
+    source: (...args: SQL[]) =>
       sql`app_public.users_most_recent_forum(${sql.join(args, ", ")})`,
     name: "users_most_recent_forum",
     columns: forumColumns,
@@ -970,7 +970,7 @@ export function makeExampleSchema(
       sql`interfaces_and_unions.union__entity`,
       unionEntityColumns,
     ),
-    source: (args: SQL[]) =>
+    source: (...args: SQL[]) =>
       sql`interfaces_and_unions.search(${sql.join(args, ", ")})`,
     name: "entity_search",
     columns: unionEntityColumns,
@@ -1691,7 +1691,7 @@ export function makeExampleSchema(
                     plan: $forum.record(),
                   },
                 ],
-                from: (args: SQL[]) =>
+                from: (...args: SQL[]) =>
                   sql`app_public.forums_random_user(${sql.join(args, ", ")})`,
                 name: "forums_random_user",
               }).single();

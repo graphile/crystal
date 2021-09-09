@@ -121,7 +121,7 @@ export interface PgSourceOptions<
   codec: TCodec;
   executor: PgExecutor;
   name: string;
-  source: SQL | ((args: SQL[]) => SQL);
+  source: SQL | ((...args: SQL[]) => SQL);
   columns: TColumns | null;
   uniques?: TUniques;
   relations?: TRelations | (() => TRelations);
@@ -227,7 +227,7 @@ export class PgSource<
   public readonly codec: TCodec;
   public readonly executor: PgExecutor;
   public readonly name: string;
-  public readonly source: SQL | ((args: SQL[]) => SQL);
+  public readonly source: SQL | ((...args: SQL[]) => SQL);
   public readonly columns: TColumns;
   public readonly uniques: TUniques;
   private relationsThunk: (() => TRelations) | null;

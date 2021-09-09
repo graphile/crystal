@@ -159,7 +159,7 @@ interface PgSelectOptions<TDataSource> {
    * override the `source.source` here with your own from code. Defaults to
    * `source.source`.
    */
-  from?: SQL | ((args: SQL[]) => SQL);
+  from?: SQL | ((...args: SQL[]) => SQL);
 
   /**
    * If you pass a custom `from` (or otherwise want to aid in debugging),
@@ -186,7 +186,7 @@ export class PgSelectPlan<
   TDataSource extends PgSource<any, any, any, any>,
 > extends ExecutablePlan<ReadonlyArray<TDataSource["TRow"]>> {
   // FROM
-  private readonly from: SQL | ((args: SQL[]) => SQL);
+  private readonly from: SQL | ((...args: SQL[]) => SQL);
 
   /**
    * This defaults to the name of the source but you can override it. Aids
@@ -369,7 +369,7 @@ export class PgSelectPlan<
           source: TDataSource;
           identifiers?: Array<PgSelectIdentifierSpec>;
           args?: Array<PgSelectArgumentSpec>;
-          from?: SQL | ((args: SQL[]) => SQL);
+          from?: SQL | ((...args: SQL[]) => SQL);
           name?: string;
         },
   ) {
@@ -918,7 +918,7 @@ export class PgSelectPlan<
   private fromExpression(): SQL {
     const source =
       typeof this.from === "function"
-        ? this.from(this.arguments.map((arg) => arg.placeholder))
+        ? this.from(...this.arguments.map((arg) => arg.placeholder))
         : this.from;
     return source;
   }
