@@ -15,7 +15,11 @@ import type {
   PgExecutorMutationOptions,
   PgExecutorOptions,
 } from "./executor";
-import type { PgTypeCodec, PgTypedExecutablePlan } from "./interfaces";
+import type {
+  PgTypeCodec,
+  PgTypedExecutablePlan,
+  PlanByUniques,
+} from "./interfaces";
 import type { PgSelectPlan } from "./plans/pgSelect";
 import { pgSelect } from "./plans/pgSelect";
 import type {
@@ -89,22 +93,6 @@ export interface PgSourceColumn<TCanonical = any, TInput = TCanonical> {
 type PgSourceRow<TColumns extends PgSourceColumns> = {
   [key in keyof TColumns]: ReturnType<TColumns[key]["codec"]["fromPg"]>;
 };
-
-type TuplePlanOrConstantMap<
-  TColumns extends { [column: string]: any },
-  TTuple extends ReadonlyArray<keyof TColumns>,
-> = {
-  [Index in keyof TTuple]: {
-    [key in TTuple[number]]:
-      | ExecutablePlan<ReturnType<TColumns[key]["pg2gql"]>>
-      | ReturnType<TColumns[key]["pg2gql"]>;
-  };
-};
-
-type PlanByUniques<
-  TColumns extends { [column: string]: any },
-  TCols extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
-> = TuplePlanOrConstantMap<TColumns, TCols[number]>[number];
 
 export interface PgSourceRelation<
   TSource extends

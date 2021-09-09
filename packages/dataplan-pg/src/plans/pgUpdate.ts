@@ -7,21 +7,25 @@ import sql from "pg-sql2";
 import { inspect } from "util";
 
 import type { PgSource, PgSourceColumn } from "../datasource";
-import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
+import type {
+  PgTypeCodec,
+  PgTypedExecutablePlan,
+  PlanByUniques,
+} from "../interfaces";
 import type { PgClassExpressionPlan } from "./pgClassExpression";
 import { pgClassExpression } from "./pgClassExpression";
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 const EMPTY_MAP = new Map<never, never>();
 
-const debugExecute = debugFactory("datasource:pg:PgInsertPlan:execute");
+const debugExecute = debugFactory("datasource:pg:PgUpdatePlan:execute");
 
 type QueryValueDetailsBySymbol = Map<
   symbol,
   { depId: number; processor: (value: any) => SQLRawValue }
 >;
 
-interface PgInsertPlanFinalizeResults {
+interface PgUpdatePlanFinalizeResults {
   /** The SQL query text */
   text: string;
 
@@ -32,13 +36,13 @@ interface PgInsertPlanFinalizeResults {
   queryValueDetailsBySymbol: QueryValueDetailsBySymbol;
 }
 
-export class PgInsertPlan<
+export class PgUpdatePlan<
   TDataSource extends PgSource<any, any, any, any, any>,
 > extends ExecutablePlan<TDataSource["TRow"]> {
   hasSideEffects = true;
 
   /**
-   * Tells us what we're dealing with - data type, columns, where to insert it,
+   * Tells us what we're dealing with - data type, columns, where to update it,
    * what it's called, etc.
    */
   public readonly source: TDataSource;
@@ -59,7 +63,16 @@ export class PgInsertPlan<
   public readonly alias: SQL;
 
   /**
-   * The columns and their dependency ids for us to insert.
+   * The columns and their dependency ids for us to find the record by.
+   */
+  private getBys: Array<{
+    name: keyof TDataSource["columns"];
+    depId: number;
+    pgCodec: PgTypeCodec;
+  }> = [];
+
+  /**
+   * The columns and their dependency ids for us to update.
    */
   private columns: Array<{
     name: keyof TDataSource["columns"];
@@ -81,7 +94,7 @@ export class PgInsertPlan<
    * When finalized, we build the SQL query, queryValues, and note where to feed in
    * the relevant queryValues. This saves repeating this work at execution time.
    */
-  private finalizeResults: PgInsertPlanFinalizeResults | null = null;
+  private finalizeResults: PgUpdatePlanFinalizeResults | null = null;
 
   /**
    * The list of things we're selecting.
@@ -91,6 +104,7 @@ export class PgInsertPlan<
 
   constructor(
     source: TDataSource,
+    getBy: PlanByUniques<TDataSource["columns"], TDataSource["uniques"]>,
     columns?: {
       [key in keyof TDataSource["columns"]]?:
         | PgTypedExecutablePlan<TDataSource["columns"][key]["codec"]>
@@ -103,6 +117,39 @@ export class PgInsertPlan<
     this.symbol = Symbol(this.name);
     this.alias = sql.identifier(this.symbol);
     this.contextId = this.addDependency(this.source.context());
+
+    const keys: ReadonlyArray<keyof TDataSource["columns"]> =
+      Object.keys(getBy);
+
+    if (
+      !this.source.uniques.some((uniq: string[]) =>
+        uniq.every((key) => keys.includes(key)),
+      )
+    ) {
+      throw new Error(
+        `Attempted to build 'PgUpdatePlan' with a non-unique getBy keys ('${keys.join(
+          "', '",
+        )}') - please ensure your 'getBy' spec uniquely identifiers a row (source = ${
+          this.source
+        }; supported uniques = ${inspect(this.source.uniques)}).`,
+      );
+    }
+
+    keys.forEach((name) => {
+      if (isDev) {
+        if (this.getBys.some((col) => col.name === name)) {
+          throw new Error(
+            `Column '${name}' was specified more than once in ${this}'s getBy spec`,
+          );
+        }
+      }
+      const value = getBy[name];
+      const depId = this.addDependency(value);
+      const column = this.source.columns[name] as PgSourceColumn;
+      const pgCodec = column.codec;
+      this.getBys.push({ name, depId, pgCodec });
+    });
+
     if (columns) {
       Object.entries(columns).forEach(([key, value]) => {
         this.set(key, value);
@@ -151,7 +198,7 @@ export class PgInsertPlan<
 
   /**
    * Returns a plan representing a named attribute (e.g. column) from the newly
-   * inserted row.
+   * updateed row.
    */
   get<TAttr extends keyof TDataSource["TRow"]>(
     attr: TAttr,
@@ -168,7 +215,7 @@ export class PgInsertPlan<
     }
 
     if (dataSourceColumn?.via) {
-      throw new Error(`Cannot select a 'via' column from PgInsertPlan`);
+      throw new Error(`Cannot select a 'via' column from PgUpdatePlan`);
     }
 
     /*
@@ -265,7 +312,7 @@ export class PgInsertPlan<
       const sourceSource = this.source.source;
       if (!sql.isSQL(sourceSource)) {
         throw new Error(
-          `Error in ${this}: can only insert into sources defined as SQL, however ${
+          `Error in ${this}: can only update into sources defined as SQL, however ${
             this.source
           } has ${inspect(this.source.source)}`,
         );
@@ -283,33 +330,59 @@ export class PgInsertPlan<
           : sql.blank;
 
       /*
-       * NOTE: Though we'd like to do bulk inserts, there's no way of us
-       * reliably linking the data back up again given users might:
+       * NOTE: Though we'd like to do bulk updates, there's no way of us
+       * reliably linking the data back up again given users might have
+       * triggers manipulating the data so we can't match it back up even using
+       * the same getBy specs.
        *
-       * - rely on auto-generated primary keys
-       * - have triggers manipulating the data so we can't match it back up
-       *
-       * Currently it seems that the order returned from `insert into ...
-       * select ... order by ... returning ...` is the same order as the
+       * Currently it seems that the order returned from `update ...
+       * from (select ... order by ...) returning ...` is the same order as the
        * `order by` was, however this is not guaranteed in the documentation
        * and as such cannot be relied upon. Further the pgsql-hackers list
        * explicitly declined guaranteeing this behaviour:
        *
        * https://www.postgresql.org/message-id/CAKFQuwbgdJ_xNn0YHWGR0D%2Bv%2B3mHGVqJpG_Ejt96KHoJjs6DkA%40mail.gmail.com
        *
-       * So we have to make do with single inserts, alas.
+       * So we have to make do with single updates, alas.
        */
+      const getByColumnsCount = this.getBys.length;
       const columnsCount = this.columns.length;
-      if (columnsCount > 0) {
+      if (columnsCount === 0) {
+        // No columns to update?! This isn't allowed.
+        throw new Error(
+          "Attempted to update a record, but no new values were specified.",
+        );
+      } else if (getByColumnsCount === 0) {
+        // No columns specified to find the row?! This is forbidden.
+        throw new Error(
+          "Attempted to update a record, but no information on uniquely determining the record was specified.",
+        );
+      } else {
         // This is our common path
-        const sqlColumns: SQL[] = new Array(columnsCount);
-        const valuePlaceholders: SQL[] = new Array(columnsCount);
+        const sqlWhereClauses: SQL[] = new Array(getByColumnsCount);
+        const sqlSets: SQL[] = new Array(columnsCount);
         const queryValueDetailsBySymbol: QueryValueDetailsBySymbol = new Map();
+
+        for (let i = 0; i < getByColumnsCount; i++) {
+          const { name, depId, pgCodec } = this.getBys[i];
+          const symbol = Symbol(name as string);
+          sqlWhereClauses[i] = sql.parens(
+            sql`${sql.identifier(this.symbol, name as string)} = ${sql.value(
+              // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
+              // a value before executing the query.
+              symbol as any,
+            )}::${pgCodec.sqlType}`,
+          );
+          queryValueDetailsBySymbol.set(symbol, {
+            depId,
+            processor: pgCodec.toPg,
+          });
+        }
+
         for (let i = 0; i < columnsCount; i++) {
           const { name, depId, pgCodec } = this.columns[i];
-          sqlColumns[i] = sql.identifier(name as string);
           const symbol = Symbol(name as string);
-          valuePlaceholders[i] = sql`${sql.value(
+          sqlSets[i] = sql`${sql.identifier(name as string)} = ${sql.value(
             // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
             // a value before executing the query.
             symbol as any,
@@ -319,25 +392,18 @@ export class PgInsertPlan<
             processor: pgCodec.toPg,
           });
         }
-        const columns = sql.join(sqlColumns, ", ");
-        const values = sql.join(valuePlaceholders, ", ");
-        const query = sql`insert into ${table} (${columns}) values (${values})${returning}`;
+
+        const set = sql` set ${sql.join(sqlSets, ", ")}`;
+        const where = sql` where ${sql.parens(
+          sql.join(sqlWhereClauses, " and "),
+        )}`;
+        const query = sql`update ${table}${set}${where}${returning}`;
         const { text, values: rawSqlValues } = sql.compile(query);
 
         this.finalizeResults = {
           text,
           rawSqlValues,
           queryValueDetailsBySymbol,
-        };
-      } else {
-        // No columns to insert?! Odd... but okay.
-        const query = sql`insert into ${table} default values${returning}`;
-        const { text, values: rawSqlValues } = sql.compile(query);
-
-        this.finalizeResults = {
-          text,
-          rawSqlValues,
-          queryValueDetailsBySymbol: EMPTY_MAP,
         };
       }
     }
@@ -346,13 +412,14 @@ export class PgInsertPlan<
   }
 }
 
-export function pgInsert<TDataSource extends PgSource<any, any, any, any, any>>(
+export function pgUpdate<TDataSource extends PgSource<any, any, any, any, any>>(
   source: TDataSource,
+  getBy: PlanByUniques<TDataSource["columns"], TDataSource["uniques"]>,
   columns?: {
     [key in keyof TDataSource["columns"]]?:
       | PgTypedExecutablePlan<TDataSource["columns"][key]["codec"]>
       | { plan: ExecutablePlan<any>; pgCodec: PgTypeCodec };
   },
-): PgInsertPlan<TDataSource> {
-  return new PgInsertPlan(source, columns);
+): PgUpdatePlan<TDataSource> {
+  return new PgUpdatePlan(source, getBy, columns);
 }

@@ -4,6 +4,7 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 import type { PgSource, PgSourceColumns } from "./datasource";
 import type { PgInsertPlan } from "./plans/pgInsert";
 import type { PgSelectSinglePlan } from "./plans/pgSelectSingle";
+import type { PgUpdatePlan } from "./plans/pgUpdate";
 
 /**
  * A class-like source of information - could be from `SELECT`-ing a row, or
@@ -11,7 +12,10 @@ import type { PgSelectSinglePlan } from "./plans/pgSelectSingle";
  */
 export type PgClassSinglePlan<
   TDataSource extends PgSource<any, any, any, any, any>,
-> = PgSelectSinglePlan<TDataSource> | PgInsertPlan<TDataSource>;
+> =
+  | PgSelectSinglePlan<TDataSource>
+  | PgInsertPlan<TDataSource>
+  | PgUpdatePlan<TDataSource>;
 
 /**
  * Given a value of type TInput, returns an `SQL` value to insert into an SQL
@@ -64,3 +68,19 @@ export interface PgOrderSpec {
   direction: "ASC" | "DESC";
   nulls?: "FIRST" | "LAST" | null;
 }
+
+export type TuplePlanMap<
+  TColumns extends { [column: string]: any },
+  TTuple extends ReadonlyArray<keyof TColumns>,
+> = {
+  [Index in keyof TTuple]: {
+    [key in TTuple[number]]: ExecutablePlan<
+      ReturnType<TColumns[key]["pg2gql"]>
+    >;
+  };
+};
+
+export type PlanByUniques<
+  TColumns extends { [column: string]: any },
+  TUniqueColumns extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+> = TuplePlanMap<TColumns, TUniqueColumns[number]>[number];
