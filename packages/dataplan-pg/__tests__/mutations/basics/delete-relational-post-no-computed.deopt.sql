@@ -12,7 +12,7 @@ from (
 ) as __relational_posts_identifiers__,
 lateral (
   select
-    __relational_items__."created_at"::text as "0",
+    __relational_items__."is_explicitly_archived"::text as "0",
     __relational_items__."author_id"::text as "1",
     __relational_posts__."id"::text as "2",
     __relational_posts__."title"::text as "3",

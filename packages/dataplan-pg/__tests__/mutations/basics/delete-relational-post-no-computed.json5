@@ -6,7 +6,7 @@
       title: "Better planning",
       description: null,
       note: null,
-      createdAt: "2020-01-28 11:01:00+00",
+      isExplicitlyArchived: false,
       author: { personId: 2, username: "Benjie" },
     },
   },

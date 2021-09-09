@@ -36,7 +36,7 @@ fragment Result on DeleteRelationalPostByIdPayload {
     note
     # NO COMPUTED COLUMNS (see note at top)
 
-    createdAt
+    isExplicitlyArchived
     author {
       personId
       username
