@@ -2666,6 +2666,12 @@ export function makeExampleSchema(
             return $post.get("id");
           },
         },
+        query: {
+          type: Query,
+          plan() {
+            return constant({});
+          },
+        },
       },
     }),
   );
