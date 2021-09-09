@@ -26,5 +26,9 @@ fragment Result on DeleteRelationalPostByIdPayload {
     description
     note
     titleLower
+    author {
+      personId
+      username
+    }
   }
 }

@@ -2778,7 +2778,10 @@ export function makeExampleSchema(
         post: {
           type: RelationalPost,
           plan($post) {
-            return $post;
+            return pgSelectSingleFromRecord(
+              relationalPostsSource,
+              $post.record(),
+            );
           },
         },
       },
