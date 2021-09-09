@@ -78,6 +78,7 @@ export interface CrystalLayerObject {
 export interface Batch {
   pathIdentity: string;
   crystalContext: CrystalContext;
+  sideEffectPlans: ReadonlyArray<ExecutablePlan>;
   plan: ExecutablePlan;
   itemPlan: ExecutablePlan;
   entries: Array<[CrystalObject<any>, Deferred<any>]>;

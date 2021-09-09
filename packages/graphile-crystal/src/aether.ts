@@ -1606,6 +1606,8 @@ export class Aether<
     returnType: GraphQLOutputType,
     crystalContext: CrystalContext,
   ): Batch {
+    const sideEffectPlanIds =
+      this.sideEffectPlanIdsByPathIdentity[pathIdentity];
     const planId = this.planIdByPathIdentity[pathIdentity];
     const itemPlanId = this.itemPlanIdByPathIdentity[pathIdentity];
     assert.ok(
@@ -1616,6 +1618,10 @@ export class Aether<
       itemPlanId != null,
       `Could not find the itemPlanId for path identity '${pathIdentity}'`,
     );
+    const sideEffectPlans =
+      sideEffectPlanIds?.map(
+        (sideEffectPlanId) => this.plans[sideEffectPlanId],
+      ) ?? [];
     const plan = this.plans[planId];
     const itemPlan = this.plans[itemPlanId];
     assert.ok(
@@ -1629,6 +1635,7 @@ export class Aether<
     const batch: Batch = {
       pathIdentity,
       crystalContext,
+      sideEffectPlans,
       plan,
       itemPlan,
       entries: [],
@@ -1748,7 +1755,7 @@ export class Aether<
     // This guarantees nothing else will be added to the batch
     delete this.batchByPathIdentity[batch.pathIdentity];
 
-    const { entries, plan, itemPlan, returnType } = batch;
+    const { entries, sideEffectPlans, plan, itemPlan, returnType } = batch;
     const namedReturnType = getNamedType(returnType);
     const entriesLength = entries.length;
     const crystalObjects: CrystalObject<any>[] = new Array(entriesLength);
@@ -1938,15 +1945,26 @@ export class Aether<
         }
       };
 
-      const results = await executeLayers(
-        layers,
-        crystalObjects.map((crystalObject) =>
-          newCrystalLayerObject(
-            crystalObject,
-            crystalObject[$$indexByListItemPlanId],
-          ),
+      const crystalLayerObjects = crystalObjects.map((crystalObject) =>
+        newCrystalLayerObject(
+          crystalObject,
+          crystalObject[$$indexByListItemPlanId],
         ),
       );
+
+      // First, execute side effects (in order, *not* in parallel)
+      const sideEffectCount = sideEffectPlans.length;
+      for (let i = 0; i < sideEffectCount; i++) {
+        const sideEffectPlan = sideEffectPlans[i];
+        await this.executePlan(
+          sideEffectPlan,
+          crystalContext,
+          crystalLayerObjects,
+        );
+      }
+
+      // Now, execute the layers to get the result
+      const results = await executeLayers(layers, crystalLayerObjects);
 
       for (let i = 0; i < entriesLength; i++) {
         deferredResults[i].resolve(results[i]);
