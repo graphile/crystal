@@ -1,6 +1,7 @@
 Error.stackTraceLimit = Infinity;
 import { promises as fsp } from "fs";
 import type { BaseGraphQLContext } from "graphile-crystal";
+import type { GraphQLError } from "graphql";
 import { graphql } from "graphql";
 import JSON5 from "json5";
 import type { PoolClient } from "pg";
@@ -134,7 +135,8 @@ export async function runTestQuery(
   variableValues?: { [key: string]: any },
   options: { deoptimize?: boolean } = Object.create(null),
 ): Promise<{
-  data: { [key: string]: any };
+  data?: { [key: string]: any };
+  errors?: GraphQLError[];
   queries: PgClientQuery[];
 }> {
   // Do not allow queries to run in parallel during these tests, we need
@@ -170,9 +172,7 @@ export async function runTestQuery(
   if (errors) {
     console.error(errors[0].originalError || errors[0]);
   }
-  expect(errors).toBeFalsy();
-  expect(data).toBeTruthy();
-  return { data, queries };
+  return { data, errors, queries };
 }
 
 async function snapshot(actual: string, filePath: string) {

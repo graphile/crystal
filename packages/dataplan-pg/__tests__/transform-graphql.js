@@ -60,7 +60,7 @@ ${assertions
   .map((assertion) => {
     return `\
 it(${JSON.stringify(assertion.trim())}, async () => {
-  const { data, queries } = await result1;
+  const { data, errors, queries } = await result1;
   ${assertion}
 });`;
   })
