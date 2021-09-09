@@ -119,6 +119,9 @@ async function releaseClients() {
     }
   }
   clientMap.clear();
+}
+
+async function resetSequences() {
   await testPool.query(
     await fsp.readFile(`${__dirname}/sequence_reset.sql`, "utf8"),
   );
@@ -138,6 +141,7 @@ export async function runTestQuery(
   // reproducibility (and we don't want to mess with the transactions, see
   // releaseClients below).
   await releaseClients();
+  await resetSequences();
 
   const queries: PgClientQuery[] = [];
   const schema = options.deoptimize ? deoptimizedSchema : optimizedSchema;
