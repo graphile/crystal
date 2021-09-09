@@ -45,5 +45,10 @@ fragment Result on UpdateRelationalPostByIdPayload {
     description
     note
     titleLower
+    isExplicitlyArchived
+    author {
+      personId
+      username
+    }
   }
 }

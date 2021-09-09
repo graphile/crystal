@@ -1,7 +1,15 @@
 {
   u1: {
     id: 4,
-    post: { id: 4, title: "Better planning", description: "A description", note: null, titleLower: "better planning" },
+    post: {
+      id: 4,
+      title: "Better planning",
+      description: "A description",
+      note: null,
+      titleLower: "better planning",
+      isExplicitlyArchived: false,
+      author: { personId: 2, username: "Benjie" },
+    },
   },
   u2: {
     id: 4,
@@ -11,11 +19,21 @@
       description: "A description",
       note: "A note",
       titleLower: "better planning",
+      isExplicitlyArchived: false,
+      author: { personId: 2, username: "Benjie" },
     },
   },
   u3: {
     id: 4,
-    post: { id: 4, title: "Better planning", description: null, note: "A note", titleLower: "better planning" },
+    post: {
+      id: 4,
+      title: "Better planning",
+      description: null,
+      note: "A note",
+      titleLower: "better planning",
+      isExplicitlyArchived: false,
+      author: { personId: 2, username: "Benjie" },
+    },
   },
   u4: null,
 }
