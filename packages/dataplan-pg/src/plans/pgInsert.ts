@@ -173,6 +173,10 @@ export class PgInsertPlan<
     return colPlan;
   }
 
+  public record(): PgClassExpressionPlan<TDataSource, TDataSource["codec"]> {
+    return pgClassExpression(this, this.source.codec)`${this.alias}`;
+  }
+
   public select(fragment: SQL): number {
     // NOTE: it's okay to add selections after the plan is "locked" - lock only
     // applies to which rows are being selected, not what is being queried

@@ -45,13 +45,16 @@ import { inspect } from "util";
 import type {
   PgClassExpressionPlan,
   PgConditionCapableParentPlan,
+  PgDeletePlan,
   PgExecutorContextPlans,
+  PgInsertPlan,
   PgSelectPlan,
   PgSourceColumn,
   PgSourceColumnVia,
   PgTypeCodec,
   WithPgClient,
 } from "../src";
+import { pgDelete } from "../src";
 import {
   enumType,
   pgClassExpression,
@@ -68,6 +71,8 @@ import {
   recordType,
   TYPES,
 } from "../src";
+import type { PgClassSinglePlan } from "../src/interfaces";
+import type { PgUpdatePlan } from "../src/plans/pgUpdate";
 import { pgUpdate } from "../src/plans/pgUpdate";
 
 // These are what the generics extend from
@@ -2683,16 +2688,27 @@ export function makeExampleSchema(
     }),
   );
 
+  const DeleteRelationalPostByIdInput = new GraphQLInputObjectType(
+    inputObjectSpec({
+      name: "DeleteRelationalPostByIdInput",
+      fields: {
+        id: {
+          type: new GraphQLNonNull(GraphQLInt),
+        },
+      },
+    }),
+  );
+
   const relationalPostMutationFields = {
     post: {
       type: RelationalPost,
-      plan($post: RelationalPostPlan) {
+      plan($post: PgClassSinglePlan<typeof relationalPostsSource>) {
         return relationalPostsSource.get({ id: $post.get("id") });
       },
     },
     id: {
       type: GraphQLInt,
-      plan($post: RelationalPostPlan) {
+      plan($post: PgClassSinglePlan<typeof relationalPostsSource>) {
         return $post.get("id");
       },
     },
@@ -2705,16 +2721,43 @@ export function makeExampleSchema(
   };
 
   const CreateRelationalPostPayload = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, RelationalPostPlan>({
+    objectSpec<
+      GraphileResolverContext,
+      PgInsertPlan<typeof relationalPostsSource>
+    >({
       name: "CreateRelationalPostPayload",
       fields: relationalPostMutationFields,
     }),
   );
 
   const UpdateRelationalPostByIdPayload = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, RelationalPostPlan>({
+    objectSpec<
+      GraphileResolverContext,
+      PgUpdatePlan<typeof relationalPostsSource>
+    >({
       name: "UpdateRelationalPostByIdPayload",
       fields: relationalPostMutationFields,
+    }),
+  );
+
+  const DeleteRelationalPostByIdPayload = new GraphQLObjectType(
+    objectSpec<
+      GraphileResolverContext,
+      PgDeletePlan<typeof relationalPostsSource>
+    >({
+      name: "DeleteRelationalPostByIdPayload",
+      fields: {
+        ...relationalPostMutationFields,
+
+        // Since we've deleted the post we cannot go and fetch it; so we must
+        // return the record from the mutation RETURNING clause
+        post: {
+          type: RelationalPost,
+          plan($post) {
+            return $post.record();
+          },
+        },
+      },
     }),
   );
 
@@ -2751,6 +2794,7 @@ export function makeExampleSchema(
             return $post;
           },
         },
+
         createThreeRelationalPosts: {
           description:
             "This silly mutation is specifically to ensure that mutation plans are not tree-shaken - we never want to throw away mutation side effects.",
@@ -2776,6 +2820,7 @@ export function makeExampleSchema(
             return $post;
           },
         },
+
         updateRelationalPostById: {
           args: {
             input: {
@@ -2799,6 +2844,22 @@ export function makeExampleSchema(
                 $post.set(key, $value);
               }
             }
+            return $post;
+          },
+        },
+
+        deleteRelationalPostById: {
+          args: {
+            input: {
+              type: new GraphQLNonNull(DeleteRelationalPostByIdInput),
+            },
+          },
+          type: DeleteRelationalPostByIdPayload,
+          plan(_$root, args) {
+            const $input = args.input as InputObjectPlan;
+            const $post = pgDelete(relationalPostsSource, {
+              id: $input.get("id"),
+            });
             return $post;
           },
         },

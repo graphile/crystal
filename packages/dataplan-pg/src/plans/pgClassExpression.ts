@@ -10,6 +10,7 @@ import type {
   PgTypeCodec,
   PgTypedExecutablePlan,
 } from "../interfaces";
+import { PgDeletePlan } from "./pgDelete";
 import { PgInsertPlan } from "./pgInsert";
 import { PgSelectSinglePlan } from "./pgSelectSingle";
 import { PgUpdatePlan } from "./pgUpdate";
@@ -160,10 +161,11 @@ export class PgClassExpressionPlan<
     if (
       !(plan instanceof PgSelectSinglePlan) &&
       !(plan instanceof PgInsertPlan) &&
-      !(plan instanceof PgUpdatePlan)
+      !(plan instanceof PgUpdatePlan) &&
+      !(plan instanceof PgDeletePlan)
     ) {
       throw new Error(
-        `Expected ${plan} to be a PgSelectSinglePlan | PgInsertPlan | PgUpdatePlan`,
+        `Expected ${plan} to be a PgSelectSinglePlan | PgInsertPlan | PgUpdatePlan | PgDeletePlan`,
       );
     }
     return plan;
