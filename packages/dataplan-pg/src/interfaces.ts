@@ -2,6 +2,7 @@ import type { ExecutablePlan } from "graphile-crystal";
 import type { SQL, SQLRawValue } from "pg-sql2";
 
 import type { PgSource, PgSourceColumns } from "./datasource";
+import type { PgDeletePlan } from "./plans/pgDelete";
 import type { PgInsertPlan } from "./plans/pgInsert";
 import type { PgSelectSinglePlan } from "./plans/pgSelectSingle";
 import type { PgUpdatePlan } from "./plans/pgUpdate";
@@ -15,7 +16,8 @@ export type PgClassSinglePlan<
 > =
   | PgSelectSinglePlan<TDataSource>
   | PgInsertPlan<TDataSource>
-  | PgUpdatePlan<TDataSource>;
+  | PgUpdatePlan<TDataSource>
+  | PgDeletePlan<TDataSource>;
 
 /**
  * Given a value of type TInput, returns an `SQL` value to insert into an SQL
