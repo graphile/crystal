@@ -87,7 +87,6 @@ export class PgInsertPlan<
    * The list of things we're selecting.
    */
   private selects: Array<SQL> = [];
-  private selectRecordIndex: number | null = null;
 
   constructor(
     source: TDataSource,
@@ -191,13 +190,6 @@ export class PgInsertPlan<
     }
 
     return this.selects.push(fragment) - 1;
-  }
-
-  public selectRecord(): number {
-    if (!this.selectRecordIndex) {
-      this.selectRecordIndex = this.select(sql`to_json(${this.alias})`);
-    }
-    return this.selectRecordIndex;
   }
 
   /**
