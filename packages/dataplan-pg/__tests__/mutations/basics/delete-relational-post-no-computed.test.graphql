@@ -1,17 +1,14 @@
 # The aim of this test (vs `delete-relational-post.test.graphql`) is that
-# because we do not select a computed column we should be able to avoid
-# selecting the record/all columns of the record. This will play better with
-# column-base select grants.
+# because we do not query RelationalPost at all (i.e. no computed columns, no
+# relations, etc) we should avoid selecting the record/all columns of the
+# record. This will play better with column-base select grants.
 
 ## expect(queries[0].text).not.toContain('__relational_posts__::text')
-## expect(queries[0].text).toContain('__relational_posts__."title"::text')
+## expect(queries[0].text).toContain('__relational_posts__."id"::text')
 
 ## expect(errors).toBeFalsy()
 
-## expect(data.d1.post.id).toEqual(4)
-## expect(data.d1.post.title).toEqual('Better planning')
-## expect(data.d1.post.description).toEqual(null)
-## expect(data.d1.post.note).toEqual(null)
+## expect(data.d1.id).toEqual(4)
 
 ## expect(data.d2).toBe(null)
 ## expect(errors).toBeFalsy()
@@ -29,17 +26,4 @@ mutation {
 
 fragment Result on DeleteRelationalPostByIdPayload {
   id
-  post {
-    id
-    title
-    description
-    note
-    # NO COMPUTED COLUMNS (see note at top)
-
-    isExplicitlyArchived
-    author {
-      personId
-      username
-    }
-  }
 }
