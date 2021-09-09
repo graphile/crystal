@@ -281,12 +281,12 @@ export class PgUpdatePlan<
             }
           })
         : rawSqlValues;
-      const { rows } = await this.source.executeMutation({
+      const { rows, rowCount } = await this.source.executeMutation({
         context: value[this.contextId],
         text,
         values: sqlValues,
       });
-      return rows[0] ?? {};
+      return rows[0] ?? (rowCount === 0 ? null : {});
     });
   }
 
