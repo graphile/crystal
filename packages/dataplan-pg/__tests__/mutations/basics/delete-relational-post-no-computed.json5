@@ -1,0 +1,14 @@
+{
+  d1: {
+    id: 4,
+    post: {
+      id: 4,
+      title: "Better planning",
+      description: null,
+      note: null,
+      createdAt: "2020-01-28 11:01:00+00",
+      author: { personId: 2, username: "Benjie" },
+    },
+  },
+  d2: null,
+}
