@@ -1,0 +1,14 @@
+## expect(data.createRelationalPost.post.description).toEqual("-- Enter description here --")
+mutation {
+  createRelationalPost(
+    input: { title: "My Relational Post", note: "Such a great post." }
+  ) {
+    id
+    post {
+      id
+      title
+      description
+      note
+    }
+  }
+}

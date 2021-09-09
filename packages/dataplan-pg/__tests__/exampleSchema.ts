@@ -2702,8 +2702,6 @@ export function makeExampleSchema(
               keyof typeof relationalPostsSource.columns
             >) {
               const $value = $input.get(key);
-              // TODO: test that we differentiate between value set to null and
-              // value not being present
               if (!$value.evalIs(undefined)) {
                 $post.set(key, $value);
               }
