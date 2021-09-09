@@ -1,0 +1,9 @@
+{
+  createThreeRelationalPostsComputed: {
+    query: {
+      i1: { id: 1000000, title: "Computed post #1", description: "-- Enter description here --", note: null },
+      i2: { id: 1000001, title: "Computed post #2", description: "-- Enter description here --", note: null },
+      i3: { id: 1000002, title: "Computed post #3", description: "-- Enter description here --", note: null },
+    },
+  },
+}

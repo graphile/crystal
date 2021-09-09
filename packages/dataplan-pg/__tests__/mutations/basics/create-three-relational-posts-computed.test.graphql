@@ -1,0 +1,34 @@
+## expect(errors).toBeFalsy()
+## expect(data.createThreeRelationalPostsComputed.query.i1.title).toEqual("Computed post #1");
+## expect(data.createThreeRelationalPostsComputed.query.i2.title).toEqual("Computed post #2");
+## expect(data.createThreeRelationalPostsComputed.query.i3.title).toEqual("Computed post #3");
+mutation {
+  createThreeRelationalPostsComputed {
+    query {
+      i1: relationalItemById(id: 1000000) {
+        id
+        ... on RelationalPost {
+          title
+          description
+          note
+        }
+      }
+      i2: relationalItemById(id: 1000001) {
+        id
+        ... on RelationalPost {
+          title
+          description
+          note
+        }
+      }
+      i3: relationalItemById(id: 1000002) {
+        id
+        ... on RelationalPost {
+          title
+          description
+          note
+        }
+      }
+    }
+  }
+}
