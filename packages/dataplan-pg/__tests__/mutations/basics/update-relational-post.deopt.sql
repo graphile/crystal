@@ -81,3 +81,6 @@ lateral (
     )
   order by __relational_posts__."id" asc
 ) as __relational_posts_result__
+
+update interfaces_and_unions.relational_posts as __relational_posts__ set "description" = $1::"text" where (__relational_posts__."id" = $2::"int4") returning
+  __relational_posts__."id"::text as "0"

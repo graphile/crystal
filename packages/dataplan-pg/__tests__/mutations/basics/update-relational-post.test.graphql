@@ -10,6 +10,9 @@
 ## expect(data.u3.post.description).toEqual(null)
 ## expect(data.u3.post.note).toEqual('A note')
 
+## expect(data.u4).toBe(null)
+## expect(errors).toBeFalsy()
+
 mutation {
   u1: updateRelationalPostById(
     input: { id: 4, patch: { description: "A description" } }
@@ -22,6 +25,13 @@ mutation {
   }
 
   u3: updateRelationalPostById(input: { id: 4, patch: { description: null } }) {
+    ...Result
+  }
+
+  # Try and update a record that doesn't exist
+  u4: updateRelationalPostById(
+    input: { id: 3141592, patch: { description: null } }
+  ) {
     ...Result
   }
 }

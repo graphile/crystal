@@ -2,4 +2,5 @@
   u1: { id: 4, post: { id: 4, title: "Better planning", description: "A description", note: null } },
   u2: { id: 4, post: { id: 4, title: "Better planning", description: "A description", note: "A note" } },
   u3: { id: 4, post: { id: 4, title: "Better planning", description: null, note: "A note" } },
+  u4: null,
 }
