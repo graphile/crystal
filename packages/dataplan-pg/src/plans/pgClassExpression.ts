@@ -12,6 +12,7 @@ import type {
 } from "../interfaces";
 import { PgInsertPlan } from "./pgInsert";
 import { PgSelectSinglePlan } from "./pgSelectSingle";
+import { PgUpdatePlan } from "./pgUpdate";
 
 //const debugPlan = debugFactory("datasource:pg:PgClassExpressionPlan:plan");
 const debugExecute = debugFactory(
@@ -158,10 +159,11 @@ export class PgClassExpressionPlan<
     const plan = this.getPlan(this.dependencies[this.tableId]);
     if (
       !(plan instanceof PgSelectSinglePlan) &&
-      !(plan instanceof PgInsertPlan)
+      !(plan instanceof PgInsertPlan) &&
+      !(plan instanceof PgUpdatePlan)
     ) {
       throw new Error(
-        `Expected ${plan} to be a PgSelectSinglePlan | PgInsertPlan`,
+        `Expected ${plan} to be a PgSelectSinglePlan | PgInsertPlan | PgUpdatePlan`,
       );
     }
     return plan;

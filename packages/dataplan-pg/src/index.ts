@@ -47,3 +47,4 @@ export {
   pgSingleTablePolymorphic,
   PgSingleTablePolymorphicPlan,
 } from "./plans/pgSingleTablePolymorphic";
+export { pgUpdate, PgUpdatePlan } from "./plans/pgUpdate";

@@ -68,6 +68,7 @@ import {
   recordType,
   TYPES,
 } from "../src";
+import { pgUpdate } from "../src/plans/pgUpdate";
 
 // These are what the generics extend from
 
@@ -2650,29 +2651,70 @@ export function makeExampleSchema(
     }),
   );
 
+  const RelationalPostPatch = new GraphQLInputObjectType(
+    inputObjectSpec({
+      name: "RelationalPostPatch",
+      fields: {
+        // All nullable, since it's a patch.
+        title: {
+          type: GraphQLString,
+        },
+        description: {
+          type: GraphQLString,
+        },
+        note: {
+          type: GraphQLString,
+        },
+      },
+    }),
+  );
+
+  const UpdateRelationalPostByIdInput = new GraphQLInputObjectType(
+    inputObjectSpec({
+      name: "UpdateRelationalPostByIdInput",
+      fields: {
+        id: {
+          type: new GraphQLNonNull(GraphQLInt),
+        },
+        patch: {
+          type: new GraphQLNonNull(RelationalPostPatch),
+        },
+      },
+    }),
+  );
+
+  const relationalPostMutationFields = {
+    post: {
+      type: RelationalPost,
+      plan($post: RelationalPostPlan) {
+        return relationalPostsSource.get({ id: $post.get("id") });
+      },
+    },
+    id: {
+      type: GraphQLInt,
+      plan($post: RelationalPostPlan) {
+        return $post.get("id");
+      },
+    },
+    query: {
+      type: Query,
+      plan() {
+        return constant({});
+      },
+    },
+  };
+
   const CreateRelationalPostPayload = new GraphQLObjectType(
     objectSpec<GraphileResolverContext, RelationalPostPlan>({
       name: "CreateRelationalPostPayload",
-      fields: {
-        post: {
-          type: RelationalPost,
-          plan($post) {
-            return relationalPostsSource.get({ id: $post.get("id") });
-          },
-        },
-        id: {
-          type: GraphQLInt,
-          plan($post) {
-            return $post.get("id");
-          },
-        },
-        query: {
-          type: Query,
-          plan() {
-            return constant({});
-          },
-        },
-      },
+      fields: relationalPostMutationFields,
+    }),
+  );
+
+  const UpdateRelationalPostByIdPayload = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, RelationalPostPlan>({
+      name: "UpdateRelationalPostByIdPayload",
+      fields: relationalPostMutationFields,
     }),
   );
 
@@ -2730,6 +2772,32 @@ export function makeExampleSchema(
                 description: constant(`Desc ${i + 1}`),
                 note: constant(null),
               });
+            }
+            return $post;
+          },
+        },
+        updateRelationalPostById: {
+          args: {
+            input: {
+              type: new GraphQLNonNull(UpdateRelationalPostByIdInput),
+            },
+          },
+          type: UpdateRelationalPostByIdPayload,
+          plan(_$root, args) {
+            const $input = args.input as InputObjectPlan;
+            const $patch = $input.get("patch") as InputObjectPlan;
+            const $post = pgUpdate(relationalPostsSource, {
+              id: $input.get("id"),
+            });
+            for (const key of ["title", "description", "note"] as Array<
+              keyof typeof relationalPostsSource.columns
+            >) {
+              const $value = $patch.get(key);
+              // TODO: test that we differentiate between value set to null and
+              // value not being present
+              if (!$value.evalIs(undefined)) {
+                $post.set(key, $value);
+              }
             }
             return $post;
           },

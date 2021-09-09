@@ -1,0 +1,37 @@
+## expect(data.u1.post.title).toEqual('Better planning')
+## expect(data.u1.post.description).toEqual('A description')
+## expect(data.u1.post.note).toEqual(null)
+
+## expect(data.u2.post.title).toEqual('Better planning')
+## expect(data.u2.post.description).toEqual('A description')
+## expect(data.u2.post.note).toEqual('A note')
+
+## expect(data.u3.post.title).toEqual('Better planning')
+## expect(data.u3.post.description).toEqual(null)
+## expect(data.u3.post.note).toEqual('A note')
+
+mutation {
+  u1: updateRelationalPostById(
+    input: { id: 4, patch: { description: "A description" } }
+  ) {
+    ...Result
+  }
+
+  u2: updateRelationalPostById(input: { id: 4, patch: { note: "A note" } }) {
+    ...Result
+  }
+
+  u3: updateRelationalPostById(input: { id: 4, patch: { description: null } }) {
+    ...Result
+  }
+}
+
+fragment Result on UpdateRelationalPostByIdPayload {
+  id
+  post {
+    id
+    title
+    description
+    note
+  }
+}
