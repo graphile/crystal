@@ -64,6 +64,7 @@ import {
   pgInsert,
   pgPolymorphic,
   pgSelect,
+  pgSelectSingleFromRecord,
   PgSelectSinglePlan,
   pgSingleTablePolymorphic,
   PgSource,
@@ -2775,7 +2776,10 @@ export function makeExampleSchema(
         post: {
           type: RelationalPost,
           plan($post) {
-            return $post.record();
+            return pgSelectSingleFromRecord(
+              relationalPostsSource,
+              $post.record(),
+            );
           },
         },
       },

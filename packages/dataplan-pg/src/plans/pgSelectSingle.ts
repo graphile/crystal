@@ -3,6 +3,7 @@ import { ExecutablePlan } from "graphile-crystal";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
+import { TYPES } from "../codecs";
 import type { PgSource, PgSourceColumn, PgSourceRelation } from "../datasource";
 import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
 import type { PgClassExpressionPlan } from "./pgClassExpression";
@@ -315,4 +316,19 @@ export class PgSelectSinglePlan<
   ): CrystalResultsList<TDataSource["TRow"]> {
     return values.map((value) => value[this.itemPlanId]);
   }
+}
+
+export function pgSelectSingleFromRecord<
+  TDataSource extends PgSource<any, any, any, any>,
+>(
+  source: TDataSource,
+  record: PgClassExpressionPlan<TDataSource, TDataSource["codec"]>,
+): PgSelectSinglePlan<TDataSource> {
+  // TODO: we should be able to optimise this so that `plan.record()` returns the original record again.
+  return new PgSelectPlan({
+    source,
+    identifiers: [],
+    from: (record) => sql`(select (${record}).*)`,
+    args: [{ plan: record, type: source.codec.sqlType }],
+  }).single();
 }
