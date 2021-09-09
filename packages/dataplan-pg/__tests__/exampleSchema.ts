@@ -2092,7 +2092,7 @@ export function makeExampleSchema(
           type: GraphQLString,
           plan($entity: RelationalItemPlan) {
             return pgSelect({
-              source: userSource,
+              source: scalarTextSource,
               identifiers: [],
               args: [
                 {
@@ -2105,7 +2105,9 @@ export function makeExampleSchema(
                   ", ",
                 )})`,
               name: "relational_posts_title_lower",
-            }).single();
+            })
+              .single()
+              .getSelfNamed();
           },
         },
       }),
