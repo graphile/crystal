@@ -2086,6 +2086,27 @@ export function makeExampleSchema(
         title: attrField("title", GraphQLString),
         description: attrField("description", GraphQLString),
         note: attrField("note", GraphQLString),
+
+        titleLower: {
+          type: GraphQLString,
+          plan($entity: RelationalItemPlan) {
+            return pgSelect({
+              source: userSource,
+              identifiers: [],
+              args: [
+                {
+                  plan: $entity.record(),
+                },
+              ],
+              from: (...args: SQL[]) =>
+                sql`interfaces_and_unions.relational_posts_title_lower(${sql.join(
+                  args,
+                  ", ",
+                )})`,
+              name: "relational_posts_title_lower",
+            }).single();
+          },
+        },
       }),
     }),
   );

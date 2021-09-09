@@ -391,6 +391,10 @@ alter table interfaces_and_unions.relational_posts add constraint relational_pos
 alter table interfaces_and_unions.relational_checklists add constraint relational_posts_commentable_fkey foreign key (id) references interfaces_and_unions.relational_commentables deferrable initially deferred;
 alter table interfaces_and_unions.relational_checklist_items add constraint relational_posts_commentable_fkey foreign key (id) references interfaces_and_unions.relational_commentables deferrable initially deferred;
 
+create function interfaces_and_unions.relational_posts_title_lower(p interfaces_and_unions.relational_posts) returns text as $$
+  select lower(p.title);
+$$ language sql stable;
+
 create function interfaces_and_unions.tg__relational_commentable() returns trigger as $$
 begin
   insert into interfaces_and_unions.relational_commentables (id, type)
