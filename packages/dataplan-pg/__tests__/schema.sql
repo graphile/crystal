@@ -297,7 +297,7 @@ create table interfaces_and_unions.relational_topics (
 create table interfaces_and_unions.relational_posts (
   id int primary key references interfaces_and_unions.relational_items,
   title text not null,
-  description text,
+  description text default '-- Enter description here --',
   note text
 );
 create table interfaces_and_unions.relational_dividers (
