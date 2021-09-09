@@ -1,3 +1,4 @@
+## expect(errors).toBeFalsy()
 ## expect(data.forums).toHaveLength(1);
 ## expect(data.forums[0].messagesList).toHaveLength(2);
 ## expect(data.forums[0].messagesList[0].featured).toBe(false);

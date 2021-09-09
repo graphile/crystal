@@ -1,3 +1,4 @@
+## expect(errors).toBeFalsy()
 ## expect(data.createThreeRelationalPosts.query.i1.title).toEqual("Post #1");
 ## expect(data.createThreeRelationalPosts.query.i2.title).toEqual("Post #2");
 ## expect(data.createThreeRelationalPosts.query.i3.title).toEqual("Post #3");

@@ -1,3 +1,4 @@
+## expect(errors).toBeFalsy()
 mutation {
   p1: createRelationalPost(
     input: {

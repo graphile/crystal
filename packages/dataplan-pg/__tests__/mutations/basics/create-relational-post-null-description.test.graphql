@@ -1,3 +1,4 @@
+## expect(errors).toBeFalsy()
 ## expect(data.createRelationalPost.post.description).toBe(null)
 mutation {
   createRelationalPost(

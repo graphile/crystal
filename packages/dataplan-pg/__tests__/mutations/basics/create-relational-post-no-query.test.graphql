@@ -1,3 +1,4 @@
+## expect(errors).toBeFalsy()
 ## expect(data.p2.query.i2.title).toEqual("My Relational Post 2");
 ## expect(data.p2.query.i3).toBe(null);
 ## expect(data.p3.query.i2.title).toEqual("My Relational Post 2");

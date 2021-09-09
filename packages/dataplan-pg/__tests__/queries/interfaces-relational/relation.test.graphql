@@ -1,3 +1,4 @@
+## expect(errors).toBeFalsy()
 {
   item: relationalItemById(id: 15) {
     __typename

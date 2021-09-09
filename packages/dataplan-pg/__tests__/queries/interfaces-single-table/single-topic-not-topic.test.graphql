@@ -1,3 +1,4 @@
+## expect(errors).toBeFalsy()
 {
   singleTableTopicById(id: 12) {
     __typename

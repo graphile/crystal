@@ -1,3 +1,4 @@
+## expect(errors).toBeFalsy()
 ## expect(queries).toHaveLength(1);
 {
   forums(includeArchived: EXCLUSIVELY) {

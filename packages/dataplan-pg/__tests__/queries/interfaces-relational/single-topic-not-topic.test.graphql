@@ -1,3 +1,4 @@
+## expect(errors).toBeFalsy()
 {
   relationalTopicById(id: 12) {
     __typename

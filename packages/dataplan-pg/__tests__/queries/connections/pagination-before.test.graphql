@@ -1,3 +1,4 @@
+## expect(errors).toBeFalsy()
 ## expect(queries).toHaveLength(1);
 ## expect(data.allMessagesConnection.edges).toHaveLength(2);
 ## expect(data.allMessagesConnection.edges[0].cursor).toEqual("WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtYTExY2UwMDBjYTcwIl0=");

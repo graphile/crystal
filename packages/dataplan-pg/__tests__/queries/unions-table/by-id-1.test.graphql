@@ -1,3 +1,4 @@
+## expect(errors).toBeFalsy()
 ## expect(data.item1.id).toEqual(1);
 ## expect(data.item1.title).toEqual('PostGraphile version 5');
 {

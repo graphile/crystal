@@ -1,3 +1,4 @@
+## expect(errors).toBeFalsy()
 {
   item: singleTableItemById(id: 15) {
     __typename

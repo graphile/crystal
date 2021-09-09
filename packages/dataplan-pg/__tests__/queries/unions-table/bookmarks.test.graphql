@@ -1,3 +1,4 @@
+## expect(errors).toBeFalsy()
 {
   personByPersonId(personId: 2) {
     personId

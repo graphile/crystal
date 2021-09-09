@@ -1,3 +1,4 @@
+## expect(errors).toBeFalsy()
 ## expect(data.u1.post.title).toEqual('Better planning')
 ## expect(data.u1.post.description).toEqual('A description')
 ## expect(data.u1.post.note).toEqual(null)

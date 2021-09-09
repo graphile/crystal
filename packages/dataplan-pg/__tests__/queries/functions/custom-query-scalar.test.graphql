@@ -1,3 +1,4 @@
+## expect(errors).toBeFalsy()
 ## expect(queries).toHaveLength(3)
 ## expect(data.all).toEqual(3)
 ## expect(data.featured).toEqual(2)

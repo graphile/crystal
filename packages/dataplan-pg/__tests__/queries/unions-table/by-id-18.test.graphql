@@ -1,3 +1,4 @@
+## expect(errors).toBeFalsy()
 ## expect(data.item18.id).toEqual(18);
 ## expect(data.item18.description).toEqual('Has an optimisation phase');
 {

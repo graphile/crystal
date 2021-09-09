@@ -1,3 +1,4 @@
+## expect(errors).toBeFalsy()
 # This should have identical SQL queries and results to
 # single-topic.test.graphql since crystal should automatically filter out the
 # unreachable fragment spreads.
