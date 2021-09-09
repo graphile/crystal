@@ -196,6 +196,9 @@ export class Aether<
   public readonly itemPlanIdByPathIdentity: {
     [pathIdentity: string]: number | undefined;
   };
+  public readonly sideEffectPlanIdsByPathIdentity: {
+    [pathIdentity: string]: number[];
+  };
   public readonly valueIdByObjectByPlanId: {
     [planId: number]: WeakMap<object, UniqueId> | undefined;
   } = Object.create(null);
@@ -289,6 +292,7 @@ export class Aether<
     this.itemPlanIdByPathIdentity = Object.assign(Object.create(null), {
       [ROOT_PATH]: this.rootValuePlan.id,
     });
+    this.sideEffectPlanIdsByPathIdentity = Object.create(null);
     this.operationType = operation.operation;
     switch (this.operationType) {
       case "query": {
@@ -489,6 +493,7 @@ export class Aether<
 
       const planResolver = objectField.extensions?.graphile?.plan;
       let plan: ExecutablePlan | PolymorphicPlan;
+      this.sideEffectPlanIdsByPathIdentity[pathIdentity] = [];
       if (typeof planResolver === "function") {
         const oldPlansLength = this.plans.length;
         const trackedArguments = this.getTrackedArguments(objectType, field);
@@ -523,6 +528,11 @@ export class Aether<
             // TODO: rename finalizeArguments; maybe argumentsFinalized or lockParameters or lock?
             newPlan.finalizeArguments();
             assertArgumentsFinalized(newPlan);
+            if (newPlan.hasSideEffects) {
+              this.sideEffectPlanIdsByPathIdentity[pathIdentity].push(
+                newPlan.id,
+              );
+            }
           }
         }
 
@@ -1217,9 +1227,13 @@ export class Aether<
     }
 
     // Mark all plans with side effects as active.
-    for (let i = 0, l = this.plans.length; i < l; i++) {
-      const plan = this.plans[i];
-      if (plan && !activePlans.has(plan) && plan.hasSideEffects) {
+    for (const pathIdentity in this.sideEffectPlanIdsByPathIdentity) {
+      const planIds = this.sideEffectPlanIdsByPathIdentity[pathIdentity];
+      for (const planId of planIds) {
+        const plan = this.plans[planId];
+        if (isDev) {
+          assert.ok(plan, `Could not find plan for identifier '${planId}'`);
+        }
         this.markPlanActive(plan, activePlans);
       }
     }
