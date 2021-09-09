@@ -2845,6 +2845,38 @@ export function makeExampleSchema(
           },
         },
 
+        createThreeRelationalPostsComputed: {
+          description:
+            "This silly mutation is specifically to ensure that mutation plans are not tree-shaken even if they use plans that are normally side-effect free - we never want to throw away mutation side effects.",
+          type: CreateRelationalPostPayload,
+          plan() {
+            // Only the _last_ post plan is returned; there's no dependency on
+            // the first two posts, and yet they should not be tree-shaken
+            // because they're mutations.
+            let $post: ExecutablePlan;
+            for (let i = 0; i < 3; i++) {
+              $post = pgSelect({
+                source: relationalPostsSource,
+                identifiers: [],
+                from: (authorId, title) =>
+                  sql`interfaces_and_unions.insert_post(${authorId}, ${title})`,
+                args: [
+                  {
+                    plan: constant(2),
+                    type: TYPES.int.sqlType,
+                  },
+                  {
+                    plan: constant(`Computed post #${i + 1}`),
+                    type: TYPES.text.sqlType,
+                  },
+                ],
+              });
+              $post.hasSideEffects = true;
+            }
+            return $post;
+          },
+        },
+
         updateRelationalPostById: {
           args: {
             input: {

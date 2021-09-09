@@ -404,6 +404,17 @@ begin
 end;
 $$ language plpgsql volatile;
 
+create function interfaces_and_unions.insert_post(author_id int, title text) returns interfaces_and_unions.relational_posts as $$
+with item as (
+  insert into interfaces_and_unions.relational_items (type, author_id)
+  values ('POST', author_id)
+  returning id
+)
+insert into interfaces_and_unions.relational_posts (id, title)
+select item.id, insert_post.title from item
+returning *
+$$ language sql volatile;
+
 create trigger _500_commentable
   after insert on interfaces_and_unions.relational_posts
   referencing new table as new_table

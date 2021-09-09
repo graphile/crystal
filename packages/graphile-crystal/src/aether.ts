@@ -1128,10 +1128,15 @@ export class Aether<
    * any found).
    */
   private deduplicatePlan(plan: ExecutablePlan): ExecutablePlan {
+    if (plan.hasSideEffects) {
+      // Never deduplicate plans with side effects.
+      return plan;
+    }
     const seenIds = new Set([plan.id]);
     const peers = this.plans.filter((potentialPeer) => {
       if (
         potentialPeer &&
+        !potentialPeer.hasSideEffects &&
         !seenIds.has(potentialPeer.id) &&
         this.isPeer(plan, potentialPeer)
       ) {

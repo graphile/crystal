@@ -62,11 +62,13 @@ export abstract class BasePlan {
   public parentPathIdentity: string;
   protected readonly createdWithParentPathIdentity: string;
 
+  // TODO: change hasSideEffects to getter/setter, forbid setting after a
+  // particular phase.
   /**
    * Set this true for plans that implement mutations; this will prevent them
    * from being tree-shaken.
    */
-  public readonly hasSideEffects: boolean = false;
+  public hasSideEffects = false;
 
   constructor() {
     const aether = getCurrentAether();

@@ -1386,7 +1386,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
     // identical we should omit the later copies and have them link back to the
     // earliest version (resolve this in `execute` via mapping).
 
-    if (!this.isInliningForbidden) {
+    if (!this.isInliningForbidden && !this.hasSideEffects) {
       // Inline ourself into our parent if we can.
       let t: PgSelectPlan<any> | null | undefined = undefined;
       let p: ExecutablePlan<any> | undefined = undefined;
@@ -1423,6 +1423,9 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
             throw new Error(
               `Recursion error - record plan ${dep} is dependent on ${t2}, and ${this} is dependent on ${dep}`,
             );
+          }
+          if (t2.hasSideEffects) {
+            continue;
           }
           if (t === undefined && p === undefined) {
             p = p2;
