@@ -2710,6 +2710,40 @@ export function makeExampleSchema(
             return $post;
           },
         },
+        createThreeRelationalPosts: {
+          description:
+            "This silly mutation is specifically to ensure that mutation plans are not tree-shaken - we never want to throw away mutation side effects.",
+          type: CreateRelationalPostPayload,
+          plan() {
+            // Only the _last_ post plan is returned; there's no dependency on
+            // the first two posts, and yet they should not be tree-shaken
+            // because they're mutations.
+            let $post: ExecutablePlan;
+            for (let i = 0; i < 3; i++) {
+              const $item = pgInsert(relationalItemsSource, {
+                type: {
+                  plan: constant`POST`,
+                  pgCodec: enumType(sql`interfaces_and_unions.item_type`),
+                },
+                author_id: { plan: constant(2), pgCodec: TYPES.int },
+              });
+              const $itemId = $item.get("id");
+              $post = pgInsert(relationalPostsSource, {
+                id: $itemId,
+                title: {
+                  plan: constant(`Post #${i + 1}`),
+                  pgCodec: TYPES.text,
+                },
+                description: {
+                  plan: constant(`Desc ${i + 1}`),
+                  pgCodec: TYPES.text,
+                },
+                note: { plan: constant(null), pgCodec: TYPES.text },
+              });
+            }
+            return $post;
+          },
+        },
       },
     }),
   );
