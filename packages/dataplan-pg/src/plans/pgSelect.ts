@@ -1424,9 +1424,20 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
               `Recursion error - record plan ${dep} is dependent on ${t2}, and ${this} is dependent on ${dep}`,
             );
           }
+
           if (t2.hasSideEffects) {
+            // It's a mutation; don't merge
             continue;
           }
+
+          if (
+            t2.groupIds.filter((id) => this.groupIds.includes(id)).length === 0
+          ) {
+            // We're not in the same group (i.e. there's probably a @defer or
+            // @stream between us) - do not merge.
+            continue;
+          }
+
           if (t === undefined && p === undefined) {
             p = p2;
             t = t2;
