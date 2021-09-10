@@ -1,0 +1,34 @@
+[
+  { data: { forums: [{ name: "Dogs", messagesConnection: {} }] }, hasNext: true },
+  {
+    data: {
+      nodes: [
+        { body: "Dogs = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+        { body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+        { body: "Dogs = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
+      ],
+    },
+    path: ["forums", 0, "messagesConnection"],
+    hasNext: true,
+  },
+  {
+    data: {
+      edges: [
+        {
+          cursor: "WyJmMGIyOGM5NGMxIiwiZDA5MGQwOTAtMDAwMC0wMDAwLTAwMDAtYTExY2UwMDBkMDkwIl0=",
+          node: { body: "Dogs = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+        },
+        {
+          cursor: "WyJmMGIyOGM5NGMxIiwiZDA5MGQwOTAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBkMDkwIl0=",
+          node: { body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+        },
+        {
+          cursor: "WyJmMGIyOGM5NGMxIiwiZDA5MGQwOTAtMDAwMC0wMDAwLTAwMDAtY2VjMTExYTBkMDkwIl0=",
+          node: { body: "Dogs = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
+        },
+      ],
+    },
+    path: ["forums", 0, "messagesConnection"],
+    hasNext: false,
+  },
+]
