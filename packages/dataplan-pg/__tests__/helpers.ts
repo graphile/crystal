@@ -1,12 +1,13 @@
 Error.stackTraceLimit = Infinity;
 import { promises as fsp } from "fs";
 import type { BaseGraphQLContext } from "graphile-crystal";
-import type { GraphQLError } from "graphql";
+import type { AsyncExecutionResult, GraphQLError } from "graphql";
 import { graphql } from "graphql";
 import JSON5 from "json5";
 import type { PoolClient } from "pg";
 import { Pool } from "pg";
 import prettier from "prettier";
+import { isAsyncIterable } from "iterall";
 
 import type { PgClient, PgClientQuery, WithPgClient } from "../src";
 import { makeExampleSchema, schema as optimizedSchema } from "./exampleSchema";
@@ -135,8 +136,12 @@ export async function runTestQuery(
   variableValues?: { [key: string]: any },
   options: { deoptimize?: boolean } = Object.create(null),
 ): Promise<{
+  payloads?: Array<{
+    data?: { [key: string]: any };
+    errors?: readonly GraphQLError[];
+  }>;
   data?: { [key: string]: any };
-  errors?: GraphQLError[];
+  errors?: readonly GraphQLError[];
   queries: PgClientQuery[];
 }> {
   // Do not allow queries to run in parallel during these tests, we need
@@ -167,12 +172,26 @@ export async function runTestQuery(
     contextValue,
     rootValue: null,
   });
-
-  const { data, errors } = result;
-  if (errors) {
-    console.error(errors[0].originalError || errors[0]);
+  if (isAsyncIterable(result)) {
+    let errors: GraphQLError[] | undefined = undefined;
+    const payloads: AsyncExecutionResult[] = [];
+    for await (const entry of result) {
+      payloads.push(entry);
+      if (entry.errors) {
+        if (!errors) {
+          errors = [];
+        }
+        errors.push(...entry.errors);
+      }
+    }
+    return { payloads, errors, queries };
+  } else {
+    const { data, errors } = result;
+    if (errors) {
+      console.error(errors[0].originalError || errors[0]);
+    }
+    return { data, errors, queries };
   }
-  return { data, errors, queries };
 }
 
 async function snapshot(actual: string, filePath: string) {
@@ -208,11 +227,11 @@ export const assertSnapshotsMatch = async (
     throw new Error(`Failed to trim .test.graphql from '${path}'`);
   }
 
-  const { data, queries } = await result;
+  const { data, payloads, queries } = await result;
 
   if (only === "result") {
     const resultFileName = basePath + (ext || "") + ".json5";
-    const formattedData = prettier.format(JSON5.stringify(data), {
+    const formattedData = prettier.format(JSON5.stringify(payloads || data), {
       parser: "json5",
       printWidth: 120,
     });
