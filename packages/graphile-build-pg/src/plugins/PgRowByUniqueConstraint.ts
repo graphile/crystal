@@ -143,7 +143,7 @@ export default (async function PgRowByUniqueConstraint(
                       const { pgClient } = resolveContext;
                       const liveRecord =
                         resolveInfo.rootValue &&
-                        resolveInfo.rootValue.liveRecord;
+                        (resolveInfo.rootValue as any).liveRecord;
                       const parsedResolveInfoFragment = parseResolveInfo(
                         resolveInfo,
                         true,

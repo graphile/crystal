@@ -106,9 +106,7 @@ export function establishAether<TContext extends object>(details: {
     [variableName: string]: unknown;
   };
   context: TContext;
-  rootValue: {
-    [key: string]: unknown;
-  };
+  rootValue: unknown;
 }): Aether {
   const { schema, operation, fragments, variableValues, context, rootValue } =
     details;

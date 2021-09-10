@@ -61,7 +61,7 @@ export default (async function PgRowNode(builder, { subscriptions }) {
           const liveRecord =
             resolveInfo &&
             resolveInfo.rootValue &&
-            resolveInfo.rootValue.liveRecord;
+            (resolveInfo.rootValue as any).liveRecord;
           if (identifiers.length !== primaryKeys.length) {
             throw new Error("Invalid ID");
           }
@@ -192,7 +192,7 @@ export default (async function PgRowNode(builder, { subscriptions }) {
                         const { pgClient } = resolveContext;
                         const liveRecord =
                           resolveInfo.rootValue &&
-                          resolveInfo.rootValue.liveRecord;
+                          (resolveInfo.rootValue as any).liveRecord;
                         const nodeId = args[nodeIdFieldName];
                         try {
                           const { Type, identifiers } =

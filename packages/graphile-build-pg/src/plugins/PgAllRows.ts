@@ -196,7 +196,7 @@ export default (async function PgAllRows(
 
                     const liveCollection =
                       resolveInfo.rootValue &&
-                      resolveInfo.rootValue.liveCollection;
+                      (resolveInfo.rootValue as any).liveCollection;
                     if (subscriptions && liveCollection && checkerGenerator) {
                       const checker = checkerGenerator();
                       liveCollection("pg", table, checker);
@@ -210,7 +210,7 @@ export default (async function PgAllRows(
                     } else {
                       const liveRecord =
                         resolveInfo.rootValue &&
-                        resolveInfo.rootValue.liveRecord;
+                        (resolveInfo.rootValue as any).liveRecord;
                       if (
                         subscriptions &&
                         !isConnection &&

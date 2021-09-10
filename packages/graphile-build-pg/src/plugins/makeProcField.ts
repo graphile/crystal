@@ -1,4 +1,5 @@
 import chalk from "chalk";
+import type { GraphQLOutputType } from "graphql";
 import type { ResolveTree } from "graphql-parse-resolve-info";
 import type { SQL } from "pg-sql2";
 
@@ -217,7 +218,10 @@ export default function makeProcField(
         fieldScope.isPgFieldSimpleCollection = true;
       } else {
         const name = getNamedType(TableType).name;
-        const ConnectionType = getTypeByName(inflection.connection(name));
+        const ConnectionType = getTypeByName(inflection.connection(name)) as
+          | GraphQLOutputType
+          | null
+          | undefined;
 
         if (!ConnectionType) {
           throw new Error(
@@ -265,7 +269,7 @@ export default function makeProcField(
       } else {
         const ConnectionType = getTypeByName(
           inflection.recordFunctionConnection(proc),
-        );
+        ) as GraphQLOutputType | null | undefined;
 
         if (!ConnectionType) {
           throw new Error(
@@ -292,7 +296,10 @@ export default function makeProcField(
 
     if (proc.returnsSet) {
       const connectionTypeName = inflection.scalarFunctionConnection(proc);
-      const ConnectionType = getTypeByName(connectionTypeName);
+      const ConnectionType = getTypeByName(connectionTypeName) as
+        | GraphQLOutputType
+        | null
+        | undefined;
       if (isMutation) {
         // Cannot return a connection because it would have to run the mutation again
         type = new GraphQLList(Type);
@@ -641,7 +648,8 @@ export default function makeProcField(
         resolve: computed
           ? (data, _args, _resolveContext, resolveInfo) => {
               const liveRecord =
-                resolveInfo.rootValue && resolveInfo.rootValue.liveRecord;
+                resolveInfo.rootValue &&
+                (resolveInfo.rootValue as any).liveRecord;
               const safeAlias = getSafeAliasFromResolveInfo(resolveInfo);
               const value = data[safeAlias];
               if (returnFirstValueAsValue) {
@@ -697,7 +705,8 @@ export default function makeProcField(
           : async (_data, args, resolveContext, resolveInfo) => {
               const { pgClient } = resolveContext;
               const liveRecord =
-                resolveInfo.rootValue && resolveInfo.rootValue.liveRecord;
+                resolveInfo.rootValue &&
+                (resolveInfo.rootValue as any).liveRecord;
               const parsedResolveInfoFragment = parseResolveInfo(
                 resolveInfo,
                 true,

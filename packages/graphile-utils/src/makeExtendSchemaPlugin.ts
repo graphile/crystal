@@ -616,9 +616,8 @@ export default function makeExtendSchemaPlugin(
       return null;
     } else if (value.kind === "ListValue") {
       // This is used in directives, so we cannot assume the type is known.
-      const childType:
-        | import("graphql").GraphQLList<import("graphql").GraphQLType>
-        | null = type && graphql.isListType(type) ? type.ofType : null;
+      const childType: import("graphql").GraphQLType | null =
+        type && graphql.isListType(type) ? type.ofType : null;
       return value.values.map((value) => getValue(value, childType));
     } else if (value.kind === "GraphileEmbed") {
       // RAW!
@@ -840,7 +839,8 @@ export default function makeExtendSchemaPlugin(
                 const safeAlias =
                   build.getSafeAliasFromResolveInfo(resolveInfo);
                 const liveRecord =
-                  resolveInfo.rootValue && resolveInfo.rootValue.liveRecord;
+                  resolveInfo.rootValue &&
+                  (resolveInfo.rootValue as any).liveRecord;
                 if (isConnection) {
                   return build.pgAddStartEndCursor(data[safeAlias]);
                 } else if (isListType) {

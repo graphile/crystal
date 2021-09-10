@@ -19,9 +19,9 @@ import type { UniqueId } from "./utils";
 
 declare module "graphql" {
   interface GraphQLFieldExtensions<
-    TSource,
-    TContext,
-    TArgs = { [argName: string]: any },
+    _TSource,
+    _TContext,
+    _TArgs = { [argName: string]: any },
   > {
     graphile?: {
       plan?: ExecutablePlanResolver<any, any, any, any>;
@@ -188,6 +188,7 @@ export type ArgumentPlanResolver<
   context: __TrackedObjectPlan<TContext>,
 ) => TResultPlan;
 
+/*
 type PlanForType<TType extends GraphQLOutputType> = TType extends GraphQLList<
   infer U
 >
@@ -201,6 +202,7 @@ type PlanForType<TType extends GraphQLOutputType> = TType extends GraphQLList<
   : TType extends GraphQLScalarType | GraphQLEnumType
   ? ExecutablePlan<boolean | number | string>
   : ExecutablePlan<{ [key: string]: any }>;
+*/
 
 /* Disabled due to TypeScript "Type instantiation is excessively deep and
  * possibly infinite".

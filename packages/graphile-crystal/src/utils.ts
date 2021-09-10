@@ -8,7 +8,7 @@ import type {
   GraphQLObjectTypeConfig,
   GraphQLOutputType,
   ObjectFieldNode,
-  Thunk,
+  ThunkObjMap,
   ValueNode,
 } from "graphql";
 import {
@@ -227,7 +227,7 @@ function rawValueToValueNode(
 
 export function defaultValueToValueNode(
   type: GraphQLInputType,
-  defaultValue: JSON | undefined,
+  defaultValue: unknown,
 ): ValueNode | undefined {
   // NOTE: even if `type` is non-null it's okay for `defaultValue` to be
   // undefined. However it is not okay for defaultValue to be null if type is
@@ -321,15 +321,15 @@ export function objectSpec<
   TParentPlan extends ExecutablePlan<any>,
 >(
   spec: Omit<GraphQLObjectTypeConfig<any, TContext>, "fields"> & {
-    fields: Thunk<{
-      [key: string]: GraphileCrystalFieldConfig<
+    fields: ThunkObjMap<
+      GraphileCrystalFieldConfig<
         GraphQLOutputType,
         TContext,
         TParentPlan,
         any,
         any
-      >;
-    }>;
+      >
+    >;
   },
 ): GraphQLObjectTypeConfig<any, TContext> {
   const modifiedSpec: GraphQLObjectTypeConfig<any, TContext> = {
@@ -397,15 +397,15 @@ export function inputObjectSpec<
   TParentPlan extends ModifierPlan<any>,
 >(
   spec: Omit<GraphQLInputObjectTypeConfig, "fields"> & {
-    fields: Thunk<{
-      [key: string]: GraphileCrystalInputFieldConfig<
+    fields: ThunkObjMap<
+      GraphileCrystalInputFieldConfig<
         GraphQLInputType,
         TContext,
         TParentPlan,
         any,
         any
-      >;
-    }>;
+      >
+    >;
   },
 ): GraphQLInputObjectTypeConfig {
   const modifiedSpec: GraphQLInputObjectTypeConfig = {

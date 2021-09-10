@@ -209,7 +209,7 @@ export default (function PgForwardRelationPlugin(builder, { subscriptions }) {
                       const record = data[safeAlias];
                       const liveRecord =
                         resolveInfo.rootValue &&
-                        resolveInfo.rootValue.liveRecord;
+                        (resolveInfo.rootValue as any).liveRecord;
                       if (record && liveRecord) {
                         liveRecord("pg", foreignTable, record.__identifiers);
                       }

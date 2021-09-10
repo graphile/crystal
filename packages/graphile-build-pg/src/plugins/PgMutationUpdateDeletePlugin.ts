@@ -1,5 +1,6 @@
 import debugFactory from "debug";
 import type { GetDataFromParsedResolveInfoFragmentFunction } from "graphile-build";
+import type { GraphQLInputType } from "graphql";
 
 import type { SQL } from "../QueryBuilder";
 import type { PgAttribute } from "./PgIntrospectionPlugin";
@@ -241,7 +242,7 @@ returning *`;
                 const tableTypeName = getNamedType(Table).name;
                 const TablePatch = getTypeByName(
                   inflection.patchType(getNamedType(Table).name),
-                );
+                ) as GraphQLInputType | null | undefined;
                 if (mode === "update" && !TablePatch) {
                   throw new Error(
                     `Could not find TablePatch type for table '${table.name}'`,

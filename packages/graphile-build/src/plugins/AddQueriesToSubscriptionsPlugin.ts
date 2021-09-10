@@ -54,9 +54,10 @@ const AddQueriesToSubscriptionsPlugin: GraphileEngine.Plugin = function (
                         const info = args[3];
                         if (
                           info.rootValue &&
-                          typeof info.rootValue.liveAbort === "function"
+                          typeof (info.rootValue as any).liveAbort ===
+                            "function"
                         ) {
-                          info.rootValue.liveAbort(e);
+                          (info.rootValue as any).liveAbort(e);
                         }
                         throw e;
                       }
@@ -64,9 +65,7 @@ const AddQueriesToSubscriptionsPlugin: GraphileEngine.Plugin = function (
                   }
                 : null),
               subscribe: build.liveCoordinator.subscribe,
-              deprecationReason: queryField.isDeprecated
-                ? queryField.deprecationReason
-                : undefined,
+              deprecationReason: queryField.deprecationReason,
             },
             {
               isLiveField: true,

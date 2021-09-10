@@ -240,7 +240,7 @@ export default (function PgBackwardRelationPlugin(
                         const record = data[safeAlias];
                         const liveRecord =
                           resolveInfo.rootValue &&
-                          resolveInfo.rootValue.liveRecord;
+                          (resolveInfo.rootValue as any).liveRecord;
                         if (record && liveRecord) {
                           liveRecord("pg", table, record.__identifiers);
                         }
@@ -435,10 +435,10 @@ export default (function PgBackwardRelationPlugin(
                           getSafeAliasFromResolveInfo(resolveInfo);
                         const liveCollection =
                           resolveInfo.rootValue &&
-                          resolveInfo.rootValue.liveCollection;
+                          (resolveInfo.rootValue as any).liveCollection;
                         const liveConditions =
                           resolveInfo.rootValue &&
-                          resolveInfo.rootValue.liveConditions;
+                          (resolveInfo.rootValue as any).liveConditions;
                         if (
                           subscriptions &&
                           liveCollection &&
@@ -457,7 +457,7 @@ export default (function PgBackwardRelationPlugin(
                           const records = data[safeAlias];
                           const liveRecord =
                             resolveInfo.rootValue &&
-                            resolveInfo.rootValue.liveRecord;
+                            (resolveInfo.rootValue as any).liveRecord;
                           if (primaryKeys && subscriptions && liveRecord) {
                             records.forEach(
                               (r: any) =>

@@ -233,9 +233,7 @@ export class InputListPlan extends ExecutablePlan {
   at(index: number): InputPlan {
     const itemPlanId = this.itemPlanIds[index];
     const outOfBoundsPlan = this.getPlan(this.outOfBoundsPlanId);
-    const itemPlan = itemPlanId
-      ? this.getPlan(itemPlanId)
-      : outOfBoundsPlan;
+    const itemPlan = itemPlanId ? this.getPlan(itemPlanId) : outOfBoundsPlan;
     assertInputPlan(itemPlan);
     return itemPlan;
   }

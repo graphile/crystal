@@ -1,3 +1,5 @@
+import type { GraphQLOutputType } from "graphql";
+
 import { base64, nullableIf } from "../utils";
 import type { PgTypeModifier } from "./PgBasicsPlugin";
 import type { PgAttribute, PgType } from "./PgIntrospectionPlugin";
@@ -484,7 +486,7 @@ export default (function PgTablesPlugin(
 
                           const liveRecord =
                             resolveInfo.rootValue &&
-                            resolveInfo.rootValue.liveRecord;
+                            (resolveInfo.rootValue as any).liveRecord;
                           if (
                             record &&
                             primaryKeys &&
@@ -531,7 +533,10 @@ export default (function PgTablesPlugin(
               );
             }
 
-            const PageInfo = getTypeByName(inflection.builtin("PageInfo"));
+            const PageInfo = getTypeByName(inflection.builtin("PageInfo")) as
+              | GraphQLOutputType
+              | null
+              | undefined;
 
             /*const ConnectionType = */
             const connectionSpec: GraphileEngine.GraphileObjectTypeConfig<
@@ -568,7 +573,7 @@ export default (function PgTablesPlugin(
 
                         const liveRecord =
                           resolveInfo.rootValue &&
-                          resolveInfo.rootValue.liveRecord;
+                          (resolveInfo.rootValue as any).liveRecord;
                         return data.data.map((entry: any) => {
                           const record = handleNullRow(
                             entry[safeAlias],
