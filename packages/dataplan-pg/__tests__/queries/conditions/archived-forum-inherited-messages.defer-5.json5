@@ -19,21 +19,17 @@
         },
       ],
     },
-    hasNext: true,
   },
   {
     data: { cursor: "WyJmMGIyOGM5NGMxIiwiZDA5MGQwOTAtMDAwMC0wMDAwLTAwMDAtYTExY2UwMDBkMDkwIl0=" },
     path: ["forums", 0, "messagesConnection", "edges", 0],
-    hasNext: true,
   },
   {
     data: { cursor: "WyJmMGIyOGM5NGMxIiwiZDA5MGQwOTAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBkMDkwIl0=" },
     path: ["forums", 0, "messagesConnection", "edges", 1],
-    hasNext: true,
   },
   {
     data: { cursor: "WyJmMGIyOGM5NGMxIiwiZDA5MGQwOTAtMDAwMC0wMDAwLTAwMDAtY2VjMTExYTBkMDkwIl0=" },
     path: ["forums", 0, "messagesConnection", "edges", 2],
-    hasNext: false,
   },
 ]

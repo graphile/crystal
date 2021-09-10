@@ -1,7 +1,11 @@
 Error.stackTraceLimit = Infinity;
 import { promises as fsp } from "fs";
 import type { BaseGraphQLContext } from "graphile-crystal";
-import type { AsyncExecutionResult, GraphQLError } from "graphql";
+import type {
+  AsyncExecutionResult,
+  ExecutionPatchResult,
+  GraphQLError,
+} from "graphql";
 import { graphql } from "graphql";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
@@ -174,9 +178,11 @@ export async function runTestQuery(
   });
   if (isAsyncIterable(result)) {
     let errors: GraphQLError[] | undefined = undefined;
-    const payloads: AsyncExecutionResult[] = [];
+    // hasNext changes based on payload order; remove it.
+    const originalPayloads: Omit<AsyncExecutionResult, "hasNext">[] = [];
     for await (const entry of result) {
-      payloads.push(entry);
+      const { hasNext, ...rest } = entry;
+      originalPayloads.push(rest);
       if (entry.errors) {
         if (!errors) {
           errors = [];
@@ -184,6 +190,57 @@ export async function runTestQuery(
         errors.push(...entry.errors);
       }
     }
+
+    // Now we're going to reorder the payloads so that they're always in a
+    // consistent order for the snapshots.
+    const sortPayloads = (
+      payload1: ExecutionPatchResult,
+      payload2: ExecutionPatchResult,
+    ) => {
+      const ONE_AFTER_TWO = 1;
+      const ONE_BEFORE_TWO = -1;
+      if (!payload1.path) {
+        return 0;
+      }
+      if (!payload2.path) {
+        return 0;
+      }
+
+      // Make it so we can assume payload1 has the longer (or equal) path
+      if (payload2.path.length > payload1.path.length) {
+        return -sortPayloads(payload2, payload1);
+      }
+
+      for (let i = 0, l = payload1.path.length; i < l; i++) {
+        let key1 = payload1.path[i];
+        let key2 = payload2.path[i];
+        if (key2 === undefined) {
+          return ONE_AFTER_TWO;
+        }
+        if (key1 === key2) {
+          /* continue */
+        } else if (typeof key1 === "number" && typeof key2 === "number") {
+          const res = key1 - key2;
+          if (res !== 0) {
+            return res;
+          }
+        } else if (typeof key1 === "string" && typeof key2 === "string") {
+          const res = key1.localeCompare(key2);
+          if (res !== 0) {
+            return res;
+          }
+        } else {
+          throw new Error("Type mismatch");
+        }
+      }
+      // We should do canonical JSON... but whatever.
+      return JSON.stringify(payload1).localeCompare(JSON.stringify(payload2));
+    };
+    const payloads = [
+      originalPayloads[0],
+      ...originalPayloads.slice(1).sort(sortPayloads),
+    ];
+
     return { payloads, errors, queries };
   } else {
     const { data, errors } = result;

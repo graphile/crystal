@@ -1,5 +1,5 @@
 [
-  { data: { forums: [{ name: "Dogs", messagesConnection: {} }] }, hasNext: true },
+  { data: { forums: [{ name: "Dogs", messagesConnection: {} }] } },
   {
     data: {
       nodes: [
@@ -23,6 +23,5 @@
       ],
     },
     path: ["forums", 0, "messagesConnection"],
-    hasNext: false,
   },
 ]

@@ -28,36 +28,23 @@
         },
       ],
     },
-    hasNext: true,
-  },
-  {
-    data: { author: { username: "Alice", gravatarUrl: null } },
-    path: ["forums", 0, "messagesConnection", "nodes", 0],
-    hasNext: true,
-  },
-  {
-    data: { author: { username: "Bob", gravatarUrl: null } },
-    path: ["forums", 0, "messagesConnection", "nodes", 1],
-    hasNext: true,
-  },
-  {
-    data: { author: { username: "Cecilia", gravatarUrl: null } },
-    path: ["forums", 0, "messagesConnection", "nodes", 2],
-    hasNext: true,
   },
   {
     data: { author: { username: "Alice", gravatarUrl: null } },
     path: ["forums", 0, "messagesConnection", "edges", 0, "node"],
-    hasNext: true,
   },
   {
     data: { author: { username: "Bob", gravatarUrl: null } },
     path: ["forums", 0, "messagesConnection", "edges", 1, "node"],
-    hasNext: true,
   },
   {
     data: { author: { username: "Cecilia", gravatarUrl: null } },
     path: ["forums", 0, "messagesConnection", "edges", 2, "node"],
-    hasNext: false,
+  },
+  { data: { author: { username: "Alice", gravatarUrl: null } }, path: ["forums", 0, "messagesConnection", "nodes", 0] },
+  { data: { author: { username: "Bob", gravatarUrl: null } }, path: ["forums", 0, "messagesConnection", "nodes", 1] },
+  {
+    data: { author: { username: "Cecilia", gravatarUrl: null } },
+    path: ["forums", 0, "messagesConnection", "nodes", 2],
   },
 ]
