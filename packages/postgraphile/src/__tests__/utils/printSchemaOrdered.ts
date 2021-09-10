@@ -1,4 +1,4 @@
-import type { GraphQLSchema } from "graphql";
+import type { GraphQLArgument, GraphQLEnumValue, GraphQLSchema } from "graphql";
 import { buildASTSchema, parse } from "graphql";
 import { printSchema } from "graphql/utilities";
 
@@ -24,14 +24,20 @@ export default function printSchemaOrdered(originalSchema: GraphQLSchema) {
 
         // Sort args
         if ("args" in value && value.args) {
-          value.args.sort((a, b) => a.name.localeCompare(b.name));
+          // TODO: remove this cast hack, we probably shouldn't mutate the schema...
+          (value.args as GraphQLArgument[]).sort((a, b) =>
+            a.name.localeCompare(b.name),
+          );
         }
       });
     }
 
     // Enum?
     if ("getValues" in gqlType && gqlType.getValues) {
-      gqlType.getValues().sort((a, b) => a.name.localeCompare(b.name));
+      // TODO: remove this cast hack, we probably shouldn't mutate the schema...
+      (gqlType.getValues() as GraphQLEnumValue[]).sort((a, b) =>
+        a.name.localeCompare(b.name),
+      );
     }
   });
 

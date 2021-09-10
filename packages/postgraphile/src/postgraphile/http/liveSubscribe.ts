@@ -92,15 +92,15 @@ function liveSubscribeImpl(
      * that it can clean up old listeners; we do this with the `finally` block.
      */
     try {
-      return await execute(
+      return await execute({
         schema,
         document,
-        payload,
+        rootValue: payload,
         contextValue,
         variableValues,
         operationName,
         fieldResolver,
-      );
+      });
     } finally {
       if (payload && typeof payload.release === "function") {
         payload.release();

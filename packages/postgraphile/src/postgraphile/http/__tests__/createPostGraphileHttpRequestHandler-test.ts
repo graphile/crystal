@@ -830,6 +830,9 @@ for (const { name, createServerFromHandler, subpath = "" } of toTest) {
           return errors.map((error) => {
             return {
               ...error,
+              get [Symbol.toStringTag]() {
+                return `HandledGraphQLError: ${this.message}`;
+              },
               message: "my custom error message",
               extensions: {
                 ...error.extensions,

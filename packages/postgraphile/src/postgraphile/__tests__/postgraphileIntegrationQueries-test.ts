@@ -85,8 +85,13 @@ beforeAll(() => {
               ? gqlSchemas.dynamicJson
               : gqlSchemas.normal;
           // Return the result of our GraphQL query.
-          return await graphql(gqlSchema, query, null, {
-            [$$pgClient]: pgClient,
+          return await graphql({
+            schema: gqlSchema,
+            source: query,
+            rootValue: null,
+            contextValue: {
+              [$$pgClient]: pgClient,
+            },
           });
         }),
       );

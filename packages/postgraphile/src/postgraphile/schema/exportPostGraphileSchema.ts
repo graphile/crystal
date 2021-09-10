@@ -50,7 +50,10 @@ export default async function exportPostGraphileSchema(
 
   // JSON version
   if (jsonPath) {
-    const result = await graphql(finalSchema, getIntrospectionQuery());
+    const result = await graphql({
+      schema: finalSchema,
+      source: getIntrospectionQuery(),
+    });
     await writeFileIfDiffers(jsonPath, JSON.stringify(result, null, 2));
   }
 

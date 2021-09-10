@@ -217,6 +217,7 @@ export async function enhanceHttpServerWithSubscriptions<
           "Only subscriptions are allowed over websocket transport",
         );
       },
+      // @ts-ignore
       subscribe: options.live ? liveSubscribe : graphqlSubscribe,
       onConnect(
         connectionParams: object,

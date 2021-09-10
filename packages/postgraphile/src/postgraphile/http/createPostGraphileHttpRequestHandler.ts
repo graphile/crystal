@@ -828,14 +828,14 @@ export default function createPostGraphileHttpRequestHandler(
                 },
                 (graphqlContext: GraphileEngine.GraphileResolverContext) => {
                   pgRole = graphqlContext.pgRole;
-                  const graphqlResult = executeGraphql(
-                    gqlSchema,
-                    queryDocumentAst!,
-                    null,
-                    graphqlContext,
-                    variables,
+                  const graphqlResult = executeGraphql({
+                    schema: gqlSchema,
+                    document: queryDocumentAst!,
+                    rootValue: null,
+                    contextValue: graphqlContext,
+                    variableValues: variables,
                     operationName,
-                  );
+                  });
                   const { getExplainResults } = graphqlContext;
                   if (typeof getExplainResults === "function") {
                     return Promise.resolve(graphqlResult).then(async (obj) => ({
