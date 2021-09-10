@@ -31,7 +31,7 @@
   "dependencies": {
     "@types/node": "^14.14.44",
     "debug": "^4.2.0",
-    "graphql": "^15.3.0",
+    "graphql": "npm:graphql@experimental-stream-defer",
     "tslib": "^2.2.0"
   },
   "engines": {

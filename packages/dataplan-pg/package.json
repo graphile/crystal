@@ -42,7 +42,7 @@
     "node": ">=14.17"
   },
   "peerDependencies": {
-    "graphql": "^15.3.0"
+    "graphql": "*"
   },
   "files": [
     "dist",
@@ -52,7 +52,7 @@
     "@types/jest": "^25.2.3",
     "@types/json5": "^2.2.0",
     "@types/nodemon": "1.19.0",
-    "graphql": "^15.3.0",
+    "graphql": "npm:graphql@experimental-stream-defer",
     "jest": "^26.0.1",
     "jest-serializer-simple": "4.6.0",
     "json5": "^2.2.0",
