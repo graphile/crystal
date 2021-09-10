@@ -1,0 +1,28 @@
+## expect(errors).toBeFalsy()
+## expect(queries).toHaveLength(1);
+{
+  forums(includeArchived: EXCLUSIVELY) {
+    name
+    messagesConnection(includeArchived: INHERIT) {
+      nodes {
+        body
+        author {
+          username
+          gravatarUrl
+        }
+      }
+      edges {
+        ... @defer {
+          cursor
+        }
+        node {
+          body
+          author {
+            username
+            gravatarUrl
+          }
+        }
+      }
+    }
+  }
+}
