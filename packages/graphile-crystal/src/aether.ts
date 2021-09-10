@@ -36,7 +36,7 @@ import { GLOBAL_PATH, ROOT_PATH } from "./constants";
 import type { Constraint } from "./constraints";
 import type { Deferred } from "./deferred";
 import { isDev } from "./dev";
-import { globalState } from "./global";
+import { withGlobalState } from "./global";
 import { getDirective, graphqlCollectFields } from "./graphqlCollectFields";
 import {
   graphqlMergeSelectionSets,
@@ -250,37 +250,50 @@ export class Aether<
     }
 
     this.phase = "plan";
-    globalState.aether = this;
-    globalState.parentPathIdentity = GLOBAL_PATH;
-    this.variableValuesPlan = new __ValuePlan();
+    /** with global state */
+    const wgs = withGlobalState.bind(null, {
+      aether: this,
+      parentPathIdentity: GLOBAL_PATH,
+      groupIds: [0],
+    }) as <T>(cb: () => T) => T;
+    this.variableValuesPlan = wgs(() => new __ValuePlan());
     debugPlan("Constructed variableValuesPlan %s", this.variableValuesPlan);
     // TODO: this should use a more intelligent tracked object plan since the variables are strongly typed (unlike context/rootValue).
-    this.trackedVariableValuesPlan = new __TrackedObjectPlan(
-      variableValues,
-      this.variableValuesPlan,
-      this.variableValuesConstraints,
+    this.trackedVariableValuesPlan = wgs(
+      () =>
+        new __TrackedObjectPlan(
+          variableValues,
+          this.variableValuesPlan,
+          this.variableValuesConstraints,
+        ),
     );
     debugPlanVerbose(
       "Constructed trackedVariableValuesPlan %s",
       this.trackedVariableValuesPlan,
     );
-    this.contextPlan = new __ValuePlan();
+    this.contextPlan = wgs(() => new __ValuePlan());
     debugPlan("Constructed contextPlan %s", this.contextPlan);
-    this.trackedContextPlan = new __TrackedObjectPlan(
-      context,
-      this.contextPlan,
-      this.contextConstraints,
+    this.trackedContextPlan = wgs(
+      () =>
+        new __TrackedObjectPlan(
+          context,
+          this.contextPlan,
+          this.contextConstraints,
+        ),
     );
     debugPlanVerbose(
       "Constructed trackedContextPlan %s",
       this.trackedContextPlan,
     );
-    this.rootValuePlan = new __ValuePlan();
+    this.rootValuePlan = wgs(() => new __ValuePlan());
     debugPlan("Constructed rootValuePlan %s", this.rootValuePlan);
-    this.trackedRootValuePlan = new __TrackedObjectPlan(
-      rootValue,
-      this.rootValuePlan,
-      this.rootValueConstraints,
+    this.trackedRootValuePlan = wgs(
+      () =>
+        new __TrackedObjectPlan(
+          rootValue,
+          this.rootValuePlan,
+          this.rootValueConstraints,
+        ),
     );
     debugPlanVerbose(
       "Constructed trackedRootValuePlan %s",
@@ -354,8 +367,6 @@ export class Aether<
     this.logPlansByPath("after optimization and finalization");
 
     this.phase = "ready";
-
-    globalState.aether = null;
   }
 
   /**
@@ -423,20 +434,31 @@ export class Aether<
     const fieldSpec: GraphQLField<unknown, unknown> = rootTypeFields[fieldName];
     const subscriptionPlanResolver =
       fieldSpec.extensions?.graphile?.subscribePlan;
+    const wgs = withGlobalState.bind(null, {
+      aether: this,
+      parentPathIdentity: ROOT_PATH,
+      groupIds: [0],
+    }) as <T>(cb: () => T) => T;
     if (subscriptionPlanResolver) {
-      const trackedArguments = this.getTrackedArguments(rootType, field);
-      const subscribePlan = subscriptionPlanResolver(
-        this.trackedRootValuePlan,
-        trackedArguments,
-        this.trackedContextPlan,
+      const trackedArguments = wgs(() =>
+        this.getTrackedArguments(rootType, field),
       );
-      this.planFieldArguments(
-        rootType,
-        fieldSpec,
-        field,
-        trackedArguments,
-        this.trackedRootValuePlan,
-        subscribePlan,
+      const subscribePlan = wgs(() =>
+        subscriptionPlanResolver(
+          this.trackedRootValuePlan,
+          trackedArguments,
+          this.trackedContextPlan,
+        ),
+      );
+      wgs(() =>
+        this.planFieldArguments(
+          rootType,
+          fieldSpec,
+          field,
+          trackedArguments,
+          this.trackedRootValuePlan,
+          subscribePlan,
+        ),
       );
       this.planSelectionSet(
         ROOT_PATH,
@@ -467,7 +489,6 @@ export class Aether<
     isSequential = false,
   ): void {
     assertObjectType(objectType);
-    globalState.parentPathIdentity = path;
     const groupedFieldSet = graphqlCollectFields(this, objectType, selections);
     const objectTypeFields = objectType.getFields();
     for (const [responseKey, fields] of groupedFieldSet.entries()) {
@@ -496,20 +517,27 @@ export class Aether<
       this.sideEffectPlanIdsByPathIdentity[pathIdentity] = [];
       if (typeof planResolver === "function") {
         const oldPlansLength = this.plans.length;
-        const trackedArguments = this.getTrackedArguments(objectType, field);
-        plan = planResolver(
-          parentPlan,
-          trackedArguments,
-          this.trackedContextPlan,
+        const wgs = withGlobalState.bind(null, {
+          aether: this,
+          parentPathIdentity: path,
+          groupIds: [0], // TODO
+        }) as <T>(cb: () => T) => T;
+        const trackedArguments = wgs(() =>
+          this.getTrackedArguments(objectType, field),
+        );
+        plan = wgs(() =>
+          planResolver(parentPlan, trackedArguments, this.trackedContextPlan),
         );
         assertExecutablePlan(plan, pathIdentity);
-        this.planFieldArguments(
-          objectType,
-          objectField,
-          field,
-          trackedArguments,
-          parentPlan,
-          plan,
+        wgs(() =>
+          this.planFieldArguments(
+            objectType,
+            objectField,
+            field,
+            trackedArguments,
+            parentPlan,
+            plan,
+          ),
         );
         const newPlansLength = this.plans.length;
         debugPlanVerbose(
@@ -547,8 +575,8 @@ export class Aether<
 
       this.planIdByPathIdentity[pathIdentity] = plan.id;
 
-      // Now we're building the child plans, the parentPathIdentity becomes actually our identity.
-      globalState.parentPathIdentity = pathIdentity;
+      // Now we're building the child plans, the parentPathIdentity becomes
+      // actually our identity.
       const itemPlan = this.planSelectionSetForType(
         fieldType,
         fields,
@@ -556,8 +584,6 @@ export class Aether<
         plan,
       );
       this.itemPlanIdByPathIdentity[pathIdentity] = itemPlan.id;
-
-      this.groupId = oldGroupId;
     }
   }
 
@@ -574,6 +600,11 @@ export class Aether<
     plan: ExecutablePlan<any>,
     depth = 0,
   ): ExecutablePlan<any> {
+    const wgs = withGlobalState.bind(null, {
+      aether: this,
+      parentPathIdentity: pathIdentity,
+      groupIds: plan.groupIds,
+    }) as <T>(cb: () => T) => T;
     if (fieldType instanceof GraphQLNonNull) {
       // TODO: we could implement a __NonNullPlan in future; currently we just
       // defer that to GraphQL.js
@@ -587,7 +618,9 @@ export class Aether<
       return plan;
     } else if (fieldType instanceof GraphQLList) {
       assertListCapablePlan(plan, pathIdentity);
-      const listItemPlan = plan.listItem(new __ListItemPlan(plan, depth));
+      const listItemPlan = wgs(() =>
+        plan.listItem(new __ListItemPlan(plan, depth)),
+      );
       this.planSelectionSetForType(
         fieldType.ofType,
         fields,
@@ -623,7 +656,9 @@ export class Aether<
           for (let i = 0, l = possibleObjectTypes.length; i < l; i++) {
             const possibleObjectType = possibleObjectTypes[i];
             // This line implements `GetPolymorphicObjectPlanForType`.
-            const subPlan = polymorphicPlan.planForType(possibleObjectType);
+            const subPlan = wgs(() =>
+              polymorphicPlan.planForType(possibleObjectType),
+            );
             this.planSelectionSet(
               pathIdentity,
               subPlan,
@@ -986,10 +1021,16 @@ export class Aether<
           }
         }
       }
-      globalState.parentPathIdentity = plan.parentPathIdentity;
       let replacementPlan: ExecutablePlan;
       try {
-        replacementPlan = callback(plan);
+        replacementPlan = withGlobalState(
+          {
+            aether: this,
+            parentPathIdentity: plan.parentPathIdentity,
+            groupIds: plan.groupIds,
+          },
+          () => callback(plan),
+        );
       } catch (e) {
         this.logPlans();
         console.error(
@@ -1270,10 +1311,18 @@ export class Aether<
     for (let i = this.plans.length - 1; i >= 0; i--) {
       const plan = this.plans[i];
       if (plan !== null) {
-        globalState.parentPathIdentity = plan.parentPathIdentity;
         // NOTE: checking the following would be redundant:
         // if (!distinctActivePlansInReverseOrder.has(plan))
-        distinctActivePlansInReverseOrder.add(plan);
+        withGlobalState(
+          {
+            aether: this,
+            parentPathIdentity: plan.parentPathIdentity,
+            groupIds: plan.groupIds,
+          },
+          () => {
+            distinctActivePlansInReverseOrder.add(plan);
+          },
+        );
       }
     }
     for (const plan of distinctActivePlansInReverseOrder) {

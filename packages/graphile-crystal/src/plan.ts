@@ -8,8 +8,9 @@ import { crystalPrintPathIdentity } from "./crystalPrint";
 import { isDev, noop } from "./dev";
 import {
   getCurrentAether,
+  getCurrentGroupIds,
   getCurrentParentPathIdentity,
-  globalState,
+  getDebug,
 } from "./global";
 import type {
   CrystalResultsList,
@@ -58,7 +59,7 @@ export abstract class BasePlan {
   public readonly aether: Aether;
   public isArgumentsFinalized = false;
   public isFinalized = false;
-  public debug = globalState.debug;
+  public debug = getDebug();
   public parentPathIdentity: string;
   protected readonly createdWithParentPathIdentity: string;
 
@@ -154,11 +155,17 @@ export abstract class ExecutablePlan<TData = any> extends BasePlan {
   public readonly children: ReadonlyArray<number> = this._children;
 
   public readonly id: number;
-  public readonly groupId: number;
+  /**
+   * The group ids this plan is associated with (e.g. if the field this plan
+   * was spawned from came from multiple selection sets in the GraphQL
+   * document, some may have been deferred/streamed/etc which may lead to
+   * multiple groupIds).
+   */
+  public readonly groupIds: number[];
 
   constructor() {
     super();
-    this.groupId = this.aether.groupId;
+    this.groupIds = getCurrentGroupIds();
     this.id = this.aether._addPlan(this);
   }
 

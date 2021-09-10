@@ -1,11 +1,36 @@
 import type { Aether } from "./aether";
-import { GLOBAL_PATH } from "./constants";
 
-export const globalState = {
-  debug: false as boolean,
-  aether: null as Aether | null,
-  parentPathIdentity: GLOBAL_PATH as string,
-};
+export interface GlobalState {
+  aether: Aether;
+  parentPathIdentity: string;
+  groupIds: number[];
+}
+
+let globalState: GlobalState | null = null;
+
+export function getGlobalState(): GlobalState {
+  if (!globalState) {
+    throw new Error(
+      `getGlobalState called at inappropriate time - there is no global state right now.`,
+    );
+  }
+  return globalState;
+}
+
+export function withGlobalState<T>(
+  newGlobalState: GlobalState,
+  callback: () => T,
+): T {
+  if (globalState) {
+    throw new Error("withGlobalState may not be called nested");
+  }
+  globalState = newGlobalState;
+  try {
+    return callback();
+  } finally {
+    globalState = null;
+  }
+}
 
 /**
  * Since plan functions are called synchronously _by us_ we don't need to pass
@@ -14,7 +39,7 @@ export const globalState = {
  * React's hooks work.
  */
 export function getCurrentAether(): Aether {
-  const aether = globalState.aether;
+  const aether = getGlobalState().aether;
   if (!aether) {
     throw new Error(
       "You have broken the rules of Graphile Crystal Plans; they must only be created synchronously from inside the relevant `plan` function.",
@@ -28,5 +53,21 @@ export function getCurrentAether(): Aether {
  * _by us_ we can pull the current parentPathIdentity from global state.
  */
 export function getCurrentParentPathIdentity(): string {
-  return globalState.parentPathIdentity;
+  return getGlobalState().parentPathIdentity;
+}
+
+/**
+ * Like with `getCurrentAether`, since plan functions are called synchronously
+ * _by us_ we can pull the current groupIds from global state.
+ */
+export function getCurrentGroupIds(): number[] {
+  return getGlobalState().groupIds;
+}
+
+let debug = false;
+export function setDebug(newDebug: boolean): void {
+  debug = newDebug;
+}
+export function getDebug(): boolean {
+  return debug;
 }

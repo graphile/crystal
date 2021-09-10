@@ -1,5 +1,5 @@
 import type { Aether } from "../aether";
-import { getCurrentAether, globalState } from "../global";
+import { getCurrentAether, getDebug, setDebug } from "../global";
 import type { BaseGraphQLContext } from "../interfaces";
 import type { __ValuePlan } from "./__value";
 
@@ -12,9 +12,10 @@ export function context(): __ValuePlan<BaseGraphQLContext> {
 }
 
 export function debugPlans<T>(callback: () => T): T {
-  globalState.debug = true;
+  const oldDebug = getDebug();
+  setDebug(true);
   const result = callback();
-  globalState.debug = false;
+  setDebug(oldDebug);
   return result;
 }
 
