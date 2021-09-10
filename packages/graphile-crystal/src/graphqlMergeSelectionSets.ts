@@ -7,6 +7,7 @@ import type {
 import { inspect } from "util";
 
 import type { Aether } from "./aether";
+import type { FieldAndGroup } from "./interfaces";
 
 /**
  * Implements the `MergeSelectionSets` algorithm from the GraphQL spec.
@@ -14,17 +15,22 @@ import type { Aether } from "./aether";
  * @see https://spec.graphql.org/draft/#MergeSelectionSets()
  */
 export function graphqlMergeSelectionSets(
-  fields: FieldNode[],
-): SelectionNode[] {
-  const selectionSet: SelectionNode[] = [];
+  fields: FieldAndGroup[],
+): { groupId: number; selections: SelectionNode[] }[] {
+  const selectionSetsByGroupId: Record<number, SelectionNode[]> = {};
   for (let i = 0, l = fields.length; i < l; i++) {
-    const field = fields[i];
+    const { field, groupId } = fields[i];
     const fieldSelectionSet = field.selectionSet;
     if (fieldSelectionSet) {
-      selectionSet.push(...fieldSelectionSet.selections);
+      if (!selectionSetsByGroupId[groupId]) {
+        selectionSetsByGroupId[groupId] = [];
+      }
+      selectionSetsByGroupId[groupId].push(...fieldSelectionSet.selections);
     }
   }
-  return selectionSet;
+  return Object.entries(selectionSetsByGroupId).map(
+    ([groupId, selections]) => ({ groupId: Number(groupId), selections }),
+  );
 }
 
 /**

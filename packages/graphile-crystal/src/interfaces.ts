@@ -1,4 +1,5 @@
 import type {
+  FieldNode,
   GraphQLArgumentConfig,
   GraphQLEnumType,
   GraphQLFieldConfig,
@@ -8,6 +9,7 @@ import type {
   GraphQLNonNull,
   GraphQLOutputType,
   GraphQLScalarType,
+  SelectionNode,
 } from "graphql";
 
 import type { Aether } from "./aether";
@@ -304,3 +306,20 @@ export type TrackedArguments<
 > = {
   [key in keyof TArgs]: InputPlan;
 };
+
+/**
+ * Represents the selections that happen within a particular group within a
+ * particular point in the GraphQL document.
+ */
+export interface GroupedSelections {
+  groupId: number;
+  selections: ReadonlyArray<SelectionNode>;
+}
+
+/**
+ * Represents an individual field and it's group.
+ */
+export interface FieldAndGroup {
+  groupId: number;
+  field: FieldNode;
+}

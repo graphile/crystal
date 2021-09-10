@@ -10,10 +10,8 @@ import type {
   GraphQLOutputType,
   GraphQLSchema,
   OperationDefinitionNode,
-  SelectionNode,
 } from "graphql";
 import {
-  assertListType,
   assertObjectType,
   getNamedType,
   GraphQLInterfaceType,
@@ -37,7 +35,7 @@ import type { Constraint } from "./constraints";
 import type { Deferred } from "./deferred";
 import { isDev } from "./dev";
 import { withGlobalState } from "./global";
-import { getDirective, graphqlCollectFields } from "./graphqlCollectFields";
+import { graphqlCollectFields } from "./graphqlCollectFields";
 import {
   graphqlMergeSelectionSets,
   interfaceTypeHasNonIntrospectionFieldQueriedInSelections,
@@ -53,6 +51,8 @@ import type {
   CrystalContext,
   CrystalLayerObject,
   CrystalObject,
+  FieldAndGroup,
+  GroupedSelections,
   IndexByListItemPlanId,
   TrackedArguments,
 } from "./interfaces";
@@ -157,7 +157,6 @@ export class Aether<
   private phase: AetherPhase = "init";
 
   public maxGroupId = 0;
-  public groupId = this.maxGroupId;
   private readonly plans: ExecutablePlan[] = [];
 
   /**
@@ -369,12 +368,12 @@ export class Aether<
     if (!rootType) {
       throw new Error("No query type found in schema");
     }
-    this.planSelectionSet(
-      ROOT_PATH,
-      this.trackedRootValuePlan,
-      rootType,
-      this.operation.selectionSet.selections,
-    );
+    this.planSelectionSet(ROOT_PATH, this.trackedRootValuePlan, rootType, [
+      {
+        groupId: 0,
+        selections: this.operation.selectionSet.selections,
+      },
+    ]);
   }
 
   /**
@@ -389,7 +388,12 @@ export class Aether<
       ROOT_PATH,
       this.trackedRootValuePlan,
       rootType,
-      this.operation.selectionSet.selections,
+      [
+        {
+          groupId: 0,
+          selections: this.operation.selectionSet.selections,
+        },
+      ],
       true,
     );
   }
@@ -403,11 +407,12 @@ export class Aether<
       throw new Error("No subscription type found in schema");
     }
     const selectionSet = this.operation.selectionSet;
-    const groupedFieldSet = graphqlCollectFields(
-      this,
-      rootType,
-      selectionSet.selections,
-    );
+    const groupedFieldSet = graphqlCollectFields(this, rootType, [
+      {
+        groupId: 0,
+        selections: selectionSet.selections,
+      },
+    ]);
     let firstKey: string | undefined = undefined;
     for (const key of groupedFieldSet.keys()) {
       if (firstKey !== undefined) {
@@ -420,7 +425,8 @@ export class Aether<
     if (!fields) {
       throw new Error("Consistency error.");
     }
-    const field = fields[0];
+    // TODO: maybe assert that all fields have groupId: 0?
+    const { field, groupId: _groupId } = fields[0];
     const fieldName = field.name.value; // Unaffected by alias.
     const rootTypeFields = rootType.getFields();
     const fieldSpec: GraphQLField<unknown, unknown> = rootTypeFields[fieldName];
@@ -442,6 +448,8 @@ export class Aether<
           this.trackedContextPlan,
         ),
       );
+      // NOTE: don't need to worry about tracking groupId when planning
+      // arguments as they're guaranteed to be identical across all selections.
       wgs(() =>
         this.planFieldArguments(
           rootType,
@@ -452,20 +460,20 @@ export class Aether<
           subscribePlan,
         ),
       );
-      this.planSelectionSet(
-        ROOT_PATH,
-        subscribePlan,
-        rootType,
-        selectionSet.selections,
-      );
+      this.planSelectionSet(ROOT_PATH, subscribePlan, rootType, [
+        {
+          groupId: 0,
+          selections: selectionSet.selections,
+        },
+      ]);
     } else {
       const subscribePlan = this.trackedRootValuePlan;
-      this.planSelectionSet(
-        ROOT_PATH,
-        subscribePlan,
-        rootType,
-        selectionSet.selections,
-      );
+      this.planSelectionSet(ROOT_PATH, subscribePlan, rootType, [
+        {
+          groupId: 0,
+          selections: selectionSet.selections,
+        },
+      ]);
     }
   }
 
@@ -477,16 +485,40 @@ export class Aether<
     path: string,
     parentPlan: ExecutablePlan,
     objectType: GraphQLObjectType,
-    selections: ReadonlyArray<SelectionNode>,
+    groupedSelectionsList: GroupedSelections[],
     isSequential = false,
   ): void {
     assertObjectType(objectType);
-    const groupedFieldSet = graphqlCollectFields(this, objectType, selections);
+    const groupedFieldSet = graphqlCollectFields(
+      this,
+      objectType,
+      groupedSelectionsList,
+    );
     const objectTypeFields = objectType.getFields();
-    for (const [responseKey, fields] of groupedFieldSet.entries()) {
-      const oldGroupId = this.groupId;
+    for (const [responseKey, fieldAndGroups] of groupedFieldSet.entries()) {
       const pathIdentity = `${path}>${objectType.name}.${responseKey}`;
-      const field = fields[0];
+
+      // We could use a Set for this, but for a very small data set arrays
+      // are faster.
+      const groupIds: number[] = [];
+
+      let firstField: FieldNode | null = null;
+      for (const { field: fieldInstance, groupId } of fieldAndGroups) {
+        if (!firstField) {
+          firstField = fieldInstance;
+        }
+        if (!groupIds.includes(groupId)) {
+          groupIds.push(groupId);
+        }
+      }
+      if (!firstField) {
+        // Impossible?
+        throw new Error("Grouped field set with no field?!");
+      }
+
+      // Tell TypeScript this isn't going to change now.
+      const field = firstField;
+
       const fieldName = field.name.value;
       if (fieldName.startsWith("__")) {
         // Introspection field, skip
@@ -497,13 +529,6 @@ export class Aether<
       const objectField = objectTypeFields[fieldName];
       const fieldType = objectTypeFields[fieldName].type;
 
-      // Note we don't have "defer" here, since "defer" only applies to fragments.
-      const stream = getDirective(field, "stream");
-      if (stream) {
-        assertListType(fieldType);
-        this.groupId = ++this.maxGroupId;
-      }
-
       const planResolver = objectField.extensions?.graphile?.plan;
       let plan: ExecutablePlan | PolymorphicPlan;
       this.sideEffectPlanIdsByPathIdentity[pathIdentity] = [];
@@ -512,7 +537,7 @@ export class Aether<
         const wgs = withGlobalState.bind(null, {
           aether: this,
           parentPathIdentity: path,
-          groupIds: [0], // TODO
+          groupIds,
         }) as <T>(cb: () => T) => T;
         const trackedArguments = wgs(() =>
           this.getTrackedArguments(objectType, field),
@@ -571,7 +596,7 @@ export class Aether<
       // actually our identity.
       const itemPlan = this.planSelectionSetForType(
         fieldType,
-        fields,
+        fieldAndGroups,
         pathIdentity,
         plan,
       );
@@ -587,7 +612,7 @@ export class Aether<
    */
   private planSelectionSetForType(
     fieldType: GraphQLOutputType,
-    fields: FieldNode[],
+    fieldAndGroups: FieldAndGroup[],
     pathIdentity: string,
     plan: ExecutablePlan<any>,
     depth = 0,
@@ -602,7 +627,7 @@ export class Aether<
       // defer that to GraphQL.js
       this.planSelectionSetForType(
         fieldType.ofType,
-        fields,
+        fieldAndGroups,
         pathIdentity,
         plan,
         depth,
@@ -615,7 +640,7 @@ export class Aether<
       );
       this.planSelectionSetForType(
         fieldType.ofType,
-        fields,
+        fieldAndGroups,
         pathIdentity,
         listItemPlan,
         depth + 1,
@@ -630,13 +655,13 @@ export class Aether<
       fieldTypeIsInterfaceType ||
       fieldTypeIsUnionType
     ) {
-      const subSelectionSet = graphqlMergeSelectionSets(fields);
+      const groupedSubSelections = graphqlMergeSelectionSets(fieldAndGroups);
       if (fieldTypeIsObjectType) {
         this.planSelectionSet(
           pathIdentity,
           plan,
           fieldType as GraphQLObjectType,
-          subSelectionSet,
+          groupedSubSelections,
           false,
         );
       } else {
@@ -655,17 +680,20 @@ export class Aether<
               pathIdentity,
               subPlan,
               possibleObjectType,
-              subSelectionSet,
+              groupedSubSelections,
               false,
             );
           }
         };
         if (fieldTypeIsUnionType) {
           const unionType = fieldType as GraphQLUnionType;
+          const subSelections = groupedSubSelections.flatMap(
+            (s) => s.selections,
+          );
           const possibleObjectTypes = typesUsedInSelections(
             this,
             unionType.getTypes(),
-            subSelectionSet,
+            subSelections,
           );
           /*@__INLINE__*/ planPossibleObjectTypes(possibleObjectTypes);
         } else {
@@ -680,11 +708,14 @@ export class Aether<
           // we only need to plan the reachable types.
           const implementations =
             this.schema.getImplementations(interfaceType).objects;
+          const subSelections = groupedSubSelections.flatMap(
+            (s) => s.selections,
+          );
           if (
             interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
               this,
               interfaceType,
-              subSelectionSet,
+              subSelections,
             )
           ) {
             /*@__INLINE__*/ planPossibleObjectTypes(implementations);
@@ -692,7 +723,7 @@ export class Aether<
             const possibleObjectTypes = typesUsedInSelections(
               this,
               implementations,
-              subSelectionSet,
+              subSelections,
             );
             /*@__INLINE__*/ planPossibleObjectTypes(possibleObjectTypes);
           }
