@@ -15,6 +15,7 @@ import {
   InputStaticLeafPlan,
   list,
   map,
+  planGroupsOverlap,
   reverse,
   reverseArray,
 } from "graphile-crystal";
@@ -1430,9 +1431,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
             continue;
           }
 
-          if (
-            t2.groupIds.filter((id) => this.groupIds.includes(id)).length === 0
-          ) {
+          if (!planGroupsOverlap(this, t2)) {
             // We're not in the same group (i.e. there's probably a @defer or
             // @stream between us) - do not merge.
             continue;

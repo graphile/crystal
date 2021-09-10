@@ -78,6 +78,7 @@ export {
   inputObjectSpec,
   objectFieldSpec,
   objectSpec,
+  planGroupsOverlap,
 } from "./utils";
 
 // Handy for debugging
