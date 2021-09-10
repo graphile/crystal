@@ -79,10 +79,10 @@ import {
 import { assertPolymorphicData } from "./polymorphic";
 import { newCrystalObject } from "./resolvers";
 import type { UniqueId } from "./utils";
-import { isPromise } from "./utils";
 import {
   arraysMatch,
   defaultValueToValueNode,
+  isPromise,
   ROOT_VALUE_OBJECT,
   uid,
 } from "./utils";
@@ -144,14 +144,6 @@ function assertPolymorphicPlan(
     "function",
     `Expected property 'planForType' for interface field plan ${plan} to be a function at ${pathIdentity}.`,
   );
-}
-
-function atIndexes(data: any, indexes: ReadonlyArray<number>): any {
-  let o = data;
-  for (let i = 0, l = indexes.length; i < l; i++) {
-    o = o?.[indexes[i]];
-  }
-  return o;
 }
 
 /**

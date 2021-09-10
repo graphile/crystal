@@ -3,11 +3,11 @@ import { promises as fsp } from "fs";
 import type { BaseGraphQLContext } from "graphile-crystal";
 import type { AsyncExecutionResult, GraphQLError } from "graphql";
 import { graphql } from "graphql";
+import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
 import type { PoolClient } from "pg";
 import { Pool } from "pg";
 import prettier from "prettier";
-import { isAsyncIterable } from "iterall";
 
 import type { PgClient, PgClientQuery, WithPgClient } from "../src";
 import { makeExampleSchema, schema as optimizedSchema } from "./exampleSchema";
