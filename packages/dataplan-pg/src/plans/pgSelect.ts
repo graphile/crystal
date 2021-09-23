@@ -1179,6 +1179,7 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
         rawSqlValues,
         identifierIndex,
         queryValuesDependencyIndexes,
+        // TODO: when streaming we must not set this to true
         shouldReverseOrder: this.shouldReverseOrder(),
       };
     }
