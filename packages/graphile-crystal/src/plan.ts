@@ -181,10 +181,15 @@ export abstract class ExecutablePlan<TData = any> extends BasePlan {
     const meta = this.toStringMeta();
     return chalk.bold.blue(
       `${this.constructor.name.replace(/Plan$/, "")}${
-        meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""
-      }[${inspect(this.id, {
-        colors: true,
-      })}@${crystalPrintPathIdentity(this.parentPathIdentity)}]`,
+        this.groupIds.length === 1 && this.groupIds[0] === 0
+          ? ""
+          : chalk.grey(`{${this.groupIds.join(",")}}`)
+      }${meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""}[${inspect(
+        this.id,
+        {
+          colors: true,
+        },
+      )}@${crystalPrintPathIdentity(this.parentPathIdentity)}]`,
     );
   }
 
