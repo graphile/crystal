@@ -3,7 +3,6 @@ import type { Aether } from "./aether";
 export interface GlobalState {
   aether: Aether;
   parentPathIdentity: string;
-  groupIds: number[];
 }
 
 let globalState: GlobalState | null = null;
@@ -54,14 +53,6 @@ export function getCurrentAether(): Aether {
  */
 export function getCurrentParentPathIdentity(): string {
   return getGlobalState().parentPathIdentity;
-}
-
-/**
- * Like with `getCurrentAether`, since plan functions are called synchronously
- * _by us_ we can pull the current groupIds from global state.
- */
-export function getCurrentGroupIds(): number[] {
-  return getGlobalState().groupIds;
 }
 
 let debug = false;

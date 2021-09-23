@@ -87,6 +87,21 @@ import {
   uid,
 } from "./utils";
 
+/**
+ * Describes the document tree that we're parsing; is populated by
+ * planSelectionSet. Is mostly useful for determining the groupIds of the plans
+ * during the tree shaking phase.
+ *
+ * @internal
+ */
+
+interface TreeNode {
+  pathIdentity: string;
+  groupIds: number[];
+  parent: null | TreeNode;
+  children: TreeNode[];
+}
+
 type AetherPhase =
   | "init"
   | "plan"
@@ -157,6 +172,13 @@ export class Aether<
   private phase: AetherPhase = "init";
 
   public maxGroupId = 0;
+  private rootTreeNode: TreeNode = {
+    pathIdentity: ROOT_PATH,
+    groupIds: [0],
+    parent: null,
+    children: [],
+  };
+
   private readonly plans: ExecutablePlan[] = [];
 
   /**
@@ -189,6 +211,16 @@ export class Aether<
   };
   public readonly sideEffectPlanIdsByPathIdentity: {
     [pathIdentity: string]: number[];
+  };
+  /**
+   * The field at each given path identity may be in one or more groups; these
+   * groups govern how the plans run (e.g. a plan will likely not optimise
+   * itself into a parent plan in a different group). Groups are advanced by
+   * features such as `@stream` and `@defer`. This behaviour ensures that only
+   * the logic required at each stage is executed at those stages.
+   */
+  public readonly groupIdsByPathIdentity: {
+    [pathIdentity: string]: number[] | undefined;
   };
   public readonly valueIdByObjectByPlanId: {
     [planId: number]: WeakMap<object, UniqueId> | undefined;
@@ -245,7 +277,6 @@ export class Aether<
     const wgs = withGlobalState.bind(null, {
       aether: this,
       parentPathIdentity: GLOBAL_PATH,
-      groupIds: [0],
     }) as <T>(cb: () => T) => T;
     this.variableValuesPlan = wgs(() => new __ValuePlan());
     debugPlan("Constructed variableValuesPlan %s", this.variableValuesPlan);
@@ -297,6 +328,9 @@ export class Aether<
       [ROOT_PATH]: this.rootValuePlan.id,
     });
     this.sideEffectPlanIdsByPathIdentity = Object.create(null);
+    this.groupIdsByPathIdentity = Object.assign(Object.create(null), {
+      [ROOT_PATH]: [0],
+    });
     this.operationType = operation.operation;
     switch (this.operationType) {
       case "query": {
@@ -368,12 +402,18 @@ export class Aether<
     if (!rootType) {
       throw new Error("No query type found in schema");
     }
-    this.planSelectionSet(ROOT_PATH, this.trackedRootValuePlan, rootType, [
-      {
-        groupId: 0,
-        selections: this.operation.selectionSet.selections,
-      },
-    ]);
+    this.planSelectionSet(
+      ROOT_PATH,
+      this.trackedRootValuePlan,
+      rootType,
+      [
+        {
+          groupId: 0,
+          selections: this.operation.selectionSet.selections,
+        },
+      ],
+      this.rootTreeNode,
+    );
   }
 
   /**
@@ -394,6 +434,7 @@ export class Aether<
           selections: this.operation.selectionSet.selections,
         },
       ],
+      this.rootTreeNode,
       true,
     );
   }
@@ -435,7 +476,6 @@ export class Aether<
     const wgs = withGlobalState.bind(null, {
       aether: this,
       parentPathIdentity: ROOT_PATH,
-      groupIds: [0],
     }) as <T>(cb: () => T) => T;
     if (subscriptionPlanResolver) {
       const trackedArguments = wgs(() =>
@@ -460,20 +500,32 @@ export class Aether<
           subscribePlan,
         ),
       );
-      this.planSelectionSet(ROOT_PATH, subscribePlan, rootType, [
-        {
-          groupId: 0,
-          selections: selectionSet.selections,
-        },
-      ]);
+      this.planSelectionSet(
+        ROOT_PATH,
+        subscribePlan,
+        rootType,
+        [
+          {
+            groupId: 0,
+            selections: selectionSet.selections,
+          },
+        ],
+        this.rootTreeNode,
+      );
     } else {
       const subscribePlan = this.trackedRootValuePlan;
-      this.planSelectionSet(ROOT_PATH, subscribePlan, rootType, [
-        {
-          groupId: 0,
-          selections: selectionSet.selections,
-        },
-      ]);
+      this.planSelectionSet(
+        ROOT_PATH,
+        subscribePlan,
+        rootType,
+        [
+          {
+            groupId: 0,
+            selections: selectionSet.selections,
+          },
+        ],
+        this.rootTreeNode,
+      );
     }
   }
 
@@ -486,6 +538,7 @@ export class Aether<
     parentPlan: ExecutablePlan,
     objectType: GraphQLObjectType,
     groupedSelectionsList: GroupedSelections[],
+    parentTreeNode: TreeNode,
     isSequential = false,
   ): void {
     assertObjectType(objectType);
@@ -501,6 +554,7 @@ export class Aether<
       // We could use a Set for this, but for a very small data set arrays
       // are faster.
       const groupIds: number[] = [];
+      this.groupIdsByPathIdentity[pathIdentity] = groupIds;
 
       let firstField: FieldNode | null = null;
       for (const { field: fieldInstance, groupId } of fieldAndGroups) {
@@ -537,7 +591,6 @@ export class Aether<
         const wgs = withGlobalState.bind(null, {
           aether: this,
           parentPathIdentity: path,
-          groupIds,
         }) as <T>(cb: () => T) => T;
         const trackedArguments = wgs(() =>
           this.getTrackedArguments(objectType, field),
@@ -592,6 +645,14 @@ export class Aether<
 
       this.planIdByPathIdentity[pathIdentity] = plan.id;
 
+      const treeNode: TreeNode = {
+        pathIdentity,
+        groupIds,
+        parent: parentTreeNode,
+        children: [],
+      };
+      parentTreeNode.children.push(treeNode);
+
       // Now we're building the child plans, the parentPathIdentity becomes
       // actually our identity.
       const itemPlan = this.planSelectionSetForType(
@@ -599,6 +660,7 @@ export class Aether<
         fieldAndGroups,
         pathIdentity,
         plan,
+        treeNode,
       );
       this.itemPlanIdByPathIdentity[pathIdentity] = itemPlan.id;
     }
@@ -615,12 +677,12 @@ export class Aether<
     fieldAndGroups: FieldAndGroup[],
     pathIdentity: string,
     plan: ExecutablePlan<any>,
+    treeNode: TreeNode,
     depth = 0,
   ): ExecutablePlan<any> {
     const wgs = withGlobalState.bind(null, {
       aether: this,
       parentPathIdentity: pathIdentity,
-      groupIds: plan.groupIds,
     }) as <T>(cb: () => T) => T;
     if (fieldType instanceof GraphQLNonNull) {
       // TODO: we could implement a __NonNullPlan in future; currently we just
@@ -630,6 +692,7 @@ export class Aether<
         fieldAndGroups,
         pathIdentity,
         plan,
+        treeNode,
         depth,
       );
       return plan;
@@ -643,6 +706,7 @@ export class Aether<
         fieldAndGroups,
         pathIdentity,
         listItemPlan,
+        treeNode,
         depth + 1,
       );
       return listItemPlan;
@@ -662,6 +726,7 @@ export class Aether<
           plan,
           fieldType as GraphQLObjectType,
           groupedSubSelections,
+          treeNode,
           false,
         );
       } else {
@@ -681,6 +746,7 @@ export class Aether<
               subPlan,
               possibleObjectType,
               groupedSubSelections,
+              treeNode,
               false,
             );
           }
@@ -1050,7 +1116,6 @@ export class Aether<
           {
             aether: this,
             parentPathIdentity: plan.parentPathIdentity,
-            groupIds: plan.groupIds,
           },
           () => callback(plan),
         );
@@ -1320,6 +1385,52 @@ export class Aether<
         this.plans[i] = null as any;
       }
     }
+
+    this.assignGroupIds(this.rootTreeNode);
+  }
+
+  /**
+   * We want to know the shallowest paths in each branch of the tree that each
+   * plan is used, and then extract the groupIds from these. This helps us to
+   * know when plans can and cannot be optimised (e.g. merged together).
+   */
+  private assignGroupIds(
+    treeNode: TreeNode,
+    knownPlans = new Set<ExecutablePlan>(),
+  ) {
+    const groupIds = this.groupIdsByPathIdentity[treeNode.pathIdentity];
+    assert.ok(
+      groupIds != null,
+      `Could not determine the group ids for path identity '${treeNode.pathIdentity}'`,
+    );
+    const planId = this.itemPlanIdByPathIdentity[treeNode.pathIdentity];
+    assert.ok(
+      planId != null,
+      `Could not determine the item plan id for path identity '${treeNode.pathIdentity}'`,
+    );
+    const plan = this.plans[planId];
+    assert.ok(
+      plan != null,
+      `Could not find the plan for path identity '${treeNode.pathIdentity}'`,
+    );
+    const processPlan = (planToProcess: ExecutablePlan): void => {
+      if (!knownPlans.has(planToProcess)) {
+        for (const groupId of groupIds) {
+          if (!planToProcess.groupIds.includes(groupId)) {
+            planToProcess.groupIds.push(groupId);
+          }
+        }
+        knownPlans.add(plan);
+        planToProcess.dependencies.forEach((depId) => {
+          const dep = this.plans[depId];
+          processPlan(dep);
+        });
+      }
+    };
+    processPlan(plan);
+    treeNode.children.forEach((child) =>
+      this.assignGroupIds(child, new Set([...knownPlans])),
+    );
   }
 
   /**
@@ -1336,7 +1447,6 @@ export class Aether<
           {
             aether: this,
             parentPathIdentity: plan.parentPathIdentity,
-            groupIds: plan.groupIds,
           },
           () => {
             distinctActivePlansInReverseOrder.add(plan);

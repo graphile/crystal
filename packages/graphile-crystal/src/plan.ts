@@ -8,7 +8,6 @@ import { crystalPrintPathIdentity } from "./crystalPrint";
 import { isDev, noop } from "./dev";
 import {
   getCurrentAether,
-  getCurrentGroupIds,
   getCurrentParentPathIdentity,
   getDebug,
 } from "./global";
@@ -149,11 +148,10 @@ export abstract class ExecutablePlan<TData = any> extends BasePlan {
    * document, some may have been deferred/streamed/etc which may lead to
    * multiple groupIds).
    */
-  public readonly groupIds: number[];
+  public readonly groupIds: number[] = [];
 
   constructor() {
     super();
-    this.groupIds = getCurrentGroupIds();
     this.id = this.aether._addPlan(this);
   }
 
@@ -169,7 +167,9 @@ export abstract class ExecutablePlan<TData = any> extends BasePlan {
     const meta = this.toStringMeta();
     return chalk.bold.blue(
       `${this.constructor.name.replace(/Plan$/, "")}${
-        this.groupIds.length === 1 && this.groupIds[0] === 0
+        this.groupIds.length === 0
+          ? chalk.grey(`{?}`)
+          : this.groupIds.length === 1 && this.groupIds[0] === 0
           ? ""
           : chalk.grey(`{${this.groupIds.join(",")}}`)
       }${meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""}[${inspect(
