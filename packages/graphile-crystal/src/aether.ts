@@ -1268,10 +1268,6 @@ export class Aether<
       const id = plan.dependencies[i];
       this.markPlanActive(this.plans[id], activePlans);
     }
-    for (let i = 0, l = plan.children.length; i < l; i++) {
-      const id = plan.children[i];
-      this.markPlanActive(this.plans[id], activePlans);
-    }
   }
 
   /**
@@ -1316,7 +1312,7 @@ export class Aether<
         // We're going to delete this plan. Theoretically nothing can reference
         // it, so it should not cause any issues. If it does, it's due to a
         // programming bug somewhere where we're referencing a plan that hasn't
-        // been added to the relevant dependencies/children. As such; I'm going
+        // been added to the relevant dependencies. As such; I'm going
         // to bypass TypeScript here and delete the node whilst still letting
         // TypeScript guarantee it exists - better that the user gets a runtime
         // error trying to use it rather than using a nonsense plan.

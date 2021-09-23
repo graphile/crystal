@@ -142,18 +142,6 @@ export abstract class ExecutablePlan<TData = any> extends BasePlan {
    */
   public readonly dependencies: ReadonlyArray<number> = this._dependencies;
 
-  /**
-   * The ids for plans this plan might execute; e.g. in `BranchPlan`.  NOTE: it's important
-   * we use the id and not the plan here otherwise when we swap out plans
-   * during optimisation things will go awry.
-   */
-  private readonly _children: number[] = [];
-
-  /**
-   * The ids for plans this plan might execute; e.g. in `BranchPlan`.
-   */
-  public readonly children: ReadonlyArray<number> = this._children;
-
   public readonly id: number;
   /**
    * The group ids this plan is associated with (e.g. if the field this plan
