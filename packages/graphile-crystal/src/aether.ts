@@ -1415,26 +1415,28 @@ export class Aether<
       planId != null,
       `Could not determine the item plan id for path identity '${treeNode.pathIdentity}'`,
     );
-    const plan = this.plans[planId];
-    assert.ok(
-      plan != null,
-      `Could not find the plan for path identity '${treeNode.pathIdentity}'`,
-    );
-    const processPlan = (planToProcess: ExecutablePlan): void => {
-      if (!knownPlans.has(planToProcess)) {
+    const processPlan = (plan: ExecutablePlan): void => {
+      if (!knownPlans.has(plan)) {
         for (const groupId of groupIds) {
-          if (!planToProcess.groupIds.includes(groupId)) {
-            planToProcess.groupIds.push(groupId);
+          if (!plan.groupIds.includes(groupId)) {
+            plan.groupIds.push(groupId);
           }
         }
         knownPlans.add(plan);
-        planToProcess.dependencies.forEach((depId) => {
+        plan.dependencies.forEach((depId) => {
           const dep = this.plans[depId];
           processPlan(dep);
         });
       }
     };
-    processPlan(plan);
+
+    const treeNodePlan = this.plans[planId];
+    assert.ok(
+      treeNodePlan != null,
+      `Could not find the plan for path identity '${treeNode.pathIdentity}'`,
+    );
+    processPlan(treeNodePlan);
+
     treeNode.children.forEach((child) =>
       this.assignGroupIds(child, new Set([...knownPlans])),
     );
