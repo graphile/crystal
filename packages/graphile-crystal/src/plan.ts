@@ -150,6 +150,13 @@ export abstract class ExecutablePlan<TData = any> extends BasePlan {
    */
   public readonly groupIds: number[] = [];
 
+  /**
+   * This identifies the deepest pathIdentity that is a common ancestor to all
+   * the places this plan is used. This value is then used to influence where
+   * the result of executing the plan is stored.
+   */
+  public commonAncestorPathIdentity = "";
+
   constructor() {
     super();
     this.id = this.aether._addPlan(this);

@@ -384,6 +384,10 @@ export class Aether<
 
     this.phase = "finalize";
 
+    // Now assign the common ancestor paths so we can determine where to store
+    // the data.
+    this.assignCommonAncestorPathIdentity();
+
     // Plans are expected to execute later; they may take steps here to prepare
     // themselves (e.g. compiling SQL queries ahead of time).
     this.finalizePlans();
@@ -1451,6 +1455,46 @@ export class Aether<
   }
 
   /**
+   * We want to know the shallowest paths in each branch of the tree that each
+   * plan is used, and then find the deepest common ancestor field for these
+   * fields. This will then give us the pathIdentity under which we will store
+   * the data this plan produces on execution - this means we can store the
+   * data with the CrystalObject and that data can be released automatically by
+   * the JavaScript garbage collector once the crystal object is no longer
+   * needed.
+   */
+  private assignCommonAncestorPathIdentity() {
+    const treeNodesByPlan = new Map<ExecutablePlan, TreeNode[]>();
+    this.walkTreeFirstPlanUsages((treeNode, plan) => {
+      const treeNodes = treeNodesByPlan.get(plan) || [];
+      treeNodesByPlan.set(plan, treeNodes);
+      treeNodes.push(treeNode);
+    });
+    for (const [plan, treeNodes] of treeNodesByPlan.entries()) {
+      const allPaths = treeNodes.map(treeNodePath);
+      // Find the largest `i` for which `allPaths[*][i]` is the same
+      let deepestCommonPath = -1;
+      matchLoop: for (let i = 0; i < allPaths[0].length; i++) {
+        const matcher = allPaths[0][i];
+        for (let j = 1; j < allPaths.length; j++) {
+          // Note this also handles arrays that are shorter, we don't need special handling for that.
+          if (allPaths[j][i] !== matcher) {
+            break matchLoop;
+          }
+        }
+        deepestCommonPath = i;
+      }
+      if (deepestCommonPath < 0) {
+        throw new Error(
+          "GraphileInternalError<aac23403-3a32-4e04-a9f2-b19229e3dbfd>: the root tree node should be in common with every path",
+        );
+      }
+      const commonAncestorNode = allPaths[0][deepestCommonPath];
+      plan.commonAncestorPathIdentity = commonAncestorNode.pathIdentity;
+    }
+  }
+
+  /**
    * Implements the `FinalizePlans` and `FinalizePlan` algorithms.
    */
   private finalizePlans(): void {
@@ -2364,4 +2408,13 @@ class CrystalError extends Error {
     super(message ? `CrystalError: ${message}` : `CrystalError`);
     this.originalError = originalError;
   }
+}
+
+function treeNodePath(treeNode: TreeNode): TreeNode[] {
+  const path: TreeNode[] = [treeNode];
+  let n: TreeNode | null = treeNode;
+  while ((n = n.parent)) {
+    path.unshift(n);
+  }
+  return path;
 }
