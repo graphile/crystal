@@ -1396,30 +1396,13 @@ export class Aether<
     }
   }
 
-  /**
-   * We want to know the shallowest paths in each branch of the tree that each
-   * plan is used, and then extract the groupIds from these. This helps us to
-   * know when plans can and cannot be optimised (e.g. merged together).
-   */
-  private assignGroupIds(_startingAtPlanId = 0) {
+  private walkTreeFirstPlanUsages(
+    callback: (treeNode: TreeNode, plan: ExecutablePlan) => void,
+  ) {
     const recurse = (treeNode: TreeNode, knownPlans: Set<ExecutablePlan>) => {
-      const groupIds = this.groupIdsByPathIdentity[treeNode.pathIdentity];
-      assert.ok(
-        groupIds != null,
-        `Could not determine the group ids for path identity '${treeNode.pathIdentity}'`,
-      );
-      const planId = this.itemPlanIdByPathIdentity[treeNode.pathIdentity];
-      assert.ok(
-        planId != null,
-        `Could not determine the item plan id for path identity '${treeNode.pathIdentity}'`,
-      );
       const processPlan = (plan: ExecutablePlan): void => {
         if (!knownPlans.has(plan)) {
-          for (const groupId of groupIds) {
-            if (!plan.groupIds.includes(groupId)) {
-              plan.groupIds.push(groupId);
-            }
-          }
+          callback(treeNode, plan);
           knownPlans.add(plan);
           plan.dependencies.forEach((depId) => {
             const dep = this.plans[depId];
@@ -1427,7 +1410,13 @@ export class Aether<
           });
         }
       };
-      const treeNodePlan = this.plans[planId];
+      const treeNodePlanId =
+        this.itemPlanIdByPathIdentity[treeNode.pathIdentity];
+      assert.ok(
+        treeNodePlanId != null,
+        `Could not determine the item plan id for path identity '${treeNode.pathIdentity}'`,
+      );
+      const treeNodePlan = this.plans[treeNodePlanId];
       assert.ok(
         treeNodePlan != null,
         `Could not find the plan for path identity '${treeNode.pathIdentity}'`,
@@ -1439,6 +1428,26 @@ export class Aether<
     };
 
     recurse(this.rootTreeNode, new Set());
+  }
+
+  /**
+   * We want to know the shallowest paths in each branch of the tree that each
+   * plan is used, and then extract the groupIds from these. This helps us to
+   * know when plans can and cannot be optimised (e.g. merged together).
+   */
+  private assignGroupIds(_startingAtPlanId = 0) {
+    this.walkTreeFirstPlanUsages((treeNode, plan) => {
+      const groupIds = this.groupIdsByPathIdentity[treeNode.pathIdentity];
+      assert.ok(
+        groupIds != null,
+        `Could not determine the group ids for path identity '${treeNode.pathIdentity}'`,
+      );
+      for (const groupId of groupIds) {
+        if (!plan.groupIds.includes(groupId)) {
+          plan.groupIds.push(groupId);
+        }
+      }
+    });
   }
 
   /**
