@@ -1006,9 +1006,9 @@ export class Aether<
     return trackedArgumentValues;
   }
 
-  private validatePlans(): void {
+  private validatePlans(startingAtPlanId = 0): void {
     const errors: Error[] = [];
-    for (let i = 0, l = this.plans.length; i < l; i++) {
+    for (let i = startingAtPlanId, l = this.plans.length; i < l; i++) {
       const plan = this.plans[i];
       const referencingPlanIsAllowed =
         // Required so that we can access the underlying value plan.
@@ -1030,6 +1030,9 @@ export class Aether<
       console.error(errors.map((e) => e.message).join("\n"));
       throw errors[0];
     }
+
+    // TODO: This might make sense to live somewhere else / be called at a different phase?
+    this.assignGroupIds(this.rootTreeNode);
   }
 
   /**
@@ -1140,7 +1143,8 @@ export class Aether<
     };
 
     let plansAdded = 0;
-    let l = this.plans.length;
+    const oldPlanCount = this.plans.length;
+    let l = oldPlanCount;
     for (let i = startingAtPlanId; i < l; i++) {
       process(this.plans[i]);
 
@@ -1160,6 +1164,11 @@ export class Aether<
       }
 
       l = this.plans.length;
+    }
+
+    if (this.plans.length > oldPlanCount) {
+      // Any time new plans are added we should validate them.
+      this.validatePlans(oldPlanCount);
     }
   }
 
@@ -1385,8 +1394,6 @@ export class Aether<
         this.plans[i] = null as any;
       }
     }
-
-    this.assignGroupIds(this.rootTreeNode);
   }
 
   /**
