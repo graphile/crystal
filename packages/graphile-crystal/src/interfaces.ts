@@ -45,10 +45,14 @@ declare module "graphql" {
 }
 
 export const $$crystalContext = Symbol("context");
+export const $$crystalObjectByPathIdentity = Symbol(
+  "crystalObjectByPathIdentity",
+);
 export const $$data = Symbol("data");
 export const $$id = Symbol("id");
 export const $$pathIdentity = Symbol("pathIdentity");
 export const $$indexByListItemPlanId = Symbol("indexByListItemPlanId");
+export const $$indexes = Symbol("indexes");
 export const $$concreteType = Symbol("concreteType");
 export const $$concreteData = Symbol("concreteData");
 
@@ -66,6 +70,10 @@ export interface CrystalObject<TData> {
   [$$pathIdentity]: string;
   [$$concreteType]: string;
   [$$crystalContext]: CrystalContext;
+  [$$crystalObjectByPathIdentity]: {
+    [pathIdentity: string]: CrystalObject<any>;
+  };
+  [$$indexes]: ReadonlyArray<number>;
   [$$indexByListItemPlanId]: IndexByListItemPlanId;
   [$$data]: TData;
 }

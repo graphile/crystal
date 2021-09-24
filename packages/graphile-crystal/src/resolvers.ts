@@ -31,8 +31,11 @@ import type {
   Batch,
   CrystalContext,
   CrystalObject,
-  IndexByListItemPlanId,
+  IndexByListItemPlanId} from "./interfaces";
+import {
+  $$crystalObjectByPathIdentity
 } from "./interfaces";
+import { $$indexes } from "./interfaces";
 import {
   $$concreteData,
   $$concreteType,
@@ -455,6 +458,12 @@ export function newCrystalObject<TData>(
     [$$id]: id,
     [$$data]: data,
     [$$crystalContext]: crystalContext,
+    [$$crystalObjectByPathIdentity]: {
+      ...(parentCrystalObject
+        ? parentCrystalObject[$$crystalObjectByPathIdentity]
+        : null),
+    },
+    [$$indexes]: indexes,
     [$$indexByListItemPlanId]: indexByListItemPlanId,
     // @ts-ignore
     toString() {
@@ -464,6 +473,7 @@ export function newCrystalObject<TData>(
       );
     },
   };
+  crystalObject[$$crystalObjectByPathIdentity][pathIdentity] = crystalObject;
   if (isDev) {
     debug(`Constructed %s with data %c`, crystalObject, data);
   }
