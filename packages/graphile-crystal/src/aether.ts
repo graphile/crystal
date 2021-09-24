@@ -2262,6 +2262,9 @@ export class Aether<
                   ? ` (deps: ${plan.dependencies
                       .map((depId) => printDep(depId))
                       .join(", ")})`
+                  : "") +
+                (plan.commonAncestorPathIdentity
+                  ? " " + chalk.yellow(`${plan.commonAncestorPathIdentity}`)
                   : "")
               }`;
             }
