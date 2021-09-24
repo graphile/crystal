@@ -1911,7 +1911,7 @@ export class Aether<
       rootCrystalObject: null,
     };
     const rootCrystalObject = newCrystalObject(
-      null,
+      null, // The ONLY place where null is allowed to be passed to newCrystalObject
       GLOBAL_PATH, // TODO: this should be ROOT_PATH I think?
       this.queryTypeName,
       rootId,
@@ -2173,7 +2173,7 @@ export class Aether<
               innerData = data;
             }
             const crystalObject = newCrystalObject(
-              layerPlan,
+              value.crystalObject,
               batch.pathIdentity,
               typeName,
               uid(batch.pathIdentity),

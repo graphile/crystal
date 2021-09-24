@@ -257,7 +257,9 @@ export function crystalWrapResolve<
         );
         const indexes = pathToIndexes(path);
         parentCrystalObject = newCrystalObject(
-          parentPlan,
+          // We treat the rootCrystalObject as the parent since this object
+          // will likely still need access to root items such as context.
+          crystalContext.rootCrystalObject,
           parentPathIdentity,
           parentType.name,
           parentId,
@@ -411,7 +413,7 @@ function crystalWrap<TData>(
   }
   if (parentCrystalObject) {
     return newCrystalObject(
-      plan,
+      parentCrystalObject,
       pathIdentity,
       typeName,
       id,
@@ -422,7 +424,7 @@ function crystalWrap<TData>(
     );
   } else {
     return newCrystalObject(
-      plan,
+      crystalContext.rootCrystalObject,
       pathIdentity,
       typeName,
       id,
@@ -438,7 +440,7 @@ function crystalWrap<TData>(
  * Implements `NewCrystalObject`
  */
 export function newCrystalObject<TData>(
-  plan: ExecutablePlan | null, // TODO: delete this line
+  parentCrystalObject: CrystalObject<any> | null,
   pathIdentity: string,
   typeName: string,
   id: UniqueId,
