@@ -17,7 +17,10 @@ export class PlanResults {
   public get(pathIdentity: string, planId: number): any {
     return this.store[pathIdentity]?.get(planId);
   }
-  public has(pathIdentity: string, planId: number): any {
-    return this.store[pathIdentity]?.has(planId);
+  public has(pathIdentity: string, planId: number): boolean {
+    return this.store[pathIdentity]?.has(planId) ?? false;
+  }
+  public hasPathIdentity(pathIdentity: string): boolean {
+    return !!this.store[pathIdentity];
   }
 }

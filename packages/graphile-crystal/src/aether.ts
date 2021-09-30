@@ -2310,18 +2310,21 @@ export class Aether<
               if (Array.isArray(listResult)) {
                 // Turn each entry in this listResult into it's own CrystalLayerObject, then execute the new layers.
                 const newCLOs = listResult.map((result, i) => {
-                  const copy = Object.assign(
-                    Object.create(null),
+                  const copy = new PlanResults(
                     planResultsByCommonAncestorPathIdentity,
                   );
-                  if (copy[layerPlan.commonAncestorPathIdentity]) {
+                  if (
+                    copy.hasPathIdentity(layerPlan.commonAncestorPathIdentity)
+                  ) {
                     throw new Error(
                       `Did not expect plans to exist within the '${layerPlan.commonAncestorPathIdentity}' bucket yet.`,
                     );
                   } else {
-                    const m = new Map();
-                    m.set(layerPlan.id, result);
-                    copy[layerPlan.commonAncestorPathIdentity] = m;
+                    copy.set(
+                      layerPlan.commonAncestorPathIdentity,
+                      layerPlan.id,
+                      result,
+                    );
                   }
                   return newCrystalLayerObject(parentCrystalObject, copy, [
                     ...indexes,
