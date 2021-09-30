@@ -1640,6 +1640,18 @@ export class Aether<
         );
         continue;
       } else {
+        if (plan instanceof __ValuePlan) {
+          throw new Error(
+            `GraphileInternalError<079b214f-3ec9-4257-8de9-0ca2b2bdb8e9>: Attempted to queue __ValuePlan ${plan} (commonAncestorPathIdentity: '${
+              plan.commonAncestorPathIdentity
+            }', groups: ${plan.groupIds.join(
+              ", ",
+            )}) for execution; however __ValuePlan must never be executed - the value should already exist in the cache: ${inspect(
+              planResultsByCommonAncestorPathIdentity,
+              { colors: true, depth: 8 },
+            )}.`,
+          );
+        }
         debugExecuteVerbose(
           "  %s no result for %c",
           follow,
@@ -1699,7 +1711,7 @@ export class Aether<
       // results into `meta`.
       if (plan instanceof __ListItemPlan) {
         throw new Error(
-          "Should never attempt to execute __ListItemPlan; that should be handled whilst evaluating dependencies",
+          "Should never attempt to execute __ListItemPlan; that should be handled within executeBatch",
         );
       }
       const pendingResults = await plan.execute(values, meta);
