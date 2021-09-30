@@ -55,6 +55,7 @@ import type {
   GroupedSelections,
   TrackedArguments,
 } from "./interfaces";
+import { $$isCrystalLayerObject } from "./interfaces";
 import {
   $$concreteData,
   $$concreteType,
@@ -102,7 +103,14 @@ type MapResult = (clo: CrystalLayerObject, result: any) => any;
  */
 
 interface TreeNode {
+  fieldPathIdentity: string;
+
+  /**
+   * Normally the same as fieldPathIdentity, but may have `[]` appended in the
+   * case of lists.
+   */
   pathIdentity: string;
+
   groupIds: number[];
   parent: null | TreeNode;
   children: TreeNode[];
@@ -117,22 +125,19 @@ type AetherPhase =
   | "finalize"
   | "ready";
 
-const $$isCrystalLayerObject = Symbol("crystalLayerObject");
-
 function newCrystalLayerObject(
-  crystalObject: CrystalObject<any>,
+  parentCrystalObject: CrystalObject<any>,
   planResultsByCommonAncestorPathIdentity: PlanResults = new PlanResults(
-    crystalObject[$$planResults],
+    parentCrystalObject[$$planResults],
   ),
   indexes: number[] = [],
 ): CrystalLayerObject {
   return {
-    // @ts-ignore
     toString(): string {
-      return chalk.bold.green(`CLO<${crystalObject}>`);
+      return chalk.bold.green(`CLO<${parentCrystalObject}>`);
     },
     [$$isCrystalLayerObject]: true,
-    crystalObject,
+    parentCrystalObject,
     itemByItemPlanId: new Map(),
     planResultsByCommonAncestorPathIdentity,
     indexes,
@@ -194,6 +199,7 @@ export class Aether<
   public maxGroupId = 0;
   private rootTreeNode: TreeNode = {
     pathIdentity: ROOT_PATH,
+    fieldPathIdentity: ROOT_PATH,
     groupIds: [0],
     parent: null,
     children: [],
@@ -428,6 +434,7 @@ export class Aether<
     }
     this.planSelectionSet(
       ROOT_PATH,
+      ROOT_PATH,
       this.trackedRootValuePlan,
       rootType,
       [
@@ -449,6 +456,7 @@ export class Aether<
       throw new Error("No mutation type found in schema");
     }
     this.planSelectionSet(
+      ROOT_PATH,
       ROOT_PATH,
       this.trackedRootValuePlan,
       rootType,
@@ -526,6 +534,7 @@ export class Aether<
       );
       this.planSelectionSet(
         ROOT_PATH,
+        ROOT_PATH,
         subscribePlan,
         rootType,
         [
@@ -539,6 +548,7 @@ export class Aether<
     } else {
       const subscribePlan = this.trackedRootValuePlan;
       this.planSelectionSet(
+        ROOT_PATH,
         ROOT_PATH,
         subscribePlan,
         rootType,
@@ -558,6 +568,7 @@ export class Aether<
    * `GetPolymorphicObjectPlanForType`.
    */
   private planSelectionSet(
+    fieldPathIdentity: string,
     path: string,
     parentPlan: ExecutablePlan,
     objectType: GraphQLObjectType,
@@ -670,6 +681,7 @@ export class Aether<
       this.planIdByPathIdentity[pathIdentity] = plan.id;
 
       const treeNode: TreeNode = {
+        fieldPathIdentity,
         pathIdentity,
         groupIds,
         parent: parentTreeNode,
@@ -682,6 +694,7 @@ export class Aether<
       const itemPlan = this.planSelectionSetForType(
         fieldType,
         fieldAndGroups,
+        pathIdentity,
         pathIdentity,
         plan,
         treeNode,
@@ -699,6 +712,7 @@ export class Aether<
   private planSelectionSetForType(
     fieldType: GraphQLOutputType,
     fieldAndGroups: FieldAndGroup[],
+    fieldPathIdentity: string,
     pathIdentity: string,
     plan: ExecutablePlan<any>,
     treeNode: TreeNode,
@@ -714,6 +728,7 @@ export class Aether<
       this.planSelectionSetForType(
         fieldType.ofType,
         fieldAndGroups,
+        fieldPathIdentity,
         pathIdentity,
         plan,
         treeNode,
@@ -722,15 +737,26 @@ export class Aether<
       return plan;
     } else if (fieldType instanceof GraphQLList) {
       assertListCapablePlan(plan, pathIdentity);
-      const listItemPlan = wgs(() =>
-        plan.listItem(new __ListItemPlan(plan, depth)),
+      const nestedParentPathIdentity = pathIdentity + "[]";
+      const nestedTreeNode: TreeNode = {
+        fieldPathIdentity,
+        pathIdentity: nestedParentPathIdentity,
+        groupIds: treeNode.groupIds,
+        parent: treeNode,
+        children: [],
+      };
+      treeNode.children.push(nestedTreeNode);
+      const listItemPlan = withGlobalState(
+        { aether: this, parentPathIdentity: nestedParentPathIdentity },
+        () => plan.listItem(new __ListItemPlan(plan, depth)),
       );
       this.planSelectionSetForType(
         fieldType.ofType,
         fieldAndGroups,
-        pathIdentity,
+        fieldPathIdentity,
+        nestedParentPathIdentity,
         listItemPlan,
-        treeNode,
+        nestedTreeNode,
         depth + 1,
       );
       return listItemPlan;
@@ -746,6 +772,7 @@ export class Aether<
       const groupedSubSelections = graphqlMergeSelectionSets(fieldAndGroups);
       if (fieldTypeIsObjectType) {
         this.planSelectionSet(
+          fieldPathIdentity,
           pathIdentity,
           plan,
           fieldType as GraphQLObjectType,
@@ -766,6 +793,7 @@ export class Aether<
               polymorphicPlan.planForType(possibleObjectType),
             );
             this.planSelectionSet(
+              fieldPathIdentity,
               pathIdentity,
               subPlan,
               possibleObjectType,
@@ -1435,7 +1463,7 @@ export class Aether<
         }
       };
       const treeNodePlanId =
-        this.itemPlanIdByPathIdentity[treeNode.pathIdentity];
+        this.itemPlanIdByPathIdentity[treeNode.fieldPathIdentity];
       assert.ok(
         treeNodePlanId != null,
         `Could not determine the item plan id for path identity '${treeNode.pathIdentity}'`,
@@ -1461,10 +1489,10 @@ export class Aether<
    */
   private assignGroupIds(_startingAtPlanId = 0) {
     this.walkTreeFirstPlanUsages((treeNode, plan) => {
-      const groupIds = this.groupIdsByPathIdentity[treeNode.pathIdentity];
+      const groupIds = this.groupIdsByPathIdentity[treeNode.fieldPathIdentity];
       assert.ok(
         groupIds != null,
-        `Could not determine the group ids for path identity '${treeNode.pathIdentity}'`,
+        `Could not determine the group ids for path identity '${treeNode.fieldPathIdentity}'`,
       );
       for (const groupId of groupIds) {
         if (!plan.groupIds.includes(groupId)) {
@@ -1477,11 +1505,11 @@ export class Aether<
   /**
    * We want to know the shallowest paths in each branch of the tree that each
    * plan is used, and then find the deepest common ancestor field for these
-   * fields. This will then give us the pathIdentity under which we will store
-   * the data this plan produces on execution - this means we can store the
-   * data with the CrystalObject and that data can be released automatically by
-   * the JavaScript garbage collector once the crystal object is no longer
-   * needed.
+   * fields without crossing a `__ListItemPlan` boundary from the plan itself.
+   * This will then give us the pathIdentity under which we will store the data
+   * this plan produces on execution - this means we can store the data with
+   * the CrystalObject and that data can be released automatically by the
+   * JavaScript garbage collector once the crystal object is no longer needed.
    */
   private assignCommonAncestorPathIdentity() {
     const treeNodesByPlan = new Map<ExecutablePlan, TreeNode[]>();
@@ -1491,7 +1519,9 @@ export class Aether<
       treeNodes.push(treeNode);
     });
     for (const [plan, treeNodes] of treeNodesByPlan.entries()) {
-      const allPaths = treeNodes.map(treeNodePath);
+      const allPaths = treeNodes.map((treeNode) =>
+        treeNodePath(treeNode, plan.parentPathIdentity),
+      );
       // Find the largest `i` for which `allPaths[*][i]` is the same
       let deepestCommonPath = -1;
       matchLoop: for (let i = 0; i < allPaths[0].length; i++) {
@@ -1854,21 +1884,21 @@ export class Aether<
    * @internal
    */
   public newBatch(
-    pathIdentity: string,
+    fieldPathIdentity: string,
     returnType: GraphQLOutputType,
     crystalContext: CrystalContext,
   ): Batch {
     const sideEffectPlanIds =
-      this.sideEffectPlanIdsByPathIdentity[pathIdentity];
-    const planId = this.planIdByPathIdentity[pathIdentity];
-    const itemPlanId = this.itemPlanIdByPathIdentity[pathIdentity];
+      this.sideEffectPlanIdsByPathIdentity[fieldPathIdentity];
+    const planId = this.planIdByPathIdentity[fieldPathIdentity];
+    const itemPlanId = this.itemPlanIdByPathIdentity[fieldPathIdentity];
     assert.ok(
       planId != null,
-      `Could not find the planId for path identity '${pathIdentity}'`,
+      `Could not find the planId for path identity '${fieldPathIdentity}'`,
     );
     assert.ok(
       itemPlanId != null,
-      `Could not find the itemPlanId for path identity '${pathIdentity}'`,
+      `Could not find the itemPlanId for path identity '${fieldPathIdentity}'`,
     );
     const sideEffectPlans =
       sideEffectPlanIds?.map(
@@ -1878,14 +1908,15 @@ export class Aether<
     const itemPlan = this.plans[itemPlanId];
     assert.ok(
       plan,
-      `Could not find the plan with id '${planId}' at '${pathIdentity}'`,
+      `Could not find the plan with id '${planId}' at '${fieldPathIdentity}'`,
     );
     assert.ok(
       itemPlan,
-      `Could not find the itemPlan with id '${itemPlanId}' at '${pathIdentity}'`,
+      `Could not find the itemPlan with id '${itemPlanId}' at '${fieldPathIdentity}'`,
     );
     const batch: Batch = {
-      pathIdentity,
+      // TODO: rename Batch.pathIdentity to fieldPathIdentity
+      pathIdentity: fieldPathIdentity,
       crystalContext,
       sideEffectPlans,
       plan,
@@ -2627,11 +2658,31 @@ class CrystalError extends Error {
   }
 }
 
-function treeNodePath(treeNode: TreeNode): TreeNode[] {
+function treeNodePath(
+  treeNode: TreeNode,
+  startPathIdentity: string,
+): TreeNode[] {
   const path: TreeNode[] = [treeNode];
   let n: TreeNode | null = treeNode;
-  while ((n = n.parent)) {
+  while ((n = n.parent) && n.pathIdentity.startsWith(startPathIdentity)) {
     path.unshift(n);
+  }
+  // Find the next `GraphQLList` / `__ListItemPlan` position (not including self)
+  const listChangeIndex = path.findIndex((v, i) => {
+    if (i === 0) {
+      return false;
+    }
+    const previous = path[i - 1];
+    if (
+      previous.fieldPathIdentity === v.fieldPathIdentity &&
+      previous.pathIdentity !== v.pathIdentity
+    ) {
+      return true;
+    }
+    return false;
+  });
+  if (listChangeIndex >= 0) {
+    path.splice(listChangeIndex, path.length - listChangeIndex);
   }
   return path;
 }

@@ -120,7 +120,11 @@ export interface CrystalObject<TData = any> {
   [$$planResults]: PlanResults;
 }
 
+export const $$isCrystalLayerObject = Symbol("crystalLayerObject");
+
 export interface CrystalLayerObject {
+  toString(): string;
+  [$$isCrystalLayerObject]: true;
   parentCrystalObject: CrystalObject<any>;
   itemByItemPlanId: Map<number, any>;
   planResultsByCommonAncestorPathIdentity: PlanResults;

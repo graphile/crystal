@@ -381,7 +381,7 @@ export function newCrystalObject(
 }
 
 export function isCrystalObject(input: any): input is CrystalObject<any> {
-  return typeof input === "object" && input && $$data in input;
+  return typeof input === "object" && input && $$planResults in input;
 }
 
 /**
