@@ -2419,8 +2419,9 @@ export class Aether<
 
       const isScalar = isLeafType(namedReturnType);
       const isPolymorphic =
-        isUnionType(namedReturnType) || isInterfaceType(namedReturnType);
-      if (!isPolymorphic) {
+        !isScalar &&
+        (isUnionType(namedReturnType) || isInterfaceType(namedReturnType));
+      if (!isScalar && !isPolymorphic) {
         assertObjectType(namedReturnType);
       }
 
@@ -2442,7 +2443,7 @@ export class Aether<
 
       // Now, execute the layers to get the result
       const mapResult: MapResult = isScalar
-        ? identity
+        ? (clo, data) => data
         : isPolymorphic
         ? (clo, data) => {
             assertPolymorphicData(data);

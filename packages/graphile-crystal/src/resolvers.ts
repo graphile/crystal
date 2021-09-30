@@ -83,9 +83,11 @@ function pathToPathIdentity(initialPath: Path): string {
   let tailPathIdentity = "";
   let path: Path | undefined = initialPath;
   while (path) {
-    // Skip over list keys.
     if (path.typename) {
       tailPathIdentity = `>${path.typename}.${path.key}${tailPathIdentity}`;
+    } else {
+      // List keys become `[]`
+      tailPathIdentity = `[]${tailPathIdentity}`;
     }
     path = path.prev;
   }
