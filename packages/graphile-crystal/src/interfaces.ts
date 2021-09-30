@@ -49,6 +49,7 @@ export const $$crystalObjectByPathIdentity = Symbol(
   "crystalObjectByPathIdentity",
 );
 export const $$data = Symbol("data");
+export const $$planResults = Symbol("planResults");
 export const $$id = Symbol("id");
 export const $$pathIdentity = Symbol("pathIdentity");
 export const $$indexByListItemPlanId = Symbol("indexByListItemPlanId");
@@ -76,6 +77,42 @@ export interface CrystalObject<TData> {
   [$$indexes]: ReadonlyArray<number>;
   [$$indexByListItemPlanId]: IndexByListItemPlanId;
   [$$data]: TData;
+
+  /**
+   * This is the plan result cache for this branch and level in the tree. What
+   * are "branch" and "level"?
+   *
+   * When lists are involved there will be `__ListItemPlan`'s (which aren't
+   * real executable plans but a special case). The resulting list items will
+   * be stored into the relevant CrystalObject for each index in the list (i.e.
+   * according to the CrystalObject's $$indexes). This causes the result cache
+   * to "branch" for a list plan, and for all plans below it.
+   *
+   * Each plan has a `commonAncestorPathIdentity` - this dictates the "level"
+   * to which the plan's result data is written. When there are no lists,
+   * `@stream` or `@defer` involved then it's likely that this will be the root
+   * level.
+   *
+   * When evaluating a particular CrystalObject you can be certain that all the
+   * $$indexes have already been factored in, so you need to find the right
+   * CrystalObject to read the plan data done - this can be done by looking up
+   * the plan's `commonAncestorPathIdentity` in the CrystalObject's
+   * $$crystalObjectByPathIdentity map.
+   *
+   * Plans can be executed more than once due to parts of the tree being
+   * delayed (possibly due to `@stream`/`@defer`, possibly just due to the
+   * resolvers for one "layer" not all completing at the same time), so we
+   * cannot rely on writing the results all at once.
+   *
+   * Plan results belonging to the current CrystalObject's $$pathIdentity are
+   * written to the $$planResults Map, where the key is the plan ID and the
+   * value is the result from executing the plan. In the case of
+   * `__ListItemPlan`'s the $$indexes are evaluated and the plan result will be
+   * just the value for this specific item - this is handled by Crystal
+   * internally and will pass the resulting value in via `planResults` to
+   * `newCrystalObject`.
+   */
+  [$$planResults]: Map<number, any>;
 }
 
 export interface CrystalLayerObject {
@@ -97,25 +134,6 @@ export interface Batch {
 
 export interface CrystalContext {
   aether: Aether;
-
-  /**
-   * This is the plan result cache. Plans can be executed more than once due to
-   * parts of the tree being delayed (possibly due to @stream/@defer, possibly
-   * just due to the resolvers for one "layer" not all completing at the same
-   * time), so we cannot rely on writing the results all at once.
-   *
-   * The cache consists of multiple layers:
-   *
-   * - First is the plan ID; note that a plan is always created within the
-   *   context of a specific field within a specific operation, so it has an
-   *   inherent path identity.
-   * - Next represents the parent field instance (if the parent field was part
-   *   of a list then each value within this list will have a different,
-   *   unique, set of indexes) - this is the indexes joined with a `,`.
-   * - Finally we have the plan result data. Note that this could be anything.
-   *
-   */
-  resultByIndexesByPlanId: Map<number, Map<string, any>>;
 
   metaByPlanId: {
     [planId: number]: Record<string, unknown> | undefined;
