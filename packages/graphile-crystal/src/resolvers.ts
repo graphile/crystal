@@ -31,10 +31,10 @@ import type {
   Batch,
   CrystalContext,
   CrystalObject,
-  IndexByListItemPlanId} from "./interfaces";
-import {
-  $$crystalObjectByPathIdentity
+  IndexByListItemPlanId,
 } from "./interfaces";
+import { $$itemByItemPlanId } from "./interfaces";
+import { $$planResults } from "./interfaces";
 import { $$indexes } from "./interfaces";
 import {
   $$concreteData,
@@ -46,6 +46,7 @@ import {
   $$pathIdentity,
 } from "./interfaces";
 import type { ExecutablePlan } from "./plan";
+import type { __ListItemPlan } from "./plans";
 import { __ValuePlan } from "./plans";
 import { assertPolymorphicData } from "./polymorphic";
 import type { UniqueId } from "./utils";
@@ -215,6 +216,9 @@ export function crystalWrapResolve<
         id,
       );
       */
+
+      // IMPORTANT: there must be no `await` between here and `await getBatchResult` below.
+      // TODO: make this clearer by moving the intermediary code into a separate function.
       const batch = aether.getBatch(
         pathIdentity,
         returnType,
@@ -223,6 +227,7 @@ export function crystalWrapResolve<
         context,
         rootValue,
       );
+
       // TODO: we're not actually using id below
       const id = uid(info.fieldName);
       debug(`👉 %p/%c for %c`, pathIdentity, id, parentObject);
@@ -259,23 +264,34 @@ export function crystalWrapResolve<
           pathIdentity,
         );
         const indexes = pathToIndexes(path);
+        const parentItemByItemPlanId = new Map(
+          crystalContext.rootCrystalObject[$$itemByItemPlanId],
+        );
+        const parentPlanResults = Object.assign(
+          Object.create(null),
+          crystalContext.rootCrystalObject[$$planResults],
+        );
+
         parentCrystalObject = newCrystalObject(
-          // We treat the rootCrystalObject as the parent since this object
-          // will likely still need access to root items such as context.
-          crystalContext.rootCrystalObject,
           parentPathIdentity,
           parentType.name,
           parentId,
           indexes,
-          parentObject,
           crystalContext,
-          {},
+          parentItemByItemPlanId,
+          parentPlanResults,
         );
         if (!existed) {
+          // TODO: here we're populating the parentObject as if it were a
+          // regular ValuePlan, however it might have been a list in which case
+          // we actually want to populate the __ListItemPlan with the
+          // underlying value from the array (which is actually
+          // `parentObject`). This is old code and is effectively now wrong,
+          // and will need replacing to enable us to have compatibility with
+          // regular GraphQL resolvers that don't know about Crystal.
           populateValuePlan(
-            crystalContext,
             parentPlan,
-            parentCrystalObject[$$indexByListItemPlanId],
+            parentCrystalObject,
             parentObject,
             "parent",
           );
@@ -304,19 +320,8 @@ export function crystalWrapResolve<
         );
         return realResolver(valueForResolver, argumentValues, context, info);
       } else {
+        // This is either a CrystalObject or an n-dimensional list of CrystalObjects.
         return result;
-        /*
-        const crystalResults = crystalWrap(
-          crystalContext,
-          plan,
-          returnType,
-          parentCrystalObject,
-          pathIdentity,
-          id,
-          result,
-        );
-        return crystalResults;
-        */
       }
     };
   Object.defineProperty(crystalResolver, $$crystalWrapped, {
@@ -344,127 +349,28 @@ export function crystalWrapSubscribe<
   return crystalWrapResolve(subscribe);
 }
 
-type CrystalWrapResult =
-  | null
-  | CrystalObject<any>
-  | CrystalObjectMultidimensionalList;
-type CrystalObjectMultidimensionalList = CrystalObjectMultidimensionalArray;
-interface CrystalObjectMultidimensionalArray
-  extends Array<CrystalObjectMultidimensionalArray | CrystalObject<any>> {}
-
-function crystalWrap<TData>(
-  crystalContext: CrystalContext,
-  plan: ExecutablePlan,
-  returnType: GraphQLOutputType,
-  parentCrystalObject: CrystalObject<any> | undefined,
-  pathIdentity: string,
-  id: UniqueId,
-  data: TData,
-  indexes: ReadonlyArray<number> = [],
-): CrystalWrapResult {
-  // This is an `any` because typing it is way too hard; it could be an infinitely nested list for example.
-  if (data == null) {
-    return null;
-  }
-  if (isNonNullType(returnType)) {
-    return crystalWrap(
-      crystalContext,
-      plan,
-      returnType.ofType,
-      parentCrystalObject,
-      pathIdentity,
-      id,
-      data,
-    );
-  }
-  if (isListType(returnType)) {
-    if (!Array.isArray(data)) {
-      throw new Error(
-        `The field at '${pathIdentity}' returned a value incompatible with '${returnType.toString()}': '${inspect(
-          data,
-        )}'`,
-      );
-    }
-    const l = data.length;
-    const result = new Array(l);
-    for (let index = 0; index < l; index++) {
-      const entry = data[index];
-      const wrappedIndexes = [...indexes, index];
-      result[index] = crystalWrap(
-        crystalContext,
-        plan,
-        returnType.ofType,
-        parentCrystalObject,
-        pathIdentity,
-        id,
-        entry,
-        wrappedIndexes,
-      );
-    }
-    return result;
-  }
-  let typeName: string;
-  let innerData: any;
-  if (isUnionType(returnType) || isInterfaceType(returnType)) {
-    assertPolymorphicData(data);
-    ({ [$$concreteType]: typeName, [$$concreteData]: innerData } = data);
-  } else {
-    // TODO: is it okay that scalars would throw here?
-    assertObjectType(returnType);
-    typeName = returnType.name;
-    innerData = data;
-  }
-  if (parentCrystalObject) {
-    return newCrystalObject(
-      parentCrystalObject,
-      pathIdentity,
-      typeName,
-      id,
-      indexes,
-      innerData,
-      crystalContext,
-      parentCrystalObject[$$indexByListItemPlanId],
-    );
-  } else {
-    return newCrystalObject(
-      crystalContext.rootCrystalObject,
-      pathIdentity,
-      typeName,
-      id,
-      indexes,
-      innerData,
-      crystalContext,
-      {},
-    );
-  }
-}
-
 /**
  * Implements `NewCrystalObject`
  */
-export function newCrystalObject<TData>(
-  parentCrystalObject: CrystalObject<any> | null,
+export function newCrystalObject(
   pathIdentity: string,
   typeName: string,
   id: UniqueId,
   indexes: ReadonlyArray<number>,
-  data: TData,
   crystalContext: CrystalContext,
-  indexByListItemPlanId: IndexByListItemPlanId,
-): CrystalObject<TData> {
-  const crystalObject: CrystalObject<TData> = {
+  // TODO: remove this?
+  itemByItemPlanId: Map<number, any>,
+  planResultsByCommonAncestorPathIdentity: {
+    [pathIdentity: string]: Map<number, any>;
+  },
+): CrystalObject {
+  const crystalObject: CrystalObject = {
     [$$pathIdentity]: pathIdentity,
     [$$concreteType]: typeName,
     [$$id]: id,
-    [$$data]: data,
+    [$$itemByItemPlanId]: itemByItemPlanId,
+    [$$planResults]: planResultsByCommonAncestorPathIdentity,
     [$$crystalContext]: crystalContext,
-    [$$crystalObjectByPathIdentity]: {
-      ...(parentCrystalObject
-        ? parentCrystalObject[$$crystalObjectByPathIdentity]
-        : null),
-    },
-    [$$indexes]: indexes,
-    [$$indexByListItemPlanId]: indexByListItemPlanId,
     // @ts-ignore
     toString() {
       const p = indexes.length ? `.${indexes.join(".")}` : ``;
@@ -473,10 +379,6 @@ export function newCrystalObject<TData>(
       );
     },
   };
-  crystalObject[$$crystalObjectByPathIdentity][pathIdentity] = crystalObject;
-  if (isDev) {
-    debug(`Constructed %s with data %c`, crystalObject, data);
-  }
   return crystalObject;
 }
 
