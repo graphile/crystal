@@ -21,10 +21,10 @@ import {
   GraphQLUnionType,
   isInputObjectType,
   isInterfaceType,
+  isLeafType,
   isListType,
   isNonNullType,
   isObjectType,
-  isScalarType,
   isUnionType,
 } from "graphql";
 import { inspect } from "util";
@@ -55,13 +55,11 @@ import type {
   GroupedSelections,
   TrackedArguments,
 } from "./interfaces";
-import { $$itemByItemPlanId, IndexByListItemPlanId } from "./interfaces";
-import { $$planResults } from "./interfaces";
 import {
   $$concreteData,
   $$concreteType,
   $$crystalContext,
-  $$indexByListItemPlanId,
+  $$planResults,
 } from "./interfaces";
 import type { ModifierPlan, PolymorphicPlan } from "./plan";
 import {
@@ -119,6 +117,8 @@ type AetherPhase =
   | "finalize"
   | "ready";
 
+const $$isCrystalLayerObject = Symbol("crystalLayerObject");
+
 function newCrystalLayerObject(
   crystalObject: CrystalObject<any>,
   planResultsByCommonAncestorPathIdentity: PlanResults = new PlanResults(
@@ -131,11 +131,20 @@ function newCrystalLayerObject(
     toString(): string {
       return chalk.bold.green(`CLO<${crystalObject}>`);
     },
+    [$$isCrystalLayerObject]: true,
     crystalObject,
     itemByItemPlanId: new Map(),
     planResultsByCommonAncestorPathIdentity,
     indexes,
   };
+}
+
+export function isCrystalLayerObject(obj: unknown): obj is CrystalLayerObject {
+  return !!(
+    typeof obj === "object" &&
+    obj &&
+    (obj as any)[$$isCrystalLayerObject]
+  );
 }
 
 const EMPTY_INDEXES = Object.freeze([] as number[]);
@@ -2216,6 +2225,12 @@ export class Aether<
         const [layerPlan, ...rest] = layers;
         const crystalLayerObjectsLength = crystalLayerObjects.length;
 
+        debugExecuteVerbose(
+          "Executing plan %c with %c crystal layer objects",
+          layerPlan,
+          crystalLayerObjectsLength,
+        );
+
         if (rest.length === 0) {
           // No more plans -> no more CrystalLayerObjects.
 
@@ -2275,6 +2290,11 @@ export class Aether<
                   dep.commonAncestorPathIdentity,
                   dep.id,
                 );
+              debugExecuteVerbose(
+                "Executing %c's dependency, %c",
+                layerPlan,
+                dep,
+              );
               if (Array.isArray(listResult)) {
                 // Turn each entry in this listResult into it's own CrystalLayerObject, then execute the new layers.
                 const newCLOs = listResult.map((result, i) => {
@@ -2315,7 +2335,21 @@ export class Aether<
             });
             return layerResults;
           } else {
-            // Execute with the same crystalLayerObjects
+            // Execute the plan with the same crystalLayerObjects
+            const executionResults = await this.executePlan(
+              layerPlan,
+              crystalContext,
+              crystalLayerObjects,
+            );
+            // Store the result
+            crystalLayerObjects.forEach((clo, i) => {
+              clo.planResultsByCommonAncestorPathIdentity.set(
+                layerPlan.commonAncestorPathIdentity,
+                layerPlan.id,
+                executionResults[i],
+              );
+            });
+            // Now executing the following layers using the same crystalLayerObjects
             return executeLayers(rest, crystalLayerObjects, mapResult);
           }
         }
@@ -2337,7 +2371,7 @@ export class Aether<
         );
       }
 
-      const isScalar = isScalarType(namedReturnType);
+      const isScalar = isLeafType(namedReturnType);
       const isPolymorphic =
         isUnionType(namedReturnType) || isInterfaceType(namedReturnType);
       if (!isPolymorphic) {
@@ -2371,6 +2405,12 @@ export class Aether<
             return common(clo, innerData, typeName);
           }
         : (clo, data) => common(clo, data, namedReturnType.name);
+
+      debugExecuteVerbose(
+        `Executing batch with %s layers: %c`,
+        layers.length,
+        layers,
+      );
 
       const results = await executeLayers(
         layers,
