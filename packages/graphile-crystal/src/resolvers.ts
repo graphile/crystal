@@ -46,6 +46,7 @@ import {
   $$pathIdentity,
 } from "./interfaces";
 import type { ExecutablePlan } from "./plan";
+import { PlanResults } from "./planResults";
 import type { __ListItemPlan } from "./plans";
 import { __ValuePlan } from "./plans";
 import { assertPolymorphicData } from "./polymorphic";
@@ -267,8 +268,7 @@ export function crystalWrapResolve<
         const parentItemByItemPlanId = new Map(
           crystalContext.rootCrystalObject[$$itemByItemPlanId],
         );
-        const parentPlanResults = Object.assign(
-          Object.create(null),
+        const parentPlanResults = new PlanResults(
           crystalContext.rootCrystalObject[$$planResults],
         );
 
@@ -360,9 +360,7 @@ export function newCrystalObject(
   crystalContext: CrystalContext,
   // TODO: remove this?
   itemByItemPlanId: Map<number, any>,
-  planResultsByCommonAncestorPathIdentity: {
-    [pathIdentity: string]: Map<number, any>;
-  },
+  planResultsByCommonAncestorPathIdentity: PlanResults,
 ): CrystalObject {
   const crystalObject: CrystalObject = {
     [$$pathIdentity]: pathIdentity,

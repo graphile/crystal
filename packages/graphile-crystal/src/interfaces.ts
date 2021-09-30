@@ -1,14 +1,10 @@
 import type {
   FieldNode,
   GraphQLArgumentConfig,
-  GraphQLEnumType,
   GraphQLFieldConfig,
   GraphQLInputFieldConfig,
   GraphQLInputType,
-  GraphQLList,
-  GraphQLNonNull,
   GraphQLOutputType,
-  GraphQLScalarType,
   SelectionNode,
 } from "graphql";
 
@@ -16,7 +12,8 @@ import type { Aether } from "./aether";
 import type { Deferred } from "./deferred";
 import type { InputPlan } from "./input";
 import type { ExecutablePlan, ModifierPlan } from "./plan";
-import type { __TrackedObjectPlan, ListCapablePlan } from "./plans";
+import type { PlanResults } from "./planResults";
+import type { __TrackedObjectPlan } from "./plans";
 import type { UniqueId } from "./utils";
 
 declare module "graphql" {
@@ -120,15 +117,13 @@ export interface CrystalObject<TData = any> {
    * resolvers for one "layer" not all completing at the same time), so we
    * cannot rely on writing the results all at once.
    */
-  [$$planResults]: { [pathIdentity: string]: Map<number, any> };
+  [$$planResults]: PlanResults;
 }
 
 export interface CrystalLayerObject {
   parentCrystalObject: CrystalObject<any>;
   itemByItemPlanId: Map<number, any>;
-  planResultsByCommonAncestorPathIdentity: {
-    [pathIdentity: string]: Map<number, any>;
-  };
+  planResultsByCommonAncestorPathIdentity: PlanResults;
   indexes: number[];
 }
 
