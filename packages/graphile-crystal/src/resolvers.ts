@@ -4,6 +4,7 @@ import debugFactory from "debug";
 import type { GraphQLFieldResolver, GraphQLResolveInfo } from "graphql";
 import { defaultFieldResolver, getNamedType, isLeafType } from "graphql";
 import type { Path } from "graphql/jsutils/Path";
+import { inspect } from "util";
 
 import { populateValuePlan } from "./aether";
 import * as assert from "./assert";
@@ -20,7 +21,7 @@ import {
   $$pathIdentity,
   $$planResults,
 } from "./interfaces";
-import { PlanResults } from "./planResults";
+import type { PlanResults } from "./planResults";
 import type { __ListItemPlan } from "./plans";
 import { __ValuePlan } from "./plans";
 import type { UniqueId } from "./utils";
@@ -219,6 +220,18 @@ export function crystalWrapResolve<
         // Special workaround for the root object.
         parentCrystalObject = crystalContext.rootCrystalObject;
       } else {
+        throw new Error(
+          `Unimplemented - we do not currently support resolving plans where the parent is not a CrystalObject. Instead of CrystalObject in resolver at ${pathIdentity}, we saw: ${inspect(
+            parentObject,
+            {
+              colors: true,
+              depth: 4,
+            },
+          )}`,
+        );
+
+        // TODO: implement this.
+        /*
         // Note: we need to "fake" that the parent was a plan. Because we may
         // have lots of resolvers all called for the same parent object, we use a
         // map. This happens to mean that multiple values in the graph being the
@@ -277,6 +290,7 @@ export function crystalWrapResolve<
           pathIdentity,
           parentCrystalObject,
         );
+        */
       }
       const result = await getBatchResult(batch, parentCrystalObject);
       debug(
