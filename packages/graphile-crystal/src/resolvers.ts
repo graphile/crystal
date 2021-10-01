@@ -343,7 +343,6 @@ export function newCrystalObject(
     [$$id]: id,
     [$$planResults]: planResultsByCommonAncestorPathIdentity,
     [$$crystalContext]: crystalContext,
-    // @ts-ignore
     toString() {
       const p = indexes.length ? `.${indexes.join(".")}` : ``;
       return chalk.bold.blue(

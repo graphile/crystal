@@ -60,6 +60,7 @@ export interface IndexByListItemPlanId {
 
 // TODO: remove <TData>
 export interface CrystalObject<TData = any> {
+  toString(): string;
   [$$id]: UniqueId;
   [$$pathIdentity]: string;
   [$$concreteType]: string;
