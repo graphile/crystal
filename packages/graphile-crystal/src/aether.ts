@@ -745,6 +745,7 @@ export class Aether<
         { aether: this, parentPathIdentity: nestedParentPathIdentity },
         () => plan.listItem(new __ListItemPlan(plan, depth)),
       );
+      this.planIdByPathIdentity[nestedParentPathIdentity] = listItemPlan.id;
       this.planSelectionSetForType(
         fieldType.ofType,
         fieldAndGroups,
@@ -2530,36 +2531,48 @@ export class Aether<
       return;
     }
     this.logPlans(why);
-    const pathIdentities = Object.keys(this.planIdByPathIdentity).sort(
-      (a, z) => a.length - z.length,
-    );
+    const fieldPathIdentities = Object.keys(this.planIdByPathIdentity)
+      .sort((a, z) => a.length - z.length)
+      .filter((pathIdentity) => !pathIdentity.endsWith("[]"));
     const printed = new Set<string>();
     let depth = 0;
     const lines: string[] = [];
-    const print = (pathIdentity: string, parentPathIdentity: string) => {
-      if (printed.has(pathIdentity)) {
+    const print = (
+      fieldPathIdentity: string,
+      parentFieldPathIdentity: string,
+    ) => {
+      if (printed.has(fieldPathIdentity)) {
         return;
       }
-      printed.add(pathIdentity);
-      const planId = this.planIdByPathIdentity[pathIdentity];
+      printed.add(fieldPathIdentity);
+      const planId = this.planIdByPathIdentity[fieldPathIdentity];
       if (!planId) {
-        throw new Error(`Corrupted plan, no id found for '${pathIdentity}'`);
+        throw new Error(
+          `Corrupted plan, no id found for '${fieldPathIdentity}'`,
+        );
       }
       const plan = this.plans[planId];
       lines.push(
         "  ".repeat(depth) +
-          `${pathIdentity.substr(parentPathIdentity.length)}: ${plan}`,
+          `${fieldPathIdentity.substr(
+            parentFieldPathIdentity.length,
+          )}: ${plan}`,
       );
       depth++;
-      for (const childPathIdentity of pathIdentities) {
-        if (childPathIdentity.startsWith(pathIdentity + ">")) {
-          print(childPathIdentity, pathIdentity);
+      for (const childFieldPathIdentity of fieldPathIdentities) {
+        if (
+          childFieldPathIdentity.startsWith(fieldPathIdentity) &&
+          /^(\[\])*>/.test(
+            childFieldPathIdentity.substr(fieldPathIdentity.length),
+          )
+        ) {
+          print(childFieldPathIdentity, fieldPathIdentity);
         }
       }
       depth--;
     };
-    for (const pathIdentity of pathIdentities) {
-      print(pathIdentity, "");
+    for (const fieldPathIdentity of fieldPathIdentities) {
+      print(fieldPathIdentity, "");
     }
 
     debugPlanVerbose(
