@@ -2225,6 +2225,15 @@ export class Aether<
                 indexes,
                 planResultsByCommonAncestorPathIdentity,
               } = value;
+              if (
+                planResultsByCommonAncestorPathIdentity.hasPathIdentity(
+                  layerPlan.commonAncestorPathIdentity,
+                )
+              ) {
+                throw new Error(
+                  `Did not expect plans to exist within the '${layerPlan.commonAncestorPathIdentity}' bucket yet.`,
+                );
+              }
               // NOTE: this could be an async iterator
               const listResult =
                 value.planResultsByCommonAncestorPathIdentity.get(
@@ -2242,19 +2251,11 @@ export class Aether<
                   const copy = new PlanResults(
                     planResultsByCommonAncestorPathIdentity,
                   );
-                  if (
-                    copy.hasPathIdentity(layerPlan.commonAncestorPathIdentity)
-                  ) {
-                    throw new Error(
-                      `Did not expect plans to exist within the '${layerPlan.commonAncestorPathIdentity}' bucket yet.`,
-                    );
-                  } else {
-                    copy.set(
-                      layerPlan.commonAncestorPathIdentity,
-                      layerPlan.id,
-                      result,
-                    );
-                  }
+                  copy.set(
+                    layerPlan.commonAncestorPathIdentity,
+                    layerPlan.id,
+                    result,
+                  );
                   return newCrystalLayerObject(parentCrystalObject, copy, [
                     ...indexes,
                     i,
