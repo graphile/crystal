@@ -332,3 +332,15 @@ export interface FieldAndGroup {
   groupId: number;
   field: FieldNode;
 }
+
+export interface PlanOptions {
+  stream: {
+    initialCount: number;
+  } | null;
+}
+
+export interface PlanOptimizeOptions {
+  stream: {
+    initialCount: number;
+  } | null;
+}

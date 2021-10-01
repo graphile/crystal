@@ -35,7 +35,7 @@ import type { Constraint } from "./constraints";
 import type { Deferred } from "./deferred";
 import { isDev } from "./dev";
 import { withGlobalState } from "./global";
-import { graphqlCollectFields } from "./graphqlCollectFields";
+import { getDirectiveArg, graphqlCollectFields } from "./graphqlCollectFields";
 import {
   graphqlMergeSelectionSets,
   interfaceTypeHasNonIntrospectionFieldQueriedInSelections,
@@ -53,6 +53,7 @@ import type {
   CrystalObject,
   FieldAndGroup,
   GroupedSelections,
+  PlanOptions,
   TrackedArguments,
 } from "./interfaces";
 import {
@@ -63,6 +64,7 @@ import {
   $$planResults,
 } from "./interfaces";
 import type { ModifierPlan, PolymorphicPlan } from "./plan";
+import { isStreamablePlan } from "./plan";
 import {
   assertArgumentsFinalized,
   assertExecutablePlan,
@@ -251,7 +253,7 @@ export class Aether<
     [planId: number]: WeakMap<object, UniqueId> | undefined;
   } = Object.create(null);
 
-  private readonly streamablePlans = new Set<ExecutablePlan>();
+  private readonly planOptionsByPlan = new Map<ExecutablePlan, PlanOptions>();
 
   public readonly variableValuesConstraints: Constraint[] = [];
   public readonly variableValuesPlan: __ValuePlan<TVariables>;
@@ -661,9 +663,23 @@ export class Aether<
           (d) => d.name.value === "stream",
         );
 
-        if (streamDirective && typeof plan.stream === "function") {
-          this.streamablePlans.add(plan);
-        }
+        const planOptions: PlanOptions = {
+          stream:
+            streamDirective && isStreamablePlan(plan)
+              ? {
+                  initialCount:
+                    Number(
+                      getDirectiveArg(
+                        field,
+                        "stream",
+                        "initialCount",
+                        this.trackedVariableValuesPlan,
+                      ),
+                    ) || 0,
+                }
+              : null,
+        };
+        this.planOptionsByPlan.set(plan, planOptions);
 
         const newPlansLength = this.plans.length;
         debugPlanVerbose(
@@ -1343,7 +1359,8 @@ export class Aether<
       return plan;
     }
 
-    const shouldStream = this.streamablePlans.has(plan);
+    const planOptions = this.planOptionsByPlan.get(plan);
+    const shouldStream = !!planOptions?.stream;
     if (shouldStream) {
       // Never deduplicate streaming plans, we cannot reference the stream more
       // than once (and we aim to not cache the stream because we want its
@@ -1394,7 +1411,8 @@ export class Aether<
     if (this.optimizedPlans.has(plan)) {
       throw new Error("Must not optimize plan twice");
     }
-    const replacementPlan = plan.optimize();
+    const options = this.planOptionsByPlan.get(plan);
+    const replacementPlan = plan.optimize({ stream: options?.stream ?? null });
     this.optimizedPlans.add(plan);
     if (replacementPlan !== plan) {
       debugPlanVerbose(

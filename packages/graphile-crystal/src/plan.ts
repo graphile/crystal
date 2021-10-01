@@ -15,6 +15,7 @@ import type {
   CrystalResultsList,
   CrystalResultStreamList,
   CrystalValuesList,
+  PlanOptimizeOptions,
   PromiseOrDirect,
 } from "./interfaces";
 
@@ -234,7 +235,7 @@ export abstract class ExecutablePlan<TData = any> extends BasePlan {
    * Our chance to optimise the plan (which could go as far as to inline the
    * plan into the parent plan).
    */
-  public optimize(): ExecutablePlan {
+  public optimize(_options: PlanOptimizeOptions): ExecutablePlan {
     return this;
   }
 
@@ -292,16 +293,6 @@ export abstract class ExecutablePlan<TData = any> extends BasePlan {
     values: CrystalValuesList<ReadonlyArray<any>>,
     meta: Record<string, unknown>,
   ): PromiseOrDirect<CrystalResultsList<TData>>;
-
-  /**
-   * If this plan supports streaming then it should implement this method. It's
-   * basically the same as `execute` except it returns a list of result streams
-   * rather than a list of results.
-   */
-  abstract stream?(
-    values: CrystalValuesList<ReadonlyArray<any>>,
-    meta: Record<string, unknown>,
-  ): PromiseOrDirect<CrystalResultStreamList<TData>>;
 }
 
 export function isExecutablePlan<TData = any>(
@@ -319,6 +310,24 @@ export function assertExecutablePlan<TData>(
       `The plan returned from '${pathIdentity}' should be an executable plan, but it does not implement the 'execute' method.`,
     );
   }
+}
+
+export type StreamablePlan<TData> = ExecutablePlan<TData> & {
+  /**
+   * If this plan supports streaming then it should implement this method. It's
+   * basically the same as `execute` except it returns a list of result streams
+   * rather than a list of results.
+   */
+  stream(
+    values: CrystalValuesList<ReadonlyArray<any>>,
+    meta: Record<string, unknown>,
+  ): PromiseOrDirect<CrystalResultStreamList<TData>>;
+};
+
+export function isStreamablePlan<TData>(
+  plan: ExecutablePlan<TData>,
+): plan is StreamablePlan<TData> {
+  return typeof (plan as StreamablePlan<TData>).stream === "function";
 }
 
 export type PolymorphicPlan = ExecutablePlan & {
