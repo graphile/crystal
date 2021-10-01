@@ -69,48 +69,21 @@ export interface CrystalObject<TData = any> {
   [$$crystalContext]: CrystalContext;
 
   /**
-   * For `__ListItemPlan`'s, this stores the relevant item for the given
-   * `__ListItemPlan` id. This allows JavaScript to garbage-collect these
-   * values once they're done with, which is particularly important to
-   * `@stream` fields.
-   *
-   * When a new level of CrystalObject is created it will inherit a _copy_ of
-   * $$itemByItemPlanId from its parent - that way all existing items are
-   * referenced and shared but new items will be specific to this
-   * CrystalObject.
-   */
-  [$$itemByItemPlanId]: Map<number, any>;
-
-  /**
-   * This is the plan result cache for this branch and level in the tree. What
-   * are "branch" and "level"?
-   *
-   * When lists are involved there will be `__ListItemPlan`'s (which aren't
-   * real executable plans but a special case). The resulting list items will
-   * ultimately result in CrystalObjects and these objects will store the
-   * relevant item into the CrystalObject's $$itemByItemPlanId map for each
-   * item plan. This causes the result cache to "branch" for a list plan item,
-   * and for all plans below it.
-   *
-   * Each plan has a `commonAncestorPathIdentity` - this dictates the "level"
-   * to which the plan's result data is written. We could use the root path
-   * identity for everything that doesn't come under a list, but it's
-   * preferable to push the commonAncestorPathIdentity to be the deepest
-   * pathIdentity that's still a common ancestor because it enables garbage
-   * collection to discard values when they're no longer needed which is
-   * especially useful with subscriptions, live queries, `@stream` and `@defer`.
+   * This is the plan result cache accessible from this CrystalObject - it
+   * should contain all the previously executed plans that plans below this
+   * CrystalObject in the operation depend on. See `PlanResults` for more
+   * information on the specifics of how the plan results are stored/accessed.
    *
    * When evaluating a particular CrystalObject you can be certain that all the
-   * $$indexes have already been factored in, so you need to find the right
-   * cache to read the plan data from - this will be by using the plan's
-   * `commonAncestorPathIdentity` to retrieve the plan result map from
-   * $$planResults. Then within this resulting map you can find the result for
-   * the plan by using the plan's id.
+   * list indexes have already been factored into the cache, so you just need
+   * to supply a plan's `commonAncestorPathIdentity` and `id` to read/write the
+   * data.
    *
    * When a new level of CrystalObject is created it will inherit a _copy_ of
-   * $$planResults from its parent - that way any shared `pathIdentity` entries
-   * will share changes between them (since the values are the same objects),
-   * but any new pathIdentities will diverge.
+   * $$planResults from its parent - that way any shared `pathIdentity`
+   * "buckets" will share changes between them (since the values are references
+   * to the same objects), but any new pathIdentities will diverge - again, see
+   * `PlanResults` for more information on this.
    *
    * Plans can be executed more than once due to parts of the tree being
    * delayed (possibly due to `@stream`/`@defer`, possibly just due to the
