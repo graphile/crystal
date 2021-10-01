@@ -2669,6 +2669,11 @@ function treeNodePath(
   treeNode: TreeNode,
   startPathIdentity: string,
 ): TreeNode[] {
+  if (!treeNode.pathIdentity.startsWith(startPathIdentity)) {
+    throw new Error(
+      `Asked to find treeNodePath to TreeNode(${treeNode.pathIdentity}) starting at '${startPathIdentity}', however that TreeNode doesn't start with that path identity!`,
+    );
+  }
   const path: TreeNode[] = [treeNode];
   let n: TreeNode | null = treeNode;
   while ((n = n.parent) && n.pathIdentity.startsWith(startPathIdentity)) {
