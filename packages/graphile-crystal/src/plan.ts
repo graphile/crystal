@@ -13,6 +13,7 @@ import {
 } from "./global";
 import type {
   CrystalResultsList,
+  CrystalResultStreamList,
   CrystalValuesList,
   PromiseOrDirect,
 } from "./interfaces";
@@ -291,6 +292,16 @@ export abstract class ExecutablePlan<TData = any> extends BasePlan {
     values: CrystalValuesList<ReadonlyArray<any>>,
     meta: Record<string, unknown>,
   ): PromiseOrDirect<CrystalResultsList<TData>>;
+
+  /**
+   * If this plan supports streaming then it should implement this method. It's
+   * basically the same as `execute` except it returns a list of result streams
+   * rather than a list of results.
+   */
+  abstract stream?(
+    values: CrystalValuesList<ReadonlyArray<any>>,
+    meta: Record<string, unknown>,
+  ): PromiseOrDirect<CrystalResultStreamList<TData>>;
 }
 
 export function isExecutablePlan<TData = any>(

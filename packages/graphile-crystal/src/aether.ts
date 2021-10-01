@@ -231,9 +231,11 @@ export class Aether<
   public readonly itemPlanIdByFieldPathIdentity: {
     [pathIdentity: string]: number | undefined;
   };
+
   public readonly sideEffectPlanIdsByPathIdentity: {
     [pathIdentity: string]: number[];
   };
+
   /**
    * The field at each given path identity may be in one or more groups; these
    * groups govern how the plans run (e.g. a plan will likely not optimise
@@ -244,9 +246,13 @@ export class Aether<
   public readonly groupIdsByPathIdentity: {
     [pathIdentity: string]: number[] | undefined;
   };
+
   public readonly valueIdByObjectByPlanId: {
     [planId: number]: WeakMap<object, UniqueId> | undefined;
   } = Object.create(null);
+
+  private readonly streamablePlans = new Set<ExecutablePlan>();
+
   public readonly variableValuesConstraints: Constraint[] = [];
   public readonly variableValuesPlan: __ValuePlan<TVariables>;
   public readonly trackedVariableValuesPlan: __TrackedObjectPlan<TVariables>;
@@ -635,6 +641,30 @@ export class Aether<
             plan,
           ),
         );
+
+        /*
+         * `SameStreamDirective`
+         * (https://github.com/graphql/graphql-spec/blob/26fd78c4a89a79552dcc0c7e0140a975ce654400/spec/Section%205%20--%20Validation.md#L450-L458)
+         * ensures that every field that has `@stream` must have the same
+         * `@stream` arguments; so we can just check the first node in the
+         * merged set to see our stream options. NOTE: if this changes before
+         * release then we may need to find the stream with the largest
+         * `initialCount` to figure what to do; something like:
+         *
+         *      const streamDirective = firstField.directives?.filter(
+         *        (d) => d.name.value === "stream",
+         *      ).sort(
+         *        (a, z) => getArg(z, 'initialCount', 0) - getArg(a, 'initialCount', 0)
+         *      )[0]
+         */
+        const streamDirective = firstField.directives?.find(
+          (d) => d.name.value === "stream",
+        );
+
+        if (streamDirective && typeof plan.stream === "function") {
+          this.streamablePlans.add(plan);
+        }
+
         const newPlansLength = this.plans.length;
         debugPlanVerbose(
           "Created %o new plans whilst processing %p",
@@ -1312,6 +1342,15 @@ export class Aether<
       // Never deduplicate plans with side effects.
       return plan;
     }
+
+    const shouldStream = this.streamablePlans.has(plan);
+    if (shouldStream) {
+      // Never deduplicate streaming plans, we cannot reference the stream more
+      // than once (and we aim to not cache the stream because we want its
+      // entries to be garbage collected).
+      return plan;
+    }
+
     const seenIds = new Set([plan.id]);
     const peers = this.plans.filter((potentialPeer) => {
       if (
