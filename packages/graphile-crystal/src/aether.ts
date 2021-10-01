@@ -232,7 +232,7 @@ export class Aether<
    * object it'll be the same as planIdByPathIdentity but if the parent
    * returned a list of objects it would be a `__ListItemPlan`.
    */
-  public readonly itemPlanIdByPathIdentity: {
+  public readonly itemPlanIdByFieldPathIdentity: {
     [pathIdentity: string]: number | undefined;
   };
   public readonly sideEffectPlanIdsByPathIdentity: {
@@ -350,7 +350,7 @@ export class Aether<
     this.planIdByPathIdentity = Object.assign(Object.create(null), {
       [ROOT_PATH]: this.rootValuePlan.id,
     });
-    this.itemPlanIdByPathIdentity = Object.assign(Object.create(null), {
+    this.itemPlanIdByFieldPathIdentity = Object.assign(Object.create(null), {
       [ROOT_PATH]: this.rootValuePlan.id,
     });
     this.sideEffectPlanIdsByPathIdentity = Object.create(null);
@@ -694,7 +694,7 @@ export class Aether<
         plan,
         treeNode,
       );
-      this.itemPlanIdByPathIdentity[pathIdentity] = itemPlan.id;
+      this.itemPlanIdByFieldPathIdentity[pathIdentity] = itemPlan.id;
     }
   }
 
@@ -1396,9 +1396,9 @@ export class Aether<
     const activePlans = new Set<ExecutablePlan>();
 
     // NOTE: every plan referenced in this.planIdByPathIdentity is included in
-    // this.itemPlanIdByPathIdentity, but the reverse is not true.
-    for (const pathIdentity in this.itemPlanIdByPathIdentity) {
-      const planId = this.itemPlanIdByPathIdentity[pathIdentity];
+    // this.itemPlanIdByFieldPathIdentity, but the reverse is not true.
+    for (const pathIdentity in this.itemPlanIdByFieldPathIdentity) {
+      const planId = this.itemPlanIdByFieldPathIdentity[pathIdentity];
       assert.ok(
         planId != null,
         `Could not find the planId for path identity '${pathIdentity}'`,
@@ -1456,7 +1456,7 @@ export class Aether<
         }
       };
       const treeNodePlanId =
-        this.itemPlanIdByPathIdentity[treeNode.fieldPathIdentity];
+        this.itemPlanIdByFieldPathIdentity[treeNode.fieldPathIdentity];
       assert.ok(
         treeNodePlanId != null,
         `Could not determine the item plan id for path identity '${treeNode.pathIdentity}'`,
@@ -1884,7 +1884,7 @@ export class Aether<
     const sideEffectPlanIds =
       this.sideEffectPlanIdsByPathIdentity[fieldPathIdentity];
     const planId = this.planIdByPathIdentity[fieldPathIdentity];
-    const itemPlanId = this.itemPlanIdByPathIdentity[fieldPathIdentity];
+    const itemPlanId = this.itemPlanIdByFieldPathIdentity[fieldPathIdentity];
     assert.ok(
       planId != null,
       `Could not find the planId for path identity '${fieldPathIdentity}'`,

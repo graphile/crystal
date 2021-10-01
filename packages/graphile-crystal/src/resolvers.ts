@@ -249,7 +249,7 @@ export function crystalWrapResolve<
           ? pathToPathIdentity(path.prev)
           : "";
         const parentPlanId =
-          aether.itemPlanIdByPathIdentity[parentPathIdentity];
+          aether.itemPlanIdByFieldPathIdentity[parentPathIdentity];
         assert.ok(
           parentPlanId != null,
           `Could not find a planId for (parent) path '${parentPathIdentity}'`,
