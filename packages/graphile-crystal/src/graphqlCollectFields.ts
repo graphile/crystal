@@ -1,6 +1,6 @@
-import type { DirectiveNode, FieldNode, SelectionNode } from "graphql";
-import { assertListType } from "graphql";
+import type { DirectiveNode, SelectionNode } from "graphql";
 import {
+  assertListType,
   GraphQLInterfaceType,
   GraphQLObjectType,
   GraphQLUnionType,

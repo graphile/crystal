@@ -1,8 +1,6 @@
 import debugFactory from "debug";
 
 import { ExecutablePlan } from "../plan";
-import type { AccessPlan } from "./access";
-import { access } from "./access";
 
 const debugObjectPlan = debugFactory("crystal:ObjectPlan");
 const debugObjectPlanVerbose = debugObjectPlan.extend("verbose");

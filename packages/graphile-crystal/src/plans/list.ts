@@ -1,6 +1,4 @@
 import { ExecutablePlan } from "../plan";
-import type { AccessPlan } from "./access";
-import { access } from "./access";
 
 type UnwrapPlanTuple<TPlanTuple extends readonly ExecutablePlan<any>[]> = [
   ...(TPlanTuple extends readonly ExecutablePlan<infer U>[]

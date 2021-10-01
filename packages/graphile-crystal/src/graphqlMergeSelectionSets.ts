@@ -1,5 +1,4 @@
 import type {
-  FieldNode,
   GraphQLInterfaceType,
   GraphQLObjectType,
   SelectionNode,
