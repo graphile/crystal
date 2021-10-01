@@ -22,6 +22,7 @@ export {
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
   CrystalResultsList,
+  CrystalResultStreamList,
   CrystalValuesList,
   ExecutablePlanResolver,
   GraphileCrystalFieldConfig,

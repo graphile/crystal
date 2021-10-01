@@ -129,7 +129,7 @@ export type CrystalValuesList<T> = ReadonlyArray<T>;
 export type PromiseOrDirect<T> = Promise<T> | T;
 export type CrystalResultsList<T> = ReadonlyArray<PromiseOrDirect<T>>;
 export type CrystalResultStreamList<T> = ReadonlyArray<
-  T extends (infer U)[] ? AsyncIterable<PromiseOrDirect<U>> : never
+  AsyncIterable<PromiseOrDirect<T>>
 >;
 
 export type BaseGraphQLRootValue = any;

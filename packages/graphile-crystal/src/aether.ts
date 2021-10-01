@@ -1792,7 +1792,7 @@ export class Aether<
       }
       const planOptions = this.planOptionsByPlan.get(plan);
       const pendingResults = planOptions?.stream
-        ? await (plan as StreamablePlan<any>).stream(
+        ? await (plan as unknown as StreamablePlan<unknown>).stream(
             values,
             meta,
             planOptions.stream,

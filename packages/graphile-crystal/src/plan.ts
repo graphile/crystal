@@ -312,7 +312,7 @@ export function assertExecutablePlan<TData>(
   }
 }
 
-export type StreamablePlan<TData> = ExecutablePlan<TData> & {
+export type StreamablePlan<TData> = ExecutablePlan<ReadonlyArray<TData>> & {
   /**
    * If this plan supports streaming then it should implement this method. It's
    * basically the same as `execute` except it returns a list of result streams
@@ -328,7 +328,7 @@ export type StreamablePlan<TData> = ExecutablePlan<TData> & {
 };
 
 export function isStreamablePlan<TData>(
-  plan: ExecutablePlan<TData>,
+  plan: ExecutablePlan<ReadonlyArray<TData>>,
 ): plan is StreamablePlan<TData> {
   return typeof (plan as StreamablePlan<TData>).stream === "function";
 }
