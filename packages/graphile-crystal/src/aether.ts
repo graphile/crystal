@@ -63,7 +63,7 @@ import {
   $$isCrystalLayerObject,
   $$planResults,
 } from "./interfaces";
-import type { ModifierPlan, PolymorphicPlan } from "./plan";
+import type { ModifierPlan, PolymorphicPlan, StreamablePlan } from "./plan";
 import { isStreamablePlan } from "./plan";
 import {
   assertArgumentsFinalized,
@@ -1790,7 +1790,14 @@ export class Aether<
           "Should never attempt to execute __ListItemPlan; that should be handled within executeBatch",
         );
       }
-      const pendingResults = await plan.execute(values, meta);
+      const planOptions = this.planOptionsByPlan.get(plan);
+      const pendingResults = planOptions?.stream
+        ? await (plan as StreamablePlan<any>).stream(
+            values,
+            meta,
+            planOptions.stream,
+          )
+        : await plan.execute(values, meta);
       if (plan.debug) {
         console.log(
           `debugPlans(${plan}): called with: ${inspect(values, {
@@ -1815,17 +1822,29 @@ export class Aether<
       }
       for (let i = 0; i < pendingCrystalObjectsLength; i++) {
         const crystalLayerObject = pendingCrystalLayerObjects[i];
+
+        // This could be a Promise, an AsyncIterable, a Promise to an
+        // AsyncIterable, or arbitrary data (including an array).
         const rawPendingResult = pendingResults[i];
+
         const j = pendingCrystalLayerObjectsIndexes[i];
+
+        // NOTE: after this result[j] could be an AsyncIterable, or arbitrary
+        // data (including an array).
         if (isPromise(rawPendingResult)) {
           try {
             result[j] = await rawPendingResult;
           } catch (e) {
             result[j] = new CrystalError(e);
           }
-        } else {
+        }
+        // TODO: do we need 'else if (isAsyncIterator(rawPendingResult)) { ... }'
+        else {
           result[j] = rawPendingResult;
         }
+
+        // TODO: if result[j] is AsyncIterable it would be nice to avoid
+        // writing it to the plan results.
         crystalLayerObject.planResultsByCommonAncestorPathIdentity.set(
           commonAncestorPathIdentity,
           plan.id,

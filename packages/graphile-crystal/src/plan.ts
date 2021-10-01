@@ -321,6 +321,9 @@ export type StreamablePlan<TData> = ExecutablePlan<TData> & {
   stream(
     values: CrystalValuesList<ReadonlyArray<any>>,
     meta: Record<string, unknown>,
+    streamOptions: {
+      initialCount: number;
+    },
   ): PromiseOrDirect<CrystalResultStreamList<TData>>;
 };
 
