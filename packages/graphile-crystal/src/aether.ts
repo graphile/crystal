@@ -55,11 +55,11 @@ import type {
   GroupedSelections,
   TrackedArguments,
 } from "./interfaces";
-import { $$isCrystalLayerObject } from "./interfaces";
 import {
   $$concreteData,
   $$concreteType,
   $$crystalContext,
+  $$isCrystalLayerObject,
   $$planResults,
 } from "./interfaces";
 import type { ModifierPlan, PolymorphicPlan } from "./plan";
@@ -87,10 +87,6 @@ import {
   ROOT_VALUE_OBJECT,
   uid,
 } from "./utils";
-
-function identity<T>(v: T): T {
-  return v;
-}
 
 type MapResult = (clo: CrystalLayerObject, result: any) => any;
 
@@ -1948,7 +1944,6 @@ export class Aether<
       rootId,
       EMPTY_INDEXES,
       crystalContext,
-      new Map(),
       new PlanResults(),
     );
     crystalContext.rootCrystalObject = rootCrystalObject;
@@ -2085,172 +2080,6 @@ export class Aether<
           layers.push(subPlan);
         }
       }
-
-      /*
-      const executeLayers = async (
-        layers: Array<ExecutablePlan<any>>,
-        values: Array<CrystalLayerObject>,
-        depth = 0,
-      ): Promise<any[]> => {
-        // If `rest` is empty then we're expecting to turn the results into
-        // CrystalObjects (or scalars), otherwise we're expecting arrays which
-        // we will then process through another layer of executeLayers.
-        const [layerPlan, ...rest] = layers;
-        const valuesLength = values.length;
-
-        debugExecuteVerbose(
-          "Batch executing plan %c with %c",
-          layerPlan,
-          crystalObjects,
-        );
-
-        const layerResult = (() => {
-          if (layerPlan instanceof __ListItemPlan) {
-            const depId = layerPlan.dependencies[0];
-            const dep = this.plans[depId];
-            const layerResults = values.map((value) => {
-              // TODO: this could be an async iterator
-              const listResult = value.planResultsByCommonAncestorPathIdentity[
-                dep.commonAncestorPathIdentity
-              ].get(dep.id);
-              if (!Array.isArray(listResult)) {
-                if (listResult != null) {
-                  console.error(
-                    `Expected listResult to be an array, found ${inspect(
-                      listResult,
-                    )}`,
-                  );
-                }
-                // Stops here
-                return [];
-              }
-            });
-            return layerResults;
-          } else {
-            const layerResults = await this.executePlan(
-              layerPlan,
-              crystalContext,
-              values,
-            );
-
-            if (isDev) {
-              assert.ok(
-                Array.isArray(layerResults),
-                "Expected plan execution to return an array",
-              );
-              assert.strictEqual(
-                layerResults.length,
-                valuesLength,
-                "Expected plan execution result to have same length as input objects",
-              );
-            }
-            return layerResults;
-          }
-        })();
-        const valueIndexByNewValuesIndex: number[] = [];
-
-        if (rest.length) {
-          const results = new Array(valuesLength).fill(null);
-          // We're expecting to be handling arrays still; there's another layer to come...
-          const newValues = values.flatMap((value, valueIndex) => {
-            const {
-              parentCrystalObject,
-              indexes,
-              planResultsByCommonAncestorPathIdentity,
-            } = value;
-            const layerResult = layerResults[valueIndex];
-            if (!Array.isArray(layerResult)) {
-              if (layerResult != null) {
-                console.error(
-                  `Expected layerResult to be an array, found ${inspect(
-                    layerResult,
-                  )}`,
-                );
-              }
-              // Stops here
-              return [];
-            }
-            results[valueIndex] = [];
-            return layerResult.map(
-              (_layerIndividualResult, layerResultIndex) => {
-                valueIndexByNewValuesIndex.push(valueIndex);
-                return newCrystalLayerObject(crystalObject, {
-                  ...indexByListItemPlanId,
-                  // TODO: when we implement `@stream` then this
-                  // might not actually be the right index, we might
-                  // need to add an offset?
-                  [listItemPlanIdAtDepth[depth]]: layerResultIndex,
-                });
-              },
-            );
-          });
-          const newValuesResults = await executeLayers(
-            rest,
-            newValues,
-            depth + 1,
-          );
-          assert.strictEqual(
-            newValuesResults.length,
-            newValues.length,
-            "Expected newValuesResults and newValues to have the same length",
-          );
-          for (let i = 0, l = newValuesResults.length; i < l; i++) {
-            const valueIndex = valueIndexByNewValuesIndex[i];
-            results[valueIndex].push(newValuesResults[i]);
-          }
-          return results;
-        } else {
-          // This was the final layer, so it's time to make the crystal objects.
-          if (isScalar) {
-            // No crystal objects for scalars; just return the results directly.
-            return layerResults;
-          }
-          const isPolymorphic =
-            isUnionType(namedReturnType) || isInterfaceType(namedReturnType);
-          if (!isPolymorphic) {
-            assertObjectType(namedReturnType);
-          }
-          return values.map((value, valueIndex) => {
-            const { parentCrystalObject, indexes } = value;
-            const layerResult = layerResults[valueIndex];
-            const data = layerResult;
-            if (data == null) {
-              return null;
-            }
-            let typeName: string;
-            let innerData: any;
-            if (isPolymorphic) {
-              assertPolymorphicData(data);
-              ({ [$$concreteType]: typeName, [$$concreteData]: innerData } =
-                data);
-            } else {
-              typeName = namedReturnType.name;
-              innerData = data;
-            }
-            const crystalObject = newCrystalObject(
-              batch.pathIdentity,
-              typeName,
-              uid(batch.pathIdentity),
-              indexes,
-              crystalContext,
-              new Map(),
-              Object.assign(
-                Object.create(null),
-                parentCrystalObject[$$planResults],
-                {
-                  // TODO: assert that we're not overwriting anything we shouldn't be
-                  [itemPlan.commonAncestorPathIdentity]: {
-                    [itemPlan.id]: innerData,
-                  },
-                },
-              ),
-            );
-            return crystalObject;
-          });
-        }
-      };
-
-      */
 
       const executeLayers = async (
         layers: ExecutablePlan[],
@@ -2429,7 +2258,6 @@ export class Aether<
           uid(batch.pathIdentity),
           clo.indexes,
           crystalContext,
-          new Map(),
           planResults,
         );
       };

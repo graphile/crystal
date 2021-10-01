@@ -1,23 +1,9 @@
 import chalk from "chalk";
 // import { getAliasFromResolveInfo } from "graphql-parse-resolve-info";
 import debugFactory from "debug";
-import type {
-  GraphQLFieldResolver,
-  GraphQLOutputType,
-  GraphQLResolveInfo,
-} from "graphql";
-import {
-  assertObjectType,
-  defaultFieldResolver,
-  getNamedType,
-  isInterfaceType,
-  isLeafType,
-  isListType,
-  isNonNullType,
-  isUnionType,
-} from "graphql";
+import type { GraphQLFieldResolver, GraphQLResolveInfo } from "graphql";
+import { defaultFieldResolver, getNamedType, isLeafType } from "graphql";
 import type { Path } from "graphql/jsutils/Path";
-import { inspect } from "util";
 
 import { populateValuePlan } from "./aether";
 import * as assert from "./assert";
@@ -25,31 +11,18 @@ import { ROOT_PATH } from "./constants";
 import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint";
 import type { Deferred } from "./deferred";
 import { defer } from "./deferred";
-import { isDev } from "./dev";
 import { establishAether } from "./establishAether";
-import type {
-  Batch,
-  CrystalContext,
-  CrystalObject,
-  IndexByListItemPlanId,
-} from "./interfaces";
-import { $$itemByItemPlanId } from "./interfaces";
-import { $$planResults } from "./interfaces";
-import { $$indexes } from "./interfaces";
+import type { Batch, CrystalContext, CrystalObject } from "./interfaces";
 import {
-  $$concreteData,
   $$concreteType,
   $$crystalContext,
-  $$data,
   $$id,
-  $$indexByListItemPlanId,
   $$pathIdentity,
+  $$planResults,
 } from "./interfaces";
-import type { ExecutablePlan } from "./plan";
 import { PlanResults } from "./planResults";
 import type { __ListItemPlan } from "./plans";
 import { __ValuePlan } from "./plans";
-import { assertPolymorphicData } from "./polymorphic";
 import type { UniqueId } from "./utils";
 import { ROOT_VALUE_OBJECT, uid } from "./utils";
 
@@ -196,6 +169,10 @@ export function crystalWrapResolve<
       const pathIdentity = pathToPathIdentity(path);
       const planId = aether.planIdByPathIdentity[pathIdentity];
       if (planId == null) {
+        throw new Error(
+          "Support for unplanned resolvers is current unimplemented",
+        );
+        /*
         const objectValue = parentCrystalObject
           ? parentCrystalObject[$$data]
           : parentObject;
@@ -206,6 +183,7 @@ export function crystalWrapResolve<
           objectValue,
         );
         return realResolver(objectValue, argumentValues, context, info);
+        */
       }
       const plan = aether.dangerouslyGetPlan(planId);
       assert.ok(
@@ -267,9 +245,6 @@ export function crystalWrapResolve<
           pathIdentity,
         );
         const indexes = pathToIndexes(path);
-        const parentItemByItemPlanId = new Map(
-          crystalContext.rootCrystalObject[$$itemByItemPlanId],
-        );
         const parentPlanResults = new PlanResults(
           crystalContext.rootCrystalObject[$$planResults],
         );
@@ -280,7 +255,6 @@ export function crystalWrapResolve<
           parentId,
           indexes,
           crystalContext,
-          parentItemByItemPlanId,
           parentPlanResults,
         );
         if (!existed) {
@@ -361,14 +335,12 @@ export function newCrystalObject(
   indexes: ReadonlyArray<number>,
   crystalContext: CrystalContext,
   // TODO: remove this?
-  itemByItemPlanId: Map<number, any>,
   planResultsByCommonAncestorPathIdentity: PlanResults,
 ): CrystalObject {
   const crystalObject: CrystalObject = {
     [$$pathIdentity]: pathIdentity,
     [$$concreteType]: typeName,
     [$$id]: id,
-    [$$itemByItemPlanId]: itemByItemPlanId,
     [$$planResults]: planResultsByCommonAncestorPathIdentity,
     [$$crystalContext]: crystalContext,
     // @ts-ignore

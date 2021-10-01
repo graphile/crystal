@@ -42,13 +42,10 @@ declare module "graphql" {
 }
 
 export const $$crystalContext = Symbol("context");
-export const $$data = Symbol("data");
 export const $$planResults = Symbol("planResults");
-export const $$itemByItemPlanId = Symbol("itemByItemPlanId");
 export const $$id = Symbol("id");
 export const $$pathIdentity = Symbol("pathIdentity");
-export const $$indexByListItemPlanId = Symbol("indexByListItemPlanId");
-export const $$indexes = Symbol("indexes");
+
 export const $$concreteType = Symbol("concreteType");
 export const $$concreteData = Symbol("concreteData");
 
