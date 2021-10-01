@@ -434,7 +434,6 @@ export class Aether<
     }
     this.planSelectionSet(
       ROOT_PATH,
-      ROOT_PATH,
       this.trackedRootValuePlan,
       rootType,
       [
@@ -456,7 +455,6 @@ export class Aether<
       throw new Error("No mutation type found in schema");
     }
     this.planSelectionSet(
-      ROOT_PATH,
       ROOT_PATH,
       this.trackedRootValuePlan,
       rootType,
@@ -534,7 +532,6 @@ export class Aether<
       );
       this.planSelectionSet(
         ROOT_PATH,
-        ROOT_PATH,
         subscribePlan,
         rootType,
         [
@@ -548,7 +545,6 @@ export class Aether<
     } else {
       const subscribePlan = this.trackedRootValuePlan;
       this.planSelectionSet(
-        ROOT_PATH,
         ROOT_PATH,
         subscribePlan,
         rootType,
@@ -568,7 +564,6 @@ export class Aether<
    * `GetPolymorphicObjectPlanForType`.
    */
   private planSelectionSet(
-    fieldPathIdentity: string,
     path: string,
     parentPlan: ExecutablePlan,
     objectType: GraphQLObjectType,
@@ -681,7 +676,7 @@ export class Aether<
       this.planIdByPathIdentity[pathIdentity] = plan.id;
 
       const treeNode: TreeNode = {
-        fieldPathIdentity,
+        fieldPathIdentity: pathIdentity,
         pathIdentity,
         groupIds,
         parent: parentTreeNode,
@@ -772,7 +767,6 @@ export class Aether<
       const groupedSubSelections = graphqlMergeSelectionSets(fieldAndGroups);
       if (fieldTypeIsObjectType) {
         this.planSelectionSet(
-          fieldPathIdentity,
           pathIdentity,
           plan,
           fieldType as GraphQLObjectType,
@@ -793,7 +787,6 @@ export class Aether<
               polymorphicPlan.planForType(possibleObjectType),
             );
             this.planSelectionSet(
-              fieldPathIdentity,
               pathIdentity,
               subPlan,
               possibleObjectType,
@@ -2443,7 +2436,7 @@ export class Aether<
 
       // Now, execute the layers to get the result
       const mapResult: MapResult = isScalar
-        ? (clo, data) => data
+        ? (_clo, data) => data
         : isPolymorphic
         ? (clo, data) => {
             assertPolymorphicData(data);
