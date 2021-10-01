@@ -27,6 +27,7 @@ import {
   isObjectType,
   isUnionType,
 } from "graphql";
+import { isAsyncIterable } from "iterall";
 import { inspect } from "util";
 
 import * as assert from "./assert";
@@ -1838,7 +1839,7 @@ export class Aether<
             result[j] = new CrystalError(e);
           }
         }
-        // TODO: do we need 'else if (isAsyncIterator(rawPendingResult)) { ... }'
+        // TODO: do we need 'else if (isAsyncIterable(rawPendingResult)) { ... }'
         else {
           result[j] = rawPendingResult;
         }
@@ -2263,9 +2264,31 @@ export class Aether<
                 });
                 // TODO: we should be optimise this to call executeLayers once, rather than once per crystalLayerObject.
                 return executeLayers(rest, newCLOs, mapResult);
-              }
-              // TODO: else if isAsyncIterator(listResult)... executeLayers ...
-              else {
+              } else if (isAsyncIterable(listResult)) {
+                return (async function* () {
+                  for await (const result of listResult) {
+                    const copy = new PlanResults(
+                      planResultsByCommonAncestorPathIdentity,
+                    );
+                    copy.set(
+                      layerPlan.commonAncestorPathIdentity,
+                      layerPlan.id,
+                      result,
+                    );
+                    const newCLO = newCrystalLayerObject(
+                      parentCrystalObject,
+                      copy,
+                      [...indexes, -1],
+                    );
+                    const [value] = await executeLayers(
+                      rest,
+                      [newCLO],
+                      mapResult,
+                    );
+                    yield value;
+                  }
+                })();
+              } else {
                 if (listResult != null) {
                   console.error(
                     `Expected listResult to be an array, found ${inspect(
