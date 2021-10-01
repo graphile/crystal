@@ -182,7 +182,10 @@ export async function runTestQuery(
     const originalPayloads: Omit<AsyncExecutionResult, "hasNext">[] = [];
     for await (const entry of result) {
       const { hasNext, ...rest } = entry;
-      originalPayloads.push(rest);
+      if (Object.keys(rest).length > 0 || hasNext) {
+        // Do not add the trailing `{hasNext: false}` entry to the snapshot
+        originalPayloads.push(rest);
+      }
       if (entry.errors) {
         if (!errors) {
           errors = [];
