@@ -3,6 +3,7 @@ import debugFactory from "debug";
 import type {
   __ListItemPlan,
   CrystalResultsList,
+  CrystalResultStreamList,
   CrystalValuesList,
 } from "graphile-crystal";
 import {
@@ -19,6 +20,7 @@ import {
   reverse,
   reverseArray,
 } from "graphile-crystal";
+import type { StreamablePlan } from "graphile-crystal/src/plan";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
 
@@ -183,9 +185,10 @@ interface PgSelectOptions<TDataSource> {
  * could be used for that purpose so long as we name the scalars (i.e. create
  * records from them `{a: 1},{a: 2},{a:3}`).
  */
-export class PgSelectPlan<
-  TDataSource extends PgSource<any, any, any, any>,
-> extends ExecutablePlan<ReadonlyArray<TDataSource["TRow"]>> {
+export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
+  extends ExecutablePlan<ReadonlyArray<TDataSource["TRow"]>>
+  implements StreamablePlan<TDataSource["TRow"]>
+{
   // FROM
   private readonly from: SQL | ((...args: SQL[]) => SQL);
 
@@ -859,6 +862,26 @@ export class PgSelectPlan<
 
     const vals = executionResult.values;
     return shouldReverseOrder ? vals.map((arr) => reverseArray(arr)) : vals;
+  }
+
+  /**
+   * Like `execute`, but stream the results via async iterables.
+   */
+  async stream(
+    values: CrystalValuesList<any[]>,
+  ): Promise<CrystalResultStreamList<TDataSource["TRow"]>> {
+    if (!this.finalizeResults) {
+      throw new Error("Cannot stream PgSelectPlan before finalizing it.");
+    }
+    // We're faking this for now just to test the infrastructure.
+    const results = await this.execute(values);
+    return results.map((list) => {
+      return (async function* () {
+        for await (const item of await list) {
+          yield item;
+        }
+      })();
+    });
   }
 
   private buildSelect(
