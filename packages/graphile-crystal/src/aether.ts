@@ -1456,8 +1456,7 @@ export class Aether<
           });
         }
       };
-      const treeNodePlanId =
-        this.itemPlanIdByFieldPathIdentity[treeNode.fieldPathIdentity];
+      const treeNodePlanId = this.planIdByPathIdentity[treeNode.pathIdentity];
       assert.ok(
         treeNodePlanId != null,
         `Could not determine the item plan id for path identity '${treeNode.pathIdentity}'`,
