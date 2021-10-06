@@ -1040,9 +1040,9 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
     return this.first == null && this.last != null;
   }
 
-  private buildOrderBy() {
+  private buildOrderBy({ reverse }: { reverse: boolean }) {
     this._lockParameter("orderBy");
-    const orders = this.shouldReverseOrder()
+    const orders = reverse
       ? this.orders.map((o) => ({
           ...o,
           direction: o.direction === "ASC" ? "DESC" : "ASC",
@@ -1110,11 +1110,13 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
       this.source.applyAuthorizationChecksToPlan(this);
     }
 
+    const reverse = this.shouldReverseOrder();
+
     const { sql: select, extraSelectIndexes } = this.buildSelect(options);
     const { sql: from } = this.buildFrom();
     const { sql: join } = this.buildJoin();
     const { sql: where } = this.buildWhere(options);
-    const { sql: orderBy } = this.buildOrderBy();
+    const { sql: orderBy } = this.buildOrderBy({ reverse });
     const { sql: limit } = this.buildLimit();
     const { sql: offset } = this.buildOffset();
 
