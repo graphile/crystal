@@ -1271,13 +1271,14 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
 
           const identifierIndexOffset =
             extraSelects.push(sql`${alias}.idx`) - 1;
-          const rowNumberIndexOffset = forceOrder
-            ? extraSelects.push(
-                sql`row_number() over (${
-                  this.buildOrderBy({ reverse: false }).sql
-                })`,
-              ) - 1
-            : -1;
+          const rowNumberIndexOffset =
+            forceOrder || limit != null || offset != null
+              ? extraSelects.push(
+                  sql`row_number() over (${
+                    this.buildOrderBy({ reverse: false }).sql
+                  })`,
+                ) - 1
+              : -1;
 
           extraWheres.push(
             ...this.identifierMatches.map(

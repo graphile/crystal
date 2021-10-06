@@ -58,6 +58,9 @@ export function getDirectiveArg(
       case "BooleanValue": {
         return value.value;
       }
+      case "IntValue": {
+        return parseInt(value.value, 10);
+      }
       case "NullValue": {
         return null;
       }
