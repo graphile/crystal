@@ -291,6 +291,21 @@ async function snapshot(actual: string, filePath: string) {
   }
 }
 
+function makeSQLSnapshotSafe(sql: string): string {
+  let count = 0;
+  const aliases = new Map();
+  return sql.replace(/__cursor_([0-9]+)__/g, (_, n) => {
+    const substitute = aliases.get(n);
+    if (substitute != null) {
+      return substitute;
+    } else {
+      const sub = `__SNAPSHOT_CURSOR_${count++}__`;
+      aliases.set(n, sub);
+      return sub;
+    }
+  });
+}
+
 export const assertSnapshotsMatch = async (
   only: "sql" | "result",
   props: {
@@ -318,7 +333,9 @@ export const assertSnapshotsMatch = async (
     await snapshot(formattedData, resultFileName);
   } else if (only === "sql") {
     const sqlFileName = basePath + (ext || "") + ".sql";
-    const formattedQueries = queries.map((q) => q.text).join("\n\n");
+    const formattedQueries = queries
+      .map((q) => makeSQLSnapshotSafe(q.text))
+      .join("\n\n");
     await snapshot(formattedQueries, sqlFileName);
   } else {
     throw new Error(
