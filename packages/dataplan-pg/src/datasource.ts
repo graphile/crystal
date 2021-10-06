@@ -1,5 +1,9 @@
 import chalk from "chalk";
-import type { CrystalValuesList, ObjectPlan } from "graphile-crystal";
+import type {
+  CrystalResultStreamList,
+  CrystalValuesList,
+  ObjectPlan,
+} from "graphile-crystal";
 import { constant } from "graphile-crystal";
 import { arraysMatch, ExecutablePlan } from "graphile-crystal";
 import { __ValuePlan, getCurrentParentPathIdentity } from "graphile-crystal";
@@ -427,6 +431,13 @@ export class PgSource<
     options: PgExecutorOptions,
   ): Promise<{ values: CrystalValuesList<ReadonlyArray<TOutput>> }> {
     return this.executor.executeWithoutCache(values, options);
+  }
+
+  public executeStream<TInput = any, TOutput = any>(
+    values: CrystalValuesList<PgExecutorInput<TInput>>,
+    options: PgExecutorOptions,
+  ): Promise<{ streams: CrystalResultStreamList<TOutput> }> {
+    return this.executor.executeStream(values, options);
   }
 
   public executeMutation<TData>(

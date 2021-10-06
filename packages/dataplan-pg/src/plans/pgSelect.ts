@@ -327,6 +327,15 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
     // The values to feed into the query
     rawSqlValues: SQLRawValue[];
 
+    // The `DECLARE ... CURSOR` query for @stream
+    textForDeclare?: string;
+
+    // The values to feed into the `DECLARE ... CURSOR` query
+    rawSqlValuesForDeclare?: SQLRawValue[];
+
+    // If streaming, what's the initialCount
+    streamInitialCount?: number;
+
     // The column on the result that indicates which group the result belongs to
     identifierIndex: number | null;
 
@@ -884,15 +893,111 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
     if (!this.finalizeResults) {
       throw new Error("Cannot stream PgSelectPlan before finalizing it.");
     }
-    // We're faking this for now just to test the infrastructure.
-    const results = await this.execute(values);
-    return results.map((list) => {
-      return (async function* () {
-        for await (const item of await list) {
-          yield item;
-        }
-      })();
-    });
+    const {
+      text,
+      rawSqlValues,
+      textForDeclare,
+      rawSqlValuesForDeclare,
+      identifierIndex,
+      queryValuesDependencyIndexes,
+      shouldReverseOrder,
+      streamInitialCount,
+    } = this.finalizeResults;
+
+    if (shouldReverseOrder !== false) {
+      throw new Error("shouldReverseOrder must be false for stream");
+    }
+    if (!rawSqlValuesForDeclare || !textForDeclare) {
+      throw new Error("declare query must exist for stream");
+    }
+
+    const initialFetchResult = text
+      ? (
+          await this.source.executeWithoutCache(
+            values.map((value) => {
+              return {
+                // The context is how we'd handle different connections with different claims
+                context: value[this.contextId],
+                queryValues:
+                  identifierIndex != null
+                    ? queryValuesDependencyIndexes.map(
+                        (dependencyIndex) => value[dependencyIndex],
+                      )
+                    : EMPTY_ARRAY,
+              };
+            }),
+            {
+              text,
+              rawSqlValues,
+              identifierIndex,
+              queryValuesSymbol: this.queryValuesSymbol,
+            },
+          )
+        ).values
+      : null;
+
+    const streams = (
+      await this.source.executeStream(
+        values.map((value) => {
+          return {
+            // The context is how we'd handle different connections with different claims
+            context: value[this.contextId],
+            queryValues:
+              identifierIndex != null
+                ? queryValuesDependencyIndexes.map(
+                    (dependencyIndex) => value[dependencyIndex],
+                  )
+                : EMPTY_ARRAY,
+          };
+        }),
+        {
+          text: textForDeclare,
+          rawSqlValues: rawSqlValuesForDeclare,
+          identifierIndex,
+          queryValuesSymbol: this.queryValuesSymbol,
+        },
+      )
+    ).streams;
+
+    if (initialFetchResult) {
+      // Munge the initialCount records into the streams
+
+      return streams.map((stream, idx) => {
+        return (async function* () {
+          const l = initialFetchResult[idx].length;
+          try {
+            for (let i = 0; i < l; i++) {
+              yield initialFetchResult[idx][i];
+            }
+          } finally {
+            // This finally block because we want to release the underlying
+            // stream even if error was thrown during above `yield`s.
+            if (
+              streamInitialCount != null &&
+              streamInitialCount > 0 &&
+              l < streamInitialCount
+            ) {
+              // End the stream here, otherwise GraphQL won't know to stop
+              // waiting for the `initialCount` records.
+
+              // Since we never `for await (...of...)` we must manually release
+              // the stream:
+              const iterator = stream[Symbol.asyncIterator]();
+              iterator.return?.();
+
+              // Now we exit this generator, ending the iterable.
+              // eslint-disable-next-line no-unsafe-finally
+              return;
+            }
+          }
+          for await (const result of stream) {
+            yield result;
+          }
+        })();
+      });
+    } else {
+      return streams;
+    }
   }
 
   private buildSelect(
@@ -1139,49 +1244,102 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
     this.locked = false;
 
     if (!this.isFinalized) {
-      let query: SQL;
-      let identifierIndex: number | null = null;
-      if (this.queryValues.length || this.placeholders.length) {
-        const alias = sql.identifier(Symbol(this.name + "_identifiers"));
+      const makeQuery = ({
+        limit,
+        offset,
+      }: { limit?: number; offset?: number } = {}): {
+        query: SQL;
+        identifierIndex: number | null;
+      } => {
+        const forceOrder =
+          (limit != null || offset != null) && this.shouldReverseOrder();
+        if (this.queryValues.length || this.placeholders.length) {
+          const alias = sql.identifier(Symbol(this.name + "_identifiers"));
 
-        this.placeholders.forEach((placeholder) => {
-          // NOTE: we're adding to `this.identifiers` but NOT to
-          // `this.identifierMatches`.
-          const idx =
-            this.queryValues.push({
-              dependencyIndex: placeholder.dependencyIndex,
-              type: placeholder.type,
-            }) - 1;
-          placeholder.sqlRef.sql = sql`${alias}.${sql.identifier(`id${idx}`)}`;
-        });
+          this.placeholders.forEach((placeholder) => {
+            // NOTE: we're adding to `this.identifiers` but NOT to
+            // `this.identifierMatches`.
+            const idx =
+              this.queryValues.push({
+                dependencyIndex: placeholder.dependencyIndex,
+                type: placeholder.type,
+              }) - 1;
+            placeholder.sqlRef.sql = sql`${alias}.${sql.identifier(
+              `id${idx}`,
+            )}`;
+          });
 
-        const wrapperAlias = sql.identifier(Symbol(this.name + "_result"));
-        const extraSelects: SQL[] = [];
-        const extraWheres: SQL[] = [];
+          const wrapperAlias = sql.identifier(Symbol(this.name + "_result"));
+          const extraSelects: SQL[] = [];
+          const extraWheres: SQL[] = [];
 
-        const identifierIndexOffset = extraSelects.push(sql`${alias}.idx`) - 1;
+          const identifierIndexOffset =
+            extraSelects.push(sql`${alias}.idx`) - 1;
+          const rowNumberIndexOffset = forceOrder
+            ? extraSelects.push(
+                sql`row_number() over (${
+                  this.buildOrderBy({ reverse: false }).sql
+                })`,
+              ) - 1
+            : -1;
 
-        extraWheres.push(
-          ...this.identifierMatches.map(
-            (frag, idx) =>
-              sql`${frag} = ${alias}.${sql.identifier(`id${idx}`)}`,
-          ),
-        );
-        const { sql: baseQuery, extraSelectIndexes } = this.buildQuery({
-          extraSelects,
-          extraWheres,
-        });
-        identifierIndex = extraSelectIndexes[identifierIndexOffset];
+          extraWheres.push(
+            ...this.identifierMatches.map(
+              (frag, idx) =>
+                sql`${frag} = ${alias}.${sql.identifier(`id${idx}`)}`,
+            ),
+          );
+          const { sql: baseQuery, extraSelectIndexes } = this.buildQuery({
+            extraSelects,
+            extraWheres,
+          });
+          const identifierIndex = extraSelectIndexes[identifierIndexOffset];
 
-        // TODO: if the query does not have a limit/offset; should we use an
-        // `inner join` in a flattened query instead of a wrapped query with
-        // `lateral`?
+          const rowNumberIndex =
+            rowNumberIndexOffset >= 0
+              ? extraSelectIndexes[rowNumberIndexOffset]
+              : null;
+          const innerWrapper = sql.identifier(Symbol("stream_wrapped"));
 
-        /*
-         * This wrapper query is necessary so that queries that have a
-         * limit/offset get the limit/offset applied _per identifier group_.
-         */
-        query = sql`select ${wrapperAlias}.*
+          /*
+           * This wrapper around the inner query is for @stream:
+           *
+           * - stream must be in the correct order, so if we have
+           *   `this.shouldReverseOrder()` then we must reverse the order
+           *   ourselves here;
+           * - stream can have an `initialCount` - we want to satisfy all
+           *   `initialCount` records from _each identifier group_ before we then
+           *   resolve the remaining records.
+           *
+           * NOTE: if neither of the above cases apply then we can skip this,
+           * even for @stream.
+           */
+          const wrappedInnerQuery =
+            rowNumberIndex != null ||
+            limit != null ||
+            (offset != null && offset > 0)
+              ? sql`select *\nfrom (${sql.indent(
+                  baseQuery,
+                )}) ${innerWrapper}\norder by ${innerWrapper}.${sql.identifier(
+                  String(rowNumberIndex),
+                )}${
+                  limit != null ? sql`\nlimit ${sql.literal(limit)}` : sql.blank
+                }${
+                  offset != null && offset > 0
+                    ? sql`\noffset ${sql.literal(offset)}`
+                    : sql.blank
+                }`
+              : baseQuery;
+
+          // TODO: if the query does not have a limit/offset; should we use an
+          // `inner join` in a flattened query instead of a wrapped query with
+          // `lateral`?
+
+          /*
+           * This wrapper query is necessary so that queries that have a
+           * limit/offset get the limit/offset applied _per identifier group_.
+           */
+          const query = sql`select ${wrapperAlias}.*
 from (${sql.indent(sql`\
 select\n${sql.indent(sql`\
 ids.ordinality - 1 as idx,
@@ -1194,14 +1352,17 @@ ${sql.join(
   ",\n",
 )}`)}
 from json_array_elements(${sql.value(
-          // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
-          // a value before executing the query.
-          this.queryValuesSymbol as any,
-        )}::json) with ordinality as ids`)}) as ${alias},
-lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
-      } else {
-        ({ sql: query } = this.buildQuery());
-      }
+            // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
+            // a value before executing the query.
+            this.queryValuesSymbol as any,
+          )}::json) with ordinality as ids`)}) as ${alias},
+lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
+          return { query, identifierIndex };
+        } else {
+          const { sql: query } = this.buildQuery();
+          return { query, identifierIndex: null };
+        }
+      };
 
       // The most trivial of optimisations...
       const queryValuesDependencyIndexes = this.queryValues.map(
@@ -1210,20 +1371,71 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
 
       if (this.streamOptions) {
         // When streaming we can't reverse order in JS - we must do it in the DB.
-        const shouldReverseOrder = this.shouldReverseOrder();
-        const flip = sql.identifier(Symbol("flip"));
-        const reorderedQuery = shouldReverseOrder
-          ? sql`with ${flip} as (${query}) select * from ${flip} order by (row_number() over (partition by 1)) desc`
-          : query;
-        const { text, values: rawSqlValues } = sql.compile(reorderedQuery);
-        this.finalizeResults = {
-          text,
-          rawSqlValues,
-          identifierIndex,
-          queryValuesDependencyIndexes,
-          shouldReverseOrder: false,
-        };
+        if (this.streamOptions.initialCount > 0) {
+          /*
+           * Here our stream is constructed of two parts - an
+           * `initialFetchQuery` to satisfy the `initialCount` and then a
+           * `streamQuery` to build the PostgreSQL cursor for fetching the
+           * remaining results across all groups.
+           */
+          const {
+            query: initialFetchQuery,
+            identifierIndex: initialFetchIdentifierIndex,
+          } = makeQuery({
+            limit: this.streamOptions.initialCount,
+          });
+          const { query: streamQuery, identifierIndex: streamIdentifierIndex } =
+            makeQuery({
+              offset: this.streamOptions.initialCount,
+            });
+          if (initialFetchIdentifierIndex !== streamIdentifierIndex) {
+            throw new Error(
+              `GraphileInternalError<3760b02e-dfd0-4924-bf62-2e0ef9399605>: expected identifier indexes to match`,
+            );
+          }
+          const identifierIndex = initialFetchIdentifierIndex;
+          const { text, values: rawSqlValues } = sql.compile(initialFetchQuery);
+          const { text: textForDeclare, values: rawSqlValuesForDeclare } =
+            sql.compile(streamQuery);
+          this.finalizeResults = {
+            text,
+            rawSqlValues,
+            textForDeclare,
+            rawSqlValuesForDeclare,
+            identifierIndex,
+            queryValuesDependencyIndexes,
+            shouldReverseOrder: false,
+            streamInitialCount: this.streamOptions.initialCount,
+          };
+        } else {
+          /*
+           * Unlike the above case, here we have an `initialCount` of zero so
+           * we can skip the `initialFetchQuery` and jump straight to the
+           * `streamQuery`.
+           */
+          const { query: streamQuery, identifierIndex: streamIdentifierIndex } =
+            makeQuery({
+              offset: 0,
+            });
+          const { text: textForDeclare, values: rawSqlValuesForDeclare } =
+            sql.compile(streamQuery);
+          this.finalizeResults = {
+            // This is a hack since this is the _only_ place we don't want
+            // `text`; loosening the types would risk us forgetting in more
+            // places (and cause us to do excessive type safety checks) so we
+            // use an explicit empty string to mark this.
+            text: "",
+            rawSqlValues: [],
+            textForDeclare,
+            rawSqlValuesForDeclare,
+            identifierIndex: streamIdentifierIndex,
+            queryValuesDependencyIndexes,
+            shouldReverseOrder: false,
+            streamInitialCount: 0,
+          };
+        }
       } else {
+        const { query, identifierIndex } = makeQuery();
         const { text, values: rawSqlValues } = sql.compile(query);
         this.finalizeResults = {
           text,
