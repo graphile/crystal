@@ -422,6 +422,13 @@ export class PgSource<
     return this.executor.executeWithCache(values, options);
   }
 
+  public executeWithoutCache<TInput = any, TOutput = any>(
+    values: CrystalValuesList<PgExecutorInput<TInput>>,
+    options: PgExecutorOptions,
+  ): Promise<{ values: CrystalValuesList<ReadonlyArray<TOutput>> }> {
+    return this.executor.executeWithoutCache(values, options);
+  }
+
   public executeMutation<TData>(
     options: PgExecutorMutationOptions,
   ): Promise<PgClientResult<TData>> {

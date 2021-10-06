@@ -177,6 +177,39 @@ ${"👆".repeat(30)}
   ): Promise<{
     values: CrystalValuesList<ReadonlyArray<TOutput>>;
   }> {
+    return this._executeWithOrWithoutCache<TInput, TOutput>(
+      values,
+      common,
+      this.cache,
+    );
+  }
+
+  public async executeWithoutCache<TInput = any, TOutput = any>(
+    values: CrystalValuesList<PgExecutorInput<TInput>>,
+    common: PgExecutorOptions,
+  ): Promise<{
+    values: CrystalValuesList<ReadonlyArray<TOutput>>;
+  }> {
+    return this._executeWithOrWithoutCache<TInput, TOutput>(
+      values,
+      common,
+      new Map(),
+    );
+  }
+
+  private async _executeWithOrWithoutCache<TInput = any, TOutput = any>(
+    values: CrystalValuesList<PgExecutorInput<TInput>>,
+    common: PgExecutorOptions,
+    cache: WeakMap<
+      Record<string, unknown> /* context */,
+      LRU<
+        string /* query and variables */,
+        Map<string /* queryValues (JSON) */, Deferred<any[]>>
+      >
+    >,
+  ): Promise<{
+    values: CrystalValuesList<ReadonlyArray<TOutput>>;
+  }> {
     const { text, rawSqlValues, identifierIndex, queryValuesSymbol } = common;
 
     const valuesCount = values.length;
@@ -211,10 +244,10 @@ ${"👆".repeat(30)}
       promises.push(
         (async () => {
           // TODO: cache must factor in placeholders.
-          let cacheForContext = this.cache.get(context);
+          let cacheForContext = cache.get(context);
           if (!cacheForContext) {
             cacheForContext = new LRU({ maxLength: 500 /* SQL queries */ });
-            this.cache.set(context, cacheForContext);
+            cache.set(context, cacheForContext);
           }
 
           const textAndValues = `${text}\n${JSON.stringify(rawSqlValues)}`;
