@@ -1159,7 +1159,7 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
         const extraSelects: SQL[] = [];
         const extraWheres: SQL[] = [];
 
-        extraSelects.push(sql`${alias}.idx`);
+        const identifierIndexOffset = extraSelects.push(sql`${alias}.idx`) - 1;
 
         extraWheres.push(
           ...this.identifierMatches.map(
@@ -1171,7 +1171,7 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
           extraSelects,
           extraWheres,
         });
-        identifierIndex = extraSelectIndexes[0];
+        identifierIndex = extraSelectIndexes[identifierIndexOffset];
 
         // TODO: if the query does not have a limit/offset; should we use an
         // `inner join` in a flattened query instead of a wrapped query with
