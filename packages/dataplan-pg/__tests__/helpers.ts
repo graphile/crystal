@@ -288,16 +288,22 @@ async function snapshot(actual: string, filePath: string) {
   }
 }
 
+const sqlSnapshotAliases = new Map();
+let sqlSnapshotAliasCount = 0;
+
+beforeEach(() => {
+  sqlSnapshotAliases.clear();
+  sqlSnapshotAliasCount = 0;
+});
+
 function makeSQLSnapshotSafe(sql: string): string {
-  let count = 0;
-  const aliases = new Map();
-  return sql.replace(/__cursor_([0-9]+)__/g, (_, n) => {
-    const substitute = aliases.get(n);
+  return sql.replace(/__cursor_[0-9]+__/g, (t) => {
+    const substitute = sqlSnapshotAliases.get(t);
     if (substitute != null) {
       return substitute;
     } else {
-      const sub = `__SNAPSHOT_CURSOR_${count++}__`;
-      aliases.set(n, sub);
+      const sub = `__SNAPSHOT_CURSOR_${sqlSnapshotAliasCount++}__`;
+      sqlSnapshotAliases.set(t, sub);
       return sub;
     }
   });

@@ -11,6 +11,7 @@ where
   )
 order by __forums__."id" asc
 
+declare __SNAPSHOT_CURSOR_0__ insensitive no scroll cursor without hold for
 select __messages_result__.*
 from (
   select
@@ -36,3 +37,7 @@ lateral (
     )
   order by __messages__."id" asc
 ) as __messages_result__
+
+fetch forward 100 from __SNAPSHOT_CURSOR_0__
+
+close __SNAPSHOT_CURSOR_0__
