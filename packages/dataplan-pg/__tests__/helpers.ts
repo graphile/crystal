@@ -93,12 +93,30 @@ function clientForSettings(
               });
         },
         async startTransaction() {
+          if (this.count <= 0) {
+            throw new Error(
+              "Attempted to start transaction on released client",
+            );
+          }
+          console.log("STARTING TRANSACTION");
           await poolClient.query("savepoint tx");
         },
         async commitTransaction() {
+          if (this.count <= 0) {
+            throw new Error(
+              "Attempted to commit transaction on released client",
+            );
+          }
+          console.log("COMMITTING TRANSACTION");
           await poolClient.query("release savepoint tx");
         },
         async rollbackTransaction() {
+          if (this.count <= 0) {
+            throw new Error(
+              "Attempted to rollback transaction on released client",
+            );
+          }
+          console.log("ROLLING BACK TRANSACTION");
           await poolClient.query("rollback to savepoint tx");
         },
       },
@@ -121,7 +139,9 @@ async function releaseClients() {
     await clientAndRelease.rawPoolClient.query(`rollback`);
     clientAndRelease.rawPoolClient.release();
     if (clientAndRelease.count !== 0) {
-      throw new Error("Client wasn't released right number of times");
+      throw new Error(
+        `Client wasn't released right number of times (missing releases = ${clientAndRelease.count})`,
+      );
     }
   }
   clientMap.clear();
