@@ -1244,6 +1244,19 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
     this.locked = false;
 
     if (!this.isFinalized) {
+      const alias = sql.identifier(Symbol(this.name + "_identifiers"));
+
+      this.placeholders.forEach((placeholder) => {
+        // NOTE: we're adding to `this.identifiers` but NOT to
+        // `this.identifierMatches`.
+        const idx =
+          this.queryValues.push({
+            dependencyIndex: placeholder.dependencyIndex,
+            type: placeholder.type,
+          }) - 1;
+        placeholder.sqlRef.sql = sql`${alias}.${sql.identifier(`id${idx}`)}`;
+      });
+
       const makeQuery = ({
         limit,
         offset,
@@ -1251,25 +1264,8 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
         query: SQL;
         identifierIndex: number | null;
       } => {
-        const forceOrder =
-          (limit != null || offset != null) && this.shouldReverseOrder();
+        const forceOrder = this.streamOptions && this.shouldReverseOrder();
         if (this.queryValues.length || this.placeholders.length) {
-          const alias = sql.identifier(Symbol(this.name + "_identifiers"));
-
-          this.placeholders.forEach((placeholder) => {
-            // NOTE: we're adding to `this.identifiers` but NOT to
-            // `this.identifierMatches`.
-            const idx =
-              this.queryValues.push({
-                dependencyIndex: placeholder.dependencyIndex,
-                type: placeholder.type,
-              }) - 1;
-            placeholder.sqlRef.sql = sql`${alias}.${sql.identifier(
-              `id${idx}`,
-            )}`;
-          });
-
-          const wrapperAlias = sql.identifier(Symbol(this.name + "_result"));
           const extraSelects: SQL[] = [];
           const extraWheres: SQL[] = [];
 
@@ -1335,6 +1331,7 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
           // `inner join` in a flattened query instead of a wrapped query with
           // `lateral`?
 
+          const wrapperAlias = sql.identifier(Symbol(this.name + "_result"));
           /*
            * This wrapper query is necessary so that queries that have a
            * limit/offset get the limit/offset applied _per identifier group_.
