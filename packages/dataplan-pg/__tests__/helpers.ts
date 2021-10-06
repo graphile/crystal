@@ -98,7 +98,6 @@ function clientForSettings(
               "Attempted to start transaction on released client",
             );
           }
-          console.log("STARTING TRANSACTION");
           await poolClient.query("savepoint tx");
         },
         async commitTransaction() {
@@ -107,7 +106,6 @@ function clientForSettings(
               "Attempted to commit transaction on released client",
             );
           }
-          console.log("COMMITTING TRANSACTION");
           await poolClient.query("release savepoint tx");
         },
         async rollbackTransaction() {
@@ -116,7 +114,6 @@ function clientForSettings(
               "Attempted to rollback transaction on released client",
             );
           }
-          console.log("ROLLING BACK TRANSACTION");
           await poolClient.query("rollback to savepoint tx");
         },
       },

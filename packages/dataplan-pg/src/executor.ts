@@ -596,7 +596,6 @@ ${"👆".repeat(30)}
           finished = true;
           tx.resolve();
           executePromise.reject(error);
-          console.log("FINISHED! Because of error.");
           console.error("Error occurred:");
           console.error(error);
           for (let i = 0, l = batch.length; i < l; i++) {
@@ -621,10 +620,8 @@ ${"👆".repeat(30)}
           }
           fetching = true;
           const queryResult = await execute<TOutput>(pullViaCursorSQL, []);
-          console.dir(queryResult);
           const { rows } = queryResult;
           if (rows.length < batchFetchSize) {
-            console.log("FINISHED!");
             finished = true;
             tx.resolve();
           }
