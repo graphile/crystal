@@ -535,13 +535,13 @@ ${"👆".repeat(30)}
         }
 
         // Maximum PostgreSQL identifier length is typically 63 bytes.
-        // Minus the `cursor` text, this leaves 57 characters for this
+        // Minus the `__cursor___` text, this leaves 52 characters for this
         // counter. JS's largest safe integer is 2^53-1 which is 16 digits
-        // long - well under the 57 character limit. Assuming we used 1000
+        // long - well under the 52 character limit. Assuming we used 1000
         // cursors per second every second, it would take us 285k years to
         // exhaust this. Because this is a cursor we control and know is
         // PostgreSQL safe we don't need to escape it.
-        const cursorIdentifier = `cursor${cursorCount++}`;
+        const cursorIdentifier = `__cursor_${cursorCount++}__`;
 
         const batchFetchSize = 100;
 
