@@ -26,6 +26,11 @@ let cursorCount = 0;
 const debug = debugFactory("datasource:pg:PgExecutor");
 const debugVerbose = debug.extend("verbose");
 
+type ExecuteFunction = <TData>(
+  text: string,
+  values: ReadonlyArray<SQLRawValue>,
+) => Promise<PgClientResult<TData>>;
+
 export interface PgClientQuery {
   /** The query string */
   text: string;
@@ -126,24 +131,19 @@ export class PgExecutor {
     return this.contextCallback();
   }
 
-  private async _execute<TData>(
-    context: PgExecutorContext,
+  private async _executeWithClient<TData>(
+    client: PgClient,
     text: string,
     values: ReadonlyArray<SQLRawValue>,
-  ) {
+  ): Promise<PgClientResult<TData>> {
     let queryResult: PgClientResult<TData> | null = null,
       error: any = null;
     try {
-      // TODO: we could probably make this more efficient by grouping the
-      // deferreds further, DataLoader-style, and running one SQL query for
-      // everything.
-      queryResult = await context.withPgClient(context.pgSettings, (client) =>
-        client.query({
-          text,
-          values: values as SQLRawValue[],
-          arrayMode: true,
-        }),
-      );
+      queryResult = await client.query({
+        text,
+        values: values as SQLRawValue[],
+        arrayMode: true,
+      });
     } catch (e) {
       error = e;
     }
@@ -178,6 +178,42 @@ ${"👆".repeat(30)}
       throw new Error("No query result and no error? Impossible.");
     }
     return queryResult;
+  }
+
+  private async _execute<TData>(
+    context: PgExecutorContext,
+    text: string,
+    values: ReadonlyArray<SQLRawValue>,
+  ) {
+    // TODO: we could probably make this more efficient by grouping the
+    // deferreds further, DataLoader-style, and running one SQL query for
+    // everything.
+    return await context.withPgClient(context.pgSettings, (client) =>
+      this._executeWithClient<TData>(client, text, values),
+    );
+  }
+
+  private async withTransaction<T>(
+    context: PgExecutorContext,
+    callback: (execute: ExecuteFunction) => Promise<T>,
+  ): Promise<T> {
+    return await context.withPgClient<T>(
+      context.pgSettings,
+      async (client): Promise<T> => {
+        await client.startTransaction();
+        try {
+          const execute: ExecuteFunction = (text, values) =>
+            this._executeWithClient(client, text, values);
+          const result = await callback(execute);
+
+          await client.commitTransaction();
+          return result;
+        } catch (e) {
+          await client.rollbackTransaction();
+          throw e;
+        }
+      },
+    );
   }
 
   public async executeWithCache<TInput = any, TOutput = any>(
@@ -429,212 +465,229 @@ ${"👆".repeat(30)}
     // For each context, run the relevant fetches
     const promises: Promise<void>[] = [];
     for (const [context, batch] of groupMap.entries()) {
-      promises.push(
-        (async () => {
-          const batchIndexesByIdentifiersJSON = new Map<string, number[]>();
+      const tx = defer();
+      const promise = (async () => {
+        const batchIndexesByIdentifiersJSON = new Map<string, number[]>();
 
-          // Concurrent requests to the same queryValues should result in the same value/execution.
-          const batchSize = batch.length;
-          for (let batchIndex = 0; batchIndex < batchSize; batchIndex++) {
-            const { queryValues } = batch[batchIndex];
-            const identifiersJSON = JSON.stringify(queryValues); // TODO: Canonical? Manual for perf?
-            const existing = batchIndexesByIdentifiersJSON.get(identifiersJSON);
-            if (existing) {
-              existing.push(batchIndex);
-              debugVerbose(
-                "%s served %o again (%o)",
-                this,
-                identifiersJSON,
-                existing,
-              );
-              //results[resultIndex] = existingResult;
-            } else {
-              debugVerbose(
-                "%s no entry for %o, allocating",
-                this,
-                identifiersJSON,
-              );
-              batchIndexesByIdentifiersJSON.set(identifiersJSON, [batchIndex]);
-            }
+        // Concurrent requests to the same queryValues should result in the same value/execution.
+        const batchSize = batch.length;
+        for (let batchIndex = 0; batchIndex < batchSize; batchIndex++) {
+          const { queryValues } = batch[batchIndex];
+          const identifiersJSON = JSON.stringify(queryValues); // TODO: Canonical? Manual for perf?
+          const existing = batchIndexesByIdentifiersJSON.get(identifiersJSON);
+          if (existing) {
+            existing.push(batchIndex);
+            debugVerbose(
+              "%s served %o again (%o)",
+              this,
+              identifiersJSON,
+              existing,
+            );
+            //results[resultIndex] = existingResult;
+          } else {
+            debugVerbose(
+              "%s no entry for %o, allocating",
+              this,
+              identifiersJSON,
+            );
+            batchIndexesByIdentifiersJSON.set(identifiersJSON, [batchIndex]);
           }
+        }
 
-          if (batchIndexesByIdentifiersJSON.size <= 0) {
+        if (batchIndexesByIdentifiersJSON.size <= 0) {
+          throw new Error(
+            "GraphileInternalError<98699a62-cd44-4372-8e92-d730b116a51d>: empty batch doesn't make sense in this context.",
+          );
+        }
+
+        let found = false;
+        const remaining = [...batchIndexesByIdentifiersJSON.keys()];
+        const batchIndexesByValueIndex = [
+          ...batchIndexesByIdentifiersJSON.values(),
+        ];
+
+        // TODO: batchIndexesByIdentifiersJSON = null;
+
+        const sqlValues = rawSqlValues.map((v) => {
+          // THIS IS A DELIBERATE HACK - we are replacing this symbol with a value
+          // before executing the query.
+          if (
+            identifierIndex != null &&
+            queryValuesSymbol != null &&
+            (v as any) === queryValuesSymbol
+          ) {
+            found = true;
+            // Manual JSON-ing
+            return "[" + remaining.join(",") + "]";
+          } else if (typeof v === "symbol") {
+            console.error(formatSQLForDebugging(text));
             throw new Error(
-              "GraphileInternalError<98699a62-cd44-4372-8e92-d730b116a51d>: empty batch doesn't make sense in this context.",
+              `Unhandled symbol when executing query: '${String(v)}'`,
             );
+          } else {
+            return v;
           }
+        });
+        if (identifierIndex != null && !found) {
+          throw new Error(
+            "Query with identifiers was executed, but no identifier reference was found in the values passed",
+          );
+        }
 
-          let found = false;
-          const remaining = [...batchIndexesByIdentifiersJSON.keys()];
-          const batchIndexesByValueIndex = [
-            ...batchIndexesByIdentifiersJSON.values(),
-          ];
+        // Maximum PostgreSQL identifier length is typically 63 bytes.
+        // Minus the `cursor` text, this leaves 57 characters for this
+        // counter. JS's largest safe integer is 2^53-1 which is 16 digits
+        // long - well under the 57 character limit. Assuming we used 1000
+        // cursors per second every second, it would take us 285k years to
+        // exhaust this. Because this is a cursor we control and know is
+        // PostgreSQL safe we don't need to escape it.
+        const cursorIdentifier = `cursor${cursorCount++}`;
 
-          // TODO: batchIndexesByIdentifiersJSON = null;
+        const batchFetchSize = 100;
 
-          const sqlValues = rawSqlValues.map((v) => {
-            // THIS IS A DELIBERATE HACK - we are replacing this symbol with a value
-            // before executing the query.
-            if (
-              identifierIndex != null &&
-              queryValuesSymbol != null &&
-              (v as any) === queryValuesSymbol
-            ) {
-              found = true;
-              // Manual JSON-ing
-              return "[" + remaining.join(",") + "]";
-            } else if (typeof v === "symbol") {
-              console.error(formatSQLForDebugging(text));
-              throw new Error(
-                `Unhandled symbol when executing query: '${String(v)}'`,
-              );
-            } else {
-              return v;
+        const declareCursorSQL = `declare ${cursorIdentifier} insensitive no scroll cursor without hold for\n${text}`;
+        const pullViaCursorSQL = `fetch forward ${batchFetchSize} from ${cursorIdentifier}`;
+        const releaseCursorSQL = `close ${cursorIdentifier}`;
+
+        let deferredStreams = 0;
+        let valuesPending = 0;
+
+        const pending: Array<any[]> = batch.map(() => []);
+        const waiting: Array<Deferred<any> | null> = batch.map(() => null);
+        let finished = false;
+
+        // eslint-disable-next-line no-inner-declarations
+        function getNext(batchIndex: number): Promise<any> | any {
+          if (pending[batchIndex].length > 0) {
+            valuesPending--;
+            if (valuesPending < batchFetchSize && !fetching) {
+              fetchNextBatch().catch(handleFetchError);
             }
-          });
-          if (identifierIndex != null && !found) {
-            throw new Error(
-              "Query with identifiers was executed, but no identifier reference was found in the values passed",
-            );
+            const value = pending[batchIndex].shift();
+            if (value instanceof Wrapped) {
+              return Promise.reject(value.originalValue);
+            } else {
+              return value;
+            }
+          } else {
+            deferredStreams++;
+            waiting[batchIndex] = defer<any>();
           }
+        }
 
-          // Maximum PostgreSQL identifier length is typically 63 bytes.
-          // Minus the `cursor` text, this leaves 57 characters for this
-          // counter. JS's largest safe integer is 2^53-1 which is 16 digits
-          // long - well under the 57 character limit. Assuming we used 1000
-          // cursors per second every second, it would take us 285k years to
-          // exhaust this. Because this is a cursor we control and know is
-          // PostgreSQL safe we don't need to escape it.
-          const cursorIdentifier = `cursor${cursorCount++}`;
-
-          const batchFetchSize = 100;
-
-          const declareCursorSQL = `declare ${cursorIdentifier} insensitive no scroll cursor without hold for\n${text}`;
-          const pullViaCursorSQL = `fetch forward ${batchFetchSize} from ${cursorIdentifier}`;
-          const releaseCursorSQL = `close ${cursorIdentifier}`;
-
-          let deferredStreams = 0;
-          let valuesPending = 0;
-
-          const pending: Array<any[]> = batch.map(() => []);
-          const waiting: Array<Deferred<any> | null> = batch.map(() => null);
-          let finished = false;
-
-          // eslint-disable-next-line no-inner-declarations
-          function getNext(batchIndex: number): Promise<any> | any {
-            if (pending[batchIndex].length > 0) {
-              valuesPending--;
-              if (valuesPending < batchFetchSize && !fetching) {
-                fetchNextBatch().catch(handleFetchError);
-              }
-              const value = pending[batchIndex].shift();
-              if (value instanceof Wrapped) {
-                return Promise.reject(value.originalValue);
-              } else {
-                return value;
-              }
+        // eslint-disable-next-line no-inner-declarations
+        function supplyValue(batchIndex: number, value: any | Wrapped): void {
+          const deferred = waiting[batchIndex];
+          if (deferred) {
+            deferredStreams--;
+            if (value instanceof Wrapped) {
+              deferred.reject(value.originalValue);
             } else {
-              deferredStreams++;
-              waiting[batchIndex] = defer<any>();
+              deferred.resolve(value);
             }
+          } else {
+            valuesPending++;
+            pending[batchIndex].push(value);
           }
+        }
 
-          // eslint-disable-next-line no-inner-declarations
-          function supplyValue(batchIndex: number, value: any | Wrapped): void {
-            const deferred = waiting[batchIndex];
-            if (deferred) {
-              deferredStreams--;
-              if (value instanceof Wrapped) {
-                deferred.reject(value.originalValue);
-              } else {
-                deferred.resolve(value);
-              }
-            } else {
-              valuesPending++;
-              pending[batchIndex].push(value);
-            }
+        const executePromise = defer<ExecuteFunction>();
+        const handleFetchError = (error: Error) => {
+          finished = true;
+          tx.resolve();
+          executePromise.reject(error);
+          console.log("FINISHED! Because of error.");
+          console.error("Error occurred:");
+          console.error(error);
+          for (let i = 0, l = batch.length; i < l; i++) {
+            supplyValue(i, new Wrapped(error));
           }
+        };
 
-          // eslint-disable-next-line no-inner-declarations
-          let fetching = false;
-          const fetchNextBatch = async (): Promise<void> => {
-            if (fetching) {
-              return;
-            }
-            if (finished) {
-              return;
-            }
-            fetching = true;
-            const queryResult = await this._execute<TOutput>(
-              context,
-              pullViaCursorSQL,
-              [],
-            );
-            console.dir(queryResult);
-            const { rows } = queryResult;
-            for (let i = 0, l = rows.length; i < l; i++) {
-              const result = rows[i];
-              const valueIndex =
-                identifierIndex != null ? result[identifierIndex] : 0;
-              const batchIndexes = batchIndexesByValueIndex[valueIndex];
-              if (!batchIndexes) {
-                throw new Error(
-                  `GraphileInternalError<8f513ceb-a3dc-4ec7-9ca1-0f0d4576a22d>: could not determine the identifier JSON for value index '${valueIndex}'`,
-                );
-              }
-              for (let i = 0, l = batchIndexes.length; i < l; i++) {
-                supplyValue(batchIndexes[i], result);
-              }
-            }
-            fetching = false;
-            if (rows.length < batchFetchSize) {
-              finished = true;
-              // We've hit the end of the road
-              for (let i = 0, l = batch.length; i < l; i++) {
-                supplyValue(i, new Wrapped($$FINISHED));
-              }
-            } else {
-              if (valuesPending < batchFetchSize) {
-                fetchNextBatch().catch(handleFetchError);
-              }
-            }
-          };
+        this.withTransaction(context, (_execute) => {
+          executePromise.resolve(_execute);
+          return tx;
+        }).catch(handleFetchError);
+        const execute = await executePromise;
 
-          const handleFetchError = (error: Error) => {
+        // eslint-disable-next-line no-inner-declarations
+        let fetching = false;
+        const fetchNextBatch = async (): Promise<void> => {
+          if (fetching) {
+            return;
+          }
+          if (finished) {
+            return;
+          }
+          fetching = true;
+          const queryResult = await execute<TOutput>(pullViaCursorSQL, []);
+          console.dir(queryResult);
+          const { rows } = queryResult;
+          if (rows.length < batchFetchSize) {
+            console.log("FINISHED!");
             finished = true;
-            for (let i = 0, l = batch.length; i < l; i++) {
-              supplyValue(i, new Wrapped(error));
-            }
-          };
-
-          // Registers the cursor
-          await this._execute<TOutput>(context, declareCursorSQL, sqlValues);
-          // TODO: if the above statement(s) throw an error, is the resulting stream being null okay?
-
-          // Ensure we release the cursor now we've registered it.
-          try {
-            fetchNextBatch().catch(handleFetchError);
-            batch.forEach(({ resultIndex }, batchIndex) => {
-              streams[resultIndex] = (async function* () {
-                try {
-                  for (;;) {
-                    yield await getNext(batchIndex);
-                  }
-                } catch (e) {
-                  if (e === $$FINISHED) {
-                    return;
-                  } else {
-                    throw e;
-                  }
-                }
-              })();
-            });
-          } finally {
-            // Release the cursor
-            await this._execute(context, releaseCursorSQL, []);
+            tx.resolve();
           }
-        })(),
-      );
+          for (let i = 0, l = rows.length; i < l; i++) {
+            const result = rows[i];
+            const valueIndex =
+              identifierIndex != null ? result[identifierIndex] : 0;
+            const batchIndexes = batchIndexesByValueIndex[valueIndex];
+            if (!batchIndexes) {
+              throw new Error(
+                `GraphileInternalError<8f513ceb-a3dc-4ec7-9ca1-0f0d4576a22d>: could not determine the identifier JSON for value index '${valueIndex}'`,
+              );
+            }
+            for (let i = 0, l = batchIndexes.length; i < l; i++) {
+              supplyValue(batchIndexes[i], result);
+            }
+          }
+          fetching = false;
+          if (finished) {
+            // We've hit the end of the road
+            for (let i = 0, l = batch.length; i < l; i++) {
+              supplyValue(i, new Wrapped($$FINISHED));
+            }
+          } else {
+            if (valuesPending < batchFetchSize) {
+              fetchNextBatch().catch(handleFetchError);
+            }
+          }
+        };
+
+        // Registers the cursor
+        await execute<TOutput>(declareCursorSQL, sqlValues);
+        // TODO: if the above statement(s) throw an error, is the resulting stream being null okay?
+
+        // Ensure we release the cursor now we've registered it.
+        try {
+          fetchNextBatch().catch(handleFetchError);
+          batch.forEach(({ resultIndex }, batchIndex) => {
+            streams[resultIndex] = (async function* () {
+              try {
+                for (;;) {
+                  yield await getNext(batchIndex);
+                }
+              } catch (e) {
+                if (e === $$FINISHED) {
+                  return;
+                } else {
+                  throw e;
+                }
+              }
+            })();
+          });
+        } finally {
+          // Release the cursor
+          await execute(releaseCursorSQL, []);
+        }
+      })();
+      promise.catch((e) => {
+        console.error("UNEXPECTED ERROR!");
+        console.error(e);
+        tx.resolve();
+      });
+      promises.push(promise);
     }
 
     // Avoids UnhandledPromiseRejection error.
