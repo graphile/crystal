@@ -333,14 +333,13 @@ export interface FieldAndGroup {
   field: FieldNode;
 }
 
+export interface PlanStreamOptions {
+  initialCount: number;
+}
 export interface PlanOptions {
-  stream: {
-    initialCount: number;
-  } | null;
+  stream: PlanStreamOptions | null;
 }
 
 export interface PlanOptimizeOptions {
-  stream: {
-    initialCount: number;
-  } | null;
+  stream: PlanStreamOptions | null;
 }

@@ -20,6 +20,10 @@ import {
   reverse,
   reverseArray,
 } from "graphile-crystal";
+import type {
+  PlanOptimizeOptions,
+  PlanStreamOptions,
+} from "graphile-crystal/src/interfaces";
 import type { StreamablePlan } from "graphile-crystal/src/plan";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
@@ -304,6 +308,13 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
    * The id for the PostgreSQL context plan.
    */
   private contextId: number;
+
+  /**
+   * If this plan going to stream, the options for the stream (e.g.
+   * initialCount). Set during the `optimize` call - do not trust it before
+   * then. If null then the plan is not expected to stream.
+   */
+  private streamOptions: PlanStreamOptions | null = null;
 
   /**
    * When finalized, we build the SQL query, queryValues, and note where to feed in
@@ -1190,21 +1201,37 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
         ({ sql: query } = this.buildQuery());
       }
 
-      const { text, values: rawSqlValues } = sql.compile(query);
-
       // The most trivial of optimisations...
       const queryValuesDependencyIndexes = this.queryValues.map(
         ({ dependencyIndex }) => dependencyIndex,
       );
 
-      this.finalizeResults = {
-        text,
-        rawSqlValues,
-        identifierIndex,
-        queryValuesDependencyIndexes,
-        // TODO: when streaming we must not set this to true
-        shouldReverseOrder: this.shouldReverseOrder(),
-      };
+      if (this.streamOptions) {
+        // When streaming we can't reverse order in JS - we must do it in the DB.
+        const shouldReverseOrder = this.shouldReverseOrder();
+        const flip = sql.identifier(Symbol("flip"));
+        const reorderedQuery = shouldReverseOrder
+          ? sql`with ${flip} as (${query}) select * from ${flip} order by (row_number() over (partition by 1)) desc`
+          : query;
+        const { text, values: rawSqlValues } = sql.compile(reorderedQuery);
+        this.finalizeResults = {
+          text,
+          rawSqlValues,
+          identifierIndex,
+          queryValuesDependencyIndexes,
+          shouldReverseOrder: false,
+        };
+      } else {
+        const { text, values: rawSqlValues } = sql.compile(query);
+        this.finalizeResults = {
+          text,
+          rawSqlValues,
+          identifierIndex,
+          queryValuesDependencyIndexes,
+          // TODO: when streaming we must not set this to true
+          shouldReverseOrder: this.shouldReverseOrder(),
+        };
+      }
     }
 
     this.locked = true;
@@ -1399,19 +1426,20 @@ lateral (${sql.indent(baseQuery)}) as ${wrapperAlias}`;
     }
   }
 
-  optimize(): ExecutablePlan {
+  optimize({ stream }: PlanOptimizeOptions): ExecutablePlan {
     // In case we have any lock actions in future:
     this.lock();
 
     // Now we need to be able to mess with ourself, but be sure to lock again
     // at the end.
     this.locked = false;
+    this.streamOptions = stream;
 
     // TODO: we should serialize our `SELECT` clauses and then if any are
     // identical we should omit the later copies and have them link back to the
     // earliest version (resolve this in `execute` via mapping).
 
-    if (!this.isInliningForbidden && !this.hasSideEffects) {
+    if (!this.isInliningForbidden && !this.hasSideEffects && !stream) {
       // Inline ourself into our parent if we can.
       let t: PgSelectPlan<any> | null | undefined = undefined;
       let p: ExecutablePlan<any> | undefined = undefined;
