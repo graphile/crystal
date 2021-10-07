@@ -364,7 +364,7 @@ export function objectFieldSpec<
     TArgs
   >,
 ): GraphQLFieldConfig<any, TContext, TArgs> {
-  const { plan, args, ...spec } = graphileSpec;
+  const { plan, subscribePlan, args, ...spec } = graphileSpec;
 
   const argsWithExtensions = args
     ? Object.keys(args).reduce((memo, argName) => {
@@ -387,6 +387,7 @@ export function objectFieldSpec<
     extensions: {
       graphile: {
         plan,
+        subscribePlan,
       },
     },
   };

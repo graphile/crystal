@@ -260,6 +260,12 @@ export type GraphileCrystalFieldConfig<
 > = Omit<GraphQLFieldConfig<any, any>, "args" | "type"> & {
   type: TType;
   plan?: ExecutablePlanResolver<TContext, TArgs, TParentPlan, TFieldPlan>;
+  subscribePlan?: ExecutablePlanResolver<
+    TContext,
+    TArgs,
+    TParentPlan,
+    TFieldPlan
+  >;
   args?: {
     [key: string]: GraphileCrystalArgumentConfig<
       GraphQLInputType,
