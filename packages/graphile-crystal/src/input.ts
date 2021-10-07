@@ -19,6 +19,7 @@ import { inspect } from "util";
 
 import type { Aether } from "./aether";
 import * as assert from "./assert";
+import type { CrystalResultsList, CrystalValuesList } from "./interfaces";
 import { ExecutablePlan } from "./plan";
 import { __TrackedObjectPlan } from "./plans";
 import { defaultValueToValueNode } from "./utils";
@@ -274,7 +275,9 @@ export class InputListPlan extends ExecutablePlan {
 /**
  * Implements `InputStaticLeafPlan`
  */
-export class InputStaticLeafPlan extends ExecutablePlan {
+export class InputStaticLeafPlan<
+  TLeaf extends any = any,
+> extends ExecutablePlan<TLeaf> {
   private readonly coercedValue: any;
   constructor(inputType: GraphQLLeafType, value: ValueNode | undefined) {
     super();
@@ -286,15 +289,15 @@ export class InputStaticLeafPlan extends ExecutablePlan {
     this.coercedValue = value != null ? valueFromAST(value, inputType) : value;
   }
 
-  execute(values: any[][]): any[] {
+  execute(values: CrystalValuesList<[TLeaf]>): CrystalResultsList<TLeaf> {
     return new Array(values.length).fill(this.coercedValue);
   }
 
-  eval(): any {
+  eval(): TLeaf {
     return this.coercedValue;
   }
 
-  evalIs(expectedValue: any): boolean {
+  evalIs(expectedValue: unknown): boolean {
     return this.coercedValue === expectedValue;
   }
 }
