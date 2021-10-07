@@ -35,9 +35,11 @@ export {
   isExecutablePlan,
   isModifierPlan,
   isObjectLikePlan,
+  isStreamablePlan,
   ModifierPlan,
   ObjectLikePlan,
   PolymorphicPlan,
+  StreamablePlan,
 } from "./plan";
 export {
   __ListItemPlan,

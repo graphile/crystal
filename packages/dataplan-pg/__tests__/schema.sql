@@ -35,6 +35,15 @@ create table app_public.messages (
   archived_at timestamptz
 );
 
+create function app_public.tg_messages__announce() returns trigger as $$
+begin
+  perform pg_notify('forum:' || NEW.forum_id::text || ':message', json_build_object('id', NEW.id, 'op', TG_OP)::text);
+  return NEW;
+end;
+$$ language plpgsql volatile;
+create trigger messages_announce after insert or update on app_public.messages
+  for each row execute function app_public.tg_messages__announce();
+
 insert into app_public.users (id, username) values
   ('a11ce000-0000-0000-0000-0000000a11ce','Alice'),
   ('b0b00000-0000-0000-0000-000000000b0b', 'Bob'),
@@ -608,5 +617,7 @@ insert into interfaces_and_unions.person_favourites (id, person_id, liked_person
   (6, 2, null, 7, null),
   (7, 2, null, null, 2),
   (8, 2, null, null, 3);
+
+--------------------------------------------------------------------------------
 
 -- see also sequence_reset.sql

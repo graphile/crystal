@@ -7,10 +7,11 @@ import type {
   ExecutablePlan,
   InputObjectPlan,
   InputStaticLeafPlan,
+  ObjectLikePlan,
 } from "graphile-crystal";
-import { constant } from "graphile-crystal";
 import {
   BasePlan,
+  constant,
   context,
   crystalEnforce,
   each,
@@ -2543,7 +2544,7 @@ export function makeExampleSchema(
           plan(_$root, args) {
             const $item: SingleTableItemPlan = singleTableItemsSource.get({
               id: args.id,
-              type: "TOPIC",
+              type: constant("TOPIC"),
             });
             return $item;
           },
@@ -2938,10 +2939,57 @@ export function makeExampleSchema(
     }),
   );
 
+  const ForumMessageSubscriptionPayload = new GraphQLObjectType(
+    objectSpec<
+      GraphileResolverContext,
+      ObjectLikePlan<{ id: ExecutablePlan<string>; op: ExecutablePlan<string> }>
+    >({
+      name: "ForumMessageSubscriptionPayload",
+      fields: {
+        operationType: {
+          type: GraphQLString,
+          plan($event) {
+            return lambda($event.get("op"), (txt) => String(txt).toLowerCase());
+          },
+        },
+        message: {
+          type: Message,
+          plan($event) {
+            return messageSource.get({ id: $event.get("id") });
+          },
+        },
+      },
+    }),
+  );
+
+  const Subscription = new GraphQLObjectType(
+    objectSpec<GraphileResolverContext, __ValuePlan<BaseGraphQLRootValue>>({
+      name: "Subscription",
+      fields: {
+        forumMessage: {
+          args: {
+            forumId: {
+              type: new GraphQLNonNull(GraphQLString),
+            },
+          },
+          type: ForumMessageSubscriptionPayload,
+          subscribePlan(_$root, args) {
+            const $forumId = args.forumId as InputStaticLeafPlan;
+            return pgSubscribe(lambda($forumId, (id) => `forum:${id}:message`));
+          },
+          plan($event) {
+            return $event;
+          },
+        },
+      },
+    }),
+  );
+
   return crystalEnforce(
     new GraphQLSchema({
       query: Query,
       mutation: Mutation,
+      subscription: Subscription,
       types: [
         // Don't forget to add all types that implement interfaces here
         // otherwise they _might_ not show up in the schema.
