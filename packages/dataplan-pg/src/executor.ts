@@ -97,6 +97,11 @@ export type PgExecutorMutationOptions = {
   values: ReadonlyArray<SQLRawValue>;
 };
 
+export type PgExecutorSubscribeOptions = {
+  context: PgExecutorContext;
+  topic: string;
+};
+
 /**
  * Represents a PostgreSQL database connection, can be used for issuing queries
  * to the database. Used by PgSource but also directly by things like
@@ -705,5 +710,35 @@ ${"👆".repeat(30)}
     this.cache.get(context)?.reset();
 
     return queryResult;
+  }
+
+  public async subscribe<TPayload>(
+    values: CrystalValuesList<PgExecutorSubscribeOptions>,
+  ): Promise<CrystalResultStreamList<TPayload>> {
+    // TODO: we do this `groupMap` pattern a lot, we should pull it out into a helper.
+    // Group by context
+    const groupMap = new Map<
+      PgExecutorContext,
+      Array<{
+        topic: string;
+        resultIndex: number;
+      }>
+    >();
+    for (
+      let resultIndex = 0, l = values.length;
+      resultIndex < l;
+      resultIndex++
+    ) {
+      const { context, topic } = values[resultIndex];
+
+      let entry = groupMap.get(context);
+      if (!entry) {
+        entry = [];
+        groupMap.set(context, entry);
+      }
+      entry.push({ topic, resultIndex });
+    }
+
+    return null;
   }
 }

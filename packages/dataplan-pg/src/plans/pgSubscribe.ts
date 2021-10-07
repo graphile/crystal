@@ -55,7 +55,7 @@ export class PgSubscribePlan<TExecutor extends PgExecutor, TPayload extends any>
   stream(
     values: CrystalValuesList<[any, string]>,
   ): PromiseOrDirect<CrystalResultStreamList<TPayload>> {
-    return this.executor.subscribe(
+    return this.executor.subscribe<TPayload>(
       values.map((value) => ({
         context: value[this.contextId],
         topic: value[this.topicDepId],
