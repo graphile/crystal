@@ -1,4 +1,8 @@
-import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
+import type {
+  CrystalResultsList,
+  CrystalValuesList,
+  ObjectLikePlan,
+} from "graphile-crystal";
 import { ExecutablePlan } from "graphile-crystal";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
@@ -34,7 +38,15 @@ export class PgSelectSinglePlan<
     TDataSource extends PgSource<any, any, any, any>,
   >
   extends ExecutablePlan<TDataSource["TRow"]>
-  implements PgTypedExecutablePlan<TDataSource["codec"]>
+  implements
+    PgTypedExecutablePlan<TDataSource["codec"]>,
+    ObjectLikePlan<
+      {
+        [key in keyof TDataSource["TRow"]]: ExecutablePlan<
+          TDataSource["TRow"][key]
+        >;
+      }
+    >
 {
   public readonly pgCodec: TDataSource["codec"];
   public readonly itemPlanId: number;

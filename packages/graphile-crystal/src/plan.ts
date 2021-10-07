@@ -312,6 +312,28 @@ export function assertExecutablePlan<TData>(
   }
 }
 
+export type ObjectLikePlan<
+  TData extends { [key: string]: ExecutablePlan<any> } = {
+    [key: string]: ExecutablePlan<any>;
+  },
+> = ExecutablePlan<
+  {
+    [key in keyof TData]: TData[key] extends ExecutablePlan<infer U>
+      ? U
+      : never;
+  }
+> & {
+  get<TKey extends keyof TData>(key: TKey): TData[TKey];
+};
+
+export function isObjectLikePlan<
+  TData extends { [key: string]: ExecutablePlan<any> } = {
+    [key: string]: ExecutablePlan<any>;
+  },
+>(plan: ExecutablePlan): plan is ObjectLikePlan<TData> {
+  return "get" in plan && typeof (plan as any).get === "function";
+}
+
 export type StreamablePlan<TData> = ExecutablePlan<ReadonlyArray<TData>> & {
   /**
    * If this plan supports streaming then it should implement this method. It's

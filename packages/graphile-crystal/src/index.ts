@@ -34,7 +34,9 @@ export {
   ExecutablePlan,
   isExecutablePlan,
   isModifierPlan,
+  isObjectLikePlan,
   ModifierPlan,
+  ObjectLikePlan,
   PolymorphicPlan,
 } from "./plan";
 export {
