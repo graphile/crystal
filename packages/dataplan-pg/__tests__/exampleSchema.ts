@@ -1,5 +1,5 @@
 import { writeFileSync } from "fs";
-import type {
+import {
   __TrackedObjectPlan,
   __ValuePlan,
   BaseGraphQLContext,
@@ -8,6 +8,7 @@ import type {
   InputObjectPlan,
   InputStaticLeafPlan,
   ObjectLikePlan,
+  subscribe,
 } from "graphile-crystal";
 import {
   BasePlan,
@@ -2975,7 +2976,9 @@ export function makeExampleSchema(
           type: ForumMessageSubscriptionPayload,
           subscribePlan(_$root, args) {
             const $forumId = args.forumId as InputStaticLeafPlan;
-            return pgSubscribe(lambda($forumId, (id) => `forum:${id}:message`));
+            const $topic = lambda($forumId, (id) => `forum:${id}:message`);
+
+            return subscribe(pgPubsub, $topic);
           },
           plan($event) {
             return $event;

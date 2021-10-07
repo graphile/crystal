@@ -28,6 +28,7 @@ export { list, ListPlan } from "./list";
 export { makeMapper, map, MapPlan } from "./map";
 export { object, ObjectPlan } from "./object";
 export { reverse, reverseArray, ReversePlan } from "./reverse";
+export { subscribe, SubscribePlan } from "./subscribe";
 
 // Internal plans
 export {

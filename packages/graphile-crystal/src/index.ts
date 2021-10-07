@@ -23,6 +23,7 @@ export {
   BaseGraphQLVariables,
   CrystalResultsList,
   CrystalResultStreamList,
+  CrystalSubscriber,
   CrystalValuesList,
   ExecutablePlanResolver,
   GraphileCrystalFieldConfig,
@@ -70,6 +71,8 @@ export {
   reverse,
   reverseArray,
   ReversePlan,
+  subscribe,
+  SubscribePlan,
 } from "./plans";
 export { polymorphicWrap, resolveType } from "./polymorphic";
 export {

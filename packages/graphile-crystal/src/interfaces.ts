@@ -349,3 +349,16 @@ export interface PlanOptions {
 export interface PlanOptimizeOptions {
   stream: PlanStreamOptions | null;
 }
+
+/**
+ * A subscriber provides realtime data, a SubscribePlan can subscribe to a
+ * given topic (string) and will receive an AsyncIterableIterator with messages
+ * published to that topic (standard pub/sub semantics).
+ */
+export type CrystalSubscriber<
+  TTopics extends { [key: string]: any } = { [key: string]: any },
+> = {
+  subscribe<TTopic extends keyof TTopics = keyof TTopics>(
+    topic: TTopic,
+  ): AsyncIterableIterator<TTopics[TTopic]>;
+};
