@@ -27,7 +27,8 @@ lateral (
       __messages__."author_id"::text as "1",
       __messages_identifiers__.idx as "2",
       row_number() over (
-      order by __messages__."id" asc) as "3"
+        order by __messages__."id" asc
+      ) as "3"
     from app_public.messages as __messages__
     where
       (
@@ -58,7 +59,8 @@ lateral (
       __messages__."author_id"::text as "1",
       __messages_identifiers__.idx as "2",
       row_number() over (
-      order by __messages__."id" asc) as "3"
+        order by __messages__."id" asc
+      ) as "3"
     from app_public.messages as __messages__
     where
       (

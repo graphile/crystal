@@ -28,7 +28,8 @@ lateral (
       __users__."gravatar_url"::text as "2",
       __messages_identifiers__.idx as "3",
       row_number() over (
-      order by __messages__."id" asc) as "4"
+        order by __messages__."id" asc
+      ) as "4"
     from app_public.messages as __messages__
     left outer join app_public.users as __users__
     on (__messages__."author_id"::"uuid" = __users__."id")
@@ -62,7 +63,8 @@ lateral (
       __users__."gravatar_url"::text as "2",
       __messages_identifiers__.idx as "3",
       row_number() over (
-      order by __messages__."id" asc) as "4"
+        order by __messages__."id" asc
+      ) as "4"
     from app_public.messages as __messages__
     left outer join app_public.users as __users__
     on (__messages__."author_id"::"uuid" = __users__."id")
