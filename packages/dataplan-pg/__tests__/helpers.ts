@@ -1,10 +1,16 @@
 Error.stackTraceLimit = Infinity;
 import { promises as fsp } from "fs";
 import type { BaseGraphQLContext } from "graphile-crystal";
-import type {
+import {
   AsyncExecutionResult,
+  execute,
   ExecutionPatchResult,
+  getOperationAST,
   GraphQLError,
+  parse,
+  subscribe,
+  validate,
+  validateSchema,
 } from "graphql";
 import { graphql } from "graphql";
 import { isAsyncIterable } from "iterall";
@@ -155,7 +161,13 @@ afterEach(releaseClients);
 export async function runTestQuery(
   source: string,
   variableValues?: { [key: string]: any },
-  options: { deoptimize?: boolean } = Object.create(null),
+  options: {
+    callback?: (
+      client: PoolClient | null,
+      payloads: Omit<AsyncExecutionResult, "hasNext">[],
+    ) => Promise<void>;
+    deoptimize?: boolean;
+  } = Object.create(null),
 ): Promise<{
   payloads?: Array<{
     data?: { [key: string]: any };
@@ -173,8 +185,10 @@ export async function runTestQuery(
 
   const queries: PgClientQuery[] = [];
   const schema = options.deoptimize ? deoptimizedSchema : optimizedSchema;
+  let latestClient: PoolClient | null = null;
   const withPgClient: WithPgClient = async (_pgSettings, callback) => {
     const o = await clientForSettings(_pgSettings, queries);
+    latestClient = o.rawPoolClient;
     try {
       return await callback(o.client);
     } finally {
@@ -186,30 +200,81 @@ export async function runTestQuery(
     withPgClient,
   };
 
-  const result = await graphql({
-    schema,
-    source,
-    variableValues,
-    contextValue,
-    rootValue: null,
-  });
+  const schemaValidationErrors = validateSchema(schema);
+  if (schemaValidationErrors.length > 0) {
+    throw new Error(
+      `Invalid schema: ${schemaValidationErrors
+        .map((e) => String(e))
+        .join(",")}`,
+    );
+  }
+
+  const document = parse(source);
+
+  const operationAST = getOperationAST(document, undefined);
+  const operationType = operationAST.operation;
+
+  const validationErrors = validate(schema, document);
+  if (validationErrors.length > 0) {
+    throw new Error(
+      `Invalid operation document: ${validationErrors
+        .map((e) => String(e))
+        .join(",")}`,
+    );
+  }
+
+  const result =
+    operationType === "subscription"
+      ? await subscribe({
+          schema,
+          document,
+          variableValues,
+          contextValue,
+          rootValue: null,
+        })
+      : await execute({
+          schema,
+          document,
+          variableValues,
+          contextValue,
+          rootValue: null,
+        });
+
   if (isAsyncIterable(result)) {
     let errors: GraphQLError[] | undefined = undefined;
     // hasNext changes based on payload order; remove it.
     const originalPayloads: Omit<AsyncExecutionResult, "hasNext">[] = [];
-    for await (const entry of result) {
-      const { hasNext, ...rest } = entry;
-      if (Object.keys(rest).length > 0 || hasNext) {
-        // Do not add the trailing `{hasNext: false}` entry to the snapshot
-        originalPayloads.push(rest);
-      }
-      if (entry.errors) {
-        if (!errors) {
-          errors = [];
+
+    // Start collecting the payloads
+    const promise = (async () => {
+      for await (const entry of result) {
+        const { hasNext, ...rest } = entry;
+        if (Object.keys(rest).length > 0 || hasNext) {
+          // Do not add the trailing `{hasNext: false}` entry to the snapshot
+          originalPayloads.push(rest);
         }
-        errors.push(...entry.errors);
+        if (entry.errors) {
+          if (!errors) {
+            errors = [];
+          }
+          errors.push(...entry.errors);
+        }
       }
+    })();
+
+    // In parallel to collecting the payloads, run the callback
+    if (options.callback) {
+      await options.callback(latestClient, originalPayloads);
     }
+
+    if (operationType === "subscription") {
+      const iterator = result[Symbol.asyncIterator]();
+      // Terminate the subscription
+      iterator.return?.();
+    }
+
+    // Now wait for all payloads to have been collected
+    await promise;
 
     // Now we're going to reorder the payloads so that they're always in a
     // consistent order for the snapshots.
@@ -263,6 +328,11 @@ export async function runTestQuery(
 
     return { payloads, errors, queries };
   } else {
+    if (options.callback) {
+      throw new Error(
+        "Callback is only appropriate when operation returns an async iterable",
+      );
+    }
     const { data, errors } = result;
     if (errors) {
       console.error(errors[0].originalError || errors[0]);

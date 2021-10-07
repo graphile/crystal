@@ -7,6 +7,7 @@ exports.process = (src, path) => {
   const config = Object.create(null);
   const assertions = [];
   const documentLines = [];
+  const scripts = [];
   for (const line of lines) {
     if (line.startsWith("#>")) {
       const colon = line.indexOf(":");
@@ -20,6 +21,8 @@ exports.process = (src, path) => {
       config[key] = value;
     } else if (line.startsWith("##")) {
       assertions.push(line.substr(2));
+    } else if (line.startsWith("#!")) {
+      scripts.push(line.substr(2));
     } else if (line.match(/^#\s*expect\(/)) {
       throw new Error(
         "Found line that looks like an assertion, but isn't in a '##' comment: '${line}'",
@@ -45,12 +48,28 @@ const config = ${JSON.stringify(config)};
 let result1;
 let result2;
 
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+const waitFor = async (conditionCallback, max = 1000) => {
+  let start = Date.now();
+  while (!conditionCallback()) {
+    if (Date.now() >= start() + max) {
+      throw new Error(\`Waited \${max}ms but condition does not pass\`);
+    }
+    await sleep(10);
+  }
+}
+
+const callback = async (pgClient, payloads) => {
+${scripts.join("\n")}
+};
+
 beforeAll(() => {
   result1 =
-    runTestQuery(document, config.variables, {});
+    runTestQuery(document, config.variables, { callback });
   // Always run result2 after result1 finishes
   result2 = result1.then(() => {}, () => {}).then(() =>
-    runTestQuery(document, config.variables, { deoptimize: true })
+    runTestQuery(document, config.variables, { callback, deoptimize: true })
   );
   // Wait for these promises to resolve, even if it's with errors.
   return Promise.all([result1.catch(e => {}), result2.catch(e => {})]);
