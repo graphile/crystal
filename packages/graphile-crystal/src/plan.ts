@@ -296,9 +296,13 @@ export abstract class ExecutablePlan<TData = any> extends BasePlan {
 }
 
 export function isExecutablePlan<TData = any>(
-  plan: BasePlan,
+  plan: unknown,
 ): plan is ExecutablePlan<TData> {
-  return "execute" in plan && typeof (plan as any).execute === "function";
+  return (
+    plan instanceof BasePlan &&
+    "execute" in plan &&
+    typeof (plan as any).execute === "function"
+  );
 }
 
 export function assertExecutablePlan<TData>(
