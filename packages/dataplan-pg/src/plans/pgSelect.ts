@@ -135,7 +135,7 @@ function assertSensible(plan: ExecutablePlan): void {
   }
 }
 
-interface PgSelectOptions<TDataSource> {
+interface PgSelectOptions<TDataSource extends PgSource<any, any, any, any>> {
   /**
    * Tells us what we're dealing with - data type, columns, where to get it
    * from, what it's called, etc. Many of these details can be overridden
