@@ -1610,6 +1610,18 @@ export function makeExampleSchema(
                   return null;
                 },
               },
+              last: {
+                type: GraphQLInt,
+                plan(
+                  _$root,
+                  $connection: PgConnectionPlan<typeof messageSource>,
+                  $value,
+                ) {
+                  const $messages = $connection.getSubplan();
+                  $messages.setLast($value.eval());
+                  return null;
+                },
+              },
               condition: {
                 type: MessageCondition,
                 plan(
