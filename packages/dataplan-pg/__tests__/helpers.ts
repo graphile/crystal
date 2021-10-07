@@ -1,12 +1,14 @@
 Error.stackTraceLimit = Infinity;
 import { promises as fsp } from "fs";
 import type { BaseGraphQLContext } from "graphile-crystal";
-import {
+import type {
   AsyncExecutionResult,
-  execute,
   ExecutionPatchResult,
-  getOperationAST,
   GraphQLError,
+} from "graphql";
+import {
+  execute,
+  getOperationAST,
   parse,
   subscribe,
   validate,
