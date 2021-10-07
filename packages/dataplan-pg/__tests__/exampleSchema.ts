@@ -1,15 +1,17 @@
 import { writeFileSync } from "fs";
-import {
+import type {
   __TrackedObjectPlan,
   __ValuePlan,
+  AccessPlan,
   BaseGraphQLContext,
   BaseGraphQLRootValue,
+  CrystalSubscriber,
   ExecutablePlan,
   InputObjectPlan,
   InputStaticLeafPlan,
   ObjectLikePlan,
-  subscribe,
 } from "graphile-crystal";
+import { subscribe } from "graphile-crystal";
 import {
   BasePlan,
   constant,
@@ -2975,10 +2977,13 @@ export function makeExampleSchema(
           },
           type: ForumMessageSubscriptionPayload,
           subscribePlan(_$root, args) {
-            const $forumId = args.forumId as InputStaticLeafPlan;
+            const $forumId = args.forumId as InputStaticLeafPlan<number>;
             const $topic = lambda($forumId, (id) => `forum:${id}:message`);
+            const $pgPubsub = context().get(
+              "pgPubsub",
+            ) as AccessPlan<CrystalSubscriber>;
 
-            return subscribe(pgPubsub, $topic);
+            return subscribe($pgPubsub, $topic);
           },
           plan($event) {
             return $event;
