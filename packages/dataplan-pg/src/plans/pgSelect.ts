@@ -1274,9 +1274,9 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
           const rowNumberIndexOffset =
             forceOrder || limit != null || offset != null
               ? extraSelects.push(
-                  sql`row_number() over (${
-                    this.buildOrderBy({ reverse: false }).sql
-                  })`,
+                  sql`row_number() over (${sql.indent(
+                    this.buildOrderBy({ reverse: false }).sql,
+                  )})`,
                 ) - 1
               : -1;
 

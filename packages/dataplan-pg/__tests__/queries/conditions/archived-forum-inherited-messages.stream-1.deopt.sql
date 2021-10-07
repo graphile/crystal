@@ -21,18 +21,25 @@ from (
   from json_array_elements($1::json) with ordinality as ids
 ) as __messages_identifiers__,
 lateral (
-  select
-    __messages__."body"::text as "0",
-    __messages__."author_id"::text as "1",
-    __messages_identifiers__.idx as "2"
-  from app_public.messages as __messages__
-  where
-    (
-      (__messages__.archived_at is null) = (__messages_identifiers__."id1" is null)
-    ) and (
-      __messages__."forum_id" = __messages_identifiers__."id0"
-    )
-  order by __messages__."id" asc
+  select *
+  from (
+    select
+      __messages__."body"::text as "0",
+      __messages__."author_id"::text as "1",
+      __messages_identifiers__.idx as "2",
+      row_number() over (
+        order by __messages__."id" asc
+      ) as "3"
+    from app_public.messages as __messages__
+    where
+      (
+        (__messages__.archived_at is null) = (__messages_identifiers__."id1" is null)
+      ) and (
+        __messages__."forum_id" = __messages_identifiers__."id0"
+      )
+    order by __messages__."id" asc
+  ) __stream_wrapped__
+  order by __stream_wrapped__."3"
 ) as __messages_result__
 
 fetch forward 100 from __SNAPSHOT_CURSOR_0__
