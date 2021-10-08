@@ -30,6 +30,7 @@ export {
   WithPgClient,
 } from "./executor";
 export { PgTypeCodec } from "./interfaces";
+export { PgSubscriber } from "./PgSubscriber";
 export {
   pgClassExpression,
   PgClassExpressionPlan,

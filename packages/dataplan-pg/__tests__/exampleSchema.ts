@@ -57,6 +57,7 @@ import type {
   PgSelectPlan,
   PgSourceColumn,
   PgSourceColumnVia,
+  PgSubscriber,
   PgTypeCodec,
   WithPgClient,
 } from "../src";
@@ -95,6 +96,7 @@ declare module "graphile-crystal" {
   interface BaseGraphQLContext {
     pgSettings: { [key: string]: string };
     withPgClient: WithPgClient;
+    pgSubscriber: PgSubscriber;
   }
 }
 
@@ -3012,11 +3014,11 @@ export function makeExampleSchema(
           subscribePlan(_$root, args) {
             const $forumId = args.forumId as InputStaticLeafPlan<number>;
             const $topic = lambda($forumId, (id) => `forum:${id}:message`);
-            const $pgPubsub = context().get(
-              "pgPubsub",
+            const $pgSubscriber = context().get(
+              "pgSubscriber",
             ) as AccessPlan<CrystalSubscriber>;
 
-            return subscribe($pgPubsub, $topic, jsonParse);
+            return subscribe($pgSubscriber, $topic, jsonParse);
           },
           plan($event) {
             return $event;

@@ -1,0 +1,211 @@
+import EventEmitter from "events";
+import type { CrystalSubscriber, Deferred } from "graphile-crystal";
+import { defer } from "graphile-crystal";
+import type { Pool, PoolClient } from "pg";
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export class PgSubscriber<
+  TTopics extends { [key: string]: string } = { [key: string]: string },
+> implements CrystalSubscriber<TTopics>
+{
+  private topics: { [topic in keyof TTopics]?: AsyncIterableIterator<any>[] } =
+    {};
+  private eventEmitter = new EventEmitter();
+  private alive = true;
+
+  constructor(private pool: Pool) {}
+
+  subscribe<TTopic extends keyof TTopics>(
+    topic: TTopic,
+  ): AsyncIterableIterator<TTopics[TTopic]> {
+    if (!this.alive) {
+      throw new Error("This PgSubscriber has been released.");
+    }
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const that = this;
+    const { eventEmitter, topics } = this;
+    const asyncIterableIterator = (async function* () {
+      let waiting: Deferred<any> | null = null;
+      const stack: any[] = [];
+      function recv(payload: any) {
+        if (waiting) {
+          waiting.resolve(payload);
+          waiting = null;
+        } else {
+          stack.push(payload);
+        }
+      }
+      eventEmitter.addListener(topic as string, recv);
+      try {
+        while (true) {
+          if (stack.length) {
+            yield stack.shift();
+          } else {
+            waiting = defer();
+            yield await waiting;
+          }
+        }
+      } finally {
+        eventEmitter.removeListener(topic as string, recv);
+        // Every code path above this has to go through a `yield` and thus
+        // `asyncIterableIterator` will definitely be defined.
+        const idx = topics[topic]?.indexOf(asyncIterableIterator!);
+        if (idx != null && idx >= 0) {
+          topics[topic]!.splice(idx, 1);
+          if (topics[topic]!.length === 0) {
+            delete topics[topic];
+            that.unlisten(topic);
+          }
+        }
+      }
+    })();
+    if (!topics[topic]) {
+      topics[topic] = [asyncIterableIterator];
+      this.listen(topic);
+    } else {
+      topics[topic]!.push(asyncIterableIterator);
+    }
+    return asyncIterableIterator;
+  }
+
+  private listen<TTopic extends keyof TTopics>(_topic: TTopic) {
+    this.sync();
+  }
+
+  private unlisten<TTopic extends keyof TTopics>(_topic: TTopic) {
+    this.sync();
+  }
+
+  private subscribedTopics = new Set<string>();
+  private sync() {
+    this.chain(async () => {
+      const client = await this.getClient();
+      await this.syncWithClient(client);
+    }).catch((e) => this.resetClient());
+  }
+
+  private async syncWithClient(client: PoolClient) {
+    if (!this.alive) {
+      throw new Error("PgSubscriber released; aborting syncWithClient");
+    }
+    const expectedTopics = Object.keys(this.topics);
+    const topicsToAdd = expectedTopics.filter(
+      (t) => !this.subscribedTopics.has(t),
+    );
+    const topicsToRemove = [...this.subscribedTopics.values()].filter(
+      (t) => !expectedTopics.includes(t),
+    );
+    for (const topic of topicsToAdd) {
+      await client.query("select pg_listen($1)", [topic]);
+      this.subscribedTopics.add(topic);
+    }
+    for (const topic of topicsToRemove) {
+      await client.query("select pg_unlisten($1)", [topic]);
+      this.subscribedTopics.delete(topic);
+    }
+  }
+
+  private resetClient() {
+    if (!this.alive) {
+      return;
+    }
+    this.chain(() => {
+      const client = this.listeningClient;
+      if (client) {
+        this.listeningClient = null;
+        this.subscribedTopics.clear();
+        if (this.listeningClientPromise) {
+          throw new Error(
+            "This should not occur (found listeningClientPromise in resetClient)",
+          );
+        }
+        if (Object.keys(this.topics).length > 0) {
+          // Trigger a new client to be fetched and have it sync.
+          this.getClient();
+        }
+      }
+    });
+  }
+
+  private listeningClient: PoolClient | null = null;
+  private listeningClientPromise: Promise<PoolClient> | null = null;
+  private getClient(): PoolClient | Promise<PoolClient> {
+    if (this.listeningClient) {
+      return this.listeningClient;
+    } else {
+      if (!this.listeningClientPromise) {
+        const promise = (async () => {
+          for (let attempts = 0; ; attempts++) {
+            try {
+              if (!this.alive) {
+                return Promise.reject(
+                  new Error("PgSubscriber released; aborting getClient"),
+                );
+              }
+              const client = await this.pool.connect();
+              const logError = (e: Error) => {
+                console.error(`Error on listening client: ${e}`);
+              };
+              client.on("error", logError);
+              await this.syncWithClient(client);
+
+              // All good; we can return this client finally!
+              this.listeningClientPromise = null;
+              this.listeningClient = client;
+              client.off("error", logError);
+              client.on("error", (e) => {
+                logError(e);
+                this.resetClient();
+              });
+              return client;
+            } catch (e) {
+              console.error(
+                `Error with listening client during getClient (attempt ${
+                  attempts + 1
+                }): ${e}`,
+              );
+              // Exponential back-off (maximum 30 seconds)
+              await sleep(Math.min(100 * Math.exp(attempts), 30000));
+            }
+          }
+        })();
+        this.listeningClientPromise = promise;
+        return promise;
+      } else {
+        return this.listeningClientPromise;
+      }
+    }
+  }
+
+  public release(): void {
+    if (this.alive) {
+      this.alive = false;
+      for (const topic of Object.keys(this.topics)) {
+        for (const asyncIterableIterator of this.topics[topic]!) {
+          if (asyncIterableIterator.return) {
+            asyncIterableIterator.return();
+          } else if (asyncIterableIterator.throw) {
+            asyncIterableIterator.throw(new Error("Released"));
+          } else {
+            console.error(
+              `Could not return or throw from iterator for topic '${topic}'`,
+            );
+          }
+        }
+        delete this.topics[topic];
+      }
+      this.sync();
+      if (this.listeningClient) {
+        this.listeningClient.release();
+      }
+    }
+  }
+
+  // Avoid race conditions by chaining everything
+  private promise: Promise<void> = Promise.resolve();
+  private async chain(callback: () => void | Promise<void>) {
+    this.promise = this.promise.finally(callback);
+    return this.promise;
+  }
+}

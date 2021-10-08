@@ -1,6 +1,6 @@
 Error.stackTraceLimit = Infinity;
 import { promises as fsp } from "fs";
-import type { BaseGraphQLContext } from "graphile-crystal";
+import type { BaseGraphQLContext, CrystalSubscriber } from "graphile-crystal";
 import type {
   AsyncExecutionResult,
   ExecutionPatchResult,
@@ -22,6 +22,8 @@ import { Pool } from "pg";
 import prettier from "prettier";
 
 import type { PgClient, PgClientQuery, WithPgClient } from "../src";
+import { PgSubscriber } from "../src";
+import type { PgClientResult } from "../src/executor";
 import { makeExampleSchema, schema as optimizedSchema } from "./exampleSchema";
 
 export const UPDATE_SNAPSHOTS = process.env.UPDATE_SNAPSHOTS === "1";
@@ -39,6 +41,91 @@ afterAll(() => {
   testPool.end();
   testPool = null;
 });
+
+function makeWithTestPgClient(queries: PgClientQuery[]): WithPgClient {
+  return async (pgSettings, callback) => {
+    const poolClient = await testPool.connect();
+    const pgSettingsEntries = Object.entries(pgSettings);
+
+    const q = async <TData>(
+      opts: PgClientQuery,
+    ): Promise<PgClientResult<TData>> => {
+      queries.push(opts);
+      const { text, values, arrayMode, name } = opts;
+      return arrayMode
+        ? await poolClient.query<TData extends Array<any> ? TData : never>({
+            text,
+            values,
+            name,
+            rowMode: "array",
+          })
+        : await poolClient.query<TData>({
+            text,
+            values,
+            name,
+          });
+    };
+
+    /** Transaction level; 0 = no transaction; 1 = begin; 2,... = savepoint */
+    let txLevel = 0;
+    try {
+      const client: PgClient = {
+        async query<TData>(opts: PgClientQuery) {
+          const needsTx = txLevel === 0 && pgSettingsEntries.length > 0;
+          try {
+            if (needsTx) {
+              await this.startTransaction();
+            }
+            const result = await q<TData>(opts);
+
+            if (needsTx) {
+              await this.commitTransaction();
+            }
+            return result;
+          } catch (e) {
+            if (needsTx) {
+              await this.rollbackTransaction();
+            }
+            throw e;
+          }
+        },
+        async startTransaction() {
+          if (txLevel === 0) {
+            await poolClient.query("begin");
+            if (pgSettingsEntries.length > 0) {
+              await q({
+                text: "select set_config(el->>0, el->>1, true) from json_array_elements($1::json)",
+                values: [pgSettingsEntries],
+              });
+            }
+          } else {
+            await q({ text: `savepoint tx${txLevel}` });
+          }
+          txLevel++;
+        },
+        async commitTransaction() {
+          txLevel--;
+          if (txLevel === 0) {
+            await q({ text: "commit" });
+          } else {
+            await q({ text: `release savepoint tx${txLevel}` });
+          }
+        },
+        async rollbackTransaction() {
+          txLevel--;
+          if (txLevel === 0) {
+            await q({ text: "rollback" });
+          } else {
+            await q({ text: `rollback to savepoint tx${txLevel}` });
+          }
+        },
+      };
+      return await callback(client);
+    } finally {
+      poolClient.release();
+    }
+  };
+}
 
 type ClientAndRelease = {
   count: number;
@@ -162,7 +249,10 @@ afterEach(releaseClients);
 
 export async function runTestQuery(
   source: string,
-  variableValues?: { [key: string]: any },
+  config: {
+    variableValues?: { [key: string]: any };
+    directPg?: boolean;
+  },
   options: {
     callback?: (
       client: PoolClient | null,
@@ -179,6 +269,7 @@ export async function runTestQuery(
   errors?: readonly GraphQLError[];
   queries: PgClientQuery[];
 }> {
+  const { variableValues } = config;
   // Do not allow queries to run in parallel during these tests, we need
   // reproducibility (and we don't want to mess with the transactions, see
   // releaseClients below).
@@ -188,158 +279,166 @@ export async function runTestQuery(
   const queries: PgClientQuery[] = [];
   const schema = options.deoptimize ? deoptimizedSchema : optimizedSchema;
   let latestClient: PoolClient | null = null;
-  const withPgClient: WithPgClient = async (_pgSettings, callback) => {
-    const o = await clientForSettings(_pgSettings, queries);
-    latestClient = o.rawPoolClient;
-    try {
-      return await callback(o.client);
-    } finally {
-      o.release();
-    }
-  };
-  const contextValue: BaseGraphQLContext = {
-    pgSettings: {},
-    withPgClient,
-  };
-
-  const schemaValidationErrors = validateSchema(schema);
-  if (schemaValidationErrors.length > 0) {
-    throw new Error(
-      `Invalid schema: ${schemaValidationErrors
-        .map((e) => String(e))
-        .join(",")}`,
-    );
-  }
-
-  const document = parse(source);
-
-  const operationAST = getOperationAST(document, undefined);
-  const operationType = operationAST.operation;
-
-  const validationErrors = validate(schema, document);
-  if (validationErrors.length > 0) {
-    throw new Error(
-      `Invalid operation document: ${validationErrors
-        .map((e) => String(e))
-        .join(",")}`,
-    );
-  }
-
-  const result =
-    operationType === "subscription"
-      ? await subscribe({
-          schema,
-          document,
-          variableValues,
-          contextValue,
-          rootValue: null,
-        })
-      : await execute({
-          schema,
-          document,
-          variableValues,
-          contextValue,
-          rootValue: null,
-        });
-
-  if (isAsyncIterable(result)) {
-    let errors: GraphQLError[] | undefined = undefined;
-    // hasNext changes based on payload order; remove it.
-    const originalPayloads: Omit<AsyncExecutionResult, "hasNext">[] = [];
-
-    // Start collecting the payloads
-    const promise = (async () => {
-      for await (const entry of result) {
-        const { hasNext, ...rest } = entry;
-        if (Object.keys(rest).length > 0 || hasNext) {
-          // Do not add the trailing `{hasNext: false}` entry to the snapshot
-          originalPayloads.push(rest);
+  const withPgClient: WithPgClient = config.directPg
+    ? makeWithTestPgClient(queries)
+    : async (pgSettings, callback) => {
+        const o = await clientForSettings(pgSettings, queries);
+        latestClient = o.rawPoolClient;
+        try {
+          return await callback(o.client);
+        } finally {
+          o.release();
         }
-        if (entry.errors) {
-          if (!errors) {
-            errors = [];
-          }
-          errors.push(...entry.errors);
-        }
-      }
-    })();
-
-    // In parallel to collecting the payloads, run the callback
-    if (options.callback) {
-      await options.callback(latestClient, originalPayloads);
-    }
-
-    if (operationType === "subscription") {
-      const iterator = result[Symbol.asyncIterator]();
-      // Terminate the subscription
-      iterator.return?.();
-    }
-
-    // Now wait for all payloads to have been collected
-    await promise;
-
-    // Now we're going to reorder the payloads so that they're always in a
-    // consistent order for the snapshots.
-    const sortPayloads = (
-      payload1: ExecutionPatchResult,
-      payload2: ExecutionPatchResult,
-    ) => {
-      const ONE_AFTER_TWO = 1;
-      const ONE_BEFORE_TWO = -1;
-      if (!payload1.path) {
-        return 0;
-      }
-      if (!payload2.path) {
-        return 0;
-      }
-
-      // Make it so we can assume payload1 has the longer (or equal) path
-      if (payload2.path.length > payload1.path.length) {
-        return -sortPayloads(payload2, payload1);
-      }
-
-      for (let i = 0, l = payload1.path.length; i < l; i++) {
-        let key1 = payload1.path[i];
-        let key2 = payload2.path[i];
-        if (key2 === undefined) {
-          return ONE_AFTER_TWO;
-        }
-        if (key1 === key2) {
-          /* continue */
-        } else if (typeof key1 === "number" && typeof key2 === "number") {
-          const res = key1 - key2;
-          if (res !== 0) {
-            return res;
-          }
-        } else if (typeof key1 === "string" && typeof key2 === "string") {
-          const res = key1.localeCompare(key2);
-          if (res !== 0) {
-            return res;
-          }
-        } else {
-          throw new Error("Type mismatch");
-        }
-      }
-      // We should do canonical JSON... but whatever.
-      return JSON.stringify(payload1).localeCompare(JSON.stringify(payload2));
+      };
+  const pgSubscriber = new PgSubscriber(testPool);
+  try {
+    const contextValue: BaseGraphQLContext = {
+      pgSettings: {},
+      withPgClient,
+      pgSubscriber,
     };
-    const payloads = [
-      originalPayloads[0],
-      ...originalPayloads.slice(1).sort(sortPayloads),
-    ];
 
-    return { payloads, errors, queries };
-  } else {
-    const { data, errors } = result;
-    if (errors) {
-      console.error(errors[0].originalError || errors[0]);
-    }
-    if (options.callback) {
+    const schemaValidationErrors = validateSchema(schema);
+    if (schemaValidationErrors.length > 0) {
       throw new Error(
-        "Callback is only appropriate when operation returns an async iterable",
+        `Invalid schema: ${schemaValidationErrors
+          .map((e) => String(e))
+          .join(",")}`,
       );
     }
-    return { data, errors, queries };
+
+    const document = parse(source);
+
+    const operationAST = getOperationAST(document, undefined);
+    const operationType = operationAST.operation;
+
+    const validationErrors = validate(schema, document);
+    if (validationErrors.length > 0) {
+      throw new Error(
+        `Invalid operation document: ${validationErrors
+          .map((e) => String(e))
+          .join(",")}`,
+      );
+    }
+
+    const result =
+      operationType === "subscription"
+        ? await subscribe({
+            schema,
+            document,
+            variableValues,
+            contextValue,
+            rootValue: null,
+          })
+        : await execute({
+            schema,
+            document,
+            variableValues,
+            contextValue,
+            rootValue: null,
+          });
+
+    if (isAsyncIterable(result)) {
+      let errors: GraphQLError[] | undefined = undefined;
+      // hasNext changes based on payload order; remove it.
+      const originalPayloads: Omit<AsyncExecutionResult, "hasNext">[] = [];
+
+      // Start collecting the payloads
+      const promise = (async () => {
+        for await (const entry of result) {
+          const { hasNext, ...rest } = entry;
+          if (Object.keys(rest).length > 0 || hasNext) {
+            // Do not add the trailing `{hasNext: false}` entry to the snapshot
+            originalPayloads.push(rest);
+          }
+          if (entry.errors) {
+            if (!errors) {
+              errors = [];
+            }
+            errors.push(...entry.errors);
+          }
+        }
+      })();
+
+      // In parallel to collecting the payloads, run the callback
+      if (options.callback) {
+        await options.callback(latestClient, originalPayloads);
+      }
+
+      if (operationType === "subscription") {
+        const iterator = result[Symbol.asyncIterator]();
+        // Terminate the subscription
+        iterator.return?.();
+      }
+
+      // Now wait for all payloads to have been collected
+      await promise;
+
+      // Now we're going to reorder the payloads so that they're always in a
+      // consistent order for the snapshots.
+      const sortPayloads = (
+        payload1: ExecutionPatchResult,
+        payload2: ExecutionPatchResult,
+      ) => {
+        const ONE_AFTER_TWO = 1;
+        const ONE_BEFORE_TWO = -1;
+        if (!payload1.path) {
+          return 0;
+        }
+        if (!payload2.path) {
+          return 0;
+        }
+
+        // Make it so we can assume payload1 has the longer (or equal) path
+        if (payload2.path.length > payload1.path.length) {
+          return -sortPayloads(payload2, payload1);
+        }
+
+        for (let i = 0, l = payload1.path.length; i < l; i++) {
+          let key1 = payload1.path[i];
+          let key2 = payload2.path[i];
+          if (key2 === undefined) {
+            return ONE_AFTER_TWO;
+          }
+          if (key1 === key2) {
+            /* continue */
+          } else if (typeof key1 === "number" && typeof key2 === "number") {
+            const res = key1 - key2;
+            if (res !== 0) {
+              return res;
+            }
+          } else if (typeof key1 === "string" && typeof key2 === "string") {
+            const res = key1.localeCompare(key2);
+            if (res !== 0) {
+              return res;
+            }
+          } else {
+            throw new Error("Type mismatch");
+          }
+        }
+        // We should do canonical JSON... but whatever.
+        return JSON.stringify(payload1).localeCompare(JSON.stringify(payload2));
+      };
+      const payloads = [
+        originalPayloads[0],
+        ...originalPayloads.slice(1).sort(sortPayloads),
+      ];
+
+      return { payloads, errors, queries };
+    } else {
+      const { data, errors } = result;
+      if (errors) {
+        console.error(errors[0].originalError || errors[0]);
+      }
+      if (options.callback) {
+        throw new Error(
+          "Callback is only appropriate when operation returns an async iterable",
+        );
+      }
+      return { data, errors, queries };
+    }
+  } finally {
+    pgSubscriber.release();
   }
 }
 
