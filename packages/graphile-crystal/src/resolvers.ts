@@ -6,7 +6,7 @@ import { defaultFieldResolver, getNamedType, isLeafType } from "graphql";
 import type { Path } from "graphql/jsutils/Path";
 import { inspect } from "util";
 
-import { populateValuePlan } from "./aether";
+// import { populateValuePlan } from "./aether";
 import * as assert from "./assert";
 import { ROOT_PATH } from "./constants";
 import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint";
@@ -84,154 +84,60 @@ function pathToIndexes(initialPath: Path): ReadonlyArray<number> {
 
 export const $$crystalWrapped = Symbol("crystalWrappedResolver");
 
-/**
- * Given a `resolve` function, wraps the function so that it can perform the
- * `ResolveFieldValueCrystal` algorithm.
- *
- * @param resolve - The resolver function.
- */
-export function crystalWrapResolve<
-  TSource extends object | null | undefined,
-  TContext extends object,
-  TArgs = { [argName: string]: any },
->(
-  resolve: GraphQLFieldResolver<
-    TSource,
-    TContext,
-    TArgs
-  > = defaultFieldResolver,
-): GraphQLFieldResolver<TSource, TContext, TArgs> {
-  const realResolver = resolve || defaultFieldResolver;
-  if (realResolver[$$crystalWrapped]) {
-    throw Object.assign(
-      new Error("ETOOMUCHBLING: this resolver is already wrapped in crystals."),
-      { code: "ETOOMUCHBLING" },
+const getAetherFromResolver = <TContext extends object>(
+  context: TContext,
+  info: GraphQLResolveInfo,
+) => {
+  // Note: in the ResolveFieldValueCrystal algorithm it uses `document` and
+  // `operationName`; however all it really needs is the `operation` and
+  // `fragments`, so that's what we extract here.
+  const {
+    schema,
+    // fieldName,
+    operation,
+    fragments,
+    variableValues,
+    rootValue,
+  } = info;
+  // const alias = getAliasFromResolveInfo(info);
+  const aether = establishAether({
+    schema,
+    operation,
+    fragments,
+    variableValues,
+    context,
+    rootValue,
+  });
+  return aether;
+};
+
+function makeParentCrystalObject(
+  batch: Batch,
+  info: GraphQLResolveInfo,
+  pathIdentity: string,
+  parentObject: any,
+): CrystalObject<any> {
+  const { path } = info;
+  // TODO: we're not actually using id below
+  const crystalContext = batch.crystalContext;
+  if (!path.prev) {
+    // Special workaround for the root object.
+    return crystalContext.rootCrystalObject;
+  } else {
+    throw new Error(
+      `Unimplemented - we do not currently support resolving plans where the parent is not a CrystalObject. Instead of CrystalObject in resolver at ${pathIdentity}, we saw: ${inspect(
+        parentObject,
+        {
+          colors: true,
+          depth: 4,
+        },
+      )}`,
     );
-  }
-  const getAetherFromResolver = (
-    context: TContext,
-    info: GraphQLResolveInfo,
-  ) => {
-    // Note: in the ResolveFieldValueCrystal algorithm it uses `document` and
-    // `operationName`; however all it really needs is the `operation` and
-    // `fragments`, so that's what we extract here.
-    const {
-      schema,
-      // fieldName,
-      operation,
-      fragments,
-      variableValues,
-      rootValue,
-    } = info;
-    // const alias = getAliasFromResolveInfo(info);
-    const aether = establishAether({
-      schema,
-      operation,
-      fragments,
-      variableValues,
-      context,
-      rootValue,
-    });
-    return aether;
-  };
 
-  //const wrapResult = makeResultWrapper(type);
-  /**
-   * Implements the `ResolveFieldValueCrystal` algorithm.
-   */
-  const crystalResolver: GraphQLFieldResolver<TSource, TContext, TArgs> =
-    async function (
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      source: any,
-      argumentValues,
-      context,
-      info,
-    ) {
-      const parentObject:
-        | Exclude<TSource, null | undefined>
-        | CrystalObject<any> = source ?? ROOT_VALUE_OBJECT;
-      let parentCrystalObject: CrystalObject<any> | null = null;
-
-      // Note: for the most optimal execution, `rootValue` passed to graphql
-      // should be a crystal object, this allows using {crystalContext} across
-      // the entire operation if plans are used everywhere. Even more optimised
-      // would be if we can share the same {crystalContext} across multiple
-      // `rootValue`s for multiple parallel executions (must be within the same
-      // aether) - e.g. as a result of multiple identical subscription
-      // operations.
-      if (isCrystalObject(parentObject)) {
-        parentCrystalObject = parentObject;
-      }
-
-      const aether = parentCrystalObject
-        ? parentCrystalObject[$$crystalContext].aether
-        : getAetherFromResolver(context, info);
-      const { path, parentType, returnType, variableValues, rootValue } = info;
-      const pathIdentity = pathToPathIdentity(path);
-      const planId = aether.planIdByPathIdentity[pathIdentity];
-      if (planId == null) {
-        throw new Error(
-          "Support for unplanned resolvers is current unimplemented",
-        );
-        /*
-        const objectValue = parentCrystalObject
-          ? parentCrystalObject[$$data]
-          : parentObject;
-        debug(
-          "Calling real resolver for %s.%s with %o",
-          info.parentType.name,
-          info.fieldName,
-          objectValue,
-        );
-        return realResolver(objectValue, argumentValues, context, info);
-        */
-      }
-      const plan = aether.dangerouslyGetPlan(planId);
-      assert.ok(
-        plan != null,
-        `Could not find plan with id '${planId}' for path '${pathIdentity}'`,
-      );
-      /*
-      debug(
-        "   id for resolver at %p is %c",
-        pathIdentity,
-        id,
-      );
-      */
-
-      // IMPORTANT: there must be no `await` between here and `await getBatchResult` below.
-      // TODO: make this clearer by moving the intermediary code into a separate function.
-      const batch = aether.getBatch(
-        pathIdentity,
-        returnType,
-        parentCrystalObject,
-        variableValues,
-        context,
-        rootValue,
-      );
-
-      // TODO: we're not actually using id below
-      const id = uid(info.fieldName);
-      debug(`👉 %p/%c for %c`, pathIdentity, id, parentObject);
-      const crystalContext = batch.crystalContext;
-      if (parentCrystalObject) {
-        /* noop */
-      } else if (!path.prev) {
-        // Special workaround for the root object.
-        parentCrystalObject = crystalContext.rootCrystalObject;
-      } else {
-        throw new Error(
-          `Unimplemented - we do not currently support resolving plans where the parent is not a CrystalObject. Instead of CrystalObject in resolver at ${pathIdentity}, we saw: ${inspect(
-            parentObject,
-            {
-              colors: true,
-              depth: 4,
-            },
-          )}`,
-        );
-
-        // TODO: implement this.
-        /*
+    // TODO: implement this.
+    /*
+        const id = uid(info.fieldName);
+        debug(`👉 %p/%c for %c`, pathIdentity, id, parentObject);
         // Note: we need to "fake" that the parent was a plan. Because we may
         // have lots of resolvers all called for the same parent object, we use a
         // map. This happens to mean that multiple values in the graph being the
@@ -291,12 +197,120 @@ export function crystalWrapResolve<
           parentCrystalObject,
         );
         */
+  }
+}
+
+/**
+ * Given a `resolve` function, wraps the function so that it can perform the
+ * `ResolveFieldValueCrystal` algorithm.
+ *
+ * @param resolve - The resolver function.
+ */
+export function crystalWrapResolve<
+  TSource extends object | null | undefined,
+  TContext extends object,
+  TArgs = { [argName: string]: any },
+>(
+  resolve: GraphQLFieldResolver<
+    TSource,
+    TContext,
+    TArgs
+  > = defaultFieldResolver,
+): GraphQLFieldResolver<TSource, TContext, TArgs> {
+  const realResolver = resolve || defaultFieldResolver;
+  if (realResolver[$$crystalWrapped]) {
+    throw Object.assign(
+      new Error("ETOOMUCHBLING: this resolver is already wrapped in crystals."),
+      { code: "ETOOMUCHBLING" },
+    );
+  }
+
+  //const wrapResult = makeResultWrapper(type);
+  /**
+   * Implements the `ResolveFieldValueCrystal` algorithm.
+   */
+  const crystalResolver: GraphQLFieldResolver<TSource, TContext, TArgs> =
+    async function (
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      source: any,
+      argumentValues,
+      context,
+      info,
+    ) {
+      const parentObject:
+        | Exclude<TSource, null | undefined>
+        | CrystalObject<any> = source ?? ROOT_VALUE_OBJECT;
+      let possiblyParentCrystalObject: CrystalObject<any> | null = null;
+
+      // Note: for the most optimal execution, `rootValue` passed to graphql
+      // should be a crystal object, this allows using {crystalContext} across
+      // the entire operation if plans are used everywhere. Even more optimised
+      // would be if we can share the same {crystalContext} across multiple
+      // `rootValue`s for multiple parallel executions (must be within the same
+      // aether) - e.g. as a result of multiple identical subscription
+      // operations.
+      if (isCrystalObject(parentObject)) {
+        possiblyParentCrystalObject = parentObject;
       }
-      const result = await getBatchResult(batch, parentCrystalObject);
+
+      const aether = possiblyParentCrystalObject
+        ? possiblyParentCrystalObject[$$crystalContext].aether
+        : getAetherFromResolver(context, info);
+      const { path, parentType, returnType, variableValues, rootValue } = info;
+      const pathIdentity = pathToPathIdentity(path);
+      const planId = aether.planIdByPathIdentity[pathIdentity];
+      if (planId == null) {
+        throw new Error(
+          "Support for unplanned resolvers is current unimplemented",
+        );
+        /*
+        const objectValue = possiblyParentCrystalObject
+          ? possiblyParentCrystalObject[$$data]
+          : parentObject;
+        debug(
+          "Calling real resolver for %s.%s with %o",
+          info.parentType.name,
+          info.fieldName,
+          objectValue,
+        );
+        return realResolver(objectValue, argumentValues, context, info);
+        */
+      }
+      const plan = aether.dangerouslyGetPlan(planId);
+      assert.ok(
+        plan != null,
+        `Could not find plan with id '${planId}' for path '${pathIdentity}'`,
+      );
+      /*
+      debug(
+        "   id for resolver at %p is %c",
+        pathIdentity,
+        id,
+      );
+      */
+
+      // IMPORTANT: there must be no `await` between here and `getBatchResult`.
+      /* 👇👇👇👇👇 NO AWAIT ALLOWED BELOW HERE 👇👇👇👇👇 */
+      const batch = aether.getBatch(
+        pathIdentity,
+        returnType,
+        possiblyParentCrystalObject,
+        variableValues,
+        context,
+        rootValue,
+      );
+      const parentCrystalObject =
+        possiblyParentCrystalObject ??
+        makeParentCrystalObject(batch, info, pathIdentity, parentObject);
+      const resultPromise = getBatchResult(batch, parentCrystalObject);
+      /* 👆👆👆👆👆 NO AWAIT ALLOWED ABOVE HERE 👆👆👆👆👆 */
+
+      const result = await resultPromise;
+
       debug(
         `👈 %p/%c for %s; result: %c`,
         pathIdentity,
-        id,
+        parentCrystalObject[$$id],
         parentCrystalObject,
         result,
       );
