@@ -216,6 +216,8 @@ export class Aether<
     [pathIdentity: string]: Batch | undefined;
   } = Object.create(null);
 
+  public subscriptionPlanId: number | undefined;
+
   /**
    * The plan by path identity is the plan that will return the results that
    * the resolver at that plan identity should return.
@@ -523,6 +525,7 @@ export class Aether<
           this.trackedContextPlan,
         ),
       );
+      this.subscriptionPlanId = subscribePlan.id;
       // NOTE: don't need to worry about tracking groupId when planning
       // arguments as they're guaranteed to be identical across all selections.
       wgs(() =>
@@ -549,6 +552,7 @@ export class Aether<
       );
     } else {
       const subscribePlan = this.trackedRootValuePlan;
+      this.subscriptionPlanId = subscribePlan.id;
       this.planSelectionSet(
         ROOT_PATH,
         subscribePlan,
