@@ -34,6 +34,7 @@ import * as assert from "./assert";
 import { GLOBAL_PATH, ROOT_PATH } from "./constants";
 import type { Constraint } from "./constraints";
 import type { Deferred } from "./deferred";
+import { defer } from "./deferred";
 import { isDev } from "./dev";
 import { withGlobalState } from "./global";
 import { getDirectiveArg, graphqlCollectFields } from "./graphqlCollectFields";
@@ -91,6 +92,8 @@ import {
   ROOT_VALUE_OBJECT,
   uid,
 } from "./utils";
+
+const $$FINISHED: unique symbol = Symbol("finished");
 
 type MapResult = (clo: CrystalLayerObject, result: any) => any;
 
@@ -2333,6 +2336,7 @@ export class Aether<
                 return executeLayers(rest, newCLOs, mapResult);
               } else if (isAsyncIterable(listResult)) {
                 const listResultIterator = listResult[Symbol.asyncIterator]();
+                const abort = defer<IteratorResult<any, any>>();
                 const asyncIterator: AsyncIterableIterator<any> = {
                   [Symbol.asyncIterator]() {
                     return this;
@@ -2342,24 +2346,39 @@ export class Aether<
                     const copy = new PlanResults(
                       planResultsByCommonAncestorPathIdentity,
                     );
-                    copy.set(
-                      layerPlan.commonAncestorPathIdentity,
-                      layerPlan.id,
-                      await nextPromise, // TODO: Make this abortable?
-                    );
-                    const newCLO = newCrystalLayerObject(
-                      parentCrystalObject,
-                      copy,
-                      [...indexes, -1],
-                    );
-                    const [value] = await executeLayers(
-                      rest,
-                      [newCLO],
-                      mapResult,
-                    );
-                    return { done: false, value };
+
+                    try {
+                      const { done, value: resultPromise } = await Promise.race(
+                        [abort, nextPromise],
+                      );
+                      const result = await Promise.race([abort, resultPromise]);
+
+                      copy.set(
+                        layerPlan.commonAncestorPathIdentity,
+                        layerPlan.id,
+                        result,
+                      );
+                      const newCLO = newCrystalLayerObject(
+                        parentCrystalObject,
+                        copy,
+                        [...indexes, -1],
+                      );
+                      const [value] = await executeLayers(
+                        rest,
+                        [newCLO],
+                        mapResult,
+                      );
+                      return { done, value };
+                    } catch (e) {
+                      if (e === $$FINISHED) {
+                        return { done: true, value: undefined };
+                      } else {
+                        throw e;
+                      }
+                    }
                   },
                   return(value) {
+                    abort.reject($$FINISHED as any);
                     return (
                       listResultIterator.return?.(value) ||
                       Promise.resolve({
@@ -2369,6 +2388,7 @@ export class Aether<
                     );
                   },
                   throw(e) {
+                    abort.reject($$FINISHED as any);
                     return (
                       listResultIterator.throw?.(e) ||
                       Promise.resolve({ done: true, value: undefined })
