@@ -39,18 +39,20 @@ export function crystalEnforce(schema: GraphQLSchema): GraphQLSchema {
           // Wrap `subscribe` if appropriate
           if (
             objectType === subscriptionType &&
-            (!subscribe || !subscribe[$$crystalWrapped]) &&
-            (objectType.extensions?.graphile as any)?.subscribePlan
+            (field.extensions?.graphile as any)?.subscribePlan
           ) {
-            if (subscribe) {
+            if (subscribe && !subscribe[$$crystalWrapped]) {
               throw new Error(
                 "We do not support `subscribe` functions existing for fields with a `subscribePlan` - please supply one or the other.",
               );
+            } else if (subscribe) {
+              /* noop */
+            } else {
+              debug(
+                `Giving ${objectType.name}.${fieldName} a crystal subscriber`,
+              );
+              field.subscribe = makeCrystalSubscriber();
             }
-            debug(
-              `Giving ${objectType.name}.${fieldName} a crystal subscriber`,
-            );
-            field.subscribe = makeCrystalSubscriber();
           }
         }
       }
