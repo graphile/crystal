@@ -100,11 +100,11 @@ export class PgSubscriber<
       (t) => !expectedTopics.includes(t),
     );
     for (const topic of topicsToAdd) {
-      await client.query("select pg_listen($1)", [topic]);
+      await client.query(`LISTEN ${client.escapeIdentifier(topic)}`);
       this.subscribedTopics.add(topic);
     }
     for (const topic of topicsToRemove) {
-      await client.query("select pg_unlisten($1)", [topic]);
+      await client.query(`UNLISTEN ${client.escapeIdentifier(topic)}`);
       this.subscribedTopics.delete(topic);
     }
   }
@@ -211,7 +211,7 @@ export class PgSubscriber<
       const unlistenAndRelease = async (client: PoolClient) => {
         try {
           for (const topic of this.subscribedTopics) {
-            await client.query("select pg_unlisten($1)", [topic]);
+            await client.query(`UNLISTEN ${client.escapeIdentifier(topic)}`);
             this.subscribedTopics.delete(topic);
           }
         } catch (e) {
