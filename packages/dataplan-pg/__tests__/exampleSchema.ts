@@ -5,12 +5,14 @@ import type {
   AccessPlan,
   BaseGraphQLContext,
   BaseGraphQLRootValue,
+  CrystalResultsList,
   CrystalSubscriber,
-  ExecutablePlan,
+  CrystalValuesList,
   InputObjectPlan,
   InputStaticLeafPlan,
   ObjectLikePlan,
 } from "graphile-crystal";
+import { access, ExecutablePlan } from "graphile-crystal";
 import { subscribe } from "graphile-crystal";
 import {
   BasePlan,
@@ -111,6 +113,37 @@ export interface GraphQLTypeFromPostgresType {
 
 type NullableUnless<TCondition extends boolean | undefined, TType> =
   TCondition extends true ? TType : TType | null | undefined;
+
+class JSONParsePlan<TObj extends JSON> extends ExecutablePlan<TObj> {
+  constructor($stringPlan: ExecutablePlan<string | null>) {
+    super();
+    this.addDependency($stringPlan);
+  }
+
+  get<TKey extends keyof (TObj extends { [key: string]: any } ? TObj : never)>(
+    key: TKey,
+  ): AccessPlan<TObj extends { [key: string]: any } ? TObj[TKey] : any> {
+    return access(this, [key as string]) as any;
+  }
+
+  at(index: number) {
+    return access(this, [index]);
+  }
+
+  execute(values: CrystalValuesList<[string]>): CrystalResultsList<TObj> {
+    return values.map((v) => {
+      if (typeof v[0] === "string") {
+        return JSON.parse(v[0]);
+      } else {
+        return null;
+      }
+    }) as any[];
+  }
+}
+
+function jsonParse<TObj extends JSON>($string: ExecutablePlan<string | null>) {
+  return new JSONParsePlan<TObj>($string);
+}
 
 export function makeExampleSchema(
   options: { deoptimize?: boolean } = Object.create(null),
@@ -2983,7 +3016,7 @@ export function makeExampleSchema(
               "pgPubsub",
             ) as AccessPlan<CrystalSubscriber>;
 
-            return subscribe($pgPubsub, $topic);
+            return subscribe($pgPubsub, $topic, jsonParse);
           },
           plan($event) {
             return $event;

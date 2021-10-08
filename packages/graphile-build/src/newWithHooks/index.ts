@@ -1,7 +1,7 @@
 import debugFactory from "debug";
 import {
   crystalWrapResolve,
-  crystalWrapSubscribe,
+  makeCrystalSubscriber,
   objectFieldSpec,
   objectSpec,
 } from "graphile-crystal";
@@ -572,8 +572,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
           for (const fieldName in fieldsSpec) {
             const { subscribe, resolve } = fieldsSpec[fieldName];
             fieldsSpec[fieldName].resolve = crystalWrapResolve(resolve);
-            if (subscribe) {
-              fieldsSpec[fieldName].subscribe = crystalWrapSubscribe(subscribe);
+            if (!subscribe && scope.isRootSubscription) {
+              fieldsSpec[fieldName].subscribe = makeCrystalSubscriber();
             }
 
             // IMPORTANT: **nothing** can modify the resolver from here - i.e.

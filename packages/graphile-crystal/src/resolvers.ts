@@ -6,6 +6,7 @@ import { defaultFieldResolver, getNamedType, isLeafType } from "graphql";
 import type { Path } from "graphql/jsutils/Path";
 import { inspect } from "util";
 
+import type { Aether } from "./aether";
 // import { populateValuePlan } from "./aether";
 import * as assert from "./assert";
 import { ROOT_PATH } from "./constants";
@@ -200,25 +201,15 @@ function makeParentCrystalObject(
   }
 }
 
-/**
- * Given a `resolve` function, wraps the function so that it can perform the
- * `ResolveFieldValueCrystal` algorithm.
- *
- * @param resolve - The resolver function.
- */
-export function crystalWrapResolve<
+function crystalWrapResolveOrSubscribe<
   TSource extends object | null | undefined,
   TContext extends object,
   TArgs = { [argName: string]: any },
 >(
-  resolve: GraphQLFieldResolver<
-    TSource,
-    TContext,
-    TArgs
-  > = defaultFieldResolver,
+  realResolver: GraphQLFieldResolver<TSource, TContext, TArgs> | undefined,
+  isSubscribe = false,
 ): GraphQLFieldResolver<TSource, TContext, TArgs> {
-  const realResolver = resolve || defaultFieldResolver;
-  if (realResolver[$$crystalWrapped]) {
+  if (realResolver?.[$$crystalWrapped]) {
     throw Object.assign(
       new Error("ETOOMUCHBLING: this resolver is already wrapped in crystals."),
       { code: "ETOOMUCHBLING" },
@@ -256,38 +247,15 @@ export function crystalWrapResolve<
       const aether = possiblyParentCrystalObject
         ? possiblyParentCrystalObject[$$crystalContext].aether
         : getAetherFromResolver(context, info);
-      const { path, parentType, returnType, variableValues, rootValue } = info;
-      const pathIdentity = pathToPathIdentity(path);
-      const planId = aether.planIdByPathIdentity[pathIdentity];
-      if (planId == null) {
-        throw new Error(
-          "Support for unplanned resolvers is current unimplemented",
-        );
-        /*
-        const objectValue = possiblyParentCrystalObject
-          ? possiblyParentCrystalObject[$$data]
-          : parentObject;
-        debug(
-          "Calling real resolver for %s.%s with %o",
-          info.parentType.name,
-          info.fieldName,
-          objectValue,
-        );
-        return realResolver(objectValue, argumentValues, context, info);
-        */
-      }
-      const plan = aether.dangerouslyGetPlan(planId);
-      assert.ok(
-        plan != null,
-        `Could not find plan with id '${planId}' for path '${pathIdentity}'`,
-      );
-      /*
-      debug(
-        "   id for resolver at %p is %c",
-        pathIdentity,
-        id,
-      );
-      */
+      const {
+        path,
+        parentType,
+        returnType,
+        variableValues,
+        rootValue,
+        fieldName,
+      } = info;
+      const pathIdentity = isSubscribe ? ROOT_PATH : pathToPathIdentity(path);
 
       // IMPORTANT: there must be no `await` between here and `getBatchResult`.
       /* 👇👇👇👇👇 NO AWAIT ALLOWED BELOW HERE 👇👇👇👇👇 */
@@ -314,17 +282,22 @@ export function crystalWrapResolve<
         parentCrystalObject,
         result,
       );
-      if (isLeafType(getNamedType(info.returnType))) {
-        const valueForResolver: any = { [info.fieldName]: result };
-        debug(
-          "   Calling real resolver for %s.%s with %o",
-          info.parentType.name,
-          info.fieldName,
-          valueForResolver,
-        );
-        return realResolver(valueForResolver, argumentValues, context, info);
+      if (isLeafType(getNamedType(returnType))) {
+        if (realResolver) {
+          const valueForResolver: any = { [fieldName]: result };
+          debug(
+            "   Calling real resolver for %s.%s with %o",
+            parentType.name,
+            fieldName,
+            valueForResolver,
+          );
+          return realResolver(valueForResolver, argumentValues, context, info);
+        } else {
+          return result;
+        }
       } else {
-        // This is either a CrystalObject or an n-dimensional list of CrystalObjects.
+        // This is either a CrystalObject or an n-dimensional list of
+        // CrystalObjects, or a stream of these things.
         return result;
       }
     };
@@ -336,21 +309,33 @@ export function crystalWrapResolve<
 }
 
 /**
+ * Given a `resolve` function, wraps the function so that it can perform the
+ * `ResolveFieldValueCrystal` algorithm.
+ *
+ * @param resolve - The resolver function.
+ */
+export function crystalWrapResolve<
+  TSource extends object | null | undefined,
+  TContext extends object,
+  TArgs = { [argName: string]: any },
+>(
+  resolve: GraphQLFieldResolver<TSource, TContext, TArgs> | undefined,
+): GraphQLFieldResolver<TSource, TContext, TArgs> {
+  return crystalWrapResolveOrSubscribe(resolve, false);
+}
+
+/**
  * Given a `subscribe` function, wraps the function so that it can perform the
  * `ResolveFieldValueCrystal` algorithm.
  *
  * @param subscribe - The subscribe function.
  */
-export function crystalWrapSubscribe<
+export function makeCrystalSubscriber<
   TSource extends object | null | undefined,
   TContext extends object,
   TArgs = { [argName: string]: any },
->(
-  subscribe: GraphQLFieldResolver<TSource, TContext, TArgs>,
-): GraphQLFieldResolver<TSource, TContext, TArgs> {
-  // For now wrapping subscribe and resolve are equivalent; but this might not
-  // always be the case.
-  return crystalWrapResolve(subscribe);
+>(): GraphQLFieldResolver<TSource, TContext, TArgs> {
+  return crystalWrapResolveOrSubscribe(undefined, true);
 }
 
 /**

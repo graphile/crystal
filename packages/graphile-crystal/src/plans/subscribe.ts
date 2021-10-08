@@ -1,3 +1,6 @@
+import chalk from "chalk";
+
+import { getCurrentParentPathIdentity } from "../global";
 import type {
   CrystalResultStreamList,
   CrystalSubscriber,
@@ -5,11 +8,32 @@ import type {
 } from "../interfaces";
 import type { StreamablePlan } from "../plan";
 import { ExecutablePlan, isExecutablePlan } from "../plan";
+import type { ListCapablePlan } from "./__listItem";
 import { constant } from "./constant";
+
+export class __ItemPlan<TData> extends ExecutablePlan<TData> {
+  constructor(
+    parentPlan: StreamablePlan<TData> | ListCapablePlan<TData>,
+    public readonly depth = 0,
+  ) {
+    super();
+    this.addDependency(parentPlan);
+    this.parentPathIdentity = getCurrentParentPathIdentity();
+  }
+
+  toStringMeta(): string {
+    return chalk.bold.yellow(String(this.dependencies[0]));
+  }
+
+  execute(): never {
+    throw new Error("__ItemPlan must never execute");
+  }
+}
 
 export class SubscribePlan<
     TTopics extends { [topic: string]: any },
     TTopic extends keyof TTopics,
+    TPayloadPlan extends ExecutablePlan,
   >
   extends ExecutablePlan<TTopics[TTopic]>
   implements StreamablePlan<TTopics[TTopic]>
@@ -29,6 +53,7 @@ export class SubscribePlan<
       | ExecutablePlan<CrystalSubscriber<TTopics>>
       | CrystalSubscriber<TTopics>,
     topicOrPlan: ExecutablePlan<TTopic> | string,
+    public itemPlan: (itemPlan: __ItemPlan<TTopics[TTopic]>) => TPayloadPlan,
   ) {
     super();
     const $topic =
@@ -60,11 +85,17 @@ export class SubscribePlan<
 export function subscribe<
   TTopics extends { [topic: string]: any },
   TTopic extends keyof TTopics,
+  TPayloadPlan extends ExecutablePlan,
 >(
   pubsubOrPlan:
     | ExecutablePlan<CrystalSubscriber<TTopics>>
     | CrystalSubscriber<TTopics>,
   topicOrPlan: ExecutablePlan<TTopic> | string,
-): SubscribePlan<TTopics, TTopic> {
-  return new SubscribePlan<TTopics, TTopic>(pubsubOrPlan, topicOrPlan);
+  itemPlan: (itemPlan: __ItemPlan<TTopics[TTopic]>) => TPayloadPlan,
+): SubscribePlan<TTopics, TTopic, TPayloadPlan> {
+  return new SubscribePlan<TTopics, TTopic, TPayloadPlan>(
+    pubsubOrPlan,
+    topicOrPlan,
+    itemPlan,
+  );
 }

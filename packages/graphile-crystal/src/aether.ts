@@ -80,6 +80,7 @@ import {
   __ValuePlan,
   assertListCapablePlan,
 } from "./plans";
+import { __ItemPlan } from "./plans/subscribe";
 import { assertPolymorphicData } from "./polymorphic";
 import { newCrystalObject } from "./resolvers";
 import type { UniqueId } from "./utils";
@@ -216,7 +217,15 @@ export class Aether<
     [pathIdentity: string]: Batch | undefined;
   } = Object.create(null);
 
+  /**
+   * The plan id for the plan that represents the subscription (if any).
+   */
   public subscriptionPlanId: number | undefined;
+
+  /**
+   * The plan id for the plan that represents a single payload in the subscription stream (if any)
+   */
+  public subscriptionItemPlanId: number | undefined;
 
   /**
    * The plan by path identity is the plan that will return the results that
@@ -526,6 +535,7 @@ export class Aether<
         ),
       );
       this.subscriptionPlanId = subscribePlan.id;
+
       // NOTE: don't need to worry about tracking groupId when planning
       // arguments as they're guaranteed to be identical across all selections.
       wgs(() =>
@@ -538,9 +548,20 @@ export class Aether<
           subscribePlan,
         ),
       );
+
+      // TODO: this is a LIE! This should be `ROOT_PATH + "[]"` but that breaks
+      // everything... We've worked around it elsewhere, but maybe all path
+      // identities inside a subscription operation should assume ROOT_PATH of
+      // `~[]` rather than `~`?
+      const nestedParentPathIdentity = ROOT_PATH;
+      const streamItemPlan = withGlobalState(
+        { aether: this, parentPathIdentity: ROOT_PATH },
+        () => subscribePlan.itemPlan(new __ItemPlan(subscribePlan)),
+      );
+      this.subscriptionItemPlanId = streamItemPlan.id;
       this.planSelectionSet(
-        ROOT_PATH,
-        subscribePlan,
+        nestedParentPathIdentity,
+        streamItemPlan,
         rootType,
         [
           {
@@ -1454,6 +1475,12 @@ export class Aether<
   private treeShakePlans(): void {
     const activePlans = new Set<ExecutablePlan>();
 
+    // The root subscription plan, if any, should be marked as active
+    if (this.subscriptionItemPlanId) {
+      const plan = this.plans[this.subscriptionItemPlanId];
+      this.markPlanActive(plan, activePlans);
+    }
+
     // NOTE: every plan referenced in this.planIdByPathIdentity is included in
     // this.itemPlanIdByFieldPathIdentity, but the reverse is not true.
     for (const pathIdentity in this.itemPlanIdByFieldPathIdentity) {
@@ -1514,6 +1541,18 @@ export class Aether<
           });
         }
       };
+
+      if (!treeNode.parent) {
+        if (this.subscriptionPlanId) {
+          const subscriptionPlan = this.plans[this.subscriptionPlanId];
+          assert.ok(
+            subscriptionPlan != null,
+            `Could not find the plan for the subscription`,
+          );
+          processPlan(subscriptionPlan);
+        }
+      }
+
       const treeNodePlanId = this.planIdByPathIdentity[treeNode.pathIdentity];
       assert.ok(
         treeNodePlanId != null,
@@ -1796,13 +1835,15 @@ export class Aether<
         );
       }
       const planOptions = this.planOptionsByPlan.get(plan);
-      const pendingResults = planOptions?.stream
-        ? await (plan as unknown as StreamablePlan<unknown>).stream(
-            values,
-            meta,
-            planOptions.stream,
-          )
-        : await plan.execute(values, meta);
+      const isSubscribe = plan.id === this.subscriptionPlanId;
+      const pendingResults =
+        isSubscribe || planOptions?.stream
+          ? await (plan as unknown as StreamablePlan<unknown>).stream(
+              values,
+              meta,
+              isSubscribe ? { initialCount: 0 } : planOptions!.stream!,
+            )
+          : await plan.execute(values, meta);
       if (plan.debug) {
         console.log(
           `debugPlans(${plan}): called with: ${inspect(values, {
@@ -1960,8 +2001,30 @@ export class Aether<
   ): Batch {
     const sideEffectPlanIds =
       this.sideEffectPlanIdsByPathIdentity[fieldPathIdentity];
-    const planId = this.planIdByPathIdentity[fieldPathIdentity];
-    const itemPlanId = this.itemPlanIdByFieldPathIdentity[fieldPathIdentity];
+    const isSubscribe = fieldPathIdentity === ROOT_PATH;
+    const planId = isSubscribe
+      ? this.subscriptionPlanId
+      : this.planIdByPathIdentity[fieldPathIdentity];
+    const itemPlanId = isSubscribe
+      ? this.subscriptionItemPlanId
+      : this.itemPlanIdByFieldPathIdentity[fieldPathIdentity];
+    /*
+    if (planId == null) {
+      throw new Error(
+        "Support for unplanned resolvers is current unimplemented",
+      );
+      const objectValue = possiblyParentCrystalObject
+        ? possiblyParentCrystalObject[$$data]
+        : parentObject;
+      debug(
+        "Calling real resolver for %s.%s with %o",
+        info.parentType.name,
+        info.fieldName,
+        objectValue,
+      );
+      return realResolver(objectValue, argumentValues, context, info);
+    }
+    */
     assert.ok(
       planId != null,
       `Could not find the planId for path identity '${fieldPathIdentity}'`,

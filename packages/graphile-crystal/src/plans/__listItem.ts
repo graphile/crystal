@@ -1,8 +1,11 @@
-import chalk from "chalk";
+// import chalk from "chalk";
 
-import { getCurrentParentPathIdentity } from "../global";
-import { ExecutablePlan } from "../plan";
+// import { getCurrentParentPathIdentity } from "../global";
+import type { ExecutablePlan } from "../plan";
+import { __ItemPlan as __ListItemPlan } from "./subscribe";
 
+export { __ListItemPlan };
+/*
 export class __ListItemPlan<
   TParentPlan extends ExecutablePlan<ReadonlyArray<any>>,
 > extends ExecutablePlan<
@@ -22,6 +25,7 @@ export class __ListItemPlan<
     throw new Error("__ListItemPlan must never execute");
   }
 }
+*/
 
 export interface ListCapablePlan<
   TOutputData extends any,

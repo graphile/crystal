@@ -5,7 +5,7 @@ import { isObjectType } from "graphql";
 import {
   $$crystalWrapped,
   crystalWrapResolve,
-  crystalWrapSubscribe,
+  makeCrystalSubscriber,
 } from "./resolvers";
 
 const debug = debugFactory("crystal:enforce");
@@ -15,6 +15,7 @@ const debug = debugFactory("crystal:enforce");
  * ✨wrapped in crystals✨.
  */
 export function crystalEnforce(schema: GraphQLSchema): GraphQLSchema {
+  const subscriptionType = schema.getSubscriptionType();
   const types = Object.values(schema.getTypeMap());
   for (const objectType of types) {
     if (isObjectType(objectType) && !objectType.name.startsWith("__")) {
@@ -36,11 +37,20 @@ export function crystalEnforce(schema: GraphQLSchema): GraphQLSchema {
           }
 
           // Wrap `subscribe` if appropriate
-          if (subscribe && !subscribe[$$crystalWrapped]) {
+          if (
+            objectType === subscriptionType &&
+            (!subscribe || !subscribe[$$crystalWrapped]) &&
+            (objectType.extensions?.graphile as any)?.subscribePlan
+          ) {
+            if (subscribe) {
+              throw new Error(
+                "We do not support `subscribe` functions existing for fields with a `subscribePlan` - please supply one or the other.",
+              );
+            }
             debug(
-              `Wrapping ${objectType.name}.${fieldName}'s subscribe in crystals`,
+              `Giving ${objectType.name}.${fieldName} a crystal subscriber`,
             );
-            field.subscribe = crystalWrapSubscribe(subscribe);
+            field.subscribe = makeCrystalSubscriber();
           }
         }
       }

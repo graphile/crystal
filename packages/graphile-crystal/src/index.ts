@@ -78,7 +78,7 @@ export { polymorphicWrap, resolveType } from "./polymorphic";
 export {
   $$crystalWrapped,
   crystalWrapResolve,
-  crystalWrapSubscribe,
+  makeCrystalSubscriber,
 } from "./resolvers";
 export {
   arraysMatch,

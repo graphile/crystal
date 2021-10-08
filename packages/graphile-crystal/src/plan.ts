@@ -287,7 +287,7 @@ export type ObjectLikePlan<
       : never;
   }
 > & {
-  get<TKey extends keyof TData>(key: TKey): TData[TKey];
+  get<TKey extends keyof TData>(key: TKey): ExecutablePlan<TData[TKey]>;
 };
 
 export function isObjectLikePlan<
