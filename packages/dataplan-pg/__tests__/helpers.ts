@@ -278,12 +278,10 @@ export async function runTestQuery(
 
   const queries: PgClientQuery[] = [];
   const schema = options.deoptimize ? deoptimizedSchema : optimizedSchema;
-  let latestClient: PoolClient | null = null;
   const withPgClient: WithPgClient = config.directPg
     ? makeWithTestPgClient(queries)
     : async (pgSettings, callback) => {
         const o = await clientForSettings(pgSettings, queries);
-        latestClient = o.rawPoolClient;
         try {
           return await callback(o.client);
         } finally {
@@ -362,7 +360,15 @@ export async function runTestQuery(
 
       // In parallel to collecting the payloads, run the callback
       if (options.callback) {
-        await options.callback(latestClient, originalPayloads);
+        if (!config.directPg) {
+          throw new Error("Can only use callback in directPg mode");
+        }
+        const poolClient = await testPool.connect();
+        try {
+          await options.callback(poolClient, originalPayloads);
+        } finally {
+          poolClient.release();
+        }
       }
 
       if (operationType === "subscription") {
@@ -438,7 +444,7 @@ export async function runTestQuery(
       return { data, errors, queries };
     }
   } finally {
-    pgSubscriber.release();
+    await pgSubscriber.release();
   }
 }
 

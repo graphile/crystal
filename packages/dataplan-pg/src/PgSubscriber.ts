@@ -80,9 +80,12 @@ export class PgSubscriber<
   private subscribedTopics = new Set<string>();
   private sync() {
     this.chain(async () => {
+      if (!this.alive) {
+        return;
+      }
       const client = await this.getClient();
       await this.syncWithClient(client);
-    }).catch((e) => this.resetClient());
+    }).catch(() => this.resetClient());
   }
 
   private async syncWithClient(client: PoolClient) {
@@ -107,10 +110,10 @@ export class PgSubscriber<
   }
 
   private resetClient() {
-    if (!this.alive) {
-      return;
-    }
     this.chain(() => {
+      if (!this.alive) {
+        return;
+      }
       const client = this.listeningClient;
       if (client) {
         this.listeningClient = null;
@@ -122,7 +125,9 @@ export class PgSubscriber<
         }
         if (Object.keys(this.topics).length > 0) {
           // Trigger a new client to be fetched and have it sync.
-          this.getClient();
+          this.getClient().catch(() => {
+            // Must be released; ignore
+          });
         }
       }
     });
@@ -130,9 +135,12 @@ export class PgSubscriber<
 
   private listeningClient: PoolClient | null = null;
   private listeningClientPromise: Promise<PoolClient> | null = null;
-  private getClient(): PoolClient | Promise<PoolClient> {
+  private getClient(): Promise<PoolClient> {
+    if (!this.alive) {
+      return Promise.reject(new Error("Released; aborting getClient"));
+    }
     if (this.listeningClient) {
-      return this.listeningClient;
+      return Promise.resolve(this.listeningClient);
     } else {
       if (!this.listeningClientPromise) {
         const promise = (async () => {
@@ -144,21 +152,26 @@ export class PgSubscriber<
                 );
               }
               const client = await this.pool.connect();
-              const logError = (e: Error) => {
-                console.error(`Error on listening client: ${e}`);
-              };
-              client.on("error", logError);
-              await this.syncWithClient(client);
+              try {
+                const logError = (e: Error) => {
+                  console.error(`Error on listening client: ${e}`);
+                };
+                client.on("error", logError);
+                await this.syncWithClient(client);
 
-              // All good; we can return this client finally!
-              this.listeningClientPromise = null;
-              this.listeningClient = client;
-              client.off("error", logError);
-              client.on("error", (e) => {
-                logError(e);
-                this.resetClient();
-              });
-              return client;
+                // All good; we can return this client finally!
+                this.listeningClientPromise = null;
+                this.listeningClient = client;
+                client.off("error", logError);
+                client.on("error", (e) => {
+                  logError(e);
+                  this.resetClient();
+                });
+                return client;
+              } catch (e) {
+                client.release();
+                throw e;
+              }
             } catch (e) {
               console.error(
                 `Error with listening client during getClient (attempt ${
@@ -195,9 +208,21 @@ export class PgSubscriber<
         }
         delete this.topics[topic];
       }
-      this.sync();
+      const unlistenAndRelease = async (client: PoolClient) => {
+        try {
+          for (const topic of this.subscribedTopics) {
+            await client.query("select pg_unlisten($1)", [topic]);
+            this.subscribedTopics.delete(topic);
+          }
+        } catch (e) {
+          // ignore
+        }
+        client.release();
+      };
       if (this.listeningClient) {
-        this.listeningClient.release();
+        unlistenAndRelease(this.listeningClient);
+      } else if (this.listeningClientPromise) {
+        this.listeningClientPromise.then(unlistenAndRelease, () => {});
       }
     }
   }
@@ -205,7 +230,7 @@ export class PgSubscriber<
   // Avoid race conditions by chaining everything
   private promise: Promise<void> = Promise.resolve();
   private async chain(callback: () => void | Promise<void>) {
-    this.promise = this.promise.finally(callback);
+    this.promise = this.promise.then(callback, callback);
     return this.promise;
   }
 }
