@@ -1,7 +1,7 @@
 import EventEmitter from "events";
 import type { CrystalSubscriber, Deferred } from "graphile-crystal";
 import { defer } from "graphile-crystal";
-import type { Pool, PoolClient } from "pg";
+import type { Notification, Pool, PoolClient } from "pg";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -15,6 +15,10 @@ export class PgSubscriber<
   private alive = true;
 
   constructor(private pool: Pool) {}
+
+  private recordNotification = (notification: Notification): void => {
+    this.eventEmitter.emit(notification.channel, notification.payload);
+  };
 
   subscribe<TTopic extends keyof TTopics>(
     topic: TTopic,
@@ -116,6 +120,8 @@ export class PgSubscriber<
       }
       const client = this.listeningClient;
       if (client) {
+        client.off("notification", this.recordNotification);
+        client.release();
         this.listeningClient = null;
         this.subscribedTopics.clear();
         if (this.listeningClientPromise) {
@@ -157,6 +163,7 @@ export class PgSubscriber<
                   console.error(`Error on listening client: ${e}`);
                 };
                 client.on("error", logError);
+                client.on("notification", this.recordNotification);
                 await this.syncWithClient(client);
 
                 // All good; we can return this client finally!
@@ -169,6 +176,8 @@ export class PgSubscriber<
                 });
                 return client;
               } catch (e) {
+                client.off("error", logError);
+                client.off("notification", this.recordNotification);
                 client.release();
                 throw e;
               }
