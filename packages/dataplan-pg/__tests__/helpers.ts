@@ -330,14 +330,14 @@ export async function runTestQuery(
 
     return { payloads, errors, queries };
   } else {
+    const { data, errors } = result;
+    if (errors) {
+      console.error(errors[0].originalError || errors[0]);
+    }
     if (options.callback) {
       throw new Error(
         "Callback is only appropriate when operation returns an async iterable",
       );
-    }
-    const { data, errors } = result;
-    if (errors) {
-      console.error(errors[0].originalError || errors[0]);
     }
     return { data, errors, queries };
   }

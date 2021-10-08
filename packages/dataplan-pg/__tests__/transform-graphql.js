@@ -60,9 +60,13 @@ const waitFor = async (conditionCallback, max = 1000) => {
   }
 }
 
-const callback = async (pgClient, payloads) => {
-${scripts.join("\n")}
-};
+const callback = ${
+    scripts.length
+      ? `async (pgClient, payloads) => {
+  ${scripts.join("\n  ")}
+}`
+      : `null`
+  };
 
 beforeAll(() => {
   result1 =
