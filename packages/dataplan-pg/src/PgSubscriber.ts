@@ -171,11 +171,11 @@ export class PgSubscriber<
                   new Error("PgSubscriber released; aborting getClient"),
                 );
               }
+              const logError = (e: Error) => {
+                console.error(`Error on listening client: ${e}`);
+              };
               const client = await this.pool.connect();
               try {
-                const logError = (e: Error) => {
-                  console.error(`Error on listening client: ${e}`);
-                };
                 client.on("error", logError);
                 client.on("notification", this.recordNotification);
                 await this.syncWithClient(client);
