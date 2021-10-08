@@ -29,41 +29,55 @@ export class PgSubscriber<
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
     const { eventEmitter, topics } = this;
-    const asyncIterableIterator = (async function* () {
-      let waiting: Deferred<any> | null = null;
-      const stack: any[] = [];
-      function recv(payload: any) {
-        if (waiting) {
-          waiting.resolve(payload);
-          waiting = null;
+    let waiting: Deferred<any> | null = null;
+    const stack: any[] = [];
+
+    function doFinally() {
+      eventEmitter.removeListener(topic as string, recv);
+      // Every code path above this has to go through a `yield` and thus
+      // `asyncIterableIterator` will definitely be defined.
+      const idx = topics[topic]?.indexOf(asyncIterableIterator);
+      if (idx != null && idx >= 0) {
+        topics[topic]!.splice(idx, 1);
+        if (topics[topic]!.length === 0) {
+          delete topics[topic];
+          that.unlisten(topic);
+        }
+      }
+    }
+
+    const asyncIterableIterator: AsyncIterableIterator<any> = {
+      [Symbol.asyncIterator]() {
+        return this;
+      },
+      async next() {
+        if (stack.length) {
+          return { done: false, value: stack.shift() };
         } else {
-          stack.push(payload);
+          waiting = defer();
+          return { done: false, value: waiting };
         }
+      },
+      async return(value) {
+        doFinally();
+        return { done: true, value: value };
+      },
+      async throw() {
+        doFinally();
+        return { done: true, value: undefined };
+      },
+    };
+
+    function recv(payload: any) {
+      if (waiting) {
+        waiting.resolve(payload);
+        waiting = null;
+      } else {
+        stack.push(payload);
       }
-      eventEmitter.addListener(topic as string, recv);
-      try {
-        while (true) {
-          if (stack.length) {
-            yield stack.shift();
-          } else {
-            waiting = defer();
-            yield await waiting;
-          }
-        }
-      } finally {
-        eventEmitter.removeListener(topic as string, recv);
-        // Every code path above this has to go through a `yield` and thus
-        // `asyncIterableIterator` will definitely be defined.
-        const idx = topics[topic]?.indexOf(asyncIterableIterator!);
-        if (idx != null && idx >= 0) {
-          topics[topic]!.splice(idx, 1);
-          if (topics[topic]!.length === 0) {
-            delete topics[topic];
-            that.unlisten(topic);
-          }
-        }
-      }
-    })();
+    }
+    eventEmitter.addListener(topic as string, recv);
+
     if (!topics[topic]) {
       topics[topic] = [asyncIterableIterator];
       this.listen(topic);

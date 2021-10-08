@@ -963,6 +963,8 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
       // Munge the initialCount records into the streams
 
       return streams.map((stream, idx) => {
+        // TODO: Merge the initial results and the stream together manually to
+        // avoid unstoppable async generator problem.
         return (async function* () {
           const l = initialFetchResult[idx].length;
           try {

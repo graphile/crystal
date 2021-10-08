@@ -2332,15 +2332,20 @@ export class Aether<
                 // TODO: we should be optimise this to call executeLayers once, rather than once per crystalLayerObject.
                 return executeLayers(rest, newCLOs, mapResult);
               } else if (isAsyncIterable(listResult)) {
-                return (async function* () {
-                  for await (const result of listResult) {
+                const listResultIterator = listResult[Symbol.asyncIterator]();
+                const asyncIterator: AsyncIterableIterator<any> = {
+                  [Symbol.asyncIterator]() {
+                    return this;
+                  },
+                  async next() {
+                    const nextPromise = listResultIterator.next();
                     const copy = new PlanResults(
                       planResultsByCommonAncestorPathIdentity,
                     );
                     copy.set(
                       layerPlan.commonAncestorPathIdentity,
                       layerPlan.id,
-                      result,
+                      await nextPromise, // TODO: Make this abortable?
                     );
                     const newCLO = newCrystalLayerObject(
                       parentCrystalObject,
@@ -2352,9 +2357,25 @@ export class Aether<
                       [newCLO],
                       mapResult,
                     );
-                    yield value;
-                  }
-                })();
+                    return { done: false, value };
+                  },
+                  return(value) {
+                    return (
+                      listResultIterator.return?.(value) ||
+                      Promise.resolve({
+                        done: true,
+                        value: undefined,
+                      })
+                    );
+                  },
+                  throw(e) {
+                    return (
+                      listResultIterator.throw?.(e) ||
+                      Promise.resolve({ done: true, value: undefined })
+                    );
+                  },
+                };
+                return asyncIterator;
               } else {
                 if (listResult != null) {
                   console.error(
