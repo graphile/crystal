@@ -366,6 +366,12 @@ export async function runTestQuery(
         const poolClient = await testPool.connect();
         try {
           await options.callback(poolClient, originalPayloads);
+        } catch (e) {
+          console.error(
+            "Detected error during test callback; here's the payloads we have thus far:",
+          );
+          console.error(originalPayloads);
+          throw e;
         } finally {
           poolClient.release();
         }
