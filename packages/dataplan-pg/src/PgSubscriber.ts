@@ -183,6 +183,9 @@ export class PgSubscriber<
             }
           }
         })();
+        promise.catch(() => {
+          /* ignore */
+        });
         this.listeningClientPromise = promise;
         return promise;
       } else {
@@ -222,7 +225,9 @@ export class PgSubscriber<
       if (this.listeningClient) {
         unlistenAndRelease(this.listeningClient);
       } else if (this.listeningClientPromise) {
-        this.listeningClientPromise.then(unlistenAndRelease, () => {});
+        this.listeningClientPromise.then(unlistenAndRelease, () => {
+          /* ignore */
+        });
       }
     }
   }
