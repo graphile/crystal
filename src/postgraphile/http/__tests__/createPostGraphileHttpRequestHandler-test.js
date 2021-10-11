@@ -639,13 +639,13 @@ for (const { name, createServerFromHandler, subpath = '' } of toTest) {
       expect(pgClient.release.mock.calls).toEqual([[]]);
     });
 
-    test('adds properties from the JWT to the session', async () => {
+    test.each([['jwtSecret'], ['jwtPublicKey']])('adds properties from the JWT to the session (keyType: %s)', async (keyType) => {
       pgPool.connect.mockClear();
       pgClient.query.mockClear();
       pgClient.release.mockClear();
       const jwtSecret = 'secret';
       const pgDefaultRole = 'pg_default_role';
-      const server = await createServer({ jwtSecret, pgDefaultRole });
+      const server = await createServer({ [keyType]: jwtSecret, pgDefaultRole });
       await request(server)
         .post(`${subpath}/graphql`)
         /*

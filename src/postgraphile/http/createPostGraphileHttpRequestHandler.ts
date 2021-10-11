@@ -126,10 +126,12 @@ function withPostGraphileContextFromReqResGenerator(
     pgSettings: pgSettingsGenerator,
     allowExplain: allowExplainGenerator,
     jwtSecret,
+    jwtPublicKey,
     additionalGraphQLContextFromRequest,
   } = options;
   return async (req, res, moreOptions, fn) => {
-    const jwtToken = jwtSecret ? getJwtToken(req) : null;
+    const jwtVerificationSecret = jwtPublicKey || jwtSecret;
+    const jwtToken = jwtVerificationSecret ? getJwtToken(req) : null;
     const additionalContext =
       typeof additionalGraphQLContextFromRequest === 'function'
         ? await additionalGraphQLContextFromRequest(req, res)
