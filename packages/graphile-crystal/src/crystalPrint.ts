@@ -1,4 +1,5 @@
 import chalk from "chalk";
+import stripAnsi from "strip-ansi";
 import { inspect } from "util";
 
 import { isCrystalLayerObject } from "./aether";
@@ -98,6 +99,17 @@ export function _crystalPrint(
     return `Map{${pairs.join(", ")}}`;
   }
   if (typeof symbol === "object" && symbol) {
+    if (symbol instanceof Error) {
+      return chalk.red(
+        `ERROR<${
+          stripAnsi(String(symbol.message)).replace(/\s+/g, " ").substr(0, 30) +
+          "..."
+        }>`,
+      );
+    }
+    if (![null, Object.prototype].includes(Object.getPrototypeOf(symbol))) {
+      return chalk.red(`OBJECT<${stripAnsi(String(symbol))}>`);
+    }
     if (seen.has(symbol)) {
       return chalk.gray`(loop)`;
     }

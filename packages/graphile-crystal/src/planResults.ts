@@ -58,7 +58,9 @@ export class PlanResults {
   }
 
   toString(): string {
-    return `PlanResults<${this.id}>`;
+    return `PlanResults<${this.id}|${Object.keys(this.store)
+      .sort((a, z) => a.length - z.length)
+      .join("|")}>`;
   }
 
   /**
@@ -75,7 +77,7 @@ export class PlanResults {
       (this.store[commonAncestorPathIdentity] = new Map());
     if (isDev && s.has(planId) && s.get(planId) !== data) {
       throw new Error(
-        `Attempted to overwrite value for plan '${planId}' at path identity '${commonAncestorPathIdentity}' from '${inspect(
+        `${this}: Attempted to overwrite value for plan '${planId}' at path identity '${commonAncestorPathIdentity}' from '${inspect(
           s.get(planId),
           { colors: true },
         )}' to '${inspect(data, { colors: true })}'`,

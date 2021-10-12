@@ -1735,8 +1735,8 @@ export class Aether<
     const inProgressPlanResultsesIndexes: number[] = []; // Same length as inProgressDeferreds
     const planResultsesLength = planResultses.length;
     const result = new Array(planResultsesLength);
-    debugExecute(
-      "%sExecutePlan(%c): executing with %o crystal objects",
+    debugExecuteVerbose(
+      "%sExecutePlan(%c): executing with %o plan results",
       indent,
       plan,
       planResultsesLength,
@@ -1902,7 +1902,11 @@ export class Aether<
     const pendingPlanResultsesLength = pendingPlanResultses.length;
     const dependenciesCount = plan.dependencies.length;
     const dependencyValuesList = new Array(dependenciesCount);
-    debugExecute("%s Executing %o dependencies", follow, dependenciesCount);
+    debugExecuteVerbose(
+      "%s Executing %o dependencies",
+      follow,
+      dependenciesCount,
+    );
 
     for (let i = 0; i < dependenciesCount; i++) {
       const dependencyPlanId = plan.dependencies[i];
