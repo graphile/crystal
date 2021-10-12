@@ -3,7 +3,7 @@ import { inspect } from "util";
 import { isDev } from "./dev";
 
 let planResultsId = 0;
-
+export type PlanResultsBucket = Map<number, any>;
 /**
  * PlanResults stores the results from plan execution. A `PlanResults` instance
  * is typically accessed via the `CrystalObject` to which it belongs, however
@@ -48,7 +48,7 @@ let planResultsId = 0;
  */
 export class PlanResults {
   id = planResultsId++;
-  private store: { [pathIdentity: string]: Map<number, any> | undefined } =
+  private store: { [pathIdentity: string]: PlanResultsBucket | undefined } =
     Object.create(null);
 
   constructor(inheritFrom?: PlanResults) {
@@ -72,18 +72,16 @@ export class PlanResults {
     planId: number,
     data: any,
   ): any {
-    const s =
-      this.store[commonAncestorPathIdentity] ??
-      (this.store[commonAncestorPathIdentity] = new Map());
-    if (isDev && s.has(planId) && s.get(planId) !== data) {
+    const bucket = this.getBucket(commonAncestorPathIdentity);
+    if (isDev && bucket.has(planId) && bucket.get(planId) !== data) {
       throw new Error(
         `${this}: Attempted to overwrite value for plan '${planId}' at path identity '${commonAncestorPathIdentity}' from '${inspect(
-          s.get(planId),
+          bucket.get(planId),
           { colors: true },
         )}' to '${inspect(data, { colors: true })}'`,
       );
     }
-    return s.set(planId, data);
+    return bucket.set(planId, data);
   }
 
   /**
@@ -92,6 +90,17 @@ export class PlanResults {
    */
   public get(commonAncestorPathIdentity: string, planId: number): any {
     return this.store[commonAncestorPathIdentity]?.get(planId);
+  }
+
+  /**
+   * Gets the bucket into which plan results are stored for plans with the
+   * given commonAncestorPathIdentity.
+   */
+  public getBucket(commonAncestorPathIdentity: string): PlanResultsBucket {
+    const s =
+      this.store[commonAncestorPathIdentity] ??
+      (this.store[commonAncestorPathIdentity] = new Map());
+    return s;
   }
 
   /**

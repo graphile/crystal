@@ -1743,8 +1743,7 @@ export class Aether<
     );
     const commonAncestorPathIdentity = plan.commonAncestorPathIdentity;
 
-    const deferredsByPlanResults =
-      crystalContext.inProgressPlanResolutionByPlanIdAndPlanResults[plan.id];
+    const deferredsByBucket = crystalContext.inProgressPlanResolutions[plan.id];
 
     for (let i = 0; i < planResultsesLength; i++) {
       const planResults = planResultses[i];
@@ -1780,9 +1779,10 @@ export class Aether<
           )}.`,
         );
       }
-      if (deferredsByPlanResults.has(planResults)) {
+      const bucket = planResults.getBucket(commonAncestorPathIdentity);
+      if (deferredsByBucket.has(bucket)) {
         // In progress already
-        const deferred = deferredsByPlanResults.get(planResults)!;
+        const deferred = deferredsByBucket.get(bucket)!;
         debugExecuteVerbose(
           "  %s already in progress for %c",
           follow,
@@ -1794,15 +1794,8 @@ export class Aether<
         // Need to start executing
         debugExecuteVerbose("  %s no result for %c", follow, planResults);
 
-        if (isDev) {
-          if (pendingPlanResultses.includes(planResults)) {
-            throw new Error(
-              `GraphileInternalError<cc654e79-fcfb-4ae7-8f25-fd032c3947d9>: Duplicate PlanResults detected whilst executing ${plan}... is this a problem?`,
-            );
-          }
-        }
-
         const deferred = defer<any>();
+        deferredsByBucket.set(bucket, deferred);
 
         pendingPlanResultses.push(planResults);
         pendingDeferreds.push(deferred);
@@ -1834,7 +1827,8 @@ export class Aether<
         for (let i = 0; i < pendingPlanResultsesLength; i++) {
           // Execution complete; delete from cache
           const planResults = pendingPlanResultses[i];
-          deferredsByPlanResults.delete(planResults);
+          const bucket = planResults.getBucket(commonAncestorPathIdentity);
+          deferredsByBucket.delete(bucket);
 
           // Add the result to our results
           const j = pendingPlanResultsesIndexes[i];
@@ -1848,7 +1842,8 @@ export class Aether<
         for (let i = 0; i < pendingPlanResultsesLength; i++) {
           // Execution complete; delete from cache
           const planResults = pendingPlanResultses[i];
-          deferredsByPlanResults.delete(planResults);
+          const bucket = planResults.getBucket(commonAncestorPathIdentity);
+          deferredsByBucket.delete(bucket);
 
           // Add the result to our results
           const j = pendingPlanResultsesIndexes[i];
@@ -2179,17 +2174,13 @@ export class Aether<
     debugExecuteVerbose("Root id is %c", rootId);
     const crystalContext: CrystalContext = {
       aether: this,
-      resultByIndexesByPlanId: new Map(),
       metaByPlanId: Object.create(null),
-      inProgressPlanResolutionByPlanIdAndPlanResults: this.plans.reduce(
-        (memo, plan, idx) => {
-          if (plan && plan.id === idx) {
-            memo[plan.id] = new Map();
-          }
-          return memo;
-        },
-        {},
-      ),
+      inProgressPlanResolutions: this.plans.reduce((memo, plan, idx) => {
+        if (plan && plan.id === idx) {
+          memo[plan.id] = new Map();
+        }
+        return memo;
+      }, {}),
       rootId,
       // @ts-ignore We'll set this in just a moment...
       rootCrystalObject: null,

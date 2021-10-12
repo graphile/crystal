@@ -12,7 +12,7 @@ import type { Aether } from "./aether";
 import type { Deferred } from "./deferred";
 import type { InputPlan } from "./input";
 import type { ExecutablePlan, ModifierPlan } from "./plan";
-import type { PlanResults } from "./planResults";
+import type { PlanResults, PlanResultsBucket } from "./planResults";
 import type { __TrackedObjectPlan } from "./plans";
 import type { UniqueId } from "./utils";
 
@@ -119,8 +119,8 @@ export interface CrystalContext {
     [planId: number]: Record<string, unknown> | undefined;
   };
 
-  inProgressPlanResolutionByPlanIdAndPlanResults: {
-    [planId: number]: Map<PlanResults, Deferred<any>>;
+  inProgressPlanResolutions: {
+    [planId: number]: Map<PlanResultsBucket, Deferred<any>>;
   };
 
   rootId: UniqueId;
