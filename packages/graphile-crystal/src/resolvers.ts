@@ -348,13 +348,13 @@ export function newCrystalObject(
   indexes: ReadonlyArray<number>,
   crystalContext: CrystalContext,
   // TODO: remove this?
-  planResultsByCommonAncestorPathIdentity: PlanResults,
+  planResults: PlanResults,
 ): CrystalObject {
   const crystalObject: CrystalObject = {
     [$$pathIdentity]: pathIdentity,
     [$$concreteType]: typeName,
     [$$id]: id,
-    [$$planResults]: planResultsByCommonAncestorPathIdentity,
+    [$$planResults]: planResults,
     [$$crystalContext]: crystalContext,
     toString() {
       const p = indexes.length ? `.${indexes.join(".")}` : ``;

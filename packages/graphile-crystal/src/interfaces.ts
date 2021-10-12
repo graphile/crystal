@@ -98,7 +98,7 @@ export interface CrystalLayerObject {
   [$$isCrystalLayerObject]: true;
   parentCrystalObject: CrystalObject<any>;
   itemByItemPlanId: Map<number, any>;
-  planResultsByCommonAncestorPathIdentity: PlanResults;
+  planResults: PlanResults;
   indexes: number[];
 }
 

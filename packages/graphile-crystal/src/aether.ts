@@ -131,7 +131,7 @@ type AetherPhase =
 
 function newCrystalLayerObject(
   parentCrystalObject: CrystalObject<any>,
-  planResultsByCommonAncestorPathIdentity: PlanResults = new PlanResults(
+  planResults: PlanResults = new PlanResults(
     parentCrystalObject[$$planResults],
   ),
   indexes: number[] = [],
@@ -143,7 +143,7 @@ function newCrystalLayerObject(
     [$$isCrystalLayerObject]: true,
     parentCrystalObject,
     itemByItemPlanId: new Map(),
-    planResultsByCommonAncestorPathIdentity,
+    planResults,
     indexes,
   };
 }
@@ -2270,7 +2270,7 @@ export class Aether<
             if (clo == null) {
               return null;
             }
-            const data = clo.planResultsByCommonAncestorPathIdentity.get(
+            const data = clo.planResults.get(
               layerPlan.commonAncestorPathIdentity,
               layerPlan.id,
             );
@@ -2298,10 +2298,10 @@ export class Aether<
         const {
           parentCrystalObject,
           indexes,
-          planResultsByCommonAncestorPathIdentity,
+          planResults,
         } = clo;
         if (
-          planResultsByCommonAncestorPathIdentity.hasPathIdentity(
+          planResults.hasPathIdentity(
             layerPlan.commonAncestorPathIdentity,
           )
         ) {
@@ -2310,7 +2310,7 @@ export class Aether<
           );
         }
         // NOTE: this could be an async iterator
-        const listResult = clo.planResultsByCommonAncestorPathIdentity.get(
+        const listResult = clo.planResults.get(
           dep.commonAncestorPathIdentity,
           dep.id,
         );
@@ -2322,7 +2322,7 @@ export class Aether<
               return null;
             }
             const copy = new PlanResults(
-              planResultsByCommonAncestorPathIdentity,
+              planResults,
             );
             copy.set(
               layerPlan.commonAncestorPathIdentity,
@@ -2352,7 +2352,7 @@ export class Aether<
             async next() {
               const nextPromise = listResultIterator.next();
               const copy = new PlanResults(
-                planResultsByCommonAncestorPathIdentity,
+                planResults,
               );
 
               try {
@@ -2435,7 +2435,7 @@ export class Aether<
         layerPlan,
         crystalContext,
         crystalLayerObjects.map((clo) =>
-          clo == null ? null : clo.planResultsByCommonAncestorPathIdentity,
+          clo == null ? null : clo.planResults,
         ),
       );
       if (isDev) {
@@ -2549,7 +2549,7 @@ export class Aether<
           sideEffectPlan,
           crystalContext,
           crystalLayerObjects.map((clo) =>
-            clo == null ? null : clo.planResultsByCommonAncestorPathIdentity,
+            clo == null ? null : clo.planResults,
           ),
         );
       }
@@ -2572,7 +2572,7 @@ export class Aether<
           uid(batch.pathIdentity),
           clo.indexes,
           crystalContext,
-          clo.planResultsByCommonAncestorPathIdentity,
+          clo.planResults,
         );
       };
 
