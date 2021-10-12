@@ -8,3 +8,4 @@ alter sequence interfaces_and_unions.union_items_id_seq restart with 1000000;
 alter sequence interfaces_and_unions.person_bookmarks_id_seq restart with 1000000;
 alter sequence interfaces_and_unions.person_likes_id_seq restart with 1000000;
 
+delete from app_public.messages where substring(id::text from 14 for 11) <> '-0000-0000-';
