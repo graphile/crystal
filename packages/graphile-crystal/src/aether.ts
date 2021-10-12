@@ -2349,17 +2349,6 @@ export class Aether<
         );
       }
 
-      // Store the result
-      crystalLayerObjects.forEach((clo, i) => {
-        if (clo != null) {
-          clo.planResultsByCommonAncestorPathIdentity.set(
-            layerPlan.commonAncestorPathIdentity,
-            layerPlan.id,
-            layerResults[i],
-          );
-        }
-      });
-
       // Now executing the following layers using the same crystalLayerObjects
       return mapResult
         ? crystalLayerObjects.map(mapResult)
