@@ -2154,6 +2154,217 @@ export class Aether<
     return batch;
   }
 
+  private async executeLayers(
+    crystalContext: CrystalContext,
+    layers: ExecutablePlan[],
+    // Even when AsyncIterators are involved, this will always be a concrete array
+    crystalLayerObjects: CrystalLayerObject[],
+    mapResult: MapResult,
+  ): Promise<any> {
+    const [layerPlan, ...rest] = layers;
+    const crystalLayerObjectsLength = crystalLayerObjects.length;
+
+    debugExecuteVerbose(
+      "Executing plan %c with %c crystal layer objects",
+      layerPlan,
+      crystalLayerObjectsLength,
+    );
+
+    if (rest.length === 0) {
+      // No more plans -> no more CrystalLayerObjects.
+
+      if (layerPlan instanceof __ListItemPlan) {
+        const depId = layerPlan.dependencies[0];
+        const dep = this.plans[depId];
+        const layerResults = crystalLayerObjects.map((value) =>
+          value == null
+            ? null
+            : mapResult(
+                value,
+                value.planResultsByCommonAncestorPathIdentity.get(
+                  dep.commonAncestorPathIdentity,
+
+                  dep.id,
+                ),
+              ),
+        );
+        return layerResults;
+      } else {
+        // Execute it, return results
+        const layerResults = await this.executePlan(
+          layerPlan,
+          crystalContext,
+          crystalLayerObjects,
+        );
+
+        if (isDev) {
+          assert.ok(
+            Array.isArray(layerResults),
+            "Expected plan execution to return an array",
+          );
+          assert.strictEqual(
+            layerResults.length,
+            crystalLayerObjectsLength,
+            "Expected plan execution result to have same length as input objects",
+          );
+        }
+        return layerResults.map((result, i) =>
+          result == null ? null : mapResult(crystalLayerObjects[i], result),
+        );
+      }
+    } else {
+      if (layerPlan instanceof __ListItemPlan) {
+        // Derive new CrystalLayerObjects from the existing ones.
+        const depId = layerPlan.dependencies[0];
+        const dep = this.plans[depId];
+        const layerResults = crystalLayerObjects.map((value) => {
+          const {
+            parentCrystalObject,
+            indexes,
+            planResultsByCommonAncestorPathIdentity,
+          } = value;
+          if (
+            planResultsByCommonAncestorPathIdentity.hasPathIdentity(
+              layerPlan.commonAncestorPathIdentity,
+            )
+          ) {
+            throw new Error(
+              `Did not expect plans to exist within the '${layerPlan.commonAncestorPathIdentity}' bucket yet.`,
+            );
+          }
+          // NOTE: this could be an async iterator
+          const listResult = value.planResultsByCommonAncestorPathIdentity.get(
+            dep.commonAncestorPathIdentity,
+            dep.id,
+          );
+          debugExecuteVerbose("Executing %c's dependency, %c", layerPlan, dep);
+          if (Array.isArray(listResult)) {
+            // Turn each entry in this listResult into it's own CrystalLayerObject, then execute the new layers.
+            const newCLOs = listResult.map((result, i) => {
+              const copy = new PlanResults(
+                planResultsByCommonAncestorPathIdentity,
+              );
+              copy.set(
+                layerPlan.commonAncestorPathIdentity,
+                layerPlan.id,
+                result,
+              );
+              return newCrystalLayerObject(parentCrystalObject, copy, [
+                ...indexes,
+                i,
+              ]);
+            });
+            // TODO: we should be optimise this to call executeLayers once, rather than once per crystalLayerObject.
+            return this.executeLayers(crystalContext, rest, newCLOs, mapResult);
+          } else if (isAsyncIterable(listResult)) {
+            const listResultIterator = listResult[Symbol.asyncIterator]();
+            const abort = defer<IteratorResult<any, any>>();
+
+            //eslint-disable-next-line @typescript-eslint/no-this-alias
+            const aether = this;
+
+            const asyncIterator: AsyncIterableIterator<any> = {
+              [Symbol.asyncIterator]() {
+                return this;
+              },
+              async next() {
+                const nextPromise = listResultIterator.next();
+                const copy = new PlanResults(
+                  planResultsByCommonAncestorPathIdentity,
+                );
+
+                try {
+                  const { done, value: resultPromise } = await Promise.race([
+                    abort,
+                    nextPromise,
+                  ]);
+                  const result = await Promise.race([abort, resultPromise]);
+
+                  copy.set(
+                    layerPlan.commonAncestorPathIdentity,
+                    layerPlan.id,
+                    result,
+                  );
+                  const newCLO = newCrystalLayerObject(
+                    parentCrystalObject,
+                    copy,
+                    [...indexes, -1],
+                  );
+                  const [value] = await aether.executeLayers(
+                    crystalContext,
+                    rest,
+                    // TODO: batch this over a tick?
+                    [newCLO],
+                    mapResult,
+                  );
+                  return { done, value };
+                } catch (e) {
+                  if (e === $$FINISHED) {
+                    return { done: true, value: undefined };
+                  } else {
+                    throw e;
+                  }
+                }
+              },
+              return(value) {
+                abort.reject($$FINISHED as any);
+                return (
+                  listResultIterator.return?.(value) ||
+                  Promise.resolve({
+                    done: true,
+                    value: undefined,
+                  })
+                );
+              },
+              throw(e) {
+                abort.reject($$FINISHED as any);
+                return (
+                  listResultIterator.throw?.(e) ||
+                  Promise.resolve({ done: true, value: undefined })
+                );
+              },
+            };
+            return asyncIterator;
+          } else {
+            if (listResult != null) {
+              console.error(
+                `Expected listResult to be an array, found ${inspect(
+                  listResult,
+                )}`,
+              );
+            }
+            // TODO: should this be null in some cases?
+            // Stops here
+            return [];
+          }
+        });
+        return layerResults;
+      } else {
+        // Execute the plan with the same crystalLayerObjects
+        const executionResults = await this.executePlan(
+          layerPlan,
+          crystalContext,
+          crystalLayerObjects,
+        );
+        // Store the result
+        crystalLayerObjects.forEach((clo, i) => {
+          clo.planResultsByCommonAncestorPathIdentity.set(
+            layerPlan.commonAncestorPathIdentity,
+            layerPlan.id,
+            executionResults[i],
+          );
+        });
+        // Now executing the following layers using the same crystalLayerObjects
+        return this.executeLayers(
+          crystalContext,
+          rest,
+          crystalLayerObjects,
+          mapResult,
+        );
+      }
+    }
+  }
+
   /**
    * Implements `ExecuteBatch`.
    *
@@ -2228,210 +2439,6 @@ export class Aether<
         }
       }
 
-      const executeLayers = async (
-        layers: ExecutablePlan[],
-        // Even when AsyncIterators are involved, this will always be a concrete array
-        crystalLayerObjects: CrystalLayerObject[],
-        mapResult: MapResult,
-      ): Promise<any> => {
-        const [layerPlan, ...rest] = layers;
-        const crystalLayerObjectsLength = crystalLayerObjects.length;
-
-        debugExecuteVerbose(
-          "Executing plan %c with %c crystal layer objects",
-          layerPlan,
-          crystalLayerObjectsLength,
-        );
-
-        if (rest.length === 0) {
-          // No more plans -> no more CrystalLayerObjects.
-
-          if (layerPlan instanceof __ListItemPlan) {
-            const depId = layerPlan.dependencies[0];
-            const dep = this.plans[depId];
-            const layerResults = crystalLayerObjects.map((value) =>
-              value == null
-                ? null
-                : mapResult(
-                    value,
-                    value.planResultsByCommonAncestorPathIdentity.get(
-                      dep.commonAncestorPathIdentity,
-
-                      dep.id,
-                    ),
-                  ),
-            );
-            return layerResults;
-          } else {
-            // Execute it, return results
-            const layerResults = await this.executePlan(
-              layerPlan,
-              crystalContext,
-              crystalLayerObjects,
-            );
-
-            if (isDev) {
-              assert.ok(
-                Array.isArray(layerResults),
-                "Expected plan execution to return an array",
-              );
-              assert.strictEqual(
-                layerResults.length,
-                crystalLayerObjectsLength,
-                "Expected plan execution result to have same length as input objects",
-              );
-            }
-            return layerResults.map((result, i) =>
-              result == null ? null : mapResult(crystalLayerObjects[i], result),
-            );
-          }
-        } else {
-          if (layerPlan instanceof __ListItemPlan) {
-            // Derive new CrystalLayerObjects from the existing ones.
-            const depId = layerPlan.dependencies[0];
-            const dep = this.plans[depId];
-            const layerResults = crystalLayerObjects.map((value) => {
-              const {
-                parentCrystalObject,
-                indexes,
-                planResultsByCommonAncestorPathIdentity,
-              } = value;
-              if (
-                planResultsByCommonAncestorPathIdentity.hasPathIdentity(
-                  layerPlan.commonAncestorPathIdentity,
-                )
-              ) {
-                throw new Error(
-                  `Did not expect plans to exist within the '${layerPlan.commonAncestorPathIdentity}' bucket yet.`,
-                );
-              }
-              // NOTE: this could be an async iterator
-              const listResult =
-                value.planResultsByCommonAncestorPathIdentity.get(
-                  dep.commonAncestorPathIdentity,
-                  dep.id,
-                );
-              debugExecuteVerbose(
-                "Executing %c's dependency, %c",
-                layerPlan,
-                dep,
-              );
-              if (Array.isArray(listResult)) {
-                // Turn each entry in this listResult into it's own CrystalLayerObject, then execute the new layers.
-                const newCLOs = listResult.map((result, i) => {
-                  const copy = new PlanResults(
-                    planResultsByCommonAncestorPathIdentity,
-                  );
-                  copy.set(
-                    layerPlan.commonAncestorPathIdentity,
-                    layerPlan.id,
-                    result,
-                  );
-                  return newCrystalLayerObject(parentCrystalObject, copy, [
-                    ...indexes,
-                    i,
-                  ]);
-                });
-                // TODO: we should be optimise this to call executeLayers once, rather than once per crystalLayerObject.
-                return executeLayers(rest, newCLOs, mapResult);
-              } else if (isAsyncIterable(listResult)) {
-                const listResultIterator = listResult[Symbol.asyncIterator]();
-                const abort = defer<IteratorResult<any, any>>();
-                const asyncIterator: AsyncIterableIterator<any> = {
-                  [Symbol.asyncIterator]() {
-                    return this;
-                  },
-                  async next() {
-                    const nextPromise = listResultIterator.next();
-                    const copy = new PlanResults(
-                      planResultsByCommonAncestorPathIdentity,
-                    );
-
-                    try {
-                      const { done, value: resultPromise } = await Promise.race(
-                        [abort, nextPromise],
-                      );
-                      const result = await Promise.race([abort, resultPromise]);
-
-                      copy.set(
-                        layerPlan.commonAncestorPathIdentity,
-                        layerPlan.id,
-                        result,
-                      );
-                      const newCLO = newCrystalLayerObject(
-                        parentCrystalObject,
-                        copy,
-                        [...indexes, -1],
-                      );
-                      const [value] = await executeLayers(
-                        rest,
-                        // TODO: batch this over a tick?
-                        [newCLO],
-                        mapResult,
-                      );
-                      return { done, value };
-                    } catch (e) {
-                      if (e === $$FINISHED) {
-                        return { done: true, value: undefined };
-                      } else {
-                        throw e;
-                      }
-                    }
-                  },
-                  return(value) {
-                    abort.reject($$FINISHED as any);
-                    return (
-                      listResultIterator.return?.(value) ||
-                      Promise.resolve({
-                        done: true,
-                        value: undefined,
-                      })
-                    );
-                  },
-                  throw(e) {
-                    abort.reject($$FINISHED as any);
-                    return (
-                      listResultIterator.throw?.(e) ||
-                      Promise.resolve({ done: true, value: undefined })
-                    );
-                  },
-                };
-                return asyncIterator;
-              } else {
-                if (listResult != null) {
-                  console.error(
-                    `Expected listResult to be an array, found ${inspect(
-                      listResult,
-                    )}`,
-                  );
-                }
-                // TODO: should this be null in some cases?
-                // Stops here
-                return [];
-              }
-            });
-            return layerResults;
-          } else {
-            // Execute the plan with the same crystalLayerObjects
-            const executionResults = await this.executePlan(
-              layerPlan,
-              crystalContext,
-              crystalLayerObjects,
-            );
-            // Store the result
-            crystalLayerObjects.forEach((clo, i) => {
-              clo.planResultsByCommonAncestorPathIdentity.set(
-                layerPlan.commonAncestorPathIdentity,
-                layerPlan.id,
-                executionResults[i],
-              );
-            });
-            // Now executing the following layers using the same crystalLayerObjects
-            return executeLayers(rest, crystalLayerObjects, mapResult);
-          }
-        }
-      };
-
       const crystalLayerObjects = crystalObjects.map((crystalObject) =>
         newCrystalLayerObject(crystalObject),
       );
@@ -2489,7 +2496,8 @@ export class Aether<
         layers,
       );
 
-      const results = await executeLayers(
+      const results = await this.executeLayers(
+        crystalContext,
         layers,
         crystalLayerObjects,
         mapResult,
