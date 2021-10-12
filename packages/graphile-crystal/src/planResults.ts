@@ -73,7 +73,7 @@ export class PlanResults {
     data: any,
   ): any {
     const bucket = this.getBucket(commonAncestorPathIdentity);
-    if (isDev && bucket.has(planId) && bucket.get(planId) !== data) {
+    if (isDev && bucket.has(planId)) {
       throw new Error(
         `${this}: Attempted to overwrite value for plan '${planId}' at path identity '${commonAncestorPathIdentity}' from '${inspect(
           bucket.get(planId),
