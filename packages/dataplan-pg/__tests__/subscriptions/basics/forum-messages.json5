@@ -4,7 +4,7 @@
       forumMessage: {
         operationType: "insert",
         message: {
-          id: "12f0e27c-285a-11ec-af52-b3b5b138d136",
+          id: "<UUID 1>",
           featured: false,
           body: "New message 1",
           isArchived: false,
@@ -24,7 +24,7 @@
       forumMessage: {
         operationType: "insert",
         message: {
-          id: "12f0e27d-285a-11ec-af52-93e1ad117594",
+          id: "<UUID 1>",
           featured: false,
           body: "New message 2",
           isArchived: false,

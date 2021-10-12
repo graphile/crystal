@@ -492,6 +492,40 @@ function makeSQLSnapshotSafe(sql: string): string {
   });
 }
 
+const UUID_REGEXP = /^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$/i;
+
+function makeResultSnapshotSafe(
+  data: any,
+  replacements = { uuid: new Map<string, number>(), uuidCounter: 1 },
+): any {
+  if (Array.isArray(data)) {
+    return data.map((entry) => makeResultSnapshotSafe(entry, replacements));
+  } else if (typeof data === "object") {
+    if (data == null) {
+      return data;
+    }
+    const keys = Object.keys(data);
+    return keys.reduce((memo, key) => {
+      memo[key] = makeResultSnapshotSafe(data[key], replacements);
+      return memo;
+    }, {} as any);
+  } else if (
+    typeof data === "string" &&
+    UUID_REGEXP.test(data) &&
+    !data.includes("-0000-0000-")
+  ) {
+    const uuidNumber = replacements.uuid.has(data)
+      ? replacements.uuid.get(data)
+      : replacements.uuidCounter++;
+    if (!replacements.uuid.has(data)) {
+      replacements.uuid.set(data, uuidNumber);
+    }
+    return `<UUID ${uuidNumber}>`;
+  } else {
+    return data;
+  }
+}
+
 export const assertSnapshotsMatch = async (
   only: "sql" | "result",
   props: {
@@ -512,7 +546,10 @@ export const assertSnapshotsMatch = async (
 
   if (only === "result") {
     const resultFileName = basePath + (ext || "") + ".json5";
-    const formattedData = prettier.format(JSON5.stringify(payloads || data), {
+    const processedResults = payloads
+      ? payloads.map((payload) => makeResultSnapshotSafe(payload))
+      : makeResultSnapshotSafe(data);
+    const formattedData = prettier.format(JSON5.stringify(processedResults), {
       parser: "json5",
       printWidth: 120,
     });
