@@ -95,7 +95,7 @@ import {
 
 const $$FINISHED: unique symbol = Symbol("finished");
 
-type MapResult = (clo: CrystalLayerObject, result: any) => any;
+type MapResult = (clo: CrystalLayerObject) => any;
 
 /**
  * Describes the document tree that we're parsing; is populated by
@@ -2174,19 +2174,8 @@ export class Aether<
       // No more plans -> no more CrystalLayerObjects.
 
       if (layerPlan instanceof __ListItemPlan) {
-        const depId = layerPlan.dependencies[0];
-        const dep = this.plans[depId];
-        const layerResults = crystalLayerObjects.map((value) =>
-          value == null
-            ? null
-            : mapResult(
-                value,
-                value.planResultsByCommonAncestorPathIdentity.get(
-                  dep.commonAncestorPathIdentity,
-
-                  dep.id,
-                ),
-              ),
+        const layerResults = crystalLayerObjects.map((clo) =>
+          clo == null ? null : mapResult(clo),
         );
         return layerResults;
       } else {
@@ -2209,7 +2198,7 @@ export class Aether<
           );
         }
         return layerResults.map((result, i) =>
-          result == null ? null : mapResult(crystalLayerObjects[i], result),
+          result == null ? null : mapResult(crystalLayerObjects[i]),
         );
       }
     } else {
@@ -2463,32 +2452,51 @@ export class Aether<
         assertObjectType(namedReturnType);
       }
 
-      const common = (clo: CrystalLayerObject, data: any, typeName: string) => {
-        const planResults = new PlanResults(
-          clo.planResultsByCommonAncestorPathIdentity,
-        );
-        planResults.set(itemPlan.commonAncestorPathIdentity, itemPlan.id, data);
+      const crystalObjectFromCrystalLayerObjectAndTypeName = (
+        clo: CrystalLayerObject,
+        typeName: string,
+      ) => {
         return newCrystalObject(
           batch.pathIdentity,
           typeName,
           uid(batch.pathIdentity),
           clo.indexes,
           crystalContext,
-          planResults,
+          clo.planResultsByCommonAncestorPathIdentity,
         );
       };
 
       // Now, execute the layers to get the result
-      const mapResult: MapResult = isScalar
-        ? (_clo, data) => data
-        : isPolymorphic
-        ? (clo, data) => {
-            assertPolymorphicData(data);
-            const { [$$concreteType]: typeName, [$$concreteData]: innerData } =
-              data;
-            return common(clo, innerData, typeName);
-          }
-        : (clo, data) => common(clo, data, namedReturnType.name);
+      const mapResult: MapResult =
+        // When we're returning a scalar it will not be wrapped in a crystal object - just get the data and return it directly.
+        isScalar
+          ? (clo) => {
+              const data = clo.planResultsByCommonAncestorPathIdentity.get(
+                itemPlan.commonAncestorPathIdentity,
+                itemPlan.id,
+              );
+              return data;
+            }
+          : // When we're returning something polymorphic we need to figure out the typeName which we get from the plan result.
+          isPolymorphic
+          ? (clo) => {
+              const data = clo.planResultsByCommonAncestorPathIdentity.get(
+                itemPlan.commonAncestorPathIdentity,
+                itemPlan.id,
+              );
+              assertPolymorphicData(data);
+              const { [$$concreteType]: typeName } = data;
+              return crystalObjectFromCrystalLayerObjectAndTypeName(
+                clo,
+                typeName,
+              );
+            }
+          : // Otherwise we represent a standard object, so we can just use the expected named type
+            (clo) =>
+              crystalObjectFromCrystalLayerObjectAndTypeName(
+                clo,
+                namedReturnType.name,
+              );
 
       debugExecuteVerbose(
         `Executing batch with %s layers: %c`,
