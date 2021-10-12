@@ -1,3 +1,7 @@
+import { inspect } from "util";
+
+import { isDev } from "./dev";
+
 /**
  * PlanResults stores the results from plan execution. A `PlanResults` instance
  * is typically accessed via the `CrystalObject` to which it belongs, however
@@ -61,6 +65,14 @@ export class PlanResults {
   ): any {
     if (!this.store[commonAncestorPathIdentity]) {
       this.store[commonAncestorPathIdentity] = new Map();
+    }
+    if (isDev && this.store[commonAncestorPathIdentity]!.has(planId)) {
+      throw new Error(
+        `Attempted to overwrite value for plan '${planId}' at path identity '${commonAncestorPathIdentity}' from '${inspect(
+          this.store[commonAncestorPathIdentity]!.get(planId),
+          { colors: true },
+        )}' to '${inspect(data, { colors: true })}'`,
+      );
     }
     return this.store[commonAncestorPathIdentity]!.set(planId, data);
   }
