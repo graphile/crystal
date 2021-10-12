@@ -2365,6 +2365,7 @@ export class Aether<
                       );
                       const [value] = await executeLayers(
                         rest,
+                        // TODO: batch this over a tick?
                         [newCLO],
                         mapResult,
                       );
