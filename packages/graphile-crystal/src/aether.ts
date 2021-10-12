@@ -56,6 +56,7 @@ import type {
   FieldAndGroup,
   GroupedSelections,
   PlanOptions,
+  PromiseOrDirect,
   TrackedArguments,
 } from "./interfaces";
 import {
@@ -1692,14 +1693,16 @@ export class Aether<
 
   /**
    * Implements `ExecutePlan`.
+   *
+   * @remarks `await` is forbidden in this method to avoid race conditions.
    */
-  private async executePlan<T>(
+  private executePlan<T>(
     plan: ExecutablePlan<T>,
     crystalContext: CrystalContext,
     planResultses: ReadonlyArray<null | PlanResults>,
     visitedPlans = new Set<ExecutablePlan>(),
     depth = 0,
-  ): Promise<any[]> {
+  ): PromiseOrDirect<any[]> {
     const indent = "    ".repeat(depth);
     const follow = indent + "  ⮞";
     if (isDev) {
@@ -1726,7 +1729,10 @@ export class Aether<
       );
     }
     const pendingPlanResultses: PlanResults[] = []; // Length unknown
-    const pendingCrystalLayerObjectsIndexes: number[] = []; // Same length as pendingPlanResultses
+    const pendingDeferreds: Deferred<any>[] = []; // Same length as pendingPlanResultses
+    const pendingPlanResultsesIndexes: number[] = []; // Same length as pendingPlanResultses
+    const inProgressDeferreds: Deferred<any>[] = []; // Length unknown
+    const inProgressPlanResultsesIndexes: number[] = []; // Same length as inProgressDeferreds
     const planResultsesLength = planResultses.length;
     const result = new Array(planResultsesLength);
     debugExecute(
@@ -1736,6 +1742,10 @@ export class Aether<
       planResultsesLength,
     );
     const commonAncestorPathIdentity = plan.commonAncestorPathIdentity;
+
+    const deferredsByPlanResults =
+      crystalContext.inProgressPlanResolutionByPlanIdAndPlanResults[plan.id];
+
     for (let i = 0; i < planResultsesLength; i++) {
       const planResults = planResultses[i];
       if (planResults == null) {
@@ -1770,142 +1780,242 @@ export class Aether<
           )}.`,
         );
       }
-      debugExecuteVerbose("  %s no result for %c", follow, planResults);
-      pendingPlanResultses.push(planResults);
-      pendingCrystalLayerObjectsIndexes.push(i);
-    }
-    const pendingCrystalObjectsLength = pendingPlanResultses.length;
-    if (pendingCrystalObjectsLength > 0) {
-      const dependenciesCount = plan.dependencies.length;
-      const dependencyValuesList = new Array(dependenciesCount);
-      debugExecute("%s Executing %o dependencies", follow, dependenciesCount);
+      if (deferredsByPlanResults.has(planResults)) {
+        // In progress already
+        const deferred = deferredsByPlanResults.get(planResults)!;
+        debugExecuteVerbose(
+          "  %s already in progress for %c",
+          follow,
+          planResults,
+        );
+        inProgressDeferreds.push(deferred);
+        inProgressPlanResultsesIndexes.push(i);
+      } else {
+        // Need to start executing
+        debugExecuteVerbose("  %s no result for %c", follow, planResults);
 
-      for (let i = 0; i < dependenciesCount; i++) {
-        const dependencyPlanId = plan.dependencies[i];
-        const dependencyPlan = this.plans[dependencyPlanId];
         if (isDev) {
-          if (!dependencyPlan) {
+          if (pendingPlanResultses.includes(planResults)) {
             throw new Error(
-              `Expected plan dependency '${i}' for '${plan}' to be a plan, instead found '${inspect(
-                dependencyPlan,
-              )}'`,
+              `GraphileInternalError<cc654e79-fcfb-4ae7-8f25-fd032c3947d9>: Duplicate PlanResults detected whilst executing ${plan}... is this a problem?`,
             );
           }
         }
-        const allDependencyResults = await this.executePlan(
-          dependencyPlan,
-          crystalContext,
-          pendingPlanResultses,
-          // This is to detect loops, so we don't want changes made inside to
-          // cascade back outside -> clone.
-          new Set([...visitedPlans]),
-          depth + 1,
-        );
-        dependencyValuesList[i] = allDependencyResults;
+
+        const deferred = defer<any>();
+
+        pendingPlanResultses.push(planResults);
+        pendingDeferreds.push(deferred);
+        pendingPlanResultsesIndexes.push(i);
       }
+    }
 
-      const values = new Array(pendingCrystalObjectsLength);
+    const pendingPlanResultsesLength = pendingPlanResultses.length;
+    const inProgressDeferredsLength = inProgressDeferreds.length;
+    if (pendingPlanResultsesLength === 0 && inProgressDeferredsLength === 0) {
+      // Optimization
+      return result;
+    }
 
-      for (let i = 0; i < pendingCrystalObjectsLength; i++) {
-        const entry = new Array(dependenciesCount);
-        for (let j = 0; j < dependenciesCount; j++) {
-          const dependencyValues = dependencyValuesList[j];
-          entry[j] = dependencyValues[i];
+    const pendingResultsPromise =
+      pendingPlanResultsesLength > 0
+        ? this.executePlanPending(
+            plan,
+            crystalContext,
+            pendingPlanResultses,
+            visitedPlans,
+            depth,
+          )
+        : Promise.resolve([]);
+
+    // IMPORTANT: this must not trigger any new errors otherwise these `deferred`'s may live forever!
+    const handlePendingPromise = pendingResultsPromise.then(
+      (pendingResults) => {
+        for (let i = 0; i < pendingPlanResultsesLength; i++) {
+          // Execution complete; delete from cache
+          const planResults = pendingPlanResultses[i];
+          deferredsByPlanResults.delete(planResults);
+
+          // Add the result to our results
+          const j = pendingPlanResultsesIndexes[i];
+          result[j] = pendingResults[i];
+
+          // Resolve the promise
+          pendingDeferreds[i].resolve(pendingResults);
         }
-        values[i] = entry;
-      }
+      },
+      (error) => {
+        for (let i = 0; i < pendingPlanResultsesLength; i++) {
+          // Execution complete; delete from cache
+          const planResults = pendingPlanResultses[i];
+          deferredsByPlanResults.delete(planResults);
 
-      let meta = crystalContext.metaByPlanId[plan.id];
-      if (!meta) {
-        meta = Object.create(null) as Record<string, unknown>;
-        crystalContext.metaByPlanId[plan.id] = meta;
-      }
-      // Note: the `execute` method on plans is responsible for memoizing
-      // results into `meta`.
-      if (plan instanceof __ListItemPlan) {
-        throw new Error(
-          "Should never attempt to execute __ListItemPlan; that should be handled within executeBatch",
-        );
-      }
-      const planOptions = this.planOptionsByPlan.get(plan);
-      const isSubscribe = plan.id === this.subscriptionPlanId;
-      const pendingResults =
-        isSubscribe || planOptions?.stream
-          ? await (plan as unknown as StreamablePlan<unknown>).stream(
-              values,
-              meta,
-              isSubscribe ? { initialCount: 0 } : planOptions!.stream!,
-            )
-          : await plan.execute(values, meta);
-      if (plan.debug) {
-        console.log(
-          `debugPlans(${plan}): called with: ${inspect(values, {
-            colors: true,
-            depth: 6,
-          })}; returned: ${inspect(pendingResults, {
-            colors: true,
-            depth: 6,
-          })}`,
-        );
-      }
-      if (isDev) {
-        assert.ok(
-          Array.isArray(pendingResults),
-          "Expected plan execution to return a list",
-        );
-        assert.strictEqual(
-          pendingResults.length,
-          pendingCrystalObjectsLength,
-          "Expected plan execution to return same number of results as inputs",
-        );
-      }
-      for (let i = 0; i < pendingCrystalObjectsLength; i++) {
-        const planResults = pendingPlanResultses[i];
+          // Add the result to our results
+          const j = pendingPlanResultsesIndexes[i];
+          // TODO: is wrapping in a CrystalError here correct?
+          result[j] = new CrystalError(error);
 
-        // This could be a Promise, an AsyncIterable, a Promise to an
-        // AsyncIterable, or arbitrary data (including an array).
-        const rawPendingResult = pendingResults[i];
+          // Reject the promise
+          pendingDeferreds[i].reject(error);
+        }
+      },
+    );
 
-        const j = pendingCrystalLayerObjectsIndexes[i];
+    const handleInProgressPromise = Promise.all(inProgressDeferreds).then(
+      (completedInProgressResultses) => {
+        for (let i = 0; i < inProgressDeferredsLength; i++) {
+          const j = inProgressPlanResultsesIndexes[i];
+          result[j] = completedInProgressResultses[i];
+        }
+      },
+    );
 
-        // NOTE: after this result[j] could be an AsyncIterable, or arbitrary
-        // data (including an array).
-        if (isPromise(rawPendingResult)) {
-          try {
-            result[j] = await rawPendingResult;
-          } catch (e) {
-            result[j] = new CrystalError(e);
+    return Promise.all([handlePendingPromise, handleInProgressPromise]).then(
+      () => {
+        if (isDev) {
+          if (debugExecuteVerbose.enabled) {
+            debugExecuteVerbose(
+              `%sExecutePlan(%s): complete; results: %c`,
+              indent,
+              plan,
+              result,
+            );
+          } else {
+            debugExecute(`%sExecutePlan(%s): complete`, indent, plan);
           }
         }
-        // TODO: do we need 'else if (isAsyncIterable(rawPendingResult)) { ... }'
-        else {
-          result[j] = rawPendingResult;
+        return result;
+      },
+    );
+  }
+
+  private async executePlanPending<T>(
+    plan: ExecutablePlan<T>,
+    crystalContext: CrystalContext,
+    pendingPlanResultses: ReadonlyArray<PlanResults>,
+    visitedPlans: Set<ExecutablePlan>,
+    depth: number,
+  ): Promise<any[]> {
+    const indent = "    ".repeat(depth);
+    const follow = indent + "  ⮞";
+    const commonAncestorPathIdentity = plan.commonAncestorPathIdentity;
+    const pendingPlanResultsesLength = pendingPlanResultses.length;
+    const dependenciesCount = plan.dependencies.length;
+    const dependencyValuesList = new Array(dependenciesCount);
+    debugExecute("%s Executing %o dependencies", follow, dependenciesCount);
+
+    for (let i = 0; i < dependenciesCount; i++) {
+      const dependencyPlanId = plan.dependencies[i];
+      const dependencyPlan = this.plans[dependencyPlanId];
+      if (isDev) {
+        if (!dependencyPlan) {
+          throw new Error(
+            `Expected plan dependency '${i}' for '${plan}' to be a plan, instead found '${inspect(
+              dependencyPlan,
+            )}'`,
+          );
         }
-
-        // TODO: if result[j] is AsyncIterable it would be nice to avoid
-        // writing it to the plan results.
-        planResults.set(commonAncestorPathIdentity, plan.id, result[j]);
       }
+      const allDependencyResults = await this.executePlan(
+        dependencyPlan,
+        crystalContext,
+        pendingPlanResultses,
+        // This is to detect loops, so we don't want changes made inside to
+        // cascade back outside -> clone.
+        new Set([...visitedPlans]),
+        depth + 1,
+      );
+      dependencyValuesList[i] = allDependencyResults;
+    }
 
-      debugExecuteVerbose(
-        `%sExecutePlan(%s): wrote results for [%s]`,
-        indent,
-        plan,
-        pendingPlanResultses.join(", "),
+    const values = new Array(pendingPlanResultsesLength);
+
+    for (let i = 0; i < pendingPlanResultsesLength; i++) {
+      const entry = new Array(dependenciesCount);
+      for (let j = 0; j < dependenciesCount; j++) {
+        const dependencyValues = dependencyValuesList[j];
+        entry[j] = dependencyValues[i];
+      }
+      values[i] = entry;
+    }
+
+    let meta = crystalContext.metaByPlanId[plan.id];
+    if (!meta) {
+      meta = Object.create(null) as Record<string, unknown>;
+      crystalContext.metaByPlanId[plan.id] = meta;
+    }
+    // Note: the `execute` method on plans is responsible for memoizing
+    // results into `meta`.
+    if (plan instanceof __ListItemPlan) {
+      throw new Error(
+        "Should never attempt to execute __ListItemPlan; that should be handled within executeBatch",
+      );
+    }
+    const planOptions = this.planOptionsByPlan.get(plan);
+    const isSubscribe = plan.id === this.subscriptionPlanId;
+    const pendingResults =
+      isSubscribe || planOptions?.stream
+        ? await (plan as unknown as StreamablePlan<unknown>).stream(
+            values,
+            meta,
+            isSubscribe ? { initialCount: 0 } : planOptions!.stream!,
+          )
+        : await plan.execute(values, meta);
+    if (plan.debug) {
+      console.log(
+        `debugPlans(${plan}): called with: ${inspect(values, {
+          colors: true,
+          depth: 6,
+        })}; returned: ${inspect(pendingResults, {
+          colors: true,
+          depth: 6,
+        })}`,
       );
     }
     if (isDev) {
-      if (debugExecuteVerbose.enabled) {
-        debugExecuteVerbose(
-          `%sExecutePlan(%s): complete; results: %c`,
-          indent,
-          plan,
-          result,
-        );
-      } else {
-        debugExecute(`%sExecutePlan(%s): complete`, indent, plan);
-      }
+      assert.ok(
+        Array.isArray(pendingResults),
+        "Expected plan execution to return a list",
+      );
+      assert.strictEqual(
+        pendingResults.length,
+        pendingPlanResultsesLength,
+        "Expected plan execution to return same number of results as inputs",
+      );
     }
+    const result = new Array(pendingPlanResultsesLength);
+    for (let i = 0; i < pendingPlanResultsesLength; i++) {
+      const planResults = pendingPlanResultses[i];
+
+      // This could be a Promise, an AsyncIterable, a Promise to an
+      // AsyncIterable, or arbitrary data (including an array).
+      const rawPendingResult = pendingResults[i];
+
+      // NOTE: after this result[j] could be an AsyncIterable, or arbitrary
+      // data (including an array).
+      if (isPromise(rawPendingResult)) {
+        try {
+          result[i] = await rawPendingResult;
+        } catch (e) {
+          result[i] = new CrystalError(e);
+        }
+      }
+      // TODO: do we need 'else if (isAsyncIterable(rawPendingResult)) { ... }'
+      else {
+        result[i] = rawPendingResult;
+      }
+
+      // TODO: if result[j] is AsyncIterable it would be nice to avoid
+      // writing it to the plan results.
+      planResults.set(commonAncestorPathIdentity, plan.id, result[i]);
+    }
+
+    debugExecuteVerbose(
+      `%sExecutePlan(%s): wrote results for [%s]`,
+      indent,
+      plan,
+      pendingPlanResultses.join(", "),
+    );
     return result;
   }
 
@@ -2067,6 +2177,15 @@ export class Aether<
       aether: this,
       resultByIndexesByPlanId: new Map(),
       metaByPlanId: Object.create(null),
+      inProgressPlanResolutionByPlanIdAndPlanResults: this.plans.reduce(
+        (memo, plan, idx) => {
+          if (plan && plan.id === idx) {
+            memo[plan.id] = new Map();
+          }
+          return memo;
+        },
+        {},
+      ),
       rootId,
       // @ts-ignore We'll set this in just a moment...
       rootCrystalObject: null,

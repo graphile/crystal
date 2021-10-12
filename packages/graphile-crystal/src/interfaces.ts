@@ -119,6 +119,10 @@ export interface CrystalContext {
     [planId: number]: Record<string, unknown> | undefined;
   };
 
+  inProgressPlanResolutionByPlanIdAndPlanResults: {
+    [planId: number]: Map<PlanResults, Deferred<any>>;
+  };
+
   rootId: UniqueId;
 
   rootCrystalObject: CrystalObject<any>;
