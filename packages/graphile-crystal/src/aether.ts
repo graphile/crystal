@@ -163,8 +163,8 @@ let depth = 0;
 const debugAether = debugFactory("crystal:aether");
 const debugPlan = debugAether.extend("plan");
 const debugPlanVerbose_ = debugPlan.extend("verbose");
-const debugExecute = debugAether.extend("plan");
-const debugExecuteVerbose_ = debugPlan.extend("verbose");
+const debugExecute = debugAether.extend("execute");
+const debugExecuteVerbose_ = debugExecute.extend("verbose");
 
 const depthWrap = (debugFn: debugFactory.Debugger) =>
   Object.assign(
