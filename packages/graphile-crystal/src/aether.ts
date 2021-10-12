@@ -1841,7 +1841,7 @@ export class Aether<
           result[j] = pendingResults[i];
 
           // Resolve the promise
-          pendingDeferreds[i].resolve(pendingResults);
+          pendingDeferreds[i].resolve(pendingResults[i]);
         }
       },
       (error) => {
