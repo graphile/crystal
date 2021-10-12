@@ -63,18 +63,18 @@ export class PlanResults {
     planId: number,
     data: any,
   ): any {
-    if (!this.store[commonAncestorPathIdentity]) {
-      this.store[commonAncestorPathIdentity] = new Map();
-    }
-    if (isDev && this.store[commonAncestorPathIdentity]!.has(planId)) {
+    const s =
+      this.store[commonAncestorPathIdentity] ??
+      (this.store[commonAncestorPathIdentity] = new Map());
+    if (isDev && s.has(planId) && s.get(planId) !== data) {
       throw new Error(
         `Attempted to overwrite value for plan '${planId}' at path identity '${commonAncestorPathIdentity}' from '${inspect(
-          this.store[commonAncestorPathIdentity]!.get(planId),
+          s.get(planId),
           { colors: true },
         )}' to '${inspect(data, { colors: true })}'`,
       );
     }
-    return this.store[commonAncestorPathIdentity]!.set(planId, data);
+    return s.set(planId, data);
   }
 
   /**
