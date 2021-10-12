@@ -1,0 +1,15 @@
+# At one point this test was the smallest way to reproduce a cache writing
+# error; we keep it to ensure the problem does not return.
+
+## expect(errors).toBeFalsy()
+{
+  allRelationalCommentablesList(first: 1) {
+    ...Item
+  }
+}
+
+fragment Item on RelationalItem {
+  __typename
+  type
+  position
+}

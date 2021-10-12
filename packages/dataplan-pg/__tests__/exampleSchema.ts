@@ -8,6 +8,7 @@ import type {
   CrystalResultsList,
   CrystalSubscriber,
   CrystalValuesList,
+  EachPlan,
   InputObjectPlan,
   InputStaticLeafPlan,
   ObjectLikePlan,
@@ -2619,6 +2620,17 @@ export function makeExampleSchema(
 
         allRelationalCommentablesList: {
           type: new GraphQLList(new GraphQLNonNull(RelationalCommentable)),
+          args: {
+            first: {
+              type: GraphQLInt,
+              plan(_$root, $each: EachPlan<any, any, any, any>, $value) {
+                const $commentables =
+                  $each.originalListPlan() as RelationalCommentablesPlan;
+                $commentables.setFirst($value.eval());
+                return null;
+              },
+            },
+          },
           plan() {
             const $commentables: RelationalCommentablesPlan =
               relationalCommentableSource.find();
