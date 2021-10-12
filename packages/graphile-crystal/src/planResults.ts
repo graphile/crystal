@@ -2,6 +2,8 @@ import { inspect } from "util";
 
 import { isDev } from "./dev";
 
+let planResultsId = 0;
+
 /**
  * PlanResults stores the results from plan execution. A `PlanResults` instance
  * is typically accessed via the `CrystalObject` to which it belongs, however
@@ -45,6 +47,7 @@ import { isDev } from "./dev";
  * @remarks API inspired by Map.
  */
 export class PlanResults {
+  id = planResultsId++;
   private store: { [pathIdentity: string]: Map<number, any> | undefined } =
     Object.create(null);
 
@@ -52,6 +55,10 @@ export class PlanResults {
     if (inheritFrom) {
       Object.assign(this.store, inheritFrom.store);
     }
+  }
+
+  toString(): string {
+    return `PlanResults<${this.id}>`;
   }
 
   /**

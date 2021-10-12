@@ -5,6 +5,7 @@ import { isCrystalLayerObject } from "./aether";
 import { isDev } from "./dev";
 import type { CrystalObject } from "./interfaces";
 import { ExecutablePlan } from "./plan";
+import { PlanResults } from "./planResults";
 import { isCrystalObject } from "./resolvers";
 import { isDeferred, isPromise, ROOT_VALUE_OBJECT } from "./utils";
 
@@ -60,6 +61,9 @@ export function _crystalPrint(
     return String(symbol);
   }
   if (symbol instanceof ExecutablePlan) {
+    return String(symbol);
+  }
+  if (symbol instanceof PlanResults) {
     return String(symbol);
   }
   if (Array.isArray(symbol)) {
