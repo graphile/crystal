@@ -14,14 +14,14 @@ import type {
   InputStaticLeafPlan,
   ObjectLikePlan,
 } from "graphile-crystal";
-import { access, ExecutablePlan } from "graphile-crystal";
-import { subscribe } from "graphile-crystal";
 import {
+  access,
   BasePlan,
   constant,
   context,
   crystalEnforce,
   each,
+  ExecutablePlan,
   inputObjectSpec,
   lambda,
   list,
@@ -29,6 +29,7 @@ import {
   object,
   objectSpec,
   resolveType,
+  subscribe,
 } from "graphile-crystal";
 import type { GraphQLOutputType } from "graphql";
 import {
@@ -63,12 +64,12 @@ import type {
   PgTypeCodec,
   WithPgClient,
 } from "../src";
-import { pgDelete } from "../src";
 import {
   enumType,
   pgClassExpression,
   PgConditionPlan,
   PgConnectionPlan,
+  pgDelete,
   PgExecutor,
   pgInsert,
   pgPolymorphic,
