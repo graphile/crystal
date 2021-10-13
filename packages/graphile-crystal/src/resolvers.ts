@@ -359,7 +359,9 @@ export function newCrystalObject(
     toString() {
       const p = indexes.length ? `.${indexes.join(".")}` : ``;
       return chalk.bold.blue(
-        `CO(${crystalPrintPathIdentity(pathIdentity)}/${crystalPrint(id)}${p})`,
+        `CO(${chalk.bold.yellow(
+          crystalPrintPathIdentity(pathIdentity),
+        )}/${crystalPrint(id)}${p})`,
       );
     },
   };

@@ -1,9 +1,13 @@
+import chalk from "chalk";
 import debugFactory from "debug";
 
 import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint";
 
 debugFactory.formatters.c = crystalPrint;
-debugFactory.formatters.p = crystalPrintPathIdentity;
+debugFactory.formatters.p = (pathIdentity) =>
+  chalk.bold.yellow(crystalPrintPathIdentity(pathIdentity));
+
+export { crystalPrintPathIdentity };
 
 export { Aether } from "./aether";
 export { ROOT_PATH } from "./constants";

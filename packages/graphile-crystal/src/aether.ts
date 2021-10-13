@@ -33,6 +33,7 @@ import { inspect } from "util";
 import * as assert from "./assert";
 import { GLOBAL_PATH, ROOT_PATH } from "./constants";
 import type { Constraint } from "./constraints";
+import { crystalPrintPathIdentity } from "./crystalPrint";
 import type { Deferred } from "./deferred";
 import { defer } from "./deferred";
 import { isDev } from "./dev";
@@ -1759,7 +1760,7 @@ export class Aether<
         result[i] = previousResult;
 
         debugExecuteVerbose(
-          "  %s result[%o] for %c found: %c",
+          "%s result[%o] for %c found: %c",
           follow,
           i,
           planResults,
@@ -1784,7 +1785,7 @@ export class Aether<
         // In progress already
         const deferred = deferredsByBucket.get(bucket)!;
         debugExecuteVerbose(
-          "  %s already in progress for %c",
+          "%s already in progress for %c",
           follow,
           planResults,
         );
@@ -1792,7 +1793,7 @@ export class Aether<
         inProgressPlanResultsesIndexes.push(i);
       } else {
         // Need to start executing
-        debugExecuteVerbose("  %s no result for %c", follow, planResults);
+        debugExecuteVerbose("%s no result for %c", follow, planResults);
 
         const deferred = defer<any>();
         deferredsByBucket.set(bucket, deferred);
@@ -2295,16 +2296,8 @@ export class Aether<
         if (clo == null) {
           return null;
         }
-        const {
-          parentCrystalObject,
-          indexes,
-          planResults,
-        } = clo;
-        if (
-          planResults.hasPathIdentity(
-            layerPlan.commonAncestorPathIdentity,
-          )
-        ) {
+        const { parentCrystalObject, indexes, planResults } = clo;
+        if (planResults.hasPathIdentity(layerPlan.commonAncestorPathIdentity)) {
           throw new Error(
             `Did not expect plans to exist within the '${layerPlan.commonAncestorPathIdentity}' bucket yet.`,
           );
@@ -2321,9 +2314,7 @@ export class Aether<
             if (result == null) {
               return null;
             }
-            const copy = new PlanResults(
-              planResults,
-            );
+            const copy = new PlanResults(planResults);
             copy.set(
               layerPlan.commonAncestorPathIdentity,
               layerPlan.id,
@@ -2351,9 +2342,7 @@ export class Aether<
             },
             async next() {
               const nextPromise = listResultIterator.next();
-              const copy = new PlanResults(
-                planResults,
-              );
+              const copy = new PlanResults(planResults);
 
               try {
                 const { done, value: resultPromise } = await Promise.race([
@@ -2569,7 +2558,7 @@ export class Aether<
         return newCrystalObject(
           batch.pathIdentity,
           typeName,
-          uid(batch.pathIdentity),
+          uid(crystalPrintPathIdentity(batch.pathIdentity)),
           clo.indexes,
           crystalContext,
           clo.planResults,

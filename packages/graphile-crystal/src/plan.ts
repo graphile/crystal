@@ -84,7 +84,9 @@ export abstract class BasePlan {
     return chalk.bold.blue(
       `${this.constructor.name.replace(/Plan$/, "")}${
         meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""
-      }@${crystalPrintPathIdentity(this.parentPathIdentity)}`,
+      }@${chalk.bold.yellow(
+        crystalPrintPathIdentity(this.parentPathIdentity),
+      )}`,
     );
   }
 
@@ -178,7 +180,9 @@ export abstract class ExecutablePlan<TData = any> extends BasePlan {
         {
           colors: true,
         },
-      )}@${crystalPrintPathIdentity(this.parentPathIdentity)}]`,
+      )}@${chalk.bold.yellow(
+        crystalPrintPathIdentity(this.parentPathIdentity),
+      )}]`,
     );
   }
 

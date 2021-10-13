@@ -138,11 +138,15 @@ function _crystalSymbolDescription(symbol: symbol): string {
   const nStr = symbol.description?.replace(/[^0-9]/g, "") || "";
   const n = parseInt(nStr, 10) || 0;
   if (n > 0) {
-    const color = COLORS[n % COLORS.length];
-    return color(symbol.description);
+    return crystalColor(symbol.description, n);
   } else {
     return chalk.cyan(`$$${symbol.description}`);
   }
+}
+
+export function crystalColor(text: string, n: number): string {
+  const color = COLORS[Math.abs(n) % COLORS.length];
+  return color(text);
 }
 
 const symbolsByAlias = new Map<string, symbol[]>();
@@ -185,7 +189,7 @@ export function crystalPrint(
 
 export function crystalPrintPathIdentity(pathIdentity: string): string {
   let short = pathIdentity.replace(/>[A-Za-z0-9]+\./g, ">").slice(1);
-  if (!short) return chalk.bold.yellow("~");
+  if (!short) return pathIdentity || "¤";
   if (isDev) {
     const segments = short.split(">");
     const shortenedSegments = segments.map((s, i) => {
@@ -202,5 +206,5 @@ export function crystalPrintPathIdentity(pathIdentity: string): string {
 
     short = shortenedSegments.join(">");
   }
-  return chalk.bold.yellow(short.replace(/\./g, chalk.gray(".")));
+  return short.replace(/\./g, chalk.gray("."));
 }

@@ -1,5 +1,7 @@
+import chalk from "chalk";
 import { inspect } from "util";
 
+import { crystalColor, crystalPrintPathIdentity } from "./crystalPrint";
 import { isDev } from "./dev";
 
 let planResultsId = 0;
@@ -58,9 +60,16 @@ export class PlanResults {
   }
 
   toString(): string {
-    return `PlanResults<${this.id}|${Object.keys(this.store)
-      .sort((a, z) => a.length - z.length)
-      .join("|")}>`;
+    return chalk.bold(
+      crystalColor(
+        `PlanResults[${this.id}:${chalk.bold.grey(
+          crystalPrintPathIdentity(
+            Object.keys(this.store).sort((a, z) => z.length - a.length)[0],
+          ),
+        )}]`,
+        this.id,
+      ),
+    );
   }
 
   /**
