@@ -141,7 +141,7 @@ export interface PostGraphileOptions<
     errors: ReadonlyArray<GraphQLError>,
     req: Request,
     res: Response,
-  ) => Array<GraphQLErrorExtended>;
+  ) => ReadonlyArray<GraphQLError | GraphQLErrorExtended>;
   // An array of [Graphile Engine](/graphile-build/plugins/) schema plugins to load
   // after the default plugins.
   appendPlugins?: Array<Plugin>;
@@ -371,7 +371,7 @@ export interface HttpRequestHandler<
     errors: ReadonlyArray<GraphQLError>,
     req: Request,
     res: Response,
-  ) => Array<GraphQLErrorExtended>;
+  ) => ReadonlyArray<GraphQLError | GraphQLErrorExtended>;
   graphqlRoute: string;
   graphqlRouteHandler: (res: PostGraphileResponse) => Promise<void>;
   graphiqlRoute: string;
