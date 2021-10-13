@@ -176,9 +176,9 @@ export class PgDeletePlan<
   }
 
   public select(fragment: SQL): number {
-    // NOTE: it's okay to add selections after the plan is "locked" - lock only
-    // applies to which rows are being selected, not what is being queried
-    // about the rows.
+    if (this.locked) {
+      throw new Error("Plan is finalized, no more selects may be added");
+    }
 
     // Optimisation: if we're already selecting this fragment, return the existing one.
     const index = this.selects.findIndex((frag) =>
