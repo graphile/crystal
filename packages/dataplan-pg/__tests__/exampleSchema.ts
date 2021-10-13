@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import { writeFileSync } from "fs";
 import type {
   __TrackedObjectPlan,
@@ -121,6 +122,10 @@ class JSONParsePlan<TObj extends JSON> extends ExecutablePlan<TObj> {
   constructor($stringPlan: ExecutablePlan<string | null>) {
     super();
     this.addDependency($stringPlan);
+  }
+
+  toStringMeta(): string {
+    return chalk.bold.yellow(String(this.dependencies[0]));
   }
 
   get<TKey extends keyof (TObj extends { [key: string]: any } ? TObj : never)>(
