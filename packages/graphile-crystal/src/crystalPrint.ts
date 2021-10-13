@@ -1,5 +1,4 @@
 import chalk from "chalk";
-import stripAnsi from "strip-ansi";
 import { inspect } from "util";
 
 import { isCrystalLayerObject } from "./aether";
@@ -8,6 +7,7 @@ import type { CrystalObject } from "./interfaces";
 import { ExecutablePlan } from "./plan";
 import { PlanResults } from "./planResults";
 import { isCrystalObject } from "./resolvers";
+import { stripAnsi } from "./stripAnsi";
 import { isDeferred, isPromise, ROOT_VALUE_OBJECT } from "./utils";
 
 const COLORS = [

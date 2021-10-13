@@ -84,6 +84,7 @@ export {
   crystalWrapResolve,
   makeCrystalSubscriber,
 } from "./resolvers";
+export { stripAnsi } from "./stripAnsi";
 export {
   arraysMatch,
   inputObjectFieldSpec,

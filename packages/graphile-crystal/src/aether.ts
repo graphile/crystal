@@ -28,7 +28,6 @@ import {
   isUnionType,
 } from "graphql";
 import { isAsyncIterable } from "iterall";
-import stripAnsi from "strip-ansi";
 import { inspect } from "util";
 
 import * as assert from "./assert";
@@ -87,6 +86,7 @@ import {
 import { __ItemPlan } from "./plans/subscribe";
 import { assertPolymorphicData } from "./polymorphic";
 import { newCrystalObject } from "./resolvers";
+import { stripAnsi } from "./stripAnsi";
 import type { UniqueId } from "./utils";
 import {
   arraysMatch,
