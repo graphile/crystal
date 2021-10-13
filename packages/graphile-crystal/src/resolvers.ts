@@ -80,7 +80,7 @@ function makeParentCrystalObject(
   info: GraphQLResolveInfo,
   pathIdentity: string,
   parentObject: any,
-): CrystalObject<any> {
+): CrystalObject {
   const { path } = info;
   // TODO: we're not actually using id below
   const crystalContext = batch.crystalContext;
@@ -193,8 +193,8 @@ function crystalWrapResolveOrSubscribe<
     ) {
       const parentObject:
         | Exclude<TSource, null | undefined>
-        | CrystalObject<any> = source ?? ROOT_VALUE_OBJECT;
-      let possiblyParentCrystalObject: CrystalObject<any> | null = null;
+        | CrystalObject = source ?? ROOT_VALUE_OBJECT;
+      let possiblyParentCrystalObject: CrystalObject | null = null;
 
       // Note: for the most optimal execution, `rootValue` passed to graphql
       // should be a crystal object, this allows using {crystalContext} across
@@ -331,7 +331,7 @@ export function newCrystalObject(
   return crystalObject;
 }
 
-export function isCrystalObject(input: any): input is CrystalObject<any> {
+export function isCrystalObject(input: any): input is CrystalObject {
   return typeof input === "object" && input && $$planResults in input;
 }
 
@@ -340,7 +340,7 @@ export function isCrystalObject(input: any): input is CrystalObject<any> {
  */
 function getBatchResult(
   batch: Batch,
-  parentCrystalObject: CrystalObject<any>,
+  parentCrystalObject: CrystalObject,
 ): Deferred<any> {
   const deferred = defer();
   batch.entries.push([parentCrystalObject, deferred]);

@@ -43,7 +43,7 @@ export function _crystalPrint(
     | symbol[]
     | Record<symbol, any>
     | Map<any, any>
-    | CrystalObject<any>,
+    | CrystalObject,
   seen: Set<any>,
 ): string {
   if (isDeferred(symbol)) {
@@ -182,7 +182,7 @@ export function crystalPrint(
     | symbol[]
     | Record<symbol, any>
     | Map<any, any>
-    | CrystalObject<any>,
+    | CrystalObject,
 ): string {
   return _crystalPrint(symbol, new Set());
 }

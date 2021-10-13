@@ -131,7 +131,7 @@ type AetherPhase =
   | "ready";
 
 function newCrystalLayerObject(
-  parentCrystalObject: CrystalObject<any>,
+  parentCrystalObject: CrystalObject,
   planResults: PlanResults = new PlanResults(
     parentCrystalObject[$$planResults],
   ),
@@ -2229,7 +2229,7 @@ export class Aether<
   public getBatch(
     pathIdentity: string,
     returnType: GraphQLOutputType,
-    parentCrystalObject: CrystalObject<any> | null,
+    parentCrystalObject: CrystalObject | null,
     variableValues: {
       [variableName: string]: unknown;
     },
@@ -2475,7 +2475,7 @@ export class Aether<
     const { entries, sideEffectPlans, plan, itemPlan, returnType } = batch;
     const namedReturnType = getNamedType(returnType);
     const entriesLength = entries.length;
-    const crystalObjects: CrystalObject<any>[] = new Array(entriesLength);
+    const crystalObjects: CrystalObject[] = new Array(entriesLength);
     const deferredResults: Deferred<any>[] = new Array(entriesLength);
     for (let i = 0; i < entriesLength; i++) {
       const [crystalObject, deferredResult] = entries[i];
@@ -2809,7 +2809,7 @@ export class Aether<
  */
 export function populateValuePlan(
   valuePlan: ExecutablePlan,
-  crystalObject: CrystalObject<any>,
+  crystalObject: CrystalObject,
   object: unknown,
   label: string,
 ): void {

@@ -59,7 +59,7 @@ export interface IndexByListItemPlanId {
 }
 
 // TODO: remove <TData>
-export interface CrystalObject<TData = any> {
+export interface CrystalObject {
   toString(): string;
   [$$id]: UniqueId;
   [$$pathIdentity]: string;
@@ -96,7 +96,7 @@ export const $$isCrystalLayerObject = Symbol("crystalLayerObject");
 export interface CrystalLayerObject {
   toString(): string;
   [$$isCrystalLayerObject]: true;
-  parentCrystalObject: CrystalObject<any>;
+  parentCrystalObject: CrystalObject;
   itemByItemPlanId: Map<number, any>;
   planResults: PlanResults;
   indexes: number[];
@@ -108,7 +108,7 @@ export interface Batch {
   sideEffectPlans: ReadonlyArray<ExecutablePlan>;
   plan: ExecutablePlan;
   itemPlan: ExecutablePlan;
-  entries: Array<[CrystalObject<any>, Deferred<any>]>;
+  entries: Array<[CrystalObject, Deferred<any>]>;
   returnType: GraphQLOutputType;
 }
 
@@ -125,7 +125,7 @@ export interface CrystalContext {
 
   rootId: UniqueId;
 
-  rootCrystalObject: CrystalObject<any>;
+  rootCrystalObject: CrystalObject;
 }
 
 // These values are just to make reading the code a little clearer
