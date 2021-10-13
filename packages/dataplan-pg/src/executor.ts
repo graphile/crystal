@@ -554,7 +554,7 @@ ${"👆".repeat(30)}
         const pullViaCursorSQL = `fetch forward ${batchFetchSize} from ${cursorIdentifier}`;
         const releaseCursorSQL = `close ${cursorIdentifier}`;
 
-        let deferredStreams = 0;
+        let _deferredStreams = 0;
         let valuesPending = 0;
 
         const pending: Array<any[]> = batch.map(() => []);
@@ -575,7 +575,7 @@ ${"👆".repeat(30)}
               return value;
             }
           } else {
-            deferredStreams++;
+            _deferredStreams++;
             waiting[batchIndex] = defer<any>();
           }
         }
@@ -584,7 +584,7 @@ ${"👆".repeat(30)}
         function supplyValue(batchIndex: number, value: any | Wrapped): void {
           const deferred = waiting[batchIndex];
           if (deferred) {
-            deferredStreams--;
+            _deferredStreams--;
             if (value instanceof Wrapped) {
               deferred.reject(value.originalValue);
             } else {

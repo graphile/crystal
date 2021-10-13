@@ -2188,6 +2188,7 @@ export class Aether<
         return memo;
       }, {}),
       rootId,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore We'll set this in just a moment...
       rootCrystalObject: null,
     };
@@ -2200,6 +2201,7 @@ export class Aether<
       new PlanResults(),
     );
     crystalContext.rootCrystalObject = rootCrystalObject;
+
     /*@__INLINE__*/ populateValuePlan(
       this.variableValuesPlan,
       rootCrystalObject,
