@@ -187,6 +187,26 @@ export function crystalPrint(
   return _crystalPrint(symbol, new Set());
 }
 
+export function ansiPad(
+  ansiString: string,
+  targetLength: number,
+  fill: string,
+  position: "start" | "end",
+): string {
+  const string = stripAnsi(ansiString);
+  const fillLength = targetLength - string.length;
+  if (fillLength >= 0) {
+    const fillString = fill.repeat(fillLength);
+    if (position === "start") {
+      return fillString + ansiString;
+    } else {
+      return ansiString + fillString;
+    }
+  } else {
+    return ansiString;
+  }
+}
+
 export function crystalPrintPathIdentity(pathIdentity: string): string {
   let short = pathIdentity.replace(/>[A-Za-z0-9]+\./g, ">").slice(1);
   if (!short) return pathIdentity || "¤";

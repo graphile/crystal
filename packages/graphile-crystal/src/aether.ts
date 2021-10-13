@@ -28,12 +28,13 @@ import {
   isUnionType,
 } from "graphql";
 import { isAsyncIterable } from "iterall";
+import stripAnsi from "strip-ansi";
 import { inspect } from "util";
 
 import * as assert from "./assert";
 import { GLOBAL_PATH, ROOT_PATH } from "./constants";
 import type { Constraint } from "./constraints";
-import { crystalPrintPathIdentity } from "./crystalPrint";
+import { ansiPad, crystalPrintPathIdentity } from "./crystalPrint";
 import type { Deferred } from "./deferred";
 import { defer } from "./deferred";
 import { isDev } from "./dev";
@@ -2632,34 +2633,72 @@ export class Aether<
         return chalk.bold.yellow(String(actualDepId));
       }
     };
+    const partsLines = plans
+      .map((plan, id) => {
+        const optimized = this.optimizedPlans.has(plan);
+        if (!plan) {
+          return null;
+        } else if (plan.id !== id) {
+          // return `- ${id}: ->${chalk.bold.yellow(String(plan.id))}`;
+          return null;
+        } else {
+          return [
+            String(id),
+            optimized ? "🚀" : "🐌",
+            plan.toString(),
+            plan.dependencies.length
+              ? `${plan.dependencies
+                  .map((depId) => printDep(depId))
+                  .join(", ")}`
+              : "",
+            plan.commonAncestorPathIdentity
+              ? " " + chalk.yellow(`${plan.commonAncestorPathIdentity}`)
+              : "",
+          ];
+        }
+      })
+      .filter(isNotNullish);
+
+    const CAP = [
+      // id
+      4,
+      // rocket/snail
+      1,
+      // plan
+      60,
+      // deps
+      20,
+      // commonAncestorPathIdentity
+      0,
+    ];
+    const maxSizes: number[] = [];
+    partsLines.forEach((parts) => {
+      parts.forEach((part, i) => {
+        const l = stripAnsi(part).length;
+        if (maxSizes.length <= i || maxSizes[i] < l) {
+          maxSizes[i] = Math.min(l, CAP[i] || 0);
+        }
+      });
+    });
+
     debugPlanVerbose(
       "Plans%s: %s",
       why ? ` ${why}` : "",
       "\n" +
-        plans
-          .map((plan, id) => {
-            const optimized = this.optimizedPlans.has(plan);
-            if (!plan) {
-              return null;
-            } else if (plan.id !== id) {
-              // return `- ${id}: ->${chalk.bold.yellow(String(plan.id))}`;
-              return null;
-            } else {
-              return `- ${id}: ${
-                (optimized ? "!!" : "  ") +
-                plan.toString() +
-                (plan.dependencies.length
-                  ? ` (deps: ${plan.dependencies
-                      .map((depId) => printDep(depId))
-                      .join(", ")})`
-                  : "") +
-                (plan.commonAncestorPathIdentity
-                  ? " " + chalk.yellow(`${plan.commonAncestorPathIdentity}`)
-                  : "")
-              }`;
-            }
+        partsLines
+          .map((parts) => {
+            const id = ansiPad(parts[0], maxSizes[0], " ", "start");
+            const optimized = ansiPad(parts[1], maxSizes[1], " ", "end");
+            const plan = ansiPad(parts[2], maxSizes[2], " ", "end");
+            const deps = ansiPad(
+              parts[3] ? `  (deps: ${parts[3]})` : "",
+              9 + maxSizes[3] + 1,
+              " ",
+              "end",
+            );
+            const pathIdentity = ansiPad(parts[4], maxSizes[4], " ", "end");
+            return `${id}: ${optimized}${plan}${deps} ${pathIdentity}`;
           })
-          .filter(isNotNullish)
           .join("\n"),
     );
   }
