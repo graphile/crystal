@@ -13,12 +13,12 @@ import type {
 import {
   execute,
   getOperationAST,
+  graphql,
   parse,
   subscribe,
   validate,
   validateSchema,
 } from "graphql";
-import { graphql } from "graphql";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
 import type { PoolClient } from "pg";

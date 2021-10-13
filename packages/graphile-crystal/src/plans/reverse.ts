@@ -6,8 +6,9 @@ import { ExecutablePlan } from "../plan";
  */
 export function reverseArray<TData = any>(list: readonly TData[]): TData[] {
   if (!Array.isArray(list)) {
-    // @ts-ignore
-    return list;
+    throw new Error(
+      `Attempted to reverse an array, but what was passed wasn't an array`,
+    );
   }
   const l = list.length;
   const newList = new Array(l);
@@ -27,7 +28,7 @@ export class ReversePlan<TData extends any> extends ExecutablePlan<TData[]> {
   }
 
   execute(values: CrystalValuesList<[TData[]]>): CrystalResultsList<TData[]> {
-    return values.map(([arr]) => reverseArray(arr));
+    return values.map(([arr]) => (arr == null ? arr : reverseArray(arr)));
   }
 
   deduplicate(peers: ReversePlan<TData>[]): ReversePlan<TData> {

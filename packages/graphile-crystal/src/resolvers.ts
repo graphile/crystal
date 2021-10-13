@@ -1,14 +1,11 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import chalk from "chalk";
-// import { getAliasFromResolveInfo } from "graphql-parse-resolve-info";
 import debugFactory from "debug";
 import type { GraphQLFieldResolver, GraphQLResolveInfo } from "graphql";
-import { defaultFieldResolver, getNamedType, isLeafType } from "graphql";
+import { getNamedType, isLeafType } from "graphql";
 import type { Path } from "graphql/jsutils/Path";
 import { inspect } from "util";
 
-import type { Aether } from "./aether";
-// import { populateValuePlan } from "./aether";
-import * as assert from "./assert";
 import { ROOT_PATH } from "./constants";
 import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint";
 import type { Deferred } from "./deferred";
@@ -26,29 +23,9 @@ import type { PlanResults } from "./planResults";
 import type { __ListItemPlan } from "./plans";
 import { __ValuePlan } from "./plans";
 import type { UniqueId } from "./utils";
-import { ROOT_VALUE_OBJECT, uid } from "./utils";
+import { ROOT_VALUE_OBJECT } from "./utils";
 
 const debug = debugFactory("crystal:resolvers");
-
-/*
- * This was the original, simple implementation. Below we rewrote this to avoid
- * recursion for performance reasons.
- *
-function pathToPathIdentityRecursive(path: Path): string {
-  // Skip over list keys.
-  if (!path.typename) {
-    assert.ok(
-      path.prev,
-      "Path has no `typename` and no `prev`; seems like an invalid Path?",
-    );
-    return pathToPathIdentity(path.prev);
-  }
-  return (
-    (path.prev ? pathToPathIdentity(path.prev) : ROOT_PATH) +
-    `>${path.typename}.${path.key}`
-  );
-}
-*/
 
 function pathToPathIdentity(initialPath: Path): string {
   /**
@@ -67,20 +44,6 @@ function pathToPathIdentity(initialPath: Path): string {
     path = path.prev;
   }
   return `${ROOT_PATH}${tailPathIdentity}`;
-}
-
-function pathToIndexes(initialPath: Path): ReadonlyArray<number> {
-  const indexes: number[] = [];
-  let path: Path | undefined = initialPath;
-  while (path && !path.typename) {
-    assert.ok(
-      typeof path.key === "number",
-      "Expected un-typenamed path entry to be a numeric index",
-    );
-    indexes.unshift(path.key);
-    path = path.prev;
-  }
-  return indexes;
 }
 
 export const $$crystalWrapped = Symbol("crystalWrappedResolver");

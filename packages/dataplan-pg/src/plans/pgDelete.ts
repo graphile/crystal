@@ -1,4 +1,3 @@
-import debugFactory from "debug";
 import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
 import { ExecutablePlan } from "graphile-crystal";
 import { isDev } from "graphile-crystal/src/dev";
@@ -7,11 +6,7 @@ import sql from "pg-sql2";
 import { inspect } from "util";
 
 import type { PgSource, PgSourceColumn } from "../datasource";
-import type {
-  PgTypeCodec,
-  PgTypedExecutablePlan,
-  PlanByUniques,
-} from "../interfaces";
+import type { PgTypeCodec, PlanByUniques } from "../interfaces";
 import type { PgClassExpressionPlan } from "./pgClassExpression";
 import { pgClassExpression } from "./pgClassExpression";
 

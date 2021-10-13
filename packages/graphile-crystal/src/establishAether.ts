@@ -98,6 +98,7 @@ export function isAetherCompatible(
  * instead accept operation and fragments since they're easier to get a hold of
  * in GraphQL.js.
  */
+// eslint-disable-next-line @typescript-eslint/ban-types
 export function establishAether<TContext extends object>(details: {
   schema: GraphQLSchema;
   operation: OperationDefinitionNode;

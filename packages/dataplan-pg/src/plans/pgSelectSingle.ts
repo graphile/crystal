@@ -7,7 +7,6 @@ import { ExecutablePlan } from "graphile-crystal";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
-import { TYPES } from "../codecs";
 import type { PgSource, PgSourceColumn, PgSourceRelation } from "../datasource";
 import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
 import type { PgClassExpressionPlan } from "./pgClassExpression";
@@ -196,8 +195,9 @@ export class PgSelectSinglePlan<
     $plan: ExecutablePlan<any> | PgTypedExecutablePlan,
     overrideType?: SQL,
   ): SQL {
-    // @ts-ignore
-    return this.getClassPlan().placeholder($plan, overrideType);
+    return overrideType
+      ? this.getClassPlan().placeholder($plan, overrideType)
+      : this.getClassPlan().placeholder($plan as PgTypedExecutablePlan);
   }
 
   private existingSingleRelation<

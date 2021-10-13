@@ -105,12 +105,6 @@ type PgSelectArgumentSpec =
       name?: string;
     };
 
-function isPgSelectIdentifierSpec(
-  identifier: PgSelectIdentifierSpec | PgSelectArgumentSpec,
-): identifier is PgSelectIdentifierSpec {
-  return "matches" in identifier && typeof identifier.matches === "function";
-}
-
 interface PgSelectArgumentDigest {
   position?: number;
   name?: string;

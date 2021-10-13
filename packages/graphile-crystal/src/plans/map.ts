@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import chalk from "chalk";
 
 import { ExecutablePlan } from "../plan";

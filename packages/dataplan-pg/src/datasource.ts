@@ -4,26 +4,25 @@ import type {
   CrystalValuesList,
   ObjectPlan,
 } from "graphile-crystal";
-import { constant } from "graphile-crystal";
-import { arraysMatch, ExecutablePlan } from "graphile-crystal";
-import { __ValuePlan, getCurrentParentPathIdentity } from "graphile-crystal";
+import {
+  __ValuePlan,
+  arraysMatch,
+  constant,
+  ExecutablePlan,
+  getCurrentParentPathIdentity,
+} from "graphile-crystal";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type {
   PgClientResult,
   PgExecutor,
-  PgExecutorContext,
   PgExecutorContextPlans,
   PgExecutorInput,
   PgExecutorMutationOptions,
   PgExecutorOptions,
 } from "./executor";
-import type {
-  PgTypeCodec,
-  PgTypedExecutablePlan,
-  PlanByUniques,
-} from "./interfaces";
+import type { PgTypeCodec, PlanByUniques } from "./interfaces";
 import type { PgSelectPlan } from "./plans/pgSelect";
 import { pgSelect } from "./plans/pgSelect";
 import type {
@@ -120,7 +119,7 @@ export interface PgSourceOptions<
   TColumns extends PgSourceColumns,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
   TRelations extends { [identifier: string]: PgSourceRelation<any, TColumns> },
-  TParameters extends { [key: string]: any } | never = never,
+  _TParameters extends { [key: string]: any } | never = never,
 > {
   codec: TCodec;
   executor: PgExecutor;

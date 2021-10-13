@@ -61,20 +61,19 @@ import type {
   TrackedArguments,
 } from "./interfaces";
 import {
-  $$concreteData,
   $$concreteType,
   $$crystalContext,
   $$isCrystalLayerObject,
   $$planResults,
 } from "./interfaces";
 import type { ModifierPlan, PolymorphicPlan, StreamablePlan } from "./plan";
-import { isStreamablePlan } from "./plan";
 import {
   assertArgumentsFinalized,
   assertExecutablePlan,
   assertFinalized,
   assertModifierPlan,
   ExecutablePlan,
+  isStreamablePlan,
 } from "./plan";
 import { PlanResults } from "./planResults";
 import {
@@ -268,6 +267,9 @@ export class Aether<
   };
 
   public readonly valueIdByObjectByPlanId: {
+    // This is just some object, we don't need to access anything about it.
+    // Critically, though, it is an object (not an `unknown`).
+    // eslint-disable-next-line @typescript-eslint/ban-types
     [planId: number]: WeakMap<object, UniqueId> | undefined;
   } = Object.create(null);
 
@@ -605,7 +607,7 @@ export class Aether<
     objectType: GraphQLObjectType,
     groupedSelectionsList: GroupedSelections[],
     parentTreeNode: TreeNode,
-    isSequential = false,
+    _isSequential = false,
   ): void {
     assertObjectType(objectType);
     const groupedFieldSet = graphqlCollectFields(
@@ -2028,6 +2030,7 @@ export class Aether<
    *
    * @internal
    */
+  // eslint-disable-next-line @typescript-eslint/ban-types
   public getValuePlanId<TData extends object>(
     crystalContext: CrystalContext,
     valuePlan: __ValuePlan<TData>,
@@ -2169,6 +2172,7 @@ export class Aether<
     variableValues: {
       [variableName: string]: unknown;
     },
+    // eslint-disable-next-line @typescript-eslint/ban-types
     context: object,
     rootValue: unknown,
   ): CrystalContext {
@@ -2229,6 +2233,7 @@ export class Aether<
     variableValues: {
       [variableName: string]: unknown;
     },
+    // eslint-disable-next-line @typescript-eslint/ban-types
     context: object,
     rootValue: unknown,
   ): Batch {

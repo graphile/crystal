@@ -1,4 +1,3 @@
-import debugFactory from "debug";
 import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
 import { ExecutablePlan } from "graphile-crystal";
 import { isDev } from "graphile-crystal/src/dev";
@@ -11,10 +10,7 @@ import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
 import type { PgClassExpressionPlan } from "./pgClassExpression";
 import { pgClassExpression } from "./pgClassExpression";
 
-const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 const EMPTY_MAP = new Map<never, never>();
-
-const debugExecute = debugFactory("datasource:pg:PgInsertPlan:execute");
 
 type QueryValueDetailsBySymbol = Map<
   symbol,

@@ -98,6 +98,8 @@ async function main() {
             stack: e.stack
               ? replaceAll(
                   replaceAll(stripAnsi(e.stack), resolve(process.cwd()), "."),
+                  // My vim highlighting goes wrong without the extra backslash! >‿<
+                  // eslint-disable-next-line no-useless-escape
                   /(?:\/[^\s\/]+)*\/node_modules\//g,
                   "~/",
                 ).split("\n")
