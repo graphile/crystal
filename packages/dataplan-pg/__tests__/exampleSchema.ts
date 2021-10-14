@@ -1,6 +1,6 @@
 import { jsonParse } from "@dataplan/json";
 import { writeFileSync } from "fs";
-import type {
+import {
   __TrackedObjectPlan,
   __ValuePlan,
   AccessPlan,
@@ -12,6 +12,9 @@ import type {
   InputObjectPlan,
   InputStaticLeafPlan,
   ObjectLikePlan,
+  GraphileCrystalFieldConfig,
+  BaseGraphQLArguments,
+  newGraphileCrystalFieldConfigBuilder,
 } from "graphile-crystal";
 import {
   BasePlan,
@@ -1155,12 +1158,15 @@ export function makeExampleSchema(
           return $connection.nodes();
         },
       },
-      nodes: {
+      nodes: newGraphileCrystalFieldConfigBuilder<
+        OurGraphQLContext,
+        MessageConnectionPlan
+      >()({
         type: new GraphQLList(Message),
         plan($connection) {
           return $connection.nodes();
         },
-      },
+      }),
     },
   });
 

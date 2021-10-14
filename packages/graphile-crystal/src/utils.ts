@@ -34,6 +34,7 @@ import type {
   BaseGraphQLContext,
   GraphileCrystalFieldConfig,
   GraphileCrystalInputFieldConfig,
+  OutputPlanForType,
 } from "./interfaces";
 import type { ExecutablePlan, ModifierPlan } from "./plan";
 
@@ -428,6 +429,25 @@ export function objectFieldSpec<
       },
     },
   };
+}
+
+export function newGraphileCrystalFieldConfigBuilder<
+  TContext extends BaseGraphQLContext,
+  TParentPlan extends ExecutablePlan<any>,
+>(): <
+  TType extends GraphQLOutputType,
+  TFieldPlan extends OutputPlanForType<TType>,
+  TArgs extends BaseGraphQLArguments,
+>(
+  config: GraphileCrystalFieldConfig<
+    TType,
+    TContext,
+    TParentPlan,
+    TFieldPlan,
+    TArgs
+  >,
+) => typeof config {
+  return (config) => config;
 }
 
 type InputObjectTypeFields<

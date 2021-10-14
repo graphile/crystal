@@ -222,7 +222,7 @@ type OutputPlanForNamedType<TType extends GraphQLType> =
   TType extends GraphileObjectType<any, infer TPlan, any>
     ? TPlan
     : ExecutablePlan<any>;
-type OutputPlanForType<TType extends GraphQLOutputType> =
+export type OutputPlanForType<TType extends GraphQLOutputType> =
   TType extends GraphQLNonNull<GraphQLList<GraphQLNonNull<infer U>>>
     ? ListCapablePlan<any, OutputPlanForNamedType<U>>
     : TType extends GraphQLNonNull<GraphQLList<infer U>>

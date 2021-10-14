@@ -90,6 +90,7 @@ export {
   GraphileObjectType,
   inputObjectFieldSpec,
   InputObjectTypeSpec,
+  newGraphileCrystalFieldConfigBuilder,
   newInputObjectTypeBuilder,
   newObjectTypeBuilder,
   objectFieldSpec,
