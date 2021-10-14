@@ -8,7 +8,6 @@ import type {
   GraphQLObjectTypeConfig,
   GraphQLOutputType,
   ObjectFieldNode,
-  ThunkObjMap,
   ValueNode,
 } from "graphql";
 import { GraphQLObjectType } from "graphql";
@@ -313,20 +312,25 @@ export function arraysMatch<T>(
   }
   return true;
 }
+type ObjectTypeFields<
+  TContext extends BaseGraphQLContext,
+  TParentPlan extends ExecutablePlan<any>,
+> = {
+  [key: string]: GraphileCrystalFieldConfig<
+    GraphQLOutputType,
+    TContext,
+    TParentPlan,
+    any,
+    any
+  >;
+};
 
 export type ObjectTypeSpec<
   TContext extends BaseGraphQLContext,
   TParentPlan extends ExecutablePlan<any>,
+  TFields extends ObjectTypeFields<TContext, TParentPlan>,
 > = Omit<GraphQLObjectTypeConfig<any, TContext>, "fields"> & {
-  fields: ThunkObjMap<
-    GraphileCrystalFieldConfig<
-      GraphQLOutputType,
-      TContext,
-      TParentPlan,
-      any,
-      any
-    >
-  >;
+  fields: TFields | (() => TFields);
 };
 
 /**
@@ -335,8 +339,9 @@ export type ObjectTypeSpec<
 function objectSpec<
   TContext extends BaseGraphQLContext,
   TParentPlan extends ExecutablePlan<any>,
+  TFields extends ObjectTypeFields<TContext, TParentPlan>,
 >(
-  spec: ObjectTypeSpec<TContext, TParentPlan>,
+  spec: ObjectTypeSpec<TContext, TParentPlan, TFields>,
 ): GraphQLObjectTypeConfig<any, TContext> {
   const modifiedSpec: GraphQLObjectTypeConfig<any, TContext> = {
     ...spec,
@@ -356,21 +361,27 @@ function objectSpec<
 export type GraphileObjectType<
   TContext extends BaseGraphQLContext,
   TParentPlan extends ExecutablePlan<any>,
+  TFields extends ObjectTypeFields<TContext, TParentPlan>,
 > = GraphQLObjectType<
   TParentPlan extends ExecutablePlan<infer U> ? U : never,
   TContext
-> & { TParentPlan: TParentPlan };
+> & { TParentPlan: TParentPlan; TFields: TFields };
 
-export function newObjectType<
+/**
+ * @remarks This is a mess because the first two generics need to be specified manually, but the latter one we want inferred.
+ */
+export function newObjectTypeBuilder<
   TContext extends BaseGraphQLContext,
   TParentPlan extends ExecutablePlan<any>,
->(
-  spec: ObjectTypeSpec<TContext, TParentPlan>,
-): GraphileObjectType<TContext, TParentPlan> {
-  return new GraphQLObjectType(objectSpec(spec)) as GraphileObjectType<
-    TContext,
-    TParentPlan
-  >;
+>(): <TFields extends ObjectTypeFields<TContext, TParentPlan>>(
+  spec: ObjectTypeSpec<TContext, TParentPlan, TFields>,
+) => GraphileObjectType<TContext, TParentPlan, TFields> {
+  return (spec) =>
+    new GraphQLObjectType(objectSpec(spec)) as GraphileObjectType<
+      TContext,
+      TParentPlan,
+      any
+    >;
 }
 
 /**
@@ -419,26 +430,33 @@ export function objectFieldSpec<
   };
 }
 
+type InputObjectTypeFields<
+  TContext extends BaseGraphQLContext,
+  TParentPlan extends ModifierPlan<any>,
+> = {
+  [key: string]: GraphileCrystalInputFieldConfig<
+    GraphQLInputType,
+    TContext,
+    TParentPlan,
+    any,
+    any
+  >;
+};
+
 export type InputObjectTypeSpec<
   TContext extends BaseGraphQLContext,
   TParentPlan extends ModifierPlan<any>,
+  TFields extends InputObjectTypeFields<TContext, TParentPlan>,
 > = Omit<GraphQLInputObjectTypeConfig, "fields"> & {
-  fields: ThunkObjMap<
-    GraphileCrystalInputFieldConfig<
-      GraphQLInputType,
-      TContext,
-      TParentPlan,
-      any,
-      any
-    >
-  >;
+  fields: TFields | (() => TFields);
 };
 
 function inputObjectSpec<
   TContext extends BaseGraphQLContext,
   TParentPlan extends ModifierPlan<any>,
+  TFields extends InputObjectTypeFields<TContext, TParentPlan>,
 >(
-  spec: InputObjectTypeSpec<TContext, TParentPlan>,
+  spec: InputObjectTypeSpec<TContext, TParentPlan, TFields>,
 ): GraphQLInputObjectTypeConfig {
   const modifiedSpec: GraphQLInputObjectTypeConfig = {
     ...spec,
@@ -458,17 +476,23 @@ function inputObjectSpec<
 export type GraphileInputObjectType<
   TContext extends BaseGraphQLContext,
   TParentPlan extends ModifierPlan<any>,
-> = GraphQLInputObjectType & { TContext: TContext; TParentPlan: TParentPlan };
+  TFields extends InputObjectTypeFields<TContext, TParentPlan>,
+> = GraphQLInputObjectType & {
+  TContext: TContext;
+  TParentPlan: TParentPlan;
+  TFields: TFields;
+};
 
-export function newInputObjectType<
+export function newInputObjectTypeBuilder<
   TContext extends BaseGraphQLContext,
   TParentPlan extends ModifierPlan<any>,
->(
-  spec: InputObjectTypeSpec<TContext, TParentPlan>,
-): GraphileInputObjectType<TContext, TParentPlan> {
-  return new GraphQLInputObjectType(
-    inputObjectSpec(spec),
-  ) as GraphileInputObjectType<TContext, TParentPlan>;
+>(): <TFields extends InputObjectTypeFields<TContext, TParentPlan>>(
+  spec: InputObjectTypeSpec<TContext, TParentPlan, TFields>,
+) => GraphileInputObjectType<TContext, TParentPlan, TFields> {
+  return (spec) =>
+    new GraphQLInputObjectType(
+      inputObjectSpec(spec),
+    ) as GraphileInputObjectType<TContext, TParentPlan, any>;
 }
 
 /**

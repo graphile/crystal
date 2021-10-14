@@ -22,8 +22,8 @@ import {
   lambda,
   list,
   ModifierPlan,
-  newInputObjectType,
-  newObjectType,
+  newInputObjectTypeBuilder,
+  newObjectTypeBuilder,
   object,
   resolveType,
   subscribe,
@@ -55,6 +55,7 @@ import type {
   PgSelectPlan,
   PgSourceColumn,
   PgSourceColumnVia,
+  PgSourceRelation,
   PgSubscriber,
   PgTypeCodec,
   WithPgClient,
@@ -140,7 +141,17 @@ export function makeExampleSchema(
   type SingleTableItemPlan = PgSelectSinglePlan<typeof singleTableItemsSource>;
   type RelationalItemsPlan = PgSelectPlan<typeof relationalItemsSource>;
   type RelationalItemPlan = PgSelectSinglePlan<typeof relationalItemsSource>;
+  type RelationalTopicPlan = PgSelectSinglePlan<typeof relationalTopicsSource>;
   type RelationalPostPlan = PgSelectSinglePlan<typeof relationalPostsSource>;
+  type RelationalDividerPlan = PgSelectSinglePlan<
+    typeof relationalDividersSource
+  >;
+  type RelationalChecklistPlan = PgSelectSinglePlan<
+    typeof relationalChecklistsSource
+  >;
+  type RelationalChecklistItemPlan = PgSelectSinglePlan<
+    typeof relationalChecklistItemsSource
+  >;
   type UnionItemsPlan = PgSelectPlan<typeof unionItemsSource>;
   type UnionItemPlan = PgSelectSinglePlan<typeof unionItemsSource>;
   type UnionTopicPlan = PgSelectSinglePlan<typeof unionTopicsSource>;
@@ -1031,7 +1042,7 @@ export function makeExampleSchema(
     };
   }
 
-  const User = newObjectType<OurGraphQLContext, UserPlan>({
+  const User = newObjectTypeBuilder<OurGraphQLContext, UserPlan>()({
     name: "User",
     fields: () => ({
       username: attrField("username", GraphQLString),
@@ -1094,7 +1105,7 @@ export function makeExampleSchema(
       },
     },
   });
-  const Message = newObjectType<OurGraphQLContext, MessagePlan>({
+  const Message = newObjectTypeBuilder<OurGraphQLContext, MessagePlan>()({
     name: "Message",
     fields: () => ({
       id: attrField("id", GraphQLString),
@@ -1114,7 +1125,7 @@ export function makeExampleSchema(
     }),
   });
 
-  const MessageEdge = newObjectType<OurGraphQLContext, MessagePlan>({
+  const MessageEdge = newObjectTypeBuilder<OurGraphQLContext, MessagePlan>()({
     name: "MessageEdge",
     fields: {
       cursor: {
@@ -1132,10 +1143,10 @@ export function makeExampleSchema(
     },
   });
 
-  const MessagesConnection = newObjectType<
+  const MessagesConnection = newObjectTypeBuilder<
     OurGraphQLContext,
     MessageConnectionPlan
-  >({
+  >()({
     name: "MessagesConnection",
     fields: {
       edges: {
@@ -1147,7 +1158,7 @@ export function makeExampleSchema(
       nodes: {
         type: new GraphQLList(Message),
         plan($connection) {
-          return $connection.nodes();
+          return $connection.getSubplan();
         },
       },
     },
@@ -1208,10 +1219,10 @@ export function makeExampleSchema(
     };
   }
 
-  const MessageCondition = newInputObjectType<
+  const MessageCondition = newInputObjectTypeBuilder<
     OurGraphQLContext,
     PgConditionPlan<any>
-  >({
+  >()({
     name: "MessageCondition",
     fields: {
       featured: {
@@ -1275,10 +1286,10 @@ export function makeExampleSchema(
     }
   }
 
-  const BooleanFilter = newInputObjectType<
+  const BooleanFilter = newInputObjectTypeBuilder<
     OurGraphQLContext,
     BooleanFilterPlan
-  >({
+  >()({
     name: "BooleanFilter",
     fields: {
       equalTo: {
@@ -1314,7 +1325,10 @@ export function makeExampleSchema(
     },
   });
 
-  const MessageFilter = newInputObjectType<OurGraphQLContext, ClassFilterPlan>({
+  const MessageFilter = newInputObjectTypeBuilder<
+    OurGraphQLContext,
+    ClassFilterPlan
+  >()({
     name: "MessageFilter",
     fields: {
       featured: {
@@ -1333,10 +1347,10 @@ export function makeExampleSchema(
     },
   });
 
-  const ForumCondition = newInputObjectType<
+  const ForumCondition = newInputObjectTypeBuilder<
     OurGraphQLContext,
     PgConditionPlan<any>
-  >({
+  >()({
     name: "ForumCondition",
     fields: {
       name: {
@@ -1450,10 +1464,10 @@ export function makeExampleSchema(
     }
   }
 
-  const ForumToManyMessageFilter = newInputObjectType<
+  const ForumToManyMessageFilter = newInputObjectTypeBuilder<
     OurGraphQLContext,
     ManyFilterPlan<typeof messageSource>
-  >({
+  >()({
     name: "ForumToManyMessageFilter",
     fields: {
       some: {
@@ -1467,7 +1481,10 @@ export function makeExampleSchema(
     },
   });
 
-  const ForumFilter = newInputObjectType<OurGraphQLContext, ClassFilterPlan>({
+  const ForumFilter = newInputObjectTypeBuilder<
+    OurGraphQLContext,
+    ClassFilterPlan
+  >()({
     name: "ForumFilter",
     fields: {
       messages: {
@@ -1486,10 +1503,10 @@ export function makeExampleSchema(
     },
   });
 
-  const Forum: GraphQLObjectType<any, OurGraphQLContext> = newObjectType<
+  const Forum: GraphQLObjectType<any, OurGraphQLContext> = newObjectTypeBuilder<
     OurGraphQLContext,
     ForumPlan
-  >({
+  >()({
     name: "Forum",
     fields: () => ({
       id: attrField("id", GraphQLString),
@@ -1819,7 +1836,7 @@ export function makeExampleSchema(
     );
 
   const PersonBookmark: GraphQLObjectType<any, OurGraphQLContext> =
-    newObjectType<OurGraphQLContext, PersonBookmarkPlan>({
+    newObjectTypeBuilder<OurGraphQLContext, PersonBookmarkPlan>()({
       name: "PersonBookmark",
       fields: () => ({
         id: attrField("id", GraphQLInt),
@@ -1833,51 +1850,49 @@ export function makeExampleSchema(
       }),
     });
 
-  const Person: GraphQLObjectType<any, OurGraphQLContext> = newObjectType<
-    OurGraphQLContext,
-    PersonPlan
-  >({
-    name: "Person",
-    fields: () => ({
-      personId: attrField("person_id", GraphQLInt),
-      username: attrField("username", GraphQLString),
-      singleTableItemsList: {
-        type: new GraphQLList(SingleTableItem),
-        plan($person) {
-          const $personId = $person.get("person_id");
-          const $items: SingleTableItemsPlan = singleTableItemsSource.find({
-            author_id: $personId,
-          });
-          deoptimizeIfAppropriate($items);
-          return each($items, ($item) => singleTableItemInterface($item));
+  const Person: GraphQLObjectType<any, OurGraphQLContext> =
+    newObjectTypeBuilder<OurGraphQLContext, PersonPlan>()({
+      name: "Person",
+      fields: () => ({
+        personId: attrField("person_id", GraphQLInt),
+        username: attrField("username", GraphQLString),
+        singleTableItemsList: {
+          type: new GraphQLList(SingleTableItem),
+          plan($person) {
+            const $personId = $person.get("person_id");
+            const $items: SingleTableItemsPlan = singleTableItemsSource.find({
+              author_id: $personId,
+            });
+            deoptimizeIfAppropriate($items);
+            return each($items, ($item) => singleTableItemInterface($item));
+          },
         },
-      },
 
-      relationalItemsList: {
-        type: new GraphQLList(RelationalItem),
-        plan($person) {
-          const $personId = $person.get("person_id");
-          const $items: RelationalItemsPlan = relationalItemsSource.find({
-            author_id: $personId,
-          });
-          deoptimizeIfAppropriate($items);
-          return each($items, ($item) => relationalItemInterface($item));
+        relationalItemsList: {
+          type: new GraphQLList(RelationalItem),
+          plan($person) {
+            const $personId = $person.get("person_id");
+            const $items: RelationalItemsPlan = relationalItemsSource.find({
+              author_id: $personId,
+            });
+            deoptimizeIfAppropriate($items);
+            return each($items, ($item) => relationalItemInterface($item));
+          },
         },
-      },
 
-      personBookmarksList: {
-        type: new GraphQLList(PersonBookmark),
-        plan($person) {
-          return $person.manyRelation("personBookmarks");
+        personBookmarksList: {
+          type: new GraphQLList(PersonBookmark),
+          plan($person) {
+            return $person.manyRelation("personBookmarks");
+          },
         },
-      },
-    }),
-  });
+      }),
+    });
 
-  const Post: GraphQLObjectType<any, OurGraphQLContext> = newObjectType<
+  const Post: GraphQLObjectType<any, OurGraphQLContext> = newObjectTypeBuilder<
     OurGraphQLContext,
     PostPlan
-  >({
+  >()({
     name: "Post",
     fields: () => ({
       postId: attrField("post_id", GraphQLInt),
@@ -1886,18 +1901,16 @@ export function makeExampleSchema(
     }),
   });
 
-  const Comment: GraphQLObjectType<any, OurGraphQLContext> = newObjectType<
-    OurGraphQLContext,
-    CommentPlan
-  >({
-    name: "Comment",
-    fields: () => ({
-      commentId: attrField("comment_id", GraphQLInt),
-      author: singleRelationField("author", Person),
-      post: singleRelationField("post", Post),
-      body: attrField("body", GraphQLString),
-    }),
-  });
+  const Comment: GraphQLObjectType<any, OurGraphQLContext> =
+    newObjectTypeBuilder<OurGraphQLContext, CommentPlan>()({
+      name: "Comment",
+      fields: () => ({
+        commentId: attrField("comment_id", GraphQLInt),
+        author: singleRelationField("author", Person),
+        post: singleRelationField("post", Post),
+        body: attrField("body", GraphQLString),
+      }),
+    });
 
   ////////////////////////////////////////
 
@@ -1936,10 +1949,10 @@ export function makeExampleSchema(
     archivedAt: attrField("archived_at", GraphQLString),
   };
 
-  const SingleTableTopic = newObjectType<
+  const SingleTableTopic = newObjectTypeBuilder<
     OurGraphQLContext,
     SingleTableItemPlan
-  >({
+  >()({
     name: "SingleTableTopic",
     interfaces: [SingleTableItem],
     fields: () => ({
@@ -1948,23 +1961,24 @@ export function makeExampleSchema(
     }),
   });
 
-  const SingleTablePost = newObjectType<OurGraphQLContext, SingleTableItemPlan>(
-    {
-      name: "SingleTablePost",
-      interfaces: [SingleTableItem],
-      fields: () => ({
-        ...commonSingleTableItemFields,
-        title: attrField("title", GraphQLString),
-        description: attrField("description", GraphQLString),
-        note: attrField("note", GraphQLString),
-      }),
-    },
-  );
-
-  const SingleTableDivider = newObjectType<
+  const SingleTablePost = newObjectTypeBuilder<
     OurGraphQLContext,
     SingleTableItemPlan
-  >({
+  >()({
+    name: "SingleTablePost",
+    interfaces: [SingleTableItem],
+    fields: () => ({
+      ...commonSingleTableItemFields,
+      title: attrField("title", GraphQLString),
+      description: attrField("description", GraphQLString),
+      note: attrField("note", GraphQLString),
+    }),
+  });
+
+  const SingleTableDivider = newObjectTypeBuilder<
+    OurGraphQLContext,
+    SingleTableItemPlan
+  >()({
     name: "SingleTableDivider",
     interfaces: [SingleTableItem],
     fields: () => ({
@@ -1974,10 +1988,10 @@ export function makeExampleSchema(
     }),
   });
 
-  const SingleTableChecklist = newObjectType<
+  const SingleTableChecklist = newObjectTypeBuilder<
     OurGraphQLContext,
     SingleTableItemPlan
-  >({
+  >()({
     name: "SingleTableChecklist",
     interfaces: [SingleTableItem],
     fields: () => ({
@@ -1986,10 +2000,10 @@ export function makeExampleSchema(
     }),
   });
 
-  const SingleTableChecklistItem = newObjectType<
+  const SingleTableChecklistItem = newObjectTypeBuilder<
     OurGraphQLContext,
     SingleTableItemPlan
-  >({
+  >()({
     name: "SingleTableChecklistItem",
     interfaces: [SingleTableItem],
     fields: () => ({
@@ -2026,46 +2040,73 @@ export function makeExampleSchema(
     resolveType,
   });
 
-  const commonRelationalItemFields = {
-    id: attrField("id", GraphQLInt),
-    type: attrField("type", GraphQLString),
+  // NOTE: the `| any`s below are because of co/contravariance woes.
+  const commonRelationalItemFields = <
+    TDataSource extends PgSource<
+      any,
+      | {
+          id: PgSourceColumn<number>;
+          type: PgSourceColumn<string>;
+          position: PgSourceColumn<string>;
+          created_at: PgSourceColumn<Date>;
+          updated_at: PgSourceColumn<Date>;
+          is_explicitly_archived: PgSourceColumn<boolean>;
+          archived_at: PgSourceColumn<Date>;
+        }
+      | any,
+      any,
+      { parent: PgSourceRelation<any, any> } | any,
+      any
+    >,
+  >() => ({
+    id: attrField<TDataSource>("id", GraphQLInt),
+    type: attrField<TDataSource>("type", GraphQLString),
     parent: {
       type: RelationalItem,
-      plan($entity: RelationalItemPlan) {
+      plan($entity: PgSelectSinglePlan<TDataSource>) {
         const $plan = $entity.singleRelation("parent");
         deoptimizeIfAppropriate($plan);
         return relationalItemInterface($plan);
       },
     },
     author: singleRelationField("author", Person),
-    position: attrField("position", GraphQLString),
-    createdAt: attrField("created_at", GraphQLString),
-    updatedAt: attrField("updated_at", GraphQLString),
-    isExplicitlyArchived: attrField("is_explicitly_archived", GraphQLBoolean),
-    archivedAt: attrField("archived_at", GraphQLString),
-  };
+    position: attrField<TDataSource>("position", GraphQLString),
+    createdAt: attrField<TDataSource>("created_at", GraphQLString),
+    updatedAt: attrField<TDataSource>("updated_at", GraphQLString),
+    isExplicitlyArchived: attrField<TDataSource>(
+      "is_explicitly_archived",
+      GraphQLBoolean,
+    ),
+    archivedAt: attrField<TDataSource>("archived_at", GraphQLString),
+  });
 
-  const RelationalTopic = newObjectType<OurGraphQLContext, RelationalItemPlan>({
+  const RelationalTopic = newObjectTypeBuilder<
+    OurGraphQLContext,
+    RelationalTopicPlan
+  >()({
     name: "RelationalTopic",
     interfaces: [RelationalItem],
     fields: () => ({
-      ...commonRelationalItemFields,
+      ...commonRelationalItemFields(),
       title: attrField("title", GraphQLString),
     }),
   });
 
-  const RelationalPost = newObjectType<OurGraphQLContext, RelationalItemPlan>({
+  const RelationalPost = newObjectTypeBuilder<
+    OurGraphQLContext,
+    RelationalPostPlan
+  >()({
     name: "RelationalPost",
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
-      ...commonRelationalItemFields,
+      ...commonRelationalItemFields(),
       title: attrField("title", GraphQLString),
       description: attrField("description", GraphQLString),
       note: attrField("note", GraphQLString),
 
       titleLower: {
         type: GraphQLString,
-        plan($entity: RelationalItemPlan) {
+        plan($entity) {
           return pgSelect({
             source: scalarTextSource,
             identifiers: [],
@@ -2088,39 +2129,39 @@ export function makeExampleSchema(
     }),
   });
 
-  const RelationalDivider = newObjectType<
+  const RelationalDivider = newObjectTypeBuilder<
     OurGraphQLContext,
-    RelationalItemPlan
-  >({
+    RelationalDividerPlan
+  >()({
     name: "RelationalDivider",
     interfaces: [RelationalItem],
     fields: () => ({
-      ...commonRelationalItemFields,
+      ...commonRelationalItemFields(),
       title: attrField("title", GraphQLString),
       color: attrField("color", GraphQLString),
     }),
   });
 
-  const RelationalChecklist = newObjectType<
+  const RelationalChecklist = newObjectTypeBuilder<
     OurGraphQLContext,
-    RelationalItemPlan
-  >({
+    RelationalChecklistPlan
+  >()({
     name: "RelationalChecklist",
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
-      ...commonRelationalItemFields,
+      ...commonRelationalItemFields(),
       title: attrField("title", GraphQLString),
     }),
   });
 
-  const RelationalChecklistItem = newObjectType<
+  const RelationalChecklistItem = newObjectTypeBuilder<
     OurGraphQLContext,
-    RelationalItemPlan
-  >({
+    RelationalChecklistItemPlan
+  >()({
     name: "RelationalChecklistItem",
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
-      ...commonRelationalItemFields,
+      ...commonRelationalItemFields(),
       description: attrField("description", GraphQLString),
       note: attrField("note", GraphQLString),
     }),
@@ -2140,7 +2181,7 @@ export function makeExampleSchema(
     ],
   });
 
-  const UnionTopic = newObjectType<OurGraphQLContext, UnionTopicPlan>({
+  const UnionTopic = newObjectTypeBuilder<OurGraphQLContext, UnionTopicPlan>()({
     name: "UnionTopic",
     fields: () => ({
       id: attrField("id", GraphQLInt),
@@ -2148,7 +2189,7 @@ export function makeExampleSchema(
     }),
   });
 
-  const UnionPost = newObjectType<OurGraphQLContext, UnionPostPlan>({
+  const UnionPost = newObjectTypeBuilder<OurGraphQLContext, UnionPostPlan>()({
     name: "UnionPost",
     fields: () => ({
       id: attrField("id", GraphQLInt),
@@ -2158,7 +2199,10 @@ export function makeExampleSchema(
     }),
   });
 
-  const UnionDivider = newObjectType<OurGraphQLContext, UnionDividerPlan>({
+  const UnionDivider = newObjectTypeBuilder<
+    OurGraphQLContext,
+    UnionDividerPlan
+  >()({
     name: "UnionDivider",
     fields: () => ({
       id: attrField("id", GraphQLInt),
@@ -2167,7 +2211,10 @@ export function makeExampleSchema(
     }),
   });
 
-  const UnionChecklist = newObjectType<OurGraphQLContext, UnionChecklistPlan>({
+  const UnionChecklist = newObjectTypeBuilder<
+    OurGraphQLContext,
+    UnionChecklistPlan
+  >()({
     name: "UnionChecklist",
     fields: () => ({
       id: attrField("id", GraphQLInt),
@@ -2175,10 +2222,10 @@ export function makeExampleSchema(
     }),
   });
 
-  const UnionChecklistItem = newObjectType<
+  const UnionChecklistItem = newObjectTypeBuilder<
     OurGraphQLContext,
     UnionChecklistItemPlan
-  >({
+  >()({
     name: "UnionChecklistItem",
     fields: () => ({
       id: attrField("id", GraphQLInt),
@@ -2197,10 +2244,10 @@ export function makeExampleSchema(
 
   ////////////////////////////////////////
 
-  const Query = newObjectType<
+  const Query = newObjectTypeBuilder<
     OurGraphQLContext,
     __ValuePlan<BaseGraphQLRootValue>
-  >({
+  >()({
     name: "Query",
     fields: {
       forums: {
@@ -2638,7 +2685,7 @@ export function makeExampleSchema(
     },
   });
 
-  const CreateRelationalPostInput = newInputObjectType({
+  const CreateRelationalPostInput = newInputObjectTypeBuilder()({
     name: "CreateRelationalPostInput",
     fields: {
       title: {
@@ -2653,7 +2700,7 @@ export function makeExampleSchema(
     },
   });
 
-  const RelationalPostPatch = newInputObjectType({
+  const RelationalPostPatch = newInputObjectTypeBuilder()({
     name: "RelationalPostPatch",
     fields: {
       // All nullable, since it's a patch.
@@ -2669,7 +2716,7 @@ export function makeExampleSchema(
     },
   });
 
-  const UpdateRelationalPostByIdInput = newInputObjectType({
+  const UpdateRelationalPostByIdInput = newInputObjectTypeBuilder()({
     name: "UpdateRelationalPostByIdInput",
     fields: {
       id: {
@@ -2681,7 +2728,7 @@ export function makeExampleSchema(
     },
   });
 
-  const DeleteRelationalPostByIdInput = newInputObjectType({
+  const DeleteRelationalPostByIdInput = newInputObjectTypeBuilder()({
     name: "DeleteRelationalPostByIdInput",
     fields: {
       id: {
@@ -2711,26 +2758,26 @@ export function makeExampleSchema(
     },
   };
 
-  const CreateRelationalPostPayload = newObjectType<
+  const CreateRelationalPostPayload = newObjectTypeBuilder<
     OurGraphQLContext,
     PgInsertPlan<typeof relationalPostsSource>
-  >({
+  >()({
     name: "CreateRelationalPostPayload",
     fields: relationalPostMutationFields,
   });
 
-  const UpdateRelationalPostByIdPayload = newObjectType<
+  const UpdateRelationalPostByIdPayload = newObjectTypeBuilder<
     OurGraphQLContext,
     PgUpdatePlan<typeof relationalPostsSource>
-  >({
+  >()({
     name: "UpdateRelationalPostByIdPayload",
     fields: relationalPostMutationFields,
   });
 
-  const DeleteRelationalPostByIdPayload = newObjectType<
+  const DeleteRelationalPostByIdPayload = newObjectTypeBuilder<
     OurGraphQLContext,
     PgDeletePlan<typeof relationalPostsSource>
-  >({
+  >()({
     name: "DeleteRelationalPostByIdPayload",
     fields: {
       ...relationalPostMutationFields,
@@ -2749,10 +2796,10 @@ export function makeExampleSchema(
     },
   });
 
-  const Mutation = newObjectType<
+  const Mutation = newObjectTypeBuilder<
     OurGraphQLContext,
     __ValuePlan<BaseGraphQLRootValue>
-  >({
+  >()({
     name: "Mutation",
     fields: {
       createRelationalPost: {
@@ -2888,10 +2935,10 @@ export function makeExampleSchema(
     },
   });
 
-  const ForumMessageSubscriptionPayload = newObjectType<
+  const ForumMessageSubscriptionPayload = newObjectTypeBuilder<
     OurGraphQLContext,
     ObjectLikePlan<{ id: ExecutablePlan<string>; op: ExecutablePlan<string> }>
-  >({
+  >()({
     name: "ForumMessageSubscriptionPayload",
     fields: {
       operationType: {
@@ -2909,10 +2956,10 @@ export function makeExampleSchema(
     },
   });
 
-  const Subscription = newObjectType<
+  const Subscription = newObjectTypeBuilder<
     OurGraphQLContext,
     __ValuePlan<BaseGraphQLRootValue>
-  >({
+  >()({
     name: "Subscription",
     fields: {
       forumMessage: {

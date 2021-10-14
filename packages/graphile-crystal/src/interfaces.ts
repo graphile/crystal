@@ -1,10 +1,19 @@
 import type {
   FieldNode,
   GraphQLArgumentConfig,
+  GraphQLEnumType,
   GraphQLFieldConfig,
+  GraphQLFloat,
+  GraphQLID,
   GraphQLInputFieldConfig,
   GraphQLInputType,
+  GraphQLInt,
+  GraphQLList,
+  GraphQLNonNull,
   GraphQLOutputType,
+  GraphQLScalarType,
+  GraphQLString,
+  GraphQLType,
   SelectionNode,
 } from "graphql";
 
@@ -13,8 +22,12 @@ import type { Deferred } from "./deferred";
 import type { InputPlan } from "./input";
 import type { ExecutablePlan, ModifierPlan } from "./plan";
 import type { PlanResults, PlanResultsBucket } from "./planResults";
-import type { __TrackedObjectPlan } from "./plans";
-import type { UniqueId } from "./utils";
+import type { __TrackedObjectPlan, ListCapablePlan } from "./plans";
+import type {
+  GraphileInputObjectType,
+  GraphileObjectType,
+  UniqueId,
+} from "./utils";
 
 declare module "graphql" {
   interface GraphQLFieldExtensions<
@@ -203,24 +216,76 @@ export type ArgumentPlanResolver<
   context: __TrackedObjectPlan<TContext>,
 ) => TResultPlan;
 
+// TypeScript gets upset if we go too deep, so we try and cover the most common
+// use cases and fall back to `any`
+type OutputPlanForNamedType<TType extends GraphQLType> =
+  TType extends GraphileObjectType<any, infer TPlan, any>
+    ? TPlan
+    : ExecutablePlan<any>;
+type OutputPlanForType<TType extends GraphQLOutputType> =
+  TType extends GraphQLNonNull<GraphQLList<GraphQLNonNull<infer U>>>
+    ? ListCapablePlan<any, OutputPlanForNamedType<U>>
+    : TType extends GraphQLNonNull<GraphQLList<infer U>>
+    ? ListCapablePlan<any, OutputPlanForNamedType<U>>
+    : TType extends GraphQLList<GraphQLNonNull<infer U>>
+    ? ListCapablePlan<any, OutputPlanForNamedType<U>>
+    : TType extends GraphQLList<infer U>
+    ? ListCapablePlan<any, OutputPlanForNamedType<U>>
+    : TType extends GraphQLNonNull<infer U>
+    ? OutputPlanForNamedType<U>
+    : OutputPlanForNamedType<TType>;
+
+// TypeScript gets upset if we go too deep, so we try and cover the most common
+// use cases and fall back to `any`
+type InputPlanForNamedType<TType extends GraphQLType> =
+  TType extends GraphileInputObjectType<any, infer U, any>
+    ? U
+    : ModifierPlan<any>;
+type InputPlanForType<TType extends GraphQLInputType> =
+  TType extends GraphQLNonNull<GraphQLList<GraphQLNonNull<infer U>>>
+    ? InputPlanForNamedType<U>
+    : TType extends GraphQLNonNull<GraphQLList<infer U>>
+    ? InputPlanForNamedType<U>
+    : TType extends GraphQLList<GraphQLNonNull<infer U>>
+    ? InputPlanForNamedType<U>
+    : TType extends GraphQLList<infer U>
+    ? InputPlanForNamedType<U>
+    : TType extends GraphQLNonNull<infer U>
+    ? InputPlanForNamedType<U>
+    : InputPlanForNamedType<TType>;
+
+// TypeScript gets upset if we go too deep, so we try and cover the most common
+// use cases and fall back to `any`
+type InputTypeForNamedType<TType extends GraphQLType> =
+  TType extends GraphQLScalarType<infer U> ? U : any;
+type InputTypeFor<TType extends GraphQLInputType> =
+  TType extends GraphQLNonNull<GraphQLList<GraphQLNonNull<infer U>>>
+    ? InputTypeForNamedType<U>
+    : TType extends GraphQLNonNull<GraphQLList<infer U>>
+    ? InputTypeForNamedType<U>
+    : TType extends GraphQLList<GraphQLNonNull<infer U>>
+    ? InputTypeForNamedType<U>
+    : TType extends GraphQLList<infer U>
+    ? InputTypeForNamedType<U>
+    : TType extends GraphQLNonNull<infer U>
+    ? InputTypeForNamedType<U>
+    : InputTypeForNamedType<TType>;
+
 /*
-type PlanForType<TType extends GraphQLOutputType> = TType extends GraphQLList<
+type OutputPlanForType<TType extends GraphQLOutputType> =
+  TType extends GraphQLList<
   infer U
 >
   ? U extends GraphQLOutputType
-    ? ListCapablePlan<any, PlanForType<U>>
+    ? ListCapablePlan<any, OutputPlanForType<U>>
     : never
   : TType extends GraphQLNonNull<infer V>
   ? V extends GraphQLOutputType
-    ? PlanForType<V>
+    ? OutputPlanForType<V>
     : never
   : TType extends GraphQLScalarType | GraphQLEnumType
   ? ExecutablePlan<boolean | number | string>
   : ExecutablePlan<{ [key: string]: any }>;
-*/
-
-/* Disabled due to TypeScript "Type instantiation is excessively deep and
- * possibly infinite".
 
 type InputPlanForType<TType extends GraphQLInputType> =
   TType extends GraphQLList<infer U>
@@ -245,12 +310,10 @@ type InputTypeFor<TType extends GraphQLInputType> = TType extends GraphQLList<
   ? V extends GraphQLInputType
     ? InputTypeFor<V>
     : never
-  : TType extends GraphQLInt | GraphQLFloat
-  ? number
-  : TType extends GraphQLString | GraphQLID
-  ? string
+  : TType extends GraphQLScalarType<infer U>
+  ? U
   : any;
-*/
+  */
 
 /**
  * Basically GraphQLFieldConfig but with an easy to access `plan` method.
@@ -259,7 +322,7 @@ export type GraphileCrystalFieldConfig<
   TType extends GraphQLOutputType,
   TContext extends BaseGraphQLContext,
   TParentPlan extends ExecutablePlan<any> | null,
-  TFieldPlan extends ExecutablePlan<any>, // PlanForType<TType>,
+  TFieldPlan extends OutputPlanForType<TType>,
   TArgs extends BaseGraphQLArguments,
 > = Omit<GraphQLFieldConfig<any, any>, "args" | "type"> & {
   type: TType;
@@ -286,11 +349,11 @@ export type GraphileCrystalArgumentConfig<
   TInputType extends GraphQLInputType,
   TContext extends BaseGraphQLContext,
   TParentPlan extends ExecutablePlan<any> | null,
-  TFieldPlan extends ExecutablePlan<TParentPlan> | null,
+  TFieldPlan extends ExecutablePlan<any>,
   TArgumentPlan extends TFieldPlan extends ExecutablePlan<any>
     ? ModifierPlan<TFieldPlan> | null
     : null,
-  TInput extends InputPlan, // InputTypeFor<TInputType>,
+  TInput extends InputTypeFor<TInputType>,
 > = Omit<GraphQLArgumentConfig, "type"> & {
   type: TInputType;
   plan?: TParentPlan extends ExecutablePlan<any>
@@ -308,8 +371,8 @@ export type GraphileCrystalInputFieldConfig<
   TInputType extends GraphQLInputType,
   TContext extends BaseGraphQLContext,
   TParentPlan extends ModifierPlan<any>,
-  TResultPlan extends ModifierPlan<TParentPlan> | null, // InputPlanForType<TInputType>
-  TInput extends InputPlan, // InputTypeFor<TInputType>,
+  TResultPlan extends InputPlanForType<TInputType>,
+  TInput extends InputTypeFor<TInputType>,
 > = Omit<GraphQLInputFieldConfig, "type"> & {
   type: TInputType;
   plan?: InputObjectFieldPlanResolver<
