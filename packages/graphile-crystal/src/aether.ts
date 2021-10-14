@@ -195,9 +195,9 @@ function assertPolymorphicPlan(
  * Implements the `NewAether` algorithm.
  */
 export class Aether<
-  TVariables extends BaseGraphQLVariables = BaseGraphQLVariables,
-  TContext extends BaseGraphQLContext = BaseGraphQLContext,
-  TRootValue extends BaseGraphQLRootValue = BaseGraphQLRootValue,
+  TVariables extends BaseGraphQLVariables = any,
+  TContext extends BaseGraphQLContext = any,
+  TRootValue extends BaseGraphQLRootValue = any,
 > {
   private phase: AetherPhase = "init";
 

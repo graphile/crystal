@@ -14,7 +14,7 @@ export class __ValuePlan<TData> extends ExecutablePlan<TData> {
         return "rootValue";
       case this.aether.variableValuesPlan as __ValuePlan<unknown>:
         return "variableValues";
-      case this.aether.contextPlan:
+      case this.aether.contextPlan as __ValuePlan<unknown>:
         return "context";
       default:
         return null;
@@ -28,17 +28,11 @@ export class __ValuePlan<TData> extends ExecutablePlan<TData> {
     );
   }
 
-  get<TAttr extends keyof TData & string>(
-    attrName: TAttr,
-  ): AccessPlan<
-    TData extends { [key: string]: unknown } ? TData[TAttr] : never
-  > {
+  get<TAttr extends keyof TData>(attrName: TAttr): AccessPlan<TData[TAttr]> {
     return access(this, [attrName as string]);
   }
 
-  at<TIndex extends keyof TData & number>(
-    index: TIndex,
-  ): AccessPlan<TData extends Array<unknown> ? TData[TIndex] : never> {
+  at<TIndex extends keyof TData>(index: TIndex): AccessPlan<TData[TIndex]> {
     return access(this, [index as number]);
   }
 }

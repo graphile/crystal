@@ -156,11 +156,11 @@ const debugAccessPlanVerbose = debugAccessPlan.extend("verbose");
  * the naming conventions detailed in assertSafeToAccessViaBraces.
  */
 export class AccessPlan<TData> extends ExecutablePlan<TData> {
-  private destructure: (value: any) => any;
+  private destructure: (value: [TData]) => any;
   private parentPlanId: number;
 
   constructor(
-    parentPlan: ExecutablePlan<any>,
+    parentPlan: ExecutablePlan<unknown>,
     public readonly path: (string | number)[],
   ) {
     super();
@@ -178,9 +178,10 @@ export class AccessPlan<TData> extends ExecutablePlan<TData> {
   /**
    * Get the named property of an object.
    */
-  get<TAttr extends keyof TData & string>(
-    attrName: TAttr,
-  ): AccessPlan<TData[TAttr]> {
+  get<TAttr extends keyof TData>(attrName: TAttr): AccessPlan<TData[TAttr]> {
+    if (typeof attrName !== "string") {
+      throw new Error(`AccessPlan::get can only be called with string values`);
+    }
     return new AccessPlan(this.getPlan(this.parentPlanId), [
       ...this.path,
       attrName,
@@ -190,9 +191,10 @@ export class AccessPlan<TData> extends ExecutablePlan<TData> {
   /**
    * Get the entry at the given index in an array.
    */
-  at<TIndex extends keyof TData & number>(
-    index: TIndex,
-  ): AccessPlan<TData[TIndex]> {
+  at<TIndex extends keyof TData>(index: TIndex): AccessPlan<TData[TIndex]> {
+    if (typeof index !== "number") {
+      throw new Error(`AccessPlan::get can only be called with string values`);
+    }
     return new AccessPlan(this.getPlan(this.parentPlanId), [
       ...this.path,
       index,
@@ -207,7 +209,7 @@ export class AccessPlan<TData> extends ExecutablePlan<TData> {
     super.finalize();
   }
 
-  deduplicate(peers: AccessPlan<any>[]): AccessPlan<TData> {
+  deduplicate(peers: AccessPlan<unknown>[]): AccessPlan<TData> {
     const myPath = JSON.stringify(this.path);
     const peersWithSamePath = peers.filter(
       (p) => JSON.stringify(p.path) === myPath,
@@ -218,12 +220,14 @@ export class AccessPlan<TData> extends ExecutablePlan<TData> {
       this.path,
       peersWithSamePath,
     );
-    return peersWithSamePath.length > 0 ? peersWithSamePath[0] : this;
+    return peersWithSamePath.length > 0
+      ? (peersWithSamePath[0] as AccessPlan<TData>)
+      : this;
   }
 }
 
 export function access<TData>(
-  parentPlan: ExecutablePlan<any>,
+  parentPlan: ExecutablePlan<unknown>,
   path: (string | number)[],
 ): AccessPlan<TData> {
   return new AccessPlan<TData>(parentPlan, path);

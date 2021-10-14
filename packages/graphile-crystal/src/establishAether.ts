@@ -8,6 +8,11 @@ import type {
 import { Aether } from "./aether";
 import { matchesConstraints } from "./constraints";
 import { isDev, noop } from "./dev";
+import type {
+  BaseGraphQLContext,
+  BaseGraphQLRootValue,
+  BaseGraphQLVariables,
+} from "./interfaces";
 
 const debug = debugFactory("crystal:establishAether");
 type Fragments = {
@@ -68,12 +73,16 @@ const assertFragmentsMatch = !isDev ? noop : reallyAssertFragmentsMatch;
  * @remarks Due to the optimisation in `establishAether`, the schema, document
  * and operationName checks have already been performed.
  */
-export function isAetherCompatible(
-  aether: Aether,
-  variableValues: { [variableName: string]: unknown },
-  context: unknown,
-  rootValue: unknown,
-): boolean {
+export function isAetherCompatible<
+  TVariables extends BaseGraphQLVariables = BaseGraphQLVariables,
+  TContext extends BaseGraphQLContext = BaseGraphQLContext,
+  TRootValue extends BaseGraphQLRootValue = BaseGraphQLRootValue,
+>(
+  aether: Aether<any, any, any>,
+  variableValues: TVariables,
+  context: TContext,
+  rootValue: TRootValue,
+): aether is Aether<TVariables, TContext, TRootValue> {
   const {
     variableValuesConstraints,
     contextConstraints,
@@ -99,16 +108,18 @@ export function isAetherCompatible(
  * in GraphQL.js.
  */
 // eslint-disable-next-line @typescript-eslint/ban-types
-export function establishAether<TContext extends object>(details: {
+export function establishAether<
+  TVariables extends BaseGraphQLVariables = BaseGraphQLVariables,
+  TContext extends BaseGraphQLContext = BaseGraphQLContext,
+  TRootValue extends BaseGraphQLRootValue = BaseGraphQLRootValue,
+>(details: {
   schema: GraphQLSchema;
   operation: OperationDefinitionNode;
   fragments: Fragments;
-  variableValues: {
-    [variableName: string]: unknown;
-  };
+  variableValues: TVariables;
   context: TContext;
-  rootValue: unknown;
-}): Aether {
+  rootValue: TRootValue;
+}): Aether<TVariables, TContext, TRootValue> {
   const { schema, operation, fragments, variableValues, context, rootValue } =
     details;
   let cacheByOperation = cacheByOperationBySchema.get(schema);
