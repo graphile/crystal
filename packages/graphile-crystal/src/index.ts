@@ -87,10 +87,12 @@ export {
 export { stripAnsi } from "./stripAnsi";
 export {
   arraysMatch,
+  GraphileObjectType,
   inputObjectFieldSpec,
   inputObjectSpec,
+  newObjectType,
   objectFieldSpec,
-  objectSpec,
+  ObjectTypeSpec,
   planGroupsOverlap,
 } from "./utils";
 

@@ -23,8 +23,8 @@ import {
   lambda,
   list,
   ModifierPlan,
+  newObjectType,
   object,
-  objectSpec,
   resolveType,
   subscribe,
 } from "graphile-crystal";
@@ -1033,27 +1033,25 @@ export function makeExampleSchema(
     };
   }
 
-  const User = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, UserPlan>({
-      name: "User",
-      fields: () => ({
-        username: attrField("username", GraphQLString),
-        gravatarUrl: attrField("gravatar_url", GraphQLString),
-        mostRecentForum: {
-          type: Forum,
-          plan($user) {
-            const $forum = pgSelect({
-              source: usersMostRecentForumSource,
-              args: [{ plan: $user.record() }],
-              identifiers: [],
-            }).single();
-            deoptimizeIfAppropriate($forum);
-            return $forum;
-          },
+  const User = newObjectType<OurGraphQLContext, UserPlan>({
+    name: "User",
+    fields: () => ({
+      username: attrField("username", GraphQLString),
+      gravatarUrl: attrField("gravatar_url", GraphQLString),
+      mostRecentForum: {
+        type: Forum,
+        plan($user) {
+          const $forum = pgSelect({
+            source: usersMostRecentForumSource,
+            args: [{ plan: $user.record() }],
+            identifiers: [],
+          }).single();
+          deoptimizeIfAppropriate($forum);
+          return $forum;
         },
-      }),
+      },
     }),
-  );
+  });
 
   const MessagesOrderBy = new GraphQLEnumType({
     name: "MessagesOrderBy",
@@ -1098,67 +1096,64 @@ export function makeExampleSchema(
       },
     },
   });
-  const Message = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, MessagePlan>({
-      name: "Message",
-      fields: () => ({
-        id: attrField("id", GraphQLString),
-        featured: attrField("featured", GraphQLBoolean),
-        body: attrField("body", GraphQLString),
-        forum: singleRelationField("forum", Forum),
-        author: {
-          type: User,
-          plan($message) {
-            const $user = $message.singleRelation("author");
-            deoptimizeIfAppropriate($user);
+  const Message = newObjectType<OurGraphQLContext, MessagePlan>({
+    name: "Message",
+    fields: () => ({
+      id: attrField("id", GraphQLString),
+      featured: attrField("featured", GraphQLBoolean),
+      body: attrField("body", GraphQLString),
+      forum: singleRelationField("forum", Forum),
+      author: {
+        type: User,
+        plan($message) {
+          const $user = $message.singleRelation("author");
+          deoptimizeIfAppropriate($user);
 
-            return $user;
-          },
-        },
-        isArchived: attrField("is_archived", GraphQLBoolean),
-      }),
-    }),
-  );
-
-  const MessageEdge = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, MessagePlan>({
-      name: "MessageEdge",
-      fields: {
-        cursor: {
-          type: GraphQLString,
-          plan($node) {
-            return $node.cursor();
-          },
-        },
-        node: {
-          type: Message,
-          plan($node) {
-            return $node;
-          },
+          return $user;
         },
       },
+      isArchived: attrField("is_archived", GraphQLBoolean),
     }),
-  );
+  });
 
-  const MessagesConnection = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, MessageConnectionPlan>({
-      name: "MessagesConnection",
-      fields: {
-        edges: {
-          type: new GraphQLList(MessageEdge),
-          plan($connection) {
-            return $connection.nodes();
-          },
-        },
-        nodes: {
-          type: new GraphQLList(Message),
-          plan($connection) {
-            return $connection.nodes();
-          },
+  const MessageEdge = newObjectType<OurGraphQLContext, MessagePlan>({
+    name: "MessageEdge",
+    fields: {
+      cursor: {
+        type: GraphQLString,
+        plan($node) {
+          return $node.cursor();
         },
       },
-    }),
-  );
+      node: {
+        type: Message,
+        plan($node) {
+          return $node;
+        },
+      },
+    },
+  });
+
+  const MessagesConnection = newObjectType<
+    OurGraphQLContext,
+    MessageConnectionPlan
+  >({
+    name: "MessagesConnection",
+    fields: {
+      edges: {
+        type: new GraphQLList(MessageEdge),
+        plan($connection) {
+          return $connection.nodes();
+        },
+      },
+      nodes: {
+        type: new GraphQLList(Message),
+        plan($connection) {
+          return $connection.nodes();
+        },
+      },
+    },
+  });
 
   const IncludeArchived = new GraphQLEnumType({
     name: "IncludeArchived",
@@ -1493,222 +1488,216 @@ export function makeExampleSchema(
     }),
   );
 
-  const Forum: GraphQLObjectType<any, OurGraphQLContext> =
-    new GraphQLObjectType(
-      objectSpec<OurGraphQLContext, ForumPlan>({
-        name: "Forum",
-        fields: () => ({
-          id: attrField("id", GraphQLString),
-          name: attrField("name", GraphQLString),
+  const Forum: GraphQLObjectType<any, OurGraphQLContext> = newObjectType<
+    OurGraphQLContext,
+    ForumPlan
+  >({
+    name: "Forum",
+    fields: () => ({
+      id: attrField("id", GraphQLString),
+      name: attrField("name", GraphQLString),
 
-          // Expression column
-          isArchived: attrField("is_archived", GraphQLBoolean),
+      // Expression column
+      isArchived: attrField("is_archived", GraphQLBoolean),
 
-          // Custom expression; actual column select shouldn't make it through to the generated query.
-          archivedAtIsNotNull: {
-            type: GraphQLBoolean,
-            plan($forum) {
-              const $archivedAt = $forum.get("archived_at");
-              const $expr1 = pgClassExpression(
-                $forum,
-                TYPES.boolean,
-              )`${$archivedAt} is not null`;
-              const $expr2 = pgClassExpression(
-                $forum,
-                TYPES.boolean,
-              )`${$expr1} is true`;
-              return $expr2;
-            },
-          },
-          self: {
-            type: Forum,
-            plan($forum) {
-              return $forum;
-            },
-          },
-          messagesList: {
-            type: new GraphQLList(Message),
-            args: {
-              first: {
-                type: GraphQLInt,
-                plan(
-                  _$forum,
-                  $messages: PgSelectPlan<typeof messageSource>,
-                  $value,
-                ) {
-                  $messages.setFirst($value.eval());
-                  return null;
-                },
-              },
-              condition: {
-                type: MessageCondition,
-                plan(_$forum, $messages: PgSelectPlan<typeof messageSource>) {
-                  return $messages.wherePlan();
-                },
-              },
-              filter: {
-                type: MessageFilter,
-                plan(_$forum, $messages: PgSelectPlan<typeof messageSource>) {
-                  return new ClassFilterPlan(
-                    $messages.wherePlan(),
-                    $messages.alias,
-                  );
-                },
-              },
-              includeArchived: makeIncludeArchivedField<
-                PgSelectPlan<typeof messageSource>
-              >(($messages) => $messages),
-            },
-            plan($forum) {
-              const $forumId = $forum.get("id");
-              const $messages = messageSource.find({ forum_id: $forumId });
-              deoptimizeIfAppropriate($messages);
-              $messages.setTrusted();
-              // $messages.leftJoin(...);
-              // $messages.innerJoin(...);
-              // $messages.relation('fk_messages_author_id')
-              // $messages.where(...);
-              // $messages.orderBy(...);
-              return $messages;
-            },
-          },
-          messagesConnection: {
-            type: MessagesConnection,
-            args: {
-              first: {
-                type: GraphQLInt,
-                plan(
-                  _$forum,
-                  $connection: PgConnectionPlan<typeof messageSource>,
-                  $value,
-                ) {
-                  const $messages = $connection.getSubplan();
-                  $messages.setFirst($value.eval());
-                  return null;
-                },
-              },
-              last: {
-                type: GraphQLInt,
-                plan(
-                  _$root,
-                  $connection: PgConnectionPlan<typeof messageSource>,
-                  $value,
-                ) {
-                  const $messages = $connection.getSubplan();
-                  $messages.setLast($value.eval());
-                  return null;
-                },
-              },
-              condition: {
-                type: MessageCondition,
-                plan(
-                  _$forum,
-                  $connection: PgConnectionPlan<typeof messageSource>,
-                ) {
-                  const $messages = $connection.getSubplan();
-                  return $messages.wherePlan();
-                },
-              },
-              filter: {
-                type: MessageFilter,
-                plan(
-                  _$forum,
-                  $connection: PgConnectionPlan<typeof messageSource>,
-                ) {
-                  const $messages = $connection.getSubplan();
-                  return new ClassFilterPlan(
-                    $messages.wherePlan(),
-                    $messages.alias,
-                  );
-                },
-              },
-              includeArchived: makeIncludeArchivedField<
-                PgConnectionPlan<typeof messageSource>
-              >(($connection) => $connection.getSubplan()),
-            },
-            plan($forum) {
-              const $messages = messageSource.find({
-                forum_id: $forum.get("id"),
-              });
-              $messages.setTrusted();
-              deoptimizeIfAppropriate($messages);
-              // $messages.leftJoin(...);
-              // $messages.innerJoin(...);
-              // $messages.relation('fk_messages_author_id')
-              // $messages.where(...);
-              const $connectionPlan = new PgConnectionPlan($messages);
-              // $connectionPlan.orderBy... ?
-              // DEFINITELY NOT $messages.orderBy BECAUSE we don't want that applied to aggregates.
-              // DEFINITELY NOT $messages.limit BECAUSE we don't want those limits applied to aggregates or page info.
-              return $connectionPlan;
-            },
-          },
-          uniqueAuthorCount: {
+      // Custom expression; actual column select shouldn't make it through to the generated query.
+      archivedAtIsNotNull: {
+        type: GraphQLBoolean,
+        plan($forum) {
+          const $archivedAt = $forum.get("archived_at");
+          const $expr1 = pgClassExpression(
+            $forum,
+            TYPES.boolean,
+          )`${$archivedAt} is not null`;
+          const $expr2 = pgClassExpression(
+            $forum,
+            TYPES.boolean,
+          )`${$expr1} is true`;
+          return $expr2;
+        },
+      },
+      self: {
+        type: Forum,
+        plan($forum) {
+          return $forum;
+        },
+      },
+      messagesList: {
+        type: new GraphQLList(Message),
+        args: {
+          first: {
             type: GraphQLInt,
-            args: {
-              featured: {
-                type: GraphQLBoolean,
+            plan(
+              _$forum,
+              $messages: PgSelectPlan<typeof messageSource>,
+              $value,
+            ) {
+              $messages.setFirst($value.eval());
+              return null;
+            },
+          },
+          condition: {
+            type: MessageCondition,
+            plan(_$forum, $messages: PgSelectPlan<typeof messageSource>) {
+              return $messages.wherePlan();
+            },
+          },
+          filter: {
+            type: MessageFilter,
+            plan(_$forum, $messages: PgSelectPlan<typeof messageSource>) {
+              return new ClassFilterPlan(
+                $messages.wherePlan(),
+                $messages.alias,
+              );
+            },
+          },
+          includeArchived: makeIncludeArchivedField<
+            PgSelectPlan<typeof messageSource>
+          >(($messages) => $messages),
+        },
+        plan($forum) {
+          const $forumId = $forum.get("id");
+          const $messages = messageSource.find({ forum_id: $forumId });
+          deoptimizeIfAppropriate($messages);
+          $messages.setTrusted();
+          // $messages.leftJoin(...);
+          // $messages.innerJoin(...);
+          // $messages.relation('fk_messages_author_id')
+          // $messages.where(...);
+          // $messages.orderBy(...);
+          return $messages;
+        },
+      },
+      messagesConnection: {
+        type: MessagesConnection,
+        args: {
+          first: {
+            type: GraphQLInt,
+            plan(
+              _$forum,
+              $connection: PgConnectionPlan<typeof messageSource>,
+              $value,
+            ) {
+              const $messages = $connection.getSubplan();
+              $messages.setFirst($value.eval());
+              return null;
+            },
+          },
+          last: {
+            type: GraphQLInt,
+            plan(
+              _$root,
+              $connection: PgConnectionPlan<typeof messageSource>,
+              $value,
+            ) {
+              const $messages = $connection.getSubplan();
+              $messages.setLast($value.eval());
+              return null;
+            },
+          },
+          condition: {
+            type: MessageCondition,
+            plan(_$forum, $connection: PgConnectionPlan<typeof messageSource>) {
+              const $messages = $connection.getSubplan();
+              return $messages.wherePlan();
+            },
+          },
+          filter: {
+            type: MessageFilter,
+            plan(_$forum, $connection: PgConnectionPlan<typeof messageSource>) {
+              const $messages = $connection.getSubplan();
+              return new ClassFilterPlan(
+                $messages.wherePlan(),
+                $messages.alias,
+              );
+            },
+          },
+          includeArchived: makeIncludeArchivedField<
+            PgConnectionPlan<typeof messageSource>
+          >(($connection) => $connection.getSubplan()),
+        },
+        plan($forum) {
+          const $messages = messageSource.find({
+            forum_id: $forum.get("id"),
+          });
+          $messages.setTrusted();
+          deoptimizeIfAppropriate($messages);
+          // $messages.leftJoin(...);
+          // $messages.innerJoin(...);
+          // $messages.relation('fk_messages_author_id')
+          // $messages.where(...);
+          const $connectionPlan = new PgConnectionPlan($messages);
+          // $connectionPlan.orderBy... ?
+          // DEFINITELY NOT $messages.orderBy BECAUSE we don't want that applied to aggregates.
+          // DEFINITELY NOT $messages.limit BECAUSE we don't want those limits applied to aggregates or page info.
+          return $connectionPlan;
+        },
+      },
+      uniqueAuthorCount: {
+        type: GraphQLInt,
+        args: {
+          featured: {
+            type: GraphQLBoolean,
+          },
+        },
+        plan($forum, args) {
+          const $featured = args.featured;
+          return pgSelect({
+            source: forumsUniqueAuthorCountSource,
+            identifiers: [],
+            args: [
+              {
+                plan: $forum.record(),
               },
-            },
-            plan($forum, args) {
-              const $featured = args.featured;
-              return pgSelect({
-                source: forumsUniqueAuthorCountSource,
-                identifiers: [],
-                args: [
-                  {
-                    plan: $forum.record(),
-                  },
-                  {
-                    plan: $featured,
-                    type: TYPES.boolean.sqlType,
-                  },
-                ],
-              })
-                .single()
-                .getSelfNamed();
-            },
-          },
+              {
+                plan: $featured,
+                type: TYPES.boolean.sqlType,
+              },
+            ],
+          })
+            .single()
+            .getSelfNamed();
+        },
+      },
 
-          randomUser: {
-            type: User,
-            plan($forum) {
-              const $user = pgSelect({
-                source: userSource,
-                identifiers: [],
-                args: [
-                  {
-                    plan: $forum.record(),
-                  },
-                ],
-                from: (...args: SQL[]) =>
-                  sql`app_public.forums_random_user(${sql.join(args, ", ")})`,
-                name: "forums_random_user",
-              }).single();
-              deoptimizeIfAppropriate($user);
-              return $user;
-            },
-          },
+      randomUser: {
+        type: User,
+        plan($forum) {
+          const $user = pgSelect({
+            source: userSource,
+            identifiers: [],
+            args: [
+              {
+                plan: $forum.record(),
+              },
+            ],
+            from: (...args: SQL[]) =>
+              sql`app_public.forums_random_user(${sql.join(args, ", ")})`,
+            name: "forums_random_user",
+          }).single();
+          deoptimizeIfAppropriate($user);
+          return $user;
+        },
+      },
 
-          featuredMessages: {
-            type: new GraphQLList(Message),
-            plan($forum) {
-              const $messages = pgSelect({
-                source: forumsFeaturedMessages,
-                identifiers: [],
-                args: [
-                  {
-                    plan: $forum.record(),
-                  },
-                ],
-              });
-              deoptimizeIfAppropriate($messages);
-              return $messages;
-            },
-          },
-        }),
-      }),
-    );
+      featuredMessages: {
+        type: new GraphQLList(Message),
+        plan($forum) {
+          const $messages = pgSelect({
+            source: forumsFeaturedMessages,
+            identifiers: [],
+            args: [
+              {
+                plan: $forum.record(),
+              },
+            ],
+          });
+          deoptimizeIfAppropriate($messages);
+          return $messages;
+        },
+      },
+    }),
+  });
 
   const singleTableTypeName = ($entity: SingleTableItemPlan) => {
     const $type = $entity.get("type");
@@ -1832,86 +1821,85 @@ export function makeExampleSchema(
     );
 
   const PersonBookmark: GraphQLObjectType<any, OurGraphQLContext> =
-    new GraphQLObjectType(
-      objectSpec<OurGraphQLContext, PersonBookmarkPlan>({
-        name: "PersonBookmark",
-        fields: () => ({
-          id: attrField("id", GraphQLInt),
-          person: singleRelationField("person", Person),
-          bookmarkedEntity: {
-            type: Entity,
-            plan($person) {
-              return entityUnion($person.get("bookmarked_entity"));
-            },
-          },
-        }),
-      }),
-    );
-
-  const Person: GraphQLObjectType<any, OurGraphQLContext> =
-    new GraphQLObjectType(
-      objectSpec<OurGraphQLContext, PersonPlan>({
-        name: "Person",
-        fields: () => ({
-          personId: attrField("person_id", GraphQLInt),
-          username: attrField("username", GraphQLString),
-          singleTableItemsList: {
-            type: new GraphQLList(SingleTableItem),
-            plan($person) {
-              const $personId = $person.get("person_id");
-              const $items: SingleTableItemsPlan = singleTableItemsSource.find({
-                author_id: $personId,
-              });
-              deoptimizeIfAppropriate($items);
-              return each($items, ($item) => singleTableItemInterface($item));
-            },
-          },
-
-          relationalItemsList: {
-            type: new GraphQLList(RelationalItem),
-            plan($person) {
-              const $personId = $person.get("person_id");
-              const $items: RelationalItemsPlan = relationalItemsSource.find({
-                author_id: $personId,
-              });
-              deoptimizeIfAppropriate($items);
-              return each($items, ($item) => relationalItemInterface($item));
-            },
-          },
-
-          personBookmarksList: {
-            type: new GraphQLList(PersonBookmark),
-            plan($person) {
-              return $person.manyRelation("personBookmarks");
-            },
-          },
-        }),
-      }),
-    );
-
-  const Post: GraphQLObjectType<any, OurGraphQLContext> = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, PostPlan>({
-      name: "Post",
+    newObjectType<OurGraphQLContext, PersonBookmarkPlan>({
+      name: "PersonBookmark",
       fields: () => ({
-        postId: attrField("post_id", GraphQLInt),
-        body: attrField("body", GraphQLString),
-        author: singleRelationField("author", Person),
+        id: attrField("id", GraphQLInt),
+        person: singleRelationField("person", Person),
+        bookmarkedEntity: {
+          type: Entity,
+          plan($person) {
+            return entityUnion($person.get("bookmarked_entity"));
+          },
+        },
       }),
-    }),
-  );
+    });
 
-  const Comment: GraphQLObjectType<any, OurGraphQLContext> =
-    new GraphQLObjectType(
-      objectSpec<OurGraphQLContext, CommentPlan>({
-        name: "Comment",
-        fields: () => ({
-          commentId: attrField("comment_id", GraphQLInt),
-          author: singleRelationField("author", Person),
-          post: singleRelationField("post", Post),
-          body: attrField("body", GraphQLString),
-        }),
-      }),
-    );
+  const Person: GraphQLObjectType<any, OurGraphQLContext> = newObjectType<
+    OurGraphQLContext,
+    PersonPlan
+  >({
+    name: "Person",
+    fields: () => ({
+      personId: attrField("person_id", GraphQLInt),
+      username: attrField("username", GraphQLString),
+      singleTableItemsList: {
+        type: new GraphQLList(SingleTableItem),
+        plan($person) {
+          const $personId = $person.get("person_id");
+          const $items: SingleTableItemsPlan = singleTableItemsSource.find({
+            author_id: $personId,
+          });
+          deoptimizeIfAppropriate($items);
+          return each($items, ($item) => singleTableItemInterface($item));
+        },
+      },
+
+      relationalItemsList: {
+        type: new GraphQLList(RelationalItem),
+        plan($person) {
+          const $personId = $person.get("person_id");
+          const $items: RelationalItemsPlan = relationalItemsSource.find({
+            author_id: $personId,
+          });
+          deoptimizeIfAppropriate($items);
+          return each($items, ($item) => relationalItemInterface($item));
+        },
+      },
+
+      personBookmarksList: {
+        type: new GraphQLList(PersonBookmark),
+        plan($person) {
+          return $person.manyRelation("personBookmarks");
+        },
+      },
+    }),
+  });
+
+  const Post: GraphQLObjectType<any, OurGraphQLContext> = newObjectType<
+    OurGraphQLContext,
+    PostPlan
+  >({
+    name: "Post",
+    fields: () => ({
+      postId: attrField("post_id", GraphQLInt),
+      body: attrField("body", GraphQLString),
+      author: singleRelationField("author", Person),
+    }),
+  });
+
+  const Comment: GraphQLObjectType<any, OurGraphQLContext> = newObjectType<
+    OurGraphQLContext,
+    CommentPlan
+  >({
+    name: "Comment",
+    fields: () => ({
+      commentId: attrField("comment_id", GraphQLInt),
+      author: singleRelationField("author", Person),
+      post: singleRelationField("post", Post),
+      body: attrField("body", GraphQLString),
+    }),
+  });
 
   ////////////////////////////////////////
 
@@ -1950,19 +1938,20 @@ export function makeExampleSchema(
     archivedAt: attrField("archived_at", GraphQLString),
   };
 
-  const SingleTableTopic = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, SingleTableItemPlan>({
-      name: "SingleTableTopic",
-      interfaces: [SingleTableItem],
-      fields: () => ({
-        ...commonSingleTableItemFields,
-        title: attrField("title", GraphQLString),
-      }),
+  const SingleTableTopic = newObjectType<
+    OurGraphQLContext,
+    SingleTableItemPlan
+  >({
+    name: "SingleTableTopic",
+    interfaces: [SingleTableItem],
+    fields: () => ({
+      ...commonSingleTableItemFields,
+      title: attrField("title", GraphQLString),
     }),
-  );
+  });
 
-  const SingleTablePost = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, SingleTableItemPlan>({
+  const SingleTablePost = newObjectType<OurGraphQLContext, SingleTableItemPlan>(
+    {
       name: "SingleTablePost",
       interfaces: [SingleTableItem],
       fields: () => ({
@@ -1971,43 +1960,46 @@ export function makeExampleSchema(
         description: attrField("description", GraphQLString),
         note: attrField("note", GraphQLString),
       }),
-    }),
+    },
   );
 
-  const SingleTableDivider = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, SingleTableItemPlan>({
-      name: "SingleTableDivider",
-      interfaces: [SingleTableItem],
-      fields: () => ({
-        ...commonSingleTableItemFields,
-        title: attrField("title", GraphQLString),
-        color: attrField("color", GraphQLString),
-      }),
+  const SingleTableDivider = newObjectType<
+    OurGraphQLContext,
+    SingleTableItemPlan
+  >({
+    name: "SingleTableDivider",
+    interfaces: [SingleTableItem],
+    fields: () => ({
+      ...commonSingleTableItemFields,
+      title: attrField("title", GraphQLString),
+      color: attrField("color", GraphQLString),
     }),
-  );
+  });
 
-  const SingleTableChecklist = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, SingleTableItemPlan>({
-      name: "SingleTableChecklist",
-      interfaces: [SingleTableItem],
-      fields: () => ({
-        ...commonSingleTableItemFields,
-        title: attrField("title", GraphQLString),
-      }),
+  const SingleTableChecklist = newObjectType<
+    OurGraphQLContext,
+    SingleTableItemPlan
+  >({
+    name: "SingleTableChecklist",
+    interfaces: [SingleTableItem],
+    fields: () => ({
+      ...commonSingleTableItemFields,
+      title: attrField("title", GraphQLString),
     }),
-  );
+  });
 
-  const SingleTableChecklistItem = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, SingleTableItemPlan>({
-      name: "SingleTableChecklistItem",
-      interfaces: [SingleTableItem],
-      fields: () => ({
-        ...commonSingleTableItemFields,
-        description: attrField("description", GraphQLString),
-        note: attrField("note", GraphQLString),
-      }),
+  const SingleTableChecklistItem = newObjectType<
+    OurGraphQLContext,
+    SingleTableItemPlan
+  >({
+    name: "SingleTableChecklistItem",
+    interfaces: [SingleTableItem],
+    fields: () => ({
+      ...commonSingleTableItemFields,
+      description: attrField("description", GraphQLString),
+      note: attrField("note", GraphQLString),
     }),
-  );
+  });
 
   ////////////////////////////////////////
 
@@ -2055,87 +2047,86 @@ export function makeExampleSchema(
     archivedAt: attrField("archived_at", GraphQLString),
   };
 
-  const RelationalTopic = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, RelationalItemPlan>({
-      name: "RelationalTopic",
-      interfaces: [RelationalItem],
-      fields: () => ({
-        ...commonRelationalItemFields,
-        title: attrField("title", GraphQLString),
-      }),
+  const RelationalTopic = newObjectType<OurGraphQLContext, RelationalItemPlan>({
+    name: "RelationalTopic",
+    interfaces: [RelationalItem],
+    fields: () => ({
+      ...commonRelationalItemFields,
+      title: attrField("title", GraphQLString),
     }),
-  );
+  });
 
-  const RelationalPost = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, RelationalItemPlan>({
-      name: "RelationalPost",
-      interfaces: [RelationalItem, RelationalCommentable],
-      fields: () => ({
-        ...commonRelationalItemFields,
-        title: attrField("title", GraphQLString),
-        description: attrField("description", GraphQLString),
-        note: attrField("note", GraphQLString),
+  const RelationalPost = newObjectType<OurGraphQLContext, RelationalItemPlan>({
+    name: "RelationalPost",
+    interfaces: [RelationalItem, RelationalCommentable],
+    fields: () => ({
+      ...commonRelationalItemFields,
+      title: attrField("title", GraphQLString),
+      description: attrField("description", GraphQLString),
+      note: attrField("note", GraphQLString),
 
-        titleLower: {
-          type: GraphQLString,
-          plan($entity: RelationalItemPlan) {
-            return pgSelect({
-              source: scalarTextSource,
-              identifiers: [],
-              args: [
-                {
-                  plan: $entity.record(),
-                },
-              ],
-              from: (...args: SQL[]) =>
-                sql`interfaces_and_unions.relational_posts_title_lower(${sql.join(
-                  args,
-                  ", ",
-                )})`,
-              name: "relational_posts_title_lower",
-            })
-              .single()
-              .getSelfNamed();
-          },
+      titleLower: {
+        type: GraphQLString,
+        plan($entity: RelationalItemPlan) {
+          return pgSelect({
+            source: scalarTextSource,
+            identifiers: [],
+            args: [
+              {
+                plan: $entity.record(),
+              },
+            ],
+            from: (...args: SQL[]) =>
+              sql`interfaces_and_unions.relational_posts_title_lower(${sql.join(
+                args,
+                ", ",
+              )})`,
+            name: "relational_posts_title_lower",
+          })
+            .single()
+            .getSelfNamed();
         },
-      }),
+      },
     }),
-  );
+  });
 
-  const RelationalDivider = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, RelationalItemPlan>({
-      name: "RelationalDivider",
-      interfaces: [RelationalItem],
-      fields: () => ({
-        ...commonRelationalItemFields,
-        title: attrField("title", GraphQLString),
-        color: attrField("color", GraphQLString),
-      }),
+  const RelationalDivider = newObjectType<
+    OurGraphQLContext,
+    RelationalItemPlan
+  >({
+    name: "RelationalDivider",
+    interfaces: [RelationalItem],
+    fields: () => ({
+      ...commonRelationalItemFields,
+      title: attrField("title", GraphQLString),
+      color: attrField("color", GraphQLString),
     }),
-  );
+  });
 
-  const RelationalChecklist = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, RelationalItemPlan>({
-      name: "RelationalChecklist",
-      interfaces: [RelationalItem, RelationalCommentable],
-      fields: () => ({
-        ...commonRelationalItemFields,
-        title: attrField("title", GraphQLString),
-      }),
+  const RelationalChecklist = newObjectType<
+    OurGraphQLContext,
+    RelationalItemPlan
+  >({
+    name: "RelationalChecklist",
+    interfaces: [RelationalItem, RelationalCommentable],
+    fields: () => ({
+      ...commonRelationalItemFields,
+      title: attrField("title", GraphQLString),
     }),
-  );
+  });
 
-  const RelationalChecklistItem = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, RelationalItemPlan>({
-      name: "RelationalChecklistItem",
-      interfaces: [RelationalItem, RelationalCommentable],
-      fields: () => ({
-        ...commonRelationalItemFields,
-        description: attrField("description", GraphQLString),
-        note: attrField("note", GraphQLString),
-      }),
+  const RelationalChecklistItem = newObjectType<
+    OurGraphQLContext,
+    RelationalItemPlan
+  >({
+    name: "RelationalChecklistItem",
+    interfaces: [RelationalItem, RelationalCommentable],
+    fields: () => ({
+      ...commonRelationalItemFields,
+      description: attrField("description", GraphQLString),
+      note: attrField("note", GraphQLString),
     }),
-  );
+  });
 
   ////////////////////////////////////////
 
@@ -2151,59 +2142,52 @@ export function makeExampleSchema(
     ],
   });
 
-  const UnionTopic = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, UnionTopicPlan>({
-      name: "UnionTopic",
-      fields: () => ({
-        id: attrField("id", GraphQLInt),
-        title: attrField("title", GraphQLString),
-      }),
+  const UnionTopic = newObjectType<OurGraphQLContext, UnionTopicPlan>({
+    name: "UnionTopic",
+    fields: () => ({
+      id: attrField("id", GraphQLInt),
+      title: attrField("title", GraphQLString),
     }),
-  );
+  });
 
-  const UnionPost = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, UnionPostPlan>({
-      name: "UnionPost",
-      fields: () => ({
-        id: attrField("id", GraphQLInt),
-        title: attrField("title", GraphQLString),
-        description: attrField("description", GraphQLString),
-        note: attrField("note", GraphQLString),
-      }),
+  const UnionPost = newObjectType<OurGraphQLContext, UnionPostPlan>({
+    name: "UnionPost",
+    fields: () => ({
+      id: attrField("id", GraphQLInt),
+      title: attrField("title", GraphQLString),
+      description: attrField("description", GraphQLString),
+      note: attrField("note", GraphQLString),
     }),
-  );
+  });
 
-  const UnionDivider = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, UnionDividerPlan>({
-      name: "UnionDivider",
-      fields: () => ({
-        id: attrField("id", GraphQLInt),
-        title: attrField("title", GraphQLString),
-        color: attrField("color", GraphQLString),
-      }),
+  const UnionDivider = newObjectType<OurGraphQLContext, UnionDividerPlan>({
+    name: "UnionDivider",
+    fields: () => ({
+      id: attrField("id", GraphQLInt),
+      title: attrField("title", GraphQLString),
+      color: attrField("color", GraphQLString),
     }),
-  );
+  });
 
-  const UnionChecklist = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, UnionChecklistPlan>({
-      name: "UnionChecklist",
-      fields: () => ({
-        id: attrField("id", GraphQLInt),
-        title: attrField("title", GraphQLString),
-      }),
+  const UnionChecklist = newObjectType<OurGraphQLContext, UnionChecklistPlan>({
+    name: "UnionChecklist",
+    fields: () => ({
+      id: attrField("id", GraphQLInt),
+      title: attrField("title", GraphQLString),
     }),
-  );
+  });
 
-  const UnionChecklistItem = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, UnionChecklistItemPlan>({
-      name: "UnionChecklistItem",
-      fields: () => ({
-        id: attrField("id", GraphQLInt),
-        description: attrField("description", GraphQLString),
-        note: attrField("note", GraphQLString),
-      }),
+  const UnionChecklistItem = newObjectType<
+    OurGraphQLContext,
+    UnionChecklistItemPlan
+  >({
+    name: "UnionChecklistItem",
+    fields: () => ({
+      id: attrField("id", GraphQLInt),
+      description: attrField("description", GraphQLString),
+      note: attrField("note", GraphQLString),
     }),
-  );
+  });
 
   ////////////////////////////////////////
 
@@ -2215,452 +2199,446 @@ export function makeExampleSchema(
 
   ////////////////////////////////////////
 
-  const Query = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, __ValuePlan<BaseGraphQLRootValue>>({
-      name: "Query",
-      fields: {
-        forums: {
-          type: new GraphQLList(Forum),
-          plan(_$root) {
-            const $forums = forumSource.find();
-            deoptimizeIfAppropriate($forums);
-            return $forums;
-          },
-          args: {
-            first: {
-              type: GraphQLInt,
-              plan(_$root, $forums: PgSelectPlan<typeof forumSource>, $value) {
-                $forums.setFirst($value.eval());
-                return null;
-              },
-            },
-            includeArchived: makeIncludeArchivedField<
-              PgSelectPlan<typeof forumSource>
-            >(($forums) => $forums),
-            condition: {
-              type: ForumCondition,
-              plan(_$root, $forums: PgSelectPlan<typeof forumSource>) {
-                return $forums.wherePlan();
-              },
-            },
-            filter: {
-              type: ForumFilter,
-              plan(_$root, $forums: PgSelectPlan<typeof forumSource>) {
-                return new ClassFilterPlan($forums.wherePlan(), $forums.alias);
-              },
-            },
-          },
+  const Query = newObjectType<
+    OurGraphQLContext,
+    __ValuePlan<BaseGraphQLRootValue>
+  >({
+    name: "Query",
+    fields: {
+      forums: {
+        type: new GraphQLList(Forum),
+        plan(_$root) {
+          const $forums = forumSource.find();
+          deoptimizeIfAppropriate($forums);
+          return $forums;
         },
-        forum: {
-          type: Forum,
-          plan(_$root, args) {
-            const $forum = forumSource.get({ id: args.id });
-            deoptimizeIfAppropriate($forum);
-            return $forum;
-          },
-          args: {
-            id: {
-              type: new GraphQLNonNull(GraphQLString),
+        args: {
+          first: {
+            type: GraphQLInt,
+            plan(_$root, $forums: PgSelectPlan<typeof forumSource>, $value) {
+              $forums.setFirst($value.eval());
+              return null;
             },
           },
-        },
-        message: {
-          type: Message,
-          plan(_$root, args) {
-            const $message = messageSource.get({ id: args.id });
-            deoptimizeIfAppropriate($message);
-            return $message;
-          },
-          args: {
-            id: {
-              type: new GraphQLNonNull(GraphQLString),
+          includeArchived: makeIncludeArchivedField<
+            PgSelectPlan<typeof forumSource>
+          >(($forums) => $forums),
+          condition: {
+            type: ForumCondition,
+            plan(_$root, $forums: PgSelectPlan<typeof forumSource>) {
+              return $forums.wherePlan();
             },
           },
-        },
-        allMessagesConnection: {
-          type: MessagesConnection,
-          args: {
-            condition: {
-              type: MessageCondition,
-              plan(
-                _$root,
-                $connection: PgConnectionPlan<typeof messageSource>,
-              ) {
-                const $messages = $connection.getSubplan();
-                return $messages.wherePlan();
-              },
+          filter: {
+            type: ForumFilter,
+            plan(_$root, $forums: PgSelectPlan<typeof forumSource>) {
+              return new ClassFilterPlan($forums.wherePlan(), $forums.alias);
             },
-            filter: {
-              type: MessageFilter,
-              plan(
-                _$root,
-                $connection: PgConnectionPlan<typeof messageSource>,
-              ) {
-                const $messages = $connection.getSubplan();
-                return new ClassFilterPlan(
-                  $messages.wherePlan(),
-                  $messages.alias,
-                );
-              },
-            },
-            includeArchived: makeIncludeArchivedField<
-              PgConnectionPlan<typeof messageSource>
-            >(($connection) => $connection.getSubplan()),
-            first: {
-              type: GraphQLInt,
-              plan(
-                _$root,
-                $connection: PgConnectionPlan<typeof messageSource>,
-                $value,
-              ) {
-                const $messages = $connection.getSubplan();
-                $messages.setFirst($value.eval());
-                return null;
-              },
-            },
-            last: {
-              type: GraphQLInt,
-              plan(
-                _$root,
-                $connection: PgConnectionPlan<typeof messageSource>,
-                $value,
-              ) {
-                const $messages = $connection.getSubplan();
-                $messages.setLast($value.eval());
-                return null;
-              },
-            },
-            after: {
-              type: GraphQLString,
-              plan(
-                _$root,
-                $connection: PgConnectionPlan<typeof messageSource>,
-                $value,
-              ) {
-                const $messages = $connection.getSubplan();
-                $messages.afterLock("orderBy", () => {
-                  $messages.after($value.eval());
-                });
-                return null;
-              },
-            },
-            before: {
-              type: GraphQLString,
-              plan(
-                _$root,
-                $connection: PgConnectionPlan<typeof messageSource>,
-                $value,
-              ) {
-                const $messages = $connection.getSubplan();
-                $messages.afterLock("orderBy", () => {
-                  $messages.before($value.eval());
-                });
-                return null;
-              },
-            },
-            orderBy: {
-              type: new GraphQLList(new GraphQLNonNull(MessagesOrderBy)),
-              plan(
-                _$root,
-                $connection: PgConnectionPlan<typeof messageSource>,
-                $value,
-              ) {
-                const $messages = $connection.getSubplan();
-                const val = $value.eval();
-                if (!val) {
-                  return null;
-                }
-                if (!Array.isArray(val)) {
-                  throw new Error("Invalid!");
-                }
-                val.forEach((order) => {
-                  if (typeof order !== "function") {
-                    console.error(
-                      `Internal server error: invalid orderBy configuration: expected function, but received ${inspect(
-                        order,
-                      )}`,
-                    );
-                    throw new Error(
-                      "Internal server error: invalid orderBy configuration",
-                    );
-                  }
-                  order($messages);
-                });
-                return null;
-              },
-            },
-          },
-          plan() {
-            const $messages = messageSource.find();
-            deoptimizeIfAppropriate($messages);
-            // $messages.leftJoin(...);
-            // $messages.innerJoin(...);
-            // $messages.relation('fk_messages_author_id')
-            // $messages.where(...);
-            const $connectionPlan = new PgConnectionPlan($messages);
-            // $connectionPlan.orderBy... ?
-            // DEFINITELY NOT $messages.orderBy BECAUSE we don't want that applied to aggregates.
-            // DEFINITELY NOT $messages.limit BECAUSE we don't want those limits applied to aggregates or page info.
-            return $connectionPlan;
-          },
-        },
-
-        uniqueAuthorCount: {
-          type: GraphQLInt,
-          args: {
-            featured: {
-              type: GraphQLBoolean,
-            },
-          },
-          plan(_$root, args) {
-            const $featured = args.featured;
-            const $plan = pgSelect({
-              source: uniqueAuthorCountSource,
-              identifiers: [],
-              args: [
-                {
-                  plan: $featured,
-                  type: TYPES.boolean.sqlType,
-                  name: "featured",
-                },
-              ],
-            });
-            deoptimizeIfAppropriate($plan);
-            return $plan.single().getSelfNamed();
-          },
-        },
-
-        forumNames: {
-          type: new GraphQLList(GraphQLString),
-          plan(_$root) {
-            const $plan = pgSelect({
-              source: scalarTextSource,
-              identifiers: [],
-              from: sql`app_public.forum_names()`,
-              name: "forum_names",
-            });
-            return each($plan, ($name) => $name.getSelfNamed());
-          },
-        },
-
-        FORUM_NAMES: {
-          type: new GraphQLList(GraphQLString),
-          description:
-            "Like forumNames, only we convert them all to upper case",
-          plan(_$root) {
-            const $plan = pgSelect({
-              source: scalarTextSource,
-              identifiers: [],
-              from: sql`app_public.forum_names()`,
-              name: "forum_names",
-            });
-            return each($plan, ($name) =>
-              lambda($name.getSelfNamed(), (name) => name.toUpperCase()),
-            );
-          },
-        },
-
-        randomUser: {
-          type: User,
-          plan() {
-            const $users = pgSelect({
-              source: userSource,
-              identifiers: [],
-              from: sql`app_public.random_user()`,
-              name: "random_user",
-            });
-            deoptimizeIfAppropriate($users);
-            return $users.single();
-          },
-        },
-
-        featuredMessages: {
-          type: new GraphQLList(Message),
-          plan() {
-            const $messages = pgSelect({
-              source: featuredMessages,
-              identifiers: [],
-            });
-            deoptimizeIfAppropriate($messages);
-            return $messages;
-          },
-        },
-        people: {
-          type: new GraphQLList(Person),
-          plan() {
-            const $people = personSource.find();
-            deoptimizeIfAppropriate($people);
-            return $people;
-          },
-        },
-
-        singleTableItemById: {
-          type: SingleTableItem,
-          args: {
-            id: {
-              type: new GraphQLNonNull(GraphQLInt),
-            },
-          },
-          plan(_$root, args) {
-            const $item: SingleTableItemPlan = singleTableItemsSource.get({
-              id: args.id,
-            });
-            return singleTableItemInterface($item);
-          },
-        },
-
-        singleTableTopicById: {
-          type: SingleTableTopic,
-          args: {
-            id: {
-              type: new GraphQLNonNull(GraphQLInt),
-            },
-          },
-          plan(_$root, args) {
-            const $item: SingleTableItemPlan = singleTableItemsSource.get({
-              id: args.id,
-              type: constant("TOPIC"),
-            });
-            return $item;
-          },
-        },
-
-        relationalItemById: {
-          type: RelationalItem,
-          args: {
-            id: {
-              type: new GraphQLNonNull(GraphQLInt),
-            },
-          },
-          plan(_$root, args) {
-            const $item: RelationalItemPlan = relationalItemsSource.get({
-              id: args.id,
-            });
-            return relationalItemInterface($item);
-          },
-        },
-
-        relationalTopicById: {
-          type: RelationalTopic,
-          args: {
-            id: {
-              type: new GraphQLNonNull(GraphQLInt),
-            },
-          },
-          plan(_$root, args) {
-            return relationalTopicsSource.get({
-              id: args.id,
-            });
-          },
-        },
-
-        allRelationalCommentablesList: {
-          type: new GraphQLList(new GraphQLNonNull(RelationalCommentable)),
-          args: {
-            first: {
-              type: GraphQLInt,
-              plan(_$root, $each: EachPlan<any, any, any, any>, $value) {
-                const $commentables =
-                  $each.originalListPlan() as RelationalCommentablesPlan;
-                $commentables.setFirst($value.eval());
-                return null;
-              },
-            },
-          },
-          plan() {
-            const $commentables: RelationalCommentablesPlan =
-              relationalCommentableSource.find();
-            $commentables.orderBy({
-              codec: TYPES.int,
-              fragment: sql`${$commentables.alias}.id`,
-              direction: "ASC",
-            });
-            return each($commentables, ($commentable) =>
-              relationalCommentableInterface($commentable),
-            );
-          },
-        },
-
-        unionItemById: {
-          type: UnionItem,
-          args: {
-            id: {
-              type: new GraphQLNonNull(GraphQLInt),
-            },
-          },
-          plan(_$root, args) {
-            const $item: UnionItemPlan = unionItemsSource.get({
-              id: args.id,
-            });
-            return unionItemUnion($item);
-          },
-        },
-
-        unionTopicById: {
-          type: UnionTopic,
-          args: {
-            id: {
-              type: new GraphQLNonNull(GraphQLInt),
-            },
-          },
-          plan(_$root, args) {
-            return unionTopicsSource.get({
-              id: args.id,
-            });
-          },
-        },
-
-        allUnionItemsList: {
-          type: new GraphQLList(new GraphQLNonNull(UnionItem)),
-          plan() {
-            const $items: UnionItemsPlan = unionItemsSource.find();
-            $items.orderBy({
-              codec: TYPES.int,
-              fragment: sql`${$items.alias}.id`,
-              direction: "ASC",
-            });
-            return each($items, ($item) => unionItemUnion($item));
-          },
-        },
-
-        searchEntities: {
-          type: new GraphQLList(new GraphQLNonNull(Entity)),
-          args: {
-            query: {
-              type: new GraphQLNonNull(GraphQLString),
-            },
-          },
-          plan(_$root, args) {
-            const $plan = pgSelect({
-              source: entitySearchSource,
-              identifiers: [],
-              args: [
-                {
-                  plan: args.query,
-                  type: TYPES.text.sqlType,
-                  name: "query",
-                },
-              ],
-            });
-            deoptimizeIfAppropriate($plan);
-            return each($plan, entityUnion);
-          },
-        },
-
-        personByPersonId: {
-          type: Person,
-          args: {
-            personId: {
-              type: new GraphQLNonNull(GraphQLInt),
-            },
-          },
-          plan(_$root, args) {
-            return personSource.get({ person_id: args.personId });
           },
         },
       },
-    }),
-  );
+      forum: {
+        type: Forum,
+        plan(_$root, args) {
+          const $forum = forumSource.get({ id: args.id });
+          deoptimizeIfAppropriate($forum);
+          return $forum;
+        },
+        args: {
+          id: {
+            type: new GraphQLNonNull(GraphQLString),
+          },
+        },
+      },
+      message: {
+        type: Message,
+        plan(_$root, args) {
+          const $message = messageSource.get({ id: args.id });
+          deoptimizeIfAppropriate($message);
+          return $message;
+        },
+        args: {
+          id: {
+            type: new GraphQLNonNull(GraphQLString),
+          },
+        },
+      },
+      allMessagesConnection: {
+        type: MessagesConnection,
+        args: {
+          condition: {
+            type: MessageCondition,
+            plan(_$root, $connection: PgConnectionPlan<typeof messageSource>) {
+              const $messages = $connection.getSubplan();
+              return $messages.wherePlan();
+            },
+          },
+          filter: {
+            type: MessageFilter,
+            plan(_$root, $connection: PgConnectionPlan<typeof messageSource>) {
+              const $messages = $connection.getSubplan();
+              return new ClassFilterPlan(
+                $messages.wherePlan(),
+                $messages.alias,
+              );
+            },
+          },
+          includeArchived: makeIncludeArchivedField<
+            PgConnectionPlan<typeof messageSource>
+          >(($connection) => $connection.getSubplan()),
+          first: {
+            type: GraphQLInt,
+            plan(
+              _$root,
+              $connection: PgConnectionPlan<typeof messageSource>,
+              $value,
+            ) {
+              const $messages = $connection.getSubplan();
+              $messages.setFirst($value.eval());
+              return null;
+            },
+          },
+          last: {
+            type: GraphQLInt,
+            plan(
+              _$root,
+              $connection: PgConnectionPlan<typeof messageSource>,
+              $value,
+            ) {
+              const $messages = $connection.getSubplan();
+              $messages.setLast($value.eval());
+              return null;
+            },
+          },
+          after: {
+            type: GraphQLString,
+            plan(
+              _$root,
+              $connection: PgConnectionPlan<typeof messageSource>,
+              $value,
+            ) {
+              const $messages = $connection.getSubplan();
+              $messages.afterLock("orderBy", () => {
+                $messages.after($value.eval());
+              });
+              return null;
+            },
+          },
+          before: {
+            type: GraphQLString,
+            plan(
+              _$root,
+              $connection: PgConnectionPlan<typeof messageSource>,
+              $value,
+            ) {
+              const $messages = $connection.getSubplan();
+              $messages.afterLock("orderBy", () => {
+                $messages.before($value.eval());
+              });
+              return null;
+            },
+          },
+          orderBy: {
+            type: new GraphQLList(new GraphQLNonNull(MessagesOrderBy)),
+            plan(
+              _$root,
+              $connection: PgConnectionPlan<typeof messageSource>,
+              $value,
+            ) {
+              const $messages = $connection.getSubplan();
+              const val = $value.eval();
+              if (!val) {
+                return null;
+              }
+              if (!Array.isArray(val)) {
+                throw new Error("Invalid!");
+              }
+              val.forEach((order) => {
+                if (typeof order !== "function") {
+                  console.error(
+                    `Internal server error: invalid orderBy configuration: expected function, but received ${inspect(
+                      order,
+                    )}`,
+                  );
+                  throw new Error(
+                    "Internal server error: invalid orderBy configuration",
+                  );
+                }
+                order($messages);
+              });
+              return null;
+            },
+          },
+        },
+        plan() {
+          const $messages = messageSource.find();
+          deoptimizeIfAppropriate($messages);
+          // $messages.leftJoin(...);
+          // $messages.innerJoin(...);
+          // $messages.relation('fk_messages_author_id')
+          // $messages.where(...);
+          const $connectionPlan = new PgConnectionPlan($messages);
+          // $connectionPlan.orderBy... ?
+          // DEFINITELY NOT $messages.orderBy BECAUSE we don't want that applied to aggregates.
+          // DEFINITELY NOT $messages.limit BECAUSE we don't want those limits applied to aggregates or page info.
+          return $connectionPlan;
+        },
+      },
+
+      uniqueAuthorCount: {
+        type: GraphQLInt,
+        args: {
+          featured: {
+            type: GraphQLBoolean,
+          },
+        },
+        plan(_$root, args) {
+          const $featured = args.featured;
+          const $plan = pgSelect({
+            source: uniqueAuthorCountSource,
+            identifiers: [],
+            args: [
+              {
+                plan: $featured,
+                type: TYPES.boolean.sqlType,
+                name: "featured",
+              },
+            ],
+          });
+          deoptimizeIfAppropriate($plan);
+          return $plan.single().getSelfNamed();
+        },
+      },
+
+      forumNames: {
+        type: new GraphQLList(GraphQLString),
+        plan(_$root) {
+          const $plan = pgSelect({
+            source: scalarTextSource,
+            identifiers: [],
+            from: sql`app_public.forum_names()`,
+            name: "forum_names",
+          });
+          return each($plan, ($name) => $name.getSelfNamed());
+        },
+      },
+
+      FORUM_NAMES: {
+        type: new GraphQLList(GraphQLString),
+        description: "Like forumNames, only we convert them all to upper case",
+        plan(_$root) {
+          const $plan = pgSelect({
+            source: scalarTextSource,
+            identifiers: [],
+            from: sql`app_public.forum_names()`,
+            name: "forum_names",
+          });
+          return each($plan, ($name) =>
+            lambda($name.getSelfNamed(), (name) => name.toUpperCase()),
+          );
+        },
+      },
+
+      randomUser: {
+        type: User,
+        plan() {
+          const $users = pgSelect({
+            source: userSource,
+            identifiers: [],
+            from: sql`app_public.random_user()`,
+            name: "random_user",
+          });
+          deoptimizeIfAppropriate($users);
+          return $users.single();
+        },
+      },
+
+      featuredMessages: {
+        type: new GraphQLList(Message),
+        plan() {
+          const $messages = pgSelect({
+            source: featuredMessages,
+            identifiers: [],
+          });
+          deoptimizeIfAppropriate($messages);
+          return $messages;
+        },
+      },
+      people: {
+        type: new GraphQLList(Person),
+        plan() {
+          const $people = personSource.find();
+          deoptimizeIfAppropriate($people);
+          return $people;
+        },
+      },
+
+      singleTableItemById: {
+        type: SingleTableItem,
+        args: {
+          id: {
+            type: new GraphQLNonNull(GraphQLInt),
+          },
+        },
+        plan(_$root, args) {
+          const $item: SingleTableItemPlan = singleTableItemsSource.get({
+            id: args.id,
+          });
+          return singleTableItemInterface($item);
+        },
+      },
+
+      singleTableTopicById: {
+        type: SingleTableTopic,
+        args: {
+          id: {
+            type: new GraphQLNonNull(GraphQLInt),
+          },
+        },
+        plan(_$root, args) {
+          const $item: SingleTableItemPlan = singleTableItemsSource.get({
+            id: args.id,
+            type: constant("TOPIC"),
+          });
+          return $item;
+        },
+      },
+
+      relationalItemById: {
+        type: RelationalItem,
+        args: {
+          id: {
+            type: new GraphQLNonNull(GraphQLInt),
+          },
+        },
+        plan(_$root, args) {
+          const $item: RelationalItemPlan = relationalItemsSource.get({
+            id: args.id,
+          });
+          return relationalItemInterface($item);
+        },
+      },
+
+      relationalTopicById: {
+        type: RelationalTopic,
+        args: {
+          id: {
+            type: new GraphQLNonNull(GraphQLInt),
+          },
+        },
+        plan(_$root, args) {
+          return relationalTopicsSource.get({
+            id: args.id,
+          });
+        },
+      },
+
+      allRelationalCommentablesList: {
+        type: new GraphQLList(new GraphQLNonNull(RelationalCommentable)),
+        args: {
+          first: {
+            type: GraphQLInt,
+            plan(_$root, $each: EachPlan<any, any, any, any>, $value) {
+              const $commentables =
+                $each.originalListPlan() as RelationalCommentablesPlan;
+              $commentables.setFirst($value.eval());
+              return null;
+            },
+          },
+        },
+        plan() {
+          const $commentables: RelationalCommentablesPlan =
+            relationalCommentableSource.find();
+          $commentables.orderBy({
+            codec: TYPES.int,
+            fragment: sql`${$commentables.alias}.id`,
+            direction: "ASC",
+          });
+          return each($commentables, ($commentable) =>
+            relationalCommentableInterface($commentable),
+          );
+        },
+      },
+
+      unionItemById: {
+        type: UnionItem,
+        args: {
+          id: {
+            type: new GraphQLNonNull(GraphQLInt),
+          },
+        },
+        plan(_$root, args) {
+          const $item: UnionItemPlan = unionItemsSource.get({
+            id: args.id,
+          });
+          return unionItemUnion($item);
+        },
+      },
+
+      unionTopicById: {
+        type: UnionTopic,
+        args: {
+          id: {
+            type: new GraphQLNonNull(GraphQLInt),
+          },
+        },
+        plan(_$root, args) {
+          return unionTopicsSource.get({
+            id: args.id,
+          });
+        },
+      },
+
+      allUnionItemsList: {
+        type: new GraphQLList(new GraphQLNonNull(UnionItem)),
+        plan() {
+          const $items: UnionItemsPlan = unionItemsSource.find();
+          $items.orderBy({
+            codec: TYPES.int,
+            fragment: sql`${$items.alias}.id`,
+            direction: "ASC",
+          });
+          return each($items, ($item) => unionItemUnion($item));
+        },
+      },
+
+      searchEntities: {
+        type: new GraphQLList(new GraphQLNonNull(Entity)),
+        args: {
+          query: {
+            type: new GraphQLNonNull(GraphQLString),
+          },
+        },
+        plan(_$root, args) {
+          const $plan = pgSelect({
+            source: entitySearchSource,
+            identifiers: [],
+            args: [
+              {
+                plan: args.query,
+                type: TYPES.text.sqlType,
+                name: "query",
+              },
+            ],
+          });
+          deoptimizeIfAppropriate($plan);
+          return each($plan, entityUnion);
+        },
+      },
+
+      personByPersonId: {
+        type: Person,
+        args: {
+          personId: {
+            type: new GraphQLNonNull(GraphQLInt),
+          },
+        },
+        plan(_$root, args) {
+          return personSource.get({ person_id: args.personId });
+        },
+      },
+    },
+  });
 
   const CreateRelationalPostInput = new GraphQLInputObjectType(
     inputObjectSpec({
@@ -2743,229 +2721,232 @@ export function makeExampleSchema(
     },
   };
 
-  const CreateRelationalPostPayload = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, PgInsertPlan<typeof relationalPostsSource>>({
-      name: "CreateRelationalPostPayload",
-      fields: relationalPostMutationFields,
-    }),
-  );
+  const CreateRelationalPostPayload = newObjectType<
+    OurGraphQLContext,
+    PgInsertPlan<typeof relationalPostsSource>
+  >({
+    name: "CreateRelationalPostPayload",
+    fields: relationalPostMutationFields,
+  });
 
-  const UpdateRelationalPostByIdPayload = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, PgUpdatePlan<typeof relationalPostsSource>>({
-      name: "UpdateRelationalPostByIdPayload",
-      fields: relationalPostMutationFields,
-    }),
-  );
+  const UpdateRelationalPostByIdPayload = newObjectType<
+    OurGraphQLContext,
+    PgUpdatePlan<typeof relationalPostsSource>
+  >({
+    name: "UpdateRelationalPostByIdPayload",
+    fields: relationalPostMutationFields,
+  });
 
-  const DeleteRelationalPostByIdPayload = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, PgDeletePlan<typeof relationalPostsSource>>({
-      name: "DeleteRelationalPostByIdPayload",
-      fields: {
-        ...relationalPostMutationFields,
+  const DeleteRelationalPostByIdPayload = newObjectType<
+    OurGraphQLContext,
+    PgDeletePlan<typeof relationalPostsSource>
+  >({
+    name: "DeleteRelationalPostByIdPayload",
+    fields: {
+      ...relationalPostMutationFields,
 
-        // Since we've deleted the post we cannot go and fetch it; so we must
-        // return the record from the mutation RETURNING clause
-        post: {
-          type: RelationalPost,
-          plan($post) {
-            return pgSelectSingleFromRecord(
-              relationalPostsSource,
-              $post.record(),
-            );
-          },
+      // Since we've deleted the post we cannot go and fetch it; so we must
+      // return the record from the mutation RETURNING clause
+      post: {
+        type: RelationalPost,
+        plan($post) {
+          return pgSelectSingleFromRecord(
+            relationalPostsSource,
+            $post.record(),
+          );
         },
       },
-    }),
-  );
+    },
+  });
 
-  const Mutation = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, __ValuePlan<BaseGraphQLRootValue>>({
-      name: "Mutation",
-      fields: {
-        createRelationalPost: {
-          args: {
-            input: {
-              type: new GraphQLNonNull(CreateRelationalPostInput),
-            },
+  const Mutation = newObjectType<
+    OurGraphQLContext,
+    __ValuePlan<BaseGraphQLRootValue>
+  >({
+    name: "Mutation",
+    fields: {
+      createRelationalPost: {
+        args: {
+          input: {
+            type: new GraphQLNonNull(CreateRelationalPostInput),
           },
-          type: CreateRelationalPostPayload,
-          plan(_$root, args) {
+        },
+        type: CreateRelationalPostPayload,
+        plan(_$root, args) {
+          const $item = pgInsert(relationalItemsSource, {
+            type: constant`POST`,
+            author_id: constant(2),
+          });
+          const $itemId = $item.get("id");
+          // TODO: make this TypeScript stuff automatic
+          const $input = args.input as InputObjectPlan;
+          const $post = pgInsert(relationalPostsSource, {
+            id: $itemId,
+          });
+          for (const key of ["title", "description", "note"] as Array<
+            keyof typeof relationalPostsSource.columns
+          >) {
+            const $value = $input.get(key);
+            if (!$value.evalIs(undefined)) {
+              $post.set(key, $value);
+            }
+          }
+          return $post;
+        },
+      },
+
+      createThreeRelationalPosts: {
+        description:
+          "This silly mutation is specifically to ensure that mutation plans are not tree-shaken - we never want to throw away mutation side effects.",
+        type: CreateRelationalPostPayload,
+        plan() {
+          // Only the _last_ post plan is returned; there's no dependency on
+          // the first two posts, and yet they should not be tree-shaken
+          // because they're mutations.
+          let $post: ExecutablePlan;
+          for (let i = 0; i < 3; i++) {
             const $item = pgInsert(relationalItemsSource, {
               type: constant`POST`,
               author_id: constant(2),
             });
             const $itemId = $item.get("id");
-            // TODO: make this TypeScript stuff automatic
-            const $input = args.input as InputObjectPlan;
-            const $post = pgInsert(relationalPostsSource, {
+            $post = pgInsert(relationalPostsSource, {
               id: $itemId,
+              title: constant(`Post #${i + 1}`),
+              description: constant(`Desc ${i + 1}`),
+              note: constant(null),
             });
-            for (const key of ["title", "description", "note"] as Array<
-              keyof typeof relationalPostsSource.columns
-            >) {
-              const $value = $input.get(key);
-              if (!$value.evalIs(undefined)) {
-                $post.set(key, $value);
-              }
-            }
-            return $post;
-          },
-        },
-
-        createThreeRelationalPosts: {
-          description:
-            "This silly mutation is specifically to ensure that mutation plans are not tree-shaken - we never want to throw away mutation side effects.",
-          type: CreateRelationalPostPayload,
-          plan() {
-            // Only the _last_ post plan is returned; there's no dependency on
-            // the first two posts, and yet they should not be tree-shaken
-            // because they're mutations.
-            let $post: ExecutablePlan;
-            for (let i = 0; i < 3; i++) {
-              const $item = pgInsert(relationalItemsSource, {
-                type: constant`POST`,
-                author_id: constant(2),
-              });
-              const $itemId = $item.get("id");
-              $post = pgInsert(relationalPostsSource, {
-                id: $itemId,
-                title: constant(`Post #${i + 1}`),
-                description: constant(`Desc ${i + 1}`),
-                note: constant(null),
-              });
-            }
-            return $post;
-          },
-        },
-
-        createThreeRelationalPostsComputed: {
-          description:
-            "This silly mutation is specifically to ensure that mutation plans are not tree-shaken even if they use plans that are normally side-effect free - we never want to throw away mutation side effects.",
-          type: CreateRelationalPostPayload,
-          plan() {
-            // Only the _last_ post plan is returned; there's no dependency on
-            // the first two posts, and yet they should not be tree-shaken
-            // because they're mutations.
-            let $post: ExecutablePlan;
-            for (let i = 0; i < 3; i++) {
-              $post = pgSelect({
-                source: relationalPostsSource,
-                identifiers: [],
-                from: (authorId, title) =>
-                  sql`interfaces_and_unions.insert_post(${authorId}, ${title})`,
-                args: [
-                  {
-                    plan: constant(2),
-                    type: TYPES.int.sqlType,
-                  },
-                  {
-                    plan: constant(`Computed post #${i + 1}`),
-                    type: TYPES.text.sqlType,
-                  },
-                ],
-              });
-              $post.hasSideEffects = true;
-            }
-            return $post;
-          },
-        },
-
-        updateRelationalPostById: {
-          args: {
-            input: {
-              type: new GraphQLNonNull(UpdateRelationalPostByIdInput),
-            },
-          },
-          type: UpdateRelationalPostByIdPayload,
-          plan(_$root, args) {
-            const $input = args.input as InputObjectPlan;
-            const $patch = $input.get("patch") as InputObjectPlan;
-            const $post = pgUpdate(relationalPostsSource, {
-              id: $input.get("id"),
-            });
-            for (const key of ["title", "description", "note"] as Array<
-              keyof typeof relationalPostsSource.columns
-            >) {
-              const $value = $patch.get(key);
-              // TODO: test that we differentiate between value set to null and
-              // value not being present
-              if (!$value.evalIs(undefined)) {
-                $post.set(key, $value);
-              }
-            }
-            return $post;
-          },
-        },
-
-        deleteRelationalPostById: {
-          args: {
-            input: {
-              type: new GraphQLNonNull(DeleteRelationalPostByIdInput),
-            },
-          },
-          type: DeleteRelationalPostByIdPayload,
-          plan(_$root, args) {
-            const $input = args.input as InputObjectPlan;
-            const $post = pgDelete(relationalPostsSource, {
-              id: $input.get("id"),
-            });
-            return $post;
-          },
+          }
+          return $post;
         },
       },
-    }),
-  );
 
-  const ForumMessageSubscriptionPayload = new GraphQLObjectType(
-    objectSpec<
-      OurGraphQLContext,
-      ObjectLikePlan<{ id: ExecutablePlan<string>; op: ExecutablePlan<string> }>
-    >({
-      name: "ForumMessageSubscriptionPayload",
-      fields: {
-        operationType: {
-          type: GraphQLString,
-          plan($event) {
-            return lambda($event.get("op"), (txt) => String(txt).toLowerCase());
-          },
-        },
-        message: {
-          type: Message,
-          plan($event) {
-            return messageSource.get({ id: $event.get("id") });
-          },
-        },
-      },
-    }),
-  );
-
-  const Subscription = new GraphQLObjectType(
-    objectSpec<OurGraphQLContext, __ValuePlan<BaseGraphQLRootValue>>({
-      name: "Subscription",
-      fields: {
-        forumMessage: {
-          args: {
-            forumId: {
-              type: new GraphQLNonNull(GraphQLString),
-            },
-          },
-          type: ForumMessageSubscriptionPayload,
-          subscribePlan(_$root, args) {
-            const $forumId = args.forumId as InputStaticLeafPlan<number>;
-            const $topic = lambda($forumId, (id) => `forum:${id}:message`);
-            const $pgSubscriber = context<OurGraphQLContext>().get(
-              "pgSubscriber",
-            ) as AccessPlan<CrystalSubscriber>;
-
-            return subscribe($pgSubscriber, $topic, jsonParse);
-          },
-          plan($event) {
-            return $event;
-          },
+      createThreeRelationalPostsComputed: {
+        description:
+          "This silly mutation is specifically to ensure that mutation plans are not tree-shaken even if they use plans that are normally side-effect free - we never want to throw away mutation side effects.",
+        type: CreateRelationalPostPayload,
+        plan() {
+          // Only the _last_ post plan is returned; there's no dependency on
+          // the first two posts, and yet they should not be tree-shaken
+          // because they're mutations.
+          let $post: ExecutablePlan;
+          for (let i = 0; i < 3; i++) {
+            $post = pgSelect({
+              source: relationalPostsSource,
+              identifiers: [],
+              from: (authorId, title) =>
+                sql`interfaces_and_unions.insert_post(${authorId}, ${title})`,
+              args: [
+                {
+                  plan: constant(2),
+                  type: TYPES.int.sqlType,
+                },
+                {
+                  plan: constant(`Computed post #${i + 1}`),
+                  type: TYPES.text.sqlType,
+                },
+              ],
+            });
+            $post.hasSideEffects = true;
+          }
+          return $post;
         },
       },
-    }),
-  );
+
+      updateRelationalPostById: {
+        args: {
+          input: {
+            type: new GraphQLNonNull(UpdateRelationalPostByIdInput),
+          },
+        },
+        type: UpdateRelationalPostByIdPayload,
+        plan(_$root, args) {
+          const $input = args.input as InputObjectPlan;
+          const $patch = $input.get("patch") as InputObjectPlan;
+          const $post = pgUpdate(relationalPostsSource, {
+            id: $input.get("id"),
+          });
+          for (const key of ["title", "description", "note"] as Array<
+            keyof typeof relationalPostsSource.columns
+          >) {
+            const $value = $patch.get(key);
+            // TODO: test that we differentiate between value set to null and
+            // value not being present
+            if (!$value.evalIs(undefined)) {
+              $post.set(key, $value);
+            }
+          }
+          return $post;
+        },
+      },
+
+      deleteRelationalPostById: {
+        args: {
+          input: {
+            type: new GraphQLNonNull(DeleteRelationalPostByIdInput),
+          },
+        },
+        type: DeleteRelationalPostByIdPayload,
+        plan(_$root, args) {
+          const $input = args.input as InputObjectPlan;
+          const $post = pgDelete(relationalPostsSource, {
+            id: $input.get("id"),
+          });
+          return $post;
+        },
+      },
+    },
+  });
+
+  const ForumMessageSubscriptionPayload = newObjectType<
+    OurGraphQLContext,
+    ObjectLikePlan<{ id: ExecutablePlan<string>; op: ExecutablePlan<string> }>
+  >({
+    name: "ForumMessageSubscriptionPayload",
+    fields: {
+      operationType: {
+        type: GraphQLString,
+        plan($event) {
+          return lambda($event.get("op"), (txt) => String(txt).toLowerCase());
+        },
+      },
+      message: {
+        type: Message,
+        plan($event) {
+          return messageSource.get({ id: $event.get("id") });
+        },
+      },
+    },
+  });
+
+  const Subscription = newObjectType<
+    OurGraphQLContext,
+    __ValuePlan<BaseGraphQLRootValue>
+  >({
+    name: "Subscription",
+    fields: {
+      forumMessage: {
+        args: {
+          forumId: {
+            type: new GraphQLNonNull(GraphQLString),
+          },
+        },
+        type: ForumMessageSubscriptionPayload,
+        subscribePlan(_$root, args) {
+          const $forumId = args.forumId as InputStaticLeafPlan<number>;
+          const $topic = lambda($forumId, (id) => `forum:${id}:message`);
+          const $pgSubscriber = context<OurGraphQLContext>().get(
+            "pgSubscriber",
+          ) as AccessPlan<CrystalSubscriber>;
+
+          return subscribe($pgSubscriber, $topic, jsonParse);
+        },
+        plan($event) {
+          return $event;
+        },
+      },
+    },
+  });
 
   return crystalEnforce(
     new GraphQLSchema({

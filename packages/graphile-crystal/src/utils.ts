@@ -11,6 +11,7 @@ import type {
   ThunkObjMap,
   ValueNode,
 } from "graphql";
+import { GraphQLObjectType } from "graphql";
 import {
   GraphQLBoolean,
   GraphQLEnumType,
@@ -313,24 +314,29 @@ export function arraysMatch<T>(
   return true;
 }
 
+export type ObjectTypeSpec<
+  TContext extends BaseGraphQLContext,
+  TParentPlan extends ExecutablePlan<any>,
+> = Omit<GraphQLObjectTypeConfig<any, TContext>, "fields"> & {
+  fields: ThunkObjMap<
+    GraphileCrystalFieldConfig<
+      GraphQLOutputType,
+      TContext,
+      TParentPlan,
+      any,
+      any
+    >
+  >;
+};
+
 /**
  * Saves us having to write `extensions: {graphile: {...}}` everywhere.
  */
-export function objectSpec<
+function objectSpec<
   TContext extends BaseGraphQLContext,
   TParentPlan extends ExecutablePlan<any>,
 >(
-  spec: Omit<GraphQLObjectTypeConfig<any, TContext>, "fields"> & {
-    fields: ThunkObjMap<
-      GraphileCrystalFieldConfig<
-        GraphQLOutputType,
-        TContext,
-        TParentPlan,
-        any,
-        any
-      >
-    >;
-  },
+  spec: ObjectTypeSpec<TContext, TParentPlan>,
 ): GraphQLObjectTypeConfig<any, TContext> {
   const modifiedSpec: GraphQLObjectTypeConfig<any, TContext> = {
     ...spec,
@@ -345,6 +351,26 @@ export function objectSpec<
     },
   };
   return modifiedSpec;
+}
+
+export type GraphileObjectType<
+  TContext extends BaseGraphQLContext,
+  TParentPlan extends ExecutablePlan<any>,
+> = GraphQLObjectType<
+  TParentPlan extends ExecutablePlan<infer U> ? U : never,
+  TContext
+> & { TParentPlan: TParentPlan };
+
+export function newObjectType<
+  TContext extends BaseGraphQLContext,
+  TParentPlan extends ExecutablePlan<any>,
+>(
+  spec: ObjectTypeSpec<TContext, TParentPlan>,
+): GraphileObjectType<TContext, TParentPlan> {
+  return new GraphQLObjectType(objectSpec(spec)) as GraphileObjectType<
+    TContext,
+    TParentPlan
+  >;
 }
 
 /**
