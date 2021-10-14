@@ -1208,12 +1208,15 @@ export function makeExampleSchema(
     };
   }
 
-  const MessageCondition = newInputObjectType({
+  const MessageCondition = newInputObjectType<
+    OurGraphQLContext,
+    PgConditionPlan<any>
+  >({
     name: "MessageCondition",
     fields: {
       featured: {
         type: GraphQLBoolean,
-        plan($condition: PgConditionPlan<any>, $value) {
+        plan($condition, $value) {
           if ($value.evalIs(null)) {
             $condition.where(sql`${$condition.alias}.featured is null`);
           } else {
@@ -1272,12 +1275,15 @@ export function makeExampleSchema(
     }
   }
 
-  const BooleanFilter = newInputObjectType({
+  const BooleanFilter = newInputObjectType<
+    OurGraphQLContext,
+    BooleanFilterPlan
+  >({
     name: "BooleanFilter",
     fields: {
       equalTo: {
         type: GraphQLBoolean,
-        plan($parent: BooleanFilterPlan, $value) {
+        plan($parent, $value) {
           if ($value.evalIs(null)) {
             // Ignore
           } else {
@@ -1308,12 +1314,12 @@ export function makeExampleSchema(
     },
   });
 
-  const MessageFilter = newInputObjectType({
+  const MessageFilter = newInputObjectType<OurGraphQLContext, ClassFilterPlan>({
     name: "MessageFilter",
     fields: {
       featured: {
         type: BooleanFilter,
-        plan($messageFilter: ClassFilterPlan, $value) {
+        plan($messageFilter, $value) {
           if ($value.evalIs(null)) {
             // Ignore
           } else {
@@ -1327,12 +1333,15 @@ export function makeExampleSchema(
     },
   });
 
-  const ForumCondition = newInputObjectType({
+  const ForumCondition = newInputObjectType<
+    OurGraphQLContext,
+    PgConditionPlan<any>
+  >({
     name: "ForumCondition",
     fields: {
       name: {
         type: GraphQLString,
-        plan($condition: PgConditionPlan<any>, $value) {
+        plan($condition, $value) {
           if ($value.evalIs(null)) {
             $condition.where(sql`${$condition.alias}.name is null`);
           } else {
@@ -1441,12 +1450,15 @@ export function makeExampleSchema(
     }
   }
 
-  const ForumToManyMessageFilter = newInputObjectType({
+  const ForumToManyMessageFilter = newInputObjectType<
+    OurGraphQLContext,
+    ManyFilterPlan<typeof messageSource>
+  >({
     name: "ForumToManyMessageFilter",
     fields: {
       some: {
         type: MessageFilter,
-        plan($manyFilter: ManyFilterPlan<typeof messageSource>, $value) {
+        plan($manyFilter, $value) {
           if (!$value.evalIs(null)) {
             return $manyFilter.some();
           }
@@ -1455,12 +1467,12 @@ export function makeExampleSchema(
     },
   });
 
-  const ForumFilter = newInputObjectType({
+  const ForumFilter = newInputObjectType<OurGraphQLContext, ClassFilterPlan>({
     name: "ForumFilter",
     fields: {
       messages: {
         type: ForumToManyMessageFilter,
-        plan($condition: ClassFilterPlan, $value) {
+        plan($condition, $value) {
           if (!$value.evalIs(null)) {
             return new ManyFilterPlan(
               $condition,
