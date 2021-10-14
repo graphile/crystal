@@ -1007,8 +1007,6 @@ export function makeExampleSchema(
     },
   });
 
-  // TODO: interfaces_and_unions.union__entity
-
   function attrField<TDataSource extends PgSource<any, any, any, any>>(
     attrName: keyof TDataSource["columns"],
     type: GraphQLOutputType,
@@ -1019,22 +1017,6 @@ export function makeExampleSchema(
         return $entity.get(attrName);
       },
     };
-  }
-
-  function mapValues<
-    TKey extends string,
-    TValue extends any,
-    TNewValue extends any,
-  >(
-    obj: { [key in TKey]: TValue },
-    mapper: (val: TValue, key: TKey) => TNewValue,
-  ): { [key in TKey]: TNewValue } {
-    let o: { [key in TKey]?: TNewValue } = Object.create(null);
-    const keys = Object.keys(obj) as TKey[];
-    for (const key of keys) {
-      o[key] = mapper(obj[key], key);
-    }
-    return o as { [key in TKey]: TNewValue };
   }
 
   function singleRelationField<
