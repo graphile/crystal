@@ -1158,7 +1158,7 @@ export function makeExampleSchema(
       nodes: {
         type: new GraphQLList(Message),
         plan($connection) {
-          return $connection.getSubplan();
+          return $connection.nodes();
         },
       },
     },
