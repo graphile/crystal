@@ -159,8 +159,7 @@ export class PgSourceBuilder<
   build<
     TRelations extends {
       [identifier: string]: PgSourceRelation<
-        | PgSourceBuilder<any, PgSourceColumns, any, any>
-        | PgSource<any, PgSourceColumns, any, any>,
+        PgSourceBuilder<any, any, any, any> | PgSource<any, any, any, any>,
         TColumns
       >;
     },
