@@ -86,19 +86,15 @@ import { pgUpdate } from "../src/plans/pgUpdate";
 // These are what the generics extend from
 
 // This is the actual runtime context; we should not use a global for this.
-export interface GraphileResolverContext extends BaseGraphQLContext {}
+export interface OurGraphQLContext extends BaseGraphQLContext {
+  pgSettings: { [key: string]: string };
+  withPgClient: WithPgClient;
+  pgSubscriber: PgSubscriber;
+}
 
 /*+--------------------------------------------------------------------------+
   |                               DATA SOURCES                               |
   +--------------------------------------------------------------------------+*/
-
-declare module "graphile-crystal" {
-  interface BaseGraphQLContext {
-    pgSettings: { [key: string]: string };
-    withPgClient: WithPgClient;
-    pgSubscriber: PgSubscriber;
-  }
-}
 
 /**
  * Expand this interface with your own types.
@@ -230,8 +226,8 @@ export function makeExampleSchema(
   const executor = new PgExecutor({
     name: "default",
     context: () => {
-      const $context = context();
-      return object<PgExecutorContextPlans<BaseGraphQLContext["pgSettings"]>>({
+      const $context = context<OurGraphQLContext>();
+      return object<PgExecutorContextPlans<OurGraphQLContext["pgSettings"]>>({
         pgSettings: $context.get("pgSettings"),
         withPgClient: $context.get("withPgClient"),
       });
@@ -1056,7 +1052,7 @@ export function makeExampleSchema(
   }
 
   const User = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, UserPlan>({
+    objectSpec<OurGraphQLContext, UserPlan>({
       name: "User",
       fields: () => ({
         username: attrField("username", GraphQLString),
@@ -1121,7 +1117,7 @@ export function makeExampleSchema(
     },
   });
   const Message = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, MessagePlan>({
+    objectSpec<OurGraphQLContext, MessagePlan>({
       name: "Message",
       fields: () => ({
         id: attrField("id", GraphQLString),
@@ -1143,7 +1139,7 @@ export function makeExampleSchema(
   );
 
   const MessageEdge = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, MessagePlan>({
+    objectSpec<OurGraphQLContext, MessagePlan>({
       name: "MessageEdge",
       fields: {
         cursor: {
@@ -1163,7 +1159,7 @@ export function makeExampleSchema(
   );
 
   const MessagesConnection = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, MessageConnectionPlan>({
+    objectSpec<OurGraphQLContext, MessageConnectionPlan>({
       name: "MessagesConnection",
       fields: {
         edges: {
@@ -1515,9 +1511,9 @@ export function makeExampleSchema(
     }),
   );
 
-  const Forum: GraphQLObjectType<any, GraphileResolverContext> =
+  const Forum: GraphQLObjectType<any, OurGraphQLContext> =
     new GraphQLObjectType(
-      objectSpec<GraphileResolverContext, ForumPlan>({
+      objectSpec<OurGraphQLContext, ForumPlan>({
         name: "Forum",
         fields: () => ({
           id: attrField("id", GraphQLString),
@@ -1853,9 +1849,9 @@ export function makeExampleSchema(
       },
     );
 
-  const PersonBookmark: GraphQLObjectType<any, GraphileResolverContext> =
+  const PersonBookmark: GraphQLObjectType<any, OurGraphQLContext> =
     new GraphQLObjectType(
-      objectSpec<GraphileResolverContext, PersonBookmarkPlan>({
+      objectSpec<OurGraphQLContext, PersonBookmarkPlan>({
         name: "PersonBookmark",
         fields: () => ({
           id: attrField("id", GraphQLInt),
@@ -1870,9 +1866,9 @@ export function makeExampleSchema(
       }),
     );
 
-  const Person: GraphQLObjectType<any, GraphileResolverContext> =
+  const Person: GraphQLObjectType<any, OurGraphQLContext> =
     new GraphQLObjectType(
-      objectSpec<GraphileResolverContext, PersonPlan>({
+      objectSpec<OurGraphQLContext, PersonPlan>({
         name: "Person",
         fields: () => ({
           personId: attrField("person_id", GraphQLInt),
@@ -1911,21 +1907,20 @@ export function makeExampleSchema(
       }),
     );
 
-  const Post: GraphQLObjectType<any, GraphileResolverContext> =
-    new GraphQLObjectType(
-      objectSpec<GraphileResolverContext, PostPlan>({
-        name: "Post",
-        fields: () => ({
-          postId: attrField("post_id", GraphQLInt),
-          body: attrField("body", GraphQLString),
-          author: singleRelationField("author", Person),
-        }),
+  const Post: GraphQLObjectType<any, OurGraphQLContext> = new GraphQLObjectType(
+    objectSpec<OurGraphQLContext, PostPlan>({
+      name: "Post",
+      fields: () => ({
+        postId: attrField("post_id", GraphQLInt),
+        body: attrField("body", GraphQLString),
+        author: singleRelationField("author", Person),
       }),
-    );
+    }),
+  );
 
-  const Comment: GraphQLObjectType<any, GraphileResolverContext> =
+  const Comment: GraphQLObjectType<any, OurGraphQLContext> =
     new GraphQLObjectType(
-      objectSpec<GraphileResolverContext, CommentPlan>({
+      objectSpec<OurGraphQLContext, CommentPlan>({
         name: "Comment",
         fields: () => ({
           commentId: attrField("comment_id", GraphQLInt),
@@ -1974,7 +1969,7 @@ export function makeExampleSchema(
   };
 
   const SingleTableTopic = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, SingleTableItemPlan>({
+    objectSpec<OurGraphQLContext, SingleTableItemPlan>({
       name: "SingleTableTopic",
       interfaces: [SingleTableItem],
       fields: () => ({
@@ -1985,7 +1980,7 @@ export function makeExampleSchema(
   );
 
   const SingleTablePost = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, SingleTableItemPlan>({
+    objectSpec<OurGraphQLContext, SingleTableItemPlan>({
       name: "SingleTablePost",
       interfaces: [SingleTableItem],
       fields: () => ({
@@ -1998,7 +1993,7 @@ export function makeExampleSchema(
   );
 
   const SingleTableDivider = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, SingleTableItemPlan>({
+    objectSpec<OurGraphQLContext, SingleTableItemPlan>({
       name: "SingleTableDivider",
       interfaces: [SingleTableItem],
       fields: () => ({
@@ -2010,7 +2005,7 @@ export function makeExampleSchema(
   );
 
   const SingleTableChecklist = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, SingleTableItemPlan>({
+    objectSpec<OurGraphQLContext, SingleTableItemPlan>({
       name: "SingleTableChecklist",
       interfaces: [SingleTableItem],
       fields: () => ({
@@ -2021,7 +2016,7 @@ export function makeExampleSchema(
   );
 
   const SingleTableChecklistItem = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, SingleTableItemPlan>({
+    objectSpec<OurGraphQLContext, SingleTableItemPlan>({
       name: "SingleTableChecklistItem",
       interfaces: [SingleTableItem],
       fields: () => ({
@@ -2079,7 +2074,7 @@ export function makeExampleSchema(
   };
 
   const RelationalTopic = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, RelationalItemPlan>({
+    objectSpec<OurGraphQLContext, RelationalItemPlan>({
       name: "RelationalTopic",
       interfaces: [RelationalItem],
       fields: () => ({
@@ -2090,7 +2085,7 @@ export function makeExampleSchema(
   );
 
   const RelationalPost = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, RelationalItemPlan>({
+    objectSpec<OurGraphQLContext, RelationalItemPlan>({
       name: "RelationalPost",
       interfaces: [RelationalItem, RelationalCommentable],
       fields: () => ({
@@ -2126,7 +2121,7 @@ export function makeExampleSchema(
   );
 
   const RelationalDivider = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, RelationalItemPlan>({
+    objectSpec<OurGraphQLContext, RelationalItemPlan>({
       name: "RelationalDivider",
       interfaces: [RelationalItem],
       fields: () => ({
@@ -2138,7 +2133,7 @@ export function makeExampleSchema(
   );
 
   const RelationalChecklist = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, RelationalItemPlan>({
+    objectSpec<OurGraphQLContext, RelationalItemPlan>({
       name: "RelationalChecklist",
       interfaces: [RelationalItem, RelationalCommentable],
       fields: () => ({
@@ -2149,7 +2144,7 @@ export function makeExampleSchema(
   );
 
   const RelationalChecklistItem = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, RelationalItemPlan>({
+    objectSpec<OurGraphQLContext, RelationalItemPlan>({
       name: "RelationalChecklistItem",
       interfaces: [RelationalItem, RelationalCommentable],
       fields: () => ({
@@ -2175,7 +2170,7 @@ export function makeExampleSchema(
   });
 
   const UnionTopic = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, UnionTopicPlan>({
+    objectSpec<OurGraphQLContext, UnionTopicPlan>({
       name: "UnionTopic",
       fields: () => ({
         id: attrField("id", GraphQLInt),
@@ -2185,7 +2180,7 @@ export function makeExampleSchema(
   );
 
   const UnionPost = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, UnionPostPlan>({
+    objectSpec<OurGraphQLContext, UnionPostPlan>({
       name: "UnionPost",
       fields: () => ({
         id: attrField("id", GraphQLInt),
@@ -2197,7 +2192,7 @@ export function makeExampleSchema(
   );
 
   const UnionDivider = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, UnionDividerPlan>({
+    objectSpec<OurGraphQLContext, UnionDividerPlan>({
       name: "UnionDivider",
       fields: () => ({
         id: attrField("id", GraphQLInt),
@@ -2208,7 +2203,7 @@ export function makeExampleSchema(
   );
 
   const UnionChecklist = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, UnionChecklistPlan>({
+    objectSpec<OurGraphQLContext, UnionChecklistPlan>({
       name: "UnionChecklist",
       fields: () => ({
         id: attrField("id", GraphQLInt),
@@ -2218,7 +2213,7 @@ export function makeExampleSchema(
   );
 
   const UnionChecklistItem = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, UnionChecklistItemPlan>({
+    objectSpec<OurGraphQLContext, UnionChecklistItemPlan>({
       name: "UnionChecklistItem",
       fields: () => ({
         id: attrField("id", GraphQLInt),
@@ -2239,7 +2234,7 @@ export function makeExampleSchema(
   ////////////////////////////////////////
 
   const Query = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, __ValuePlan<BaseGraphQLRootValue>>({
+    objectSpec<OurGraphQLContext, __ValuePlan<BaseGraphQLRootValue>>({
       name: "Query",
       fields: {
         forums: {
@@ -2767,30 +2762,21 @@ export function makeExampleSchema(
   };
 
   const CreateRelationalPostPayload = new GraphQLObjectType(
-    objectSpec<
-      GraphileResolverContext,
-      PgInsertPlan<typeof relationalPostsSource>
-    >({
+    objectSpec<OurGraphQLContext, PgInsertPlan<typeof relationalPostsSource>>({
       name: "CreateRelationalPostPayload",
       fields: relationalPostMutationFields,
     }),
   );
 
   const UpdateRelationalPostByIdPayload = new GraphQLObjectType(
-    objectSpec<
-      GraphileResolverContext,
-      PgUpdatePlan<typeof relationalPostsSource>
-    >({
+    objectSpec<OurGraphQLContext, PgUpdatePlan<typeof relationalPostsSource>>({
       name: "UpdateRelationalPostByIdPayload",
       fields: relationalPostMutationFields,
     }),
   );
 
   const DeleteRelationalPostByIdPayload = new GraphQLObjectType(
-    objectSpec<
-      GraphileResolverContext,
-      PgDeletePlan<typeof relationalPostsSource>
-    >({
+    objectSpec<OurGraphQLContext, PgDeletePlan<typeof relationalPostsSource>>({
       name: "DeleteRelationalPostByIdPayload",
       fields: {
         ...relationalPostMutationFields,
@@ -2811,7 +2797,7 @@ export function makeExampleSchema(
   );
 
   const Mutation = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, __ValuePlan<BaseGraphQLRootValue>>({
+    objectSpec<OurGraphQLContext, __ValuePlan<BaseGraphQLRootValue>>({
       name: "Mutation",
       fields: {
         createRelationalPost: {
@@ -2950,7 +2936,7 @@ export function makeExampleSchema(
 
   const ForumMessageSubscriptionPayload = new GraphQLObjectType(
     objectSpec<
-      GraphileResolverContext,
+      OurGraphQLContext,
       ObjectLikePlan<{ id: ExecutablePlan<string>; op: ExecutablePlan<string> }>
     >({
       name: "ForumMessageSubscriptionPayload",
@@ -2972,7 +2958,7 @@ export function makeExampleSchema(
   );
 
   const Subscription = new GraphQLObjectType(
-    objectSpec<GraphileResolverContext, __ValuePlan<BaseGraphQLRootValue>>({
+    objectSpec<OurGraphQLContext, __ValuePlan<BaseGraphQLRootValue>>({
       name: "Subscription",
       fields: {
         forumMessage: {
@@ -2985,7 +2971,7 @@ export function makeExampleSchema(
           subscribePlan(_$root, args) {
             const $forumId = args.forumId as InputStaticLeafPlan<number>;
             const $topic = lambda($forumId, (id) => `forum:${id}:message`);
-            const $pgSubscriber = context().get(
+            const $pgSubscriber = context<OurGraphQLContext>().get(
               "pgSubscriber",
             ) as AccessPlan<CrystalSubscriber>;
 

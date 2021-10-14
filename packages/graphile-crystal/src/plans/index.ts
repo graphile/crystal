@@ -7,7 +7,9 @@ export function aether(): Aether {
   return getCurrentAether();
 }
 
-export function context(): __ValuePlan<BaseGraphQLContext> {
+export function context<
+  TContext extends BaseGraphQLContext = BaseGraphQLContext,
+>(): __ValuePlan<TContext> {
   return aether().contextPlan;
 }
 
