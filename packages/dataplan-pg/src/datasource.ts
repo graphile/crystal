@@ -232,6 +232,13 @@ export class PgSource<
   public readonly source: SQL | ((...args: SQL[]) => SQL);
   public readonly columns: TColumns;
   public readonly uniques: TUniques;
+  private readonly _options: PgSourceOptions<
+    TCodec,
+    TColumns,
+    TUniques,
+    TRelations,
+    TParameters
+  >;
   private relationsThunk: (() => TRelations) | null;
   private _relations: TRelations | null = null;
 
@@ -253,17 +260,46 @@ export class PgSource<
   ) {
     const { codec, executor, name, source, columns, uniques, relations } =
       options;
+    this._options = options;
     this.codec = codec;
     this.executor = executor;
     this.name = name;
     this.source = source;
     this.columns = columns ?? ({} as TColumns);
-    this.uniques = uniques ?? ([] as any);
+    this.uniques =
+      uniques ?? ([] as TUniques extends never[] ? TUniques : never);
     this.relationsThunk = typeof relations === "function" ? relations : null;
     if (typeof relations !== "function") {
       this._relations = relations || ({} as TRelations);
       this.validateRelations();
     }
+  }
+
+  /**
+   * Often you can access table records from a table directly but also from a
+   * number of functions. This method makes it convenient to construct multiple
+   * datasources that all represent the same underlying table
+   * type/relations/etc.
+   */
+  public alternativeSource<
+    TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+    TNewParameters extends { [key: string]: any } | never = never,
+  >(overrideOptions: {
+    name: string;
+    source: SQL | ((...args: SQL[]) => SQL);
+    uniques?: TUniques;
+  }): PgSource<TCodec, TColumns, TUniques, TRelations, TNewParameters> {
+    const { name, source, uniques } = overrideOptions;
+    const { codec, executor, columns, relations } = this._options;
+    return new PgSource({
+      codec,
+      executor,
+      name,
+      source,
+      columns,
+      uniques,
+      relations,
+    });
   }
 
   public toString(): string {

@@ -264,33 +264,6 @@ export function makeExampleSchema(
     columns: null,
   });
 
-  const featuredMessages = new PgSource({
-    executor,
-    codec: recordType(sql`app_public.messages`, messageColumns),
-    source: (...args) =>
-      sql`app_public.featured_messages(${sql.join(args, ", ")})`,
-    name: "featured_messages",
-    columns: messageColumns,
-  });
-
-  const forumsFeaturedMessages = new PgSource({
-    executor,
-    codec: recordType(sql`app_public.messages`, messageColumns),
-    source: (...args) =>
-      sql`app_public.forums_featured_messages(${sql.join(args, ", ")})`,
-    name: "forums_featured_messages",
-    columns: messageColumns,
-  });
-
-  const usersMostRecentForumSource = new PgSource({
-    executor,
-    codec: recordType(sql`app_public.forums`, forumColumns),
-    source: (...args) =>
-      sql`app_public.users_most_recent_forum(${sql.join(args, ", ")})`,
-    name: "users_most_recent_forum",
-    columns: forumColumns,
-  });
-
   const messageSourceBuilder = new PgSourceBuilder({
     executor,
     codec: recordType(sql`app_public.messages`, messageColumns),
@@ -318,6 +291,12 @@ export function makeExampleSchema(
     uniques: [["id"]],
   });
 
+  const usersMostRecentForumSource = forumSource.alternativeSource({
+    name: "users_most_recent_forum",
+    source: (...args) =>
+      sql`app_public.users_most_recent_forum(${sql.join(args, ", ")})`,
+  });
+
   const messageSource = messageSourceBuilder.build({
     relations: {
       author: {
@@ -333,6 +312,18 @@ export function makeExampleSchema(
         isUnique: true,
       },
     },
+  });
+
+  const featuredMessages = messageSource.alternativeSource({
+    name: "featured_messages",
+    source: (...args) =>
+      sql`app_public.featured_messages(${sql.join(args, ", ")})`,
+  });
+
+  const forumsFeaturedMessages = messageSource.alternativeSource({
+    name: "forums_featured_messages",
+    source: (...args) =>
+      sql`app_public.forums_featured_messages(${sql.join(args, ", ")})`,
   });
 
   const unionEntityColumns = {
