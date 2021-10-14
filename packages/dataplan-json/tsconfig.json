@@ -7,9 +7,7 @@
   },
   "include": ["src"],
   "references": [
-    { "path": "../dataplan-json" },
     { "path": "../graphile-crystal" },
-    { "path": "../pg-sql2" },
     { "path": "../jest-serializer-simple" }
   ]
 }

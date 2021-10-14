@@ -1,0 +1,48 @@
+{
+  "name": "@dataplan/json",
+  "version": "4.7.0",
+  "description": "JSON data plans for Graphile Crystal",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "jest",
+    "prepack": "tsc -b"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/graphile/graphile-build.git"
+  },
+  "keywords": [
+    "graphile",
+    "graphql",
+    "crystal",
+    "json",
+    "dataplan"
+  ],
+  "author": "Benjie Gillam <code@benjiegillam.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/graphile/crystal/issues"
+  },
+  "homepage": "https://github.com/graphile/crystal/tree/main/packages/dataplan-json",
+  "dependencies": {
+    "chalk": "^4.0.0",
+    "tslib": "^2.2.0"
+  },
+  "engines": {
+    "node": ">=14.17"
+  },
+  "peerDependencies": {
+    "graphile-crystal": "*",
+    "graphql": "*"
+  },
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@types/jest": "^25.2.3",
+    "jest": "^26.0.1",
+    "jest-serializer-simple": "4.6.0",
+    "typescript": "^4.2.4"
+  }
+}
