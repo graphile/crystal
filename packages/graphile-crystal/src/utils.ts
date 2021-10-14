@@ -419,21 +419,26 @@ export function objectFieldSpec<
   };
 }
 
-export function inputObjectSpec<
+export type InputObjectTypeSpec<
+  TContext extends BaseGraphQLContext,
+  TParentPlan extends ModifierPlan<any>,
+> = Omit<GraphQLInputObjectTypeConfig, "fields"> & {
+  fields: ThunkObjMap<
+    GraphileCrystalInputFieldConfig<
+      GraphQLInputType,
+      TContext,
+      TParentPlan,
+      any,
+      any
+    >
+  >;
+};
+
+function inputObjectSpec<
   TContext extends BaseGraphQLContext,
   TParentPlan extends ModifierPlan<any>,
 >(
-  spec: Omit<GraphQLInputObjectTypeConfig, "fields"> & {
-    fields: ThunkObjMap<
-      GraphileCrystalInputFieldConfig<
-        GraphQLInputType,
-        TContext,
-        TParentPlan,
-        any,
-        any
-      >
-    >;
-  },
+  spec: InputObjectTypeSpec<TContext, TParentPlan>,
 ): GraphQLInputObjectTypeConfig {
   const modifiedSpec: GraphQLInputObjectTypeConfig = {
     ...spec,
@@ -448,6 +453,22 @@ export function inputObjectSpec<
     },
   };
   return modifiedSpec;
+}
+
+export type GraphileInputObjectType<
+  TContext extends BaseGraphQLContext,
+  TParentPlan extends ModifierPlan<any>,
+> = GraphQLInputObjectType & { TContext: TContext; TParentPlan: TParentPlan };
+
+export function newInputObjectType<
+  TContext extends BaseGraphQLContext,
+  TParentPlan extends ModifierPlan<any>,
+>(
+  spec: InputObjectTypeSpec<TContext, TParentPlan>,
+): GraphileInputObjectType<TContext, TParentPlan> {
+  return new GraphQLInputObjectType(
+    inputObjectSpec(spec),
+  ) as GraphileInputObjectType<TContext, TParentPlan>;
 }
 
 /**

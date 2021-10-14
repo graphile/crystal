@@ -3,7 +3,6 @@ import {
   crystalWrapResolve,
   makeCrystalSubscriber,
   objectFieldSpec,
-  objectSpec,
 } from "graphile-crystal";
 import * as graphql from "graphql";
 import type { ResolveTree } from "graphql-parse-resolve-info";
@@ -337,7 +336,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
       newSpec = builder.applyHooks(
         this,
         "GraphQLObjectType",
-        objectSpec(newSpec),
+        newSpec,
         objectContext,
 
         `|${newSpec.name}`,

@@ -19,25 +19,23 @@ import {
   context,
   crystalEnforce,
   each,
-  inputObjectSpec,
   lambda,
   list,
   ModifierPlan,
+  newInputObjectType,
   newObjectType,
   object,
   resolveType,
   subscribe,
 } from "graphile-crystal";
-import type { GraphQLOutputType } from "graphql";
+import type { GraphQLObjectType, GraphQLOutputType } from "graphql";
 import {
   GraphQLBoolean,
   GraphQLEnumType,
-  GraphQLInputObjectType,
   GraphQLInt,
   GraphQLInterfaceType,
   GraphQLList,
   GraphQLNonNull,
-  GraphQLObjectType,
   GraphQLSchema,
   GraphQLString,
   GraphQLUnionType,
@@ -1210,28 +1208,26 @@ export function makeExampleSchema(
     };
   }
 
-  const MessageCondition = new GraphQLInputObjectType(
-    inputObjectSpec({
-      name: "MessageCondition",
-      fields: {
-        featured: {
-          type: GraphQLBoolean,
-          plan($condition: PgConditionPlan<any>, $value) {
-            if ($value.evalIs(null)) {
-              $condition.where(sql`${$condition.alias}.featured is null`);
-            } else {
-              $condition.where(
-                sql`${$condition.alias}.featured = ${$condition.placeholder(
-                  $value,
-                  sql`boolean`,
-                )}`,
-              );
-            }
-          },
+  const MessageCondition = newInputObjectType({
+    name: "MessageCondition",
+    fields: {
+      featured: {
+        type: GraphQLBoolean,
+        plan($condition: PgConditionPlan<any>, $value) {
+          if ($value.evalIs(null)) {
+            $condition.where(sql`${$condition.alias}.featured is null`);
+          } else {
+            $condition.where(
+              sql`${$condition.alias}.featured = ${$condition.placeholder(
+                $value,
+                sql`boolean`,
+              )}`,
+            );
+          }
         },
       },
-    }),
-  );
+    },
+  });
 
   class ClassFilterPlan extends ModifierPlan<PgConditionPlan<any>> {
     private conditions: SQL[] = [];
@@ -1276,87 +1272,81 @@ export function makeExampleSchema(
     }
   }
 
-  const BooleanFilter = new GraphQLInputObjectType(
-    inputObjectSpec({
-      name: "BooleanFilter",
-      fields: {
-        equalTo: {
-          type: GraphQLBoolean,
-          plan($parent: BooleanFilterPlan, $value) {
-            if ($value.evalIs(null)) {
-              // Ignore
-            } else {
-              $parent.where(
-                sql`${$parent.expression} = ${$parent.placeholder(
-                  $value,
-                  sql`boolean`,
-                )}`,
-              );
-            }
-          },
-        },
-        notEqualTo: {
-          type: GraphQLBoolean,
-          plan($parent: BooleanFilterPlan, $value) {
-            if ($value.evalIs(null)) {
-              // Ignore
-            } else {
-              $parent.where(
-                sql`${$parent.expression} <> ${$parent.placeholder(
-                  $value,
-                  sql`boolean`,
-                )}`,
-              );
-            }
-          },
+  const BooleanFilter = newInputObjectType({
+    name: "BooleanFilter",
+    fields: {
+      equalTo: {
+        type: GraphQLBoolean,
+        plan($parent: BooleanFilterPlan, $value) {
+          if ($value.evalIs(null)) {
+            // Ignore
+          } else {
+            $parent.where(
+              sql`${$parent.expression} = ${$parent.placeholder(
+                $value,
+                sql`boolean`,
+              )}`,
+            );
+          }
         },
       },
-    }),
-  );
+      notEqualTo: {
+        type: GraphQLBoolean,
+        plan($parent: BooleanFilterPlan, $value) {
+          if ($value.evalIs(null)) {
+            // Ignore
+          } else {
+            $parent.where(
+              sql`${$parent.expression} <> ${$parent.placeholder(
+                $value,
+                sql`boolean`,
+              )}`,
+            );
+          }
+        },
+      },
+    },
+  });
 
-  const MessageFilter = new GraphQLInputObjectType(
-    inputObjectSpec({
-      name: "MessageFilter",
-      fields: {
-        featured: {
-          type: BooleanFilter,
-          plan($messageFilter: ClassFilterPlan, $value) {
-            if ($value.evalIs(null)) {
-              // Ignore
-            } else {
-              return new BooleanFilterPlan(
-                $messageFilter,
-                sql`${$messageFilter.alias}.featured`,
-              );
-            }
-          },
+  const MessageFilter = newInputObjectType({
+    name: "MessageFilter",
+    fields: {
+      featured: {
+        type: BooleanFilter,
+        plan($messageFilter: ClassFilterPlan, $value) {
+          if ($value.evalIs(null)) {
+            // Ignore
+          } else {
+            return new BooleanFilterPlan(
+              $messageFilter,
+              sql`${$messageFilter.alias}.featured`,
+            );
+          }
         },
       },
-    }),
-  );
+    },
+  });
 
-  const ForumCondition = new GraphQLInputObjectType(
-    inputObjectSpec({
-      name: "ForumCondition",
-      fields: {
-        name: {
-          type: GraphQLString,
-          plan($condition: PgConditionPlan<any>, $value) {
-            if ($value.evalIs(null)) {
-              $condition.where(sql`${$condition.alias}.name is null`);
-            } else {
-              $condition.where(
-                sql`${$condition.alias}.name = ${$condition.placeholder(
-                  $value,
-                  sql`text`,
-                )}`,
-              );
-            }
-          },
+  const ForumCondition = newInputObjectType({
+    name: "ForumCondition",
+    fields: {
+      name: {
+        type: GraphQLString,
+        plan($condition: PgConditionPlan<any>, $value) {
+          if ($value.evalIs(null)) {
+            $condition.where(sql`${$condition.alias}.name is null`);
+          } else {
+            $condition.where(
+              sql`${$condition.alias}.name = ${$condition.placeholder(
+                $value,
+                sql`text`,
+              )}`,
+            );
+          }
         },
       },
-    }),
-  );
+    },
+  });
 
   class TempTablePlan<TDataSource extends PgSource<any, any, any, any>>
     extends BasePlan
@@ -1451,42 +1441,38 @@ export function makeExampleSchema(
     }
   }
 
-  const ForumToManyMessageFilter = new GraphQLInputObjectType(
-    inputObjectSpec({
-      name: "ForumToManyMessageFilter",
-      fields: {
-        some: {
-          type: MessageFilter,
-          plan($manyFilter: ManyFilterPlan<typeof messageSource>, $value) {
-            if (!$value.evalIs(null)) {
-              return $manyFilter.some();
-            }
-          },
+  const ForumToManyMessageFilter = newInputObjectType({
+    name: "ForumToManyMessageFilter",
+    fields: {
+      some: {
+        type: MessageFilter,
+        plan($manyFilter: ManyFilterPlan<typeof messageSource>, $value) {
+          if (!$value.evalIs(null)) {
+            return $manyFilter.some();
+          }
         },
       },
-    }),
-  );
+    },
+  });
 
-  const ForumFilter = new GraphQLInputObjectType(
-    inputObjectSpec({
-      name: "ForumFilter",
-      fields: {
-        messages: {
-          type: ForumToManyMessageFilter,
-          plan($condition: ClassFilterPlan, $value) {
-            if (!$value.evalIs(null)) {
-              return new ManyFilterPlan(
-                $condition,
-                messageSource,
-                ["id"],
-                ["forum_id"],
-              );
-            }
-          },
+  const ForumFilter = newInputObjectType({
+    name: "ForumFilter",
+    fields: {
+      messages: {
+        type: ForumToManyMessageFilter,
+        plan($condition: ClassFilterPlan, $value) {
+          if (!$value.evalIs(null)) {
+            return new ManyFilterPlan(
+              $condition,
+              messageSource,
+              ["id"],
+              ["forum_id"],
+            );
+          }
         },
       },
-    }),
-  );
+    },
+  });
 
   const Forum: GraphQLObjectType<any, OurGraphQLContext> = newObjectType<
     OurGraphQLContext,
@@ -2640,65 +2626,57 @@ export function makeExampleSchema(
     },
   });
 
-  const CreateRelationalPostInput = new GraphQLInputObjectType(
-    inputObjectSpec({
-      name: "CreateRelationalPostInput",
-      fields: {
-        title: {
-          type: new GraphQLNonNull(GraphQLString),
-        },
-        description: {
-          type: GraphQLString,
-        },
-        note: {
-          type: GraphQLString,
-        },
+  const CreateRelationalPostInput = newInputObjectType({
+    name: "CreateRelationalPostInput",
+    fields: {
+      title: {
+        type: new GraphQLNonNull(GraphQLString),
       },
-    }),
-  );
+      description: {
+        type: GraphQLString,
+      },
+      note: {
+        type: GraphQLString,
+      },
+    },
+  });
 
-  const RelationalPostPatch = new GraphQLInputObjectType(
-    inputObjectSpec({
-      name: "RelationalPostPatch",
-      fields: {
-        // All nullable, since it's a patch.
-        title: {
-          type: GraphQLString,
-        },
-        description: {
-          type: GraphQLString,
-        },
-        note: {
-          type: GraphQLString,
-        },
+  const RelationalPostPatch = newInputObjectType({
+    name: "RelationalPostPatch",
+    fields: {
+      // All nullable, since it's a patch.
+      title: {
+        type: GraphQLString,
       },
-    }),
-  );
+      description: {
+        type: GraphQLString,
+      },
+      note: {
+        type: GraphQLString,
+      },
+    },
+  });
 
-  const UpdateRelationalPostByIdInput = new GraphQLInputObjectType(
-    inputObjectSpec({
-      name: "UpdateRelationalPostByIdInput",
-      fields: {
-        id: {
-          type: new GraphQLNonNull(GraphQLInt),
-        },
-        patch: {
-          type: new GraphQLNonNull(RelationalPostPatch),
-        },
+  const UpdateRelationalPostByIdInput = newInputObjectType({
+    name: "UpdateRelationalPostByIdInput",
+    fields: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
       },
-    }),
-  );
+      patch: {
+        type: new GraphQLNonNull(RelationalPostPatch),
+      },
+    },
+  });
 
-  const DeleteRelationalPostByIdInput = new GraphQLInputObjectType(
-    inputObjectSpec({
-      name: "DeleteRelationalPostByIdInput",
-      fields: {
-        id: {
-          type: new GraphQLNonNull(GraphQLInt),
-        },
+  const DeleteRelationalPostByIdInput = newInputObjectType({
+    name: "DeleteRelationalPostByIdInput",
+    fields: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
       },
-    }),
-  );
+    },
+  });
 
   const relationalPostMutationFields = {
     post: {
