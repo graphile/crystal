@@ -74,9 +74,8 @@ export type PgExecutorContext<TSettings = any> = {
 };
 
 export type PgExecutorContextPlans<TSettings = any> = {
-  [key in keyof PgExecutorContext<TSettings>]: ExecutablePlan<
-    PgExecutorContext<TSettings>[key]
-  >;
+  pgSettings: ExecutablePlan<TSettings>;
+  withPgClient: ExecutablePlan<WithPgClient>;
 };
 
 export type PgExecutorInput<TInput> = {
@@ -107,9 +106,9 @@ export type PgExecutorSubscribeOptions = {
  * to the database. Used by PgSource but also directly by things like
  * PgSimpleFunctionCallPlan. Was once PgDataSource itself.
  */
-export class PgExecutor {
+export class PgExecutor<TSettings = any> {
   public name: string;
-  private contextCallback: () => ObjectPlan<PgExecutorContextPlans>;
+  private contextCallback: () => ObjectPlan<PgExecutorContextPlans<TSettings>>;
   private cache: WeakMap<
     Record<string, unknown> /* context */,
     LRU<
@@ -120,7 +119,7 @@ export class PgExecutor {
 
   constructor(options: {
     name: string;
-    context: () => ObjectPlan<PgExecutorContextPlans>;
+    context: () => ObjectPlan<PgExecutorContextPlans<TSettings>>;
   }) {
     const { name, context } = options;
     this.name = name;
@@ -132,7 +131,7 @@ export class PgExecutor {
   }
 
   // public context(): ExecutablePlan<any>
-  public context(): ObjectPlan<PgExecutorContextPlans> {
+  public context(): ObjectPlan<PgExecutorContextPlans<TSettings>> {
     return this.contextCallback();
   }
 

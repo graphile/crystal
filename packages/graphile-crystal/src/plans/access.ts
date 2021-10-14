@@ -178,9 +178,9 @@ export class AccessPlan<TData> extends ExecutablePlan<TData> {
   /**
    * Get the named property of an object.
    */
-  get<TAttr extends string>(
+  get<TAttr extends keyof TData & string>(
     attrName: TAttr,
-  ): AccessPlan<TData extends { [key: string]: any } ? TData[TAttr] : never> {
+  ): AccessPlan<TData[TAttr]> {
     return new AccessPlan(this.getPlan(this.parentPlanId), [
       ...this.path,
       attrName,
@@ -190,16 +190,16 @@ export class AccessPlan<TData> extends ExecutablePlan<TData> {
   /**
    * Get the entry at the given index in an array.
    */
-  at<TIndex extends number>(
+  at<TIndex extends keyof TData & number>(
     index: TIndex,
-  ): AccessPlan<TData extends Array<any> ? TData[TIndex] : never> {
+  ): AccessPlan<TData[TIndex]> {
     return new AccessPlan(this.getPlan(this.parentPlanId), [
       ...this.path,
       index,
     ]);
   }
 
-  execute(values: CrystalValuesList<[any]>): CrystalResultsList<TData> {
+  execute(values: CrystalValuesList<[TData]>): CrystalResultsList<TData> {
     return values.map(this.destructure);
   }
 

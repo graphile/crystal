@@ -1,4 +1,5 @@
 import type { Constraint } from "../constraints";
+import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
 import { ExecutablePlan } from "../plan";
 import type { __ValuePlan } from "./__value";
 import type { AccessPlan } from "./access";
@@ -29,7 +30,7 @@ export class __TrackedObjectPlan<TData = any> extends ExecutablePlan<TData> {
    * Could be anything. In the case of context it could even have exotic
    * entries such as `pgClient`.
    */
-  private readonly value: TData;
+  private readonly value: TData | undefined;
 
   /**
    * For runtime (not plan-time) access to the value.
@@ -49,7 +50,7 @@ export class __TrackedObjectPlan<TData = any> extends ExecutablePlan<TData> {
   private readonly path: Array<string | number>;
 
   constructor(
-    value: TData,
+    value: TData | undefined,
     valuePlan: __ValuePlan<TData> | AccessPlan<TData>,
     constraints: Constraint[],
     path: Array<string | number> = [],
@@ -62,7 +63,7 @@ export class __TrackedObjectPlan<TData = any> extends ExecutablePlan<TData> {
     this.path = path;
   }
 
-  execute(values: any[][]): any[] {
+  execute(values: CrystalValuesList<[TData]>): CrystalResultsList<TData> {
     // We have only one dependency, return the value of that.
     return values.map((v) => v[0]);
   }
@@ -70,13 +71,11 @@ export class __TrackedObjectPlan<TData = any> extends ExecutablePlan<TData> {
   /**
    * Get the named property of an object.
    */
-  get<TAttribute extends string>(
+  get<TAttribute extends keyof TData & string>(
     attrName: TAttribute,
-  ): __TrackedObjectPlan<
-    TData extends { [key in TAttribute]: infer U } ? U : any
-  > {
+  ): __TrackedObjectPlan<TData[TAttribute]> {
     const { value, path, constraints } = this;
-    const newValue = (value as any)?.[attrName];
+    const newValue = value?.[attrName];
     const newValuePlan = this.valuePlan.get(attrName);
     const newPath = [...path, attrName];
     return new __TrackedObjectPlan(
@@ -90,9 +89,11 @@ export class __TrackedObjectPlan<TData = any> extends ExecutablePlan<TData> {
   /**
    * Get the entry at the given index in an array.
    */
-  at(index: number): __TrackedObjectPlan<TData extends (infer U)[] ? U : any> {
+  at<TIndex extends keyof TData & number>(
+    index: TIndex,
+  ): __TrackedObjectPlan<TData[TIndex]> {
     const { value, path, constraints } = this;
-    const newValue = (value as any)?.[index];
+    const newValue = value?.[index];
     const newValuePlan = this.valuePlan.at(index);
     const newPath = [...path, index];
     return new __TrackedObjectPlan(
@@ -112,7 +113,7 @@ export class __TrackedObjectPlan<TData = any> extends ExecutablePlan<TData> {
    *
    * **WARNING**: this is the most expensive eval, if you need to eval, prefer evalIs, evalHas, etc instead.
    */
-  eval(): TData {
+  eval(): TData | undefined {
     const { path, value } = this;
     this.constraints.push({
       type: "value",
@@ -131,7 +132,7 @@ export class __TrackedObjectPlan<TData = any> extends ExecutablePlan<TData> {
    *
    * **WARNING**: avoid using this where possible, it causes Aethers to split.
    */
-  evalIs(expectedValue: any): boolean {
+  evalIs(expectedValue: unknown): boolean {
     const { value, path } = this;
     const pass = value === expectedValue;
     this.constraints.push({
