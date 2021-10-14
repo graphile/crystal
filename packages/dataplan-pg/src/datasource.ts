@@ -262,6 +262,7 @@ export class PgSource<
     this.relationsThunk = typeof relations === "function" ? relations : null;
     if (typeof relations !== "function") {
       this._relations = relations || ({} as TRelations);
+      this.validateRelations();
     }
   }
 
@@ -269,10 +270,55 @@ export class PgSource<
     return chalk.bold.blue(`PgSource(${this.name})`);
   }
 
+  private validateRelations(): void {
+    // TODO: skip this if not isDev?
+
+    if (!this._relations) {
+      return;
+    }
+
+    // Check that all the `via` and `identicalVia` match actual relations.
+    const relationKeys = Object.keys(this._relations);
+    Object.entries(this.columns).forEach(([columnName, col]) => {
+      const { via, identicalVia } = col;
+      if (via) {
+        if (typeof via === "string") {
+          if (!relationKeys.includes(via)) {
+            throw new Error(
+              `${this} claims column '${columnName}' is via relation '${via}', but there is no such relation.`,
+            );
+          }
+        } else {
+          if (!relationKeys.includes(via.relation)) {
+            throw new Error(
+              `${this} claims column '${columnName}' is via relation '${via.relation}', but there is no such relation.`,
+            );
+          }
+        }
+      }
+      if (identicalVia) {
+        if (typeof identicalVia === "string") {
+          if (!relationKeys.includes(identicalVia)) {
+            throw new Error(
+              `${this} claims column '${columnName}' is identicalVia relation '${identicalVia}', but there is no such relation.`,
+            );
+          }
+        } else {
+          if (!relationKeys.includes(identicalVia.relation)) {
+            throw new Error(
+              `${this} claims column '${columnName}' is identicalVia relation '${identicalVia.relation}', but there is no such relation.`,
+            );
+          }
+        }
+      }
+    });
+  }
+
   private getRelations(): TRelations {
     if (typeof this.relationsThunk === "function") {
       this._relations = this.relationsThunk();
       this.relationsThunk = null;
+      this.validateRelations();
     }
     if (!this._relations) {
       throw new Error("PgSource relations must not be null");
