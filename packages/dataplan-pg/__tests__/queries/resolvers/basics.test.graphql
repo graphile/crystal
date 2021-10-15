@@ -1,0 +1,7 @@
+## expect(errors).toBeFalsy()
+{
+  randomUser {
+    username
+    usernameHash(hashType: SHA1)
+  }
+}

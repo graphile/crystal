@@ -1,6 +1,7 @@
 import { jsonParse } from "@dataplan/json";
+import * as crypto from "crypto";
 import { writeFileSync } from "fs";
-import {
+import type {
   __TrackedObjectPlan,
   __ValuePlan,
   AccessPlan,
@@ -12,8 +13,10 @@ import {
   InputObjectPlan,
   InputStaticLeafPlan,
   ObjectLikePlan,
-  GraphileCrystalFieldConfig,
+} from "graphile-crystal";
+import {
   BaseGraphQLArguments,
+  GraphileCrystalFieldConfig,
   newGraphileCrystalFieldConfigBuilder,
 } from "graphile-crystal";
 import {
@@ -1045,6 +1048,15 @@ export function makeExampleSchema(
     };
   }
 
+  const HashType = new GraphQLEnumType({
+    name: "HashType",
+    values: {
+      MD5: { value: "md5" },
+      SHA1: { value: "sha1" },
+      SHA256: { value: "sha256" },
+    },
+  });
+
   const User = newObjectTypeBuilder<OurGraphQLContext, UserPlan>()({
     name: "User",
     fields: () => ({
@@ -1060,6 +1072,25 @@ export function makeExampleSchema(
           }).single();
           deoptimizeIfAppropriate($forum);
           return $forum;
+        },
+      },
+
+      // This field is to test standard resolvers work on planned types
+      usernameHash: {
+        type: GraphQLString,
+        args: {
+          hashType: {
+            type: new GraphQLNonNull(HashType),
+          },
+        },
+        plan($user) {
+          return object({ username: $user.get("username") });
+        },
+        resolve({ usernameHash: user }, args) {
+          return crypto
+            .createHash(args.hashType)
+            .update(user.username)
+            .digest("hex");
         },
       },
     }),
