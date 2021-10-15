@@ -1,0 +1,10 @@
+## expect(errors).toBeFalsy()
+{
+  randomUser {
+    username
+    usernameHashes {
+      md5
+      sha256
+    }
+  }
+}

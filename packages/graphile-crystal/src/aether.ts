@@ -745,8 +745,13 @@ export class Aether<
         // peers are identical.
         this.deduplicatePlans(oldPlansLength);
       } else {
+        // There's no plan resolver; use a __ValuePlan instead.
+        const wgs = withGlobalState.bind(null, {
+          aether: this,
+          parentPathIdentity: path,
+        }) as <T>(cb: () => T) => T;
         // Note: this is populated in GetValuePlanId
-        plan = new __ValuePlan();
+        plan = wgs(() => new __ValuePlan());
       }
 
       this.planIdByPathIdentity[pathIdentity] = plan.id;

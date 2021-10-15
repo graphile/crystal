@@ -34,7 +34,7 @@ import {
   resolveType,
   subscribe,
 } from "graphile-crystal";
-import type { GraphQLObjectType, GraphQLOutputType } from "graphql";
+import type { GraphQLOutputType } from "graphql";
 import {
   GraphQLBoolean,
   GraphQLEnumType,
@@ -42,6 +42,7 @@ import {
   GraphQLInterfaceType,
   GraphQLList,
   GraphQLNonNull,
+  GraphQLObjectType,
   GraphQLSchema,
   GraphQLString,
   GraphQLUnionType,
@@ -1057,6 +1058,30 @@ export function makeExampleSchema(
     },
   });
 
+  const Hashes = new GraphQLObjectType({
+    name: "Hashes",
+    fields: {
+      md5: {
+        type: GraphQLString,
+        resolve(parent) {
+          return crypto.createHash("md5").update(parent.text).digest("hex");
+        },
+      },
+      sha1: {
+        type: GraphQLString,
+        resolve(parent) {
+          return crypto.createHash("sha1").update(parent.text).digest("hex");
+        },
+      },
+      sha256: {
+        type: GraphQLString,
+        resolve(parent) {
+          return crypto.createHash("sha256").update(parent.text).digest("hex");
+        },
+      },
+    },
+  });
+
   const User = newObjectTypeBuilder<OurGraphQLContext, UserPlan>()({
     name: "User",
     fields: () => ({
@@ -1091,6 +1116,16 @@ export function makeExampleSchema(
             .createHash(args.hashType)
             .update(user.username)
             .digest("hex");
+        },
+      },
+      // This field is to test standard resolvers work when returning non-scalars on planned types
+      usernameHashes: {
+        type: Hashes,
+        plan($user) {
+          return $user.get("username");
+        },
+        resolve({ usernameHash: username }) {
+          return { text: username };
         },
       },
     }),
