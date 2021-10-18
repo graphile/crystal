@@ -20037,7 +20037,18 @@ exports[`exports a schema as JSON 1`] = `
             {
               \\"name\\": \\"args\\",
               \\"description\\": null,
-              \\"args\\": [],
+              \\"args\\": [
+                {
+                  \\"name\\": \\"includeDeprecated\\",
+                  \\"description\\": null,
+                  \\"type\\": {
+                    \\"kind\\": \\"SCALAR\\",
+                    \\"name\\": \\"Boolean\\",
+                    \\"ofType\\": null
+                  },
+                  \\"defaultValue\\": \\"false\\"
+                }
+              ],
               \\"type\\": {
                 \\"kind\\": \\"NON_NULL\\",
                 \\"name\\": null,
@@ -21568,6 +21579,56 @@ enum ForeignKeysOrderBy {
   PERSON_ID_DESC
 }
 
+\\"\\"\\"All input for the \`intSetMutation\` mutation.\\"\\"\\"
+input IntSetMutationInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  x: Int
+  y: Int
+  z: Int
+}
+
+\\"\\"\\"The output of our \`intSetMutation\` mutation.\\"\\"\\"
+type IntSetMutationPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  integers: [Int]
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"A connection to a list of \`Int\` values.\\"\\"\\"
+type IntSetQueryConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`Int\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [IntSetQueryEdge!]!
+
+  \\"\\"\\"A list of \`Int\` objects.\\"\\"\\"
+  nodes: [Int]!
+
+  \\"\\"\\"The count of *all* \`Int\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
+}
+
+\\"\\"\\"A \`Int\` edge in the connection.\\"\\"\\"
+type IntSetQueryEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Int\` at the end of the edge.\\"\\"\\"
+  node: Int
+}
+
 \\"\\"\\"
 An interval of time that has passed where the smallest distinct unit is a second.
 \\"\\"\\"
@@ -21620,56 +21681,6 @@ input IntervalInput {
 
   \\"\\"\\"A quantity of years.\\"\\"\\"
   years: Int
-}
-
-\\"\\"\\"All input for the \`intSetMutation\` mutation.\\"\\"\\"
-input IntSetMutationInput {
-  \\"\\"\\"
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  \\"\\"\\"
-  clientMutationId: String
-  x: Int
-  y: Int
-  z: Int
-}
-
-\\"\\"\\"The output of our \`intSetMutation\` mutation.\\"\\"\\"
-type IntSetMutationPayload {
-  \\"\\"\\"
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  \\"\\"\\"
-  clientMutationId: String
-  integers: [Int]
-
-  \\"\\"\\"
-  Our root query field type. Allows us to run any query from our mutation payload.
-  \\"\\"\\"
-  query: Query
-}
-
-\\"\\"\\"A connection to a list of \`Int\` values.\\"\\"\\"
-type IntSetQueryConnection {
-  \\"\\"\\"
-  A list of edges which contains the \`Int\` and cursor to aid in pagination.
-  \\"\\"\\"
-  edges: [IntSetQueryEdge!]!
-
-  \\"\\"\\"A list of \`Int\` objects.\\"\\"\\"
-  nodes: [Int]!
-
-  \\"\\"\\"The count of *all* \`Int\` you could get from the connection.\\"\\"\\"
-  totalCount: Int!
-}
-
-\\"\\"\\"A \`Int\` edge in the connection.\\"\\"\\"
-type IntSetQueryEdge {
-  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
-  cursor: Cursor
-
-  \\"\\"\\"The \`Int\` at the end of the edge.\\"\\"\\"
-  node: Int
 }
 
 \\"\\"\\"
@@ -23593,26 +23604,26 @@ enum TypesOrderBy {
   BOOLEAN_DESC
   COMPOUND_TYPE_ASC
   COMPOUND_TYPE_DESC
-  DATE_ASC
-  DATE_DESC
   DATERANGE_ASC
   DATERANGE_DESC
+  DATE_ASC
+  DATE_DESC
   DECIMAL_ASC
   DECIMAL_DESC
-  DOMAIN_ASC
-  DOMAIN_DESC
   DOMAIN2_ASC
   DOMAIN2_DESC
+  DOMAIN_ASC
+  DOMAIN_DESC
   ENUM_ASC
   ENUM_DESC
   ID_ASC
   ID_DESC
   INTERVAL_ASC
   INTERVAL_DESC
-  JSON_ASC
-  JSON_DESC
   JSONB_ASC
   JSONB_DESC
+  JSON_ASC
+  JSON_DESC
   MONEY_ASC
   MONEY_DESC
   NATURAL
@@ -23630,17 +23641,22 @@ enum TypesOrderBy {
   SMALLINT_DESC
   TEXT_ARRAY_ASC
   TEXT_ARRAY_DESC
-  TIME_ASC
-  TIME_DESC
-  TIMESTAMP_ASC
-  TIMESTAMP_DESC
   TIMESTAMPTZ_ASC
   TIMESTAMPTZ_DESC
+  TIMESTAMP_ASC
+  TIMESTAMP_DESC
   TIMETZ_ASC
   TIMETZ_DESC
+  TIME_ASC
+  TIME_DESC
   VARCHAR_ASC
   VARCHAR_DESC
 }
+
+\\"\\"\\"
+A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+\\"\\"\\"
+scalar UUID
 
 \\"\\"\\"YOYOYO!!\\"\\"\\"
 type UpdatableView {
@@ -24083,10 +24099,5 @@ type UpdateTypePayload {
     orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]
   ): TypesEdge
 }
-
-\\"\\"\\"
-A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
-\\"\\"\\"
-scalar UUID
 "
 `;
