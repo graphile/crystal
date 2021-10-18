@@ -341,8 +341,8 @@ export interface GraphQLFormattedErrorExtended {
 export type GraphQLErrorExtended = GraphQLError & {
   extensions: {
     exception: {
-      hint: string;
-      detail: string;
+      hint?: string;
+      detail?: string;
       code: string;
     };
   };
