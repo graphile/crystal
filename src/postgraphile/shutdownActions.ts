@@ -52,7 +52,7 @@ export class ShutdownActions {
   }
 
   /**
-   * Calls the release actions in parallel and returns the array of resulting
+   * Calls the release actions in reverse order and returns the array of resulting
    * promises/results. Will not throw unless the shutdown actions have already
    * been invoked.
    */
@@ -63,16 +63,20 @@ export class ShutdownActions {
     this.didInvoke = true;
     const actions = this.actions;
     this.actions = [];
-    // Invoke in parallel.
-    return actions.map(fn => {
+    // Invoke in reverse order.
+    const result = new Array(actions.length);
+    let chain = Promise.resolve();
+    for (let i = actions.length - 1; i >= 0; i--) {
+      const fn = actions[i];
+
       // Ensure that all actions are called, even if a previous action throws an
       // error.
-      try {
-        return fn();
-      } catch (e) {
-        return Promise.reject(e);
-      }
-    });
+      result[i] = chain = chain.then(
+        () => fn(),
+        () => fn(),
+      );
+    }
+    return result;
   }
 
   /**
