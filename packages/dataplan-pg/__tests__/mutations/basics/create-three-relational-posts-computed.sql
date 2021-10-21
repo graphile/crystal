@@ -44,7 +44,8 @@ from (
 ) as __relational_posts_identifiers__,
 lateral (
   select
-    __relational_posts_identifiers__.idx as "0"
+    __relational_posts__::text as "0",
+    __relational_posts_identifiers__.idx as "1"
   from interfaces_and_unions.insert_post(__relational_posts_identifiers__."id0", __relational_posts_identifiers__."id1") as __relational_posts__
   where (
     true /* authorization checks */

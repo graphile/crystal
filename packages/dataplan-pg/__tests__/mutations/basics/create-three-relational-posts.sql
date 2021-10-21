@@ -14,7 +14,9 @@ insert into interfaces_and_unions.relational_items as __relational_items__ ("typ
   __relational_items__."id"::text as "0"
 
 
-insert into interfaces_and_unions.relational_posts as __relational_posts__ ("id", "title", "description", "note") values ($1::"int4", $2::"text", $3::"text", $4::"text")
+insert into interfaces_and_unions.relational_posts as __relational_posts__ ("id", "title", "description", "note") values ($1::"int4", $2::"text", $3::"text", $4::"text") returning
+  __relational_posts__::text as "0"
+
 
 select __relational_items_result__.*
 from (

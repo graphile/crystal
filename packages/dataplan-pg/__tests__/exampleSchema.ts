@@ -2941,6 +2941,13 @@ export function makeExampleSchema(
               $post.set(key, $value);
             }
           }
+
+          // NOTE: returning a record() here is unnecessary and requires
+          // `select *` privileges. In a normal schema we'd just return the
+          // mutation plan directly. Even if we're sharing types it would
+          // generally be better to return the identifier and then look up the
+          // record using the identifier. Nonetheless, this is useful for tests.
+
           // Since our field type, `CreateRelationalPostPayload`, is shared between
           // `createRelationalPost`, `createThreeRelationalPosts` and
           // `createThreeRelationalPostsComputed` must return a common plan
@@ -2972,11 +2979,8 @@ export function makeExampleSchema(
               note: constant(null),
             });
           }
-          // Since our field type, `CreateRelationalPostPayload`, is shared
-          // between `createRelationalPost`, `createThreeRelationalPosts` and
-          // `createThreeRelationalPostsComputed` must return a common plan
-          // type that `CreateRelationalPostPayload` can use; in this case a
-          // `PgClassExpressionPlan`
+
+          // See NOTE in createRelationalPost plan.
           return $post.record();
         },
       },
@@ -3009,11 +3013,8 @@ export function makeExampleSchema(
             });
             $post.hasSideEffects = true;
           }
-          // Since our field type, `CreateRelationalPostPayload`, is shared between
-          // `createRelationalPost`, `createThreeRelationalPosts` and
-          // `createThreeRelationalPostsComputed` must return a common plan
-          // type that `CreateRelationalPostPayload` can use; in this case a
-          // `PgClassExpressionPlan`
+
+          // See NOTE in createRelationalPost plan.
           return $post.single().record();
         },
       },
