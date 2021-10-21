@@ -52,6 +52,12 @@ declare module "graphql" {
       plan?: InputObjectFieldPlanResolver<any, any, any, any>;
     };
   }
+
+  interface GraphQLObjectTypeExtensions<_TSource = any, _TContext = any> {
+    graphile?: {
+      Plan?: { new (...args: any[]): ExecutablePlan };
+    };
+  }
 }
 
 export const $$crystalContext = Symbol("context");
@@ -123,6 +129,11 @@ export interface Batch {
   itemPlan: ExecutablePlan;
   entries: Array<[CrystalObject, Deferred<any>]>;
   returnType: GraphQLOutputType;
+  /**
+   * If the user has their own resolver we must return raw data, otherwise
+   * we'll return CrystalObjects.
+   */
+  returnRaw: boolean;
 }
 
 export interface CrystalContext {

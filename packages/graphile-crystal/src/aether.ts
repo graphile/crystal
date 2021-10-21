@@ -7,6 +7,7 @@ import type {
   GraphQLInputField,
   GraphQLInputObjectType,
   GraphQLInputType,
+  GraphQLNamedType,
   GraphQLOutputType,
   GraphQLSchema,
   OperationDefinitionNode,
@@ -84,7 +85,7 @@ import {
 } from "./plans";
 import { __ItemPlan } from "./plans/subscribe";
 import { assertPolymorphicData } from "./polymorphic";
-import { newCrystalObject } from "./resolvers";
+import { $$crystalWrapped, newCrystalObject } from "./resolvers";
 import { stripAnsi } from "./stripAnsi";
 import type { UniqueId } from "./utils";
 import {
@@ -255,6 +256,10 @@ export class Aether<
     [pathIdentity: string]: number[];
   };
 
+  public readonly returnRawValueByPathIdentity: {
+    [fieldPathIdentity: string]: boolean;
+  };
+
   /**
    * The field at each given path identity may be in one or more groups; these
    * groups govern how the plans run (e.g. a plan will likely not optimise
@@ -378,6 +383,7 @@ export class Aether<
       [ROOT_PATH]: this.rootValuePlan.id,
     });
     this.sideEffectPlanIdsByPathIdentity = Object.create(null);
+    this.returnRawValueByPathIdentity = Object.create(null);
     this.groupIdsByPathIdentity = Object.assign(Object.create(null), {
       [ROOT_PATH]: [0],
     });
@@ -650,8 +656,114 @@ export class Aether<
       // This is presumed to exist because the operation passed validation.
       const objectField = objectTypeFields[fieldName];
       const fieldType = objectTypeFields[fieldName].type;
-
       const planResolver = objectField.extensions?.graphile?.plan;
+
+      /*
+       *  When considering resolvers on fields, there's three booleans to
+       *  consider:
+       *
+       *  - typeIsPlanned: Does the type the field is defined on expect a plan?
+       *    - NOTE: the root types (Query, Mutation, Subscription) implicitly
+       *      expect the "root plan"
+       *  - fieldHasPlan: Does the field define a `plan()` method?
+       *  - resultIsPlanned: Does the named type that the field returns (the
+       *    "named field type") expect a plan?
+       *    - NOTE: only object types, unions and interfaces may expect plans;
+       *      but not all of them do.
+       *    - NOTE: a union/interface expects a plan iff ANY of its object
+       *      types expect plans
+       *    - NOTE: if ANY object type in an interface/union expects a plan
+       *      then ALL object types within the interface/union must expect
+       *      plans.
+       *    - NOTE: scalars and enums never expect a plan.
+       *
+       *  These booleans impact:
+       *
+       *  - Whether there must be a `plan()` declaration and what the "parent"
+       *    argument is to the same
+       *    - If typeIsPlanned:
+       *      - Assert: `fieldHasPlan` must be true
+       *      - Pass through the parent plan
+       *    - Else, if resultIsPlanned:
+       *      - Assert: `fieldHasPlan` must be true
+       *      - Pass through a `__ValuePlan` representing the parent value.
+       *    - Else, if fieldHasPlan:
+       *      - Pass through a `__ValuePlan` representing the parent value.
+       *    - Else
+       *      - No action necessary.
+       *  - If the field may define `resolve()` and what the "parent" argument
+       *    is to the same
+       *    - If resultIsPlanned
+       *      - Assert: there must not be a `resolve()`
+       *      - Crystal provides pure resolver.
+       *    - Else if fieldHasPlan (which may be implied by typeIsPlanned
+       *      above)
+       *      - If `resolve()` is not set:
+       *        - crystal will return the value from the plan directly
+       *      - Otherwise:
+       *        - Crystal will wrap this resolver and will call `resolve()` (or
+       *          default resolver) with the plan result.  IMPORTANT: you may
+       *          want to use an `ObjectPlan` so that the parent object is of
+       *          the expected shape; e.g. your plan might return
+       *          `object({username: $username})` for a `User.username` field.
+       *    - Else
+       *      - Leave `resolve()` untouched - do not even wrap it.
+       *      - (Failing that, use a __ValuePlan and return the result
+       *        directly.)
+       */
+
+      /**
+       * This could be the crystal resolver or a user-supplied resolver or
+       * nothing.
+       */
+      const rawResolver = objectField.resolve;
+
+      const typePlan = objectType.extensions?.graphile?.Plan;
+      const namedResultType = getNamedType(fieldType);
+      const namedResultTypeIsLeaf = isLeafType(namedResultType);
+
+      /**
+       * This will never be the crystal resolver - only ever the user-supplied
+       * resolver or nothing
+       */
+      const graphqlResolver =
+        rawResolver && $$crystalWrapped in rawResolver
+          ? rawResolver[$$crystalWrapped]
+          : rawResolver;
+      /*
+        namedResultType instanceof GraphQLInterfaceType ||
+        namedResultType instanceof GraphQLUnionType
+        */
+      const resultIsPlanned = isTypePlanned(this.schema, namedResultType);
+      const fieldHasPlan = !!planResolver;
+
+      // Return raw data if either the user has their own resolver _or_ it's a leaf field.
+      const returnRaw = graphqlResolver != null || namedResultTypeIsLeaf;
+
+      if (typePlan && !fieldHasPlan) {
+        throw new Error(
+          `Every field within a planned type must have a plan; object type ${
+            objectType.name
+          } expects a ${typePlan.name || "ExecutablePlan"} however field ${
+            objectType.name
+          }.${fieldName} has no plan. Please add an 'extensions.graphile.plan' callback to this field.`,
+        );
+      }
+
+      if (!typePlan && resultIsPlanned && !fieldHasPlan) {
+        throw new Error(
+          `Field ${objectType.name}.${fieldName} returns a ${namedResultType.name} which expects a plan to be available; however this field has no plan() method to produce such a plan; please add 'extensions.graphile.plan' to this field.`,
+        );
+      }
+
+      if (resultIsPlanned && graphqlResolver) {
+        throw new Error(
+          `Field ${objectType.name}.${fieldName} returns a ${namedResultType.name} which expects a plan to be available; this means that ${objectType.name}.${fieldName} is forbidden from defining a GraphQL resolver.`,
+        );
+      }
+
+      this.returnRawValueByPathIdentity[pathIdentity] = returnRaw;
+
       let plan: ExecutablePlan | PolymorphicPlan;
       this.sideEffectPlanIdsByPathIdentity[pathIdentity] = [];
       if (typeof planResolver === "function") {
@@ -2116,6 +2228,9 @@ export class Aether<
     const itemPlanId = isSubscribe
       ? this.subscriptionItemPlanId
       : this.itemPlanIdByFieldPathIdentity[fieldPathIdentity];
+    const returnRaw = isSubscribe
+      ? false
+      : !!this.returnRawValueByPathIdentity[fieldPathIdentity];
     /*
     if (planId == null) {
       throw new Error(
@@ -2164,6 +2279,7 @@ export class Aether<
       itemPlan,
       entries: [],
       returnType,
+      returnRaw,
     };
     return batch;
   }
@@ -2479,7 +2595,8 @@ export class Aether<
     // This guarantees nothing else will be added to the batch
     delete this.batchByPathIdentity[batch.pathIdentity];
 
-    const { entries, sideEffectPlans, plan, itemPlan, returnType } = batch;
+    const { entries, sideEffectPlans, plan, itemPlan, returnType, returnRaw } =
+      batch;
     const namedReturnType = getNamedType(returnType);
     const entriesLength = entries.length;
     const crystalObjects: CrystalObject[] = new Array(entriesLength);
@@ -2556,11 +2673,10 @@ export class Aether<
         );
       }
 
-      const isScalar = isLeafType(namedReturnType);
+      const isLeaf = isLeafType(namedReturnType);
       const isPolymorphic =
-        !isScalar &&
-        (isUnionType(namedReturnType) || isInterfaceType(namedReturnType));
-      if (!isScalar && !isPolymorphic) {
+        isUnionType(namedReturnType) || isInterfaceType(namedReturnType);
+      if (!isLeaf && !isPolymorphic) {
         assertObjectType(namedReturnType);
       }
 
@@ -2578,10 +2694,13 @@ export class Aether<
         );
       };
 
-      // Now, execute the layers to get the result
+      // TODO: what should we do if the user has a graphqlResolver AND it's a
+      // polymorphic plan?
+
+      // Execute the layers to get the result
       const mapResult: MapResult =
-        // When we're returning a scalar it will not be wrapped in a crystal object - just get the data and return it directly.
-        isScalar
+        // The user has their own resolver, so we must not return a crystalObject
+        returnRaw
           ? (_clo, data) => data
           : // When we're returning something polymorphic we need to figure out the typeName which we get from the plan result.
           isPolymorphic
@@ -2889,4 +3008,33 @@ function treeNodePath(
     path.splice(listChangeIndex, path.length - listChangeIndex);
   }
   return path;
+}
+
+function isTypePlanned(
+  schema: GraphQLSchema,
+  namedType: GraphQLNamedType,
+): boolean {
+  if (namedType instanceof GraphQLObjectType) {
+    return !!namedType.extensions?.graphile?.Plan;
+  } else if (
+    namedType instanceof GraphQLUnionType ||
+    namedType instanceof GraphQLInterfaceType
+  ) {
+    const types =
+      namedType instanceof GraphQLUnionType
+        ? namedType.getTypes()
+        : schema.getImplementations(namedType).objects;
+    let firstHadPlan = null;
+    for (const type of types) {
+      const hasPlan = !!type.extensions?.graphile?.Plan;
+      if (firstHadPlan === null) {
+        firstHadPlan = hasPlan;
+      } else if (hasPlan !== firstHadPlan) {
+        throw new Error();
+      }
+    }
+    return !!firstHadPlan;
+  } else {
+    return false;
+  }
 }

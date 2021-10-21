@@ -343,9 +343,17 @@ function objectSpec<
   TFields extends ObjectTypeFields<TContext, TParentPlan>,
 >(
   spec: ObjectTypeSpec<TContext, TParentPlan, TFields>,
+  Plan: { new (...args: any[]): TParentPlan },
 ): GraphQLObjectTypeConfig<any, TContext> {
   const modifiedSpec: GraphQLObjectTypeConfig<any, TContext> = {
     ...spec,
+    extensions: {
+      ...spec.extensions,
+      graphile: {
+        Plan,
+        ...spec.extensions?.graphile,
+      },
+    },
     fields: () => {
       const fields =
         typeof spec.fields === "function" ? spec.fields() : spec.fields;
@@ -374,11 +382,13 @@ export type GraphileObjectType<
 export function newObjectTypeBuilder<
   TContext extends BaseGraphQLContext,
   TParentPlan extends ExecutablePlan<any>,
->(): <TFields extends ObjectTypeFields<TContext, TParentPlan>>(
+>(Plan: {
+  new (...args: any[]): TParentPlan;
+}): <TFields extends ObjectTypeFields<TContext, TParentPlan>>(
   spec: ObjectTypeSpec<TContext, TParentPlan, TFields>,
 ) => GraphileObjectType<TContext, TParentPlan, TFields> {
   return (spec) =>
-    new GraphQLObjectType(objectSpec(spec)) as GraphileObjectType<
+    new GraphQLObjectType(objectSpec(spec, Plan)) as GraphileObjectType<
       TContext,
       TParentPlan,
       any

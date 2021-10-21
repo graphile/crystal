@@ -1,9 +1,8 @@
-import { jsonParse } from "@dataplan/json";
+import { jsonParse, JSONParsePlan } from "@dataplan/json";
 import * as crypto from "crypto";
 import { writeFileSync } from "fs";
 import type {
   __TrackedObjectPlan,
-  __ValuePlan,
   AccessPlan,
   BaseGraphQLContext,
   BaseGraphQLRootValue,
@@ -12,14 +11,10 @@ import type {
   ExecutablePlan,
   InputObjectPlan,
   InputStaticLeafPlan,
-  ObjectLikePlan,
 } from "graphile-crystal";
 import {
-  BaseGraphQLArguments,
-  GraphileCrystalFieldConfig,
+  __ValuePlan,
   newGraphileCrystalFieldConfigBuilder,
-} from "graphile-crystal";
-import {
   BasePlan,
   constant,
   context,
@@ -56,9 +51,7 @@ import { inspect } from "util";
 import type {
   PgClassExpressionPlan,
   PgConditionCapableParentPlan,
-  PgDeletePlan,
   PgExecutorContextPlans,
-  PgInsertPlan,
   PgSelectPlan,
   PgSourceColumn,
   PgSourceColumnVia,
@@ -67,14 +60,17 @@ import type {
   PgTypeCodec,
   WithPgClient,
 } from "../src";
+import { PgPolymorphicPlan } from "../src";
 import {
   enumType,
   pgClassExpression,
   PgConditionPlan,
   PgConnectionPlan,
   pgDelete,
+  PgDeletePlan,
   PgExecutor,
   pgInsert,
+  PgInsertPlan,
   pgPolymorphic,
   pgSelect,
   pgSelectSingleFromRecord,
@@ -86,7 +82,7 @@ import {
   TYPES,
 } from "../src";
 import type { PgClassSinglePlan } from "../src/interfaces";
-import type { PgUpdatePlan } from "../src/plans/pgUpdate";
+import { PgUpdatePlan } from "../src/plans/pgUpdate";
 import { pgUpdate } from "../src/plans/pgUpdate";
 
 // These are what the generics extend from
@@ -1082,7 +1078,9 @@ export function makeExampleSchema(
     },
   });
 
-  const User = newObjectTypeBuilder<OurGraphQLContext, UserPlan>()({
+  const User = newObjectTypeBuilder<OurGraphQLContext, UserPlan>(
+    PgSelectSinglePlan,
+  )({
     name: "User",
     fields: () => ({
       username: attrField("username", GraphQLString),
@@ -1174,7 +1172,9 @@ export function makeExampleSchema(
       },
     },
   });
-  const Message = newObjectTypeBuilder<OurGraphQLContext, MessagePlan>()({
+  const Message = newObjectTypeBuilder<OurGraphQLContext, MessagePlan>(
+    PgSelectSinglePlan,
+  )({
     name: "Message",
     fields: () => ({
       id: attrField("id", GraphQLString),
@@ -1194,7 +1194,9 @@ export function makeExampleSchema(
     }),
   });
 
-  const MessageEdge = newObjectTypeBuilder<OurGraphQLContext, MessagePlan>()({
+  const MessageEdge = newObjectTypeBuilder<OurGraphQLContext, MessagePlan>(
+    PgSelectSinglePlan,
+  )({
     name: "MessageEdge",
     fields: {
       cursor: {
@@ -1215,12 +1217,13 @@ export function makeExampleSchema(
   const MessagesConnection = newObjectTypeBuilder<
     OurGraphQLContext,
     MessageConnectionPlan
-  >()({
+  >(PgConnectionPlan)({
     name: "MessagesConnection",
     fields: {
       edges: {
         type: new GraphQLList(MessageEdge),
         plan($connection) {
+          // return context();
           return $connection.nodes();
         },
       },
@@ -1230,6 +1233,7 @@ export function makeExampleSchema(
       >()({
         type: new GraphQLList(Message),
         plan($connection) {
+          // return context();
           return $connection.nodes();
         },
       }),
@@ -1578,7 +1582,7 @@ export function makeExampleSchema(
   const Forum: GraphQLObjectType<any, OurGraphQLContext> = newObjectTypeBuilder<
     OurGraphQLContext,
     ForumPlan
-  >()({
+  >(PgSelectSinglePlan)({
     name: "Forum",
     fields: () => ({
       id: attrField("id", GraphQLString),
@@ -1908,7 +1912,9 @@ export function makeExampleSchema(
     );
 
   const PersonBookmark: GraphQLObjectType<any, OurGraphQLContext> =
-    newObjectTypeBuilder<OurGraphQLContext, PersonBookmarkPlan>()({
+    newObjectTypeBuilder<OurGraphQLContext, PersonBookmarkPlan>(
+      PgSelectSinglePlan,
+    )({
       name: "PersonBookmark",
       fields: () => ({
         id: attrField("id", GraphQLInt),
@@ -1923,7 +1929,7 @@ export function makeExampleSchema(
     });
 
   const Person: GraphQLObjectType<any, OurGraphQLContext> =
-    newObjectTypeBuilder<OurGraphQLContext, PersonPlan>()({
+    newObjectTypeBuilder<OurGraphQLContext, PersonPlan>(PgSelectSinglePlan)({
       name: "Person",
       fields: () => ({
         personId: attrField("person_id", GraphQLInt),
@@ -1964,7 +1970,7 @@ export function makeExampleSchema(
   const Post: GraphQLObjectType<any, OurGraphQLContext> = newObjectTypeBuilder<
     OurGraphQLContext,
     PostPlan
-  >()({
+  >(PgSelectSinglePlan)({
     name: "Post",
     fields: () => ({
       postId: attrField("post_id", GraphQLInt),
@@ -1974,7 +1980,7 @@ export function makeExampleSchema(
   });
 
   const Comment: GraphQLObjectType<any, OurGraphQLContext> =
-    newObjectTypeBuilder<OurGraphQLContext, CommentPlan>()({
+    newObjectTypeBuilder<OurGraphQLContext, CommentPlan>(PgSelectSinglePlan)({
       name: "Comment",
       fields: () => ({
         commentId: attrField("comment_id", GraphQLInt),
@@ -2024,7 +2030,7 @@ export function makeExampleSchema(
   const SingleTableTopic = newObjectTypeBuilder<
     OurGraphQLContext,
     SingleTableItemPlan
-  >()({
+  >(PgSelectSinglePlan)({
     name: "SingleTableTopic",
     interfaces: [SingleTableItem],
     fields: () => ({
@@ -2036,7 +2042,7 @@ export function makeExampleSchema(
   const SingleTablePost = newObjectTypeBuilder<
     OurGraphQLContext,
     SingleTableItemPlan
-  >()({
+  >(PgSelectSinglePlan)({
     name: "SingleTablePost",
     interfaces: [SingleTableItem],
     fields: () => ({
@@ -2050,7 +2056,7 @@ export function makeExampleSchema(
   const SingleTableDivider = newObjectTypeBuilder<
     OurGraphQLContext,
     SingleTableItemPlan
-  >()({
+  >(PgSelectSinglePlan)({
     name: "SingleTableDivider",
     interfaces: [SingleTableItem],
     fields: () => ({
@@ -2063,7 +2069,7 @@ export function makeExampleSchema(
   const SingleTableChecklist = newObjectTypeBuilder<
     OurGraphQLContext,
     SingleTableItemPlan
-  >()({
+  >(PgSelectSinglePlan)({
     name: "SingleTableChecklist",
     interfaces: [SingleTableItem],
     fields: () => ({
@@ -2075,7 +2081,7 @@ export function makeExampleSchema(
   const SingleTableChecklistItem = newObjectTypeBuilder<
     OurGraphQLContext,
     SingleTableItemPlan
-  >()({
+  >(PgSelectSinglePlan)({
     name: "SingleTableChecklistItem",
     interfaces: [SingleTableItem],
     fields: () => ({
@@ -2155,7 +2161,7 @@ export function makeExampleSchema(
   const RelationalTopic = newObjectTypeBuilder<
     OurGraphQLContext,
     RelationalTopicPlan
-  >()({
+  >(PgSelectSinglePlan)({
     name: "RelationalTopic",
     interfaces: [RelationalItem],
     fields: () => ({
@@ -2167,7 +2173,7 @@ export function makeExampleSchema(
   const RelationalPost = newObjectTypeBuilder<
     OurGraphQLContext,
     RelationalPostPlan
-  >()({
+  >(PgSelectSinglePlan)({
     name: "RelationalPost",
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
@@ -2204,7 +2210,7 @@ export function makeExampleSchema(
   const RelationalDivider = newObjectTypeBuilder<
     OurGraphQLContext,
     RelationalDividerPlan
-  >()({
+  >(PgSelectSinglePlan)({
     name: "RelationalDivider",
     interfaces: [RelationalItem],
     fields: () => ({
@@ -2217,7 +2223,7 @@ export function makeExampleSchema(
   const RelationalChecklist = newObjectTypeBuilder<
     OurGraphQLContext,
     RelationalChecklistPlan
-  >()({
+  >(PgSelectSinglePlan)({
     name: "RelationalChecklist",
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
@@ -2229,7 +2235,7 @@ export function makeExampleSchema(
   const RelationalChecklistItem = newObjectTypeBuilder<
     OurGraphQLContext,
     RelationalChecklistItemPlan
-  >()({
+  >(PgSelectSinglePlan)({
     name: "RelationalChecklistItem",
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
@@ -2253,7 +2259,9 @@ export function makeExampleSchema(
     ],
   });
 
-  const UnionTopic = newObjectTypeBuilder<OurGraphQLContext, UnionTopicPlan>()({
+  const UnionTopic = newObjectTypeBuilder<OurGraphQLContext, UnionTopicPlan>(
+    PgSelectSinglePlan,
+  )({
     name: "UnionTopic",
     fields: () => ({
       id: attrField("id", GraphQLInt),
@@ -2261,7 +2269,9 @@ export function makeExampleSchema(
     }),
   });
 
-  const UnionPost = newObjectTypeBuilder<OurGraphQLContext, UnionPostPlan>()({
+  const UnionPost = newObjectTypeBuilder<OurGraphQLContext, UnionPostPlan>(
+    PgSelectSinglePlan,
+  )({
     name: "UnionPost",
     fields: () => ({
       id: attrField("id", GraphQLInt),
@@ -2274,7 +2284,7 @@ export function makeExampleSchema(
   const UnionDivider = newObjectTypeBuilder<
     OurGraphQLContext,
     UnionDividerPlan
-  >()({
+  >(PgSelectSinglePlan)({
     name: "UnionDivider",
     fields: () => ({
       id: attrField("id", GraphQLInt),
@@ -2286,7 +2296,7 @@ export function makeExampleSchema(
   const UnionChecklist = newObjectTypeBuilder<
     OurGraphQLContext,
     UnionChecklistPlan
-  >()({
+  >(PgSelectSinglePlan)({
     name: "UnionChecklist",
     fields: () => ({
       id: attrField("id", GraphQLInt),
@@ -2297,7 +2307,7 @@ export function makeExampleSchema(
   const UnionChecklistItem = newObjectTypeBuilder<
     OurGraphQLContext,
     UnionChecklistItemPlan
-  >()({
+  >(PgSelectSinglePlan)({
     name: "UnionChecklistItem",
     fields: () => ({
       id: attrField("id", GraphQLInt),
@@ -2319,7 +2329,7 @@ export function makeExampleSchema(
   const Query = newObjectTypeBuilder<
     OurGraphQLContext,
     __ValuePlan<BaseGraphQLRootValue>
-  >()({
+  >(__ValuePlan)({
     name: "Query",
     fields: {
       forums: {
@@ -2833,7 +2843,7 @@ export function makeExampleSchema(
   const CreateRelationalPostPayload = newObjectTypeBuilder<
     OurGraphQLContext,
     PgInsertPlan<typeof relationalPostsSource>
-  >()({
+  >(PgInsertPlan)({
     name: "CreateRelationalPostPayload",
     fields: relationalPostMutationFields,
   });
@@ -2841,7 +2851,7 @@ export function makeExampleSchema(
   const UpdateRelationalPostByIdPayload = newObjectTypeBuilder<
     OurGraphQLContext,
     PgUpdatePlan<typeof relationalPostsSource>
-  >()({
+  >(PgUpdatePlan)({
     name: "UpdateRelationalPostByIdPayload",
     fields: relationalPostMutationFields,
   });
@@ -2849,7 +2859,7 @@ export function makeExampleSchema(
   const DeleteRelationalPostByIdPayload = newObjectTypeBuilder<
     OurGraphQLContext,
     PgDeletePlan<typeof relationalPostsSource>
-  >()({
+  >(PgDeletePlan)({
     name: "DeleteRelationalPostByIdPayload",
     fields: {
       ...relationalPostMutationFields,
@@ -2871,7 +2881,7 @@ export function makeExampleSchema(
   const Mutation = newObjectTypeBuilder<
     OurGraphQLContext,
     __ValuePlan<BaseGraphQLRootValue>
-  >()({
+  >(__ValuePlan)({
     name: "Mutation",
     fields: {
       createRelationalPost: {
@@ -3009,8 +3019,8 @@ export function makeExampleSchema(
 
   const ForumMessageSubscriptionPayload = newObjectTypeBuilder<
     OurGraphQLContext,
-    ObjectLikePlan<{ id: ExecutablePlan<string>; op: ExecutablePlan<string> }>
-  >()({
+    JSONParsePlan<{ id: string; op: string }>
+  >(JSONParsePlan)({
     name: "ForumMessageSubscriptionPayload",
     fields: {
       operationType: {
@@ -3031,7 +3041,7 @@ export function makeExampleSchema(
   const Subscription = newObjectTypeBuilder<
     OurGraphQLContext,
     __ValuePlan<BaseGraphQLRootValue>
-  >()({
+  >(__ValuePlan)({
     name: "Subscription",
     fields: {
       forumMessage: {

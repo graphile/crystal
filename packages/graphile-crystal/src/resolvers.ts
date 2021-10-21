@@ -2,7 +2,7 @@
 import chalk from "chalk";
 import debugFactory from "debug";
 import type { GraphQLFieldResolver, GraphQLResolveInfo } from "graphql";
-import { getNamedType, isLeafType } from "graphql";
+import { defaultFieldResolver } from "graphql";
 import type { Path } from "graphql/jsutils/Path";
 import { inspect } from "util";
 
@@ -178,6 +178,8 @@ function crystalWrapResolveOrSubscribe<
       { code: "ETOOMUCHBLING" },
     );
   }
+  const userSpecifiedResolver =
+    realResolver === defaultFieldResolver ? undefined : realResolver;
 
   //const wrapResult = makeResultWrapper(type);
   /**
@@ -191,9 +193,8 @@ function crystalWrapResolveOrSubscribe<
       context,
       info,
     ) {
-      const parentObject:
-        | Exclude<TSource, null | undefined>
-        | CrystalObject = source ?? ROOT_VALUE_OBJECT;
+      const parentObject: Exclude<TSource, null | undefined> | CrystalObject =
+        source ?? ROOT_VALUE_OBJECT;
       let possiblyParentCrystalObject: CrystalObject | null = null;
 
       // Note: for the most optimal execution, `rootValue` passed to graphql
@@ -245,7 +246,7 @@ function crystalWrapResolveOrSubscribe<
         parentCrystalObject,
         result,
       );
-      if (realResolver) {
+      if (userSpecifiedResolver) {
         // At this point, Aether will already have performed the relevant
         // checks to ensure this is safe to do. The values returned through
         // here must never be CrystalObjects (or lists thereof).
@@ -255,7 +256,7 @@ function crystalWrapResolveOrSubscribe<
           fieldName,
           result,
         );
-        return realResolver(result, argumentValues, context, info);
+        return userSpecifiedResolver(result, argumentValues, context, info);
       } else {
         // In the case of leaf fields this will just be the underlying data to
         // return; however in all other cases this is either a CrystalObject or
@@ -267,6 +268,7 @@ function crystalWrapResolveOrSubscribe<
   Object.defineProperty(crystalResolver, $$crystalWrapped, {
     enumerable: false,
     configurable: false,
+    value: userSpecifiedResolver,
   });
   return crystalResolver;
 }
