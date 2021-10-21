@@ -1111,7 +1111,7 @@ export function makeExampleSchema(
         plan($user) {
           return object({ username: $user.get("username") });
         },
-        resolve({ usernameHash: user }, args) {
+        resolve(user, args) {
           return crypto
             .createHash(args.hashType)
             .update(user.username)

@@ -247,14 +247,13 @@ function crystalWrapResolveOrSubscribe<
       );
       if (isLeafType(getNamedType(returnType))) {
         if (realResolver) {
-          const valueForResolver: any = { [fieldName]: result };
           debug(
             "   Calling real resolver for %s.%s with %o",
             parentType.name,
             fieldName,
-            valueForResolver,
+            result,
           );
-          return realResolver(valueForResolver, argumentValues, context, info);
+          return realResolver(result, argumentValues, context, info);
         } else {
           return result;
         }
