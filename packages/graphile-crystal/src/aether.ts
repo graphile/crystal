@@ -950,16 +950,26 @@ export class Aether<
       );
       return listItemPlan;
     }
-    const fieldTypeIsObjectType = fieldType instanceof GraphQLObjectType;
-    const fieldTypeIsInterfaceType = fieldType instanceof GraphQLInterfaceType;
-    const fieldTypeIsUnionType = fieldType instanceof GraphQLUnionType;
     if (
-      fieldTypeIsObjectType ||
-      fieldTypeIsInterfaceType ||
-      fieldTypeIsUnionType
+      fieldType instanceof GraphQLObjectType ||
+      fieldType instanceof GraphQLInterfaceType ||
+      fieldType instanceof GraphQLUnionType
     ) {
       const groupedSubSelections = graphqlMergeSelectionSets(fieldAndGroups);
-      if (fieldTypeIsObjectType) {
+      if (fieldType instanceof GraphQLObjectType) {
+        if (isDev) {
+          // Check that the plan we're dealing with is the one the user declared
+          const ExpectedPlan = fieldType.extensions?.graphile?.Plan;
+          if (ExpectedPlan && !(plan instanceof ExpectedPlan)) {
+            throw new Error(
+              `Plan mis-match: expected ${
+                ExpectedPlan.name
+              } at '${pathIdentity}', but instead found ${
+                (plan as ExecutablePlan).constructor.name
+              }`,
+            );
+          }
+        }
         this.planSelectionSet(
           pathIdentity,
           plan,
@@ -990,7 +1000,7 @@ export class Aether<
             );
           }
         };
-        if (fieldTypeIsUnionType) {
+        if (fieldType instanceof GraphQLUnionType) {
           const unionType = fieldType as GraphQLUnionType;
           const subSelections = groupedSubSelections.flatMap(
             (s) => s.selections,
@@ -1003,7 +1013,7 @@ export class Aether<
           /*@__INLINE__*/ planPossibleObjectTypes(possibleObjectTypes);
         } else {
           assert.ok(
-            fieldTypeIsInterfaceType,
+            fieldType instanceof GraphQLInterfaceType,
             "Impossible. fieldTypeIsObjectType and fieldTypeIsUnionType are false so fieldTypeIsInterfaceType must be true",
           );
           const interfaceType = fieldType as GraphQLInterfaceType;
