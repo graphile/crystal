@@ -14,7 +14,7 @@ import type {
 } from "graphile-crystal";
 import {
   __ValuePlan,
-  newGraphileCrystalFieldConfigBuilder,
+  aether,
   BasePlan,
   constant,
   context,
@@ -23,6 +23,7 @@ import {
   lambda,
   list,
   ModifierPlan,
+  newGraphileCrystalFieldConfigBuilder,
   newInputObjectTypeBuilder,
   newObjectTypeBuilder,
   object,
@@ -2835,7 +2836,7 @@ export function makeExampleSchema(
     query: {
       type: Query,
       plan() {
-        return constant({});
+        return aether().rootValuePlan;
       },
     },
   };
