@@ -245,21 +245,22 @@ function crystalWrapResolveOrSubscribe<
         parentCrystalObject,
         result,
       );
-      if (isLeafType(getNamedType(returnType))) {
-        if (realResolver) {
-          debug(
-            "   Calling real resolver for %s.%s with %o",
-            parentType.name,
-            fieldName,
-            result,
-          );
-          return realResolver(result, argumentValues, context, info);
-        } else {
-          return result;
-        }
+      if (realResolver) {
+        // At this point, Aether will already have performed the relevant
+        // checks to ensure this is safe to do. The values returned through
+        // here must never be CrystalObjects (or lists thereof).
+        debug(
+          "   Calling real resolver for %s.%s with %o",
+          parentType.name,
+          fieldName,
+          result,
+        );
+        return realResolver(result, argumentValues, context, info);
       } else {
-        // This is either a CrystalObject or an n-dimensional list of
-        // CrystalObjects, or a stream of these things.
+        // In the case of leaf fields this will just be the underlying data to
+        // return; however in all other cases this is either a CrystalObject or
+        // an n-dimensional list of CrystalObjects, or a stream of these
+        // things.
         return result;
       }
     };
