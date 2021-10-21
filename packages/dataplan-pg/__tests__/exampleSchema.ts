@@ -50,9 +50,9 @@ import prettier from "prettier";
 import { inspect } from "util";
 
 import type {
-  PgClassExpressionPlan,
   PgConditionCapableParentPlan,
   PgExecutorContextPlans,
+  PgInsertPlan,
   PgSelectPlan,
   PgSourceColumn,
   PgSourceColumnVia,
@@ -61,17 +61,16 @@ import type {
   PgTypeCodec,
   WithPgClient,
 } from "../src";
-import { PgPolymorphicPlan } from "../src";
 import {
   enumType,
   pgClassExpression,
+  PgClassExpressionPlan,
   PgConditionPlan,
   PgConnectionPlan,
   pgDelete,
   PgDeletePlan,
   PgExecutor,
   pgInsert,
-  PgInsertPlan,
   pgPolymorphic,
   pgSelect,
   pgSelectSingleFromRecord,
@@ -2820,33 +2819,34 @@ export function makeExampleSchema(
     },
   });
 
-  const relationalPostMutationFields = {
-    post: {
-      type: RelationalPost,
-      plan($post: PgClassSinglePlan<typeof relationalPostsSource>) {
-        return relationalPostsSource.get({ id: $post.get("id") });
-      },
-    },
-    id: {
-      type: GraphQLInt,
-      plan($post: PgClassSinglePlan<typeof relationalPostsSource>) {
-        return $post.get("id");
-      },
-    },
-    query: {
-      type: Query,
-      plan() {
-        return aether().rootValuePlan;
-      },
-    },
-  };
+  type PgRecord<TDataSource extends PgSource<any, any, any, any, any>> =
+    PgClassExpressionPlan<TDataSource, TDataSource["codec"]>;
 
   const CreateRelationalPostPayload = newObjectTypeBuilder<
     OurGraphQLContext,
-    PgInsertPlan<typeof relationalPostsSource>
-  >(PgInsertPlan)({
+    PgRecord<typeof relationalPostsSource>
+  >(PgClassExpressionPlan)({
     name: "CreateRelationalPostPayload",
-    fields: relationalPostMutationFields,
+    fields: {
+      post: {
+        type: RelationalPost,
+        plan($post) {
+          return relationalPostsSource.get({ id: $post.get("id") });
+        },
+      },
+      id: {
+        type: GraphQLInt,
+        plan($post) {
+          return $post.get("id");
+        },
+      },
+      query: {
+        type: Query,
+        plan() {
+          return aether().rootValuePlan;
+        },
+      },
+    },
   });
 
   const UpdateRelationalPostByIdPayload = newObjectTypeBuilder<
@@ -2854,7 +2854,26 @@ export function makeExampleSchema(
     PgUpdatePlan<typeof relationalPostsSource>
   >(PgUpdatePlan)({
     name: "UpdateRelationalPostByIdPayload",
-    fields: relationalPostMutationFields,
+    fields: {
+      post: {
+        type: RelationalPost,
+        plan($post) {
+          return relationalPostsSource.get({ id: $post.get("id") });
+        },
+      },
+      id: {
+        type: GraphQLInt,
+        plan($post) {
+          return $post.get("id");
+        },
+      },
+      query: {
+        type: Query,
+        plan() {
+          return aether().rootValuePlan;
+        },
+      },
+    },
   });
 
   const DeleteRelationalPostByIdPayload = newObjectTypeBuilder<
@@ -2863,8 +2882,6 @@ export function makeExampleSchema(
   >(PgDeletePlan)({
     name: "DeleteRelationalPostByIdPayload",
     fields: {
-      ...relationalPostMutationFields,
-
       // Since we've deleted the post we cannot go and fetch it; so we must
       // return the record from the mutation RETURNING clause
       post: {
@@ -2874,6 +2891,19 @@ export function makeExampleSchema(
             relationalPostsSource,
             $post.record(),
           );
+        },
+      },
+
+      id: {
+        type: GraphQLInt,
+        plan($post) {
+          return $post.get("id");
+        },
+      },
+      query: {
+        type: Query,
+        plan() {
+          return aether().rootValuePlan;
         },
       },
     },
@@ -2911,7 +2941,12 @@ export function makeExampleSchema(
               $post.set(key, $value);
             }
           }
-          return $post;
+          // Since our field type, `CreateRelationalPostPayload`, is shared between
+          // `createRelationalPost`, `createThreeRelationalPosts` and
+          // `createThreeRelationalPostsComputed` must return a common plan
+          // type that `CreateRelationalPostPayload` can use; in this case a
+          // `PgClassExpressionPlan`
+          return $post.record();
         },
       },
 
@@ -2923,7 +2958,7 @@ export function makeExampleSchema(
           // Only the _last_ post plan is returned; there's no dependency on
           // the first two posts, and yet they should not be tree-shaken
           // because they're mutations.
-          let $post: ExecutablePlan;
+          let $post: PgInsertPlan<typeof relationalPostsSource>;
           for (let i = 0; i < 3; i++) {
             const $item = pgInsert(relationalItemsSource, {
               type: constant`POST`,
@@ -2937,7 +2972,12 @@ export function makeExampleSchema(
               note: constant(null),
             });
           }
-          return $post;
+          // Since our field type, `CreateRelationalPostPayload`, is shared
+          // between `createRelationalPost`, `createThreeRelationalPosts` and
+          // `createThreeRelationalPostsComputed` must return a common plan
+          // type that `CreateRelationalPostPayload` can use; in this case a
+          // `PgClassExpressionPlan`
+          return $post.record();
         },
       },
 
@@ -2949,7 +2989,7 @@ export function makeExampleSchema(
           // Only the _last_ post plan is returned; there's no dependency on
           // the first two posts, and yet they should not be tree-shaken
           // because they're mutations.
-          let $post: ExecutablePlan;
+          let $post: PgSelectPlan<typeof relationalPostsSource>;
           for (let i = 0; i < 3; i++) {
             $post = pgSelect({
               source: relationalPostsSource,
@@ -2969,7 +3009,12 @@ export function makeExampleSchema(
             });
             $post.hasSideEffects = true;
           }
-          return $post;
+          // Since our field type, `CreateRelationalPostPayload`, is shared between
+          // `createRelationalPost`, `createThreeRelationalPosts` and
+          // `createThreeRelationalPostsComputed` must return a common plan
+          // type that `CreateRelationalPostPayload` can use; in this case a
+          // `PgClassExpressionPlan`
+          return $post.single().record();
         },
       },
 
