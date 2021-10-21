@@ -6,7 +6,17 @@ import type {
 } from "graphile-crystal";
 import { access, ExecutablePlan } from "graphile-crystal";
 
-export class JSONParsePlan<TJSON extends JSON> extends ExecutablePlan<TJSON> {
+type JSONValue =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: JSONValue }
+  | Array<JSONValue>;
+
+export class JSONParsePlan<
+  TJSON extends JSONValue,
+> extends ExecutablePlan<TJSON> {
   constructor($stringPlan: ExecutablePlan<string | null>) {
     super();
     this.addDependency($stringPlan);
@@ -49,7 +59,7 @@ export class JSONParsePlan<TJSON extends JSON> extends ExecutablePlan<TJSON> {
   }
 }
 
-export function jsonParse<TJSON extends JSON>(
+export function jsonParse<TJSON extends JSONValue>(
   $string: ExecutablePlan<string | null>,
 ): JSONParsePlan<TJSON> {
   return new JSONParsePlan<TJSON>($string);
