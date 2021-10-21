@@ -604,7 +604,12 @@ const loadPlugins = (rawNames: mixed) => {
     }
     const name = String(rawName);
     const parts = name.split(':');
-    if (process.platform === 'win32' && parts[0].length === 1 && ['\\', '/'].includes(name[2])) {
+    if (
+      process.platform === 'win32' &&
+      parts[0].length === 1 &&
+      /^[a-z]$/i.test(parts[0]) &&
+      ['\\', '/'].includes(name[2])
+    ) {
       // Assume this is a windows path `C:/path/to/module.js` or `C:\path\to\module.js`
       const driveLetter = parts.shift();
       // Add the drive part back onto the path
