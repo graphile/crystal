@@ -8,6 +8,15 @@ to you also.
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
+## [4.12.5](https://github.com/graphile/postgraphile/compare/v4.12.4...v4.12.5) (2021-10-21)
+
+### Bug Fixes
+
+- **jwt:** JWT now extracted when `jwtPublicKey || jwtSecret` set ([#1537](https://github.com/graphile/postgraphile/issues/1537)) ([04ef23e](https://github.com/graphile/postgraphile/commit/04ef23e3f8da1107489ba4d09c5ed004994efd5b))
+- **release:** call shutdown actions in reverse order ([#1543](https://github.com/graphile/postgraphile/issues/1543)) ([c4eb076](https://github.com/graphile/postgraphile/commit/c4eb076889201aeeb5c45519e225a9dedf163d3a))
+- **types:** handleErrors option type ([#1542](https://github.com/graphile/postgraphile/issues/1542)) ([3a19293](https://github.com/graphile/postgraphile/commit/3a192937a8068f79664bf227c24bb3f6183376fa))
+- **windows:** CLI recognition of absolute paths on Windows ([#1518](https://github.com/graphile/postgraphile/issues/1518)) ([666bf77](https://github.com/graphile/postgraphile/commit/666bf773461210dba05de880e7ab9e290ffd8a4a))
+
 ## [4.12.4](https://github.com/graphile/postgraphile/compare/v4.12.3...v4.12.4) (2021-09-23)
 
 ## [4.12.3](https://github.com/graphile/postgraphile/compare/v4.12.2...v4.12.3) (2021-06-04)
