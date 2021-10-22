@@ -251,7 +251,12 @@ function fieldTreeFromAST<T extends SelectionNode>(
           return tree;
         }
         const fieldGqlType: GraphQLNamedType = fieldGqlTypeOrUndefined;
-        const args = getArgumentValues(field, val, variableValues) || {};
+        const args =
+          getArgumentValues(
+            field as GraphQLField<unknown, unknown>,
+            val,
+            variableValues,
+          ) || {};
         if (parentType.name && !tree[parentType.name][alias]) {
           const newTreeRoot: ResolveTree = {
             name,
