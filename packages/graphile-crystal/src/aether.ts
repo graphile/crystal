@@ -34,7 +34,11 @@ import { inspect } from "util";
 import * as assert from "./assert";
 import { GLOBAL_PATH, ROOT_PATH } from "./constants";
 import type { Constraint } from "./constraints";
-import { ansiPad, crystalPrintPathIdentity } from "./crystalPrint";
+import {
+  ansiPad,
+  crystalPrint,
+  crystalPrintPathIdentity,
+} from "./crystalPrint";
 import type { Deferred } from "./deferred";
 import { defer } from "./deferred";
 import { isDev } from "./dev";
@@ -857,13 +861,8 @@ export class Aether<
         // peers are identical.
         this.deduplicatePlans(oldPlansLength);
       } else {
-        // There's no plan resolver; use a __ValuePlan instead.
-        const wgs = withGlobalState.bind(null, {
-          aether: this,
-          parentPathIdentity: path,
-        }) as <T>(cb: () => T) => T;
-        // Note: this is populated in GetValuePlanId
-        plan = wgs(() => new __ValuePlan());
+        // There's no plan resolver; use the parent plan
+        plan = parentPlan;
       }
 
       this.planIdByPathIdentity[pathIdentity] = plan.id;
@@ -886,6 +885,7 @@ export class Aether<
         pathIdentity,
         plan,
         treeNode,
+        returnRaw && !namedResultTypeIsLeaf,
       );
       this.itemPlanIdByFieldPathIdentity[pathIdentity] = itemPlan.id;
     }
@@ -904,25 +904,22 @@ export class Aether<
     pathIdentity: string,
     plan: ExecutablePlan<any>,
     treeNode: TreeNode,
+    useValuePlan: boolean,
     depth = 0,
   ): ExecutablePlan<any> {
-    const wgs = withGlobalState.bind(null, {
-      aether: this,
-      parentPathIdentity: pathIdentity,
-    }) as <T>(cb: () => T) => T;
     if (fieldType instanceof GraphQLNonNull) {
       // TODO: we could implement a __NonNullPlan in future; currently we just
       // defer that to GraphQL.js
-      this.planSelectionSetForType(
+      return this.planSelectionSetForType(
         fieldType.ofType,
         fieldAndGroups,
         fieldPathIdentity,
         pathIdentity,
         plan,
         treeNode,
+        useValuePlan,
         depth,
       );
-      return plan;
     } else if (fieldType instanceof GraphQLList) {
       assertListCapablePlan(plan, pathIdentity);
       const nestedParentPathIdentity = pathIdentity + "[]";
@@ -939,17 +936,44 @@ export class Aether<
         () => plan.listItem(new __ListItemPlan(plan, depth)),
       );
       this.planIdByPathIdentity[nestedParentPathIdentity] = listItemPlan.id;
-      this.planSelectionSetForType(
+      return this.planSelectionSetForType(
         fieldType.ofType,
         fieldAndGroups,
         fieldPathIdentity,
         nestedParentPathIdentity,
         listItemPlan,
         nestedTreeNode,
+        useValuePlan,
         depth + 1,
       );
-      return listItemPlan;
+    } else if (useValuePlan) {
+      // We don't do this check first because we need the TreeNode manipulation
+      // to have already taken place due to lists/etc.
+
+      const valuePlan = withGlobalState(
+        { aether: this, parentPathIdentity: pathIdentity },
+        () => new __ValuePlan(),
+      );
+      // Explicitly populate the groupIds because we don't get our own path
+      // identity in `planIdByPathIdentity` and thus `assignGroupIds` will not
+      // run against us.
+      valuePlan.groupIds.push(...treeNode.groupIds);
+
+      return this.planSelectionSetForType(
+        fieldType,
+        fieldAndGroups,
+        fieldPathIdentity,
+        pathIdentity,
+        valuePlan,
+        treeNode,
+        false,
+        depth,
+      );
     }
+    const wgs = withGlobalState.bind(null, {
+      aether: this,
+      parentPathIdentity: pathIdentity,
+    }) as <T>(cb: () => T) => T;
     if (
       fieldType instanceof GraphQLObjectType ||
       fieldType instanceof GraphQLInterfaceType ||
@@ -1808,6 +1832,9 @@ export class Aether<
     if (ancestorPlan === descendentPlan) {
       return [];
     }
+    if (descendentPlan instanceof __ValuePlan) {
+      return [];
+    }
     for (let i = 0, l = descendentPlan.dependencies.length; i < l; i++) {
       const depPlan = this.plans[descendentPlan.dependencies[i]];
       // Optimisation
@@ -1904,9 +1931,8 @@ export class Aether<
             plan.commonAncestorPathIdentity
           }', groups: ${plan.groupIds.join(
             ", ",
-          )}) for execution; however __ValuePlan must never be executed - the value should already exist in the cache: ${inspect(
+          )}) for execution; however __ValuePlan must never be executed - the value should already exist in the cache: ${crystalPrint(
             planResults,
-            { colors: true, depth: 8 },
           )}.`,
         );
       }
@@ -2163,7 +2189,7 @@ export class Aether<
     valuePlan: __ValuePlan<TData>,
     object: TData,
     pathIdentity: string,
-  ): { valueId: UniqueId; existed: boolean } {
+  ): UniqueId {
     assert.ok(
       valuePlan instanceof __ValuePlan,
       "Expected getValuePlanId to be called with a __ValuePlan",
@@ -2191,9 +2217,8 @@ export class Aether<
       );
       valueIdByObject.set(key, valueId);
       // populateValuePlan used to be here, but now it lives in resolvers.ts
-      return { valueId, existed: false };
     }
-    return { valueId, existed: true };
+    return valueId;
   }
 
   /**

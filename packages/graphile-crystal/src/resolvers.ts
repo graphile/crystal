@@ -4,8 +4,9 @@ import debugFactory from "debug";
 import type { GraphQLFieldResolver, GraphQLResolveInfo } from "graphql";
 import { defaultFieldResolver } from "graphql";
 import type { Path } from "graphql/jsutils/Path";
-import { inspect } from "util";
 
+import { populateValuePlan } from "./aether";
+import * as assert from "./assert";
 import { ROOT_PATH } from "./constants";
 import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint";
 import type { Deferred } from "./deferred";
@@ -19,11 +20,11 @@ import {
   $$pathIdentity,
   $$planResults,
 } from "./interfaces";
-import type { PlanResults } from "./planResults";
+import { PlanResults } from "./planResults";
 import type { __ListItemPlan } from "./plans";
 import { __ValuePlan } from "./plans";
 import type { UniqueId } from "./utils";
-import { ROOT_VALUE_OBJECT } from "./utils";
+import { ROOT_VALUE_OBJECT, uid } from "./utils";
 
 const debug = debugFactory("crystal:resolvers");
 
@@ -88,79 +89,61 @@ function makeParentCrystalObject(
     // Special workaround for the root object.
     return crystalContext.rootCrystalObject;
   } else {
-    throw new Error(
-      `Unimplemented - we do not currently support resolving plans where the parent is not a CrystalObject. Instead of CrystalObject in resolver at ${pathIdentity}, we saw: ${inspect(
-        parentObject,
-        {
-          colors: true,
-          depth: 4,
-        },
-      )}`,
+    const parentPathIdentity = path.prev ? pathToPathIdentity(path.prev) : "";
+    const { crystalContext } = batch;
+    const { aether } = crystalContext;
+    const parentPlanId =
+      aether.itemPlanIdByFieldPathIdentity[parentPathIdentity];
+    if (parentPlanId == null) {
+      throw new Error(
+        `Could not find a planId for (parent) path '${parentPathIdentity}'`,
+      );
+    }
+    const parentPlan = aether.dangerouslyGetPlan(parentPlanId); // TODO: assert that this is handled for us
+    if (!(parentPlan instanceof __ValuePlan)) {
+      throw new Error(
+        `Expected parent field (which returned non-crystal object) to be a __ValuePlan, instead found ${parentPlan})`,
+      );
+    }
+
+    // Note: we need to "fake" that the parent was a plan. Because we may
+    // have lots of resolvers all called for the same parent object, we use a
+    // map. This happens to mean that multiple values in the graph being the
+    // same object will be merged automatically.
+    const valueId = aether.getValuePlanId(
+      crystalContext,
+      parentPlan,
+      parentObject,
+      pathIdentity,
     );
 
-    // TODO: implement this.
-    /*
-        const id = uid(info.fieldName);
-        debug(`👉 %p/%c for %c`, pathIdentity, id, parentObject);
-        // Note: we need to "fake" that the parent was a plan. Because we may
-        // have lots of resolvers all called for the same parent object, we use a
-        // map. This happens to mean that multiple values in the graph being the
-        // same object will be merged automatically.
-        const parentPathIdentity = path.prev
-          ? pathToPathIdentity(path.prev)
-          : "";
-        const parentPlanId =
-          aether.itemPlanIdByFieldPathIdentity[parentPathIdentity];
-        assert.ok(
-          parentPlanId != null,
-          `Could not find a planId for (parent) path '${parentPathIdentity}'`,
-        );
-        const parentPlan = aether.dangerouslyGetPlan(parentPlanId); // TODO: assert that this is handled for us
-        assert.ok(
-          parentPlan instanceof __ValuePlan,
-          "Expected parent field (which returned non-crystal object) to be a valuePlan)",
-        );
+    // We don't really care about indexes, it's just for debugging. Skipping
+    // for now.
+    const indexes: ReadonlyArray<number> = []; //pathToIndexes(path);
 
-        const { valueId: parentId, existed } = aether.getValuePlanId(
-          crystalContext,
-          parentPlan,
-          parentObject,
-          pathIdentity,
-        );
-        const indexes = pathToIndexes(path);
-        const parentPlanResults = new PlanResults(
-          crystalContext.rootCrystalObject[$$planResults],
-        );
+    const parentPlanResults = new PlanResults(
+      crystalContext.rootCrystalObject[$$planResults],
+    );
+    const { parentType } = info;
 
-        parentCrystalObject = newCrystalObject(
-          parentPathIdentity,
-          parentType.name,
-          parentId,
-          indexes,
-          crystalContext,
-          parentPlanResults,
-        );
-        if (!existed) {
-          // TODO: here we're populating the parentObject as if it were a
-          // regular ValuePlan, however it might have been a list in which case
-          // we actually want to populate the __ListItemPlan with the
-          // underlying value from the array (which is actually
-          // `parentObject`). This is old code and is effectively now wrong,
-          // and will need replacing to enable us to have compatibility with
-          // regular GraphQL resolvers that don't know about Crystal.
-          populateValuePlan(
-            parentPlan,
-            parentCrystalObject,
-            parentObject,
-            "parent",
-          );
-        }
-        debug(
-          "   Created a new crystal object to represent the parent of %p: %c",
-          pathIdentity,
-          parentCrystalObject,
-        );
-        */
+    const parentCrystalObject = newCrystalObject(
+      parentPathIdentity,
+      parentType.name,
+      valueId,
+      indexes,
+      crystalContext,
+      parentPlanResults,
+    );
+
+    populateValuePlan(parentPlan, parentCrystalObject, parentObject, "parent");
+
+    debug(
+      "👉  Created a new crystal object to represent the parent of %p: %c (results: %c)",
+      pathIdentity,
+      parentCrystalObject,
+      parentPlanResults,
+    );
+    return parentCrystalObject;
   }
 }
 

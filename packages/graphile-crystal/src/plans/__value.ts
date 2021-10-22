@@ -8,6 +8,11 @@ import { access } from "./access";
  * `GetValuePlanId` and `PopulateValuePlan`.
  */
 export class __ValuePlan<TData> extends ExecutablePlan<TData> {
+  constructor() {
+    super();
+    this.parentPathIdentity = this.createdWithParentPathIdentity;
+  }
+
   toStringMeta(): string | null {
     switch (this) {
       case this.aether.rootValuePlan:
