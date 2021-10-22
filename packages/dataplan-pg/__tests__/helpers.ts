@@ -531,7 +531,7 @@ function makeResultSnapshotSafe(
 }
 
 export const assertSnapshotsMatch = async (
-  only: "sql" | "result",
+  only: "sql" | "result" | "errors",
   props: {
     result: ReturnType<typeof runTestQuery>;
     document: string;
@@ -546,7 +546,7 @@ export const assertSnapshotsMatch = async (
     throw new Error(`Failed to trim .test.graphql from '${path}'`);
   }
 
-  const { data, payloads, queries } = await result;
+  const { data, payloads, queries, errors } = await result;
 
   if (only === "result") {
     const resultFileName = basePath + (ext || "") + ".json5";
@@ -558,6 +558,17 @@ export const assertSnapshotsMatch = async (
       printWidth: 120,
     });
     await snapshot(formattedData, resultFileName);
+  } else if (only === "errors") {
+    const errorsFileName = basePath + (ext || "") + ".errors.json5";
+    const processedErrors = makeResultSnapshotSafe(errors);
+    const formattedErrors = prettier.format(
+      processedErrors ? JSON5.stringify(processedErrors) : "null",
+      {
+        parser: "json5",
+        printWidth: 120,
+      },
+    );
+    await snapshot(formattedErrors, errorsFileName);
   } else if (only === "sql") {
     const sqlFileName = basePath + (ext || "") + ".sql";
     const formattedQueries = queries
@@ -578,4 +589,13 @@ export const assertResultsMatch = async (
   const { data: data1 } = await result1;
   const { data: data2 } = await result2;
   expect(data2).toEqual(data1);
+};
+
+export const assertErrorsMatch = async (
+  result1: ReturnType<typeof runTestQuery>,
+  result2: ReturnType<typeof runTestQuery>,
+): Promise<void> => {
+  const { errors: errors1 } = await result1;
+  const { errors: errors2 } = await result2;
+  expect(errors2).toEqual(errors1);
 };

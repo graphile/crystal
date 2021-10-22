@@ -5,6 +5,7 @@ const JSON5 = require("json5");
 exports.process = (src, path) => {
   const lines = src.split("\n");
   const config = Object.create(null);
+  config.checkErrorShapshots = true;
   const assertions = [];
   const documentLines = [];
   const scripts = [];
@@ -20,7 +21,11 @@ exports.process = (src, path) => {
       const value = JSON5.parse(line.substr(colon + 1));
       config[key] = value;
     } else if (line.startsWith("##")) {
-      assertions.push(line.substr(2));
+      const assertion = line.substr(2);
+      assertions.push(assertion);
+      if (/expect\(errors\).toBeFalsy\(\)/.test(assertion)) {
+        config.checkErrorShapshots = false;
+      }
     } else if (line.startsWith("#!")) {
       scripts.push(line.substr(2));
     } else if (line.match(/^#\s*expect\(/)) {
@@ -39,7 +44,7 @@ exports.process = (src, path) => {
   // we'd only be attacking ourselves, therefore we'll allow it rather than
   // bringing in an extra dependency.
   return `\
-const { assertSnapshotsMatch, assertResultsMatch, runTestQuery } = require("../_test");
+const { assertSnapshotsMatch, assertResultsMatch, assertErrorsMatch, runTestQuery } = require("../_test");
 
 const document = ${JSON.stringify(document)};
 const path = ${JSON.stringify(path)};
@@ -103,7 +108,17 @@ it('matches data snapshot', () => assertSnapshotsMatch('result', {
   result: result1,
 }));
 
+if (config.checkErrorShapshots) {
+  it('matches errors snapshot', () => assertSnapshotsMatch('errors', {
+    document,
+    path,
+    config,
+    result: result1,
+  }));
+}
+
 it('returns same data for optimized vs deoptimized', () => assertResultsMatch(result1, result2));
+it('returns same errors for optimized vs deoptimized', () => assertErrorsMatch(result1, result2));
 
 it('matches SQL snapshots with inlining disabled', () => assertSnapshotsMatch('sql', {
   document,

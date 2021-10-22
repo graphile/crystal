@@ -1,4 +1,5 @@
 export {
+  assertErrorsMatch,
   assertResultsMatch,
   assertSnapshotsMatch,
   runTestQuery,
