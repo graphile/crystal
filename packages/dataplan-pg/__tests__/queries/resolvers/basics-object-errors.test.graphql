@@ -1,0 +1,26 @@
+## expect(errors).toHaveLength(3)
+{
+  randomUser {
+    username
+    usernameHashes {
+      md5
+      sha256
+      self {
+        nne: self {
+          md5
+          sha256
+          throwNonNullError
+        }
+        te: self {
+          md5
+          sha256
+          throwTestError
+        }
+        MD5: md5
+        SHA256: sha256
+        SHA256_2: sha256
+      }
+      throwTestError
+    }
+  }
+}

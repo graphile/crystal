@@ -1069,6 +1069,18 @@ export function makeExampleSchema(
           return crypto.createHash("sha1").update(parent.text).digest("hex");
         },
       },
+      throwNonNullError: {
+        type: new GraphQLNonNull(GraphQLString),
+        resolve() {
+          return null;
+        },
+      },
+      throwTestError: {
+        type: GraphQLString,
+        resolve() {
+          throw new Error("Test");
+        },
+      },
       sha256: {
         type: GraphQLString,
         resolve(parent) {
