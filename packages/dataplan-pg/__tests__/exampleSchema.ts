@@ -1056,7 +1056,7 @@ export function makeExampleSchema(
 
   const Hashes = new GraphQLObjectType({
     name: "Hashes",
-    fields: {
+    fields: () => ({
       md5: {
         type: GraphQLString,
         resolve(parent) {
@@ -1075,7 +1075,13 @@ export function makeExampleSchema(
           return crypto.createHash("sha256").update(parent.text).digest("hex");
         },
       },
-    },
+      self: {
+        type: Hashes,
+        resolve(parent) {
+          return parent;
+        },
+      },
+    }),
   });
 
   const User = newObjectTypeBuilder<OurGraphQLContext, UserPlan>(
