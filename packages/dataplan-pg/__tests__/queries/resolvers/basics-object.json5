@@ -1,0 +1,9 @@
+{
+  randomUser: {
+    username: "Bob",
+    usernameHashes: {
+      md5: "2fc1c0beb992cd7096975cfebf9d5c3b",
+      sha256: "cd9fb1e148ccd8442e5aa74904cc73bf6fb54d1d54d333bd596aa9bb4bb4e961",
+    },
+  },
+}
