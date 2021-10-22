@@ -1122,7 +1122,7 @@ export function makeExampleSchema(
         plan($user) {
           return $user.get("username");
         },
-        resolve({ usernameHash: username }) {
+        resolve(username) {
           return { text: username };
         },
       },
