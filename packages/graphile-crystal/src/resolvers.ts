@@ -21,7 +21,6 @@ import {
   $$planResults,
 } from "./interfaces";
 import { PlanResults } from "./planResults";
-import type { __ListItemPlan } from "./plans";
 import { __ValuePlan } from "./plans";
 import type { UniqueId } from "./utils";
 import { ROOT_VALUE_OBJECT, uid } from "./utils";

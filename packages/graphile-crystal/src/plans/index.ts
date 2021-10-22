@@ -33,10 +33,6 @@ export { reverse, reverseArray, ReversePlan } from "./reverse";
 export { subscribe, SubscribePlan } from "./subscribe";
 
 // Internal plans
-export {
-  __ListItemPlan,
-  assertListCapablePlan,
-  ListCapablePlan,
-} from "./__listItem";
+export { __ItemPlan } from "./__item";
 export { __TrackedObjectPlan } from "./__trackedObject";
 export { __ValuePlan } from "./__value";

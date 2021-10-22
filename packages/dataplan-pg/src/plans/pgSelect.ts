@@ -1,7 +1,7 @@
 import { createHash } from "crypto";
 import debugFactory from "debug";
 import type {
-  __ListItemPlan,
+  __ItemPlan,
   CrystalResultsList,
   CrystalResultStreamList,
   CrystalValuesList,
@@ -1909,7 +1909,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
    * IMPORTANT: do not call `.listItem` from user code; it's only intended to
    * be called by Graphile Crystal.
    */
-  listItem(itemPlan: __ListItemPlan<this>): PgSelectSinglePlan<TDataSource> {
+  listItem(itemPlan: __ItemPlan<this>): PgSelectSinglePlan<TDataSource> {
     return new PgSelectSinglePlan(this, itemPlan);
   }
 

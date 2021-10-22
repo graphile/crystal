@@ -18,14 +18,14 @@ import type {
   __ValuePlan,
   BaseGraphQLContext,
 } from "graphile-crystal";
-import { __ListItemPlan, stripAnsi } from "graphile-crystal";
+import { stripAnsi } from "graphile-crystal";
 import type { ExecutionResult } from "graphql";
 import { graphql } from "graphql";
 import { resolve } from "path";
 import { Pool } from "pg";
 import prettier from "prettier";
 
-import type { WithPgClient } from "../src/datasource";
+import type { WithPgClient } from "../src";
 import { schema } from "./exampleSchema";
 
 // Convenience so we don't have to type these out each time. These used to be

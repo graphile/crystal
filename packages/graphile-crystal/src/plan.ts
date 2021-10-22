@@ -18,6 +18,7 @@ import type {
   PlanOptimizeOptions,
   PromiseOrDirect,
 } from "./interfaces";
+import type { __ItemPlan } from "./plans";
 
 function reallyAssertFinalized(plan: BasePlan): void {
   if (!plan.isFinalized) {
@@ -204,7 +205,7 @@ export abstract class ExecutablePlan<TData = any> extends BasePlan {
     /*
      * We set our actual parentPathIdentity to be the shortest parentPathIdentity of all
      * of our dependencies; this effectively means that we only care about list
-     * boundaries (since __ListItemPlan opts out of this) which allows us to
+     * boundaries (since `__ItemPlan` opts out of this) which allows us to
      * optimise more plans.
      */
     if (plan.parentPathIdentity.length > this.parentPathIdentity.length) {
@@ -365,6 +366,36 @@ export function assertModifierPlan<
   if (!isModifierPlan(plan)) {
     throw new Error(
       `The plan returned from '${pathIdentity}' should be an modifier plan, but it does not implement the 'apply' method.`,
+    );
+  }
+}
+
+export interface ListCapablePlan<
+  TOutputData extends any,
+  TItemPlan extends ExecutablePlan<TOutputData> = ExecutablePlan<TOutputData>,
+> extends ExecutablePlan<ReadonlyArray<any>> {
+  listItem(itemPlan: __ItemPlan<this>): TItemPlan;
+}
+
+export function isListCapablePlan<
+  TData,
+  TItemPlan extends ExecutablePlan<TData>,
+>(
+  plan: ExecutablePlan<ReadonlyArray<TData>>,
+): plan is ListCapablePlan<TData, TItemPlan> {
+  return "listItem" in plan && typeof (plan as any).listItem === "function";
+}
+
+export function assertListCapablePlan<
+  TData,
+  TItemPlan extends ExecutablePlan<TData>,
+>(
+  plan: ExecutablePlan<ReadonlyArray<TData>>,
+  pathIdentity: string,
+): asserts plan is ListCapablePlan<TData, TItemPlan> {
+  if (!isListCapablePlan(plan)) {
+    throw new Error(
+      `The plan returned from '${pathIdentity}' should be a list capable plan, but it does not implement the 'listItem' method.`,
     );
   }
 }

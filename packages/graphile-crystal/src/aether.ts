@@ -76,18 +76,13 @@ import {
   assertArgumentsFinalized,
   assertExecutablePlan,
   assertFinalized,
+  assertListCapablePlan,
   assertModifierPlan,
   ExecutablePlan,
   isStreamablePlan,
 } from "./plan";
 import { PlanResults } from "./planResults";
-import {
-  __ListItemPlan,
-  __TrackedObjectPlan,
-  __ValuePlan,
-  assertListCapablePlan,
-} from "./plans";
-import { __ItemPlan } from "./plans/subscribe";
+import { __ItemPlan, __TrackedObjectPlan, __ValuePlan } from "./plans";
 import { assertPolymorphicData } from "./polymorphic";
 import { $$crystalWrapped, newCrystalObject } from "./resolvers";
 import { stripAnsi } from "./stripAnsi";
@@ -246,11 +241,12 @@ export class Aether<
   };
 
   /**
-   * The itemPlan by path identity is like planIdByPathIdentity **except** it
-   * factors in list indexes, i.e. it's the plan for the value that child
-   * fields would receive as their parent object. If the parent returned an
-   * object it'll be the same as planIdByPathIdentity but if the parent
-   * returned a list of objects it would be a `__ListItemPlan`.
+   * Whereas `planIdByPathIdentity` references the plan that controls what a
+   * field will resolve to, `itemPlanByPathIdentity` references the plan that
+   * controls what child fields will receive as their `parent`/`source`
+   * argument. When the field resolves to a type directly these will likely be
+   * the same thing, but when a field returns a GraphQLList the itemPlan will
+   * represent individual items within this (potentially nested) list.
    */
   public readonly itemPlanIdByFieldPathIdentity: {
     [pathIdentity: string]: number | undefined;
@@ -894,8 +890,8 @@ export class Aether<
   /**
    * This algorithm wasn't originally planned, but we should not have jumped
    * straight to getNamedType in the plan. This method lets us walk the type
-   * tree and add in `__ListItemPlan`s in the relevant places so that we can
-   * refer to indexes when referencing the relevant values.
+   * tree and add in `__ItemPlan`s in the relevant places so that we can refer
+   * to individual values within lists.
    */
   private planSelectionSetForType(
     fieldType: GraphQLOutputType,
@@ -933,7 +929,7 @@ export class Aether<
       treeNode.children.push(nestedTreeNode);
       const listItemPlan = withGlobalState(
         { aether: this, parentPathIdentity: nestedParentPathIdentity },
-        () => plan.listItem(new __ListItemPlan(plan, depth)),
+        () => plan.listItem(new __ItemPlan(plan, depth)),
       );
       this.planIdByPathIdentity[nestedParentPathIdentity] = listItemPlan.id;
       return this.planSelectionSetForType(
@@ -1754,7 +1750,7 @@ export class Aether<
   /**
    * We want to know the shallowest paths in each branch of the tree that each
    * plan is used, and then find the deepest common ancestor field for these
-   * fields without crossing a `__ListItemPlan` boundary from the plan itself.
+   * fields without crossing a `__ItemPlan` boundary from the plan itself.
    * This will then give us the pathIdentity under which we will store the data
    * this plan produces on execution - this means we can store the data with
    * the CrystalObject and that data can be released automatically by the
@@ -1823,7 +1819,7 @@ export class Aether<
   /**
    * Finds a (the?) path from ancestorPlan to descendentPlan. Semi-expensive; try
    * and only use this at planning time, not execution time. Useful for tracking
-   * down all the __ListItemPlans.
+   * down all the `__ItemPlan`s.
    */
   private findPath(
     ancestorPlan: ExecutablePlan<any>,
@@ -1878,8 +1874,8 @@ export class Aether<
       );
     }
     visitedPlans.add(plan);
-    if (plan instanceof __ListItemPlan) {
-      // Shortcut evaluation because __ListItemPlan cannot be executed.
+    if (plan instanceof __ItemPlan) {
+      // Shortcut evaluation because __ItemPlan cannot be executed.
       return planResultses.map((planResults) =>
         planResults == null
           ? null
@@ -2102,9 +2098,9 @@ export class Aether<
     }
     // Note: the `execute` method on plans is responsible for memoizing
     // results into `meta`.
-    if (plan instanceof __ListItemPlan) {
+    if (plan instanceof __ItemPlan) {
       throw new Error(
-        "Should never attempt to execute __ListItemPlan; that should be handled within executeBatch",
+        "Should never attempt to execute __ItemPlan; that should be handled within executeBatch",
       );
     }
     const planOptions = this.planOptionsByPlan.get(plan);
@@ -2452,7 +2448,7 @@ export class Aether<
       crystalLayerObjectsLength,
     );
 
-    if (layerPlan instanceof __ListItemPlan) {
+    if (layerPlan instanceof __ItemPlan) {
       // Derive new CrystalLayerObjects from the existing ones.
       const depId = layerPlan.dependencies[0];
       const dep = this.plans[depId];
@@ -2655,8 +2651,8 @@ export class Aether<
 
       /**
        * We'll always have at least one layer, but for itemPlans that depend on
-       * `__ListItemPlan`s we'll have one additional layer for each
-       * `__ListItemPlan`.
+       * `__ItemPlan`s we'll have one additional layer for each
+       * `__ItemPlan` and intermediate plans.
        */
       const layers: Array<ExecutablePlan<any>> = [plan];
 
@@ -2664,10 +2660,10 @@ export class Aether<
       // This block to define a new scope for the mutable `depth` variable. (No shadowing.)
       {
         let depth = 0;
-        // Walk through the subplans, each time we find a `__ListItemPlan` we
+        // Walk through the subplans, each time we find a `__ItemPlan` we
         // add a new layer and record the listItemPlanIdAtDepth.
         for (const subPlan of path) {
-          if (subPlan instanceof __ListItemPlan) {
+          if (subPlan instanceof __ItemPlan) {
             assert.strictEqual(
               subPlan.depth,
               depth,
@@ -2678,7 +2674,7 @@ export class Aether<
           } else if (depth === 0) {
             // This should never happen
             throw new Error(
-              `Unexpected plan structure: did not expect to find plan ${subPlan} between ${plan} and the first '__ListItemPlan' leading to ${itemPlan}.`,
+              `Unexpected plan structure: did not expect to find plan ${subPlan} between ${plan} and the first '__ItemPlan' leading to ${itemPlan}.`,
             );
           } else {
             /*
@@ -3025,7 +3021,7 @@ function treeNodePath(
   while ((n = n.parent) && n.pathIdentity.startsWith(startPathIdentity)) {
     path.unshift(n);
   }
-  // Find the next `GraphQLList` / `__ListItemPlan` position (not including self)
+  // Find the next `GraphQLList` / `__ItemPlan` position (not including self)
   const listChangeIndex = path.findIndex((v, i) => {
     if (i === 0) {
       return false;

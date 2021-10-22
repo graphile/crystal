@@ -1,7 +1,11 @@
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
-import { ExecutablePlan } from "../plan";
-import type { __ListItemPlan, ListCapablePlan } from "./__listItem";
-import { assertListCapablePlan, isListCapablePlan } from "./__listItem";
+import type { ListCapablePlan } from "../plan";
+import {
+  assertListCapablePlan,
+  ExecutablePlan,
+  isListCapablePlan,
+} from "../plan";
+import type { __ItemPlan } from "./__item";
 
 export class EachPlan<
     TSourceData,
@@ -33,7 +37,7 @@ export class EachPlan<
     return plan as ListCapablePlan<TSourceData, TSourceItemPlan>;
   }
 
-  listItem(itemPlan: __ListItemPlan<this>): TResultItemPlan {
+  listItem(itemPlan: __ItemPlan<this>): TResultItemPlan {
     const originalListItem = this.originalListPlan().listItem(itemPlan);
     const mappedPlan = this.mapper(originalListItem);
     return mappedPlan;

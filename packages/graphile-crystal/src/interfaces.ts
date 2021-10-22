@@ -1,18 +1,13 @@
 import type {
   FieldNode,
   GraphQLArgumentConfig,
-  GraphQLEnumType,
   GraphQLFieldConfig,
-  GraphQLFloat,
-  GraphQLID,
   GraphQLInputFieldConfig,
   GraphQLInputType,
-  GraphQLInt,
   GraphQLList,
   GraphQLNonNull,
   GraphQLOutputType,
   GraphQLScalarType,
-  GraphQLString,
   GraphQLType,
   SelectionNode,
 } from "graphql";
@@ -20,9 +15,9 @@ import type {
 import type { Aether } from "./aether";
 import type { Deferred } from "./deferred";
 import type { InputPlan } from "./input";
-import type { ExecutablePlan, ModifierPlan } from "./plan";
+import type { ExecutablePlan, ListCapablePlan, ModifierPlan } from "./plan";
 import type { PlanResults, PlanResultsBucket } from "./planResults";
-import type { __TrackedObjectPlan, ListCapablePlan } from "./plans";
+import type { __TrackedObjectPlan } from "./plans";
 import type {
   GraphileInputObjectType,
   GraphileObjectType,
