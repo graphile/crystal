@@ -37,7 +37,6 @@ const pathCompare = (
   path2: readonly (string | number)[],
 ) => {
   const l = Math.min(path1.length, path2.length);
-  console.log("COMPARE", path1, path2, l);
   for (let i = 0; i < l; i++) {
     const a = path1[i];
     const z = path2[i];
@@ -61,7 +60,6 @@ const pathCompare = (
       throw new Error("Unexpected type");
     }
   }
-  console.log("l", path1.length, path2.length);
   return path1.length - path2.length;
 };
 
