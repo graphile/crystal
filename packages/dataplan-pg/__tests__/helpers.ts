@@ -32,6 +32,39 @@ import { makeExampleSchema, schema as optimizedSchema } from "./exampleSchema";
 
 export const UPDATE_SNAPSHOTS = process.env.UPDATE_SNAPSHOTS === "1";
 
+const pathCompare = (
+  path1: readonly (string | number)[],
+  path2: readonly (string | number)[],
+) => {
+  const l = Math.min(path1.length, path2.length);
+  console.log("COMPARE", path1, path2, l);
+  for (let i = 0; i < l; i++) {
+    const a = path1[i];
+    const z = path2[i];
+    if (typeof a === "number") {
+      if (typeof z !== "number") {
+        throw new Error("Type mismatch; expected number");
+      }
+      const v = a - z;
+      if (v !== 0) {
+        return v;
+      }
+    } else if (typeof a === "string") {
+      if (typeof z !== "string") {
+        throw new Error("Type mismatch; expected string");
+      }
+      const v = a.localeCompare(z);
+      if (v !== 0) {
+        return v;
+      }
+    } else {
+      throw new Error("Unexpected type");
+    }
+  }
+  console.log("l", path1.length, path2.length);
+  return path1.length - path2.length;
+};
+
 const deoptimizedSchema = makeExampleSchema({ deoptimize: true });
 
 let testPool: Pool | null = null;
@@ -560,7 +593,13 @@ export const assertSnapshotsMatch = async (
     await snapshot(formattedData, resultFileName);
   } else if (only === "errors") {
     const errorsFileName = basePath + (ext || "") + ".errors.json5";
-    const processedErrors = makeResultSnapshotSafe(errors);
+    const processedErrors = errors
+      ? makeResultSnapshotSafe(errors).sort(
+          (e1: GraphQLError, e2: GraphQLError) => {
+            return pathCompare(e1.path, e2.path);
+          },
+        )
+      : null;
     const formattedErrors = prettier.format(
       processedErrors ? JSON5.stringify(processedErrors) : "null",
       {
