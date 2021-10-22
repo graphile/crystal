@@ -1,4 +1,5 @@
 #> directPg: true
+#> checkErrorShapshots: false
 #! const query = 'insert into app_public.messages (forum_id, author_id, body) values ($1, $2, $3);';
 #! await pgClient.query(query, ["ca700000-0000-0000-0000-000000000ca7", "a11ce000-0000-0000-0000-0000000a11ce", "New message 1"]);
 #! await waitFor(() => payloads.length >= 1);
