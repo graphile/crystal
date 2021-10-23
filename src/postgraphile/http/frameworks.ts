@@ -295,7 +295,6 @@ export class PostGraphileResponseKoa extends PostGraphileResponse {
 
   setBody(body: Stream | Buffer | string | undefined) {
     this._ctx.body = body || '';
-    this._next();
   }
 }
 
