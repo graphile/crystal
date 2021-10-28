@@ -58,6 +58,9 @@ export async function enhanceHttpServerWithWebSockets<
     keepAlive?: number;
     graphqlRoute?: string;
   },
+  wsOptions?: {
+    onError?: (e: unknown) => void;
+  },
 ): Promise<void> {
   if (websocketServer['__postgraphileSubscriptionsEnabled']) {
     return;
@@ -478,7 +481,21 @@ export async function enhanceHttpServerWithWebSockets<
             // and gracefully reject invalid ones. if the client supports
             // both v0 and v1, v1 will prevail
             v1Wss;
+
       if (wss) {
+        wss.on('connection', function (ws) {
+          ws.on('error', function (e) {
+            if (wsOptions && wsOptions.onError) {
+              wsOptions.onError(e);
+            } else {
+              console.info(
+                'the following error thrown from `ws` was caught and ignored. if you want to handle it yourself pass an onError handler',
+              );
+              console.error(e);
+            }
+          });
+        });
+
         wss.handleUpgrade(req, socket, head, ws => {
           wss.emit('connection', ws, req);
         });
