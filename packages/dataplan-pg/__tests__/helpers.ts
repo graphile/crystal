@@ -24,8 +24,8 @@ import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
 import type { PoolClient } from "pg";
 import { Pool } from "pg";
-import prettier from "prettier";
 
+//import prettier from "prettier";
 import type { PgClient, PgClientQuery, WithPgClient } from "../src";
 import { PgSubscriber } from "../src";
 import type { PgClientResult } from "../src/executor";
@@ -591,10 +591,16 @@ export const assertSnapshotsMatch = async (
     const processedResults = payloads
       ? payloads.map((payload) => makeResultSnapshotSafe(payload))
       : makeResultSnapshotSafe(data);
-    const formattedData = prettier.format(JSON5.stringify(processedResults), {
-      parser: "json5",
-      printWidth: 120,
-    });
+    const formattedData =
+      //prettier.format(
+      JSON5.stringify(processedResults, {
+        space: 2,
+        quote: '"',
+      }) + "\n";
+    // , {
+    //   parser: "json5",
+    //   printWidth: 120,
+    // });
     await snapshot(formattedData, resultFileName);
   } else if (only === "errors") {
     const errorsFileName = basePath + (ext || "") + ".errors.json5";
@@ -605,13 +611,14 @@ export const assertSnapshotsMatch = async (
           },
         )
       : null;
-    const formattedErrors = prettier.format(
-      processedErrors ? JSON5.stringify(processedErrors) : "null",
-      {
-        parser: "json5",
-        printWidth: 120,
-      },
-    );
+    const formattedErrors = processedErrors //prettier.format(
+      ? JSON5.stringify(processedErrors, null, 2)
+      : "null";
+    //   {
+    //     parser: "json5",
+    //     printWidth: 120,
+    //   },
+    // );
     await snapshot(formattedErrors, errorsFileName);
   } else if (only === "sql") {
     const sqlFileName = basePath + (ext || "") + ".sql";

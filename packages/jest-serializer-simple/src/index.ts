@@ -1,5 +1,5 @@
 import JSON5 from "json5";
-import prettier from "prettier";
+// import prettier from "prettier";
 import type { Plugin } from "pretty-format";
 
 export interface FormattedObject {
@@ -21,12 +21,16 @@ function printFormattedObject(val: FormattedObject): string {
     ? String(val.__)
     : typeof val.__ === "undefined"
     ? "undefined"
-    : prettier
-        .format(JSON5.stringify(val.__), {
-          printWidth: 120,
-          parser: "json5",
-        })
-        .trim();
+    : JSON5.stringify(val.__, {
+        space: 2,
+        quote: '"',
+      }).trim();
+  // prettier
+  //     .format(JSON5.stringify(val.__), {
+  //       printWidth: 120,
+  //       parser: "json5",
+  //     })
+  //     .trim();
 }
 
 export const test: Plugin["test"] = isFormattedObject;

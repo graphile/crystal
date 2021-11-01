@@ -46,7 +46,7 @@ import {
 } from "graphql";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
-import prettier from "prettier";
+//import prettier from "prettier";
 import { inspect } from "util";
 
 import type {
@@ -116,8 +116,10 @@ export interface GraphQLTypeFromPostgresType {
   boolean: boolean;
 }
 
-type NullableUnless<TCondition extends boolean | undefined, TType> =
-  TCondition extends true ? TType : TType | null | undefined;
+type NullableUnless<
+  TCondition extends boolean | undefined,
+  TType,
+> = TCondition extends true ? TType : TType | null | undefined;
 
 export function makeExampleSchema(
   options: { deoptimize?: boolean } = Object.create(null),
@@ -3234,10 +3236,12 @@ async function main() {
   const filePath = `${__dirname}/schema.graphql`;
   writeFileSync(
     filePath,
-    prettier.format(printSchema(schema), {
-      ...(await prettier.resolveConfig(filePath)),
-      parser: "graphql",
-    }),
+    //prettier.format(
+    printSchema(schema),
+    //{
+    //  ...(await prettier.resolveConfig(filePath)),
+    //  parser: "graphql",
+    //}),
   );
 }
 
