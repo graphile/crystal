@@ -3,6 +3,7 @@
     {
       __typename: "RelationalPost",
       type: "POST",
+      type2: "POST",
       position: "1",
     },
   ],

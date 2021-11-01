@@ -4,6 +4,7 @@ select
     select array[
       __single_table_items__."type"::text,
       __single_table_items__."id"::text,
+      __single_table_items__."type2"::text,
       __single_table_items__."position"::text,
       __single_table_items__."created_at"::text,
       __single_table_items__."updated_at"::text,

@@ -9,6 +9,7 @@ fragment Item on RelationalItem {
   __typename
   id
   type
+  type2
   position
   ... on RelationalTopic {
     # Should never fire - not compatible with RelationalCommentable

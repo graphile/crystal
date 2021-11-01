@@ -9,9 +9,11 @@
         __typename
         id
         type
+        type2
       }
       id
       type
+      type2
     }
   }
 }

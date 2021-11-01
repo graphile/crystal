@@ -9,6 +9,7 @@
           parent: null,
           id: 2,
           type: "TOPIC",
+          type2: "TOPIC",
           author: {
             __typename: "Person",
             username: "Alice",
@@ -26,6 +27,7 @@
             __typename: "SingleTableTopic",
             id: 2,
             type: "TOPIC",
+            type2: "TOPIC",
             author: {
               __typename: "Person",
               username: "Alice",
@@ -39,6 +41,7 @@
           },
           id: 15,
           type: "POST",
+          type2: "POST",
           author: {
             __typename: "Person",
             username: "Alice",
@@ -58,6 +61,7 @@
             __typename: "SingleTableChecklist",
             id: 16,
             type: "CHECKLIST",
+            type2: "CHECKLIST",
             author: {
               __typename: "Person",
               username: "Benjie",
@@ -71,6 +75,7 @@
           },
           id: 21,
           type: "CHECKLIST_ITEM",
+          type2: "CHECKLIST_ITEM",
           author: {
             __typename: "Person",
             username: "Alice",
@@ -94,6 +99,7 @@
           parent: null,
           id: 1,
           type: "TOPIC",
+          type2: "TOPIC",
           author: {
             __typename: "Person",
             username: "Benjie",
@@ -111,6 +117,7 @@
             __typename: "SingleTableTopic",
             id: 1,
             type: "TOPIC",
+            type2: "TOPIC",
             author: {
               __typename: "Person",
               username: "Benjie",
@@ -124,6 +131,7 @@
           },
           id: 3,
           type: "DIVIDER",
+          type2: "DIVIDER",
           author: {
             __typename: "Person",
             username: "Benjie",
@@ -142,6 +150,7 @@
             __typename: "SingleTableTopic",
             id: 1,
             type: "TOPIC",
+            type2: "TOPIC",
             author: {
               __typename: "Person",
               username: "Benjie",
@@ -155,6 +164,7 @@
           },
           id: 4,
           type: "POST",
+          type2: "POST",
           author: {
             __typename: "Person",
             username: "Benjie",
@@ -174,6 +184,7 @@
             __typename: "SingleTableTopic",
             id: 1,
             type: "TOPIC",
+            type2: "TOPIC",
             author: {
               __typename: "Person",
               username: "Benjie",
@@ -187,6 +198,7 @@
           },
           id: 5,
           type: "POST",
+          type2: "POST",
           author: {
             __typename: "Person",
             username: "Benjie",
@@ -206,6 +218,7 @@
             __typename: "SingleTableTopic",
             id: 1,
             type: "TOPIC",
+            type2: "TOPIC",
             author: {
               __typename: "Person",
               username: "Benjie",
@@ -219,6 +232,7 @@
           },
           id: 6,
           type: "POST",
+          type2: "POST",
           author: {
             __typename: "Person",
             username: "Benjie",
@@ -238,6 +252,7 @@
             __typename: "SingleTableTopic",
             id: 1,
             type: "TOPIC",
+            type2: "TOPIC",
             author: {
               __typename: "Person",
               username: "Benjie",
@@ -251,6 +266,7 @@
           },
           id: 7,
           type: "POST",
+          type2: "POST",
           author: {
             __typename: "Person",
             username: "Benjie",
@@ -270,6 +286,7 @@
             __typename: "SingleTableTopic",
             id: 1,
             type: "TOPIC",
+            type2: "TOPIC",
             author: {
               __typename: "Person",
               username: "Benjie",
@@ -283,6 +300,7 @@
           },
           id: 8,
           type: "DIVIDER",
+          type2: "DIVIDER",
           author: {
             __typename: "Person",
             username: "Benjie",
@@ -301,6 +319,7 @@
             __typename: "SingleTableTopic",
             id: 1,
             type: "TOPIC",
+            type2: "TOPIC",
             author: {
               __typename: "Person",
               username: "Benjie",
@@ -314,6 +333,7 @@
           },
           id: 9,
           type: "POST",
+          type2: "POST",
           author: {
             __typename: "Person",
             username: "Benjie",
@@ -333,6 +353,7 @@
             __typename: "SingleTableTopic",
             id: 1,
             type: "TOPIC",
+            type2: "TOPIC",
             author: {
               __typename: "Person",
               username: "Benjie",
@@ -346,6 +367,7 @@
           },
           id: 10,
           type: "TOPIC",
+          type2: "TOPIC",
           author: {
             __typename: "Person",
             username: "Benjie",
@@ -363,6 +385,7 @@
             __typename: "SingleTableTopic",
             id: 10,
             type: "TOPIC",
+            type2: "TOPIC",
             author: {
               __typename: "Person",
               username: "Benjie",
@@ -376,6 +399,7 @@
           },
           id: 11,
           type: "TOPIC",
+          type2: "TOPIC",
           author: {
             __typename: "Person",
             username: "Benjie",
@@ -393,6 +417,7 @@
             __typename: "SingleTableTopic",
             id: 11,
             type: "TOPIC",
+            type2: "TOPIC",
             author: {
               __typename: "Person",
               username: "Benjie",
@@ -406,6 +431,7 @@
           },
           id: 12,
           type: "POST",
+          type2: "POST",
           author: {
             __typename: "Person",
             username: "Benjie",
@@ -425,6 +451,7 @@
             __typename: "SingleTableTopic",
             id: 11,
             type: "TOPIC",
+            type2: "TOPIC",
             author: {
               __typename: "Person",
               username: "Benjie",
@@ -438,6 +465,7 @@
           },
           id: 13,
           type: "POST",
+          type2: "POST",
           author: {
             __typename: "Person",
             username: "Benjie",
@@ -457,6 +485,7 @@
             __typename: "SingleTableTopic",
             id: 11,
             type: "TOPIC",
+            type2: "TOPIC",
             author: {
               __typename: "Person",
               username: "Benjie",
@@ -470,6 +499,7 @@
           },
           id: 14,
           type: "POST",
+          type2: "POST",
           author: {
             __typename: "Person",
             username: "Benjie",
@@ -489,6 +519,7 @@
             __typename: "SingleTablePost",
             id: 4,
             type: "POST",
+            type2: "POST",
             author: {
               __typename: "Person",
               username: "Benjie",
@@ -504,6 +535,7 @@
           },
           id: 16,
           type: "CHECKLIST",
+          type2: "CHECKLIST",
           author: {
             __typename: "Person",
             username: "Benjie",
@@ -521,6 +553,7 @@
             __typename: "SingleTableChecklist",
             id: 16,
             type: "CHECKLIST",
+            type2: "CHECKLIST",
             author: {
               __typename: "Person",
               username: "Benjie",
@@ -534,6 +567,7 @@
           },
           id: 17,
           type: "CHECKLIST_ITEM",
+          type2: "CHECKLIST_ITEM",
           author: {
             __typename: "Person",
             username: "Benjie",
@@ -552,6 +586,7 @@
             __typename: "SingleTableChecklist",
             id: 16,
             type: "CHECKLIST",
+            type2: "CHECKLIST",
             author: {
               __typename: "Person",
               username: "Benjie",
@@ -565,6 +600,7 @@
           },
           id: 19,
           type: "CHECKLIST_ITEM",
+          type2: "CHECKLIST_ITEM",
           author: {
             __typename: "Person",
             username: "Benjie",
@@ -583,6 +619,7 @@
             __typename: "SingleTableChecklist",
             id: 16,
             type: "CHECKLIST",
+            type2: "CHECKLIST",
             author: {
               __typename: "Person",
               username: "Benjie",
@@ -596,6 +633,7 @@
           },
           id: 20,
           type: "CHECKLIST_ITEM",
+          type2: "CHECKLIST_ITEM",
           author: {
             __typename: "Person",
             username: "Benjie",
@@ -620,6 +658,7 @@
             __typename: "SingleTableChecklist",
             id: 16,
             type: "CHECKLIST",
+            type2: "CHECKLIST",
             author: {
               __typename: "Person",
               username: "Benjie",
@@ -633,6 +672,7 @@
           },
           id: 18,
           type: "CHECKLIST_ITEM",
+          type2: "CHECKLIST_ITEM",
           author: {
             __typename: "Person",
             username: "Caroline",

@@ -479,6 +479,17 @@ export function makeExampleSchema(
     },
   });
 
+  const EnumTableItemType = new GraphQLEnumType({
+    name: "EnumTableItemType",
+    values: {
+      TOPIC: { value: "TOPIC" },
+      POST: { value: "POST" },
+      DIVIDER: { value: "DIVIDER" },
+      CHECKLIST: { value: "CHECKLIST" },
+      CHECKLIST_ITEM: { value: "CHECKLIST_ITEM" },
+    },
+  });
+
   const singleTableItemColumns = {
     id: col({ codec: TYPES.int, notNull: true }),
     type: col({
@@ -689,6 +700,7 @@ export function makeExampleSchema(
     type2: col({
       codec: enumTableItemTypeEnumSource.codec,
       notNull: true,
+      via: "item",
     }),
     parent_id: col({
       codec: TYPES.int,
@@ -2090,6 +2102,7 @@ export function makeExampleSchema(
     fields: () => ({
       id: { type: GraphQLInt },
       type: { type: GraphQLString },
+      type2: { type: EnumTableItemType },
       parent: { type: SingleTableItem },
       author: { type: Person },
       position: { type: GraphQLString },
@@ -2104,6 +2117,7 @@ export function makeExampleSchema(
   const commonSingleTableItemFields = {
     id: attrField("id", GraphQLInt),
     type: attrField("type", GraphQLString),
+    type2: attrField("type2", EnumTableItemType),
     parent: {
       type: SingleTableItem,
       plan($entity: SingleTableItemPlan) {
@@ -2191,6 +2205,7 @@ export function makeExampleSchema(
     fields: () => ({
       id: { type: GraphQLInt },
       type: { type: GraphQLString },
+      type2: { type: EnumTableItemType },
       parent: { type: RelationalItem },
       author: { type: Person },
       position: { type: GraphQLString },
@@ -2207,6 +2222,7 @@ export function makeExampleSchema(
     fields: () => ({
       id: { type: GraphQLInt },
       type: { type: GraphQLString },
+      type2: { type: EnumTableItemType },
     }),
     resolveType,
   });
@@ -2217,6 +2233,7 @@ export function makeExampleSchema(
       any,
       | {
           id: PgSourceColumn<number>;
+          type: PgSourceColumn<string>;
           type: PgSourceColumn<string>;
           position: PgSourceColumn<string>;
           created_at: PgSourceColumn<Date>;
@@ -2232,6 +2249,7 @@ export function makeExampleSchema(
   >() => ({
     id: attrField<TDataSource>("id", GraphQLInt),
     type: attrField<TDataSource>("type", GraphQLString),
+    type2: attrField<TDataSource>("type2", EnumTableItemType),
     parent: {
       type: RelationalItem,
       plan($entity: PgSelectSinglePlan<TDataSource>) {

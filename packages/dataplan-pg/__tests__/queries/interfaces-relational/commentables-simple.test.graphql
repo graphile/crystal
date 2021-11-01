@@ -11,5 +11,6 @@
 fragment Item on RelationalItem {
   __typename
   type
+  type2
   position
 }

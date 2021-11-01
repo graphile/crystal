@@ -4,6 +4,7 @@ select
     select array[
       __relational_items__."type"::text,
       __relational_items__."id"::text,
+      __relational_items__."type2"::text,
       __relational_items__."position"::text,
       __relational_items__."created_at"::text,
       __relational_items__."updated_at"::text,

@@ -17,6 +17,7 @@
 fragment Item on RelationalItem {
   id
   type
+  type2
   author {
     __typename
     username

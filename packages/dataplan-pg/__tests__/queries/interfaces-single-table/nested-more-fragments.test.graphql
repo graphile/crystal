@@ -17,6 +17,7 @@
 fragment Item on SingleTableItem {
   id
   type
+  type2
   author {
     __typename
     username

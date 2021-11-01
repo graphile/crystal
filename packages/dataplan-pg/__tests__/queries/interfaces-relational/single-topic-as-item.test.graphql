@@ -12,6 +12,7 @@ fragment Item on RelationalItem {
   __typename
   id
   type
+  type2
   position
   createdAt
   updatedAt
