@@ -18,6 +18,9 @@
     "noFallthroughCasesInSwitch": true,
     "preserveWatchOutput": true,
 
+    // We should remove this later
+    "useUnknownInCatchVariables": false,
+
     // Use eslint for these "lint"-y checks
     "noUnusedParameters": false,
     "noUnusedLocals": false

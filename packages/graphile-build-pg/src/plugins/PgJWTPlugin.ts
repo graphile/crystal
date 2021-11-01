@@ -85,7 +85,7 @@ export default (function PgJWTPlugin(
             name: compositeTypeName,
             description:
               "A JSON Web Token defined by [RFC 7519](https://tools.ietf.org/html/rfc7519) which securely represents claims between two parties.",
-            serialize(value) {
+            serialize(value: any) {
               const token = attributes.reduce((memo, attr) => {
                 if (attr.name === "exp") {
                   memo[attr.name] = value[attr.name]

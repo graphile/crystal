@@ -790,7 +790,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions) {
             }
           }
         }
-      } catch (e) {
+      } catch (e: any) {
         // This is the error we're expecting to handle:
         // https://github.com/graphql/graphql-js/blob/831598ba76f015078ecb6c5c1fbaf133302f3f8e/src/type/definition.js#L526-L531
         if (inScope && inScope.isRootQuery) {

@@ -842,7 +842,7 @@ for (const { name, createServerFromHandler, subpath = "" } of toTest) {
                   code: "MYCODE",
                 },
               },
-            };
+            } as GraphQLErrorExtended;
           });
         },
       });

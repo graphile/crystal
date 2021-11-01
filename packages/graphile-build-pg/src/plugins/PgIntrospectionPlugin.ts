@@ -263,7 +263,7 @@ export type PgIntrospectionResultsByKind = {
   typeById: { [typeId: string]: PgType };
 };
 
-function readFile(filename: string, encoding: string) {
+function readFile(filename: string, encoding: BufferEncoding) {
   return new Promise((resolve, reject) => {
     rawReadFile(filename, encoding, (err, res) => {
       if (err) reject(err);

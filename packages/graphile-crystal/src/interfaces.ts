@@ -25,11 +25,7 @@ import type {
 } from "./utils";
 
 declare module "graphql" {
-  interface GraphQLFieldExtensions<
-    _TSource,
-    _TContext,
-    _TArgs = { [argName: string]: any },
-  > {
+  interface GraphQLFieldExtensions<_TSource, _TContext, _TArgs = any> {
     graphile?: {
       plan?: ExecutablePlanResolver<any, any, any, any>;
       subscribePlan?: ExecutablePlanResolver<any, any, any, any>;

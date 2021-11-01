@@ -39,11 +39,13 @@ const BG_COLORS = [
 
 export function _crystalPrint(
   symbol:
+    | string
     | symbol
     | symbol[]
     | Record<symbol, any>
     | Map<any, any>
-    | CrystalObject,
+    | CrystalObject
+    | PlanResults,
   seen: Set<any>,
 ): string {
   if (isDeferred(symbol)) {
@@ -182,7 +184,8 @@ export function crystalPrint(
     | symbol[]
     | Record<symbol, any>
     | Map<any, any>
-    | CrystalObject,
+    | CrystalObject
+    | PlanResults,
 ): string {
   return _crystalPrint(symbol, new Set());
 }

@@ -1,7 +1,9 @@
 import type {
   GraphQLInterfaceType,
   GraphQLObjectType,
-  SelectionNode,
+  SelectionNode} from "graphql";
+import {
+  Kind
 } from "graphql";
 import { inspect } from "util";
 
@@ -91,7 +93,7 @@ export function interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
   for (let i = 0, l = selections.length; i < l; i++) {
     const selection = selections[i];
     switch (selection.kind) {
-      case "FragmentSpread": {
+      case Kind.FRAGMENT_SPREAD: {
         // Assumed to exist because query passed validation.
         const fragment = aether.fragments[selection.name.value];
         const typeCondition = fragment.typeCondition;
@@ -111,7 +113,7 @@ export function interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
         }
         break;
       }
-      case "InlineFragment": {
+      case Kind.INLINE_FRAGMENT: {
         const typeCondition = selection.typeCondition;
         if (typeCondition) {
           const matchingInterfaceType = types.find(
@@ -131,7 +133,7 @@ export function interfaceTypeHasNonIntrospectionFieldQueriedInSelections(
         }
         break;
       }
-      case "Field": {
+      case Kind.FIELD: {
         const fieldName = selection.name.value;
         if (!fieldName.startsWith("__")) {
           return true;

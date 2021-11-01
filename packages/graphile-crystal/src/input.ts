@@ -5,7 +5,9 @@ import type {
   ListTypeNode,
   NamedTypeNode,
   NonNullTypeNode,
-  ValueNode,
+  ValueNode} from "graphql";
+import {
+  Kind
 } from "graphql";
 import {
   GraphQLInputObjectType,
@@ -44,7 +46,7 @@ function graphqlGetTypeForNode(
   node: NamedTypeNode | ListTypeNode | NonNullTypeNode,
 ): GraphQLType {
   switch (node.kind) {
-    case "NamedType": {
+    case Kind.NAMED_TYPE: {
       const type = aether.schema.getType(node.name.value);
       if (!type) {
         // Should not happen since the GraphQL operation has already been
@@ -55,9 +57,9 @@ function graphqlGetTypeForNode(
       }
       return type;
     }
-    case "ListType":
+    case Kind.LIST_TYPE:
       return new GraphQLList(graphqlGetTypeForNode(aether, node.type));
-    case "NonNullType":
+    case Kind.NON_NULL_TYPE:
       return new GraphQLNonNull(graphqlGetTypeForNode(aether, node.type));
     default: {
       const never: never = node;

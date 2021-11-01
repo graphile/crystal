@@ -3,6 +3,7 @@ import type { ExecutionResult, OperationDefinitionNode } from "graphql";
 import { Kind } from "graphql";
 import jwt from "jsonwebtoken";
 import type { Pool, PoolClient, QueryConfig, QueryResult } from "pg";
+import type { NoticeMessage } from "pg-protocol/dist/messages";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 import { formatSQLForDebugging } from "postgraphile-core";
@@ -36,7 +37,7 @@ const debugPgNotice = createDebugger("postgraphile:postgres:notice");
  */
 function debugPgErrorObject(
   debugFn: createDebugger.IDebugger,
-  object: Error | PgNotice,
+  object: Error | PgNotice | NoticeMessage,
 ) {
   const severity = "severity" in object ? object.severity : "ERROR";
   const code = "code" in object ? `[${object.code}]` : "";
@@ -548,7 +549,7 @@ export function debugPgClient(
     };
 
     if (debugPgNotice.enabled) {
-      pgClient.on("notice", (msg: Error | PgNotice) => {
+      pgClient.on("notice", (msg) => {
         debugPgErrorObject(debugPgNotice, msg);
       });
     }

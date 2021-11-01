@@ -78,7 +78,7 @@ export default function callbackToAsyncIterator<CallbackInput, ReturnVal>(
         return this;
       },
     };
-  } catch (err) {
+  } catch (err: any) {
     onError(err);
     return {
       next() {

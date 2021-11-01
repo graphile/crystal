@@ -7,6 +7,7 @@ import {
 } from "graphql";
 import type { IncomingMessage, OutgoingHttpHeaders, Server } from "http";
 import { ServerResponse } from "http";
+import type { Socket } from "net";
 import parseUrl from "parseurl";
 import type {
   ConnectionContext,
@@ -195,7 +196,7 @@ export async function enhanceHttpServerWithSubscriptions<
     const { pathname = "" } = parseUrl(req) || {};
     const isGraphqlRoute = pathname === externalUrlBase + graphqlRoute;
     if (isGraphqlRoute) {
-      wss.handleUpgrade(req, socket, head, (ws) => {
+      wss.handleUpgrade(req, socket as Socket, head, (ws) => {
         wss.emit("connection", ws, req);
       });
     }

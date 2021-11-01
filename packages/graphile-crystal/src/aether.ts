@@ -2148,7 +2148,7 @@ export class Aether<
       if (isPromise(rawPendingResult)) {
         try {
           result[i] = await rawPendingResult;
-        } catch (e) {
+        } catch (e: any) {
           result[i] = new CrystalError(e);
         }
       }
@@ -2766,7 +2766,7 @@ export class Aether<
       for (let i = 0; i < entriesLength; i++) {
         deferredResults[i].resolve(results[i]);
       }
-    } catch (e) {
+    } catch (e: any) {
       for (let i = 0; i < entriesLength; i++) {
         deferredResults[i].reject(e);
       }

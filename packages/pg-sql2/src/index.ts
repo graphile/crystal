@@ -535,7 +535,7 @@ export function raw(text: string): SQL {
     sqlRawWarningOutput = true;
     try {
       throw new Error("sql.raw first invoked here");
-    } catch (e) {
+    } catch (e: any) {
       console.warn(
         `[pg-sql2] WARNING: you're using the sql.raw escape hatch, usage of this API is rarely required and is highly discouraged. Please be sure this is what you intend. ${e.stack}`,
       );

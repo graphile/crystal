@@ -10,6 +10,7 @@ import type {
   ObjectFieldNode,
   ValueNode,
 } from "graphql";
+import { Kind } from "graphql";
 import { GraphQLObjectType } from "graphql";
 import {
   GraphQLBoolean,
@@ -61,33 +62,33 @@ export function assertNullPrototype(
 
 function dangerousRawValueToValueNode(value: JSON): ValueNode {
   if (value == null) {
-    return { kind: "NullValue" };
+    return { kind: Kind.NULL };
   }
   if (typeof value === "boolean") {
-    return { kind: "BooleanValue", value };
+    return { kind: Kind.BOOLEAN, value };
   }
   if (typeof value === "number") {
     if (value === Math.round(value)) {
-      return { kind: "IntValue", value: String(value) };
+      return { kind: Kind.INT, value: String(value) };
     } else {
-      return { kind: "FloatValue", value: String(value) };
+      return { kind: Kind.FLOAT, value: String(value) };
     }
   }
   if (typeof value === "string") {
-    return { kind: "StringValue", value };
+    return { kind: Kind.STRING, value };
   }
   if (Array.isArray(value)) {
     return {
-      kind: "ListValue",
+      kind: Kind.LIST,
       values: value.map(dangerousRawValueToValueNode),
     };
   }
   if (typeof value === "object" && value) {
     return {
-      kind: "ObjectValue",
+      kind: Kind.OBJECT,
       fields: Object.keys(value).map((key) => ({
-        kind: "ObjectField",
-        name: { kind: "Name", value: key },
+        kind: Kind.OBJECT_FIELD,
+        name: { kind: Kind.NAME, value: key },
         value: dangerousRawValueToValueNode(value[key]),
       })),
     };
@@ -119,7 +120,7 @@ function rawValueToValueNode(
     return undefined;
   }
   if (value === null) {
-    return { kind: "NullValue" };
+    return { kind: Kind.NULL };
   }
   if (type === GraphQLBoolean) {
     if (typeof value !== "boolean") {
@@ -127,7 +128,7 @@ function rawValueToValueNode(
         "defaultValue contained invalid value at a position expecting boolean",
       );
     }
-    return { kind: "BooleanValue", value };
+    return { kind: Kind.BOOLEAN, value };
   }
   if (type === GraphQLInt) {
     if (typeof value !== "number") {
@@ -135,7 +136,7 @@ function rawValueToValueNode(
         "defaultValue contained invalid value at a position expecting int",
       );
     }
-    return { kind: "IntValue", value: String(parseInt(String(value), 10)) };
+    return { kind: Kind.INT, value: String(parseInt(String(value), 10)) };
   }
   if (type === GraphQLFloat) {
     if (typeof value !== "number") {
@@ -143,7 +144,7 @@ function rawValueToValueNode(
         "defaultValue contained invalid value at a position expecting int",
       );
     }
-    return { kind: "FloatValue", value: String(value) };
+    return { kind: Kind.FLOAT, value: String(value) };
   }
   if (type === GraphQLString || type === GraphQLID) {
     if (typeof value !== "string") {
@@ -151,7 +152,7 @@ function rawValueToValueNode(
         "defaultValue contained invalid value at a position expecting string",
       );
     }
-    return { kind: "StringValue", value };
+    return { kind: Kind.STRING, value };
   }
   if (type instanceof GraphQLEnumType) {
     const enumValues = type.getValues();
@@ -164,7 +165,7 @@ function rawValueToValueNode(
       );
       throw new Error(`Default contained invalid value for enum ${type.name}`);
     }
-    return { kind: "EnumValue", value: enumValue.name };
+    return { kind: Kind.ENUM, value: enumValue.name };
   }
   if (type instanceof GraphQLScalarType) {
     return dangerousRawValueToValueNode(value);
@@ -176,7 +177,7 @@ function rawValueToValueNode(
       );
     }
     return {
-      kind: "ListValue",
+      kind: Kind.LIST,
       values: value.map((entry: any) => {
         const entryValueNode = rawValueToValueNode(type.ofType, entry);
         if (entryValueNode === undefined) {
@@ -206,14 +207,14 @@ function rawValueToValueNode(
       const fieldValueNode = rawValueToValueNode(fieldType, rawValue);
       if (fieldValueNode !== undefined) {
         fields.push({
-          kind: "ObjectField",
-          name: { kind: "Name", value: fieldName },
+          kind: Kind.OBJECT_FIELD,
+          name: { kind: Kind.NAME, value: fieldName },
           value: fieldValueNode,
         });
       }
     }
     return {
-      kind: "ObjectValue",
+      kind: Kind.OBJECT,
       fields,
     };
   }
