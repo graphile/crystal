@@ -1,3 +1,0 @@
-# PostGraphile GraphiQL
-
-TODO

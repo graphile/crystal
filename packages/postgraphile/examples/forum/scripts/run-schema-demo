@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-# TODO: Demo Postgres database
-
-# set -e
-
-# scripts/run-schema $@
-
-# psql -f schema-demo.sql $@

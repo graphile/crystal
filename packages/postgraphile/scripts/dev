@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-set -e
-
-cd $(dirname $0)/..
-concurrently --kill-others "./scripts/dev-postgraphile $*" 'cd ../postgraphiql && PORT=5783 yarn react-scripts start'
