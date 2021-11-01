@@ -84,6 +84,10 @@ beforeAll(() => {
   return Promise.all([result1.catch(e => {}), result2.catch(e => {})]);
 });
 
+afterAll(() => {
+  result1 = result2 = null;
+});
+
 ${assertions
   .map((assertion) => {
     return `\

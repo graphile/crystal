@@ -9,6 +9,7 @@ import type {
   AsyncExecutionResult,
   ExecutionPatchResult,
   GraphQLError,
+  GraphQLSchema,
 } from "graphql";
 import {
   execute,
@@ -28,7 +29,7 @@ import prettier from "prettier";
 import type { PgClient, PgClientQuery, WithPgClient } from "../src";
 import { PgSubscriber } from "../src";
 import type { PgClientResult } from "../src/executor";
-import { makeExampleSchema, schema as optimizedSchema } from "./exampleSchema";
+import { makeExampleSchema } from "./exampleSchema";
 
 export const UPDATE_SNAPSHOTS = process.env.UPDATE_SNAPSHOTS === "1";
 
@@ -63,10 +64,12 @@ const pathCompare = (
   return path1.length - path2.length;
 };
 
-const deoptimizedSchema = makeExampleSchema({ deoptimize: true });
-
+let optimizedSchema!: GraphQLSchema;
+let deoptimizedSchema!: GraphQLSchema;
 let testPool: Pool | null = null;
 beforeAll(() => {
+  optimizedSchema = makeExampleSchema();
+  deoptimizedSchema = makeExampleSchema({ deoptimize: true });
   testPool = new Pool({
     connectionString: process.env.TEST_DATABASE_URL || "graphile_crystal",
   });
@@ -75,6 +78,7 @@ beforeAll(() => {
 afterAll(() => {
   testPool.end();
   testPool = null;
+  optimizedSchema = deoptimizedSchema = null;
 });
 
 function makeWithTestPgClient(queries: PgClientQuery[]): WithPgClient {
@@ -512,6 +516,9 @@ let sqlSnapshotAliasCount = 0;
 beforeEach(() => {
   sqlSnapshotAliases.clear();
   sqlSnapshotAliasCount = 0;
+});
+afterAll(() => {
+  sqlSnapshotAliases.clear();
 });
 
 function makeSQLSnapshotSafe(sql: string): string {

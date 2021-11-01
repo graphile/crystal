@@ -3230,8 +3230,6 @@ export function makeExampleSchema(
   );
 }
 
-export const schema = makeExampleSchema();
-
 async function main() {
   const filePath = `${__dirname}/schema.graphql`;
   writeFileSync(
