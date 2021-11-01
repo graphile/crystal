@@ -5,18 +5,50 @@
         {
           name: "Dogs",
           messagesConnection: {
-            nodes: [{ body: "Dogs = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } }],
+            nodes: [
+              {
+                body: "Dogs = awesome -- Alice",
+                author: {
+                  username: "Alice",
+                  gravatarUrl: null,
+                },
+              },
+            ],
           },
         },
       ],
     },
   },
   {
-    data: { body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
-    path: ["forums", 0, "messagesConnection", "nodes", 1],
+    data: {
+      body: "Dogs = awesome -- Bob",
+      author: {
+        username: "Bob",
+        gravatarUrl: null,
+      },
+    },
+    path: [
+      "forums",
+      0,
+      "messagesConnection",
+      "nodes",
+      1,
+    ],
   },
   {
-    data: { body: "Dogs = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
-    path: ["forums", 0, "messagesConnection", "nodes", 2],
+    data: {
+      body: "Dogs = awesome -- Cecilia",
+      author: {
+        username: "Cecilia",
+        gravatarUrl: null,
+      },
+    },
+    path: [
+      "forums",
+      0,
+      "messagesConnection",
+      "nodes",
+      2,
+    ],
   },
 ]

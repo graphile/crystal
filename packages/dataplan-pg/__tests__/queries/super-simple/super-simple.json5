@@ -1,1 +1,10 @@
-{ forums: [{ name: "Cats" }, { name: "Postgres" }] }
+{
+  forums: [
+    {
+      name: "Cats",
+    },
+    {
+      name: "Postgres",
+    },
+  ],
+}

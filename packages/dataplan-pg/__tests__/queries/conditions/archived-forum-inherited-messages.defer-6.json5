@@ -6,22 +6,34 @@
           name: "Dogs",
           messagesConnection: {
             nodes: [
-              { body: "Dogs = awesome -- Alice" },
-              { body: "Dogs = awesome -- Bob" },
-              { body: "Dogs = awesome -- Cecilia" },
+              {
+                body: "Dogs = awesome -- Alice",
+              },
+              {
+                body: "Dogs = awesome -- Bob",
+              },
+              {
+                body: "Dogs = awesome -- Cecilia",
+              },
             ],
             edges: [
               {
                 cursor: "WyJmMGIyOGM5NGMxIiwiZDA5MGQwOTAtMDAwMC0wMDAwLTAwMDAtYTExY2UwMDBkMDkwIl0=",
-                node: { body: "Dogs = awesome -- Alice" },
+                node: {
+                  body: "Dogs = awesome -- Alice",
+                },
               },
               {
                 cursor: "WyJmMGIyOGM5NGMxIiwiZDA5MGQwOTAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBkMDkwIl0=",
-                node: { body: "Dogs = awesome -- Bob" },
+                node: {
+                  body: "Dogs = awesome -- Bob",
+                },
               },
               {
                 cursor: "WyJmMGIyOGM5NGMxIiwiZDA5MGQwOTAtMDAwMC0wMDAwLTAwMDAtY2VjMTExYTBkMDkwIl0=",
-                node: { body: "Dogs = awesome -- Cecilia" },
+                node: {
+                  body: "Dogs = awesome -- Cecilia",
+                },
               },
             ],
           },
@@ -30,21 +42,96 @@
     },
   },
   {
-    data: { author: { username: "Alice", gravatarUrl: null } },
-    path: ["forums", 0, "messagesConnection", "edges", 0, "node"],
+    data: {
+      author: {
+        username: "Alice",
+        gravatarUrl: null,
+      },
+    },
+    path: [
+      "forums",
+      0,
+      "messagesConnection",
+      "edges",
+      0,
+      "node",
+    ],
   },
   {
-    data: { author: { username: "Bob", gravatarUrl: null } },
-    path: ["forums", 0, "messagesConnection", "edges", 1, "node"],
+    data: {
+      author: {
+        username: "Bob",
+        gravatarUrl: null,
+      },
+    },
+    path: [
+      "forums",
+      0,
+      "messagesConnection",
+      "edges",
+      1,
+      "node",
+    ],
   },
   {
-    data: { author: { username: "Cecilia", gravatarUrl: null } },
-    path: ["forums", 0, "messagesConnection", "edges", 2, "node"],
+    data: {
+      author: {
+        username: "Cecilia",
+        gravatarUrl: null,
+      },
+    },
+    path: [
+      "forums",
+      0,
+      "messagesConnection",
+      "edges",
+      2,
+      "node",
+    ],
   },
-  { data: { author: { username: "Alice", gravatarUrl: null } }, path: ["forums", 0, "messagesConnection", "nodes", 0] },
-  { data: { author: { username: "Bob", gravatarUrl: null } }, path: ["forums", 0, "messagesConnection", "nodes", 1] },
   {
-    data: { author: { username: "Cecilia", gravatarUrl: null } },
-    path: ["forums", 0, "messagesConnection", "nodes", 2],
+    data: {
+      author: {
+        username: "Alice",
+        gravatarUrl: null,
+      },
+    },
+    path: [
+      "forums",
+      0,
+      "messagesConnection",
+      "nodes",
+      0,
+    ],
+  },
+  {
+    data: {
+      author: {
+        username: "Bob",
+        gravatarUrl: null,
+      },
+    },
+    path: [
+      "forums",
+      0,
+      "messagesConnection",
+      "nodes",
+      1,
+    ],
+  },
+  {
+    data: {
+      author: {
+        username: "Cecilia",
+        gravatarUrl: null,
+      },
+    },
+    path: [
+      "forums",
+      0,
+      "messagesConnection",
+      "nodes",
+      2,
+    ],
   },
 ]

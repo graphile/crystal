@@ -12,9 +12,14 @@
             id: "ca700000-0000-0000-0000-000000000ca7",
             name: "Cats",
             isArchived: false,
-            self: { name: "Cats" },
+            self: {
+              name: "Cats",
+            },
           },
-          author: { username: "Alice", gravatarUrl: null },
+          author: {
+            username: "Alice",
+            gravatarUrl: null,
+          },
         },
       },
     },
@@ -32,9 +37,14 @@
             id: "ca700000-0000-0000-0000-000000000ca7",
             name: "Cats",
             isArchived: false,
-            self: { name: "Cats" },
+            self: {
+              name: "Cats",
+            },
           },
-          author: { username: "Bob", gravatarUrl: null },
+          author: {
+            username: "Bob",
+            gravatarUrl: null,
+          },
         },
       },
     },

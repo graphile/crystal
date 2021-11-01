@@ -8,7 +8,10 @@
       note: "Such a great post.",
       titleLower: "my relational post",
       isExplicitlyArchived: false,
-      author: { personId: 2, username: "Benjie" },
+      author: {
+        personId: 2,
+        username: "Benjie",
+      },
     },
   },
 }

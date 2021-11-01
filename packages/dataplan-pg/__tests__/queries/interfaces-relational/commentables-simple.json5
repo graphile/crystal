@@ -1,1 +1,9 @@
-{ allRelationalCommentablesList: [{ __typename: "RelationalPost", type: "POST", position: "1" }] }
+{
+  allRelationalCommentablesList: [
+    {
+      __typename: "RelationalPost",
+      type: "POST",
+      position: "1",
+    },
+  ],
+}

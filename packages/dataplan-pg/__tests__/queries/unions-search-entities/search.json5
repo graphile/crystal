@@ -1,11 +1,25 @@
 {
   searchEntities: [
-    { personId: 4, username: "Dave" },
-    { postId: 1, author: { username: "Ellie" }, body: "Dave do you fancy pizza?" },
+    {
+      personId: 4,
+      username: "Dave",
+    },
+    {
+      postId: 1,
+      author: {
+        username: "Ellie",
+      },
+      body: "Dave do you fancy pizza?",
+    },
     {
       commentId: 4,
-      author: { username: "Ellie" },
-      post: { postId: 3, body: "Sweet, I'll order some Mighty Meaty" },
+      author: {
+        username: "Ellie",
+      },
+      post: {
+        postId: 3,
+        body: "Sweet, I'll order some Mighty Meaty",
+      },
       body: "Of course; I'll grab a selection. Dave: BYOB!",
     },
   ],

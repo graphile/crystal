@@ -1,1 +1,3 @@
-{ singleTableTopicById: null }
+{
+  singleTableTopicById: null,
+}

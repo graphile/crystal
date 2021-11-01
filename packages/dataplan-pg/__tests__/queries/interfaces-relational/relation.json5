@@ -1,7 +1,14 @@
 {
   item: {
     __typename: "RelationalPost",
-    parent: { __typename: "RelationalTopic", id: 2, author: { __typename: "Person", username: "Alice" } },
+    parent: {
+      __typename: "RelationalTopic",
+      id: 2,
+      author: {
+        __typename: "Person",
+        username: "Alice",
+      },
+    },
     id: 15,
   },
 }

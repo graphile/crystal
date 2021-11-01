@@ -1,1 +1,6 @@
-{ randomUser: { username: "Bob", usernameHash: "da6645f6e22bf5f75974dc7eed5fcd6160d6b51e" } }
+{
+  randomUser: {
+    username: "Bob",
+    usernameHash: "da6645f6e22bf5f75974dc7eed5fcd6160d6b51e",
+  },
+}

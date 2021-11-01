@@ -81,7 +81,13 @@
       description: null,
       note: null,
     },
-    { __typename: "RelationalChecklist", id: 16, type: "CHECKLIST", position: "0", title: "Planning goals" },
+    {
+      __typename: "RelationalChecklist",
+      id: 16,
+      type: "CHECKLIST",
+      position: "0",
+      title: "Planning goals",
+    },
     {
       __typename: "RelationalChecklistItem",
       id: 17,

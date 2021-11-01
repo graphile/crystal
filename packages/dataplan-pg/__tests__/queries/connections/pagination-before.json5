@@ -3,11 +3,23 @@
     edges: [
       {
         cursor: "WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtYTExY2UwMDBjYTcwIl0=",
-        node: { body: "Cats = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
+        node: {
+          body: "Cats = awesome -- Alice",
+          author: {
+            username: "Alice",
+            gravatarUrl: null,
+          },
+        },
       },
       {
         cursor: "WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBjYTcwIl0=",
-        node: { body: "Cats = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+        node: {
+          body: "Cats = awesome -- Bob",
+          author: {
+            username: "Bob",
+            gravatarUrl: null,
+          },
+        },
       },
     ],
   },

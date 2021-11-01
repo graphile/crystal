@@ -3,7 +3,14 @@
     randomUser: {
       username: "Bob",
       gravatarUrl: null,
-      mostRecentForum: { uniqueAuthorCount: 3, featuredMessages: [{ body: "Postgres = awesome -- Bob" }] },
+      mostRecentForum: {
+        uniqueAuthorCount: 3,
+        featuredMessages: [
+          {
+            body: "Postgres = awesome -- Bob",
+          },
+        ],
+      },
     },
   },
 }

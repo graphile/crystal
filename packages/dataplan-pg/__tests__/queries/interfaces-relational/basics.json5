@@ -228,10 +228,30 @@
         },
       ],
     },
-    { __typename: "Person", username: "Dave", items: [] },
-    { __typename: "Person", username: "Ellie", items: [] },
-    { __typename: "Person", username: "Fred", items: [] },
-    { __typename: "Person", username: "Georgina", items: [] },
-    { __typename: "Person", username: "Harry", items: [] },
+    {
+      __typename: "Person",
+      username: "Dave",
+      items: [],
+    },
+    {
+      __typename: "Person",
+      username: "Ellie",
+      items: [],
+    },
+    {
+      __typename: "Person",
+      username: "Fred",
+      items: [],
+    },
+    {
+      __typename: "Person",
+      username: "Georgina",
+      items: [],
+    },
+    {
+      __typename: "Person",
+      username: "Harry",
+      items: [],
+    },
   ],
 }

@@ -1,6 +1,12 @@
 {
   forums: [
-    { a: "Cats", b: "Cats" },
-    { a: "Postgres", b: "Postgres" },
+    {
+      a: "Cats",
+      b: "Cats",
+    },
+    {
+      a: "Postgres",
+      b: "Postgres",
+    },
   ],
 }

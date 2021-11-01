@@ -1,1 +1,8 @@
-{ forum: { randomUser: { username: "Bob", gravatarUrl: null } } }
+{
+  forum: {
+    randomUser: {
+      username: "Bob",
+      gravatarUrl: null,
+    },
+  },
+}

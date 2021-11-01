@@ -1,9 +1,24 @@
 {
   createThreeRelationalPosts: {
     query: {
-      i1: { id: 1000000, title: "Post #1", description: "Desc 1", note: null },
-      i2: { id: 1000001, title: "Post #2", description: "Desc 2", note: null },
-      i3: { id: 1000002, title: "Post #3", description: "Desc 3", note: null },
+      i1: {
+        id: 1000000,
+        title: "Post #1",
+        description: "Desc 1",
+        note: null,
+      },
+      i2: {
+        id: 1000001,
+        title: "Post #2",
+        description: "Desc 2",
+        note: null,
+      },
+      i3: {
+        id: 1000002,
+        title: "Post #3",
+        description: "Desc 3",
+        note: null,
+      },
     },
   },
 }

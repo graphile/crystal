@@ -1,1 +1,6 @@
-{ randomUser: { username: "Bob", gravatarUrl: null } }
+{
+  randomUser: {
+    username: "Bob",
+    gravatarUrl: null,
+  },
+}

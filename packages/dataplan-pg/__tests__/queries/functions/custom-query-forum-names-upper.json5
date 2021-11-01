@@ -1,1 +1,7 @@
-{ FORUM_NAMES: ["CATS", "DOGS", "POSTGRES"] }
+{
+  FORUM_NAMES: [
+    "CATS",
+    "DOGS",
+    "POSTGRES",
+  ],
+}

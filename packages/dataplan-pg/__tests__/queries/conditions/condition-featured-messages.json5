@@ -1,14 +1,34 @@
 {
   forums: [
-    { name: "Cats", messagesConnection: { nodes: [], edges: [] } },
+    {
+      name: "Cats",
+      messagesConnection: {
+        nodes: [],
+        edges: [],
+      },
+    },
     {
       name: "Postgres",
       messagesConnection: {
-        nodes: [{ body: "Postgres = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } }],
+        nodes: [
+          {
+            body: "Postgres = awesome -- Bob",
+            author: {
+              username: "Bob",
+              gravatarUrl: null,
+            },
+          },
+        ],
         edges: [
           {
             cursor: "WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBmMTcwIl0=",
-            node: { body: "Postgres = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
+            node: {
+              body: "Postgres = awesome -- Bob",
+              author: {
+                username: "Bob",
+                gravatarUrl: null,
+              },
+            },
           },
         ],
       },

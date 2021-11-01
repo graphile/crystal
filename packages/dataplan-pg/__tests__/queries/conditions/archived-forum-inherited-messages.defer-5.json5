@@ -6,14 +6,56 @@
           name: "Dogs",
           messagesConnection: {
             nodes: [
-              { body: "Dogs = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } },
-              { body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } },
-              { body: "Dogs = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } },
+              {
+                body: "Dogs = awesome -- Alice",
+                author: {
+                  username: "Alice",
+                  gravatarUrl: null,
+                },
+              },
+              {
+                body: "Dogs = awesome -- Bob",
+                author: {
+                  username: "Bob",
+                  gravatarUrl: null,
+                },
+              },
+              {
+                body: "Dogs = awesome -- Cecilia",
+                author: {
+                  username: "Cecilia",
+                  gravatarUrl: null,
+                },
+              },
             ],
             edges: [
-              { node: { body: "Dogs = awesome -- Alice", author: { username: "Alice", gravatarUrl: null } } },
-              { node: { body: "Dogs = awesome -- Bob", author: { username: "Bob", gravatarUrl: null } } },
-              { node: { body: "Dogs = awesome -- Cecilia", author: { username: "Cecilia", gravatarUrl: null } } },
+              {
+                node: {
+                  body: "Dogs = awesome -- Alice",
+                  author: {
+                    username: "Alice",
+                    gravatarUrl: null,
+                  },
+                },
+              },
+              {
+                node: {
+                  body: "Dogs = awesome -- Bob",
+                  author: {
+                    username: "Bob",
+                    gravatarUrl: null,
+                  },
+                },
+              },
+              {
+                node: {
+                  body: "Dogs = awesome -- Cecilia",
+                  author: {
+                    username: "Cecilia",
+                    gravatarUrl: null,
+                  },
+                },
+              },
             ],
           },
         },
@@ -21,15 +63,39 @@
     },
   },
   {
-    data: { cursor: "WyJmMGIyOGM5NGMxIiwiZDA5MGQwOTAtMDAwMC0wMDAwLTAwMDAtYTExY2UwMDBkMDkwIl0=" },
-    path: ["forums", 0, "messagesConnection", "edges", 0],
+    data: {
+      cursor: "WyJmMGIyOGM5NGMxIiwiZDA5MGQwOTAtMDAwMC0wMDAwLTAwMDAtYTExY2UwMDBkMDkwIl0=",
+    },
+    path: [
+      "forums",
+      0,
+      "messagesConnection",
+      "edges",
+      0,
+    ],
   },
   {
-    data: { cursor: "WyJmMGIyOGM5NGMxIiwiZDA5MGQwOTAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBkMDkwIl0=" },
-    path: ["forums", 0, "messagesConnection", "edges", 1],
+    data: {
+      cursor: "WyJmMGIyOGM5NGMxIiwiZDA5MGQwOTAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBkMDkwIl0=",
+    },
+    path: [
+      "forums",
+      0,
+      "messagesConnection",
+      "edges",
+      1,
+    ],
   },
   {
-    data: { cursor: "WyJmMGIyOGM5NGMxIiwiZDA5MGQwOTAtMDAwMC0wMDAwLTAwMDAtY2VjMTExYTBkMDkwIl0=" },
-    path: ["forums", 0, "messagesConnection", "edges", 2],
+    data: {
+      cursor: "WyJmMGIyOGM5NGMxIiwiZDA5MGQwOTAtMDAwMC0wMDAwLTAwMDAtY2VjMTExYTBkMDkwIl0=",
+    },
+    path: [
+      "forums",
+      0,
+      "messagesConnection",
+      "edges",
+      2,
+    ],
   },
 ]

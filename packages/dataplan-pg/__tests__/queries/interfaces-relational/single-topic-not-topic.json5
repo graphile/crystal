@@ -1,1 +1,3 @@
-{ relationalTopicById: null }
+{
+  relationalTopicById: null,
+}
