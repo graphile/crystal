@@ -226,7 +226,30 @@ create type interfaces_and_unions.item_type as enum (
   'CHECKLIST_ITEM'
 );
 
+create table interfaces_and_unions.enum_table_item_type (
+  type text primary key,
+  description text
+);
+
+insert into interfaces_and_unions.enum_table_item_type (type) values
+  ('TOPIC'),
+  ('POST'),
+  ('DIVIDER'),
+  ('CHECKLIST'),
+  ('CHECKLIST_ITEM');
+
 --------------------------------------------------------------------------------
+
+create function interfaces_and_unions.tg__set_type2() returns trigger as $$
+begin
+  -- Cannot do this via `generated always as (type::text) stored` since casting
+  -- an enum to text is not immutable (since you might rename the enum value
+  -- later). We won't be doing that though; so work around it with a trigger.
+  NEW.type2 = NEW.type::text;
+  return NEW;
+end;
+$$ language plpgsql volatile;
+
 
 -- Here's a table that stores the data for all the different types of Item; we
 -- have to declare somewhere which additional columns each of the various item
@@ -236,6 +259,7 @@ create table interfaces_and_unions.single_table_items (
 
   -- Rails-style polymorphism column
   type interfaces_and_unions.item_type not null default 'POST'::interfaces_and_unions.item_type,
+  type2 text not null references interfaces_and_unions.enum_table_item_type,
 
   -- Shared attributes:
   parent_id int references interfaces_and_unions.single_table_items on delete cascade,
@@ -252,6 +276,7 @@ create table interfaces_and_unions.single_table_items (
   note text,
   color text
 );
+create trigger set_type2 before insert or update on interfaces_and_unions.single_table_items for each row execute function interfaces_and_unions.tg__set_type2();
 comment on table interfaces_and_unions.single_table_items is E'@interface single_table type\n@type TOPIC title\n@type POST title,description,note\n@type DIVIDER title,color\n@type CHECKLIST title\n@type CHECKLIST_ITEM description,note';
 
 insert into interfaces_and_unions.single_table_items 
@@ -289,6 +314,7 @@ create table interfaces_and_unions.relational_items (
 
   -- This column is used to tell us which table we need to join to
   type interfaces_and_unions.item_type not null default 'POST'::interfaces_and_unions.item_type,
+  type2 text not null references interfaces_and_unions.enum_table_item_type,
 
   -- Shared attributes (also 'id'):
   parent_id int references interfaces_and_unions.relational_items on delete cascade,
@@ -299,6 +325,7 @@ create table interfaces_and_unions.relational_items (
   is_explicitly_archived bool not null default false,
   archived_at timestamptz
 );
+create trigger set_type2 before insert or update on interfaces_and_unions.relational_items for each row execute function interfaces_and_unions.tg__set_type2();
 create table interfaces_and_unions.relational_topics (
   id int primary key references interfaces_and_unions.relational_items,
   title text not null
@@ -386,8 +413,10 @@ insert into interfaces_and_unions.relational_checklist_items (id, description, n
 create table interfaces_and_unions.relational_commentables (
   id serial primary key,
 
-  type interfaces_and_unions.item_type not null check (type in ('POST', 'CHECKLIST', 'CHECKLIST_ITEM'))
+  type interfaces_and_unions.item_type not null check (type in ('POST', 'CHECKLIST', 'CHECKLIST_ITEM')),
+  type2 text not null references interfaces_and_unions.enum_table_item_type 
 );
+create trigger set_type2 before insert or update on interfaces_and_unions.relational_commentables for each row execute function interfaces_and_unions.tg__set_type2();
 
 insert into interfaces_and_unions.relational_commentables (id, type)
   select id, 'POST'::interfaces_and_unions.item_type from interfaces_and_unions.relational_posts
@@ -452,10 +481,12 @@ create table interfaces_and_unions.union_items (
   id serial primary key,
 
   -- This column is used to tell us which table we need to join to
-  type interfaces_and_unions.item_type not null default 'POST'::interfaces_and_unions.item_type
+  type interfaces_and_unions.item_type not null default 'POST'::interfaces_and_unions.item_type,
+  type2 text not null references interfaces_and_unions.enum_table_item_type
 
   -- No shared columns!
 );
+create trigger set_type2 before insert or update on interfaces_and_unions.union_items for each row execute function interfaces_and_unions.tg__set_type2();
 create table interfaces_and_unions.union_topics (
   id int primary key references interfaces_and_unions.union_items,
   title text not null

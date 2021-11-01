@@ -2,7 +2,7 @@ import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type { PgSourceColumns } from "./datasource";
-import type { PgTypeCodec } from "./interfaces";
+import type { PgEnumTypeCodec, PgTypeCodec } from "./interfaces";
 
 // TODO: optimisation: `identity` can be shortcut
 const identity = <T>(value: T): T => value;
@@ -60,11 +60,15 @@ export function recordType(
   };
 }
 
-export function enumType(identifier: SQL): PgTypeCodec<string, string> {
+export function enumType<TValue extends string>(
+  identifier: SQL,
+  values: TValue[],
+): PgEnumTypeCodec<TValue> {
   return {
     sqlType: identifier,
     fromPg: identity,
     toPg: identity,
+    values,
   };
 }
 

@@ -13,12 +13,16 @@ debugFactory.formatters.S = sqlPrint;
 
 export { enumType, recordType, TYPES } from "./codecs";
 export {
+  PgEnumSource,
+  PgEnumSourceExtensions,
+  PgEnumSourceOptions,
   PgSource,
   PgSourceBuilder,
   PgSourceColumn,
   PgSourceColumns,
   PgSourceColumnVia,
   PgSourceColumnViaExplicit,
+  PgSourceExtensions,
   PgSourceRelation,
 } from "./datasource";
 export {

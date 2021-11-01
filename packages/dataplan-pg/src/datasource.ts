@@ -22,7 +22,7 @@ import type {
   PgExecutorMutationOptions,
   PgExecutorOptions,
 } from "./executor";
-import type { PgTypeCodec, PlanByUniques } from "./interfaces";
+import type { PgEnumTypeCodec, PgTypeCodec, PlanByUniques } from "./interfaces";
 import type { PgSelectPlan } from "./plans/pgSelect";
 import { pgSelect } from "./plans/pgSelect";
 import type {
@@ -114,6 +114,8 @@ export interface PgSourceRelation<
   isUnique: boolean;
 }
 
+export interface PgSourceExtensions {}
+
 export interface PgSourceOptions<
   TCodec extends PgTypeCodec<any, any>,
   TColumns extends PgSourceColumns,
@@ -128,6 +130,7 @@ export interface PgSourceOptions<
   columns: TColumns | null;
   uniques?: TUniques;
   relations?: TRelations | (() => TRelations);
+  extensions?: PgSourceExtensions;
 }
 
 /**
@@ -145,6 +148,7 @@ export class PgSourceBuilder<
   public codec: TCodec;
   public columns: TColumns | null;
   public uniques: TUniques | undefined;
+  public readonly extensions: PgSourceExtensions;
   constructor(
     private options: Omit<
       PgSourceOptions<TCodec, TColumns, TUniques, any, TParameters>,
@@ -154,6 +158,7 @@ export class PgSourceBuilder<
     this.codec = options.codec;
     this.columns = options.columns;
     this.uniques = options.uniques;
+    this.extensions = options.extensions || {};
   }
 
   build<
@@ -524,5 +529,21 @@ export class PgSource<
     options: PgExecutorMutationOptions,
   ): Promise<PgClientResult<TData>> {
     return this.executor.executeMutation<TData>(options);
+  }
+}
+
+export interface PgEnumSourceExtensions {}
+
+export interface PgEnumSourceOptions<TValue extends string> {
+  codec: PgEnumTypeCodec<TValue>;
+  extensions?: PgEnumSourceExtensions;
+}
+
+export class PgEnumSource<TValue extends string> {
+  public readonly codec: PgEnumTypeCodec<TValue>;
+  public readonly extensions: PgEnumSourceExtensions;
+  constructor(options: PgEnumSourceOptions<TValue>) {
+    this.codec = options.codec;
+    this.extensions = options.extensions || {};
   }
 }

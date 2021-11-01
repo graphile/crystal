@@ -53,10 +53,16 @@ export interface PgTypeCodec<
    */
   sqlType: SQL;
 
+  // TODO: extract this to a different interface
   /**
    * If this is a composite type, the columns it supports.
    */
   columns?: TColumns;
+}
+
+export interface PgEnumTypeCodec<TValue extends string>
+  extends PgTypeCodec<string, TValue, any> {
+  values: TValue[];
 }
 
 export interface PgTypedExecutablePlan<TCodec extends PgTypeCodec = PgTypeCodec>

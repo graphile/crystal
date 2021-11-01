@@ -69,6 +69,7 @@ import {
   PgConnectionPlan,
   pgDelete,
   PgDeletePlan,
+  PgEnumSource,
   PgExecutor,
   pgInsert,
   pgPolymorphic,
@@ -81,9 +82,13 @@ import {
   recordType,
   TYPES,
 } from "../src";
-import type { PgClassSinglePlan } from "../src/interfaces";
-import { PgUpdatePlan } from "../src/plans/pgUpdate";
-import { pgUpdate } from "../src/plans/pgUpdate";
+import { pgUpdate, PgUpdatePlan } from "../src/plans/pgUpdate";
+
+declare module "../src" {
+  interface PgEnumSourceExtensions {
+    tableSource?: PgSource<any, any, any, any, any>;
+  }
+}
 
 // These are what the generics extend from
 
@@ -424,10 +429,62 @@ export function makeExampleSchema(
     uniques: [["comment_id"]],
   });
 
+  const itemTypeEnumSource = new PgEnumSource({
+    codec: enumType(sql`interfaces_and_unions.item_type`, [
+      "TOPIC",
+      "POST",
+      "DIVIDER",
+      "CHECKLIST",
+      "CHECKLIST_ITEM",
+    ]),
+  });
+
+  const enumTablesItemTypeColumns = {
+    type: {
+      codec: TYPES.text,
+      notNull: true,
+    },
+    description: {
+      codec: TYPES.text,
+      notNull: false,
+    },
+  };
+
+  const enumTableItemTypeSourceBuilder = new PgSourceBuilder({
+    executor,
+    codec: recordType(
+      sql`interfaces_and_unions.enum_table_item_type`,
+      enumTablesItemTypeColumns,
+    ),
+    source: sql`interfaces_and_unions.enum_table_item_type`,
+    name: "enum_table_item_type",
+    columns: enumTablesItemTypeColumns,
+    uniques: [["type"]],
+  });
+
+  const enumTableItemTypeSource = enumTableItemTypeSourceBuilder.build({});
+
+  const enumTableItemTypeEnumSource = new PgEnumSource({
+    codec: enumType(sql`text`, [
+      "TOPIC",
+      "POST",
+      "DIVIDER",
+      "CHECKLIST",
+      "CHECKLIST_ITEM",
+    ]),
+    extensions: {
+      tableSource: enumTableItemTypeSource,
+    },
+  });
+
   const singleTableItemColumns = {
     id: col({ codec: TYPES.int, notNull: true }),
     type: col({
-      codec: enumType(sql`interfaces_and_unions.item_type`),
+      codec: itemTypeEnumSource.codec,
+      notNull: true,
+    }),
+    type2: col({
+      codec: enumTableItemTypeEnumSource.codec,
       notNull: true,
     }),
 
@@ -564,7 +621,11 @@ export function makeExampleSchema(
   const relationalItemColumns = {
     id: col({ codec: TYPES.int, notNull: true }),
     type: col({
-      codec: enumType(sql`interfaces_and_unions.item_type`),
+      codec: itemTypeEnumSource.codec,
+      notNull: true,
+    }),
+    type2: col({
+      codec: enumTableItemTypeEnumSource.codec,
       notNull: true,
     }),
 
@@ -600,7 +661,11 @@ export function makeExampleSchema(
   const relationalCommentableColumns = {
     id: col({ codec: TYPES.int, notNull: true }),
     type: col({
-      codec: enumType(sql`interfaces_and_unions.item_type`),
+      codec: itemTypeEnumSource.codec,
+      notNull: true,
+    }),
+    type2: col({
+      codec: enumTableItemTypeEnumSource.codec,
       notNull: true,
     }),
   };
@@ -619,6 +684,10 @@ export function makeExampleSchema(
   const itemColumns = {
     id: col({ codec: TYPES.int, notNull: true, identicalVia: "item" }),
     type: col({ codec: TYPES.text, notNull: true, via: "item" }),
+    type2: col({
+      codec: enumTableItemTypeEnumSource.codec,
+      notNull: true,
+    }),
     parent_id: col({
       codec: TYPES.int,
       notNull: false,
@@ -872,7 +941,11 @@ export function makeExampleSchema(
   const unionItemsColumns = {
     id: col({ codec: TYPES.int, notNull: true }),
     type: col({
-      codec: enumType(sql`interfaces_and_unions.item_type`),
+      codec: itemTypeEnumSource.codec,
+      notNull: true,
+    }),
+    type2: col({
+      codec: enumTableItemTypeEnumSource.codec,
       notNull: true,
     }),
   };
