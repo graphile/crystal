@@ -93,5 +93,4 @@ type Query {
   pokemons(first: Int!): [Pokemon]
   pokemon(id: String, name: String): Pokemon
 }
-
 `;
