@@ -388,11 +388,13 @@ declare global {
       extends ContextGraphQLInterfaceType {
       scope: ScopeGraphQLInterfaceTypeFields;
       Self: GraphQLInterfaceType;
-      fieldWithHooks: FieldWithHooksFunction;
+      fieldWithHooks: InterfaceFieldWithHooksFunction;
     }
 
     interface ScopeGraphQLInterfaceTypeFieldsField
-      extends ScopeGraphQLInterfaceTypeFields {}
+      extends ScopeGraphQLInterfaceTypeFields {
+      fieldName: string;
+    }
     interface ContextGraphQLInterfaceTypeFieldsField
       extends ContextGraphQLInterfaceTypeFields {
       scope: ScopeGraphQLInterfaceTypeFieldsField;
@@ -509,6 +511,15 @@ declare global {
         | GraphQLFieldConfig<any, any>
         | ((
             context: ContextGraphQLObjectTypeFieldsField,
+          ) => GraphQLFieldConfig<any, any>),
+    ) => GraphQLFieldConfig<any, any>;
+
+    type InterfaceFieldWithHooksFunction = (
+      fieldScope: ScopeGraphQLInterfaceTypeFieldsField,
+      spec:
+        | GraphQLFieldConfig<any, any>
+        | ((
+            context: ContextGraphQLInterfaceTypeFieldsField,
           ) => GraphQLFieldConfig<any, any>),
     ) => GraphQLFieldConfig<any, any>;
 
@@ -705,12 +716,12 @@ declare global {
         TBuild
       >[];
       "GraphQLInterfaceType:fields:field": GraphileEngine.Hook<
-        GraphQLInterfaceTypeConfig<any, any>,
+        GraphQLFieldConfig<any, any>,
         GraphileEngine.ContextGraphQLInterfaceTypeFieldsField,
         TBuild
       >[];
       "GraphQLInterfaceType:fields:field:args": GraphileEngine.Hook<
-        GraphQLInterfaceTypeConfig<any, any>,
+        GraphQLFieldConfigArgumentMap,
         GraphileEngine.ContextGraphQLInterfaceTypeFieldsFieldArgs,
         TBuild
       >[];

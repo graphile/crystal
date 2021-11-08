@@ -1,4 +1,3 @@
-import debugFactory from "debug";
 import {
   crystalWrapResolve,
   makeCrystalSubscriber,
@@ -12,9 +11,7 @@ import type {
   GraphQLNamedType,
   GraphQLScalarTypeConfig,
   GraphQLSchemaConfig,
-  GraphQLUnionTypeConfig,
 } from "graphql";
-import { isNamedType } from "graphql";
 import {
   GraphQLEnumType,
   GraphQLInputObjectType,
@@ -23,23 +20,13 @@ import {
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLUnionType,
+  isNamedType,
 } from "graphql";
 
 import type { ScopeForType, SpecForType } from "../global";
 import type SchemaBuilder from "../SchemaBuilder";
 
-const recurseDataGeneratorsForFieldWarned = false;
-
 const isString = (str: unknown): str is string => typeof str === "string";
-const debug = debugFactory("graphile-build");
-
-function getNameFromType(Type: GraphQLNamedType | GraphQLSchema) {
-  if (Type instanceof GraphQLSchema) {
-    return "schema";
-  } else {
-    return Type.name;
-  }
-}
 
 const knownTypes = [
   GraphQLSchema,
@@ -157,7 +144,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 rawInterfaces,
                 build,
                 interfacesContext,
-                `|${getNameFromType(Self)}`,
+                `|${Self.name}`,
               );
             },
             fields: () => {
@@ -167,6 +154,11 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 fieldSpec,
               ) => {
                 const { fieldName } = fieldScope;
+                build.extend(
+                  fieldScope,
+                  scope,
+                  "Adding the object type scope to the field's scope",
+                );
                 if (!isString(fieldName)) {
                   throw new Error(
                     "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is current necessary.",
@@ -199,7 +191,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                   objectFieldSpec(finalFieldSpec),
                   build,
                   fieldContext,
-                  `|${getNameFromType(Self)}.fields.${fieldName}`,
+                  `|${Self.name}.fields.${fieldName}`,
                 );
 
                 finalFieldSpec.args = finalFieldSpec.args || {};
@@ -215,7 +207,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     build,
                     argsContext,
 
-                    `|${getNameFromType(Self)}.fields.${fieldName}`,
+                    `|${Self.name}.fields.${fieldName}`,
                   ),
                 };
 
@@ -305,67 +297,69 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             ...baseSpec,
             fields: () => {
               const processedFields: GraphQLFieldConfig<any, any>[] = [];
-              const fieldsContext = {
-                ...interfaceContext,
-                Self,
-                fieldWithHooks: (fieldScope, fieldSpec) => {
-                  const { fieldName } = fieldScope;
-                  build.extend(
-                    fieldScope,
-                    scope,
-                    "Adding interface scope to interface's field scope",
-                  );
-                  if (!isString(fieldName)) {
-                    throw new Error(
-                      "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is currently necessary.",
+              const fieldsContext: GraphileEngine.ContextGraphQLInterfaceTypeFields =
+                {
+                  ...interfaceContext,
+                  Self,
+                  fieldWithHooks: (fieldScope, fieldSpec) => {
+                    const { fieldName } = fieldScope;
+                    build.extend(
+                      fieldScope,
+                      scope,
+                      "Adding interface scope to interface's field scope",
                     );
-                  }
-                  if (!fieldScope) {
-                    throw new Error(
-                      "All calls to `fieldWithHooks` must specify a `fieldScope` " +
-                        "argument that gives additional context about the field so " +
-                        "that further plugins may more easily understand the field. " +
-                        "Keys within this object should contain the phrase 'field' " +
-                        "since they will be merged into the parent objects scope and " +
-                        "are not allowed to clash. If you really have no additional " +
-                        "information to give, please just pass `{}`.",
-                    );
-                  }
+                    if (!isString(fieldName)) {
+                      throw new Error(
+                        "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is currently necessary.",
+                      );
+                    }
+                    if (!fieldScope) {
+                      throw new Error(
+                        "All calls to `fieldWithHooks` must specify a `fieldScope` " +
+                          "argument that gives additional context about the field so " +
+                          "that further plugins may more easily understand the field. " +
+                          "Keys within this object should contain the phrase 'field' " +
+                          "since they will be merged into the parent objects scope and " +
+                          "are not allowed to clash. If you really have no additional " +
+                          "information to give, please just pass `{}`.",
+                      );
+                    }
 
-                  const fieldContext = {
-                    ...fieldsContext,
-                    scope: fieldScope,
-                  };
-                  let newSpec =
-                    typeof fieldSpec === "function"
-                      ? fieldSpec(fieldContext)
-                      : fieldSpec;
-                  newSpec = builder.applyHooks(
-                    "GraphQLInterfaceType:fields:field",
-                    newSpec,
-                    build,
-                    fieldContext,
-                    `|${getNameFromType(Self)}.fields.${fieldName}`,
-                  );
-                  newSpec.args = newSpec.args || {};
-                  const argsContext = {
-                    ...fieldContext,
-                  };
-                  newSpec = {
-                    ...newSpec,
-                    args: builder.applyHooks(
-                      "GraphQLInterfaceType:fields:field:args",
-                      newSpec.args,
+                    const fieldContext: GraphileEngine.ContextGraphQLInterfaceTypeFieldsField =
+                      {
+                        ...fieldsContext,
+                        scope: fieldScope,
+                      };
+                    let newSpec =
+                      typeof fieldSpec === "function"
+                        ? fieldSpec(fieldContext)
+                        : fieldSpec;
+                    newSpec = builder.applyHooks(
+                      "GraphQLInterfaceType:fields:field",
+                      newSpec,
                       build,
-                      argsContext,
-                      `|${getNameFromType(Self)}.fields.${fieldName}`,
-                    ),
-                  };
-                  const finalSpec = newSpec;
-                  processedFields.push(finalSpec);
-                  return finalSpec;
-                },
-              };
+                      fieldContext,
+                      `|${Self.name}.fields.${fieldName}`,
+                    );
+                    newSpec.args = newSpec.args || {};
+                    const argsContext = {
+                      ...fieldContext,
+                    };
+                    newSpec = {
+                      ...newSpec,
+                      args: builder.applyHooks(
+                        "GraphQLInterfaceType:fields:field:args",
+                        newSpec.args,
+                        build,
+                        argsContext,
+                        `|${Self.name}.fields.${fieldName}`,
+                      ),
+                    };
+                    const finalSpec = newSpec;
+                    processedFields.push(finalSpec);
+                    return finalSpec;
+                  },
+                };
               const rawFields =
                 (typeof rawSpec.fields === "function"
                   ? rawSpec.fields(fieldsContext)
@@ -442,7 +436,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 rawTypes,
                 build,
                 typesContext,
-                `|${getNameFromType(Self)}`,
+                `|${Self.name}`,
               );
             },
           };
@@ -501,7 +495,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     newSpec,
                     build,
                     fieldContext,
-                    `|${getNameFromType(Self)}.fields.${fieldName}`,
+                    `|${Self.name}.fields.${fieldName}`,
                   );
 
                   const finalSpec = newSpec;
@@ -531,7 +525,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 fieldsList,
                 build,
                 fieldsContext,
-                `|${getNameFromType(Self)}`,
+                `|${Self.name}`,
               );
 
               // Finally, check through all the fields that they've all been processed; any that have not we should do so now.
@@ -629,7 +623,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
       build.scopeByType.set(Result, inScope);
     }
 
-    return Result;
+    return Result as any;
   };
 
   return { newWithHooks };
