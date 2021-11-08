@@ -2183,7 +2183,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/debug@npm:4.1.7":
+"@types/debug@npm:4.1.7, @types/debug@npm:^4.1.7":
   version: 4.1.7
   resolution: "@types/debug@npm:4.1.7"
   dependencies:
@@ -2366,6 +2366,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/pluralize@npm:^0.0.29":
+  version: 0.0.29
+  resolution: "@types/pluralize@npm:0.0.29"
+  checksum: db7732b733ba1dc59f080f87364c9f985c1ae9f1e5ec5fcefb83c1327149e01ecac42766352eb7b19b117cf39defa99cf514629f3666968a3bdeb00e74f2a97e
+  languageName: node
+  linkType: hard
+
 "@types/prettier@npm:^2.1.5":
   version: 2.4.1
   resolution: "@types/prettier@npm:2.4.1"
@@ -2379,6 +2386,13 @@ __metadata:
   dependencies:
     "@types/node": "*"
   checksum: e99fc7cc6265407987b30deda54c1c24bb1478803faf6037557a774b2f034c5b097ffd65847daa87e82a61a250d919f35c3588654b0fdaa816906650f596d1b0
+  languageName: node
+  linkType: hard
+
+"@types/semver@npm:^7.3.9":
+  version: 7.3.9
+  resolution: "@types/semver@npm:7.3.9"
+  checksum: 60bfcfdfa7f937be2c6f4b37ddb6714fb0f27b05fe4cbdfdd596a97d35ed95d13ee410efdd88e72a66449d0384220bf20055ab7d6b5df10de4990fbd20e5cbe0
   languageName: node
   linkType: hard
 
@@ -5332,6 +5346,31 @@ __metadata:
   languageName: node
   linkType: hard
 
+"graphile-build@workspace:packages/graphile-build":
+  version: 0.0.0-use.local
+  resolution: "graphile-build@workspace:packages/graphile-build"
+  dependencies:
+    "@graphile/lru": 4.6.0-alpha.0
+    "@types/debug": ^4.1.7
+    "@types/jest": ^27.0.2
+    "@types/node": ^16.11.6
+    "@types/pluralize": ^0.0.29
+    "@types/semver": ^7.3.9
+    chalk: ^4.1.2
+    debug: ^4.3.2
+    graphile-crystal: 4.7.0
+    graphql: "npm:graphql@experimental-stream-defer"
+    jest: ^27.3.1
+    pluralize: ^7.0.0
+    semver: ^7.3.5
+    ts-node: ^10.4.0
+    tslib: ^2.3.1
+    typescript: ^4.4.4
+  peerDependencies:
+    graphql: "*"
+  languageName: unknown
+  linkType: soft
+
 "graphile-crystal@4.7.0, graphile-crystal@workspace:packages/graphile-crystal":
   version: 0.0.0-use.local
   resolution: "graphile-crystal@workspace:packages/graphile-crystal"
@@ -8015,6 +8054,13 @@ __metadata:
   dependencies:
     find-up: ^4.0.0
   checksum: 9863e3f35132bf99ae1636d31ff1e1e3501251d480336edb1c211133c8d58906bed80f154a1d723652df1fda91e01c7442c2eeaf9dc83157c7ae89087e43c8d6
+  languageName: node
+  linkType: hard
+
+"pluralize@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "pluralize@npm:7.0.0"
+  checksum: e3f694924b7c8c03dc9fa40b2312e17787998ac6e20fccace11efa1146046eb9931541bfd247b3ec5535e730d902a5aee7c32681d5bf9a00fc74a72039a3e609
   languageName: node
   linkType: hard
 
