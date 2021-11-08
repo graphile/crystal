@@ -114,11 +114,10 @@ module.exports = {
         project: ["tsconfig.json", "packages/*/tsconfig.json"],
       },
       rules: {
-        "@typescript-eslint/no-unused-vars": "off",
-        "@typescript-eslint/no-unused-vars-experimental": [
+        "@typescript-eslint/no-unused-vars": [
           "error",
           {
-            ignoreArgsIfArgsAfterAreUsed: true,
+            args: "after-used",
           },
         ],
       },
