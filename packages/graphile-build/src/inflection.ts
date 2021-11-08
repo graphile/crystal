@@ -2,7 +2,7 @@ import pluralize from "pluralize";
 
 import { camelCase, constantCase, upperCamelCase } from "./utils";
 
-const makeInitialInflection = () => ({
+export const makeInitialInflection = () => ({
   pluralize,
   singularize: pluralize.singular,
   upperCamelCase,
