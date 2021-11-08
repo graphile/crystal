@@ -388,6 +388,7 @@ declare global {
       extends ContextGraphQLInterfaceType {
       scope: ScopeGraphQLInterfaceTypeFields;
       Self: GraphQLInterfaceType;
+      fieldWithHooks: FieldWithHooksFunction;
     }
 
     interface ScopeGraphQLInterfaceTypeFieldsField
@@ -430,6 +431,7 @@ declare global {
       extends ContextGraphQLInputObjectType {
       scope: ScopeGraphQLInputObjectTypeFields;
       Self: GraphQLInputObjectType;
+      fieldWithHooks: InputFieldWithHooksFunction;
     }
 
     interface ScopeGraphQLInputObjectTypeFieldsField
@@ -451,7 +453,6 @@ declare global {
     interface ScopeGraphQLEnumTypeValues extends ScopeGraphQLEnumType {}
     interface ContextGraphQLEnumTypeValues extends ContextGraphQLEnumType {
       scope: ScopeGraphQLEnumTypeValues;
-      Self: GraphQLEnumType;
     }
 
     interface ScopeGraphQLEnumTypeValuesValue
@@ -678,7 +679,7 @@ declare global {
         TBuild
       >[];
       "GraphQLUnionType:types": GraphileEngine.Hook<
-        string[],
+        GraphQLObjectType[],
         GraphileEngine.ContextGraphQLUnionTypeTypes,
         TBuild
       >[];
