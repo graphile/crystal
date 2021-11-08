@@ -184,18 +184,18 @@ describe("sql.compile", () => {
     expect(sql.compile(node)).toEqual({
       text: `    select 1
     from
-      foo __foo_1__,
-      foo __foo_2__,
-      foo __local_1__,
-      foo __foo_3__,
-      bar __bar_2_1__,
-      bar __local_2__,
-      bar __local_3__,
-      bar __bar_1__,
-      bar __bar_1__,
-      bar __local_4__,
-      bar __bar_1__,
-      baz __k_s_l_d_f_j_p_j_r_d_i_g_f_jf90_2mf_sd_wng_nq_nrgd_1__`,
+      foo __foo__,
+      foo __foo_2,
+      foo __local__,
+      foo __foo_3,
+      bar __bar_2__,
+      bar __local_2,
+      bar __local_3,
+      bar __bar__,
+      bar __bar__,
+      bar __local_4,
+      bar __bar__,
+      baz __k_s_l_d_f_j_p_j_r_d_i_g_f_jf90_2mf_sd_wng_nq_nrgd__`,
       values: [],
     });
   });
