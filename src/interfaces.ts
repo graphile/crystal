@@ -72,6 +72,8 @@ export interface PostGraphileOptions<
   subscriptions?: boolean;
   // [EXPERIMENTAL] Enables live-query support via GraphQL subscriptions (sends updated payload any time nested collections/records change)
   live?: boolean;
+  // Enable usage of Server-Sent Events through `graphql-sse`. Defaults to `true` if `subscriptions` or `live` are true, `false` otherwise
+  sse?: boolean;
   // Choose which websocket transport libraries to use. Use commas to define multiple. Defaults to `['v0', 'v1']` if `subscriptions` or `live` are true, `[]` otherwise
   websockets?: ('v0' | 'v1')[];
   // Toggle which GraphQL websocket transport operations are supported: 'subscriptions' or 'all'. Defaults to `subscriptions`
@@ -176,9 +178,10 @@ export interface PostGraphileOptions<
   // The endpoint the GraphQL executer will listen on. Defaults to `/graphql`.
   /* @middlewareOnly */
   graphqlRoute?: string;
-  // The endpoint the watch-mode EventStream will be mounted on (only
-  // appropriate when watchPg is specified). Defaults to
-  // `${graphqlRoute}/stream`.
+  // The endpoint the GraphQL over Server-Sent Events (SSE) handler
+  // together with the watch-mode EventStream will be mounted on (only
+  // appropriate when `sse` or `watchPg` is specified).
+  // Defaults to `${graphqlRoute}/stream`.
   /* @middlewareOnly */
   eventStreamRoute?: string;
   // The URL to the GraphQL endpoint for embedding into the GraphiQL client.

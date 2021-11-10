@@ -15,7 +15,7 @@ import { extendedFormatError } from '../extendedFormatError';
 import { IncomingMessage, ServerResponse } from 'http';
 import { pluginHookFromOptions } from '../pluginHook';
 import { HttpRequestHandler, mixed, CreateRequestHandlerOptions } from '../../interfaces';
-import setupServerSentEvents from './setupServerSentEvents';
+import setupServerSentEvents, { handleGraphQLSSE } from './setupServerSentEvents';
 import withPostGraphileContext from '../withPostGraphileContext';
 import LRU from '@graphile/lru';
 
@@ -188,6 +188,7 @@ export default function createPostGraphileHttpRequestHandler(
     disableQueryLog,
     enableQueryBatching,
     websockets = options.subscriptions || options.live ? ['v0', 'v1'] : [],
+    sse = options.subscriptions || options.live ? true : false,
   } = options;
   const live = !!options.live;
   const enhanceGraphiql =
@@ -625,7 +626,16 @@ export default function createPostGraphileHttpRequestHandler(
           res.end();
           return;
         }
-        setupServerSentEvents(res, options);
+
+        // TODO: could it just be `req.url.includes('?')`
+        const { query } = parseUrl(req) || {};
+        if (req.method === 'GET' && !query) {
+          // receiving a GET request without query params is PostGraphiQL listening for schema changes
+          setupServerSentEvents(res, options);
+        }
+
+        // all other cases are handled following the GraphQL over Server-Sent Events (SSE) protocol
+        if (sse) await handleGraphQLSSE(res, middleware);
       } catch (e) {
         console.error('Unexpected error occurred in eventStreamRouteHandler');
         console.error(e);

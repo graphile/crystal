@@ -123,6 +123,10 @@ program
     'Enable GraphQL support for subscriptions (you still need a subscriptions plugin currently)',
   )
   .option(
+    '--sse',
+    "Enable usage of Server-Sent Events through `graphql-sse`. Defaults to 'true' if `--subscriptions` or `--live` were passed, 'false' otherwise",
+  )
+  .option(
     '--websockets <string>',
     "Choose which websocket transport libraries to use. Use commas to define multiple. Defaults to 'v0,v1' if `--subscriptions` or `--live` were passed, '[]' otherwise",
     (option: string) => option.split(','),
@@ -438,6 +442,7 @@ const {
   ownerConnection,
   subscriptions,
   live,
+  sse,
   websockets = subscriptions || live ? ['v0', 'v1'] : [],
   websocketOperations = 'subscriptions',
   watch: watchPg,
@@ -721,6 +726,7 @@ const postgraphileOptions = pluginHook(
     retryOnInitFail,
     pgDefaultRole,
     subscriptions: subscriptions || live,
+    sse,
     websockets,
     websocketOperations,
     live,

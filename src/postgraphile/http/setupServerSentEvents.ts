@@ -1,6 +1,14 @@
 /* tslint:disable:no-any */
-import { CreateRequestHandlerOptions } from '../../interfaces';
+import { CreateRequestHandlerOptions, HttpRequestHandler } from '../../interfaces';
 import { PostGraphileResponse } from './frameworks';
+import { IncomingMessage, ServerResponse } from 'http';
+import { execute, subscribe, parse, validate, specifiedRules, ExecutionArgs } from 'graphql';
+import {
+  createHandler as createGraphQLSSEHandler,
+  Handler as GraphQLSSEHandler,
+} from 'graphql-sse';
+import { makeLiveSubscribe } from './liveSubscribe';
+import { pluginHookFromOptions } from '../pluginHook';
 
 /**
  * Sets the headers and streams a body for server-sent events (primarily used
@@ -56,4 +64,114 @@ export default function setupServerSentEvents(
   req.on('finish', cleanup);
   req.on('error', cleanup);
   _emitter.on('test:close', cleanup);
+}
+
+// through setup, we create the SSE handler only once and reuse it for additional requests
+let sseHandler: GraphQLSSEHandler | undefined = undefined;
+
+/**
+ * Handles the request following the GraphQL over Server-Sent Events (SSE) protocol.
+ * Internally uses `graphql-sse`.
+ *
+ * @internal
+ */
+export async function handleGraphQLSSE<
+  Request extends IncomingMessage = IncomingMessage,
+  Response extends ServerResponse = ServerResponse
+>(res: PostGraphileResponse, postgraphileMiddleware: HttpRequestHandler): Promise<void> {
+  if (!sseHandler) {
+    const {
+      options,
+      getGraphQLSchema,
+      withPostGraphileContextFromReqRes,
+      handleErrors,
+    } = postgraphileMiddleware;
+    const pluginHook = pluginHookFromOptions(options);
+    const liveSubscribe = makeLiveSubscribe({ pluginHook, options });
+
+    const staticValidationRules = pluginHook(
+      'postgraphile:validationRules:static',
+      specifiedRules,
+      {
+        options,
+      },
+    );
+
+    sseHandler = createGraphQLSSEHandler<Request, Response>({
+      execute,
+      subscribe: options.live ? liveSubscribe : subscribe,
+      validate(schema, document) {
+        const validationErrors = validate(schema, document, staticValidationRules);
+        if (validationErrors.length) {
+          return validationErrors;
+        }
+
+        // TODO: implement
+        // // You are strongly encouraged to use
+        // // `postgraphile:validationRules:static` if possible - you should
+        // // only use this one if you need access to variables.
+        // const moreValidationRules = pluginHook('postgraphile:validationRules', [], {
+        //   options,
+        //   req,
+        //   res,
+        //   variables: variableValues,
+        //   operationName: operationName,
+        // });
+        // if (moreValidationRules.length) {
+        //   const moreValidationErrors = validate(schema, document, moreValidationRules);
+        //   if (moreValidationErrors.length) {
+        //     return moreValidationErrors;
+        //   }
+        // }
+
+        return [];
+      },
+      async onSubscribe(req, res, params) {
+        const context = await withPostGraphileContextFromReqRes(
+          req,
+          res,
+          undefined,
+          context => context,
+        );
+
+        // Override schema (for --watch)
+        const schema = await getGraphQLSchema();
+
+        const args = {
+          schema,
+          contextValue: context,
+          operationName: params.operationName,
+          document: typeof params.query === 'string' ? parse(params.query) : params.query,
+          variableValues: params.variables,
+        };
+
+        // A SSE request should be treated as any other request, usual PostGraphile middlewares should apply
+        // applyMiddleware(options.sseMiddlewares, req, res)
+
+        // for supplying custom execution arguments. if not already
+        // complete, the pluginHook should fill in the gaps
+        const hookedArgs = (pluginHook
+          ? pluginHook('postgraphile:sse:onSubscribe', args, {
+              options,
+            })
+          : args) as ExecutionArgs;
+
+        return hookedArgs;
+      },
+      async onNext(req, _args, result) {
+        if (result.errors) {
+          // operation execution errors
+          result.errors = handleErrors(result.errors, req, res.getNodeServerResponse());
+          return result;
+        }
+      },
+    });
+  }
+
+  const req = res.getNodeServerRequest();
+  await sseHandler(
+    req,
+    res.getNodeServerResponse(),
+    req.body, // when nullish, `graphql-sse` will read out the body vanilla Node style
+  );
 }
