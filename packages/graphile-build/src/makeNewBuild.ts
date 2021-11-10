@@ -144,24 +144,32 @@ export default function makeNewBuild(
     getTypeByName(typeName) {
       if (typeName in allTypes) {
         return allTypes[typeName];
-      } else if (typeName in typeRegistry) {
-        const details = typeRegistry[typeName];
-        const { klass, scope, specGenerator } = details;
-        const spec = specGenerator();
-        const finishedBuild = build as ReturnType<
-          typeof builder["createBuild"]
-        >;
-        const type = builder.newWithHooks<any>(
-          finishedBuild,
-          klass,
-          spec,
-          scope,
-        );
-        allTypes[typeName] = type;
-        return type;
       } else {
-        allTypes[typeName] = undefined;
-        return undefined;
+        const details = typeRegistry[typeName];
+        if (details != null) {
+          const { klass, scope, specGenerator } = details;
+
+          const spec = specGenerator();
+          // No need to have the user specify name, and they're forbidden from
+          // changing name (use inflection instead!) so we just set it
+          // ourselves:
+          spec.name = typeName;
+
+          const finishedBuild = build as ReturnType<
+            typeof builder["createBuild"]
+          >;
+          const type = builder.newWithHooks<any>(
+            finishedBuild,
+            klass,
+            spec,
+            scope,
+          );
+          allTypes[typeName] = type;
+          return type;
+        } else {
+          allTypes[typeName] = undefined;
+          return undefined;
+        }
       }
     },
   };

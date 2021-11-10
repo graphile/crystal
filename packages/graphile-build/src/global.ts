@@ -2,7 +2,6 @@ import type {
   BaseGraphQLContext,
   ExecutablePlan,
   GraphileFieldConfig,
-  GraphileFieldConfigMap,
 } from "graphile-crystal";
 import type {
   GraphQLEnumType,
@@ -214,42 +213,45 @@ declare global {
       registerObjectType: (
         typeName: string,
         scope: ScopeGraphQLObjectType,
-        specGenerator: () => GraphileObjectTypeConfig<any, any>,
+        specGenerator: () => Omit<GraphileObjectTypeConfig<any, any>, "name">,
         origin: string | null | undefined,
       ) => void;
       /** As registerObjectType, but for interfaces */
       registerInterfaceType: (
         typeName: string,
         scope: ScopeGraphQLInterfaceType,
-        specGenerator: () => GraphileInterfaceTypeConfig<any, any>,
+        specGenerator: () => Omit<
+          GraphileInterfaceTypeConfig<any, any>,
+          "name"
+        >,
         origin: string | null | undefined,
       ) => void;
       /** As registerObjectType, but for unions */
       registerUnionType: (
         typeName: string,
         scope: ScopeGraphQLUnionType,
-        specGenerator: () => GraphileUnionTypeConfig<any, any>,
+        specGenerator: () => Omit<GraphileUnionTypeConfig<any, any>, "name">,
         origin: string | null | undefined,
       ) => void;
       /** As registerObjectType, but for scalars */
       registerScalarType: (
         typeName: string,
         scope: ScopeGraphQLScalarType,
-        specGenerator: () => GraphQLScalarTypeConfig<any, any>,
+        specGenerator: () => Omit<GraphQLScalarTypeConfig<any, any>, "name">,
         origin: string | null | undefined,
       ) => void;
       /** As registerObjectType, but for enums */
       registerEnumType: (
         typeName: string,
         scope: ScopeGraphQLEnumType,
-        specGenerator: () => GraphQLEnumTypeConfig,
+        specGenerator: () => Omit<GraphQLEnumTypeConfig, "name">,
         origin: string | null | undefined,
       ) => void;
       /** As registerObjectType, but for input objects */
       registerInputObjectType: (
         typeName: string,
         scope: ScopeGraphQLInputObjectType,
-        specGenerator: () => GraphileInputObjectTypeConfig,
+        specGenerator: () => Omit<GraphileInputObjectTypeConfig, "name">,
         origin: string | null | undefined,
       ) => void;
 
