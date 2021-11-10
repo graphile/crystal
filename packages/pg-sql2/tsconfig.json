@@ -3,7 +3,9 @@
   "compilerOptions": {
     "rootDir": "src",
     "declarationDir": "./dist",
-    "outDir": "./dist"
+    "outDir": "./dist",
+
+    "noUncheckedIndexedAccess": true
   },
   "include": ["src/**/*"],
   "references": [{ "path": "../lru" }]
