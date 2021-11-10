@@ -110,14 +110,7 @@ module.exports = {
       parserOptions: {
         project: ["tsconfig.json", "packages/*/tsconfig.json"],
       },
-      rules: {
-        "@typescript-eslint/no-unused-vars": [
-          "error",
-          {
-            args: "after-used",
-          },
-        ],
-      },
+      rules: {},
     },
 
     // Rules for tests only
