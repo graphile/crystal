@@ -6,6 +6,7 @@ import type {
   GraphQLInputType,
   GraphQLList,
   GraphQLNonNull,
+  GraphQLObjectTypeConfig,
   GraphQLOutputType,
   GraphQLScalarType,
   GraphQLType,
@@ -320,7 +321,7 @@ type InputTypeFor<TType extends GraphQLInputType> = TType extends GraphQLList<
 /**
  * Basically GraphQLFieldConfig but with an easy to access `plan` method.
  */
-export type GraphileCrystalFieldConfig<
+export type GraphileFieldConfig<
   TType extends GraphQLOutputType,
   TContext extends BaseGraphQLContext,
   TParentPlan extends ExecutablePlan<any> | null,
@@ -336,7 +337,7 @@ export type GraphileCrystalFieldConfig<
     TFieldPlan
   >;
   args?: {
-    [key: string]: GraphileCrystalArgumentConfig<
+    [key: string]: GraphileArgumentConfig<
       GraphQLInputType,
       TContext,
       TParentPlan,
@@ -347,7 +348,23 @@ export type GraphileCrystalFieldConfig<
   };
 };
 
-export type GraphileCrystalArgumentConfig<
+/**
+ * Basically GraphQLFieldConfigMap but with GraphileFieldConfig
+ */
+export type GraphileFieldConfigMap<
+  TParentPlan extends ExecutablePlan<any> | null,
+  TContext extends BaseGraphQLContext,
+> = {
+  [fieldName: string]: GraphileFieldConfig<
+    any,
+    TContext,
+    TParentPlan,
+    any,
+    any
+  >;
+};
+
+export type GraphileArgumentConfig<
   TInputType extends GraphQLInputType,
   TContext extends BaseGraphQLContext,
   TParentPlan extends ExecutablePlan<any> | null,
@@ -369,7 +386,7 @@ export type GraphileCrystalArgumentConfig<
     : never;
 };
 
-export type GraphileCrystalInputFieldConfig<
+export type GraphileInputFieldConfig<
   TInputType extends GraphQLInputType,
   TContext extends BaseGraphQLContext,
   TParentPlan extends ModifierPlan<any>,

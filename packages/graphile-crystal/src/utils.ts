@@ -33,8 +33,8 @@ import type { InputPlan } from "./input";
 import type {
   BaseGraphQLArguments,
   BaseGraphQLContext,
-  GraphileCrystalFieldConfig,
-  GraphileCrystalInputFieldConfig,
+  GraphileFieldConfig,
+  GraphileInputFieldConfig,
   OutputPlanForType,
 } from "./interfaces";
 import type { ExecutablePlan, ModifierPlan } from "./plan";
@@ -318,7 +318,7 @@ type ObjectTypeFields<
   TContext extends BaseGraphQLContext,
   TParentPlan extends ExecutablePlan<any>,
 > = {
-  [key: string]: GraphileCrystalFieldConfig<
+  [key: string]: GraphileFieldConfig<
     GraphQLOutputType,
     TContext,
     TParentPlan,
@@ -405,7 +405,7 @@ export function objectFieldSpec<
   TResult extends ExecutablePlan<any> = ExecutablePlan<any>,
   TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
 >(
-  graphileSpec: GraphileCrystalFieldConfig<
+  graphileSpec: GraphileFieldConfig<
     GraphQLOutputType,
     TContext,
     TSource,
@@ -442,7 +442,7 @@ export function objectFieldSpec<
   };
 }
 
-export function newGraphileCrystalFieldConfigBuilder<
+export function newGraphileFieldConfigBuilder<
   TContext extends BaseGraphQLContext,
   TParentPlan extends ExecutablePlan<any>,
 >(): <
@@ -450,7 +450,7 @@ export function newGraphileCrystalFieldConfigBuilder<
   TFieldPlan extends OutputPlanForType<TType>,
   TArgs extends BaseGraphQLArguments,
 >(
-  config: GraphileCrystalFieldConfig<
+  config: GraphileFieldConfig<
     TType,
     TContext,
     TParentPlan,
@@ -465,7 +465,7 @@ type InputObjectTypeFields<
   TContext extends BaseGraphQLContext,
   TParentPlan extends ModifierPlan<any>,
 > = {
-  [key: string]: GraphileCrystalInputFieldConfig<
+  [key: string]: GraphileInputFieldConfig<
     GraphQLInputType,
     TContext,
     TParentPlan,
@@ -535,7 +535,7 @@ export function inputObjectFieldSpec<
   TResult extends ModifierPlan<TParent> = ModifierPlan<TParent>,
   TInput extends InputPlan = InputPlan,
 >(
-  graphileSpec: GraphileCrystalInputFieldConfig<
+  graphileSpec: GraphileInputFieldConfig<
     GraphQLInputType,
     TContext,
     TParent,

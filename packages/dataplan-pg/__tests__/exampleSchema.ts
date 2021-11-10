@@ -23,7 +23,7 @@ import {
   lambda,
   list,
   ModifierPlan,
-  newGraphileCrystalFieldConfigBuilder,
+  newGraphileFieldConfigBuilder,
   newInputObjectTypeBuilder,
   newObjectTypeBuilder,
   object,
@@ -1332,7 +1332,7 @@ export function makeExampleSchema(
           return $connection.nodes();
         },
       },
-      nodes: newGraphileCrystalFieldConfigBuilder<
+      nodes: newGraphileFieldConfigBuilder<
         OurGraphQLContext,
         MessageConnectionPlan
       >()({

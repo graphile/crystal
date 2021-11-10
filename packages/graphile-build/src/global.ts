@@ -1,4 +1,10 @@
 import type {
+  BaseGraphQLContext,
+  ExecutablePlan,
+  GraphileFieldConfig,
+  GraphileFieldConfigMap,
+} from "graphile-crystal";
+import type {
   GraphQLEnumType,
   GraphQLEnumTypeConfig,
   GraphQLEnumValueConfig,
@@ -92,16 +98,31 @@ declare global {
 
     interface Inflection extends InflectionBase {}
 
-    interface GraphileObjectTypeConfig<TSource, TContext>
-      extends Omit<
-        GraphQLObjectTypeConfig<TSource, TContext>,
+    type GraphileFieldConfigMap<
+      TParentPlan extends ExecutablePlan<any> | null,
+      TContext extends BaseGraphQLContext,
+    > = {
+      [fieldName: string]: GraphileFieldConfig<
+        any,
+        TContext,
+        TParentPlan,
+        any,
+        any
+      >;
+    };
+
+    interface GraphileObjectTypeConfig<
+      TParentPlan extends ExecutablePlan<any> | null,
+      TContext extends BaseGraphQLContext,
+    > extends Omit<
+        GraphQLObjectTypeConfig<unknown, TContext>,
         "fields" | "interfaces"
       > {
       fields?:
-        | GraphQLFieldConfigMap<TSource, TContext>
+        | GraphileFieldConfigMap<TParentPlan, TContext>
         | ((
             context: ContextGraphQLObjectTypeFields,
-          ) => GraphQLFieldConfigMap<TSource, TContext>);
+          ) => GraphileFieldConfigMap<TParentPlan, TContext>);
       interfaces?:
         | GraphQLInterfaceType[]
         | ((
@@ -605,7 +626,7 @@ declare global {
        * - 'GraphQLObjectType:fields:field:args' to customize the arguments to a field
        */
       GraphQLObjectType: GraphileEngine.Hook<
-        GraphileEngine.GraphileObjectTypeConfig<any, any>,
+        GraphileObjectTypeConfig<any, any>,
         GraphileEngine.ContextGraphQLObjectType,
         TBuild
       >[];
@@ -615,7 +636,7 @@ declare global {
         TBuild
       >[];
       "GraphQLObjectType:fields": GraphileEngine.Hook<
-        GraphQLFieldConfigMap<any, any>,
+        GraphileFieldConfigMap<any, any>,
         GraphileEngine.ContextGraphQLObjectTypeFields,
         TBuild
       >[];

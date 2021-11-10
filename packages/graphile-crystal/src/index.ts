@@ -30,7 +30,8 @@ export {
   CrystalSubscriber,
   CrystalValuesList,
   ExecutablePlanResolver,
-  GraphileCrystalFieldConfig,
+  GraphileFieldConfig,
+  GraphileFieldConfigMap,
   InputObjectFieldPlanResolver,
   PolymorphicData,
 } from "./interfaces";
@@ -91,7 +92,7 @@ export {
   GraphileObjectType,
   inputObjectFieldSpec,
   InputObjectTypeSpec,
-  newGraphileCrystalFieldConfigBuilder,
+  newGraphileFieldConfigBuilder,
   newInputObjectTypeBuilder,
   newObjectTypeBuilder,
   objectFieldSpec,
