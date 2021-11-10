@@ -2128,7 +2128,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tsconfig/node14@npm:^1.0.0, @tsconfig/node14@npm:^1.0.1":
+"@tsconfig/node14@npm:^1.0.0":
   version: 1.0.1
   resolution: "@tsconfig/node14@npm:1.0.1"
   checksum: 976345e896c0f059867f94f8d0f6ddb8b1844fb62bf36b727de8a9a68f024857e5db97ed51d3325e23e0616a5e48c034ff51a8d595b3fe7e955f3587540489be
@@ -8637,7 +8637,7 @@ resolve@~1.19.0:
     "@babel/plugin-transform-runtime": ^7.16.0
     "@babel/preset-env": ^7.16.0
     "@babel/preset-typescript": ^7.16.0
-    "@tsconfig/node14": ^1.0.1
+    "@tsconfig/node16": ^1.0.2
     "@types/jest": ^27.0.2
     "@types/mock-fs": 4.13.1
     "@types/node": ^16.11.6

@@ -28,7 +28,7 @@
     "@babel/plugin-transform-runtime": "^7.16.0",
     "@babel/preset-env": "^7.16.0",
     "@babel/preset-typescript": "^7.16.0",
-    "@tsconfig/node14": "^1.0.1",
+    "@tsconfig/node16": "^1.0.2",
     "@types/jest": "^27.0.2",
     "@types/mock-fs": "4.13.1",
     "@types/node": "^16.11.6",
