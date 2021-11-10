@@ -382,7 +382,7 @@ export function compile(sql: SQL): {
             }
           }
           sqlFragments.push(
-            nameCount === 1 ? mappedNames[0] : mappedNames.join("."),
+            nameCount === 1 ? mappedNames[0]! : mappedNames.join("."),
           );
           break;
         }
@@ -712,7 +712,7 @@ export function parens(fragment: SQL, force = false): SQL {
   if (Array.isArray(fragment)) {
     if (fragment.length === 1) {
       // Pretend that the child was just a single node
-      return parens(fragment[0], force);
+      return parens(fragment[0]!, force);
     } else {
       // Normal behaviour (fall through)
     }
@@ -727,7 +727,7 @@ export function parens(fragment: SQL, force = false): SQL {
   } else if (fragment.type === "INDENT") {
     if (Array.isArray(fragment.content)) {
       if (fragment.content.length === 1) {
-        const inner = fragment.content[0];
+        const inner = fragment.content[0]!;
         if (inner.type === "PARENS" && !inner.force) {
           return makeParensNode(inner.content, force);
         } else {
@@ -762,7 +762,7 @@ export function arraysMatch<T>(
     return false;
   }
   for (let i = 0; i < l; i++) {
-    if (!comparator(array1[i], array2[i])) {
+    if (!comparator(array1[i]!, array2[i]!)) {
       return false;
     }
   }
