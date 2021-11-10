@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`generated schema 1`] = `
+enum MyEnum {
+  ONE @deprecated(reason: "We no longer support numbers smaller than PI")
+  TWO @deprecated(reason: "We no longer support numbers smaller than PI")
+  THREE @deprecated(reason: "We no longer support numbers smaller than PI")
+  FOUR
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query {
+  enum: MyEnum
+}
+`;
