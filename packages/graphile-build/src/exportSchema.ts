@@ -1,5 +1,6 @@
 import { types as t } from "@babel/core";
 import generate from "@babel/generator";
+import template from "@babel/template";
 import { writeFile } from "fs/promises";
 import type { GraphQLSchema } from "graphql";
 
@@ -8,27 +9,15 @@ export async function exportSchema(
   toPath: string,
 ): Promise<void> {
   const config = schema.toConfig();
-  const ast = t.file(
-    t.program([
-      t.exportNamedDeclaration(
-        t.variableDeclaration("const", [
-          t.variableDeclarator(
-            t.identifier("schema"),
-            t.newExpression(t.identifier("GraphQLSchema"), [
-              t.objectExpression([
-                t.objectProperty(
-                  t.identifier("description"),
-                  config.description
-                    ? t.stringLiteral(config.description)
-                    : t.nullLiteral(),
-                ),
-              ]),
-            ]),
-          ),
-        ]),
-      ),
-    ]),
-  );
+  const statement = template`\
+export const schema = new GraphQLSchema({
+  description: ${
+    config.description ? t.stringLiteral(config.description) : t.nullLiteral()
+  }
+});
+`();
+  const statements = Array.isArray(statement) ? statement : [statement];
+  const ast = t.file(t.program(statements));
   const { code } = generate(ast, {});
   /*
   const output = `\

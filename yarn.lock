@@ -2164,7 +2164,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/babel__template@npm:*":
+"@types/babel__template@npm:*, @types/babel__template@npm:^7":
   version: 7.4.1
   resolution: "@types/babel__template@npm:7.4.1"
   dependencies:
@@ -5351,8 +5351,10 @@ __metadata:
   resolution: "graphile-build@workspace:packages/graphile-build"
   dependencies:
     "@babel/generator": ^7.16.0
+    "@babel/template": ^7.16.0
     "@graphile/lru": 4.6.0-alpha.0
     "@types/babel__generator": ^7
+    "@types/babel__template": ^7
     "@types/debug": ^4.1.7
     "@types/jest": ^27.0.2
     "@types/node": ^16.11.6
