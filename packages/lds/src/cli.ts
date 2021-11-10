@@ -34,7 +34,7 @@ async function main() {
         [stringifiedKey: string]: Array<WebSocket | null>;
       };
     };
-  } = {};
+  } = Object.create(null);
   // Send keepalive every 25 seconds
   setInterval(() => {
     clients.forEach((ws) => {
@@ -58,10 +58,9 @@ async function main() {
       }
       // Release all the subscriptions
       // TODO: do this more performantly!!
-      for (const schema of Object.keys(channels)) {
-        for (const table of Object.keys(channels[schema])) {
-          for (const stringifiedKey of Object.keys(channels[schema][table])) {
-            const channelClients = channels[schema][table][stringifiedKey];
+      for (const tableMap of Object.values(channels)) {
+        for (const clientsMap of Object.values(tableMap)) {
+          for (const channelClients of Object.values(clientsMap)) {
             const index = channelClients.indexOf(ws);
             if (index >= 0) {
               channelClients[index] = null;
@@ -99,23 +98,24 @@ async function main() {
       }
 
       const stringifiedKey = key ? stringify(key) : "";
-      if (!channels[schema]) {
-        channels[schema] = {};
-      }
-      if (!channels[schema][table]) {
-        channels[schema][table] = {};
-      }
-      if (!channels[schema][table][stringifiedKey]) {
-        channels[schema][table][stringifiedKey] = new Array(SLOTS);
-      }
-      const channelClients = channels[schema][table][stringifiedKey]!;
+      const tableMap =
+        channels[schema] ??
+        (channels[schema] = Object.create(null) as typeof channels[string]);
+      const clientsMap =
+        tableMap[table] ??
+        (tableMap[table] = Object.create(null) as typeof tableMap[string]);
+      const channelClients =
+        clientsMap[stringifiedKey] ??
+        (clientsMap[stringifiedKey] = new Array(
+          SLOTS,
+        ) as typeof clientsMap[string]);
       const i = channelClients.indexOf(ws);
       if (sub) {
         if (i >= 0) {
           console.error("Socket is already registered for ", stringifiedKey);
           return;
         }
-        const emptyIndex = channelClients.findIndex((s) => !s);
+        const emptyIndex = channelClients.findIndex((s) => s != null);
         if (emptyIndex < 0) {
           console.error("All sockets are full");
           return;
@@ -139,12 +139,15 @@ async function main() {
 
   const callback: AnnounceCallback = function (announcement) {
     const { _: kind, schema, table } = announcement;
-    if (!channels[schema] || !channels[schema][table]) return;
+
+    const tableMap = channels[schema];
+    const clientsMap = tableMap?.[table];
+    if (!clientsMap) return;
     const stringifiedKey =
       announcement._ !== "insertC" && announcement._ !== "updateC"
         ? stringify(announcement.keys)
         : "";
-    const channelClients = channels[schema][table][stringifiedKey];
+    const channelClients = clientsMap?.[stringifiedKey];
     if (!channelClients) return;
     const msg = JSON.stringify(announcement);
     for (const socket of channelClients) {
@@ -153,7 +156,7 @@ async function main() {
       }
     }
     if (kind === "delete") {
-      delete channels[schema][table][stringifiedKey];
+      delete clientsMap[stringifiedKey];
     }
   };
 
