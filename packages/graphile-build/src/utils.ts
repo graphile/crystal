@@ -1,3 +1,5 @@
+import type { GraphQLNamedType } from "graphql";
+import { GraphQLObjectType } from "graphql";
 import camelCaseAll from "lodash/camelCase";
 import upperFirstAll from "lodash/upperFirst";
 import plz from "pluralize";
@@ -23,10 +25,13 @@ export const constantCaseAll = (str: string) =>
 
 export const formatInsideUnderscores =
   (fn: (input: string) => string) => (str: string) => {
-    const matches = str.match(/^(_*)([\s\S]*?)(_*)$/);
-    if (!matches) {
-      throw new Error("Impossible?"); // Satiate Flow
-    }
+    // Guaranteed to match all strings, and to contain 3 capture groups.
+    const matches = str.match(/^(_*)([\s\S]*?)(_*)$/) as [
+      string,
+      string,
+      string,
+      string,
+    ];
     const [, start, middle, end] = matches;
     return `${start}${fn(middle)}${end}`;
   };
@@ -39,3 +44,19 @@ export const upperCamelCase = (str: string): string =>
 
 export const pluralize = (str: string) => plz(str);
 export const singularize = (str: string) => plz.singular(str);
+
+/**
+ * Returns true if the given type is a GraphQL object type AND that object type
+ * defines fields; false otherwise.
+ *
+ * WARNING: this function may throw if there's issues with the type's fields,
+ * since it calls Type.getFields()
+ */
+export function isValidObjectType(
+  Type: GraphQLNamedType | null | undefined,
+): Type is GraphQLObjectType {
+  return (
+    Type instanceof GraphQLObjectType &&
+    Object.keys(Type.getFields()).length > 0
+  );
+}
