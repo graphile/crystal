@@ -38,7 +38,7 @@ export const SubscriptionPlugin: GraphileEngine.Plugin =
         const { getTypeByName, extend, inflection, handleRecoverableError } =
           build;
 
-        // IIFE to get the mutation type, handling errors occurring during
+        // IIFE to get the subscription type, handling errors occurring during
         // validation.
         const Subscription = (() => {
           try {
@@ -61,7 +61,7 @@ export const SubscriptionPlugin: GraphileEngine.Plugin =
         // hence this is outside of the IIFE.
         return extend(
           schema,
-          { mutation: Subscription },
+          { subscription: Subscription },
           "Adding subscription type to schema",
         );
       },
