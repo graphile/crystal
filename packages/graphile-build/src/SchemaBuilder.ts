@@ -2,7 +2,8 @@ import "./global";
 
 import debugFactory from "debug";
 import { EventEmitter } from "events";
-import type { GraphQLSchemaConfig } from "graphql";
+import type { GraphQLError, GraphQLSchemaConfig } from "graphql";
+import { validateSchema } from "graphql";
 import { GraphQLSchema } from "graphql";
 
 import makeNewBuild from "./makeNewBuild";
@@ -31,6 +32,7 @@ class SchemaBuilder<
 
   _currentPluginName: string | null | undefined;
   _generatedSchema: GraphQLSchema | null | undefined;
+  _validationErrors: ReadonlyArray<GraphQLError> = [];
   _explicitSchemaListener: GraphileEngine.SchemaListener | null | undefined;
   _busy: boolean;
   _watching: boolean;
@@ -326,7 +328,7 @@ class SchemaBuilder<
   }
 
   buildSchema(): GraphQLSchema {
-    if (!this._generatedSchema) {
+    if (!this._generatedSchema || this._validationErrors.length > 0) {
       const build = this.createBuild();
       const schemaSpec: Partial<GraphQLSchemaConfig> = {
         directives: [...build.graphql.specifiedDirectives],
@@ -354,9 +356,17 @@ class SchemaBuilder<
             "Finalizing GraphQL schema",
           )
         : schema;
+
+      this._validationErrors = validateSchema(schema);
     }
     if (!this._generatedSchema) {
       throw new Error("Schema generation failed");
+    }
+    if (this._validationErrors.length) {
+      throw new AggregateError(
+        this._validationErrors,
+        "Schema construction failed due to validation failure",
+      );
     }
     return this._generatedSchema;
   }
