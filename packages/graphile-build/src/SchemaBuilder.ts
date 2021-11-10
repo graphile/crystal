@@ -365,7 +365,11 @@ class SchemaBuilder<
     if (this._validationErrors.length) {
       throw new AggregateError(
         this._validationErrors,
-        "Schema construction failed due to validation failure",
+        `Schema construction failed due to ${
+          this._validationErrors.length
+        } validation failure(s). First failure was: ${String(
+          this._validationErrors[0],
+        )}`,
       );
     }
     return this._generatedSchema;
