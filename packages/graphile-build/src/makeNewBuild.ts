@@ -23,7 +23,6 @@ import { version } from "../package.json";
 import extend, { indent } from "./extend";
 import { makeInitialInflection } from "./inflection";
 import type SchemaBuilder from "./SchemaBuilder";
-import swallowError from "./swallowError";
 
 export default function makeNewBuild(
   builder: SchemaBuilder<any>,
@@ -114,7 +113,10 @@ export default function makeNewBuild(
     extend,
     scopeByType,
     inflection: makeInitialInflection(),
-    handleRecoverableError: swallowError,
+    handleRecoverableError(e) {
+      e["recoverable"] = true;
+      throw e;
+    },
     status: {
       currentHookName: null,
       currentHookEvent: null,
