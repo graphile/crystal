@@ -8,7 +8,7 @@
  * Descriptions aren't required in these places, so you can safely disable this
  * plugin.
  */
-export const ClientMutationIdDescription: GraphileEngine.Plugin =
+export const ClientMutationIdDescriptionPlugin: GraphileEngine.Plugin =
   function ClientMutationIdDescriptionPlugin(builder) {
     builder.hook(
       "GraphQLInputObjectType:fields:field",

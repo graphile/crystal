@@ -1,5 +1,5 @@
-import type { GraphQLNamedType } from "graphql";
-import { GraphQLObjectType } from "graphql";
+import type { GraphQLNamedType, GraphQLScalarTypeConfig } from "graphql";
+import { GraphQLObjectType, Kind } from "graphql";
 import camelCaseAll from "lodash/camelCase";
 import upperFirstAll from "lodash/upperFirst";
 import plz from "pluralize";
@@ -60,3 +60,14 @@ export function isValidObjectType(
     Object.keys(Type.getFields()).length > 0
   );
 }
+
+export const stringScalarSpec = Object.freeze({
+  serialize: (value) => String(value),
+  parseValue: (value) => String(value),
+  parseLiteral: (ast) => {
+    if (ast.kind !== Kind.STRING) {
+      throw new Error("Can only parse string values");
+    }
+    return ast.value;
+  },
+} as Omit<GraphQLScalarTypeConfig<unknown, unknown>, "name" | "description">);
