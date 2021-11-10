@@ -1,7 +1,7 @@
 import { lambda } from "graphile-crystal";
 import { graphql, printSchema } from "graphql";
 
-import { buildSchema, defaultPlugins } from "../src";
+import { buildSchema, defaultPlugins, exportSchema } from "../src";
 
 function FN<T>(t: T): T {
   return t;
@@ -78,6 +78,9 @@ const MyRandomFieldPlugin: GraphileEngine.Plugin = (
     variableValues: {},
   });
   console.log(result); // { data: { random: 4 } }
+
+  // Export schema
+  await exportSchema(schema, `${__dirname}/../temp.ts`);
 })().catch((e) => {
   console.error(e);
   process.exit(1);

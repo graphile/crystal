@@ -29,6 +29,7 @@
   },
   "homepage": "https://graphile.org/graphile-build/",
   "dependencies": {
+    "@babel/generator": "^7.16.0",
     "@graphile/lru": "4.6.0-alpha.0",
     "@types/node": "^16.11.6",
     "@types/pluralize": "^0.0.29",
@@ -51,6 +52,7 @@
     "index.js"
   ],
   "devDependencies": {
+    "@types/babel__generator": "^7",
     "@types/debug": "^4.1.7",
     "@types/jest": "^27.0.2",
     "graphql": "npm:graphql@experimental-stream-defer",
