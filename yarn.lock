@@ -1379,7 +1379,7 @@ __metadata:
     jest: ^27.3.1
     jest-serializer-simple: 4.6.0
     tslib: ^2.3.1
-    typescript: ^4.5.1-rc
+    typescript: next
   peerDependencies:
     graphile-crystal: "*"
     graphql: "*"
@@ -1405,7 +1405,7 @@ __metadata:
     pg-sql2: 4.7.0
     ts-node: ^10.4.0
     tslib: ^2.3.1
-    typescript: ^4.5.1-rc
+    typescript: next
   peerDependencies:
     graphql: "*"
   languageName: unknown
@@ -1477,7 +1477,7 @@ __metadata:
     pg: ^8.7.1
     ts-node: ^10.4.0
     tslib: ^2.3.1
-    typescript: ^4.5.1-rc
+    typescript: next
     ws: ^8.2.3
   bin:
     graphile-lds: ./dist/cli.js
@@ -1493,7 +1493,7 @@ __metadata:
     jest: ^27.3.1
     ts-node: ^10.4.0
     tslib: ^2.3.1
-    typescript: ^4.5.1-rc
+    typescript: next
   languageName: unknown
   linkType: soft
 
@@ -5365,7 +5365,7 @@ __metadata:
     semver: ^7.3.5
     ts-node: ^10.4.0
     tslib: ^2.3.1
-    typescript: ^4.5.1-rc
+    typescript: next
   peerDependencies:
     graphql: "*"
   languageName: unknown
@@ -5390,7 +5390,7 @@ __metadata:
     spec-md: ^3.0.2
     ts-node: ^10.4.0
     tslib: ^2.3.1
-    typescript: ^4.5.1-rc
+    typescript: next
   peerDependencies:
     graphql: "*"
   languageName: unknown
@@ -6507,7 +6507,7 @@ __metadata:
     pretty-format: ^27.3.1
     ts-node: ^10.4.0
     tslib: ^2.3.1
-    typescript: ^4.5.1-rc
+    typescript: next
   peerDependencies:
     graphql: "*"
   languageName: unknown
@@ -6525,7 +6525,7 @@ __metadata:
     pretty-format: ^27.3.1
     ts-node: ^10.4.0
     tslib: ^2.3.1
-    typescript: ^4.5.1-rc
+    typescript: next
   languageName: unknown
   linkType: soft
 
@@ -7949,7 +7949,7 @@ __metadata:
     markdown-doctest: ^1.1.0
     ts-node: ^10.4.0
     tslib: ^2.3.1
-    typescript: ^4.5.1-rc
+    typescript: next
   languageName: unknown
   linkType: soft
 
@@ -8664,7 +8664,7 @@ resolve@~1.19.0:
     mock-fs: ^5.1.1
     pg: ^8.7.1
     prettier: ^2.4.1
-    typescript: ^4.5.1-rc
+    typescript: next
     webpack: ^5.61.0
   languageName: unknown
   linkType: soft
@@ -9666,23 +9666,23 @@ resolve@~1.19.0:
   languageName: node
   linkType: hard
 
-typescript@^4.5.1-rc:
-  version: 4.5.1-rc
-  resolution: "typescript@npm:4.5.1-rc"
+typescript@next:
+  version: 4.6.0-dev.20211110
+  resolution: "typescript@npm:4.6.0-dev.20211110"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 6b4ceb7b6751eae2dbfa56e59d2411dd3da793d86b9bb2c07ae8a01fed3acd696216870841825ab549c7bb1732fb7ed8b38b5befc1ee332807261aee98136783
+  checksum: 7c852e74cbdb85734c99924fae516aff24c11060499fc17810653a5b69924d27aa6fbb9cf63caeb60a1370cb0ee69f5afbd5833ae326183fd100540ff59a402a
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^4.5.1-rc#~builtin<compat/typescript>":
-  version: 4.5.1-rc
-  resolution: "typescript@patch:typescript@npm%3A4.5.1-rc#~builtin<compat/typescript>::version=4.5.1-rc&hash=32657b"
+"typescript@patch:typescript@next#~builtin<compat/typescript>":
+  version: 4.6.0-dev.20211110
+  resolution: "typescript@patch:typescript@npm%3A4.6.0-dev.20211110#~builtin<compat/typescript>::version=4.6.0-dev.20211110&hash=32657b"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 91df371a2db56be80cb8f220a94e2060e2bb29a6343ba624fcca7759e8508d3ae58ff8347a82e8091bb782cbb17cd76eac301b15551c9ed6474686d963bc81a0
+  checksum: 39c96c8289ed644ae2fce936f4090960481424cdf7d08c8a4e0aadb7a48f8c93335daeec17d94ebdb1278ed99f944bebb13223349f92351cf2f490e85ed93886
   languageName: node
   linkType: hard
 
