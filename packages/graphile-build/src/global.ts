@@ -531,11 +531,11 @@ declare global {
     type FieldWithHooksFunction = (
       fieldScope: ScopeGraphQLObjectTypeFieldsField,
       spec:
-        | GraphQLFieldConfig<any, any>
+        | GraphileFieldConfig<any, any, any, any, any>
         | ((
             context: ContextGraphQLObjectTypeFieldsField,
-          ) => GraphQLFieldConfig<any, any>),
-    ) => GraphQLFieldConfig<any, any>;
+          ) => GraphileFieldConfig<any, any, any, any, any>),
+    ) => GraphileFieldConfig<any, any, any, any, any>;
 
     type InterfaceFieldWithHooksFunction = (
       fieldScope: ScopeGraphQLInterfaceTypeFieldsField,
