@@ -1,3 +1,4 @@
+import type { GraphileFieldConfig } from "graphile-crystal";
 import {
   crystalWrapResolve,
   makeCrystalSubscriber,
@@ -148,7 +149,13 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               );
             },
             fields: () => {
-              const processedFields: GraphQLFieldConfig<any, any>[] = [];
+              const processedFields: GraphileFieldConfig<
+                any,
+                any,
+                any,
+                any,
+                any
+              >[] = [];
               const fieldWithHooks: GraphileEngine.FieldWithHooksFunction = (
                 fieldScope,
                 fieldSpec,
@@ -229,7 +236,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               const fieldsSpec = builder.applyHooks(
                 "GraphQLObjectType:fields",
                 build.extend(
-                  {},
+                  Object.create(null),
                   rawFields,
                   `Default field included in newWithHooks call for '${
                     rawSpec.name
@@ -242,8 +249,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
 
               // Finally, check through all the fields that they've all been
               // processed; any that have not we should do so now.
-              for (const fieldName in fieldsSpec) {
-                const fieldSpec = fieldsSpec[fieldName];
+              for (const [fieldName, fieldSpec] of Object.entries(fieldsSpec)) {
                 if (processedFields.indexOf(fieldSpec) < 0) {
                   // We've not processed this yet; process it now!
                   fieldsSpec[fieldName] = fieldsContext.fieldWithHooks(
@@ -255,11 +261,11 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               }
 
               // Perform the Graphile Crystal magic
-              for (const fieldName in fieldsSpec) {
-                const { subscribe, resolve } = fieldsSpec[fieldName];
-                fieldsSpec[fieldName].resolve = crystalWrapResolve(resolve);
+              for (const fieldSpec of Object.values(fieldsSpec)) {
+                const { subscribe, resolve } = fieldSpec;
+                fieldSpec.resolve = crystalWrapResolve(resolve);
                 if (!subscribe && scope.isRootSubscription) {
-                  fieldsSpec[fieldName].subscribe = makeCrystalSubscriber();
+                  fieldSpec.subscribe = makeCrystalSubscriber();
                 }
 
                 // IMPORTANT: **nothing** can modify the resolver from here - i.e.
@@ -378,8 +384,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 `|${rawSpec.name}`,
               );
               // Finally, check through all the fields that they've all been processed; any that have not we should do so now.
-              for (const fieldName in fieldsSpec) {
-                const fieldSpec = fieldsSpec[fieldName];
+              for (const [fieldName, fieldSpec] of Object.entries(fieldsSpec)) {
                 if (processedFields.indexOf(fieldSpec) < 0) {
                   // We've not processed this yet; process it now!
                   fieldsSpec[fieldName] = fieldsContext.fieldWithHooks(
@@ -529,8 +534,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               );
 
               // Finally, check through all the fields that they've all been processed; any that have not we should do so now.
-              for (const fieldName in fieldsSpec) {
-                const fieldSpec = fieldsSpec[fieldName];
+              for (const [fieldName, fieldSpec] of Object.entries(fieldsSpec)) {
                 if (processedFields.indexOf(fieldSpec) < 0) {
                   // We've not processed this yet; process it now!
                   fieldsSpec[fieldName] = fieldsContext.fieldWithHooks(
@@ -595,19 +599,21 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
           );
 
           const values = finalSpec.values;
-          finalSpec.values = Object.keys(values).reduce((memo, valueKey) => {
-            const value = values[valueKey];
-            const newValue = builder.applyHooks(
-              "GraphQLEnumType:values:value",
-              value,
-              build,
-              enumContext,
-              `|${finalSpec.name}|${valueKey}`,
-            );
+          finalSpec.values = Object.entries(values).reduce(
+            (memo, [valueKey, value]) => {
+              const newValue = builder.applyHooks(
+                "GraphQLEnumType:values:value",
+                value,
+                build,
+                enumContext,
+                `|${finalSpec.name}|${valueKey}`,
+              );
 
-            memo[valueKey] = newValue;
-            return memo;
-          }, {});
+              memo[valueKey] = newValue;
+              return memo;
+            },
+            Object.create(null),
+          );
 
           const Self = new GraphQLEnumType(finalSpec);
           return Self;
