@@ -33,6 +33,7 @@
     { "path": "packages/lds" },
     { "path": "packages/lru" },
     { "path": "packages/pg-sql2" },
+    { "path": "packages/graphile-build" },
     { "path": "packages/graphile-crystal" },
     { "path": "packages/dataplan-pg" }
   ]
