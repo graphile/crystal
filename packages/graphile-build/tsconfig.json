@@ -3,12 +3,10 @@
   "compilerOptions": {
     "rootDir": "src",
     "declarationDir": "./dist",
-    "outDir": "./dist"
+    "outDir": "./dist",
+
+    "noUncheckedIndexedAccess": true
   },
   "include": ["src"],
-  "references": [
-    { "path": "../lru" },
-    { "path": "../graphile-crystal" },
-    { "path": "../graphql-parse-resolve-info" }
-  ]
+  "references": [{ "path": "../lru" }, { "path": "../graphile-crystal" }]
 }
