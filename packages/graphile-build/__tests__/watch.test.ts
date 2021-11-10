@@ -68,6 +68,7 @@ const makePluginEtc = (defaultCounter = 0) => {
       build.registerObjectType(
         `Dummy${dummyCounter}`,
         {},
+        null,
         () => ({
           fields: () => {
             return {

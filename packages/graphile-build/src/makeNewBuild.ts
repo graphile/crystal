@@ -1,6 +1,7 @@
 import "./global";
 
 import chalk from "chalk";
+import type { ExecutablePlan } from "graphile-crystal";
 import type { GraphQLNamedType } from "graphql";
 import {
   GraphQLBoolean,
@@ -52,6 +53,7 @@ export default function makeNewBuild(
       scope: GraphileEngine.SomeScope;
       specGenerator: any;
       origin: string | null | undefined;
+      Plan?: { new (...args: any[]): ExecutablePlan<any> } | null;
     };
   } = {};
 
@@ -62,6 +64,7 @@ export default function makeNewBuild(
     klass: { new (spec: any): GraphQLNamedType },
     typeName: string,
     scope: GraphileEngine.SomeScope,
+    Plan: { new (...args: any[]): ExecutablePlan<any> } | null,
     specGenerator: () => any,
     origin: string | null | undefined,
   ) {
@@ -89,6 +92,7 @@ export default function makeNewBuild(
       scope,
       specGenerator,
       origin,
+      Plan,
     };
   }
 
@@ -122,23 +126,37 @@ export default function makeNewBuild(
       currentHookEvent: null,
     },
 
-    registerObjectType(typeName, scope, specGenerator, origin) {
-      register(GraphQLObjectType, typeName, scope, specGenerator, origin);
+    registerObjectType(typeName, scope, Plan, specGenerator, origin) {
+      register(GraphQLObjectType, typeName, scope, Plan, specGenerator, origin);
     },
     registerUnionType(typeName, scope, specGenerator, origin) {
-      register(GraphQLUnionType, typeName, scope, specGenerator, origin);
+      register(GraphQLUnionType, typeName, scope, null, specGenerator, origin);
     },
     registerInterfaceType(typeName, scope, specGenerator, origin) {
-      register(GraphQLInterfaceType, typeName, scope, specGenerator, origin);
+      register(
+        GraphQLInterfaceType,
+        typeName,
+        scope,
+        null,
+        specGenerator,
+        origin,
+      );
     },
     registerInputObjectType(typeName, scope, specGenerator, origin) {
-      register(GraphQLInputObjectType, typeName, scope, specGenerator, origin);
+      register(
+        GraphQLInputObjectType,
+        typeName,
+        scope,
+        null,
+        specGenerator,
+        origin,
+      );
     },
     registerScalarType(typeName, scope, specGenerator, origin) {
-      register(GraphQLScalarType, typeName, scope, specGenerator, origin);
+      register(GraphQLScalarType, typeName, scope, null, specGenerator, origin);
     },
     registerEnumType(typeName, scope, specGenerator, origin) {
-      register(GraphQLEnumType, typeName, scope, specGenerator, origin);
+      register(GraphQLEnumType, typeName, scope, null, specGenerator, origin);
     },
 
     getTypeByName(typeName) {
@@ -147,7 +165,7 @@ export default function makeNewBuild(
       } else {
         const details = typeRegistry[typeName];
         if (details != null) {
-          const { klass, scope, specGenerator } = details;
+          const { klass, scope, specGenerator, Plan } = details;
 
           const spec = specGenerator();
           // No need to have the user specify name, and they're forbidden from
@@ -163,6 +181,7 @@ export default function makeNewBuild(
             klass,
             spec,
             scope,
+            Plan,
           );
           allTypes[typeName] = type;
           return type;

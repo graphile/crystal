@@ -336,29 +336,25 @@ export type GraphileFieldConfig<
     TParentPlan,
     TFieldPlan
   >;
-  args?: {
-    [key: string]: GraphileArgumentConfig<
-      GraphQLInputType,
-      TContext,
-      TParentPlan,
-      TFieldPlan,
-      any,
-      any
-    >;
-  };
+  args?: GraphileFieldConfigArgumentMap<
+    TType,
+    TContext,
+    TParentPlan,
+    TFieldPlan
+  >;
 };
 
-/**
- * Basically GraphQLFieldConfigMap but with GraphileFieldConfig
- */
-export type GraphileFieldConfigMap<
-  TParentPlan extends ExecutablePlan<any> | null,
+export type GraphileFieldConfigArgumentMap<
+  TType extends GraphQLOutputType,
   TContext extends BaseGraphQLContext,
+  TParentPlan extends ExecutablePlan<any> | null,
+  TFieldPlan extends OutputPlanForType<TType>,
 > = {
-  [fieldName: string]: GraphileFieldConfig<
+  [argName: string]: GraphileArgumentConfig<
     any,
     TContext,
     TParentPlan,
+    TFieldPlan,
     any,
     any
   >;

@@ -1,3 +1,5 @@
+import { __ValuePlan } from "graphile-crystal";
+
 import { isValidObjectType } from "../utils";
 
 /**
@@ -21,6 +23,7 @@ export const MutationPlugin: GraphileEngine.Plugin =
         {
           isRootMutation: true,
         },
+        __ValuePlan,
         () => {
           return {
             description:

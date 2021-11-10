@@ -31,8 +31,9 @@ export {
   CrystalValuesList,
   ExecutablePlanResolver,
   GraphileFieldConfig,
-  GraphileFieldConfigMap,
+  GraphileFieldConfigArgumentMap,
   InputObjectFieldPlanResolver,
+  OutputPlanForType,
   PolymorphicData,
 } from "./interfaces";
 export {
@@ -96,6 +97,7 @@ export {
   newInputObjectTypeBuilder,
   newObjectTypeBuilder,
   objectFieldSpec,
+  objectSpec,
   ObjectTypeSpec,
   planGroupsOverlap,
 } from "./utils";

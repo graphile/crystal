@@ -1,3 +1,5 @@
+import { __ValuePlan } from "graphile-crystal";
+
 import { isValidObjectType } from "../utils";
 
 /**
@@ -21,6 +23,7 @@ export const SubscriptionPlugin: GraphileEngine.Plugin =
         {
           isRootSubscription: true,
         },
+        __ValuePlan,
         () => {
           return {
             description: `The root subscription type: contains realtime events you can subscribe to with the \`subscription\` operation.`,

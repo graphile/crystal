@@ -1,7 +1,10 @@
 import type {
+  BaseGraphQLArguments,
   BaseGraphQLContext,
   ExecutablePlan,
   GraphileFieldConfig,
+  GraphileFieldConfigArgumentMap,
+  OutputPlanForType,
 } from "graphile-crystal";
 import type {
   GraphQLEnumType,
@@ -20,6 +23,7 @@ import type {
   GraphQLNamedType,
   GraphQLObjectType,
   GraphQLObjectTypeConfig,
+  GraphQLOutputType,
   GraphQLScalarType,
   GraphQLScalarTypeConfig,
   GraphQLSchema,
@@ -210,12 +214,16 @@ declare global {
        * scope so that other plugins may hook it; it can also be helpful to
        * indicate where a conflict has occurred.
        */
-      registerObjectType: (
+      registerObjectType<TPlan extends ExecutablePlan<any> | null>(
         typeName: string,
         scope: ScopeGraphQLObjectType,
-        specGenerator: () => Omit<GraphileObjectTypeConfig<any, any>, "name">,
+        Plan: TPlan extends ExecutablePlan<any>
+          ? { new (...args: any[]): TPlan }
+          : null,
+        specGenerator: () => Omit<GraphileObjectTypeConfig<TPlan, any>, "name">,
         origin: string | null | undefined,
-      ) => void;
+      ): void;
+
       /** As registerObjectType, but for interfaces */
       registerInterfaceType: (
         typeName: string,
@@ -528,14 +536,26 @@ declare global {
       after?: Array<string>;
     }
 
-    type FieldWithHooksFunction = (
+    type FieldWithHooksFunction = <
+      TType extends GraphQLOutputType,
+      TContext extends BaseGraphQLContext,
+      TParentPlan extends ExecutablePlan<any>,
+      TFieldPlan extends OutputPlanForType<TType>,
+      TArgs extends BaseGraphQLArguments,
+    >(
       fieldScope: ScopeGraphQLObjectTypeFieldsField,
       spec:
-        | GraphileFieldConfig<any, any, any, any, any>
+        | GraphileFieldConfig<TType, TContext, TParentPlan, TFieldPlan, TArgs>
         | ((
             context: ContextGraphQLObjectTypeFieldsField,
-          ) => GraphileFieldConfig<any, any, any, any, any>),
-    ) => GraphileFieldConfig<any, any, any, any, any>;
+          ) => GraphileFieldConfig<
+            TType,
+            TContext,
+            TParentPlan,
+            TFieldPlan,
+            TArgs
+          >),
+    ) => GraphileFieldConfig<TType, TContext, TParentPlan, TFieldPlan, TArgs>;
 
     type InterfaceFieldWithHooksFunction = (
       fieldScope: ScopeGraphQLInterfaceTypeFieldsField,
@@ -643,12 +663,12 @@ declare global {
         TBuild
       >[];
       "GraphQLObjectType:fields:field": GraphileEngine.Hook<
-        GraphQLFieldConfig<any, any>,
+        GraphileFieldConfig<any, any, any, any, any>,
         GraphileEngine.ContextGraphQLObjectTypeFieldsField,
         TBuild
       >[];
       "GraphQLObjectType:fields:field:args": GraphileEngine.Hook<
-        GraphQLFieldConfigArgumentMap,
+        GraphileFieldConfigArgumentMap<any, any, any, any>,
         GraphileEngine.ContextGraphQLObjectTypeFieldsFieldArgs,
         TBuild
       >[];

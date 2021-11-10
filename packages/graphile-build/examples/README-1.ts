@@ -3,6 +3,10 @@ import { graphql, printSchema } from "graphql";
 
 import { buildSchema, defaultPlugins } from "../src";
 
+function FN<T>(t: T): T {
+  return t;
+}
+
 declare global {
   namespace GraphileEngine {
     interface GraphileBuildOptions {
@@ -22,26 +26,26 @@ const MyRandomFieldPlugin: GraphileEngine.Plugin = (
       extend,
       graphql: { GraphQLInt },
     } = build;
-    const { Self } = context;
+    const { Self, fieldWithHooks } = context;
     return extend<typeof fields, typeof fields>(
       fields,
       {
-        random: {
+        random: fieldWithHooks({ fieldName: "random" }, () => ({
           type: GraphQLInt,
           args: {
             sides: {
               type: GraphQLInt,
             },
           },
-          plan(_$parent, args) {
+          plan: FN((_$parent, args) => {
             return lambda(
               args.sides,
               (sides = myDefaultMax) =>
                 Math.floor(Math.random() * (sides + 1 - myDefaultMin)) +
                 myDefaultMin,
             );
-          },
-        },
+          }),
+        })),
       },
       `adding 'random' field to ${Self.name}`,
     );

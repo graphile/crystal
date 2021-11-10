@@ -1,3 +1,5 @@
+import { __ValuePlan } from "graphile-crystal";
+
 import { isValidObjectType } from "../utils";
 
 /**
@@ -25,6 +27,7 @@ export const QueryPlugin: GraphileEngine.Plugin = async function QueryPlugin(
         {
           isRootQuery: true,
         },
+        __ValuePlan,
         () => {
           return {
             description:

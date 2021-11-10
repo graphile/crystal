@@ -338,20 +338,20 @@ export type ObjectTypeSpec<
 /**
  * Saves us having to write `extensions: {graphile: {...}}` everywhere.
  */
-function objectSpec<
+export function objectSpec<
   TContext extends BaseGraphQLContext,
   TParentPlan extends ExecutablePlan<any>,
   TFields extends ObjectTypeFields<TContext, TParentPlan>,
 >(
   spec: ObjectTypeSpec<TContext, TParentPlan, TFields>,
-  Plan: { new (...args: any[]): TParentPlan },
+  Plan: { new (...args: any[]): TParentPlan } | null,
 ): GraphQLObjectTypeConfig<any, TContext> {
   const modifiedSpec: GraphQLObjectTypeConfig<any, TContext> = {
     ...spec,
     extensions: {
       ...spec.extensions,
       graphile: {
-        Plan,
+        Plan: Plan ?? undefined,
         ...spec.extensions?.graphile,
       },
     },
@@ -450,13 +450,7 @@ export function newGraphileFieldConfigBuilder<
   TFieldPlan extends OutputPlanForType<TType>,
   TArgs extends BaseGraphQLArguments,
 >(
-  config: GraphileFieldConfig<
-    TType,
-    TContext,
-    TParentPlan,
-    TFieldPlan,
-    TArgs
-  >,
+  config: GraphileFieldConfig<TType, TContext, TParentPlan, TFieldPlan, TArgs>,
 ) => typeof config {
   return (config) => config;
 }

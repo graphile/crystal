@@ -1,8 +1,14 @@
-import type { GraphileFieldConfig } from "graphile-crystal";
+import type {
+  BaseGraphQLArguments,
+  BaseGraphQLContext,
+  ExecutablePlan,
+  GraphileFieldConfig,
+  OutputPlanForType,
+} from "graphile-crystal";
 import {
   crystalWrapResolve,
   makeCrystalSubscriber,
-  objectFieldSpec,
+  objectSpec,
 } from "graphile-crystal";
 import type {
   GraphQLEnumTypeConfig,
@@ -10,6 +16,7 @@ import type {
   GraphQLInputFieldConfig,
   GraphQLInputFieldConfigMap,
   GraphQLNamedType,
+  GraphQLOutputType,
   GraphQLScalarTypeConfig,
   GraphQLSchemaConfig,
 } from "graphql";
@@ -52,6 +59,7 @@ export type NewWithHooksFunction = <
   klass: { new (spec: SpecForType<TType>): TType },
   spec: SpecForType<TType>,
   scope: ScopeForType<TType>,
+  Plan?: { new (...args: any[]): ExecutablePlan<any> } | null,
 ) => TType;
 
 export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
@@ -62,6 +70,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
     Type,
     inSpec,
     inScope,
+    Plan,
   ) {
     if (!inScope) {
       // eslint-disable-next-line no-console
@@ -156,10 +165,38 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 any,
                 any
               >[] = [];
-              const fieldWithHooks: GraphileEngine.FieldWithHooksFunction = (
-                fieldScope,
-                fieldSpec,
-              ) => {
+              const fieldWithHooks: GraphileEngine.FieldWithHooksFunction = <
+                TType extends GraphQLOutputType,
+                TContext extends BaseGraphQLContext,
+                TParentPlan extends ExecutablePlan<any>,
+                TFieldPlan extends OutputPlanForType<TType>,
+                TArgs extends BaseGraphQLArguments,
+              >(
+                fieldScope: GraphileEngine.ScopeGraphQLObjectTypeFieldsField,
+                fieldSpec:
+                  | GraphileFieldConfig<
+                      TType,
+                      TContext,
+                      TParentPlan,
+                      TFieldPlan,
+                      TArgs
+                    >
+                  | ((
+                      context: GraphileEngine.ContextGraphQLObjectTypeFieldsField,
+                    ) => GraphileFieldConfig<
+                      TType,
+                      TContext,
+                      TParentPlan,
+                      TFieldPlan,
+                      TArgs
+                    >),
+              ): GraphileFieldConfig<
+                TType,
+                TContext,
+                TParentPlan,
+                TFieldPlan,
+                TArgs
+              > => {
                 const { fieldName } = fieldScope;
                 build.extend(
                   fieldScope,
@@ -189,28 +226,28 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     scope: fieldScope,
                   };
 
-                let finalFieldSpec =
+                let resolvedFieldSpec =
                   typeof fieldSpec === "function"
                     ? fieldSpec(fieldContext)
                     : fieldSpec;
-                finalFieldSpec = builder.applyHooks(
+                resolvedFieldSpec = builder.applyHooks(
                   "GraphQLObjectType:fields:field",
-                  objectFieldSpec(finalFieldSpec),
+                  resolvedFieldSpec,
                   build,
                   fieldContext,
                   `|${Self.name}.fields.${fieldName}`,
-                );
+                ) as typeof resolvedFieldSpec;
 
-                finalFieldSpec.args = finalFieldSpec.args || {};
+                resolvedFieldSpec.args = resolvedFieldSpec.args ?? {};
                 const argsContext: GraphileEngine.ContextGraphQLObjectTypeFieldsFieldArgs =
                   {
                     ...fieldContext,
                   };
-                finalFieldSpec = {
-                  ...finalFieldSpec,
+                const finalFieldSpec = {
+                  ...resolvedFieldSpec,
                   args: builder.applyHooks(
                     "GraphQLObjectType:fields:field:args",
-                    finalFieldSpec.args,
+                    resolvedFieldSpec.args,
                     build,
                     argsContext,
 
@@ -275,7 +312,9 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               return fieldsSpec;
             },
           };
-          const Self = new GraphQLObjectType(finalSpec);
+          const Self = new GraphQLObjectType(
+            objectSpec(finalSpec, Plan ?? null),
+          );
           return Self;
         }
 
