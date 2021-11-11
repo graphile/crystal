@@ -60,7 +60,7 @@ import type {
   PgSubscriber,
   PgTypeCodec,
   WithPgClient,
-} from "../src";
+} from "../../src";
 import {
   enumType,
   pgClassExpression,
@@ -79,12 +79,13 @@ import {
   pgSingleTablePolymorphic,
   PgSource,
   PgSourceBuilder,
+  pgUpdate,
+  PgUpdatePlan,
   recordType,
   TYPES,
-} from "../src";
-import { pgUpdate, PgUpdatePlan } from "../src/plans/pgUpdate";
+} from "../../src";
 
-declare module "../src" {
+declare module "../../src" {
   interface PgEnumSourceExtensions {
     tableSource?: PgSource<any, any, any, any, any>;
   }
@@ -1059,16 +1060,21 @@ export function makeExampleSchema(
     uniques: [["id"]],
   });
 
-  const entitySearchSource = new PgSource({
+  const unionEntitySource = new PgSource({
     executor,
     codec: recordType(
       sql`interfaces_and_unions.union__entity`,
       unionEntityColumns,
     ),
+    source: sql`(select null::interfaces_and_unions.union__entity)`,
+    name: "union__entity",
+    columns: unionEntityColumns,
+  });
+
+  const entitySearchSource = unionEntitySource.alternativeSource({
     source: (...args: SQL[]) =>
       sql`interfaces_and_unions.search(${sql.join(args, ", ")})`,
     name: "entity_search",
-    columns: unionEntityColumns,
   });
 
   const unionItemsSource = unionItemsSourceBuilder.build({
@@ -1141,7 +1147,7 @@ export function makeExampleSchema(
     },
   });
 
-  const Hashes = new GraphQLObjectType({
+  const Hashes: GraphQLObjectType = new GraphQLObjectType({
     name: "Hashes",
     fields: () => ({
       md5: {
@@ -1897,17 +1903,19 @@ export function makeExampleSchema(
 
   const singleTableTypeName = ($entity: SingleTableItemPlan) => {
     const $type = $entity.get("type");
-    const $typeName = lambda(
-      $type,
-      (v) =>
-        ({
-          TOPIC: "SingleTableTopic",
-          POST: "SingleTablePost",
-          DIVIDER: "SingleTableDivider",
-          CHECKLIST: "SingleTableChecklist",
-          CHECKLIST_ITEM: "SingleTableChecklistItem",
-        }[v]),
-    );
+    const $typeName = lambda($type, (v) => {
+      const type = {
+        TOPIC: "SingleTableTopic",
+        POST: "SingleTablePost",
+        DIVIDER: "SingleTableDivider",
+        CHECKLIST: "SingleTableChecklist",
+        CHECKLIST_ITEM: "SingleTableChecklistItem",
+      }[v];
+      if (!type) {
+        throw new Error(`Could not determine type for '${v}'`);
+      }
+      return type;
+    });
     return $typeName;
   };
 
@@ -1981,15 +1989,21 @@ export function makeExampleSchema(
       },
     });
 
+  /**
+   * This makes a polymorphic plan that returns the "entity" represented by the
+   * "interfaces_and_unions.union__entity" type in the database (a composite
+   * type with an attribute that's a "foreign key" to each table that's
+   * included in the union).
+   *
+   * i.e. if `$item.get('person_id')` is set, then it's a Person and we should
+   * grab that person from the `personSource`. If `post_id` is set it's a Post,
+   * and so on.
+   */
   const entityUnion = <
-    TPlan extends
-      | PgSelectSinglePlan<
-          PgSource<any, typeof unionEntityColumns, any, any, any>
-        >
-      | PgClassExpressionPlan<
-          any,
-          PgTypeCodec<any, any, typeof unionEntityColumns>
-        >,
+    TPlan extends PgClassExpressionPlan<
+      typeof unionEntitySource,
+      PgTypeCodec<any, any, typeof unionEntityColumns>
+    >,
   >(
     $item: TPlan,
   ) =>
@@ -2233,7 +2247,6 @@ export function makeExampleSchema(
       any,
       | {
           id: PgSourceColumn<number>;
-          type: PgSourceColumn<string>;
           type: PgSourceColumn<string>;
           position: PgSourceColumn<string>;
           created_at: PgSourceColumn<Date>;
@@ -2860,7 +2873,7 @@ export function makeExampleSchema(
             ],
           });
           deoptimizeIfAppropriate($plan);
-          return each($plan, entityUnion);
+          return each($plan, ($item) => entityUnion($item.record()));
         },
       },
 
