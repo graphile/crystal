@@ -5,6 +5,9 @@ import type {
   CrystalResultsList,
   CrystalResultStreamList,
   CrystalValuesList,
+  PlanOptimizeOptions,
+  PlanStreamOptions,
+  StreamablePlan,
 } from "graphile-crystal";
 import {
   __TrackedObjectPlan,
@@ -20,11 +23,6 @@ import {
   reverse,
   reverseArray,
 } from "graphile-crystal";
-import type {
-  PlanOptimizeOptions,
-  PlanStreamOptions,
-} from "graphile-crystal/src/interfaces";
-import type { StreamablePlan } from "graphile-crystal/src/plan";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
 

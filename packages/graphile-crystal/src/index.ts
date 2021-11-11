@@ -34,6 +34,8 @@ export {
   GraphileFieldConfigArgumentMap,
   InputObjectFieldPlanResolver,
   OutputPlanForType,
+  PlanOptimizeOptions,
+  PlanStreamOptions,
   PolymorphicData,
 } from "./interfaces";
 export {
