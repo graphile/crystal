@@ -546,7 +546,7 @@ export default function createPostGraphileHttpRequestHandler(
     // GraphQL Watch Stream
     // ======================================================================
 
-    if (watchPg) {
+    if (sse || watchPg) {
       // Setup an event stream so we can broadcast events to graphiql, etc.
       if (pathname === eventStreamRoute || pathname === '/_postgraphile/stream') {
         return eventStreamRouteHandler(res);
