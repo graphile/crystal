@@ -123,12 +123,12 @@ export class PgClassExpressionPlan<
     }
   }
 
-  public get<TAttr extends keyof TCodec["columns"]>(
+  public get<TAttr extends keyof NonNullable<TCodec["columns"]>>(
     attributeName: TAttr,
   ): PgClassExpressionPlan<
     TDataSource,
-    TCodec["columns"][TAttr] extends PgSourceColumn
-      ? TCodec["columns"][TAttr]["codec"]
+    NonNullable<TCodec["columns"]>[TAttr] extends PgSourceColumn
+      ? NonNullable<TCodec["columns"]>[TAttr]["codec"]
       : never
   > {
     const columns = this.pgCodec.columns;

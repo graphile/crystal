@@ -113,20 +113,26 @@ export class PgPolymorphicPlan<
 
 export function pgPolymorphic<
   TCodec extends PgTypeCodec,
-  TTypeSpecifier,
-  TTypeSpecifierPlan extends ExecutablePlan<TTypeSpecifier> = ExecutablePlan<TTypeSpecifier>,
+  TTypeSpecifierPlan extends ExecutablePlan<any> = ExecutablePlan<any>,
 >(
   $itemPlan:
     | PgSelectSinglePlan<PgSource<TCodec, any, any, any, any>>
     | PgClassExpressionPlan<any, TCodec>,
   $typeSpecifierPlan: TTypeSpecifierPlan,
-  possibleTypes: PgPolymorphicTypeMap<TTypeSpecifier, TTypeSpecifierPlan>,
-): PgPolymorphicPlan<TCodec, TTypeSpecifier, TTypeSpecifierPlan> {
-  return new PgPolymorphicPlan<TCodec, TTypeSpecifier, TTypeSpecifierPlan>(
-    $itemPlan,
-    $typeSpecifierPlan,
-    possibleTypes,
-  );
+  possibleTypes: PgPolymorphicTypeMap<
+    TTypeSpecifierPlan extends ExecutablePlan<infer U> ? U : any,
+    TTypeSpecifierPlan
+  >,
+): PgPolymorphicPlan<
+  TCodec,
+  TTypeSpecifierPlan extends ExecutablePlan<infer U> ? U : any,
+  TTypeSpecifierPlan
+> {
+  return new PgPolymorphicPlan<
+    TCodec,
+    TTypeSpecifierPlan extends ExecutablePlan<infer U> ? U : any,
+    TTypeSpecifierPlan
+  >($itemPlan, $typeSpecifierPlan, possibleTypes);
 }
 
 Object.assign(pgPolymorphic, {
