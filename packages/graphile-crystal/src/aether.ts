@@ -84,7 +84,11 @@ import {
 import { PlanResults } from "./planResults";
 import { __ItemPlan, __TrackedObjectPlan, __ValuePlan } from "./plans";
 import { assertPolymorphicData } from "./polymorphic";
-import { $$crystalWrapped, newCrystalObject } from "./resolvers";
+import {
+  $$crystalWrapped,
+  isCrystalWrapped,
+  newCrystalObject,
+} from "./resolvers";
 import { stripAnsi } from "./stripAnsi";
 import type { UniqueId } from "./utils";
 import {
@@ -727,8 +731,8 @@ export class Aether<
        * resolver or nothing
        */
       const graphqlResolver =
-        rawResolver && $$crystalWrapped in rawResolver
-          ? rawResolver[$$crystalWrapped]
+        rawResolver && isCrystalWrapped(rawResolver)
+          ? rawResolver[$$crystalWrapped].original
           : rawResolver;
       /*
         namedResultType instanceof GraphQLInterfaceType ||

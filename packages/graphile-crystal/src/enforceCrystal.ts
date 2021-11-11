@@ -3,8 +3,8 @@ import type { GraphQLSchema } from "graphql";
 import { isObjectType } from "graphql";
 
 import {
-  $$crystalWrapped,
   crystalWrapResolve,
+  isCrystalWrapped,
   makeCrystalSubscriber,
 } from "./resolvers";
 
@@ -29,7 +29,7 @@ export function crystalEnforce(schema: GraphQLSchema): GraphQLSchema {
           const { resolve, subscribe } = field;
 
           // Wrap `resolve`
-          if (!resolve || !resolve[$$crystalWrapped]) {
+          if (!resolve || !isCrystalWrapped(resolve)) {
             debug(
               `Wrapping ${objectType.name}.${fieldName}'s resolve in crystals`,
             );
@@ -41,7 +41,7 @@ export function crystalEnforce(schema: GraphQLSchema): GraphQLSchema {
             objectType === subscriptionType &&
             (field.extensions?.graphile as any)?.subscribePlan
           ) {
-            if (subscribe && !subscribe[$$crystalWrapped]) {
+            if (subscribe && !isCrystalWrapped(subscribe)) {
               throw new Error(
                 "We do not support `subscribe` functions existing for fields with a `subscribePlan` - please supply one or the other.",
               );

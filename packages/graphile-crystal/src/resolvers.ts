@@ -48,6 +48,19 @@ function pathToPathIdentity(initialPath: Path): string {
 
 export const $$crystalWrapped = Symbol("crystalWrappedResolver");
 
+export interface CrystalWrapDetails<
+  T extends GraphQLFieldResolver<any, any> = GraphQLFieldResolver<any, any>,
+> {
+  original: T;
+  isSubscribe: boolean;
+}
+
+export function isCrystalWrapped<T>(
+  t: T,
+): t is T & { [$$crystalWrapped]: CrystalWrapDetails } {
+  return $$crystalWrapped in t;
+}
+
 const getAetherFromResolver = <TContext extends object>(
   context: TContext,
   info: GraphQLResolveInfo,
@@ -253,7 +266,7 @@ function crystalWrapResolveOrSubscribe<
     value: {
       original: userSpecifiedResolver,
       isSubscribe,
-    },
+    } as CrystalWrapDetails,
   });
   return crystalResolver;
 }
