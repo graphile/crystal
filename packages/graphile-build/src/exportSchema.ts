@@ -4,7 +4,7 @@ import { parseExpression } from "@babel/parser";
 import type { TemplateBuilderOptions } from "@babel/template";
 import template from "@babel/template";
 import { writeFile } from "fs/promises";
-import { $$crystalWrapped } from "graphile-crystal";
+import { $$crystalWrapped, ExecutablePlan } from "graphile-crystal";
 import type {
   GraphQLFieldConfigMap,
   GraphQLNamedType,
@@ -25,6 +25,12 @@ const templateOptions: TemplateBuilderOptions = {
 
 export function isNotNullish<T>(input: T | null | undefined): input is T {
   return input != null;
+}
+
+function isImportable(
+  thing: unknown,
+): thing is { $$export: { moduleName: string; exportName: string } } {
+  return thing != null && "$$export" in (thing as object | Function);
 }
 
 const BUILTINS = ["Int", "Float", "Boolean", "ID", "String"];
@@ -372,7 +378,10 @@ function convertToAST(
       `convertToAST: potentially infinite recursion at ${locationHint}. TODO: allow exporting recursive structures.`,
     );
   }
-  if (thing === null) {
+  if (isImportable(thing)) {
+    const { moduleName, exportName } = thing.$$export;
+    return file.import(moduleName, exportName);
+  } else if (thing === null) {
     return t.nullLiteral();
   } else if (thing === undefined) {
     return t.identifier("undefined");
