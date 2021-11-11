@@ -30,6 +30,7 @@
   "homepage": "https://graphile.org/graphile-build/",
   "dependencies": {
     "@babel/generator": "^7.16.0",
+    "@babel/parser": "^7.16.3",
     "@babel/template": "^7.16.0",
     "@graphile/lru": "4.6.0-alpha.0",
     "@types/node": "^16.11.6",

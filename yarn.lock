@@ -374,6 +374,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/parser@npm:^7.16.3":
+  version: 7.16.3
+  resolution: "@babel/parser@npm:7.16.3"
+  bin:
+    parser: ./bin/babel-parser.js
+  checksum: 486b676b9d47d10de72598f9453eb4591535c5639b5e153d46442fb0d8523d775abf6e5f457193730b609d55ad0fd171f28a075c1fa5679f5049279e77cd63b2
+  languageName: node
+  linkType: hard
+
 "@babel/plugin-bugfix-safari-id-destructuring-collision-in-function-expression@npm:^7.16.0":
   version: 7.16.0
   resolution: "@babel/plugin-bugfix-safari-id-destructuring-collision-in-function-expression@npm:7.16.0"
@@ -5351,6 +5360,7 @@ __metadata:
   resolution: "graphile-build@workspace:packages/graphile-build"
   dependencies:
     "@babel/generator": ^7.16.0
+    "@babel/parser": ^7.16.3
     "@babel/template": ^7.16.0
     "@graphile/lru": 4.6.0-alpha.0
     "@types/babel__generator": ^7
