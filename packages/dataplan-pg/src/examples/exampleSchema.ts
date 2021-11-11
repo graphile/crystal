@@ -2001,7 +2001,7 @@ export function makeExampleSchema(
    */
   const entityUnion = <
     TPlan extends PgClassExpressionPlan<
-      typeof unionEntitySource,
+      any,
       PgTypeCodec<any, any, typeof unionEntityColumns>
     >,
   >(
@@ -2040,8 +2040,9 @@ export function makeExampleSchema(
         person: singleRelationField("person", Person),
         bookmarkedEntity: {
           type: Entity,
-          plan($person) {
-            return entityUnion($person.get("bookmarked_entity"));
+          plan($personBookmark) {
+            const $entity = $personBookmark.get("bookmarked_entity");
+            return entityUnion($entity);
           },
         },
       }),
@@ -3105,7 +3106,7 @@ export function makeExampleSchema(
           }
 
           // See NOTE in createRelationalPost plan.
-          return $post.record();
+          return $post!.record();
         },
       },
 
@@ -3139,7 +3140,7 @@ export function makeExampleSchema(
           }
 
           // See NOTE in createRelationalPost plan.
-          return $post.single().record();
+          return $post!.single().record();
         },
       },
 
@@ -3265,6 +3266,7 @@ export function makeExampleSchema(
 
 async function main() {
   const filePath = `${__dirname}/schema.graphql`;
+  const schema = makeExampleSchema();
   writeFileSync(
     filePath,
     //prettier.format(

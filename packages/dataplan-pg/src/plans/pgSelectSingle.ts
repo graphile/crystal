@@ -98,7 +98,7 @@ export class PgSelectSinglePlan<
    * Returns a plan representing a named attribute (e.g. column) from the class
    * (e.g. table).
    */
-  get<TAttr extends keyof TDataSource["TRow"]>(
+  get<TAttr extends keyof TDataSource["columns"]>(
     attr: TAttr,
   ): PgClassExpressionPlan<
     TDataSource,
