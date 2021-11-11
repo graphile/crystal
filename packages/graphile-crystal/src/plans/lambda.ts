@@ -2,6 +2,11 @@ import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
 import { ExecutablePlan } from "../plan";
 
 export class LambdaPlan<TIn, TOut> extends ExecutablePlan<TOut> {
+  static $$export = {
+    moduleName: "graphile-crystal",
+    exportName: "LambdaPlan",
+  };
+
   private planId: number | null;
   constructor(
     $plan: ExecutablePlan<TIn> | null | undefined,

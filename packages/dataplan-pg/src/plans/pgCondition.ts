@@ -11,6 +11,11 @@ export interface PgConditionCapableParentPlan extends BasePlan {
 export class PgConditionPlan<
   TParentPlan extends PgConditionCapableParentPlan,
 > extends ModifierPlan<TParentPlan> {
+  static $$export = {
+    moduleName: "@dataplan/pg",
+    exportName: "PgConditionPlan",
+  };
+
   private conditions: SQL[] = [];
 
   public readonly alias: SQL;

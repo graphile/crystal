@@ -31,6 +31,11 @@ interface PgInsertPlanFinalizeResults {
 export class PgInsertPlan<
   TDataSource extends PgSource<any, any, any, any, any>,
 > extends ExecutablePlan<TDataSource["TRow"]> {
+  static $$export = {
+    moduleName: "@dataplan/pg",
+    exportName: "PgInsertPlan",
+  };
+
   hasSideEffects = true;
 
   /**

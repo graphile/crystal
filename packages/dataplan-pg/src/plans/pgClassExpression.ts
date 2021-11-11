@@ -34,6 +34,11 @@ export class PgClassExpressionPlan<
   extends ExecutablePlan<any>
   implements PgTypedExecutablePlan<TCodec>
 {
+  static $$export = {
+    moduleName: "@dataplan/pg",
+    exportName: "PgClassExpressionPlan",
+  };
+
   // TODO: rename to 'row'?
   /**
    * The dependency id of the parent table row (from SELECT,

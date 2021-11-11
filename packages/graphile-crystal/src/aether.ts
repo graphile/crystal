@@ -2982,20 +2982,6 @@ function isNotNullish<T>(a: T | null | undefined): a is T {
   return a != null;
 }
 
-class __TypePlan extends ExecutablePlan<any> {
-  private planId: number;
-  private typeName: string;
-  constructor(type: GraphQLObjectType, plan: ExecutablePlan<any>) {
-    super();
-    this.planId = this.addDependency(plan);
-    this.typeName = type.name;
-  }
-
-  execute(values: any[][]): any[] {
-    return values.map((v) => ({ type: this.typeName, data: v[this.planId] }));
-  }
-}
-
 // IMPORTANT: this WILL NOT WORK when compiled down to ES5. It requires ES6+
 // native class support.
 class CrystalError extends Error {

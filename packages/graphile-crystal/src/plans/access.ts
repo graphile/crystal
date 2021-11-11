@@ -156,6 +156,11 @@ const debugAccessPlanVerbose = debugAccessPlan.extend("verbose");
  * the naming conventions detailed in assertSafeToAccessViaBraces.
  */
 export class AccessPlan<TData> extends ExecutablePlan<TData> {
+  static $$export = {
+    moduleName: "graphile-crystal",
+    exportName: "AccessPlan",
+  };
+
   private destructure: (value: [TData]) => any;
   private parentPlanId: number;
 

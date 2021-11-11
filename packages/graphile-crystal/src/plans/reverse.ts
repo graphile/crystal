@@ -21,7 +21,12 @@ export function reverseArray<TData = any>(list: readonly TData[]): TData[] {
 /**
  * Reverses a list.
  */
-export class ReversePlan<TData extends any> extends ExecutablePlan<TData[]> {
+export class ReversePlan<TData> extends ExecutablePlan<TData[]> {
+  static $$export = {
+    moduleName: "graphile-crystal",
+    exportName: "ReversePlan",
+  };
+
   constructor(plan: ExecutablePlan<TData[]>) {
     super();
     this.addDependency(plan);
@@ -36,7 +41,7 @@ export class ReversePlan<TData extends any> extends ExecutablePlan<TData[]> {
   }
 }
 
-export function reverse<TData extends any>(
+export function reverse<TData>(
   plan: ExecutablePlan<TData[]>,
 ): ReversePlan<TData> {
   return new ReversePlan<TData>(plan);

@@ -9,6 +9,11 @@ type UnwrapPlanTuple<TPlanTuple extends readonly ExecutablePlan<any>[]> = [
 export class ListPlan<
   TPlanTuple extends readonly ExecutablePlan<any>[],
 > extends ExecutablePlan<UnwrapPlanTuple<TPlanTuple>> {
+  static $$export = {
+    moduleName: "graphile-crystal",
+    exportName: "ListPlan",
+  };
+
   private results: Array<UnwrapPlanTuple<TPlanTuple>> = [];
   constructor(list: readonly [...TPlanTuple]) {
     super();

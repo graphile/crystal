@@ -17,6 +17,11 @@ type JSONValue =
 export class JSONParsePlan<
   TJSON extends JSONValue,
 > extends ExecutablePlan<TJSON> {
+  static $$export = {
+    moduleName: "@dataplan/json",
+    exportName: "JSONParsePlan",
+  };
+
   constructor($stringPlan: ExecutablePlan<string | null>) {
     super();
     this.addDependency($stringPlan);

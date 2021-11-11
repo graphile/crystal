@@ -16,6 +16,11 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
 }
 
 export class MapPlan extends ExecutablePlan {
+  static $$export = {
+    moduleName: "graphile-crystal",
+    exportName: "MapPlan ",
+  };
+
   private mapper: (obj: object) => object;
   constructor(
     parentPlan: ExecutablePlan,

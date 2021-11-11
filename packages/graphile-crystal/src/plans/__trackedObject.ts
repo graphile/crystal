@@ -26,6 +26,11 @@ import type { AccessPlan } from "./access";
  * branch the logic of a plan based on something in these entities.
  */
 export class __TrackedObjectPlan<TData = any> extends ExecutablePlan<TData> {
+  static $$export = {
+    moduleName: "graphile-crystal",
+    exportName: "__TrackedObjectPlan",
+  };
+
   /**
    * Could be anything. In the case of context it could even have exotic
    * entries such as `pgClient`.

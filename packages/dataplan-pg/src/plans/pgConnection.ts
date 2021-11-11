@@ -13,6 +13,11 @@ const debugExecuteVerbose = debugExecute.extend("verbose");
 export class PgConnectionPlan<
   TDataSource extends PgSource<any, any, any, any>,
 > extends ExecutablePlan<unknown> {
+  static $$export = {
+    moduleName: "@dataplan/pg",
+    exportName: "PgConnectionPlan",
+  };
+
   private subplanId: number;
 
   private readonly source: TDataSource;

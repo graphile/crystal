@@ -16,6 +16,11 @@ export class SubscribePlan<
   extends ExecutablePlan<TTopics[TTopic]>
   implements StreamablePlan<TTopics[TTopic]>
 {
+  static $$export = {
+    moduleName: "graphile-crystal",
+    exportName: "SubscribePlan",
+  };
+
   /**
    * The id for the PostgreSQL context plan.
    */

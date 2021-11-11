@@ -58,6 +58,10 @@ export const assertArgumentsFinalized = !isDev
  * will be ExecutablePlans.
  */
 export abstract class BasePlan {
+  public static readonly $$export: {
+    moduleName: string;
+    exportName: string;
+  };
   public readonly aether: Aether;
   public isArgumentsFinalized = false;
   public isFinalized = false;
@@ -285,13 +289,9 @@ export type ObjectLikePlan<
   TData extends { [key: string]: ExecutablePlan<any> } = {
     [key: string]: ExecutablePlan<any>;
   },
-> = ExecutablePlan<
-  {
-    [key in keyof TData]: TData[key] extends ExecutablePlan<infer U>
-      ? U
-      : never;
-  }
-> & {
+> = ExecutablePlan<{
+  [key in keyof TData]: TData[key] extends ExecutablePlan<infer U> ? U : never;
+}> & {
   get<TKey extends keyof TData>(key: TKey): ExecutablePlan<TData[TKey]>;
 };
 
@@ -371,7 +371,7 @@ export function assertModifierPlan<
 }
 
 export interface ListCapablePlan<
-  TOutputData extends any,
+  TOutputData,
   TItemPlan extends ExecutablePlan<TOutputData> = ExecutablePlan<TOutputData>,
 > extends ExecutablePlan<ReadonlyArray<any>> {
   listItem(itemPlan: __ItemPlan<this>): TItemPlan;

@@ -8,6 +8,11 @@ import { access } from "./access";
  * `GetValuePlanId` and `PopulateValuePlan`.
  */
 export class __ValuePlan<TData> extends ExecutablePlan<TData> {
+  static $$export = {
+    moduleName: "graphile-crystal",
+    exportName: "__ValuePlan",
+  };
+
   constructor() {
     super();
     this.parentPathIdentity = this.createdWithParentPathIdentity;

@@ -187,6 +187,11 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
   extends ExecutablePlan<ReadonlyArray<TDataSource["TRow"]>>
   implements StreamablePlan<TDataSource["TRow"]>
 {
+  static $$export = {
+    moduleName: "@dataplan/pg",
+    exportName: "PgSelectPlan",
+  };
+
   // FROM
   private readonly from: SQL | ((...args: SQL[]) => SQL);
 

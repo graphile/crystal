@@ -15,7 +15,7 @@ import type { PgClassExpressionPlan } from "./pgClassExpression";
 import type { PgSelectSinglePlan } from "./pgSelectSingle";
 
 interface PgPolymorphicTypeMap<
-  TTypeSpecifier extends any,
+  TTypeSpecifier,
   TTypeSpecifierPlan extends ExecutablePlan<TTypeSpecifier>,
 > {
   [typeName: string]: {
@@ -26,12 +26,17 @@ interface PgPolymorphicTypeMap<
 
 export class PgPolymorphicPlan<
     TCodec extends PgTypeCodec,
-    TTypeSpecifier extends any,
+    TTypeSpecifier,
     TTypeSpecifierPlan extends ExecutablePlan<TTypeSpecifier> = ExecutablePlan<TTypeSpecifier>,
   >
   extends ExecutablePlan<any>
   implements PolymorphicPlan
 {
+  static $$export = {
+    moduleName: "@dataplan/pg",
+    exportName: "PgPolymorphicPlan",
+  };
+
   private typeSpecifierPlanId: number;
   private itemPlanId: number;
   private types: string[];
@@ -108,7 +113,7 @@ export class PgPolymorphicPlan<
 
 export function pgPolymorphic<
   TCodec extends PgTypeCodec,
-  TTypeSpecifier extends any,
+  TTypeSpecifier,
   TTypeSpecifierPlan extends ExecutablePlan<TTypeSpecifier> = ExecutablePlan<TTypeSpecifier>,
 >(
   $itemPlan:

@@ -39,14 +39,17 @@ export class PgSelectSinglePlan<
   extends ExecutablePlan<TDataSource["TRow"]>
   implements
     PgTypedExecutablePlan<TDataSource["codec"]>,
-    ObjectLikePlan<
-      {
-        [key in keyof TDataSource["TRow"]]: ExecutablePlan<
-          TDataSource["TRow"][key]
-        >;
-      }
-    >
+    ObjectLikePlan<{
+      [key in keyof TDataSource["TRow"]]: ExecutablePlan<
+        TDataSource["TRow"][key]
+      >;
+    }>
 {
+  static $$export = {
+    moduleName: "@dataplan/pg",
+    exportName: "PgSelectSinglePlan",
+  };
+
   public readonly pgCodec: TDataSource["codec"];
   public readonly itemPlanId: number;
   private classPlanId: number;

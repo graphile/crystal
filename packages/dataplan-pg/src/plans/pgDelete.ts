@@ -29,6 +29,11 @@ interface PgDeletePlanFinalizeResults {
 export class PgDeletePlan<
   TDataSource extends PgSource<any, any, any, any, any>,
 > extends ExecutablePlan<TDataSource["TRow"]> {
+  static $$export = {
+    moduleName: "@dataplan/pg",
+    exportName: "PgDeletePlan",
+  };
+
   hasSideEffects = true;
 
   /**

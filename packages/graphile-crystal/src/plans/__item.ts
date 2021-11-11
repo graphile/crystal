@@ -10,6 +10,10 @@ import { ExecutablePlan } from "../plan";
  * or stream.
  */
 export class __ItemPlan<TData> extends ExecutablePlan<TData> {
+  static $$export = {
+    moduleName: "graphile-crystal",
+    exportName: "__ItemPlan",
+  };
   constructor(
     parentPlan: StreamablePlan<TData> | ListCapablePlan<TData>,
     public readonly depth = 0,

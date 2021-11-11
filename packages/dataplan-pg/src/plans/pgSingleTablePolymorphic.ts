@@ -16,6 +16,11 @@ export class PgSingleTablePolymorphicPlan<
   extends ExecutablePlan<any>
   implements PolymorphicPlan
 {
+  static $$export = {
+    moduleName: "@dataplan/pg",
+    exportName: "PgSingleTablePolymorphicPlan",
+  };
+
   private typePlanId: number;
   private rowPlanId: number;
 

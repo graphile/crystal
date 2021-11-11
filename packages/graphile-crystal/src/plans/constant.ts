@@ -5,6 +5,10 @@ import { ExecutablePlan } from "../plan";
  * Converts a constant value (e.g. a string/number/etc) into a plan
  */
 export class ConstantPlan<TData> extends ExecutablePlan<TData> {
+  static $$export = {
+    moduleName: "graphile-crystal",
+    exportName: "ConstantPlan",
+  };
   constructor(private data: TData) {
     super();
   }

@@ -16,6 +16,11 @@ export class EachPlan<
   extends ExecutablePlan<ReadonlyArray<TSourceData>>
   implements ListCapablePlan<TOutputData>
 {
+  static $$export = {
+    moduleName: "graphile-crystal",
+    exportName: "EachPlan",
+  };
+
   listPlanId: number;
 
   constructor(

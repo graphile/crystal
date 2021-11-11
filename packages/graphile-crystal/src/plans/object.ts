@@ -15,6 +15,10 @@ type DataFromPlans<TPlans extends { [key: string]: ExecutablePlan<any> }> = {
 export class ObjectPlan<
   TPlans extends { [key: string]: ExecutablePlan<any> },
 > extends ExecutablePlan<DataFromPlans<TPlans>> {
+  static $$export = {
+    moduleName: "graphile-crystal",
+    exportName: "ObjectPlan",
+  };
   private keys: Array<keyof TPlans>;
   private results: Array<
     [Array<DataFromPlans<TPlans>[keyof TPlans]>, DataFromPlans<TPlans>]

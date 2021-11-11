@@ -7,6 +7,11 @@ import { PgSelectSinglePlan } from "./pgSelectSingle";
 export class PgCursorPlan<
   TDataSource extends PgSource<any, any, any, any>,
 > extends ExecutablePlan<any> {
+  static $$export = {
+    moduleName: "@dataplan/pg",
+    exportName: "PgCursorPlan",
+  };
+
   private cursorValuesPlanId: number;
   private classSinglePlanId: number;
   private digest: string;

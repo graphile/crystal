@@ -2,6 +2,11 @@ import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
 import { ExecutablePlan } from "../plan";
 
 export class FirstPlan<TData> extends ExecutablePlan<TData> {
+  static $$export = {
+    moduleName: "graphile-crystal",
+    exportName: "FirstPlan",
+  };
+
   constructor(parentPlan: ExecutablePlan<ReadonlyArray<TData>>) {
     super();
     this.addDependency(parentPlan);

@@ -5,9 +5,7 @@ import type {
   ListTypeNode,
   NamedTypeNode,
   NonNullTypeNode,
-  ValueNode} from "graphql";
-import {
-  Kind
+  ValueNode,
 } from "graphql";
 import {
   GraphQLInputObjectType,
@@ -15,6 +13,7 @@ import {
   GraphQLNonNull,
   isInputType,
   isLeafType,
+  Kind,
   valueFromAST,
 } from "graphql";
 import { inspect } from "util";
@@ -172,6 +171,11 @@ function inputNonNullPlan(_aether: Aether, innerPlan: InputPlan): InputPlan {
  * Implements `InputListPlan`.
  */
 export class InputListPlan extends ExecutablePlan {
+  $$export = {
+    moduleName: "graphile-crystal",
+    exportName: "InputListPlan",
+  };
+
   private itemPlanIds: number[] = [];
   private outOfBoundsPlanId: number;
 
@@ -277,9 +281,12 @@ export class InputListPlan extends ExecutablePlan {
 /**
  * Implements `InputStaticLeafPlan`
  */
-export class InputStaticLeafPlan<
-  TLeaf extends any = any,
-> extends ExecutablePlan<TLeaf> {
+export class InputStaticLeafPlan<TLeaf = any> extends ExecutablePlan<TLeaf> {
+  static $$export = {
+    moduleName: "graphile-crystal",
+    exportName: "InputStaticLeafPlan",
+  };
+
   private readonly coercedValue: any;
   constructor(inputType: GraphQLLeafType, value: ValueNode | undefined) {
     super();
@@ -308,6 +315,11 @@ export class InputStaticLeafPlan<
  * Implements `InputObjectPlan`
  */
 export class InputObjectPlan extends ExecutablePlan {
+  static $$export = {
+    moduleName: "graphile-crystal",
+    exportName: "InputObjectPlan",
+  };
+
   private inputFields: {
     [fieldName: string]: { dependencyIndex: number; plan: InputPlan };
   } = Object.create(null);
