@@ -3,7 +3,8 @@
   "compilerOptions": {
     "rootDir": "src",
     "declarationDir": "./dist",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "moduleResolution": "node12"
   },
   "include": ["src"],
   "references": [
