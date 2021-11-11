@@ -621,16 +621,18 @@ export default function createPostGraphileHttpRequestHandler(
         // on port 5783.
         if (enableCors) addCORSHeaders(res);
 
-        if (req.headers.accept !== 'text/event-stream') {
-          res.statusCode = 405;
-          res.end();
-          return;
-        }
-
+        // receiving a GET request without query params is PostGraphiQL listening for schema changes
         // TODO: could it just be `req.url.includes('?')`
         const { query } = parseUrl(req) || {};
         if (req.method === 'GET' && !query) {
-          // receiving a GET request without query params is PostGraphiQL listening for schema changes
+          // this conditional is intentionally nested here because "single connection mode" in GraphQL over SSE accepts non-event stream requests
+          // for more information, please read: https://github.com/enisdenjo/graphql-sse/blob/master/PROTOCOL.md#single-connection-mode
+          if (req.headers.accept !== 'text/event-stream') {
+            res.statusCode = 405;
+            res.end();
+            return;
+          }
+
           setupServerSentEvents(res, options);
         }
 
