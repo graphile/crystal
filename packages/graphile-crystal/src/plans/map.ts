@@ -55,17 +55,16 @@ export class MapPlan extends ExecutablePlan {
   }
 }
 
-export const map = Object.assign(
-  function map(
-    p: ExecutablePlan,
-    actualKeyByDesiredKey: { [desiredKey: string]: string },
-  ): MapPlan {
-    return new MapPlan(p, actualKeyByDesiredKey);
+export function map(
+  p: ExecutablePlan,
+  actualKeyByDesiredKey: { [desiredKey: string]: string },
+): MapPlan {
+  return new MapPlan(p, actualKeyByDesiredKey);
+}
+
+Object.assign(map, {
+  $$export: {
+    moduleName: "graphile-crystal",
+    exportName: "map",
   },
-  {
-    $$export: {
-      moduleName: "graphile-crystal",
-      exportName: "map",
-    },
-  },
-);
+});

@@ -26,17 +26,16 @@ export class LambdaPlan<TIn, TOut> extends ExecutablePlan<TOut> {
   }
 }
 
-export const lambda = Object.assign(
-  function lambda<TIn, TOut>(
-    $plan: ExecutablePlan<TIn> | null | undefined,
-    fn: (value: TIn) => TOut,
-  ): LambdaPlan<TIn, TOut> {
-    return new LambdaPlan<TIn, TOut>($plan, fn);
+export function lambda<TIn, TOut>(
+  $plan: ExecutablePlan<TIn> | null | undefined,
+  fn: (value: TIn) => TOut,
+): LambdaPlan<TIn, TOut> {
+  return new LambdaPlan<TIn, TOut>($plan, fn);
+}
+
+Object.assign(lambda, {
+  $$export: {
+    moduleName: "graphile-crystal",
+    exportName: "lambda",
   },
-  {
-    $$export: {
-      moduleName: "graphile-crystal",
-      exportName: "lambda",
-    },
-  },
-);
+});

@@ -391,22 +391,21 @@ export class PgUpdatePlan<
   }
 }
 
-export const pgUpdate = Object.assign(
-  function pgUpdate<TDataSource extends PgSource<any, any, any, any, any>>(
-    source: TDataSource,
-    getBy: PlanByUniques<TDataSource["columns"], TDataSource["uniques"]>,
-    columns?: {
-      [key in keyof TDataSource["columns"]]?:
-        | PgTypedExecutablePlan<TDataSource["columns"][key]["codec"]>
-        | ExecutablePlan<any>;
-    },
-  ): PgUpdatePlan<TDataSource> {
-    return new PgUpdatePlan(source, getBy, columns);
+export function pgUpdate<TDataSource extends PgSource<any, any, any, any, any>>(
+  source: TDataSource,
+  getBy: PlanByUniques<TDataSource["columns"], TDataSource["uniques"]>,
+  columns?: {
+    [key in keyof TDataSource["columns"]]?:
+      | PgTypedExecutablePlan<TDataSource["columns"][key]["codec"]>
+      | ExecutablePlan<any>;
   },
-  {
-    $$export: {
-      moduleName: "@dataplan/pg",
-      exportName: "pgUpdate",
-    },
+): PgUpdatePlan<TDataSource> {
+  return new PgUpdatePlan(source, getBy, columns);
+}
+
+Object.assign(pgUpdate, {
+  $$export: {
+    moduleName: "@dataplan/pg",
+    exportName: "pgUpdate",
   },
-);
+});

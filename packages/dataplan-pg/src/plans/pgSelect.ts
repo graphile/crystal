@@ -2079,16 +2079,15 @@ function ensureOrderIsUnique(plan: PgSelectPlan<any>) {
   }
 }
 
-export const pgSelect = Object.assign(
-  function pgSelect<TDataSource extends PgSource<any, any, any, any>>(
-    options: PgSelectOptions<TDataSource>,
-  ): PgSelectPlan<TDataSource> {
-    return new PgSelectPlan(options);
+export function pgSelect<TDataSource extends PgSource<any, any, any, any>>(
+  options: PgSelectOptions<TDataSource>,
+): PgSelectPlan<TDataSource> {
+  return new PgSelectPlan(options);
+}
+
+Object.assign(pgSelect, {
+  $$export: {
+    moduleName: "@dataplan/pg",
+    exportName: "pgSelect",
   },
-  {
-    $$export: {
-      moduleName: "@dataplan/pg",
-      exportName: "pgSelect",
-    },
-  },
-);
+});

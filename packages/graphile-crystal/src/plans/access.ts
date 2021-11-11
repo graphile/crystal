@@ -231,17 +231,16 @@ export class AccessPlan<TData> extends ExecutablePlan<TData> {
   }
 }
 
-export const access = Object.assign(
-  function access<TData>(
-    parentPlan: ExecutablePlan<unknown>,
-    path: (string | number)[],
-  ): AccessPlan<TData> {
-    return new AccessPlan<TData>(parentPlan, path);
+export function access<TData>(
+  parentPlan: ExecutablePlan<unknown>,
+  path: (string | number)[],
+): AccessPlan<TData> {
+  return new AccessPlan<TData>(parentPlan, path);
+}
+
+Object.assign(access, {
+  $$export: {
+    moduleName: "graphile-crystal",
+    exportName: "access",
   },
-  {
-    $$export: {
-      moduleName: "graphile-crystal",
-      exportName: "access",
-    },
-  },
-);
+});

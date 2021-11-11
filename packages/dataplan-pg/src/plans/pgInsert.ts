@@ -327,21 +327,20 @@ export class PgInsertPlan<
   }
 }
 
-export const pgInsert = Object.assign(
-  function pgInsert<TDataSource extends PgSource<any, any, any, any, any>>(
-    source: TDataSource,
-    columns?: {
-      [key in keyof TDataSource["columns"]]?:
-        | PgTypedExecutablePlan<TDataSource["columns"][key]["codec"]>
-        | ExecutablePlan<any>;
-    },
-  ): PgInsertPlan<TDataSource> {
-    return new PgInsertPlan(source, columns);
+export function pgInsert<TDataSource extends PgSource<any, any, any, any, any>>(
+  source: TDataSource,
+  columns?: {
+    [key in keyof TDataSource["columns"]]?:
+      | PgTypedExecutablePlan<TDataSource["columns"][key]["codec"]>
+      | ExecutablePlan<any>;
   },
-  {
-    $$export: {
-      moduleName: "@dataplan/pg",
-      exportName: "pgInsert",
-    },
+): PgInsertPlan<TDataSource> {
+  return new PgInsertPlan(source, columns);
+}
+
+Object.assign(pgInsert, {
+  $$export: {
+    moduleName: "@dataplan/pg",
+    exportName: "pgInsert",
   },
-);
+});

@@ -320,17 +320,16 @@ export class PgDeletePlan<
   }
 }
 
-export const pgDelete = Object.assign(
-  function pgDelete<TDataSource extends PgSource<any, any, any, any, any>>(
-    source: TDataSource,
-    getBy: PlanByUniques<TDataSource["columns"], TDataSource["uniques"]>,
-  ): PgDeletePlan<TDataSource> {
-    return new PgDeletePlan(source, getBy);
+export function pgDelete<TDataSource extends PgSource<any, any, any, any, any>>(
+  source: TDataSource,
+  getBy: PlanByUniques<TDataSource["columns"], TDataSource["uniques"]>,
+): PgDeletePlan<TDataSource> {
+  return new PgDeletePlan(source, getBy);
+}
+
+Object.assign(pgDelete, {
+  $$export: {
+    moduleName: "@dataplan/pg",
+    exportName: "pgDelete",
   },
-  {
-    $$export: {
-      moduleName: "@dataplan/pg",
-      exportName: "pgDelete",
-    },
-  },
-);
+});

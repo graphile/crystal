@@ -72,16 +72,15 @@ export class ListPlan<
   }
 }
 
-export const list = Object.assign(
-  function list<TPlanTuple extends ExecutablePlan<any>[]>(
-    list: TPlanTuple,
-  ): ListPlan<TPlanTuple> {
-    return new ListPlan<TPlanTuple>(list);
+export function list<TPlanTuple extends ExecutablePlan<any>[]>(
+  list: TPlanTuple,
+): ListPlan<TPlanTuple> {
+  return new ListPlan<TPlanTuple>(list);
+}
+
+Object.assign(list, {
+  $$export: {
+    moduleName: "graphile-crystal",
+    exportName: "list",
   },
-  {
-    $$export: {
-      moduleName: "graphile-crystal",
-      exportName: "list",
-    },
-  },
-);
+});

@@ -3,47 +3,44 @@ import { getCurrentAether, getDebug, setDebug } from "../global";
 import type { BaseGraphQLContext } from "../interfaces";
 import type { __ValuePlan } from "./__value";
 
-export const aether = Object.assign(
-  function aether(): Aether {
-    return getCurrentAether();
-  },
-  {
-    $$export: {
-      moduleName: "graphile-crystal",
-      exportName: "aether",
-    },
-  },
-);
+export function aether(): Aether {
+  return getCurrentAether();
+}
 
-export const context = Object.assign(
-  function context<
-    TContext extends BaseGraphQLContext = BaseGraphQLContext,
-  >(): __ValuePlan<TContext> {
-    return aether().contextPlan;
+Object.assign(aether, {
+  $$export: {
+    moduleName: "graphile-crystal",
+    exportName: "aether",
   },
-  {
-    $$export: {
-      moduleName: "graphile-crystal",
-      exportName: "context",
-    },
-  },
-);
+});
 
-export const debugPlans = Object.assign(
-  function debugPlans<T>(callback: () => T): T {
-    const oldDebug = getDebug();
-    setDebug(true);
-    const result = callback();
-    setDebug(oldDebug);
-    return result;
+export function context<
+  TContext extends BaseGraphQLContext = BaseGraphQLContext,
+>(): __ValuePlan<TContext> {
+  return aether().contextPlan;
+}
+
+Object.assign(context, {
+  $$export: {
+    moduleName: "graphile-crystal",
+    exportName: "context",
   },
-  {
-    $$export: {
-      moduleName: "graphile-crystal",
-      exportName: "debugPlans",
-    },
+});
+
+export function debugPlans<T>(callback: () => T): T {
+  const oldDebug = getDebug();
+  setDebug(true);
+  const result = callback();
+  setDebug(oldDebug);
+  return result;
+}
+
+Object.assign(debugPlans, {
+  $$export: {
+    moduleName: "graphile-crystal",
+    exportName: "debugPlans",
   },
-);
+});
 
 export { access, AccessPlan } from "./access";
 export { constant, ConstantPlan } from "./constant";

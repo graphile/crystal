@@ -64,16 +64,15 @@ export class JSONParsePlan<
   }
 }
 
-export const jsonParse = Object.assign(
-  function jsonParse<TJSON extends JSONValue>(
-    $string: ExecutablePlan<string | null>,
-  ): JSONParsePlan<TJSON> {
-    return new JSONParsePlan<TJSON>($string);
+export function jsonParse<TJSON extends JSONValue>(
+  $string: ExecutablePlan<string | null>,
+): JSONParsePlan<TJSON> {
+  return new JSONParsePlan<TJSON>($string);
+}
+
+Object.assign(jsonParse, {
+  $$export: {
+    moduleName: "@dataplan/json",
+    exportName: "jsonParse",
   },
-  {
-    $$export: {
-      moduleName: "@dataplan/json",
-      exportName: "jsonParse",
-    },
-  },
-);
+});

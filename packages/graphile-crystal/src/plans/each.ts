@@ -55,27 +55,26 @@ export class EachPlan<
   }
 }
 
-export const each = Object.assign(
-  function each<
+export function each<
+  TSourceData,
+  TOutputData,
+  TSourceItemPlan extends ExecutablePlan<TSourceData> = ExecutablePlan<TSourceData>,
+  TResultItemPlan extends ExecutablePlan<TOutputData> = ExecutablePlan<TOutputData>,
+>(
+  listPlan: ListCapablePlan<TSourceData, TSourceItemPlan>,
+  mapper: (itemPlan: TSourceItemPlan) => TResultItemPlan,
+): EachPlan<TSourceData, TOutputData, TSourceItemPlan, TResultItemPlan> {
+  return new EachPlan<
     TSourceData,
     TOutputData,
-    TSourceItemPlan extends ExecutablePlan<TSourceData> = ExecutablePlan<TSourceData>,
-    TResultItemPlan extends ExecutablePlan<TOutputData> = ExecutablePlan<TOutputData>,
-  >(
-    listPlan: ListCapablePlan<TSourceData, TSourceItemPlan>,
-    mapper: (itemPlan: TSourceItemPlan) => TResultItemPlan,
-  ): EachPlan<TSourceData, TOutputData, TSourceItemPlan, TResultItemPlan> {
-    return new EachPlan<
-      TSourceData,
-      TOutputData,
-      TSourceItemPlan,
-      TResultItemPlan
-    >(listPlan, mapper);
+    TSourceItemPlan,
+    TResultItemPlan
+  >(listPlan, mapper);
+}
+
+Object.assign(each, {
+  $$export: {
+    moduleName: "graphile-crystal",
+    exportName: "each",
   },
-  {
-    $$export: {
-      moduleName: "graphile-crystal",
-      exportName: "each",
-    },
-  },
-);
+});

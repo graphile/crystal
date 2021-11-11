@@ -44,6 +44,7 @@ export function constant<TData>(
   }
   return new ConstantPlan<TData>(data);
 }
+
 Object.assign(constant, {
   $$export: {
     moduleName: "graphile-crystal",
