@@ -616,12 +616,5 @@ export async function exportSchema(
   const ast = file.toAST();
 
   const { code } = reallyGenerate(ast, {});
-  /*
-  const output = `\
-export const schema = new GraphQLSchema({
-  description:
-});
-`;
-*/
   await writeFile(toPath, code);
 }
