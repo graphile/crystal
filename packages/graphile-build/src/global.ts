@@ -33,8 +33,8 @@ import type {
   GraphQLUnionTypeConfig,
 } from "graphql";
 
-import type { InflectionBase } from "./inflection";
-import type SchemaBuilder from "./SchemaBuilder";
+import type { InflectionBase } from "./inflection.js";
+import type SchemaBuilder from "./SchemaBuilder.js";
 
 declare global {
   namespace GraphileEngine {

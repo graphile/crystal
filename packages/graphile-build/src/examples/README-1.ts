@@ -2,8 +2,9 @@ import chalk from "chalk";
 import { readFile } from "fs/promises";
 import { lambda } from "graphile-crystal";
 import { graphql, printSchema } from "graphql";
+import { URL } from "url";
 
-import { buildSchema, defaultPlugins, exportSchema } from "../src";
+import { buildSchema, defaultPlugins, exportSchema } from "../index.js";
 
 function FN<T>(
   t: T,
@@ -94,14 +95,14 @@ const MyRandomFieldPlugin: GraphileEngine.Plugin = (
   console.dir(schema.toConfig());
 
   // Export schema
-  const exportFileLocation = `${__dirname}/../temp.ts`;
+  const exportFileLocation = new URL("../../temp.js", import.meta.url);
   await exportSchema(schema, exportFileLocation);
 
   // output code
   console.log(chalk.green(await readFile(exportFileLocation, "utf8")));
 
   // run code
-  const { schema: schema2 } = await import(exportFileLocation);
+  const { schema: schema2 } = await import(exportFileLocation.toString());
   const result2 = await graphql({
     schema: schema2,
     source: `

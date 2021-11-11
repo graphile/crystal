@@ -31,8 +31,8 @@ import {
   isNamedType,
 } from "graphql";
 
-import type { ScopeForType, SpecForType } from "../global";
-import type SchemaBuilder from "../SchemaBuilder";
+import type { ScopeForType, SpecForType } from "../global.js";
+import type SchemaBuilder from "../SchemaBuilder.js";
 
 const isString = (str: unknown): str is string => typeof str === "string";
 

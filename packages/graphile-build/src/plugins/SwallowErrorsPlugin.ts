@@ -1,4 +1,4 @@
-import swallowError from "../swallowError";
+import swallowError from "../swallowError.js";
 
 /**
  * This plugin changes the default handling for "recoverable" errors from

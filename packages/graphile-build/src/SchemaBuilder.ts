@@ -1,4 +1,4 @@
-import "./global";
+import "./global.js";
 
 import debugFactory from "debug";
 import { EventEmitter } from "events";
@@ -6,11 +6,11 @@ import type { GraphQLError, GraphQLSchemaConfig } from "graphql";
 import { validateSchema } from "graphql";
 import { GraphQLSchema } from "graphql";
 
-import makeNewBuild from "./makeNewBuild";
-import type { NewWithHooksFunction } from "./newWithHooks";
-import { makeNewWithHooks } from "./newWithHooks";
-import { makeSchemaBuilderHooks } from "./SchemaBuilderHooks";
-import { bindAll } from "./utils";
+import makeNewBuild from "./makeNewBuild.js";
+import type { NewWithHooksFunction } from "./newWithHooks/index.js";
+import { makeNewWithHooks } from "./newWithHooks/index.js";
+import { makeSchemaBuilderHooks } from "./SchemaBuilderHooks.js";
+import { bindAll } from "./utils.js";
 
 const debug = debugFactory("graphile-builder");
 

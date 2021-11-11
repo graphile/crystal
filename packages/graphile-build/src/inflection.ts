@@ -1,6 +1,6 @@
 import pluralize from "pluralize";
 
-import { camelCase, constantCase, upperCamelCase } from "./utils";
+import { camelCase, constantCase, upperCamelCase } from "./utils.js";
 
 export const makeInitialInflection = () => ({
   pluralize,

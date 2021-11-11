@@ -1,4 +1,4 @@
-import { stringScalarSpec } from "../utils";
+import { stringScalarSpec } from "../utils.js";
 
 declare global {
   namespace GraphileEngine {

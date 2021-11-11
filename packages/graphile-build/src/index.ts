@@ -1,4 +1,4 @@
-import "./global";
+import "./global.js";
 
 import type { GraphQLSchema } from "graphql";
 import util from "util";
@@ -12,8 +12,8 @@ import {
   QueryQueryPlugin,
   SubscriptionPlugin,
   SwallowErrorsPlugin,
-} from "./plugins";
-import SchemaBuilder from "./SchemaBuilder";
+} from "./plugins/index.js";
+import SchemaBuilder from "./SchemaBuilder.js";
 export {
   camelCase,
   constantCase,
@@ -23,7 +23,7 @@ export {
   singularize,
   upperCamelCase,
   upperFirst,
-} from "./utils";
+} from "./utils.js";
 
 export { SchemaBuilder };
 
@@ -76,4 +76,4 @@ export {
   SwallowErrorsPlugin,
 };
 
-export { exportSchema } from "./exportSchema";
+export { exportSchema } from "./exportSchema.js";

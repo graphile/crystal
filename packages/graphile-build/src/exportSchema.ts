@@ -1,10 +1,10 @@
-import { types as t } from "@babel/core";
 import generate from "@babel/generator";
 import { parseExpression } from "@babel/parser";
 import type { TemplateBuilderOptions } from "@babel/template";
 import template from "@babel/template";
+import * as t from "@babel/types";
 import { writeFile } from "fs/promises";
-import { $$crystalWrapped, ExecutablePlan } from "graphile-crystal";
+import { $$crystalWrapped } from "graphile-crystal";
 import type {
   GraphQLFieldConfigMap,
   GraphQLNamedType,
@@ -17,7 +17,10 @@ import {
   GraphQLObjectType,
   GraphQLScalarType,
 } from "graphql";
+import type { URL } from "url";
 import { inspect } from "util";
+
+const reallyGenerate = (generate as any).default as typeof generate;
 
 const templateOptions: TemplateBuilderOptions = {
   plugins: ["typescript"],
@@ -358,7 +361,7 @@ const VARIABLE_NAME = new CONSTRUCTOR({
   templateOptions,
 );
 
-const declareGraphqlSchema = template(
+const declareGraphqlSchema = template.statement(
   // GraphQLSchema
   `\
 export const VARIABLE_NAME = new CONSTRUCTOR({
@@ -574,7 +577,7 @@ function funcToAst(fn: AnyFunction): t.Expression {
 
 export async function exportSchema(
   schema: GraphQLSchema,
-  toPath: string,
+  toPath: string | URL,
 ): Promise<void> {
   const config = schema.toConfig();
   const file = new CodegenFile();
@@ -612,7 +615,7 @@ export async function exportSchema(
 
   const ast = file.toAST();
 
-  const { code } = generate(ast, {});
+  const { code } = reallyGenerate(ast, {});
   /*
   const output = `\
 export const schema = new GraphQLSchema({

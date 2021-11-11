@@ -1,4 +1,4 @@
-import "./global";
+import "./global.js";
 
 export function makeSchemaBuilderHooks<
   TBuild extends GraphileEngine.Build = GraphileEngine.Build,

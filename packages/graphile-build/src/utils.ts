@@ -1,7 +1,7 @@
 import type { GraphQLNamedType, GraphQLScalarTypeConfig } from "graphql";
 import { GraphQLObjectType, Kind } from "graphql";
-import camelCaseAll from "lodash/camelCase";
-import upperFirstAll from "lodash/upperFirst";
+import camelCaseAll from "lodash/camelCase.js";
+import upperFirstAll from "lodash/upperFirst.js";
 import plz from "pluralize";
 
 const bindAll = (obj: object, keys: Array<string>) => {

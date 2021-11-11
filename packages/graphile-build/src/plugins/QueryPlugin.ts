@@ -1,6 +1,6 @@
 import { __ValuePlan } from "graphile-crystal";
 
-import { isValidObjectType } from "../utils";
+import { isValidObjectType } from "../utils.js";
 
 /**
  * This plugin registers the operation type for the 'query' operation; the

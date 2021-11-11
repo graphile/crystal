@@ -5,7 +5,9 @@
     "declarationDir": "./dist",
     "outDir": "./dist",
 
-    "noUncheckedIndexedAccess": true
+    "noUncheckedIndexedAccess": true,
+    "moduleResolution": "Node",
+    "module": "ESNext"
   },
   "include": ["src"],
   "references": [{ "path": "../lru" }, { "path": "../graphile-crystal" }]
