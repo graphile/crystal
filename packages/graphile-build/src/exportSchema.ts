@@ -19,7 +19,7 @@ export function isNotNullish<T>(input: T | null | undefined): input is T {
 class CodegenFile {
   _variables: {
     [name: string]: true;
-  } = {};
+  } = Object.create(null);
   _imports: {
     [fromModule: string]: {
       [exportName: "default" | "*" | string]: {
@@ -27,7 +27,15 @@ class CodegenFile {
         asType?: boolean;
       };
     };
-  } = {};
+  } = Object.create(null);
+  _types: {
+    [typeName: string]: {
+      type: GraphQLNamedType;
+      variableName: t.Identifier;
+      declaration: t.Statement;
+    };
+  } = Object.create(null);
+
   _statements: t.Statement[] = [];
 
   addStatements(statements: t.Statement | t.Statement[]): void {
@@ -79,6 +87,58 @@ class CodegenFile {
     }
   }
 
+  declareType(type: GraphQLNamedType): t.Identifier {
+    const existing = this._types[type.name];
+    if (existing) {
+      if (existing.type !== type) {
+        throw new Error("Duplicate types with same name found! Error!");
+      }
+      return existing.variableName;
+    }
+    const VARIABLE_NAME = this.makeVariable(type.name);
+    this._types[type.name] = {
+      type,
+      variableName: VARIABLE_NAME,
+      declaration: this.makeTypeDeclaration(type, VARIABLE_NAME),
+    };
+    return VARIABLE_NAME;
+  }
+
+  private makeTypeDeclaration(
+    type: GraphQLNamedType,
+    VARIABLE_NAME: t.Identifier,
+  ): t.Statement {
+    if (type instanceof GraphQLObjectType) {
+      return declareObjectType({
+        VARIABLE_NAME,
+        CONSTRUCTOR: this.import("graphql", "GraphQLObjectType"),
+        TYPE_NAME: t.stringLiteral(type.name),
+        DESCRIPTION: desc(type.description),
+        IS_TYPE_OF: func(this, type.isTypeOf),
+        EXTENSIONS: extensions(type.extensions),
+        FIELDS: t.objectExpression([]), // TODO
+        INTERFACES: t.arrayExpression([]), // TODO
+      });
+    } else if (type instanceof GraphQLScalarType) {
+      return declareScalarType({
+        VARIABLE_NAME,
+        CONSTRUCTOR: this.import("graphql", "GraphQLScalarType"),
+        TYPE_NAME: t.stringLiteral(type.name),
+        DESCRIPTION: desc(type.description),
+        SPECIFIED_BY_URL: type.specifiedByURL,
+        SERIALIZE: func(this, type.serialize),
+        PARSE_VALUE: func(this, type.parseValue),
+        PARSE_LITERAL: func(this, type.parseLiteral),
+        EXTENSIONS: extensions(type.extensions),
+      });
+    } else {
+      const never /* TODO: : never*/ = type;
+      throw new Error(
+        `Did not understand type: ${(never as any).constructor.name}`,
+      );
+    }
+  }
+
   toAST(): t.File {
     const importStatements: t.Statement[] = [];
     Object.keys(this._imports)
@@ -123,7 +183,10 @@ class CodegenFile {
           importStatements.push(importStatement);
         }
       });
-    const allStatements = [...importStatements, ...this._statements];
+    const typeDeclarationStatements = Object.values(this._types).map(
+      (v) => v.declaration,
+    );
+    const allStatements = [...importStatements, ...typeDeclarationStatements];
     return t.file(t.program(allStatements));
   }
 }
@@ -213,46 +276,6 @@ function func(
   return result;
 }
 
-function declareType(file: CodegenFile, type: GraphQLNamedType): t.Identifier {
-  if (type instanceof GraphQLObjectType) {
-    const VARIABLE_NAME = file.makeVariable(type.name);
-    file.addStatements(
-      declareObjectType({
-        VARIABLE_NAME,
-        CONSTRUCTOR: file.import("graphql", "GraphQLObjectType"),
-        TYPE_NAME: t.stringLiteral(type.name),
-        DESCRIPTION: desc(type.description),
-        IS_TYPE_OF: func(file, type.isTypeOf),
-        EXTENSIONS: extensions(type.extensions),
-        FIELDS: t.objectExpression([]), // TODO
-        INTERFACES: t.arrayExpression([]), // TODO
-      }),
-    );
-    return VARIABLE_NAME;
-  } else if (type instanceof GraphQLScalarType) {
-    const VARIABLE_NAME = file.makeVariable(type.name);
-    file.addStatements(
-      declareScalarType({
-        VARIABLE_NAME,
-        CONSTRUCTOR: file.import("graphql", "GraphQLScalarType"),
-        TYPE_NAME: t.stringLiteral(type.name),
-        DESCRIPTION: desc(type.description),
-        SPECIFIED_BY_URL: type.specifiedByURL,
-        SERIALIZE: func(file, type.serialize),
-        PARSE_VALUE: func(file, type.parseValue),
-        PARSE_LITERAL: func(file, type.parseLiteral),
-        EXTENSIONS: extensions(type.extensions),
-      }),
-    );
-    return VARIABLE_NAME;
-  } else {
-    const never /* TODO: : never*/ = type;
-    throw new Error(
-      `Did not understand type: ${(never as any).constructor.name}`,
-    );
-  }
-}
-
 const BUILTINS = ["Int", "Float", "Boolean", "ID", "String"];
 
 export async function exportSchema(
@@ -267,7 +290,7 @@ export async function exportSchema(
   const types = config.types
     .map((type) => {
       if (!type.name.startsWith("__") && !BUILTINS.includes(type.name)) {
-        return declareType(file, type);
+        return file.declareType(type);
       }
     })
     .filter(isNotNullish);
