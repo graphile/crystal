@@ -6,7 +6,6 @@ import type {
   GraphQLInputType,
   GraphQLList,
   GraphQLNonNull,
-  GraphQLObjectTypeConfig,
   GraphQLOutputType,
   GraphQLScalarType,
   GraphQLType,

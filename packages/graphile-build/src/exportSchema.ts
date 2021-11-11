@@ -118,7 +118,7 @@ class CodegenFile {
       return existing.variableName;
     }
     if (BUILTINS.includes(type.name)) {
-      return this.import("graphql", type.name);
+      return this.import("graphql", "GraphQL" + type.name);
     }
     if (isBuiltinType(type)) {
       throw new Error(
@@ -163,7 +163,7 @@ class CodegenFile {
             expressionObjectFieldSpec({
               DESCRIPTION: desc(config.description),
               TYPE: this.typeExpression(config.type),
-              ARGS: t.nullLiteral(), // TODO
+              ARGS: t.identifier("undefined"), // TODO
               RESOLVE: func(this, config.resolve, `${locationHint}.resolve`),
               SUBSCRIBE: func(
                 this,
@@ -181,7 +181,7 @@ class CodegenFile {
         );
       }
     }
-    return objectNullPrototype(properties);
+    return t.objectExpression(properties);
   }
 
   private makeTypeDeclaration(
@@ -282,7 +282,11 @@ class CodegenFile {
     const typeDeclarationStatements = Object.values(this._types).map(
       (v) => v.declaration,
     );
-    const allStatements = [...importStatements, ...typeDeclarationStatements];
+    const allStatements = [
+      ...importStatements,
+      ...typeDeclarationStatements,
+      ...this._statements,
+    ];
     return t.file(t.program(allStatements));
   }
 }
@@ -400,7 +404,7 @@ function convertToAST(
   } else if (typeof thing === "function") {
     return func(file, thing, locationHint);
   } else if (typeof thing === "object" && thing != null) {
-    return objectNullPrototype(
+    return t.objectExpression(
       Object.entries(thing).map(([key, value]) =>
         t.objectProperty(
           t.identifier(key),
@@ -428,13 +432,15 @@ function extensions(
   locationHint: string,
 ) {
   if (extensions == null) {
-    return objectNullPrototype([]);
+    return t.objectExpression([]);
   }
   return convertToAST(file, extensions, locationHint);
 }
 
 /** Maps to `Object.assign(Object.create(null), {...})` */
-function objectNullPrototype(properties: t.ObjectProperty[]): t.Expression {
+export function objectNullPrototype(
+  properties: t.ObjectProperty[],
+): t.Expression {
   return t.callExpression(
     t.memberExpression(t.identifier("Object"), t.identifier("assign")),
     [
@@ -460,13 +466,21 @@ function func(
     isSubscribe: boolean;
   };
   if (crystalSpec) {
-    const iCrystalWrap = file.import(
-      "graphile-crystal",
-      crystalSpec.isSubscribe ? "crystalWrapSubscribe" : "crystalWrapResolve",
-    );
-    return t.callExpression(iCrystalWrap, [
-      func(file, crystalSpec.original, locationHint + `[$$crystalWrapped]`),
-    ]);
+    if (crystalSpec.isSubscribe) {
+      const iMakeCrystalSubscriber = file.import(
+        "graphile-crystal",
+        "makeCrystalSubscriber",
+      );
+      return t.callExpression(iMakeCrystalSubscriber, []);
+    } else {
+      const iCrystalWrapResolve = file.import(
+        "graphile-crystal",
+        "crystalWrapResolve",
+      );
+      return t.callExpression(iCrystalWrapResolve, [
+        func(file, crystalSpec.original, locationHint + `[$$crystalWrapped]`),
+      ]);
+    }
   }
 
   // TODO
@@ -528,12 +542,16 @@ export async function exportSchema(
       VARIABLE_NAME: schemaExportName,
       CONSTRUCTOR: iGraphQLSchema,
       DESCRIPTION: desc(config.description),
-      QUERY: t.nullLiteral(),
-      MUTATION: t.nullLiteral(),
-      SUBSCRIPTION: t.nullLiteral(),
+      QUERY: config.query ? file.declareType(config.query) : t.nullLiteral(),
+      MUTATION: config.mutation
+        ? file.declareType(config.mutation)
+        : t.nullLiteral(),
+      SUBSCRIPTION: config.subscription
+        ? file.declareType(config.subscription)
+        : t.nullLiteral(),
       TYPES: t.arrayExpression(types),
-      DIRECTIVES: t.nullLiteral(),
-      EXTENSIONS: t.nullLiteral(),
+      DIRECTIVES: t.nullLiteral(), // TODO
+      EXTENSIONS: extensions(file, config.extensions, "schema.extensions"),
       ASSUME_VALID: t.booleanLiteral(false),
     }),
   );
