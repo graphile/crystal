@@ -27,8 +27,18 @@ export class FirstPlan<TData> extends ExecutablePlan<TData> {
  * A plan that resolves to the first entry in the list returned by the given
  * plan.
  */
-export function first<TPlan extends ExecutablePlan<ReadonlyArray<any>>>(
-  plan: TPlan,
-): FirstPlan<TPlan extends ExecutablePlan<ReadonlyArray<infer U>> ? U : never> {
-  return new FirstPlan(plan);
-}
+export const first = Object.assign(
+  function first<TPlan extends ExecutablePlan<ReadonlyArray<any>>>(
+    plan: TPlan,
+  ): FirstPlan<
+    TPlan extends ExecutablePlan<ReadonlyArray<infer U>> ? U : never
+  > {
+    return new FirstPlan(plan);
+  },
+  {
+    $$export: {
+      moduleName: "graphile-crystal",
+      exportName: "first",
+    },
+  },
+);

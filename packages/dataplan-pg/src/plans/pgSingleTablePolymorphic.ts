@@ -59,11 +59,19 @@ export class PgSingleTablePolymorphicPlan<
   }
 }
 
-export function pgSingleTablePolymorphic<
-  TDataSource extends PgSource<any, any, any, any, any>,
->(
-  $typePlan: ExecutablePlan<string>,
-  $rowPlan: PgSelectSinglePlan<TDataSource>,
-): PgSingleTablePolymorphicPlan<TDataSource> {
-  return new PgSingleTablePolymorphicPlan<TDataSource>($typePlan, $rowPlan);
-}
+export const pgSingleTablePolymorphic = Object.assign(
+  function pgSingleTablePolymorphic<
+    TDataSource extends PgSource<any, any, any, any, any>,
+  >(
+    $typePlan: ExecutablePlan<string>,
+    $rowPlan: PgSelectSinglePlan<TDataSource>,
+  ): PgSingleTablePolymorphicPlan<TDataSource> {
+    return new PgSingleTablePolymorphicPlan<TDataSource>($typePlan, $rowPlan);
+  },
+  {
+    $$export: {
+      moduleName: "@dataplan/pg",
+      exportName: "pgSingleTablePolymorphic",
+    },
+  },
+);

@@ -111,20 +111,28 @@ export class PgPolymorphicPlan<
   }
 }
 
-export function pgPolymorphic<
-  TCodec extends PgTypeCodec,
-  TTypeSpecifier,
-  TTypeSpecifierPlan extends ExecutablePlan<TTypeSpecifier> = ExecutablePlan<TTypeSpecifier>,
->(
-  $itemPlan:
-    | PgSelectSinglePlan<PgSource<TCodec, any, any, any, any>>
-    | PgClassExpressionPlan<any, TCodec>,
-  $typeSpecifierPlan: TTypeSpecifierPlan,
-  possibleTypes: PgPolymorphicTypeMap<TTypeSpecifier, TTypeSpecifierPlan>,
-): PgPolymorphicPlan<TCodec, TTypeSpecifier, TTypeSpecifierPlan> {
-  return new PgPolymorphicPlan<TCodec, TTypeSpecifier, TTypeSpecifierPlan>(
-    $itemPlan,
-    $typeSpecifierPlan,
-    possibleTypes,
-  );
-}
+export const pgPolymorphic = Object.assign(
+  function pgPolymorphic<
+    TCodec extends PgTypeCodec,
+    TTypeSpecifier,
+    TTypeSpecifierPlan extends ExecutablePlan<TTypeSpecifier> = ExecutablePlan<TTypeSpecifier>,
+  >(
+    $itemPlan:
+      | PgSelectSinglePlan<PgSource<TCodec, any, any, any, any>>
+      | PgClassExpressionPlan<any, TCodec>,
+    $typeSpecifierPlan: TTypeSpecifierPlan,
+    possibleTypes: PgPolymorphicTypeMap<TTypeSpecifier, TTypeSpecifierPlan>,
+  ): PgPolymorphicPlan<TCodec, TTypeSpecifier, TTypeSpecifierPlan> {
+    return new PgPolymorphicPlan<TCodec, TTypeSpecifier, TTypeSpecifierPlan>(
+      $itemPlan,
+      $typeSpecifierPlan,
+      possibleTypes,
+    );
+  },
+  {
+    $$export: {
+      moduleName: "@dataplan/pg",
+      exportName: "pgPolymorphic",
+    },
+  },
+);

@@ -105,8 +105,16 @@ export class ObjectPlan<
   }
 }
 
-export function object<TPlans extends { [key: string]: ExecutablePlan<any> }>(
-  obj: TPlans,
-): ObjectPlan<TPlans> {
-  return new ObjectPlan<TPlans>(obj);
-}
+export const object = Object.assign(
+  function object<TPlans extends { [key: string]: ExecutablePlan<any> }>(
+    obj: TPlans,
+  ): ObjectPlan<TPlans> {
+    return new ObjectPlan<TPlans>(obj);
+  },
+  {
+    $$export: {
+      moduleName: "graphile-crystal",
+      exportName: "object",
+    },
+  },
+);

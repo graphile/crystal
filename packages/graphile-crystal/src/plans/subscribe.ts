@@ -65,20 +65,28 @@ export class SubscribePlan<
   }
 }
 
-export function subscribe<
-  TTopics extends { [topic: string]: any },
-  TTopic extends keyof TTopics,
-  TPayloadPlan extends ExecutablePlan,
->(
-  pubsubOrPlan:
-    | ExecutablePlan<CrystalSubscriber<TTopics>>
-    | CrystalSubscriber<TTopics>,
-  topicOrPlan: ExecutablePlan<TTopic> | string,
-  itemPlan: (itemPlan: __ItemPlan<TTopics[TTopic]>) => TPayloadPlan,
-): SubscribePlan<TTopics, TTopic, TPayloadPlan> {
-  return new SubscribePlan<TTopics, TTopic, TPayloadPlan>(
-    pubsubOrPlan,
-    topicOrPlan,
-    itemPlan,
-  );
-}
+export const subscribe = Object.assign(
+  function subscribe<
+    TTopics extends { [topic: string]: any },
+    TTopic extends keyof TTopics,
+    TPayloadPlan extends ExecutablePlan,
+  >(
+    pubsubOrPlan:
+      | ExecutablePlan<CrystalSubscriber<TTopics>>
+      | CrystalSubscriber<TTopics>,
+    topicOrPlan: ExecutablePlan<TTopic> | string,
+    itemPlan: (itemPlan: __ItemPlan<TTopics[TTopic]>) => TPayloadPlan,
+  ): SubscribePlan<TTopics, TTopic, TPayloadPlan> {
+    return new SubscribePlan<TTopics, TTopic, TPayloadPlan>(
+      pubsubOrPlan,
+      topicOrPlan,
+      itemPlan,
+    );
+  },
+  {
+    $$export: {
+      moduleName: "graphile-crystal",
+      exportName: "subscribe",
+    },
+  },
+);

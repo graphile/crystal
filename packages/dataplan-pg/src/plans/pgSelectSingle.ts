@@ -45,7 +45,7 @@ export class PgSelectSinglePlan<
       >;
     }>
 {
-  static $$export = {
+  $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgSelectSinglePlan",
   };
@@ -333,17 +333,25 @@ export class PgSelectSinglePlan<
   }
 }
 
-export function pgSelectSingleFromRecord<
-  TDataSource extends PgSource<any, any, any, any>,
->(
-  source: TDataSource,
-  record: PgClassExpressionPlan<TDataSource, TDataSource["codec"]>,
-): PgSelectSinglePlan<TDataSource> {
-  // TODO: we should be able to optimise this so that `plan.record()` returns the original record again.
-  return new PgSelectPlan({
-    source,
-    identifiers: [],
-    from: (record) => sql`(select (${record}).*)`,
-    args: [{ plan: record, type: source.codec.sqlType }],
-  }).single();
-}
+export const pgSelectSingleFromRecord = Object.assign(
+  function pgSelectSingleFromRecord<
+    TDataSource extends PgSource<any, any, any, any>,
+  >(
+    source: TDataSource,
+    record: PgClassExpressionPlan<TDataSource, TDataSource["codec"]>,
+  ): PgSelectSinglePlan<TDataSource> {
+    // TODO: we should be able to optimise this so that `plan.record()` returns the original record again.
+    return new PgSelectPlan({
+      source,
+      identifiers: [],
+      from: (record) => sql`(select (${record}).*)`,
+      args: [{ plan: record, type: source.codec.sqlType }],
+    }).single();
+  },
+  {
+    $$export: {
+      moduleName: "@dataplan/pg",
+      exportName: "pgSelectSingleFromRecord",
+    },
+  },
+);

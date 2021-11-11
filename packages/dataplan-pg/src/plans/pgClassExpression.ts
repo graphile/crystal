@@ -224,19 +224,27 @@ export class PgClassExpressionPlan<
   }
 }
 
-function pgClassExpression<
-  TDataSource extends PgSource<any, any, any, any>,
-  TCodec extends PgTypeCodec,
->(
-  table: PgClassSinglePlan<TDataSource>,
-  codec: TCodec,
-): (
-  strings: TemplateStringsArray,
-  ...dependencies: ReadonlyArray<PgTypedExecutablePlan | SQL>
-) => PgClassExpressionPlan<TDataSource, TCodec> {
-  return (strings, ...dependencies) => {
-    return new PgClassExpressionPlan(table, codec, strings, dependencies);
-  };
-}
+const pgClassExpression = Object.assign(
+  function pgClassExpression<
+    TDataSource extends PgSource<any, any, any, any>,
+    TCodec extends PgTypeCodec,
+  >(
+    table: PgClassSinglePlan<TDataSource>,
+    codec: TCodec,
+  ): (
+    strings: TemplateStringsArray,
+    ...dependencies: ReadonlyArray<PgTypedExecutablePlan | SQL>
+  ) => PgClassExpressionPlan<TDataSource, TCodec> {
+    return (strings, ...dependencies) => {
+      return new PgClassExpressionPlan(table, codec, strings, dependencies);
+    };
+  },
+  {
+    $$export: {
+      moduleName: "@dataplan/pg",
+      exportName: "pgClassExpression",
+    },
+  },
+);
 
 export { pgClassExpression };

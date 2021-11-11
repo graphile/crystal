@@ -41,8 +41,14 @@ export class ReversePlan<TData> extends ExecutablePlan<TData[]> {
   }
 }
 
-export function reverse<TData>(
-  plan: ExecutablePlan<TData[]>,
-): ReversePlan<TData> {
-  return new ReversePlan<TData>(plan);
-}
+export const reverse = Object.assign(
+  function reverse<TData>(plan: ExecutablePlan<TData[]>): ReversePlan<TData> {
+    return new ReversePlan<TData>(plan);
+  },
+  {
+    $$export: {
+      moduleName: "graphile-crystal",
+      exportName: "reverse",
+    },
+  },
+);
