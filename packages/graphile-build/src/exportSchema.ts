@@ -461,6 +461,13 @@ export function objectNullPrototype(
   );
 }
 
+function iife(statements: t.Statement[]): t.Expression {
+  return t.callExpression(
+    t.arrowFunctionExpression([], t.blockStatement(statements)),
+    [],
+  );
+}
+
 function func(
   file: CodegenFile,
   fn: AnyFunction | null | undefined,
@@ -491,35 +498,40 @@ function func(
     }
   }
 
-  // TODO
+  // Determine if we should wrap it in an IIFE to put the variables into
+  // scope; e.g.:
+  //
+  // `(() => { const foo = 1, bar = 2; return /*>*/() => {return foo+bar}/*<*/})();`
   const funcAST = funcToAst(fn);
   const scope = hasScope(fn) ? fn.$$scope : null;
   const scopeKeys = scope ? Object.keys(scope) : null;
-  if (scope && scopeKeys?.length) {
-    // Wrap in an IIFE to put the variables into scope
-    // (() => { const foo = 1, bar = 2; return () => {}})();
-    return t.callExpression(
-      t.arrowFunctionExpression(
-        [],
-        t.blockStatement([
-          t.variableDeclaration(
-            "const",
-            scopeKeys.map((key) => {
-              return t.variableDeclarator(
-                t.identifier(key),
-                convertToAST(
-                  file,
-                  scope[key],
-                  `${locationHint}[$$scope][${JSON.stringify(key)}]`,
-                ),
-              );
-            }),
-          ),
-          t.returnStatement(funcAST),
-        ]),
-      ),
-      [],
-    );
+  const variableDeclarations =
+    scope && scopeKeys
+      ? scopeKeys
+          .map((key) => {
+            const value = scope[key];
+            const convertedValue = convertToAST(
+              file,
+              value,
+              `${locationHint}[$$scope][${JSON.stringify(key)}]`,
+            );
+            if (
+              convertedValue.type === "Identifier" &&
+              convertedValue.name === key
+            ) {
+              // The import is sufficient for it to be in scope
+              return null;
+            }
+            return t.variableDeclarator(t.identifier(key), convertedValue);
+          })
+          .filter(isNotNullish)
+      : [];
+
+  if (variableDeclarations.length > 0) {
+    return iife([
+      t.variableDeclaration("const", variableDeclarations),
+      t.returnStatement(funcAST),
+    ]);
   } else {
     return funcAST;
   }
