@@ -30,7 +30,15 @@ export function isNotNullish<T>(input: T | null | undefined): input is T {
 function isImportable(
   thing: unknown,
 ): thing is { $$export: { moduleName: string; exportName: string } } {
-  return thing != null && "$$export" in (thing as object | Function);
+  return thing != null && "$$export" in (thing as object | AnyFunction);
+}
+
+type AnyFunction = (...args: any[]) => any;
+
+function hasScope<T extends AnyFunction>(
+  thing: T,
+): thing is T & { $$scope: { [variableName: string]: any } } {
+  return "$$scope" in thing;
 }
 
 const BUILTINS = ["Int", "Float", "Boolean", "ID", "String"];
@@ -382,10 +390,7 @@ function convertToAST(
       `convertToAST: potentially infinite recursion at ${locationHint}. TODO: allow exporting recursive structures.`,
     );
   }
-  if (isImportable(thing)) {
-    const { moduleName, exportName } = thing.$$export;
-    return file.import(moduleName, exportName);
-  } else if (thing === null) {
+  if (thing === null) {
     return t.nullLiteral();
   } else if (thing === undefined) {
     return t.identifier("undefined");
@@ -395,6 +400,9 @@ function convertToAST(
     return t.stringLiteral(thing);
   } else if (typeof thing === "number") {
     return t.numericLiteral(thing);
+  } else if (isImportable(thing)) {
+    const { moduleName, exportName } = thing.$$export;
+    return file.import(moduleName, exportName);
   } else if (Array.isArray(thing)) {
     return t.arrayExpression(
       thing.map((entry, i) =>
@@ -402,7 +410,7 @@ function convertToAST(
       ),
     );
   } else if (typeof thing === "function") {
-    return func(file, thing, locationHint);
+    return func(file, thing as AnyFunction, locationHint);
   } else if (typeof thing === "object" && thing != null) {
     return t.objectExpression(
       Object.entries(thing).map(([key, value]) =>
@@ -455,14 +463,14 @@ export function objectNullPrototype(
 
 function func(
   file: CodegenFile,
-  fn: Function | null | undefined,
+  fn: AnyFunction | null | undefined,
   locationHint: string,
 ): t.Expression {
   if (fn == null) {
     return t.identifier("undefined");
   }
   const crystalSpec = fn[$$crystalWrapped] as {
-    original: Function | undefined;
+    original: AnyFunction | undefined;
     isSubscribe: boolean;
   };
   if (crystalSpec) {
@@ -484,6 +492,40 @@ function func(
   }
 
   // TODO
+  const funcAST = funcToAst(fn);
+  const scope = hasScope(fn) ? fn.$$scope : null;
+  const scopeKeys = scope ? Object.keys(scope) : null;
+  if (scope && scopeKeys?.length) {
+    // Wrap in an IIFE to put the variables into scope
+    // (() => { const foo = 1, bar = 2; return () => {}})();
+    return t.callExpression(
+      t.arrowFunctionExpression(
+        [],
+        t.blockStatement([
+          t.variableDeclaration(
+            "const",
+            scopeKeys.map((key) => {
+              return t.variableDeclarator(
+                t.identifier(key),
+                convertToAST(
+                  file,
+                  scope[key],
+                  `${locationHint}[$$scope][${JSON.stringify(key)}]`,
+                ),
+              );
+            }),
+          ),
+          t.returnStatement(funcAST),
+        ]),
+      ),
+      [],
+    );
+  } else {
+    return funcAST;
+  }
+}
+
+function funcToAst(fn: AnyFunction): t.Expression {
   const funcString = fn.toString().trim();
   try {
     const result = parseExpression(funcString, {

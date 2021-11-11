@@ -5,8 +5,15 @@ import { graphql, printSchema } from "graphql";
 
 import { buildSchema, defaultPlugins, exportSchema } from "../src";
 
-function FN<T>(t: T): T {
-  return t;
+function FN<T>(
+  t: T,
+  $$scope: { [key: string]: any } | undefined = undefined,
+): T {
+  if ($$scope) {
+    return Object.assign(t, { $$scope });
+  } else {
+    return t;
+  }
 }
 
 declare global {
@@ -39,14 +46,17 @@ const MyRandomFieldPlugin: GraphileEngine.Plugin = (
               type: GraphQLInt,
             },
           },
-          plan: FN((_$parent, args) => {
-            return lambda(
-              args.sides,
-              (sides = myDefaultMax) =>
-                Math.floor(Math.random() * (sides + 1 - myDefaultMin)) +
-                myDefaultMin,
-            );
-          }),
+          plan: FN(
+            (_$parent, args) => {
+              return lambda(
+                args.sides,
+                (sides = myDefaultMax) =>
+                  Math.floor(Math.random() * (sides + 1 - myDefaultMin)) +
+                  myDefaultMin,
+              );
+            },
+            { myDefaultMax, myDefaultMin, lambda },
+          ),
         })),
       },
       `adding 'random' field to ${Self.name}`,
