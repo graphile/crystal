@@ -130,7 +130,7 @@ export async function handleGraphQLSSE<
         const context = await withPostGraphileContextFromReqRes(
           req,
           res,
-          undefined,
+          { singleStatement: true },
           context => context,
         );
 
