@@ -82,6 +82,13 @@ export type TuplePlanMap<
   TTuple extends ReadonlyArray<keyof TColumns>,
 > = {
   [Index in keyof TTuple]: {
+    // Optional columns
+    [key in keyof TColumns as Exclude<
+      key,
+      keyof TTuple[number]
+    >]?: ExecutablePlan<ReturnType<TColumns[key]["pg2gql"]>>;
+  } & {
+    // Required unique combination of columns
     [key in TTuple[number]]: ExecutablePlan<
       ReturnType<TColumns[key]["pg2gql"]>
     >;
