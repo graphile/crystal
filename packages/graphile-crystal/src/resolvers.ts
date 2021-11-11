@@ -250,7 +250,10 @@ function crystalWrapResolveOrSubscribe<
   Object.defineProperty(crystalResolver, $$crystalWrapped, {
     enumerable: false,
     configurable: false,
-    value: userSpecifiedResolver,
+    value: {
+      original: userSpecifiedResolver,
+      isSubscribe,
+    },
   });
   return crystalResolver;
 }
