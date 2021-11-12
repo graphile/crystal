@@ -634,6 +634,7 @@ export default function createPostGraphileHttpRequestHandler(
           }
 
           setupServerSentEvents(res, options);
+          return;
         }
 
         // all other cases are handled following the GraphQL over Server-Sent Events (SSE) protocol
