@@ -11,6 +11,8 @@ import type {
   GraphQLFieldConfig,
   GraphQLFieldConfigArgumentMap,
   GraphQLFieldConfigMap,
+  GraphQLInputFieldConfig,
+  GraphQLInputFieldConfigMap,
   GraphQLInputObjectTypeConfig,
   GraphQLInterfaceTypeConfig,
   GraphQLNamedType,
@@ -50,7 +52,10 @@ function isImportable(
   return thing != null && "$$export" in (thing as object | AnyFunction);
 }
 
-type AnyFunction = (...args: any[]) => any;
+type AnyFunction = {
+  (...args: any[]): any;
+  displayName?: string;
+};
 
 function hasScope<T extends AnyFunction>(
   thing: T,
@@ -79,7 +84,7 @@ class CodegenFile {
     [typeName: string]: {
       type: GraphQLNamedType;
       variableName: t.Identifier;
-      declaration: t.Statement;
+      declaration: t.Statement | null;
     };
   } = Object.create(null);
 
@@ -151,11 +156,15 @@ class CodegenFile {
       );
     }
     const VARIABLE_NAME = this.makeVariable(type.name);
-    this._types[type.name] = {
+    const t: CodegenFile["_types"][string] = {
       type,
       variableName: VARIABLE_NAME,
-      declaration: this.makeTypeDeclaration(type, VARIABLE_NAME),
+      declaration: null,
     };
+    this._types[type.name] = t;
+    // Must perform declaration _AFTER_ registering type, otherwise we might
+    // get infinite recursion.
+    t.declaration = this.makeTypeDeclaration(type, VARIABLE_NAME);
     return VARIABLE_NAME;
   }
 
@@ -173,6 +182,7 @@ class CodegenFile {
     }
   }
 
+  // For objects and interfaces
   private makeObjectFields(
     fields: GraphQLFieldConfigMap<any, any>,
     typeName: string,
@@ -201,6 +211,43 @@ class CodegenFile {
           subscribe: config.subscribe
             ? func(this, config.subscribe, `${locationHint}.subscribe`)
             : null,
+          deprecationReason: desc(config.deprecationReason),
+          extensions: extensions(
+            this,
+            config.extensions,
+            `${locationHint}.extensions`,
+          ),
+        };
+        memo[fieldName] = configToAST(mappedConfig);
+      }
+      return memo;
+    }, {} as { [key: string]: t.Expression | null });
+    return t.objectExpression(objectToObjectProperties(obj));
+  }
+
+  private makeInputObjectFields(
+    fields: GraphQLInputFieldConfigMap,
+    typeName: string,
+  ): t.Expression {
+    const obj = Object.entries(fields).reduce((memo, [fieldName, config]) => {
+      if (!fieldName.startsWith("__")) {
+        const locationHint = `${typeName}.fields[${fieldName}]`;
+        const mappedConfig: {
+          [key in keyof GraphQLInputFieldConfig as Exclude<
+            keyof GraphQLInputFieldConfig,
+            "astNode"
+          >]-?: t.Expression | null;
+        } = {
+          description: desc(config.description),
+          type: this.typeExpression(config.type),
+          defaultValue:
+            config.defaultValue !== undefined
+              ? convertToAST(
+                  this,
+                  config.defaultValue,
+                  `${locationHint}.defaultValue`,
+                )
+              : null,
           deprecationReason: desc(config.deprecationReason),
           extensions: extensions(
             this,
@@ -283,14 +330,66 @@ class CodegenFile {
             : null,
       });
     } else if (type instanceof GraphQLInterfaceType) {
-      console.dir(type);
-      throw new Error("GraphQLInterfaceType support not yet present");
+      const config = type.toConfig();
+      return declareGraphQLEntity(this, VARIABLE_NAME, "GraphQLInterfaceType", {
+        name: t.stringLiteral(config.name),
+        description: desc(config.description),
+        resolveType: config.resolveType
+          ? func(this, config.resolveType, `${config.name}.resolveType`)
+          : null,
+        extensions: extensions(
+          this,
+          config.extensions,
+          `${config.name}.extensions`,
+        ),
+        fields: t.arrowFunctionExpression(
+          [],
+          this.makeObjectFields(config.fields, config.name),
+        ),
+        interfaces:
+          config.interfaces.length > 0
+            ? t.arrayExpression(
+                config.interfaces.map((interfaceType) =>
+                  this.declareType(interfaceType),
+                ),
+              )
+            : null,
+      });
     } else if (type instanceof GraphQLUnionType) {
-      console.dir(type);
-      throw new Error("GraphQLUnionType support not yet present");
+      const config = type.toConfig();
+      return declareGraphQLEntity(this, VARIABLE_NAME, "GraphQLUnionType", {
+        name: t.stringLiteral(config.name),
+        description: desc(config.description),
+        resolveType: config.resolveType
+          ? func(this, config.resolveType, `${config.name}.resolveType`)
+          : null,
+        extensions: extensions(
+          this,
+          config.extensions,
+          `${config.name}.extensions`,
+        ),
+        types: t.arrayExpression(config.types.map((t) => this.declareType(t))),
+      });
     } else if (type instanceof GraphQLInputObjectType) {
-      console.dir(type);
-      throw new Error("GraphQLInputObjectType support not yet present");
+      const config = type.toConfig();
+      return declareGraphQLEntity(
+        this,
+        VARIABLE_NAME,
+        "GraphQLInputObjectType",
+        {
+          name: t.stringLiteral(config.name),
+          description: desc(config.description),
+          extensions: extensions(
+            this,
+            config.extensions,
+            `${config.name}.extensions`,
+          ),
+          fields: t.arrowFunctionExpression(
+            [],
+            this.makeInputObjectFields(config.fields, config.name),
+          ),
+        },
+      );
     } else if (type instanceof GraphQLScalarType) {
       const config = type.toConfig();
       return declareGraphQLEntity(this, VARIABLE_NAME, "GraphQLScalarType", {
@@ -385,9 +484,9 @@ class CodegenFile {
           importStatements.push(importStatement);
         }
       });
-    const typeDeclarationStatements = Object.values(this._types).map(
-      (v) => v.declaration,
-    );
+    const typeDeclarationStatements = Object.values(this._types)
+      .map((v) => v.declaration)
+      .filter(isNotNullish);
     const allStatements = [
       ...importStatements,
       ...typeDeclarationStatements,
@@ -625,7 +724,7 @@ function func(
   // scope; e.g.:
   //
   // `(() => { const foo = 1, bar = 2; return /*>*/() => {return foo+bar}/*<*/})();`
-  const funcAST = funcToAst(fn);
+  const funcAST = funcToAst(fn, locationHint);
   const scope = hasScope(fn) ? fn.$$scope : null;
   const scopeKeys = scope ? Object.keys(scope) : null;
   const variableDeclarations =
@@ -660,7 +759,7 @@ function func(
   }
 }
 
-function funcToAst(fn: AnyFunction): t.Expression {
+function funcToAst(fn: AnyFunction, locationHint: string): t.Expression {
   const funcString = fn.toString().trim();
   try {
     const result = parseExpression(funcString, {
