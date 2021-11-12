@@ -434,9 +434,11 @@ export function objectFieldSpec<
     ...spec,
     args: argsWithExtensions,
     extensions: {
+      ...spec.extensions,
       graphile: {
-        plan,
-        subscribePlan,
+        ...spec.extensions?.graphile,
+        ...(plan ? { plan } : null),
+        ...(subscribePlan ? { subscribePlan } : null),
       },
     },
   };
