@@ -7,6 +7,8 @@ import { writeFile } from "fs/promises";
 import { $$crystalWrapped } from "graphile-crystal";
 import type {
   GraphQLArgumentConfig,
+  GraphQLDirective,
+  GraphQLDirectiveConfig,
   GraphQLEnumTypeConfig,
   GraphQLFieldConfig,
   GraphQLFieldConfigArgumentMap,
@@ -87,6 +89,13 @@ class CodegenFile {
       declaration: t.Statement | null;
     };
   } = Object.create(null);
+  _directives: {
+    [typeName: string]: {
+      directive: GraphQLDirective;
+      variableName: t.Identifier;
+      declaration: t.Statement | null;
+    };
+  } = Object.create(null);
 
   _statements: t.Statement[] = [];
 
@@ -156,15 +165,62 @@ class CodegenFile {
       );
     }
     const VARIABLE_NAME = this.makeVariable(type.name);
-    const t: CodegenFile["_types"][string] = {
+    const spec: CodegenFile["_types"][string] = {
       type,
       variableName: VARIABLE_NAME,
       declaration: null,
     };
-    this._types[type.name] = t;
+    this._types[type.name] = spec;
     // Must perform declaration _AFTER_ registering type, otherwise we might
     // get infinite recursion.
-    t.declaration = this.makeTypeDeclaration(type, VARIABLE_NAME);
+    spec.declaration = this.makeTypeDeclaration(type, VARIABLE_NAME);
+    return VARIABLE_NAME;
+  }
+
+  declareDirective(directive: GraphQLDirective): t.Identifier {
+    const existing = this._directives[directive.name];
+    if (existing) {
+      if (existing.directive !== directive) {
+        throw new Error("Duplicate types with same name found! Error!");
+      }
+      return existing.variableName;
+    }
+    const config = directive.toConfig();
+    const VARIABLE_NAME = this.makeVariable(config.name);
+    const spec: CodegenFile["_directives"][string] = {
+      directive,
+      variableName: VARIABLE_NAME,
+      declaration: null,
+    };
+    this._directives[config.name] = spec;
+    const locationHint = `@${config.name}`;
+    // Must perform declaration _AFTER_ registering type, otherwise we might
+    // get infinite recursion.
+    const iDirectiveLocation = this.import("graphql", "DirectiveLocation");
+    spec.declaration = declareGraphQLEntity(
+      this,
+      VARIABLE_NAME,
+      "GraphQLDirective",
+      {
+        name: t.stringLiteral(config.name),
+        description: desc(config.description),
+        locations: t.arrayExpression(
+          config.locations.map((l) =>
+            t.memberExpression(iDirectiveLocation, t.identifier(String(l))),
+          ),
+        ),
+        args:
+          config.args && Object.keys(config.args).length > 0
+            ? this.makeFieldArgs(config.args, `${locationHint}.args`)
+            : null,
+        isRepeatable: t.booleanLiteral(config.isRepeatable),
+        extensions: extensions(
+          this,
+          config.extensions,
+          `${config.name}.extensions`,
+        ),
+      },
+    );
     return VARIABLE_NAME;
   }
 
@@ -490,9 +546,13 @@ class CodegenFile {
     const typeDeclarationStatements = Object.values(this._types)
       .map((v) => v.declaration)
       .filter(isNotNullish);
+    const directiveDeclarationStatements = Object.values(this._directives)
+      .map((v) => v.declaration)
+      .filter(isNotNullish);
     const allStatements = [
       ...importStatements,
       ...typeDeclarationStatements,
+      ...directiveDeclarationStatements,
       ...this._statements,
     ];
     return t.file(t.program(allStatements));
@@ -536,6 +596,7 @@ export const VARIABLE_NAME = new CONSTRUCTOR(CONFIG);
 
 type GraphQLEntityName =
   | "GraphQLSchema"
+  | "GraphQLDirective"
   | "GraphQLObjectType"
   | "GraphQLInterfaceType"
   | "GraphQLUnionType"
@@ -545,6 +606,8 @@ type GraphQLEntityName =
 type ConfigForGraphQLEntity<TKey extends GraphQLEntityName> =
   TKey extends "GraphQLSchema"
     ? GraphQLSchemaConfig
+    : TKey extends "GraphQLDirective"
+    ? GraphQLDirectiveConfig
     : TKey extends "GraphQLObjectType"
     ? GraphQLObjectTypeConfig<unknown, unknown>
     : TKey extends "GraphQLInterfaceType"
@@ -814,6 +877,18 @@ export async function exportSchema(
     })
     .filter(isNotNullish);
 
+  const customDirectives = config.directives.filter(
+    (d) =>
+      ![
+        "skip",
+        "include",
+        "deprecated",
+        "specifiedBy",
+        "defer",
+        "stream",
+      ].includes(d.name),
+  );
+
   file.addStatements(
     declareGraphQLEntity(file, schemaExportName, "GraphQLSchema", {
       description: desc(config.description),
@@ -825,7 +900,14 @@ export async function exportSchema(
         ? file.declareType(config.subscription)
         : t.nullLiteral(),
       types: t.arrayExpression(types),
-      directives: null, // TODO
+      directives:
+        customDirectives.length > 0
+          ? t.arrayExpression(
+              customDirectives.map((directive) =>
+                file.declareDirective(directive),
+              ),
+            )
+          : null,
       extensions: extensions(file, config.extensions, "schema.extensions"),
       assumeValid: null, // TODO: t.booleanLiteral(true),
     }),
