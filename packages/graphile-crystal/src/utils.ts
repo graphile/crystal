@@ -348,13 +348,17 @@ export function objectSpec<
 ): GraphQLObjectTypeConfig<any, TContext> {
   const modifiedSpec: GraphQLObjectTypeConfig<any, TContext> = {
     ...spec,
-    extensions: {
-      ...spec.extensions,
-      graphile: {
-        Plan: Plan ?? undefined,
-        ...spec.extensions?.graphile,
-      },
-    },
+    ...(Plan
+      ? {
+          extensions: {
+            ...spec.extensions,
+            graphile: {
+              Plan: Plan,
+              ...spec.extensions?.graphile,
+            },
+          },
+        }
+      : null),
     fields: () => {
       const fields =
         typeof spec.fields === "function" ? spec.fields() : spec.fields;
@@ -420,11 +424,15 @@ export function objectFieldSpec<
         const { plan, ...argSpec } = args[argName];
         memo[argName] = {
           ...argSpec,
-          extensions: {
-            graphile: {
-              plan,
-            },
-          },
+          ...(plan
+            ? {
+                extensions: {
+                  graphile: {
+                    plan,
+                  },
+                },
+              }
+            : null),
         };
         return memo;
       }, {})
@@ -433,14 +441,18 @@ export function objectFieldSpec<
   return {
     ...spec,
     args: argsWithExtensions,
-    extensions: {
-      ...spec.extensions,
-      graphile: {
-        ...spec.extensions?.graphile,
-        ...(plan ? { plan } : null),
-        ...(subscribePlan ? { subscribePlan } : null),
-      },
-    },
+    ...(plan || subscribePlan
+      ? {
+          extensions: {
+            ...spec.extensions,
+            graphile: {
+              ...spec.extensions?.graphile,
+              ...(plan ? { plan } : null),
+              ...(subscribePlan ? { subscribePlan } : null),
+            },
+          },
+        }
+      : null),
   };
 }
 
@@ -540,15 +552,16 @@ export function inputObjectFieldSpec<
   >,
 ): GraphQLInputFieldConfig {
   const { plan, ...spec } = graphileSpec;
-
-  return {
-    ...spec,
-    extensions: {
-      graphile: {
-        plan,
-      },
-    },
-  };
+  return plan
+    ? {
+        ...spec,
+        extensions: {
+          graphile: {
+            plan,
+          },
+        },
+      }
+    : spec;
 }
 
 /**
