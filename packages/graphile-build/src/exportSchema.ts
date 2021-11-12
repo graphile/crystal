@@ -715,7 +715,7 @@ function func(
                 locationHint + `[$$crystalWrapped]`,
               ),
             ]
-          : [],
+          : [t.identifier("undefined")],
       );
     }
   }
