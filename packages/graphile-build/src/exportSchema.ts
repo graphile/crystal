@@ -6,22 +6,30 @@ import * as t from "@babel/types";
 import { writeFile } from "fs/promises";
 import { $$crystalWrapped } from "graphile-crystal";
 import type {
+  GraphQLArgumentConfig,
+  GraphQLEnumTypeConfig,
+  GraphQLFieldConfig,
+  GraphQLFieldConfigArgumentMap,
   GraphQLFieldConfigMap,
+  GraphQLInputObjectTypeConfig,
+  GraphQLInterfaceTypeConfig,
   GraphQLNamedType,
+  GraphQLObjectTypeConfig,
+  GraphQLScalarTypeConfig,
   GraphQLSchema,
+  GraphQLSchemaConfig,
   GraphQLType,
+  GraphQLUnionTypeConfig,
 } from "graphql";
-import { GraphQLEnumType } from "graphql";
 import {
+  GraphQLEnumType,
   GraphQLInputObjectType,
   GraphQLInterfaceType,
-  GraphQLUnionType,
-} from "graphql";
-import {
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLScalarType,
+  GraphQLUnionType,
 } from "graphql";
 import type { URL } from "url";
 import { inspect } from "util";
@@ -169,36 +177,79 @@ class CodegenFile {
     fields: GraphQLFieldConfigMap<any, any>,
     typeName: string,
   ): t.Expression {
-    const properties: t.ObjectProperty[] = [];
-    for (const fieldName in fields) {
+    const obj = Object.entries(fields).reduce((memo, [fieldName, config]) => {
       if (!fieldName.startsWith("__")) {
-        const config = fields[fieldName]!;
         const locationHint = `${typeName}.fields[${fieldName}]`;
-        properties.push(
-          t.objectProperty(
-            t.identifier(fieldName),
-            expressionObjectFieldSpec({
-              DESCRIPTION: desc(config.description),
-              TYPE: this.typeExpression(config.type),
-              ARGS: t.identifier("undefined"), // TODO
-              RESOLVE: func(this, config.resolve, `${locationHint}.resolve`),
-              SUBSCRIBE: func(
-                this,
-                config.subscribe,
-                `${locationHint}.subscribe`,
-              ),
-              DEPRECATION_REASON: desc(config.deprecationReason),
-              EXTENSIONS: extensions(
-                this,
-                config.extensions,
-                `${locationHint}.extensions`,
-              ),
-            }),
+        const mappedConfig: {
+          [key in keyof GraphQLFieldConfig<any, any> as Exclude<
+            keyof GraphQLFieldConfig<any, any>,
+            "astNode"
+          >]-?: t.Expression | null;
+        } = {
+          description: desc(config.description),
+          type: this.typeExpression(config.type),
+          args:
+            config.args && Object.keys(config.args).length > 0
+              ? this.makeFieldArgs(
+                  config.args,
+                  `${typeName}.fields[${fieldName}].args`,
+                )
+              : null,
+          resolve: config.resolve
+            ? func(this, config.resolve, `${locationHint}.resolve`)
+            : null,
+          subscribe: config.subscribe
+            ? func(this, config.subscribe, `${locationHint}.subscribe`)
+            : null,
+          deprecationReason: desc(config.deprecationReason),
+          extensions: extensions(
+            this,
+            config.extensions,
+            `${locationHint}.extensions`,
           ),
-        );
+        };
+        memo[fieldName] = configToAST(mappedConfig);
       }
-    }
-    return t.objectExpression(properties);
+      return memo;
+    }, {} as { [key: string]: t.Expression | null });
+    return t.objectExpression(objectToObjectProperties(obj));
+  }
+
+  private makeFieldArgs(
+    args: GraphQLFieldConfigArgumentMap,
+    baseLocationHint: string,
+  ): t.Expression {
+    const obj = Object.entries(args).reduce((memo, [argName, config]) => {
+      if (!argName.startsWith("__")) {
+        const locationHint = `${baseLocationHint}[${argName}]`;
+        const mappedConfig: {
+          [key in keyof GraphQLArgumentConfig as Exclude<
+            keyof GraphQLArgumentConfig,
+            "astNode"
+          >]-?: t.Expression | null;
+        } = {
+          description: desc(config.description),
+          type: this.typeExpression(config.type),
+          defaultValue:
+            config.defaultValue !== undefined
+              ? convertToAST(
+                  this,
+                  config.defaultValue,
+                  `${locationHint}.defaultValue`,
+                )
+              : null,
+          deprecationReason: desc(config.deprecationReason),
+          extensions: extensions(
+            this,
+            config.extensions,
+            `${locationHint}.extensions`,
+          ),
+        };
+        memo[argName] = configToAST(mappedConfig);
+      }
+      return memo;
+    }, {} as { [key: string]: t.Expression | null });
+    return t.objectExpression(objectToObjectProperties(obj));
   }
 
   private makeTypeDeclaration(
@@ -207,22 +258,29 @@ class CodegenFile {
   ): t.Statement {
     if (type instanceof GraphQLObjectType) {
       const config = type.toConfig();
-      return declareObjectType({
-        VARIABLE_NAME,
-        CONSTRUCTOR: this.import("graphql", "GraphQLObjectType"),
-        TYPE_NAME: t.stringLiteral(config.name),
-        DESCRIPTION: desc(config.description),
-        IS_TYPE_OF: func(this, config.isTypeOf, `${type.name}.isTypeOf`),
-        EXTENSIONS: extensions(
+      return declareGraphQLEntity(this, VARIABLE_NAME, "GraphQLObjectType", {
+        name: t.stringLiteral(config.name),
+        description: desc(config.description),
+        isTypeOf: config.isTypeOf
+          ? func(this, config.isTypeOf, `${config.name}.isTypeOf`)
+          : null,
+        extensions: extensions(
           this,
           config.extensions,
-          `${type.name}.extensions`,
+          `${config.name}.extensions`,
         ),
-        FIELDS: t.arrowFunctionExpression(
+        fields: t.arrowFunctionExpression(
           [],
           this.makeObjectFields(config.fields, config.name),
         ),
-        INTERFACES: t.arrayExpression([]), // TODO
+        interfaces:
+          config.interfaces.length > 0
+            ? t.arrayExpression(
+                config.interfaces.map((interfaceType) =>
+                  this.declareType(interfaceType),
+                ),
+              )
+            : null,
       });
     } else if (type instanceof GraphQLInterfaceType) {
       console.dir(type);
@@ -234,45 +292,42 @@ class CodegenFile {
       console.dir(type);
       throw new Error("GraphQLInputObjectType support not yet present");
     } else if (type instanceof GraphQLScalarType) {
-      return declareScalarType({
-        VARIABLE_NAME,
-        CONSTRUCTOR: this.import("graphql", "GraphQLScalarType"),
-        TYPE_NAME: t.stringLiteral(type.name),
-        DESCRIPTION: desc(type.description),
-        SPECIFIED_BY_URL: desc(type.specifiedByURL),
-        SERIALIZE: func(this, type.serialize, `${type.name}.serialize`),
-        PARSE_VALUE: func(this, type.parseValue, `${type.name}.parseValue`),
-        PARSE_LITERAL: func(
+      const config = type.toConfig();
+      return declareGraphQLEntity(this, VARIABLE_NAME, "GraphQLScalarType", {
+        name: t.stringLiteral(config.name),
+        description: desc(config.description),
+        specifiedByURL: desc(config.specifiedByURL),
+        serialize: func(this, config.serialize, `${config.name}.serialize`),
+        parseValue: func(this, config.parseValue, `${config.name}.parseValue`),
+        parseLiteral: func(
           this,
-          type.parseLiteral,
-          `${type.name}.parseLiteral`,
+          config.parseLiteral,
+          `${config.name}.parseLiteral`,
         ),
-        EXTENSIONS: extensions(
+        extensions: extensions(
           this,
-          type.extensions,
-          `${type.name}.extensions`,
+          config.extensions,
+          `${config.name}.extensions`,
         ),
       });
     } else if (type instanceof GraphQLEnumType) {
       const config = type.toConfig();
-      return declareEnumType({
-        VARIABLE_NAME,
-        CONSTRUCTOR: this.import("graphql", "GraphQLEnumType"),
-        TYPE_NAME: t.stringLiteral(config.name),
-        DESCRIPTION: desc(config.description),
-        EXTENSIONS: extensions(
+      return declareGraphQLEntity(this, VARIABLE_NAME, "GraphQLEnumType", {
+        name: t.stringLiteral(config.name),
+        description: desc(config.description),
+        extensions: extensions(
           this,
           config.extensions,
-          `${type.name}.extensions`,
+          `${config.name}.extensions`,
         ),
-        VALUES: objectNullPrototype(
+        values: objectNullPrototype(
           Object.entries(config.values).map(([key, value]) =>
             t.objectProperty(
               t.identifier(key),
               convertToAST(
                 this,
                 value,
-                `${type.name}.values[${JSON.stringify(key)}]`,
+                `${config.name}.values[${JSON.stringify(key)}]`,
               ),
             ),
           ),
@@ -370,69 +425,58 @@ const expressionObjectFieldSpec = template.expression(
   templateOptions,
 );
 
-const declareObjectType = template.statement(
-  // GraphQLObjectType
+const declareConstructorWithConfig = template.statement(
   `\
-const VARIABLE_NAME = new CONSTRUCTOR({
-  name: TYPE_NAME,
-  description: DESCRIPTION,
-  isTypeOf: IS_TYPE_OF,
-  extensions: EXTENSIONS,
-  fields: FIELDS,
-  interfaces: INTERFACES
-});
+export const VARIABLE_NAME = new CONSTRUCTOR(CONFIG);
 `,
   templateOptions,
 );
 
-const declareScalarType = template.statement(
-  // GraphQLScalarType
-  `\
-const VARIABLE_NAME = new CONSTRUCTOR({
-  name: TYPE_NAME,
-  description: DESCRIPTION,
-  specifiedByURL: SPECIFIED_BY_URL,
-  serialize: SERIALIZE,
-  parseValue: PARSE_VALUE,
-  parseLiteral: PARSE_LITERAL,
-  extensions: EXTENSIONS,
-});
-`,
-  templateOptions,
-);
+type GraphQLEntityName =
+  | "GraphQLSchema"
+  | "GraphQLObjectType"
+  | "GraphQLInterfaceType"
+  | "GraphQLUnionType"
+  | "GraphQLInputObjectType"
+  | "GraphQLScalarType"
+  | "GraphQLEnumType";
+type ConfigForGraphQLEntity<TKey extends GraphQLEntityName> =
+  TKey extends "GraphQLSchema"
+    ? GraphQLSchemaConfig
+    : TKey extends "GraphQLObjectType"
+    ? GraphQLObjectTypeConfig<unknown, unknown>
+    : TKey extends "GraphQLInterfaceType"
+    ? GraphQLInterfaceTypeConfig<unknown, unknown>
+    : TKey extends "GraphQLUnionType"
+    ? GraphQLUnionTypeConfig<unknown, unknown>
+    : TKey extends "GraphQLInputObjectType"
+    ? GraphQLInputObjectTypeConfig
+    : TKey extends "GraphQLScalarType"
+    ? GraphQLScalarTypeConfig<unknown, unknown>
+    : TKey extends "GraphQLEnumType"
+    ? GraphQLEnumTypeConfig
+    : never;
 
-const declareEnumType = template.statement(
-  // GraphQLEnumType
-  `\
-const VARIABLE_NAME = new CONSTRUCTOR({
-  name: TYPE_NAME,
-  description: DESCRIPTION,
-  values: VALUES,
-  extensions: EXTENSIONS,
-});
-`,
-  templateOptions,
-);
+function declareGraphQLEntity<TKey extends GraphQLEntityName>(
+  file: CodegenFile,
+  VARIABLE_NAME: t.Identifier,
+  constructorName: TKey,
+  config: {
+    [key in keyof ConfigForGraphQLEntity<TKey> as Exclude<
+      keyof ConfigForGraphQLEntity<TKey>,
+      "astNode" | "extensionASTNodes"
+    >]-?: t.Expression | null;
+  },
+) {
+  return declareConstructorWithConfig({
+    VARIABLE_NAME,
+    CONSTRUCTOR: file.import("graphql", constructorName),
+    CONFIG: configToAST(config),
+  });
+}
 
-const declareGraphqlSchema = template.statement(
-  // GraphQLSchema
-  `\
-export const VARIABLE_NAME = new CONSTRUCTOR({
-  description: DESCRIPTION,
-  query: QUERY,
-  mutation: MUTATION,
-  subscription: SUBSCRIPTION,
-  types: TYPES,
-  directives: DIRECTIVES,
-  extensions: EXTENSIONS,
-  assumeValid: ASSUME_VALID,
-});
-`,
-  templateOptions,
-);
-
-function desc(description: string | null | undefined): t.Expression {
-  return description ? t.stringLiteral(description) : t.nullLiteral();
+function desc(description: string | null | undefined): t.Expression | null {
+  return description ? t.stringLiteral(description) : null;
 }
 
 function convertToAST(
@@ -490,13 +534,27 @@ function convertToAST(
   }
 }
 
+function configToAST(o: {
+  [key: string]: t.Expression | null;
+}): t.ObjectExpression {
+  return t.objectExpression(objectToObjectProperties(o));
+}
+
+function objectToObjectProperties(o: {
+  [key: string]: t.Expression | null;
+}): t.ObjectProperty[] {
+  return Object.entries(o)
+    .filter(([, value]) => value != null)
+    .map(([key, value]) => t.objectProperty(t.identifier(key), value!));
+}
+
 function extensions(
   file: CodegenFile,
   extensions: object | null | undefined,
   locationHint: string,
-) {
-  if (extensions == null) {
-    return t.objectExpression([]);
+): t.Expression | null {
+  if (extensions == null || Object.keys(extensions).length === 0) {
+    return null;
   }
   return convertToAST(file, extensions, locationHint);
 }
@@ -526,7 +584,7 @@ function iife(statements: t.Statement[]): t.Expression {
 
 function func(
   file: CodegenFile,
-  fn: AnyFunction | null | undefined,
+  fn: AnyFunction,
   locationHint: string,
 ): t.Expression {
   if (fn == null) {
@@ -548,9 +606,18 @@ function func(
         "graphile-crystal",
         "crystalWrapResolve",
       );
-      return t.callExpression(iCrystalWrapResolve, [
-        func(file, crystalSpec.original, locationHint + `[$$crystalWrapped]`),
-      ]);
+      return t.callExpression(
+        iCrystalWrapResolve,
+        crystalSpec.original
+          ? [
+              func(
+                file,
+                crystalSpec.original,
+                locationHint + `[$$crystalWrapped]`,
+              ),
+            ]
+          : [],
+      );
     }
   }
 
@@ -645,24 +712,20 @@ export async function exportSchema(
     })
     .filter(isNotNullish);
 
-  const iGraphQLSchema = file.import("graphql", "GraphQLSchema");
-
   file.addStatements(
-    declareGraphqlSchema({
-      VARIABLE_NAME: schemaExportName,
-      CONSTRUCTOR: iGraphQLSchema,
-      DESCRIPTION: desc(config.description),
-      QUERY: config.query ? file.declareType(config.query) : t.nullLiteral(),
-      MUTATION: config.mutation
+    declareGraphQLEntity(file, schemaExportName, "GraphQLSchema", {
+      description: desc(config.description),
+      query: config.query ? file.declareType(config.query) : t.nullLiteral(),
+      mutation: config.mutation
         ? file.declareType(config.mutation)
         : t.nullLiteral(),
-      SUBSCRIPTION: config.subscription
+      subscription: config.subscription
         ? file.declareType(config.subscription)
         : t.nullLiteral(),
-      TYPES: t.arrayExpression(types),
-      DIRECTIVES: t.nullLiteral(), // TODO
-      EXTENSIONS: extensions(file, config.extensions, "schema.extensions"),
-      ASSUME_VALID: t.booleanLiteral(false),
+      types: t.arrayExpression(types),
+      directives: null, // TODO
+      extensions: extensions(file, config.extensions, "schema.extensions"),
+      assumeValid: null, // TODO: t.booleanLiteral(true),
     }),
   );
 
