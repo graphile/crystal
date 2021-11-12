@@ -11,6 +11,12 @@ import type {
   GraphQLSchema,
   GraphQLType,
 } from "graphql";
+import { GraphQLEnumType } from "graphql";
+import {
+  GraphQLInputObjectType,
+  GraphQLInterfaceType,
+  GraphQLUnionType,
+} from "graphql";
 import {
   GraphQLList,
   GraphQLNonNull,
@@ -218,6 +224,15 @@ class CodegenFile {
         ),
         INTERFACES: t.arrayExpression([]), // TODO
       });
+    } else if (type instanceof GraphQLInterfaceType) {
+      console.dir(type);
+      throw new Error("GraphQLInterfaceType support not yet present");
+    } else if (type instanceof GraphQLUnionType) {
+      console.dir(type);
+      throw new Error("GraphQLUnionType support not yet present");
+    } else if (type instanceof GraphQLInputObjectType) {
+      console.dir(type);
+      throw new Error("GraphQLInputObjectType support not yet present");
     } else if (type instanceof GraphQLScalarType) {
       return declareScalarType({
         VARIABLE_NAME,
@@ -238,8 +253,33 @@ class CodegenFile {
           `${type.name}.extensions`,
         ),
       });
+    } else if (type instanceof GraphQLEnumType) {
+      const config = type.toConfig();
+      return declareEnumType({
+        VARIABLE_NAME,
+        CONSTRUCTOR: this.import("graphql", "GraphQLEnumType"),
+        TYPE_NAME: t.stringLiteral(config.name),
+        DESCRIPTION: desc(config.description),
+        EXTENSIONS: extensions(
+          this,
+          config.extensions,
+          `${type.name}.extensions`,
+        ),
+        VALUES: objectNullPrototype(
+          Object.entries(config.values).map(([key, value]) =>
+            t.objectProperty(
+              t.identifier(key),
+              convertToAST(
+                this,
+                value,
+                `${type.name}.values[${JSON.stringify(key)}]`,
+              ),
+            ),
+          ),
+        ),
+      });
     } else {
-      const never /* TODO: : never*/ = type;
+      const never: never = type;
       throw new Error(
         `Did not understand type: ${(never as any).constructor.name}`,
       );
@@ -355,6 +395,19 @@ const VARIABLE_NAME = new CONSTRUCTOR({
   serialize: SERIALIZE,
   parseValue: PARSE_VALUE,
   parseLiteral: PARSE_LITERAL,
+  extensions: EXTENSIONS,
+});
+`,
+  templateOptions,
+);
+
+const declareEnumType = template.statement(
+  // GraphQLEnumType
+  `\
+const VARIABLE_NAME = new CONSTRUCTOR({
+  name: TYPE_NAME,
+  description: DESCRIPTION,
+  values: VALUES,
   extensions: EXTENSIONS,
 });
 `,
