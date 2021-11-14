@@ -59,7 +59,7 @@
     "@types/babel__template": "^7",
     "@types/debug": "^4.1.7",
     "@types/jest": "^27.0.2",
-    "graphile-schema-exporter": "^0.0.1",
+    "graphile-exporter": "^0.0.1",
     "graphql": "npm:graphql@experimental-stream-defer",
     "jest": "^27.3.1",
     "ts-node": "^10.4.0",

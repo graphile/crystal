@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import { readFile } from "fs/promises";
 import { lambda } from "graphile-crystal";
-import { exportSchema } from "graphile-schema-exporter";
+import { exportSchema } from "graphile-exporter";
 import { graphql, printSchema } from "graphql";
 import { URL } from "url";
 

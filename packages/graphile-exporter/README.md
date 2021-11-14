@@ -1,19 +1,19 @@
-# graphile-schema-exporter
+# graphile-exporter
 
 <span class="badge-patreon"><a href="https://patreon.com/benjie" title="Support Graphile development on Patreon"><img src="https://img.shields.io/badge/sponsor-via%20Patreon-orange.svg" alt="Patreon sponsor button" /></a></span>
 [![Discord chat room](https://img.shields.io/discord/489127045289476126.svg)](http://discord.gg/graphile)
-[![Package on npm](https://img.shields.io/npm/v/graphile-build.svg?style=flat)](https://www.npmjs.com/package/graphile-schema-exporter)
-![MIT license](https://img.shields.io/npm/l/graphile-schema-exporter.svg)
+[![Package on npm](https://img.shields.io/npm/v/graphile-exporter.svg?style=flat)](https://www.npmjs.com/package/graphile-exporter)
+![MIT license](https://img.shields.io/npm/l/graphile-exporter.svg)
 [![Follow](https://img.shields.io/badge/twitter-@GraphileHQ-blue.svg)](https://twitter.com/GraphileHQ)
 
-`graphile-schema-exporter` can export an in-memory GraphQL schema constructed
-with various types of tooling to an on disk executable schema using (eventually)
-a variety of formats. This is particularly useful if you want to remove the
-"build time" dependencies of building your schema and have a highly optimised
-runtime that does not require those dependencies. It's also useful for
-converting from one schema builder to another - `graphile-schema-exporter` is
-indifferent what tool was used to build the schema (so long as it's a valid
-GraphQL.js schema), but can export the schema to various tools.
+`graphile-exporter` can export an in-memory GraphQL schema constructed with
+various types of tooling to an on disk executable schema using (eventually) a
+variety of formats. This is particularly useful if you want to remove the "build
+time" dependencies of building your schema and have a highly optimised runtime
+that does not require those dependencies. It's also useful for converting from
+one schema builder to another - `graphile-exporter` is indifferent what tool was
+used to build the schema (so long as it's a valid GraphQL.js schema), but can
+export the schema to various tools.
 
 ## Caveats
 

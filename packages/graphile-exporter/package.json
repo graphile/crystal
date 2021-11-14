@@ -1,5 +1,5 @@
 {
-  "name": "graphile-schema-exporter",
+  "name": "graphile-exporter",
   "version": "0.0.1",
   "description": "Take a GraphQL schema from memory and write it to file",
   "main": "dist/index.js",
