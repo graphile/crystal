@@ -572,21 +572,6 @@ import * as VARIABLE_NAME from MODULE_NAME;
   templateOptions,
 );
 
-const expressionObjectFieldSpec = template.expression(
-  `\
-{
-  description: DESCRIPTION,
-  type: TYPE,
-  args: ARGS,
-  resolve: RESOLVE,
-  subscribe: SUBSCRIBE,
-  deprecationReason: DEPRECATION_REASON,
-  extensions: EXTENSIONS,
-}
-`,
-  templateOptions,
-);
-
 const declareConstructorWithConfig = template.statement(
   `\
 export const VARIABLE_NAME = new CONSTRUCTOR(CONFIG);
