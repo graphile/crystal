@@ -75,5 +75,3 @@ export {
   SubscriptionPlugin,
   SwallowErrorsPlugin,
 };
-
-export { exportSchema } from "./exportSchema.js";

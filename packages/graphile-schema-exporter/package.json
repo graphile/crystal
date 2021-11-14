@@ -1,10 +1,14 @@
 {
-  "name": "graphile-build",
-  "version": "5.0.0-alpha.0",
-  "description": "Build a GraphQL schema from plugins",
+  "name": "graphile-schema-exporter",
+  "version": "0.0.1",
+  "description": "Take a GraphQL schema from memory and write it to file",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./helpers": "./dist/helpers.js"
+  },
   "scripts": {
     "test": "jest -i",
     "prepack": "tsc -b"
@@ -14,52 +18,42 @@
     "url": "git+https://github.com/graphile/graphile-build.git"
   },
   "keywords": [
-    "graphile",
     "graphql",
-    "engine",
-    "apollo",
-    "graphqljs",
-    "plugin",
-    "build",
-    "extension"
+    "schema",
+    "memory",
+    "export",
+    "output",
+    "write",
+    "file",
+    "graphile"
   ],
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/graphile/graphile-build/issues"
   },
-  "homepage": "https://graphile.org/graphile-build/",
+  "homepage": "https://graphile.org/",
   "dependencies": {
     "@babel/generator": "^7.16.0",
     "@babel/parser": "^7.16.3",
     "@babel/template": "^7.16.0",
-    "@graphile/lru": "4.6.0-alpha.0",
     "@types/node": "^16.11.6",
-    "@types/pluralize": "^0.0.29",
-    "@types/semver": "^7.3.9",
-    "chalk": "^4.1.2",
-    "debug": "^4.3.2",
     "graphile-crystal": "4.7.0",
-    "pluralize": "^7.0.0",
-    "semver": "^7.3.5",
     "tslib": "^2.3.1"
   },
   "engines": {
-    "node": ">=12.16"
+    "node": ">=16"
   },
   "peerDependencies": {
     "graphql": "*"
   },
   "files": [
-    "dist",
-    "index.js"
+    "dist"
   ],
   "devDependencies": {
     "@types/babel__generator": "^7",
     "@types/babel__template": "^7",
-    "@types/debug": "^4.1.7",
     "@types/jest": "^27.0.2",
-    "graphile-schema-exporter": "^0.0.1",
     "graphql": "npm:graphql@experimental-stream-defer",
     "jest": "^27.3.1",
     "ts-node": "^10.4.0",

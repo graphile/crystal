@@ -5373,6 +5373,7 @@ __metadata:
     chalk: ^4.1.2
     debug: ^4.3.2
     graphile-crystal: 4.7.0
+    graphile-schema-exporter: ^0.0.1
     graphql: "npm:graphql@experimental-stream-defer"
     jest: ^27.3.1
     pluralize: ^7.0.0
@@ -5402,6 +5403,28 @@ __metadata:
     nodemon: ^2.0.14
     pg-sql2: 4.7.0
     spec-md: ^3.0.2
+    ts-node: ^10.4.0
+    tslib: ^2.3.1
+    typescript: next
+  peerDependencies:
+    graphql: "*"
+  languageName: unknown
+  linkType: soft
+
+"graphile-schema-exporter@^0.0.1, graphile-schema-exporter@workspace:packages/graphile-schema-exporter":
+  version: 0.0.0-use.local
+  resolution: "graphile-schema-exporter@workspace:packages/graphile-schema-exporter"
+  dependencies:
+    "@babel/generator": ^7.16.0
+    "@babel/parser": ^7.16.3
+    "@babel/template": ^7.16.0
+    "@types/babel__generator": ^7
+    "@types/babel__template": ^7
+    "@types/jest": ^27.0.2
+    "@types/node": ^16.11.6
+    graphile-crystal: 4.7.0
+    graphql: "npm:graphql@experimental-stream-defer"
+    jest: ^27.3.1
     ts-node: ^10.4.0
     tslib: ^2.3.1
     typescript: next

@@ -1,10 +1,11 @@
 import chalk from "chalk";
 import { readFile } from "fs/promises";
 import { lambda } from "graphile-crystal";
+import { exportSchema } from "graphile-schema-exporter";
 import { graphql, printSchema } from "graphql";
 import { URL } from "url";
 
-import { buildSchema, defaultPlugins, exportSchema } from "../index.js";
+import { buildSchema, defaultPlugins } from "../index.js";
 
 function FN<T>(
   t: T,

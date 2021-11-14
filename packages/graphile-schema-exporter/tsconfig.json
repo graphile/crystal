@@ -10,9 +10,5 @@
     "module": "ESNext"
   },
   "include": ["src"],
-  "references": [
-    { "path": "../lru" },
-    { "path": "../graphile-crystal" },
-    { "path": "../graphile-schema-exporter" }
-  ]
+  "references": [{ "path": "../graphile-crystal" }]
 }
