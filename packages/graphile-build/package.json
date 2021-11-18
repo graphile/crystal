@@ -2,11 +2,11 @@
   "name": "graphile-build",
   "version": "5.0.0-alpha.0",
   "description": "Build a GraphQL schema from plugins",
-  "type": "module",
+  "type": "commonjs",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "require": "./dist/index.js"
     }
   },
   "scripts": {

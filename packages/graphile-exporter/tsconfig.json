@@ -7,7 +7,7 @@
 
     "noUncheckedIndexedAccess": true,
     "moduleResolution": "Node",
-    "module": "ESNext"
+    "module": "nodenext"
   },
   "include": ["src"],
   "references": [{ "path": "../graphile-crystal" }]

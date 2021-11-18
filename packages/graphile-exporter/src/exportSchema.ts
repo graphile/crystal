@@ -38,7 +38,8 @@ import {
 import type { URL } from "url";
 import { inspect } from "util";
 
-const reallyGenerate = (generate as any).default as typeof generate;
+//const reallyGenerate = (generate as any).default as typeof generate;
+const reallyGenerate = generate;
 
 const templateOptions: TemplateBuilderOptions = {
   plugins: ["typescript"],

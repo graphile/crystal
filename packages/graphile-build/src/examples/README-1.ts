@@ -86,7 +86,7 @@ const MyRandomFieldPlugin: GraphileEngine.Plugin = (
 
   // Export schema
   // const exportFileLocation = new URL("../../temp.js", import.meta.url);
-  const exportFileLocation = new URL("../../temp.js", process.cwd());
+  const exportFileLocation = `${__dirname}/../../temp.mjs`;
   await exportSchema(schema, exportFileLocation);
 
   // output code
