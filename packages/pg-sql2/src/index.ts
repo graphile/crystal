@@ -936,9 +936,10 @@ export interface PgSQL {
   false: typeof falseNode;
   null: typeof nullNode;
   isSQL: typeof isSQL;
+  sql: PgSQL;
 }
 
-const pgSql: PgSQL = Object.assign(query, {
+const attributes = {
   escapeSqlIdentifier,
   compile,
   isEquivalent,
@@ -959,6 +960,15 @@ const pgSql: PgSQL = Object.assign(query, {
   false: falseNode,
   null: nullNode,
   isSQL,
+  sql: query as PgSQL,
+};
+
+Object.entries(attributes).forEach(([exportName, value]) => {
+  Object.defineProperty(value, "$$export", {
+    value: { moduleName: "pg-sql2", exportName },
+  });
 });
 
-export default pgSql;
+export const sql: PgSQL = Object.assign(query, attributes);
+
+export default sql;
