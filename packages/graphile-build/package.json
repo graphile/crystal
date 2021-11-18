@@ -6,7 +6,7 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "require": "./dist/index.js"
+      "node": "./dist/index.js"
     }
   },
   "scripts": {

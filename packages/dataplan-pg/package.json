@@ -2,8 +2,15 @@
   "name": "@dataplan/pg",
   "version": "4.7.0",
   "description": "PostgreSQL data plans for Graphile Crystal",
+  "type": "commonjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "node": "./dist/index.js"
+    }
+  },
   "scripts": {
     "update-schema": "ts-node ./__tests__/exampleSchema.ts",
     "test:install-schema": "psql -X1v ON_ERROR_STOP=1 -f __tests__/schema.sql -f __tests__/sequence_reset.sql \"${TEST_DATABASE_URL:-graphile_crystal}\"",
