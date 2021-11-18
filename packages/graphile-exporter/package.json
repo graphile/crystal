@@ -2,12 +2,18 @@
   "name": "graphile-exporter",
   "version": "0.0.1",
   "description": "Take a GraphQL schema from memory and write it to file",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./dist/index.js",
-    "./helpers": "./dist/helpers.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./helpers": {
+      "types": "./dist/helpers.d.ts",
+      "import": "./dist/helpers.js"
+    }
   },
   "scripts": {
     "test": "jest -i",
@@ -47,9 +53,7 @@
   "peerDependencies": {
     "graphql": "*"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "devDependencies": {
     "@types/babel__generator": "^7",
     "@types/babel__template": "^7",

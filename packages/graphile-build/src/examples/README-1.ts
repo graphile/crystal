@@ -1,22 +1,11 @@
 import chalk from "chalk";
 import { readFile } from "fs/promises";
 import { lambda } from "graphile-crystal";
-import { exportSchema } from "graphile-exporter";
+import { exportSchema, FN } from "graphile-exporter";
 import { graphql, printSchema } from "graphql";
 import { URL } from "url";
 
 import { buildSchema, defaultPlugins } from "../index.js";
-
-function FN<T>(
-  t: T,
-  $$scope: { [key: string]: any } | undefined = undefined,
-): T {
-  if ($$scope) {
-    return Object.assign(t, { $$scope });
-  } else {
-    return t;
-  }
-}
 
 declare global {
   namespace GraphileEngine {
@@ -96,7 +85,8 @@ const MyRandomFieldPlugin: GraphileEngine.Plugin = (
   console.dir(schema.toConfig());
 
   // Export schema
-  const exportFileLocation = new URL("../../temp.js", import.meta.url);
+  // const exportFileLocation = new URL("../../temp.js", import.meta.url);
+  const exportFileLocation = new URL("../../temp.js", process.cwd());
   await exportSchema(schema, exportFileLocation);
 
   // output code

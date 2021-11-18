@@ -25,9 +25,12 @@ import extend, { indent } from "./extend.js";
 import { makeInitialInflection } from "./inflection.js";
 import type SchemaBuilder from "./SchemaBuilder.js";
 
+const version = "TODO";
+/*
 const version: string = JSON.parse(
   readFileSync(new URL("../package.json", import.meta.url), "utf8"),
 ).version;
+*/
 
 export default function makeNewBuild(
   builder: SchemaBuilder<any>,

@@ -2,9 +2,13 @@
   "name": "graphile-build",
   "version": "5.0.0-alpha.0",
   "description": "Build a GraphQL schema from plugins",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "scripts": {
     "test": "jest -i",
     "prepack": "tsc -b"
@@ -45,15 +49,12 @@
     "tslib": "^2.3.1"
   },
   "engines": {
-    "node": ">=12.16"
+    "node": ">=16"
   },
   "peerDependencies": {
     "graphql": "*"
   },
-  "files": [
-    "dist",
-    "index.js"
-  ],
+  "files": ["dist", "index.js"],
   "devDependencies": {
     "@types/babel__generator": "^7",
     "@types/babel__template": "^7",

@@ -36,6 +36,7 @@
     { "path": "packages/pg-sql2" },
     { "path": "packages/graphile-build" },
     { "path": "packages/graphile-crystal" },
+    { "path": "packages/graphile-exporter" },
     { "path": "packages/dataplan-pg" }
   ]
 }
