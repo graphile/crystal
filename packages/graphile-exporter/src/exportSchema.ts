@@ -103,6 +103,8 @@ class CodegenFile {
 
   _statements: t.Statement[] = [];
 
+  _values: Map<any, t.Expression> = new Map();
+
   addStatements(statements: t.Statement | t.Statement[]): void {
     if (Array.isArray(statements)) {
       this._statements.push(...statements);
@@ -688,6 +690,27 @@ function convertToAST(
   }
 }
 
+function convertToASTOnce(
+  file: CodegenFile,
+  thing: unknown,
+  nameHint: string | null,
+  locationHint: string,
+): t.Expression {
+  const existingIdentifier = file._values.get(thing);
+  if (existingIdentifier) {
+    return existingIdentifier;
+  }
+  const variableIdentifier = file.makeVariable(nameHint || "value");
+  const ast = convertToAST(file, thing, locationHint);
+  file.addStatements(
+    t.variableDeclaration("const", [
+      t.variableDeclarator(variableIdentifier, ast),
+    ]),
+  );
+  file._values.set(thing, variableIdentifier);
+  return variableIdentifier;
+}
+
 function configToAST(o: {
   [key: string]: t.Expression | null;
 }): t.ObjectExpression {
@@ -783,26 +806,41 @@ function func(
     const funcAST = funcToAst(fn.$exporter$factory, locationHint);
     return t.callExpression(
       funcAST,
-      fn.$exporter$args.map((arg, i) =>
-        convertToAST(
+      fn.$exporter$args.map((arg, i) => {
+        const param = funcAST.params[i];
+        const paramName =
+          param && param.type === "Identifier" ? param.name : null;
+        return convertToASTOnce(
           file,
           arg,
+          paramName,
           `${locationHint}[$$scope][${JSON.stringify(i)}]`,
-        ),
-      ),
+        );
+      }),
     );
   } else {
     return funcToAst(fn, locationHint);
   }
 }
 
-function funcToAst(fn: AnyFunction, locationHint: string): t.Expression {
+function funcToAst(
+  fn: AnyFunction,
+  locationHint: string,
+): t.FunctionExpression | t.ArrowFunctionExpression {
   const funcString = fn.toString().trim();
   try {
     const result = parseExpression(funcString, {
       sourceType: "module",
       plugins: ["typescript"],
     });
+    if (
+      result.type !== "FunctionExpression" &&
+      result.type !== "ArrowFunctionExpression"
+    ) {
+      throw new Error(
+        `Expected FunctionExpression or ArrowFunctionExpression but saw ${result.type}`,
+      );
+    }
     return result;
   } catch (e) {
     try {
@@ -821,6 +859,14 @@ function funcToAst(fn: AnyFunction, locationHint: string): t.Expression {
         sourceType: "module",
         plugins: ["typescript"],
       });
+      if (
+        result.type !== "FunctionExpression" &&
+        result.type !== "ArrowFunctionExpression"
+      ) {
+        throw new Error(
+          `Expected FunctionExpression or ArrowFunctionExpression but saw ${result.type}`,
+        );
+      }
       return result;
     } catch {
       console.error(
