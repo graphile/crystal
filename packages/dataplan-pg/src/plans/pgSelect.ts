@@ -2083,8 +2083,8 @@ export function pgSelect<TDataSource extends PgSource<any, any, any, any>>(
   return new PgSelectPlan(options);
 }
 
-Object.assign(pgSelect, {
-  $$export: {
+Object.defineProperty(pgSelect, "$$export", {
+  value: {
     moduleName: "@dataplan/pg",
     exportName: "pgSelect",
   },

@@ -327,8 +327,8 @@ export function pgDelete<TDataSource extends PgSource<any, any, any, any, any>>(
   return new PgDeletePlan(source, getBy);
 }
 
-Object.assign(pgDelete, {
-  $$export: {
+Object.defineProperty(pgDelete, "$$export", {
+  value: {
     moduleName: "@dataplan/pg",
     exportName: "pgDelete",
   },

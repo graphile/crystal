@@ -348,8 +348,8 @@ export function pgSelectSingleFromRecord<
   }).single();
 }
 
-Object.assign(pgSelectSingleFromRecord, {
-  $$export: {
+Object.defineProperty(pgSelectSingleFromRecord, "$$export", {
+  value: {
     moduleName: "@dataplan/pg",
     exportName: "pgSelectSingleFromRecord",
   },

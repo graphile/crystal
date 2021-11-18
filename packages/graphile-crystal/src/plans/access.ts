@@ -238,8 +238,8 @@ export function access<TData>(
   return new AccessPlan<TData>(parentPlan, path);
 }
 
-Object.assign(access, {
-  $$export: {
+Object.defineProperty(access, "$$export", {
+  value: {
     moduleName: "graphile-crystal",
     exportName: "access",
   },

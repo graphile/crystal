@@ -33,8 +33,8 @@ export function first<TPlan extends ExecutablePlan<ReadonlyArray<any>>>(
   return new FirstPlan(plan);
 }
 
-Object.assign(first, {
-  $$export: {
+Object.defineProperty(first, "$$export", {
+  value: {
     moduleName: "graphile-crystal",
     exportName: "first",
   },

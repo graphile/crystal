@@ -78,8 +78,8 @@ export function list<TPlanTuple extends ExecutablePlan<any>[]>(
   return new ListPlan<TPlanTuple>(list);
 }
 
-Object.assign(list, {
-  $$export: {
+Object.defineProperty(list, "$$export", {
+  value: {
     moduleName: "graphile-crystal",
     exportName: "list",
   },

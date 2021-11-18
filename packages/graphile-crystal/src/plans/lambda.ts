@@ -33,8 +33,8 @@ export function lambda<TIn, TOut>(
   return new LambdaPlan<TIn, TOut>($plan, fn);
 }
 
-Object.assign(lambda, {
-  $$export: {
+Object.defineProperty(lambda, "$$export", {
+  value: {
     moduleName: "graphile-crystal",
     exportName: "lambda",
   },

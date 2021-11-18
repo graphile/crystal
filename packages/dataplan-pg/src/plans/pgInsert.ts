@@ -338,8 +338,8 @@ export function pgInsert<TDataSource extends PgSource<any, any, any, any, any>>(
   return new PgInsertPlan(source, columns);
 }
 
-Object.assign(pgInsert, {
-  $$export: {
+Object.defineProperty(pgInsert, "$$export", {
+  value: {
     moduleName: "@dataplan/pg",
     exportName: "pgInsert",
   },

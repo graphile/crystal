@@ -62,8 +62,8 @@ export function map(
   return new MapPlan(p, actualKeyByDesiredKey);
 }
 
-Object.assign(map, {
-  $$export: {
+Object.defineProperty(map, "$$export", {
+  value: {
     moduleName: "graphile-crystal",
     exportName: "map",
   },

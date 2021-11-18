@@ -72,8 +72,8 @@ export function each<
   >(listPlan, mapper);
 }
 
-Object.assign(each, {
-  $$export: {
+Object.defineProperty(each, "$$export", {
+  value: {
     moduleName: "graphile-crystal",
     exportName: "each",
   },

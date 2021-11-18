@@ -111,8 +111,8 @@ export function object<TPlans extends { [key: string]: ExecutablePlan<any> }>(
   return new ObjectPlan<TPlans>(obj);
 }
 
-Object.assign(object, {
-  $$export: {
+Object.defineProperty(object, "$$export", {
+  value: {
     moduleName: "graphile-crystal",
     exportName: "object",
   },

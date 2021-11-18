@@ -7,8 +7,8 @@ export function aether(): Aether {
   return getCurrentAether();
 }
 
-Object.assign(aether, {
-  $$export: {
+Object.defineProperty(aether, "$$export", {
+  value: {
     moduleName: "graphile-crystal",
     exportName: "aether",
   },
@@ -20,8 +20,8 @@ export function context<
   return aether().contextPlan;
 }
 
-Object.assign(context, {
-  $$export: {
+Object.defineProperty(context, "$$export", {
+  value: {
     moduleName: "graphile-crystal",
     exportName: "context",
   },
@@ -35,8 +35,8 @@ export function debugPlans<T>(callback: () => T): T {
   return result;
 }
 
-Object.assign(debugPlans, {
-  $$export: {
+Object.defineProperty(debugPlans, "$$export", {
+  value: {
     moduleName: "graphile-crystal",
     exportName: "debugPlans",
   },

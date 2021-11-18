@@ -239,8 +239,8 @@ function pgClassExpression<
   };
 }
 
-Object.assign(pgClassExpression, {
-  $$export: {
+Object.defineProperty(pgClassExpression, "$$export", {
+  value: {
     moduleName: "@dataplan/pg",
     exportName: "pgClassExpression",
   },

@@ -70,8 +70,8 @@ export function jsonParse<TJSON extends JSONValue>(
   return new JSONParsePlan<TJSON>($string);
 }
 
-Object.assign(jsonParse, {
-  $$export: {
+Object.defineProperty(jsonParse, "$$export", {
+  value: {
     moduleName: "@dataplan/json",
     exportName: "jsonParse",
   },

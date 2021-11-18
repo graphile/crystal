@@ -83,8 +83,8 @@ export function subscribe<
   );
 }
 
-Object.assign(subscribe, {
-  $$export: {
+Object.defineProperty(subscribe, "$$export", {
+  value: {
     moduleName: "graphile-crystal",
     exportName: "subscribe",
   },

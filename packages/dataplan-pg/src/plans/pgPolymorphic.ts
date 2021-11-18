@@ -135,8 +135,8 @@ export function pgPolymorphic<
   >($itemPlan, $typeSpecifierPlan, possibleTypes);
 }
 
-Object.assign(pgPolymorphic, {
-  $$export: {
+Object.defineProperty(pgPolymorphic, "$$export", {
+  value: {
     moduleName: "@dataplan/pg",
     exportName: "pgPolymorphic",
   },

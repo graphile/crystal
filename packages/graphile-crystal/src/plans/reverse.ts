@@ -47,8 +47,8 @@ export function reverse<TData>(
   return new ReversePlan<TData>(plan);
 }
 
-Object.assign(reverse, {
-  $$export: {
+Object.defineProperty(reverse, "$$export", {
+  value: {
     moduleName: "graphile-crystal",
     exportName: "reverse",
   },

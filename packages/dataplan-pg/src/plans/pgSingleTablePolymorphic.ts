@@ -68,8 +68,8 @@ export function pgSingleTablePolymorphic<
   return new PgSingleTablePolymorphicPlan<TDataSource>($typePlan, $rowPlan);
 }
 
-Object.assign(pgSingleTablePolymorphic, {
-  $$export: {
+Object.defineProperty(pgSingleTablePolymorphic, "$$export", {
+  value: {
     moduleName: "@dataplan/pg",
     exportName: "pgSingleTablePolymorphic",
   },

@@ -403,8 +403,8 @@ export function pgUpdate<TDataSource extends PgSource<any, any, any, any, any>>(
   return new PgUpdatePlan(source, getBy, columns);
 }
 
-Object.assign(pgUpdate, {
-  $$export: {
+Object.defineProperty(pgUpdate, "$$export", {
+  value: {
     moduleName: "@dataplan/pg",
     exportName: "pgUpdate",
   },
