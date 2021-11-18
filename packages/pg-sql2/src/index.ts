@@ -2,6 +2,22 @@ import LRU from "@graphile/lru";
 import * as assert from "assert";
 import { inspect } from "util";
 
+function exportAs<T>(thing: T, exportName: string) {
+  const existingExport = (thing as any).$$export;
+  if (existingExport) {
+    if (existingExport.exportName !== exportName) {
+      throw new Error(
+        `Attempted to export same thing under multiple names '${existingExport.exportName}' and '${exportName}'`,
+      );
+    }
+  } else {
+    Object.defineProperty(thing, "$$export", {
+      value: { moduleName: "pg-sql2", exportName },
+    });
+  }
+  return thing;
+}
+
 const isDev = process.env.GRAPHILE_ENV === "development";
 
 /**
@@ -199,7 +215,7 @@ export function escapeSqlIdentifier(str: string): string {
   return `"${str.replace(/"/g, '""')}"`;
 }
 
-function makeRawNode(text: string): SQLRawNode {
+function makeRawNode(text: string, exportName?: string): SQLRawNode {
   const n = CACHE_RAW_NODES.get(text);
   if (n) {
     return n;
@@ -211,11 +227,15 @@ function makeRawNode(text: string): SQLRawNode {
       )}'`,
     );
   }
-  const newNode: SQLRawNode = Object.freeze({
+  const newNode: SQLRawNode = {
     type: "RAW",
     text,
     [$$trusted]: true,
-  });
+  };
+  if (exportName) {
+    exportAs(newNode, exportName);
+  }
+  Object.freeze(newNode);
   CACHE_RAW_NODES.set(text, newNode);
   return newNode;
 }
@@ -596,10 +616,10 @@ export function value(val: SQLRawValue): SQL {
   return makeValueNode(val);
 }
 
-const trueNode = makeRawNode(`TRUE`);
-const falseNode = makeRawNode(`FALSE`);
-const nullNode = makeRawNode(`NULL`);
-export const blank = makeRawNode(``);
+const trueNode = makeRawNode(`TRUE`, "true");
+const falseNode = makeRawNode(`FALSE`, "false");
+const nullNode = makeRawNode(`NULL`, "null");
+export const blank = makeRawNode(``, "blank");
 
 /**
  * If the value is simple will inline it into the query, otherwise will defer
@@ -964,9 +984,9 @@ const attributes = {
 };
 
 Object.entries(attributes).forEach(([exportName, value]) => {
-  Object.defineProperty(value, "$$export", {
-    value: { moduleName: "pg-sql2", exportName },
-  });
+  if (!(value as any).$$export) {
+    exportAs(value, exportName);
+  }
 });
 
 export const sql: PgSQL = Object.assign(query, attributes);
