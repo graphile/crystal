@@ -38,7 +38,7 @@ const MyRandomFieldPlugin: GraphileEngine.Plugin = (
             },
           },
           plan: FN(
-            (_$parent, args) => {
+            (myDefaultMax, myDefaultMin, lambda) => (_$parent, args) => {
               return lambda(
                 args.sides,
                 (sides = myDefaultMax) =>
@@ -46,7 +46,7 @@ const MyRandomFieldPlugin: GraphileEngine.Plugin = (
                   myDefaultMin,
               );
             },
-            { myDefaultMax, myDefaultMin, lambda },
+            [myDefaultMax, myDefaultMin, lambda],
           ),
         })),
       },

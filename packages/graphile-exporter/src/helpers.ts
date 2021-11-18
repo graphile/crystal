@@ -1,10 +1,8 @@
-export function FN<T>(
-  t: T,
-  $$scope: { [key: string]: any } | undefined = undefined,
+export function FN<T, TScope extends any[]>(
+  factory: (...args: TScope) => T,
+  $$scope: [...TScope],
 ): T {
-  if ($$scope) {
-    return Object.assign(t, { $$scope });
-  } else {
-    return t;
-  }
+  const fn: T = factory(...$$scope);
+  Object.assign(fn, { $$scope, factory });
+  return fn;
 }
