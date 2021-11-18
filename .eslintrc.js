@@ -10,9 +10,17 @@ module.exports = {
     //'plugin:@typescript-eslint/recommended-requiring-type-checking',
     "plugin:import/errors",
     "plugin:import/typescript",
+    "plugin:graphile-exporter/recommended",
     "prettier",
   ],
-  plugins: ["jest", "graphql", "tsdoc", "simple-import-sort", "import"],
+  plugins: [
+    "jest",
+    "graphql",
+    "tsdoc",
+    "simple-import-sort",
+    "import",
+    "graphile-exporter",
+  ],
   env: {
     jest: true,
     node: true,
