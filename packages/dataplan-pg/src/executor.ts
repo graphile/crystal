@@ -711,3 +711,7 @@ ${"👆".repeat(30)}
     return queryResult;
   }
 }
+
+Object.defineProperty(PgExecutor, "$$export", {
+  value: { moduleName: "@dataplan/pg", exportName: "PgExecutor" },
+});

@@ -60,12 +60,14 @@ type AnyFunction = {
   displayName?: string;
 };
 
-function isExportedFn<T extends AnyFunction, TTuple extends any[]>(
-  thing: T,
-): thing is T & {
+type ExportedFromFactory<T, TTuple extends any[]> = T & {
   $exporter$args: [...TTuple];
   $exporter$factory: (...args: TTuple) => T;
-} {
+};
+
+function isExportedFromFactory<T, TTuple extends any[]>(
+  thing: T,
+): thing is ExportedFromFactory<T, TTuple> {
   return "$exporter$factory" in thing;
 }
 
@@ -659,6 +661,8 @@ function convertToAST(
   } else if (isImportable(thing)) {
     const { moduleName, exportName } = thing.$$export;
     return file.import(moduleName, exportName);
+  } else if (isExportedFromFactory(thing)) {
+    return convertToASTOnce(file, thing, null, locationHint);
   } else if (Array.isArray(thing)) {
     return t.arrayExpression(
       thing.map((entry, i) =>
@@ -701,7 +705,9 @@ function convertToASTOnce(
     return existingIdentifier;
   }
   const variableIdentifier = file.makeVariable(nameHint || "value");
-  const ast = convertToAST(file, thing, locationHint);
+  const ast = isExportedFromFactory(thing)
+    ? factoryAst(file, thing, locationHint)
+    : convertToAST(file, thing, locationHint);
   file.addStatements(
     t.variableDeclaration("const", [
       t.variableDeclarator(variableIdentifier, ast),
@@ -802,25 +808,33 @@ function func(
   // scope; e.g.:
   //
   // `(() => { const foo = 1, bar = 2; return /*>*/() => {return foo+bar}/*<*/})();`
-  if (isExportedFn(fn)) {
-    const funcAST = funcToAst(fn.$exporter$factory, locationHint);
-    return t.callExpression(
-      funcAST,
-      fn.$exporter$args.map((arg, i) => {
-        const param = funcAST.params[i];
-        const paramName =
-          param && param.type === "Identifier" ? param.name : null;
-        return convertToASTOnce(
-          file,
-          arg,
-          paramName,
-          `${locationHint}[$$scope][${JSON.stringify(i)}]`,
-        );
-      }),
-    );
+  if (isExportedFromFactory(fn)) {
+    return factoryAst(file, fn, locationHint);
   } else {
     return funcToAst(fn, locationHint);
   }
+}
+
+function factoryAst<TTuple extends any[]>(
+  file: CodegenFile,
+  fn: ExportedFromFactory<unknown, TTuple>,
+  locationHint: string,
+) {
+  const funcAST = funcToAst(fn.$exporter$factory, locationHint);
+  return t.callExpression(
+    funcAST,
+    fn.$exporter$args.map((arg, i) => {
+      const param = funcAST.params[i];
+      const paramName =
+        param && param.type === "Identifier" ? param.name : null;
+      return convertToASTOnce(
+        file,
+        arg,
+        paramName,
+        `${locationHint}[$$scope][${JSON.stringify(i)}]`,
+      );
+    }),
+  );
 }
 
 function funcToAst(

@@ -245,25 +245,35 @@ export function makeExampleSchema(
     }),
   };
 
-  const executor = new PgExecutor({
-    name: "default",
-    context: () => {
-      const $context = context<OurGraphQLContext>();
-      return object<PgExecutorContextPlans<OurGraphQLContext["pgSettings"]>>({
-        pgSettings: $context.get("pgSettings"),
-        withPgClient: $context.get("withPgClient"),
-      });
-    },
-  });
+  const executor = EXPORTABLE(
+    (PgExecutor, context, object) =>
+      new PgExecutor({
+        name: "default",
+        context: () => {
+          const $context = context<OurGraphQLContext>();
+          return object<
+            PgExecutorContextPlans<OurGraphQLContext["pgSettings"]>
+          >({
+            pgSettings: $context.get("pgSettings"),
+            withPgClient: $context.get("withPgClient"),
+          });
+        },
+      }),
+    [PgExecutor, context, object],
+  );
 
-  const uniqueAuthorCountSource = new PgSource({
-    executor,
-    codec: TYPES.int,
-    source: (...args) =>
-      sql`app_public.unique_author_count(${sql.join(args, ", ")})`,
-    name: "unique_author_count",
-    columns: null,
-  });
+  const uniqueAuthorCountSource = EXPORTABLE(
+    (PgSource, TYPES, executor, sql) =>
+      new PgSource({
+        executor,
+        codec: TYPES.int,
+        source: (...args) =>
+          sql`app_public.unique_author_count(${sql.join(args, ", ")})`,
+        name: "unique_author_count",
+        columns: null,
+      }),
+    [PgSource, TYPES, executor, sql],
+  );
 
   const forumsUniqueAuthorCountSource = new PgSource({
     executor,
