@@ -844,7 +844,16 @@ function factoryAst<TTuple extends any[]>(
     );
   });
   if (shouldOptimizeFactoryCalls) {
-    // Try and trim args from factory calls
+    /*
+     * Factories take the form of an IIFE: `((a, b, c) => ...)(x, y, z)`; where
+     * the corresponding argument names match up with the names of the values
+     * we're passing we can remove both the arg and the value and rely on it
+     * being available in the ambient scope.
+     *
+     * Further, if we get down to the situation where we have `(() => ...)()`
+     * and the `...` is not a block, then it must be an expression so we can
+     * just return it directly and get rid of the IIFE.
+     */
     const factoryArgNames = funcAST.params.map((p) =>
       p.type === "Identifier" ? p.name : null,
     );
