@@ -5,9 +5,7 @@
     "declarationDir": "./dist",
     "outDir": "./dist",
 
-    "noUncheckedIndexedAccess": false,
-    "moduleResolution": "Node",
-    "module": "ESNext"
+    "noUncheckedIndexedAccess": false
   },
   "include": ["src"],
   "references": []

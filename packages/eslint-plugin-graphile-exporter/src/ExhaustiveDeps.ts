@@ -65,11 +65,17 @@ function gatherDependenciesRecursively(
   node: (FunctionDeclaration | FunctionExpression | ArrowFunctionExpression) &
     Rule.NodeParentExtension,
   currentScope: Scope.Scope,
+  monitoredScopes: Set<Scope.Scope>,
 ) {
   for (const reference of currentScope.references) {
     // If this reference is not resolved or it is not declared in a pure
     // scope then we don't care about this reference.
     if (!reference.resolved) {
+      continue;
+    }
+
+    // If this reference is within the function then we don't care about it.
+    if (!monitoredScopes.has((reference.resolved as any).scope)) {
       continue;
     }
 
@@ -87,8 +93,8 @@ function gatherDependenciesRecursively(
     const dependency = analyzePropertyChain(dependencyNode);
 
     if (
-      dependencyNode.parent.type === "TSTypeQuery" ||
-      dependencyNode.parent.type === "TSTypeReference"
+      (dependencyNode.parent.type as string) === "TSTypeQuery" ||
+      (dependencyNode.parent.type as string) === "TSTypeReference"
     ) {
       continue;
     }
@@ -119,8 +125,39 @@ function gatherDependenciesRecursively(
   }
 
   for (const childScope of currentScope.childScopes) {
-    gatherDependenciesRecursively(dependencies, node, childScope);
+    gatherDependenciesRecursively(
+      dependencies,
+      node,
+      childScope,
+      monitoredScopes,
+    );
   }
+}
+
+function getWarningMessage(
+  deps: Set<string>,
+  singlePrefix: string,
+  label: string,
+  fixVerb: string,
+) {
+  if (deps.size === 0) {
+    return null;
+  }
+  return (
+    (deps.size > 1 ? "" : singlePrefix + " ") +
+    label +
+    " " +
+    (deps.size > 1 ? "dependencies" : "dependency") +
+    ": " +
+    joinEnglish(
+      Array.from(deps)
+        .sort()
+        .map((name) => "'" + name + "'"),
+    ) +
+    `. Either ${fixVerb} ${
+      deps.size > 1 ? "them" : "it"
+    } or remove the dependency array.`
+  );
 }
 
 export const ExhaustiveDeps: Rule.RuleModule = {
@@ -184,9 +221,16 @@ export const ExhaustiveDeps: Rule.RuleModule = {
           "eslint-plugin-graphile-exporter: could not determine scope",
         );
       }
+      const monitoredScopes = new Set<Scope.Scope>();
+      {
+        let currentScope: Scope.Scope | null = scope;
+        while ((currentScope = currentScope.upper)) {
+          monitoredScopes.add(currentScope);
+        }
+      }
 
       const dependencies: DependenciesMap = new Map();
-      gatherDependenciesRecursively(dependencies, node, scope);
+      gatherDependenciesRecursively(dependencies, node, scope, monitoredScopes);
 
       // Warn about assigning to variables in the outer scope since there's no
       // outer scope when exporting.
@@ -199,7 +243,7 @@ export const ExhaustiveDeps: Rule.RuleModule = {
         reportProblem(context, options, {
           node: writeExpr,
           message:
-            `Assignments to the '${key}' variable from inside FN ` +
+            `Assignments to the '${key}' variable from inside ` +
             `${context.getSource(fnCall)} cannot be safely exported.`,
         });
       }
@@ -225,7 +269,7 @@ export const ExhaustiveDeps: Rule.RuleModule = {
         reportProblem(context, options, {
           node: declaredDependenciesNode as unknown as ESTreeNode,
           message:
-            `FN ${context.getSource(fnCall)} was passed a ` +
+            `${context.getSource(fnCall)} was passed a ` +
             "dependency map that is not an object literal. This means we " +
             "can't statically verify whether you've passed the correct " +
             "dependencies.",
@@ -245,7 +289,7 @@ export const ExhaustiveDeps: Rule.RuleModule = {
               reportProblem(context, options, {
                 node: declaredDependencyNode as unknown as ESTreeNode,
                 message:
-                  `FN ${context.getSource(
+                  `${context.getSource(
                     fnCall,
                   )} has a spread element or method ` +
                   "in its dependency map. This means we can't " +
@@ -311,6 +355,14 @@ export const ExhaustiveDeps: Rule.RuleModule = {
         declaredDependencies,
       });
 
+      if (
+        missingDependencies.size === 0 &&
+        unnecessaryDependencies.size === 0 &&
+        duplicateDependencies.size === 0
+      ) {
+        return;
+      }
+
       let suggestedDeps = suggestedDependencies;
 
       // If we're going to report a missing dependency,
@@ -337,36 +389,10 @@ export const ExhaustiveDeps: Rule.RuleModule = {
         suggestedDeps.sort();
       }
 
-      function getWarningMessage(
-        deps: Set<string>,
-        singlePrefix: string,
-        label: string,
-        fixVerb: string,
-      ) {
-        if (deps.size === 0) {
-          return null;
-        }
-        return (
-          (deps.size > 1 ? "" : singlePrefix + " ") +
-          label +
-          " " +
-          (deps.size > 1 ? "dependencies" : "dependency") +
-          ": " +
-          joinEnglish(
-            Array.from(deps)
-              .sort()
-              .map((name) => "'" + name + "'"),
-          ) +
-          `. Either ${fixVerb} ${
-            deps.size > 1 ? "them" : "it"
-          } or remove the dependency array.`
-        );
-      }
-
       reportProblem(context, options, {
         node: declaredDependenciesNode as unknown as ESTreeNode,
         message:
-          `FN ${context.getSource(fnCall)} has ` +
+          `${context.getSource(fnCall)} has ` +
           // To avoid a long message, show the next actionable item.
           (getWarningMessage(missingDependencies, "a", "missing", "include") ||
             getWarningMessage(
