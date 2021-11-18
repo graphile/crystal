@@ -68,7 +68,7 @@ type ExportedFromFactory<T, TTuple extends any[]> = T & {
 function isExportedFromFactory<T, TTuple extends any[]>(
   thing: T,
 ): thing is ExportedFromFactory<T, TTuple> {
-  return "$exporter$factory" in thing;
+  return thing != null && "$exporter$factory" in thing;
 }
 
 const BUILTINS = ["Int", "Float", "Boolean", "ID", "String"];
@@ -662,7 +662,16 @@ function convertToAST(
     const { moduleName, exportName } = thing.$$export;
     return file.import(moduleName, exportName);
   } else if (isExportedFromFactory(thing)) {
-    return convertToASTOnce(file, thing, null, locationHint);
+    const thingAsAny = thing as any;
+    const thingConstructor = thingAsAny.constructor;
+    const thingConstructorName =
+      thingConstructor?.name ?? thingConstructor?.displayName ?? null;
+    const thingName = (thing as any).name ?? (thing as any).displayName ?? null;
+    const name =
+      thingConstructorName && thingName
+        ? `${thingName}${thingConstructorName}`
+        : thingName ?? thingConstructorName ?? null;
+    return convertToASTOnce(file, thing, name, locationHint);
   } else if (Array.isArray(thing)) {
     return t.arrayExpression(
       thing.map((entry, i) =>
