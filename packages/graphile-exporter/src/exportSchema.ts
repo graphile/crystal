@@ -60,10 +60,13 @@ type AnyFunction = {
   displayName?: string;
 };
 
-function hasScope<T extends AnyFunction>(
+function isExportedFn<T extends AnyFunction, TTuple extends any[]>(
   thing: T,
-): thing is T & { $$scope: { [variableName: string]: any } } {
-  return "$$scope" in thing;
+): thing is T & {
+  $exporter$args: [...TTuple];
+  $exporter$factory: (...args: TTuple) => T;
+} {
+  return "$exporter$factory" in thing;
 }
 
 const BUILTINS = ["Int", "Float", "Boolean", "ID", "String"];
@@ -776,38 +779,20 @@ function func(
   // scope; e.g.:
   //
   // `(() => { const foo = 1, bar = 2; return /*>*/() => {return foo+bar}/*<*/})();`
-  const funcAST = funcToAst(fn, locationHint);
-  const scope = hasScope(fn) ? fn.$$scope : null;
-  const scopeKeys = scope ? Object.keys(scope) : null;
-  const variableDeclarations =
-    scope && scopeKeys
-      ? scopeKeys
-          .map((key) => {
-            const value = scope[key];
-            const convertedValue = convertToAST(
-              file,
-              value,
-              `${locationHint}[$$scope][${JSON.stringify(key)}]`,
-            );
-            if (
-              convertedValue.type === "Identifier" &&
-              convertedValue.name === key
-            ) {
-              // The import is sufficient for it to be in scope
-              return null;
-            }
-            return t.variableDeclarator(t.identifier(key), convertedValue);
-          })
-          .filter(isNotNullish)
-      : [];
-
-  if (variableDeclarations.length > 0) {
-    return iife([
-      t.variableDeclaration("const", variableDeclarations),
-      t.returnStatement(funcAST),
-    ]);
+  if (isExportedFn(fn)) {
+    const funcAST = funcToAst(fn.$exporter$factory, locationHint);
+    return t.callExpression(
+      funcAST,
+      fn.$exporter$args.map((arg, i) =>
+        convertToAST(
+          file,
+          arg,
+          `${locationHint}[$$scope][${JSON.stringify(i)}]`,
+        ),
+      ),
+    );
   } else {
-    return funcAST;
+    return funcToAst(fn, locationHint);
   }
 }
 
