@@ -126,22 +126,18 @@ type NullableUnless<
 export function makeExampleSchema(
   options: { deoptimize?: boolean } = Object.create(null),
 ): GraphQLSchema {
-  const deoptimizeIf = FN(
-    () =>
-      (
-        plan: PgSelectPlan<any> | PgSelectSinglePlan<any>,
-        deoptimize: boolean | undefined,
-      ) => {
-        if (deoptimize) {
-          if ("getClassPlan" in plan) {
-            plan.getClassPlan().setInliningForbidden();
-          } else {
-            plan.setInliningForbidden();
-          }
+  const deoptimizeIfAppropriate = FN(
+    (options) => (plan: PgSelectPlan<any> | PgSelectSinglePlan<any>) => {
+      if (options.deoptimize) {
+        if ("getClassPlan" in plan) {
+          plan.getClassPlan().setInliningForbidden();
+        } else {
+          plan.setInliningForbidden();
         }
-        return plan;
-      },
-    [],
+      }
+      return plan;
+    },
+    [options],
   );
   // type MessagesPlan = PgSelectPlan<typeof messageSource>;
   type MessageConnectionPlan = PgConnectionPlan<typeof messageSource>;
@@ -1138,7 +1134,7 @@ export function makeExampleSchema(
       type,
       plan($entity: PgSelectSinglePlan<TMyDataSource>) {
         const $plan = $entity.singleRelation(relation);
-        deoptimizeIf($plan, options.deoptimize);
+        deoptimizeIfAppropriate($plan);
         return $plan;
       },
     };
@@ -1205,17 +1201,17 @@ export function makeExampleSchema(
       mostRecentForum: {
         type: Forum,
         plan: FN(
-          (pgSelect, usersMostRecentForumSource, deoptimizeIf, options) =>
+          (pgSelect, usersMostRecentForumSource, deoptimizeIfAppropriate) =>
             ($user) => {
               const $forum = pgSelect({
                 source: usersMostRecentForumSource,
                 args: [{ plan: $user.record() }],
                 identifiers: [],
               }).single();
-              deoptimizeIf($forum, options.deoptimize);
+              deoptimizeIfAppropriate($forum);
               return $forum;
             },
-          [pgSelect, usersMostRecentForumSource, deoptimizeIf, options],
+          [pgSelect, usersMostRecentForumSource, deoptimizeIfAppropriate],
         ),
       },
 
@@ -1306,7 +1302,7 @@ export function makeExampleSchema(
         type: User,
         plan($message) {
           const $user = $message.singleRelation("author");
-          deoptimizeIf($user, options.deoptimize);
+          deoptimizeIfAppropriate($user);
 
           return $user;
         },
@@ -1770,7 +1766,7 @@ export function makeExampleSchema(
         plan($forum) {
           const $forumId = $forum.get("id");
           const $messages = messageSource.find({ forum_id: $forumId });
-          deoptimizeIf($messages, options.deoptimize);
+          deoptimizeIfAppropriate($messages);
           $messages.setTrusted();
           // $messages.leftJoin(...);
           // $messages.innerJoin(...);
@@ -1833,7 +1829,7 @@ export function makeExampleSchema(
             forum_id: $forum.get("id"),
           });
           $messages.setTrusted();
-          deoptimizeIf($messages, options.deoptimize);
+          deoptimizeIfAppropriate($messages);
           // $messages.leftJoin(...);
           // $messages.innerJoin(...);
           // $messages.relation('fk_messages_author_id')
@@ -1887,7 +1883,7 @@ export function makeExampleSchema(
               sql`app_public.forums_random_user(${sql.join(args, ", ")})`,
             name: "forums_random_user",
           }).single();
-          deoptimizeIf($user, options.deoptimize);
+          deoptimizeIfAppropriate($user);
           return $user;
         },
       },
@@ -1904,7 +1900,7 @@ export function makeExampleSchema(
               },
             ],
           });
-          deoptimizeIf($messages, options.deoptimize);
+          deoptimizeIfAppropriate($messages);
           return $messages;
         },
       },
@@ -1936,31 +1932,24 @@ export function makeExampleSchema(
     pgPolymorphic($item, $item.get("type"), {
       RelationalTopic: {
         match: (t) => t === "TOPIC",
-        plan: () =>
-          deoptimizeIf($item.singleRelation("topic"), options.deoptimize),
+        plan: () => deoptimizeIfAppropriate($item.singleRelation("topic")),
       },
       RelationalPost: {
         match: (t) => t === "POST",
-        plan: () =>
-          deoptimizeIf($item.singleRelation("post"), options.deoptimize),
+        plan: () => deoptimizeIfAppropriate($item.singleRelation("post")),
       },
       RelationalDivider: {
         match: (t) => t === "DIVIDER",
-        plan: () =>
-          deoptimizeIf($item.singleRelation("divider"), options.deoptimize),
+        plan: () => deoptimizeIfAppropriate($item.singleRelation("divider")),
       },
       RelationalChecklist: {
         match: (t) => t === "CHECKLIST",
-        plan: () =>
-          deoptimizeIf($item.singleRelation("checklist"), options.deoptimize),
+        plan: () => deoptimizeIfAppropriate($item.singleRelation("checklist")),
       },
       RelationalChecklistItem: {
         match: (t) => t === "CHECKLIST_ITEM",
         plan: () =>
-          deoptimizeIf(
-            $item.singleRelation("checklistItem"),
-            options.deoptimize,
-          ),
+          deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
       },
     });
 
@@ -1968,31 +1957,24 @@ export function makeExampleSchema(
     pgPolymorphic($item, $item.get("type"), {
       UnionTopic: {
         match: (t) => t === "TOPIC",
-        plan: () =>
-          deoptimizeIf($item.singleRelation("topic"), options.deoptimize),
+        plan: () => deoptimizeIfAppropriate($item.singleRelation("topic")),
       },
       UnionPost: {
         match: (t) => t === "POST",
-        plan: () =>
-          deoptimizeIf($item.singleRelation("post"), options.deoptimize),
+        plan: () => deoptimizeIfAppropriate($item.singleRelation("post")),
       },
       UnionDivider: {
         match: (t) => t === "DIVIDER",
-        plan: () =>
-          deoptimizeIf($item.singleRelation("divider"), options.deoptimize),
+        plan: () => deoptimizeIfAppropriate($item.singleRelation("divider")),
       },
       UnionChecklist: {
         match: (t) => t === "CHECKLIST",
-        plan: () =>
-          deoptimizeIf($item.singleRelation("checklist"), options.deoptimize),
+        plan: () => deoptimizeIfAppropriate($item.singleRelation("checklist")),
       },
       UnionChecklistItem: {
         match: (t) => t === "CHECKLIST_ITEM",
         plan: () =>
-          deoptimizeIf(
-            $item.singleRelation("checklistItem"),
-            options.deoptimize,
-          ),
+          deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
       },
     });
 
@@ -2000,21 +1982,16 @@ export function makeExampleSchema(
     pgPolymorphic($item, $item.get("type"), {
       RelationalPost: {
         match: (t) => t === "POST",
-        plan: () =>
-          deoptimizeIf($item.singleRelation("post"), options.deoptimize),
+        plan: () => deoptimizeIfAppropriate($item.singleRelation("post")),
       },
       RelationalChecklist: {
         match: (t) => t === "CHECKLIST",
-        plan: () =>
-          deoptimizeIf($item.singleRelation("checklist"), options.deoptimize),
+        plan: () => deoptimizeIfAppropriate($item.singleRelation("checklist")),
       },
       RelationalChecklistItem: {
         match: (t) => t === "CHECKLIST_ITEM",
         plan: () =>
-          deoptimizeIf(
-            $item.singleRelation("checklistItem"),
-            options.deoptimize,
-          ),
+          deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
       },
     });
 
@@ -2090,7 +2067,7 @@ export function makeExampleSchema(
             const $items: SingleTableItemsPlan = singleTableItemsSource.find({
               author_id: $personId,
             });
-            deoptimizeIf($items, options.deoptimize);
+            deoptimizeIfAppropriate($items);
             return each($items, ($item) => singleTableItemInterface($item));
           },
         },
@@ -2102,7 +2079,7 @@ export function makeExampleSchema(
             const $items: RelationalItemsPlan = relationalItemsSource.find({
               author_id: $personId,
             });
-            deoptimizeIf($items, options.deoptimize);
+            deoptimizeIfAppropriate($items);
             return each($items, ($item) => relationalItemInterface($item));
           },
         },
@@ -2166,7 +2143,7 @@ export function makeExampleSchema(
       type: SingleTableItem,
       plan($entity: SingleTableItemPlan) {
         const $plan = $entity.singleRelation("parent");
-        deoptimizeIf($plan, options.deoptimize);
+        deoptimizeIfAppropriate($plan);
         return singleTableItemInterface($plan);
       },
     },
@@ -2297,7 +2274,7 @@ export function makeExampleSchema(
       type: RelationalItem,
       plan($entity: PgSelectSinglePlan<TDataSource>) {
         const $plan = $entity.singleRelation("parent");
-        deoptimizeIf($plan, options.deoptimize);
+        deoptimizeIfAppropriate($plan);
         return relationalItemInterface($plan);
       },
     },
@@ -2490,7 +2467,7 @@ export function makeExampleSchema(
         type: new GraphQLList(Forum),
         plan(_$root) {
           const $forums = forumSource.find();
-          deoptimizeIf($forums, options.deoptimize);
+          deoptimizeIfAppropriate($forums);
           return $forums;
         },
         args: {
@@ -2522,7 +2499,7 @@ export function makeExampleSchema(
         type: Forum,
         plan(_$root, args) {
           const $forum = forumSource.get({ id: args.id });
-          deoptimizeIf($forum, options.deoptimize);
+          deoptimizeIfAppropriate($forum);
           return $forum;
         },
         args: {
@@ -2535,7 +2512,7 @@ export function makeExampleSchema(
         type: Message,
         plan(_$root, args) {
           const $message = messageSource.get({ id: args.id });
-          deoptimizeIf($message, options.deoptimize);
+          deoptimizeIfAppropriate($message);
           return $message;
         },
         args: {
@@ -2653,7 +2630,7 @@ export function makeExampleSchema(
         },
         plan() {
           const $messages = messageSource.find();
-          deoptimizeIf($messages, options.deoptimize);
+          deoptimizeIfAppropriate($messages);
           // $messages.leftJoin(...);
           // $messages.innerJoin(...);
           // $messages.relation('fk_messages_author_id')
@@ -2686,7 +2663,7 @@ export function makeExampleSchema(
               },
             ],
           });
-          deoptimizeIf($plan, options.deoptimize);
+          deoptimizeIfAppropriate($plan);
           return $plan.single().getSelfNamed();
         },
       },
@@ -2729,7 +2706,7 @@ export function makeExampleSchema(
             from: sql`app_public.random_user()`,
             name: "random_user",
           });
-          deoptimizeIf($users, options.deoptimize);
+          deoptimizeIfAppropriate($users);
           return $users.single();
         },
       },
@@ -2741,7 +2718,7 @@ export function makeExampleSchema(
             source: featuredMessages,
             identifiers: [],
           });
-          deoptimizeIf($messages, options.deoptimize);
+          deoptimizeIfAppropriate($messages);
           return $messages;
         },
       },
@@ -2749,7 +2726,7 @@ export function makeExampleSchema(
         type: new GraphQLList(Person),
         plan() {
           const $people = personSource.find();
-          deoptimizeIf($people, options.deoptimize);
+          deoptimizeIfAppropriate($people);
           return $people;
         },
       },
@@ -2902,7 +2879,7 @@ export function makeExampleSchema(
               },
             ],
           });
-          deoptimizeIf($plan, options.deoptimize);
+          deoptimizeIfAppropriate($plan);
           return each($plan, ($item) => entityUnion($item.record()));
         },
       },
