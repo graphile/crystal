@@ -824,26 +824,46 @@ function func(
   }
 }
 
+const shouldOptimizeFactoryCalls = true;
+
 function factoryAst<TTuple extends any[]>(
   file: CodegenFile,
   fn: ExportedFromFactory<unknown, TTuple>,
   locationHint: string,
 ) {
-  const funcAST = funcToAst(fn.$exporter$factory, locationHint);
-  return t.callExpression(
-    funcAST,
-    fn.$exporter$args.map((arg, i) => {
-      const param = funcAST.params[i];
-      const paramName =
-        param && param.type === "Identifier" ? param.name : null;
-      return convertToASTOnce(
-        file,
-        arg,
-        paramName,
-        `${locationHint}[$$scope][${JSON.stringify(i)}]`,
-      );
-    }),
-  );
+  const factory = fn.$exporter$factory;
+  const funcAST = funcToAst(factory, locationHint);
+  const depArgs = fn.$exporter$args.map((arg, i) => {
+    const param = funcAST.params[i];
+    const paramName = param && param.type === "Identifier" ? param.name : null;
+    return convertToASTOnce(
+      file,
+      arg,
+      paramName,
+      `${locationHint}[$$scope][${JSON.stringify(i)}]`,
+    );
+  });
+  if (shouldOptimizeFactoryCalls) {
+    // Try and trim args from factory calls
+    const factoryArgNames = funcAST.params.map((p) =>
+      p.type === "Identifier" ? p.name : null,
+    );
+    const depArgsNames = depArgs.map((d) =>
+      d.type === "Identifier" ? d.name : null,
+    );
+    for (let i = factoryArgNames.length - 1; i >= 0; i--) {
+      if (factoryArgNames[i] === depArgsNames[i]) {
+        funcAST.params.splice(i, 1);
+        depArgs.splice(i, 1);
+      }
+    }
+    if (funcAST.params.length === 0 && funcAST.body.type !== "BlockStatement") {
+      return funcAST.body;
+    }
+    return t.callExpression(funcAST, depArgs);
+  } else {
+    return t.callExpression(funcAST, depArgs);
+  }
 }
 
 function funcToAst(
