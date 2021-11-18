@@ -1204,16 +1204,19 @@ export function makeExampleSchema(
       gravatarUrl: attrField("gravatar_url", GraphQLString),
       mostRecentForum: {
         type: Forum,
-        plan($user) {
-          const $forum = pgSelect({
-            source: usersMostRecentForumSource,
-            args: [{ plan: $user.record() }],
-            identifiers: [],
-          }).single();
-          deoptimizeIfAppropriate($forum);
-          deoptimizeIf($forum, options.deoptimize);
-          return $forum;
-        },
+        plan: FN(
+          (pgSelect, usersMostRecentForumSource, deoptimizeIf, options) =>
+            ($user) => {
+              const $forum = pgSelect({
+                source: usersMostRecentForumSource,
+                args: [{ plan: $user.record() }],
+                identifiers: [],
+              }).single();
+              deoptimizeIf($forum, options.deoptimize);
+              return $forum;
+            },
+          [pgSelect, usersMostRecentForumSource, deoptimizeIf, options],
+        ),
       },
 
       // This field is to test standard resolvers work on planned types
