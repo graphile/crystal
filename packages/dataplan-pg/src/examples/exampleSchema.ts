@@ -30,7 +30,7 @@ import {
   resolveType,
   subscribe,
 } from "graphile-crystal";
-import { FN } from "graphile-exporter";
+import { EXPORTABLE } from "graphile-exporter";
 import type { GraphQLOutputType } from "graphql";
 import {
   GraphQLBoolean,
@@ -126,7 +126,7 @@ type NullableUnless<
 export function makeExampleSchema(
   options: { deoptimize?: boolean } = Object.create(null),
 ): GraphQLSchema {
-  const deoptimizeIfAppropriate = FN(
+  const deoptimizeIfAppropriate = EXPORTABLE(
     (options) => (plan: PgSelectPlan<any> | PgSelectSinglePlan<any>) => {
       if (options.deoptimize) {
         if ("getClassPlan" in plan) {
@@ -1200,7 +1200,7 @@ export function makeExampleSchema(
       gravatarUrl: attrField("gravatar_url", GraphQLString),
       mostRecentForum: {
         type: Forum,
-        plan: FN(
+        plan: EXPORTABLE(
           (pgSelect, usersMostRecentForumSource, deoptimizeIfAppropriate) =>
             ($user) => {
               const $forum = pgSelect({

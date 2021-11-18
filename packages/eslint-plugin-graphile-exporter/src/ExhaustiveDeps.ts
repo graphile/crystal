@@ -417,7 +417,7 @@ export const ExhaustiveDeps: Rule.RuleModule = {
       CallExpression(node) {
         const callbackIndex = getScopesCallbackIndex(node.callee);
         if (callbackIndex === -1) {
-          // Not a FN call that needs deps.
+          // Not a EXPORTABLE call that needs deps.
           return;
         }
         const callback = node.arguments[callbackIndex];
@@ -428,7 +428,7 @@ export const ExhaustiveDeps: Rule.RuleModule = {
         if (!callback) {
           reportProblem(context, options, {
             node: fnCall as unknown as ESTreeNode,
-            message: `FN must wrap a function.`,
+            message: `EXPORTABLE must wrap a function.`,
           });
           return;
         }
@@ -438,7 +438,7 @@ export const ExhaustiveDeps: Rule.RuleModule = {
           reportProblem(context, options, {
             node: fnCall as unknown as ESTreeNode,
             message:
-              `FN does nothing when called with ` +
+              `EXPORTABLE does nothing when called with ` +
               `only one argument. Did you forget to pass an array of ` +
               `dependencies?`,
           });
@@ -463,7 +463,7 @@ export const ExhaustiveDeps: Rule.RuleModule = {
             reportProblem(context, options, {
               node: fnCall as unknown as ESTreeNode,
               message:
-                `FN received a function whose dependencies ` +
+                `EXPORTABLE received a function whose dependencies ` +
                 `are unknown. Pass an inline function instead.`,
             });
             return; // Handled
@@ -704,12 +704,12 @@ function analyzePropertyChain(node: Node | ESTreeNode): string {
 }
 
 /**
- * Returns 0 if this is a FN call, -1 otherwise.
+ * Returns 0 if this is a EXPORTABLE call, -1 otherwise.
  */
 function getScopesCallbackIndex(
   node: Expression | Super | ESTreeExpression | ESTreeSuper,
 ) {
-  if (node.type === "Identifier" && node.name === "FN") {
+  if (node.type === "Identifier" && node.name === "EXPORTABLE") {
     return 0;
   } else {
     return -1;

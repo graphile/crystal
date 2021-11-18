@@ -1,2 +1,2 @@
 export { exportSchema } from "./exportSchema.js";
-export { FN } from "./helpers.js";
+export { EXPORTABLE } from "./helpers.js";
