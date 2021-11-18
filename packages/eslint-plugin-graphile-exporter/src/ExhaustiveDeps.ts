@@ -74,7 +74,7 @@ function gatherDependenciesRecursively(
       continue;
     }
 
-    // If this reference is within the function then we don't care about it.
+    // If this reference is _defined_ within the function then we don't care about it.
     if (!monitoredScopes.has((reference.resolved as any).scope)) {
       continue;
     }
@@ -257,12 +257,30 @@ export const ExhaustiveDeps: Rule.RuleModule = {
         });
       });
 
-      // TODO: change this to a Map/object
+      const argNames: Array<string | null> = [];
+      const invalid = node.params.some((arg) => {
+        if (arg.type !== "Identifier") {
+          reportProblem(context, options, {
+            node: arg as unknown as ESTreeNode,
+            message: `${context.getSource(
+              fnCall,
+            )} has an argument which isn't a plain identifier, we don't support this currently.`,
+          });
+          argNames.push(null);
+          return true;
+        }
+        argNames.push(arg.name);
+        return false;
+      });
+      if (invalid) {
+        return;
+      }
+
       const declaredDependencies: Array<{
         key: string;
-        node: ObjectProperty & Rule.NodeParentExtension;
+        node: Expression & Rule.NodeParentExtension;
       }> = [];
-      if (declaredDependenciesNode.type !== "ObjectExpression") {
+      if (declaredDependenciesNode.type !== "ArrayExpression") {
         // If the declared dependencies is not an object expression then we
         // can't verify that the user provided the correct dependencies. Tell
         // the user this in an error.
@@ -270,84 +288,57 @@ export const ExhaustiveDeps: Rule.RuleModule = {
           node: declaredDependenciesNode as unknown as ESTreeNode,
           message:
             `${context.getSource(fnCall)} was passed a ` +
-            "dependency map that is not an object literal. This means we " +
+            "dependency map that is not an array. This means we " +
             "can't statically verify whether you've passed the correct " +
             "dependencies.",
         });
       } else {
-        declaredDependenciesNode.properties.forEach(
-          (declaredDependencyNode) => {
+        declaredDependenciesNode.elements.forEach(
+          (declaredDependencyNode, i) => {
             // Skip elided elements.
             if (declaredDependencyNode === null) {
               return;
             }
             // If we see a spread element then add a special warning.
-            if (
-              declaredDependencyNode.type === "SpreadElement" ||
-              declaredDependencyNode.type === "ObjectMethod"
-            ) {
+            if (declaredDependencyNode.type === "SpreadElement") {
               reportProblem(context, options, {
                 node: declaredDependencyNode as unknown as ESTreeNode,
                 message:
-                  `${context.getSource(
-                    fnCall,
-                  )} has a spread element or method ` +
+                  `${context.getSource(fnCall)} has a spread element ` +
                   "in its dependency map. This means we can't " +
                   "statically verify whether you've passed the " +
                   "correct dependencies.",
               });
               return;
             }
-            // Try to normalize the declared dependency. If we can't then an error
-            // will be thrown. We will catch that error and report an error.
-            const { key, value } = declaredDependencyNode;
-            const keyString =
-              key.type === "Identifier"
-                ? key.name
-                : key.type === "StringLiteral"
-                ? key.value
-                : null;
-            const valueIdentifierString =
-              value.type === "Identifier" ? value.name : null;
-            if (typeof keyString !== "string") {
-              reportProblem(context, options, {
-                node: declaredDependencyNode as unknown as ESTreeNode,
-                message: `Could not decode key.`,
-              });
-              return;
-            }
-            if (typeof valueIdentifierString !== "string") {
-              reportProblem(context, options, {
-                node: declaredDependencyNode as unknown as ESTreeNode,
-                message: `The value for every entry in the dependencies map should be a simple identifier with the same name as the key; received a complex value.`,
-              });
-              return;
-            }
-            if (keyString !== valueIdentifierString) {
-              reportProblem(context, options, {
-                node: declaredDependencyNode as unknown as ESTreeNode,
-                message: `The value for every entry in the dependencies map should be a simple identifier with the same name as the key; ${JSON.stringify(
-                  keyString,
-                )} !== ${JSON.stringify(valueIdentifierString)}.`,
-              });
-              return;
-            }
 
-            const declaredDependency = keyString;
+            const argName = argNames[i] || `_unknownArg${i}`;
 
             // Add the dependency to our declared dependency map.
             declaredDependencies.push({
-              key: declaredDependency,
-              node: declaredDependencyNode as ObjectProperty &
+              key: argName,
+              node: declaredDependencyNode as Expression &
                 Rule.NodeParentExtension,
             });
           },
         );
+        if (node.params.length !== declaredDependenciesNode.elements.length) {
+          reportProblem(context, options, {
+            node: declaredDependenciesNode as unknown as ESTreeNode,
+            message: `${context.getSource(
+              fnCall,
+            )} has different arguments count (${
+              node.params.length
+            }) versus dependencies count (${
+              declaredDependenciesNode.elements.length
+            }); this is invalid.`,
+          });
+        }
       }
 
       const {
         suggestedDependencies,
-        unnecessaryDependencies,
+        //unnecessaryDependencies,
         missingDependencies,
         duplicateDependencies,
       } = collectRecommendations({
@@ -357,23 +348,26 @@ export const ExhaustiveDeps: Rule.RuleModule = {
 
       if (
         missingDependencies.size === 0 &&
-        unnecessaryDependencies.size === 0 &&
+        //unnecessaryDependencies.size === 0 &&
         duplicateDependencies.size === 0
       ) {
         return;
       }
 
-      let suggestedDeps = suggestedDependencies;
+      let suggestedDeps = [...argNames, ...suggestedDependencies];
 
       // If we're going to report a missing dependency,
       // we might as well recalculate the list ignoring
       // the currently specified deps. This can result
       // in some extra deduplication.
-      if (missingDependencies.size > 0) {
-        suggestedDeps = collectRecommendations({
-          dependencies,
-          declaredDependencies: [], // Pretend we don't know
-        }).suggestedDependencies;
+      if (missingDependencies.size > 0 || true) {
+        suggestedDeps = [
+          ...argNames,
+          ...collectRecommendations({
+            dependencies,
+            declaredDependencies: [], // Pretend we don't know
+          }).suggestedDependencies,
+        ];
       }
 
       // Alphabetize the suggestions, but only if deps were already alphabetized.
@@ -395,12 +389,12 @@ export const ExhaustiveDeps: Rule.RuleModule = {
           `${context.getSource(fnCall)} has ` +
           // To avoid a long message, show the next actionable item.
           (getWarningMessage(missingDependencies, "a", "missing", "include") ||
-            getWarningMessage(
+            /*getWarningMessage(
               unnecessaryDependencies,
               "an",
               "unnecessary",
               "exclude",
-            ) ||
+            ) || */
             getWarningMessage(duplicateDependencies, "a", "duplicate", "omit")),
         suggest: [
           {
@@ -494,7 +488,7 @@ function collectRecommendations({
   dependencies: DependenciesMap;
   declaredDependencies: Array<{
     key: string;
-    node: ObjectProperty & Rule.NodeParentExtension;
+    node: Expression & Rule.NodeParentExtension;
   }>;
 }) {
   // Our primary data structure.
