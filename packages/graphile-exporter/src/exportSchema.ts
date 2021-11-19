@@ -697,7 +697,7 @@ function convertToAST(
       thingConstructorName && thingName
         ? `${thingName}${thingConstructorName}`
         : thingName ?? thingConstructorName ?? null;
-    return convertToASTOnce(file, thing, name, locationHint);
+    return convertToIdentifierViaAST(file, thing, name, locationHint);
   } else if (Array.isArray(thing)) {
     return t.arrayExpression(
       thing.map((entry, i) =>
@@ -729,7 +729,7 @@ function convertToAST(
   }
 }
 
-function convertToASTOnce(
+function convertToIdentifierViaAST(
   file: CodegenFile,
   thing: unknown,
   nameHint: string | null,
@@ -739,22 +739,29 @@ function convertToASTOnce(
   if (existingIdentifier) {
     return existingIdentifier;
   }
+  if (isImportable(thing)) {
+    const { moduleName, exportName } = thing.$$export;
+    return file.import(moduleName, exportName);
+  }
+
+  // Prevent infinite loop by declaring the variableIdentifier immediately
+  const variableIdentifier = file.makeVariable(nameHint || "value");
+  file._values.set(thing, variableIdentifier);
+
   const ast = isExportedFromFactory(thing)
     ? factoryAst(file, thing, locationHint)
     : convertToAST(file, thing, locationHint);
   if (ast.type === "Identifier") {
-    file._values.set(thing, ast);
-    return ast;
-  } else {
-    const variableIdentifier = file.makeVariable(nameHint || "value");
-    file.addStatements(
-      t.variableDeclaration("const", [
-        t.variableDeclarator(variableIdentifier, ast),
-      ]),
+    console.warn(
+      `graphile-exporter error: AST returned an identifier '${ast.name}'; this could cause an infinite loop.`,
     );
-    file._values.set(thing, variableIdentifier);
-    return variableIdentifier;
   }
+  file.addStatements(
+    t.variableDeclaration("const", [
+      t.variableDeclarator(variableIdentifier, ast),
+    ]),
+  );
+  return variableIdentifier;
 }
 
 function configToAST(o: {
@@ -867,7 +874,7 @@ function factoryAst<TTuple extends any[]>(
   const depArgs = fn.$exporter$args.map((arg, i) => {
     const param = funcAST.params[i];
     const paramName = param && param.type === "Identifier" ? param.name : null;
-    return convertToASTOnce(
+    return convertToIdentifierViaAST(
       file,
       arg,
       paramName,
