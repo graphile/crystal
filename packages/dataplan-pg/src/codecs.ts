@@ -2,6 +2,7 @@ import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type { PgSourceColumns } from "./datasource";
+import { exportAs } from "./exportAs";
 import type { PgEnumTypeCodec, PgTypeCodec } from "./interfaces";
 
 // TODO: optimisation: `identity` can be shortcut
@@ -59,6 +60,7 @@ export function recordType(
     columns,
   };
 }
+exportAs(recordType, "recordType");
 
 export function enumType<TValue extends string>(
   identifier: SQL,
@@ -71,6 +73,7 @@ export function enumType<TValue extends string>(
     values,
   };
 }
+exportAs(enumType, "enumType");
 
 export const TYPES = {
   boolean: t<boolean>("bool"),
@@ -84,3 +87,4 @@ export const TYPES = {
   uuid: t<string>("uuid"),
   timestamptz: t<Date, Date | string>("text"),
 };
+exportAs(TYPES, "TYPES");

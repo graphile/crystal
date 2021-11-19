@@ -22,6 +22,7 @@ import type {
   PgExecutorMutationOptions,
   PgExecutorOptions,
 } from "./executor";
+import { exportAs } from "./exportAs";
 import type { PgEnumTypeCodec, PgTypeCodec, PlanByUniques } from "./interfaces";
 import type { PgSelectPlan } from "./plans/pgSelect";
 import { pgSelect } from "./plans/pgSelect";
@@ -382,8 +383,10 @@ export class PgSource<
     }
     if (typeof via === "string") {
       // Check
-      const relation: PgSourceRelation<PgSource<any, any, any, any, any>, any> =
-        this.getRelation(via);
+      const relation: PgSourceRelation<
+        PgSource<any, any, any, any, any>,
+        any
+      > = this.getRelation(via);
       if (!relation) {
         throw new Error(`Unknown relation '${via}' in ${this}`);
       }
@@ -531,6 +534,7 @@ export class PgSource<
     return this.executor.executeMutation<TData>(options);
   }
 }
+exportAs(PgSource, "PgSource");
 
 export interface PgEnumSourceExtensions {}
 
@@ -547,3 +551,4 @@ export class PgEnumSource<TValue extends string> {
     this.extensions = options.extensions || {};
   }
 }
+exportAs(PgEnumSource, "PgEnumSource");
