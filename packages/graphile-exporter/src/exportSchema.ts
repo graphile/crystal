@@ -908,13 +908,16 @@ function funcToAst(
       result.type !== "ArrowFunctionExpression"
     ) {
       if (result.type === "ClassExpression") {
-        throw new Error(
-          `We don't support exporting classes directly, instead you should mark your class as importable via:
+        throw Object.assign(
+          new Error(
+            `We don't support exporting classes directly, instead you should mark your class as importable via:
 Object.defineProperty(${
-            result.id?.name ?? "MyClass"
-          }, '$$export', { value: { moduleName: 'my-module', exportName: '${
-            result.id?.name ?? "MyClass"
-          }' } });`,
+              result.id?.name ?? "MyClass"
+            }, '$$export', { value: { moduleName: 'my-module', exportName: '${
+              result.id?.name ?? "MyClass"
+            }' } });`,
+          ),
+          { retry: false },
         );
       }
       throw new Error(
@@ -923,6 +926,9 @@ Object.defineProperty(${
     }
     return result;
   } catch (e) {
+    if (e.retry === false) {
+      throw e;
+    }
     try {
       // Parsing failed; so it's not any of these:
       //
