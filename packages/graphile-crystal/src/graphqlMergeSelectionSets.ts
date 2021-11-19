@@ -1,10 +1,9 @@
 import type {
   GraphQLInterfaceType,
   GraphQLObjectType,
-  SelectionNode} from "graphql";
-import {
-  Kind
+  SelectionNode,
 } from "graphql";
+import { Kind } from "graphql";
 import { inspect } from "util";
 
 import type { Aether } from "./aether";
