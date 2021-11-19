@@ -10,7 +10,6 @@ import type {
   FunctionExpression,
   Identifier,
   Node,
-  ObjectProperty,
   OptionalMemberExpression,
   SpreadElement,
   Super,
@@ -23,35 +22,11 @@ import type {
   Super as ESTreeSuper,
 } from "estree";
 
-declare module "eslint" {
-  namespace Rule {
-    interface RuleMetaData {
-      hasSuggestions: boolean;
-    }
-    interface RuleContext {
-      getSource(node: Expression | ESTreeExpression): string;
-    }
-  }
-}
+import { reportProblem } from "./common";
 
 interface CommonOptions {
   disableAutofix: boolean;
   sortExports: boolean;
-}
-
-function reportProblem(
-  context: Rule.RuleContext,
-  options: CommonOptions,
-  problem: Rule.ReportDescriptor,
-) {
-  if (options.disableAutofix !== true) {
-    // Used to enable legacy behavior. Dangerous.
-    // Keep this as an option until major IDEs upgrade (including VSCode FB ESLint extension).
-    if (Array.isArray(problem.suggest) && problem.suggest.length > 0) {
-      problem.fix = problem.suggest[0].fix;
-    }
-  }
-  context.report(problem);
 }
 
 type DependenciesMap = Map<
