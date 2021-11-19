@@ -1684,28 +1684,33 @@ export function makeExampleSchema(
     }
   }
 
-  class BooleanFilterPlan extends ModifierPlan<ClassFilterPlan> {
-    private conditions: SQL[] = [];
+  const BooleanFilterPlan = EXPORTABLE(
+    (ModifierPlan) =>
+      class BooleanFilterPlan extends ModifierPlan<ClassFilterPlan> {
+        private conditions: SQL[] = [];
 
-    constructor(
-      $classFilterPlan: ClassFilterPlan,
-      public readonly expression: SQL,
-    ) {
-      super($classFilterPlan);
-    }
+        constructor(
+          $classFilterPlan: ClassFilterPlan,
+          public readonly expression: SQL,
+        ) {
+          super($classFilterPlan);
+        }
 
-    placeholder($plan: ExecutablePlan<any>, type: SQL): SQL {
-      return this.$parent.placeholder($plan, type);
-    }
+        placeholder($plan: ExecutablePlan<any>, type: SQL): SQL {
+          return this.$parent.placeholder($plan, type);
+        }
 
-    where(condition: SQL) {
-      this.conditions.push(condition);
-    }
+        where(condition: SQL) {
+          this.conditions.push(condition);
+        }
 
-    apply() {
-      this.conditions.forEach((condition) => this.$parent.where(condition));
-    }
-  }
+        apply() {
+          this.conditions.forEach((condition) => this.$parent.where(condition));
+        }
+      },
+    [ModifierPlan],
+  );
+  type BooleanFilterPlan = InstanceType<typeof BooleanFilterPlan>;
 
   const BooleanFilter = newInputObjectTypeBuilder<
     OurGraphQLContext,
