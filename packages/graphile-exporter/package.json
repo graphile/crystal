@@ -53,7 +53,9 @@
   "peerDependencies": {
     "graphql": "*"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
     "@types/babel__generator": "^7",
     "@types/babel__template": "^7",

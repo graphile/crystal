@@ -55,7 +55,10 @@
   "peerDependencies": {
     "graphql": "*"
   },
-  "files": ["dist", "index.js"],
+  "files": [
+    "dist",
+    "index.js"
+  ],
   "devDependencies": {
     "@types/babel__generator": "^7",
     "@types/babel__template": "^7",
