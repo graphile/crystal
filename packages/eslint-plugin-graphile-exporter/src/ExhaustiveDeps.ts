@@ -36,6 +36,7 @@ declare module "eslint" {
 
 interface CommonOptions {
   disableAutofix: boolean;
+  sortExports: boolean;
 }
 
 function reportProblem(
@@ -164,9 +165,7 @@ function getWarningMessage(
         .sort()
         .map((name) => "'" + name + "'"),
     ) +
-    `. Either ${fixVerb} ${
-      deps.size > 1 ? "them" : "it"
-    } or remove the dependency array.`
+    `. You should ${fixVerb} ${deps.size > 1 ? "them" : "it"}.`
   );
 }
 
@@ -186,8 +185,12 @@ export const ExhaustiveDeps: Rule.RuleModule = {
         type: "object",
         additionalProperties: false,
         disableAutofix: false,
+        sortExports: false,
         properties: {
           disableAutofix: {
+            type: "boolean",
+          },
+          sortExports: {
             type: "boolean",
           },
         },
@@ -196,9 +199,11 @@ export const ExhaustiveDeps: Rule.RuleModule = {
   },
   create(context) {
     const disableAutofix = context.options?.[0]?.disableAutofix ?? false;
+    const sortExports = context.options?.[0]?.sortExports ?? false;
 
     const options: CommonOptions = {
       disableAutofix,
+      sortExports,
     };
 
     const scopeManager = context.getSourceCode().scopeManager;
@@ -360,40 +365,25 @@ export const ExhaustiveDeps: Rule.RuleModule = {
         declaredDependencies,
       });
 
+      const suggestedDeps = [
+        ...collectRecommendations({
+          dependencies,
+          declaredDependencies: [], // Pretend we don't know
+        }).suggestedDependencies,
+      ].sort();
+
+      const declaredDependencyNames = declaredDependencies.map((d) => d.key);
+      const isSorted =
+        suggestedDeps.length === declaredDependencyNames.length &&
+        suggestedDeps.every((name, i) => name === declaredDependencyNames[i]);
+
       if (
         missingDependencies.size === 0 &&
         unnecessaryDependencies.size === 0 &&
-        duplicateDependencies.size === 0
+        duplicateDependencies.size === 0 &&
+        (isSorted || !options.sortExports)
       ) {
         return;
-      }
-
-      let suggestedDeps = [...suggestedDependencies].sort();
-
-      // If we're going to report a missing dependency,
-      // we might as well recalculate the list ignoring
-      // the currently specified deps. This can result
-      // in some extra deduplication.
-      if (missingDependencies.size > 0 || 3 > 2) {
-        suggestedDeps = [
-          ...collectRecommendations({
-            dependencies,
-            declaredDependencies: [], // Pretend we don't know
-          }).suggestedDependencies,
-        ].sort();
-      }
-
-      // Alphabetize the suggestions, but only if deps were already alphabetized.
-      function areDeclaredDepsAlphabetized() {
-        if (declaredDependencies.length === 0) {
-          return true;
-        }
-        const declaredDepKeys = declaredDependencies.map((dep) => dep.key);
-        const sortedDeclaredDepKeys = declaredDepKeys.slice().sort();
-        return declaredDepKeys.join(",") === sortedDeclaredDepKeys.join(",");
-      }
-      if (areDeclaredDepsAlphabetized()) {
-        suggestedDeps.sort();
       }
 
       reportProblem(context, options, {
@@ -408,7 +398,13 @@ export const ExhaustiveDeps: Rule.RuleModule = {
               "unnecessary",
               "exclude",
             ) ||
-            getWarningMessage(duplicateDependencies, "a", "duplicate", "omit")),
+            getWarningMessage(
+              duplicateDependencies,
+              "a",
+              "duplicate",
+              "omit",
+            ) ||
+            "incorrectly ordered dependencies."),
         suggest: [
           {
             desc: `Update the dependencies array to be: [${suggestedDeps.join(

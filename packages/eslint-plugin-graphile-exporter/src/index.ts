@@ -6,7 +6,13 @@ export const configs = {
   recommended: {
     plugins: ["graphile-exporter"],
     rules: {
-      "graphile-exporter/exhaustive-deps": "error",
+      "graphile-exporter/exhaustive-deps": [
+        "error",
+        {
+          disableAutofix: false,
+          sortExports: true,
+        },
+      ],
     },
   },
 };
