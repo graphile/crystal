@@ -185,7 +185,7 @@ function processNode(
       console.debug(
         `Spotted 'plan' on object defined at ${
           parentObject.loc
-            ? `${parentObject.loc.source ?? "unknown"}:${
+            ? `${context.getPhysicalFilename()}:${
                 parentObject.loc.start.line
               }:${parentObject.loc.start.column}`
             : "unknown location"
