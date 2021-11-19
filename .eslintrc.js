@@ -61,6 +61,10 @@ module.exports = {
     "@typescript-eslint/no-inferrable-types": "warn",
     "no-inner-declarations": "warn",
 
+    // Rules we've disabled for now because they're so noisy (but we should really address)
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+
     /*
      * simple-import-sort seems to be the most stable import sorting currently,
      * disable others
