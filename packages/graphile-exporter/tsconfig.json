@@ -10,5 +10,5 @@
     "module": "nodenext"
   },
   "include": ["src"],
-  "references": [{ "path": "../graphile-crystal" }]
+  "references": [{ "path": "../graphile-crystal" }, { "path": "../pg-sql2" }]
 }

@@ -51,7 +51,8 @@
     "node": ">=16"
   },
   "peerDependencies": {
-    "graphql": "*"
+    "graphql": "*",
+    "pg-sql2": "*"
   },
   "files": [
     "dist"

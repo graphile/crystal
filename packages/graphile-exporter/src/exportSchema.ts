@@ -35,6 +35,7 @@ import {
   GraphQLScalarType,
   GraphQLUnionType,
 } from "graphql";
+import { sql } from "pg-sql2";
 import type { URL } from "url";
 import { inspect } from "util";
 
@@ -698,6 +699,12 @@ function convertToAST(
         ? `${thingName}${thingConstructorName}`
         : thingName ?? thingConstructorName ?? null;
     return convertToIdentifierViaAST(file, thing, name, locationHint);
+  } else if (sql.isSQL(thing)) {
+    throw new Error(
+      `Exporting of 'sql' values is not supported, please wrap in EXPORTABLE: ${
+        sql.compile(thing).text
+      }`,
+    );
   } else if (Array.isArray(thing)) {
     return t.arrayExpression(
       thing.map((entry, i) =>
