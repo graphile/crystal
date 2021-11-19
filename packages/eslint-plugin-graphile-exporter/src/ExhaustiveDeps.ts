@@ -474,6 +474,25 @@ export const ExhaustiveDeps: Rule.RuleModule = {
               `EXPORTABLE does nothing when called with ` +
               `only one argument. Did you forget to pass an array of ` +
               `dependencies?`,
+            suggest: [
+              {
+                desc: "Add dependencies array",
+
+                fix(fixer) {
+                  // Add `, []` just before the `)` for the call.
+                  const sourceCode = context.getSourceCode();
+                  const nextToken = sourceCode.getTokenAfter(callback);
+                  const hasComma =
+                    nextToken &&
+                    nextToken.value === "," &&
+                    nextToken.type === "Punctuator";
+                  return fixer.replaceTextRange(
+                    [node.range![1] - 1, node.range![1] - 1],
+                    `${hasComma ? `` : `, `}[]`,
+                  );
+                },
+              },
+            ],
           });
           return;
         }
