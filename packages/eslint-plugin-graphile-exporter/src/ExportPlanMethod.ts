@@ -153,7 +153,7 @@ function processNode(
                       ),
                       fixer.replaceTextRange(
                         [node.range![1], node.range![1]],
-                        ")",
+                        ", [])",
                       ),
                     ];
                   } else {
@@ -165,7 +165,7 @@ function processNode(
                       ),
                       fixer.replaceTextRange(
                         [value.range![1], value.range![1]],
-                        ")",
+                        ", [])",
                       ),
                     ];
                   }
