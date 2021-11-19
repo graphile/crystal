@@ -688,10 +688,10 @@ function collectRecommendations({
 
 /**
  * Assuming () means the passed/returned node:
- * (props) => (props)
- * props.(foo) => (props.foo)
- * props.foo.(bar) => (props).foo.bar
- * props.foo.bar.(baz) => (props).foo.bar.baz
+ * `(props) => (props)`
+ * `props.(foo) => (props.foo)`
+ * `props.foo.(bar) => (props).foo.bar`
+ * `props.foo.bar.(baz) => (props).foo.bar.baz`
  */
 function getDependency(
   node: (Node | ESTreeNode) & Rule.NodeParentExtension,
