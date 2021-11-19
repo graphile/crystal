@@ -38,6 +38,21 @@ import {
 import type { URL } from "url";
 import { inspect } from "util";
 
+function trimDef(def: string): string {
+  const str = def.replace(/\s+/g, " ");
+  const PREFIX_LENGTH = 60;
+  const SUFFIX_LENGTH = 10;
+  if (str.length < PREFIX_LENGTH + SUFFIX_LENGTH + 10) {
+    return str;
+  } else {
+    return (
+      str.substring(0, 0 + PREFIX_LENGTH) +
+      "..." +
+      str.substring(str.length - SUFFIX_LENGTH)
+    );
+  }
+}
+
 //const reallyGenerate = (generate as any).default as typeof generate;
 const reallyGenerate = generate;
 
@@ -935,7 +950,9 @@ Object.defineProperty(${
       return result;
     } catch {
       console.error(
-        `Function export error - failed to process function definition '${fn.toString()}'`,
+        `Function export error - failed to process function definition '${trimDef(
+          fn.toString(),
+        )}'`,
       );
       throw e;
     }
