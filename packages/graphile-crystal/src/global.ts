@@ -1,5 +1,4 @@
 import type { Aether } from "./aether";
-import { isDev } from "./dev";
 
 export interface GlobalState {
   aether: Aether;
@@ -10,9 +9,6 @@ let globalState: GlobalState | null = null;
 
 export function getGlobalState(): GlobalState {
   if (!globalState) {
-    if (isDev) {
-      debugger;
-    }
     throw new Error(
       `getGlobalState called at inappropriate time - there is no global state right now.`,
     );

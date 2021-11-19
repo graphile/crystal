@@ -10,8 +10,6 @@ import type {
   ObjectFieldNode,
   ValueNode,
 } from "graphql";
-import { Kind } from "graphql";
-import { GraphQLObjectType } from "graphql";
 import {
   GraphQLBoolean,
   GraphQLEnumType,
@@ -21,8 +19,10 @@ import {
   GraphQLInt,
   GraphQLList,
   GraphQLNonNull,
+  GraphQLObjectType,
   GraphQLScalarType,
   GraphQLString,
+  Kind,
 } from "graphql";
 import { inspect } from "util";
 

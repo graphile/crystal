@@ -1,4 +1,4 @@
-/* eslint-disable no-console,curly */
+/* eslint-disable no-console,curly,@typescript-eslint/ban-types */
 import FatalError from "./fatal-error";
 import PgLogicalDecoding, {
   changeToPk,
