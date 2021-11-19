@@ -105,4 +105,5 @@ export {
 } from "./utils";
 
 // Handy for debugging
+export { isDev, noop } from "./dev";
 export { getCurrentParentPathIdentity } from "./global";

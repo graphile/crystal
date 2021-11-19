@@ -1,6 +1,5 @@
 import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
-import { ExecutablePlan } from "graphile-crystal";
-import { isDev } from "graphile-crystal/src/dev";
+import { ExecutablePlan, isDev } from "graphile-crystal";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 import { inspect } from "util";

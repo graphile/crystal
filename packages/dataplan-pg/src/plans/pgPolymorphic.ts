@@ -4,8 +4,7 @@ import type {
   PolymorphicData,
   PolymorphicPlan,
 } from "graphile-crystal";
-import { ExecutablePlan, polymorphicWrap } from "graphile-crystal";
-import { isDev } from "graphile-crystal/src/dev";
+import { ExecutablePlan, isDev, polymorphicWrap } from "graphile-crystal";
 import type { GraphQLObjectType } from "graphql";
 import { inspect } from "util";
 
