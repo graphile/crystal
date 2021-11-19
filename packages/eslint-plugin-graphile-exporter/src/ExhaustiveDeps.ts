@@ -66,6 +66,12 @@ function gatherDependenciesRecursively(
     Rule.NodeParentExtension,
   currentScope: Scope.Scope,
   monitoredScopes: Set<Scope.Scope>,
+  rootNode: (
+    | FunctionDeclaration
+    | FunctionExpression
+    | ArrowFunctionExpression
+  ) &
+    Rule.NodeParentExtension,
 ) {
   for (const reference of currentScope.references) {
     // If this reference is not resolved or it is not declared in a pure
@@ -75,7 +81,10 @@ function gatherDependenciesRecursively(
     }
 
     // If this reference is _defined_ within the function then we don't care about it.
-    if (!monitoredScopes.has((reference.resolved as any).scope)) {
+    if (
+      !monitoredScopes.has((reference.resolved as any).scope) &&
+      reference.resolved.defs[0].node !== rootNode
+    ) {
       continue;
     }
 
@@ -130,6 +139,7 @@ function gatherDependenciesRecursively(
       node,
       childScope,
       monitoredScopes,
+      rootNode,
     );
   }
 }
@@ -228,7 +238,13 @@ export const ExhaustiveDeps: Rule.RuleModule = {
       }
 
       const dependencies: DependenciesMap = new Map();
-      gatherDependenciesRecursively(dependencies, node, scope, monitoredScopes);
+      gatherDependenciesRecursively(
+        dependencies,
+        node,
+        scope,
+        monitoredScopes,
+        node,
+      );
 
       // Warn about assigning to variables in the outer scope since there's no
       // outer scope when exporting.
@@ -336,7 +352,7 @@ export const ExhaustiveDeps: Rule.RuleModule = {
 
       const {
         suggestedDependencies,
-        //unnecessaryDependencies,
+        unnecessaryDependencies,
         missingDependencies,
         duplicateDependencies,
       } = collectRecommendations({
@@ -346,13 +362,13 @@ export const ExhaustiveDeps: Rule.RuleModule = {
 
       if (
         missingDependencies.size === 0 &&
-        //unnecessaryDependencies.size === 0 &&
+        unnecessaryDependencies.size === 0 &&
         duplicateDependencies.size === 0
       ) {
         return;
       }
 
-      let suggestedDeps = [...argNames, ...suggestedDependencies].sort();
+      let suggestedDeps = [...suggestedDependencies].sort();
 
       // If we're going to report a missing dependency,
       // we might as well recalculate the list ignoring
@@ -360,12 +376,11 @@ export const ExhaustiveDeps: Rule.RuleModule = {
       // in some extra deduplication.
       if (missingDependencies.size > 0 || 3 > 2) {
         suggestedDeps = [
-          ...argNames,
           ...collectRecommendations({
             dependencies,
             declaredDependencies: [], // Pretend we don't know
           }).suggestedDependencies,
-        ];
+        ].sort();
       }
 
       // Alphabetize the suggestions, but only if deps were already alphabetized.
@@ -387,12 +402,12 @@ export const ExhaustiveDeps: Rule.RuleModule = {
           `${context.getSource(fnCall)} has ` +
           // To avoid a long message, show the next actionable item.
           (getWarningMessage(missingDependencies, "a", "missing", "include") ||
-            /*getWarningMessage(
+            getWarningMessage(
               unnecessaryDependencies,
               "an",
               "unnecessary",
               "exclude",
-            ) || */
+            ) ||
             getWarningMessage(duplicateDependencies, "a", "duplicate", "omit")),
         suggest: [
           {
