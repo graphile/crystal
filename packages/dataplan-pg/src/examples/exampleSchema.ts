@@ -3405,7 +3405,7 @@ export function makeExampleSchema(
           },
         },
         type: ForumMessageSubscriptionPayload,
-        subscribePlan(_$root, args) {
+        subscribePlan: EXPORTABLE((context, jsonParse, lambda, subscribe) => function subscribePlan(_$root, args) {
           const $forumId = args.forumId as InputStaticLeafPlan<number>;
           const $topic = lambda($forumId, (id) => `forum:${id}:message`);
           const $pgSubscriber = context<OurGraphQLContext>().get(
@@ -3413,7 +3413,7 @@ export function makeExampleSchema(
           ) as AccessPlan<CrystalSubscriber>;
 
           return subscribe($pgSubscriber, $topic, jsonParse);
-        },
+        }, [context, jsonParse, lambda, subscribe]),
         plan: EXPORTABLE(() => function plan($event) {
           return $event;
         }, []),
