@@ -399,12 +399,15 @@ export const ExhaustiveDeps: Rule.RuleModule = {
                 const preferredArgs = `(${suggestedDeps.join(", ")})`;
                 if (node.type === "ArrowFunctionExpression") {
                   let prefix = "";
-                  const suffix = " => ";
+                  let suffix = " => ";
                   if (node.async) {
                     prefix = "async " + prefix;
                   }
                   if (node.generator) {
                     prefix = "generator " + prefix;
+                  }
+                  if (node.body.type === "ObjectExpression") {
+                    suffix = suffix + "(";
                   }
                   fixArgs.push(
                     fixer.replaceTextRange(
