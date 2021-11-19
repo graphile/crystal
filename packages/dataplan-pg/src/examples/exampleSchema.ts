@@ -207,44 +207,53 @@ export function makeExampleSchema(
     };
   };
 
-  const userColumns = {
-    id: col({ notNull: true, codec: TYPES.uuid }),
-    username: col({ notNull: true, codec: TYPES.citext }),
-    gravatar_url: col({ codec: TYPES.text }),
-    created_at: col({ notNull: true, codec: TYPES.timestamptz }),
-  };
+  const userColumns = EXPORTABLE(
+    (TYPES, col) => ({
+      id: col({ notNull: true, codec: TYPES.uuid }),
+      username: col({ notNull: true, codec: TYPES.citext }),
+      gravatar_url: col({ codec: TYPES.text }),
+      created_at: col({ notNull: true, codec: TYPES.timestamptz }),
+    }),
+    [TYPES, col],
+  );
 
-  const forumColumns = {
-    id: col({ notNull: true, codec: TYPES.uuid }),
-    name: col({ notNull: true, codec: TYPES.citext }),
-    archived_at: col({ codec: TYPES.timestamptz }),
-    is_archived: col({
-      codec: TYPES.boolean,
-      expression: (alias) => sql`${alias}.archived_at is not null`,
+  const forumColumns = EXPORTABLE(
+    (TYPES, col, sql) => ({
+      id: col({ notNull: true, codec: TYPES.uuid }),
+      name: col({ notNull: true, codec: TYPES.citext }),
+      archived_at: col({ codec: TYPES.timestamptz }),
+      is_archived: col({
+        codec: TYPES.boolean,
+        expression: (alias) => sql`${alias}.archived_at is not null`,
+      }),
     }),
-  };
+    [TYPES, col, sql],
+  );
 
-  const messageColumns = {
-    id: col({ notNull: true, codec: TYPES.uuid }),
-    body: col({ notNull: true, codec: TYPES.text }),
-    author_id: col({
-      notNull: true,
-      codec: TYPES.uuid,
-      identicalVia: { relation: "author", attribute: "person_id" },
+  const messageColumns = EXPORTABLE(
+    (TYPES, col, sql) => ({
+      id: col({ notNull: true, codec: TYPES.uuid }),
+      body: col({ notNull: true, codec: TYPES.text }),
+      author_id: col({
+        notNull: true,
+        codec: TYPES.uuid,
+        identicalVia: { relation: "author", attribute: "person_id" },
+      }),
+      forum_id: col({
+        notNull: true,
+        codec: TYPES.uuid,
+        identicalVia: { relation: "forum", attribute: "id" },
+      }),
+      created_at: col({ notNull: true, codec: TYPES.timestamptz }),
+      archived_at: col({ codec: TYPES.timestamptz }),
+      featured: col({ codec: TYPES.boolean }),
+      is_archived: col({
+        codec: TYPES.boolean,
+        expression: (alias) => sql`${alias}.archived_at is not null`,
+      }),
     }),
-    forum_id: col({
-      notNull: true,
-      codec: TYPES.uuid,
-      identicalVia: { relation: "forum", attribute: "id" },
-    }),
-    created_at: col({ notNull: true, codec: TYPES.timestamptz }),
-    archived_at: col({ codec: TYPES.timestamptz }),
-    featured: col({ codec: TYPES.boolean }),
-    is_archived: col({
-      codec: TYPES.boolean,
-      expression: (alias) => sql`${alias}.archived_at is not null`,
-    }),
-  };
+    [TYPES, col, sql],
+  );
 
   const executor = EXPORTABLE(
     (PgExecutor, context, object) =>
@@ -371,39 +380,47 @@ export function makeExampleSchema(
     [forumSource, messageSourceBuilder, userSource],
   );
 
-  const featuredMessages = messageSource.alternativeSource({
-    name: "featured_messages",
-    source: (...args) =>
-      sql`app_public.featured_messages(${sql.join(args, ", ")})`,
-  });
-
-  const forumsFeaturedMessages = messageSource.alternativeSource({
-    name: "forums_featured_messages",
-    source: (...args) =>
-      sql`app_public.forums_featured_messages(${sql.join(args, ", ")})`,
-  });
-
-  const unionEntityColumns = {
-    person_id: col({ codec: TYPES.int, notNull: false }),
-    post_id: col({ codec: TYPES.int, notNull: false }),
-    comment_id: col({ codec: TYPES.int, notNull: false }),
-  };
-
-  const personBookmarkColumns = {
-    id: col({ codec: TYPES.int, notNull: true }),
-    person_id: col({
-      codec: TYPES.int,
-      notNull: true,
-      identicalVia: { relation: "person", attribute: "id" },
+  const featuredMessages = EXPORTABLE((messageSource, sql) => messageSource.alternativeSource({
+      name: "featured_messages",
+      source: (...args) =>
+        sql`app_public.featured_messages(${sql.join(args, ", ")})`,
     }),
-    bookmarked_entity: col({
-      codec: recordType(
-        sql`interfaces_and_unions.union__entity`,
-        unionEntityColumns,
-      ),
-      notNull: true,
+  [messageSource, sql]);
+
+  const forumsFeaturedMessages = EXPORTABLE((messageSource, sql) => messageSource.alternativeSource({
+      name: "forums_featured_messages",
+      source: (...args) =>
+        sql`app_public.forums_featured_messages(${sql.join(args, ", ")})`,
     }),
-  };
+  [messageSource, sql]);
+
+  const unionEntityColumns = EXPORTABLE(
+    (TYPES, col) => ({
+      person_id: col({ codec: TYPES.int, notNull: false }),
+      post_id: col({ codec: TYPES.int, notNull: false }),
+      comment_id: col({ codec: TYPES.int, notNull: false }),
+    }),
+    [TYPES, col],
+  );
+
+  const personBookmarkColumns = EXPORTABLE(
+    (TYPES, col, recordType, sql, unionEntityColumns) => ({
+      id: col({ codec: TYPES.int, notNull: true }),
+      person_id: col({
+        codec: TYPES.int,
+        notNull: true,
+        identicalVia: { relation: "person", attribute: "id" },
+      }),
+      bookmarked_entity: col({
+        codec: recordType(
+          sql`interfaces_and_unions.union__entity`,
+          unionEntityColumns,
+        ),
+        notNull: true,
+      }),
+    }),
+    [TYPES, col, recordType, sql, unionEntityColumns],
+  );
   const personBookmarksSourceBuilder = EXPORTABLE(
     (PgSourceBuilder, executor, personBookmarkColumns, recordType, sql) =>
       new PgSourceBuilder({
@@ -420,10 +437,13 @@ export function makeExampleSchema(
     [PgSourceBuilder, executor, personBookmarkColumns, recordType, sql],
   );
 
-  const personColumns = {
-    person_id: col({ codec: TYPES.int, notNull: true }),
-    username: col({ codec: TYPES.text, notNull: true }),
-  };
+  const personColumns = EXPORTABLE(
+    (TYPES, col) => ({
+      person_id: col({ codec: TYPES.int, notNull: true }),
+      username: col({ codec: TYPES.text, notNull: true }),
+    }),
+    [TYPES, col],
+  );
 
   const personSourceBuilder = EXPORTABLE(
     (PgSourceBuilder, executor, personColumns, recordType, sql) =>
@@ -438,15 +458,18 @@ export function makeExampleSchema(
     [PgSourceBuilder, executor, personColumns, recordType, sql],
   );
 
-  const postColumns = {
-    post_id: col({ codec: TYPES.int, notNull: true }),
-    author_id: col({
-      codec: TYPES.int,
-      notNull: true,
-      identicalVia: { relation: "author", attribute: "person_id" },
+  const postColumns = EXPORTABLE(
+    (TYPES, col) => ({
+      post_id: col({ codec: TYPES.int, notNull: true }),
+      author_id: col({
+        codec: TYPES.int,
+        notNull: true,
+        identicalVia: { relation: "author", attribute: "person_id" },
+      }),
+      body: col({ codec: TYPES.text, notNull: true }),
     }),
-    body: col({ codec: TYPES.text, notNull: true }),
-  };
+    [TYPES, col],
+  );
 
   const postSourceBuilder = EXPORTABLE(
     (PgSourceBuilder, executor, postColumns, recordType, sql) =>
@@ -461,20 +484,23 @@ export function makeExampleSchema(
     [PgSourceBuilder, executor, postColumns, recordType, sql],
   );
 
-  const commentColumns = {
-    comment_id: col({ codec: TYPES.int, notNull: true }),
-    author_id: col({
-      codec: TYPES.int,
-      notNull: true,
-      identicalVia: { relation: "author", attribute: "person_id" },
+  const commentColumns = EXPORTABLE(
+    (TYPES, col) => ({
+      comment_id: col({ codec: TYPES.int, notNull: true }),
+      author_id: col({
+        codec: TYPES.int,
+        notNull: true,
+        identicalVia: { relation: "author", attribute: "person_id" },
+      }),
+      post_id: col({
+        codec: TYPES.int,
+        notNull: true,
+        identicalVia: { relation: "post", attribute: "id" },
+      }),
+      body: col({ codec: TYPES.text, notNull: true }),
     }),
-    post_id: col({
-      codec: TYPES.int,
-      notNull: true,
-      identicalVia: { relation: "post", attribute: "id" },
-    }),
-    body: col({ codec: TYPES.text, notNull: true }),
-  };
+    [TYPES, col],
+  );
 
   const commentSourceBuilder = EXPORTABLE(
     (PgSourceBuilder, commentColumns, executor, recordType, sql) =>
@@ -503,16 +529,19 @@ export function makeExampleSchema(
     [PgEnumSource, enumType, sql],
   );
 
-  const enumTablesItemTypeColumns = {
-    type: {
-      codec: TYPES.text,
-      notNull: true,
-    },
-    description: {
-      codec: TYPES.text,
-      notNull: false,
-    },
-  };
+  const enumTablesItemTypeColumns = EXPORTABLE(
+    (TYPES) => ({
+      type: {
+        codec: TYPES.text,
+        notNull: true,
+      },
+      description: {
+        codec: TYPES.text,
+        notNull: false,
+      },
+    }),
+    [TYPES],
+  );
 
   const enumTableItemTypeSourceBuilder = EXPORTABLE(
     (PgSourceBuilder, enumTablesItemTypeColumns, executor, recordType, sql) =>
@@ -564,38 +593,41 @@ export function makeExampleSchema(
     },
   });
 
-  const singleTableItemColumns = {
-    id: col({ codec: TYPES.int, notNull: true }),
-    type: col({
-      codec: itemTypeEnumSource.codec,
-      notNull: true,
-    }),
-    type2: col({
-      codec: enumTableItemTypeEnumSource.codec,
-      notNull: true,
-    }),
+  const singleTableItemColumns = EXPORTABLE(
+    (TYPES, col, enumTableItemTypeEnumSource, itemTypeEnumSource) => ({
+      id: col({ codec: TYPES.int, notNull: true }),
+      type: col({
+        codec: itemTypeEnumSource.codec,
+        notNull: true,
+      }),
+      type2: col({
+        codec: enumTableItemTypeEnumSource.codec,
+        notNull: true,
+      }),
 
-    parent_id: col({
-      codec: TYPES.int,
-      notNull: false,
-      identicalVia: { relation: "parent", attribute: "id" },
-    }),
-    author_id: col({
-      codec: TYPES.int,
-      notNull: true,
-      identicalVia: { relation: "author", attribute: "person_id" },
-    }),
-    position: col({ codec: TYPES.bigint, notNull: true }),
-    created_at: col({ codec: TYPES.timestamptz, notNull: true }),
-    updated_at: col({ codec: TYPES.timestamptz, notNull: true }),
-    is_explicitly_archived: col({ codec: TYPES.boolean, notNull: true }),
-    archived_at: col({ codec: TYPES.timestamptz, notNull: false }),
+      parent_id: col({
+        codec: TYPES.int,
+        notNull: false,
+        identicalVia: { relation: "parent", attribute: "id" },
+      }),
+      author_id: col({
+        codec: TYPES.int,
+        notNull: true,
+        identicalVia: { relation: "author", attribute: "person_id" },
+      }),
+      position: col({ codec: TYPES.bigint, notNull: true }),
+      created_at: col({ codec: TYPES.timestamptz, notNull: true }),
+      updated_at: col({ codec: TYPES.timestamptz, notNull: true }),
+      is_explicitly_archived: col({ codec: TYPES.boolean, notNull: true }),
+      archived_at: col({ codec: TYPES.timestamptz, notNull: false }),
 
-    title: col({ codec: TYPES.text, notNull: false }),
-    description: col({ codec: TYPES.text, notNull: false }),
-    note: col({ codec: TYPES.text, notNull: false }),
-    color: col({ codec: TYPES.text, notNull: false }),
-  };
+      title: col({ codec: TYPES.text, notNull: false }),
+      description: col({ codec: TYPES.text, notNull: false }),
+      note: col({ codec: TYPES.text, notNull: false }),
+      color: col({ codec: TYPES.text, notNull: false }),
+    }),
+    [TYPES, col, enumTableItemTypeEnumSource, itemTypeEnumSource],
+  );
   const singleTableItemsSourceBuilder = EXPORTABLE(
     (PgSourceBuilder, executor, recordType, singleTableItemColumns, sql) =>
       new PgSourceBuilder({
@@ -739,33 +771,36 @@ export function makeExampleSchema(
     [personSource, singleTableItemsSourceBuilder],
   );
 
-  const relationalItemColumns = {
-    id: col({ codec: TYPES.int, notNull: true }),
-    type: col({
-      codec: itemTypeEnumSource.codec,
-      notNull: true,
-    }),
-    type2: col({
-      codec: enumTableItemTypeEnumSource.codec,
-      notNull: true,
-    }),
+  const relationalItemColumns = EXPORTABLE(
+    (TYPES, col, enumTableItemTypeEnumSource, itemTypeEnumSource) => ({
+      id: col({ codec: TYPES.int, notNull: true }),
+      type: col({
+        codec: itemTypeEnumSource.codec,
+        notNull: true,
+      }),
+      type2: col({
+        codec: enumTableItemTypeEnumSource.codec,
+        notNull: true,
+      }),
 
-    parent_id: col({
-      codec: TYPES.int,
-      notNull: false,
-      identicalVia: { relation: "parent", attribute: "id" },
+      parent_id: col({
+        codec: TYPES.int,
+        notNull: false,
+        identicalVia: { relation: "parent", attribute: "id" },
+      }),
+      author_id: col({
+        codec: TYPES.int,
+        notNull: true,
+        identicalVia: { relation: "author", attribute: "person_id" },
+      }),
+      position: col({ codec: TYPES.bigint, notNull: true }),
+      created_at: col({ codec: TYPES.timestamptz, notNull: true }),
+      updated_at: col({ codec: TYPES.timestamptz, notNull: true }),
+      is_explicitly_archived: col({ codec: TYPES.boolean, notNull: true }),
+      archived_at: col({ codec: TYPES.timestamptz, notNull: false }),
     }),
-    author_id: col({
-      codec: TYPES.int,
-      notNull: true,
-      identicalVia: { relation: "author", attribute: "person_id" },
-    }),
-    position: col({ codec: TYPES.bigint, notNull: true }),
-    created_at: col({ codec: TYPES.timestamptz, notNull: true }),
-    updated_at: col({ codec: TYPES.timestamptz, notNull: true }),
-    is_explicitly_archived: col({ codec: TYPES.boolean, notNull: true }),
-    archived_at: col({ codec: TYPES.timestamptz, notNull: false }),
-  };
+    [TYPES, col, enumTableItemTypeEnumSource, itemTypeEnumSource],
+  );
 
   const relationalItemsSourceBuilder = EXPORTABLE(
     (PgSourceBuilder, executor, recordType, relationalItemColumns, sql) =>
@@ -783,17 +818,20 @@ export function makeExampleSchema(
     [PgSourceBuilder, executor, recordType, relationalItemColumns, sql],
   );
 
-  const relationalCommentableColumns = {
-    id: col({ codec: TYPES.int, notNull: true }),
-    type: col({
-      codec: itemTypeEnumSource.codec,
-      notNull: true,
+  const relationalCommentableColumns = EXPORTABLE(
+    (TYPES, col, enumTableItemTypeEnumSource, itemTypeEnumSource) => ({
+      id: col({ codec: TYPES.int, notNull: true }),
+      type: col({
+        codec: itemTypeEnumSource.codec,
+        notNull: true,
+      }),
+      type2: col({
+        codec: enumTableItemTypeEnumSource.codec,
+        notNull: true,
+      }),
     }),
-    type2: col({
-      codec: enumTableItemTypeEnumSource.codec,
-      notNull: true,
-    }),
-  };
+    [TYPES, col, enumTableItemTypeEnumSource, itemTypeEnumSource],
+  );
 
   const relationalCommentableSourceBuilder = EXPORTABLE(
     (
@@ -816,68 +854,84 @@ export function makeExampleSchema(
     [PgSourceBuilder, executor, recordType, relationalCommentableColumns, sql],
   );
 
-  const itemColumns = {
-    id: col({ codec: TYPES.int, notNull: true, identicalVia: "item" }),
-    type: col({ codec: TYPES.text, notNull: true, via: "item" }),
-    type2: col({
-      codec: enumTableItemTypeEnumSource.codec,
-      notNull: true,
-      via: "item",
+  const itemColumns = EXPORTABLE(
+    (TYPES, col, enumTableItemTypeEnumSource) => ({
+      id: col({ codec: TYPES.int, notNull: true, identicalVia: "item" }),
+      type: col({ codec: TYPES.text, notNull: true, via: "item" }),
+      type2: col({
+        codec: enumTableItemTypeEnumSource.codec,
+        notNull: true,
+        via: "item",
+      }),
+      parent_id: col({
+        codec: TYPES.int,
+        notNull: false,
+        via: "item",
+      }),
+      author_id: col({
+        codec: TYPES.int,
+        notNull: true,
+        via: "item",
+      }),
+      position: col({ codec: TYPES.bigint, notNull: true, via: "item" }),
+      created_at: col({ codec: TYPES.timestamptz, notNull: true, via: "item" }),
+      updated_at: col({ codec: TYPES.timestamptz, notNull: true, via: "item" }),
+      is_explicitly_archived: col({
+        codec: TYPES.boolean,
+        notNull: true,
+        via: "item",
+      }),
+      archived_at: col({
+        codec: TYPES.timestamptz,
+        notNull: false,
+        via: "item",
+      }),
     }),
-    parent_id: col({
-      codec: TYPES.int,
-      notNull: false,
-      via: "item",
-    }),
-    author_id: col({
-      codec: TYPES.int,
-      notNull: true,
-      via: "item",
-    }),
-    position: col({ codec: TYPES.bigint, notNull: true, via: "item" }),
-    created_at: col({ codec: TYPES.timestamptz, notNull: true, via: "item" }),
-    updated_at: col({ codec: TYPES.timestamptz, notNull: true, via: "item" }),
-    is_explicitly_archived: col({
-      codec: TYPES.boolean,
-      notNull: true,
-      via: "item",
-    }),
-    archived_at: col({ codec: TYPES.timestamptz, notNull: false, via: "item" }),
-  };
+    [TYPES, col, enumTableItemTypeEnumSource],
+  );
 
-  const itemRelations = {
-    item: {
-      source: relationalItemsSourceBuilder,
+  const itemRelations = EXPORTABLE(
+    (personSource, relationalItemsSourceBuilder) => ({
+      item: {
+        source: relationalItemsSourceBuilder,
+        localColumns: [`id`] as const,
+        remoteColumns: [`id`] as const,
+        isUnique: true,
+      },
+      parent: {
+        source: relationalItemsSourceBuilder,
+        localColumns: [`parent_id`] as const,
+        remoteColumns: [`id`] as const,
+        isUnique: true,
+      },
+      author: {
+        source: personSource,
+        localColumns: [`author_id`] as const,
+        remoteColumns: [`person_id`] as const,
+        isUnique: true,
+      },
+    }),
+    [personSource, relationalItemsSourceBuilder],
+  );
+
+  const commentableRelation = EXPORTABLE(
+    (relationalCommentableSourceBuilder) => ({
+      source: relationalCommentableSourceBuilder,
       localColumns: [`id`] as const,
       remoteColumns: [`id`] as const,
       isUnique: true,
-    },
-    parent: {
-      source: relationalItemsSourceBuilder,
-      localColumns: [`parent_id`] as const,
-      remoteColumns: [`id`] as const,
-      isUnique: true,
-    },
-    author: {
-      source: personSource,
-      localColumns: [`author_id`] as const,
-      remoteColumns: [`person_id`] as const,
-      isUnique: true,
-    },
-  };
+    }),
+    [relationalCommentableSourceBuilder],
+  );
 
-  const commentableRelation = {
-    source: relationalCommentableSourceBuilder,
-    localColumns: [`id`] as const,
-    remoteColumns: [`id`] as const,
-    isUnique: true,
-  };
+  const relationalTopicsColumns = EXPORTABLE(
+    (TYPES, col, itemColumns) => ({
+      title: col({ codec: TYPES.text, notNull: false }),
 
-  const relationalTopicsColumns = {
-    title: col({ codec: TYPES.text, notNull: false }),
-
-    ...itemColumns,
-  };
+      ...itemColumns,
+    }),
+    [TYPES, col, itemColumns],
+  );
   const relationalTopicsSourceBuilder = EXPORTABLE(
     (PgSourceBuilder, executor, recordType, relationalTopicsColumns, sql) =>
       new PgSourceBuilder({
@@ -894,13 +948,16 @@ export function makeExampleSchema(
     [PgSourceBuilder, executor, recordType, relationalTopicsColumns, sql],
   );
 
-  const relationalPostsColumns = {
-    title: col({ codec: TYPES.text, notNull: false }),
-    description: col({ codec: TYPES.text, notNull: false }),
-    note: col({ codec: TYPES.text, notNull: false }),
+  const relationalPostsColumns = EXPORTABLE(
+    (TYPES, col, itemColumns) => ({
+      title: col({ codec: TYPES.text, notNull: false }),
+      description: col({ codec: TYPES.text, notNull: false }),
+      note: col({ codec: TYPES.text, notNull: false }),
 
-    ...itemColumns,
-  };
+      ...itemColumns,
+    }),
+    [TYPES, col, itemColumns],
+  );
   const relationalPostsSourceBuilder = EXPORTABLE(
     (PgSourceBuilder, executor, recordType, relationalPostsColumns, sql) =>
       new PgSourceBuilder({
@@ -917,12 +974,15 @@ export function makeExampleSchema(
     [PgSourceBuilder, executor, recordType, relationalPostsColumns, sql],
   );
 
-  const relationalDividersColumns = {
-    title: col({ codec: TYPES.text, notNull: false }),
-    color: col({ codec: TYPES.text, notNull: false }),
+  const relationalDividersColumns = EXPORTABLE(
+    (TYPES, col, itemColumns) => ({
+      title: col({ codec: TYPES.text, notNull: false }),
+      color: col({ codec: TYPES.text, notNull: false }),
 
-    ...itemColumns,
-  };
+      ...itemColumns,
+    }),
+    [TYPES, col, itemColumns],
+  );
   const relationalDividersSourceBuilder = EXPORTABLE(
     (PgSourceBuilder, executor, recordType, relationalDividersColumns, sql) =>
       new PgSourceBuilder({
@@ -939,11 +999,14 @@ export function makeExampleSchema(
     [PgSourceBuilder, executor, recordType, relationalDividersColumns, sql],
   );
 
-  const relationalChecklistsColumns = {
-    title: col({ codec: TYPES.text, notNull: false }),
+  const relationalChecklistsColumns = EXPORTABLE(
+    (TYPES, col, itemColumns) => ({
+      title: col({ codec: TYPES.text, notNull: false }),
 
-    ...itemColumns,
-  };
+      ...itemColumns,
+    }),
+    [TYPES, col, itemColumns],
+  );
   const relationalChecklistsSourceBuilder = EXPORTABLE(
     (PgSourceBuilder, executor, recordType, relationalChecklistsColumns, sql) =>
       new PgSourceBuilder({
@@ -960,12 +1023,15 @@ export function makeExampleSchema(
     [PgSourceBuilder, executor, recordType, relationalChecklistsColumns, sql],
   );
 
-  const relationalChecklistItemsColumns = {
-    description: col({ codec: TYPES.text, notNull: true }),
-    note: col({ codec: TYPES.text, notNull: false }),
+  const relationalChecklistItemsColumns = EXPORTABLE(
+    (TYPES, col, itemColumns) => ({
+      description: col({ codec: TYPES.text, notNull: true }),
+      note: col({ codec: TYPES.text, notNull: false }),
 
-    ...itemColumns,
-  };
+      ...itemColumns,
+    }),
+    [TYPES, col, itemColumns],
+  );
   const relationalChecklistItemsSourceBuilder = EXPORTABLE(
     (
       PgSourceBuilder,
@@ -1163,17 +1229,20 @@ export function makeExampleSchema(
 
   ////////////////////////////////////////
 
-  const unionItemsColumns = {
-    id: col({ codec: TYPES.int, notNull: true }),
-    type: col({
-      codec: itemTypeEnumSource.codec,
-      notNull: true,
+  const unionItemsColumns = EXPORTABLE(
+    (TYPES, col, enumTableItemTypeEnumSource, itemTypeEnumSource) => ({
+      id: col({ codec: TYPES.int, notNull: true }),
+      type: col({
+        codec: itemTypeEnumSource.codec,
+        notNull: true,
+      }),
+      type2: col({
+        codec: enumTableItemTypeEnumSource.codec,
+        notNull: true,
+      }),
     }),
-    type2: col({
-      codec: enumTableItemTypeEnumSource.codec,
-      notNull: true,
-    }),
-  };
+    [TYPES, col, enumTableItemTypeEnumSource, itemTypeEnumSource],
+  );
   const unionItemsSourceBuilder = EXPORTABLE(
     (PgSourceBuilder, executor, recordType, sql, unionItemsColumns) =>
       new PgSourceBuilder({
@@ -1190,10 +1259,13 @@ export function makeExampleSchema(
     [PgSourceBuilder, executor, recordType, sql, unionItemsColumns],
   );
 
-  const unionTopicsColumns = {
-    id: col({ codec: TYPES.int, notNull: true }),
-    title: col({ codec: TYPES.text, notNull: false }),
-  };
+  const unionTopicsColumns = EXPORTABLE(
+    (TYPES, col) => ({
+      id: col({ codec: TYPES.int, notNull: true }),
+      title: col({ codec: TYPES.text, notNull: false }),
+    }),
+    [TYPES, col],
+  );
   const unionTopicsSource = EXPORTABLE(
     (PgSource, executor, recordType, sql, unionTopicsColumns) =>
       new PgSource({
@@ -1210,12 +1282,15 @@ export function makeExampleSchema(
     [PgSource, executor, recordType, sql, unionTopicsColumns],
   );
 
-  const unionPostsColumns = {
-    id: col({ codec: TYPES.int, notNull: true }),
-    title: col({ codec: TYPES.text, notNull: false }),
-    description: col({ codec: TYPES.text, notNull: false }),
-    note: col({ codec: TYPES.text, notNull: false }),
-  };
+  const unionPostsColumns = EXPORTABLE(
+    (TYPES, col) => ({
+      id: col({ codec: TYPES.int, notNull: true }),
+      title: col({ codec: TYPES.text, notNull: false }),
+      description: col({ codec: TYPES.text, notNull: false }),
+      note: col({ codec: TYPES.text, notNull: false }),
+    }),
+    [TYPES, col],
+  );
   const unionPostsSource = EXPORTABLE(
     (PgSource, executor, recordType, sql, unionPostsColumns) =>
       new PgSource({
@@ -1232,11 +1307,14 @@ export function makeExampleSchema(
     [PgSource, executor, recordType, sql, unionPostsColumns],
   );
 
-  const unionDividersColumns = {
-    id: col({ codec: TYPES.int, notNull: true }),
-    title: col({ codec: TYPES.text, notNull: false }),
-    color: col({ codec: TYPES.text, notNull: false }),
-  };
+  const unionDividersColumns = EXPORTABLE(
+    (TYPES, col) => ({
+      id: col({ codec: TYPES.int, notNull: true }),
+      title: col({ codec: TYPES.text, notNull: false }),
+      color: col({ codec: TYPES.text, notNull: false }),
+    }),
+    [TYPES, col],
+  );
   const unionDividersSource = EXPORTABLE(
     (PgSource, executor, recordType, sql, unionDividersColumns) =>
       new PgSource({
@@ -1253,10 +1331,13 @@ export function makeExampleSchema(
     [PgSource, executor, recordType, sql, unionDividersColumns],
   );
 
-  const unionChecklistsColumns = {
-    id: col({ codec: TYPES.int, notNull: true }),
-    title: col({ codec: TYPES.text, notNull: false }),
-  };
+  const unionChecklistsColumns = EXPORTABLE(
+    (TYPES, col) => ({
+      id: col({ codec: TYPES.int, notNull: true }),
+      title: col({ codec: TYPES.text, notNull: false }),
+    }),
+    [TYPES, col],
+  );
   const unionChecklistsSource = EXPORTABLE(
     (PgSource, executor, recordType, sql, unionChecklistsColumns) =>
       new PgSource({
@@ -1273,11 +1354,14 @@ export function makeExampleSchema(
     [PgSource, executor, recordType, sql, unionChecklistsColumns],
   );
 
-  const unionChecklistItemsColumns = {
-    id: col({ codec: TYPES.int, notNull: true }),
-    description: col({ codec: TYPES.text, notNull: true }),
-    note: col({ codec: TYPES.text, notNull: false }),
-  };
+  const unionChecklistItemsColumns = EXPORTABLE(
+    (TYPES, col) => ({
+      id: col({ codec: TYPES.int, notNull: true }),
+      description: col({ codec: TYPES.text, notNull: true }),
+      note: col({ codec: TYPES.text, notNull: false }),
+    }),
+    [TYPES, col],
+  );
   const unionChecklistItemsSource = EXPORTABLE(
     (PgSource, executor, recordType, sql, unionChecklistItemsColumns) =>
       new PgSource({
