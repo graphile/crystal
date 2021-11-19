@@ -64,6 +64,7 @@ module.exports = {
     // Rules we've disabled for now because they're so noisy (but we should really address)
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/no-unused-vars": "off",
 
     /*
      * simple-import-sort seems to be the most stable import sorting currently,
@@ -112,6 +113,8 @@ module.exports = {
       rules: {
         "no-dupe-class-members": "off",
         "no-undef": "off",
+        // This rule doesn't understand import of './js'
+        "import/no-unresolved": "off",
       },
     },
 
