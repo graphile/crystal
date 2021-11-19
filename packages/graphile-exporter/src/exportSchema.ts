@@ -83,7 +83,11 @@ type ExportedFromFactory<T, TTuple extends any[]> = T & {
 function isExportedFromFactory<T, TTuple extends any[]>(
   thing: T,
 ): thing is ExportedFromFactory<T, TTuple> {
-  return thing != null && "$exporter$factory" in thing;
+  return (
+    (typeof thing === "object" || typeof thing === "function") &&
+    thing != null &&
+    "$exporter$factory" in thing
+  );
 }
 
 const BUILTINS = ["Int", "Float", "Boolean", "ID", "String"];
