@@ -38,15 +38,6 @@ module.exports = {
     "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/no-use-before-define": "off",
     "@typescript-eslint/no-var-requires": "off",
-    "@typescript-eslint/no-unused-vars": [
-      "error",
-      {
-        argsIgnorePattern: "^_",
-        varsIgnorePattern: "^_",
-        args: "after-used",
-        ignoreRestSiblings: true,
-      },
-    ],
     "@typescript-eslint/consistent-type-imports": "error",
     "no-confusing-arrow": 0,
     "no-else-return": 0,
@@ -64,7 +55,15 @@ module.exports = {
     // Rules we've disabled for now because they're so noisy (but we should really address)
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
-    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "off",
+      {
+        argsIgnorePattern: "^_",
+        varsIgnorePattern: "^_",
+        args: "after-used",
+        ignoreRestSiblings: true,
+      },
+    ],
 
     /*
      * simple-import-sort seems to be the most stable import sorting currently,
