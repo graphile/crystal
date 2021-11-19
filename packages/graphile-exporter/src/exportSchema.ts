@@ -435,7 +435,10 @@ class CodegenFile {
           config.extensions,
           `${config.name}.extensions`,
         ),
-        types: t.arrayExpression(config.types.map((t) => this.declareType(t))),
+        types: t.arrowFunctionExpression(
+          [],
+          t.arrayExpression(config.types.map((t) => this.declareType(t))),
+        ),
       });
     } else if (type instanceof GraphQLInputObjectType) {
       const config = type.toConfig();
