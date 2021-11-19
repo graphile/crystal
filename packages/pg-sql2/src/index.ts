@@ -960,6 +960,7 @@ export interface PgSQL {
 }
 
 const attributes = {
+  sql: query as PgSQL,
   escapeSqlIdentifier,
   compile,
   isEquivalent,
@@ -980,7 +981,6 @@ const attributes = {
   false: falseNode,
   null: nullNode,
   isSQL,
-  sql: query as PgSQL,
 };
 
 Object.entries(attributes).forEach(([exportName, value]) => {
