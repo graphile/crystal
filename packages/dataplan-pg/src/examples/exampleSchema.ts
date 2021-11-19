@@ -4033,6 +4033,15 @@ export function makeExampleSchema(
         RelationalChecklist,
         RelationalChecklistItem,
       ],
+      extensions: {
+        graphileExporter: {
+          deps: [
+            relationalDividersSource,
+            relationalChecklistsSource,
+            relationalChecklistItemsSource,
+          ],
+        },
+      },
     }),
   );
 }
