@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion */
 import { jsonParse, JSONParsePlan } from "@dataplan/json";
 import * as crypto from "crypto";
 import { writeFileSync } from "fs";
