@@ -71,10 +71,3 @@ export function each<
     TResultItemPlan
   >(listPlan, mapper);
 }
-
-Object.defineProperty(each, "$$export", {
-  value: {
-    moduleName: "graphile-crystal",
-    exportName: "each",
-  },
-});

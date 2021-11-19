@@ -211,6 +211,7 @@ export class PgSourceBuilder<
     return this.built;
   }
 }
+exportAs(PgSourceBuilder, "PgSourceBuilder");
 
 /**
  * PG class data source represents a PostgreSQL data source. This could be a table,

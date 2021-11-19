@@ -32,10 +32,3 @@ export function first<TPlan extends ExecutablePlan<ReadonlyArray<any>>>(
 ): FirstPlan<TPlan extends ExecutablePlan<ReadonlyArray<infer U>> ? U : never> {
   return new FirstPlan(plan);
 }
-
-Object.defineProperty(first, "$$export", {
-  value: {
-    moduleName: "graphile-crystal",
-    exportName: "first",
-  },
-});

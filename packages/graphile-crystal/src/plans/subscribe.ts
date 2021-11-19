@@ -82,10 +82,3 @@ export function subscribe<
     itemPlan,
   );
 }
-
-Object.defineProperty(subscribe, "$$export", {
-  value: {
-    moduleName: "graphile-crystal",
-    exportName: "subscribe",
-  },
-});

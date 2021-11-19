@@ -7,25 +7,11 @@ export function aether(): Aether {
   return getCurrentAether();
 }
 
-Object.defineProperty(aether, "$$export", {
-  value: {
-    moduleName: "graphile-crystal",
-    exportName: "aether",
-  },
-});
-
 export function context<
   TContext extends BaseGraphQLContext = BaseGraphQLContext,
 >(): __ValuePlan<TContext> {
   return aether().contextPlan;
 }
-
-Object.defineProperty(context, "$$export", {
-  value: {
-    moduleName: "graphile-crystal",
-    exportName: "context",
-  },
-});
 
 export function debugPlans<T>(callback: () => T): T {
   const oldDebug = getDebug();
@@ -34,13 +20,6 @@ export function debugPlans<T>(callback: () => T): T {
   setDebug(oldDebug);
   return result;
 }
-
-Object.defineProperty(debugPlans, "$$export", {
-  value: {
-    moduleName: "graphile-crystal",
-    exportName: "debugPlans",
-  },
-});
 
 export { access, AccessPlan } from "./access";
 export { constant, ConstantPlan } from "./constant";

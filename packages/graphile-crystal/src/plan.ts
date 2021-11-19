@@ -128,6 +128,11 @@ export abstract class BasePlan {
  * they must be able to execute to return values.
  */
 export abstract class ExecutablePlan<TData = any> extends BasePlan {
+  static $$export = {
+    moduleName: "graphile-crystal",
+    exportName: "ExecutablePlan",
+  };
+
   /**
    * The ids for plans this plan will need data from in order to execute. NOTE:
    * it's important we use the id and not the plan here otherwise when we swap

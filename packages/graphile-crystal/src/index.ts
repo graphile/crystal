@@ -2,24 +2,26 @@ import chalk from "chalk";
 import debugFactory from "debug";
 
 import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint";
+import { exportAsMany } from "./exportAs";
 
 debugFactory.formatters.c = crystalPrint;
 debugFactory.formatters.p = (pathIdentity) =>
   chalk.bold.yellow(crystalPrintPathIdentity(pathIdentity));
 
-export { crystalPrintPathIdentity };
-
-export { Aether } from "./aether";
-export { ROOT_PATH } from "./constants";
-export { defer, Deferred } from "./deferred";
-export { crystalEnforce } from "./enforceCrystal";
-export {
+import { Aether } from "./aether";
+import { ROOT_PATH } from "./constants";
+import { defer, Deferred } from "./deferred";
+// Handy for debugging
+import { isDev, noop } from "./dev";
+import { crystalEnforce } from "./enforceCrystal";
+import { getCurrentParentPathIdentity } from "./global";
+import {
   InputListPlan,
   InputObjectPlan,
   InputPlan,
   InputStaticLeafPlan,
 } from "./input";
-export {
+import {
   ArgumentPlanResolver,
   BaseGraphQLArguments,
   BaseGraphQLContext,
@@ -38,7 +40,7 @@ export {
   PlanStreamOptions,
   PolymorphicData,
 } from "./interfaces";
-export {
+import {
   assertListCapablePlan,
   BasePlan,
   ExecutablePlan,
@@ -53,7 +55,7 @@ export {
   PolymorphicPlan,
   StreamablePlan,
 } from "./plan";
-export {
+import {
   __ItemPlan,
   __TrackedObjectPlan,
   __ValuePlan,
@@ -83,14 +85,14 @@ export {
   subscribe,
   SubscribePlan,
 } from "./plans";
-export { polymorphicWrap, resolveType } from "./polymorphic";
-export {
+import { polymorphicWrap, resolveType } from "./polymorphic";
+import {
   $$crystalWrapped,
   crystalWrapResolve,
   makeCrystalSubscriber,
 } from "./resolvers";
-export { stripAnsi } from "./stripAnsi";
-export {
+import { stripAnsi } from "./stripAnsi";
+import {
   arraysMatch,
   GraphileObjectType,
   inputObjectFieldSpec,
@@ -104,6 +106,158 @@ export {
   planGroupsOverlap,
 } from "./utils";
 
-// Handy for debugging
-export { isDev, noop } from "./dev";
-export { getCurrentParentPathIdentity } from "./global";
+export {
+  __ItemPlan,
+  __TrackedObjectPlan,
+  __ValuePlan,
+  $$crystalWrapped,
+  access,
+  AccessPlan,
+  Aether,
+  aether,
+  ArgumentPlanResolver,
+  arraysMatch,
+  assertListCapablePlan,
+  BaseGraphQLArguments,
+  BaseGraphQLContext,
+  BaseGraphQLRootValue,
+  BaseGraphQLVariables,
+  BasePlan,
+  constant,
+  ConstantPlan,
+  context,
+  crystalEnforce,
+  crystalPrintPathIdentity,
+  CrystalResultsList,
+  CrystalResultStreamList,
+  CrystalSubscriber,
+  CrystalValuesList,
+  crystalWrapResolve,
+  debugPlans,
+  defer,
+  Deferred,
+  each,
+  EachPlan,
+  ExecutablePlan,
+  ExecutablePlanResolver,
+  first,
+  FirstPlan,
+  getCurrentParentPathIdentity,
+  GraphileFieldConfig,
+  GraphileFieldConfigArgumentMap,
+  GraphileObjectType,
+  InputListPlan,
+  InputObjectFieldPlanResolver,
+  inputObjectFieldSpec,
+  InputObjectPlan,
+  InputObjectTypeSpec,
+  InputPlan,
+  InputStaticLeafPlan,
+  isDev,
+  isExecutablePlan,
+  isListCapablePlan,
+  isModifierPlan,
+  isObjectLikePlan,
+  isStreamablePlan,
+  lambda,
+  LambdaPlan,
+  list,
+  ListCapablePlan,
+  ListPlan,
+  makeCrystalSubscriber,
+  makeMapper,
+  map,
+  MapPlan,
+  ModifierPlan,
+  newGraphileFieldConfigBuilder,
+  newInputObjectTypeBuilder,
+  newObjectTypeBuilder,
+  noop,
+  object,
+  objectFieldSpec,
+  ObjectLikePlan,
+  ObjectPlan,
+  objectSpec,
+  ObjectTypeSpec,
+  OutputPlanForType,
+  planGroupsOverlap,
+  PlanOptimizeOptions,
+  PlanStreamOptions,
+  PolymorphicData,
+  PolymorphicPlan,
+  polymorphicWrap,
+  resolveType,
+  reverse,
+  reverseArray,
+  ReversePlan,
+  ROOT_PATH,
+  StreamablePlan,
+  stripAnsi,
+  subscribe,
+  SubscribePlan,
+};
+
+exportAsMany({
+  crystalPrintPathIdentity,
+  Aether,
+  ROOT_PATH,
+  defer,
+  crystalEnforce,
+  InputListPlan,
+  InputObjectPlan,
+  InputStaticLeafPlan,
+  assertListCapablePlan,
+  BasePlan,
+  ExecutablePlan,
+  isExecutablePlan,
+  isListCapablePlan,
+  isModifierPlan,
+  isObjectLikePlan,
+  isStreamablePlan,
+  ModifierPlan,
+  __ItemPlan,
+  __TrackedObjectPlan,
+  __ValuePlan,
+  access,
+  AccessPlan,
+  aether,
+  constant,
+  ConstantPlan,
+  context,
+  debugPlans,
+  each,
+  EachPlan,
+  first,
+  FirstPlan,
+  lambda,
+  LambdaPlan,
+  list,
+  ListPlan,
+  makeMapper,
+  map,
+  MapPlan,
+  object,
+  ObjectPlan,
+  reverse,
+  reverseArray,
+  ReversePlan,
+  subscribe,
+  SubscribePlan,
+  polymorphicWrap,
+  resolveType,
+  $$crystalWrapped,
+  crystalWrapResolve,
+  makeCrystalSubscriber,
+  stripAnsi,
+  arraysMatch,
+  inputObjectFieldSpec,
+  newGraphileFieldConfigBuilder,
+  newInputObjectTypeBuilder,
+  newObjectTypeBuilder,
+  objectFieldSpec,
+  objectSpec,
+  planGroupsOverlap,
+  isDev,
+  noop,
+  getCurrentParentPathIdentity,
+});

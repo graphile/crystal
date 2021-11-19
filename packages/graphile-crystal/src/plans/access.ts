@@ -237,10 +237,3 @@ export function access<TData>(
 ): AccessPlan<TData> {
   return new AccessPlan<TData>(parentPlan, path);
 }
-
-Object.defineProperty(access, "$$export", {
-  value: {
-    moduleName: "graphile-crystal",
-    exportName: "access",
-  },
-});
