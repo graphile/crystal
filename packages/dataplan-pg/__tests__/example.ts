@@ -26,7 +26,7 @@ import { Pool } from "pg";
 import prettier from "prettier";
 
 import type { WithPgClient } from "../src";
-import { schema } from "./exampleSchema";
+import { schema } from "../src/examples/exampleSchema";
 
 // Convenience so we don't have to type these out each time. These used to be
 // separate plans, but required too much maintenance.

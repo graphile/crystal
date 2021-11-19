@@ -28,8 +28,8 @@ import { Pool } from "pg";
 //import prettier from "prettier";
 import type { PgClient, PgClientQuery, WithPgClient } from "../src";
 import { PgSubscriber } from "../src";
+import { makeExampleSchema } from "../src/examples/exampleSchema";
 import type { PgClientResult } from "../src/executor";
-import { makeExampleSchema } from "./exampleSchema";
 
 export const UPDATE_SNAPSHOTS = process.env.UPDATE_SNAPSHOTS === "1";
 
