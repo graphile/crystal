@@ -404,7 +404,7 @@ export function makeExampleSchema(
       notNull: true,
     }),
   };
-  const personBookmarksSourceBuilder = new PgSourceBuilder({
+  const personBookmarksSourceBuilder = EXPORTABLE((PgSourceBuilder, executor, personBookmarkColumns, recordType, sql) => new PgSourceBuilder({
     executor,
     codec: recordType(
       sql`interfaces_and_unions.person_bookmarks`,
@@ -414,21 +414,21 @@ export function makeExampleSchema(
     name: "person_bookmarks",
     columns: personBookmarkColumns,
     uniques: [["id"]],
-  });
+  }), [PgSourceBuilder, executor, personBookmarkColumns, recordType, sql]);
 
   const personColumns = {
     person_id: col({ codec: TYPES.int, notNull: true }),
     username: col({ codec: TYPES.text, notNull: true }),
   };
 
-  const personSourceBuilder = new PgSourceBuilder({
+  const personSourceBuilder = EXPORTABLE((PgSourceBuilder, executor, personColumns, recordType, sql) => new PgSourceBuilder({
     executor,
     codec: recordType(sql`interfaces_and_unions.people`, personColumns),
     source: sql`interfaces_and_unions.people`,
     name: "people",
     columns: personColumns,
     uniques: [["person_id"], ["username"]],
-  });
+  }), [PgSourceBuilder, executor, personColumns, recordType, sql]);
 
   const postColumns = {
     post_id: col({ codec: TYPES.int, notNull: true }),
@@ -440,14 +440,14 @@ export function makeExampleSchema(
     body: col({ codec: TYPES.text, notNull: true }),
   };
 
-  const postSourceBuilder = new PgSourceBuilder({
+  const postSourceBuilder = EXPORTABLE((PgSourceBuilder, executor, postColumns, recordType, sql) => new PgSourceBuilder({
     executor,
     codec: recordType(sql`interfaces_and_unions.posts`, postColumns),
     source: sql`interfaces_and_unions.posts`,
     name: "posts",
     columns: postColumns,
     uniques: [["post_id"]],
-  });
+  }), [PgSourceBuilder, executor, postColumns, recordType, sql]);
 
   const commentColumns = {
     comment_id: col({ codec: TYPES.int, notNull: true }),
@@ -464,14 +464,14 @@ export function makeExampleSchema(
     body: col({ codec: TYPES.text, notNull: true }),
   };
 
-  const commentSourceBuilder = new PgSourceBuilder({
+  const commentSourceBuilder = EXPORTABLE((PgSourceBuilder, commentColumns, executor, recordType, sql) => new PgSourceBuilder({
     executor,
     codec: recordType(sql`interfaces_and_unions.comments`, commentColumns),
     source: sql`interfaces_and_unions.comments`,
     name: "comments",
     columns: commentColumns,
     uniques: [["comment_id"]],
-  });
+  }), [PgSourceBuilder, commentColumns, executor, recordType, sql]);
 
   const itemTypeEnumSource = EXPORTABLE(
     (PgEnumSource, enumType, sql) =>
@@ -498,7 +498,7 @@ export function makeExampleSchema(
     },
   };
 
-  const enumTableItemTypeSourceBuilder = new PgSourceBuilder({
+  const enumTableItemTypeSourceBuilder = EXPORTABLE((PgSourceBuilder, enumTablesItemTypeColumns, executor, recordType, sql) => new PgSourceBuilder({
     executor,
     codec: recordType(
       sql`interfaces_and_unions.enum_table_item_type`,
@@ -508,7 +508,7 @@ export function makeExampleSchema(
     name: "enum_table_item_type",
     columns: enumTablesItemTypeColumns,
     uniques: [["type"]],
-  });
+  }), [PgSourceBuilder, enumTablesItemTypeColumns, executor, recordType, sql]);
 
   const enumTableItemTypeSource = EXPORTABLE(
     (enumTableItemTypeSourceBuilder) =>
@@ -576,7 +576,7 @@ export function makeExampleSchema(
     note: col({ codec: TYPES.text, notNull: false }),
     color: col({ codec: TYPES.text, notNull: false }),
   };
-  const singleTableItemsSourceBuilder = new PgSourceBuilder({
+  const singleTableItemsSourceBuilder = EXPORTABLE((PgSourceBuilder, executor, recordType, singleTableItemColumns, sql) => new PgSourceBuilder({
     executor,
     codec: recordType(
       sql`interfaces_and_unions.single_table_items`,
@@ -586,7 +586,7 @@ export function makeExampleSchema(
     name: "single_table_items",
     columns: singleTableItemColumns,
     uniques: [["id"]],
-  });
+  }), [PgSourceBuilder, executor, recordType, singleTableItemColumns, sql]);
 
   const personBookmarksSource = EXPORTABLE(
     (personBookmarksSourceBuilder, personSourceBuilder) =>
@@ -743,7 +743,7 @@ export function makeExampleSchema(
     archived_at: col({ codec: TYPES.timestamptz, notNull: false }),
   };
 
-  const relationalItemsSourceBuilder = new PgSourceBuilder({
+  const relationalItemsSourceBuilder = EXPORTABLE((PgSourceBuilder, executor, recordType, relationalItemColumns, sql) => new PgSourceBuilder({
     executor,
     codec: recordType(
       sql`interfaces_and_unions.relational_items`,
@@ -753,7 +753,7 @@ export function makeExampleSchema(
     name: "relational_items",
     columns: relationalItemColumns,
     uniques: [["id"]],
-  });
+  }), [PgSourceBuilder, executor, recordType, relationalItemColumns, sql]);
 
   const relationalCommentableColumns = {
     id: col({ codec: TYPES.int, notNull: true }),
@@ -767,7 +767,7 @@ export function makeExampleSchema(
     }),
   };
 
-  const relationalCommentableSourceBuilder = new PgSourceBuilder({
+  const relationalCommentableSourceBuilder = EXPORTABLE((PgSourceBuilder, executor, recordType, relationalCommentableColumns, sql) => new PgSourceBuilder({
     executor,
     codec: recordType(
       sql`interfaces_and_unions.relational_commentables`,
@@ -776,7 +776,7 @@ export function makeExampleSchema(
     source: sql`interfaces_and_unions.relational_commentables`,
     name: "relational_commentables",
     columns: relationalCommentableColumns,
-  });
+  }), [PgSourceBuilder, executor, recordType, relationalCommentableColumns, sql]);
 
   const itemColumns = {
     id: col({ codec: TYPES.int, notNull: true, identicalVia: "item" }),
@@ -840,7 +840,7 @@ export function makeExampleSchema(
 
     ...itemColumns,
   };
-  const relationalTopicsSourceBuilder = new PgSourceBuilder({
+  const relationalTopicsSourceBuilder = EXPORTABLE((PgSourceBuilder, executor, recordType, relationalTopicsColumns, sql) => new PgSourceBuilder({
     executor,
     codec: recordType(
       sql`interfaces_and_unions.relational_topics`,
@@ -850,7 +850,7 @@ export function makeExampleSchema(
     name: "relational_topics",
     columns: relationalTopicsColumns,
     uniques: [["id"]],
-  });
+  }), [PgSourceBuilder, executor, recordType, relationalTopicsColumns, sql]);
 
   const relationalPostsColumns = {
     title: col({ codec: TYPES.text, notNull: false }),
@@ -859,7 +859,7 @@ export function makeExampleSchema(
 
     ...itemColumns,
   };
-  const relationalPostsSourceBuilder = new PgSourceBuilder({
+  const relationalPostsSourceBuilder = EXPORTABLE((PgSourceBuilder, executor, recordType, relationalPostsColumns, sql) => new PgSourceBuilder({
     executor,
     codec: recordType(
       sql`interfaces_and_unions.relational_posts`,
@@ -869,7 +869,7 @@ export function makeExampleSchema(
     name: "relational_posts",
     columns: relationalPostsColumns,
     uniques: [["id"]],
-  });
+  }), [PgSourceBuilder, executor, recordType, relationalPostsColumns, sql]);
 
   const relationalDividersColumns = {
     title: col({ codec: TYPES.text, notNull: false }),
@@ -877,7 +877,7 @@ export function makeExampleSchema(
 
     ...itemColumns,
   };
-  const relationalDividersSourceBuilder = new PgSourceBuilder({
+  const relationalDividersSourceBuilder = EXPORTABLE((PgSourceBuilder, executor, recordType, relationalDividersColumns, sql) => new PgSourceBuilder({
     executor,
     codec: recordType(
       sql`interfaces_and_unions.relational_dividers`,
@@ -887,14 +887,14 @@ export function makeExampleSchema(
     name: "relational_dividers",
     columns: relationalDividersColumns,
     uniques: [["id"]],
-  });
+  }), [PgSourceBuilder, executor, recordType, relationalDividersColumns, sql]);
 
   const relationalChecklistsColumns = {
     title: col({ codec: TYPES.text, notNull: false }),
 
     ...itemColumns,
   };
-  const relationalChecklistsSourceBuilder = new PgSourceBuilder({
+  const relationalChecklistsSourceBuilder = EXPORTABLE((PgSourceBuilder, executor, recordType, relationalChecklistsColumns, sql) => new PgSourceBuilder({
     executor,
     codec: recordType(
       sql`interfaces_and_unions.relational_checklists`,
@@ -904,7 +904,7 @@ export function makeExampleSchema(
     name: "relational_checklists",
     columns: relationalChecklistsColumns,
     uniques: [["id"]],
-  });
+  }), [PgSourceBuilder, executor, recordType, relationalChecklistsColumns, sql]);
 
   const relationalChecklistItemsColumns = {
     description: col({ codec: TYPES.text, notNull: true }),
@@ -912,7 +912,7 @@ export function makeExampleSchema(
 
     ...itemColumns,
   };
-  const relationalChecklistItemsSourceBuilder = new PgSourceBuilder({
+  const relationalChecklistItemsSourceBuilder = EXPORTABLE((PgSourceBuilder, executor, recordType, relationalChecklistItemsColumns, sql) => new PgSourceBuilder({
     executor,
     codec: recordType(
       sql`interfaces_and_unions.relational_checklist_items`,
@@ -922,7 +922,7 @@ export function makeExampleSchema(
     name: "relational_checklist_items",
     columns: relationalChecklistItemsColumns,
     uniques: [["id"]],
-  });
+  }), [PgSourceBuilder, executor, recordType, relationalChecklistItemsColumns, sql]);
 
   const relationalItemsSource = EXPORTABLE(
     (
@@ -1104,7 +1104,7 @@ export function makeExampleSchema(
       notNull: true,
     }),
   };
-  const unionItemsSourceBuilder = new PgSourceBuilder({
+  const unionItemsSourceBuilder = EXPORTABLE((PgSourceBuilder, executor, recordType, sql, unionItemsColumns) => new PgSourceBuilder({
     executor,
     codec: recordType(
       sql`interfaces_and_unions.union_items`,
@@ -1114,7 +1114,7 @@ export function makeExampleSchema(
     name: "union_items",
     columns: unionItemsColumns,
     uniques: [["id"]],
-  });
+  }), [PgSourceBuilder, executor, recordType, sql, unionItemsColumns]);
 
   const unionTopicsColumns = {
     id: col({ codec: TYPES.int, notNull: true }),
