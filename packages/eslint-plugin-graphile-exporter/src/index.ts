@@ -1,6 +1,7 @@
 // Inspired by babel-plugin-react-hooks
 
 import { ExhaustiveDeps } from "./ExhaustiveDeps";
+import { ExportInstances } from "./ExportInstances";
 import { ExportPlanMethod } from "./ExportPlanMethod";
 
 export const configs = {
@@ -20,6 +21,12 @@ export const configs = {
           disableAutofix: false,
         },
       ],
+      "graphile-exporter/export-instances": [
+        "error",
+        {
+          disableAutofix: false,
+        },
+      ],
     },
   },
 };
@@ -27,4 +34,5 @@ export const configs = {
 export const rules = {
   "exhaustive-deps": ExhaustiveDeps,
   "export-plan-method": ExportPlanMethod,
+  "export-instances": ExportInstances,
 };
