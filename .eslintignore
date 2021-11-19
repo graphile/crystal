@@ -1,3 +1,4 @@
+package.json
 node_modules
 /.vscode/pnpify
 /packages/pg-sql2/examples
