@@ -67,7 +67,11 @@ export function isNotNullish<T>(input: T | null | undefined): input is T {
 function isImportable(
   thing: unknown,
 ): thing is { $$export: { moduleName: string; exportName: string } } {
-  return thing != null && "$$export" in (thing as object | AnyFunction);
+  return (
+    (typeof thing === "object" || typeof thing === "function") &&
+    thing != null &&
+    "$$export" in (thing as object | AnyFunction)
+  );
 }
 
 type AnyFunction = {
