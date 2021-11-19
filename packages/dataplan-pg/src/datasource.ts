@@ -206,7 +206,9 @@ export class PgSourceBuilder<
 
   get(): PgSource<TCodec, TColumns, TUniques, any, TParameters> {
     if (!this.built) {
-      throw new Error("This builder has not been built!");
+      throw new Error(
+        `This builder (${this.options.name}) has not been built!`,
+      );
     }
     return this.built;
   }
