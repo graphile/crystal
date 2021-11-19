@@ -35,7 +35,7 @@ declare module "eslint" {
 }
 
 interface CommonOptions {
-  enableAutofix: boolean;
+  disableAutofix: boolean;
 }
 
 function reportProblem(
@@ -43,7 +43,7 @@ function reportProblem(
   options: CommonOptions,
   problem: Rule.ReportDescriptor,
 ) {
-  if (options.enableAutofix) {
+  if (options.disableAutofix !== true) {
     // Used to enable legacy behavior. Dangerous.
     // Keep this as an option until major IDEs upgrade (including VSCode FB ESLint extension).
     if (Array.isArray(problem.suggest) && problem.suggest.length > 0) {
@@ -175,9 +175,9 @@ export const ExhaustiveDeps: Rule.RuleModule = {
       {
         type: "object",
         additionalProperties: false,
-        enableDangerousAutofixThisMayCauseInfiniteLoops: false,
+        disableAutofix: false,
         properties: {
-          enableDangerousAutofixThisMayCauseInfiniteLoops: {
+          disableAutofix: {
             type: "boolean",
           },
         },
@@ -185,12 +185,10 @@ export const ExhaustiveDeps: Rule.RuleModule = {
     ],
   },
   create(context) {
-    const enableAutofix =
-      context.options?.[0]?.enableDangerousAutofixThisMayCauseInfiniteLoops ??
-      false;
+    const disableAutofix = context.options?.[0]?.disableAutofix ?? false;
 
     const options: CommonOptions = {
-      enableAutofix,
+      disableAutofix,
     };
 
     const scopeManager = context.getSourceCode().scopeManager;
@@ -354,13 +352,13 @@ export const ExhaustiveDeps: Rule.RuleModule = {
         return;
       }
 
-      let suggestedDeps = [...argNames, ...suggestedDependencies];
+      let suggestedDeps = [...argNames, ...suggestedDependencies].sort();
 
       // If we're going to report a missing dependency,
       // we might as well recalculate the list ignoring
       // the currently specified deps. This can result
       // in some extra deduplication.
-      if (missingDependencies.size > 0 || true) {
+      if (missingDependencies.size > 0 || 3 > 2) {
         suggestedDeps = [
           ...argNames,
           ...collectRecommendations({
@@ -403,10 +401,60 @@ export const ExhaustiveDeps: Rule.RuleModule = {
             )}]`,
             fix(fixer) {
               // TODO: consider preserving the comments or formatting?
-              return fixer.replaceText(
-                declaredDependenciesNode as unknown as ESTreeNode | AST.Token,
-                `[${suggestedDeps.join(", ")}]`,
-              );
+              //
+              const fixArgs = [];
+
+              const range: [number, number] | null =
+                node.range != null && node.body.range != null
+                  ? [node.range[0], node.body.range[0]]
+                  : node.start != null && node.body.start != null
+                  ? [node.start, node.body.start]
+                  : null;
+              if (range != null) {
+                const preferredArgs = `(${suggestedDeps.join(", ")})`;
+                if (node.type === "ArrowFunctionExpression") {
+                  let prefix = "";
+                  const suffix = " => ";
+                  if (node.async) {
+                    prefix = "async " + prefix;
+                  }
+                  if (node.generator) {
+                    prefix = "generator " + prefix;
+                  }
+                  fixArgs.push(
+                    fixer.replaceTextRange(
+                      range,
+                      prefix + preferredArgs + suffix,
+                    ),
+                  );
+                } else if (node.type === "FunctionExpression") {
+                  let prefix = "function ";
+                  const suffix = " ";
+                  if (node.generator) {
+                    prefix = prefix + "*";
+                  }
+                  if (node.id) {
+                    prefix = prefix + `${node.id.name}`;
+                  }
+                  if (node.async) {
+                    prefix = "async " + prefix;
+                  }
+                  fixArgs.push(
+                    fixer.replaceTextRange(
+                      range,
+                      prefix + preferredArgs + suffix,
+                    ),
+                  );
+                }
+              }
+
+              return [
+                ...fixArgs,
+                fixer.replaceText(
+                  declaredDependenciesNode as unknown as ESTreeNode | AST.Token,
+                  `[${suggestedDeps.join(", ")}]`,
+                ),
+              ];
             },
           },
         ],
