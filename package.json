@@ -23,6 +23,7 @@
   "devDependencies": {
     "@babel/cli": "^7.16.0",
     "@babel/core": "^7.16.0",
+    "@babel/eslint-parser": "^7.16.3",
     "@babel/plugin-syntax-object-rest-spread": "^7.8.3",
     "@babel/plugin-transform-modules-commonjs": "^7.16.0",
     "@babel/plugin-transform-runtime": "^7.16.0",
@@ -35,7 +36,6 @@
     "@typescript-eslint/eslint-plugin": "^5.2.0",
     "@typescript-eslint/parser": "^5.2.0",
     "@typescript-eslint/typescript-estree": "^5.2.0",
-    "babel-eslint": "^10.1.0",
     "babel-jest": "^27.3.1",
     "concurrently": "^6.3.0",
     "conventional-changelog-cli": "^2.1.1",
