@@ -356,7 +356,6 @@ export const ExhaustiveDeps: Rule.RuleModule = {
       }
 
       const {
-        suggestedDependencies,
         unnecessaryDependencies,
         missingDependencies,
         duplicateDependencies,
