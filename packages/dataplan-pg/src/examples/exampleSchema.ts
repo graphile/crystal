@@ -606,8 +606,9 @@ export function makeExampleSchema(
   const personSource = EXPORTABLE(
     (
       personBookmarksSource,
-      singleTableItemsSourceBuilder,
       personSourceBuilder,
+      postSourceBuilder,
+      singleTableItemsSourceBuilder,
     ) =>
       personSourceBuilder.build({
         relations: {
@@ -637,11 +638,16 @@ export function makeExampleSchema(
           },
         },
       }),
-    [personBookmarksSource, singleTableItemsSourceBuilder, personSourceBuilder],
+    [
+      personBookmarksSource,
+      personSourceBuilder,
+      postSourceBuilder,
+      singleTableItemsSourceBuilder,
+    ],
   );
 
   const postSource = EXPORTABLE(
-    (PgSource, TYPES, executor, sql) =>
+    (commentSourceBuilder, personSource, postSourceBuilder) =>
       postSourceBuilder.build({
         relations: {
           author: {
@@ -658,12 +664,11 @@ export function makeExampleSchema(
           },
         },
       }),
-    [PgSource, TYPES, executor, sql],
+    [commentSourceBuilder, personSource, postSourceBuilder],
   );
 
   const commentSource = EXPORTABLE(
-    (PgSource, TYPES, executor, sql) =>
-      commentSourceBuilder.build({
+    (commentSourceBuilder, personSource, postSource) => commentSourceBuilder.build({
         relations: {
           author: {
             source: personSource,
@@ -679,12 +684,11 @@ export function makeExampleSchema(
           },
         },
       }),
-    [PgSource, TYPES, executor, sql],
+    [commentSourceBuilder, personSource, postSource],
   );
 
   const singleTableItemsSource = EXPORTABLE(
-    (PgSource, TYPES, executor, sql) =>
-      singleTableItemsSourceBuilder.build({
+    (personSource, singleTableItemsSourceBuilder) => singleTableItemsSourceBuilder.build({
         relations: {
           parent: {
             source: singleTableItemsSourceBuilder,
@@ -706,7 +710,7 @@ export function makeExampleSchema(
           },
         },
       }),
-    [PgSource, TYPES, executor, sql],
+    [personSource, singleTableItemsSourceBuilder],
   );
 
   const relationalItemColumns = {
@@ -919,8 +923,7 @@ export function makeExampleSchema(
   });
 
   const relationalItemsSource = EXPORTABLE(
-    (PgSource, TYPES, executor, sql) =>
-      relationalItemsSourceBuilder.build({
+    (personSource, relationalChecklistItemsSourceBuilder, relationalChecklistsSourceBuilder, relationalDividersSourceBuilder, relationalItemsSourceBuilder, relationalPostsSourceBuilder, relationalTopicsSourceBuilder) => relationalItemsSourceBuilder.build({
         relations: {
           parent: {
             source: relationalItemsSourceBuilder,
@@ -977,12 +980,11 @@ export function makeExampleSchema(
           },
         },
       }),
-    [PgSource, TYPES, executor, sql],
+    [personSource, relationalChecklistItemsSourceBuilder, relationalChecklistsSourceBuilder, relationalDividersSourceBuilder, relationalItemsSourceBuilder, relationalPostsSourceBuilder, relationalTopicsSourceBuilder],
   );
 
   const relationalCommentableSource = EXPORTABLE(
-    (PgSource, TYPES, executor, sql) =>
-      relationalCommentableSourceBuilder.build({
+    (relationalChecklistItemsSourceBuilder, relationalChecklistsSourceBuilder, relationalCommentableSourceBuilder, relationalPostsSourceBuilder) => relationalCommentableSourceBuilder.build({
         relations: {
           post: {
             source: relationalPostsSourceBuilder,
@@ -1007,52 +1009,47 @@ export function makeExampleSchema(
           },
         },
       }),
-    [PgSource, TYPES, executor, sql],
+    [relationalChecklistItemsSourceBuilder, relationalChecklistsSourceBuilder, relationalCommentableSourceBuilder, relationalPostsSourceBuilder],
   );
 
   const relationalTopicsSource = EXPORTABLE(
-    (PgSource, TYPES, executor, sql) =>
-      relationalTopicsSourceBuilder.build({
+    (itemRelations, relationalTopicsSourceBuilder) => relationalTopicsSourceBuilder.build({
         relations: itemRelations,
       }),
-    [PgSource, TYPES, executor, sql],
+    [itemRelations, relationalTopicsSourceBuilder],
   );
   const relationalPostsSource = EXPORTABLE(
-    (PgSource, TYPES, executor, sql) =>
-      relationalPostsSourceBuilder.build({
+    (commentableRelation, itemRelations, relationalPostsSourceBuilder) => relationalPostsSourceBuilder.build({
         relations: {
           ...itemRelations,
           commentable: commentableRelation,
         },
       }),
-    [PgSource, TYPES, executor, sql],
+    [commentableRelation, itemRelations, relationalPostsSourceBuilder],
   );
   const relationalDividersSource = EXPORTABLE(
-    (PgSource, TYPES, executor, sql) =>
-      relationalDividersSourceBuilder.build({
+    (itemRelations, relationalDividersSourceBuilder) => relationalDividersSourceBuilder.build({
         relations: itemRelations,
       }),
-    [PgSource, TYPES, executor, sql],
+    [itemRelations, relationalDividersSourceBuilder],
   );
   const relationalChecklistsSource = EXPORTABLE(
-    (PgSource, TYPES, executor, sql) =>
-      relationalChecklistsSourceBuilder.build({
+    (commentableRelation, itemRelations, relationalChecklistsSourceBuilder) => relationalChecklistsSourceBuilder.build({
         relations: {
           ...itemRelations,
           commentable: commentableRelation,
         },
       }),
-    [PgSource, TYPES, executor, sql],
+    [commentableRelation, itemRelations, relationalChecklistsSourceBuilder],
   );
   const relationalChecklistItemsSource = EXPORTABLE(
-    (PgSource, TYPES, executor, sql) =>
-      relationalChecklistItemsSourceBuilder.build({
+    (commentableRelation, itemRelations, relationalChecklistItemsSourceBuilder) => relationalChecklistItemsSourceBuilder.build({
         relations: {
           ...itemRelations,
           commentable: commentableRelation,
         },
       }),
-    [PgSource, TYPES, executor, sql],
+    [commentableRelation, itemRelations, relationalChecklistItemsSourceBuilder],
   );
 
   ////////////////////////////////////////
@@ -1085,8 +1082,7 @@ export function makeExampleSchema(
     title: col({ codec: TYPES.text, notNull: false }),
   };
   const unionTopicsSource = EXPORTABLE(
-    (PgSource, TYPES, executor, sql) =>
-      new PgSource({
+    (PgSource, executor, recordType, sql, unionTopicsColumns) => new PgSource({
         executor,
         codec: recordType(
           sql`interfaces_and_unions.union_topics`,
@@ -1097,7 +1093,7 @@ export function makeExampleSchema(
         columns: unionTopicsColumns,
         uniques: [["id"]],
       }),
-    [PgSource, TYPES, executor, sql],
+    [PgSource, executor, recordType, sql, unionTopicsColumns],
   );
 
   const unionPostsColumns = {
@@ -1107,8 +1103,7 @@ export function makeExampleSchema(
     note: col({ codec: TYPES.text, notNull: false }),
   };
   const unionPostsSource = EXPORTABLE(
-    (PgSource, TYPES, executor, sql) =>
-      new PgSource({
+    (PgSource, executor, recordType, sql, unionPostsColumns) => new PgSource({
         executor,
         codec: recordType(
           sql`interfaces_and_unions.union_posts`,
@@ -1119,7 +1114,7 @@ export function makeExampleSchema(
         columns: unionPostsColumns,
         uniques: [["id"]],
       }),
-    [PgSource, TYPES, executor, sql],
+    [PgSource, executor, recordType, sql, unionPostsColumns],
   );
 
   const unionDividersColumns = {
@@ -1128,8 +1123,7 @@ export function makeExampleSchema(
     color: col({ codec: TYPES.text, notNull: false }),
   };
   const unionDividersSource = EXPORTABLE(
-    (PgSource, TYPES, executor, sql) =>
-      new PgSource({
+    (PgSource, executor, recordType, sql, unionDividersColumns) => new PgSource({
         executor,
         codec: recordType(
           sql`interfaces_and_unions.union_dividers`,
@@ -1140,7 +1134,7 @@ export function makeExampleSchema(
         columns: unionDividersColumns,
         uniques: [["id"]],
       }),
-    [PgSource, TYPES, executor, sql],
+    [PgSource, executor, recordType, sql, unionDividersColumns],
   );
 
   const unionChecklistsColumns = {
@@ -1148,8 +1142,7 @@ export function makeExampleSchema(
     title: col({ codec: TYPES.text, notNull: false }),
   };
   const unionChecklistsSource = EXPORTABLE(
-    (PgSource, TYPES, executor, sql) =>
-      new PgSource({
+    (PgSource, executor, recordType, sql, unionChecklistsColumns) => new PgSource({
         executor,
         codec: recordType(
           sql`interfaces_and_unions.union_checklists`,
@@ -1160,7 +1153,7 @@ export function makeExampleSchema(
         columns: unionChecklistsColumns,
         uniques: [["id"]],
       }),
-    [PgSource, TYPES, executor, sql],
+    [PgSource, executor, recordType, sql, unionChecklistsColumns],
   );
 
   const unionChecklistItemsColumns = {
@@ -1169,8 +1162,7 @@ export function makeExampleSchema(
     note: col({ codec: TYPES.text, notNull: false }),
   };
   const unionChecklistItemsSource = EXPORTABLE(
-    (PgSource, TYPES, executor, sql) =>
-      new PgSource({
+    (PgSource, executor, recordType, sql, unionChecklistItemsColumns) => new PgSource({
         executor,
         codec: recordType(
           sql`interfaces_and_unions.union_checklist_items`,
@@ -1181,12 +1173,11 @@ export function makeExampleSchema(
         columns: unionChecklistItemsColumns,
         uniques: [["id"]],
       }),
-    [PgSource, TYPES, executor, sql],
+    [PgSource, executor, recordType, sql, unionChecklistItemsColumns],
   );
 
   const unionEntitySource = EXPORTABLE(
-    (PgSource, TYPES, executor, sql) =>
-      new PgSource({
+    (PgSource, executor, recordType, sql, unionEntityColumns) => new PgSource({
         executor,
         codec: recordType(
           sql`interfaces_and_unions.union__entity`,
@@ -1196,22 +1187,20 @@ export function makeExampleSchema(
         name: "union__entity",
         columns: unionEntityColumns,
       }),
-    [PgSource, TYPES, executor, sql],
+    [PgSource, executor, recordType, sql, unionEntityColumns],
   );
 
   const entitySearchSource = EXPORTABLE(
-    (PgSource, TYPES, executor, sql) =>
-      unionEntitySource.alternativeSource({
+    (sql, unionEntitySource) => unionEntitySource.alternativeSource({
         source: (...args: SQL[]) =>
           sql`interfaces_and_unions.search(${sql.join(args, ", ")})`,
         name: "entity_search",
       }),
-    [PgSource, TYPES, executor, sql],
+    [sql, unionEntitySource],
   );
 
   const unionItemsSource = EXPORTABLE(
-    (PgSource, TYPES, executor, sql) =>
-      unionItemsSourceBuilder.build({
+    (unionChecklistItemsSource, unionChecklistsSource, unionDividersSource, unionItemsSourceBuilder, unionPostsSource, unionTopicsSource) => unionItemsSourceBuilder.build({
         relations: {
           topic: {
             source: unionTopicsSource,
@@ -1245,7 +1234,7 @@ export function makeExampleSchema(
           },
         },
       }),
-    [PgSource, TYPES, executor, sql],
+    [unionChecklistItemsSource, unionChecklistsSource, unionDividersSource, unionItemsSourceBuilder, unionPostsSource, unionTopicsSource],
   );
 
   function attrField<TDataSource extends PgSource<any, any, any, any>>(
