@@ -1,5 +1,6 @@
 import { EventEmitter } from "events";
 import { lambda, object } from "graphile-crystal";
+import { EXPORTABLE } from "graphile-exporter";
 import type { ExecutionResult, GraphQLSchema } from "graphql";
 import {
   graphql,
@@ -74,7 +75,11 @@ const makePluginEtc = (defaultCounter = 0) => {
             return {
               n: {
                 type: new GraphQLNonNull(GraphQLInt),
-                plan: () => lambda(null, () => dummyCounter),
+                plan: EXPORTABLE(
+                  (dummyCounter, lambda) => () =>
+                    lambda(null, () => dummyCounter),
+                  [dummyCounter, lambda],
+                ),
               },
             };
           },
@@ -100,9 +105,13 @@ const makePluginEtc = (defaultCounter = 0) => {
             () => {
               return {
                 type: Dummy,
-                plan() {
-                  return object({});
-                },
+                plan: EXPORTABLE(
+                  (object) =>
+                    function plan() {
+                      return object({});
+                    },
+                  [object],
+                ),
               };
             },
           ),

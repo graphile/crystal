@@ -21,7 +21,7 @@ export function assertPolymorphicData(
   }
 }
 
-export function polymorphicWrap<TType extends string, TData extends any>(
+export function polymorphicWrap<TType extends string, TData>(
   type: TType,
   data: TData,
 ): PolymorphicData<TType, TData> {

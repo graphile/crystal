@@ -1,4 +1,5 @@
 import { aether } from "graphile-crystal";
+import { EXPORTABLE } from "graphile-exporter";
 
 /**
  * Adds the Query.query field to the Query type for Relay 1 compatibility. This
@@ -25,9 +26,13 @@ export const QueryQueryPlugin: GraphileEngine.Plugin =
             description:
               "Exposes the root query type nested one level down. This is helpful for Relay 1 which can only query top level fields if they are in a particular form.",
             type: new GraphQLNonNull(Self),
-            plan() {
-              return aether().rootValuePlan;
-            },
+            plan: EXPORTABLE(
+              (aether) =>
+                function plan() {
+                  return aether().rootValuePlan;
+                },
+              [aether],
+            ),
           },
         },
         "Adding the Query.query field for Relay 1 compat",

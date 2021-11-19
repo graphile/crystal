@@ -1,4 +1,5 @@
 import { aether } from "graphile-crystal";
+import { EXPORTABLE } from "graphile-exporter";
 
 /**
  * Adds a 'query' field to each mutation payload object type; this often turns
@@ -28,9 +29,13 @@ export const MutationPayloadQueryPlugin: GraphileEngine.Plugin =
               description:
                 "Our root query field type. Allows us to run any query from our mutation payload.",
               type: Query,
-              plan() {
-                return aether().rootValuePlan;
-              },
+              plan: EXPORTABLE(
+                (aether) =>
+                  function plan() {
+                    return aether().rootValuePlan;
+                  },
+                [aether],
+              ),
             },
           },
           `Adding 'query' field to mutation payload ${Self.name}`,

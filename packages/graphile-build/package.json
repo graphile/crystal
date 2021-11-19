@@ -44,6 +44,7 @@
     "chalk": "^4.1.2",
     "debug": "^4.3.2",
     "graphile-crystal": "4.7.0",
+    "graphile-exporter": "^0.0.1",
     "pluralize": "^7.0.0",
     "semver": "^7.3.5",
     "tslib": "^2.3.1"
@@ -60,7 +61,6 @@
     "@types/babel__template": "^7",
     "@types/debug": "^4.1.7",
     "@types/jest": "^27.0.2",
-    "graphile-exporter": "^0.0.1",
     "graphql": "npm:graphql@experimental-stream-defer",
     "jest": "^27.3.1",
     "ts-node": "^10.4.0",

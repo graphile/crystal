@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import { readFile } from "fs/promises";
 import { lambda } from "graphile-crystal";
-import { exportSchema, EXPORTABLE } from "graphile-exporter";
+import { EXPORTABLE, exportSchema } from "graphile-exporter";
 import { graphql, printSchema } from "graphql";
 import { URL } from "url";
 
@@ -38,7 +38,7 @@ const MyRandomFieldPlugin: GraphileEngine.Plugin = (
             },
           },
           plan: EXPORTABLE(
-            (myDefaultMax, myDefaultMin, lambda) => (_$parent, args) => {
+            (lambda, myDefaultMax, myDefaultMin) => (_$parent, args) => {
               return lambda(
                 args.sides,
                 (sides = myDefaultMax) =>
@@ -46,7 +46,7 @@ const MyRandomFieldPlugin: GraphileEngine.Plugin = (
                   myDefaultMin,
               );
             },
-            [myDefaultMax, myDefaultMin, lambda],
+            [lambda, myDefaultMax, myDefaultMin],
           ),
         })),
       },
