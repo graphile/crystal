@@ -1,6 +1,10 @@
 import type { Expression, Method, Property } from "@babel/types";
 import type { Rule } from "eslint";
-import type { Node as ESTreeNode } from "estree";
+import type {
+  Expression as ESTreeExpression,
+  Node as ESTreeNode,
+  PrivateIdentifier,
+} from "estree";
 
 import { reportProblem } from "./common";
 
@@ -71,7 +75,7 @@ export const ExportPlanMethod: Rule.RuleModule = {
     };
     return {
       Property(node) {
-        if (node.key.type === "Identifier" && node.key.name === "plan") {
+        if (isPlan(node.key)) {
           processNode(
             context,
             options,
@@ -80,7 +84,7 @@ export const ExportPlanMethod: Rule.RuleModule = {
         }
       },
       MethodDefinition(node) {
-        if (node.key.type === "Identifier" && node.key.name === "plan") {
+        if (isPlan(node.key)) {
           processNode(
             context,
             options,
@@ -191,4 +195,11 @@ function processNode(
       );
     }
   }
+}
+
+function isPlan(node: ESTreeExpression | PrivateIdentifier): boolean {
+  return (
+    node.type === "Identifier" &&
+    (node.name === "plan" || node.name === "subscribePlan")
+  );
 }
