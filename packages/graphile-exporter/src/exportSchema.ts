@@ -731,17 +731,22 @@ function convertToASTOnce(
   if (existingIdentifier) {
     return existingIdentifier;
   }
-  const variableIdentifier = file.makeVariable(nameHint || "value");
   const ast = isExportedFromFactory(thing)
     ? factoryAst(file, thing, locationHint)
     : convertToAST(file, thing, locationHint);
-  file.addStatements(
-    t.variableDeclaration("const", [
-      t.variableDeclarator(variableIdentifier, ast),
-    ]),
-  );
-  file._values.set(thing, variableIdentifier);
-  return variableIdentifier;
+  if (ast.type === "Identifier") {
+    file._values.set(thing, ast);
+    return ast;
+  } else {
+    const variableIdentifier = file.makeVariable(nameHint || "value");
+    file.addStatements(
+      t.variableDeclaration("const", [
+        t.variableDeclarator(variableIdentifier, ast),
+      ]),
+    );
+    file._values.set(thing, variableIdentifier);
+    return variableIdentifier;
+  }
 }
 
 function configToAST(o: {
