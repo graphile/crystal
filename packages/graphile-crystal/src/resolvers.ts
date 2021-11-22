@@ -233,9 +233,6 @@ function crystalWrapResolveOrSubscribe<
       /* 👆👆👆👆👆 NO AWAIT ALLOWED ABOVE HERE 👆👆👆👆👆 */
 
       const result = await resultPromise;
-      if (result instanceof CrystalError) {
-        throw result.originalError;
-      }
 
       debug(
         `👈 %p/%c for %s; result: %c`,

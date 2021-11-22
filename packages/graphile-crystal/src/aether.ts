@@ -2574,6 +2574,7 @@ export class Aether<
           return asyncIterator;
         } else {
           if (listResult != null) {
+            // TODO: should we handle CrystalError here?
             console.error(
               `Expected listResult to be an array, found ${inspect(
                 listResult,
@@ -2614,64 +2615,60 @@ export class Aether<
           finalResult[i] =
             layerResults[i] instanceof CrystalError
               ? Promise.reject(layerResults[i].originalError)
-              : mapResult(finalResult[i]);
+              : mapResult(crystalLayerObjects[i]);
         }
         return finalResult;
       } else {
         // Now executing the following layers using the same crystalLayerObjects
         const finalResult = new Array(crystalLayerObjectsLength);
-        const map = new Map<number, number>();
+        const pendingIndexes = [];
         const pendingCrystalLayerObjects = [];
-        let hasError = false;
         for (
           let finalResultIndex = 0;
           finalResultIndex < crystalLayerObjectsLength;
           finalResultIndex++
         ) {
           if (layerResults[finalResultIndex] instanceof CrystalError) {
-            finalResult[finalResultIndex] = layerResults[finalResultIndex];
-            hasError = true;
+            finalResult[finalResultIndex] = Promise.reject(
+              layerResults[finalResultIndex],
+            );
           } else {
-            map.set(
-              finalResultIndex,
-              pendingCrystalLayerObjects.push(
-                crystalLayerObjects[finalResultIndex],
-              ) - 1,
+            pendingCrystalLayerObjects.push(
+              crystalLayerObjects[finalResultIndex],
             );
+            pendingIndexes.push(finalResultIndex);
           }
         }
-        if (hasError) {
-          const pendingResults = await this.executeLayers(
-            crystalContext,
-            rest,
-            pendingCrystalLayerObjects,
-            rawMapResult,
+        const pendingResults = await this.executeLayers(
+          crystalContext,
+          rest,
+          pendingCrystalLayerObjects,
+          rawMapResult,
+        );
+        if (isDev) {
+          assert.ok(
+            Array.isArray(pendingResults),
+            "Expected non-error plan execution to return an array",
           );
-          if (isDev) {
-            assert.ok(
-              Array.isArray(pendingResults),
-              "Expected non-error plan execution to return an array",
-            );
-            assert.strictEqual(
-              pendingResults.length,
-              pendingCrystalLayerObjects.length,
-              "Expected non-error plan execution result to have same length as input objects",
-            );
-          }
-          // Stitch the results back into the list
-          for (const [finalResultIndex, pendingResultIndex] of map.entries()) {
-            finalResult[finalResultIndex] = pendingResults[pendingResultIndex];
-          }
-          return finalResult;
-        } else {
-          // Optimization: no errors so use existing list (and GC the temporary one)
-          return this.executeLayers(
-            crystalContext,
-            rest,
-            crystalLayerObjects,
-            rawMapResult,
+          assert.strictEqual(
+            pendingResults.length,
+            pendingCrystalLayerObjects.length,
+            "Expected non-error plan execution result to have same length as input objects",
           );
         }
+        // Stitch the results back into the list
+        for (
+          let pendingResultIndex = 0, l = pendingResults.length;
+          pendingResultIndex < l;
+          pendingResultIndex++
+        ) {
+          const finalResultIndex = pendingIndexes[pendingResultIndex];
+          finalResult[finalResultIndex] =
+            pendingResults[pendingResultIndex] instanceof CrystalError
+              ? Promise.reject(pendingResults[pendingResultIndex].originalError)
+              : pendingResults[pendingResultIndex];
+        }
+        return finalResult;
       }
     }
   }
