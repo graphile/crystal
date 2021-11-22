@@ -1024,7 +1024,7 @@ Object.defineProperty(${
       return result;
     } catch {
       console.error(
-        `Function export error - failed to process function definition '${trimDef(
+        `Function export error at ${locationHint} - failed to process function definition '${trimDef(
           fn.toString(),
         )}'`,
       );
