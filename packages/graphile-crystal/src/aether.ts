@@ -2041,6 +2041,10 @@ export class Aether<
     );
   }
 
+  /**
+   * The meat of plan execution, this is called by executePlan for pending
+   * plans - those that have not been executed yet.
+   */
   private async executePlanPending<T>(
     plan: ExecutablePlan<T>,
     crystalContext: CrystalContext,
