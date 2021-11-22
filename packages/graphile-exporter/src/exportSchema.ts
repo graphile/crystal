@@ -10,6 +10,7 @@ import type {
   GraphQLDirective,
   GraphQLDirectiveConfig,
   GraphQLEnumTypeConfig,
+  GraphQLEnumValueConfig,
   GraphQLFieldConfig,
   GraphQLFieldConfigArgumentMap,
   GraphQLFieldConfigMap,
@@ -295,6 +296,30 @@ class CodegenFile {
     }
   }
 
+  private makeEnumValue(
+    config: GraphQLEnumValueConfig,
+    typeName: string,
+    enumValueName: string,
+  ): t.Expression {
+    const locationHint = `${typeName}.values[${JSON.stringify(enumValueName)}]`;
+    const mappedConfig: {
+      [key in keyof GraphQLEnumValueConfig as Exclude<
+        keyof GraphQLEnumValueConfig,
+        "astNode"
+      >]-?: t.Expression | null;
+    } = {
+      description: desc(config.description),
+      value: convertToAST(this, config.value, `${locationHint}.value`),
+      extensions: extensions(
+        this,
+        config.extensions,
+        `${locationHint}.extensions`,
+      ),
+      deprecationReason: desc(config.deprecationReason),
+    };
+    return configToAST(mappedConfig);
+  }
+
   // For objects and interfaces
   private makeObjectFields(
     fields: GraphQLFieldConfigMap<any, any>,
@@ -542,11 +567,7 @@ class CodegenFile {
           Object.entries(config.values).map(([key, value]) =>
             t.objectProperty(
               t.identifier(key),
-              convertToAST(
-                this,
-                value,
-                `${config.name}.values[${JSON.stringify(key)}]`,
-              ),
+              this.makeEnumValue(value, config.name, key),
             ),
           ),
         ),
