@@ -5698,6 +5698,7 @@ __metadata:
     typescript: next
   peerDependencies:
     graphql: "*"
+    pg-sql2: "*"
   languageName: unknown
   linkType: soft
 
