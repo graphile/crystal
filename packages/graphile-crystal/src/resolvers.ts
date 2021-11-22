@@ -5,7 +5,7 @@ import type { GraphQLFieldResolver, GraphQLResolveInfo } from "graphql";
 import { defaultFieldResolver } from "graphql";
 import type { Path } from "graphql/jsutils/Path";
 
-import { populateValuePlan } from "./aether";
+import { CrystalError, populateValuePlan } from "./aether";
 import * as assert from "./assert";
 import { ROOT_PATH } from "./constants";
 import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint";
@@ -233,6 +233,9 @@ function crystalWrapResolveOrSubscribe<
       /* 👆👆👆👆👆 NO AWAIT ALLOWED ABOVE HERE 👆👆👆👆👆 */
 
       const result = await resultPromise;
+      if (result instanceof CrystalError) {
+        throw result.originalError;
+      }
 
       debug(
         `👈 %p/%c for %s; result: %c`,

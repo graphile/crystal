@@ -2607,15 +2607,72 @@ export class Aether<
         );
       }
 
-      // Now executing the following layers using the same crystalLayerObjects
-      return mapResult
-        ? crystalLayerObjects.map(mapResult)
-        : this.executeLayers(
+      if (mapResult) {
+        // No following layers; map the result
+        const finalResult = new Array(crystalLayerObjectsLength);
+        for (let i = 0; i < crystalLayerObjectsLength; i++) {
+          finalResult[i] =
+            layerResults[i] instanceof CrystalError
+              ? Promise.reject(layerResults[i].originalError)
+              : mapResult(finalResult[i]);
+        }
+        return finalResult;
+      } else {
+        // Now executing the following layers using the same crystalLayerObjects
+        const finalResult = new Array(crystalLayerObjectsLength);
+        const map = new Map<number, number>();
+        const pendingCrystalLayerObjects = [];
+        let hasError = false;
+        for (
+          let finalResultIndex = 0;
+          finalResultIndex < crystalLayerObjectsLength;
+          finalResultIndex++
+        ) {
+          if (layerResults[finalResultIndex] instanceof CrystalError) {
+            finalResult[finalResultIndex] = layerResults[finalResultIndex];
+            hasError = true;
+          } else {
+            map.set(
+              finalResultIndex,
+              pendingCrystalLayerObjects.push(
+                crystalLayerObjects[finalResultIndex],
+              ) - 1,
+            );
+          }
+        }
+        if (hasError) {
+          const pendingResults = await this.executeLayers(
+            crystalContext,
+            rest,
+            pendingCrystalLayerObjects,
+            rawMapResult,
+          );
+          if (isDev) {
+            assert.ok(
+              Array.isArray(pendingResults),
+              "Expected non-error plan execution to return an array",
+            );
+            assert.strictEqual(
+              pendingResults.length,
+              pendingCrystalLayerObjects.length,
+              "Expected non-error plan execution result to have same length as input objects",
+            );
+          }
+          // Stitch the results back into the list
+          for (const [finalResultIndex, pendingResultIndex] of map.entries()) {
+            finalResult[finalResultIndex] = pendingResults[pendingResultIndex];
+          }
+          return finalResult;
+        } else {
+          // Optimization: no errors so use existing list (and GC the temporary one)
+          return this.executeLayers(
             crystalContext,
             rest,
             crystalLayerObjects,
             rawMapResult,
           );
+        }
+      }
     }
   }
 
@@ -2623,7 +2680,8 @@ export class Aether<
    * Implements `ExecuteBatch`.
    *
    * TODO: we can optimise this to not be `async` (only return a promise when
-   * necessary).
+   * necessary); but when doing so be very careful that errors are handled
+   * correctly.
    *
    * @internal
    */
@@ -2992,7 +3050,14 @@ function isNotNullish<T>(a: T | null | undefined): a is T {
 
 // IMPORTANT: this WILL NOT WORK when compiled down to ES5. It requires ES6+
 // native class support.
-class CrystalError extends Error {
+/**
+ * When an error occurs during plan execution we wrap it in a CrystalError so
+ * that we can pass it around as a value.  It gets unwrapped and thrown in the
+ * crystal resolver.
+ *
+ * @internal
+ */
+export class CrystalError extends Error {
   public readonly originalError: Error;
   constructor(originalError: Error) {
     const message = originalError?.message;
