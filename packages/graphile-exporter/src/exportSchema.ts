@@ -39,6 +39,31 @@ import { sql } from "pg-sql2";
 import type { URL } from "url";
 import { inspect } from "util";
 
+function locationHintToIdentifierName(locationHint: string): string {
+  let result = locationHint;
+  result = result.replace(/[\[.]/g, "__").replace(/\]/g, "");
+  result = result.replace(/[^a-z0-9_]+/gi, "");
+  result = result.replace(/^([0-9])/, "_$1");
+  return result;
+}
+
+function getNameForThing(thing: any, locationHint: string): string {
+  if (typeof thing === "function") {
+    // const thingName = (thing as any).name ?? (thing as any).displayName ?? null;
+    return locationHintToIdentifierName(locationHint);
+  } else {
+    const thingConstructor = thing.constructor;
+    const thingConstructorName =
+      thingConstructor?.name ?? thingConstructor?.displayName ?? null;
+    const thingName = (thing as any).name ?? (thing as any).displayName ?? null;
+    const name =
+      thingConstructorName && thingName
+        ? `${thingName}${thingConstructorName}`
+        : thingName ?? thingConstructorName ?? null;
+    return name;
+  }
+}
+
 function trimDef(def: string): string {
   const str = def.replace(/\s+/g, " ");
   const PREFIX_LENGTH = 60;
@@ -690,14 +715,7 @@ function convertToAST(
     return file.import(moduleName, exportName);
   } else if (isExportedFromFactory(thing)) {
     const thingAsAny = thing as any;
-    const thingConstructor = thingAsAny.constructor;
-    const thingConstructorName =
-      thingConstructor?.name ?? thingConstructor?.displayName ?? null;
-    const thingName = (thing as any).name ?? (thing as any).displayName ?? null;
-    const name =
-      thingConstructorName && thingName
-        ? `${thingName}${thingConstructorName}`
-        : thingName ?? thingConstructorName ?? null;
+    const name = getNameForThing(thingAsAny, locationHint);
     return convertToIdentifierViaAST(file, thing, name, locationHint);
   } else if (sql.isSQL(thing)) {
     throw new Error(
