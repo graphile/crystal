@@ -2464,7 +2464,7 @@ export function makeExampleSchema(
   });
 
   const singleTableTypeName = EXPORTABLE(
-    ($entity, lambda) => {
+    (lambda) => ($entity: SingleTableItemPlan) => {
       const $type = $entity.get("type");
       const $typeName = lambda($type, (v) => {
         if (v == null) {
@@ -2484,7 +2484,7 @@ export function makeExampleSchema(
       });
       return $typeName;
     },
-    [$entity, lambda],
+    [lambda],
   );
 
   const singleTableItemInterface = EXPORTABLE(
@@ -2632,54 +2632,73 @@ export function makeExampleSchema(
    * grab that person from the `personSource`. If `post_id` is set it's a Post,
    * and so on.
    */
-  const entityUnion = <
-    TCodec extends PgTypeCodec<any, any, typeof unionEntityColumns>,
-  >(
-    $item:
-      | PgSelectSinglePlan<PgSource<TCodec, any, any, any, any>>
-      | PgClassExpressionPlan<any, TCodec>,
-  ) =>
-    pgPolymorphic(
-      $item,
-      list([
-        // TODO: this ridiculous code is just to appease TypeScript; we should
-        // be able to just `$item.get("person_id")`.
-        $item instanceof PgSelectSinglePlan
-          ? $item.get("person_id")
-          : $item.get("person_id"),
-        $item instanceof PgSelectSinglePlan
-          ? $item.get("post_id")
-          : $item.get("post_id"),
-        $item instanceof PgSelectSinglePlan
-          ? $item.get("comment_id")
-          : $item.get("comment_id"),
-      ]),
-      {
-        Person: {
-          match: (v) => v[0] != null,
-          plan: EXPORTABLE(
-            (personSource) => ($list) =>
-              personSource.get({ person_id: $list.at(0) }),
-            [personSource],
-          ),
-        },
-        Post: {
-          match: (v) => v[1] != null,
-          plan: EXPORTABLE(
-            (postSource) => ($list) => postSource.get({ post_id: $list.at(1) }),
-            [postSource],
-          ),
-        },
-        Comment: {
-          match: (v) => v[2] != null,
-          plan: EXPORTABLE(
-            (commentSource) => ($list) =>
-              commentSource.get({ comment_id: $list.at(2) }),
-            [commentSource],
-          ),
-        },
-      },
-    );
+  const entityUnion = EXPORTABLE(
+    (
+        EXPORTABLE,
+        PgSelectSinglePlan,
+        commentSource,
+        list,
+        personSource,
+        pgPolymorphic,
+        postSource,
+      ) =>
+      <TCodec extends PgTypeCodec<any, any, typeof unionEntityColumns>>(
+        $item:
+          | PgSelectSinglePlan<PgSource<TCodec, any, any, any, any>>
+          | PgClassExpressionPlan<any, TCodec>,
+      ) =>
+        pgPolymorphic(
+          $item,
+          list([
+            // TODO: this ridiculous code is just to appease TypeScript; we should
+            // be able to just `$item.get("person_id")`.
+            $item instanceof PgSelectSinglePlan
+              ? $item.get("person_id")
+              : $item.get("person_id"),
+            $item instanceof PgSelectSinglePlan
+              ? $item.get("post_id")
+              : $item.get("post_id"),
+            $item instanceof PgSelectSinglePlan
+              ? $item.get("comment_id")
+              : $item.get("comment_id"),
+          ]),
+          {
+            Person: {
+              match: (v) => v[0] != null,
+              plan: EXPORTABLE(
+                (personSource) => ($list) =>
+                  personSource.get({ person_id: $list.at(0) }),
+                [personSource],
+              ),
+            },
+            Post: {
+              match: (v) => v[1] != null,
+              plan: EXPORTABLE(
+                (postSource) => ($list) =>
+                  postSource.get({ post_id: $list.at(1) }),
+                [postSource],
+              ),
+            },
+            Comment: {
+              match: (v) => v[2] != null,
+              plan: EXPORTABLE(
+                (commentSource) => ($list) =>
+                  commentSource.get({ comment_id: $list.at(2) }),
+                [commentSource],
+              ),
+            },
+          },
+        ),
+    [
+      EXPORTABLE,
+      PgSelectSinglePlan,
+      commentSource,
+      list,
+      personSource,
+      pgPolymorphic,
+      postSource,
+    ],
+  );
 
   const PersonBookmark: GraphQLObjectType<any, OurGraphQLContext> =
     newObjectTypeBuilder<OurGraphQLContext, PersonBookmarkPlan>(
