@@ -2399,6 +2399,9 @@ export function makeExampleSchema(
   const singleTableTypeName = ($entity: SingleTableItemPlan) => {
     const $type = $entity.get("type");
     const $typeName = lambda($type, (v) => {
+      if (v == null) {
+        return v;
+      }
       const type = {
         TOPIC: "SingleTableTopic",
         POST: "SingleTablePost",
