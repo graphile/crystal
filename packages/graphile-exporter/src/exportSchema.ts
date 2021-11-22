@@ -1089,6 +1089,6 @@ export async function exportSchema(
   const ast = file.toAST();
 
   const { code } = reallyGenerate(ast, {});
-  const HEADER = `/* eslint-disable graphile-exporter/export-instances, graphile-exporter/export-plan-method, graphile-exporter/exhaustive-deps */\n`;
+  const HEADER = `/* eslint-disable graphile-exporter/export-instances, graphile-exporter/export-methods, graphile-exporter/exhaustive-deps */\n`;
   await writeFile(toPath, HEADER + code);
 }

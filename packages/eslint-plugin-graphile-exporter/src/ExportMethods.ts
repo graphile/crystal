@@ -10,6 +10,7 @@ import { reportProblem } from "./common";
 
 interface CommonOptions {
   disableAutofix: boolean;
+  methods: string[];
 }
 
 /**
@@ -19,10 +20,6 @@ interface CommonOptions {
  * plan/type/name for pgSelect.
  */
 const ALLOWED_SIBLING_KEYS: string[] = [
-  // Plan itself
-  "plan",
-  "subscribePlan",
-
   // GraphQLFieldConfig
   "description",
   "type",
@@ -43,12 +40,12 @@ const ALLOWED_SIBLING_KEYS: string[] = [
   "name",
 ];
 
-export const ExportPlanMethod: Rule.RuleModule = {
+export const ExportMethods: Rule.RuleModule = {
   meta: {
     type: "suggestion",
     docs: {
       description:
-        "Looks for 'plan' method on something that looks like a GraphQL definition and ensures it's exportable.",
+        "Looks for 'resolve'/'subscribe'/'plan'/'subscribePlan' method on something that looks like a GraphQL definition and ensures it's exportable.",
       recommended: true,
       url: "TODO",
     },
@@ -63,19 +60,32 @@ export const ExportPlanMethod: Rule.RuleModule = {
           disableAutofix: {
             type: "boolean",
           },
+          methods: {
+            type: "array",
+            items: {
+              type: "string",
+            },
+          },
         },
       },
     ],
   },
   create(context) {
     const disableAutofix = context.options?.[0]?.disableAutofix ?? false;
+    const methods = context.options?.[0]?.methods ?? [
+      "resolve",
+      "subscribe",
+      "plan",
+      "subscribePlan",
+    ];
 
     const options: CommonOptions = {
       disableAutofix,
+      methods,
     };
     return {
       Property(node) {
-        if (isPlan(node.key)) {
+        if (isAllowedMethod(options, node.key)) {
           processNode(
             context,
             options,
@@ -84,7 +94,7 @@ export const ExportPlanMethod: Rule.RuleModule = {
         }
       },
       MethodDefinition(node) {
-        if (isPlan(node.key)) {
+        if (isAllowedMethod(options, node.key)) {
           processNode(
             context,
             options,
@@ -111,7 +121,9 @@ function processNode(
         : null,
     );
     const disallowedSiblingKeys = parentObjectKeys.filter(
-      (key) => key == null || !ALLOWED_SIBLING_KEYS.includes(key),
+      (key) =>
+        key == null ||
+        (!ALLOWED_SIBLING_KEYS.includes(key) && !options.methods.includes(key)),
     );
     if (disallowedSiblingKeys.length === 0) {
       // Match
@@ -197,9 +209,9 @@ function processNode(
   }
 }
 
-function isPlan(node: ESTreeExpression | PrivateIdentifier): boolean {
-  return (
-    node.type === "Identifier" &&
-    (node.name === "plan" || node.name === "subscribePlan")
-  );
+function isAllowedMethod(
+  options: CommonOptions,
+  node: ESTreeExpression | PrivateIdentifier,
+): boolean {
+  return node.type === "Identifier" && options.methods.includes(node.name);
 }

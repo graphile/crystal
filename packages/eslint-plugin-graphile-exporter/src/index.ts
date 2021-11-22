@@ -2,7 +2,7 @@
 
 import { ExhaustiveDeps } from "./ExhaustiveDeps";
 import { ExportInstances } from "./ExportInstances";
-import { ExportPlanMethod } from "./ExportPlanMethod";
+import { ExportMethods } from "./ExportMethods";
 
 export const configs = {
   recommended: {
@@ -15,10 +15,11 @@ export const configs = {
           sortExports: true,
         },
       ],
-      "graphile-exporter/export-plan-method": [
+      "graphile-exporter/export-methods": [
         "error",
         {
           disableAutofix: false,
+          methods: ["resolve", "subscribe", "plan", "subscribePlan"],
         },
       ],
       "graphile-exporter/export-instances": [
@@ -33,6 +34,6 @@ export const configs = {
 
 export const rules = {
   "exhaustive-deps": ExhaustiveDeps,
-  "export-plan-method": ExportPlanMethod,
+  "export-methods": ExportMethods,
   "export-instances": ExportInstances,
 };
