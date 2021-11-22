@@ -283,7 +283,7 @@ function isSQLNode(node: unknown): node is SQLNode {
 
 function isSQL(fragment: unknown): fragment is SQL {
   return Array.isArray(fragment)
-    ? fragment.every((el) => isSQLNode(el))
+    ? fragment.length > 0 && fragment.every((el) => isSQLNode(el))
     : isSQLNode(fragment);
 }
 
