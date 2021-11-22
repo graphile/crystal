@@ -1511,39 +1511,69 @@ export function makeExampleSchema(
     fields: () => ({
       md5: {
         type: GraphQLString,
-        resolve(parent) {
-          return crypto.createHash("md5").update(parent.text).digest("hex");
-        },
+        resolve: EXPORTABLE(
+          (crypto) =>
+            function resolve(parent) {
+              return crypto.createHash("md5").update(parent.text).digest("hex");
+            },
+          [crypto],
+        ),
       },
       sha1: {
         type: GraphQLString,
-        resolve(parent) {
-          return crypto.createHash("sha1").update(parent.text).digest("hex");
-        },
+        resolve: EXPORTABLE(
+          (crypto) =>
+            function resolve(parent) {
+              return crypto
+                .createHash("sha1")
+                .update(parent.text)
+                .digest("hex");
+            },
+          [crypto],
+        ),
       },
       throwNonNullError: {
         type: new GraphQLNonNull(GraphQLString),
-        resolve() {
-          return null;
-        },
+        resolve: EXPORTABLE(
+          () =>
+            function resolve() {
+              return null;
+            },
+          [],
+        ),
       },
       throwTestError: {
         type: GraphQLString,
-        resolve() {
-          throw new Error("Test");
-        },
+        resolve: EXPORTABLE(
+          () =>
+            function resolve() {
+              throw new Error("Test");
+            },
+          [],
+        ),
       },
       sha256: {
         type: GraphQLString,
-        resolve(parent) {
-          return crypto.createHash("sha256").update(parent.text).digest("hex");
-        },
+        resolve: EXPORTABLE(
+          (crypto) =>
+            function resolve(parent) {
+              return crypto
+                .createHash("sha256")
+                .update(parent.text)
+                .digest("hex");
+            },
+          [crypto],
+        ),
       },
       self: {
         type: Hashes,
-        resolve(parent) {
-          return parent;
-        },
+        resolve: EXPORTABLE(
+          () =>
+            function resolve(parent) {
+              return parent;
+            },
+          [],
+        ),
       },
     }),
   });
@@ -1587,12 +1617,16 @@ export function makeExampleSchema(
             },
           [object],
         ),
-        resolve(user, args) {
-          return crypto
-            .createHash(args.hashType)
-            .update(user.username)
-            .digest("hex");
-        },
+        resolve: EXPORTABLE(
+          (crypto) =>
+            function resolve(user, args) {
+              return crypto
+                .createHash(args.hashType)
+                .update(user.username)
+                .digest("hex");
+            },
+          [crypto],
+        ),
       },
       // This field is to test standard resolvers work when returning non-scalars on planned types
       usernameHashes: {
@@ -1604,9 +1638,13 @@ export function makeExampleSchema(
             },
           [],
         ),
-        resolve(username) {
-          return { text: username };
-        },
+        resolve: EXPORTABLE(
+          () =>
+            function resolve(username) {
+              return { text: username };
+            },
+          [],
+        ),
       },
     }),
   });
