@@ -19,7 +19,14 @@ export const configs = {
         "error",
         {
           disableAutofix: false,
-          methods: ["resolve", "subscribe", "plan", "subscribePlan"],
+          methods: [
+            "resolve",
+            "subscribe",
+            "plan",
+            "subscribePlan",
+            "isTypeOf",
+            "resolveType",
+          ],
         },
       ],
       "graphile-exporter/export-instances": [

@@ -77,6 +77,8 @@ export const ExportMethods: Rule.RuleModule = {
       "subscribe",
       "plan",
       "subscribePlan",
+      "isTypeOf",
+      "resolveType",
     ];
 
     const options: CommonOptions = {
