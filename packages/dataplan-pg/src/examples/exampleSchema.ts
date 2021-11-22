@@ -21,6 +21,7 @@ import {
   context,
   crystalEnforce,
   each,
+  getEnumValueConfig,
   lambda,
   list,
   ModifierPlan,
@@ -1614,41 +1615,69 @@ export function makeExampleSchema(
     name: "MessagesOrderBy",
     values: {
       BODY_ASC: {
-        value: (plan: PgSelectPlan<typeof messageSource>) => {
-          plan.orderBy({
-            codec: TYPES.text,
-            fragment: sql`${plan.alias}.body`,
-            direction: "ASC",
-          });
+        extensions: {
+          graphile: {
+            plan: EXPORTABLE(
+              (TYPES, sql) => (plan: PgSelectPlan<typeof messageSource>) => {
+                plan.orderBy({
+                  codec: TYPES.text,
+                  fragment: sql`${plan.alias}.body`,
+                  direction: "ASC",
+                });
+              },
+              [TYPES, sql],
+            ),
+          },
         },
       },
       BODY_DESC: {
-        value: (plan: PgSelectPlan<typeof messageSource>) => {
-          plan.orderBy({
-            codec: TYPES.text,
-            fragment: sql`${plan.alias}.body`,
-            direction: "DESC",
-          });
+        extensions: {
+          graphile: {
+            plan: EXPORTABLE(
+              (TYPES, sql) => (plan: PgSelectPlan<typeof messageSource>) => {
+                plan.orderBy({
+                  codec: TYPES.text,
+                  fragment: sql`${plan.alias}.body`,
+                  direction: "DESC",
+                });
+              },
+              [TYPES, sql],
+            ),
+          },
         },
       },
       AUTHOR_USERNAME_ASC: {
-        value: (plan: PgSelectPlan<typeof messageSource>) => {
-          const authorAlias = plan.singleRelation("author");
-          plan.orderBy({
-            codec: TYPES.text,
-            fragment: sql`${authorAlias}.username`,
-            direction: "ASC",
-          });
+        extensions: {
+          graphile: {
+            plan: EXPORTABLE(
+              (TYPES, sql) => (plan: PgSelectPlan<typeof messageSource>) => {
+                const authorAlias = plan.singleRelation("author");
+                plan.orderBy({
+                  codec: TYPES.text,
+                  fragment: sql`${authorAlias}.username`,
+                  direction: "ASC",
+                });
+              },
+              [TYPES, sql],
+            ),
+          },
         },
       },
       AUTHOR_USERNAME_DESC: {
-        value: (plan: PgSelectPlan<typeof messageSource>) => {
-          const authorAlias = plan.singleRelation("author");
-          plan.orderBy({
-            codec: TYPES.text,
-            fragment: sql`${authorAlias}.username`,
-            direction: "DESC",
-          });
+        extensions: {
+          graphile: {
+            plan: EXPORTABLE(
+              (TYPES, sql) => (plan: PgSelectPlan<typeof messageSource>) => {
+                const authorAlias = plan.singleRelation("author");
+                plan.orderBy({
+                  codec: TYPES.text,
+                  fragment: sql`${authorAlias}.username`,
+                  direction: "DESC",
+                });
+              },
+              [TYPES, sql],
+            ),
+          },
         },
       },
     },
@@ -3287,7 +3316,7 @@ export function makeExampleSchema(
           orderBy: {
             type: new GraphQLList(new GraphQLNonNull(MessagesOrderBy)),
             plan: EXPORTABLE(
-              (inspect) =>
+              (MessagesOrderBy, getEnumValueConfig, inspect) =>
                 function plan(
                   _$root,
                   $connection: PgConnectionPlan<typeof messageSource>,
@@ -3295,28 +3324,27 @@ export function makeExampleSchema(
                 ) {
                   const $messages = $connection.getSubplan();
                   const val = $value.eval();
-                  if (!val) {
-                    return null;
-                  }
                   if (!Array.isArray(val)) {
                     throw new Error("Invalid!");
                   }
                   val.forEach((order) => {
-                    if (typeof order !== "function") {
+                    const config = getEnumValueConfig(MessagesOrderBy, order);
+                    const plan = config?.extensions?.graphile?.plan;
+                    if (typeof plan !== "function") {
                       console.error(
                         `Internal server error: invalid orderBy configuration: expected function, but received ${inspect(
-                          order,
+                          plan,
                         )}`,
                       );
                       throw new Error(
                         "Internal server error: invalid orderBy configuration",
                       );
                     }
-                    order($messages);
+                    plan($messages);
                   });
                   return null;
                 },
-              [inspect],
+              [MessagesOrderBy, getEnumValueConfig, inspect],
             ),
           },
         },

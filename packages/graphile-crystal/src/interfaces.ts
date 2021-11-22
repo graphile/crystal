@@ -49,6 +49,21 @@ declare module "graphql" {
       Plan?: { new (...args: any[]): ExecutablePlan };
     };
   }
+
+  interface GraphQLEnumValueExtensions {
+    graphile?: {
+      /**
+       * EXPERIMENTAL!
+       *
+       * NOTE: this is an `any` because we want to allow users to specify
+       * subclasses of ExecutablePlan but TypeScript only wants to allow
+       * superclasses.
+       *
+       * @internal
+       */
+      plan?: (plan: any) => void;
+    };
+  }
 }
 
 export const $$crystalContext = Symbol("context");
