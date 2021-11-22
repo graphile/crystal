@@ -2568,6 +2568,8 @@ export function makeExampleSchema(
     pgPolymorphic(
       $item,
       list([
+        // TODO: this ridiculous code is just to appease TypeScript; we should
+        // be able to just `$item.get("person_id")`.
         $item instanceof PgSelectSinglePlan
           ? $item.get("person_id")
           : $item.get("person_id"),
