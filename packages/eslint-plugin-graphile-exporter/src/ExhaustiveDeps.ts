@@ -79,7 +79,8 @@ function gatherDependenciesRecursively(
 
     if (
       (dependencyNode.parent.type as string) === "TSTypeQuery" ||
-      (dependencyNode.parent.type as string) === "TSTypeReference"
+      (dependencyNode.parent.type as string) === "TSTypeReference" ||
+      (dependencyNode.parent.type as string) === "TSClassImplements"
     ) {
       continue;
     }
