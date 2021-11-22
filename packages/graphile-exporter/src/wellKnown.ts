@@ -1,5 +1,7 @@
 import crypto from "crypto";
+// eslint-disable-next-line @typescript-eslint/no-duplicate-imports
 import * as _crypto from "crypto";
+import { BasePlan, ExecutablePlan, ModifierPlan } from "graphile-crystal";
 import graphql, {
   GraphQLDirective,
   GraphQLEnumType,
@@ -20,11 +22,26 @@ interface $$Export {
 }
 
 const wellKnownMap = new Map<unknown, $$Export>();
-
 // TODO: fill this out a bit...
+
 wellKnownMap.set(crypto, { moduleName: "crypto", exportName: "default" });
+
 wellKnownMap.set(util, { moduleName: "util", exportName: "default" });
 wellKnownMap.set(inspect, { moduleName: "util", exportName: "inspect" });
+
+wellKnownMap.set(BasePlan, {
+  moduleName: "graphile-crystal",
+  exportName: "BasePlan",
+});
+wellKnownMap.set(ExecutablePlan, {
+  moduleName: "graphile-crystal",
+  exportName: "ExecutablePlan",
+});
+wellKnownMap.set(ModifierPlan, {
+  moduleName: "graphile-crystal",
+  exportName: "ModifierPlan",
+});
+
 wellKnownMap.set(graphql, { moduleName: "graphql", exportName: "default" });
 wellKnownMap.set(GraphQLSchema, {
   moduleName: "graphql",

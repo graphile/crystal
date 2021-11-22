@@ -58,10 +58,8 @@ export const assertArgumentsFinalized = !isDev
  * will be ExecutablePlans.
  */
 export abstract class BasePlan {
-  public static readonly $$export: {
-    moduleName: string;
-    exportName: string;
-  };
+  // Explicitly we do not add $$export here because we want children to set it
+
   public readonly aether: Aether;
   public isArgumentsFinalized = false;
   public isFinalized = false;
@@ -128,10 +126,7 @@ export abstract class BasePlan {
  * they must be able to execute to return values.
  */
 export abstract class ExecutablePlan<TData = any> extends BasePlan {
-  static $$export = {
-    moduleName: "graphile-crystal",
-    exportName: "ExecutablePlan",
-  };
+  // Explicitly we do not add $$export here because we want children to set it
 
   /**
    * The ids for plans this plan will need data from in order to execute. NOTE:
@@ -344,6 +339,8 @@ export type PolymorphicPlan = ExecutablePlan & {
 export abstract class ModifierPlan<
   TParentPlan extends BasePlan,
 > extends BasePlan {
+  // Explicitly we do not add $$export here because we want children to set it
+
   public readonly id: number;
   constructor(protected readonly $parent: TParentPlan) {
     super();

@@ -2463,29 +2463,36 @@ export function makeExampleSchema(
     }),
   });
 
-  const singleTableTypeName = ($entity: SingleTableItemPlan) => {
-    const $type = $entity.get("type");
-    const $typeName = lambda($type, (v) => {
-      if (v == null) {
-        return v;
-      }
-      const type = {
-        TOPIC: "SingleTableTopic",
-        POST: "SingleTablePost",
-        DIVIDER: "SingleTableDivider",
-        CHECKLIST: "SingleTableChecklist",
-        CHECKLIST_ITEM: "SingleTableChecklistItem",
-      }[v];
-      if (!type) {
-        throw new Error(`Could not determine type for '${v}'`);
-      }
-      return type;
-    });
-    return $typeName;
-  };
+  const singleTableTypeName = EXPORTABLE(
+    ($entity, lambda) => {
+      const $type = $entity.get("type");
+      const $typeName = lambda($type, (v) => {
+        if (v == null) {
+          return v;
+        }
+        const type = {
+          TOPIC: "SingleTableTopic",
+          POST: "SingleTablePost",
+          DIVIDER: "SingleTableDivider",
+          CHECKLIST: "SingleTableChecklist",
+          CHECKLIST_ITEM: "SingleTableChecklistItem",
+        }[v];
+        if (!type) {
+          throw new Error(`Could not determine type for '${v}'`);
+        }
+        return type;
+      });
+      return $typeName;
+    },
+    [$entity, lambda],
+  );
 
-  const singleTableItemInterface = ($item: SingleTableItemPlan) =>
-    pgSingleTablePolymorphic(singleTableTypeName($item), $item);
+  const singleTableItemInterface = EXPORTABLE(
+    (pgSingleTablePolymorphic, singleTableTypeName) =>
+      ($item: SingleTableItemPlan) =>
+        pgSingleTablePolymorphic(singleTableTypeName($item), $item),
+    [pgSingleTablePolymorphic, singleTableTypeName],
+  );
 
   const relationalItemInterface = EXPORTABLE(
     (EXPORTABLE, deoptimizeIfAppropriate, pgPolymorphic) =>
