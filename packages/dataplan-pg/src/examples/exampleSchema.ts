@@ -380,19 +380,25 @@ export function makeExampleSchema(
     [forumSource, messageSourceBuilder, userSource],
   );
 
-  const featuredMessages = EXPORTABLE((messageSource, sql) => messageSource.alternativeSource({
-      name: "featured_messages",
-      source: (...args) =>
-        sql`app_public.featured_messages(${sql.join(args, ", ")})`,
-    }),
-  [messageSource, sql]);
+  const featuredMessages = EXPORTABLE(
+    (messageSource, sql) =>
+      messageSource.alternativeSource({
+        name: "featured_messages",
+        source: (...args) =>
+          sql`app_public.featured_messages(${sql.join(args, ", ")})`,
+      }),
+    [messageSource, sql],
+  );
 
-  const forumsFeaturedMessages = EXPORTABLE((messageSource, sql) => messageSource.alternativeSource({
-      name: "forums_featured_messages",
-      source: (...args) =>
-        sql`app_public.forums_featured_messages(${sql.join(args, ", ")})`,
-    }),
-  [messageSource, sql]);
+  const forumsFeaturedMessages = EXPORTABLE(
+    (messageSource, sql) =>
+      messageSource.alternativeSource({
+        name: "forums_featured_messages",
+        source: (...args) =>
+          sql`app_public.forums_featured_messages(${sql.join(args, ", ")})`,
+      }),
+    [messageSource, sql],
+  );
 
   const unionEntityColumns = EXPORTABLE(
     (TYPES, col) => ({
