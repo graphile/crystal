@@ -3,6 +3,7 @@
 import { ExhaustiveDeps } from "./ExhaustiveDeps";
 import { ExportInstances } from "./ExportInstances";
 import { ExportMethods } from "./ExportMethods";
+import { ExportSubclasses } from "./ExportSubclasses";
 
 export const configs = {
   recommended: {
@@ -35,6 +36,12 @@ export const configs = {
           disableAutofix: false,
         },
       ],
+      "graphile-exporter/export-subclasses": [
+        "error",
+        {
+          disableAutofix: false,
+        },
+      ],
     },
   },
 };
@@ -43,4 +50,5 @@ export const rules = {
   "exhaustive-deps": ExhaustiveDeps,
   "export-methods": ExportMethods,
   "export-instances": ExportInstances,
+  "export-subclasses": ExportSubclasses,
 };
