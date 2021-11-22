@@ -2559,19 +2559,24 @@ export function makeExampleSchema(
    * and so on.
    */
   const entityUnion = <
-    TPlan extends PgClassExpressionPlan<
-      any,
-      PgTypeCodec<any, any, typeof unionEntityColumns>
-    >,
+    TCodec extends PgTypeCodec<any, any, typeof unionEntityColumns>,
   >(
-    $item: TPlan,
+    $item:
+      | PgSelectSinglePlan<PgSource<TCodec, any, any, any, any>>
+      | PgClassExpressionPlan<any, TCodec>,
   ) =>
     pgPolymorphic(
       $item,
       list([
-        $item.get("person_id"),
-        $item.get("post_id"),
-        $item.get("comment_id"),
+        $item instanceof PgSelectSinglePlan
+          ? $item.get("person_id")
+          : $item.get("person_id"),
+        $item instanceof PgSelectSinglePlan
+          ? $item.get("post_id")
+          : $item.get("post_id"),
+        $item instanceof PgSelectSinglePlan
+          ? $item.get("comment_id")
+          : $item.get("comment_id"),
       ]),
       {
         Person: {
@@ -2860,6 +2865,7 @@ export function makeExampleSchema(
       | {
           id: PgSourceColumn<number>;
           type: PgSourceColumn<string>;
+          // type: PgSourceColumn<string>;
           position: PgSourceColumn<string>;
           created_at: PgSourceColumn<Date>;
           updated_at: PgSourceColumn<Date>;
@@ -3653,7 +3659,7 @@ export function makeExampleSchema(
                 ],
               });
               deoptimizeIfAppropriate($plan);
-              return each($plan, ($item) => entityUnion($item.record()));
+              return each($plan, ($item) => entityUnion($item));
             },
           [
             TYPES,
@@ -4126,26 +4132,16 @@ export function makeExampleSchema(
         RelationalChecklist,
         RelationalChecklistItem,
       ],
-      extensions: {
-        graphileExporter: {
-          deps: [
-            relationalDividersSource,
-            relationalChecklistsSource,
-            relationalChecklistItemsSource,
-          ],
-        },
-      },
     }),
   );
 }
 
 async function main() {
   const filePath = `${__dirname}/schema.graphql`;
-  const schema = makeExampleSchema();
   writeFileSync(
     filePath,
     //prettier.format(
-    printSchema(schema),
+    printSchema(makeExampleSchema()),
     //{
     //  ...(await prettier.resolveConfig(filePath)),
     //  parser: "graphql",
