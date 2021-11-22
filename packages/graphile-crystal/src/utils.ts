@@ -1,4 +1,5 @@
 import type {
+  GraphQLEnumValueConfig,
   GraphQLFieldConfig,
   GraphQLFieldConfigMap,
   GraphQLInputFieldConfig,
@@ -579,4 +580,31 @@ export function planGroupsOverlap(
   plan2: ExecutablePlan,
 ): boolean {
   return plan1.groupIds.some((id) => plan2.groupIds.includes(id));
+}
+
+const enumValueDefinitionCache: WeakMap<
+  GraphQLEnumType,
+  Map<unknown, GraphQLEnumValueConfig>
+> = new WeakMap();
+
+/**
+ * This would be equivalent to `enumType._valueLookup.get(outputValue)` except
+ * that's not a public API so we have to do a bit of heavy lifting here. Since
+ * it is heavy lifting, we cache the result, but we don't know when enumType
+ * will go away so we use a weakmap.
+ */
+export function getEnumValueConfig(
+  enumType: GraphQLEnumType,
+  outputValue: unknown,
+): GraphQLEnumValueConfig | undefined {
+  let cache = enumValueDefinitionCache.get(enumType);
+  if (!cache) {
+    cache = new Map();
+    enumValueDefinitionCache.set(enumType, cache);
+    const config = enumType.toConfig();
+    for (const value of Object.values(config.values)) {
+      cache.set(value.value, value);
+    }
+  }
+  return cache.get(outputValue);
 }

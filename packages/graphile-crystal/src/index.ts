@@ -94,6 +94,7 @@ import {
 import { stripAnsi } from "./stripAnsi";
 import {
   arraysMatch,
+  getEnumValueConfig,
   GraphileObjectType,
   inputObjectFieldSpec,
   InputObjectTypeSpec,
@@ -143,6 +144,7 @@ export {
   first,
   FirstPlan,
   getCurrentParentPathIdentity,
+  getEnumValueConfig,
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,
   GraphileObjectType,
@@ -260,4 +262,5 @@ exportAsMany({
   isDev,
   noop,
   getCurrentParentPathIdentity,
+  getEnumValueConfig,
 });
