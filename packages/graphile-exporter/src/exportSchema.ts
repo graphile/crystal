@@ -40,6 +40,8 @@ import { sql } from "pg-sql2";
 import type { URL } from "url";
 import { inspect } from "util";
 
+import { wellKnown } from "./wellKnown";
+
 function locationHintToIdentifierName(locationHint: string): string {
   let result = locationHint;
   result = result.replace(/[\[.]/g, "__").replace(/\]/g, "");
@@ -731,6 +733,9 @@ function convertToAST(
     return t.stringLiteral(thing);
   } else if (typeof thing === "number") {
     return t.numericLiteral(thing);
+  } else if (wellKnown(thing)) {
+    const { moduleName, exportName } = wellKnown(thing)!;
+    return file.import(moduleName, exportName);
   } else if (isImportable(thing)) {
     const { moduleName, exportName } = thing.$$export;
     return file.import(moduleName, exportName);
@@ -785,7 +790,10 @@ function convertToIdentifierViaAST(
   if (existingIdentifier) {
     return existingIdentifier;
   }
-  if (isImportable(thing)) {
+  if (wellKnown(thing)) {
+    const { moduleName, exportName } = wellKnown(thing)!;
+    return file.import(moduleName, exportName);
+  } else if (isImportable(thing)) {
     const { moduleName, exportName } = thing.$$export;
     return file.import(moduleName, exportName);
   }
@@ -903,6 +911,9 @@ function func(
   // `(() => { const foo = 1, bar = 2; return /*>*/() => {return foo+bar}/*<*/})();`
   if (isExportedFromFactory(fn)) {
     return factoryAst(file, fn, locationHint);
+  } else if (wellKnown(fn)) {
+    const { moduleName, exportName } = wellKnown(fn)!;
+    return file.import(moduleName, exportName);
   } else if (isImportable(fn)) {
     return file.import(fn.$$export.moduleName, fn.$$export.exportName);
   } else {
