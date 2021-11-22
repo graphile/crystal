@@ -740,7 +740,7 @@ function convertToAST(
     return convertToIdentifierViaAST(file, thing, name, locationHint);
   } else if (sql.isSQL(thing)) {
     throw new Error(
-      `Exporting of 'sql' values is not supported, please wrap in EXPORTABLE: ${
+      `Exporting of 'sql' values is not supported (at ${locationHint}), please wrap in EXPORTABLE: ${
         sql.compile(thing).text
       }`,
     );
