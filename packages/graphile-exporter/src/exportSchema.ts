@@ -648,12 +648,24 @@ import type VARIABLE_NAME from MODULE_NAME;
 `,
   templateOptions,
 );
-const importStar = template.statement(
-  `\
-import * as VARIABLE_NAME from MODULE_NAME;
-`,
-  templateOptions,
-);
+/**
+ * A manual way of doing this (which doesn't seem to work).
+ *
+ * ```
+ * const importStar = template.statement(
+ *   `import * as VARIABLE_NAME from MODULE_NAME;`,
+ *   templateOptions,
+ * );
+ * ```
+ */
+const importStar = (args: {
+  VARIABLE_NAME: t.Identifier;
+  MODULE_NAME: t.StringLiteral;
+}) =>
+  t.importDeclaration(
+    [t.importNamespaceSpecifier(args.VARIABLE_NAME)],
+    args.MODULE_NAME,
+  );
 
 const declareConstructorWithConfig = template.statement(
   `\
