@@ -4134,16 +4134,26 @@ export function makeExampleSchema(
         RelationalChecklist,
         RelationalChecklistItem,
       ],
+      extensions: {
+        graphileExporter: {
+          deps: [
+            relationalDividersSource,
+            relationalChecklistsSource,
+            relationalChecklistItemsSource,
+          ],
+        },
+      },
     }),
   );
 }
 
 async function main() {
   const filePath = `${__dirname}/schema.graphql`;
+  const schema = makeExampleSchema();
   writeFileSync(
     filePath,
     //prettier.format(
-    printSchema(makeExampleSchema()),
+    printSchema(schema),
     //{
     //  ...(await prettier.resolveConfig(filePath)),
     //  parser: "graphql",
