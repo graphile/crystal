@@ -864,6 +864,8 @@ function func(
   // `(() => { const foo = 1, bar = 2; return /*>*/() => {return foo+bar}/*<*/})();`
   if (isExportedFromFactory(fn)) {
     return factoryAst(file, fn, locationHint);
+  } else if (isImportable(fn)) {
+    return file.import(fn.$$export.moduleName, fn.$$export.exportName);
   } else {
     return funcToAst(fn, locationHint);
   }
