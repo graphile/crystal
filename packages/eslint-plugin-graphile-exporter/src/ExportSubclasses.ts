@@ -75,12 +75,31 @@ export const ExportSubclasses: Rule.RuleModule = {
         const $$export = node.body.body.find(
           (def) =>
             def.type === "PropertyDefinition" &&
-            def.static &&
             def.key.type === "Identifier" &&
             def.key.name === "$$export",
         );
 
         if ($$export) {
+          if (!$$export.static) {
+            reportProblem(context, options, {
+              node: $$export as unknown as ESTreeNode,
+              message: `$$export should be a static property; this is probably a mistake?`,
+              suggest: [
+                {
+                  desc: "add 'static' keyword",
+                  fix(fixer) {
+                    return [
+                      fixer.replaceTextRange(
+                        [$$export.range![0], $$export.range![0]],
+                        `static `,
+                      ),
+                    ];
+                  },
+                },
+              ],
+            });
+            return;
+          }
           if ($$export.value?.type === "ObjectExpression") {
             // Validate the object
             const moduleName = $$export.value.properties.find(
