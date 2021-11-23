@@ -53,7 +53,7 @@ import sql from "pg-sql2";
 import { inspect } from "util";
 
 import type {
-  PgConditionCapableParentPlan,
+  PgConditionPlan,
   PgExecutorContextPlans,
   PgInsertPlan,
   PgSelectPlan,
@@ -65,10 +65,12 @@ import type {
   WithPgClient,
 } from "../../src";
 import {
+  BooleanFilterPlan,
+  ClassFilterPlan,
   enumType,
+  ManyFilterPlan,
   pgClassExpression,
   PgClassExpressionPlan,
-  PgConditionPlan,
   PgConnectionPlan,
   pgDelete,
   PgDeletePlan,
@@ -1895,54 +1897,6 @@ export function makeExampleSchema(
     },
   });
 
-  class ClassFilterPlan extends ModifierPlan<PgConditionPlan<any>> {
-    private conditions: SQL[] = [];
-
-    constructor(parent: PgConditionPlan<any>, public readonly alias: SQL) {
-      super(parent);
-    }
-
-    where(condition: SQL) {
-      this.conditions.push(condition);
-    }
-
-    placeholder($plan: ExecutablePlan<any>, type: SQL): SQL {
-      return this.$parent.placeholder($plan, type);
-    }
-
-    apply() {
-      this.conditions.forEach((condition) => this.$parent.where(condition));
-    }
-  }
-
-  const BooleanFilterPlan = EXPORTABLE(
-    (ModifierPlan) =>
-      class BooleanFilterPlan extends ModifierPlan<ClassFilterPlan> {
-        private conditions: SQL[] = [];
-
-        constructor(
-          $classFilterPlan: ClassFilterPlan,
-          public readonly expression: SQL,
-        ) {
-          super($classFilterPlan);
-        }
-
-        placeholder($plan: ExecutablePlan<any>, type: SQL): SQL {
-          return this.$parent.placeholder($plan, type);
-        }
-
-        where(condition: SQL) {
-          this.conditions.push(condition);
-        }
-
-        apply() {
-          this.conditions.forEach((condition) => this.$parent.where(condition));
-        }
-      },
-    [ModifierPlan],
-  );
-  type BooleanFilterPlan = InstanceType<typeof BooleanFilterPlan>;
-
   const BooleanFilter = newInputObjectTypeBuilder<
     OurGraphQLContext,
     BooleanFilterPlan
@@ -2043,99 +1997,6 @@ export function makeExampleSchema(
       },
     },
   });
-
-  class TempTablePlan<TDataSource extends PgSource<any, any, any, any>>
-    extends BasePlan
-    implements PgConditionCapableParentPlan
-  {
-    public readonly alias: SQL;
-    public readonly conditions: SQL[] = [];
-    constructor(
-      public readonly $parent: ClassFilterPlan,
-      public readonly source: TDataSource,
-    ) {
-      super();
-      this.alias = sql.identifier(Symbol(`${source.name}_filter`));
-    }
-
-    placeholder($plan: ExecutablePlan<any>, type: SQL): SQL {
-      return this.$parent.placeholder($plan, type);
-    }
-
-    where(condition: SQL): void {
-      this.conditions.push(condition);
-    }
-    wherePlan() {
-      return new PgConditionPlan(this);
-    }
-
-    fromExpression() {
-      const source = this.source.source;
-      if (typeof source === "function") {
-        throw new Error("TempTablePlan doesn't support function sources yet.");
-      } else {
-        return source;
-      }
-    }
-  }
-
-  class ManyFilterPlan<
-    TChildDataSource extends PgSource<any, any, any, any>,
-  > extends ModifierPlan<ClassFilterPlan> {
-    public $some: TempTablePlan<TChildDataSource> | null = null;
-    constructor(
-      $parentFilterPlan: ClassFilterPlan,
-      public childDataSource: TChildDataSource,
-      private myAttrs: string[],
-      private theirAttrs: string[],
-    ) {
-      super($parentFilterPlan);
-      if (myAttrs.length !== theirAttrs.length) {
-        throw new Error(
-          "Expected the local and remote attributes to have the same number of entries.",
-        );
-      }
-    }
-
-    some() {
-      const $table = new TempTablePlan(this.$parent, this.childDataSource);
-
-      // Implement the relationship
-      this.myAttrs.forEach((attr, i) => {
-        $table.where(
-          sql`${this.$parent.alias}.${sql.identifier(attr)} = ${
-            $table.alias
-          }.${sql.identifier(this.theirAttrs[i])}`,
-        );
-      });
-
-      const $filter = new ClassFilterPlan($table.wherePlan(), $table.alias);
-      this.$some = $table;
-      return $filter;
-    }
-
-    apply() {
-      if (this.$some) {
-        const conditions = this.$some.conditions;
-        const from = sql`\nfrom ${this.$some.fromExpression()} as ${
-          this.$some.alias
-        }`;
-        const sqlConditions = sql.join(
-          conditions.map((c) => sql.parens(sql.indent(c))),
-          " and ",
-        );
-        const where =
-          conditions.length === 0
-            ? sql.blank
-            : conditions.length === 1
-            ? sql`\nwhere ${sqlConditions}`
-            : sql`\nwhere\n${sql.indent(sqlConditions)}`;
-        this.$parent.where(
-          sql`exists(${sql.indent(sql`select 1${from}${where}`)})`,
-        );
-      }
-    }
-  }
 
   const ForumToManyMessageFilter = newInputObjectTypeBuilder<
     OurGraphQLContext,

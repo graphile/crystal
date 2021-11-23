@@ -33,6 +33,9 @@ export {
   PgExecutorContextPlans,
   WithPgClient,
 } from "./executor";
+export { BooleanFilterPlan } from "./filters/booleanFilter";
+export { ClassFilterPlan } from "./filters/classFilter";
+export { ManyFilterPlan } from "./filters/manyFilter";
 export { PgTypeCodec } from "./interfaces";
 export { PgSubscriber } from "./PgSubscriber";
 export {
@@ -57,3 +60,4 @@ export {
   PgSingleTablePolymorphicPlan,
 } from "./plans/pgSingleTablePolymorphic";
 export { pgUpdate, PgUpdatePlan } from "./plans/pgUpdate";
+export { TempTablePlan } from "./plans/tempTable";
