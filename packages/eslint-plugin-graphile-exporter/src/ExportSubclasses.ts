@@ -1,4 +1,4 @@
-import type { ClassDeclaration } from "@babel/types";
+import type { ClassDeclaration, Property } from "@babel/types";
 import type { Linter, Rule } from "eslint";
 import type { Node as ESTreeNode } from "estree";
 
@@ -71,8 +71,68 @@ export const ExportSubclasses: Rule.RuleModule = {
         const isTypeScript = /\.[mc]?tsx?$/.test(context.getFilename());
         const isGeneric = !!(node as unknown as ClassDeclaration)
           .typeParameters;
+        const $$export = node.body.body.find(
+          (def) =>
+            def.type === "PropertyDefinition" &&
+            def.static &&
+            def.key.type === "Identifier" &&
+            def.key.name === "$$export",
+        );
 
-        // TODO: don't run this rule if it declares `static $$export`.
+        if ($$export) {
+          if ($$export.value?.type === "ObjectExpression") {
+            // Validate the object
+            const moduleName = $$export.value.properties.find(
+              (prop) =>
+                prop.type === "Property" &&
+                prop.key.type === "Identifier" &&
+                prop.key.name === "moduleName",
+            ) as unknown as Property | null;
+            const exportName = $$export.value.properties.find(
+              (prop) =>
+                prop.type === "Property" &&
+                prop.key.type === "Identifier" &&
+                prop.key.name === "exportName",
+            ) as unknown as Property | null;
+            const safe =
+              !$$export.value.properties.some(
+                (prop) => prop.type === "SpreadElement",
+              ) &&
+              !$$export.value.properties.some(
+                (prop) =>
+                  prop.type === "Property" && prop.key.type !== "Identifier",
+              );
+            if (safe && !moduleName) {
+              reportProblem(context, options, {
+                node: $$export as unknown as ESTreeNode,
+                message: `$$export specifier doesn't explicitly specify 'moduleName'`,
+              });
+            }
+            if (safe && !exportName) {
+              reportProblem(context, options, {
+                node: $$export as unknown as ESTreeNode,
+                message: `$$export specifier doesn't explicitly specify 'exportName'`,
+              });
+            }
+            if (moduleName && exportName) {
+              if (moduleName.value?.type !== "StringLiteral") {
+                reportProblem(context, options, {
+                  node: $$export as unknown as ESTreeNode,
+                  message: `$$export has invalid value for 'moduleName' - expected a string literal.`,
+                });
+              }
+              if (exportName.value?.type !== "StringLiteral") {
+                reportProblem(context, options, {
+                  node: $$export as unknown as ESTreeNode,
+                  message: `$$export has invalid value for 'exportName' - expected a string literal.`,
+                });
+              }
+            }
+          } else {
+            // Assume it's all good.
+          }
+          return;
+        }
 
         const convertToImportable: Rule.SuggestionReportDescriptor = {
           desc: "convert to importable",
