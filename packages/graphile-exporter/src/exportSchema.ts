@@ -234,6 +234,7 @@ class CodegenFile {
     // Must perform declaration _AFTER_ registering type, otherwise we might
     // get infinite recursion.
     spec.declaration = this.makeTypeDeclaration(type, VARIABLE_NAME);
+    this.addStatements(spec.declaration);
     return VARIABLE_NAME;
   }
 
@@ -281,6 +282,7 @@ class CodegenFile {
         ),
       },
     );
+    this.addStatements(spec.declaration);
     return VARIABLE_NAME;
   }
 
@@ -626,18 +628,7 @@ class CodegenFile {
           importStatements.push(importStatement);
         }
       });
-    const typeDeclarationStatements = Object.values(this._types)
-      .map((v) => v.declaration)
-      .filter(isNotNullish);
-    const directiveDeclarationStatements = Object.values(this._directives)
-      .map((v) => v.declaration)
-      .filter(isNotNullish);
-    const allStatements = [
-      ...importStatements,
-      ...typeDeclarationStatements,
-      ...directiveDeclarationStatements,
-      ...this._statements,
-    ];
+    const allStatements = [...importStatements, ...this._statements];
     return t.file(t.program(allStatements));
   }
 }
