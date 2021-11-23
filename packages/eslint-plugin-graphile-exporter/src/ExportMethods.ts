@@ -1,4 +1,4 @@
-import type { Expression, Method, Property } from "@babel/types";
+import type { Expression, Identifier, Method, Property } from "@babel/types";
 import type { Rule } from "eslint";
 import type {
   Expression as ESTreeExpression,
@@ -92,6 +92,7 @@ export const ExportMethods: Rule.RuleModule = {
             context,
             options,
             node as unknown as Property & Rule.NodeParentExtension,
+            node.key.name,
           );
         }
       },
@@ -101,6 +102,7 @@ export const ExportMethods: Rule.RuleModule = {
             context,
             options,
             node as unknown as Method & Rule.NodeParentExtension,
+            node.key.name,
           );
         }
       },
@@ -114,6 +116,7 @@ function processNode(
   node:
     | (Property & Rule.NodeParentExtension)
     | (Method & Rule.NodeParentExtension),
+  match: string,
 ) {
   const parentObject = node.parent;
   if (parentObject.type === "ObjectExpression") {
@@ -150,8 +153,9 @@ function processNode(
         const value = (node as any).value as Expression &
           Rule.NodeParentExtension;
         if (
-          value.type === "FunctionExpression" ||
-          value.type === "ArrowFunctionExpression"
+          value &&
+          (value.type === "FunctionExpression" ||
+            value.type === "ArrowFunctionExpression")
         ) {
           // Wrap with EXPORTABLE
           reportProblem(context, options, {
@@ -196,24 +200,31 @@ function processNode(
         console.log(node.type);
       }
     } else {
-      console.debug(
-        `Spotted 'plan' on object defined at ${
-          parentObject.loc
-            ? `${context.getPhysicalFilename()}:${
-                parentObject.loc.start.line
-              }:${parentObject.loc.start.column}`
-            : "unknown location"
-        }, but it had disallowed keys: ${disallowedSiblingKeys.join(
-          ", ",
-        )} (all keys: ${parentObjectKeys.join(", ")})`,
-      );
+      if (
+        node.type === "ObjectMethod" ||
+        ((node.type as string) === "Property" &&
+          ((node as any).value?.type === "FunctionExpression" ||
+            (node as any).value?.type === "ArrowFunctionExpression"))
+      ) {
+        console.debug(
+          `Spotted '${match}' on object defined at ${
+            parentObject.loc
+              ? `${context.getPhysicalFilename()}:${
+                  parentObject.loc.start.line
+                }:${parentObject.loc.start.column}`
+              : "unknown location"
+          }, but it had disallowed keys: ${disallowedSiblingKeys.join(
+            ", ",
+          )} (all keys: ${parentObjectKeys.join(", ")})`,
+        );
+      }
     }
   }
 }
 
 function isAllowedMethod(
   options: CommonOptions,
-  node: ESTreeExpression | PrivateIdentifier,
-): boolean {
+  node: any,
+): node is Identifier {
   return node.type === "Identifier" && options.methods.includes(node.name);
 }
