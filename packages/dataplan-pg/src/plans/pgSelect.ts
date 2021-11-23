@@ -9,6 +9,7 @@ import type {
   PlanStreamOptions,
   StreamablePlan,
 } from "graphile-crystal";
+import { isAsyncIterable } from "graphile-crystal";
 import {
   __TrackedObjectPlan,
   access,
@@ -960,6 +961,9 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
       // Munge the initialCount records into the streams
 
       return streams.map((stream, idx) => {
+        if (!isAsyncIterable(stream)) {
+          return stream;
+        }
         // TODO: Merge the initial results and the stream together manually to
         // avoid unstoppable async generator problem.
         return (async function* () {

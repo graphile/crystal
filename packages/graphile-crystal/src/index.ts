@@ -8,7 +8,7 @@ debugFactory.formatters.c = crystalPrint;
 debugFactory.formatters.p = (pathIdentity) =>
   chalk.bold.yellow(crystalPrintPathIdentity(pathIdentity));
 
-import { Aether } from "./aether";
+import { Aether, CrystalError } from "./aether";
 import { ROOT_PATH } from "./constants";
 import { defer, Deferred } from "./deferred";
 // Handy for debugging
@@ -107,6 +107,8 @@ import {
   planGroupsOverlap,
 } from "./utils";
 
+export { isAsyncIterable } from "iterall";
+
 export {
   __ItemPlan,
   __TrackedObjectPlan,
@@ -128,6 +130,7 @@ export {
   ConstantPlan,
   context,
   crystalEnforce,
+  CrystalError,
   crystalPrintPathIdentity,
   CrystalResultsList,
   CrystalResultStreamList,
@@ -223,6 +226,7 @@ exportAsMany({
   constant,
   ConstantPlan,
   context,
+  CrystalError,
   debugPlans,
   each,
   EachPlan,

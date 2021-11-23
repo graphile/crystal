@@ -12,7 +12,7 @@ import type {
   SelectionNode,
 } from "graphql";
 
-import type { Aether } from "./aether";
+import type { Aether, CrystalError } from "./aether";
 import type { Deferred } from "./deferred";
 import type { InputPlan } from "./input";
 import type { ExecutablePlan, ListCapablePlan, ModifierPlan } from "./plan";
@@ -176,7 +176,7 @@ export type CrystalValuesList<T> = ReadonlyArray<T>;
 export type PromiseOrDirect<T> = Promise<T> | T;
 export type CrystalResultsList<T> = ReadonlyArray<PromiseOrDirect<T>>;
 export type CrystalResultStreamList<T> = ReadonlyArray<
-  AsyncIterable<PromiseOrDirect<T>>
+  AsyncIterable<PromiseOrDirect<T>> | CrystalError
 >;
 
 export type BaseGraphQLRootValue = any;

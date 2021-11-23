@@ -9,7 +9,7 @@ import type {
   ExecutablePlan,
   ObjectPlan,
 } from "graphile-crystal";
-import { defer } from "graphile-crystal";
+import { CrystalError, defer } from "graphile-crystal";
 import type { SQLRawValue } from "pg-sql2";
 import { inspect } from "util";
 
@@ -441,7 +441,9 @@ ${"👆".repeat(30)}
     const { text, rawSqlValues, identifierIndex, queryValuesSymbol } = common;
 
     const valuesCount = values.length;
-    const streams: AsyncIterable<TOutput>[] = new Array(valuesCount);
+    const streams: Array<AsyncIterable<TOutput> | CrystalError> = new Array(
+      valuesCount,
+    );
 
     // Group by context
     const groupMap = new Map<
@@ -687,6 +689,9 @@ ${"👆".repeat(30)}
         console.error("UNEXPECTED ERROR!");
         console.error(e);
         tx.resolve();
+        batch.forEach(({ resultIndex }) => {
+          streams[resultIndex] = new CrystalError(e);
+        });
       });
       promises.push(promise);
     }
