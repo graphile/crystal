@@ -1,2 +1,2 @@
-export { exportSchema } from "./exportSchema.js";
+export { exportSchema, exportSchemaAsString } from "./exportSchema.js";
 export { EXPORTABLE } from "./helpers.js";

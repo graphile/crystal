@@ -1062,10 +1062,9 @@ Object.defineProperty(${
   }
 }
 
-export async function exportSchema(
+export async function exportSchemaAsString(
   schema: GraphQLSchema,
-  toPath: string | URL,
-): Promise<void> {
+): Promise<{ code: string }> {
   const config = schema.toConfig();
   const file = new CodegenFile();
 
@@ -1118,6 +1117,14 @@ export async function exportSchema(
   const ast = file.toAST();
 
   const { code } = reallyGenerate(ast, {});
+  return { code };
+}
+
+export async function exportSchema(
+  schema: GraphQLSchema,
+  toPath: string | URL,
+): Promise<void> {
+  const { code } = await exportSchemaAsString(schema);
   const HEADER = `/* eslint-disable graphile-exporter/export-instances, graphile-exporter/export-methods, graphile-exporter/exhaustive-deps */\n`;
   await writeFile(toPath, HEADER + code);
 }
