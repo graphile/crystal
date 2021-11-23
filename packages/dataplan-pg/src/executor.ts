@@ -9,6 +9,7 @@ import type {
   ExecutablePlan,
   ObjectPlan,
 } from "graphile-crystal";
+import { isAsyncIterable } from "graphile-crystal";
 import { CrystalError, defer } from "graphile-crystal";
 import type { SQLRawValue } from "pg-sql2";
 import { inspect } from "util";
@@ -690,6 +691,9 @@ ${"👆".repeat(30)}
         console.error(e);
         tx.resolve();
         batch.forEach(({ resultIndex }) => {
+          if (isAsyncIterable(streams[resultIndex])) {
+            streams[resultIndex][Symbol.asyncIterator].throw?.(e);
+          }
           streams[resultIndex] = new CrystalError(e);
         });
       });
