@@ -115,13 +115,13 @@ export const ExportSubclasses: Rule.RuleModule = {
             message: `Generic class '${className}' extending '${superClassIdentifier}' cannot be safely exported. Because it's generic we cannot make it EXPORTABLE, instead make it importable by putting it in its own module and declaring a '${exportExample}' property.`,
             suggest: [convertToImportable],
           });
+        } else {
+          reportProblem(context, options, {
+            node: node as unknown as ESTreeNode,
+            message: `Class '${className}' extends '${superClassIdentifier}' but cannot be safely exported. Either make it EXPORTABLE or make it importable and add a '${exportExample}' property to indicate this.`,
+            suggest: [convertToExportable, convertToImportable],
+          });
         }
-
-        reportProblem(context, options, {
-          node: node as unknown as ESTreeNode,
-          message: `Class '${className}' extends '${superClassIdentifier}' but cannot be safely exported. Either make it EXPORTABLE or make it importable and add a '${exportExample}' property to indicate this.`,
-          suggest: [convertToExportable, convertToImportable],
-        });
       },
     };
   },
