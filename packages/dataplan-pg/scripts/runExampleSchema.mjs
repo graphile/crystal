@@ -65,6 +65,11 @@ async function runTestQuery(basePath) {
   });
   const operationType = "query";
 
+  const errorMatches = source.match(
+    /^## expect\(errors\)\.toHaveLength\(([0-9]+)\)/,
+  );
+  const expectErrors = errorMatches ? parseInt(errorMatches[1], 10) : 0;
+
   // Very much taken from packages/dataplan-pg/__tests__/helpers.ts
   if (isAsyncIterable(result)) {
     let errors = undefined;
@@ -136,11 +141,6 @@ async function runTestQuery(basePath) {
       originalPayloads[0],
       ...originalPayloads.slice(1).sort(sortPayloads),
     ];
-    if (errors) {
-      console.log("ERRORS!");
-      console.dir(errors);
-      process.exit(1);
-    }
     assert.deepEqual(
       payloads,
       expectedData,
@@ -151,7 +151,15 @@ async function runTestQuery(basePath) {
   } else {
     const { data, errors } = result;
 
-    if (errors) {
+    if (expectErrors > 0) {
+      if (errors.length !== expectErrors) {
+        console.log(
+          `WRONG ERRORS - expected ${expectErrors} but found ${errors.length}`,
+        );
+        console.dir(errors);
+        process.exit(1);
+      }
+    } else if (errors) {
       console.log("ERRORS!");
       console.dir(errors);
       process.exit(1);
