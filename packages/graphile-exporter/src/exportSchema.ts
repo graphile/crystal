@@ -35,6 +35,9 @@ import {
   GraphQLObjectType,
   GraphQLScalarType,
   GraphQLUnionType,
+  isDirective,
+  isNamedType,
+  isSchema,
 } from "graphql";
 import { sql } from "pg-sql2";
 import type { URL } from "url";
@@ -760,6 +763,14 @@ function convertToAST(
     );
   } else if (typeof thing === "function") {
     return func(file, thing as AnyFunction, locationHint);
+  } else if (isSchema(thing)) {
+    throw new Error(
+      "Attempted to export GraphQLSchema directly from `convertToAST`; this is currently unsupported.",
+    );
+  } else if (isDirective(thing)) {
+    return file.declareDirective(thing);
+  } else if (isNamedType(thing)) {
+    return file.declareType(thing);
   } else if (typeof thing === "object" && thing != null) {
     return t.objectExpression(
       Object.entries(thing).map(([key, value]) =>
@@ -799,6 +810,10 @@ function convertToIdentifierViaAST(
   } else if (isImportable(thing)) {
     const { moduleName, exportName } = thing.$$export;
     return file.import(moduleName, exportName);
+  } else if (isDirective(thing)) {
+    return file.declareDirective(thing);
+  } else if (isNamedType(thing)) {
+    return file.declareType(thing);
   }
 
   // Prevent infinite loop by declaring the variableIdentifier immediately
