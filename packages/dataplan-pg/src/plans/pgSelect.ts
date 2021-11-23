@@ -9,7 +9,6 @@ import type {
   PlanStreamOptions,
   StreamablePlan,
 } from "graphile-crystal";
-import { isAsyncIterable } from "graphile-crystal";
 import {
   __TrackedObjectPlan,
   access,
@@ -18,6 +17,7 @@ import {
   InputListPlan,
   InputObjectPlan,
   InputStaticLeafPlan,
+  isAsyncIterable,
   list,
   map,
   planGroupsOverlap,

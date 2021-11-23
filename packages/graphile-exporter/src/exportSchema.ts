@@ -47,7 +47,7 @@ import { wellKnown } from "./wellKnown";
 
 function locationHintToIdentifierName(locationHint: string): string {
   let result = locationHint;
-  result = result.replace(/[\[.]/g, "__").replace(/\]/g, "");
+  result = result.replace(/[[.]/g, "__").replace(/\]/g, "");
   result = result.replace(/[^a-z0-9_]+/gi, "");
   result = result.replace(/^([0-9])/, "_$1");
   return result;

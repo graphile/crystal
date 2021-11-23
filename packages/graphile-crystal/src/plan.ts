@@ -127,6 +127,7 @@ export abstract class BasePlan {
  */
 export abstract class ExecutablePlan<TData = any> extends BasePlan {
   // Explicitly we do not add $$export here because we want children to set it
+  static $$export: any;
 
   /**
    * The ids for plans this plan will need data from in order to execute. NOTE:
@@ -340,6 +341,7 @@ export abstract class ModifierPlan<
   TParentPlan extends BasePlan,
 > extends BasePlan {
   // Explicitly we do not add $$export here because we want children to set it
+  static $$export: any;
 
   public readonly id: number;
   constructor(protected readonly $parent: TParentPlan) {

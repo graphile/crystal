@@ -11,7 +11,7 @@ export interface PgConditionCapableParentPlan extends BasePlan {
 export class PgConditionPlan<
   TParentPlan extends PgConditionCapableParentPlan,
 > extends ModifierPlan<TParentPlan> {
-  $$export = {
+  static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgConditionPlan",
   };

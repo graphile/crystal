@@ -171,7 +171,7 @@ function inputNonNullPlan(_aether: Aether, innerPlan: InputPlan): InputPlan {
  * Implements `InputListPlan`.
  */
 export class InputListPlan extends ExecutablePlan {
-  $$export = {
+  static $$export = {
     moduleName: "graphile-crystal",
     exportName: "InputListPlan",
   };
