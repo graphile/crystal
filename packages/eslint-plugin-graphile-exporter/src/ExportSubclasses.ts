@@ -116,13 +116,20 @@ export const ExportSubclasses: Rule.RuleModule = {
               });
             }
             if (moduleName && exportName) {
-              if (moduleName.value?.type !== "StringLiteral") {
+              if (
+                !moduleName.value ||
+                !["StringLiteral", "Literal"].includes(moduleName.value.type)
+              ) {
+                console.dir(moduleName.value);
                 reportProblem(context, options, {
                   node: $$export as unknown as ESTreeNode,
                   message: `$$export has invalid value for 'moduleName' - expected a string literal.`,
                 });
               }
-              if (exportName.value?.type !== "StringLiteral") {
+              if (
+                !exportName.value ||
+                !["StringLiteral", "Literal"].includes(exportName.value.type)
+              ) {
                 reportProblem(context, options, {
                   node: $$export as unknown as ESTreeNode,
                   message: `$$export has invalid value for 'exportName' - expected a string literal.`,
