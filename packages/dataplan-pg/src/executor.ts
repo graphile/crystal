@@ -9,7 +9,7 @@ import type {
   ExecutablePlan,
   ObjectPlan,
 } from "graphile-crystal";
-import { CrystalError, defer,isAsyncIterable } from "graphile-crystal";
+import { CrystalError, defer, isAsyncIterable } from "graphile-crystal";
 import type { SQLRawValue } from "pg-sql2";
 import { inspect } from "util";
 
