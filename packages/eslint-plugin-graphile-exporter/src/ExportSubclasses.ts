@@ -1,4 +1,5 @@
-import type { Rule } from "eslint";
+import type { ClassDeclaration } from "@babel/types";
+import type { Linter, Rule } from "eslint";
 import type { Node as ESTreeNode } from "estree";
 
 import { reportProblem } from "./common";
@@ -68,32 +69,58 @@ export const ExportSubclasses: Rule.RuleModule = {
         // TODO: determine if the definition for this identifier is an import from any of these `possibles`.
         //const scope = scopeManager.acquire(node);
         const isTypeScript = /\.[mc]?tsx?$/.test(context.getFilename());
+        const isGeneric = !!(node as unknown as ClassDeclaration)
+          .typeParameters;
 
         // TODO: don't run this rule if it declares `static $$export`.
 
+        const convertToImportable: Rule.SuggestionReportDescriptor = {
+          desc: "convert to importable",
+          fix(fixer) {
+            return [
+              fixer.replaceTextRange(
+                [node.body.range![0] + 1, node.body.range![0] + 1],
+                `\n  static $$export = { moduleName: /* TODO! */ ${JSON.stringify(
+                  `./${context.getFilename()}`,
+                )}, exportName: "${className}" };\n`,
+              ),
+            ];
+          },
+        };
+
+        const convertToExportable: Rule.SuggestionReportDescriptor = {
+          desc: "convert to exportable",
+          fix(fixer) {
+            return [
+              fixer.replaceTextRange(
+                [node.range![0], node.range![0]],
+                `const ${className} = EXPORTABLE(() => `,
+              ),
+              fixer.replaceTextRange(
+                [node.range![1], node.range![1]],
+                ", []);" +
+                  (isTypeScript
+                    ? `\ntype ${className} = InstanceType<typeof ${className}>;`
+                    : ``),
+              ),
+            ];
+          },
+        };
+
+        const exportExample = `static $$export = { moduleName: ".../path/to/module.js", exportName: "${className}" }`;
+
+        if (isGeneric) {
+          reportProblem(context, options, {
+            node: node as unknown as ESTreeNode,
+            message: `Generic class '${className}' extending '${superClassIdentifier}' cannot be safely exported. Because it's generic we cannot make it EXPORTABLE, instead make it importable by putting it in its own module and declaring a '${exportExample}' property.`,
+            suggest: [convertToImportable],
+          });
+        }
+
         reportProblem(context, options, {
           node: node as unknown as ESTreeNode,
-          message: `Class extending '${superClassIdentifier}' without EXPORTABLE.`,
-          suggest: [
-            {
-              desc: "convert to exportable",
-              fix(fixer) {
-                return [
-                  fixer.replaceTextRange(
-                    [node.range![0], node.range![0]],
-                    `const ${className} = EXPORTABLE(() => `,
-                  ),
-                  fixer.replaceTextRange(
-                    [node.range![1], node.range![1]],
-                    ", []);" +
-                      (isTypeScript
-                        ? `\ntype ${className} = InstanceType<typeof ${className}>;`
-                        : ``),
-                  ),
-                ];
-              },
-            },
-          ],
+          message: `Class '${className}' extends '${superClassIdentifier}' but cannot be safely exported. Either make it EXPORTABLE or make it importable and add a '${exportExample}' property to indicate this.`,
+          suggest: [convertToExportable, convertToImportable],
         });
       },
     };
