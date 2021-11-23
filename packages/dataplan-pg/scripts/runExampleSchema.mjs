@@ -19,7 +19,37 @@ async function runTestQuery(basePath) {
   const withPgClient = async (_pgSettings, callback) => {
     const client = await pool.connect();
     try {
-      return await callback(client);
+      let transactionDepth = -1;
+      const crystalPgClient = {
+        async startTransaction() {
+          transactionDepth++;
+          if (transactionDepth === 0) {
+            await client.query("begin");
+          } else {
+            await client.query(`savepoint tx${transactionDepth}`);
+          }
+        },
+        async commitTransaction() {
+          if (transactionDepth === 0) {
+            await client.query("commit");
+          } else {
+            await client.query(`release savepoint tx${transactionDepth}`);
+          }
+          transactionDepth--;
+        },
+        async rollbackTransaction() {
+          if (transactionDepth === 0) {
+            await client.query("rollback");
+          } else {
+            await client.query(`rollback savepoint tx${transactionDepth}`);
+          }
+          transactionDepth--;
+        },
+        query(...args) {
+          return client.query(...args);
+        },
+      };
+      return await callback(crystalPgClient);
     } finally {
       client.release();
     }
