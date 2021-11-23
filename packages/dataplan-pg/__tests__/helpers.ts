@@ -4,7 +4,7 @@ if (process.env.DEBUG) {
   jest.setTimeout(30000);
 }
 import { promises as fsp } from "fs";
-import type { BaseGraphQLContext, CrystalSubscriber } from "graphile-crystal";
+import type { BaseGraphQLContext } from "graphile-crystal";
 import type {
   AsyncExecutionResult,
   ExecutionPatchResult,
@@ -14,7 +14,6 @@ import type {
 import {
   execute,
   getOperationAST,
-  graphql,
   parse,
   subscribe,
   validate,
