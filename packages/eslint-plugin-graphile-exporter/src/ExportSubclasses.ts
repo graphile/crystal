@@ -1,6 +1,7 @@
 import type { ClassDeclaration, Property } from "@babel/types";
 import type { Linter, Rule } from "eslint";
 import type { Node as ESTreeNode } from "estree";
+import { basename } from "path";
 
 import { reportProblem } from "./common";
 
@@ -141,7 +142,7 @@ export const ExportSubclasses: Rule.RuleModule = {
               fixer.replaceTextRange(
                 [node.body.range![0] + 1, node.body.range![0] + 1],
                 `\n  static $$export = { moduleName: /* TODO! */ ${JSON.stringify(
-                  `./${context.getFilename()}`,
+                  `./${basename(context.getFilename())}`,
                 )}, exportName: "${className}" };\n`,
               ),
             ];
