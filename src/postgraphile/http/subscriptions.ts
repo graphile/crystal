@@ -489,7 +489,7 @@ export async function enhanceHttpServerWithWebSockets<
               wsOptions.onError(e);
             } else {
               console.info(
-                'the following error thrown from `ws` was caught and ignored. if you want to handle it yourself pass an onError handler',
+                'The following error thrown from `ws` was caught and ignored.',
               );
               console.error(e);
             }
