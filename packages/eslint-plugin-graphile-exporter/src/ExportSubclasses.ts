@@ -194,7 +194,7 @@ export const ExportSubclasses: Rule.RuleModule = {
           },
         };
 
-        const exportExample = `static $$export = { moduleName: ".../path/to/module.js", exportName: "${className}" }`;
+        const exportExample = `static $$export = { moduleName: /* TODO */ ".../path/to/module.js", exportName: "${className}" }`;
 
         if (isGeneric) {
           reportProblem(context, options, {
