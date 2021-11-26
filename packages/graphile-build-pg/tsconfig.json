@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "declarationDir": "./dist",
+    "outDir": "./dist",
+
+    "noUncheckedIndexedAccess": true,
+    "moduleResolution": "Nodenext",
+    "module": "nodenext"
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../graphile-build" },
+    { "path": "../graphile-build-pg" },
+    { "path": "../graphile-crystal" },
+    { "path": "../graphile-exporter" }
+  ]
+}

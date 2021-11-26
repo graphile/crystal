@@ -5623,16 +5623,30 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphile-build@workspace:packages/graphile-build":
+"graphile-build-pg@workspace:packages/graphile-build-pg":
+  version: 0.0.0-use.local
+  resolution: "graphile-build-pg@workspace:packages/graphile-build-pg"
+  dependencies:
+    "@types/debug": ^4.1.7
+    "@types/jest": ^27.0.2
+    "@types/node": ^16.11.6
+    debug: ^4.3.2
+    graphile-build: 5.0.0-alpha.0
+    graphile-crystal: 4.7.0
+    graphile-exporter: ^0.0.1
+    graphql: "npm:graphql@experimental-stream-defer"
+    jest: ^27.3.1
+    ts-node: ^10.4.0
+    tslib: ^2.3.1
+    typescript: next
+  languageName: unknown
+  linkType: soft
+
+"graphile-build@5.0.0-alpha.0, graphile-build@workspace:packages/graphile-build":
   version: 0.0.0-use.local
   resolution: "graphile-build@workspace:packages/graphile-build"
   dependencies:
-    "@babel/generator": ^7.16.0
-    "@babel/parser": ^7.16.3
-    "@babel/template": ^7.16.0
     "@graphile/lru": 4.6.0-alpha.0
-    "@types/babel__generator": ^7
-    "@types/babel__template": ^7
     "@types/debug": ^4.1.7
     "@types/jest": ^27.0.2
     "@types/node": ^16.11.6

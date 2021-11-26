@@ -1,7 +1,7 @@
 {
-  "name": "graphile-build",
+  "name": "graphile-build-pg",
   "version": "5.0.0-alpha.0",
-  "description": "Build a GraphQL schema from plugins",
+  "description": "PostgreSQL plugins for Graphile Build - build a supercharged GraphQL schema by reflection over a PostgreSQL database and executed by Graphile Crystal.",
   "type": "commonjs",
   "exports": {
     ".": {
@@ -21,7 +21,10 @@
     "graphile",
     "graphql",
     "engine",
-    "apollo",
+    "postgraphile",
+    "pg",
+    "postgres",
+    "postgresql",
     "graphqljs",
     "plugin",
     "build",
@@ -34,23 +37,15 @@
   },
   "homepage": "https://graphile.org/graphile-build/",
   "dependencies": {
-    "@graphile/lru": "4.6.0-alpha.0",
     "@types/node": "^16.11.6",
-    "@types/pluralize": "^0.0.29",
-    "@types/semver": "^7.3.9",
-    "chalk": "^4.1.2",
     "debug": "^4.3.2",
+    "graphile-build": "5.0.0-alpha.0",
     "graphile-crystal": "4.7.0",
     "graphile-exporter": "^0.0.1",
-    "pluralize": "^7.0.0",
-    "semver": "^7.3.5",
     "tslib": "^2.3.1"
   },
   "engines": {
     "node": ">=16"
-  },
-  "peerDependencies": {
-    "graphql": "*"
   },
   "files": [
     "dist",

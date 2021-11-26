@@ -25,7 +25,7 @@ export {
   upperFirst,
 } from "./utils.js";
 
-export { SchemaBuilder };
+export { GraphileEngine, SchemaBuilder };
 
 export const getBuilder = async (
   plugins: Array<GraphileEngine.Plugin>,
