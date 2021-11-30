@@ -10,6 +10,7 @@ import {
   parse,
   DocumentNode,
   execute,
+  getOperationAST,
 } from 'graphql';
 import * as WebSocket from 'ws';
 import { SubscriptionServer, ConnectionContext, ExecutionParams } from 'subscriptions-transport-ws';
@@ -166,11 +167,12 @@ export async function enhanceHttpServerWithWebSockets<
     return { req, res: dummyRes };
   };
 
-  const getContext = (socket: WebSocket, opId: string): Promise<mixed> => {
+  const getContext = (socket: WebSocket, opId: string, isSubscription: boolean): Promise<mixed> => {
+    const singleStatement = isSubscription;
     return new Promise((resolve, reject): void => {
       reqResFromSocket(socket)
         .then(({ req, res }) =>
-          withPostGraphileContextFromReqRes(req, res, { singleStatement: true }, context => {
+          withPostGraphileContextFromReqRes(req, res, { singleStatement }, context => {
             const promise = addContextForSocketAndOpId(context, socket, opId);
             resolve(promise['context']);
             return promise;
@@ -234,12 +236,9 @@ export async function enhanceHttpServerWithWebSockets<
         // tslint:disable-next-line no-any
         async onOperation(message: any, params: ExecutionParams, socket: WebSocket) {
           const opId = message.id;
-          const context = await getContext(socket, opId);
 
           // Override schema (for --watch)
           params.schema = await getGraphQLSchema();
-
-          Object.assign(params.context, context);
 
           const { req, res } = await reqResFromSocket(socket);
           const meta = {};
@@ -273,6 +272,10 @@ export async function enhanceHttpServerWithWebSockets<
                 ? hookedParams.query
                 : parse(hookedParams.query),
           };
+          const operation = getOperationAST(finalParams.query, finalParams.operationName);
+          const isSubscription = !!operation && operation.operation === 'subscription';
+          const context = await getContext(socket, opId, isSubscription);
+          Object.assign(params.context, context);
 
           // You are strongly encouraged to use
           // `postgraphile:validationRules:static` if possible - you should
@@ -365,15 +368,13 @@ export async function enhanceHttpServerWithWebSockets<
           };
         },
         async onSubscribe(ctx, msg) {
-          const context = await getContext(ctx.extra.socket, msg.id);
-
           // Override schema (for --watch)
           const schema = await getGraphQLSchema();
 
           const { payload } = msg;
           const args = {
             schema,
-            contextValue: context,
+            contextValue: {},
             operationName: payload.operationName,
             document: payload.query ? parse(payload.query) : null, // parse if there is something to parse
             variableValues: payload.variables,
@@ -388,6 +389,12 @@ export async function enhanceHttpServerWithWebSockets<
                 options,
               })
             : args) as ExecutionArgs;
+          const operation = args.document
+            ? getOperationAST(args.document, hookedArgs.operationName)
+            : null;
+          const isSubscription = !!operation && operation.operation === 'subscription';
+          const context = await getContext(ctx.extra.socket, msg.id, isSubscription);
+          Object.assign(hookedArgs.contextValue, context);
 
           // when supplying custom execution args from the
           // onSubscribe, you're trusted to do the validation
