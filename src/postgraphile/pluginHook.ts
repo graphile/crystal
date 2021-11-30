@@ -102,6 +102,15 @@ export interface PostGraphilePlugin {
     }
   >;
 
+  'postgraphile:sse:onSubscribe'?: HookFn<
+    graphql.ExecutionArgs & {
+      document: graphql.DocumentNode | null; // optional for persisted query support
+    },
+    {
+      options: CreateRequestHandlerOptions;
+    }
+  >;
+
   'postgraphile:liveSubscribe:executionResult'?: HookFn<
     PromiseOrValue<
       graphql.ExecutionResult<
