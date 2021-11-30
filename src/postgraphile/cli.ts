@@ -439,6 +439,7 @@ const {
   subscriptions,
   live,
   websockets = subscriptions || live ? ['v0', 'v1'] : [],
+  websocketOperations = 'subscriptions',
   watch: watchPg,
   schema: dbSchema,
   host: hostname = 'localhost',
@@ -542,6 +543,12 @@ if (
 ) {
   exitWithErrorMessage(
     `Invalid argument to '--websockets' - expected 'v0' and/or 'v1' (separated by comma); but received '${websockets}'`,
+  );
+}
+
+if (websocketOperations !== 'subscriptions' && websocketOperations !== 'all') {
+  exitWithErrorMessage(
+    `Invalid argument to '--websocket-operations' - expected 'subscriptions' or 'all' but received '${websocketOperations}'`,
   );
 }
 
@@ -715,6 +722,7 @@ const postgraphileOptions = pluginHook(
     pgDefaultRole,
     subscriptions: subscriptions || live,
     websockets,
+    websocketOperations,
     live,
     watchPg,
     showErrorStack,
