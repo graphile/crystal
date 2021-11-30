@@ -8,6 +8,12 @@ to you also.
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
+## [4.12.6](https://github.com/graphile/postgraphile/compare/v4.12.5...v4.12.6) (2021-11-30)
+
+### Bug Fixes
+
+- **ws:** only use singleStatement for subscriptions ([#1559](https://github.com/graphile/postgraphile/issues/1559)) ([bf11b75](https://github.com/graphile/postgraphile/commit/bf11b75022287dd2d3c2d657501349daddb4d69f))
+
 ## [4.12.5](https://github.com/graphile/postgraphile/compare/v4.12.4...v4.12.5) (2021-10-21)
 
 ### Bug Fixes
