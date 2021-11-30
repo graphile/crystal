@@ -639,9 +639,9 @@ export default function createPostGraphileHttpRequestHandler(
         // TODO: could it just be `req.url.includes('?')`
         const { query } = parseUrl(req) || {};
         if (req.method === 'GET' && !req.headers[TOKEN_HEADER_KEY] && !query) {
-          // this conditional is intentionally nested here because "single connection mode" in GraphQL over SSE accepts non-event stream requests
-          // for more information, please read: https://github.com/enisdenjo/graphql-sse/blob/master/PROTOCOL.md#single-connection-mode
           if (req.headers.accept !== 'text/event-stream') {
+            // this conditional is intentionally nested here because "single connection mode" in GraphQL over SSE accepts non-event stream requests
+            // for more information, please read: https://github.com/enisdenjo/graphql-sse/blob/master/PROTOCOL.md#single-connection-mode
             res.statusCode = 405;
             res.end();
             return;
