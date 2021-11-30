@@ -79,6 +79,11 @@ export async function handleGraphQLSSE<
   Request extends IncomingMessage = IncomingMessage,
   Response extends ServerResponse = ServerResponse
 >(res: PostGraphileResponse, postgraphileMiddleware: HttpRequestHandler): Promise<void> {
+  const major = parseInt(process.version.replace(/\..*$/, ''), 10); // copied from isTurbo.js
+  if (major <= 12) {
+    throw new Error('graphql-sse requres Node >=12');
+  }
+
   if (!sseHandler) {
     const {
       options,
