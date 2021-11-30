@@ -18,6 +18,7 @@ import { HttpRequestHandler, mixed, CreateRequestHandlerOptions } from '../../in
 import setupServerSentEvents, { handleGraphQLSSE } from './setupServerSentEvents';
 import withPostGraphileContext from '../withPostGraphileContext';
 import LRU from '@graphile/lru';
+import { TOKEN_HEADER_KEY } from 'graphql-sse';
 
 import chalk from 'chalk';
 import Debugger = require('debug'); // tslint:disable-line variable-name
@@ -619,12 +620,25 @@ export default function createPostGraphileHttpRequestHandler(
         //
         // Always enable CORS when developing PostGraphile because GraphiQL will be
         // on port 5783.
-        if (enableCors) addCORSHeaders(res);
+        if (enableCors)
+          addCORSHeaders(
+            // we use the node response because graphql-sse will append
+            // more headers down the read and flush them on its own
+            res.getNodeServerResponse(),
+            sse,
+          );
+
+        // Just a CORS preflight check
+        if (req.method === 'OPTIONS') {
+          res.statusCode = 200;
+          res.end();
+          return;
+        }
 
         // receiving a GET request without query params is PostGraphiQL listening for schema changes
         // TODO: could it just be `req.url.includes('?')`
         const { query } = parseUrl(req) || {};
-        if (req.method === 'GET' && !query) {
+        if (req.method === 'GET' && !req.headers[TOKEN_HEADER_KEY] && !query) {
           // this conditional is intentionally nested here because "single connection mode" in GraphQL over SSE accepts non-event stream requests
           // for more information, please read: https://github.com/enisdenjo/graphql-sse/blob/master/PROTOCOL.md#single-connection-mode
           if (req.headers.accept !== 'text/event-stream') {
@@ -637,8 +651,14 @@ export default function createPostGraphileHttpRequestHandler(
           return;
         }
 
+        if (!sse) {
+          // TODO: would this ever get reached?
+          res.statusCode = 404;
+          res.end();
+        }
+
         // all other cases are handled following the GraphQL over Server-Sent Events (SSE) protocol
-        if (sse) await handleGraphQLSSE(res, middleware);
+        await handleGraphQLSSE(res, middleware);
       } catch (e) {
         console.error('Unexpected error occurred in eventStreamRouteHandler');
         console.error(e);
@@ -769,9 +789,10 @@ export default function createPostGraphileHttpRequestHandler(
 
       // If we didn’t call `next` above, all requests will return 200 by default!
       res.statusCode = 200;
-      if (watchPg) {
+      if (watchPg || sse) {
         // Inform GraphiQL and other clients that they can subscribe to events
-        // (such as the schema being updated) at the following URL
+        // (such as the schema being updated) and execute subscriptions
+        // implementing the GraphQL over SSE protocol at the following URL
         res.setHeader(
           'X-GraphQL-Event-Stream',
           externalEventStreamRoute || `${externalUrlBase}${eventStreamRoute}`,
@@ -1167,9 +1188,16 @@ export default function createPostGraphileHttpRequestHandler(
  *
  * [1]: http://www.html5rocks.com/static/images/cors_server_flowchart.png
  */
-function addCORSHeaders(res: PostGraphileResponse): void {
+function addCORSHeaders(res: PostGraphileResponse | ServerResponse, sseEnabled?: boolean): void {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'HEAD, GET, POST');
+  if (sseEnabled) {
+    // For "single connection mode" GraphQL over SSE
+    //   - PUT creates a event stream reservation
+    //   - DELETE stops an active subscription in a stream
+    res.setHeader('Access-Control-Allow-Methods', 'HEAD, GET, POST, PUT, DELETE');
+  } else {
+    res.setHeader('Access-Control-Allow-Methods', 'HEAD, GET, POST');
+  }
   res.setHeader(
     'Access-Control-Allow-Headers',
     [
@@ -1188,6 +1216,8 @@ function addCORSHeaders(res: PostGraphileResponse): void {
       'Content-Length',
       // For our 'Explain' feature
       'X-PostGraphile-Explain',
+      // For "single connection mode" GraphQL over SSE
+      ...(sseEnabled ? [TOKEN_HEADER_KEY] : []),
     ].join(', '),
   );
   res.setHeader('Access-Control-Expose-Headers', ['X-GraphQL-Event-Stream'].join(', '));
