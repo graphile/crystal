@@ -37,6 +37,7 @@
     { "path": "packages/graphile-build" },
     { "path": "packages/graphile-crystal" },
     { "path": "packages/graphile-exporter" },
+    { "path": "packages/graphile-plugin" },
     { "path": "packages/dataplan-pg" }
   ]
 }

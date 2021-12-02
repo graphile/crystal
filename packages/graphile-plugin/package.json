@@ -1,0 +1,51 @@
+{
+  "name": "graphile-plugin",
+  "version": "5.0.0-alpha.0",
+  "description": "Standard plugin interface and helpers to be used across the Graphile stack.",
+  "type": "commonjs",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "node": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "test": "jest -i",
+    "prepack": "tsc -b"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/graphile/graphile-build.git"
+  },
+  "keywords": [
+    "graphile",
+    "plugin"
+  ],
+  "author": "Benjie Gillam <code@benjiegillam.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/graphile/graphile-build/issues"
+  },
+  "homepage": "https://graphile.org/graphile-build/",
+  "dependencies": {
+    "@types/node": "^16.11.6",
+    "@types/semver": "^7.3.9",
+    "chalk": "^4.1.2",
+    "debug": "^4.3.2",
+    "semver": "^7.3.5",
+    "tslib": "^2.3.1"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@types/debug": "^4.1.7",
+    "@types/jest": "^27.0.2",
+    "jest": "^27.3.1",
+    "ts-node": "^10.4.0",
+    "typescript": "next"
+  }
+}

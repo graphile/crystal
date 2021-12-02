@@ -5716,6 +5716,24 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"graphile-plugin@workspace:packages/graphile-plugin":
+  version: 0.0.0-use.local
+  resolution: "graphile-plugin@workspace:packages/graphile-plugin"
+  dependencies:
+    "@types/debug": ^4.1.7
+    "@types/jest": ^27.0.2
+    "@types/node": ^16.11.6
+    "@types/semver": ^7.3.9
+    chalk: ^4.1.2
+    debug: ^4.3.2
+    jest: ^27.3.1
+    semver: ^7.3.5
+    ts-node: ^10.4.0
+    tslib: ^2.3.1
+    typescript: next
+  languageName: unknown
+  linkType: soft
+
 "graphql-config@npm:^3.0.2":
   version: 3.4.1
   resolution: "graphql-config@npm:3.4.1"
