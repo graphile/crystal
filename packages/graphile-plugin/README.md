@@ -44,23 +44,23 @@ for PostGraphile, or a `worker` scope for Graphile Worker. The value for each of
 these scopes will be an object, but the contents of that object are defined by
 the projects in question.
 
-Currently this plugin system is only intended for Graphile usage (and thus we do
-not need to "reserve" keys), but should you find it useful for other projects
-please reach out via GitHub issues and we can discuss what's necessary to make
-this more universal. Should you decide to not heed this advice, please at least
-make sure that the "scopes" you add are namespaced in a way to avoid future
-conflicts with features we may wish to add.
+**NOTE**: Currently this plugin system is only intended for Graphile usage (and
+thus we do not need to "reserve" keys), but should you find it useful for other
+projects please reach out via GitHub issues and we can discuss what's necessary
+to make this more universal. Should you decide to not heed this advice, please
+at least make sure that the "scopes" you add are namespaced in a way to avoid
+future conflicts with features we may wish to add.
 
 ## Preset
 
-A preset is a configuration that bundles together a list of plugins and options
-for various of the "scopes". You may use more than one preset at a time, and
-presets may also compose (extend) other presets. When a library is passed a list
-of presets it results in a resolved preset (a preset that has no "extends")
-using the `ResolvePresets` algorithm; broadly all the `extends` are resolved in
-order, the plugins specified are merged as a set (each plugin will only be
-included once) and the options are merged via object merging such that the
-options specified last win.
+A preset bundles together a list of plugins, and options for various of the
+"scopes". You may use more than one preset at a time, and presets may also
+compose (extend) other presets. When a library is passed a list of presets it
+results in a resolved preset (a preset that has no "extends") using the
+`ResolvePresets` algorithm; broadly all the `extends` are resolved in order, the
+plugins specified are merged as a set (each plugin will only be included once)
+and the options are merged via object merging such that the options specified
+last win.
 
 **NOTE**: if you compose two presets (PresetA and PresetB) that both `extends`
 the same underlying preset (BASE) and apply some overrides, then the overrides
