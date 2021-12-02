@@ -62,9 +62,14 @@ order, the plugins specified are merged as a set (each plugin will only be
 included once) and the options are merged via object merging such that the
 options specified last win.
 
-**TODO**: this seems non-ideal, it would let the base presets defaults override
-a preset that comes later just because the base preset is used again in the
-second preset chain.
+**NOTE**: if you compose two presets (PresetA and PresetB) that both `extends`
+the same underlying preset (BASE) and apply some overrides, then the overrides
+in PresetA will be overridden by re-applying the BASE preset again. For this
+reason, presets that are expected to be combined with other presets should not
+`extends` common/shared presets, instead the end-user should be expected to add
+these presets themselves.
+
+**NOTE**: the order of presets is significant.
 
 ResolvePresets(presets):
 
