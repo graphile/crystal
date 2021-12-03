@@ -42,6 +42,7 @@
     "debug": "^4.3.2",
     "graphile-crystal": "4.7.0",
     "graphile-exporter": "^0.0.1",
+    "graphile-plugin": "^5.0.0-alpha.0",
     "pluralize": "^7.0.0",
     "semver": "^7.3.5",
     "tslib": "^2.3.1"
@@ -52,10 +53,7 @@
   "peerDependencies": {
     "graphql": "*"
   },
-  "files": [
-    "dist",
-    "index.js"
-  ],
+  "files": ["dist", "index.js"],
   "devDependencies": {
     "@types/debug": "^4.1.7",
     "@types/jest": "^27.0.2",

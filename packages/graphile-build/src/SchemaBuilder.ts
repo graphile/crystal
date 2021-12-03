@@ -80,9 +80,6 @@ class SchemaBuilder<
   hook<THookName extends keyof GraphileEngine.SchemaBuilderHooks<TBuild>>(
     hookName: THookName,
     fn: GraphileEngine.SchemaBuilderHooks[THookName][number],
-    provides?: Array<string>,
-    before?: Array<string>,
-    after?: Array<string>,
   ): void {
     if (!this.hooks[hookName]) {
       // TODO: fuzzy-find a similar hook
@@ -90,112 +87,10 @@ class SchemaBuilder<
     }
     if (this._currentPluginName) {
       fn.displayName = `${this._currentPluginName}/${hookName}/${
-        (provides && provides.length > 0 && provides.join("+")) ||
-        fn.displayName ||
-        fn.name ||
-        "unnamed"
+        fn.displayName || fn.name || "unnamed"
       }`;
     }
-    if (provides) {
-      if (!fn.displayName && provides.length) {
-        fn.displayName = `unknown/${hookName}/${provides[0]}`;
-      }
-      fn.provides = provides;
-    }
-    if (before) {
-      fn.before = before;
-    }
-    if (after) {
-      fn.after = after;
-    }
-    if (!fn.provides && !fn.before && !fn.after) {
-      // No explicit dependencies - add to the end
-      this.hooks[hookName].push(fn as any);
-    } else {
-      // We need to figure out where it can go, respecting all the dependencies.
-      // TODO: I think there are situations in which this algorithm may result in unnecessary conflict errors; we should take a more iterative approach or find a better algorithm
-      const relevantHooks = this.hooks[hookName];
-      let minIndex = 0;
-      let minReason: GraphileEngine.Hook<any, any> | null = null;
-      let maxIndex = relevantHooks.length;
-      let maxReason: GraphileEngine.Hook<any, any> | null = null;
-      const { provides: newProvides, before: newBefore, after: newAfter } = fn;
-      const describe = (hook: any, index?: number) => {
-        if (!hook) {
-          return "-";
-        }
-        return `${hook.displayName || hook.name || "anonymous"} (${
-          index ? `index: ${index}, ` : ""
-        }provides: ${hook.provides ? hook.provides.join(",") : "-"}, before: ${
-          hook.before ? hook.before.join(",") : "-"
-        }, after: ${hook.after ? hook.after.join(",") : "-"})`;
-      };
-      const check = () => {
-        if (minIndex > maxIndex) {
-          throw new Error(
-            `Cannot resolve plugin order - ${describe(
-              fn,
-            )} cannot be before ${describe(
-              maxReason,
-              maxIndex,
-            )} and after ${describe(
-              minReason,
-              minIndex,
-            )} - please report this issue`,
-          );
-        }
-      };
-      const setMin = (
-        newMin: number,
-        reason: GraphileEngine.Hook<any, any, any>,
-      ) => {
-        if (newMin > minIndex) {
-          minIndex = newMin;
-          minReason = reason;
-          check();
-        }
-      };
-      const setMax = (
-        newMax: number,
-        reason: GraphileEngine.Hook<any, any, any>,
-      ) => {
-        if (newMax < maxIndex) {
-          maxIndex = newMax;
-          maxReason = reason;
-          check();
-        }
-      };
-      relevantHooks.forEach((oldHook, idx) => {
-        const {
-          provides: oldProvides,
-          before: oldBefore,
-          after: oldAfter,
-        } = oldHook;
-        if (newProvides) {
-          if (oldBefore && oldBefore.some((dep) => newProvides.includes(dep))) {
-            // Old says it has to come before new
-            setMin(idx + 1, oldHook);
-          }
-          if (oldAfter && oldAfter.some((dep) => newProvides.includes(dep))) {
-            // Old says it has to be after new
-            setMax(idx, oldHook);
-          }
-        }
-        if (oldProvides) {
-          if (newBefore && newBefore.some((dep) => oldProvides.includes(dep))) {
-            // New says it has to come before old
-            setMax(idx, oldHook);
-          }
-          if (newAfter && newAfter.some((dep) => oldProvides.includes(dep))) {
-            // New says it has to be after old
-            setMin(idx + 1, oldHook);
-          }
-        }
-      });
-
-      // We've already validated everything, so we can now insert the record.
-      this.hooks[hookName].splice(maxIndex, 0, fn as any);
-    }
+    this.hooks[hookName].push(fn as any);
   }
 
   applyHooks<THookName extends keyof GraphileEngine.SchemaBuilderHooks<TBuild>>(

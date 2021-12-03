@@ -1,4 +1,5 @@
 import { __ValuePlan } from "graphile-crystal";
+import type { Plugin } from "graphile-plugin";
 
 import { isValidObjectType } from "../utils.js";
 
@@ -15,66 +16,73 @@ import { isValidObjectType } from "../utils.js";
  *
  * Removing this plugin will result in an invalid GraphQL schema.
  */
-export const QueryPlugin: GraphileEngine.Plugin = async function QueryPlugin(
-  builder,
-) {
-  builder.hook(
-    "init",
-    (_, build, _context) => {
-      const { registerObjectType, inflection } = build;
-      registerObjectType(
-        inflection.builtin("Query"),
-        {
-          isRootQuery: true,
-        },
-        __ValuePlan,
-        () => {
-          return {
-            description:
-              "The root query type which gives access points into the data universe.",
-            /*
+export const QueryPlugin: Plugin = {
+  name: "QueryPlugin",
+  version: "1.0.0",
+  description: `Registers the operation type for the 'query' operation.`,
+  schema: {
+    hooks: {
+      init: {
+        callback: (_, build, _context) => {
+          const { registerObjectType, inflection } = build;
+          registerObjectType(
+            inflection.builtin("Query"),
+            {
+              isRootQuery: true,
+            },
+            __ValuePlan,
+            () => {
+              return {
+                description:
+                  "The root query type which gives access points into the data universe.",
+                /*
             isTypeOf: (value, _context, info) =>
               info.parentType == null || value === $$isQuery,
             */
-          };
+              };
+            },
+            `graphile-build built-in (root query type)`,
+          );
+          return _;
         },
-        `graphile-build built-in (root query type)`,
-      );
-      return _;
-    },
 
-    ["Query"],
-  );
+        provides: ["Query"],
+      },
 
-  builder.hook(
-    "GraphQLSchema",
-    (schema, build, _context) => {
-      const { getTypeByName, extend, inflection, handleRecoverableError } =
-        build;
+      GraphQLSchema: {
+        callback: (schema, build, _context) => {
+          const { getTypeByName, extend, inflection, handleRecoverableError } =
+            build;
 
-      // IIFE to get the mutation type, handling errors occurring during
-      // validation.
-      const Query = (() => {
-        try {
-          const Type = getTypeByName(inflection.builtin("Query"));
+          // IIFE to get the mutation type, handling errors occurring during
+          // validation.
+          const Query = (() => {
+            try {
+              const Type = getTypeByName(inflection.builtin("Query"));
 
-          if (isValidObjectType(Type)) {
-            return Type;
+              if (isValidObjectType(Type)) {
+                return Type;
+              }
+            } catch (e) {
+              handleRecoverableError(e);
+            }
+            return null;
+          })();
+
+          if (Query == null) {
+            return schema;
           }
-        } catch (e) {
-          handleRecoverableError(e);
-        }
-        return null;
-      })();
 
-      if (Query == null) {
-        return schema;
-      }
-
-      // Errors thrown here (e.g. due to naming conflicts) should be raised,
-      // hence this is outside of the IIFE.
-      return extend(schema, { query: Query }, "Adding query type to schema");
+          // Errors thrown here (e.g. due to naming conflicts) should be raised,
+          // hence this is outside of the IIFE.
+          return extend(
+            schema,
+            { query: Query },
+            "Adding query type to schema",
+          );
+        },
+        provides: ["Query"],
+      },
     },
-    ["Query"],
-  );
+  },
 };

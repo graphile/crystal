@@ -2,10 +2,11 @@ import chalk from "chalk";
 import { readFile } from "fs/promises";
 import { lambda } from "graphile-crystal";
 import { EXPORTABLE, exportSchema } from "graphile-exporter";
+import type { Plugin } from "graphile-plugin";
 import { graphql, printSchema } from "graphql";
 import { URL } from "url";
 
-import { buildSchema, defaultPlugins } from "../index.js";
+import { buildSchema, defaultPreset } from "../index.js";
 
 declare global {
   namespace GraphileEngine {
@@ -16,51 +17,60 @@ declare global {
   }
 }
 
-// Create a simple plugin that adds a random field to every GraphQLObject
-const MyRandomFieldPlugin: GraphileEngine.Plugin = (
-  builder,
-  { myDefaultMin = 1, myDefaultMax = 100 },
-) => {
-  builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
-    const {
-      extend,
-      graphql: { GraphQLInt },
-    } = build;
-    const { Self, fieldWithHooks } = context;
-    return extend<typeof fields, typeof fields>(
-      fields,
-      {
-        random: fieldWithHooks({ fieldName: "random" }, () => ({
-          type: GraphQLInt,
-          args: {
-            sides: {
-              type: GraphQLInt,
+const MyRandomFieldPlugin: Plugin = {
+  name: "MyRandomFieldPlugin",
+  description: "Adds a random field to every GraphQLObject",
+  version: "1.0.0",
+  schema: {
+    hooks: {
+      "GraphQLObjectType:fields": {
+        callback: (fields, build, context) => {
+          const {
+            extend,
+            graphql: { GraphQLInt },
+          } = build;
+          const { Self, fieldWithHooks } = context;
+          const { myDefaultMin = 1, myDefaultMax = 100 } = build.options;
+          return extend<typeof fields, typeof fields>(
+            fields,
+            {
+              random: fieldWithHooks({ fieldName: "random" }, () => ({
+                type: GraphQLInt,
+                args: {
+                  sides: {
+                    type: GraphQLInt,
+                  },
+                },
+                plan: EXPORTABLE(
+                  (lambda, myDefaultMax, myDefaultMin) => (_$parent, args) => {
+                    return lambda(
+                      args.sides,
+                      (sides = myDefaultMax) =>
+                        Math.floor(Math.random() * (sides + 1 - myDefaultMin)) +
+                        myDefaultMin,
+                    );
+                  },
+                  [lambda, myDefaultMax, myDefaultMin],
+                ),
+              })),
             },
-          },
-          plan: EXPORTABLE(
-            (lambda, myDefaultMax, myDefaultMin) => (_$parent, args) => {
-              return lambda(
-                args.sides,
-                (sides = myDefaultMax) =>
-                  Math.floor(Math.random() * (sides + 1 - myDefaultMin)) +
-                  myDefaultMin,
-              );
-            },
-            [lambda, myDefaultMax, myDefaultMin],
-          ),
-        })),
+            `adding 'random' field to ${Self.name}`,
+          );
+        },
       },
-      `adding 'random' field to ${Self.name}`,
-    );
-  });
+    },
+  },
 };
 
 (async function () {
   // Create our GraphQL schema by applying all the plugins
-  const schema = await buildSchema([...defaultPlugins, MyRandomFieldPlugin], {
-    // ... options
-    myDefaultMin: 1,
-    myDefaultMax: 6,
+  const schema = buildSchema({
+    extends: [defaultPreset],
+    plugins: [MyRandomFieldPlugin],
+    schema: {
+      myDefaultMin: 1,
+      myDefaultMax: 6,
+    },
   });
 
   // Output our schema

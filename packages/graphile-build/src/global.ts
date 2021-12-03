@@ -34,7 +34,6 @@ import type {
 } from "graphql";
 
 import type { InflectionBase } from "./inflection.js";
-import type SchemaBuilder from "./SchemaBuilder.js";
 
 declare global {
   namespace GraphileEngine {
@@ -55,14 +54,6 @@ declare global {
      * Do not change this object, your changes will be ignored.
      */
     type InitObject = Record<string, never>;
-
-    interface Plugin {
-      (
-        builder: SchemaBuilder,
-        options: GraphileBuildOptions,
-      ): Promise<void> | void;
-      displayName?: string;
-    }
 
     type TriggerChangeType = () => void;
 
@@ -524,17 +515,14 @@ declare global {
       | ScopeGraphQLEnumTypeValuesValue
       | ScopeFinalize;
 
-    interface Hook<
+    type Hook<
       Type,
       TContext extends Context,
       TBuild extends Partial<Build> = Build,
-    > {
+    > = {
       (input: Type, build: TBuild, context: TContext): Type;
       displayName?: string;
-      provides?: Array<string>;
-      before?: Array<string>;
-      after?: Array<string>;
-    }
+    };
 
     type FieldWithHooksFunction = <
       TType extends GraphQLOutputType,

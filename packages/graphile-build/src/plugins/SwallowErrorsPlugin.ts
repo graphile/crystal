@@ -1,3 +1,5 @@
+import { Plugin } from "graphile-plugin";
+import { version } from "../index.js";
 import swallowError from "../swallowError.js";
 
 /**
@@ -11,17 +13,22 @@ import swallowError from "../swallowError.js";
  * We've registered the `dontSwallowErrors` option in case you want to opt out
  * of this without changing your plugin list.
  */
-export const SwallowErrorsPlugin: GraphileEngine.Plugin =
-  function SwallowErrorsPlugin(builder, { dontSwallowErrors = false }) {
-    if (dontSwallowErrors !== true) {
-      builder.hook(
-        "build",
-        (build) => {
-          // Explicitly overwrite the error handler
-          build.handleRecoverableError = swallowError;
+export const SwallowErrorsPlugin: Plugin = {
+  name: "SwallowErrorsPlugin",
+  description: "",
+  version: version,
+  schema: {
+    hooks: {
+      build: {
+        callback: (build) => {
+          if (build.options.dontSwallowErrors !== true) {
+            // Explicitly overwrite the error handler
+            build.handleRecoverableError = swallowError;
+          }
           return build;
         },
-        ["SwallowErrors"],
-      );
-    }
-  };
+        provides: ["SwallowErrors"],
+      },
+    },
+  },
+};

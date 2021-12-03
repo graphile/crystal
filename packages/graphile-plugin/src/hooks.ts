@@ -1,0 +1,164 @@
+import * as assert from "assert";
+
+import type { Plugin, PluginHook } from "./interfaces.js";
+
+export function applyHooks<
+  THooks extends {
+    [hookKey: string]: (...args: any[]) => any;
+  },
+>(
+  plugins: Plugin[],
+  hooksRetriever: (plugin: Plugin) =>
+    | {
+        [key in keyof THooks]?: PluginHook<THooks[key]>;
+      }
+    | undefined,
+  applyHookCallback: <THookName extends keyof THooks>(
+    hookName: THookName,
+    hookFn: THooks[THookName],
+    plugin: Plugin,
+  ) => void,
+): void {
+  type FullHookSpec = {
+    id: string;
+    plugin: Plugin;
+    provides: string[];
+    before: string[];
+    after: string[];
+    callback: THooks[keyof THooks];
+  };
+  // Normalize all the hooks and gather them into collections
+  const allHooks: {
+    [key in keyof THooks]?: Array<FullHookSpec>;
+  } = Object.create(null);
+  let uid = 0;
+  for (const plugin of plugins) {
+    const hooks = hooksRetriever(plugin);
+    if (!hooks) {
+      continue;
+    }
+    const keys = Object.keys(hooks) as unknown as Array<keyof typeof hooks>;
+    for (const key of keys) {
+      const hookSpecRaw: PluginHook<THooks[typeof key]> | undefined =
+        hooks[key];
+      if (!hookSpecRaw) {
+        continue;
+      }
+      const callback =
+        typeof hookSpecRaw === "function" ? hookSpecRaw : hookSpecRaw.callback;
+      const { provides, before, after } =
+        typeof hookSpecRaw === "function"
+          ? ({} as { provides?: never[]; before?: never[]; after?: never })
+          : hookSpecRaw;
+      if (!allHooks[key]) {
+        allHooks[key] = [];
+      }
+      // We need to give each hook a unique ID
+      const id = String(uid++);
+      allHooks[key]!.push({
+        id,
+        plugin,
+        callback,
+        provides: [...(provides || []), id],
+        before: before || [],
+        after: after || [],
+      });
+    }
+  }
+
+  // Sort the collections according to provides, before and after.
+  for (const hookName in allHooks) {
+    const hooks = allHooks[hookName] as FullHookSpec[] | undefined;
+    if (!hooks) {
+      continue;
+    }
+
+    // "before" and "after" are very similar, lets simplify them into one
+    // concept by converting all the "befores" into "afters" on their targets.
+    for (const hook of hooks) {
+      const { id, before } = hook;
+      if (before.length) {
+        const previousBefore = before.splice(0, before.length);
+        for (const otherHook of hooks) {
+          if (
+            previousBefore.some((beforeValue) =>
+              otherHook.provides.includes(beforeValue),
+            )
+          ) {
+            otherHook.after.push(id);
+          }
+        }
+      }
+    }
+
+    // Now lets figure out all the possible provides values:
+    const providers: {
+      [key: string]: typeof hooks;
+    } = Object.create(null);
+    for (const hook of hooks) {
+      const { provides } = hook;
+      for (const provide in provides) {
+        if (!providers[provide]) {
+          providers[provide] = [];
+        }
+        providers[provide]!.push(hook);
+      }
+    }
+
+    // And ignore any "afters" with no providers:
+    const validProviders = Object.keys(providers);
+    for (const hook of hooks) {
+      hook.after = hook.after.filter((afterValue) =>
+        validProviders.includes(afterValue),
+      );
+    }
+
+    const final = [];
+    const remaining = [...hooks];
+    // Now we can iteratively add items following the rule that there must be
+    // no pending items that "provides" anything that the hook must come
+    // "after".
+    for (let loops = 0; loops < 10000; loops++) {
+      let changes = 0;
+      if (remaining.length === 0) {
+        // We're done!
+        break;
+      }
+
+      for (let i = 0; i < remaining.length; i++) {
+        const hook = remaining[i];
+        if (!hook) {
+          continue;
+        }
+        const dependsOnRemaining = remaining.some(
+          (otherHook) =>
+            otherHook !== hook &&
+            otherHook.provides.some((otherHookProvide) =>
+              hook.after.includes(otherHookProvide),
+            ),
+        );
+        if (!dependsOnRemaining) {
+          changes++;
+          remaining.splice(i, 1);
+          final.push(hook);
+          i--;
+        }
+      }
+
+      if (changes === 0) {
+        throw new Error("Infinite loop in hook dependencies detected.");
+      }
+    }
+
+    assert.equal(
+      final.length,
+      hooks.length,
+      `Expected the same number of hooks after sorting`,
+    );
+
+    // Finally we can register the hooks
+    for (const hook of final) {
+      applyHookCallback(hookName, hook.callback, hook.plugin);
+    }
+  }
+}

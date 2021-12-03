@@ -13,6 +13,7 @@
   "references": [
     { "path": "../lru" },
     { "path": "../graphile-crystal" },
-    { "path": "../graphile-exporter" }
+    { "path": "../graphile-exporter" },
+    { "path": "../graphile-plugin" }
   ]
 }

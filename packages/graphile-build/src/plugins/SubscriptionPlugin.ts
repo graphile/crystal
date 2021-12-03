@@ -1,4 +1,6 @@
 import { __ValuePlan } from "graphile-crystal";
+import { Plugin } from "graphile-plugin";
+import { version } from "../index.js";
 
 import { isValidObjectType } from "../utils.js";
 
@@ -13,63 +15,69 @@ import { isValidObjectType } from "../utils.js";
  * Removing this plugin will mean that your GraphQL schema will not allow
  * subscription operations.
  */
-export const SubscriptionPlugin: GraphileEngine.Plugin =
-  async function SubscriptionPlugin(builder) {
-    builder.hook("init", (_, build, _context) => {
-      const { inflection } = build;
+export const SubscriptionPlugin: Plugin = {
+  name: "SubscriptionPlugin",
+  description: "",
+  version: version,
+  schema: {
+    hooks: {
+      init: {
+        callback: (_, build, _context) => {
+          const { inflection } = build;
 
-      build.registerObjectType(
-        inflection.builtin("Subscription"),
-        {
-          isRootSubscription: true,
+          build.registerObjectType(
+            inflection.builtin("Subscription"),
+            {
+              isRootSubscription: true,
+            },
+            __ValuePlan,
+            () => {
+              return {
+                description: `The root subscription type: contains realtime events you can subscribe to with the \`subscription\` operation.`,
+              };
+            },
+            `graphile-build built-in (root subscription type)`,
+          );
+
+          return _;
         },
-        __ValuePlan,
-        () => {
-          return {
-            description: `The root subscription type: contains realtime events you can subscribe to with the \`subscription\` operation.`,
-          };
-        },
-        `graphile-build built-in (root subscription type)`,
-      );
-
-      return _;
-    });
-
-    builder.hook(
-      "GraphQLSchema",
-      (schema, build, _context) => {
-        const { getTypeByName, extend, inflection, handleRecoverableError } =
-          build;
-
-        // IIFE to get the subscription type, handling errors occurring during
-        // validation.
-        const Subscription = (() => {
-          try {
-            const Type = getTypeByName(inflection.builtin("Subscription"));
-
-            if (isValidObjectType(Type)) {
-              return Type;
-            }
-          } catch (e) {
-            handleRecoverableError(e);
-          }
-          return null;
-        })();
-
-        if (Subscription == null) {
-          return schema;
-        }
-
-        // Errors thrown here (e.g. due to naming conflicts) should be raised,
-        // hence this is outside of the IIFE.
-        return extend(
-          schema,
-          { subscription: Subscription },
-          "Adding subscription type to schema",
-        );
       },
-      ["Subscription"],
-      [],
-      ["Query"],
-    );
-  };
+      GraphQLSchema: {
+        callback: (schema, build, _context) => {
+          const { getTypeByName, extend, inflection, handleRecoverableError } =
+            build;
+
+          // IIFE to get the subscription type, handling errors occurring during
+          // validation.
+          const Subscription = (() => {
+            try {
+              const Type = getTypeByName(inflection.builtin("Subscription"));
+
+              if (isValidObjectType(Type)) {
+                return Type;
+              }
+            } catch (e) {
+              handleRecoverableError(e);
+            }
+            return null;
+          })();
+
+          if (Subscription == null) {
+            return schema;
+          }
+
+          // Errors thrown here (e.g. due to naming conflicts) should be raised,
+          // hence this is outside of the IIFE.
+          return extend(
+            schema,
+            { subscription: Subscription },
+            "Adding subscription type to schema",
+          );
+        },
+        provides: ["Subscription"],
+        before: [],
+        after: ["Query"],
+      },
+    },
+  },
+};

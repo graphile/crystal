@@ -1,5 +1,8 @@
 import "./global.js";
 
+import type { Plugin, Preset } from "graphile-plugin";
+import { applyHooks } from "graphile-plugin";
+import { resolvePresets } from "graphile-plugin";
 import type { GraphQLSchema } from "graphql";
 import util from "util";
 
@@ -27,43 +30,24 @@ export {
 
 export { GraphileEngine, SchemaBuilder };
 
-export const getBuilder = async (
-  plugins: Array<GraphileEngine.Plugin>,
-  options: GraphileEngine.GraphileBuildOptions = {},
-): Promise<SchemaBuilder> => {
-  const builder = new SchemaBuilder(options);
-  for (let i = 0, l = plugins.length; i < l; i++) {
-    const plugin = plugins[i];
-    if (typeof plugin !== "function") {
-      throw new Error(
-        `Expected a list of plugin functions, instead list contained a non-function at index ${i} (this could be an ESM/CommonJS compatibility issue - try adding or removing '.default' from the import): ${util.inspect(
-          plugin,
-        )}`,
-      );
-    }
-    builder._setPluginName(plugin.displayName || plugin.name);
-    await plugin(builder, options);
+const getSchemaHooks = (plugin: Plugin) => plugin.schema?.hooks;
+
+export const getBuilder = (preset: Preset): SchemaBuilder => {
+  const config = resolvePresets([preset]);
+  const { plugins, schema: options } = config;
+  const builder = new SchemaBuilder(options || {});
+  applyHooks(plugins, getSchemaHooks, (hookName, hookFn, plugin) => {
+    builder._setPluginName(plugin.name);
+    builder.hook(hookName, hookFn);
     builder._setPluginName(null);
-  }
+  });
   return builder;
 };
 
-export const buildSchema = async (
-  plugins: Array<GraphileEngine.Plugin>,
-  options: GraphileEngine.GraphileBuildOptions = {},
-): Promise<GraphQLSchema> => {
-  const builder = await getBuilder(plugins, options);
+export const buildSchema = (preset: Preset): GraphQLSchema => {
+  const builder = getBuilder(preset);
   return builder.buildSchema();
 };
-
-export const defaultPlugins: Array<GraphileEngine.Plugin> = [
-  QueryPlugin,
-  MutationPlugin,
-  SubscriptionPlugin,
-  ClientMutationIdDescriptionPlugin,
-  MutationPayloadQueryPlugin,
-  CursorTypePlugin,
-];
 
 export {
   ClientMutationIdDescriptionPlugin,
@@ -75,3 +59,6 @@ export {
   SubscriptionPlugin,
   SwallowErrorsPlugin,
 };
+
+export { defaultPreset } from "./preset";
+export const version = require("../package.json").version;

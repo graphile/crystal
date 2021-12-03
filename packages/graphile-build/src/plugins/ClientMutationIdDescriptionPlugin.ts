@@ -1,3 +1,7 @@
+import type { Plugin } from "graphile-plugin";
+
+import { version } from "..";
+
 /**
  * Adds generic descriptions (where not already present) to:
  *
@@ -8,95 +12,97 @@
  * Descriptions aren't required in these places, so you can safely disable this
  * plugin.
  */
-export const ClientMutationIdDescriptionPlugin: GraphileEngine.Plugin =
-  function ClientMutationIdDescriptionPlugin(builder) {
-    builder.hook(
-      "GraphQLInputObjectType:fields:field",
-      (field, build, context) => {
-        const { extend } = build;
-        const {
-          scope: { isMutationInput, fieldName },
-          Self,
-        } = context;
+export const ClientMutationIdDescriptionPlugin: Plugin = {
+  name: "ClientMutationIdDescriptionPlugin",
+  version,
+  schema: {
+    hooks: {
+      "GraphQLInputObjectType:fields:field": {
+        callback: (field, build, context) => {
+          const { extend } = build;
+          const {
+            scope: { isMutationInput, fieldName },
+            Self,
+          } = context;
 
-        if (
-          isMutationInput !== true ||
-          fieldName !== "clientMutationId" ||
-          field.description != null
-        ) {
-          return field;
-        }
+          if (
+            isMutationInput !== true ||
+            fieldName !== "clientMutationId" ||
+            field.description != null
+          ) {
+            return field;
+          }
 
-        return extend(
-          field,
-          {
-            description:
-              "An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.",
-          },
-          `Tweaking '${fieldName}' field in '${Self.name}'`,
-        );
-      },
-      ["ClientMutationIdDescription"],
-    );
-
-    builder.hook(
-      "GraphQLObjectType:fields:field",
-      (field, build, context) => {
-        const { extend } = build;
-        const {
-          scope: { isMutationPayload, fieldName },
-          Self,
-        } = context;
-
-        if (
-          isMutationPayload !== true ||
-          fieldName !== "clientMutationId" ||
-          field.description != null
-        ) {
-          return field;
-        }
-
-        return extend(
-          field,
-          {
-            description:
-              "The exact same `clientMutationId` that was provided in the mutation input, unchanged and unused. May be used by a client to track mutations.",
-          },
-          `Tweaking '${fieldName}' field in '${Self.name}'`,
-        );
-      },
-      ["ClientMutationIdDescription"],
-    );
-
-    builder.hook(
-      "GraphQLObjectType:fields:field:args",
-      (args, build, context) => {
-        const { extend } = build;
-        const {
-          scope: { isRootMutation, fieldName },
-          Self,
-        } = context;
-
-        if (
-          isRootMutation !== true ||
-          args.input == null ||
-          args.input.description != null
-        ) {
-          return args;
-        }
-
-        return {
-          ...args,
-          input: extend(
-            args.input,
+          return extend(
+            field,
             {
               description:
-                "The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.",
+                "An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.",
             },
-            `Adding a description to input arg for field '${fieldName}' field in '${Self.name}'`,
-          ),
-        };
+            `Tweaking '${fieldName}' field in '${Self.name}'`,
+          );
+        },
+        provides: ["ClientMutationIdDescription"],
       },
-      ["ClientMutationIdDescription"],
-    );
-  };
+
+      "GraphQLObjectType:fields:field": {
+        callback: (field, build, context) => {
+          const { extend } = build;
+          const {
+            scope: { isMutationPayload, fieldName },
+            Self,
+          } = context;
+
+          if (
+            isMutationPayload !== true ||
+            fieldName !== "clientMutationId" ||
+            field.description != null
+          ) {
+            return field;
+          }
+
+          return extend(
+            field,
+            {
+              description:
+                "The exact same `clientMutationId` that was provided in the mutation input, unchanged and unused. May be used by a client to track mutations.",
+            },
+            `Tweaking '${fieldName}' field in '${Self.name}'`,
+          );
+        },
+        provides: ["ClientMutationIdDescription"],
+      },
+
+      "GraphQLObjectType:fields:field:args": {
+        callback: (args, build, context) => {
+          const { extend } = build;
+          const {
+            scope: { isRootMutation, fieldName },
+            Self,
+          } = context;
+
+          if (
+            isRootMutation !== true ||
+            args.input == null ||
+            args.input.description != null
+          ) {
+            return args;
+          }
+
+          return {
+            ...args,
+            input: extend(
+              args.input,
+              {
+                description:
+                  "The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.",
+              },
+              `Adding a description to input arg for field '${fieldName}' field in '${Self.name}'`,
+            ),
+          };
+        },
+        provides: ["ClientMutationIdDescription"],
+      },
+    },
+  },
+};
