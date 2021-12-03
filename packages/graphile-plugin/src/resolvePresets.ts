@@ -2,11 +2,22 @@ import * as assert from "assert";
 
 import type { Preset, ResolvedPreset } from "./interfaces.js";
 
+function isResolvedPreset(preset: Preset): preset is ResolvedPreset {
+  return (preset.plugins && preset.extends?.length === 0) || false;
+}
+
 /**
  * Given a list of presets, resolves the presets and returns the resulting
  * ResolvedPreset (which does not have any `extends`).
  */
 export function resolvePresets(presets: ReadonlyArray<Preset>): ResolvedPreset {
+  if (presets.length === 1) {
+    // Maybe it's already resolved?
+    const preset = presets[0];
+    if (preset && isResolvedPreset(preset)) {
+      return preset;
+    }
+  }
   const finalPreset = blankResolvedPreset();
   for (const preset of presets) {
     const resolvedPreset = resolvePreset(preset);

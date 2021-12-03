@@ -3,6 +3,7 @@ import { readFile } from "fs/promises";
 import { lambda } from "graphile-crystal";
 import { EXPORTABLE, exportSchema } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
+import { resolvePresets } from "graphile-plugin";
 import { graphql, printSchema } from "graphql";
 
 import { buildSchema, defaultPreset } from "../index.js";
@@ -63,14 +64,18 @@ const MyRandomFieldPlugin: Plugin = {
 
 (async function () {
   // Create our GraphQL schema by applying all the plugins
-  const schema = buildSchema({
-    extends: [defaultPreset],
-    plugins: [MyRandomFieldPlugin],
-    schema: {
-      myDefaultMin: 1,
-      myDefaultMax: 6,
+  const config = resolvePresets([
+    {
+      extends: [defaultPreset],
+      plugins: [MyRandomFieldPlugin],
+      schema: {
+        myDefaultMin: 1,
+        myDefaultMax: 6,
+      },
     },
-  });
+  ]);
+  const input: GraphileEngine.BuildInput = {};
+  const schema = buildSchema(config, input);
 
   // Output our schema
   console.log(chalk.blue(printSchema(schema)));

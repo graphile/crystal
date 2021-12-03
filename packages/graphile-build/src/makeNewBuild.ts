@@ -34,6 +34,7 @@ const version: string = JSON.parse(
 
 export default function makeNewBuild(
   builder: SchemaBuilder<any>,
+  input: GraphileEngine.BuildInput,
 ): GraphileEngine.BuildBase {
   const allTypes = {
     Int: GraphQLInt,
@@ -109,6 +110,7 @@ export default function makeNewBuild(
       graphql: graphql.version,
       "graphile-build": version,
     },
+    input,
 
     hasVersion(
       packageName: string,

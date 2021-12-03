@@ -37,6 +37,10 @@ import type { InflectionBase } from "./inflection.js";
 
 declare global {
   namespace GraphileEngine {
+    interface BuildInput {
+      // Expand this interface with declaration merging
+    }
+
     interface DirectiveMap {
       [directiveName: string]: {
         [directiveArgument: string]: any;
@@ -165,6 +169,12 @@ declare global {
         "graphile-build": string;
         [packageName: string]: string;
       };
+
+      /**
+       * Input from the "data gathering phase" that plugins can use to
+       * influence what types/fields/etc are added to the GraphQL schema.
+       */
+      input: BuildInput;
 
       /**
        * Returns true if `Build.versions` contains an entry for `packageName`

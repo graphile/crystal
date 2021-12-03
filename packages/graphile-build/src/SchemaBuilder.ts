@@ -23,18 +23,10 @@ class SchemaBuilder<
   TBuild extends GraphileEngine.Build = GraphileEngine.Build,
 > extends EventEmitter {
   options: GraphileEngine.GraphileBuildOptions;
-  watchers: Array<GraphileEngine.WatchUnwatch>;
-  unwatchers: Array<GraphileEngine.WatchUnwatch>;
-  triggerChange: GraphileEngine.TriggerChangeType | null | undefined;
   depth: number;
   hooks: GraphileEngine.SchemaBuilderHooks<TBuild>;
 
   _currentPluginName: string | null | undefined;
-  _generatedSchema: GraphQLSchema | null | undefined;
-  _validationErrors: ReadonlyArray<GraphQLError> = [];
-  _explicitSchemaListener: GraphileEngine.SchemaListener | null | undefined;
-  _busy: boolean;
-  _watching: boolean;
 
   newWithHooks: NewWithHooksFunction;
 
@@ -45,12 +37,6 @@ class SchemaBuilder<
       throw new Error("Please pass options to SchemaBuilder");
     }
     this.options = options;
-
-    this._busy = false;
-    this._watching = false;
-
-    this.watchers = [];
-    this.unwatchers = [];
 
     // Because hooks can nest, this keeps track of how deep we are.
     this.depth = -1;
@@ -178,19 +164,8 @@ class SchemaBuilder<
     }
   }
 
-  registerWatcher(
-    listen: GraphileEngine.WatchUnwatch,
-    unlisten: GraphileEngine.WatchUnwatch,
-  ): void {
-    if (!listen || !unlisten) {
-      throw new Error("You must provide both a listener and an unlistener");
-    }
-    this.watchers.push(listen);
-    this.unwatchers.push(unlisten);
-  }
-
-  createBuild(): TBuild {
-    const initialBuild = makeNewBuild(this) as Partial<TBuild> &
+  createBuild(input: GraphileEngine.BuildInput): TBuild {
+    const initialBuild = makeNewBuild(this, input) as Partial<TBuild> &
       GraphileEngine.BuildBase;
     // Inflection needs to come first, in case 'build' hooks depend on it
     const scopeContext: GraphileEngine.ContextInflection = {
@@ -221,137 +196,53 @@ class SchemaBuilder<
     return finalBuild;
   }
 
-  buildSchema(): GraphQLSchema {
-    if (!this._generatedSchema || this._validationErrors.length > 0) {
-      const build = this.createBuild();
-      const schemaSpec: Partial<GraphQLSchemaConfig> = {
-        directives: [...build.graphql.specifiedDirectives],
-      };
-      const schemaScope: GraphileEngine.ScopeGraphQLSchema = {
-        __origin: `GraphQL built-in`,
-      };
-      const schema = this.newWithHooks(
-        build,
-        GraphQLSchema,
-        schemaSpec,
-        schemaScope,
-      );
+  buildSchema(input: GraphileEngine.BuildInput): GraphQLSchema {
+    const build = this.createBuild(input);
+    const schemaSpec: Partial<GraphQLSchemaConfig> = {
+      directives: [...build.graphql.specifiedDirectives],
+    };
+    const schemaScope: GraphileEngine.ScopeGraphQLSchema = {
+      __origin: `Graphile built-in`,
+    };
+    const tempSchema = this.newWithHooks(
+      build,
+      GraphQLSchema,
+      schemaSpec,
+      schemaScope,
+    );
 
-      const finalizeContext: GraphileEngine.ContextFinalize = {
-        scope: {},
-        type: "finalize",
-      };
-      this._generatedSchema = schema
-        ? this.applyHooks(
-            "finalize",
-            schema,
-            build,
-            finalizeContext,
-            "Finalizing GraphQL schema",
-          )
-        : schema;
+    const finalizeContext: GraphileEngine.ContextFinalize = {
+      scope: {},
+      type: "finalize",
+    };
 
-      this._validationErrors = validateSchema(schema);
-    }
-    if (!this._generatedSchema) {
+    const schema = tempSchema
+      ? this.applyHooks(
+          "finalize",
+          tempSchema,
+          build,
+          finalizeContext,
+          "Finalizing GraphQL schema",
+        )
+      : tempSchema;
+
+    if (!schema) {
       throw new Error("Schema generation failed");
     }
-    if (this._validationErrors.length) {
+
+    const validationErrors = validateSchema(schema);
+    if (validationErrors.length) {
       throw new AggregateError(
-        this._validationErrors,
+        validationErrors,
         `Schema construction failed due to ${
-          this._validationErrors.length
+          validationErrors.length
         } validation failure(s). First failure was: ${String(
-          this._validationErrors[0],
+          validationErrors[0],
         )}`,
       );
     }
-    return this._generatedSchema;
-  }
 
-  async watchSchema(listener?: GraphileEngine.SchemaListener): Promise<void> {
-    if (this._busy) {
-      throw new Error("An operation is in progress");
-    }
-    if (this._watching) {
-      throw new Error(
-        "We're already watching this schema! Use `builder.on('schema', callback)` instead.",
-      );
-    }
-    try {
-      this._busy = true;
-      this._explicitSchemaListener = listener;
-
-      // We want to ignore `triggerChange` calls that occur whilst we're setting
-      // up the listeners to prevent an unnecessary double schema build.
-      let ignoreChangeTriggers = true;
-
-      this.triggerChange = () => {
-        if (ignoreChangeTriggers) {
-          return;
-        }
-        this._generatedSchema = null;
-        // XXX: optionally debounce
-        try {
-          const schema = this.buildSchema();
-          this.emit("schema", schema);
-        } catch (e) {
-          // Build errors introduced while watching are ignored because it's
-          // primarily used in development.
-          // eslint-disable-next-line no-console
-          console.error(
-            "⚠️⚠️⚠️ An error occurred when building the schema on watch:",
-          );
-
-          // eslint-disable-next-line no-console
-          console.error(e);
-        }
-      };
-      for (const fn of this.watchers) {
-        // TODO: should this await or not?
-        await fn(this.triggerChange);
-      }
-
-      // Now we're about to build the first schema, any further `triggerChange`
-      // calls should be honoured.
-      ignoreChangeTriggers = false;
-
-      if (listener) {
-        this.on("schema", listener);
-      }
-      this.emit("schema", this.buildSchema());
-
-      this._watching = true;
-    } finally {
-      this._busy = false;
-    }
-  }
-
-  async unwatchSchema(): Promise<void> {
-    if (this._busy) {
-      throw new Error("An operation is in progress");
-    }
-    if (!this._watching) {
-      throw new Error("We're not watching this schema!");
-    }
-    this._busy = true;
-    try {
-      const listener = this._explicitSchemaListener;
-      this._explicitSchemaListener = null;
-      if (listener) {
-        this.removeListener("schema", listener);
-      }
-      if (this.triggerChange) {
-        for (const fn of this.unwatchers) {
-          // TODO: should this await or not?
-          await fn(this.triggerChange);
-        }
-      }
-      this.triggerChange = null;
-      this._watching = false;
-    } finally {
-      this._busy = false;
-    }
+    return schema;
   }
 }
 

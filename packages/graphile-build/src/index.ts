@@ -1,4 +1,5 @@
 import "./global.js";
+import "./interfaces.js";
 
 import type { Plugin, Preset } from "graphile-plugin";
 import { applyHooks, resolvePresets } from "graphile-plugin";
@@ -42,9 +43,12 @@ export const getBuilder = (preset: Preset): SchemaBuilder => {
   return builder;
 };
 
-export const buildSchema = (preset: Preset): GraphQLSchema => {
+export const buildSchema = (
+  preset: Preset,
+  input: GraphileEngine.BuildInput,
+): GraphQLSchema => {
   const builder = getBuilder(preset);
-  return builder.buildSchema();
+  return builder.buildSchema(input);
 };
 
 export {

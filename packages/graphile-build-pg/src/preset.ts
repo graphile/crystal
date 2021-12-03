@@ -1,3 +1,7 @@
 import type { Preset } from "graphile-plugin";
 
-export const defaultPreset: Preset = {};
+import { PgIntrospectionPlugin } from "./plugins/PgIntrospectionPlugin";
+
+export const defaultPreset: Preset = {
+  plugins: [PgIntrospectionPlugin],
+};
