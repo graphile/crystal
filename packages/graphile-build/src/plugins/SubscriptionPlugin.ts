@@ -1,7 +1,7 @@
 import { __ValuePlan } from "graphile-crystal";
-import { Plugin } from "graphile-plugin";
-import { version } from "../index.js";
+import type { Plugin } from "graphile-plugin";
 
+import { version } from "../index.js";
 import { isValidObjectType } from "../utils.js";
 
 /**

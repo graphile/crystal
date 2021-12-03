@@ -4,7 +4,6 @@ import { lambda } from "graphile-crystal";
 import { EXPORTABLE, exportSchema } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import { graphql, printSchema } from "graphql";
-import { URL } from "url";
 
 import { buildSchema, defaultPreset } from "../index.js";
 

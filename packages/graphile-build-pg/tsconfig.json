@@ -12,8 +12,8 @@
   "include": ["src"],
   "references": [
     { "path": "../graphile-build" },
-    { "path": "../graphile-build-pg" },
     { "path": "../graphile-crystal" },
-    { "path": "../graphile-exporter" }
+    { "path": "../graphile-exporter" },
+    { "path": "../graphile-plugin" }
   ]
 }

@@ -1,3 +1,1 @@
-import type { GraphileEngine } from "graphile-build";
-
-export const defaultPlugins: GraphileEngine.Plugin[] = [];
+export { defaultPreset } from "./preset";

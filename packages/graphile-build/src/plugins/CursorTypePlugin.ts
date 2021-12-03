@@ -1,4 +1,5 @@
 import type { Plugin } from "graphile-plugin";
+
 import { version } from "../index.js";
 import { stringScalarSpec } from "../utils.js";
 

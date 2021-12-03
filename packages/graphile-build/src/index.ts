@@ -1,10 +1,8 @@
 import "./global.js";
 
 import type { Plugin, Preset } from "graphile-plugin";
-import { applyHooks } from "graphile-plugin";
-import { resolvePresets } from "graphile-plugin";
+import { applyHooks, resolvePresets } from "graphile-plugin";
 import type { GraphQLSchema } from "graphql";
-import util from "util";
 
 import {
   ClientMutationIdDescriptionPlugin,

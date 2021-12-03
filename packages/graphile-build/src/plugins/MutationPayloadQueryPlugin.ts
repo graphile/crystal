@@ -1,6 +1,7 @@
 import { aether } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
-import { Plugin } from "graphile-plugin";
+import type { Plugin } from "graphile-plugin";
+
 import { version } from "../index";
 
 /**

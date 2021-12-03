@@ -1,4 +1,5 @@
-import { Plugin } from "graphile-plugin";
+import type { Plugin } from "graphile-plugin";
+
 import { version } from "../index.js";
 import swallowError from "../swallowError.js";
 
