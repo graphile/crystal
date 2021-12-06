@@ -1,4 +1,4 @@
-export { applyHooks } from "./hooks.js";
+export { applyHooks, AsyncHooks, HookObject } from "./hooks.js";
 export type {
   Plugin,
   PluginHook,

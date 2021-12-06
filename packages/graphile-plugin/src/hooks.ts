@@ -2,11 +2,33 @@ import * as assert from "assert";
 
 import type { Plugin, PluginHook } from "./interfaces.js";
 
-export function applyHooks<
-  THooks extends {
-    [hookKey: string]: (...args: any[]) => any;
-  },
->(
+export type HookObject<T> = Record<keyof T, (...args: any[]) => any>;
+
+export class AsyncHooks<THooks extends HookObject<THooks>> {
+  callbacks: { [key in keyof THooks]?: Array<THooks[keyof THooks]> } = {};
+
+  hook<TKey extends keyof THooks>(event: TKey, fn: THooks[TKey]): void {
+    this.callbacks[event] = this.callbacks[event] || [];
+    this.callbacks[event]!.push(fn);
+  }
+
+  async process<TKey extends keyof THooks>(
+    event: TKey,
+    ...args: Parameters<THooks[TKey]>[]
+  ): Promise<Awaited<ReturnType<THooks[TKey]>>> {
+    const [arg, ...rest] = args;
+    let result = arg;
+    const callbacks = this.callbacks[event];
+    if (callbacks) {
+      for (const callback of callbacks!) {
+        result = await callback(result, ...rest);
+      }
+    }
+    return result as any;
+  }
+}
+
+export function applyHooks<THooks extends HookObject<THooks>>(
   plugins: Plugin[],
   hooksRetriever: (plugin: Plugin) =>
     | {

@@ -39,6 +39,7 @@ import {
   PlanOptimizeOptions,
   PlanStreamOptions,
   PolymorphicData,
+  PromiseOrDirect,
 } from "./interfaces";
 import {
   assertListCapablePlan,
@@ -191,6 +192,7 @@ export {
   PolymorphicData,
   PolymorphicPlan,
   polymorphicWrap,
+  PromiseOrDirect,
   resolveType,
   reverse,
   reverseArray,

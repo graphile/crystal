@@ -2,7 +2,7 @@ import type {
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,
 } from "graphile-crystal";
-import type { PluginHook } from "graphile-plugin";
+import type { AsyncHooks, PluginHook } from "graphile-plugin";
 import type {
   GraphQLEnumTypeConfig,
   GraphQLEnumValueConfig,
@@ -26,6 +26,10 @@ declare module "graphile-plugin" {
   }
 
   interface GatherHelpers {
+    // Extend this with declaration merging
+  }
+
+  interface GatherHooks {
     // Extend this with declaration merging
   }
 
@@ -65,9 +69,24 @@ declare module "graphile-plugin" {
               options: GraphileEngine.GraphileBuildGatherOptions;
               state: TState;
               cache: TCache;
+              process: AsyncHooks<GatherHooks>["process"];
             },
             ...args: Parameters<GatherHelpers[TNamespace][key]>
           ) => ReturnType<GatherHelpers[TNamespace][key]>
+        : never;
+    };
+
+    hooks?: {
+      [key in keyof GatherHooks]?: GatherHooks[key] extends PluginHook<infer U>
+        ? (
+            context: {
+              options: GraphileEngine.GraphileBuildGatherOptions;
+              state: TState;
+              cache: TCache;
+              process: AsyncHooks<GatherHooks>["process"];
+            },
+            ...args: Parameters<U>
+          ) => ReturnType<U>
         : never;
     };
 
@@ -78,6 +97,11 @@ declare module "graphile-plugin" {
      */
     main?: (
       output: Partial<GraphileEngine.BuildInput>,
+      context: {
+        options: GraphileEngine.GraphileBuildGatherOptions;
+        state: TState;
+        cache: TCache;
+      },
       helpers: GatherHelpers,
     ) => Promise<void>;
   }

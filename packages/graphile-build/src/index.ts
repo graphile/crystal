@@ -1,7 +1,13 @@
 import "./global.js";
 import "./interfaces.js";
 
-import type { GatherHelpers, Plugin, Preset } from "graphile-plugin";
+import type {
+  GatherHelpers,
+  GatherHooks,
+  Plugin,
+  Preset,
+} from "graphile-plugin";
+import { AsyncHooks } from "graphile-plugin";
 import { applyHooks, resolvePresets } from "graphile-plugin";
 import type { GraphQLSchema } from "graphql";
 
@@ -38,13 +44,25 @@ export const gather = async (
   preset: Preset,
 ): Promise<GraphileEngine.BuildInput> => {
   const config = resolvePresets([preset]);
-  const options = config.gather;
+  const options = config.gather || {};
   const plugins = config.plugins;
   const globalState: { [key: string]: any } = {};
   const gatherState: { [key: string]: any } = {};
   const helpers: { [key: string]: any } = {}; // GatherHelpers
 
-  // Prepare the plugins to run by preparing their initial states and hooking up the helpers.
+  const hooks = new AsyncHooks<GatherHooks>();
+
+  const pluginContext = new Map<
+    Plugin,
+    {
+      options: typeof options;
+      cache: any;
+      state: any;
+      process: typeof hooks.process;
+    }
+  >();
+
+  // Prepare the plugins to run by preparing their initial states, and registering the helpers (hooks area already done).
   for (const plugin of plugins) {
     console.log(plugin.name + "...");
     const spec = plugin.gather;
@@ -60,20 +78,44 @@ export const gather = async (
     }
     const cache = (globalState[spec.namespace] = spec.initialCache?.() ?? {});
     const state = (gatherState[spec.namespace] = spec.initialState?.() ?? {});
+    const context = {
+      options,
+      state,
+      cache,
+      process: hooks.process.bind(hooks),
+    };
+    pluginContext.set(plugin, context);
     helpers[spec.namespace] = {};
     for (const helperName of Object.keys(spec.helpers)) {
       helpers[spec.namespace][helperName] = (...args: any[]): any => {
-        const info = { options, state, cache };
-        return spec.helpers[helperName](info, ...args);
+        return spec.helpers[helperName](context, ...args);
       };
     }
   }
+
+  // Register the hooks
+  applyHooks(
+    plugins,
+    (p) => p.gather?.hooks,
+    (name, fn, plugin) => {
+      const context = pluginContext.get(plugin);
+      if (!context) {
+        throw new Error("No context for this plugin?");
+      }
+      hooks.hook(name, ((...args: any[]) =>
+        (fn as any)(context, ...args)) as any);
+    },
+  );
 
   // Now call the main functions
   const output: Partial<GraphileEngine.BuildInput> = {};
   for (const plugin of plugins) {
     if (plugin.gather?.main) {
-      await plugin.gather.main(output, helpers as GatherHelpers);
+      const context = pluginContext.get(plugin);
+      if (!context) {
+        throw new Error("No context for this plugin?");
+      }
+      await plugin.gather.main(output, context, helpers as GatherHelpers);
     }
   }
 
