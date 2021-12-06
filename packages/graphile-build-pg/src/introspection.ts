@@ -185,12 +185,14 @@ export interface PgClass {
   /**
    * - r = ordinary table,
    * - i = index,
+   * - S = sequence,
+   * - t = TOAST table,
    * - v = view,
    * - m = materialized view,
    * - c = composite type,
    * - f = foreign table,
    * - p = partitioned table,
-   * -  table, p = partitioned table, I = partitioned index
+   * - I = partitioned index
    */
   relkind: string | null;
 
