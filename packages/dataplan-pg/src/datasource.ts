@@ -162,6 +162,10 @@ export class PgSourceBuilder<
     this.extensions = options.extensions || {};
   }
 
+  public toString(): string {
+    return chalk.bold.blueBright(`PgSourceBuilder(${this.options.name})`);
+  }
+
   build<
     TRelations extends {
       [identifier: string]: PgSourceRelation<
