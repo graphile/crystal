@@ -194,7 +194,7 @@ export interface PgClass {
    * - p = partitioned table,
    * - I = partitioned index
    */
-  relkind: string | null;
+  relkind: string;
 
   /**
    * Number of user columns in the relation (system columns not counted). There must be this many corresponding entries
