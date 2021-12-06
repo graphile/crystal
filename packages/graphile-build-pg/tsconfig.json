@@ -11,6 +11,7 @@
   },
   "include": ["src"],
   "references": [
+    { "path": "../dataplan-pg" },
     { "path": "../graphile-build" },
     { "path": "../graphile-crystal" },
     { "path": "../graphile-exporter" },

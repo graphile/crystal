@@ -37,6 +37,7 @@
   },
   "homepage": "https://graphile.org/graphile-build/",
   "dependencies": {
+    "@dataplan/pg": "^4.7.0",
     "@types/node": "^16.11.6",
     "debug": "^4.3.2",
     "graphile-build": "5.0.0-alpha.0",

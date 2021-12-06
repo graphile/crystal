@@ -28,6 +28,10 @@ declare module "graphile-plugin" {
     // Extend this with declaration merging
   }
 
+  interface GatherOptions {
+    // Extend this with declaration merging
+  }
+
   interface PluginGatherConfig<
     TNamespace extends keyof GatherHelpers = keyof GatherHelpers,
     TState extends { [key: string]: any } = { [key: string]: any },
@@ -61,6 +65,7 @@ declare module "graphile-plugin" {
       ) => any
         ? (
             info: {
+              options: GatherOptions;
               state: TState;
               cache: TCache;
             },

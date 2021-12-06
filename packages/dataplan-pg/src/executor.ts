@@ -64,7 +64,7 @@ export interface PgClient {
 }
 
 export type WithPgClient = <T>(
-  pgSettings: { [key: string]: string },
+  pgSettings: { [key: string]: string } | null,
   callback: (client: PgClient) => T | Promise<T>,
 ) => Promise<T>;
 
