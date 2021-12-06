@@ -1,10 +1,19 @@
 import "graphile-build";
 
-import type { PgSource } from "@dataplan/pg";
+import { PgSource, PgSourceBuilder, recordType } from "@dataplan/pg";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
 
 import { version } from "../index";
 import type { PgClass } from "../introspection";
+import sql from "pg-sql2";
+
+declare global {
+  namespace GraphileEngine {
+    interface BuildInput {
+      pgSources: PgSource<any, any, any, any>[];
+    }
+  }
+}
 
 declare module "graphile-plugin" {
   interface GatherHelpers {
@@ -17,13 +26,12 @@ declare module "graphile-plugin" {
         source: PgSource<any, any, any, any>;
         pgClass: PgClass;
         databaseName: string;
-      }) => Promise<PgSource<any, any, any, any>>
+      }) => Promise<void>
     >;
   }
 }
 
 interface State {
-  tables: PgClass[];
   sources: PgSource<any, any, any, any>[];
 }
 
@@ -36,26 +44,46 @@ export const PgTablesPlugin: Plugin = {
     namespace: "pgTables",
     helpers: {},
     initialState: (): State => ({
-      tables: [],
       sources: [],
     }),
     hooks: {
-      "pgIntrospection:class"({ state }, event) {
-        console.log(event.entity);
+      async "pgIntrospection:class"({ state, helpers }, event) {
+        const { entity: klass, databaseName } = event;
         if (
-          ["r", "v", "m", "p"].includes(event.entity.relkind) &&
-          !event.entity.relispartition
+          ["r", "v", "m", "p"].includes(klass.relkind) &&
+          !klass.relispartition
         ) {
-          state.tables.push(event.entity);
+          const namespace = await helpers.pgIntrospection.getNamespace(
+            event.databaseName,
+            klass.relnamespace,
+          );
+          if (!namespace) {
+            throw new Error(
+              `Could not retrieve namespace for table '${klass._id}'`,
+            );
+          }
+          const sqlIdentifier = sql.identifier(
+            namespace.nspname,
+            klass.relname,
+          );
+          const columns = {};
+          const source = new PgSourceBuilder({
+            executor:
+              helpers.pgIntrospection.getExecutorForDatabase(databaseName),
+            name: `${event.databaseName}.${namespace.nspname}.${klass.relname}`,
+            source: sqlIdentifier,
+            codec: recordType(sqlIdentifier, columns),
+            columns,
+          });
+          state.sources.push(source);
         }
-        return event;
       },
     },
-    async main(output: any, context, _helpers) {
+    async main(output, info) {
       if (!output.pgSources) {
         output.pgSources = [];
       }
-      output.pgSources!.push(...context.state.sources);
+      output.pgSources!.push(...info.state.sources);
     },
   } as PluginGatherConfig<"pgTables">,
 };

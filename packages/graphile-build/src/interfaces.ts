@@ -2,7 +2,12 @@ import type {
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,
 } from "graphile-crystal";
-import type { AsyncHooks, PluginHook } from "graphile-plugin";
+import type {
+  AsyncHooks,
+  GatherHelpers,
+  GatherHooks,
+  PluginHook,
+} from "graphile-plugin";
 import type {
   GraphQLEnumTypeConfig,
   GraphQLEnumValueConfig,
@@ -18,6 +23,17 @@ import type {
   GraphQLSchema,
   GraphQLSchemaConfig,
 } from "graphql";
+
+interface GatherPluginContext<
+  TState extends { [key: string]: any },
+  TCache extends { [key: string]: any },
+> {
+  options: GraphileEngine.GraphileBuildGatherOptions;
+  helpers: GatherHelpers;
+  state: TState;
+  cache: TCache;
+  process: AsyncHooks<GatherHooks>["process"];
+}
 
 declare module "graphile-plugin" {
   interface Preset {
@@ -65,12 +81,7 @@ declare module "graphile-plugin" {
         ...args: any[]
       ) => any
         ? (
-            info: {
-              options: GraphileEngine.GraphileBuildGatherOptions;
-              state: TState;
-              cache: TCache;
-              process: AsyncHooks<GatherHooks>["process"];
-            },
+            info: GatherPluginContext<TState, TCache>,
             ...args: Parameters<GatherHelpers[TNamespace][key]>
           ) => ReturnType<GatherHelpers[TNamespace][key]>
         : never;
@@ -79,12 +90,7 @@ declare module "graphile-plugin" {
     hooks?: {
       [key in keyof GatherHooks]?: GatherHooks[key] extends PluginHook<infer U>
         ? (
-            context: {
-              options: GraphileEngine.GraphileBuildGatherOptions;
-              state: TState;
-              cache: TCache;
-              process: AsyncHooks<GatherHooks>["process"];
-            },
+            info: GatherPluginContext<TState, TCache>,
             ...args: Parameters<U>
           ) => ReturnType<U>
         : never;
@@ -97,12 +103,7 @@ declare module "graphile-plugin" {
      */
     main?: (
       output: Partial<GraphileEngine.BuildInput>,
-      context: {
-        options: GraphileEngine.GraphileBuildGatherOptions;
-        state: TState;
-        cache: TCache;
-      },
-      helpers: GatherHelpers,
+      info: GatherPluginContext<TState, TCache>,
     ) => Promise<void>;
   }
 

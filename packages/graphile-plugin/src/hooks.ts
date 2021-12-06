@@ -12,19 +12,21 @@ export class AsyncHooks<THooks extends HookObject<THooks>> {
     this.callbacks[event]!.push(fn);
   }
 
+  /**
+   * Hooks can _mutate_ the argument, they cannot return a replacement. This
+   * allows us to completely side-step the problem of recursive calls.
+   */
   async process<TKey extends keyof THooks>(
     event: TKey,
     ...args: Parameters<THooks[TKey]>[]
-  ): Promise<Awaited<ReturnType<THooks[TKey]>>> {
+  ): Promise<void> {
     const [arg, ...rest] = args;
-    let result = arg;
     const callbacks = this.callbacks[event];
     if (callbacks) {
       for (const callback of callbacks!) {
-        result = await callback(result, ...rest);
+        await callback(arg, ...rest);
       }
     }
-    return result as any;
   }
 }
 

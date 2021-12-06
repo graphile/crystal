@@ -7,8 +7,7 @@ import type {
   Plugin,
   Preset,
 } from "graphile-plugin";
-import { AsyncHooks } from "graphile-plugin";
-import { applyHooks, resolvePresets } from "graphile-plugin";
+import { applyHooks, AsyncHooks, resolvePresets } from "graphile-plugin";
 import type { GraphQLSchema } from "graphql";
 
 import {
@@ -55,6 +54,7 @@ export const gather = async (
   const pluginContext = new Map<
     Plugin,
     {
+      helpers: GatherHelpers;
       options: typeof options;
       cache: any;
       state: any;
@@ -79,6 +79,7 @@ export const gather = async (
     const cache = (globalState[spec.namespace] = spec.initialCache?.() ?? {});
     const state = (gatherState[spec.namespace] = spec.initialState?.() ?? {});
     const context = {
+      helpers: helpers as GatherHelpers,
       options,
       state,
       cache,
@@ -115,7 +116,7 @@ export const gather = async (
       if (!context) {
         throw new Error("No context for this plugin?");
       }
-      await plugin.gather.main(output, context, helpers as GatherHelpers);
+      await plugin.gather.main(output, context);
     }
   }
 
