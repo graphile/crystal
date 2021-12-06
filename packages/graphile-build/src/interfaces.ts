@@ -21,14 +21,11 @@ import type {
 
 declare module "graphile-plugin" {
   interface Preset {
-    schema?: GraphileEngine.GraphileBuildOptions;
+    schema?: GraphileEngine.GraphileBuildSchemaOptions;
+    gather?: GraphileEngine.GraphileBuildGatherOptions;
   }
 
   interface GatherHelpers {
-    // Extend this with declaration merging
-  }
-
-  interface GatherOptions {
     // Extend this with declaration merging
   }
 
@@ -65,7 +62,7 @@ declare module "graphile-plugin" {
       ) => any
         ? (
             info: {
-              options: GatherOptions;
+              options: GraphileEngine.GraphileBuildGatherOptions;
               state: TState;
               cache: TCache;
             },
@@ -80,7 +77,7 @@ declare module "graphile-plugin" {
      * phase to the 'output' object.
      */
     main?: (
-      output: { [key: string]: any },
+      output: Partial<GraphileEngine.BuildInput>,
       helpers: GatherHelpers,
     ) => Promise<void>;
   }

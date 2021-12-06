@@ -7,18 +7,23 @@ import { version } from "../index";
 import type { Introspection } from "../introspection";
 import { makeIntrospectionQuery } from "../introspection";
 
+declare global {
+  namespace GraphileEngine {
+    interface GraphileBuildGatherOptions {
+      pgDatabases: ReadonlyArray<{
+        name: string;
+        withClient: WithPgClient;
+        listen?(topic: string): AsyncIterable<string>;
+      }>;
+    }
+  }
+}
+
 declare module "graphile-plugin" {
   interface GatherHelpers {
     pg: {
       getIntrospection(): Promise<Introspection>;
     };
-  }
-  interface GatherOptions {
-    pgDatabases: ReadonlyArray<{
-      name: string;
-      withClient: WithPgClient;
-      listen(topic: string): AsyncIterable<string>;
-    }>;
   }
 }
 
@@ -37,21 +42,26 @@ export const PgIntrospectionPlugin: Plugin = {
       introspectionResultsPromise: null,
     }),
     helpers: {
-      getIntrospection(opts) {
-        let introspectionPromise = opts.cache.introspectionResultsPromise;
+      getIntrospection(info) {
+        let introspectionPromise = info.cache.introspectionResultsPromise;
         if (!introspectionPromise) {
-          introspectionPromise = opts.cache.introspectionResultsPromise =
+          introspectionPromise = info.cache.introspectionResultsPromise =
             Promise.all(
-              opts.options.pgDatabases.map(async (database) => {
+              info.options.pgDatabases.map(async (database) => {
                 const introspectionQuery = makeIntrospectionQuery();
-                console.log(introspectionQuery);
                 const {
-                  rows: [introspection],
+                  rows: [row],
                 } = await database.withClient(null, (client) =>
-                  client.query<{ introspection: Introspection }>({
+                  client.query<{ introspection: string }>({
                     text: introspectionQuery,
                   }),
                 );
+                if (!row) {
+                  throw new Error("Introspection failed");
+                }
+                const introspection = JSON.parse(
+                  row.introspection,
+                ) as Introspection;
                 return { database, introspection };
               }),
             );

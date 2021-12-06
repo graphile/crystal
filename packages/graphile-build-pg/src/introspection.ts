@@ -1374,6 +1374,7 @@ with
     select pg_proc.oid as _id, *
     from pg_catalog.pg_proc
     where pronamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg_%')
+    and prorettype operator(pg_catalog.<>) 2279
   ),
 
   roles as (
@@ -1518,5 +1519,5 @@ select json_build_object(
   version(),
   'introspection_version',
   1
-) as introspection
+)::text as introspection
 `;

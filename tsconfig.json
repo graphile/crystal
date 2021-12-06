@@ -35,6 +35,7 @@
     { "path": "packages/lru" },
     { "path": "packages/pg-sql2" },
     { "path": "packages/graphile-build" },
+    { "path": "packages/graphile-build-pg" },
     { "path": "packages/graphile-crystal" },
     { "path": "packages/graphile-exporter" },
     { "path": "packages/graphile-plugin" },
