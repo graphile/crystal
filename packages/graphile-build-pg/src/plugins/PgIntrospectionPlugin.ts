@@ -1,7 +1,8 @@
 import "graphile-build";
 
-import type { WithPgClient } from "@dataplan/pg";
+import { PgExecutor, WithPgClient } from "@dataplan/pg";
 import type { GatherHooks, Plugin, PluginHook } from "graphile-plugin";
+import { context, ExecutablePlan, object } from "graphile-crystal";
 
 import { version } from "../index";
 import type {
@@ -25,12 +26,27 @@ import type {
 import { makeIntrospectionQuery } from "../introspection";
 import { PromiseOrDirect } from "graphile-crystal";
 
+type KeysOfType<TObject, TValueType> = {
+  [key in keyof TObject]: TObject[key] extends TValueType ? key : never;
+}[keyof TObject];
+
 declare global {
   namespace GraphileEngine {
     interface GraphileBuildGatherOptions {
       pgDatabases: ReadonlyArray<{
         name: string;
-        withClient: WithPgClient;
+        /** The key on 'context' where the pgSettings for this DB will be sourced */
+        pgSettingsKey: KeysOfType<
+          GraphileEngine.GraphileResolverContext,
+          { [key: string]: string } | null
+        >;
+        /** The key on 'context' where the withPgClient function will be sourced */
+        withPgClientKey: KeysOfType<
+          GraphileEngine.GraphileResolverContext,
+          WithPgClient
+        >;
+        /** A function to allow us to run queries during the data gathering phase */
+        withPgClient: WithPgClient;
         listen?(topic: string): AsyncIterable<string>;
       }>;
     }
@@ -41,6 +57,7 @@ declare module "graphile-plugin" {
   interface GatherHelpers {
     pgIntrospection: {
       getIntrospection(): Promise<Introspection>;
+      getExecutorForDatabase(databaseName: string): PgExecutor;
     };
   }
 
@@ -160,6 +177,17 @@ interface Cache {
   introspectionResultsPromise: null | Promise<Introspection>;
 }
 
+interface State {
+  executors: {
+    [key: string]: PgExecutor;
+  };
+}
+
+type PgExecutorContextPlans<TSettings = any> = {
+  pgSettings: ExecutablePlan<TSettings>;
+  withPgClient: ExecutablePlan<WithPgClient>;
+};
+
 export const PgIntrospectionPlugin: Plugin = {
   name: "PgIntrospectionPlugin",
   description:
@@ -170,7 +198,34 @@ export const PgIntrospectionPlugin: Plugin = {
     initialCache: (): Cache => ({
       introspectionResultsPromise: null,
     }),
+    initialState: (): State => ({
+      executors: {},
+    }),
     helpers: {
+      getExecutorForDatabase(info, databaseName) {
+        if (info.state.executors[databaseName]) {
+          return info.state.executors[databaseName];
+        }
+        const database = info.options.pgDatabases.find(
+          (db) => db.name === databaseName,
+        );
+        if (!database) {
+          throw new Error(`Database '${databaseName}' not found`);
+        }
+        const { pgSettingsKey, withPgClientKey } = database;
+        const executor = new PgExecutor({
+          name: databaseName,
+          context: () => {
+            const ctx = context<GraphileEngine.GraphileResolverContext>();
+            return object({
+              pgSettings: ctx.get(pgSettingsKey),
+              withPgClient: ctx.get(withPgClientKey),
+            } as PgExecutorContextPlans<any>);
+          },
+        });
+        info.state.executors[databaseName] = executor;
+        return executor;
+      },
       getIntrospection(info) {
         let introspectionPromise = info.cache.introspectionResultsPromise;
         if (!introspectionPromise) {
@@ -180,7 +235,7 @@ export const PgIntrospectionPlugin: Plugin = {
                 const introspectionQuery = makeIntrospectionQuery();
                 const {
                   rows: [row],
-                } = await database.withClient(null, (client) =>
+                } = await database.withPgClient(null, (client) =>
                   client.query<{ introspection: string }>({
                     text: introspectionQuery,
                   }),

@@ -81,7 +81,7 @@ export class ObjectPlan<
     return values.map(this.tupleToObject.bind(this));
   }
 
-  deduplicate(peers: ObjectPlan<TPlans>[]): ObjectPlan<TPlans> {
+  deduplicate(peers: ObjectPlan<any>[]): ObjectPlan<TPlans> {
     const myKeys = JSON.stringify(this.keys);
     const peersWithSameKeys = peers.filter(
       (p) => JSON.stringify(p.keys) === myKeys,

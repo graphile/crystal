@@ -17,6 +17,17 @@ import { Pool } from "pg";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 
+declare global {
+  namespace GraphileEngine {
+    interface GraphileResolverContext {
+      pgSettings: {
+        [key: string]: string;
+      } | null;
+      withPgClient: WithPgClient;
+    }
+  }
+}
+
 const pool = new Pool({
   connectionString: "pggql_test",
 });
@@ -32,7 +43,9 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
         pgDatabases: [
           {
             name: "main",
-            withClient: withPgClient,
+            pgSettingsKey: "pgSettings",
+            withPgClientKey: "withPgClient",
+            withPgClient: withPgClient,
           },
         ],
       },
