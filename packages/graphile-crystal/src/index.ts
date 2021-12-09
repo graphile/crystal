@@ -132,6 +132,7 @@ export {
   context,
   crystalEnforce,
   CrystalError,
+  crystalPrint,
   crystalPrintPathIdentity,
   CrystalResultsList,
   CrystalResultStreamList,
@@ -205,6 +206,7 @@ export {
 };
 
 exportAsMany({
+  crystalPrint,
   crystalPrintPathIdentity,
   Aether,
   ROOT_PATH,
