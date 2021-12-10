@@ -1,11 +1,14 @@
 import "graphile-build";
 
-import { PgSource, PgSourceBuilder, recordType } from "@dataplan/pg";
+import type { PgSource, PgSourceColumns } from "@dataplan/pg";
+import { PgSourceBuilder, recordType } from "@dataplan/pg";
+import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
+import sql from "pg-sql2";
 
 import { version } from "../index";
+import type { PgTypeCodec } from "../interfaces";
 import type { PgClass } from "../introspection";
-import sql from "pg-sql2";
 
 declare global {
   namespace GraphileEngine {
@@ -67,14 +70,20 @@ export const PgTablesPlugin: Plugin = {
             klass.relname,
           );
           const columns = {};
-          const source = new PgSourceBuilder({
-            executor:
-              helpers.pgIntrospection.getExecutorForDatabase(databaseName),
-            name: `${event.databaseName}.${namespace.nspname}.${klass.relname}`,
-            source: sqlIdentifier,
-            codec: recordType(sqlIdentifier, columns),
-            columns,
-          });
+          const name = `${event.databaseName}.${namespace.nspname}.${klass.relname}`;
+          const executor =
+            helpers.pgIntrospection.getExecutorForDatabase(databaseName);
+          const codec = recordType(sqlIdentifier, columns);
+          const source = EXPORTABLE(
+            (PgSourceBuilder, codec, executor, name, sqlIdentifier) =>
+              new PgSourceBuilder({
+                executor,
+                name,
+                source: sqlIdentifier,
+                codec,
+              }),
+            [PgSourceBuilder, codec, executor, name, sqlIdentifier],
+          );
           state.sources.push(source);
         }
       },
