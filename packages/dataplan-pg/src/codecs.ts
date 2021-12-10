@@ -49,10 +49,10 @@ function t<TCanonical = any, TInput = TCanonical>(
   };
 }
 
-export function recordType(
+export function recordType<TColumns extends PgSourceColumns>(
   identifier: SQL,
-  columns: PgSourceColumns,
-): PgTypeCodec<string, string> {
+  columns: TColumns,
+): PgTypeCodec<string, string, TColumns> {
   return {
     sqlType: identifier,
     fromPg: identity,
