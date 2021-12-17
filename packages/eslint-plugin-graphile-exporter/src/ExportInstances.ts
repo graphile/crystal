@@ -2,6 +2,7 @@ import type { Rule } from "eslint";
 import type { Node as ESTreeNode } from "estree";
 
 import { reportProblem } from "./common";
+import { hasExportableParent } from "./NoNested";
 
 interface CommonOptions {
   disableAutofix: boolean;
@@ -49,6 +50,7 @@ export const ExportInstances: Rule.RuleModule = {
         if (!init || init.type !== "NewExpression") {
           return;
         }
+
         const callee = init.callee;
         const calleeIdentifier = callee.type === "Identifier" ? callee : null;
         if (!calleeIdentifier) {
@@ -63,6 +65,8 @@ export const ExportInstances: Rule.RuleModule = {
         }
         // TODO: determine if the definition for this identifier is an import from any of these `possibles`.
         //const scope = scopeManager.acquire(node);
+
+        if (hasExportableParent(node)) return;
 
         reportProblem(context, options, {
           node: node as unknown as ESTreeNode,

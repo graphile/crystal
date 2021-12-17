@@ -4,6 +4,7 @@ import type { Node as ESTreeNode } from "estree";
 import { basename } from "path";
 
 import { reportProblem } from "./common";
+import { hasExportableParent } from "./NoNested";
 
 interface CommonOptions {
   disableAutofix: boolean;
@@ -67,6 +68,9 @@ export const ExportSubclasses: Rule.RuleModule = {
         if (!className) {
           return;
         }
+
+        if (hasExportableParent(node)) return;
+
         // TODO: determine if the definition for this identifier is an import from any of these `possibles`.
         //const scope = scopeManager.acquire(node);
         const isTypeScript = /\.[mc]?tsx?$/.test(context.getFilename());

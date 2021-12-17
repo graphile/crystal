@@ -7,6 +7,7 @@ import type {
 } from "estree";
 
 import { reportProblem } from "./common";
+import { hasExportableParent } from "./NoNested";
 
 interface CommonOptions {
   disableAutofix: boolean;
@@ -131,6 +132,8 @@ function processNode(
         (!ALLOWED_SIBLING_KEYS.includes(key) && !options.methods.includes(key)),
     );
     if (disallowedSiblingKeys.length === 0) {
+      if (hasExportableParent(node)) return;
+
       // Match
       if (node.type === "ObjectMethod") {
         // replace with property -> EXPORTABLE
