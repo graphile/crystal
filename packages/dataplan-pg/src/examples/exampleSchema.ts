@@ -60,7 +60,7 @@ import type {
   PgSubscriber,
   PgTypeCodec,
   WithPgClient,
-} from "../../src";
+} from "../";
 import {
   BooleanFilterPlan,
   ClassFilterPlan,
@@ -85,10 +85,10 @@ import {
   PgUpdatePlan,
   recordType,
   TYPES,
-} from "../../src";
+} from "../";
 import type { PgSourceColumns } from "../datasource";
 
-declare module "../../src" {
+declare module ".." {
   interface PgEnumSourceExtensions {
     tableSource?: PgSource<any, any, any, any>;
   }
@@ -2547,7 +2547,14 @@ export function makeExampleSchema(
       <TColumns extends typeof unionEntityColumns>(
         $item:
           | PgSelectSinglePlan<TColumns, any, any, any>
-          | PgClassExpressionPlan<TColumns, any, any, any>,
+          | PgClassExpressionPlan<
+              TColumns,
+              PgTypeCodec<TColumns, any, any>,
+              TColumns,
+              any,
+              any,
+              any
+            >,
       ) =>
         pgPolymorphic(
           $item,

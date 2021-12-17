@@ -8,7 +8,7 @@ import { ExecutablePlan, isDev, polymorphicWrap } from "graphile-crystal";
 import type { GraphQLObjectType } from "graphql";
 import { inspect } from "util";
 
-import type { PgSource } from "../datasource";
+import type { PgSourceColumns } from "../datasource";
 import type { PgTypeCodec } from "../interfaces";
 import type { PgClassExpressionPlan } from "./pgClassExpression";
 import type { PgSelectSinglePlan } from "./pgSelectSingle";
@@ -118,34 +118,22 @@ export class PgPolymorphicPlan<
 }
 
 export function pgPolymorphic<
-  TCodec extends PgTypeCodec<any, any, any>,
-  TTypeSpecifierPlan extends ExecutablePlan<any> = ExecutablePlan<any>,
+  TColumns extends PgSourceColumns,
+  TCodec extends PgTypeCodec<TColumns, any, any>,
+  TTypeSpecifier = any,
+  TTypeSpecifierPlan extends ExecutablePlan<TTypeSpecifier> = ExecutablePlan<TTypeSpecifier>,
 >(
   $itemPlan:
-    | PgSelectSinglePlan<TCodec["columns"], any, any, any>
-    | PgClassExpressionPlan<
-        TCodec["columns"],
-        TCodec,
-        TCodec["columns"],
-        any,
-        any,
-        any
-      >,
+    | PgSelectSinglePlan<TColumns, any, any, any>
+    | PgClassExpressionPlan<TColumns, TCodec, TColumns, any, any, any>,
   $typeSpecifierPlan: TTypeSpecifierPlan,
-  possibleTypes: PgPolymorphicTypeMap<
-    TTypeSpecifierPlan extends ExecutablePlan<infer U> ? U : any,
-    TTypeSpecifierPlan
-  >,
-): PgPolymorphicPlan<
-  TCodec,
-  TTypeSpecifierPlan extends ExecutablePlan<infer U> ? U : any,
-  TTypeSpecifierPlan
-> {
-  return new PgPolymorphicPlan<
-    TCodec,
-    TTypeSpecifierPlan extends ExecutablePlan<infer U> ? U : any,
-    TTypeSpecifierPlan
-  >($itemPlan, $typeSpecifierPlan, possibleTypes);
+  possibleTypes: PgPolymorphicTypeMap<TTypeSpecifier, TTypeSpecifierPlan>,
+): PgPolymorphicPlan<TCodec, TTypeSpecifier, TTypeSpecifierPlan> {
+  return new PgPolymorphicPlan<TCodec, TTypeSpecifier, TTypeSpecifierPlan>(
+    $itemPlan,
+    $typeSpecifierPlan,
+    possibleTypes,
+  );
 }
 
 Object.defineProperty(pgPolymorphic, "$$export", {

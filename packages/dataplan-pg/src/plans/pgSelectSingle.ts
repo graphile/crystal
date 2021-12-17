@@ -101,13 +101,13 @@ export class PgSelectSinglePlan<
   getSelfNamed(): PgClassExpressionPlan<
     TColumns,
     PgTypeCodec<TColumns, any, any>,
-    NonNullable<TColumns>,
+    TColumns extends PgSourceColumns ? TColumns : never,
     TUniques,
     TRelations,
     TParameters
   > {
     // Hack because I don't want to duplicate the code.
-    return this.get("" as any);
+    return this.get("" as any) as any;
   }
 
   /**
@@ -119,9 +119,9 @@ export class PgSelectSinglePlan<
   ): PgClassExpressionPlan<
     TColumns extends PgSourceColumns
       ? TColumns[TAttr]["codec"]["columns"]
-      : never,
-    TColumns extends PgSourceColumns ? TColumns[TAttr]["codec"] : never,
-    NonNullable<TColumns>,
+      : any,
+    TColumns extends PgSourceColumns ? TColumns[TAttr]["codec"] : any,
+    TColumns extends PgSourceColumn ? TColumns : any,
     TUniques,
     TRelations,
     TParameters
@@ -151,7 +151,7 @@ export class PgSelectSinglePlan<
         dataSourceColumn.via,
         attr as string,
       );
-      return this.singleRelation(relation).get(attribute);
+      return this.singleRelation(relation).get(attribute) as any;
     }
 
     if (dataSourceColumn?.identicalVia) {
@@ -163,7 +163,7 @@ export class PgSelectSinglePlan<
       const $existingPlan = this.existingSingleRelation(relation);
       if ($existingPlan) {
         // Relation exists already; load it from there for efficiency
-        return $existingPlan.get(attribute);
+        return $existingPlan.get(attribute) as any;
       } else {
         // Load it from ourself instead
       }
@@ -205,7 +205,7 @@ export class PgSelectSinglePlan<
 
     const sqlExpr = pgClassExpression(
       this as unknown as PgSelectSinglePlan<
-        NonNullable<TColumns>,
+        TColumns extends PgSourceColumns ? TColumns : never,
         TUniques,
         TRelations,
         TParameters
@@ -240,7 +240,9 @@ export class PgSelectSinglePlan<
   private existingSingleRelation<TRelationName extends keyof TRelations>(
     relationIdentifier: TRelationName,
   ): PgSelectSinglePlan<
-    TRelations[TRelationName]["source"]["TColumns"],
+    TRelations[TRelationName]["source"]["TColumns"] extends PgSourceColumns
+      ? TRelations[TRelationName]["source"]["TColumns"]
+      : any,
     TRelations[TRelationName]["source"]["TUniques"],
     TRelations[TRelationName]["source"]["TRelations"],
     TRelations[TRelationName]["source"]["TParameters"]
@@ -268,7 +270,9 @@ export class PgSelectSinglePlan<
   public singleRelation<TRelationName extends keyof TRelations>(
     relationIdentifier: TRelationName,
   ): PgSelectSinglePlan<
-    TRelations[TRelationName]["source"]["TColumns"],
+    TRelations[TRelationName]["source"]["TColumns"] extends PgSourceColumns
+      ? TRelations[TRelationName]["source"]["TColumns"]
+      : any,
     TRelations[TRelationName]["source"]["TUniques"],
     TRelations[TRelationName]["source"]["TRelations"],
     TRelations[TRelationName]["source"]["TParameters"]
@@ -308,7 +312,9 @@ export class PgSelectSinglePlan<
   public manyRelation<TRelationName extends keyof TRelations>(
     relationIdentifier: TRelationName,
   ): PgSelectPlan<
-    TRelations[TRelationName]["source"]["TColumns"],
+    TRelations[TRelationName]["source"]["TColumns"] extends PgSourceColumns
+      ? TRelations[TRelationName]["source"]["TColumns"]
+      : any,
     TRelations[TRelationName]["source"]["TUniques"],
     TRelations[TRelationName]["source"]["TRelations"],
     TRelations[TRelationName]["source"]["TParameters"]
@@ -340,14 +346,14 @@ export class PgSelectSinglePlan<
   record(): PgClassExpressionPlan<
     TColumns,
     PgTypeCodec<TColumns, any, any>,
-    NonNullable<TColumns>,
+    TColumns extends PgSourceColumns ? TColumns : never,
     TUniques,
     TRelations,
     TParameters
   > {
     return pgClassExpression(
       this as unknown as PgSelectSinglePlan<
-        NonNullable<TColumns>,
+        TColumns extends PgSourceColumns ? TColumns : never,
         TUniques,
         TRelations,
         TParameters
@@ -368,14 +374,14 @@ export class PgSelectSinglePlan<
   ): PgClassExpressionPlan<
     TExpressionColumns,
     TExpressionCodec,
-    NonNullable<TColumns>,
+    TColumns extends PgSourceColumns ? TColumns : never,
     TUniques,
     TRelations,
     TParameters
   > {
     return pgClassExpression(
       this as unknown as PgSelectSinglePlan<
-        NonNullable<TColumns>,
+        TColumns extends PgSourceColumns ? TColumns : never,
         TUniques,
         TRelations,
         TParameters
