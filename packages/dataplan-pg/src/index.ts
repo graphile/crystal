@@ -36,7 +36,7 @@ export {
 export { BooleanFilterPlan } from "./filters/booleanFilter";
 export { ClassFilterPlan } from "./filters/classFilter";
 export { ManyFilterPlan } from "./filters/manyFilter";
-export { PgTypeCodec } from "./interfaces";
+export { PgTypeCodec, PgTypeCodecExtensions } from "./interfaces";
 export { PgSubscriber } from "./PgSubscriber";
 export {
   pgClassExpression,

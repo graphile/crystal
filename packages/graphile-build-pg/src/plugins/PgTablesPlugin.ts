@@ -119,7 +119,11 @@ export const PgTablesPlugin: Plugin = {
           inflection,
           {
             _tableName(source) {
-              return this.coerceToGraphQLName(source.name);
+              return this.coerceToGraphQLName(
+                source.extensions.tags?.name ||
+                  source.codec.extensions?.tags?.name ||
+                  source.name,
+              );
             },
 
             _singularizedTableName(source) {

@@ -37,6 +37,8 @@ export type PgEncode<TInput> = (value: TInput) => SQLRawValue;
  */
 export type PgDecode<TCanonical> = (value: string) => TCanonical;
 
+export interface PgTypeCodecExtensions {}
+
 export interface PgTypeCodec<
   TColumns extends PgSourceColumns | undefined,
   TCanonical,
@@ -65,6 +67,8 @@ export interface PgTypeCodec<
    * If this is a composite type, the columns it supports.
    */
   columns: TColumns;
+
+  extensions?: Partial<PgTypeCodecExtensions>;
 }
 
 export interface PgEnumTypeCodec<TValue extends string>

@@ -163,7 +163,7 @@ export class PgSourceBuilder<
   private built: PgSource<TColumns, TUniques, any, TParameters> | null = null;
   public codec: PgTypeCodec<TColumns, any, any>;
   public uniques: TUniques | undefined;
-  public readonly extensions: PgSourceExtensions;
+  public readonly extensions: Partial<PgSourceExtensions>;
   constructor(
     private options: Omit<
       PgSourceOptions<TColumns, TUniques, any, TParameters>,
@@ -268,6 +268,8 @@ export class PgSource<
   private relationsThunk: (() => TRelations) | null;
   private _relations: TRelations | null = null;
 
+  public readonly extensions: Partial<PgSourceExtensions>;
+
   /**
    * @param source - the SQL for the `FROM` clause (without any
    * aliasing). If this is a subquery don't forget to wrap it in parens.
@@ -278,8 +280,10 @@ export class PgSource<
   constructor(
     options: PgSourceOptions<TColumns, TUniques, TRelations, TParameters>,
   ) {
-    const { codec, executor, name, source, uniques, relations } = options;
+    const { codec, executor, name, source, uniques, relations, extensions } =
+      options;
     this._options = options;
+    this.extensions = extensions || {};
     this.codec = codec;
     this.executor = executor;
     this.name = name;
