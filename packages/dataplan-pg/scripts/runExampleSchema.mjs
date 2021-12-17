@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import * as assert from "assert";
 import { readFile } from "fs/promises";
 import glob from "glob";
