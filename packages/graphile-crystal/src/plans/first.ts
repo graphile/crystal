@@ -27,8 +27,8 @@ export class FirstPlan<TData> extends ExecutablePlan<TData> {
  * A plan that resolves to the first entry in the list returned by the given
  * plan.
  */
-export function first<TPlan extends ExecutablePlan<ReadonlyArray<any>>>(
-  plan: TPlan,
-): FirstPlan<TPlan extends ExecutablePlan<ReadonlyArray<infer U>> ? U : never> {
+export function first<TData>(
+  plan: ExecutablePlan<ReadonlyArray<TData>>,
+): FirstPlan<TData> {
   return new FirstPlan(plan);
 }

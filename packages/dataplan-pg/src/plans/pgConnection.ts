@@ -2,7 +2,11 @@ import debugFactory from "debug";
 import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
 import { ExecutablePlan } from "graphile-crystal";
 
-import type { PgSource } from "../datasource";
+import type {
+  PgSource,
+  PgSourceColumns,
+  PgSourceRelation,
+} from "../datasource";
 import { PgSelectPlan } from "./pgSelect";
 
 const debugPlan = debugFactory("datasource:pg:PgConnectionPlan:plan");
@@ -11,7 +15,14 @@ const debugPlanVerbose = debugPlan.extend("verbose");
 const debugExecuteVerbose = debugExecute.extend("verbose");
 
 export class PgConnectionPlan<
-  TDataSource extends PgSource<any, any, any, any>,
+  TColumns extends PgSourceColumns | undefined,
+  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TRelations extends {
+    [identifier: string]: TColumns extends PgSourceColumns
+      ? PgSourceRelation<TColumns, any>
+      : never;
+  },
+  TParameters extends { [key: string]: any } | never = never,
 > extends ExecutablePlan<unknown> {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -20,9 +31,16 @@ export class PgConnectionPlan<
 
   private subplanId: number;
 
-  private readonly source: TDataSource;
+  private readonly source: PgSource<
+    TColumns,
+    TUniques,
+    TRelations,
+    TParameters
+  >;
 
-  constructor(subplan: PgSelectPlan<TDataSource>) {
+  constructor(
+    subplan: PgSelectPlan<TColumns, TUniques, TRelations, TParameters>,
+  ) {
     super();
     this.source = subplan.source;
     this.subplanId = subplan.id;
@@ -33,7 +51,12 @@ export class PgConnectionPlan<
     return this.source.name;
   }
 
-  public getSubplan(): PgSelectPlan<TDataSource> {
+  public getSubplan(): PgSelectPlan<
+    TColumns,
+    TUniques,
+    TRelations,
+    TParameters
+  > {
     const plan = this.getPlan(this.subplanId);
     if (!(plan instanceof PgSelectPlan)) {
       throw new Error(`Expected ${plan} to be a PgSelectPlan`);
@@ -41,7 +64,7 @@ export class PgConnectionPlan<
     return plan;
   }
 
-  public nodes(): PgSelectPlan<TDataSource> {
+  public nodes(): PgSelectPlan<TColumns, TUniques, TRelations, TParameters> {
     return this.getSubplan().clone();
   }
 

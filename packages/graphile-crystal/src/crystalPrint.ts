@@ -185,7 +185,8 @@ export function crystalPrint(
     | Record<symbol, any>
     | Map<any, any>
     | CrystalObject
-    | PlanResults,
+    | PlanResults
+    | any,
 ): string {
   return _crystalPrint(symbol, new Set());
 }

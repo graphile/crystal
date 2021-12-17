@@ -4,7 +4,12 @@ import { ExecutablePlan } from "graphile-crystal";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { PgSource, PgSourceColumn } from "../datasource";
+import type {
+  PgSource,
+  PgSourceColumn,
+  PgSourceColumns,
+  PgSourceRelation,
+} from "../datasource";
 import type {
   PgClassSinglePlan,
   PgTypeCodec,
@@ -28,11 +33,19 @@ const debugExecuteVerbose = debugExecute.extend("verbose");
  * not be a "leaf"; it might be used as the input of another layer of plan.
  */
 export class PgClassExpressionPlan<
-    TDataSource extends PgSource<any, any, any, any>,
-    TCodec extends PgTypeCodec,
+    TExpressionColumns extends PgSourceColumns | undefined,
+    TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any>,
+    TSourceColumns extends PgSourceColumns,
+    TUniques extends ReadonlyArray<ReadonlyArray<keyof TSourceColumns>>,
+    TRelations extends {
+      [identifier: string]: TSourceColumns extends PgSourceColumns
+        ? PgSourceRelation<TSourceColumns, any>
+        : never;
+    },
+    TParameters extends { [key: string]: any } | never = never,
   >
   extends ExecutablePlan<any>
-  implements PgTypedExecutablePlan<TCodec>
+  implements PgTypedExecutablePlan<TExpressionCodec>
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -54,7 +67,12 @@ export class PgClassExpressionPlan<
    */
   private attrIndex: number | null = null;
 
-  public readonly source: TDataSource;
+  public readonly source: PgSource<
+    TSourceColumns,
+    TUniques,
+    TRelations,
+    TParameters
+  >;
 
   public readonly expression: SQL;
 
@@ -62,10 +80,10 @@ export class PgClassExpressionPlan<
   placeholderIndexes: number[] = [];
 
   constructor(
-    table: PgClassSinglePlan<TDataSource>,
-    public readonly pgCodec: TCodec,
+    table: PgClassSinglePlan<TSourceColumns, TUniques, TRelations, TParameters>,
+    public readonly pgCodec: TExpressionCodec,
     strings: TemplateStringsArray,
-    dependencies: ReadonlyArray<PgTypedExecutablePlan | SQL> = [],
+    dependencies: ReadonlyArray<PgTypedExecutablePlan<any> | SQL> = [],
   ) {
     super();
     if (strings.length !== dependencies.length + 1) {
@@ -123,13 +141,19 @@ export class PgClassExpressionPlan<
     }
   }
 
-  public get<TAttr extends keyof NonNullable<TCodec["columns"]>>(
+  public get<TAttr extends keyof TExpressionColumns>(
     attributeName: TAttr,
   ): PgClassExpressionPlan<
-    TDataSource,
-    NonNullable<TCodec["columns"]>[TAttr] extends PgSourceColumn
-      ? NonNullable<TCodec["columns"]>[TAttr]["codec"]
-      : never
+    TExpressionColumns[TAttr] extends PgSourceColumn
+      ? TExpressionColumns[TAttr]["codec"]["columns"]
+      : never,
+    TExpressionColumns[TAttr] extends PgSourceColumn
+      ? TExpressionColumns[TAttr]["codec"]
+      : never,
+    TSourceColumns,
+    TUniques,
+    TRelations,
+    TParameters
   > {
     const columns = this.pgCodec.columns;
     if (!columns) {
@@ -161,7 +185,12 @@ export class PgClassExpressionPlan<
     )}` as any;
   }
 
-  public getParentPlan(): PgClassSinglePlan<TDataSource> {
+  public getParentPlan(): PgClassSinglePlan<
+    TSourceColumns,
+    TUniques,
+    TRelations,
+    TParameters
+  > {
     const plan = this.getPlan(this.dependencies[this.tableId]);
     if (
       !(plan instanceof PgSelectSinglePlan) &&
@@ -183,9 +212,7 @@ export class PgClassExpressionPlan<
     return this;
   }
 
-  public execute(
-    values: CrystalValuesList<any[]>,
-  ): CrystalResultsList<ReturnType<TCodec["fromPg"]>> {
+  public execute(values: CrystalValuesList<any[]>): CrystalResultsList<any> {
     const { attrIndex, tableId } = this;
     const pg2gql = this.pgCodec.fromPg;
     if (attrIndex != null) {
@@ -210,8 +237,15 @@ export class PgClassExpressionPlan<
   }
 
   public deduplicate(
-    peers: Array<PgClassExpressionPlan<TDataSource, TCodec>>,
-  ): PgClassExpressionPlan<TDataSource, TCodec> {
+    peers: Array<PgClassExpressionPlan<any, any, any, any, any, any>>,
+  ): PgClassExpressionPlan<
+    TExpressionColumns,
+    TExpressionCodec,
+    TSourceColumns,
+    TUniques,
+    TRelations,
+    TParameters
+  > {
     const equivalentPeer = peers.find(
       (p) => sql.isEquivalent(this.expression, p.expression),
       // TODO: when we defer placeholders until finalize we'll need to do additional comparison here
@@ -225,15 +259,30 @@ export class PgClassExpressionPlan<
 }
 
 function pgClassExpression<
-  TDataSource extends PgSource<any, any, any, any>,
-  TCodec extends PgTypeCodec,
+  TExpressionColumns extends PgSourceColumns | undefined,
+  TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any>,
+  TSourceColumns extends PgSourceColumns,
+  TUniques extends ReadonlyArray<ReadonlyArray<keyof TSourceColumns>>,
+  TRelations extends {
+    [identifier: string]: TSourceColumns extends PgSourceColumns
+      ? PgSourceRelation<TSourceColumns, any>
+      : never;
+  },
+  TParameters extends { [key: string]: any } | never = never,
 >(
-  table: PgClassSinglePlan<TDataSource>,
-  codec: TCodec,
+  table: PgClassSinglePlan<TSourceColumns, TUniques, TRelations, TParameters>,
+  codec: TExpressionCodec,
 ): (
   strings: TemplateStringsArray,
-  ...dependencies: ReadonlyArray<PgTypedExecutablePlan | SQL>
-) => PgClassExpressionPlan<TDataSource, TCodec> {
+  ...dependencies: ReadonlyArray<PgTypedExecutablePlan<any> | SQL>
+) => PgClassExpressionPlan<
+  TExpressionColumns,
+  TExpressionCodec,
+  TSourceColumns,
+  TUniques,
+  TRelations,
+  TParameters
+> {
   return (strings, ...dependencies) => {
     return new PgClassExpressionPlan(table, codec, strings, dependencies);
   };

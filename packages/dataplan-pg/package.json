@@ -9,6 +9,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "node": "./dist/index.js"
+    },
+    "./adaptors/node-postgres": {
+      "types": "./dist/adaptors/node-postgres.d.ts",
+      "node": "./dist/adaptors/node-postgres.js"
     }
   },
   "scripts": {
@@ -51,10 +55,7 @@
   "peerDependencies": {
     "graphql": "*"
   },
-  "files": [
-    "dist",
-    "index.js"
-  ],
+  "files": ["dist", "index.js"],
   "devDependencies": {
     "@dataplan/json": "4.7.0",
     "@types/jest": "^27.0.2",

@@ -1,7 +1,7 @@
 import type { ExecutablePlan } from "graphile-crystal";
 import type { SQL, SQLRawValue } from "pg-sql2";
 
-import type { PgSource, PgSourceColumns } from "./datasource";
+import type { PgSourceColumns, PgSourceRelation } from "./datasource";
 import type { PgDeletePlan } from "./plans/pgDelete";
 import type { PgInsertPlan } from "./plans/pgInsert";
 import type { PgSelectSinglePlan } from "./plans/pgSelectSingle";
@@ -12,12 +12,19 @@ import type { PgUpdatePlan } from "./plans/pgUpdate";
  * `INSERT...RETURNING` or similar. *ALWAYS* represents a single row (or null).
  */
 export type PgClassSinglePlan<
-  TDataSource extends PgSource<any, any, any, any, any>,
+  TColumns extends PgSourceColumns,
+  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TRelations extends {
+    [identifier: string]: TColumns extends PgSourceColumns
+      ? PgSourceRelation<TColumns, any>
+      : never;
+  },
+  TParameters extends { [key: string]: any } | never = never,
 > =
-  | PgSelectSinglePlan<TDataSource>
-  | PgInsertPlan<TDataSource>
-  | PgUpdatePlan<TDataSource>
-  | PgDeletePlan<TDataSource>;
+  | PgSelectSinglePlan<TColumns, TUniques, TRelations, TParameters>
+  | PgInsertPlan<TColumns, TUniques, TRelations>
+  | PgUpdatePlan<TColumns, TUniques, TRelations>
+  | PgDeletePlan<TColumns, TUniques, TRelations>;
 
 /**
  * Given a value of type TInput, returns an `SQL` value to insert into an SQL
@@ -31,9 +38,9 @@ export type PgEncode<TInput> = (value: TInput) => SQLRawValue;
 export type PgDecode<TCanonical> = (value: string) => TCanonical;
 
 export interface PgTypeCodec<
-  TCanonical = any,
+  TColumns extends PgSourceColumns | undefined,
+  TCanonical,
   TInput = TCanonical,
-  TColumns extends PgSourceColumns | undefined = any,
 > {
   /**
    * Given a value of type TInput, returns an `SQL` value to insert into an SQL
@@ -57,22 +64,23 @@ export interface PgTypeCodec<
   /**
    * If this is a composite type, the columns it supports.
    */
-  columns?: TColumns;
+  columns: TColumns;
 }
 
 export interface PgEnumTypeCodec<TValue extends string>
-  extends PgTypeCodec<string, TValue, any> {
+  extends PgTypeCodec<undefined, string, TValue> {
   values: TValue[];
 }
 
-export interface PgTypedExecutablePlan<TCodec extends PgTypeCodec = PgTypeCodec>
-  extends ExecutablePlan<any> {
+export interface PgTypedExecutablePlan<
+  TCodec extends PgTypeCodec<any, any, any>,
+> extends ExecutablePlan<any> {
   pgCodec: TCodec;
 }
 
 export interface PgOrderSpec {
   fragment: SQL;
-  codec: PgTypeCodec;
+  codec: PgTypeCodec<any, any, any>;
   direction: "ASC" | "DESC";
   nulls?: "FIRST" | "LAST" | null;
 }
@@ -96,6 +104,8 @@ export type TuplePlanMap<
 };
 
 export type PlanByUniques<
-  TColumns extends { [column: string]: any },
+  TColumns extends PgSourceColumns | undefined,
   TUniqueColumns extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
-> = TuplePlanMap<TColumns, TUniqueColumns[number]>[number];
+> = TColumns extends PgSourceColumns
+  ? TuplePlanMap<TColumns, TUniqueColumns[number]>[number]
+  : undefined;

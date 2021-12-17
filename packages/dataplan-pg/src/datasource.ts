@@ -35,6 +35,7 @@ export type PgSourceColumns = {
   [columnName: string]: PgSourceColumn<any>;
 };
 
+// TODO: feels like we should be able to type these more strongly
 export type PgSourceColumnViaExplicit = { relation: string; attribute: string };
 export type PgSourceColumnVia = string | PgSourceColumnViaExplicit;
 
@@ -42,7 +43,7 @@ export interface PgSourceColumn<TCanonical = any, TInput = TCanonical> {
   /**
    * How to translate to/from PG and how to cast.
    */
-  codec: PgTypeCodec<TCanonical, TInput>;
+  codec: PgTypeCodec<any, TCanonical, TInput>;
 
   /**
    * Is the column/attribute guaranteed to not be null?
@@ -94,41 +95,48 @@ export interface PgSourceColumn<TCanonical = any, TInput = TCanonical> {
   // multiple foreign key references?
 }
 
-type PgSourceRow<TColumns extends PgSourceColumns> = {
-  [key in keyof TColumns]: ReturnType<TColumns[key]["codec"]["fromPg"]>;
-};
+export type PgSourceRowAttribute<
+  TColumns extends PgSourceColumns,
+  TAttribute extends keyof TColumns,
+> = ReturnType<TColumns[TAttribute]["codec"]["fromPg"]>;
+export type PgSourceRow<TColumns extends PgSourceColumns | undefined> =
+  TColumns extends PgSourceColumns
+    ? {
+        [key in keyof TColumns]: PgSourceRowAttribute<TColumns, key>;
+      }
+    : undefined;
 
 export interface PgSourceRelation<
-  TSource extends
-    | PgSourceBuilder<any, PgSourceColumns, any, any>
-    | PgSource<any, PgSourceColumns, any, any, any>,
   TLocalColumns extends PgSourceColumns,
+  TRemoteColumns extends PgSourceColumns,
 > {
-  source: TSource;
+  source:
+    | PgSourceBuilder<TRemoteColumns, any, any>
+    | PgSource<TRemoteColumns, any, any, any>;
   localColumns: readonly (keyof TLocalColumns)[];
 
-  remoteColumns: TSource extends PgSourceBuilder<any, infer U, any, any>
-    ? ReadonlyArray<keyof U>
-    : TSource extends PgSource<any, infer U, any, any, any>
-    ? ReadonlyArray<keyof U>
-    : never;
+  remoteColumns: ReadonlyArray<keyof TRemoteColumns>;
   isUnique: boolean;
 }
 
 export interface PgSourceExtensions {}
 
 export interface PgSourceOptions<
-  TCodec extends PgTypeCodec<any, any>,
-  TColumns extends PgSourceColumns,
+  TColumns extends PgSourceColumns | undefined,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
-  TRelations extends { [identifier: string]: PgSourceRelation<any, TColumns> },
-  _TParameters extends { [key: string]: any } | never = never,
+  TRelations extends {
+    [identifier: string]: TColumns extends PgSourceColumns
+      ? PgSourceRelation<TColumns, any>
+      : never;
+  },
+  _TParameters extends { [key: string]: any } | never =
+    | { [key: string]: any }
+    | never,
 > {
-  codec: TCodec;
+  codec: PgTypeCodec<TColumns, any, any>;
   executor: PgExecutor;
   name: string;
   source: SQL | ((...args: SQL[]) => SQL);
-  columns: TColumns | null;
   uniques?: TUniques;
   relations?: TRelations | (() => TRelations);
   extensions?: PgSourceExtensions;
@@ -139,25 +147,30 @@ export interface PgSourceOptions<
  * the relations at a later step to avoid circular references.
  */
 export class PgSourceBuilder<
-  TCodec extends PgTypeCodec<any, any>,
   TColumns extends PgSourceColumns,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
   TParameters extends { [key: string]: any } | never = never,
 > {
-  private built: PgSource<TCodec, TColumns, TUniques, any, TParameters> | null =
-    null;
-  public codec: TCodec;
-  public columns: TColumns | null;
+  /** TypeScript hack, avoid. @internal */
+  TColumns!: TColumns;
+  /** TypeScript hack, avoid. @internal */
+  TUniques!: TUniques;
+  /** TypeScript hack, avoid. @internal */
+  TRelations!: never;
+  /** TypeScript hack, avoid. @internal */
+  TParameters!: TParameters;
+
+  private built: PgSource<TColumns, TUniques, any, TParameters> | null = null;
+  public codec: PgTypeCodec<TColumns, any, any>;
   public uniques: TUniques | undefined;
   public readonly extensions: PgSourceExtensions;
   constructor(
     private options: Omit<
-      PgSourceOptions<TCodec, TColumns, TUniques, any, TParameters>,
+      PgSourceOptions<TColumns, TUniques, any, TParameters>,
       "relations"
     >,
   ) {
     this.codec = options.codec;
-    this.columns = options.columns;
     this.uniques = options.uniques;
     this.extensions = options.extensions || {};
   }
@@ -168,16 +181,15 @@ export class PgSourceBuilder<
 
   build<
     TRelations extends {
-      [identifier: string]: PgSourceRelation<
-        PgSourceBuilder<any, any, any, any> | PgSource<any, any, any, any>,
-        TColumns
-      >;
+      [identifier: string]: TColumns extends PgSourceColumns
+        ? PgSourceRelation<TColumns, any>
+        : never;
     },
   >({
     relations,
   }: {
     relations?: TRelations;
-  }): PgSource<TCodec, TColumns, TUniques, TRelations, TParameters> {
+  }): PgSource<TColumns, TUniques, TRelations, TParameters> {
     if (this.built) {
       throw new Error("This builder has already been built!");
     }
@@ -208,7 +220,7 @@ export class PgSourceBuilder<
     return this.built;
   }
 
-  get(): PgSource<TCodec, TColumns, TUniques, any, TParameters> {
+  get(): PgSource<TColumns, TUniques, any, TParameters> {
     if (!this.built) {
       throw new Error(
         `This builder (${this.options.name}) has not been built!`,
@@ -224,29 +236,30 @@ exportAs(PgSourceBuilder, "PgSourceBuilder");
  * view, materialized view, setof function call, join, etc. Anything table-like.
  */
 export class PgSource<
-  TCodec extends PgTypeCodec<any, any>,
-  TColumns extends PgSourceColumns,
+  TColumns extends PgSourceColumns | undefined,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
-  TRelations extends { [identifier: string]: PgSourceRelation<any, TColumns> },
+  TRelations extends {
+    [identifier: string]: TColumns extends PgSourceColumns
+      ? PgSourceRelation<TColumns, any>
+      : never;
+  },
   TParameters extends { [key: string]: any } | never = never,
 > {
-  /**
-   * TypeScript hack so that we can retrieve the TRow type from a Postgres data
-   * source at a later time - needed so we can have strong typing on `.get()`
-   * and similar methods.
-   *
-   * @internal
-   */
-  TRow!: PgSourceRow<TColumns>;
+  /** TypeScript hack, avoid. @internal */
+  TColumns!: TColumns;
+  /** TypeScript hack, avoid. @internal */
+  TUniques!: TUniques;
+  /** TypeScript hack, avoid. @internal */
+  TRelations!: TRelations;
+  /** TypeScript hack, avoid. @internal */
+  TParameters!: TParameters;
 
-  public readonly codec: TCodec;
+  public readonly codec: PgTypeCodec<TColumns, any, any>;
   public readonly executor: PgExecutor;
   public readonly name: string;
   public readonly source: SQL | ((...args: SQL[]) => SQL);
-  public readonly columns: TColumns;
   public readonly uniques: TUniques;
   private readonly _options: PgSourceOptions<
-    TCodec,
     TColumns,
     TUniques,
     TRelations,
@@ -263,22 +276,14 @@ export class PgSource<
    * to understand.
    */
   constructor(
-    options: PgSourceOptions<
-      TCodec,
-      TColumns,
-      TUniques,
-      TRelations,
-      TParameters
-    >,
+    options: PgSourceOptions<TColumns, TUniques, TRelations, TParameters>,
   ) {
-    const { codec, executor, name, source, columns, uniques, relations } =
-      options;
+    const { codec, executor, name, source, uniques, relations } = options;
     this._options = options;
     this.codec = codec;
     this.executor = executor;
     this.name = name;
     this.source = source;
-    this.columns = columns ?? ({} as TColumns);
     this.uniques =
       uniques ?? ([] as TUniques extends never[] ? TUniques : never);
     this.relationsThunk = typeof relations === "function" ? relations : null;
@@ -301,15 +306,14 @@ export class PgSource<
     name: string;
     source: SQL | ((...args: SQL[]) => SQL);
     uniques?: TUniques;
-  }): PgSource<TCodec, TColumns, TUniques, TRelations, TNewParameters> {
+  }): PgSource<TColumns, TUniques, TRelations, TNewParameters> {
     const { name, source, uniques } = overrideOptions;
-    const { codec, executor, columns, relations } = this._options;
+    const { codec, executor, relations } = this._options;
     return new PgSource({
       codec,
       executor,
       name,
       source,
-      columns,
       uniques,
       relations,
     });
@@ -328,39 +332,41 @@ export class PgSource<
 
     // Check that all the `via` and `identicalVia` match actual relations.
     const relationKeys = Object.keys(this._relations);
-    Object.entries(this.columns).forEach(([columnName, col]) => {
-      const { via, identicalVia } = col;
-      if (via) {
-        if (typeof via === "string") {
-          if (!relationKeys.includes(via)) {
-            throw new Error(
-              `${this} claims column '${columnName}' is via relation '${via}', but there is no such relation.`,
-            );
-          }
-        } else {
-          if (!relationKeys.includes(via.relation)) {
-            throw new Error(
-              `${this} claims column '${columnName}' is via relation '${via.relation}', but there is no such relation.`,
-            );
-          }
-        }
-      }
-      if (identicalVia) {
-        if (typeof identicalVia === "string") {
-          if (!relationKeys.includes(identicalVia)) {
-            throw new Error(
-              `${this} claims column '${columnName}' is identicalVia relation '${identicalVia}', but there is no such relation.`,
-            );
-          }
-        } else {
-          if (!relationKeys.includes(identicalVia.relation)) {
-            throw new Error(
-              `${this} claims column '${columnName}' is identicalVia relation '${identicalVia.relation}', but there is no such relation.`,
-            );
+    if (this.codec.columns) {
+      Object.entries(this.codec.columns).forEach(([columnName, col]) => {
+        const { via, identicalVia } = col;
+        if (via) {
+          if (typeof via === "string") {
+            if (!relationKeys.includes(via)) {
+              throw new Error(
+                `${this} claims column '${columnName}' is via relation '${via}', but there is no such relation.`,
+              );
+            }
+          } else {
+            if (!relationKeys.includes(via.relation)) {
+              throw new Error(
+                `${this} claims column '${columnName}' is via relation '${via.relation}', but there is no such relation.`,
+              );
+            }
           }
         }
-      }
-    });
+        if (identicalVia) {
+          if (typeof identicalVia === "string") {
+            if (!relationKeys.includes(identicalVia)) {
+              throw new Error(
+                `${this} claims column '${columnName}' is identicalVia relation '${identicalVia}', but there is no such relation.`,
+              );
+            }
+          } else {
+            if (!relationKeys.includes(identicalVia.relation)) {
+              throw new Error(
+                `${this} claims column '${columnName}' is identicalVia relation '${identicalVia.relation}', but there is no such relation.`,
+              );
+            }
+          }
+        }
+      });
+    }
   }
 
   private getRelations(): TRelations {
@@ -390,14 +396,11 @@ export class PgSource<
     }
     if (typeof via === "string") {
       // Check
-      const relation: PgSourceRelation<
-        PgSource<any, any, any, any, any>,
-        any
-      > = this.getRelation(via);
+      const relation = this.getRelation(via);
       if (!relation) {
         throw new Error(`Unknown relation '${via}' in ${this}`);
       }
-      if (!relation.source.columns[attr]) {
+      if (!relation.source.codec.columns[attr]) {
         throw new Error(
           `${this} relation '${via}' does not have column '${attr}'`,
         );
@@ -409,14 +412,13 @@ export class PgSource<
   }
 
   public getReciprocal<
-    TOtherDataSource extends PgSource<any, any, any, any, any>,
+    TOtherDataSource extends PgSource<any, any, any, any>,
     TOtherRelationName extends Parameters<TOtherDataSource["getRelation"]>[0],
   >(
     otherDataSource: TOtherDataSource,
     otherRelationName: TOtherRelationName,
   ): [keyof TRelations, TRelations[keyof TRelations]] | null {
-    const otherRelation: PgSourceRelation<TOtherDataSource, any> =
-      otherDataSource.getRelation(otherRelationName);
+    const otherRelation = otherDataSource.getRelation(otherRelationName);
     const relations = this.getRelations();
     const reciprocal = (
       Object.entries(relations) as Array<
@@ -441,8 +443,13 @@ export class PgSource<
     spec: PlanByUniques<TColumns, TUniques>,
     // This is internal, it's an optimisation we can use but you shouldn't.
     _internalOptionsDoNotPass?: PgSelectSinglePlanOptions,
-  ): PgSelectSinglePlan<this> {
-    const keys: ReadonlyArray<keyof TColumns> = Object.keys(spec);
+  ): PgSelectSinglePlan<TColumns, TUniques, TRelations, TParameters> {
+    if (!spec) {
+      throw new Error(`Cannot ${this}.get without a valid spec`);
+    }
+    const keys = Object.keys(spec) as ReadonlyArray<string> as ReadonlyArray<
+      keyof TColumns
+    >;
     if (!this.uniques.some((uniq) => uniq.every((key) => keys.includes(key)))) {
       throw new Error(
         `Attempted to call ${this}.get({${keys.join(
@@ -459,9 +466,13 @@ export class PgSource<
     spec: {
       [key in keyof TColumns]?: ExecutablePlan | string | number;
     } = Object.create(null),
-  ): PgSelectPlan<this> {
-    const keys: ReadonlyArray<keyof TColumns> = Object.keys(spec);
-    const invalidKeys = keys.filter((key) => this.columns[key] == null);
+  ): PgSelectPlan<TColumns, TUniques, TRelations, TParameters> {
+    if (!this.codec.columns) {
+      throw new Error("Cannot call find if there's no columns");
+    }
+    const columns = this.codec.columns as NonNullable<TColumns>;
+    const keys = Object.keys(spec) as Array<keyof typeof columns>;
+    const invalidKeys = keys.filter((key) => columns[key] == null);
     if (invalidKeys.length > 0) {
       throw new Error(
         `Attempted to call ${this}.get({${keys.join(
@@ -473,8 +484,8 @@ export class PgSource<
     }
 
     const identifiers = keys.map((key) => {
-      const column = this.columns[key];
-      if (column.via) {
+      const column = columns[key];
+      if ("via" in column && column.via) {
         throw new Error(
           `Attribute '${key}' is defined with a 'via' and thus cannot be used as an identifier for '.find()' or '.get()' calls (requested keys: '${keys.join(
             "', '",
@@ -484,7 +495,7 @@ export class PgSource<
       const {
         codec: { sqlType: type },
       } = column;
-      const plan = spec[key];
+      const plan = spec[key as keyof TColumns];
       if (plan == undefined) {
         throw new Error(
           `Attempted to call ${this}.find({${keys.join(
@@ -504,7 +515,9 @@ export class PgSource<
     return pgSelect({ source: this, identifiers });
   }
 
-  public applyAuthorizationChecksToPlan($plan: PgSelectPlan<this>): void {
+  public applyAuthorizationChecksToPlan(
+    $plan: PgSelectPlan<TColumns, TUniques, TRelations, TParameters>,
+  ): void {
     // e.g. $plan.where(sql`user_id = ${me}`);
     $plan.where(sql`true /* authorization checks */`);
     return;

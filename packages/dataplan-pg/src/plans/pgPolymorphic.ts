@@ -24,7 +24,7 @@ interface PgPolymorphicTypeMap<
 }
 
 export class PgPolymorphicPlan<
-    TCodec extends PgTypeCodec,
+    TCodec extends PgTypeCodec<any, any, any>,
     TTypeSpecifier,
     TTypeSpecifierPlan extends ExecutablePlan<TTypeSpecifier> = ExecutablePlan<TTypeSpecifier>,
   >
@@ -42,8 +42,15 @@ export class PgPolymorphicPlan<
 
   constructor(
     $itemPlan:
-      | PgSelectSinglePlan<PgSource<TCodec, any, any, any, any>>
-      | PgClassExpressionPlan<any, TCodec>,
+      | PgSelectSinglePlan<TCodec["columns"], any, any, any>
+      | PgClassExpressionPlan<
+          TCodec["columns"],
+          TCodec,
+          TCodec["columns"],
+          any,
+          any,
+          any
+        >,
     $typeSpecifierPlan: TTypeSpecifierPlan,
     private possibleTypes: PgPolymorphicTypeMap<
       TTypeSpecifier,
@@ -111,12 +118,19 @@ export class PgPolymorphicPlan<
 }
 
 export function pgPolymorphic<
-  TCodec extends PgTypeCodec,
+  TCodec extends PgTypeCodec<any, any, any>,
   TTypeSpecifierPlan extends ExecutablePlan<any> = ExecutablePlan<any>,
 >(
   $itemPlan:
-    | PgSelectSinglePlan<PgSource<TCodec, any, any, any, any>>
-    | PgClassExpressionPlan<any, TCodec>,
+    | PgSelectSinglePlan<TCodec["columns"], any, any, any>
+    | PgClassExpressionPlan<
+        TCodec["columns"],
+        TCodec,
+        TCodec["columns"],
+        any,
+        any,
+        any
+      >,
   $typeSpecifierPlan: TTypeSpecifierPlan,
   possibleTypes: PgPolymorphicTypeMap<
     TTypeSpecifierPlan extends ExecutablePlan<infer U> ? U : any,

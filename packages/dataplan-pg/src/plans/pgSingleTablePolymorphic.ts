@@ -7,11 +7,22 @@ import type {
 import { ExecutablePlan, polymorphicWrap } from "graphile-crystal";
 import type { GraphQLObjectType } from "graphql";
 
-import type { PgSource } from "../datasource";
+import type {
+  PgSourceColumns,
+  PgSourceRelation,
+  PgSourceRow,
+} from "../datasource";
 import type { PgSelectSinglePlan } from "./pgSelectSingle";
 
 export class PgSingleTablePolymorphicPlan<
-    TDataSource extends PgSource<any, any, any, any, any>,
+    TColumns extends PgSourceColumns | undefined,
+    TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+    TRelations extends {
+      [identifier: string]: TColumns extends PgSourceColumns
+        ? PgSourceRelation<TColumns, any>
+        : never;
+    },
+    TParameters extends { [key: string]: any } | never = never,
   >
   extends ExecutablePlan<any>
   implements PolymorphicPlan
@@ -26,7 +37,7 @@ export class PgSingleTablePolymorphicPlan<
 
   constructor(
     $typePlan: ExecutablePlan<string>,
-    $rowPlan: PgSelectSinglePlan<TDataSource>,
+    $rowPlan: PgSelectSinglePlan<TColumns, TUniques, TRelations, TParameters>,
   ) {
     super();
     this.typePlanId = this.addDependency($typePlan);
@@ -48,7 +59,7 @@ export class PgSingleTablePolymorphicPlan<
   ): Promise<
     CrystalResultsList<PolymorphicData<
       string,
-      ReadonlyArray<TDataSource["TRow"]>
+      ReadonlyArray<PgSourceRow<TColumns>>
     > | null>
   > {
     return values.map((v) =>
@@ -60,12 +71,19 @@ export class PgSingleTablePolymorphicPlan<
 }
 
 export function pgSingleTablePolymorphic<
-  TDataSource extends PgSource<any, any, any, any, any>,
+  TColumns extends PgSourceColumns | undefined,
+  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TRelations extends {
+    [identifier: string]: TColumns extends PgSourceColumns
+      ? PgSourceRelation<TColumns, any>
+      : never;
+  },
+  TParameters extends { [key: string]: any } | never = never,
 >(
   $typePlan: ExecutablePlan<string>,
-  $rowPlan: PgSelectSinglePlan<TDataSource>,
-): PgSingleTablePolymorphicPlan<TDataSource> {
-  return new PgSingleTablePolymorphicPlan<TDataSource>($typePlan, $rowPlan);
+  $rowPlan: PgSelectSinglePlan<TColumns, TUniques, TRelations, TParameters>,
+): PgSingleTablePolymorphicPlan<TColumns, TUniques, TRelations, TParameters> {
+  return new PgSingleTablePolymorphicPlan($typePlan, $rowPlan);
 }
 
 Object.defineProperty(pgSingleTablePolymorphic, "$$export", {

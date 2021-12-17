@@ -4,7 +4,13 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 import { inspect } from "util";
 
-import type { PgSource, PgSourceColumn } from "../datasource";
+import type {
+  PgSource,
+  PgSourceColumn,
+  PgSourceColumns,
+  PgSourceRelation,
+  PgSourceRow,
+} from "../datasource";
 import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
 import type { PgClassExpressionPlan } from "./pgClassExpression";
 import { pgClassExpression } from "./pgClassExpression";
@@ -28,8 +34,14 @@ interface PgInsertPlanFinalizeResults {
 }
 
 export class PgInsertPlan<
-  TDataSource extends PgSource<any, any, any, any, any>,
-> extends ExecutablePlan<TDataSource["TRow"]> {
+  TColumns extends PgSourceColumns,
+  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TRelations extends {
+    [identifier: string]: TColumns extends PgSourceColumns
+      ? PgSourceRelation<TColumns, any>
+      : never;
+  },
+> extends ExecutablePlan<PgSourceRow<TColumns>> {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgInsertPlan",
@@ -41,7 +53,7 @@ export class PgInsertPlan<
    * Tells us what we're dealing with - data type, columns, where to insert it,
    * what it's called, etc.
    */
-  public readonly source: TDataSource;
+  public readonly source: PgSource<TColumns, TUniques, TRelations>;
 
   /**
    * This defaults to the name of the source but you can override it. Aids
@@ -62,9 +74,9 @@ export class PgInsertPlan<
    * The columns and their dependency ids for us to insert.
    */
   private columns: Array<{
-    name: keyof TDataSource["columns"];
+    name: keyof TColumns;
     depId: number;
-    pgCodec: PgTypeCodec;
+    pgCodec: PgTypeCodec<any, any, any>;
   }> = [];
 
   /**
@@ -89,10 +101,10 @@ export class PgInsertPlan<
   private selects: Array<SQL> = [];
 
   constructor(
-    source: TDataSource,
+    source: PgSource<TColumns, TUniques, TRelations>,
     columns?: {
-      [key in keyof TDataSource["columns"]]?:
-        | PgTypedExecutablePlan<TDataSource["columns"][key]["codec"]>
+      [key in keyof TColumns]?:
+        | PgTypedExecutablePlan<TColumns[key]["codec"]>
         | ExecutablePlan<any>;
     },
   ) {
@@ -111,11 +123,9 @@ export class PgInsertPlan<
     }
   }
 
-  set<TKey extends keyof TDataSource["columns"]>(
+  set<TKey extends keyof TColumns>(
     name: TKey,
-    value:
-      | PgTypedExecutablePlan<TDataSource["columns"][TKey]["codec"]>
-      | ExecutablePlan<any>,
+    value: PgTypedExecutablePlan<TColumns[TKey]["codec"]> | ExecutablePlan<any>,
   ): void {
     if (this.locked) {
       throw new Error("Cannot set after plan is locked.");
@@ -127,7 +137,9 @@ export class PgInsertPlan<
         );
       }
     }
-    const { codec: pgCodec } = this.source.columns[name] as PgSourceColumn;
+    const { codec: pgCodec } = this.source.codec.columns[
+      name
+    ] as PgSourceColumn;
     const depId = this.addDependency(value);
     this.columns.push({ name, depId, pgCodec });
   }
@@ -136,14 +148,17 @@ export class PgInsertPlan<
    * Returns a plan representing a named attribute (e.g. column) from the newly
    * inserted row.
    */
-  get<TAttr extends keyof TDataSource["TRow"]>(
+  get<TAttr extends keyof TColumns>(
     attr: TAttr,
   ): PgClassExpressionPlan<
-    TDataSource,
-    TDataSource["columns"][TAttr]["codec"]
+    TColumns[TAttr]["codec"]["columns"],
+    TColumns[TAttr]["codec"],
+    TColumns,
+    TUniques,
+    TRelations
   > {
     const dataSourceColumn: PgSourceColumn =
-      this.source.columns[attr as string];
+      this.source.codec.columns[attr as string];
     if (!dataSourceColumn) {
       throw new Error(
         `${this.source} does not define an attribute named '${attr}'`,
@@ -172,7 +187,13 @@ export class PgInsertPlan<
     return colPlan;
   }
 
-  public record(): PgClassExpressionPlan<TDataSource, TDataSource["codec"]> {
+  public record(): PgClassExpressionPlan<
+    TColumns,
+    PgTypeCodec<TColumns, any, any>,
+    TColumns,
+    TUniques,
+    TRelations
+  > {
     return pgClassExpression(this, this.source.codec)`${this.alias}`;
   }
 
@@ -326,14 +347,22 @@ export class PgInsertPlan<
   }
 }
 
-export function pgInsert<TDataSource extends PgSource<any, any, any, any, any>>(
-  source: TDataSource,
+export function pgInsert<
+  TColumns extends PgSourceColumns,
+  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TRelations extends {
+    [identifier: string]: TColumns extends PgSourceColumns
+      ? PgSourceRelation<TColumns, any>
+      : never;
+  },
+>(
+  source: PgSource<TColumns, TUniques, TRelations>,
   columns?: {
-    [key in keyof TDataSource["columns"]]?:
-      | PgTypedExecutablePlan<TDataSource["columns"][key]["codec"]>
+    [key in keyof TColumns]?:
+      | PgTypedExecutablePlan<TColumns[key]["codec"]>
       | ExecutablePlan<any>;
   },
-): PgInsertPlan<TDataSource> {
+): PgInsertPlan<TColumns, TUniques, TRelations> {
   return new PgInsertPlan(source, columns);
 }
 

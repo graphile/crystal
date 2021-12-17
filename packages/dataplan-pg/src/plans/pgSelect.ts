@@ -27,7 +27,13 @@ import {
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
 
-import type { PgSource, PgSourceRelation } from "../datasource";
+import type {
+  PgSource,
+  PgSourceColumns,
+  PgSourceRelation,
+  PgSourceRow,
+} from "../datasource";
+import { PgSourceBuilder } from "../datasource";
 import type { PgOrderSpec, PgTypedExecutablePlan } from "../interfaces";
 import { PgClassExpressionPlan } from "./pgClassExpression";
 import { PgConditionPlan } from "./pgCondition";
@@ -48,9 +54,16 @@ function isStaticInputPlan(
 }
 
 type LockableParameter = "orderBy" | "first" | "last" | "offset";
-type LockCallback<TDataSource extends PgSource<any, any, any, any>> = (
-  plan: PgSelectPlan<TDataSource>,
-) => void;
+type LockCallback<
+  TColumns extends PgSourceColumns | undefined,
+  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TRelations extends {
+    [identifier: string]: TColumns extends PgSourceColumns
+      ? PgSourceRelation<TColumns, any>
+      : never;
+  },
+  TParameters extends { [key: string]: any } | never = never,
+> = (plan: PgSelectPlan<TColumns, TUniques, TRelations, TParameters>) => void;
 
 const debugPlan = debugFactory("datasource:pg:PgSelectPlan:plan");
 const debugExecute = debugFactory("datasource:pg:PgSelectPlan:execute");
@@ -87,7 +100,7 @@ type PgSelectIdentifierSpec =
       matches: (alias: SQL) => SQL;
     }
   | {
-      plan: PgTypedExecutablePlan;
+      plan: PgTypedExecutablePlan<any>;
       type?: SQL;
       matches: (alias: SQL) => SQL;
     };
@@ -99,7 +112,7 @@ type PgSelectArgumentSpec =
       name?: string;
     }
   | {
-      plan: PgTypedExecutablePlan;
+      plan: PgTypedExecutablePlan<any>;
       type?: SQL;
       name?: string;
     };
@@ -128,13 +141,13 @@ function assertSensible(plan: ExecutablePlan): void {
   }
 }
 
-interface PgSelectOptions<TDataSource extends PgSource<any, any, any, any>> {
+interface PgSelectOptions<TColumns extends PgSourceColumns | undefined> {
   /**
    * Tells us what we're dealing with - data type, columns, where to get it
    * from, what it's called, etc. Many of these details can be overridden
    * below.
    */
-  source: TDataSource;
+  source: PgSource<TColumns, any, any, any>;
 
   /**
    * The identifiers to limit the results down to just the row(s) you care
@@ -182,9 +195,18 @@ interface PgSelectOptions<TDataSource extends PgSource<any, any, any, any>> {
  * could be used for that purpose so long as we name the scalars (i.e. create
  * records from them `{a: 1},{a: 2},{a:3}`).
  */
-export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
-  extends ExecutablePlan<ReadonlyArray<TDataSource["TRow"]>>
-  implements StreamablePlan<TDataSource["TRow"]>
+export class PgSelectPlan<
+    TColumns extends PgSourceColumns | undefined,
+    TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+    TRelations extends {
+      [identifier: string]: TColumns extends PgSourceColumns
+        ? PgSourceRelation<TColumns, any>
+        : never;
+    },
+    TParameters extends { [key: string]: any } | never = never,
+  >
+  extends ExecutablePlan<ReadonlyArray<PgSourceRow<TColumns>>>
+  implements StreamablePlan<PgSourceRow<TColumns>>
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -218,11 +240,11 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
   /**
    * The data source from which we are selecting: table, view, etc
    */
-  public readonly source: TDataSource;
+  public readonly source: PgSource<TColumns, TUniques, TRelations, TParameters>;
 
   // JOIN
 
-  private relationJoins: Map<Parameters<TDataSource["getRelation"]>[0], SQL>;
+  private relationJoins: Map<keyof TRelations, SQL>;
   private joins: Array<PgSelectPlanJoin>;
 
   // WHERE
@@ -355,7 +377,9 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
   // --------------------
 
   private _beforeLock: {
-    [a in LockableParameter]: Array<LockCallback<TDataSource>>;
+    [a in LockableParameter]: Array<
+      LockCallback<TColumns, TUniques, TRelations, TParameters>
+    >;
   } = {
     orderBy: [],
     first: [],
@@ -364,7 +388,9 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
   };
 
   private _afterLock: {
-    [a in LockableParameter]: Array<LockCallback<TDataSource>>;
+    [a in LockableParameter]: Array<
+      LockCallback<TColumns, TUniques, TRelations, TParameters>
+    >;
   } = {
     orderBy: [],
     first: [],
@@ -381,13 +407,15 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
     offset: false,
   };
 
-  constructor(options: PgSelectOptions<TDataSource>);
-  constructor(cloneFrom: PgSelectPlan<TDataSource>);
+  constructor(options: PgSelectOptions<TColumns>);
+  constructor(
+    cloneFrom: PgSelectPlan<TColumns, TUniques, TRelations, TParameters>,
+  );
   constructor(
     optionsOrCloneFrom:
-      | PgSelectPlan<TDataSource>
+      | PgSelectPlan<TColumns, TUniques, TRelations, TParameters>
       | {
-          source: TDataSource;
+          source: PgSource<TColumns, TUniques, TRelations, TParameters>;
           identifiers?: Array<PgSelectIdentifierSpec>;
           args?: Array<PgSelectArgumentSpec>;
           from?: SQL | ((...args: SQL[]) => SQL);
@@ -475,7 +503,7 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
         const { plan, matches } = identifier;
         const type =
           identifier.type ||
-          (identifier.plan as PgTypedExecutablePlan).pgCodec.sqlType;
+          (identifier.plan as PgTypedExecutablePlan<any>).pgCodec.sqlType;
         queryValues.push({
           dependencyIndex: this.addDependency(plan),
           type,
@@ -489,7 +517,8 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
           }
           const { plan, name } = identifier;
           const type =
-            identifier.type || (plan as PgTypedExecutablePlan).pgCodec.sqlType;
+            identifier.type ||
+            (plan as PgTypedExecutablePlan<any>).pgCodec.sqlType;
           const placeholder = this.placeholder(plan, type);
           if (name) {
             argIndex = null;
@@ -616,10 +645,10 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
     return this.isUnique;
   }
 
-  public placeholder($plan: PgTypedExecutablePlan): SQL;
+  public placeholder($plan: PgTypedExecutablePlan<any>): SQL;
   public placeholder($plan: ExecutablePlan<any>, type: SQL): SQL;
   public placeholder(
-    $plan: ExecutablePlan<any> | PgTypedExecutablePlan,
+    $plan: ExecutablePlan<any> | PgTypedExecutablePlan<any>,
     overrideType?: SQL,
   ): SQL {
     if (this.locked) {
@@ -657,12 +686,10 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
    * Join to a named relationship and return the alias that can be used in
    * SELECT, WHERE and ORDER BY.
    */
-  public singleRelation(
-    relationIdentifier: Parameters<TDataSource["getRelation"]>[0],
+  public singleRelation<TRelationName extends keyof TRelations>(
+    relationIdentifier: TRelationName,
   ): SQL {
-    const relation:
-      | PgSourceRelation<PgSource<any, any, any, any>, TDataSource["columns"]>
-      | undefined = this.source.getRelation(relationIdentifier as string);
+    const relation = this.source.getRelation(relationIdentifier);
     if (!relation) {
       throw new Error(
         `${this.source} does not have a relation named '${relationIdentifier}'`,
@@ -673,7 +700,11 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
         `${this.source} relation '${relationIdentifier}' is not unique so cannot be used with singleRelation`,
       );
     }
-    const { source: relationSource, localColumns, remoteColumns } = relation;
+    const { source: rawRelationSource, localColumns, remoteColumns } = relation;
+    const relationSource =
+      rawRelationSource instanceof PgSourceBuilder
+        ? rawRelationSource.get()
+        : rawRelationSource;
 
     // Join to this relation if we haven't already
     const cachedAlias = this.relationJoins.get(relationIdentifier);
@@ -726,7 +757,7 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
    * connections/etc (e.g. copying `where` conditions but adding more, or
    * pagination, or grouping, aggregates, etc)
    */
-  clone(): PgSelectPlan<TDataSource> {
+  clone(): PgSelectPlan<TColumns, TUniques, TRelations, TParameters> {
     return new PgSelectPlan(this);
   }
 
@@ -844,7 +875,7 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
    */
   async execute(
     values: CrystalValuesList<any[]>,
-  ): Promise<CrystalResultsList<ReadonlyArray<TDataSource["TRow"]>>> {
+  ): Promise<CrystalResultsList<ReadonlyArray<PgSourceRow<TColumns>>>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectPlan before finalizing it.");
     }
@@ -887,7 +918,7 @@ export class PgSelectPlan<TDataSource extends PgSource<any, any, any, any>>
    */
   async stream(
     values: CrystalValuesList<any[]>,
-  ): Promise<CrystalResultStreamList<TDataSource["TRow"]>> {
+  ): Promise<CrystalResultStreamList<PgSourceRow<TColumns>>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot stream PgSelectPlan before finalizing it.");
     }
@@ -1454,7 +1485,9 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
     super.finalize();
   }
 
-  deduplicate(peers: PgSelectPlan<any>[]): ExecutablePlan {
+  deduplicate(
+    peers: PgSelectPlan<any, any, any, any>[],
+  ): PgSelectPlan<TColumns, TUniques, TRelations, TParameters> {
     const identical = peers.find((p) => {
       // If SELECT, FROM, JOIN, WHERE, ORDER, GROUP BY, HAVING, LIMIT, OFFSET
       // all match with one of our peers then we can replace ourself with one
@@ -1594,7 +1627,9 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
     return this;
   }
 
-  mergeSelectsWith(otherPlan: PgSelectPlan<TDataSource>): {
+  mergeSelectsWith<TOtherPlan extends PgSelectPlan<any, any, any, any>>(
+    otherPlan: TOtherPlan,
+  ): {
     [desiredIndex: string]: string;
   } {
     const actualKeyByDesiredKey = Object.create(null);
@@ -1611,7 +1646,9 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
     return actualKeyByDesiredKey;
   }
 
-  mergePlaceholdersInto(otherPlan: PgSelectPlan<TDataSource>): void {
+  mergePlaceholdersInto<TOtherPlan extends PgSelectPlan<any, any, any, any>>(
+    otherPlan: TOtherPlan,
+  ): void {
     for (const placeholder of this.placeholders) {
       const { dependencyIndex, sqlRef, type } = placeholder;
       const dep = this.getPlan(this.dependencies[dependencyIndex]);
@@ -1656,7 +1693,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
 
     if (!this.isInliningForbidden && !this.hasSideEffects && !stream) {
       // Inline ourself into our parent if we can.
-      let t: PgSelectPlan<any> | null | undefined = undefined;
+      let t: PgSelectPlan<any, any, any, any> | null | undefined = undefined;
       let p: ExecutablePlan<any> | undefined = undefined;
       for (
         let dependencyIndex = 0, l = this.dependencies.length;
@@ -1895,7 +1932,9 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
    * does currently). Beware: if you call this and the database might actually
    * return more than one record then you're potentially in for a Bad Time.
    */
-  single(options?: PgSelectSinglePlanOptions): PgSelectSinglePlan<TDataSource> {
+  single(
+    options?: PgSelectSinglePlanOptions,
+  ): PgSelectSinglePlan<TColumns, TUniques, TRelations, TParameters> {
     this.setUnique(true);
     // TODO: should this be on a clone plan? I don't currently think so since
     // PgSelectSinglePlan does not allow for `.where` divergence (since it
@@ -1916,7 +1955,9 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
    * IMPORTANT: do not call `.listItem` from user code; it's only intended to
    * be called by Graphile Crystal.
    */
-  listItem(itemPlan: __ItemPlan<this>): PgSelectSinglePlan<TDataSource> {
+  listItem(
+    itemPlan: __ItemPlan<this>,
+  ): PgSelectSinglePlan<TColumns, TUniques, TRelations, TParameters> {
     return new PgSelectSinglePlan(this, itemPlan);
   }
 
@@ -1936,7 +1977,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
    */
   public beforeLock(
     type: LockableParameter,
-    callback: LockCallback<TDataSource>,
+    callback: LockCallback<TColumns, TUniques, TRelations, TParameters>,
   ): void {
     this._assertParameterUnlocked(type);
     this._beforeLock[type].push(callback);
@@ -1948,7 +1989,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
    */
   public afterLock(
     type: LockableParameter,
-    callback: LockCallback<TDataSource>,
+    callback: LockCallback<TColumns, TUniques, TRelations, TParameters>,
   ): void {
     this._assertParameterUnlocked(type);
     this._afterLock[type].push(callback);
@@ -2064,7 +2105,7 @@ function joinMatches(
 /**
  * Apply a default order in case our default is not unique.
  */
-function ensureOrderIsUnique(plan: PgSelectPlan<any>) {
+function ensureOrderIsUnique(plan: PgSelectPlan<any, any, any, any>) {
   const uniqueColumns: string[] = plan.source.uniques[0];
   if (uniqueColumns) {
     const ordersIsUnique = plan.orderIsUnique();
@@ -2072,7 +2113,7 @@ function ensureOrderIsUnique(plan: PgSelectPlan<any>) {
       uniqueColumns.forEach((c) => {
         plan.orderBy({
           fragment: sql`${plan.alias}.${sql.identifier(c)}`,
-          codec: plan.source.columns[c].codec,
+          codec: plan.source.codec.columns[c].codec,
           direction: "ASC",
         });
       });
@@ -2081,9 +2122,18 @@ function ensureOrderIsUnique(plan: PgSelectPlan<any>) {
   }
 }
 
-export function pgSelect<TDataSource extends PgSource<any, any, any, any>>(
-  options: PgSelectOptions<TDataSource>,
-): PgSelectPlan<TDataSource> {
+export function pgSelect<
+  TColumns extends PgSourceColumns | undefined,
+  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TRelations extends {
+    [identifier: string]: TColumns extends PgSourceColumns
+      ? PgSourceRelation<TColumns, any>
+      : never;
+  },
+  TParameters extends { [key: string]: any } | never = never,
+>(
+  options: PgSelectOptions<TColumns>,
+): PgSelectPlan<TColumns, TUniques, TRelations, TParameters> {
   return new PgSelectPlan(options);
 }
 

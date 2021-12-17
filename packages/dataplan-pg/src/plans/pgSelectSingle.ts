@@ -1,13 +1,16 @@
-import type {
-  CrystalResultsList,
-  CrystalValuesList,
-  ObjectLikePlan,
-} from "graphile-crystal";
+import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
 import { ExecutablePlan } from "graphile-crystal";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { PgSource, PgSourceColumn, PgSourceRelation } from "../datasource";
+import type {
+  PgSource,
+  PgSourceColumn,
+  PgSourceColumns,
+  PgSourceRelation,
+  PgSourceRow,
+} from "../datasource";
+import { PgSourceBuilder } from "../datasource";
 import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
 import type { PgClassExpressionPlan } from "./pgClassExpression";
 import { pgClassExpression } from "./pgClassExpression";
@@ -21,7 +24,7 @@ import { PgSelectPlan } from "./pgSelect";
 // const debugExecuteVerbose = debugExecute.extend("verbose");
 
 export interface PgSelectSinglePlanOptions {
-  fromRelation?: [PgSelectSinglePlan<any>, string];
+  fromRelation?: [PgSelectSinglePlan<any, any, any, any>, string];
 }
 
 /**
@@ -34,30 +37,31 @@ export interface PgSelectSinglePlanOptions {
  * expressions.
  */
 export class PgSelectSinglePlan<
-    TDataSource extends PgSource<any, any, any, any>,
+    TColumns extends PgSourceColumns | undefined,
+    TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+    TRelations extends {
+      [identifier: string]: TColumns extends PgSourceColumns
+        ? PgSourceRelation<TColumns, any>
+        : never;
+    },
+    TParameters extends { [key: string]: any } | never = never,
   >
-  extends ExecutablePlan<TDataSource["TRow"]>
-  implements
-    PgTypedExecutablePlan<TDataSource["codec"]>,
-    ObjectLikePlan<{
-      [key in keyof TDataSource["TRow"]]: ExecutablePlan<
-        TDataSource["TRow"][key]
-      >;
-    }>
+  extends ExecutablePlan<PgSourceRow<TColumns>>
+  implements PgTypedExecutablePlan<PgTypeCodec<TColumns, any, any>>
 {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgSelectSinglePlan",
   };
 
-  public readonly pgCodec: TDataSource["codec"];
+  public readonly pgCodec: PgTypeCodec<TColumns, any, any>;
   public readonly itemPlanId: number;
   private classPlanId: number;
-  public readonly source: TDataSource;
+  public readonly source: PgSource<TColumns, TUniques, TRelations, TParameters>;
 
   constructor(
-    classPlan: PgSelectPlan<TDataSource>,
-    itemPlan: ExecutablePlan<TDataSource["TRow"]>,
+    classPlan: PgSelectPlan<TColumns, TUniques, TRelations, TParameters>,
+    itemPlan: ExecutablePlan<PgSourceRow<TColumns>>,
     private options: PgSelectSinglePlanOptions = Object.create(null),
   ) {
     super();
@@ -71,7 +75,12 @@ export class PgSelectSinglePlan<
     return this.source.name;
   }
 
-  public getClassPlan(): PgSelectPlan<TDataSource> {
+  public getClassPlan(): PgSelectPlan<
+    TColumns,
+    TUniques,
+    TRelations,
+    TParameters
+  > {
     if (this.aether.isOptimized(this)) {
       throw new Error(`Cannot ${this}.getClassPlan() after we're optimized.`);
     }
@@ -84,12 +93,19 @@ export class PgSelectSinglePlan<
     return plan;
   }
 
-  private getItemPlan(): ExecutablePlan<TDataSource["TRow"]> {
+  private getItemPlan(): ExecutablePlan<PgSourceRow<TColumns>> {
     const plan = this.getPlan(this.dependencies[this.itemPlanId]);
     return plan;
   }
 
-  getSelfNamed(): PgClassExpressionPlan<TDataSource, any> {
+  getSelfNamed(): PgClassExpressionPlan<
+    TColumns,
+    PgTypeCodec<TColumns, any, any>,
+    NonNullable<TColumns>,
+    TUniques,
+    TRelations,
+    TParameters
+  > {
     // Hack because I don't want to duplicate the code.
     return this.get("" as any);
   }
@@ -98,19 +114,32 @@ export class PgSelectSinglePlan<
    * Returns a plan representing a named attribute (e.g. column) from the class
    * (e.g. table).
    */
-  get<TAttr extends keyof TDataSource["columns"]>(
+  get<TAttr extends keyof TColumns>(
     attr: TAttr,
   ): PgClassExpressionPlan<
-    TDataSource,
-    TDataSource["columns"][TAttr]["codec"]
+    TColumns extends PgSourceColumns
+      ? TColumns[TAttr]["codec"]["columns"]
+      : never,
+    TColumns extends PgSourceColumns ? TColumns[TAttr]["codec"] : never,
+    NonNullable<TColumns>,
+    TUniques,
+    TRelations,
+    TParameters
   > {
+    if (!this.source.codec.columns) {
+      throw new Error(
+        "Cannot call .get() when the source codec has no columns to get.",
+      );
+    }
+    const thisSourceCodeColumns = this.source.codec
+      .columns as NonNullable<TColumns>;
     const classPlan = this.getClassPlan();
     // TODO: where do we do the SQL conversion, e.g. to_json for dates to
     // enforce ISO8601? Perhaps this should be the datasource itself, and
     // `attr` should be an SQL expression? This would allow for computed
     // fields/etc too (admittedly those without arguments).
-    const dataSourceColumn: PgSourceColumn =
-      this.source.columns[attr as string];
+    const dataSourceColumn: PgSourceColumn | undefined =
+      thisSourceCodeColumns[attr as string];
     if (!dataSourceColumn && attr !== "") {
       throw new Error(
         `${this.source} does not define an attribute named '${attr}'`,
@@ -143,7 +172,7 @@ export class PgSelectSinglePlan<
     if (this.options.fromRelation) {
       const [$fromPlan, fromRelationName] = this.options.fromRelation;
       const matchingColumn = (
-        Object.entries($fromPlan.source.columns) as Array<
+        Object.entries($fromPlan.source.codec.columns) as Array<
           [string, PgSourceColumn]
         >
       ).find(([name, col]) => {
@@ -175,37 +204,47 @@ export class PgSelectSinglePlan<
      */
 
     const sqlExpr = pgClassExpression(
-      this,
+      this as unknown as PgSelectSinglePlan<
+        NonNullable<TColumns>,
+        TUniques,
+        TRelations,
+        TParameters
+      >,
       attr === ""
         ? this.source.codec
-        : this.source.columns[attr as string].codec,
+        : this.source.codec.columns[attr as string].codec,
     );
     const colPlan = dataSourceColumn
       ? dataSourceColumn.expression
         ? sqlExpr`${sql.parens(dataSourceColumn.expression(classPlan.alias))}`
         : sqlExpr`${classPlan.alias}.${sql.identifier(String(attr))}`
       : sqlExpr`${classPlan.alias}.${classPlan.alias}`; /* self named */
-    return colPlan;
+    return colPlan as any;
   }
 
   public select(fragment: SQL): number {
     return this.getClassPlan().select(fragment);
   }
 
-  public placeholder($plan: PgTypedExecutablePlan): SQL;
+  public placeholder($plan: PgTypedExecutablePlan<any>): SQL;
   public placeholder($plan: ExecutablePlan<any>, type: SQL): SQL;
   public placeholder(
-    $plan: ExecutablePlan<any> | PgTypedExecutablePlan,
+    $plan: ExecutablePlan<any> | PgTypedExecutablePlan<any>,
     overrideType?: SQL,
   ): SQL {
     return overrideType
       ? this.getClassPlan().placeholder($plan, overrideType)
-      : this.getClassPlan().placeholder($plan as PgTypedExecutablePlan);
+      : this.getClassPlan().placeholder($plan as PgTypedExecutablePlan<any>);
   }
 
-  private existingSingleRelation<
-    TRelationName extends Parameters<TDataSource["getRelation"]>[0],
-  >(relationIdentifier: TRelationName): PgSelectSinglePlan<any> | null {
+  private existingSingleRelation<TRelationName extends keyof TRelations>(
+    relationIdentifier: TRelationName,
+  ): PgSelectSinglePlan<
+    TRelations[TRelationName]["source"]["TColumns"],
+    TRelations[TRelationName]["source"]["TUniques"],
+    TRelations[TRelationName]["source"]["TRelations"],
+    TRelations[TRelationName]["source"]["TParameters"]
+  > | null {
     if (this.options.fromRelation) {
       const [$fromPlan, fromRelationName] = this.options.fromRelation;
       // check to see if we already came via this relationship
@@ -226,70 +265,123 @@ export class PgSelectSinglePlan<
     return null;
   }
 
-  public singleRelation<
-    TRelationName extends Parameters<TDataSource["getRelation"]>[0],
-  >(relationIdentifier: TRelationName): PgSelectSinglePlan<any> {
+  public singleRelation<TRelationName extends keyof TRelations>(
+    relationIdentifier: TRelationName,
+  ): PgSelectSinglePlan<
+    TRelations[TRelationName]["source"]["TColumns"],
+    TRelations[TRelationName]["source"]["TUniques"],
+    TRelations[TRelationName]["source"]["TRelations"],
+    TRelations[TRelationName]["source"]["TParameters"]
+  > {
     const $existingPlan = this.existingSingleRelation(relationIdentifier);
     if ($existingPlan) {
       return $existingPlan;
     }
-    const relation = this.source.getRelation(relationIdentifier as string);
+    const relation = this.source.getRelation(relationIdentifier);
     if (!relation || !relation.isUnique) {
       throw new Error(
         `${relationIdentifier} is not a unique relation on ${this.source}`,
       );
     }
-    const relationSource = relation.source as PgSource<any, any, any, any, any>;
-    const remoteColumns = relation.remoteColumns as string[];
-    const localColumns = relation.localColumns as string[];
+    const rawRelationSource = relation.source;
+    const relationSource =
+      rawRelationSource instanceof PgSourceBuilder
+        ? rawRelationSource.get()
+        : rawRelationSource;
+    const remoteColumns = relation.remoteColumns;
+    const localColumns = relation.localColumns;
 
     const options: PgSelectSinglePlanOptions = {
       fromRelation: [this, relationIdentifier as string],
     };
     return relationSource.get(
       remoteColumns.reduce((memo, remoteColumn, columnIndex) => {
-        memo[remoteColumn] = this.get(localColumns[columnIndex]);
+        memo[remoteColumn] = this.get(
+          localColumns[columnIndex] as keyof TColumns,
+        );
         return memo;
       }, Object.create(null)),
       options,
     );
   }
 
-  public manyRelation<
-    TRelationName extends Parameters<TDataSource["getRelation"]>[0],
-  >(relationIdentifier: TRelationName): PgSelectPlan<any> {
-    const relation = this.source.getRelation(relationIdentifier as string);
+  public manyRelation<TRelationName extends keyof TRelations>(
+    relationIdentifier: TRelationName,
+  ): PgSelectPlan<
+    TRelations[TRelationName]["source"]["TColumns"],
+    TRelations[TRelationName]["source"]["TUniques"],
+    TRelations[TRelationName]["source"]["TRelations"],
+    TRelations[TRelationName]["source"]["TParameters"]
+  > {
+    const relation = this.source.getRelation(relationIdentifier);
     if (!relation) {
       throw new Error(
         `${relationIdentifier} is not a relation on ${this.source}`,
       );
     }
-    const relationSource = relation.source as PgSource<any, any, any, any, any>;
-    const remoteColumns = relation.remoteColumns as string[];
-    const localColumns = relation.localColumns as string[];
+    const rawRelationSource = relation.source;
+    const relationSource =
+      rawRelationSource instanceof PgSourceBuilder
+        ? rawRelationSource.get()
+        : rawRelationSource;
+    const remoteColumns = relation.remoteColumns;
+    const localColumns = relation.localColumns;
 
     return relationSource.find(
       remoteColumns.reduce((memo, remoteColumn, columnIndex) => {
-        memo[remoteColumn] = this.get(localColumns[columnIndex]);
+        memo[remoteColumn] = this.get(
+          localColumns[columnIndex] as keyof TColumns,
+        );
         return memo;
       }, Object.create(null)),
     );
   }
 
-  record(): PgClassExpressionPlan<TDataSource, TDataSource["codec"]> {
-    return pgClassExpression(this, this.source.codec)`${
-      this.getClassPlan().alias
-    }`;
+  record(): PgClassExpressionPlan<
+    TColumns,
+    PgTypeCodec<TColumns, any, any>,
+    NonNullable<TColumns>,
+    TUniques,
+    TRelations,
+    TParameters
+  > {
+    return pgClassExpression(
+      this as unknown as PgSelectSinglePlan<
+        NonNullable<TColumns>,
+        TUniques,
+        TRelations,
+        TParameters
+      >,
+      this.source.codec,
+    )`${this.getClassPlan().alias}`;
   }
 
   /**
    * Returns a plan representing the result of an expression.
    */
-  expression<TCodec extends PgTypeCodec>(
+  expression<
+    TExpressionColumns extends PgSourceColumns | undefined,
+    TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any>,
+  >(
     expression: SQL,
-    codec: TCodec,
-  ): PgClassExpressionPlan<TDataSource, TCodec> {
-    return pgClassExpression(this, codec)`${expression}`;
+    codec: TExpressionCodec,
+  ): PgClassExpressionPlan<
+    TExpressionColumns,
+    TExpressionCodec,
+    NonNullable<TColumns>,
+    TUniques,
+    TRelations,
+    TParameters
+  > {
+    return pgClassExpression(
+      this as unknown as PgSelectSinglePlan<
+        NonNullable<TColumns>,
+        TUniques,
+        TRelations,
+        TParameters
+      >,
+      codec,
+    )`${expression}`;
   }
 
   /**
@@ -297,14 +389,14 @@ export class PgSelectSinglePlan<
    * cursor is built from the values of the `ORDER BY` clause so that we can
    * find nodes before/after it.
    */
-  public cursor(): PgCursorPlan<TDataSource> {
-    const cursorPlan = new PgCursorPlan<TDataSource>(this);
+  public cursor(): PgCursorPlan<this> {
+    const cursorPlan = new PgCursorPlan<this>(this);
     return cursorPlan;
   }
 
   deduplicate(
-    peers: PgSelectSinglePlan<any>[],
-  ): PgSelectSinglePlan<TDataSource> {
+    peers: PgSelectSinglePlan<any, any, any, any>[],
+  ): PgSelectSinglePlan<TColumns, TUniques, TRelations, TParameters> {
     const identicalPeer = peers.find((peer) => {
       if (peer.source !== this.source) {
         return false;
@@ -327,20 +419,34 @@ export class PgSelectSinglePlan<
   }
 
   execute(
-    values: CrystalValuesList<[TDataSource["TRow"]]>,
-  ): CrystalResultsList<TDataSource["TRow"]> {
+    values: CrystalValuesList<[PgSourceRow<TColumns>]>,
+  ): CrystalResultsList<PgSourceRow<TColumns>> {
     return values.map((value) => value[this.itemPlanId]);
   }
 }
 
 export function pgSelectSingleFromRecord<
-  TDataSource extends PgSource<any, any, any, any>,
+  TColumns extends PgSourceColumns,
+  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TRelations extends {
+    [identifier: string]: TColumns extends PgSourceColumns
+      ? PgSourceRelation<TColumns, any>
+      : never;
+  },
+  TParameters extends { [key: string]: any } | never = never,
 >(
-  source: TDataSource,
-  record: PgClassExpressionPlan<TDataSource, TDataSource["codec"]>,
-): PgSelectSinglePlan<TDataSource> {
+  source: PgSource<TColumns, TUniques, TRelations, TParameters>,
+  record: PgClassExpressionPlan<
+    TColumns,
+    PgTypeCodec<TColumns, any, any>,
+    TColumns,
+    TUniques,
+    TRelations,
+    TParameters
+  >,
+): PgSelectSinglePlan<TColumns, TUniques, TRelations, TParameters> {
   // TODO: we should be able to optimise this so that `plan.record()` returns the original record again.
-  return new PgSelectPlan({
+  return new PgSelectPlan<TColumns, TUniques, TRelations, TParameters>({
     source,
     identifiers: [],
     from: (record) => sql`(select (${record}).*)`,

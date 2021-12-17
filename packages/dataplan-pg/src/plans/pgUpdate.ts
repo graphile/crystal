@@ -4,7 +4,13 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 import { inspect } from "util";
 
-import type { PgSource, PgSourceColumn } from "../datasource";
+import type {
+  PgSource,
+  PgSourceColumn,
+  PgSourceColumns,
+  PgSourceRelation,
+  PgSourceRow,
+} from "../datasource";
 import type {
   PgTypeCodec,
   PgTypedExecutablePlan,
@@ -30,8 +36,14 @@ interface PgUpdatePlanFinalizeResults {
 }
 
 export class PgUpdatePlan<
-  TDataSource extends PgSource<any, any, any, any, any>,
-> extends ExecutablePlan<TDataSource["TRow"]> {
+  TColumns extends PgSourceColumns,
+  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TRelations extends {
+    [identifier: string]: TColumns extends PgSourceColumns
+      ? PgSourceRelation<TColumns, any>
+      : never;
+  },
+> extends ExecutablePlan<PgSourceRow<TColumns>> {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgUpdatePlan",
@@ -43,7 +55,7 @@ export class PgUpdatePlan<
    * Tells us what we're dealing with - data type, columns, where to update it,
    * what it's called, etc.
    */
-  public readonly source: TDataSource;
+  public readonly source: PgSource<TColumns, TUniques, TRelations>;
 
   /**
    * This defaults to the name of the source but you can override it. Aids
@@ -64,18 +76,18 @@ export class PgUpdatePlan<
    * The columns and their dependency ids for us to find the record by.
    */
   private getBys: Array<{
-    name: keyof TDataSource["columns"];
+    name: keyof TColumns;
     depId: number;
-    pgCodec: PgTypeCodec;
+    pgCodec: PgTypeCodec<any, any, any>;
   }> = [];
 
   /**
    * The columns and their dependency ids for us to update.
    */
   private columns: Array<{
-    name: keyof TDataSource["columns"];
+    name: keyof TColumns;
     depId: number;
-    pgCodec: PgTypeCodec;
+    pgCodec: PgTypeCodec<any, any, any>;
   }> = [];
 
   /**
@@ -100,11 +112,11 @@ export class PgUpdatePlan<
   private selects: Array<SQL> = [];
 
   constructor(
-    source: TDataSource,
-    getBy: PlanByUniques<TDataSource["columns"], TDataSource["uniques"]>,
+    source: PgSource<TColumns, TUniques, TRelations>,
+    getBy: PlanByUniques<TColumns, TUniques>,
     columns?: {
-      [key in keyof TDataSource["columns"]]?:
-        | PgTypedExecutablePlan<TDataSource["columns"][key]["codec"]>
+      [key in keyof TColumns]?:
+        | PgTypedExecutablePlan<TColumns[key]["codec"]>
         | ExecutablePlan<any>;
     },
   ) {
@@ -115,11 +127,10 @@ export class PgUpdatePlan<
     this.alias = sql.identifier(this.symbol);
     this.contextId = this.addDependency(this.source.context());
 
-    const keys: ReadonlyArray<keyof TDataSource["columns"]> =
-      Object.keys(getBy);
+    const keys: ReadonlyArray<keyof TColumns> = Object.keys(getBy);
 
     if (
-      !this.source.uniques.some((uniq: string[]) =>
+      !this.source.uniques.some((uniq) =>
         uniq.every((key) => keys.includes(key)),
       )
     ) {
@@ -142,7 +153,7 @@ export class PgUpdatePlan<
       }
       const value = getBy[name];
       const depId = this.addDependency(value);
-      const column = this.source.columns[name] as PgSourceColumn;
+      const column = this.source.codec.columns[name] as PgSourceColumn;
       const pgCodec = column.codec;
       this.getBys.push({ name, depId, pgCodec });
     });
@@ -156,11 +167,9 @@ export class PgUpdatePlan<
     }
   }
 
-  set<TKey extends keyof TDataSource["columns"]>(
+  set<TKey extends keyof TColumns>(
     name: TKey,
-    value:
-      | PgTypedExecutablePlan<TDataSource["columns"][TKey]["codec"]>
-      | ExecutablePlan<any>,
+    value: PgTypedExecutablePlan<TColumns[TKey]["codec"]> | ExecutablePlan<any>,
   ): void {
     if (this.locked) {
       throw new Error("Cannot set after plan is locked.");
@@ -172,7 +181,9 @@ export class PgUpdatePlan<
         );
       }
     }
-    const { codec: pgCodec } = this.source.columns[name] as PgSourceColumn;
+    const { codec: pgCodec } = this.source.codec.columns[
+      name
+    ] as PgSourceColumn;
     const depId = this.addDependency(value);
     this.columns.push({ name, depId, pgCodec });
   }
@@ -181,14 +192,17 @@ export class PgUpdatePlan<
    * Returns a plan representing a named attribute (e.g. column) from the newly
    * updateed row.
    */
-  get<TAttr extends keyof TDataSource["TRow"]>(
+  get<TAttr extends keyof TColumns>(
     attr: TAttr,
   ): PgClassExpressionPlan<
-    TDataSource,
-    TDataSource["columns"][TAttr]["codec"]
+    TColumns[TAttr]["codec"]["columns"],
+    TColumns[TAttr]["codec"],
+    TColumns,
+    TUniques,
+    TRelations
   > {
     const dataSourceColumn: PgSourceColumn =
-      this.source.columns[attr as string];
+      this.source.codec.columns[attr as string];
     if (!dataSourceColumn) {
       throw new Error(
         `${this.source} does not define an attribute named '${attr}'`,
@@ -217,7 +231,13 @@ export class PgUpdatePlan<
     return colPlan;
   }
 
-  public record(): PgClassExpressionPlan<TDataSource, TDataSource["codec"]> {
+  public record(): PgClassExpressionPlan<
+    TColumns,
+    PgTypeCodec<TColumns, any, any>,
+    TColumns,
+    TUniques,
+    TRelations
+  > {
     return pgClassExpression(this, this.source.codec)`${this.alias}`;
   }
 
@@ -390,15 +410,23 @@ export class PgUpdatePlan<
   }
 }
 
-export function pgUpdate<TDataSource extends PgSource<any, any, any, any, any>>(
-  source: TDataSource,
-  getBy: PlanByUniques<TDataSource["columns"], TDataSource["uniques"]>,
+export function pgUpdate<
+  TColumns extends PgSourceColumns,
+  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TRelations extends {
+    [identifier: string]: TColumns extends PgSourceColumns
+      ? PgSourceRelation<TColumns, any>
+      : never;
+  },
+>(
+  source: PgSource<TColumns, TUniques, TRelations>,
+  getBy: PlanByUniques<TColumns, TUniques>,
   columns?: {
-    [key in keyof TDataSource["columns"]]?:
-      | PgTypedExecutablePlan<TDataSource["columns"][key]["codec"]>
+    [key in keyof TColumns]?:
+      | PgTypedExecutablePlan<TColumns[key]["codec"]>
       | ExecutablePlan<any>;
   },
-): PgUpdatePlan<TDataSource> {
+): PgUpdatePlan<TColumns, TUniques, TRelations> {
   return new PgUpdatePlan(source, getBy, columns);
 }
 

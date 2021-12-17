@@ -3,7 +3,7 @@ import sql from "pg-sql2";
 
 import type { PgSourceColumns } from "./datasource";
 import { exportAs } from "./exportAs";
-import type { PgEnumTypeCodec, PgTypeCodec } from "./interfaces";
+import type { PgEncode, PgEnumTypeCodec, PgTypeCodec } from "./interfaces";
 
 // TODO: optimisation: `identity` can be shortcut
 const identity = <T>(value: T): T => value;
@@ -27,7 +27,7 @@ const pg2gqlForType = (type: "bool" | "timestamptz" | "timestamp" | string) => {
   }
 };
 
-const gql2pgForType = (type: string): PgTypeCodec["toPg"] => {
+const gql2pgForType = (type: string): PgEncode<any> => {
   switch (type) {
     case "jsonb":
     case "json": {
@@ -41,18 +41,19 @@ const gql2pgForType = (type: string): PgTypeCodec["toPg"] => {
 
 function t<TCanonical = any, TInput = TCanonical>(
   type: string,
-): PgTypeCodec<TCanonical, TInput> {
+): PgTypeCodec<undefined, TCanonical, TInput> {
   return {
     sqlType: sql.identifier(...type.split(".")),
     fromPg: pg2gqlForType(type),
     toPg: gql2pgForType(type),
+    columns: undefined,
   };
 }
 
 export function recordType<TColumns extends PgSourceColumns>(
   identifier: SQL,
   columns: TColumns,
-): PgTypeCodec<string, string, TColumns> {
+): PgTypeCodec<TColumns, string, string> {
   return {
     sqlType: identifier,
     fromPg: identity,
@@ -71,6 +72,7 @@ export function enumType<TValue extends string>(
     fromPg: identity,
     toPg: identity,
     values,
+    columns: undefined,
   };
 }
 exportAs(enumType, "enumType");

@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 
+import { crystalPrint } from "graphile-crystal";
 import type { WithPgClient } from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import chalk from "chalk";
@@ -14,6 +15,7 @@ import { exportSchema } from "graphile-exporter";
 import { resolvePresets } from "graphile-plugin";
 import { graphql, printSchema } from "graphql";
 import { Pool } from "pg";
+import { inspect } from "util";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 
@@ -52,7 +54,9 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     },
   ]);
   const input = await gather(config);
-  console.dir(input);
+  console.log(
+    input.pgSources.map((s) => crystalPrint((s as any).options)).join("\n"),
+  );
   const schema = buildSchema(config, input);
   if (Math.random() < 2) process.exit(1);
 

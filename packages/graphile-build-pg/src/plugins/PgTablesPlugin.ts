@@ -7,13 +7,12 @@ import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
 import sql from "pg-sql2";
 
 import { version } from "../index";
-import type { PgTypeCodec } from "../interfaces";
 import type { PgClass } from "../introspection";
 
 declare global {
   namespace GraphileEngine {
     interface BuildInput {
-      pgSources: PgSource<any, any, any, any>[];
+      pgSources: PgSource<any, any, any>[];
     }
   }
 }
@@ -35,7 +34,7 @@ declare module "graphile-plugin" {
 }
 
 interface State {
-  sources: PgSource<any, any, any, any>[];
+  sources: PgSource<any, any, any>[];
 }
 
 export const PgTablesPlugin: Plugin = {

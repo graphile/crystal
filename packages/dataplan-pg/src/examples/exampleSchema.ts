@@ -16,7 +16,6 @@ import type {
 import {
   __ValuePlan,
   aether,
-  BasePlan,
   constant,
   context,
   crystalEnforce,
@@ -24,7 +23,6 @@ import {
   getEnumValueConfig,
   lambda,
   list,
-  ModifierPlan,
   newGraphileFieldConfigBuilder,
   newInputObjectTypeBuilder,
   newObjectTypeBuilder,
@@ -59,7 +57,6 @@ import type {
   PgSelectPlan,
   PgSourceColumn,
   PgSourceColumnVia,
-  PgSourceRelation,
   PgSubscriber,
   PgTypeCodec,
   WithPgClient,
@@ -89,10 +86,11 @@ import {
   recordType,
   TYPES,
 } from "../../src";
+import type { PgSourceColumns } from "../datasource";
 
 declare module "../../src" {
   interface PgEnumSourceExtensions {
-    tableSource?: PgSource<any, any, any, any, any>;
+    tableSource?: PgSource<any, any, any, any>;
   }
 }
 
@@ -131,63 +129,128 @@ export function makeExampleSchema(
   options: { deoptimize?: boolean } = Object.create(null),
 ): GraphQLSchema {
   const deoptimizeIfAppropriate = EXPORTABLE(
-    (options) => (plan: PgSelectPlan<any> | PgSelectSinglePlan<any>) => {
-      if (options.deoptimize) {
-        if ("getClassPlan" in plan) {
-          plan.getClassPlan().setInliningForbidden();
-        } else {
-          plan.setInliningForbidden();
+    (options) =>
+      (
+        plan:
+          | PgSelectPlan<any, any, any, any>
+          | PgSelectSinglePlan<any, any, any, any>,
+      ) => {
+        if (options.deoptimize) {
+          if ("getClassPlan" in plan) {
+            plan.getClassPlan().setInliningForbidden();
+          } else {
+            plan.setInliningForbidden();
+          }
         }
-      }
-      return plan;
-    },
+        return plan;
+      },
     [options],
   );
-  // type MessagesPlan = PgSelectPlan<typeof messageSource>;
-  type MessageConnectionPlan = PgConnectionPlan<typeof messageSource>;
-  type MessagePlan = PgSelectSinglePlan<typeof messageSource>;
-  // type UsersPlan = PgSelectPlan<typeof userSource>;
-  type UserPlan = PgSelectSinglePlan<typeof userSource>;
-  // type ForumsPlan = PgSelectPlan<typeof forumSource>;
-  type ForumPlan = PgSelectSinglePlan<typeof forumSource>;
-  type PersonPlan = PgSelectSinglePlan<typeof personSource>;
-  type PersonBookmarkPlan = PgSelectSinglePlan<typeof personBookmarksSource>;
-  type PostPlan = PgSelectSinglePlan<typeof postSource>;
-  type CommentPlan = PgSelectSinglePlan<typeof commentSource>;
-  type SingleTableItemsPlan = PgSelectPlan<typeof singleTableItemsSource>;
-  type SingleTableItemPlan = PgSelectSinglePlan<typeof singleTableItemsSource>;
-  type RelationalItemsPlan = PgSelectPlan<typeof relationalItemsSource>;
-  type RelationalItemPlan = PgSelectSinglePlan<typeof relationalItemsSource>;
-  type RelationalTopicPlan = PgSelectSinglePlan<typeof relationalTopicsSource>;
-  type RelationalPostPlan = PgSelectSinglePlan<typeof relationalPostsSource>;
-  type RelationalDividerPlan = PgSelectSinglePlan<
+  type PgSelectPlanFromSource<TSource extends PgSource<any, any, any, any>> =
+    PgSelectPlan<
+      TSource["TColumns"],
+      TSource["TUniques"],
+      TSource["TRelations"],
+      TSource["TParameters"]
+    >;
+  type PgSelectSinglePlanFromSource<
+    TSource extends PgSource<any, any, any, any>,
+  > = PgSelectSinglePlan<
+    TSource["TColumns"],
+    TSource["TUniques"],
+    TSource["TRelations"],
+    TSource["TParameters"]
+  >;
+  type PgConnectionPlanFromSource<
+    TSource extends PgSource<any, any, any, any>,
+  > = PgConnectionPlan<
+    TSource["TColumns"],
+    TSource["TUniques"],
+    TSource["TRelations"],
+    TSource["TParameters"]
+  >;
+  type PgInsertPlanFromSource<TSource extends PgSource<any, any, any, any>> =
+    PgInsertPlan<
+      TSource["TColumns"],
+      TSource["TUniques"],
+      TSource["TRelations"]
+    >;
+  type PgUpdatePlanFromSource<TSource extends PgSource<any, any, any, any>> =
+    PgUpdatePlan<
+      TSource["TColumns"],
+      TSource["TUniques"],
+      TSource["TRelations"]
+    >;
+  type PgDeletePlanFromSource<TSource extends PgSource<any, any, any, any>> =
+    PgDeletePlan<
+      TSource["TColumns"],
+      TSource["TUniques"],
+      TSource["TRelations"]
+    >;
+
+  // type MessagesPlan = PgSelectPlanFromSource<typeof messageSource>;
+  type MessageConnectionPlan = PgConnectionPlanFromSource<typeof messageSource>;
+  type MessagePlan = PgSelectSinglePlanFromSource<typeof messageSource>;
+  // type UsersPlan = PgSelectPlanFromSource<typeof userSource>;
+  type UserPlan = PgSelectSinglePlanFromSource<typeof userSource>;
+  // type ForumsPlan = PgSelectPlanFromSource<typeof forumSource>;
+  type ForumPlan = PgSelectSinglePlanFromSource<typeof forumSource>;
+  type PersonPlan = PgSelectSinglePlanFromSource<typeof personSource>;
+  type PersonBookmarkPlan = PgSelectSinglePlanFromSource<
+    typeof personBookmarksSource
+  >;
+  type PostPlan = PgSelectSinglePlanFromSource<typeof postSource>;
+  type CommentPlan = PgSelectSinglePlanFromSource<typeof commentSource>;
+  type SingleTableItemsPlan = PgSelectPlanFromSource<
+    typeof singleTableItemsSource
+  >;
+  type SingleTableItemPlan = PgSelectSinglePlanFromSource<
+    typeof singleTableItemsSource
+  >;
+  type RelationalItemsPlan = PgSelectPlanFromSource<
+    typeof relationalItemsSource
+  >;
+  type RelationalItemPlan = PgSelectSinglePlanFromSource<
+    typeof relationalItemsSource
+  >;
+  type RelationalTopicPlan = PgSelectSinglePlanFromSource<
+    typeof relationalTopicsSource
+  >;
+  type RelationalPostPlan = PgSelectSinglePlanFromSource<
+    typeof relationalPostsSource
+  >;
+  type RelationalDividerPlan = PgSelectSinglePlanFromSource<
     typeof relationalDividersSource
   >;
-  type RelationalChecklistPlan = PgSelectSinglePlan<
+  type RelationalChecklistPlan = PgSelectSinglePlanFromSource<
     typeof relationalChecklistsSource
   >;
-  type RelationalChecklistItemPlan = PgSelectSinglePlan<
+  type RelationalChecklistItemPlan = PgSelectSinglePlanFromSource<
     typeof relationalChecklistItemsSource
   >;
-  type UnionItemsPlan = PgSelectPlan<typeof unionItemsSource>;
-  type UnionItemPlan = PgSelectSinglePlan<typeof unionItemsSource>;
-  type UnionTopicPlan = PgSelectSinglePlan<typeof unionTopicsSource>;
-  type UnionPostPlan = PgSelectSinglePlan<typeof unionPostsSource>;
-  type UnionDividerPlan = PgSelectSinglePlan<typeof unionDividersSource>;
-  type UnionChecklistPlan = PgSelectSinglePlan<typeof unionChecklistsSource>;
-  type UnionChecklistItemPlan = PgSelectSinglePlan<
+  type UnionItemsPlan = PgSelectPlanFromSource<typeof unionItemsSource>;
+  type UnionItemPlan = PgSelectSinglePlanFromSource<typeof unionItemsSource>;
+  type UnionTopicPlan = PgSelectSinglePlanFromSource<typeof unionTopicsSource>;
+  type UnionPostPlan = PgSelectSinglePlanFromSource<typeof unionPostsSource>;
+  type UnionDividerPlan = PgSelectSinglePlanFromSource<
+    typeof unionDividersSource
+  >;
+  type UnionChecklistPlan = PgSelectSinglePlanFromSource<
+    typeof unionChecklistsSource
+  >;
+  type UnionChecklistItemPlan = PgSelectSinglePlanFromSource<
     typeof unionChecklistItemsSource
   >;
-  type RelationalCommentablesPlan = PgSelectPlan<
+  type RelationalCommentablesPlan = PgSelectPlanFromSource<
     typeof relationalCommentableSource
   >;
-  type RelationalCommentablePlan = PgSelectSinglePlan<
+  type RelationalCommentablePlan = PgSelectSinglePlanFromSource<
     typeof relationalCommentableSource
   >;
 
   const col = <
     TOptions extends {
-      codec: PgTypeCodec;
+      codec: PgTypeCodec<any, any, any>;
       notNull?: boolean;
       expression?: PgSourceColumn<any>["expression"];
       // TODO: we could make TypeScript understand the relations on the object
@@ -283,7 +346,6 @@ export function makeExampleSchema(
         source: (...args) =>
           sql`app_public.unique_author_count(${sql.join(args, ", ")})`,
         name: "unique_author_count",
-        columns: null,
       }),
     [PgSource, TYPES, executor, sql],
   );
@@ -296,7 +358,6 @@ export function makeExampleSchema(
         source: (...args) =>
           sql`app_public.forums_unique_author_count(${sql.join(args, ", ")})`,
         name: "forums_unique_author_count",
-        columns: null,
       }),
     [PgSource, TYPES, executor, sql],
   );
@@ -308,7 +369,6 @@ export function makeExampleSchema(
         codec: TYPES.text,
         source: sql`(select '')`,
         name: "text",
-        columns: null,
       }),
     [PgSource, TYPES, executor, sql],
   );
@@ -320,7 +380,6 @@ export function makeExampleSchema(
         codec: recordType(sql`app_public.messages`, messageColumns),
         source: sql`app_public.messages`,
         name: "messages",
-        columns: messageColumns,
         uniques: [["id"]],
       }),
     [PgSourceBuilder, executor, messageColumns, recordType, sql],
@@ -333,7 +392,6 @@ export function makeExampleSchema(
         codec: recordType(sql`app_public.users`, userColumns),
         source: sql`app_public.users`,
         name: "users",
-        columns: userColumns,
         uniques: [["id"], ["username"]],
       }),
     [PgSource, executor, recordType, sql, userColumns],
@@ -346,7 +404,6 @@ export function makeExampleSchema(
         codec: recordType(sql`app_public.forums`, forumColumns),
         source: sql`app_public.forums`,
         name: "forums",
-        columns: forumColumns,
         uniques: [["id"]],
       }),
     [PgSource, executor, forumColumns, recordType, sql],
@@ -440,7 +497,6 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.person_bookmarks`,
         name: "person_bookmarks",
-        columns: personBookmarkColumns,
         uniques: [["id"]],
       }),
     [PgSourceBuilder, executor, personBookmarkColumns, recordType, sql],
@@ -461,7 +517,6 @@ export function makeExampleSchema(
         codec: recordType(sql`interfaces_and_unions.people`, personColumns),
         source: sql`interfaces_and_unions.people`,
         name: "people",
-        columns: personColumns,
         uniques: [["person_id"], ["username"]],
       }),
     [PgSourceBuilder, executor, personColumns, recordType, sql],
@@ -487,7 +542,6 @@ export function makeExampleSchema(
         codec: recordType(sql`interfaces_and_unions.posts`, postColumns),
         source: sql`interfaces_and_unions.posts`,
         name: "posts",
-        columns: postColumns,
         uniques: [["post_id"]],
       }),
     [PgSourceBuilder, executor, postColumns, recordType, sql],
@@ -518,7 +572,6 @@ export function makeExampleSchema(
         codec: recordType(sql`interfaces_and_unions.comments`, commentColumns),
         source: sql`interfaces_and_unions.comments`,
         name: "comments",
-        columns: commentColumns,
         uniques: [["comment_id"]],
       }),
     [PgSourceBuilder, commentColumns, executor, recordType, sql],
@@ -562,7 +615,6 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.enum_table_item_type`,
         name: "enum_table_item_type",
-        columns: enumTablesItemTypeColumns,
         uniques: [["type"]],
       }),
     [PgSourceBuilder, enumTablesItemTypeColumns, executor, recordType, sql],
@@ -647,7 +699,6 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.single_table_items`,
         name: "single_table_items",
-        columns: singleTableItemColumns,
         uniques: [["id"]],
       }),
     [PgSourceBuilder, executor, recordType, singleTableItemColumns, sql],
@@ -821,7 +872,6 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.relational_items`,
         name: "relational_items",
-        columns: relationalItemColumns,
         uniques: [["id"]],
       }),
     [PgSourceBuilder, executor, recordType, relationalItemColumns, sql],
@@ -858,7 +908,6 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.relational_commentables`,
         name: "relational_commentables",
-        columns: relationalCommentableColumns,
       }),
     [PgSourceBuilder, executor, recordType, relationalCommentableColumns, sql],
   );
@@ -951,7 +1000,6 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.relational_topics`,
         name: "relational_topics",
-        columns: relationalTopicsColumns,
         uniques: [["id"]],
       }),
     [PgSourceBuilder, executor, recordType, relationalTopicsColumns, sql],
@@ -977,7 +1025,6 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.relational_posts`,
         name: "relational_posts",
-        columns: relationalPostsColumns,
         uniques: [["id"]],
       }),
     [PgSourceBuilder, executor, recordType, relationalPostsColumns, sql],
@@ -1002,7 +1049,6 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.relational_dividers`,
         name: "relational_dividers",
-        columns: relationalDividersColumns,
         uniques: [["id"]],
       }),
     [PgSourceBuilder, executor, recordType, relationalDividersColumns, sql],
@@ -1026,7 +1072,6 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.relational_checklists`,
         name: "relational_checklists",
-        columns: relationalChecklistsColumns,
         uniques: [["id"]],
       }),
     [PgSourceBuilder, executor, recordType, relationalChecklistsColumns, sql],
@@ -1057,7 +1102,6 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.relational_checklist_items`,
         name: "relational_checklist_items",
-        columns: relationalChecklistItemsColumns,
         uniques: [["id"]],
       }),
     [
@@ -1262,7 +1306,6 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.union_items`,
         name: "union_items",
-        columns: unionItemsColumns,
         uniques: [["id"]],
       }),
     [PgSourceBuilder, executor, recordType, sql, unionItemsColumns],
@@ -1285,7 +1328,6 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.union_topics`,
         name: "union_topics",
-        columns: unionTopicsColumns,
         uniques: [["id"]],
       }),
     [PgSource, executor, recordType, sql, unionTopicsColumns],
@@ -1310,7 +1352,6 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.union_posts`,
         name: "union_posts",
-        columns: unionPostsColumns,
         uniques: [["id"]],
       }),
     [PgSource, executor, recordType, sql, unionPostsColumns],
@@ -1334,7 +1375,6 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.union_dividers`,
         name: "union_dividers",
-        columns: unionDividersColumns,
         uniques: [["id"]],
       }),
     [PgSource, executor, recordType, sql, unionDividersColumns],
@@ -1357,7 +1397,6 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.union_checklists`,
         name: "union_checklists",
-        columns: unionChecklistsColumns,
         uniques: [["id"]],
       }),
     [PgSource, executor, recordType, sql, unionChecklistsColumns],
@@ -1381,7 +1420,6 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.union_checklist_items`,
         name: "union_checklist_items",
-        columns: unionChecklistItemsColumns,
         uniques: [["id"]],
       }),
     [PgSource, executor, recordType, sql, unionChecklistItemsColumns],
@@ -1397,7 +1435,6 @@ export function makeExampleSchema(
         ),
         source: sql`(select null::interfaces_and_unions.union__entity)`,
         name: "union__entity",
-        columns: unionEntityColumns,
       }),
     [PgSource, executor, recordType, sql, unionEntityColumns],
   );
@@ -1465,15 +1502,15 @@ export function makeExampleSchema(
     ],
   );
 
-  function attrField<TDataSource extends PgSource<any, any, any, any>>(
-    attrName: keyof TDataSource["columns"],
+  function attrField<TColumns extends PgSourceColumns>(
+    attrName: keyof TColumns,
     type: GraphQLOutputType,
   ) {
     return {
       type,
       plan: EXPORTABLE(
         (attrName) =>
-          function plan($entity: PgSelectSinglePlan<TDataSource>) {
+          function plan($entity: PgSelectSinglePlan<any, any, any, any>) {
             return $entity.get(attrName);
           },
         [attrName],
@@ -1489,7 +1526,7 @@ export function makeExampleSchema(
       type,
       plan: EXPORTABLE(
         (deoptimizeIfAppropriate, relation) =>
-          function plan($entity: PgSelectSinglePlan<TMyDataSource>) {
+          function plan($entity: PgSelectSinglePlanFromSource<TMyDataSource>) {
             const $plan = $entity.singleRelation(relation);
             deoptimizeIfAppropriate($plan);
             return $plan;
@@ -1658,13 +1695,14 @@ export function makeExampleSchema(
         extensions: {
           graphile: {
             plan: EXPORTABLE(
-              (TYPES, sql) => (plan: PgSelectPlan<typeof messageSource>) => {
-                plan.orderBy({
-                  codec: TYPES.text,
-                  fragment: sql`${plan.alias}.body`,
-                  direction: "ASC",
-                });
-              },
+              (TYPES, sql) =>
+                (plan: PgSelectPlanFromSource<typeof messageSource>) => {
+                  plan.orderBy({
+                    codec: TYPES.text,
+                    fragment: sql`${plan.alias}.body`,
+                    direction: "ASC",
+                  });
+                },
               [TYPES, sql],
             ),
           },
@@ -1674,13 +1712,14 @@ export function makeExampleSchema(
         extensions: {
           graphile: {
             plan: EXPORTABLE(
-              (TYPES, sql) => (plan: PgSelectPlan<typeof messageSource>) => {
-                plan.orderBy({
-                  codec: TYPES.text,
-                  fragment: sql`${plan.alias}.body`,
-                  direction: "DESC",
-                });
-              },
+              (TYPES, sql) =>
+                (plan: PgSelectPlanFromSource<typeof messageSource>) => {
+                  plan.orderBy({
+                    codec: TYPES.text,
+                    fragment: sql`${plan.alias}.body`,
+                    direction: "DESC",
+                  });
+                },
               [TYPES, sql],
             ),
           },
@@ -1690,14 +1729,15 @@ export function makeExampleSchema(
         extensions: {
           graphile: {
             plan: EXPORTABLE(
-              (TYPES, sql) => (plan: PgSelectPlan<typeof messageSource>) => {
-                const authorAlias = plan.singleRelation("author");
-                plan.orderBy({
-                  codec: TYPES.text,
-                  fragment: sql`${authorAlias}.username`,
-                  direction: "ASC",
-                });
-              },
+              (TYPES, sql) =>
+                (plan: PgSelectPlanFromSource<typeof messageSource>) => {
+                  const authorAlias = plan.singleRelation("author");
+                  plan.orderBy({
+                    codec: TYPES.text,
+                    fragment: sql`${authorAlias}.username`,
+                    direction: "ASC",
+                  });
+                },
               [TYPES, sql],
             ),
           },
@@ -1707,14 +1747,15 @@ export function makeExampleSchema(
         extensions: {
           graphile: {
             plan: EXPORTABLE(
-              (TYPES, sql) => (plan: PgSelectPlan<typeof messageSource>) => {
-                const authorAlias = plan.singleRelation("author");
-                plan.orderBy({
-                  codec: TYPES.text,
-                  fragment: sql`${authorAlias}.username`,
-                  direction: "DESC",
-                });
-              },
+              (TYPES, sql) =>
+                (plan: PgSelectPlanFromSource<typeof messageSource>) => {
+                  const authorAlias = plan.singleRelation("author");
+                  plan.orderBy({
+                    codec: TYPES.text,
+                    fragment: sql`${authorAlias}.username`,
+                    direction: "DESC",
+                  });
+                },
               [TYPES, sql],
             ),
           },
@@ -1829,7 +1870,7 @@ export function makeExampleSchema(
   });
 
   function makeIncludeArchivedField<TFieldPlan>(
-    getClassPlan: ($fieldPlan: TFieldPlan) => PgSelectPlan<any>,
+    getClassPlan: ($fieldPlan: TFieldPlan) => PgSelectPlanFromSource<any>,
   ) {
     return {
       type: IncludeArchived,
@@ -1849,7 +1890,7 @@ export function makeExampleSchema(
               $value.evalIs("INHERIT") &&
               // INHERIT only works if the parent has an archived_at column.
               $parent instanceof PgSelectSinglePlan &&
-              !!$parent.source.columns.archived_at
+              !!$parent.source.codec.columns.archived_at
             ) {
               $messages.where(
                 sql`(${
@@ -2096,7 +2137,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$forum,
-                  $messages: PgSelectPlan<typeof messageSource>,
+                  $messages: PgSelectPlanFromSource<typeof messageSource>,
                   $value,
                 ) {
                   $messages.setFirst($value.eval());
@@ -2111,7 +2152,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$forum,
-                  $messages: PgSelectPlan<typeof messageSource>,
+                  $messages: PgSelectPlanFromSource<typeof messageSource>,
                 ) {
                   return $messages.wherePlan();
                 },
@@ -2124,7 +2165,7 @@ export function makeExampleSchema(
               (ClassFilterPlan) =>
                 function plan(
                   _$forum,
-                  $messages: PgSelectPlan<typeof messageSource>,
+                  $messages: PgSelectPlanFromSource<typeof messageSource>,
                 ) {
                   return new ClassFilterPlan(
                     $messages.wherePlan(),
@@ -2135,7 +2176,7 @@ export function makeExampleSchema(
             ),
           },
           includeArchived: makeIncludeArchivedField<
-            PgSelectPlan<typeof messageSource>
+            PgSelectPlanFromSource<typeof messageSource>
           >(($messages) => $messages),
         },
         plan: EXPORTABLE(
@@ -2164,7 +2205,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$forum,
-                  $connection: PgConnectionPlan<typeof messageSource>,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
                   $value,
                 ) {
                   const $messages = $connection.getSubplan();
@@ -2180,7 +2221,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlan<typeof messageSource>,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
                   $value,
                 ) {
                   const $messages = $connection.getSubplan();
@@ -2196,7 +2237,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$forum,
-                  $connection: PgConnectionPlan<typeof messageSource>,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
                 ) {
                   const $messages = $connection.getSubplan();
                   return $messages.wherePlan();
@@ -2210,7 +2251,7 @@ export function makeExampleSchema(
               (ClassFilterPlan) =>
                 function plan(
                   _$forum,
-                  $connection: PgConnectionPlan<typeof messageSource>,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
                 ) {
                   const $messages = $connection.getSubplan();
                   return new ClassFilterPlan(
@@ -2222,7 +2263,7 @@ export function makeExampleSchema(
             ),
           },
           includeArchived: makeIncludeArchivedField<
-            PgConnectionPlan<typeof messageSource>
+            PgConnectionPlanFromSource<typeof messageSource>
           >(($connection) => $connection.getSubplan()),
         },
         plan: EXPORTABLE(
@@ -2503,10 +2544,10 @@ export function makeExampleSchema(
         pgPolymorphic,
         postSource,
       ) =>
-      <TCodec extends PgTypeCodec<any, any, typeof unionEntityColumns>>(
+      <TColumns extends typeof unionEntityColumns>(
         $item:
-          | PgSelectSinglePlan<PgSource<TCodec, any, any, any, any>>
-          | PgClassExpressionPlan<any, TCodec>,
+          | PgSelectSinglePlan<TColumns, any, any, any>
+          | PgClassExpressionPlan<TColumns, any, any, any>,
       ) =>
         pgPolymorphic(
           $item,
@@ -2815,33 +2856,25 @@ export function makeExampleSchema(
   });
 
   // NOTE: the `| any`s below are because of co/contravariance woes.
-  const commonRelationalItemFields = <
-    TDataSource extends PgSource<
-      any,
-      | {
-          id: PgSourceColumn<number>;
-          type: PgSourceColumn<string>;
-          // type: PgSourceColumn<string>;
-          position: PgSourceColumn<string>;
-          created_at: PgSourceColumn<Date>;
-          updated_at: PgSourceColumn<Date>;
-          is_explicitly_archived: PgSourceColumn<boolean>;
-          archived_at: PgSourceColumn<Date>;
-        }
-      | any,
-      any,
-      { parent: PgSourceRelation<any, any> } | any,
-      any
-    >,
-  >() => ({
-    id: attrField<TDataSource>("id", GraphQLInt),
-    type: attrField<TDataSource>("type", GraphQLString),
-    type2: attrField<TDataSource>("type2", EnumTableItemType),
+  type CommonRelationalItemColumns = {
+    id: PgSourceColumn<number>;
+    type: PgSourceColumn<string>;
+    type2: PgSourceColumn<string>;
+    position: PgSourceColumn<string>;
+    created_at: PgSourceColumn<Date>;
+    updated_at: PgSourceColumn<Date>;
+    is_explicitly_archived: PgSourceColumn<boolean>;
+    archived_at: PgSourceColumn<Date>;
+  };
+  const commonRelationalItemFields = () => ({
+    id: attrField<CommonRelationalItemColumns>("id", GraphQLInt),
+    type: attrField<CommonRelationalItemColumns>("type", GraphQLString),
+    type2: attrField<CommonRelationalItemColumns>("type2", EnumTableItemType),
     parent: {
       type: RelationalItem,
       plan: EXPORTABLE(
         (deoptimizeIfAppropriate, relationalItemInterface) =>
-          function plan($entity: PgSelectSinglePlan<TDataSource>) {
+          function plan($entity: PgSelectSinglePlan<any, any, any, any>) {
             const $plan = $entity.singleRelation("parent");
             deoptimizeIfAppropriate($plan);
             return relationalItemInterface($plan);
@@ -2850,14 +2883,23 @@ export function makeExampleSchema(
       ),
     },
     author: singleRelationField("author", Person),
-    position: attrField<TDataSource>("position", GraphQLString),
-    createdAt: attrField<TDataSource>("created_at", GraphQLString),
-    updatedAt: attrField<TDataSource>("updated_at", GraphQLString),
-    isExplicitlyArchived: attrField<TDataSource>(
+    position: attrField<CommonRelationalItemColumns>("position", GraphQLString),
+    createdAt: attrField<CommonRelationalItemColumns>(
+      "created_at",
+      GraphQLString,
+    ),
+    updatedAt: attrField<CommonRelationalItemColumns>(
+      "updated_at",
+      GraphQLString,
+    ),
+    isExplicitlyArchived: attrField<CommonRelationalItemColumns>(
       "is_explicitly_archived",
       GraphQLBoolean,
     ),
-    archivedAt: attrField<TDataSource>("archived_at", GraphQLString),
+    archivedAt: attrField<CommonRelationalItemColumns>(
+      "archived_at",
+      GraphQLString,
+    ),
   });
 
   const RelationalTopic = newObjectTypeBuilder<
@@ -3056,7 +3098,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $forums: PgSelectPlan<typeof forumSource>,
+                  $forums: PgSelectPlanFromSource<typeof forumSource>,
                   $value,
                 ) {
                   $forums.setFirst($value.eval());
@@ -3066,7 +3108,7 @@ export function makeExampleSchema(
             ),
           },
           includeArchived: makeIncludeArchivedField<
-            PgSelectPlan<typeof forumSource>
+            PgSelectPlanFromSource<typeof forumSource>
           >(($forums) => $forums),
           condition: {
             type: ForumCondition,
@@ -3074,7 +3116,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $forums: PgSelectPlan<typeof forumSource>,
+                  $forums: PgSelectPlanFromSource<typeof forumSource>,
                 ) {
                   return $forums.wherePlan();
                 },
@@ -3087,7 +3129,7 @@ export function makeExampleSchema(
               (ClassFilterPlan) =>
                 function plan(
                   _$root,
-                  $forums: PgSelectPlan<typeof forumSource>,
+                  $forums: PgSelectPlanFromSource<typeof forumSource>,
                 ) {
                   return new ClassFilterPlan(
                     $forums.wherePlan(),
@@ -3142,7 +3184,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlan<typeof messageSource>,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
                 ) {
                   const $messages = $connection.getSubplan();
                   return $messages.wherePlan();
@@ -3156,7 +3198,7 @@ export function makeExampleSchema(
               (ClassFilterPlan) =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlan<typeof messageSource>,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
                 ) {
                   const $messages = $connection.getSubplan();
                   return new ClassFilterPlan(
@@ -3168,7 +3210,7 @@ export function makeExampleSchema(
             ),
           },
           includeArchived: makeIncludeArchivedField<
-            PgConnectionPlan<typeof messageSource>
+            PgConnectionPlanFromSource<typeof messageSource>
           >(($connection) => $connection.getSubplan()),
           first: {
             type: GraphQLInt,
@@ -3176,7 +3218,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlan<typeof messageSource>,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
                   $value,
                 ) {
                   const $messages = $connection.getSubplan();
@@ -3192,7 +3234,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlan<typeof messageSource>,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
                   $value,
                 ) {
                   const $messages = $connection.getSubplan();
@@ -3208,7 +3250,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlan<typeof messageSource>,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
                   $value,
                 ) {
                   const $messages = $connection.getSubplan();
@@ -3226,7 +3268,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlan<typeof messageSource>,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
                   $value,
                 ) {
                   const $messages = $connection.getSubplan();
@@ -3244,7 +3286,7 @@ export function makeExampleSchema(
               (MessagesOrderBy, getEnumValueConfig, inspect) =>
                 function plan(
                   _$root,
-                  $connection: PgConnectionPlan<typeof messageSource>,
+                  $connection: PgConnectionPlanFromSource<typeof messageSource>,
                   $value,
                 ) {
                   const $messages = $connection.getSubplan();
@@ -3697,8 +3739,13 @@ export function makeExampleSchema(
     },
   });
 
-  type PgRecord<TDataSource extends PgSource<any, any, any, any, any>> =
-    PgClassExpressionPlan<TDataSource, TDataSource["codec"]>;
+  type PgRecord<TDataSource extends PgSource<any, any, any, any>> =
+    PgClassExpressionPlan<
+      TDataSource["TColumns"],
+      TDataSource["TUniques"],
+      TDataSource["TRelations"],
+      TDataSource["TParameters"]
+    >;
 
   const CreateRelationalPostPayload = newObjectTypeBuilder<
     OurGraphQLContext,
@@ -3741,7 +3788,7 @@ export function makeExampleSchema(
 
   const UpdateRelationalPostByIdPayload = newObjectTypeBuilder<
     OurGraphQLContext,
-    PgUpdatePlan<typeof relationalPostsSource>
+    PgUpdatePlanFromSource<typeof relationalPostsSource>
   >(PgUpdatePlan)({
     name: "UpdateRelationalPostByIdPayload",
     fields: {
@@ -3780,7 +3827,7 @@ export function makeExampleSchema(
 
   const DeleteRelationalPostByIdPayload = newObjectTypeBuilder<
     OurGraphQLContext,
-    PgDeletePlan<typeof relationalPostsSource>
+    PgDeletePlanFromSource<typeof relationalPostsSource>
   >(PgDeletePlan)({
     name: "DeleteRelationalPostByIdPayload",
     fields: {
@@ -3850,7 +3897,7 @@ export function makeExampleSchema(
                 id: $itemId,
               });
               for (const key of ["title", "description", "note"] as Array<
-                keyof typeof relationalPostsSource.columns
+                keyof typeof relationalPostsSource.codec.columns
               >) {
                 const $value = $input.get(key);
                 if (!$value.evalIs(undefined)) {
@@ -3885,7 +3932,7 @@ export function makeExampleSchema(
               // Only the _last_ post plan is returned; there's no dependency on
               // the first two posts, and yet they should not be tree-shaken
               // because they're mutations.
-              let $post: PgInsertPlan<typeof relationalPostsSource>;
+              let $post: PgInsertPlanFromSource<typeof relationalPostsSource>;
               for (let i = 0; i < 3; i++) {
                 const $item = pgInsert(relationalItemsSource, {
                   type: constant`POST`,
@@ -3917,7 +3964,7 @@ export function makeExampleSchema(
               // Only the _last_ post plan is returned; there's no dependency on
               // the first two posts, and yet they should not be tree-shaken
               // because they're mutations.
-              let $post: PgSelectPlan<typeof relationalPostsSource>;
+              let $post: PgSelectPlanFromSource<typeof relationalPostsSource>;
               for (let i = 0; i < 3; i++) {
                 $post = pgSelect({
                   source: relationalPostsSource,
@@ -3961,7 +4008,7 @@ export function makeExampleSchema(
                 id: $input.get("id"),
               });
               for (const key of ["title", "description", "note"] as Array<
-                keyof typeof relationalPostsSource.columns
+                keyof typeof relationalPostsSource.codec.columns
               >) {
                 const $value = $patch.get(key);
                 // TODO: test that we differentiate between value set to null and

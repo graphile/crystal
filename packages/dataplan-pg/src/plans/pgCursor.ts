@@ -5,7 +5,7 @@ import type { PgSource } from "../datasource";
 import { PgSelectSinglePlan } from "./pgSelectSingle";
 
 export class PgCursorPlan<
-  TDataSource extends PgSource<any, any, any, any>,
+  TPlan extends PgSelectSinglePlan<any, any, any, any>,
 > extends ExecutablePlan<any> {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -16,7 +16,7 @@ export class PgCursorPlan<
   private classSinglePlanId: number;
   private digest: string;
 
-  constructor(itemPlan: PgSelectSinglePlan<any>) {
+  constructor(itemPlan: TPlan) {
     super();
     const classPlan = itemPlan.getClassPlan();
     this.classSinglePlanId = itemPlan.id;
@@ -28,14 +28,14 @@ export class PgCursorPlan<
     this.cursorValuesPlanId = this.addDependency(plan);
   }
 
-  public getClassSinglePlan(): PgSelectSinglePlan<TDataSource> {
+  public getClassSinglePlan(): TPlan {
     const plan = this.getPlan(this.classSinglePlanId);
     if (!(plan instanceof PgSelectSinglePlan)) {
       throw new Error(
         `Expected ${this.classSinglePlanId} (${plan}) to be a PgSelectSinglePlan`,
       );
     }
-    return plan;
+    return plan as TPlan;
   }
 
   execute(
