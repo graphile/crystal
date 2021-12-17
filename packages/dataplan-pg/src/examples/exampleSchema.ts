@@ -130,11 +130,13 @@ export function makeExampleSchema(
 ): GraphQLSchema {
   const deoptimizeIfAppropriate = EXPORTABLE(
     (options) =>
-      (
-        plan:
+      <
+        TPlan extends
           | PgSelectPlan<any, any, any, any>
           | PgSelectSinglePlan<any, any, any, any>,
-      ) => {
+      >(
+        plan: TPlan,
+      ): TPlan => {
         if (options.deoptimize) {
           if ("getClassPlan" in plan) {
             plan.getClassPlan().setInliningForbidden();
@@ -2501,7 +2503,7 @@ export function makeExampleSchema(
           | PgClassExpressionPlan<
               TColumns,
               PgTypeCodec<TColumns, any, any>,
-              TColumns,
+              any,
               any,
               any,
               any
@@ -3686,6 +3688,8 @@ export function makeExampleSchema(
 
   type PgRecord<TDataSource extends PgSource<any, any, any, any>> =
     PgClassExpressionPlan<
+      TDataSource["TColumns"],
+      PgTypeCodec<TDataSource["TColumns"], any, any>,
       TDataSource["TColumns"],
       TDataSource["TUniques"],
       TDataSource["TRelations"],

@@ -99,8 +99,8 @@ export class PgSelectSinglePlan<
   }
 
   getSelfNamed(): PgClassExpressionPlan<
-    TColumns,
-    PgTypeCodec<TColumns, any, any>,
+    any,
+    any,
     TColumns,
     TUniques,
     TRelations,
@@ -263,12 +263,19 @@ export class PgSelectSinglePlan<
   public singleRelation<TRelationName extends keyof TRelations>(
     relationIdentifier: TRelationName,
   ): PgSelectSinglePlan<
+    any,
+    any,
+    any,
+    any
+    // TODO: fix the return type
+    /*
     TRelations[TRelationName]["source"]["TColumns"] extends PgSourceColumns
       ? TRelations[TRelationName]["source"]["TColumns"]
       : any,
     TRelations[TRelationName]["source"]["TUniques"],
     TRelations[TRelationName]["source"]["TRelations"],
     TRelations[TRelationName]["source"]["TParameters"]
+  */
   > {
     const $existingPlan = this.existingSingleRelation(relationIdentifier);
     if ($existingPlan) {
