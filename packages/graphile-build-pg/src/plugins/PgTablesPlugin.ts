@@ -14,6 +14,21 @@ declare global {
     interface BuildInput {
       pgSources: PgSource<any, any, any>[];
     }
+
+    interface Inflection {
+      _tableName(
+        this: Inflection,
+        source: PgSource<any, any, any, any>,
+      ): string;
+      _singularizedTableName(
+        this: Inflection,
+        source: PgSource<any, any, any, any>,
+      ): string;
+      tableType(
+        this: GraphileEngine.Inflection,
+        source: PgSource<any, any, any, any>,
+      ): string;
+    }
   }
 }
 
@@ -96,20 +111,48 @@ export const PgTablesPlugin: Plugin = {
   } as PluginGatherConfig<"pgTables">,
   schema: {
     hooks: {
-      init(_, build, _context) {
-        build.registerObjectType(
-          "T",
-          {},
-          null,
-          () => ({
-            fields: {
-              k: {
-                type: build.graphql.GraphQLString,
-              },
+      inflection(inflection, build) {
+        return build.extend<
+          typeof inflection,
+          Partial<GraphileEngine.Inflection>
+        >(
+          inflection,
+          {
+            _tableName(source) {
+              return this.coerceToGraphQLName(source.name);
             },
-          }),
-          "PgTablesPlugin",
+
+            _singularizedTableName(source) {
+              return this.singularize(this._tableName(source)).replace(
+                /.(?:(?:[_-]i|I)nput|(?:[_-]p|P)atch)$/,
+                "$&_record",
+              );
+            },
+
+            tableType(source: PgSource<any, any, any, any>) {
+              return this.upperCamelCase(this._singularizedTableName(source));
+            },
+          },
+          "Adding inflectors for PgTablesPlugin",
         );
+      },
+
+      init(_, build, _context) {
+        build.input.pgSources.forEach((source) => {
+          build.registerObjectType(
+            build.inflection.tableType(source),
+            {},
+            null,
+            () => ({
+              fields: {
+                k: {
+                  type: build.graphql.GraphQLString,
+                },
+              },
+            }),
+            "PgTablesPlugin",
+          );
+        });
         return _;
       },
     },
