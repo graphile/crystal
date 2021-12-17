@@ -94,4 +94,24 @@ export const PgTablesPlugin: Plugin = {
       output.pgSources!.push(...info.state.sources);
     },
   } as PluginGatherConfig<"pgTables">,
+  schema: {
+    hooks: {
+      init(_, build, _context) {
+        build.registerObjectType(
+          "T",
+          {},
+          null,
+          () => ({
+            fields: {
+              k: {
+                type: build.graphql.GraphQLString,
+              },
+            },
+          }),
+          "PgTablesPlugin",
+        );
+        return _;
+      },
+    },
+  },
 };
