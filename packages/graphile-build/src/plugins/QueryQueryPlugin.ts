@@ -14,7 +14,7 @@ export const QueryQueryPlugin: Plugin = {
   version: version,
   schema: {
     hooks: {
-      "GraphQLObjectType:fields": {
+      GraphQLObjectType_fields: {
         callback: (fields, build, context) => {
           const {
             extend,

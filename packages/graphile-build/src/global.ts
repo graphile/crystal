@@ -639,34 +639,34 @@ declare global {
        * When creating a GraphQLObjectType via `newWithHooks`, we'll
        * execute, the following hooks:
        * - 'GraphQLObjectType' to add any root-level attributes, e.g. add a description
-       * - 'GraphQLObjectType:interfaces' to add additional interfaces to this object type
-       * - 'GraphQLObjectType:fields' to add additional fields to this object type (is
+       * - 'GraphQLObjectType_interfaces' to add additional interfaces to this object type
+       * - 'GraphQLObjectType_fields' to add additional fields to this object type (is
        *   ran asynchronously and gets a reference to the final GraphQL Object as
        *   `Self` in the context)
-       * - 'GraphQLObjectType:fields:field' to customize an individual field from above
-       * - 'GraphQLObjectType:fields:field:args' to customize the arguments to a field
+       * - 'GraphQLObjectType_fields_field' to customize an individual field from above
+       * - 'GraphQLObjectType_fields_field_args' to customize the arguments to a field
        */
       GraphQLObjectType: GraphileEngine.Hook<
         GraphileObjectTypeConfig<any, any>,
         GraphileEngine.ContextGraphQLObjectType,
         TBuild
       >[];
-      "GraphQLObjectType:interfaces": GraphileEngine.Hook<
+      GraphQLObjectType_interfaces: GraphileEngine.Hook<
         GraphQLInterfaceType[],
         GraphileEngine.ContextGraphQLObjectTypeInterfaces,
         TBuild
       >[];
-      "GraphQLObjectType:fields": GraphileEngine.Hook<
+      GraphQLObjectType_fields: GraphileEngine.Hook<
         GraphileFieldConfigMap<any, any>,
         GraphileEngine.ContextGraphQLObjectTypeFields,
         TBuild
       >[];
-      "GraphQLObjectType:fields:field": GraphileEngine.Hook<
+      GraphQLObjectType_fields_field: GraphileEngine.Hook<
         GraphileFieldConfig<any, any, any, any, any>,
         GraphileEngine.ContextGraphQLObjectTypeFieldsField,
         TBuild
       >[];
-      "GraphQLObjectType:fields:field:args": GraphileEngine.Hook<
+      GraphQLObjectType_fields_field_args: GraphileEngine.Hook<
         GraphileFieldConfigArgumentMap<any, any, any, any>,
         GraphileEngine.ContextGraphQLObjectTypeFieldsFieldArgs,
         TBuild
@@ -676,22 +676,22 @@ declare global {
        * When creating a GraphQLInputObjectType via `newWithHooks`, we'll
        * execute, the following hooks:
        * - 'GraphQLInputObjectType' to add any root-level attributes, e.g. add a description
-       * - 'GraphQLInputObjectType:fields' to add additional fields to this object type (is
+       * - 'GraphQLInputObjectType_fields' to add additional fields to this object type (is
        *   ran asynchronously and gets a reference to the final GraphQL Object as
        *   `Self` in the context)
-       * - 'GraphQLInputObjectType:fields:field' to customize an individual field from above
+       * - 'GraphQLInputObjectType_fields_field' to customize an individual field from above
        */
       GraphQLInputObjectType: GraphileEngine.Hook<
         GraphileEngine.GraphileInputObjectTypeConfig,
         GraphileEngine.ContextGraphQLInputObjectType,
         TBuild
       >[];
-      "GraphQLInputObjectType:fields": GraphileEngine.Hook<
+      GraphQLInputObjectType_fields: GraphileEngine.Hook<
         GraphQLInputFieldConfigMap,
         GraphileEngine.ContextGraphQLInputObjectTypeFields,
         TBuild
       >[];
-      "GraphQLInputObjectType:fields:field": GraphileEngine.Hook<
+      GraphQLInputObjectType_fields_field: GraphileEngine.Hook<
         GraphQLInputFieldConfig,
         GraphileEngine.ContextGraphQLInputObjectTypeFieldsField,
         TBuild
@@ -701,20 +701,20 @@ declare global {
        * When creating a GraphQLEnumType via `newWithHooks`, we'll
        * execute, the following hooks:
        * - 'GraphQLEnumType' to add any root-level attributes, e.g. add a description
-       * - 'GraphQLEnumType:values' to add additional values
-       * - 'GraphQLEnumType:values:value' to change an individual value
+       * - 'GraphQLEnumType_values' to add additional values
+       * - 'GraphQLEnumType_values_value' to change an individual value
        */
       GraphQLEnumType: GraphileEngine.Hook<
         GraphQLEnumTypeConfig,
         GraphileEngine.ContextGraphQLEnumType,
         TBuild
       >[];
-      "GraphQLEnumType:values": GraphileEngine.Hook<
+      GraphQLEnumType_values: GraphileEngine.Hook<
         GraphQLEnumValueConfigMap,
         GraphileEngine.ContextGraphQLEnumTypeValues,
         TBuild
       >[];
-      "GraphQLEnumType:values:value": GraphileEngine.Hook<
+      GraphQLEnumType_values_value: GraphileEngine.Hook<
         GraphQLEnumValueConfig,
         GraphileEngine.ContextGraphQLEnumTypeValuesValue,
         TBuild
@@ -724,14 +724,14 @@ declare global {
        * When creating a GraphQLUnionType via `newWithHooks`, we'll
        * execute, the following hooks:
        * - 'GraphQLUnionType' to add any root-level attributes, e.g. add a description
-       * - 'GraphQLUnionType:types' to add additional types to this union
+       * - 'GraphQLUnionType_types' to add additional types to this union
        */
       GraphQLUnionType: GraphileEngine.Hook<
         GraphileEngine.GraphileUnionTypeConfig<any, any>,
         GraphileEngine.ContextGraphQLUnionType,
         TBuild
       >[];
-      "GraphQLUnionType:types": GraphileEngine.Hook<
+      GraphQLUnionType_types: GraphileEngine.Hook<
         GraphQLObjectType[],
         GraphileEngine.ContextGraphQLUnionTypeTypes,
         TBuild
@@ -741,28 +741,28 @@ declare global {
        * When creating a GraphQLInterfaceType via `newWithHooks`, we'll
        *  execute, the following hooks:
        *  - 'GraphQLInterfaceType' to add any root-level attributes, e.g. add a description
-       *  - 'GraphQLInterfaceType:fields' to add additional fields to this interface type (is
+       *  - 'GraphQLInterfaceType_fields' to add additional fields to this interface type (is
        *    ran asynchronously and gets a reference to the final GraphQL Interface as
        *    `Self` in the context)
-       *  - 'GraphQLInterfaceType:fields:field' to customise an individual field from above
-       *  - 'GraphQLInterfaceType:fields:field:args' to customize the arguments to a field
+       *  - 'GraphQLInterfaceType_fields_field' to customise an individual field from above
+       *  - 'GraphQLInterfaceType_fields_field_args' to customize the arguments to a field
        */
       GraphQLInterfaceType: GraphileEngine.Hook<
         GraphileEngine.GraphileInterfaceTypeConfig<any, any>,
         GraphileEngine.ContextGraphQLInterfaceType,
         TBuild
       >[];
-      "GraphQLInterfaceType:fields": GraphileEngine.Hook<
+      GraphQLInterfaceType_fields: GraphileEngine.Hook<
         GraphQLFieldConfigMap<any, any>,
         GraphileEngine.ContextGraphQLInterfaceTypeFields,
         TBuild
       >[];
-      "GraphQLInterfaceType:fields:field": GraphileEngine.Hook<
+      GraphQLInterfaceType_fields_field: GraphileEngine.Hook<
         GraphQLFieldConfig<any, any>,
         GraphileEngine.ContextGraphQLInterfaceTypeFieldsField,
         TBuild
       >[];
-      "GraphQLInterfaceType:fields:field:args": GraphileEngine.Hook<
+      GraphQLInterfaceType_fields_field_args: GraphileEngine.Hook<
         GraphQLFieldConfigArgumentMap,
         GraphileEngine.ContextGraphQLInterfaceTypeFieldsFieldArgs,
         TBuild

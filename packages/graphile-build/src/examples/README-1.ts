@@ -23,7 +23,7 @@ const MyRandomFieldPlugin: Plugin = {
   version: "1.0.0",
   schema: {
     hooks: {
-      "GraphQLObjectType:fields": {
+      GraphQLObjectType_fields: {
         callback: (fields, build, context) => {
           const {
             extend,

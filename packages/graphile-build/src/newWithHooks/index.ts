@@ -150,7 +150,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 rawInterfaces = rawInterfaces(interfacesContext);
               }
               return builder.applyHooks(
-                "GraphQLObjectType:interfaces",
+                "GraphQLObjectType_interfaces",
                 rawInterfaces,
                 build,
                 interfacesContext,
@@ -231,7 +231,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     ? fieldSpec(fieldContext)
                     : fieldSpec;
                 resolvedFieldSpec = builder.applyHooks(
-                  "GraphQLObjectType:fields:field",
+                  "GraphQLObjectType_fields_field",
                   resolvedFieldSpec,
                   build,
                   fieldContext,
@@ -246,7 +246,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 const finalFieldSpec = {
                   ...resolvedFieldSpec,
                   args: builder.applyHooks(
-                    "GraphQLObjectType:fields:field:args",
+                    "GraphQLObjectType_fields_field_args",
                     resolvedFieldSpec.args,
                     build,
                     argsContext,
@@ -271,7 +271,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                   ? rawSpec.fields(fieldsContext)
                   : rawSpec.fields || {};
               const fieldsSpec = builder.applyHooks(
-                "GraphQLObjectType:fields",
+                "GraphQLObjectType_fields",
                 build.extend(
                   Object.create(null),
                   rawFields,
@@ -380,7 +380,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                         ? fieldSpec(fieldContext)
                         : fieldSpec;
                     newSpec = builder.applyHooks(
-                      "GraphQLInterfaceType:fields:field",
+                      "GraphQLInterfaceType_fields_field",
                       newSpec,
                       build,
                       fieldContext,
@@ -393,7 +393,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     newSpec = {
                       ...newSpec,
                       args: builder.applyHooks(
-                        "GraphQLInterfaceType:fields:field:args",
+                        "GraphQLInterfaceType_fields_field_args",
                         newSpec.args,
                         build,
                         argsContext,
@@ -410,7 +410,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                   ? rawSpec.fields(fieldsContext)
                   : rawSpec.fields) || {};
               const fieldsSpec = builder.applyHooks(
-                "GraphQLInterfaceType:fields",
+                "GraphQLInterfaceType_fields",
                 build.extend(
                   {},
                   rawFields,
@@ -476,7 +476,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                   ? baseSpec.types(typesContext)
                   : baseSpec.types) || [];
               return builder.applyHooks(
-                "GraphQLUnionType:types",
+                "GraphQLUnionType_types",
                 rawTypes,
                 build,
                 typesContext,
@@ -535,7 +535,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                   let newSpec =
                     typeof spec === "function" ? spec(fieldContext) : spec;
                   newSpec = builder.applyHooks(
-                    "GraphQLInputObjectType:fields:field",
+                    "GraphQLInputObjectType_fields_field",
                     newSpec,
                     build,
                     fieldContext,
@@ -565,7 +565,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 }'. ${inScope.__origin || ""}`,
               );
               const fieldsSpec: GraphQLInputFieldConfigMap = builder.applyHooks(
-                "GraphQLInputObjectType:fields",
+                "GraphQLInputObjectType_fields",
                 fieldsList,
                 build,
                 fieldsContext,
@@ -630,7 +630,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
           );
 
           finalSpec.values = builder.applyHooks(
-            "GraphQLEnumType:values",
+            "GraphQLEnumType_values",
             finalSpec.values,
             build,
             enumContext,
@@ -641,7 +641,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
           finalSpec.values = Object.entries(values).reduce(
             (memo, [valueKey, value]) => {
               const newValue = builder.applyHooks(
-                "GraphQLEnumType:values:value",
+                "GraphQLEnumType_values_value",
                 value,
                 build,
                 enumContext,

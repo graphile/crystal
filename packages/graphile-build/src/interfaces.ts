@@ -180,12 +180,12 @@ declare module "graphile-plugin" {
          * When creating a GraphQLObjectType via `newWithHooks`, we'll
          * execute, the following hooks:
          * - 'GraphQLObjectType' to add any root-level attributes, e.g. add a description
-         * - 'GraphQLObjectType:interfaces' to add additional interfaces to this object type
-         * - 'GraphQLObjectType:fields' to add additional fields to this object type (is
+         * - 'GraphQLObjectType_interfaces' to add additional interfaces to this object type
+         * - 'GraphQLObjectType_fields' to add additional fields to this object type (is
          *   ran asynchronously and gets a reference to the final GraphQL Object as
          *   `Self` in the context)
-         * - 'GraphQLObjectType:fields:field' to customize an individual field from above
-         * - 'GraphQLObjectType:fields:field:args' to customize the arguments to a field
+         * - 'GraphQLObjectType_fields_field' to customize an individual field from above
+         * - 'GraphQLObjectType_fields_field_args' to customize the arguments to a field
          */
         GraphQLObjectType?: PluginHook<
           GraphileEngine.Hook<
@@ -194,28 +194,28 @@ declare module "graphile-plugin" {
             GraphileEngine.Build
           >
         >;
-        "GraphQLObjectType:interfaces"?: PluginHook<
+        GraphQLObjectType_interfaces?: PluginHook<
           GraphileEngine.Hook<
             GraphQLInterfaceType[],
             GraphileEngine.ContextGraphQLObjectTypeInterfaces,
             GraphileEngine.Build
           >
         >;
-        "GraphQLObjectType:fields"?: PluginHook<
+        GraphQLObjectType_fields?: PluginHook<
           GraphileEngine.Hook<
             GraphileEngine.GraphileFieldConfigMap<any, any>,
             GraphileEngine.ContextGraphQLObjectTypeFields,
             GraphileEngine.Build
           >
         >;
-        "GraphQLObjectType:fields:field"?: PluginHook<
+        GraphQLObjectType_fields_field?: PluginHook<
           GraphileEngine.Hook<
             GraphileFieldConfig<any, any, any, any, any>,
             GraphileEngine.ContextGraphQLObjectTypeFieldsField,
             GraphileEngine.Build
           >
         >;
-        "GraphQLObjectType:fields:field:args"?: PluginHook<
+        GraphQLObjectType_fields_field_args?: PluginHook<
           GraphileEngine.Hook<
             GraphileFieldConfigArgumentMap<any, any, any, any>,
             GraphileEngine.ContextGraphQLObjectTypeFieldsFieldArgs,
@@ -227,10 +227,10 @@ declare module "graphile-plugin" {
          * When creating a GraphQLInputObjectType via `newWithHooks`, we'll
          * execute, the following hooks:
          * - 'GraphQLInputObjectType' to add any root-level attributes, e.g. add a description
-         * - 'GraphQLInputObjectType:fields' to add additional fields to this object type (is
+         * - 'GraphQLInputObjectType_fields' to add additional fields to this object type (is
          *   ran asynchronously and gets a reference to the final GraphQL Object as
          *   `Self` in the context)
-         * - 'GraphQLInputObjectType:fields:field' to customize an individual field from above
+         * - 'GraphQLInputObjectType_fields_field' to customize an individual field from above
          */
         GraphQLInputObjectType?: PluginHook<
           GraphileEngine.Hook<
@@ -239,14 +239,14 @@ declare module "graphile-plugin" {
             GraphileEngine.Build
           >
         >;
-        "GraphQLInputObjectType:fields"?: PluginHook<
+        GraphQLInputObjectType_fields?: PluginHook<
           GraphileEngine.Hook<
             GraphQLInputFieldConfigMap,
             GraphileEngine.ContextGraphQLInputObjectTypeFields,
             GraphileEngine.Build
           >
         >;
-        "GraphQLInputObjectType:fields:field"?: PluginHook<
+        GraphQLInputObjectType_fields_field?: PluginHook<
           GraphileEngine.Hook<
             GraphQLInputFieldConfig,
             GraphileEngine.ContextGraphQLInputObjectTypeFieldsField,
@@ -258,8 +258,8 @@ declare module "graphile-plugin" {
          * When creating a GraphQLEnumType via `newWithHooks`, we'll
          * execute, the following hooks:
          * - 'GraphQLEnumType' to add any root-level attributes, e.g. add a description
-         * - 'GraphQLEnumType:values' to add additional values
-         * - 'GraphQLEnumType:values:value' to change an individual value
+         * - 'GraphQLEnumType_values' to add additional values
+         * - 'GraphQLEnumType_values_value' to change an individual value
          */
         GraphQLEnumType?: PluginHook<
           GraphileEngine.Hook<
@@ -268,14 +268,14 @@ declare module "graphile-plugin" {
             GraphileEngine.Build
           >
         >;
-        "GraphQLEnumType:values"?: PluginHook<
+        GraphQLEnumType_values?: PluginHook<
           GraphileEngine.Hook<
             GraphQLEnumValueConfigMap,
             GraphileEngine.ContextGraphQLEnumTypeValues,
             GraphileEngine.Build
           >
         >;
-        "GraphQLEnumType:values:value"?: PluginHook<
+        GraphQLEnumType_values_value?: PluginHook<
           GraphileEngine.Hook<
             GraphQLEnumValueConfig,
             GraphileEngine.ContextGraphQLEnumTypeValuesValue,
@@ -287,7 +287,7 @@ declare module "graphile-plugin" {
          * When creating a GraphQLUnionType via `newWithHooks`, we'll
          * execute, the following hooks:
          * - 'GraphQLUnionType' to add any root-level attributes, e.g. add a description
-         * - 'GraphQLUnionType:types' to add additional types to this union
+         * - 'GraphQLUnionType_types' to add additional types to this union
          */
         GraphQLUnionType?: PluginHook<
           GraphileEngine.Hook<
@@ -296,7 +296,7 @@ declare module "graphile-plugin" {
             GraphileEngine.Build
           >
         >;
-        "GraphQLUnionType:types"?: PluginHook<
+        GraphQLUnionType_types?: PluginHook<
           GraphileEngine.Hook<
             GraphQLObjectType[],
             GraphileEngine.ContextGraphQLUnionTypeTypes,
@@ -308,11 +308,11 @@ declare module "graphile-plugin" {
          * When creating a GraphQLInterfaceType via `newWithHooks`, we'll
          *  execute, the following hooks:
          *  - 'GraphQLInterfaceType' to add any root-level attributes, e.g. add a description
-         *  - 'GraphQLInterfaceType:fields' to add additional fields to this interface type (is
+         *  - 'GraphQLInterfaceType_fields' to add additional fields to this interface type (is
          *    ran asynchronously and gets a reference to the final GraphQL Interface as
          *    `Self` in the context)
-         *  - 'GraphQLInterfaceType:fields:field' to customise an individual field from above
-         *  - 'GraphQLInterfaceType:fields:field:args' to customize the arguments to a field
+         *  - 'GraphQLInterfaceType_fields_field' to customise an individual field from above
+         *  - 'GraphQLInterfaceType_fields_field_args' to customize the arguments to a field
          */
         GraphQLInterfaceType?: PluginHook<
           GraphileEngine.Hook<
@@ -321,21 +321,21 @@ declare module "graphile-plugin" {
             GraphileEngine.Build
           >
         >;
-        "GraphQLInterfaceType:fields"?: PluginHook<
+        GraphQLInterfaceType_fields?: PluginHook<
           GraphileEngine.Hook<
             GraphQLFieldConfigMap<any, any>,
             GraphileEngine.ContextGraphQLInterfaceTypeFields,
             GraphileEngine.Build
           >
         >;
-        "GraphQLInterfaceType:fields:field"?: PluginHook<
+        GraphQLInterfaceType_fields_field?: PluginHook<
           GraphileEngine.Hook<
             GraphQLFieldConfig<any, any>,
             GraphileEngine.ContextGraphQLInterfaceTypeFieldsField,
             GraphileEngine.Build
           >
         >;
-        "GraphQLInterfaceType:fields:field:args"?: PluginHook<
+        GraphQLInterfaceType_fields_field_args?: PluginHook<
           GraphileEngine.Hook<
             GraphQLFieldConfigArgumentMap,
             GraphileEngine.ContextGraphQLInterfaceTypeFieldsFieldArgs,

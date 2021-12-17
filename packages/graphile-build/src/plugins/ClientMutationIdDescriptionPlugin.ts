@@ -17,7 +17,7 @@ export const ClientMutationIdDescriptionPlugin: Plugin = {
   version,
   schema: {
     hooks: {
-      "GraphQLInputObjectType:fields:field": {
+      GraphQLInputObjectType_fields_field: {
         callback: (field, build, context) => {
           const { extend } = build;
           const {
@@ -45,7 +45,7 @@ export const ClientMutationIdDescriptionPlugin: Plugin = {
         provides: ["ClientMutationIdDescription"],
       },
 
-      "GraphQLObjectType:fields:field": {
+      GraphQLObjectType_fields_field: {
         callback: (field, build, context) => {
           const { extend } = build;
           const {
@@ -73,7 +73,7 @@ export const ClientMutationIdDescriptionPlugin: Plugin = {
         provides: ["ClientMutationIdDescription"],
       },
 
-      "GraphQLObjectType:fields:field:args": {
+      GraphQLObjectType_fields_field_args: {
         callback: (args, build, context) => {
           const { extend } = build;
           const {

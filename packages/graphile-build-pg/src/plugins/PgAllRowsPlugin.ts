@@ -10,7 +10,7 @@ export const PgAllRowsPlugin: Plugin = {
   version: version,
   schema: {
     hooks: {
-      "GraphQLObjectType:fields"(fields, build, context) {
+      GraphQLObjectType_fields(fields, build, context) {
         if (!context.scope.isRootQuery) {
           return fields;
         }
