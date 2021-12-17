@@ -1,7 +1,6 @@
 import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
 import { ExecutablePlan, list } from "graphile-crystal";
 
-import type { PgSource } from "../datasource";
 import { PgSelectSinglePlan } from "./pgSelectSingle";
 
 export class PgCursorPlan<
