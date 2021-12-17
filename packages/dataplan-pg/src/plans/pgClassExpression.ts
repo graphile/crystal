@@ -35,7 +35,7 @@ const debugExecuteVerbose = debugExecute.extend("verbose");
 export class PgClassExpressionPlan<
     TExpressionColumns extends PgSourceColumns | undefined,
     TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any>,
-    TSourceColumns extends PgSourceColumns,
+    TSourceColumns extends PgSourceColumns | undefined,
     TUniques extends ReadonlyArray<ReadonlyArray<keyof TSourceColumns>>,
     TRelations extends {
       [identifier: string]: TSourceColumns extends PgSourceColumns
@@ -144,12 +144,8 @@ export class PgClassExpressionPlan<
   public get<TAttr extends keyof TExpressionColumns>(
     attributeName: TAttr,
   ): PgClassExpressionPlan<
-    TExpressionColumns[TAttr] extends PgSourceColumn
-      ? TExpressionColumns[TAttr]["codec"]["columns"]
-      : never,
-    TExpressionColumns[TAttr] extends PgSourceColumn
-      ? TExpressionColumns[TAttr]["codec"]
-      : never,
+    any,
+    any,
     TSourceColumns,
     TUniques,
     TRelations,
@@ -261,7 +257,7 @@ export class PgClassExpressionPlan<
 function pgClassExpression<
   TExpressionColumns extends PgSourceColumns | undefined,
   TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any>,
-  TSourceColumns extends PgSourceColumns,
+  TSourceColumns extends PgSourceColumns | undefined,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TSourceColumns>>,
   TRelations extends {
     [identifier: string]: TSourceColumns extends PgSourceColumns

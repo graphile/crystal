@@ -36,7 +36,7 @@ interface PgUpdatePlanFinalizeResults {
 }
 
 export class PgUpdatePlan<
-  TColumns extends PgSourceColumns,
+  TColumns extends PgSourceColumns | undefined,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgSourceColumns
@@ -115,9 +115,7 @@ export class PgUpdatePlan<
     source: PgSource<TColumns, TUniques, TRelations>,
     getBy: PlanByUniques<TColumns, TUniques>,
     columns?: {
-      [key in keyof TColumns]?:
-        | PgTypedExecutablePlan<TColumns[key]["codec"]>
-        | ExecutablePlan<any>;
+      [key in keyof TColumns]?: ExecutablePlan<any>; // | PgTypedExecutablePlan<TColumns[key]["codec"]>
     },
   ) {
     super();
@@ -127,7 +125,9 @@ export class PgUpdatePlan<
     this.alias = sql.identifier(this.symbol);
     this.contextId = this.addDependency(this.source.context());
 
-    const keys: ReadonlyArray<keyof TColumns> = Object.keys(getBy);
+    const keys: ReadonlyArray<keyof TColumns> = getBy
+      ? (Object.keys(getBy) as Array<keyof TColumns>)
+      : [];
 
     if (
       !this.source.uniques.some((uniq) =>
@@ -151,9 +151,9 @@ export class PgUpdatePlan<
           );
         }
       }
-      const value = getBy[name];
+      const value = getBy![name];
       const depId = this.addDependency(value);
-      const column = this.source.codec.columns[name] as PgSourceColumn;
+      const column = this.source.codec.columns![name] as PgSourceColumn;
       const pgCodec = column.codec;
       this.getBys.push({ name, depId, pgCodec });
     });
@@ -161,7 +161,7 @@ export class PgUpdatePlan<
     if (columns) {
       Object.entries(columns).forEach(([key, value]) => {
         if (value) {
-          this.set(key, value);
+          this.set(key as keyof TColumns, value as ExecutablePlan<any>);
         }
       });
     }
@@ -169,7 +169,7 @@ export class PgUpdatePlan<
 
   set<TKey extends keyof TColumns>(
     name: TKey,
-    value: PgTypedExecutablePlan<TColumns[TKey]["codec"]> | ExecutablePlan<any>,
+    value: ExecutablePlan<any>, // | PgTypedExecutablePlan<TColumns[TKey]["codec"]>
   ): void {
     if (this.locked) {
       throw new Error("Cannot set after plan is locked.");
@@ -181,7 +181,7 @@ export class PgUpdatePlan<
         );
       }
     }
-    const { codec: pgCodec } = this.source.codec.columns[
+    const { codec: pgCodec } = this.source.codec.columns![
       name
     ] as PgSourceColumn;
     const depId = this.addDependency(value);
@@ -195,14 +195,16 @@ export class PgUpdatePlan<
   get<TAttr extends keyof TColumns>(
     attr: TAttr,
   ): PgClassExpressionPlan<
-    TColumns[TAttr]["codec"]["columns"],
-    TColumns[TAttr]["codec"],
+    TColumns extends PgSourceColumns
+      ? TColumns[TAttr]["codec"]["columns"]
+      : any,
+    TColumns extends PgSourceColumns ? TColumns[TAttr]["codec"] : any,
     TColumns,
     TUniques,
     TRelations
   > {
     const dataSourceColumn: PgSourceColumn =
-      this.source.codec.columns[attr as string];
+      this.source.codec.columns![attr as string];
     if (!dataSourceColumn) {
       throw new Error(
         `${this.source} does not define an attribute named '${attr}'`,
@@ -228,7 +230,7 @@ export class PgUpdatePlan<
     const colPlan = dataSourceColumn.expression
       ? sqlExpr`${sql.parens(dataSourceColumn.expression(this.alias))}`
       : sqlExpr`${this.alias}.${sql.identifier(String(attr))}`;
-    return colPlan;
+    return colPlan as any;
   }
 
   public record(): PgClassExpressionPlan<
@@ -411,7 +413,7 @@ export class PgUpdatePlan<
 }
 
 export function pgUpdate<
-  TColumns extends PgSourceColumns,
+  TColumns extends PgSourceColumns | undefined,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgSourceColumns
@@ -422,9 +424,7 @@ export function pgUpdate<
   source: PgSource<TColumns, TUniques, TRelations>,
   getBy: PlanByUniques<TColumns, TUniques>,
   columns?: {
-    [key in keyof TColumns]?:
-      | PgTypedExecutablePlan<TColumns[key]["codec"]>
-      | ExecutablePlan<any>;
+    [key in keyof TColumns]?: ExecutablePlan<any>; // | PgTypedExecutablePlan<TColumns[key]["codec"]>
   },
 ): PgUpdatePlan<TColumns, TUniques, TRelations> {
   return new PgUpdatePlan(source, getBy, columns);

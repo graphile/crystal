@@ -101,7 +101,7 @@ export class PgSelectSinglePlan<
   getSelfNamed(): PgClassExpressionPlan<
     TColumns,
     PgTypeCodec<TColumns, any, any>,
-    TColumns extends PgSourceColumns ? TColumns : never,
+    TColumns,
     TUniques,
     TRelations,
     TParameters
@@ -117,11 +117,9 @@ export class PgSelectSinglePlan<
   get<TAttr extends keyof TColumns>(
     attr: TAttr,
   ): PgClassExpressionPlan<
-    TColumns extends PgSourceColumns
-      ? TColumns[TAttr]["codec"]["columns"]
-      : any,
-    TColumns extends PgSourceColumns ? TColumns[TAttr]["codec"] : any,
-    TColumns extends PgSourceColumn ? TColumns : any,
+    any,
+    any,
+    TColumns,
     TUniques,
     TRelations,
     TParameters
@@ -204,12 +202,7 @@ export class PgSelectSinglePlan<
      */
 
     const sqlExpr = pgClassExpression(
-      this as unknown as PgSelectSinglePlan<
-        TColumns extends PgSourceColumns ? TColumns : never,
-        TUniques,
-        TRelations,
-        TParameters
-      >,
+      this,
       attr === ""
         ? this.source.codec
         : this.source.codec.columns[attr as string].codec,
@@ -346,20 +339,14 @@ export class PgSelectSinglePlan<
   record(): PgClassExpressionPlan<
     TColumns,
     PgTypeCodec<TColumns, any, any>,
-    TColumns extends PgSourceColumns ? TColumns : never,
+    TColumns,
     TUniques,
     TRelations,
     TParameters
   > {
-    return pgClassExpression(
-      this as unknown as PgSelectSinglePlan<
-        TColumns extends PgSourceColumns ? TColumns : never,
-        TUniques,
-        TRelations,
-        TParameters
-      >,
-      this.source.codec,
-    )`${this.getClassPlan().alias}`;
+    return pgClassExpression(this, this.source.codec)`${
+      this.getClassPlan().alias
+    }`;
   }
 
   /**
@@ -374,20 +361,12 @@ export class PgSelectSinglePlan<
   ): PgClassExpressionPlan<
     TExpressionColumns,
     TExpressionCodec,
-    TColumns extends PgSourceColumns ? TColumns : never,
+    TColumns,
     TUniques,
     TRelations,
     TParameters
   > {
-    return pgClassExpression(
-      this as unknown as PgSelectSinglePlan<
-        TColumns extends PgSourceColumns ? TColumns : never,
-        TUniques,
-        TRelations,
-        TParameters
-      >,
-      codec,
-    )`${expression}`;
+    return pgClassExpression(this, codec)`${expression}`;
   }
 
   /**

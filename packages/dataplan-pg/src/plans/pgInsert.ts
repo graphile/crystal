@@ -34,7 +34,7 @@ interface PgInsertPlanFinalizeResults {
 }
 
 export class PgInsertPlan<
-  TColumns extends PgSourceColumns,
+  TColumns extends PgSourceColumns | undefined,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgSourceColumns
@@ -103,9 +103,7 @@ export class PgInsertPlan<
   constructor(
     source: PgSource<TColumns, TUniques, TRelations>,
     columns?: {
-      [key in keyof TColumns]?:
-        | PgTypedExecutablePlan<TColumns[key]["codec"]>
-        | ExecutablePlan<any>;
+      [key in keyof TColumns]?: ExecutablePlan<any>; // PgTypedExecutablePlan<TColumns[key]["codec"]> |
     },
   ) {
     super();
@@ -117,7 +115,7 @@ export class PgInsertPlan<
     if (columns) {
       Object.entries(columns).forEach(([key, value]) => {
         if (value) {
-          this.set(key, value);
+          this.set(key as keyof TColumns, value as ExecutablePlan<any>);
         }
       });
     }
@@ -125,7 +123,7 @@ export class PgInsertPlan<
 
   set<TKey extends keyof TColumns>(
     name: TKey,
-    value: PgTypedExecutablePlan<TColumns[TKey]["codec"]> | ExecutablePlan<any>,
+    value: ExecutablePlan<any>, // | PgTypedExecutablePlan<TColumns[TKey]["codec"]>
   ): void {
     if (this.locked) {
       throw new Error("Cannot set after plan is locked.");
@@ -137,9 +135,11 @@ export class PgInsertPlan<
         );
       }
     }
-    const { codec: pgCodec } = this.source.codec.columns[
-      name
-    ] as PgSourceColumn;
+    const column = (this.source.codec.columns as NonNullable<TColumns>)?.[name];
+    if (!column) {
+      throw new Error(`Column ${name} not found in ${this.source.codec}`);
+    }
+    const { codec: pgCodec } = column;
     const depId = this.addDependency(value);
     this.columns.push({ name, depId, pgCodec });
   }
@@ -151,12 +151,17 @@ export class PgInsertPlan<
   get<TAttr extends keyof TColumns>(
     attr: TAttr,
   ): PgClassExpressionPlan<
-    TColumns[TAttr]["codec"]["columns"],
-    TColumns[TAttr]["codec"],
+    TColumns[TAttr] extends PgSourceColumn
+      ? TColumns[TAttr]["codec"]["columns"]
+      : any,
+    TColumns[TAttr] extends PgSourceColumn ? TColumns[TAttr]["codec"] : any,
     TColumns,
     TUniques,
     TRelations
   > {
+    if (!this.source.codec.columns) {
+      throw new Error(`Cannot call .get() when there's no columns.`);
+    }
     const dataSourceColumn: PgSourceColumn =
       this.source.codec.columns[attr as string];
     if (!dataSourceColumn) {
@@ -348,7 +353,7 @@ export class PgInsertPlan<
 }
 
 export function pgInsert<
-  TColumns extends PgSourceColumns,
+  TColumns extends PgSourceColumns | undefined,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgSourceColumns
@@ -359,7 +364,9 @@ export function pgInsert<
   source: PgSource<TColumns, TUniques, TRelations>,
   columns?: {
     [key in keyof TColumns]?:
-      | PgTypedExecutablePlan<TColumns[key]["codec"]>
+      | PgTypedExecutablePlan<
+          TColumns extends PgSourceColumns ? TColumns[key]["codec"] : any
+        >
       | ExecutablePlan<any>;
   },
 ): PgInsertPlan<TColumns, TUniques, TRelations> {

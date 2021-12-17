@@ -32,7 +32,7 @@ interface PgDeletePlanFinalizeResults {
 }
 
 export class PgDeletePlan<
-  TColumns extends PgSourceColumns,
+  TColumns extends PgSourceColumns | undefined,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgSourceColumns
@@ -109,7 +109,9 @@ export class PgDeletePlan<
     this.alias = sql.identifier(this.symbol);
     this.contextId = this.addDependency(this.source.context());
 
-    const keys: ReadonlyArray<keyof TColumns> = Object.keys(getBy);
+    const keys: ReadonlyArray<keyof TColumns> = getBy
+      ? (Object.keys(getBy) as Array<keyof TColumns>)
+      : [];
 
     if (
       !this.source.uniques.some((uniq) =>
@@ -133,9 +135,9 @@ export class PgDeletePlan<
           );
         }
       }
-      const value = getBy[name];
+      const value = getBy![name];
       const depId = this.addDependency(value);
-      const column = this.source.codec.columns[name] as PgSourceColumn;
+      const column = this.source.codec.columns![name] as PgSourceColumn;
       const pgCodec = column.codec;
       this.getBys.push({ name, depId, pgCodec });
     });
@@ -148,14 +150,16 @@ export class PgDeletePlan<
   get<TAttr extends keyof TColumns>(
     attr: TAttr,
   ): PgClassExpressionPlan<
-    TColumns[TAttr]["codec"]["columns"],
-    TColumns[TAttr]["codec"],
+    TColumns extends PgSourceColumns
+      ? TColumns[TAttr]["codec"]["columns"]
+      : any,
+    TColumns extends PgSourceColumns ? TColumns[TAttr]["codec"] : any,
     TColumns,
     TUniques,
     TRelations
   > {
     const dataSourceColumn: PgSourceColumn =
-      this.source.codec.columns[attr as string];
+      this.source.codec.columns![attr as string];
     if (!dataSourceColumn) {
       throw new Error(
         `${this.source} does not define an attribute named '${attr}'`,
@@ -181,7 +185,7 @@ export class PgDeletePlan<
     const colPlan = dataSourceColumn.expression
       ? sqlExpr`${sql.parens(dataSourceColumn.expression(this.alias))}`
       : sqlExpr`${this.alias}.${sql.identifier(String(attr))}`;
-    return colPlan;
+    return colPlan as any;
   }
 
   public record(): PgClassExpressionPlan<
@@ -340,7 +344,7 @@ export class PgDeletePlan<
 }
 
 export function pgDelete<
-  TColumns extends PgSourceColumns,
+  TColumns extends PgSourceColumns | undefined,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgSourceColumns

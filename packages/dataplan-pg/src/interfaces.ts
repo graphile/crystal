@@ -12,7 +12,7 @@ import type { PgUpdatePlan } from "./plans/pgUpdate";
  * `INSERT...RETURNING` or similar. *ALWAYS* represents a single row (or null).
  */
 export type PgClassSinglePlan<
-  TColumns extends PgSourceColumns,
+  TColumns extends PgSourceColumns | undefined,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgSourceColumns
