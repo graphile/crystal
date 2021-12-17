@@ -124,20 +124,20 @@ export class PgSelectSinglePlan<
     TRelations,
     TParameters
   > {
-    if (!this.source.codec.columns) {
+    if (!this.source.codec.columns && attr !== "") {
       throw new Error(
-        "Cannot call .get() when the source codec has no columns to get.",
+        `Cannot call ${this}.get() when the source codec (${
+          sql.compile(this.source.codec.sqlType).text
+        }) has no columns to get.`,
       );
     }
-    const thisSourceCodeColumns = this.source.codec
-      .columns as NonNullable<TColumns>;
     const classPlan = this.getClassPlan();
     // TODO: where do we do the SQL conversion, e.g. to_json for dates to
     // enforce ISO8601? Perhaps this should be the datasource itself, and
     // `attr` should be an SQL expression? This would allow for computed
     // fields/etc too (admittedly those without arguments).
     const dataSourceColumn: PgSourceColumn | undefined =
-      thisSourceCodeColumns[attr as string];
+      this.source.codec.columns?.[attr as string];
     if (!dataSourceColumn && attr !== "") {
       throw new Error(
         `${this.source} does not define an attribute named '${attr}'`,
@@ -205,7 +205,7 @@ export class PgSelectSinglePlan<
       this,
       attr === ""
         ? this.source.codec
-        : this.source.codec.columns[attr as string].codec,
+        : this.source.codec.columns![attr as string].codec,
     );
     const colPlan = dataSourceColumn
       ? dataSourceColumn.expression
