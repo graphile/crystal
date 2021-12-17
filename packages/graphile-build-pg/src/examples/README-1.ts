@@ -1,6 +1,5 @@
 /* eslint-disable no-restricted-syntax */
 
-import { crystalPrint } from "graphile-crystal";
 import type { WithPgClient } from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import chalk from "chalk";
@@ -11,6 +10,7 @@ import {
   gather,
   QueryQueryPlugin,
 } from "graphile-build";
+import { crystalPrint } from "graphile-crystal";
 import { exportSchema } from "graphile-exporter";
 import { resolvePresets } from "graphile-plugin";
 import { graphql, printSchema } from "graphql";

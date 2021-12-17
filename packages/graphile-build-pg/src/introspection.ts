@@ -396,7 +396,7 @@ export interface PgAttribute {
   /* FIELDS THAT AREN'T AVAILABLE IN ALL VERSIONS */
 
   /**
-   * The current compression method of the column. Typically this is '\0' to specify use of the current default setting
+   * The current compression method of the column. Typically this is `\0` to specify use of the current default setting
    * (see [guc-default-toast-compression]). Otherwise, 'p' selects pglz compression, while 'l' selects LZ4 compression.
    * However, this field is ignored whenever attstorage does not allow compression.
    *
@@ -1256,7 +1256,7 @@ export interface PgDepend {
 
 /**
  * The catalog pg_description stores optional descriptions (comments) for each database object. Descriptions can be
- * manipulated with the COMMENT command and viewed with psql's \d commands. Descriptions of many built-in system
+ * manipulated with the COMMENT command and viewed with psql's `\d` commands. Descriptions of many built-in system
  * objects are provided in the initial contents of pg_description.
  */
 export interface PgDescription {

@@ -1,13 +1,15 @@
 import "graphile-build";
 
-import { PgExecutor, WithPgClient } from "@dataplan/pg";
+import type { WithPgClient } from "@dataplan/pg";
+import { PgExecutor } from "@dataplan/pg";
+import type { ExecutablePlan, PromiseOrDirect } from "graphile-crystal";
+import { context, object } from "graphile-crystal";
 import type {
   GatherHelpers,
   GatherHooks,
   Plugin,
   PluginHook,
 } from "graphile-plugin";
-import { context, ExecutablePlan, object } from "graphile-crystal";
 
 import { version } from "../index";
 import type {
@@ -29,7 +31,6 @@ import type {
   PgType,
 } from "../introspection";
 import { makeIntrospectionQuery } from "../introspection";
-import { PromiseOrDirect } from "graphile-crystal";
 
 type KeysOfType<TObject, TValueType> = {
   [key in keyof TObject]: TObject[key] extends TValueType ? key : never;
