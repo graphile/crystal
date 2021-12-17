@@ -2397,131 +2397,83 @@ export function makeExampleSchema(
   );
 
   const relationalItemInterface = EXPORTABLE(
-    (EXPORTABLE, deoptimizeIfAppropriate, pgPolymorphic) =>
-      ($item: RelationalItemPlan) =>
-        pgPolymorphic($item, $item.get("type"), {
-          RelationalTopic: {
-            match: (t) => t === "TOPIC",
-            plan: EXPORTABLE(
-              ($item, deoptimizeIfAppropriate) => () =>
-                deoptimizeIfAppropriate($item.singleRelation("topic")),
-              [$item, deoptimizeIfAppropriate],
-            ),
-          },
-          RelationalPost: {
-            match: (t) => t === "POST",
-            plan: EXPORTABLE(
-              ($item, deoptimizeIfAppropriate) => () =>
-                deoptimizeIfAppropriate($item.singleRelation("post")),
-              [$item, deoptimizeIfAppropriate],
-            ),
-          },
-          RelationalDivider: {
-            match: (t) => t === "DIVIDER",
-            plan: EXPORTABLE(
-              ($item, deoptimizeIfAppropriate) => () =>
-                deoptimizeIfAppropriate($item.singleRelation("divider")),
-              [$item, deoptimizeIfAppropriate],
-            ),
-          },
-          RelationalChecklist: {
-            match: (t) => t === "CHECKLIST",
-            plan: EXPORTABLE(
-              ($item, deoptimizeIfAppropriate) => () =>
-                deoptimizeIfAppropriate($item.singleRelation("checklist")),
-              [$item, deoptimizeIfAppropriate],
-            ),
-          },
-          RelationalChecklistItem: {
-            match: (t) => t === "CHECKLIST_ITEM",
-            plan: EXPORTABLE(
-              ($item, deoptimizeIfAppropriate) => () =>
-                deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
-              [$item, deoptimizeIfAppropriate],
-            ),
-          },
-        }),
-    [EXPORTABLE, deoptimizeIfAppropriate, pgPolymorphic],
+    (deoptimizeIfAppropriate, pgPolymorphic) => ($item: RelationalItemPlan) =>
+      pgPolymorphic($item, $item.get("type"), {
+        RelationalTopic: {
+          match: (t) => t === "TOPIC",
+          plan: () => deoptimizeIfAppropriate($item.singleRelation("topic")),
+        },
+        RelationalPost: {
+          match: (t) => t === "POST",
+          plan: () => deoptimizeIfAppropriate($item.singleRelation("post")),
+        },
+        RelationalDivider: {
+          match: (t) => t === "DIVIDER",
+          plan: () => deoptimizeIfAppropriate($item.singleRelation("divider")),
+        },
+        RelationalChecklist: {
+          match: (t) => t === "CHECKLIST",
+          plan: () =>
+            deoptimizeIfAppropriate($item.singleRelation("checklist")),
+        },
+        RelationalChecklistItem: {
+          match: (t) => t === "CHECKLIST_ITEM",
+          plan: () =>
+            deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
+        },
+      }),
+    [deoptimizeIfAppropriate, pgPolymorphic],
   );
 
   const unionItemUnion = EXPORTABLE(
-    (EXPORTABLE, deoptimizeIfAppropriate, pgPolymorphic) =>
-      ($item: UnionItemPlan) =>
-        pgPolymorphic($item, $item.get("type"), {
-          UnionTopic: {
-            match: (t) => t === "TOPIC",
-            plan: EXPORTABLE(
-              ($item, deoptimizeIfAppropriate) => () =>
-                deoptimizeIfAppropriate($item.singleRelation("topic")),
-              [$item, deoptimizeIfAppropriate],
-            ),
-          },
-          UnionPost: {
-            match: (t) => t === "POST",
-            plan: EXPORTABLE(
-              ($item, deoptimizeIfAppropriate) => () =>
-                deoptimizeIfAppropriate($item.singleRelation("post")),
-              [$item, deoptimizeIfAppropriate],
-            ),
-          },
-          UnionDivider: {
-            match: (t) => t === "DIVIDER",
-            plan: EXPORTABLE(
-              ($item, deoptimizeIfAppropriate) => () =>
-                deoptimizeIfAppropriate($item.singleRelation("divider")),
-              [$item, deoptimizeIfAppropriate],
-            ),
-          },
-          UnionChecklist: {
-            match: (t) => t === "CHECKLIST",
-            plan: EXPORTABLE(
-              ($item, deoptimizeIfAppropriate) => () =>
-                deoptimizeIfAppropriate($item.singleRelation("checklist")),
-              [$item, deoptimizeIfAppropriate],
-            ),
-          },
-          UnionChecklistItem: {
-            match: (t) => t === "CHECKLIST_ITEM",
-            plan: EXPORTABLE(
-              ($item, deoptimizeIfAppropriate) => () =>
-                deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
-              [$item, deoptimizeIfAppropriate],
-            ),
-          },
-        }),
-    [EXPORTABLE, deoptimizeIfAppropriate, pgPolymorphic],
+    (deoptimizeIfAppropriate, pgPolymorphic) => ($item: UnionItemPlan) =>
+      pgPolymorphic($item, $item.get("type"), {
+        UnionTopic: {
+          match: (t) => t === "TOPIC",
+          plan: () => deoptimizeIfAppropriate($item.singleRelation("topic")),
+        },
+        UnionPost: {
+          match: (t) => t === "POST",
+          plan: () => deoptimizeIfAppropriate($item.singleRelation("post")),
+        },
+        UnionDivider: {
+          match: (t) => t === "DIVIDER",
+          plan: () => deoptimizeIfAppropriate($item.singleRelation("divider")),
+        },
+        UnionChecklist: {
+          match: (t) => t === "CHECKLIST",
+          plan: () =>
+            deoptimizeIfAppropriate($item.singleRelation("checklist")),
+        },
+        UnionChecklistItem: {
+          match: (t) => t === "CHECKLIST_ITEM",
+          plan: () =>
+            deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
+        },
+      }),
+    [deoptimizeIfAppropriate, pgPolymorphic],
   );
 
   const relationalCommentableInterface = EXPORTABLE(
-    (EXPORTABLE, deoptimizeIfAppropriate, pgPolymorphic) =>
+    (deoptimizeIfAppropriate, pgPolymorphic) =>
       ($item: RelationalCommentablePlan) =>
         pgPolymorphic($item, $item.get("type"), {
           RelationalPost: {
             match: (t) => t === "POST",
-            plan: EXPORTABLE(
-              ($item, deoptimizeIfAppropriate) => () =>
-                deoptimizeIfAppropriate($item.singleRelation("post")),
-              [$item, deoptimizeIfAppropriate],
-            ),
+            plan: () => deoptimizeIfAppropriate($item.singleRelation("post")),
           },
           RelationalChecklist: {
             match: (t) => t === "CHECKLIST",
-            plan: EXPORTABLE(
-              ($item, deoptimizeIfAppropriate) => () =>
-                deoptimizeIfAppropriate($item.singleRelation("checklist")),
-              [$item, deoptimizeIfAppropriate],
-            ),
+            plan: () =>
+              deoptimizeIfAppropriate($item.singleRelation("checklist")),
           },
           RelationalChecklistItem: {
             match: (t) => t === "CHECKLIST_ITEM",
-            plan: EXPORTABLE(
-              ($item, deoptimizeIfAppropriate) => () =>
-                deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
-              [$item, deoptimizeIfAppropriate],
-            ),
+            plan: () =>
+              deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
           },
         }),
-    [EXPORTABLE, deoptimizeIfAppropriate, pgPolymorphic],
+    [deoptimizeIfAppropriate, pgPolymorphic],
   );
 
   /**
@@ -2536,7 +2488,6 @@ export function makeExampleSchema(
    */
   const entityUnion = EXPORTABLE(
     (
-        EXPORTABLE,
         PgSelectSinglePlan,
         commentSource,
         list,
@@ -2574,32 +2525,19 @@ export function makeExampleSchema(
           {
             Person: {
               match: (v) => v[0] != null,
-              plan: EXPORTABLE(
-                (personSource) => ($list) =>
-                  personSource.get({ person_id: $list.at(0) }),
-                [personSource],
-              ),
+              plan: ($list) => personSource.get({ person_id: $list.at(0) }),
             },
             Post: {
               match: (v) => v[1] != null,
-              plan: EXPORTABLE(
-                (postSource) => ($list) =>
-                  postSource.get({ post_id: $list.at(1) }),
-                [postSource],
-              ),
+              plan: ($list) => postSource.get({ post_id: $list.at(1) }),
             },
             Comment: {
               match: (v) => v[2] != null,
-              plan: EXPORTABLE(
-                (commentSource) => ($list) =>
-                  commentSource.get({ comment_id: $list.at(2) }),
-                [commentSource],
-              ),
+              plan: ($list) => commentSource.get({ comment_id: $list.at(2) }),
             },
           },
         ),
     [
-      EXPORTABLE,
       PgSelectSinglePlan,
       commentSource,
       list,
