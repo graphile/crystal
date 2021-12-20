@@ -1,15 +1,18 @@
 declare module "@dataplan/pg" {
   interface PgSourceTags extends PgSmartTagsDict {
     name: string;
+    behavior: string | string[];
   }
   interface PgSourceExtensions {
-    tags: PgSourceTags;
+    tags: Partial<PgSourceTags>;
   }
+
   interface PgTypeCodecTags extends PgSmartTagsDict {
     name: string;
+    behavior: string | string[];
   }
   interface PgTypeCodecExtensions {
-    tags: PgTypeCodecTags;
+    tags: Partial<PgTypeCodecTags>;
   }
 }
 

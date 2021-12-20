@@ -1,13 +1,15 @@
 import "graphile-build";
 
-import type { PgSource, PgSourceColumns } from "@dataplan/pg";
+import type { PgSource, PgTypeCodec } from "@dataplan/pg";
 import { PgSourceBuilder, recordType } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
 import sql from "pg-sql2";
 
+import { uniq } from "../_";
 import { version } from "../index";
 import type { PgClass } from "../introspection";
+import { getBehavior } from "../behaviour";
 
 declare global {
   namespace GraphileEngine {
@@ -16,17 +18,42 @@ declare global {
     }
 
     interface Inflection {
-      _tableName(
+      /**
+       * A PgTypeCodec may represent any of a wide range of PostgreSQL types;
+       * this inflector gives a name to this codec, it's primarily used when
+       * naming _types_ in the GraphQL schema (as opposed to `_sourceName`
+       * which typically names _fields.
+       *
+       * @remarks The method beginning with `_` implies it's not ment to
+       * be called directly, instead it's called from other inflectors to give
+       * them common behaviour.
+       */
+      _codecName(this: Inflection, codec: PgTypeCodec<any, any, any>): string;
+
+      /**
+       * Takes a `_codecName` and singularizes it. This is also a good place to
+       * try and avoid potential conflicts, e.g. for a table `foo` a `Foo` and
+       * `FooInput` and `FooPatch` type might be generated. So a `foo_input`
+       * table could potentially cause conflicts. The default inflector would
+       * turn `foo_input` into `FooInputRecord`.
+       *
+       * @remarks The method beginning with `_` implies it's not ment to
+       * be called directly, instead it's called from other inflectors to give
+       * them common behaviour.
+       */
+      _singularizedCodecName(
         this: Inflection,
-        source: PgSource<any, any, any, any>,
+        codec: PgTypeCodec<any, any, any>,
       ): string;
-      _singularizedTableName(
-        this: Inflection,
-        source: PgSource<any, any, any, any>,
-      ): string;
+
+      /**
+       * The name of the GraphQL Object Type that's generated to represent a
+       * specific table (more specifically a PostgreSQL "pg_class" which is
+       * represented as a certain PgTypeCodec)
+       */
       tableType(
         this: GraphileEngine.Inflection,
-        source: PgSource<any, any, any, any>,
+        codec: PgTypeCodec<any, any, any>,
       ): string;
     }
   }
@@ -109,6 +136,7 @@ export const PgTablesPlugin: Plugin = {
       output.pgSources!.push(...info.state.sources);
     },
   } as PluginGatherConfig<"pgTables">,
+
   schema: {
     hooks: {
       inflection(inflection, build) {
@@ -118,23 +146,21 @@ export const PgTablesPlugin: Plugin = {
         >(
           inflection,
           {
-            _tableName(source) {
+            _codecName(codec) {
               return this.coerceToGraphQLName(
-                source.extensions.tags?.name ||
-                  source.codec.extensions?.tags?.name ||
-                  source.name,
+                codec.extensions?.tags?.name || sql.compile(codec.sqlType).text,
               );
             },
 
-            _singularizedTableName(source) {
-              return this.singularize(this._tableName(source)).replace(
+            _singularizedCodecName(codec) {
+              return this.singularize(this._codecName(codec)).replace(
                 /.(?:(?:[_-]i|I)nput|(?:[_-]p|P)atch)$/,
                 "$&_record",
               );
             },
 
-            tableType(source: PgSource<any, any, any, any>) {
-              return this.upperCamelCase(this._singularizedTableName(source));
+            tableType(codec) {
+              return this.upperCamelCase(this._singularizedCodecName(codec));
             },
           },
           "Adding inflectors for PgTablesPlugin",
@@ -142,9 +168,23 @@ export const PgTablesPlugin: Plugin = {
       },
 
       init(_, build, _context) {
-        build.input.pgSources.forEach((source) => {
+        const codecs = uniq(build.input.pgSources.map((s) => s.codec));
+        codecs.forEach((codec) => {
+          if (!codec.columns) {
+            // Only apply to codecs that define columns
+            return;
+          }
+
+          const behavior = getBehavior(codec.extensions);
+          // TODO: is 'selectable' the right behavior? What if you can only see
+          // it in a subscription? What if only on a mutation payload? More
+          // like "viewable"?
+          if (behavior && !behavior.includes("selectable")) {
+            return;
+          }
+
           build.registerObjectType(
-            build.inflection.tableType(source),
+            build.inflection.tableType(codec),
             {},
             null,
             () => ({

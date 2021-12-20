@@ -1,6 +1,11 @@
 /* eslint-disable no-restricted-syntax */
 
-import type { PgExecutorContextPlans, WithPgClient } from "@dataplan/pg";
+import type {
+  PgExecutorContextPlans,
+  PgSourceColumns,
+  WithPgClient,
+} from "@dataplan/pg";
+import { TYPES } from "@dataplan/pg";
 import { PgExecutor, PgSource, recordType } from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import chalk from "chalk";
@@ -54,24 +59,39 @@ async function main() {
     },
   ]);
 
-  const appPublicForumsColumns = {};
+  const appPublicForumsColumns: PgSourceColumns = {
+    id: {
+      codec: TYPES.uuid,
+      notNull: true,
+      // TODO: hasDefault: true
+    },
+    name: {
+      codec: TYPES.text,
+      notNull: true,
+    },
+    archived_at: {
+      codec: TYPES.timestamptz,
+      notNull: false,
+    },
+  };
   const mainAppPublicForumsCodec = recordType(
     sql`app_public.forums`,
     appPublicForumsColumns,
+    {
+      tags: {
+        name: "forums",
+      },
+    },
   );
   // We're crafting our own input
   const input: GraphileEngine.BuildInput = {
     pgSources: [
       new PgSource({
-        name: "main.app_public.forums",
+        //name: "main.app_public.forums",
+        name: "forums",
         executor,
         source: sql`app_public.forums`,
         codec: mainAppPublicForumsCodec,
-        extensions: {
-          tags: {
-            name: "forums",
-          },
-        },
       }),
     ],
   };

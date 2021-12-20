@@ -1,7 +1,7 @@
 import type { ExecutablePlan } from "graphile-crystal";
 import type { SQL, SQLRawValue } from "pg-sql2";
 
-import type { PgSourceColumns, PgSourceRelation } from "./datasource";
+import type { PgSource, PgSourceColumns, PgSourceRelation } from "./datasource";
 import type { PgDeletePlan } from "./plans/pgDelete";
 import type { PgInsertPlan } from "./plans/pgInsert";
 import type { PgSelectSinglePlan } from "./plans/pgSelectSingle";

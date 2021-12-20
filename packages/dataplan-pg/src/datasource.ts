@@ -163,7 +163,7 @@ export class PgSourceBuilder<
   private built: PgSource<TColumns, TUniques, any, TParameters> | null = null;
   public codec: PgTypeCodec<TColumns, any, any>;
   public uniques: TUniques | undefined;
-  public readonly extensions: Partial<PgSourceExtensions>;
+  public readonly extensions: Partial<PgSourceExtensions> | undefined;
   constructor(
     private options: Omit<
       PgSourceOptions<TColumns, TUniques, any, TParameters>,
@@ -172,7 +172,7 @@ export class PgSourceBuilder<
   ) {
     this.codec = options.codec;
     this.uniques = options.uniques;
-    this.extensions = options.extensions || {};
+    this.extensions = options.extensions;
   }
 
   public toString(): string {
@@ -268,7 +268,7 @@ export class PgSource<
   private relationsThunk: (() => TRelations) | null;
   private _relations: TRelations | null = null;
 
-  public readonly extensions: Partial<PgSourceExtensions>;
+  public readonly extensions: Partial<PgSourceExtensions> | undefined;
 
   /**
    * @param source - the SQL for the `FROM` clause (without any
@@ -283,7 +283,7 @@ export class PgSource<
     const { codec, executor, name, source, uniques, relations, extensions } =
       options;
     this._options = options;
-    this.extensions = extensions || {};
+    this.extensions = extensions;
     this.codec = codec;
     this.executor = executor;
     this.name = name;
@@ -569,7 +569,7 @@ export interface PgEnumSourceOptions<TValue extends string> {
 
 export class PgEnumSource<TValue extends string> {
   public readonly codec: PgEnumTypeCodec<TValue>;
-  public readonly extensions: PgEnumSourceExtensions;
+  public readonly extensions: PgEnumSourceExtensions | undefined;
   constructor(options: PgEnumSourceOptions<TValue>) {
     this.codec = options.codec;
     this.extensions = options.extensions || {};

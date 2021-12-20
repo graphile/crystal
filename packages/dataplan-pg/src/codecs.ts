@@ -3,7 +3,12 @@ import sql from "pg-sql2";
 
 import type { PgSourceColumns } from "./datasource";
 import { exportAs } from "./exportAs";
-import type { PgEncode, PgEnumTypeCodec, PgTypeCodec } from "./interfaces";
+import type {
+  PgEncode,
+  PgEnumTypeCodec,
+  PgTypeCodec,
+  PgTypeCodecExtensions,
+} from "./interfaces";
 
 // TODO: optimisation: `identity` can be shortcut
 const identity = <T>(value: T): T => value;
@@ -47,18 +52,21 @@ function t<TCanonical = any, TInput = TCanonical>(
     fromPg: pg2gqlForType(type),
     toPg: gql2pgForType(type),
     columns: undefined,
+    extensions: undefined,
   };
 }
 
 export function recordType<TColumns extends PgSourceColumns>(
   identifier: SQL,
   columns: TColumns,
+  extensions?: Partial<PgTypeCodecExtensions>,
 ): PgTypeCodec<TColumns, string, string> {
   return {
     sqlType: identifier,
     fromPg: identity,
     toPg: identity,
     columns,
+    extensions,
   };
 }
 exportAs(recordType, "recordType");
@@ -66,6 +74,7 @@ exportAs(recordType, "recordType");
 export function enumType<TValue extends string>(
   identifier: SQL,
   values: TValue[],
+  extensions?: Partial<PgTypeCodecExtensions>,
 ): PgEnumTypeCodec<TValue> {
   return {
     sqlType: identifier,
@@ -73,6 +82,7 @@ export function enumType<TValue extends string>(
     toPg: identity,
     values,
     columns: undefined,
+    extensions,
   };
 }
 exportAs(enumType, "enumType");
