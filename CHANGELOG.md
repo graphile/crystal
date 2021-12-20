@@ -8,6 +8,12 @@ to you also.
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
+## [4.12.8](https://github.com/graphile/postgraphile/compare/v4.12.7...v4.12.8) (2021-12-20)
+
+### Bug Fixes
+
+- **cli:** handling of SSL options from the connection string ([#1564](https://github.com/graphile/postgraphile/issues/1564)) ([d8401c6](https://github.com/graphile/postgraphile/commit/d8401c6e143a2680c092d8ad077f8469f2f02625))
+
 ## [4.12.7](https://github.com/graphile/postgraphile/compare/v4.12.6...v4.12.7) (2021-12-20)
 
 ## [4.12.6](https://github.com/graphile/postgraphile/compare/v4.12.5...v4.12.6) (2021-11-30)
