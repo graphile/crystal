@@ -193,13 +193,7 @@ export const PgTablesPlugin: Plugin = {
               isPgTableType: true,
             },
             null,
-            () => ({
-              fields: {
-                k: {
-                  type: build.graphql.GraphQLString,
-                },
-              },
-            }),
+            () => ({}),
             "PgTablesPlugin",
           );
         }

@@ -9,7 +9,7 @@ import {
   getCodecMetaLookupFromInput,
   PgTypeCodecMetaLookup,
 } from "../inputUtils";
-import { PgTypeCodec } from "@dataplan/pg";
+import { PgTypeCodec, TYPES } from "@dataplan/pg";
 import sql from "pg-sql2";
 import { GraphQLType } from "graphql";
 
@@ -17,12 +17,18 @@ type GetGraphQLTypeByPgCodec = (
   codec: PgTypeCodec<any, any, any>,
   variant: string,
 ) => GraphQLType | null;
+type SetGraphQLTypeForPgCodec = (
+  codec: PgTypeCodec<any, any, any>,
+  variant: string,
+  typeName: string,
+) => void;
 
 declare global {
   namespace GraphileEngine {
     interface Build {
       pgCodecMetaLookup: PgTypeCodecMetaLookup;
       getGraphQLTypeByPgCodec: GetGraphQLTypeByPgCodec;
+      setGraphQLTypeForPgCodec: SetGraphQLTypeForPgCodec;
     }
   }
 }
@@ -37,6 +43,7 @@ export const PgBasicsPlugin: Plugin = {
     hooks: {
       build(build) {
         const pgCodecMetaLookup = getCodecMetaLookupFromInput(build.input);
+
         const getGraphQLTypeByPgCodec: GetGraphQLTypeByPgCodec = (
           codec,
           variant,
@@ -59,14 +66,42 @@ export const PgBasicsPlugin: Plugin = {
           }
           return type;
         };
+
+        const setGraphQLTypeForPgCodec: SetGraphQLTypeForPgCodec = (
+          codec,
+          variant,
+          typeName,
+        ) => {
+          const meta = pgCodecMetaLookup.get(codec);
+          if (!meta) {
+            throw new Error("That codec is not known");
+          }
+          if (meta.typeNameByVariant[variant] != null) {
+            // TODO: allow this?
+            throw new Error("Type already set");
+          }
+          meta.typeNameByVariant[variant] = typeName;
+        };
+
         return build.extend(
           build,
           {
             pgCodecMetaLookup,
             getGraphQLTypeByPgCodec,
+            setGraphQLTypeForPgCodec,
           },
           "Adding helpers from PgBasicsPlugin",
         );
+      },
+      init(_, build) {
+        // Register common types
+        build.setGraphQLTypeForPgCodec(TYPES.text, "input", "String");
+        build.setGraphQLTypeForPgCodec(TYPES.text, "output", "String");
+        build.setGraphQLTypeForPgCodec(TYPES.timestamptz, "input", "String");
+        build.setGraphQLTypeForPgCodec(TYPES.timestamptz, "output", "String");
+        build.setGraphQLTypeForPgCodec(TYPES.uuid, "input", "String");
+        build.setGraphQLTypeForPgCodec(TYPES.uuid, "output", "String");
+        return _;
       },
     },
   },
