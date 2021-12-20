@@ -39,6 +39,8 @@ export type PgSourceColumns = {
 export type PgSourceColumnViaExplicit = { relation: string; attribute: string };
 export type PgSourceColumnVia = string | PgSourceColumnViaExplicit;
 
+export interface PgSourceColumnExtensions {}
+
 export interface PgSourceColumn<TCanonical = any, TInput = TCanonical> {
   /**
    * How to translate to/from PG and how to cast.
@@ -93,6 +95,8 @@ export interface PgSourceColumn<TCanonical = any, TInput = TCanonical> {
   identicalVia?: PgSourceColumnVia;
   // TODO: can identicalVia be plural? Is that useful? Maybe a column that has
   // multiple foreign key references?
+
+  extensions?: Partial<PgSourceColumnExtensions>;
 }
 
 export type PgSourceRowAttribute<

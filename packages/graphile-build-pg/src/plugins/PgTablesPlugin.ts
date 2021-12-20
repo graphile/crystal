@@ -7,10 +7,10 @@ import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
 import sql from "pg-sql2";
 
 import { uniq } from "../_";
-import { version } from "../index";
-import type { PgClass } from "../introspection";
 import { getBehavior } from "../behaviour";
+import { version } from "../index";
 import { getCodecsFromInput } from "../inputUtils";
+import type { PgClass } from "../introspection";
 
 declare global {
   namespace GraphileEngine {
@@ -56,6 +56,11 @@ declare global {
         this: GraphileEngine.Inflection,
         codec: PgTypeCodec<any, any, any>,
       ): string;
+    }
+
+    interface ScopeGraphQLObjectType {
+      pgCodec?: PgTypeCodec<any, any, any>;
+      isPgTableType?: boolean;
     }
   }
 }
@@ -186,7 +191,10 @@ export const PgTablesPlugin: Plugin = {
 
           build.registerObjectType(
             build.inflection.tableType(codec),
-            {},
+            {
+              pgCodec: codec,
+              isPgTableType: true,
+            },
             null,
             () => ({
               fields: {

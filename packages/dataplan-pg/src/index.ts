@@ -19,6 +19,7 @@ export {
   PgSource,
   PgSourceBuilder,
   PgSourceColumn,
+  PgSourceColumnExtensions,
   PgSourceColumns,
   PgSourceColumnVia,
   PgSourceColumnViaExplicit,
