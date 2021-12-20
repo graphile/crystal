@@ -147,7 +147,7 @@ export interface PgSourceOptions<
  * the relations at a later step to avoid circular references.
  */
 export class PgSourceBuilder<
-  TColumns extends PgSourceColumns,
+  TColumns extends PgSourceColumns | undefined,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
   TParameters extends { [key: string]: any } | never = never,
 > {
@@ -373,7 +373,7 @@ export class PgSource<
     }
   }
 
-  private getRelations(): TRelations {
+  public getRelations(): TRelations {
     if (typeof this.relationsThunk === "function") {
       this._relations = this.relationsThunk();
       this.relationsThunk = null;

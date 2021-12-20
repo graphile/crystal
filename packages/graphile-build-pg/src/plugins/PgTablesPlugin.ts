@@ -10,6 +10,7 @@ import { uniq } from "../_";
 import { version } from "../index";
 import type { PgClass } from "../introspection";
 import { getBehavior } from "../behaviour";
+import { getCodecsFromInput } from "../inputUtils";
 
 declare global {
   namespace GraphileEngine {
@@ -22,7 +23,7 @@ declare global {
        * A PgTypeCodec may represent any of a wide range of PostgreSQL types;
        * this inflector gives a name to this codec, it's primarily used when
        * naming _types_ in the GraphQL schema (as opposed to `_sourceName`
-       * which typically names _fields.
+       * which typically names _fields_).
        *
        * @remarks The method beginning with `_` implies it's not ment to
        * be called directly, instead it's called from other inflectors to give
@@ -168,7 +169,7 @@ export const PgTablesPlugin: Plugin = {
       },
 
       init(_, build, _context) {
-        const codecs = uniq(build.input.pgSources.map((s) => s.codec));
+        const codecs = getCodecsFromInput(build.input);
         codecs.forEach((codec) => {
           if (!codec.columns) {
             // Only apply to codecs that define columns

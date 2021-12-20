@@ -99,6 +99,9 @@ export const PgAllRowsPlugin: Plugin = {
         );
       },
       GraphQLObjectType_fields(fields, build, context) {
+        const {
+          graphql: { GraphQLList, GraphQLNonNull },
+        } = build;
         if (!context.scope.isRootQuery) {
           return fields;
         }
@@ -120,7 +123,7 @@ export const PgAllRowsPlugin: Plugin = {
             fields,
             {
               [build.inflection.allRowsList(source)]: {
-                type,
+                type: new GraphQLList(new GraphQLNonNull(type)),
               },
             },
             `Adding 'all rows' field for PgSource ${source}`,
