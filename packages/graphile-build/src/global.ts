@@ -281,7 +281,7 @@ declare global {
        * describe what you are doing and when a conflict occurs both hints will
        * be logged helping users to figure out what went wrong.
        */
-      extend: <Obj1 extends object, Obj2 extends object>(
+      extend: <Obj1 extends object, Obj2 extends Partial<Obj1> & object>(
         base: Obj1,
         extra: Obj2,
         hint: string,
