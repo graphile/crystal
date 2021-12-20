@@ -572,7 +572,12 @@ const coerce = (o: ReturnType<typeof parsePgConnectionString>): PoolConfig => {
   return {
     ...o,
     application_name: o['application_name'] || undefined,
-    ssl: o.ssl != null ? !!o.ssl : undefined,
+    ssl:
+      o.ssl == null
+        ? undefined
+        : (o.ssl as any).rejectUnauthorized == null
+        ? !!o.ssl
+        : (o.ssl as any),
     user: typeof o.user === 'string' ? o.user : undefined,
     database: typeof o.database === 'string' ? o.database : undefined,
     password: typeof o.password === 'string' ? o.password : undefined,
