@@ -6,10 +6,8 @@ import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
 import sql from "pg-sql2";
 
-import { uniq } from "../_";
 import { getBehavior } from "../behaviour";
 import { version } from "../index";
-import { getCodecsFromInput } from "../inputUtils";
 import type { PgClass } from "../introspection";
 
 declare global {
@@ -174,11 +172,10 @@ export const PgTablesPlugin: Plugin = {
       },
 
       init(_, build, _context) {
-        const codecs = getCodecsFromInput(build.input);
-        codecs.forEach((codec) => {
+        for (const codec of build.pgCodecMetaLookup.keys()) {
           if (!codec.columns) {
             // Only apply to codecs that define columns
-            return;
+            continue;
           }
 
           const behavior = getBehavior(codec.extensions);
@@ -186,7 +183,7 @@ export const PgTablesPlugin: Plugin = {
           // it in a subscription? What if only on a mutation payload? More
           // like "viewable"?
           if (behavior && !behavior.includes("selectable")) {
-            return;
+            continue;
           }
 
           build.registerObjectType(
@@ -205,7 +202,7 @@ export const PgTablesPlugin: Plugin = {
             }),
             "PgTablesPlugin",
           );
-        });
+        }
         return _;
       },
     },

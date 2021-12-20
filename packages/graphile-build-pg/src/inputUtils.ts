@@ -8,10 +8,24 @@ import type {
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
 
-const getCodecsFromInputMemo = new WeakMap<
-  GraphileEngine.BuildInput,
-  PgTypeCodec<any, any, any>[]
->();
+export interface PgTypeCodecMeta {
+  typeNameByVariant: {
+    [variant: string]: string;
+  };
+}
+
+export type PgTypeCodecMetaLookup = Map<
+  PgTypeCodec<any, any, any>,
+  PgTypeCodecMeta
+>;
+
+function makePgTypeCodecMeta(
+  _codec: PgTypeCodec<any, any, any>,
+): PgTypeCodecMeta {
+  return {
+    typeNameByVariant: {},
+  };
+}
 
 /**
  * Given the input object, this function walks through all the pgSources and
@@ -20,21 +34,15 @@ const getCodecsFromInputMemo = new WeakMap<
  *
  * Memoized for performance, using a WeakMap.
  */
-export function getCodecsFromInput(
+export function getCodecMetaLookupFromInput(
   input: GraphileEngine.BuildInput,
-): PgTypeCodec<any, any, any>[] {
-  const cached = getCodecsFromInputMemo.get(input);
-  if (cached) {
-    return cached;
-  }
-  const codecs = new Set<PgTypeCodec<any, any, any>>();
+): PgTypeCodecMetaLookup {
+  const metaLookup: PgTypeCodecMetaLookup = new Map();
   const seenSources = new Set<PgSource<any, any, any, any>>();
   for (const source of input.pgSources) {
-    walkSource(resolveSource(source), codecs, seenSources);
+    walkSource(resolveSource(source), metaLookup, seenSources);
   }
-  const result = [...codecs];
-  getCodecsFromInputMemo.set(input, result);
-  return result;
+  return metaLookup;
 }
 
 /**
@@ -42,22 +50,22 @@ export function getCodecsFromInput(
  */
 function walkSource(
   source: PgSource<any, any, any, any>,
-  codecs: Set<PgTypeCodec<any, any, any>>,
+  metaLookup: PgTypeCodecMetaLookup,
   seenSources: Set<PgSource<any, any, any, any>>,
 ): void {
   if (seenSources.has(source)) {
     return;
   }
   seenSources.add(source);
-  if (!codecs.has(source.codec)) {
-    walkCodec(source.codec, codecs);
+  if (!metaLookup.has(source.codec)) {
+    walkCodec(source.codec, metaLookup);
   }
   const relations = source.getRelations();
   if (relations) {
     for (const relationshipName in relations) {
       walkSource(
         resolveSource(relations[relationshipName].source),
-        codecs,
+        metaLookup,
         seenSources,
       );
     }
@@ -69,15 +77,15 @@ function walkSource(
  */
 function walkCodec(
   codec: PgTypeCodec<any, any, any>,
-  codecs: Set<PgTypeCodec<any, any, any>>,
+  metaLookup: PgTypeCodecMetaLookup,
 ): void {
-  if (codecs.has(codec)) {
+  if (metaLookup.has(codec)) {
     return;
   }
-  codecs.add(codec);
+  metaLookup.set(codec, makePgTypeCodecMeta(codec));
   if (codec.columns) {
     for (const columnName in codec.columns) {
-      walkCodec(codec.columns[columnName].codec, codecs);
+      walkCodec(codec.columns[columnName].codec, metaLookup);
     }
   }
 }

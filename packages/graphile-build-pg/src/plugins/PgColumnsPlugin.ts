@@ -80,6 +80,12 @@ export const PgColumnsPlugin: Plugin = {
       },
       GraphQLObjectType_fields(fields, build, context) {
         const {
+          extend,
+          graphql: { getNullableType, GraphQLNonNull },
+          inflection,
+          getGraphQLTypeByPgCodec,
+        } = build;
+        const {
           scope: { pgCodec, isPgTableType },
         } = context;
 
@@ -96,14 +102,25 @@ export const PgColumnsPlugin: Plugin = {
             continue;
           }
 
-          const columnFieldName = build.inflection.column({
+          const columnFieldName = inflection.column({
             columnName,
             column,
             codec: pgCodec,
           });
-          const type = build.getTypeByPgCodec(column.codec, {
-            nonNull: column.nonNull,
-          });
+          const baseType = getGraphQLTypeByPgCodec(column.codec, "output");
+          if (!baseType) {
+            console.warn(
+              `Couldn't find a 'output' variant for ${
+                sql.compile(pgCodec.sqlType).text
+              }'s '${columnName}' column (${
+                sql.compile(column.codec.sqlType).text
+              })`,
+            );
+            continue;
+          }
+          const type = column.notNull
+            ? new GraphQLNonNull(getNullableType(baseType))
+            : baseType;
 
           if (!type) {
             // Could not determine the type, skip this field
@@ -115,7 +132,7 @@ export const PgColumnsPlugin: Plugin = {
             continue;
           }
 
-          fields = build.extend(
+          fields = extend(
             fields,
             {
               [columnFieldName]: {
