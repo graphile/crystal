@@ -124,6 +124,9 @@ export const PgAllRowsPlugin: Plugin = {
             {
               [build.inflection.allRowsList(source)]: {
                 type: new GraphQLList(new GraphQLNonNull(type)),
+                plan() {
+                  return source.find();
+                },
               },
             },
             `Adding 'all rows' field for PgSource ${source}`,
