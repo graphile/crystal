@@ -1,6 +1,4 @@
 /* eslint-disable no-restricted-syntax */
-import { inspect } from "util";
-
 import type {
   PgExecutorContextPlans,
   PgSourceColumns,
@@ -17,11 +15,12 @@ import {
   QueryQueryPlugin,
 } from "graphile-build";
 import { context, crystalPrint, object } from "graphile-crystal";
-import { exportSchema } from "graphile-exporter";
+import { EXPORTABLE, exportSchema } from "graphile-exporter";
 import { resolvePresets } from "graphile-plugin";
 import { graphql, printSchema } from "graphql";
 import { Pool } from "pg";
 import sql from "pg-sql2";
+import { inspect } from "util";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 
