@@ -2,14 +2,15 @@ import "graphile-build";
 import "./PgTablesPlugin";
 import "../interfaces";
 
-import { inspect } from "util";
 import type { PgTypeCodec } from "@dataplan/pg";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLType } from "graphql";
 import sql from "pg-sql2";
+import { inspect } from "util";
 
 import { version } from "../index";
-import { makePgTypeCodecMeta, PgTypeCodecMetaLookup } from "../inputUtils";
+import type { PgTypeCodecMetaLookup } from "../inputUtils";
+import { makePgTypeCodecMeta } from "../inputUtils";
 import { getCodecMetaLookupFromInput } from "../inputUtils";
 
 type GetGraphQLTypeByPgCodec = (
@@ -71,6 +72,8 @@ export const PgBasicsPlugin: Plugin = {
           variants,
           typeName,
         ) => {
+          build.assertTypeName(typeName);
+
           let meta = pgCodecMetaLookup.get(codec);
           if (!meta) {
             meta = makePgTypeCodecMeta(codec);

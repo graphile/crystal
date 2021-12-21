@@ -171,6 +171,15 @@ export default function makeNewBuild(
       register(GraphQLEnumType, typeName, scope, null, specGenerator, origin);
     },
 
+    assertTypeName(typeName) {
+      if (typeName in allTypesSources) {
+        return true;
+      } else {
+        throw new Error(
+          `Type name '${typeName}' is not registered - be sure to register the type before you attempt to reference it.`,
+        );
+      }
+    },
     getTypeByName(typeName) {
       if (typeName in allTypes) {
         return allTypes[typeName];

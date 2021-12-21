@@ -281,6 +281,12 @@ declare global {
       ) => void;
 
       /**
+       * Asserts that the given typeName is registered; throws if this isn't
+       * the case.
+       */
+      assertTypeName(typeName: string): void;
+
+      /**
        * Returns the GraphQL type with the given name, constructing it if
        * necessary (assuming there's a registered type generator). If the
        * constructed type is invalid (e.g. an object type with no fields) then
