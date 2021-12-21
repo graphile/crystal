@@ -40,6 +40,12 @@ export const makeInitialInflection = () => ({
    */
   builtin: (name: string): string => name,
 
+  /** Take a type name and return the edge type name */
+  edgeType: (typeName: string): string => typeName + `Edge`,
+
+  /** Take a type name and return the connection type name */
+  connectionType: (typeName: string): string => typeName + `Connection`,
+
   /**
    * Try and make something a valid GraphQL 'Name'.
    *

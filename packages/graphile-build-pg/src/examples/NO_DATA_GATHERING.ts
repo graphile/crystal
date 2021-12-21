@@ -4,7 +4,7 @@ import type {
   PgSourceColumns,
   WithPgClient,
 } from "@dataplan/pg";
-import { PgExecutor, PgSource, recordType,TYPES } from "@dataplan/pg";
+import { PgExecutor, PgSource, recordType, TYPES } from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import chalk from "chalk";
 import { readFile } from "fs/promises";

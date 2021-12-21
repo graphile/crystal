@@ -428,6 +428,7 @@ declare global {
       extends ScopeGraphQLObjectTypeFields {
       fieldName: string;
       fieldDirectives?: DirectiveMap;
+      isCursorField?: boolean;
     }
     interface ContextGraphQLObjectTypeFieldsField
       extends ContextGraphQLObjectTypeFields {

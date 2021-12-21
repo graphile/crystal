@@ -2,11 +2,12 @@ import "graphile-build";
 import "./PgBasicsPlugin";
 import "../interfaces";
 
-import { PgHStore, TYPES } from "@dataplan/pg";
+import type { PgHStore } from "@dataplan/pg";
+import { TYPES } from "@dataplan/pg";
 import type { Plugin } from "graphile-plugin";
+import type { GraphQLInputFieldConfigMap, ValueNode } from "graphql";
 
 import { version } from "../index";
-import { GraphQLInputFieldConfigMap, ValueNode } from "graphql";
 
 declare global {
   namespace GraphileEngine {
