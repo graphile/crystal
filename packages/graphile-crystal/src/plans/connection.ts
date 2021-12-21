@@ -4,7 +4,9 @@ import { ExecutablePlan } from "../plan";
 export interface ConnectionCapablePlan<
   T extends ReadonlyArray<any> = ReadonlyArray<any>,
 > extends ExecutablePlan<T> {
-  clone(): this;
+  clone(): ConnectionCapablePlan<any>; // TODO: `this`
+  hasNextPage(): ExecutablePlan<boolean>;
+  hasPreviousPage(): ExecutablePlan<boolean>;
 }
 
 export class ConnectionPlan<
@@ -52,7 +54,17 @@ export class ConnectionPlan<
       );
     }
     const plan = this.getPlan(this.subplanId) as TPlan;
-    return plan.clone();
+    return plan.clone() as any;
+  }
+
+  public hasNextPage() {
+    const plan = this.getPlan(this.subplanId) as TPlan;
+    return plan.clone().hasNextPage();
+  }
+
+  public hasPreviousPage() {
+    const plan = this.getPlan(this.subplanId) as TPlan;
+    return plan.clone().hasNextPage();
   }
 
   public execute(

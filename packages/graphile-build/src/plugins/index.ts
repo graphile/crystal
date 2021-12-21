@@ -3,6 +3,7 @@ import { CommonTypesPlugin } from "./CommonTypesPlugin.js";
 import { CursorTypePlugin } from "./CursorTypePlugin.js";
 import { MutationPayloadQueryPlugin } from "./MutationPayloadQueryPlugin.js";
 import { MutationPlugin } from "./MutationPlugin.js";
+import { PageInfoTypePlugin } from "./PageInfoTypePlugin.js";
 import { QueryPlugin } from "./QueryPlugin.js";
 import { QueryQueryPlugin } from "./QueryQueryPlugin.js";
 import { SubscriptionPlugin } from "./SubscriptionPlugin.js";
@@ -14,6 +15,7 @@ export {
   CursorTypePlugin,
   MutationPayloadQueryPlugin,
   MutationPlugin,
+  PageInfoTypePlugin,
   QueryPlugin,
   QueryQueryPlugin,
   SubscriptionPlugin,

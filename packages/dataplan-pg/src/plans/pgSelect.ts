@@ -2,12 +2,15 @@ import { createHash } from "crypto";
 import debugFactory from "debug";
 import type {
   __ItemPlan,
+  ConnectionCapablePlan,
   CrystalResultsList,
   CrystalResultStreamList,
   CrystalValuesList,
   PlanOptimizeOptions,
   PlanStreamOptions,
-  StreamablePlan,
+  StreamablePlan} from "graphile-crystal";
+import {
+  constant
 } from "graphile-crystal";
 import {
   __TrackedObjectPlan,
@@ -206,7 +209,9 @@ export class PgSelectPlan<
     TParameters extends { [key: string]: any } | never = never,
   >
   extends ExecutablePlan<ReadonlyArray<PgSourceRow<TColumns>>>
-  implements StreamablePlan<PgSourceRow<TColumns>>
+  implements
+    StreamablePlan<PgSourceRow<TColumns>>,
+    ConnectionCapablePlan<ReadonlyArray<PgSourceRow<TColumns>>>
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -859,6 +864,15 @@ export class PgSelectPlan<
 
   before(cursor: string): void {
     this.parseCursor("before", cursor);
+  }
+
+  public hasNextPage(): ExecutablePlan<boolean> {
+    // TODO!
+    return constant(true);
+  }
+  public hasPreviousPage(): ExecutablePlan<boolean> {
+    // TODO!
+    return constant(true);
   }
 
   /**

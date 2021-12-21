@@ -8,6 +8,7 @@ import {
   CursorTypePlugin,
   MutationPayloadQueryPlugin,
   MutationPlugin,
+  PageInfoTypePlugin,
   QueryPlugin,
   SubscriptionPlugin,
 } from "./plugins/index.js";
@@ -21,5 +22,6 @@ export const defaultPreset: Preset = {
     MutationPayloadQueryPlugin,
     CursorTypePlugin,
     CommonTypesPlugin,
+    PageInfoTypePlugin,
   ],
 };
