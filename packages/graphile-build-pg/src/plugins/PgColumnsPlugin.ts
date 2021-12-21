@@ -4,7 +4,6 @@ import "../interfaces";
 
 import type {
   PgSelectSinglePlan,
-  PgSource,
   PgSourceColumn,
   PgTypeCodec,
 } from "@dataplan/pg";

@@ -1,12 +1,33 @@
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { PgInterval } from "./codecUtils";
+import type {
+  PgBox,
+  PgCircle,
+  PgInterval,
+  PgLine,
+  PgLseg,
+  PgPath,
+  PgPoint,
+  PgPolygon,
+} from "./codecUtils";
 import {
+  parseBox,
+  parseCircle,
   parseInterval,
+  parseLine,
+  parseLseg,
+  parsePath,
   parsePoint,
+  parsePolygon,
+  stringifyBox,
+  stringifyCircle,
   stringifyInterval,
+  stringifyLine,
+  stringifyLseg,
+  stringifyPath,
   stringifyPoint,
+  stringifyPolygon,
 } from "./codecUtils";
 import type { PgSourceColumns } from "./datasource";
 import { exportAs } from "./exportAs";
@@ -58,7 +79,13 @@ type SupportedPostgresType =
   | "interval"
   | "bit"
   | "varbit"
-  | "point";
+  | "point"
+  | "line"
+  | "lseg"
+  | "box"
+  | "path"
+  | "polygon"
+  | "circle";
 
 const pg2gqlForType = (type: SupportedPostgresType): ((value: any) => any) => {
   switch (type) {
@@ -78,6 +105,24 @@ const pg2gqlForType = (type: SupportedPostgresType): ((value: any) => any) => {
     }
     case "point": {
       return parsePoint;
+    }
+    case "line": {
+      return parseLine;
+    }
+    case "lseg": {
+      return parseLseg;
+    }
+    case "box": {
+      return parseBox;
+    }
+    case "path": {
+      return parsePath;
+    }
+    case "polygon": {
+      return parsePolygon;
+    }
+    case "circle": {
+      return parseCircle;
     }
     case "jsonb":
     case "json":
@@ -127,6 +172,24 @@ const gql2pgForType = (type: SupportedPostgresType): PgEncode<any> => {
     }
     case "point": {
       return stringifyPoint;
+    }
+    case "line": {
+      return stringifyLine;
+    }
+    case "lseg": {
+      return stringifyLseg;
+    }
+    case "box": {
+      return stringifyBox;
+    }
+    case "path": {
+      return stringifyPath;
+    }
+    case "polygon": {
+      return stringifyPolygon;
+    }
+    case "circle": {
+      return stringifyCircle;
     }
     case "int2":
     case "int4":
@@ -252,10 +315,16 @@ export const TYPES = {
   cidr: t<string>("cidr"),
   macaddr: t<string>("macaddr"),
   macaddr8: t<string>("macaddr8"),
-  interval: t<PgInterval, string>("interval"), // TODO: parsing/etc
+  interval: t<PgInterval, string>("interval"),
   bit: t<string>("bit"),
   varbit: t<string>("varbit"),
-  point: t<{ x: number; y: number }, string>("point"), // TODO: custom parsing/etc?
+  point: t<PgPoint, string>("point"),
+  line: t<PgLine, string>("line"),
+  lseg: t<PgLseg, string>("lseg"),
+  box: t<PgBox, string>("box"),
+  path: t<PgPath, string>("path"),
+  polygon: t<PgPolygon, string>("polygon"),
+  circle: t<PgCircle, string>("circle"),
 } as const;
 exportAs(TYPES, "TYPES");
 for (const key of Object.keys(TYPES)) {

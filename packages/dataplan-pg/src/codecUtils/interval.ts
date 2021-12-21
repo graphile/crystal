@@ -1,28 +1,3 @@
-import type { SQL } from "pg-sql2";
-import sql from "pg-sql2";
-import { inspect } from "util";
-
-interface PgPoint {
-  x: number;
-  y: number;
-}
-
-export function parsePoint(f: string): PgPoint {
-  if (f[0] === "(" && f[f.length - 1] === ")") {
-    const [x, y] = f
-      .substring(1, f.length - 1)
-      .split(",")
-      .map((f) => parseFloat(f));
-    return { x, y };
-  } else {
-    throw new Error(`Failed to parse point ${inspect(f)}`);
-  }
-}
-
-export function stringifyPoint(point: PgPoint): string {
-  return `(${point.x}, ${point.y})`;
-}
-
 export interface PgInterval {
   years: number;
   months: number;
