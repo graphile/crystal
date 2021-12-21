@@ -2,15 +2,11 @@ import "graphile-build";
 import "./PgBasicsPlugin";
 import "../interfaces";
 
-import { TYPES } from "@dataplan/pg";
+import { PgHStore, TYPES } from "@dataplan/pg";
 import type { Plugin } from "graphile-plugin";
 
 import { version } from "../index";
-import {
-  GraphQLFieldConfigMap,
-  GraphQLInputFieldConfigMap,
-  GraphQLInputType,
-} from "graphql";
+import { GraphQLInputFieldConfigMap, ValueNode } from "graphql";
 
 declare global {
   namespace GraphileEngine {
@@ -49,6 +45,7 @@ export const PgTypesPlugin: Plugin = {
             GraphQLNonNull,
             GraphQLList,
             GraphQLBoolean,
+            Kind,
           },
           getInputTypeByName,
           getOutputTypeByName,
@@ -544,6 +541,120 @@ export const PgTypesPlugin: Plugin = {
           },
         );
 
+        // hstore
+        const hstoreTypeName = inflection.builtin("KeyValueHash");
+        {
+          function isValidHstoreObject(obj: unknown): obj is PgHStore {
+            if (obj === null) {
+              // Null is okay
+              return true;
+            } else if (typeof obj === "object") {
+              // A hash with string/null values is also okay
+              const keys = Object.keys(obj);
+              for (const key of keys) {
+                const val = obj[key];
+                if (val === null) {
+                  // Null is okay
+                } else if (typeof val === "string") {
+                  // String is okay
+                } else {
+                  // Everything else is invalid.
+                  return false;
+                }
+              }
+              return true;
+            } else {
+              // Everything else is invalid.
+              return false;
+            }
+          }
+
+          function parseValueLiteral(
+            ast: ValueNode,
+            variables: { [key: string]: any } | null | undefined,
+          ) {
+            switch (ast.kind) {
+              case Kind.INT:
+              case Kind.FLOAT:
+                // Number isn't really okay, but we'll coerce it to a string anyway.
+                return String(parseFloat(ast.value));
+              case Kind.STRING:
+                // String is okay.
+                return String(ast.value);
+              case Kind.NULL:
+                // Null is okay.
+                return null;
+              case Kind.VARIABLE: {
+                // Variable is okay if that variable is either a string or null.
+                const name = ast.name.value;
+                const value = variables ? variables[name] : undefined;
+                if (value === null || typeof value === "string") {
+                  return value;
+                }
+                return undefined;
+              }
+              default:
+                // Everything else is invalid.
+                return undefined;
+            }
+          }
+
+          build.registerScalarType(
+            hstoreTypeName,
+            {},
+            () => ({
+              description: build.wrapDescription(
+                "A set of key/value pairs, keys are strings, values may be a string or null. Exposed as a JSON object.",
+                "type",
+              ),
+              serialize: (value) => value,
+              parseValue(obj) {
+                if (isValidHstoreObject(obj)) {
+                  return obj;
+                }
+                throw new TypeError(
+                  `This is not a valid ${hstoreTypeName} object, it must be a key/value hash where keys and values are both strings (or null).`,
+                );
+              },
+              parseLiteral(ast, variables) {
+                switch (ast.kind) {
+                  case Kind.OBJECT: {
+                    const value = ast.fields.reduce((memo, field) => {
+                      memo[field.name.value] = parseValueLiteral(
+                        field.value,
+                        variables,
+                      );
+                      return memo;
+                    }, Object.create(null));
+
+                    if (!isValidHstoreObject(value)) {
+                      return undefined;
+                    }
+                    return value;
+                  }
+
+                  case Kind.NULL:
+                    return null;
+
+                  case Kind.VARIABLE: {
+                    const name = ast.name.value;
+                    const value = variables ? variables[name] : undefined;
+
+                    if (!isValidHstoreObject(value)) {
+                      return undefined;
+                    }
+                    return value;
+                  }
+
+                  default:
+                    return undefined;
+                }
+              },
+            }),
+            "graphile-build-pg built-in (KeyValueStore)",
+          );
+        }
+
         const typeNameByTYPESKey: {
           [key in keyof typeof TYPES]: string | { [variant: string]: string };
         } = {
@@ -601,6 +712,7 @@ export const PgTypesPlugin: Plugin = {
             input: inflection.inputType(inflection.builtin("Polygon")),
             output: inflection.builtin("Polygon"),
           },
+          hstore: hstoreTypeName,
           inet: inflection.builtin("InternetAddress"),
           regproc: inflection.builtin("RegProc"),
           regprocedure: inflection.builtin("RegProcedure"),

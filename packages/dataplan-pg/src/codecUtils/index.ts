@@ -1,5 +1,6 @@
 export * from "./box";
 export * from "./circle";
+export * from "./hstore";
 export * from "./interval";
 export * from "./line";
 export * from "./lseg";

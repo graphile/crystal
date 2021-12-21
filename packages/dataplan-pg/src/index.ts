@@ -13,6 +13,17 @@ debugFactory.formatters.S = sqlPrint;
 
 export { enumType, recordType, TYPES } from "./codecs";
 export {
+  PgBox,
+  PgCircle,
+  PgHStore,
+  PgInterval,
+  PgLine,
+  PgLseg,
+  PgPath,
+  PgPoint,
+  PgPolygon,
+} from "./codecUtils";
+export {
   PgEnumSource,
   PgEnumSourceExtensions,
   PgEnumSourceOptions,

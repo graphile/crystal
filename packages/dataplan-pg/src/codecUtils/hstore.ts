@@ -147,7 +147,7 @@ function toHstoreString(str: string | null): string {
   return str == null ? "NULL" : '"' + str.replace(/(["\\])/g, "\\$1") + '"';
 }
 
-export function hstoreStringify(o: PgHStore | null): string | null {
+export function stringifyHstore(o: PgHStore | null): string | null {
   if (o == null) {
     return null;
   }

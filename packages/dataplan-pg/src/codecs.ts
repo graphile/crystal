@@ -4,13 +4,17 @@ import sql from "pg-sql2";
 import type {
   PgBox,
   PgCircle,
+  PgHStore,
   PgInterval,
   PgLine,
   PgLseg,
   PgPath,
   PgPoint,
-  PgPolygon,
+  PgPolygon} from "./codecUtils";
+import {
+  stringifyHstore,
 } from "./codecUtils";
+import { parseHstore } from "./codecUtils";
 import {
   parseBox,
   parseCircle,
@@ -85,7 +89,8 @@ type SupportedPostgresType =
   | "box"
   | "path"
   | "polygon"
-  | "circle";
+  | "circle"
+  | "hstore";
 
 const pg2gqlForType = (type: SupportedPostgresType): ((value: any) => any) => {
   switch (type) {
@@ -123,6 +128,9 @@ const pg2gqlForType = (type: SupportedPostgresType): ((value: any) => any) => {
     }
     case "circle": {
       return parseCircle;
+    }
+    case "hstore": {
+      return parseHstore;
     }
     case "jsonb":
     case "json":
@@ -190,6 +198,9 @@ const gql2pgForType = (type: SupportedPostgresType): PgEncode<any> => {
     }
     case "circle": {
       return stringifyCircle;
+    }
+    case "hstore": {
+      return stringifyHstore;
     }
     case "int2":
     case "int4":
@@ -325,6 +336,7 @@ export const TYPES = {
   path: t<PgPath, string>("path"),
   polygon: t<PgPolygon, string>("polygon"),
   circle: t<PgCircle, string>("circle"),
+  hstore: t<PgHStore, string>("hstore"),
 } as const;
 exportAs(TYPES, "TYPES");
 for (const key of Object.keys(TYPES)) {
