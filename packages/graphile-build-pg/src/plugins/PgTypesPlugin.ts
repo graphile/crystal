@@ -40,9 +40,27 @@ export const PgTypesPlugin: Plugin = {
         );
 
         build.setGraphQLTypeForPgCodec(
+          TYPES.float,
+          ["input", "output"],
+          "Float",
+        );
+
+        build.setGraphQLTypeForPgCodec(
           TYPES.text,
           ["input", "output"],
           "String",
+        );
+
+        build.setGraphQLTypeForPgCodec(
+          TYPES.json,
+          ["input", "output"],
+          inflection.builtin("JSON"),
+        );
+
+        build.setGraphQLTypeForPgCodec(
+          TYPES.jsonb,
+          ["input", "output"],
+          inflection.builtin("JSON"),
         );
 
         build.setGraphQLTypeForPgCodec(

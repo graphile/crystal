@@ -1,11 +1,15 @@
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
+import type { GraphQLScalarLiteralParser } from "graphql";
 
 import { version } from "../index.js";
 
 declare global {
   namespace GraphileEngine {
     interface ScopeGraphQLScalarType {}
+    interface GraphileBuildSchemaOptions {
+      extendedTypes?: boolean;
+    }
   }
 }
 
@@ -18,7 +22,12 @@ export const CommonTypesPlugin: Plugin = {
     hooks: {
       // TODO: add "specifiedBy" configuration
       init(_, build) {
-        const { inflection, stringTypeSpec } = build;
+        const {
+          options: { extendedTypes },
+          inflection,
+          stringTypeSpec,
+          graphql: { Kind },
+        } = build;
 
         build.registerScalarType(
           inflection.builtin("BigInt"),
@@ -73,6 +82,70 @@ export const CommonTypesPlugin: Plugin = {
             ),
           "graphile-build built-in (UUID type)",
         );
+
+        if (extendedTypes !== false) {
+          const parseLiteral: GraphQLScalarLiteralParser<any> = EXPORTABLE(
+            (Kind) => (ast, variables) => {
+              switch (ast.kind) {
+                case Kind.STRING:
+                case Kind.BOOLEAN:
+                  return ast.value;
+                case Kind.INT:
+                case Kind.FLOAT:
+                  return parseFloat(ast.value);
+                case Kind.OBJECT: {
+                  const value = Object.create(null);
+                  ast.fields.forEach((field) => {
+                    value[field.name.value] = parseLiteral(
+                      field.value,
+                      variables,
+                    );
+                  });
+
+                  return value;
+                }
+                case Kind.LIST:
+                  return ast.values.map((n) => parseLiteral(n, variables));
+                case Kind.NULL:
+                  return null;
+                case Kind.VARIABLE: {
+                  const name = ast.name.value;
+                  return variables ? variables[name] : undefined;
+                }
+                default:
+                  return undefined;
+              }
+            },
+            [Kind],
+          );
+          build.registerScalarType(
+            inflection.builtin("JSON"),
+            {},
+            () => ({
+              description:
+                `Represents JSON values as specified by ` +
+                "[ECMA-404](http://www.ecma-international.org/" +
+                "publications/files/ECMA-ST/ECMA-404.pdf).",
+              serialize: (value) => value,
+              parseValue: (value) => value,
+              parseLiteral,
+            }),
+            "graphile-build built-in (JSON type; extended)",
+          );
+        } else {
+          build.registerScalarType(
+            inflection.builtin("JSON"),
+            {},
+            () =>
+              stringTypeSpec(
+                build.wrapDescription(
+                  "A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).",
+                  "type",
+                ),
+              ),
+            "graphile-build built-in (JSON type; simple)",
+          );
+        }
 
         return _;
       },
