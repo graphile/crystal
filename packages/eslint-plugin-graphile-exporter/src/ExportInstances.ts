@@ -1,5 +1,5 @@
 import type { Rule } from "eslint";
-import type { Node as ESTreeNode } from "estree";
+import type { CallExpression, NewExpression, Node as ESTreeNode } from "estree";
 
 import { reportProblem } from "./common";
 import { hasExportableParent } from "./NoNested";
@@ -11,6 +11,8 @@ interface CommonOptions {
 const KNOWN_IMPORTS: Array<[string, string]> = [
   ["@dataplan/pg", "PgSource"],
   ["@dataplan/pg", "PgSourceBuilder"],
+  ["@dataplan/pg", "PgExecutor"],
+  ["@dataplan/pg", "recordType"],
 ];
 
 export const ExportInstances: Rule.RuleModule = {
@@ -44,14 +46,13 @@ export const ExportInstances: Rule.RuleModule = {
     const options: CommonOptions = {
       disableAutofix,
     };
-    return {
-      VariableDeclarator(node) {
-        const init = node.init;
-        if (!init || init.type !== "NewExpression") {
-          return;
-        }
-
-        const callee = init.callee;
+    function process(
+      node:
+        | (NewExpression & Rule.NodeParentExtension)
+        | (CallExpression & Rule.NodeParentExtension),
+    ) {
+      if (node.type === "NewExpression" || node.type === "CallExpression") {
+        const callee = node.callee;
         const calleeIdentifier = callee.type === "Identifier" ? callee : null;
         if (!calleeIdentifier) {
           return;
@@ -70,18 +71,20 @@ export const ExportInstances: Rule.RuleModule = {
 
         reportProblem(context, options, {
           node: node as unknown as ESTreeNode,
-          message: `Construction of '${constructorName}' without EXPORTABLE.`,
+          message: `${
+            node.type === "NewExpression" ? "Construction" : "Call"
+          } of '${constructorName}' without EXPORTABLE.`,
           suggest: [
             {
               desc: "convert to exportable",
               fix(fixer) {
                 return [
                   fixer.replaceTextRange(
-                    [init.range![0], init.range![0]],
+                    [node.range![0], node.range![0]],
                     "EXPORTABLE(() => ",
                   ),
                   fixer.replaceTextRange(
-                    [init.range![1], init.range![1]],
+                    [node.range![1], node.range![1]],
                     ", [])",
                   ),
                 ];
@@ -89,6 +92,14 @@ export const ExportInstances: Rule.RuleModule = {
             },
           ],
         });
+      }
+    }
+    return {
+      NewExpression(node) {
+        process(node);
+      },
+      CallExpression(node) {
+        process(node);
       },
     };
   },
