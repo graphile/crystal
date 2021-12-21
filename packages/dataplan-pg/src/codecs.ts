@@ -1,6 +1,13 @@
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
+import type { PgInterval } from "./codecUtils";
+import {
+  parseInterval,
+  parsePoint,
+  stringifyInterval,
+  stringifyPoint,
+} from "./codecUtils";
 import type { PgSourceColumns } from "./datasource";
 import { exportAs } from "./exportAs";
 import type {
@@ -13,39 +20,162 @@ import type {
 // TODO: optimisation: `identity` can be shortcut
 const identity = <T>(value: T): T => value;
 
-const pg2gqlForType = (type: "bool" | "timestamptz" | "timestamp" | string) => {
+type SupportedPostgresType =
+  | "bool"
+  | "int2"
+  | "int4"
+  | "bigint"
+  | "float4"
+  | "float"
+  | "money"
+  | "numeric"
+  | "char"
+  | "varchar"
+  | "text"
+  | "json"
+  | "jsonb"
+  | "citext"
+  | "uuid"
+  | "timestamp"
+  | "timestamptz"
+  | "date"
+  | "time"
+  | "timetz"
+  | "inet"
+  | "regproc"
+  | "regprocedure"
+  | "regoper"
+  | "regoperator"
+  | "regclass"
+  | "regtype"
+  | "regrole"
+  | "regnamespace"
+  | "regconfig"
+  | "regdictionary"
+  | "cidr"
+  | "macaddr"
+  | "macaddr8"
+  | "interval"
+  | "bit"
+  | "varbit"
+  | "point";
+
+const pg2gqlForType = (type: SupportedPostgresType): ((value: any) => any) => {
   switch (type) {
+    case "int2":
+    case "int4": {
+      return (value: any) => parseInt(value, 10);
+    }
+    case "float":
+    case "float4": {
+      return (value: any) => parseFloat(value);
+    }
     case "bool": {
       return (value: any) => value === "true";
     }
-    case "timestamptz":
-    case "timestamp": {
-      return (value: any) => new Date(Date.parse(value));
+    case "interval": {
+      return parseInterval;
+    }
+    case "point": {
+      return parsePoint;
     }
     case "jsonb":
-    case "json": {
-      return (value: any) => JSON.parse(value);
+    case "json":
+    case "bigint":
+    case "money":
+    case "numeric":
+    case "date":
+    case "timestamp":
+    case "timestamptz":
+    case "time":
+    case "timetz":
+    case "inet":
+    case "regdictionary":
+    case "regconfig":
+    case "regnamespace":
+    case "regrole":
+    case "regtype":
+    case "regclass":
+    case "regoper":
+    case "regoperator":
+    case "regproc":
+    case "regprocedure":
+    case "bit":
+    case "varbit":
+    case "cidr":
+    case "macaddr":
+    case "macaddr8":
+    case "char":
+    case "varchar":
+    case "citext":
+    case "uuid":
+    case "text": {
+      return identity;
     }
     default: {
+      const never: never = type;
+      console.warn(`No pg2gqlForType handler for '${never}'`);
       return identity;
     }
   }
 };
 
-const gql2pgForType = (type: string): PgEncode<any> => {
+const gql2pgForType = (type: SupportedPostgresType): PgEncode<any> => {
   switch (type) {
+    case "interval": {
+      return stringifyInterval;
+    }
+    case "point": {
+      return stringifyPoint;
+    }
+    case "int2":
+    case "int4":
+    case "float":
+    case "float4":
+    case "bool":
     case "jsonb":
-    case "json": {
-      return (value) => JSON.stringify(value);
+    case "json":
+    case "bigint":
+    case "money":
+    case "numeric":
+    case "date":
+    case "timestamp":
+    case "timestamptz":
+    case "time":
+    case "timetz":
+    case "inet":
+    case "regdictionary":
+    case "regconfig":
+    case "regnamespace":
+    case "regrole":
+    case "regtype":
+    case "regclass":
+    case "regoper":
+    case "regoperator":
+    case "regproc":
+    case "regprocedure":
+    case "bit":
+    case "varbit":
+    case "cidr":
+    case "macaddr":
+    case "macaddr8":
+    case "char":
+    case "varchar":
+    case "citext":
+    case "uuid":
+    case "text": {
+      return identity;
     }
     default: {
+      const never: never = type;
+      console.warn(`No gql2pgForType handler for '${never}'`);
       return identity;
     }
   }
 };
 
 function t<TCanonical = any, TInput = TCanonical>(
-  type: string,
+  type: SupportedPostgresType,
 ): PgTypeCodec<undefined, TCanonical, TInput> {
   return {
     sqlType: sql.identifier(...type.split(".")),
@@ -86,15 +216,6 @@ export function enumType<TValue extends string>(
   };
 }
 exportAs(enumType, "enumType");
-
-export interface PgInterval {
-  years?: number;
-  months?: number;
-  days?: number;
-  hours?: number;
-  minutes?: number;
-  seconds?: number;
-}
 
 export const TYPES = {
   boolean: t<boolean>("bool"),
