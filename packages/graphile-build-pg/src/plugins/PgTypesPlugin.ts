@@ -358,9 +358,6 @@ export const PgTypesPlugin: Plugin = {
           "An infinite line that passes through points 'a' and 'b'.",
           () => {
             const Point = getOutputTypeByName(inflection.builtin("Point"));
-            if (!Point) {
-              throw new Error("Could not find Point type");
-            }
             return {
               a: { type: new GraphQLNonNull(Point) },
               b: { type: new GraphQLNonNull(Point) },
@@ -370,9 +367,6 @@ export const PgTypesPlugin: Plugin = {
             const PointInput = getInputTypeByName(
               inflection.inputType(inflection.builtin("Point")),
             );
-            if (!PointInput) {
-              throw new Error("Could not find PointInput type");
-            }
             return {
               a: { type: new GraphQLNonNull(PointInput) },
               b: { type: new GraphQLNonNull(PointInput) },
@@ -385,9 +379,6 @@ export const PgTypesPlugin: Plugin = {
           "An finite line between points 'a' and 'b'.",
           () => {
             const Point = getOutputTypeByName(inflection.builtin("Point"));
-            if (!Point) {
-              throw new Error("Could not find Point type");
-            }
             return {
               a: { type: new GraphQLNonNull(Point) },
               b: { type: new GraphQLNonNull(Point) },
@@ -397,9 +388,6 @@ export const PgTypesPlugin: Plugin = {
             const PointInput = getInputTypeByName(
               inflection.inputType(inflection.builtin("Point")),
             );
-            if (!PointInput) {
-              throw new Error("Could not find PointInput type");
-            }
             return {
               a: { type: new GraphQLNonNull(PointInput) },
               b: { type: new GraphQLNonNull(PointInput) },
@@ -412,9 +400,6 @@ export const PgTypesPlugin: Plugin = {
           "A rectangular box defined by two opposite corners 'a' and 'b'",
           () => {
             const Point = getOutputTypeByName(inflection.builtin("Point"));
-            if (!Point) {
-              throw new Error("Could not find Point type");
-            }
             return {
               a: { type: new GraphQLNonNull(Point) },
               b: { type: new GraphQLNonNull(Point) },
@@ -424,9 +409,6 @@ export const PgTypesPlugin: Plugin = {
             const PointInput = getInputTypeByName(
               inflection.inputType(inflection.builtin("Point")),
             );
-            if (!PointInput) {
-              throw new Error("Could not find PointInput type");
-            }
             return {
               a: { type: new GraphQLNonNull(PointInput) },
               b: { type: new GraphQLNonNull(PointInput) },
@@ -439,9 +421,6 @@ export const PgTypesPlugin: Plugin = {
           "A path (open or closed) made up of points",
           () => {
             const Point = getOutputTypeByName(inflection.builtin("Point"));
-            if (!Point) {
-              throw new Error("Could not find Point type");
-            }
             return {
               points: {
                 type: new GraphQLNonNull(
@@ -461,9 +440,6 @@ export const PgTypesPlugin: Plugin = {
             const PointInput = getInputTypeByName(
               inflection.inputType(inflection.builtin("Point")),
             );
-            if (!PointInput) {
-              throw new Error("Could not find PointInput type");
-            }
             return {
               points: {
                 type: new GraphQLNonNull(
@@ -486,9 +462,6 @@ export const PgTypesPlugin: Plugin = {
           "A polygon made up of points",
           () => {
             const Point = getOutputTypeByName(inflection.builtin("Point"));
-            if (!Point) {
-              throw new Error("Could not find Point type");
-            }
             return {
               points: {
                 type: new GraphQLNonNull(
@@ -501,9 +474,6 @@ export const PgTypesPlugin: Plugin = {
             const PointInput = getInputTypeByName(
               inflection.inputType(inflection.builtin("Point")),
             );
-            if (!PointInput) {
-              throw new Error("Could not find PointInput type");
-            }
             return {
               points: {
                 type: new GraphQLNonNull(
@@ -519,9 +489,6 @@ export const PgTypesPlugin: Plugin = {
           "A circle about the given center point with the given radius",
           () => {
             const Point = getOutputTypeByName(inflection.builtin("Point"));
-            if (!Point) {
-              throw new Error("Could not find Point type");
-            }
             return {
               center: { type: new GraphQLNonNull(Point) },
               radius: { type: new GraphQLNonNull(GraphQLFloat) },
@@ -531,9 +498,6 @@ export const PgTypesPlugin: Plugin = {
             const PointInput = getInputTypeByName(
               inflection.inputType(inflection.builtin("Point")),
             );
-            if (!PointInput) {
-              throw new Error("Could not find PointInput type");
-            }
             return {
               center: { type: new GraphQLNonNull(PointInput) },
               radius: { type: new GraphQLNonNull(GraphQLFloat) },

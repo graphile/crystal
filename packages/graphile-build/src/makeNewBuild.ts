@@ -216,15 +216,19 @@ export default function makeNewBuild(
     },
     getInputTypeByName(typeName) {
       const type = this.getTypeByName(typeName);
-      if (type && !isInputType(type)) {
-        throw new Error(`Expected an input type, instead found ${type}`);
+      if (!type || !isInputType(type)) {
+        throw new Error(
+          `Expected an input type, instead found ${String(type)}`,
+        );
       }
       return type;
     },
     getOutputTypeByName(typeName) {
       const type = this.getTypeByName(typeName);
-      if (type && !isOutputType(type)) {
-        throw new Error(`Expected an output type, instead found ${type}`);
+      if (!type || !isOutputType(type)) {
+        throw new Error(
+          `Expected an output type, instead found ${String(type)}`,
+        );
       }
       return type;
     },

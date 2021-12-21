@@ -299,16 +299,12 @@ declare global {
        * As `getTypeByName`, except it throws if the returned type was not an
        * input type.
        */
-      getInputTypeByName: (
-        typeName: string,
-      ) => GraphQLInputType | null | undefined;
+      getInputTypeByName: (typeName: string) => GraphQLInputType;
       /**
        * As `getTypeByName`, except it throws if the returned type was not an
        * output type.
        */
-      getOutputTypeByName: (
-        typeName: string,
-      ) => GraphQLOutputType | null | undefined;
+      getOutputTypeByName: (typeName: string) => GraphQLOutputType;
 
       /**
        * Writes the properties of `extra` into `base` being sure not to
