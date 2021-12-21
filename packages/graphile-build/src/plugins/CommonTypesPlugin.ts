@@ -46,6 +46,19 @@ export const CommonTypesPlugin: Plugin = {
         );
 
         build.registerScalarType(
+          inflection.builtin("BigFloat"),
+          {},
+          () =>
+            stringTypeSpec(
+              build.wrapDescription(
+                "A floating point number that requires more precision than IEEE 754 binary 64",
+                "type",
+              ),
+            ),
+          "graphile-build built-in (BigFloat type)",
+        );
+
+        build.registerScalarType(
           inflection.builtin("Datetime"),
           {},
           () =>

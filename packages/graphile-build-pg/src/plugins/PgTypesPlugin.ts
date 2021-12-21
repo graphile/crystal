@@ -213,11 +213,17 @@ export const PgTypesPlugin: Plugin = {
 
         const typeNameByTYPESKey: { [key in keyof typeof TYPES]: string } = {
           boolean: "Boolean",
+          int2: "Int",
           int: "Int",
           bigint: inflection.builtin("BigInt"),
           float: "Float",
+          float4: "Float",
+          money: "Float",
+          numeric: "BigFloat",
           citext: "String",
           text: "String",
+          char: "String",
+          varchar: "String",
           json: inflection.builtin("JSON"),
           jsonb: inflection.builtin("JSON"),
           timestamp: inflection.builtin("Datetime"),

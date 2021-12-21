@@ -89,9 +89,15 @@ exportAs(enumType, "enumType");
 
 export const TYPES = {
   boolean: t<boolean>("bool"),
+  int2: t<number>("int2"),
   int: t<number>("int4"),
   bigint: t<string>("bigint"),
+  float4: t<number>("float4"),
   float: t<number>("float"),
+  money: t<string>("money"), // TODO: this needs special formatting/parsing? Cast to 'numeric'?
+  numeric: t<string>("numeric"),
+  char: t<string>("char"),
+  varchar: t<string>("varchar"),
   text: t<string>("text"),
   json: t<string>("json"),
   jsonb: t<string>("jsonb"),
@@ -117,7 +123,10 @@ export const TYPES = {
   macaddr: t<string>("macaddr"),
   macaddr8: t<string>("macaddr8"),
   // interval
+  // bit
+  // varbit
   // bitstring
+  // point
 } as const;
 exportAs(TYPES, "TYPES");
 for (const key of Object.keys(TYPES)) {
