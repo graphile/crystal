@@ -16,6 +16,7 @@ import type {
 import {
   __ValuePlan,
   aether,
+  ConnectionPlan,
   constant,
   context,
   crystalEnforce,
@@ -68,7 +69,6 @@ import {
   ManyFilterPlan,
   pgClassExpression,
   PgClassExpressionPlan,
-  PgConnectionPlan,
   pgDelete,
   PgDeletePlan,
   PgEnumSource,
@@ -165,11 +165,13 @@ export function makeExampleSchema(
   >;
   type PgConnectionPlanFromSource<
     TSource extends PgSource<any, any, any, any>,
-  > = PgConnectionPlan<
-    TSource["TColumns"],
-    TSource["TUniques"],
-    TSource["TRelations"],
-    TSource["TParameters"]
+  > = ConnectionPlan<
+    PgSelectPlan<
+      TSource["TColumns"],
+      TSource["TUniques"],
+      TSource["TRelations"],
+      TSource["TParameters"]
+    >
   >;
   type PgInsertPlanFromSource<TSource extends PgSource<any, any, any, any>> =
     PgInsertPlan<
@@ -1822,7 +1824,7 @@ export function makeExampleSchema(
   const MessagesConnection = newObjectTypeBuilder<
     OurGraphQLContext,
     MessageConnectionPlan
-  >(PgConnectionPlan)({
+  >(ConnectionPlan)({
     name: "MessagesConnection",
     fields: {
       edges: {
@@ -2269,7 +2271,7 @@ export function makeExampleSchema(
           >(($connection) => $connection.getSubplan()),
         },
         plan: EXPORTABLE(
-          (PgConnectionPlan, deoptimizeIfAppropriate, messageSource) =>
+          (ConnectionPlan, deoptimizeIfAppropriate, messageSource) =>
             function plan($forum) {
               const $messages = messageSource.find({
                 forum_id: $forum.get("id"),
@@ -2280,13 +2282,13 @@ export function makeExampleSchema(
               // $messages.innerJoin(...);
               // $messages.relation('fk_messages_author_id')
               // $messages.where(...);
-              const $connectionPlan = new PgConnectionPlan($messages);
+              const $connectionPlan = new ConnectionPlan($messages);
               // $connectionPlan.orderBy... ?
               // DEFINITELY NOT $messages.orderBy BECAUSE we don't want that applied to aggregates.
               // DEFINITELY NOT $messages.limit BECAUSE we don't want those limits applied to aggregates or page info.
               return $connectionPlan;
             },
-          [PgConnectionPlan, deoptimizeIfAppropriate, messageSource],
+          [ConnectionPlan, deoptimizeIfAppropriate, messageSource],
         ),
       },
       uniqueAuthorCount: {
@@ -3263,7 +3265,7 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (PgConnectionPlan, deoptimizeIfAppropriate, messageSource) =>
+          (ConnectionPlan, deoptimizeIfAppropriate, messageSource) =>
             function plan() {
               const $messages = messageSource.find();
               deoptimizeIfAppropriate($messages);
@@ -3271,13 +3273,13 @@ export function makeExampleSchema(
               // $messages.innerJoin(...);
               // $messages.relation('fk_messages_author_id')
               // $messages.where(...);
-              const $connectionPlan = new PgConnectionPlan($messages);
+              const $connectionPlan = new ConnectionPlan($messages);
               // $connectionPlan.orderBy... ?
               // DEFINITELY NOT $messages.orderBy BECAUSE we don't want that applied to aggregates.
               // DEFINITELY NOT $messages.limit BECAUSE we don't want those limits applied to aggregates or page info.
               return $connectionPlan;
             },
-          [PgConnectionPlan, deoptimizeIfAppropriate, messageSource],
+          [ConnectionPlan, deoptimizeIfAppropriate, messageSource],
         ),
       },
 
