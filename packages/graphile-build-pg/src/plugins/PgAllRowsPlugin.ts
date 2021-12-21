@@ -4,7 +4,7 @@ import "./PgTablesPlugin";
 import type { PgSource } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
-
+import { connection } from "graphile-crystal";
 import { getBehavior } from "../behaviour";
 import { version } from "../index";
 
@@ -102,6 +102,7 @@ export const PgAllRowsPlugin: Plugin = {
       GraphQLObjectType_fields(fields, build, context) {
         const {
           graphql: { GraphQLList, GraphQLNonNull },
+          getOutputTypeByName,
         } = build;
         if (!context.scope.isRootQuery) {
           return fields;
@@ -129,6 +130,27 @@ export const PgAllRowsPlugin: Plugin = {
                   (source) =>
                     function plan() {
                       return source.find();
+                    },
+                  [source],
+                ),
+              },
+            },
+            `Adding 'all rows' field for PgSource ${source}`,
+          );
+
+          fields = build.extend(
+            fields,
+            {
+              [build.inflection.allRowsConnection(source)]: {
+                type: getOutputTypeByName(
+                  build.inflection.connectionType(
+                    build.inflection.tableType(source.codec),
+                  ),
+                ),
+                plan: EXPORTABLE(
+                  (source) =>
+                    function plan() {
+                      return connection(source.find());
                     },
                   [source],
                 ),

@@ -126,6 +126,13 @@ async function main() {
         name
         archivedAt
       }
+      allForums {
+        nodes {
+          id
+          name
+          archivedAt
+        }
+      }
     }
   `;
   const rootValue = null;

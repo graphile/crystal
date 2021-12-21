@@ -1,15 +1,21 @@
 import "graphile-build";
 
 import type { PgSource, PgTypeCodec } from "@dataplan/pg";
-import { PgSelectSinglePlan, PgSourceBuilder, recordType } from "@dataplan/pg";
+import {
+  PgSelectSinglePlan,
+  PgSelectPlan,
+  PgSourceBuilder,
+  recordType,
+} from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
-import type { GraphQLOutputType, GraphQLType } from "graphql";
+import type { GraphQLOutputType } from "graphql";
 import sql from "pg-sql2";
 
 import { getBehavior } from "../behaviour";
 import { version } from "../index";
 import type { PgClass } from "../introspection";
+import { ConnectionPlan } from "graphile-crystal";
 
 declare global {
   namespace GraphileEngine {
@@ -187,10 +193,12 @@ export const PgTablesPlugin: Plugin = {
       init(_, build, _context) {
         const {
           getOutputTypeByName,
-          graphql: { GraphQLNonNull },
+          graphql: { GraphQLNonNull, GraphQLList },
           inflection,
           options: { pgForbidSetofFunctionsToReturnNull },
         } = build;
+        const nullableIf = (condition: boolean, Type: GraphQLOutputType) =>
+          condition ? Type : new GraphQLNonNull(Type);
         for (const codec of build.pgCodecMetaLookup.keys()) {
           if (!codec.columns) {
             // Only apply to codecs that define columns
@@ -236,10 +244,6 @@ export const PgTablesPlugin: Plugin = {
                   );
                   const TableType = getOutputTypeByName(tableTypeName);
 
-                  const nullableIf = (
-                    condition: boolean,
-                    Type: GraphQLOutputType,
-                  ) => (condition ? Type : new GraphQLNonNull(Type));
                   return {
                     cursor: fieldWithHooks(
                       {
@@ -292,7 +296,53 @@ export const PgTablesPlugin: Plugin = {
               }),
               `PgTablesPlugin edge type for ${codecName}`,
             );
+
             // Register connection
+            const connectionTypeName =
+              build.inflection.connectionType(tableTypeName);
+            build.registerObjectType(
+              connectionTypeName,
+              {},
+              ConnectionPlan,
+              () => {
+                const TableType = getOutputTypeByName(tableTypeName);
+                return {
+                  description: build.wrapDescription(
+                    `A connection to a list of \`${tableTypeName}\` values.`,
+                    "type",
+                  ),
+                  fields: ({ fieldWithHooks }) => ({
+                    nodes: fieldWithHooks(
+                      {
+                        fieldName: "nodes",
+                      },
+                      () => ({
+                        description: build.wrapDescription(
+                          `A list of \`${tableTypeName}\` objects.`,
+                          "field",
+                        ),
+                        type: new GraphQLNonNull(
+                          new GraphQLList(
+                            nullableIf(
+                              !pgForbidSetofFunctionsToReturnNull,
+                              TableType,
+                            ),
+                          ),
+                        ),
+                        plan(
+                          $connection: ConnectionPlan<
+                            PgSelectPlan<any, any, any, any>
+                          >,
+                        ) {
+                          return $connection.nodes();
+                        },
+                      }),
+                    ),
+                  }),
+                };
+              },
+              `PgTablesPlugin connection type for ${codecName}`,
+            );
           }
         }
         return _;
