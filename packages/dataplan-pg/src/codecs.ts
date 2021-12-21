@@ -97,11 +97,27 @@ export const TYPES = {
   jsonb: t<string>("jsonb"),
   citext: t<string>("citext"),
   uuid: t<string>("uuid"),
-  timestamp: t<Date, Date | string>("text"),
-  timestamptz: t<Date, Date | string>("text"),
-  date: t<Date, Date | string>("text"),
-  time: t<string>("text"),
-  timetz: t<string>("text"),
+  timestamp: t<Date, Date | string>("timestamp"),
+  timestamptz: t<Date, Date | string>("timestamptz"),
+  date: t<Date, Date | string>("date"),
+  time: t<string>("time"),
+  timetz: t<string>("timetz"),
+  inet: t<string>("inet"),
+  regproc: t<string>("regproc"),
+  regprocedure: t<string>("regprocedure"),
+  regoper: t<string>("regoper"),
+  regoperator: t<string>("regoperator"),
+  regclass: t<string>("regclass"),
+  regtype: t<string>("regtype"),
+  regrole: t<string>("regrole"),
+  regnamespace: t<string>("regnamespace"),
+  regconfig: t<string>("regconfig"),
+  regdictionary: t<string>("regdictionary"),
+  cidr: t<string>("cidr"),
+  macaddr: t<string>("macaddr"),
+  macaddr8: t<string>("macaddr8"),
+  // interval
+  // bitstring
 } as const;
 exportAs(TYPES, "TYPES");
 for (const key of Object.keys(TYPES)) {
