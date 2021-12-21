@@ -6,12 +6,13 @@ import type { PgTypeCodec } from "@dataplan/pg";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLType } from "graphql";
 import sql from "pg-sql2";
-import { inspect } from "util";
 
 import { version } from "../index";
 import type { PgTypeCodecMetaLookup } from "../inputUtils";
-import { makePgTypeCodecMeta } from "../inputUtils";
-import { getCodecMetaLookupFromInput } from "../inputUtils";
+import {
+  getCodecMetaLookupFromInput,
+  makePgTypeCodecMeta,
+} from "../inputUtils";
 
 type GetGraphQLTypeByPgCodec = (
   codec: PgTypeCodec<any, any, any>,

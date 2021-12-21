@@ -2,9 +2,10 @@ import "graphile-build";
 import "./PgTablesPlugin";
 
 import type { PgSource } from "@dataplan/pg";
+import { connection } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
-import { connection } from "graphile-crystal";
+
 import { getBehavior } from "../behaviour";
 import { version } from "../index";
 
@@ -148,11 +149,11 @@ export const PgAllRowsPlugin: Plugin = {
                   ),
                 ),
                 plan: EXPORTABLE(
-                  (source) =>
+                  (connection, source) =>
                     function plan() {
                       return connection(source.find());
                     },
-                  [source],
+                  [connection, source],
                 ),
               },
             },

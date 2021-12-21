@@ -8,13 +8,12 @@ import type {
   CrystalValuesList,
   PlanOptimizeOptions,
   PlanStreamOptions,
-  StreamablePlan} from "graphile-crystal";
-import {
-  constant
+  StreamablePlan,
 } from "graphile-crystal";
 import {
   __TrackedObjectPlan,
   access,
+  constant,
   ExecutablePlan,
   first,
   InputListPlan,

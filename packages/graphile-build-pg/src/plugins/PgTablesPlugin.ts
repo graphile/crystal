@@ -1,12 +1,8 @@
 import "graphile-build";
 
-import type { PgSource, PgTypeCodec } from "@dataplan/pg";
-import {
-  PgSelectSinglePlan,
-  PgSelectPlan,
-  PgSourceBuilder,
-  recordType,
-} from "@dataplan/pg";
+import type { PgSelectPlan, PgSource, PgTypeCodec } from "@dataplan/pg";
+import { PgSelectSinglePlan, PgSourceBuilder, recordType } from "@dataplan/pg";
+import { ConnectionPlan } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
 import type { GraphQLOutputType } from "graphql";
@@ -15,7 +11,6 @@ import sql from "pg-sql2";
 import { getBehavior } from "../behaviour";
 import { version } from "../index";
 import type { PgClass } from "../introspection";
-import { ConnectionPlan } from "graphile-crystal";
 
 declare global {
   namespace GraphileEngine {
@@ -337,13 +332,17 @@ export const PgTablesPlugin: Plugin = {
                             ),
                           ),
                         ),
-                        plan(
-                          $connection: ConnectionPlan<
-                            PgSelectPlan<any, any, any, any>
-                          >,
-                        ) {
-                          return $connection.nodes();
-                        },
+                        plan: EXPORTABLE(
+                          () =>
+                            function plan(
+                              $connection: ConnectionPlan<
+                                PgSelectPlan<any, any, any, any>
+                              >,
+                            ) {
+                              return $connection.nodes();
+                            },
+                          [],
+                        ),
                       }),
                     ),
                     edges: fieldWithHooks(
@@ -358,13 +357,17 @@ export const PgTablesPlugin: Plugin = {
                         type: new GraphQLNonNull(
                           new GraphQLList(new GraphQLNonNull(EdgeType)),
                         ),
-                        plan(
-                          $connection: ConnectionPlan<
-                            PgSelectPlan<any, any, any, any>
-                          >,
-                        ) {
-                          return $connection.nodes();
-                        },
+                        plan: EXPORTABLE(
+                          () =>
+                            function plan(
+                              $connection: ConnectionPlan<
+                                PgSelectPlan<any, any, any, any>
+                              >,
+                            ) {
+                              return $connection.nodes();
+                            },
+                          [],
+                        ),
                       }),
                     ),
                     pageInfo: fieldWithHooks(
@@ -377,14 +380,18 @@ export const PgTablesPlugin: Plugin = {
                           "field",
                         ),
                         type: new GraphQLNonNull(PageInfo),
-                        plan(
-                          $connection: ConnectionPlan<
-                            PgSelectPlan<any, any, any, any>
-                          >,
-                        ) {
-                          // TODO: why is this a TypeScript issue without the 'any'?
-                          return $connection as any;
-                        },
+                        plan: EXPORTABLE(
+                          () =>
+                            function plan(
+                              $connection: ConnectionPlan<
+                                PgSelectPlan<any, any, any, any>
+                              >,
+                            ) {
+                              // TODO: why is this a TypeScript issue without the 'any'?
+                              return $connection as any;
+                            },
+                          [],
+                        ),
                       }),
                     ),
                   }),

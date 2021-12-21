@@ -10,14 +10,12 @@ import type {
   PgLseg,
   PgPath,
   PgPoint,
-  PgPolygon} from "./codecUtils";
-import {
-  stringifyHstore,
+  PgPolygon,
 } from "./codecUtils";
-import { parseHstore } from "./codecUtils";
 import {
   parseBox,
   parseCircle,
+  parseHstore,
   parseInterval,
   parseLine,
   parseLseg,
@@ -26,6 +24,7 @@ import {
   parsePolygon,
   stringifyBox,
   stringifyCircle,
+  stringifyHstore,
   stringifyInterval,
   stringifyLine,
   stringifyLseg,

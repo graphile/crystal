@@ -51,9 +51,13 @@ export const PageInfoTypePlugin: Plugin = {
                       "field",
                     ),
                     type: new GraphQLNonNull(GraphQLBoolean),
-                    plan($connection) {
-                      return $connection.hasNextPage() as any;
-                    },
+                    plan: EXPORTABLE(
+                      () =>
+                        function plan($connection) {
+                          return $connection.hasNextPage() as any;
+                        },
+                      [],
+                    ),
                   }),
                 ),
                 hasPreviousPage: fieldWithHooks(
@@ -67,9 +71,13 @@ export const PageInfoTypePlugin: Plugin = {
                       "field",
                     ),
                     type: new GraphQLNonNull(GraphQLBoolean),
-                    plan($connection) {
-                      return $connection.hasPreviousPage() as any;
-                    },
+                    plan: EXPORTABLE(
+                      () =>
+                        function plan($connection) {
+                          return $connection.hasPreviousPage() as any;
+                        },
+                      [],
+                    ),
                   }),
                 ),
               }),
