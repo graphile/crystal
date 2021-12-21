@@ -1,4 +1,5 @@
 /* eslint-disable no-restricted-syntax */
+import { inspect } from "util";
 
 import type {
   PgExecutorContextPlans,
@@ -63,7 +64,11 @@ async function main() {
     id: {
       codec: TYPES.uuid,
       notNull: true,
-      // TODO: hasDefault: true
+      extensions: {
+        tags: {
+          hasDefault: true,
+        },
+      },
     },
     name: {
       codec: TYPES.text,
@@ -95,9 +100,6 @@ async function main() {
       }),
     ],
   };
-  console.log(
-    input.pgSources.map((s) => crystalPrint((s as any)._options)).join("\n"),
-  );
   const schema = buildSchema(config, input);
 
   // Output our schema
@@ -105,20 +107,34 @@ async function main() {
   console.log();
   console.log();
   console.log();
-  if (Math.random() < 2) process.exit(1);
+
+  // Common GraphQL arguments
+  const source = /* GraphQL */ `
+    query {
+      allForumsList {
+        id
+        name
+        archivedAt
+      }
+    }
+  `;
+  const rootValue = null;
+  const contextValue = {
+    withPgClient,
+  };
+  const variableValues = {};
 
   // Run our query
   const result = await graphql({
     schema,
-    source: `
-      query {
-        random
-      }
-    `,
-    rootValue: null,
-    variableValues: {},
+    source,
+    rootValue,
+    variableValues,
+    contextValue,
   });
-  console.log(result); // { data: { random: 4 } }
+  console.log(inspect(result, { depth: Infinity, colors: true })); // { data: { random: 4 } }
+
+  if (Math.random() < 2) process.exit(1);
 
   console.dir(schema.toConfig());
 
@@ -134,13 +150,10 @@ async function main() {
   const { schema: schema2 } = await import(exportFileLocation.toString());
   const result2 = await graphql({
     schema: schema2,
-    source: `
-      query {
-        random
-      }
-    `,
-    rootValue: null,
-    variableValues: {},
+    source,
+    rootValue,
+    variableValues,
+    contextValue,
   });
   console.log(result2); // { data: { random: 4 } }
 }

@@ -1,11 +1,12 @@
-import { PgSource } from "@dataplan/pg";
 import "graphile-build";
 import "./PgTablesPlugin";
 
+import type { PgSource } from "@dataplan/pg";
 import type { Plugin } from "graphile-plugin";
 
-import { version } from "../index";
 import { getBehavior } from "../behaviour";
+import { version } from "../index";
+import { EXPORTABLE } from "graphile-exporter";
 
 declare global {
   namespace GraphileEngine {
@@ -124,9 +125,13 @@ export const PgAllRowsPlugin: Plugin = {
             {
               [build.inflection.allRowsList(source)]: {
                 type: new GraphQLList(new GraphQLNonNull(type)),
-                plan() {
-                  return source.find();
-                },
+                plan: EXPORTABLE(
+                  (source) =>
+                    function plan() {
+                      return source.find();
+                    },
+                  [source],
+                ),
               },
             },
             `Adding 'all rows' field for PgSource ${source}`,
