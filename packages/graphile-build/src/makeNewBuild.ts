@@ -1,7 +1,6 @@
 import "./global.js";
 
 import chalk from "chalk";
-import { readFileSync } from "fs";
 import type { ExecutablePlan } from "graphile-crystal";
 import type { GraphQLNamedType } from "graphql";
 import {
@@ -19,14 +18,16 @@ import {
 } from "graphql";
 import * as graphql from "graphql";
 import * as semver from "semver";
-import { URL } from "url";
 
 import extend, { indent } from "./extend.js";
 import { makeInitialInflection } from "./inflection.js";
 import type SchemaBuilder from "./SchemaBuilder.js";
+import { wrapDescription } from "./utils.js";
 
 const version = "TODO";
 /*
+import { readFileSync } from "fs";
+import { URL } from "url";
 const version: string = JSON.parse(
   readFileSync(new URL("../package.json", import.meta.url), "utf8"),
 ).version;
@@ -134,6 +135,7 @@ export default function makeNewBuild(
       currentHookName: null,
       currentHookEvent: null,
     },
+    wrapDescription,
 
     registerObjectType(typeName, scope, Plan, specGenerator, origin) {
       register(GraphQLObjectType, typeName, scope, Plan, specGenerator, origin);

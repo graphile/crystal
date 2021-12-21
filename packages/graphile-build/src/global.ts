@@ -34,6 +34,7 @@ import type {
 } from "graphql";
 
 import type { InflectionBase } from "./inflection.js";
+import { wrapDescription } from "./utils.js";
 
 declare global {
   namespace GraphileEngine {
@@ -208,6 +209,14 @@ declare global {
         currentHookName: string | null | undefined;
         currentHookEvent: string | null | undefined;
       };
+
+      /**
+       * Only use this on descriptions that are plain text, or that we create
+       * manually in code; since descriptions are markdown, it's not safe to
+       * use on descriptions that contain code blocks or long inline code
+       * strings.
+       */
+      wrapDescription: typeof wrapDescription;
 
       /**
        * Register a type by name with the system; names must be unique. It's
