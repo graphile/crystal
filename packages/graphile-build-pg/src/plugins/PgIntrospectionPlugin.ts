@@ -287,16 +287,34 @@ export const PgIntrospectionPlugin: Plugin = {
           throw new Error(`Database '${databaseName}' not found`);
         }
         const { pgSettingsKey, withPgClientKey } = database;
-        const executor = new PgExecutor({
-          name: databaseName,
-          context: () => {
-            const ctx = context<GraphileEngine.GraphileResolverContext>();
-            return object({
-              pgSettings: ctx.get(pgSettingsKey),
-              withPgClient: ctx.get(withPgClientKey),
-            } as PgExecutorContextPlans<any>);
-          },
-        });
+        const executor = EXPORTABLE(
+          (
+            PgExecutor,
+            context,
+            databaseName,
+            object,
+            pgSettingsKey,
+            withPgClientKey,
+          ) =>
+            new PgExecutor({
+              name: databaseName,
+              context: () => {
+                const ctx = context<GraphileEngine.GraphileResolverContext>();
+                return object({
+                  pgSettings: ctx.get(pgSettingsKey),
+                  withPgClient: ctx.get(withPgClientKey),
+                } as PgExecutorContextPlans<any>);
+              },
+            }),
+          [
+            PgExecutor,
+            context,
+            databaseName,
+            object,
+            pgSettingsKey,
+            withPgClientKey,
+          ],
+        );
         info.state.executors[databaseName] = executor;
         return executor;
       },

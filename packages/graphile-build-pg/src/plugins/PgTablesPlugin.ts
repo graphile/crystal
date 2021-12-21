@@ -118,7 +118,11 @@ export const PgTablesPlugin: Plugin = {
           const name = `${event.databaseName}.${namespace.nspname}.${klass.relname}`;
           const executor =
             helpers.pgIntrospection.getExecutorForDatabase(databaseName);
-          const codec = recordType(sqlIdentifier, columns);
+          const codec = EXPORTABLE(
+            (columns, recordType, sqlIdentifier) =>
+              recordType(sqlIdentifier, columns),
+            [columns, recordType, sqlIdentifier],
+          );
           const source = EXPORTABLE(
             (PgSourceBuilder, codec, executor, name, sqlIdentifier) =>
               new PgSourceBuilder({
