@@ -300,12 +300,20 @@ export const PgTablesPlugin: Plugin = {
             // Register connection
             const connectionTypeName =
               build.inflection.connectionType(tableTypeName);
-            build.registerObjectType(
+            build.registerObjectType<
+              ConnectionPlan<PgSelectPlan<any, any, any, any>>
+            >(
               connectionTypeName,
               {},
               ConnectionPlan,
               () => {
                 const TableType = getOutputTypeByName(tableTypeName);
+                const EdgeType = getOutputTypeByName(
+                  build.inflection.edgeType(tableTypeName),
+                );
+                const PageInfo = getOutputTypeByName(
+                  build.inflection.builtin("PageInfo"),
+                );
                 return {
                   description: build.wrapDescription(
                     `A connection to a list of \`${tableTypeName}\` values.`,
@@ -335,6 +343,47 @@ export const PgTablesPlugin: Plugin = {
                           >,
                         ) {
                           return $connection.nodes();
+                        },
+                      }),
+                    ),
+                    edges: fieldWithHooks(
+                      {
+                        fieldName: "edges",
+                      },
+                      () => ({
+                        description: build.wrapDescription(
+                          `A list of edges which contains the \`${tableTypeName}\` and cursor to aid in pagination.`,
+                          "field",
+                        ),
+                        type: new GraphQLNonNull(
+                          new GraphQLList(new GraphQLNonNull(EdgeType)),
+                        ),
+                        plan(
+                          $connection: ConnectionPlan<
+                            PgSelectPlan<any, any, any, any>
+                          >,
+                        ) {
+                          return $connection.nodes();
+                        },
+                      }),
+                    ),
+                    pageInfo: fieldWithHooks(
+                      {
+                        fieldName: "pageInfo",
+                      },
+                      () => ({
+                        description: build.wrapDescription(
+                          "Information to aid in pagination.",
+                          "field",
+                        ),
+                        type: new GraphQLNonNull(PageInfo),
+                        plan(
+                          $connection: ConnectionPlan<
+                            PgSelectPlan<any, any, any, any>
+                          >,
+                        ) {
+                          // TODO: why is this a TypeScript issue without the 'any'?
+                          return $connection as any;
                         },
                       }),
                     ),
