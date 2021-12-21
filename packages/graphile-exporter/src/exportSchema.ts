@@ -975,6 +975,17 @@ function factoryAst<TTuple extends any[]>(
   const factory = fn.$exporter$factory;
   const funcAST = funcToAst(factory, locationHint);
   const depArgs = fn.$exporter$args.map((arg, i) => {
+    if (typeof arg === "string") {
+      return t.stringLiteral(arg);
+    } else if (typeof arg === "number") {
+      return t.numericLiteral(arg);
+    } else if (typeof arg === "boolean") {
+      return t.booleanLiteral(arg);
+    } else if (arg === null) {
+      return t.nullLiteral();
+    } else if (arg === undefined) {
+      return t.identifier("undefined");
+    }
     const param = funcAST.params[i];
     const paramName = param && param.type === "Identifier" ? param.name : null;
     return convertToIdentifierViaAST(
