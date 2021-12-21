@@ -15,6 +15,8 @@ import {
   GraphQLScalarType,
   GraphQLString,
   GraphQLUnionType,
+  isInputType,
+  isOutputType,
 } from "graphql";
 import * as graphql from "graphql";
 import * as semver from "semver";
@@ -211,6 +213,20 @@ export default function makeNewBuild(
           return undefined;
         }
       }
+    },
+    getInputTypeByName(typeName) {
+      const type = this.getTypeByName(typeName);
+      if (type && !isInputType(type)) {
+        throw new Error(`Expected an input type, instead found ${type}`);
+      }
+      return type;
+    },
+    getOutputTypeByName(typeName) {
+      const type = this.getTypeByName(typeName);
+      if (type && !isOutputType(type)) {
+        throw new Error(`Expected an output type, instead found ${type}`);
+      }
+      return type;
     },
   };
   return build;

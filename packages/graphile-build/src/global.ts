@@ -18,6 +18,7 @@ import type {
   GraphQLInputFieldConfigMap,
   GraphQLInputObjectType,
   GraphQLInputObjectTypeConfig,
+  GraphQLInputType,
   GraphQLInterfaceType,
   GraphQLInterfaceTypeConfig,
   GraphQLNamedType,
@@ -294,6 +295,20 @@ declare global {
        * undefined will be returned.
        */
       getTypeByName: (typeName: string) => GraphQLNamedType | null | undefined;
+      /**
+       * As `getTypeByName`, except it throws if the returned type was not an
+       * input type.
+       */
+      getInputTypeByName: (
+        typeName: string,
+      ) => GraphQLInputType | null | undefined;
+      /**
+       * As `getTypeByName`, except it throws if the returned type was not an
+       * output type.
+       */
+      getOutputTypeByName: (
+        typeName: string,
+      ) => GraphQLOutputType | null | undefined;
 
       /**
        * Writes the properties of `extra` into `base` being sure not to

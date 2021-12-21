@@ -6,6 +6,11 @@ import { TYPES } from "@dataplan/pg";
 import type { Plugin } from "graphile-plugin";
 
 import { version } from "../index";
+import {
+  GraphQLFieldConfigMap,
+  GraphQLInputFieldConfigMap,
+  GraphQLInputType,
+} from "graphql";
 
 declare global {
   namespace GraphileEngine {
@@ -38,7 +43,15 @@ export const PgTypesPlugin: Plugin = {
           inflection,
           stringTypeSpec,
           options: { pgUseCustomNetworkScalars },
-          graphql: { GraphQLInt, GraphQLFloat, GraphQLNonNull },
+          graphql: {
+            GraphQLInt,
+            GraphQLFloat,
+            GraphQLNonNull,
+            GraphQLList,
+            GraphQLBoolean,
+          },
+          getInputTypeByName,
+          getOutputTypeByName,
         } = build;
 
         // Time is a weird type; we only really want it for Postgres (which is
@@ -303,38 +316,232 @@ export const PgTypesPlugin: Plugin = {
           "graphile-build-pg built-in (IntervalInput)",
         );
 
-        build.registerObjectType(
-          inflection.builtin("Point"),
-          { isPgPointType: true },
-          null, // TODO: does this want a plan?
+        function registerGeometry(
+          typeName: string,
+          description: string,
+          fieldGen: () => GraphileEngine.GraphileFieldConfigMap<any, any>,
+          inputFieldGen: () => GraphQLInputFieldConfigMap,
+        ): void {
+          build.registerObjectType(
+            inflection.builtin(typeName),
+            { [`isPg${typeName}Type`]: true },
+            null, // TODO: does this want a plan?
+            () => ({
+              description: build.wrapDescription(description, "type"),
+              fields: fieldGen(),
+            }),
+            `graphile-build-pg built-in (${typeName})`,
+          );
+          build.registerInputObjectType(
+            inflection.inputType(inflection.builtin(typeName)),
+            { [`isPg${typeName}InputType`]: true },
+            () => ({
+              description: build.wrapDescription(description, "type"),
+              fields: inputFieldGen(),
+            }),
+            `graphile-build-pg built-in (${typeName}Input)`,
+          );
+        }
+
+        registerGeometry(
+          "Point",
+          "A cartesian point.",
           () => ({
-            description: build.wrapDescription("A cartesian point.", "type"),
-            fields: {
-              x: {
-                type: new GraphQLNonNull(GraphQLFloat),
-              },
-              y: {
-                type: new GraphQLNonNull(GraphQLFloat),
-              },
-            },
+            x: { type: new GraphQLNonNull(GraphQLFloat) },
+            y: { type: new GraphQLNonNull(GraphQLFloat) },
           }),
-          "graphile-build-pg built-in (Point)",
+          () => ({
+            x: { type: new GraphQLNonNull(GraphQLFloat) },
+            y: { type: new GraphQLNonNull(GraphQLFloat) },
+          }),
         );
-        build.registerInputObjectType(
-          inflection.inputType(inflection.builtin("Point")),
-          { isPgPointInputType: true },
-          () => ({
-            description: build.wrapDescription("A cartesian point.", "type"),
-            fields: {
-              x: {
-                type: new GraphQLNonNull(GraphQLFloat),
+
+        registerGeometry(
+          "Line",
+          "An infinite line that passes through points 'a' and 'b'.",
+          () => {
+            const Point = getOutputTypeByName(inflection.builtin("Point"));
+            if (!Point) {
+              throw new Error("Could not find Point type");
+            }
+            return {
+              a: { type: new GraphQLNonNull(Point) },
+              b: { type: new GraphQLNonNull(Point) },
+            };
+          },
+          () => {
+            const PointInput = getInputTypeByName(
+              inflection.inputType(inflection.builtin("Point")),
+            );
+            if (!PointInput) {
+              throw new Error("Could not find PointInput type");
+            }
+            return {
+              a: { type: new GraphQLNonNull(PointInput) },
+              b: { type: new GraphQLNonNull(PointInput) },
+            };
+          },
+        );
+
+        registerGeometry(
+          "LineSegment",
+          "An finite line between points 'a' and 'b'.",
+          () => {
+            const Point = getOutputTypeByName(inflection.builtin("Point"));
+            if (!Point) {
+              throw new Error("Could not find Point type");
+            }
+            return {
+              a: { type: new GraphQLNonNull(Point) },
+              b: { type: new GraphQLNonNull(Point) },
+            };
+          },
+          () => {
+            const PointInput = getInputTypeByName(
+              inflection.inputType(inflection.builtin("Point")),
+            );
+            if (!PointInput) {
+              throw new Error("Could not find PointInput type");
+            }
+            return {
+              a: { type: new GraphQLNonNull(PointInput) },
+              b: { type: new GraphQLNonNull(PointInput) },
+            };
+          },
+        );
+
+        registerGeometry(
+          "Box",
+          "A rectangular box defined by two opposite corners 'a' and 'b'",
+          () => {
+            const Point = getOutputTypeByName(inflection.builtin("Point"));
+            if (!Point) {
+              throw new Error("Could not find Point type");
+            }
+            return {
+              a: { type: new GraphQLNonNull(Point) },
+              b: { type: new GraphQLNonNull(Point) },
+            };
+          },
+          () => {
+            const PointInput = getInputTypeByName(
+              inflection.inputType(inflection.builtin("Point")),
+            );
+            if (!PointInput) {
+              throw new Error("Could not find PointInput type");
+            }
+            return {
+              a: { type: new GraphQLNonNull(PointInput) },
+              b: { type: new GraphQLNonNull(PointInput) },
+            };
+          },
+        );
+
+        registerGeometry(
+          "Path",
+          "A path (open or closed) made up of points",
+          () => {
+            const Point = getOutputTypeByName(inflection.builtin("Point"));
+            if (!Point) {
+              throw new Error("Could not find Point type");
+            }
+            return {
+              points: {
+                type: new GraphQLNonNull(
+                  new GraphQLList(new GraphQLNonNull(Point)),
+                ),
               },
-              y: {
-                type: new GraphQLNonNull(GraphQLFloat),
+              isOpen: {
+                description: build.wrapDescription(
+                  "True if this is a closed path (similar to a polygon), false otherwise.",
+                  "field",
+                ),
+                type: new GraphQLNonNull(GraphQLBoolean),
               },
-            },
-          }),
-          "graphile-build-pg built-in (PointInput)",
+            };
+          },
+          () => {
+            const PointInput = getInputTypeByName(
+              inflection.inputType(inflection.builtin("Point")),
+            );
+            if (!PointInput) {
+              throw new Error("Could not find PointInput type");
+            }
+            return {
+              points: {
+                type: new GraphQLNonNull(
+                  new GraphQLList(new GraphQLNonNull(PointInput)),
+                ),
+              },
+              isOpen: {
+                description: build.wrapDescription(
+                  "True if this is a closed path (similar to a polygon), false otherwise.",
+                  "field",
+                ),
+                type: GraphQLBoolean,
+              },
+            };
+          },
+        );
+
+        registerGeometry(
+          "Polygon",
+          "A polygon made up of points",
+          () => {
+            const Point = getOutputTypeByName(inflection.builtin("Point"));
+            if (!Point) {
+              throw new Error("Could not find Point type");
+            }
+            return {
+              points: {
+                type: new GraphQLNonNull(
+                  new GraphQLList(new GraphQLNonNull(Point)),
+                ),
+              },
+            };
+          },
+          () => {
+            const PointInput = getInputTypeByName(
+              inflection.inputType(inflection.builtin("Point")),
+            );
+            if (!PointInput) {
+              throw new Error("Could not find PointInput type");
+            }
+            return {
+              points: {
+                type: new GraphQLNonNull(
+                  new GraphQLList(new GraphQLNonNull(PointInput)),
+                ),
+              },
+            };
+          },
+        );
+
+        registerGeometry(
+          "Circle",
+          "A circle about the given center point with the given radius",
+          () => {
+            const Point = getOutputTypeByName(inflection.builtin("Point"));
+            if (!Point) {
+              throw new Error("Could not find Point type");
+            }
+            return {
+              center: { type: new GraphQLNonNull(Point) },
+              radius: { type: new GraphQLNonNull(GraphQLFloat) },
+            };
+          },
+          () => {
+            const PointInput = getInputTypeByName(
+              inflection.inputType(inflection.builtin("Point")),
+            );
+            if (!PointInput) {
+              throw new Error("Could not find PointInput type");
+            }
+            return {
+              center: { type: new GraphQLNonNull(PointInput) },
+              radius: { type: new GraphQLNonNull(GraphQLFloat) },
+            };
+          },
         );
 
         const typeNameByTYPESKey: {
@@ -366,9 +573,33 @@ export const PgTypesPlugin: Plugin = {
           },
           bit: inflection.builtin("BitString"),
           varbit: inflection.builtin("BitString"),
+          box: {
+            input: inflection.inputType(inflection.builtin("Box")),
+            output: inflection.builtin("Box"),
+          },
+          circle: {
+            input: inflection.inputType(inflection.builtin("Circle")),
+            output: inflection.builtin("Circle"),
+          },
+          line: {
+            input: inflection.inputType(inflection.builtin("Line")),
+            output: inflection.builtin("Line"),
+          },
+          lseg: {
+            input: inflection.inputType(inflection.builtin("LineSegment")),
+            output: inflection.builtin("LineSegment"),
+          },
+          path: {
+            input: inflection.inputType(inflection.builtin("Path")),
+            output: inflection.builtin("Path"),
+          },
           point: {
             input: inflection.inputType(inflection.builtin("Point")),
             output: inflection.builtin("Point"),
+          },
+          polygon: {
+            input: inflection.inputType(inflection.builtin("Polygon")),
+            output: inflection.builtin("Polygon"),
           },
           inet: inflection.builtin("InternetAddress"),
           regproc: inflection.builtin("RegProc"),
