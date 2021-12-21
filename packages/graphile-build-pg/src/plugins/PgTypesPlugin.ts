@@ -23,57 +23,93 @@ export const PgTypesPlugin: Plugin = {
     hooks: {
       // Register common types
       init(_, build) {
-        const { inflection } = build;
+        const { inflection, stringTypeSpec } = build;
 
-        build.setGraphQLTypeForPgCodec(
-          TYPES.boolean,
-          ["input", "output"],
-          "Boolean",
+        function setInOutTypeName(
+          key: keyof typeof TYPES,
+          typeName: string,
+        ): void {
+          build.setGraphQLTypeForPgCodec(
+            TYPES[key],
+            ["input", "output"],
+            typeName,
+          );
+        }
+
+        // Time is a weird type; we only really want it for Postgres (which is
+        // why it's not global).
+        build.registerScalarType(
+          inflection.builtin("Time"),
+          {},
+          () =>
+            stringTypeSpec(
+              build.wrapDescription(
+                "The exact time of day, does not include the date. May or may not have a timezone offset.",
+                "type",
+              ),
+            ),
+          "graphile-build-pg built-in (Time)",
         );
 
-        build.setGraphQLTypeForPgCodec(TYPES.int, ["input", "output"], "Int");
+        for (const key of Object.keys(TYPES) as Array<keyof typeof TYPES>) {
+          switch (key) {
+            case "boolean": {
+              setInOutTypeName(key, "Boolean");
+              break;
+            }
+            case "int": {
+              setInOutTypeName(key, "Int");
+              break;
+            }
+            case "bigint": {
+              setInOutTypeName(key, inflection.builtin("BigInt"));
+              break;
+            }
+            case "float": {
+              setInOutTypeName(key, "Float");
+              break;
+            }
+            case "citext":
+            case "text": {
+              setInOutTypeName(key, "String");
+              break;
+            }
 
-        build.setGraphQLTypeForPgCodec(
-          TYPES.bigint,
-          ["input", "output"],
-          inflection.builtin("BigInt"),
-        );
+            case "json":
+            case "jsonb": {
+              setInOutTypeName(key, inflection.builtin("JSON"));
+              break;
+            }
 
-        build.setGraphQLTypeForPgCodec(
-          TYPES.float,
-          ["input", "output"],
-          "Float",
-        );
+            case "timestamp":
+            case "timestamptz": {
+              setInOutTypeName(key, inflection.builtin("Datetime"));
+              break;
+            }
 
-        build.setGraphQLTypeForPgCodec(
-          TYPES.text,
-          ["input", "output"],
-          "String",
-        );
+            case "date": {
+              setInOutTypeName(key, inflection.builtin("Date"));
+              break;
+            }
 
-        build.setGraphQLTypeForPgCodec(
-          TYPES.json,
-          ["input", "output"],
-          inflection.builtin("JSON"),
-        );
+            case "time":
+            case "timetz": {
+              setInOutTypeName(key, inflection.builtin("Time"));
+              break;
+            }
 
-        build.setGraphQLTypeForPgCodec(
-          TYPES.jsonb,
-          ["input", "output"],
-          inflection.builtin("JSON"),
-        );
+            case "uuid": {
+              setInOutTypeName(key, inflection.builtin("UUID"));
+              break;
+            }
 
-        build.setGraphQLTypeForPgCodec(
-          TYPES.timestamptz,
-          ["input", "output"],
-          inflection.builtin("Datetime"),
-        );
-
-        build.setGraphQLTypeForPgCodec(
-          TYPES.uuid,
-          ["input", "output"],
-          inflection.builtin("UUID"),
-        );
+            default: {
+              const never: never = key;
+              console.warn(`Unhandled builtin TYPES.${never}`);
+              break;
+            }
+          }
+        }
 
         return _;
       },

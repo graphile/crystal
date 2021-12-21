@@ -59,6 +59,19 @@ export const CommonTypesPlugin: Plugin = {
         );
 
         build.registerScalarType(
+          inflection.builtin("Date"),
+          {},
+          () =>
+            stringTypeSpec(
+              build.wrapDescription(
+                "A calendar date in YYYY-MM-DD format.",
+                "type",
+              ),
+            ),
+          "graphile-build built-in (Datetype)",
+        );
+
+        build.registerScalarType(
           inflection.builtin("UUID"),
           {},
           () =>

@@ -97,8 +97,12 @@ export const TYPES = {
   jsonb: t<string>("jsonb"),
   citext: t<string>("citext"),
   uuid: t<string>("uuid"),
+  timestamp: t<Date, Date | string>("text"),
   timestamptz: t<Date, Date | string>("text"),
-};
+  date: t<Date, Date | string>("text"),
+  time: t<string>("text"),
+  timetz: t<string>("text"),
+} as const;
 exportAs(TYPES, "TYPES");
 for (const key of Object.keys(TYPES)) {
   exportAs(TYPES[key], ["TYPES", key]);
