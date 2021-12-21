@@ -153,7 +153,9 @@ async function main() {
   console.log(inspect(result2, { depth: Infinity, colors: true }));
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+main()
+  .then(() => pool.end())
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
