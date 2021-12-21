@@ -132,11 +132,7 @@ async function main() {
     variableValues,
     contextValue,
   });
-  console.log(inspect(result, { depth: Infinity, colors: true })); // { data: { random: 4 } }
-
-  if (Math.random() < 2) process.exit(1);
-
-  console.dir(schema.toConfig());
+  console.log(inspect(result, { depth: Infinity, colors: true }));
 
   // Export schema
   // const exportFileLocation = new URL("../../temp.js", import.meta.url);
@@ -155,7 +151,7 @@ async function main() {
     variableValues,
     contextValue,
   });
-  console.log(result2); // { data: { random: 4 } }
+  console.log(inspect(result2, { depth: Infinity, colors: true }));
 }
 
 main().catch((e) => {
