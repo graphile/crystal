@@ -4,9 +4,7 @@ import "../interfaces";
 
 import type { PgTypeCodec } from "@dataplan/pg";
 import { TYPES } from "@dataplan/pg";
-import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
-import type { GraphQLScalarTypeConfig } from "graphql";
 
 import { version } from "../index";
 
@@ -28,41 +26,7 @@ export const PgTypesPlugin: Plugin = {
     hooks: {
       // Register common types
       init(_, build) {
-        const {
-          graphql: { Kind },
-          inflection,
-        } = build;
-
-        /**
-         * Generates the spec for a GraphQLScalar (except the name) with the
-         * given description/coercion.
-         */
-        const stringTypeSpec = (
-          description: string,
-          coerce?: (input: string) => string,
-        ): Omit<GraphQLScalarTypeConfig<any, any>, "name"> => ({
-          description,
-          serialize: (value) => String(value),
-          parseValue: coerce
-            ? EXPORTABLE((coerce) => (value) => coerce(String(value)), [coerce])
-            : EXPORTABLE(() => (value) => String(value), []),
-          parseLiteral: coerce
-            ? EXPORTABLE(
-                (Kind, coerce) => (ast) => {
-                  if (ast.kind !== Kind.STRING) {
-                    throw new Error("Can only parse string values");
-                  }
-                  return coerce(ast.value);
-                },
-                [Kind, coerce],
-              )
-            : EXPORTABLE((Kind) => (ast) => {
-                if (ast.kind !== Kind.STRING) {
-                  throw new Error("Can only parse string values");
-                }
-                return ast.value;
-              }, [Kind]),
-        });
+        const { inflection, stringTypeSpec } = build;
 
         build.setGraphQLTypeForPgCodec(
           TYPES.text,

@@ -34,7 +34,7 @@ import type {
 } from "graphql";
 
 import type { InflectionBase } from "./inflection.js";
-import { wrapDescription } from "./utils.js";
+import type { stringTypeSpec, wrapDescription } from "./utils.js";
 
 declare global {
   namespace GraphileEngine {
@@ -217,6 +217,12 @@ declare global {
        * strings.
        */
       wrapDescription: typeof wrapDescription;
+
+      /**
+       * Generates the spec for a GraphQLScalar (except the name) with the
+       * given description/coercion.
+       */
+      stringTypeSpec: typeof stringTypeSpec;
 
       /**
        * Register a type by name with the system; names must be unique. It's

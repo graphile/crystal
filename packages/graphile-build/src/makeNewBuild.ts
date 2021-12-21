@@ -22,7 +22,7 @@ import * as semver from "semver";
 import extend, { indent } from "./extend.js";
 import { makeInitialInflection } from "./inflection.js";
 import type SchemaBuilder from "./SchemaBuilder.js";
-import { wrapDescription } from "./utils.js";
+import { stringTypeSpec, wrapDescription } from "./utils.js";
 
 const version = "TODO";
 /*
@@ -136,6 +136,7 @@ export default function makeNewBuild(
       currentHookEvent: null,
     },
     wrapDescription,
+    stringTypeSpec,
 
     registerObjectType(typeName, scope, Plan, specGenerator, origin) {
       register(GraphQLObjectType, typeName, scope, Plan, specGenerator, origin);

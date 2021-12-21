@@ -1,3 +1,4 @@
+import { EXPORTABLE } from "graphile-exporter";
 import type { GraphQLNamedType, GraphQLScalarTypeConfig } from "graphql";
 import { GraphQLObjectType, Kind } from "graphql";
 import camelCaseAll from "lodash/camelCase.js";
@@ -120,3 +121,37 @@ export const wrapDescription = (
     })
     .join("\n");
 };
+
+/**
+ * Generates the spec for a GraphQLScalar (except the name) with the
+ * given description/coercion.
+ */
+export const stringTypeSpec = (
+  description: string,
+  coerce?: (input: string) => string,
+): Omit<GraphQLScalarTypeConfig<any, any>, "name"> => ({
+  description,
+  serialize: (value) => String(value),
+  parseValue: coerce
+    ? EXPORTABLE((coerce) => (value) => coerce(String(value)), [coerce])
+    : EXPORTABLE(() => (value) => String(value), []),
+  parseLiteral: coerce
+    ? EXPORTABLE(
+        (Kind, coerce) => (ast) => {
+          if (ast.kind !== Kind.STRING) {
+            throw new Error("Can only parse string values");
+          }
+          return coerce(ast.value);
+        },
+        [Kind, coerce],
+      )
+    : EXPORTABLE(
+        (Kind) => (ast) => {
+          if (ast.kind !== Kind.STRING) {
+            throw new Error("Can only parse string values");
+          }
+          return ast.value;
+        },
+        [Kind],
+      ),
+});
