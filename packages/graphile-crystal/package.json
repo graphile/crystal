@@ -51,7 +51,7 @@
     "@types/jest": "^27.0.3",
     "@types/lodash": "^4.14.178",
     "@types/nodemon": "1.19.1",
-    "graphql": "npm:graphql@experimental-stream-defer",
+    "graphql": "16.1.0-experimental-stream-defer.6",
     "jest": "^27.4.5",
     "nodemon": "^2.0.15",
     "pg-sql2": "4.7.0",

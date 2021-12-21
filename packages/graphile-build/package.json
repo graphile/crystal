@@ -60,7 +60,7 @@
   "devDependencies": {
     "@types/debug": "^4.1.7",
     "@types/jest": "^27.0.3",
-    "graphql": "npm:graphql@experimental-stream-defer",
+    "graphql": "16.1.0-experimental-stream-defer.6",
     "jest": "^27.4.5",
     "ts-node": "^10.4.0",
     "typescript": "next"

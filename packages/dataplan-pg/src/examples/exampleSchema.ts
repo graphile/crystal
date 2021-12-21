@@ -4092,6 +4092,7 @@ export function makeExampleSchema(
           ],
         },
       },
+      enableDeferStream: true,
     }),
   );
 }

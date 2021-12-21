@@ -65,7 +65,7 @@
     "@types/json5": "^2.2.0",
     "@types/nodemon": "1.19.1",
     "graphile-exporter": "^0.0.1",
-    "graphql": "npm:graphql@experimental-stream-defer",
+    "graphql": "16.1.0-experimental-stream-defer.6",
     "jest": "^27.4.5",
     "jest-serializer-simple": "4.6.0",
     "json5": "^2.2.0",
