@@ -1131,12 +1131,10 @@ export async function exportSchemaAsString(
     declareGraphQLEntity(file, schemaExportName, "GraphQLSchema", {
       description: desc(config.description),
       query: config.query ? file.declareType(config.query) : t.nullLiteral(),
-      mutation: config.mutation
-        ? file.declareType(config.mutation)
-        : t.nullLiteral(),
+      mutation: config.mutation ? file.declareType(config.mutation) : null,
       subscription: config.subscription
         ? file.declareType(config.subscription)
-        : t.nullLiteral(),
+        : null,
       types: t.arrayExpression(types),
       directives:
         customDirectives.length > 0
