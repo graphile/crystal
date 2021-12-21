@@ -218,7 +218,9 @@ export default function makeNewBuild(
       const type = this.getTypeByName(typeName);
       if (!type || !isInputType(type)) {
         throw new Error(
-          `Expected an input type, instead found ${String(type)}`,
+          `Expected an input type named '${typeName}', instead found ${String(
+            type,
+          )}`,
         );
       }
       return type;
@@ -227,7 +229,9 @@ export default function makeNewBuild(
       const type = this.getTypeByName(typeName);
       if (!type || !isOutputType(type)) {
         throw new Error(
-          `Expected an output type, instead found ${String(type)}`,
+          `Expected an output type named '${typeName}', instead found ${String(
+            type,
+          )}`,
         );
       }
       return type;
