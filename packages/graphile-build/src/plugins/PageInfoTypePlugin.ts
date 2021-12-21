@@ -1,4 +1,5 @@
 import { ConnectionPlan } from "graphile-crystal";
+import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 
 import { version } from "../index.js";
