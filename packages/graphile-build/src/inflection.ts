@@ -68,6 +68,14 @@ export const makeInitialInflection = () => ({
 
     return resultingName;
   },
+
+  /**
+   * Given the name of a GraphQL output type, what name should we use for the
+   * equivalent input type?
+   */
+  inputType: (typeName: string) => {
+    return `${typeName}Input`;
+  },
 });
 
 export type InflectionBase = ReturnType<typeof makeInitialInflection>;

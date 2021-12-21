@@ -87,6 +87,15 @@ export function enumType<TValue extends string>(
 }
 exportAs(enumType, "enumType");
 
+export interface PgInterval {
+  years?: number;
+  months?: number;
+  days?: number;
+  hours?: number;
+  minutes?: number;
+  seconds?: number;
+}
+
 export const TYPES = {
   boolean: t<boolean>("bool"),
   int2: t<number>("int2"),
@@ -122,11 +131,10 @@ export const TYPES = {
   cidr: t<string>("cidr"),
   macaddr: t<string>("macaddr"),
   macaddr8: t<string>("macaddr8"),
-  // interval
-  // bit
-  // varbit
-  // bitstring
-  // point
+  interval: t<PgInterval, string>("interval"), // TODO: parsing/etc
+  bit: t<string>("bit"),
+  varbit: t<string>("varbit"),
+  point: t<{ x: number; y: number }, string>("point"), // TODO: custom parsing/etc?
 } as const;
 exportAs(TYPES, "TYPES");
 for (const key of Object.keys(TYPES)) {
