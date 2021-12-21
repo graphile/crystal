@@ -2,11 +2,11 @@ import "graphile-build";
 import "./PgTablesPlugin";
 
 import type { PgSource } from "@dataplan/pg";
+import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 
 import { getBehavior } from "../behaviour";
 import { version } from "../index";
-import { EXPORTABLE } from "graphile-exporter";
 
 declare global {
   namespace GraphileEngine {

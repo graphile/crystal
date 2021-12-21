@@ -3,6 +3,9 @@ export function EXPORTABLE<T, TScope extends any[]>(
   args: [...TScope],
 ): T {
   const fn: T = factory(...args);
-  Object.assign(fn, { $exporter$args: args, $exporter$factory: factory });
+  Object.defineProperties(fn, {
+    $exporter$args: { value: args },
+    $exporter$factory: { value: factory },
+  });
   return fn;
 }
