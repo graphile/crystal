@@ -132,6 +132,14 @@ async function main() {
           name
           archivedAt
         }
+        edges {
+          cursor
+          node {
+            id
+            name
+            archivedAt
+          }
+        }
       }
     }
   `;
