@@ -28,10 +28,10 @@
   },
   "homepage": "https://graphile.org/graphile-build/",
   "dependencies": {
-    "@types/node": "^16.11.6",
+    "@types/node": "^16.11.15",
     "@types/semver": "^7.3.9",
     "chalk": "^4.1.2",
-    "debug": "^4.3.2",
+    "debug": "^4.3.3",
     "semver": "^7.3.5",
     "tslib": "^2.3.1"
   },
@@ -43,8 +43,8 @@
   ],
   "devDependencies": {
     "@types/debug": "^4.1.7",
-    "@types/jest": "^27.0.2",
-    "jest": "^27.3.1",
+    "@types/jest": "^27.0.3",
+    "jest": "^27.4.5",
     "ts-node": "^10.4.0",
     "typescript": "next"
   }

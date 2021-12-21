@@ -28,10 +28,10 @@
     "graphql": "*"
   },
   "devDependencies": {
-    "@types/jest": "^27.0.2",
+    "@types/jest": "^27.0.3",
     "graphql": "npm:graphql@experimental-stream-defer",
-    "jest": "^27.3.1",
-    "pretty-format": "^27.3.1",
+    "jest": "^27.4.5",
+    "pretty-format": "^27.4.2",
     "ts-node": "^10.4.0",
     "tslib": "^2.3.1",
     "typescript": "next"

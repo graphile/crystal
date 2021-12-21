@@ -35,11 +35,11 @@
   "homepage": "https://graphile.org/graphile-build/",
   "dependencies": {
     "@graphile/lru": "4.6.0-alpha.0",
-    "@types/node": "^16.11.6",
+    "@types/node": "^16.11.15",
     "@types/pluralize": "^0.0.29",
     "@types/semver": "^7.3.9",
     "chalk": "^4.1.2",
-    "debug": "^4.3.2",
+    "debug": "^4.3.3",
     "graphile-crystal": "4.7.0",
     "graphile-exporter": "^0.0.1",
     "graphile-plugin": "^5.0.0-alpha.0",
@@ -53,12 +53,15 @@
   "peerDependencies": {
     "graphql": "*"
   },
-  "files": ["dist", "index.js"],
+  "files": [
+    "dist",
+    "index.js"
+  ],
   "devDependencies": {
     "@types/debug": "^4.1.7",
-    "@types/jest": "^27.0.2",
+    "@types/jest": "^27.0.3",
     "graphql": "npm:graphql@experimental-stream-defer",
-    "jest": "^27.3.1",
+    "jest": "^27.4.5",
     "ts-node": "^10.4.0",
     "typescript": "next"
   }

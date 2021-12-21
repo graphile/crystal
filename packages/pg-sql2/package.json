@@ -34,9 +34,9 @@
   "homepage": "https://github.com/graphile/graphile-build/tree/master/packages/pg-sql2",
   "devDependencies": {
     "@types/debug": "4.1.7",
-    "@types/jest": "^27.0.2",
-    "@types/node": "16.11.6",
-    "jest": "^27.3.1",
+    "@types/jest": "^27.0.3",
+    "@types/node": "16.11.15",
+    "jest": "^27.4.5",
     "markdown-doctest": "^1.1.0",
     "ts-node": "^10.4.0",
     "typescript": "next"

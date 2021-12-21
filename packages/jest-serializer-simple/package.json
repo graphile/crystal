@@ -27,12 +27,12 @@
   "dependencies": {
     "@types/json5": "^2.2.0",
     "json5": "^2.2.0",
-    "prettier": "^2.4.1"
+    "prettier": "^2.5.1"
   },
   "devDependencies": {
-    "@types/jest": "^27.0.2",
-    "jest": "^27.3.1",
-    "pretty-format": "^27.3.1",
+    "@types/jest": "^27.0.3",
+    "jest": "^27.4.5",
+    "pretty-format": "^27.4.2",
     "ts-node": "^10.4.0",
     "tslib": "^2.3.1",
     "typescript": "next"

@@ -44,7 +44,7 @@
   "homepage": "https://github.com/graphile/crystal/tree/main/packages/dataplan-pg",
   "dependencies": {
     "@graphile/lru": "4.6.0-alpha.0",
-    "@types/node": "^16.11.6",
+    "@types/node": "^16.11.15",
     "graphile-crystal": "4.7.0",
     "pg-sql2": "4.7.0",
     "tslib": "^2.3.1"
@@ -55,18 +55,21 @@
   "peerDependencies": {
     "graphql": "*"
   },
-  "files": ["dist", "index.js"],
+  "files": [
+    "dist",
+    "index.js"
+  ],
   "devDependencies": {
     "@dataplan/json": "4.7.0",
-    "@types/jest": "^27.0.2",
+    "@types/jest": "^27.0.3",
     "@types/json5": "^2.2.0",
     "@types/nodemon": "1.19.1",
     "graphile-exporter": "^0.0.1",
     "graphql": "npm:graphql@experimental-stream-defer",
-    "jest": "^27.3.1",
+    "jest": "^27.4.5",
     "jest-serializer-simple": "4.6.0",
     "json5": "^2.2.0",
-    "nodemon": "^2.0.14",
+    "nodemon": "^2.0.15",
     "ts-node": "^10.4.0",
     "typescript": "next"
   }

@@ -40,10 +40,10 @@
   },
   "homepage": "https://graphile.org/",
   "dependencies": {
-    "@babel/generator": "^7.16.0",
-    "@babel/parser": "^7.16.3",
+    "@babel/generator": "^7.16.5",
+    "@babel/parser": "^7.16.6",
     "@babel/template": "^7.16.0",
-    "@types/node": "^16.11.6",
+    "@types/node": "^16.11.15",
     "graphile-crystal": "4.7.0",
     "tslib": "^2.3.1"
   },
@@ -58,11 +58,11 @@
     "dist"
   ],
   "devDependencies": {
-    "@types/babel__generator": "^7",
-    "@types/babel__template": "^7",
-    "@types/jest": "^27.0.2",
+    "@types/babel__generator": "^7.6.3",
+    "@types/babel__template": "^7.4.1",
+    "@types/jest": "^27.0.3",
     "graphql": "npm:graphql@experimental-stream-defer",
-    "jest": "^27.3.1",
+    "jest": "^27.4.5",
     "ts-node": "^10.4.0",
     "typescript": "next"
   }

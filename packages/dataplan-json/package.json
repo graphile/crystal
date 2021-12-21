@@ -40,8 +40,8 @@
     "dist"
   ],
   "devDependencies": {
-    "@types/jest": "^27.0.2",
-    "jest": "^27.3.1",
+    "@types/jest": "^27.0.3",
+    "jest": "^27.4.5",
     "jest-serializer-simple": "4.6.0",
     "typescript": "next"
   }
