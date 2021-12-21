@@ -19,7 +19,7 @@ export type PgTypeCodecMetaLookup = Map<
   PgTypeCodecMeta
 >;
 
-function makePgTypeCodecMeta(
+export function makePgTypeCodecMeta(
   _codec: PgTypeCodec<any, any, any>,
 ): PgTypeCodecMeta {
   return {

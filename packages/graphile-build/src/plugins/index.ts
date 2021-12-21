@@ -1,4 +1,5 @@
 import { ClientMutationIdDescriptionPlugin } from "./ClientMutationIdDescriptionPlugin.js";
+import { CommonTypesPlugin } from "./CommonTypesPlugin.js";
 import { CursorTypePlugin } from "./CursorTypePlugin.js";
 import { MutationPayloadQueryPlugin } from "./MutationPayloadQueryPlugin.js";
 import { MutationPlugin } from "./MutationPlugin.js";
@@ -9,6 +10,7 @@ import { SwallowErrorsPlugin } from "./SwallowErrorsPlugin.js";
 
 export {
   ClientMutationIdDescriptionPlugin,
+  CommonTypesPlugin,
   CursorTypePlugin,
   MutationPayloadQueryPlugin,
   MutationPlugin,

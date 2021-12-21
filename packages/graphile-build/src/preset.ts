@@ -4,6 +4,7 @@ import type { Preset } from "graphile-plugin";
 
 import {
   ClientMutationIdDescriptionPlugin,
+  CommonTypesPlugin,
   CursorTypePlugin,
   MutationPayloadQueryPlugin,
   MutationPlugin,
@@ -19,5 +20,6 @@ export const defaultPreset: Preset = {
     ClientMutationIdDescriptionPlugin,
     MutationPayloadQueryPlugin,
     CursorTypePlugin,
+    CommonTypesPlugin,
   ],
 };
