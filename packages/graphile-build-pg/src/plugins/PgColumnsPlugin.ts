@@ -9,10 +9,11 @@ import type {
   PgTypeCodec,
 } from "@dataplan/pg";
 import type { Plugin } from "graphile-plugin";
+import sql from "pg-sql2";
 
 import { getBehavior } from "../behaviour";
 import { version } from "../index";
-import sql from "pg-sql2";
+import { EXPORTABLE } from "graphile-exporter";
 
 declare global {
   namespace GraphileEngine {
@@ -137,8 +138,12 @@ export const PgColumnsPlugin: Plugin = {
             {
               [columnFieldName]: {
                 type,
-                plan: ($record: PgSelectSinglePlan<any, any, any, any>) =>
-                  $record.get(columnName),
+                plan: EXPORTABLE(
+                  (columnName) =>
+                    ($record: PgSelectSinglePlan<any, any, any, any>) =>
+                      $record.get(columnName),
+                  [columnName],
+                ),
               },
             },
             `Adding '${columnName}' column field for codec representing ${

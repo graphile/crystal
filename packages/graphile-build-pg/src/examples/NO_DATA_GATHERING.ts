@@ -42,16 +42,24 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
 
 async function main() {
   // Create our GraphQL schema by applying all the plugins
-  const executor = new PgExecutor({
-    name: "main",
-    context: () =>
-      object({
-        pgSettings:
-          context<GraphileEngine.GraphileResolverContext>().get("pgSettings"),
-        withPgClient:
-          context<GraphileEngine.GraphileResolverContext>().get("withPgClient"),
-      } as PgExecutorContextPlans<any>),
-  });
+  const executor = EXPORTABLE(
+    (PgExecutor, context, object) =>
+      new PgExecutor({
+        name: "main",
+        context: () =>
+          object({
+            pgSettings:
+              context<GraphileEngine.GraphileResolverContext>().get(
+                "pgSettings",
+              ),
+            withPgClient:
+              context<GraphileEngine.GraphileResolverContext>().get(
+                "withPgClient",
+              ),
+          } as PgExecutorContextPlans<any>),
+      }),
+    [PgExecutor, context, object],
+  );
   const config = resolvePresets([
     {
       extends: [graphileBuildPreset, graphileBuildPgPreset],
@@ -78,25 +86,29 @@ async function main() {
       notNull: false,
     },
   };
-  const mainAppPublicForumsCodec = recordType(
-    sql`app_public.forums`,
-    appPublicForumsColumns,
-    {
-      tags: {
-        name: "forums",
-      },
-    },
+  const mainAppPublicForumsCodec = EXPORTABLE(
+    (appPublicForumsColumns, recordType, sql) =>
+      recordType(sql`app_public.forums`, appPublicForumsColumns, {
+        tags: {
+          name: "forums",
+        },
+      }),
+    [appPublicForumsColumns, recordType, sql],
   );
   // We're crafting our own input
   const input: GraphileEngine.BuildInput = {
     pgSources: [
-      new PgSource({
-        //name: "main.app_public.forums",
-        name: "forums",
-        executor,
-        source: sql`app_public.forums`,
-        codec: mainAppPublicForumsCodec,
-      }),
+      EXPORTABLE(
+        (PgSource, executor, mainAppPublicForumsCodec, sql) =>
+          new PgSource({
+            //name: "main.app_public.forums",
+            name: "forums",
+            executor,
+            source: sql`app_public.forums`,
+            codec: mainAppPublicForumsCodec,
+          }),
+        [PgSource, executor, mainAppPublicForumsCodec, sql],
+      ),
     ],
   };
   const schema = buildSchema(config, input);
