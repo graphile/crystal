@@ -1,4 +1,4 @@
-import { PgSourceExtensions, PgTypeCodecExtensions } from "@dataplan/pg";
+import type { PgSourceExtensions, PgTypeCodecExtensions } from "@dataplan/pg";
 import { isDev } from "graphile-crystal";
 import { inspect } from "util";
 
@@ -43,8 +43,8 @@ export function getBehavior(
 /**
  * We're strict with this because we want to be able to expand this in future.
  * For example I want to allow `@behavior all,some` to operate the same as
- * `@behavior all\n@behavior some`. I also want to be able to add `@behavior
- * -all` to remove a previously enabled behavior.
+ * `@behavior all\n@behavior some`. I also want to be able to add
+ * `@behavior -all` to remove a previously enabled behavior.
  *
  * @internal
  */

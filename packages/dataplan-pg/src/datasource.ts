@@ -1,3 +1,4 @@
+/* eslint-disable graphile-exporter/export-instances */
 import chalk from "chalk";
 import type {
   CrystalResultStreamList,

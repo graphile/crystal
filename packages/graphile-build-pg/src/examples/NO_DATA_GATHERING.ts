@@ -4,8 +4,7 @@ import type {
   PgSourceColumns,
   WithPgClient,
 } from "@dataplan/pg";
-import { TYPES } from "@dataplan/pg";
-import { PgExecutor, PgSource, recordType } from "@dataplan/pg";
+import { PgExecutor, PgSource, recordType,TYPES } from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import chalk from "chalk";
 import { readFile } from "fs/promises";
@@ -14,7 +13,7 @@ import {
   defaultPreset as graphileBuildPreset,
   QueryQueryPlugin,
 } from "graphile-build";
-import { context, crystalPrint, object } from "graphile-crystal";
+import { context, object } from "graphile-crystal";
 import { EXPORTABLE, exportSchema } from "graphile-exporter";
 import { resolvePresets } from "graphile-plugin";
 import { graphql, printSchema } from "graphql";

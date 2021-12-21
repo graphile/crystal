@@ -8,12 +8,12 @@ import type {
   PgSourceColumn,
   PgTypeCodec,
 } from "@dataplan/pg";
+import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import sql from "pg-sql2";
 
 import { getBehavior } from "../behaviour";
 import { version } from "../index";
-import { EXPORTABLE } from "graphile-exporter";
 
 declare global {
   namespace GraphileEngine {

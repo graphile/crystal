@@ -4,6 +4,7 @@ import type { WithPgClient } from "@dataplan/pg";
 import { PgExecutor } from "@dataplan/pg";
 import type { ExecutablePlan, PromiseOrDirect } from "graphile-crystal";
 import { context, object } from "graphile-crystal";
+import { EXPORTABLE } from "graphile-exporter";
 import type {
   GatherHelpers,
   GatherHooks,

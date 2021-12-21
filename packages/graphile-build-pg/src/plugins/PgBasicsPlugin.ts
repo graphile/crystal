@@ -2,16 +2,15 @@ import "graphile-build";
 import "./PgTablesPlugin";
 import "../interfaces";
 
+import type { PgTypeCodec } from "@dataplan/pg";
+import { TYPES } from "@dataplan/pg";
 import type { Plugin } from "graphile-plugin";
+import type { GraphQLType } from "graphql";
+import sql from "pg-sql2";
 
 import { version } from "../index";
-import {
-  getCodecMetaLookupFromInput,
-  PgTypeCodecMetaLookup,
-} from "../inputUtils";
-import { PgTypeCodec, TYPES } from "@dataplan/pg";
-import sql from "pg-sql2";
-import { GraphQLType } from "graphql";
+import type { PgTypeCodecMetaLookup } from "../inputUtils";
+import { getCodecMetaLookupFromInput } from "../inputUtils";
 
 type GetGraphQLTypeByPgCodec = (
   codec: PgTypeCodec<any, any, any>,
