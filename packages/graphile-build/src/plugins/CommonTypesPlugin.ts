@@ -8,7 +8,10 @@ declare global {
   namespace GraphileEngine {
     interface ScopeGraphQLScalarType {}
     interface GraphileBuildSchemaOptions {
-      extendedTypes?: boolean;
+      /**
+       * Set 'true' if you want JSON values to be stringified.
+       */
+      jsonScalarAsString?: boolean;
     }
   }
 }
@@ -23,7 +26,7 @@ export const CommonTypesPlugin: Plugin = {
       // TODO: add "specifiedBy" configuration
       init(_, build) {
         const {
-          options: { extendedTypes },
+          options: { jsonScalarAsString },
           inflection,
           stringTypeSpec,
           graphql: { Kind },
@@ -83,7 +86,7 @@ export const CommonTypesPlugin: Plugin = {
           "graphile-build built-in (UUID type)",
         );
 
-        if (extendedTypes !== false) {
+        if (jsonScalarAsString !== true) {
           const parseLiteral: GraphQLScalarLiteralParser<any> = EXPORTABLE(
             (Kind) => (ast, variables) => {
               switch (ast.kind) {
