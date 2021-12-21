@@ -183,6 +183,32 @@ class CodegenFile {
 
   import(
     fromModule: string,
+    exportNames: "default" | "*" | string | string[] = "default",
+    asType = false,
+  ): t.Identifier | t.MemberExpression {
+    if (Array.isArray(exportNames)) {
+      const [exportName, ...path] = exportNames;
+      if (!exportName) {
+        throw new Error("Could not determine the export name");
+      }
+      const variable = this.importOnly(fromModule, exportName, asType);
+      if (path.length) {
+        let result: t.Node = variable;
+        for (const pathSegment of path) {
+          result = t.memberExpression(result, t.identifier(pathSegment));
+        }
+        return result;
+      } else {
+        return variable;
+      }
+    } else {
+      const variable = this.importOnly(fromModule, exportNames, asType);
+      return variable;
+    }
+  }
+
+  importOnly(
+    fromModule: string,
     exportName: "default" | "*" | string = "default",
     asType = false,
   ): t.Identifier {
@@ -220,7 +246,7 @@ class CodegenFile {
       return existing.variableName;
     }
     if (BUILTINS.includes(type.name)) {
-      return this.import("graphql", "GraphQL" + type.name);
+      return this.importOnly("graphql", "GraphQL" + type.name);
     }
     if (isBuiltinType(type)) {
       throw new Error(

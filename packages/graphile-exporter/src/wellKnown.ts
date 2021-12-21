@@ -18,7 +18,7 @@ import util, { inspect } from "util";
 
 interface $$Export {
   moduleName: string;
-  exportName: string | "default" | "*";
+  exportName: string | "default" | "*" | string[];
 }
 
 const wellKnownMap = new Map<unknown, $$Export>();

@@ -100,3 +100,6 @@ export const TYPES = {
   timestamptz: t<Date, Date | string>("text"),
 };
 exportAs(TYPES, "TYPES");
+for (const key of Object.keys(TYPES)) {
+  exportAs(TYPES[key], ["TYPES", key]);
+}
