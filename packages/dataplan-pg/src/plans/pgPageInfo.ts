@@ -45,8 +45,11 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
   }
 
   public hasPreviousPage(): ExecutablePlan<boolean> {
-    // TODO!
     return constant(true);
+  }
+
+  public totalCount(): ExecutablePlan<number> {
+    return constant(-1);
   }
 
   execute(

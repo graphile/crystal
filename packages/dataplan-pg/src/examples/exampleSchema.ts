@@ -9,6 +9,7 @@ import type {
   BaseGraphQLRootValue,
   CrystalSubscriber,
   EachPlan,
+  ExecutablePlan,
   InputObjectPlan,
   InputStaticLeafPlan,
   PageInfoCapablePlan,
@@ -22,7 +23,6 @@ import {
   context,
   crystalEnforce,
   each,
-  ExecutablePlan,
   getEnumValueConfig,
   lambda,
   list,
@@ -89,6 +89,7 @@ import {
   TYPES,
 } from "../";
 import type { PgSourceColumns } from "../datasource";
+import { PgPageInfoPlan } from "../plans/pgPageInfo";
 
 declare module ".." {
   interface PgEnumSourceExtensions {
@@ -1823,8 +1824,8 @@ export function makeExampleSchema(
     },
   });
 
-  const PageInfo = newObjectTypeBuilder<OurGraphQLContext, PageInfoCapablePlan>(
-    ExecutablePlan as any,
+  const PageInfo = newObjectTypeBuilder<OurGraphQLContext, PgPageInfoPlan<any>>(
+    PgPageInfoPlan,
   )({
     name: "PageInfo",
     fields: {
@@ -1835,6 +1836,10 @@ export function makeExampleSchema(
       hasPreviousPage: {
         type: new GraphQLNonNull(GraphQLBoolean),
         plan: EXPORTABLE(() => ($pageInfo) => $pageInfo.hasPreviousPage(), []),
+      },
+      totalCount: {
+        type: new GraphQLNonNull(GraphQLInt),
+        plan: EXPORTABLE(() => ($pageInfo) => $pageInfo.totalCount(), []),
       },
     },
   });
