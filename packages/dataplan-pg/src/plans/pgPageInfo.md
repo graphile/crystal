@@ -8,9 +8,14 @@ PgPageInfoPlan allows you to retrieve:
 
 - `hasNextPage`
 - `hasPreviousPage`
+- `startCursor`
+- `endCursor`
 - `totalCount`
 
 for a given connection (which relates ultimately to a `PgSelectPlan`).
+
+Satisfying `startCursor` and `endCursor` merely involves resolving the cursors
+of the returned nodes and returning the first and last ones.
 
 There's lots of different ways of calculating `hasNextPage` and
 `hasPreviousPage` and different approaches may be more or less appropriate
@@ -65,7 +70,7 @@ For example:
 
 ```
      A B C D E F G H I J
-    |-->                    No cursor
+    |-->             <--|   No cursor
     |A B C|                 First 3
 ```
 
@@ -73,7 +78,7 @@ For example:
 
 ```
      A B C D E F G H I J
-                     <--|   No cursor
+    |-->             <--|   No cursor
                   |H I J|   Last 3
 ```
 
@@ -107,7 +112,7 @@ null)
 
 ```
      A B C D E F G H I J
-    |-->                    No cursor
+    |-->             <--|   No cursor
      X X|-->                Skip first 2 results
         |C D E|             First 3 in range
 ```
@@ -183,3 +188,74 @@ page since you're starting the fetch at the beginning.
 
 If `b` is null and `f` is null and `l` is not null then there can be no next
 page since you're starting the fetch at the end.
+
+## Remaining strategies
+
+Assuming none of the above apply, we need to figure out whether there is a
+previous/next page.
+
+It's highly recommended that you read the algorithm in the spec before reading
+this section:
+https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo.Fields
+
+### `hasPreviousPage`
+
+Assumption: `offset` is not set (or is zero).
+
+#### If `last` is set:
+
+Assumption: `first` is not set, or `first > last`.
+
+We're paginating backwards through the set. We need to determine if there's more
+than `last` records between `after` (or the start) and `before` (or the end). To
+do this, here's some options:
+
+1. if `totalCount` is calculated and neither `after` nor `before` are set, then:
+   `hasPreviousPage = totalCount > last`. _(0 additional queries)_
+1. fetch `last` matching rows; if fewer than `last` rows are returned, then
+   `false`, otherwise apply a different strategy. _(0+ additional queries)_
+1. instead of selecting `last` records, select `last+1` records and throw the
+   extra away - if it existed then we know there's a previous page, otherwise
+   there isn't. This might be expensive if the selection query is expensive. _(0
+   additional queries)_
+1. as above, but using a CTE that does `select *` with the `last+1` records
+   (works around the expensive selection set problem). _(0 additional queries)_
+1. do a separate query with a cheap selection set (e.g. `select 1`) and see if
+   `last+1` rows exist
+   (`select 1 from <source> where <filters> and <"before" condition> limit <last + 1>`).
+   _(1 additional query)_
+
+Which of these options to select depends on the circumstances. The first option
+should always be leveraged when it's applicable because it saves further
+calculation, but failing that... play it by ear.
+
+#### If `last` is not set:
+
+Assumption: `after` is set.
+
+Determining if you have a previous page can be determined via an `EXISTS`
+subquery seeing if anything exists "before or matching the after"; something
+like:
+
+```
+select exists(
+  select 1
+  from <source>
+  where <filters>
+  and <inverse of "after" condition>
+) as has_previous_page
+```
+
+Note: the spec states
+
+> If the server can efficiently determine that elements exist prior to after,
+> return true. [Otherwise] return false.
+
+So if this looks too complex (e.g. it's using complex filters or unindexed
+filters) then it's acceptable to return `false` in all cases.
+
+### `hasNextPage`
+
+This is basically the same strategy as `hasPreviousPage`, but swapping `first`
+for `last` and `after` for `before`. The `first > last` assumption may need
+adjustment.
