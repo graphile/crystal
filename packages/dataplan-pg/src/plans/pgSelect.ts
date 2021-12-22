@@ -1168,6 +1168,9 @@ export class PgSelectPlan<
    */
   public getOrderByDigest() {
     this._lockParameter("orderBy");
+    if (this.orders.length === 0) {
+      return "natural";
+    }
     // The security of this hash is unimportant; the main aim is to protect the
     // user from themself. If they bypass this, that's their problem (it will
     // not introduce a security issue).

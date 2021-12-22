@@ -1,6 +1,8 @@
 import type { CrystalResultsList, CrystalValuesList } from "graphile-crystal";
 import { ExecutablePlan, list } from "graphile-crystal";
+import sql from "pg-sql2";
 
+import { TYPES } from "../codecs";
 import { PgSelectSinglePlan } from "./pgSelectSingle";
 
 export class PgCursorPlan<
@@ -22,7 +24,15 @@ export class PgCursorPlan<
     this.digest = classPlan.getOrderByDigest();
     const orders = classPlan.getOrderBy();
     const plan = list(
-      orders.map((o) => itemPlan.expression(o.fragment, o.codec)),
+      orders.length > 0
+        ? orders.map((o) => itemPlan.expression(o.fragment, o.codec))
+        : // No ordering; so use row number
+          [
+            itemPlan.expression(
+              sql`row_number() over (partition by 1)`,
+              TYPES.int,
+            ),
+          ],
     );
     this.cursorValuesPlanId = this.addDependency(plan);
   }
