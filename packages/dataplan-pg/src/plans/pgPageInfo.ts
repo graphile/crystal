@@ -6,7 +6,6 @@ import type {
 import { constant, ExecutablePlan } from "graphile-crystal";
 
 import { PgSelectPlan } from "./pgSelect";
-import { PgSelectSinglePlan } from "./pgSelectSingle";
 
 /**
  * Invoking PgPageInfoPlan should have no direct overhead (e.g.
