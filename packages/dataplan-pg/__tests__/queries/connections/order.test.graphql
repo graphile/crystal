@@ -6,6 +6,8 @@
 ## expect(data.allMessagesConnection.edges[0].node.body).toMatch("Cats");
 ## expect(data.allMessagesConnection.edges[1].node.author.username).toEqual("Cecilia");
 ## expect(data.allMessagesConnection.edges[1].node.body).toMatch("Postgres");
+## expect(data.allMessagesConnection.pageInfo.hasPreviousPage).toEqual(false);
+## expect(data.allMessagesConnection.pageInfo.hasNextPage).toEqual(true);
 {
   allMessagesConnection(orderBy: [AUTHOR_USERNAME_DESC, BODY_ASC], first: 5) {
     edges {
@@ -17,6 +19,11 @@
           gravatarUrl
         }
       }
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      totalCount
     }
   }
 }

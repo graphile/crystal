@@ -1,6 +1,8 @@
 ## expect(errors).toBeFalsy()
 ## expect(queries).toHaveLength(1);
 ## expect(data.allMessagesConnection.edges).toHaveLength(6);
+## expect(data.allMessagesConnection.pageInfo.hasPreviousPage).toEqual(false);
+## expect(data.allMessagesConnection.pageInfo.hasNextPage).toEqual(false);
 {
   allMessagesConnection {
     edges {
@@ -12,6 +14,11 @@
           gravatarUrl
         }
       }
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      totalCount
     }
   }
 }

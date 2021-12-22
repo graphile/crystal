@@ -4,6 +4,8 @@
 ## expect(data.allMessagesConnection.edges[0].cursor).toEqual("WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtYTExY2UwMDBjYTcwIl0=");
 ## expect(data.allMessagesConnection.edges[0].node.author.username).toEqual("Alice");
 ## expect(data.allMessagesConnection.edges[1].node.author.username).toEqual("Bob");
+## expect(data.allMessagesConnection.pageInfo.hasPreviousPage).toEqual(false);
+## expect(data.allMessagesConnection.pageInfo.hasNextPage).toEqual(true);
 {
   # Before "Cecilia / Cats" there's only two records
   allMessagesConnection(
@@ -19,6 +21,11 @@
           gravatarUrl
         }
       }
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      totalCount
     }
   }
 }
