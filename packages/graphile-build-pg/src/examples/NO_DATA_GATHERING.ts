@@ -105,6 +105,7 @@ async function main() {
             executor,
             source: sql`app_public.forums`,
             codec: mainAppPublicForumsCodec,
+            uniques: [["id"]],
           }),
         [PgSource, executor, mainAppPublicForumsCodec, sql],
       ),
