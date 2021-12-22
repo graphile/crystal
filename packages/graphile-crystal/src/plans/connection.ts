@@ -1,12 +1,16 @@
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
 import { ExecutablePlan } from "../plan";
 
+export interface PageInfoCapablePlan extends ExecutablePlan<any> {
+  hasNextPage(): ExecutablePlan<boolean>;
+  hasPreviousPage(): ExecutablePlan<boolean>;
+}
+
 export interface ConnectionCapablePlan<
   T extends ReadonlyArray<any> = ReadonlyArray<any>,
 > extends ExecutablePlan<T> {
   clone(): ConnectionCapablePlan<any>; // TODO: `this`
-  hasNextPage(): ExecutablePlan<boolean>;
-  hasPreviousPage(): ExecutablePlan<boolean>;
+  pageInfo(): PageInfoCapablePlan;
 }
 
 export class ConnectionPlan<
@@ -57,14 +61,9 @@ export class ConnectionPlan<
     return plan.clone() as any;
   }
 
-  public hasNextPage() {
+  public pageInfo() {
     const plan = this.getPlan(this.subplanId) as TPlan;
-    return plan.clone().hasNextPage();
-  }
-
-  public hasPreviousPage() {
-    const plan = this.getPlan(this.subplanId) as TPlan;
-    return plan.clone().hasNextPage();
+    return plan.clone().pageInfo();
   }
 
   public execute(

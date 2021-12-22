@@ -388,7 +388,7 @@ export const PgTablesPlugin: Plugin = {
                               >,
                             ) {
                               // TODO: why is this a TypeScript issue without the 'any'?
-                              return $connection as any;
+                              return $connection.pageInfo() as any;
                             },
                           [],
                         ),

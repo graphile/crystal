@@ -1,9 +1,8 @@
-import { ConnectionPlan } from "graphile-crystal";
+import { PgPageInfoPlan } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 
 import { version } from "../index.js";
-import { stringScalarSpec } from "../utils.js";
 
 declare global {
   namespace GraphileEngine {
@@ -34,7 +33,7 @@ export const PageInfoTypePlugin: Plugin = {
           registerObjectType(
             inflection.builtin("PageInfo"),
             { isPageInfo: true },
-            ConnectionPlan,
+            PgPageInfoPlan,
             () => ({
               description: build.wrapDescription(
                 "Information about pagination in a connection.",

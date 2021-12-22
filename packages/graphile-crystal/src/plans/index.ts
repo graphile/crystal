@@ -26,6 +26,7 @@ export {
   connection,
   ConnectionCapablePlan,
   ConnectionPlan,
+  PageInfoCapablePlan,
 } from "./connection";
 export { constant, ConstantPlan } from "./constant";
 export { each, EachPlan } from "./each";

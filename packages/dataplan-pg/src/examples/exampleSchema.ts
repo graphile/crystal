@@ -9,10 +9,11 @@ import type {
   BaseGraphQLRootValue,
   CrystalSubscriber,
   EachPlan,
-  ExecutablePlan,
   InputObjectPlan,
   InputStaticLeafPlan,
+  PageInfoCapablePlan,
 } from "graphile-crystal";
+import { BasePlan } from "graphile-crystal";
 import {
   __ValuePlan,
   aether,
@@ -21,6 +22,7 @@ import {
   context,
   crystalEnforce,
   each,
+  ExecutablePlan,
   getEnumValueConfig,
   lambda,
   list,
@@ -1821,6 +1823,22 @@ export function makeExampleSchema(
     },
   });
 
+  const PageInfo = newObjectTypeBuilder<OurGraphQLContext, PageInfoCapablePlan>(
+    ExecutablePlan as any,
+  )({
+    name: "PageInfo",
+    fields: {
+      hasNextPage: {
+        type: new GraphQLNonNull(GraphQLBoolean),
+        plan: EXPORTABLE(() => ($pageInfo) => $pageInfo.hasNextPage(), []),
+      },
+      hasPreviousPage: {
+        type: new GraphQLNonNull(GraphQLBoolean),
+        plan: EXPORTABLE(() => ($pageInfo) => $pageInfo.hasPreviousPage(), []),
+      },
+    },
+  });
+
   const MessagesConnection = newObjectTypeBuilder<
     OurGraphQLContext,
     MessageConnectionPlan
@@ -1848,6 +1866,20 @@ export function makeExampleSchema(
             function plan($connection) {
               // return context();
               return $connection.nodes();
+            },
+          [],
+        ),
+      }),
+      pageInfo: newGraphileFieldConfigBuilder<
+        OurGraphQLContext,
+        MessageConnectionPlan
+      >()({
+        type: new GraphQLNonNull(PageInfo),
+        plan: EXPORTABLE(
+          () =>
+            function plan($connection) {
+              // return context();
+              return $connection.pageInfo() as any;
             },
           [],
         ),

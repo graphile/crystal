@@ -39,6 +39,8 @@ import { PgSourceBuilder } from "../datasource";
 import type { PgOrderSpec, PgTypedExecutablePlan } from "../interfaces";
 import { PgClassExpressionPlan } from "./pgClassExpression";
 import { PgConditionPlan } from "./pgCondition";
+import type { PgPageInfoPlan } from "./pgPageInfo";
+import { pgPageInfo } from "./pgPageInfo";
 import type { PgSelectSinglePlanOptions } from "./pgSelectSingle";
 import { PgSelectSinglePlan } from "./pgSelectSingle";
 
@@ -865,13 +867,8 @@ export class PgSelectPlan<
     this.parseCursor("before", cursor);
   }
 
-  public hasNextPage(): ExecutablePlan<boolean> {
-    // TODO!
-    return constant(true);
-  }
-  public hasPreviousPage(): ExecutablePlan<boolean> {
-    // TODO!
-    return constant(true);
+  public pageInfo(): PgPageInfoPlan<this> {
+    return pgPageInfo(this);
   }
 
   /**
