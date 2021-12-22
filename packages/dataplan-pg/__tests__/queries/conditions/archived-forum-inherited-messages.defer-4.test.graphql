@@ -23,6 +23,11 @@
           }
         }
       }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        totalCount
+      }
     }
   }
 }

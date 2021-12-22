@@ -21,6 +21,11 @@
           }
         }
       }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        totalCount
+      }
     }
   }
 }
