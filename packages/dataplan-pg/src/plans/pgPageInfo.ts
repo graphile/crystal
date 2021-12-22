@@ -7,6 +7,8 @@ import { constant, ExecutablePlan } from "graphile-crystal";
 
 import { PgSelectPlan } from "./pgSelect";
 
+// PLEASE SEE pgPageInfo.md!
+
 /**
  * Invoking PgPageInfoPlan should have no direct overhead (e.g.
  * `pageInfo { __typename }` is free); cost should not be incurred until one of
