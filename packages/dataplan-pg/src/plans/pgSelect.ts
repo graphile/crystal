@@ -145,6 +145,8 @@ function assertSensible(plan: ExecutablePlan): void {
   }
 }
 
+type PgSelectMode = "normal" | "aggregate";
+
 interface PgSelectOptions<TColumns extends PgSourceColumns | undefined> {
   /**
    * Tells us what we're dealing with - data type, columns, where to get it
@@ -184,6 +186,8 @@ interface PgSelectOptions<TColumns extends PgSourceColumns | undefined> {
    * generated.
    */
   name?: string;
+
+  mode?: PgSelectMode;
 }
 
 /**
@@ -413,20 +417,18 @@ export class PgSelectPlan<
     offset: false,
   };
 
+  public readonly mode: PgSelectMode;
+
   constructor(options: PgSelectOptions<TColumns>);
   constructor(
     cloneFrom: PgSelectPlan<TColumns, TUniques, TRelations, TParameters>,
+    mode?: PgSelectMode,
   );
   constructor(
     optionsOrCloneFrom:
       | PgSelectPlan<TColumns, TUniques, TRelations, TParameters>
-      | {
-          source: PgSource<TColumns, TUniques, TRelations, TParameters>;
-          identifiers?: Array<PgSelectIdentifierSpec>;
-          args?: Array<PgSelectArgumentSpec>;
-          from?: SQL | ((...args: SQL[]) => SQL);
-          name?: string;
-        },
+      | PgSelectOptions<TColumns>,
+    overrideMode?: PgSelectMode,
   ) {
     super();
     const [
@@ -437,6 +439,7 @@ export class PgSelectPlan<
         args: inArgs,
         from: inFrom = null,
         name: customName,
+        mode: inMode,
       },
     ] =
       optionsOrCloneFrom instanceof PgSelectPlan
@@ -448,9 +451,14 @@ export class PgSelectPlan<
               from: optionsOrCloneFrom.from,
               args: null,
               name: optionsOrCloneFrom.name,
+              mode: undefined,
             },
           ]
         : [null, optionsOrCloneFrom];
+
+    this.mode = overrideMode ?? inMode ?? "normal";
+    const cloneFromMatchingMode =
+      cloneFrom?.mode === this.mode ? cloneFrom : null;
 
     this.source = source;
     if (cloneFrom) {
@@ -553,7 +561,9 @@ export class PgSelectPlan<
       ? new Map(cloneFrom.relationJoins)
       : new Map();
     this.joins = cloneFrom ? [...cloneFrom.joins] : [];
-    this.selects = cloneFrom ? [...cloneFrom.selects] : [];
+    this.selects = cloneFromMatchingMode
+      ? [...cloneFromMatchingMode.selects]
+      : [];
     this.isTrusted = cloneFrom ? cloneFrom.isTrusted : false;
     this.isUnique = cloneFrom ? cloneFrom.isUnique : false;
     this.isInliningForbidden = cloneFrom
@@ -562,20 +572,21 @@ export class PgSelectPlan<
     this.conditions = cloneFrom ? [...cloneFrom.conditions] : [];
     this.orders = cloneFrom ? [...cloneFrom.orders] : [];
     this.isOrderUnique = cloneFrom ? cloneFrom.isOrderUnique : false;
-    this.first = cloneFrom ? cloneFrom.first : null;
-    this.last = cloneFrom ? cloneFrom.last : null;
-    this.offset = cloneFrom ? cloneFrom.offset : null;
+    this.first = cloneFromMatchingMode ? cloneFromMatchingMode.first : null;
+    this.last = cloneFromMatchingMode ? cloneFromMatchingMode.last : null;
+    this.offset = cloneFromMatchingMode ? cloneFromMatchingMode.offset : null;
 
     debugPlan(
-      `%s (%s) constructor (%s)`,
+      `%s (%s) constructor (%s; %s)`,
       this,
       this.name,
       cloneFrom ? "clone" : "original",
+      this.mode,
     );
     return this;
   }
 
-  toStringMeta(): string {
+  public toStringMeta(): string {
     return this.name;
   }
 
@@ -613,6 +624,9 @@ export class PgSelectPlan<
   }
 
   public setLast(last: number | null | undefined): this {
+    if (this.mode === "aggregate") {
+      throw new Error("Cannot use cursor pagination with aggregates.");
+    }
     this._assertParameterUnlocked("orderBy");
     this._assertParameterUnlocked("last");
     this.last = last ?? null;
@@ -763,8 +777,10 @@ export class PgSelectPlan<
    * connections/etc (e.g. copying `where` conditions but adding more, or
    * pagination, or grouping, aggregates, etc)
    */
-  clone(): PgSelectPlan<TColumns, TUniques, TRelations, TParameters> {
-    return new PgSelectPlan(this);
+  clone(
+    mode?: PgSelectMode,
+  ): PgSelectPlan<TColumns, TUniques, TRelations, TParameters> {
+    return new PgSelectPlan(this, mode);
   }
 
   where(condition: SQL): void {
@@ -1515,6 +1531,11 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
         return false;
       }
 
+      // Check mode matches
+      if (p.mode !== this.mode) {
+        return false;
+      }
+
       // Since deduplicate runs before we have children, we do not need to
       // check the symbol or alias matches. We do need to factor the different
       // symbols into SQL equivalency checks though.
@@ -1937,6 +1958,17 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
     this.locked = true;
 
     return this;
+  }
+
+  /**
+   * Returns a PgSelectPlan capable of aggregate queries.
+   */
+  aggregate() {
+    if (this.mode === "aggregate") {
+      return this;
+    } else {
+      return this.clone("aggregate");
+    }
   }
 
   /**
