@@ -202,7 +202,7 @@ export class PgClassExpressionPlan<
   }
 
   public optimize(): this {
-    this.attrIndex = this.getParentPlan().select(
+    this.attrIndex = this.getParentPlan().selectAndReturnIndex(
       sql`${sql.parens(this.expression)}::text`,
     );
     return this;

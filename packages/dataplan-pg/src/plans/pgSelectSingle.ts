@@ -215,8 +215,14 @@ export class PgSelectSinglePlan<
     return colPlan as any;
   }
 
-  public select(fragment: SQL): number {
-    return this.getClassPlan().select(fragment);
+  /**
+   * Advanced method; rather than returning a plan it returns an index.
+   * Generally useful for PgClassExpressionPlan.
+   *
+   * @internal
+   */
+  public selectAndReturnIndex(fragment: SQL): number {
+    return this.getClassPlan().selectAndReturnIndex(fragment);
   }
 
   public placeholder($plan: PgTypedExecutablePlan<any>): SQL;

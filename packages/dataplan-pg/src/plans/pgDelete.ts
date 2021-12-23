@@ -198,7 +198,13 @@ export class PgDeletePlan<
     return pgClassExpression(this, this.source.codec)`${this.alias}`;
   }
 
-  public select(fragment: SQL): number {
+  /**
+   * Advanced method; rather than returning a plan it returns an index.
+   * Generally useful for PgClassExpressionPlan.
+   *
+   * @internal
+   */
+  public selectAndReturnIndex(fragment: SQL): number {
     if (this.locked) {
       throw new Error("Plan is finalized, no more selects may be added");
     }

@@ -243,7 +243,13 @@ export class PgUpdatePlan<
     return pgClassExpression(this, this.source.codec)`${this.alias}`;
   }
 
-  public select(fragment: SQL): number {
+  /**
+   * Advanced method; rather than returning a plan it returns an index.
+   * Generally useful for PgClassExpressionPlan.
+   *
+   * @internal
+   */
+  public selectAndReturnIndex(fragment: SQL): number {
     // NOTE: it's okay to add selections after the plan is "locked" - lock only
     // applies to which rows are being selected, not what is being queried
     // about the rows.

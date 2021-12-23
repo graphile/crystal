@@ -756,7 +756,7 @@ export class PgSelectPlan<
   /**
    * Select an SQL fragment, returning the index the result will have.
    */
-  public select(fragment: SQL): number {
+  public selectAndReturnIndex(fragment: SQL): number {
     if (!this.isArgumentsFinalized) {
       throw new Error("Select added before arguments were finalized");
     }
@@ -1675,7 +1675,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
     //console.log(`My ${this} selects:`);
     //console.dir(this.selects, { depth: 8 });
     this.selects.forEach((frag, idx) => {
-      actualKeyByDesiredKey[idx] = otherPlan.select(frag);
+      actualKeyByDesiredKey[idx] = otherPlan.selectAndReturnIndex(frag);
     });
     //console.dir(actualKeyByDesiredKey);
     //console.log(`Other ${otherPlan} selects now:`);
@@ -1938,7 +1938,9 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
           });
           this.mergePlaceholdersInto(table);
           const { sql: query } = this.buildQuery({ asArray: true });
-          const selfIndex = table.select(sql`array(${sql.indent(query)})`);
+          const selfIndex = table.selectAndReturnIndex(
+            sql`array(${sql.indent(query)})`,
+          );
           debugPlanVerbose(
             "Optimising %c (via %c and %c)",
             this,
