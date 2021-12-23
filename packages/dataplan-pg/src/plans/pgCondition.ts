@@ -1,3 +1,4 @@
+import assert from "assert";
 import type { BasePlan, ExecutablePlan } from "graphile-crystal";
 import { ModifierPlan } from "graphile-crystal";
 import type { SQL } from "pg-sql2";
@@ -6,6 +7,7 @@ export interface PgConditionCapableParentPlan extends BasePlan {
   alias: SQL;
   placeholder($plan: ExecutablePlan<any>, type: SQL): SQL;
   where(condition: SQL): void;
+  having?(condition: SQL): void;
 }
 
 export class PgConditionPlan<
@@ -17,16 +19,31 @@ export class PgConditionPlan<
   };
 
   private conditions: SQL[] = [];
+  private havingConditions: SQL[] = [];
 
   public readonly alias: SQL;
 
-  constructor($parent: TParentPlan) {
+  constructor($parent: TParentPlan, private isHaving = false) {
     super($parent);
     this.alias = $parent.alias;
   }
 
   where(condition: SQL): void {
+    assert.equal(
+      this.isHaving,
+      false,
+      `cannot call .where() on a 'having' condition`,
+    );
     this.conditions.push(condition);
+  }
+
+  having(condition: SQL): void {
+    assert.equal(
+      this.isHaving,
+      true,
+      `cannot call .having() on a 'where' condition`,
+    );
+    this.havingConditions.push(condition);
   }
 
   placeholder($plan: ExecutablePlan<any>, type: SQL): SQL {
@@ -34,6 +51,17 @@ export class PgConditionPlan<
   }
 
   apply(): void {
-    this.conditions.forEach((condition) => this.$parent.where(condition));
+    if (this.isHaving) {
+      if (!this.$parent.having) {
+        throw new Error(`${this.$parent} doesn't support 'having'`);
+      }
+      this.havingConditions.forEach((condition) => {
+        this.$parent.having!(condition);
+      });
+    } else {
+      this.conditions.forEach((condition) => {
+        this.$parent.where(condition);
+      });
+    }
   }
 }

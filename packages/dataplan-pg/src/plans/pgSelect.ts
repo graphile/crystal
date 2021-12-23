@@ -1,3 +1,4 @@
+import assert from "assert";
 import { createHash } from "crypto";
 import debugFactory from "debug";
 import type {
@@ -36,7 +37,11 @@ import type {
   PgSourceRow,
 } from "../datasource";
 import { PgSourceBuilder } from "../datasource";
-import type { PgOrderSpec, PgTypedExecutablePlan } from "../interfaces";
+import type {
+  PgGroupSpec,
+  PgOrderSpec,
+  PgTypedExecutablePlan,
+} from "../interfaces";
 import { PgClassExpressionPlan } from "./pgClassExpression";
 import { PgConditionPlan } from "./pgCondition";
 import type { PgPageInfoPlan } from "./pgPageInfo";
@@ -57,7 +62,7 @@ function isStaticInputPlan(
   );
 }
 
-type LockableParameter = "orderBy" | "first" | "last" | "offset";
+type LockableParameter = "orderBy" | "first" | "last" | "offset" | "groupBy";
 type LockCallback<
   TColumns extends PgSourceColumns | undefined,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
@@ -145,7 +150,7 @@ function assertSensible(plan: ExecutablePlan): void {
   }
 }
 
-type PgSelectMode = "normal" | "aggregate";
+export type PgSelectMode = "normal" | "aggregate";
 
 interface PgSelectOptions<TColumns extends PgSourceColumns | undefined> {
   /**
@@ -260,6 +265,14 @@ export class PgSelectPlan<
   // WHERE
 
   private conditions: SQL[];
+
+  // GROUP BY
+
+  private groups: Array<PgGroupSpec>;
+
+  // HAVING
+
+  private havingConditions: SQL[];
 
   // ORDER BY
 
@@ -392,6 +405,7 @@ export class PgSelectPlan<
     >;
   } = {
     orderBy: [],
+    groupBy: [],
     first: [],
     last: [],
     offset: [],
@@ -403,6 +417,7 @@ export class PgSelectPlan<
     >;
   } = {
     orderBy: [],
+    groupBy: [],
     first: [],
     last: [],
     offset: [],
@@ -412,6 +427,7 @@ export class PgSelectPlan<
     [a in LockableParameter]: false | true | string | undefined;
   } = {
     orderBy: false,
+    groupBy: false,
     first: false,
     last: false,
     offset: false,
@@ -480,6 +496,7 @@ export class PgSelectPlan<
     } else {
       // Since we're applying this to the original it doesn't make sense to
       // also apply it to the clones.
+      this.beforeLock("orderBy", () => this._lockParameter("groupBy"));
       this.beforeLock("orderBy", ensureOrderIsUnique);
     }
 
@@ -570,6 +587,8 @@ export class PgSelectPlan<
       ? cloneFrom.isInliningForbidden
       : false;
     this.conditions = cloneFrom ? [...cloneFrom.conditions] : [];
+    this.groups = cloneFrom ? [...cloneFrom.groups] : [];
+    this.havingConditions = cloneFrom ? [...cloneFrom.havingConditions] : [];
     this.orders = cloneFrom ? [...cloneFrom.orders] : [];
     this.isOrderUnique = cloneFrom ? cloneFrom.isOrderUnique : false;
     this.first = cloneFromMatchingMode ? cloneFromMatchingMode.first : null;
@@ -624,9 +643,7 @@ export class PgSelectPlan<
   }
 
   public setLast(last: number | null | undefined): this {
-    if (this.mode === "aggregate") {
-      throw new Error("Cannot use cursor pagination with aggregates.");
-    }
+    this.assertCursorPaginationAllowed();
     this._assertParameterUnlocked("orderBy");
     this._assertParameterUnlocked("last");
     this.last = last ?? null;
@@ -788,13 +805,52 @@ export class PgSelectPlan<
 
   where(condition: SQL): void {
     if (this.locked) {
-      throw new Error(`${this}: cannot add conditions once plan is locked`);
+      throw new Error(
+        `${this}: cannot add conditions once plan is locked ('where')`,
+      );
     }
     this.conditions.push(condition);
   }
 
   wherePlan(): PgConditionPlan<this> {
+    if (this.locked) {
+      throw new Error(
+        `${this}: cannot add conditions once plan is locked ('wherePlan')`,
+      );
+    }
     return new PgConditionPlan(this);
+  }
+
+  groupBy(group: PgGroupSpec): void {
+    this._assertParameterUnlocked("groupBy");
+    if (this.mode !== "aggregate") {
+      throw new Error(`Cannot add groupBy to a non-aggregate query`);
+    }
+    this.groups.push(group);
+  }
+
+  havingPlan(): PgConditionPlan<this> {
+    if (this.locked) {
+      throw new Error(
+        `${this}: cannot add having conditions once plan is locked ('havingPlan')`,
+      );
+    }
+    if (this.mode !== "aggregate") {
+      throw new Error(`Cannot add having to a non-aggregate query`);
+    }
+    return new PgConditionPlan(this, true);
+  }
+
+  having(condition: SQL): void {
+    if (this.locked) {
+      throw new Error(
+        `${this}: cannot add having conditions once plan is locked ('having')`,
+      );
+    }
+    if (this.mode !== "aggregate") {
+      throw new Error(`Cannot add having to a non-aggregate query`);
+    }
+    this.havingConditions.push(condition);
   }
 
   orderBy(order: PgOrderSpec): void {
@@ -807,10 +863,25 @@ export class PgSelectPlan<
   }
 
   setOrderIsUnique(): void {
+    if (this.locked) {
+      throw new Error(`${this}: cannot set order unique once plan is locked`);
+    }
     this.isOrderUnique = true;
   }
 
-  parseCursor(beforeOrAfter: "before" | "after", cursor: string | null): void {
+  private assertCursorPaginationAllowed(): void {
+    if (this.mode === "aggregate") {
+      throw new Error(
+        "Cannot use cursor pagination on an aggregate PgSelectPlan",
+      );
+    }
+  }
+
+  private parseCursor(
+    beforeOrAfter: "before" | "after",
+    cursor: string | null,
+  ): void {
+    this.assertCursorPaginationAllowed();
     if (cursor == null) {
       return;
     }
@@ -879,14 +950,18 @@ export class PgSelectPlan<
   }
 
   after(cursor: string): void {
+    this.assertCursorPaginationAllowed();
     this.parseCursor("after", cursor);
   }
 
   before(cursor: string): void {
+    this.assertCursorPaginationAllowed();
     this.parseCursor("before", cursor);
   }
 
   public pageInfo(): PgPageInfoPlan<this> {
+    this.assertCursorPaginationAllowed();
+    this.lock();
     return pgPageInfo(this);
   }
 
@@ -1215,6 +1290,20 @@ export class PgSelectPlan<
     return this.first == null && this.last != null;
   }
 
+  private buildGroupBy() {
+    this._lockParameter("groupBy");
+    const groups = this.groups;
+    return {
+      sql:
+        groups.length > 0
+          ? sql`\ngroup by ${sql.join(
+              groups.map((o) => o.fragment),
+              ", ",
+            )}`
+          : sql.blank,
+    };
+  }
+
   private buildOrderBy({ reverse }: { reverse: boolean }) {
     this._lockParameter("orderBy");
     const orders = reverse
@@ -1295,11 +1384,16 @@ export class PgSelectPlan<
       this.conditions,
       options,
     );
+    const { sql: groupBy } = this.buildGroupBy();
+    const { sql: having } = this.buildWhereOrHaving(
+      sql`having`,
+      this.havingConditions,
+    );
     const { sql: orderBy } = this.buildOrderBy({ reverse });
     const { sql: limit } = this.buildLimit();
     const { sql: offset } = this.buildOffset();
 
-    const query = sql`${select}${from}${join}${where}${orderBy}${limit}${offset}`;
+    const query = sql`${select}${from}${join}${where}${groupBy}${having}${orderBy}${limit}${offset}`;
 
     return { sql: query, extraSelectIndexes };
   }
@@ -1612,6 +1706,22 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
         return false;
       }
 
+      // Check GROUPs match
+      if (
+        !arraysMatch(this.groups, p.groups, (a, b) =>
+          sqlIsEquivalent(a.fragment, b.fragment),
+        )
+      ) {
+        return false;
+      }
+
+      // Check HAVINGs match
+      if (
+        !arraysMatch(this.havingConditions, p.havingConditions, sqlIsEquivalent)
+      ) {
+        return false;
+      }
+
       // Check ORDERs match
       if (
         !arraysMatch(
@@ -1625,9 +1735,6 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
       ) {
         return false;
       }
-
-      // GROUP BY is not supported
-      // HAVING is not supported
 
       // Check LIMIT matches
       if (this.first !== p.first) {
@@ -1672,11 +1779,16 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
     return this;
   }
 
-  mergeSelectsWith<TOtherPlan extends PgSelectPlan<any, any, any, any>>(
+  private mergeSelectsWith<TOtherPlan extends PgSelectPlan<any, any, any, any>>(
     otherPlan: TOtherPlan,
   ): {
     [desiredIndex: string]: string;
   } {
+    assert.equal(
+      otherPlan.mode,
+      this.mode,
+      "GraphileInternalError<d12a3d95-4f7b-41d9-8cb4-a97bd169d128>: attempted to merge selects with a PgSelectPlan in a different mode",
+    );
     const actualKeyByDesiredKey = Object.create(null);
     //console.log(`Other ${otherPlan} selects:`);
     //console.dir(otherPlan.selects, { depth: 8 });
@@ -1691,9 +1803,9 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
     return actualKeyByDesiredKey;
   }
 
-  mergePlaceholdersInto<TOtherPlan extends PgSelectPlan<any, any, any, any>>(
-    otherPlan: TOtherPlan,
-  ): void {
+  private mergePlaceholdersInto<
+    TOtherPlan extends PgSelectPlan<any, any, any, any>,
+  >(otherPlan: TOtherPlan): void {
     for (const placeholder of this.placeholders) {
       const { dependencyIndex, sqlRef, type } = placeholder;
       const dep = this.getPlan(this.dependencies[dependencyIndex]);
@@ -1853,8 +1965,10 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
           this.isUnique &&
           this.first == null &&
           this.last == null &&
-          this.offset == null
-          /* TODO: && !this.groupBy && !this.having && !this.order && ... */
+          this.offset == null &&
+          this.mode !== "aggregate" &&
+          table.mode !== "aggregate"
+          // TODO: && !this.order && ... */
         ) {
           if (this.selects.length > 0) {
             debugPlanVerbose(
@@ -1928,7 +2042,10 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
             // `first` plan on us.
             return list([parent]);
           }
-        } else if (parent instanceof PgSelectSinglePlan) {
+        } else if (
+          parent instanceof PgSelectSinglePlan &&
+          parent.getClassPlan().mode !== "aggregate"
+        ) {
           const parent2 = this.getPlan(parent.dependencies[parent.itemPlanId]);
           this.identifierMatches.forEach((identifierMatch, i) => {
             const { dependencyIndex, type } = this.queryValues[i];
@@ -1974,17 +2091,6 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
     this.locked = true;
 
     return this;
-  }
-
-  /**
-   * Returns a PgSelectPlan capable of aggregate queries.
-   */
-  aggregate() {
-    if (this.mode === "aggregate") {
-      return this;
-    } else {
-      return this.clone("aggregate");
-    }
   }
 
   /**
@@ -2113,6 +2219,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
     // // We must execute everything after `from` so we have the alias to reference
     // this._lockParameter("from");
     // this._lockParameter("join");
+    this._lockParameter("groupBy");
     this._lockParameter("orderBy");
     // // We must execute where after orderBy because cursor queries require all orderBy columns
     // this._lockParameter("cursorComparator");

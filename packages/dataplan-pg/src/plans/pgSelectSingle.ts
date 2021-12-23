@@ -15,6 +15,7 @@ import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
 import type { PgClassExpressionPlan } from "./pgClassExpression";
 import { pgClassExpression } from "./pgClassExpression";
 import { PgCursorPlan } from "./pgCursor";
+import type { PgSelectMode } from "./pgSelect";
 import { PgSelectPlan } from "./pgSelect";
 // import debugFactory from "debug";
 
@@ -56,6 +57,7 @@ export class PgSelectSinglePlan<
 
   public readonly pgCodec: PgTypeCodec<TColumns, any, any>;
   public readonly itemPlanId: number;
+  public readonly mode: PgSelectMode;
   private classPlanId: number;
   public readonly source: PgSource<TColumns, TUniques, TRelations, TParameters>;
 
@@ -67,6 +69,7 @@ export class PgSelectSinglePlan<
     super();
     this.source = classPlan.source;
     this.pgCodec = this.source.codec;
+    this.mode = classPlan.mode;
     this.classPlanId = classPlan.id;
     this.itemPlanId = this.addDependency(itemPlan);
   }
@@ -106,6 +109,9 @@ export class PgSelectSinglePlan<
     TRelations,
     TParameters
   > {
+    if (this.mode === "aggregate") {
+      throw new Error("Invalid call to getSelfNamed on aggregate plan");
+    }
     // Hack because I don't want to duplicate the code.
     return this.get("" as any) as any;
   }
@@ -124,6 +130,9 @@ export class PgSelectSinglePlan<
     TRelations,
     TParameters
   > {
+    if (this.mode === "aggregate") {
+      throw new Error("Invalid call to .get() on aggregate plan");
+    }
     if (!this.source.codec.columns && attr !== "") {
       throw new Error(
         `Cannot call ${this}.get() when the source codec (${
@@ -213,6 +222,24 @@ export class PgSelectSinglePlan<
         : sqlExpr`${classPlan.alias}.${sql.identifier(String(attr))}`
       : sqlExpr`${classPlan.alias}.${classPlan.alias}`; /* self named */
     return colPlan as any;
+  }
+
+  public select<
+    TExpressionColumns extends PgSourceColumns | undefined,
+    TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any>,
+  >(
+    fragment: SQL,
+    codec: TExpressionCodec,
+  ): PgClassExpressionPlan<
+    TExpressionColumns,
+    TExpressionCodec,
+    TColumns,
+    TUniques,
+    TRelations,
+    TParameters
+  > {
+    const sqlExpr = pgClassExpression(this, codec);
+    return sqlExpr`${fragment}`;
   }
 
   /**

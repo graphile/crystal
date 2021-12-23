@@ -89,6 +89,12 @@ export interface PgOrderSpec {
   nulls?: "FIRST" | "LAST" | null;
 }
 
+export interface PgGroupSpec {
+  fragment: SQL;
+  // codec: PgTypeCodec<any, any, any>;
+  // TODO: consider if 'cube', 'rollup', 'grouping sets' need special handling or can just be part of the fragment
+}
+
 export type TuplePlanMap<
   TColumns extends { [column: string]: any },
   TTuple extends ReadonlyArray<keyof TColumns>,
