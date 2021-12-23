@@ -496,8 +496,11 @@ export class PgSelectPlan<
     } else {
       // Since we're applying this to the original it doesn't make sense to
       // also apply it to the clones.
-      this.beforeLock("orderBy", () => this._lockParameter("groupBy"));
-      this.beforeLock("orderBy", ensureOrderIsUnique);
+      if (this.mode === "aggregate") {
+        this.beforeLock("orderBy", () => this._lockParameter("groupBy"));
+      } else {
+        this.beforeLock("orderBy", ensureOrderIsUnique);
+      }
     }
 
     this.contextId = cloneFrom
@@ -587,10 +590,18 @@ export class PgSelectPlan<
       ? cloneFrom.isInliningForbidden
       : false;
     this.conditions = cloneFrom ? [...cloneFrom.conditions] : [];
-    this.groups = cloneFrom ? [...cloneFrom.groups] : [];
-    this.havingConditions = cloneFrom ? [...cloneFrom.havingConditions] : [];
-    this.orders = cloneFrom ? [...cloneFrom.orders] : [];
-    this.isOrderUnique = cloneFrom ? cloneFrom.isOrderUnique : false;
+    this.groups = cloneFromMatchingMode
+      ? [...cloneFromMatchingMode.groups]
+      : [];
+    this.havingConditions = cloneFromMatchingMode
+      ? [...cloneFromMatchingMode.havingConditions]
+      : [];
+    this.orders = cloneFromMatchingMode
+      ? [...cloneFromMatchingMode.orders]
+      : [];
+    this.isOrderUnique = cloneFromMatchingMode
+      ? cloneFromMatchingMode.isOrderUnique
+      : false;
     this.first = cloneFromMatchingMode ? cloneFromMatchingMode.first : null;
     this.last = cloneFromMatchingMode ? cloneFromMatchingMode.last : null;
     this.offset = cloneFromMatchingMode ? cloneFromMatchingMode.offset : null;
