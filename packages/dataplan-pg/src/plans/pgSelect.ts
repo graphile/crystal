@@ -1159,21 +1159,25 @@ export class PgSelectPlan<
     return { sql: joins.length ? sql`\n${sql.join(joins, "\n")}` : sql.blank };
   }
 
-  private buildWhere(options: { extraWheres?: SQL[] } = Object.create(null)) {
-    const conditions = options.extraWheres
-      ? [...this.conditions, ...options.extraWheres]
-      : this.conditions;
+  private buildWhereOrHaving(
+    whereOrHaving: SQL,
+    baseConditions: SQL[],
+    options: { extraWheres?: SQL[] } = Object.create(null),
+  ) {
+    const allConditions = options.extraWheres
+      ? [...baseConditions, ...options.extraWheres]
+      : baseConditions;
     const sqlConditions = sql.join(
-      conditions.map((c) => sql.parens(sql.indent(c))),
+      allConditions.map((c) => sql.parens(sql.indent(c))),
       " and ",
     );
     return {
       sql:
-        conditions.length === 0
+        allConditions.length === 0
           ? sql.blank
-          : conditions.length === 1
-          ? sql`\nwhere ${sqlConditions}`
-          : sql`\nwhere\n${sql.indent(sqlConditions)}`,
+          : allConditions.length === 1
+          ? sql`\n${whereOrHaving} ${sqlConditions}`
+          : sql`\n${whereOrHaving}\n${sql.indent(sqlConditions)}`,
     };
   }
 
@@ -1194,7 +1198,7 @@ export class PgSelectPlan<
     hash.update(
       JSON.stringify(this.orders.map((o) => sql.compile(o.fragment).text)),
     );
-    const digest = hash.digest("hex").substr(0, 10);
+    const digest = hash.digest("hex").substring(0, 10);
     return digest;
   }
 
@@ -1286,7 +1290,11 @@ export class PgSelectPlan<
     const { sql: select, extraSelectIndexes } = this.buildSelect(options);
     const { sql: from } = this.buildFrom();
     const { sql: join } = this.buildJoin();
-    const { sql: where } = this.buildWhere(options);
+    const { sql: where } = this.buildWhereOrHaving(
+      sql`where`,
+      this.conditions,
+      options,
+    );
     const { sql: orderBy } = this.buildOrderBy({ reverse });
     const { sql: limit } = this.buildLimit();
     const { sql: offset } = this.buildOffset();
@@ -1855,7 +1863,10 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
               table,
               parent,
             );
-            const { sql: where } = this.buildWhere();
+            const { sql: where } = this.buildWhereOrHaving(
+              sql`where`,
+              this.conditions,
+            );
             const conditions = [
               ...this.identifierMatches.map((identifierMatch, i) => {
                 const { dependencyIndex, type } = this.queryValues[i];
