@@ -838,23 +838,7 @@ export class Aether<
           pathIdentity,
         );
 
-        const newPlans = new Set(
-          this.plans.slice(oldPlansLength).filter(isNotNullish),
-        );
-
-        for (const newPlan of newPlans) {
-          // If the newPlan still exists, finalize it with respect to arguments.
-          if (this.plans[newPlan.id] === newPlan) {
-            // TODO: rename finalizeArguments; maybe argumentsFinalized or lockParameters or lock?
-            newPlan.finalizeArguments();
-            assertArgumentsFinalized(newPlan);
-            if (newPlan.hasSideEffects) {
-              this.sideEffectPlanIdsByPathIdentity[pathIdentity].push(
-                newPlan.id,
-              );
-            }
-          }
-        }
+        this.finalizeArgumentsSince(oldPlansLength, pathIdentity);
 
         // Now that the field has been planned (including arguments, but NOT
         // including selection set) we can deduplicate it to see if any of its
@@ -888,6 +872,26 @@ export class Aether<
         returnRaw && !namedResultTypeIsLeaf,
       );
       this.itemPlanIdByFieldPathIdentity[pathIdentity] = itemPlan.id;
+    }
+  }
+
+  private finalizeArgumentsSince(
+    oldPlansLength: number,
+    sideEffectsPathIdentity: string | null = null,
+  ): void {
+    for (let i = oldPlansLength, l = this.plans.length; i < l; i++) {
+      const newPlan = this.plans[i];
+      // If the newPlan still exists, finalize it with respect to arguments (once only).
+      if (newPlan != null && this.plans[newPlan.id] === newPlan) {
+        // TODO: rename finalizeArguments; maybe argumentsFinalized or lockParameters or lock?
+        newPlan.finalizeArguments();
+        assertArgumentsFinalized(newPlan);
+        if (newPlan.hasSideEffects && sideEffectsPathIdentity != null) {
+          this.sideEffectPlanIdsByPathIdentity[sideEffectsPathIdentity].push(
+            newPlan.id,
+          );
+        }
+      }
     }
   }
 
