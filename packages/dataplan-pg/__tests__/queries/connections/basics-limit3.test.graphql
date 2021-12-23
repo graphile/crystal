@@ -1,5 +1,5 @@
 ## expect(errors).toBeFalsy()
-## expect(queries).toHaveLength(1);
+## expect(queries).toHaveLength(2);
 ## expect(data.allMessagesConnection.edges).toHaveLength(3);
 ## expect(data.allMessagesConnection.pageInfo.hasPreviousPage).toEqual(false);
 ## expect(data.allMessagesConnection.pageInfo.hasNextPage).toEqual(true);
