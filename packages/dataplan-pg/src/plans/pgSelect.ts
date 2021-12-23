@@ -757,6 +757,9 @@ export class PgSelectPlan<
    * Select an SQL fragment, returning the index the result will have.
    */
   public select(fragment: SQL): number {
+    if (!this.isArgumentsFinalized) {
+      throw new Error("Select added before arguments were finalized");
+    }
     // NOTE: it's okay to add selections after the plan is "locked" - lock only
     // applies to which rows are being selected, not what is being queried
     // about the rows.
