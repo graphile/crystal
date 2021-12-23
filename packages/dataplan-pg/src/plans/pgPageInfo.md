@@ -10,9 +10,9 @@ PgPageInfoPlan allows you to retrieve:
 - `hasPreviousPage`
 - `startCursor`
 - `endCursor`
-- `totalCount`
 
-for a given connection (which relates ultimately to a `PgSelectPlan`).
+for a given connection (which relates ultimately to a `PgSelectPlan`). You can
+also typically request the `totalCount` via the connection directly.
 
 Satisfying `startCursor` and `endCursor` merely involves resolving the cursors
 of the returned nodes and returning the first and last ones.
