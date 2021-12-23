@@ -466,6 +466,7 @@ export class Aether<
     if (!rootType) {
       throw new Error("No query type found in schema");
     }
+    this.finalizeArgumentsSince(0);
     this.planSelectionSet(
       ROOT_PATH,
       this.trackedRootValuePlan,
@@ -488,6 +489,7 @@ export class Aether<
     if (!rootType) {
       throw new Error("No mutation type found in schema");
     }
+    this.finalizeArgumentsSince(0);
     this.planSelectionSet(
       ROOT_PATH,
       this.trackedRootValuePlan,
@@ -577,6 +579,7 @@ export class Aether<
         () => subscribePlan.itemPlan(new __ItemPlan(subscribePlan)),
       );
       this.subscriptionItemPlanId = streamItemPlan.id;
+      this.finalizeArgumentsSince(0);
       this.planSelectionSet(
         nestedParentPathIdentity,
         streamItemPlan,
@@ -592,6 +595,7 @@ export class Aether<
     } else {
       const subscribePlan = this.trackedRootValuePlan;
       this.subscriptionPlanId = subscribePlan.id;
+      this.finalizeArgumentsSince(0);
       this.planSelectionSet(
         ROOT_PATH,
         subscribePlan,
@@ -935,10 +939,14 @@ export class Aether<
         children: [],
       };
       treeNode.children.push(nestedTreeNode);
+
+      const oldPlansLength = this.plans.length;
       const listItemPlan = withGlobalState(
         { aether: this, parentPathIdentity: nestedParentPathIdentity },
         () => plan.listItem(new __ItemPlan(plan, depth)),
       );
+      this.finalizeArgumentsSince(oldPlansLength);
+
       this.planIdByPathIdentity[nestedParentPathIdentity] = listItemPlan.id;
       return this.planSelectionSetForType(
         fieldType.ofType,
@@ -954,10 +962,13 @@ export class Aether<
       // We don't do this check first because we need the TreeNode manipulation
       // to have already taken place due to lists/etc.
 
+      const oldPlansLength = this.plans.length;
       const valuePlan = withGlobalState(
         { aether: this, parentPathIdentity: pathIdentity },
         () => new __ValuePlan(),
       );
+      this.finalizeArgumentsSince(oldPlansLength);
+
       // Explicitly populate the groupIds because we don't get our own path
       // identity in `planIdByPathIdentity` and thus `assignGroupIds` will not
       // run against us.
@@ -1014,10 +1025,14 @@ export class Aether<
         ): void => {
           for (let i = 0, l = possibleObjectTypes.length; i < l; i++) {
             const possibleObjectType = possibleObjectTypes[i];
+
+            const oldPlansLength = this.plans.length;
             // This line implements `GetPolymorphicObjectPlanForType`.
             const subPlan = wgs(() =>
               polymorphicPlan.planForType(possibleObjectType),
             );
+            this.finalizeArgumentsSince(oldPlansLength);
+
             this.planSelectionSet(
               pathIdentity,
               subPlan,
@@ -1391,6 +1406,7 @@ export class Aether<
         }
       }
       let replacementPlan: ExecutablePlan;
+      const oldPlansLength = this.plans.length;
       try {
         replacementPlan = withGlobalState(
           {
@@ -1406,6 +1422,7 @@ export class Aether<
         );
         throw e;
       }
+      this.finalizeArgumentsSince(oldPlansLength);
       if (replacementPlan != plan) {
         // Replace all references to `plan` with `replacementPlan`
         for (let j = 0, m = this.plans.length; j < m; j++) {
