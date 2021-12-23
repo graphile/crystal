@@ -23,7 +23,7 @@
     pageInfo {
       hasNextPage
       hasPreviousPage
-      totalCount
     }
+    totalCount
   }
 }

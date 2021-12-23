@@ -1837,10 +1837,6 @@ export function makeExampleSchema(
         type: new GraphQLNonNull(GraphQLBoolean),
         plan: EXPORTABLE(() => ($pageInfo) => $pageInfo.hasPreviousPage(), []),
       },
-      totalCount: {
-        type: new GraphQLNonNull(GraphQLInt),
-        plan: EXPORTABLE(() => ($pageInfo) => $pageInfo.totalCount(), []),
-      },
     },
   });
 
@@ -1856,7 +1852,7 @@ export function makeExampleSchema(
           () =>
             function plan($connection) {
               // return context();
-              return $connection.nodes();
+              return $connection.cloneSubplan();
             },
           [],
         ),
@@ -1870,7 +1866,7 @@ export function makeExampleSchema(
           () =>
             function plan($connection) {
               // return context();
-              return $connection.nodes();
+              return $connection.cloneSubplan();
             },
           [],
         ),
@@ -1889,6 +1885,17 @@ export function makeExampleSchema(
           [],
         ),
       }),
+      totalCount: {
+        type: new GraphQLNonNull(GraphQLInt),
+        plan: EXPORTABLE(
+          (TYPES, sql) => ($connection) =>
+            $connection
+              .cloneSubplan("aggregate")
+              .single()
+              .select(sql`count(*)`, TYPES.bigint),
+          [TYPES, sql],
+        ),
+      },
     },
   });
 

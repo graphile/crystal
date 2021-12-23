@@ -339,7 +339,7 @@ export const PgTablesPlugin: Plugin = {
                                 PgSelectPlan<any, any, any, any>
                               >,
                             ) {
-                              return $connection.nodes();
+                              return $connection.cloneSubplan();
                             },
                           [],
                         ),
@@ -364,7 +364,7 @@ export const PgTablesPlugin: Plugin = {
                                 PgSelectPlan<any, any, any, any>
                               >,
                             ) {
-                              return $connection.nodes();
+                              return $connection.cloneSubplan();
                             },
                           [],
                         ),

@@ -9,7 +9,7 @@ export interface PageInfoCapablePlan extends ExecutablePlan<any> {
 export interface ConnectionCapablePlan<
   T extends ReadonlyArray<any> = ReadonlyArray<any>,
 > extends ExecutablePlan<T> {
-  clone(): ConnectionCapablePlan<any>; // TODO: `this`
+  clone(...args: any[]): ConnectionCapablePlan<any>; // TODO: `this`
   pageInfo(): PageInfoCapablePlan;
 }
 
@@ -51,14 +51,14 @@ export class ConnectionPlan<
   /**
    * This cannot be called before 'finalizeArguments' has been called.
    */
-  public nodes(): TPlan {
+  public cloneSubplan(...args: Parameters<TPlan["clone"]>): TPlan {
     if (!this.isArgumentsFinalized) {
       throw new Error(
         "Forbidden to call ConnectionPlan.nodes before arguments finalize",
       );
     }
     const plan = this.getPlan(this.subplanId) as TPlan;
-    return plan.clone() as any;
+    return plan.clone(...args) as any;
   }
 
   public pageInfo() {

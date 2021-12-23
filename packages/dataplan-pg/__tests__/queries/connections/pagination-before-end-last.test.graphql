@@ -7,7 +7,7 @@
 ## expect(data.allMessagesConnection.edges[2].node.author.username).toEqual("Bob");
 ## expect(data.allMessagesConnection.pageInfo.hasPreviousPage).toEqual(true);
 ## expect(data.allMessagesConnection.pageInfo.hasNextPage).toEqual(true);
-## expect(data.allMessagesConnection.pageInfo.totalCount).toEqual(6);
+## expect(data.allMessagesConnection.totalCount).toEqual(6);
 {
   # Last 3 records before (Cecilia / Postgres)
   allMessagesConnection(
@@ -27,7 +27,7 @@
     pageInfo {
       hasNextPage
       hasPreviousPage
-      totalCount
     }
+    totalCount
   }
 }
