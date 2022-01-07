@@ -131,12 +131,12 @@ export interface SQLSymbolAliasNode {
 }
 
 /**
- * Informs pg-sql2 to evaluate the callback function at compile time, merging
- * the result into the query (recursively if necessary).
+ * A placeholder that should be replaced at compile time using one of the
+ * replacements provided.
  */
-export interface SQLCallbackNode {
-  callback: () => SQL;
-  type: "CALLBACK";
+export interface SQLPlaceholderNode {
+  type: "PLACEHOLDER";
+  fallback?: SQL;
   [$$trusted]: true;
 }
 
@@ -148,7 +148,7 @@ export type SQLNode =
   | SQLIndentNode
   | SQLParensNode
   | SQLSymbolAliasNode
-  | SQLCallbackNode;
+  | SQLPlaceholderNode;
 /** @internal */
 export type SQLQuery = Array<SQLNode>;
 
@@ -269,10 +269,10 @@ function makeSymbolAliasNode(a: symbol, b: symbol): SQLSymbolAliasNode {
   });
 }
 
-function makeCallbackNode(callback: () => SQL): SQLCallbackNode {
+function makePlaceholderNode(fallback?: SQL): SQLPlaceholderNode {
   return Object.freeze({
-    type: "CALLBACK",
-    callback,
+    type: "PLACEHOLDER",
+    fallback,
     [$$trusted]: true,
   });
 }
@@ -304,7 +304,12 @@ function enforceValidNode(node: unknown, where = ""): SQLNode {
  * Accepts an sql`...` expression and compiles it out to SQL text with
  * placeholders, and the values to substitute for these values.
  */
-export function compile(sql: SQL): {
+export function compile(
+  sql: SQL,
+  {
+    placeholderValues,
+  }: { placeholderValues?: Map<SQLPlaceholderNode, SQL> } = {},
+): {
   text: string;
   values: SQLRawValue[];
 } {
@@ -458,8 +463,15 @@ export function compile(sql: SQL): {
           }
           break;
         }
-        case "CALLBACK": {
-          sqlFragments.push(print(item.callback(), indent));
+        case "PLACEHOLDER": {
+          const resolvedPlaceholder =
+            placeholderValues?.get(item) ?? item.fallback;
+          if (!resolvedPlaceholder) {
+            throw new Error(
+              "ERROR: sql.placeholder was used in this query, but no value was supplied for it, and it has no fallback.",
+            );
+          }
+          sqlFragments.push(print(resolvedPlaceholder, indent));
           break;
         }
         default: {
@@ -768,8 +780,8 @@ export function symbolAlias(symbol1: symbol, symbol2: symbol): SQL {
   return makeSymbolAliasNode(symbol1, symbol2);
 }
 
-export function callback(callback: () => SQL): SQL {
-  return makeCallbackNode(callback);
+export function placeholder(fallback?: SQL): SQLPlaceholderNode {
+  return makePlaceholderNode(fallback);
 }
 
 export function arraysMatch<T>(
@@ -849,15 +861,8 @@ export function isEquivalent(
           identifiersAreEquivalent(a, b, symbolSubstitutes),
         );
       }
-      case "CALLBACK": {
-        if (sql2.type !== sql1.type) {
-          return false;
-        }
-        return isEquivalent(
-          sql1.callback(),
-          sql2.callback(),
-          symbolSubstitutes,
-        );
+      case "PLACEHOLDER": {
+        return sql1 === sql2;
       }
       case "SYMBOL_ALIAS": {
         // TODO
@@ -949,7 +954,7 @@ export interface PgSQL {
   indentIf: typeof indentIf;
   parens: typeof parens;
   symbolAlias: typeof symbolAlias;
-  callback: typeof callback;
+  placeholder: typeof placeholder;
   blank: typeof blank;
   fragment: typeof query;
   true: typeof trueNode;
@@ -974,7 +979,7 @@ const attributes = {
   indentIf,
   parens,
   symbolAlias,
-  callback,
+  placeholder,
   blank,
   fragment: query,
   true: trueNode,

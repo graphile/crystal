@@ -27,7 +27,7 @@ import {
   reverse,
   reverseArray,
 } from "graphile-crystal";
-import type { SQL, SQLRawValue } from "pg-sql2";
+import type { SQL, SQLPlaceholderNode, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
 
 import type {
@@ -94,12 +94,21 @@ type PgSelectPlanJoin =
       conditions: SQL[];
     };
 
+/**
+ * Sometimes we want to refer to something that might change later - e.g. we
+ * might have SQL that specifies a list of explicit values, or it might later
+ * want to be replaced with a reference to an existing table value (e.g. when a
+ * query is being inlined). PgSelectPlaceholder allows for this kind of
+ * flexibility. It's really important to keep in mind that the same placeholder
+ * might be used in multiple different SQL queries, and in the different
+ * queries it might end up with different values - this is particularly
+ * relevant when using `@stream`/`@defer`, for example.
+ */
 type PgSelectPlaceholder = {
   dependencyIndex: number;
-  // This is a "ref" so that it can be merged into other objects whilst still
-  // allowing `placeholder.sqlRef.sql = ...` to work.
-  sqlRef: { sql: SQL };
   type: SQL;
+  // A placeholder so that we can supply the actual SQL later.
+  sqlPlaceholder: SQLPlaceholderNode;
 };
 
 type PgSelectIdentifierSpec =
@@ -323,6 +332,7 @@ export class PgSelectPlan<
    * Values used in this plan.
    */
   private placeholders: Array<PgSelectPlaceholder>;
+  private placeholderValues: Map<SQLPlaceholderNode, SQL>;
 
   /**
    * If true, we don't need to add any of the security checks from the data
@@ -518,6 +528,9 @@ export class PgSelectPlan<
     this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
     this.from = inFrom ?? source.source;
     this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
+    this.placeholderValues = cloneFrom
+      ? new Map(cloneFrom.placeholderValues)
+      : new Map();
     if (cloneFrom) {
       this.queryValues = [...cloneFrom.queryValues]; // References indexes cloned above
       this.identifierMatches = Object.freeze(cloneFrom.identifierMatches);
@@ -693,12 +706,12 @@ export class PgSelectPlan<
     return this.isUnique;
   }
 
-  public placeholder($plan: PgTypedExecutablePlan<any>): SQL;
-  public placeholder($plan: ExecutablePlan<any>, type: SQL): SQL;
+  public placeholder($plan: PgTypedExecutablePlan<any>): SQLPlaceholderNode;
+  public placeholder($plan: ExecutablePlan<any>, type: SQL): SQLPlaceholderNode;
   public placeholder(
     $plan: ExecutablePlan<any> | PgTypedExecutablePlan<any>,
     overrideType?: SQL,
-  ): SQL {
+  ): SQLPlaceholderNode {
     if (this.locked) {
       throw new Error(`${this}: cannot add placeholders once plan is locked`);
     }
@@ -718,16 +731,18 @@ export class PgSelectPlan<
       );
     }
     const dependencyIndex = this.addDependency($plan);
-    const sqlRef = { sql: sql`(1/0) /* ERROR! Unhandled placeholder! */` };
+    const sqlPlaceholder = sql.placeholder(
+      sql`(1/0) /* ERROR! Unhandled placeholder! */`,
+    );
     const p: PgSelectPlaceholder = {
       dependencyIndex,
       type,
-      sqlRef,
+      sqlPlaceholder,
     };
     this.placeholders.push(p);
     // This allows us to replace the SQL that will be compiled, for example
     // when we're inlining this into a parent query.
-    return sql.callback(() => sqlRef.sql);
+    return sqlPlaceholder;
   }
 
   /**
@@ -1282,7 +1297,14 @@ export class PgSelectPlan<
     // not introduce a security issue).
     const hash = createHash("sha256");
     hash.update(
-      JSON.stringify(this.orders.map((o) => sql.compile(o.fragment).text)),
+      JSON.stringify(
+        this.orders.map(
+          (o) =>
+            sql.compile(o.fragment, {
+              placeholderValues: this.placeholderValues,
+            }).text,
+        ),
+      ),
     );
     const digest = hash.digest("hex").substring(0, 10);
     return digest;
@@ -1433,7 +1455,10 @@ export class PgSelectPlan<
             dependencyIndex: placeholder.dependencyIndex,
             type: placeholder.type,
           }) - 1;
-        placeholder.sqlRef.sql = sql`${alias}.${sql.identifier(`id${idx}`)}`;
+        this.placeholderValues.set(
+          placeholder.sqlPlaceholder,
+          sql`${alias}.${sql.identifier(`id${idx}`)}`,
+        );
       });
 
       const makeQuery = ({
@@ -1571,9 +1596,14 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
             );
           }
           const identifierIndex = initialFetchIdentifierIndex;
-          const { text, values: rawSqlValues } = sql.compile(initialFetchQuery);
+          const { text, values: rawSqlValues } = sql.compile(
+            initialFetchQuery,
+            { placeholderValues: this.placeholderValues },
+          );
           const { text: textForDeclare, values: rawSqlValuesForDeclare } =
-            sql.compile(streamQuery);
+            sql.compile(streamQuery, {
+              placeholderValues: this.placeholderValues,
+            });
           this.finalizeResults = {
             text,
             rawSqlValues,
@@ -1595,7 +1625,9 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
               offset: 0,
             });
           const { text: textForDeclare, values: rawSqlValuesForDeclare } =
-            sql.compile(streamQuery);
+            sql.compile(streamQuery, {
+              placeholderValues: this.placeholderValues,
+            });
           this.finalizeResults = {
             // This is a hack since this is the _only_ place we don't want
             // `text`; loosening the types would risk us forgetting in more
@@ -1613,7 +1645,9 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
         }
       } else {
         const { query, identifierIndex } = makeQuery();
-        const { text, values: rawSqlValues } = sql.compile(query);
+        const { text, values: rawSqlValues } = sql.compile(query, {
+          placeholderValues: this.placeholderValues,
+        });
         this.finalizeResults = {
           text,
           rawSqlValues,
@@ -1818,7 +1852,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
     TOtherPlan extends PgSelectPlan<any, any, any, any>,
   >(otherPlan: TOtherPlan): void {
     for (const placeholder of this.placeholders) {
-      const { dependencyIndex, sqlRef, type } = placeholder;
+      const { dependencyIndex, sqlPlaceholder, type } = placeholder;
       const dep = this.getPlan(this.dependencies[dependencyIndex]);
       if (
         // I am uncertain on this code.
@@ -1833,16 +1867,33 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
         otherPlan.placeholders.push({
           dependencyIndex: newPlanIndex,
           type,
-          sqlRef,
+          sqlPlaceholder,
         });
       } else if (dep instanceof PgClassExpressionPlan) {
         // Replace with a reference.
-        placeholder.sqlRef.sql = dep.toSQL();
+        otherPlan.placeholderValues.set(
+          placeholder.sqlPlaceholder,
+          dep.toSQL(),
+        );
       } else {
         throw new Error(
           `Could not merge placeholder from unsupported plan type: ${dep}`,
         );
       }
+    }
+    for (const [
+      sqlPlaceholder,
+      placeholderValue,
+    ] of this.placeholderValues.entries()) {
+      if (
+        otherPlan.placeholderValues.has(sqlPlaceholder) &&
+        otherPlan.placeholderValues.get(sqlPlaceholder) !== placeholderValue
+      ) {
+        throw new Error(
+          `${otherPlan} already has an identical placeholder with a different value when trying to mergePlaceholdersInto it from ${this}`,
+        );
+      }
+      otherPlan.placeholderValues.set(sqlPlaceholder, placeholderValue);
     }
   }
 
