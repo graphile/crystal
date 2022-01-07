@@ -5,6 +5,11 @@
       messagesConnection: {
         nodes: [],
         edges: [],
+        pageInfo: {
+          hasNextPage: true,
+          hasPreviousPage: true,
+        },
+        totalCount: 0,
       },
     },
     {
@@ -31,6 +36,11 @@
             },
           },
         ],
+        pageInfo: {
+          hasNextPage: true,
+          hasPreviousPage: true,
+        },
+        totalCount: 1,
       },
     },
   ],

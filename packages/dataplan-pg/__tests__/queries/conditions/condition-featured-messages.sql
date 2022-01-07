@@ -2,7 +2,8 @@ select __forums_result__.*
 from (
   select
     ids.ordinality - 1 as idx,
-    (ids.value->>0)::boolean as "id0"
+    (ids.value->>0)::boolean as "id0",
+    (ids.value->>1)::boolean as "id1"
   from json_array_elements($1::json) with ordinality as ids
 ) as __forums_identifiers__,
 lateral (
@@ -26,14 +27,28 @@ lateral (
         (
           (__messages__.archived_at is null) = (__forums__."archived_at" is null)
         ) and (
-          __messages__.featured = __forums_identifiers__."id0"
+          __messages__.featured = __forums_identifiers__."id1"
         ) and (
           __forums__."id"::"uuid" = __messages__."forum_id"
         )
       order by __messages__."id" asc
       limit 5
     ) as "1",
-    __forums_identifiers__.idx as "2"
+    array(
+      select array[
+        (count(*))::text
+      ]::text[]
+      from app_public.messages as __messages__
+      where
+        (
+          (__messages__.archived_at is null) = (__forums__."archived_at" is null)
+        ) and (
+          __messages__.featured = __forums_identifiers__."id1"
+        ) and (
+          __forums__."id"::"uuid" = __messages__."forum_id"
+        )
+    ) as "2",
+    __forums_identifiers__.idx as "3"
   from app_public.forums as __forums__
   where
     (

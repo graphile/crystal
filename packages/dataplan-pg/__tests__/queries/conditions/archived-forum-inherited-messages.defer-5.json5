@@ -57,6 +57,11 @@
                 },
               },
             ],
+            pageInfo: {
+              hasNextPage: true,
+              hasPreviousPage: true,
+            },
+            totalCount: 3,
           },
         },
       ],

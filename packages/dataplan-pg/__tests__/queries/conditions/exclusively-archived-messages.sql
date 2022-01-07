@@ -22,7 +22,19 @@ select
       )
     order by __messages__."id" asc
     limit 5
-  ) as "1"
+  ) as "1",
+  array(
+    select array[
+      (count(*))::text
+    ]::text[]
+    from app_public.messages as __messages__
+    where
+      (
+        __messages__.archived_at is not null
+      ) and (
+        __forums__."id"::"uuid" = __messages__."forum_id"
+      )
+  ) as "2"
 from app_public.forums as __forums__
 where (
   true /* authorization checks */

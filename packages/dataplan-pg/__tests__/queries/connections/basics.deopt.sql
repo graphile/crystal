@@ -11,6 +11,17 @@ where
   )
 order by __messages__."id" asc
 
+select
+  (count(*))::text as "0"
+from app_public.messages as __messages__
+where
+  (
+    __messages__.archived_at is null
+  ) and (
+    true /* authorization checks */
+  )
+
+
 select __users_result__.*
 from (
   select

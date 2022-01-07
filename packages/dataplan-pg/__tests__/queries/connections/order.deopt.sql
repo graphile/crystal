@@ -16,6 +16,19 @@ where
 order by __author__.username desc, __messages__.body asc, __messages__."id" asc
 limit 5
 
+select
+  (count(*))::text as "0"
+from app_public.messages as __messages__
+left outer join app_public.users as __author__
+on (__messages__."author_id" = __author__."id")
+where
+  (
+    __messages__.archived_at is null
+  ) and (
+    true /* authorization checks */
+  )
+
+
 select __users_result__.*
 from (
   select

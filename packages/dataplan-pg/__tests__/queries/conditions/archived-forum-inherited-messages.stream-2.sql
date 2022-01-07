@@ -1,7 +1,19 @@
 select
   __forums__."name"::text as "0",
-  __forums__."id"::text as "1",
-  __forums__."archived_at"::text as "2"
+  array(
+    select array[
+      (count(*))::text
+    ]::text[]
+    from app_public.messages as __messages__
+    where
+      (
+        (__messages__.archived_at is null) = (__forums__."archived_at" is null)
+      ) and (
+        __forums__."id"::"uuid" = __messages__."forum_id"
+      )
+  ) as "1",
+  __forums__."id"::text as "2",
+  __forums__."archived_at"::text as "3"
 from app_public.forums as __forums__
 where
   (

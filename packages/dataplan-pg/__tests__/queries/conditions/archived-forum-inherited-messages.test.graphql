@@ -1,5 +1,7 @@
 ## expect(errors).toBeFalsy()
 ## expect(queries).toHaveLength(1);
+## expect(data.forums).toHaveLength(1);
+## expect(data.forums[0].messagesConnection.totalCount).toEqual(3);
 {
   forums(includeArchived: EXCLUSIVELY) {
     name
