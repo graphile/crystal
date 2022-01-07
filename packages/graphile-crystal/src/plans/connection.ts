@@ -11,7 +11,7 @@ export interface ConnectionCapablePlan<
   T extends ReadonlyArray<any> = ReadonlyArray<any>,
 > extends ExecutablePlan<T> {
   clone(...args: any[]): ConnectionCapablePlan<any>; // TODO: `this`
-  pageInfo(): PageInfoCapablePlan;
+  pageInfo($connectionPlan: ConnectionPlan<any>): PageInfoCapablePlan;
   setFirst($plan: InputPlan): void;
   setLast($plan: InputPlan): void;
   setOffset($plan: InputPlan): void;
@@ -48,11 +48,21 @@ export class ConnectionPlan<
     return String(this.subplanId);
   }
 
+  public getFirst(): InputPlan | null {
+    return this._firstId != null
+      ? (this.getPlan(this._firstId) as InputPlan)
+      : null;
+  }
   public setFirst($firstPlan: InputPlan) {
     if (this._firstId) {
       throw new Error(`${this}->setFirst already called`);
     }
     this._firstId = $firstPlan.id;
+  }
+  public getLast(): InputPlan | null {
+    return this._lastId != null
+      ? (this.getPlan(this._lastId) as InputPlan)
+      : null;
   }
   public setLast($lastPlan: InputPlan) {
     if (this._lastId) {
@@ -60,17 +70,32 @@ export class ConnectionPlan<
     }
     this._lastId = $lastPlan.id;
   }
+  public getOffset(): InputPlan | null {
+    return this._offsetId != null
+      ? (this.getPlan(this._offsetId) as InputPlan)
+      : null;
+  }
   public setOffset($offsetPlan: InputPlan) {
     if (this._offsetId) {
       throw new Error(`${this}->setOffset already called`);
     }
     this._offsetId = $offsetPlan.id;
   }
+  public getBefore(): InputPlan | null {
+    return this._beforeId != null
+      ? (this.getPlan(this._beforeId) as InputPlan)
+      : null;
+  }
   public setBefore($beforePlan: InputPlan) {
     if (this._beforeId) {
       throw new Error(`${this}->setBefore already called`);
     }
     this._beforeId = $beforePlan.id;
+  }
+  public getAfter(): InputPlan | null {
+    return this._afterId != null
+      ? (this.getPlan(this._afterId) as InputPlan)
+      : null;
   }
   public setAfter($afterPlan: InputPlan) {
     if (this._afterId) {
@@ -147,9 +172,9 @@ export class ConnectionPlan<
     return clonedPlan;
   }
 
-  public pageInfo() {
+  public pageInfo(): PageInfoCapablePlan {
     const plan = this.getPlan(this.subplanId) as TPlan;
-    return plan.clone().pageInfo();
+    return plan.pageInfo(this);
   }
 
   public execute(

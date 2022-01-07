@@ -82,8 +82,8 @@ For example:
                   |H I J|   Last 3
 ```
 
-"Give me the first 3 rows after [C]aroline and before [F]reddie" (f = 3, l =
-null, a = C, b = F):
+"Give me the first 3 rows after [C]aroline and before [F]reddie" (f = 3, a = C,
+b = F):
 
 ```
      A B C D E F G H I J
@@ -107,8 +107,7 @@ To make things even hairier, we also allow _limit/offset_ pagination. To do so
 we use the "first" argument as the limit, and an additional "offset" `o`
 argument.
 
-"Give me the first 3 rows, offset by 2" (f = 3, o = 2, l = null, a = null, b =
-null)
+"Give me the first 3 rows, offset by 2" (f = 3, o = 2)
 
 ```
      A B C D E F G H I J
@@ -182,12 +181,10 @@ everything.
 If `o` is null and `a` is null and `l` is null then there can be no previous
 page since you're starting the fetch at the beginning.
 
-#### If "last" is set, "before" is not set, and "first" is not set, then no next page
+#### If "before" is not set, and "first" is not set, then no next page
 
-**NOTE**: `l` is not null implies `o` is null.
-
-If `b` is null and `f` is null and `l` is not null then there can be no next
-page since you're starting the fetch at the end.
+If `b` is null and `f` is null then there can be no next page since you have no
+upper bound.
 
 ## Remaining strategies
 
@@ -259,3 +256,16 @@ filters) then it's acceptable to return `false` in all cases.
 This is basically the same strategy as `hasPreviousPage`, but swapping `first`
 for `last` and `after` for `before`. The `first > last` assumption may need
 adjustment.
+
+## Taking the easy way out
+
+After reading up on https://github.com/graphql/graphql-relay-js/issues/58 it
+became clear that in general the Cursor Connections Spec only cares about
+`hasNextPage` when paginating "forwards" (i.e. when `first` is set), and only
+cares about `hasPreviousPage` when paginating backwards (i.e. when `last` is
+set). (And if both are set then it doesn't care about either.)
+
+It has become much more clear that the intent is that you fetch an extra node,
+and if it exists then you can set `true` otherwise you set `false`. This is
+option 2 from the "If last is set" list above; so we're going to go with that
+initially but we may want to revise this in future.

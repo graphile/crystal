@@ -3,9 +3,9 @@ import type {
   CrystalValuesList,
   PageInfoCapablePlan,
 } from "graphile-crystal";
-import { constant, ExecutablePlan } from "graphile-crystal";
+import { ConnectionPlan, constant, ExecutablePlan } from "graphile-crystal";
 
-import { PgSelectPlan } from "./pgSelect";
+import type { PgSelectPlan } from "./pgSelect";
 
 // PLEASE SEE pgPageInfo.md!
 
@@ -23,30 +23,76 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
     exportName: "PgPageInfoPlan",
   };
 
-  private classPlanId: number;
+  private connectionPlanId: number;
 
-  constructor(selectPlan: TPlan) {
+  constructor(connectionPlan: ConnectionPlan<TPlan>) {
     super();
-    this.classPlanId = selectPlan.id;
+    this.connectionPlanId = connectionPlan.id;
   }
 
-  public getClassPlan(): TPlan {
-    const plan = this.getPlan(this.classPlanId);
-    if (!(plan instanceof PgSelectPlan)) {
+  /**
+   * Might come in handy later?
+   *
+   * @internal
+   */
+  public getConnectionPlan(): ConnectionPlan<TPlan> {
+    const plan = this.getPlan(this.connectionPlanId);
+    if (!(plan instanceof ConnectionPlan)) {
       throw new Error(
-        `Expected ${this.classPlanId} (${plan}) to be a PgSelectPlan`,
+        `Expected ${this.connectionPlanId} (${plan}) to be a ConnectionPlan`,
       );
     }
-    return plan as TPlan;
+    return plan as ConnectionPlan<TPlan>;
   }
 
+  /**
+   * Returns true if the following hold:
+   *
+   * - first is set
+   * - last is not set
+   * - if first had been one larger, another record would have been returned.
+   *
+   * In all other cases, false is returned.
+   *
+   * @see {@link https://relay.dev/graphql/connections.htm#HasNextPage()}
+   */
   public hasNextPage(): ExecutablePlan<boolean> {
-    // TODO!
-    return constant(true);
+    const $connection = this.getConnectionPlan();
+    const first = $connection.getFirst();
+    const last = $connection.getLast();
+    if (first && !last) {
+      const nodePlan = (
+        $connection as ConnectionPlan<PgSelectPlan<any, any, any, any>>
+      ).cloneSubplanWithPagination();
+      return nodePlan.hasMore();
+    } else {
+      return constant(false);
+    }
   }
 
+  /**
+   * Returns true if the following hold:
+   *
+   * - last is set
+   * - first is not set
+   * - if last had been one larger, another record would have been returned.
+   *
+   * In all other cases, false is returned.
+   *
+   * @see {@link https://relay.dev/graphql/connections.htm#HasPreviousPage()}
+   */
   public hasPreviousPage(): ExecutablePlan<boolean> {
-    return constant(true);
+    const $connection = this.getConnectionPlan();
+    const first = $connection.getFirst();
+    const last = $connection.getLast();
+    if (last && !first) {
+      const nodePlan = (
+        $connection as ConnectionPlan<PgSelectPlan<any, any, any, any>>
+      ).cloneSubplanWithPagination();
+      return nodePlan.hasMore();
+    } else {
+      return constant(false);
+    }
   }
 
   execute(
@@ -57,7 +103,7 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
 }
 
 export function pgPageInfo<TPlan extends PgSelectPlan<any, any, any, any>>(
-  selectPlan: TPlan,
+  connectionPlan: ConnectionPlan<TPlan>,
 ): PgPageInfoPlan<TPlan> {
-  return new PgPageInfoPlan(selectPlan);
+  return new PgPageInfoPlan(connectionPlan);
 }

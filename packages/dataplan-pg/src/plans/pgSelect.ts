@@ -4,6 +4,7 @@ import debugFactory from "debug";
 import type {
   __ItemPlan,
   ConnectionCapablePlan,
+  ConnectionPlan,
   CrystalResultsList,
   CrystalResultStreamList,
   CrystalValuesList,
@@ -295,6 +296,7 @@ export class PgSelectPlan<
 
   private first: number | null;
   private last: number | null;
+  private fetchOneExtra: boolean;
 
   // OFFSET
 
@@ -625,6 +627,9 @@ export class PgSelectPlan<
       : false;
     this.first = cloneFromMatchingMode ? cloneFromMatchingMode.first : null;
     this.last = cloneFromMatchingMode ? cloneFromMatchingMode.last : null;
+    this.fetchOneExtra = cloneFromMatchingMode
+      ? cloneFromMatchingMode.fetchOneExtra
+      : false;
     this.offset = cloneFromMatchingMode ? cloneFromMatchingMode.offset : null;
     this.beforePlanId =
       cloneFromMatchingMode && cloneFromMatchingMode.beforePlanId != null
@@ -740,6 +745,17 @@ export class PgSelectPlan<
     }
     this.isUnique = newUnique;
     return this;
+  }
+
+  /**
+   * Someone (probably pageInfo) wants to know if there's more records. To
+   * determine this we fetch one extra record and then throw it away.
+   */
+  public hasMore(): ExecutablePlan<boolean> {
+    this.fetchOneExtra = true;
+    // TODO: This is a truly hideous hack. We should solve this by having this
+    // plan resolve to an object with rows and metadata.
+    return lambda(this, (list) => (list as any)?.hasMore || false);
   }
 
   public unique(): boolean {
@@ -1082,10 +1098,10 @@ export class PgSelectPlan<
     this.addCursorPlan("before", $cursorPlan);
   }
 
-  public pageInfo(): PgPageInfoPlan<this> {
+  public pageInfo($connectionPlan: ConnectionPlan<this>): PgPageInfoPlan<this> {
     this.assertCursorPaginationAllowed();
     this.lock();
-    return pgPageInfo(this);
+    return pgPageInfo($connectionPlan);
   }
 
   /**
@@ -1473,9 +1489,13 @@ export class PgSelectPlan<
     return {
       sql:
         this.first != null
-          ? sql`\nlimit ${sql.literal(this.first)}`
+          ? sql`\nlimit ${sql.literal(
+              this.first + (this.fetchOneExtra ? 1 : 0),
+            )}`
           : this.last != null
-          ? sql`\nlimit ${sql.literal(this.last)}`
+          ? sql`\nlimit ${sql.literal(
+              this.last + (this.fetchOneExtra ? 1 : 0),
+            )}`
           : sql.blank,
     };
   }
