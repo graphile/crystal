@@ -949,6 +949,10 @@ export class PgSelectPlan<
   ): void {
     this.assertCursorPaginationAllowed();
 
+    if ($cursorPlan.evalIs(null) || $cursorPlan.evalIs(undefined)) {
+      return;
+    }
+
     const $parsedCursorPlan = lambda($cursorPlan, (cursor) => {
       if (cursor == null) {
         return null;
