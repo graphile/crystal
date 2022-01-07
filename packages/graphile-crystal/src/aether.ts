@@ -2881,13 +2881,14 @@ export class Aether<
     };
     const partsLines = plans
       .map((plan, id) => {
-        const optimized = this.optimizedPlans.has(plan);
         if (!plan) {
           return null;
         } else if (plan.id !== id) {
           // return `- ${id}: ->${chalk.bold.yellow(String(plan.id))}`;
           return null;
         } else {
+          const optimized = this.optimizedPlans.has(plan);
+          const finalized = plan.isFinalized;
           return [
             String(id),
             optimized ? "🚀" : "🐌",
@@ -2900,6 +2901,7 @@ export class Aether<
             plan.commonAncestorPathIdentity
               ? " " + chalk.yellow(`${plan.commonAncestorPathIdentity}`)
               : "",
+            finalized ? "✅" : "🤔",
           ];
         }
       })
@@ -2916,6 +2918,8 @@ export class Aether<
       20,
       // commonAncestorPathIdentity
       0,
+      // tick/thinking
+      1,
     ];
     const maxSizes: number[] = [];
     partsLines.forEach((parts) => {
@@ -2943,7 +2947,8 @@ export class Aether<
               "end",
             );
             const pathIdentity = ansiPad(parts[4], maxSizes[4], " ", "end");
-            return `${id}: ${optimized}${plan}${deps} ${pathIdentity}`;
+            const finalized = ansiPad(parts[5], maxSizes[5], " ", "end");
+            return `${id}: ${optimized}${finalized}${plan}${deps} ${pathIdentity}`;
           })
           .join("\n"),
     );
