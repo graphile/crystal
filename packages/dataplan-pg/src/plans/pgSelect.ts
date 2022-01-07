@@ -196,6 +196,28 @@ interface PgSelectOptions<TColumns extends PgSourceColumns | undefined> {
 }
 
 /**
+ * Because we mutate the internals of placeholders' `sqlRef` we must be very
+ * careful to deeply clone them, otherwise changes to a cloned placeholder
+ * might affect the original and vice versa.
+ */
+function clonePlaceholders(
+  placeholders: PgSelectPlaceholder[],
+): PgSelectPlaceholder[] {
+  return placeholders.map((p) => {
+    const {
+      type,
+      sqlRef: { sql },
+      dependencyIndex,
+    } = p;
+    return {
+      dependencyIndex,
+      sqlRef: { sql },
+      type,
+    };
+  });
+}
+
+/**
  * This represents selecting from a class-like entity (table, view, etc); i.e.
  * it represents `SELECT <columns>, <cursor?> FROM <table>`. You can also add
  * `JOIN`, `WHERE`, `ORDER BY`, `LIMIT`, `OFFSET`. You cannot add `GROUP BY`
@@ -517,7 +539,9 @@ export class PgSelectPlan<
       : new Map();
     this.alias = cloneFrom ? cloneFrom.alias : sql.identifier(this.symbol);
     this.from = inFrom ?? source.source;
-    this.placeholders = cloneFrom ? [...cloneFrom.placeholders] : [];
+    this.placeholders = cloneFrom
+      ? clonePlaceholders(cloneFrom.placeholders)
+      : [];
     if (cloneFrom) {
       this.queryValues = [...cloneFrom.queryValues]; // References indexes cloned above
       this.identifierMatches = Object.freeze(cloneFrom.identifierMatches);
