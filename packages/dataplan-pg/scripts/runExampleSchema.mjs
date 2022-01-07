@@ -176,7 +176,10 @@ async function runTestQuery(basePath) {
 }
 
 try {
-  const matches = glob.sync("__tests__/queries/*/*.test.graphql");
+  const matches =
+    process.argv.length > 2
+      ? process.argv.slice(2)
+      : glob.sync("__tests__/queries/*/*.test.graphql");
 
   for (const match of matches) {
     const basePath = match.replace(/\.test\.graphql$/, "");
