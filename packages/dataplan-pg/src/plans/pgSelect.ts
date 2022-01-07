@@ -955,7 +955,9 @@ export class PgSelectPlan<
 
     const $parsedCursorPlan = lambda($cursorPlan, (cursor) => {
       if (cursor == null) {
-        return null;
+        throw new Error(
+          "GraphileInternalError<3b076b86-828b-46b3-885d-ed2577068b8d>: cursor is null, but we have a constraint preventing that...",
+        );
       }
       if (typeof cursor !== "string") {
         throw new Error("Invalid cursor");
@@ -1053,12 +1055,19 @@ export class PgSelectPlan<
       return sql.parens(fragment);
     };
 
+    /*
+     * We used to allow the cursor to be null or string; but we now _only_ run
+     * this code when the `evalIs(null) || evalIs(undefined)` returns false. So
+     * we know that the cursor must exist, so therefore we don't need to add
+     * this extra condition.
     // If the cursor is null then no condition is needed
     const cursorIsNullPlaceholder = this.placeholder(
       lambda($parsedCursorPlan, (cursor) => cursor == null),
       sql`bool`,
     );
     const finalCondition = sql`(${condition()}) or (${cursorIsNullPlaceholder} is true)`;
+    */
+    const finalCondition = condition();
 
     return finalCondition;
   }

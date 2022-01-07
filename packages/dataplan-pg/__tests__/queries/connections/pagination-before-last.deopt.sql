@@ -2,8 +2,7 @@ select __messages_result__.*
 from (
   select
     ids.ordinality - 1 as idx,
-    (ids.value->>0)::bool as "id0",
-    (ids.value->>1)::"uuid" as "id1"
+    (ids.value->>0)::"uuid" as "id0"
   from json_array_elements($1::json) with ordinality as ids
 ) as __messages_identifiers__,
 lateral (
@@ -16,9 +15,7 @@ lateral (
   where
     (
       __messages__.archived_at is null
-    ) and (
-      ((__messages__."id" < __messages_identifiers__."id1")) or (__messages_identifiers__."id0" is true)
-    ) and (
+    ) and (__messages__."id" < __messages_identifiers__."id0") and (
       true /* authorization checks */
     )
   order by __messages__."id" desc
