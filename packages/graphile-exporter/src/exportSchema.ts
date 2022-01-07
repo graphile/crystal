@@ -1145,10 +1145,14 @@ export async function exportSchemaAsString(
             )
           : null,
       extensions: extensions(file, config.extensions, "schema.extensions"),
+      enableDeferStream: t.booleanLiteral(true),
+      /*
+      // TODO: use the below once https://github.com/graphql/graphql-js/pull/3450 is fixed:
       enableDeferStream:
         config.enableDeferStream != null
           ? t.booleanLiteral(config.enableDeferStream)
           : null,
+          */
       assumeValid: null, // TODO: t.booleanLiteral(true),
     }),
   );
