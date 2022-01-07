@@ -1852,7 +1852,7 @@ export function makeExampleSchema(
           () =>
             function plan($connection) {
               // return context();
-              return $connection.cloneSubplan();
+              return $connection.cloneSubplanWithPagination();
             },
           [],
         ),
@@ -1866,7 +1866,7 @@ export function makeExampleSchema(
           () =>
             function plan($connection) {
               // return context();
-              return $connection.cloneSubplan();
+              return $connection.cloneSubplanWithPagination();
             },
           [],
         ),
@@ -1890,7 +1890,7 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (TYPES, sql) => ($connection) =>
             $connection
-              .cloneSubplan("aggregate")
+              .cloneSubplanWithoutPagination("aggregate")
               .single()
               .select(sql`count(*)`, TYPES.bigint),
           [TYPES, sql],
@@ -2188,7 +2188,7 @@ export function makeExampleSchema(
                   $messages: PgSelectPlanFromSource<typeof messageSource>,
                   $value,
                 ) {
-                  $messages.setFirst($value.eval());
+                  $messages.setFirst($value);
                   return null;
                 },
               [],
@@ -2256,8 +2256,7 @@ export function makeExampleSchema(
                   $connection: PgConnectionPlanFromSource<typeof messageSource>,
                   $value,
                 ) {
-                  const $messages = $connection.getSubplan();
-                  $messages.setFirst($value.eval());
+                  $connection.setFirst($value);
                   return null;
                 },
               [],
@@ -2272,8 +2271,7 @@ export function makeExampleSchema(
                   $connection: PgConnectionPlanFromSource<typeof messageSource>,
                   $value,
                 ) {
-                  const $messages = $connection.getSubplan();
-                  $messages.setLast($value.eval());
+                  $connection.setLast($value);
                   return null;
                 },
               [],
@@ -3094,7 +3092,7 @@ export function makeExampleSchema(
                   $forums: PgSelectPlanFromSource<typeof forumSource>,
                   $value,
                 ) {
-                  $forums.setFirst($value.eval());
+                  $forums.setFirst($value);
                   return null;
                 },
               [],
@@ -3215,7 +3213,7 @@ export function makeExampleSchema(
                   $value,
                 ) {
                   const $messages = $connection.getSubplan();
-                  $messages.setFirst($value.eval());
+                  $messages.setFirst($value);
                   return null;
                 },
               [],
@@ -3231,7 +3229,7 @@ export function makeExampleSchema(
                   $value,
                 ) {
                   const $messages = $connection.getSubplan();
-                  $messages.setLast($value.eval());
+                  $messages.setLast($value);
                   return null;
                 },
               [],
@@ -3246,10 +3244,7 @@ export function makeExampleSchema(
                   $connection: PgConnectionPlanFromSource<typeof messageSource>,
                   $value,
                 ) {
-                  const $messages = $connection.getSubplan();
-                  $messages.afterLock("orderBy", () => {
-                    $messages.after($value.eval());
-                  });
+                  $connection.setAfter($value);
                   return null;
                 },
               [],
@@ -3264,10 +3259,7 @@ export function makeExampleSchema(
                   $connection: PgConnectionPlanFromSource<typeof messageSource>,
                   $value,
                 ) {
-                  const $messages = $connection.getSubplan();
-                  $messages.afterLock("orderBy", () => {
-                    $messages.before($value.eval());
-                  });
+                  $connection.setBefore($value);
                   return null;
                 },
               [],
@@ -3529,7 +3521,7 @@ export function makeExampleSchema(
                 ) {
                   const $commentables =
                     $each.originalListPlan() as RelationalCommentablesPlan;
-                  $commentables.setFirst($value.eval());
+                  $commentables.setFirst($value);
                   return null;
                 },
               [],

@@ -7,10 +7,13 @@ import type {
   CrystalResultsList,
   CrystalResultStreamList,
   CrystalValuesList,
+  InputPlan,
+  LambdaPlan,
   PlanOptimizeOptions,
   PlanStreamOptions,
   StreamablePlan,
 } from "graphile-crystal";
+import { lambda } from "graphile-crystal";
 import {
   __TrackedObjectPlan,
   access,
@@ -296,6 +299,11 @@ export class PgSelectPlan<
   // OFFSET
 
   private offset: number | null;
+
+  // CURSORS
+
+  private beforePlanId: number | null;
+  private afterPlanId: number | null;
 
   // --------------------
 
@@ -618,6 +626,37 @@ export class PgSelectPlan<
     this.first = cloneFromMatchingMode ? cloneFromMatchingMode.first : null;
     this.last = cloneFromMatchingMode ? cloneFromMatchingMode.last : null;
     this.offset = cloneFromMatchingMode ? cloneFromMatchingMode.offset : null;
+    this.beforePlanId =
+      cloneFromMatchingMode && cloneFromMatchingMode.beforePlanId != null
+        ? this.addDependency(
+            cloneFromMatchingMode.getDep(cloneFromMatchingMode.beforePlanId),
+          )
+        : null;
+    this.afterPlanId =
+      cloneFromMatchingMode && cloneFromMatchingMode.afterPlanId != null
+        ? this.addDependency(
+            cloneFromMatchingMode.getDep(cloneFromMatchingMode.afterPlanId),
+          )
+        : null;
+
+    this.afterLock("orderBy", () => {
+      if (this.beforePlanId != null) {
+        this.where(
+          this.conditionFromCursor(
+            "before",
+            this.getDep(this.beforePlanId) as any,
+          ),
+        );
+      }
+      if (this.afterPlanId != null) {
+        this.where(
+          this.conditionFromCursor(
+            "after",
+            this.getDep(this.afterPlanId) as any,
+          ),
+        );
+      }
+    });
 
     debugPlan(
       `%s (%s) constructor (%s; %s)`,
@@ -659,25 +698,26 @@ export class PgSelectPlan<
     return this.isTrusted;
   }
 
-  public setFirst(first: number | null | undefined): this {
+  public setFirst(first: InputPlan): this {
     this._assertParameterUnlocked("first");
-    this.first = first ?? null;
+    // TODO: don't eval
+    this.first = first.eval() ?? null;
     this._lockParameter("first");
     return this;
   }
 
-  public setLast(last: number | null | undefined): this {
+  public setLast(last: InputPlan): this {
     this.assertCursorPaginationAllowed();
     this._assertParameterUnlocked("orderBy");
     this._assertParameterUnlocked("last");
-    this.last = last ?? null;
+    this.last = last.eval() ?? null;
     this._lockParameter("last");
     return this;
   }
 
-  public setOffset(offset: number | null | undefined): this {
+  public setOffset(offset: InputPlan): this {
     this._assertParameterUnlocked("offset");
-    this.offset = offset ?? null;
+    this.offset = offset.eval() ?? null;
     if (this.offset !== null) {
       this._lockParameter("last");
       if (this.last != null) {
@@ -903,14 +943,39 @@ export class PgSelectPlan<
     }
   }
 
-  private parseCursor(
+  private addCursorPlan(
     beforeOrAfter: "before" | "after",
-    cursor: string | null,
+    $cursorPlan: InputStaticLeafPlan<string | null>,
   ): void {
     this.assertCursorPaginationAllowed();
-    if (cursor == null) {
-      return;
+
+    const $parsedCursorPlan = lambda($cursorPlan, (cursor) => {
+      if (cursor == null) {
+        return null;
+      }
+      if (typeof cursor !== "string") {
+        throw new Error("Invalid cursor");
+      }
+      const decoded = JSON.parse(
+        Buffer.from(cursor, "base64").toString("utf8"),
+      );
+      if (!Array.isArray(decoded)) {
+        throw new Error("Expected array");
+      }
+      return decoded;
+    });
+
+    if (beforeOrAfter === "before") {
+      this.beforePlanId = this.addDependency($parsedCursorPlan);
+    } else {
+      this.afterPlanId = this.addDependency($parsedCursorPlan);
     }
+  }
+
+  private conditionFromCursor(
+    beforeOrAfter: "before" | "after",
+    $parsedCursorPlan: LambdaPlan<any, any[] | null>,
+  ) {
     const digest = this.getOrderByDigest();
     const orders = this.getOrderBy();
     const orderCount = orders.length;
@@ -919,70 +984,89 @@ export class PgSelectPlan<
         `Can only use '${beforeOrAfter}' cursor when there is a unique defined order.`,
       );
     }
-    try {
-      const decoded = JSON.parse(
-        Buffer.from(cursor, "base64").toString("utf8"),
-      );
-      if (!Array.isArray(decoded)) {
-        throw new Error("Expected array");
-      }
-      const [cursorDigest, ...cursorParts] = decoded;
-      if (!cursorDigest || cursorDigest !== digest) {
-        throw new Error(
-          `Invalid cursor digest - '${cursorDigest}' !== '${digest}'`,
-        );
-      }
-      if (cursorParts.length !== orderCount) {
-        throw new Error(
-          `Invalid cursor length - ${cursorParts.length} !== ${orderCount}`,
-        );
-      }
-      const condition = (i = 0): SQL => {
-        const order = orders[i];
-        // Codec is responsible for performing validation/coercion and throwing
-        // error if value is invalid.
-        // TODO: make sure this ^ is clear in the relevant places.
-        const sqlValue = sql`${sql.value(
-          (void 0 /* forbid relying on `this` */, order.codec.toPg)(
-            cursorParts[i],
-          ),
-        )}::${order.codec.sqlType}`;
-        const gt =
-          (order.direction === "ASC" && beforeOrAfter === "after") ||
-          (order.direction === "DESC" && beforeOrAfter === "before");
 
-        let fragment = sql`${order.fragment} ${
-          gt ? sql`>` : sql`<`
-        } ${sqlValue}`;
-
-        if (i < orderCount - 1) {
-          fragment = sql`(${fragment}) or (${
-            order.fragment
-          } = ${sqlValue} and ${condition(i + 1)})`;
+    // Cursor validity check; if we get inlined then this will be passed up
+    // to the parent so we can trust it.
+    this.addDependency(
+      lambda($parsedCursorPlan, (decoded) => {
+        if (!decoded) {
+          return;
         }
+        try {
+          const [cursorDigest, ...cursorParts] = decoded;
+          if (!cursorDigest || cursorDigest !== digest) {
+            throw new Error(
+              `Invalid cursor digest - '${cursorDigest}' !== '${digest}'`,
+            );
+          }
+          if (cursorParts.length !== orderCount) {
+            throw new Error(
+              `Invalid cursor length - ${cursorParts.length} !== ${orderCount}`,
+            );
+          }
+        } catch (e) {
+          if (isDev) {
+            console.error("Invalid cursor:");
+            console.error(e);
+          }
+          throw new Error(
+            `Invalid '${beforeOrAfter}' cursor - a cursor is only valid within a specific ordering, if you change the order then you'll need different cursors.`,
+          );
+        }
+      }),
+    );
 
-        return sql.parens(fragment);
-      };
-      this.where(condition());
-    } catch (e) {
-      if (isDev) {
-        console.error("Invalid cursor:");
-        console.error(e);
-      }
-      throw new Error(
-        `Invalid '${beforeOrAfter}' cursor - a cursor is only valid within a specific ordering, if you change the order then you'll need different cursors.`,
+    const condition = (i = 0): SQL => {
+      const order = orders[i];
+      // Codec is responsible for performing validation/coercion and throwing
+      // error if value is invalid.
+      // TODO: make sure this ^ is clear in the relevant places.
+      /*
+          const sqlValue = sql`${sql.value(
+            (void 0 /* forbid relying on `this` * /, order.codec.toPg)(
+              this.placeholder(access($parsedCursorPlan, [i + 1]), sql`text`),
+            ),
+          )}::${order.codec.sqlType}`;
+          */
+      const sqlValue = this.placeholder(
+        lambda(access($parsedCursorPlan, [i + 1]), (val) =>
+          order.codec.toPg(val),
+        ),
+        order.codec.sqlType,
       );
-    }
+      const gt =
+        (order.direction === "ASC" && beforeOrAfter === "after") ||
+        (order.direction === "DESC" && beforeOrAfter === "before");
+
+      let fragment = sql`${order.fragment} ${gt ? sql`>` : sql`<`} ${sqlValue}`;
+
+      if (i < orderCount - 1) {
+        fragment = sql`(${fragment}) or (${
+          order.fragment
+        } = ${sqlValue} and ${condition(i + 1)})`;
+      }
+
+      return sql.parens(fragment);
+    };
+
+    // If the cursor is null then no condition is needed
+    const cursorIsNullPlaceholder = this.placeholder(
+      lambda($parsedCursorPlan, (cursor) => cursor == null),
+      sql`bool`,
+    );
+    const finalCondition = sql`(${condition()}) or (${cursorIsNullPlaceholder} is true)`;
+
+    return finalCondition;
   }
 
-  after(cursor: string): void {
+  setAfter($cursorPlan: InputStaticLeafPlan<string>): void {
     this.assertCursorPaginationAllowed();
-    this.parseCursor("after", cursor);
+    this.addCursorPlan("after", $cursorPlan);
   }
 
-  before(cursor: string): void {
+  setBefore($cursorPlan: InputStaticLeafPlan<string>): void {
     this.assertCursorPaginationAllowed();
-    this.parseCursor("before", cursor);
+    this.addCursorPlan("before", $cursorPlan);
   }
 
   public pageInfo(): PgPageInfoPlan<this> {
