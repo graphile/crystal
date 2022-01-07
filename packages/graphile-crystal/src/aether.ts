@@ -887,8 +887,14 @@ export class Aether<
       const newPlan = this.plans[i];
       // If the newPlan still exists, finalize it with respect to arguments (once only).
       if (newPlan != null && this.plans[newPlan.id] === newPlan) {
-        // TODO: rename finalizeArguments; maybe argumentsFinalized or lockParameters or lock?
-        newPlan.finalizeArguments();
+        const wgs = withGlobalState.bind(null, {
+          aether: this,
+          parentPathIdentity: newPlan.parentPathIdentity,
+        }) as <T>(cb: () => T) => T;
+        wgs(() => {
+          // TODO: rename finalizeArguments; maybe argumentsFinalized or lockParameters or lock?
+          newPlan.finalizeArguments();
+        });
         assertArgumentsFinalized(newPlan);
         if (newPlan.hasSideEffects && sideEffectsPathIdentity != null) {
           this.sideEffectPlanIdsByPathIdentity[sideEffectsPathIdentity].push(
