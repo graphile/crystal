@@ -132,9 +132,9 @@ export class PgClassExpressionPlan<
     const expr = sql.compile(this.expression);
     if (expr.text.length > 23) {
       return (
-        expr.text.substr(0, 10) +
+        expr.text.substring(0, 10) +
         "..." +
-        expr.text.substr(expr.text.length - 10)
+        expr.text.substring(expr.text.length - 10)
       );
     } else {
       return expr.text;
