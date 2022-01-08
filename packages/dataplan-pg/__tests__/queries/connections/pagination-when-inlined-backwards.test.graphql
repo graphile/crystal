@@ -1,0 +1,39 @@
+## expect(errors).toBeFalsy()
+## expect(queries).toHaveLength(1);
+## expect(data.forums[0].messagesConnection.nodes).toHaveLength(2);
+## expect(data.forums[0].messagesConnection.edges).toHaveLength(2);
+## expect(data.forums[0].messagesConnection.totalCount).toEqual(3);
+## expect(data.forums[0].messagesConnection.pageInfo.hasPreviousPage).toEqual(true);
+## expect(data.forums[0].messagesConnection.pageInfo.hasNextPage).toEqual(false);
+## expect(data.forums[1].messagesConnection.totalCount).toEqual(0);
+## expect(data.forums[1].messagesConnection.pageInfo.hasPreviousPage).toEqual(false);
+## expect(data.forums[1].messagesConnection.pageInfo.hasNextPage).toEqual(false);
+{
+  forums(includeArchived: YES, first: 2) {
+    name
+    messagesConnection(last: 2, includeArchived: NO) {
+      nodes {
+        body
+        author {
+          username
+          gravatarUrl
+        }
+      }
+      edges {
+        cursor
+        node {
+          body
+          author {
+            username
+            gravatarUrl
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }
+      totalCount
+    }
+  }
+}
