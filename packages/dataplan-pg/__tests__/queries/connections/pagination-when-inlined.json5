@@ -1,0 +1,64 @@
+{
+  forums: [
+    {
+      name: "Cats",
+      messagesConnection: {
+        nodes: [
+          {
+            body: "Cats = awesome -- Alice",
+            author: {
+              username: "Alice",
+              gravatarUrl: null,
+            },
+          },
+          {
+            body: "Cats = awesome -- Bob",
+            author: {
+              username: "Bob",
+              gravatarUrl: null,
+            },
+          },
+        ],
+        edges: [
+          {
+            cursor: "WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtYTExY2UwMDBjYTcwIl0=",
+            node: {
+              body: "Cats = awesome -- Alice",
+              author: {
+                username: "Alice",
+                gravatarUrl: null,
+              },
+            },
+          },
+          {
+            cursor: "WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBjYTcwIl0=",
+            node: {
+              body: "Cats = awesome -- Bob",
+              author: {
+                username: "Bob",
+                gravatarUrl: null,
+              },
+            },
+          },
+        ],
+        pageInfo: {
+          hasNextPage: true,
+          hasPreviousPage: false,
+        },
+        totalCount: 3,
+      },
+    },
+    {
+      name: "Dogs",
+      messagesConnection: {
+        nodes: [],
+        edges: [],
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+        totalCount: 0,
+      },
+    },
+  ],
+}
