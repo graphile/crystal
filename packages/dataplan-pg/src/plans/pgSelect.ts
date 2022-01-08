@@ -51,6 +51,8 @@ import type { PgPageInfoPlan } from "./pgPageInfo";
 import { pgPageInfo } from "./pgPageInfo";
 import type { PgSelectSinglePlanOptions } from "./pgSelectSingle";
 import { PgSelectSinglePlan } from "./pgSelectSingle";
+import { pgValidateParsedCursor } from "./pgValidateParsedCursor";
+import { toPg } from "./toPg";
 
 const isDev =
   process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
@@ -1011,32 +1013,12 @@ export class PgSelectPlan<
     // Cursor validity check; if we get inlined then this will be passed up
     // to the parent so we can trust it.
     this.addDependency(
-      lambda($parsedCursorPlan, (decoded) => {
-        if (!decoded) {
-          return;
-        }
-        try {
-          const [cursorDigest, ...cursorParts] = decoded;
-          if (!cursorDigest || cursorDigest !== digest) {
-            throw new Error(
-              `Invalid cursor digest - '${cursorDigest}' !== '${digest}'`,
-            );
-          }
-          if (cursorParts.length !== orderCount) {
-            throw new Error(
-              `Invalid cursor length - ${cursorParts.length} !== ${orderCount}`,
-            );
-          }
-        } catch (e) {
-          if (isDev) {
-            console.error("Invalid cursor:");
-            console.error(e);
-          }
-          throw new Error(
-            `Invalid '${beforeOrAfter}' cursor - a cursor is only valid within a specific ordering, if you change the order then you'll need different cursors.`,
-          );
-        }
-      }),
+      pgValidateParsedCursor(
+        $parsedCursorPlan,
+        digest,
+        orderCount,
+        beforeOrAfter,
+      ),
     );
 
     const condition = (i = 0): SQL => {
@@ -1052,9 +1034,7 @@ export class PgSelectPlan<
           )}::${order.codec.sqlType}`;
           */
       const sqlValue = this.placeholder(
-        lambda(access($parsedCursorPlan, [i + 1]), (val) =>
-          order.codec.toPg(val),
-        ),
+        toPg(access($parsedCursorPlan, [i + 1]), order.codec),
         order.codec.sqlType,
       );
       const gt =

@@ -72,4 +72,9 @@ export {
   PgSingleTablePolymorphicPlan,
 } from "./plans/pgSingleTablePolymorphic";
 export { pgUpdate, PgUpdatePlan } from "./plans/pgUpdate";
+export {
+  pgValidateParsedCursor,
+  PgValidateParsedCursorPlan,
+} from "./plans/pgValidateParsedCursor";
 export { TempTablePlan } from "./plans/tempTable";
+export { toPg, ToPgPlan } from "./plans/toPg";
