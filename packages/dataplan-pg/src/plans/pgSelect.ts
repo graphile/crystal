@@ -1144,9 +1144,7 @@ export class PgSelectPlan<
       const hasMore =
         this.fetchOneExtra && limit != null && allVals.length > limit;
       const vals = hasMore ? allVals.slice(0, limit) : allVals;
-      const finalArray = shouldReverseOrder
-        ? vals.map((arr) => reverseArray(arr))
-        : vals;
+      const finalArray = shouldReverseOrder ? reverseArray(vals) : vals;
       if (this.fetchOneExtra) {
         // TODO: this is an ugly hack; really we should consider resolving to an
         // object that can contain metadata as well as the rows.
