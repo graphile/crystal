@@ -6,8 +6,8 @@
         nodes: [],
         edges: [],
         pageInfo: {
-          hasNextPage: true,
-          hasPreviousPage: true,
+          hasNextPage: false,
+          hasPreviousPage: false,
         },
         totalCount: 0,
       },
@@ -71,8 +71,8 @@
           },
         ],
         pageInfo: {
-          hasNextPage: true,
-          hasPreviousPage: true,
+          hasNextPage: false,
+          hasPreviousPage: false,
         },
         totalCount: 3,
       },
@@ -83,8 +83,8 @@
         nodes: [],
         edges: [],
         pageInfo: {
-          hasNextPage: true,
-          hasPreviousPage: true,
+          hasNextPage: false,
+          hasPreviousPage: false,
         },
         totalCount: 0,
       },

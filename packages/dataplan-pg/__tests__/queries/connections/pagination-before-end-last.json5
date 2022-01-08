@@ -33,7 +33,7 @@
       },
     ],
     pageInfo: {
-      hasNextPage: true,
+      hasNextPage: false,
       hasPreviousPage: true,
     },
     totalCount: 6,

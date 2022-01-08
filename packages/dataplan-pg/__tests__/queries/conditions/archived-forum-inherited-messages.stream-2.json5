@@ -8,8 +8,8 @@
             nodes: [],
             edges: [],
             pageInfo: {
-              hasNextPage: true,
-              hasPreviousPage: true,
+              hasNextPage: false,
+              hasPreviousPage: false,
             },
             totalCount: 3,
           },

@@ -13,7 +13,7 @@ where
     true /* authorization checks */
   )
 order by __messages__."id" asc
-limit 3
+limit 4
 
 select
   (count(*))::text as "0"

@@ -22,7 +22,7 @@ lateral (
       true /* authorization checks */
     )
   order by __messages__."id" desc
-  limit 3
+  limit 4
 ) as __messages_result__
 
 select

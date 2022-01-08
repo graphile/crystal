@@ -21,7 +21,7 @@ select
         __forums__."id"::"uuid" = __messages__."forum_id"
       )
     order by __messages__."id" asc
-    limit 5
+    limit 6
   ) as "1",
   array(
     select array[

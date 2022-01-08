@@ -6,7 +6,10 @@
 ## expect(data.allMessagesConnection.edges[0].node.body).toMatch("Cats");
 ## expect(data.allMessagesConnection.edges[1].node.author.username).toEqual("Cecilia");
 ## expect(data.allMessagesConnection.edges[1].node.body).toMatch("Postgres");
+# See: https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo.Fields
+# 'last' is not set, so hasPreviousPage is false.
 ## expect(data.allMessagesConnection.pageInfo.hasPreviousPage).toEqual(false);
+# 'first' is set, so hasNextPage is true if a larger `first` would return additional nodes.
 ## expect(data.allMessagesConnection.pageInfo.hasNextPage).toEqual(true);
 {
   allMessagesConnection(orderBy: [AUTHOR_USERNAME_DESC, BODY_ASC], first: 5) {

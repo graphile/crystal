@@ -5,8 +5,11 @@
 ## expect(data.allMessagesConnection.edges[0].node.author.username).toEqual("Cecilia");
 ## expect(data.allMessagesConnection.edges[1].node.author.username).toEqual("Alice");
 ## expect(data.allMessagesConnection.edges[2].node.author.username).toEqual("Bob");
+# See: https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo.Fields
+# 'last' is set, so hasPreviousPage is true if a larger last would return more records.
 ## expect(data.allMessagesConnection.pageInfo.hasPreviousPage).toEqual(true);
-## expect(data.allMessagesConnection.pageInfo.hasNextPage).toEqual(true);
+# 'first' is not set, so hasNextPage is false.
+## expect(data.allMessagesConnection.pageInfo.hasNextPage).toEqual(false);
 ## expect(data.allMessagesConnection.totalCount).toEqual(6);
 {
   # Last 3 records before (Cecilia / Postgres)

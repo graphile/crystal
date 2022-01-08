@@ -36,7 +36,7 @@ lateral (
       __messages__."forum_id" = __messages_identifiers__."id0"
     )
   order by __messages__."id" asc
-  limit 5
+  limit 6
 ) as __messages_result__
 
 select __messages_result__.*

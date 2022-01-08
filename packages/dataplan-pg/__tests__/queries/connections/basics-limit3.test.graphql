@@ -1,7 +1,10 @@
 ## expect(errors).toBeFalsy()
 ## expect(queries).toHaveLength(2);
 ## expect(data.allMessagesConnection.edges).toHaveLength(3);
+# See: https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo.Fields
+# 'last' is not set, so hasPreviousPage is false.
 ## expect(data.allMessagesConnection.pageInfo.hasPreviousPage).toEqual(false);
+# 'first' is set, so hasNextPage is true if a larger `first` would return additional nodes.
 ## expect(data.allMessagesConnection.pageInfo.hasNextPage).toEqual(true);
 {
   allMessagesConnection(first: 3) {
