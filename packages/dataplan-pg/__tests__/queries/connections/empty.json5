@@ -1,0 +1,22 @@
+{
+  forums: [
+    {
+      name: "Cats",
+      messagesConnection: {
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+      },
+    },
+    {
+      name: "Postgres",
+      messagesConnection: {
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+      },
+    },
+  ],
+}

@@ -1,0 +1,13 @@
+## expect(errors).toBeFalsy()
+## expect(queries).toHaveLength(1);
+{
+  forums {
+    name
+    messagesConnection {
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }
+    }
+  }
+}
