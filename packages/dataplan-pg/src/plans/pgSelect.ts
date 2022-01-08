@@ -2273,12 +2273,24 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
             table,
             parent2,
           );
-          //console.dir(this.dependencies.map((id) => this.getPlan(id)));
+          const limit = this.fetchOneExtra ? this.first ?? this.last : null;
           const rowsPlan = access<any[]>(parent2, [selfIndex]);
-          if (this.shouldReverseOrder()) {
-            return reverse(rowsPlan);
+          const shouldReverse = this.shouldReverseOrder();
+          const orderedPlan = shouldReverse ? reverse(rowsPlan) : rowsPlan;
+          if (this.fetchOneExtra && limit != null) {
+            return lambda(orderedPlan, (rows) => {
+              const hasMore = rows.length > limit;
+              const slicedRows =
+                shouldReverse && hasMore
+                  ? rows.slice(1)
+                  : hasMore
+                  ? rows.slice(0, limit)
+                  : rows;
+              Object.defineProperty(slicedRows, "hasMore", { value: hasMore });
+              return slicedRows;
+            });
           } else {
-            return rowsPlan;
+            return orderedPlan;
           }
         }
 
