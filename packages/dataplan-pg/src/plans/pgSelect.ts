@@ -1817,29 +1817,6 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
         return false;
       }
 
-      // Check JOINs match
-      if (
-        !arraysMatch(this.joins, p.joins, (a, b) =>
-          joinMatches(a, b, sqlIsEquivalent),
-        )
-      ) {
-        return false;
-      }
-
-      // Check WHEREs match
-      if (!arraysMatch(this.conditions, p.conditions, sqlIsEquivalent)) {
-        return false;
-      }
-
-      // Check PLACEHOLDERS match
-      if (
-        !arraysMatch(this.placeholders, p.placeholders, (a, b) => {
-          return a.type === b.type && a.dependencyIndex === b.dependencyIndex;
-        })
-      ) {
-        return false;
-      }
-
       // Check IDENTIFIERs match
       if (
         !arraysMatch(
@@ -1891,6 +1868,44 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
 
       // Check OFFSET matches
       if (this.offset !== p.offset) {
+        return false;
+      }
+
+      // Check PLACEHOLDERS match
+      if (
+        !arraysMatch(this.placeholders, p.placeholders, (a, b) => {
+          return a.type === b.type && a.dependencyIndex === b.dependencyIndex;
+        })
+      ) {
+        debugPlanVerbose(
+          "Refusing to deduplicate %c with %c because the placeholders don't match",
+          this,
+          p,
+        );
+        return false;
+      }
+
+      // Check JOINs match
+      if (
+        !arraysMatch(this.joins, p.joins, (a, b) =>
+          joinMatches(a, b, sqlIsEquivalent),
+        )
+      ) {
+        debugPlanVerbose(
+          "Refusing to deduplicate %c with %c because the joins don't match",
+          this,
+          p,
+        );
+        return false;
+      }
+
+      // Check WHEREs match
+      if (!arraysMatch(this.conditions, p.conditions, sqlIsEquivalent)) {
+        debugPlanVerbose(
+          "Refusing to deduplicate %c with %c because the conditions don't match",
+          this,
+          p,
+        );
         return false;
       }
 
