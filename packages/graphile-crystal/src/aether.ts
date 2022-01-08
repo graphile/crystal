@@ -1593,9 +1593,20 @@ export class Aether<
       }
       return false;
     });
+
+    // TODO: should we keep this optimisation, or should we remove it so that
+    // plans that are "smarter" than us can return replacement plans even if
+    // they're not peers?
     if (peers.length === 0) {
       return plan;
     }
+
+    // Sort the peers so the one with the lowest id comes first - this is the
+    // one we'd rather substitute with.
+    peers.sort((a, z) => {
+      return a.id - z.id;
+    });
+
     const replacementPlan = plan.deduplicate(peers);
     if (replacementPlan !== plan) {
       if (!peers.includes(replacementPlan)) {
