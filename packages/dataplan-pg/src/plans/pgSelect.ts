@@ -2044,14 +2044,10 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
         if (dep instanceof __TrackedObjectPlan) {
           // This has come from a variable, context or rootValue, therefore
           // it's shared and thus safe.
-          continue;
-        }
-        if (isStaticInputPlan(dep)) {
+        } else if (isStaticInputPlan(dep)) {
           // This has come from a hard-coded input in the document, therefore
           // it's shared and thus safe.
-          continue;
-        }
-        if (dep instanceof PgClassExpressionPlan) {
+        } else if (dep instanceof PgClassExpressionPlan) {
           const p2 = this.getPlan(dep.dependencies[dep.tableId]);
           const t2Parent = dep.getParentPlan();
           if (!(t2Parent instanceof PgSelectSinglePlan)) {
