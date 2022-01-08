@@ -804,8 +804,11 @@ export function arraysMatch<T>(
 export function isEquivalent(
   sql1: SQL | symbol,
   sql2: SQL | symbol,
-  symbolSubstitutes?: Map<symbol, symbol>,
+  options: {
+    symbolSubstitutes?: Map<symbol, symbol>;
+  } = {},
 ): boolean {
+  const { symbolSubstitutes } = options;
   if (typeof sql1 === "symbol") {
     if (symbolSubstitutes?.has(sql1)) {
       return symbolSubstitutes.get(sql1) === sql2;
@@ -819,9 +822,7 @@ export function isEquivalent(
     if (!Array.isArray(sql2)) {
       return false;
     }
-    return arraysMatch(sql1, sql2, (a, b) =>
-      isEquivalent(a, b, symbolSubstitutes),
-    );
+    return arraysMatch(sql1, sql2, (a, b) => isEquivalent(a, b, options));
   } else if (Array.isArray(sql2)) {
     return false;
   } else {
@@ -842,7 +843,7 @@ export function isEquivalent(
         if (sql2.type !== sql1.type) {
           return false;
         }
-        return isEquivalent(sql1.content, sql2.content, symbolSubstitutes);
+        return isEquivalent(sql1.content, sql2.content, options);
       }
       case "PARENS": {
         if (sql2.type !== sql1.type) {
@@ -851,7 +852,7 @@ export function isEquivalent(
         if (sql2.force !== sql1.force) {
           return false;
         }
-        return isEquivalent(sql1.content, sql2.content, symbolSubstitutes);
+        return isEquivalent(sql1.content, sql2.content, options);
       }
       case "IDENTIFIER": {
         if (sql2.type !== sql1.type) {
