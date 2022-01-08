@@ -30,7 +30,7 @@ import {
   reverse,
   reverseArray,
 } from "graphile-crystal";
-import type { SQL, SQLPlaceholderNode, SQLRawValue } from "pg-sql2";
+import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
 
 import type {
@@ -130,8 +130,7 @@ type PgSelectPlanJoin =
 type PgSelectPlaceholder = {
   dependencyIndex: number;
   type: SQL;
-  // A placeholder so that we can supply the actual SQL later.
-  sqlPlaceholder: SQLPlaceholderNode;
+  symbol: symbol;
 };
 
 type PgSelectIdentifierSpec =
@@ -361,7 +360,7 @@ export class PgSelectPlan<
    * Values used in this plan.
    */
   private placeholders: Array<PgSelectPlaceholder>;
-  private placeholderValues: Map<SQLPlaceholderNode, SQL>;
+  private placeholderValues: Map<symbol, SQL>;
 
   /**
    * If true, we don't need to add any of the security checks from the data
@@ -781,12 +780,12 @@ export class PgSelectPlan<
     return this.isUnique;
   }
 
-  public placeholder($plan: PgTypedExecutablePlan<any>): SQLPlaceholderNode;
-  public placeholder($plan: ExecutablePlan<any>, type: SQL): SQLPlaceholderNode;
+  public placeholder($plan: PgTypedExecutablePlan<any>): SQL;
+  public placeholder($plan: ExecutablePlan<any>, type: SQL): SQL;
   public placeholder(
     $plan: ExecutablePlan<any> | PgTypedExecutablePlan<any>,
     overrideType?: SQL,
-  ): SQLPlaceholderNode {
+  ): SQL {
     if (this.locked) {
       throw new Error(`${this}: cannot add placeholders once plan is locked`);
     }
@@ -806,13 +805,15 @@ export class PgSelectPlan<
       );
     }
     const dependencyIndex = this.addDependency($plan);
+    const symbol = Symbol(`plan-${$plan.id}`);
     const sqlPlaceholder = sql.placeholder(
+      symbol,
       sql`(1/0) /* ERROR! Unhandled placeholder! */`,
     );
     const p: PgSelectPlaceholder = {
       dependencyIndex,
       type,
-      sqlPlaceholder,
+      symbol,
     };
     this.placeholders.push(p);
     // This allows us to replace the SQL that will be compiled, for example
@@ -1572,7 +1573,7 @@ export class PgSelectPlan<
             type: placeholder.type,
           }) - 1;
         this.placeholderValues.set(
-          placeholder.sqlPlaceholder,
+          placeholder.symbol,
           sql`${alias}.${sql.identifier(`id${idx}`)}`,
         );
       });
@@ -1815,6 +1816,29 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
       } else if (this.symbol !== p.symbol) {
         return false;
       }
+
+      // Check PLACEHOLDERS match
+      if (
+        !arraysMatch(this.placeholders, p.placeholders, (a, b) => {
+          const equivalent =
+            a.type === b.type && a.dependencyIndex === b.dependencyIndex;
+          if (equivalent) {
+            if (a.symbol !== b.symbol) {
+              // Make symbols appear equivalent
+              symbolSubstitutes.set(a.symbol, b.symbol);
+            }
+          }
+          return equivalent;
+        })
+      ) {
+        debugPlanVerbose(
+          "Refusing to deduplicate %c with %c because the placeholders don't match",
+          this,
+          p,
+        );
+        return false;
+      }
+
       const sqlIsEquivalent = (a: SQL | symbol, b: SQL | symbol) =>
         sql.isEquivalent(a, b, { symbolSubstitutes });
 
@@ -1887,20 +1911,6 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
         return false;
       }
 
-      // Check PLACEHOLDERS match
-      if (
-        !arraysMatch(this.placeholders, p.placeholders, (a, b) => {
-          return a.type === b.type && a.dependencyIndex === b.dependencyIndex;
-        })
-      ) {
-        debugPlanVerbose(
-          "Refusing to deduplicate %c with %c because the placeholders don't match",
-          this,
-          p,
-        );
-        return false;
-      }
-
       // Check JOINs match
       if (
         !arraysMatch(this.joins, p.joins, (a, b) =>
@@ -1939,6 +1949,10 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
         } else {
           // Fine :)
         }
+      }
+
+      if (this.fetchOneExtra) {
+        identical.fetchOneExtra = true;
       }
 
       return identical;
@@ -1983,7 +1997,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
     TOtherPlan extends PgSelectPlan<any, any, any, any>,
   >(otherPlan: TOtherPlan): void {
     for (const placeholder of this.placeholders) {
-      const { dependencyIndex, sqlPlaceholder, type } = placeholder;
+      const { dependencyIndex, symbol, type } = placeholder;
       const dep = this.getPlan(this.dependencies[dependencyIndex]);
       if (
         // I am uncertain on this code.
@@ -1998,14 +2012,11 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
         otherPlan.placeholders.push({
           dependencyIndex: newPlanIndex,
           type,
-          sqlPlaceholder,
+          symbol,
         });
       } else if (dep instanceof PgClassExpressionPlan) {
         // Replace with a reference.
-        otherPlan.placeholderValues.set(
-          placeholder.sqlPlaceholder,
-          dep.toSQL(),
-        );
+        otherPlan.placeholderValues.set(placeholder.symbol, dep.toSQL());
       } else {
         throw new Error(
           `Could not merge placeholder from unsupported plan type: ${dep}`,

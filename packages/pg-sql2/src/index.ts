@@ -136,6 +136,7 @@ export interface SQLSymbolAliasNode {
  */
 export interface SQLPlaceholderNode {
   type: "PLACEHOLDER";
+  symbol: symbol;
   fallback?: SQL;
   [$$trusted]: true;
 }
@@ -269,9 +270,13 @@ function makeSymbolAliasNode(a: symbol, b: symbol): SQLSymbolAliasNode {
   });
 }
 
-function makePlaceholderNode(fallback?: SQL): SQLPlaceholderNode {
+function makePlaceholderNode(
+  symbol: symbol,
+  fallback?: SQL,
+): SQLPlaceholderNode {
   return Object.freeze({
     type: "PLACEHOLDER",
+    symbol,
     fallback,
     [$$trusted]: true,
   });
@@ -306,9 +311,7 @@ function enforceValidNode(node: unknown, where = ""): SQLNode {
  */
 export function compile(
   sql: SQL,
-  {
-    placeholderValues,
-  }: { placeholderValues?: Map<SQLPlaceholderNode, SQL> } = {},
+  { placeholderValues }: { placeholderValues?: Map<symbol, SQL> } = {},
 ): {
   text: string;
   values: SQLRawValue[];
@@ -464,8 +467,9 @@ export function compile(
           break;
         }
         case "PLACEHOLDER": {
+          // TODO: symbol substitutes?
           const resolvedPlaceholder =
-            placeholderValues?.get(item) ?? item.fallback;
+            placeholderValues?.get(item.symbol) ?? item.fallback;
           if (!resolvedPlaceholder) {
             throw new Error(
               "ERROR: sql.placeholder was used in this query, but no value was supplied for it, and it has no fallback.",
@@ -780,8 +784,11 @@ export function symbolAlias(symbol1: symbol, symbol2: symbol): SQL {
   return makeSymbolAliasNode(symbol1, symbol2);
 }
 
-export function placeholder(fallback?: SQL): SQLPlaceholderNode {
-  return makePlaceholderNode(fallback);
+export function placeholder(
+  symbol: symbol,
+  fallback?: SQL,
+): SQLPlaceholderNode {
+  return makePlaceholderNode(symbol, fallback);
 }
 
 export function arraysMatch<T>(
@@ -863,7 +870,12 @@ export function isEquivalent(
         );
       }
       case "PLACEHOLDER": {
-        return sql1 === sql2;
+        if (sql2.type !== sql1.type) {
+          return false;
+        }
+        const symbol1 = getSubstitute(sql1.symbol, symbolSubstitutes);
+        const symbol2 = getSubstitute(sql2.symbol, symbolSubstitutes);
+        return symbol1 === symbol2;
       }
       case "SYMBOL_ALIAS": {
         // TODO

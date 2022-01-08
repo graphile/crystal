@@ -252,12 +252,12 @@ export class PgSelectSinglePlan<
     return this.getClassPlan().selectAndReturnIndex(fragment);
   }
 
-  public placeholder($plan: PgTypedExecutablePlan<any>): SQLPlaceholderNode;
-  public placeholder($plan: ExecutablePlan<any>, type: SQL): SQLPlaceholderNode;
+  public placeholder($plan: PgTypedExecutablePlan<any>): SQL;
+  public placeholder($plan: ExecutablePlan<any>, type: SQL): SQL;
   public placeholder(
     $plan: ExecutablePlan<any> | PgTypedExecutablePlan<any>,
     overrideType?: SQL,
-  ): SQLPlaceholderNode {
+  ): SQL {
     return overrideType
       ? this.getClassPlan().placeholder($plan, overrideType)
       : this.getClassPlan().placeholder($plan as PgTypedExecutablePlan<any>);
