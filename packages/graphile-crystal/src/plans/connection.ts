@@ -50,58 +50,58 @@ export class ConnectionPlan<
 
   public getFirst(): InputPlan | null {
     return this._firstId != null
-      ? (this.getPlan(this._firstId) as InputPlan)
+      ? (this.getDep(this._firstId) as InputPlan)
       : null;
   }
   public setFirst($firstPlan: InputPlan) {
-    if (this._firstId) {
+    if (this._firstId != null) {
       throw new Error(`${this}->setFirst already called`);
     }
-    this._firstId = $firstPlan.id;
+    this._firstId = this.addDependency($firstPlan);
   }
   public getLast(): InputPlan | null {
     return this._lastId != null
-      ? (this.getPlan(this._lastId) as InputPlan)
+      ? (this.getDep(this._lastId) as InputPlan)
       : null;
   }
   public setLast($lastPlan: InputPlan) {
-    if (this._lastId) {
+    if (this._lastId != null) {
       throw new Error(`${this}->setLast already called`);
     }
-    this._lastId = $lastPlan.id;
+    this._lastId = this.addDependency($lastPlan);
   }
   public getOffset(): InputPlan | null {
     return this._offsetId != null
-      ? (this.getPlan(this._offsetId) as InputPlan)
+      ? (this.getDep(this._offsetId) as InputPlan)
       : null;
   }
   public setOffset($offsetPlan: InputPlan) {
-    if (this._offsetId) {
+    if (this._offsetId != null) {
       throw new Error(`${this}->setOffset already called`);
     }
-    this._offsetId = $offsetPlan.id;
+    this._offsetId = this.addDependency($offsetPlan);
   }
   public getBefore(): InputPlan | null {
     return this._beforeId != null
-      ? (this.getPlan(this._beforeId) as InputPlan)
+      ? (this.getDep(this._beforeId) as InputPlan)
       : null;
   }
   public setBefore($beforePlan: InputPlan) {
-    if (this._beforeId) {
+    if (this._beforeId != null) {
       throw new Error(`${this}->setBefore already called`);
     }
-    this._beforeId = $beforePlan.id;
+    this._beforeId = this.addDependency($beforePlan);
   }
   public getAfter(): InputPlan | null {
     return this._afterId != null
-      ? (this.getPlan(this._afterId) as InputPlan)
+      ? (this.getDep(this._afterId) as InputPlan)
       : null;
   }
   public setAfter($afterPlan: InputPlan) {
-    if (this._afterId) {
+    if (this._afterId != null) {
       throw new Error(`${this}->setAfter already called`);
     }
-    this._afterId = $afterPlan.id;
+    this._afterId = this.addDependency($afterPlan);
   }
 
   /**
@@ -153,20 +153,35 @@ export class ConnectionPlan<
   ): TPlan {
     const clonedPlan = this.cloneSubplanWithoutPagination(...args);
 
-    if (this._beforeId) {
-      clonedPlan.setBefore(this.getPlan(this._beforeId) as InputPlan);
+    {
+      const plan = this.getBefore();
+      if (plan) {
+        clonedPlan.setBefore(plan);
+      }
     }
-    if (this._afterId) {
-      clonedPlan.setAfter(this.getPlan(this._afterId) as InputPlan);
+    {
+      const plan = this.getAfter();
+      if (plan) {
+        clonedPlan.setAfter(plan);
+      }
     }
-    if (this._firstId) {
-      clonedPlan.setFirst(this.getPlan(this._firstId) as InputPlan);
+    {
+      const plan = this.getFirst();
+      if (plan) {
+        clonedPlan.setFirst(plan);
+      }
     }
-    if (this._lastId) {
-      clonedPlan.setLast(this.getPlan(this._lastId) as InputPlan);
+    {
+      const plan = this.getLast();
+      if (plan) {
+        clonedPlan.setLast(plan);
+      }
     }
-    if (this._offsetId) {
-      clonedPlan.setOffset(this.getPlan(this._offsetId) as InputPlan);
+    {
+      const plan = this.getOffset();
+      if (plan) {
+        clonedPlan.setOffset(plan);
+      }
     }
 
     return clonedPlan;
