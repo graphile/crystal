@@ -14,17 +14,16 @@ import type {
   PlanStreamOptions,
   StreamablePlan,
 } from "graphile-crystal";
-import { lambda } from "graphile-crystal";
 import {
   __TrackedObjectPlan,
   access,
-  constant,
   ExecutablePlan,
   first,
   InputListPlan,
   InputObjectPlan,
   InputStaticLeafPlan,
   isAsyncIterable,
+  lambda,
   list,
   map,
   planGroupsOverlap,
@@ -55,6 +54,24 @@ import { PgSelectSinglePlan } from "./pgSelectSingle";
 
 const isDev =
   process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
+
+// Constant functions so lambdas can be optimized
+const listHasMore = (list: any | null | undefined) => list?.hasMore || false;
+const parseCursor = (cursor: string | null) => {
+  if (cursor == null) {
+    throw new Error(
+      "GraphileInternalError<3b076b86-828b-46b3-885d-ed2577068b8d>: cursor is null, but we have a constraint preventing that...",
+    );
+  }
+  if (typeof cursor !== "string") {
+    throw new Error("Invalid cursor");
+  }
+  const decoded = JSON.parse(Buffer.from(cursor, "base64").toString("utf8"));
+  if (!Array.isArray(decoded)) {
+    throw new Error("Expected array");
+  }
+  return decoded;
+};
 
 function isStaticInputPlan(
   dep: ExecutablePlan,
@@ -755,7 +772,7 @@ export class PgSelectPlan<
     this.fetchOneExtra = true;
     // TODO: This is a truly hideous hack. We should solve this by having this
     // plan resolve to an object with rows and metadata.
-    return lambda(this, (list) => (list as any)?.hasMore || false);
+    return lambda(this, listHasMore);
   }
 
   public unique(): boolean {
@@ -969,23 +986,7 @@ export class PgSelectPlan<
       return;
     }
 
-    const $parsedCursorPlan = lambda($cursorPlan, (cursor) => {
-      if (cursor == null) {
-        throw new Error(
-          "GraphileInternalError<3b076b86-828b-46b3-885d-ed2577068b8d>: cursor is null, but we have a constraint preventing that...",
-        );
-      }
-      if (typeof cursor !== "string") {
-        throw new Error("Invalid cursor");
-      }
-      const decoded = JSON.parse(
-        Buffer.from(cursor, "base64").toString("utf8"),
-      );
-      if (!Array.isArray(decoded)) {
-        throw new Error("Expected array");
-      }
-      return decoded;
-    });
+    const $parsedCursorPlan = lambda($cursorPlan, parseCursor);
 
     if (beforeOrAfter === "before") {
       this.beforePlanId = this.addDependency($parsedCursorPlan);
