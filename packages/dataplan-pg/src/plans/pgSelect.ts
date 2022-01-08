@@ -1135,8 +1135,24 @@ export class PgSelectPlan<
     );
     debugExecute("%s; result: %c", this, executionResult);
 
-    const vals = executionResult.values;
-    return shouldReverseOrder ? vals.map((arr) => reverseArray(arr)) : vals;
+    return executionResult.values.map((allVals) => {
+      if (!allVals) {
+        return allVals;
+      }
+      const limit = this.fetchOneExtra ? this.first ?? this.last : null;
+      const hasMore =
+        this.fetchOneExtra && limit != null && allVals.length > limit;
+      const vals = hasMore ? allVals.slice(0, limit) : allVals;
+      const finalArray = shouldReverseOrder
+        ? vals.map((arr) => reverseArray(arr))
+        : vals;
+      if (this.fetchOneExtra) {
+        // TODO: this is an ugly hack; really we should consider resolving to an
+        // object that can contain metadata as well as the rows.
+        Object.defineProperty(finalArray, "hasMore", { value: hasMore });
+      }
+      return finalArray;
+    });
   }
 
   /**
