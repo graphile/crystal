@@ -3212,8 +3212,7 @@ export function makeExampleSchema(
                   $connection: PgConnectionPlanFromSource<typeof messageSource>,
                   $value,
                 ) {
-                  const $messages = $connection.getSubplan();
-                  $messages.setFirst($value);
+                  $connection.setFirst($value);
                   return null;
                 },
               [],
@@ -3228,8 +3227,7 @@ export function makeExampleSchema(
                   $connection: PgConnectionPlanFromSource<typeof messageSource>,
                   $value,
                 ) {
-                  const $messages = $connection.getSubplan();
-                  $messages.setLast($value);
+                  $connection.setLast($value);
                   return null;
                 },
               [],
