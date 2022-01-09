@@ -1,0 +1,20 @@
+{
+  forums: [
+    {
+      messagesConnection: {
+        pageInfo: {
+          hasNextPage: false,
+        },
+        totalCount: 0,
+      },
+    },
+    {
+      messagesConnection: {
+        pageInfo: {
+          hasNextPage: false,
+        },
+        totalCount: 1,
+      },
+    },
+  ],
+}
