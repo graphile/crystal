@@ -2,8 +2,7 @@ select __forums_result__.*
 from (
   select
     ids.ordinality - 1 as idx,
-    (ids.value->>0)::boolean as "id0",
-    (ids.value->>1)::boolean as "id1"
+    (ids.value->>0)::boolean as "id0"
   from json_array_elements($1::json) with ordinality as ids
 ) as __forums_identifiers__,
 lateral (
@@ -27,7 +26,7 @@ lateral (
         (
           (__messages__.archived_at is null) = (__forums__."archived_at" is null)
         ) and (
-          __messages__.featured = __forums_identifiers__."id1"
+          __messages__.featured = __forums_identifiers__."id0"
         ) and (
           __forums__."id"::"uuid" = __messages__."forum_id"
         )
@@ -43,7 +42,7 @@ lateral (
         (
           (__messages__.archived_at is null) = (__forums__."archived_at" is null)
         ) and (
-          __messages__.featured = __forums_identifiers__."id1"
+          __messages__.featured = __forums_identifiers__."id0"
         ) and (
           __forums__."id"::"uuid" = __messages__."forum_id"
         )
