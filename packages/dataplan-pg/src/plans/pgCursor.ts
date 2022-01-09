@@ -48,13 +48,16 @@ export class PgCursorPlan<
   }
 
   execute(
-    values: CrystalValuesList<ReadonlyArray<any>>,
-  ): CrystalResultsList<string> {
+    values: CrystalValuesList<ReadonlyArray<any[] | null>>,
+  ): CrystalResultsList<string | null> {
     return values.map((value) =>
-      Buffer.from(
-        JSON.stringify([this.digest, ...value[this.cursorValuesPlanId]]),
-        "utf8",
-      ).toString("base64"),
+      value[this.cursorValuesPlanId] == null ||
+      value[this.cursorValuesPlanId]!.every((v) => v == null)
+        ? null
+        : Buffer.from(
+            JSON.stringify([this.digest, ...value[this.cursorValuesPlanId]]),
+            "utf8",
+          ).toString("base64"),
     );
   }
 }
