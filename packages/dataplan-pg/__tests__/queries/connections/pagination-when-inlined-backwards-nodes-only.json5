@@ -1,0 +1,41 @@
+{
+  forums: [
+    {
+      name: "Cats",
+      messagesConnection: {
+        nodes: [
+          {
+            body: "Cats = awesome -- Bob",
+            author: {
+              username: "Bob",
+              gravatarUrl: null,
+            },
+          },
+          {
+            body: "Cats = awesome -- Cecilia",
+            author: {
+              username: "Cecilia",
+              gravatarUrl: null,
+            },
+          },
+        ],
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: true,
+        },
+        totalCount: 3,
+      },
+    },
+    {
+      name: "Dogs",
+      messagesConnection: {
+        nodes: [],
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+        totalCount: 0,
+      },
+    },
+  ],
+}
