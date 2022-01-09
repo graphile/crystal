@@ -32,6 +32,7 @@ export { constant, ConstantPlan } from "./constant";
 export { each, EachPlan } from "./each";
 export { first, FirstPlan } from "./first";
 export { lambda, LambdaPlan } from "./lambda";
+export { last, LastPlan } from "./last";
 export { list, ListPlan } from "./list";
 export { makeMapper, map, MapPlan } from "./map";
 export { object, ObjectPlan } from "./object";
