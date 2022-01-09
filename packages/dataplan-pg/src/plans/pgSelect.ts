@@ -1563,13 +1563,26 @@ export class PgSelectPlan<
       const alias = sql.identifier(Symbol(this.name + "_identifiers"));
 
       this.placeholders.forEach((placeholder) => {
-        // NOTE: we're adding to `this.identifiers` but NOT to
-        // `this.identifierMatches`.
+        // NOTE: we're NOT adding to `this.identifierMatches`.
+
+        // Fine a existing match for this dependency of this type
+        const existingIndex = this.queryValues.findIndex((v) => {
+          return (
+            v.dependencyIndex === placeholder.dependencyIndex &&
+            sql.isEquivalent(v.type, placeholder.type)
+          );
+        });
+
+        // If none exists, add one to our query values
         const idx =
-          this.queryValues.push({
-            dependencyIndex: placeholder.dependencyIndex,
-            type: placeholder.type,
-          }) - 1;
+          existingIndex >= 0
+            ? existingIndex
+            : this.queryValues.push({
+                dependencyIndex: placeholder.dependencyIndex,
+                type: placeholder.type,
+              }) - 1;
+
+        // Finally alias this symbol to a reference to this placeholder
         this.placeholderValues.set(
           placeholder.symbol,
           sql`${alias}.${sql.identifier(`id${idx}`)}`,
