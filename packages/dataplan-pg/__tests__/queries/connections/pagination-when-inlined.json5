@@ -44,6 +44,8 @@
         pageInfo: {
           hasNextPage: true,
           hasPreviousPage: false,
+          startCursor: "WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtYTExY2UwMDBjYTcwIl0=",
+          endCursor: "WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBjYTcwIl0=",
         },
         totalCount: 3,
       },
@@ -56,6 +58,8 @@
         pageInfo: {
           hasNextPage: false,
           hasPreviousPage: false,
+          startCursor: "WyJmMGIyOGM5NGMxIixudWxsXQ==",
+          endCursor: "WyJmMGIyOGM5NGMxIixudWxsXQ==",
         },
         totalCount: 0,
       },

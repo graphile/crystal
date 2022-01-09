@@ -21,6 +21,8 @@
     pageInfo {
       hasNextPage
       hasPreviousPage
+      startCursor
+      endCursor
     }
     totalCount
   }

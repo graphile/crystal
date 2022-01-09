@@ -2,6 +2,8 @@
 ## expect(queries).toHaveLength(2);
 ## expect(payloads[0].data.forums).toHaveLength(1);
 ## expect(payloads[0].data.forums[0].messagesConnection.totalCount).toEqual(3);
+## expect(payloads[0].data.forums[0].messagesConnection.pageInfo.startCursor).toEqual(payloads[0].data.forums[0].messagesConnection.edges[0].cursor);
+## expect(payloads[0].data.forums[0].messagesConnection.pageInfo.endCursor).toEqual(payloads[0].data.forums[0].messagesConnection.edges[2].cursor);
 {
   forums(includeArchived: EXCLUSIVELY) {
     name
@@ -28,6 +30,8 @@
       pageInfo {
         hasNextPage
         hasPreviousPage
+        startCursor
+        endCursor
       }
       totalCount
     }

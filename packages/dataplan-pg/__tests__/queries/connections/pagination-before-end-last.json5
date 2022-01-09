@@ -35,6 +35,8 @@
     pageInfo: {
       hasNextPage: false,
       hasPreviousPage: true,
+      startCursor: "WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtY2VjMTExYTBjYTcwIl0=",
+      endCursor: "WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBmMTcwIl0=",
     },
     totalCount: 6,
   },
