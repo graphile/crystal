@@ -223,6 +223,10 @@ export abstract class ExecutablePlan<TData = any> extends BasePlan {
         );
       }
     }
+    const existingIndex = this._dependencies.indexOf(plan.id);
+    if (existingIndex >= 0) {
+      return existingIndex;
+    }
     return this._dependencies.push(plan.id) - 1;
   }
 
