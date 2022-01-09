@@ -58,8 +58,8 @@
         pageInfo: {
           hasNextPage: false,
           hasPreviousPage: false,
-          startCursor: "WyJmMGIyOGM5NGMxIixudWxsXQ==",
-          endCursor: "WyJmMGIyOGM5NGMxIixudWxsXQ==",
+          startCursor: null,
+          endCursor: null,
         },
         totalCount: 0,
       },
