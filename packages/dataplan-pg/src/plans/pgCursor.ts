@@ -50,14 +50,13 @@ export class PgCursorPlan<
   execute(
     values: CrystalValuesList<ReadonlyArray<any[] | null>>,
   ): CrystalResultsList<string | null> {
-    return values.map((value) =>
-      value[this.cursorValuesPlanId] == null ||
-      value[this.cursorValuesPlanId]!.every((v) => v == null)
+    return values.map((value) => {
+      const v = value[this.cursorValuesPlanId];
+      return v == null || v!.every((v) => v == null)
         ? null
-        : Buffer.from(
-            JSON.stringify([this.digest, ...value[this.cursorValuesPlanId]]),
-            "utf8",
-          ).toString("base64"),
-    );
+        : Buffer.from(JSON.stringify([this.digest, ...v]), "utf8").toString(
+            "base64",
+          );
+    });
   }
 }
