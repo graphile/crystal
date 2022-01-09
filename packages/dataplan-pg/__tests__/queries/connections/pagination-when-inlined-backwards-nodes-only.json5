@@ -22,6 +22,8 @@
         pageInfo: {
           hasNextPage: false,
           hasPreviousPage: true,
+          startCursor: "WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAwMDBjYTcwIl0=",
+          endCursor: "WyJmMGIyOGM5NGMxIiwiY2E3MGNhNzAtMDAwMC0wMDAwLTAwMDAtY2VjMTExYTBjYTcwIl0=",
         },
         totalCount: 3,
       },
@@ -33,6 +35,8 @@
         pageInfo: {
           hasNextPage: false,
           hasPreviousPage: false,
+          startCursor: "WyJmMGIyOGM5NGMxIixudWxsXQ==",
+          endCursor: "WyJmMGIyOGM5NGMxIixudWxsXQ==",
         },
         totalCount: 0,
       },
