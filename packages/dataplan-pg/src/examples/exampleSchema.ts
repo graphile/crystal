@@ -12,9 +12,7 @@ import type {
   ExecutablePlan,
   InputObjectPlan,
   InputStaticLeafPlan,
-  PageInfoCapablePlan,
 } from "graphile-crystal";
-import { BasePlan } from "graphile-crystal";
 import {
   __ValuePlan,
   aether,
