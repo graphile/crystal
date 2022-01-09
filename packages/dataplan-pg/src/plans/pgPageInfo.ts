@@ -3,9 +3,17 @@ import type {
   CrystalValuesList,
   PageInfoCapablePlan,
 } from "graphile-crystal";
-import { ConnectionPlan, constant, ExecutablePlan } from "graphile-crystal";
+import {
+  ConnectionPlan,
+  constant,
+  ExecutablePlan,
+  first,
+  last,
+} from "graphile-crystal";
 
+import type { PgCursorPlan } from "./pgCursor";
 import type { PgSelectPlan } from "./pgSelect";
+import { PgSelectSinglePlan } from "./pgSelectSingle";
 
 // PLEASE SEE pgPageInfo.md!
 
@@ -99,6 +107,22 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
     } else {
       return constant(false);
     }
+  }
+
+  startCursor(): PgCursorPlan<PgSelectSinglePlan<any, any, any, any>> {
+    const $connection = this.getConnectionPlan() as ConnectionPlan<
+      PgSelectPlan<any, any, any, any>
+    >;
+    const $rows = $connection.cloneSubplanWithPagination();
+    return new PgSelectSinglePlan($rows, first($rows)).cursor();
+  }
+
+  endCursor(): PgCursorPlan<PgSelectSinglePlan<any, any, any, any>> {
+    const $connection = this.getConnectionPlan() as ConnectionPlan<
+      PgSelectPlan<any, any, any, any>
+    >;
+    const $rows = $connection.cloneSubplanWithPagination();
+    return new PgSelectSinglePlan($rows, last($rows)).cursor();
   }
 
   execute(

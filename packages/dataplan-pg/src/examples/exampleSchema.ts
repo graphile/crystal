@@ -1835,6 +1835,14 @@ export function makeExampleSchema(
         type: new GraphQLNonNull(GraphQLBoolean),
         plan: EXPORTABLE(() => ($pageInfo) => $pageInfo.hasPreviousPage(), []),
       },
+      startCursor: {
+        type: GraphQLString,
+        plan: EXPORTABLE(() => ($pageInfo) => $pageInfo.startCursor(), []),
+      },
+      endCursor: {
+        type: GraphQLString,
+        plan: EXPORTABLE(() => ($pageInfo) => $pageInfo.endCursor(), []),
+      },
     },
   });
 
