@@ -7,6 +7,7 @@ import type {
   PgSource,
   PgSourceColumn,
   PgSourceColumns,
+  PgSourceParameter,
   PgSourceRelation,
   PgSourceRow,
 } from "../datasource";
@@ -45,7 +46,7 @@ export class PgSelectSinglePlan<
         ? PgSourceRelation<TColumns, any>
         : never;
     },
-    TParameters extends { [key: string]: any } | never = never,
+    TParameters extends PgSourceParameter[] | undefined = undefined,
   >
   extends ExecutablePlan<PgSourceRow<TColumns>>
   implements PgTypedExecutablePlan<PgTypeCodec<TColumns, any, any>>
@@ -458,7 +459,7 @@ export function pgSelectSingleFromRecord<
       ? PgSourceRelation<TColumns, any>
       : never;
   },
-  TParameters extends { [key: string]: any } | never = never,
+  TParameters extends PgSourceParameter[] | undefined = undefined,
 >(
   source: PgSource<TColumns, TUniques, TRelations, TParameters>,
   record: PgClassExpressionPlan<

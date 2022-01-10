@@ -23,7 +23,7 @@ declare global {
     }
 
     interface BuildInput {
-      pgSources: PgSource<any, any, any>[];
+      pgSources: PgSource<any, any, any, any>[];
     }
 
     interface Inflection {

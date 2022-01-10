@@ -129,6 +129,13 @@ export interface PgSourceRelation<
 
 export interface PgSourceExtensions {}
 
+export interface PgSourceParameter {
+  name: string;
+  codec: PgTypeCodec<any, any, any>;
+  required: boolean;
+  notNull?: boolean;
+}
+
 export interface PgSourceOptions<
   TColumns extends PgSourceColumns | undefined,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
@@ -137,17 +144,18 @@ export interface PgSourceOptions<
       ? PgSourceRelation<TColumns, any>
       : never;
   },
-  _TParameters extends { [key: string]: any } | never =
-    | { [key: string]: any }
-    | never,
+  TParameters extends PgSourceParameter[] | undefined = undefined,
 > {
   codec: PgTypeCodec<TColumns, any, any>;
   executor: PgExecutor;
   name: string;
-  source: SQL | ((...args: SQL[]) => SQL);
+  source: TParameters extends PgSourceParameter[]
+    ? (...args: SQL[]) => SQL
+    : SQL;
   uniques?: TUniques;
   relations?: TRelations | (() => TRelations);
   extensions?: PgSourceExtensions;
+  parameters?: TParameters;
 }
 
 /**
@@ -157,7 +165,7 @@ export interface PgSourceOptions<
 export class PgSourceBuilder<
   TColumns extends PgSourceColumns | undefined,
   TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
-  TParameters extends { [key: string]: any } | never = never,
+  TParameters extends PgSourceParameter[] | undefined = undefined,
 > {
   /** TypeScript hack, avoid. @internal */
   TColumns!: TColumns;
@@ -251,7 +259,7 @@ export class PgSource<
       ? PgSourceRelation<TColumns, any>
       : never;
   },
-  TParameters extends { [key: string]: any } | never = never,
+  TParameters extends PgSourceParameter[] | undefined = undefined,
 > {
   /** TypeScript hack, avoid. @internal */
   TColumns!: TColumns;
@@ -313,21 +321,21 @@ export class PgSource<
    */
   public alternativeSource<
     TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
-    TNewParameters extends { [key: string]: any } | never = never,
   >(overrideOptions: {
     name: string;
     source: SQL | ((...args: SQL[]) => SQL);
     uniques?: TUniques;
-  }): PgSource<TColumns, TUniques, TRelations, TNewParameters> {
+  }): PgSource<TColumns, TUniques, TRelations, TParameters> {
     const { name, source, uniques } = overrideOptions;
-    const { codec, executor, relations } = this._options;
+    const { codec, executor, relations, parameters } = this._options;
     return new PgSource({
       codec,
       executor,
       name,
-      source,
+      source: source as any,
       uniques,
       relations,
+      parameters,
     });
   }
 

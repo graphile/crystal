@@ -300,6 +300,11 @@ export function makeExampleSchema(
     }),
     [TYPES, col, sql],
   );
+  const forumCodec = EXPORTABLE(
+    (forumColumns, recordType, sql) =>
+      recordType(sql`app_public.forums`, forumColumns),
+    [forumColumns, recordType, sql],
+  );
 
   const messageColumns = EXPORTABLE(
     (TYPES, col, sql) => ({
@@ -351,20 +356,38 @@ export function makeExampleSchema(
         source: (...args) =>
           sql`app_public.unique_author_count(${sql.join(args, ", ")})`,
         name: "unique_author_count",
+        parameters: [
+          {
+            name: "featured",
+            required: false,
+            codec: TYPES.boolean,
+          },
+        ],
       }),
     [PgSource, TYPES, executor, sql],
   );
 
   const forumsUniqueAuthorCountSource = EXPORTABLE(
-    (PgSource, TYPES, executor, sql) =>
-      new PgSource({
+    (PgSource, TYPES, executor, forumCodec, sql) => new PgSource({
         executor,
         codec: TYPES.int,
         source: (...args) =>
           sql`app_public.forums_unique_author_count(${sql.join(args, ", ")})`,
         name: "forums_unique_author_count",
+        parameters: [
+          {
+            name: "forums",
+            required: true,
+            codec: forumCodec,
+          },
+          {
+            name: "featured",
+            required: false,
+            codec: TYPES.boolean,
+          },
+        ],
       }),
-    [PgSource, TYPES, executor, sql],
+    [PgSource, TYPES, executor, forumCodec, sql],
   );
 
   const scalarTextSource = EXPORTABLE(
@@ -403,15 +426,15 @@ export function makeExampleSchema(
   );
 
   const forumSource = EXPORTABLE(
-    (PgSource, executor, forumColumns, recordType, sql) =>
+    (PgSource, executor, forumCodec, sql) =>
       new PgSource({
         executor,
-        codec: recordType(sql`app_public.forums`, forumColumns),
+        codec: forumCodec,
         source: sql`app_public.forums`,
         name: "forums",
         uniques: [["id"]],
       }),
-    [PgSource, executor, forumColumns, recordType, sql],
+    [PgSource, executor, forumCodec, sql],
   );
 
   const usersMostRecentForumSource = EXPORTABLE(

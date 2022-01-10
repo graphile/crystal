@@ -8,6 +8,7 @@ import type {
   PgSource,
   PgSourceColumn,
   PgSourceColumns,
+  PgSourceParameter,
   PgSourceRelation,
 } from "../datasource";
 import type {
@@ -42,7 +43,7 @@ export class PgClassExpressionPlan<
         ? PgSourceRelation<TSourceColumns, any>
         : never;
     },
-    TParameters extends { [key: string]: any } | never = never,
+    TParameters extends PgSourceParameter[] | undefined = undefined,
   >
   extends ExecutablePlan<any>
   implements PgTypedExecutablePlan<TExpressionCodec>
@@ -97,7 +98,13 @@ export class PgClassExpressionPlan<
         `Received a non-string at index ${badStringIndex} to strings argument of ${this}.`,
       );
     }
-    this.source = table.source;
+    // TODO: fix this TypeScript cast
+    this.source = table.source as PgSource<
+      TSourceColumns,
+      TUniques,
+      TRelations,
+      any
+    >;
     this.tableId = this.addDependency(table);
 
     const fragments: SQL[] = dependencies.map((plan, i) => {
@@ -264,7 +271,7 @@ function pgClassExpression<
       ? PgSourceRelation<TSourceColumns, any>
       : never;
   },
-  TParameters extends { [key: string]: any } | never = never,
+  TParameters extends PgSourceParameter[] | undefined = undefined,
 >(
   table: PgClassSinglePlan<TSourceColumns, TUniques, TRelations, TParameters>,
   codec: TExpressionCodec,

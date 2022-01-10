@@ -35,6 +35,7 @@ export {
   PgSourceColumnVia,
   PgSourceColumnViaExplicit,
   PgSourceExtensions,
+  PgSourceParameter,
   PgSourceRelation,
   PgSourceRelationExtensions,
 } from "./datasource";

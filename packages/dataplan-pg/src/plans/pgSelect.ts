@@ -36,6 +36,7 @@ import sql, { arraysMatch } from "pg-sql2";
 import type {
   PgSource,
   PgSourceColumns,
+  PgSourceParameter,
   PgSourceRelation,
   PgSourceRow,
 } from "../datasource";
@@ -94,7 +95,7 @@ type LockCallback<
       ? PgSourceRelation<TColumns, any>
       : never;
   },
-  TParameters extends { [key: string]: any } | never = never,
+  TParameters extends PgSourceParameter[] | undefined = undefined,
 > = (plan: PgSelectPlan<TColumns, TUniques, TRelations, TParameters>) => void;
 
 const debugPlan = debugFactory("datasource:pg:PgSelectPlan:plan");
@@ -247,7 +248,7 @@ export class PgSelectPlan<
         ? PgSourceRelation<TColumns, any>
         : never;
     },
-    TParameters extends { [key: string]: any } | never = never,
+    TParameters extends PgSourceParameter[] | undefined = undefined,
   >
   extends ExecutablePlan<ReadonlyArray<PgSourceRow<TColumns>>>
   implements
@@ -2519,7 +2520,7 @@ export function pgSelect<
       ? PgSourceRelation<TColumns, any>
       : never;
   },
-  TParameters extends { [key: string]: any } | never = never,
+  TParameters extends PgSourceParameter[] | undefined = undefined,
 >(
   options: PgSelectOptions<TColumns>,
 ): PgSelectPlan<TColumns, TUniques, TRelations, TParameters> {

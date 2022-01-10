@@ -1,7 +1,11 @@
 import type { ExecutablePlan } from "graphile-crystal";
 import type { SQL, SQLRawValue } from "pg-sql2";
 
-import type { PgSource, PgSourceColumns, PgSourceRelation } from "./datasource";
+import type {
+  PgSourceColumns,
+  PgSourceParameter,
+  PgSourceRelation,
+} from "./datasource";
 import type { PgDeletePlan } from "./plans/pgDelete";
 import type { PgInsertPlan } from "./plans/pgInsert";
 import type { PgSelectSinglePlan } from "./plans/pgSelectSingle";
@@ -19,7 +23,7 @@ export type PgClassSinglePlan<
       ? PgSourceRelation<TColumns, any>
       : never;
   },
-  TParameters extends { [key: string]: any } | never = never,
+  TParameters extends PgSourceParameter[] | undefined = undefined,
 > =
   | PgSelectSinglePlan<TColumns, TUniques, TRelations, TParameters>
   | PgInsertPlan<TColumns, TUniques, TRelations>

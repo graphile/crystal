@@ -3,6 +3,7 @@ import "graphile-build";
 import type {
   PgSource,
   PgSourceColumns,
+  PgSourceParameter,
   PgSourceRelation,
   PgTypeCodec,
 } from "@dataplan/pg";
@@ -98,7 +99,7 @@ function resolveSource<
       ? PgSourceRelation<TColumns, any>
       : never;
   },
-  TParameters extends { [key: string]: any } | never = never,
+  TParameters extends PgSourceParameter[] | undefined = undefined,
 >(
   source:
     | PgSource<TColumns, TUniques, TRelations, TParameters>

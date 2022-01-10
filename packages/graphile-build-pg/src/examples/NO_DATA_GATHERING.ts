@@ -1,9 +1,6 @@
 /* eslint-disable no-restricted-syntax */
-import type {
-  PgExecutorContextPlans,
-  PgSourceColumns,
-  WithPgClient,
-} from "@dataplan/pg";
+import type { PgExecutorContextPlans, WithPgClient } from "@dataplan/pg";
+import { PgSource, PgSourceColumns } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
 import { PgExecutor, recordType, TYPES } from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
@@ -274,9 +271,70 @@ async function main() {
     [forumsSource, messagesSourceBuilder, usersSource],
   );
 
+  const uniqueAuthorCountSource = EXPORTABLE(
+    (PgSource, TYPES, executor, sql) =>
+      new PgSource({
+        executor,
+        codec: TYPES.int,
+        source: (...args) =>
+          sql`app_public.unique_author_count(${sql.join(args, ", ")})`,
+        name: "unique_author_count",
+        parameters: [
+          {
+            name: "featured",
+            required: false,
+            codec: TYPES.boolean,
+          },
+        ],
+        extensions: {
+          tags: {
+            behavior: ["query_field"],
+          },
+        },
+      }),
+    [PgSource, TYPES, executor, sql],
+  );
+
+  const forumsUniqueAuthorCountSource = EXPORTABLE(
+    (PgSource, TYPES, executor, forumsCodec, sql) =>
+      new PgSource({
+        executor,
+        codec: TYPES.int,
+        source: (...args) =>
+          sql`app_public.forums_unique_author_count(${sql.join(args, ", ")})`,
+        name: "forums_unique_author_count",
+        parameters: [
+          {
+            name: "forum",
+            codec: forumsCodec,
+            required: true,
+            notNull: true,
+          },
+          {
+            name: "featured",
+            codec: TYPES.boolean,
+            required: false,
+            notNull: false,
+          },
+        ],
+        extensions: {
+          tags: {
+            behavior: ["type_field"],
+          },
+        },
+      }),
+    [PgSource, TYPES, executor, forumsCodec, sql],
+  );
+
   // We're crafting our own input
   const input: GraphileEngine.BuildInput = {
-    pgSources: [usersSource, forumsSource, messagesSource],
+    pgSources: [
+      usersSource,
+      forumsSource,
+      messagesSource,
+      uniqueAuthorCountSource,
+      forumsUniqueAuthorCountSource,
+    ],
   };
   const schema = buildSchema(config, input);
 

@@ -9,6 +9,7 @@ import type { GraphQLObjectType } from "graphql";
 
 import type {
   PgSourceColumns,
+  PgSourceParameter,
   PgSourceRelation,
   PgSourceRow,
 } from "../datasource";
@@ -22,7 +23,7 @@ export class PgSingleTablePolymorphicPlan<
         ? PgSourceRelation<TColumns, any>
         : never;
     },
-    TParameters extends { [key: string]: any } | never = never,
+    TParameters extends PgSourceParameter[] | undefined = undefined,
   >
   extends ExecutablePlan<any>
   implements PolymorphicPlan
@@ -78,7 +79,7 @@ export function pgSingleTablePolymorphic<
       ? PgSourceRelation<TColumns, any>
       : never;
   },
-  TParameters extends { [key: string]: any } | never = never,
+  TParameters extends PgSourceParameter[] | undefined = undefined,
 >(
   $typePlan: ExecutablePlan<string>,
   $rowPlan: PgSelectSinglePlan<TColumns, TUniques, TRelations, TParameters>,
