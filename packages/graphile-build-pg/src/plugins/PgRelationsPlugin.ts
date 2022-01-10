@@ -1,8 +1,9 @@
 import "graphile-build";
 
-import type {
+import {
   PgSelectSinglePlan,
   PgSource,
+  PgSourceBuilder,
   PgSourceRelation,
   PgTypeCodec,
 } from "@dataplan/pg";
@@ -10,6 +11,7 @@ import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 
 import { version } from "../index.js";
+import { GraphQLObjectType } from "graphql";
 
 declare global {
   namespace GraphileEngine {
@@ -49,6 +51,7 @@ export const PgRelationsPlugin: Plugin = {
         const {
           Self,
           scope: { isPgTableType, pgCodec: codec },
+          fieldWithHooks,
         } = context;
         if (!isPgTableType || !codec) {
           return fields;
@@ -66,8 +69,12 @@ export const PgRelationsPlugin: Plugin = {
               isUnique,
               localColumns,
               remoteColumns,
-              source: otherSource,
+              source: otherSourceOrBuilder,
             } = relation;
+            const otherSource =
+              otherSourceOrBuilder instanceof PgSourceBuilder
+                ? otherSourceOrBuilder.get()
+                : otherSourceOrBuilder;
             const otherCodec = otherSource.codec;
             const typeName = build.inflection.tableType(otherCodec);
             const OtherType = build.getOutputTypeByName(typeName);
@@ -77,35 +84,41 @@ export const PgRelationsPlugin: Plugin = {
             let fields = memo;
             // TODO: add behaviour check here!
             if (isUnique) {
+              const fieldName = build.inflection.singleRelation({
+                source,
+                codec,
+                identifier,
+                relation,
+              });
               fields = extend(
                 fields,
                 {
-                  [build.inflection.singleRelation({
-                    source,
-                    codec,
-                    identifier,
-                    relation,
-                  })]: {
-                    type: OtherType,
-                    plan: EXPORTABLE(
-                      (localColumns, otherSource, remoteColumns) =>
-                        function plan(
-                          $message: PgSelectSinglePlan<any, any, any, any>,
-                        ) {
-                          const spec = remoteColumns.reduce(
-                            (memo, remoteColumnName, i) => {
-                              memo[remoteColumnName] = $message.get(
-                                localColumns[i] as string,
-                              );
-                              return memo;
-                            },
-                            {},
-                          );
-                          return otherSource.get(spec);
-                        },
-                      [localColumns, otherSource, remoteColumns],
-                    ),
-                  },
+                  [fieldName]: fieldWithHooks(
+                    {
+                      fieldName,
+                    },
+                    {
+                      type: OtherType as GraphQLObjectType,
+                      plan: EXPORTABLE(
+                        (localColumns, otherSource, remoteColumns) =>
+                          function plan(
+                            $message: PgSelectSinglePlan<any, any, any, any>,
+                          ) {
+                            const spec = remoteColumns.reduce(
+                              (memo, remoteColumnName, i) => {
+                                memo[remoteColumnName] = $message.get(
+                                  localColumns[i] as string,
+                                );
+                                return memo;
+                              },
+                              {},
+                            );
+                            return otherSource.get(spec);
+                          },
+                        [localColumns, otherSource, remoteColumns],
+                      ),
+                    },
+                  ),
                 },
                 `Adding '${identifier}' relation to ${Self.name}`,
               );
