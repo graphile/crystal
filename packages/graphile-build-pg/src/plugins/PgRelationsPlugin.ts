@@ -1,18 +1,20 @@
 import "graphile-build";
 
-import {
+import type {
   PgSelectSinglePlan,
   PgSource,
-  PgSourceBuilder,
   PgSourceRelation,
   PgTypeCodec,
 } from "@dataplan/pg";
+import { PgSourceBuilder } from "@dataplan/pg";
+import { connection } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
+import type { GraphQLObjectType } from "graphql";
+import { GraphQLList } from "graphql";
 
-import { version } from "../index.js";
-import { GraphQLList, GraphQLObjectType } from "graphql";
 import { getBehavior } from "../behavior.js";
+import { version } from "../index.js";
 
 interface RelationDetails {
   source: PgSource<any, any, any, any>;
@@ -101,7 +103,8 @@ export const PgRelationsPlugin: Plugin = {
             }
             let fields = memo;
             const behavior =
-              getBehavior(extensions) ?? isUnique ? ["single"] : ["connection"];
+              getBehavior(extensions) ??
+              (isUnique ? ["single"] : ["connection"]);
 
             const relationDetails: RelationDetails = {
               source,
@@ -128,7 +131,7 @@ export const PgRelationsPlugin: Plugin = {
               [localColumns, otherSource, remoteColumns],
             );
 
-            const connectionAndListPlan = EXPORTABLE(
+            const listPlan = EXPORTABLE(
               (localColumns, otherSource, remoteColumns) =>
                 function plan(
                   $message: PgSelectSinglePlan<any, any, any, any>,
@@ -145,6 +148,25 @@ export const PgRelationsPlugin: Plugin = {
                   return otherSource.find(spec);
                 },
               [localColumns, otherSource, remoteColumns],
+            );
+
+            const connectionPlan = EXPORTABLE(
+              (connection, localColumns, otherSource, remoteColumns) =>
+                function plan(
+                  $message: PgSelectSinglePlan<any, any, any, any>,
+                ) {
+                  const spec = remoteColumns.reduce(
+                    (memo, remoteColumnName, i) => {
+                      memo[remoteColumnName] = $message.get(
+                        localColumns[i] as string,
+                      );
+                      return memo;
+                    },
+                    {},
+                  );
+                  return connection(otherSource.find(spec));
+                },
+              [connection, localColumns, otherSource, remoteColumns],
             );
 
             if (isUnique && behavior.includes("single")) {
@@ -190,7 +212,7 @@ export const PgRelationsPlugin: Plugin = {
                       {
                         // TODO: handle nullability
                         type: ConnectionType as GraphQLObjectType,
-                        plan: connectionAndListPlan,
+                        plan: connectionPlan,
                       },
                     ),
                   },
@@ -214,7 +236,7 @@ export const PgRelationsPlugin: Plugin = {
                     {
                       // TODO: handle nullability x2
                       type: new GraphQLList(OtherType),
-                      plan: connectionAndListPlan,
+                      plan: listPlan,
                     },
                   ),
                 },
