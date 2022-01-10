@@ -171,8 +171,9 @@ class CodegenFile {
   }
 
   makeVariable(preferredName: string): t.Identifier {
+    const allowedName = preferredName.replace(/[^_a-z0-9]+/gi, "_");
     for (let i = 0; i < 10000; i++) {
-      const variableName = preferredName + (i > 0 ? String(i + 1) : "");
+      const variableName = allowedName + (i > 0 ? String(i + 1) : "");
       if (!this._variables[variableName]) {
         this._variables[variableName] = true;
         return t.identifier(variableName);
