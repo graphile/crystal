@@ -303,6 +303,13 @@ async function main() {
             archivedAt
           }
         }
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          startCursor
+          endCursor
+        }
+        totalCount
       }
       allUsersList {
         id
