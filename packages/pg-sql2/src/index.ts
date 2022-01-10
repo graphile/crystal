@@ -750,7 +750,7 @@ export function parens(fragment: SQL, force = false): SQL {
       // Pretend that the child was just a single node
       return parens(fragment[0]!, force);
     } else {
-      // Normal behaviour (fall through)
+      // Normal behavior (fall through)
     }
   } else if (fragment.type === "PARENS") {
     if (fragment.force || !force) {
@@ -767,10 +767,10 @@ export function parens(fragment: SQL, force = false): SQL {
         if (inner.type === "PARENS" && !inner.force) {
           return makeParensNode(inner.content, force);
         } else {
-          // Normal behaviour (fall through)
+          // Normal behavior (fall through)
         }
       } else {
-        // Normal behaviour (fall through)
+        // Normal behavior (fall through)
       }
     } else if (fragment.content.type === "PARENS" && !fragment.content.force) {
       return makeParensNode(fragment.content.content, force);

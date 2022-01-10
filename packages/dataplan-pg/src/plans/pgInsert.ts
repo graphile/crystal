@@ -305,7 +305,7 @@ export class PgInsertPlan<
        * select ... order by ... returning ...` is the same order as the
        * `order by` was, however this is not guaranteed in the documentation
        * and as such cannot be relied upon. Further the pgsql-hackers list
-       * explicitly declined guaranteeing this behaviour:
+       * explicitly declined guaranteeing this behavior:
        *
        * https://www.postgresql.org/message-id/CAKFQuwbgdJ_xNn0YHWGR0D%2Bv%2B3mHGVqJpG_Ejt96KHoJjs6DkA%40mail.gmail.com
        *

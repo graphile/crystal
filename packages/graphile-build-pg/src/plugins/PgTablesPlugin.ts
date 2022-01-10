@@ -8,7 +8,7 @@ import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
 import type { GraphQLOutputType } from "graphql";
 import sql from "pg-sql2";
 
-import { getBehavior } from "../behaviour";
+import { getBehavior } from "../behavior";
 import { version } from "../index";
 import type { PgClass } from "../introspection";
 
@@ -35,7 +35,7 @@ declare global {
        *
        * @remarks The method beginning with `_` implies it's not ment to
        * be called directly, instead it's called from other inflectors to give
-       * them common behaviour.
+       * them common behavior.
        */
       _codecName(this: Inflection, codec: PgTypeCodec<any, any, any>): string;
 
@@ -48,7 +48,7 @@ declare global {
        *
        * @remarks The method beginning with `_` implies it's not ment to
        * be called directly, instead it's called from other inflectors to give
-       * them common behaviour.
+       * them common behavior.
        */
       _singularizedCodecName(
         this: Inflection,

@@ -11,7 +11,7 @@ import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import sql from "pg-sql2";
 
-import { getBehavior } from "../behaviour";
+import { getBehavior } from "../behavior";
 import { version } from "../index";
 
 declare global {
@@ -23,7 +23,7 @@ declare global {
        *
        * @remarks The method beginning with `_` implies it's not ment to
        * be called directly, instead it's called from other inflectors to give
-       * them common behaviour.
+       * them common behavior.
        */
       _columnName(
         this: GraphileEngine.Inflection,

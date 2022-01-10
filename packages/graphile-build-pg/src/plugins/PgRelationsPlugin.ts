@@ -84,7 +84,7 @@ export const PgRelationsPlugin: Plugin = {
             let fields = memo;
             if (
               isUnique
-              // TODO: add behaviour check here!
+              // TODO: add behavior check here!
             ) {
               const fieldName = build.inflection.singleRelation({
                 source,

@@ -21,7 +21,7 @@ export function getBehavior(
     return null;
   }
   if (Array.isArray(behavior)) {
-    if (isDev && !behavior.every(isValidBehaviour)) {
+    if (isDev && !behavior.every(isValidBehavior)) {
       throw new Error(
         `Invalid value for behavior; expected a string or string array using simple alphanumeric strings, but found ${inspect(
           behavior,
@@ -30,7 +30,7 @@ export function getBehavior(
     }
     return behavior;
   }
-  if (isValidBehaviour(behavior)) {
+  if (isValidBehavior(behavior)) {
     return [behavior];
   }
   throw new Error(
@@ -48,7 +48,7 @@ export function getBehavior(
  *
  * @internal
  */
-function isValidBehaviour(behavior: unknown): behavior is string {
+function isValidBehavior(behavior: unknown): behavior is string {
   return (
     typeof behavior === "string" &&
     /^[a-zA-Z]([-_]?[a-zA-Z0-9])+$/.test(behavior)

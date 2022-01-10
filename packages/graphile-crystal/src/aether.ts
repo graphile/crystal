@@ -268,7 +268,7 @@ export class Aether<
    * The field at each given path identity may be in one or more groups; these
    * groups govern how the plans run (e.g. a plan will likely not optimise
    * itself into a parent plan in a different group). Groups are advanced by
-   * features such as `@stream` and `@defer`. This behaviour ensures that only
+   * features such as `@stream` and `@defer`. This behavior ensures that only
    * the logic required at each stage is executed at those stages.
    */
   public readonly groupIdsByPathIdentity: {
