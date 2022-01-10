@@ -14,13 +14,14 @@ import { inspect } from "util";
  * property and coerces it to be a string array. Returns null if no behavior
  * was specified (in which case the default behavior should be used).
  */
-export function getBehavior(
-  extensions:
-    | Partial<PgSourceExtensions>
-    | Partial<PgSourceRelationExtensions>
-    | Partial<PgTypeCodecExtensions>
-    | undefined,
-): string[] | null {
+export function getBehavior<
+  TExtensions extends
+    | PgSourceExtensions
+    | PgSourceRelationExtensions
+    | PgTypeCodecExtensions,
+>(
+  extensions: Partial<TExtensions> | undefined,
+): TExtensions["tags"]["behavior"] | null {
   const behavior = extensions?.tags?.behavior || extensions?.tags?.behaviour;
   if (behavior == null) {
     return null;
