@@ -506,13 +506,13 @@ const CACHE_SIMPLE_FRAGMENTS = new Map<string, SQLRawNode>();
  * Note that using this function, the user *must* specify if they are injecting
  * raw text. This makes a SQL injection vulnerability harder to create.
  */
-export function query(
+const sqlBase = function sql(
   strings: TemplateStringsArray,
   ...values: Array<SQL>
 ): SQL {
   if (!Array.isArray(strings) || !strings.raw) {
     throw new Error(
-      "[pg-sql2] sql.query should be used as a template literal, not a function call.",
+      "[pg-sql2] sql should be used as a template literal, not a function call.",
     );
   }
   const first = strings[0];
@@ -557,7 +557,7 @@ export function query(
     }
   }
   return items;
-}
+};
 
 let sqlRawWarningOutput = false;
 /**
@@ -944,11 +944,15 @@ function identifiersAreEquivalent(
   return namesMatch && symbolsMatch;
 }
 
+export const sql = sqlBase as PgSQL;
+export default sql;
+
 export {
   falseNode as false,
-  query as fragment,
+  sql as fragment,
   isSQL,
   nullNode as null,
+  sql as query,
   trueNode as true,
 };
 
@@ -957,7 +961,7 @@ export interface PgSQL {
   escapeSqlIdentifier: typeof escapeSqlIdentifier;
   compile: typeof compile;
   isEquivalent: typeof isEquivalent;
-  query: typeof query;
+  query: PgSQL;
   raw: typeof raw;
   identifier: typeof identifier;
   value: typeof value;
@@ -969,7 +973,7 @@ export interface PgSQL {
   symbolAlias: typeof symbolAlias;
   placeholder: typeof placeholder;
   blank: typeof blank;
-  fragment: typeof query;
+  fragment: PgSQL;
   true: typeof trueNode;
   false: typeof falseNode;
   null: typeof nullNode;
@@ -978,11 +982,11 @@ export interface PgSQL {
 }
 
 const attributes = {
-  sql: query as PgSQL,
+  sql,
   escapeSqlIdentifier,
   compile,
   isEquivalent,
-  query,
+  query: sql,
   raw,
   identifier,
   value,
@@ -994,7 +998,7 @@ const attributes = {
   symbolAlias,
   placeholder,
   blank,
-  fragment: query,
+  fragment: sql,
   true: trueNode,
   false: falseNode,
   null: nullNode,
@@ -1007,6 +1011,4 @@ Object.entries(attributes).forEach(([exportName, value]) => {
   }
 });
 
-export const sql: PgSQL = Object.assign(query, attributes);
-
-export default sql;
+Object.assign(sqlBase, attributes);
