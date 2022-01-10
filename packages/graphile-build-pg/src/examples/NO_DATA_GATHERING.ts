@@ -4,7 +4,8 @@ import type {
   PgSourceColumns,
   WithPgClient,
 } from "@dataplan/pg";
-import { PgExecutor, PgSource, recordType, TYPES } from "@dataplan/pg";
+import { PgSourceBuilder } from "@dataplan/pg";
+import { PgExecutor, recordType, TYPES } from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import chalk from "chalk";
 import { readFile } from "fs/promises";
@@ -66,50 +67,186 @@ async function main() {
     },
   ]);
 
-  const appPublicForumsColumns: PgSourceColumns = {
-    id: {
-      codec: TYPES.uuid,
-      notNull: true,
-      extensions: {
-        tags: {
-          hasDefault: true,
+  const usersCodec = EXPORTABLE(
+    (TYPES, recordType, sql) =>
+      recordType(sql`app_public.users`, {
+        id: {
+          codec: TYPES.uuid,
+          notNull: true,
+          extensions: {
+            tags: {
+              hasDefault: true,
+            },
+          },
         },
-      },
-    },
-    name: {
-      codec: TYPES.text,
-      notNull: true,
-    },
-    archived_at: {
-      codec: TYPES.timestamptz,
-      notNull: false,
-    },
-  };
-  const mainAppPublicForumsCodec = EXPORTABLE(
-    (appPublicForumsColumns, recordType, sql) =>
-      recordType(sql`app_public.forums`, appPublicForumsColumns, {
-        tags: {
-          name: "forums",
+        username: {
+          codec: TYPES.text,
+          notNull: true,
+        },
+        gravatar_url: {
+          codec: TYPES.text,
+          notNull: false,
+        },
+        created_at: {
+          codec: TYPES.timestamptz,
+          notNull: true,
         },
       }),
-    [appPublicForumsColumns, recordType, sql],
+    [TYPES, recordType, sql],
   );
+
+  const forumsCodec = EXPORTABLE(
+    (TYPES, recordType, sql) =>
+      recordType(
+        sql`app_public.forums`,
+        {
+          id: {
+            codec: TYPES.uuid,
+            notNull: true,
+            extensions: {
+              tags: {
+                hasDefault: true,
+              },
+            },
+          },
+          name: {
+            codec: TYPES.text,
+            notNull: true,
+          },
+          archived_at: {
+            codec: TYPES.timestamptz,
+            notNull: false,
+          },
+        },
+        {
+          tags: {
+            name: "forums",
+          },
+        },
+      ),
+    [TYPES, recordType, sql],
+  );
+
+  const messagesCodec = EXPORTABLE(
+    (TYPES, recordType, sql) =>
+      recordType(sql`app_public.messages`, {
+        id: {
+          codec: TYPES.uuid,
+          notNull: true,
+          extensions: {
+            tags: {
+              hasDefault: true,
+            },
+          },
+        },
+        forum_id: {
+          codec: TYPES.uuid,
+          notNull: true,
+        },
+        author_id: {
+          codec: TYPES.uuid,
+          notNull: true,
+        },
+        body: {
+          codec: TYPES.text,
+          notNull: true,
+        },
+        featured: {
+          codec: TYPES.boolean,
+          notNull: true,
+        },
+        created_at: {
+          codec: TYPES.timestamptz,
+          notNull: true,
+        },
+        archived_at: {
+          codec: TYPES.timestamptz,
+          notNull: false,
+        },
+      }),
+    [TYPES, recordType, sql],
+  );
+
+  const usersSourceBuilder = EXPORTABLE(
+    (PgSourceBuilder, executor, usersCodec) =>
+      new PgSourceBuilder({
+        name: "users",
+        executor,
+        source: usersCodec.sqlType,
+        codec: usersCodec,
+        uniques: [["id"]],
+      }),
+    [PgSourceBuilder, executor, usersCodec],
+  );
+
+  const forumsSourceBuilder = EXPORTABLE(
+    (PgSourceBuilder, executor, forumsCodec) =>
+      new PgSourceBuilder({
+        //name: "main.app_public.forums",
+        name: "forums",
+        executor,
+        source: forumsCodec.sqlType,
+        codec: forumsCodec,
+        uniques: [["id"]],
+      }),
+    [PgSourceBuilder, executor, forumsCodec],
+  );
+
+  const messagesSourceBuilder = EXPORTABLE(
+    (PgSourceBuilder, executor, messagesCodec) =>
+      new PgSourceBuilder({
+        name: "messages",
+        executor,
+        source: messagesCodec.sqlType,
+        codec: messagesCodec,
+        uniques: [["id"]],
+      }),
+    [PgSourceBuilder, executor, messagesCodec],
+  );
+
+  const usersSource = EXPORTABLE((messagesSourceBuilder, usersSourceBuilder) => usersSourceBuilder.build({
+      relations: {
+        messages: {
+          source: messagesSourceBuilder,
+          isUnique: false,
+          localColumns: ["id"],
+          remoteColumns: ["author_id"],
+        },
+      },
+    }),
+  [messagesSourceBuilder, usersSourceBuilder]);
+  const forumsSource = EXPORTABLE((forumsSourceBuilder, messagesSourceBuilder) => forumsSourceBuilder.build({
+      relations: {
+        messages: {
+          source: messagesSourceBuilder,
+          isUnique: false,
+          localColumns: ["id"],
+          remoteColumns: ["forum_id"],
+        },
+      },
+    }),
+  [forumsSourceBuilder, messagesSourceBuilder]);
+  const messagesSource = EXPORTABLE((forumsSource, messagesSourceBuilder, usersSource) => messagesSourceBuilder.build({
+      relations: {
+        author: {
+          source: usersSource,
+          isUnique: true,
+          localColumns: ["author_id"],
+          remoteColumns: ["id"],
+        },
+        forum: {
+          source: forumsSource,
+          isUnique: true,
+          localColumns: ["forum_id"],
+          remoteColumns: ["id"],
+        },
+      },
+    }),
+  [forumsSource, messagesSourceBuilder, usersSource]);
+
   // We're crafting our own input
   const input: GraphileEngine.BuildInput = {
-    pgSources: [
-      EXPORTABLE(
-        (PgSource, executor, mainAppPublicForumsCodec, sql) =>
-          new PgSource({
-            //name: "main.app_public.forums",
-            name: "forums",
-            executor,
-            source: sql`app_public.forums`,
-            codec: mainAppPublicForumsCodec,
-            uniques: [["id"]],
-          }),
-        [PgSource, executor, mainAppPublicForumsCodec, sql],
-      ),
-    ],
+    pgSources: [usersSource, forumsSource, messagesSource],
   };
   const schema = buildSchema(config, input);
 
@@ -141,6 +278,12 @@ async function main() {
             archivedAt
           }
         }
+      }
+      allUsersList {
+        id
+        username
+        gravatarUrl
+        createdAt
       }
     }
   `;
