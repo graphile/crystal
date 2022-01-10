@@ -352,7 +352,7 @@ export type GraphileFieldConfig<
   TType extends GraphQLOutputType,
   TContext extends BaseGraphQLContext,
   TParentPlan extends ExecutablePlan<any> | null,
-  TFieldPlan extends OutputPlanForType<TType>,
+  TFieldPlan extends ExecutablePlan<any>, // TODO: should be OutputPlanForType<TType>, but that results in everything thinking it should be a ListPlan
   TArgs extends BaseGraphQLArguments,
 > = Omit<GraphQLFieldConfig<any, any>, "args" | "type"> & {
   type: TType;
@@ -372,10 +372,10 @@ export type GraphileFieldConfig<
 };
 
 export type GraphileFieldConfigArgumentMap<
-  TType extends GraphQLOutputType,
+  _TType extends GraphQLOutputType,
   TContext extends BaseGraphQLContext,
   TParentPlan extends ExecutablePlan<any> | null,
-  TFieldPlan extends OutputPlanForType<TType>,
+  TFieldPlan extends ExecutablePlan<any>, // TODO: should be OutputPlanForType<_TType>, but that results in everything thinking it should be a ListPlan
 > = {
   [argName: string]: GraphileArgumentConfig<
     any,
