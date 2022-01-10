@@ -476,7 +476,7 @@ export function pgSelectSingleFromRecord<
     source,
     identifiers: [],
     from: (record) => sql`(select (${record}).*)`,
-    args: [{ plan: record, type: source.codec.sqlType }],
+    args: [{ plan: record, pgCodec: source.codec }],
   }).single();
 }
 

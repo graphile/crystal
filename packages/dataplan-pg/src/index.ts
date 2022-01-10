@@ -64,7 +64,7 @@ export { pgDelete, PgDeletePlan } from "./plans/pgDelete";
 export { pgInsert, PgInsertPlan } from "./plans/pgInsert";
 export { pgPageInfo, PgPageInfoPlan } from "./plans/pgPageInfo";
 export { pgPolymorphic, PgPolymorphicPlan } from "./plans/pgPolymorphic";
-export { pgSelect, PgSelectPlan } from "./plans/pgSelect";
+export { pgSelect, PgSelectArgumentSpec, PgSelectPlan } from "./plans/pgSelect";
 export {
   pgSelectSingleFromRecord,
   PgSelectSinglePlan,

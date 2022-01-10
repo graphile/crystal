@@ -368,7 +368,8 @@ export function makeExampleSchema(
   );
 
   const forumsUniqueAuthorCountSource = EXPORTABLE(
-    (PgSource, TYPES, executor, forumCodec, sql) => new PgSource({
+    (PgSource, TYPES, executor, forumCodec, sql) =>
+      new PgSource({
         executor,
         codec: TYPES.int,
         source: (...args) =>
@@ -2382,7 +2383,7 @@ export function makeExampleSchema(
                   },
                   {
                     plan: $featured,
-                    type: TYPES.boolean.sqlType,
+                    pgCodec: TYPES.boolean,
                   },
                 ],
               })
@@ -3363,7 +3364,7 @@ export function makeExampleSchema(
                 args: [
                   {
                     plan: $featured,
-                    type: TYPES.boolean.sqlType,
+                    pgCodec: TYPES.boolean,
                     name: "featured",
                   },
                 ],
@@ -3662,7 +3663,7 @@ export function makeExampleSchema(
                 args: [
                   {
                     plan: args.query,
-                    type: TYPES.text.sqlType,
+                    pgCodec: TYPES.text,
                     name: "query",
                   },
                 ],
@@ -3988,11 +3989,11 @@ export function makeExampleSchema(
                   args: [
                     {
                       plan: constant(2),
-                      type: TYPES.int.sqlType,
+                      pgCodec: TYPES.int,
                     },
                     {
                       plan: constant(`Computed post #${i + 1}`),
-                      type: TYPES.text.sqlType,
+                      pgCodec: TYPES.text,
                     },
                   ],
                 });

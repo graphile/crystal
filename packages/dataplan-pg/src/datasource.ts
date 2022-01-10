@@ -156,6 +156,7 @@ export interface PgSourceOptions<
   relations?: TRelations | (() => TRelations);
   extensions?: PgSourceExtensions;
   parameters?: TParameters;
+  description?: string;
 }
 
 /**
@@ -283,6 +284,8 @@ export class PgSource<
   >;
   private relationsThunk: (() => TRelations) | null;
   private _relations: TRelations | null = null;
+  public readonly parameters: TParameters;
+  public readonly description: string | undefined;
 
   public readonly extensions: Partial<PgSourceExtensions> | undefined;
 
@@ -296,8 +299,17 @@ export class PgSource<
   constructor(
     options: PgSourceOptions<TColumns, TUniques, TRelations, TParameters>,
   ) {
-    const { codec, executor, name, source, uniques, relations, extensions } =
-      options;
+    const {
+      codec,
+      executor,
+      name,
+      source,
+      uniques,
+      relations,
+      extensions,
+      parameters,
+      description,
+    } = options;
     this._options = options;
     this.extensions = extensions;
     this.codec = codec;
@@ -311,6 +323,8 @@ export class PgSource<
       this._relations = relations || ({} as TRelations);
       this.validateRelations();
     }
+    this.parameters = parameters as TParameters;
+    this.description = description;
   }
 
   /**

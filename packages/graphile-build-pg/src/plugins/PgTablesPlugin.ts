@@ -68,6 +68,7 @@ declare global {
 
     interface ScopeGraphQLObjectType {
       pgCodec?: PgTypeCodec<any, any, any>;
+      // TODO: rename this to isPgClassType?
       isPgTableType?: boolean;
       isConnectionType?: true;
       isPgRowConnectionType?: true;

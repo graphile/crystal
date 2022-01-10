@@ -44,6 +44,7 @@ import { PgSourceBuilder } from "../datasource";
 import type {
   PgGroupSpec,
   PgOrderSpec,
+  PgTypeCodec,
   PgTypedExecutablePlan,
 } from "../interfaces";
 import { PgClassExpressionPlan } from "./pgClassExpression";
@@ -146,15 +147,14 @@ type PgSelectIdentifierSpec =
       matches: (alias: SQL) => SQL;
     };
 
-type PgSelectArgumentSpec =
+export type PgSelectArgumentSpec =
   | {
       plan: ExecutablePlan<any>;
-      type: SQL;
+      pgCodec: PgTypeCodec<any, any, any>;
       name?: string;
     }
   | {
       plan: PgTypedExecutablePlan<any>;
-      type?: SQL;
       name?: string;
     };
 
@@ -593,8 +593,9 @@ export class PgSelectPlan<
           }
           const { plan, name } = identifier;
           const type =
-            identifier.type ||
-            (plan as PgTypedExecutablePlan<any>).pgCodec.sqlType;
+            "pgCodec" in identifier
+              ? identifier.pgCodec.sqlType
+              : identifier.plan.pgCodec.sqlType;
           const placeholder = this.placeholder(plan, type);
           if (name) {
             argIndex = null;

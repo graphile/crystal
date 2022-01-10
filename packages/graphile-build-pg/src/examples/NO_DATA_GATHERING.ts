@@ -320,6 +320,7 @@ async function main() {
         extensions: {
           tags: {
             behavior: ["type_field"],
+            name: "unique_author_count",
           },
         },
       }),
@@ -407,6 +408,7 @@ async function main() {
         archivedAt
         forum {
           name
+          uniqueAuthorCount
         }
         author {
           username

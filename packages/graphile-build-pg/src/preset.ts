@@ -9,6 +9,7 @@ import { PgRelationsPlugin } from "./plugins/PgRelationsPlugin";
 import { PgTablesPlugin } from "./plugins/PgTablesPlugin";
 import { PgTypesPlugin } from "./plugins/PgTypesPlugin";
 import { PgColumnDeprecationPlugin } from "./plugins/PgColumnDeprecationPlugin";
+import { PgCustomTypeFieldPlugin } from "./plugins/PgCustomTypeFieldPlugin";
 
 export const defaultPreset: Preset = {
   plugins: [
@@ -21,5 +22,6 @@ export const defaultPreset: Preset = {
     PgConnectionTotalCountPlugin,
     PgRelationsPlugin,
     PgColumnDeprecationPlugin,
+    PgCustomTypeFieldPlugin,
   ],
 };
