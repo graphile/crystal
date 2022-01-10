@@ -1,21 +1,9 @@
 import crypto from "crypto";
 // eslint-disable-next-line @typescript-eslint/no-duplicate-imports
 import * as _crypto from "crypto";
-import { BasePlan, ExecutablePlan, ModifierPlan } from "graphile-crystal";
-import graphql, {
-  GraphQLDirective,
-  GraphQLEnumType,
-  GraphQLInputObjectType,
-  GraphQLInterfaceType,
-  GraphQLList,
-  GraphQLNonNull,
-  GraphQLObjectType,
-  GraphQLScalarType,
-  GraphQLSchema,
-  GraphQLUnionType,
-  Kind,
-} from "graphql";
-import util, { inspect } from "util";
+import * as crystalStar from "graphile-crystal";
+import * as graphqlStar from "graphql";
+import util, * as utilStar from "util";
 
 interface $$Export {
   moduleName: string;
@@ -23,68 +11,24 @@ interface $$Export {
 }
 
 const wellKnownMap = new Map<unknown, $$Export>();
+
+function exportAll(obj: object, moduleName: string) {
+  for (const exportName of Object.keys(obj)) {
+    if (exportName !== "default" && !wellKnownMap.has(obj[exportName])) {
+      wellKnownMap.set(obj[exportName], {
+        moduleName,
+        exportName,
+      });
+    }
+  }
+}
+
 // TODO: fill this out a bit...
-
 wellKnownMap.set(crypto, { moduleName: "crypto", exportName: "default" });
-
 wellKnownMap.set(util, { moduleName: "util", exportName: "default" });
-wellKnownMap.set(inspect, { moduleName: "util", exportName: "inspect" });
-
-wellKnownMap.set(BasePlan, {
-  moduleName: "graphile-crystal",
-  exportName: "BasePlan",
-});
-wellKnownMap.set(ExecutablePlan, {
-  moduleName: "graphile-crystal",
-  exportName: "ExecutablePlan",
-});
-wellKnownMap.set(ModifierPlan, {
-  moduleName: "graphile-crystal",
-  exportName: "ModifierPlan",
-});
-
-wellKnownMap.set(graphql, { moduleName: "graphql", exportName: "default" });
-wellKnownMap.set(Kind, { moduleName: "graphql", exportName: "Kind" });
-wellKnownMap.set(GraphQLSchema, {
-  moduleName: "graphql",
-  exportName: "GraphQLSchema",
-});
-wellKnownMap.set(GraphQLDirective, {
-  moduleName: "graphql",
-  exportName: "GraphQLDirective",
-});
-wellKnownMap.set(GraphQLObjectType, {
-  moduleName: "graphql",
-  exportName: "GraphQLObjectType",
-});
-wellKnownMap.set(GraphQLInterfaceType, {
-  moduleName: "graphql",
-  exportName: "GraphQLInterfaceType",
-});
-wellKnownMap.set(GraphQLUnionType, {
-  moduleName: "graphql",
-  exportName: "GraphQLUnionType",
-});
-wellKnownMap.set(GraphQLInputObjectType, {
-  moduleName: "graphql",
-  exportName: "GraphQLInputObjectType",
-});
-wellKnownMap.set(GraphQLScalarType, {
-  moduleName: "graphql",
-  exportName: "GraphQLScalarType",
-});
-wellKnownMap.set(GraphQLEnumType, {
-  moduleName: "graphql",
-  exportName: "GraphQLEnumType",
-});
-wellKnownMap.set(GraphQLList, {
-  moduleName: "graphql",
-  exportName: "GraphQLList",
-});
-wellKnownMap.set(GraphQLNonNull, {
-  moduleName: "graphql",
-  exportName: "GraphQLNonNull",
-});
+exportAll(crystalStar, "graphile-crystal");
+exportAll(graphqlStar, "graphql");
+exportAll(utilStar, "util");
 
 const namespaces = Object.assign(Object.create(null), { crypto: _crypto });
 
