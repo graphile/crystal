@@ -69,6 +69,8 @@ declare global {
     interface ScopeGraphQLObjectType {
       pgCodec?: PgTypeCodec<any, any, any>;
       isPgTableType?: boolean;
+      isConnectionType?: true;
+      isPgRowConnectionType?: true;
     }
   }
 }
@@ -299,7 +301,11 @@ export const PgTablesPlugin: Plugin = {
               ConnectionPlan<PgSelectPlan<any, any, any, any>>
             >(
               connectionTypeName,
-              {},
+              {
+                isConnectionType: true,
+                isPgRowConnectionType: true,
+                pgCodec: codec,
+              },
               ConnectionPlan,
               () => {
                 const TableType = getOutputTypeByName(tableTypeName);
