@@ -99,6 +99,8 @@ export const PgBasicsPlugin: Plugin = {
             getGraphQLTypeByPgCodec,
             setGraphQLTypeForPgCodec,
             sql,
+            // For slightly better backwards compatibility with v4.
+            pgSql: sql,
           },
           "Adding helpers from PgBasicsPlugin",
         );
