@@ -69,29 +69,37 @@ async function main() {
 
   const usersCodec = EXPORTABLE(
     (TYPES, recordType, sql) =>
-      recordType(sql`app_public.users`, {
-        id: {
-          codec: TYPES.uuid,
-          notNull: true,
-          extensions: {
-            tags: {
-              hasDefault: true,
+      recordType(
+        sql`app_public.users`,
+        {
+          id: {
+            codec: TYPES.uuid,
+            notNull: true,
+            extensions: {
+              tags: {
+                hasDefault: true,
+              },
             },
           },
+          username: {
+            codec: TYPES.text,
+            notNull: true,
+          },
+          gravatar_url: {
+            codec: TYPES.text,
+            notNull: false,
+          },
+          created_at: {
+            codec: TYPES.timestamptz,
+            notNull: true,
+          },
         },
-        username: {
-          codec: TYPES.text,
-          notNull: true,
+        {
+          tags: {
+            name: "users",
+          },
         },
-        gravatar_url: {
-          codec: TYPES.text,
-          notNull: false,
-        },
-        created_at: {
-          codec: TYPES.timestamptz,
-          notNull: true,
-        },
-      }),
+      ),
     [TYPES, recordType, sql],
   );
 
@@ -129,41 +137,49 @@ async function main() {
 
   const messagesCodec = EXPORTABLE(
     (TYPES, recordType, sql) =>
-      recordType(sql`app_public.messages`, {
-        id: {
-          codec: TYPES.uuid,
-          notNull: true,
-          extensions: {
-            tags: {
-              hasDefault: true,
+      recordType(
+        sql`app_public.messages`,
+        {
+          id: {
+            codec: TYPES.uuid,
+            notNull: true,
+            extensions: {
+              tags: {
+                hasDefault: true,
+              },
             },
           },
+          forum_id: {
+            codec: TYPES.uuid,
+            notNull: true,
+          },
+          author_id: {
+            codec: TYPES.uuid,
+            notNull: true,
+          },
+          body: {
+            codec: TYPES.text,
+            notNull: true,
+          },
+          featured: {
+            codec: TYPES.boolean,
+            notNull: true,
+          },
+          created_at: {
+            codec: TYPES.timestamptz,
+            notNull: true,
+          },
+          archived_at: {
+            codec: TYPES.timestamptz,
+            notNull: false,
+          },
         },
-        forum_id: {
-          codec: TYPES.uuid,
-          notNull: true,
+        {
+          tags: {
+            name: "messages",
+          },
         },
-        author_id: {
-          codec: TYPES.uuid,
-          notNull: true,
-        },
-        body: {
-          codec: TYPES.text,
-          notNull: true,
-        },
-        featured: {
-          codec: TYPES.boolean,
-          notNull: true,
-        },
-        created_at: {
-          codec: TYPES.timestamptz,
-          notNull: true,
-        },
-        archived_at: {
-          codec: TYPES.timestamptz,
-          notNull: false,
-        },
-      }),
+      ),
     [TYPES, recordType, sql],
   );
 
@@ -204,45 +220,54 @@ async function main() {
     [PgSourceBuilder, executor, messagesCodec],
   );
 
-  const usersSource = EXPORTABLE((messagesSourceBuilder, usersSourceBuilder) => usersSourceBuilder.build({
-      relations: {
-        messages: {
-          source: messagesSourceBuilder,
-          isUnique: false,
-          localColumns: ["id"],
-          remoteColumns: ["author_id"],
+  const usersSource = EXPORTABLE(
+    (messagesSourceBuilder, usersSourceBuilder) =>
+      usersSourceBuilder.build({
+        relations: {
+          messages: {
+            source: messagesSourceBuilder,
+            isUnique: false,
+            localColumns: ["id"],
+            remoteColumns: ["author_id"],
+          },
         },
-      },
-    }),
-  [messagesSourceBuilder, usersSourceBuilder]);
-  const forumsSource = EXPORTABLE((forumsSourceBuilder, messagesSourceBuilder) => forumsSourceBuilder.build({
-      relations: {
-        messages: {
-          source: messagesSourceBuilder,
-          isUnique: false,
-          localColumns: ["id"],
-          remoteColumns: ["forum_id"],
+      }),
+    [messagesSourceBuilder, usersSourceBuilder],
+  );
+  const forumsSource = EXPORTABLE(
+    (forumsSourceBuilder, messagesSourceBuilder) =>
+      forumsSourceBuilder.build({
+        relations: {
+          messages: {
+            source: messagesSourceBuilder,
+            isUnique: false,
+            localColumns: ["id"],
+            remoteColumns: ["forum_id"],
+          },
         },
-      },
-    }),
-  [forumsSourceBuilder, messagesSourceBuilder]);
-  const messagesSource = EXPORTABLE((forumsSource, messagesSourceBuilder, usersSource) => messagesSourceBuilder.build({
-      relations: {
-        author: {
-          source: usersSource,
-          isUnique: true,
-          localColumns: ["author_id"],
-          remoteColumns: ["id"],
+      }),
+    [forumsSourceBuilder, messagesSourceBuilder],
+  );
+  const messagesSource = EXPORTABLE(
+    (forumsSource, messagesSourceBuilder, usersSource) =>
+      messagesSourceBuilder.build({
+        relations: {
+          author: {
+            source: usersSource,
+            isUnique: true,
+            localColumns: ["author_id"],
+            remoteColumns: ["id"],
+          },
+          forum: {
+            source: forumsSource,
+            isUnique: true,
+            localColumns: ["forum_id"],
+            remoteColumns: ["id"],
+          },
         },
-        forum: {
-          source: forumsSource,
-          isUnique: true,
-          localColumns: ["forum_id"],
-          remoteColumns: ["id"],
-        },
-      },
-    }),
-  [forumsSource, messagesSourceBuilder, usersSource]);
+      }),
+    [forumsSource, messagesSourceBuilder, usersSource],
+  );
 
   // We're crafting our own input
   const input: GraphileEngine.BuildInput = {
@@ -284,6 +309,15 @@ async function main() {
         username
         gravatarUrl
         createdAt
+      }
+      allMessagesList {
+        id
+        forumId
+        authorId
+        body
+        featured
+        createdAt
+        archivedAt
       }
     }
   `;
