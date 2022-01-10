@@ -82,8 +82,10 @@ export const PgRelationsPlugin: Plugin = {
               return memo;
             }
             let fields = memo;
-            // TODO: add behaviour check here!
-            if (isUnique) {
+            if (
+              isUnique
+              // TODO: add behaviour check here!
+            ) {
               const fieldName = build.inflection.singleRelation({
                 source,
                 codec,
