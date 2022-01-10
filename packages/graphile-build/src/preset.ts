@@ -8,6 +8,7 @@ import {
   CursorTypePlugin,
   MutationPayloadQueryPlugin,
   MutationPlugin,
+  PageInfoStartEndCursorPlugin,
   PageInfoTypePlugin,
   QueryPlugin,
   SubscriptionPlugin,
@@ -23,5 +24,6 @@ export const defaultPreset: Preset = {
     CursorTypePlugin,
     CommonTypesPlugin,
     PageInfoTypePlugin,
+    PageInfoStartEndCursorPlugin,
   ],
 };

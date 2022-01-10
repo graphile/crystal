@@ -5,6 +5,8 @@ import { ExecutablePlan } from "../plan";
 export interface PageInfoCapablePlan extends ExecutablePlan<any> {
   hasNextPage(): ExecutablePlan<boolean>;
   hasPreviousPage(): ExecutablePlan<boolean>;
+  startCursor(): ExecutablePlan<string | null>;
+  endCursor(): ExecutablePlan<string | null>;
 }
 
 export interface ConnectionCapablePlan<

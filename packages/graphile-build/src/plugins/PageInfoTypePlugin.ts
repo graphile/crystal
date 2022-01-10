@@ -1,4 +1,5 @@
-import { PgPageInfoPlan } from "@dataplan/pg";
+import type { PageInfoCapablePlan } from "graphile-crystal";
+import { ExecutablePlan } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 
@@ -33,7 +34,9 @@ export const PageInfoTypePlugin: Plugin = {
           registerObjectType(
             inflection.builtin("PageInfo"),
             { isPageInfo: true },
-            PgPageInfoPlan,
+            ExecutablePlan as unknown as {
+              new (...args: any[]): PageInfoCapablePlan;
+            },
             () => ({
               description: build.wrapDescription(
                 "Information about pagination in a connection.",
@@ -53,8 +56,8 @@ export const PageInfoTypePlugin: Plugin = {
                     type: new GraphQLNonNull(GraphQLBoolean),
                     plan: EXPORTABLE(
                       () =>
-                        function plan($connection) {
-                          return $connection.hasNextPage() as any;
+                        function plan($pageInfo) {
+                          return $pageInfo.hasNextPage() as any;
                         },
                       [],
                     ),
@@ -73,8 +76,8 @@ export const PageInfoTypePlugin: Plugin = {
                     type: new GraphQLNonNull(GraphQLBoolean),
                     plan: EXPORTABLE(
                       () =>
-                        function plan($connection) {
-                          return $connection.hasPreviousPage() as any;
+                        function plan($pageInfo) {
+                          return $pageInfo.hasPreviousPage() as any;
                         },
                       [],
                     ),

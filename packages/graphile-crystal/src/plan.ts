@@ -125,7 +125,7 @@ export abstract class BasePlan {
  * Executable plans are the plans associated with leaves on the GraphQL tree,
  * they must be able to execute to return values.
  */
-export abstract class ExecutablePlan<TData = any> extends BasePlan {
+export class ExecutablePlan<TData = any> extends BasePlan {
   // Explicitly we do not add $$export here because we want children to set it
   static $$export: any;
 
@@ -263,10 +263,15 @@ export abstract class ExecutablePlan<TData = any> extends BasePlan {
    * add attributes to meta for each purpose (e.g. use `meta.cache` for
    * memoizing results) so that you can expand your usage of meta in future.
    */
-  abstract execute(
+  execute(
     values: CrystalValuesList<ReadonlyArray<any>>,
     meta: Record<string, unknown>,
-  ): PromiseOrDirect<CrystalResultsList<TData>>;
+  ): PromiseOrDirect<CrystalResultsList<TData>> {
+    // ESLint/TS: ignore not used.
+    values;
+    meta;
+    throw new Error(`${this} has not implemented an 'execute' method`);
+  }
 }
 
 export function isExecutablePlan<TData = any>(
