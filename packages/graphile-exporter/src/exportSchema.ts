@@ -1089,12 +1089,13 @@ Object.defineProperty(${
       }
       return result;
     } catch {
-      console.error(
+      throw new Error(
         `Function export error at ${locationHint} - failed to process function definition '${trimDef(
           fn.toString(),
-        )}'`,
+        )}'\n    ${String(e.stack ?? e)
+          .split("\n")
+          .join("\n    ")}`,
       );
-      throw e;
     }
   }
 }
