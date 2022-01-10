@@ -7,8 +7,14 @@ import plz from "pluralize";
 
 const bindAll = (obj: object, keys: Array<string>) => {
   keys.forEach((key) => {
-    // The Object.assign is to copy across any function properties
-    obj[key] = Object.assign(obj[key].bind(obj), obj[key]);
+    if (
+      typeof obj[key] === "function" &&
+      !("$$export" in obj[key]) &&
+      !("$exporter$factory" in obj[key])
+    ) {
+      // The Object.assign is to copy across any function properties
+      obj[key] = Object.assign(obj[key].bind(obj), obj[key]);
+    }
   });
   return obj;
 };
