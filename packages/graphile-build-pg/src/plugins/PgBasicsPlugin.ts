@@ -30,6 +30,7 @@ declare global {
       pgCodecMetaLookup: PgTypeCodecMetaLookup;
       getGraphQLTypeByPgCodec: GetGraphQLTypeByPgCodec;
       setGraphQLTypeForPgCodec: SetGraphQLTypeForPgCodec;
+      sql: typeof sql;
     }
   }
 }
@@ -97,6 +98,7 @@ export const PgBasicsPlugin: Plugin = {
             pgCodecMetaLookup,
             getGraphQLTypeByPgCodec,
             setGraphQLTypeForPgCodec,
+            sql,
           },
           "Adding helpers from PgBasicsPlugin",
         );
