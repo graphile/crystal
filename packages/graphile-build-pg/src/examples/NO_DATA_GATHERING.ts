@@ -243,6 +243,11 @@ async function main() {
             isUnique: false,
             localColumns: ["id"],
             remoteColumns: ["forum_id"],
+            extensions: {
+              tags: {
+                behavior: ["connection", "list"],
+              },
+            },
           },
         },
       }),
@@ -294,6 +299,12 @@ async function main() {
           id
           name
           archivedAt
+          messagesList {
+            id
+            body
+            forumId
+            authorId
+          }
         }
         edges {
           cursor
@@ -301,6 +312,14 @@ async function main() {
             id
             name
             archivedAt
+            messages {
+              nodes {
+                id
+                body
+                forumId
+                authorId
+              }
+            }
           }
         }
         pageInfo {
@@ -316,6 +335,9 @@ async function main() {
         username
         gravatarUrl
         createdAt
+        messages {
+          totalCount
+        }
       }
       allMessagesList {
         id
