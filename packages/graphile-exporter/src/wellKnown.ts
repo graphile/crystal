@@ -13,6 +13,7 @@ import graphql, {
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLUnionType,
+  Kind,
 } from "graphql";
 import util, { inspect } from "util";
 
@@ -43,6 +44,7 @@ wellKnownMap.set(ModifierPlan, {
 });
 
 wellKnownMap.set(graphql, { moduleName: "graphql", exportName: "default" });
+wellKnownMap.set(Kind, { moduleName: "graphql", exportName: "Kind" });
 wellKnownMap.set(GraphQLSchema, {
   moduleName: "graphql",
   exportName: "GraphQLSchema",
