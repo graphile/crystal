@@ -409,6 +409,7 @@ async function main() {
         forum {
           name
           uniqueAuthorCount
+          uniqueAuthorCountFeatured: uniqueAuthorCount(featured: true)
         }
         author {
           username
