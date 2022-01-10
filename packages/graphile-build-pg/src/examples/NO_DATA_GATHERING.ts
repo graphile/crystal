@@ -325,9 +325,16 @@ async function main() {
         featured
         createdAt
         archivedAt
+        forum {
+          name
+        }
+        author {
+          username
+        }
       }
     }
   `;
+
   const rootValue = null;
   const contextValue = {
     withPgClient,
