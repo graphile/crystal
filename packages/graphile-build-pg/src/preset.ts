@@ -8,6 +8,7 @@ import { PgIntrospectionPlugin } from "./plugins/PgIntrospectionPlugin";
 import { PgRelationsPlugin } from "./plugins/PgRelationsPlugin";
 import { PgTablesPlugin } from "./plugins/PgTablesPlugin";
 import { PgTypesPlugin } from "./plugins/PgTypesPlugin";
+import { PgColumnDeprecationPlugin } from "./plugins/PgColumnDeprecationPlugin";
 
 export const defaultPreset: Preset = {
   plugins: [
@@ -19,5 +20,6 @@ export const defaultPreset: Preset = {
     PgAllRowsPlugin,
     PgConnectionTotalCountPlugin,
     PgRelationsPlugin,
+    PgColumnDeprecationPlugin,
   ],
 };
