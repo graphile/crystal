@@ -7,6 +7,13 @@ declare module "@dataplan/pg" {
     tags: Partial<PgSourceTags>;
   }
 
+  interface PgSourceRelationTags extends PgSmartTagsDict {
+    behavior: string | string[];
+  }
+  interface PgSourceRelationExtensions {
+    tags: Partial<PgSourceTags>;
+  }
+
   interface PgSourceColumnTags extends PgSmartTagsDict {
     name: string;
     behavior: string | string[];

@@ -1,4 +1,8 @@
-import type { PgSourceExtensions, PgTypeCodecExtensions } from "@dataplan/pg";
+import type {
+  PgSourceExtensions,
+  PgTypeCodecExtensions,
+  PgSourceRelationExtensions,
+} from "@dataplan/pg";
 import { isDev } from "graphile-crystal";
 import { inspect } from "util";
 
@@ -13,6 +17,7 @@ import { inspect } from "util";
 export function getBehavior(
   extensions:
     | Partial<PgSourceExtensions>
+    | Partial<PgSourceRelationExtensions>
     | Partial<PgTypeCodecExtensions>
     | undefined,
 ): string[] | null {

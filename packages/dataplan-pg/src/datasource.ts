@@ -111,6 +111,8 @@ export type PgSourceRow<TColumns extends PgSourceColumns | undefined> =
       }
     : undefined;
 
+export interface PgSourceRelationExtensions {}
+
 export interface PgSourceRelation<
   TLocalColumns extends PgSourceColumns,
   TRemoteColumns extends PgSourceColumns,
@@ -122,6 +124,7 @@ export interface PgSourceRelation<
 
   remoteColumns: ReadonlyArray<keyof TRemoteColumns>;
   isUnique: boolean;
+  extensions?: PgSourceRelationExtensions;
 }
 
 export interface PgSourceExtensions {}

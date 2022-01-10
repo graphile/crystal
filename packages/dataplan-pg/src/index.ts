@@ -36,6 +36,7 @@ export {
   PgSourceColumnViaExplicit,
   PgSourceExtensions,
   PgSourceRelation,
+  PgSourceRelationExtensions,
 } from "./datasource";
 export {
   PgClient,

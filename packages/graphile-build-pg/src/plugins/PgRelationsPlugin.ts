@@ -11,20 +11,31 @@ import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 
 import { version } from "../index.js";
-import { GraphQLObjectType } from "graphql";
+import { GraphQLList, GraphQLObjectType } from "graphql";
+import { getBehavior } from "../behavior.js";
+
+interface RelationDetails {
+  source: PgSource<any, any, any, any>;
+  codec: PgTypeCodec<any, any, any>;
+  identifier: string;
+  relation: PgSourceRelation<any, any>;
+}
 
 declare global {
   namespace GraphileEngine {
+    interface ScopeGraphQLObjectTypeFieldsField {
+      isPgSingleRelationField?: boolean;
+      isPgManyRelationConnectionField?: boolean;
+      isPgManyRelationListField?: boolean;
+      pgRelationDetails?: RelationDetails;
+    }
     interface Inflection {
-      singleRelation(
+      singleRelation(this: Inflection, details: RelationDetails): string;
+      manyRelationConnection(
         this: Inflection,
-        details: {
-          source: PgSource<any, any, any, any>;
-          codec: PgTypeCodec<any, any, any>;
-          identifier: string;
-          relation: PgSourceRelation<any, any>;
-        },
+        details: RelationDetails,
       ): string;
+      manyRelationList(this: Inflection, details: RelationDetails): string;
     }
   }
 }
@@ -41,6 +52,12 @@ export const PgRelationsPlugin: Plugin = {
           {
             singleRelation(details) {
               return this.camelCase(details.identifier);
+            },
+            manyRelationConnection(details) {
+              return this.camelCase(details.identifier);
+            },
+            manyRelationList(details) {
+              return this.camelCase(details.identifier + "-list");
             },
           },
           "Adding inflectors from PgForwardRelationPlugin",
@@ -70,6 +87,7 @@ export const PgRelationsPlugin: Plugin = {
               localColumns,
               remoteColumns,
               source: otherSourceOrBuilder,
+              extensions,
             } = relation;
             const otherSource =
               otherSourceOrBuilder instanceof PgSourceBuilder
@@ -82,49 +100,128 @@ export const PgRelationsPlugin: Plugin = {
               return memo;
             }
             let fields = memo;
-            if (
-              isUnique
-              // TODO: add behavior check here!
-            ) {
-              const fieldName = build.inflection.singleRelation({
-                source,
-                codec,
-                identifier,
-                relation,
-              });
+            const behavior =
+              getBehavior(extensions) ?? isUnique ? ["single"] : ["connection"];
+
+            const relationDetails: RelationDetails = {
+              source,
+              codec,
+              identifier,
+              relation,
+            };
+            const singleRecordPlan = EXPORTABLE(
+              (localColumns, otherSource, remoteColumns) =>
+                function plan(
+                  $message: PgSelectSinglePlan<any, any, any, any>,
+                ) {
+                  const spec = remoteColumns.reduce(
+                    (memo, remoteColumnName, i) => {
+                      memo[remoteColumnName] = $message.get(
+                        localColumns[i] as string,
+                      );
+                      return memo;
+                    },
+                    {},
+                  );
+                  return otherSource.get(spec);
+                },
+              [localColumns, otherSource, remoteColumns],
+            );
+
+            const connectionAndListPlan = EXPORTABLE(
+              (localColumns, otherSource, remoteColumns) =>
+                function plan(
+                  $message: PgSelectSinglePlan<any, any, any, any>,
+                ) {
+                  const spec = remoteColumns.reduce(
+                    (memo, remoteColumnName, i) => {
+                      memo[remoteColumnName] = $message.get(
+                        localColumns[i] as string,
+                      );
+                      return memo;
+                    },
+                    {},
+                  );
+                  return otherSource.find(spec);
+                },
+              [localColumns, otherSource, remoteColumns],
+            );
+
+            if (isUnique && behavior.includes("single")) {
+              const fieldName =
+                build.inflection.singleRelation(relationDetails);
               fields = extend(
                 fields,
                 {
                   [fieldName]: fieldWithHooks(
                     {
                       fieldName,
+                      isPgSingleRelationField: true,
+                      pgRelationDetails: relationDetails,
                     },
                     {
+                      // TODO: handle nullability
                       type: OtherType as GraphQLObjectType,
-                      plan: EXPORTABLE(
-                        (localColumns, otherSource, remoteColumns) =>
-                          function plan(
-                            $message: PgSelectSinglePlan<any, any, any, any>,
-                          ) {
-                            const spec = remoteColumns.reduce(
-                              (memo, remoteColumnName, i) => {
-                                memo[remoteColumnName] = $message.get(
-                                  localColumns[i] as string,
-                                );
-                                return memo;
-                              },
-                              {},
-                            );
-                            return otherSource.get(spec);
-                          },
-                        [localColumns, otherSource, remoteColumns],
-                      ),
+                      plan: singleRecordPlan,
                     },
                   ),
                 },
-                `Adding '${identifier}' relation to ${Self.name}`,
+                `Adding '${identifier}' single relation field to ${Self.name}`,
               );
             }
+
+            if (behavior.includes("connection")) {
+              const connectionTypeName =
+                build.inflection.connectionType(typeName);
+              const ConnectionType =
+                build.getOutputTypeByName(connectionTypeName);
+              if (ConnectionType) {
+                const fieldName =
+                  build.inflection.manyRelationConnection(relationDetails);
+                fields = extend(
+                  fields,
+                  {
+                    [fieldName]: fieldWithHooks(
+                      {
+                        fieldName,
+                        isPgManyRelationConnectionField: true,
+                        pgRelationDetails: relationDetails,
+                      },
+                      {
+                        // TODO: handle nullability
+                        type: ConnectionType as GraphQLObjectType,
+                        plan: connectionAndListPlan,
+                      },
+                    ),
+                  },
+                  `Adding '${identifier}' many relation connection field to ${Self.name}`,
+                );
+              }
+            }
+
+            if (behavior.includes("list")) {
+              const fieldName =
+                build.inflection.manyRelationList(relationDetails);
+              fields = extend(
+                fields,
+                {
+                  [fieldName]: fieldWithHooks(
+                    {
+                      fieldName,
+                      isPgManyRelationListField: true,
+                      pgRelationDetails: relationDetails,
+                    },
+                    {
+                      // TODO: handle nullability x2
+                      type: new GraphQLList(OtherType),
+                      plan: connectionAndListPlan,
+                    },
+                  ),
+                },
+                `Adding '${identifier}' many relation list field to ${Self.name}`,
+              );
+            }
+
             return fields;
           },
           fields,
