@@ -320,12 +320,66 @@ async function main() {
         ],
         extensions: {
           tags: {
-            behavior: ["type_field"],
+            // behavior: ["type_field"],
             name: "unique_author_count",
           },
         },
       }),
     [PgSource, TYPES, executor, forumsCodec, sql],
+  );
+
+  const forumsRandomUser = EXPORTABLE(
+    (PgSource, executor, forumsCodec, sql, usersCodec) =>
+      new PgSource({
+        executor,
+        codec: usersCodec,
+        isUnique: true,
+        source: (...args) =>
+          sql`app_public.forums_random_user(${sql.join(args, ", ")})`,
+        name: "forums_random_user",
+        parameters: [
+          {
+            name: "forum",
+            codec: forumsCodec,
+            required: true,
+            notNull: true,
+          },
+        ],
+        extensions: {
+          tags: {
+            // behavior: ["type_field"],
+            name: "random_user",
+          },
+        },
+      }),
+    [PgSource, executor, forumsCodec, sql, usersCodec],
+  );
+
+  const forumsFeaturedMessages = EXPORTABLE(
+    (PgSource, executor, forumsCodec, messagesCodec, sql) =>
+      new PgSource({
+        executor,
+        codec: messagesCodec,
+        isUnique: false,
+        source: (...args) =>
+          sql`app_public.forums_featured_messages(${sql.join(args, ", ")})`,
+        name: "forums_featured_messages",
+        parameters: [
+          {
+            name: "forum",
+            codec: forumsCodec,
+            required: true,
+            notNull: true,
+          },
+        ],
+        extensions: {
+          tags: {
+            behavior: ["type_field", "connection", "list"],
+            name: "featured_messages",
+          },
+        },
+      }),
+    [PgSource, executor, forumsCodec, messagesCodec, sql],
   );
 
   // We're crafting our own input
@@ -336,6 +390,8 @@ async function main() {
       messagesSource,
       uniqueAuthorCountSource,
       forumsUniqueAuthorCountSource,
+      forumsRandomUser,
+      forumsFeaturedMessages,
     ],
   };
   const schema = buildSchema(config, input);
