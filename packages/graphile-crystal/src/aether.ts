@@ -864,18 +864,23 @@ export class Aether<
       };
       parentTreeNode.children.push(treeNode);
 
-      // Now we're building the child plans, the parentPathIdentity becomes
-      // actually our identity.
-      const itemPlan = this.planSelectionSetForType(
-        fieldType,
-        fieldAndGroups,
-        pathIdentity,
-        pathIdentity,
-        plan,
-        treeNode,
-        returnRaw && !namedResultTypeIsLeaf,
-      );
-      this.itemPlanIdByFieldPathIdentity[pathIdentity] = itemPlan.id;
+      if (namedResultTypeIsLeaf) {
+        // Leaf types don't have selection sets
+        this.itemPlanIdByFieldPathIdentity[pathIdentity] = plan.id;
+      } else {
+        // Now we're building the child plans, the parentPathIdentity becomes
+        // actually our identity.
+        const itemPlan = this.planSelectionSetForType(
+          fieldType,
+          fieldAndGroups,
+          pathIdentity,
+          pathIdentity,
+          plan,
+          treeNode,
+          returnRaw && !namedResultTypeIsLeaf,
+        );
+        this.itemPlanIdByFieldPathIdentity[pathIdentity] = itemPlan.id;
+      }
     }
   }
 
