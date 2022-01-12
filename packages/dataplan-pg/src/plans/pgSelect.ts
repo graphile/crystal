@@ -253,7 +253,7 @@ export class PgSelectPlan<
   extends ExecutablePlan<ReadonlyArray<PgSourceRow<TColumns>>>
   implements
     StreamablePlan<PgSourceRow<TColumns>>,
-    ConnectionCapablePlan<ReadonlyArray<PgSourceRow<TColumns>>>
+    ConnectionCapablePlan<PgSourceRow<TColumns>>
 {
   static $$export = {
     moduleName: "@dataplan/pg",
