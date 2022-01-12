@@ -1,0 +1,6 @@
+## expect(errors).toBeFalsy()
+## expect(queries).toHaveLength(1)
+## expect(data.forumNamesCasesList).toEqual([["Cats", "cats", "CATS"], ["Dogs", "dogs", "DOGS"], ["Postgres", "postgres", "POSTGRES"]])
+{
+  forumNamesCasesList
+}

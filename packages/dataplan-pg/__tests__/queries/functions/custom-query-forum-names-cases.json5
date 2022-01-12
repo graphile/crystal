@@ -1,0 +1,19 @@
+{
+  forumNamesCasesList: [
+    [
+      "Cats",
+      "cats",
+      "CATS",
+    ],
+    [
+      "Dogs",
+      "dogs",
+      "DOGS",
+    ],
+    [
+      "Postgres",
+      "postgres",
+      "POSTGRES",
+    ],
+  ],
+}

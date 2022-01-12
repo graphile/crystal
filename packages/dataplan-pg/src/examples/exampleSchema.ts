@@ -383,7 +383,8 @@ export function makeExampleSchema(
   );
 
   const forumNamesCasesSource = EXPORTABLE(
-    (PgSource, TYPES, executor, listOfType, sql) => new PgSource({
+    (PgSource, TYPES, executor, listOfType, sql) =>
+      new PgSource({
         executor,
         codec: listOfType(TYPES.text),
         source: (...args) =>
@@ -3441,14 +3442,13 @@ export function makeExampleSchema(
       },
 
       forumNamesCasesList: {
-        type: new GraphQLList(GraphQLString),
+        type: new GraphQLList(new GraphQLList(GraphQLString)),
         plan: EXPORTABLE(
-          (forumNamesArraySource) =>
-            function plan(_$root) {
-              const $plan = forumNamesArraySource.execute();
+          (forumNamesCasesSource) => function plan(_$root) {
+              const $plan = forumNamesCasesSource.execute();
               return $plan;
             },
-          [forumNamesArraySource],
+          [forumNamesCasesSource],
         ),
       },
 
