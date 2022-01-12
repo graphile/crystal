@@ -300,6 +300,7 @@ async function main() {
       new PgSource({
         executor,
         codec: TYPES.int,
+        isUnique: true,
         source: (...args) =>
           sql`app_public.forums_unique_author_count(${sql.join(args, ", ")})`,
         name: "forums_unique_author_count",

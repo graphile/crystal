@@ -157,6 +157,12 @@ export interface PgSourceOptions<
   extensions?: PgSourceExtensions;
   parameters?: TParameters;
   description?: string;
+  /**
+   * Set true if this source will only return at most one record - this is
+   * generally only useful for PostgreSQL function sources, in which case you
+   * should set it false if the function `returns setof` and true otherwise.
+   */
+  isUnique?: boolean;
 }
 
 /**
@@ -286,6 +292,7 @@ export class PgSource<
   private _relations: TRelations | null = null;
   public readonly parameters: TParameters;
   public readonly description: string | undefined;
+  public readonly isUnique: boolean;
 
   public readonly extensions: Partial<PgSourceExtensions> | undefined;
 
@@ -309,6 +316,7 @@ export class PgSource<
       extensions,
       parameters,
       description,
+      isUnique,
     } = options;
     this._options = options;
     this.extensions = extensions;
@@ -325,6 +333,7 @@ export class PgSource<
     }
     this.parameters = parameters as TParameters;
     this.description = description;
+    this.isUnique = !!isUnique;
   }
 
   /**
