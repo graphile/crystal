@@ -1,7 +1,6 @@
 import chalk from "chalk";
 
 import { getCurrentParentPathIdentity } from "../global";
-import type { ListCapablePlan, StreamablePlan } from "../plan";
 import { ExecutablePlan } from "../plan";
 
 /**
@@ -14,10 +13,7 @@ export class __ItemPlan<TData> extends ExecutablePlan<TData> {
     moduleName: "graphile-crystal",
     exportName: "__ItemPlan",
   };
-  constructor(
-    parentPlan: StreamablePlan<TData> | ListCapablePlan<TData>,
-    public readonly depth = 0,
-  ) {
+  constructor(parentPlan: ExecutablePlan<TData>, public readonly depth = 0) {
     super();
     this.addDependency(parentPlan);
     this.parentPathIdentity = getCurrentParentPathIdentity();

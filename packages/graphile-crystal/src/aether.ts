@@ -79,6 +79,7 @@ import {
   assertListCapablePlan,
   assertModifierPlan,
   ExecutablePlan,
+  isListCapablePlan,
   isStreamablePlan,
 } from "./plan";
 import { PlanResults } from "./planResults";
@@ -864,23 +865,19 @@ export class Aether<
       };
       parentTreeNode.children.push(treeNode);
 
-      if (namedResultTypeIsLeaf) {
-        // Leaf types don't have selection sets
-        this.itemPlanIdByFieldPathIdentity[pathIdentity] = plan.id;
-      } else {
-        // Now we're building the child plans, the parentPathIdentity becomes
-        // actually our identity.
-        const itemPlan = this.planSelectionSetForType(
-          fieldType,
-          fieldAndGroups,
-          pathIdentity,
-          pathIdentity,
-          plan,
-          treeNode,
-          returnRaw && !namedResultTypeIsLeaf,
-        );
-        this.itemPlanIdByFieldPathIdentity[pathIdentity] = itemPlan.id;
-      }
+      // Now we're building the child plans, the parentPathIdentity becomes
+      // actually our identity.
+      const itemPlan = this.planFieldReturnType(
+        fieldType,
+        fieldAndGroups,
+        pathIdentity,
+        pathIdentity,
+        plan,
+        treeNode,
+        returnRaw && !namedResultTypeIsLeaf,
+        namedResultTypeIsLeaf,
+      );
+      this.itemPlanIdByFieldPathIdentity[pathIdentity] = itemPlan.id;
     }
   }
 
@@ -915,8 +912,10 @@ export class Aether<
    * straight to getNamedType in the plan. This method lets us walk the type
    * tree and add in `__ItemPlan`s in the relevant places so that we can refer
    * to individual values within lists.
+   *
+   * Note this handles both leaf types and branch types.
    */
-  private planSelectionSetForType(
+  private planFieldReturnType(
     fieldType: GraphQLOutputType,
     fieldAndGroups: FieldAndGroup[],
     fieldPathIdentity: string,
@@ -924,12 +923,20 @@ export class Aether<
     plan: ExecutablePlan<any>,
     treeNode: TreeNode,
     useValuePlan: boolean,
+    isLeaf: boolean,
     depth = 0,
   ): ExecutablePlan<any> {
+    if (isDev) {
+      assert.strictEqual(
+        isLeaf,
+        isLeafType(getNamedType(fieldType)),
+        "isLeaf is incorrect",
+      );
+    }
     if (fieldType instanceof GraphQLNonNull) {
       // TODO: we could implement a __NonNullPlan in future; currently we just
       // defer that to GraphQL.js
-      return this.planSelectionSetForType(
+      return this.planFieldReturnType(
         fieldType.ofType,
         fieldAndGroups,
         fieldPathIdentity,
@@ -937,10 +944,13 @@ export class Aether<
         plan,
         treeNode,
         useValuePlan,
+        isLeaf,
         depth,
       );
     } else if (fieldType instanceof GraphQLList) {
-      assertListCapablePlan(plan, pathIdentity);
+      if (!isLeaf) {
+        assertListCapablePlan(plan, pathIdentity);
+      }
       const nestedParentPathIdentity = pathIdentity + "[]";
       const nestedTreeNode: TreeNode = {
         fieldPathIdentity,
@@ -950,16 +960,18 @@ export class Aether<
         children: [],
       };
       treeNode.children.push(nestedTreeNode);
-
       const oldPlansLength = this.plans.length;
+
       const listItemPlan = withGlobalState(
         { aether: this, parentPathIdentity: nestedParentPathIdentity },
-        () => plan.listItem(new __ItemPlan(plan, depth)),
+        isListCapablePlan(plan)
+          ? () => plan.listItem(new __ItemPlan(plan, depth))
+          : () => new __ItemPlan(plan, depth),
       );
       this.finalizeArgumentsSince(oldPlansLength);
 
       this.planIdByPathIdentity[nestedParentPathIdentity] = listItemPlan.id;
-      return this.planSelectionSetForType(
+      return this.planFieldReturnType(
         fieldType.ofType,
         fieldAndGroups,
         fieldPathIdentity,
@@ -967,6 +979,7 @@ export class Aether<
         listItemPlan,
         nestedTreeNode,
         useValuePlan,
+        isLeaf,
         depth + 1,
       );
     } else if (useValuePlan) {
@@ -985,7 +998,7 @@ export class Aether<
       // run against us.
       valuePlan.groupIds.push(...treeNode.groupIds);
 
-      return this.planSelectionSetForType(
+      return this.planFieldReturnType(
         fieldType,
         fieldAndGroups,
         fieldPathIdentity,
@@ -993,6 +1006,7 @@ export class Aether<
         valuePlan,
         treeNode,
         false,
+        isLeaf,
         depth,
       );
     }
