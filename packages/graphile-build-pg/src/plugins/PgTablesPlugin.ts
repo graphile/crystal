@@ -194,6 +194,7 @@ export const PgTablesPlugin: Plugin = {
           graphql: { GraphQLNonNull, GraphQLList },
           inflection,
           options: { pgForbidSetofFunctionsToReturnNull },
+          setGraphQLTypeForPgCodec,
         } = build;
         const nullableIf = (condition: boolean, Type: GraphQLOutputType) =>
           condition ? Type : new GraphQLNonNull(Type);
@@ -223,6 +224,9 @@ export const PgTablesPlugin: Plugin = {
             () => ({}),
             `PgTablesPlugin table type for ${codecName}`,
           );
+          setGraphQLTypeForPgCodec(codec, ["output"], tableTypeName);
+
+          // TODO: input type?
 
           if (!behavior || behavior.includes("connection")) {
             // Register edges
