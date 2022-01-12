@@ -397,7 +397,7 @@ async function main() {
   const schema = buildSchema(config, input);
 
   // Output our schema
-  console.log(chalk.blue(printSchema(schema)));
+  // console.log(chalk.blue(printSchema(schema)));
   console.log();
   console.log();
   console.log();
@@ -506,6 +506,10 @@ async function main() {
     contextValue,
   });
   console.log(inspect(result, { depth: Infinity, colors: true }));
+
+  if ("errors" in result && result.errors) {
+    process.exit(1);
+  }
 
   // Export schema
   // const exportFileLocation = new URL("../../temp.js", import.meta.url);
