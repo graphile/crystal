@@ -66,7 +66,7 @@ export const PgConnectionTotalCountPlugin: Plugin = {
                       ) =>
                         $connection
                           .cloneSubplanWithoutPagination("aggregate")
-                          .single()
+                          .singleAsRecord()
                           .select(sql`count(*)`, TYPES.bigint) as any,
                     [TYPES, sql],
                   ),

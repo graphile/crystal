@@ -25,6 +25,7 @@ import type {
 } from "./executor";
 import { exportAs } from "./exportAs";
 import type { PgEnumTypeCodec, PgTypeCodec, PlanByUniques } from "./interfaces";
+import type { PgClassExpressionPlan } from "./plans/pgClassExpression";
 import type { PgSelectPlan } from "./plans/pgSelect";
 import { pgSelect } from "./plans/pgSelect";
 import type {
@@ -486,7 +487,16 @@ export class PgSource<
     spec: PlanByUniques<TColumns, TUniques>,
     // This is internal, it's an optimisation we can use but you shouldn't.
     _internalOptionsDoNotPass?: PgSelectSinglePlanOptions,
-  ): PgSelectSinglePlan<TColumns, TUniques, TRelations, TParameters> {
+  ): TColumns extends PgSourceColumns
+    ? PgSelectSinglePlan<TColumns, TUniques, TRelations, TParameters>
+    : PgClassExpressionPlan<
+        undefined,
+        PgTypeCodec<undefined, any, any>,
+        TColumns,
+        TUniques,
+        TRelations,
+        TParameters
+      > {
     if (!spec) {
       throw new Error(`Cannot ${this}.get without a valid spec`);
     }

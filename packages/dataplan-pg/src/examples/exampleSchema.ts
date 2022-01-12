@@ -2386,9 +2386,7 @@ export function makeExampleSchema(
                     pgCodec: TYPES.boolean,
                   },
                 ],
-              })
-                .single()
-                .getSelfNamed();
+              }).single();
             },
           [TYPES, forumsUniqueAuthorCountSource, pgSelect],
         ),
@@ -2966,9 +2964,7 @@ export function makeExampleSchema(
                     ", ",
                   )})`,
                 name: "relational_posts_title_lower",
-              })
-                .single()
-                .getSelfNamed();
+              }).single();
             },
           [pgSelect, scalarTextSource, sql],
         ),
@@ -3370,7 +3366,7 @@ export function makeExampleSchema(
                 ],
               });
               deoptimizeIfAppropriate($plan);
-              return $plan.single().getSelfNamed();
+              return $plan.single();
             },
           [TYPES, deoptimizeIfAppropriate, pgSelect, uniqueAuthorCountSource],
         ),
@@ -3379,7 +3375,7 @@ export function makeExampleSchema(
       forumNames: {
         type: new GraphQLList(GraphQLString),
         plan: EXPORTABLE(
-          (each, pgSelect, scalarTextSource, sql) =>
+          (pgSelect, scalarTextSource, sql) =>
             function plan(_$root) {
               const $plan = pgSelect({
                 source: scalarTextSource,
@@ -3387,9 +3383,9 @@ export function makeExampleSchema(
                 from: sql`app_public.forum_names()`,
                 name: "forum_names",
               });
-              return each($plan, ($name) => $name.getSelfNamed());
+              return $plan;
             },
-          [each, pgSelect, scalarTextSource, sql],
+          [pgSelect, scalarTextSource, sql],
         ),
       },
 
@@ -3406,7 +3402,7 @@ export function makeExampleSchema(
                 name: "forum_names",
               });
               return each($plan, ($name) =>
-                lambda($name.getSelfNamed(), (name) => name.toUpperCase()),
+                lambda($name, (name) => name.toUpperCase()),
               );
             },
           [each, lambda, pgSelect, scalarTextSource, sql],

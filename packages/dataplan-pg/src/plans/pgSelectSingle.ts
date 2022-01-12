@@ -102,6 +102,11 @@ export class PgSelectSinglePlan<
     return plan;
   }
 
+  /**
+   * Do not rely on this, we're going to refactor it to work a different way at some point.
+   *
+   * @internal
+   */
   getSelfNamed(): PgClassExpressionPlan<
     any,
     any,
@@ -340,7 +345,7 @@ export class PgSelectSinglePlan<
         return memo;
       }, Object.create(null)),
       options,
-    );
+    ) as PgSelectSinglePlan<any, any, any, any>;
   }
 
   public manyRelation<TRelationName extends keyof TRelations>(
@@ -477,7 +482,12 @@ export function pgSelectSingleFromRecord<
     identifiers: [],
     from: (record) => sql`(select (${record}).*)`,
     args: [{ plan: record, pgCodec: source.codec }],
-  }).single();
+  }).single() as PgSelectSinglePlan<
+    TColumns,
+    TUniques,
+    TRelations,
+    TParameters
+  >;
 }
 
 Object.defineProperty(pgSelectSingleFromRecord, "$$export", {

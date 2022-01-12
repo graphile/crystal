@@ -2317,12 +2317,20 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
   }
 
   /**
-   * If this plan may only return one record, you can use `.single()` to return
-   * a plan that resolves to that record (rather than a list of records as it
-   * does currently). Beware: if you call this and the database might actually
-   * return more than one record then you're potentially in for a Bad Time.
+   * Most likely you want `.single()` instead of this method.
+   *
+   * If this plan may only return one record, you can use `.singleAsRecord()`
+   * to return a plan that resolves to that record (rather than a list of
+   * records as it does currently).
+   *
+   * The main reason to use this instead of `.single()` is if you are
+   * paginating over a scalar and you truly need a PgSelectSinglePlan interface
+   * e.g. so you can get the `count(*)` aggregate.
+   *
+   * Beware: if you call this and the database might actually return more than
+   * one record then you're potentially in for a Bad Time.
    */
-  single(
+  singleAsRecord(
     options?: PgSelectSinglePlanOptions,
   ): PgSelectSinglePlan<TColumns, TUniques, TRelations, TParameters> {
     this.setUnique(true);
@@ -2330,6 +2338,32 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
     // PgSelectSinglePlan does not allow for `.where` divergence (since it
     // does not support `.where`).
     return new PgSelectSinglePlan(this, first(this), options);
+  }
+
+  /**
+   * If this plan may only return one record, you can use `.single()` to return
+   * a plan that resolves to either that record (in the case of composite
+   * types) or the underlying scalar (in the case of a source whose codec has
+   * no columns).
+   *
+   * Beware: if you call this and the database might actually return more than
+   * one record then you're potentially in for a Bad Time.
+   */
+  single(
+    options?: PgSelectSinglePlanOptions,
+  ): TColumns extends PgSourceColumns
+    ? PgSelectSinglePlan<TColumns, TUniques, TRelations, TParameters>
+    : PgClassExpressionPlan<
+        undefined,
+        PgTypeCodec<undefined, any, any>,
+        TColumns,
+        TUniques,
+        TRelations,
+        TParameters
+      > {
+    const $single = this.singleAsRecord(options);
+    const isScalar = !this.source.codec.columns;
+    return (isScalar ? $single.getSelfNamed() : $single) as any;
   }
 
   /**
@@ -2347,8 +2381,19 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
    */
   listItem(
     itemPlan: __ItemPlan<this>,
-  ): PgSelectSinglePlan<TColumns, TUniques, TRelations, TParameters> {
-    return new PgSelectSinglePlan(this, itemPlan);
+  ): TColumns extends PgSourceColumns
+    ? PgSelectSinglePlan<TColumns, TUniques, TRelations, TParameters>
+    : PgClassExpressionPlan<
+        undefined,
+        PgTypeCodec<undefined, any, any>,
+        TColumns,
+        TUniques,
+        TRelations,
+        TParameters
+      > {
+    const $single = new PgSelectSinglePlan(this, itemPlan);
+    const isScalar = !this.source.codec.columns;
+    return (isScalar ? $single.getSelfNamed() : $single) as any;
   }
 
   // --------------------
