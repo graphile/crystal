@@ -467,6 +467,22 @@ async function main() {
           name
           uniqueAuthorCount
           uniqueAuthorCountFeatured: uniqueAuthorCount(featured: true)
+          randomUser {
+            id
+            username
+          }
+          featuredMessages {
+            nodes {
+              id
+              body
+              featured
+            }
+          }
+          featuredMessagesList {
+            id
+            body
+            featured
+          }
         }
         author {
           username

@@ -3,19 +3,21 @@
 // (e.g. they can be relations to other tables), so we've renamed them.
 
 import type {
+  PgSelectArgumentSpec,
+  PgSelectPlan,
   PgSelectSinglePlan,
   PgSource,
   PgSourceParameter,
 } from "@dataplan/pg";
 import { pgSelect } from "@dataplan/pg";
+import { connection } from "graphile-crystal";
+import type { TrackedArguments } from "graphile-crystal/src/interfaces";
+import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLOutputType } from "graphql";
-import type { PgSelectArgumentSpec } from "@dataplan/pg";
-import { EXPORTABLE } from "graphile-exporter";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";
-import { TrackedArguments } from "graphile-crystal/src/interfaces";
 
 function isNotNullish<T>(a: T | null | undefined): a is T {
   return a != null;
@@ -34,6 +36,14 @@ declare global {
   namespace GraphileEngine {
     interface Inflection {
       computedColumn(this: Inflection, details: ComputedColumnDetails): string;
+      computedColumnConnection(
+        this: Inflection,
+        details: ComputedColumnDetails,
+      ): string;
+      computedColumnList(
+        this: Inflection,
+        details: ComputedColumnDetails,
+      ): string;
       argument(this: Inflection, details: ArgumentDetails): string;
     }
   }
@@ -55,6 +65,12 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                 details.source.extensions?.tags?.name ?? details.source.name,
               );
             },
+            computedColumnConnection(details) {
+              return this.computedColumn(details);
+            },
+            computedColumnList(details) {
+              return this.camelCase(this.computedColumn(details) + "-list");
+            },
             argument(details) {
               return this.camelCase(
                 details.param.name ?? `arg${details.index}`,
@@ -65,7 +81,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
         );
       },
       GraphQLObjectType_fields(fields, build, context) {
-        const { getGraphQLTypeByPgCodec } = build;
+        const { getGraphQLTypeByPgCodec, sql } = build;
         const {
           Self,
           scope: { isPgTableType, pgCodec },
@@ -92,9 +108,13 @@ export const PgCustomTypeFieldPlugin: Plugin = {
               | GraphQLOutputType
               | undefined;
             if (!type) {
+              console.warn(
+                `Failed to find a suitable type for codec '${
+                  sql.compile(source.codec.sqlType).text
+                }'; not adding function field`,
+              );
               return memo;
             }
-            const fieldName = build.inflection.computedColumn({ source });
             const argDetails = (source.parameters as PgSourceParameter[])
               .slice(1)
               .map((param, index) => {
@@ -117,44 +137,122 @@ export const PgCustomTypeFieldPlugin: Plugin = {
               };
               return memo;
             }, {});
-            memo[fieldName] = fieldWithHooks(
-              {
-                fieldName,
-              },
-              {
-                description: source.description,
-                type,
-                args,
-                plan: EXPORTABLE(
-                  (argDetails, isNotNullish, pgSelect, source) =>
-                    function plan(
-                      $row: PgSelectSinglePlan<any, any, any, any>,
-                      args: TrackedArguments<any>,
-                    ) {
-                      const selectArgs: PgSelectArgumentSpec[] = [
-                        { plan: $row.record() },
-                        ...argDetails
-                          .map(({ argName, pgCodec }) => {
-                            const plan = args[argName];
-                            if (!plan) {
-                              return null;
-                            }
-                            return { plan, pgCodec };
-                          })
-                          .filter(isNotNullish),
-                      ];
-                      return pgSelect({
-                        source,
-                        identifiers: [],
-                        args: selectArgs,
+
+            const getSelectPlanFromRowAndArgs = EXPORTABLE(
+              (argDetails, isNotNullish, pgSelect, source) =>
+                (
+                  $row: PgSelectSinglePlan<any, any, any, any>,
+                  args: TrackedArguments<any>,
+                ): PgSelectPlan<any, any, any, any> => {
+                  const selectArgs: PgSelectArgumentSpec[] = [
+                    { plan: $row.record() },
+                    ...argDetails
+                      .map(({ argName, pgCodec }) => {
+                        const plan = args[argName];
+                        if (!plan) {
+                          return null;
+                        }
+                        return { plan, pgCodec };
                       })
-                        .single()
-                        .getSelfNamed();
-                    },
-                  [argDetails, isNotNullish, pgSelect, source],
-                ),
-              },
+                      .filter(isNotNullish),
+                  ];
+                  return pgSelect({
+                    source,
+                    identifiers: [],
+                    args: selectArgs,
+                  });
+                },
+              [argDetails, isNotNullish, pgSelect, source],
             );
+
+            const isScalar = !source.codec.columns;
+            if (source.isUnique) {
+              const fieldName = build.inflection.computedColumn({ source });
+              memo[fieldName] = fieldWithHooks(
+                { fieldName },
+                {
+                  description: source.description,
+                  type,
+                  args,
+                  plan: EXPORTABLE(
+                    (getSelectPlanFromRowAndArgs) =>
+                      function plan(
+                        $row: PgSelectSinglePlan<any, any, any, any>,
+                        args: TrackedArguments<any>,
+                      ) {
+                        const $select = getSelectPlanFromRowAndArgs($row, args);
+                        return $select.single();
+                      },
+                    [getSelectPlanFromRowAndArgs],
+                  ),
+                },
+              );
+            } else {
+              const behavior = getBehavior(source.extensions) ?? ["connection"];
+              if (behavior.includes("connection")) {
+                const fieldName = build.inflection.computedColumnConnection({
+                  source,
+                });
+                const namedType = build.graphql.getNamedType(type);
+                const ConnectionType = namedType
+                  ? build.getOutputTypeByName(
+                      build.inflection.connectionType(namedType.name),
+                    )
+                  : null;
+                if (ConnectionType) {
+                  memo[fieldName] = fieldWithHooks(
+                    { fieldName },
+                    {
+                      description: source.description,
+                      type: ConnectionType,
+                      args,
+                      plan: EXPORTABLE(
+                        (connection, getSelectPlanFromRowAndArgs) =>
+                          function plan(
+                            $row: PgSelectSinglePlan<any, any, any, any>,
+                            args: TrackedArguments<any>,
+                          ) {
+                            const $select = getSelectPlanFromRowAndArgs(
+                              $row,
+                              args,
+                            );
+                            return connection($select);
+                          },
+                        [connection, getSelectPlanFromRowAndArgs],
+                      ),
+                    },
+                  );
+                }
+              }
+              if (behavior.includes("list")) {
+                const fieldName = build.inflection.computedColumnList({
+                  source,
+                });
+                memo[fieldName] = fieldWithHooks(
+                  { fieldName },
+                  {
+                    description: source.description,
+                    // TODO: nullability
+                    type: new build.graphql.GraphQLList(type),
+                    args,
+                    plan: EXPORTABLE(
+                      (getSelectPlanFromRowAndArgs) =>
+                        function plan(
+                          $row: PgSelectSinglePlan<any, any, any, any>,
+                          args: TrackedArguments<any>,
+                        ) {
+                          const $select = getSelectPlanFromRowAndArgs(
+                            $row,
+                            args,
+                          );
+                          return $select;
+                        },
+                      [getSelectPlanFromRowAndArgs],
+                    ),
+                  },
+                );
+              }
+            }
             return memo;
           }, {}),
           `Adding custom type field for ${Self.name}`,
