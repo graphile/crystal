@@ -26,7 +26,7 @@ import type {
 import { exportAs } from "./exportAs";
 import type { PgEnumTypeCodec, PgTypeCodec, PlanByUniques } from "./interfaces";
 import type { PgClassExpressionPlan } from "./plans/pgClassExpression";
-import type { PgSelectPlan } from "./plans/pgSelect";
+import type { PgSelectArgumentSpec, PgSelectPlan } from "./plans/pgSelect";
 import { pgSelect } from "./plans/pgSelect";
 import type {
   PgSelectSinglePlan,
@@ -335,6 +335,19 @@ export class PgSource<
     this.parameters = parameters as TParameters;
     this.description = description;
     this.isUnique = !!isUnique;
+
+    // parameters is null iff source is not a function
+    const sourceIsFunction = typeof this.source === "function";
+    if (this.parameters == null && sourceIsFunction) {
+      throw new Error(
+        `Source ${this} is invalid - it's a function but without a parameters array. If the function accepts no parameters please pass an empty array.`,
+      );
+    }
+    if (this.parameters != null && !sourceIsFunction) {
+      throw new Error(
+        `Source ${this} is invalid - parameters can only be specified when the source is a function.`,
+      );
+    }
   }
 
   /**
@@ -345,12 +358,19 @@ export class PgSource<
    */
   public alternativeSource<
     TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+    TNewParameters extends PgSourceParameter[] | undefined = TParameters,
   >(overrideOptions: {
     name: string;
     source: SQL | ((...args: SQL[]) => SQL);
+    parameters?: TNewParameters;
     uniques?: TUniques;
-  }): PgSource<TColumns, TUniques, TRelations, TParameters> {
-    const { name, source, uniques } = overrideOptions;
+  }): PgSource<TColumns, TUniques, TRelations, TNewParameters> {
+    const {
+      name,
+      source,
+      uniques,
+      parameters: overrideParameters,
+    } = overrideOptions;
     const { codec, executor, relations, parameters } = this._options;
     return new PgSource({
       codec,
@@ -359,7 +379,7 @@ export class PgSource<
       source: source as any,
       uniques,
       relations,
-      parameters,
+      parameters: (overrideParameters ?? parameters) as TNewParameters,
     });
   }
 
@@ -462,6 +482,11 @@ export class PgSource<
     otherDataSource: TOtherDataSource,
     otherRelationName: TOtherRelationName,
   ): [keyof TRelations, TRelations[keyof TRelations]] | null {
+    if (this.parameters) {
+      throw new Error(
+        ".getReciprocal() cannot be used with functional sources; please use .execute()",
+      );
+    }
     const otherRelation = otherDataSource.getRelation(otherRelationName);
     const relations = this.getRelations();
     const reciprocal = (
@@ -497,6 +522,11 @@ export class PgSource<
         TRelations,
         TParameters
       > {
+    if (this.parameters) {
+      throw new Error(
+        ".get() cannot be used with functional sources; please use .execute()",
+      );
+    }
     if (!spec) {
       throw new Error(`Cannot ${this}.get without a valid spec`);
     }
@@ -520,6 +550,11 @@ export class PgSource<
       [key in keyof TColumns]?: ExecutablePlan | string | number;
     } = Object.create(null),
   ): PgSelectPlan<TColumns, TUniques, TRelations, TParameters> {
+    if (this.parameters) {
+      throw new Error(
+        ".get() cannot be used with functional sources; please use .execute()",
+      );
+    }
     if (!this.codec.columns) {
       throw new Error("Cannot call find if there's no columns");
     }
@@ -566,6 +601,14 @@ export class PgSource<
       };
     });
     return pgSelect({ source: this, identifiers });
+  }
+
+  execute(args: Array<PgSelectArgumentSpec> = []) {
+    return pgSelect({
+      source: this,
+      identifiers: [],
+      args,
+    });
   }
 
   public applyAuthorizationChecksToPlan(

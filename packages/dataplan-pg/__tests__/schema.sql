@@ -86,8 +86,20 @@ $$ language sql stable;
 create function app_public.forum_names() returns setof text as $$
   select name from app_public.forums order by name asc;
 $$ language sql stable;
+create function app_public.forum_names_array() returns text[] as $$
+  select array_agg(name order by name asc) from app_public.forums;
+$$ language sql stable;
+create function app_public.forum_names_cases() returns setof text[] as $$
+  select array[name, lower(name), upper(name)] as cases from app_public.forums order by name asc;
+$$ language sql stable;
 create function app_public.random_user() returns app_public.users as $$
   select users.*
+  from app_public.users
+  where users.id = 'b0b00000-0000-0000-0000-000000000b0b' /* user chosen by a fair dice role - 1-2 Alice, 3-4 Bob, 5-6 Cecilia */
+  limit 1
+$$ language sql stable;
+create function app_public.random_user_array() returns app_public.users[] as $$
+  select array_agg(users order by users.id)
   from app_public.users
   where users.id = 'b0b00000-0000-0000-0000-000000000b0b' /* user chosen by a fair dice role - 1-2 Alice, 3-4 Bob, 5-6 Cecilia */
   limit 1

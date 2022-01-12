@@ -72,6 +72,12 @@ export interface PgTypeCodec<
    */
   columns: TColumns;
 
+  /**
+   * If true, this represents a PostgreSQL array type. Please note: array types
+   * should NOT be nested.
+   */
+  isArray?: boolean;
+
   extensions?: Partial<PgTypeCodecExtensions>;
 }
 

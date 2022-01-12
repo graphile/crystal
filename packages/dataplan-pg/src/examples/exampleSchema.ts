@@ -86,6 +86,7 @@ import {
   recordType,
   TYPES,
 } from "../";
+import { listOfType } from "../codecs";
 import type { PgSourceColumns } from "../datasource";
 import { PgPageInfoPlan } from "../plans/pgPageInfo";
 
@@ -367,6 +368,32 @@ export function makeExampleSchema(
     [PgSource, TYPES, executor, sql],
   );
 
+  const forumNamesArraySource = EXPORTABLE(
+    (PgSource, TYPES, executor, listOfType, sql) =>
+      new PgSource({
+        executor,
+        codec: listOfType(TYPES.text),
+        source: (...args) =>
+          sql`app_public.forum_names_array(${sql.join(args, ", ")})`,
+        name: "forum_names_array",
+        parameters: [],
+        isUnique: true, // No setof
+      }),
+    [PgSource, TYPES, executor, listOfType, sql],
+  );
+
+  const forumNamesCasesSource = EXPORTABLE(
+    (PgSource, TYPES, executor, listOfType, sql) => new PgSource({
+        executor,
+        codec: listOfType(TYPES.text),
+        source: (...args) =>
+          sql`app_public.forum_names_cases(${sql.join(args, ", ")})`,
+        name: "forum_names_cases",
+        parameters: [],
+      }),
+    [PgSource, TYPES, executor, listOfType, sql],
+  );
+
   const forumsUniqueAuthorCountSource = EXPORTABLE(
     (PgSource, TYPES, executor, forumCodec, sql) =>
       new PgSource({
@@ -444,6 +471,7 @@ export function makeExampleSchema(
         name: "users_most_recent_forum",
         source: (...args) =>
           sql`app_public.users_most_recent_forum(${sql.join(args, ", ")})`,
+        parameters: [],
       }),
     [forumSource, sql],
   );
@@ -475,18 +503,26 @@ export function makeExampleSchema(
         name: "featured_messages",
         source: (...args) =>
           sql`app_public.featured_messages(${sql.join(args, ", ")})`,
+        parameters: [],
       }),
     [messageSource, sql],
   );
 
   const forumsFeaturedMessages = EXPORTABLE(
-    (messageSource, sql) =>
+    (forumCodec, messageSource, sql) =>
       messageSource.alternativeSource({
         name: "forums_featured_messages",
         source: (...args) =>
           sql`app_public.forums_featured_messages(${sql.join(args, ", ")})`,
+        parameters: [
+          {
+            name: "forum",
+            required: true,
+            codec: forumCodec,
+          },
+        ],
       }),
-    [messageSource, sql],
+    [forumCodec, messageSource, sql],
   );
 
   const unionEntityColumns = EXPORTABLE(
@@ -1469,13 +1505,20 @@ export function makeExampleSchema(
   );
 
   const entitySearchSource = EXPORTABLE(
-    (sql, unionEntitySource) =>
+    (TYPES, sql, unionEntitySource) =>
       unionEntitySource.alternativeSource({
         source: (...args: SQL[]) =>
           sql`interfaces_and_unions.search(${sql.join(args, ", ")})`,
         name: "entity_search",
+        parameters: [
+          {
+            name: "query",
+            required: true,
+            codec: TYPES.text,
+          },
+        ],
       }),
-    [sql, unionEntitySource],
+    [TYPES, sql, unionEntitySource],
   );
 
   const unionItemsSource = EXPORTABLE(
@@ -3351,24 +3394,20 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (TYPES, deoptimizeIfAppropriate, pgSelect, uniqueAuthorCountSource) =>
+          (TYPES, deoptimizeIfAppropriate, uniqueAuthorCountSource) =>
             function plan(_$root, args) {
               const $featured = args.featured;
-              const $plan = pgSelect({
-                source: uniqueAuthorCountSource,
-                identifiers: [],
-                args: [
-                  {
-                    plan: $featured,
-                    pgCodec: TYPES.boolean,
-                    name: "featured",
-                  },
-                ],
-              });
+              const $plan = uniqueAuthorCountSource.execute([
+                {
+                  plan: $featured,
+                  pgCodec: TYPES.boolean,
+                  name: "featured",
+                },
+              ]);
               deoptimizeIfAppropriate($plan);
               return $plan.single();
             },
-          [TYPES, deoptimizeIfAppropriate, pgSelect, uniqueAuthorCountSource],
+          [TYPES, deoptimizeIfAppropriate, uniqueAuthorCountSource],
         ),
       },
 
@@ -3389,19 +3428,58 @@ export function makeExampleSchema(
         ),
       },
 
+      forumNamesArray: {
+        type: new GraphQLList(GraphQLString),
+        plan: EXPORTABLE(
+          (forumNamesArraySource) =>
+            function plan(_$root) {
+              const $plan = forumNamesArraySource.execute().single();
+              return $plan;
+            },
+          [forumNamesArraySource],
+        ),
+      },
+
+      forumNamesCasesList: {
+        type: new GraphQLList(GraphQLString),
+        plan: EXPORTABLE(
+          (forumNamesArraySource) =>
+            function plan(_$root) {
+              const $plan = forumNamesArraySource.execute();
+              return $plan;
+            },
+          [forumNamesArraySource],
+        ),
+      },
+
+      // TODO
+      /*
+      forumNamesCasesConnection: {
+        type: new GraphQLList(GraphQLString),
+        plan: EXPORTABLE(
+          (forumNamesArraySource, connection) =>
+            function plan(_$root) {
+              const $plan = forumNamesArraySource.execute();
+              return connection($plan);
+            },
+          [forumNamesArraySource, connection],
+        ),
+      },
+      */
+
       FORUM_NAMES: {
         type: new GraphQLList(GraphQLString),
         description: "Like forumNames, only we convert them all to upper case",
         plan: EXPORTABLE(
           (each, lambda, pgSelect, scalarTextSource, sql) =>
             function plan(_$root) {
-              const $plan = pgSelect({
+              const $names = pgSelect({
                 source: scalarTextSource,
                 identifiers: [],
                 from: sql`app_public.forum_names()`,
                 name: "forum_names",
               });
-              return each($plan, ($name) =>
+              return each($names, ($name) =>
                 lambda($name, (name) => name.toUpperCase()),
               );
             },

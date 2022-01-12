@@ -1,5 +1,6 @@
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
+import { parse as arrayParse } from "postgres-array";
 
 import type {
   PgBox,
@@ -289,6 +290,33 @@ export function enumType<TValue extends string>(
   };
 }
 exportAs(enumType, "enumType");
+
+export function listOfType<TInnerType extends PgTypeCodec<any, any>>(
+  innerType: TInnerType,
+  extensions?: Partial<PgTypeCodecExtensions>,
+  identifier: SQL = sql`${innerType.sqlType}[]`,
+): PgTypeCodec<
+  undefined, // Array has no columns
+  TInnerType extends PgTypeCodec<any, infer U, any> ? U[] : any[],
+  TInnerType extends PgTypeCodec<any, any, infer U> ? U[] : any[]
+> {
+  if (innerType.isArray) {
+    throw new Error("Array types cannot be nested");
+  }
+  return {
+    sqlType: identifier,
+    // TODO: this does __NOT__ handle nulls safely!
+    fromPg: (value) =>
+      arrayParse(value)
+        .flat(100)
+        .map((v) => innerType.fromPg(v)) as any,
+    // TODO: this does __NOT__ handle nulls safely!
+    toPg: (value) => (value ? value.map((v) => innerType.toPg(v)) : null),
+    columns: undefined,
+    extensions,
+    isArray: true,
+  };
+}
 
 export const TYPES = {
   boolean: t<boolean>("bool"),
