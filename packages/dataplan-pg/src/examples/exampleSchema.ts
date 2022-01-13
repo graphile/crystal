@@ -3557,9 +3557,17 @@ export function makeExampleSchema(
       },
 
       randomUserArraySet: {
-        type: new GraphQLList(User),
+        type: new GraphQLList(new GraphQLList(User)),
         plan: EXPORTABLE(
-          (TYPES, deoptimizeIfAppropriate, groupBy, lambda, randomUserArraySetSource, randomUserArraySetSourceIdx) => function plan() {
+          (
+            TYPES,
+            deoptimizeIfAppropriate,
+            groupBy,
+            lambda,
+            randomUserArraySetSource,
+            randomUserArraySetSourceIdx,
+          ) =>
+            function plan() {
               const $select = randomUserArraySetSource.execute();
               deoptimizeIfAppropriate($select);
               return groupBy($select, ($row) =>
@@ -3570,7 +3578,14 @@ export function makeExampleSchema(
                 ),
               );
             },
-          [TYPES, deoptimizeIfAppropriate, groupBy, lambda, randomUserArraySetSource, randomUserArraySetSourceIdx],
+          [
+            TYPES,
+            deoptimizeIfAppropriate,
+            groupBy,
+            lambda,
+            randomUserArraySetSource,
+            randomUserArraySetSourceIdx,
+          ],
         ),
       },
 
