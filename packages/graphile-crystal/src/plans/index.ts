@@ -31,6 +31,7 @@ export {
 export { constant, ConstantPlan } from "./constant";
 export { each, EachPlan } from "./each";
 export { first, FirstPlan } from "./first";
+export { groupBy } from "./groupBy";
 export { lambda, LambdaPlan } from "./lambda";
 export { last, LastPlan } from "./last";
 export { list, ListPlan } from "./list";
@@ -38,6 +39,7 @@ export { makeMapper, map, MapPlan } from "./map";
 export { object, ObjectPlan } from "./object";
 export { reverse, reverseArray, ReversePlan } from "./reverse";
 export { subscribe, SubscribePlan } from "./subscribe";
+export { transform } from "./transform";
 
 // Internal plans
 export { __ItemPlan } from "./__item";

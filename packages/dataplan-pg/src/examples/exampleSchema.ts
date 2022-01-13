@@ -13,6 +13,7 @@ import type {
   InputObjectPlan,
   InputStaticLeafPlan,
 } from "graphile-crystal";
+import { groupBy } from "graphile-crystal";
 import {
   __ValuePlan,
   aether,
@@ -3552,6 +3553,24 @@ export function makeExampleSchema(
               return $select;
             },
           [deoptimizeIfAppropriate, randomUserArraySource],
+        ),
+      },
+
+      randomUserArraySet: {
+        type: new GraphQLList(User),
+        plan: EXPORTABLE(
+          (TYPES, deoptimizeIfAppropriate, groupBy, lambda, randomUserArraySetSource, randomUserArraySetSourceIdx) => function plan() {
+              const $select = randomUserArraySetSource.execute();
+              deoptimizeIfAppropriate($select);
+              return groupBy($select, ($row) =>
+                // Ordinality is 1-indexed but we want a 0-indexed number
+                lambda(
+                  $row.select(randomUserArraySetSourceIdx, TYPES.int),
+                  (n: number) => n - 1,
+                ),
+              );
+            },
+          [TYPES, deoptimizeIfAppropriate, groupBy, lambda, randomUserArraySetSource, randomUserArraySetSourceIdx],
         ),
       },
 

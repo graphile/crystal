@@ -74,6 +74,7 @@ import {
   EachPlan,
   first,
   FirstPlan,
+  groupBy,
   lambda,
   LambdaPlan,
   last,
@@ -91,6 +92,7 @@ import {
   ReversePlan,
   subscribe,
   SubscribePlan,
+  transform,
 } from "./plans";
 import { polymorphicWrap, resolveType } from "./polymorphic";
 import {
@@ -162,6 +164,7 @@ export {
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,
   GraphileObjectType,
+  groupBy,
   InputListPlan,
   InputObjectFieldPlanResolver,
   inputObjectFieldSpec,
@@ -215,6 +218,7 @@ export {
   stripAnsi,
   subscribe,
   SubscribePlan,
+  transform,
 };
 
 exportAsMany({
@@ -247,6 +251,8 @@ exportAsMany({
   CrystalError,
   debugPlans,
   each,
+  groupBy,
+  transform,
   EachPlan,
   first,
   FirstPlan,
