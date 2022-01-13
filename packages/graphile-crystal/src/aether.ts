@@ -84,6 +84,7 @@ import {
 } from "./plan";
 import { PlanResults } from "./planResults";
 import { __ItemPlan, __TrackedObjectPlan, __ValuePlan } from "./plans";
+import { __TransformPlan } from "./plans/transform";
 import { assertPolymorphicData } from "./polymorphic";
 import {
   $$crystalWrapped,
@@ -261,6 +262,10 @@ export class Aether<
     [pathIdentity: string]: number[];
   };
 
+  public readonly transformDependencyPlanIdsByFieldPathIdentity: {
+    [pathIdentity: string]: number[];
+  };
+
   public readonly returnRawValueByPathIdentity: {
     [fieldPathIdentity: string]: boolean;
   };
@@ -388,6 +393,7 @@ export class Aether<
       [ROOT_PATH]: this.rootValuePlan.id,
     });
     this.sideEffectPlanIdsByPathIdentity = Object.create(null);
+    this.transformDependencyPlanIdsByFieldPathIdentity = Object.create(null);
     this.returnRawValueByPathIdentity = Object.create(null);
     this.groupIdsByPathIdentity = Object.assign(Object.create(null), {
       [ROOT_PATH]: [0],
@@ -775,6 +781,7 @@ export class Aether<
 
       let plan: ExecutablePlan | PolymorphicPlan;
       this.sideEffectPlanIdsByPathIdentity[pathIdentity] = [];
+      this.transformDependencyPlanIdsByFieldPathIdentity[pathIdentity] = [];
       if (typeof planResolver === "function") {
         const oldPlansLength = this.plans.length;
         const wgs = withGlobalState.bind(null, {
@@ -889,19 +896,42 @@ export class Aether<
       const newPlan = this.plans[i];
       // If the newPlan still exists, finalize it with respect to arguments (once only).
       if (newPlan != null && this.plans[newPlan.id] === newPlan) {
-        const wgs = withGlobalState.bind(null, {
-          aether: this,
-          parentPathIdentity: newPlan.parentPathIdentity,
-        }) as <T>(cb: () => T) => T;
-        wgs(() => {
-          // TODO: rename finalizeArguments; maybe argumentsFinalized or lockParameters or lock?
-          newPlan.finalizeArguments();
-        });
+        {
+          const wgs = withGlobalState.bind(null, {
+            aether: this,
+            parentPathIdentity: newPlan.parentPathIdentity,
+          }) as <T>(cb: () => T) => T;
+          wgs(() => {
+            // TODO: rename finalizeArguments; maybe argumentsFinalized or lockParameters or lock?
+            newPlan.finalizeArguments();
+          });
+        }
         assertArgumentsFinalized(newPlan);
         if (newPlan.hasSideEffects && sideEffectsPathIdentity != null) {
           this.sideEffectPlanIdsByPathIdentity[sideEffectsPathIdentity].push(
             newPlan.id,
           );
+        }
+        if (newPlan instanceof __TransformPlan && sideEffectsPathIdentity) {
+          const listPlan = newPlan.getListPlan();
+          const nestedParentPathIdentity =
+            sideEffectsPathIdentity + `@${newPlan.id}[]`;
+          const wgs = withGlobalState.bind(null, {
+            aether: this,
+            parentPathIdentity: nestedParentPathIdentity,
+          }) as <T>(cb: () => T) => T;
+          const itemPlan = wgs(() => {
+            const __listItem = new __ItemPlan(listPlan);
+            const listItem = listPlan.listItem?.(__listItem) ?? __listItem;
+            return newPlan.itemPlanCallback(listItem);
+          });
+
+          // For logging only
+          this.planIdByPathIdentity[nestedParentPathIdentity] = itemPlan.id;
+
+          this.transformDependencyPlanIdsByFieldPathIdentity[
+            sideEffectsPathIdentity
+          ].push(itemPlan.id);
         }
       }
     }
@@ -1716,6 +1746,20 @@ export class Aether<
     // Mark all plans with side effects as active.
     for (const pathIdentity in this.sideEffectPlanIdsByPathIdentity) {
       const planIds = this.sideEffectPlanIdsByPathIdentity[pathIdentity];
+      for (const planId of planIds) {
+        const plan = this.plans[planId];
+        if (isDev) {
+          assert.ok(plan, `Could not find plan for identifier '${planId}'`);
+        }
+        this.markPlanActive(plan, activePlans);
+      }
+    }
+
+    // Mark all plans used in transforms as active.
+    for (const pathIdentity in this
+      .transformDependencyPlanIdsByFieldPathIdentity) {
+      const planIds =
+        this.transformDependencyPlanIdsByFieldPathIdentity[pathIdentity];
       for (const planId of planIds) {
         const plan = this.plans[planId];
         if (isDev) {
@@ -3007,7 +3051,10 @@ export class Aether<
     this.logPlans(why);
     const fieldPathIdentities = Object.keys(this.planIdByPathIdentity)
       .sort((a, z) => a.length - z.length)
-      .filter((pathIdentity) => !pathIdentity.endsWith("[]"));
+      .filter(
+        (pathIdentity) =>
+          !pathIdentity.endsWith("[]") || pathIdentity.match(/@[0-9]+(\[\])+$/),
+      );
     const printed = new Set<string>();
     let depth = 0;
     const lines: string[] = [];
@@ -3036,7 +3083,7 @@ export class Aether<
       for (const childFieldPathIdentity of fieldPathIdentities) {
         if (
           childFieldPathIdentity.startsWith(fieldPathIdentity) &&
-          /^(\[\])*>/.test(
+          /^(\[\])*>|@/.test(
             childFieldPathIdentity.substr(fieldPathIdentity.length),
           )
         ) {
