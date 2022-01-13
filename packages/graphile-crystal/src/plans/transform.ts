@@ -1,3 +1,5 @@
+import type { GraphQLNamedType, GraphQLOutputType } from "graphql";
+
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
 import type { ListCapablePlan } from "../plan";
 import { ExecutablePlan } from "../plan";
@@ -25,6 +27,7 @@ export interface TransformOptions<
   >;
   listItem?(itemPlan: __ItemPlan<this>): TItemPlan;
   finalizeCallback?(data: TMemo): TMemo;
+  namedType: GraphQLNamedType & GraphQLOutputType;
 }
 
 /**
@@ -56,6 +59,7 @@ export class __TransformPlan<
   >;
   public finalizeCallback?: (data: TMemo) => TMemo;
   public listItem?: (itemPlan: __ItemPlan<this>) => TItemPlan;
+  public namedType: GraphQLNamedType & GraphQLOutputType;
 
   constructor(
     options: TransformOptions<TListPlan, TDepsPlan, TMemo, TItemPlan>,
@@ -68,6 +72,7 @@ export class __TransformPlan<
       reduceCallback,
       finalizeCallback,
       listItem,
+      namedType,
     } = options;
     this.listPlanId = this.addDependency(listPlan);
     this.itemPlanCallback = itemPlanCallback;
@@ -75,10 +80,17 @@ export class __TransformPlan<
     this.reduceCallback = reduceCallback;
     this.finalizeCallback = finalizeCallback;
     this.listItem = listItem;
+    this.namedType = namedType;
   }
 
   getListPlan(): TListPlan {
     return this.getDep(this.listPlanId) as TListPlan;
+  }
+
+  dangerouslyGetListPlan(): TListPlan {
+    return this.aether.dangerouslyGetPlan(
+      this.dependencies[this.listPlanId],
+    ) as TListPlan;
   }
 
   deduplicate(
@@ -92,9 +104,15 @@ export class __TransformPlan<
         peer.finalizeCallback === this.finalizeCallback &&
         peer.listItem === this.listItem
       ) {
-        return peer;
+        // TODO: We shouldn't return `peer` until we alias the replacement id in aether.transformDependencyPlanIdByTransformPlanIdByFieldPathIdentity
+        // return peer;
       }
     }
+    return this;
+  }
+
+  // Transform plans must _NOT_ optimize away. They must persist.
+  optimize() {
     return this;
   }
 
@@ -104,7 +122,8 @@ export class __TransformPlan<
     >,
   ): CrystalResultsList<TMemo> {
     return values.map(([_list]) => {
-      throw new Error("TODO");
+      return [_list] as any;
+      //throw new Error("TODO");
     });
   }
 }

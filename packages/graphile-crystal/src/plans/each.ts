@@ -28,23 +28,25 @@ export class EachPlan<
     private mapper: (itemPlan: TSourceItemPlan) => TResultItemPlan,
   ) {
     super();
+    /*
     if (!isListCapablePlan(listPlan)) {
       throw new Error(
         `EachPlan called with plan ${listPlan}, but that isn't a list capable plan`,
       );
     }
+    */
     this.listPlanId = this.addDependency(listPlan);
   }
 
   originalListPlan(): ListCapablePlan<TSourceData, TSourceItemPlan> {
     const plan = this.getPlan(this.dependencies[this.listPlanId]);
-    assertListCapablePlan(plan, this.createdWithParentPathIdentity);
+    // assertListCapablePlan(plan, this.createdWithParentPathIdentity);
     return plan as ListCapablePlan<TSourceData, TSourceItemPlan>;
   }
 
   listItem(itemPlan: __ItemPlan<this>): TResultItemPlan {
-    const originalListItem = this.originalListPlan().listItem(itemPlan);
-    const mappedPlan = this.mapper(originalListItem);
+    const originalListItem = this.originalListPlan().listItem?.(itemPlan);
+    const mappedPlan = this.mapper(originalListItem ?? itemPlan);
     return mappedPlan;
   }
 

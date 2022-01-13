@@ -3521,6 +3521,7 @@ export function makeExampleSchema(
                 from: sql`app_public.forum_names()`,
                 name: "forum_names",
               });
+              // return lambda($names, (names: string[]) => names.map(name => name.toUpperCase())),
               return each($names, ($name) =>
                 lambda($name, (name) => name.toUpperCase()),
               );

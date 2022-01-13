@@ -262,8 +262,8 @@ export class Aether<
     [pathIdentity: string]: number[];
   };
 
-  public readonly transformDependencyPlanIdsByFieldPathIdentity: {
-    [pathIdentity: string]: number[];
+  public readonly transformDependencyPlanIdByTransformPlanId: {
+    [transformPlanId: number]: number;
   };
 
   public readonly returnRawValueByPathIdentity: {
@@ -393,7 +393,7 @@ export class Aether<
       [ROOT_PATH]: this.rootValuePlan.id,
     });
     this.sideEffectPlanIdsByPathIdentity = Object.create(null);
-    this.transformDependencyPlanIdsByFieldPathIdentity = Object.create(null);
+    this.transformDependencyPlanIdByTransformPlanId = Object.create(null);
     this.returnRawValueByPathIdentity = Object.create(null);
     this.groupIdsByPathIdentity = Object.assign(Object.create(null), {
       [ROOT_PATH]: [0],
@@ -781,12 +781,12 @@ export class Aether<
 
       let plan: ExecutablePlan | PolymorphicPlan;
       this.sideEffectPlanIdsByPathIdentity[pathIdentity] = [];
-      this.transformDependencyPlanIdsByFieldPathIdentity[pathIdentity] = [];
       if (typeof planResolver === "function") {
         const oldPlansLength = this.plans.length;
         const wgs = withGlobalState.bind(null, {
           aether: this,
           parentPathIdentity: path,
+          currentGraphQLType: fieldType,
         }) as <T>(cb: () => T) => T;
         const trackedArguments = wgs(() =>
           this.getTrackedArguments(objectType, field),
@@ -896,6 +896,39 @@ export class Aether<
       const newPlan = this.plans[i];
       // If the newPlan still exists, finalize it with respect to arguments (once only).
       if (newPlan != null && this.plans[newPlan.id] === newPlan) {
+        if (newPlan.hasSideEffects && sideEffectsPathIdentity != null) {
+          this.sideEffectPlanIdsByPathIdentity[sideEffectsPathIdentity].push(
+            newPlan.id,
+          );
+        }
+
+        if (newPlan instanceof __TransformPlan) {
+          const listPlan = newPlan.getListPlan();
+          const nestedParentPathIdentity =
+            sideEffectsPathIdentity + `@${newPlan.id}[]`;
+          const wgs = withGlobalState.bind(null, {
+            aether: this,
+            parentPathIdentity: nestedParentPathIdentity,
+          }) as <T>(cb: () => T) => T;
+          const itemPlan = wgs(() => {
+            const __listItem = new __ItemPlan(listPlan);
+
+            // TODO: this is a hack; we should instead incorporate calculation into this.assignCommonAncestorPathIdentity()
+            // __listItem.commonAncestorPathIdentity = nestedParentPathIdentity;
+
+            const listItem = listPlan.listItem?.(__listItem) ?? __listItem;
+            return newPlan.itemPlanCallback(listItem);
+          });
+
+          // For logging only
+          this.planIdByPathIdentity[nestedParentPathIdentity] = itemPlan.id;
+
+          this.transformDependencyPlanIdByTransformPlanId[
+            // TODO: if newPlan gets deduplicated, will this lookup be broken?
+            newPlan.id
+          ] = itemPlan.id;
+        }
+
         {
           const wgs = withGlobalState.bind(null, {
             aether: this,
@@ -907,32 +940,6 @@ export class Aether<
           });
         }
         assertArgumentsFinalized(newPlan);
-        if (newPlan.hasSideEffects && sideEffectsPathIdentity != null) {
-          this.sideEffectPlanIdsByPathIdentity[sideEffectsPathIdentity].push(
-            newPlan.id,
-          );
-        }
-        if (newPlan instanceof __TransformPlan && sideEffectsPathIdentity) {
-          const listPlan = newPlan.getListPlan();
-          const nestedParentPathIdentity =
-            sideEffectsPathIdentity + `@${newPlan.id}[]`;
-          const wgs = withGlobalState.bind(null, {
-            aether: this,
-            parentPathIdentity: nestedParentPathIdentity,
-          }) as <T>(cb: () => T) => T;
-          const itemPlan = wgs(() => {
-            const __listItem = new __ItemPlan(listPlan);
-            const listItem = listPlan.listItem?.(__listItem) ?? __listItem;
-            return newPlan.itemPlanCallback(listItem);
-          });
-
-          // For logging only
-          this.planIdByPathIdentity[nestedParentPathIdentity] = itemPlan.id;
-
-          this.transformDependencyPlanIdsByFieldPathIdentity[
-            sideEffectsPathIdentity
-          ].push(itemPlan.id);
-        }
       }
     }
   }
@@ -978,9 +985,9 @@ export class Aether<
         depth,
       );
     } else if (fieldType instanceof GraphQLList) {
-      if (!isLeaf) {
-        assertListCapablePlan(plan, pathIdentity);
-      }
+      // if (!isLeaf) {
+      //   assertListCapablePlan(plan, pathIdentity);
+      // }
       const nestedParentPathIdentity = pathIdentity + "[]";
       const nestedTreeNode: TreeNode = {
         fieldPathIdentity,
@@ -992,6 +999,7 @@ export class Aether<
       treeNode.children.push(nestedTreeNode);
       const oldPlansLength = this.plans.length;
 
+      // TODO: transform?
       const listItemPlan = withGlobalState(
         { aether: this, parentPathIdentity: nestedParentPathIdentity },
         isListCapablePlan(plan)
@@ -1756,17 +1764,15 @@ export class Aether<
     }
 
     // Mark all plans used in transforms as active.
-    for (const pathIdentity in this
-      .transformDependencyPlanIdsByFieldPathIdentity) {
-      const planIds =
-        this.transformDependencyPlanIdsByFieldPathIdentity[pathIdentity];
-      for (const planId of planIds) {
-        const plan = this.plans[planId];
-        if (isDev) {
-          assert.ok(plan, `Could not find plan for identifier '${planId}'`);
-        }
-        this.markPlanActive(plan, activePlans);
+    const planIds = Object.values(
+      this.transformDependencyPlanIdByTransformPlanId,
+    );
+    for (const planId of planIds) {
+      const plan = this.plans[planId];
+      if (isDev) {
+        assert.ok(plan, `Could not find plan for identifier '${planId}'`);
       }
+      this.markPlanActive(plan, activePlans);
     }
 
     for (let i = 0, l = this.plans.length; i < l; i++) {
@@ -1794,6 +1800,33 @@ export class Aether<
     const recurse = (treeNode: TreeNode, knownPlans: Set<ExecutablePlan>) => {
       const processPlan = (plan: ExecutablePlan): void => {
         if (!knownPlans.has(plan)) {
+          // Must come first to avoid race conditions
+          if (plan instanceof __TransformPlan) {
+            // TODO: this entire `if` statement is a big hack; we should add transforms to the treeNode elsewhere...
+            const transformPathIdentity =
+              treeNode.pathIdentity + `@${plan.id}[]`;
+            if (
+              !treeNode.children.some(
+                (c) => c.pathIdentity === transformPathIdentity,
+              )
+            ) {
+              console.log(
+                `Found __TransformPlan ${plan} at ${treeNode.pathIdentity}`,
+              );
+              const transformTreeNode: TreeNode = {
+                parent: treeNode,
+                pathIdentity: transformPathIdentity,
+                children: [],
+                groupIds: treeNode.groupIds,
+                fieldPathIdentity: treeNode.fieldPathIdentity,
+              };
+              treeNode.children.push(transformTreeNode);
+              const depId =
+                this.transformDependencyPlanIdByTransformPlanId[plan.id];
+              this.planIdByPathIdentity[transformTreeNode.pathIdentity] = depId;
+            }
+          }
+
           callback(treeNode, plan);
           knownPlans.add(plan);
           plan.dependencies.forEach((depId) => {
@@ -1825,10 +1858,29 @@ export class Aether<
         `Could not find the plan for path identity '${treeNode.pathIdentity}'`,
       );
       processPlan(treeNodePlan);
+
+      /*
+      const treenNodeItemPlanId =
+        this.itemPlanIdByFieldPathIdentity[treeNode.pathIdentity];
+      if (
+        treenNodeItemPlanId != null &&
+        treenNodeItemPlanId !== treeNodePlanId
+      ) {
+        const treeNodeItemPlan = this.plans[treenNodeItemPlanId];
+        assert.ok(
+          treeNodeItemPlan != null,
+          `Could not find the item plan for path identity '${treeNode.pathIdentity}'`,
+        );
+        processPlan(treeNodeItemPlan);
+      }
+      */
+
       treeNode.children.forEach((child) =>
         recurse(child, new Set([...knownPlans])),
       );
     };
+
+    console.log(require("util").inspect(this.rootTreeNode, { depth: 20 }));
 
     recurse(this.rootTreeNode, new Set());
   }
@@ -1865,6 +1917,9 @@ export class Aether<
   private assignCommonAncestorPathIdentity() {
     const treeNodesByPlan = new Map<ExecutablePlan, TreeNode[]>();
     this.walkTreeFirstPlanUsages((treeNode, plan) => {
+      console.log(
+        `Saw ${plan} (${plan.parentPathIdentity}) in ${treeNode.pathIdentity}`,
+      );
       const treeNodes = treeNodesByPlan.get(plan) || [];
       treeNodesByPlan.set(plan, treeNodes);
       treeNodes.push(treeNode);
@@ -1880,6 +1935,9 @@ export class Aether<
         for (let j = 1; j < allPaths.length; j++) {
           // Note this also handles arrays that are shorter, we don't need special handling for that.
           if (allPaths[j][i] !== matcher) {
+            console.log(
+              `${allPaths[j][i].pathIdentity} !== ${matcher.pathIdentity}`,
+            );
             break matchLoop;
           }
         }
@@ -1887,11 +1945,33 @@ export class Aether<
       }
       if (deepestCommonPath < 0) {
         throw new Error(
-          "GraphileInternalError<aac23403-3a32-4e04-a9f2-b19229e3dbfd>: the root tree node should be in common with every path",
+          `GraphileInternalError<aac23403-3a32-4e04-a9f2-b19229e3dbfd>: the root tree node should be in common with every path (whilst trying to find the deepestCommonPath for ${plan})`,
         );
       }
       const commonAncestorNode = allPaths[0][deepestCommonPath];
       plan.commonAncestorPathIdentity = commonAncestorNode.pathIdentity;
+    }
+
+    // Assert it worked
+    if (isDev) {
+      let firstInvalidPlan: any = null;
+      for (const plan of this.plans) {
+        if (
+          plan &&
+          plan.commonAncestorPathIdentity === "" &&
+          plan.parentPathIdentity !== ""
+        ) {
+          firstInvalidPlan = firstInvalidPlan ?? plan;
+          console.warn(
+            `WARNING: Plan ${plan} has empty commonAncestorPathIdentity`,
+          );
+        }
+      }
+      if (firstInvalidPlan) {
+        throw new Error(
+          `GraphileInternalError<1398689a-8285-4dd9-8e6c-25216258f275>: Failed to assign commonAncestorPathIdentity to ${firstInvalidPlan} (parentPathIdentity = '${firstInvalidPlan.parentPathIdentity}')`,
+        );
+      }
     }
   }
 
@@ -1987,6 +2067,101 @@ export class Aether<
           ? null
           : planResults.get(plan.commonAncestorPathIdentity, plan.id),
       );
+    }
+    if (plan instanceof __TransformPlan) {
+      // __TransformPlan gets custom execution.
+      console.log(`${plan} - ${plan.parentPathIdentity}`);
+      const itemPlanId =
+        this.transformDependencyPlanIdByTransformPlanId[plan.id];
+      const itemPlan = this.dangerouslyGetPlan(itemPlanId);
+      const namedReturnType = plan.namedType;
+      const listPlan = plan.dangerouslyGetListPlan();
+      const batch: Batch = {
+        // TODO: rename Batch.pathIdentity to fieldPathIdentity
+        pathIdentity: itemPlan.parentPathIdentity, // TODO: this is probably not right?
+        crystalContext,
+        sideEffectPlans: [],
+        plan: listPlan,
+        itemPlan,
+        entries: [],
+        namedReturnType,
+        returnRaw: true,
+      };
+      console.log(
+        `itemPlan.parentPathIdentity : ${itemPlan.parentPathIdentity}`,
+      );
+      batch.entries = planResultses
+        .map((planResults): [CrystalObject, Deferred<any>] | null =>
+          planResults
+            ? [
+                newCrystalObject(
+                  batch.pathIdentity,
+                  namedReturnType.name,
+                  uid(),
+                  [], // Doesn't matter
+                  crystalContext,
+                  new PlanResults(planResults),
+                ),
+                defer(),
+              ]
+            : null,
+        )
+        .filter(isNotNullish);
+      return Promise.resolve().then(async () => {
+        const listResults = await this.executePlan(
+          listPlan,
+          crystalContext,
+          planResultses,
+          visitedPlans,
+          depth, // TODO: should depth be incremented?
+        );
+        console.dir(listResults);
+        await this.executeBatch(batch, crystalContext);
+        console.dir(batch.entries);
+        const depResults = await Promise.all(batch.entries.map((t) => t[1]));
+        console.dir(depResults);
+        return listResults.map((list, listIndex) => {
+          const values = depResults[listIndex];
+          if (!Array.isArray(list) || !Array.isArray(values)) {
+            // TODO: should this be an error?
+            console.warn(
+              `Either list or values was not an array when processing ${plan}`,
+            );
+            return null;
+          }
+          assert.strictEqual(
+            list.length,
+            values.length,
+            "GraphileInternalError<c85b6936-d406-4801-9c6b-625a567d32ff>: The list and values length must match for a __TransformPlan",
+          );
+          const initialState = plan.initialState();
+          const reduceResult = list.reduce(
+            (memo, entireItemValue, listEntryIndex) =>
+              plan.reduceCallback(
+                memo,
+                entireItemValue,
+                values[listEntryIndex],
+              ),
+            initialState,
+          );
+          const finalResult = plan.finalizeCallback
+            ? plan.finalizeCallback(reduceResult)
+            : reduceResult;
+          console.log(
+            inspect(
+              {
+                values,
+                list,
+                initialState,
+                reduceResult,
+                finalResult,
+              },
+              { depth: 8 },
+            ),
+          );
+          return finalResult;
+        });
+      });
     }
     const pendingPlanResultses: PlanResults[] = []; // Length unknown
     const pendingDeferreds: Deferred<any>[] = []; // Same length as pendingPlanResultses
@@ -2554,7 +2729,7 @@ export class Aether<
         : null;
 
     debugExecuteVerbose(
-      "Executing plan %c with %c crystal layer objects",
+      "$$$ Executing layerPlan %c with %c crystal layer objects",
       layerPlan,
       crystalLayerObjectsLength,
     );
@@ -2578,7 +2753,11 @@ export class Aether<
           dep.commonAncestorPathIdentity,
           dep.id,
         );
-        debugExecuteVerbose("Executing %c's dependency, %c", layerPlan, dep);
+        debugExecuteVerbose(
+          "$$$ Executing %c's dependency, %c",
+          layerPlan,
+          dep,
+        );
         if (Array.isArray(listResult)) {
           // Turn each entry in this listResult into it's own CrystalLayerObject, then execute the new layers.
           const newCLOs = listResult.map((result, i) => {
@@ -2596,6 +2775,12 @@ export class Aether<
               i,
             ]);
           });
+          debugExecuteVerbose(
+            "$$$ %c's dependency, %c, generated %c crystal layer objects",
+            layerPlan,
+            dep,
+            newCLOs.length,
+          );
           return mapResult
             ? newCLOs.map(mapResult)
             : // TODO: we should be optimise this to call executeLayers once, rather than once per crystalLayerObject.

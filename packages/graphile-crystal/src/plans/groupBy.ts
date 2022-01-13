@@ -1,3 +1,6 @@
+import { getNamedType } from "graphql";
+
+import { getGlobalState } from "../global";
 import type { ExecutablePlan, ListCapablePlan } from "../plan";
 import type { __ItemPlan } from "./__item";
 import { each } from "./each";
@@ -26,6 +29,11 @@ export function groupBy<
   listPlan: TListPlan,
   mapper: (listItemPlan: ReturnType<TListPlan["listItem"]>) => TItemPlan,
 ): __TransformPlan<TListPlan, TItemPlan, unknown[][], any> {
+  const currentGraphQLType = getGlobalState().currentGraphQLType;
+  if (!currentGraphQLType) {
+    throw new Error("groupBy cannot be used in this position");
+  }
+  const namedType = getNamedType(currentGraphQLType);
   return transform<TListPlan, TItemPlan, unknown[][], any>({
     listPlan,
     itemPlanCallback: mapper,
@@ -34,5 +42,6 @@ export function groupBy<
     listItem(itemPlan) {
       return each(itemPlan as any, ($item) => listPlan.listItem($item as any));
     },
+    namedType,
   });
 }

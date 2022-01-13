@@ -1,8 +1,12 @@
+import type { GraphQLOutputType } from "graphql";
+
 import type { Aether } from "./aether";
 
 export interface GlobalState {
   aether: Aether;
   parentPathIdentity: string;
+  // TODO: rename?
+  currentGraphQLType?: GraphQLOutputType;
 }
 
 let globalState: GlobalState | null = null;
