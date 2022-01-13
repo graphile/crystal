@@ -408,7 +408,7 @@ export function assertListCapablePlan<
 ): asserts plan is ListCapablePlan<TData, TItemPlan> {
   if (!isListCapablePlan(plan)) {
     throw new Error(
-      `The plan returned from '${pathIdentity}' should be a list capable plan, but it does not implement the 'listItem' method.`,
+      `The plan returned from '${pathIdentity}' should be a list capable plan, but ${plan} does not implement the 'listItem' method.`,
     );
   }
 }
