@@ -8,7 +8,16 @@ export type TransformReduce<TMemo, TItemPlanData> = (
   itemPlanData: TItemPlanData,
 ) => TMemo;
 
-export interface TransformOptions<TItemPlan extends ExecutablePlan, TMemo> {
+export interface TransformOptions<
+  TListPlan extends ListCapablePlan<any, any>,
+  TItemPlan extends ExecutablePlan,
+  TMemo,
+> {
+  listPlan: TListPlan;
+  // TODO: rename this:
+  itemPlanCallback: (
+    listItemPlan: ReturnType<TListPlan["listItem"]>,
+  ) => TItemPlan;
   initialState: () => TMemo;
   reduceCallback: TransformReduce<
     TMemo,
@@ -34,18 +43,30 @@ export class __TransformPlan<
     exportName: "TransformPlan",
   };
 
-  public transformOptions: TransformOptions<TItemPlan, TMemo>;
+  public itemPlanCallback: (
+    listItemPlan: ReturnType<TListPlan["listItem"]>,
+  ) => TItemPlan;
+  public initialState: () => TMemo;
+  public reduceCallback: TransformReduce<
+    TMemo,
+    TItemPlan extends ExecutablePlan<infer U> ? U : never
+  >;
+  public finalizeCallback?: (data: TMemo) => TMemo;
 
-  constructor(
-    listPlan: TListPlan,
-    public itemPlanCallback: (
-      listItemPlan: ReturnType<TListPlan["listItem"]>,
-    ) => TItemPlan,
-    options: TransformOptions<TItemPlan, TMemo>,
-  ) {
+  constructor(options: TransformOptions<TListPlan, TItemPlan, TMemo>) {
     super();
+    const {
+      listPlan,
+      itemPlanCallback,
+      initialState,
+      reduceCallback,
+      finalizeCallback,
+    } = options;
     this.addDependency(listPlan);
-    this.transformOptions = options;
+    this.itemPlanCallback = itemPlanCallback;
+    this.initialState = initialState;
+    this.reduceCallback = reduceCallback;
+    this.finalizeCallback = finalizeCallback;
   }
 
   deduplicate(
@@ -54,12 +75,9 @@ export class __TransformPlan<
     for (const peer of peers) {
       if (
         peer.itemPlanCallback === this.itemPlanCallback &&
-        peer.transformOptions.initialState ===
-          this.transformOptions.initialState &&
-        peer.transformOptions.reduceCallback ===
-          this.transformOptions.reduceCallback &&
-        peer.transformOptions.finalizeCallback ===
-          this.transformOptions.finalizeCallback
+        peer.initialState === this.initialState &&
+        peer.reduceCallback === this.reduceCallback &&
+        peer.finalizeCallback === this.finalizeCallback
       ) {
         return peer;
       }
@@ -83,11 +101,7 @@ export function transform<
   TItemPlan extends ExecutablePlan,
   TMemo,
 >(
-  listPlan: TListPlan,
-  itemPlanCallback: (
-    listItemPlan: ReturnType<TListPlan["listItem"]>,
-  ) => TItemPlan,
-  options: TransformOptions<TItemPlan, TMemo>,
+  options: TransformOptions<TListPlan, TItemPlan, TMemo>,
 ): __TransformPlan<TListPlan, TItemPlan, TMemo> {
-  return new __TransformPlan(listPlan, itemPlanCallback, options);
+  return new __TransformPlan(options);
 }

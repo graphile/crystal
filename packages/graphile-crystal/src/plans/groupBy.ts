@@ -1,18 +1,21 @@
 import type { ExecutablePlan, ListCapablePlan } from "../plan";
 import type { __ItemPlan } from "./__item";
-import type { __TransformPlan, TransformOptions } from "./transform";
+import type { __TransformPlan, TransformReduce } from "./transform";
 import { transform } from "./transform";
 
-const groupByOptions: TransformOptions<ExecutablePlan<number>, unknown[][]> = {
-  initialState: () => [],
-  reduceCallback(memo, entireItemValue, idx) {
-    if (!memo[idx]) {
-      memo[idx] = [];
-    }
-    memo[idx].push(entireItemValue);
-    return memo;
-  },
+const reduceCallback: TransformReduce<unknown[][], number> = (
+  memo,
+  entireItemValue,
+  idx,
+) => {
+  if (!memo[idx]) {
+    memo[idx] = [];
+  }
+  memo[idx].push(entireItemValue);
+  return memo;
 };
+
+const initialState = () => [];
 
 // TODO: rename so we're not confusing vs lodash' groupBy (which does something a little different)
 export function groupBy<
@@ -22,9 +25,10 @@ export function groupBy<
   listPlan: TListPlan,
   mapper: (listItemPlan: ReturnType<TListPlan["listItem"]>) => TItemPlan,
 ): __TransformPlan<TListPlan, TItemPlan, unknown[][]> {
-  return transform<TListPlan, TItemPlan, unknown[][]>(
+  return transform<TListPlan, TItemPlan, unknown[][]>({
     listPlan,
-    mapper,
-    groupByOptions,
-  );
+    itemPlanCallback: mapper,
+    initialState,
+    reduceCallback,
+  });
 }
