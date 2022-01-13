@@ -102,7 +102,19 @@ create function app_public.random_user_array() returns app_public.users[] as $$
   select array_agg(users order by users.id)
   from app_public.users
   where users.id = 'b0b00000-0000-0000-0000-000000000b0b' /* user chosen by a fair dice role - 1-2 Alice, 3-4 Bob, 5-6 Cecilia */
-  limit 1
+$$ language sql stable;
+create function app_public.random_user_array_set() returns setof app_public.users[] as $$
+  select array_agg(users order by users.id)
+  from generate_series(0, 1) i
+  inner join app_public.users
+  on (
+    case when i = 0 then
+      users.id = 'b0b00000-0000-0000-0000-000000000b0b'
+    else
+      users.id in ('a11ce000-0000-0000-0000-0000000a11ce', 'cec111a0-0000-0000-0000-00000cec111a')
+    end
+  )
+  group by i
 $$ language sql stable;
 create function app_public.featured_messages() returns setof app_public.messages as $$
   select messages.*
