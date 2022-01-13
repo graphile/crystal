@@ -2068,101 +2068,6 @@ export class Aether<
           : planResults.get(plan.commonAncestorPathIdentity, plan.id),
       );
     }
-    if (plan instanceof __TransformPlan) {
-      // __TransformPlan gets custom execution.
-      console.log(`${plan} - ${plan.parentPathIdentity}`);
-      const itemPlanId =
-        this.transformDependencyPlanIdByTransformPlanId[plan.id];
-      const itemPlan = this.dangerouslyGetPlan(itemPlanId);
-      const namedReturnType = plan.namedType;
-      const listPlan = plan.dangerouslyGetListPlan();
-      const batch: Batch = {
-        // TODO: rename Batch.pathIdentity to fieldPathIdentity
-        pathIdentity: itemPlan.parentPathIdentity, // TODO: this is probably not right?
-        crystalContext,
-        sideEffectPlans: [],
-        plan: listPlan,
-        itemPlan,
-        entries: [],
-        namedReturnType,
-        returnRaw: true,
-      };
-      console.log(
-        `itemPlan.parentPathIdentity : ${itemPlan.parentPathIdentity}`,
-      );
-      batch.entries = planResultses
-        .map((planResults): [CrystalObject, Deferred<any>] | null =>
-          planResults
-            ? [
-                newCrystalObject(
-                  batch.pathIdentity,
-                  namedReturnType.name,
-                  uid(),
-                  [], // Doesn't matter
-                  crystalContext,
-                  new PlanResults(planResults),
-                ),
-                defer(),
-              ]
-            : null,
-        )
-        .filter(isNotNullish);
-      return Promise.resolve().then(async () => {
-        const listResults = await this.executePlan(
-          listPlan,
-          crystalContext,
-          planResultses,
-          visitedPlans,
-          depth, // TODO: should depth be incremented?
-        );
-        console.dir(listResults);
-        await this.executeBatch(batch, crystalContext);
-        console.dir(batch.entries);
-        const depResults = await Promise.all(batch.entries.map((t) => t[1]));
-        console.dir(depResults);
-        return listResults.map((list, listIndex) => {
-          const values = depResults[listIndex];
-          if (!Array.isArray(list) || !Array.isArray(values)) {
-            // TODO: should this be an error?
-            console.warn(
-              `Either list or values was not an array when processing ${plan}`,
-            );
-            return null;
-          }
-          assert.strictEqual(
-            list.length,
-            values.length,
-            "GraphileInternalError<c85b6936-d406-4801-9c6b-625a567d32ff>: The list and values length must match for a __TransformPlan",
-          );
-          const initialState = plan.initialState();
-          const reduceResult = list.reduce(
-            (memo, entireItemValue, listEntryIndex) =>
-              plan.reduceCallback(
-                memo,
-                entireItemValue,
-                values[listEntryIndex],
-              ),
-            initialState,
-          );
-          const finalResult = plan.finalizeCallback
-            ? plan.finalizeCallback(reduceResult)
-            : reduceResult;
-          console.log(
-            inspect(
-              {
-                values,
-                list,
-                initialState,
-                reduceResult,
-                finalResult,
-              },
-              { depth: 8 },
-            ),
-          );
-          return finalResult;
-        });
-      });
-    }
     const pendingPlanResultses: PlanResults[] = []; // Length unknown
     const pendingDeferreds: Deferred<any>[] = []; // Same length as pendingPlanResultses
     const pendingPlanResultsesIndexes: number[] = []; // Same length as pendingPlanResultses
@@ -2391,7 +2296,15 @@ export class Aether<
     const planOptions = this.planOptionsByPlan.get(plan);
     const isSubscribe = plan.id === this.subscriptionPlanId;
     const pendingResults =
-      isSubscribe || planOptions?.stream
+      plan instanceof __TransformPlan
+        ? // __TransformPlan gets custom execution.
+          await this.executeTransformPlan(
+            plan,
+            crystalContext,
+            pendingPlanResultses,
+            visitedPlans,
+          )
+        : isSubscribe || planOptions?.stream
         ? await (plan as unknown as StreamablePlan<unknown>).stream(
             values,
             meta,
@@ -2454,6 +2367,99 @@ export class Aether<
       pendingPlanResultses.join(", "),
     );
     return result;
+  }
+
+  private async executeTransformPlan(
+    plan: __TransformPlan<any, any, any>,
+    crystalContext: CrystalContext,
+    planResultses: readonly PlanResults[],
+    visitedPlans: Set<ExecutablePlan>,
+  ) {
+    console.log(`${plan} - ${plan.parentPathIdentity}`);
+    const itemPlanId = this.transformDependencyPlanIdByTransformPlanId[plan.id];
+    const itemPlan = this.dangerouslyGetPlan(itemPlanId);
+    const namedReturnType = plan.namedType;
+    const listPlan = plan.dangerouslyGetListPlan();
+    const batch: Batch = {
+      // TODO: rename Batch.pathIdentity to fieldPathIdentity
+      pathIdentity: itemPlan.parentPathIdentity, // TODO: this is probably not right?
+      crystalContext,
+      sideEffectPlans: [],
+      plan: listPlan,
+      itemPlan,
+      entries: [],
+      namedReturnType,
+      returnRaw: true,
+    };
+    console.log(`itemPlan.parentPathIdentity : ${itemPlan.parentPathIdentity}`);
+    batch.entries = planResultses
+      .map((planResults): [CrystalObject, Deferred<any>] | null =>
+        planResults
+          ? [
+              newCrystalObject(
+                batch.pathIdentity,
+                namedReturnType.name,
+                uid(),
+                [], // Doesn't matter
+                crystalContext,
+                new PlanResults(planResults),
+              ),
+              defer(),
+            ]
+          : null,
+      )
+      .filter(isNotNullish);
+    return Promise.resolve().then(async () => {
+      const listResults = await this.executePlan(
+        listPlan,
+        crystalContext,
+        planResultses,
+        visitedPlans,
+        depth, // TODO: should depth be incremented?
+      );
+      console.dir(listResults);
+      await this.executeBatch(batch, crystalContext);
+      console.dir(batch.entries);
+      const depResults = await Promise.all(batch.entries.map((t) => t[1]));
+      console.dir(depResults);
+      return listResults.map((list, listIndex) => {
+        const values = depResults[listIndex];
+        if (!Array.isArray(list) || !Array.isArray(values)) {
+          // TODO: should this be an error?
+          console.warn(
+            `Either list or values was not an array when processing ${plan}`,
+          );
+          return null;
+        }
+        assert.strictEqual(
+          list.length,
+          values.length,
+          "GraphileInternalError<c85b6936-d406-4801-9c6b-625a567d32ff>: The list and values length must match for a __TransformPlan",
+        );
+        const initialState = plan.initialState();
+        const reduceResult = list.reduce(
+          (memo, entireItemValue, listEntryIndex) =>
+            plan.reduceCallback(memo, entireItemValue, values[listEntryIndex]),
+          initialState,
+        );
+        const finalResult = plan.finalizeCallback
+          ? plan.finalizeCallback(reduceResult)
+          : reduceResult;
+        console.log(
+          inspect(
+            {
+              values,
+              list,
+              initialState,
+              reduceResult,
+              finalResult,
+            },
+            { depth: 8 },
+          ),
+        );
+        return finalResult;
+      });
+    });
   }
 
   //----------------------------------------
