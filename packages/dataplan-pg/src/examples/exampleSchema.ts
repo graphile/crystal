@@ -128,6 +128,10 @@ type NullableUnless<
   TType,
 > = TCondition extends true ? TType : TType | null | undefined;
 
+function subtractOne(n: number): number {
+  return n - 1;
+}
+
 export function makeExampleSchema(
   options: { deoptimize?: boolean } = Object.create(null),
 ): GraphQLSchema {
@@ -3559,33 +3563,18 @@ export function makeExampleSchema(
       randomUserArraySet: {
         type: new GraphQLList(new GraphQLList(User)),
         plan: EXPORTABLE(
-          (
-            TYPES,
-            deoptimizeIfAppropriate,
-            groupBy,
-            lambda,
-            randomUserArraySetSource,
-            randomUserArraySetSourceIdx,
-          ) =>
-            function plan() {
+          (TYPES, deoptimizeIfAppropriate, groupBy, lambda, randomUserArraySetSource, randomUserArraySetSourceIdx, subtractOne) => function plan() {
               const $select = randomUserArraySetSource.execute();
               deoptimizeIfAppropriate($select);
               return groupBy($select, ($row) =>
                 // Ordinality is 1-indexed but we want a 0-indexed number
                 lambda(
                   $row.select(randomUserArraySetSourceIdx, TYPES.int),
-                  (n: number) => n - 1,
+                  subtractOne,
                 ),
               );
             },
-          [
-            TYPES,
-            deoptimizeIfAppropriate,
-            groupBy,
-            lambda,
-            randomUserArraySetSource,
-            randomUserArraySetSourceIdx,
-          ],
+          [TYPES, deoptimizeIfAppropriate, groupBy, lambda, randomUserArraySetSource, randomUserArraySetSourceIdx, subtractOne],
         ),
       },
 
