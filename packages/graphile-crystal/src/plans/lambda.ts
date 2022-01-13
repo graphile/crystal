@@ -16,6 +16,10 @@ export class LambdaPlan<TIn, TOut> extends ExecutablePlan<TOut> {
     this.planId = $plan != null ? this.addDependency($plan) : null;
   }
 
+  toStringMeta() {
+    return (this.fn as any).displayName || this.fn.name;
+  }
+
   deduplicate(peers: LambdaPlan<any, any>[]): LambdaPlan<TIn, TOut> {
     for (const peer of peers) {
       if (peer.fn === this.fn) {
