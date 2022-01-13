@@ -5,6 +5,7 @@ import type {
   GraphQLInputFieldConfig,
   GraphQLInputType,
   GraphQLList,
+  GraphQLNamedType,
   GraphQLNonNull,
   GraphQLOutputType,
   GraphQLScalarType,
@@ -147,7 +148,7 @@ export interface Batch {
   plan: ExecutablePlan;
   itemPlan: ExecutablePlan;
   entries: Array<[CrystalObject, Deferred<any>]>;
-  returnType: GraphQLOutputType;
+  namedReturnType: GraphQLNamedType & GraphQLOutputType;
   /**
    * If the user has their own resolver we must return raw data, otherwise
    * we'll return CrystalObjects.

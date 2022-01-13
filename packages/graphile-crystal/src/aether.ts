@@ -2366,6 +2366,7 @@ export class Aether<
       itemPlan,
       `Could not find the itemPlan with id '${itemPlanId}' at '${fieldPathIdentity}'`,
     );
+    const namedReturnType = getNamedType(returnType);
     const batch: Batch = {
       // TODO: rename Batch.pathIdentity to fieldPathIdentity
       pathIdentity: fieldPathIdentity,
@@ -2374,7 +2375,7 @@ export class Aether<
       plan,
       itemPlan,
       entries: [],
-      returnType,
+      namedReturnType,
       returnRaw,
     };
     return batch;
@@ -2746,9 +2747,14 @@ export class Aether<
     // This guarantees nothing else will be added to the batch
     delete this.batchByPathIdentity[batch.pathIdentity];
 
-    const { entries, sideEffectPlans, plan, itemPlan, returnType, returnRaw } =
-      batch;
-    const namedReturnType = getNamedType(returnType);
+    const {
+      entries,
+      sideEffectPlans,
+      plan,
+      itemPlan,
+      namedReturnType,
+      returnRaw,
+    } = batch;
     const entriesLength = entries.length;
     const crystalObjects: CrystalObject[] = new Array(entriesLength);
     const deferredResults: Deferred<any>[] = new Array(entriesLength);
