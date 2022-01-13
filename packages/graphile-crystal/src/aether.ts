@@ -1025,12 +1025,13 @@ export class Aether<
           // Check that the plan we're dealing with is the one the user declared
           const ExpectedPlan = fieldType.extensions?.graphile?.Plan;
           if (ExpectedPlan && !(plan instanceof ExpectedPlan)) {
+            this.logPlansByPath();
             throw new Error(
               `Plan mis-match: expected ${
                 ExpectedPlan.name
               } at '${pathIdentity}', but instead found ${
                 (plan as ExecutablePlan).constructor.name
-              }`,
+              } (${plan})`,
             );
           }
         }
