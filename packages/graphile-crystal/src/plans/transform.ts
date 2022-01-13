@@ -45,6 +45,7 @@ export class __TransformPlan<
     exportName: "TransformPlan",
   };
 
+  private listPlanId: number;
   public itemPlanCallback: (
     listItemPlan: ReturnType<TListPlan["listItem"]>,
   ) => TDepsPlan;
@@ -68,12 +69,16 @@ export class __TransformPlan<
       finalizeCallback,
       listItem,
     } = options;
-    this.addDependency(listPlan);
+    this.listPlanId = this.addDependency(listPlan);
     this.itemPlanCallback = itemPlanCallback;
     this.initialState = initialState;
     this.reduceCallback = reduceCallback;
     this.finalizeCallback = finalizeCallback;
     this.listItem = listItem;
+  }
+
+  getListPlan(): TListPlan {
+    return this.getDep(this.listPlanId) as TListPlan;
   }
 
   deduplicate(
