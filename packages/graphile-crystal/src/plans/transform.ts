@@ -1,6 +1,7 @@
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
 import type { ListCapablePlan } from "../plan";
 import { ExecutablePlan } from "../plan";
+import type { __ItemPlan } from "./__item";
 
 export type TransformReduce<TMemo, TItemPlanData> = (
   memo: TMemo,
@@ -10,20 +11,20 @@ export type TransformReduce<TMemo, TItemPlanData> = (
 
 export interface TransformOptions<
   TListPlan extends ListCapablePlan<any, any>,
-  TItemPlan extends ExecutablePlan,
+  TDepsPlan extends ExecutablePlan,
   TMemo,
+  TItemPlan extends ExecutablePlan | undefined = undefined,
 > {
   listPlan: TListPlan;
   // TODO: rename this:
-  itemPlanCallback: (
-    listItemPlan: ReturnType<TListPlan["listItem"]>,
-  ) => TItemPlan;
-  initialState: () => TMemo;
+  itemPlanCallback(listItemPlan: ReturnType<TListPlan["listItem"]>): TDepsPlan;
+  initialState(): TMemo;
   reduceCallback: TransformReduce<
     TMemo,
-    TItemPlan extends ExecutablePlan<infer U> ? U : never
+    TDepsPlan extends ExecutablePlan<infer U> ? U : never
   >;
-  finalizeCallback?: (data: TMemo) => TMemo;
+  listItem?(itemPlan: __ItemPlan<this>): TItemPlan;
+  finalizeCallback?(data: TMemo): TMemo;
 }
 
 /**
@@ -35,8 +36,9 @@ export interface TransformOptions<
  */
 export class __TransformPlan<
   TListPlan extends ListCapablePlan<any, any>,
-  TItemPlan extends ExecutablePlan,
+  TDepsPlan extends ExecutablePlan,
   TMemo,
+  TItemPlan extends ExecutablePlan | undefined = undefined,
 > extends ExecutablePlan<TMemo> {
   static $$export = {
     moduleName: "graphile-crystal",
@@ -45,15 +47,18 @@ export class __TransformPlan<
 
   public itemPlanCallback: (
     listItemPlan: ReturnType<TListPlan["listItem"]>,
-  ) => TItemPlan;
+  ) => TDepsPlan;
   public initialState: () => TMemo;
   public reduceCallback: TransformReduce<
     TMemo,
-    TItemPlan extends ExecutablePlan<infer U> ? U : never
+    TDepsPlan extends ExecutablePlan<infer U> ? U : never
   >;
   public finalizeCallback?: (data: TMemo) => TMemo;
+  public listItem?: (itemPlan: __ItemPlan<this>) => TItemPlan;
 
-  constructor(options: TransformOptions<TListPlan, TItemPlan, TMemo>) {
+  constructor(
+    options: TransformOptions<TListPlan, TDepsPlan, TMemo, TItemPlan>,
+  ) {
     super();
     const {
       listPlan,
@@ -61,23 +66,26 @@ export class __TransformPlan<
       initialState,
       reduceCallback,
       finalizeCallback,
+      listItem,
     } = options;
     this.addDependency(listPlan);
     this.itemPlanCallback = itemPlanCallback;
     this.initialState = initialState;
     this.reduceCallback = reduceCallback;
     this.finalizeCallback = finalizeCallback;
+    this.listItem = listItem;
   }
 
   deduplicate(
-    peers: __TransformPlan<any, any, any>[],
-  ): __TransformPlan<TListPlan, TItemPlan, TMemo> {
+    peers: __TransformPlan<any, any, any, any>[],
+  ): __TransformPlan<TListPlan, TDepsPlan, TMemo, TItemPlan> {
     for (const peer of peers) {
       if (
         peer.itemPlanCallback === this.itemPlanCallback &&
         peer.initialState === this.initialState &&
         peer.reduceCallback === this.reduceCallback &&
-        peer.finalizeCallback === this.finalizeCallback
+        peer.finalizeCallback === this.finalizeCallback &&
+        peer.listItem === this.listItem
       ) {
         return peer;
       }
@@ -98,10 +106,11 @@ export class __TransformPlan<
 
 export function transform<
   TListPlan extends ListCapablePlan<any, any>,
-  TItemPlan extends ExecutablePlan,
+  TDepsPlan extends ExecutablePlan,
   TMemo,
+  TItemPlan extends ExecutablePlan | undefined = undefined,
 >(
-  options: TransformOptions<TListPlan, TItemPlan, TMemo>,
-): __TransformPlan<TListPlan, TItemPlan, TMemo> {
+  options: TransformOptions<TListPlan, TDepsPlan, TMemo, TItemPlan>,
+): __TransformPlan<TListPlan, TDepsPlan, TMemo, TItemPlan> {
   return new __TransformPlan(options);
 }

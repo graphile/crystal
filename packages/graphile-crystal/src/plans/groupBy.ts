@@ -1,5 +1,6 @@
 import type { ExecutablePlan, ListCapablePlan } from "../plan";
 import type { __ItemPlan } from "./__item";
+import { each } from "./each";
 import type { __TransformPlan, TransformReduce } from "./transform";
 import { transform } from "./transform";
 
@@ -24,11 +25,14 @@ export function groupBy<
 >(
   listPlan: TListPlan,
   mapper: (listItemPlan: ReturnType<TListPlan["listItem"]>) => TItemPlan,
-): __TransformPlan<TListPlan, TItemPlan, unknown[][]> {
-  return transform<TListPlan, TItemPlan, unknown[][]>({
+): __TransformPlan<TListPlan, TItemPlan, unknown[][], any> {
+  return transform<TListPlan, TItemPlan, unknown[][], any>({
     listPlan,
     itemPlanCallback: mapper,
     initialState,
     reduceCallback,
+    listItem(itemPlan) {
+      return each(itemPlan as any, ($item) => listPlan.listItem($item as any));
+    },
   });
 }
