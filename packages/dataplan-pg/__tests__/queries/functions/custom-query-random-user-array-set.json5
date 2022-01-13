@@ -1,0 +1,20 @@
+{
+  randomUserArraySet: [
+    [
+      {
+        username: "Bob",
+        gravatarUrl: null,
+      },
+    ],
+    [
+      {
+        username: "Alice",
+        gravatarUrl: null,
+      },
+      {
+        username: "Cecilia",
+        gravatarUrl: null,
+      },
+    ],
+  ],
+}
