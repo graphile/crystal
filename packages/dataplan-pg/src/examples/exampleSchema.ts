@@ -537,6 +537,31 @@ export function makeExampleSchema(
     [sql, userSource],
   );
 
+  const randomUserArraySetSourceTmp = sql.identifier(
+    Symbol("random_user_array_set_array"),
+  );
+  const randomUserArraySetSourceIdx = sql.identifier(
+    Symbol("random_user_array_set_idx"),
+  );
+  const randomUserArraySetSource = EXPORTABLE(
+    (
+      randomUserArraySetSourceIdx,
+      randomUserArraySetSourceTmp,
+      sql,
+      userSource,
+    ) =>
+      userSource.alternativeSource({
+        name: "random_user_array_set",
+        source: (...args) =>
+          sql`app_public.random_user_array_set(${sql.join(
+            args,
+            ", ",
+          )}) with ordinality as ${randomUserArraySetSourceTmp} (arr, ${randomUserArraySetSourceIdx}) cross join lateral unnest (arr)`,
+        parameters: [],
+      }),
+    [randomUserArraySetSourceIdx, randomUserArraySetSourceTmp, sql, userSource],
+  );
+
   const unionEntityColumns = EXPORTABLE(
     (TYPES, col) => ({
       person_id: col({ codec: TYPES.int, notNull: false }),
@@ -3520,7 +3545,8 @@ export function makeExampleSchema(
       randomUserArray: {
         type: new GraphQLList(User),
         plan: EXPORTABLE(
-          (deoptimizeIfAppropriate, randomUserArraySource) => function plan() {
+          (deoptimizeIfAppropriate, randomUserArraySource) =>
+            function plan() {
               const $select = randomUserArraySource.execute();
               deoptimizeIfAppropriate($select);
               return $select;
