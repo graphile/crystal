@@ -526,6 +526,17 @@ export function makeExampleSchema(
     [forumCodec, messageSource, sql],
   );
 
+  const randomUserArraySource = EXPORTABLE(
+    (sql, userSource) =>
+      userSource.alternativeSource({
+        name: "random_user_array",
+        source: (...args) =>
+          sql`unnest(app_public.random_user_array(${sql.join(args, ", ")}))`,
+        parameters: [],
+      }),
+    [sql, userSource],
+  );
+
   const unionEntityColumns = EXPORTABLE(
     (TYPES, col) => ({
       person_id: col({ codec: TYPES.int, notNull: false }),
@@ -3444,7 +3455,8 @@ export function makeExampleSchema(
       forumNamesCasesList: {
         type: new GraphQLList(new GraphQLList(GraphQLString)),
         plan: EXPORTABLE(
-          (forumNamesCasesSource) => function plan(_$root) {
+          (forumNamesCasesSource) =>
+            function plan(_$root) {
               const $plan = forumNamesCasesSource.execute();
               return $plan;
             },
@@ -3502,6 +3514,18 @@ export function makeExampleSchema(
               return $users.single();
             },
           [deoptimizeIfAppropriate, pgSelect, sql, userSource],
+        ),
+      },
+
+      randomUserArray: {
+        type: new GraphQLList(User),
+        plan: EXPORTABLE(
+          (deoptimizeIfAppropriate, randomUserArraySource) => function plan() {
+              const $select = randomUserArraySource.execute();
+              deoptimizeIfAppropriate($select);
+              return $select;
+            },
+          [deoptimizeIfAppropriate, randomUserArraySource],
         ),
       },
 

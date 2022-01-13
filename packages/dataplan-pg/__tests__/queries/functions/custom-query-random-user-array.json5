@@ -1,0 +1,8 @@
+{
+  randomUserArray: [
+    {
+      username: "Bob",
+      gravatarUrl: null,
+    },
+  ],
+}
