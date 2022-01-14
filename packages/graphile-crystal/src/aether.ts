@@ -1810,9 +1810,6 @@ export class Aether<
                 (c) => c.pathIdentity === transformPathIdentity,
               )
             ) {
-              console.log(
-                `Found __TransformPlan ${plan} at ${treeNode.pathIdentity}`,
-              );
               const transformTreeNode: TreeNode = {
                 parent: treeNode,
                 pathIdentity: transformPathIdentity,
@@ -1859,28 +1856,10 @@ export class Aether<
       );
       processPlan(treeNodePlan);
 
-      /*
-      const treenNodeItemPlanId =
-        this.itemPlanIdByFieldPathIdentity[treeNode.pathIdentity];
-      if (
-        treenNodeItemPlanId != null &&
-        treenNodeItemPlanId !== treeNodePlanId
-      ) {
-        const treeNodeItemPlan = this.plans[treenNodeItemPlanId];
-        assert.ok(
-          treeNodeItemPlan != null,
-          `Could not find the item plan for path identity '${treeNode.pathIdentity}'`,
-        );
-        processPlan(treeNodeItemPlan);
-      }
-      */
-
       treeNode.children.forEach((child) =>
         recurse(child, new Set([...knownPlans])),
       );
     };
-
-    console.log(require("util").inspect(this.rootTreeNode, { depth: 20 }));
 
     recurse(this.rootTreeNode, new Set());
   }
@@ -1917,9 +1896,6 @@ export class Aether<
   private assignCommonAncestorPathIdentity() {
     const treeNodesByPlan = new Map<ExecutablePlan, TreeNode[]>();
     this.walkTreeFirstPlanUsages((treeNode, plan) => {
-      console.log(
-        `Saw ${plan} (${plan.parentPathIdentity}) in ${treeNode.pathIdentity}`,
-      );
       const treeNodes = treeNodesByPlan.get(plan) || [];
       treeNodesByPlan.set(plan, treeNodes);
       treeNodes.push(treeNode);
@@ -1935,9 +1911,6 @@ export class Aether<
         for (let j = 1; j < allPaths.length; j++) {
           // Note this also handles arrays that are shorter, we don't need special handling for that.
           if (allPaths[j][i] !== matcher) {
-            console.log(
-              `${allPaths[j][i].pathIdentity} !== ${matcher.pathIdentity}`,
-            );
             break matchLoop;
           }
         }
@@ -2375,7 +2348,6 @@ export class Aether<
     planResultses: readonly PlanResults[],
     visitedPlans: Set<ExecutablePlan>,
   ) {
-    console.log(`${plan} - ${plan.parentPathIdentity}`);
     const itemPlanId = this.transformDependencyPlanIdByTransformPlanId[plan.id];
     const itemPlan = this.dangerouslyGetPlan(itemPlanId);
     const namedReturnType = plan.namedType;
@@ -2391,7 +2363,6 @@ export class Aether<
       namedReturnType,
       returnRaw: true,
     };
-    console.log(`itemPlan.parentPathIdentity : ${itemPlan.parentPathIdentity}`);
     batch.entries = planResultses
       .map((planResults): [CrystalObject, Deferred<any>] | null =>
         planResults
@@ -2417,11 +2388,8 @@ export class Aether<
         visitedPlans,
         depth, // TODO: should depth be incremented?
       );
-      console.dir(listResults);
       await this.executeBatch(batch, crystalContext);
-      console.dir(batch.entries);
       const depResults = await Promise.all(batch.entries.map((t) => t[1]));
-      console.dir(depResults);
       return listResults.map((list, listIndex) => {
         const values = depResults[listIndex];
         if (!Array.isArray(list) || !Array.isArray(values)) {
@@ -2445,18 +2413,6 @@ export class Aether<
         const finalResult = plan.finalizeCallback
           ? plan.finalizeCallback(reduceResult)
           : reduceResult;
-        console.log(
-          inspect(
-            {
-              values,
-              list,
-              initialState,
-              reduceResult,
-              finalResult,
-            },
-            { depth: 8 },
-          ),
-        );
         return finalResult;
       });
     });
