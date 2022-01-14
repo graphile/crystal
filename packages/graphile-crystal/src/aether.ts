@@ -2716,8 +2716,17 @@ export class Aether<
         }
         const { parentCrystalObject, indexes, planResults } = clo;
         if (planResults.hasPathIdentity(layerPlan.commonAncestorPathIdentity)) {
+          const bucket = planResults.getBucket(
+            layerPlan.commonAncestorPathIdentity,
+          );
           throw new Error(
-            `Did not expect plans to exist within the '${layerPlan.commonAncestorPathIdentity}' bucket yet.`,
+            `GraphileInternalError<355413ed-6688-45ce-8d5d-22faee9668a3>: Did not expect plans to exist within the '${
+              layerPlan.commonAncestorPathIdentity
+            }' bucket yet (creating for ${layerPlan}, but already contains data from ${[
+              ...bucket.keys(),
+            ]
+              .map((id) => this.dangerouslyGetPlan(id))
+              .join(", ")}). Data found: ${crystalPrint(bucket)}`,
           );
         }
         // NOTE: this could be an async iterator
