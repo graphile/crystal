@@ -473,7 +473,7 @@ export class Aether<
     if (!rootType) {
       throw new Error("No query type found in schema");
     }
-    this.finalizeArgumentsSince(0);
+    this.finalizeArgumentsSince(0, ROOT_PATH);
     this.planSelectionSet(
       ROOT_PATH,
       this.trackedRootValuePlan,
@@ -496,7 +496,7 @@ export class Aether<
     if (!rootType) {
       throw new Error("No mutation type found in schema");
     }
-    this.finalizeArgumentsSince(0);
+    this.finalizeArgumentsSince(0, ROOT_PATH);
     this.planSelectionSet(
       ROOT_PATH,
       this.trackedRootValuePlan,
@@ -586,7 +586,7 @@ export class Aether<
         () => subscribePlan.itemPlan(new __ItemPlan(subscribePlan)),
       );
       this.subscriptionItemPlanId = streamItemPlan.id;
-      this.finalizeArgumentsSince(0);
+      this.finalizeArgumentsSince(0, ROOT_PATH);
       this.planSelectionSet(
         nestedParentPathIdentity,
         streamItemPlan,
@@ -602,7 +602,7 @@ export class Aether<
     } else {
       const subscribePlan = this.trackedRootValuePlan;
       this.subscriptionPlanId = subscribePlan.id;
-      this.finalizeArgumentsSince(0);
+      this.finalizeArgumentsSince(0, ROOT_PATH);
       this.planSelectionSet(
         ROOT_PATH,
         subscribePlan,
@@ -850,7 +850,7 @@ export class Aether<
           pathIdentity,
         );
 
-        this.finalizeArgumentsSince(oldPlansLength, pathIdentity);
+        this.finalizeArgumentsSince(oldPlansLength, pathIdentity, true);
 
         // Now that the field has been planned (including arguments, but NOT
         // including selection set) we can deduplicate it to see if any of its
@@ -890,22 +890,25 @@ export class Aether<
 
   private finalizeArgumentsSince(
     oldPlansLength: number,
-    sideEffectsPathIdentity: string | null = null,
+    pathIdentity: string,
+    allowSideEffects = false,
   ): void {
     for (let i = oldPlansLength, l = this.plans.length; i < l; i++) {
       const newPlan = this.plans[i];
       // If the newPlan still exists, finalize it with respect to arguments (once only).
       if (newPlan != null && this.plans[newPlan.id] === newPlan) {
-        if (newPlan.hasSideEffects && sideEffectsPathIdentity != null) {
-          this.sideEffectPlanIdsByPathIdentity[sideEffectsPathIdentity].push(
-            newPlan.id,
+        if (newPlan.hasSideEffects && !allowSideEffects) {
+          throw new Error(
+            `Side effects are not allowed here - attempted to execute side effects in ${newPlan} @ ${pathIdentity}`,
           );
+        }
+        if (newPlan.hasSideEffects) {
+          this.sideEffectPlanIdsByPathIdentity[pathIdentity].push(newPlan.id);
         }
 
         if (newPlan instanceof __TransformPlan) {
           const listPlan = newPlan.getListPlan();
-          const nestedParentPathIdentity =
-            sideEffectsPathIdentity + `@${newPlan.id}[]`;
+          const nestedParentPathIdentity = pathIdentity + `@${newPlan.id}[]`;
           const wgs = withGlobalState.bind(null, {
             aether: this,
             parentPathIdentity: nestedParentPathIdentity,
@@ -1001,12 +1004,16 @@ export class Aether<
 
       // TODO: transform?
       const listItemPlan = withGlobalState(
-        { aether: this, parentPathIdentity: nestedParentPathIdentity },
+        {
+          aether: this,
+          parentPathIdentity: nestedParentPathIdentity,
+          currentGraphQLType: fieldType,
+        },
         isListCapablePlan(plan)
           ? () => plan.listItem(new __ItemPlan(plan, depth))
           : () => new __ItemPlan(plan, depth),
       );
-      this.finalizeArgumentsSince(oldPlansLength);
+      this.finalizeArgumentsSince(oldPlansLength, nestedParentPathIdentity);
 
       this.planIdByPathIdentity[nestedParentPathIdentity] = listItemPlan.id;
       return this.planFieldReturnType(
@@ -1029,7 +1036,7 @@ export class Aether<
         { aether: this, parentPathIdentity: pathIdentity },
         () => new __ValuePlan(),
       );
-      this.finalizeArgumentsSince(oldPlansLength);
+      this.finalizeArgumentsSince(oldPlansLength, pathIdentity);
 
       // Explicitly populate the groupIds because we don't get our own path
       // identity in `planIdByPathIdentity` and thus `assignGroupIds` will not
@@ -1095,7 +1102,7 @@ export class Aether<
             const subPlan = wgs(() =>
               polymorphicPlan.planForType(possibleObjectType),
             );
-            this.finalizeArgumentsSince(oldPlansLength);
+            this.finalizeArgumentsSince(oldPlansLength, pathIdentity);
 
             this.planSelectionSet(
               pathIdentity,
@@ -1486,7 +1493,10 @@ export class Aether<
         );
         throw e;
       }
-      this.finalizeArgumentsSince(oldPlansLength);
+
+      // TODO: what pathIdentity should this be?
+      this.finalizeArgumentsSince(oldPlansLength, ROOT_PATH);
+
       if (replacementPlan != plan) {
         // Replace all references to `plan` with `replacementPlan`
         for (let j = 0, m = this.plans.length; j < m; j++) {
