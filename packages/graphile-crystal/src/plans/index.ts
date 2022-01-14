@@ -30,6 +30,7 @@ export {
 } from "./connection";
 export { constant, ConstantPlan } from "./constant";
 export { each } from "./each";
+export { filter } from "./filter";
 export { first, FirstPlan } from "./first";
 export { groupBy } from "./groupBy";
 export { lambda, LambdaPlan } from "./lambda";
@@ -37,6 +38,7 @@ export { last, LastPlan } from "./last";
 export { list, ListPlan } from "./list";
 export { makeMapper, map, MapPlan } from "./map";
 export { object, ObjectPlan } from "./object";
+export { partitionByIndex } from "./partitionByIndex";
 export { reverse, reverseArray, ReversePlan } from "./reverse";
 export { subscribe, SubscribePlan } from "./subscribe";
 export { transform } from "./transform";

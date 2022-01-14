@@ -1,6 +1,6 @@
 import type { GraphQLNamedType, GraphQLOutputType } from "graphql";
 
-import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
+import type { CrystalResultsList } from "../interfaces";
 import type { ListCapablePlan } from "../plan";
 import { ExecutablePlan } from "../plan";
 import type { __ItemPlan } from "./__item";
@@ -11,15 +11,24 @@ export type TransformReduce<TMemo, TItemPlanData> = (
   itemPlanData: TItemPlanData,
 ) => TMemo;
 
+export type TransformItemPlanCallback<
+  TListPlan extends ExecutablePlan<readonly any[]>,
+  TDepsPlan extends ExecutablePlan,
+> = (
+  listItemPlan: TListPlan extends ListCapablePlan<any, any>
+    ? ReturnType<TListPlan["listItem"]>
+    : __ItemPlan<any>,
+) => TDepsPlan;
+
 export interface TransformOptions<
-  TListPlan extends ListCapablePlan<any, any>,
+  TListPlan extends ExecutablePlan<readonly any[]>,
   TDepsPlan extends ExecutablePlan,
   TMemo,
   TItemPlan extends ExecutablePlan | undefined = undefined,
 > {
   listPlan: TListPlan;
   // TODO: rename this:
-  itemPlanCallback(listItemPlan: ReturnType<TListPlan["listItem"]>): TDepsPlan;
+  itemPlanCallback: TransformItemPlanCallback<TListPlan, TDepsPlan>;
   initialState(): TMemo;
   reduceCallback: TransformReduce<
     TMemo,
@@ -38,7 +47,7 @@ export interface TransformOptions<
  * @internal
  */
 export class __TransformPlan<
-  TListPlan extends ListCapablePlan<any, any>,
+  TListPlan extends ExecutablePlan<readonly any[]>,
   TDepsPlan extends ExecutablePlan,
   TMemo,
   TItemPlan extends ExecutablePlan | undefined = undefined,
@@ -49,9 +58,7 @@ export class __TransformPlan<
   };
 
   private listPlanId: number;
-  public itemPlanCallback: (
-    listItemPlan: ReturnType<TListPlan["listItem"]>,
-  ) => TDepsPlan;
+  public itemPlanCallback: TransformItemPlanCallback<TListPlan, TDepsPlan>;
   public initialState: () => TMemo;
   public reduceCallback: TransformReduce<
     TMemo,
@@ -124,7 +131,7 @@ export class __TransformPlan<
 }
 
 export function transform<
-  TListPlan extends ListCapablePlan<any, any>,
+  TListPlan extends ExecutablePlan<readonly any[]>,
   TDepsPlan extends ExecutablePlan,
   TMemo,
   TItemPlan extends ExecutablePlan | undefined = undefined,

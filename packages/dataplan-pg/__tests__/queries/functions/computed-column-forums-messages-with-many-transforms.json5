@@ -1,0 +1,70 @@
+{
+  forums: [
+    {
+      name: "Cats",
+      messagesWithManyTransforms: [
+        [
+          {
+            body: "Dogs = awesome -- Alice",
+            featured: false,
+          },
+          {
+            body: "Postgres = awesome -- Alice",
+            featured: false,
+          },
+          {
+            body: "Postgres = awesome -- Cecilia",
+            featured: false,
+          },
+        ],
+        [
+          {
+            body: "Dogs = awesome -- Bob",
+            featured: true,
+          },
+          {
+            body: "Dogs = awesome -- Cecilia",
+            featured: true,
+          },
+          {
+            body: "Postgres = awesome -- Bob",
+            featured: true,
+          },
+        ],
+      ],
+    },
+    {
+      name: "Postgres",
+      messagesWithManyTransforms: [
+        [
+          {
+            body: "Dogs = awesome -- Alice",
+            featured: false,
+          },
+          {
+            body: "Postgres = awesome -- Alice",
+            featured: false,
+          },
+          {
+            body: "Postgres = awesome -- Cecilia",
+            featured: false,
+          },
+        ],
+        [
+          {
+            body: "Dogs = awesome -- Bob",
+            featured: true,
+          },
+          {
+            body: "Dogs = awesome -- Cecilia",
+            featured: true,
+          },
+          {
+            body: "Postgres = awesome -- Bob",
+            featured: true,
+          },
+        ],
+      ],
+    },
+  ],
+}

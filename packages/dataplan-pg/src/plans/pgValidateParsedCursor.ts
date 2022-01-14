@@ -15,7 +15,7 @@ export class PgValidateParsedCursorPlan extends ExecutablePlan<undefined> {
   };
 
   constructor(
-    $parsedCursorPlan: ExecutablePlan<any[] | null>,
+    $parsedCursorPlan: ExecutablePlan<readonly any[] | null>,
     private digest: string,
     private orderCount: number,
     private beforeOrAfter: "before" | "after",
@@ -71,7 +71,7 @@ export class PgValidateParsedCursorPlan extends ExecutablePlan<undefined> {
 }
 
 export const pgValidateParsedCursor = (
-  $parsedCursorPlan: ExecutablePlan<any[] | null>,
+  $parsedCursorPlan: ExecutablePlan<readonly any[] | null>,
   digest: string,
   orderCount: number,
   beforeOrAfter: "before" | "after",

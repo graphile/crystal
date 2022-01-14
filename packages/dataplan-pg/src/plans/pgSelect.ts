@@ -2380,7 +2380,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
    * be called by Graphile Crystal.
    */
   listItem(
-    itemPlan: __ItemPlan<this>,
+    itemPlan: ExecutablePlan,
   ): TColumns extends PgSourceColumns
     ? PgSelectSinglePlan<TColumns, TUniques, TRelations, TParameters>
     : PgClassExpressionPlan<

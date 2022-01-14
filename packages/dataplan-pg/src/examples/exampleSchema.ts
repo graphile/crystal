@@ -20,6 +20,7 @@ import {
   context,
   crystalEnforce,
   each,
+  filter,
   getEnumValueConfig,
   groupBy,
   lambda,
@@ -28,6 +29,7 @@ import {
   newInputObjectTypeBuilder,
   newObjectTypeBuilder,
   object,
+  partitionByIndex,
   resolveType,
   subscribe,
 } from "graphile-crystal";
@@ -127,10 +129,6 @@ type NullableUnless<
   TCondition extends boolean | undefined,
   TType,
 > = TCondition extends true ? TType : TType | null | undefined;
-
-function subtractOne(n: number): number {
-  return n - 1;
-}
 
 export function makeExampleSchema(
   options: { deoptimize?: boolean } = Object.create(null),
@@ -2555,10 +2553,8 @@ export function makeExampleSchema(
             deoptimizeIfAppropriate,
             forumsMessagesListSetIdx,
             forumsMessagesListSetSource,
-            groupBy,
-            lambda,
+            partitionByIndex,
             pgSelect,
-            subtractOne,
           ) =>
             function plan($forum) {
               const $messages = pgSelect({
@@ -2571,12 +2567,11 @@ export function makeExampleSchema(
                 ],
               });
               deoptimizeIfAppropriate($messages);
-              return groupBy($messages, ($row) =>
+              return partitionByIndex(
+                $messages,
+                ($row) => $row.select(forumsMessagesListSetIdx, TYPES.int),
                 // Ordinality is 1-indexed but we want a 0-indexed number
-                lambda(
-                  $row.select(forumsMessagesListSetIdx, TYPES.int),
-                  subtractOne,
-                ),
+                1,
               );
             },
           [
@@ -2584,10 +2579,50 @@ export function makeExampleSchema(
             deoptimizeIfAppropriate,
             forumsMessagesListSetIdx,
             forumsMessagesListSetSource,
+            partitionByIndex,
+            pgSelect,
+          ],
+        ),
+      },
+
+      messagesWithManyTransforms: {
+        type: new GraphQLList(new GraphQLList(Message)),
+        plan: EXPORTABLE(
+          (
+            deoptimizeIfAppropriate,
+            each,
+            filter,
             groupBy,
             lambda,
-            pgSelect,
-            subtractOne,
+            list,
+            messageSource,
+          ) =>
+            function plan($forum) {
+              const $messages = messageSource.find();
+              deoptimizeIfAppropriate($messages);
+              const $messagesFromOtherForums = filter($messages, ($message) =>
+                lambda(
+                  list([$message.get("forum_id"), $forum.get("id")]),
+                  ([messageForumId, forumId]) => messageForumId !== forumId,
+                ),
+              );
+              console.log($messagesFromOtherForums.listItem?.toString());
+              const $grouped = groupBy($messagesFromOtherForums, ($message) =>
+                ($message as unknown as MessagePlan).get("featured"),
+              );
+              const $entries = lambda($grouped, (map) => [...map.values()]);
+              return each($entries, ($group) =>
+                each($group, ($item) => $messages.listItem($item)),
+              );
+            },
+          [
+            deoptimizeIfAppropriate,
+            each,
+            filter,
+            groupBy,
+            lambda,
+            list,
+            messageSource,
           ],
         ),
       },
@@ -3637,31 +3672,26 @@ export function makeExampleSchema(
           (
             TYPES,
             deoptimizeIfAppropriate,
-            groupBy,
-            lambda,
+            partitionByIndex,
             randomUserArraySetSource,
             randomUserArraySetSourceIdx,
-            subtractOne,
           ) =>
             function plan() {
               const $select = randomUserArraySetSource.execute();
               deoptimizeIfAppropriate($select);
-              return groupBy($select, ($row) =>
+              return partitionByIndex(
+                $select,
+                ($row) => $row.select(randomUserArraySetSourceIdx, TYPES.int),
                 // Ordinality is 1-indexed but we want a 0-indexed number
-                lambda(
-                  $row.select(randomUserArraySetSourceIdx, TYPES.int),
-                  subtractOne,
-                ),
+                1,
               );
             },
           [
             TYPES,
             deoptimizeIfAppropriate,
-            groupBy,
-            lambda,
+            partitionByIndex,
             randomUserArraySetSource,
             randomUserArraySetSourceIdx,
-            subtractOne,
           ],
         ),
       },
