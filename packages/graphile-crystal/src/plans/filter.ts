@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import { getNamedType } from "graphql";
 
 import { getGlobalState } from "../global";
@@ -59,5 +60,8 @@ export function filter<
       ? (itemPlan) => listPlan.listItem(itemPlan as any)
       : undefined,
     namedType,
+    meta: `filter:${chalk.yellow(listPlan.id)}${
+      filterCallback.name ? `/${filterCallback.name}` : ""
+    }`,
   });
 }

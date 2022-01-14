@@ -1,8 +1,9 @@
+import chalk from "chalk";
 import { getNamedType } from "graphql";
 
 import { getGlobalState } from "../global";
 import type { ExecutablePlan } from "../plan";
-import { isListCapablePlan, ListCapablePlan } from "../plan";
+import { isListCapablePlan } from "../plan";
 import type { __ItemPlan } from "./__item";
 import { each } from "./each";
 import type {
@@ -61,5 +62,8 @@ export function groupBy<
         }
       : undefined,
     namedType,
+    meta: `groupBy:${chalk.yellow(listPlan.id)}${
+      mapper.name ? `/${mapper.name}` : ""
+    }`,
   });
 }

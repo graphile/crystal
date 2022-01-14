@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import { getNamedType } from "graphql";
 
 import { getGlobalState } from "../global";
@@ -105,5 +106,8 @@ export function partitionByIndex<
         }
       : undefined,
     namedType,
+    meta: `partitionByIndex${startIndex}:${chalk.yellow(listPlan.id)}${
+      mapper.name ? `/${mapper.name}` : ""
+    }`,
   });
 }

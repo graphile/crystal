@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import { getNamedType } from "graphql";
 
 import { getGlobalState } from "../global";
@@ -35,5 +36,8 @@ export function each<
       ? (itemPlan) => mapper(listPlan.listItem(itemPlan as any) as any)
       : mapper,
     namedType,
+    meta: `each:${chalk.yellow(listPlan.id)}${
+      mapper.name ? `/${mapper.name}` : ""
+    }`,
   });
 }

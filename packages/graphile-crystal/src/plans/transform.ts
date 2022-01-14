@@ -37,6 +37,7 @@ export interface TransformOptions<
   listItem?(itemPlan: ExecutablePlan<any>): TItemPlan;
   finalizeCallback?(data: TMemo): TMemo;
   namedType: GraphQLNamedType & GraphQLOutputType;
+  meta?: string;
 }
 
 /**
@@ -67,6 +68,7 @@ export class __TransformPlan<
   public finalizeCallback?: (data: TMemo) => TMemo;
   public listItem?: (itemPlan: __ItemPlan<this>) => TItemPlan;
   public namedType: GraphQLNamedType & GraphQLOutputType;
+  private meta: string | null;
 
   constructor(
     options: TransformOptions<TListPlan, TDepsPlan, TMemo, TItemPlan>,
@@ -80,6 +82,7 @@ export class __TransformPlan<
       finalizeCallback,
       listItem,
       namedType,
+      meta,
     } = options;
     this.listPlanId = this.addDependency(listPlan);
     this.itemPlanCallback = itemPlanCallback;
@@ -88,6 +91,11 @@ export class __TransformPlan<
     this.finalizeCallback = finalizeCallback;
     this.listItem = listItem;
     this.namedType = namedType;
+    this.meta = meta ?? null;
+  }
+
+  toStringMeta() {
+    return this.meta;
   }
 
   getListPlan(): TListPlan {
