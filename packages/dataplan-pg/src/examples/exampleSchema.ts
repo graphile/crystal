@@ -13,7 +13,6 @@ import type {
   InputObjectPlan,
   InputStaticLeafPlan,
 } from "graphile-crystal";
-import { groupBy } from "graphile-crystal";
 import {
   __ValuePlan,
   aether,
@@ -23,6 +22,7 @@ import {
   crystalEnforce,
   each,
   getEnumValueConfig,
+  groupBy,
   lambda,
   list,
   newGraphileFieldConfigBuilder,
@@ -565,6 +565,31 @@ export function makeExampleSchema(
         parameters: [],
       }),
     [randomUserArraySetSourceIdx, randomUserArraySetSourceTmp, sql, userSource],
+  );
+
+  const forumsMessagesListSetTmp = sql.identifier(
+    Symbol("forums_messages_list_set_tmp"),
+  );
+  const forumsMessagesListSetIdx = sql.identifier(
+    Symbol("forums_messages_list_set_idx"),
+  );
+  const forumsMessagesListSetSource = EXPORTABLE(
+    (forumsMessagesListSetIdx, forumsMessagesListSetTmp, messageSource, sql) =>
+      messageSource.alternativeSource({
+        name: "forums_messages_list_set",
+        source: (...args) =>
+          sql`app_public.forums_messages_list_set(${sql.join(
+            args,
+            ", ",
+          )}) with ordinality as ${forumsMessagesListSetTmp} (arr, ${forumsMessagesListSetIdx}) cross join lateral unnest (arr)`,
+        parameters: [],
+        extensions: {
+          tags: {
+            name: "messagesListSet",
+          },
+        },
+      }),
+    [forumsMessagesListSetIdx, forumsMessagesListSetTmp, messageSource, sql],
   );
 
   const unionEntityColumns = EXPORTABLE(
@@ -2521,6 +2546,32 @@ export function makeExampleSchema(
           [deoptimizeIfAppropriate, forumsFeaturedMessages, pgSelect],
         ),
       },
+
+      messagesListSet: {
+        type: new GraphQLList(new GraphQLList(Message)),
+        plan: EXPORTABLE(
+          (TYPES, deoptimizeIfAppropriate, forumsMessagesListSetIdx, forumsMessagesListSetSource, groupBy, lambda, pgSelect, subtractOne) => function plan($forum) {
+              const $messages = pgSelect({
+                source: forumsMessagesListSetSource,
+                identifiers: [],
+                args: [
+                  {
+                    plan: $forum.record(),
+                  },
+                ],
+              });
+              deoptimizeIfAppropriate($messages);
+              return groupBy($messages, ($row) =>
+                // Ordinality is 1-indexed but we want a 0-indexed number
+                lambda(
+                  $row.select(forumsMessagesListSetIdx, TYPES.int),
+                  subtractOne,
+                ),
+              );
+            },
+          [TYPES, deoptimizeIfAppropriate, forumsMessagesListSetIdx, forumsMessagesListSetSource, groupBy, lambda, pgSelect, subtractOne],
+        ),
+      },
     }),
   });
 
@@ -3564,7 +3615,16 @@ export function makeExampleSchema(
       randomUserArraySet: {
         type: new GraphQLList(new GraphQLList(User)),
         plan: EXPORTABLE(
-          (TYPES, deoptimizeIfAppropriate, groupBy, lambda, randomUserArraySetSource, randomUserArraySetSourceIdx, subtractOne) => function plan() {
+          (
+            TYPES,
+            deoptimizeIfAppropriate,
+            groupBy,
+            lambda,
+            randomUserArraySetSource,
+            randomUserArraySetSourceIdx,
+            subtractOne,
+          ) =>
+            function plan() {
               const $select = randomUserArraySetSource.execute();
               deoptimizeIfAppropriate($select);
               return groupBy($select, ($row) =>
@@ -3575,7 +3635,15 @@ export function makeExampleSchema(
                 ),
               );
             },
-          [TYPES, deoptimizeIfAppropriate, groupBy, lambda, randomUserArraySetSource, randomUserArraySetSourceIdx, subtractOne],
+          [
+            TYPES,
+            deoptimizeIfAppropriate,
+            groupBy,
+            lambda,
+            randomUserArraySetSource,
+            randomUserArraySetSourceIdx,
+            subtractOne,
+          ],
         ),
       },
 

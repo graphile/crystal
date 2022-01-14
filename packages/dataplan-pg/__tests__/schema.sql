@@ -154,6 +154,14 @@ create function app_public.forums_featured_messages(forum app_public.forums) ret
   from app_public.messages
   where featured is true
   and messages.forum_id = forum.id
+  order by messages.id
+$$ language sql stable;
+create function app_public.forums_messages_list_set(forum app_public.forums) returns setof app_public.messages[] as $$
+  select array_agg(messages.* order by messages.id)
+  from app_public.messages
+  where messages.forum_id = forum.id
+  group by featured
+  order by featured
 $$ language sql stable;
 create function app_public.users_most_recent_forum(u app_public.users) returns app_public.forums as $$
   select forums.*
