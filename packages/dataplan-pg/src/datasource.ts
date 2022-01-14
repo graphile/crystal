@@ -364,12 +364,14 @@ export class PgSource<
     source: SQL | ((...args: SQL[]) => SQL);
     parameters?: TNewParameters;
     uniques?: TUniques;
+    extensions?: PgSourceExtensions;
   }): PgSource<TColumns, TUniques, TRelations, TNewParameters> {
     const {
       name,
       source,
       uniques,
       parameters: overrideParameters,
+      extensions,
     } = overrideOptions;
     const { codec, executor, relations, parameters } = this._options;
     return new PgSource({
@@ -380,6 +382,7 @@ export class PgSource<
       uniques,
       relations,
       parameters: (overrideParameters ?? parameters) as TNewParameters,
+      extensions,
     });
   }
 
