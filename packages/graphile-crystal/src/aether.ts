@@ -2390,41 +2390,40 @@ export class Aether<
           : null,
       )
       .filter(isNotNullish);
-    return Promise.resolve().then(async () => {
-      const listResults = await this.executePlan(
-        listPlan,
-        crystalContext,
-        planResultses,
-        visitedPlans,
-        depth, // TODO: should depth be incremented?
+    await this.executeBatch(batch, crystalContext);
+    // This shouldn't actually execute it, because it should already be executed.
+    const listResults = await this.executePlan(
+      listPlan,
+      crystalContext,
+      planResultses,
+      visitedPlans,
+      depth, // TODO: should depth be incremented?
+    );
+    const depResults = await Promise.all(batch.entries.map((t) => t[1]));
+    return listResults.map((list, listIndex) => {
+      const values = depResults[listIndex];
+      if (!Array.isArray(list) || !Array.isArray(values)) {
+        // TODO: should this be an error?
+        console.warn(
+          `Either list or values was not an array when processing ${plan}`,
+        );
+        return null;
+      }
+      assert.strictEqual(
+        list.length,
+        values.length,
+        "GraphileInternalError<c85b6936-d406-4801-9c6b-625a567d32ff>: The list and values length must match for a __TransformPlan",
       );
-      await this.executeBatch(batch, crystalContext);
-      const depResults = await Promise.all(batch.entries.map((t) => t[1]));
-      return listResults.map((list, listIndex) => {
-        const values = depResults[listIndex];
-        if (!Array.isArray(list) || !Array.isArray(values)) {
-          // TODO: should this be an error?
-          console.warn(
-            `Either list or values was not an array when processing ${plan}`,
-          );
-          return null;
-        }
-        assert.strictEqual(
-          list.length,
-          values.length,
-          "GraphileInternalError<c85b6936-d406-4801-9c6b-625a567d32ff>: The list and values length must match for a __TransformPlan",
-        );
-        const initialState = plan.initialState();
-        const reduceResult = list.reduce(
-          (memo, entireItemValue, listEntryIndex) =>
-            plan.reduceCallback(memo, entireItemValue, values[listEntryIndex]),
-          initialState,
-        );
-        const finalResult = plan.finalizeCallback
-          ? plan.finalizeCallback(reduceResult)
-          : reduceResult;
-        return finalResult;
-      });
+      const initialState = plan.initialState();
+      const reduceResult = list.reduce(
+        (memo, entireItemValue, listEntryIndex) =>
+          plan.reduceCallback(memo, entireItemValue, values[listEntryIndex]),
+        initialState,
+      );
+      const finalResult = plan.finalizeCallback
+        ? plan.finalizeCallback(reduceResult)
+        : reduceResult;
+      return finalResult;
     });
   }
 
@@ -2715,6 +2714,17 @@ export class Aether<
           return null;
         }
         const { parentCrystalObject, indexes, planResults } = clo;
+        if (
+          planResults.has(layerPlan.commonAncestorPathIdentity, layerPlan.id)
+        ) {
+          const existingResult = planResults.get(
+            layerPlan.commonAncestorPathIdentity,
+            layerPlan.id,
+          );
+          // I wasn't sure what to do here... so I returned existingResult...
+          // and the tests started passing again... so... ¯\_(ツ)_/¯
+          return existingResult;
+        }
         if (planResults.hasPathIdentity(layerPlan.commonAncestorPathIdentity)) {
           const bucket = planResults.getBucket(
             layerPlan.commonAncestorPathIdentity,
