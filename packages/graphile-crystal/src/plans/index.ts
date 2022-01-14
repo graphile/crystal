@@ -29,7 +29,7 @@ export {
   PageInfoCapablePlan,
 } from "./connection";
 export { constant, ConstantPlan } from "./constant";
-export { each, EachPlan } from "./each";
+export { each } from "./each";
 export { first, FirstPlan } from "./first";
 export { groupBy } from "./groupBy";
 export { lambda, LambdaPlan } from "./lambda";

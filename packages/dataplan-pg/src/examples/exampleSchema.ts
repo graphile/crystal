@@ -8,7 +8,6 @@ import type {
   BaseGraphQLContext,
   BaseGraphQLRootValue,
   CrystalSubscriber,
-  EachPlan,
   ExecutablePlan,
   InputObjectPlan,
   InputStaticLeafPlan,
@@ -32,6 +31,7 @@ import {
   resolveType,
   subscribe,
 } from "graphile-crystal";
+import type { __TransformPlan } from "graphile-crystal/src/plans/transform";
 import { EXPORTABLE } from "graphile-exporter";
 import type { GraphQLOutputType } from "graphql";
 import {
@@ -2550,7 +2550,17 @@ export function makeExampleSchema(
       messagesListSet: {
         type: new GraphQLList(new GraphQLList(Message)),
         plan: EXPORTABLE(
-          (TYPES, deoptimizeIfAppropriate, forumsMessagesListSetIdx, forumsMessagesListSetSource, groupBy, lambda, pgSelect, subtractOne) => function plan($forum) {
+          (
+            TYPES,
+            deoptimizeIfAppropriate,
+            forumsMessagesListSetIdx,
+            forumsMessagesListSetSource,
+            groupBy,
+            lambda,
+            pgSelect,
+            subtractOne,
+          ) =>
+            function plan($forum) {
               const $messages = pgSelect({
                 source: forumsMessagesListSetSource,
                 identifiers: [],
@@ -2569,7 +2579,16 @@ export function makeExampleSchema(
                 ),
               );
             },
-          [TYPES, deoptimizeIfAppropriate, forumsMessagesListSetIdx, forumsMessagesListSetSource, groupBy, lambda, pgSelect, subtractOne],
+          [
+            TYPES,
+            deoptimizeIfAppropriate,
+            forumsMessagesListSetIdx,
+            forumsMessagesListSetSource,
+            groupBy,
+            lambda,
+            pgSelect,
+            subtractOne,
+          ],
         ),
       },
     }),
@@ -3760,11 +3779,11 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $each: EachPlan<any, any, any, any>,
+                  $each: __TransformPlan<any, any, any, any>,
                   $value,
                 ) {
                   const $commentables =
-                    $each.originalListPlan() as RelationalCommentablesPlan;
+                    $each.getListPlan() as RelationalCommentablesPlan;
                   $commentables.setFirst($value);
                   return null;
                 },

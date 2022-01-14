@@ -25,7 +25,7 @@ export interface TransformOptions<
     TMemo,
     TDepsPlan extends ExecutablePlan<infer U> ? U : never
   >;
-  listItem?(itemPlan: __ItemPlan<this>): TItemPlan;
+  listItem?(itemPlan: ExecutablePlan<any>): TItemPlan;
   finalizeCallback?(data: TMemo): TMemo;
   namedType: GraphQLNamedType & GraphQLOutputType;
 }

@@ -1,75 +1,39 @@
-import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
-import type { ListCapablePlan } from "../plan";
-import {
-  assertListCapablePlan,
-  ExecutablePlan,
-  isListCapablePlan,
-} from "../plan";
+import { getNamedType } from "graphql";
+
+import { getGlobalState } from "../global";
+import type { ExecutablePlan, ListCapablePlan } from "../plan";
+import { isListCapablePlan } from "../plan";
 import type { __ItemPlan } from "./__item";
-
-export class EachPlan<
-    TSourceData,
-    TOutputData,
-    TSourceItemPlan extends ExecutablePlan<TSourceData> = ExecutablePlan<TSourceData>,
-    TResultItemPlan extends ExecutablePlan<TOutputData> = ExecutablePlan<TOutputData>,
-  >
-  extends ExecutablePlan<ReadonlyArray<TSourceData>>
-  implements ListCapablePlan<TOutputData>
-{
-  static $$export = {
-    moduleName: "graphile-crystal",
-    exportName: "EachPlan",
-  };
-
-  listPlanId: number;
-
-  constructor(
-    listPlan: ListCapablePlan<TSourceData, TSourceItemPlan>,
-    private mapper: (itemPlan: TSourceItemPlan) => TResultItemPlan,
-  ) {
-    super();
-    /*
-    if (!isListCapablePlan(listPlan)) {
-      throw new Error(
-        `EachPlan called with plan ${listPlan}, but that isn't a list capable plan`,
-      );
-    }
-    */
-    this.listPlanId = this.addDependency(listPlan);
-  }
-
-  originalListPlan(): ListCapablePlan<TSourceData, TSourceItemPlan> {
-    const plan = this.getPlan(this.dependencies[this.listPlanId]);
-    // assertListCapablePlan(plan, this.createdWithParentPathIdentity);
-    return plan as ListCapablePlan<TSourceData, TSourceItemPlan>;
-  }
-
-  listItem(itemPlan: __ItemPlan<this>): TResultItemPlan {
-    const originalListItem = this.originalListPlan().listItem?.(itemPlan);
-    const mappedPlan = this.mapper(originalListItem ?? itemPlan);
-    return mappedPlan;
-  }
-
-  execute(
-    values: CrystalValuesList<[TSourceData[]]>,
-  ): CrystalResultsList<TSourceData[]> {
-    return values.map((v) => v[this.listPlanId]);
-  }
-}
+import type { __TransformPlan } from "./transform";
+import { transform } from "./transform";
 
 export function each<
-  TSourceData,
-  TOutputData,
-  TSourceItemPlan extends ExecutablePlan<TSourceData> = ExecutablePlan<TSourceData>,
-  TResultItemPlan extends ExecutablePlan<TOutputData> = ExecutablePlan<TOutputData>,
+  TListPlan extends ExecutablePlan<readonly any[]>,
+  TResultItemPlan extends ExecutablePlan<any>,
 >(
-  listPlan: ListCapablePlan<TSourceData, TSourceItemPlan>,
-  mapper: (itemPlan: TSourceItemPlan) => TResultItemPlan,
-): EachPlan<TSourceData, TOutputData, TSourceItemPlan, TResultItemPlan> {
-  return new EachPlan<
-    TSourceData,
-    TOutputData,
-    TSourceItemPlan,
-    TResultItemPlan
-  >(listPlan, mapper);
+  listPlan: TListPlan,
+  mapper: (
+    itemPlan: TListPlan extends ListCapablePlan<any, any>
+      ? ReturnType<TListPlan["listItem"]>
+      : __ItemPlan<any>,
+  ) => TResultItemPlan,
+): __TransformPlan<any, any, any, any> {
+  const currentGraphQLType = getGlobalState().currentGraphQLType;
+  if (!currentGraphQLType) {
+    throw new Error("partitionByIndex cannot be used in this position");
+  }
+  const namedType = getNamedType(currentGraphQLType);
+  return transform<any, any, any, any>({
+    listPlan,
+    itemPlanCallback: (itemPlan) => itemPlan,
+    initialState: () => [] as any,
+    reduceCallback: (memo, item) => {
+      memo.push(item);
+      return memo;
+    },
+    listItem: isListCapablePlan(listPlan)
+      ? (itemPlan) => mapper(listPlan.listItem(itemPlan as any) as any)
+      : mapper,
+    namedType,
+  });
 }
