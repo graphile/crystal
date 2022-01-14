@@ -116,15 +116,10 @@ export class __TransformPlan<
     return this;
   }
 
-  execute(
-    values: CrystalValuesList<
-      [TListPlan extends ListCapablePlan<infer U, any> ? U[] : never]
-    >,
-  ): CrystalResultsList<TMemo> {
-    return values.map(([_list]) => {
-      return [_list] as any;
-      //throw new Error("TODO");
-    });
+  execute(): CrystalResultsList<TMemo> {
+    throw new Error(
+      "__TransformPlan must never execute, Crystal handles this internally",
+    );
   }
 }
 
