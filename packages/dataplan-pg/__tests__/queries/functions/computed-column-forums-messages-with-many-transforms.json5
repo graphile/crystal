@@ -38,15 +38,19 @@
       messagesWithManyTransforms: [
         [
           {
+            body: "Cats = awesome -- Alice",
+            featured: false,
+          },
+          {
+            body: "Cats = awesome -- Bob",
+            featured: false,
+          },
+          {
+            body: "Cats = awesome -- Cecilia",
+            featured: false,
+          },
+          {
             body: "Dogs = awesome -- Alice",
-            featured: false,
-          },
-          {
-            body: "Postgres = awesome -- Alice",
-            featured: false,
-          },
-          {
-            body: "Postgres = awesome -- Cecilia",
             featured: false,
           },
         ],
@@ -57,10 +61,6 @@
           },
           {
             body: "Dogs = awesome -- Cecilia",
-            featured: true,
-          },
-          {
-            body: "Postgres = awesome -- Bob",
             featured: true,
           },
         ],

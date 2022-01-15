@@ -1,5 +1,6 @@
 import type { GraphQLNamedType, GraphQLOutputType } from "graphql";
 
+import { getGlobalState } from "../global";
 import type { CrystalResultsList } from "../interfaces";
 import type { ListCapablePlan } from "../plan";
 import { ExecutablePlan } from "../plan";
@@ -74,6 +75,7 @@ export class __TransformPlan<
     options: TransformOptions<TListPlan, TDepsPlan, TMemo, TItemPlan>,
   ) {
     super();
+    this.parentPathIdentity = getGlobalState().parentPathIdentity;
     const {
       listPlan,
       itemPlanCallback,
