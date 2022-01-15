@@ -15,8 +15,8 @@ export class __ItemPlan<TData> extends ExecutablePlan<TData> {
   };
   constructor(parentPlan: ExecutablePlan<TData>, public readonly depth = 0) {
     super();
-    this.addDependency(parentPlan);
     this.parentPathIdentity = getCurrentParentPathIdentity();
+    this.addDependency(parentPlan);
   }
 
   toStringMeta(): string {

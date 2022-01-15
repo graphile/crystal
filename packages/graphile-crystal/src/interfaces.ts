@@ -253,6 +253,8 @@ type OutputPlanForNamedType<TType extends GraphQLType> =
   TType extends GraphileObjectType<any, infer TPlan, any>
     ? TPlan
     : ExecutablePlan<any>;
+
+// TODO: this is completely wrong now; ListCapablePlan is no longer required to be supported for lists.
 export type OutputPlanForType<TType extends GraphQLOutputType> =
   TType extends GraphQLNonNull<GraphQLList<GraphQLNonNull<infer U>>>
     ? ListCapablePlan<any, OutputPlanForNamedType<U>>

@@ -76,7 +76,6 @@ import {
   assertArgumentsFinalized,
   assertExecutablePlan,
   assertFinalized,
-  assertListCapablePlan,
   assertModifierPlan,
   ExecutablePlan,
   isListCapablePlan,
@@ -988,9 +987,6 @@ export class Aether<
         depth,
       );
     } else if (fieldType instanceof GraphQLList) {
-      // if (!isLeaf) {
-      //   assertListCapablePlan(plan, pathIdentity);
-      // }
       const nestedParentPathIdentity = pathIdentity + "[]";
       const nestedTreeNode: TreeNode = {
         fieldPathIdentity,
