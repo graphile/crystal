@@ -188,7 +188,9 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                 },
               );
             } else {
-              const behavior = getBehavior(source.extensions) ?? ["connection"];
+              const behavior = getBehavior(source.extensions) ?? [
+                source.codec.isArray ? "list" : "connection",
+              ];
               if (behavior.includes("connection")) {
                 const fieldName = build.inflection.computedColumnConnection({
                   source,
