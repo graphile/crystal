@@ -2700,7 +2700,7 @@ export class Aether<
         : null;
 
     debugExecuteVerbose(
-      "$$$ Executing layerPlan %c with %c crystal layer objects",
+      "Executing layerPlan %c with %c crystal layer objects",
       layerPlan,
       crystalLayerObjectsLength,
     );
@@ -2744,11 +2744,7 @@ export class Aether<
           dep.commonAncestorPathIdentity,
           dep.id,
         );
-        debugExecuteVerbose(
-          "$$$ Executing %c's dependency, %c",
-          layerPlan,
-          dep,
-        );
+        debugExecuteVerbose("Executing %c's dependency, %c", layerPlan, dep);
         if (Array.isArray(listResult)) {
           // Turn each entry in this listResult into it's own CrystalLayerObject, then execute the new layers.
           const newCLOs = listResult.map((result, i) => {
@@ -2766,12 +2762,6 @@ export class Aether<
               i,
             ]);
           });
-          debugExecuteVerbose(
-            "$$$ %c's dependency, %c, generated %c crystal layer objects",
-            layerPlan,
-            dep,
-            newCLOs.length,
-          );
           return mapResult
             ? newCLOs.map(mapResult)
             : // TODO: we should be optimise this to call executeLayers once, rather than once per crystalLayerObject.
