@@ -914,10 +914,6 @@ export class Aether<
           }) as <T>(cb: () => T) => T;
           const itemPlan = wgs(() => {
             const __listItem = new __ItemPlan(listPlan);
-
-            // TODO: this is a hack; we should instead incorporate calculation into this.assignCommonAncestorPathIdentity()
-            // __listItem.commonAncestorPathIdentity = nestedParentPathIdentity;
-
             const listItem = listPlan.listItem?.(__listItem) ?? __listItem;
             return newPlan.itemPlanCallback(listItem);
           });
@@ -2717,6 +2713,7 @@ export class Aether<
             layerPlan.commonAncestorPathIdentity,
             layerPlan.id,
           );
+          // TODO: review this entire `if` statement; it was added to support __ListTransformPlan.
           // I wasn't sure what to do here... so I returned existingResult...
           // and the tests started passing again... so... ¯\_(ツ)_/¯
           return existingResult;
