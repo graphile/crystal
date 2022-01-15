@@ -140,6 +140,11 @@ export class __ListTransformPlan<
   }
 }
 
+/**
+ * **Experimental.**
+ *
+ * @see {@link ./listTransform.md}
+ */
 export function listTransform<
   TListPlan extends ExecutablePlan<readonly any[]>,
   TDepsPlan extends ExecutablePlan,
