@@ -5,17 +5,16 @@ import { getGlobalState } from "../global";
 import type { ExecutablePlan, ListCapablePlan } from "../plan";
 import { isListCapablePlan } from "../plan";
 import type { __ItemPlan } from "./__item";
-import { each } from "./each";
 import type {
-  __TransformPlan,
-  TransformItemPlanCallback,
-  TransformReduce,
-} from "./transform";
-import { transform } from "./transform";
+  __ListTransformPlan,
+  ListTransformItemPlanCallback,
+  ListTransformReduce,
+} from "./listTransform";
+import { listTransform } from "./listTransform";
 
 type Memo = unknown[];
 
-const reduceCallback: TransformReduce<Memo, boolean> = (
+const reduceCallback: ListTransformReduce<Memo, boolean> = (
   memo,
   entireItemValue,
   include,
@@ -37,8 +36,8 @@ export function filter<
   TItemPlan extends ExecutablePlan<boolean>,
 >(
   listPlan: TListPlan,
-  filterCallback: TransformItemPlanCallback<TListPlan, TItemPlan>,
-): __TransformPlan<
+  filterCallback: ListTransformItemPlanCallback<TListPlan, TItemPlan>,
+): __ListTransformPlan<
   TListPlan,
   TItemPlan,
   Memo,
@@ -51,7 +50,7 @@ export function filter<
     throw new Error("partitionByIndex cannot be used in this position");
   }
   const namedType = getNamedType(currentGraphQLType);
-  return transform<TListPlan, TItemPlan, Memo, any>({
+  return listTransform<TListPlan, TItemPlan, Memo, any>({
     listPlan,
     itemPlanCallback: filterCallback,
     initialState,

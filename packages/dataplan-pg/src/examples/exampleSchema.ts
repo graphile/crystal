@@ -3,6 +3,7 @@ import { jsonParse, JSONParsePlan } from "@dataplan/json";
 import * as crypto from "crypto";
 import { writeFileSync } from "fs";
 import type {
+  __ListTransformPlan,
   __TrackedObjectPlan,
   AccessPlan,
   BaseGraphQLContext,
@@ -33,7 +34,6 @@ import {
   resolveType,
   subscribe,
 } from "graphile-crystal";
-import type { __TransformPlan } from "graphile-crystal/src/plans/transform";
 import { EXPORTABLE } from "graphile-exporter";
 import type { GraphQLOutputType } from "graphql";
 import {
@@ -3809,7 +3809,7 @@ export function makeExampleSchema(
               () =>
                 function plan(
                   _$root,
-                  $each: __TransformPlan<any, any, any, any>,
+                  $each: __ListTransformPlan<any, any, any, any>,
                   $value,
                 ) {
                   const $commentables =

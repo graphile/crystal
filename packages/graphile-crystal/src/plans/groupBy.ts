@@ -7,15 +7,15 @@ import { isListCapablePlan } from "../plan";
 import type { __ItemPlan } from "./__item";
 import { each } from "./each";
 import type {
-  __TransformPlan,
-  TransformItemPlanCallback,
-  TransformReduce,
-} from "./transform";
-import { transform } from "./transform";
+  __ListTransformPlan,
+  ListTransformItemPlanCallback,
+  ListTransformReduce,
+} from "./listTransform";
+import { listTransform } from "./listTransform";
 
 type Memo = Map<unknown, unknown[]>;
 
-const reduceCallback: TransformReduce<Memo, any> = (
+const reduceCallback: ListTransformReduce<Memo, any> = (
   memo,
   entireItemValue,
   idx,
@@ -42,14 +42,14 @@ export function groupBy<
   TItemPlan extends ExecutablePlan<number>,
 >(
   listPlan: TListPlan,
-  mapper: TransformItemPlanCallback<TListPlan, TItemPlan>,
-): __TransformPlan<TListPlan, TItemPlan, Memo, any> {
+  mapper: ListTransformItemPlanCallback<TListPlan, TItemPlan>,
+): __ListTransformPlan<TListPlan, TItemPlan, Memo, any> {
   const currentGraphQLType = getGlobalState().currentGraphQLType;
   if (!currentGraphQLType) {
     throw new Error("partitionByIndex cannot be used in this position");
   }
   const namedType = getNamedType(currentGraphQLType);
-  return transform<TListPlan, TItemPlan, Memo, any>({
+  return listTransform<TListPlan, TItemPlan, Memo, any>({
     listPlan,
     itemPlanCallback: mapper,
     initialState,

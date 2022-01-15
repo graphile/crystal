@@ -7,13 +7,13 @@ import { isListCapablePlan } from "../plan";
 import type { __ItemPlan } from "./__item";
 import { each } from "./each";
 import type {
-  __TransformPlan,
-  TransformItemPlanCallback,
-  TransformReduce,
-} from "./transform";
-import { transform } from "./transform";
+  __ListTransformPlan,
+  ListTransformItemPlanCallback,
+  ListTransformReduce,
+} from "./listTransform";
+import { listTransform } from "./listTransform";
 
-type Reduce = TransformReduce<unknown[][], number>;
+type Reduce = ListTransformReduce<unknown[][], number>;
 
 /**
  * For 0-based indexes
@@ -80,9 +80,9 @@ export function partitionByIndex<
   TItemPlan extends ExecutablePlan<number>,
 >(
   listPlan: TListPlan,
-  mapper: TransformItemPlanCallback<TListPlan, TItemPlan>,
+  mapper: ListTransformItemPlanCallback<TListPlan, TItemPlan>,
   startIndex: 0 | 1 = 0,
-): __TransformPlan<TListPlan, TItemPlan, unknown[][], any> {
+): __ListTransformPlan<TListPlan, TItemPlan, unknown[][], any> {
   if (startIndex !== 0 && startIndex !== 1) {
     throw new Error(
       `partitionByIndex only supports 0- and 1-indexed lists currently; please use 'lambda' to convert your index`,
@@ -93,7 +93,7 @@ export function partitionByIndex<
     throw new Error("partitionByIndex cannot be used in this position");
   }
   const namedType = getNamedType(currentGraphQLType);
-  return transform<TListPlan, TItemPlan, unknown[][], any>({
+  return listTransform<TListPlan, TItemPlan, unknown[][], any>({
     listPlan,
     itemPlanCallback: mapper,
     initialState,

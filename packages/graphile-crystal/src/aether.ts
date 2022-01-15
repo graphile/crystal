@@ -84,7 +84,7 @@ import {
 } from "./plan";
 import { PlanResults } from "./planResults";
 import { __ItemPlan, __TrackedObjectPlan, __ValuePlan } from "./plans";
-import { __TransformPlan } from "./plans/transform";
+import { __ListTransformPlan } from "./plans/listTransform";
 import { assertPolymorphicData } from "./polymorphic";
 import {
   $$crystalWrapped,
@@ -906,7 +906,7 @@ export class Aether<
           this.sideEffectPlanIdsByPathIdentity[pathIdentity].push(newPlan.id);
         }
 
-        if (newPlan instanceof __TransformPlan) {
+        if (newPlan instanceof __ListTransformPlan) {
           const listPlan = newPlan.getListPlan();
           const nestedParentPathIdentity = pathIdentity + `@${newPlan.id}[]`;
           const wgs = withGlobalState.bind(null, {
@@ -1811,7 +1811,7 @@ export class Aether<
       const processPlan = (plan: ExecutablePlan): void => {
         if (!knownPlans.has(plan)) {
           // Must come first to avoid race conditions
-          if (plan instanceof __TransformPlan) {
+          if (plan instanceof __ListTransformPlan) {
             // TODO: this entire `if` statement is a big hack; we should add transforms to the treeNode elsewhere...
             const transformPathIdentity =
               treeNode.pathIdentity + `@${plan.id}[]`;
@@ -2279,8 +2279,8 @@ export class Aether<
     const planOptions = this.planOptionsByPlan.get(plan);
     const isSubscribe = plan.id === this.subscriptionPlanId;
     const pendingResults =
-      plan instanceof __TransformPlan
-        ? // __TransformPlan gets custom execution.
+      plan instanceof __ListTransformPlan
+        ? // __ListTransformPlan gets custom execution.
           await this.executeTransformPlan(
             plan,
             crystalContext,
@@ -2353,7 +2353,7 @@ export class Aether<
   }
 
   private async executeTransformPlan(
-    plan: __TransformPlan<any, any, any>,
+    plan: __ListTransformPlan<any, any, any>,
     crystalContext: CrystalContext,
     planResultses: readonly PlanResults[],
     visitedPlans: Set<ExecutablePlan>,
@@ -2412,7 +2412,7 @@ export class Aether<
       assert.strictEqual(
         list.length,
         values.length,
-        "GraphileInternalError<c85b6936-d406-4801-9c6b-625a567d32ff>: The list and values length must match for a __TransformPlan",
+        "GraphileInternalError<c85b6936-d406-4801-9c6b-625a567d32ff>: The list and values length must match for a __ListTransformPlan",
       );
       const initialState = plan.initialState();
       const reduceResult = list.reduce(

@@ -6,13 +6,13 @@ import type { ListCapablePlan } from "../plan";
 import { ExecutablePlan } from "../plan";
 import type { __ItemPlan } from "./__item";
 
-export type TransformReduce<TMemo, TItemPlanData> = (
+export type ListTransformReduce<TMemo, TItemPlanData> = (
   memo: TMemo,
   entireItemValue: unknown,
   itemPlanData: TItemPlanData,
 ) => TMemo;
 
-export type TransformItemPlanCallback<
+export type ListTransformItemPlanCallback<
   TListPlan extends ExecutablePlan<readonly any[]>,
   TDepsPlan extends ExecutablePlan,
 > = (
@@ -21,7 +21,7 @@ export type TransformItemPlanCallback<
     : __ItemPlan<any>,
 ) => TDepsPlan;
 
-export interface TransformOptions<
+export interface ListTransformOptions<
   TListPlan extends ExecutablePlan<readonly any[]>,
   TDepsPlan extends ExecutablePlan,
   TMemo,
@@ -29,9 +29,9 @@ export interface TransformOptions<
 > {
   listPlan: TListPlan;
   // TODO: rename this:
-  itemPlanCallback: TransformItemPlanCallback<TListPlan, TDepsPlan>;
+  itemPlanCallback: ListTransformItemPlanCallback<TListPlan, TDepsPlan>;
   initialState(): TMemo;
-  reduceCallback: TransformReduce<
+  reduceCallback: ListTransformReduce<
     TMemo,
     TDepsPlan extends ExecutablePlan<infer U> ? U : never
   >;
@@ -48,7 +48,7 @@ export interface TransformOptions<
  *
  * @internal
  */
-export class __TransformPlan<
+export class __ListTransformPlan<
   TListPlan extends ExecutablePlan<readonly any[]>,
   TDepsPlan extends ExecutablePlan,
   TMemo,
@@ -56,13 +56,13 @@ export class __TransformPlan<
 > extends ExecutablePlan<TMemo> {
   static $$export = {
     moduleName: "graphile-crystal",
-    exportName: "TransformPlan",
+    exportName: "__ListTransformPlan",
   };
 
   private listPlanId: number;
-  public itemPlanCallback: TransformItemPlanCallback<TListPlan, TDepsPlan>;
+  public itemPlanCallback: ListTransformItemPlanCallback<TListPlan, TDepsPlan>;
   public initialState: () => TMemo;
-  public reduceCallback: TransformReduce<
+  public reduceCallback: ListTransformReduce<
     TMemo,
     TDepsPlan extends ExecutablePlan<infer U> ? U : never
   >;
@@ -72,7 +72,7 @@ export class __TransformPlan<
   private meta: string | null;
 
   constructor(
-    options: TransformOptions<TListPlan, TDepsPlan, TMemo, TItemPlan>,
+    options: ListTransformOptions<TListPlan, TDepsPlan, TMemo, TItemPlan>,
   ) {
     super();
     this.parentPathIdentity = getGlobalState().parentPathIdentity;
@@ -111,8 +111,8 @@ export class __TransformPlan<
   }
 
   deduplicate(
-    peers: __TransformPlan<any, any, any, any>[],
-  ): __TransformPlan<TListPlan, TDepsPlan, TMemo, TItemPlan> {
+    peers: __ListTransformPlan<any, any, any, any>[],
+  ): __ListTransformPlan<TListPlan, TDepsPlan, TMemo, TItemPlan> {
     for (const peer of peers) {
       if (
         peer.itemPlanCallback === this.itemPlanCallback &&
@@ -121,32 +121,32 @@ export class __TransformPlan<
         peer.finalizeCallback === this.finalizeCallback &&
         peer.listItem === this.listItem
       ) {
-        // TODO: We shouldn't return `peer` until we alias the replacement id in aether.transformDependencyPlanIdByTransformPlanIdByFieldPathIdentity
+        // TODO: We shouldn't return `peer` until we alias the replacement id in aether.listTransformDependencyPlanIdByListTransformPlanIdByFieldPathIdentity
         // return peer;
       }
     }
     return this;
   }
 
-  // Transform plans must _NOT_ optimize away. They must persist.
+  // ListTransform plans must _NOT_ optimize away. They must persist.
   optimize() {
     return this;
   }
 
   execute(): CrystalResultsList<TMemo> {
     throw new Error(
-      "__TransformPlan must never execute, Crystal handles this internally",
+      "__ListTransformPlan must never execute, Crystal handles this internally",
     );
   }
 }
 
-export function transform<
+export function listTransform<
   TListPlan extends ExecutablePlan<readonly any[]>,
   TDepsPlan extends ExecutablePlan,
   TMemo,
   TItemPlan extends ExecutablePlan | undefined = undefined,
 >(
-  options: TransformOptions<TListPlan, TDepsPlan, TMemo, TItemPlan>,
-): __TransformPlan<TListPlan, TDepsPlan, TMemo, TItemPlan> {
-  return new __TransformPlan(options);
+  options: ListTransformOptions<TListPlan, TDepsPlan, TMemo, TItemPlan>,
+): __ListTransformPlan<TListPlan, TDepsPlan, TMemo, TItemPlan> {
+  return new __ListTransformPlan(options);
 }

@@ -58,6 +58,7 @@ import {
 } from "./plan";
 import {
   __ItemPlan,
+  __ListTransformPlan,
   __TrackedObjectPlan,
   __ValuePlan,
   access,
@@ -81,6 +82,7 @@ import {
   LastPlan,
   list,
   ListPlan,
+  listTransform,
   makeMapper,
   map,
   MapPlan,
@@ -93,7 +95,6 @@ import {
   ReversePlan,
   subscribe,
   SubscribePlan,
-  transform,
 } from "./plans";
 import { polymorphicWrap, resolveType } from "./polymorphic";
 import {
@@ -121,6 +122,7 @@ export { isAsyncIterable } from "iterall";
 
 export {
   __ItemPlan,
+  __ListTransformPlan,
   __TrackedObjectPlan,
   __ValuePlan,
   $$crystalWrapped,
@@ -186,6 +188,7 @@ export {
   list,
   ListCapablePlan,
   ListPlan,
+  listTransform,
   makeCrystalSubscriber,
   makeMapper,
   map,
@@ -220,7 +223,6 @@ export {
   stripAnsi,
   subscribe,
   SubscribePlan,
-  transform,
 };
 
 exportAsMany({
@@ -240,6 +242,7 @@ exportAsMany({
   isObjectLikePlan,
   isStreamablePlan,
   __ItemPlan,
+  __ListTransformPlan,
   __TrackedObjectPlan,
   __ValuePlan,
   access,
@@ -256,7 +259,7 @@ exportAsMany({
   groupBy,
   filter,
   partitionByIndex,
-  transform,
+  listTransform,
   first,
   FirstPlan,
   last,

@@ -5,8 +5,8 @@ import { getGlobalState } from "../global";
 import type { ExecutablePlan, ListCapablePlan } from "../plan";
 import { isListCapablePlan } from "../plan";
 import type { __ItemPlan } from "./__item";
-import type { __TransformPlan } from "./transform";
-import { transform } from "./transform";
+import type { __ListTransformPlan } from "./listTransform";
+import { listTransform } from "./listTransform";
 
 export function each<
   TListPlan extends ExecutablePlan<readonly any[]>,
@@ -18,13 +18,13 @@ export function each<
       ? ReturnType<TListPlan["listItem"]>
       : __ItemPlan<any>,
   ) => TResultItemPlan,
-): __TransformPlan<any, any, any, any> {
+): __ListTransformPlan<any, any, any, any> {
   const currentGraphQLType = getGlobalState().currentGraphQLType;
   if (!currentGraphQLType) {
     throw new Error("partitionByIndex cannot be used in this position");
   }
   const namedType = getNamedType(currentGraphQLType);
-  return transform<any, any, any, any>({
+  return listTransform<any, any, any, any>({
     listPlan,
     itemPlanCallback: (itemPlan) => itemPlan,
     initialState: () => [] as any,
