@@ -2598,19 +2598,30 @@ export function makeExampleSchema(
             messageSource,
           ) =>
             function plan($forum) {
+              // This is a deliberately convoluted plan to ensure that multiple
+              // filter plans work well together.
+
+              // Load _all_ the messages from the DB.
               const $messages = messageSource.find();
               deoptimizeIfAppropriate($messages);
+
+              // Filter messages to those _not_ in this forum
               const $messagesFromOtherForums = filter($messages, ($message) =>
                 lambda(
                   list([$message.get("forum_id"), $forum.get("id")]),
                   ([messageForumId, forumId]) => messageForumId !== forumId,
                 ),
               );
-              console.log($messagesFromOtherForums.listItem?.toString());
+
+              // Group messages by the "featured" property
               const $grouped = groupBy($messagesFromOtherForums, ($message) =>
                 ($message as unknown as MessagePlan).get("featured"),
               );
+
+              // Since `groupBy` results in a `Map`, turn it into an array by just getting the values
               const $entries = lambda($grouped, (map) => [...map.values()]);
+
+              // Now map over the resulting list of list of values and wrap with the message list item plan.
               return each($entries, ($group) =>
                 each($group, ($item) => $messages.listItem($item)),
               );
