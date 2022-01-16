@@ -250,6 +250,13 @@ const gql2pgForType = (type: SupportedPostgresType): PgEncode<any> => {
 
 function t<TCanonical = any, TInput = TCanonical>(
   type: SupportedPostgresType,
+  {
+    castFromPg,
+    listCastFromPg,
+  }: {
+    castFromPg?: (frag: SQL) => SQL;
+    listCastFromPg?: (frag: SQL) => SQL;
+  } = {},
 ): PgTypeCodec<undefined, TCanonical, TInput> {
   return {
     sqlType: sql.identifier(...type.split(".")),
@@ -257,6 +264,8 @@ function t<TCanonical = any, TInput = TCanonical>(
     toPg: gql2pgForType(type),
     columns: undefined,
     extensions: undefined,
+    castFromPg,
+    listCastFromPg,
   };
 }
 
@@ -319,6 +328,10 @@ export function listOfType<TInnerType extends PgTypeCodec<any, any>>(
   };
 }
 
+const verbatim = {
+  castFromPg: (frag: SQL): SQL => frag,
+};
+
 export const TYPES = {
   boolean: t<boolean>("bool"),
   int2: t<number>("int2"),
@@ -328,13 +341,13 @@ export const TYPES = {
   float: t<number>("float"),
   money: t<string>("money"), // TODO: this needs special formatting/parsing? Cast to 'numeric'?
   numeric: t<string>("numeric"),
-  char: t<string>("char"),
-  varchar: t<string>("varchar"),
-  text: t<string>("text"),
+  char: t<string>("char", verbatim),
+  varchar: t<string>("varchar", verbatim),
+  text: t<string>("text", verbatim),
   json: t<string>("json"),
   jsonb: t<string>("jsonb"),
-  citext: t<string>("citext"),
-  uuid: t<string>("uuid"),
+  citext: t<string>("citext", verbatim),
+  uuid: t<string>("uuid", verbatim),
   timestamp: t<Date, Date | string>("timestamp"),
   timestamptz: t<Date, Date | string>("timestamptz"),
   date: t<Date, Date | string>("date"),
