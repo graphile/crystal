@@ -315,6 +315,7 @@ export function listOfType<TInnerType extends PgTypeCodec<any, any>>(
     columns: undefined,
     extensions,
     isArray: true,
+    castFromPg: innerType.listCastFromPg,
   };
 }
 

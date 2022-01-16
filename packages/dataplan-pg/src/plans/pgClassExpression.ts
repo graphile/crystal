@@ -6,7 +6,6 @@ import sql from "pg-sql2";
 
 import type {
   PgSource,
-  PgSourceColumn,
   PgSourceColumns,
   PgSourceParameter,
   PgSourceRelation,
@@ -210,7 +209,9 @@ export class PgClassExpressionPlan<
 
   public optimize(): this {
     this.attrIndex = this.getParentPlan().selectAndReturnIndex(
-      sql`${sql.parens(this.expression)}::text`,
+      this.pgCodec.castFromPg
+        ? this.pgCodec.castFromPg(this.expression)
+        : sql`${sql.parens(this.expression)}::text`,
     );
     return this;
   }

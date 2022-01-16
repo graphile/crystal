@@ -59,6 +59,22 @@ export interface PgTypeCodec<
    */
   fromPg: PgDecode<TCanonical>;
 
+  // TODO: rename?
+  /**
+   * We'll append `::text` by default to each selection; however if this type
+   * needs something special (e.g. `money` should be converted to `numeric`
+   * before being converted to `text`) then you can provide this custom
+   * callback to provide your own casting - this could even include function
+   * calls if you want.
+   */
+  castFromPg?: (fragment: SQL) => SQL;
+
+  /**
+   * If you provide `castFromPg` you probably ought to also specify
+   * `listCastFromPg` so that a list of this type can be converted properly.
+   */
+  listCastFromPg?: (fragment: SQL) => SQL;
+
   /**
    * When we have an expression of this type, we can safely cast it within
    * Postgres using the cast `(${expression})::${sqlType}` to make the type
