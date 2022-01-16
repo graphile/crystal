@@ -39,25 +39,27 @@ export type PgEncode<TInput> = (value: TInput) => SQLRawValue;
 /**
  * Given a text value from PostgreSQL, returns the value cast to TCanonical.
  */
-export type PgDecode<TCanonical> = (value: string) => TCanonical;
+export type PgDecode<TForJavaScript, TFromPostgres = string> = (
+  value: TFromPostgres,
+) => TForJavaScript;
 
 export interface PgTypeCodecExtensions {}
 
 export interface PgTypeCodec<
   TColumns extends PgSourceColumns | undefined,
-  TCanonical,
-  TInput = TCanonical,
+  TFromPostgres,
+  TFromJavaScript = TFromPostgres,
 > {
   /**
-   * Given a value of type TInput, returns an `SQL` value to insert into an SQL
+   * Given a value of type TFromJavaScript, returns an `SQL` value to insert into an SQL
    * statement.
    */
-  toPg: PgEncode<TInput>;
+  toPg: PgEncode<TFromJavaScript>;
 
   /**
    * Given a text value from PostgreSQL, returns the value cast to TCanonical.
    */
-  fromPg: PgDecode<TCanonical>;
+  fromPg: PgDecode<TFromJavaScript, TFromPostgres>;
 
   // TODO: rename?
   /**

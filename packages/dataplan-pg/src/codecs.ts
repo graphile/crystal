@@ -17,7 +17,6 @@ import {
   parseBox,
   parseCircle,
   parseHstore,
-  parseInterval,
   parseLine,
   parseLseg,
   parsePath,
@@ -36,6 +35,7 @@ import {
 import type { PgSourceColumns } from "./datasource";
 import { exportAs } from "./exportAs";
 import type {
+  PgDecode,
   PgEncode,
   PgEnumTypeCodec,
   PgTypeCodec,
@@ -45,223 +45,19 @@ import type {
 // TODO: optimisation: `identity` can be shortcut
 const identity = <T>(value: T): T => value;
 
-type SupportedPostgresType =
-  | "bool"
-  | "int2"
-  | "int4"
-  | "bigint"
-  | "float4"
-  | "float"
-  | "money"
-  | "numeric"
-  | "char"
-  | "varchar"
-  | "text"
-  | "json"
-  | "jsonb"
-  | "citext"
-  | "uuid"
-  | "timestamp"
-  | "timestamptz"
-  | "date"
-  | "time"
-  | "timetz"
-  | "inet"
-  | "regproc"
-  | "regprocedure"
-  | "regoper"
-  | "regoperator"
-  | "regclass"
-  | "regtype"
-  | "regrole"
-  | "regnamespace"
-  | "regconfig"
-  | "regdictionary"
-  | "cidr"
-  | "macaddr"
-  | "macaddr8"
-  | "interval"
-  | "bit"
-  | "varbit"
-  | "point"
-  | "line"
-  | "lseg"
-  | "box"
-  | "path"
-  | "polygon"
-  | "circle"
-  | "hstore";
-
-const pg2gqlForType = (type: SupportedPostgresType): ((value: any) => any) => {
-  switch (type) {
-    case "int2":
-    case "int4": {
-      return (value: any) => parseInt(value, 10);
-    }
-    case "float":
-    case "float4": {
-      return (value: any) => parseFloat(value);
-    }
-    case "bool": {
-      return (value: any) => value === "true";
-    }
-    case "interval": {
-      return parseInterval;
-    }
-    case "point": {
-      return parsePoint;
-    }
-    case "line": {
-      return parseLine;
-    }
-    case "lseg": {
-      return parseLseg;
-    }
-    case "box": {
-      return parseBox;
-    }
-    case "path": {
-      return parsePath;
-    }
-    case "polygon": {
-      return parsePolygon;
-    }
-    case "circle": {
-      return parseCircle;
-    }
-    case "hstore": {
-      return parseHstore;
-    }
-    case "jsonb":
-    case "json":
-    case "bigint":
-    case "money":
-    case "numeric":
-    case "date":
-    case "timestamp":
-    case "timestamptz":
-    case "time":
-    case "timetz":
-    case "inet":
-    case "regdictionary":
-    case "regconfig":
-    case "regnamespace":
-    case "regrole":
-    case "regtype":
-    case "regclass":
-    case "regoper":
-    case "regoperator":
-    case "regproc":
-    case "regprocedure":
-    case "bit":
-    case "varbit":
-    case "cidr":
-    case "macaddr":
-    case "macaddr8":
-    case "char":
-    case "varchar":
-    case "citext":
-    case "uuid":
-    case "text": {
-      return identity;
-    }
-    default: {
-      const never: never = type;
-      console.warn(`No pg2gqlForType handler for '${never}'`);
-      return identity;
-    }
-  }
-};
-
-const gql2pgForType = (type: SupportedPostgresType): PgEncode<any> => {
-  switch (type) {
-    case "interval": {
-      return stringifyInterval;
-    }
-    case "point": {
-      return stringifyPoint;
-    }
-    case "line": {
-      return stringifyLine;
-    }
-    case "lseg": {
-      return stringifyLseg;
-    }
-    case "box": {
-      return stringifyBox;
-    }
-    case "path": {
-      return stringifyPath;
-    }
-    case "polygon": {
-      return stringifyPolygon;
-    }
-    case "circle": {
-      return stringifyCircle;
-    }
-    case "hstore": {
-      return stringifyHstore;
-    }
-    case "int2":
-    case "int4":
-    case "float":
-    case "float4":
-    case "bool":
-    case "jsonb":
-    case "json":
-    case "bigint":
-    case "money":
-    case "numeric":
-    case "date":
-    case "timestamp":
-    case "timestamptz":
-    case "time":
-    case "timetz":
-    case "inet":
-    case "regdictionary":
-    case "regconfig":
-    case "regnamespace":
-    case "regrole":
-    case "regtype":
-    case "regclass":
-    case "regoper":
-    case "regoperator":
-    case "regproc":
-    case "regprocedure":
-    case "bit":
-    case "varbit":
-    case "cidr":
-    case "macaddr":
-    case "macaddr8":
-    case "char":
-    case "varchar":
-    case "citext":
-    case "uuid":
-    case "text": {
-      return identity;
-    }
-    default: {
-      const never: never = type;
-      console.warn(`No gql2pgForType handler for '${never}'`);
-      return identity;
-    }
-  }
-};
-
-function t<TCanonical = any, TInput = TCanonical>(
-  type: SupportedPostgresType,
+function t<TFromJavaScript = any, TFromPostgres = string>(
+  type: string,
   {
     castFromPg,
     listCastFromPg,
-  }: {
-    castFromPg?: (frag: SQL) => SQL;
-    listCastFromPg?: (frag: SQL) => SQL;
-  } = {},
-): PgTypeCodec<undefined, TCanonical, TInput> {
+    fromPg,
+    toPg,
+  }: Cast<TFromJavaScript, TFromPostgres> = {},
+): PgTypeCodec<undefined, TFromPostgres, TFromJavaScript> {
   return {
     sqlType: sql.identifier(...type.split(".")),
-    fromPg: pg2gqlForType(type),
-    toPg: gql2pgForType(type),
+    fromPg: fromPg ?? (identity as any),
+    toPg: toPg ?? (identity as any),
     columns: undefined,
     extensions: undefined,
     castFromPg,
@@ -291,7 +87,7 @@ export function enumType<TValue extends string>(
 ): PgEnumTypeCodec<TValue> {
   return {
     sqlType: identifier,
-    fromPg: identity,
+    fromPg: identity as (val: string) => TValue,
     toPg: identity,
     values,
     columns: undefined,
@@ -306,7 +102,7 @@ export function listOfType<TInnerType extends PgTypeCodec<any, any>>(
   identifier: SQL = sql`${innerType.sqlType}[]`,
 ): PgTypeCodec<
   undefined, // Array has no columns
-  TInnerType extends PgTypeCodec<any, infer U, any> ? U[] : any[],
+  string,
   TInnerType extends PgTypeCodec<any, any, infer U> ? U[] : any[]
 > {
   if (innerType.isArray) {
@@ -328,18 +124,50 @@ export function listOfType<TInnerType extends PgTypeCodec<any, any>>(
   };
 }
 
-const verbatim = {
+type Cast<TFromJavaScript = any, TFromPostgres = string> = {
+  castFromPg?(frag: SQL): SQL;
+  listCastFromPg?(frag: SQL): SQL;
+  toPg?: PgEncode<TFromJavaScript>;
+  fromPg?: PgDecode<TFromJavaScript, TFromPostgres>;
+};
+
+const verbatim: Cast = {
   castFromPg: (frag: SQL): SQL => frag,
 };
 
+const castVia = (via: SQL): Cast => ({
+  castFromPg(frag) {
+    return sql`${sql.parens(frag)}::${via}::text`;
+  },
+  listCastFromPg(frag) {
+    return sql`${sql.parens(frag)}::${via}[]::text[]::text`;
+  },
+});
+const viaNumeric = castVia(sql`numeric`);
+const viaJson = castVia(sql`json`);
+
+const viaDateFormat = (format: string): Cast => {
+  const sqlFormat = sql.literal(format);
+  return {
+    castFromPg(frag) {
+      return sql`to_char(${frag}, ${sqlFormat})`;
+    },
+    listCastFromPg(frag) {
+      return sql`(select array_agg(to_char(t, ${sqlFormat})) from unnest(${frag}) t)::text`;
+    },
+  };
+};
+
+const parseAsInt = (n: string) => parseInt(n, 10);
+
 export const TYPES = {
-  boolean: t<boolean>("bool"),
-  int2: t<number>("int2"),
-  int: t<number>("int4"),
+  boolean: t<boolean>("bool", { fromPg: (value) => value === "true" }),
+  int2: t<number>("int2", { fromPg: parseAsInt }),
+  int: t<number>("int4", { fromPg: parseAsInt }),
   bigint: t<string>("bigint"),
-  float4: t<number>("float4"),
-  float: t<number>("float"),
-  money: t<string>("money"), // TODO: this needs special formatting/parsing? Cast to 'numeric'?
+  float4: t<number>("float4", { fromPg: parseFloat }),
+  float: t<number>("float", { fromPg: parseFloat }),
+  money: t<string>("money", viaNumeric),
   numeric: t<string>("numeric"),
   char: t<string>("char", verbatim),
   varchar: t<string>("varchar", verbatim),
@@ -348,11 +176,14 @@ export const TYPES = {
   jsonb: t<string>("jsonb"),
   citext: t<string>("citext", verbatim),
   uuid: t<string>("uuid", verbatim),
-  timestamp: t<Date, Date | string>("timestamp"),
-  timestamptz: t<Date, Date | string>("timestamptz"),
-  date: t<Date, Date | string>("date"),
-  time: t<string>("time"),
-  timetz: t<string>("timetz"),
+  timestamp: t<string>("timestamp", viaDateFormat("YYYY-MM-DD HH24:MI:SS")),
+  timestamptz: t<string>(
+    "timestamptz",
+    viaDateFormat("YYYY-MM-DDTHH24:MI:SSTZHTZM"),
+  ),
+  date: t<string>("date", viaDateFormat("YYYY-MM-DD")),
+  time: t<string>("time", viaDateFormat("HH24:MI:SS")),
+  timetz: t<string>("timetz", viaDateFormat("HH24:MI:SS")),
   inet: t<string>("inet"),
   regproc: t<string>("regproc"),
   regprocedure: t<string>("regprocedure"),
@@ -367,19 +198,33 @@ export const TYPES = {
   cidr: t<string>("cidr"),
   macaddr: t<string>("macaddr"),
   macaddr8: t<string>("macaddr8"),
-  interval: t<PgInterval, string>("interval"),
+  interval: t<PgInterval, string>("interval", {
+    ...viaDateFormat(`YYYY_MM_DD_HH24_MI_SS.US`),
+    fromPg(value: string): PgInterval {
+      const parts = value.split("_").map(parseFloat);
+      // Note these are actually all integers except for `seconds`.
+      const [years, months, days, hours, minutes, seconds] = parts;
+      return { years, months, days, hours, minutes, seconds };
+    },
+    toPg: stringifyInterval,
+  }),
   bit: t<string>("bit"),
   varbit: t<string>("varbit"),
-  point: t<PgPoint, string>("point"),
-  line: t<PgLine, string>("line"),
-  lseg: t<PgLseg, string>("lseg"),
-  box: t<PgBox, string>("box"),
-  path: t<PgPath, string>("path"),
-  polygon: t<PgPolygon, string>("polygon"),
-  circle: t<PgCircle, string>("circle"),
-  hstore: t<PgHStore, string>("hstore"),
+  point: t<PgPoint>("point", { fromPg: parsePoint, toPg: stringifyPoint }),
+  line: t<PgLine>("line", { fromPg: parseLine, toPg: stringifyLine }),
+  lseg: t<PgLseg>("lseg", { fromPg: parseLseg, toPg: stringifyLseg }),
+  box: t<PgBox>("box", { fromPg: parseBox, toPg: stringifyBox }),
+  path: t<PgPath>("path", { fromPg: parsePath, toPg: stringifyPath }),
+  polygon: t<PgPolygon>("polygon", {
+    fromPg: parsePolygon,
+    toPg: stringifyPolygon,
+  }),
+  circle: t<PgCircle>("circle", { fromPg: parseCircle, toPg: stringifyCircle }),
+  hstore: t<PgHStore>("hstore", { fromPg: parseHstore, toPg: stringifyHstore }),
 } as const;
+
 exportAs(TYPES, "TYPES");
+
 for (const key of Object.keys(TYPES)) {
   exportAs(TYPES[key], ["TYPES", key]);
 }

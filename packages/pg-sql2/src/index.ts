@@ -642,7 +642,7 @@ export const blank = makeRawNode(``, "blank");
  * to `sql.value`.
  */
 export function literal(val: string | number | boolean | null): SQL {
-  if (typeof val === "string" && val.match(/^[-a-zA-Z0-9_@!$ ]*$/)) {
+  if (typeof val === "string" && val.match(/^[-a-zA-Z0-9_@!$ :]*$/)) {
     return makeRawNode(`'${val}'`);
   } else if (typeof val === "number" && Number.isFinite(val)) {
     if (Number.isInteger(val)) {
