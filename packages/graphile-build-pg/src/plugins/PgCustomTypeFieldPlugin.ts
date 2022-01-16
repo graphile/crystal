@@ -9,8 +9,9 @@ import type {
   PgSource,
   PgSourceParameter,
 } from "@dataplan/pg";
+import { TYPES } from "@dataplan/pg";
 import { pgSelect } from "@dataplan/pg";
-import { connection } from "graphile-crystal";
+import { connection, partitionByIndex } from "graphile-crystal";
 import type { TrackedArguments } from "graphile-crystal/src/interfaces";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
@@ -154,7 +155,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                 (
                   $row: PgSelectSinglePlan<any, any, any, any>,
                   args: TrackedArguments<any>,
-                ): PgSelectPlan<any, any, any, any> => {
+                ) => {
                   const selectArgs: PgSelectArgumentSpec[] = [
                     { plan: $row.record() },
                     ...argDetails
@@ -167,17 +168,17 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                       })
                       .filter(isNotNullish),
                   ];
-                  return pgSelect({
-                    source,
-                    identifiers: [],
-                    args: selectArgs,
-                  });
+                  return source.execute(selectArgs);
                 },
               [argDetails, isNotNullish, pgSelect, source],
             );
 
-            const isScalar = !source.codec.columns;
             if (source.isUnique) {
+              if (source.codec.arrayOfCodec?.columns) {
+                throw new Error(
+                  `Invalid source '${source}'; 'isUnique' is true, but the type is an array of a composite type. Please use PostgreSQL's 'unnest' in your source to convert the array returned by the function into a set, then change the codec to be the underlying (not listOf) codec and remove 'isUnique'.`,
+                );
+              }
               const fieldName = build.inflection.computedColumn({ source });
               memo[fieldName] = fieldWithHooks(
                 { fieldName },
@@ -185,24 +186,22 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                   description: source.description,
                   type,
                   args,
-                  plan: EXPORTABLE(
-                    (getSelectPlanFromRowAndArgs) =>
-                      function plan(
-                        $row: PgSelectSinglePlan<any, any, any, any>,
-                        args: TrackedArguments<any>,
-                      ) {
-                        const $select = getSelectPlanFromRowAndArgs($row, args);
-                        return $select.single();
-                      },
-                    [getSelectPlanFromRowAndArgs],
-                  ),
+                  plan: getSelectPlanFromRowAndArgs,
                 },
               );
             } else {
+              // isUnique is false => this is a 'setof' source.
+
+              // If the source still has an array type, then it's a 'setof
+              // foo[]' which __MUST NOT USE__ GraphQL connections; see:
+              // https://relay.dev/graphql/connections.htm#sec-Node
+              const canUseConnection = !source.sqlPartitionByIndex;
+
               const behavior = getBehavior(source.extensions) ?? [
-                source.codec.arrayOfCodec ? "list" : "connection",
+                canUseConnection ? "connection" : "list",
               ];
-              if (behavior.includes("connection")) {
+
+              if (behavior.includes("connection") && canUseConnection) {
                 const fieldName = build.inflection.computedColumnConnection({
                   source,
                 });
@@ -228,7 +227,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                             const $select = getSelectPlanFromRowAndArgs(
                               $row,
                               args,
-                            );
+                            ) as PgSelectPlan<any, any, any, any>;
                             return connection($select);
                           },
                         [connection, getSelectPlanFromRowAndArgs],
@@ -237,6 +236,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                   );
                 }
               }
+
               if (behavior.includes("list")) {
                 const fieldName = build.inflection.computedColumnList({
                   source,
@@ -248,20 +248,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                     // TODO: nullability
                     type: new build.graphql.GraphQLList(type),
                     args,
-                    plan: EXPORTABLE(
-                      (getSelectPlanFromRowAndArgs) =>
-                        function plan(
-                          $row: PgSelectSinglePlan<any, any, any, any>,
-                          args: TrackedArguments<any>,
-                        ) {
-                          const $select = getSelectPlanFromRowAndArgs(
-                            $row,
-                            args,
-                          );
-                          return $select;
-                        },
-                      [getSelectPlanFromRowAndArgs],
-                    ),
+                    plan: getSelectPlanFromRowAndArgs as any,
                   },
                 );
               }

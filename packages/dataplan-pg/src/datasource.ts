@@ -11,10 +11,12 @@ import {
   constant,
   ExecutablePlan,
   getCurrentParentPathIdentity,
+  partitionByIndex,
 } from "graphile-crystal";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
+import { TYPES } from "./codecs";
 import type {
   PgClientResult,
   PgExecutor,
@@ -164,6 +166,7 @@ export interface PgSourceOptions<
    * should set it false if the function `returns setof` and true otherwise.
    */
   isUnique?: boolean;
+  sqlPartitionByIndex?: SQL;
 }
 
 /**
@@ -278,7 +281,7 @@ export class PgSource<
   /** TypeScript hack, avoid. @internal */
   TParameters!: TParameters;
 
-  public readonly codec: PgTypeCodec<TColumns, any, any>;
+  public readonly codec: PgTypeCodec<TColumns, any, any, any>;
   public readonly executor: PgExecutor;
   public readonly name: string;
   public readonly source: SQL | ((...args: SQL[]) => SQL);
@@ -291,6 +294,14 @@ export class PgSource<
   >;
   private relationsThunk: (() => TRelations) | null;
   private _relations: TRelations | null = null;
+
+  /**
+   * If present, implies that the source represents a `setof composite[]` (i.e.
+   * an array of arrays) - and thus is not appropriate to use for GraphQL
+   * Cursor Connections.
+   */
+  private sqlPartitionByIndex: SQL | null = null;
+
   public readonly parameters: TParameters;
   public readonly description: string | undefined;
   public readonly isUnique: boolean;
@@ -318,6 +329,7 @@ export class PgSource<
       parameters,
       description,
       isUnique,
+      sqlPartitionByIndex,
     } = options;
     this._options = options;
     this.extensions = extensions;
@@ -335,6 +347,7 @@ export class PgSource<
     this.parameters = parameters as TParameters;
     this.description = description;
     this.isUnique = !!isUnique;
+    this.sqlPartitionByIndex = sqlPartitionByIndex ?? null;
 
     // parameters is null iff source is not a function
     const sourceIsFunction = typeof this.source === "function";
@@ -348,32 +361,36 @@ export class PgSource<
         `Source ${this} is invalid - parameters can only be specified when the source is a function.`,
       );
     }
+
+    if (this.codec.arrayOfCodec?.columns) {
+      throw new Error(
+        `Source ${this} is invalid - creating a source that returns an array of a composite type is forbidden; please \`unnest\` the array.`,
+      );
+    }
+
+    if (this.isUnique && this.sqlPartitionByIndex) {
+      throw new Error(
+        `Source ${this} is invalid - cannot be unique and also partitionable`,
+      );
+    }
   }
 
   /**
    * Often you can access table records from a table directly but also from a
-   * number of functions. This method makes it convenient to construct multiple
-   * datasources that all represent the same underlying table
+   * view or materialized view.  This method makes it convenient to construct
+   * multiple datasources that all represent the same underlying table
    * type/relations/etc.
    */
   public alternativeSource<
     TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
-    TNewParameters extends PgSourceParameter[] | undefined = TParameters,
   >(overrideOptions: {
     name: string;
-    source: SQL | ((...args: SQL[]) => SQL);
-    parameters?: TNewParameters;
+    source: SQL;
     uniques?: TUniques;
     extensions?: PgSourceExtensions;
-  }): PgSource<TColumns, TUniques, TRelations, TNewParameters> {
-    const {
-      name,
-      source,
-      uniques,
-      parameters: overrideParameters,
-      extensions,
-    } = overrideOptions;
-    const { codec, executor, relations, parameters } = this._options;
+  }): PgSource<TColumns, TUniques, TRelations, undefined> {
+    const { name, source, uniques, extensions } = overrideOptions;
+    const { codec, executor, relations } = this._options;
     return new PgSource({
       codec,
       executor,
@@ -381,9 +398,87 @@ export class PgSource<
       source: source as any,
       uniques,
       relations,
-      parameters: (overrideParameters ?? parameters) as TNewParameters,
+      parameters: undefined,
       extensions,
     });
+  }
+
+  /**
+   * Often you can access table records from a table directly but also from a
+   * number of functions. This method makes it convenient to construct multiple
+   * datasources that all represent the same underlying table
+   * type/relations/etc but pull their rows from functions.
+   */
+  public functionSource<
+    TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+    TNewParameters extends PgSourceParameter[],
+  >(overrideOptions: {
+    name: string;
+    source: (...args: SQL[]) => SQL;
+    parameters: TNewParameters;
+    returnsSetof: boolean;
+    returnsArray: boolean;
+    uniques?: TUniques;
+    extensions?: PgSourceExtensions;
+  }) {
+    const {
+      name,
+      source: fnSource,
+      parameters,
+      returnsSetof,
+      returnsArray,
+      uniques,
+      extensions,
+    } = overrideOptions;
+    const { codec, executor, relations } = this._options;
+    if (!returnsArray) {
+      // This is the easy case
+      return new PgSource<TColumns, TUniques, TRelations, TNewParameters>({
+        codec,
+        executor,
+        name,
+        source: fnSource as any,
+        uniques,
+        relations,
+        parameters,
+        extensions,
+        isUnique: !returnsSetof,
+      });
+    } else if (!returnsSetof) {
+      // This is a `composite[]` function; convert it to a `setof composite` function:
+      const source = (...args: SQL[]) => sql`unnest(${fnSource(...args)})`;
+      return new PgSource<TColumns, TUniques, TRelations, TNewParameters>({
+        codec,
+        executor,
+        name,
+        source: source as any,
+        uniques,
+        relations,
+        parameters,
+        extensions,
+        isUnique: false, // set now, not unique
+      });
+    } else {
+      // This is a `setof composite[]` function; convert it to `setof composite` and indicate that we should partition it.
+      const sqlTmp = sql.identifier(Symbol(`${name}_tmp`));
+      const sqlPartitionByIndex = sql.identifier(Symbol(`${name}_idx`));
+      const source = (...args: SQL[]) =>
+        sql`${fnSource(
+          ...args,
+        )} with ordinality as ${sqlTmp} (arr, ${sqlPartitionByIndex}) cross join lateral unnest (${sqlTmp}.arr)`;
+      return new PgSource<TColumns, TUniques, TRelations, TNewParameters>({
+        codec,
+        executor,
+        name,
+        source: source as any,
+        uniques,
+        relations,
+        parameters,
+        extensions,
+        isUnique: false, // set now, not unique
+        sqlPartitionByIndex,
+      });
+    }
   }
 
   public toString(): string {
@@ -607,11 +702,30 @@ export class PgSource<
   }
 
   execute(args: Array<PgSelectArgumentSpec> = []) {
-    return pgSelect({
+    const $select = pgSelect({
       source: this,
       identifiers: [],
       args,
     });
+    if (this.isUnique) {
+      return $select.single();
+    }
+    const sqlPartitionByIndex = this.sqlPartitionByIndex;
+    if (sqlPartitionByIndex) {
+      // We're a setof array of composite type function, e.g. `setof users[]`, so we need to reconstitute the plan.
+      return partitionByIndex(
+        $select,
+        ($row) =>
+          ($row as PgSelectSinglePlan<any, any, any, any>).select(
+            sqlPartitionByIndex,
+            TYPES.int,
+          ),
+        // Ordinality is 1-indexed but we want a 0-indexed number
+        1,
+      );
+    } else {
+      return $select;
+    }
   }
 
   public applyAuthorizationChecksToPlan(

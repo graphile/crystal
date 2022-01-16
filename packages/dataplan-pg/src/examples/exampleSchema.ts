@@ -3,7 +3,6 @@ import { jsonParse, JSONParsePlan } from "@dataplan/json";
 import * as crypto from "crypto";
 import { writeFileSync } from "fs";
 import type {
-  __ListTransformPlan,
   __TrackedObjectPlan,
   AccessPlan,
   BaseGraphQLContext,
@@ -14,6 +13,7 @@ import type {
   InputStaticLeafPlan,
 } from "graphile-crystal";
 import {
+  __ListTransformPlan,
   __ValuePlan,
   aether,
   ConnectionPlan,
@@ -30,7 +30,6 @@ import {
   newInputObjectTypeBuilder,
   newObjectTypeBuilder,
   object,
-  partitionByIndex,
   resolveType,
   subscribe,
 } from "graphile-crystal";
@@ -134,24 +133,37 @@ export function makeExampleSchema(
   options: { deoptimize?: boolean } = Object.create(null),
 ): GraphQLSchema {
   const deoptimizeIfAppropriate = EXPORTABLE(
-    (options) =>
+    (__ListTransformPlan, options) =>
       <
         TPlan extends
           | PgSelectPlan<any, any, any, any>
-          | PgSelectSinglePlan<any, any, any, any>,
+          | PgSelectSinglePlan<any, any, any, any>
+          | PgClassExpressionPlan<any, any, any, any, any, any>
+          | __ListTransformPlan<
+              PgSelectPlan<any, any, any, any>,
+              any,
+              any,
+              any
+            >,
       >(
         plan: TPlan,
       ): TPlan => {
         if (options.deoptimize) {
-          if ("getClassPlan" in plan) {
-            plan.getClassPlan().setInliningForbidden();
-          } else {
-            plan.setInliningForbidden();
+          const innerPlan =
+            plan instanceof __ListTransformPlan
+              ? plan.getListPlan()
+              : (plan as
+                  | PgSelectPlan<any, any, any, any>
+                  | PgSelectSinglePlan<any, any, any, any>);
+          if ("getClassPlan" in innerPlan) {
+            innerPlan.getClassPlan().setInliningForbidden();
+          } else if ("setInliningForbidden" in innerPlan) {
+            innerPlan.setInliningForbidden();
           }
         }
         return plan;
       },
-    [options],
+    [__ListTransformPlan, options],
   );
   type PgSelectPlanFromSource<TSource extends PgSource<any, any, any, any>> =
     PgSelectPlan<
@@ -367,6 +379,7 @@ export function makeExampleSchema(
             codec: TYPES.boolean,
           },
         ],
+        isUnique: true,
       }),
     [PgSource, TYPES, executor, sql],
   );
@@ -418,6 +431,7 @@ export function makeExampleSchema(
             codec: TYPES.boolean,
           },
         ],
+        isUnique: true,
       }),
     [PgSource, TYPES, executor, forumCodec, sql],
   );
@@ -470,14 +484,23 @@ export function makeExampleSchema(
   );
 
   const usersMostRecentForumSource = EXPORTABLE(
-    (forumSource, sql) =>
-      forumSource.alternativeSource({
+    (forumSource, sql, userSource) =>
+      forumSource.functionSource({
         name: "users_most_recent_forum",
         source: (...args) =>
           sql`app_public.users_most_recent_forum(${sql.join(args, ", ")})`,
-        parameters: [],
+        returnsArray: false,
+        returnsSetof: false,
+        parameters: [
+          {
+            name: "u",
+            codec: userSource.codec,
+            required: true,
+            notNull: true,
+          },
+        ],
       }),
-    [forumSource, sql],
+    [forumSource, sql, userSource],
   );
 
   const messageSource = EXPORTABLE(
@@ -503,10 +526,12 @@ export function makeExampleSchema(
 
   const featuredMessages = EXPORTABLE(
     (messageSource, sql) =>
-      messageSource.alternativeSource({
+      messageSource.functionSource({
         name: "featured_messages",
         source: (...args) =>
           sql`app_public.featured_messages(${sql.join(args, ", ")})`,
+        returnsSetof: true,
+        returnsArray: false,
         parameters: [],
       }),
     [messageSource, sql],
@@ -514,10 +539,12 @@ export function makeExampleSchema(
 
   const forumsFeaturedMessages = EXPORTABLE(
     (forumCodec, messageSource, sql) =>
-      messageSource.alternativeSource({
+      messageSource.functionSource({
         name: "forums_featured_messages",
         source: (...args) =>
           sql`app_public.forums_featured_messages(${sql.join(args, ", ")})`,
+        returnsSetof: true,
+        returnsArray: false,
         parameters: [
           {
             name: "forum",
@@ -531,63 +558,46 @@ export function makeExampleSchema(
 
   const randomUserArraySource = EXPORTABLE(
     (sql, userSource) =>
-      userSource.alternativeSource({
+      userSource.functionSource({
         name: "random_user_array",
         source: (...args) =>
-          sql`unnest(app_public.random_user_array(${sql.join(args, ", ")}))`,
+          sql`app_public.random_user_array(${sql.join(args, ", ")})`,
+        returnsArray: true,
+        returnsSetof: false,
         parameters: [],
       }),
     [sql, userSource],
   );
 
-  const randomUserArraySetSourceTmp = sql.identifier(
-    Symbol("random_user_array_set_array"),
-  );
-  const randomUserArraySetSourceIdx = sql.identifier(
-    Symbol("random_user_array_set_idx"),
-  );
   const randomUserArraySetSource = EXPORTABLE(
-    (
-      randomUserArraySetSourceIdx,
-      randomUserArraySetSourceTmp,
-      sql,
-      userSource,
-    ) =>
-      userSource.alternativeSource({
+    (sql, userSource) =>
+      userSource.functionSource({
         name: "random_user_array_set",
         source: (...args) =>
-          sql`app_public.random_user_array_set(${sql.join(
-            args,
-            ", ",
-          )}) with ordinality as ${randomUserArraySetSourceTmp} (arr, ${randomUserArraySetSourceIdx}) cross join lateral unnest (arr)`,
+          sql`app_public.random_user_array_set(${sql.join(args, ", ")})`,
+        returnsSetof: true,
+        returnsArray: true,
         parameters: [],
       }),
-    [randomUserArraySetSourceIdx, randomUserArraySetSourceTmp, sql, userSource],
+    [sql, userSource],
   );
 
-  const forumsMessagesListSetTmp = sql.identifier(
-    Symbol("forums_messages_list_set_tmp"),
-  );
-  const forumsMessagesListSetIdx = sql.identifier(
-    Symbol("forums_messages_list_set_idx"),
-  );
   const forumsMessagesListSetSource = EXPORTABLE(
-    (forumsMessagesListSetIdx, forumsMessagesListSetTmp, messageSource, sql) =>
-      messageSource.alternativeSource({
+    (messageSource, sql) =>
+      messageSource.functionSource({
         name: "forums_messages_list_set",
         source: (...args) =>
-          sql`app_public.forums_messages_list_set(${sql.join(
-            args,
-            ", ",
-          )}) with ordinality as ${forumsMessagesListSetTmp} (arr, ${forumsMessagesListSetIdx}) cross join lateral unnest (arr)`,
+          sql`app_public.forums_messages_list_set(${sql.join(args, ", ")})`,
         parameters: [],
+        returnsArray: true,
+        returnsSetof: true,
         extensions: {
           tags: {
             name: "messagesListSet",
           },
         },
       }),
-    [forumsMessagesListSetIdx, forumsMessagesListSetTmp, messageSource, sql],
+    [messageSource, sql],
   );
 
   const unionEntityColumns = EXPORTABLE(
@@ -1571,9 +1581,11 @@ export function makeExampleSchema(
 
   const entitySearchSource = EXPORTABLE(
     (TYPES, sql, unionEntitySource) =>
-      unionEntitySource.alternativeSource({
+      unionEntitySource.functionSource({
         source: (...args: SQL[]) =>
           sql`interfaces_and_unions.search(${sql.join(args, ", ")})`,
+        returnsSetof: true,
+        returnsArray: false,
         name: "entity_search",
         parameters: [
           {
@@ -1764,17 +1776,14 @@ export function makeExampleSchema(
       mostRecentForum: {
         type: Forum,
         plan: EXPORTABLE(
-          (deoptimizeIfAppropriate, pgSelect, usersMostRecentForumSource) =>
-            ($user) => {
-              const $forum = pgSelect({
-                source: usersMostRecentForumSource,
-                args: [{ plan: $user.record() }],
-                identifiers: [],
-              }).single();
-              deoptimizeIfAppropriate($forum);
-              return $forum;
-            },
-          [deoptimizeIfAppropriate, pgSelect, usersMostRecentForumSource],
+          (deoptimizeIfAppropriate, usersMostRecentForumSource) => ($user) => {
+            const $forum = usersMostRecentForumSource.execute([
+              { plan: $user.record() },
+            ]);
+            deoptimizeIfAppropriate($forum);
+            return $forum;
+          },
+          [deoptimizeIfAppropriate, usersMostRecentForumSource],
         ),
       },
 
@@ -2479,24 +2488,20 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (TYPES, forumsUniqueAuthorCountSource, pgSelect) =>
+          (TYPES, forumsUniqueAuthorCountSource) =>
             function plan($forum, args) {
               const $featured = args.featured;
-              return pgSelect({
-                source: forumsUniqueAuthorCountSource,
-                identifiers: [],
-                args: [
-                  {
-                    plan: $forum.record(),
-                  },
-                  {
-                    plan: $featured,
-                    pgCodec: TYPES.boolean,
-                  },
-                ],
-              }).single();
+              return forumsUniqueAuthorCountSource.execute([
+                {
+                  plan: $forum.record(),
+                },
+                {
+                  plan: $featured,
+                  pgCodec: TYPES.boolean,
+                },
+              ]);
             },
-          [TYPES, forumsUniqueAuthorCountSource, pgSelect],
+          [TYPES, forumsUniqueAuthorCountSource],
         ),
       },
 
@@ -2527,61 +2532,34 @@ export function makeExampleSchema(
       featuredMessages: {
         type: new GraphQLList(Message),
         plan: EXPORTABLE(
-          (deoptimizeIfAppropriate, forumsFeaturedMessages, pgSelect) =>
+          (deoptimizeIfAppropriate, forumsFeaturedMessages) =>
             function plan($forum) {
-              const $messages = pgSelect({
-                source: forumsFeaturedMessages,
-                identifiers: [],
-                args: [
-                  {
-                    plan: $forum.record(),
-                  },
-                ],
-              });
+              const $messages = forumsFeaturedMessages.execute([
+                {
+                  plan: $forum.record(),
+                },
+              ]);
               deoptimizeIfAppropriate($messages);
               return $messages;
             },
-          [deoptimizeIfAppropriate, forumsFeaturedMessages, pgSelect],
+          [deoptimizeIfAppropriate, forumsFeaturedMessages],
         ),
       },
 
       messagesListSet: {
         type: new GraphQLList(new GraphQLList(Message)),
         plan: EXPORTABLE(
-          (
-            TYPES,
-            deoptimizeIfAppropriate,
-            forumsMessagesListSetIdx,
-            forumsMessagesListSetSource,
-            partitionByIndex,
-            pgSelect,
-          ) =>
+          (deoptimizeIfAppropriate, forumsMessagesListSetSource) =>
             function plan($forum) {
-              const $messages = pgSelect({
-                source: forumsMessagesListSetSource,
-                identifiers: [],
-                args: [
-                  {
-                    plan: $forum.record(),
-                  },
-                ],
-              });
-              deoptimizeIfAppropriate($messages);
-              return partitionByIndex(
-                $messages,
-                ($row) => $row.select(forumsMessagesListSetIdx, TYPES.int),
-                // Ordinality is 1-indexed but we want a 0-indexed number
-                1,
-              );
+              const $partitionedMessages = forumsMessagesListSetSource.execute([
+                {
+                  plan: $forum.record(),
+                },
+              ]);
+              deoptimizeIfAppropriate($partitionedMessages);
+              return $partitionedMessages;
             },
-          [
-            TYPES,
-            deoptimizeIfAppropriate,
-            forumsMessagesListSetIdx,
-            forumsMessagesListSetSource,
-            partitionByIndex,
-            pgSelect,
-          ],
+          [deoptimizeIfAppropriate, forumsMessagesListSetSource],
         ),
       },
 
@@ -3563,7 +3541,7 @@ export function makeExampleSchema(
                 },
               ]);
               deoptimizeIfAppropriate($plan);
-              return $plan.single();
+              return $plan;
             },
           [TYPES, deoptimizeIfAppropriate, uniqueAuthorCountSource],
         ),
@@ -3591,8 +3569,7 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (forumNamesArraySource) =>
             function plan(_$root) {
-              const $plan = forumNamesArraySource.execute().single();
-              return $plan;
+              return forumNamesArraySource.execute();
             },
           [forumNamesArraySource],
         ),
@@ -3680,30 +3657,13 @@ export function makeExampleSchema(
       randomUserArraySet: {
         type: new GraphQLList(new GraphQLList(User)),
         plan: EXPORTABLE(
-          (
-            TYPES,
-            deoptimizeIfAppropriate,
-            partitionByIndex,
-            randomUserArraySetSource,
-            randomUserArraySetSourceIdx,
-          ) =>
+          (deoptimizeIfAppropriate, randomUserArraySetSource) =>
             function plan() {
-              const $select = randomUserArraySetSource.execute();
-              deoptimizeIfAppropriate($select);
-              return partitionByIndex(
-                $select,
-                ($row) => $row.select(randomUserArraySetSourceIdx, TYPES.int),
-                // Ordinality is 1-indexed but we want a 0-indexed number
-                1,
-              );
+              const $selectPartitioned = randomUserArraySetSource.execute();
+              deoptimizeIfAppropriate($selectPartitioned);
+              return $selectPartitioned;
             },
-          [
-            TYPES,
-            deoptimizeIfAppropriate,
-            partitionByIndex,
-            randomUserArraySetSource,
-            randomUserArraySetSourceIdx,
-          ],
+          [deoptimizeIfAppropriate, randomUserArraySetSource],
         ),
       },
 
@@ -3930,20 +3890,15 @@ export function makeExampleSchema(
             each,
             entitySearchSource,
             entityUnion,
-            pgSelect,
           ) =>
             function plan(_$root, args) {
-              const $plan = pgSelect({
-                source: entitySearchSource,
-                identifiers: [],
-                args: [
-                  {
-                    plan: args.query,
-                    pgCodec: TYPES.text,
-                    name: "query",
-                  },
-                ],
-              });
+              const $plan = entitySearchSource.execute([
+                {
+                  plan: args.query,
+                  pgCodec: TYPES.text,
+                  name: "query",
+                },
+              ]) as PgSelectPlan<any, any, any, any>;
               deoptimizeIfAppropriate($plan);
               return each($plan, ($item) => entityUnion($item));
             },
@@ -3953,7 +3908,6 @@ export function makeExampleSchema(
             each,
             entitySearchSource,
             entityUnion,
-            pgSelect,
           ],
         ),
       },
