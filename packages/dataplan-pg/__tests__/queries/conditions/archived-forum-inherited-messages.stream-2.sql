@@ -13,7 +13,7 @@ select
       )
   ) as "1",
   __forums__."id" as "2",
-  __forums__."archived_at"::text as "3"
+  to_char(__forums__."archived_at", $1) as "3"
 from app_public.forums as __forums__
 where
   (

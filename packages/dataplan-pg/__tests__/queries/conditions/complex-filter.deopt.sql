@@ -9,7 +9,7 @@ lateral (
   select
     __forums__."name" as "0",
     __forums__."id" as "1",
-    __forums__."archived_at"::text as "2",
+    to_char(__forums__."archived_at", $2) as "2",
     __forums_identifiers__.idx as "3"
   from app_public.forums as __forums__
   where

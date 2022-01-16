@@ -6,10 +6,10 @@ select
       __relational_items__."id"::text,
       __relational_items__."type2"::text,
       __relational_items__."position"::text,
-      __relational_items__."created_at"::text,
-      __relational_items__."updated_at"::text,
+      to_char(__relational_items__."created_at", $1),
+      to_char(__relational_items__."updated_at", $2),
       __relational_items__."is_explicitly_archived"::text,
-      __relational_items__."archived_at"::text
+      to_char(__relational_items__."archived_at", $3)
     ]::text[]
     from interfaces_and_unions.relational_items as __relational_items__
     where

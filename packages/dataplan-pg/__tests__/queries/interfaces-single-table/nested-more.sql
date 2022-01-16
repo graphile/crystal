@@ -7,19 +7,19 @@ select
       __single_table_items__."type2"::text,
       __people_2."username",
       __single_table_items__."position"::text,
-      __single_table_items__."created_at"::text,
-      __single_table_items__."updated_at"::text,
+      to_char(__single_table_items__."created_at", $1),
+      to_char(__single_table_items__."updated_at", $2),
       __single_table_items__."is_explicitly_archived"::text,
-      __single_table_items__."archived_at"::text,
+      to_char(__single_table_items__."archived_at", $3),
       __single_table_items_2."parent_id"::text,
       __single_table_items_2."id"::text,
       __single_table_items_2."type2"::text,
       __people_3."username",
       __single_table_items_2."position"::text,
-      __single_table_items_2."created_at"::text,
-      __single_table_items_2."updated_at"::text,
+      to_char(__single_table_items_2."created_at", $4),
+      to_char(__single_table_items_2."updated_at", $5),
       __single_table_items_2."is_explicitly_archived"::text,
-      __single_table_items_2."archived_at"::text
+      to_char(__single_table_items_2."archived_at", $6)
     ]::text[]
     from interfaces_and_unions.single_table_items as __single_table_items_2
     left outer join interfaces_and_unions.single_table_items as __single_table_items__

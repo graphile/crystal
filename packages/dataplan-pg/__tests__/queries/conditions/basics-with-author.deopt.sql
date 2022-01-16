@@ -1,7 +1,7 @@
 select
   __forums__."name" as "0",
   __forums__."id" as "1",
-  __forums__."archived_at"::text as "2"
+  to_char(__forums__."archived_at", $1) as "2"
 from app_public.forums as __forums__
 where (
   true /* authorization checks */

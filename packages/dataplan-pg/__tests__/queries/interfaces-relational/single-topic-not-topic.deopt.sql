@@ -10,10 +10,10 @@ lateral (
     __relational_items__."type"::text as "0",
     __relational_items__."type2"::text as "1",
     __relational_items__."position"::text as "2",
-    __relational_items__."created_at"::text as "3",
-    __relational_items__."updated_at"::text as "4",
+    to_char(__relational_items__."created_at", $2) as "3",
+    to_char(__relational_items__."updated_at", $3) as "4",
     __relational_items__."is_explicitly_archived"::text as "5",
-    __relational_items__."archived_at"::text as "6",
+    to_char(__relational_items__."archived_at", $4) as "6",
     __relational_topics__."id"::text as "7",
     __relational_topics__."title" as "8",
     __relational_topics_identifiers__.idx as "9"

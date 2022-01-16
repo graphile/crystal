@@ -20,10 +20,10 @@ lateral (
     __relational_items__."id"::text as "1",
     __relational_items__."type2"::text as "2",
     __relational_items__."position"::text as "3",
-    __relational_items__."created_at"::text as "4",
-    __relational_items__."updated_at"::text as "5",
+    to_char(__relational_items__."created_at", $2) as "4",
+    to_char(__relational_items__."updated_at", $3) as "5",
     __relational_items__."is_explicitly_archived"::text as "6",
-    __relational_items__."archived_at"::text as "7",
+    to_char(__relational_items__."archived_at", $4) as "7",
     __relational_items_identifiers__.idx as "8"
   from interfaces_and_unions.relational_items as __relational_items__
   where
