@@ -5,7 +5,7 @@ select
       __forums_messages_list_set__."featured"::text,
       __forums_messages_list_set_idx__::text
     ]::text[]
-    from app_public.forums_messages_list_set(__forums__) with ordinality as __forums_messages_list_set_tmp__ (arr, __forums_messages_list_set_idx__) cross join lateral unnest (arr) as __forums_messages_list_set__
+    from app_public.forums_messages_list_set(__forums__) with ordinality as __forums_messages_list_set_tmp__ (arr, __forums_messages_list_set_idx__) cross join lateral unnest (__forums_messages_list_set_tmp__.arr) as __forums_messages_list_set__
     where (
       true /* authorization checks */
     )
