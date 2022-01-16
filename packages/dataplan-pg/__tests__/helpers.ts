@@ -167,6 +167,7 @@ function makeWithTestPgClient(queries: PgClientQuery[]): WithPgClient {
 
 type ClientAndRelease = {
   count: number;
+  pendingQueries: Set<Promise<any>>;
   client: PgClient;
   release: () => void;
   rawPoolClient: PoolClient;
@@ -204,55 +205,64 @@ function clientForSettings(
       await poolClient.query(query, setValues);
     }
 
+    const pendingQueries = new Set<Promise<any>>();
+    function q<T>(promise: Promise<T>): Promise<T> {
+      pendingQueries.add(promise);
+      promise.finally(() => pendingQueries.delete(promise));
+      return promise;
+    }
     const clientAndRelease: ClientAndRelease = {
       rawPoolClient: poolClient,
       count: 1,
+      pendingQueries,
       client: {
         query<TData>(opts: PgClientQuery) {
           queries.push(opts);
           const { text, values, arrayMode, name } = opts;
 
-          return arrayMode
-            ? poolClient.query<TData extends Array<any> ? TData : never>({
-                text,
-                values,
-                name,
-                rowMode: "array",
-              })
-            : poolClient.query<TData>({
-                text,
-                values,
-                name,
-              });
+          return q(
+            arrayMode
+              ? poolClient.query<TData extends Array<any> ? TData : never>({
+                  text,
+                  values,
+                  name,
+                  rowMode: "array",
+                })
+              : poolClient.query<TData>({
+                  text,
+                  values,
+                  name,
+                }),
+          );
         },
         async startTransaction() {
-          if (this.count <= 0) {
+          if (clientAndRelease.count <= 0) {
             throw new Error(
               "Attempted to start transaction on released client",
             );
           }
-          await poolClient.query("savepoint tx");
+          await q(poolClient.query("savepoint tx"));
         },
         async commitTransaction() {
-          if (this.count <= 0) {
+          if (clientAndRelease.count <= 0) {
             throw new Error(
               "Attempted to commit transaction on released client",
             );
           }
-          await poolClient.query("release savepoint tx");
+          await q(poolClient.query("release savepoint tx"));
         },
         async rollbackTransaction() {
-          if (this.count <= 0) {
+          if (clientAndRelease.count <= 0) {
             throw new Error(
               "Attempted to rollback transaction on released client",
             );
           }
-          await poolClient.query("rollback to savepoint tx");
+          await q(poolClient.query("rollback to savepoint tx"));
         },
       },
       release() {
-        this.count--;
-        if (this.count < 0) {
+        clientAndRelease.count--;
+        if (clientAndRelease.count < 0) {
           throw new Error("Released client too many times");
         }
       },
@@ -267,6 +277,8 @@ async function releaseClients() {
   for (const clientAndReleasePromise of clientMap.values()) {
     const clientAndRelease = await clientAndReleasePromise;
     await clientAndRelease.rawPoolClient.query(`rollback`);
+    await Promise.allSettled([...clientAndRelease.pendingQueries]);
+    await Promise.allSettled([...clientAndRelease.pendingQueries]);
     clientAndRelease.rawPoolClient.release();
     if (clientAndRelease.count !== 0) {
       throw new Error(
