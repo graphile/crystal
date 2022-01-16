@@ -174,11 +174,6 @@ export const PgCustomTypeFieldPlugin: Plugin = {
             );
 
             if (source.isUnique) {
-              if (source.codec.arrayOfCodec?.columns) {
-                throw new Error(
-                  `Invalid source '${source}'; 'isUnique' is true, but the type is an array of a composite type. Please use PostgreSQL's 'unnest' in your source to convert the array returned by the function into a set, then change the codec to be the underlying (not listOf) codec and remove 'isUnique'.`,
-                );
-              }
               const fieldName = build.inflection.computedColumn({ source });
               memo[fieldName] = fieldWithHooks(
                 { fieldName },
