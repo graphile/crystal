@@ -28,7 +28,7 @@ from (
 ) as __forums_featured_messages_identifiers__,
 lateral (
   select
-    __forums_featured_messages__."body"::text as "0",
+    __forums_featured_messages__."body" as "0",
     __forums_featured_messages_identifiers__.idx as "1"
   from app_public.forums_featured_messages(__forums_featured_messages_identifiers__."id0") as __forums_featured_messages__
   where (

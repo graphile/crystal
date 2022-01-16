@@ -9,7 +9,7 @@ lateral (
   select
     array(
       select array[
-        __forums_featured_messages__."body"::text
+        __forums_featured_messages__."body"
       ]::text[]
       from app_public.forums_featured_messages(__forums__) as __forums_featured_messages__
       where (

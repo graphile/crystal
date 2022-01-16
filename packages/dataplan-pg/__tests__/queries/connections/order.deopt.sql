@@ -1,9 +1,9 @@
 select
-  __author__.username::text as "0",
-  __messages__.body::text as "1",
-  __messages__."id"::text as "2",
-  __messages__."body"::text as "3",
-  __messages__."author_id"::text as "4"
+  __author__.username as "0",
+  __messages__.body as "1",
+  __messages__."id" as "2",
+  __messages__."body" as "3",
+  __messages__."author_id" as "4"
 from app_public.messages as __messages__
 left outer join app_public.users as __author__
 on (__messages__."author_id" = __author__."id")
@@ -38,8 +38,8 @@ from (
 ) as __users_identifiers__,
 lateral (
   select
-    __users__."username"::text as "0",
-    __users__."gravatar_url"::text as "1",
+    __users__."username" as "0",
+    __users__."gravatar_url" as "1",
     __users_identifiers__.idx as "2"
   from app_public.users as __users__
   where

@@ -1,5 +1,5 @@
 select
-  __forums__."id"::text as "0",
+  __forums__."id" as "0",
   __forums__."archived_at"::text as "1"
 from app_public.forums as __forums__
 where

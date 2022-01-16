@@ -1,10 +1,10 @@
 select
-  __forums__."name"::text as "0",
+  __forums__."name" as "0",
   array(
     select array[
-      __messages__."body"::text,
-      __users__."username"::text,
-      __users__."gravatar_url"::text
+      __messages__."body",
+      __users__."username",
+      __users__."gravatar_url"
     ]::text[]
     from app_public.messages as __messages__
     left outer join app_public.users as __users__

@@ -24,9 +24,9 @@ from (
 lateral (
   select
     __relational_items__."type"::text as "0",
-    __relational_posts__."title"::text as "1",
-    __relational_posts__."description"::text as "2",
-    __relational_posts__."note"::text as "3",
+    __relational_posts__."title" as "1",
+    __relational_posts__."description" as "2",
+    __relational_posts__."note" as "3",
     __relational_items__."id"::text as "4",
     __relational_items_identifiers__.idx as "5"
   from interfaces_and_unions.relational_items as __relational_items__
@@ -51,9 +51,9 @@ from (
 lateral (
   select
     __relational_items__."type"::text as "0",
-    __relational_posts__."title"::text as "1",
-    __relational_posts__."description"::text as "2",
-    __relational_posts__."note"::text as "3",
+    __relational_posts__."title" as "1",
+    __relational_posts__."description" as "2",
+    __relational_posts__."note" as "3",
     __relational_items__."id"::text as "4",
     __relational_items_identifiers__.idx as "5"
   from interfaces_and_unions.relational_items as __relational_items__
@@ -78,9 +78,9 @@ from (
 lateral (
   select
     __relational_items__."type"::text as "0",
-    __relational_posts__."title"::text as "1",
-    __relational_posts__."description"::text as "2",
-    __relational_posts__."note"::text as "3",
+    __relational_posts__."title" as "1",
+    __relational_posts__."description" as "2",
+    __relational_posts__."note" as "3",
     __relational_items__."id"::text as "4",
     __relational_items_identifiers__.idx as "5"
   from interfaces_and_unions.relational_items as __relational_items__
@@ -113,9 +113,9 @@ from (
 lateral (
   select
     __relational_items__."type"::text as "0",
-    __relational_posts__."title"::text as "1",
-    __relational_posts__."description"::text as "2",
-    __relational_posts__."note"::text as "3",
+    __relational_posts__."title" as "1",
+    __relational_posts__."description" as "2",
+    __relational_posts__."note" as "3",
     __relational_items__."id"::text as "4",
     __relational_items_identifiers__.idx as "5"
   from interfaces_and_unions.relational_items as __relational_items__
@@ -140,9 +140,9 @@ from (
 lateral (
   select
     __relational_items__."type"::text as "0",
-    __relational_posts__."title"::text as "1",
-    __relational_posts__."description"::text as "2",
-    __relational_posts__."note"::text as "3",
+    __relational_posts__."title" as "1",
+    __relational_posts__."description" as "2",
+    __relational_posts__."note" as "3",
     __relational_items__."id"::text as "4",
     __relational_items_identifiers__.idx as "5"
   from interfaces_and_unions.relational_items as __relational_items__
@@ -167,9 +167,9 @@ from (
 lateral (
   select
     __relational_items__."type"::text as "0",
-    __relational_posts__."title"::text as "1",
-    __relational_posts__."description"::text as "2",
-    __relational_posts__."note"::text as "3",
+    __relational_posts__."title" as "1",
+    __relational_posts__."description" as "2",
+    __relational_posts__."note" as "3",
     __relational_items__."id"::text as "4",
     __relational_items_identifiers__.idx as "5"
   from interfaces_and_unions.relational_items as __relational_items__

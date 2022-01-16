@@ -1,5 +1,5 @@
 select
-  __people__."username"::text as "0",
+  __people__."username" as "0",
   array(
     select array[
       __single_table_items__."type"::text,
@@ -10,10 +10,10 @@ select
       __single_table_items__."updated_at"::text,
       __single_table_items__."is_explicitly_archived"::text,
       __single_table_items__."archived_at"::text,
-      __single_table_items__."title"::text,
-      __single_table_items__."description"::text,
-      __single_table_items__."note"::text,
-      __single_table_items__."color"::text
+      __single_table_items__."title",
+      __single_table_items__."description",
+      __single_table_items__."note",
+      __single_table_items__."color"
     ]::text[]
     from interfaces_and_unions.single_table_items as __single_table_items__
     where

@@ -1,5 +1,5 @@
 select
-  __people__."username"::text as "0",
+  __people__."username" as "0",
   array(
     select array[
       __relational_items_2."type"::text,

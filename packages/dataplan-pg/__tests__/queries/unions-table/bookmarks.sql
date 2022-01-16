@@ -10,19 +10,19 @@ lateral (
     array(
       select array[
         __person_bookmarks__."id"::text,
-        __people__."username"::text,
+        __people__."username",
         __person_bookmarks__."bookmarked_entity"::text,
         __people_2."person_id"::text,
-        __people_2."username"::text,
+        __people_2."username",
         ((__person_bookmarks__."bookmarked_entity")."person_id")::text,
         __posts__."post_id"::text,
-        __people_3."username"::text,
-        __posts__."body"::text,
+        __people_3."username",
+        __posts__."body",
         ((__person_bookmarks__."bookmarked_entity")."post_id")::text,
         __comments__."comment_id"::text,
-        __people_4."username"::text,
-        __posts_2."body"::text,
-        __comments__."body"::text,
+        __people_4."username",
+        __posts_2."body",
+        __comments__."body",
         ((__person_bookmarks__."bookmarked_entity")."comment_id")::text
       ]::text[]
       from interfaces_and_unions.person_bookmarks as __person_bookmarks__
@@ -49,7 +49,7 @@ lateral (
       order by __person_bookmarks__."id" asc
     ) as "0",
     __people_5."person_id"::text as "1",
-    __people_5."username"::text as "2",
+    __people_5."username" as "2",
     __people_identifiers__.idx as "3"
   from interfaces_and_unions.people as __people_5
   where

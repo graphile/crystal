@@ -7,15 +7,15 @@ from (
 ) as __messages_identifiers__,
 lateral (
   select
-    __messages__."id"::text as "0",
+    __messages__."id" as "0",
     __messages__."featured"::text as "1",
-    __messages__."body"::text as "2",
+    __messages__."body" as "2",
     (__messages__.archived_at is not null)::text as "3",
-    __forums__."name"::text as "4",
+    __forums__."name" as "4",
     (__forums__.archived_at is not null)::text as "5",
-    __messages__."forum_id"::text as "6",
-    __users__."username"::text as "7",
-    __users__."gravatar_url"::text as "8",
+    __messages__."forum_id" as "6",
+    __users__."username" as "7",
+    __users__."gravatar_url" as "8",
     __messages_identifiers__.idx as "9"
   from app_public.messages as __messages__
   left outer join app_public.forums as __forums__
@@ -40,15 +40,15 @@ from (
 ) as __messages_identifiers__,
 lateral (
   select
-    __messages__."id"::text as "0",
+    __messages__."id" as "0",
     __messages__."featured"::text as "1",
-    __messages__."body"::text as "2",
+    __messages__."body" as "2",
     (__messages__.archived_at is not null)::text as "3",
-    __forums__."name"::text as "4",
+    __forums__."name" as "4",
     (__forums__.archived_at is not null)::text as "5",
-    __messages__."forum_id"::text as "6",
-    __users__."username"::text as "7",
-    __users__."gravatar_url"::text as "8",
+    __messages__."forum_id" as "6",
+    __users__."username" as "7",
+    __users__."gravatar_url" as "8",
     __messages_identifiers__.idx as "9"
   from app_public.messages as __messages__
   left outer join app_public.forums as __forums__

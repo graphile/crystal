@@ -8,12 +8,12 @@ from (
 ) as __forums_identifiers__,
 lateral (
   select
-    __forums_random_user__."username"::text as "0",
-    __forums_random_user__."gravatar_url"::text as "1",
+    __forums_random_user__."username" as "0",
+    __forums_random_user__."gravatar_url" as "1",
     __forums_unique_author_count__.__forums_unique_author_count__::text as "2",
     array(
       select array[
-        __forums_featured_messages__."body"::text
+        __forums_featured_messages__."body"
       ]::text[]
       from app_public.forums_featured_messages(__users_most_recent_forum__) as __forums_featured_messages__
       where (

@@ -8,10 +8,10 @@ from (
 ) as __forums_identifiers__,
 lateral (
   select
-    __forums__."name"::text as "0",
+    __forums__."name" as "0",
     array(
       select array[
-        __messages__."body"::text,
+        __messages__."body",
         __messages__."featured"::text
       ]::text[]
       from app_public.messages as __messages__

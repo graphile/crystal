@@ -1,5 +1,5 @@
 select
-  __people__."username"::text as "0",
+  __people__."username" as "0",
   __people__."person_id"::text as "1"
 from interfaces_and_unions.people as __people__
 where (
@@ -74,7 +74,7 @@ from (
 ) as __people_identifiers__,
 lateral (
   select
-    __people__."username"::text as "0",
+    __people__."username" as "0",
     __people_identifiers__.idx as "1"
   from interfaces_and_unions.people as __people__
   where
@@ -151,7 +151,7 @@ from (
 ) as __people_identifiers__,
 lateral (
   select
-    __people__."username"::text as "0",
+    __people__."username" as "0",
     __people_identifiers__.idx as "1"
   from interfaces_and_unions.people as __people__
   where

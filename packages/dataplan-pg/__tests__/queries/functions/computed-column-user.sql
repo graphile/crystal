@@ -7,8 +7,8 @@ from (
 ) as __forums_identifiers__,
 lateral (
   select
-    __forums_random_user__."username"::text as "0",
-    __forums_random_user__."gravatar_url"::text as "1",
+    __forums_random_user__."username" as "0",
+    __forums_random_user__."gravatar_url" as "1",
     __forums_identifiers__.idx as "2"
   from app_public.forums as __forums__
   left outer join app_public.forums_random_user(__forums__) as __forums_random_user__

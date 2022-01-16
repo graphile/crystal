@@ -28,8 +28,8 @@ from (
 ) as __forums_random_user_identifiers__,
 lateral (
   select
-    __forums_random_user__."username"::text as "0",
-    __forums_random_user__."gravatar_url"::text as "1",
+    __forums_random_user__."username" as "0",
+    __forums_random_user__."gravatar_url" as "1",
     __forums_random_user_identifiers__.idx as "2"
   from app_public.forums_random_user(__forums_random_user_identifiers__."id0") as __forums_random_user__
   where (

@@ -1,6 +1,6 @@
 select
-  __forums__."name"::text as "0",
-  __forums__."id"::text as "1",
+  __forums__."name" as "0",
+  __forums__."id" as "1",
   __forums__."archived_at"::text as "2"
 from app_public.forums as __forums__
 where
@@ -24,9 +24,9 @@ lateral (
   select *
   from (
     select
-      __messages__."body"::text as "0",
-      __users__."username"::text as "1",
-      __users__."gravatar_url"::text as "2",
+      __messages__."body" as "0",
+      __users__."username" as "1",
+      __users__."gravatar_url" as "2",
       __messages_identifiers__.idx as "3",
       row_number() over (
         order by __messages__."id" asc

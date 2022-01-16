@@ -15,7 +15,7 @@ lateral (
     __relational_items__."is_explicitly_archived"::text as "5",
     __relational_items__."archived_at"::text as "6",
     __relational_topics__."id"::text as "7",
-    __relational_topics__."title"::text as "8",
+    __relational_topics__."title" as "8",
     __relational_topics_identifiers__.idx as "9"
   from interfaces_and_unions.relational_topics as __relational_topics__
   left outer join interfaces_and_unions.relational_items as __relational_items__

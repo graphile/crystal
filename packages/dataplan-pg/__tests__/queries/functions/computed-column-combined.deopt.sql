@@ -28,8 +28,8 @@ from (
 ) as __forums_random_user_identifiers__,
 lateral (
   select
-    __forums_random_user__."username"::text as "0",
-    __forums_random_user__."gravatar_url"::text as "1",
+    __forums_random_user__."username" as "0",
+    __forums_random_user__."gravatar_url" as "1",
     __forums_random_user__::text as "2",
     __forums_random_user_identifiers__.idx as "3"
   from app_public.forums_random_user(__forums_random_user_identifiers__."id0") as __forums_random_user__
@@ -69,7 +69,7 @@ from (
 ) as __forums_featured_messages_identifiers__,
 lateral (
   select
-    __forums_featured_messages__."body"::text as "0",
+    __forums_featured_messages__."body" as "0",
     __forums_featured_messages_identifiers__.idx as "1"
   from app_public.forums_featured_messages(__forums_featured_messages_identifiers__."id0") as __forums_featured_messages__
   where (

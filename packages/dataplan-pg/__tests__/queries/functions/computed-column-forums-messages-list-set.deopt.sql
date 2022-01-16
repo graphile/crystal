@@ -18,7 +18,7 @@ from (
 ) as __forums_messages_list_set_identifiers__,
 lateral (
   select
-    __forums_messages_list_set__."body"::text as "0",
+    __forums_messages_list_set__."body" as "0",
     __forums_messages_list_set__."featured"::text as "1",
     __forums_messages_list_set_idx__::text as "2",
     __forums_messages_list_set_identifiers__.idx as "3"

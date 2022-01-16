@@ -13,16 +13,16 @@ lateral (
         __person_bookmarks__."person_id"::text,
         __person_bookmarks__."bookmarked_entity"::text,
         __people__."person_id"::text,
-        __people__."username"::text,
+        __people__."username",
         ((__person_bookmarks__."bookmarked_entity")."person_id")::text,
         __posts__."post_id"::text,
         __posts__."author_id"::text,
-        __posts__."body"::text,
+        __posts__."body",
         ((__person_bookmarks__."bookmarked_entity")."post_id")::text,
         __comments__."comment_id"::text,
         __comments__."author_id"::text,
         __comments__."post_id"::text,
-        __comments__."body"::text,
+        __comments__."body",
         ((__person_bookmarks__."bookmarked_entity")."comment_id")::text
       ]::text[]
       from interfaces_and_unions.person_bookmarks as __person_bookmarks__
@@ -41,7 +41,7 @@ lateral (
       order by __person_bookmarks__."id" asc
     ) as "0",
     __people_2."person_id"::text as "1",
-    __people_2."username"::text as "2",
+    __people_2."username" as "2",
     __people_identifiers__.idx as "3"
   from interfaces_and_unions.people as __people_2
   where
@@ -62,7 +62,7 @@ from (
 ) as __people_identifiers__,
 lateral (
   select
-    __people__."username"::text as "0",
+    __people__."username" as "0",
     __people_identifiers__.idx as "1"
   from interfaces_and_unions.people as __people__
   where
@@ -83,7 +83,7 @@ from (
 ) as __people_identifiers__,
 lateral (
   select
-    __people__."username"::text as "0",
+    __people__."username" as "0",
     __people_identifiers__.idx as "1"
   from interfaces_and_unions.people as __people__
   where
@@ -104,7 +104,7 @@ from (
 ) as __posts_identifiers__,
 lateral (
   select
-    __posts__."body"::text as "0",
+    __posts__."body" as "0",
     __posts_identifiers__.idx as "1"
   from interfaces_and_unions.posts as __posts__
   where

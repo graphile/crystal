@@ -16,7 +16,7 @@ lateral (
     __single_table_items__."updated_at"::text as "5",
     __single_table_items__."is_explicitly_archived"::text as "6",
     __single_table_items__."archived_at"::text as "7",
-    __single_table_items__."title"::text as "8",
+    __single_table_items__."title" as "8",
     __single_table_items_identifiers__.idx as "9"
   from interfaces_and_unions.single_table_items as __single_table_items__
   where

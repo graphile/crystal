@@ -1,7 +1,7 @@
 select
   array(
     select array[
-      __forums_messages_list_set__."body"::text,
+      __forums_messages_list_set__."body",
       __forums_messages_list_set__."featured"::text,
       __forums_messages_list_set_idx__::text
     ]::text[]

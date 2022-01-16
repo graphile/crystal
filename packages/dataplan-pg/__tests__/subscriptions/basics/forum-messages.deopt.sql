@@ -7,12 +7,12 @@ from (
 ) as __messages_identifiers__,
 lateral (
   select
-    __messages__."id"::text as "0",
+    __messages__."id" as "0",
     __messages__."featured"::text as "1",
-    __messages__."body"::text as "2",
+    __messages__."body" as "2",
     (__messages__.archived_at is not null)::text as "3",
-    __messages__."forum_id"::text as "4",
-    __messages__."author_id"::text as "5",
+    __messages__."forum_id" as "4",
+    __messages__."author_id" as "5",
     __messages_identifiers__.idx as "6"
   from app_public.messages as __messages__
   where
@@ -33,7 +33,7 @@ from (
 ) as __forums_identifiers__,
 lateral (
   select
-    __forums__."name"::text as "0",
+    __forums__."name" as "0",
     (__forums__.archived_at is not null)::text as "1",
     __forums_identifiers__.idx as "2"
   from app_public.forums as __forums__
@@ -55,8 +55,8 @@ from (
 ) as __users_identifiers__,
 lateral (
   select
-    __users__."username"::text as "0",
-    __users__."gravatar_url"::text as "1",
+    __users__."username" as "0",
+    __users__."gravatar_url" as "1",
     __users_identifiers__.idx as "2"
   from app_public.users as __users__
   where
@@ -77,12 +77,12 @@ from (
 ) as __messages_identifiers__,
 lateral (
   select
-    __messages__."id"::text as "0",
+    __messages__."id" as "0",
     __messages__."featured"::text as "1",
-    __messages__."body"::text as "2",
+    __messages__."body" as "2",
     (__messages__.archived_at is not null)::text as "3",
-    __messages__."forum_id"::text as "4",
-    __messages__."author_id"::text as "5",
+    __messages__."forum_id" as "4",
+    __messages__."author_id" as "5",
     __messages_identifiers__.idx as "6"
   from app_public.messages as __messages__
   where
@@ -103,8 +103,8 @@ from (
 ) as __users_identifiers__,
 lateral (
   select
-    __users__."username"::text as "0",
-    __users__."gravatar_url"::text as "1",
+    __users__."username" as "0",
+    __users__."gravatar_url" as "1",
     __users_identifiers__.idx as "2"
   from app_public.users as __users__
   where

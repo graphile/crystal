@@ -1,6 +1,6 @@
 select
-  __forums__."id"::text as "0",
-  __forums__."name"::text as "1"
+  __forums__."id" as "0",
+  __forums__."name" as "1"
 from app_public.forums as __forums__
 where
   (

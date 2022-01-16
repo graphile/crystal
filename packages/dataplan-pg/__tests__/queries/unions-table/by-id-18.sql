@@ -9,19 +9,19 @@ lateral (
   select
     __union_items__."type"::text as "0",
     __union_topics__."id"::text as "1",
-    __union_topics__."title"::text as "2",
+    __union_topics__."title" as "2",
     __union_posts__."id"::text as "3",
-    __union_posts__."title"::text as "4",
-    __union_posts__."description"::text as "5",
-    __union_posts__."note"::text as "6",
+    __union_posts__."title" as "4",
+    __union_posts__."description" as "5",
+    __union_posts__."note" as "6",
     __union_dividers__."id"::text as "7",
-    __union_dividers__."title"::text as "8",
-    __union_dividers__."color"::text as "9",
+    __union_dividers__."title" as "8",
+    __union_dividers__."color" as "9",
     __union_checklists__."id"::text as "10",
-    __union_checklists__."title"::text as "11",
+    __union_checklists__."title" as "11",
     __union_checklist_items__."id"::text as "12",
-    __union_checklist_items__."description"::text as "13",
-    __union_checklist_items__."note"::text as "14",
+    __union_checklist_items__."description" as "13",
+    __union_checklist_items__."note" as "14",
     __union_items_identifiers__.idx as "15"
   from interfaces_and_unions.union_items as __union_items__
   left outer join interfaces_and_unions.union_topics as __union_topics__

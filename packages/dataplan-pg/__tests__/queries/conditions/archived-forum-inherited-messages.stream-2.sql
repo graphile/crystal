@@ -1,5 +1,5 @@
 select
-  __forums__."name"::text as "0",
+  __forums__."name" as "0",
   array(
     select array[
       (count(*))::text
@@ -12,7 +12,7 @@ select
         __forums__."id"::"uuid" = __messages__."forum_id"
       )
   ) as "1",
-  __forums__."id"::text as "2",
+  __forums__."id" as "2",
   __forums__."archived_at"::text as "3"
 from app_public.forums as __forums__
 where
@@ -36,9 +36,9 @@ lateral (
   select *
   from (
     select
-      __messages__."body"::text as "0",
-      __users__."username"::text as "1",
-      __users__."gravatar_url"::text as "2",
+      __messages__."body" as "0",
+      __users__."username" as "1",
+      __users__."gravatar_url" as "2",
       __messages_identifiers__.idx as "3",
       row_number() over (
         order by __messages__."id" asc
@@ -70,10 +70,10 @@ lateral (
   select *
   from (
     select
-      __messages__."id"::text as "0",
-      __messages__."body"::text as "1",
-      __users__."username"::text as "2",
-      __users__."gravatar_url"::text as "3",
+      __messages__."id" as "0",
+      __messages__."body" as "1",
+      __users__."username" as "2",
+      __users__."gravatar_url" as "3",
       __messages_identifiers__.idx as "4",
       row_number() over (
         order by __messages__."id" asc

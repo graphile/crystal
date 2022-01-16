@@ -1,12 +1,12 @@
 select
-  __forums__."name"::text as "0",
+  __forums__."name" as "0",
   array(
     select array[
-      __messages__."body"::text,
-      __messages__."author_id"::text,
-      __messages__."id"::text,
-      __users__."username"::text,
-      __users__."gravatar_url"::text
+      __messages__."body",
+      __messages__."author_id",
+      __messages__."id",
+      __users__."username",
+      __users__."gravatar_url"
     ]::text[]
     from app_public.messages as __messages__
     left outer join app_public.users as __users__
@@ -49,8 +49,8 @@ from (
 ) as __users_identifiers__,
 lateral (
   select
-    __users__."username"::text as "0",
-    __users__."gravatar_url"::text as "1",
+    __users__."username" as "0",
+    __users__."gravatar_url" as "1",
     __users_identifiers__.idx as "2"
   from app_public.users as __users__
   where

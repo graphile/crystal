@@ -1,7 +1,7 @@
 select
-  __messages__."id"::text as "0",
-  __messages__."body"::text as "1",
-  __messages__."author_id"::text as "2"
+  __messages__."id" as "0",
+  __messages__."body" as "1",
+  __messages__."author_id" as "2"
 from app_public.messages as __messages__
 where
   (
@@ -31,8 +31,8 @@ from (
 ) as __users_identifiers__,
 lateral (
   select
-    __users__."username"::text as "0",
-    __users__."gravatar_url"::text as "1",
+    __users__."username" as "0",
+    __users__."gravatar_url" as "1",
     __users_identifiers__.idx as "2"
   from app_public.users as __users__
   where

@@ -9,7 +9,7 @@ lateral (
   select
     __single_table_items_2."type"::text as "0",
     __single_table_items__."type"::text as "1",
-    __people__."username"::text as "2",
+    __people__."username" as "2",
     __single_table_items_2."parent_id"::text as "3",
     __single_table_items_2."id"::text as "4",
     __single_table_items_identifiers__.idx as "5"

@@ -30,7 +30,7 @@ from (
 lateral (
   select
     __union_topics__."id"::text as "0",
-    __union_topics__."title"::text as "1",
+    __union_topics__."title" as "1",
     __union_topics_identifiers__.idx as "2"
   from interfaces_and_unions.union_topics as __union_topics__
   where

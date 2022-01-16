@@ -1,6 +1,6 @@
 select
-  __forums__."name"::text as "0",
-  __forums__."id"::text as "1",
+  __forums__."name" as "0",
+  __forums__."id" as "1",
   __forums__."archived_at"::text as "2"
 from app_public.forums as __forums__
 where (
@@ -18,7 +18,7 @@ from (
 ) as __messages_identifiers__,
 lateral (
   select
-    __messages__."body"::text as "0",
+    __messages__."body" as "0",
     __messages_identifiers__.idx as "1"
   from app_public.messages as __messages__
   where

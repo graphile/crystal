@@ -1,33 +1,33 @@
 select
-  __people__."username"::text as "0",
+  __people__."username" as "0",
   array(
     select array[
       __single_table_items_2."type"::text,
       __single_table_items__."type"::text,
       __single_table_items__."type2"::text,
-      __people_2."username"::text,
+      __people_2."username",
       __single_table_items__."position"::text,
       __single_table_items__."created_at"::text,
       __single_table_items__."updated_at"::text,
       __single_table_items__."is_explicitly_archived"::text,
       __single_table_items__."archived_at"::text,
-      __single_table_items__."title"::text,
-      __single_table_items__."description"::text,
-      __single_table_items__."note"::text,
-      __single_table_items__."color"::text,
+      __single_table_items__."title",
+      __single_table_items__."description",
+      __single_table_items__."note",
+      __single_table_items__."color",
       __single_table_items_2."parent_id"::text,
       __single_table_items_2."id"::text,
       __single_table_items_2."type2"::text,
-      __people_3."username"::text,
+      __people_3."username",
       __single_table_items_2."position"::text,
       __single_table_items_2."created_at"::text,
       __single_table_items_2."updated_at"::text,
       __single_table_items_2."is_explicitly_archived"::text,
       __single_table_items_2."archived_at"::text,
-      __single_table_items_2."title"::text,
-      __single_table_items_2."description"::text,
-      __single_table_items_2."note"::text,
-      __single_table_items_2."color"::text
+      __single_table_items_2."title",
+      __single_table_items_2."description",
+      __single_table_items_2."note",
+      __single_table_items_2."color"
     ]::text[]
     from interfaces_and_unions.single_table_items as __single_table_items_2
     left outer join interfaces_and_unions.single_table_items as __single_table_items__

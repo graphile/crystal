@@ -1,5 +1,5 @@
 select
-  __people__."username"::text as "0",
+  __people__."username" as "0",
   array(
     select array[
       __relational_items_2."type"::text,
@@ -7,14 +7,14 @@ select
       __relational_items__."type"::text,
       __relational_items__."id"::text,
       __relational_items__."type2"::text,
-      __people_2."username"::text,
+      __people_2."username",
       __relational_items__."position"::text,
       __relational_items__."created_at"::text,
       __relational_items__."updated_at"::text,
       __relational_items__."is_explicitly_archived"::text,
       __relational_items__."archived_at"::text,
       __relational_items_2."type2"::text,
-      __people_3."username"::text,
+      __people_3."username",
       __relational_items_2."position"::text,
       __relational_items_2."created_at"::text,
       __relational_items_2."updated_at"::text,
