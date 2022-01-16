@@ -81,7 +81,11 @@ export const PgCustomTypeFieldPlugin: Plugin = {
         );
       },
       GraphQLObjectType_fields(fields, build, context) {
-        const { getGraphQLTypeByPgCodec, sql } = build;
+        const {
+          getGraphQLTypeByPgCodec,
+          sql,
+          graphql: { GraphQLList },
+        } = build;
         const {
           Self,
           scope: { isPgTableType, pgCodec },
@@ -104,10 +108,11 @@ export const PgCustomTypeFieldPlugin: Plugin = {
         return build.extend(
           fields,
           procSources.reduce((memo, source) => {
-            const type = getGraphQLTypeByPgCodec(source.codec, "output") as
-              | GraphQLOutputType
-              | undefined;
-            if (!type) {
+            const innerType = getGraphQLTypeByPgCodec(
+              source.codec.arrayOfCodec ?? source.codec,
+              "output",
+            ) as GraphQLOutputType | undefined;
+            if (!innerType) {
               console.warn(
                 `Failed to find a suitable type for codec '${
                   sql.compile(source.codec.sqlType).text
@@ -115,6 +120,12 @@ export const PgCustomTypeFieldPlugin: Plugin = {
               );
               return memo;
             }
+
+            // TODO: nullability
+            const type = source.codec.arrayOfCodec
+              ? new GraphQLList(innerType)
+              : innerType;
+
             const argDetails = (source.parameters as PgSourceParameter[])
               .slice(1)
               .map((param, index) => {
@@ -189,7 +200,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
               );
             } else {
               const behavior = getBehavior(source.extensions) ?? [
-                source.codec.isArray ? "list" : "connection",
+                source.codec.arrayOfCodec ? "list" : "connection",
               ];
               if (behavior.includes("connection")) {
                 const fieldName = build.inflection.computedColumnConnection({

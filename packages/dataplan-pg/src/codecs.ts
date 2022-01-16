@@ -96,16 +96,19 @@ export function enumType<TValue extends string>(
 }
 exportAs(enumType, "enumType");
 
-export function listOfType<TInnerType extends PgTypeCodec<any, any>>(
-  innerType: TInnerType,
+export function listOfType<
+  TInnerCodec extends PgTypeCodec<any, any, any, undefined>,
+>(
+  innerCodec: TInnerCodec,
   extensions?: Partial<PgTypeCodecExtensions>,
-  identifier: SQL = sql`${innerType.sqlType}[]`,
+  identifier: SQL = sql`${innerCodec.sqlType}[]`,
 ): PgTypeCodec<
   undefined, // Array has no columns
   string,
-  TInnerType extends PgTypeCodec<any, any, infer U> ? U[] : any[]
+  TInnerCodec extends PgTypeCodec<any, any, infer U> ? U[] : any[],
+  TInnerCodec
 > {
-  if (innerType.isArray) {
+  if (innerCodec.arrayOfCodec) {
     throw new Error("Array types cannot be nested");
   }
   return {
@@ -114,13 +117,13 @@ export function listOfType<TInnerType extends PgTypeCodec<any, any>>(
     fromPg: (value) =>
       arrayParse(value)
         .flat(100)
-        .map((v) => innerType.fromPg(v)) as any,
+        .map((v) => innerCodec.fromPg(v)) as any,
     // TODO: this does __NOT__ handle nulls safely!
-    toPg: (value) => (value ? value.map((v) => innerType.toPg(v)) : null),
+    toPg: (value) => (value ? value.map((v) => innerCodec.toPg(v)) : null),
     columns: undefined,
     extensions,
-    isArray: true,
-    castFromPg: innerType.listCastFromPg,
+    arrayOfCodec: innerCodec,
+    castFromPg: innerCodec.listCastFromPg,
   };
 }
 

@@ -49,6 +49,9 @@ export interface PgTypeCodec<
   TColumns extends PgSourceColumns | undefined,
   TFromPostgres,
   TFromJavaScript = TFromPostgres,
+  TArrayItemCodec extends
+    | PgTypeCodec<any, any, any, undefined>
+    | undefined = undefined,
 > {
   /**
    * Given a value of type TFromJavaScript, returns an `SQL` value to insert into an SQL
@@ -91,10 +94,10 @@ export interface PgTypeCodec<
   columns: TColumns;
 
   /**
-   * If true, this represents a PostgreSQL array type. Please note: array types
+   * If set, this represents a PostgreSQL array type. Please note: array types
    * should NOT be nested.
    */
-  isArray?: boolean;
+  arrayOfCodec?: TArrayItemCodec;
 
   extensions?: Partial<PgTypeCodecExtensions>;
 }

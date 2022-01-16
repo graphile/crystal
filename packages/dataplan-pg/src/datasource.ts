@@ -147,7 +147,7 @@ export interface PgSourceOptions<
   },
   TParameters extends PgSourceParameter[] | undefined = undefined,
 > {
-  codec: PgTypeCodec<TColumns, any, any>;
+  codec: PgTypeCodec<TColumns, any, any, any>;
   executor: PgExecutor;
   name: string;
   source: TParameters extends PgSourceParameter[]
