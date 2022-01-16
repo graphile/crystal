@@ -295,12 +295,15 @@ export class PgSource<
   private relationsThunk: (() => TRelations) | null;
   private _relations: TRelations | null = null;
 
+  // TODO: make a public interface for this information
   /**
    * If present, implies that the source represents a `setof composite[]` (i.e.
    * an array of arrays) - and thus is not appropriate to use for GraphQL
    * Cursor Connections.
+   *
+   * @internal
    */
-  private sqlPartitionByIndex: SQL | null = null;
+  public sqlPartitionByIndex: SQL | null = null;
 
   public readonly parameters: TParameters;
   public readonly description: string | undefined;
