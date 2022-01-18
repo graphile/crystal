@@ -76,10 +76,6 @@ export const PgCodecsPlugin: Plugin = {
               `Could not retrieve namespace for table '${pgClass._id}'`,
             );
           }
-          const sqlIdentifier = sql.identifier(
-            namespace.nspname,
-            pgClass.relname,
-          );
 
           const columns: PgSourceColumns = {};
           const allAttributes =
@@ -116,9 +112,12 @@ export const PgCodecsPlugin: Plugin = {
           }
 
           const codec = EXPORTABLE(
-            (columns, recordType, sqlIdentifier) =>
-              recordType(sqlIdentifier, columns),
-            [columns, recordType, sqlIdentifier],
+            (columns, recordType) =>
+              recordType(
+                sql.identifier(namespace.nspname, pgClass.relname),
+                columns,
+              ),
+            [columns, recordType],
           );
           return codec;
         })();
@@ -167,7 +166,10 @@ export const PgCodecsPlugin: Plugin = {
                 innerType._id,
               );
               if (innerCodec) {
-                return listOfType(innerCodec);
+                return EXPORTABLE(
+                  (listOfType, innerCodec) => listOfType(innerCodec),
+                  [listOfType, innerCodec],
+                );
               }
             }
           }
