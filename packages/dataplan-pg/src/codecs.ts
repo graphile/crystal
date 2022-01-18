@@ -126,6 +126,7 @@ export function listOfType<
     castFromPg: innerCodec.listCastFromPg,
   };
 }
+exportAs(listOfType, "listOfType");
 
 type Cast<TFromJavaScript = any, TFromPostgres = string> = {
   castFromPg?(frag: SQL): SQL;
