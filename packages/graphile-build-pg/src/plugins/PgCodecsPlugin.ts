@@ -111,13 +111,12 @@ export const PgCodecsPlugin: Plugin = {
             return null;
           }
 
+          const nspName = namespace.nspname;
+          const className = pgClass.relname;
           const codec = EXPORTABLE(
-            (columns, recordType) =>
-              recordType(
-                sql.identifier(namespace.nspname, pgClass.relname),
-                columns,
-              ),
-            [columns, recordType],
+            (columns, recordType, sql, nspName, className) =>
+              recordType(sql.identifier(nspName, className), columns),
+            [columns, recordType, sql, nspName, className],
           );
           return codec;
         })();
