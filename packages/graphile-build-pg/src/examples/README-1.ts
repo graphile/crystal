@@ -112,7 +112,9 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     contextValue,
   });
   console.log(inspect(result2, { depth: 12, colors: true })); // { data: { random: 4 } }
-})().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+})()
+  .then(() => pool.end())
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
