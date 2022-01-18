@@ -125,8 +125,28 @@ export const PgTablesPlugin: Plugin = {
       sources: [],
     }),
     hooks: {
-      async "pgIntrospection:class"({ state, helpers, process }, event) {
+      async "pgIntrospection:class"(
+        { state, helpers, process, options },
+        event,
+      ) {
         const { entity: pgClass, databaseName } = event;
+
+        const database = options.pgDatabases.find(
+          (db) => db.name === databaseName,
+        )!;
+        const schemas = database.schemas;
+
+        const namespace = await helpers.pgIntrospection.getNamespace(
+          event.databaseName,
+          pgClass.relnamespace,
+        );
+        if (!namespace) {
+          return;
+        }
+
+        if (!schemas.includes(namespace.nspname)) {
+          return;
+        }
 
         if (
           !["r", "v", "m", "p"].includes(pgClass.relkind) ||
@@ -140,14 +160,6 @@ export const PgTablesPlugin: Plugin = {
           pgClass._id,
         );
         if (!codec) {
-          return;
-        }
-
-        const namespace = await helpers.pgIntrospection.getNamespace(
-          event.databaseName,
-          pgClass.relnamespace,
-        );
-        if (!namespace) {
           return;
         }
 

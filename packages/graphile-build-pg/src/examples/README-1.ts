@@ -45,6 +45,7 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
         pgDatabases: [
           {
             name: "main",
+            schemas: ["a", "b", "c"],
             pgSettingsKey: "pgSettings",
             withPgClientKey: "withPgClient",
             withPgClient: withPgClient,

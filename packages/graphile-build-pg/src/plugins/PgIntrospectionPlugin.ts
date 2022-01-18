@@ -42,6 +42,7 @@ type KeysOfType<TObject, TValueType> = {
 // TODO: rename
 interface Database {
   name: string;
+  schemas: string[];
   /** The key on 'context' where the pgSettings for this DB will be sourced */
   pgSettingsKey: KeysOfType<
     GraphileEngine.GraphileResolverContext,
