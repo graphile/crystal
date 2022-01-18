@@ -153,6 +153,6 @@ export {
   SubscriptionPlugin,
   SwallowErrorsPlugin,
 };
-
+export { GatherPluginContext } from "./interfaces.js";
 export { defaultPreset } from "./preset";
 export const version = require("../package.json").version;

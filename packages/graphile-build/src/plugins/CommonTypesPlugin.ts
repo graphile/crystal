@@ -175,6 +175,13 @@ export const CommonTypesPlugin: Plugin = {
             "graphile-build built-in (JSON type; simple)",
           );
         }
+        build.registerScalarType(
+          inflection.builtin("XML"),
+          {},
+          () =>
+            stringTypeSpec(build.wrapDescription("An XML document", "type")),
+          "graphile-build built-in (XML type)",
+        );
 
         return _;
       },

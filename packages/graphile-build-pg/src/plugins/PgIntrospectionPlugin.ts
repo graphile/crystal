@@ -9,6 +9,7 @@ import type {
   GatherHelpers,
   GatherHooks,
   Plugin,
+  PluginGatherConfig,
   PluginHook,
 } from "graphile-plugin";
 
@@ -32,6 +33,7 @@ import type {
   PgType,
 } from "../introspection";
 import { makeIntrospectionQuery } from "../introspection";
+import { GatherPluginContext } from "graphile-build";
 
 type KeysOfType<TObject, TValueType> = {
   [key in keyof TObject]: TObject[key] extends TValueType ? key : never;
@@ -124,6 +126,19 @@ declare module "graphile-plugin" {
       //   databaseName: string,
       //   id: string,
       // ): Promise<PgDescription | undefined>;
+
+      getAttributesForClass(
+        databaseName: string,
+        classId: string,
+      ): Promise<PgAttribute[]>;
+      getNamespaceByName(
+        databaseName: string,
+        namespaceName: string,
+      ): Promise<PgNamespace | undefined>;
+      getTypeByArray(
+        databaseName: string,
+        arrayId: string,
+      ): Promise<PgType | undefined>;
     };
   }
 
@@ -213,10 +228,12 @@ declare module "graphile-plugin" {
 }
 
 interface Cache {
-  introspectionResultsPromise: null | Promise<{
-    database: Database;
-    introspection: Introspection;
-  }>;
+  introspectionResultsPromise: null | Promise<
+    {
+      database: Database;
+      introspection: Introspection;
+    }[]
+  >;
 }
 
 interface State {
@@ -230,22 +247,29 @@ type PgExecutorContextPlans<TSettings = any> = {
   withPgClient: ExecutablePlan<WithPgClient>;
 };
 
+async function getDb(
+  info: GatherPluginContext<State, Cache>,
+  databaseName: string,
+) {
+  const introspections = await info.helpers.pgIntrospection.getIntrospection();
+  const relevant = introspections.find(
+    (intro) => intro.database.name === databaseName,
+  );
+  if (!relevant) {
+    throw new Error(`Could not find database '${databaseName}'`);
+  }
+  return relevant;
+}
+
 function makeGetEntity<
   TKey extends KeysOfType<Introspection, Array<PgEntityWithId>>,
 >(loc: TKey) {
   return async (
-    info: { helpers: GatherHelpers },
+    info: GatherPluginContext<State, Cache>,
     databaseName: string,
     id: string,
   ): Promise<Introspection[TKey][number] | undefined> => {
-    const introspections =
-      await info.helpers.pgIntrospection.getIntrospection();
-    const relevant = introspections.find(
-      (intro) => intro.database.name === databaseName,
-    );
-    if (!relevant) {
-      throw new Error(`Could not find database '${databaseName}'`);
-    }
+    const relevant = await getDb(info, databaseName);
     const list = relevant.introspection[loc];
     if (!list) {
       throw new Error(
@@ -267,8 +291,9 @@ export const PgIntrospectionPlugin: Plugin = {
   description:
     "Introspects PostgreSQL databases and makes the results available to other plugins",
   version: version,
-  gather: {
-    namespace: "pgIntrospection" as const,
+  // TODO: refactor TypeScript so this isn't necessary; maybe via `makePluginGatherConfig`?
+  gather: <PluginGatherConfig<"pgIntrospection", State, Cache>>{
+    namespace: "pgIntrospection",
     initialCache: (): Cache => ({
       introspectionResultsPromise: null,
     }),
@@ -336,6 +361,26 @@ export const PgIntrospectionPlugin: Plugin = {
       // getRange: makeGetEntity("ranges"),
       // getDepend: makeGetEntity("depends"),
       // getDescription: makeGetEntity("descriptions"),
+      //
+      async getAttributesForClass(info, databaseName, classId) {
+        // const pgClass = this.getClass(info, databaseName, classId);
+        const relevant = await getDb(info, databaseName);
+        const list = relevant.introspection.attributes;
+        // TODO: cache
+        return list.filter((entity) => entity.attrelid === classId);
+      },
+
+      async getNamespaceByName(info, databaseName, name) {
+        const relevant = await getDb(info, databaseName);
+        const list = relevant.introspection.namespaces;
+        return list.find((nsp) => nsp.nspname === name);
+      },
+
+      async getTypeByArray(info, databaseName, arrayId) {
+        const relevant = await getDb(info, databaseName);
+        const list = relevant.introspection.types;
+        return list.find((type) => type.typarray === arrayId);
+      },
 
       getIntrospection(info) {
         if (info.cache.introspectionResultsPromise) {

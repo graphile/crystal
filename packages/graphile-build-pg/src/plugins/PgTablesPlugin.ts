@@ -1,6 +1,11 @@
 import "graphile-build";
 
-import type { PgSelectPlan, PgSource, PgTypeCodec } from "@dataplan/pg";
+import type {
+  PgSelectPlan,
+  PgSource,
+  PgSourceRelation,
+  PgTypeCodec,
+} from "@dataplan/pg";
 import { PgSelectSinglePlan, PgSourceBuilder, recordType } from "@dataplan/pg";
 import { ConnectionPlan } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
@@ -76,12 +81,24 @@ declare global {
   }
 }
 
+type PgSourceRelations = {
+  [identifier: string]: PgSourceRelation<any, any>;
+};
+
 declare module "graphile-plugin" {
   interface GatherHelpers {
     pgTables: Record<string, never>;
   }
 
   interface GatherHooks {
+    "pgTables:PgSourceBuilder:relations": PluginHook<
+      (event: {
+        sourceBuilder: PgSourceBuilder<any, any, any>;
+        pgClass: PgClass;
+        databaseName: string;
+        relations: PgSourceRelations;
+      }) => Promise<void>
+    >;
     "pgTables:PgSource": PluginHook<
       (event: {
         source: PgSource<any, any, any, any>;
@@ -108,46 +125,64 @@ export const PgTablesPlugin: Plugin = {
       sources: [],
     }),
     hooks: {
-      async "pgIntrospection:class"({ state, helpers }, event) {
-        const { entity: klass, databaseName } = event;
+      async "pgIntrospection:class"({ state, helpers, process }, event) {
+        const { entity: pgClass, databaseName } = event;
+
         if (
-          ["r", "v", "m", "p"].includes(klass.relkind) &&
-          !klass.relispartition
+          !["r", "v", "m", "p"].includes(pgClass.relkind) ||
+          pgClass.relispartition
         ) {
-          const namespace = await helpers.pgIntrospection.getNamespace(
-            event.databaseName,
-            klass.relnamespace,
-          );
-          if (!namespace) {
-            throw new Error(
-              `Could not retrieve namespace for table '${klass._id}'`,
-            );
-          }
-          const sqlIdentifier = sql.identifier(
-            namespace.nspname,
-            klass.relname,
-          );
-          const columns = {};
-          const name = `${event.databaseName}.${namespace.nspname}.${klass.relname}`;
-          const executor =
-            helpers.pgIntrospection.getExecutorForDatabase(databaseName);
-          const codec = EXPORTABLE(
-            (columns, recordType, sqlIdentifier) =>
-              recordType(sqlIdentifier, columns),
-            [columns, recordType, sqlIdentifier],
-          );
-          const source = EXPORTABLE(
-            (PgSourceBuilder, codec, executor, name, sqlIdentifier) =>
-              new PgSourceBuilder({
-                executor,
-                name,
-                source: sqlIdentifier,
-                codec,
-              }),
-            [PgSourceBuilder, codec, executor, name, sqlIdentifier],
-          );
-          state.sources.push(source);
+          return;
         }
+
+        const codec = await helpers.pgCodecs.getCodecFromClass(
+          databaseName,
+          pgClass._id,
+        );
+        if (!codec) {
+          return;
+        }
+
+        const namespace = await helpers.pgIntrospection.getNamespace(
+          event.databaseName,
+          pgClass.relnamespace,
+        );
+        if (!namespace) {
+          return;
+        }
+
+        const executor =
+          helpers.pgIntrospection.getExecutorForDatabase(databaseName);
+        const name = `${event.databaseName}.${namespace.nspname}.${pgClass.relname}`;
+
+        const sourceBuilder = EXPORTABLE(
+          (PgSourceBuilder, codec, executor, name) =>
+            new PgSourceBuilder({
+              executor,
+              name,
+              source: codec.sqlType,
+              codec,
+              extensions: {
+                tags: {
+                  // TODO
+                },
+              },
+            }),
+          [PgSourceBuilder, codec, executor, name],
+        );
+        const relations: PgSourceRelations = {};
+        await process("pgTables:PgSourceBuilder:relations", {
+          sourceBuilder,
+          pgClass,
+          relations,
+          databaseName,
+        });
+        const source = EXPORTABLE(
+          (relations, sourceBuilder) => sourceBuilder.build({ relations }),
+          [relations, sourceBuilder],
+        );
+        await process("pgTables:PgSource", { source, pgClass, databaseName });
+        state.sources.push(source);
       },
     },
     async main(output, info) {

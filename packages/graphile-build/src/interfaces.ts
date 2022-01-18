@@ -24,7 +24,7 @@ import type {
   GraphQLSchemaConfig,
 } from "graphql";
 
-interface GatherPluginContext<
+export interface GatherPluginContext<
   TState extends { [key: string]: any },
   TCache extends { [key: string]: any },
 > {
@@ -50,7 +50,7 @@ declare module "graphile-plugin" {
   }
 
   interface PluginGatherConfig<
-    TNamespace extends keyof GatherHelpers = keyof GatherHelpers,
+    TNamespace extends keyof GatherHelpers,
     TState extends { [key: string]: any } = { [key: string]: any },
     TCache extends { [key: string]: any } = { [key: string]: any },
   > {
@@ -78,12 +78,12 @@ declare module "graphile-plugin" {
      */
     helpers: {
       [key in keyof GatherHelpers[TNamespace]]: GatherHelpers[TNamespace][key] extends (
-        ...args: any[]
-      ) => any
+        ...args: infer UArgs
+      ) => infer UReturnType
         ? (
             info: GatherPluginContext<TState, TCache>,
-            ...args: Parameters<GatherHelpers[TNamespace][key]>
-          ) => ReturnType<GatherHelpers[TNamespace][key]>
+            ...args: UArgs
+          ) => UReturnType
         : never;
     };
 
@@ -108,7 +108,7 @@ declare module "graphile-plugin" {
   }
 
   interface Plugin {
-    gather?: PluginGatherConfig;
+    gather?: PluginGatherConfig<keyof GatherHelpers, any, any>;
 
     schema?: {
       hooks?: {

@@ -18,7 +18,7 @@ export class AsyncHooks<THooks extends HookObject<THooks>> {
    */
   async process<TKey extends keyof THooks>(
     event: TKey,
-    ...args: Parameters<THooks[TKey]>[]
+    ...args: Parameters<THooks[TKey]>
   ): Promise<void> {
     const [arg, ...rest] = args;
     const callbacks = this.callbacks[event];

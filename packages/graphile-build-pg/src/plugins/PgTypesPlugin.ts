@@ -635,6 +635,7 @@ export const PgTypesPlugin: Plugin = {
           text: "String",
           char: "String",
           varchar: "String",
+          xml: inflection.builtin("XML"),
           json: inflection.builtin("JSON"),
           jsonb: inflection.builtin("JSON"),
           timestamp: inflection.builtin("Datetime"),

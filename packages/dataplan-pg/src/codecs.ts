@@ -177,6 +177,7 @@ export const TYPES = {
   text: t<string>("text", verbatim),
   json: t<string>("json"),
   jsonb: t<string>("jsonb"),
+  xml: t<string>("xml"),
   citext: t<string>("citext", verbatim),
   uuid: t<string>("uuid", verbatim),
   timestamp: t<string>("timestamp", viaDateFormat("YYYY-MM-DD HH24:MI:SS.US")),
