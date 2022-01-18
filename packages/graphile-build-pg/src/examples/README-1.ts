@@ -59,28 +59,40 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     input.pgSources.map((s) => crystalPrint((s as any).options)).join("\n"),
   );
   const schema = buildSchema(config, input);
-  if (Math.random() < 2) process.exit(1);
 
   // Output our schema
-  console.log(chalk.blue(printSchema(schema)));
+  // console.log(chalk.blue(printSchema(schema)));
   console.log();
   console.log();
   console.log();
+  const source = /* GraphQL */ `
+    {
+      allMainAPosts {
+        nodes {
+          id
+        }
+      }
+    }
+  `;
+  const rootValue = null;
+  const contextValue = {
+    withPgClient,
+  };
+  const variableValues = {};
 
   // Run our query
   const result = await graphql({
     schema,
-    source: `
-      query {
-        random
-      }
-    `,
-    rootValue: null,
-    variableValues: {},
+    source,
+    rootValue,
+    variableValues,
+    contextValue,
   });
-  console.log(result); // { data: { random: 4 } }
+  console.log(inspect(result, { depth: 12, colors: true })); // { data: { random: 4 } }
 
-  console.dir(schema.toConfig());
+  if ("errors" in result) {
+    process.exit(1);
+  }
 
   // Export schema
   // const exportFileLocation = new URL("../../temp.js", import.meta.url);
@@ -88,21 +100,18 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
   await exportSchema(schema, exportFileLocation);
 
   // output code
-  console.log(chalk.green(await readFile(exportFileLocation, "utf8")));
+  //console.log(chalk.green(await readFile(exportFileLocation, "utf8")));
 
   // run code
   const { schema: schema2 } = await import(exportFileLocation.toString());
   const result2 = await graphql({
     schema: schema2,
-    source: `
-      query {
-        random
-      }
-    `,
-    rootValue: null,
-    variableValues: {},
+    source,
+    rootValue,
+    variableValues,
+    contextValue,
   });
-  console.log(result2); // { data: { random: 4 } }
+  console.log(inspect(result2, { depth: 12, colors: true })); // { data: { random: 4 } }
 })().catch((e) => {
   console.error(e);
   process.exit(1);
