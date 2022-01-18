@@ -45,6 +45,16 @@ import { inspect } from "util";
 
 import { wellKnown } from "./wellKnown";
 
+function identifierOrLiteral(key: string) {
+  const isSafeIdentifier = /^[a-z_$][a-z0-9_$]*$/i.test(key);
+
+  if (isSafeIdentifier) {
+    return t.identifier(key);
+  } else {
+    return t.stringLiteral(key);
+  }
+}
+
 function locationHintToIdentifierName(locationHint: string): string {
   let result = locationHint;
   result = result.replace(/[[.]/g, "__").replace(/\]/g, "");
@@ -196,7 +206,7 @@ class CodegenFile {
       if (path.length) {
         let result: t.Node = variable;
         for (const pathSegment of path) {
-          result = t.memberExpression(result, t.identifier(pathSegment));
+          result = t.memberExpression(result, identifierOrLiteral(pathSegment));
         }
         return result;
       } else {
@@ -297,7 +307,10 @@ class CodegenFile {
         description: desc(config.description),
         locations: t.arrayExpression(
           config.locations.map((l) =>
-            t.memberExpression(iDirectiveLocation, t.identifier(String(l))),
+            t.memberExpression(
+              iDirectiveLocation,
+              identifierOrLiteral(String(l)),
+            ),
           ),
         ),
         args:
@@ -600,7 +613,7 @@ class CodegenFile {
         values: objectNullPrototype(
           Object.entries(config.values).map(([key, value]) =>
             t.objectProperty(
-              t.identifier(key),
+              identifierOrLiteral(key),
               this.makeEnumValue(value, config.name, key),
             ),
           ),
@@ -802,7 +815,7 @@ function convertToAST(
     return t.objectExpression(
       Object.entries(thing).map(([key, value]) =>
         t.objectProperty(
-          t.identifier(key),
+          identifierOrLiteral(key),
           convertToAST(
             file,
             value,
@@ -874,7 +887,7 @@ function objectToObjectProperties(o: {
 }): t.ObjectProperty[] {
   return Object.entries(o)
     .filter(([, value]) => value != null)
-    .map(([key, value]) => t.objectProperty(t.identifier(key), value!));
+    .map(([key, value]) => t.objectProperty(identifierOrLiteral(key), value!));
 }
 
 function extensions(
