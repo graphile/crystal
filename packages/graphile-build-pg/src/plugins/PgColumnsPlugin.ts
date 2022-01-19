@@ -114,7 +114,8 @@ export const PgColumnsPlugin: Plugin = {
                 sql.compile(pgCodec.sqlType).text
               }'s '${columnName}' column (${
                 sql.compile(column.codec.sqlType).text
-              })`,
+              }; array=${!!column.codec.arrayOfCodec}, domain=${!!column.codec
+                .domainOfCodec}, enum=${!!(column.codec as any).values})`,
             );
             continue;
           }
