@@ -209,27 +209,14 @@ export const PgCodecsPlugin: Plugin = {
             );
           }
 
-          // Array types are just listOfType() of their inner type
-          if (type.typcategory === "A") {
-            const innerType = await info.helpers.pgIntrospection.getTypeByArray(
-              databaseName,
-              type._id,
-            );
-
-            if (innerType) {
-              const innerCodec = await info.helpers.pgCodecs.getCodecFromType(
-                databaseName,
-                innerType._id,
-                typeModifier, // TODO: is it correct to pass this through?
-              );
-              if (innerCodec) {
-                return EXPORTABLE(
-                  (innerCodec, listOfType) => listOfType(innerCodec),
-                  [innerCodec, listOfType],
-                );
-              }
-            }
+          const namespace = await info.helpers.pgIntrospection.getNamespace(
+            databaseName,
+            type.typnamespace,
+          );
+          if (!namespace) {
+            throw new Error(`Could not get namespace '${type.typnamespace}'`);
           }
+          const namespaceName = namespace.nspname;
 
           // For the standard pg_catalog types, we have standard handling.
           // (In v4 we used OIDs for this, but using the name is safer for PostgreSQL-likes.)
@@ -248,14 +235,6 @@ export const PgCodecsPlugin: Plugin = {
             return TYPES.hstore;
           }
 
-          const namespace = await info.helpers.pgIntrospection.getNamespace(
-            databaseName,
-            type.typnamespace,
-          );
-          if (!namespace) {
-            throw new Error(`Could not get namespace '${type.typnamespace}'`);
-          }
-
           // Enum type
           if (type.typtype === "e") {
             const enumValues =
@@ -263,7 +242,6 @@ export const PgCodecsPlugin: Plugin = {
                 databaseName,
                 type._id,
               );
-            const namespaceName = namespace.nspname;
             const typeName = type.typname;
             return EXPORTABLE(
               (enumType, enumValues, namespaceName, sql, typeName) =>
@@ -359,6 +337,32 @@ export const PgCodecsPlugin: Plugin = {
                 ],
               );
             }
+          }
+
+          // Array types are just listOfType() of their inner type
+          if (type.typcategory === "A") {
+            const innerType = await info.helpers.pgIntrospection.getTypeByArray(
+              databaseName,
+              type._id,
+            );
+
+            if (innerType) {
+              const innerCodec = await info.helpers.pgCodecs.getCodecFromType(
+                databaseName,
+                innerType._id,
+                typeModifier, // TODO: is it correct to pass this through?
+              );
+              if (innerCodec) {
+                return EXPORTABLE(
+                  (innerCodec, listOfType) => listOfType(innerCodec),
+                  [innerCodec, listOfType],
+                );
+              }
+            }
+            console.warn(
+              `Could not build PgTypeCodec for '${namespaceName}.${type.typname}' due to issue with getting codec for underlying type`,
+            );
+            return null;
           }
 
           // TODO: basic type support
