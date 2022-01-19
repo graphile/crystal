@@ -89,6 +89,15 @@ function walkCodec(
       walkCodec(codec.columns[columnName].codec, metaLookup);
     }
   }
+  if (codec.arrayOfCodec) {
+    walkCodec(codec.arrayOfCodec, metaLookup);
+  }
+  if (codec.domainOfCodec) {
+    walkCodec(codec.domainOfCodec, metaLookup);
+  }
+  if (codec.rangeOfCodec) {
+    walkCodec(codec.rangeOfCodec, metaLookup);
+  }
 }
 
 function resolveSource<
