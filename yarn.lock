@@ -1431,6 +1431,7 @@ __metadata:
     json5: ^2.2.0
     nodemon: ^2.0.15
     pg-sql2: 4.7.0
+    postgres-range: ^1.1.1
     ts-node: ^10.4.0
     tslib: ^2.3.1
     typescript: next
@@ -8709,6 +8710,13 @@ __metadata:
   dependencies:
     xtend: ^4.0.0
   checksum: 746b71f93805ae33b03528e429dc624706d1f9b20ee81bf743263efb6a0cd79ae02a642a8a480dbc0f09547b4315ab7df6ce5ec0be77ed700bac42730f5c76b2
+  languageName: node
+  linkType: hard
+
+"postgres-range@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "postgres-range@npm:1.1.1"
+  checksum: 9059d138843b068c36dcb870fce1d901d189a34f261d9103c0bf5ac1cae45cb754ac1fe69b7dff8e208c3de267f55567a46a33e90ebeb85efc106e42abcafba8
   languageName: node
   linkType: hard
 
