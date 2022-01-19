@@ -817,10 +817,10 @@ export interface PgType {
   _id: PgOid;
 
   /** Data type name */
-  typname: PgName | null;
+  typname: PgName;
 
   /** The OID of the namespace that contains this type */
-  typnamespace: PgOid | null;
+  typnamespace: PgOid;
 
   /** Owner of the type */
   typowner: PgOid | null;
