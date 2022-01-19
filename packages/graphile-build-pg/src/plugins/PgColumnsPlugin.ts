@@ -96,8 +96,8 @@ export const PgColumnsPlugin: Plugin = {
         for (const columnName in pgCodec.columns) {
           const column = pgCodec.columns[columnName];
 
-          const behavior = getBehavior(column.extensions);
-          if (behavior && !behavior.includes("select")) {
+          const behavior = getBehavior(column.extensions) ?? ["select"];
+          if (!behavior.includes("select")) {
             // Don't allow selecting this column.
             continue;
           }
