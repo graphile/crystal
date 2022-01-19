@@ -2,6 +2,7 @@ import "graphile-build";
 
 import type { WithPgClient } from "@dataplan/pg";
 import { PgExecutor } from "@dataplan/pg";
+import type { GatherPluginContext } from "graphile-build";
 import type { ExecutablePlan, PromiseOrDirect } from "graphile-crystal";
 import { context, object } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
@@ -33,7 +34,6 @@ import type {
   PgType,
 } from "../introspection";
 import { makeIntrospectionQuery } from "../introspection";
-import { GatherPluginContext } from "graphile-build";
 
 type KeysOfType<TObject, TValueType> = {
   [key in keyof TObject]: TObject[key] extends TValueType ? key : never;
@@ -382,6 +382,8 @@ export const PgIntrospectionPlugin: Plugin = {
         return list.find((nsp) => nsp.nspname === name);
       },
 
+      // TODO: we should maybe use pg_type.typelem and look up by ID directy
+      // instead of having this function
       async getTypeByArray(info, databaseName, arrayId) {
         const relevant = await getDb(info, databaseName);
         const list = relevant.introspection.types;
