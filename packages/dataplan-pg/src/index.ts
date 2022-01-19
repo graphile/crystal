@@ -14,6 +14,7 @@ debugFactory.formatters.S = sqlPrint;
 export {
   enumType,
   listOfType,
+  domainOfCodec,
   recordType,
   TYPES,
   getCodecByPgCatalogTypeName,

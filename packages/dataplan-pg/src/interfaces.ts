@@ -99,6 +99,15 @@ export interface PgTypeCodec<
    */
   arrayOfCodec?: TArrayItemCodec;
 
+  /**
+   * The underlying codec that this type is a domain over.
+   */
+  domainOfCodec?: PgTypeCodec<any, any, any, any>;
+  /**
+   * If this is a domain, does it add a non-null constraint?
+   */
+  notNull?: boolean;
+
   extensions?: Partial<PgTypeCodecExtensions>;
 }
 

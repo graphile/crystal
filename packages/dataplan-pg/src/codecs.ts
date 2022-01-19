@@ -96,6 +96,7 @@ export function enumType<TValue extends string>(
 }
 exportAs(enumType, "enumType");
 
+// TODO: rename to listOfCodec
 export function listOfType<
   TInnerCodec extends PgTypeCodec<any, any, any, undefined>,
 >(
@@ -128,6 +129,37 @@ export function listOfType<
 }
 exportAs(listOfType, "listOfType");
 
+export function domainOfCodec<
+  TInnerCodec extends PgTypeCodec<any, any, any, any>,
+>(
+  innerCodec: TInnerCodec,
+  identifier: SQL,
+  {
+    extensions,
+    notNull,
+  }: {
+    extensions?: Partial<PgTypeCodecExtensions>;
+    notNull?: boolean | null;
+  },
+): PgTypeCodec<
+  TInnerCodec extends PgTypeCodec<infer U, any, any, any> ? U : any,
+  TInnerCodec extends PgTypeCodec<any, infer U, any, any> ? U : any,
+  TInnerCodec extends PgTypeCodec<any, any, infer U, any> ? U : any,
+  TInnerCodec extends PgTypeCodec<any, any, any, infer U> ? U : any
+> {
+  return {
+    // Generally same as underlying type:
+    ...innerCodec,
+
+    // Overriding:
+    sqlType: identifier,
+    extensions,
+    domainOfCodec: innerCodec,
+    notNull: Boolean(notNull),
+  };
+}
+exportAs(domainOfCodec, "domainOfCodec");
+
 type Cast<TFromJavaScript = any, TFromPostgres = string> = {
   castFromPg?(frag: SQL): SQL;
   listCastFromPg?(frag: SQL): SQL;
@@ -148,7 +180,7 @@ const castVia = (via: SQL): Cast => ({
   },
 });
 const viaNumeric = castVia(sql`numeric`);
-const viaJson = castVia(sql`json`);
+// const viaJson = castVia(sql`json`);
 
 const viaDateFormat = (format: string): Cast => {
   const sqlFormat = sql.literal(format);

@@ -2,6 +2,7 @@ import "graphile-build";
 
 import type { PgSourceColumns, PgTypeCodec } from "@dataplan/pg";
 import {
+  domainOfCodec,
   getCodecByPgCatalogTypeName,
   listOfType,
   recordType,
@@ -201,6 +202,65 @@ export const PgCodecsPlugin: Plugin = {
           // matches the citext extension namespace
           if (type.typname === "citext") {
             return TYPES.citext;
+          }
+
+          // Domains are wrappers under an underlying type
+          if (type.typtype === "d") {
+            const {
+              typnotnull: notNull,
+              typbasetype: baseTypeOid,
+              typtypmod: baseTypeModifier,
+              typndims: _numberOfArrayDimensions,
+              typcollation: _domainCollation,
+              typdefaultbin: _defaultValueNodeTree,
+            } = type;
+            const innerCodec = baseTypeOid
+              ? await info.helpers.pgCodecs.getCodecFromType(
+                  databaseName,
+                  baseTypeOid,
+                  baseTypeModifier,
+                )
+              : null;
+            const namespace = await info.helpers.pgIntrospection.getNamespace(
+              databaseName,
+              type.typnamespace,
+            );
+            if (!namespace) {
+              throw new Error(`Could not get namespace '${type.typnamespace}'`);
+            }
+            const namespaceName = namespace.nspname;
+            const typeName = type.typname;
+            const extensions = {};
+            if (innerCodec) {
+              return EXPORTABLE(
+                (
+                  domainOfCodec,
+                  extensions,
+                  innerCodec,
+                  namespaceName,
+                  notNull,
+                  sql,
+                  typeName,
+                ) =>
+                  domainOfCodec(
+                    innerCodec,
+                    sql.identifier(namespaceName, typeName),
+                    {
+                      extensions,
+                      notNull,
+                    },
+                  ),
+                [
+                  domainOfCodec,
+                  extensions,
+                  innerCodec,
+                  namespaceName,
+                  notNull,
+                  sql,
+                  typeName,
+                ],
+              );
+            }
           }
 
           // TODO: basic type support
