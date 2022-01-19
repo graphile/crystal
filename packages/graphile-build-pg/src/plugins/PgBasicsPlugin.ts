@@ -14,13 +14,21 @@ import {
   makePgTypeCodecMeta,
 } from "../inputUtils";
 
+type HasGraphQLTypeForPgCodec = (
+  codec: PgTypeCodec<any, any, any>,
+  situation?: string,
+) => boolean;
 type GetGraphQLTypeByPgCodec = (
   codec: PgTypeCodec<any, any, any>,
-  variant: string,
+  situation: string,
 ) => GraphQLType | null;
+type GetGraphQLTypeNameByPgCodec = (
+  codec: PgTypeCodec<any, any, any>,
+  situation: string,
+) => string | null;
 type SetGraphQLTypeForPgCodec = (
   codec: PgTypeCodec<any, any, any>,
-  variants: string | string[],
+  situations: string | string[],
   typeName: string,
 ) => void;
 
@@ -28,7 +36,9 @@ declare global {
   namespace GraphileEngine {
     interface Build {
       pgCodecMetaLookup: PgTypeCodecMetaLookup;
+      hasGraphQLTypeForPgCodec: HasGraphQLTypeForPgCodec;
       getGraphQLTypeByPgCodec: GetGraphQLTypeByPgCodec;
+      getGraphQLTypeNameByPgCodec: GetGraphQLTypeNameByPgCodec;
       setGraphQLTypeForPgCodec: SetGraphQLTypeForPgCodec;
       sql: typeof sql;
     }
@@ -46,20 +56,40 @@ export const PgBasicsPlugin: Plugin = {
       build(build) {
         const pgCodecMetaLookup = getCodecMetaLookupFromInput(build.input);
 
-        const getGraphQLTypeByPgCodec: GetGraphQLTypeByPgCodec = (
+        const getGraphQLTypeNameByPgCodec: GetGraphQLTypeNameByPgCodec = (
           codec,
-          variant,
+          situation,
         ) => {
           const meta = pgCodecMetaLookup.get(codec);
           if (!meta) {
             throw new Error("That codec is not known");
           }
-          const typeName = meta.typeNameByVariant[variant] ?? null;
-          if (typeName == null) {
-            return null;
+          const typeName = meta.typeNameBySituation[situation] ?? null;
+          return typeName ?? null;
+        };
+
+        const getGraphQLTypeByPgCodec: GetGraphQLTypeByPgCodec = (
+          codec,
+          situation,
+        ) => {
+          const typeName = getGraphQLTypeNameByPgCodec(codec, situation);
+          return typeName ? build.getTypeByName(typeName) ?? null : null;
+        };
+
+        const hasGraphQLTypeForPgCodec: HasGraphQLTypeForPgCodec = (
+          codec,
+          situation,
+        ) => {
+          const meta = pgCodecMetaLookup.get(codec);
+          if (!meta) {
+            return false;
           }
-          const type = build.getTypeByName(typeName);
-          return type ?? null;
+          if (situation != null) {
+            const typeName = meta.typeNameBySituation[situation] ?? null;
+            return typeName != null;
+          } else {
+            return Object.keys(meta.typeNameBySituation).length > 0;
+          }
         };
 
         const setGraphQLTypeForPgCodec: SetGraphQLTypeForPgCodec = (
@@ -75,13 +105,13 @@ export const PgBasicsPlugin: Plugin = {
             pgCodecMetaLookup.set(codec, meta);
           }
 
-          const variants_ = Array.isArray(variants) ? variants : [variants];
-          for (const variant of variants_) {
-            if (meta.typeNameByVariant[variant] != null) {
+          const situations_ = Array.isArray(variants) ? variants : [variants];
+          for (const situation of situations_) {
+            if (meta.typeNameBySituation[situation] != null) {
               // TODO: allow this?
               throw new Error("Type already set");
             }
-            meta.typeNameByVariant[variant] = typeName;
+            meta.typeNameBySituation[situation] = typeName;
           }
         };
 
@@ -89,7 +119,9 @@ export const PgBasicsPlugin: Plugin = {
           build,
           {
             pgCodecMetaLookup,
+            getGraphQLTypeNameByPgCodec,
             getGraphQLTypeByPgCodec,
+            hasGraphQLTypeForPgCodec,
             setGraphQLTypeForPgCodec,
             sql,
             // For slightly better backwards compatibility with v4.

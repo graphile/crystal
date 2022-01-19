@@ -60,6 +60,7 @@ export default function makeNewBuild(
    */
   const typeRegistry: {
     [key: string]: {
+      // The constructor - GraphQLScalarType, GraphQLObjectType, etc
       klass: { new (spec: any): GraphQLNamedType };
       scope: GraphileEngine.SomeScope;
       specGenerator: any;
@@ -182,6 +183,35 @@ export default function makeNewBuild(
         );
       }
     },
+
+    getTypeMetaByName(typeName) {
+      // Meta for builtins
+      switch (typeName) {
+        case "String":
+        case "ID":
+        case "Boolean":
+        case "Int":
+        case "Float":
+          return Object.assign(Object.create(null), {
+            Constructor: GraphQLScalarType,
+            scope: Object.freeze({}),
+            origin: "GraphQL builtin",
+          });
+      }
+
+      const details = typeRegistry[typeName];
+      if (details != null) {
+        const { klass: Constructor, scope, origin, Plan } = details;
+        return Object.assign(Object.create(null), {
+          Constructor,
+          scope,
+          origin,
+          Plan,
+        });
+      }
+      return null;
+    },
+
     getTypeByName(typeName) {
       if (typeName in allTypes) {
         return allTypes[typeName];

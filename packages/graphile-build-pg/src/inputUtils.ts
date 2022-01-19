@@ -10,8 +10,8 @@ import type {
 import { PgSourceBuilder } from "@dataplan/pg";
 
 export interface PgTypeCodecMeta {
-  typeNameByVariant: {
-    [variant: string]: string;
+  typeNameBySituation: {
+    [situation: string]: string;
   };
 }
 
@@ -24,7 +24,7 @@ export function makePgTypeCodecMeta(
   _codec: PgTypeCodec<any, any, any>,
 ): PgTypeCodecMeta {
   return {
-    typeNameByVariant: {},
+    typeNameBySituation: {},
   };
 }
 

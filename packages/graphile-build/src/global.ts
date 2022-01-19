@@ -288,6 +288,17 @@ declare global {
       assertTypeName(typeName: string): void;
 
       /**
+       * Returns details of the type name's registration (if it has been
+       * registered) - useful when types are built based on other types.
+       */
+      getTypeMetaByName: (typeName: string) => {
+        Constructor: { new (spec: any): GraphQLNamedType };
+        scope: GraphileEngine.SomeScope;
+        origin: string | null | undefined;
+        Plan?: { new (...args: any[]): ExecutablePlan<any> } | null;
+      } | null;
+
+      /**
        * Returns the GraphQL type with the given name, constructing it if
        * necessary (assuming there's a registered type generator). If the
        * constructed type is invalid (e.g. an object type with no fields) then
