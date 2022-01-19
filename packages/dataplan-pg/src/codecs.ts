@@ -227,8 +227,113 @@ export const TYPES = {
   circle: t<PgCircle>("circle", { fromPg: parseCircle, toPg: stringifyCircle }),
   hstore: t<PgHStore>("hstore", { fromPg: parseHstore, toPg: stringifyHstore }),
 } as const;
-
 exportAs(TYPES, "TYPES");
+
+export function getCodecByPgCatalogTypeName(
+  pgCatalogTypeName: string,
+): PgTypeCodec<undefined, any, any, undefined> | null {
+  switch (pgCatalogTypeName) {
+    case "bool":
+      return TYPES.boolean;
+
+    // TODO!
+    //case "bytea":
+    //  return TYPES.bytea;
+
+    case "char":
+      return TYPES.char;
+    case "varchar":
+      return TYPES.varchar;
+    case "text":
+      return TYPES.char;
+    case "uuid":
+      return TYPES.uuid;
+
+    case "xml":
+      return TYPES.xml;
+    case "json":
+      return TYPES.json;
+    case "jsonb":
+      return TYPES.jsonb;
+
+    case "bit":
+      return TYPES.bit;
+    case "varbit":
+      return TYPES.varbit;
+
+    case "int2":
+      return TYPES.int2;
+    case "int4":
+      return TYPES.int;
+    case "int8":
+      return TYPES.bigint;
+    case "float8":
+      return TYPES.float;
+    case "float4":
+      return TYPES.float4;
+    case "numeric":
+      return TYPES.numeric;
+    case "money":
+      return TYPES.money;
+
+    case "box":
+      return TYPES.box;
+    case "point":
+      return TYPES.point;
+    case "line":
+      return TYPES.line;
+    case "lseg":
+      return TYPES.lseg;
+    case "circle":
+      return TYPES.circle;
+    case "polygon":
+      return TYPES.polygon;
+
+    case "cidr":
+      return TYPES.cidr;
+    case "inet":
+      return TYPES.inet;
+    case "macaddr":
+      return TYPES.macaddr;
+    case "macaddr8":
+      return TYPES.macaddr8;
+
+    case "date":
+      return TYPES.date;
+    case "timestamp":
+      return TYPES.timestamp;
+    case "timestamptz":
+      return TYPES.timestamptz;
+    case "time":
+      return TYPES.time;
+    case "timetz":
+      return TYPES.timetz;
+    case "interval":
+      return TYPES.interval;
+
+    case "regclass":
+      return TYPES.regclass;
+    case "regconfig":
+      return TYPES.regconfig;
+    case "regdictionary":
+      return TYPES.regdictionary;
+    case "regnamespace":
+      return TYPES.regnamespace;
+    case "regoper":
+      return TYPES.regoper;
+    case "regoperator":
+      return TYPES.regoperator;
+    case "regproc":
+      return TYPES.regproc;
+    case "regprocedure":
+      return TYPES.regprocedure;
+    case "regrole":
+      return TYPES.regrole;
+    case "regtype":
+      return TYPES.regtype;
+  }
+  return null;
+}
 
 for (const key of Object.keys(TYPES)) {
   exportAs(TYPES[key], ["TYPES", key]);

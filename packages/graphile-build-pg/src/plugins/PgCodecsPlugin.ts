@@ -1,14 +1,17 @@
 import "graphile-build";
 
 import type { PgSourceColumns, PgTypeCodec } from "@dataplan/pg";
-import { listOfType, TYPES } from "@dataplan/pg";
-import { recordType } from "@dataplan/pg";
+import {
+  getCodecByPgCatalogTypeName,
+  listOfType,
+  recordType,
+  TYPES,
+} from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig } from "graphile-plugin";
 import sql from "pg-sql2";
 
 import { version } from "../index";
-import type { PgClass } from "../introspection";
 
 interface State {
   codecByTypeIdByDatabaseName: Map<
@@ -115,7 +118,8 @@ export const PgCodecsPlugin: Plugin = {
           const nspName = namespace.nspname;
           const className = pgClass.relname;
           const codec = EXPORTABLE(
-            (className, columns, nspName, recordType, sql) => recordType(sql.identifier(nspName, className), columns),
+            (className, columns, nspName, recordType, sql) =>
+              recordType(sql.identifier(nspName, className), columns),
             [className, columns, nspName, recordType, sql],
           );
           return codec;
@@ -145,14 +149,24 @@ export const PgCodecsPlugin: Plugin = {
             return null;
           }
 
+          const pgCatalog =
+            await info.helpers.pgIntrospection.getNamespaceByName(
+              databaseName,
+              "pg_catalog",
+            );
+          if (!pgCatalog) {
+            return null;
+          }
+
+          // Class types are handled via getCodecFromClass (they have to add columns)
           if (type.typtype === "c") {
-            // Class type
             return info.helpers.pgCodecs.getCodecFromClass(
               databaseName,
               type.typrelid!,
             );
           }
 
+          // Array types are just listOfType() of their inner type
           if (type.typcategory === "A") {
             const innerType = await info.helpers.pgIntrospection.getTypeByArray(
               databaseName,
@@ -174,116 +188,12 @@ export const PgCodecsPlugin: Plugin = {
             }
           }
 
-          const pgCatalog =
-            await info.helpers.pgIntrospection.getNamespaceByName(
-              databaseName,
-              "pg_catalog",
-            );
-          if (!pgCatalog) {
-            return null;
-          }
-
+          // For the standard pg_catalog types, we have standard handling.
+          // (In v4 we used OIDs for this, but using the name is safer for PostgreSQL-likes.)
           if (type.typnamespace == pgCatalog._id) {
-            // Native types
-            switch (type.typname) {
-              case "bool":
-                return TYPES.boolean;
-
-              // TODO!
-              //case "bytea":
-              //  return TYPES.bytea;
-
-              case "char":
-                return TYPES.char;
-              case "varchar":
-                return TYPES.varchar;
-              case "text":
-                return TYPES.char;
-              case "uuid":
-                return TYPES.uuid;
-
-              case "xml":
-                return TYPES.xml;
-              case "json":
-                return TYPES.json;
-              case "jsonb":
-                return TYPES.jsonb;
-
-              case "bit":
-                return TYPES.bit;
-              case "varbit":
-                return TYPES.varbit;
-
-              case "int2":
-                return TYPES.int2;
-              case "int4":
-                return TYPES.int;
-              case "int8":
-                return TYPES.bigint;
-              case "float8":
-                return TYPES.float;
-              case "float4":
-                return TYPES.float4;
-              case "numeric":
-                return TYPES.numeric;
-              case "money":
-                return TYPES.money;
-
-              case "box":
-                return TYPES.box;
-              case "point":
-                return TYPES.point;
-              case "line":
-                return TYPES.line;
-              case "lseg":
-                return TYPES.lseg;
-              case "circle":
-                return TYPES.circle;
-              case "polygon":
-                return TYPES.polygon;
-
-              case "cidr":
-                return TYPES.cidr;
-              case "inet":
-                return TYPES.inet;
-              case "macaddr":
-                return TYPES.macaddr;
-              case "macaddr8":
-                return TYPES.macaddr8;
-
-              case "date":
-                return TYPES.date;
-              case "timestamp":
-                return TYPES.timestamp;
-              case "timestamptz":
-                return TYPES.timestamptz;
-              case "time":
-                return TYPES.time;
-              case "timetz":
-                return TYPES.timetz;
-              case "interval":
-                return TYPES.interval;
-
-              case "regclass":
-                return TYPES.regclass;
-              case "regconfig":
-                return TYPES.regconfig;
-              case "regdictionary":
-                return TYPES.regdictionary;
-              case "regnamespace":
-                return TYPES.regnamespace;
-              case "regoper":
-                return TYPES.regoper;
-              case "regoperator":
-                return TYPES.regoperator;
-              case "regproc":
-                return TYPES.regproc;
-              case "regprocedure":
-                return TYPES.regprocedure;
-              case "regrole":
-                return TYPES.regrole;
-              case "regtype":
-                return TYPES.regtype;
+            const knownType = getCodecByPgCatalogTypeName(type.typname);
+            if (knownType) {
+              return knownType;
             }
           }
 
