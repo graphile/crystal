@@ -121,7 +121,7 @@ export function applyHooks<THooks extends HookObject<THooks>>(
     } = Object.create(null);
     for (const hook of hooks) {
       const { provides } = hook;
-      for (const provide in provides) {
+      for (const provide of provides) {
         if (!providers[provide]) {
           providers[provide] = [];
         }
