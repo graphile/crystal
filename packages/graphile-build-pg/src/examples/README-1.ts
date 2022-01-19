@@ -16,6 +16,8 @@ import { resolvePresets } from "graphile-plugin";
 import { graphql, printSchema } from "graphql";
 import { Pool } from "pg";
 import { inspect } from "util";
+import express from "express";
+import { graphqlHTTP } from "express-graphql";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 
@@ -112,6 +114,21 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     contextValue,
   });
   console.log(inspect(result2, { depth: 12, colors: true })); // { data: { random: 4 } }
+
+  const app = express();
+  app.use(
+    "/graphql",
+    graphqlHTTP({
+      schema: schema2,
+      graphiql: true,
+      context: contextValue,
+      pretty: true,
+    }),
+  );
+  app.listen(4000);
+  console.log("Running a GraphQL API server at http://localhost:4000/graphql");
+  // Keep alive forever.
+  return new Promise(() => {});
 })()
   .then(() => pool.end())
   .catch((e) => {
