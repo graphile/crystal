@@ -616,7 +616,7 @@ export const PgCodecsPlugin: Plugin = {
 
             // Process the inner type of list types, then exit.
             if (codec.arrayOfCodec) {
-              walkCodec(codec, visited);
+              walkCodec(codec.arrayOfCodec, visited);
 
               // Array codecs don't get their own type, they just use GraphQLList or connection or whatever.
               return;
