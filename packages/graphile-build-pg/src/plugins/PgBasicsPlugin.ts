@@ -59,14 +59,7 @@ export const PgBasicsPlugin: Plugin = {
             return null;
           }
           const type = build.getTypeByName(typeName);
-          if (type == null) {
-            throw new Error(
-              `Codec ${
-                sql.compile(codec.sqlType).text
-              } variant '${variant}' expected GraphQL type '${typeName}' but no type with that name exists. This is a bug in a Graphile Build plugin (likely a third-party plugin).`,
-            );
-          }
-          return type;
+          return type ?? null;
         };
 
         const setGraphQLTypeForPgCodec: SetGraphQLTypeForPgCodec = (
