@@ -31,6 +31,7 @@ declare module "graphile-plugin" {
       getCodecFromType(
         databaseName: string,
         pgTypeId: string,
+        pgTypeModifier?: number | null,
       ): Promise<PgTypeCodec<any, any, any, any> | null>;
     };
   }
@@ -90,6 +91,7 @@ export const PgCodecsPlugin: Plugin = {
             const columnCodec = await info.helpers.pgCodecs.getCodecFromType(
               databaseName,
               columnAttribute.atttypid,
+              columnAttribute.atttypmod,
             );
             if (columnCodec) {
               hasAtLeastOneColumn = true;
@@ -124,7 +126,7 @@ export const PgCodecsPlugin: Plugin = {
         return promise;
       },
 
-      getCodecFromType(info, databaseName, typeId) {
+      getCodecFromType(info, databaseName, typeId, typeModifier) {
         let map = info.state.codecByTypeIdByDatabaseName.get(databaseName);
         if (!map) {
           map = new Map();
@@ -161,6 +163,7 @@ export const PgCodecsPlugin: Plugin = {
               const innerCodec = await info.helpers.pgCodecs.getCodecFromType(
                 databaseName,
                 innerType._id,
+                typeModifier, // TODO: is it correct to pass this through?
               );
               if (innerCodec) {
                 return EXPORTABLE(
