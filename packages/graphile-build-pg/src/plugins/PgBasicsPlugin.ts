@@ -62,7 +62,11 @@ export const PgBasicsPlugin: Plugin = {
         ) => {
           const meta = pgCodecMetaLookup.get(codec);
           if (!meta) {
-            throw new Error("That codec is not known");
+            throw new Error(
+              `Codec '${
+                sql.compile(codec.sqlType).text
+              }' does not have an entry in pgCodecMetaLookup, someone needs to call setGraphQLTypeForPgCodec passing this codec.`,
+            );
           }
           const typeName = meta.typeNameBySituation[situation] ?? null;
           return typeName ?? null;
