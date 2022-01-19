@@ -57,16 +57,23 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     },
   ]);
   const input = await gather(config);
+  console.log("Sources:");
   console.log(
-    input.pgSources.map((s) => crystalPrint((s as any).options)).join("\n"),
+    "  " +
+      input.pgSources
+        .map(
+          (s) => crystalPrint((s as any).name),
+          // + ` => ${(s as any).extensions?.tags?.name}`,
+        )
+        .join("\n  "),
   );
   const schema = buildSchema(config, input);
 
   // Output our schema
   // console.log(chalk.blue(printSchema(schema)));
-  console.log();
-  console.log();
-  console.log();
+  console.log("");
+  console.log("");
+  console.log("");
   const source = /* GraphQL */ `
     {
       allMainAPosts {
@@ -90,9 +97,9 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     variableValues,
     contextValue,
   });
-  console.log(inspect(result, { depth: 12, colors: true })); // { data: { random: 4 } }
 
   if ("errors" in result) {
+    console.log(inspect(result, { depth: 12, colors: true })); // { data: { random: 4 } }
     process.exit(1);
   }
 
@@ -113,7 +120,10 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     variableValues,
     contextValue,
   });
-  console.log(inspect(result2, { depth: 12, colors: true })); // { data: { random: 4 } }
+  if ("errors" in result2) {
+    console.log(inspect(result2, { depth: 12, colors: true })); // { data: { random: 4 } }
+    process.exit(1);
+  }
 
   const app = express();
   app.use(
