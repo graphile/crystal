@@ -52,6 +52,15 @@ declare global {
   }
 }
 
+function unwrapCodec(
+  codec: PgTypeCodec<any, any, any, any>,
+): PgTypeCodec<any, any, any, any> {
+  if (codec.arrayOfCodec) {
+    return unwrapCodec(codec.arrayOfCodec);
+  }
+  return codec;
+}
+
 export const PgColumnsPlugin: Plugin = {
   name: "PgColumnsPlugin",
   description: "Adds columns to composite types",
@@ -81,7 +90,7 @@ export const PgColumnsPlugin: Plugin = {
       GraphQLObjectType_fields(fields, build, context) {
         const {
           extend,
-          graphql: { getNullableType, GraphQLNonNull },
+          graphql: { getNullableType, GraphQLNonNull, GraphQLList },
           inflection,
           getGraphQLTypeByPgCodec,
         } = build;
@@ -107,8 +116,14 @@ export const PgColumnsPlugin: Plugin = {
             column,
             codec: pgCodec,
           });
-          const baseType = getGraphQLTypeByPgCodec(column.codec, "output");
-          if (!baseType) {
+          const baseCodec = unwrapCodec(column.codec);
+          const baseType = getGraphQLTypeByPgCodec(baseCodec, "output")!;
+          const arrayOrNotType = column.codec.arrayOfCodec
+            ? new GraphQLList(
+                baseType, // TODO: nullability
+              )
+            : baseType;
+          if (!arrayOrNotType) {
             console.warn(
               `Couldn't find a 'output' variant for ${
                 sql.compile(pgCodec.sqlType).text
@@ -120,8 +135,8 @@ export const PgColumnsPlugin: Plugin = {
             continue;
           }
           const type = column.notNull
-            ? new GraphQLNonNull(getNullableType(baseType))
-            : baseType;
+            ? new GraphQLNonNull(getNullableType(arrayOrNotType))
+            : arrayOrNotType;
 
           if (!type) {
             // Could not determine the type, skip this field
