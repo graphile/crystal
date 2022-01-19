@@ -5,7 +5,7 @@
     "declarationDir": "./dist",
     "outDir": "./dist",
 
-    "noUncheckedIndexedAccess": true,
+    "noUncheckedIndexedAccess": false,
     "moduleResolution": "Node12",
     "module": "nodenext"
   },
