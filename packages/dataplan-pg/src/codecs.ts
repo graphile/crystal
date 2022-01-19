@@ -81,6 +81,7 @@ export function recordType<TColumns extends PgSourceColumns>(
 }
 exportAs(recordType, "recordType");
 
+// TODO: rename to enumCodec
 export function enumType<TValue extends string>(
   identifier: SQL,
   values: TValue[],
@@ -96,6 +97,12 @@ export function enumType<TValue extends string>(
   };
 }
 exportAs(enumType, "enumType");
+
+export function isEnumCodec<TValue extends string = string>(
+  t: PgTypeCodec<any, any, any, any>,
+): t is PgEnumTypeCodec<TValue> {
+  return "values" in t;
+}
 
 // TODO: rename to listOfCodec
 export function listOfType<

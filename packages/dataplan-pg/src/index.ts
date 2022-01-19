@@ -15,6 +15,7 @@ export {
   domainOfCodec,
   enumType,
   getCodecByPgCatalogTypeName,
+  isEnumCodec,
   listOfType,
   rangeOfCodec,
   recordType,
@@ -58,7 +59,11 @@ export {
 export { BooleanFilterPlan } from "./filters/booleanFilter";
 export { ClassFilterPlan } from "./filters/classFilter";
 export { ManyFilterPlan } from "./filters/manyFilter";
-export { PgTypeCodec, PgTypeCodecExtensions } from "./interfaces";
+export {
+  PgEnumTypeCodec,
+  PgTypeCodec,
+  PgTypeCodecExtensions,
+} from "./interfaces";
 export { PgSubscriber } from "./PgSubscriber";
 export {
   pgClassExpression,

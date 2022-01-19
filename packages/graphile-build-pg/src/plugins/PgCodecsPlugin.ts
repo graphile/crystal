@@ -1,6 +1,7 @@
 import "graphile-build";
 
 import type { PgSourceColumns, PgTypeCodec } from "@dataplan/pg";
+import { isEnumCodec } from "@dataplan/pg";
 import {
   domainOfCodec,
   enumType,
@@ -9,6 +10,7 @@ import {
   rangeOfCodec,
   recordType,
   TYPES,
+  PgEnumTypeCodec,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig } from "graphile-plugin";
@@ -32,6 +34,12 @@ declare global {
       scalarCodecTypeName(
         this: Inflection,
         codec: PgTypeCodec<undefined, any, any, undefined>,
+      ): string;
+      enumType(this: Inflection, codec: PgEnumTypeCodec<any>): string;
+      enumValue(
+        this: Inflection,
+        value: string,
+        codec: PgEnumTypeCodec<any>,
       ): string;
     }
   }
@@ -353,6 +361,90 @@ export const PgCodecsPlugin: Plugin = {
                 fullName.replace(/"/g, "").replace(/[^0-9a-z]/gi, "_"),
               );
             },
+            enumType(codec) {
+              return this.scalarCodecTypeName(codec);
+            },
+            enumValue(inValue) {
+              let value = inValue;
+
+              if (value === "") {
+                return "_EMPTY_";
+              }
+
+              // Some enums use asterisks to signify wildcards - this might be for
+              // the whole item, or prefixes/suffixes, or even in the middle.  This
+              // is provided on a best efforts basis, if it doesn't suit your
+              // purposes then please pass a custom inflector as mentioned below.
+              value = value
+                .replace(/\*/g, "_ASTERISK_")
+                .replace(/^(_?)_+ASTERISK/, "$1ASTERISK")
+                .replace(/ASTERISK_(_?)_*$/, "ASTERISK$1");
+
+              // This is a best efforts replacement for common symbols that you
+              // might find in enums. Generally we only support enums that are
+              // alphanumeric, if these replacements don't work for you, you should
+              // pass a custom inflector that replaces this `enumName` method
+              // with one of your own chosing.
+              value =
+                {
+                  // SQL comparison operators
+                  ">": "GREATER_THAN",
+                  ">=": "GREATER_THAN_OR_EQUAL",
+                  "=": "EQUAL",
+                  "!=": "NOT_EQUAL",
+                  "<>": "DIFFERENT",
+                  "<=": "LESS_THAN_OR_EQUAL",
+                  "<": "LESS_THAN",
+
+                  // PostgreSQL LIKE shortcuts
+                  "~~": "LIKE",
+                  "~~*": "ILIKE",
+                  "!~~": "NOT_LIKE",
+                  "!~~*": "NOT_ILIKE",
+
+                  // '~' doesn't necessarily represent regexps, but the three
+                  // operators following it likely do, so we'll use the word TILDE
+                  // in all for consistency.
+                  "~": "TILDE",
+                  "~*": "TILDE_ASTERISK",
+                  "!~": "NOT_TILDE",
+                  "!~*": "NOT_TILDE_ASTERISK",
+
+                  // A number of other symbols where we're not sure of their
+                  // meaning.  We give them common generic names so that they're
+                  // suitable for multiple purposes, e.g. favouring 'PLUS' over
+                  // 'ADDITION' and 'DOT' over 'FULL_STOP'
+                  "%": "PERCENT",
+                  "+": "PLUS",
+                  "-": "MINUS",
+                  "/": "SLASH",
+                  "\\": "BACKSLASH",
+                  _: "UNDERSCORE",
+                  "#": "POUND",
+                  "£": "STERLING",
+                  $: "DOLLAR",
+                  "&": "AMPERSAND",
+                  "@": "AT",
+                  "'": "APOSTROPHE",
+                  '"': "QUOTE",
+                  "`": "BACKTICK",
+                  ":": "COLON",
+                  ";": "SEMICOLON",
+                  "!": "EXCLAMATION_POINT",
+                  "?": "QUESTION_MARK",
+                  ",": "COMMA",
+                  ".": "DOT",
+                  "^": "CARET",
+                  "|": "BAR",
+                  "[": "OPEN_BRACKET",
+                  "]": "CLOSE_BRACKET",
+                  "(": "OPEN_PARENTHESIS",
+                  ")": "CLOSE_PARENTHESIS",
+                  "{": "OPEN_BRACE",
+                  "}": "CLOSE_BRACE",
+                }[value] || value;
+              return value;
+            },
           },
           "Adding inflectors from PgCodecsPlugin",
         );
@@ -510,21 +602,47 @@ export const PgCodecsPlugin: Plugin = {
               walkCodec(codec.domainOfCodec, visited);
             }
 
+            // Process the underlying type for ranges (if any)
+            if (codec.rangeOfCodec) {
+              walkCodec(codec.rangeOfCodec, visited);
+            }
+
             if (build.hasGraphQLTypeForPgCodec(codec)) {
               // This type already has a codec; ignore
               return;
             }
 
             // There's currently no type registered for this scalar codec; let's sort that out.
-            if (codec.domainOfCodec) {
+
+            const underlyingType = codec.rangeOfCodec || codec.domainOfCodec;
+            if (isEnumCodec(codec)) {
+              const typeName = inflection.enumType(codec);
+              const values = codec.values.reduce((memo, value, i) => {
+                memo[inflection.enumValue(value, codec)] = {
+                  // TODO: description
+                  value: value,
+                };
+                return memo;
+              }, {});
+              build.registerEnumType(
+                typeName,
+                {},
+                () => ({
+                  values,
+                }),
+                "PgCodecsPlugin",
+              );
+              build.setGraphQLTypeForPgCodec(
+                codec,
+                ["input", "output"],
+                typeName,
+              );
+            } else if (underlyingType) {
               // This type is a "domain", so we can mimic the underlying type
               const underlyingOutputTypeName =
-                build.getGraphQLTypeNameByPgCodec(
-                  codec.domainOfCodec,
-                  "output",
-                );
+                build.getGraphQLTypeNameByPgCodec(underlyingType, "output");
               const underlyingInputTypeName = build.getGraphQLTypeNameByPgCodec(
-                codec.domainOfCodec,
+                underlyingType,
                 "input",
               );
               const underlyingOutputMeta = underlyingOutputTypeName
@@ -537,103 +655,112 @@ export const PgCodecsPlugin: Plugin = {
               const isSameInputOutputType =
                 underlyingInputTypeName === underlyingOutputTypeName;
 
-              // We just want to be a copy of the underlying type spec, but with a different name/description
-              const copy = (underlyingTypeName: string) => (): any => {
-                const baseType = build.getTypeByName(underlyingTypeName);
-                const config = { ...baseType?.toConfig() };
-                delete (config as any).name;
-                delete (config as any).description;
-                return config;
-              };
-
               if (!underlyingOutputMeta) {
                 console.warn(
                   `Failed to find output meta for '${underlyingOutputTypeName}' (${
-                    sql.compile(codec.domainOfCodec.sqlType).text
+                    sql.compile(underlyingType.sqlType).text
                   })`,
                 );
+                return;
               }
 
-              if (underlyingOutputMeta && underlyingOutputTypeName) {
-                // Register the GraphQL type
-                switch (underlyingOutputMeta.Constructor) {
-                  case GraphQLScalarType: {
-                    build.registerScalarType(
-                      typeName,
-                      {},
-                      copy(underlyingOutputTypeName),
-                      "PgCodecsPlugin",
-                    );
-                    break;
+              if (codec.rangeOfCodec) {
+                throw new Error("Range not implemented");
+              } else if (codec.domainOfCodec) {
+                // We just want to be a copy of the underlying type spec, but with a different name/description
+                const copy = (underlyingTypeName: string) => (): any => {
+                  const baseType = build.getTypeByName(underlyingTypeName);
+                  const config = { ...baseType?.toConfig() };
+                  delete (config as any).name;
+                  delete (config as any).description;
+                  return config;
+                };
+
+                if (underlyingOutputMeta && underlyingOutputTypeName) {
+                  // Register the GraphQL type
+                  switch (underlyingOutputMeta.Constructor) {
+                    case GraphQLScalarType: {
+                      build.registerScalarType(
+                        typeName,
+                        {},
+                        copy(underlyingOutputTypeName),
+                        "PgCodecsPlugin",
+                      );
+                      break;
+                    }
+                    case GraphQLEnumType: {
+                      build.registerEnumType(
+                        typeName,
+                        {},
+                        copy(underlyingOutputTypeName),
+                        "PgCodecsPlugin",
+                      );
+                      break;
+                    }
+                    case GraphQLObjectType: {
+                      build.registerEnumType(
+                        typeName,
+                        {},
+                        copy(underlyingOutputTypeName),
+                        "PgCodecsPlugin",
+                      );
+                      break;
+                    }
+                    default: {
+                      console.warn(
+                        `PgTypeCodec output type for '${
+                          sql.compile(codec.sqlType).text
+                        }' not understood, we don't know how to copy a '${
+                          underlyingOutputMeta.Constructor?.name
+                        }'`,
+                      );
+                      return;
+                    }
                   }
-                  case GraphQLEnumType: {
-                    build.registerEnumType(
-                      typeName,
-                      {},
-                      copy(underlyingOutputTypeName),
-                      "PgCodecsPlugin",
-                    );
-                    break;
-                  }
-                  case GraphQLObjectType: {
-                    build.registerEnumType(
-                      typeName,
-                      {},
-                      copy(underlyingOutputTypeName),
-                      "PgCodecsPlugin",
-                    );
-                    break;
-                  }
-                  default: {
-                    console.warn(
-                      `PgTypeCodec output type for '${
-                        sql.compile(codec.sqlType).text
-                      }' not understood, we don't know how to copy a '${
-                        underlyingOutputMeta.Constructor?.name
-                      }'`,
-                    );
-                    return;
+
+                  // Now link this type to the codec for output (and input if appropriate)
+                  build.setGraphQLTypeForPgCodec(codec, "output", typeName);
+                  if (isSameInputOutputType) {
+                    build.setGraphQLTypeForPgCodec(codec, "input", typeName);
                   }
                 }
+                if (
+                  underlyingInputMeta &&
+                  !isSameInputOutputType &&
+                  underlyingInputTypeName
+                ) {
+                  const inputTypeName = inflection.inputType(typeName);
 
-                // Now link this type to the codec for output (and input if appropriate)
-                build.setGraphQLTypeForPgCodec(codec, "output", typeName);
-                if (isSameInputOutputType) {
-                  build.setGraphQLTypeForPgCodec(codec, "input", typeName);
-                }
-              }
-              if (
-                underlyingInputMeta &&
-                !isSameInputOutputType &&
-                underlyingInputTypeName
-              ) {
-                const inputTypeName = inflection.inputType(typeName);
-
-                // Register the GraphQL type
-                switch (underlyingInputMeta.Constructor) {
-                  case GraphQLInputObjectType: {
-                    build.registerInputObjectType(
-                      inputTypeName,
-                      {},
-                      copy(underlyingInputTypeName),
-                      "PgCodecsPlugin",
-                    );
-                    break;
+                  // Register the GraphQL type
+                  switch (underlyingInputMeta.Constructor) {
+                    case GraphQLInputObjectType: {
+                      build.registerInputObjectType(
+                        inputTypeName,
+                        {},
+                        copy(underlyingInputTypeName),
+                        "PgCodecsPlugin",
+                      );
+                      break;
+                    }
+                    default: {
+                      console.warn(
+                        `PgTypeCodec input type for '${
+                          sql.compile(codec.sqlType).text
+                        }' not understood, we don't know how to copy a '${
+                          underlyingInputMeta.Constructor?.name
+                        }'`,
+                      );
+                      return;
+                    }
                   }
-                  default: {
-                    console.warn(
-                      `PgTypeCodec input type for '${
-                        sql.compile(codec.sqlType).text
-                      }' not understood, we don't know how to copy a '${
-                        underlyingInputMeta.Constructor?.name
-                      }'`,
-                    );
-                    return;
-                  }
-                }
 
-                // Now link this type to the codec for input
-                build.setGraphQLTypeForPgCodec(codec, "input", inputTypeName);
+                  // Now link this type to the codec for input
+                  build.setGraphQLTypeForPgCodec(codec, "input", inputTypeName);
+                }
+              } else {
+                throw new Error(
+                  "GraphileInternalError<0bcf67df-4c5f-4261-a51c-28c8a916edfe> Fallthrough here should be impossible",
+                );
               }
             } else {
               // We have no idea what this is or how to handle it.
