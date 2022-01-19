@@ -1,8 +1,7 @@
 import "graphile-build";
 
-import { listOfType, TYPES } from "@dataplan/pg";
-
 import type { PgSourceColumns, PgTypeCodec } from "@dataplan/pg";
+import { listOfType, TYPES } from "@dataplan/pg";
 import { recordType } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig } from "graphile-plugin";
@@ -114,9 +113,8 @@ export const PgCodecsPlugin: Plugin = {
           const nspName = namespace.nspname;
           const className = pgClass.relname;
           const codec = EXPORTABLE(
-            (columns, recordType, sql, nspName, className) =>
-              recordType(sql.identifier(nspName, className), columns),
-            [columns, recordType, sql, nspName, className],
+            (className, columns, nspName, recordType, sql) => recordType(sql.identifier(nspName, className), columns),
+            [className, columns, nspName, recordType, sql],
           );
           return codec;
         })();
@@ -166,8 +164,8 @@ export const PgCodecsPlugin: Plugin = {
               );
               if (innerCodec) {
                 return EXPORTABLE(
-                  (listOfType, innerCodec) => listOfType(innerCodec),
-                  [listOfType, innerCodec],
+                  (innerCodec, listOfType) => listOfType(innerCodec),
+                  [innerCodec, listOfType],
                 );
               }
             }

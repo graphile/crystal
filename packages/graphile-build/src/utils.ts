@@ -71,12 +71,12 @@ export function isValidObjectType(
 export const stringScalarSpec = Object.freeze({
   serialize: (value) => String(value),
   parseValue: (value) => String(value),
-  parseLiteral: (ast) => {
+  parseLiteral: EXPORTABLE((Kind) => (ast) => {
     if (ast.kind !== Kind.STRING) {
       throw new Error("Can only parse string values");
     }
     return ast.value;
-  },
+  }, [Kind]),
 } as Omit<GraphQLScalarTypeConfig<unknown, unknown>, "name" | "description">);
 
 // Copied from GraphQL v14, MIT license (c) GraphQL Contributors.

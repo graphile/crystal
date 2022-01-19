@@ -114,36 +114,42 @@ export const CommonTypesPlugin: Plugin = {
 
         if (jsonScalarAsString !== true) {
           const parseLiteral: GraphQLScalarLiteralParser<any> = EXPORTABLE(
-            (Kind) => (ast, variables) => {
-              switch (ast.kind) {
-                case Kind.STRING:
-                case Kind.BOOLEAN:
-                  return ast.value;
-                case Kind.INT:
-                case Kind.FLOAT:
-                  return parseFloat(ast.value);
-                case Kind.OBJECT: {
-                  const value = Object.create(null);
-                  ast.fields.forEach((field) => {
-                    value[field.name.value] = parseLiteral(
-                      field.value,
-                      variables,
-                    );
-                  });
+            (Kind) => {
+              const parseLiteral: GraphQLScalarLiteralParser<any> = (
+                ast,
+                variables,
+              ): any => {
+                switch (ast.kind) {
+                  case Kind.STRING:
+                  case Kind.BOOLEAN:
+                    return ast.value;
+                  case Kind.INT:
+                  case Kind.FLOAT:
+                    return parseFloat(ast.value);
+                  case Kind.OBJECT: {
+                    const value = Object.create(null);
+                    ast.fields.forEach((field) => {
+                      value[field.name.value] = parseLiteral(
+                        field.value,
+                        variables,
+                      );
+                    });
 
-                  return value;
+                    return value;
+                  }
+                  case Kind.LIST:
+                    return ast.values.map((n) => parseLiteral(n, variables));
+                  case Kind.NULL:
+                    return null;
+                  case Kind.VARIABLE: {
+                    const name = ast.name.value;
+                    return variables ? variables[name] : undefined;
+                  }
+                  default:
+                    return undefined;
                 }
-                case Kind.LIST:
-                  return ast.values.map((n) => parseLiteral(n, variables));
-                case Kind.NULL:
-                  return null;
-                case Kind.VARIABLE: {
-                  const name = ast.name.value;
-                  return variables ? variables[name] : undefined;
-                }
-                default:
-                  return undefined;
-              }
+              };
+              return parseLiteral;
             },
             [Kind],
           );
