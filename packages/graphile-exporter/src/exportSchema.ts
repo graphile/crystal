@@ -144,7 +144,45 @@ function isBuiltinType(type: GraphQLNamedType): boolean {
 class CodegenFile {
   _variables: {
     [name: string]: true;
-  } = Object.create(null);
+  } = Object.assign(Object.create(null), {
+    // Reserved variables
+    AbortController: true,
+    Buffer: true,
+    DOMException: true,
+    Error: true,
+    Event: true,
+    EventTarget: true,
+    Math: true,
+    MessageChannel: true,
+    MessageEvent: true,
+    MessagePort: true,
+    Object: true,
+    TextDecoder: true,
+    TextEncoder: true,
+    URL: true,
+    URLSearchParams: true,
+    WebAssembly: true,
+    __dirname: true,
+    __filename: true,
+    atob: true,
+    btoa: true,
+    clearImmediate: true,
+    clearInterval: true,
+    clearTimeout: true,
+    console: true,
+    exports: true,
+    global: true,
+    module: true,
+    performance: true,
+    process: true,
+    queueMicrotask: true,
+    require: true,
+    setImmediate: true,
+    setInterval: true,
+    setTimeout: true,
+    structuredClone: true,
+  });
+
   _imports: {
     [fromModule: string]: {
       [exportName: "default" | "*" | string]: {
@@ -153,6 +191,7 @@ class CodegenFile {
       };
     };
   } = Object.create(null);
+
   _types: {
     [typeName: string]: {
       type: GraphQLNamedType;
@@ -160,6 +199,7 @@ class CodegenFile {
       declaration: t.Statement | null;
     };
   } = Object.create(null);
+
   _directives: {
     [typeName: string]: {
       directive: GraphQLDirective;
