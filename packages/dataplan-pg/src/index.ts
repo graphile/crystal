@@ -12,12 +12,13 @@ function sqlPrint(fragment: SQL): string {
 debugFactory.formatters.S = sqlPrint;
 
 export {
-  enumType,
-  listOfType,
   domainOfCodec,
+  enumType,
+  getCodecByPgCatalogTypeName,
+  listOfType,
+  rangeOfCodec,
   recordType,
   TYPES,
-  getCodecByPgCatalogTypeName,
 } from "./codecs";
 export {
   PgBox,

@@ -140,6 +140,11 @@ declare module "graphile-plugin" {
         databaseName: string,
         arrayId: string,
       ): Promise<PgType | undefined>;
+      getEnumsForType(databaseName: string, typeId: string): Promise<PgEnum[]>;
+      getRangeByType(
+        databaseName: string,
+        typeId: string,
+      ): Promise<PgRange | null>;
     };
   }
 
@@ -381,6 +386,22 @@ export const PgIntrospectionPlugin: Plugin = {
         const relevant = await getDb(info, databaseName);
         const list = relevant.introspection.types;
         return list.find((type) => type.typarray === arrayId);
+      },
+
+      async getEnumsForType(info, databaseName, typeId) {
+        const relevant = await getDb(info, databaseName);
+        const list = relevant.introspection.enums;
+        // TODO: cache
+        return list
+          .filter((entity) => entity.enumtypid === typeId)
+          .sort((a, z) => a.enumsortorder - z.enumsortorder);
+      },
+
+      async getRangeByType(info, databaseName, typeId) {
+        const relevant = await getDb(info, databaseName);
+        const list = relevant.introspection.ranges;
+        // TODO: cache
+        return list.find((entity) => entity.rngtypid === typeId);
       },
 
       getIntrospection(info) {

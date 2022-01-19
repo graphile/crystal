@@ -3,8 +3,10 @@ import "graphile-build";
 import type { PgSourceColumns, PgTypeCodec } from "@dataplan/pg";
 import {
   domainOfCodec,
+  enumType,
   getCodecByPgCatalogTypeName,
   listOfType,
+  rangeOfCodec,
   recordType,
   TYPES,
 } from "@dataplan/pg";
@@ -212,6 +214,65 @@ export const PgCodecsPlugin: Plugin = {
           // matches the citext extension namespace
           if (type.typname === "citext") {
             return TYPES.citext;
+          } else if (type.typname === "hstore") {
+            return TYPES.hstore;
+          }
+
+          const namespace = await info.helpers.pgIntrospection.getNamespace(
+            databaseName,
+            type.typnamespace,
+          );
+          if (!namespace) {
+            throw new Error(`Could not get namespace '${type.typnamespace}'`);
+          }
+
+          // Enum type
+          if (type.typtype === "e") {
+            const enumValues =
+              await info.helpers.pgIntrospection.getEnumsForType(
+                databaseName,
+                type._id,
+              );
+            const namespaceName = namespace.nspname;
+            const typeName = type.typname;
+            return enumType(
+              sql.identifier(namespaceName, typeName),
+              enumValues.map((e) => e.enumlabel),
+            );
+          }
+
+          // Range type
+          if (type.typtype === "r") {
+            const range = await info.helpers.pgIntrospection.getRangeByType(
+              databaseName,
+              type._id,
+            );
+            if (!range) {
+              throw new Error(
+                `Failed to get range entry related to '${type._id}'`,
+              );
+            }
+            const innerCodec = await info.helpers.pgCodecs.getCodecFromType(
+              databaseName,
+              range.rngsubtype!,
+            );
+            const namespaceName = namespace.nspname;
+            const typeName = type.typname;
+            if (!innerCodec) {
+              console.warn(
+                `PgTypeCodec could not build codec for '${namespaceName}.${typeName}', we don't know how to process the subtype`,
+              );
+              return null;
+            }
+            return EXPORTABLE(
+              (innerCodec, namespaceName, rangeOfCodec, sql, typeName) =>
+                rangeOfCodec(
+                  innerCodec,
+                  sql.identifier(namespaceName, typeName),
+                  { extensions: {} },
+                ),
+              [innerCodec, namespaceName, rangeOfCodec, sql, typeName],
+            );
           }
 
           // Domains are wrappers under an underlying type
@@ -231,13 +292,6 @@ export const PgCodecsPlugin: Plugin = {
                   baseTypeModifier,
                 )
               : null;
-            const namespace = await info.helpers.pgIntrospection.getNamespace(
-              databaseName,
-              type.typnamespace,
-            );
-            if (!namespace) {
-              throw new Error(`Could not get namespace '${type.typnamespace}'`);
-            }
             const namespaceName = namespace.nspname;
             const typeName = type.typname;
             const extensions = {};

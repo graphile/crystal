@@ -1,6 +1,7 @@
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 import { parse as arrayParse } from "postgres-array";
+import { parse as rangeParse } from "postgres-range";
 
 import type {
   PgBox,
@@ -159,6 +160,68 @@ export function domainOfCodec<
   };
 }
 exportAs(domainOfCodec, "domainOfCodec");
+
+/**
+ * @see {@link https://www.postgresql.org/docs/14/rangetypes.html#RANGETYPES-IO}
+ *
+ * @internal
+ */
+function escapeRangeValue(
+  value: null | any,
+  innerCodec: PgTypeCodec<undefined, any, any, undefined>,
+): string {
+  if (value == null) {
+    return "";
+  }
+  const encoded = String(innerCodec.toPg(value));
+  // TODO: we don't always need to do this
+  return `"${encoded.replace(/"/g, '""')}"`;
+}
+
+export function rangeOfCodec<
+  TInnerCodec extends PgTypeCodec<undefined, any, any, undefined>,
+>(
+  innerCodec: TInnerCodec,
+  identifier: SQL,
+  {
+    extensions,
+  }: {
+    extensions?: Partial<PgTypeCodecExtensions>;
+  },
+): PgTypeCodec<
+  undefined,
+  any, // TODO
+  any, // TODO
+  undefined
+> {
+  return {
+    sqlType: identifier,
+    extensions,
+    rangeOfCodec: innerCodec,
+    fromPg(value) {
+      const parsed = rangeParse(value);
+      return {
+        lower: parsed.lower,
+        lowerInclusive: parsed.isLowerBoundClosed(),
+        upper: parsed.upper,
+        upperInclusive: parsed.isUpperBoundClosed(),
+      };
+    },
+    toPg(value) {
+      if (value.lower == null && value.upper == null) {
+        return "";
+      }
+      return `${value.lowerInclusive ? "[" : "("}${escapeRangeValue(
+        value.lower,
+        innerCodec,
+      )},${escapeRangeValue(value.upper, innerCodec)}${
+        value.upperInclusive ? "]" : ")"
+      }`;
+    },
+    columns: undefined,
+  };
+}
+exportAs(rangeOfCodec, "rangeOfCodec");
 
 type Cast<TFromJavaScript = any, TFromPostgres = string> = {
   castFromPg?(frag: SQL): SQL;

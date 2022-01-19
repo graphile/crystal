@@ -996,13 +996,13 @@ export interface PgEnum {
   _id: PgOid;
 
   /** The OID of the pg_type entry owning this enum value */
-  enumtypid: PgOid | null;
+  enumtypid: PgOid;
 
   /** The sort position of this enum value within its enum type */
-  enumsortorder: number | null;
+  enumsortorder: number;
 
   /** The textual label for this enum value */
-  enumlabel: PgName | null;
+  enumlabel: PgName;
 }
 
 /**

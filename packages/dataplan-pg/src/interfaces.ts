@@ -108,6 +108,11 @@ export interface PgTypeCodec<
    */
   notNull?: boolean;
 
+  /**
+   * The underlying codec that this type is a range over.
+   */
+  rangeOfCodec?: PgTypeCodec<undefined, any, any, undefined>;
+
   extensions?: Partial<PgTypeCodecExtensions>;
 }
 
