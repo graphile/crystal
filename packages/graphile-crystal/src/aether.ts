@@ -2406,6 +2406,9 @@ export class Aether<
     const depResults = await Promise.all(batch.entries.map((t) => t[1]));
     return listResults.map((list, listIndex) => {
       const values = depResults[listIndex];
+      if (list == null) {
+        return list;
+      }
       if (!Array.isArray(list) || !Array.isArray(values)) {
         // TODO: should this be an error?
         console.warn(

@@ -2294,6 +2294,9 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
           const shouldReverse = this.shouldReverseOrder();
           if (this.fetchOneExtra && limit != null) {
             return lambda(rowsPlan, (rows) => {
+              if (!rows) {
+                return rows;
+              }
               const hasMore = rows.length > limit;
               const slicedRows = hasMore ? rows.slice(0, limit) : rows;
               const orderedRows = shouldReverse
