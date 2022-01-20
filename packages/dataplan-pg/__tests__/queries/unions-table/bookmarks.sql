@@ -7,8 +7,8 @@ from (
 ) as __people_identifiers__,
 lateral (
   select
-    array(
-      select array[
+    (select json_agg(_._) from (
+      select json_build_array(
         __person_bookmarks__."id"::text,
         __people__."username",
         __person_bookmarks__."bookmarked_entity"::text,
@@ -24,7 +24,7 @@ lateral (
         __posts_2."body",
         __comments__."body",
         ((__person_bookmarks__."bookmarked_entity")."comment_id")::text
-      ]::text[]
+      ) as _
       from interfaces_and_unions.person_bookmarks as __person_bookmarks__
       left outer join interfaces_and_unions.people as __people__
       on (__person_bookmarks__."person_id"::"int4" = __people__."person_id")
@@ -47,7 +47,7 @@ lateral (
           true /* authorization checks */
         )
       order by __person_bookmarks__."id" asc
-    ) as "0",
+    ) _) as "0",
     __people_5."person_id"::text as "1",
     __people_5."username" as "2",
     __people_identifiers__.idx as "3"

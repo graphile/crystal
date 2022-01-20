@@ -1302,16 +1302,24 @@ export class PgSelectPlan<
     const aliases = sql.join(sqlAliases, "");
 
     if (asArray) {
+      if (fragmentsWithAliases.length > 100) {
+        // The maximum number of arguments you can pass to a PostgreSQL
+        // function is 100, so we need to concatenate multiple arrays
+        // TODO: jsonb_build_array || jsonb_build_array
+        throw new Error(
+          "Please select fewer fields, support for this many fields has not yet been added.",
+        );
+      }
       const selection = fragmentsWithAliases.length
-        ? sql` array[${sql.indent(
+        ? sql` json_build_array(\n${sql.indent(
             sql.join(fragmentsWithAliases, ",\n"),
-          )}]::text[]`
+          )}) as _`
         : /*
            * In the case where our array is empty, we must add something or
            * PostgreSQL will fail with 'ERROR:  2202E: cannot accumulate empty
            * arrays'
            */
-          sql` array['' /* NOTHING?! */]::text[]`;
+          sql` '[]'::json as _ /* NOTHING?! */`;
 
       return { sql: sql`${aliases}select${selection}`, extraSelectIndexes };
     } else {
@@ -1513,6 +1521,7 @@ export class PgSelectPlan<
   private buildQuery(
     options: {
       asArray?: boolean;
+      asJsonAgg?: boolean;
       withIdentifiers?: boolean;
       extraSelects?: SQL[];
       extraWheres?: SQL[];
@@ -1521,6 +1530,9 @@ export class PgSelectPlan<
     sql: SQL;
     extraSelectIndexes: number[];
   } {
+    if (options.asJsonAgg && !options.asArray) {
+      throw new Error("asJsonAgg can only be set when asArray is set");
+    }
     if (!this.isTrusted) {
       this.source.applyAuthorizationChecksToPlan(this);
     }
@@ -1544,7 +1556,10 @@ export class PgSelectPlan<
     const { sql: limit } = this.buildLimit();
     const { sql: offset } = this.buildOffset();
 
-    const query = sql`${select}${from}${join}${where}${groupBy}${having}${orderBy}${limit}${offset}`;
+    const baseQuery = sql`${select}${from}${join}${where}${groupBy}${having}${orderBy}${limit}${offset}`;
+    const query = options.asJsonAgg
+      ? sql`select json_agg(_._) from (${sql.indent(baseQuery)}) _`
+      : baseQuery;
 
     return { sql: query, extraSelectIndexes };
   }
@@ -2279,9 +2294,14 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
             }
           });
           this.mergePlaceholdersInto(table);
-          const { sql: query } = this.buildQuery({ asArray: true });
+          const { sql: query } = this.buildQuery({
+            asArray: true,
+            asJsonAgg: true,
+          });
           const selfIndex = table.selectAndReturnIndex(
-            sql`array(${sql.indent(query)})`,
+            // TODO: indent this for nice formatting. We're not doing it to minimize the diff.
+            // sql`(${sql.indent(query)})`,
+            sql`(${query})`,
           );
           debugPlanVerbose(
             "Optimising %c (via %c and %c)",

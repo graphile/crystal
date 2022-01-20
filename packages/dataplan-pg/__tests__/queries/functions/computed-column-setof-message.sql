@@ -7,15 +7,15 @@ from (
 ) as __forums_identifiers__,
 lateral (
   select
-    array(
-      select array[
+    (select json_agg(_._) from (
+      select json_build_array(
         __forums_featured_messages__."body"
-      ]::text[]
+      ) as _
       from app_public.forums_featured_messages(__forums__) as __forums_featured_messages__
       where (
         true /* authorization checks */
       )
-    ) as "0",
+    ) _) as "0",
     __forums_identifiers__.idx as "1"
   from app_public.forums as __forums__
   where

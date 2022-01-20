@@ -1,7 +1,7 @@
 select
   __people__."username" as "0",
-  array(
-    select array[
+  (select json_agg(_._) from (
+    select json_build_array(
       __single_table_items__."type"::text,
       __single_table_items__."id"::text,
       __single_table_items__."type2"::text,
@@ -14,7 +14,7 @@ select
       __single_table_items__."description",
       __single_table_items__."note",
       __single_table_items__."color"
-    ]::text[]
+    ) as _
     from interfaces_and_unions.single_table_items as __single_table_items__
     where
       (
@@ -23,7 +23,7 @@ select
         true /* authorization checks */
       )
     order by __single_table_items__."id" asc
-  ) as "1"
+  ) _) as "1"
 from interfaces_and_unions.people as __people__
 where (
   true /* authorization checks */

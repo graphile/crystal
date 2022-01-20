@@ -1,9 +1,9 @@
 select
   __forums__."name" as "0",
-  array(
-    select array[
+  (select json_agg(_._) from (
+    select json_build_array(
       __messages__."body"
-    ]::text[]
+    ) as _
     from app_public.messages as __messages__
     where
       (
@@ -13,7 +13,7 @@ select
       )
     order by __messages__."id" asc
     limit 2
-  ) as "1"
+  ) _) as "1"
 from app_public.forums as __forums__
 where (
   true /* authorization checks */

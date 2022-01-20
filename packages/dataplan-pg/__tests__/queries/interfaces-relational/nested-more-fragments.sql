@@ -1,7 +1,7 @@
 select
   __people__."username" as "0",
-  array(
-    select array[
+  (select json_agg(_._) from (
+    select json_build_array(
       __relational_items_2."type"::text,
       __relational_topics_2."title",
       __relational_posts_2."title",
@@ -38,7 +38,7 @@ select
       to_char(__relational_items_2."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'),
       __relational_items_2."is_explicitly_archived"::text,
       to_char(__relational_items_2."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM')
-    ]::text[]
+    ) as _
     from interfaces_and_unions.relational_items as __relational_items_2
     left outer join interfaces_and_unions.relational_topics as __relational_topics_2
     on (__relational_items_2."id"::"int4" = __relational_topics_2."id")
@@ -73,7 +73,7 @@ select
         true /* authorization checks */
       )
     order by __relational_items_2."id" asc
-  ) as "1"
+  ) _) as "1"
 from interfaces_and_unions.people as __people__
 where (
   true /* authorization checks */

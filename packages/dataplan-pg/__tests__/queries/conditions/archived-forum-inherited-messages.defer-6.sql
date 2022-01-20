@@ -1,11 +1,11 @@
 select
   __forums__."name" as "0",
-  array(
-    select array[
+  (select json_agg(_._) from (
+    select json_build_array(
       __messages__."body",
       __messages__."author_id",
       __messages__."id"
-    ]::text[]
+    ) as _
     from app_public.messages as __messages__
     where
       (
@@ -14,7 +14,7 @@ select
         __forums__."id"::"uuid" = __messages__."forum_id"
       )
     order by __messages__."id" asc
-  ) as "1"
+  ) _) as "1"
 from app_public.forums as __forums__
 where
   (

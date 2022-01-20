@@ -1,14 +1,14 @@
 select
   __forums__."name" as "0",
-  array(
-    select array[
+  (select json_agg(_._) from (
+    select json_build_array(
       __messages__."body",
       __users__."username",
       __users__."gravatar_url",
       __messages__."id",
       __users_2."username",
       __users_2."gravatar_url"
-    ]::text[]
+    ) as _
     from app_public.messages as __messages__
     left outer join app_public.users as __users__
     on (__messages__."author_id"::"uuid" = __users__."id")
@@ -21,11 +21,11 @@ select
         __forums__."id"::"uuid" = __messages__."forum_id"
       )
     order by __messages__."id" asc
-  ) as "1",
-  array(
-    select array[
+  ) _) as "1",
+  (select json_agg(_._) from (
+    select json_build_array(
       (count(*))::text
-    ]::text[]
+    ) as _
     from app_public.messages as __messages__
     where
       (
@@ -33,7 +33,7 @@ select
       ) and (
         __forums__."id"::"uuid" = __messages__."forum_id"
       )
-  ) as "2"
+  ) _) as "2"
 from app_public.forums as __forums__
 where
   (

@@ -1,11 +1,11 @@
 select
   __forums__."name" as "0",
-  array(
-    select array[
+  (select json_agg(_._) from (
+    select json_build_array(
       __messages__."body",
       __users__."username",
       __users__."gravatar_url"
-    ]::text[]
+    ) as _
     from app_public.messages as __messages__
     left outer join app_public.users as __users__
     on (__messages__."author_id"::"uuid" = __users__."id")
@@ -17,7 +17,7 @@ select
       )
     order by __messages__."id" asc
     limit 2
-  ) as "1"
+  ) _) as "1"
 from app_public.forums as __forums__
 where (
   true /* authorization checks */
