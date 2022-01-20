@@ -104,6 +104,8 @@ export function isEnumCodec<TValue extends string = string>(
   return "values" in t;
 }
 
+const $$listCodec = Symbol("listCodec");
+
 // TODO: rename to listOfCodec
 export function listOfType<
   TInnerCodec extends PgTypeCodec<any, any, any, undefined>,
@@ -120,7 +122,17 @@ export function listOfType<
   if (innerCodec.arrayOfCodec) {
     throw new Error("Array types cannot be nested");
   }
-  return {
+
+  if (innerCodec[$$listCodec]) {
+    return innerCodec[$$listCodec];
+  }
+
+  const listCodec: PgTypeCodec<
+    undefined, // Array has no columns
+    string,
+    TInnerCodec extends PgTypeCodec<any, any, infer U> ? U[] : any[],
+    TInnerCodec
+  > = {
     sqlType: identifier,
     // TODO: this does __NOT__ handle nulls safely!
     fromPg: (value) =>
@@ -134,6 +146,11 @@ export function listOfType<
     arrayOfCodec: innerCodec,
     castFromPg: innerCodec.listCastFromPg,
   };
+
+  // Memoize such that every `listOfType(foo)` returns the same object.
+  Object.defineProperty(innerCodec, $$listCodec, { value: listCodec });
+
+  return listCodec;
 }
 exportAs(listOfType, "listOfType");
 
