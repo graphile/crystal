@@ -2682,9 +2682,12 @@ export class Aether<
     // Even when AsyncIterators are involved, this will always be a concrete array
     crystalLayerObjects: ReadonlyArray<CrystalLayerObject | null>,
     rawMapResult: MapResult,
-  ): Promise<any> {
+  ): Promise<any[]> {
     const [layerPlan, ...rest] = layers;
     const crystalLayerObjectsLength = crystalLayerObjects.length;
+    if (crystalLayerObjectsLength === 0) {
+      return [];
+    }
 
     const mapResult =
       rest.length === 0
@@ -2913,34 +2916,38 @@ export class Aether<
             pendingIndexes.push(finalResultIndex);
           }
         }
-        const pendingResults = await this.executeLayers(
-          crystalContext,
-          rest,
-          pendingCrystalLayerObjects,
-          rawMapResult,
-        );
-        if (isDev) {
-          assert.ok(
-            Array.isArray(pendingResults),
-            "Expected non-error plan execution to return an array",
+        if (pendingCrystalLayerObjects.length > 0) {
+          const pendingResults = await this.executeLayers(
+            crystalContext,
+            rest,
+            pendingCrystalLayerObjects,
+            rawMapResult,
           );
-          assert.strictEqual(
-            pendingResults.length,
-            pendingCrystalLayerObjects.length,
-            "Expected non-error plan execution result to have same length as input objects",
-          );
-        }
-        // Stitch the results back into the list
-        for (
-          let pendingResultIndex = 0, l = pendingResults.length;
-          pendingResultIndex < l;
-          pendingResultIndex++
-        ) {
-          const finalResultIndex = pendingIndexes[pendingResultIndex];
-          finalResult[finalResultIndex] =
-            pendingResults[pendingResultIndex] instanceof CrystalError
-              ? Promise.reject(pendingResults[pendingResultIndex].originalError)
-              : pendingResults[pendingResultIndex];
+          if (isDev) {
+            assert.ok(
+              Array.isArray(pendingResults),
+              "Expected non-error plan execution to return an array",
+            );
+            assert.strictEqual(
+              pendingResults.length,
+              pendingCrystalLayerObjects.length,
+              "Expected non-error plan execution result to have same length as input objects",
+            );
+          }
+          // Stitch the results back into the list
+          for (
+            let pendingResultIndex = 0, l = pendingResults.length;
+            pendingResultIndex < l;
+            pendingResultIndex++
+          ) {
+            const finalResultIndex = pendingIndexes[pendingResultIndex];
+            finalResult[finalResultIndex] =
+              pendingResults[pendingResultIndex] instanceof CrystalError
+                ? Promise.reject(
+                    pendingResults[pendingResultIndex].originalError,
+                  )
+                : pendingResults[pendingResultIndex];
+          }
         }
         return finalResult;
       }
