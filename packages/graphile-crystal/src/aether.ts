@@ -398,23 +398,28 @@ export class Aether<
       [ROOT_PATH]: [0],
     });
     this.operationType = operation.operation;
-    switch (this.operationType) {
-      case "query": {
-        this.planQuery();
-        break;
+    try {
+      switch (this.operationType) {
+        case "query": {
+          this.planQuery();
+          break;
+        }
+        case "mutation": {
+          this.planMutation();
+          break;
+        }
+        case "subscription": {
+          this.planSubscription();
+          break;
+        }
+        default: {
+          const never: never = this.operationType;
+          throw new Error(`Unsupported operation type '${never}'.`);
+        }
       }
-      case "mutation": {
-        this.planMutation();
-        break;
-      }
-      case "subscription": {
-        this.planSubscription();
-        break;
-      }
-      default: {
-        const never: never = this.operationType;
-        throw new Error(`Unsupported operation type '${never}'.`);
-      }
+    } catch (e) {
+      this.logPlansByPath();
+      throw e;
     }
 
     this.phase = "validate";
