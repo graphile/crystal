@@ -15,7 +15,7 @@ import {
 import { crystalPrint } from "graphile-crystal";
 import { exportSchema } from "graphile-exporter";
 import { resolvePresets } from "graphile-plugin";
-import { graphql, printSchema } from "graphql";
+import { formatError, graphql, printSchema } from "graphql";
 import { Pool } from "pg";
 import { inspect } from "util";
 
@@ -34,6 +34,9 @@ declare global {
 
 const pool = new Pool({
   connectionString: "pggql_test",
+});
+pool.on("error", (e) => {
+  console.log("Client error", e);
 });
 const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
 
@@ -134,7 +137,7 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
       context: contextValue,
       pretty: true,
       customFormatErrorFn(e) {
-        return Object.assign(e, {
+        return Object.assign(e.toJSON(), {
           extensions: { stack: e.stack?.split("\n") },
         });
       },
