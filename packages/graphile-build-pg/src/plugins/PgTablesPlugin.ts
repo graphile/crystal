@@ -117,7 +117,7 @@ declare module "graphile-plugin" {
 interface State {
   sourceBuilderByPgClassByDatabase: Map<
     string,
-    Map<PgClass, PgSourceBuilder<any, any, any>>
+    Map<PgClass, Promise<PgSourceBuilder<any, any, any> | null>>
   >;
 }
 interface Cache {}
@@ -131,7 +131,7 @@ export const PgTablesPlugin: Plugin = {
   gather: {
     namespace: "pgTables",
     helpers: {
-      async getSourceBuilder(info, databaseName, pgClass) {
+      getSourceBuilder(info, databaseName, pgClass) {
         let sourceBuilderByPgClass =
           info.state.sourceBuilderByPgClassByDatabase.get(databaseName);
         if (!sourceBuilderByPgClass) {
@@ -145,58 +145,61 @@ export const PgTablesPlugin: Plugin = {
         if (sourceBuilder) {
           return sourceBuilder;
         }
-        const database = info.options.pgDatabases.find(
-          (db) => db.name === databaseName,
-        )!;
-        const schemas = database.schemas;
+        sourceBuilder = (async () => {
+          const database = info.options.pgDatabases.find(
+            (db) => db.name === databaseName,
+          )!;
+          const schemas = database.schemas;
 
-        const namespace = await info.helpers.pgIntrospection.getNamespace(
-          databaseName,
-          pgClass.relnamespace,
-        );
-        if (!namespace) {
-          return null;
-        }
+          const namespace = await info.helpers.pgIntrospection.getNamespace(
+            databaseName,
+            pgClass.relnamespace,
+          );
+          if (!namespace) {
+            return null;
+          }
 
-        if (!schemas.includes(namespace.nspname)) {
-          return null;
-        }
+          if (!schemas.includes(namespace.nspname)) {
+            return null;
+          }
 
-        if (
-          !["r", "v", "m", "p"].includes(pgClass.relkind) ||
-          pgClass.relispartition
-        ) {
-          return null;
-        }
+          if (
+            !["r", "v", "m", "p"].includes(pgClass.relkind) ||
+            pgClass.relispartition
+          ) {
+            return null;
+          }
 
-        const codec = await info.helpers.pgCodecs.getCodecFromClass(
-          databaseName,
-          pgClass._id,
-        );
-        if (!codec) {
-          return null;
-        }
+          const codec = await info.helpers.pgCodecs.getCodecFromClass(
+            databaseName,
+            pgClass._id,
+          );
+          if (!codec) {
+            return null;
+          }
 
-        const executor =
-          info.helpers.pgIntrospection.getExecutorForDatabase(databaseName);
-        const name = `${databaseName}.${namespace.nspname}.${pgClass.relname}`;
+          const executor =
+            info.helpers.pgIntrospection.getExecutorForDatabase(databaseName);
+          const name = `${databaseName}.${namespace.nspname}.${pgClass.relname}`;
 
-        sourceBuilder = EXPORTABLE(
-          (PgSourceBuilder, codec, executor, name) =>
-            new PgSourceBuilder({
-              executor,
-              name,
-              source: codec.sqlType,
-              codec,
-              extensions: {
-                tags: {
-                  // TODO
+          return EXPORTABLE(
+            (PgSourceBuilder, codec, executor, name) =>
+              new PgSourceBuilder({
+                executor,
+                name,
+                source: codec.sqlType,
+                codec,
+                extensions: {
+                  tags: {
+                    // TODO
+                  },
                 },
-              },
-            }),
-          [PgSourceBuilder, codec, executor, name],
-        );
+              }),
+            [PgSourceBuilder, codec, executor, name],
+          );
+        })();
         sourceBuilderByPgClass.set(pgClass, sourceBuilder);
+        return sourceBuilder;
       },
     },
     initialState: () => ({
@@ -220,9 +223,13 @@ export const PgTablesPlugin: Plugin = {
       ] of info.state.sourceBuilderByPgClassByDatabase.entries()) {
         for (const [
           pgClass,
-          sourceBuilder,
+          sourceBuilderPromise,
         ] of sourceBuilderByPgClass.entries()) {
           const relations: PgSourceRelations = {};
+          const sourceBuilder = await sourceBuilderPromise;
+          if (!sourceBuilder) {
+            continue;
+          }
           await info.process("pgTables:PgSourceBuilder:relations", {
             sourceBuilder,
             pgClass,
