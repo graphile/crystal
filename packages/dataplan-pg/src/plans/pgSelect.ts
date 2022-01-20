@@ -2298,11 +2298,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
             asArray: true,
             asJsonAgg: true,
           });
-          const selfIndex = table.selectAndReturnIndex(
-            // TODO: indent this for nice formatting. We're not doing it to minimize the diff.
-            // sql`(${sql.indent(query)})`,
-            sql`(${query})`,
-          );
+          const selfIndex = table.selectAndReturnIndex(sql`(${query})`);
           debugPlanVerbose(
             "Optimising %c (via %c and %c)",
             this,
