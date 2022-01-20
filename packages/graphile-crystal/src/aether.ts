@@ -2116,6 +2116,11 @@ export class Aether<
         debugExecuteVerbose("%s no result for %c", follow, planResults);
 
         const deferred = defer<any>();
+
+        // TODO: this is critical to avoid unhandledPromiseRejection errors; but really we should be awaiting this error somewhere reliable.
+        // Ignore errors from this deferred
+        deferred.catch(() => {});
+
         deferredsByBucket.set(bucket, deferred);
 
         pendingPlanResultses.push(planResults);
