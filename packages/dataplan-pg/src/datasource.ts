@@ -258,6 +258,9 @@ export class PgSourceBuilder<
 }
 exportAs(PgSourceBuilder, "PgSourceBuilder");
 
+const $$codecSource = Symbol("codecSource");
+let temporarySourceCounter = 0;
+
 /**
  * PG class data source represents a PostgreSQL data source. This could be a table,
  * view, materialized view, setof function call, join, etc. Anything table-like.
@@ -310,6 +313,29 @@ export class PgSource<
   public readonly isUnique: boolean;
 
   public readonly extensions: Partial<PgSourceExtensions> | undefined;
+
+  static fromCodec<TColumns extends PgSourceColumns>(
+    executor: PgExecutor,
+    codec: PgTypeCodec<TColumns, any, any>,
+  ): PgSource<TColumns, any, any, undefined> {
+    if (!codec[$$codecSource]) {
+      codec[$$codecSource] = new Map();
+    }
+    if (codec[$$codecSource].has(executor)) {
+      return codec[$$codecSource].get(executor);
+    }
+
+    const source = new PgSource({
+      executor,
+      source: sql`(select 1/0 /* codec-only source; should not select directly */)`,
+      codec,
+      name: `TemporarySource${++temporarySourceCounter}`,
+    });
+
+    codec[$$codecSource].set(executor, source);
+
+    return source;
+  }
 
   /**
    * @param source - the SQL for the `FROM` clause (without any

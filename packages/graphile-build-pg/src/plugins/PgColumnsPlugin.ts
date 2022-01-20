@@ -7,6 +7,7 @@ import type {
   PgSourceColumn,
   PgTypeCodec,
 } from "@dataplan/pg";
+import { PgSource } from "@dataplan/pg";
 import { pgSelectFromRecords, pgSelectSingleFromRecord } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
@@ -151,12 +152,7 @@ export const PgColumnsPlugin: Plugin = {
 
           const makePlan = () => {
             // See if there's a source to pull record types from (e.g. for relations/etc)
-            const source = baseCodec.columns
-              ? build.input.pgSources.find(
-                  (s) => s.codec === baseCodec && !s.parameters,
-                )
-              : null;
-            if (!source) {
+            if (!baseCodec.columns) {
               // Simply get the value
               return EXPORTABLE(
                 (columnName) =>
@@ -170,40 +166,63 @@ export const PgColumnsPlugin: Plugin = {
                   },
                 [columnName],
               );
-            } else if (!column.codec.arrayOfCodec) {
-              // Single record from source
-              /*
-               * TODO: if we refactor `PgSelectSinglePlan` we can probably
-               * optimise this to do inline selection and still join against
-               * the base table using e.g. `(table.column).attribute =
-               * joined_thing.column`
-               */
-              return EXPORTABLE(
-                (columnName, pgSelectSingleFromRecord, source) =>
-                  ($record: PgSelectSinglePlan<any, any, any, any>) => {
-                    const $plan = $record.get(columnName);
-                    const $select = pgSelectSingleFromRecord(source, $plan);
-                    return $select;
-                  },
-                [columnName, pgSelectSingleFromRecord, source],
-              );
             } else {
-              // Many records from source
-              /*
-               * TODO: if we refactor `PgSelectSinglePlan` we can probably
-               * optimise this to do inline selection and still join against
-               * the base table using e.g. `(table.column).attribute =
-               * joined_thing.column`
-               */
-              return EXPORTABLE(
-                (columnName, pgSelectFromRecords, source) =>
-                  ($record: PgSelectSinglePlan<any, any, any, any>) => {
-                    const $plan = $record.get(columnName);
-                    const $select = pgSelectFromRecords(source, $plan);
-                    return $select;
+              const pgSources = build.input.pgSources;
+              const getSource = EXPORTABLE(
+                (PgSource, baseCodec, pgSources) => ($record: PgSelectSinglePlan<any, any, any, any>) => {
+                    const executor = $record.source.executor;
+                    const source =
+                      pgSources.find(
+                        (potentialSource) =>
+                          potentialSource.codec === baseCodec &&
+                          !potentialSource.parameters &&
+                          potentialSource.executor === executor,
+                      ) ?? PgSource.fromCodec(executor, baseCodec);
+                    return source;
                   },
-                [columnName, pgSelectFromRecords, source],
+                [PgSource, baseCodec, pgSources],
               );
+              if (!column.codec.arrayOfCodec) {
+                // Single record from source
+                /*
+                 * TODO: if we refactor `PgSelectSinglePlan` we can probably
+                 * optimise this to do inline selection and still join against
+                 * the base table using e.g. `(table.column).attribute =
+                 * joined_thing.column`
+                 */
+                return EXPORTABLE(
+                  (columnName, getSource, pgSelectSingleFromRecord) =>
+                    ($record: PgSelectSinglePlan<any, any, any, any>) => {
+                      const $plan = $record.get(columnName);
+                      const $select = pgSelectSingleFromRecord(
+                        getSource($record),
+                        $plan,
+                      );
+                      return $select;
+                    },
+                  [columnName, getSource, pgSelectSingleFromRecord],
+                );
+              } else {
+                // Many records from source
+                /*
+                 * TODO: if we refactor `PgSelectSinglePlan` we can probably
+                 * optimise this to do inline selection and still join against
+                 * the base table using e.g. `(table.column).attribute =
+                 * joined_thing.column`
+                 */
+                return EXPORTABLE(
+                  (columnName, getSource, pgSelectFromRecords) =>
+                    ($record: PgSelectSinglePlan<any, any, any, any>) => {
+                      const $plan = $record.get(columnName);
+                      const $select = pgSelectFromRecords(
+                        getSource($record),
+                        $plan,
+                      );
+                      return $select;
+                    },
+                  [columnName, getSource, pgSelectFromRecords],
+                );
+              }
             }
           };
 
