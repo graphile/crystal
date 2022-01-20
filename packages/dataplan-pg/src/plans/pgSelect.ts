@@ -33,6 +33,7 @@ import {
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql, { arraysMatch } from "pg-sql2";
 
+import { listOfType } from "../codecs";
 import type {
   PgSource,
   PgSourceColumns,
@@ -150,7 +151,7 @@ type PgSelectIdentifierSpec =
 export type PgSelectArgumentSpec =
   | {
       plan: ExecutablePlan<any>;
-      pgCodec: PgTypeCodec<any, any, any>;
+      pgCodec: PgTypeCodec<any, any, any, any>;
       name?: string;
     }
   | {
@@ -2577,5 +2578,40 @@ Object.defineProperty(pgSelect, "$$export", {
   value: {
     moduleName: "@dataplan/pg",
     exportName: "pgSelect",
+  },
+});
+
+export function pgSelectFromRecords<
+  TColumns extends PgSourceColumns,
+  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TRelations extends {
+    [identifier: string]: TColumns extends PgSourceColumns
+      ? PgSourceRelation<TColumns, any>
+      : never;
+  },
+  TParameters extends PgSourceParameter[] | undefined = undefined,
+>(
+  source: PgSource<TColumns, TUniques, TRelations, TParameters>,
+  records: PgClassExpressionPlan<
+    undefined,
+    PgTypeCodec<undefined, any, any, PgTypeCodec<TColumns, any, any>>,
+    TColumns,
+    TUniques,
+    TRelations,
+    TParameters
+  >,
+): PgSelectPlan<TColumns, TUniques, TRelations, TParameters> {
+  return new PgSelectPlan<TColumns, TUniques, TRelations, TParameters>({
+    source,
+    identifiers: [],
+    from: (records) => sql`unnest(${records})`,
+    args: [{ plan: records, pgCodec: listOfType(source.codec) }],
+  }) as PgSelectPlan<TColumns, TUniques, TRelations, TParameters>;
+}
+
+Object.defineProperty(pgSelectFromRecords, "$$export", {
+  value: {
+    moduleName: "@dataplan/pg",
+    exportName: "pgSelectFromRecords",
   },
 });

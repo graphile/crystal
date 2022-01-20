@@ -34,7 +34,7 @@ const debugExecuteVerbose = debugExecute.extend("verbose");
  */
 export class PgClassExpressionPlan<
     TExpressionColumns extends PgSourceColumns | undefined,
-    TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any>,
+    TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any, any>,
     TSourceColumns extends PgSourceColumns | undefined,
     TUniques extends ReadonlyArray<ReadonlyArray<keyof TSourceColumns>>,
     TRelations extends {
