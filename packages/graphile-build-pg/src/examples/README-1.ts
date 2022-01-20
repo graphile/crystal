@@ -3,6 +3,8 @@
 import type { WithPgClient } from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import chalk from "chalk";
+import express from "express";
+import { graphqlHTTP } from "express-graphql";
 import { readFile } from "fs/promises";
 import {
   buildSchema,
@@ -16,8 +18,6 @@ import { resolvePresets } from "graphile-plugin";
 import { graphql, printSchema } from "graphql";
 import { Pool } from "pg";
 import { inspect } from "util";
-import express from "express";
-import { graphqlHTTP } from "express-graphql";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 
@@ -133,6 +133,11 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
       graphiql: true,
       context: contextValue,
       pretty: true,
+      customFormatErrorFn(e) {
+        return Object.assign(e, {
+          extensions: { stack: e.stack?.split("\n") },
+        });
+      },
     }),
   );
   app.listen(4000);
