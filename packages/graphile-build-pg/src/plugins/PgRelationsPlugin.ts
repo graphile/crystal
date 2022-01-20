@@ -1,4 +1,5 @@
 import "graphile-build";
+import "./PgTablesPlugin.js";
 
 import type {
   PgSelectSinglePlan,
@@ -9,7 +10,7 @@ import type {
 import { PgSourceBuilder } from "@dataplan/pg";
 import { connection } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
-import type { Plugin } from "graphile-plugin";
+import type { GatherHooks, Plugin, PluginGatherConfig } from "graphile-plugin";
 import type { GraphQLObjectType } from "graphql";
 import { GraphQLList } from "graphql";
 
@@ -42,10 +43,110 @@ declare global {
   }
 }
 
+declare module "graphile-plugin" {
+  interface GatherHelpers {
+    pgRelations: Record<string, never>;
+  }
+}
+
+interface State {}
+interface Cache {}
+
 export const PgRelationsPlugin: Plugin = {
   name: "PgRelationsPlugin",
   description: "Creates links between types representing PostgreSQL tables",
   version,
+  gather: <PluginGatherConfig<"pgRelations", State, Cache>>{
+    namespace: "pgRelations",
+    helpers: {},
+    initialState: (): State => ({}),
+    hooks: {
+      async "pgTables:PgSourceBuilder:relations"(
+        info,
+        { pgClass, databaseName, relations },
+      ) {
+        const constraints =
+          await info.helpers.pgIntrospection.getConstraintsForClass(
+            databaseName,
+            pgClass._id,
+          );
+        const foreignConstraints =
+          await info.helpers.pgIntrospection.getForeignConstraintsForClass(
+            databaseName,
+            pgClass._id,
+          );
+        const addRelation = async (
+          relationName: string,
+          localColumnNumbers: readonly number[],
+          foreignClassId: string,
+          foreignColumnNumbers: readonly number[],
+        ) => {
+          const localColumns = await Promise.all(
+            localColumnNumbers!.map((key) =>
+              info.helpers.pgIntrospection.getAttribute(
+                databaseName,
+                pgClass._id,
+                key,
+              ),
+            ),
+          );
+          const foreignClass = await info.helpers.pgIntrospection.getClass(
+            databaseName,
+            foreignClassId,
+          );
+          if (!foreignClass) {
+            throw new Error(`Could not find class with id '${foreignClassId}'`);
+          }
+          const foreignColumns = await Promise.all(
+            foreignColumnNumbers.map((key) =>
+              info.helpers.pgIntrospection.getAttribute(
+                databaseName,
+                foreignClass!._id,
+                key,
+              ),
+            ),
+          );
+          // TODO: isunique?
+          const isUnique = false;
+          const foreignSource = await info.helpers.pgTables.getSourceBuilder(
+            databaseName,
+            foreignClass,
+          );
+          if (!foreignSource) {
+            return;
+          }
+          relations[relationName] = {
+            localColumns: localColumns.map((c) => c!.attname),
+            remoteColumns: foreignColumns.map((c) => c!.attname),
+            source: foreignSource,
+            isUnique,
+            extensions: { tags: {} },
+          };
+        };
+
+        for (const constraint of constraints) {
+          if (constraint.contype === "f") {
+            addRelation(
+              constraint.conname,
+              constraint.conkey!,
+              constraint.confrelid!,
+              constraint.confkey!,
+            );
+          }
+        }
+        for (const constraint of foreignConstraints) {
+          if (constraint.contype === "f") {
+            addRelation(
+              constraint.conname,
+              constraint.confkey!,
+              constraint.conrelid!,
+              constraint.conkey!,
+            );
+          }
+        }
+      },
+    },
+  },
   schema: {
     hooks: {
       inflection(inflection, build) {

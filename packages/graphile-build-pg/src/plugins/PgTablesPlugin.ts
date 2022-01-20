@@ -87,7 +87,12 @@ type PgSourceRelations = {
 
 declare module "graphile-plugin" {
   interface GatherHelpers {
-    pgTables: Record<string, never>;
+    pgTables: {
+      getSourceBuilder(
+        databaseName: string,
+        pgClass: PgClass,
+      ): Promise<PgSourceBuilder<any, any, any> | null>;
+    };
   }
 
   interface GatherHooks {
@@ -110,9 +115,14 @@ declare module "graphile-plugin" {
 }
 
 interface State {
-  sources: PgSource<any, any, any>[];
+  sourceBuilderByPgClassByDatabase: Map<
+    string,
+    Map<PgClass, PgSourceBuilder<any, any, any>>
+  >;
 }
+interface Cache {}
 
+// TODO: rename to "PgClassesPlugin"? This coverse more than just tables.
 export const PgTablesPlugin: Plugin = {
   name: "PgTablesPlugin",
   description:
@@ -120,54 +130,58 @@ export const PgTablesPlugin: Plugin = {
   version: version,
   gather: {
     namespace: "pgTables",
-    helpers: {},
-    initialState: (): State => ({
-      sources: [],
-    }),
-    hooks: {
-      async "pgIntrospection:class"(
-        { state, helpers, process, options },
-        event,
-      ) {
-        const { entity: pgClass, databaseName } = event;
-
-        const database = options.pgDatabases.find(
+    helpers: {
+      async getSourceBuilder(info, databaseName, pgClass) {
+        let sourceBuilderByPgClass =
+          info.state.sourceBuilderByPgClassByDatabase.get(databaseName);
+        if (!sourceBuilderByPgClass) {
+          sourceBuilderByPgClass = new Map();
+          info.state.sourceBuilderByPgClassByDatabase.set(
+            databaseName,
+            sourceBuilderByPgClass,
+          );
+        }
+        let sourceBuilder = sourceBuilderByPgClass.get(pgClass);
+        if (sourceBuilder) {
+          return sourceBuilder;
+        }
+        const database = info.options.pgDatabases.find(
           (db) => db.name === databaseName,
         )!;
         const schemas = database.schemas;
 
-        const namespace = await helpers.pgIntrospection.getNamespace(
-          event.databaseName,
+        const namespace = await info.helpers.pgIntrospection.getNamespace(
+          databaseName,
           pgClass.relnamespace,
         );
         if (!namespace) {
-          return;
+          return null;
         }
 
         if (!schemas.includes(namespace.nspname)) {
-          return;
+          return null;
         }
 
         if (
           !["r", "v", "m", "p"].includes(pgClass.relkind) ||
           pgClass.relispartition
         ) {
-          return;
+          return null;
         }
 
-        const codec = await helpers.pgCodecs.getCodecFromClass(
+        const codec = await info.helpers.pgCodecs.getCodecFromClass(
           databaseName,
           pgClass._id,
         );
         if (!codec) {
-          return;
+          return null;
         }
 
         const executor =
-          helpers.pgIntrospection.getExecutorForDatabase(databaseName);
-        const name = `${event.databaseName}.${namespace.nspname}.${pgClass.relname}`;
+          info.helpers.pgIntrospection.getExecutorForDatabase(databaseName);
+        const name = `${databaseName}.${namespace.nspname}.${pgClass.relname}`;
 
-        const sourceBuilder = EXPORTABLE(
+        sourceBuilder = EXPORTABLE(
           (PgSourceBuilder, codec, executor, name) =>
             new PgSourceBuilder({
               executor,
@@ -182,28 +196,53 @@ export const PgTablesPlugin: Plugin = {
             }),
           [PgSourceBuilder, codec, executor, name],
         );
-        const relations: PgSourceRelations = {};
-        await process("pgTables:PgSourceBuilder:relations", {
-          sourceBuilder,
-          pgClass,
-          relations,
-          databaseName,
-        });
-        const source = EXPORTABLE(
-          (relations, sourceBuilder) => sourceBuilder.build({ relations }),
-          [relations, sourceBuilder],
-        );
-        await process("pgTables:PgSource", { source, pgClass, databaseName });
-        state.sources.push(source);
+        sourceBuilderByPgClass.set(pgClass, sourceBuilder);
       },
     },
+    initialState: () => ({
+      sourceBuilderByPgClassByDatabase: new Map(),
+    }),
+    hooks: {
+      async "pgIntrospection:class"({ helpers }, event) {
+        const { entity: pgClass, databaseName } = event;
+        helpers.pgTables.getSourceBuilder(databaseName, pgClass);
+      },
+    },
+
+    // TODO: do we need to assert the order this runs?
     async main(output, info) {
       if (!output.pgSources) {
         output.pgSources = [];
       }
-      output.pgSources!.push(...info.state.sources);
+      for (const [
+        databaseName,
+        sourceBuilderByPgClass,
+      ] of info.state.sourceBuilderByPgClassByDatabase.entries()) {
+        for (const [
+          pgClass,
+          sourceBuilder,
+        ] of sourceBuilderByPgClass.entries()) {
+          const relations: PgSourceRelations = {};
+          await info.process("pgTables:PgSourceBuilder:relations", {
+            sourceBuilder,
+            pgClass,
+            relations,
+            databaseName,
+          });
+          const source = EXPORTABLE(
+            (relations, sourceBuilder) => sourceBuilder.build({ relations }),
+            [relations, sourceBuilder],
+          );
+          await info.process("pgTables:PgSource", {
+            source,
+            pgClass,
+            databaseName,
+          });
+          output.pgSources!.push(source);
+        }
+      }
     },
-  } as PluginGatherConfig<"pgTables">,
+  } as PluginGatherConfig<"pgTables", State, Cache>,
 
   schema: {
     hooks: {
