@@ -2917,36 +2917,47 @@ export class Aether<
           }
         }
         if (pendingCrystalLayerObjects.length > 0) {
-          const pendingResults = await this.executeLayers(
-            crystalContext,
-            rest,
-            pendingCrystalLayerObjects,
-            rawMapResult,
-          );
-          if (isDev) {
-            assert.ok(
-              Array.isArray(pendingResults),
-              "Expected non-error plan execution to return an array",
+          try {
+            const pendingResults = await this.executeLayers(
+              crystalContext,
+              rest,
+              pendingCrystalLayerObjects,
+              rawMapResult,
             );
-            assert.strictEqual(
-              pendingResults.length,
-              pendingCrystalLayerObjects.length,
-              "Expected non-error plan execution result to have same length as input objects",
-            );
-          }
-          // Stitch the results back into the list
-          for (
-            let pendingResultIndex = 0, l = pendingResults.length;
-            pendingResultIndex < l;
-            pendingResultIndex++
-          ) {
-            const finalResultIndex = pendingIndexes[pendingResultIndex];
-            finalResult[finalResultIndex] =
-              pendingResults[pendingResultIndex] instanceof CrystalError
-                ? Promise.reject(
-                    pendingResults[pendingResultIndex].originalError,
-                  )
-                : pendingResults[pendingResultIndex];
+            if (isDev) {
+              assert.ok(
+                Array.isArray(pendingResults),
+                "Expected non-error plan execution to return an array",
+              );
+              assert.strictEqual(
+                pendingResults.length,
+                pendingCrystalLayerObjects.length,
+                "Expected non-error plan execution result to have same length as input objects",
+              );
+            }
+            // Stitch the results back into the list
+            for (
+              let pendingResultIndex = 0, l = pendingResults.length;
+              pendingResultIndex < l;
+              pendingResultIndex++
+            ) {
+              const finalResultIndex = pendingIndexes[pendingResultIndex];
+              finalResult[finalResultIndex] =
+                pendingResults[pendingResultIndex] instanceof CrystalError
+                  ? Promise.reject(
+                      pendingResults[pendingResultIndex].originalError,
+                    )
+                  : pendingResults[pendingResultIndex];
+            }
+          } catch (e) {
+            for (
+              let pendingResultIndex = 0, l = pendingCrystalLayerObjects.length;
+              pendingResultIndex < l;
+              pendingResultIndex++
+            ) {
+              const finalResultIndex = pendingIndexes[pendingResultIndex];
+              finalResult[finalResultIndex] = Promise.reject(e);
+            }
           }
         }
         return finalResult;
