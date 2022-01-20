@@ -170,6 +170,12 @@ export const PgTablesPlugin: Plugin = {
             return null;
           }
 
+          const attributes =
+            await info.helpers.pgIntrospection.getAttributesForClass(
+              databaseName,
+              pgClass._id,
+            );
+
           const codec = await info.helpers.pgCodecs.getCodecFromClass(
             databaseName,
             pgClass._id,
@@ -178,24 +184,40 @@ export const PgTablesPlugin: Plugin = {
             return null;
           }
 
+          const constraints =
+            await info.helpers.pgIntrospection.getConstraintsForClass(
+              databaseName,
+              pgClass._id,
+            );
+          const uniqueColumnOnlyConstraints = constraints.filter(
+            (c) =>
+              ["u", "p"].includes(c.contype) && c.conkey?.every((k) => k > 0),
+          );
+          const uniques = uniqueColumnOnlyConstraints.map((c) =>
+            c.conkey!.map(
+              (k) => attributes.find((att) => att.attnum === k)!.attname,
+            ),
+          );
+
           const executor =
             info.helpers.pgIntrospection.getExecutorForDatabase(databaseName);
           const name = `${databaseName}.${namespace.nspname}.${pgClass.relname}`;
 
           return EXPORTABLE(
-            (PgSourceBuilder, codec, executor, name) =>
+            (PgSourceBuilder, codec, executor, name, uniques) =>
               new PgSourceBuilder({
                 executor,
                 name,
                 source: codec.sqlType,
                 codec,
+                uniques,
                 extensions: {
                   tags: {
                     // TODO
                   },
                 },
               }),
-            [PgSourceBuilder, codec, executor, name],
+            [PgSourceBuilder, codec, executor, name, uniques],
           );
         })();
         sourceBuilderByPgClass.set(pgClass, sourceBuilder);
