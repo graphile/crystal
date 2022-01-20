@@ -110,10 +110,11 @@ declare module "graphile-plugin" {
         id: string,
       ): Promise<PgLanguage | undefined>;
 
-      // getAttribute(
-      //   databaseName: string,
-      //   id: string,
-      // ): Promise<PgAttribute | undefined>;
+      getAttribute(
+        databaseName: string,
+        classId: string,
+        attributeNumber: number,
+      ): Promise<PgAttribute | undefined>;
       // getAuthMembers(
       //   databaseName: string,
       //   id: string,
@@ -132,6 +133,14 @@ declare module "graphile-plugin" {
         databaseName: string,
         classId: string,
       ): Promise<PgAttribute[]>;
+      getConstraintsForClass(
+        databaseName: string,
+        classId: string,
+      ): Promise<PgConstraint[]>;
+      getForeignConstraintsForClass(
+        databaseName: string,
+        classId: string,
+      ): Promise<PgConstraint[]>;
       getNamespaceByName(
         databaseName: string,
         namespaceName: string,
@@ -362,18 +371,44 @@ export const PgIntrospectionPlugin: Plugin = {
       getLanguage: makeGetEntity("languages"),
 
       // TODO: we need getters for these
-      // getAttribute: makeGetEntity("attributes"),
       // getAuthMembers: makeGetEntity("authMembers"),
       // getRange: makeGetEntity("ranges"),
       // getDepend: makeGetEntity("depends"),
       // getDescription: makeGetEntity("descriptions"),
       //
+
+      async getAttribute(info, databaseName, classId, attributeNumber) {
+        // const pgClass = this.getClass(info, databaseName, classId);
+        const attributes = await this.getAttributesForClass(
+          info,
+          databaseName,
+          classId,
+        );
+        return attributes.find((attr) => attr.attnum === attributeNumber);
+      },
+
       async getAttributesForClass(info, databaseName, classId) {
         // const pgClass = this.getClass(info, databaseName, classId);
         const relevant = await getDb(info, databaseName);
         const list = relevant.introspection.attributes;
         // TODO: cache
         return list.filter((entity) => entity.attrelid === classId);
+      },
+
+      async getConstraintsForClass(info, databaseName, classId) {
+        // const pgClass = this.getClass(info, databaseName, classId);
+        const relevant = await getDb(info, databaseName);
+        const list = relevant.introspection.constraints;
+        // TODO: cache
+        return list.filter((entity) => entity.conrelid === classId);
+      },
+
+      async getForeignConstraintsForClass(info, databaseName, classId) {
+        // const pgClass = this.getClass(info, databaseName, classId);
+        const relevant = await getDb(info, databaseName);
+        const list = relevant.introspection.constraints;
+        // TODO: cache
+        return list.filter((entity) => entity.confrelid === classId);
       },
 
       async getNamespaceByName(info, databaseName, name) {
