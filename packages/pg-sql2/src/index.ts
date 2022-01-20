@@ -642,7 +642,13 @@ export const blank = makeRawNode(``, "blank");
  * to `sql.value`.
  */
 export function literal(val: string | number | boolean | null): SQL {
-  if (typeof val === "string" && val.match(/^[-a-zA-Z0-9_@!$ :]*$/)) {
+  if (typeof val === "string" && val.match(/^[-a-zA-Z0-9_@!$ :".]*$/)) {
+    // Examples of things we'd like to be included raw:
+    // - 1
+    // - myFieldName
+    // - @@myFieldName
+    // - $myField$
+    // - YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM
     return makeRawNode(`'${val}'`);
   } else if (typeof val === "number" && Number.isFinite(val)) {
     if (Number.isInteger(val)) {
