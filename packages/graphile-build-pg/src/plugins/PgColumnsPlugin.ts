@@ -169,7 +169,8 @@ export const PgColumnsPlugin: Plugin = {
             } else {
               const pgSources = build.input.pgSources;
               const getSource = EXPORTABLE(
-                (PgSource, baseCodec, pgSources) => ($record: PgSelectSinglePlan<any, any, any, any>) => {
+                (PgSource, baseCodec, pgSources) =>
+                  ($record: PgSelectSinglePlan<any, any, any, any>) => {
                     const executor = $record.source.executor;
                     const source =
                       pgSources.find(
@@ -198,6 +199,7 @@ export const PgColumnsPlugin: Plugin = {
                         getSource($record),
                         $plan,
                       );
+                      $select.getClassPlan().setTrusted();
                       return $select;
                     },
                   [columnName, getSource, pgSelectSingleFromRecord],
@@ -218,6 +220,7 @@ export const PgColumnsPlugin: Plugin = {
                         getSource($record),
                         $plan,
                       );
+                      $select.setTrusted();
                       return $select;
                     },
                   [columnName, getSource, pgSelectFromRecords],
