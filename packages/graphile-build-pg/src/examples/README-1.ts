@@ -11,6 +11,7 @@ import {
   defaultPreset as graphileBuildPreset,
   gather,
   QueryQueryPlugin,
+  SwallowErrorsPlugin,
 } from "graphile-build";
 import { crystalPrint } from "graphile-crystal";
 import { exportSchema } from "graphile-exporter";
@@ -45,7 +46,7 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
   const config = resolvePresets([
     {
       extends: [graphileBuildPreset, graphileBuildPgPreset],
-      plugins: [QueryQueryPlugin],
+      plugins: [QueryQueryPlugin, SwallowErrorsPlugin],
       gather: {
         pgDatabases: [
           {
