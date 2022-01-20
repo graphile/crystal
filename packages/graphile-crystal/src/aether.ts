@@ -418,8 +418,10 @@ export class Aether<
         }
       }
     } catch (e) {
+      // TODO: raise this somewhere critical
+      console.error(`Error occurred during query planning: \n${e.stack || e}`);
       this.logPlansByPath();
-      throw e;
+      throw new Error(`Failed to plan this query.`);
     }
 
     this.phase = "validate";
