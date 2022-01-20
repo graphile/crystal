@@ -328,6 +328,7 @@ declare global {
         base: Obj1,
         extra: Obj2,
         hint: string,
+        behaviourOnConflict?: "throw" | "recoverable",
       ) => Obj1 & Obj2;
 
       /**

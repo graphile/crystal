@@ -127,7 +127,18 @@ export default function makeNewBuild(
     },
     graphql,
 
-    extend,
+    extend(base, extra, hint, behaviorOnConflict = "throw") {
+      try {
+        return extend(base, extra, hint);
+      } catch (e) {
+        if (behaviorOnConflict === "recoverable") {
+          this.handleRecoverableError(e);
+          return base as any;
+        } else {
+          throw e;
+        }
+      }
+    },
     scopeByType,
     inflection: makeInitialInflection(),
     handleRecoverableError(e) {
