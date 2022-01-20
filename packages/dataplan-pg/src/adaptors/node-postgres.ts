@@ -19,7 +19,10 @@ export function makeNodePostgresWithPgClient(pool: Pool): WithPgClient {
             if (needsTx) {
               await this.startTransaction();
             }
-            const result = await pgClient.query<TData>(opts);
+            const queryObj = opts.arrayMode
+              ? { ...opts, rowMode: "array" }
+              : opts;
+            const result = await pgClient.query<TData>(queryObj);
 
             if (needsTx) {
               await this.commitTransaction();
