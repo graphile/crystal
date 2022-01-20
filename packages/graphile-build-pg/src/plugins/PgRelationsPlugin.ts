@@ -70,12 +70,6 @@ export const PgRelationsPlugin: Plugin = {
             databaseName,
             pgClass._id,
           );
-        const uniqueColumnOnlyConstraints = constraints.filter(
-          (c) => c.contype === "u" && c.conkey?.every((k) => k > 0),
-        );
-        const uniqueColumnNumberCombinations = uniqueColumnOnlyConstraints.map(
-          (c) => c.conkey!,
-        );
 
         const foreignConstraints =
           await info.helpers.pgIntrospection.getForeignConstraintsForClass(
@@ -143,13 +137,21 @@ export const PgRelationsPlugin: Plugin = {
         }
         for (const constraint of foreignConstraints) {
           if (constraint.contype === "f") {
-            // This relationship is unique if the LOCAL table has a unique
-            // constraint on the localColumns the relationship specifies (or a
-            // subset thereof).
-            const isUnique = uniqueColumnNumberCombinations.some(
-              (uniqueColumnNumbers) => {
-                return uniqueColumnNumbers.every((n) =>
-                  constraint.confkey!.includes(n),
+            // This relationship is unique if the REFERENCED table (not us!)
+            // has a unique constraint on the remoteColumns the relationship
+            // specifies (or a subset thereof).
+            const foreignUniqueColumnOnlyConstraints =
+              foreignConstraints.filter(
+                (c) =>
+                  ["u", "p"].includes(c.contype) &&
+                  c.conkey?.every((k) => k > 0),
+              );
+            const foreignUniqueColumnNumberCombinations =
+              foreignUniqueColumnOnlyConstraints.map((c) => c.conkey!);
+            const isUnique = foreignUniqueColumnNumberCombinations.some(
+              (foreignUniqueColumnNumbers) => {
+                return foreignUniqueColumnNumbers.every(
+                  (n) => n > 0 && constraint.confkey!.includes(n),
                 );
               },
             );
