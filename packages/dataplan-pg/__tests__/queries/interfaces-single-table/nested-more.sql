@@ -7,19 +7,19 @@ select
       __single_table_items__."type2"::text,
       __people_2."username",
       __single_table_items__."position"::text,
-      to_char(__single_table_items__."created_at", $1),
-      to_char(__single_table_items__."updated_at", $2),
+      to_char(__single_table_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'),
+      to_char(__single_table_items__."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'),
       __single_table_items__."is_explicitly_archived"::text,
-      to_char(__single_table_items__."archived_at", $3),
+      to_char(__single_table_items__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'),
       __single_table_items_2."parent_id"::text,
       __single_table_items_2."id"::text,
       __single_table_items_2."type2"::text,
       __people_3."username",
       __single_table_items_2."position"::text,
-      to_char(__single_table_items_2."created_at", $4),
-      to_char(__single_table_items_2."updated_at", $5),
+      to_char(__single_table_items_2."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'),
+      to_char(__single_table_items_2."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM'),
       __single_table_items_2."is_explicitly_archived"::text,
-      to_char(__single_table_items_2."archived_at", $6)
+      to_char(__single_table_items_2."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZHTZM')
     ]::text[]
     from interfaces_and_unions.single_table_items as __single_table_items_2
     left outer join interfaces_and_unions.single_table_items as __single_table_items__
