@@ -70,6 +70,13 @@ export const PgRelationsPlugin: Plugin = {
             databaseName,
             pgClass._id,
           );
+        const uniqueColumnOnlyConstraints = constraints.filter(
+          (c) => c.contype === "u" && c.conkey?.every((k) => k > 0),
+        );
+        const uniqueColumnNumberCombinations = uniqueColumnOnlyConstraints.map(
+          (c) => c.conkey!,
+        );
+
         const foreignConstraints =
           await info.helpers.pgIntrospection.getForeignConstraintsForClass(
             databaseName,
@@ -80,6 +87,7 @@ export const PgRelationsPlugin: Plugin = {
           localColumnNumbers: readonly number[],
           foreignClassId: string,
           foreignColumnNumbers: readonly number[],
+          isUnique: boolean,
         ) => {
           const localColumns = await Promise.all(
             localColumnNumbers!.map((key) =>
@@ -106,8 +114,6 @@ export const PgRelationsPlugin: Plugin = {
               ),
             ),
           );
-          // TODO: isunique?
-          const isUnique = false;
           const foreignSource = await info.helpers.pgTables.getSourceBuilder(
             databaseName,
             foreignClass,
@@ -131,16 +137,28 @@ export const PgRelationsPlugin: Plugin = {
               constraint.conkey!,
               constraint.confrelid!,
               constraint.confkey!,
+              true,
             );
           }
         }
         for (const constraint of foreignConstraints) {
           if (constraint.contype === "f") {
+            // This relationship is unique if the LOCAL table has a unique
+            // constraint on the localColumns the relationship specifies (or a
+            // subset thereof).
+            const isUnique = uniqueColumnNumberCombinations.some(
+              (uniqueColumnNumbers) => {
+                return uniqueColumnNumbers.every((n) =>
+                  constraint.confkey!.includes(n),
+                );
+              },
+            );
             addRelation(
               constraint.conname,
               constraint.confkey!,
               constraint.conrelid!,
               constraint.conkey!,
+              isUnique,
             );
           }
         }
