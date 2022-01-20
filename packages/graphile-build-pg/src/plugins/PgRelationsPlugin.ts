@@ -154,13 +154,31 @@ export const PgRelationsPlugin: Plugin = {
           inflection,
           {
             singleRelation(details) {
-              return this.camelCase(details.identifier);
+              // E.g. posts(author_id) references users(id)
+              const remoteType = this.tableType(details.relation.source.codec);
+              const localColumns = details.relation.localColumns;
+              return this.camelCase(
+                `${remoteType}-by-${localColumns.join("-and-")}`,
+              );
             },
             manyRelationConnection(details) {
-              return this.camelCase(details.identifier);
+              // E.g. users(id) references posts(author_id)
+              const remoteType = this.tableType(details.relation.source.codec);
+              const remoteColumns = details.relation.remoteColumns;
+              return this.camelCase(
+                `${this.pluralize(remoteType)}-by-${remoteColumns.join(
+                  "-and-",
+                )}`,
+              );
             },
             manyRelationList(details) {
-              return this.camelCase(details.identifier + "-list");
+              const remoteType = this.tableType(details.relation.source.codec);
+              const remoteColumns = details.relation.remoteColumns;
+              return this.camelCase(
+                `${this.pluralize(remoteType)}-by-${remoteColumns.join(
+                  "-and-",
+                )}-list`,
+              );
             },
           },
           "Adding inflectors from PgForwardRelationPlugin",
@@ -273,24 +291,28 @@ export const PgRelationsPlugin: Plugin = {
             if (isUnique && behavior.includes("single")) {
               const fieldName =
                 build.inflection.singleRelation(relationDetails);
-              fields = extend(
-                fields,
-                {
-                  [fieldName]: fieldWithHooks(
-                    {
-                      fieldName,
-                      isPgSingleRelationField: true,
-                      pgRelationDetails: relationDetails,
-                    },
-                    {
-                      // TODO: handle nullability
-                      type: OtherType as GraphQLObjectType,
-                      plan: singleRecordPlan,
-                    },
-                  ),
-                },
-                `Adding '${identifier}' single relation field to ${Self.name}`,
-              );
+              try {
+                fields = extend(
+                  fields,
+                  {
+                    [fieldName]: fieldWithHooks(
+                      {
+                        fieldName,
+                        isPgSingleRelationField: true,
+                        pgRelationDetails: relationDetails,
+                      },
+                      {
+                        // TODO: handle nullability
+                        type: OtherType as GraphQLObjectType,
+                        plan: singleRecordPlan,
+                      },
+                    ),
+                  },
+                  `Adding '${identifier}' single relation field to ${Self.name}`,
+                );
+              } catch (e) {
+                build.handleRecoverableError(e);
+              }
             }
 
             if (behavior.includes("connection")) {
@@ -301,24 +323,28 @@ export const PgRelationsPlugin: Plugin = {
               if (ConnectionType) {
                 const fieldName =
                   build.inflection.manyRelationConnection(relationDetails);
-                fields = extend(
-                  fields,
-                  {
-                    [fieldName]: fieldWithHooks(
-                      {
-                        fieldName,
-                        isPgManyRelationConnectionField: true,
-                        pgRelationDetails: relationDetails,
-                      },
-                      {
-                        // TODO: handle nullability
-                        type: ConnectionType as GraphQLObjectType,
-                        plan: connectionPlan,
-                      },
-                    ),
-                  },
-                  `Adding '${identifier}' many relation connection field to ${Self.name}`,
-                );
+                try {
+                  fields = extend(
+                    fields,
+                    {
+                      [fieldName]: fieldWithHooks(
+                        {
+                          fieldName,
+                          isPgManyRelationConnectionField: true,
+                          pgRelationDetails: relationDetails,
+                        },
+                        {
+                          // TODO: handle nullability
+                          type: ConnectionType as GraphQLObjectType,
+                          plan: connectionPlan,
+                        },
+                      ),
+                    },
+                    `Adding '${identifier}' many relation connection field to ${Self.name}`,
+                  );
+                } catch (e) {
+                  build.handleRecoverableError(e);
+                }
               }
             }
 
