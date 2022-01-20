@@ -437,7 +437,7 @@ export interface PgConstraint {
   conname: PgName;
 
   /** The OID of the namespace that contains this constraint */
-  connamespace: PgOid | null;
+  connamespace: PgOid;
 
   /**
    * - c = check constraint,
@@ -447,7 +447,7 @@ export interface PgConstraint {
    * - t = constraint trigger,
    * - x = exclusion constraint
    */
-  contype: string | null;
+  contype: string;
 
   /** Is the constraint deferrable? */
   condeferrable: boolean | null;
