@@ -54,8 +54,16 @@ export const PgTypesPlugin: Plugin = {
             getOutputTypeByName,
           } = build;
 
+          const doConnection = (name: string) => {
+            build.registerCursorConnection?.({
+              typeName: inflection.builtin(name),
+              nonNullNode: !build.options.pgForbidSetofFunctionsToReturnNull,
+            });
+          };
+
           // Time is a weird type; we only really want it for Postgres (which is
           // why it's not global).
+
           build.registerScalarType(
             inflection.builtin("Time"),
             {},
@@ -68,8 +76,10 @@ export const PgTypesPlugin: Plugin = {
               ),
             "graphile-build-pg built-in (Time)",
           );
+          doConnection("Time");
 
           // A bunch more postgres-specific types
+
           build.registerScalarType(
             inflection.builtin("BitString"),
             {},
@@ -82,6 +92,8 @@ export const PgTypesPlugin: Plugin = {
               ),
             "graphile-build-pg built-in (BitString)",
           );
+          doConnection("BitString");
+
           build.registerScalarType(
             inflection.builtin("InternetAddress"),
             {},
@@ -94,6 +106,8 @@ export const PgTypesPlugin: Plugin = {
               ),
             "graphile-build-pg built-in (InternetAddress)",
           );
+          doConnection("InternetAddress");
+
           build.registerScalarType(
             inflection.builtin("RegProc"),
             {},
@@ -106,6 +120,8 @@ export const PgTypesPlugin: Plugin = {
               ),
             "graphile-build-pg built-in (RegProc)",
           );
+          doConnection("RegProc");
+
           build.registerScalarType(
             inflection.builtin("RegProcedure"),
             {},
@@ -118,6 +134,8 @@ export const PgTypesPlugin: Plugin = {
               ),
             "graphile-build-pg built-in (RegProcedure)",
           );
+          doConnection("RegProcedure");
+
           build.registerScalarType(
             inflection.builtin("RegOper"),
             {},
@@ -130,6 +148,8 @@ export const PgTypesPlugin: Plugin = {
               ),
             "graphile-build-pg built-in (RegOper)",
           );
+          doConnection("RegOper");
+
           build.registerScalarType(
             inflection.builtin("RegOperator"),
             {},
@@ -142,6 +162,8 @@ export const PgTypesPlugin: Plugin = {
               ),
             "graphile-build-pg built-in (RegOperator)",
           );
+          doConnection("RegOperator");
+
           build.registerScalarType(
             inflection.builtin("RegClass"),
             {},
@@ -154,6 +176,8 @@ export const PgTypesPlugin: Plugin = {
               ),
             "graphile-build-pg built-in (RegClass)",
           );
+          doConnection("RegClass");
+
           build.registerScalarType(
             inflection.builtin("RegType"),
             {},
@@ -166,6 +190,8 @@ export const PgTypesPlugin: Plugin = {
               ),
             "graphile-build-pg built-in (RegType)",
           );
+          doConnection("RegType");
+
           build.registerScalarType(
             inflection.builtin("RegRole"),
             {},
@@ -178,6 +204,8 @@ export const PgTypesPlugin: Plugin = {
               ),
             "graphile-build-pg built-in (RegRole)",
           );
+          doConnection("RegRole");
+
           build.registerScalarType(
             inflection.builtin("RegNamespace"),
             {},
@@ -190,6 +218,8 @@ export const PgTypesPlugin: Plugin = {
               ),
             "graphile-build-pg built-in (RegNamespace)",
           );
+          doConnection("RegNamespace");
+
           build.registerScalarType(
             inflection.builtin("RegConfig"),
             {},
@@ -202,6 +232,8 @@ export const PgTypesPlugin: Plugin = {
               ),
             "graphile-build-pg built-in (RegConfig)",
           );
+          doConnection("RegConfig");
+
           build.registerScalarType(
             inflection.builtin("RegDictionary"),
             {},
@@ -214,6 +246,7 @@ export const PgTypesPlugin: Plugin = {
               ),
             "graphile-build-pg built-in (RegDictionary)",
           );
+          doConnection("RegDictionary");
           if (pgUseCustomNetworkScalars !== false) {
             build.registerScalarType(
               inflection.builtin("CidrAddress"),
@@ -227,6 +260,8 @@ export const PgTypesPlugin: Plugin = {
                 ),
               "graphile-build-pg built-in (CidrAddress)",
             );
+            doConnection("CidrAddress");
+
             build.registerScalarType(
               inflection.builtin("MacAddress"),
               {},
@@ -236,6 +271,8 @@ export const PgTypesPlugin: Plugin = {
                 ),
               "graphile-build-pg built-in (MacAddress)",
             );
+            doConnection("MacAddress");
+
             build.registerScalarType(
               inflection.builtin("MacAddress8"),
               {},
@@ -245,6 +282,7 @@ export const PgTypesPlugin: Plugin = {
                 ),
               "graphile-build-pg built-in (MacAddress8)",
             );
+            doConnection("MacAddress8");
           }
           const makeIntervalFields = () => {
             return {
@@ -306,6 +344,8 @@ export const PgTypesPlugin: Plugin = {
             }),
             "graphile-build-pg built-in (Interval)",
           );
+          doConnection("Interval");
+
           build.registerInputObjectType(
             inflection.inputType(inflection.builtin("Interval")),
             { isPgIntervalInputType: true },
@@ -335,6 +375,7 @@ export const PgTypesPlugin: Plugin = {
               }),
               `graphile-build-pg built-in (${typeName})`,
             );
+            doConnection(typeName);
             build.registerInputObjectType(
               inflection.inputType(inflection.builtin(typeName)),
               { [`isPg${typeName}InputType`]: true },
@@ -623,6 +664,7 @@ export const PgTypesPlugin: Plugin = {
               }),
               "graphile-build-pg built-in (KeyValueStore)",
             );
+            doConnection("KeyValueHash");
           }
 
           return _;

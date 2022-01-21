@@ -670,6 +670,10 @@ export const PgCodecsPlugin: Plugin = {
                 }),
                 "PgCodecsPlugin",
               );
+              build.registerCursorConnection?.({
+                typeName,
+                nonNullNode: !build.options.pgForbidSetofFunctionsToReturnNull,
+              });
               build.setGraphQLTypeForPgCodec(
                 codec,
                 ["input", "output"],
@@ -812,6 +816,12 @@ export const PgCodecsPlugin: Plugin = {
                   }),
                   "PgCodecsPlugin enum range output",
                 );
+                // TODO: should we remove this?
+                build.registerCursorConnection?.({
+                  typeName: rangeTypeName,
+                  nonNullNode:
+                    !build.options.pgForbidSetofFunctionsToReturnNull,
+                });
                 build.registerInputObjectType(
                   rangeInputTypeName,
                   {
@@ -869,6 +879,11 @@ export const PgCodecsPlugin: Plugin = {
                         copy(underlyingOutputTypeName),
                         "PgCodecsPlugin",
                       );
+                      build.registerCursorConnection?.({
+                        typeName,
+                        nonNullNode:
+                          !build.options.pgForbidSetofFunctionsToReturnNull,
+                      });
                       break;
                     }
                     case GraphQLEnumType: {
@@ -878,6 +893,11 @@ export const PgCodecsPlugin: Plugin = {
                         copy(underlyingOutputTypeName),
                         "PgCodecsPlugin",
                       );
+                      build.registerCursorConnection?.({
+                        typeName,
+                        nonNullNode:
+                          !build.options.pgForbidSetofFunctionsToReturnNull,
+                      });
                       break;
                     }
                     case GraphQLObjectType: {
@@ -887,6 +907,11 @@ export const PgCodecsPlugin: Plugin = {
                         copy(underlyingOutputTypeName),
                         "PgCodecsPlugin",
                       );
+                      build.registerCursorConnection?.({
+                        typeName,
+                        nonNullNode:
+                          !build.options.pgForbidSetofFunctionsToReturnNull,
+                      });
                       break;
                     }
                     default: {
