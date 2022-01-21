@@ -109,6 +109,9 @@ export const PgAllRowsPlugin: Plugin = {
           return fields;
         }
         for (const source of build.input.pgSources) {
+          if (!source.find) {
+            continue;
+          }
           const type = build.getTypeByName(
             build.inflection.tableType(source.codec),
           );
