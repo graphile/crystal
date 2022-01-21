@@ -1,7 +1,7 @@
 import "graphile-build";
 
 import type { PgSource, PgSourceRelation, PgTypeCodec } from "@dataplan/pg";
-import { PgSelectSinglePlan, PgSourceBuilder } from "@dataplan/pg";
+import { PgSourceBuilder } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
 import sql from "pg-sql2";
@@ -339,7 +339,6 @@ export const PgTablesPlugin: Plugin = {
                 isPgRowConnectionType: true,
                 pgCodec: codec,
               },
-              IntermediatePlan: PgSelectSinglePlan,
               nonNullNode: !pgForbidSetofFunctionsToReturnNull,
             });
           }

@@ -1,18 +1,22 @@
-import type { EdgePlan, PageInfoCapablePlan } from "graphile-crystal";
-import { ConnectionPlan, each, ExecutablePlan } from "graphile-crystal";
+import type { PageInfoCapablePlan } from "graphile-crystal";
+import {
+  ConnectionPlan,
+  each,
+  EdgePlan,
+  ExecutablePlan,
+} from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLOutputType } from "graphql";
 
 import { version } from "../index.js";
-interface RegisterCursorConnectionOptions<
-  TIntermediatePlan extends ExecutablePlan<any>,
-> {
+
+interface RegisterCursorConnectionOptions {
   typeName: string;
   scope?: GraphileEngine.ScopeGraphQLObjectType;
-  IntermediatePlan?: { new (...args: any[]): TIntermediatePlan };
   nonNullNode?: boolean;
 }
+
 declare global {
   namespace GraphileEngine {
     interface ScopeGraphQLObjectType {
@@ -25,9 +29,7 @@ declare global {
       isPageInfoHasPreviousPageField?: boolean;
     }
     interface Build {
-      registerCursorConnection<TIntermediatePlan extends ExecutablePlan<any>>(
-        options: RegisterCursorConnectionOptions<TIntermediatePlan>,
-      ): void;
+      registerCursorConnection(options: RegisterCursorConnectionOptions): void;
     }
   }
 }
@@ -44,15 +46,8 @@ export const ConnectionPlugin: Plugin = {
         return build.extend(
           build,
           {
-            registerCursorConnection<
-              TIntermediatePlan extends ExecutablePlan<any>,
-            >(options: RegisterCursorConnectionOptions<TIntermediatePlan>) {
-              const {
-                typeName,
-                scope = {},
-                IntermediatePlan = ExecutablePlan as any,
-                nonNullNode = false,
-              } = options;
+            registerCursorConnection(options: RegisterCursorConnectionOptions) {
+              const { typeName, scope = {}, nonNullNode = false } = options;
               const edgeTypeName = build.inflection.edgeType(typeName);
               build.registerObjectType(
                 edgeTypeName,
@@ -60,7 +55,7 @@ export const ConnectionPlugin: Plugin = {
                   ...scope,
                   isConnectionEdgeType: true,
                 },
-                IntermediatePlan as any,
+                EdgePlan,
                 () => ({
                   description: build.wrapDescription(
                     `A \`${typeName}\` edge in the connection.`,
