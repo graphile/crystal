@@ -3,13 +3,14 @@ import "./interfaces";
 import type { Preset } from "graphile-plugin";
 
 import {
+  BuiltinScalarConnectionsPlugin,
   ClientMutationIdDescriptionPlugin,
   CommonTypesPlugin,
+  ConnectionPlugin,
   CursorTypePlugin,
   MutationPayloadQueryPlugin,
   MutationPlugin,
   PageInfoStartEndCursorPlugin,
-  ConnectionPlugin,
   QueryPlugin,
   SubscriptionPlugin,
 } from "./plugins/index.js";
@@ -25,5 +26,6 @@ export const defaultPreset: Preset = {
     CommonTypesPlugin,
     ConnectionPlugin,
     PageInfoStartEndCursorPlugin,
+    BuiltinScalarConnectionsPlugin,
   ],
 };
