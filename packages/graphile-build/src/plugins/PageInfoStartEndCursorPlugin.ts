@@ -1,4 +1,4 @@
-import { PageInfoCapablePlan } from "graphile-crystal";
+import type { PageInfoCapablePlan } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 
