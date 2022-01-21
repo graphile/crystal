@@ -254,7 +254,7 @@ export class PgSelectPlan<
   extends ExecutablePlan<ReadonlyArray<PgSourceRow<TColumns>>>
   implements
     StreamablePlan<PgSourceRow<TColumns>>,
-    ConnectionCapablePlan<PgSourceRow<TColumns>>
+    ConnectionCapablePlan<PgSelectSinglePlan<TColumns, any, any, any>>
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -1085,7 +1085,9 @@ export class PgSelectPlan<
     this.addCursorPlan("before", $cursorPlan);
   }
 
-  public pageInfo($connectionPlan: ConnectionPlan<this>): PgPageInfoPlan<this> {
+  public pageInfo(
+    $connectionPlan: ConnectionPlan<any, this, any>,
+  ): PgPageInfoPlan<this> {
     this.assertCursorPaginationAllowed();
     this.lock();
     return pgPageInfo($connectionPlan);

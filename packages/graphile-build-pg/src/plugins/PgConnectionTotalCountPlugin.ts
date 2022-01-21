@@ -1,7 +1,7 @@
 import "./PgTablesPlugin";
 import "./PgBasicsPlugin";
 
-import type { PgSelectPlan } from "@dataplan/pg";
+import type { PgSelectPlan, PgSelectSinglePlan } from "@dataplan/pg";
 import { TYPES } from "@dataplan/pg";
 import type { ConnectionPlan } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
@@ -61,7 +61,9 @@ export const PgConnectionTotalCountPlugin: Plugin = {
                     (TYPES, sql) =>
                       (
                         $connection: ConnectionPlan<
-                          PgSelectPlan<any, any, any, any>
+                          PgSelectSinglePlan<any, any, any, any>,
+                          PgSelectPlan<any, any, any, any>,
+                          PgSelectSinglePlan<any, any, any, any>
                         >,
                       ) =>
                         $connection

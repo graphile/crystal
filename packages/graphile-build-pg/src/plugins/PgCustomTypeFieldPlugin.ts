@@ -221,7 +221,12 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                               $row,
                               args,
                             ) as PgSelectPlan<any, any, any, any>;
-                            return connection($select);
+                            return connection(
+                              $select,
+                              ($item) => $item,
+                              ($item: PgSelectSinglePlan<any, any, any, any>) =>
+                                $item.cursor(),
+                            );
                           },
                         [connection, getSelectPlanFromRowAndArgs],
                       ),

@@ -12,6 +12,7 @@ import type {
   InputObjectPlan,
   InputStaticLeafPlan,
 } from "graphile-crystal";
+import { connection } from "graphile-crystal";
 import {
   __ListTransformPlan,
   __ValuePlan,
@@ -183,7 +184,19 @@ export function makeExampleSchema(
   type PgConnectionPlanFromSource<
     TSource extends PgSource<any, any, any, any>,
   > = ConnectionPlan<
+    PgSelectSinglePlan<
+      TSource["TColumns"],
+      TSource["TUniques"],
+      TSource["TRelations"],
+      TSource["TParameters"]
+    >,
     PgSelectPlan<
+      TSource["TColumns"],
+      TSource["TUniques"],
+      TSource["TRelations"],
+      TSource["TParameters"]
+    >,
+    PgSelectSinglePlan<
       TSource["TColumns"],
       TSource["TUniques"],
       TSource["TRelations"],
@@ -2460,7 +2473,7 @@ export function makeExampleSchema(
           >(($connection) => $connection.getSubplan()),
         },
         plan: EXPORTABLE(
-          (ConnectionPlan, deoptimizeIfAppropriate, messageSource) =>
+          (connection, deoptimizeIfAppropriate, messageSource) =>
             function plan($forum) {
               const $messages = messageSource.find({
                 forum_id: $forum.get("id"),
@@ -2471,13 +2484,18 @@ export function makeExampleSchema(
               // $messages.innerJoin(...);
               // $messages.relation('fk_messages_author_id')
               // $messages.where(...);
-              const $connectionPlan = new ConnectionPlan($messages);
+              const $connectionPlan = connection(
+                $messages,
+                ($item) => $item,
+                ($item: PgSelectSinglePlan<any, any, any, any>) =>
+                  $item.cursor(),
+              );
               // $connectionPlan.orderBy... ?
               // DEFINITELY NOT $messages.orderBy BECAUSE we don't want that applied to aggregates.
               // DEFINITELY NOT $messages.limit BECAUSE we don't want those limits applied to aggregates or page info.
               return $connectionPlan;
             },
-          [ConnectionPlan, deoptimizeIfAppropriate, messageSource],
+          [connection, deoptimizeIfAppropriate, messageSource],
         ),
       },
       uniqueAuthorCount: {
@@ -3504,7 +3522,7 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (ConnectionPlan, deoptimizeIfAppropriate, messageSource) =>
+          (connection, deoptimizeIfAppropriate, messageSource) =>
             function plan() {
               const $messages = messageSource.find();
               deoptimizeIfAppropriate($messages);
@@ -3512,13 +3530,18 @@ export function makeExampleSchema(
               // $messages.innerJoin(...);
               // $messages.relation('fk_messages_author_id')
               // $messages.where(...);
-              const $connectionPlan = new ConnectionPlan($messages);
+              const $connectionPlan = connection(
+                $messages,
+                ($item) => $item,
+                ($item: PgSelectSinglePlan<any, any, any, any>) =>
+                  $item.cursor(),
+              );
               // $connectionPlan.orderBy... ?
               // DEFINITELY NOT $messages.orderBy BECAUSE we don't want that applied to aggregates.
               // DEFINITELY NOT $messages.limit BECAUSE we don't want those limits applied to aggregates or page info.
               return $connectionPlan;
             },
-          [ConnectionPlan, deoptimizeIfAppropriate, messageSource],
+          [connection, deoptimizeIfAppropriate, messageSource],
         ),
       },
 

@@ -339,15 +339,6 @@ export const PgTablesPlugin: Plugin = {
                 isPgRowConnectionType: true,
                 pgCodec: codec,
               },
-              cursorPlan: EXPORTABLE(
-                () =>
-                  function plan(
-                    $record: PgSelectSinglePlan<any, any, any, any>,
-                  ) {
-                    return $record.cursor();
-                  },
-                [],
-              ),
               IntermediatePlan: PgSelectSinglePlan,
               nonNullNode: !pgForbidSetofFunctionsToReturnNull,
             });

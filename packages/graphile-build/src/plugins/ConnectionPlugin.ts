@@ -1,22 +1,16 @@
-import type { PageInfoCapablePlan } from "graphile-crystal";
-import { each, ExecutablePlanResolver } from "graphile-crystal";
-import { ConnectionPlan, ExecutablePlan } from "graphile-crystal";
+import type { EdgePlan, PageInfoCapablePlan } from "graphile-crystal";
+import { ConnectionPlan, each, ExecutablePlan } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLOutputType } from "graphql";
 
 import { version } from "../index.js";
 interface RegisterCursorConnectionOptions<
-  TItemPlan extends ExecutablePlan<any>,
   TIntermediatePlan extends ExecutablePlan<any>,
 > {
   typeName: string;
   scope?: GraphileEngine.ScopeGraphQLObjectType;
-  itemPlan?: ($intermediate: TIntermediatePlan) => TItemPlan;
-  cursorPlan: (
-    $intermediate: TIntermediatePlan,
-  ) => ExecutablePlan<string | null>;
-  IntermediatePlan: { new (...args: any[]): TIntermediatePlan };
+  IntermediatePlan?: { new (...args: any[]): TIntermediatePlan };
   nonNullNode?: boolean;
 }
 declare global {
@@ -31,11 +25,8 @@ declare global {
       isPageInfoHasPreviousPageField?: boolean;
     }
     interface Build {
-      registerCursorConnection<
-        TItemPlan extends ExecutablePlan<any>,
-        TIntermediatePlan extends ExecutablePlan<any>,
-      >(
-        options: RegisterCursorConnectionOptions<TItemPlan, TIntermediatePlan>,
+      registerCursorConnection<TIntermediatePlan extends ExecutablePlan<any>>(
+        options: RegisterCursorConnectionOptions<TIntermediatePlan>,
       ): void;
     }
   }
@@ -54,21 +45,12 @@ export const ConnectionPlugin: Plugin = {
           build,
           {
             registerCursorConnection<
-              TItemPlan extends ExecutablePlan<any>,
               TIntermediatePlan extends ExecutablePlan<any>,
-            >(
-              options: RegisterCursorConnectionOptions<
-                TItemPlan,
-                TIntermediatePlan
-              >,
-            ) {
+            >(options: RegisterCursorConnectionOptions<TIntermediatePlan>) {
               const {
                 typeName,
                 scope = {},
-                itemPlan = ($item: TIntermediatePlan) =>
-                  $item as unknown as TItemPlan,
-                cursorPlan,
-                IntermediatePlan,
+                IntermediatePlan = ExecutablePlan as any,
                 nonNullNode = false,
               } = options;
               const edgeTypeName = build.inflection.edgeType(typeName);
@@ -102,7 +84,11 @@ export const ConnectionPlugin: Plugin = {
                             "field",
                           ),
                           type: Cursor,
-                          plan: cursorPlan as any,
+                          plan: EXPORTABLE(
+                            () => ($edge: EdgePlan<any, any, any>) =>
+                              $edge.cursor(),
+                            [],
+                          ),
                         }),
                       ),
                       node: fieldWithHooks(
@@ -116,12 +102,10 @@ export const ConnectionPlugin: Plugin = {
                           ),
                           type: nullableIf(!nonNullNode, NodeType),
                           plan: EXPORTABLE(
-                            (itemPlan) =>
-                              function plan($record: TIntermediatePlan) {
-                                return itemPlan($record);
-                              },
-                            [itemPlan],
-                          ) as any,
+                            () => ($edge: EdgePlan<any, any, any>) =>
+                              $edge.node(),
+                            [],
+                          ),
                         }),
                       ),
                     };
@@ -133,7 +117,7 @@ export const ConnectionPlugin: Plugin = {
               // Register connection
               const connectionTypeName =
                 build.inflection.connectionType(typeName);
-              build.registerObjectType<ConnectionPlan<any>>(
+              build.registerObjectType<ConnectionPlan<any, any, any>>(
                 connectionTypeName,
                 {
                   ...scope,
@@ -169,14 +153,17 @@ export const ConnectionPlugin: Plugin = {
                             ),
                           ),
                           plan: EXPORTABLE(
-                            (each, itemPlan) =>
-                              function plan($connection: ConnectionPlan<any>) {
+                            (each) =>
+                              function plan(
+                                $connection: ConnectionPlan<any, any, any>,
+                              ) {
                                 return each(
                                   $connection.cloneSubplanWithPagination(),
-                                  itemPlan,
+                                  ($intermediate) =>
+                                    $connection.itemPlan($intermediate),
                                 );
                               },
-                            [each, itemPlan],
+                            [each],
                           ) as any,
                         }),
                       ),
@@ -195,12 +182,18 @@ export const ConnectionPlugin: Plugin = {
                             ),
                           ),
                           plan: EXPORTABLE(
-                            () =>
-                              function plan($connection: ConnectionPlan<any>) {
-                                return $connection.cloneSubplanWithPagination();
+                            (each) =>
+                              function plan(
+                                $connection: ConnectionPlan<any, any, any>,
+                              ) {
+                                return each(
+                                  $connection.cloneSubplanWithPagination(),
+                                  ($intermediate) =>
+                                    $connection.wrapEdge($intermediate),
+                                );
                               },
-                            [],
-                          ),
+                            [each],
+                          ) as any,
                         }),
                       ),
                       pageInfo: fieldWithHooks(
@@ -215,7 +208,9 @@ export const ConnectionPlugin: Plugin = {
                           type: new build.graphql.GraphQLNonNull(PageInfo),
                           plan: EXPORTABLE(
                             () =>
-                              function plan($connection: ConnectionPlan<any>) {
+                              function plan(
+                                $connection: ConnectionPlan<any, any, any>,
+                              ) {
                                 // TODO: why is this a TypeScript issue without the 'any'?
                                 return $connection.pageInfo() as any;
                               },

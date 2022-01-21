@@ -305,7 +305,12 @@ export const PgRelationsPlugin: Plugin = {
                     },
                     {},
                   );
-                  return connection(otherSource.find(spec));
+                  return connection(
+                    otherSource.find(spec),
+                    ($item) => $item,
+                    ($item: PgSelectSinglePlan<any, any, any, any>) =>
+                      $item.cursor(),
+                  );
                 },
               [connection, localColumns, otherSource, remoteColumns],
             );

@@ -33,7 +33,7 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
 
   private connectionPlanId: number;
 
-  constructor(connectionPlan: ConnectionPlan<TPlan>) {
+  constructor(connectionPlan: ConnectionPlan<any, TPlan, any>) {
     super();
     this.connectionPlanId = connectionPlan.id;
   }
@@ -43,14 +43,14 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
    *
    * @internal
    */
-  public getConnectionPlan(): ConnectionPlan<TPlan> {
+  public getConnectionPlan(): ConnectionPlan<any, TPlan, any> {
     const plan = this.getPlan(this.connectionPlanId);
     if (!(plan instanceof ConnectionPlan)) {
       throw new Error(
         `Expected ${this.connectionPlanId} (${plan}) to be a ConnectionPlan`,
       );
     }
-    return plan as ConnectionPlan<TPlan>;
+    return plan as ConnectionPlan<any, TPlan, any>;
   }
 
   /**
@@ -73,7 +73,11 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
     const lastExists = last && !last.evalIs(null) && !last.evalIs(undefined);
     if (firstExists && !lastExists) {
       const nodePlan = (
-        $connection as ConnectionPlan<PgSelectPlan<any, any, any, any>>
+        $connection as ConnectionPlan<
+          any,
+          PgSelectPlan<any, any, any, any>,
+          any
+        >
       ).cloneSubplanWithPagination();
       return nodePlan.hasMore();
     } else {
@@ -101,7 +105,11 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
     const lastExists = last && !last.evalIs(null) && !last.evalIs(undefined);
     if (lastExists && !firstExists) {
       const nodePlan = (
-        $connection as ConnectionPlan<PgSelectPlan<any, any, any, any>>
+        $connection as ConnectionPlan<
+          PgSelectSinglePlan<any, any, any, any>,
+          PgSelectPlan<any, any, any, any>,
+          PgSelectSinglePlan<any, any, any, any>
+        >
       ).cloneSubplanWithPagination();
       return nodePlan.hasMore();
     } else {
@@ -111,7 +119,9 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
 
   startCursor(): PgCursorPlan<PgSelectSinglePlan<any, any, any, any>> {
     const $connection = this.getConnectionPlan() as ConnectionPlan<
-      PgSelectPlan<any, any, any, any>
+      PgSelectSinglePlan<any, any, any, any>,
+      PgSelectPlan<any, any, any, any>,
+      PgSelectSinglePlan<any, any, any, any>
     >;
     const $rows = $connection.cloneSubplanWithPagination();
     return new PgSelectSinglePlan($rows, first($rows)).cursor();
@@ -119,7 +129,9 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
 
   endCursor(): PgCursorPlan<PgSelectSinglePlan<any, any, any, any>> {
     const $connection = this.getConnectionPlan() as ConnectionPlan<
-      PgSelectPlan<any, any, any, any>
+      PgSelectSinglePlan<any, any, any, any>,
+      PgSelectPlan<any, any, any, any>,
+      PgSelectSinglePlan<any, any, any, any>
     >;
     const $rows = $connection.cloneSubplanWithPagination();
     return new PgSelectSinglePlan($rows, last($rows)).cursor();
@@ -133,7 +145,7 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
 }
 
 export function pgPageInfo<TPlan extends PgSelectPlan<any, any, any, any>>(
-  connectionPlan: ConnectionPlan<TPlan>,
+  connectionPlan: ConnectionPlan<any, TPlan, any>,
 ): PgPageInfoPlan<TPlan> {
   return new PgPageInfoPlan(connectionPlan);
 }

@@ -9,10 +9,18 @@ export interface PageInfoCapablePlan extends ExecutablePlan<any> {
   endCursor(): ExecutablePlan<string | null>;
 }
 
-export interface ConnectionCapablePlan<T = any>
-  extends ExecutablePlan<ReadonlyArray<T>> {
-  clone(...args: any[]): ConnectionCapablePlan<any>; // TODO: `this`
-  pageInfo($connectionPlan: ConnectionPlan<any>): PageInfoCapablePlan;
+export interface ConnectionCapablePlan<TItemPlan extends ExecutablePlan<any>>
+  extends ExecutablePlan<
+    ReadonlyArray<TItemPlan extends ExecutablePlan<infer U> ? U : any>
+  > {
+  clone(...args: any[]): ConnectionCapablePlan<TItemPlan>; // TODO: `this`
+  pageInfo(
+    $connectionPlan: ConnectionPlan<
+      TItemPlan,
+      ConnectionCapablePlan<TItemPlan>,
+      any
+    >,
+  ): PageInfoCapablePlan;
   setFirst($plan: InputPlan): void;
   setLast($plan: InputPlan): void;
   setOffset($plan: InputPlan): void;
@@ -20,8 +28,12 @@ export interface ConnectionCapablePlan<T = any>
   setAfter($plan: InputPlan): void;
 }
 
+const EMPTY_OBJECT = Object.freeze(Object.create(null));
+
 export class ConnectionPlan<
-  TPlan extends ConnectionCapablePlan,
+  TItemPlan extends ExecutablePlan<any>,
+  TPlan extends ConnectionCapablePlan<TItemPlan>,
+  TNodePlan extends ExecutablePlan<any> = ExecutablePlan<any>,
 > extends ExecutablePlan<unknown> {
   static $$export = {
     moduleName: "graphile-crystal",
@@ -37,7 +49,13 @@ export class ConnectionPlan<
   private _beforeId: number | null = null;
   private _afterId: number | null = null;
 
-  constructor(subplan: TPlan) {
+  constructor(
+    subplan: TPlan,
+    public readonly itemPlan: ($item: TItemPlan) => TNodePlan,
+    public readonly cursorPlan: (
+      $item: TItemPlan,
+    ) => ExecutablePlan<string | null>,
+  ) {
     super();
     // This is a _soft_ reference to the plan; we're not adding it as a
     // dependency since we do not actually need it to execute; it's our
@@ -188,6 +206,10 @@ export class ConnectionPlan<
     return clonedPlan;
   }
 
+  public wrapEdge($edge: TItemPlan): EdgePlan<TItemPlan, TPlan, TNodePlan> {
+    return new EdgePlan(this, $edge);
+  }
+
   public pageInfo(): PageInfoCapablePlan {
     const plan = this.getPlan(this.subplanId) as TPlan;
     return plan.pageInfo(this);
@@ -196,12 +218,56 @@ export class ConnectionPlan<
   public execute(
     values: CrystalValuesList<any[]>,
   ): CrystalResultsList<Record<string, never>> {
-    return values.map(() => ({}));
+    return values.map(() => EMPTY_OBJECT);
   }
 }
 
-export function connection<TPlan extends ConnectionCapablePlan>(
+export class EdgePlan<
+  TItemPlan extends ExecutablePlan<any>,
+  TPlan extends ConnectionCapablePlan<TItemPlan>,
+  TNodePlan extends ExecutablePlan<any> = ExecutablePlan<any>,
+> extends ExecutablePlan {
+  static $$export = {
+    moduleName: "graphile-crystal",
+    exportName: "EdgePlan",
+  };
+
+  private connectionPlanId: number;
+
+  constructor(
+    $connection: ConnectionPlan<TItemPlan, TPlan, TNodePlan>,
+    $item: TItemPlan,
+  ) {
+    super();
+    this.connectionPlanId = $connection.id;
+    this.addDependency($item);
+  }
+
+  getConnectionPlan(): ConnectionPlan<TItemPlan, TPlan, TNodePlan> {
+    return this.getPlan(this.connectionPlanId) as any;
+  }
+
+  getItemPlan(): TItemPlan {
+    return this.getDep(0) as any;
+  }
+
+  node(): TNodePlan {
+    return this.getConnectionPlan().itemPlan(this.getItemPlan());
+  }
+
+  cursor(): ExecutablePlan<string | null> {
+    return this.getConnectionPlan().cursorPlan(this.getItemPlan());
+  }
+}
+
+export function connection<
+  TItemPlan extends ExecutablePlan<any>,
+  TPlan extends ConnectionCapablePlan<TItemPlan>,
+  TNodePlan extends ExecutablePlan<any> = ExecutablePlan<any>,
+>(
   plan: TPlan,
-): ConnectionPlan<TPlan> {
-  return new ConnectionPlan(plan);
+  itemPlan: ($item: TItemPlan) => TNodePlan,
+  cursorPlan: ($item: TItemPlan) => ExecutablePlan<string | null>,
+): ConnectionPlan<TItemPlan, TPlan, TNodePlan> {
+  return new ConnectionPlan(plan, itemPlan, cursorPlan);
 }

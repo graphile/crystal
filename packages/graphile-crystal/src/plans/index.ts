@@ -26,6 +26,7 @@ export {
   connection,
   ConnectionCapablePlan,
   ConnectionPlan,
+  EdgePlan,
   PageInfoCapablePlan,
 } from "./connection";
 export { constant, ConstantPlan } from "./constant";

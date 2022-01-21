@@ -1,7 +1,7 @@
 import "graphile-build";
 import "./PgTablesPlugin";
 
-import type { PgSource } from "@dataplan/pg";
+import type { PgSelectSinglePlan, PgSource } from "@dataplan/pg";
 import { connection } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
@@ -154,7 +154,12 @@ export const PgAllRowsPlugin: Plugin = {
                 plan: EXPORTABLE(
                   (connection, source) =>
                     function plan() {
-                      return connection(source.find());
+                      return connection(
+                        source.find(),
+                        ($item) => $item,
+                        ($item: PgSelectSinglePlan<any, any, any, any>) =>
+                          $item.cursor(),
+                      );
                     },
                   [connection, source],
                 ),
