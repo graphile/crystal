@@ -315,11 +315,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
           const Self = new GraphQLObjectType(
             objectSpec(finalSpec, Plan ?? null),
           );
-          if (Object.keys(Self.getFields()).length === 0) {
-            return null;
-          } else {
-            return Self;
-          }
+          return Self;
         }
 
         case GraphQLInterfaceType: {

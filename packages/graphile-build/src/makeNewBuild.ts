@@ -247,7 +247,21 @@ export default function makeNewBuild(
             scope,
             Plan,
           );
+
           allTypes[typeName] = type;
+
+          if (klass === GraphQLObjectType || klass === GraphQLInputObjectType) {
+            // Perform fields check. It's critical that `allTypes[typeName]` is
+            // set above this to prevent infinite loops in case one of our
+            // fields is dependent on another type, which is in turn dependent
+            // on this type - in this case we know there's at least one field
+            // otherwise the conflict would not occur?
+            if (Object.keys(type.getFields()).length === 0) {
+              allTypes[typeName] = null;
+              return null;
+            }
+          }
+
           return type;
         } else {
           allTypes[typeName] = undefined;
