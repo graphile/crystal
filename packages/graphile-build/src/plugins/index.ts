@@ -4,7 +4,7 @@ import { CursorTypePlugin } from "./CursorTypePlugin.js";
 import { MutationPayloadQueryPlugin } from "./MutationPayloadQueryPlugin.js";
 import { MutationPlugin } from "./MutationPlugin.js";
 import { PageInfoStartEndCursorPlugin } from "./PageInfoStartEndCursorPlugin.js";
-import { PageInfoTypePlugin } from "./PageInfoTypePlugin.js";
+import { ConnectionPlugin } from "./ConnectionPlugin.js";
 import { QueryPlugin } from "./QueryPlugin.js";
 import { QueryQueryPlugin } from "./QueryQueryPlugin.js";
 import { SubscriptionPlugin } from "./SubscriptionPlugin.js";
@@ -17,7 +17,7 @@ export {
   MutationPayloadQueryPlugin,
   MutationPlugin,
   PageInfoStartEndCursorPlugin,
-  PageInfoTypePlugin,
+  ConnectionPlugin,
   QueryPlugin,
   QueryQueryPlugin,
   SubscriptionPlugin,

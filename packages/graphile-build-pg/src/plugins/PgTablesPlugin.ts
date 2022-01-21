@@ -1,16 +1,9 @@
 import "graphile-build";
 
-import type {
-  PgSelectPlan,
-  PgSource,
-  PgSourceRelation,
-  PgTypeCodec,
-} from "@dataplan/pg";
-import { PgSelectSinglePlan, PgSourceBuilder, recordType } from "@dataplan/pg";
-import { ConnectionPlan } from "graphile-crystal";
+import type { PgSource, PgSourceRelation, PgTypeCodec } from "@dataplan/pg";
+import { PgSelectSinglePlan, PgSourceBuilder } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
-import type { GraphQLOutputType } from "graphql";
 import sql from "pg-sql2";
 
 import { getBehavior } from "../behavior";
@@ -75,7 +68,6 @@ declare global {
       pgCodec?: PgTypeCodec<any, any, any>;
       // TODO: rename this to isPgClassType?
       isPgTableType?: boolean;
-      isConnectionType?: true;
       isPgRowConnectionType?: true;
     }
   }
@@ -305,14 +297,10 @@ export const PgTablesPlugin: Plugin = {
 
       init(_, build, _context) {
         const {
-          getOutputTypeByName,
-          graphql: { GraphQLNonNull, GraphQLList },
           inflection,
           options: { pgForbidSetofFunctionsToReturnNull },
           setGraphQLTypeForPgCodec,
         } = build;
-        const nullableIf = (condition: boolean, Type: GraphQLOutputType) =>
-          condition ? Type : new GraphQLNonNull(Type);
         for (const codec of build.pgCodecMetaLookup.keys()) {
           if (!codec.columns) {
             // Only apply to codecs that define columns
@@ -328,7 +316,7 @@ export const PgTablesPlugin: Plugin = {
           }
           const codecName = sql.compile(codec.sqlType).text;
 
-          const tableTypeName = build.inflection.tableType(codec);
+          const tableTypeName = inflection.tableType(codec);
           build.registerObjectType(
             tableTypeName,
             {
@@ -345,185 +333,23 @@ export const PgTablesPlugin: Plugin = {
 
           if (!behavior || behavior.includes("connection")) {
             // Register edges
-            const edgeTypeName = build.inflection.edgeType(tableTypeName);
-            build.registerObjectType(
-              edgeTypeName,
-              {},
-              PgSelectSinglePlan,
-              () => ({
-                description: build.wrapDescription(
-                  `A \`${tableTypeName}\` edge in the connection.`,
-                  "type",
-                ),
-                fields: ({ fieldWithHooks }) => {
-                  const Cursor = getOutputTypeByName(
-                    inflection.builtin("Cursor"),
-                  );
-                  const TableType = getOutputTypeByName(tableTypeName);
-
-                  return {
-                    cursor: fieldWithHooks(
-                      {
-                        fieldName: "cursor",
-                        isCursorField: true,
-                      },
-                      () => ({
-                        description: build.wrapDescription(
-                          "A cursor for use in pagination.",
-                          "field",
-                        ),
-                        type: Cursor,
-                        plan: EXPORTABLE(
-                          () =>
-                            function plan(
-                              $record: PgSelectSinglePlan<any, any, any, any>,
-                            ) {
-                              return $record.cursor();
-                            },
-                          [],
-                        ),
-                      }),
-                    ),
-                    node: fieldWithHooks(
-                      {
-                        fieldName: "node",
-                      },
-                      () => ({
-                        description: build.wrapDescription(
-                          `The \`${tableTypeName}\` at the end of the edge.`,
-                          "field",
-                        ),
-                        type: nullableIf(
-                          !pgForbidSetofFunctionsToReturnNull,
-                          TableType,
-                        ),
-                        plan: EXPORTABLE(
-                          () =>
-                            function plan(
-                              $record: PgSelectSinglePlan<any, any, any, any>,
-                            ) {
-                              return $record;
-                            },
-                          [],
-                        ),
-                      }),
-                    ),
-                  };
-                },
-              }),
-              `PgTablesPlugin edge type for ${codecName}`,
-            );
-
-            // Register connection
-            const connectionTypeName =
-              build.inflection.connectionType(tableTypeName);
-            build.registerObjectType<
-              ConnectionPlan<PgSelectPlan<any, any, any, any>>
-            >(
-              connectionTypeName,
+            build.registerCursorConnection(
+              tableTypeName,
               {
-                isConnectionType: true,
                 isPgRowConnectionType: true,
                 pgCodec: codec,
               },
-              ConnectionPlan,
-              () => {
-                const TableType = getOutputTypeByName(tableTypeName);
-                const EdgeType = getOutputTypeByName(
-                  build.inflection.edgeType(tableTypeName),
-                );
-                const PageInfo = getOutputTypeByName(
-                  build.inflection.builtin("PageInfo"),
-                );
-                return {
-                  description: build.wrapDescription(
-                    `A connection to a list of \`${tableTypeName}\` values.`,
-                    "type",
-                  ),
-                  fields: ({ fieldWithHooks }) => ({
-                    nodes: fieldWithHooks(
-                      {
-                        fieldName: "nodes",
-                      },
-                      () => ({
-                        description: build.wrapDescription(
-                          `A list of \`${tableTypeName}\` objects.`,
-                          "field",
-                        ),
-                        type: new GraphQLNonNull(
-                          new GraphQLList(
-                            nullableIf(
-                              !pgForbidSetofFunctionsToReturnNull,
-                              TableType,
-                            ),
-                          ),
-                        ),
-                        plan: EXPORTABLE(
-                          () =>
-                            function plan(
-                              $connection: ConnectionPlan<
-                                PgSelectPlan<any, any, any, any>
-                              >,
-                            ) {
-                              return $connection.cloneSubplanWithPagination();
-                            },
-                          [],
-                        ),
-                      }),
-                    ),
-                    edges: fieldWithHooks(
-                      {
-                        fieldName: "edges",
-                      },
-                      () => ({
-                        description: build.wrapDescription(
-                          `A list of edges which contains the \`${tableTypeName}\` and cursor to aid in pagination.`,
-                          "field",
-                        ),
-                        type: new GraphQLNonNull(
-                          new GraphQLList(new GraphQLNonNull(EdgeType)),
-                        ),
-                        plan: EXPORTABLE(
-                          () =>
-                            function plan(
-                              $connection: ConnectionPlan<
-                                PgSelectPlan<any, any, any, any>
-                              >,
-                            ) {
-                              return $connection.cloneSubplanWithPagination();
-                            },
-                          [],
-                        ),
-                      }),
-                    ),
-                    pageInfo: fieldWithHooks(
-                      {
-                        fieldName: "pageInfo",
-                      },
-                      () => ({
-                        description: build.wrapDescription(
-                          "Information to aid in pagination.",
-                          "field",
-                        ),
-                        type: new GraphQLNonNull(PageInfo),
-                        plan: EXPORTABLE(
-                          () =>
-                            function plan(
-                              $connection: ConnectionPlan<
-                                PgSelectPlan<any, any, any, any>
-                              >,
-                            ) {
-                              // TODO: why is this a TypeScript issue without the 'any'?
-                              return $connection.pageInfo() as any;
-                            },
-                          [],
-                        ),
-                      }),
-                    ),
-                  }),
-                };
-              },
-              `PgTablesPlugin connection type for ${codecName}`,
+              EXPORTABLE(
+                () =>
+                  function plan(
+                    $record: PgSelectSinglePlan<any, any, any, any>,
+                  ) {
+                    return $record.cursor();
+                  },
+                [],
+              ),
+              PgSelectSinglePlan,
+              !pgForbidSetofFunctionsToReturnNull,
             );
           }
         }
