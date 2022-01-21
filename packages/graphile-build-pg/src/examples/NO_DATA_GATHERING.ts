@@ -1,8 +1,12 @@
 /* eslint-disable no-restricted-syntax */
 import type { PgExecutorContextPlans, WithPgClient } from "@dataplan/pg";
-import { PgSource, PgSourceColumns } from "@dataplan/pg";
-import { PgSourceBuilder } from "@dataplan/pg";
-import { PgExecutor, recordType, TYPES } from "@dataplan/pg";
+import {
+  PgExecutor,
+  PgSource,
+  PgSourceBuilder,
+  recordType,
+  TYPES,
+} from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import chalk from "chalk";
 import { readFile } from "fs/promises";
@@ -14,7 +18,7 @@ import {
 import { context, object } from "graphile-crystal";
 import { EXPORTABLE, exportSchema } from "graphile-exporter";
 import { resolvePresets } from "graphile-plugin";
-import { graphql, printSchema } from "graphql";
+import { graphql } from "graphql";
 import { Pool } from "pg";
 import sql from "pg-sql2";
 import { inspect } from "util";

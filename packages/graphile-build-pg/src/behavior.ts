@@ -1,7 +1,7 @@
 import type {
   PgSourceExtensions,
-  PgTypeCodecExtensions,
   PgSourceRelationExtensions,
+  PgTypeCodecExtensions,
 } from "@dataplan/pg";
 import { isDev } from "graphile-crystal";
 import { inspect } from "util";

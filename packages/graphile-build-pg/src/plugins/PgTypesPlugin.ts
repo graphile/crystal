@@ -514,7 +514,7 @@ export const PgTypesPlugin: Plugin = {
           // hstore
           const hstoreTypeName = inflection.builtin("KeyValueHash");
           {
-            function isValidHstoreObject(obj: unknown): obj is PgHStore {
+            const isValidHstoreObject = (obj: unknown): obj is PgHStore => {
               if (obj === null) {
                 // Null is okay
                 return true;
@@ -537,12 +537,12 @@ export const PgTypesPlugin: Plugin = {
                 // Everything else is invalid.
                 return false;
               }
-            }
+            };
 
-            function parseValueLiteral(
+            const parseValueLiteral = (
               ast: ValueNode,
               variables: { [key: string]: any } | null | undefined,
-            ) {
+            ) => {
               switch (ast.kind) {
                 case Kind.INT:
                 case Kind.FLOAT:
@@ -567,7 +567,7 @@ export const PgTypesPlugin: Plugin = {
                   // Everything else is invalid.
                   return undefined;
               }
-            }
+            };
 
             build.registerScalarType(
               hstoreTypeName,

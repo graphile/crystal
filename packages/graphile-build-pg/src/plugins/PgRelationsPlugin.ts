@@ -10,9 +10,8 @@ import type {
 import { PgSourceBuilder } from "@dataplan/pg";
 import { connection } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
-import type { GatherHooks, Plugin, PluginGatherConfig } from "graphile-plugin";
+import type { Plugin, PluginGatherConfig } from "graphile-plugin";
 import type { GraphQLObjectType } from "graphql";
-import { GraphQLList } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
@@ -205,7 +204,10 @@ export const PgRelationsPlugin: Plugin = {
         );
       },
       GraphQLObjectType_fields(fields, build, context) {
-        const { extend } = build;
+        const {
+          extend,
+          graphql: { GraphQLList },
+        } = build;
         const {
           Self,
           scope: { isPgTableType, pgCodec: codec },

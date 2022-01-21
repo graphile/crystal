@@ -5,11 +5,11 @@ import type {
   PgSourceColumns,
   PgTypeCodec,
 } from "@dataplan/pg";
-import { isEnumCodec } from "@dataplan/pg";
 import {
   domainOfCodec,
   enumType,
   getCodecByPgCatalogTypeName,
+  isEnumCodec,
   listOfType,
   rangeOfCodec,
   recordType,

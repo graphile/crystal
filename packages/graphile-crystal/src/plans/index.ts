@@ -36,7 +36,7 @@ export { groupBy } from "./groupBy";
 export { lambda, LambdaPlan } from "./lambda";
 export { last, LastPlan } from "./last";
 export { list, ListPlan } from "./list";
-export { __ListTransformPlan,listTransform } from "./listTransform";
+export { __ListTransformPlan, listTransform } from "./listTransform";
 export { makeMapper, map, MapPlan } from "./map";
 export { object, ObjectPlan } from "./object";
 export { partitionByIndex } from "./partitionByIndex";

@@ -9,9 +9,7 @@ import type {
   PgSource,
   PgSourceParameter,
 } from "@dataplan/pg";
-import { TYPES } from "@dataplan/pg";
-import { pgSelect } from "@dataplan/pg";
-import { connection, partitionByIndex } from "graphile-crystal";
+import { connection } from "graphile-crystal";
 import type { TrackedArguments } from "graphile-crystal/src/interfaces";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
@@ -151,7 +149,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
             }, {});
 
             const getSelectPlanFromRowAndArgs = EXPORTABLE(
-              (argDetails, isNotNullish, pgSelect, source) =>
+              (argDetails, isNotNullish, source) =>
                 (
                   $row: PgSelectSinglePlan<any, any, any, any>,
                   args: TrackedArguments<any>,
@@ -170,7 +168,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                   ];
                   return source.execute(selectArgs);
                 },
-              [argDetails, isNotNullish, pgSelect, source],
+              [argDetails, isNotNullish, source],
             );
 
             if (source.isUnique) {

@@ -7,8 +7,11 @@ import type {
   PgSourceColumn,
   PgTypeCodec,
 } from "@dataplan/pg";
-import { PgSource } from "@dataplan/pg";
-import { pgSelectFromRecords, pgSelectSingleFromRecord } from "@dataplan/pg";
+import {
+  pgSelectFromRecords,
+  pgSelectSingleFromRecord,
+  PgSource,
+} from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import sql from "pg-sql2";

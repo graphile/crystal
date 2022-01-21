@@ -9,7 +9,7 @@ export interface PageInfoCapablePlan extends ExecutablePlan<any> {
   endCursor(): ExecutablePlan<string | null>;
 }
 
-export interface ConnectionCapablePlan<T extends any = any>
+export interface ConnectionCapablePlan<T = any>
   extends ExecutablePlan<ReadonlyArray<T>> {
   clone(...args: any[]): ConnectionCapablePlan<any>; // TODO: `this`
   pageInfo($connectionPlan: ConnectionPlan<any>): PageInfoCapablePlan;
