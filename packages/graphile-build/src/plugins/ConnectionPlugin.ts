@@ -1,14 +1,24 @@
-import type {
-  ExecutablePlanResolver,
-  PageInfoCapablePlan,
-} from "graphile-crystal";
+import type { PageInfoCapablePlan } from "graphile-crystal";
+import { each, ExecutablePlanResolver } from "graphile-crystal";
 import { ConnectionPlan, ExecutablePlan } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
-import { GraphQLOutputType } from "graphql";
+import type { GraphQLOutputType } from "graphql";
 
 import { version } from "../index.js";
-
+interface RegisterCursorConnectionOptions<
+  TItemPlan extends ExecutablePlan<any>,
+  TIntermediatePlan extends ExecutablePlan<any>,
+> {
+  typeName: string;
+  scope?: GraphileEngine.ScopeGraphQLObjectType;
+  itemPlan?: ($intermediate: TIntermediatePlan) => TItemPlan;
+  cursorPlan: (
+    $intermediate: TIntermediatePlan,
+  ) => ExecutablePlan<string | null>;
+  IntermediatePlan: { new (...args: any[]): TIntermediatePlan };
+  nonNullNode?: boolean;
+}
 declare global {
   namespace GraphileEngine {
     interface ScopeGraphQLObjectType {
@@ -21,17 +31,11 @@ declare global {
       isPageInfoHasPreviousPageField?: boolean;
     }
     interface Build {
-      registerCursorConnection<TRowPlan extends ExecutablePlan<any>>(
-        typeName: string,
-        scope: GraphileEngine.ScopeGraphQLObjectType,
-        cursorPlan: ExecutablePlanResolver<
-          any,
-          any,
-          TRowPlan,
-          ExecutablePlan<string | null>
-        >,
-        RowPlan: { new (...args: any[]): TRowPlan },
-        nonNullNode: boolean,
+      registerCursorConnection<
+        TItemPlan extends ExecutablePlan<any>,
+        TIntermediatePlan extends ExecutablePlan<any>,
+      >(
+        options: RegisterCursorConnectionOptions<TItemPlan, TIntermediatePlan>,
       ): void;
     }
   }
@@ -49,13 +53,24 @@ export const ConnectionPlugin: Plugin = {
         return build.extend(
           build,
           {
-            registerCursorConnection(
-              typeName,
-              scope,
-              cursorPlan,
-              RowPlan,
-              nonNullNode,
+            registerCursorConnection<
+              TItemPlan extends ExecutablePlan<any>,
+              TIntermediatePlan extends ExecutablePlan<any>,
+            >(
+              options: RegisterCursorConnectionOptions<
+                TItemPlan,
+                TIntermediatePlan
+              >,
             ) {
+              const {
+                typeName,
+                scope = {},
+                itemPlan = ($item: TIntermediatePlan) =>
+                  $item as unknown as TItemPlan,
+                cursorPlan,
+                IntermediatePlan,
+                nonNullNode = false,
+              } = options;
               const edgeTypeName = build.inflection.edgeType(typeName);
               build.registerObjectType(
                 edgeTypeName,
@@ -63,7 +78,7 @@ export const ConnectionPlugin: Plugin = {
                   ...scope,
                   isConnectionEdgeType: true,
                 },
-                RowPlan as any,
+                IntermediatePlan as any,
                 () => ({
                   description: build.wrapDescription(
                     `A \`${typeName}\` edge in the connection.`,
@@ -101,12 +116,12 @@ export const ConnectionPlugin: Plugin = {
                           ),
                           type: nullableIf(!nonNullNode, NodeType),
                           plan: EXPORTABLE(
-                            () =>
-                              function plan($record: ExecutablePlan<any>) {
-                                return $record;
+                            (itemPlan) =>
+                              function plan($record: TIntermediatePlan) {
+                                return itemPlan($record);
                               },
-                            [],
-                          ),
+                            [itemPlan],
+                          ) as any,
                         }),
                       ),
                     };
@@ -154,12 +169,15 @@ export const ConnectionPlugin: Plugin = {
                             ),
                           ),
                           plan: EXPORTABLE(
-                            () =>
+                            (each, itemPlan) =>
                               function plan($connection: ConnectionPlan<any>) {
-                                return $connection.cloneSubplanWithPagination();
+                                return each(
+                                  $connection.cloneSubplanWithPagination(),
+                                  itemPlan,
+                                );
                               },
-                            [],
-                          ),
+                            [each, itemPlan],
+                          ) as any,
                         }),
                       ),
                       edges: fieldWithHooks(

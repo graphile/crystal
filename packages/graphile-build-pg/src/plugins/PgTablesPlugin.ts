@@ -333,13 +333,13 @@ export const PgTablesPlugin: Plugin = {
 
           if (!behavior || behavior.includes("connection")) {
             // Register edges
-            build.registerCursorConnection(
-              tableTypeName,
-              {
+            build.registerCursorConnection({
+              typeName: tableTypeName,
+              scope: {
                 isPgRowConnectionType: true,
                 pgCodec: codec,
               },
-              EXPORTABLE(
+              cursorPlan: EXPORTABLE(
                 () =>
                   function plan(
                     $record: PgSelectSinglePlan<any, any, any, any>,
@@ -348,9 +348,9 @@ export const PgTablesPlugin: Plugin = {
                   },
                 [],
               ),
-              PgSelectSinglePlan,
-              !pgForbidSetofFunctionsToReturnNull,
-            );
+              IntermediatePlan: PgSelectSinglePlan,
+              nonNullNode: !pgForbidSetofFunctionsToReturnNull,
+            });
           }
         }
         return _;
