@@ -33,7 +33,7 @@ In this tutorial we will walk through the Postgres schema design for a forum app
   - [Row Level Security](#row-level-security)
 - [How to use the system](#how-to-use-the-system)
   - [Query All Table Records](#query-all-table-records)
-  - [Query a Table record by Id](#query-a-table-record-by-id)
+  - [Query a Table Record by Id](#query-a-table-record-by-id)
   - [Query a Function for Search Results](#query-a-function-for-search-results)
   - [Mutating a Post](#mutating-a-post)
   - [Overcoming Security](#overcoming-security)
