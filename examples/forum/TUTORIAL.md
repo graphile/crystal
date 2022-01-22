@@ -31,6 +31,12 @@ In this tutorial we will walk through the Postgres schema design for a forum app
   - [Updating Passwords](#updating-passwords)
   - [Grants](#grants)
   - [Row Level Security](#row-level-security)
+- [How to use the system](#how-to-use-the-system)
+  - [Query All Table Records](#query-all-table-records)
+  - [Query a Table record by Id](#query-a-table-record-by-id)
+  - [Query a Function for Search Results](#query-a-function-for-search-results)
+  - [Mutating a Post](#mutating-a-post)
+  - [Overcoming Security](#overcoming-security)
 - [Conclusion](#conclusion)
 
 ## Installation
@@ -805,8 +811,180 @@ postgraphile \
 
 ---
 
+
+## How to use the system
+
+Congralations your Graphophile system is up and running, lets go ahead and use it!
+
+First thing is to make sure you have populated the database with the demo data provided, the script is here:
+https://github.com/graphile/postgraphile/blob/main/examples/forum/data.sql
+
+
+### Query All Table Records
+
+Graphophiles smarts allow you to get all table records. Simply prefix the table name with **all**, for example the People table:
+
+```
+query {
+	allPeople{
+		edges{
+			node{
+				firstName
+				lastName
+				about
+			}
+		}
+	}
+}
+```
+
+
+## Query a Table Record By Id
+
+Graphophiles smarts allow you to query tables by Primary Key. All tables can be queried by their Id field:
+
+```{
+  postById(id: 4) {
+    id
+    headline
+  }
+}
+```
+
+## Query a Function for Search Results
+
+Graphophiles smarts allow you to query Functions that can return single/scalar or multiple/setof records:
+
+```{
+  searchPosts(search: "circuit", first: 5) {
+    edges {
+      cursor
+      node {
+        headline
+        body
+      }
+    }
+  }
+}
+```
+
+
+## Mutating a Post
+
+Use your favorite GraphQL IDE (eg https://insomnia.rest/) to work out the syntax of the API. Start by typing:
+
+```
+mutation {
+ 	createPost (
+```
+
+Press Ctrl + Space and it will give you an intellisense suggestion of ```input:```:
+
+![Alt text](images/1_input.jpg?raw=true "Intellisense suggesting input")
+
+```
+mutation {
+ 	createPost (input: {}
+```
+
+Next intellisense will suggest you need a ```post```:
+
+![Alt text](images/2_post.jpg?raw=true "Intellisense suggesting post")
+
+```
+mutation {
+ 	createPost (input: {post : {}}
+```
+
+Then intellisense will suggest the parameters:
+
+![Alt text](images/3_args.jpg?raw=true "Intellisense suggesting the arguments for the parameter")
+
+```
+mutation {
+ 	createPost (input: {post : {authorId: 1, headline: "Unbelievable Database API", body:"GraphQL combines multiple backends!", topic:  DISCUSSION}})
+}
+```
+
+
+And dont forget the return type of post id, otherwise you'll get the error message:
+
+> "Field "createPost" of type "CreatePostPayload" must have a selection of subfields.
+
+
+```
+mutation 
+{
+  createPost (input: {post : {authorId: 1, headline: "Clickbait", body:"Unbelievable GraphQL combines multiple backends!", topic: DISCUSSION}})
+  {
+    post 
+    {
+      id
+    }
+  }
+}
+```
+
+Now execute that command and it fails with:
+
+> "message": "permission denied for table post",
+
+
+## Overcoming Security
+
+After getting a feel for writing mutations we realise we need to understand how security works before altering the database.
+
+**Getting a Json Web Token (JWT)**
+ 
+Since we specified **"--default-role forum_example_anonymous"** when starting Graphphile we're using the **forum_example_anonymous** role. In order to create and save posts we need to assume the **forum_example_person** role that's been granted access to INSERT in the ```forum_example.post``` table:
+
+```
+grant INSERT, update, delete on table forum_example.post to forum_example_person;
+```
+
+ First we need to get the JWT for a user/person, here I've used *spowell0@noaa.gov*. You can refer to the forum/data.sql demo data file for other people and unencrypted passwords.
+
+
+```
+mutation {
+  authenticate (input:  {email: "spowell0@noaa.gov" password: "iFbWWlc"})
+  {
+		jwtToken
+  }
+}
+```
+
+Returns:
+
+```
+{
+	"data": {
+		"authenticate": {
+			"jwtToken": "eyJhbGciOiJIUzI1NiIsInR5cCI....."
+```
+
+*If you get an  **function crypt(text, text) does not exist** error after trying to authenticate, set the Schema for the crypt call: forum-example.crypt in the authenticate function.*
+  
+
+**Using a Json Web Token (JWT)**
+
+In SQL we can see the JWT contains the role and the person_id:
+
+![Alt text](images/6_role.jpg?raw=true "Intellisense suggesting the arguments for the parameter")
+
+Remember when Graphophile accepts an Authorization Request Header with a valid JWT containing a role field...
+
+![Alt text](images/4_header.jpg?raw=true "Intellisense suggesting the arguments for the parameter")
+
+
+...then the Request Bodys' GraphQL is executed as a transaction using that Postgres Roles' privilages: 
+
+![Alt text](images/5_post.jpg?raw=true "Intellisense suggesting the arguments for the parameter")
+
+
+
 ## Conclusion
 
-You should now be equipped with the knowledge to go out and design your own Postgres schema. If you have any questions, encounter a bug, or just want to say thank you, don’t hesitate to [open an issue](https://github.com/graphile/postgraphile/issues), we’d love to hear from you. The PostGraphile community wants to invest in making you a productive developer so that you can invest back into PostGraphile.
+You should now be equipped with the knowledge to go out and design your own Postgres schema and use it. If you have any questions, encounter a bug, or just want to say thank you, don’t hesitate to [open an issue](https://github.com/graphile/postgraphile/issues), we’d love to hear from you. The PostGraphile community wants to invest in making you a productive developer so that you can invest back into PostGraphile.
 
 <!-- TODO: More next steps and calls to action -->
