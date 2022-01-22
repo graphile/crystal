@@ -963,23 +963,23 @@ Returns:
 			"jwtToken": "eyJhbGciOiJIUzI1NiIsInR5cCI....."
 ```
 
-*If you get an  **function crypt(text, text) does not exist** error after trying to authenticate, set the Schema for the crypt call: forum-example.crypt in the authenticate function.*
+*If you get a  **function crypt(text, text) does not exist** error after trying to authenticate, set the Schema for the crypt call: forum-example.crypt in the authenticate function.*
   
 
 **Using a Json Web Token (JWT)**
 
 In SQL we can see the JWT contains the role and the person_id:
 
-![Alt text](images/6_role.jpg?raw=true "Intellisense suggesting the arguments for the parameter")
+![Alt text](images/6_role.jpg?raw=true "Role is contained in the JWT")
 
 Remember when Graphophile accepts an Authorization Request Header with a valid JWT containing a role field...
 
-![Alt text](images/4_header.jpg?raw=true "Intellisense suggesting the arguments for the parameter")
+![Alt text](images/4_header.jpg?raw=true "Set Request Header Authorization")
 
 
 ...then the Request Bodys' GraphQL is executed as a transaction using that Postgres Roles' privilages: 
 
-![Alt text](images/5_post.jpg?raw=true "Intellisense suggesting the arguments for the parameter")
+![Alt text](images/5_post.jpg?raw=true "Posting with Authorization works")
 
 
 
