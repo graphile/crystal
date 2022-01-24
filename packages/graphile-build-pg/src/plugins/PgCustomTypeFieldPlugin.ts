@@ -104,7 +104,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
             },
             argument(details) {
               return this.camelCase(
-                details.param.name ?? `arg${details.index}`,
+                details.param.name || `arg${details.index}`,
               );
             },
           },
