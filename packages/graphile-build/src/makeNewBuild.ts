@@ -145,6 +145,14 @@ export default function makeNewBuild(
       e["recoverable"] = true;
       throw e;
     },
+    recoverable(value, callback) {
+      try {
+        return callback();
+      } catch (e) {
+        this.handleRecoverableError(e);
+        return value;
+      }
+    },
     status: {
       currentHookName: null,
       currentHookEvent: null,

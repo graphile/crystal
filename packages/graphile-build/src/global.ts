@@ -352,6 +352,12 @@ declare global {
        * users chose to throw instead.
        */
       handleRecoverableError: (e: Error) => void;
+
+      /**
+       * Calls callback, but if an error is thrown then it processes it withe
+       * `handleRecoverableError` and then returns the fallback.
+       */
+      recoverable<T>(fallback: T, callback: () => T): T;
     }
 
     interface Build extends BuildBase {
