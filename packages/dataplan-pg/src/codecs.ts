@@ -2,6 +2,7 @@ import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 import { parse as arrayParse } from "postgres-array";
 import { parse as rangeParse } from "postgres-range";
+import { inspect } from "util";
 
 import type {
   PgBox,
@@ -112,6 +113,7 @@ export function listOfType<
 >(
   innerCodec: TInnerCodec,
   extensions?: Partial<PgTypeCodecExtensions>,
+  typeDelim = `,`,
   identifier: SQL = sql`${innerCodec.sqlType}[]`,
 ): PgTypeCodec<
   undefined, // Array has no columns
@@ -140,7 +142,30 @@ export function listOfType<
         .flat(100)
         .map((v) => innerCodec.fromPg(v)) as any,
     // TODO: this does __NOT__ handle nulls safely!
-    toPg: (value) => (value ? value.map((v) => innerCodec.toPg(v)) : null),
+    toPg: (value) => {
+      if (!value) {
+        return null;
+      }
+      const encoded = value.map((v) => {
+        if (v == null) {
+          return "NULL";
+        }
+        const str = innerCodec.toPg(v);
+        if (str == null) {
+          return "NULL";
+        }
+        if (typeof str !== "string" && typeof str !== "number") {
+          throw new Error(
+            `Do not known how to encode ${inspect(
+              str,
+            )} to an array (send a PR!)`,
+          );
+        }
+        return `"${String(str).replace(/"/g, '""')}"`;
+      });
+
+      return `{${encoded.join(typeDelim)}}`;
+    },
     columns: undefined,
     extensions,
     arrayOfCodec: innerCodec,

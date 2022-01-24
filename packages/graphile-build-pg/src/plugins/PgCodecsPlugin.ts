@@ -353,9 +353,11 @@ export const PgCodecsPlugin: Plugin = {
                 typeModifier, // TODO: is it correct to pass this through?
               );
               if (innerCodec) {
+                const typeDelim = innerType.typdelim!;
                 return EXPORTABLE(
-                  (innerCodec, listOfType) => listOfType(innerCodec),
-                  [innerCodec, listOfType],
+                  (innerCodec, listOfType, typeDelim) =>
+                    listOfType(innerCodec, {}, typeDelim),
+                  [innerCodec, listOfType, typeDelim],
                 );
               }
             }
