@@ -150,6 +150,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                   argName,
                   pgCodec: param.codec,
                   inputType,
+                  required: param.required,
                 };
               });
             const args = argDetails.reduce((memo, { argName, inputType }) => {
@@ -168,9 +169,9 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                   const selectArgs: PgSelectArgumentSpec[] = [
                     { plan: $row.record() },
                     ...argDetails
-                      .map(({ argName, pgCodec }) => {
+                      .map(({ argName, pgCodec, required }) => {
                         const plan = args[argName];
-                        if (!plan) {
+                        if (!required && plan.evalIs(undefined)) {
                           return null;
                         }
                         return { plan, pgCodec };
