@@ -605,7 +605,7 @@ export interface PgProc {
   proisstrict: boolean | null;
 
   /** Function returns a set (i.e., multiple values of the specified data type) */
-  proretset: boolean | null;
+  proretset: boolean;
 
   /**
    * provolatile tells whether the function's result depends only on its input arguments, or is affected by outside
@@ -631,7 +631,7 @@ export interface PgProc {
   pronargdefaults: number | null;
 
   /** Data type of the return value */
-  prorettype: PgOid | null;
+  prorettype: PgOid;
 
   /**
    * An array of the data types of the function arguments. This includes only input arguments (including INOUT and

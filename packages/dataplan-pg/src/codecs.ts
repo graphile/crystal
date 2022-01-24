@@ -284,6 +284,8 @@ const viaDateFormat = (format: string): Cast => {
 const parseAsInt = (n: string) => parseInt(n, 10);
 
 export const TYPES = {
+  void: t<void>("void"), // void: 2278
+  record: t<string>("record"), // void: 2249
   boolean: t<boolean>("bool", { fromPg: (value) => value === "true" }),
   int2: t<number>("int2", { fromPg: parseAsInt }),
   int: t<number>("int4", { fromPg: parseAsInt }),
@@ -352,6 +354,10 @@ export function getCodecByPgCatalogTypeName(
   pgCatalogTypeName: string,
 ): PgTypeCodec<undefined, any, any, undefined> | null {
   switch (pgCatalogTypeName) {
+    case "void":
+      return TYPES.void;
+    case "record":
+      return TYPES.record;
     case "bool":
       return TYPES.boolean;
 

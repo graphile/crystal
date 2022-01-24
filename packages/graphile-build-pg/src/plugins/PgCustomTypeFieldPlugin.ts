@@ -2,6 +2,8 @@
 // Postgres' own computed columns, and they're not necessarily column-like
 // (e.g. they can be relations to other tables), so we've renamed them.
 
+import "./PgProceduresPlugin";
+
 import type {
   PgSelectArgumentSpec,
   PgSelectPlan,
@@ -83,7 +85,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
         const {
           getGraphQLTypeByPgCodec,
           sql,
-          graphql: { GraphQLList },
+          graphql: { GraphQLList, GraphQLNonNull },
         } = build;
         const {
           Self,
@@ -107,6 +109,9 @@ export const PgCustomTypeFieldPlugin: Plugin = {
         return build.extend(
           fields,
           procSources.reduce((memo, source) => {
+            if (source.extensions?.isMutation) {
+              return memo;
+            }
             const innerType = getGraphQLTypeByPgCodec(
               source.codec.arrayOfCodec ?? source.codec,
               "output",
@@ -133,8 +138,14 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                   source,
                   index,
                 });
-                // TODO: nullability
-                const inputType = getGraphQLTypeByPgCodec(param.codec, "input");
+                const baseInputType = getGraphQLTypeByPgCodec(
+                  param.codec,
+                  "input",
+                );
+                const nonNull = param.required;
+                const inputType = nonNull
+                  ? new GraphQLNonNull(baseInputType!)
+                  : baseInputType;
                 return {
                   argName,
                   pgCodec: param.codec,

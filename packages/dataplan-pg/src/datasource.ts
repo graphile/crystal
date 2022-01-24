@@ -133,7 +133,7 @@ export interface PgSourceRelation<
 export interface PgSourceExtensions {}
 
 export interface PgSourceParameter {
-  name: string;
+  name: string | null;
   codec: PgTypeCodec<any, any, any>;
   required: boolean;
   notNull?: boolean;

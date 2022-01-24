@@ -505,8 +505,11 @@ export const PgCodecsPlugin: Plugin = {
           const typeNameByTYPESKey: {
             [key in keyof typeof TYPES]:
               | string
-              | { [situation: string]: string };
+              | null
+              | { [situation: string]: string | null };
           } = {
+            void: null,
+            record: null,
             boolean: "Boolean",
             int2: "Int",
             int: "Int",

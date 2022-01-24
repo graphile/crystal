@@ -12,11 +12,11 @@ import type {
   InputObjectPlan,
   InputStaticLeafPlan,
 } from "graphile-crystal";
-import { connection } from "graphile-crystal";
 import {
   __ListTransformPlan,
   __ValuePlan,
   aether,
+  connection,
   ConnectionPlan,
   constant,
   context,

@@ -84,6 +84,9 @@ declare module "graphile-plugin" {
         databaseName: string,
         pgClass: PgClass,
       ): Promise<PgSourceBuilder<any, any, any> | null>;
+      getSource(
+        sourceBuilder: PgSourceBuilder<any, any, any>,
+      ): Promise<PgSource<any, any, any, any> | null>;
     };
   }
 
@@ -111,6 +114,14 @@ interface State {
     string,
     Map<PgClass, Promise<PgSourceBuilder<any, any, any> | null>>
   >;
+  sourceBySourceBuilder: Map<
+    PgSourceBuilder<any, any, any>,
+    Promise<PgSource<any, any, any, any> | null>
+  >;
+  detailsBySourceBuilder: Map<
+    PgSourceBuilder<any, any, any>,
+    { databaseName: string; pgClass: PgClass }
+  >;
 }
 interface Cache {}
 
@@ -123,6 +134,35 @@ export const PgTablesPlugin: Plugin = {
   gather: {
     namespace: "pgTables",
     helpers: {
+      getSource(info, sourceBuilder) {
+        let source = info.state.sourceBySourceBuilder.get(sourceBuilder);
+        if (source) {
+          return source;
+        }
+        source = (async () => {
+          const relations: PgSourceRelations = {};
+          const { pgClass, databaseName } =
+            info.state.detailsBySourceBuilder.get(sourceBuilder)!;
+          await info.process("pgTables:PgSourceBuilder:relations", {
+            sourceBuilder,
+            pgClass,
+            relations,
+            databaseName,
+          });
+          const source = EXPORTABLE(
+            (relations, sourceBuilder) => sourceBuilder.build({ relations }),
+            [relations, sourceBuilder],
+          );
+          await info.process("pgTables:PgSource", {
+            source,
+            pgClass,
+            databaseName,
+          });
+          return source;
+        })();
+        info.state.sourceBySourceBuilder.set(sourceBuilder, source);
+        return source;
+      },
       getSourceBuilder(info, databaseName, pgClass) {
         let sourceBuilderByPgClass =
           info.state.sourceBuilderByPgClassByDatabase.get(databaseName);
@@ -195,7 +235,7 @@ export const PgTablesPlugin: Plugin = {
             info.helpers.pgIntrospection.getExecutorForDatabase(databaseName);
           const name = `${databaseName}.${namespace.nspname}.${pgClass.relname}`;
 
-          return EXPORTABLE(
+          const sourceBuilder = EXPORTABLE(
             (PgSourceBuilder, codec, executor, name, uniques) =>
               new PgSourceBuilder({
                 executor,
@@ -211,6 +251,12 @@ export const PgTablesPlugin: Plugin = {
               }),
             [PgSourceBuilder, codec, executor, name, uniques],
           );
+          info.state.detailsBySourceBuilder.set(sourceBuilder, {
+            databaseName,
+            pgClass,
+          });
+
+          return sourceBuilder;
         })();
         sourceBuilderByPgClass.set(pgClass, sourceBuilder);
         return sourceBuilder;
@@ -218,6 +264,8 @@ export const PgTablesPlugin: Plugin = {
     },
     initialState: () => ({
       sourceBuilderByPgClassByDatabase: new Map(),
+      sourceBySourceBuilder: new Map(),
+      detailsBySourceBuilder: new Map(),
     }),
     hooks: {
       async "pgIntrospection:class"({ helpers }, event) {
@@ -226,40 +274,26 @@ export const PgTablesPlugin: Plugin = {
       },
     },
 
-    // TODO: do we need to assert the order this runs?
     async main(output, info) {
       if (!output.pgSources) {
         output.pgSources = [];
       }
       for (const [
-        databaseName,
+        ,
         sourceBuilderByPgClass,
       ] of info.state.sourceBuilderByPgClassByDatabase.entries()) {
         for (const [
-          pgClass,
+          ,
           sourceBuilderPromise,
         ] of sourceBuilderByPgClass.entries()) {
-          const relations: PgSourceRelations = {};
           const sourceBuilder = await sourceBuilderPromise;
           if (!sourceBuilder) {
             continue;
           }
-          await info.process("pgTables:PgSourceBuilder:relations", {
-            sourceBuilder,
-            pgClass,
-            relations,
-            databaseName,
-          });
-          const source = EXPORTABLE(
-            (relations, sourceBuilder) => sourceBuilder.build({ relations }),
-            [relations, sourceBuilder],
-          );
-          await info.process("pgTables:PgSource", {
-            source,
-            pgClass,
-            databaseName,
-          });
-          output.pgSources!.push(source);
+          const source = await info.helpers.pgTables.getSource(sourceBuilder);
+          if (source) {
+            output.pgSources!.push(source);
+          }
         }
       }
     },
