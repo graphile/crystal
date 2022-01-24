@@ -170,7 +170,6 @@ export const PgProceduresPlugin: Plugin = {
           for (let i = 0, l = numberOfArguments; i < l; i++) {
             const argType = allArgTypes[i];
             const argName = pgProc.proargnames?.[i] ?? null;
-            const argHasDefault = i >= numberOfRequiredArguments;
 
             // TODO: smart tag should allow changing the modifier
             const typeModifier = undefined;
@@ -199,8 +198,8 @@ export const PgProceduresPlugin: Plugin = {
               if (!argCodec) {
                 return null;
               }
-              let required = argHasDefault ? false : isStrictish;
-              let notNull = isStrict;
+              let required = i < numberOfRequiredArguments;
+              let notNull = isStrictish;
               if (!processedFirstInputArg) {
                 processedFirstInputArg = true;
                 if (argCodec.columns && !isMutation) {
