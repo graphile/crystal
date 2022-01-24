@@ -44,6 +44,11 @@ export const CommonTypesPlugin: Plugin = {
             ),
           "graphile-build built-in (BigInt type)",
         );
+        build.registerCursorConnection({
+          typeName: "BigInt",
+          scope: {},
+          nonNullNode: false,
+        });
 
         build.registerScalarType(
           inflection.builtin("BigFloat"),
@@ -57,6 +62,11 @@ export const CommonTypesPlugin: Plugin = {
             ),
           "graphile-build built-in (BigFloat type)",
         );
+        build.registerCursorConnection({
+          typeName: "BigFloat",
+          scope: {},
+          nonNullNode: false,
+        });
 
         build.registerScalarType(
           inflection.builtin("Datetime"),
@@ -70,6 +80,11 @@ export const CommonTypesPlugin: Plugin = {
             ),
           "graphile-build built-in (Datetime type)",
         );
+        build.registerCursorConnection({
+          typeName: "Datetime",
+          scope: {},
+          nonNullNode: false,
+        });
 
         build.registerScalarType(
           inflection.builtin("Date"),
@@ -83,6 +98,11 @@ export const CommonTypesPlugin: Plugin = {
             ),
           "graphile-build built-in (Datetype)",
         );
+        build.registerCursorConnection({
+          typeName: "Date",
+          scope: {},
+          nonNullNode: false,
+        });
 
         build.registerScalarType(
           inflection.builtin("UUID"),
@@ -111,6 +131,11 @@ export const CommonTypesPlugin: Plugin = {
             ),
           "graphile-build built-in (UUID type)",
         );
+        build.registerCursorConnection({
+          typeName: "UUID",
+          scope: {},
+          nonNullNode: false,
+        });
 
         if (jsonScalarAsString !== true) {
           const parseLiteral: GraphQLScalarLiteralParser<any> = EXPORTABLE(
@@ -181,6 +206,12 @@ export const CommonTypesPlugin: Plugin = {
             "graphile-build built-in (JSON type; simple)",
           );
         }
+        build.registerCursorConnection({
+          typeName: "JSON",
+          scope: {},
+          nonNullNode: false,
+        });
+
         build.registerScalarType(
           inflection.builtin("XML"),
           {},
@@ -188,6 +219,11 @@ export const CommonTypesPlugin: Plugin = {
             stringTypeSpec(build.wrapDescription("An XML document", "type")),
           "graphile-build built-in (XML type)",
         );
+        build.registerCursorConnection({
+          typeName: "XML",
+          scope: {},
+          nonNullNode: false,
+        });
 
         return _;
       },
