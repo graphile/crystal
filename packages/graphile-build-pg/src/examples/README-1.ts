@@ -13,7 +13,7 @@ import {
   QueryQueryPlugin,
   SwallowErrorsPlugin,
 } from "graphile-build";
-import { crystalPrint } from "graphile-crystal";
+import { crystalPrint, stripAnsi } from "graphile-crystal";
 import { exportSchema } from "graphile-exporter";
 import { resolvePresets } from "graphile-plugin";
 import { formatError, graphql, printSchema } from "graphql";
@@ -138,8 +138,10 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
       context: contextValue,
       pretty: true,
       customFormatErrorFn(e) {
-        return Object.assign(e.toJSON(), {
-          extensions: { stack: e.stack?.split("\n") },
+        const obj = e.toJSON();
+        return Object.assign(obj, {
+          message: stripAnsi(obj.message),
+          extensions: { stack: stripAnsi(e.stack ?? "").split("\n") },
         });
       },
     }),
