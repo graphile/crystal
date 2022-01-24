@@ -267,7 +267,6 @@ export const PgProceduresPlugin: Plugin = {
             if (!source) {
               return null;
             }
-            console.log("Function source");
             return EXPORTABLE(
               (
                 extensions,
