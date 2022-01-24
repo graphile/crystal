@@ -244,6 +244,9 @@ export class Aether<
   public readonly planIdByPathIdentity: {
     [pathIdentity: string]: number | undefined;
   };
+  public readonly isUnplannedByPathIdentity: {
+    [pathIdentity: string]: boolean | undefined;
+  };
 
   /**
    * Whereas `planIdByPathIdentity` references the plan that controls what a
@@ -388,6 +391,7 @@ export class Aether<
     this.planIdByPathIdentity = Object.assign(Object.create(null), {
       [ROOT_PATH]: this.rootValuePlan.id,
     });
+    this.isUnplannedByPathIdentity = Object.create(null);
     this.itemPlanIdByFieldPathIdentity = Object.assign(Object.create(null), {
       [ROOT_PATH]: this.rootValuePlan.id,
     });
@@ -865,6 +869,7 @@ export class Aether<
       } else {
         // There's no plan resolver; use the parent plan
         plan = parentPlan;
+        this.isUnplannedByPathIdentity[pathIdentity] = true;
       }
 
       this.planIdByPathIdentity[pathIdentity] = plan.id;

@@ -233,6 +233,8 @@ function crystalWrapResolveOrSubscribe<
       /* 👆👆👆👆👆 NO AWAIT ALLOWED ABOVE HERE 👆👆👆👆👆 */
 
       const result = await resultPromise;
+      const isUnplanned =
+        aether.isUnplannedByPathIdentity[pathIdentity] === true;
 
       debug(
         `👈 %p/%c for %s; result: %c`,
@@ -252,11 +254,15 @@ function crystalWrapResolveOrSubscribe<
           result,
         );
         return userSpecifiedResolver(result, argumentValues, context, info);
+      } else if (isUnplanned) {
+        // If the field is unplanned then we want the default resolver to
+        // extract the relevant property.
+        return defaultFieldResolver(result, argumentValues, context, info);
       } else {
-        // In the case of leaf fields this will just be the underlying data to
-        // return; however in all other cases this is either a CrystalObject or
-        // an n-dimensional list of CrystalObjects, or a stream of these
-        // things.
+        // In the case of planned leaf fields this will just be the underlying
+        // data to return; however in all other cases this is either a
+        // CrystalObject or an n-dimensional list of CrystalObjects, or a
+        // stream of these things.
         return result;
       }
     };
