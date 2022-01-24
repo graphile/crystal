@@ -276,7 +276,9 @@ const viaDateFormat = (format: string): Cast => {
       return sql`to_char(${frag}, ${sqlFormat})`;
     },
     listCastFromPg(frag) {
-      return sql`(select array_agg(to_char(t, ${sqlFormat})) from unnest(${frag}) t)::text`;
+      return sql`(${sql.indent(
+        sql`select array_agg(to_char(t, ${sqlFormat}))\nfrom unnest(${frag}) t`,
+      )})::text`;
     },
   };
 };
