@@ -422,10 +422,6 @@ export class PgSelectPlan<
     // The column on the result that indicates which group the result belongs to
     identifierIndex: number | null;
 
-    // The dependency index (i.e. index in the `values` object we'll receive
-    // during execution) in which each of the `queryValues` are identified.
-    queryValuesDependencyIndexes: number[];
-
     // If last but not first, reverse order.
     shouldReverseOrder: boolean;
   } | null = null;
@@ -1113,13 +1109,8 @@ export class PgSelectPlan<
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectPlan before finalizing it.");
     }
-    const {
-      text,
-      rawSqlValues,
-      identifierIndex,
-      queryValuesDependencyIndexes,
-      shouldReverseOrder,
-    } = this.finalizeResults;
+    const { text, rawSqlValues, identifierIndex, shouldReverseOrder } =
+      this.finalizeResults;
 
     const executionResult = await this.source.executeWithCache(
       values.map((value) => {
@@ -1128,8 +1119,8 @@ export class PgSelectPlan<
           context: value[this.contextId],
           queryValues:
             identifierIndex != null
-              ? queryValuesDependencyIndexes.map(
-                  (dependencyIndex) => value[dependencyIndex],
+              ? this.queryValues.map(({ dependencyIndex, codec }) =>
+                  codec.toPg(value[dependencyIndex]),
                 )
               : EMPTY_ARRAY,
         };
@@ -1176,7 +1167,6 @@ export class PgSelectPlan<
       textForDeclare,
       rawSqlValuesForDeclare,
       identifierIndex,
-      queryValuesDependencyIndexes,
       shouldReverseOrder,
       streamInitialCount,
     } = this.finalizeResults;
@@ -1197,8 +1187,8 @@ export class PgSelectPlan<
                 context: value[this.contextId],
                 queryValues:
                   identifierIndex != null
-                    ? queryValuesDependencyIndexes.map(
-                        (dependencyIndex) => value[dependencyIndex],
+                    ? this.queryValues.map(({ dependencyIndex, codec }) =>
+                        codec.toPg(value[dependencyIndex]),
                       )
                     : EMPTY_ARRAY,
               };
@@ -1221,8 +1211,8 @@ export class PgSelectPlan<
             context: value[this.contextId],
             queryValues:
               identifierIndex != null
-                ? queryValuesDependencyIndexes.map(
-                    (dependencyIndex) => value[dependencyIndex],
+                ? this.queryValues.map(({ dependencyIndex, codec }) =>
+                    codec.toPg(value[dependencyIndex]),
                   )
                 : EMPTY_ARRAY,
           };
@@ -1716,11 +1706,6 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
         }
       };
 
-      // The most trivial of optimisations...
-      const queryValuesDependencyIndexes = this.queryValues.map(
-        ({ dependencyIndex }) => dependencyIndex,
-      );
-
       if (this.streamOptions) {
         // When streaming we can't reverse order in JS - we must do it in the DB.
         if (this.streamOptions.initialCount > 0) {
@@ -1760,7 +1745,6 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
             textForDeclare,
             rawSqlValuesForDeclare,
             identifierIndex,
-            queryValuesDependencyIndexes,
             shouldReverseOrder: false,
             streamInitialCount: this.streamOptions.initialCount,
           };
@@ -1788,7 +1772,6 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
             textForDeclare,
             rawSqlValuesForDeclare,
             identifierIndex: streamIdentifierIndex,
-            queryValuesDependencyIndexes,
             shouldReverseOrder: false,
             streamInitialCount: 0,
           };
@@ -1802,7 +1785,6 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
           text,
           rawSqlValues,
           identifierIndex,
-          queryValuesDependencyIndexes,
           // TODO: when streaming we must not set this to true
           shouldReverseOrder: this.shouldReverseOrder(),
         };
