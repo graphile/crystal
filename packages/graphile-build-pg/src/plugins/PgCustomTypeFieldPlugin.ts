@@ -7,12 +7,12 @@ import "./PgProceduresPlugin";
 import type {
   PgSelectArgumentSpec,
   PgSelectPlan,
-  PgSelectSinglePlan,
   PgSource,
   PgSourceParameter,
   PgTypeCodec,
 } from "@dataplan/pg";
-import { TYPES } from "@dataplan/pg";
+import { PgSelectSinglePlan,TYPES } from "@dataplan/pg";
+import type { ExecutablePlan } from "graphile-crystal";
 import { connection } from "graphile-crystal";
 import type { TrackedArguments } from "graphile-crystal/src/interfaces";
 import { EXPORTABLE } from "graphile-exporter";
@@ -122,7 +122,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
           scope: { isPgTableType, pgCodec, isRootQuery, isRootMutation },
           fieldWithHooks,
         } = context;
-        if (!isPgTableType || !pgCodec) {
+        if (!(isPgTableType && pgCodec) && !isRootQuery && !isRootMutation) {
           return fields;
         }
         const procSources = (() => {
@@ -166,199 +166,266 @@ export const PgCustomTypeFieldPlugin: Plugin = {
             );
           }
         })();
+        if (isRootQuery) {
+          console.log(`${procSources.length} query sources`);
+        }
+        if (isRootMutation) {
+          console.log(`${procSources.length} mutation sources`);
+        }
         if (procSources.length === 0) {
           return fields;
         }
 
         return build.extend(
           fields,
-          procSources.reduce((memo, source) => {
-            const sourceInnerCodec: PgTypeCodec<any, any, any> =
-              source.codec.arrayOfCodec ?? source.codec;
-            if (!sourceInnerCodec) {
-              return memo;
-            }
-            const isVoid = sourceInnerCodec === TYPES.void;
-            const innerType = isVoid
-              ? null
-              : (getGraphQLTypeByPgCodec(sourceInnerCodec, "output") as
-                  | GraphQLOutputType
-                  | undefined);
-            if (!innerType && !isVoid) {
-              console.warn(
-                `Failed to find a suitable type for codec '${
-                  sql.compile(source.codec.sqlType).text
-                }'; not adding function field`,
-              );
-              return memo;
-            }
+          procSources.reduce(
+            (memo, source) =>
+              build.recoverable(memo, () => {
+                const sourceInnerCodec: PgTypeCodec<any, any, any> =
+                  source.codec.arrayOfCodec ?? source.codec;
+                if (!sourceInnerCodec) {
+                  return memo;
+                }
+                const isVoid = sourceInnerCodec === TYPES.void;
+                const innerType = isVoid
+                  ? null
+                  : (getGraphQLTypeByPgCodec(sourceInnerCodec, "output") as
+                      | GraphQLOutputType
+                      | undefined);
+                if (!innerType && !isVoid) {
+                  console.warn(
+                    `Failed to find a suitable type for codec '${
+                      sql.compile(source.codec.sqlType).text
+                    }'; not adding function field`,
+                  );
+                  return memo;
+                }
 
-            // TODO: nullability
-            const type =
-              innerType && source.codec.arrayOfCodec
-                ? new GraphQLList(innerType)
-                : innerType;
+                // TODO: nullability
+                const type =
+                  innerType && source.codec.arrayOfCodec
+                    ? new GraphQLList(innerType)
+                    : innerType;
 
-            // "Computed columns" skip a parameter
-            const remainingParameters = (
-              isRootMutation || isRootQuery
-                ? source.parameters
-                : source.parameters.slice(1)
-            ) as PgSourceParameter[];
-            const argDetails = remainingParameters.map((param, index) => {
-              const argName = build.inflection.argument({
-                param,
-                source,
-                index,
-              });
-              const baseInputType = getGraphQLTypeByPgCodec(
-                param.codec,
-                "input",
-              );
-              const inputType =
-                param.notNull && param.required
-                  ? new GraphQLNonNull(baseInputType!)
-                  : baseInputType;
-              return {
-                argName,
-                pgCodec: param.codec,
-                inputType,
-                required: param.required,
-              };
-            });
-            const args = argDetails.reduce((memo, { argName, inputType }) => {
-              memo[argName] = {
-                type: inputType,
-              };
-              return memo;
-            }, {});
+                // "Computed columns" skip a parameter
+                const remainingParameters = (
+                  isRootMutation || isRootQuery
+                    ? source.parameters
+                    : source.parameters.slice(1)
+                ) as PgSourceParameter[];
 
-            const getSelectPlanFromRowAndArgs = EXPORTABLE(
-              (argDetails, isNotNullish, source) =>
-                (
-                  $row: PgSelectSinglePlan<any, any, any, any>,
-                  args: TrackedArguments<any>,
-                ) => {
-                  const selectArgs: PgSelectArgumentSpec[] = [
-                    { plan: $row.record() },
-                    ...argDetails
-                      .map(({ argName, pgCodec, required }) => {
-                        const plan = args[argName];
-                        if (!required && plan.evalIs(undefined)) {
-                          return null;
-                        }
-                        return { plan, pgCodec };
-                      })
-                      .filter(isNotNullish),
-                  ];
-                  return source.execute(selectArgs);
-                },
-              [argDetails, isNotNullish, source],
-            );
+                const argDetails = remainingParameters.map((param, index) => {
+                  const argName = build.inflection.argument({
+                    param,
+                    source,
+                    index,
+                  });
+                  const paramBaseCodec =
+                    param.codec.arrayOfCodec ?? param.codec;
+                  const baseInputType = getGraphQLTypeByPgCodec(
+                    paramBaseCodec,
+                    "input",
+                  );
+                  if (!baseInputType) {
+                    throw new Error(
+                      `Failed to find a suitable type for argument codec '${
+                        sql.compile(param.codec.sqlType).text
+                      }'; not adding function field`,
+                    );
+                  }
 
-            if (isRootMutation) {
-              // mutation type
-              const fieldName = build.inflection.customMutation({ source });
-              const payloadTypeName = build.inflection.customMutationPayload({
-                source,
-              });
-              const payloadType = build.getOutputTypeByName(payloadTypeName);
-              if (!payloadType) {
-                return memo;
-              }
-              memo[fieldName] = fieldWithHooks(
-                { fieldName },
-                {
-                  description: source.description,
-                  type: payloadType,
-                  args,
-                  plan: getSelectPlanFromRowAndArgs,
-                },
-              );
-            } else if (source.isUnique) {
-              const fieldName = isRootQuery
-                ? build.inflection.customQuery({ source })
-                : build.inflection.computedColumn({ source });
-              memo[fieldName] = fieldWithHooks(
-                { fieldName },
-                {
-                  description: source.description,
-                  type: type!,
-                  args,
-                  plan: getSelectPlanFromRowAndArgs,
-                },
-              );
-            } else {
-              // isUnique is false => this is a 'setof' source.
+                  // Not necessarily a list type... Need to rename this
+                  // variable.
+                  const listType = param.codec.arrayOfCodec
+                    ? new GraphQLList(baseInputType)
+                    : baseInputType;
 
-              // If the source still has an array type, then it's a 'setof
-              // foo[]' which __MUST NOT USE__ GraphQL connections; see:
-              // https://relay.dev/graphql/connections.htm#sec-Node
-              const canUseConnection = !source.sqlPartitionByIndex;
+                  const inputType =
+                    param.notNull && param.required
+                      ? new GraphQLNonNull(listType)
+                      : listType;
+                  return {
+                    argName,
+                    pgCodec: param.codec,
+                    inputType,
+                    required: param.required,
+                  };
+                });
+                const args = argDetails.reduce(
+                  (memo, { inputType, argName }) => {
+                    memo[argName] = {
+                      type: inputType,
+                    };
+                    return memo;
+                  },
+                  {},
+                );
 
-              const behavior = getBehavior(source.extensions) ?? [
-                canUseConnection ? "connection" : "list",
-              ];
+                const getSelectPlanFromParentAndArgs =
+                  isRootQuery || isRootMutation
+                    ? // Not computed
+                      EXPORTABLE(
+                        (argDetails, isNotNullish, source) =>
+                          (
+                            $root: ExecutablePlan,
+                            args: TrackedArguments<any>,
+                          ) => {
+                            const selectArgs: PgSelectArgumentSpec[] = [
+                              ...argDetails
+                                .map(({ argName, pgCodec, required }) => {
+                                  const plan = args[argName];
+                                  if (!required && plan.evalIs(undefined)) {
+                                    return null;
+                                  }
+                                  return { plan, pgCodec };
+                                })
+                                .filter(isNotNullish),
+                            ];
+                            return source.execute(selectArgs);
+                          },
+                        [argDetails, isNotNullish, source],
+                      )
+                    : // Otherwise computed:
+                      EXPORTABLE(
+                        (PgSelectSinglePlan, argDetails, isNotNullish, source) => (
+                            $row: ExecutablePlan,
+                            args: TrackedArguments<any>,
+                          ) => {
+                            if (!($row instanceof PgSelectSinglePlan)) {
+                              throw new Error(
+                                `Invalid plan, exepcted 'PgSelectSinglePlan', but found ${$row}`,
+                              );
+                            }
+                            const selectArgs: PgSelectArgumentSpec[] = [
+                              { plan: $row.record() },
+                              ...argDetails
+                                .map(({ argName, pgCodec, required }) => {
+                                  const plan = args[argName];
+                                  if (!required && plan.evalIs(undefined)) {
+                                    return null;
+                                  }
+                                  return { plan, pgCodec };
+                                })
+                                .filter(isNotNullish),
+                            ];
+                            return source.execute(selectArgs);
+                          },
+                        [PgSelectSinglePlan, argDetails, isNotNullish, source],
+                      );
 
-              if (behavior.includes("connection") && canUseConnection) {
-                const fieldName = isRootQuery
-                  ? build.inflection.customQueryConnection({ source })
-                  : build.inflection.computedColumnConnection({ source });
-                const namedType = build.graphql.getNamedType(type!);
-                const ConnectionType = namedType
-                  ? build.getOutputTypeByName(
-                      build.inflection.connectionType(namedType.name),
-                    )
-                  : null;
-                if (ConnectionType) {
+                if (isRootMutation) {
+                  // mutation type
+                  const fieldName = build.inflection.customMutation({ source });
+                  const payloadTypeName =
+                    build.inflection.customMutationPayload({
+                      source,
+                    });
+                  const payloadType =
+                    build.getOutputTypeByName(payloadTypeName);
+                  if (!payloadType) {
+                    return memo;
+                  }
                   memo[fieldName] = fieldWithHooks(
                     { fieldName },
                     {
                       description: source.description,
-                      type: ConnectionType,
+                      type: payloadType,
                       args,
-                      plan: EXPORTABLE(
-                        (connection, getSelectPlanFromRowAndArgs) =>
-                          function plan(
-                            $row: PgSelectSinglePlan<any, any, any, any>,
-                            args: TrackedArguments<any>,
-                          ) {
-                            const $select = getSelectPlanFromRowAndArgs(
-                              $row,
-                              args,
-                            ) as PgSelectPlan<any, any, any, any>;
-                            return connection(
-                              $select,
-                              ($item) => $item,
-                              ($item: PgSelectSinglePlan<any, any, any, any>) =>
-                                $item.cursor(),
-                            );
-                          },
-                        [connection, getSelectPlanFromRowAndArgs],
-                      ),
+                      plan: getSelectPlanFromParentAndArgs as any,
                     },
                   );
-                }
-              }
+                } else if (source.isUnique) {
+                  const fieldName = isRootQuery
+                    ? build.inflection.customQuery({ source })
+                    : build.inflection.computedColumn({ source });
+                  memo[fieldName] = fieldWithHooks(
+                    { fieldName },
+                    {
+                      description: source.description,
+                      type: type!,
+                      args,
+                      plan: getSelectPlanFromParentAndArgs as any,
+                    },
+                  );
+                } else {
+                  // isUnique is false => this is a 'setof' source.
 
-              if (behavior.includes("list")) {
-                const fieldName = isRootQuery
-                  ? build.inflection.customQueryList({ source })
-                  : build.inflection.computedColumnList({ source });
-                memo[fieldName] = fieldWithHooks(
-                  { fieldName },
-                  {
-                    description: source.description,
-                    // TODO: nullability
-                    type: new build.graphql.GraphQLList(type!),
-                    args,
-                    plan: getSelectPlanFromRowAndArgs as any,
-                  },
-                );
-              }
-            }
-            return memo;
-          }, {}),
+                  // If the source still has an array type, then it's a 'setof
+                  // foo[]' which __MUST NOT USE__ GraphQL connections; see:
+                  // https://relay.dev/graphql/connections.htm#sec-Node
+                  const canUseConnection = !source.sqlPartitionByIndex;
+
+                  const behavior = getBehavior(source.extensions) ?? [
+                    canUseConnection ? "connection" : "list",
+                  ];
+
+                  if (behavior.includes("connection") && canUseConnection) {
+                    const fieldName = isRootQuery
+                      ? build.inflection.customQueryConnection({ source })
+                      : build.inflection.computedColumnConnection({ source });
+                    const namedType = build.graphql.getNamedType(type!);
+                    const ConnectionType = namedType
+                      ? build.getOutputTypeByName(
+                          build.inflection.connectionType(namedType.name),
+                        )
+                      : null;
+                    if (ConnectionType) {
+                      memo[fieldName] = fieldWithHooks(
+                        { fieldName },
+                        {
+                          description: source.description,
+                          type: ConnectionType,
+                          args,
+                          plan: EXPORTABLE(
+                            (connection, getSelectPlanFromParentAndArgs) =>
+                              function plan(
+                                $parent: ExecutablePlan,
+                                args: TrackedArguments<any>,
+                              ) {
+                                const $select = getSelectPlanFromParentAndArgs(
+                                  $parent,
+                                  args,
+                                ) as PgSelectPlan<any, any, any, any>;
+                                return connection(
+                                  $select,
+                                  ($item) => $item,
+                                  (
+                                    $item: PgSelectSinglePlan<
+                                      any,
+                                      any,
+                                      any,
+                                      any
+                                    >,
+                                  ) => $item.cursor(),
+                                );
+                              },
+                            [connection, getSelectPlanFromParentAndArgs],
+                          ),
+                        },
+                      );
+                    }
+                  }
+
+                  if (behavior.includes("list")) {
+                    const fieldName = isRootQuery
+                      ? build.inflection.customQueryList({ source })
+                      : build.inflection.computedColumnList({ source });
+                    memo[fieldName] = fieldWithHooks(
+                      { fieldName },
+                      {
+                        description: source.description,
+                        // TODO: nullability
+                        type: new build.graphql.GraphQLList(type!),
+                        args,
+                        plan: getSelectPlanFromParentAndArgs as any,
+                      },
+                    );
+                  }
+                }
+                return memo;
+              }),
+            {},
+          ),
           `Adding custom type field for ${Self.name}`,
         );
       },
