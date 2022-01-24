@@ -140,7 +140,7 @@ export const CommonTypesPlugin: Plugin = {
         if (jsonScalarAsString !== true) {
           const parseLiteral: GraphQLScalarLiteralParser<any> = EXPORTABLE(
             (Kind) => {
-              const parseLiteral: GraphQLScalarLiteralParser<any> = (
+              const parseLiteralToObject: GraphQLScalarLiteralParser<any> = (
                 ast,
                 variables,
               ): any => {
@@ -154,7 +154,7 @@ export const CommonTypesPlugin: Plugin = {
                   case Kind.OBJECT: {
                     const value = Object.create(null);
                     ast.fields.forEach((field) => {
-                      value[field.name.value] = parseLiteral(
+                      value[field.name.value] = parseLiteralToObject(
                         field.value,
                         variables,
                       );
@@ -163,7 +163,9 @@ export const CommonTypesPlugin: Plugin = {
                     return value;
                   }
                   case Kind.LIST:
-                    return ast.values.map((n) => parseLiteral(n, variables));
+                    return ast.values.map((n) =>
+                      parseLiteralToObject(n, variables),
+                    );
                   case Kind.NULL:
                     return null;
                   case Kind.VARIABLE: {
@@ -174,6 +176,14 @@ export const CommonTypesPlugin: Plugin = {
                     return undefined;
                 }
               };
+              const parseLiteral: GraphQLScalarLiteralParser<any> = (
+                ast,
+                variables,
+              ): any => {
+                const obj = parseLiteralToObject(ast, variables);
+                return JSON.stringify(obj);
+              };
+
               return parseLiteral;
             },
             [Kind],
@@ -186,8 +196,9 @@ export const CommonTypesPlugin: Plugin = {
                 `Represents JSON values as specified by ` +
                 "[ECMA-404](http://www.ecma-international.org/" +
                 "publications/files/ECMA-ST/ECMA-404.pdf).",
-              serialize: (value) => value,
-              parseValue: (value) => value,
+              serialize: (value) =>
+                value == null ? value : JSON.parse(String(value)),
+              parseValue: (value) => JSON.stringify(value),
               parseLiteral,
             }),
             "graphile-build built-in (JSON type; extended)",
