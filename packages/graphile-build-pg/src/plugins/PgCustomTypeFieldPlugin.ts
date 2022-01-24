@@ -142,10 +142,10 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                   param.codec,
                   "input",
                 );
-                const nonNull = param.required;
-                const inputType = nonNull
-                  ? new GraphQLNonNull(baseInputType!)
-                  : baseInputType;
+                const inputType =
+                  param.notNull && param.required
+                    ? new GraphQLNonNull(baseInputType!)
+                    : baseInputType;
                 return {
                   argName,
                   pgCodec: param.codec,
