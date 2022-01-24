@@ -109,6 +109,10 @@ export const PgAllRowsPlugin: Plugin = {
           return fields;
         }
         for (const source of build.input.pgSources) {
+          if (source.parameters) {
+            // Skip functions
+            continue;
+          }
           if (!source.find) {
             continue;
           }
