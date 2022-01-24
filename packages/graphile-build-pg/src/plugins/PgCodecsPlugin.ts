@@ -987,6 +987,11 @@ export const PgCodecsPlugin: Plugin = {
           const visited: Set<PgTypeCodec<any, any, any, any>> = new Set();
           for (const source of build.input.pgSources) {
             walkCodec(source.codec, visited);
+            if (source.parameters) {
+              for (const parameter of source.parameters) {
+                walkCodec(parameter.codec, visited);
+              }
+            }
           }
 
           return _;
