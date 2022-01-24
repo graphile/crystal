@@ -224,10 +224,11 @@ export const PgProceduresPlugin: Plugin = {
           const sourceCallback = EXPORTABLE(
             (namespaceName, procName, sql) =>
               (...args: SQL[]) =>
-                sql`${sql.identifier(namespaceName, procName)}(${sql.join(
-                  args,
-                  ", ",
-                )})`,
+                sql`${sql.identifier(namespaceName, procName)}(${
+                  args.length > 1
+                    ? sql.indent(sql.join(args, ",\n"))
+                    : sql.join(args, ", ")
+                })`,
             [namespaceName, procName, sql],
           );
 
