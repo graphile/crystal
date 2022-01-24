@@ -45,12 +45,6 @@ declare global {
   }
 }
 
-declare module "@dataplan/pg" {
-  interface PgSourceExtensions {
-    isMutation?: boolean;
-  }
-}
-
 declare module "graphile-plugin" {
   interface GatherHelpers {
     pgProcedures: {
@@ -154,7 +148,6 @@ export const PgProceduresPlugin: Plugin = {
             pgProc.provolatile !== "i" && pgProc.provolatile !== "s";
 
           const extensions: PgSourceExtensions = {
-            isMutation,
             tags: {
               // TODO
             },
@@ -269,6 +262,7 @@ export const PgProceduresPlugin: Plugin = {
             return EXPORTABLE(
               (
                 extensions,
+                isMutation,
                 name,
                 parameters,
                 returnsArray,
@@ -283,9 +277,11 @@ export const PgProceduresPlugin: Plugin = {
                   returnsArray,
                   returnsSetof,
                   extensions,
+                  isMutation,
                 }),
               [
                 extensions,
+                isMutation,
                 name,
                 parameters,
                 returnsArray,
@@ -301,6 +297,7 @@ export const PgProceduresPlugin: Plugin = {
               PgSource,
               executor,
               extensions,
+              isMutation,
               name,
               parameters,
               returnCodec,
@@ -316,11 +313,13 @@ export const PgProceduresPlugin: Plugin = {
                 codec: returnCodec,
                 uniques: [],
                 extensions,
+                isMutation,
               }),
             [
               PgSource,
               executor,
               extensions,
+              isMutation,
               name,
               parameters,
               returnCodec,

@@ -167,6 +167,7 @@ export interface PgSourceOptions<
    */
   isUnique?: boolean;
   sqlPartitionByIndex?: SQL;
+  isMutation?: boolean;
 }
 
 /**
@@ -311,6 +312,7 @@ export class PgSource<
   public readonly parameters: TParameters;
   public readonly description: string | undefined;
   public readonly isUnique: boolean;
+  public readonly isMutation: boolean;
 
   public readonly extensions: Partial<PgSourceExtensions> | undefined;
 
@@ -359,6 +361,7 @@ export class PgSource<
       description,
       isUnique,
       sqlPartitionByIndex,
+      isMutation,
     } = options;
     this._options = options;
     this.extensions = extensions;
@@ -377,6 +380,7 @@ export class PgSource<
     this.description = description;
     this.isUnique = !!isUnique;
     this.sqlPartitionByIndex = sqlPartitionByIndex ?? null;
+    this.isMutation = !!isMutation;
 
     // parameters is null iff source is not a function
     const sourceIsFunction = typeof this.source === "function";
@@ -449,6 +453,7 @@ export class PgSource<
     returnsArray: boolean;
     uniques?: TUniques;
     extensions?: PgSourceExtensions;
+    isMutation?: boolean;
   }) {
     const {
       name,
@@ -458,6 +463,7 @@ export class PgSource<
       returnsArray,
       uniques,
       extensions,
+      isMutation,
     } = overrideOptions;
     const { codec, executor, relations } = this._options;
     if (!returnsArray) {
@@ -472,6 +478,7 @@ export class PgSource<
         parameters,
         extensions,
         isUnique: !returnsSetof,
+        isMutation: Boolean(isMutation),
       });
     } else if (!returnsSetof) {
       // This is a `composite[]` function; convert it to a `setof composite` function:
@@ -486,6 +493,7 @@ export class PgSource<
         parameters,
         extensions,
         isUnique: false, // set now, not unique
+        isMutation: Boolean(isMutation),
       });
     } else {
       // This is a `setof composite[]` function; convert it to `setof composite` and indicate that we should partition it.
@@ -506,6 +514,7 @@ export class PgSource<
         extensions,
         isUnique: false, // set now, not unique
         sqlPartitionByIndex,
+        isMutation: Boolean(isMutation),
       });
     }
   }
@@ -736,6 +745,9 @@ export class PgSource<
       identifiers: [],
       args,
     });
+    if (this.isMutation) {
+      $select.hasSideEffects = true;
+    }
     if (this.isUnique) {
       return $select.single();
     }

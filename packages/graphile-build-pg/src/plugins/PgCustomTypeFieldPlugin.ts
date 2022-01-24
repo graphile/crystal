@@ -10,7 +10,9 @@ import type {
   PgSelectSinglePlan,
   PgSource,
   PgSourceParameter,
+  PgTypeCodec,
 } from "@dataplan/pg";
+import { TYPES } from "@dataplan/pg";
 import { connection } from "graphile-crystal";
 import type { TrackedArguments } from "graphile-crystal/src/interfaces";
 import { EXPORTABLE } from "graphile-exporter";
@@ -24,7 +26,7 @@ function isNotNullish<T>(a: T | null | undefined): a is T {
   return a != null;
 }
 
-interface ComputedColumnDetails {
+interface ProcedureDetails {
   source: PgSource<any, any, any, PgSourceParameter[]>;
 }
 interface ArgumentDetails {
@@ -36,15 +38,23 @@ interface ArgumentDetails {
 declare global {
   namespace GraphileEngine {
     interface Inflection {
-      computedColumn(this: Inflection, details: ComputedColumnDetails): string;
+      customMutation(this: Inflection, details: ProcedureDetails): string;
+      customMutationPayload(
+        this: Inflection,
+        details: ProcedureDetails,
+      ): string;
+      customQuery(this: Inflection, details: ProcedureDetails): string;
+      customQueryConnection(
+        this: Inflection,
+        details: ProcedureDetails,
+      ): string;
+      customQueryList(this: Inflection, details: ProcedureDetails): string;
+      computedColumn(this: Inflection, details: ProcedureDetails): string;
       computedColumnConnection(
         this: Inflection,
-        details: ComputedColumnDetails,
+        details: ProcedureDetails,
       ): string;
-      computedColumnList(
-        this: Inflection,
-        details: ComputedColumnDetails,
-      ): string;
+      computedColumnList(this: Inflection, details: ProcedureDetails): string;
       argument(this: Inflection, details: ArgumentDetails): string;
     }
   }
@@ -61,7 +71,27 @@ export const PgCustomTypeFieldPlugin: Plugin = {
         return build.extend(
           inflection,
           {
+            customMutation(details) {
+              return this.camelCase(
+                details.source.extensions?.tags?.name ?? details.source.name,
+              );
+            },
+            customMutationPayload(details) {
+              return this.camelCase(this.customMutation(details) + "-payload");
+            },
+            customQuery(details) {
+              return this.camelCase(
+                details.source.extensions?.tags?.name ?? details.source.name,
+              );
+            },
+            customQueryConnection(details) {
+              return this.customQuery(details);
+            },
+            customQueryList(details) {
+              return this.camelCase(this.customQuery(details) + "-list");
+            },
             computedColumn(details) {
+              // TODO: remove prefix from name?
               return this.camelCase(
                 details.source.extensions?.tags?.name ?? details.source.name,
               );
@@ -89,19 +119,53 @@ export const PgCustomTypeFieldPlugin: Plugin = {
         } = build;
         const {
           Self,
-          scope: { isPgTableType, pgCodec },
+          scope: { isPgTableType, pgCodec, isRootQuery, isRootMutation },
           fieldWithHooks,
         } = context;
         if (!isPgTableType || !pgCodec) {
           return fields;
         }
-        const procSources = build.input.pgSources.filter(
-          (s) =>
-            s.parameters?.[0]?.codec === pgCodec &&
-            (getBehavior(s.extensions) ?? ["type_field"]).includes(
-              "type_field",
-            ),
-        );
+        const procSources = (() => {
+          if (isRootQuery) {
+            // "custom query"
+            // Find non-mutation function sources that don't accept a row type
+            // as the first argument
+            return build.input.pgSources.filter(
+              (s) =>
+                !s.isMutation &&
+                s.parameters &&
+                !(s as PgSource<any, any, any, PgSourceParameter[]>)
+                  .parameters[0]?.codec?.columns &&
+                (getBehavior(s.extensions) ?? ["query_field"]).includes(
+                  "query_field",
+                ),
+            );
+          } else if (isRootMutation) {
+            // "custom mutation"
+            // Find mutation function sources
+            return build.input.pgSources.filter(
+              (s) =>
+                s.isMutation &&
+                s.parameters &&
+                (getBehavior(s.extensions) ?? ["mutation"]).includes(
+                  "mutation",
+                ),
+            );
+          } else {
+            // "computed column"
+            // Find non-mutation function sources that accept a row type of the
+            // matching codec as the first argument
+            return build.input.pgSources.filter(
+              (s) =>
+                !s.isMutation &&
+                s.parameters &&
+                s.parameters?.[0]?.codec === pgCodec &&
+                (getBehavior(s.extensions) ?? ["type_field"]).includes(
+                  "type_field",
+                ),
+            );
+          }
+        })();
         if (procSources.length === 0) {
           return fields;
         }
@@ -109,14 +173,18 @@ export const PgCustomTypeFieldPlugin: Plugin = {
         return build.extend(
           fields,
           procSources.reduce((memo, source) => {
-            if (source.extensions?.isMutation) {
+            const sourceInnerCodec: PgTypeCodec<any, any, any> =
+              source.codec.arrayOfCodec ?? source.codec;
+            if (!sourceInnerCodec) {
               return memo;
             }
-            const innerType = getGraphQLTypeByPgCodec(
-              source.codec.arrayOfCodec ?? source.codec,
-              "output",
-            ) as GraphQLOutputType | undefined;
-            if (!innerType) {
+            const isVoid = sourceInnerCodec === TYPES.void;
+            const innerType = isVoid
+              ? null
+              : (getGraphQLTypeByPgCodec(sourceInnerCodec, "output") as
+                  | GraphQLOutputType
+                  | undefined);
+            if (!innerType && !isVoid) {
               console.warn(
                 `Failed to find a suitable type for codec '${
                   sql.compile(source.codec.sqlType).text
@@ -126,33 +194,38 @@ export const PgCustomTypeFieldPlugin: Plugin = {
             }
 
             // TODO: nullability
-            const type = source.codec.arrayOfCodec
-              ? new GraphQLList(innerType)
-              : innerType;
+            const type =
+              innerType && source.codec.arrayOfCodec
+                ? new GraphQLList(innerType)
+                : innerType;
 
-            const argDetails = (source.parameters as PgSourceParameter[])
-              .slice(1)
-              .map((param, index) => {
-                const argName = build.inflection.argument({
-                  param,
-                  source,
-                  index,
-                });
-                const baseInputType = getGraphQLTypeByPgCodec(
-                  param.codec,
-                  "input",
-                );
-                const inputType =
-                  param.notNull && param.required
-                    ? new GraphQLNonNull(baseInputType!)
-                    : baseInputType;
-                return {
-                  argName,
-                  pgCodec: param.codec,
-                  inputType,
-                  required: param.required,
-                };
+            // "Computed columns" skip a parameter
+            const remainingParameters = (
+              isRootMutation || isRootQuery
+                ? source.parameters
+                : source.parameters.slice(1)
+            ) as PgSourceParameter[];
+            const argDetails = remainingParameters.map((param, index) => {
+              const argName = build.inflection.argument({
+                param,
+                source,
+                index,
               });
+              const baseInputType = getGraphQLTypeByPgCodec(
+                param.codec,
+                "input",
+              );
+              const inputType =
+                param.notNull && param.required
+                  ? new GraphQLNonNull(baseInputType!)
+                  : baseInputType;
+              return {
+                argName,
+                pgCodec: param.codec,
+                inputType,
+                required: param.required,
+              };
+            });
             const args = argDetails.reduce((memo, { argName, inputType }) => {
               memo[argName] = {
                 type: inputType,
@@ -183,13 +256,34 @@ export const PgCustomTypeFieldPlugin: Plugin = {
               [argDetails, isNotNullish, source],
             );
 
-            if (source.isUnique) {
-              const fieldName = build.inflection.computedColumn({ source });
+            if (isRootMutation) {
+              // mutation type
+              const fieldName = build.inflection.customMutation({ source });
+              const payloadTypeName = build.inflection.customMutationPayload({
+                source,
+              });
+              const payloadType = build.getOutputTypeByName(payloadTypeName);
+              if (!payloadType) {
+                return memo;
+              }
               memo[fieldName] = fieldWithHooks(
                 { fieldName },
                 {
                   description: source.description,
-                  type,
+                  type: payloadType,
+                  args,
+                  plan: getSelectPlanFromRowAndArgs,
+                },
+              );
+            } else if (source.isUnique) {
+              const fieldName = isRootQuery
+                ? build.inflection.customQuery({ source })
+                : build.inflection.computedColumn({ source });
+              memo[fieldName] = fieldWithHooks(
+                { fieldName },
+                {
+                  description: source.description,
+                  type: type!,
                   args,
                   plan: getSelectPlanFromRowAndArgs,
                 },
@@ -207,10 +301,10 @@ export const PgCustomTypeFieldPlugin: Plugin = {
               ];
 
               if (behavior.includes("connection") && canUseConnection) {
-                const fieldName = build.inflection.computedColumnConnection({
-                  source,
-                });
-                const namedType = build.graphql.getNamedType(type);
+                const fieldName = isRootQuery
+                  ? build.inflection.customQueryConnection({ source })
+                  : build.inflection.computedColumnConnection({ source });
+                const namedType = build.graphql.getNamedType(type!);
                 const ConnectionType = namedType
                   ? build.getOutputTypeByName(
                       build.inflection.connectionType(namedType.name),
@@ -248,15 +342,15 @@ export const PgCustomTypeFieldPlugin: Plugin = {
               }
 
               if (behavior.includes("list")) {
-                const fieldName = build.inflection.computedColumnList({
-                  source,
-                });
+                const fieldName = isRootQuery
+                  ? build.inflection.customQueryList({ source })
+                  : build.inflection.computedColumnList({ source });
                 memo[fieldName] = fieldWithHooks(
                   { fieldName },
                   {
                     description: source.description,
                     // TODO: nullability
-                    type: new build.graphql.GraphQLList(type),
+                    type: new build.graphql.GraphQLList(type!),
                     args,
                     plan: getSelectPlanFromRowAndArgs as any,
                   },
