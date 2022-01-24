@@ -250,22 +250,41 @@ export function rangeOfCodec<
     fromPg(value) {
       const parsed = rangeParse(value);
       return {
-        lower: parsed.lower,
-        lowerInclusive: parsed.isLowerBoundClosed(),
-        upper: parsed.upper,
-        upperInclusive: parsed.isUpperBoundClosed(),
+        start:
+          parsed.lower != null
+            ? {
+                value: parsed.lower,
+                inclusive: parsed.isLowerBoundClosed(),
+              }
+            : null,
+        end:
+          parsed.upper != null
+            ? {
+                value: parsed.upper,
+                inclusive: parsed.isUpperBoundClosed(),
+              }
+            : null,
       };
     },
     toPg(value) {
-      if (value.lower == null && value.upper == null) {
-        return "";
+      let str = "";
+      if (value.start == null) {
+        str += "(";
+      } else {
+        str += `${value.start.inclusive ? "[" : "("}${escapeRangeValue(
+          value.start.value,
+          innerCodec,
+        )}`;
       }
-      return `${value.lowerInclusive ? "[" : "("}${escapeRangeValue(
-        value.lower,
-        innerCodec,
-      )},${escapeRangeValue(value.upper, innerCodec)}${
-        value.upperInclusive ? "]" : ")"
-      }`;
+      str += ",";
+      if (value.end == null) {
+        str += ")";
+      } else {
+        str += `${escapeRangeValue(value.end.value, innerCodec)}${
+          value.end.inclusive ? "]" : ")"
+        }`;
+      }
+      return str;
     },
     columns: undefined,
   };
