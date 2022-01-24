@@ -22,7 +22,7 @@ import type { Aether } from "./aether";
 import * as assert from "./assert";
 import type { CrystalResultsList, CrystalValuesList } from "./interfaces";
 import { ExecutablePlan } from "./plan";
-import { __TrackedObjectPlan } from "./plans";
+import { __TrackedObjectPlan, constant } from "./plans";
 import { defaultValueToValueNode } from "./utils";
 
 // TODO: should this have `__` prefix?
@@ -200,6 +200,7 @@ export class InputListPlan extends ExecutablePlan {
         const inputValue = values[inputValueIndex];
         const innerPlan = inputPlan(this.aether, innerType, inputValue);
         this.itemPlanIds.push(innerPlan.id);
+        this.addDependency(innerPlan);
       }
     }
     // TODO: is `outOfBoundsPlan` safe? Maybe it was before we simplified
@@ -207,16 +208,10 @@ export class InputListPlan extends ExecutablePlan {
     this.outOfBoundsPlanId = inputPlan(this.aether, innerType, undefined).id;
   }
 
-  execute(values: any[][]): any[] {
+  optimize() {
     const { inputValues } = this;
-
-    /**
-     * All the results will be the same, so generate them once and then share
-     * them with everyone.
-     */
-    let eachResult;
     if (inputValues?.kind === "NullValue") {
-      eachResult = null;
+      return constant(null);
     } else {
       const itemPlansLength = this.itemPlanIds.length;
       const list = new Array(itemPlansLength);
@@ -226,15 +221,19 @@ export class InputListPlan extends ExecutablePlan {
         itemPlanIndex++
       ) {
         const itemPlanId = this.itemPlanIds[itemPlanIndex];
-        const itemPlan = this.getPlan(itemPlanId);
+        const itemPlan = this.aether.dangerouslyGetPlan(itemPlanId);
         assertInputPlan(itemPlan);
         const value = itemPlan.eval();
         list[itemPlanIndex] = value;
       }
-      eachResult = list;
+      return constant(list);
     }
+  }
 
-    return new Array(values.length).fill(eachResult);
+  execute(): any[] {
+    throw new Error(
+      "InputListPlan should never execute; it should have been optimized away.",
+    );
   }
 
   at(index: number): InputPlan {
