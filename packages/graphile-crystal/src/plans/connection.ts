@@ -218,6 +218,7 @@ export class ConnectionPlan<
   public execute(
     values: CrystalValuesList<any[]>,
   ): CrystalResultsList<Record<string, never>> {
+    // Fake execution; data actually comes from the child plans
     return values.map(() => EMPTY_OBJECT);
   }
 }
@@ -257,6 +258,11 @@ export class EdgePlan<
 
   cursor(): ExecutablePlan<string | null> {
     return this.getConnectionPlan().cursorPlan(this.getItemPlan());
+  }
+
+  execute(values: CrystalValuesList<any>): CrystalResultsList<any> {
+    // Fake execution; data actually comes from the child plans
+    return values.map((v) => EMPTY_OBJECT);
   }
 }
 
