@@ -2,8 +2,8 @@ select __forums_result__.*
 from (
   select
     ids.ordinality - 1 as idx,
-    (ids.value->>0)::boolean as "id0",
-    (ids.value->>1)::boolean as "id1"
+    (ids.value->>0)::"bool" as "id0",
+    (ids.value->>1)::"bool" as "id1"
   from json_array_elements($1::json) with ordinality as ids
 ) as __forums_identifiers__,
 lateral (

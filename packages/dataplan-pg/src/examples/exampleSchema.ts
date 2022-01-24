@@ -2083,7 +2083,7 @@ export function makeExampleSchema(
     return {
       type: IncludeArchived,
       plan: EXPORTABLE(
-        (PgSelectSinglePlan, getClassPlan, sql) =>
+        (PgSelectSinglePlan, TYPES, getClassPlan, sql) =>
           function plan(
             $parent: ExecutablePlan<any>,
             $field: TFieldPlan,
@@ -2105,14 +2105,14 @@ export function makeExampleSchema(
                   $messages.alias
                 }.archived_at is null) = (${$messages.placeholder(
                   $parent.get("archived_at"),
-                  sql`timestamptz`,
+                  TYPES.timestamptz,
                 )} is null)`,
               );
             } else {
               $messages.where(sql`${$messages.alias}.archived_at is null`);
             }
           },
-        [PgSelectSinglePlan, getClassPlan, sql],
+        [PgSelectSinglePlan, TYPES, getClassPlan, sql],
       ),
       defaultValue: "INHERIT",
     };
@@ -2127,7 +2127,7 @@ export function makeExampleSchema(
       featured: {
         type: GraphQLBoolean,
         plan: EXPORTABLE(
-          (sql) =>
+          (TYPES, sql) =>
             function plan($condition, $value) {
               if ($value.evalIs(null)) {
                 $condition.where(sql`${$condition.alias}.featured is null`);
@@ -2135,12 +2135,12 @@ export function makeExampleSchema(
                 $condition.where(
                   sql`${$condition.alias}.featured = ${$condition.placeholder(
                     $value,
-                    sql`boolean`,
+                    TYPES.boolean,
                   )}`,
                 );
               }
             },
-          [sql],
+          [TYPES, sql],
         ),
       },
     },
@@ -2155,7 +2155,7 @@ export function makeExampleSchema(
       equalTo: {
         type: GraphQLBoolean,
         plan: EXPORTABLE(
-          (sql) =>
+          (TYPES, sql) =>
             function plan($parent, $value) {
               if ($value.evalIs(null)) {
                 // Ignore
@@ -2163,18 +2163,18 @@ export function makeExampleSchema(
                 $parent.where(
                   sql`${$parent.expression} = ${$parent.placeholder(
                     $value,
-                    sql`boolean`,
+                    TYPES.boolean,
                   )}`,
                 );
               }
             },
-          [sql],
+          [TYPES, sql],
         ),
       },
       notEqualTo: {
         type: GraphQLBoolean,
         plan: EXPORTABLE(
-          (sql) =>
+          (TYPES, sql) =>
             function plan($parent: BooleanFilterPlan, $value) {
               if ($value.evalIs(null)) {
                 // Ignore
@@ -2182,12 +2182,12 @@ export function makeExampleSchema(
                 $parent.where(
                   sql`${$parent.expression} <> ${$parent.placeholder(
                     $value,
-                    sql`boolean`,
+                    TYPES.boolean,
                   )}`,
                 );
               }
             },
-          [sql],
+          [TYPES, sql],
         ),
       },
     },
@@ -2228,20 +2228,19 @@ export function makeExampleSchema(
       name: {
         type: GraphQLString,
         plan: EXPORTABLE(
-          (sql) =>
-            function plan($condition, $value) {
+          (TYPES, sql) => function plan($condition, $value) {
               if ($value.evalIs(null)) {
                 $condition.where(sql`${$condition.alias}.name is null`);
               } else {
                 $condition.where(
                   sql`${$condition.alias}.name = ${$condition.placeholder(
                     $value,
-                    sql`text`,
+                    TYPES.text,
                   )}`,
                 );
               }
             },
-          [sql],
+          [TYPES, sql],
         ),
       },
     },

@@ -2,6 +2,7 @@ import type { ExecutablePlan } from "graphile-crystal";
 import { ModifierPlan } from "graphile-crystal";
 import type { SQL } from "pg-sql2";
 
+import type { PgTypeCodec } from "../interfaces";
 import type { ClassFilterPlan } from "./classFilter";
 
 export class BooleanFilterPlan extends ModifierPlan<ClassFilterPlan> {
@@ -19,8 +20,11 @@ export class BooleanFilterPlan extends ModifierPlan<ClassFilterPlan> {
     super($classFilterPlan);
   }
 
-  placeholder($plan: ExecutablePlan<any>, type: SQL): SQL {
-    return this.$parent.placeholder($plan, type);
+  placeholder(
+    $plan: ExecutablePlan<any>,
+    codec: PgTypeCodec<any, any, any>,
+  ): SQL {
+    return this.$parent.placeholder($plan, codec);
   }
 
   where(condition: SQL) {

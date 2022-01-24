@@ -5,6 +5,7 @@ import { sql } from "pg-sql2";
 
 import type { PgSource } from "../datasource";
 import type { ClassFilterPlan } from "../filters/classFilter";
+import type { PgTypeCodec } from "../interfaces";
 import type { PgConditionCapableParentPlan } from "./pgCondition";
 import { PgConditionPlan } from "./pgCondition";
 
@@ -27,8 +28,11 @@ export class TempTablePlan<TDataSource extends PgSource<any, any, any, any>>
     this.alias = sql.identifier(Symbol(`${source.name}_filter`));
   }
 
-  placeholder($plan: ExecutablePlan<any>, type: SQL): SQL {
-    return this.$parent.placeholder($plan, type);
+  placeholder(
+    $plan: ExecutablePlan<any>,
+    codec: PgTypeCodec<any, any, any>,
+  ): SQL {
+    return this.$parent.placeholder($plan, codec);
   }
 
   where(condition: SQL): void {

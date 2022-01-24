@@ -716,9 +716,7 @@ export class PgSource<
           )}').`,
         );
       }
-      const {
-        codec: { sqlType: type },
-      } = column;
+      const { codec } = column;
       const plan = spec[key as keyof TColumns];
       if (plan == undefined) {
         throw new Error(
@@ -729,7 +727,7 @@ export class PgSource<
       }
       return {
         plan: plan instanceof ExecutablePlan ? plan : constant(plan),
-        type,
+        codec,
         matches: (alias: SQL) =>
           typeof column.expression === "function"
             ? column.expression(alias)

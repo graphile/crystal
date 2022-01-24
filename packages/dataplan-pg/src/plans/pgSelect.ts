@@ -132,19 +132,19 @@ type PgSelectPlanJoin =
  */
 type PgSelectPlaceholder = {
   dependencyIndex: number;
-  type: SQL;
+  codec: PgTypeCodec<any, any, any, any>;
   symbol: symbol;
 };
 
 type PgSelectIdentifierSpec =
   | {
       plan: ExecutablePlan<any>;
-      type: SQL;
+      codec: PgTypeCodec<any, any, any>;
       matches: (alias: SQL) => SQL;
     }
   | {
       plan: PgTypedExecutablePlan<any>;
-      type?: SQL;
+      codec?: PgTypeCodec<any, any, any>;
       matches: (alias: SQL) => SQL;
     };
 
@@ -167,7 +167,7 @@ interface PgSelectArgumentDigest {
 
 interface QueryValue {
   dependencyIndex: number;
-  type: SQL;
+  codec: PgTypeCodec<any, any, any>;
 }
 
 function assertSensible(plan: ExecutablePlan): void {
@@ -578,12 +578,12 @@ export class PgSelectPlan<
           assertSensible(identifier.plan);
         }
         const { plan, matches } = identifier;
-        const type =
-          identifier.type ||
-          (identifier.plan as PgTypedExecutablePlan<any>).pgCodec.sqlType;
+        const codec =
+          identifier.codec ||
+          (identifier.plan as PgTypedExecutablePlan<any>).pgCodec;
         queryValues.push({
           dependencyIndex: this.addDependency(plan),
-          type,
+          codec,
         });
         identifierMatches.push(matches(this.alias));
       });
@@ -593,11 +593,11 @@ export class PgSelectPlan<
             assertSensible(identifier.plan);
           }
           const { plan, name } = identifier;
-          const type =
+          const codec =
             "pgCodec" in identifier
-              ? identifier.pgCodec.sqlType
-              : identifier.plan.pgCodec.sqlType;
-          const placeholder = this.placeholder(plan, type);
+              ? identifier.pgCodec
+              : identifier.plan.pgCodec;
+          const placeholder = this.placeholder(plan, codec);
           if (name) {
             argIndex = null;
             args.push({
@@ -784,10 +784,13 @@ export class PgSelectPlan<
   }
 
   public placeholder($plan: PgTypedExecutablePlan<any>): SQL;
-  public placeholder($plan: ExecutablePlan<any>, type: SQL): SQL;
+  public placeholder(
+    $plan: ExecutablePlan<any>,
+    codec: PgTypeCodec<any, any, any>,
+  ): SQL;
   public placeholder(
     $plan: ExecutablePlan<any> | PgTypedExecutablePlan<any>,
-    overrideType?: SQL,
+    overrideCodec?: PgTypeCodec<any, any, any>,
   ): SQL {
     if (this.locked) {
       throw new Error(`${this}: cannot add placeholders once plan is locked`);
@@ -797,16 +800,15 @@ export class PgSelectPlan<
         `There's already ${this.placeholders.length} placeholders; wanting more suggests there's a bug somewhere`,
       );
     }
-    const type =
-      overrideType ??
-      ("pgCodec" in $plan && $plan.pgCodec ? $plan.pgCodec.sqlType : null);
 
-    if (type === null) {
+    const codec = overrideCodec ?? ("pgCodec" in $plan ? $plan.pgCodec : null);
+    if (!codec) {
       throw new Error(
         `Plan ${$plan} does not contain pgCodec information, please wrap ` +
           `it in \`pgCast\`. E.g. \`pgCast($plan, TYPES.boolean)\``,
       );
     }
+
     const dependencyIndex = this.addDependency($plan);
     const symbol = Symbol(`plan-${$plan.id}`);
     const sqlPlaceholder = sql.placeholder(
@@ -815,7 +817,7 @@ export class PgSelectPlan<
     );
     const p: PgSelectPlaceholder = {
       dependencyIndex,
-      type,
+      codec,
       symbol,
     };
     this.placeholders.push(p);
@@ -1041,7 +1043,7 @@ export class PgSelectPlan<
           */
       const sqlValue = this.placeholder(
         toPg(access($parsedCursorPlan, [i + 1]), order.codec),
-        order.codec.sqlType,
+        order.codec,
       );
       const gt =
         (order.direction === "ASC" && beforeOrAfter === "after") ||
@@ -1066,7 +1068,7 @@ export class PgSelectPlan<
     // If the cursor is null then no condition is needed
     const cursorIsNullPlaceholder = this.placeholder(
       lambda($parsedCursorPlan, (cursor) => cursor == null),
-      sql`bool`,
+      TYPES.boolean
     );
     const finalCondition = sql`(${condition()}) or (${cursorIsNullPlaceholder} is true)`;
     */
@@ -1589,7 +1591,7 @@ export class PgSelectPlan<
         const existingIndex = this.queryValues.findIndex((v) => {
           return (
             v.dependencyIndex === placeholder.dependencyIndex &&
-            sql.isEquivalent(v.type, placeholder.type)
+            v.codec === placeholder.codec
           );
         });
 
@@ -1599,7 +1601,7 @@ export class PgSelectPlan<
             ? existingIndex
             : this.queryValues.push({
                 dependencyIndex: placeholder.dependencyIndex,
-                type: placeholder.type,
+                codec: placeholder.codec,
               }) - 1;
 
         // Finally alias this symbol to a reference to this placeholder
@@ -1694,10 +1696,10 @@ from (${sql.indent(sql`\
 select\n${sql.indent(sql`\
 ids.ordinality - 1 as idx,
 ${sql.join(
-  this.queryValues.map(({ type }, idx) => {
-    return sql`(ids.value->>${sql.literal(idx)})::${type} as ${sql.identifier(
-      `id${idx}`,
-    )}`;
+  this.queryValues.map(({ codec }, idx) => {
+    return sql`(ids.value->>${sql.literal(idx)})::${
+      codec.sqlType
+    } as ${sql.identifier(`id${idx}`)}`;
   }),
   ",\n",
 )}`)}
@@ -1852,7 +1854,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
       if (
         !arraysMatch(this.placeholders, p.placeholders, (a, b) => {
           const equivalent =
-            a.type === b.type && a.dependencyIndex === b.dependencyIndex;
+            a.codec === b.codec && a.dependencyIndex === b.dependencyIndex;
           if (equivalent) {
             if (a.symbol !== b.symbol) {
               // Make symbols appear equivalent
@@ -2028,7 +2030,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
     TOtherPlan extends PgSelectPlan<any, any, any, any>,
   >(otherPlan: TOtherPlan): void {
     for (const placeholder of this.placeholders) {
-      const { dependencyIndex, symbol, type } = placeholder;
+      const { dependencyIndex, symbol, codec } = placeholder;
       const dep = this.getPlan(this.dependencies[dependencyIndex]);
       if (
         // I am uncertain on this code.
@@ -2042,7 +2044,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
         const newPlanIndex = otherPlan.addDependency(dep);
         otherPlan.placeholders.push({
           dependencyIndex: newPlanIndex,
-          type,
+          codec,
           symbol,
         });
       } else if (dep instanceof PgClassExpressionPlan) {
@@ -2214,14 +2216,16 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
             );
             const conditions = [
               ...this.identifierMatches.map((identifierMatch, i) => {
-                const { dependencyIndex, type } = this.queryValues[i];
+                const { dependencyIndex, codec } = this.queryValues[i];
                 const plan = this.getPlan(this.dependencies[dependencyIndex]);
                 if (plan instanceof PgClassExpressionPlan) {
-                  return sql`${plan.toSQL()}::${type} = ${identifierMatch}`;
+                  return sql`${plan.toSQL()}::${
+                    codec.sqlType
+                  } = ${identifierMatch}`;
                 } else if (isStaticInputPlan(plan)) {
                   return sql`${this.placeholder(
                     plan,
-                    type,
+                    codec,
                   )} = ${identifierMatch}`;
                 } else {
                   throw new Error(
@@ -2279,15 +2283,15 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
         ) {
           const parent2 = this.getPlan(parent.dependencies[parent.itemPlanId]);
           this.identifierMatches.forEach((identifierMatch, i) => {
-            const { dependencyIndex, type } = this.queryValues[i];
+            const { dependencyIndex, codec } = this.queryValues[i];
             const plan = this.getPlan(this.dependencies[dependencyIndex]);
             if (plan instanceof PgClassExpressionPlan) {
               return this.where(
-                sql`${plan.toSQL()}::${type} = ${identifierMatch}`,
+                sql`${plan.toSQL()}::${codec.sqlType} = ${identifierMatch}`,
               );
             } else if (isStaticInputPlan(plan)) {
               return this.where(
-                sql`${this.placeholder(plan, type)} = ${identifierMatch}`,
+                sql`${this.placeholder(plan, codec)} = ${identifierMatch}`,
               );
             } else {
               throw new Error(

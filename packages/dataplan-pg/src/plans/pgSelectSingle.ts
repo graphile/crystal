@@ -259,13 +259,16 @@ export class PgSelectSinglePlan<
   }
 
   public placeholder($plan: PgTypedExecutablePlan<any>): SQL;
-  public placeholder($plan: ExecutablePlan<any>, type: SQL): SQL;
+  public placeholder(
+    $plan: ExecutablePlan<any>,
+    codec: PgTypeCodec<any, any, any>,
+  ): SQL;
   public placeholder(
     $plan: ExecutablePlan<any> | PgTypedExecutablePlan<any>,
-    overrideType?: SQL,
+    overrideCodec?: PgTypeCodec<any, any, any>,
   ): SQL {
-    return overrideType
-      ? this.getClassPlan().placeholder($plan, overrideType)
+    return overrideCodec
+      ? this.getClassPlan().placeholder($plan, overrideCodec)
       : this.getClassPlan().placeholder($plan as PgTypedExecutablePlan<any>);
   }
 

@@ -3,9 +3,14 @@ import type { BasePlan, ExecutablePlan } from "graphile-crystal";
 import { ModifierPlan } from "graphile-crystal";
 import type { SQL } from "pg-sql2";
 
+import type { PgTypeCodec } from "../interfaces";
+
 export interface PgConditionCapableParentPlan extends BasePlan {
   alias: SQL;
-  placeholder($plan: ExecutablePlan<any>, type: SQL): SQL;
+  placeholder(
+    $plan: ExecutablePlan<any>,
+    codec: PgTypeCodec<any, any, any>,
+  ): SQL;
   where(condition: SQL): void;
   having?(condition: SQL): void;
 }
@@ -46,8 +51,11 @@ export class PgConditionPlan<
     this.havingConditions.push(condition);
   }
 
-  placeholder($plan: ExecutablePlan<any>, type: SQL): SQL {
-    return this.$parent.placeholder($plan, type);
+  placeholder(
+    $plan: ExecutablePlan<any>,
+    codec: PgTypeCodec<any, any, any>,
+  ): SQL {
+    return this.$parent.placeholder($plan, codec);
   }
 
   apply(): void {
