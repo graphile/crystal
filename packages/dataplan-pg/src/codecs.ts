@@ -291,7 +291,7 @@ export const TYPES = {
   boolean: t<boolean>("bool", { fromPg: (value) => value === "true" }),
   int2: t<number>("int2", { fromPg: parseAsInt }),
   int: t<number>("int4", { fromPg: parseAsInt }),
-  bigint: t<string>("bigint"),
+  bigint: t<string>("int8"),
   float4: t<number>("float4", { fromPg: parseFloat }),
   float: t<number>("float", { fromPg: parseFloat }),
   money: t<string>("money", viaNumeric),
