@@ -152,6 +152,7 @@ class CodegenFile {
     Error: true,
     Event: true,
     EventTarget: true,
+    JSON: true,
     Math: true,
     MessageChannel: true,
     MessageEvent: true,
