@@ -497,7 +497,11 @@ export class PgSelectSinglePlan<
         // privileges).
         for (const attr of Object.keys(columns)) {
           const column = columns[attr];
-          if (column.notNull && CHEAP_COLUMN_TYPES.has(column.codec)) {
+          if (
+            column.notNull &&
+            CHEAP_COLUMN_TYPES.has(column.codec) &&
+            !column.restrictedAccess
+          ) {
             return {
               column,
               attr,
