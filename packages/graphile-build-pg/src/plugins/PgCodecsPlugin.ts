@@ -511,7 +511,6 @@ export const PgCodecsPlugin: Plugin = {
               | { [situation: string]: string | null };
           } = {
             void: null,
-            record: null,
             boolean: "Boolean",
             int2: "Int",
             int: "Int",
