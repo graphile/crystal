@@ -229,6 +229,19 @@ export class PgSelectSinglePlan<
         ? sqlExpr`${sql.parens(dataSourceColumn.expression(classPlan.alias))}`
         : sqlExpr`${classPlan.alias}.${sql.identifier(String(attr))}`
       : sqlExpr`${classPlan.alias}.${classPlan.alias}`; /* self named */
+
+    if (
+      this.nonNullColumn == null &&
+      typeof attr === "string" &&
+      attr.length > 0 &&
+      dataSourceColumn &&
+      !dataSourceColumn.expression &&
+      dataSourceColumn.notNull
+    ) {
+      // We know the row is null iff this attribute is null
+      this.nonNullColumn = { column: dataSourceColumn, attr };
+    }
+
     return colPlan as any;
   }
 
@@ -454,8 +467,30 @@ export class PgSelectSinglePlan<
     }
   }
 
+  private nonNullColumn: { column: PgSourceColumn; attr: string } | null = null;
+  private nullCheckAttributeIndex: number | null = null;
   optimize() {
-    this.nullCheckId = this.getClassPlan().getNullCheckIndex();
+    if (this.source.codec.columns) {
+      // We need to see if this row is null. The cheapest way is to select a
+      // non-null column, but failing that we invoke the codec's
+      // nonNullExpression (indirectly).
+      if (this.nonNullColumn != null) {
+        const {
+          column: { codec },
+          attr,
+        } = this.nonNullColumn;
+        const expression = sql`${this.getClassPlan().alias}.${sql.identifier(
+          attr,
+        )}`;
+        this.nullCheckAttributeIndex = this.getClassPlan().selectAndReturnIndex(
+          codec.castFromPg
+            ? codec.castFromPg(expression)
+            : sql`${sql.parens(expression)}::text`,
+        );
+      } else {
+        this.nullCheckId = this.getClassPlan().getNullCheckIndex();
+      }
+    }
     return this;
   }
 
@@ -464,14 +499,21 @@ export class PgSelectSinglePlan<
   ): CrystalResultsList<PgSourceRow<TColumns> | null> {
     return values.map((value) => {
       const result = value[this.itemPlanId];
-      const nullCheck =
-        this.nullCheckId != null ? result?.[this.nullCheckId] : undefined;
-      if (
-        !result ||
-        (this.nullCheckId != null &&
-          (nullCheck == null || TYPES.boolean.fromPg(nullCheck) != true))
-      ) {
+      if (!result) {
         return null;
+      } else if (this.nullCheckAttributeIndex != null) {
+        const nullIfAttributeNull = result[this.nullCheckAttributeIndex];
+        if (nullIfAttributeNull == null) {
+          return null;
+        }
+      } else if (this.nullCheckId != null) {
+        const nullIfExpressionNotTrue = result[this.nullCheckId];
+        if (
+          nullIfExpressionNotTrue == null ||
+          TYPES.boolean.fromPg(nullIfExpressionNotTrue) != true
+        ) {
+          return null;
+        }
       }
       return result;
     });
