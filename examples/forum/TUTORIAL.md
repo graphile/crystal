@@ -822,7 +822,7 @@ https://github.com/graphile/postgraphile/blob/main/examples/forum/data.sql
 
 ### Query All Table Records
 
-Graphophiles smarts allow you to get all table records. Simply prefix the table name with **all**, for example the People table:
+Postgraphile smarts allow you to get all table records. Simply prefix the table name with **all**, for example the People table:
 
 ```
 query {
@@ -841,7 +841,7 @@ query {
 
 ## Query a Table Record By Id
 
-Graphophiles smarts allow you to query tables by Primary Key. All tables can be queried by their Id field:
+Postgraphile smarts allow you to query tables by Primary Key. All tables can be queried by their Id field:
 
 ```{
   postById(id: 4) {
@@ -853,7 +853,7 @@ Graphophiles smarts allow you to query tables by Primary Key. All tables can be 
 
 ## Query a Function for Search Results
 
-Graphophiles smarts allow you to query Functions that can return single/scalar or multiple/setof records:
+Postgraphile smarts allow you to query Functions that can return single/scalar or multiple/setof records:
 
 ```{
   searchPosts(search: "circuit", first: 5) {
