@@ -812,7 +812,7 @@ export class PgSource<
    *
    * @see {@link PgTypeCodec.nonNullExpression}
    */
-  public getNullCheckExpression(alias: SQL): SQL {
+  public getNullCheckExpression(alias: SQL): SQL | null {
     if (this.codec.notNullExpression) {
       // Use the user-provided check
       return this.codec.notNullExpression(alias);

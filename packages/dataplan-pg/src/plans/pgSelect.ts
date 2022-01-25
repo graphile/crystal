@@ -899,8 +899,9 @@ export class PgSelectPlan<
 
   private nullCheckIndex: number | null | undefined = undefined;
   public getNullCheckIndex(): number | null {
-    // TODO: only do this if it _can_ be null - e.g. it's coming from a
-    // function source
+    // TODO: if this isn't coming from a function _and_ it's not being inlined
+    // via a left-join or similar then we shouldn't need this and should be
+    // able to drop it.
     if (this.nullCheckIndex !== undefined) {
       return this.nullCheckIndex;
     }
