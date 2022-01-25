@@ -1,0 +1,10 @@
+{
+  "tsserver.maxTsServerMemory": 4096,
+  "tsserver.tsdk": "node_modules/typescript/lib",
+  "tsserver.disableAutomaticTypeAcquisition": true,
+  "typescript.updateImportsOnFileMove.enable": false,
+  "typescript.preferences.quoteStyle": "double",
+  "typescript.showUnused": false,
+  "typescript.suggest.completeFunctionCalls": false,
+  "typescript.format.enabled": false
+}
