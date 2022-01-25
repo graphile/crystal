@@ -4,13 +4,13 @@
 
 import "./PgProceduresPlugin";
 
-import {
-  PgClassExpressionPlan,
+import type {
   PgSelectArgumentSpec,
   PgSource,
   PgSourceParameter,
   PgTypeCodec,
 } from "@dataplan/pg";
+import { PgClassExpressionPlan } from "@dataplan/pg";
 import { PgSelectPlan, PgSelectSinglePlan, TYPES } from "@dataplan/pg";
 import type { ExecutablePlan } from "graphile-crystal";
 import { __ListTransformPlan, connection } from "graphile-crystal";
@@ -260,11 +260,6 @@ export const PgCustomTypeFieldPlugin: Plugin = {
           procSources.reduce(
             (memo, source) =>
               build.recoverable(memo, () => {
-                const type = getFunctionSourceReturnGraphQLType(build, source);
-                if (!type) {
-                  return memo;
-                }
-
                 // "Computed columns" skip a parameter
                 const remainingParameters = (
                   isRootMutation || isRootQuery
@@ -399,6 +394,14 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                     },
                   );
                 } else if (source.isUnique) {
+                  const type = getFunctionSourceReturnGraphQLType(
+                    build,
+                    source,
+                  );
+                  if (!type) {
+                    return memo;
+                  }
+
                   const fieldName = isRootQuery
                     ? build.inflection.customQuery({ source })
                     : build.inflection.computedColumn({ source });
@@ -412,6 +415,14 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                     },
                   );
                 } else {
+                  const type = getFunctionSourceReturnGraphQLType(
+                    build,
+                    source,
+                  );
+                  if (!type) {
+                    return memo;
+                  }
+
                   // isUnique is false => this is a 'setof' source.
 
                   // If the source still has an array type, then it's a 'setof

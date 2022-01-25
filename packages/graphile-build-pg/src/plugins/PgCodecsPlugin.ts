@@ -654,6 +654,10 @@ export const PgCodecsPlugin: Plugin = {
               return;
             }
 
+            if (codec === TYPES.void) {
+              return;
+            }
+
             // There's currently no type registered for this scalar codec; let's sort that out.
 
             const underlyingType = codec.rangeOfCodec || codec.domainOfCodec;
