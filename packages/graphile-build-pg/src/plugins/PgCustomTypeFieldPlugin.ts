@@ -4,7 +4,8 @@
 
 import "./PgProceduresPlugin";
 
-import type {
+import {
+  PgClassExpressionPlan,
   PgSelectArgumentSpec,
   PgSource,
   PgSourceParameter,
@@ -12,7 +13,7 @@ import type {
 } from "@dataplan/pg";
 import { PgSelectPlan, PgSelectSinglePlan, TYPES } from "@dataplan/pg";
 import type { ExecutablePlan } from "graphile-crystal";
-import { connection } from "graphile-crystal";
+import { __ListTransformPlan, connection } from "graphile-crystal";
 import type { TrackedArguments } from "graphile-crystal/src/interfaces";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
@@ -124,15 +125,53 @@ export const PgCustomTypeFieldPlugin: Plugin = {
           const payloadTypeName = build.inflection.customMutationPayload({
             source,
           });
+
+          const ExpectedPlan = source.isUnique
+            ? source.codec.columns
+              ? PgSelectSinglePlan
+              : PgClassExpressionPlan
+            : source.sqlPartitionByIndex
+            ? __ListTransformPlan
+            : PgSelectPlan;
+
+          const isVoid = source.codec === TYPES.void;
+
+          /*
+          const resultFieldName = inflection.functionMutationResultFieldName(
+            proc,
+            getNamedType(type),
+            proc.returnsSet || rawReturnType.isPgArray,
+            outputArgNames
+          );
+          */
+          const resultFieldName = `result`;
+
           build.registerObjectType(
             payloadTypeName,
             {
               isMutationPayload: true,
               pgCodec: source.codec,
             },
-            PgSelectPlan,
+            ExpectedPlan as { new (...args: any[]): ExecutablePlan },
             () => {
-              return { fields: {} };
+              const type = getFunctionSourceReturnGraphQLType(build, source);
+              return {
+                fields: isVoid
+                  ? {}
+                  : () => {
+                      return {
+                        [resultFieldName]: {
+                          type,
+                          plan: EXPORTABLE(
+                            () => ($parent) => {
+                              return $parent;
+                            },
+                            [],
+                          ),
+                        },
+                      };
+                    },
+              };
             },
             "PgCustomTypeFieldPlugin mutation function payload type",
           );
@@ -211,31 +250,10 @@ export const PgCustomTypeFieldPlugin: Plugin = {
           procSources.reduce(
             (memo, source) =>
               build.recoverable(memo, () => {
-                const sourceInnerCodec: PgTypeCodec<any, any, any> =
-                  source.codec.arrayOfCodec ?? source.codec;
-                if (!sourceInnerCodec) {
+                const type = getFunctionSourceReturnGraphQLType(build, source);
+                if (!type) {
                   return memo;
                 }
-                const isVoid = sourceInnerCodec === TYPES.void;
-                const innerType = isVoid
-                  ? null
-                  : (getGraphQLTypeByPgCodec(sourceInnerCodec, "output") as
-                      | GraphQLOutputType
-                      | undefined);
-                if (!innerType && !isVoid) {
-                  console.warn(
-                    `Failed to find a suitable type for codec '${
-                      sql.compile(source.codec.sqlType).text
-                    }'; not adding function field`,
-                  );
-                  return memo;
-                }
-
-                // TODO: nullability
-                const type =
-                  innerType && source.codec.arrayOfCodec
-                    ? new GraphQLList(innerType)
-                    : innerType;
 
                 // "Computed columns" skip a parameter
                 const remainingParameters = (
@@ -260,7 +278,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                     throw new Error(
                       `Failed to find a suitable type for argument codec '${
                         sql.compile(param.codec.sqlType).text
-                      }'; not adding function field`,
+                      }'; not adding function field for '${source}'`,
                     );
                   }
 
@@ -468,3 +486,37 @@ export const PgCustomTypeFieldPlugin: Plugin = {
     },
   },
 };
+
+function getFunctionSourceReturnGraphQLType(
+  build: GraphileEngine.Build,
+  source: PgSource<any, any, any, any>,
+): GraphQLOutputType | null {
+  const sourceInnerCodec: PgTypeCodec<any, any, any> =
+    source.codec.arrayOfCodec ?? source.codec;
+  if (!sourceInnerCodec) {
+    return null;
+  }
+  const isVoid = sourceInnerCodec === TYPES.void;
+  const innerType = isVoid
+    ? null
+    : (build.getGraphQLTypeByPgCodec(sourceInnerCodec, "output") as
+        | GraphQLOutputType
+        | undefined);
+  if (!innerType && !isVoid) {
+    console.warn(
+      `Failed to find a suitable type for codec '${
+        build.sql.compile(source.codec.sqlType).text
+      }'; not adding function field`,
+    );
+    return null;
+  } else if (!innerType) {
+    return null;
+  }
+
+  // TODO: nullability
+  const type =
+    innerType && source.codec.arrayOfCodec
+      ? new build.graphql.GraphQLList(innerType)
+      : innerType;
+  return type;
+}
