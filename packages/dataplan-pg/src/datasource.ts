@@ -805,6 +805,30 @@ export class PgSource<
   ): Promise<PgClientResult<TData>> {
     return this.executor.executeMutation<TData>(options);
   }
+
+  /**
+   * Returns an SQL fragment that evaluates to `'true'` (string) if the row is
+   * non-null and `'false'` or `null` otherwise.
+   *
+   * @see {@link PgTypeCodec.nonNullExpression}
+   */
+  public getNullCheckExpression(alias: SQL): SQL {
+    if (this.codec.notNullExpression) {
+      // Use the user-provided check
+      return this.codec.notNullExpression(alias);
+    } else if (this.uniques.length > 0) {
+      // We're just going to assume the first unique is the primary key, and that
+      // if that's not null then we're not null
+      const pk = this.uniques[0];
+      const columns = (pk as readonly string[]).map(
+        (col) => sql`${alias}.${sql.identifier(col)}`,
+      );
+      return sql`(not((${sql.join(columns, ", ")}) is null))::text`;
+    } else {
+      // Fallback
+      return sql`(not (${alias} is null))::text`;
+    }
+  }
 }
 exportAs(PgSource, "PgSource");
 

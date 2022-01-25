@@ -3,6 +3,7 @@ import { ExecutablePlan } from "graphile-crystal";
 import type { SQL, SQLPlaceholderNode } from "pg-sql2";
 import sql from "pg-sql2";
 
+import { TYPES } from "../codecs";
 import type {
   PgSource,
   PgSourceColumn,
@@ -48,7 +49,7 @@ export class PgSelectSinglePlan<
     },
     TParameters extends PgSourceParameter[] | undefined = undefined,
   >
-  extends ExecutablePlan<PgSourceRow<TColumns>>
+  extends ExecutablePlan<PgSourceRow<TColumns> | null>
   implements PgTypedExecutablePlan<PgTypeCodec<TColumns, any, any>>
 {
   static $$export = {
@@ -60,6 +61,7 @@ export class PgSelectSinglePlan<
   public readonly itemPlanId: number;
   public readonly mode: PgSelectMode;
   private classPlanId: number;
+  private nullCheckId: number | null = null;
   public readonly source: PgSource<TColumns, TUniques, TRelations, TParameters>;
 
   constructor(
@@ -452,10 +454,27 @@ export class PgSelectSinglePlan<
     }
   }
 
+  optimize() {
+    this.nullCheckId = this.getClassPlan().getNullCheckIndex();
+    return this;
+  }
+
   execute(
     values: CrystalValuesList<[PgSourceRow<TColumns>]>,
-  ): CrystalResultsList<PgSourceRow<TColumns>> {
-    return values.map((value) => value[this.itemPlanId]);
+  ): CrystalResultsList<PgSourceRow<TColumns> | null> {
+    return values.map((value) => {
+      const result = value[this.itemPlanId];
+      const nullCheck =
+        this.nullCheckId != null ? result?.[this.nullCheckId] : undefined;
+      if (
+        !result ||
+        (this.nullCheckId != null &&
+          (nullCheck == null || TYPES.boolean.fromPg(nullCheck) != true))
+      ) {
+        return null;
+      }
+      return result;
+    });
   }
 }
 

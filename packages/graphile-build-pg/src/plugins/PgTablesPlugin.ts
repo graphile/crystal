@@ -225,6 +225,18 @@ export const PgTablesPlugin: Plugin = {
             (c) =>
               ["u", "p"].includes(c.contype) && c.conkey?.every((k) => k > 0),
           );
+          const idx = uniqueColumnOnlyConstraints.findIndex(
+            (c) => c.contype === "p",
+          );
+
+          if (idx > 0) {
+            // Primary key was found, but wasn't in initial position; let's
+            // move it to the front
+            uniqueColumnOnlyConstraints.unshift(
+              ...uniqueColumnOnlyConstraints.splice(idx, 1),
+            );
+          }
+
           const uniques = uniqueColumnOnlyConstraints.map((c) =>
             c.conkey!.map(
               (k) => attributes.find((att) => att.attnum === k)!.attname,

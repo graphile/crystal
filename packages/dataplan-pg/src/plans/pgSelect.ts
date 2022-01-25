@@ -897,6 +897,22 @@ export class PgSelectPlan<
     return this.selects.push(fragment) - 1;
   }
 
+  private nullCheckIndex: number | null | undefined = undefined;
+  public getNullCheckIndex(): number | null {
+    // TODO: only do this if it _can_ be null - e.g. it's coming from a
+    // function source
+    if (this.nullCheckIndex !== undefined) {
+      return this.nullCheckIndex;
+    }
+    const nullCheckExpression = this.source.getNullCheckExpression(this.alias);
+    if (nullCheckExpression) {
+      this.nullCheckIndex = this.selectAndReturnIndex(nullCheckExpression);
+    } else {
+      this.nullCheckIndex = null;
+    }
+    return this.nullCheckIndex;
+  }
+
   /**
    * Finalizes this instance and returns a mutable clone; useful for
    * connections/etc (e.g. copying `where` conditions but adding more, or
