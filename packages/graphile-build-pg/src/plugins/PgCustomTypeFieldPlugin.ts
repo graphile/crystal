@@ -113,6 +113,9 @@ export const PgCustomTypeFieldPlugin: Plugin = {
       },
 
       init(_, build) {
+        const {
+          graphql: { GraphQLList },
+        } = build;
         // Add payload type for mutation functions
         const mutationProcSources = build.input.pgSources.filter(
           (s) =>
@@ -153,26 +156,33 @@ export const PgCustomTypeFieldPlugin: Plugin = {
               pgCodec: source.codec,
             },
             ExpectedPlan as { new (...args: any[]): ExecutablePlan },
-            () => {
-              const type = getFunctionSourceReturnGraphQLType(build, source);
-              return {
-                fields: isVoid
-                  ? {}
-                  : () => {
-                      return {
-                        [resultFieldName]: {
-                          type,
-                          plan: EXPORTABLE(
-                            () => ($parent) => {
-                              return $parent;
-                            },
-                            [],
-                          ),
-                        },
-                      };
-                    },
-              };
-            },
+            () => ({
+              fields: isVoid
+                ? {}
+                : () => {
+                    const baseType = getFunctionSourceReturnGraphQLType(
+                      build,
+                      source,
+                    );
+                    if (!baseType) {
+                      return {};
+                    }
+                    const type = source.isUnique
+                      ? baseType
+                      : new GraphQLList(baseType);
+                    return {
+                      [resultFieldName]: {
+                        type,
+                        plan: EXPORTABLE(
+                          () => ($parent) => {
+                            return $parent;
+                          },
+                          [],
+                        ),
+                      },
+                    };
+                  },
+            }),
             "PgCustomTypeFieldPlugin mutation function payload type",
           );
         }
