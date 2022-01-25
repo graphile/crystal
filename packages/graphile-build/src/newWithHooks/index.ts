@@ -30,6 +30,7 @@ import {
   GraphQLUnionType,
   isNamedType,
 } from "graphql";
+import { inspect } from "util";
 
 import type { ScopeForType, SpecForType } from "../global.js";
 import type SchemaBuilder from "../SchemaBuilder.js";
@@ -255,6 +256,18 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                   ),
                 };
 
+                for (const [argName, argSpec] of Object.entries(
+                  finalFieldSpec.args,
+                )) {
+                  if (!argName) {
+                    throw new Error(
+                      `Attempted to add empty/falsy argName to GraphQLObjectType ${
+                        Self.name
+                      }'s '${fieldName}' field; ${inspect(argSpec)}`,
+                    );
+                  }
+                }
+
                 processedFields.push(finalFieldSpec);
                 return finalFieldSpec;
               };
@@ -287,6 +300,13 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               // Finally, check through all the fields that they've all been
               // processed; any that have not we should do so now.
               for (const [fieldName, fieldSpec] of Object.entries(fieldsSpec)) {
+                if (!fieldName) {
+                  throw new Error(
+                    `Attempted to add empty/falsy fieldName to GraphQLObjectType ${
+                      Self.name
+                    }; ${inspect(fieldSpec)}`,
+                  );
+                }
                 if (processedFields.indexOf(fieldSpec) < 0) {
                   // We've not processed this yet; process it now!
                   fieldsSpec[fieldName] = fieldsContext.fieldWithHooks(
@@ -424,6 +444,13 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               );
               // Finally, check through all the fields that they've all been processed; any that have not we should do so now.
               for (const [fieldName, fieldSpec] of Object.entries(fieldsSpec)) {
+                if (!fieldName) {
+                  throw new Error(
+                    `Attempted to add empty/falsy fieldName to GraphQLInterfaceType ${
+                      Self.name
+                    }; ${inspect(fieldSpec)}`,
+                  );
+                }
                 if (processedFields.indexOf(fieldSpec) < 0) {
                   // We've not processed this yet; process it now!
                   fieldsSpec[fieldName] = fieldsContext.fieldWithHooks(
@@ -574,6 +601,13 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
 
               // Finally, check through all the fields that they've all been processed; any that have not we should do so now.
               for (const [fieldName, fieldSpec] of Object.entries(fieldsSpec)) {
+                if (!fieldName) {
+                  throw new Error(
+                    `Attempted to add empty/falsy fieldName to GraphQLInputObjectType ${
+                      Self.name
+                    }; ${inspect(fieldSpec)}`,
+                  );
+                }
                 if (processedFields.indexOf(fieldSpec) < 0) {
                   // We've not processed this yet; process it now!
                   fieldsSpec[fieldName] = fieldsContext.fieldWithHooks(

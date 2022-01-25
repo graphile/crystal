@@ -80,6 +80,11 @@ export default function makeNewBuild(
     specGenerator: () => any,
     origin: string | null | undefined,
   ) {
+    if (!typeName) {
+      throw new Error(
+        `Attempted to register a ${klass.name} with empty (or falsy) type name`,
+      );
+    }
     const newTypeSource =
       origin || `'addType' call during hook '${build.status.currentHookName}'`;
     if (allTypesSources[typeName]) {
