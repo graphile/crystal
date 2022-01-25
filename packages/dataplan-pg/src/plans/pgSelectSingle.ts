@@ -30,6 +30,21 @@ export interface PgSelectSinglePlanOptions {
   fromRelation?: [PgSelectSinglePlan<any, any, any, any>, string];
 }
 
+// Types that only take a few bytes so adding them to the selection would be
+// cheap to do.
+const CHEAP_COLUMN_TYPES = new Set([
+  TYPES.int2,
+  TYPES.int,
+  TYPES.bigint,
+  TYPES.float,
+  TYPES.float4,
+  TYPES.uuid,
+  TYPES.boolean,
+  TYPES.date,
+  TYPES.timestamp,
+  TYPES.timestamptz,
+]);
+
 /**
  * Represents the single result of a unique PgSelectPlan. This might be
  * retrieved explicitly by PgSelectPlan.single(), or implicitly (via
@@ -470,15 +485,33 @@ export class PgSelectSinglePlan<
   private nonNullColumn: { column: PgSourceColumn; attr: string } | null = null;
   private nullCheckAttributeIndex: number | null = null;
   optimize() {
-    if (this.source.codec.columns) {
+    const columns = this.source.codec.columns;
+    if (columns && this.getClassPlan().mode === "normal") {
       // We need to see if this row is null. The cheapest way is to select a
       // non-null column, but failing that we invoke the codec's
       // nonNullExpression (indirectly).
-      if (this.nonNullColumn != null) {
+      const getSuitableColumn = () => {
+        // We want to find a _cheap_ not-null column to select to prove that
+        // the row is not null. Critically this must be a column that we can
+        // always select (i.e.  is not prevented by any column-level select
+        // privileges).
+        for (const attr of Object.keys(columns)) {
+          const column = columns[attr];
+          if (column.notNull && CHEAP_COLUMN_TYPES.has(column.codec)) {
+            return {
+              column,
+              attr,
+            };
+          }
+        }
+        return null;
+      };
+      const nonNullColumn = this.nonNullColumn ?? getSuitableColumn();
+      if (nonNullColumn != null) {
         const {
           column: { codec },
           attr,
-        } = this.nonNullColumn;
+        } = nonNullColumn;
         const expression = sql`${this.getClassPlan().alias}.${sql.identifier(
           attr,
         )}`;

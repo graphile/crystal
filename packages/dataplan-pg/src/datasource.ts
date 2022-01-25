@@ -100,6 +100,14 @@ export interface PgSourceColumn<TCanonical = any, TInput = TCanonical> {
   // TODO: can identicalVia be plural? Is that useful? Maybe a column that has
   // multiple foreign key references?
 
+  /**
+   * Set this true if you're using column-level select privileges and there are
+   * roles accessible that do not have permission to select it. This will tell
+   * us not to auto-select it to more efficiently resolve row nullability
+   * questions - we'll only try when the user explicitly tells us to.
+   */
+  restrictedAccess?: boolean;
+
   extensions?: Partial<PgSourceColumnExtensions>;
 }
 
