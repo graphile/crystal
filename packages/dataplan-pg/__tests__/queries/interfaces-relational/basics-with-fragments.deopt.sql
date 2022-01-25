@@ -45,7 +45,8 @@ from (
 lateral (
   select
     __relational_topics__."title" as "0",
-    __relational_topics_identifiers__.idx as "1"
+    __relational_topics__."id"::text as "1",
+    __relational_topics_identifiers__.idx as "2"
   from interfaces_and_unions.relational_topics as __relational_topics__
   where
     (
@@ -68,7 +69,8 @@ lateral (
     __relational_posts__."title" as "0",
     __relational_posts__."description" as "1",
     __relational_posts__."note" as "2",
-    __relational_posts_identifiers__.idx as "3"
+    __relational_posts__."id"::text as "3",
+    __relational_posts_identifiers__.idx as "4"
   from interfaces_and_unions.relational_posts as __relational_posts__
   where
     (
@@ -112,7 +114,8 @@ lateral (
   select
     __relational_dividers__."title" as "0",
     __relational_dividers__."color" as "1",
-    __relational_dividers_identifiers__.idx as "2"
+    __relational_dividers__."id"::text as "2",
+    __relational_dividers_identifiers__.idx as "3"
   from interfaces_and_unions.relational_dividers as __relational_dividers__
   where
     (
@@ -133,7 +136,8 @@ from (
 lateral (
   select
     __relational_checklists__."title" as "0",
-    __relational_checklists_identifiers__.idx as "1"
+    __relational_checklists__."id"::text as "1",
+    __relational_checklists_identifiers__.idx as "2"
   from interfaces_and_unions.relational_checklists as __relational_checklists__
   where
     (

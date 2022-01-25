@@ -30,7 +30,8 @@ from (
 ) as __forums_identifiers__,
 lateral (
   select
-    __forums_identifiers__.idx as "0"
+    __forums__."id" as "0",
+    __forums_identifiers__.idx as "1"
   from app_public.forums as __forums__
   where
     (

@@ -3,12 +3,16 @@ select
   __relational_items__."type"::text as "1",
   __relational_items__."type2"::text as "2",
   __relational_items__."position"::text as "3",
-  __relational_items_2."type"::text as "4",
-  __relational_items_2."type2"::text as "5",
-  __relational_items_2."position"::text as "6",
-  __relational_items_3."type"::text as "7",
-  __relational_items_3."type2"::text as "8",
-  __relational_items_3."position"::text as "9"
+  __relational_posts__."id"::text as "4",
+  __relational_items_2."type"::text as "5",
+  __relational_items_2."type2"::text as "6",
+  __relational_items_2."position"::text as "7",
+  __relational_checklists__."id"::text as "8",
+  __relational_items_3."type"::text as "9",
+  __relational_items_3."type2"::text as "10",
+  __relational_items_3."position"::text as "11",
+  __relational_checklist_items__."id"::text as "12",
+  __relational_commentables__."id"::text as "13"
 from interfaces_and_unions.relational_commentables as __relational_commentables__
 left outer join interfaces_and_unions.relational_posts as __relational_posts__
 on (__relational_commentables__."id"::"int4" = __relational_posts__."id")

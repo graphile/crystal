@@ -14,12 +14,13 @@ lateral (
   select
     __people__."person_id"::text as "0",
     __people__."username" as "1",
-    __relational_posts__."id"::text as "2",
-    __relational_posts__."title" as "3",
-    __relational_posts__."description" as "4",
-    __relational_posts__."note" as "5",
-    __relational_posts_title_lower__.__relational_posts_title_lower__ as "6",
-    __relational_posts_identifiers__.idx as "7"
+    __relational_items__."author_id"::text as "2",
+    __relational_posts__."id"::text as "3",
+    __relational_posts__."title" as "4",
+    __relational_posts__."description" as "5",
+    __relational_posts__."note" as "6",
+    __relational_posts_title_lower__.__relational_posts_title_lower__ as "7",
+    __relational_posts_identifiers__.idx as "8"
   from (select (__relational_posts_identifiers__."id0").*) as __relational_posts__
   left outer join interfaces_and_unions.relational_items as __relational_items__
   on (__relational_posts__."id"::"int4" = __relational_items__."id")

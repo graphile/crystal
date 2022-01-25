@@ -45,7 +45,8 @@ from (
 lateral (
   select
     __relational_posts__::text as "0",
-    __relational_posts_identifiers__.idx as "1"
+    __relational_posts__."id"::text as "1",
+    __relational_posts_identifiers__.idx as "2"
   from interfaces_and_unions.insert_post(__relational_posts_identifiers__."id0", __relational_posts_identifiers__."id1") as __relational_posts__
   where (
     true /* authorization checks */
@@ -66,8 +67,9 @@ lateral (
     __relational_posts__."title" as "1",
     __relational_posts__."description" as "2",
     __relational_posts__."note" as "3",
-    __relational_items__."id"::text as "4",
-    __relational_items_identifiers__.idx as "5"
+    __relational_posts__."id"::text as "4",
+    __relational_items__."id"::text as "5",
+    __relational_items_identifiers__.idx as "6"
   from interfaces_and_unions.relational_items as __relational_items__
   left outer join interfaces_and_unions.relational_posts as __relational_posts__
   on (__relational_items__."id"::"int4" = __relational_posts__."id")
@@ -93,8 +95,9 @@ lateral (
     __relational_posts__."title" as "1",
     __relational_posts__."description" as "2",
     __relational_posts__."note" as "3",
-    __relational_items__."id"::text as "4",
-    __relational_items_identifiers__.idx as "5"
+    __relational_posts__."id"::text as "4",
+    __relational_items__."id"::text as "5",
+    __relational_items_identifiers__.idx as "6"
   from interfaces_and_unions.relational_items as __relational_items__
   left outer join interfaces_and_unions.relational_posts as __relational_posts__
   on (__relational_items__."id"::"int4" = __relational_posts__."id")
@@ -120,8 +123,9 @@ lateral (
     __relational_posts__."title" as "1",
     __relational_posts__."description" as "2",
     __relational_posts__."note" as "3",
-    __relational_items__."id"::text as "4",
-    __relational_items_identifiers__.idx as "5"
+    __relational_posts__."id"::text as "4",
+    __relational_items__."id"::text as "5",
+    __relational_items_identifiers__.idx as "6"
   from interfaces_and_unions.relational_items as __relational_items__
   left outer join interfaces_and_unions.relational_posts as __relational_posts__
   on (__relational_items__."id"::"int4" = __relational_posts__."id")

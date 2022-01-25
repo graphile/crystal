@@ -35,7 +35,8 @@ lateral (
           __forums__."id"::"uuid" = __messages__."forum_id"
         )
     ) _) as "1",
-    __forums_identifiers__.idx as "2"
+    __forums__."id" as "2",
+    __forums_identifiers__.idx as "3"
   from app_public.forums as __forums__
   where
     (

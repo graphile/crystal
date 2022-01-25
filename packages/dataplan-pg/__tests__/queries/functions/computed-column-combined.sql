@@ -20,7 +20,9 @@ lateral (
         true /* authorization checks */
       )
     ) _) as "3",
-    __forums_identifiers__.idx as "4"
+    __users_most_recent_forum__."id" as "4",
+    __forums__."id" as "5",
+    __forums_identifiers__.idx as "6"
   from app_public.forums as __forums__
   left outer join app_public.forums_random_user(__forums__) as __forums_random_user__
   on TRUE

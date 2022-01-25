@@ -1,5 +1,6 @@
 select
-  __forums__::text as "0"
+  __forums__::text as "0",
+  __forums__."id" as "1"
 from app_public.forums as __forums__
 where
   (
@@ -21,7 +22,8 @@ lateral (
     __forums_messages_list_set__."body" as "0",
     __forums_messages_list_set__."featured"::text as "1",
     __forums_messages_list_set_idx__::text as "2",
-    __forums_messages_list_set_identifiers__.idx as "3"
+    __forums_messages_list_set__."id" as "3",
+    __forums_messages_list_set_identifiers__.idx as "4"
   from app_public.forums_messages_list_set(__forums_messages_list_set_identifiers__."id0") with ordinality as __forums_messages_list_set_tmp__ (arr, __forums_messages_list_set_idx__) cross join lateral unnest (__forums_messages_list_set_tmp__.arr) as __forums_messages_list_set__
   where (
     true /* authorization checks */
