@@ -638,13 +638,14 @@ export class Aether<
     objectType: GraphQLObjectType,
     groupedSelectionsList: GroupedSelections[],
     parentTreeNode: TreeNode,
-    _isSequential = false,
+    isMutation = false,
   ): void {
     assertObjectType(objectType);
     const groupedFieldSet = graphqlCollectFields(
       this,
       objectType,
       groupedSelectionsList,
+      isMutation,
     );
     const objectTypeFields = objectType.getFields();
     for (const [responseKey, fieldAndGroups] of groupedFieldSet.entries()) {

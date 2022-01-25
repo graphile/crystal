@@ -111,6 +111,7 @@ export function graphqlCollectFields(
   aether: Aether,
   objectType: GraphQLObjectType,
   groupedSelectionsList: GroupedSelections[],
+  isMutation = false,
   visitedFragments = new Set<string>(),
   groupedFields = new Map<string, FieldAndGroup[]>(),
 ): Map<string, FieldAndGroup[]> {
@@ -156,7 +157,8 @@ export function graphqlCollectFields(
             const fieldType = objectTypeFields[fieldName].type;
             assertListType(fieldType);
           }
-          const selectionGroupId = stream ? ++aether.maxGroupId : groupId;
+          const selectionGroupId =
+            stream || isMutation ? ++aether.maxGroupId : groupId;
 
           groupForResponseKey.push({
             field,
@@ -190,7 +192,8 @@ export function graphqlCollectFields(
           const fragmentSelectionSet = fragment.selectionSet;
 
           const defer = getDirective(selection, "defer");
-          const fragmentGroupId = defer ? ++aether.maxGroupId : groupId;
+          const fragmentGroupId =
+            defer || isMutation ? ++aether.maxGroupId : groupId;
 
           graphqlCollectFields(
             aether,
@@ -201,6 +204,7 @@ export function graphqlCollectFields(
                 selections: fragmentSelectionSet.selections,
               },
             ],
+            false,
             visitedFragments,
             groupedFields,
           );
@@ -230,7 +234,8 @@ export function graphqlCollectFields(
           const fragmentSelectionSet = selection.selectionSet;
 
           const defer = getDirective(selection, "defer");
-          const fragmentGroupId = defer ? ++aether.maxGroupId : groupId;
+          const fragmentGroupId =
+            defer || isMutation ? ++aether.maxGroupId : groupId;
 
           graphqlCollectFields(
             aether,
@@ -241,6 +246,7 @@ export function graphqlCollectFields(
                 selections: fragmentSelectionSet.selections,
               },
             ],
+            false,
             visitedFragments,
             groupedFields,
           );
