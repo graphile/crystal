@@ -338,7 +338,7 @@ export const TYPES = {
   int: t<number>("int4", { fromPg: parseAsInt }),
   bigint: t<string>("int8"),
   float4: t<number>("float4", { fromPg: parseFloat }),
-  float: t<number>("float", { fromPg: parseFloat }),
+  float: t<number>("float8", { fromPg: parseFloat }),
   money: t<string>("money", viaNumeric),
   numeric: t<string>("numeric"),
   char: t<string>("char", verbatim),
