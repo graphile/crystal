@@ -30,6 +30,22 @@ exportAll(crystalStar, "graphile-crystal");
 exportAll(graphqlStar, "graphql");
 exportAll(utilStar, "util");
 
+// When defining custom scalars it's often useful to copy the implementation from builtins
+for (const builtinScalarName of [
+  "GraphQLBoolean",
+  "GraphQLInt",
+  "GraphQLFloat",
+  "GraphQLString",
+  "GraphQLID",
+]) {
+  for (const method of ["serialize", "parseValue", "parseLiteral"]) {
+    wellKnownMap.set(graphqlStar[builtinScalarName][method], {
+      moduleName: "graphql",
+      exportName: [builtinScalarName, method],
+    });
+  }
+}
+
 const namespaces = Object.assign(Object.create(null), { crypto: _crypto });
 
 /**
