@@ -6,12 +6,11 @@ import "./PgProceduresPlugin";
 
 import type {
   PgSelectArgumentSpec,
-  PgSelectPlan,
   PgSource,
   PgSourceParameter,
   PgTypeCodec,
 } from "@dataplan/pg";
-import { PgSelectSinglePlan,TYPES } from "@dataplan/pg";
+import { PgSelectPlan, PgSelectSinglePlan, TYPES } from "@dataplan/pg";
 import type { ExecutablePlan } from "graphile-crystal";
 import { connection } from "graphile-crystal";
 import type { TrackedArguments } from "graphile-crystal/src/interfaces";
@@ -111,6 +110,37 @@ export const PgCustomTypeFieldPlugin: Plugin = {
           "Adding inflectors for PgCustomTypeFieldPlugin",
         );
       },
+
+      init(_, build) {
+        // Add payload type for mutation functions
+        const mutationProcSources = build.input.pgSources.filter(
+          (s) =>
+            s.isMutation &&
+            s.parameters &&
+            (getBehavior(s.extensions) ?? ["mutation"]).includes("mutation"),
+        );
+
+        for (const source of mutationProcSources) {
+          const payloadTypeName = build.inflection.customMutationPayload({
+            source,
+          });
+          build.registerObjectType(
+            payloadTypeName,
+            {
+              isMutationPayload: true,
+              pgCodec: source.codec,
+            },
+            PgSelectPlan,
+            () => {
+              return { fields: {} };
+            },
+            "PgCustomTypeFieldPlugin mutation function payload type",
+          );
+        }
+
+        return _;
+      },
+
       GraphQLObjectType_fields(fields, build, context) {
         const {
           getGraphQLTypeByPgCodec,
@@ -287,7 +317,13 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                       )
                     : // Otherwise computed:
                       EXPORTABLE(
-                        (PgSelectSinglePlan, argDetails, isNotNullish, source) => (
+                        (
+                            PgSelectSinglePlan,
+                            argDetails,
+                            isNotNullish,
+                            source,
+                          ) =>
+                          (
                             $row: ExecutablePlan,
                             args: TrackedArguments<any>,
                           ) => {
