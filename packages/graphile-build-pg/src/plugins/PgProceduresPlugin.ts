@@ -199,7 +199,7 @@ export const PgProceduresPlugin: Plugin = {
                   columns,
                   {
                     tags: {
-                      name: `${name}-payload`,
+                      name: `${name}-record`,
                     },
                   },
                   true,
