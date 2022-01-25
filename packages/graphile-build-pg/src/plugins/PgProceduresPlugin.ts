@@ -117,8 +117,34 @@ export const PgProceduresPlugin: Plugin = {
             return null;
           }
 
+          /**
+           * The types of all the arguments that the function has, including
+           * both input, output, inout, variadic and table arguments.
+           *
+           * @remarks If all arguments are 'in' arguments, proallargtypes will
+           * be null and we fall back to proargtypes.  Note: proargnames and
+           * proargmodes are both indexed off of proallargtypes, but sometimes
+           * that's null so we assume in those cases it's actually indexed off
+           * of proargtypes - this may be a small oversight in the Postgres
+           * docs.
+           */
+          const allArgTypes = pgProc.proallargtypes ?? pgProc.proargtypes ?? [];
+
+          /**
+           * If there's any OUT, INOUT or TABLE arguments then we'll need to
+           * generate a codec for the payload.
+           */
+          const needsPayloadCodecToBeGenerated = pgProc.proargmodes?.some(
+            (m) => m === "o" || m === "b" || m === "t",
+          );
+
           const isRecordReturnType =
             pgProc.prorettype === "2249"; /* OID of the 'record' type */
+
+          if (isRecordReturnType && !needsPayloadCodecToBeGenerated) {
+            // We do not support anonymous 'record' return type
+            return null;
+          }
 
           const name = `${databaseName}.${namespace.nspname}.${pgProc.proname}(...)`;
           const makeCodecFromReturn = async (): Promise<PgTypeCodec<
@@ -128,9 +154,6 @@ export const PgProceduresPlugin: Plugin = {
           > | null> => {
             // We're building a PgTypeCodec to represent specifically the
             // return type of this function.
-
-            const allArgTypes =
-              pgProc.proallargtypes ?? pgProc.proargtypes ?? [];
 
             const numberOfArguments = allArgTypes.length ?? 0;
             const columns: PgSourceColumns = {};
@@ -185,7 +208,7 @@ export const PgProceduresPlugin: Plugin = {
             );
           };
 
-          const returnCodec = isRecordReturnType
+          const returnCodec = needsPayloadCodecToBeGenerated
             ? await makeCodecFromReturn()
             : await info.helpers.pgCodecs.getCodecFromType(
                 databaseName,
@@ -201,19 +224,6 @@ export const PgProceduresPlugin: Plugin = {
           // TODO: this isn't a sufficiently unique name, it does not allow for overloaded functions
 
           const parameters: PgSourceParameter[] = [];
-
-          /**
-           * The types of all the arguments that the function has, including
-           * both input, output, inout, variadic and table arguments.
-           *
-           * @remarks If all arguments are 'in' arguments, proallargtypes will
-           * be null and we fall back to proargtypes.  Note: proargnames and
-           * proargmodes are both indexed off of proallargtypes, but sometimes
-           * that's null so we assume in those cases it's actually indexed off
-           * of proargtypes - this may be a small oversight in the Postgres
-           * docs.
-           */
-          const allArgTypes = pgProc.proallargtypes ?? pgProc.proargtypes ?? [];
 
           let processedFirstInputArg = false;
 
