@@ -87,6 +87,13 @@ export interface PgTypeCodec<
    */
   sqlType: SQL;
 
+  /**
+   * If true, this is an anonymous type (e.g. the return type of a `returns
+   * record` or `returns table` PostgreSQL function) and thus should not be
+   * referenced via `sqlType` directly.
+   */
+  isAnonymous?: boolean;
+
   // TODO: extract this to a different interface
   /**
    * If this is a composite type, the columns it supports.

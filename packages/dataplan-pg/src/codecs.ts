@@ -71,9 +71,11 @@ export function recordType<TColumns extends PgSourceColumns>(
   identifier: SQL,
   columns: TColumns,
   extensions?: Partial<PgTypeCodecExtensions>,
+  isAnonymous = false,
 ): PgTypeCodec<TColumns, string, string> {
   return {
     sqlType: identifier,
+    isAnonymous,
     fromPg: identity,
     toPg: identity,
     columns,

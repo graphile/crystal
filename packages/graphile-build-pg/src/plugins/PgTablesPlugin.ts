@@ -336,46 +336,48 @@ export const PgTablesPlugin: Plugin = {
           setGraphQLTypeForPgCodec,
         } = build;
         for (const codec of build.pgCodecMetaLookup.keys()) {
-          if (!codec.columns) {
-            // Only apply to codecs that define columns
-            continue;
-          }
+          build.recoverable(null, () => {
+            if (!codec.columns) {
+              // Only apply to codecs that define columns
+              return;
+            }
 
-          const behavior = getBehavior(codec.extensions);
-          // TODO: is 'selectable' the right behavior? What if you can only see
-          // it in a subscription? What if only on a mutation payload? More
-          // like "viewable"?
-          if (behavior && !behavior.includes("selectable")) {
-            continue;
-          }
-          const codecName = sql.compile(codec.sqlType).text;
+            const behavior = getBehavior(codec.extensions);
+            // TODO: is 'selectable' the right behavior? What if you can only see
+            // it in a subscription? What if only on a mutation payload? More
+            // like "viewable"?
+            if (behavior && !behavior.includes("selectable")) {
+              return;
+            }
+            const codecName = sql.compile(codec.sqlType).text;
 
-          const tableTypeName = inflection.tableType(codec);
-          build.registerObjectType(
-            tableTypeName,
-            {
-              pgCodec: codec,
-              isPgTableType: true,
-            },
-            null,
-            () => ({}),
-            `PgTablesPlugin table type for ${codecName}`,
-          );
-          setGraphQLTypeForPgCodec(codec, ["output"], tableTypeName);
-
-          // TODO: input type?
-
-          if (!behavior || behavior.includes("connection")) {
-            // Register edges
-            build.registerCursorConnection({
-              typeName: tableTypeName,
-              scope: {
-                isPgRowConnectionType: true,
+            const tableTypeName = inflection.tableType(codec);
+            build.registerObjectType(
+              tableTypeName,
+              {
                 pgCodec: codec,
+                isPgTableType: true,
               },
-              nonNullNode: !pgForbidSetofFunctionsToReturnNull,
-            });
-          }
+              null,
+              () => ({}),
+              `PgTablesPlugin table type for ${codecName}`,
+            );
+            setGraphQLTypeForPgCodec(codec, ["output"], tableTypeName);
+
+            // TODO: input type?
+
+            if (!behavior || behavior.includes("connection")) {
+              // Register edges
+              build.registerCursorConnection({
+                typeName: tableTypeName,
+                scope: {
+                  isPgRowConnectionType: true,
+                  pgCodec: codec,
+                },
+                nonNullNode: !pgForbidSetofFunctionsToReturnNull,
+              });
+            }
+          });
         }
         return _;
       },

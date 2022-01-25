@@ -2,7 +2,13 @@
 // Postgres' own computed columns, and they're not necessarily column-like
 // (e.g. they can be relations to other tables), so we've renamed them.
 
-import type { PgSourceExtensions, PgSourceParameter } from "@dataplan/pg";
+import type {
+  PgSourceColumns,
+  PgSourceExtensions,
+  PgSourceParameter,
+  PgTypeCodec,
+} from "@dataplan/pg";
+import { recordType } from "@dataplan/pg";
 import { PgSource } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
@@ -111,10 +117,80 @@ export const PgProceduresPlugin: Plugin = {
             return null;
           }
 
-          const returnCodec = await info.helpers.pgCodecs.getCodecFromType(
-            databaseName,
-            pgProc.prorettype,
-          );
+          const isRecordReturnType =
+            pgProc.prorettype === "2249"; /* OID of the 'record' type */
+
+          const name = `${databaseName}.${namespace.nspname}.${pgProc.proname}(...)`;
+          const makeCodecFromReturn = async (): Promise<PgTypeCodec<
+            any,
+            any,
+            any
+          > | null> => {
+            // We're building a PgTypeCodec to represent specifically the
+            // return type of this function.
+
+            const allArgTypes =
+              pgProc.proallargtypes ?? pgProc.proargtypes ?? [];
+
+            const numberOfArguments = allArgTypes.length ?? 0;
+            const columns: PgSourceColumns = {};
+            for (let i = 0, l = numberOfArguments; i < l; i++) {
+              const argType = allArgTypes[i];
+              const argName = pgProc.proargnames?.[i] ?? `column${i + 1}`;
+
+              // TODO: smart tag should allow changing the modifier
+              const typeModifier = undefined;
+
+              // i for IN arguments, o for OUT arguments, b for INOUT arguments,
+              // v for VARIADIC arguments, t for TABLE arguments
+              const argMode = (pgProc.proargmodes?.[i] ?? "i") as
+                | "i"
+                | "o"
+                | "b"
+                | "v"
+                | "t";
+
+              if (argMode === "o" || argMode === "b" || argMode === "t") {
+                // This argument exists on the record type output
+                // NOTE: we treat `OUT foo`, `INOUT foo` and
+                // `RETURNS TABLE (foo ...)` as the same.
+                const columnCodec =
+                  await info.helpers.pgCodecs.getCodecFromType(
+                    databaseName,
+                    argType,
+                    null,
+                  );
+                if (!columnCodec) {
+                  return null;
+                }
+                columns[argName] = {
+                  notNull: false,
+                  codec: columnCodec,
+                };
+              }
+            }
+            return EXPORTABLE(
+              (columns, name, recordType, sql) =>
+                recordType(
+                  sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
+                  columns,
+                  {
+                    tags: {
+                      name: `${name}-payload`,
+                    },
+                  },
+                  true,
+                ),
+              [columns, name, recordType, sql],
+            );
+          };
+
+          const returnCodec = isRecordReturnType
+            ? await makeCodecFromReturn()
+            : await info.helpers.pgCodecs.getCodecFromType(
+                databaseName,
+                pgProc.prorettype,
+              );
 
           if (!returnCodec) {
             return null;
@@ -123,7 +199,6 @@ export const PgProceduresPlugin: Plugin = {
           const executor =
             info.helpers.pgIntrospection.getExecutorForDatabase(databaseName);
           // TODO: this isn't a sufficiently unique name, it does not allow for overloaded functions
-          const name = `${databaseName}.${namespace.nspname}.${pgProc.proname}(...)`;
 
           const parameters: PgSourceParameter[] = [];
 
@@ -208,13 +283,6 @@ export const PgProceduresPlugin: Plugin = {
                 codec: argCodec,
               });
             }
-
-            if (argMode === "o" || argMode === "b" || argMode === "t") {
-              // This argument exists on the record type output
-              // NOTE: we treat `OUT foo`, `INOUT foo` and
-              // `RETURNS TABLE (foo ...)` as the same.
-              // TODO: process record types
-            }
           }
 
           const returnsSetof = pgProc.proretset;
@@ -232,7 +300,10 @@ export const PgProceduresPlugin: Plugin = {
             [namespaceName, procName, sql],
           );
 
-          if (returnCodec.columns || returnCodec.arrayOfCodec?.columns) {
+          if (
+            !returnCodec.isAnonymous &&
+            (returnCodec.columns || returnCodec.arrayOfCodec?.columns)
+          ) {
             const returnPgType = await info.helpers.pgIntrospection.getType(
               databaseName,
               pgProc.prorettype,
