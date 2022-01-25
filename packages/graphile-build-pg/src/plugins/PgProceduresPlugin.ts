@@ -159,7 +159,7 @@ export const PgProceduresPlugin: Plugin = {
             const columns: PgSourceColumns = {};
             for (let i = 0, l = numberOfArguments; i < l; i++) {
               const argType = allArgTypes[i];
-              const argName = pgProc.proargnames?.[i] ?? `column${i + 1}`;
+              const argName = pgProc.proargnames?.[i] || `column${i + 1}`;
 
               // TODO: smart tag should allow changing the modifier
               const typeModifier = undefined;
