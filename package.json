@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "check": "yarn clean && yarn lint && yarn prepack:all && yarn test",
-    "lint:fix": "yarn prettier:fix && yarn run eslint --fix .",
+    "lint:fix": "yarn run eslint --fix . && yarn prettier:fix",
     "pretest": "tsc -b && ./scripts/pretest && yarn workspaces foreach --topological run pretest",
     "test": "jest -i",
     "posttest": "yarn workspaces foreach --topological run posttest",
