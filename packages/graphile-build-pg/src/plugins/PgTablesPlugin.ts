@@ -8,7 +8,7 @@ import sql from "pg-sql2";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";
-import type { PgClass } from "../introspection";
+import type { PgClass, PgNamespace } from "../introspection";
 
 declare global {
   namespace GraphileEngine {
@@ -25,6 +25,30 @@ declare global {
     }
 
     interface Inflection {
+      /**
+       * When you're using multiple databases and/or schemas, you may want to
+       * prefix various type names/field names with an identifier for these
+       * DBs/schemas.
+       */
+      _schemaPrefix(
+        this: Inflection,
+        details: {
+          databaseName: string;
+          pgNamespace: PgNamespace;
+        },
+      ): string;
+
+      /**
+       * The name of the PgSource for a table/class
+       */
+      tableSourceName(
+        this: Inflection,
+        details: {
+          databaseName: string;
+          pgClass: PgClass;
+        },
+      ): string;
+
       /**
        * A PgTypeCodec may represent any of a wide range of PostgreSQL types;
        * this inflector gives a name to this codec, it's primarily used when
@@ -131,6 +155,47 @@ export const PgTablesPlugin: Plugin = {
   description:
     "Spots pg_class entries that looks like tables/views/materialized views (but not partitions!) and registers them as sources",
   version: version,
+
+  inflection: {
+    add: {
+      _schemaPrefix(options, { pgNamespace, databaseName }) {
+        const database = options.gather?.pgDatabases.find(
+          (db) => db.name === databaseName,
+        );
+        const databasePrefix =
+          databaseName === database?.name ? "" : `${databaseName}-`;
+        const schemaPrefix =
+          pgNamespace.nspname === database?.schemas?.[0]
+            ? ""
+            : `${pgNamespace.nspname}-`;
+        return `${databasePrefix}${schemaPrefix}`;
+      },
+
+      tableSourceName(options, { pgClass, databaseName }) {
+        const pgNamespace = pgClass.getNamespace()!;
+        const schemaPrefix = this._schemaPrefix({ pgNamespace, databaseName });
+        return `${schemaPrefix}${pgClass.relname}`;
+      },
+
+      _codecName(options, codec) {
+        return this.coerceToGraphQLName(
+          codec.extensions?.tags?.name || sql.compile(codec.sqlType).text,
+        );
+      },
+
+      _singularizedCodecName(options, codec) {
+        return this.singularize(this._codecName(codec)).replace(
+          /.(?:(?:[_-]i|I)nput|(?:[_-]p|P)atch)$/,
+          "$&_record",
+        );
+      },
+
+      tableType(options, codec) {
+        return this.upperCamelCase(this._singularizedCodecName(codec));
+      },
+    },
+  },
+
   gather: {
     namespace: "pgTables",
     helpers: {
@@ -245,13 +310,18 @@ export const PgTablesPlugin: Plugin = {
 
           const executor =
             info.helpers.pgIntrospection.getExecutorForDatabase(databaseName);
-          const name = `${databaseName}.${namespace.nspname}.${pgClass.relname}`;
+          const name = info.inflection.tableSourceName({
+            databaseName,
+            pgClass,
+          });
+          const identifier = `${databaseName}.${namespace.nspname}.${pgClass.relname}`;
 
           const sourceBuilder = EXPORTABLE(
-            (PgSourceBuilder, codec, executor, name, uniques) =>
+            (PgSourceBuilder, codec, executor, identifier, name, uniques) =>
               new PgSourceBuilder({
                 executor,
                 name,
+                identifier,
                 source: codec.sqlType,
                 codec,
                 uniques,
@@ -261,7 +331,7 @@ export const PgTablesPlugin: Plugin = {
                   },
                 },
               }),
-            [PgSourceBuilder, codec, executor, name, uniques],
+            [PgSourceBuilder, codec, executor, identifier, name, uniques],
           );
           info.state.detailsBySourceBuilder.set(sourceBuilder, {
             databaseName,
@@ -310,27 +380,6 @@ export const PgTablesPlugin: Plugin = {
       }
     },
   } as PluginGatherConfig<"pgTables", State, Cache>,
-
-  inflection: {
-    add: {
-      _codecName(options, codec) {
-        return this.coerceToGraphQLName(
-          codec.extensions?.tags?.name || sql.compile(codec.sqlType).text,
-        );
-      },
-
-      _singularizedCodecName(options, codec) {
-        return this.singularize(this._codecName(codec)).replace(
-          /.(?:(?:[_-]i|I)nput|(?:[_-]p|P)atch)$/,
-          "$&_record",
-        );
-      },
-
-      tableType(options, codec) {
-        return this.upperCamelCase(this._singularizedCodecName(codec));
-      },
-    },
-  },
 
   schema: {
     hooks: {

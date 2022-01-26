@@ -82,7 +82,7 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
   console.log("");
   const source = /* GraphQL */ `
     {
-      allMainAPosts {
+      allPosts {
         nodes {
           id
         }

@@ -51,7 +51,7 @@ declare module "graphile-plugin" {
       [key in keyof GraphileEngine.Inflection]?: (
         this: GraphileEngine.Inflection,
         // TODO: should we wrap this in an object to allow future expansion?
-        options: GraphileEngine.GraphileBuildInflectionOptions,
+        options: Preset,
         ...args: Parameters<GraphileEngine.Inflection[key]>
       ) => ReturnType<GraphileEngine.Inflection[key]>;
     };
@@ -63,7 +63,7 @@ declare module "graphile-plugin" {
       [key in keyof GraphileEngine.Inflection]?: (
         this: GraphileEngine.Inflection,
         previous: GraphileEngine.Inflection[key] | undefined,
-        options: GraphileEngine.GraphileBuildInflectionOptions,
+        options: Preset,
         ...args: Parameters<GraphileEngine.Inflection[key]>
       ) => ReturnType<GraphileEngine.Inflection[key]>;
     };
