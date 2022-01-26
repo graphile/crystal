@@ -36,6 +36,13 @@ declare global {
           pgProc: PgProc;
         },
       ): string;
+      functionRecordReturnCodecName(
+        this: Inflection,
+        details: {
+          databaseName: string;
+          pgProc: PgProc;
+        },
+      ): string;
     }
     interface GraphileBuildGatherOptions {
       /**
@@ -84,6 +91,11 @@ export const PgProceduresPlugin: Plugin = {
   inflection: {
     add: {
       functionSourceName(options, { databaseName, pgProc }) {
+        const pgNamespace = pgProc.getNamespace()!;
+        const schemaPrefix = this._schemaPrefix({ databaseName, pgNamespace });
+        return `${schemaPrefix}${pgProc.proname}`;
+      },
+      functionRecordReturnCodecName(options, { databaseName, pgProc }) {
         const pgNamespace = pgProc.getNamespace()!;
         const schemaPrefix = this._schemaPrefix({ databaseName, pgNamespace });
         return `${schemaPrefix}${pgProc.proname}`;
@@ -202,19 +214,25 @@ export const PgProceduresPlugin: Plugin = {
                 };
               }
             }
+            const recordCodecName =
+              info.inflection.functionRecordReturnCodecName({
+                pgProc,
+                databaseName,
+              });
             return EXPORTABLE(
-              (columns, name, recordType, sql) =>
-                recordType(
+              (columns, name, recordCodecName, recordType, sql) => recordType(
+                  recordCodecName,
                   sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
                   columns,
                   {
                     tags: {
+                      // TODO: should use inflector; should add directly to PgTypeCodec
                       name: `${name}-record`,
                     },
                   },
                   true,
                 ),
-              [columns, name, recordType, sql],
+              [columns, name, recordCodecName, recordType, sql],
             );
           };
 
@@ -352,7 +370,18 @@ export const PgProceduresPlugin: Plugin = {
               return null;
             }
             return EXPORTABLE(
-              (extensions, identifier, isMutation, name, parameters, returnsArray, returnsSetof, source, sourceCallback) => source.functionSource({
+              (
+                extensions,
+                identifier,
+                isMutation,
+                name,
+                parameters,
+                returnsArray,
+                returnsSetof,
+                source,
+                sourceCallback,
+              ) =>
+                source.functionSource({
                   name,
                   identifier,
                   source: sourceCallback,
@@ -362,12 +391,34 @@ export const PgProceduresPlugin: Plugin = {
                   extensions,
                   isMutation,
                 }),
-              [extensions, identifier, isMutation, name, parameters, returnsArray, returnsSetof, source, sourceCallback],
+              [
+                extensions,
+                identifier,
+                isMutation,
+                name,
+                parameters,
+                returnsArray,
+                returnsSetof,
+                source,
+                sourceCallback,
+              ],
             );
           }
 
           return EXPORTABLE(
-            (PgSource, executor, extensions, identifier, isMutation, name, parameters, returnCodec, returnsSetof, sourceCallback) => new PgSource({
+            (
+              PgSource,
+              executor,
+              extensions,
+              identifier,
+              isMutation,
+              name,
+              parameters,
+              returnCodec,
+              returnsSetof,
+              sourceCallback,
+            ) =>
+              new PgSource({
                 executor,
                 name,
                 identifier,
@@ -379,7 +430,18 @@ export const PgProceduresPlugin: Plugin = {
                 extensions,
                 isMutation,
               }),
-            [PgSource, executor, extensions, identifier, isMutation, name, parameters, returnCodec, returnsSetof, sourceCallback],
+            [
+              PgSource,
+              executor,
+              extensions,
+              identifier,
+              isMutation,
+              name,
+              parameters,
+              returnCodec,
+              returnsSetof,
+              sourceCallback,
+            ],
           );
         })();
         sourceByPgProc.set(pgProc, source!);

@@ -71,6 +71,7 @@ async function main() {
   const usersCodec = EXPORTABLE(
     (TYPES, recordType, sql) =>
       recordType(
+        `app_public.users`,
         sql`app_public.users`,
         {
           id: {
@@ -107,6 +108,7 @@ async function main() {
   const forumsCodec = EXPORTABLE(
     (TYPES, recordType, sql) =>
       recordType(
+        `app_public.forums`,
         sql`app_public.forums`,
         {
           id: {
@@ -139,6 +141,7 @@ async function main() {
   const messagesCodec = EXPORTABLE(
     (TYPES, recordType, sql) =>
       recordType(
+        `app_public.messages`,
         sql`app_public.messages`,
         {
           id: {

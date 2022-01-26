@@ -57,6 +57,7 @@ function t<TFromJavaScript = any, TFromPostgres = string>(
   }: Cast<TFromJavaScript, TFromPostgres> = {},
 ): PgTypeCodec<undefined, TFromPostgres, TFromJavaScript> {
   return {
+    name: type,
     sqlType: sql.identifier(...type.split(".")),
     fromPg: fromPg ?? (identity as any),
     toPg: toPg ?? (identity as any),
@@ -68,12 +69,14 @@ function t<TFromJavaScript = any, TFromPostgres = string>(
 }
 
 export function recordType<TColumns extends PgSourceColumns>(
+  name: string,
   identifier: SQL,
   columns: TColumns,
   extensions?: Partial<PgTypeCodecExtensions>,
   isAnonymous = false,
 ): PgTypeCodec<TColumns, string, string> {
   return {
+    name,
     sqlType: identifier,
     isAnonymous,
     fromPg: identity,
@@ -86,11 +89,13 @@ exportAs(recordType, "recordType");
 
 // TODO: rename to enumCodec
 export function enumType<TValue extends string>(
+  name: string,
   identifier: SQL,
   values: TValue[],
   extensions?: Partial<PgTypeCodecExtensions>,
 ): PgEnumTypeCodec<TValue> {
   return {
+    name,
     sqlType: identifier,
     fromPg: identity as (val: string) => TValue,
     toPg: identity,
@@ -137,6 +142,7 @@ export function listOfType<
     TInnerCodec extends PgTypeCodec<any, any, infer U> ? U[] : any[],
     TInnerCodec
   > = {
+    name: innerCodec.name + "[]",
     sqlType: identifier,
     // TODO: this does __NOT__ handle nulls safely!
     fromPg: (value) =>
@@ -185,6 +191,7 @@ export function domainOfCodec<
   TInnerCodec extends PgTypeCodec<any, any, any, any>,
 >(
   innerCodec: TInnerCodec,
+  name: string,
   identifier: SQL,
   {
     extensions,
@@ -204,6 +211,7 @@ export function domainOfCodec<
     ...innerCodec,
 
     // Overriding:
+    name,
     sqlType: identifier,
     extensions,
     domainOfCodec: innerCodec,
@@ -233,6 +241,7 @@ export function rangeOfCodec<
   TInnerCodec extends PgTypeCodec<undefined, any, any, undefined>,
 >(
   innerCodec: TInnerCodec,
+  name: string,
   identifier: SQL,
   {
     extensions,
@@ -246,6 +255,7 @@ export function rangeOfCodec<
   undefined
 > {
   return {
+    name,
     sqlType: identifier,
     extensions,
     rangeOfCodec: innerCodec,

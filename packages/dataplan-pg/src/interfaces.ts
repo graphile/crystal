@@ -54,6 +54,11 @@ export interface PgTypeCodec<
     | undefined = undefined,
 > {
   /**
+   * Unique name to identify this codec.
+   */
+  name: string;
+
+  /**
    * Given a value of type TFromJavaScript, returns an `SQL` value to insert into an SQL
    * statement.
    */

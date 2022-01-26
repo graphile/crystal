@@ -331,7 +331,7 @@ export function makeExampleSchema(
   );
   const forumCodec = EXPORTABLE(
     (forumColumns, recordType, sql) =>
-      recordType(sql`app_public.forums`, forumColumns),
+      recordType("forums", sql`app_public.forums`, forumColumns),
     [forumColumns, recordType, sql],
   );
 
@@ -464,7 +464,7 @@ export function makeExampleSchema(
     (PgSourceBuilder, executor, messageColumns, recordType, sql) =>
       new PgSourceBuilder({
         executor,
-        codec: recordType(sql`app_public.messages`, messageColumns),
+        codec: recordType("messages", sql`app_public.messages`, messageColumns),
         source: sql`app_public.messages`,
         name: "messages",
         uniques: [["id"]],
@@ -476,7 +476,7 @@ export function makeExampleSchema(
     (PgSource, executor, recordType, sql, userColumns) =>
       new PgSource({
         executor,
-        codec: recordType(sql`app_public.users`, userColumns),
+        codec: recordType("users", sql`app_public.users`, userColumns),
         source: sql`app_public.users`,
         name: "users",
         uniques: [["id"], ["username"]],
@@ -632,6 +632,7 @@ export function makeExampleSchema(
       }),
       bookmarked_entity: col({
         codec: recordType(
+          "union__entity",
           sql`interfaces_and_unions.union__entity`,
           unionEntityColumns,
         ),
@@ -645,6 +646,7 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         codec: recordType(
+          "person_bookmarks",
           sql`interfaces_and_unions.person_bookmarks`,
           personBookmarkColumns,
         ),
@@ -667,7 +669,11 @@ export function makeExampleSchema(
     (PgSourceBuilder, executor, personColumns, recordType, sql) =>
       new PgSourceBuilder({
         executor,
-        codec: recordType(sql`interfaces_and_unions.people`, personColumns),
+        codec: recordType(
+          "interfaces_and_unions.people",
+          sql`interfaces_and_unions.people`,
+          personColumns,
+        ),
         source: sql`interfaces_and_unions.people`,
         name: "people",
         uniques: [["person_id"], ["username"]],
@@ -692,7 +698,11 @@ export function makeExampleSchema(
     (PgSourceBuilder, executor, postColumns, recordType, sql) =>
       new PgSourceBuilder({
         executor,
-        codec: recordType(sql`interfaces_and_unions.posts`, postColumns),
+        codec: recordType(
+          "interfaces_and_unions.posts",
+          sql`interfaces_and_unions.posts`,
+          postColumns,
+        ),
         source: sql`interfaces_and_unions.posts`,
         name: "posts",
         uniques: [["post_id"]],
@@ -722,7 +732,11 @@ export function makeExampleSchema(
     (PgSourceBuilder, commentColumns, executor, recordType, sql) =>
       new PgSourceBuilder({
         executor,
-        codec: recordType(sql`interfaces_and_unions.comments`, commentColumns),
+        codec: recordType(
+          "interfaces_and_unions.comments",
+          sql`interfaces_and_unions.comments`,
+          commentColumns,
+        ),
         source: sql`interfaces_and_unions.comments`,
         name: "comments",
         uniques: [["comment_id"]],
@@ -733,13 +747,11 @@ export function makeExampleSchema(
   const itemTypeEnumSource = EXPORTABLE(
     (PgEnumSource, enumType, sql) =>
       new PgEnumSource({
-        codec: enumType(sql`interfaces_and_unions.item_type`, [
-          "TOPIC",
-          "POST",
-          "DIVIDER",
-          "CHECKLIST",
-          "CHECKLIST_ITEM",
-        ]),
+        codec: enumType(
+          `interfaces_and_unions.item_type`,
+          sql`interfaces_and_unions.item_type`,
+          ["TOPIC", "POST", "DIVIDER", "CHECKLIST", "CHECKLIST_ITEM"],
+        ),
       }),
     [PgEnumSource, enumType, sql],
   );
@@ -763,6 +775,7 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         codec: recordType(
+          `interfaces_and_unions.enum_table_item_type`,
           sql`interfaces_and_unions.enum_table_item_type`,
           enumTablesItemTypeColumns,
         ),
@@ -782,7 +795,7 @@ export function makeExampleSchema(
   const enumTableItemTypeEnumSource = EXPORTABLE(
     (PgEnumSource, enumTableItemTypeSource, enumType, sql) =>
       new PgEnumSource({
-        codec: enumType(sql`text`, [
+        codec: enumType("text", sql`text`, [
           "TOPIC",
           "POST",
           "DIVIDER",
@@ -847,6 +860,7 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         codec: recordType(
+          `interfaces_and_unions.single_table_items`,
           sql`interfaces_and_unions.single_table_items`,
           singleTableItemColumns,
         ),
@@ -1020,6 +1034,7 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         codec: recordType(
+          `interfaces_and_unions.relational_items`,
           sql`interfaces_and_unions.relational_items`,
           relationalItemColumns,
         ),
@@ -1056,6 +1071,7 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         codec: recordType(
+          `interfaces_and_unions.relational_commentables`,
           sql`interfaces_and_unions.relational_commentables`,
           relationalCommentableColumns,
         ),
@@ -1148,6 +1164,7 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         codec: recordType(
+          `interfaces_and_unions.relational_topics`,
           sql`interfaces_and_unions.relational_topics`,
           relationalTopicsColumns,
         ),
@@ -1173,6 +1190,7 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         codec: recordType(
+          `interfaces_and_unions.relational_posts`,
           sql`interfaces_and_unions.relational_posts`,
           relationalPostsColumns,
         ),
@@ -1197,6 +1215,7 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         codec: recordType(
+          `interfaces_and_unions.relational_dividers`,
           sql`interfaces_and_unions.relational_dividers`,
           relationalDividersColumns,
         ),
@@ -1220,6 +1239,7 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         codec: recordType(
+          `interfaces_and_unions.relational_checklists`,
           sql`interfaces_and_unions.relational_checklists`,
           relationalChecklistsColumns,
         ),
@@ -1250,6 +1270,7 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         codec: recordType(
+          `interfaces_and_unions.relational_checklist_items`,
           sql`interfaces_and_unions.relational_checklist_items`,
           relationalChecklistItemsColumns,
         ),
@@ -1454,6 +1475,7 @@ export function makeExampleSchema(
       new PgSourceBuilder({
         executor,
         codec: recordType(
+          `interfaces_and_unions.union_items`,
           sql`interfaces_and_unions.union_items`,
           unionItemsColumns,
         ),
@@ -1476,6 +1498,7 @@ export function makeExampleSchema(
       new PgSource({
         executor,
         codec: recordType(
+          `interfaces_and_unions.union_topics`,
           sql`interfaces_and_unions.union_topics`,
           unionTopicsColumns,
         ),
@@ -1500,6 +1523,7 @@ export function makeExampleSchema(
       new PgSource({
         executor,
         codec: recordType(
+          `interfaces_and_unions.union_posts`,
           sql`interfaces_and_unions.union_posts`,
           unionPostsColumns,
         ),
@@ -1523,6 +1547,7 @@ export function makeExampleSchema(
       new PgSource({
         executor,
         codec: recordType(
+          `interfaces_and_unions.union_dividers`,
           sql`interfaces_and_unions.union_dividers`,
           unionDividersColumns,
         ),
@@ -1545,6 +1570,7 @@ export function makeExampleSchema(
       new PgSource({
         executor,
         codec: recordType(
+          `interfaces_and_unions.union_checklists`,
           sql`interfaces_and_unions.union_checklists`,
           unionChecklistsColumns,
         ),
@@ -1568,6 +1594,7 @@ export function makeExampleSchema(
       new PgSource({
         executor,
         codec: recordType(
+          `interfaces_and_unions.union_checklist_items`,
           sql`interfaces_and_unions.union_checklist_items`,
           unionChecklistItemsColumns,
         ),
@@ -1583,6 +1610,7 @@ export function makeExampleSchema(
       new PgSource({
         executor,
         codec: recordType(
+          `interfaces_and_unions.union__entity`,
           sql`interfaces_and_unions.union__entity`,
           unionEntityColumns,
         ),
@@ -2228,7 +2256,8 @@ export function makeExampleSchema(
       name: {
         type: GraphQLString,
         plan: EXPORTABLE(
-          (TYPES, sql) => function plan($condition, $value) {
+          (TYPES, sql) =>
+            function plan($condition, $value) {
               if ($value.evalIs(null)) {
                 $condition.where(sql`${$condition.alias}.name is null`);
               } else {
