@@ -8,8 +8,7 @@ import type {
   PgSourceParameter,
   PgTypeCodec,
 } from "@dataplan/pg";
-import { recordType } from "@dataplan/pg";
-import { PgSource } from "@dataplan/pg";
+import { PgSource, recordType } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
 import type { SQL } from "pg-sql2";
