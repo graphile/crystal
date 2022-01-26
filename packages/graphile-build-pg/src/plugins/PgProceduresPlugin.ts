@@ -93,12 +93,12 @@ export const PgProceduresPlugin: Plugin = {
       functionSourceName(options, { databaseName, pgProc }) {
         const pgNamespace = pgProc.getNamespace()!;
         const schemaPrefix = this._schemaPrefix({ databaseName, pgNamespace });
-        return `${schemaPrefix}${pgProc.proname}`;
+        return this.camelCase(`${schemaPrefix}${pgProc.proname}`);
       },
       functionRecordReturnCodecName(options, { databaseName, pgProc }) {
         const pgNamespace = pgProc.getNamespace()!;
         const schemaPrefix = this._schemaPrefix({ databaseName, pgNamespace });
-        return `${schemaPrefix}${pgProc.proname}`;
+        return this.camelCase(`${schemaPrefix}${pgProc.proname}`);
       },
     },
   },
@@ -220,19 +220,14 @@ export const PgProceduresPlugin: Plugin = {
                 databaseName,
               });
             return EXPORTABLE(
-              (columns, name, recordCodecName, recordType, sql) => recordType(
+              (columns, recordCodecName, recordType, sql) => recordType(
                   recordCodecName,
                   sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
                   columns,
-                  {
-                    tags: {
-                      // TODO: should use inflector; should add directly to PgTypeCodec
-                      name: `${name}-record`,
-                    },
-                  },
+                  {},
                   true,
                 ),
-              [columns, name, recordCodecName, recordType, sql],
+              [columns, recordCodecName, recordType, sql],
             );
           };
 

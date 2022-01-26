@@ -174,7 +174,7 @@ export const PgTablesPlugin: Plugin = {
       tableSourceName(options, { pgClass, databaseName }) {
         const pgNamespace = pgClass.getNamespace()!;
         const schemaPrefix = this._schemaPrefix({ pgNamespace, databaseName });
-        return `${schemaPrefix}${pgClass.relname}`;
+        return this.camelCase(`${schemaPrefix}${pgClass.relname}`);
       },
 
       _codecName(options, codec) {

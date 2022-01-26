@@ -101,17 +101,19 @@ export const PgCodecsPlugin: Plugin = {
       classCodecName(options, { pgClass, databaseName }) {
         const pgNamespace = pgClass.getNamespace()!;
         const schemaPrefix = this._schemaPrefix({ pgNamespace, databaseName });
-        return `${schemaPrefix}${pgClass.relname}`;
+        return this.camelCase(`${schemaPrefix}${pgClass.relname}`);
       },
       typeCodecName(options, { pgType, databaseName }) {
         const pgNamespace = pgType.getNamespace()!;
         const schemaPrefix = this._schemaPrefix({ pgNamespace, databaseName });
-        return `${schemaPrefix}${pgType.typname}`;
+        return this.camelCase(`${schemaPrefix}${pgType.typname}`);
       },
       scalarCodecTypeName(options, codec) {
         const fullName = sql.compile(codec.sqlType).text;
-        return this.coerceToGraphQLName(
-          fullName.replace(/"/g, "").replace(/[^0-9a-z]/gi, "_"),
+        return this.camelCase(
+          this.coerceToGraphQLName(
+            fullName.replace(/"/g, "").replace(/[^0-9a-z]/gi, "_"),
+          ),
         );
       },
       enumType(options, codec) {
@@ -375,13 +377,15 @@ export const PgCodecsPlugin: Plugin = {
               pgType: type,
               databaseName,
             });
+            const enumLabels = enumValues.map((e) => e.enumlabel);
             return EXPORTABLE(
-              (codecName, enumType, enumValues, namespaceName, sql, typeName) => enumType(
+              (codecName, enumLabels, enumType, namespaceName, sql, typeName) =>
+                enumType(
                   codecName,
                   sql.identifier(namespaceName, typeName),
-                  enumValues.map((e) => e.enumlabel),
+                  enumLabels,
                 ),
-              [codecName, enumType, enumValues, namespaceName, sql, typeName],
+              [codecName, enumLabels, enumType, namespaceName, sql, typeName],
             );
           }
 
@@ -413,13 +417,28 @@ export const PgCodecsPlugin: Plugin = {
               databaseName,
             });
             return EXPORTABLE(
-              (codecName, innerCodec, namespaceName, rangeOfCodec, sql, typeName) => rangeOfCodec(
+              (
+                codecName,
+                innerCodec,
+                namespaceName,
+                rangeOfCodec,
+                sql,
+                typeName,
+              ) =>
+                rangeOfCodec(
                   innerCodec,
                   codecName,
                   sql.identifier(namespaceName, typeName),
                   { extensions: {} },
                 ),
-              [codecName, innerCodec, namespaceName, rangeOfCodec, sql, typeName],
+              [
+                codecName,
+                innerCodec,
+                namespaceName,
+                rangeOfCodec,
+                sql,
+                typeName,
+              ],
             );
           }
 
@@ -449,7 +468,17 @@ export const PgCodecsPlugin: Plugin = {
                 databaseName,
               });
               return EXPORTABLE(
-                (codecName, domainOfCodec, extensions, innerCodec, namespaceName, notNull, sql, typeName) => domainOfCodec(
+                (
+                  codecName,
+                  domainOfCodec,
+                  extensions,
+                  innerCodec,
+                  namespaceName,
+                  notNull,
+                  sql,
+                  typeName,
+                ) =>
+                  domainOfCodec(
                     innerCodec,
                     codecName,
                     sql.identifier(namespaceName, typeName),
@@ -458,7 +487,16 @@ export const PgCodecsPlugin: Plugin = {
                       notNull,
                     },
                   ),
-                [codecName, domainOfCodec, extensions, innerCodec, namespaceName, notNull, sql, typeName],
+                [
+                  codecName,
+                  domainOfCodec,
+                  extensions,
+                  innerCodec,
+                  namespaceName,
+                  notNull,
+                  sql,
+                  typeName,
+                ],
               );
             }
           }
