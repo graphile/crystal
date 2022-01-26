@@ -34,6 +34,7 @@ import type {
   PgType,
 } from "../introspection";
 import { makeIntrospectionQuery } from "../introspection";
+import { augmentIntrospection } from "../augmentIntrospection";
 
 type KeysOfType<TObject, TValueType> = {
   [key in keyof TObject]: TObject[key] extends TValueType ? key : never;
@@ -459,9 +460,9 @@ export const PgIntrospectionPlugin: Plugin = {
             if (!row) {
               throw new Error("Introspection failed");
             }
-            const introspection = JSON.parse(
-              row.introspection,
-            ) as Introspection;
+            const introspection = augmentIntrospection(
+              JSON.parse(row.introspection),
+            );
             return { database, introspection };
           }),
         );
