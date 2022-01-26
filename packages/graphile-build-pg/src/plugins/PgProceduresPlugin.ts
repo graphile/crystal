@@ -29,16 +29,13 @@ interface ArgumentDetails {
 declare global {
   namespace GraphileEngine {
     interface Inflection {
-      computedColumn(this: Inflection, details: ComputedColumnDetails): string;
-      computedColumnConnection(
+      functionSourceName(
         this: Inflection,
-        details: ComputedColumnDetails,
+        details: {
+          databaseName: string;
+          pgProc: PgProc;
+        },
       ): string;
-      computedColumnList(
-        this: Inflection,
-        details: ComputedColumnDetails,
-      ): string;
-      argument(this: Inflection, details: ArgumentDetails): string;
     }
     interface GraphileBuildGatherOptions {
       /**
@@ -83,6 +80,16 @@ export const PgProceduresPlugin: Plugin = {
   name: "PgProceduresPlugin",
   description: "Generates sources for the PostgreSQL procedures it finds",
   version: version,
+
+  inflection: {
+    add: {
+      functionSourceName(options, { databaseName, pgProc }) {
+        const pgNamespace = pgProc.getNamespace()!;
+        const schemaPrefix = this._schemaPrefix({ databaseName, pgNamespace });
+        return `${schemaPrefix}${pgProc.proname}`;
+      },
+    },
+  },
 
   gather: {
     namespace: "pgProcedures",
@@ -145,7 +152,11 @@ export const PgProceduresPlugin: Plugin = {
             return null;
           }
 
-          const name = `${databaseName}.${namespace.nspname}.${pgProc.proname}(...)`;
+          const name = info.inflection.functionSourceName({
+            databaseName,
+            pgProc,
+          });
+          const identifier = `${databaseName}.${namespace.nspname}.${pgProc.proname}(...)`;
           const makeCodecFromReturn = async (): Promise<PgTypeCodec<
             any,
             any,
@@ -341,18 +352,9 @@ export const PgProceduresPlugin: Plugin = {
               return null;
             }
             return EXPORTABLE(
-              (
-                extensions,
-                isMutation,
-                name,
-                parameters,
-                returnsArray,
-                returnsSetof,
-                source,
-                sourceCallback,
-              ) =>
-                source.functionSource({
+              (extensions, identifier, isMutation, name, parameters, returnsArray, returnsSetof, source, sourceCallback) => source.functionSource({
                   name,
+                  identifier,
                   source: sourceCallback,
                   parameters,
                   returnsArray,
@@ -360,34 +362,15 @@ export const PgProceduresPlugin: Plugin = {
                   extensions,
                   isMutation,
                 }),
-              [
-                extensions,
-                isMutation,
-                name,
-                parameters,
-                returnsArray,
-                returnsSetof,
-                source,
-                sourceCallback,
-              ],
+              [extensions, identifier, isMutation, name, parameters, returnsArray, returnsSetof, source, sourceCallback],
             );
           }
 
           return EXPORTABLE(
-            (
-              PgSource,
-              executor,
-              extensions,
-              isMutation,
-              name,
-              parameters,
-              returnCodec,
-              returnsSetof,
-              sourceCallback,
-            ) =>
-              new PgSource({
+            (PgSource, executor, extensions, identifier, isMutation, name, parameters, returnCodec, returnsSetof, sourceCallback) => new PgSource({
                 executor,
                 name,
+                identifier,
                 source: sourceCallback,
                 parameters,
                 isUnique: !returnsSetof,
@@ -396,17 +379,7 @@ export const PgProceduresPlugin: Plugin = {
                 extensions,
                 isMutation,
               }),
-            [
-              PgSource,
-              executor,
-              extensions,
-              isMutation,
-              name,
-              parameters,
-              returnCodec,
-              returnsSetof,
-              sourceCallback,
-            ],
+            [PgSource, executor, extensions, identifier, isMutation, name, parameters, returnCodec, returnsSetof, sourceCallback],
           );
         })();
         sourceByPgProc.set(pgProc, source!);
