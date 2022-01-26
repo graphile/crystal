@@ -496,7 +496,10 @@ export class PgSource<
       });
     } else if (!returnsSetof) {
       // This is a `composite[]` function; convert it to a `setof composite` function:
-      const source = (...args: SQL[]) => sql`unnest(${fnSource(...args)})`;
+      const source = EXPORTABLE(
+        (fnSource, sql) => (...args: SQL[]) =>
+            sql`unnest(${fnSource(...args)})`,
+      [fnSource, sql]);
       return new PgSource<TColumns, TUniques, TRelations, TNewParameters>({
         codec,
         executor,
@@ -513,10 +516,12 @@ export class PgSource<
       // This is a `setof composite[]` function; convert it to `setof composite` and indicate that we should partition it.
       const sqlTmp = sql.identifier(Symbol(`${name}_tmp`));
       const sqlPartitionByIndex = sql.identifier(Symbol(`${name}_idx`));
-      const source = (...args: SQL[]) =>
-        sql`${fnSource(
-          ...args,
-        )} with ordinality as ${sqlTmp} (arr, ${sqlPartitionByIndex}) cross join lateral unnest (${sqlTmp}.arr)`;
+      const source = EXPORTABLE(
+        (fnSource, sql, sqlPartitionByIndex, sqlTmp) => (...args: SQL[]) =>
+            sql`${fnSource(
+              ...args,
+            )} with ordinality as ${sqlTmp} (arr, ${sqlPartitionByIndex}) cross join lateral unnest (${sqlTmp}.arr)`,
+      [fnSource, sql, sqlPartitionByIndex, sqlTmp]);
       return new PgSource<TColumns, TUniques, TRelations, TNewParameters>({
         codec,
         executor,
