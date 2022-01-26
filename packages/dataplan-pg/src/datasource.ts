@@ -161,6 +161,7 @@ export interface PgSourceOptions<
   codec: PgTypeCodec<TColumns, any, any, any>;
   executor: PgExecutor;
   name: string;
+  identifier?: string;
   source: TParameters extends PgSourceParameter[]
     ? (...args: SQL[]) => SQL
     : SQL;
@@ -297,6 +298,7 @@ export class PgSource<
   public readonly codec: PgTypeCodec<TColumns, any, any, any>;
   public readonly executor: PgExecutor;
   public readonly name: string;
+  public readonly identifier: string;
   public readonly source: SQL | ((...args: SQL[]) => SQL);
   public readonly uniques: TUniques;
   private readonly _options: PgSourceOptions<
@@ -344,6 +346,7 @@ export class PgSource<
           source: sql`(select 1/0 /* codec-only source; should not select directly */)`,
           codec,
           name,
+          identifier: name,
         }),
       [PgSource, codec, executor, name, sql],
     );
@@ -367,6 +370,7 @@ export class PgSource<
       codec,
       executor,
       name,
+      identifier,
       source,
       uniques,
       relations,
@@ -382,6 +386,7 @@ export class PgSource<
     this.codec = codec;
     this.executor = executor;
     this.name = name;
+    this.identifier = identifier ?? name;
     this.source = source;
     this.uniques =
       uniques ?? ([] as TUniques extends never[] ? TUniques : never);
@@ -432,16 +437,18 @@ export class PgSource<
     TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
   >(overrideOptions: {
     name: string;
+    identifier?: string;
     source: SQL;
     uniques?: TUniques;
     extensions?: PgSourceExtensions;
   }): PgSource<TColumns, TUniques, TRelations, undefined> {
-    const { name, source, uniques, extensions } = overrideOptions;
+    const { name, identifier, source, uniques, extensions } = overrideOptions;
     const { codec, executor, relations } = this._options;
     return new PgSource({
       codec,
       executor,
       name,
+      identifier,
       source: source as any,
       uniques,
       relations,
@@ -461,6 +468,7 @@ export class PgSource<
     TNewParameters extends PgSourceParameter[],
   >(overrideOptions: {
     name: string;
+    identifier?: string;
     source: (...args: SQL[]) => SQL;
     parameters: TNewParameters;
     returnsSetof: boolean;
@@ -471,6 +479,7 @@ export class PgSource<
   }) {
     const {
       name,
+      identifier,
       source: fnSource,
       parameters,
       returnsSetof,
@@ -486,6 +495,7 @@ export class PgSource<
         codec,
         executor,
         name,
+        identifier,
         source: fnSource as any,
         uniques,
         relations,
@@ -497,13 +507,16 @@ export class PgSource<
     } else if (!returnsSetof) {
       // This is a `composite[]` function; convert it to a `setof composite` function:
       const source = EXPORTABLE(
-        (fnSource, sql) => (...args: SQL[]) =>
+        (fnSource, sql) =>
+          (...args: SQL[]) =>
             sql`unnest(${fnSource(...args)})`,
-      [fnSource, sql]);
+        [fnSource, sql],
+      );
       return new PgSource<TColumns, TUniques, TRelations, TNewParameters>({
         codec,
         executor,
         name,
+        identifier,
         source: source as any,
         uniques,
         relations,
@@ -517,15 +530,18 @@ export class PgSource<
       const sqlTmp = sql.identifier(Symbol(`${name}_tmp`));
       const sqlPartitionByIndex = sql.identifier(Symbol(`${name}_idx`));
       const source = EXPORTABLE(
-        (fnSource, sql, sqlPartitionByIndex, sqlTmp) => (...args: SQL[]) =>
+        (fnSource, sql, sqlPartitionByIndex, sqlTmp) =>
+          (...args: SQL[]) =>
             sql`${fnSource(
               ...args,
             )} with ordinality as ${sqlTmp} (arr, ${sqlPartitionByIndex}) cross join lateral unnest (${sqlTmp}.arr)`,
-      [fnSource, sql, sqlPartitionByIndex, sqlTmp]);
+        [fnSource, sql, sqlPartitionByIndex, sqlTmp],
+      );
       return new PgSource<TColumns, TUniques, TRelations, TNewParameters>({
         codec,
         executor,
         name,
+        identifier,
         source: source as any,
         uniques,
         relations,
