@@ -166,43 +166,37 @@ export const PgRelationsPlugin: Plugin = {
       },
     },
   },
-  schema: {
-    hooks: {
-      inflection(inflection, build) {
-        return build.extend(
-          inflection,
-          {
-            singleRelation(details) {
-              // E.g. posts(author_id) references users(id)
-              const remoteType = this.tableType(details.relation.source.codec);
-              const localColumns = details.relation.localColumns;
-              return this.camelCase(
-                `${remoteType}-by-${localColumns.join("-and-")}`,
-              );
-            },
-            manyRelationConnection(details) {
-              // E.g. users(id) references posts(author_id)
-              const remoteType = this.tableType(details.relation.source.codec);
-              const remoteColumns = details.relation.remoteColumns;
-              return this.camelCase(
-                `${this.pluralize(remoteType)}-by-${remoteColumns.join(
-                  "-and-",
-                )}`,
-              );
-            },
-            manyRelationList(details) {
-              const remoteType = this.tableType(details.relation.source.codec);
-              const remoteColumns = details.relation.remoteColumns;
-              return this.camelCase(
-                `${this.pluralize(remoteType)}-by-${remoteColumns.join(
-                  "-and-",
-                )}-list`,
-              );
-            },
-          },
-          "Adding inflectors from PgForwardRelationPlugin",
+
+  inflection: {
+    add: {
+      singleRelation(options, details) {
+        // E.g. posts(author_id) references users(id)
+        const remoteType = this.tableType(details.relation.source.codec);
+        const localColumns = details.relation.localColumns;
+        return this.camelCase(`${remoteType}-by-${localColumns.join("-and-")}`);
+      },
+      manyRelationConnection(options, details) {
+        // E.g. users(id) references posts(author_id)
+        const remoteType = this.tableType(details.relation.source.codec);
+        const remoteColumns = details.relation.remoteColumns;
+        return this.camelCase(
+          `${this.pluralize(remoteType)}-by-${remoteColumns.join("-and-")}`,
         );
       },
+      manyRelationList(options, details) {
+        const remoteType = this.tableType(details.relation.source.codec);
+        const remoteColumns = details.relation.remoteColumns;
+        return this.camelCase(
+          `${this.pluralize(remoteType)}-by-${remoteColumns.join(
+            "-and-",
+          )}-list`,
+        );
+      },
+    },
+  },
+
+  schema: {
+    hooks: {
       GraphQLObjectType_fields(fields, build, context) {
         const {
           extend,

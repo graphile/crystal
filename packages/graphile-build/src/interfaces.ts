@@ -49,20 +49,23 @@ declare module "graphile-plugin" {
      */
     add?: {
       [key in keyof GraphileEngine.Inflection]?: (
+        this: GraphileEngine.Inflection,
+        // TODO: should we wrap this in an object to allow future expansion?
         options: GraphileEngine.GraphileBuildInflectionOptions,
-      ) => GraphileEngine.Inflection[key];
+        ...args: Parameters<GraphileEngine.Inflection[key]>
+      ) => ReturnType<GraphileEngine.Inflection[key]>;
     };
 
     /**
      * Overwrite existing inflectors here.
      */
     replace?: {
-      [key in keyof GraphileEngine.Inflection]?: PluginHook<
-        (
-          options: GraphileEngine.GraphileBuildInflectionOptions,
-          previous: GraphileEngine.Inflection[key] | undefined,
-        ) => GraphileEngine.Inflection[key]
-      >;
+      [key in keyof GraphileEngine.Inflection]?: (
+        this: GraphileEngine.Inflection,
+        previous: GraphileEngine.Inflection[key] | undefined,
+        options: GraphileEngine.GraphileBuildInflectionOptions,
+        ...args: Parameters<GraphileEngine.Inflection[key]>
+      ) => ReturnType<GraphileEngine.Inflection[key]>;
     };
   }
 
@@ -140,20 +143,6 @@ declare module "graphile-plugin" {
     schema?: {
       hooks?: {
         /**
-         * Inflection is used for naming resulting types/fields/args/etc - it's
-         * hook-able so that other plugins may extend it or override it. `Build` is
-         * exceedingly barebones at this point since no plugins have been allowed to
-         * extend it.
-         */
-        inflection?: PluginHook<
-          GraphileEngine.Hook<
-            Partial<GraphileEngine.Inflection>,
-            GraphileEngine.ContextInflection,
-            GraphileEngine.BuildBase
-          >
-        >;
-
-        /**
          * The build object represents the current schema build and is passed to all
          * hooks, hook the 'build' event to extend this object. Note: you MUST NOT
          * generate GraphQL objects during this phase.
@@ -167,9 +156,9 @@ declare module "graphile-plugin" {
         >;
 
         /**
-         * The `init` phase runs after `inflection` and `build` are complete but
-         * before any types or the schema are actually built. It is the only phase in
-         * which you can register GraphQL types; do so using `build.registerType`.
+         * The `init` phase runs after `build` is complete but before any types
+         * or the schema are actually built. It is the only phase in which you
+         * can register GraphQL types; do so using `build.registerType`.
          */
         init?: PluginHook<
           GraphileEngine.Hook<

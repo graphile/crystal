@@ -65,53 +65,48 @@ export const PgCustomTypeFieldPlugin: Plugin = {
   description:
     "Adds fields to types for custom type field functions (aka 'computed column functions')",
   version: version,
-  schema: {
-    hooks: {
-      inflection(inflection, build) {
-        return build.extend(
-          inflection,
-          {
-            customMutation(details) {
-              return this.camelCase(
-                details.source.extensions?.tags?.name ?? details.source.name,
-              );
-            },
-            customMutationPayload(details) {
-              return this.camelCase(this.customMutation(details) + "-payload");
-            },
-            customQuery(details) {
-              return this.camelCase(
-                details.source.extensions?.tags?.name ?? details.source.name,
-              );
-            },
-            customQueryConnection(details) {
-              return this.customQuery(details);
-            },
-            customQueryList(details) {
-              return this.camelCase(this.customQuery(details) + "-list");
-            },
-            computedColumn(details) {
-              // TODO: remove prefix from name?
-              return this.camelCase(
-                details.source.extensions?.tags?.name ?? details.source.name,
-              );
-            },
-            computedColumnConnection(details) {
-              return this.computedColumn(details);
-            },
-            computedColumnList(details) {
-              return this.camelCase(this.computedColumn(details) + "-list");
-            },
-            argument(details) {
-              return this.camelCase(
-                details.param.name || `arg${details.index}`,
-              );
-            },
-          },
-          "Adding inflectors for PgCustomTypeFieldPlugin",
+
+  inflection: {
+    add: {
+      customMutation(options, details) {
+        return this.camelCase(
+          details.source.extensions?.tags?.name ?? details.source.name,
         );
       },
+      customMutationPayload(options, details) {
+        return this.camelCase(this.customMutation(details) + "-payload");
+      },
+      customQuery(options, details) {
+        return this.camelCase(
+          details.source.extensions?.tags?.name ?? details.source.name,
+        );
+      },
+      customQueryConnection(options, details) {
+        return this.customQuery(details);
+      },
+      customQueryList(options, details) {
+        return this.camelCase(this.customQuery(details) + "-list");
+      },
+      computedColumn(options, details) {
+        // TODO: remove prefix from name?
+        return this.camelCase(
+          details.source.extensions?.tags?.name ?? details.source.name,
+        );
+      },
+      computedColumnConnection(options, details) {
+        return this.computedColumn(details);
+      },
+      computedColumnList(options, details) {
+        return this.camelCase(this.computedColumn(details) + "-list");
+      },
+      argument(options, details) {
+        return this.camelCase(details.param.name || `arg${details.index}`);
+      },
+    },
+  },
 
+  schema: {
+    hooks: {
       init(_, build) {
         const {
           graphql: { GraphQLList },

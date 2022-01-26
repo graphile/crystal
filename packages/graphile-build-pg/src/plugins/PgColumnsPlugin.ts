@@ -71,27 +71,22 @@ export const PgColumnsPlugin: Plugin = {
   description: "Adds columns to composite types",
   version: version,
   // TODO: Requires PgTablesPlugin
-  schema: {
-    hooks: {
-      inflection(inflection, build) {
-        return build.extend<
-          typeof inflection,
-          Partial<GraphileEngine.Inflection>
-        >(
-          inflection,
-          {
-            _columnName({ columnName, column }) {
-              return this.coerceToGraphQLName(
-                column.extensions?.tags?.name || columnName,
-              );
-            },
-            column(details) {
-              return this.camelCase(this._columnName(details));
-            },
-          },
-          "Adding inflectors from PgColumnsPlugin",
+
+  inflection: {
+    add: {
+      _columnName(options, { columnName, column }) {
+        return this.coerceToGraphQLName(
+          column.extensions?.tags?.name || columnName,
         );
       },
+      column(options, details) {
+        return this.camelCase(this._columnName(details));
+      },
+    },
+  },
+
+  schema: {
+    hooks: {
       GraphQLObjectType_fields(fields, build, context) {
         const {
           extend,

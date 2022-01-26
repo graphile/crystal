@@ -375,7 +375,6 @@ declare global {
       scope: Scope;
       type:
         | "build"
-        | "inflection"
         | "init"
         | "finalize"
         | "GraphQLSchema"
@@ -391,12 +390,6 @@ declare global {
     interface ContextBuild extends Context {
       scope: ScopeBuild;
       type: "build";
-    }
-
-    interface ScopeInflection extends Scope {}
-    interface ContextInflection extends Context {
-      scope: ScopeInflection;
-      type: "inflection";
     }
 
     interface ScopeInit extends Scope {}
@@ -558,7 +551,6 @@ declare global {
     type SomeScope =
       | Scope
       | ScopeBuild
-      | ScopeInflection
       | ScopeInit
       | ScopeGraphQLSchema
       | ScopeGraphQLScalarType
@@ -634,18 +626,6 @@ declare global {
       TBuild extends GraphileEngine.Build = GraphileEngine.Build,
     > {
       /**
-       * Inflection is used for naming resulting types/fields/args/etc - it's
-       * hook-able so that other plugins may extend it or override it. `Build` is
-       * exceedingly barebones at this point since no plugins have been allowed to
-       * extend it.
-       */
-      inflection: GraphileEngine.Hook<
-        Partial<GraphileEngine.Inflection>,
-        GraphileEngine.ContextInflection,
-        GraphileEngine.BuildBase
-      >[];
-
-      /**
        * The build object represents the current schema build and is passed to all
        * hooks, hook the 'build' event to extend this object. Note: you MUST NOT
        * generate GraphQL objects during this phase.
@@ -657,9 +637,9 @@ declare global {
       >[];
 
       /**
-       * The `init` phase runs after `inflection` and `build` are complete but
-       * before any types or the schema are actually built. It is the only phase in
-       * which you can register GraphQL types; do so using `build.registerType`.
+       * The `init` phase runs after `build` is complete but before any types
+       * or the schema are actually built. It is the only phase in which you
+       * can register GraphQL types; do so using `build.registerType`.
        */
       init: GraphileEngine.Hook<
         Record<string, never>,

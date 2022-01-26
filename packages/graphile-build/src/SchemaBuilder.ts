@@ -173,17 +173,6 @@ class SchemaBuilder<
       input,
       this.inflection,
     ) as Partial<TBuild> & GraphileEngine.BuildBase;
-    // Inflection needs to come first, in case 'build' hooks depend on it
-    const scopeContext: GraphileEngine.ContextInflection = {
-      scope: {},
-      type: "inflection",
-    };
-    initialBuild.inflection = this.applyHooks(
-      "inflection",
-      initialBuild.inflection,
-      initialBuild,
-      scopeContext,
-    ) as GraphileEngine.Inflection;
 
     const build = this.applyHooks("build", initialBuild, initialBuild, {
       scope: {},

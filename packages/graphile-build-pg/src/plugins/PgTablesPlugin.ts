@@ -311,36 +311,29 @@ export const PgTablesPlugin: Plugin = {
     },
   } as PluginGatherConfig<"pgTables", State, Cache>,
 
-  schema: {
-    hooks: {
-      inflection(inflection, build) {
-        return build.extend<
-          typeof inflection,
-          Partial<GraphileEngine.Inflection>
-        >(
-          inflection,
-          {
-            _codecName(codec) {
-              return this.coerceToGraphQLName(
-                codec.extensions?.tags?.name || sql.compile(codec.sqlType).text,
-              );
-            },
-
-            _singularizedCodecName(codec) {
-              return this.singularize(this._codecName(codec)).replace(
-                /.(?:(?:[_-]i|I)nput|(?:[_-]p|P)atch)$/,
-                "$&_record",
-              );
-            },
-
-            tableType(codec) {
-              return this.upperCamelCase(this._singularizedCodecName(codec));
-            },
-          },
-          "Adding inflectors for PgTablesPlugin",
+  inflection: {
+    add: {
+      _codecName(options, codec) {
+        return this.coerceToGraphQLName(
+          codec.extensions?.tags?.name || sql.compile(codec.sqlType).text,
         );
       },
 
+      _singularizedCodecName(options, codec) {
+        return this.singularize(this._codecName(codec)).replace(
+          /.(?:(?:[_-]i|I)nput|(?:[_-]p|P)atch)$/,
+          "$&_record",
+        );
+      },
+
+      tableType(options, codec) {
+        return this.upperCamelCase(this._singularizedCodecName(codec));
+      },
+    },
+  },
+
+  schema: {
+    hooks: {
       init(_, build, _context) {
         const {
           inflection,

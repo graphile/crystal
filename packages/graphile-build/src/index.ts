@@ -52,12 +52,21 @@ export const buildInflection = (preset: Preset): GraphileEngine.Inflection => {
   for (const plugin of plugins) {
     if (plugin.inflection?.add) {
       const inflectorsToAdd = plugin.inflection.add;
-      for (const inflectorName of Object.keys(inflectorsToAdd)) {
-        extend(
-          inflectors,
-          { [inflectorName]: inflectorsToAdd[inflectorName](options) },
-          `Adding inflectors from ${plugin.name}`,
-        );
+      for (const inflectorName of Object.keys(
+        inflectorsToAdd,
+      ) as (keyof GraphileEngine.Inflection)[]) {
+        const fn = inflectorsToAdd[inflectorName];
+        if (fn) {
+          const inflector = fn.bind(
+            inflectors as GraphileEngine.Inflection,
+            options,
+          );
+          extend(
+            inflectors,
+            { [inflectorName]: inflector },
+            `Adding inflectors from ${plugin.name}`,
+          );
+        }
       }
     }
   }
@@ -74,6 +83,16 @@ export const buildInflection = (preset: Preset): GraphileEngine.Inflection => {
         );
       }
       inflectors[inflectorName] = replacementFunction(options, previous);
+      const inflector = replacementFunction.bind(
+        inflectors as GraphileEngine.Inflection,
+        previous,
+        options,
+      );
+      extend(
+        inflectors,
+        { [inflectorName]: inflector },
+        `Adding inflectors from ${plugin.name}`,
+      );
     },
   );
 

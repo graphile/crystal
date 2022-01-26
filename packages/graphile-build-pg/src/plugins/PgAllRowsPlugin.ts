@@ -65,41 +65,34 @@ export const PgAllRowsPlugin: Plugin = {
   description: "Adds 'all rows' accessors for all tables.",
   version: version,
   // TODO: Requires PgTablesPlugin
-  schema: {
-    hooks: {
-      inflection(inflection, build) {
-        return build.extend<
-          typeof inflection,
-          Partial<GraphileEngine.Inflection>
-        >(
-          inflection,
-          {
-            _sourceName(source) {
-              return this.coerceToGraphQLName(
-                source.extensions?.tags?.name || source.name,
-              );
-            },
 
-            _singularizedSourceName(source) {
-              return this.singularize(this._sourceName(source));
-            },
-
-            allRowsConnection(source) {
-              return this.camelCase(
-                `all-${this.pluralize(this._singularizedSourceName(source))}`,
-              );
-            },
-            allRowsList(source) {
-              return this.camelCase(
-                `all-${this.pluralize(
-                  this._singularizedSourceName(source),
-                )}-list`,
-              );
-            },
-          },
-          "Adding inflectors from PgAllRowsPlugin",
+  inflection: {
+    add: {
+      _sourceName(options, source) {
+        return this.coerceToGraphQLName(
+          source.extensions?.tags?.name || source.name,
         );
       },
+
+      _singularizedSourceName(options, source) {
+        return this.singularize(this._sourceName(source));
+      },
+
+      allRowsConnection(options, source) {
+        return this.camelCase(
+          `all-${this.pluralize(this._singularizedSourceName(source))}`,
+        );
+      },
+      allRowsList(options, source) {
+        return this.camelCase(
+          `all-${this.pluralize(this._singularizedSourceName(source))}-list`,
+        );
+      },
+    },
+  },
+
+  schema: {
+    hooks: {
       GraphQLObjectType_fields(fields, build, context) {
         const {
           graphql: { GraphQLList, GraphQLNonNull },

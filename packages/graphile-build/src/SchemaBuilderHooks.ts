@@ -4,7 +4,6 @@ export function makeSchemaBuilderHooks<
   TBuild extends GraphileEngine.Build = GraphileEngine.Build,
 >(): GraphileEngine.SchemaBuilderHooks<TBuild> {
   return {
-    inflection: [],
     build: [],
     init: [],
     finalize: [],

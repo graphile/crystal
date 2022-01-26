@@ -381,112 +381,110 @@ export const PgCodecsPlugin: Plugin = {
       },
     },
   },
-  schema: {
-    hooks: {
-      inflection(inflection, build) {
-        return build.extend(
-          inflection,
-          {
-            scalarCodecTypeName(codec) {
-              const fullName = sql.compile(codec.sqlType).text;
-              return this.coerceToGraphQLName(
-                fullName.replace(/"/g, "").replace(/[^0-9a-z]/gi, "_"),
-              );
-            },
-            enumType(codec) {
-              return this.scalarCodecTypeName(codec);
-            },
-            enumValue(inValue) {
-              let value = inValue;
 
-              if (value === "") {
-                return "_EMPTY_";
-              }
-
-              // Some enums use asterisks to signify wildcards - this might be for
-              // the whole item, or prefixes/suffixes, or even in the middle.  This
-              // is provided on a best efforts basis, if it doesn't suit your
-              // purposes then please pass a custom inflector as mentioned below.
-              value = value
-                .replace(/\*/g, "_ASTERISK_")
-                .replace(/^(_?)_+ASTERISK/, "$1ASTERISK")
-                .replace(/ASTERISK_(_?)_*$/, "ASTERISK$1");
-
-              // This is a best efforts replacement for common symbols that you
-              // might find in enums. Generally we only support enums that are
-              // alphanumeric, if these replacements don't work for you, you should
-              // pass a custom inflector that replaces this `enumName` method
-              // with one of your own chosing.
-              value =
-                {
-                  // SQL comparison operators
-                  ">": "GREATER_THAN",
-                  ">=": "GREATER_THAN_OR_EQUAL",
-                  "=": "EQUAL",
-                  "!=": "NOT_EQUAL",
-                  "<>": "DIFFERENT",
-                  "<=": "LESS_THAN_OR_EQUAL",
-                  "<": "LESS_THAN",
-
-                  // PostgreSQL LIKE shortcuts
-                  "~~": "LIKE",
-                  "~~*": "ILIKE",
-                  "!~~": "NOT_LIKE",
-                  "!~~*": "NOT_ILIKE",
-
-                  // '~' doesn't necessarily represent regexps, but the three
-                  // operators following it likely do, so we'll use the word TILDE
-                  // in all for consistency.
-                  "~": "TILDE",
-                  "~*": "TILDE_ASTERISK",
-                  "!~": "NOT_TILDE",
-                  "!~*": "NOT_TILDE_ASTERISK",
-
-                  // A number of other symbols where we're not sure of their
-                  // meaning.  We give them common generic names so that they're
-                  // suitable for multiple purposes, e.g. favouring 'PLUS' over
-                  // 'ADDITION' and 'DOT' over 'FULL_STOP'
-                  "%": "PERCENT",
-                  "+": "PLUS",
-                  "-": "MINUS",
-                  "/": "SLASH",
-                  "\\": "BACKSLASH",
-                  _: "UNDERSCORE",
-                  "#": "POUND",
-                  "£": "STERLING",
-                  $: "DOLLAR",
-                  "&": "AMPERSAND",
-                  "@": "AT",
-                  "'": "APOSTROPHE",
-                  '"': "QUOTE",
-                  "`": "BACKTICK",
-                  ":": "COLON",
-                  ";": "SEMICOLON",
-                  "!": "EXCLAMATION_POINT",
-                  "?": "QUESTION_MARK",
-                  ",": "COMMA",
-                  ".": "DOT",
-                  "^": "CARET",
-                  "|": "BAR",
-                  "[": "OPEN_BRACKET",
-                  "]": "CLOSE_BRACKET",
-                  "(": "OPEN_PARENTHESIS",
-                  ")": "CLOSE_PARENTHESIS",
-                  "{": "OPEN_BRACE",
-                  "}": "CLOSE_BRACE",
-                }[value] || value;
-              return this.coerceToGraphQLName(value);
-            },
-            rangeBoundType({ underlyingTypeName }) {
-              return `${underlyingTypeName}Bound`;
-            },
-            rangeType({ underlyingTypeName }) {
-              return `${underlyingTypeName}Range`;
-            },
-          },
-          "Adding inflectors from PgCodecsPlugin",
+  inflection: {
+    add: {
+      scalarCodecTypeName(options, codec) {
+        const fullName = sql.compile(codec.sqlType).text;
+        return this.coerceToGraphQLName(
+          fullName.replace(/"/g, "").replace(/[^0-9a-z]/gi, "_"),
         );
       },
+      enumType(options, codec) {
+        return this.scalarCodecTypeName(codec);
+      },
+      enumValue(options, inValue) {
+        let value = inValue;
+
+        if (value === "") {
+          return "_EMPTY_";
+        }
+
+        // Some enums use asterisks to signify wildcards - this might be for
+        // the whole item, or prefixes/suffixes, or even in the middle.  This
+        // is provided on a best efforts basis, if it doesn't suit your
+        // purposes then please pass a custom inflector as mentioned below.
+        value = value
+          .replace(/\*/g, "_ASTERISK_")
+          .replace(/^(_?)_+ASTERISK/, "$1ASTERISK")
+          .replace(/ASTERISK_(_?)_*$/, "ASTERISK$1");
+
+        // This is a best efforts replacement for common symbols that you
+        // might find in enums. Generally we only support enums that are
+        // alphanumeric, if these replacements don't work for you, you should
+        // pass a custom inflector that replaces this `enumName` method
+        // with one of your own chosing.
+        value =
+          {
+            // SQL comparison operators
+            ">": "GREATER_THAN",
+            ">=": "GREATER_THAN_OR_EQUAL",
+            "=": "EQUAL",
+            "!=": "NOT_EQUAL",
+            "<>": "DIFFERENT",
+            "<=": "LESS_THAN_OR_EQUAL",
+            "<": "LESS_THAN",
+
+            // PostgreSQL LIKE shortcuts
+            "~~": "LIKE",
+            "~~*": "ILIKE",
+            "!~~": "NOT_LIKE",
+            "!~~*": "NOT_ILIKE",
+
+            // '~' doesn't necessarily represent regexps, but the three
+            // operators following it likely do, so we'll use the word TILDE
+            // in all for consistency.
+            "~": "TILDE",
+            "~*": "TILDE_ASTERISK",
+            "!~": "NOT_TILDE",
+            "!~*": "NOT_TILDE_ASTERISK",
+
+            // A number of other symbols where we're not sure of their
+            // meaning.  We give them common generic names so that they're
+            // suitable for multiple purposes, e.g. favouring 'PLUS' over
+            // 'ADDITION' and 'DOT' over 'FULL_STOP'
+            "%": "PERCENT",
+            "+": "PLUS",
+            "-": "MINUS",
+            "/": "SLASH",
+            "\\": "BACKSLASH",
+            _: "UNDERSCORE",
+            "#": "POUND",
+            "£": "STERLING",
+            $: "DOLLAR",
+            "&": "AMPERSAND",
+            "@": "AT",
+            "'": "APOSTROPHE",
+            '"': "QUOTE",
+            "`": "BACKTICK",
+            ":": "COLON",
+            ";": "SEMICOLON",
+            "!": "EXCLAMATION_POINT",
+            "?": "QUESTION_MARK",
+            ",": "COMMA",
+            ".": "DOT",
+            "^": "CARET",
+            "|": "BAR",
+            "[": "OPEN_BRACKET",
+            "]": "CLOSE_BRACKET",
+            "(": "OPEN_PARENTHESIS",
+            ")": "CLOSE_PARENTHESIS",
+            "{": "OPEN_BRACE",
+            "}": "CLOSE_BRACE",
+          }[value] || value;
+        return this.coerceToGraphQLName(value);
+      },
+      rangeBoundType(options, { underlyingTypeName }) {
+        return `${underlyingTypeName}Bound`;
+      },
+      rangeType(options, { underlyingTypeName }) {
+        return `${underlyingTypeName}Range`;
+      },
+    },
+  },
+
+  schema: {
+    hooks: {
       init: {
         after: ["pg-standard-types"],
         callback: (_, build) => {
