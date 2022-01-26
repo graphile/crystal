@@ -34,6 +34,11 @@ const ALLOWED_SIBLING_KEYS: string[] = [
   // GraphQLArgumentConfig
   "defaultValue",
 
+  // GraphQLScalarConfig
+  "serialize",
+  "parseValue",
+  "parseLiteral",
+
   // pgPolymorphic
   "match",
 
@@ -80,6 +85,9 @@ export const ExportMethods: Rule.RuleModule = {
       "subscribePlan",
       "isTypeOf",
       "resolveType",
+      "serialize",
+      "parseValue",
+      "parseLiteral",
     ];
 
     const options: CommonOptions = {
