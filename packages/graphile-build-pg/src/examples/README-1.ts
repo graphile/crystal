@@ -16,7 +16,7 @@ import {
 import { crystalPrint, stripAnsi } from "graphile-crystal";
 import { exportSchema } from "graphile-exporter";
 import { resolvePresets } from "graphile-plugin";
-import { formatError, graphql, printSchema } from "graphql";
+import { graphql, printSchema } from "graphql";
 import { Pool } from "pg";
 import { inspect } from "util";
 
