@@ -30,7 +30,10 @@ class SchemaBuilder<
 
   newWithHooks: NewWithHooksFunction;
 
-  constructor(options: GraphileEngine.GraphileBuildSchemaOptions) {
+  constructor(
+    options: GraphileEngine.GraphileBuildSchemaOptions,
+    private inflection: GraphileEngine.Inflection,
+  ) {
     super();
 
     if (!options) {
@@ -165,8 +168,11 @@ class SchemaBuilder<
   }
 
   createBuild(input: GraphileEngine.BuildInput): TBuild {
-    const initialBuild = makeNewBuild(this, input) as Partial<TBuild> &
-      GraphileEngine.BuildBase;
+    const initialBuild = makeNewBuild(
+      this,
+      input,
+      this.inflection,
+    ) as Partial<TBuild> & GraphileEngine.BuildBase;
     // Inflection needs to come first, in case 'build' hooks depend on it
     const scopeContext: GraphileEngine.ContextInflection = {
       scope: {},

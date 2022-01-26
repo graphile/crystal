@@ -11,6 +11,7 @@ import { applyHooks, AsyncHooks, resolvePresets } from "graphile-plugin";
 import type { GraphQLSchema } from "graphql";
 
 import extend from "./extend.js";
+import { makeInitialInflection } from "./inflection.js";
 import {
   ClientMutationIdDescriptionPlugin,
   CursorTypePlugin,
@@ -40,11 +41,12 @@ const getSchemaHooks = (plugin: Plugin) => plugin.schema?.hooks;
 /**
  * Generate 'build.inflection' from the given preset.
  */
-export const inflection = (preset: Preset): GraphileEngine.Inflection => {
+export const buildInflection = (preset: Preset): GraphileEngine.Inflection => {
   const config = resolvePresets([preset]);
   const { plugins, inflection: options = {} } = config;
 
-  const inflectors: Partial<GraphileEngine.Inflection> = {};
+  const inflectors: Partial<GraphileEngine.Inflection> =
+    makeInitialInflection();
 
   // Add the base inflectors
   for (const plugin of plugins) {
@@ -83,6 +85,11 @@ export const inflection = (preset: Preset): GraphileEngine.Inflection => {
  */
 export const gather = async (
   preset: Preset,
+  {
+    inflection,
+  }: {
+    inflection: GraphileEngine.Inflection;
+  } = { inflection: buildInflection(preset) },
 ): Promise<GraphileEngine.BuildInput> => {
   const config = resolvePresets([preset]);
   const options = config.gather || {};
@@ -96,6 +103,7 @@ export const gather = async (
   const pluginContext = new Map<
     Plugin,
     {
+      inflection: GraphileEngine.Inflection;
       helpers: GatherHelpers;
       options: typeof options;
       cache: any;
@@ -126,6 +134,7 @@ export const gather = async (
       state,
       cache,
       process: hooks.process.bind(hooks),
+      inflection,
     };
     pluginContext.set(plugin, context);
     helpers[spec.namespace] = {};
@@ -167,10 +176,13 @@ export const gather = async (
   return output as GraphileEngine.BuildInput;
 };
 
-export const getBuilder = (preset: Preset): SchemaBuilder => {
+export const getBuilder = (
+  preset: Preset,
+  inflection: GraphileEngine.Inflection,
+): SchemaBuilder => {
   const config = resolvePresets([preset]);
   const { plugins, schema: options } = config;
-  const builder = new SchemaBuilder(options || {});
+  const builder = new SchemaBuilder(options || {}, inflection);
   applyHooks(plugins, getSchemaHooks, (hookName, hookFn, plugin) => {
     builder._setPluginName(plugin.name);
     builder.hook(hookName, hookFn);
@@ -182,8 +194,13 @@ export const getBuilder = (preset: Preset): SchemaBuilder => {
 export const buildSchema = (
   preset: Preset,
   input: GraphileEngine.BuildInput,
+  {
+    inflection,
+  }: {
+    inflection: GraphileEngine.Inflection;
+  } = { inflection: buildInflection(preset) },
 ): GraphQLSchema => {
-  const builder = getBuilder(preset);
+  const builder = getBuilder(preset, inflection);
   return builder.buildSchema(input);
 };
 

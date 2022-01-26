@@ -28,6 +28,7 @@ export interface GatherPluginContext<
   TState extends { [key: string]: any },
   TCache extends { [key: string]: any },
 > {
+  inflection: GraphileEngine.Inflection;
   options: GraphileEngine.GraphileBuildGatherOptions;
   helpers: GatherHelpers;
   state: TState;

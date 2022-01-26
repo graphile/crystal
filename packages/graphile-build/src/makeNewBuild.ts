@@ -22,7 +22,6 @@ import * as graphql from "graphql";
 import * as semver from "semver";
 
 import extend, { indent } from "./extend.js";
-import { makeInitialInflection } from "./inflection.js";
 import type SchemaBuilder from "./SchemaBuilder.js";
 import { stringTypeSpec, wrapDescription } from "./utils.js";
 
@@ -38,6 +37,7 @@ const version: string = JSON.parse(
 export default function makeNewBuild(
   builder: SchemaBuilder<any>,
   input: GraphileEngine.BuildInput,
+  inflection: GraphileEngine.Inflection,
 ): GraphileEngine.BuildBase {
   const allTypes = {
     Int: GraphQLInt,
@@ -145,7 +145,7 @@ export default function makeNewBuild(
       }
     },
     scopeByType,
-    inflection: makeInitialInflection(),
+    inflection,
     handleRecoverableError(e) {
       e["recoverable"] = true;
       throw e;

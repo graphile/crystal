@@ -7,6 +7,7 @@ import express from "express";
 import { graphqlHTTP } from "express-graphql";
 import { readFile } from "fs/promises";
 import {
+  buildInflection,
   buildSchema,
   defaultPreset as graphileBuildPreset,
   gather,
@@ -60,7 +61,8 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
       },
     },
   ]);
-  const input = await gather(config);
+  const shared = { inflection: buildInflection(config) };
+  const input = await gather(config, shared);
   console.log("Sources:");
   console.log(
     "  " +
@@ -71,7 +73,7 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
         )
         .join("\n  "),
   );
-  const schema = buildSchema(config, input);
+  const schema = buildSchema(config, input, shared);
 
   // Output our schema
   // console.log(chalk.blue(printSchema(schema)));
