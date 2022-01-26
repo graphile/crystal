@@ -15,6 +15,7 @@ import type { GraphQLObjectType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
+import { PgAttribute, PgClass, PgConstraint } from "../introspection.js";
 
 interface RelationDetails {
   source: PgSource<any, any, any, any>;
@@ -32,6 +33,18 @@ declare global {
       pgRelationDetails?: RelationDetails;
     }
     interface Inflection {
+      sourceRelationName(
+        this: Inflection,
+        details: {
+          databaseName: string;
+          pgConstraint: PgConstraint;
+          localClass: PgClass;
+          localColumns: PgAttribute[];
+          foreignClass: PgClass;
+          foreignColumns: PgAttribute[];
+          isUnique: boolean;
+        },
+      ): string;
       singleRelation(this: Inflection, details: RelationDetails): string;
       manyRelationConnection(
         this: Inflection,
@@ -55,6 +68,65 @@ export const PgRelationsPlugin: Plugin = {
   name: "PgRelationsPlugin",
   description: "Creates links between types representing PostgreSQL tables",
   version,
+
+  inflection: {
+    add: {
+      sourceRelationName(
+        options,
+        {
+          databaseName,
+          pgConstraint,
+          localClass,
+          localColumns,
+          foreignClass,
+          foreignColumns,
+          isUnique,
+        },
+      ) {
+        const remoteName = this.tableSourceName({
+          databaseName,
+          pgClass: foreignClass,
+        });
+        const columns =
+          pgConstraint.getClass() === localClass
+            ? // We have a column referencing another table
+              localColumns
+            : // The other table has a constraint that references us; this is the backwards relation.
+              foreignColumns;
+        const columnNames = columns.map((col) => col.attname);
+        return this.camelCase(
+          `${
+            isUnique ? remoteName : this.pluralize(remoteName)
+          }-by-${columnNames.join("-and-")}`,
+        );
+      },
+
+      singleRelation(options, details) {
+        // E.g. posts(author_id) references users(id)
+        const remoteType = this.tableType(details.relation.source.codec);
+        const localColumns = details.relation.localColumns;
+        return this.camelCase(`${remoteType}-by-${localColumns.join("-and-")}`);
+      },
+      manyRelationConnection(options, details) {
+        // E.g. users(id) references posts(author_id)
+        const remoteType = this.tableType(details.relation.source.codec);
+        const remoteColumns = details.relation.remoteColumns;
+        return this.camelCase(
+          `${this.pluralize(remoteType)}-by-${remoteColumns.join("-and-")}`,
+        );
+      },
+      manyRelationList(options, details) {
+        const remoteType = this.tableType(details.relation.source.codec);
+        const remoteColumns = details.relation.remoteColumns;
+        return this.camelCase(
+          `${this.pluralize(remoteType)}-by-${remoteColumns.join(
+            "-and-",
+          )}-list`,
+        );
+      },
+    },
+  },
+
   gather: <PluginGatherConfig<"pgRelations", State, Cache>>{
     namespace: "pgRelations",
     helpers: {},
@@ -76,7 +148,7 @@ export const PgRelationsPlugin: Plugin = {
             pgClass._id,
           );
         const addRelation = async (
-          relationName: string,
+          pgConstraint: PgConstraint,
           localColumnNumbers: readonly number[],
           foreignClassId: string,
           foreignColumnNumbers: readonly number[],
@@ -114,6 +186,15 @@ export const PgRelationsPlugin: Plugin = {
           if (!foreignSource) {
             return;
           }
+          const relationName = info.inflection.sourceRelationName({
+            databaseName,
+            pgConstraint,
+            localClass: pgClass,
+            localColumns: localColumns as PgAttribute[],
+            foreignClass,
+            foreignColumns: foreignColumns as PgAttribute[],
+            isUnique,
+          });
           relations[relationName] = {
             localColumns: localColumns.map((c) => c!.attname),
             remoteColumns: foreignColumns.map((c) => c!.attname),
@@ -126,7 +207,7 @@ export const PgRelationsPlugin: Plugin = {
         for (const constraint of constraints) {
           if (constraint.contype === "f") {
             addRelation(
-              constraint.conname,
+              constraint,
               constraint.conkey!,
               constraint.confrelid!,
               constraint.confkey!,
@@ -155,7 +236,7 @@ export const PgRelationsPlugin: Plugin = {
               },
             );
             addRelation(
-              constraint.conname,
+              constraint,
               constraint.confkey!,
               constraint.conrelid!,
               constraint.conkey!,
@@ -163,34 +244,6 @@ export const PgRelationsPlugin: Plugin = {
             );
           }
         }
-      },
-    },
-  },
-
-  inflection: {
-    add: {
-      singleRelation(options, details) {
-        // E.g. posts(author_id) references users(id)
-        const remoteType = this.tableType(details.relation.source.codec);
-        const localColumns = details.relation.localColumns;
-        return this.camelCase(`${remoteType}-by-${localColumns.join("-and-")}`);
-      },
-      manyRelationConnection(options, details) {
-        // E.g. users(id) references posts(author_id)
-        const remoteType = this.tableType(details.relation.source.codec);
-        const remoteColumns = details.relation.remoteColumns;
-        return this.camelCase(
-          `${this.pluralize(remoteType)}-by-${remoteColumns.join("-and-")}`,
-        );
-      },
-      manyRelationList(options, details) {
-        const remoteType = this.tableType(details.relation.source.codec);
-        const remoteColumns = details.relation.remoteColumns;
-        return this.camelCase(
-          `${this.pluralize(remoteType)}-by-${remoteColumns.join(
-            "-and-",
-          )}-list`,
-        );
       },
     },
   },
