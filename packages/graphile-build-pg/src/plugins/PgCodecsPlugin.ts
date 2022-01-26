@@ -109,12 +109,7 @@ export const PgCodecsPlugin: Plugin = {
         return this.camelCase(`${schemaPrefix}${pgType.typname}`);
       },
       scalarCodecTypeName(options, codec) {
-        const fullName = sql.compile(codec.sqlType).text;
-        return this.camelCase(
-          this.coerceToGraphQLName(
-            fullName.replace(/"/g, "").replace(/[^0-9a-z]/gi, "_"),
-          ),
-        );
+        return this.camelCase(this.coerceToGraphQLName(codec.name));
       },
       enumType(options, codec) {
         return this.scalarCodecTypeName(codec);

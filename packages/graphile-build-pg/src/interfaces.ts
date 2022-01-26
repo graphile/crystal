@@ -23,7 +23,6 @@ declare module "@dataplan/pg" {
   }
 
   interface PgTypeCodecTags extends PgSmartTagsDict {
-    name: string;
     behavior: string | string[];
   }
   interface PgTypeCodecExtensions {

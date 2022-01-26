@@ -178,9 +178,7 @@ export const PgTablesPlugin: Plugin = {
       },
 
       _codecName(options, codec) {
-        return this.coerceToGraphQLName(
-          codec.extensions?.tags?.name || sql.compile(codec.sqlType).text,
-        );
+        return this.coerceToGraphQLName(codec.name);
       },
 
       _singularizedCodecName(options, codec) {
