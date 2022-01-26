@@ -17,6 +17,7 @@ declare module "./introspection" {
   }
   interface PgNamespace {
     getOwner(): PgRoles | undefined;
+    getDescription(): string | undefined;
   }
   interface PgClass {
     getNamespace(): PgNamespace | undefined;
@@ -27,21 +28,25 @@ declare module "./introspection" {
     getConstraints(): PgConstraint[];
     getForeignConstraints(): PgConstraint[];
     getIndexes(): PgIndex[];
+    getDescription(): string | undefined;
   }
   interface PgAttribute {
     getClass(): PgClass | undefined;
     getType(): PgType | undefined;
+    getDescription(): string | undefined;
   }
   interface PgConstraint {
     getNamespace(): PgNamespace | undefined;
     getClass(): PgClass | undefined;
     getType(): PgType | undefined;
     getForeignClass(): PgClass | undefined;
+    getDescription(): string | undefined;
   }
   interface PgProc {
     getNamespace(): PgNamespace | undefined;
     getOwner(): PgRoles | undefined;
     getReturnType(): PgType | undefined;
+    getDescription(): string | undefined;
   }
   interface PgType {
     getNamespace(): PgNamespace | undefined;
@@ -51,6 +56,7 @@ declare module "./introspection" {
     getArrayType(): PgType | undefined;
     getEnumValues(): PgEnum[] | undefined;
     getRange(): PgRange | undefined;
+    getDescription(): string | undefined;
   }
   interface PgEnum {
     getType(): PgType | undefined;
@@ -97,9 +103,50 @@ export function augmentIntrospection(
   const getIndexes = (id: string | null): PgIndex[] =>
     introspection.indexes.filter((entity) => entity.indrelid === id);
 
+  const oidByCatalog: { [catalog: string]: string } = {};
+  for (const [oid, catalog] of Object.entries(introspection.catalog_by_oid)) {
+    oidByCatalog[catalog] = oid;
+  }
+  const PG_NAMESPACE = oidByCatalog["pg_namespace"];
+  const PG_CLASS = oidByCatalog["pg_class"];
+  const PG_PROC = oidByCatalog["pg_proc"];
+  const PG_TYPE = oidByCatalog["pg_type"];
+  const PG_CONSTRAINT = oidByCatalog["pg_constraint"];
+  const PG_EXTENSION = oidByCatalog["pg_extension"];
+
+  if (
+    !PG_NAMESPACE ||
+    !PG_CLASS ||
+    !PG_PROC ||
+    !PG_TYPE ||
+    !PG_CONSTRAINT ||
+    !PG_EXTENSION
+  ) {
+    throw new Error(
+      `Invalid introspection results; could not determine the ids of the system catalogs`,
+    );
+  }
+
+  const getDescription = (
+    classoid: string,
+    objoid: string,
+    objsubid?: number,
+  ): string | undefined =>
+    objsubid == null
+      ? introspection.descriptions.find(
+          (d) => d.classoid === classoid && d.objoid === objoid,
+        )?.description ?? undefined
+      : introspection.descriptions.find(
+          (d) =>
+            d.classoid === classoid &&
+            d.objoid === objoid &&
+            d.objsubid === objsubid,
+        )?.description ?? undefined;
+
   introspection.database.getDba = () => getRole(introspection.database.datdba);
-  introspection.namespaces.forEach((nsp) => {
-    nsp.getOwner = () => getRole(nsp.nspowner);
+  introspection.namespaces.forEach((entity) => {
+    entity.getOwner = () => getRole(entity.nspowner);
+    entity.getDescription = () => getDescription(PG_NAMESPACE, entity._id);
   });
   introspection.classes.forEach((entity) => {
     entity.getNamespace = () => getNamespace(entity.relnamespace);
@@ -110,21 +157,26 @@ export function augmentIntrospection(
     entity.getConstraints = () => getConstraints(entity._id);
     entity.getForeignConstraints = () => getForeignConstraints(entity._id);
     entity.getIndexes = () => getIndexes(entity._id);
+    entity.getDescription = () => getDescription(PG_CLASS, entity._id, 0);
   });
   introspection.attributes.forEach((entity) => {
     entity.getClass = () => getClass(entity.attrelid);
     entity.getType = () => getType(entity.atttypid);
+    entity.getDescription = () =>
+      getDescription(PG_CLASS, entity.attrelid, entity.attnum);
   });
   introspection.constraints.forEach((entity) => {
     entity.getNamespace = () => getNamespace(entity.connamespace);
     entity.getClass = () => getClass(entity.conrelid);
     entity.getType = () => getType(entity.contypid);
     entity.getForeignClass = () => getClass(entity.confrelid);
+    entity.getDescription = () => getDescription(PG_CONSTRAINT, entity._id);
   });
   introspection.procs.forEach((entity) => {
     entity.getNamespace = () => getNamespace(entity.pronamespace);
     entity.getOwner = () => getRole(entity.proowner);
     entity.getReturnType = () => getType(entity.prorettype);
+    entity.getDescription = () => getDescription(PG_PROC, entity._id);
   });
   introspection.types.forEach((entity) => {
     entity.getNamespace = () => getNamespace(entity.typnamespace);
@@ -134,6 +186,7 @@ export function augmentIntrospection(
     entity.getArrayType = () => getType(entity.typarray);
     entity.getEnumValues = () => getEnums(entity._id);
     entity.getRange = () => getRange(entity._id);
+    entity.getDescription = () => getDescription(PG_TYPE, entity._id);
   });
   introspection.enums.forEach((entity) => {
     entity.getType = () => getType(entity.enumtypid);
