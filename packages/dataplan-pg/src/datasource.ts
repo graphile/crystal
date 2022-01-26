@@ -13,6 +13,7 @@ import {
   getCurrentParentPathIdentity,
   partitionByIndex,
 } from "graphile-crystal";
+import { EXPORTABLE } from "graphile-exporter";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
@@ -335,12 +336,17 @@ export class PgSource<
       return codec[$$codecSource].get(executor);
     }
 
-    const source = new PgSource({
-      executor,
-      source: sql`(select 1/0 /* codec-only source; should not select directly */)`,
-      codec,
-      name: `TemporarySource${++temporarySourceCounter}`,
-    });
+    const name = `TemporarySource${++temporarySourceCounter}`;
+    const source = EXPORTABLE(
+      (PgSource, codec, executor, name, sql) =>
+        new PgSource({
+          executor,
+          source: sql`(select 1/0 /* codec-only source; should not select directly */)`,
+          codec,
+          name,
+        }),
+      [PgSource, codec, executor, name, sql],
+    );
 
     codec[$$codecSource].set(executor, source);
 
