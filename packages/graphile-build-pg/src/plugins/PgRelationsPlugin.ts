@@ -15,7 +15,7 @@ import type { GraphQLObjectType } from "graphql";
 
 import { getBehavior } from "../behavior.js";
 import { version } from "../index.js";
-import { PgAttribute, PgClass, PgConstraint } from "../introspection.js";
+import type { PgAttribute, PgClass, PgConstraint } from "../introspection.js";
 
 interface RelationDetails {
   source: PgSource<any, any, any, any>;

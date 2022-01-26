@@ -14,6 +14,7 @@ import type {
   PluginHook,
 } from "graphile-plugin";
 
+import { augmentIntrospection } from "../augmentIntrospection";
 import { version } from "../index";
 import type {
   Introspection,
@@ -34,7 +35,6 @@ import type {
   PgType,
 } from "../introspection";
 import { makeIntrospectionQuery } from "../introspection";
-import { augmentIntrospection } from "../augmentIntrospection";
 
 type KeysOfType<TObject, TValueType> = {
   [key in keyof TObject]: TObject[key] extends TValueType ? key : never;

@@ -220,7 +220,8 @@ export const PgProceduresPlugin: Plugin = {
                 databaseName,
               });
             return EXPORTABLE(
-              (columns, recordCodecName, recordType, sql) => recordType(
+              (columns, recordCodecName, recordType, sql) =>
+                recordType(
                   recordCodecName,
                   sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
                   columns,

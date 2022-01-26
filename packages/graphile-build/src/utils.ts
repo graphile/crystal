@@ -69,8 +69,8 @@ export function isValidObjectType(
 }
 
 export const stringScalarSpec = Object.freeze({
-  serialize: (value) => String(value),
-  parseValue: (value) => String(value),
+  serialize: EXPORTABLE(() => (value) => String(value), []),
+  parseValue: EXPORTABLE(() => (value) => String(value), []),
   parseLiteral: EXPORTABLE(
     (Kind) => (ast) => {
       if (ast.kind !== Kind.STRING) {
@@ -140,7 +140,7 @@ export const stringTypeSpec = (
   coerce?: (input: string) => string,
 ): Omit<GraphQLScalarTypeConfig<any, any>, "name"> => ({
   description,
-  serialize: (value) => String(value),
+  serialize: EXPORTABLE(() => (value) => String(value), []),
   parseValue: coerce
     ? EXPORTABLE((coerce) => (value) => coerce(String(value)), [coerce])
     : EXPORTABLE(() => (value) => String(value), []),
