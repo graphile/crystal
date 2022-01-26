@@ -7,6 +7,7 @@ import type { Plugin } from "graphile-plugin";
 import type { GraphQLInputFieldConfigMap, ValueNode } from "graphql";
 
 import { version } from "../index";
+import { EXPORTABLE } from "graphile-exporter";
 
 declare global {
   namespace GraphileEngine {
@@ -617,49 +618,57 @@ export const PgTypesPlugin: Plugin = {
                   "A set of key/value pairs, keys are strings, values may be a string or null. Exposed as a JSON object.",
                   "type",
                 ),
-                serialize: (value) => value,
-                parseValue(obj) {
-                  if (isValidHstoreObject(obj)) {
-                    return obj;
-                  }
-                  throw new TypeError(
-                    `This is not a valid ${hstoreTypeName} object, it must be a key/value hash where keys and values are both strings (or null).`,
-                  );
-                },
-                parseLiteral(ast, variables) {
-                  switch (ast.kind) {
-                    case Kind.OBJECT: {
-                      const value = ast.fields.reduce((memo, field) => {
-                        memo[field.name.value] = parseValueLiteral(
-                          field.value,
-                          variables,
-                        );
-                        return memo;
-                      }, Object.create(null));
-
-                      if (!isValidHstoreObject(value)) {
-                        return undefined;
+                serialize: EXPORTABLE(() => (value) => value, []),
+                parseValue: EXPORTABLE(
+                  (hstoreTypeName, isValidHstoreObject) =>
+                    function parseValue(obj) {
+                      if (isValidHstoreObject(obj)) {
+                        return obj;
                       }
-                      return value;
-                    }
+                      throw new TypeError(
+                        `This is not a valid ${hstoreTypeName} object, it must be a key/value hash where keys and values are both strings (or null).`,
+                      );
+                    },
+                  [hstoreTypeName, isValidHstoreObject],
+                ),
+                parseLiteral: EXPORTABLE(
+                  (Kind, isValidHstoreObject, parseValueLiteral) =>
+                    function parseLiteral(ast, variables) {
+                      switch (ast.kind) {
+                        case Kind.OBJECT: {
+                          const value = ast.fields.reduce((memo, field) => {
+                            memo[field.name.value] = parseValueLiteral(
+                              field.value,
+                              variables,
+                            );
+                            return memo;
+                          }, Object.create(null));
 
-                    case Kind.NULL:
-                      return null;
+                          if (!isValidHstoreObject(value)) {
+                            return undefined;
+                          }
+                          return value;
+                        }
 
-                    case Kind.VARIABLE: {
-                      const name = ast.name.value;
-                      const value = variables ? variables[name] : undefined;
+                        case Kind.NULL:
+                          return null;
 
-                      if (!isValidHstoreObject(value)) {
-                        return undefined;
+                        case Kind.VARIABLE: {
+                          const name = ast.name.value;
+                          const value = variables ? variables[name] : undefined;
+
+                          if (!isValidHstoreObject(value)) {
+                            return undefined;
+                          }
+                          return value;
+                        }
+
+                        default:
+                          return undefined;
                       }
-                      return value;
-                    }
-
-                    default:
-                      return undefined;
-                  }
-                },
+                    },
+                  [Kind, isValidHstoreObject, parseValueLiteral],
+                ),
               }),
               "graphile-build-pg built-in (KeyValueStore)",
             );
