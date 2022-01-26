@@ -7,14 +7,19 @@ export interface Plugin {
   before?: string[];
 }
 
+export type PluginHookObject<T extends (...args: any[]) => any> = {
+  provides?: string[];
+  before?: string[];
+  after?: string[];
+  callback: T;
+};
+
 export type PluginHook<T extends (...args: any[]) => any> =
   | T
-  | {
-      provides?: string[];
-      before?: string[];
-      after?: string[];
-      callback: T;
-    };
+  | PluginHookObject<T>;
+
+export type PluginHookCallback<T extends PluginHook<(...args: any[]) => any>> =
+  T extends PluginHook<infer U> ? U : never;
 
 export interface Preset {
   extends?: ReadonlyArray<Preset>;

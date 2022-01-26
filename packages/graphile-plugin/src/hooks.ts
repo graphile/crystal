@@ -1,6 +1,6 @@
 import * as assert from "assert";
 
-import type { Plugin, PluginHook } from "./interfaces.js";
+import type { Plugin, PluginHook, PluginHookObject } from "./interfaces.js";
 
 export type HookObject<T> = Record<keyof T, (...args: any[]) => any>;
 
@@ -30,16 +30,16 @@ export class AsyncHooks<THooks extends HookObject<THooks>> {
   }
 }
 
-export function applyHooks<THooks extends HookObject<THooks>>(
+export function applyHooks<
+  THooks extends {
+    [key: string]: PluginHook<(...args: any[]) => any>;
+  },
+>(
   plugins: Plugin[],
-  hooksRetriever: (plugin: Plugin) =>
-    | {
-        [key in keyof THooks]?: PluginHook<THooks[key]>;
-      }
-    | undefined,
+  hooksRetriever: (plugin: Plugin) => Partial<THooks> | undefined,
   applyHookCallback: <THookName extends keyof THooks>(
     hookName: THookName,
-    hookFn: THooks[THookName],
+    hookFn: THooks[THookName] extends PluginHook<infer U> ? U : never,
     plugin: Plugin,
   ) => void,
 ): void {
@@ -49,7 +49,7 @@ export function applyHooks<THooks extends HookObject<THooks>>(
     provides: string[];
     before: string[];
     after: string[];
-    callback: THooks[keyof THooks];
+    callback: THooks[keyof THooks] extends PluginHook<infer U> ? U : never;
   };
   // Normalize all the hooks and gather them into collections
   const allHooks: {
@@ -63,17 +63,27 @@ export function applyHooks<THooks extends HookObject<THooks>>(
     }
     const keys = Object.keys(hooks) as unknown as Array<keyof typeof hooks>;
     for (const key of keys) {
-      const hookSpecRaw: PluginHook<THooks[typeof key]> | undefined =
-        hooks[key];
+      const hookSpecRaw: THooks[typeof key] | undefined = hooks[key];
       if (!hookSpecRaw) {
         continue;
       }
-      const callback =
-        typeof hookSpecRaw === "function" ? hookSpecRaw : hookSpecRaw.callback;
-      const { provides, before, after } =
-        typeof hookSpecRaw === "function"
-          ? ({} as { provides?: never[]; before?: never[]; after?: never })
-          : hookSpecRaw;
+
+      // TypeScript nonsense
+      const isPluginHookObject = <T extends (...args: any[]) => any>(
+        v: PluginHook<T>,
+      ): v is PluginHookObject<T> => typeof v !== "function";
+      const isPluginHookFunction = <T extends (...args: any[]) => any>(
+        v: PluginHook<T>,
+      ): v is T => typeof v === "function";
+
+      const callback: THooks[typeof key] extends PluginHook<infer U>
+        ? U
+        : never = (
+        isPluginHookFunction(hookSpecRaw) ? hookSpecRaw : hookSpecRaw.callback
+      ) as any;
+      const { provides, before, after } = isPluginHookObject(hookSpecRaw)
+        ? hookSpecRaw
+        : ({} as { provides?: never[]; before?: never[]; after?: never });
       if (!allHooks[key]) {
         allHooks[key] = [];
       }

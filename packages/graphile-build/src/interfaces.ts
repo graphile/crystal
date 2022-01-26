@@ -46,17 +46,21 @@ declare module "graphile-plugin" {
     /**
      * Define new inflectors here
      */
-    add?: Partial<GraphileEngine.Inflection>;
+    add?: {
+      [key in keyof GraphileEngine.Inflection]?: (
+        options: GraphileEngine.GraphileBuildInflectionOptions,
+      ) => GraphileEngine.Inflection[key];
+    };
 
     /**
      * Overwrite existing inflectors here.
      */
-    augment?: {
+    replace?: {
       [key in keyof GraphileEngine.Inflection]?: PluginHook<
         (
-          previous: GraphileEngine.Inflection[key],
-          ...args: Parameters<GraphileEngine.Inflection[key]>
-        ) => ReturnType<GraphileEngine.Inflection[key]>
+          options: GraphileEngine.GraphileBuildInflectionOptions,
+          previous: GraphileEngine.Inflection[key] | undefined,
+        ) => GraphileEngine.Inflection[key]
       >;
     };
   }

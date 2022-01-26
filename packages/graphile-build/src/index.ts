@@ -10,6 +10,7 @@ import type {
 import { applyHooks, AsyncHooks, resolvePresets } from "graphile-plugin";
 import type { GraphQLSchema } from "graphql";
 
+import extend from "./extend.js";
 import {
   ClientMutationIdDescriptionPlugin,
   CursorTypePlugin,
@@ -35,6 +36,47 @@ export {
 export { GraphileEngine, SchemaBuilder };
 
 const getSchemaHooks = (plugin: Plugin) => plugin.schema?.hooks;
+
+/**
+ * Generate 'build.inflection' from the given preset.
+ */
+export const inflection = (preset: Preset): GraphileEngine.Inflection => {
+  const config = resolvePresets([preset]);
+  const { plugins, inflection: options = {} } = config;
+
+  const inflectors: Partial<GraphileEngine.Inflection> = {};
+
+  // Add the base inflectors
+  for (const plugin of plugins) {
+    if (plugin.inflection?.add) {
+      const inflectorsToAdd = plugin.inflection.add;
+      for (const inflectorName of Object.keys(inflectorsToAdd)) {
+        extend(
+          inflectors,
+          { [inflectorName]: inflectorsToAdd[inflectorName](options) },
+          `Adding inflectors from ${plugin.name}`,
+        );
+      }
+    }
+  }
+
+  // Overwrite the inflectors
+  applyHooks(
+    plugins,
+    (plugin) => plugin.inflection?.replace,
+    (inflectorName, replacementFunction, plugin) => {
+      const previous = inflectors[inflectorName];
+      if (!previous) {
+        console.warn(
+          `Plugin '${plugin.name}' attempted to overwrite inflector '${inflectorName}', but no such inflector exists.`,
+        );
+      }
+      inflectors[inflectorName] = replacementFunction(options, previous);
+    },
+  );
+
+  return inflectors as GraphileEngine.Inflection;
+};
 
 /**
  * One-time gather; see `watchGather` for watch mode.
@@ -103,8 +145,10 @@ export const gather = async (
       if (!context) {
         throw new Error("No context for this plugin?");
       }
-      hooks.hook(name, ((...args: any[]) =>
-        (fn as any)(context, ...args)) as any);
+      (hooks.hook as any)(
+        name as any,
+        ((...args: any[]) => (fn as any)(context, ...args)) as any,
+      );
     },
   );
 
