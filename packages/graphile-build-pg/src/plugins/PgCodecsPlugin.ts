@@ -761,9 +761,7 @@ export const PgCodecsPlugin: Plugin = {
 
               if (!underlyingOutputMeta) {
                 console.warn(
-                  `Failed to find output meta for '${underlyingOutputTypeName}' (${
-                    sql.compile(underlyingType.sqlType).text
-                  })`,
+                  `Failed to find output meta for '${underlyingOutputTypeName}' (${underlyingType.name})`,
                 );
                 return;
               }
@@ -978,11 +976,7 @@ export const PgCodecsPlugin: Plugin = {
                     }
                     default: {
                       console.warn(
-                        `PgTypeCodec output type for '${
-                          sql.compile(codec.sqlType).text
-                        }' not understood, we don't know how to copy a '${
-                          underlyingOutputMeta.Constructor?.name
-                        }'`,
+                        `PgTypeCodec output type '${codec.name}' not understood, we don't know how to copy a '${underlyingOutputMeta.Constructor?.name}'`,
                       );
                       return;
                     }
@@ -1014,11 +1008,7 @@ export const PgCodecsPlugin: Plugin = {
                     }
                     default: {
                       console.warn(
-                        `PgTypeCodec input type for '${
-                          sql.compile(codec.sqlType).text
-                        }' not understood, we don't know how to copy a '${
-                          underlyingInputMeta.Constructor?.name
-                        }'`,
+                        `PgTypeCodec input type '${codec.name}' not understood, we don't know how to copy a '${underlyingInputMeta.Constructor?.name}'`,
                       );
                       return;
                     }
@@ -1036,9 +1026,7 @@ export const PgCodecsPlugin: Plugin = {
               // We have no idea what this is or how to handle it.
               // TODO: add some default handling, like "behavesLike = TYPES.string"?
               console.warn(
-                `PgTypeCodec for '${
-                  sql.compile(codec.sqlType).text
-                }' not understood, please set 'domainOfCodec' to indicate the underlying behaviour the type should have when exposed to GraphQL`,
+                `PgTypeCodec '${codec.name}' not understood, please set 'domainOfCodec' to indicate the underlying behaviour the type should have when exposed to GraphQL`,
               );
             }
           }

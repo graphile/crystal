@@ -280,9 +280,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                   );
                   if (!baseInputType) {
                     throw new Error(
-                      `Failed to find a suitable type for argument codec '${
-                        sql.compile(param.codec.sqlType).text
-                      }'; not adding function field for '${source}'`,
+                      `Failed to find a suitable type for argument codec '${param.codec.name}'; not adding function field for '${source}'`,
                     );
                   }
 
@@ -524,9 +522,7 @@ function getFunctionSourceReturnGraphQLType(
         | undefined);
   if (!innerType && !isVoid) {
     console.warn(
-      `Failed to find a suitable type for codec '${
-        build.sql.compile(source.codec.sqlType).text
-      }'; not adding function field`,
+      `Failed to find a suitable type for codec '${source.codec.name}'; not adding function field`,
     );
     return null;
   } else if (!innerType) {

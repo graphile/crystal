@@ -125,11 +125,10 @@ export const PgColumnsPlugin: Plugin = {
             : baseType;
           if (!arrayOrNotType) {
             console.warn(
-              `Couldn't find a 'output' variant for ${
-                sql.compile(pgCodec.sqlType).text
-              }'s '${columnName}' column (${
-                sql.compile(column.codec.sqlType).text
-              }; array=${!!column.codec.arrayOfCodec}, domain=${!!column.codec
+              `Couldn't find a 'output' variant for PgTypeCodec ${
+                pgCodec.name
+              }'s '${columnName}' column (${column.codec.name}; array=${!!column
+                .codec.arrayOfCodec}, domain=${!!column.codec
                 .domainOfCodec}, enum=${!!(column.codec as any).values})`,
             );
             continue;
@@ -141,9 +140,7 @@ export const PgColumnsPlugin: Plugin = {
           if (!type) {
             // Could not determine the type, skip this field
             console.warn(
-              `Could not determine the type for column '${columnName}' of ${
-                sql.compile(pgCodec.sqlType).text
-              }`,
+              `Could not determine the type for column '${columnName}' of ${pgCodec.name}`,
             );
             continue;
           }
@@ -235,9 +232,7 @@ export const PgColumnsPlugin: Plugin = {
                 plan: makePlan(),
               },
             },
-            `Adding '${columnName}' column field for codec representing ${
-              sql.compile(pgCodec.sqlType).text
-            }`,
+            `Adding '${columnName}' column field for PgTypeCodec ${pgCodec.name}`,
           );
         }
         return fields;

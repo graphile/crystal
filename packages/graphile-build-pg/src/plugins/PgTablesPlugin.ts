@@ -401,7 +401,6 @@ export const PgTablesPlugin: Plugin = {
             if (behavior && !behavior.includes("selectable")) {
               return;
             }
-            const codecName = sql.compile(codec.sqlType).text;
 
             const tableTypeName = inflection.tableType(codec);
             build.registerObjectType(
@@ -412,7 +411,7 @@ export const PgTablesPlugin: Plugin = {
               },
               null,
               () => ({}),
-              `PgTablesPlugin table type for ${codecName}`,
+              `PgTablesPlugin table type for ${codec.name}`,
             );
             setGraphQLTypeForPgCodec(codec, ["output"], tableTypeName);
 

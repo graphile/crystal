@@ -158,9 +158,7 @@ export class PgSelectSinglePlan<
     }
     if (!this.source.codec.columns && attr !== "") {
       throw new Error(
-        `Cannot call ${this}.get() when the source codec (${
-          sql.compile(this.source.codec.sqlType).text
-        }) has no columns to get.`,
+        `Cannot call ${this}.get() when the source codec (${this.source.codec.name}) has no columns to get.`,
       );
     }
     const classPlan = this.getClassPlan();
