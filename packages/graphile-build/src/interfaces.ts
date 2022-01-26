@@ -37,8 +37,28 @@ export interface GatherPluginContext<
 
 declare module "graphile-plugin" {
   interface Preset {
-    schema?: GraphileEngine.GraphileBuildSchemaOptions;
+    inflection?: GraphileEngine.GraphileBuildInflectionOptions;
     gather?: GraphileEngine.GraphileBuildGatherOptions;
+    schema?: GraphileEngine.GraphileBuildSchemaOptions;
+  }
+
+  interface PluginInflectionConfig {
+    /**
+     * Define new inflectors here
+     */
+    add?: Partial<GraphileEngine.Inflection>;
+
+    /**
+     * Overwrite existing inflectors here.
+     */
+    augment?: {
+      [key in keyof GraphileEngine.Inflection]?: PluginHook<
+        (
+          previous: GraphileEngine.Inflection[key],
+          ...args: Parameters<GraphileEngine.Inflection[key]>
+        ) => ReturnType<GraphileEngine.Inflection[key]>
+      >;
+    };
   }
 
   interface GatherHelpers {
@@ -108,6 +128,8 @@ declare module "graphile-plugin" {
   }
 
   interface Plugin {
+    inflection?: PluginInflectionConfig;
+
     gather?: PluginGatherConfig<keyof GatherHelpers, any, any>;
 
     schema?: {

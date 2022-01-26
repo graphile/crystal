@@ -49,6 +49,7 @@ declare global {
       };
     }
 
+    interface GraphileBuildInflectionOptions {}
     interface GraphileBuildGatherOptions {}
     interface GraphileBuildSchemaOptions {
       subscriptions?: boolean;
