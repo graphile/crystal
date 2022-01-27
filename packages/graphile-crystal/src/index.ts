@@ -40,6 +40,7 @@ import {
   PlanStreamOptions,
   PolymorphicData,
   PromiseOrDirect,
+  GraphileInputFieldConfig,
 } from "./interfaces";
 import {
   assertListCapablePlan,
@@ -108,6 +109,8 @@ import {
   arraysMatch,
   getEnumValueConfig,
   GraphileObjectType,
+  GraphileInputObjectType,
+  GraphileInputFieldConfigMap,
   inputObjectFieldSpec,
   InputObjectTypeSpec,
   newGraphileFieldConfigBuilder,
@@ -169,6 +172,9 @@ export {
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,
   GraphileObjectType,
+  GraphileInputObjectType,
+  GraphileInputFieldConfig,
+  GraphileInputFieldConfigMap,
   groupBy,
   InputListPlan,
   InputObjectFieldPlanResolver,

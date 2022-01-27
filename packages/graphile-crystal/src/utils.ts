@@ -470,7 +470,7 @@ export function newGraphileFieldConfigBuilder<
   return (config) => config;
 }
 
-type InputObjectTypeFields<
+export type GraphileInputFieldConfigMap<
   TContext extends BaseGraphQLContext,
   TParentPlan extends ModifierPlan<any>,
 > = {
@@ -486,7 +486,7 @@ type InputObjectTypeFields<
 export type InputObjectTypeSpec<
   TContext extends BaseGraphQLContext,
   TParentPlan extends ModifierPlan<any>,
-  TFields extends InputObjectTypeFields<TContext, TParentPlan>,
+  TFields extends GraphileInputFieldConfigMap<TContext, TParentPlan>,
 > = Omit<GraphQLInputObjectTypeConfig, "fields"> & {
   fields: TFields | (() => TFields);
 };
@@ -494,7 +494,7 @@ export type InputObjectTypeSpec<
 function inputObjectSpec<
   TContext extends BaseGraphQLContext,
   TParentPlan extends ModifierPlan<any>,
-  TFields extends InputObjectTypeFields<TContext, TParentPlan>,
+  TFields extends GraphileInputFieldConfigMap<TContext, TParentPlan>,
 >(
   spec: InputObjectTypeSpec<TContext, TParentPlan, TFields>,
 ): GraphQLInputObjectTypeConfig {
@@ -516,7 +516,7 @@ function inputObjectSpec<
 export type GraphileInputObjectType<
   TContext extends BaseGraphQLContext,
   TParentPlan extends ModifierPlan<any>,
-  TFields extends InputObjectTypeFields<TContext, TParentPlan>,
+  TFields extends GraphileInputFieldConfigMap<TContext, TParentPlan>,
 > = GraphQLInputObjectType & {
   TContext: TContext;
   TParentPlan: TParentPlan;
@@ -526,7 +526,7 @@ export type GraphileInputObjectType<
 export function newInputObjectTypeBuilder<
   TContext extends BaseGraphQLContext,
   TParentPlan extends ModifierPlan<any>,
->(): <TFields extends InputObjectTypeFields<TContext, TParentPlan>>(
+>(): <TFields extends GraphileInputFieldConfigMap<TContext, TParentPlan>>(
   spec: InputObjectTypeSpec<TContext, TParentPlan, TFields>,
 ) => GraphileInputObjectType<TContext, TParentPlan, TFields> {
   return (spec) =>

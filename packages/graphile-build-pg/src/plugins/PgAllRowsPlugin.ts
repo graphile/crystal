@@ -8,6 +8,7 @@ import type { Plugin } from "graphile-plugin";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";
+import { GraphQLOutputType } from "graphql";
 
 declare global {
   namespace GraphileEngine {
@@ -98,6 +99,7 @@ export const PgAllRowsPlugin: Plugin = {
           graphql: { GraphQLList, GraphQLNonNull },
           getOutputTypeByName,
         } = build;
+        const { fieldWithHooks } = context;
         if (!context.scope.isRootQuery) {
           return fields;
         }
@@ -122,48 +124,70 @@ export const PgAllRowsPlugin: Plugin = {
             continue;
           }
 
-          fields = build.extend(
-            fields,
-            {
-              [build.inflection.allRowsList(source)]: {
-                type: new GraphQLList(new GraphQLNonNull(type)),
-                plan: EXPORTABLE(
-                  (source) =>
-                    function plan() {
-                      return source.find();
-                    },
-                  [source],
+          {
+            const fieldName = build.inflection.allRowsList(source);
+            fields = build.extend(
+              fields,
+              {
+                [fieldName]: fieldWithHooks(
+                  {
+                    fieldName,
+                    isPgFieldSimpleCollection: true,
+                    pgSource: source,
+                  },
+                  () => ({
+                    type: new GraphQLList(
+                      new GraphQLNonNull(type),
+                    ) as GraphQLOutputType,
+                    plan: EXPORTABLE(
+                      (source) =>
+                        function plan() {
+                          return source.find();
+                        },
+                      [source],
+                    ),
+                  }),
                 ),
               },
-            },
-            `Adding 'all rows' field for PgSource ${source}`,
-          );
+              `Adding 'all rows' list field for PgSource ${source}`,
+            );
+          }
 
-          fields = build.extend(
-            fields,
-            {
-              [build.inflection.allRowsConnection(source)]: {
-                type: getOutputTypeByName(
-                  build.inflection.connectionType(
-                    build.inflection.tableType(source.codec),
-                  ),
-                ),
-                plan: EXPORTABLE(
-                  (connection, source) =>
-                    function plan() {
-                      return connection(
-                        source.find(),
-                        ($item) => $item,
-                        ($item: PgSelectSinglePlan<any, any, any, any>) =>
-                          $item.cursor(),
-                      );
-                    },
-                  [connection, source],
+          {
+            const fieldName = build.inflection.allRowsConnection(source);
+            fields = build.extend(
+              fields,
+              {
+                [fieldName]: fieldWithHooks(
+                  {
+                    fieldName,
+                    isPgFieldConnection: true,
+                    pgSource: source,
+                  },
+                  () => ({
+                    type: getOutputTypeByName(
+                      build.inflection.connectionType(
+                        build.inflection.tableType(source.codec),
+                      ),
+                    ),
+                    plan: EXPORTABLE(
+                      (connection, source) =>
+                        function plan() {
+                          return connection(
+                            source.find(),
+                            ($item) => $item,
+                            ($item: PgSelectSinglePlan<any, any, any, any>) =>
+                              $item.cursor(),
+                          );
+                        },
+                      [connection, source],
+                    ),
+                  }),
                 ),
               },
-            },
-            `Adding 'all rows' field for PgSource ${source}`,
-          );
+              `Adding 'all rows' connection field for PgSource ${source}`,
+            );
+          }
         }
         return fields;
       },

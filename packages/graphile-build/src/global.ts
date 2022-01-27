@@ -4,6 +4,8 @@ import type {
   ExecutablePlan,
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,
+  GraphileInputFieldConfig,
+  GraphileInputFieldConfigMap,
   OutputPlanForType,
 } from "graphile-crystal";
 import type {
@@ -14,7 +16,6 @@ import type {
   GraphQLFieldConfig,
   GraphQLFieldConfigArgumentMap,
   GraphQLFieldConfigMap,
-  GraphQLInputFieldConfig,
   GraphQLInputFieldConfigMap,
   GraphQLInputObjectType,
   GraphQLInputObjectTypeConfig,
@@ -135,10 +136,10 @@ declare global {
     interface GraphileInputObjectTypeConfig
       extends Omit<GraphQLInputObjectTypeConfig, "fields"> {
       fields?:
-        | GraphQLInputFieldConfigMap
+        | GraphileInputFieldConfigMap<any, any>
         | ((
             context: ContextGraphQLInputObjectTypeFields,
-          ) => GraphQLInputFieldConfigMap);
+          ) => GraphileInputFieldConfigMap<any, any>);
     }
 
     interface GraphileUnionTypeConfig<TSource, TContext>
@@ -612,11 +613,11 @@ declare global {
     type InputFieldWithHooksFunction = (
       fieldScope: ScopeGraphQLInputObjectTypeFieldsField,
       spec:
-        | GraphQLInputFieldConfig
+        | GraphileInputFieldConfig<any, any, any, any, any>
         | ((
             context: ContextGraphQLInputObjectTypeFieldsField,
-          ) => GraphQLInputFieldConfig),
-    ) => GraphQLInputFieldConfig;
+          ) => GraphileInputFieldConfig<any, any, any, any, any>),
+    ) => GraphileInputFieldConfig<any, any, any, any, any>;
 
     type WatchUnwatch = (triggerChange: TriggerChangeType) => void;
 
@@ -724,7 +725,7 @@ declare global {
         TBuild
       >[];
       GraphQLInputObjectType_fields_field: GraphileEngine.Hook<
-        GraphQLInputFieldConfig,
+        GraphileInputFieldConfig<any, any, any, any, any>,
         GraphileEngine.ContextGraphQLInputObjectTypeFieldsField,
         TBuild
       >[];

@@ -5,6 +5,7 @@ import type {
   GraphileFieldConfig,
   OutputPlanForType,
 } from "graphile-crystal";
+import { inputObjectFieldSpec } from "graphile-crystal";
 import {
   crystalWrapResolve,
   makeCrystalSubscriber,
@@ -616,6 +617,9 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     fieldSpec,
                   );
                 }
+                fieldsSpec[fieldName] = inputObjectFieldSpec(
+                  fieldsSpec[fieldName],
+                );
               }
               return fieldsSpec;
             },

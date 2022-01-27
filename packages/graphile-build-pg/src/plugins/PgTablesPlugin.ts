@@ -94,6 +94,11 @@ declare global {
       isPgTableType?: boolean;
       isPgRowConnectionType?: true;
     }
+    interface ScopeGraphQLObjectTypeFieldsField {
+      pgSource?: PgSource<any, any, any, any>;
+      isPgFieldConnection?: boolean;
+      isPgFieldSimpleCollection?: boolean;
+    }
   }
 }
 
