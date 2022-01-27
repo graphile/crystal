@@ -74,6 +74,12 @@ export const PgOrderAllColumnsPlugin: Plugin = {
             if (behavior && !behavior.includes("order")) {
               return memo;
             }
+            if (!behavior) {
+              // Unless explicitly told to, do not allow ordering by arrays/ranges
+              if (column.codec.arrayOfCodec || column.codec.rangeOfCodec) {
+                return memo;
+              }
+            }
             const isUnique = uniques.some((list) => list[0] === columnName);
 
             const ascFieldName = inflection.orderByColumnEnum({
@@ -95,7 +101,8 @@ export const PgOrderAllColumnsPlugin: Plugin = {
                   extensions: {
                     graphile: {
                       plan: EXPORTABLE(
-                        (column, columnName, isUnique, sql) => (plan: PgSelectPlan<any, any, any, any>) => {
+                        (column, columnName, isUnique, sql) =>
+                          (plan: PgSelectPlan<any, any, any, any>) => {
                             plan.orderBy({
                               codec: column.codec,
                               fragment: sql`${plan.alias}.${sql.identifier(
@@ -129,7 +136,8 @@ export const PgOrderAllColumnsPlugin: Plugin = {
                   extensions: {
                     graphile: {
                       plan: EXPORTABLE(
-                        (column, columnName, isUnique, sql) => (plan: PgSelectPlan<any, any, any, any>) => {
+                        (column, columnName, isUnique, sql) =>
+                          (plan: PgSelectPlan<any, any, any, any>) => {
                             plan.orderBy({
                               codec: column.codec,
                               fragment: sql`${plan.alias}.${sql.identifier(
