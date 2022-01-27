@@ -34,13 +34,14 @@ import {
   ExecutablePlanResolver,
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,
+  GraphileInputFieldConfig,
   InputObjectFieldPlanResolver,
   OutputPlanForType,
   PlanOptimizeOptions,
   PlanStreamOptions,
   PolymorphicData,
   PromiseOrDirect,
-  GraphileInputFieldConfig,
+  TrackedArguments,
 } from "./interfaces";
 import {
   assertListCapablePlan,
@@ -108,9 +109,9 @@ import { stripAnsi } from "./stripAnsi";
 import {
   arraysMatch,
   getEnumValueConfig,
-  GraphileObjectType,
-  GraphileInputObjectType,
   GraphileInputFieldConfigMap,
+  GraphileInputObjectType,
+  GraphileObjectType,
   inputObjectFieldSpec,
   InputObjectTypeSpec,
   newGraphileFieldConfigBuilder,
@@ -171,10 +172,10 @@ export {
   getEnumValueConfig,
   GraphileFieldConfig,
   GraphileFieldConfigArgumentMap,
-  GraphileObjectType,
-  GraphileInputObjectType,
   GraphileInputFieldConfig,
   GraphileInputFieldConfigMap,
+  GraphileInputObjectType,
+  GraphileObjectType,
   groupBy,
   InputListPlan,
   InputObjectFieldPlanResolver,
@@ -231,6 +232,7 @@ export {
   stripAnsi,
   subscribe,
   SubscribePlan,
+  TrackedArguments,
 };
 
 exportAsMany({

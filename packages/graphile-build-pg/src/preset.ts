@@ -20,6 +20,7 @@ import { PgProceduresPlugin } from "./plugins/PgProceduresPlugin";
 import { PgRelationsPlugin } from "./plugins/PgRelationsPlugin";
 import { PgTablesPlugin } from "./plugins/PgTablesPlugin";
 import { PgTypesPlugin } from "./plugins/PgTypesPlugin";
+import { PgRowByUniquePlugin } from "./plugins/PgRowByUniquePlugin";
 
 export const defaultPreset: Preset = {
   plugins: [
@@ -31,6 +32,7 @@ export const defaultPreset: Preset = {
     PgProceduresPlugin,
     PgColumnsPlugin,
     PgAllRowsPlugin,
+    PgRowByUniquePlugin,
     PgConnectionTotalCountPlugin,
     PgRelationsPlugin,
     PgColumnDeprecationPlugin,
