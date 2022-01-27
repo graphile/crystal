@@ -66,6 +66,7 @@ export const PgConditionArgumentPlugin: Plugin = {
               conditionName,
               {
                 isPgCondition: true,
+                pgCodec: codec,
               },
 
               () => ({
@@ -117,21 +118,16 @@ export const PgConditionArgumentPlugin: Plugin = {
                                     >,
                                     $value: InputPlan,
                                   ) {
+                                    const expression = sql`${
+                                      $condition.alias
+                                    }.${sql.identifier(columnName)}`;
                                     if ($value.evalIs(null)) {
                                       $condition.where(
-                                        sql`${
-                                          $condition.alias
-                                        }.${sql.identifier(
-                                          columnName,
-                                        )} is null`,
+                                        sql`${expression} is null`,
                                       );
                                     } else {
                                       $condition.where(
-                                        sql`${
-                                          $condition.alias
-                                        }.${sql.identifier(
-                                          columnName,
-                                        )} = ${$condition.placeholder(
+                                        sql`${expression} = ${$condition.placeholder(
                                           $value,
                                           column.codec,
                                         )}`,
