@@ -425,7 +425,7 @@ export function getCodecByPgCatalogTypeName(
     case "varchar":
       return TYPES.varchar;
     case "text":
-      return TYPES.char;
+      return TYPES.text;
     case "uuid":
       return TYPES.uuid;
 
