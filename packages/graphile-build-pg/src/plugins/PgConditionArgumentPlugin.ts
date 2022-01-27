@@ -6,7 +6,7 @@ import type {
   PgSelectSinglePlan,
   PgSourceColumns,
 } from "@dataplan/pg";
-import type { ConnectionPlan } from "graphile-crystal";
+import type { ConnectionPlan, InputPlan } from "graphile-crystal";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLInputType } from "graphql";
 
@@ -115,16 +115,28 @@ export const PgConditionArgumentPlugin: Plugin = {
                                     $condition: PgConditionPlan<
                                       PgSelectPlan<any, any, any, any>
                                     >,
-                                    $value: any,
+                                    $value: InputPlan,
                                   ) {
-                                    $condition.where(
-                                      sql`${$condition.alias}.${sql.identifier(
-                                        columnName,
-                                      )} = ${$condition.placeholder(
-                                        $value,
-                                        column.codec,
-                                      )}`,
-                                    );
+                                    if ($value.evalIs(null)) {
+                                      $condition.where(
+                                        sql`${
+                                          $condition.alias
+                                        }.${sql.identifier(
+                                          columnName,
+                                        )} is null`,
+                                      );
+                                    } else {
+                                      $condition.where(
+                                        sql`${
+                                          $condition.alias
+                                        }.${sql.identifier(
+                                          columnName,
+                                        )} = ${$condition.placeholder(
+                                          $value,
+                                          column.codec,
+                                        )}`,
+                                      );
+                                    }
                                   },
                                 [column, columnName, sql],
                               ),
