@@ -7,6 +7,7 @@ import { PgColumnDeprecationPlugin } from "./plugins/PgColumnDeprecationPlugin";
 import { PgColumnsPlugin } from "./plugins/PgColumnsPlugin";
 import { PgConditionArgumentPlugin } from "./plugins/PgConditionArgumentPlugin";
 import { PgConnectionArgFirstLastBeforeAfterPlugin } from "./plugins/PgConnectionArgFirstLastBeforeAfterPlugin";
+import { PgConnectionArgOrderByDefaultValuePlugin } from "./plugins/PgConnectionArgOrderByDefaultValuePlugin";
 import { PgConnectionArgOrderByPlugin } from "./plugins/PgConnectionArgOrderByPlugin";
 import { PgConnectionTotalCountPlugin } from "./plugins/PgConnectionTotalCountPlugin";
 import { PgCustomConditionPlugin } from "./plugins/PgCustomConditionPlugin";
@@ -37,5 +38,6 @@ export const defaultPreset: Preset = {
     PgCustomConditionPlugin,
     PgConnectionArgOrderByPlugin,
     PgOrderAllColumnsPlugin,
+    PgConnectionArgOrderByDefaultValuePlugin,
   ],
 };
