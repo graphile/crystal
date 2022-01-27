@@ -7,6 +7,7 @@ import { PgColumnDeprecationPlugin } from "./plugins/PgColumnDeprecationPlugin";
 import { PgColumnsPlugin } from "./plugins/PgColumnsPlugin";
 import { PgConditionArgumentPlugin } from "./plugins/PgConditionArgumentPlugin";
 import { PgConnectionTotalCountPlugin } from "./plugins/PgConnectionTotalCountPlugin";
+import { PgCustomConditionPlugin } from "./plugins/PgCustomConditionPlugin";
 import { PgCustomTypeFieldPlugin } from "./plugins/PgCustomTypeFieldPlugin";
 import { PgIntrospectionPlugin } from "./plugins/PgIntrospectionPlugin";
 import { PgProceduresPlugin } from "./plugins/PgProceduresPlugin";
@@ -29,5 +30,6 @@ export const defaultPreset: Preset = {
     PgColumnDeprecationPlugin,
     PgCustomTypeFieldPlugin,
     PgConditionArgumentPlugin,
+    PgCustomConditionPlugin,
   ],
 };
