@@ -12,6 +12,7 @@ import { PgConnectionTotalCountPlugin } from "./plugins/PgConnectionTotalCountPl
 import { PgCustomConditionPlugin } from "./plugins/PgCustomConditionPlugin";
 import { PgCustomTypeFieldPlugin } from "./plugins/PgCustomTypeFieldPlugin";
 import { PgIntrospectionPlugin } from "./plugins/PgIntrospectionPlugin";
+import { PgOrderAllColumnsPlugin } from "./plugins/PgOrderAllColumnsPlugin";
 import { PgProceduresPlugin } from "./plugins/PgProceduresPlugin";
 import { PgRelationsPlugin } from "./plugins/PgRelationsPlugin";
 import { PgTablesPlugin } from "./plugins/PgTablesPlugin";
@@ -35,5 +36,6 @@ export const defaultPreset: Preset = {
     PgConditionArgumentPlugin,
     PgCustomConditionPlugin,
     PgConnectionArgOrderByPlugin,
+    PgOrderAllColumnsPlugin,
   ],
 };
