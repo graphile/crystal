@@ -14,6 +14,7 @@ import { PgCustomConditionPlugin } from "./plugins/PgCustomConditionPlugin";
 import { PgCustomTypeFieldPlugin } from "./plugins/PgCustomTypeFieldPlugin";
 import { PgIntrospectionPlugin } from "./plugins/PgIntrospectionPlugin";
 import { PgOrderAllColumnsPlugin } from "./plugins/PgOrderAllColumnsPlugin";
+import { PgOrderByPrimaryKeyPlugin } from "./plugins/PgOrderByPrimaryKeyPlugin";
 import { PgProceduresPlugin } from "./plugins/PgProceduresPlugin";
 import { PgRelationsPlugin } from "./plugins/PgRelationsPlugin";
 import { PgTablesPlugin } from "./plugins/PgTablesPlugin";
@@ -39,5 +40,6 @@ export const defaultPreset: Preset = {
     PgConnectionArgOrderByPlugin,
     PgOrderAllColumnsPlugin,
     PgConnectionArgOrderByDefaultValuePlugin,
+    PgOrderByPrimaryKeyPlugin,
   ],
 };
