@@ -69,6 +69,7 @@ export const PgOrderCustomFieldsPlugin: Plugin = {
         const functionSources = build.input.pgSources.filter((source) => {
           if (source.codec.columns) return false;
           if (source.codec.arrayOfCodec) return false;
+          if (source.codec.rangeOfCodec) return false;
           const parameters: PgSourceParameter[] | undefined = source.parameters;
           if (!parameters) return false;
           if (parameters.filter((p) => p.required).length !== 1) return false;
