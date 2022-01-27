@@ -1,4 +1,3 @@
-import { EXPORTABLE } from "graphile-exporter";
 import type {
   PgConditionPlan,
   PgSelectPlan,
@@ -6,6 +5,7 @@ import type {
   PgSourceParameter,
 } from "@dataplan/pg";
 import type { InputPlan } from "graphile-crystal";
+import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 
 import { version } from "../index";
@@ -19,8 +19,8 @@ declare global {
   }
 }
 
-export const PgCustomConditionPlugin: Plugin = {
-  name: "PgCustomConditionPlugin",
+export const PgConditionCustomFieldsPlugin: Plugin = {
+  name: "PgConditionCustomFieldsPlugin",
   description: "Add conditions based on 'filterable' functions",
   version: version,
 
