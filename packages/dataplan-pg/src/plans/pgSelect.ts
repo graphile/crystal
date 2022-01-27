@@ -1155,17 +1155,25 @@ export class PgSelectPlan<
       if (!allVals) {
         return allVals;
       }
-      const limit = this.fetchOneExtra ? this.first ?? this.last : null;
+      const limit = this.first ?? this.last;
+      const firstAndLast =
+        this.first != null && this.last != null && this.last < this.first;
       const hasMore =
         this.fetchOneExtra && limit != null && allVals.length > limit;
-      const vals = hasMore ? allVals.slice(0, limit) : allVals;
-      const finalArray = shouldReverseOrder ? reverseArray(vals) : vals;
+      const limitedRows = hasMore ? allVals.slice(0, limit) : allVals;
+      const slicedRows =
+        firstAndLast && this.last != null
+          ? limitedRows.slice(-this.last)
+          : limitedRows;
+      const orderedRows = shouldReverseOrder
+        ? reverseArray(slicedRows)
+        : slicedRows;
       if (this.fetchOneExtra) {
         // TODO: this is an ugly hack; really we should consider resolving to an
         // object that can contain metadata as well as the rows.
-        Object.defineProperty(finalArray, "hasMore", { value: hasMore });
+        Object.defineProperty(orderedRows, "hasMore", { value: hasMore });
       }
-      return finalArray;
+      return orderedRows;
     });
   }
 
@@ -2310,20 +2318,32 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
             table,
             parent2,
           );
-          const limit = this.fetchOneExtra ? this.first ?? this.last : null;
+          const limit = this.first ?? this.last;
+          const firstAndLast =
+            this.first != null && this.last != null && this.last < this.first;
           const rowsPlan = access<any[]>(parent2, [selfIndex]);
           const shouldReverse = this.shouldReverseOrder();
-          if (this.fetchOneExtra && limit != null) {
+          if ((this.fetchOneExtra || firstAndLast) && limit != null) {
             return lambda(rowsPlan, (rows) => {
               if (!rows) {
                 return rows;
               }
               const hasMore = rows.length > limit;
-              const slicedRows = hasMore ? rows.slice(0, limit) : rows;
+              const limitedRows = hasMore ? rows.slice(0, limit) : rows;
+              const slicedRows =
+                firstAndLast && this.last != null
+                  ? limitedRows.slice(-this.last)
+                  : limitedRows;
               const orderedRows = shouldReverse
-                ? slicedRows.reverse()
+                ? reverseArray(slicedRows)
                 : slicedRows;
-              Object.defineProperty(orderedRows, "hasMore", { value: hasMore });
+              if (this.fetchOneExtra) {
+                // TODO: this is an ugly hack; really we should consider resolving to an
+                // object that can contain metadata as well as the rows.
+                Object.defineProperty(orderedRows, "hasMore", {
+                  value: hasMore,
+                });
+              }
               return orderedRows;
             });
           } else {
