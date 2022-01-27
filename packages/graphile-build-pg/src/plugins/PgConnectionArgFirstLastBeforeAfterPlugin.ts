@@ -28,6 +28,7 @@ declare global {
   }
 }
 
+// TODO: rename this, it's not just for connections
 export const PgConnectionArgFirstLastBeforeAfterPlugin: Plugin = {
   name: "PgConnectionArgFirstLastBeforeAfterPlugin",
   description:
