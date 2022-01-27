@@ -87,6 +87,7 @@ export {
   pgSelectSingleFromRecord,
   PgSelectSinglePlan,
 } from "./plans/pgSelectSingle";
+export { PgSetCapableParentPlan, PgSetPlan } from "./plans/pgSet";
 export {
   pgSingleTablePolymorphic,
   PgSingleTablePolymorphicPlan,

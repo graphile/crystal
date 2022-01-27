@@ -378,7 +378,7 @@ export function assertModifierPlan<
 ): asserts plan is ModifierPlan<TParentPlan> {
   if (!isModifierPlan(plan)) {
     throw new Error(
-      `The plan returned from '${pathIdentity}' should be an modifier plan, but it does not implement the 'apply' method.`,
+      `The plan returned from '${pathIdentity}' should be a modifier plan, but it does not implement the 'apply' method.`,
     );
   }
 }

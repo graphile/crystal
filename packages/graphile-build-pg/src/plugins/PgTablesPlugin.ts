@@ -399,28 +399,41 @@ export const PgTablesPlugin: Plugin = {
               return;
             }
 
+            const tableTypeName = inflection.tableType(codec);
             const behavior = getBehavior(codec.extensions);
             // TODO: is 'selectable' the right behavior? What if you can only see
             // it in a subscription? What if only on a mutation payload? More
             // like "viewable"?
-            if (behavior && !behavior.includes("selectable")) {
-              return;
+            const selectable = !behavior || behavior.includes("selectable");
+            if (selectable) {
+              build.registerObjectType(
+                tableTypeName,
+                {
+                  pgCodec: codec,
+                  isPgTableType: true,
+                },
+                null,
+                () => ({}),
+                `PgTablesPlugin table type for ${codec.name}`,
+              );
+              setGraphQLTypeForPgCodec(codec, ["output"], tableTypeName);
             }
 
-            const tableTypeName = inflection.tableType(codec);
-            build.registerObjectType(
-              tableTypeName,
-              {
-                pgCodec: codec,
-                isPgTableType: true,
-              },
-              null,
-              () => ({}),
-              `PgTablesPlugin table type for ${codec.name}`,
-            );
-            setGraphQLTypeForPgCodec(codec, ["output"], tableTypeName);
-
-            // TODO: input type?
+            if (!behavior || behavior.includes("insertable")) {
+              const inputTypeName = inflection.inputType(tableTypeName);
+              build.registerInputObjectType(
+                inputTypeName,
+                {
+                  pgCodec: codec,
+                  isInputType: true,
+                  isPgRowType: selectable,
+                  isPgCompoundType: !selectable,
+                },
+                () => ({}),
+                `PgTablesPlugin input table type for ${codec.name}`,
+              );
+              setGraphQLTypeForPgCodec(codec, ["input"], inputTypeName);
+            }
 
             if (!behavior || behavior.includes("connection")) {
               // Register edges

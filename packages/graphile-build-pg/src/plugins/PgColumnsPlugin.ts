@@ -3,21 +3,39 @@ import "./PgTablesPlugin";
 import "../interfaces";
 
 import type {
+  PgInsertPlan,
+  PgSelectPlan,
   PgSelectSinglePlan,
   PgSourceColumn,
+  PgSourceColumns,
   PgTypeCodec,
+  PgSetPlan,
 } from "@dataplan/pg";
 import {
   pgSelectFromRecords,
   pgSelectSingleFromRecord,
   PgSource,
 } from "@dataplan/pg";
+import type { InputPlan } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
+import type { GraphQLNonNull, GraphQLType } from "graphql";
 import sql from "pg-sql2";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";
+
+function nullableIf<T extends GraphQLType>(
+  GraphQLNonNull: { new <T extends GraphQLType>(t: T): GraphQLNonNull<T> },
+  condition: boolean,
+  type: T,
+): T | GraphQLNonNull<T> {
+  if (condition) {
+    return type;
+  } else {
+    return new GraphQLNonNull(type);
+  }
+}
 
 declare global {
   namespace GraphileEngine {
@@ -53,6 +71,15 @@ declare global {
           codec: PgTypeCodec<any, any, any>;
         },
       ): string;
+    }
+
+    interface ScopeGraphQLInputObjectType {
+      isInputType?: boolean;
+      isPgPatch?: boolean;
+      isPgBaseInput?: boolean;
+      isPgRowType?: boolean;
+      isPgCompoundType?: boolean;
+      pgColumn?: PgSourceColumn;
     }
   }
 }
@@ -94,6 +121,7 @@ export const PgColumnsPlugin: Plugin = {
           inflection,
           getGraphQLTypeByPgCodec,
         } = build;
+
         const {
           scope: { pgCodec, isPgTableType },
         } = context;
@@ -236,6 +264,104 @@ export const PgColumnsPlugin: Plugin = {
           );
         }
         return fields;
+      },
+      GraphQLInputObjectType_fields(fields, build, context) {
+        const {
+          extend,
+          graphql: { GraphQLString, GraphQLNonNull },
+          inflection,
+        } = build;
+        const {
+          scope: {
+            isPgRowType,
+            isPgCompoundType,
+            isPgPatch,
+            isPgBaseInput,
+            pgCodec,
+          },
+          fieldWithHooks,
+        } = context;
+        if (
+          !(isPgRowType || isPgCompoundType) ||
+          !pgCodec ||
+          !pgCodec.columns ||
+          pgCodec.isAnonymous
+        ) {
+          return fields;
+        }
+
+        return Object.entries(pgCodec.columns as PgSourceColumns).reduce(
+          (memo, [columnName, column]) =>
+            build.recoverable(memo, () => {
+              const behavior = getBehavior(column.extensions);
+              if (behavior && !behavior.includes("insertable")) {
+                return memo;
+              }
+              const action = isPgBaseInput
+                ? "base"
+                : isPgPatch
+                ? "update"
+                : "create";
+
+              const fieldName = inflection.column({
+                column,
+                columnName,
+                codec: pgCodec,
+              });
+              if (memo[fieldName]) {
+                throw new Error(
+                  `Two columns produce the same GraphQL field name '${fieldName}' on input PgTypeCodec '${pgCodec.name}'; one of them is '${columnName}'`,
+                );
+              }
+              const columnType = build.getGraphQLTypeByPgCodec(
+                column.codec,
+                "input",
+              );
+              if (!columnType) {
+                return memo;
+              }
+              return extend(
+                memo,
+                {
+                  [fieldName]: fieldWithHooks(
+                    { fieldName, pgCodec, pgColumn: column },
+                    {
+                      description: column.description,
+                      type: nullableIf(
+                        GraphQLNonNull,
+                        isPgBaseInput ||
+                          isPgPatch ||
+                          (!column.notNull &&
+                            !column.extensions?.tags?.notNull) ||
+                          column.hasDefault ||
+                          Boolean(column.extensions?.tags?.hasDefault),
+                        columnType,
+                      ),
+                      plan: EXPORTABLE(
+                        (columnName) =>
+                          function plan(
+                            $insert: PgSetPlan<any, any>,
+                            $value: InputPlan,
+                          ) {
+                            $insert.set(columnName, $value);
+                          },
+                        [columnName],
+                      ),
+                    },
+                  ),
+                },
+                `Adding input object field for ${pgCodec.name}.`,
+                // TODO:
+                /* `You can rename this field with a 'Smart Comment':\n\n  ${sqlCommentByAddingTags(
+                  attr,
+                  {
+                    name: "newNameHere",
+                  },
+                )}`, */
+              );
+            }),
+          fields,
+        );
       },
     },
   },

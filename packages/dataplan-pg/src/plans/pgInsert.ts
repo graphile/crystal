@@ -14,6 +14,8 @@ import type {
 import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
 import type { PgClassExpressionPlan } from "./pgClassExpression";
 import { pgClassExpression } from "./pgClassExpression";
+import type { PgSetCapableParentPlan } from "./pgSet";
+import { PgSetPlan } from "./pgSet";
 
 const EMPTY_MAP = new Map<never, never>();
 
@@ -34,14 +36,17 @@ interface PgInsertPlanFinalizeResults {
 }
 
 export class PgInsertPlan<
-  TColumns extends PgSourceColumns | undefined,
-  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
-  TRelations extends {
-    [identifier: string]: TColumns extends PgSourceColumns
-      ? PgSourceRelation<TColumns, any>
-      : never;
-  },
-> extends ExecutablePlan<PgSourceRow<TColumns>> {
+    TColumns extends PgSourceColumns | undefined,
+    TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+    TRelations extends {
+      [identifier: string]: TColumns extends PgSourceColumns
+        ? PgSourceRelation<TColumns, any>
+        : never;
+    },
+  >
+  extends ExecutablePlan<PgSourceRow<TColumns>>
+  implements PgSetCapableParentPlan<keyof TColumns & string>
+{
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgInsertPlan",
@@ -142,6 +147,15 @@ export class PgInsertPlan<
     const { codec: pgCodec } = column;
     const depId = this.addDependency(value);
     this.columns.push({ name, depId, pgCodec });
+  }
+
+  setPlan(): PgSetPlan<keyof TColumns & string, this> {
+    if (this.locked) {
+      throw new Error(
+        `${this}: cannot set values once plan is locked ('setPlan')`,
+      );
+    }
+    return new PgSetPlan(this);
   }
 
   /**

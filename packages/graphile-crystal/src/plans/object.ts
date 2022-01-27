@@ -31,6 +31,23 @@ export class ObjectPlan<
     }
   }
 
+  /**
+   * This key doesn't get typed, but it can be added later which can be quite
+   * handy.
+   */
+  public set(key: string, plan: ExecutablePlan<any>): void {
+    this.keys.push(key);
+    this.addDependency(plan);
+  }
+
+  getPlanForKey<TKey extends keyof TPlans>(key: TKey): TPlans[TKey] {
+    const idx = this.keys.indexOf(key);
+    if (idx < 0) {
+      throw new Error("No such plan");
+    }
+    return this.getDep(idx) as any;
+  }
+
   toStringMeta(): string {
     return "{" + this.keys.join(",") + "}";
   }

@@ -1200,10 +1200,14 @@ export class Aether<
             this.trackedContextPlan,
           );
           if (argPlan != null) {
+            // TODO: why did I add this? Is it required? Seems important, but
+            // also makes writing the schema a bit more painful.
+            /*
             assertModifierPlan(
               argPlan,
               `${_objectType.name}.${fieldSpec.name}(${argName}:)`,
             );
+            */
 
             this.planInput(argSpec.type, trackedArgumentValuePlan, argPlan);
           }

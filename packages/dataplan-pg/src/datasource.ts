@@ -56,6 +56,7 @@ export interface PgSourceColumn<TCanonical = any, TInput = TCanonical> {
    * Is the column/attribute guaranteed to not be null?
    */
   notNull: boolean;
+  hasDefault?: boolean;
 
   /**
    * The SQL expression for a derivative attributes, e.g.:
@@ -108,6 +109,8 @@ export interface PgSourceColumn<TCanonical = any, TInput = TCanonical> {
    * questions - we'll only try when the user explicitly tells us to.
    */
   restrictedAccess?: boolean;
+
+  description?: string;
 
   extensions?: Partial<PgSourceColumnExtensions>;
 }
