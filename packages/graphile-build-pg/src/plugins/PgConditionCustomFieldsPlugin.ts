@@ -8,6 +8,7 @@ import type { InputPlan } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 
+import { getBehavior } from "../behavior";
 import { version } from "../index";
 
 declare global {
@@ -43,11 +44,17 @@ export const PgConditionCustomFieldsPlugin: Plugin = {
 
         const functionSources = build.input.pgSources.filter((source) => {
           if (source.codec.columns) return false;
+          if (source.codec.arrayOfCodec) return false;
+          if (source.codec.rangeOfCodec) return false;
           const parameters: PgSourceParameter[] | undefined = source.parameters;
           if (!parameters) return false;
           if (parameters.filter((p) => p.required).length !== 1) return false;
           if (parameters[0].codec !== pgCodec) return false;
           if (!source.isUnique) return false;
+          const behavior = getBehavior(source.extensions);
+          if (behavior && !behavior.includes("filterBy")) {
+            return false;
+          }
           return true;
         });
 
