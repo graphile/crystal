@@ -400,6 +400,8 @@ export const PgRelationsPlugin: Plugin = {
                     [fieldName]: fieldWithHooks(
                       {
                         fieldName,
+                        pgSource: otherSource,
+                        isPgFieldConnection: true,
                         isPgManyRelationConnectionField: true,
                         pgRelationDetails: relationDetails,
                       },
@@ -425,6 +427,8 @@ export const PgRelationsPlugin: Plugin = {
                   [fieldName]: fieldWithHooks(
                     {
                       fieldName,
+                      pgSource: otherSource,
+                      isPgFieldSimpleCollection: true,
                       isPgManyRelationListField: true,
                       pgRelationDetails: relationDetails,
                     },
