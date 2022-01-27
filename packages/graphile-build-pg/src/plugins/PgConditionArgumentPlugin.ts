@@ -48,7 +48,7 @@ export const PgConditionArgumentPlugin: Plugin = {
         for (const codec of build.pgCodecMetaLookup.keys()) {
           build.recoverable(null, () => {
             // Ignore scalar codecs
-            if (!codec.columns) {
+            if (!codec.columns || codec.isAnonymous) {
               return;
             }
 
@@ -79,7 +79,7 @@ export const PgConditionArgumentPlugin: Plugin = {
                   return Object.entries(columns).reduce(
                     (memo, [columnName, column]) => {
                       const behavior = getBehavior(column.extensions);
-                      if (behavior && !behavior.includes("selectable")) {
+                      if (behavior && !behavior.includes("filter")) {
                         return memo;
                       }
 
