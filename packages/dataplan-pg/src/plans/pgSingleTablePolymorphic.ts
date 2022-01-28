@@ -64,9 +64,7 @@ export class PgSingleTablePolymorphicPlan<
     > | null>
   > {
     return values.map((v) =>
-      v[this.typePlanId]
-        ? polymorphicWrap(v[this.typePlanId], v[this.rowPlanId])
-        : null,
+      v[this.typePlanId] ? polymorphicWrap(v[this.typePlanId]) : null,
     );
   }
 }

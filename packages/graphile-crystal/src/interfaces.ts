@@ -73,11 +73,9 @@ export const $$id = Symbol("id");
 export const $$pathIdentity = Symbol("pathIdentity");
 
 export const $$concreteType = Symbol("concreteType");
-export const $$concreteData = Symbol("concreteData");
 
 export interface PolymorphicData<TType extends string = string, TData = any> {
   [$$concreteType]: TType;
-  [$$concreteData]: TData;
 }
 
 export interface IndexByListItemPlanId {

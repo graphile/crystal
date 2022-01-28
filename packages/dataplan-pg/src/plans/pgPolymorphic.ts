@@ -109,7 +109,7 @@ export class PgPolymorphicPlan<
       const specifier = v[this.typeSpecifierPlanId];
       if (specifier) {
         const typeName = this.getTypeNameFromSpecifier(specifier);
-        return polymorphicWrap(typeName, v[this.itemPlanId]);
+        return polymorphicWrap(typeName);
       } else {
         return null;
       }

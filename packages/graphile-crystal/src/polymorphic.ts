@@ -1,7 +1,7 @@
 import { inspect } from "util";
 
 import type { PolymorphicData } from "./interfaces";
-import { $$concreteData, $$concreteType } from "./interfaces";
+import { $$concreteType } from "./interfaces";
 
 export function isPolymorphicData(data: unknown): data is PolymorphicData {
   if (typeof data !== "object" || !data) {
@@ -21,10 +21,9 @@ export function assertPolymorphicData(
   }
 }
 
-export function polymorphicWrap<TType extends string, TData>(
+export function polymorphicWrap<TType extends string>(
   type: TType,
-  data: TData,
-): PolymorphicData<TType, TData> {
+): PolymorphicData<TType> {
   // TODO: validate type further, e.g. that it's a valid object type
   if (typeof type !== "string") {
     throw new Error(
@@ -33,7 +32,6 @@ export function polymorphicWrap<TType extends string, TData>(
   }
   return {
     [$$concreteType]: type,
-    [$$concreteData]: data,
   };
 }
 
