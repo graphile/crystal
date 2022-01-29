@@ -12,7 +12,7 @@ In this tutorial we will walk through the Postgres schema design for a forum app
 
 - [Installation](#installation)
   - [Installing Postgres](#installing-postgres)
-  - [Installing PostGraphile](#installing-PostGraphile)
+  - [Installing PostGraphile](#installing-postgraphile)
 - [The Basics](#the-basics)
   - [Setting Up Your Schemas](#setting-up-your-schemas)
   - [The Person Table](#the-person-table)
@@ -91,15 +91,15 @@ $ npm install -g PostGraphile
 To run PostGraphile, you’ll use the same URL that you used for `psql`:
 
 ```bash
-$ PostGraphile                                     # Connects to the default database at `postgres://localhost:5432`
-$ PostGraphile -c postgres://localhost:5432/testdb # Connects to the `testdb` database at `postgres://localhost:5432`
-$ PostGraphile -c postgres://somehost:2345/somedb  # connects to the `somedb` database at `postgres://somehost:2345`
+$ postgraphile                                     # Connects to the default database at `postgres://localhost:5432`
+$ postgraphile -c postgres://localhost:5432/testdb # Connects to the `testdb` database at `postgres://localhost:5432`
+$ postgraphile -c postgres://somehost:2345/somedb  # connects to the `somedb` database at `postgres://somehost:2345`
 ```
 
 You can also run PostGraphile with the watch flag:
 
 ```bash
-$ PostGraphile --watch
+$ postgraphile --watch
 ```
 
 With the `--watch` flag, whenever the Postgres schemas you are introspecting change PostGraphile will automatically update your GraphQL API.
@@ -123,7 +123,7 @@ You could create more or less schemas, it is all up to you and how you want to s
 
 Theoretically we want a user to be able to log in directly to our Postgres database, and only be able to create, read, update, and delete data for their user all within SQL. This is a mindshift from how we traditionally use a SQL database. Normally, we assume whoever is querying the database has full visibility into the system as the only one with database access is our application. In this tutorial, we want to restrict access at the database level. Don’t worry though! Postgres is very secure about this, users will have no more permissions than that which you explicitly grant.
 
-> **Note:** When starting PostGraphile, you will want to use the name of the schema you created with the `--schema` option, like so: `PostGraphile --schema forum_example`. Also, don’t forget to add the `--watch` flag, with watch mode enabled PostGraphile will update your API as we add tables and types throughout this tutorial.
+> **Note:** When starting PostGraphile, you will want to use the name of the schema you created with the `--schema` option, like so: `postgraphile --schema forum_example`. Also, don’t forget to add the `--watch` flag, with watch mode enabled PostGraphile will update your API as we add tables and types throughout this tutorial.
 
 ### The Person Table
 
@@ -522,40 +522,40 @@ This function will create a user and their account, but how will we log the user
 When a user logs in, we want them to make their queries using a specific PostGraphile role. Using that role we can define rules that restrict what data the user may access. So what roles do we need to define for our forum example? Remember when we were connecting to Postgres and we used a URL like `postgres://localhost:5432/mydb`? Well, when you use a connection string like that, you are logging into Postgres using your computer account’s username and no password. Say your computer account username is `buddy`, then connecting with the URL `postgres://localhost:5432/mydb`, would be the same as connecting with the URL `postgres://buddy@localhost:5432/mydb`. If you wanted to connect to your Postgres database with a password it would look like `postgres://buddy:password@localhost:5432/mydb`. When you run Postgres locally, this account will probably be the superuser. So when you run `PostGraphile -c postgres://localhost:5432/mydb`, you are running PostGraphile with superuser privileges. To change that let’s create a role that PostGraphile can use to connect to our database:
 
 ```sql
-create role forum_example_PostGraphile login password 'xyz';
+create role forum_example_postgraphile login password 'xyz';
 ```
 
-We create this `forum_example_PostGraphile` role with the [`CREATE ROLE`](https://www.postgresql.org/docs/current/static/sql-createrole.html) command. We want to make sure our PostGraphile role can login so we specify that with the `login` option and we give the user a password of ‘xyz’ with the `password` option. Now we will start PostGraphile as such:
+We create this `forum_example_postgraphile` role with the [`CREATE ROLE`](https://www.postgresql.org/docs/current/static/sql-createrole.html) command. We want to make sure our PostGraphile role can login so we specify that with the `login` option and we give the user a password of ‘xyz’ with the `password` option. Now we will start PostGraphile as such:
 
 ```bash
-PostGraphile -c postgres://forum_example_PostGraphile:xyz@localhost:5432/mydb
+postgraphile -c postgres://forum_example_postgraphile:xyz@localhost:5432/mydb
 ```
 
-When a user who does not have a JWT token makes a request to Postgres, we do not want that user to have the privileges we will give to the `forum_example_PostGraphile` role, so instead we will create another role.
+When a user who does not have a JWT token makes a request to Postgres, we do not want that user to have the privileges we will give to the `forum_example_postgraphile` role, so instead we will create another role.
 
 ```sql
 create role forum_example_anonymous;
 grant forum_example_anonymous to forum_example_PostGraphile;
 ```
 
-Here we use [`CREATE ROLE`](https://www.postgresql.org/docs/current/static/sql-createrole.html) again. This role cannot login so it does not have the `login` option, or a password. We also use the [`GRANT`](https://www.postgresql.org/docs/9.6/static/sql-grant.html) command to grant access to the `forum_example_anonymous` role to the `forum_example_PostGraphile` role. Now, the `forum_example_PostGraphile` role can control and become the `forum_example_anonymous` role. If we did not use that grant, we could not change into the `forum_example_anonymous` role in PostGraphile. Now we will start our server like so:
+Here we use [`CREATE ROLE`](https://www.postgresql.org/docs/current/static/sql-createrole.html) again. This role cannot login so it does not have the `login` option, or a password. We also use the [`GRANT`](https://www.postgresql.org/docs/9.6/static/sql-grant.html) command to grant access to the `forum_example_anonymous` role to the `forum_example_postgraphile` role. Now, the `forum_example_postgraphile` role can control and become the `forum_example_anonymous` role. If we did not use that grant, we could not change into the `forum_example_anonymous` role in PostGraphile. Now we will start our server like so:
 
 ```bash
 PostGraphile \
-  --connection postgres://forum_example_PostGraphile:xyz@localhost:5432/mydb \
+  --connection postgres://forum_example_postgraphile:xyz@localhost:5432/mydb \
   --default-role forum_example_anonymous
 ```
 
-There is one more role we want to create. When a user logs in we don’t want them to use the `forum_example_PostGraphile` role, or the basic `forum_example_anonymous` role. So instead we will create a role that all of our logged in users will authorize with. We will call it `forum_example_person` and similarly grant it to the `forum_example_PostGraphile` role.
+There is one more role we want to create. When a user logs in we don’t want them to use the `forum_example_postgraphile` role, or the basic `forum_example_anonymous` role. So instead we will create a role that all of our logged in users will authorize with. We will call it `forum_example_person` and similarly grant it to the `forum_example_postgraphile` role.
 
 ```sql
 create role forum_example_person;
-grant forum_example_person to forum_example_PostGraphile;
+grant forum_example_person to forum_example_postgraphile;
 ```
 
-> **Warning:** The `forum_example_PostGraphile` role will have all of the permissions of the roles granted to it. So it can do everything `forum_example_anonymous` can do and everything `forum_example_person` can do. This is why having a default role is important. We would not want an anonymous user to have admin access level because we have granted an admin role to `forum_example_PostGraphile`.
+> **Warning:** The `forum_example_postgraphile` role will have all of the permissions of the roles granted to it. So it can do everything `forum_example_anonymous` can do and everything `forum_example_person` can do. This is why having a default role is important. We would not want an anonymous user to have admin access level because we have granted an admin role to `forum_example_postgraphile`.
 
-Ok, so now we have three roles. `forum_example_PostGraphile`, `forum_example_anonymous`, and `forum_example_person`. We know how `forum_example_PostGraphile` and `forum_example_anonymous` get used, but how do we know when a user is logged in and should be using `forum_example_person`? The answer is JSON Web Tokens.
+Ok, so now we have three roles. `forum_example_postgraphile`, `forum_example_anonymous`, and `forum_example_person`. We know how `forum_example_postgraphile` and `forum_example_anonymous` get used, but how do we know when a user is logged in and should be using `forum_example_person`? The answer is JSON Web Tokens.
 
 ### JSON Web Tokens
 
@@ -629,7 +629,7 @@ create type forum_example.jwt_token as (
 That’s it. We are using the [`CREATE TYPE`](https://www.postgresql.org/docs/current/static/sql-createtype.html) command again as we did before to create an enum type. This time we are creating a composite type. The definition for a composite type looks very much like the definition of a table type, except a composite type cannot store rows. i.e. you can’t `INSERT`, `SELECT`, `UPDATE`, or `DELETE` from a composite type. While you can’t store rows in a composite type, PostGraphile can turn a composite type into a JWT. Now that we’ve defined this type we will want to start PostGraphile with the `--jwt-token-identifier` flag:
 
 ```bash
-PostGraphile --jwt-token-identifier forum_example.jwt_token
+postgraphile --jwt-token-identifier forum_example.jwt_token
 ```
 
 Next we need to create the function which will actually return the token:
@@ -801,8 +801,8 @@ That’s it! We have successfully creating a Postgres schema embedded with our b
 The final argument list for starting our PostGraphile server using the CLI would be as follows:
 
 ```bash
-PostGraphile \
-  --connection postgres://forum_example_PostGraphile:xyz@localhost:5432 \
+postgraphile \
+  --connection postgres://forum_example_postgraphile:xyz@localhost:5432 \
   --schema forum_example \
   --default-role forum_example_anonymous \
   --jwt-secret keyboard_kitten \
@@ -817,7 +817,7 @@ PostGraphile \
 Congralations your PostGraphile system is up and running, lets go ahead and use it!
 
 First thing is to make sure you have populated the database with the demo data provided, the script is here:
-https://github.com/graphile/PostGraphile/blob/main/examples/forum/data.sql
+https://github.com/graphile/postgraphile/blob/main/examples/forum/data.sql
 
 
 ### Query All Table Records
@@ -985,6 +985,6 @@ Remember when Graphophile accepts an Authorization Request Header with a valid J
 
 ## Conclusion
 
-You should now be equipped with the knowledge to go out and design your own Postgres schema and use it. If you have any questions, encounter a bug, or just want to say thank you, don’t hesitate to [open an issue](https://github.com/graphile/PostGraphile/issues), we’d love to hear from you. The PostGraphile community wants to invest in making you a productive developer so that you can invest back into PostGraphile.
+You should now be equipped with the knowledge to go out and design your own Postgres schema and use it. If you have any questions, encounter a bug, or just want to say thank you, don’t hesitate to [open an issue](https://github.com/graphile/postgraphile/issues), we’d love to hear from you. The PostGraphile community wants to invest in making you a productive developer so that you can invest back into PostGraphile.
 
 <!-- TODO: More next steps and calls to action -->
