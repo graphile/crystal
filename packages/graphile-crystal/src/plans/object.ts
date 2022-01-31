@@ -40,10 +40,18 @@ export class ObjectPlan<
     this.addDependency(plan);
   }
 
-  getPlanForKey<TKey extends keyof TPlans>(key: TKey): TPlans[TKey] {
+  getPlanForKey<TKey extends keyof TPlans>(
+    key: TKey,
+    allowMissing = false,
+  ): TKey extends keyof TPlans ? TPlans[TKey] : null {
     const idx = this.keys.indexOf(key);
     if (idx < 0) {
-      throw new Error("No such plan");
+      if (!allowMissing) {
+        throw new Error(
+          `${this}: failed to retrieve plan for key '${key}' - we have no such key`,
+        );
+      }
+      return null as any;
     }
     return this.getDep(idx) as any;
   }

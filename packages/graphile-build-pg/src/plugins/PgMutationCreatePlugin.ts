@@ -1,10 +1,11 @@
-import type { PgSource, PgInsertPlan } from "@dataplan/pg";
+import type { PgInsertPlan, PgSource } from "@dataplan/pg";
 import { pgInsert } from "@dataplan/pg";
 import type { ObjectPlan } from "graphile-crystal";
+import { constant } from "graphile-crystal";
 import { ExecutablePlan, object } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
-import { GraphQLOutputType } from "graphql";
+import type { GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";
@@ -148,11 +149,16 @@ export const PgMutationCreatePlugin: Plugin = {
                     clientMutationId: {
                       type: GraphQLString,
                       plan: EXPORTABLE(
-                        () =>
+                        (constant) =>
                           function plan($mutation: ObjectPlan<any>) {
-                            return $mutation.getPlanForKey("clientMutationId");
+                            return (
+                              $mutation.getPlanForKey(
+                                "clientMutationId",
+                                true,
+                              ) ?? constant(null)
+                            );
                           },
-                        [],
+                        [constant],
                       ),
                     },
                     ...(TableType
@@ -163,13 +169,17 @@ export const PgMutationCreatePlugin: Plugin = {
                             },
                             {
                               type: TableType,
-                              plan(
-                                $object: ObjectPlan<{
-                                  insert: PgInsertPlan<any, any, any>;
-                                }>,
-                              ) {
-                                return $object.get("insert");
-                              },
+                              plan: EXPORTABLE(
+                                () =>
+                                  function plan(
+                                    $object: ObjectPlan<{
+                                      insert: PgInsertPlan<any, any, any>;
+                                    }>,
+                                  ) {
+                                    return $object.get("insert");
+                                  },
+                                [],
+                              ),
                             },
                           ),
                         }
