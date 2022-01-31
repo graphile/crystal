@@ -261,6 +261,7 @@ export const PgCodecsPlugin: Plugin = {
               columns[columnAttribute.attname] = {
                 codec: columnCodec,
                 notNull: columnAttribute.attnotnull === true,
+                hasDefault: columnAttribute.atthasdef ?? undefined,
                 // TODO: identicalVia,
                 extensions: {
                   // TODO: tags
