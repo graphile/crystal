@@ -49,6 +49,7 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
       extends: [graphileBuildPreset, graphileBuildPgPreset],
       plugins: [QueryQueryPlugin, SwallowErrorsPlugin],
       gather: {
+        jwtType: ["b", "jwt_token"],
         pgDatabases: [
           {
             name: "main",

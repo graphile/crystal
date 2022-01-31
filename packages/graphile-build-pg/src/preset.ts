@@ -24,6 +24,7 @@ import { PgRowByUniquePlugin } from "./plugins/PgRowByUniquePlugin";
 import { PgTableNodePlugin } from "./plugins/PgTableNodePlugin";
 import { PgTablesPlugin } from "./plugins/PgTablesPlugin";
 import { PgTypesPlugin } from "./plugins/PgTypesPlugin";
+import { PgJWTPlugin } from "./plugins/PgJWTPlugin";
 
 export const defaultPreset: Preset = {
   plugins: [
@@ -51,5 +52,6 @@ export const defaultPreset: Preset = {
     PgConnectionArgOrderByDefaultValuePlugin,
     PgTableNodePlugin,
     PgMutationPayloadEdgePlugin,
+    PgJWTPlugin,
   ],
 };
