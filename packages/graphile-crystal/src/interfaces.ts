@@ -473,22 +473,53 @@ export type CrystalSubscriber<
   ): AsyncIterableIterator<TTopics[TTopic]>;
 };
 
+/**
+ * Specifically relates to the stringification of NodeIDs, e.g. `["User", 1]`
+ * to/from `WyJVc2VyIiwgMV0=`
+ */
 export interface NodeIdCodec<T = any> {
-  encode(value: T): string;
+  encode(value: T): string | null;
   decode(value: string): T;
 }
 
+/**
+ * Determines if a NodeID relates to a given object type, and also relates to
+ * encoding the NodeID for that type.
+ */
 export type NodeIdHandler<
   TCodecs extends { [key: string]: NodeIdCodec<any> } = {
     [key: string]: NodeIdCodec<any>;
   },
   TCodecName extends keyof TCodecs = keyof TCodecs,
+  TNodePlan extends ExecutablePlan<any> = ExecutablePlan<any>,
 > = {
+  /**
+   * Which codec are we using to encode/decode the NodeID string?
+   */
   codecName: TCodecName & string;
+
+  /**
+   * Returns true if the given decoded Node ID value represents this type.
+   */
+  match(
+    specifier: TCodecs[TCodecName] extends NodeIdCodec<infer U> ? U : any,
+  ): boolean;
+
+  /**
+   * Returns a plan that returns the value ready to be encoded. When the result
+   * of this plan is fed into `match`, it should return `true`.
+   */
+  plan(
+    $thing: TNodePlan,
+  ): ExecutablePlan<TCodecs[TCodecName] extends NodeIdCodec<infer U> ? U : any>;
+
+  /**
+   * The recprocal of `plan`, given the return value of plan, this should
+   * return a plan that results in the original node.
+   */
   get(
     plan: ExecutablePlan<
       TCodecs[TCodecName] extends NodeIdCodec<infer U> ? U : any
     >,
-  ): ExecutablePlan<string>;
-  match(specifier: any): boolean;
+  ): TNodePlan;
 };

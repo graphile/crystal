@@ -35,10 +35,6 @@ export const QueryPlugin: Plugin = {
               return {
                 description:
                   "The root query type which gives access points into the data universe.",
-                /*
-            isTypeOf: (value, _context, info) =>
-              info.parentType == null || value === $$isQuery,
-            */
               };
             },
             `graphile-build built-in (root query type)`,

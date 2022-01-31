@@ -57,7 +57,7 @@ export const buildInflection = (preset: Preset): GraphileEngine.Inflection => {
       ) as (keyof GraphileEngine.Inflection)[]) {
         const fn = inflectorsToAdd[inflectorName];
         if (fn) {
-          const inflector = fn.bind(
+          const inflector = (fn as any).bind(
             inflectors as GraphileEngine.Inflection,
             preset,
           );

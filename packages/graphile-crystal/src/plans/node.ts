@@ -63,7 +63,8 @@ export class NodePlan<TCodecs extends { [key: string]: NodeIdCodec<any> }>
 
   private getTypeNameFromSpecifier(specifier: any) {
     for (const [typeName, typeSpec] of Object.entries(this.possibleTypes)) {
-      if (typeSpec.match(specifier)) {
+      const value = specifier[typeSpec.codecName];
+      if (value != null && typeSpec.match(value)) {
         return typeName;
       }
     }
