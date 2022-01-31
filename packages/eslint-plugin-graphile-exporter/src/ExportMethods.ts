@@ -31,6 +31,9 @@ const ALLOWED_SIBLING_KEYS: string[] = [
   "extensions",
   "astNode",
 
+  // GraphQLInterfaceType
+  "fields",
+
   // GraphQLArgumentConfig
   "defaultValue",
 
