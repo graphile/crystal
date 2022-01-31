@@ -6,6 +6,7 @@ import { PgSourceBuilder } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
 import sql from "pg-sql2";
+import { ExecutablePlan } from "graphile-crystal";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";
@@ -413,7 +414,8 @@ export const PgTablesPlugin: Plugin = {
                   pgCodec: codec,
                   isPgTableType: true,
                 },
-                PgSelectSinglePlan,
+                // TODO: we actually allow a number of different plans; should we make this an array?
+                ExecutablePlan, // PgSelectSinglePlan | PgInsertPlan | ...
                 () => ({}),
                 `PgTablesPlugin table type for ${codec.name}`,
               );
