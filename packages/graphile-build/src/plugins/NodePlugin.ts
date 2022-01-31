@@ -16,7 +16,10 @@ declare global {
       [NODE_ID_CODECS]: { [codecName: string]: NodeIdCodec };
       [NODE_ID_HANDLER_BY_TYPE_NAME]: { [typeName: string]: NodeIdHandler };
       registerNodeIdCodec(codecName: string, codec: NodeIdCodec): void;
+      getNodeIdCodec(codecName: string): NodeIdCodec;
       registerNodeIdHandler(typeName: string, matcher: NodeIdHandler): void;
+      getNodeIdHandler(typeName: string): NodeIdHandler | undefined;
+      getNodeTypeNames(): string[];
     }
 
     interface ScopeGraphQLObjectTypeFieldsField {
@@ -78,6 +81,13 @@ export const NodePlugin: Plugin = {
               }
               nodeIdCodecs[codecName] = codec;
             },
+            getNodeIdCodec(codecName) {
+              const codec = nodeIdCodecs[codecName];
+              if (!codec) {
+                throw new Error("Could not find matching Node ID codec");
+              }
+              return codec;
+            },
             registerNodeIdHandler(typeName, handler) {
               if (nodeIdHandlerByTypeName[typeName]) {
                 throw new Error(
@@ -85,6 +95,12 @@ export const NodePlugin: Plugin = {
                 );
               }
               nodeIdHandlerByTypeName[typeName] = handler;
+            },
+            getNodeIdHandler(typeName) {
+              return nodeIdHandlerByTypeName[typeName];
+            },
+            getNodeTypeNames() {
+              return Object.keys(nodeIdHandlerByTypeName);
             },
           },
           "Adding helpers from NodePlugin",

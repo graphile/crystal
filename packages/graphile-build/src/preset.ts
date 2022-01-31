@@ -11,6 +11,7 @@ import {
   CursorTypePlugin,
   MutationPayloadQueryPlugin,
   MutationPlugin,
+  NodeAccessorPlugin,
   NodeIdCodecBase64JSONPlugin,
   NodeIdCodecPipeStringPlugin,
   NodePlugin,
@@ -39,5 +40,6 @@ export const defaultPreset: Preset = {
     NodeIdCodecBase64JSONPlugin,
     NodeIdCodecPipeStringPlugin,
     RegisterQueryNodePlugin,
+    NodeAccessorPlugin,
   ],
 };
