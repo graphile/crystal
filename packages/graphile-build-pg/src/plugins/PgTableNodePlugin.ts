@@ -63,7 +63,6 @@ export const PgTableNodePlugin: Plugin = {
           const pgSource = sources[0];
           const pk = pgSource.uniques[0] as string[];
 
-          console.log("Register NodeID handler for ", tableTypeName);
           build.registerNodeIdHandler(tableTypeName, {
             codecName: "base64JSON",
             plan: EXPORTABLE(
