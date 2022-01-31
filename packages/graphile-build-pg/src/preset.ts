@@ -13,15 +13,16 @@ import { PgConnectionArgOrderByPlugin } from "./plugins/PgConnectionArgOrderByPl
 import { PgConnectionTotalCountPlugin } from "./plugins/PgConnectionTotalCountPlugin";
 import { PgCustomTypeFieldPlugin } from "./plugins/PgCustomTypeFieldPlugin";
 import { PgIntrospectionPlugin } from "./plugins/PgIntrospectionPlugin";
+import { PgMutationCreatePlugin } from "./plugins/PgMutationCreatePlugin";
 import { PgOrderAllColumnsPlugin } from "./plugins/PgOrderAllColumnsPlugin";
 import { PgOrderByPrimaryKeyPlugin } from "./plugins/PgOrderByPrimaryKeyPlugin";
 import { PgOrderCustomFieldsPlugin } from "./plugins/PgOrderCustomFieldsPlugin";
 import { PgProceduresPlugin } from "./plugins/PgProceduresPlugin";
 import { PgRelationsPlugin } from "./plugins/PgRelationsPlugin";
+import { PgRowByUniquePlugin } from "./plugins/PgRowByUniquePlugin";
+import { PgTableNodePlugin } from "./plugins/PgTableNodePlugin";
 import { PgTablesPlugin } from "./plugins/PgTablesPlugin";
 import { PgTypesPlugin } from "./plugins/PgTypesPlugin";
-import { PgRowByUniquePlugin } from "./plugins/PgRowByUniquePlugin";
-import { PgMutationCreatePlugin } from "./plugins/PgMutationCreatePlugin";
 
 export const defaultPreset: Preset = {
   plugins: [
@@ -47,5 +48,6 @@ export const defaultPreset: Preset = {
     PgOrderAllColumnsPlugin,
     PgOrderCustomFieldsPlugin,
     PgConnectionArgOrderByDefaultValuePlugin,
+    PgTableNodePlugin,
   ],
 };

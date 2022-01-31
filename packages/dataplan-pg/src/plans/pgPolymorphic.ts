@@ -94,7 +94,9 @@ export class PgPolymorphicPlan<
           )}'`,
         );
       }
-      throw new Error("Could not determine the type to use");
+      throw new Error(
+        "Could not determine the type to use for this polymorphic value.",
+      );
     }
     return t;
   }

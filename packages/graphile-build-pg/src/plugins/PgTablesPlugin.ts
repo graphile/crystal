@@ -1,6 +1,7 @@
 import "graphile-build";
 
 import type { PgSource, PgSourceRelation, PgTypeCodec } from "@dataplan/pg";
+import { PgSelectSinglePlan } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
@@ -412,7 +413,7 @@ export const PgTablesPlugin: Plugin = {
                   pgCodec: codec,
                   isPgTableType: true,
                 },
-                null,
+                PgSelectSinglePlan,
                 () => ({}),
                 `PgTablesPlugin table type for ${codec.name}`,
               );

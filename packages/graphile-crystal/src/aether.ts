@@ -3461,13 +3461,24 @@ function isTypePlanned(
         ? namedType.getTypes()
         : schema.getImplementations(namedType).objects;
     let firstHadPlan = null;
+    let i = 0;
     for (const type of types) {
       const hasPlan = !!type.extensions?.graphile?.Plan;
       if (firstHadPlan === null) {
         firstHadPlan = hasPlan;
       } else if (hasPlan !== firstHadPlan) {
-        throw new Error();
+        // TODO: validate this at schema build time
+        throw new Error(
+          `The '${namedType.name}' interface or union type's first type '${
+            types[0]
+          }' ${
+            firstHadPlan ? "expected a plan" : "did not expect a plan"
+          }, however the type '${type}' (index = ${i}) ${
+            hasPlan ? "expected a plan" : "did not expect a plan"
+          }. All types in an interface or union must be in agreement about whether a plan is expected or not.`,
+        );
       }
+      i++;
     }
     return !!firstHadPlan;
   } else {

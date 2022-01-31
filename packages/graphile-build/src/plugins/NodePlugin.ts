@@ -25,9 +25,14 @@ declare global {
   }
 }
 
-// Deliberately private
-const NODE_ID_CODECS = Symbol("nodeIdCodecs");
-const NODE_ID_HANDLER_BY_TYPE_NAME = Symbol("nodeIdHandlerByTypeName");
+/**
+ * @internal
+ */
+export const NODE_ID_CODECS = Symbol("nodeIdCodecs");
+/**
+ * @internal
+ */
+export const NODE_ID_HANDLER_BY_TYPE_NAME = Symbol("nodeIdHandlerByTypeName");
 
 export const NodePlugin: Plugin = {
   name: "NodePlugin",
@@ -58,29 +63,6 @@ export const NodePlugin: Plugin = {
           decode(value) {
             return typeof value === "string" ? value : null;
           },
-        };
-
-        // Add 'query' as the id for the Query type
-        nodeIdHandlerByTypeName[build.inflection.builtin("Query")] = {
-          codecName: "raw",
-          match: EXPORTABLE(
-            () => (specifier) => {
-              return specifier === "query";
-            },
-            [],
-          ),
-          get: EXPORTABLE(
-            (constant) => () => {
-              return constant({});
-            },
-            [constant],
-          ),
-          plan: EXPORTABLE(
-            (constant) => () => {
-              return constant`query`;
-            },
-            [constant],
-          ),
         };
 
         return build.extend(

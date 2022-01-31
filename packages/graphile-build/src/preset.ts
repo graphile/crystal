@@ -3,7 +3,7 @@ import "./interfaces";
 import type { Preset } from "graphile-plugin";
 
 import {
-  AddNodeInterfaceToQueryPlugin,
+  AddNodeInterfaceToSuitableTypesPlugin,
   BuiltinScalarConnectionsPlugin,
   ClientMutationIdDescriptionPlugin,
   CommonTypesPlugin,
@@ -16,6 +16,7 @@ import {
   NodePlugin,
   PageInfoStartEndCursorPlugin,
   QueryPlugin,
+  RegisterQueryNodePlugin,
   SubscriptionPlugin,
   TrimEmptyDescriptionsPlugin,
 } from "./plugins/index.js";
@@ -34,8 +35,9 @@ export const defaultPreset: Preset = {
     PageInfoStartEndCursorPlugin,
     BuiltinScalarConnectionsPlugin,
     TrimEmptyDescriptionsPlugin,
-    AddNodeInterfaceToQueryPlugin,
+    AddNodeInterfaceToSuitableTypesPlugin,
     NodeIdCodecBase64JSONPlugin,
     NodeIdCodecPipeStringPlugin,
+    RegisterQueryNodePlugin,
   ],
 };

@@ -1,4 +1,4 @@
-import { AddNodeInterfaceToQueryPlugin } from "./AddNodeInterfaceToQueryPlugin.js";
+import { AddNodeInterfaceToSuitableTypesPlugin } from "./AddNodeInterfaceToSuitableTypesPlugin.js";
 import { BuiltinScalarConnectionsPlugin } from "./BuiltinScalarConnectionsPlugin.js";
 import { ClientMutationIdDescriptionPlugin } from "./ClientMutationIdDescriptionPlugin.js";
 import { CommonTypesPlugin } from "./CommonTypesPlugin.js";
@@ -12,12 +12,13 @@ import { NodePlugin } from "./NodePlugin.js";
 import { PageInfoStartEndCursorPlugin } from "./PageInfoStartEndCursorPlugin.js";
 import { QueryPlugin } from "./QueryPlugin.js";
 import { QueryQueryPlugin } from "./QueryQueryPlugin.js";
+import { RegisterQueryNodePlugin } from "./RegisterQueryNodePlugin.js";
 import { SubscriptionPlugin } from "./SubscriptionPlugin.js";
 import { SwallowErrorsPlugin } from "./SwallowErrorsPlugin.js";
 import { TrimEmptyDescriptionsPlugin } from "./TrimEmptyDescriptionsPlugin.js";
 
 export {
-  AddNodeInterfaceToQueryPlugin,
+  AddNodeInterfaceToSuitableTypesPlugin,
   BuiltinScalarConnectionsPlugin,
   ClientMutationIdDescriptionPlugin,
   CommonTypesPlugin,
@@ -31,6 +32,7 @@ export {
   PageInfoStartEndCursorPlugin,
   QueryPlugin,
   QueryQueryPlugin,
+  RegisterQueryNodePlugin,
   SubscriptionPlugin,
   SwallowErrorsPlugin,
   TrimEmptyDescriptionsPlugin,
