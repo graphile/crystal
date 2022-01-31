@@ -84,7 +84,7 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     {
       allPosts {
         nodes {
-          id
+          rowId
         }
       }
     }

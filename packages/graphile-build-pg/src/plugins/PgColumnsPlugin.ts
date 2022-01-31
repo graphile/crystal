@@ -6,10 +6,10 @@ import type {
   PgInsertPlan,
   PgSelectPlan,
   PgSelectSinglePlan,
+  PgSetPlan,
   PgSourceColumn,
   PgSourceColumns,
   PgTypeCodec,
-  PgSetPlan,
 } from "@dataplan/pg";
 import {
   pgSelectFromRecords,
@@ -107,7 +107,9 @@ export const PgColumnsPlugin: Plugin = {
         );
       },
       column(options, details) {
-        return this.camelCase(this._columnName(details));
+        const columnFieldName = this.camelCase(this._columnName(details));
+        // Avoid conflict with 'id' field used for Relay.
+        return columnFieldName === "id" ? "rowId" : columnFieldName;
       },
     },
   },
