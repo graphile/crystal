@@ -37,7 +37,7 @@ import {
   GraphileInputFieldConfig,
   InputObjectFieldPlanResolver,
   NodeIdCodec,
-  NodeIdMatcher,
+  NodeIdHandler,
   OutputPlanForType,
   PlanOptimizeOptions,
   PlanStreamOptions,

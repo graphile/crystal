@@ -478,7 +478,7 @@ export interface NodeIdCodec<T = any> {
   decode(value: string): T;
 }
 
-export type NodeIdMatcher<
+export type NodeIdHandler<
   TCodecs extends { [key: string]: NodeIdCodec<any> } = {
     [key: string]: NodeIdCodec<any>;
   },

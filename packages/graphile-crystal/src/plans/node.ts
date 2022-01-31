@@ -6,7 +6,7 @@ import type {
   CrystalResultsList,
   CrystalValuesList,
   NodeIdCodec,
-  NodeIdMatcher,
+  NodeIdHandler,
   PolymorphicData,
 } from "../interfaces";
 import type { PolymorphicPlan } from "../plan";
@@ -30,7 +30,7 @@ export class NodePlan<TCodecs extends { [key: string]: NodeIdCodec<any> }>
   constructor(
     private codecs: TCodecs,
     private possibleTypes: {
-      [typeName: string]: NodeIdMatcher<TCodecs>;
+      [typeName: string]: NodeIdHandler<TCodecs>;
     },
     $id: ExecutablePlan<string>,
   ) {
@@ -97,7 +97,7 @@ export class NodePlan<TCodecs extends { [key: string]: NodeIdCodec<any> }>
 export function node<TCodecs extends { [key: string]: NodeIdCodec<any> }>(
   codecs: TCodecs,
   possibleTypes: {
-    [typeName: string]: NodeIdMatcher<TCodecs>;
+    [typeName: string]: NodeIdHandler<TCodecs>;
   },
   $id: ExecutablePlan<string>,
 ): NodePlan<TCodecs> {
