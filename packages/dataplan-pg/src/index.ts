@@ -60,6 +60,7 @@ export { BooleanFilterPlan } from "./filters/booleanFilter";
 export { ClassFilterPlan } from "./filters/classFilter";
 export { ManyFilterPlan } from "./filters/manyFilter";
 export {
+  PgClassSinglePlan,
   PgEnumTypeCodec,
   PgTypeCodec,
   PgTypeCodecExtensions,

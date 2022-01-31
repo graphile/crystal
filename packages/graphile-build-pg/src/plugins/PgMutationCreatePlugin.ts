@@ -115,12 +115,12 @@ export const PgMutationCreatePlugin: Plugin = {
                                 () =>
                                   function plan(
                                     $object: ObjectPlan<{
-                                      insert: PgInsertPlan<any, any, any>;
+                                      record: PgInsertPlan<any, any, any>;
                                     }>,
                                   ) {
-                                    const $insert =
-                                      $object.getPlanForKey("insert");
-                                    return $insert.setPlan();
+                                    const $record =
+                                      $object.getPlanForKey("record");
+                                    return $record.setPlan();
                                   },
                                 [],
                               ),
@@ -137,7 +137,10 @@ export const PgMutationCreatePlugin: Plugin = {
             const payloadTypeName = inflection.createPayloadType(source);
             build.registerObjectType(
               payloadTypeName,
-              {},
+              {
+                isMutationPayload: true,
+                pgCodec: source.codec,
+              },
               ExecutablePlan as any,
               () => ({
                 fields: ({ fieldWithHooks }) => {
@@ -173,10 +176,10 @@ export const PgMutationCreatePlugin: Plugin = {
                                 () =>
                                   function plan(
                                     $object: ObjectPlan<{
-                                      insert: PgInsertPlan<any, any, any>;
+                                      record: PgInsertPlan<any, any, any>;
                                     }>,
                                   ) {
-                                    return $object.get("insert");
+                                    return $object.get("record");
                                   },
                                 [],
                               ),
@@ -235,7 +238,7 @@ export const PgMutationCreatePlugin: Plugin = {
                             function plan(
                               _: any,
                               $object: ObjectPlan<{
-                                insert: PgInsertPlan<any, any, any>;
+                                record: PgInsertPlan<any, any, any>;
                               }>,
                             ) {
                               return $object;
@@ -249,7 +252,7 @@ export const PgMutationCreatePlugin: Plugin = {
                       (object, pgInsert, source) =>
                         function plan() {
                           return object({
-                            insert: pgInsert(source, {}),
+                            record: pgInsert(source, {}),
                           });
                         },
                       [object, pgInsert, source],

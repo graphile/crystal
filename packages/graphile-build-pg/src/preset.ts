@@ -14,6 +14,7 @@ import { PgConnectionTotalCountPlugin } from "./plugins/PgConnectionTotalCountPl
 import { PgCustomTypeFieldPlugin } from "./plugins/PgCustomTypeFieldPlugin";
 import { PgIntrospectionPlugin } from "./plugins/PgIntrospectionPlugin";
 import { PgMutationCreatePlugin } from "./plugins/PgMutationCreatePlugin";
+import { PgMutationPayloadEdgePlugin } from "./plugins/PgMutationPayloadEdgePlugin";
 import { PgOrderAllColumnsPlugin } from "./plugins/PgOrderAllColumnsPlugin";
 import { PgOrderByPrimaryKeyPlugin } from "./plugins/PgOrderByPrimaryKeyPlugin";
 import { PgOrderCustomFieldsPlugin } from "./plugins/PgOrderCustomFieldsPlugin";
@@ -49,5 +50,6 @@ export const defaultPreset: Preset = {
     PgOrderCustomFieldsPlugin,
     PgConnectionArgOrderByDefaultValuePlugin,
     PgTableNodePlugin,
+    PgMutationPayloadEdgePlugin,
   ],
 };
