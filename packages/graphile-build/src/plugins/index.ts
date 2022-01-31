@@ -6,6 +6,8 @@ import { ConnectionPlugin } from "./ConnectionPlugin.js";
 import { CursorTypePlugin } from "./CursorTypePlugin.js";
 import { MutationPayloadQueryPlugin } from "./MutationPayloadQueryPlugin.js";
 import { MutationPlugin } from "./MutationPlugin.js";
+import { NodeIdCodecBase64JSONPlugin } from "./NodeIdCodecBase64JSONPlugin.js";
+import { NodeIdCodecPipeStringPlugin } from "./NodeIdCodecPipeStringPlugin.js";
 import { NodePlugin } from "./NodePlugin.js";
 import { PageInfoStartEndCursorPlugin } from "./PageInfoStartEndCursorPlugin.js";
 import { QueryPlugin } from "./QueryPlugin.js";
@@ -23,6 +25,8 @@ export {
   CursorTypePlugin,
   MutationPayloadQueryPlugin,
   MutationPlugin,
+  NodeIdCodecBase64JSONPlugin,
+  NodeIdCodecPipeStringPlugin,
   NodePlugin,
   PageInfoStartEndCursorPlugin,
   QueryPlugin,

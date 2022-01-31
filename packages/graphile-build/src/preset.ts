@@ -11,6 +11,8 @@ import {
   CursorTypePlugin,
   MutationPayloadQueryPlugin,
   MutationPlugin,
+  NodeIdCodecBase64JSONPlugin,
+  NodeIdCodecPipeStringPlugin,
   NodePlugin,
   PageInfoStartEndCursorPlugin,
   QueryPlugin,
@@ -33,5 +35,7 @@ export const defaultPreset: Preset = {
     BuiltinScalarConnectionsPlugin,
     TrimEmptyDescriptionsPlugin,
     AddNodeInterfaceToQueryPlugin,
+    NodeIdCodecBase64JSONPlugin,
+    NodeIdCodecPipeStringPlugin,
   ],
 };
