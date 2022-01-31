@@ -211,6 +211,8 @@ export {
   newInputObjectTypeBuilder,
   newObjectTypeBuilder,
   node,
+  NodeIdCodec,
+  NodeIdHandler,
   NodePlan,
   noop,
   object,
