@@ -37,7 +37,6 @@ export const PgConnectionArgOrderByDefaultValuePlugin: Plugin = {
         }
 
         if (!isPgFieldConnection || !pgSource || !pgSource.codec.columns) {
-          console.log("FAIL 1");
           return args;
         }
 
