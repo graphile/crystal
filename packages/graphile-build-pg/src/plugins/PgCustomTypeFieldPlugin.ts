@@ -78,7 +78,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
         );
       },
       customMutationPayload(options, details) {
-        return this.camelCase(this.customMutation(details) + "-payload");
+        return this.upperCamelCase(this.customMutation(details) + "-payload");
       },
       customQuery(options, details) {
         return this.camelCase(
