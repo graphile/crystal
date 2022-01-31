@@ -10,6 +10,7 @@ import { QueryPlugin } from "./QueryPlugin.js";
 import { QueryQueryPlugin } from "./QueryQueryPlugin.js";
 import { SubscriptionPlugin } from "./SubscriptionPlugin.js";
 import { SwallowErrorsPlugin } from "./SwallowErrorsPlugin.js";
+import { TrimEmptyDescriptionsPlugin } from "./TrimEmptyDescriptionsPlugin.js";
 
 export {
   BuiltinScalarConnectionsPlugin,
@@ -24,4 +25,5 @@ export {
   QueryQueryPlugin,
   SubscriptionPlugin,
   SwallowErrorsPlugin,
+  TrimEmptyDescriptionsPlugin,
 };

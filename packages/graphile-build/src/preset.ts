@@ -13,6 +13,7 @@ import {
   PageInfoStartEndCursorPlugin,
   QueryPlugin,
   SubscriptionPlugin,
+  TrimEmptyDescriptionsPlugin,
 } from "./plugins/index.js";
 
 export const defaultPreset: Preset = {
@@ -27,5 +28,6 @@ export const defaultPreset: Preset = {
     ConnectionPlugin,
     PageInfoStartEndCursorPlugin,
     BuiltinScalarConnectionsPlugin,
+    TrimEmptyDescriptionsPlugin,
   ],
 };
