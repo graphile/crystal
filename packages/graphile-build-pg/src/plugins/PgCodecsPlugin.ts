@@ -16,7 +16,7 @@ import {
   TYPES,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-exporter";
-import type { Plugin, PluginGatherConfig } from "graphile-plugin";
+import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
 import sql from "pg-sql2";
 
 import { version } from "../index";
@@ -88,6 +88,16 @@ declare module "graphile-plugin" {
         pgTypeModifier?: number | null,
       ): Promise<PgTypeCodec<any, any, any, any> | null>;
     };
+  }
+  interface GatherHooks {
+    pgCodecs_PgTypeCodec: PluginHook<
+      (event: {
+        pgCodec: PgTypeCodec<any, any, any, any>;
+        databaseName: string;
+        pgClass?: PgClass;
+        pgType: PgType;
+      }) => Promise<void>
+    >;
   }
 }
 
@@ -291,6 +301,12 @@ export const PgCodecsPlugin: Plugin = {
               ),
             [className, codecName, columns, nspName, recordType, sql],
           );
+          info.process("pgCodecs_PgTypeCodec", {
+            pgCodec: codec,
+            pgType: pgClass.getType()!,
+            pgClass,
+            databaseName,
+          });
           return codec;
         })();
 
@@ -335,130 +351,87 @@ export const PgCodecsPlugin: Plugin = {
             );
           }
 
-          const namespace = await info.helpers.pgIntrospection.getNamespace(
-            databaseName,
-            type.typnamespace,
-          );
-          if (!namespace) {
-            throw new Error(`Could not get namespace '${type.typnamespace}'`);
-          }
-          const namespaceName = namespace.nspname;
-
-          // For the standard pg_catalog types, we have standard handling.
-          // (In v4 we used OIDs for this, but using the name is safer for PostgreSQL-likes.)
-          if (type.typnamespace == pgCatalog._id) {
-            const knownType = getCodecByPgCatalogTypeName(type.typname);
-            if (knownType) {
-              return knownType;
+          const codec = await (async () => {
+            const namespace = await info.helpers.pgIntrospection.getNamespace(
+              databaseName,
+              type.typnamespace,
+            );
+            if (!namespace) {
+              throw new Error(`Could not get namespace '${type.typnamespace}'`);
             }
-          }
+            const namespaceName = namespace.nspname;
 
-          // TODO: this is technically unsafe; we should check the namespace
-          // matches the citext extension namespace
-          if (type.typname === "citext") {
-            return TYPES.citext;
-          } else if (type.typname === "hstore") {
-            return TYPES.hstore;
-          }
+            // For the standard pg_catalog types, we have standard handling.
+            // (In v4 we used OIDs for this, but using the name is safer for PostgreSQL-likes.)
+            if (type.typnamespace == pgCatalog._id) {
+              const knownType = getCodecByPgCatalogTypeName(type.typname);
+              if (knownType) {
+                return knownType;
+              }
+            }
 
-          // Enum type
-          if (type.typtype === "e") {
-            const enumValues =
-              await info.helpers.pgIntrospection.getEnumsForType(
+            // TODO: this is technically unsafe; we should check the namespace
+            // matches the citext extension namespace
+            if (type.typname === "citext") {
+              return TYPES.citext;
+            } else if (type.typname === "hstore") {
+              return TYPES.hstore;
+            }
+
+            // Enum type
+            if (type.typtype === "e") {
+              const enumValues =
+                await info.helpers.pgIntrospection.getEnumsForType(
+                  databaseName,
+                  type._id,
+                );
+              const typeName = type.typname;
+              const codecName = info.inflection.typeCodecName({
+                pgType: type,
+                databaseName,
+              });
+              const enumLabels = enumValues.map((e) => e.enumlabel);
+              return EXPORTABLE(
+                (
+                  codecName,
+                  enumLabels,
+                  enumType,
+                  namespaceName,
+                  sql,
+                  typeName,
+                ) =>
+                  enumType(
+                    codecName,
+                    sql.identifier(namespaceName, typeName),
+                    enumLabels,
+                  ),
+                [codecName, enumLabels, enumType, namespaceName, sql, typeName],
+              );
+            }
+
+            // Range type
+            if (type.typtype === "r") {
+              const range = await info.helpers.pgIntrospection.getRangeByType(
                 databaseName,
                 type._id,
               );
-            const typeName = type.typname;
-            const codecName = info.inflection.typeCodecName({
-              pgType: type,
-              databaseName,
-            });
-            const enumLabels = enumValues.map((e) => e.enumlabel);
-            return EXPORTABLE(
-              (codecName, enumLabels, enumType, namespaceName, sql, typeName) =>
-                enumType(
-                  codecName,
-                  sql.identifier(namespaceName, typeName),
-                  enumLabels,
-                ),
-              [codecName, enumLabels, enumType, namespaceName, sql, typeName],
-            );
-          }
-
-          // Range type
-          if (type.typtype === "r") {
-            const range = await info.helpers.pgIntrospection.getRangeByType(
-              databaseName,
-              type._id,
-            );
-            if (!range) {
-              throw new Error(
-                `Failed to get range entry related to '${type._id}'`,
+              if (!range) {
+                throw new Error(
+                  `Failed to get range entry related to '${type._id}'`,
+                );
+              }
+              const innerCodec = await info.helpers.pgCodecs.getCodecFromType(
+                databaseName,
+                range.rngsubtype!,
               );
-            }
-            const innerCodec = await info.helpers.pgCodecs.getCodecFromType(
-              databaseName,
-              range.rngsubtype!,
-            );
-            const namespaceName = namespace.nspname;
-            const typeName = type.typname;
-            if (!innerCodec) {
-              console.warn(
-                `PgTypeCodec could not build codec for '${namespaceName}.${typeName}', we don't know how to process the subtype`,
-              );
-              return null;
-            }
-            const codecName = info.inflection.typeCodecName({
-              pgType: type,
-              databaseName,
-            });
-            return EXPORTABLE(
-              (
-                codecName,
-                innerCodec,
-                namespaceName,
-                rangeOfCodec,
-                sql,
-                typeName,
-              ) =>
-                rangeOfCodec(
-                  innerCodec,
-                  codecName,
-                  sql.identifier(namespaceName, typeName),
-                  { extensions: {} },
-                ),
-              [
-                codecName,
-                innerCodec,
-                namespaceName,
-                rangeOfCodec,
-                sql,
-                typeName,
-              ],
-            );
-          }
-
-          // Domains are wrappers under an underlying type
-          if (type.typtype === "d") {
-            const {
-              typnotnull: notNull,
-              typbasetype: baseTypeOid,
-              typtypmod: baseTypeModifier,
-              typndims: _numberOfArrayDimensions,
-              typcollation: _domainCollation,
-              typdefaultbin: _defaultValueNodeTree,
-            } = type;
-            const innerCodec = baseTypeOid
-              ? await info.helpers.pgCodecs.getCodecFromType(
-                  databaseName,
-                  baseTypeOid,
-                  baseTypeModifier,
-                )
-              : null;
-            const namespaceName = namespace.nspname;
-            const typeName = type.typname;
-            const extensions = {};
-            if (innerCodec) {
+              const namespaceName = namespace.nspname;
+              const typeName = type.typname;
+              if (!innerCodec) {
+                console.warn(
+                  `PgTypeCodec could not build codec for '${namespaceName}.${typeName}', we don't know how to process the subtype`,
+                );
+                return null;
+              }
               const codecName = info.inflection.typeCodecName({
                 pgType: type,
                 databaseName,
@@ -466,71 +439,133 @@ export const PgCodecsPlugin: Plugin = {
               return EXPORTABLE(
                 (
                   codecName,
-                  domainOfCodec,
-                  extensions,
                   innerCodec,
                   namespaceName,
-                  notNull,
+                  rangeOfCodec,
                   sql,
                   typeName,
                 ) =>
-                  domainOfCodec(
+                  rangeOfCodec(
                     innerCodec,
                     codecName,
                     sql.identifier(namespaceName, typeName),
-                    {
-                      extensions,
-                      notNull,
-                    },
+                    { extensions: {} },
                   ),
                 [
                   codecName,
-                  domainOfCodec,
-                  extensions,
                   innerCodec,
                   namespaceName,
-                  notNull,
+                  rangeOfCodec,
                   sql,
                   typeName,
                 ],
               );
             }
-          }
 
-          // Array types are just listOfType() of their inner type
-          if (type.typcategory === "A") {
-            const innerType = await info.helpers.pgIntrospection.getTypeByArray(
-              databaseName,
-              type._id,
-            );
-
-            if (innerType) {
-              const innerCodec = await info.helpers.pgCodecs.getCodecFromType(
-                databaseName,
-                innerType._id,
-                typeModifier, // TODO: is it correct to pass this through?
-              );
+            // Domains are wrappers under an underlying type
+            if (type.typtype === "d") {
+              const {
+                typnotnull: notNull,
+                typbasetype: baseTypeOid,
+                typtypmod: baseTypeModifier,
+                typndims: _numberOfArrayDimensions,
+                typcollation: _domainCollation,
+                typdefaultbin: _defaultValueNodeTree,
+              } = type;
+              const innerCodec = baseTypeOid
+                ? await info.helpers.pgCodecs.getCodecFromType(
+                    databaseName,
+                    baseTypeOid,
+                    baseTypeModifier,
+                  )
+                : null;
+              const namespaceName = namespace.nspname;
+              const typeName = type.typname;
+              const extensions = {};
               if (innerCodec) {
-                const typeDelim = innerType.typdelim!;
+                const codecName = info.inflection.typeCodecName({
+                  pgType: type,
+                  databaseName,
+                });
                 return EXPORTABLE(
-                  (innerCodec, listOfType, typeDelim) =>
-                    listOfType(innerCodec, {}, typeDelim),
-                  [innerCodec, listOfType, typeDelim],
+                  (
+                    codecName,
+                    domainOfCodec,
+                    extensions,
+                    innerCodec,
+                    namespaceName,
+                    notNull,
+                    sql,
+                    typeName,
+                  ) =>
+                    domainOfCodec(
+                      innerCodec,
+                      codecName,
+                      sql.identifier(namespaceName, typeName),
+                      {
+                        extensions,
+                        notNull,
+                      },
+                    ),
+                  [
+                    codecName,
+                    domainOfCodec,
+                    extensions,
+                    innerCodec,
+                    namespaceName,
+                    notNull,
+                    sql,
+                    typeName,
+                  ],
                 );
               }
             }
+
+            // Array types are just listOfType() of their inner type
+            if (type.typcategory === "A") {
+              const innerType =
+                await info.helpers.pgIntrospection.getTypeByArray(
+                  databaseName,
+                  type._id,
+                );
+
+              if (innerType) {
+                const innerCodec = await info.helpers.pgCodecs.getCodecFromType(
+                  databaseName,
+                  innerType._id,
+                  typeModifier, // TODO: is it correct to pass this through?
+                );
+                if (innerCodec) {
+                  const typeDelim = innerType.typdelim!;
+                  return EXPORTABLE(
+                    (innerCodec, listOfType, typeDelim) =>
+                      listOfType(innerCodec, {}, typeDelim),
+                    [innerCodec, listOfType, typeDelim],
+                  );
+                }
+              }
+              console.warn(
+                `Could not build PgTypeCodec for '${namespaceName}.${type.typname}' due to issue with getting codec for underlying type`,
+              );
+              return null;
+            }
+
+            // TODO: basic type support
             console.warn(
-              `Could not build PgTypeCodec for '${namespaceName}.${type.typname}' due to issue with getting codec for underlying type`,
+              `Don't understand how to build type for ${type.typname}`,
             );
+
             return null;
+          })();
+          if (codec) {
+            // Be careful not to call this for class codecs!
+            info.process("pgCodecs_PgTypeCodec", {
+              pgCodec: codec,
+              pgType: type,
+              databaseName,
+            });
           }
-
-          // TODO: basic type support
-          console.warn(
-            `Don't understand how to build type for ${type.typname}`,
-          );
-
-          return null;
+          return codec;
         })();
 
         map.set(typeId, promise);
