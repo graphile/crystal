@@ -472,3 +472,23 @@ export type CrystalSubscriber<
     topic: TTopic,
   ): AsyncIterableIterator<TTopics[TTopic]>;
 };
+
+export interface NodeIdCodec<T = any> {
+  encode(value: T): string;
+  decode(value: string): T;
+}
+
+export type NodeIdMatcher<
+  TCodecs extends { [key: string]: NodeIdCodec<any> } = {
+    [key: string]: NodeIdCodec<any>;
+  },
+  TCodecName extends keyof TCodecs = keyof TCodecs,
+> = {
+  codecName: TCodecName & string;
+  get(
+    plan: ExecutablePlan<
+      TCodecs[TCodecName] extends NodeIdCodec<infer U> ? U : any
+    >,
+  ): ExecutablePlan<string>;
+  match(specifier: any): boolean;
+};
