@@ -298,7 +298,7 @@ export const PgMutationUpdateDeletePlugin: Plugin = {
                       ),
                       type: GraphQLString,
                     },
-                    ...(TableType
+                    ...(mode === "update" && TableType
                       ? {
                           [tableName]: fieldWithHooks(
                             {
@@ -340,13 +340,17 @@ export const PgMutationUpdateDeletePlugin: Plugin = {
                                 plan: EXPORTABLE(
                                   (handler, lambda, nodeIdCodec) =>
                                     function plan(
-                                      $record: PgClassSinglePlan<
-                                        any,
-                                        any,
-                                        any,
-                                        any
-                                      >,
+                                      $object: ObjectPlan<{
+                                        result: PgClassSinglePlan<
+                                          any,
+                                          any,
+                                          any,
+                                          any
+                                        >;
+                                      }>,
                                     ) {
+                                      const $record =
+                                        $object.getPlanForKey("result");
                                       const specifier = handler.plan($record);
                                       return lambda(
                                         specifier,
