@@ -20,6 +20,7 @@ import { resolvePresets } from "graphile-plugin";
 import { graphql, printSchema } from "graphql";
 import { Pool } from "pg";
 import { inspect } from "util";
+import * as jsonwebtoken from "jsonwebtoken";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 
@@ -59,6 +60,9 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
             withPgClient: withPgClient,
           },
         ],
+      },
+      schema: {
+        pgJwtSecret: "secret",
       },
     },
   ]);
@@ -116,7 +120,11 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
   // Export schema
   // const exportFileLocation = new URL("../../temp.js", import.meta.url);
   const exportFileLocation = `${__dirname}/../../temp.mjs`;
-  await exportSchema(schema, exportFileLocation);
+  await exportSchema(schema, exportFileLocation, {
+    modules: {
+      jsonwebtoken: jsonwebtoken,
+    },
+  });
 
   // output code
   //console.log(chalk.green(await readFile(exportFileLocation, "utf8")));

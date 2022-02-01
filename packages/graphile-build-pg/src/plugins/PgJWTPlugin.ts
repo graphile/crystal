@@ -80,11 +80,11 @@ export const PgJWTPlugin: Plugin = {
           return _;
         }
 
-        const compositeTypeName = build.inflection.tableType(jwtCodec);
+        const jwtTypeName = build.inflection.tableType(jwtCodec);
         const columns = Object.keys(jwtCodec.columns);
 
         build.registerScalarType(
-          compositeTypeName,
+          jwtTypeName,
           {
             isPgJwtType: true,
             pgCodec: jwtCodec,
@@ -138,6 +138,7 @@ export const PgJWTPlugin: Plugin = {
           }),
           "JWT scalar from PgJWTPlugin",
         );
+        build.setGraphQLTypeForPgCodec(jwtCodec, "output", jwtTypeName);
 
         return _;
       },
