@@ -140,6 +140,7 @@ export interface PgSourceRelation<
 
   remoteColumns: ReadonlyArray<keyof TRemoteColumns>;
   isUnique: boolean;
+  isBackwards?: boolean;
   extensions?: PgSourceRelationExtensions;
 }
 

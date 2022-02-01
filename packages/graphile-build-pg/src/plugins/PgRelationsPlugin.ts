@@ -46,6 +46,10 @@ declare global {
         },
       ): string;
       singleRelation(this: Inflection, details: RelationDetails): string;
+      singleRelationBackwards(
+        this: Inflection,
+        details: RelationDetails,
+      ): string;
       manyRelationConnection(
         this: Inflection,
         details: RelationDetails,
@@ -107,6 +111,14 @@ export const PgRelationsPlugin: Plugin = {
         const localColumns = details.relation.localColumns;
         return this.camelCase(`${remoteType}-by-${localColumns.join("-and-")}`);
       },
+      singleRelationBackwards(options, details) {
+        // E.g. posts(author_id) references users(id)
+        const remoteType = this.tableType(details.relation.source.codec);
+        const remoteColumns = details.relation.remoteColumns;
+        return this.camelCase(
+          `${remoteType}-by-${remoteColumns.join("-and-")}`,
+        );
+      },
       manyRelationConnection(options, details) {
         // E.g. users(id) references posts(author_id)
         const remoteType = this.tableType(details.relation.source.codec);
@@ -153,6 +165,7 @@ export const PgRelationsPlugin: Plugin = {
           foreignClassId: string,
           foreignColumnNumbers: readonly number[],
           isUnique: boolean,
+          isBackwards = false,
         ) => {
           const localColumns = await Promise.all(
             localColumnNumbers!.map((key) =>
@@ -200,6 +213,7 @@ export const PgRelationsPlugin: Plugin = {
             remoteColumns: foreignColumns.map((c) => c!.attname),
             source: foreignSource,
             isUnique,
+            isBackwards,
             extensions: { tags: {} },
           };
         };
@@ -217,11 +231,13 @@ export const PgRelationsPlugin: Plugin = {
         }
         for (const constraint of foreignConstraints) {
           if (constraint.contype === "f") {
+            const foreignClass = constraint.getClass()!;
             // This relationship is unique if the REFERENCED table (not us!)
             // has a unique constraint on the remoteColumns the relationship
             // specifies (or a subset thereof).
-            const foreignUniqueColumnOnlyConstraints =
-              foreignConstraints.filter(
+            const foreignUniqueColumnOnlyConstraints = foreignClass
+              .getConstraints()!
+              .filter(
                 (c) =>
                   ["u", "p"].includes(c.contype) &&
                   c.conkey?.every((k) => k > 0),
@@ -231,7 +247,7 @@ export const PgRelationsPlugin: Plugin = {
             const isUnique = foreignUniqueColumnNumberCombinations.some(
               (foreignUniqueColumnNumbers) => {
                 return foreignUniqueColumnNumbers.every(
-                  (n) => n > 0 && constraint.confkey!.includes(n),
+                  (n) => n > 0 && constraint.conkey!.includes(n),
                 );
               },
             );
@@ -241,6 +257,7 @@ export const PgRelationsPlugin: Plugin = {
               constraint.conrelid!,
               constraint.conkey!,
               isUnique,
+              true,
             );
           }
         }
@@ -363,8 +380,9 @@ export const PgRelationsPlugin: Plugin = {
             );
 
             if (isUnique && behavior.includes("single")) {
-              const fieldName =
-                build.inflection.singleRelation(relationDetails);
+              const fieldName = relationDetails.relation.isBackwards
+                ? build.inflection.singleRelationBackwards(relationDetails)
+                : build.inflection.singleRelation(relationDetails);
               fields = extend(
                 fields,
                 {
