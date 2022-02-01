@@ -132,12 +132,10 @@ export const gather = async (
 
   // Prepare the plugins to run by preparing their initial states, and registering the helpers (hooks area already done).
   for (const plugin of plugins) {
-    console.log(plugin.name + "...");
     const spec = plugin.gather;
     if (!spec) {
       continue;
     }
-    console.log(plugin.name);
     if (spec.namespace in globalState) {
       // TODO: track who registers which namespace, output more helpful error.
       throw new Error(

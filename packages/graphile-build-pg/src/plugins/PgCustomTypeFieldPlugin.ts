@@ -244,12 +244,6 @@ export const PgCustomTypeFieldPlugin: Plugin = {
             );
           }
         })();
-        if (isRootQuery) {
-          console.log(`${procSources.length} query sources`);
-        }
-        if (isRootMutation) {
-          console.log(`${procSources.length} mutation sources`);
-        }
         if (procSources.length === 0) {
           return fields;
         }

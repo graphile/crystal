@@ -45,7 +45,6 @@ export const PgConnectionArgOrderByDefaultValuePlugin: Plugin = {
           inflection.orderByType(tableTypeName),
         ) as GraphQLEnumType;
         if (!TableOrderByType) {
-          console.log("FAIL 2");
           return args;
         }
 
@@ -54,7 +53,6 @@ export const PgConnectionArgOrderByDefaultValuePlugin: Plugin = {
           TableOrderByType.getValues().find((v) => v.name === primaryKeyAsc) ||
           TableOrderByType.getValues()[0];
         if (!defaultValueEnum) {
-          console.log("FAIL 3");
           return args;
         }
 

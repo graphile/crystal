@@ -75,7 +75,6 @@ export const PgJWTPlugin: Plugin = {
           }
           return false;
         });
-        console.log({ jwtCodec });
 
         if (!jwtCodec) {
           return _;
