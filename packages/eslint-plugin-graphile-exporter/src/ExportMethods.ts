@@ -183,10 +183,15 @@ function processNode(
                     const name = node.key.name;
                     // This is a method definition `plan(...) {...}`
                     return [
-                      fixer.replaceTextRange(
-                        [node.range![0], node.range![0]],
-                        `${name}: EXPORTABLE(() => function `,
-                      ),
+                      (node as any).value.async // It starts with 'async '
+                        ? fixer.replaceTextRange(
+                            [node.range![0], node.range![0] + 6],
+                            `${name}: EXPORTABLE(() => async function `,
+                          )
+                        : fixer.replaceTextRange(
+                            [node.range![0], node.range![0]],
+                            `${name}: EXPORTABLE(() => function `,
+                          ),
                       fixer.replaceTextRange(
                         [node.range![1], node.range![1]],
                         ", [])",
