@@ -16,6 +16,7 @@ import { PgIntrospectionPlugin } from "./plugins/PgIntrospectionPlugin";
 import { PgJWTPlugin } from "./plugins/PgJWTPlugin";
 import { PgMutationCreatePlugin } from "./plugins/PgMutationCreatePlugin";
 import { PgMutationPayloadEdgePlugin } from "./plugins/PgMutationPayloadEdgePlugin";
+import { PgMutationUpdateDeletePlugin } from "./plugins/PgMutationUpdateDeletePlugin";
 import { PgOrderAllColumnsPlugin } from "./plugins/PgOrderAllColumnsPlugin";
 import { PgOrderByPrimaryKeyPlugin } from "./plugins/PgOrderByPrimaryKeyPlugin";
 import { PgOrderCustomFieldsPlugin } from "./plugins/PgOrderCustomFieldsPlugin";
@@ -52,6 +53,7 @@ export const defaultPreset: Preset = {
     PgConnectionArgOrderByDefaultValuePlugin,
     PgTableNodePlugin,
     PgMutationPayloadEdgePlugin,
+    PgMutationUpdateDeletePlugin,
     PgJWTPlugin,
   ],
 };

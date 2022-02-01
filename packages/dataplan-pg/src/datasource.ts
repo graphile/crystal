@@ -155,7 +155,7 @@ export interface PgSourceParameter {
 export interface PgSourceUnique<
   TColumns extends PgSourceColumns = PgSourceColumns,
 > {
-  columns: ReadonlyArray<keyof TColumns>;
+  columns: ReadonlyArray<keyof TColumns & string>;
   isPrimary?: boolean;
   extensions?: PgSourceUniqueExtensions;
 }
