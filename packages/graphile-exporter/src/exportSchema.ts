@@ -43,6 +43,7 @@ import { sql } from "pg-sql2";
 import type { URL } from "url";
 import { inspect } from "util";
 
+import type { ExportOptions } from "./interfaces";
 import { wellKnown } from "./wellKnown";
 
 function identifierOrLiteral(key: string) {
@@ -212,6 +213,8 @@ class CodegenFile {
   _statements: t.Statement[] = [];
 
   _values: Map<any, t.Expression> = new Map();
+
+  constructor(public options: ExportOptions) {}
 
   addStatements(statements: t.Statement | t.Statement[]): void {
     if (Array.isArray(statements)) {
@@ -820,8 +823,8 @@ function convertToAST(
     return t.stringLiteral(thing);
   } else if (typeof thing === "number") {
     return t.numericLiteral(thing);
-  } else if (wellKnown(thing)) {
-    const { moduleName, exportName } = wellKnown(thing)!;
+  } else if (wellKnown(file.options, thing)) {
+    const { moduleName, exportName } = wellKnown(file.options, thing)!;
     return file.import(moduleName, exportName);
   } else if (isImportable(thing)) {
     const { moduleName, exportName } = thing.$$export;
@@ -885,8 +888,8 @@ function convertToIdentifierViaAST(
   if (existingIdentifier) {
     return existingIdentifier;
   }
-  if (wellKnown(thing)) {
-    const { moduleName, exportName } = wellKnown(thing)!;
+  if (wellKnown(file.options, thing)) {
+    const { moduleName, exportName } = wellKnown(file.options, thing)!;
     return file.import(moduleName, exportName);
   } else if (isImportable(thing)) {
     const { moduleName, exportName } = thing.$$export;
@@ -1010,8 +1013,8 @@ function func(
   // `(() => { const foo = 1, bar = 2; return /*>*/() => {return foo+bar}/*<*/})();`
   if (isExportedFromFactory(fn)) {
     return factoryAst(file, fn, locationHint);
-  } else if (wellKnown(fn)) {
-    const { moduleName, exportName } = wellKnown(fn)!;
+  } else if (wellKnown(file.options, fn)) {
+    const { moduleName, exportName } = wellKnown(file.options, fn)!;
     return file.import(moduleName, exportName);
   } else if (isImportable(fn)) {
     return file.import(fn.$$export.moduleName, fn.$$export.exportName);
@@ -1157,9 +1160,10 @@ Object.defineProperty(${
 
 export async function exportSchemaAsString(
   schema: GraphQLSchema,
+  options: ExportOptions,
 ): Promise<{ code: string }> {
   const config = schema.toConfig();
-  const file = new CodegenFile();
+  const file = new CodegenFile(options);
 
   const schemaExportName = file.makeVariable("schema");
 
@@ -1222,8 +1226,9 @@ export async function exportSchemaAsString(
 export async function exportSchema(
   schema: GraphQLSchema,
   toPath: string | URL,
+  options: ExportOptions = {},
 ): Promise<void> {
-  const { code } = await exportSchemaAsString(schema);
+  const { code } = await exportSchemaAsString(schema, options);
   const HEADER = `/* eslint-disable graphile-exporter/export-instances, graphile-exporter/export-methods, graphile-exporter/exhaustive-deps */\n`;
   await writeFile(toPath, HEADER + code);
 }

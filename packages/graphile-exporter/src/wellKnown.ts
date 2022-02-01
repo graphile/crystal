@@ -5,48 +5,90 @@ import * as crystalStar from "graphile-crystal";
 import * as graphqlStar from "graphql";
 import util, * as utilStar from "util";
 
+import type { ExportOptions } from "./interfaces";
+
 interface $$Export {
   moduleName: string;
   exportName: string | "default" | "*" | string[];
 }
 
-const wellKnownMap = new Map<unknown, $$Export>();
+function makeWellKnownFromOptions(options: ExportOptions) {
+  const wellKnownMap = new Map<unknown, $$Export>();
 
-function exportAll(obj: object, moduleName: string) {
-  for (const exportName of Object.keys(obj)) {
-    if (exportName !== "default" && !wellKnownMap.has(obj[exportName])) {
-      wellKnownMap.set(obj[exportName], {
-        moduleName,
-        exportName,
+  function exportAll(
+    obj: object,
+    moduleName: string,
+    preferViaDefault = false,
+  ) {
+    for (const exportName of Object.keys(obj)) {
+      if (exportName !== "default" && !wellKnownMap.has(obj[exportName])) {
+        /**
+         * ESM is still a bit flaky, so though `import { foo } from 'bar';` may
+         * work in some contexts, in raw Node it's often required to do
+         * `import bar from 'bar'; const foo = bar.foo;`. This code determines
+         * if this latter approach is desired.
+         */
+        const viaDefault =
+          preferViaDefault && obj[exportName] === obj["default"]?.[exportName];
+        wellKnownMap.set(obj[exportName], {
+          moduleName,
+          exportName: viaDefault ? ["default", exportName] : exportName,
+        });
+      }
+    }
+  }
+
+  // TODO: fill this out a bit...
+  wellKnownMap.set(crypto, { moduleName: "crypto", exportName: "default" });
+  wellKnownMap.set(util, { moduleName: "util", exportName: "default" });
+  exportAll(crystalStar, "graphile-crystal");
+  exportAll(graphqlStar, "graphql");
+  exportAll(utilStar, "util");
+
+  // When defining custom scalars it's often useful to copy the implementation from builtins
+  for (const builtinScalarName of [
+    "GraphQLBoolean",
+    "GraphQLInt",
+    "GraphQLFloat",
+    "GraphQLString",
+    "GraphQLID",
+  ]) {
+    for (const method of ["serialize", "parseValue", "parseLiteral"]) {
+      wellKnownMap.set(graphqlStar[builtinScalarName][method], {
+        moduleName: "graphql",
+        exportName: [builtinScalarName, method],
       });
     }
   }
+
+  const namespaces = Object.assign(Object.create(null), { crypto: _crypto });
+
+  // Now process options
+  if (options.modules) {
+    for (const [moduleName, moduleStar] of Object.entries(options.modules)) {
+      exportAll(moduleStar, moduleName, true);
+      namespaces[moduleName] = moduleStar;
+    }
+  }
+
+  return { namespaces, wellKnownMap };
 }
 
-// TODO: fill this out a bit...
-wellKnownMap.set(crypto, { moduleName: "crypto", exportName: "default" });
-wellKnownMap.set(util, { moduleName: "util", exportName: "default" });
-exportAll(crystalStar, "graphile-crystal");
-exportAll(graphqlStar, "graphql");
-exportAll(utilStar, "util");
-
-// When defining custom scalars it's often useful to copy the implementation from builtins
-for (const builtinScalarName of [
-  "GraphQLBoolean",
-  "GraphQLInt",
-  "GraphQLFloat",
-  "GraphQLString",
-  "GraphQLID",
-]) {
-  for (const method of ["serialize", "parseValue", "parseLiteral"]) {
-    wellKnownMap.set(graphqlStar[builtinScalarName][method], {
-      moduleName: "graphql",
-      exportName: [builtinScalarName, method],
-    });
+const cache = new WeakMap<
+  ExportOptions,
+  ReturnType<typeof makeWellKnownFromOptions>
+>();
+function getWellKnownFromOptions(
+  options: ExportOptions,
+): ReturnType<typeof makeWellKnownFromOptions> {
+  if (cache.has(options)) {
+    return cache.get(options)!;
+  } else {
+    const result = makeWellKnownFromOptions(options);
+    cache.set(options, result);
+    return result;
   }
 }
-
-const namespaces = Object.assign(Object.create(null), { crypto: _crypto });
 
 /**
  * Determines if the thing is something well known (like a Node.js builtin); if
@@ -54,7 +96,12 @@ const namespaces = Object.assign(Object.create(null), { crypto: _crypto });
  *
  * @internal
  */
-export function wellKnown(thing: unknown): $$Export | undefined {
+export function wellKnown(
+  options: ExportOptions,
+  thing: unknown,
+): $$Export | undefined {
+  const { wellKnownMap, namespaces } = getWellKnownFromOptions(options);
+
   // Straight imports are relatively easy:
   const simple = wellKnownMap.get(thing);
   if (simple) {
