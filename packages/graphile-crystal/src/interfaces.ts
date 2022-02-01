@@ -65,6 +65,12 @@ declare module "graphql" {
       plan?: (plan: any) => void;
     };
   }
+
+  interface GraphQLScalarTypeExtensions {
+    graphile?: {
+      plan?: ($parentPlan: any) => ExecutablePlan<any>;
+    };
+  }
 }
 
 export const $$crystalContext = Symbol("context");

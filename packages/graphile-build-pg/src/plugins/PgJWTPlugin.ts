@@ -1,5 +1,6 @@
 import type { PgSource, PgTypeCodec } from "@dataplan/pg";
 import type { TrackedArguments } from "graphile-crystal";
+import { object } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { GatherHooks, Plugin, PluginGatherConfig } from "graphile-plugin";
 import type { GraphQLObjectType } from "graphql";
@@ -81,7 +82,7 @@ export const PgJWTPlugin: Plugin = {
         }
 
         const jwtTypeName = build.inflection.tableType(jwtCodec);
-        const columns = Object.keys(jwtCodec.columns);
+        const columnNames = Object.keys(jwtCodec.columns);
 
         build.registerScalarType(
           jwtTypeName,
@@ -95,9 +96,9 @@ export const PgJWTPlugin: Plugin = {
               "type",
             ),
             serialize: EXPORTABLE(
-              (columns, pgJwtSecret, pgJwtSignOptions, signJwt) =>
+              (columnNames, pgJwtSecret, pgJwtSignOptions, signJwt) =>
                 function serialize(value: any) {
-                  const token = columns.reduce((memo, columnName) => {
+                  const token = columnNames.reduce((memo, columnName) => {
                     if (columnName === "exp") {
                       memo[columnName] = value[columnName]
                         ? parseFloat(value[columnName])
@@ -133,8 +134,22 @@ export const PgJWTPlugin: Plugin = {
                     ),
                   );
                 },
-              [columns, pgJwtSecret, pgJwtSignOptions, signJwt],
+              [columnNames, pgJwtSecret, pgJwtSignOptions, signJwt],
             ),
+            extensions: {
+              graphile: {
+                plan: EXPORTABLE(
+                  (columnNames, object) => function plan($record) {
+                      const spec = columnNames.reduce((memo, columnName) => {
+                        memo[columnName] = $record.get(columnName);
+                        return memo;
+                      }, {});
+                      return object(spec);
+                    },
+                  [columnNames, object],
+                ),
+              },
+            },
           }),
           "JWT scalar from PgJWTPlugin",
         );

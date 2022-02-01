@@ -19,6 +19,7 @@ import {
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
+  GraphQLScalarType,
   GraphQLUnionType,
   isInputObjectType,
   isInterfaceType,
@@ -71,7 +72,12 @@ import {
   $$isCrystalLayerObject,
   $$planResults,
 } from "./interfaces";
-import type { ModifierPlan, PolymorphicPlan, StreamablePlan } from "./plan";
+import type {
+  ListCapablePlan,
+  ModifierPlan,
+  PolymorphicPlan,
+  StreamablePlan,
+} from "./plan";
 import {
   assertArgumentsFinalized,
   assertExecutablePlan,
@@ -1015,7 +1021,10 @@ export class Aether<
           currentGraphQLType: fieldType,
         },
         isListCapablePlan(plan)
-          ? () => plan.listItem(new __ItemPlan(plan, depth))
+          ? () =>
+              (plan as ListCapablePlan<any>).listItem(
+                new __ItemPlan(plan, depth),
+              )
           : () => new __ItemPlan(plan, depth),
       );
       this.finalizeArgumentsSince(oldPlansLength, nestedParentPathIdentity);
@@ -1162,6 +1171,11 @@ export class Aether<
             /*@__INLINE__*/ planPossibleObjectTypes(possibleObjectTypes);
           }
         }
+      }
+    } else if (fieldType instanceof GraphQLScalarType) {
+      const scalarPlanResolver = fieldType.extensions?.graphile?.plan;
+      if (typeof scalarPlanResolver === "function") {
+        plan = wgs(() => scalarPlanResolver(plan));
       }
     }
     return plan;
@@ -3075,11 +3089,6 @@ export class Aether<
             );
             depth++;
             // null means no need to transform the data; we might replace this in further iterations
-          } else if (depth === 0) {
-            // This should never happen
-            throw new Error(
-              `Unexpected plan structure: did not expect to find plan ${subPlan} between ${plan} and the first '__ItemPlan' leading to ${itemPlan}.`,
-            );
           } else {
             /*
              * We need to execute each layer in turn so that we can handle list
