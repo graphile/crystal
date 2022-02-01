@@ -423,7 +423,10 @@ export const PgTablesPlugin: Plugin = {
               setGraphQLTypeForPgCodec(codec, ["output"], tableTypeName);
             }
 
-            if (!behavior || behavior.includes("insertable")) {
+            if (
+              (!behavior && !codec.isAnonymous) ||
+              behavior?.includes("insertable")
+            ) {
               const inputTypeName = inflection.inputType(tableTypeName);
               build.registerInputObjectType(
                 inputTypeName,
