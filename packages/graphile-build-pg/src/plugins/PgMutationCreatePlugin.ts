@@ -115,11 +115,11 @@ export const PgMutationCreatePlugin: Plugin = {
                                 () =>
                                   function plan(
                                     $object: ObjectPlan<{
-                                      record: PgInsertPlan<any, any, any>;
+                                      result: PgInsertPlan<any, any, any>;
                                     }>,
                                   ) {
                                     const $record =
-                                      $object.getPlanForKey("record");
+                                      $object.getPlanForKey("result");
                                     return $record.setPlan();
                                   },
                                 [],
@@ -176,10 +176,10 @@ export const PgMutationCreatePlugin: Plugin = {
                                 () =>
                                   function plan(
                                     $object: ObjectPlan<{
-                                      record: PgInsertPlan<any, any, any>;
+                                      result: PgInsertPlan<any, any, any>;
                                     }>,
                                   ) {
-                                    return $object.get("record");
+                                    return $object.get("result");
                                   },
                                 [],
                               ),
@@ -238,7 +238,7 @@ export const PgMutationCreatePlugin: Plugin = {
                             function plan(
                               _: any,
                               $object: ObjectPlan<{
-                                record: PgInsertPlan<any, any, any>;
+                                result: PgInsertPlan<any, any, any>;
                               }>,
                             ) {
                               return $object;
@@ -252,7 +252,7 @@ export const PgMutationCreatePlugin: Plugin = {
                       (object, pgInsert, source) =>
                         function plan() {
                           return object({
-                            record: pgInsert(source, {}),
+                            result: pgInsert(source, {}),
                           });
                         },
                       [object, pgInsert, source],

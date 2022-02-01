@@ -5,19 +5,22 @@
 import "./PgProceduresPlugin";
 
 import type {
+  PgClassSinglePlan,
   PgSelectArgumentSpec,
+  PgSelectPlan,
   PgSource,
   PgSourceParameter,
   PgTypeCodec,
 } from "@dataplan/pg";
+import { PgClassExpressionPlan, PgSelectSinglePlan, TYPES } from "@dataplan/pg";
+import type { ExecutablePlan, InputPlan } from "graphile-crystal";
 import {
-  PgClassExpressionPlan,
-  PgSelectPlan,
-  PgSelectSinglePlan,
-  TYPES,
-} from "@dataplan/pg";
-import type { ExecutablePlan } from "graphile-crystal";
-import { __ListTransformPlan, connection } from "graphile-crystal";
+  __ListTransformPlan,
+  connection,
+  constant,
+  object,
+  ObjectPlan,
+} from "graphile-crystal";
 import type { TrackedArguments } from "graphile-crystal/src/interfaces";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
@@ -47,6 +50,7 @@ declare global {
         this: Inflection,
         details: ProcedureDetails,
       ): string;
+      customMutationInput(this: Inflection, details: ProcedureDetails): string;
       customQuery(this: Inflection, details: ProcedureDetails): string;
       customQueryConnection(
         this: Inflection,
@@ -64,6 +68,47 @@ declare global {
   }
 }
 
+function getArgDetailsFromParameters(
+  build: GraphileEngine.Build,
+  source: PgSource<any, any, any, any>,
+  parameters: PgSourceParameter[],
+) {
+  const {
+    graphql: { GraphQLList, GraphQLNonNull },
+    getGraphQLTypeByPgCodec,
+  } = build;
+  const argDetails = parameters.map((param, index) => {
+    const argName = build.inflection.argument({
+      param,
+      source,
+      index,
+    });
+    const paramBaseCodec = param.codec.arrayOfCodec ?? param.codec;
+    const baseInputType = getGraphQLTypeByPgCodec(paramBaseCodec, "input");
+    if (!baseInputType) {
+      throw new Error(
+        `Failed to find a suitable type for argument codec '${param.codec.name}'; not adding function field for '${source}'`,
+      );
+    }
+
+    // Not necessarily a list type... Need to rename this
+    // variable.
+    const listType = param.codec.arrayOfCodec
+      ? new GraphQLList(baseInputType)
+      : baseInputType;
+
+    const inputType =
+      param.notNull && param.required ? new GraphQLNonNull(listType) : listType;
+    return {
+      argName,
+      pgCodec: param.codec,
+      inputType,
+      required: param.required,
+    };
+  });
+  return argDetails;
+}
+
 export const PgCustomTypeFieldPlugin: Plugin = {
   name: "PgCustomTypeFieldPlugin",
   description:
@@ -79,6 +124,11 @@ export const PgCustomTypeFieldPlugin: Plugin = {
       },
       customMutationPayload(options, details) {
         return this.upperCamelCase(this.customMutation(details) + "-payload");
+      },
+      customMutationInput(options, details) {
+        return this.inputType(
+          this.upperCamelCase(this.customMutation(details)),
+        );
       },
       customQuery(options, details) {
         return this.camelCase(
@@ -113,7 +163,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
     hooks: {
       init(_, build) {
         const {
-          graphql: { GraphQLList },
+          graphql: { GraphQLList, GraphQLString },
         } = build;
         // Add payload type for mutation functions
         const mutationProcSources = build.input.pgSources.filter(
@@ -124,17 +174,57 @@ export const PgCustomTypeFieldPlugin: Plugin = {
         );
 
         for (const source of mutationProcSources) {
-          const payloadTypeName = build.inflection.customMutationPayload({
+          const inputTypeName = build.inflection.customMutationInput({
             source,
           });
 
-          const ExpectedPlan = source.isUnique
-            ? source.codec.columns
-              ? PgSelectSinglePlan
-              : PgClassExpressionPlan
-            : source.sqlPartitionByIndex
-            ? __ListTransformPlan
-            : PgSelectPlan;
+          build.registerInputObjectType(
+            inputTypeName,
+            {},
+            () => {
+              const argDetails = getArgDetailsFromParameters(
+                build,
+                source,
+                source.parameters,
+              );
+
+              // Not used for isMutation; that's handled elsewhere
+              const fields = argDetails.reduce(
+                (memo, { inputType, argName }) => {
+                  memo[argName] = {
+                    type: inputType,
+                  };
+                  return memo;
+                },
+                {
+                  clientMutationId: {
+                    type: GraphQLString,
+                    plan: EXPORTABLE(
+                      () =>
+                        function plan(
+                          $input: ObjectPlan<any>,
+                          value: InputPlan,
+                        ) {
+                          $input.set("clientMutationId", value);
+                        },
+                      [],
+                    ),
+                  },
+                },
+              );
+
+              return {
+                fields,
+              };
+            },
+            "PgCustomTypeFieldPlugin mutation function input type",
+          );
+
+          ////////////////////////////////////////
+
+          const payloadTypeName = build.inflection.customMutationPayload({
+            source,
+          });
 
           const isVoid = source.codec === TYPES.void;
 
@@ -154,33 +244,56 @@ export const PgCustomTypeFieldPlugin: Plugin = {
               isMutationPayload: true,
               pgCodec: source.codec,
             },
-            ExpectedPlan as { new (...args: any[]): ExecutablePlan },
+            ObjectPlan,
             () => ({
-              fields: isVoid
-                ? {}
-                : () => {
-                    const baseType = getFunctionSourceReturnGraphQLType(
-                      build,
-                      source,
-                    );
-                    if (!baseType) {
-                      return {};
-                    }
-                    const type = source.isUnique
-                      ? baseType
-                      : new GraphQLList(baseType);
-                    return {
-                      [resultFieldName]: {
-                        type,
-                        plan: EXPORTABLE(
-                          () => ($parent) => {
-                            return $parent;
-                          },
-                          [],
-                        ),
-                      },
-                    };
+              fields: () => {
+                const fields = {
+                  clientMutationId: {
+                    type: GraphQLString,
+                    plan: EXPORTABLE(
+                      (constant) =>
+                        function plan($object: ObjectPlan<any>) {
+                          return (
+                            $object.getPlanForKey("clientMutationId", true) ??
+                            constant(undefined)
+                          );
+                        },
+                      [constant],
+                    ),
                   },
+                };
+                if (isVoid) {
+                  return fields;
+                }
+                const baseType = getFunctionSourceReturnGraphQLType(
+                  build,
+                  source,
+                );
+                if (!baseType) {
+                  console.warn(
+                    `Procedure source ${source} has a return type, but we couldn't build it; skipping output field`,
+                  );
+                  return {};
+                }
+                const type = source.isUnique
+                  ? baseType
+                  : new GraphQLList(baseType);
+                fields[resultFieldName] = {
+                  type,
+                  plan: EXPORTABLE(
+                    () =>
+                      (
+                        $object: ObjectPlan<{
+                          result: PgClassSinglePlan<any, any, any, any>;
+                        }>,
+                      ) => {
+                        return $object.get("result");
+                      },
+                    [],
+                  ),
+                };
+                return fields;
+              },
             }),
             "PgCustomTypeFieldPlugin mutation function payload type",
           );
@@ -193,7 +306,12 @@ export const PgCustomTypeFieldPlugin: Plugin = {
         const {
           getGraphQLTypeByPgCodec,
           sql,
-          graphql: { GraphQLList, GraphQLNonNull },
+          graphql: {
+            GraphQLList,
+            GraphQLNonNull,
+            GraphQLObjectType,
+            GraphQLInputObjectType,
+          },
         } = build;
         const {
           Self,
@@ -260,41 +378,13 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                     : source.parameters.slice(1)
                 ) as PgSourceParameter[];
 
-                const argDetails = remainingParameters.map((param, index) => {
-                  const argName = build.inflection.argument({
-                    param,
-                    source,
-                    index,
-                  });
-                  const paramBaseCodec =
-                    param.codec.arrayOfCodec ?? param.codec;
-                  const baseInputType = getGraphQLTypeByPgCodec(
-                    paramBaseCodec,
-                    "input",
-                  );
-                  if (!baseInputType) {
-                    throw new Error(
-                      `Failed to find a suitable type for argument codec '${param.codec.name}'; not adding function field for '${source}'`,
-                    );
-                  }
+                const argDetails = getArgDetailsFromParameters(
+                  build,
+                  source,
+                  remainingParameters,
+                );
 
-                  // Not necessarily a list type... Need to rename this
-                  // variable.
-                  const listType = param.codec.arrayOfCodec
-                    ? new GraphQLList(baseInputType)
-                    : baseInputType;
-
-                  const inputType =
-                    param.notNull && param.required
-                      ? new GraphQLNonNull(listType)
-                      : listType;
-                  return {
-                    argName,
-                    pgCodec: param.codec,
-                    inputType,
-                    required: param.required,
-                  };
-                });
+                // Not used for isMutation; that's handled elsewhere
                 const args = argDetails.reduce(
                   (memo, { inputType, argName }) => {
                     memo[argName] = {
@@ -305,63 +395,83 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                   {},
                 );
 
-                const getSelectPlanFromParentAndArgs =
-                  isRootQuery || isRootMutation
-                    ? // Not computed
-                      EXPORTABLE(
-                        (argDetails, isNotNullish, source) =>
-                          (
-                            $root: ExecutablePlan,
-                            args: TrackedArguments<any>,
-                          ) => {
-                            const selectArgs: PgSelectArgumentSpec[] = [
-                              ...argDetails
-                                .map(({ argName, pgCodec, required }) => {
-                                  const plan = args[argName];
-                                  if (!required && plan.evalIs(undefined)) {
-                                    return null;
-                                  }
-                                  return { plan, pgCodec };
-                                })
-                                .filter(isNotNullish),
-                            ];
-                            return source.execute(selectArgs);
-                          },
-                        [argDetails, isNotNullish, source],
-                      )
-                    : // Otherwise computed:
-                      EXPORTABLE(
+                const getSelectPlanFromParentAndArgs = isRootQuery
+                  ? // Not computed
+                    EXPORTABLE(
+                      (argDetails, isNotNullish, source) =>
                         (
-                            PgSelectSinglePlan,
-                            argDetails,
-                            isNotNullish,
-                            source,
-                          ) =>
-                          (
-                            $row: ExecutablePlan,
-                            args: TrackedArguments<any>,
-                          ) => {
-                            if (!($row instanceof PgSelectSinglePlan)) {
-                              throw new Error(
-                                `Invalid plan, exepcted 'PgSelectSinglePlan', but found ${$row}`,
-                              );
-                            }
-                            const selectArgs: PgSelectArgumentSpec[] = [
-                              { plan: $row.record() },
-                              ...argDetails
-                                .map(({ argName, pgCodec, required }) => {
-                                  const plan = args[argName];
-                                  if (!required && plan.evalIs(undefined)) {
-                                    return null;
-                                  }
-                                  return { plan, pgCodec };
-                                })
-                                .filter(isNotNullish),
-                            ];
-                            return source.execute(selectArgs);
-                          },
-                        [PgSelectSinglePlan, argDetails, isNotNullish, source],
-                      );
+                          $root: ExecutablePlan,
+                          args: TrackedArguments<any>,
+                        ) => {
+                          const selectArgs: PgSelectArgumentSpec[] = [
+                            ...argDetails
+                              .map(({ argName, pgCodec, required }) => {
+                                const plan = args[argName];
+                                if (!required && plan.evalIs(undefined)) {
+                                  return null;
+                                }
+                                return { plan, pgCodec };
+                              })
+                              .filter(isNotNullish),
+                          ];
+                          return source.execute(selectArgs);
+                        },
+                      [argDetails, isNotNullish, source],
+                    )
+                  : isRootMutation
+                  ? // Mutation uses 'args.input' rather than 'args'
+                    EXPORTABLE(
+                      (argDetails, constant, isNotNullish, object, source) =>
+                        (
+                          $root: ExecutablePlan,
+                          { input: args }: TrackedArguments<any>,
+                        ) => {
+                          const selectArgs: PgSelectArgumentSpec[] = [
+                            ...argDetails
+                              .map(({ argName, pgCodec, required }) => {
+                                const plan = args[argName];
+                                if (!required && plan.evalIs(undefined)) {
+                                  return null;
+                                }
+                                return {
+                                  plan: plan ?? constant(undefined),
+                                  pgCodec,
+                                };
+                              })
+                              .filter(isNotNullish),
+                          ];
+                          const $result = source.execute(selectArgs);
+                          return object({
+                            result: $result,
+                          });
+                        },
+                      [argDetails, constant, isNotNullish, object, source],
+                    )
+                  : // Otherwise computed:
+                    EXPORTABLE(
+                      (PgSelectSinglePlan, argDetails, isNotNullish, source) =>
+                        ($row: ExecutablePlan, args: TrackedArguments<any>) => {
+                          if (!($row instanceof PgSelectSinglePlan)) {
+                            throw new Error(
+                              `Invalid plan, exepcted 'PgSelectSinglePlan', but found ${$row}`,
+                            );
+                          }
+                          const selectArgs: PgSelectArgumentSpec[] = [
+                            { plan: $row.record() },
+                            ...argDetails
+                              .map(({ argName, pgCodec, required }) => {
+                                const plan = args[argName];
+                                if (!required && plan.evalIs(undefined)) {
+                                  return null;
+                                }
+                                return { plan, pgCodec };
+                              })
+                              .filter(isNotNullish),
+                          ];
+                          return source.execute(selectArgs);
+                        },
+                      [PgSelectSinglePlan, argDetails, isNotNullish, source],
+                    );
 
                 if (isRootMutation) {
                   // mutation type
@@ -370,9 +480,15 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                     build.inflection.customMutationPayload({
                       source,
                     });
-                  const payloadType =
-                    build.getOutputTypeByName(payloadTypeName);
-                  if (!payloadType) {
+                  const payloadType = build.getTypeByName(payloadTypeName);
+                  const inputTypeName = build.inflection.customMutationInput({
+                    source,
+                  });
+                  const inputType = build.getTypeByName(inputTypeName);
+                  if (!(payloadType instanceof GraphQLObjectType)) {
+                    return memo;
+                  }
+                  if (!(inputType instanceof GraphQLInputObjectType)) {
                     return memo;
                   }
                   memo[fieldName] = fieldWithHooks(
@@ -380,7 +496,18 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                     {
                       description: source.description,
                       type: payloadType,
-                      args,
+                      args: {
+                        input: {
+                          type: new GraphQLNonNull(inputType),
+                          plan: EXPORTABLE(
+                            () =>
+                              function plan(_: any, $object: ObjectPlan<any>) {
+                                return $object;
+                              },
+                            [],
+                          ),
+                        },
+                      },
                       plan: getSelectPlanFromParentAndArgs as any,
                     },
                   );
