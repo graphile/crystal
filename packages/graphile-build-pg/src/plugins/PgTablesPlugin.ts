@@ -6,8 +6,7 @@ import type {
   PgSourceRelation,
   PgTypeCodec,
 } from "@dataplan/pg";
-import { PgSelectSinglePlan } from "@dataplan/pg";
-import { PgSourceBuilder } from "@dataplan/pg";
+import { PgSelectSinglePlan, PgSourceBuilder } from "@dataplan/pg";
 import { ExecutablePlan } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
@@ -258,10 +257,7 @@ export const PgTablesPlugin: Plugin = {
           )!;
           const schemas = database.schemas;
 
-          const namespace = await info.helpers.pgIntrospection.getNamespace(
-            databaseName,
-            pgClass.relnamespace,
-          );
+          const namespace = pgClass.getNamespace();
           if (!namespace) {
             return null;
           }
@@ -271,7 +267,7 @@ export const PgTablesPlugin: Plugin = {
           }
 
           if (
-            !["r", "v", "m", "p"].includes(pgClass.relkind) ||
+            !["r", "v", "m", "p", "c"].includes(pgClass.relkind) ||
             pgClass.relispartition
           ) {
             return null;

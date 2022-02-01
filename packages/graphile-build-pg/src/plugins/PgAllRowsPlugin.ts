@@ -5,10 +5,10 @@ import type { PgSelectSinglePlan, PgSource } from "@dataplan/pg";
 import { connection } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
+import type { GraphQLObjectType, GraphQLOutputType } from "graphql";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";
-import { GraphQLOutputType } from "graphql";
 
 declare global {
   namespace GraphileEngine {
@@ -155,38 +155,41 @@ export const PgAllRowsPlugin: Plugin = {
 
           {
             const fieldName = build.inflection.allRowsConnection(source);
-            fields = build.extend(
-              fields,
-              {
-                [fieldName]: fieldWithHooks(
-                  {
-                    fieldName,
-                    isPgFieldConnection: true,
-                    pgSource: source,
-                  },
-                  () => ({
-                    type: getOutputTypeByName(
-                      build.inflection.connectionType(
-                        build.inflection.tableType(source.codec),
+            const connectionType = build.getTypeByName(
+              build.inflection.connectionType(
+                build.inflection.tableType(source.codec),
+              ),
+            ) as GraphQLObjectType | undefined;
+            if (connectionType) {
+              fields = build.extend(
+                fields,
+                {
+                  [fieldName]: fieldWithHooks(
+                    {
+                      fieldName,
+                      isPgFieldConnection: true,
+                      pgSource: source,
+                    },
+                    () => ({
+                      type: connectionType,
+                      plan: EXPORTABLE(
+                        (connection, source) =>
+                          function plan() {
+                            return connection(
+                              source.find(),
+                              ($item) => $item,
+                              ($item: PgSelectSinglePlan<any, any, any, any>) =>
+                                $item.cursor(),
+                            );
+                          },
+                        [connection, source],
                       ),
-                    ),
-                    plan: EXPORTABLE(
-                      (connection, source) =>
-                        function plan() {
-                          return connection(
-                            source.find(),
-                            ($item) => $item,
-                            ($item: PgSelectSinglePlan<any, any, any, any>) =>
-                              $item.cursor(),
-                          );
-                        },
-                      [connection, source],
-                    ),
-                  }),
-                ),
-              },
-              `Adding 'all rows' connection field for PgSource ${source}`,
-            );
+                    }),
+                  ),
+                },
+                `Adding 'all rows' connection field for PgSource ${source}`,
+              );
+            }
           }
         }
         return fields;

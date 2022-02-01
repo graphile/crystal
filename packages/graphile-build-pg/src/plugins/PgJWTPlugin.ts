@@ -52,7 +52,6 @@ export const PgJWTPlugin: Plugin = {
           info.options.jwtType?.[1] === pgType.typname &&
           info.options.jwtType?.[0] === pgType.getNamespace()!.nspname
         ) {
-          console.log("MATCH!", pgType);
           // It's a JWT type!
           pgCodec.extensions ||= {};
           pgCodec.extensions.tags ||= {};
@@ -71,7 +70,6 @@ export const PgJWTPlugin: Plugin = {
         const jwtCodec = [...build.pgCodecMetaLookup.keys()].find((codec) => {
           const behavior = getBehavior(codec.extensions);
           // TODO: why is b.jwt_token not found here?
-          console.log({ name: codec.name, behavior });
           if (behavior?.includes("jwt")) {
             return true;
           }

@@ -123,10 +123,7 @@ export const PgProceduresPlugin: Plugin = {
           )!;
           const schemas = database.schemas;
 
-          const namespace = await info.helpers.pgIntrospection.getNamespace(
-            databaseName,
-            pgProc.pronamespace,
-          );
+          const namespace = pgProc.getNamespace();
           if (!namespace) {
             return null;
           }
@@ -158,6 +155,7 @@ export const PgProceduresPlugin: Plugin = {
 
           const isRecordReturnType =
             pgProc.prorettype === "2249"; /* OID of the 'record' type */
+          const debugProcName = `${namespace.nspname}.${pgProc.proname}`;
 
           if (isRecordReturnType && !needsPayloadCodecToBeGenerated) {
             // We do not support anonymous 'record' return type
@@ -206,6 +204,14 @@ export const PgProceduresPlugin: Plugin = {
                     null,
                   );
                 if (!columnCodec) {
+                  console.warn(
+                    `Could not make codec for '${debugProcName}' argument '${argName}' which has type ${argType} (${
+                      (await info.helpers.pgIntrospection.getType(
+                        databaseName,
+                        argType,
+                      ))!.typname
+                    }); skipping function`,
+                  );
                   return null;
                 }
                 columns[argName] = {
@@ -240,6 +246,9 @@ export const PgProceduresPlugin: Plugin = {
               );
 
           if (!returnCodec) {
+            console.warn(
+              `Could not make return codec for '${debugProcName}'; skipping function`,
+            );
             return null;
           }
 
@@ -298,6 +307,14 @@ export const PgProceduresPlugin: Plugin = {
                 typeModifier,
               );
               if (!argCodec) {
+                console.warn(
+                  `Could not make codec for '${debugProcName}' argument '${argName}' which has type ${argType} (${
+                    (await info.helpers.pgIntrospection.getType(
+                      databaseName,
+                      argType,
+                    ))!.typname
+                  }); skipping function`,
+                );
                 return null;
               }
               let required = i < numberOfRequiredArguments;
@@ -342,7 +359,10 @@ export const PgProceduresPlugin: Plugin = {
               databaseName,
               pgProc.prorettype,
             );
-            if (!returnPgType) return null;
+            if (!returnPgType) {
+              console.log(`Failed to get returnPgType for '${debugProcName}'`);
+              return null;
+            }
             const returnsArray = !!returnCodec.arrayOfCodec;
             const pgType = returnsArray
               ? await info.helpers.pgIntrospection.getType(

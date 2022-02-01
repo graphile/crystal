@@ -7,12 +7,12 @@ import type {
   PgSourceColumns,
 } from "@dataplan/pg";
 import type { ConnectionPlan, InputPlan } from "graphile-crystal";
+import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
-import type { GraphQLInputType } from "graphql";
+import type { GraphQLInputObjectType, GraphQLInputType } from "graphql";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";
-import { EXPORTABLE } from "graphile-exporter";
 
 declare global {
   namespace GraphileEngine {
@@ -191,9 +191,9 @@ export const PgConditionArgumentPlugin: Plugin = {
         const tableTypeName = build.inflection.tableType(pgSource.codec);
         const tableConditionTypeName =
           build.inflection.conditionType(tableTypeName);
-        const tableConditionType = build.getInputTypeByName(
+        const tableConditionType = build.getTypeByName(
           tableConditionTypeName,
-        );
+        ) as GraphQLInputObjectType | undefined;
         if (!tableConditionType) {
           return args;
         }
