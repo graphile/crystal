@@ -1,4 +1,4 @@
-import type { PgSource, PgTypeCodec } from "@dataplan/pg";
+import type { PgSource, PgSourceUnique, PgTypeCodec } from "@dataplan/pg";
 import type { TrackedArguments } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
@@ -62,7 +62,8 @@ export const PgRowByUniquePlugin: Plugin = {
           (outerMemo, source) =>
             build.recoverable(outerMemo, () =>
               // TODO: by having 'uniques' be a simple array, we can't add 'behaviour' extensions.
-              (source.uniques as string[][]).reduce((memo, uniqueKeys) => {
+              (source.uniques as PgSourceUnique[]).reduce((memo, unique) => {
+                const uniqueKeys = unique.columns as string[];
                 const fieldName = build.inflection.rowByUniqueKeys({
                   uniqueKeys,
                   source,

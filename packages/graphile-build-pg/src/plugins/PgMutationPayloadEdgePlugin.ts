@@ -1,6 +1,5 @@
 import "graphile-build";
 
-import { inspect } from "util";
 import type {
   PgClassSinglePlan,
   PgDeletePlan,
@@ -8,6 +7,7 @@ import type {
   PgSelectSinglePlan,
   PgSource,
   PgSourceRelation,
+  PgSourceUnique,
   PgTypeCodec,
   PgUpdatePlan,
 } from "@dataplan/pg";
@@ -29,6 +29,7 @@ import type {
   GraphQLObjectType,
 } from "graphql";
 import sql from "pg-sql2";
+import { inspect } from "util";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";
@@ -106,10 +107,13 @@ export const PgMutationPayloadEdgePlugin: Plugin = {
 
         const source = sources[0];
 
-        const pkColumns = source.uniques?.[0] as string[] | undefined;
-        if (!pkColumns) {
+        const pk = (source.uniques as PgSourceUnique[])?.find(
+          (u) => u.isPrimary,
+        );
+        if (!pk) {
           return fields;
         }
+        const pkColumns = pk.columns;
 
         const TableType = build.getGraphQLTypeByPgCodec(pgCodec, "output") as
           | GraphQLObjectType<any, any>
@@ -174,6 +178,7 @@ export const PgMutationPayloadEdgePlugin: Plugin = {
                     connection,
                     constant,
                     getEnumValueConfig,
+                    inspect,
                     pkColumns,
                     source,
                   ) =>
@@ -235,6 +240,7 @@ export const PgMutationPayloadEdgePlugin: Plugin = {
                     connection,
                     constant,
                     getEnumValueConfig,
+                    inspect,
                     pkColumns,
                     source,
                   ],

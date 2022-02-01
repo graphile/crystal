@@ -194,7 +194,7 @@ async function main() {
         executor,
         source: usersCodec.sqlType,
         codec: usersCodec,
-        uniques: [["id"]],
+        uniques: [{ columns: ["id"], isPrimary: true }],
       }),
     [PgSourceBuilder, executor, usersCodec],
   );
@@ -207,7 +207,7 @@ async function main() {
         executor,
         source: forumsCodec.sqlType,
         codec: forumsCodec,
-        uniques: [["id"]],
+        uniques: [{ columns: ["id"], isPrimary: true }],
       }),
     [PgSourceBuilder, executor, forumsCodec],
   );
@@ -219,7 +219,7 @@ async function main() {
         executor,
         source: messagesCodec.sqlType,
         codec: messagesCodec,
-        uniques: [["id"]],
+        uniques: [{ columns: ["id"], isPrimary: true }],
       }),
     [PgSourceBuilder, executor, messagesCodec],
   );

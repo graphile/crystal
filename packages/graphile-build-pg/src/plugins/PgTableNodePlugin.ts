@@ -61,7 +61,7 @@ export const PgTableNodePlugin: Plugin = {
             continue;
           }
           const pgSource = sources[0];
-          const pk = pgSource.uniques[0] as string[];
+          const pk = pgSource.uniques[0].columns as string[];
 
           build.registerNodeIdHandler(tableTypeName, {
             codecName: "base64JSON",

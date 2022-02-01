@@ -11,6 +11,7 @@ import type {
   PgSourceParameter,
   PgSourceRelation,
   PgSourceRow,
+  PgSourceUnique,
 } from "../datasource";
 import { PgSourceBuilder } from "../datasource";
 import type { PgTypeCodec, PgTypedExecutablePlan } from "../interfaces";
@@ -56,7 +57,9 @@ const CHEAP_COLUMN_TYPES = new Set([
  */
 export class PgSelectSinglePlan<
     TColumns extends PgSourceColumns | undefined,
-    TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+    TUniques extends ReadonlyArray<
+      PgSourceUnique<Exclude<TColumns, undefined>>
+    >,
     TRelations extends {
       [identifier: string]: TColumns extends PgSourceColumns
         ? PgSourceRelation<TColumns, any>
@@ -557,7 +560,7 @@ export class PgSelectSinglePlan<
 
 export function pgSelectSingleFromRecord<
   TColumns extends PgSourceColumns,
-  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgSourceColumns
       ? PgSourceRelation<TColumns, any>

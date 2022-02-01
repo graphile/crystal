@@ -467,7 +467,7 @@ export function makeExampleSchema(
         codec: recordType("messages", sql`app_public.messages`, messageColumns),
         source: sql`app_public.messages`,
         name: "messages",
-        uniques: [["id"]],
+        uniques: [{ columns: ["id"], isPrimary: true }],
       }),
     [PgSourceBuilder, executor, messageColumns, recordType, sql],
   );
@@ -479,7 +479,10 @@ export function makeExampleSchema(
         codec: recordType("users", sql`app_public.users`, userColumns),
         source: sql`app_public.users`,
         name: "users",
-        uniques: [["id"], ["username"]],
+        uniques: [
+          { columns: ["id"], isPrimary: true },
+          { columns: ["username"] },
+        ],
       }),
     [PgSource, executor, recordType, sql, userColumns],
   );
@@ -491,7 +494,7 @@ export function makeExampleSchema(
         codec: forumCodec,
         source: sql`app_public.forums`,
         name: "forums",
-        uniques: [["id"]],
+        uniques: [{ columns: ["id"], isPrimary: true }],
       }),
     [PgSource, executor, forumCodec, sql],
   );
@@ -652,7 +655,7 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.person_bookmarks`,
         name: "person_bookmarks",
-        uniques: [["id"]],
+        uniques: [{ columns: ["id"], isPrimary: true }],
       }),
     [PgSourceBuilder, executor, personBookmarkColumns, recordType, sql],
   );
@@ -676,7 +679,10 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.people`,
         name: "people",
-        uniques: [["person_id"], ["username"]],
+        uniques: [
+          { columns: ["person_id"], isPrimary: true },
+          { columns: ["username"] },
+        ],
       }),
     [PgSourceBuilder, executor, personColumns, recordType, sql],
   );
@@ -705,7 +711,7 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.posts`,
         name: "posts",
-        uniques: [["post_id"]],
+        uniques: [{ columns: ["post_id"], isPrimary: true }],
       }),
     [PgSourceBuilder, executor, postColumns, recordType, sql],
   );
@@ -739,7 +745,7 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.comments`,
         name: "comments",
-        uniques: [["comment_id"]],
+        uniques: [{ columns: ["comment_id"], isPrimary: true }],
       }),
     [PgSourceBuilder, commentColumns, executor, recordType, sql],
   );
@@ -781,7 +787,7 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.enum_table_item_type`,
         name: "enum_table_item_type",
-        uniques: [["type"]],
+        uniques: [{ columns: ["type"], isPrimary: true }],
       }),
     [PgSourceBuilder, enumTablesItemTypeColumns, executor, recordType, sql],
   );
@@ -866,7 +872,7 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.single_table_items`,
         name: "single_table_items",
-        uniques: [["id"]],
+        uniques: [{ columns: ["id"], isPrimary: true }],
       }),
     [PgSourceBuilder, executor, recordType, singleTableItemColumns, sql],
   );
@@ -1040,7 +1046,7 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.relational_items`,
         name: "relational_items",
-        uniques: [["id"]],
+        uniques: [{ columns: ["id"], isPrimary: true }],
       }),
     [PgSourceBuilder, executor, recordType, relationalItemColumns, sql],
   );
@@ -1170,7 +1176,7 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.relational_topics`,
         name: "relational_topics",
-        uniques: [["id"]],
+        uniques: [{ columns: ["id"], isPrimary: true }],
       }),
     [PgSourceBuilder, executor, recordType, relationalTopicsColumns, sql],
   );
@@ -1196,7 +1202,7 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.relational_posts`,
         name: "relational_posts",
-        uniques: [["id"]],
+        uniques: [{ columns: ["id"], isPrimary: true }],
       }),
     [PgSourceBuilder, executor, recordType, relationalPostsColumns, sql],
   );
@@ -1221,7 +1227,7 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.relational_dividers`,
         name: "relational_dividers",
-        uniques: [["id"]],
+        uniques: [{ columns: ["id"], isPrimary: true }],
       }),
     [PgSourceBuilder, executor, recordType, relationalDividersColumns, sql],
   );
@@ -1245,7 +1251,7 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.relational_checklists`,
         name: "relational_checklists",
-        uniques: [["id"]],
+        uniques: [{ columns: ["id"], isPrimary: true }],
       }),
     [PgSourceBuilder, executor, recordType, relationalChecklistsColumns, sql],
   );
@@ -1276,7 +1282,7 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.relational_checklist_items`,
         name: "relational_checklist_items",
-        uniques: [["id"]],
+        uniques: [{ columns: ["id"], isPrimary: true }],
       }),
     [
       PgSourceBuilder,
@@ -1481,7 +1487,7 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.union_items`,
         name: "union_items",
-        uniques: [["id"]],
+        uniques: [{ columns: ["id"], isPrimary: true }],
       }),
     [PgSourceBuilder, executor, recordType, sql, unionItemsColumns],
   );
@@ -1504,7 +1510,7 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.union_topics`,
         name: "union_topics",
-        uniques: [["id"]],
+        uniques: [{ columns: ["id"], isPrimary: true }],
       }),
     [PgSource, executor, recordType, sql, unionTopicsColumns],
   );
@@ -1529,7 +1535,7 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.union_posts`,
         name: "union_posts",
-        uniques: [["id"]],
+        uniques: [{ columns: ["id"], isPrimary: true }],
       }),
     [PgSource, executor, recordType, sql, unionPostsColumns],
   );
@@ -1553,7 +1559,7 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.union_dividers`,
         name: "union_dividers",
-        uniques: [["id"]],
+        uniques: [{ columns: ["id"], isPrimary: true }],
       }),
     [PgSource, executor, recordType, sql, unionDividersColumns],
   );
@@ -1576,7 +1582,7 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.union_checklists`,
         name: "union_checklists",
-        uniques: [["id"]],
+        uniques: [{ columns: ["id"], isPrimary: true }],
       }),
     [PgSource, executor, recordType, sql, unionChecklistsColumns],
   );
@@ -1600,7 +1606,7 @@ export function makeExampleSchema(
         ),
         source: sql`interfaces_and_unions.union_checklist_items`,
         name: "union_checklist_items",
-        uniques: [["id"]],
+        uniques: [{ columns: ["id"], isPrimary: true }],
       }),
     [PgSource, executor, recordType, sql, unionChecklistItemsColumns],
   );

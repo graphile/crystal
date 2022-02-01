@@ -10,6 +10,7 @@ import type {
   PgSourceColumns,
   PgSourceRelation,
   PgSourceRow,
+  PgSourceUnique,
 } from "../datasource";
 import type { PgTypeCodec, PlanByUniques } from "../interfaces";
 import type { PgClassExpressionPlan } from "./pgClassExpression";
@@ -33,7 +34,7 @@ interface PgDeletePlanFinalizeResults {
 
 export class PgDeletePlan<
   TColumns extends PgSourceColumns | undefined,
-  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgSourceColumns
       ? PgSourceRelation<TColumns, any>
@@ -115,7 +116,7 @@ export class PgDeletePlan<
 
     if (
       !this.source.uniques.some((uniq) =>
-        uniq.every((key) => keys.includes(key)),
+        uniq.columns.every((key) => keys.includes(key as any)),
       )
     ) {
       throw new Error(
@@ -135,7 +136,7 @@ export class PgDeletePlan<
           );
         }
       }
-      const value = getBy![name];
+      const value = getBy![name as any];
       const depId = this.addDependency(value);
       const column = this.source.codec.columns![name] as PgSourceColumn;
       const pgCodec = column.codec;
@@ -351,7 +352,7 @@ export class PgDeletePlan<
 
 export function pgDelete<
   TColumns extends PgSourceColumns | undefined,
-  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgSourceColumns
       ? PgSourceRelation<TColumns, any>

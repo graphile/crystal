@@ -9,6 +9,7 @@ import type {
   PgSourceColumns,
   PgSourceParameter,
   PgSourceRelation,
+  PgSourceUnique,
 } from "../datasource";
 import type {
   PgClassSinglePlan,
@@ -36,7 +37,9 @@ export class PgClassExpressionPlan<
     TExpressionColumns extends PgSourceColumns | undefined,
     TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any, any>,
     TSourceColumns extends PgSourceColumns | undefined,
-    TUniques extends ReadonlyArray<ReadonlyArray<keyof TSourceColumns>>,
+    TUniques extends ReadonlyArray<
+      PgSourceUnique<Exclude<TSourceColumns, undefined>>
+    >,
     TRelations extends {
       [identifier: string]: TSourceColumns extends PgSourceColumns
         ? PgSourceRelation<TSourceColumns, any>
@@ -266,7 +269,9 @@ function pgClassExpression<
   TExpressionColumns extends PgSourceColumns | undefined,
   TExpressionCodec extends PgTypeCodec<TExpressionColumns, any, any>,
   TSourceColumns extends PgSourceColumns | undefined,
-  TUniques extends ReadonlyArray<ReadonlyArray<keyof TSourceColumns>>,
+  TUniques extends ReadonlyArray<
+    PgSourceUnique<Exclude<TSourceColumns, undefined>>
+  >,
   TRelations extends {
     [identifier: string]: TSourceColumns extends PgSourceColumns
       ? PgSourceRelation<TSourceColumns, any>

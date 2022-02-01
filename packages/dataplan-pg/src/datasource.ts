@@ -127,6 +127,7 @@ export type PgSourceRow<TColumns extends PgSourceColumns | undefined> =
     : undefined;
 
 export interface PgSourceRelationExtensions {}
+export interface PgSourceUniqueExtensions {}
 
 export interface PgSourceRelation<
   TLocalColumns extends PgSourceColumns,
@@ -151,9 +152,17 @@ export interface PgSourceParameter {
   notNull?: boolean;
 }
 
+export interface PgSourceUnique<
+  TColumns extends PgSourceColumns = PgSourceColumns,
+> {
+  columns: ReadonlyArray<keyof TColumns>;
+  isPrimary?: boolean;
+  extensions?: PgSourceUniqueExtensions;
+}
+
 export interface PgSourceOptions<
   TColumns extends PgSourceColumns | undefined,
-  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgSourceColumns
       ? PgSourceRelation<TColumns, any>
@@ -189,7 +198,7 @@ export interface PgSourceOptions<
  */
 export class PgSourceBuilder<
   TColumns extends PgSourceColumns | undefined,
-  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TParameters extends PgSourceParameter[] | undefined = undefined,
 > {
   /** TypeScript hack, avoid. @internal */
@@ -281,7 +290,7 @@ let temporarySourceCounter = 0;
  */
 export class PgSource<
   TColumns extends PgSourceColumns | undefined,
-  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgSourceColumns
       ? PgSourceRelation<TColumns, any>
@@ -437,7 +446,9 @@ export class PgSource<
    * type/relations/etc.
    */
   public alternativeSource<
-    TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+    TUniques extends ReadonlyArray<
+      PgSourceUnique<Exclude<TColumns, undefined>>
+    >,
   >(overrideOptions: {
     name: string;
     identifier?: string;
@@ -467,7 +478,9 @@ export class PgSource<
    * type/relations/etc but pull their rows from functions.
    */
   public functionSource<
-    TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+    TUniques extends ReadonlyArray<
+      PgSourceUnique<Exclude<TColumns, undefined>>
+    >,
     TNewParameters extends PgSourceParameter[],
   >(overrideOptions: {
     name: string;
@@ -707,7 +720,11 @@ export class PgSource<
     const keys = Object.keys(spec) as ReadonlyArray<string> as ReadonlyArray<
       keyof TColumns
     >;
-    if (!this.uniques.some((uniq) => uniq.every((key) => keys.includes(key)))) {
+    if (
+      !this.uniques.some((uniq) =>
+        uniq.columns.every((key) => keys.includes(key as any)),
+      )
+    ) {
       throw new Error(
         `Attempted to call ${this}.get({${keys.join(
           ", ",
@@ -858,7 +875,7 @@ export class PgSource<
       // We're just going to assume the first unique is the primary key, and that
       // if that's not null then we're not null
       const pk = this.uniques[0];
-      const columns = (pk as readonly string[]).map(
+      const columns = (pk.columns as readonly string[]).map(
         (col) => sql`${alias}.${sql.identifier(col)}`,
       );
       return sql`(not((${sql.join(columns, ", ")}) is null))::text`;

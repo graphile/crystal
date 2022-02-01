@@ -6,6 +6,7 @@ import type {
   PgSelectSinglePlan,
   PgSourceColumn,
   PgSourceColumns,
+  PgSourceUnique,
   PgTypeCodec,
 } from "@dataplan/pg";
 import type { ConnectionPlan, InputPlan } from "graphile-crystal";
@@ -47,10 +48,13 @@ export const PgOrderByPrimaryKeyPlugin: Plugin = {
           return values;
         }
 
-        const primaryKeyColumns = sources[0].uniques[0] as string[];
-        if (!primaryKeyColumns) {
+        const primaryKey = (sources[0].uniques as PgSourceUnique[]).find(
+          (source) => source.isPrimary,
+        );
+        if (!primaryKey) {
           return values;
         }
+        const primaryKeyColumns = primaryKey.columns as string[];
 
         return extend(
           values,
@@ -59,7 +63,8 @@ export const PgOrderByPrimaryKeyPlugin: Plugin = {
               extensions: {
                 graphile: {
                   plan: EXPORTABLE(
-                    (pgCodec, primaryKeyColumns, sql) => (plan: PgSelectPlan<any, any, any, any>) => {
+                    (pgCodec, primaryKeyColumns, sql) =>
+                      (plan: PgSelectPlan<any, any, any, any>) => {
                         primaryKeyColumns.forEach((columnName) => {
                           const column = pgCodec.columns[columnName];
                           plan.orderBy({
@@ -81,7 +86,8 @@ export const PgOrderByPrimaryKeyPlugin: Plugin = {
               extensions: {
                 graphile: {
                   plan: EXPORTABLE(
-                    (pgCodec, primaryKeyColumns, sql) => (plan: PgSelectPlan<any, any, any, any>) => {
+                    (pgCodec, primaryKeyColumns, sql) =>
+                      (plan: PgSelectPlan<any, any, any, any>) => {
                         primaryKeyColumns.forEach((columnName) => {
                           const column = pgCodec.columns[columnName];
                           plan.orderBy({

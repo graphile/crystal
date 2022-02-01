@@ -6,6 +6,7 @@ import type {
   PgSelectSinglePlan,
   PgSourceColumn,
   PgSourceColumns,
+  PgSourceUnique,
   PgTypeCodec,
 } from "@dataplan/pg";
 import type { ConnectionPlan, InputPlan } from "graphile-crystal";
@@ -66,7 +67,7 @@ export const PgOrderAllColumnsPlugin: Plugin = {
         const sources = build.input.pgSources.filter(
           (s) => s.codec === pgCodec && !s.parameters,
         );
-        const uniques = sources.flatMap((s) => s.uniques);
+        const uniques = sources.flatMap((s) => s.uniques as PgSourceUnique[]);
         return extend(
           values,
           Object.entries(columns).reduce((memo, [columnName, column]) => {
@@ -80,7 +81,9 @@ export const PgOrderAllColumnsPlugin: Plugin = {
                 return memo;
               }
             }
-            const isUnique = uniques.some((list) => list[0] === columnName);
+            const isUnique = uniques.some(
+              (list) => list.columns[0] === columnName,
+            );
 
             const ascFieldName = inflection.orderByColumnEnum({
               column,

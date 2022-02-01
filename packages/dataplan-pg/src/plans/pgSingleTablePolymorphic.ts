@@ -12,12 +12,15 @@ import type {
   PgSourceParameter,
   PgSourceRelation,
   PgSourceRow,
+  PgSourceUnique,
 } from "../datasource";
 import type { PgSelectSinglePlan } from "./pgSelectSingle";
 
 export class PgSingleTablePolymorphicPlan<
     TColumns extends PgSourceColumns | undefined,
-    TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+    TUniques extends ReadonlyArray<
+      PgSourceUnique<Exclude<TColumns, undefined>>
+    >,
     TRelations extends {
       [identifier: string]: TColumns extends PgSourceColumns
         ? PgSourceRelation<TColumns, any>
@@ -71,7 +74,7 @@ export class PgSingleTablePolymorphicPlan<
 
 export function pgSingleTablePolymorphic<
   TColumns extends PgSourceColumns | undefined,
-  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgSourceColumns
       ? PgSourceRelation<TColumns, any>

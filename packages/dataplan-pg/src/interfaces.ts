@@ -5,6 +5,7 @@ import type {
   PgSourceColumns,
   PgSourceParameter,
   PgSourceRelation,
+  PgSourceUnique,
 } from "./datasource";
 import type { PgDeletePlan } from "./plans/pgDelete";
 import type { PgInsertPlan } from "./plans/pgInsert";
@@ -17,7 +18,7 @@ import type { PgUpdatePlan } from "./plans/pgUpdate";
  */
 export type PgClassSinglePlan<
   TColumns extends PgSourceColumns | undefined,
-  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgSourceColumns
       ? PgSourceRelation<TColumns, any>
@@ -192,7 +193,9 @@ export type TuplePlanMap<
 
 export type PlanByUniques<
   TColumns extends PgSourceColumns | undefined,
-  TUniqueColumns extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TUniqueColumns extends ReadonlyArray<
+    PgSourceUnique<Exclude<TColumns, undefined>>
+  >,
 > = TColumns extends PgSourceColumns
-  ? TuplePlanMap<TColumns, TUniqueColumns[number]>[number]
+  ? TuplePlanMap<TColumns, TUniqueColumns[number]["columns"] & string[]>[number]
   : undefined;

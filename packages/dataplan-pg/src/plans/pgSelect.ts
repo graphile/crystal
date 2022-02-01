@@ -40,6 +40,7 @@ import type {
   PgSourceParameter,
   PgSourceRelation,
   PgSourceRow,
+  PgSourceUnique,
 } from "../datasource";
 import { PgSourceBuilder } from "../datasource";
 import type {
@@ -91,7 +92,7 @@ function isStaticInputPlan(
 type LockableParameter = "orderBy" | "first" | "last" | "offset" | "groupBy";
 type LockCallback<
   TColumns extends PgSourceColumns | undefined,
-  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgSourceColumns
       ? PgSourceRelation<TColumns, any>
@@ -243,7 +244,9 @@ interface PgSelectOptions<TColumns extends PgSourceColumns | undefined> {
  */
 export class PgSelectPlan<
     TColumns extends PgSourceColumns | undefined,
-    TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+    TUniques extends ReadonlyArray<
+      PgSourceUnique<Exclude<TColumns, undefined>>
+    >,
     TRelations extends {
       [identifier: string]: TColumns extends PgSourceColumns
         ? PgSourceRelation<TColumns, any>
@@ -2587,13 +2590,13 @@ function joinMatches(
  * Apply a default order in case our default is not unique.
  */
 function ensureOrderIsUnique(plan: PgSelectPlan<any, any, any, any>) {
-  const uniqueColumns: string[] = plan.source.uniques[0];
-  if (uniqueColumns) {
+  const unique = (plan.source.uniques as PgSourceUnique[])[0];
+  if (unique) {
     const ordersIsUnique = plan.orderIsUnique();
     if (!ordersIsUnique) {
-      uniqueColumns.forEach((c) => {
+      unique.columns.forEach((c) => {
         plan.orderBy({
-          fragment: sql`${plan.alias}.${sql.identifier(c)}`,
+          fragment: sql`${plan.alias}.${sql.identifier(c as string)}`,
           codec: plan.source.codec.columns[c].codec,
           direction: "ASC",
         });
@@ -2605,7 +2608,7 @@ function ensureOrderIsUnique(plan: PgSelectPlan<any, any, any, any>) {
 
 export function pgSelect<
   TColumns extends PgSourceColumns | undefined,
-  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgSourceColumns
       ? PgSourceRelation<TColumns, any>
@@ -2627,7 +2630,7 @@ Object.defineProperty(pgSelect, "$$export", {
 
 export function pgSelectFromRecords<
   TColumns extends PgSourceColumns,
-  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgSourceColumns
       ? PgSourceRelation<TColumns, any>

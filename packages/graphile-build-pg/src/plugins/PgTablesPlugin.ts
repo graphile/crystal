@@ -308,11 +308,13 @@ export const PgTablesPlugin: Plugin = {
             );
           }
 
-          const uniques = uniqueColumnOnlyConstraints.map((c) =>
-            c.conkey!.map(
+          const uniques = uniqueColumnOnlyConstraints.map((c) => ({
+            isPrimary: c.contype === "p",
+            columns: c.conkey!.map(
               (k) => attributes.find((att) => att.attnum === k)!.attname,
             ),
-          );
+            extensions: {},
+          }));
 
           const executor =
             info.helpers.pgIntrospection.getExecutorForDatabase(databaseName);

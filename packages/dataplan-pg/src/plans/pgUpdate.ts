@@ -10,6 +10,7 @@ import type {
   PgSourceColumns,
   PgSourceRelation,
   PgSourceRow,
+  PgSourceUnique,
 } from "../datasource";
 import type {
   PgTypeCodec,
@@ -37,7 +38,7 @@ interface PgUpdatePlanFinalizeResults {
 
 export class PgUpdatePlan<
   TColumns extends PgSourceColumns | undefined,
-  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgSourceColumns
       ? PgSourceRelation<TColumns, any>
@@ -131,7 +132,7 @@ export class PgUpdatePlan<
 
     if (
       !this.source.uniques.some((uniq) =>
-        uniq.every((key) => keys.includes(key)),
+        uniq.columns.every((key) => keys.includes(key as any)),
       )
     ) {
       throw new Error(
@@ -151,7 +152,7 @@ export class PgUpdatePlan<
           );
         }
       }
-      const value = getBy![name];
+      const value = getBy![name as any];
       const depId = this.addDependency(value);
       const column = this.source.codec.columns![name] as PgSourceColumn;
       const pgCodec = column.codec;
@@ -420,7 +421,7 @@ export class PgUpdatePlan<
 
 export function pgUpdate<
   TColumns extends PgSourceColumns | undefined,
-  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgSourceColumns
       ? PgSourceRelation<TColumns, any>

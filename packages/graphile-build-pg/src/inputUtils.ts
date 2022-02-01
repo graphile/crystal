@@ -9,6 +9,8 @@ import type {
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
 
+import type { PgSourceUnique } from "../../../node_modules/@dataplan/pg/src/datasource";
+
 export interface PgTypeCodecMeta {
   typeNameBySituation: {
     [situation: string]: string;
@@ -102,7 +104,7 @@ function walkCodec(
 
 function resolveSource<
   TColumns extends PgSourceColumns | undefined,
-  TUniques extends ReadonlyArray<ReadonlyArray<keyof TColumns>>,
+  TUniques extends ReadonlyArray<PgSourceUnique<Exclude<TColumns, undefined>>>,
   TRelations extends {
     [identifier: string]: TColumns extends PgSourceColumns
       ? PgSourceRelation<TColumns, any>
