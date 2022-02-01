@@ -19,6 +19,7 @@ import type {
 } from "../interfaces";
 import type { PgClassExpressionPlan } from "./pgClassExpression";
 import { pgClassExpression } from "./pgClassExpression";
+import { PgSetPlan } from "./pgSet";
 
 type QueryValueDetailsBySymbol = Map<
   symbol,
@@ -187,6 +188,15 @@ export class PgUpdatePlan<
     ] as PgSourceColumn;
     const depId = this.addDependency(value);
     this.columns.push({ name, depId, pgCodec });
+  }
+
+  setPlan(): PgSetPlan<keyof TColumns & string, this> {
+    if (this.locked) {
+      throw new Error(
+        `${this}: cannot set values once plan is locked ('setPlan')`,
+      );
+    }
+    return new PgSetPlan(this);
   }
 
   /**
