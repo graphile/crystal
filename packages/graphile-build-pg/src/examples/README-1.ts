@@ -64,6 +64,7 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
   ]);
   const shared = { inflection: buildInflection(config) };
   const input = await gather(config, shared);
+  /*
   console.log("Sources:");
   console.log(
     "  " +
@@ -74,6 +75,7 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
         )
         .join("\n  "),
   );
+  */
   const schema = buildSchema(config, input, shared);
 
   // Output our schema
