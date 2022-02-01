@@ -92,6 +92,8 @@ declare global {
         this: GraphileEngine.Inflection,
         codec: PgTypeCodec<any, any, any>,
       ): string;
+
+      patchType(this: GraphileEngine.Inflection, typeName: string): string;
     }
 
     interface ScopeGraphQLObjectType {
@@ -201,6 +203,10 @@ export const PgTablesPlugin: Plugin = {
 
       tableType(options, codec) {
         return this.upperCamelCase(this._singularizedCodecName(codec));
+      },
+
+      patchType(options, typeName) {
+        return this.upperCamelCase(`${typeName}-patch`);
       },
     },
   },
@@ -427,7 +433,7 @@ export const PgTablesPlugin: Plugin = {
 
             if (
               (!behavior && !codec.isAnonymous) ||
-              behavior?.includes("insertable")
+              behavior?.includes("insert")
             ) {
               const inputTypeName = inflection.inputType(tableTypeName);
               build.registerInputObjectType(
@@ -442,6 +448,25 @@ export const PgTablesPlugin: Plugin = {
                 `PgTablesPlugin input table type for ${codec.name}`,
               );
               setGraphQLTypeForPgCodec(codec, ["input"], inputTypeName);
+            }
+
+            if (
+              (!behavior && !codec.isAnonymous) ||
+              behavior?.includes("update")
+            ) {
+              const patchTypeName = inflection.patchType(tableTypeName);
+              build.registerInputObjectType(
+                patchTypeName,
+                {
+                  pgCodec: codec,
+                  isPgPatch: true,
+                  isPgRowType: selectable,
+                  isPgCompoundType: !selectable,
+                },
+                () => ({}),
+                `PgTablesPlugin patch table type for ${codec.name}`,
+              );
+              setGraphQLTypeForPgCodec(codec, ["patch"], patchTypeName);
             }
 
             if (!behavior || behavior.includes("connection")) {

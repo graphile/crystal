@@ -1,17 +1,27 @@
 import type {
-  PgInsertPlan,
+  PgClassSinglePlan,
+  PgDeletePlan,
   PgSource,
   PgSourceColumn,
   PgSourceUnique,
-  PgClassSinglePlan,
+  PgUpdatePlan,
 } from "@dataplan/pg";
-import { pgInsert } from "@dataplan/pg";
-import type { InputPlan } from "graphile-crystal";
-import { lambda } from "graphile-crystal";
-import { constant, ObjectPlan } from "graphile-crystal";
+import { pgDelete, pgInsert, pgUpdate } from "@dataplan/pg";
+import type {
+  __TrackedObjectPlan,
+  ExecutablePlan,
+  InputObjectPlan,
+  InputPlan,
+  TrackedArguments,
+} from "graphile-crystal";
+import { constant, lambda, object, ObjectPlan } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
-import type { GraphQLObjectType, GraphQLOutputType } from "graphql";
+import type {
+  GraphQLFieldConfigMap,
+  GraphQLObjectType,
+  GraphQLOutputType,
+} from "graphql";
 
 import { getBehavior } from "../behavior";
 import { version } from "../index";
@@ -304,7 +314,9 @@ export const PgMutationUpdateDeletePlugin: Plugin = {
                                 () =>
                                   function plan(
                                     $object: ObjectPlan<{
-                                      result: PgInsertPlan<any, any, any>;
+                                      result:
+                                        | PgUpdatePlan<any, any, any>
+                                        | PgDeletePlan<any, any, any>;
                                     }>,
                                   ) {
                                     return $object.get("result");
@@ -490,6 +502,19 @@ export const PgMutationUpdateDeletePlugin: Plugin = {
                                 "field",
                               ),
                               type: new GraphQLNonNull(TablePatch!),
+                              plan: EXPORTABLE(
+                                () =>
+                                  function plan(
+                                    $object: ObjectPlan<{
+                                      result: PgUpdatePlan<any, any, any>;
+                                    }>,
+                                  ) {
+                                    const $record =
+                                      $object.getPlanForKey("result");
+                                    return $record.setPlan();
+                                  },
+                                [],
+                              ),
                             },
                           }
                         : null,
@@ -516,6 +541,177 @@ export const PgMutationUpdateDeletePlugin: Plugin = {
         });
 
         return _;
+      },
+
+      GraphQLObjectType_fields(fields, build, context) {
+        const {
+          inflection,
+          sql,
+          graphql: { GraphQLNonNull },
+        } = build;
+        const {
+          scope: { isRootMutation },
+          Self,
+          fieldWithHooks,
+        } = context;
+        if (!isRootMutation) {
+          return fields;
+        }
+
+        const updatableSources = build.input.pgSources.filter(isUpdatable);
+        const deletableSources = build.input.pgSources.filter(isDeletable);
+
+        const process = (
+          fields: GraphQLFieldConfigMap<any, any>,
+          sources: PgSource<any, any, any, any>[],
+          mode: "update" | "delete",
+        ) => {
+          for (const source of sources) {
+            const payloadTypeName =
+              mode === "update"
+                ? inflection.updatePayloadType({ source })
+                : inflection.deletePayloadType({ source });
+            const primaryUnique = source.uniques.find(
+              (u: PgSourceUnique) => u.isPrimary,
+            );
+            const specs = [
+              ...(primaryUnique
+                ? [{ unique: primaryUnique, uniqueMode: "node" }]
+                : []),
+              ...source.uniques.map((unique: PgSourceUnique) => ({
+                unique,
+                uniqueMode: "keys",
+              })),
+            ];
+            for (const spec of specs) {
+              const { uniqueMode, unique } = spec;
+              const details = {
+                source,
+                unique,
+              };
+              fields = build.recoverable(fields, () => {
+                const fieldName =
+                  mode === "update"
+                    ? uniqueMode === "node"
+                      ? inflection.updateNodeField(details)
+                      : inflection.updateByKeysField(details)
+                    : uniqueMode === "node"
+                    ? inflection.deleteNodeField(details)
+                    : inflection.deleteByKeysField(details);
+                const inputTypeName =
+                  mode === "update"
+                    ? uniqueMode === "node"
+                      ? inflection.updateNodeInputType(details)
+                      : inflection.updateByKeysInputType(details)
+                    : uniqueMode === "node"
+                    ? inflection.deleteNodeInputType(details)
+                    : inflection.deleteByKeysInputType(details);
+
+                const payloadType = build.getOutputTypeByName(payloadTypeName);
+                const mutationInputType =
+                  build.getInputTypeByName(inputTypeName);
+                const tableFieldName = inflection.tableFieldName(source);
+
+                const uniqueColumns = (unique.columns as string[]).map(
+                  (columnName) => [
+                    columnName,
+                    inflection.column({
+                      columnName,
+                      codec: source.codec,
+                      column: source.codec.columns[columnName],
+                    }),
+                  ],
+                );
+
+                const specFromArgs = EXPORTABLE(
+                  (uniqueColumns) => (args: TrackedArguments) => {
+                    return uniqueColumns.reduce(
+                      (memo, [columnName, fieldName]) => {
+                        memo[columnName] = (
+                          args.input as __TrackedObjectPlan | InputObjectPlan
+                        ).get(fieldName);
+                        return memo;
+                      },
+                      {},
+                    );
+                  },
+                  [uniqueColumns],
+                );
+
+                return build.extend(
+                  fields,
+                  {
+                    [fieldName]: fieldWithHooks(
+                      { fieldName },
+                      {
+                        args: {
+                          input: {
+                            type: new GraphQLNonNull(mutationInputType),
+                            plan: EXPORTABLE(
+                              () =>
+                                function plan(
+                                  _: any,
+                                  $object: ObjectPlan<{
+                                    result:
+                                      | PgUpdatePlan<any, any, any>
+                                      | PgDeletePlan<any, any, any>;
+                                  }>,
+                                ) {
+                                  return $object;
+                                },
+                              [],
+                            ),
+                          },
+                        },
+                        type: payloadType,
+                        plan:
+                          mode === "update"
+                            ? (EXPORTABLE(
+                                (object, pgUpdate, source, specFromArgs) =>
+                                  function plan(
+                                    _$root: ExecutablePlan,
+                                    args: TrackedArguments,
+                                  ) {
+                                    return object({
+                                      result: pgUpdate(
+                                        source,
+                                        specFromArgs(args),
+                                      ),
+                                    });
+                                  },
+                                [object, pgUpdate, source, specFromArgs],
+                              ) as any)
+                            : (EXPORTABLE(
+                                (object, pgDelete, source, specFromArgs) =>
+                                  function plan(
+                                    _$root: ExecutablePlan,
+                                    args: TrackedArguments,
+                                  ) {
+                                    return object({
+                                      result: pgDelete(
+                                        source,
+                                        specFromArgs(args),
+                                      ),
+                                    });
+                                  },
+                                [object, pgDelete, source, specFromArgs],
+                              ) as any),
+                      },
+                    ),
+                  },
+                  `Adding ${mode} mutation for ${source}`,
+                );
+              });
+            }
+          }
+          return fields;
+        };
+
+        return process(
+          process(fields, updatableSources, "update"),
+          deletableSources,
+          "delete",
+        );
       },
     },
   },
