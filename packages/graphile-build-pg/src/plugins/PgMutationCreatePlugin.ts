@@ -36,6 +36,7 @@ declare global {
 const isInsertable = (source: PgSource<any, any, any, any>) => {
   if (source.parameters) return false;
   if (!source.codec.columns) return false;
+  if (source.codec.isAnonymous) return false;
   const behavior = getBehavior(source.extensions);
   if (behavior && !behavior.includes("create")) {
     return false;
