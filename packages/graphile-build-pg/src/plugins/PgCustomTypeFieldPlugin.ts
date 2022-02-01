@@ -13,7 +13,12 @@ import type {
   PgTypeCodec,
 } from "@dataplan/pg";
 import { PgClassExpressionPlan, PgSelectSinglePlan, TYPES } from "@dataplan/pg";
-import type { ExecutablePlan, InputPlan } from "graphile-crystal";
+import type {
+  __TrackedObjectPlan,
+  ExecutablePlan,
+  InputObjectPlan,
+  InputPlan,
+} from "graphile-crystal";
 import {
   __ListTransformPlan,
   connection,
@@ -424,12 +429,16 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                       (argDetails, constant, isNotNullish, object, source) =>
                         (
                           $root: ExecutablePlan,
-                          { input: args }: TrackedArguments<any>,
+                          args: TrackedArguments<any>,
                         ) => {
                           const selectArgs: PgSelectArgumentSpec[] = [
                             ...argDetails
                               .map(({ argName, pgCodec, required }) => {
-                                const plan = args[argName];
+                                const plan = (
+                                  args.input as
+                                    | __TrackedObjectPlan
+                                    | InputObjectPlan
+                                ).get(argName);
                                 if (!required && plan.evalIs(undefined)) {
                                   return null;
                                 }
