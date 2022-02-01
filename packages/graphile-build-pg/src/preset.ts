@@ -13,6 +13,7 @@ import { PgConnectionArgOrderByPlugin } from "./plugins/PgConnectionArgOrderByPl
 import { PgConnectionTotalCountPlugin } from "./plugins/PgConnectionTotalCountPlugin";
 import { PgCustomTypeFieldPlugin } from "./plugins/PgCustomTypeFieldPlugin";
 import { PgIntrospectionPlugin } from "./plugins/PgIntrospectionPlugin";
+import { PgJWTPlugin } from "./plugins/PgJWTPlugin";
 import { PgMutationCreatePlugin } from "./plugins/PgMutationCreatePlugin";
 import { PgMutationPayloadEdgePlugin } from "./plugins/PgMutationPayloadEdgePlugin";
 import { PgOrderAllColumnsPlugin } from "./plugins/PgOrderAllColumnsPlugin";
@@ -24,7 +25,6 @@ import { PgRowByUniquePlugin } from "./plugins/PgRowByUniquePlugin";
 import { PgTableNodePlugin } from "./plugins/PgTableNodePlugin";
 import { PgTablesPlugin } from "./plugins/PgTablesPlugin";
 import { PgTypesPlugin } from "./plugins/PgTypesPlugin";
-import { PgJWTPlugin } from "./plugins/PgJWTPlugin";
 
 export const defaultPreset: Preset = {
   plugins: [
