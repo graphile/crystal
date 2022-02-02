@@ -44,6 +44,7 @@ import type { URL } from "url";
 import { inspect } from "util";
 
 import type { ExportOptions } from "./interfaces";
+import { optimize } from "./optimize";
 import { wellKnown } from "./wellKnown";
 
 function identifierOrLiteral(key: string) {
@@ -1219,7 +1220,9 @@ export async function exportSchemaAsString(
 
   const ast = file.toAST();
 
-  const { code } = reallyGenerate(ast, {});
+  const optimizedAst = optimize(ast);
+
+  const { code } = reallyGenerate(optimizedAst, {});
   return { code };
 }
 
