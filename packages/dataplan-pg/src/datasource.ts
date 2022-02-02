@@ -219,6 +219,7 @@ export class PgSourceBuilder<
   public codec: PgTypeCodec<TColumns, any, any>;
   public uniques: TUniques | undefined;
   public readonly extensions: Partial<PgSourceExtensions> | undefined;
+  private readonly name: string;
   constructor(
     private options: Omit<
       PgSourceOptions<TColumns, TUniques, any, TParameters>,
@@ -228,6 +229,7 @@ export class PgSourceBuilder<
     this.codec = options.codec;
     this.uniques = options.uniques;
     this.extensions = options.extensions;
+    this.name = options.name;
   }
 
   public toString(): string {
