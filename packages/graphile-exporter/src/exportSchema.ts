@@ -891,6 +891,7 @@ function _convertToAST(
   locationHint: string,
   nameHint: string,
   depth: number,
+  reference: t.Expression,
 ): t.Expression {
   if (depth > 100) {
     throw new Error(
@@ -1002,7 +1003,14 @@ function convertToIdentifierViaAST(
 
   const ast = isExportedFromFactory(thing)
     ? factoryAst(file, thing, locationHint, nameHint)
-    : _convertToAST(file, thing, locationHint, nameHint, depth);
+    : _convertToAST(
+        file,
+        thing,
+        locationHint,
+        nameHint,
+        depth,
+        variableIdentifier,
+      );
   if (ast.type === "Identifier") {
     console.warn(
       `graphile-exporter error: AST returned an identifier '${ast.name}'; this could cause an infinite loop.`,
