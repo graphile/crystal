@@ -955,13 +955,7 @@ function _convertToAST(
   }
 }
 
-function convertToIdentifierViaAST(
-  file: CodegenFile,
-  thing: unknown,
-  baseNameHint: string,
-  locationHint: string,
-  depth = 0,
-): t.Expression {
+const getExistingIdentifier = (file: CodegenFile, thing: unknown) => {
   const existingIdentifier = file._values.get(thing);
   if (existingIdentifier) {
     return existingIdentifier;
@@ -986,6 +980,19 @@ function convertToIdentifierViaAST(
     return file.declareDirective(thing);
   } else if (isNamedType(thing)) {
     return file.declareType(thing);
+  }
+};
+
+function convertToIdentifierViaAST(
+  file: CodegenFile,
+  thing: unknown,
+  baseNameHint: string,
+  locationHint: string,
+  depth = 0,
+): t.Expression {
+  const existingIdentifier = getExistingIdentifier(file, thing);
+  if (existingIdentifier) {
+    return existingIdentifier;
   }
 
   // Prevent infinite loop by declaring the variableIdentifier immediately
