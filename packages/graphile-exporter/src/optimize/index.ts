@@ -2,8 +2,16 @@ import generate from "@babel/generator";
 import traverse from "@babel/traverse";
 import * as t from "@babel/types";
 
-function isSimpleArg(arg: t.Node): arg is t.Literal | t.Identifier {
-  return t.isLiteral(arg) || t.isIdentifier(arg);
+function isSimpleArg(
+  arg: t.Node,
+): arg is t.Literal | t.Identifier | t.MemberExpression {
+  return (
+    t.isLiteral(arg) ||
+    t.isIdentifier(arg) ||
+    (t.isMemberExpression(arg) &&
+      isSimpleArg(arg.object) &&
+      isSimpleArg(arg.property))
+  );
 }
 
 function isSimpleParam(param: t.Node): param is t.Identifier {
@@ -73,7 +81,7 @@ export const optimize = (ast: t.Node) => {
                 paramPath.remove();
               }
             }
-          } else if (t.isLiteral(arg)) {
+          } else if (t.isLiteral(arg) || t.isMemberExpression(arg)) {
             const binding = calleePath.scope.bindings[param.name];
 
             // Replace all references to this identifier with the value
