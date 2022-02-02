@@ -929,7 +929,7 @@ function _convertToAST(
         const existingIdentifier = getExistingIdentifier(file, value);
         if (existingIdentifier) {
           return t.objectProperty(tKey, existingIdentifier);
-        } else if (isExportedFromFactory(thing)) {
+        } else if (isExportedFromFactory(value)) {
           const val = convertToIdentifierViaAST(
             file,
             value,
@@ -939,14 +939,20 @@ function _convertToAST(
           );
           return t.objectProperty(tKey, val);
         } else {
-          const val = convertToIdentifierViaAST(
+          const newReference = t.memberExpression(
+            reference,
+            tKey,
+            !t.isIdentifier(tKey),
+          );
+          file._values.set(value, newReference);
+          const val = _convertToAST(
             file,
             value,
-            nameHint + `.${key}`,
             locationHint + `[${JSON.stringify(key)}]`,
+            nameHint + `.${key}`,
             depth + 1,
+            newReference,
           );
-          // TODO: cache val via `file._values`
           return t.objectProperty(tKey, val);
         }
       }),
