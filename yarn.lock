@@ -2484,6 +2484,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/prettier@npm:^2":
+  version: 2.4.3
+  resolution: "@types/prettier@npm:2.4.3"
+  checksum: b240434daabac54700c862b0bb52a83fec396e0e9c847447119ba41fd8404d79aadfa174e6306fb094b29efadac586344b7606c3a71c286b71755ab2579d54df
+  languageName: node
+  linkType: hard
+
 "@types/prettier@npm:^2.1.5":
   version: 2.4.2
   resolution: "@types/prettier@npm:2.4.2"
@@ -5957,9 +5964,11 @@ __metadata:
     "@types/babel__template": ^7.4.1
     "@types/jest": ^27.0.3
     "@types/node": ^16.11.15
+    "@types/prettier": ^2
     graphile-crystal: 4.7.0
     graphql: 16.1.0-experimental-stream-defer.6
     jest: ^27.4.5
+    prettier: ^2.5.1
     ts-node: ^10.4.0
     tslib: ^2.3.1
     typescript: next

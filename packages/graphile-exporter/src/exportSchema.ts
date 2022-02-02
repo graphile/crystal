@@ -1,3 +1,4 @@
+import prettier from "prettier";
 import generate from "@babel/generator";
 import { parseExpression } from "@babel/parser";
 import type { TemplateBuilderOptions } from "@babel/template";
@@ -1335,5 +1336,11 @@ export async function exportSchema(
 ): Promise<void> {
   const { code } = await exportSchemaAsString(schema, options);
   const HEADER = `/* eslint-disable graphile-exporter/export-instances, graphile-exporter/export-methods, graphile-exporter/exhaustive-deps */\n`;
-  await writeFile(toPath, HEADER + code);
+  const toFormat = HEADER + code;
+  const config = await prettier.resolveConfig(toPath.toString());
+  const formatted = prettier.format(toFormat, {
+    parser: 'babel',
+    ...(config ?? {}
+  });
+  await writeFile(toPath, formatted);
 }

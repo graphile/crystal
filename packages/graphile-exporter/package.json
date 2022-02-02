@@ -45,6 +45,7 @@
     "@babel/template": "^7.16.0",
     "@types/node": "^16.11.15",
     "graphile-crystal": "4.7.0",
+    "prettier": "^2.5.1",
     "tslib": "^2.3.1"
   },
   "engines": {
@@ -61,6 +62,7 @@
     "@types/babel__generator": "^7.6.3",
     "@types/babel__template": "^7.4.1",
     "@types/jest": "^27.0.3",
+    "@types/prettier": "^2",
     "graphql": "16.1.0-experimental-stream-defer.6",
     "jest": "^27.4.5",
     "ts-node": "^10.4.0",
