@@ -2,8 +2,6 @@ import generate from "@babel/generator";
 import traverse from "@babel/traverse";
 import * as t from "@babel/types";
 
-import { SimplifyIIFE } from "./simplify-iife";
-
 function isSimpleArg(arg: t.Node): arg is t.Literal | t.Identifier {
   return t.isLiteral(arg) || t.isIdentifier(arg);
 }
