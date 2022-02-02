@@ -62,23 +62,43 @@ function locationHintToIdentifierName(locationHint: string): string {
   result = result.replace(/[[.]/g, "__").replace(/\]/g, "");
   result = result.replace(/[^a-z0-9_]+/gi, "");
   result = result.replace(/^([0-9])/, "_$1");
+  if (result.includes("scope")) {
+    console.log({ locationHint, result });
+  }
   return result;
 }
 
-function getNameForThing(thing: any, locationHint: string): string {
+function getNameForThing(
+  thing: any,
+  locationHint: string,
+  baseNameHint: string,
+): string {
   if (typeof thing === "function") {
-    // const thingName = (thing as any).name ?? (thing as any).displayName ?? null;
+    if (baseNameHint) {
+      return baseNameHint;
+    }
+    const thingName = (thing as any).name ?? (thing as any).displayName ?? null;
+    if (thingName) {
+      return (baseNameHint ? baseNameHint + "-" : "") + thingName;
+    }
     return locationHintToIdentifierName(locationHint);
   } else {
     const thingConstructor = thing.constructor;
-    const thingConstructorName =
+    const thingConstructorNameRaw =
       thingConstructor?.name ?? thingConstructor?.displayName ?? null;
+    const thingConstructorName = ["Array", "Object", "Set", "Map"].includes(
+      thingConstructorNameRaw,
+    )
+      ? null
+      : thingConstructorNameRaw;
     const thingName = (thing as any).name ?? (thing as any).displayName ?? null;
     const name =
       thingConstructorName && thingName
         ? `${thingName}${thingConstructorName}`
         : thingName ?? thingConstructorName ?? null;
-    return name;
+    return baseNameHint || name
+      ? (baseNameHint ?? "") + (baseNameHint && name ? "-" : "") + (name ?? "")
+      : "value";
   }
 }
 
@@ -149,6 +169,7 @@ class CodegenFile {
   } = Object.assign(Object.create(null), {
     // Reserved variables
     AbortController: true,
+    Array: true,
     Buffer: true,
     DOMException: true,
     Error: true,
@@ -360,13 +381,18 @@ class CodegenFile {
         ),
         args:
           config.args && Object.keys(config.args).length > 0
-            ? this.makeFieldArgs(config.args, `${locationHint}.args`)
+            ? this.makeFieldArgs(
+                config.args,
+                `${locationHint}.args`,
+                `@${config.name}.args`,
+              )
             : null,
         isRepeatable: t.booleanLiteral(config.isRepeatable),
         extensions: extensions(
           this,
           config.extensions,
           `${config.name}.extensions`,
+          `@${config.name}.extensions`,
         ),
       },
     );
@@ -401,11 +427,17 @@ class CodegenFile {
       >]-?: t.Expression | null;
     } = {
       description: desc(config.description),
-      value: convertToAST(this, config.value, `${locationHint}.value`),
+      value: convertToAST(
+        this,
+        config.value,
+        `${locationHint}.value`,
+        `${typeName}.${enumValueName}`,
+      ),
       extensions: extensions(
         this,
         config.extensions,
         `${locationHint}.extensions`,
+        `${typeName}.extensions`,
       ),
       deprecationReason: desc(config.deprecationReason),
     };
@@ -433,19 +465,31 @@ class CodegenFile {
               ? this.makeFieldArgs(
                   config.args,
                   `${typeName}.fields[${fieldName}].args`,
+                  `${typeName}.${fieldName}`,
                 )
               : null,
           resolve: config.resolve
-            ? func(this, config.resolve, `${locationHint}.resolve`)
+            ? func(
+                this,
+                config.resolve,
+                `${locationHint}.resolve`,
+                `${typeName}.${fieldName}.resolve`,
+              )
             : null,
           subscribe: config.subscribe
-            ? func(this, config.subscribe, `${locationHint}.subscribe`)
+            ? func(
+                this,
+                config.subscribe,
+                `${locationHint}.subscribe`,
+                `${typeName}.${fieldName}.subscribe`,
+              )
             : null,
           deprecationReason: desc(config.deprecationReason),
           extensions: extensions(
             this,
             config.extensions,
             `${locationHint}.extensions`,
+            `${typeName}.${fieldName}.extensions`,
           ),
         };
         memo[fieldName] = configToAST(mappedConfig);
@@ -476,6 +520,7 @@ class CodegenFile {
                   this,
                   config.defaultValue,
                   `${locationHint}.defaultValue`,
+                  `${typeName}.${fieldName}.defaultValue`,
                 )
               : null,
           deprecationReason: desc(config.deprecationReason),
@@ -483,6 +528,7 @@ class CodegenFile {
             this,
             config.extensions,
             `${locationHint}.extensions`,
+            `${typeName}.${fieldName}.extensions`,
           ),
         };
         memo[fieldName] = configToAST(mappedConfig);
@@ -495,6 +541,7 @@ class CodegenFile {
   private makeFieldArgs(
     args: GraphQLFieldConfigArgumentMap,
     baseLocationHint: string,
+    nameHint: string,
   ): t.Expression {
     const obj = Object.entries(args).reduce((memo, [argName, config]) => {
       if (!argName.startsWith("__")) {
@@ -513,6 +560,7 @@ class CodegenFile {
                   this,
                   config.defaultValue,
                   `${locationHint}.defaultValue`,
+                  `${nameHint}.${argName}.defaultValue`,
                 )
               : null,
           deprecationReason: desc(config.deprecationReason),
@@ -520,6 +568,7 @@ class CodegenFile {
             this,
             config.extensions,
             `${locationHint}.extensions`,
+            `${nameHint}.${argName}.extensions`,
           ),
         };
         memo[argName] = configToAST(mappedConfig);
@@ -539,11 +588,17 @@ class CodegenFile {
         name: t.stringLiteral(config.name),
         description: desc(config.description),
         isTypeOf: config.isTypeOf
-          ? func(this, config.isTypeOf, `${config.name}.isTypeOf`)
+          ? func(
+              this,
+              config.isTypeOf,
+              `${config.name}.isTypeOf`,
+              `${config.name}.isTypeOf`,
+            )
           : null,
         extensions: extensions(
           this,
           config.extensions,
+          `${config.name}.extensions`,
           `${config.name}.extensions`,
         ),
         fields: t.arrowFunctionExpression(
@@ -568,11 +623,17 @@ class CodegenFile {
         name: t.stringLiteral(config.name),
         description: desc(config.description),
         resolveType: config.resolveType
-          ? func(this, config.resolveType, `${config.name}.resolveType`)
+          ? func(
+              this,
+              config.resolveType,
+              `${config.name}.resolveType`,
+              `${config.name}.resolveType`,
+            )
           : null,
         extensions: extensions(
           this,
           config.extensions,
+          `${config.name}.extensions`,
           `${config.name}.extensions`,
         ),
         fields: t.arrowFunctionExpression(
@@ -594,11 +655,17 @@ class CodegenFile {
         name: t.stringLiteral(config.name),
         description: desc(config.description),
         resolveType: config.resolveType
-          ? func(this, config.resolveType, `${config.name}.resolveType`)
+          ? func(
+              this,
+              config.resolveType,
+              `${config.name}.resolveType`,
+              `${config.name}.resolveType`,
+            )
           : null,
         extensions: extensions(
           this,
           config.extensions,
+          `${config.name}.extensions`,
           `${config.name}.extensions`,
         ),
         types: t.arrowFunctionExpression(
@@ -619,6 +686,7 @@ class CodegenFile {
             this,
             config.extensions,
             `${config.name}.extensions`,
+            `${config.name}.extensions`,
           ),
           fields: t.arrowFunctionExpression(
             [],
@@ -632,16 +700,28 @@ class CodegenFile {
         name: t.stringLiteral(config.name),
         description: desc(config.description),
         specifiedByURL: desc(config.specifiedByURL),
-        serialize: func(this, config.serialize, `${config.name}.serialize`),
-        parseValue: func(this, config.parseValue, `${config.name}.parseValue`),
+        serialize: func(
+          this,
+          config.serialize,
+          `${config.name}.serialize`,
+          `${config.name}.serialize`,
+        ),
+        parseValue: func(
+          this,
+          config.parseValue,
+          `${config.name}.parseValue`,
+          `${config.name}.parseValue`,
+        ),
         parseLiteral: func(
           this,
           config.parseLiteral,
+          `${config.name}.parseLiteral`,
           `${config.name}.parseLiteral`,
         ),
         extensions: extensions(
           this,
           config.extensions,
+          `${config.name}.extensions`,
           `${config.name}.extensions`,
         ),
       });
@@ -653,6 +733,7 @@ class CodegenFile {
         extensions: extensions(
           this,
           config.extensions,
+          `${config.name}.extensions`,
           `${config.name}.extensions`,
         ),
         values: objectNullPrototype(
@@ -807,6 +888,7 @@ function convertToAST(
   file: CodegenFile,
   thing: unknown,
   locationHint: string,
+  nameHint: string,
   depth = 0,
 ): t.Expression {
   if (depth > 100) {
@@ -832,7 +914,7 @@ function convertToAST(
     return file.import(moduleName, exportName);
   } else if (isExportedFromFactory(thing)) {
     const thingAsAny = thing as any;
-    const name = getNameForThing(thingAsAny, locationHint);
+    const name = getNameForThing(thingAsAny, locationHint, nameHint);
     return convertToIdentifierViaAST(file, thing, name, locationHint);
   } else if (sql.isSQL(thing)) {
     throw new Error(
@@ -843,11 +925,17 @@ function convertToAST(
   } else if (Array.isArray(thing)) {
     return t.arrayExpression(
       thing.map((entry, i) =>
-        convertToAST(file, entry, locationHint + `[${i}]`, depth + 1),
+        convertToAST(
+          file,
+          entry,
+          locationHint + `[${i}]`,
+          nameHint + `[${i}]`,
+          depth + 1,
+        ),
       ),
     );
   } else if (typeof thing === "function") {
-    return func(file, thing as AnyFunction, locationHint);
+    return func(file, thing as AnyFunction, locationHint, nameHint);
   } else if (isSchema(thing)) {
     throw new Error(
       "Attempted to export GraphQLSchema directly from `convertToAST`; this is currently unsupported.",
@@ -865,6 +953,7 @@ function convertToAST(
             file,
             value,
             locationHint + `[${JSON.stringify(key)}]`,
+            nameHint + `.${key}`,
             depth + 1,
           ),
         ),
@@ -882,7 +971,7 @@ function convertToAST(
 function convertToIdentifierViaAST(
   file: CodegenFile,
   thing: unknown,
-  nameHint: string | null,
+  baseNameHint: string,
   locationHint: string,
 ): t.Expression {
   const existingIdentifier = file._values.get(thing);
@@ -902,12 +991,13 @@ function convertToIdentifierViaAST(
   }
 
   // Prevent infinite loop by declaring the variableIdentifier immediately
+  const nameHint = getNameForThing(thing, locationHint, baseNameHint);
   const variableIdentifier = file.makeVariable(nameHint || "value");
   file._values.set(thing, variableIdentifier);
 
   const ast = isExportedFromFactory(thing)
-    ? factoryAst(file, thing, locationHint)
-    : convertToAST(file, thing, locationHint);
+    ? factoryAst(file, thing, locationHint, nameHint)
+    : convertToAST(file, thing, locationHint, nameHint);
   if (ast.type === "Identifier") {
     console.warn(
       `graphile-exporter error: AST returned an identifier '${ast.name}'; this could cause an infinite loop.`,
@@ -939,11 +1029,12 @@ function extensions(
   file: CodegenFile,
   extensions: object | null | undefined,
   locationHint: string,
+  nameHint: string,
 ): t.Expression | null {
   if (extensions == null || Object.keys(extensions).length === 0) {
     return null;
   }
-  return convertToAST(file, extensions, locationHint);
+  return convertToAST(file, extensions, locationHint, nameHint);
 }
 
 /** Maps to `Object.assign(Object.create(null), {...})` */
@@ -973,6 +1064,7 @@ function func(
   file: CodegenFile,
   fn: AnyFunction,
   locationHint: string,
+  nameHint: string,
 ): t.Expression {
   if (fn == null) {
     return t.identifier("undefined");
@@ -1001,6 +1093,7 @@ function func(
                 file,
                 crystalSpec.original,
                 locationHint + `[$$crystalWrapped]`,
+                nameHint + `__original`,
               ),
             ]
           : [t.identifier("undefined")],
@@ -1013,14 +1106,14 @@ function func(
   //
   // `(() => { const foo = 1, bar = 2; return /*>*/() => {return foo+bar}/*<*/})();`
   if (isExportedFromFactory(fn)) {
-    return factoryAst(file, fn, locationHint);
+    return factoryAst(file, fn, locationHint, nameHint);
   } else if (wellKnown(file.options, fn)) {
     const { moduleName, exportName } = wellKnown(file.options, fn)!;
     return file.import(moduleName, exportName);
   } else if (isImportable(fn)) {
     return file.import(fn.$$export.moduleName, fn.$$export.exportName);
   } else {
-    return funcToAst(fn, locationHint);
+    return funcToAst(fn, locationHint, nameHint);
   }
 }
 
@@ -1030,9 +1123,10 @@ function factoryAst<TTuple extends any[]>(
   file: CodegenFile,
   fn: ExportedFromFactory<unknown, TTuple>,
   locationHint: string,
+  nameHint: string,
 ) {
   const factory = fn.$exporter$factory;
-  const funcAST = funcToAst(factory, locationHint);
+  const funcAST = funcToAst(factory, locationHint, nameHint);
   const depArgs = fn.$exporter$args.map((arg, i) => {
     if (typeof arg === "string") {
       return t.stringLiteral(arg);
@@ -1050,10 +1144,12 @@ function factoryAst<TTuple extends any[]>(
     return convertToIdentifierViaAST(
       file,
       arg,
-      paramName,
+      paramName || "parameter",
       `${locationHint}[$$scope][${JSON.stringify(i)}]`,
     );
   });
+
+  // TODO: we can remove this now that we have the post-processing via babel
   if (shouldOptimizeFactoryCalls) {
     /*
      * Factories take the form of an IIFE: `((a, b, c) => ...)(x, y, z)`; where
@@ -1089,6 +1185,7 @@ function factoryAst<TTuple extends any[]>(
 function funcToAst(
   fn: AnyFunction,
   locationHint: string,
+  nameHint: string,
 ): t.FunctionExpression | t.ArrowFunctionExpression {
   const funcString = fn.toString().trim();
   try {
@@ -1205,7 +1302,12 @@ export async function exportSchemaAsString(
               ),
             )
           : null,
-      extensions: extensions(file, config.extensions, "schema.extensions"),
+      extensions: extensions(
+        file,
+        config.extensions,
+        "schema.extensions",
+        "schema.extensions",
+      ),
       enableDeferStream: t.booleanLiteral(true),
       /*
       // TODO: use the below once https://github.com/graphql/graphql-js/pull/3450 is fixed:
