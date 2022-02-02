@@ -48,7 +48,10 @@ import type { ExportOptions } from "./interfaces";
 import { optimize } from "./optimize";
 import { wellKnown } from "./wellKnown";
 
-function identifierOrLiteral(key: string) {
+function identifierOrLiteral(key: string | number) {
+  if (typeof key === "number") {
+    return t.numericLiteral(key);
+  }
   const isSafeIdentifier = /^[a-z_$][a-z0-9_$]*$/i.test(key);
 
   if (isSafeIdentifier) {
@@ -893,6 +896,41 @@ function _convertToAST(
   depth: number,
   reference: t.Expression,
 ): t.Expression {
+  const handleSubvalue = (
+    value: any,
+    tKey: t.Expression,
+    key: string | number,
+  ) => {
+    const existingIdentifier = getExistingIdentifier(file, value);
+    if (existingIdentifier) {
+      return existingIdentifier;
+    } else if (isExportedFromFactory(value)) {
+      const val = convertToIdentifierViaAST(
+        file,
+        value,
+        nameHint + `.${key}`,
+        locationHint + `[${JSON.stringify(key)}]`,
+        depth + 1,
+      );
+      return val;
+    } else {
+      const newReference = t.memberExpression(
+        reference,
+        tKey,
+        !t.isIdentifier(tKey),
+      );
+      file._values.set(value, newReference);
+      const val = _convertToAST(
+        file,
+        value,
+        locationHint + `[${JSON.stringify(key)}]`,
+        nameHint + `.${key}`,
+        depth + 1,
+        newReference,
+      );
+      return val;
+    }
+  };
   if (depth > 100) {
     throw new Error(
       `_convertToAST: potentially infinite recursion at ${locationHint}. TODO: allow exporting recursive structures.`,
@@ -906,15 +944,10 @@ function _convertToAST(
     );
   } else if (Array.isArray(thing)) {
     return t.arrayExpression(
-      thing.map((entry, i) =>
-        convertToIdentifierViaAST(
-          file,
-          entry,
-          nameHint + `[${i}]`,
-          locationHint + `[${i}]`,
-          depth + 1,
-        ),
-      ),
+      thing.map((entry, i) => {
+        const tKey = identifierOrLiteral(i);
+        return handleSubvalue(entry, tKey, i);
+      }),
     );
   } else if (typeof thing === "function") {
     return func(file, thing as AnyFunction, locationHint, nameHint);
@@ -926,35 +959,7 @@ function _convertToAST(
     return t.objectExpression(
       Object.entries(thing).map(([key, value]) => {
         const tKey = identifierOrLiteral(key);
-        const existingIdentifier = getExistingIdentifier(file, value);
-        if (existingIdentifier) {
-          return t.objectProperty(tKey, existingIdentifier);
-        } else if (isExportedFromFactory(value)) {
-          const val = convertToIdentifierViaAST(
-            file,
-            value,
-            nameHint + `.${key}`,
-            locationHint + `[${JSON.stringify(key)}]`,
-            depth + 1,
-          );
-          return t.objectProperty(tKey, val);
-        } else {
-          const newReference = t.memberExpression(
-            reference,
-            tKey,
-            !t.isIdentifier(tKey),
-          );
-          file._values.set(value, newReference);
-          const val = _convertToAST(
-            file,
-            value,
-            locationHint + `[${JSON.stringify(key)}]`,
-            nameHint + `.${key}`,
-            depth + 1,
-            newReference,
-          );
-          return t.objectProperty(tKey, val);
-        }
+        return t.objectProperty(tKey, handleSubvalue(value, tKey, key));
       }),
     );
   } else {
