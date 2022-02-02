@@ -173,6 +173,10 @@ export interface PgSourceOptions<
 > {
   codec: PgTypeCodec<TColumns, any, any, any>;
   executor: PgExecutor;
+
+  // TODO: auth should also apply to insert, update and delete, maybe via insertAuth, updateAuth, etc
+  selectAuth?: ($plan: PgSelectPlan<any, any, any, any>) => void;
+
   name: string;
   identifier?: string;
   source: TParameters extends PgSourceParameter[]
@@ -322,6 +326,7 @@ export class PgSource<
   >;
   private relationsThunk: (() => TRelations) | null;
   private _relations: TRelations | null = null;
+  private selectAuth?: ($plan: PgSelectPlan<any, any, any, any>) => void;
 
   // TODO: make a public interface for this information
   /**
@@ -393,6 +398,7 @@ export class PgSource<
       isUnique,
       sqlPartitionByIndex,
       isMutation,
+      selectAuth,
     } = options;
     this._options = options;
     this.extensions = extensions;
@@ -413,6 +419,7 @@ export class PgSource<
     this.isUnique = !!isUnique;
     this.sqlPartitionByIndex = sqlPartitionByIndex ?? null;
     this.isMutation = !!isMutation;
+    this.selectAuth = selectAuth;
 
     // parameters is null iff source is not a function
     const sourceIsFunction = typeof this.source === "function";
@@ -458,7 +465,7 @@ export class PgSource<
     extensions?: PgSourceExtensions;
   }): PgSource<TColumns, TUniques, TRelations, undefined> {
     const { name, identifier, source, uniques, extensions } = overrideOptions;
-    const { codec, executor, relations } = this._options;
+    const { codec, executor, relations, selectAuth } = this._options;
     return new PgSource({
       codec,
       executor,
@@ -469,6 +476,7 @@ export class PgSource<
       relations,
       parameters: undefined,
       extensions,
+      selectAuth,
     });
   }
 
@@ -493,6 +501,7 @@ export class PgSource<
     uniques?: TUniques;
     extensions?: PgSourceExtensions;
     isMutation?: boolean;
+    selectAuth?: ($plan: PgSelectPlan<any, any, any, any>) => void;
   }) {
     const {
       name,
@@ -504,8 +513,9 @@ export class PgSource<
       uniques,
       extensions,
       isMutation,
+      selectAuth: overrideSelectAuth,
     } = overrideOptions;
-    const { codec, executor, relations } = this._options;
+    const { codec, executor, relations, selectAuth } = this._options;
     if (!returnsArray) {
       // This is the easy case
       return new PgSource<TColumns, TUniques, TRelations, TNewParameters>({
@@ -520,6 +530,7 @@ export class PgSource<
         extensions,
         isUnique: !returnsSetof,
         isMutation: Boolean(isMutation),
+        selectAuth: overrideSelectAuth ?? selectAuth,
       });
     } else if (!returnsSetof) {
       // This is a `composite[]` function; convert it to a `setof composite` function:
@@ -541,6 +552,7 @@ export class PgSource<
         extensions,
         isUnique: false, // set now, not unique
         isMutation: Boolean(isMutation),
+        selectAuth: overrideSelectAuth ?? selectAuth,
       });
     } else {
       // This is a `setof composite[]` function; convert it to `setof composite` and indicate that we should partition it.
@@ -567,6 +579,7 @@ export class PgSource<
         isUnique: false, // set now, not unique
         sqlPartitionByIndex,
         isMutation: Boolean(isMutation),
+        selectAuth: overrideSelectAuth ?? selectAuth,
       });
     }
   }
@@ -826,8 +839,10 @@ export class PgSource<
   public applyAuthorizationChecksToPlan(
     $plan: PgSelectPlan<TColumns, TUniques, TRelations, TParameters>,
   ): void {
+    if (this.selectAuth) {
+      this.selectAuth($plan);
+    }
     // e.g. $plan.where(sql`user_id = ${me}`);
-    $plan.where(sql`true /* authorization checks */`);
     return;
   }
 
