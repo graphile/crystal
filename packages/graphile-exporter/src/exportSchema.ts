@@ -1,4 +1,3 @@
-import prettier from "prettier";
 import generate from "@babel/generator";
 import { parseExpression } from "@babel/parser";
 import type { TemplateBuilderOptions } from "@babel/template";
@@ -41,6 +40,7 @@ import {
   isSchema,
 } from "graphql";
 import { sql } from "pg-sql2";
+import prettier from "prettier";
 import type { URL } from "url";
 import { inspect } from "util";
 
@@ -428,11 +428,11 @@ class CodegenFile {
       >]-?: t.Expression | null;
     } = {
       description: desc(config.description),
-      value: convertToAST(
+      value: convertToIdentifierViaAST(
         this,
         config.value,
-        `${locationHint}.value`,
         `${typeName}.${enumValueName}`,
+        `${locationHint}.value`,
       ),
       extensions: extensions(
         this,
@@ -517,11 +517,11 @@ class CodegenFile {
           type: this.typeExpression(config.type),
           defaultValue:
             config.defaultValue !== undefined
-              ? convertToAST(
+              ? convertToIdentifierViaAST(
                   this,
                   config.defaultValue,
-                  `${locationHint}.defaultValue`,
                   `${typeName}.${fieldName}.defaultValue`,
+                  `${locationHint}.defaultValue`,
                 )
               : null,
           deprecationReason: desc(config.deprecationReason),
@@ -557,11 +557,11 @@ class CodegenFile {
           type: this.typeExpression(config.type),
           defaultValue:
             config.defaultValue !== undefined
-              ? convertToAST(
+              ? convertToIdentifierViaAST(
                   this,
                   config.defaultValue,
-                  `${locationHint}.defaultValue`,
                   `${nameHint}.${argName}.defaultValue`,
+                  `${locationHint}.defaultValue`,
                 )
               : null,
           deprecationReason: desc(config.deprecationReason),
@@ -885,17 +885,86 @@ function desc(description: string | null | undefined): t.Expression | null {
   return description ? t.stringLiteral(description) : null;
 }
 
-function convertToAST(
+function _convertToAST(
   file: CodegenFile,
   thing: unknown,
   locationHint: string,
   nameHint: string,
-  depth = 0,
+  depth: number,
 ): t.Expression {
   if (depth > 100) {
     throw new Error(
-      `convertToAST: potentially infinite recursion at ${locationHint}. TODO: allow exporting recursive structures.`,
+      `_convertToAST: potentially infinite recursion at ${locationHint}. TODO: allow exporting recursive structures.`,
     );
+  }
+  if (sql.isSQL(thing)) {
+    throw new Error(
+      `Exporting of 'sql' values is not supported (at ${locationHint}), please wrap in EXPORTABLE: ${
+        sql.compile(thing).text
+      }`,
+    );
+  } else if (Array.isArray(thing)) {
+    return t.arrayExpression(
+      thing.map((entry, i) =>
+        convertToIdentifierViaAST(
+          file,
+          entry,
+          nameHint + `[${i}]`,
+          locationHint + `[${i}]`,
+          depth + 1,
+        ),
+      ),
+    );
+  } else if (typeof thing === "function") {
+    return func(file, thing as AnyFunction, locationHint, nameHint);
+  } else if (isSchema(thing)) {
+    throw new Error(
+      "Attempted to export GraphQLSchema directly from `_convertToAST`; this is currently unsupported.",
+    );
+  } else if (typeof thing === "object" && thing != null) {
+    return t.objectExpression(
+      Object.entries(thing).map(([key, value]) => {
+        const val = convertToIdentifierViaAST(
+          file,
+          value,
+          nameHint + `.${key}`,
+          locationHint + `[${JSON.stringify(key)}]`,
+          depth + 1,
+        );
+        // TODO: cache val via `file._values`
+        return t.objectProperty(
+          identifierOrLiteral(key),
+          val,
+          /*
+          convertToIdentifierViaAST(
+            file,
+            value,
+            nameHint + `.${key}`,
+            locationHint + `[${JSON.stringify(key)}]`,
+          ),
+          */
+        );
+      }),
+    );
+  } else {
+    throw new Error(
+      `_convertToAST: did not understand item (${inspect(
+        thing,
+      )}) at ${locationHint}`,
+    );
+  }
+}
+
+function convertToIdentifierViaAST(
+  file: CodegenFile,
+  thing: unknown,
+  baseNameHint: string,
+  locationHint: string,
+  depth = 0,
+): t.Expression {
+  const existingIdentifier = file._values.get(thing);
+  if (existingIdentifier) {
+    return existingIdentifier;
   }
   if (thing === null) {
     return t.nullLiteral();
@@ -908,78 +977,6 @@ function convertToAST(
   } else if (typeof thing === "number") {
     return t.numericLiteral(thing);
   } else if (wellKnown(file.options, thing)) {
-    const { moduleName, exportName } = wellKnown(file.options, thing)!;
-    return file.import(moduleName, exportName);
-  } else if (isImportable(thing)) {
-    const { moduleName, exportName } = thing.$$export;
-    return file.import(moduleName, exportName);
-  } else if (isExportedFromFactory(thing)) {
-    const thingAsAny = thing as any;
-    const name = getNameForThing(thingAsAny, locationHint, nameHint);
-    return convertToIdentifierViaAST(file, thing, name, locationHint);
-  } else if (sql.isSQL(thing)) {
-    throw new Error(
-      `Exporting of 'sql' values is not supported (at ${locationHint}), please wrap in EXPORTABLE: ${
-        sql.compile(thing).text
-      }`,
-    );
-  } else if (Array.isArray(thing)) {
-    return t.arrayExpression(
-      thing.map((entry, i) =>
-        convertToAST(
-          file,
-          entry,
-          locationHint + `[${i}]`,
-          nameHint + `[${i}]`,
-          depth + 1,
-        ),
-      ),
-    );
-  } else if (typeof thing === "function") {
-    return func(file, thing as AnyFunction, locationHint, nameHint);
-  } else if (isSchema(thing)) {
-    throw new Error(
-      "Attempted to export GraphQLSchema directly from `convertToAST`; this is currently unsupported.",
-    );
-  } else if (isDirective(thing)) {
-    return file.declareDirective(thing);
-  } else if (isNamedType(thing)) {
-    return file.declareType(thing);
-  } else if (typeof thing === "object" && thing != null) {
-    return t.objectExpression(
-      Object.entries(thing).map(([key, value]) =>
-        t.objectProperty(
-          identifierOrLiteral(key),
-          convertToAST(
-            file,
-            value,
-            locationHint + `[${JSON.stringify(key)}]`,
-            nameHint + `.${key}`,
-            depth + 1,
-          ),
-        ),
-      ),
-    );
-  } else {
-    throw new Error(
-      `convertToAST: did not understand item (${inspect(
-        thing,
-      )}) at ${locationHint}`,
-    );
-  }
-}
-
-function convertToIdentifierViaAST(
-  file: CodegenFile,
-  thing: unknown,
-  baseNameHint: string,
-  locationHint: string,
-): t.Expression {
-  const existingIdentifier = file._values.get(thing);
-  if (existingIdentifier) {
-    return existingIdentifier;
-  }
-  if (wellKnown(file.options, thing)) {
     const { moduleName, exportName } = wellKnown(file.options, thing)!;
     return file.import(moduleName, exportName);
   } else if (isImportable(thing)) {
@@ -998,7 +995,7 @@ function convertToIdentifierViaAST(
 
   const ast = isExportedFromFactory(thing)
     ? factoryAst(file, thing, locationHint, nameHint)
-    : convertToAST(file, thing, locationHint, nameHint);
+    : _convertToAST(file, thing, locationHint, nameHint, depth);
   if (ast.type === "Identifier") {
     console.warn(
       `graphile-exporter error: AST returned an identifier '${ast.name}'; this could cause an infinite loop.`,
@@ -1035,7 +1032,7 @@ function extensions(
   if (extensions == null || Object.keys(extensions).length === 0) {
     return null;
   }
-  return convertToAST(file, extensions, locationHint, nameHint);
+  return convertToIdentifierViaAST(file, extensions, nameHint, locationHint);
 }
 
 /** Maps to `Object.assign(Object.create(null), {...})` */
@@ -1339,8 +1336,8 @@ export async function exportSchema(
   const toFormat = HEADER + code;
   const config = await prettier.resolveConfig(toPath.toString());
   const formatted = prettier.format(toFormat, {
-    parser: 'babel',
-    ...(config ?? {}
+    parser: "babel",
+    ...(config ?? {}),
   });
   await writeFile(toPath, formatted);
 }
