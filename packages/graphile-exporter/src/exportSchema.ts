@@ -925,26 +925,30 @@ function _convertToAST(
   } else if (typeof thing === "object" && thing != null) {
     return t.objectExpression(
       Object.entries(thing).map(([key, value]) => {
-        const val = convertToIdentifierViaAST(
-          file,
-          value,
-          nameHint + `.${key}`,
-          locationHint + `[${JSON.stringify(key)}]`,
-          depth + 1,
-        );
-        // TODO: cache val via `file._values`
-        return t.objectProperty(
-          identifierOrLiteral(key),
-          val,
-          /*
-          convertToIdentifierViaAST(
+        const tKey = identifierOrLiteral(key);
+        const existingIdentifier = getExistingIdentifier(file, value);
+        if (existingIdentifier) {
+          return t.objectProperty(tKey, existingIdentifier);
+        } else if (isExportedFromFactory(thing)) {
+          const val = convertToIdentifierViaAST(
             file,
             value,
             nameHint + `.${key}`,
             locationHint + `[${JSON.stringify(key)}]`,
-          ),
-          */
-        );
+            depth + 1,
+          );
+          return t.objectProperty(tKey, val);
+        } else {
+          const val = convertToIdentifierViaAST(
+            file,
+            value,
+            nameHint + `.${key}`,
+            locationHint + `[${JSON.stringify(key)}]`,
+            depth + 1,
+          );
+          // TODO: cache val via `file._values`
+          return t.objectProperty(tKey, val);
+        }
       }),
     );
   } else {
