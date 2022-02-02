@@ -294,6 +294,11 @@ export function crystalWrapResolve<
 }
 
 /**
+ * If you don't need to wrap a resolver, you can use this to save memory.
+ */
+export const crystalResolve = crystalWrapResolve(undefined);
+
+/**
  * Given a `subscribe` function, wraps the function so that it can perform the
  * `ResolveFieldValueCrystal` algorithm.
  *

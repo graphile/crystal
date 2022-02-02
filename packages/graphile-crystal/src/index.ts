@@ -106,6 +106,7 @@ import {
 import { polymorphicWrap, resolveType } from "./polymorphic";
 import {
   $$crystalWrapped,
+  crystalResolve,
   crystalWrapResolve,
   makeCrystalSubscriber,
 } from "./resolvers";
@@ -157,6 +158,7 @@ export {
   CrystalError,
   crystalPrint,
   crystalPrintPathIdentity,
+  crystalResolve,
   CrystalResultsList,
   CrystalResultStreamList,
   CrystalSubscriber,
@@ -302,6 +304,7 @@ exportAsMany({
   resolveType,
   $$crystalWrapped,
   crystalWrapResolve,
+  crystalResolve,
   makeCrystalSubscriber,
   stripAnsi,
   arraysMatch,

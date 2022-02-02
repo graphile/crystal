@@ -1109,23 +1109,27 @@ function func(
       );
       return t.callExpression(iMakeCrystalSubscriber, []);
     } else {
-      const iCrystalWrapResolve = file.import(
-        "graphile-crystal",
-        "crystalWrapResolve",
-      );
-      return t.callExpression(
-        iCrystalWrapResolve,
-        crystalSpec.original
-          ? [
-              func(
-                file,
-                crystalSpec.original,
-                locationHint + `[$$crystalWrapped]`,
-                nameHint + `__original`,
-              ),
-            ]
-          : [t.identifier("undefined")],
-      );
+      if (crystalSpec.original) {
+        const iCrystalWrapResolve = file.import(
+          "graphile-crystal",
+          "crystalWrapResolve",
+        );
+
+        return t.callExpression(iCrystalWrapResolve, [
+          func(
+            file,
+            crystalSpec.original,
+            locationHint + `[$$crystalWrapped]`,
+            nameHint + `__original`,
+          ),
+        ]);
+      } else {
+        const iCrystalResolve = file.import(
+          "graphile-crystal",
+          "crystalResolve",
+        );
+        return iCrystalResolve;
+      }
     }
   }
 
