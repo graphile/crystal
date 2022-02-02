@@ -97,6 +97,44 @@ export const optimize = (ast: t.Node) => {
         return;
       },
     },
+    Program: {
+      exit(path) {
+        // Refresh the scope after all the rewriting
+        path.scope.crawl();
+
+        // Replace all things that are only referenced once
+        for (const [bindingName, binding] of Object.entries(
+          path.scope.bindings,
+        )) {
+          if (!t.isVariableDeclarator(binding.path.node)) {
+            continue;
+          }
+          if (!t.isIdentifier(binding.path.node.id)) {
+            continue;
+          }
+          if (!binding.path.node.init) {
+            continue;
+          }
+
+          // Skip if it's an export
+          const statementPath = binding.path.getStatementParent();
+          if (
+            !statementPath ||
+            t.isExportNamedDeclaration(statementPath.node) ||
+            t.isExportDefaultDeclaration(statementPath.node)
+          ) {
+            continue;
+          }
+
+          // Only replace if it's only referenced once (we don't want duplicates)
+          if (binding.referencePaths.length === 1) {
+            binding.referencePaths[0].replaceWith(binding.path.node.init);
+            binding.path.remove();
+          }
+        }
+      },
+    },
   });
+
   return ast;
 };
