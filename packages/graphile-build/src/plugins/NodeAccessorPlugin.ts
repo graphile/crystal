@@ -1,4 +1,9 @@
-import type { ExecutablePlan, TrackedArguments } from "graphile-crystal";
+import type {
+  ExecutablePlan,
+  NodeIdCodec,
+  NodeIdHandler,
+  TrackedArguments,
+} from "graphile-crystal";
 import { lambda } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
@@ -16,6 +21,21 @@ declare global {
     }
   }
 }
+
+const specForHandler =
+  (handler: NodeIdHandler, codec: NodeIdCodec) => (nodeId: string) => {
+    // We only want to return the specifier if it matches
+    // this handler; otherwise return null.
+    try {
+      const specifier = codec.decode(nodeId);
+      if (handler.match(specifier)) {
+        return specifier;
+      }
+    } catch {
+      // Ignore errors
+    }
+    return null;
+  };
 
 export const NodeAccessorPlugin: Plugin = {
   name: "NodeAccessorPlugin",
@@ -67,27 +87,18 @@ export const NodeAccessorPlugin: Plugin = {
                 },
                 type: build.getOutputTypeByName(typeName),
                 plan: EXPORTABLE(
-                  (codec, handler, lambda, nodeIdFieldName) =>
+                  (codec, handler, lambda, nodeIdFieldName, specForHandler) =>
                     function plan(
-                      $parent: ExecutablePlan<any>,
+                      _$parent: ExecutablePlan<any>,
                       args: TrackedArguments,
                     ) {
-                      const $spec = lambda(args[nodeIdFieldName], (value) => {
-                        // We only want to return the specifier if it matches
-                        // this handler; otherwise return null.
-                        try {
-                          const specifier = codec.decode(value);
-                          if (handler.match(specifier)) {
-                            return specifier;
-                          }
-                        } catch {
-                          // Ignore errors
-                        }
-                        return null;
-                      });
+                      const $spec = lambda(
+                        args[nodeIdFieldName],
+                        specForHandler(handler, codec),
+                      );
                       return handler.get($spec);
                     },
-                  [codec, handler, lambda, nodeIdFieldName],
+                  [codec, handler, lambda, nodeIdFieldName, specForHandler],
                 ),
               },
             },
