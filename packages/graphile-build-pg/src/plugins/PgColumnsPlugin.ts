@@ -93,6 +93,23 @@ function unwrapCodec(
   return codec;
 }
 
+const getSource = EXPORTABLE(
+  (PgSource) =>
+    (
+      baseCodec: PgTypeCodec<any, any, any, any>,
+      pgSources: PgSource<any, any, any, any>[],
+      $record: PgSelectSinglePlan<any, any, any, any>,
+    ) => {
+      const executor = $record.source.executor;
+      const source =
+        pgSources.find(
+          (potentialSource) => potentialSource.executor === executor,
+        ) ?? PgSource.fromCodec(executor, baseCodec);
+      return source;
+    },
+  [PgSource],
+);
+
 export const PgColumnsPlugin: Plugin = {
   name: "PgColumnsPlugin",
   description: "Adds columns to composite types",
@@ -187,23 +204,12 @@ export const PgColumnsPlugin: Plugin = {
                 [columnName],
               );
             } else {
-              const pgSources = build.input.pgSources;
-              // TODO: this is pretty horrible in the export; we should fix that.
-              const getSource = EXPORTABLE(
-                (PgSource, baseCodec, pgSources) =>
-                  ($record: PgSelectSinglePlan<any, any, any, any>) => {
-                    const executor = $record.source.executor;
-                    const source =
-                      pgSources.find(
-                        (potentialSource) =>
-                          potentialSource.codec === baseCodec &&
-                          !potentialSource.parameters &&
-                          potentialSource.executor === executor,
-                      ) ?? PgSource.fromCodec(executor, baseCodec);
-                    return source;
-                  },
-                [PgSource, baseCodec, pgSources],
+              const pgSources = build.input.pgSources.filter(
+                (potentialSource) =>
+                  potentialSource.codec === baseCodec &&
+                  !potentialSource.parameters,
               );
+              // TODO: this is pretty horrible in the export; we should fix that.
               if (!column.codec.arrayOfCodec) {
                 // Single record from source
                 /*
@@ -213,17 +219,29 @@ export const PgColumnsPlugin: Plugin = {
                  * joined_thing.column`
                  */
                 return EXPORTABLE(
-                  (columnName, getSource, pgSelectSingleFromRecord) =>
+                  (
+                      baseCodec,
+                      columnName,
+                      getSource,
+                      pgSelectSingleFromRecord,
+                      pgSources,
+                    ) =>
                     ($record: PgSelectSinglePlan<any, any, any, any>) => {
                       const $plan = $record.get(columnName);
                       const $select = pgSelectSingleFromRecord(
-                        getSource($record),
+                        getSource(baseCodec, pgSources, $record),
                         $plan,
                       );
                       $select.getClassPlan().setTrusted();
                       return $select;
                     },
-                  [columnName, getSource, pgSelectSingleFromRecord],
+                  [
+                    baseCodec,
+                    columnName,
+                    getSource,
+                    pgSelectSingleFromRecord,
+                    pgSources,
+                  ],
                 );
               } else {
                 // Many records from source
@@ -234,17 +252,29 @@ export const PgColumnsPlugin: Plugin = {
                  * joined_thing.column`
                  */
                 return EXPORTABLE(
-                  (columnName, getSource, pgSelectFromRecords) =>
+                  (
+                      baseCodec,
+                      columnName,
+                      getSource,
+                      pgSelectFromRecords,
+                      pgSources,
+                    ) =>
                     ($record: PgSelectSinglePlan<any, any, any, any>) => {
                       const $plan = $record.get(columnName);
                       const $select = pgSelectFromRecords(
-                        getSource($record),
+                        getSource(baseCodec, pgSources, $record),
                         $plan,
                       );
                       $select.setTrusted();
                       return $select;
                     },
-                  [columnName, getSource, pgSelectFromRecords],
+                  [
+                    baseCodec,
+                    columnName,
+                    getSource,
+                    pgSelectFromRecords,
+                    pgSources,
+                  ],
                 );
               }
             }
