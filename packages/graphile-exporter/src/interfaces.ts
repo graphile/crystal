@@ -1,4 +1,5 @@
 export interface ExportOptions {
+  mode?: "graphql-js" | "typeDefs";
   /**
    * Pass modules to factor into the export; when we see any of the root-level
    * exports from these modules we'll automatically reference them.

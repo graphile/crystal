@@ -4,7 +4,7 @@ import type { TemplateBuilderOptions } from "@babel/template";
 import template from "@babel/template";
 import * as t from "@babel/types";
 import { writeFile } from "fs/promises";
-import { $$crystalWrapped } from "graphile-crystal";
+import { $$crystalWrapped, isCrystalWrapped } from "graphile-crystal";
 import type {
   GraphQLArgumentConfig,
   GraphQLDirective,
@@ -26,6 +26,7 @@ import type {
   GraphQLType,
   GraphQLUnionTypeConfig,
 } from "graphql";
+import { printSchema } from "graphql";
 import {
   GraphQLEnumType,
   GraphQLInputObjectType,
@@ -39,7 +40,7 @@ import {
   isNamedType,
   isSchema,
 } from "graphql";
-import { GraphQLSchemaNormalizedConfig } from "graphql/type/schema";
+import type { GraphQLSchemaNormalizedConfig } from "graphql/type/schema";
 import { sql } from "pg-sql2";
 import prettier from "prettier";
 import type { URL } from "url";
@@ -1351,6 +1352,140 @@ function exportSchemaGraphQLJS({
   );
 }
 
+/**
+ * Exposes as `typeDefs`/`plans` for simplified read
+ */
+function exportSchemaTypeDefs({
+  schema,
+  config,
+  options,
+  customTypes,
+  customDirectives,
+  file,
+}: SchemaExportDetails) {
+  const schemaExportName = file.makeVariable("typeDefs");
+
+  const typeDefsString = printSchema(schema);
+  const graphqlAST = t.templateLiteral(
+    [t.templateElement({ raw: typeDefsString.replace(/[\\`]/g, "\\&1") })],
+    [],
+  );
+  graphqlAST.leadingComments = [
+    { type: "CommentBlock", value: " GraphQL " } as any,
+  ];
+
+  const plansProperties: t.ObjectProperty[] = [];
+  customTypes.forEach((type) => {
+    if (type instanceof GraphQLObjectType) {
+      const typeProperties: t.ObjectProperty[] = [];
+
+      if (type.extensions.graphile?.Plan) {
+        typeProperties.push(
+          t.objectProperty(
+            t.identifier("__Plan"),
+            convertToIdentifierViaAST(
+              file,
+              type.extensions.graphile.Plan,
+              `${type.name}ExpectedPlan`,
+              `${type.name}.extensions.Plan`,
+            ),
+          ),
+        );
+      }
+
+      for (const [fieldName, field] of Object.entries(type.toConfig().fields)) {
+        // Use shorthand if there's only a `plan` and nothing else
+        const planAST = field.extensions?.graphile?.plan
+          ? convertToIdentifierViaAST(
+              file,
+              field.extensions?.graphile?.plan,
+              `${type.name}.${fieldName}Plan`,
+              `${type.name}.fields[${fieldName}].extensions.graphile.plan`,
+            )
+          : null;
+        const subscribePlanAST = field.extensions?.graphile?.subscribePlan
+          ? convertToIdentifierViaAST(
+              file,
+              field.extensions?.graphile?.subscribePlan,
+              `${type.name}.${fieldName}SubscribePlan`,
+              `${type.name}.fields[${fieldName}].extensions.graphile.subscribePlan`,
+            )
+          : null;
+        const originalResolver =
+          field.resolve && isCrystalWrapped(field.resolve)
+            ? field.resolve[$$crystalWrapped].original
+            : field.resolve;
+        const originalSubscribe =
+          field.subscribe && isCrystalWrapped(field.subscribe)
+            ? field.subscribe[$$crystalWrapped].original
+            : field.subscribe;
+        const resolveAST = originalResolver
+          ? convertToIdentifierViaAST(
+              file,
+              originalResolver,
+              `${type.name}.${fieldName}Resolve`,
+              `${type.name}.fields[${fieldName}].resolve`,
+            )
+          : null;
+        const subscribeAST = originalResolver
+          ? convertToIdentifierViaAST(
+              file,
+              originalSubscribe,
+              `${type.name}.${fieldName}Subscribe`,
+              `${type.name}.fields[${fieldName}].subscribe`,
+            )
+          : null;
+        if (!planAST && !subscribePlanAST && !resolveAST && !subscribeAST) {
+          // No definition
+          continue;
+        }
+        const shorthand =
+          planAST &&
+          !subscribePlanAST &&
+          !originalResolver &&
+          !originalSubscribe;
+        const fieldSpec = shorthand
+          ? planAST
+          : t.objectExpression(
+              objectToObjectProperties({
+                plan: planAST,
+                subscribePlan: subscribePlanAST,
+                resolve: resolveAST,
+                subscribe: subscribeAST,
+              }),
+            );
+        typeProperties.push(
+          t.objectProperty(identifierOrLiteral(fieldName), fieldSpec),
+        );
+      }
+
+      plansProperties.push(
+        t.objectProperty(
+          identifierOrLiteral(type.name),
+          t.objectExpression(typeProperties),
+        ),
+      );
+    }
+  });
+
+  const typeDefs = t.exportNamedDeclaration(
+    t.variableDeclaration("const", [
+      t.variableDeclarator(t.identifier("typeDefs"), graphqlAST),
+    ]),
+  );
+  const plans = t.exportNamedDeclaration(
+    t.variableDeclaration("const", [
+      t.variableDeclarator(
+        t.identifier("plans"),
+        t.objectExpression(plansProperties),
+      ),
+    ]),
+  );
+
+  file.addStatements(typeDefs);
+  file.addStatements(plans);
+}
+
 export async function exportSchemaAsString(
   schema: GraphQLSchema,
   options: ExportOptions,
@@ -1381,7 +1516,11 @@ export async function exportSchemaAsString(
     file,
   };
 
-  exportSchemaGraphQLJS(schemaExportDetails);
+  if (options.mode === "typeDefs") {
+    exportSchemaTypeDefs(schemaExportDetails);
+  } else {
+    exportSchemaGraphQLJS(schemaExportDetails);
+  }
 
   const ast = file.toAST();
 
