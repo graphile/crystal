@@ -9,7 +9,7 @@ import type {
 import { PgSourceBuilder } from "@dataplan/pg";
 import type { ListPlan } from "graphile-crystal";
 import { access, constant, list } from "graphile-crystal";
-import { EXPORTABLE } from "graphile-exporter";
+import { EXPORTABLE, isSafeIdentifier } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
 import type { GraphQLInterfaceType } from "graphql";
 import sql from "pg-sql2";
@@ -63,28 +63,56 @@ export const PgTableNodePlugin: Plugin = {
           const pgSource = sources[0];
           const pk = pgSource.uniques[0].columns as string[];
 
+          const clean =
+            isSafeIdentifier(tableTypeName) &&
+            pk.every((columnName) => isSafeIdentifier(columnName));
+
           build.registerNodeIdHandler(tableTypeName, {
             codecName: "base64JSON",
-            plan: EXPORTABLE(
-              (constant, list, pk, tableTypeName) =>
-                ($record: PgSelectSinglePlan<any, any, any, any>) => {
-                  return list([
-                    constant(tableTypeName),
-                    ...pk.map((column) => $record.get(column)),
-                  ]);
-                },
-              [constant, list, pk, tableTypeName],
-            ),
-            get: EXPORTABLE(
-              (access, pgSource, pk) => ($list: ListPlan<any[]>) => {
-                const spec = pk.reduce((memo, column, index) => {
-                  memo[column] = access($list, [index + 1]);
-                  return memo;
-                }, {});
-                return pgSource.get(spec);
-              },
-              [access, pgSource, pk],
-            ),
+            plan: clean
+              ? EXPORTABLE(
+                  eval(
+                    `(list, constant) => $record => list([constant(${JSON.stringify(
+                      tableTypeName,
+                    )}), ${pk
+                      .map(
+                        (columnName) =>
+                          `$record.get(${JSON.stringify(columnName)})`,
+                      )
+                      .join(", ")}])`,
+                  ),
+                  [list, constant],
+                )
+              : EXPORTABLE(
+                  (constant, list, pk, tableTypeName) =>
+                    ($record: PgSelectSinglePlan<any, any, any, any>) => {
+                      return list([
+                        constant(tableTypeName),
+                        ...pk.map((column) => $record.get(column)),
+                      ]);
+                    },
+                  [constant, list, pk, tableTypeName],
+                ),
+            get: clean
+              ? EXPORTABLE(
+                  eval(
+                    `(pgSource, access) => $list => pgSource.get({ ${pk.map(
+                      (columnName, index) =>
+                        `${columnName}: access($list, [${index + 1}])`,
+                    )} })`,
+                  ),
+                  [pgSource, access],
+                )
+              : EXPORTABLE(
+                  (access, pgSource, pk) => ($list: ListPlan<any[]>) => {
+                    const spec = pk.reduce((memo, column, index) => {
+                      memo[column] = access($list, [index + 1]);
+                      return memo;
+                    }, {});
+                    return pgSource.get(spec);
+                  },
+                  [access, pgSource, pk],
+                ),
             match: EXPORTABLE(
               (tableTypeName) => (obj) => {
                 return obj[0] === tableTypeName;
