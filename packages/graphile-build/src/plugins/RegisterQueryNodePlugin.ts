@@ -1,4 +1,4 @@
-import { constant, node, NodePlan } from "graphile-crystal";
+import { aether, constant, node, NodePlan } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLInterfaceType } from "graphql";
@@ -22,10 +22,10 @@ export const RegisterQueryNodePlugin: Plugin = {
             [],
           ),
           get: EXPORTABLE(
-            (constant) => () => {
-              return constant({});
+            (aether) => () => {
+              return aether().rootValuePlan;
             },
-            [constant],
+            [aether],
           ),
           plan: EXPORTABLE(
             (constant) => () => {
