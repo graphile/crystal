@@ -50,13 +50,14 @@ import type { ExportOptions } from "./interfaces";
 import { optimize } from "./optimize";
 import { wellKnown } from "./wellKnown";
 
+export const isSafeIdentifier = (key: string) =>
+  /^[a-z_$][a-z0-9_$]*$/i.test(key);
+
 function identifierOrLiteral(key: string | number) {
   if (typeof key === "number") {
     return t.numericLiteral(key);
   }
-  const isSafeIdentifier = /^[a-z_$][a-z0-9_$]*$/i.test(key);
-
-  if (isSafeIdentifier) {
+  if (isSafeIdentifier(key)) {
     return t.identifier(key);
   } else {
     return t.stringLiteral(key);

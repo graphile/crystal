@@ -1,6 +1,6 @@
 import type { PgSource, PgSourceUnique, PgTypeCodec } from "@dataplan/pg";
 import type { TrackedArguments } from "graphile-crystal";
-import { EXPORTABLE } from "graphile-exporter";
+import { EXPORTABLE, isSafeIdentifier } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import type { GraphQLObjectType } from "graphql";
 
@@ -95,6 +95,46 @@ export const PgRowByUniquePlugin: Plugin = {
                   };
                 });
 
+                const columnNames = Object.keys(detailsByColumnName);
+                const clean = columnNames.every(
+                  (key) =>
+                    isSafeIdentifier(key) &&
+                    isSafeIdentifier(detailsByColumnName[key].graphqlName),
+                );
+                const plan = clean
+                  ? /*
+                     * Since all the identifiers are nice and clean we can use
+                     * an optimized function that doesn't loop over the
+                     * attributes and just builds the object directly.  This is
+                     * more performant, but it also makes the code nicer to
+                     * read in the exported code.
+                     */
+                    EXPORTABLE(
+                      eval(
+                        `source => (_$root, args) => source.get({ ${columnNames
+                          .map(
+                            (columnName) =>
+                              `${columnName}: args.${detailsByColumnName[columnName].graphqlName}`,
+                          )
+                          .join(", ")} })`,
+                      ),
+                      [source],
+                    )
+                  : EXPORTABLE(
+                      (detailsByColumnName, source) =>
+                        function plan(
+                          _$root: any,
+                          args: TrackedArguments<any>,
+                        ) {
+                          const spec = {};
+                          for (const columnName in detailsByColumnName) {
+                            spec[columnName] =
+                              args[detailsByColumnName[columnName].graphqlName];
+                          }
+                          return source.get(spec);
+                        },
+                      [detailsByColumnName, source],
+                    );
                 return build.extend(
                   memo,
                   {
@@ -122,26 +162,7 @@ export const PgRowByUniquePlugin: Plugin = {
                           return args;
                         }, {}),
 
-                        // TODO: JIT-ing this function would allow for
-                        // `const spec = {user_id: args.userId, org_id: args.orgId}`
-                        // in the compiled output.
-                        plan: EXPORTABLE(
-                          (detailsByColumnName, source) =>
-                            function plan(
-                              _$root: any,
-                              args: TrackedArguments<any>,
-                            ) {
-                              const spec = {};
-                              for (const columnName in detailsByColumnName) {
-                                spec[columnName] =
-                                  args[
-                                    detailsByColumnName[columnName].graphqlName
-                                  ];
-                              }
-                              return source.get(spec);
-                            },
-                          [detailsByColumnName, source],
-                        ) as any,
+                        plan: plan as any,
                       }),
                     ),
                   },
