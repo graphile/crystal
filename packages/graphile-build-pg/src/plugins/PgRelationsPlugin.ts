@@ -9,7 +9,7 @@ import type {
 } from "@dataplan/pg";
 import { PgSourceBuilder } from "@dataplan/pg";
 import { connection } from "graphile-crystal";
-import { EXPORTABLE } from "graphile-exporter";
+import { EXPORTABLE, isSafeIdentifier } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig } from "graphile-plugin";
 import type { GraphQLObjectType } from "graphql";
 
@@ -317,24 +317,50 @@ export const PgRelationsPlugin: Plugin = {
               identifier,
               relation,
             };
-            const singleRecordPlan = EXPORTABLE(
-              (localColumns, otherSource, remoteColumns) =>
-                function plan(
-                  $message: PgSelectSinglePlan<any, any, any, any>,
-                ) {
-                  const spec = remoteColumns.reduce(
-                    (memo, remoteColumnName, i) => {
-                      memo[remoteColumnName] = $message.get(
-                        localColumns[i] as string,
+            const clean =
+              remoteColumns.every(
+                (remoteColumnName) =>
+                  typeof remoteColumnName === "string" &&
+                  isSafeIdentifier(remoteColumnName),
+              ) &&
+              localColumns.every(
+                (localColumnName) =>
+                  typeof localColumnName === "string" &&
+                  isSafeIdentifier(localColumnName),
+              );
+            const singleRecordPlan = clean
+              ? // Optimise function for both execution and export.
+                (EXPORTABLE(
+                  eval(
+                    `(otherSource) => $messages => otherSource.get({ ${remoteColumns
+                      .map(
+                        (remoteColumnName, i) =>
+                          `${
+                            remoteColumnName as string
+                          }: $messages.get(${JSON.stringify(localColumns[i])})`,
+                      )
+                      .join(", ")} })`,
+                  ),
+                  [otherSource],
+                ) as any)
+              : EXPORTABLE(
+                  (localColumns, otherSource, remoteColumns) =>
+                    function plan(
+                      $message: PgSelectSinglePlan<any, any, any, any>,
+                    ) {
+                      const spec = remoteColumns.reduce(
+                        (memo, remoteColumnName, i) => {
+                          memo[remoteColumnName] = $message.get(
+                            localColumns[i] as string,
+                          );
+                          return memo;
+                        },
+                        {},
                       );
-                      return memo;
+                      return otherSource.get(spec);
                     },
-                    {},
-                  );
-                  return otherSource.get(spec);
-                },
-              [localColumns, otherSource, remoteColumns],
-            );
+                  [localColumns, otherSource, remoteColumns],
+                );
 
             const listPlan = EXPORTABLE(
               (localColumns, otherSource, remoteColumns) =>
