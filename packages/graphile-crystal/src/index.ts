@@ -108,6 +108,7 @@ import {
   $$crystalWrapped,
   crystalResolve,
   crystalWrapResolve,
+  isCrystalWrapped,
   makeCrystalSubscriber,
 } from "./resolvers";
 import { stripAnsi } from "./stripAnsi";
@@ -190,6 +191,7 @@ export {
   InputObjectTypeSpec,
   InputPlan,
   InputStaticLeafPlan,
+  isCrystalWrapped,
   isDev,
   isExecutablePlan,
   isListCapablePlan,
@@ -303,6 +305,7 @@ exportAsMany({
   polymorphicWrap,
   resolveType,
   $$crystalWrapped,
+  isCrystalWrapped,
   crystalWrapResolve,
   crystalResolve,
   makeCrystalSubscriber,
