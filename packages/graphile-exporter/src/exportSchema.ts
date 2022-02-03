@@ -39,6 +39,7 @@ import {
   isNamedType,
   isSchema,
 } from "graphql";
+import { GraphQLSchemaNormalizedConfig } from "graphql/type/schema";
 import { sql } from "pg-sql2";
 import prettier from "prettier";
 import type { URL } from "url";
@@ -1288,34 +1289,31 @@ Object.defineProperty(${
   }
 }
 
-export async function exportSchemaAsString(
-  schema: GraphQLSchema,
-  options: ExportOptions,
-): Promise<{ code: string }> {
-  const config = schema.toConfig();
-  const file = new CodegenFile(options);
+interface SchemaExportDetails {
+  schema: GraphQLSchema;
+  config: GraphQLSchemaNormalizedConfig;
+  options: ExportOptions;
+  customTypes: GraphQLNamedType[];
+  customDirectives: GraphQLDirective[];
+  file: CodegenFile;
+}
 
+/**
+ * Exposes a `GraphQLSchema` object built via GraphQL.js constructors
+ */
+function exportSchemaGraphQLJS({
+  schema,
+  config,
+  options,
+  customTypes,
+  customDirectives,
+  file,
+}: SchemaExportDetails) {
   const schemaExportName = file.makeVariable("schema");
 
-  const types = config.types
-    .map((type) => {
-      if (!isBuiltinType(type)) {
-        return file.declareType(type);
-      }
-    })
-    .filter(isNotNullish);
-
-  const customDirectives = config.directives.filter(
-    (d) =>
-      ![
-        "skip",
-        "include",
-        "deprecated",
-        "specifiedBy",
-        "defer",
-        "stream",
-      ].includes(d.name),
-  );
+  const types = customTypes.map((type) => {
+    return file.declareType(type);
+  });
 
   file.addStatements(
     declareGraphQLEntity(file, schemaExportName, "GraphQLSchema", {
@@ -1351,6 +1349,39 @@ export async function exportSchemaAsString(
       assumeValid: null, // TODO: t.booleanLiteral(true),
     }),
   );
+}
+
+export async function exportSchemaAsString(
+  schema: GraphQLSchema,
+  options: ExportOptions,
+): Promise<{ code: string }> {
+  const config = schema.toConfig();
+
+  const customTypes = config.types.filter((type) => !isBuiltinType(type));
+  const customDirectives = config.directives.filter(
+    (d) =>
+      ![
+        "skip",
+        "include",
+        "deprecated",
+        "specifiedBy",
+        "defer",
+        "stream",
+      ].includes(d.name),
+  );
+
+  const file = new CodegenFile(options);
+
+  const schemaExportDetails: SchemaExportDetails = {
+    schema,
+    config,
+    options,
+    customTypes,
+    customDirectives,
+    file,
+  };
+
+  exportSchemaGraphQLJS(schemaExportDetails);
 
   const ast = file.toAST();
 
