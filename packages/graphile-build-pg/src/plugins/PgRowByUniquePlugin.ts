@@ -121,6 +121,10 @@ export const PgRowByUniquePlugin: Plugin = {
                           };
                           return args;
                         }, {}),
+
+                        // TODO: JIT-ing this function would allow for
+                        // `const spec = {user_id: args.userId, org_id: args.orgId}`
+                        // in the compiled output.
                         plan: EXPORTABLE(
                           (detailsByColumnName, source) =>
                             function plan(
