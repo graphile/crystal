@@ -58,7 +58,7 @@ export interface CrystalWrapDetails<
 export function isCrystalWrapped<T>(
   t: T,
 ): t is T & { [$$crystalWrapped]: CrystalWrapDetails } {
-  return $$crystalWrapped in t;
+  return t != null && $$crystalWrapped in t;
 }
 
 const getAetherFromResolver = <TContext extends object>(
