@@ -169,7 +169,7 @@ export const PgConnectionArgOrderByPlugin: Plugin = {
   },
 };
 
-const applyOrderToPlan = EXPORTABLE(
+export const applyOrderToPlan = EXPORTABLE(
   (getEnumValueConfig, inspect) =>
     (
       $select: PgSelectPlan<any, any, any, any>,

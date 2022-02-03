@@ -34,6 +34,7 @@ import { inspect } from "util";
 import { getBehavior } from "../behavior";
 import { version } from "../index";
 import type { PgClass, PgNamespace } from "../introspection";
+import { applyOrderToPlan } from "./PgConnectionArgOrderByPlugin";
 
 declare global {
   namespace GraphileEngine {
@@ -171,14 +172,14 @@ export const PgMutationPayloadEdgePlugin: Plugin = {
                       : null,
                   },
                 },
+                // TODO: review this plan, it feels overly complex and somewhat hacky.
                 plan: EXPORTABLE(
                   (
                     EdgePlan,
                     TableOrderByType,
+                    applyOrderToPlan,
                     connection,
                     constant,
-                    getEnumValueConfig,
-                    inspect,
                     pkColumns,
                     source,
                   ) =>
@@ -188,12 +189,9 @@ export const PgMutationPayloadEdgePlugin: Plugin = {
                       }>,
                       args: TrackedArguments,
                     ) {
-                      // TODO: review this plan, it feels overly complex and somewhat hacky.
-
                       const $record = $mutation.getPlanForKey("record", true);
-                      if (!$record) {
-                        return constant(null);
-                      }
+                      if (!$record) return constant(null);
+
                       const spec = pkColumns.reduce((memo, columnName) => {
                         memo[columnName] = $record.get(columnName);
                         return memo;
@@ -202,28 +200,7 @@ export const PgMutationPayloadEdgePlugin: Plugin = {
 
                       // Perform ordering
                       const $value = args.orderBy;
-                      const val = $value.eval();
-                      if (!Array.isArray(val)) {
-                        throw new Error("Invalid!");
-                      }
-                      val.forEach((order) => {
-                        const config = getEnumValueConfig(
-                          TableOrderByType,
-                          order,
-                        );
-                        const plan = config?.extensions?.graphile?.plan;
-                        if (typeof plan !== "function") {
-                          console.error(
-                            `Internal server error: invalid orderBy configuration: expected function, but received ${inspect(
-                              plan,
-                            )}`,
-                          );
-                          throw new Error(
-                            "Internal server error: invalid orderBy configuration",
-                          );
-                        }
-                        plan($select);
-                      });
+                      applyOrderToPlan($select, $value, TableOrderByType);
 
                       const $connection = connection(
                         $select,
@@ -237,10 +214,9 @@ export const PgMutationPayloadEdgePlugin: Plugin = {
                   [
                     EdgePlan,
                     TableOrderByType,
+                    applyOrderToPlan,
                     connection,
                     constant,
-                    getEnumValueConfig,
-                    inspect,
                     pkColumns,
                     source,
                   ],
