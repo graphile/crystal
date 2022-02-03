@@ -134,14 +134,23 @@ export const optimize = (ast: t.Node) => {
             continue;
           }
 
-          // Only replace if it's only referenced once (we don't want duplicates) and it's not a call (we don't want IIFEs really)
-          if (
-            binding.referencePaths.length === 1 &&
-            !t.isCallExpression(binding.referencePaths[0].parent)
-          ) {
-            binding.referencePaths[0].replaceWith(binding.path.node.init);
-            binding.path.remove();
+          // Only replace if it's only referenced once (we don't want duplicates)
+          if (binding.referencePaths.length !== 1) {
+            continue;
           }
+          const parent = binding.referencePaths[0].parent;
+
+          // Don't turn this into an IIFE
+          if (
+            parent &&
+            t.isCallExpression(parent) &&
+            parent.callee === binding.referencePaths[0].node
+          ) {
+            continue;
+          }
+
+          binding.referencePaths[0].replaceWith(binding.path.node.init);
+          binding.path.remove();
         }
       },
     },
