@@ -1495,6 +1495,74 @@ function exportSchemaTypeDefs({
           t.objectExpression(typeProperties),
         ),
       );
+    } else if (type instanceof GraphQLInputObjectType) {
+      const typeProperties: t.ObjectProperty[] = [];
+
+      for (const [fieldName, field] of Object.entries(type.toConfig().fields)) {
+        // Use shorthand if there's only a `plan` and nothing else
+        const planAST = field.extensions?.graphile?.plan
+          ? convertToIdentifierViaAST(
+              file,
+              field.extensions?.graphile?.plan,
+              `${type.name}.${fieldName}Plan`,
+              `${type.name}.fields[${fieldName}].extensions.graphile.plan`,
+            )
+          : null;
+        if (!planAST) {
+          continue;
+        }
+        typeProperties.push(
+          t.objectProperty(identifierOrLiteral(fieldName), planAST),
+        );
+      }
+
+      plansProperties.push(
+        t.objectProperty(
+          identifierOrLiteral(type.name),
+          t.objectExpression(typeProperties),
+        ),
+      );
+    } else if (type instanceof GraphQLScalarType) {
+      const typeProperties: t.ObjectProperty[] = [];
+      const config = type.toConfig();
+      const planAST = config.extensions.graphile?.plan
+        ? convertToIdentifierViaAST(
+            file,
+            config.extensions?.graphile?.plan,
+            `${type.name}Plan`,
+            `${type.name}.extensions.graphile.plan`,
+          )
+        : null;
+      if (planAST) {
+        plansProperties.push(
+          t.objectProperty(
+            identifierOrLiteral(type.name),
+            t.objectExpression(
+              objectToObjectProperties({
+                serialize: convertToIdentifierViaAST(
+                  file,
+                  type.serialize,
+                  `${type.name}Serialize`,
+                  `${type.name}.serialize`,
+                ),
+                parseValue: convertToIdentifierViaAST(
+                  file,
+                  type.parseValue,
+                  `${type.name}ParseValue`,
+                  `${type.name}.parseValue`,
+                ),
+                parseLiteral: convertToIdentifierViaAST(
+                  file,
+                  type.parseLiteral,
+                  `${type.name}ParseLiteral`,
+                  `${type.name}.parseLiteral`,
+                ),
+                plan: planAST,
+              }),
+            ),
+          ),
+        );
+      }
     }
   });
 
