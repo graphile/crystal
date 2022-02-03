@@ -145,7 +145,7 @@ export const PgConnectionArgOrderByPlugin: Plugin = {
               ),
               type: new GraphQLList(new GraphQLNonNull(TableOrderByType)),
               plan: EXPORTABLE(
-                (TableOrderByType, getEnumValueConfig, inspect) =>
+                (TableOrderByType, applyOrderToPlan) =>
                   function plan(
                     _: any,
                     $connection: ConnectionPlan<
@@ -155,31 +155,10 @@ export const PgConnectionArgOrderByPlugin: Plugin = {
                     $value: InputPlan,
                   ) {
                     const $select = $connection.getSubplan();
-                    const val = $value.eval();
-                    if (!Array.isArray(val)) {
-                      throw new Error("Invalid!");
-                    }
-                    val.forEach((order) => {
-                      const config = getEnumValueConfig(
-                        TableOrderByType,
-                        order,
-                      );
-                      const plan = config?.extensions?.graphile?.plan;
-                      if (typeof plan !== "function") {
-                        console.error(
-                          `Internal server error: invalid orderBy configuration: expected function, but received ${inspect(
-                            plan,
-                          )}`,
-                        );
-                        throw new Error(
-                          "Internal server error: invalid orderBy configuration",
-                        );
-                      }
-                      plan($select);
-                    });
+                    applyOrderToPlan($select, $value, TableOrderByType);
                     return null;
                   },
-                [TableOrderByType, getEnumValueConfig, inspect],
+                [TableOrderByType, applyOrderToPlan],
               ),
             },
           },
@@ -189,3 +168,33 @@ export const PgConnectionArgOrderByPlugin: Plugin = {
     },
   },
 };
+
+const applyOrderToPlan = EXPORTABLE(
+  (getEnumValueConfig, inspect) =>
+    (
+      $select: PgSelectPlan<any, any, any, any>,
+      $value: InputPlan,
+      TableOrderByType: GraphQLEnumType,
+    ) => {
+      const val = $value.eval();
+      if (!Array.isArray(val)) {
+        throw new Error("Invalid!");
+      }
+      val.forEach((order) => {
+        const config = getEnumValueConfig(TableOrderByType, order);
+        const plan = config?.extensions?.graphile?.plan;
+        if (typeof plan !== "function") {
+          console.error(
+            `Internal server error: invalid orderBy configuration: expected function, but received ${inspect(
+              plan,
+            )}`,
+          );
+          throw new Error(
+            "Internal server error: invalid orderBy configuration",
+          );
+        }
+        plan($select);
+      });
+    },
+  [getEnumValueConfig, inspect],
+);

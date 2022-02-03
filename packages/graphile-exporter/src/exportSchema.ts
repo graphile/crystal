@@ -1354,7 +1354,9 @@ function exportSchemaGraphQLJS({
 }
 
 /**
- * Exposes as `typeDefs`/`plans` for simplified read
+ * Exposes as `typeDefs`/`plans` for simplified read.
+ *
+ * EXPERIMENTAL!
  */
 function exportSchemaTypeDefs({
   schema,
@@ -1436,7 +1438,32 @@ function exportSchemaTypeDefs({
               `${type.name}.fields[${fieldName}].subscribe`,
             )
           : null;
+
+        const args = field.args
+          ? Object.entries(field.args)
+              .map(([argName, arg]) => {
+                if (arg.extensions?.graphile?.plan) {
+                  return t.objectProperty(
+                    identifierOrLiteral(argName),
+                    convertToIdentifierViaAST(
+                      file,
+                      arg.extensions.graphile.plan,
+                      `${type.name}.${fieldName}.${argName}Plan`,
+                      `${type.name}.fields[${fieldName}].args[${argName}].extensions.graphile.plan`,
+                    ),
+                  );
+                }
+              })
+              .filter(isNotNullish)
+          : null;
+        const argsAST = args && args.length ? t.objectExpression(args) : null;
+
         if (!planAST && !subscribePlanAST && !resolveAST && !subscribeAST) {
+          if (argsAST) {
+            throw new Error(
+              `Invalid schema! ${type.name}.${fieldName} has no plan, but it's arguments do!`,
+            );
+          }
           // No definition
           continue;
         }
@@ -1444,7 +1471,8 @@ function exportSchemaTypeDefs({
           planAST &&
           !subscribePlanAST &&
           !originalResolver &&
-          !originalSubscribe;
+          !originalSubscribe &&
+          !argsAST;
         const fieldSpec = shorthand
           ? planAST
           : t.objectExpression(
@@ -1453,6 +1481,7 @@ function exportSchemaTypeDefs({
                 subscribePlan: subscribePlanAST,
                 resolve: resolveAST,
                 subscribe: subscribeAST,
+                args: argsAST,
               }),
             );
         typeProperties.push(
