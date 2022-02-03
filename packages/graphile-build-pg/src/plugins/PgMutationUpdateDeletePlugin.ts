@@ -15,7 +15,7 @@ import type {
   TrackedArguments,
 } from "graphile-crystal";
 import { constant, lambda, object, ObjectPlan } from "graphile-crystal";
-import { EXPORTABLE } from "graphile-exporter";
+import { EXPORTABLE, isSafeIdentifier } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
 import type {
   GraphQLFieldConfigMap,
@@ -627,20 +627,40 @@ export const PgMutationUpdateDeletePlugin: Plugin = {
                   ],
                 );
 
-                const specFromArgs = EXPORTABLE(
-                  (uniqueColumns) => (args: TrackedArguments) => {
-                    return uniqueColumns.reduce(
-                      (memo, [columnName, fieldName]) => {
-                        memo[columnName] = (
-                          args.input as __TrackedObjectPlan | InputObjectPlan
-                        ).get(fieldName);
-                        return memo;
-                      },
-                      {},
-                    );
-                  },
-                  [uniqueColumns],
+                const clean = uniqueColumns.every(
+                  ([columnName, fieldName]) =>
+                    isSafeIdentifier(columnName) && isSafeIdentifier(fieldName),
                 );
+                const specFromArgs = clean
+                  ? (EXPORTABLE(
+                      eval(
+                        `() => (args) => ({ ${uniqueColumns
+                          .map(
+                            ([columnName, fieldName]) =>
+                              `${columnName}: args.input.get(${JSON.stringify(
+                                fieldName,
+                              )})`,
+                          )
+                          .join(", ")} })`,
+                      ),
+                      [],
+                    ) as any)
+                  : EXPORTABLE(
+                      (uniqueColumns) => (args: TrackedArguments) => {
+                        return uniqueColumns.reduce(
+                          (memo, [columnName, fieldName]) => {
+                            memo[columnName] = (
+                              args.input as
+                                | __TrackedObjectPlan
+                                | InputObjectPlan
+                            ).get(fieldName);
+                            return memo;
+                          },
+                          {},
+                        );
+                      },
+                      [uniqueColumns],
+                    );
 
                 return build.extend(
                   fields,

@@ -18,7 +18,7 @@ function isSimpleParam(param: t.Node): param is t.Identifier {
   return t.isIdentifier(param);
 }
 
-export const optimize = (ast: t.Node) => {
+export const optimize = (ast: t.Node, runs = 1): t.Node => {
   traverse(ast, {
     CallExpression: {
       enter(path) {
@@ -144,7 +144,9 @@ export const optimize = (ast: t.Node) => {
           if (
             parent &&
             t.isCallExpression(parent) &&
-            parent.callee === binding.referencePaths[0].node
+            parent.callee === binding.referencePaths[0].node &&
+            (!t.isArrowFunctionExpression(binding.path.node.init) ||
+              t.isBlock(binding.path.node.init.body))
           ) {
             continue;
           }
@@ -199,6 +201,10 @@ export const optimize = (ast: t.Node) => {
       );
     },
   });
+
+  if (runs < 2) {
+    return optimize(ast, runs + 1);
+  }
 
   return ast;
 };
