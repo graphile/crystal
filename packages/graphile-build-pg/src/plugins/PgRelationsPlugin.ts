@@ -362,48 +362,79 @@ export const PgRelationsPlugin: Plugin = {
                   [localColumns, otherSource, remoteColumns],
                 );
 
-            const listPlan = EXPORTABLE(
-              (localColumns, otherSource, remoteColumns) =>
-                function plan(
-                  $message: PgSelectSinglePlan<any, any, any, any>,
-                ) {
-                  const spec = remoteColumns.reduce(
-                    (memo, remoteColumnName, i) => {
-                      memo[remoteColumnName] = $message.get(
-                        localColumns[i] as string,
+            const listPlan = clean
+              ? (EXPORTABLE(
+                  eval(
+                    `(otherSource) => $messages => otherSource.find({ ${remoteColumns
+                      .map(
+                        (remoteColumnName, i) =>
+                          `${
+                            remoteColumnName as string
+                          }: $messages.get(${JSON.stringify(localColumns[i])})`,
+                      )
+                      .join(", ")} })`,
+                  ),
+                  [otherSource],
+                ) as any)
+              : EXPORTABLE(
+                  (localColumns, otherSource, remoteColumns) =>
+                    function plan(
+                      $message: PgSelectSinglePlan<any, any, any, any>,
+                    ) {
+                      const spec = remoteColumns.reduce(
+                        (memo, remoteColumnName, i) => {
+                          memo[remoteColumnName] = $message.get(
+                            localColumns[i] as string,
+                          );
+                          return memo;
+                        },
+                        {},
                       );
-                      return memo;
+                      return otherSource.find(spec);
                     },
-                    {},
-                  );
-                  return otherSource.find(spec);
-                },
-              [localColumns, otherSource, remoteColumns],
-            );
+                  [localColumns, otherSource, remoteColumns],
+                );
 
-            const connectionPlan = EXPORTABLE(
-              (connection, localColumns, otherSource, remoteColumns) =>
-                function plan(
-                  $message: PgSelectSinglePlan<any, any, any, any>,
-                ) {
-                  const spec = remoteColumns.reduce(
-                    (memo, remoteColumnName, i) => {
-                      memo[remoteColumnName] = $message.get(
-                        localColumns[i] as string,
+            const connectionPlan = clean
+              ? (EXPORTABLE(
+                  eval(
+                    `(otherSource) => $messages => {
+  const $records = otherSource.find({ ${remoteColumns
+    .map(
+      (remoteColumnName, i) =>
+        `${remoteColumnName as string}: $messages.get(${JSON.stringify(
+          localColumns[i],
+        )})`,
+    )
+    .join(", ")} });
+  return connection($records, $item => $item, $item => $item.cursor());
+}`,
+                  ),
+                  [otherSource],
+                ) as any)
+              : EXPORTABLE(
+                  (connection, localColumns, otherSource, remoteColumns) =>
+                    function plan(
+                      $message: PgSelectSinglePlan<any, any, any, any>,
+                    ) {
+                      const spec = remoteColumns.reduce(
+                        (memo, remoteColumnName, i) => {
+                          memo[remoteColumnName] = $message.get(
+                            localColumns[i] as string,
+                          );
+                          return memo;
+                        },
+                        {},
                       );
-                      return memo;
+                      return connection(
+                        otherSource.find(spec),
+                        ($item) => $item,
+                        ($item: PgSelectSinglePlan<any, any, any, any>) =>
+                          $item.cursor(),
+                      );
                     },
-                    {},
-                  );
-                  return connection(
-                    otherSource.find(spec),
-                    ($item) => $item,
-                    ($item: PgSelectSinglePlan<any, any, any, any>) =>
-                      $item.cursor(),
-                  );
-                },
-              [connection, localColumns, otherSource, remoteColumns],
-            );
+                  [connection, localColumns, otherSource, remoteColumns],
+                );
 
             if (isUnique && behavior.includes("single")) {
               const fieldName = relationDetails.relation.isBackwards
