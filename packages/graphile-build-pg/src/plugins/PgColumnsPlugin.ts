@@ -182,17 +182,13 @@ export const PgColumnsPlugin: Plugin = {
               return EXPORTABLE(
                 (columnName) =>
                   ($record: PgSelectSinglePlan<any, any, any, any>) => {
-                    if (!$record.get) {
-                      console.log(
-                        `Unexpected plan ${$record} - expected a plan with a '.get' method`,
-                      );
-                    }
                     return $record.get(columnName);
                   },
                 [columnName],
               );
             } else {
               const pgSources = build.input.pgSources;
+              // TODO: this is pretty horrible in the export; we should fix that.
               const getSource = EXPORTABLE(
                 (PgSource, baseCodec, pgSources) =>
                   ($record: PgSelectSinglePlan<any, any, any, any>) => {
