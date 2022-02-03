@@ -151,21 +151,35 @@ export const optimize = (ast: t.Node) => {
         return;
       }
       const func = path.node.value;
-      if (!t.isFunctionExpression(func)) {
+      if (!t.isFunctionExpression(func) && !t.isArrowFunctionExpression(func)) {
         return;
       }
+      if (t.isArrowFunctionExpression(func)) {
+        // Check if it contains `this`; if so, do not rewrite
+        const hasThis = !!path
+          .get("value")
+          .find((path) => t.isThisExpression(path.node));
+        if (hasThis) {
+          return;
+        }
+      }
+      /*
       if (!func.id) {
         return;
       }
       if (func.id.name !== path.node.key.name) {
         return;
       }
+      */
+      const body = t.isBlock(func.body)
+        ? func.body
+        : t.blockStatement([t.returnStatement(func.body)]);
       path.replaceWith(
         t.objectMethod(
           "method",
           path.node.key,
           func.params,
-          func.body,
+          body,
           false,
           func.generator,
           func.async,
