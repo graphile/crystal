@@ -1522,6 +1522,28 @@ function exportSchemaTypeDefs({
           t.objectExpression(typeProperties),
         ),
       );
+    } else if (
+      type instanceof GraphQLInterfaceType ||
+      type instanceof GraphQLUnionType
+    ) {
+      const config = type.toConfig();
+      if (config.resolveType) {
+        plansProperties.push(
+          t.objectProperty(
+            identifierOrLiteral(type.name),
+            t.objectExpression(
+              objectToObjectProperties({
+                __resolveType: convertToIdentifierViaAST(
+                  file,
+                  type.resolveType,
+                  `${type.name}ResolveType`,
+                  `${type.name}.resolveType`,
+                ),
+              }),
+            ),
+          ),
+        );
+      }
     } else if (type instanceof GraphQLScalarType) {
       const typeProperties: t.ObjectProperty[] = [];
       const config = type.toConfig();
@@ -1563,6 +1585,11 @@ function exportSchemaTypeDefs({
           ),
         );
       }
+    } else if (type instanceof GraphQLEnumType) {
+      // Nothing special required for enums
+    } else {
+      const never: never = type;
+      console.warn(`Unhandled type ${never}`);
     }
   });
 
