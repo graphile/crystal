@@ -1370,7 +1370,7 @@ function exportSchemaTypeDefs({
 
   const typeDefsString = printSchema(schema);
   const graphqlAST = t.templateLiteral(
-    [t.templateElement({ raw: typeDefsString.replace(/[\\`]/g, "\\&1") })],
+    [t.templateElement({ raw: typeDefsString.replace(/[\\`]/g, "\\$&") })],
     [],
   );
   graphqlAST.leadingComments = [
