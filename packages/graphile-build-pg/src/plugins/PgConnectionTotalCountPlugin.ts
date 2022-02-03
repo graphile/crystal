@@ -31,12 +31,12 @@ export const PgConnectionTotalCountPlugin: Plugin = {
           sql,
         } = build;
         const {
-          scope: { isPgRowConnectionType, pgCodec: codec },
+          scope: { isPgConnectionRelated, isConnectionType, pgCodec: codec },
           fieldWithHooks,
           Self,
         } = context;
 
-        if (!isPgRowConnectionType) {
+        if (!isPgConnectionRelated || !isConnectionType) {
           return fields;
         }
 

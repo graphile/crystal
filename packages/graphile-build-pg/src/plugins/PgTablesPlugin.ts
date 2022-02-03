@@ -100,7 +100,7 @@ declare global {
       pgCodec?: PgTypeCodec<any, any, any>;
       // TODO: rename this to isPgClassType?
       isPgTableType?: boolean;
-      isPgRowConnectionType?: true;
+      isPgConnectionRelated?: true;
     }
     interface ScopeGraphQLObjectTypeFieldsField {
       pgSource?: PgSource<any, any, any, any>;
@@ -474,7 +474,7 @@ export const PgTablesPlugin: Plugin = {
               build.registerCursorConnection({
                 typeName: tableTypeName,
                 scope: {
-                  isPgRowConnectionType: true,
+                  isPgConnectionRelated: true,
                   pgCodec: codec,
                 },
                 nonNullNode: !pgForbidSetofFunctionsToReturnNull,
