@@ -144,5 +144,35 @@ export const optimize = (ast: t.Node) => {
     },
   });
 
+  // convert `plan: function plan() {...}` to `plan() { ... }`
+  traverse(ast, {
+    ObjectProperty(path) {
+      if (!t.isIdentifier(path.node.key)) {
+        return;
+      }
+      const func = path.node.value;
+      if (!t.isFunctionExpression(func)) {
+        return;
+      }
+      if (!func.id) {
+        return;
+      }
+      if (func.id.name !== path.node.key.name) {
+        return;
+      }
+      path.replaceWith(
+        t.objectMethod(
+          "method",
+          path.node.key,
+          func.params,
+          func.body,
+          false,
+          func.generator,
+          func.async,
+        ),
+      );
+    },
+  });
+
   return ast;
 };
