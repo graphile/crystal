@@ -1588,7 +1588,53 @@ function exportSchemaTypeDefs({
         );
       }
     } else if (type instanceof GraphQLEnumType) {
-      // Nothing special required for enums
+      const config = type.toConfig();
+      const enumValues: t.ObjectProperty[] = [];
+      for (const [enumValueName, enumValueConfig] of Object.entries(
+        config.values,
+      )) {
+        const valueAST =
+          enumValueConfig.value !== undefined &&
+          enumValueConfig.value !== enumValueName
+            ? convertToIdentifierViaAST(
+                file,
+                enumValueConfig.value,
+                `${type.name}_${enumValueName}`,
+                `${type.name}.values[${enumValueName}].value`,
+              )
+            : null;
+        const planAST = enumValueConfig.extensions?.graphile?.plan
+          ? convertToIdentifierViaAST(
+              file,
+              enumValueConfig.extensions.graphile.plan,
+              `${type.name}_${enumValueName}Plan`,
+              `${type.name}.values[${enumValueName}].extensions.graphile.plan`,
+            )
+          : null;
+
+        if (valueAST || planAST) {
+          enumValues.push(
+            t.objectProperty(
+              identifierOrLiteral(enumValueName),
+              t.objectExpression(
+                objectToObjectProperties({
+                  value: valueAST,
+                  plan: planAST,
+                }),
+              ),
+            ),
+          );
+        }
+      }
+
+      if (enumValues.length > 0) {
+        plansProperties.push(
+          t.objectProperty(
+            identifierOrLiteral(type.name),
+            t.objectExpression(enumValues),
+          ),
+        );
+      }
     } else {
       const never: never = type;
       console.warn(`Unhandled type ${never}`);
