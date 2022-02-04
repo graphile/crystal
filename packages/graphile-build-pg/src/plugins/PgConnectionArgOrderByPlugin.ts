@@ -39,7 +39,7 @@ export const PgConnectionArgOrderByPlugin: Plugin = {
   inflection: {
     add: {
       orderByType(options, typeName) {
-        return this.camelCase(`${typeName}-order-by`);
+        return this.upperCamelCase(`${typeName}-order-by`);
       },
     },
   },
