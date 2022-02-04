@@ -121,6 +121,7 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
   // const exportFileLocation = new URL("../../temp.js", import.meta.url);
   const exportFileLocation = `${__dirname}/../../temp.mjs`;
   await exportSchema(schema, exportFileLocation, {
+    mode: "typeDefs",
     modules: {
       jsonwebtoken: jsonwebtoken,
     },
