@@ -571,11 +571,9 @@ export class Aether<
         this.getTrackedArguments(rootType, field),
       );
       const subscribePlan = wgs(() =>
-        subscriptionPlanResolver(
-          this.trackedRootValuePlan,
-          trackedArguments,
-          this.trackedContextPlan,
-        ),
+        subscriptionPlanResolver(this.trackedRootValuePlan, trackedArguments, {
+          schema: this.schema,
+        }),
       );
       this.subscriptionPlanId = subscribePlan.id;
 
@@ -809,7 +807,9 @@ export class Aether<
           this.getTrackedArguments(objectType, field),
         );
         plan = wgs(() =>
-          planResolver(parentPlan, trackedArguments, this.trackedContextPlan),
+          planResolver(parentPlan, trackedArguments, {
+            schema: this.schema,
+          }),
         );
         assertExecutablePlan(plan, pathIdentity);
         wgs(() =>
@@ -1175,7 +1175,7 @@ export class Aether<
     } else if (fieldType instanceof GraphQLScalarType) {
       const scalarPlanResolver = fieldType.extensions?.graphile?.plan;
       if (typeof scalarPlanResolver === "function") {
-        plan = wgs(() => scalarPlanResolver(plan));
+        plan = wgs(() => scalarPlanResolver(plan, { schema: this.schema }));
       }
     }
     return plan;
@@ -1211,7 +1211,7 @@ export class Aether<
             parentPlan,
             fieldPlan,
             trackedArgumentValuePlan,
-            this.trackedContextPlan,
+            { schema: this.schema },
           );
           if (argPlan != null) {
             // TODO: why did I add this? Is it required? Seems important, but
@@ -1326,11 +1326,9 @@ export class Aether<
         "function",
         `Expected ${inputObjectType.name}.${inputField.name}'s 'extensions.graphile.plan' property to be a plan resolver function.`,
       );
-      const inputFieldPlan = planResolver(
-        parentPlan,
-        trackedValuePlan,
-        this.trackedContextPlan,
-      );
+      const inputFieldPlan = planResolver(parentPlan, trackedValuePlan, {
+        schema: this.schema,
+      });
       if (inputFieldPlan != null) {
         const inputFieldType = inputField.type;
         // Note: the unwrapped type of inputFieldType must be an input object.

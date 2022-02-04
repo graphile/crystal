@@ -14,19 +14,22 @@ import type {
 import { PgSourceBuilder } from "@dataplan/pg";
 import type { ObjectPlan, TrackedArguments } from "graphile-crystal";
 import {
+  access,
   connection,
+  constant,
   EdgePlan,
   first,
   getEnumValueConfig,
+  list,
   ListPlan,
 } from "graphile-crystal";
-import { access, constant, list } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin, PluginGatherConfig, PluginHook } from "graphile-plugin";
 import type {
   GraphQLEnumType,
   GraphQLInterfaceType,
   GraphQLObjectType,
+  GraphQLSchema,
 } from "graphql";
 import sql from "pg-sql2";
 import { inspect } from "util";
@@ -124,9 +127,10 @@ export const PgMutationPayloadEdgePlugin: Plugin = {
         }
 
         const tableTypeName = TableType.name;
-        const TableOrderByType = getTypeByName(
-          inflection.orderByType(tableTypeName),
-        ) as GraphQLEnumType | undefined;
+        const tableOrderByTypeName = inflection.orderByType(tableTypeName);
+        const TableOrderByType = getTypeByName(tableOrderByTypeName) as
+          | GraphQLEnumType
+          | undefined;
         if (!TableOrderByType) {
           return fields;
         }
@@ -176,18 +180,19 @@ export const PgMutationPayloadEdgePlugin: Plugin = {
                 plan: EXPORTABLE(
                   (
                     EdgePlan,
-                    TableOrderByType,
                     applyOrderToPlan,
                     connection,
                     constant,
                     pkColumns,
                     source,
+                    tableOrderByTypeName,
                   ) =>
                     function plan(
                       $mutation: ObjectPlan<{
                         record: PgClassSinglePlan<any, any, any, any>;
                       }>,
                       args: TrackedArguments,
+                      info: { schema: GraphQLSchema },
                     ) {
                       const $record = $mutation.getPlanForKey("record", true);
                       if (!$record) return constant(null);
@@ -200,7 +205,13 @@ export const PgMutationPayloadEdgePlugin: Plugin = {
 
                       // Perform ordering
                       const $value = args.orderBy;
-                      applyOrderToPlan($select, $value, TableOrderByType);
+                      applyOrderToPlan(
+                        $select,
+                        $value,
+                        info.schema.getType(
+                          tableOrderByTypeName,
+                        ) as GraphQLEnumType,
+                      );
 
                       const $connection = connection(
                         $select,
@@ -213,12 +224,12 @@ export const PgMutationPayloadEdgePlugin: Plugin = {
                     },
                   [
                     EdgePlan,
-                    TableOrderByType,
                     applyOrderToPlan,
                     connection,
                     constant,
                     pkColumns,
                     source,
+                    tableOrderByTypeName,
                   ],
                 ),
               }),

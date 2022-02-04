@@ -400,16 +400,24 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                   {},
                 );
 
+                const argDetailsSimple = argDetails.map(
+                  ({ argName, pgCodec, required }) => ({
+                    argName,
+                    pgCodec,
+                    required,
+                  }),
+                );
+
                 const getSelectPlanFromParentAndArgs = isRootQuery
                   ? // Not computed
                     EXPORTABLE(
-                      (argDetails, isNotNullish, source) =>
+                      (argDetailsSimple, isNotNullish, source) =>
                         (
                           $root: ExecutablePlan,
                           args: TrackedArguments<any>,
                         ) => {
                           const selectArgs: PgSelectArgumentSpec[] = [
-                            ...argDetails
+                            ...argDetailsSimple
                               .map(({ argName, pgCodec, required }) => {
                                 const plan = args[argName];
                                 if (!required && plan.evalIs(undefined)) {
@@ -421,18 +429,24 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                           ];
                           return source.execute(selectArgs);
                         },
-                      [argDetails, isNotNullish, source],
+                      [argDetailsSimple, isNotNullish, source],
                     )
                   : isRootMutation
                   ? // Mutation uses 'args.input' rather than 'args'
                     EXPORTABLE(
-                      (argDetails, constant, isNotNullish, object, source) =>
+                      (
+                          argDetailsSimple,
+                          constant,
+                          isNotNullish,
+                          object,
+                          source,
+                        ) =>
                         (
                           $root: ExecutablePlan,
                           args: TrackedArguments<any>,
                         ) => {
                           const selectArgs: PgSelectArgumentSpec[] = [
-                            ...argDetails
+                            ...argDetailsSimple
                               .map(({ argName, pgCodec, required }) => {
                                 const plan = (
                                   args.input as
@@ -454,11 +468,22 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                             result: $result,
                           });
                         },
-                      [argDetails, constant, isNotNullish, object, source],
+                      [
+                        argDetailsSimple,
+                        constant,
+                        isNotNullish,
+                        object,
+                        source,
+                      ],
                     )
                   : // Otherwise computed:
                     EXPORTABLE(
-                      (PgSelectSinglePlan, argDetails, isNotNullish, source) =>
+                      (
+                          PgSelectSinglePlan,
+                          argDetailsSimple,
+                          isNotNullish,
+                          source,
+                        ) =>
                         ($row: ExecutablePlan, args: TrackedArguments<any>) => {
                           if (!($row instanceof PgSelectSinglePlan)) {
                             throw new Error(
@@ -467,7 +492,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                           }
                           const selectArgs: PgSelectArgumentSpec[] = [
                             { plan: $row.record() },
-                            ...argDetails
+                            ...argDetailsSimple
                               .map(({ argName, pgCodec, required }) => {
                                 const plan = args[argName];
                                 if (!required && plan.evalIs(undefined)) {
@@ -479,7 +504,12 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                           ];
                           return source.execute(selectArgs);
                         },
-                      [PgSelectSinglePlan, argDetails, isNotNullish, source],
+                      [
+                        PgSelectSinglePlan,
+                        argDetailsSimple,
+                        isNotNullish,
+                        source,
+                      ],
                     );
 
                 if (isRootMutation) {

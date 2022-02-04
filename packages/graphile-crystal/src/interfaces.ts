@@ -9,6 +9,7 @@ import type {
   GraphQLNonNull,
   GraphQLOutputType,
   GraphQLScalarType,
+  GraphQLSchema,
   GraphQLType,
   SelectionNode,
 } from "graphql";
@@ -68,7 +69,10 @@ declare module "graphql" {
 
   interface GraphQLScalarTypeExtensions {
     graphile?: {
-      plan?: ($parentPlan: any) => ExecutablePlan<any>;
+      plan?: (
+        $parentPlan: any,
+        info: { schema: GraphQLSchema },
+      ) => ExecutablePlan<any>;
     };
   }
 }
@@ -220,7 +224,9 @@ export type ExecutablePlanResolver<
 > = (
   $parentPlan: TParentPlan,
   args: TrackedArguments<TArgs>,
-  context: __TrackedObjectPlan<TContext>,
+  info: {
+    schema: GraphQLSchema;
+  },
 ) => TResultPlan;
 
 export type InputObjectFieldPlanResolver<
@@ -233,7 +239,9 @@ export type InputObjectFieldPlanResolver<
 > = (
   $parentPlan: TParentPlan,
   $input: TInput,
-  context: __TrackedObjectPlan<TContext>,
+  info: {
+    schema: GraphQLSchema;
+  },
 ) => TResultPlan;
 
 export type ArgumentPlanResolver<
@@ -248,7 +256,9 @@ export type ArgumentPlanResolver<
   $parentPlan: TParentPlan,
   $fieldPlan: TFieldPlan,
   $input: TInput,
-  context: __TrackedObjectPlan<TContext>,
+  info: {
+    schema: GraphQLSchema;
+  },
 ) => TResultPlan;
 
 // TypeScript gets upset if we go too deep, so we try and cover the most common

@@ -11,7 +11,7 @@ import type { ConnectionPlan, InputPlan } from "graphile-crystal";
 import { getEnumValueConfig } from "graphile-crystal";
 import { EXPORTABLE } from "graphile-exporter";
 import type { Plugin } from "graphile-plugin";
-import type { GraphQLEnumType, GraphQLInputType } from "graphql";
+import type { GraphQLEnumType, GraphQLInputType, GraphQLSchema } from "graphql";
 import { inspect } from "util";
 
 import { getBehavior } from "../behavior";
@@ -128,8 +128,9 @@ export const PgConnectionArgOrderByPlugin: Plugin = {
         }
 
         const tableTypeName = inflection.tableType(pgSource.codec);
+        const tableOrderByTypeName = inflection.orderByType(tableTypeName);
         const TableOrderByType = getTypeByName(
-          inflection.orderByType(tableTypeName),
+          tableOrderByTypeName,
         ) as GraphQLEnumType;
         if (!TableOrderByType) {
           return args;
@@ -145,7 +146,7 @@ export const PgConnectionArgOrderByPlugin: Plugin = {
               ),
               type: new GraphQLList(new GraphQLNonNull(TableOrderByType)),
               plan: EXPORTABLE(
-                (TableOrderByType, applyOrderToPlan) =>
+                (applyOrderToPlan, tableOrderByTypeName) =>
                   function plan(
                     _: any,
                     $connection: ConnectionPlan<
@@ -153,12 +154,19 @@ export const PgConnectionArgOrderByPlugin: Plugin = {
                       PgSelectPlan<any, any, any, any>
                     >,
                     $value: InputPlan,
+                    info: { schema: GraphQLSchema },
                   ) {
                     const $select = $connection.getSubplan();
-                    applyOrderToPlan($select, $value, TableOrderByType);
+                    applyOrderToPlan(
+                      $select,
+                      $value,
+                      info.schema.getType(
+                        tableOrderByTypeName,
+                      ) as GraphQLEnumType,
+                    );
                     return null;
                   },
-                [TableOrderByType, applyOrderToPlan],
+                [applyOrderToPlan, tableOrderByTypeName],
               ),
             },
           },
