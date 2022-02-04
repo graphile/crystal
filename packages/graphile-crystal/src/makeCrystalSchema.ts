@@ -1,4 +1,5 @@
 import type {
+  GraphQLFieldExtensions,
   GraphQLFieldResolver,
   GraphQLScalarLiteralParser,
   GraphQLScalarSerializer,
@@ -24,6 +25,7 @@ import type {
 } from "./interfaces";
 import type { ExecutablePlan } from "./plan";
 import { resolveType } from "./polymorphic";
+import { crystalResolve, crystalWrapResolve } from "./resolvers";
 
 type FieldPlans =
   | ExecutablePlanResolver<any, any, any, any>
@@ -101,6 +103,79 @@ export function makeCrystalSchema(details: {
       continue;
     }
     if (isObjectType(type)) {
+      if (typeof spec !== "object" || !spec) {
+        throw new Error(`Invalid object config for '${typeName}'`);
+      }
+
+      const objSpec = spec as ObjectPlans;
+      const fields = type.getFields();
+      for (const [fieldName, fieldSpec] of Object.entries(spec)) {
+        if (fieldName === "__Plan") {
+          (type.extensions as any).graphile = { Plan: fieldSpec };
+          continue;
+        }
+
+        const field = fields[fieldName];
+        if (!field) {
+          console.warn(
+            `'plans' specified configuration for object type '${typeName}' field '${fieldName}', but that field was not present in the type`,
+          );
+          continue;
+        }
+
+        if (typeof fieldSpec === "function") {
+          // it's a plan
+          field.resolve = crystalResolve;
+          (field.extensions as any).graphile = {
+            plan: fieldSpec,
+          };
+        } else {
+          // it's a spec
+          const graphileExtensions: GraphQLFieldExtensions<
+            any,
+            any
+          >["graphile"] = {};
+          (field.extensions as any).graphile = graphileExtensions;
+          if (fieldSpec.resolve || fieldSpec.plan) {
+            field.resolve = fieldSpec.resolve
+              ? crystalWrapResolve(fieldSpec.resolve)
+              : crystalResolve;
+          }
+          if (fieldSpec.subscribe || fieldSpec.subscribePlan) {
+            field.subscribe = fieldSpec.subscribe
+              ? crystalWrapResolve(fieldSpec.subscribe)
+              : crystalResolve;
+          }
+          if (fieldSpec.plan) {
+            graphileExtensions.plan = fieldSpec.plan;
+          }
+          if (fieldSpec.subscribePlan) {
+            graphileExtensions.subscribePlan = fieldSpec.subscribePlan;
+          }
+
+          if (typeof fieldSpec.args === "object" && fieldSpec.args != null) {
+            for (const [argName, argSpec] of Object.entries(fieldSpec.args)) {
+              const arg = field.args.find((arg) => arg.name === argName);
+              if (!arg) {
+                console.warn(
+                  `'plans' specified configuration for object type '${typeName}' field '${fieldName}' arg '${argName}', but that arg was not present in the type`,
+                );
+                continue;
+              }
+              if (typeof argSpec === "function") {
+                (arg.extensions as any).graphile = {
+                  plan: argSpec,
+                };
+              } else {
+                console.warn(
+                  `Invalid configuration for plans.${typeName}.${fieldName}.args.${argName}`,
+                );
+                // Invalid
+              }
+            }
+          }
+        }
+      }
     } else if (isInputObjectType(type)) {
       if (typeof spec !== "object" || !spec) {
         throw new Error(`Invalid input object config for '${typeName}'`);
