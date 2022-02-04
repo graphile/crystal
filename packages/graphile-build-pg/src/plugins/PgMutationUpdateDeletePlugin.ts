@@ -631,36 +631,30 @@ export const PgMutationUpdateDeletePlugin: Plugin = {
                   ([columnName, fieldName]) =>
                     isSafeIdentifier(columnName) && isSafeIdentifier(fieldName),
                 );
-                const specFromArgs = clean
-                  ? (EXPORTABLE(
-                      eval(
-                        `() => (args) => ({ ${uniqueColumns
-                          .map(
-                            ([columnName, fieldName]) =>
-                              `${columnName}: args.input.get(${JSON.stringify(
-                                fieldName,
-                              )})`,
-                          )
-                          .join(", ")} })`,
-                      ),
-                      [],
-                    ) as any)
-                  : EXPORTABLE(
-                      (uniqueColumns) => (args: TrackedArguments) => {
-                        return uniqueColumns.reduce(
-                          (memo, [columnName, fieldName]) => {
-                            memo[columnName] = (
-                              args.input as
-                                | __TrackedObjectPlan
-                                | InputObjectPlan
-                            ).get(fieldName);
-                            return memo;
-                          },
-                          {},
-                        );
+                const specFromArgsString = clean
+                  ? `{ ${uniqueColumns
+                      .map(
+                        ([columnName, fieldName]) =>
+                          `${columnName}: args.input.get(${JSON.stringify(
+                            fieldName,
+                          )})`,
+                      )
+                      .join(", ")} }`
+                  : null;
+                const specFromArgs = EXPORTABLE(
+                  (uniqueColumns) => (args: TrackedArguments) => {
+                    return uniqueColumns.reduce(
+                      (memo, [columnName, fieldName]) => {
+                        memo[columnName] = (
+                          args.input as __TrackedObjectPlan | InputObjectPlan
+                        ).get(fieldName);
+                        return memo;
                       },
-                      [uniqueColumns],
+                      {},
                     );
+                  },
+                  [uniqueColumns],
+                );
 
                 return build.extend(
                   fields,
@@ -690,21 +684,35 @@ export const PgMutationUpdateDeletePlugin: Plugin = {
                         type: payloadType,
                         plan:
                           mode === "update"
-                            ? (EXPORTABLE(
-                                (object, pgUpdate, source, specFromArgs) =>
-                                  function plan(
-                                    _$root: ExecutablePlan,
-                                    args: TrackedArguments,
-                                  ) {
-                                    return object({
-                                      result: pgUpdate(
-                                        source,
-                                        specFromArgs(args),
-                                      ),
-                                    });
-                                  },
-                                [object, pgUpdate, source, specFromArgs],
-                              ) as any)
+                            ? specFromArgsString
+                              ? EXPORTABLE(
+                                  eval(
+                                    `(object, pgUpdate, source) =>  (_$root, args) => object({result: pgUpdate(source, ${specFromArgsString})})`,
+                                  ),
+                                  [object, pgUpdate, source],
+                                )
+                              : (EXPORTABLE(
+                                  (object, pgUpdate, source, specFromArgs) =>
+                                    function plan(
+                                      _$root: ExecutablePlan,
+                                      args: TrackedArguments,
+                                    ) {
+                                      return object({
+                                        result: pgUpdate(
+                                          source,
+                                          specFromArgs(args),
+                                        ),
+                                      });
+                                    },
+                                  [object, pgUpdate, source, specFromArgs],
+                                ) as any)
+                            : specFromArgsString
+                            ? EXPORTABLE(
+                                eval(
+                                  `(object, pgDelete, source) =>  (_$root, args) => object({result: pgDelete(source, ${specFromArgsString})})`,
+                                ),
+                                [object, pgDelete, source],
+                              )
                             : (EXPORTABLE(
                                 (object, pgDelete, source, specFromArgs) =>
                                   function plan(
