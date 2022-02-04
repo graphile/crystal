@@ -3,6 +3,7 @@ import debugFactory from "debug";
 
 import { crystalPrint, crystalPrintPathIdentity } from "./crystalPrint";
 import { exportAsMany } from "./exportAs";
+import { makeCrystalSchema } from "./makeCrystalSchema";
 
 debugFactory.formatters.c = crystalPrint;
 debugFactory.formatters.p = (pathIdentity) =>
@@ -206,6 +207,7 @@ export {
   ListCapablePlan,
   ListPlan,
   listTransform,
+  makeCrystalSchema,
   makeCrystalSubscriber,
   makeMapper,
   map,
@@ -250,6 +252,7 @@ export {
 exportAsMany({
   crystalPrint,
   crystalPrintPathIdentity,
+  makeCrystalSchema,
   Aether,
   ROOT_PATH,
   defer,
