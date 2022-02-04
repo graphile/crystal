@@ -1366,7 +1366,9 @@ function exportSchemaTypeDefs({
   customDirectives,
   file,
 }: SchemaExportDetails) {
-  const schemaExportName = file.makeVariable("typeDefs");
+  const typeDefsExportName = file.makeVariable("typeDefs");
+  const plansExportName = file.makeVariable("plans");
+  const schemaExportName = file.makeVariable("schema");
 
   const typeDefsString = printSchema(schema);
   const graphqlAST = t.templateLiteral(
@@ -1595,13 +1597,13 @@ function exportSchemaTypeDefs({
 
   const typeDefs = t.exportNamedDeclaration(
     t.variableDeclaration("const", [
-      t.variableDeclarator(t.identifier("typeDefs"), graphqlAST),
+      t.variableDeclarator(typeDefsExportName, graphqlAST),
     ]),
   );
   const plans = t.exportNamedDeclaration(
     t.variableDeclaration("const", [
       t.variableDeclarator(
-        t.identifier("plans"),
+        plansExportName,
         t.objectExpression(plansProperties),
       ),
     ]),
@@ -1609,6 +1611,26 @@ function exportSchemaTypeDefs({
 
   file.addStatements(typeDefs);
   file.addStatements(plans);
+  const makeCrystalSchemaAST = file.import(
+    "graphile-crystal",
+    "makeCrystalSchema",
+  );
+
+  const schemaAST = t.callExpression(makeCrystalSchemaAST, [
+    t.objectExpression(
+      objectToObjectProperties({
+        typeDefs: typeDefsExportName,
+        plans: plansExportName,
+      }),
+    ),
+  ]);
+  file.addStatements(
+    t.exportNamedDeclaration(
+      t.variableDeclaration("const", [
+        t.variableDeclarator(schemaExportName, schemaAST),
+      ]),
+    ),
+  );
 }
 
 export async function exportSchemaAsString(
