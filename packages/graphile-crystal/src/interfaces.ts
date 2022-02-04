@@ -57,22 +57,15 @@ declare module "graphql" {
       /**
        * EXPERIMENTAL!
        *
-       * NOTE: this is an `any` because we want to allow users to specify
-       * subclasses of ExecutablePlan but TypeScript only wants to allow
-       * superclasses.
-       *
        * @internal
        */
-      plan?: (plan: any) => void;
+      plan?: EnumPlanResolver;
     };
   }
 
   interface GraphQLScalarTypeExtensions {
     graphile?: {
-      plan?: (
-        $parentPlan: any,
-        info: { schema: GraphQLSchema },
-      ) => ExecutablePlan<any>;
+      plan?: ScalarPlanResolver<any, any>;
     };
   }
 }
@@ -260,6 +253,22 @@ export type ArgumentPlanResolver<
     schema: GraphQLSchema;
   },
 ) => TResultPlan;
+
+export type ScalarPlanResolver<
+  TParentPlan extends ExecutablePlan<any>,
+  TResultPlan extends ExecutablePlan<any>,
+> = ($parentPlan: TParentPlan, info: { schema: GraphQLSchema }) => TResultPlan;
+
+/**
+ * EXPERIMENTAL!
+ *
+ * NOTE: this is an `any` because we want to allow users to specify
+ * subclasses of ExecutablePlan but TypeScript only wants to allow
+ * superclasses.
+ *
+ * @internal
+ */
+export type EnumPlanResolver = (plan: any) => void;
 
 // TypeScript gets upset if we go too deep, so we try and cover the most common
 // use cases and fall back to `any`
