@@ -138,20 +138,30 @@ export const optimize = (ast: t.Node, runs = 1): t.Node => {
           if (binding.referencePaths.length !== 1) {
             continue;
           }
-          const parent = binding.referencePaths[0].parent;
+          const targetPath = binding.referencePaths[0];
+          const parent = targetPath.parent;
 
           // Don't turn this into an IIFE
           if (
             parent &&
             t.isCallExpression(parent) &&
-            parent.callee === binding.referencePaths[0].node &&
+            parent.callee === targetPath.node &&
             (!t.isArrowFunctionExpression(binding.path.node.init) ||
               t.isBlock(binding.path.node.init.body))
           ) {
             continue;
           }
 
-          binding.referencePaths[0].replaceWith(binding.path.node.init);
+          // It's allowed if:
+          // 1. it's a simple value (scalar), OR
+          // 2. it's not being inserted into a function body
+          const targetFunctionParent = targetPath.getFunctionParent();
+          const sourceFunctionParent = path.getFunctionParent();
+          if (targetFunctionParent !== sourceFunctionParent) {
+            continue;
+          }
+
+          targetPath.replaceWith(binding.path.node.init);
           binding.path.remove();
         }
       },
