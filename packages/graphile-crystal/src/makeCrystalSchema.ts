@@ -52,10 +52,10 @@ type InterfaceOrUnionPlans = {
 };
 
 type ScalarPlans = {
-  serialize: GraphQLScalarSerializer<any>;
-  parseValue: GraphQLScalarValueParser<any>;
-  parseLiteral: GraphQLScalarLiteralParser<any>;
-  plan: ScalarPlanResolver<any, any>;
+  serialize?: GraphQLScalarSerializer<any>;
+  parseValue?: GraphQLScalarValueParser<any>;
+  parseLiteral?: GraphQLScalarLiteralParser<any>;
+  plan?: ScalarPlanResolver<any, any>;
 };
 
 type EnumPlans = {
@@ -102,9 +102,88 @@ export function makeCrystalSchema(details: {
     }
     if (isObjectType(type)) {
     } else if (isInputObjectType(type)) {
+      if (typeof spec !== "object" || !spec) {
+        throw new Error(`Invalid input object config for '${typeName}'`);
+      }
+
+      const inputSpec = spec as InputObjectPlans;
+
+      const fields = type.getFields();
+
+      for (const [fieldName, fieldSpec] of Object.entries(inputSpec)) {
+        const field = fields[fieldName];
+        if (!field) {
+          console.warn(
+            `'plans' specified configuration for input object type '${typeName}' field '${fieldName}', but that field was not present in the type`,
+          );
+          continue;
+        }
+        if (typeof fieldSpec === "function") {
+          (field.extensions as any).graphile = { plan: fieldSpec };
+        } else {
+          throw new Error(
+            `Expected function input object type '${typeName}' field '${fieldName}', but an invalid value was received`,
+          );
+        }
+      }
     } else if (isInterfaceType(type) || isUnionType(type)) {
+      if (typeof spec !== "object" || !spec) {
+        throw new Error(`Invalid interface/union config for '${typeName}'`);
+      }
+      const polySpec = spec as InterfaceOrUnionPlans;
+      if (polySpec.__resolveType) {
+        type.resolveType = polySpec.__resolveType;
+      }
     } else if (isScalarType(type)) {
+      if (typeof spec !== "object" || !spec) {
+        throw new Error(`Invalid scalar config for '${typeName}'`);
+      }
+      const scalarSpec = spec as ScalarPlans;
+      if (scalarSpec.serialize) {
+        type.serialize = scalarSpec.serialize;
+      }
+      if (scalarSpec.parseValue) {
+        type.parseValue = scalarSpec.parseValue;
+      }
+      if (scalarSpec.parseLiteral) {
+        type.parseLiteral = scalarSpec.parseLiteral;
+      }
+      if (scalarSpec.plan) {
+        (type.extensions as any).graphile = { plan: scalarSpec.plan };
+      }
     } else if (isEnumType(type)) {
+      if (typeof spec !== "object" || !spec) {
+        throw new Error(`Invalid enum config for '${typeName}'`);
+      }
+      const enumValues = type.getValues();
+      for (const [enumValueName, enumValueSpec] of Object.entries(spec)) {
+        const enumValue = enumValues.find((val) => val.name === enumValueName);
+        if (!enumValue) {
+          console.warn(
+            `'plans' specified configuration for enum type '${typeName}' value '${enumValueName}', but that value was not present in the type`,
+          );
+          continue;
+        }
+        if (typeof enumValueSpec === "function") {
+          // It's a plan
+          (enumValue.extensions as any).graphile = {
+            plan: enumValueSpec,
+          };
+        } else if (typeof enumValueSpec === "object" && enumValueSpec != null) {
+          // It's a full spec
+          if (enumValueSpec.plan) {
+            (enumValue.extensions as any).graphile = {
+              plan: enumValueSpec.plan,
+            };
+          }
+          if ("value" in enumValueSpec) {
+            enumValue.value = enumValueSpec.value;
+          }
+        } else {
+          // It must be the value
+          enumValue.value = enumValueSpec;
+        }
+      }
     } else {
       const never: never = type;
       console.error(`Unhandled type ${never}`);
