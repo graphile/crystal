@@ -14,7 +14,6 @@ export class ListPlan<
     exportName: "ListPlan",
   };
 
-  private results: Array<UnwrapPlanTuple<TPlanTuple>> = [];
   constructor(list: readonly [...TPlanTuple]) {
     super();
     for (let i = 0, l = list.length; i < l; i++) {
@@ -23,13 +22,14 @@ export class ListPlan<
   }
 
   tupleToTuple(
+    results: Array<UnwrapPlanTuple<TPlanTuple>>,
     tuple: UnwrapPlanTuple<TPlanTuple>,
   ): UnwrapPlanTuple<TPlanTuple> {
     const tupleLength = tuple.length;
     // Note: `outerloop` is a JavaScript "label". They are not very common.
     // First look for an existing match:
-    outerloop: for (let i = 0, l = this.results.length; i < l; i++) {
-      const existingTuple = this.results[i];
+    outerloop: for (let i = 0, l = results.length; i < l; i++) {
+      const existingTuple = results[i];
       // Shortcut for identical tuples (unlikely).
       if (existingTuple === tuple) {
         return existingTuple;
@@ -46,14 +46,15 @@ export class ListPlan<
     }
 
     // That failed; store this tuple so the same tuple values result in the exact same array.
-    this.results.push(tuple);
+    results.push(tuple);
     return tuple;
   }
 
   execute(
     values: Array<UnwrapPlanTuple<TPlanTuple>>,
   ): Array<UnwrapPlanTuple<TPlanTuple>> {
-    return values.map(this.tupleToTuple.bind(this));
+    const results: Array<UnwrapPlanTuple<TPlanTuple>> = [];
+    return values.map(this.tupleToTuple.bind(this, results));
   }
 
   deduplicate(peers: ListPlan<TPlanTuple>[]): ListPlan<TPlanTuple> {
