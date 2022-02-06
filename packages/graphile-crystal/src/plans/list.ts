@@ -21,6 +21,7 @@ export class ListPlan<
     }
   }
 
+  // Could be used to reduce the number of unique values returned
   tupleToTuple(
     results: Array<UnwrapPlanTuple<TPlanTuple>>,
     tuple: UnwrapPlanTuple<TPlanTuple>,
@@ -53,8 +54,7 @@ export class ListPlan<
   execute(
     values: Array<UnwrapPlanTuple<TPlanTuple>>,
   ): Array<UnwrapPlanTuple<TPlanTuple>> {
-    const results: Array<UnwrapPlanTuple<TPlanTuple>> = [];
-    return values.map(this.tupleToTuple.bind(this, results));
+    return values;
   }
 
   deduplicate(peers: ListPlan<TPlanTuple>[]): ListPlan<TPlanTuple> {
