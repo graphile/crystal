@@ -2401,10 +2401,10 @@ export class Aether<
     }
 
     debugExecuteVerbose(
-      `%sExecutePlan(%s): wrote results for [%s]`,
+      `%sExecutePlan(%s): wrote results for %s`,
       indent,
       plan,
-      pendingPlanResultses.join(", "),
+      pendingPlanResultses,
     );
     return result;
   }
