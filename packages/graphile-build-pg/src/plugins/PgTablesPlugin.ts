@@ -400,7 +400,7 @@ export const PgTablesPlugin: Plugin = {
       init(_, build, _context) {
         const {
           inflection,
-          options: { pgForbidSetofFunctionsToReturnNull },
+          options: { pgForbidSetofFunctionsToReturnNull, simpleCollections },
           setGraphQLTypeForPgCodec,
         } = build;
         for (const codec of build.pgCodecMetaLookup.keys()) {
@@ -411,7 +411,15 @@ export const PgTablesPlugin: Plugin = {
             }
 
             const tableTypeName = inflection.tableType(codec);
-            const behavior = getBehavior(codec.extensions);
+            const behavior = getBehavior(codec.extensions) ?? [
+              "selectable",
+              ...(!codec.isAnonymous ? ["insert", "update"] : []),
+              ...(simpleCollections === "both"
+                ? ["connection", "list"]
+                : simpleCollections === "only"
+                ? ["list"]
+                : ["connection"]),
+            ];
             // TODO: is 'selectable' the right behavior? What if you can only see
             // it in a subscription? What if only on a mutation payload? More
             // like "viewable"?

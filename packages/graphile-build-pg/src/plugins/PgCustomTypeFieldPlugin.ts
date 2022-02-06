@@ -317,6 +317,7 @@ export const PgCustomTypeFieldPlugin: Plugin = {
             GraphQLObjectType,
             GraphQLInputObjectType,
           },
+          options: { simpleCollections },
         } = build;
         const {
           Self,
@@ -588,7 +589,13 @@ export const PgCustomTypeFieldPlugin: Plugin = {
                   const canUseConnection = !source.sqlPartitionByIndex;
 
                   const behavior = getBehavior(source.extensions) ?? [
-                    canUseConnection ? "connection" : "list",
+                    ...(canUseConnection
+                      ? simpleCollections === "both"
+                        ? ["connection", "list"]
+                        : simpleCollections === "only"
+                        ? ["list"]
+                        : ["connection"]
+                      : ["list"]),
                   ];
 
                   if (behavior.includes("connection") && canUseConnection) {

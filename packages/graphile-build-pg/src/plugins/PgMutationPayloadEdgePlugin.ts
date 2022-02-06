@@ -78,6 +78,7 @@ export const PgMutationPayloadEdgePlugin: Plugin = {
           sql,
           graphql: { GraphQLList, GraphQLNonNull },
           inflection,
+          options: { simpleCollections },
         } = build;
         const {
           scope: { isMutationPayload, pgCodec },
@@ -94,8 +95,14 @@ export const PgMutationPayloadEdgePlugin: Plugin = {
           return fields;
         }
 
-        const behavior = getBehavior(pgCodec.extensions);
-        if (behavior && !behavior.includes("connection")) {
+        const behavior =
+          getBehavior(pgCodec.extensions) ??
+          (simpleCollections === "both"
+            ? ["connection", "list"]
+            : simpleCollections === "only"
+            ? ["list"]
+            : ["connection"]);
+        if (!behavior.includes("connection")) {
           return fields;
         }
 

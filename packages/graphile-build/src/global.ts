@@ -56,6 +56,13 @@ declare global {
       subscriptions?: boolean;
       nodeIdFieldName?: string;
       dontSwallowErrors?: boolean;
+
+      /**
+       * If set to 'only' then connections will be avoided, preferring lists.
+       * If set to 'omit' then lists will be avoided, preferring connections.
+       * If set to 'both' then both lists and connections will be generated.
+       */
+      simpleCollections?: "only" | "both" | "omit";
     }
     interface GraphileResolverContext {}
 

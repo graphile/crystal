@@ -271,6 +271,7 @@ export const PgRelationsPlugin: Plugin = {
         const {
           extend,
           graphql: { GraphQLList },
+          options: { simpleCollections },
         } = build;
         const {
           Self,
@@ -309,7 +310,13 @@ export const PgRelationsPlugin: Plugin = {
             let fields = memo;
             const behavior =
               getBehavior(extensions) ??
-              (isUnique ? ["single"] : ["connection"]);
+              (isUnique
+                ? ["single"]
+                : simpleCollections === "both"
+                ? ["connection", "list"]
+                : simpleCollections === "only"
+                ? ["list"]
+                : ["connection"]);
 
             const relationDetails: RelationDetails = {
               source,
