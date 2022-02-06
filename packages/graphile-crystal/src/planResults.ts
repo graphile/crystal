@@ -50,12 +50,13 @@ export type PlanResultsBucket = Map<number, any>;
  */
 export class PlanResults {
   id = planResultsId++;
-  private store: { [pathIdentity: string]: PlanResultsBucket | undefined } =
-    Object.create(null);
+  private store: { [pathIdentity: string]: PlanResultsBucket | undefined };
 
   constructor(inheritFrom?: PlanResults) {
     if (inheritFrom) {
-      Object.assign(this.store, inheritFrom.store);
+      this.store = Object.create(inheritFrom.store);
+    } else {
+      this.store = Object.create(null);
     }
   }
 
