@@ -220,7 +220,7 @@ export const PgRelationsPlugin: Plugin = {
 
         for (const constraint of constraints) {
           if (constraint.contype === "f") {
-            addRelation(
+            await addRelation(
               constraint,
               constraint.conkey!,
               constraint.confrelid!,
@@ -251,7 +251,7 @@ export const PgRelationsPlugin: Plugin = {
                 );
               },
             );
-            addRelation(
+            await addRelation(
               constraint,
               constraint.confkey!,
               constraint.conrelid!,
