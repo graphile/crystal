@@ -36,7 +36,7 @@ export const PgConditionArgumentPlugin: Plugin = {
   inflection: {
     add: {
       conditionType(options, typeName) {
-        return this.camelCase(`${typeName}-condition`);
+        return this.upperCamelCase(`${typeName}-condition`);
       },
     },
   },
