@@ -9,9 +9,8 @@ export function defer<T = void>(): Deferred<T> {
   const promise = new Promise<T>((_resolve, _reject): void => {
     resolve = _resolve;
     reject = _reject;
-  });
-  return Object.assign(promise, {
-    resolve,
-    reject,
-  });
+  }) as Deferred<T>;
+  promise.resolve = resolve;
+  promise.reject = reject;
+  return promise;
 }
