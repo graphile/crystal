@@ -145,29 +145,49 @@ export const PgConnectionArgOrderByPlugin: Plugin = {
                 "arg",
               ),
               type: new GraphQLList(new GraphQLNonNull(TableOrderByType)),
-              plan: EXPORTABLE(
-                (applyOrderToPlan, tableOrderByTypeName) =>
-                  function plan(
-                    _: any,
-                    $connection: ConnectionPlan<
-                      PgSelectSinglePlan<any, any, any, any>,
-                      PgSelectPlan<any, any, any, any>
-                    >,
-                    $value: InputPlan,
-                    info: { schema: GraphQLSchema },
-                  ) {
-                    const $select = $connection.getSubplan();
-                    applyOrderToPlan(
-                      $select,
-                      $value,
-                      info.schema.getType(
-                        tableOrderByTypeName,
-                      ) as GraphQLEnumType,
-                    );
-                    return null;
-                  },
-                [applyOrderToPlan, tableOrderByTypeName],
-              ),
+              plan: isPgFieldConnection
+                ? EXPORTABLE(
+                    (applyOrderToPlan, tableOrderByTypeName) =>
+                      function plan(
+                        _: any,
+                        $connection: ConnectionPlan<
+                          PgSelectSinglePlan<any, any, any, any>,
+                          PgSelectPlan<any, any, any, any>
+                        >,
+                        $value: InputPlan,
+                        info: { schema: GraphQLSchema },
+                      ) {
+                        const $select = $connection.getSubplan();
+                        applyOrderToPlan(
+                          $select,
+                          $value,
+                          info.schema.getType(
+                            tableOrderByTypeName,
+                          ) as GraphQLEnumType,
+                        );
+                        return null;
+                      },
+                    [applyOrderToPlan, tableOrderByTypeName],
+                  )
+                : EXPORTABLE(
+                    (applyOrderToPlan, tableOrderByTypeName) =>
+                      function plan(
+                        _: any,
+                        $select: PgSelectPlan<any, any, any, any>,
+                        $value: InputPlan,
+                        info: { schema: GraphQLSchema },
+                      ) {
+                        applyOrderToPlan(
+                          $select,
+                          $value,
+                          info.schema.getType(
+                            tableOrderByTypeName,
+                          ) as GraphQLEnumType,
+                        );
+                        return null;
+                      },
+                    [applyOrderToPlan, tableOrderByTypeName],
+                  ),
             },
           },
           `Adding 'orderBy' argument to field '${fieldName}' of '${Self.name}'`,
