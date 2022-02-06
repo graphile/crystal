@@ -8,11 +8,11 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "node": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./helpers": {
       "types": "./dist/helpers.d.ts",
-      "node": "./dist/helpers.js"
+      "default": "./dist/helpers.js"
     }
   },
   "scripts": {

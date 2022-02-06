@@ -8,11 +8,11 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "node": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./adaptors/node-postgres": {
       "types": "./dist/adaptors/node-postgres.d.ts",
-      "node": "./dist/adaptors/node-postgres.js"
+      "default": "./dist/adaptors/node-postgres.js"
     }
   },
   "scripts": {
