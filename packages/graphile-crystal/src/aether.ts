@@ -2400,7 +2400,7 @@ export class Aether<
     }
 
     debugExecuteVerbose(
-      `%sExecutePlan(%s): wrote results for %s`,
+      `%sExecutePlan(%s): wrote results for %c`,
       indent,
       plan,
       pendingPlanResultses,

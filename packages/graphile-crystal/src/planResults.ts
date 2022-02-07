@@ -61,12 +61,15 @@ export class PlanResults {
   }
 
   toString(): string {
+    const keys: string[] = [];
+    for (const key in this.store) {
+      keys.push(key);
+    }
+    keys.sort((a, z) => z.length - a.length)[0] ?? "?";
     return chalk.bold(
       crystalColor(
         `PlanResults[${this.id}:${chalk.bold.grey(
-          crystalPrintPathIdentity(
-            Object.keys(this.store).sort((a, z) => z.length - a.length)[0],
-          ),
+          crystalPrintPathIdentity(keys[0] ?? "?"),
         )}]`,
         this.id,
       ),
