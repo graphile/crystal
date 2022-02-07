@@ -2070,11 +2070,6 @@ export class Aether<
           : planResults.get(plan.commonAncestorPathIdentity, plan.id),
       );
     }
-    const pendingPlanResultses: PlanResults[] = []; // Length unknown
-    const pendingDeferreds: Deferred<any>[] = []; // Same length as pendingPlanResultses
-    const pendingPlanResultsesIndexes: number[] = []; // Same length as pendingPlanResultses
-    const inProgressDeferreds: Deferred<any>[] = []; // Length unknown
-    const inProgressPlanResultsesIndexes: number[] = []; // Same length as inProgressDeferreds
     const planResultsesLength = planResultses.length;
     const result = new Array(planResultsesLength);
     debugExecuteVerbose(
@@ -2084,6 +2079,12 @@ export class Aether<
       planResultsesLength,
     );
     const commonAncestorPathIdentity = plan.commonAncestorPathIdentity;
+
+    const pendingPlanResultses: PlanResults[] = []; // Length unknown
+    const pendingDeferreds: Deferred<any>[] = []; // Same length as pendingPlanResultses
+    const pendingPlanResultsesIndexes: number[] = []; // Same length as pendingPlanResultses
+    const inProgressDeferreds: Deferred<any>[] = []; // Length unknown
+    const inProgressPlanResultsesIndexes: number[] = []; // Same length as inProgressDeferreds
 
     const deferredsByBucket = crystalContext.inProgressPlanResolutions[plan.id];
 
