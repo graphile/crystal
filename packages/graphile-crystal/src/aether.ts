@@ -60,6 +60,7 @@ import type {
   CrystalContext,
   CrystalLayerObject,
   CrystalObject,
+  CrystalResultsList,
   FieldAndGroup,
   GroupedSelections,
   PlanOptions,
@@ -105,6 +106,8 @@ import {
   ROOT_VALUE_OBJECT,
   uid,
 } from "./utils";
+
+function NOOP() {}
 
 const $$FINISHED: unique symbol = Symbol("finished");
 
@@ -2033,12 +2036,28 @@ export class Aether<
     return null;
   }
 
+  private executePlan<T>(
+    plan: ExecutablePlan<T>,
+    crystalContext: CrystalContext,
+    planResultses: ReadonlyArray<null | PlanResults>,
+    visitedPlans = new Set<ExecutablePlan>(),
+    depth = 0,
+  ): PromiseOrDirect<any[]> {
+    return this.executePlanAlt(
+      plan,
+      crystalContext,
+      planResultses,
+      visitedPlans,
+      depth,
+    );
+  }
+
   /**
    * Implements `ExecutePlan`.
    *
-   * @remarks `await` is forbidden in this method to avoid race conditions.
+   * @remarks `await` is forbidden to avoid race conditions
    */
-  private executePlan<T>(
+  private executePlanAlt<T>(
     plan: ExecutablePlan<T>,
     crystalContext: CrystalContext,
     planResultses: ReadonlyArray<null | PlanResults>,
@@ -2062,6 +2081,372 @@ export class Aether<
       );
     }
     visitedPlans.add(plan);
+    if (plan instanceof __ItemPlan) {
+      // Shortcut evaluation because __ItemPlan cannot be executed.
+      return planResultses.map((planResults) =>
+        planResults == null
+          ? null
+          : planResults.get(plan.commonAncestorPathIdentity, plan.id),
+      );
+    }
+    const planResultsesLength = planResultses.length;
+    const result = new Array(planResultsesLength);
+    debugExecuteVerbose(
+      "%sExecutePlan(%c): executing with %o plan results",
+      indent,
+      plan,
+      planResultsesLength,
+    );
+    const commonAncestorPathIdentity = plan.commonAncestorPathIdentity;
+
+    const pendingPlanResultses: PlanResults[] = []; // Length unknown
+    const pendingPlanResultsesIndexes: number[] = []; // Same length as pendingPlanResultses
+
+    // Collect uncompleted resultses
+    for (
+      let planResultsesIndex = 0;
+      planResultsesIndex < planResultsesLength;
+      planResultsesIndex++
+    ) {
+      const planResults = planResultses[planResultsesIndex];
+      if (planResults == null) {
+        result[planResultsesIndex] = null;
+        continue;
+      }
+      if (planResults.has(commonAncestorPathIdentity, plan.id)) {
+        const previousResult = planResults.get(
+          commonAncestorPathIdentity,
+          plan.id,
+        );
+        result[planResultsesIndex] = previousResult;
+
+        debugExecuteVerbose(
+          "%s result[%o] for %c found: %c",
+          follow,
+          planResultsesIndex,
+          planResults,
+          result[planResultsesIndex],
+        );
+        continue;
+      }
+      if (plan instanceof __ValuePlan) {
+        throw new Error(
+          `GraphileInternalError<079b214f-3ec9-4257-8de9-0ca2b2bdb8e9>: Attempted to queue __ValuePlan ${plan} (commonAncestorPathIdentity: '${
+            plan.commonAncestorPathIdentity
+          }', groups: ${plan.groupIds.join(
+            ", ",
+          )}) for execution; however __ValuePlan must never be executed - the value should already exist in the cache: ${crystalPrint(
+            planResults,
+          )}.`,
+        );
+      }
+      const bucket = planResults.getBucket(commonAncestorPathIdentity);
+      // Need to start executing
+      debugExecuteVerbose("%s no result for %c", follow, planResults);
+
+      pendingPlanResultses.push(planResults);
+      pendingPlanResultsesIndexes.push(planResultsesIndex);
+    }
+
+    // If none, return results
+    if (pendingPlanResultses.length === 0) {
+      // Optimisation
+      return result;
+    }
+
+    // For each dependency of plan, get the results
+    const dependenciesCount = plan.dependencies.length;
+    const dependencyValuesList = new Array(dependenciesCount);
+    const dependencyPromises: Array<{
+      promise: PromiseOrDirect<any[]>;
+      dependencyIndex: number;
+    }> = [];
+    for (
+      let dependencyIndex = 0;
+      dependencyIndex < dependenciesCount;
+      dependencyIndex++
+    ) {
+      const dependencyPlanId = plan.dependencies[dependencyIndex];
+      const dependencyPlan = this.plans[dependencyPlanId];
+      if (isDev) {
+        if (!dependencyPlan) {
+          throw new Error(
+            `Expected plan dependency '${dependencyIndex}' for '${plan}' to be a plan, instead found '${inspect(
+              dependencyPlan,
+            )}'`,
+          );
+        }
+      }
+      const allDependencyResultsOrPromise = this.executePlan(
+        dependencyPlan,
+        crystalContext,
+        pendingPlanResultses,
+        // This is to detect loops, so we don't want changes made inside to
+        // cascade back outside -> clone.
+        new Set([...visitedPlans]),
+        depth + 1,
+      );
+      if (typeof (allDependencyResultsOrPromise as any).then === "function") {
+        dependencyPromises.push({
+          promise: allDependencyResultsOrPromise,
+          dependencyIndex,
+        });
+        // Don't moan about unhandled rejections; we only care about the first fail (and we don't care if they get handled later)
+        (allDependencyResultsOrPromise as any).then(null, NOOP);
+      } else {
+        dependencyValuesList[dependencyIndex] = allDependencyResultsOrPromise;
+      }
+    }
+
+    // TODO: extract this to be a separate method.
+    const awaitDependencyPromises = async () => {
+      for (
+        let dependencyPromiseIndex = 0,
+          dependencyPromisesLength = dependencyPromises.length;
+        dependencyPromiseIndex < dependencyPromisesLength;
+        dependencyPromiseIndex++
+      ) {
+        const { promise, dependencyIndex } =
+          dependencyPromises[dependencyPromiseIndex];
+        try {
+          dependencyValuesList[dependencyIndex] = await promise;
+        } catch (e) {
+          // An error has occurred; we can short-circuit execution.
+          for (
+            let pendingPlanResultsesIndex = pendingPlanResultses.length;
+            pendingPlanResultsesIndex >= 0;
+            pendingPlanResultsesIndex--
+          ) {
+            result[pendingPlanResultsesIndexes[pendingPlanResultsesIndex]] =
+              new CrystalError(e);
+          }
+          return result;
+        }
+      }
+
+      // Since we just awaited, we must re-evaluate the pendingResults
+      for (
+        let pendingPlanResultsesIndex = pendingPlanResultses.length - 1;
+        pendingPlanResultsesIndex >= 0;
+        pendingPlanResultsesIndex--
+      ) {
+        const planResults = pendingPlanResultses[pendingPlanResultsesIndex];
+        if (planResults.has(commonAncestorPathIdentity, plan.id)) {
+          const previousResult = planResults.get(
+            commonAncestorPathIdentity,
+            plan.id,
+          );
+          const index = pendingPlanResultsesIndexes[pendingPlanResultsesIndex];
+          result[index] = previousResult;
+
+          // Now remove this completed result from the relevant places
+          pendingPlanResultses.splice(pendingPlanResultsesIndex, 1);
+          pendingPlanResultsesIndexes.splice(pendingPlanResultsesIndex, 1);
+          for (
+            let dependencyIndex = 0;
+            dependencyIndex < dependenciesCount;
+            dependencyIndex++
+          ) {
+            dependencyValuesList[dependencyIndex].splice(
+              pendingPlanResultsesIndex,
+              1,
+            );
+          }
+        }
+      }
+
+      // And since we just re-evaluated pendingResults, we might already be done
+      if (pendingPlanResultses.length === 0) {
+        // Optimisation
+        return result;
+      }
+
+      // Continue with execution
+      // TODO: should we just call doNext here instead?
+      return null;
+    };
+
+    // TODO: extract this to be a separate method.
+    const doNext = () => {
+      // Format the dependencies, detect & shortcircuit errors, etc
+      const hasDependencies = dependenciesCount > 0;
+      let realPendingPlanResultsesLength = hasDependencies
+        ? 0
+        : pendingPlanResultses.length;
+      const values = hasDependencies
+        ? []
+        : new Array(realPendingPlanResultsesLength).fill([]);
+      const realPendingPlanResultses = hasDependencies
+        ? []
+        : pendingPlanResultses;
+      const indexMap = hasDependencies
+        ? []
+        : pendingPlanResultses.map((_, i) => i);
+      // Only run this loop if there are actually dependencies
+      if (hasDependencies) {
+        for (
+          let pendingPlanResultsesIndex = 0,
+            pendingPlanResultsesLength = pendingPlanResultses.length;
+          pendingPlanResultsesIndex < pendingPlanResultsesLength;
+          pendingPlanResultsesIndex++
+        ) {
+          const entry = new Array(dependenciesCount);
+          let error;
+          for (
+            let dependencyIndex = 0;
+            dependencyIndex < dependenciesCount;
+            dependencyIndex++
+          ) {
+            const dependencyValues = dependencyValuesList[dependencyIndex];
+            if (!dependencyValues) {
+              console.log(dependencyValuesList, dependencyIndex);
+            }
+            const dependencyValue = dependencyValues[pendingPlanResultsesIndex];
+            if (
+              dependencyValue &&
+              dependencyValue.constructor === CrystalError
+            ) {
+              error = dependencyValue;
+              break;
+            }
+            entry[dependencyIndex] = dependencyValue;
+          }
+          if (error) {
+            // Error occurred; short-circuit execution
+            result[pendingPlanResultsesIndexes[pendingPlanResultsesIndex]] =
+              error;
+            const planResults = pendingPlanResultses[pendingPlanResultsesIndex];
+            planResults.set(commonAncestorPathIdentity, plan.id, error);
+          } else {
+            values[realPendingPlanResultsesLength] = entry;
+            realPendingPlanResultses[realPendingPlanResultsesLength] =
+              pendingPlanResultses[pendingPlanResultsesIndex];
+            // TODO: should we change this to be
+            // pendingPlanResultsesIndexes[pendingPlanResultsesIndex] for
+            // increased efficiency later?
+            indexMap[realPendingPlanResultsesLength] =
+              pendingPlanResultsesIndex;
+            realPendingPlanResultsesLength++;
+          }
+        }
+      }
+
+      let meta = crystalContext.metaByPlanId[plan.id];
+      if (!meta) {
+        meta = Object.create(null) as Record<string, unknown>;
+        crystalContext.metaByPlanId[plan.id] = meta;
+      }
+      // Note: the `execute` method on plans is responsible for memoizing
+      // results into `meta`.
+      if (plan instanceof __ItemPlan) {
+        throw new Error(
+          "Should never attempt to execute __ItemPlan; that should be handled within executeBatch",
+        );
+      }
+      const planOptions = this.planOptionsByPlan.get(plan);
+      const isSubscribe = plan.id === this.subscriptionPlanId;
+
+      // If plan is sync, execute, store and return results (there's no risk of a race condition)
+      if (
+        plan.sync &&
+        !(plan instanceof __ListTransformPlan) &&
+        !(isSubscribe || planOptions?.stream)
+      ) {
+        let crystalError: CrystalError | undefined;
+        let executionResults: CrystalResultsList<any> | undefined;
+        try {
+          executionResults = plan.execute(
+            values,
+            meta,
+          ) as CrystalResultsList<any>;
+          if (typeof (executionResults as any).then === "function") {
+            throw new Error(
+              `${plan} claims to be synchronous, but it returned a promise; please set 'sync = false'`,
+            );
+          }
+        } catch (e) {
+          crystalError = new CrystalError(e);
+        }
+        for (
+          let realPendingPlanResultsesIndex = 0,
+            realPendingPlanResultsesLength = realPendingPlanResultses.length;
+          realPendingPlanResultsesIndex < realPendingPlanResultsesLength;
+          realPendingPlanResultsesIndex++
+        ) {
+          const planResults =
+            realPendingPlanResultses[realPendingPlanResultsesIndex];
+          const underlyingIndex =
+            pendingPlanResultsesIndexes[
+              indexMap[realPendingPlanResultsesIndex]
+            ];
+          const value =
+            crystalError ?? executionResults![realPendingPlanResultsesIndex];
+          result[underlyingIndex] = value;
+          planResults.set(commonAncestorPathIdentity, plan.id, value);
+        }
+        return result;
+      }
+
+      // Plan's not synchronous
+
+      // TODO: this is a hack! Use the new execution algorithm.
+      return this.executePlanOld(
+        plan,
+        crystalContext,
+        planResultses,
+        visitedPlans,
+        depth,
+      );
+    };
+
+    // If any dependency result was a promise, await all dependencyPromises then re-evaluate uncompleted resultses
+    if (dependencyPromises.length > 0) {
+      // Return a promise
+      return awaitDependencyPromises().then((finalResult) => {
+        if (finalResult) {
+          return finalResult;
+        } else {
+          return doNext();
+        }
+      });
+    } else {
+      // Remain synchronous, if possible
+      return doNext();
+    }
+  }
+
+  /**
+   * Implements `ExecutePlan`.
+   *
+   * @remarks `await` is forbidden in this method to avoid race conditions.
+   *
+   * This was the original (known good) implementation of executePlan; however
+   * it was `defer()`-heavy, so performance suffered.
+   */
+  private executePlanOld<T>(
+    plan: ExecutablePlan<T>,
+    crystalContext: CrystalContext,
+    planResultses: ReadonlyArray<null | PlanResults>,
+    visitedPlans = new Set<ExecutablePlan>(),
+    depth = 0,
+  ): PromiseOrDirect<any[]> {
+    const indent = "    ".repeat(depth);
+    const follow = indent + "  ⮞";
+    if (isDev) {
+      if (!plan) {
+        throw new Error(
+          `executePlan was called but it was not passed a plan to execute, instead '${inspect(
+            plan,
+          )}'`,
+        );
+      }
+    }
+    //if (visitedPlans.has(plan)) {
+    //  throw new Error(
+    //    `ExecutablePlan execution recursion error: attempted to execute ${plan} again`,
+    //  );
+    //}
+    //visitedPlans.add(plan);
     if (plan instanceof __ItemPlan) {
       // Shortcut evaluation because __ItemPlan cannot be executed.
       return planResultses.map((planResults) =>
@@ -2231,6 +2616,7 @@ export class Aether<
     );
   }
 
+  // TODO: can this be made synchronous?
   /**
    * The meat of plan execution, this is called by executePlan for pending
    * plans - those that have not been executed yet.
