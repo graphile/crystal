@@ -175,6 +175,7 @@ export class InputListPlan extends ExecutablePlan {
     moduleName: "graphile-crystal",
     exportName: "InputListPlan",
   };
+  sync = true;
 
   private itemPlanIds: number[] = [];
   private outOfBoundsPlanId: number;
@@ -285,6 +286,7 @@ export class InputStaticLeafPlan<TLeaf = any> extends ExecutablePlan<TLeaf> {
     moduleName: "graphile-crystal",
     exportName: "InputStaticLeafPlan",
   };
+  sync = true;
 
   private readonly coercedValue: any;
   constructor(inputType: GraphQLLeafType, value: ValueNode | undefined) {
@@ -318,6 +320,7 @@ export class InputObjectPlan extends ExecutablePlan {
     moduleName: "graphile-crystal",
     exportName: "InputObjectPlan",
   };
+  sync = true;
 
   private inputFields: {
     [fieldName: string]: { dependencyIndex: number; plan: InputPlan };

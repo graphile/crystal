@@ -35,6 +35,7 @@ export class PgSingleTablePolymorphicPlan<
     moduleName: "@dataplan/pg",
     exportName: "PgSingleTablePolymorphicPlan",
   };
+  sync = true;
 
   private typePlanId: number;
   private rowPlanId: number;
@@ -58,14 +59,12 @@ export class PgSingleTablePolymorphicPlan<
     return this.rowPlan();
   }
 
-  async execute(
+  execute(
     values: CrystalValuesList<any[]>,
-  ): Promise<
-    CrystalResultsList<PolymorphicData<
-      string,
-      ReadonlyArray<PgSourceRow<TColumns>>
-    > | null>
-  > {
+  ): CrystalResultsList<PolymorphicData<
+    string,
+    ReadonlyArray<PgSourceRow<TColumns>>
+  > | null> {
     return values.map((v) =>
       v[this.typePlanId] ? polymorphicWrap(v[this.typePlanId]) : null,
     );

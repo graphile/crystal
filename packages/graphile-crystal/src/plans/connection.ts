@@ -39,6 +39,7 @@ export class ConnectionPlan<
     moduleName: "graphile-crystal",
     exportName: "ConnectionPlan",
   };
+  sync = true;
 
   private subplanId: number;
 
@@ -232,6 +233,7 @@ export class EdgePlan<
     moduleName: "graphile-crystal",
     exportName: "EdgePlan",
   };
+  sync = true;
 
   private connectionPlanId: number;
 

@@ -12,6 +12,7 @@ export class PgCursorPlan<
     moduleName: "@dataplan/pg",
     exportName: "PgCursorPlan",
   };
+  sync = true;
 
   private cursorValuesPlanId: number;
   private classSinglePlanId: number;

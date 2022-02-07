@@ -24,6 +24,7 @@ export class NodePlan<TCodecs extends { [key: string]: NodeIdCodec<any> }>
     moduleName: "graphile-crystal",
     exportName: "NodePlan",
   };
+  sync = true;
 
   private specPlanId: number;
 
@@ -78,11 +79,9 @@ export class NodePlan<TCodecs extends { [key: string]: NodeIdCodec<any> }>
     throw new Error("Could not determine the type to use");
   }
 
-  async execute(
+  execute(
     values: CrystalValuesList<any[]>,
-  ): Promise<
-    CrystalResultsList<PolymorphicData<string, ReadonlyArray<any>> | null>
-  > {
+  ): CrystalResultsList<PolymorphicData<string, ReadonlyArray<any>> | null> {
     return values.map((v) => {
       const specifier = v[this.specPlanId];
       if (specifier) {

@@ -130,6 +130,17 @@ export class ExecutablePlan<TData = any> extends BasePlan {
   static $$export: any;
 
   /**
+   * Set true if your plan executes synchronously (i.e. no
+   * async/await/promises); this allows us to avoid deferreds and is a
+   * performance optimisation.
+   *
+   * If you don't set this, we'll try and guess it by whether your `execute`
+   * function is `async` or not; this will fail if you have a sync function
+   * that returns promises.
+   */
+  public sync!: boolean;
+
+  /**
    * The ids for plans this plan will need data from in order to execute. NOTE:
    * it's important we use the id and not the plan here otherwise when we swap
    * out plans during optimisation things will go awry.
@@ -161,6 +172,11 @@ export class ExecutablePlan<TData = any> extends BasePlan {
 
   constructor() {
     super();
+    if (typeof (this as any).sync !== "boolean") {
+      // Take a guess
+      this.sync = this.execute.constructor.name !== "AsyncFunction";
+    }
+
     this.id = this.aether._addPlan(this);
   }
 

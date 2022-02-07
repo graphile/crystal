@@ -6,6 +6,7 @@ export class LambdaPlan<TIn, TOut> extends ExecutablePlan<TOut> {
     moduleName: "graphile-crystal",
     exportName: "LambdaPlan",
   };
+  sync = true;
 
   private planId: number | null;
   constructor(

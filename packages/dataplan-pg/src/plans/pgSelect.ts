@@ -264,6 +264,8 @@ export class PgSelectPlan<
     exportName: "PgSelectPlan",
   };
 
+  sync = false;
+
   // FROM
   private readonly from: SQL | ((...args: SQL[]) => SQL);
 

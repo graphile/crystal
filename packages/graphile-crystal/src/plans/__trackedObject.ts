@@ -30,6 +30,7 @@ export class __TrackedObjectPlan<TData = any> extends ExecutablePlan<TData> {
     moduleName: "graphile-crystal",
     exportName: "__TrackedObjectPlan",
   };
+  sync = true;
 
   /**
    * Could be anything. In the case of context it could even have exotic

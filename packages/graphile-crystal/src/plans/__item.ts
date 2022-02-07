@@ -13,6 +13,7 @@ export class __ItemPlan<TData> extends ExecutablePlan<TData> {
     moduleName: "graphile-crystal",
     exportName: "__ItemPlan",
   };
+  sync = true;
   constructor(parentPlan: ExecutablePlan<TData>, public readonly depth = 0) {
     super();
     this.parentPathIdentity = getCurrentParentPathIdentity();

@@ -13,6 +13,7 @@ export class ListPlan<
     moduleName: "graphile-crystal",
     exportName: "ListPlan",
   };
+  sync = true;
 
   constructor(list: readonly [...TPlanTuple]) {
     super();

@@ -12,6 +12,7 @@ export class __ValuePlan<TData> extends ExecutablePlan<TData> {
     moduleName: "graphile-crystal",
     exportName: "__ValuePlan",
   };
+  sync = true;
 
   constructor() {
     super();

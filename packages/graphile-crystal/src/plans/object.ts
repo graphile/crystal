@@ -19,6 +19,7 @@ export class ObjectPlan<
     moduleName: "graphile-crystal",
     exportName: "ObjectPlan",
   };
+  sync = true;
   private keys: Array<keyof TPlans>;
   private results: Array<
     [Array<DataFromPlans<TPlans>[keyof TPlans]>, DataFromPlans<TPlans>]

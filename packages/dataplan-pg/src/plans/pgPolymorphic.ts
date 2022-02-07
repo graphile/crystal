@@ -35,6 +35,7 @@ export class PgPolymorphicPlan<
     moduleName: "@dataplan/pg",
     exportName: "PgPolymorphicPlan",
   };
+  sync = true;
 
   private typeSpecifierPlanId: number;
   private itemPlanId: number;
@@ -101,12 +102,10 @@ export class PgPolymorphicPlan<
     return t;
   }
 
-  async execute(values: CrystalValuesList<any[]>): Promise<
-    CrystalResultsList<PolymorphicData<
-      string,
-      ReadonlyArray<any> // TODO: something to do with TCodec
-    > | null>
-  > {
+  execute(values: CrystalValuesList<any[]>): CrystalResultsList<PolymorphicData<
+    string,
+    ReadonlyArray<any> // TODO: something to do with TCodec
+  > | null> {
     return values.map((v) => {
       const specifier = v[this.typeSpecifierPlanId];
       if (specifier) {

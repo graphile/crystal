@@ -21,6 +21,7 @@ export class JSONParsePlan<
     moduleName: "@dataplan/json",
     exportName: "JSONParsePlan",
   };
+  sync = true;
 
   constructor($stringPlan: ExecutablePlan<string | null>) {
     super();

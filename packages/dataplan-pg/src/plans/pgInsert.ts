@@ -55,6 +55,7 @@ export class PgInsertPlan<
     exportName: "PgInsertPlan",
   };
 
+  sync = false;
   hasSideEffects = true;
 
   /**

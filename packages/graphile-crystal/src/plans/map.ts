@@ -20,6 +20,7 @@ export class MapPlan extends ExecutablePlan {
     moduleName: "graphile-crystal",
     exportName: "MapPlan ",
   };
+  sync = true;
 
   private mapper: (obj: object) => object;
   constructor(

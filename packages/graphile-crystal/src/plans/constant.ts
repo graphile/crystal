@@ -9,6 +9,8 @@ export class ConstantPlan<TData> extends ExecutablePlan<TData> {
     moduleName: "graphile-crystal",
     exportName: "ConstantPlan",
   };
+  sync = true;
+
   constructor(private data: TData) {
     super();
   }

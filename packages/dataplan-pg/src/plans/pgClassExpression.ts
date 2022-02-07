@@ -55,6 +55,8 @@ export class PgClassExpressionPlan<
     exportName: "PgClassExpressionPlan",
   };
 
+  sync = true;
+
   // TODO: rename to 'row'?
   /**
    * The dependency id of the parent table row (from SELECT,
