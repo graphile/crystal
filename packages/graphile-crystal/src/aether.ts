@@ -2768,7 +2768,9 @@ export class Aether<
       // Derive new CrystalLayerObjects from the existing ones.
       const depId = layerPlan.dependencies[0];
       const dep = this.plans[depId];
-      const layerResults = crystalLayerObjects.map((clo) => {
+      const pendingCLOs: Array<CrystalLayerObject | null> = [];
+      const pendingCLOIndexes: Array<[number, number]> = [];
+      const layerResults = crystalLayerObjects.map((clo, cloIndex) => {
         if (clo == null) {
           return null;
         }
@@ -2819,10 +2821,17 @@ export class Aether<
             );
             return newCrystalLayerObject(parentCrystalObject, copy);
           });
-          return mapResult
-            ? newCLOs.map(mapResult)
-            : // TODO: we should be optimise this to call executeLayers once, rather than once per crystalLayerObject.
-              this.executeLayers(crystalContext, rest, newCLOs, rawMapResult);
+          if (mapResult) {
+            return newCLOs.map(mapResult);
+          } else {
+            // Optimise this to call executeLayers once, rather than once per crystalLayerObject - see code below `layerResults` loop.
+            const l = newCLOs.length;
+            for (let innerCLOIndex = 0; innerCLOIndex < l; innerCLOIndex++) {
+              pendingCLOs.push(newCLOs[innerCLOIndex]);
+              pendingCLOIndexes.push([cloIndex, innerCLOIndex]);
+            }
+            return new Array(l);
+          }
         } else if (isAsyncIterable(listResult)) {
           const listResultIterator = listResult[Symbol.asyncIterator]();
           const abort = defer<IteratorResult<any, any>>();
@@ -2908,6 +2917,19 @@ export class Aether<
           return [];
         }
       });
+      const l = pendingCLOs.length;
+      if (!mapResult && l > 0) {
+        const allResults = await this.executeLayers(
+          crystalContext,
+          rest,
+          pendingCLOs,
+          rawMapResult,
+        );
+        for (let j = 0; j < l; j++) {
+          const [cloIndex, innerCLOIndex] = pendingCLOIndexes[j];
+          layerResults[cloIndex][innerCLOIndex] = allResults[j];
+        }
+      }
       return layerResults;
     } else {
       // Execute the plan with the same crystalLayerObjects
