@@ -146,7 +146,6 @@ function newCrystalLayerObject(
   planResults: PlanResults = new PlanResults(
     parentCrystalObject[$$planResults],
   ),
-  indexes: number[] = [],
 ): CrystalLayerObject {
   return {
     toString(): string {
@@ -156,7 +155,6 @@ function newCrystalLayerObject(
     parentCrystalObject,
     itemByItemPlanId: new Map(),
     planResults,
-    indexes,
   };
 }
 
@@ -2438,7 +2436,6 @@ export class Aether<
                 batch.pathIdentity,
                 namedReturnType.name,
                 uid(),
-                [], // Doesn't matter
                 crystalContext,
                 new PlanResults(planResults),
               ),
@@ -2665,7 +2662,6 @@ export class Aether<
       GLOBAL_PATH, // TODO: this should be ROOT_PATH I think?
       this.queryTypeName,
       rootId,
-      EMPTY_INDEXES,
       crystalContext,
       new PlanResults(),
     );
@@ -2776,7 +2772,7 @@ export class Aether<
         if (clo == null) {
           return null;
         }
-        const { parentCrystalObject, indexes, planResults } = clo;
+        const { parentCrystalObject, planResults } = clo;
         if (
           planResults.has(layerPlan.commonAncestorPathIdentity, layerPlan.id)
         ) {
@@ -2821,10 +2817,7 @@ export class Aether<
               layerPlan.id,
               result,
             );
-            return newCrystalLayerObject(parentCrystalObject, copy, [
-              ...indexes,
-              i,
-            ]);
+            return newCrystalLayerObject(parentCrystalObject, copy);
           });
           return mapResult
             ? newCLOs.map(mapResult)
@@ -2861,11 +2854,7 @@ export class Aether<
                   layerPlan.id,
                   result,
                 );
-                const newCLO = newCrystalLayerObject(
-                  parentCrystalObject,
-                  copy,
-                  [...indexes, -1],
-                );
+                const newCLO = newCrystalLayerObject(parentCrystalObject, copy);
                 const value = mapResult
                   ? mapResult(newCLO)
                   : (
@@ -3130,7 +3119,6 @@ export class Aether<
           batch.pathIdentity,
           typeName,
           uid(crystalPrintPathIdentity(batch.pathIdentity)),
-          clo.indexes,
           crystalContext,
           clo.planResults,
         );

@@ -142,7 +142,6 @@ function makeParentCrystalObject(
       parentPathIdentity,
       parentType.name,
       valueId,
-      indexes,
       crystalContext,
       parentPlanResults,
     );
@@ -319,7 +318,6 @@ export function newCrystalObject(
   pathIdentity: string,
   typeName: string,
   id: UniqueId,
-  indexes: ReadonlyArray<number>,
   crystalContext: CrystalContext,
   // TODO: remove this?
   planResults: PlanResults,
@@ -331,11 +329,10 @@ export function newCrystalObject(
     [$$planResults]: planResults,
     [$$crystalContext]: crystalContext,
     toString() {
-      const p = indexes.length ? `.${indexes.join(".")}` : ``;
       return chalk.bold.blue(
         `CO(${chalk.bold.yellow(
           crystalPrintPathIdentity(pathIdentity),
-        )}/${crystalPrint(id)}${p})`,
+        )}/${crystalPrint(id)})`,
       );
     },
   };

@@ -123,8 +123,7 @@ export const $$isCrystalLayerObject = Symbol("crystalLayerObject");
 /**
  * A "CrystalLayerObject" represents an intermediate stage whilst resolving a
  * field against a CrystalObject parent - it acts as a container for the
- * intermediate `planResults` (which is important!) and `indexes` (which is
- * only really used for debugging).
+ * intermediate `planResults` (which is important!).
  *
  * Note that a field might actually have a stack of plans that need to be
  * executed, and may result in lists (or even lists of lists) being returned;
@@ -139,7 +138,6 @@ export interface CrystalLayerObject {
   parentCrystalObject: CrystalObject;
   itemByItemPlanId: Map<number, any>;
   planResults: PlanResults;
-  indexes: number[];
 }
 
 export interface Batch {
