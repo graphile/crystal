@@ -176,6 +176,14 @@ export class ExecutablePlan<TData = any> extends BasePlan {
       // Take a guess
       this.sync = this.execute.constructor.name !== "AsyncFunction";
     }
+    if (
+      this.sync === true &&
+      this.execute.constructor.name === "AsyncFunction"
+    ) {
+      throw new Error(
+        `${this} claims to be synchronous, however the execute method is asynchronous`,
+      );
+    }
 
     this.id = this.aether._addPlan(this);
   }
