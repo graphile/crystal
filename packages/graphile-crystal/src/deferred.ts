@@ -1,4 +1,4 @@
-export interface Deferred<T> extends Promise<T> {
+export interface Deferred<T> extends PromiseLike<T> {
   resolve: (input: T | PromiseLike<T>) => void;
   reject: (error: Error) => void;
 }
@@ -6,7 +6,7 @@ export interface Deferred<T> extends Promise<T> {
 function NOOP() {}
 
 /**
- * Node.js promises have a lot of overhead (not least `async_hooks`); this
+ * Node.js promises have a little overhead (not least `async_hooks`); this
  * light promise implementation helps us avoid that for `defer()` which is used
  * _a lot_.
  *
@@ -40,36 +40,12 @@ class LightPromise<T> {
       reject: (reason?: any) => void,
     ) => void,
   ) {
-    this.resolve = this.resolve.bind(this);
-    this.reject = this.reject.bind(this);
     if (executor !== NOOP) {
       executor(this.resolve, this.reject);
     }
   }
 
-  public catch<TResult = never>(
-    onrejected?:
-      | ((reason: any) => TResult | PromiseLike<TResult>)
-      | undefined
-      | null,
-  ): LightPromise<T | TResult> {
-    return this._then(null, onrejected);
-  }
-
   public then<TResult1 = T, TResult2 = never>(
-    onfulfilled?:
-      | ((value: T) => TResult1 | PromiseLike<TResult1>)
-      | undefined
-      | null,
-    onrejected?:
-      | ((reason: any) => TResult2 | PromiseLike<TResult2>)
-      | undefined
-      | null,
-  ): LightPromise<TResult1 | TResult2> {
-    return this._then(onfulfilled, onrejected);
-  }
-
-  private _then<TResult1 = T, TResult2 = never>(
     onfulfilled?:
       | ((value: T) => TResult1 | PromiseLike<TResult1>)
       | undefined
@@ -106,12 +82,10 @@ class LightPromise<T> {
     return promise;
   }
 
-  public resolve(input: T | PromiseLike<T>): void {
+  public resolve = (input: T | PromiseLike<T>): void => {
     if (input && typeof (input as any).then === "function") {
       (input as any).then(this.resolve, this.reject);
-      return;
-    }
-    if (this.state === 0) {
+    } else if (this.state === 0) {
       this.state = 1;
       this._value = input;
       this.executeThens();
@@ -122,9 +96,9 @@ class LightPromise<T> {
         }.`,
       );
     }
-  }
+  };
 
-  public reject(error: Error): void {
+  public reject = (error: Error): void => {
     if (this.state === 0) {
       this.state = 2;
       this._value = error;
@@ -136,13 +110,13 @@ class LightPromise<T> {
         }.`,
       );
     }
-  }
+  };
 
   private executeThens(): void {
     const thens = this._thens;
     (this._thens as any) = null;
-    for (const then of thens) {
-      this._then(then.onfulfilled, then.onrejected, then.promise);
+    for (const { onfulfilled, onrejected, promise } of thens) {
+      this.then(onfulfilled, onrejected, promise);
     }
   }
 }
@@ -157,9 +131,15 @@ export function deferWithNativePromise<T = void>(): Deferred<T> {
   const promise = new Promise<T>((_resolve, _reject): void => {
     resolve = _resolve;
     reject = _reject;
-  }) as Deferred<T>;
+  }) as unknown as Deferred<T>;
   promise.resolve = resolve;
   promise.reject = reject;
+
+  // TODO: this is to avoid unhandledPromiseRejection errors; generally
+  // deferred errors are handled at a later time (or can be safely ignored if
+  // another error wins)
+  promise.then(null, NOOP);
+
   return promise;
 }
 

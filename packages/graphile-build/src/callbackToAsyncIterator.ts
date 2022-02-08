@@ -58,13 +58,9 @@ export default function callbackToAsyncIterator<CallbackInput, ReturnVal>(
 
   try {
     // Start listener
-    Promise.resolve(listener((value) => pushValue(value)))
-      .then((a) => {
-        listenerReturnValue = a;
-      })
-      .catch((err) => {
-        onError(err);
-      });
+    Promise.resolve(listener((value) => pushValue(value))).then((a) => {
+      listenerReturnValue = a;
+    }, onError);
 
     const i: StrongAsyncIterableIterator<CallbackInput> = {
       next() {

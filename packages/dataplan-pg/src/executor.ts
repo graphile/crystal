@@ -209,7 +209,7 @@ ${
 
   private async withTransaction<T>(
     context: PgExecutorContext,
-    callback: (execute: ExecuteFunction) => Promise<T>,
+    callback: (execute: ExecuteFunction) => PromiseLike<T>,
   ): Promise<T> {
     return await context.withPgClient<T>(
       context.pgSettings,
@@ -577,7 +577,7 @@ ${
           if (pending[batchIndex].length > 0) {
             valuesPending--;
             if (valuesPending < batchFetchSize && !fetching) {
-              fetchNextBatch().catch(handleFetchError);
+              fetchNextBatch().then(null, handleFetchError);
             }
             const value = pending[batchIndex].shift();
             if (value instanceof Wrapped) {
@@ -622,7 +622,7 @@ ${
         this.withTransaction(context, (_execute) => {
           executePromise.resolve(_execute);
           return tx;
-        }).catch(handleFetchError);
+        }).then(null, handleFetchError);
         const execute = await executePromise;
 
         // eslint-disable-next-line no-inner-declarations
@@ -663,7 +663,7 @@ ${
             }
           } else {
             if (valuesPending < batchFetchSize) {
-              fetchNextBatch().catch(handleFetchError);
+              fetchNextBatch().then(null, handleFetchError);
             }
           }
         };
@@ -674,7 +674,7 @@ ${
 
         // Ensure we release the cursor now we've registered it.
         try {
-          fetchNextBatch().catch(handleFetchError);
+          fetchNextBatch().then(null, handleFetchError);
           batch.forEach(({ resultIndex }, batchIndex) => {
             streams[resultIndex] = (async function* () {
               try {
@@ -695,7 +695,7 @@ ${
           await execute(releaseCursorSQL, []);
         }
       })();
-      promise.catch((e) => {
+      promise.then(null, (e) => {
         console.error("UNEXPECTED ERROR!");
         console.error(e);
         tx.resolve();

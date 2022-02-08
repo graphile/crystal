@@ -100,6 +100,7 @@ import {
 } from "./resolvers";
 import { stripAnsi } from "./stripAnsi";
 import type { UniqueId } from "./utils";
+import { isPromiseLike } from "./utils";
 import {
   arraysMatch,
   defaultValueToValueNode,
@@ -2237,8 +2238,7 @@ export class Aether<
         new Set([...visitedPlans]),
         depth + 1,
       );
-      // TODO: change to `isPromiseLike`
-      if (isPromise(allDependencyResultsOrPromise)) {
+      if (isPromiseLike(allDependencyResultsOrPromise)) {
         dependencyPromises.push({
           promise: allDependencyResultsOrPromise,
           dependencyIndex,
@@ -2590,10 +2590,6 @@ export class Aether<
         debugExecuteVerbose("%s no result for %c", follow, planResults);
 
         const deferred = defer<any>();
-
-        // TODO: this is critical to avoid unhandledPromiseRejection errors; but really we should be awaiting this error somewhere reliable.
-        // Ignore errors from this deferred
-        deferred.catch(() => {});
 
         deferredsByBucket.set(bucket, deferred);
 
@@ -3171,7 +3167,7 @@ export class Aether<
       // (Note: when batch is executed it will delete itself from aether.batchByPathIdentity.)
       setTimeout(
         () =>
-          this.executeBatch(definitelyBatch, crystalContext).catch((e) => {
+          this.executeBatch(definitelyBatch, crystalContext).then(null, (e) => {
             // This should not be able to happen because executeBatch contains the try/catch.
             console.error(
               `GraphileInternalError<cd7c157b-9f20-432d-8716-7ff052acd1fd>: ${e.message}`,

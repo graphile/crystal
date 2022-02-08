@@ -103,7 +103,7 @@ export class PgSubscriber<
       }
       const client = await this.getClient();
       await this.syncWithClient(client);
-    }).catch(() => this.resetClient());
+    }).then(null, () => this.resetClient());
   }
 
   private async syncWithClient(client: PoolClient) {
@@ -145,7 +145,7 @@ export class PgSubscriber<
         }
         if (Object.keys(this.topics).length > 0) {
           // Trigger a new client to be fetched and have it sync.
-          this.getClient().catch(() => {
+          this.getClient().then(null, () => {
             // Must be released; ignore
           });
         }
@@ -206,7 +206,7 @@ export class PgSubscriber<
             }
           }
         })();
-        promise.catch(() => {
+        promise.then(null, () => {
           /* ignore */
         });
         this.listeningClientPromise = promise;

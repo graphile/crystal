@@ -173,8 +173,7 @@ export interface CrystalContext {
 
 // These values are just to make reading the code a little clearer
 export type CrystalValuesList<T> = ReadonlyArray<T>;
-// TODO: Change to PromiseLike?
-export type PromiseOrDirect<T> = Promise<T> | T;
+export type PromiseOrDirect<T> = PromiseLike<T> | T;
 export type CrystalResultsList<T> = ReadonlyArray<PromiseOrDirect<T>>;
 export type CrystalResultStreamList<T> = ReadonlyArray<
   AsyncIterable<PromiseOrDirect<T>> | CrystalError
