@@ -235,7 +235,7 @@ export class PgDeletePlan<
    * the plans stored in this.identifiers to get actual values we can use.
    */
   async execute(
-    values: CrystalValuesList<any[]>,
+    values: Array<CrystalValuesList<any>>,
   ): Promise<CrystalResultsList<any>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectPlan before finalizing it.");
@@ -246,7 +246,7 @@ export class PgDeletePlan<
     // We must execute each mutation on its own, but we can at least do so in
     // parallel. Note we return a list of promises, each may reject or resolve
     // without causing the others to reject.
-    return values.map(async (value) => {
+    return values[this.contextId].map(async (context, i) => {
       const sqlValues = queryValueDetailsBySymbol.size
         ? rawSqlValues.map((v) => {
             if (typeof v === "symbol") {
@@ -254,14 +254,14 @@ export class PgDeletePlan<
               if (!details) {
                 throw new Error(`Saw unexpected symbol '${inspect(v)}'`);
               }
-              return details.processor(value[details.depId]);
+              return details.processor(values[details.depId][i]);
             } else {
               return v;
             }
           })
         : rawSqlValues;
       const { rows, rowCount } = await this.source.executeMutation({
-        context: value[this.contextId],
+        context,
         text,
         values: sqlValues,
       });

@@ -46,17 +46,17 @@ export class JSONParsePlan<
     return access(this, [index]);
   }
 
-  execute(values: CrystalValuesList<[string]>): CrystalResultsList<TJSON> {
-    return values.map((v) => {
-      if (typeof v[0] === "string") {
-        return JSON.parse(v[0]);
-      } else if (v[0] == null) {
+  execute(values: [CrystalValuesList<string>]): CrystalResultsList<TJSON> {
+    return values[0].map((v) => {
+      if (typeof v === "string") {
+        return JSON.parse(v);
+      } else if (v == null) {
         return null;
       } else {
         return Promise.reject(
           new Error(
             `JSONParsePlan: expected string to parse, but received ${
-              Array.isArray(v[0]) ? "array" : typeof v[0]
+              Array.isArray(v) ? "array" : typeof v
             }`,
           ),
         );

@@ -2180,13 +2180,15 @@ export class Aether<
         const previousResult = bucket.get(plan.id);
         if (debugExecuteVerbose.enabled) {
           const planResults = bucketPlanResultses[0].planResults;
-          debugExecuteVerbose(
-            "%s result[%o] for %c found: %c",
-            follow,
-            bucketPlanResultses.map((i) => i.planResultsesIndex),
-            planResults,
-            previousResult,
-          );
+          if (debugExecuteVerbose.enabled) {
+            debugExecuteVerbose(
+              "%s result[%o] for %c found: %c",
+              follow,
+              bucketPlanResultses.map((i) => i.planResultsesIndex),
+              bucketPlanResultses.map((i) => i.planResults),
+              previousResult,
+            );
+          }
         }
 
         // Fill into the relevant places in `result`
@@ -2237,45 +2239,50 @@ export class Aether<
 
     // For each dependency of plan, get the results
     const dependenciesCount = plan.dependencies.length;
-    const dependencyValuesList = new Array(dependenciesCount);
+    const hasDependencies = dependenciesCount > 0;
+    const dependencyValuesList = hasDependencies
+      ? new Array(dependenciesCount)
+      : [[undefined]];
     const dependencyPromises: Array<{
       promise: PromiseOrDirect<any[]>;
       dependencyIndex: number;
     }> = [];
-    for (
-      let dependencyIndex = 0;
-      dependencyIndex < dependenciesCount;
-      dependencyIndex++
-    ) {
-      const dependencyPlanId = plan.dependencies[dependencyIndex];
-      const dependencyPlan = this.plans[dependencyPlanId];
-      if (isDev) {
-        if (!dependencyPlan) {
-          throw new Error(
-            `Expected plan dependency '${dependencyIndex}' for '${plan}' to be a plan, instead found '${inspect(
-              dependencyPlan,
-            )}'`,
-          );
+    if (hasDependencies) {
+      for (
+        let dependencyIndex = 0;
+        dependencyIndex < dependenciesCount;
+        dependencyIndex++
+      ) {
+        const dependencyPlanId = plan.dependencies[dependencyIndex];
+        const dependencyPlan = this.plans[dependencyPlanId];
+        if (isDev) {
+          if (!dependencyPlan) {
+            throw new Error(
+              `Expected plan dependency '${dependencyIndex}' for '${plan}' to be a plan, instead found '${inspect(
+                dependencyPlan,
+              )}'`,
+            );
+          }
         }
-      }
-      const allDependencyResultsOrPromise = this.executePlan(
-        dependencyPlan,
-        crystalContext,
-        pendingPlanResultses,
-        // This is to detect loops, so we don't want changes made inside to
-        // cascade back outside -> clone.
-        new Set(visitedPlans),
-        depth + 1,
-      );
-      if (isPromiseLike(allDependencyResultsOrPromise)) {
-        dependencyPromises.push({
-          promise: allDependencyResultsOrPromise,
-          dependencyIndex,
-        });
-        // Don't moan about unhandled rejections; we only care about the first fail (and we don't care if they get handled later)
-        allDependencyResultsOrPromise.then(null, NOOP);
-      } else {
-        dependencyValuesList[dependencyIndex] = allDependencyResultsOrPromise;
+        const allDependencyResultsOrPromise = this.executePlan(
+          dependencyPlan,
+          crystalContext,
+          pendingPlanResultses,
+          // This is to detect loops, so we don't want changes made inside to
+          // cascade back outside -> clone.
+          new Set(visitedPlans),
+          depth + 1,
+        );
+        if (isPromiseLike(allDependencyResultsOrPromise)) {
+          dependencyPromises.push({
+            promise: allDependencyResultsOrPromise,
+            dependencyIndex,
+          });
+          // Don't moan about unhandled rejections; we only care about the first fail (and we don't care if they get handled later)
+          allDependencyResultsOrPromise.then(null, NOOP);
+        } else {
+          dependencyValuesList[dependencyIndex] = allDependencyResultsOrPromise;
+        }
       }
     }
 
@@ -2354,13 +2361,9 @@ export class Aether<
     // TODO: extract this to be a separate method.
     const doNext = () => {
       // Format the dependencies, detect & shortcircuit errors, etc
-      const hasDependencies = dependenciesCount > 0;
       const toExecute = hasDependencies
         ? []
         : pendingPlanResultsAndIndexListList;
-      const values = hasDependencies
-        ? []
-        : new Array(toExecute.length).fill(EMPTY_ARRAY);
 
       // For each bucket, build dependency values to feed to execute
       if (hasDependencies) {
@@ -2403,11 +2406,20 @@ export class Aether<
                 );
               }
             }
+            for (
+              let dependencyIndex = 0;
+              dependencyIndex < dependenciesCount;
+              dependencyIndex++
+            ) {
+              dependencyValuesList[dependencyIndex].splice(
+                pendingPlanResultsesIndex,
+                1,
+              );
+            }
           } else {
             toExecute.push(
               pendingPlanResultsAndIndexListList[pendingPlanResultsesIndex],
             );
-            values.push(entry);
           }
         }
       }
@@ -2417,6 +2429,9 @@ export class Aether<
       if (toExecuteLength === 0) {
         return result;
       }
+
+      // TODO: optimize away
+      toExecute.reverse();
 
       let meta = crystalContext.metaByPlanId[plan.id];
       if (!meta) {
@@ -2443,7 +2458,7 @@ export class Aether<
         let executionResults: CrystalResultsList<any> | undefined;
         try {
           executionResults = plan.execute(
-            values,
+            dependencyValuesList,
             meta,
           ) as CrystalResultsList<any>;
           if (typeof (executionResults as any).then === "function") {
@@ -2461,19 +2476,23 @@ export class Aether<
         ) {
           const list = toExecute[executableIndex];
           let first = true;
-          const value = crystalError ?? executionResults![executableIndex];
+          const value =
+            crystalError ??
+            (hasDependencies
+              ? executionResults![executableIndex]
+              : executionResults![0]);
           for (const item of list) {
             result[item.planResultsesIndex] = value;
             if (first) {
               first = false;
-              // debugExecuteVerbose(
-              //   `%sExecutePlan(%s): writing value %c for %c to %c`,
-              //   indent,
-              //   plan,
-              //   value,
-              //   commonAncestorPathIdentity,
-              //   item.planResults,
-              // );
+              debugExecuteVerbose(
+                `%sExecutePlan(%s): writing value %c for %c to %c`,
+                indent,
+                plan,
+                value,
+                commonAncestorPathIdentity,
+                item.planResults,
+              );
               item.planResults.set(commonAncestorPathIdentity, plan.id, value);
             } else if (isDev) {
               if (
@@ -2726,31 +2745,36 @@ export class Aether<
     const commonAncestorPathIdentity = plan.commonAncestorPathIdentity;
     const pendingPlanResultsesLength = pendingPlanResultses.length;
     const dependenciesCount = plan.dependencies.length;
-    const dependencyValuesList = new Array(dependenciesCount);
+    const hasDependencies = dependenciesCount > 0;
+    const dependencyValuesList = hasDependencies
+      ? new Array(dependenciesCount)
+      : [[undefined]];
     debugExecute("%s Executing %o dependencies", follow, dependenciesCount);
 
-    for (let i = 0; i < dependenciesCount; i++) {
-      const dependencyPlanId = plan.dependencies[i];
-      const dependencyPlan = this.plans[dependencyPlanId];
-      if (isDev) {
-        if (!dependencyPlan) {
-          throw new Error(
-            `Expected plan dependency '${i}' for '${plan}' to be a plan, instead found '${inspect(
-              dependencyPlan,
-            )}'`,
-          );
+    if (hasDependencies) {
+      for (let i = 0; i < dependenciesCount; i++) {
+        const dependencyPlanId = plan.dependencies[i];
+        const dependencyPlan = this.plans[dependencyPlanId];
+        if (isDev) {
+          if (!dependencyPlan) {
+            throw new Error(
+              `Expected plan dependency '${i}' for '${plan}' to be a plan, instead found '${inspect(
+                dependencyPlan,
+              )}'`,
+            );
+          }
         }
+        const allDependencyResults = await this.executePlan(
+          dependencyPlan,
+          crystalContext,
+          pendingPlanResultses,
+          // This is to detect loops, so we don't want changes made inside to
+          // cascade back outside -> clone.
+          new Set(visitedPlans),
+          depth + 1,
+        );
+        dependencyValuesList[i] = allDependencyResults;
       }
-      const allDependencyResults = await this.executePlan(
-        dependencyPlan,
-        crystalContext,
-        pendingPlanResultses,
-        // This is to detect loops, so we don't want changes made inside to
-        // cascade back outside -> clone.
-        new Set(visitedPlans),
-        depth + 1,
-      );
-      dependencyValuesList[i] = allDependencyResults;
     }
 
     // Uses the true result length
@@ -2758,12 +2782,10 @@ export class Aether<
 
     // Only for pendingPlanResultses that don't have errors in their dependencies
     let realPendingPlanResultsesLength = 0;
-    const values = [];
     const realPendingPlanResultses = [];
     const indexMap = [];
 
-    for (let i = 0; i < pendingPlanResultsesLength; i++) {
-      const entry = new Array(dependenciesCount);
+    for (let i = pendingPlanResultsesLength - 1; i >= 0; i--) {
       let error;
       for (let j = 0; j < dependenciesCount; j++) {
         const dependencyValues = dependencyValuesList[j];
@@ -2772,21 +2794,28 @@ export class Aether<
           error = dependencyValue;
           break;
         }
-        entry[j] = dependencyValue;
       }
       if (error) {
         // Error occurred; short-circuit execution
         result[i] = error;
         const planResults = pendingPlanResultses[i];
         planResults.set(commonAncestorPathIdentity, plan.id, error);
+        // Remove the dependency values
+        for (let j = 0; j < dependenciesCount; j++) {
+          dependencyValuesList[j].splice(i, 1);
+        }
       } else {
-        values[realPendingPlanResultsesLength] = entry;
+        //values[realPendingPlanResultsesLength] = entry;
         realPendingPlanResultses[realPendingPlanResultsesLength] =
           pendingPlanResultses[i];
         indexMap[realPendingPlanResultsesLength] = i;
         realPendingPlanResultsesLength++;
       }
     }
+
+    // TODO: optimize this away
+    realPendingPlanResultses.reverse();
+    indexMap.reverse();
 
     // If all the plans failed we can skip this
     if (realPendingPlanResultsesLength > 0) {
@@ -2815,14 +2844,14 @@ export class Aether<
             )
           : isSubscribe || planOptions?.stream
           ? await (plan as unknown as StreamablePlan<unknown>).stream(
-              values,
+              dependencyValuesList,
               meta,
               isSubscribe ? { initialCount: 0 } : planOptions!.stream!,
             )
-          : await plan.execute(values, meta);
+          : await plan.execute(dependencyValuesList, meta);
       if (plan.debug) {
         console.log(
-          `debugPlans(${plan}): called with: ${inspect(values, {
+          `debugPlans(${plan}): called with: ${inspect(dependencyValuesList, {
             colors: true,
             depth: 6,
           })}; returned: ${inspect(pendingResults, {
@@ -2831,7 +2860,7 @@ export class Aether<
           })}`,
         );
       }
-      if (isDev) {
+      if (isDev && hasDependencies) {
         assert.ok(
           Array.isArray(pendingResults),
           "Expected plan execution to return a list",
@@ -2848,7 +2877,10 @@ export class Aether<
 
         // This could be a Promise, an AsyncIterable, a Promise to an
         // AsyncIterable, or arbitrary data (including an array).
-        const rawPendingResult = pendingResults[i];
+        const rawPendingResult =
+          hasDependencies || plan instanceof __ListTransformPlan
+            ? pendingResults[i]
+            : pendingResults[0];
 
         // NOTE: after this result[j] could be an AsyncIterable, or arbitrary
         // data (including an array).

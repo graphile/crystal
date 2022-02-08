@@ -63,7 +63,7 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
  */
 function constructDestructureFunction(
   path: (string | number)[],
-): (value: any[]) => any {
+): (value: any) => any {
   const jitParts: string[] = [];
 
   let slowMode = false;
@@ -101,15 +101,11 @@ function constructDestructureFunction(
     }
   }
 
-  // The below functions reference value[0] because value is the list for all
-  // of our dependencies; but we only have one dependency so we just grab that
-  // value directly.
-
   // Slow mode is if we need to do hasOwnProperty checks; otherwise we can use
   // a JIT-d function.
   if (slowMode) {
     return function slowlyExtractValueAtPath(value: any): any {
-      let current = value[0];
+      let current = value;
       for (let i = 0, l = path.length; i < l; i++) {
         const pathItem = path[i];
         if (current == null) {
@@ -131,8 +127,8 @@ function constructDestructureFunction(
     // ?.blah?.bog?.["!!!"]?.[0]
     const expression = jitParts.join("");
 
-    // return value[0]?.blah?.bog?.["!!!"]?.[0]
-    const functionBody = `return value[0]${expression};`;
+    // return value?.blah?.bog?.["!!!"]?.[0]
+    const functionBody = `return value${expression};`;
 
     // JIT this via `new Function` for great performance.
     const quicklyExtractValueAtPath = new Function(
@@ -162,7 +158,7 @@ export class AccessPlan<TData> extends ExecutablePlan<TData> {
   };
   sync = true;
 
-  private executeSingle: (value: [TData]) => any;
+  private destructure: (value: TData) => any;
   private parentPlanId: number;
 
   constructor(
@@ -172,7 +168,7 @@ export class AccessPlan<TData> extends ExecutablePlan<TData> {
     super();
     this.addDependency(parentPlan);
     this.parentPlanId = parentPlan.id;
-    this.executeSingle = constructDestructureFunction(path);
+    this.destructure = constructDestructureFunction(path);
   }
 
   toStringMeta(): string {
@@ -207,8 +203,8 @@ export class AccessPlan<TData> extends ExecutablePlan<TData> {
     ]);
   }
 
-  execute(values: CrystalValuesList<[TData]>): CrystalResultsList<TData> {
-    return values.map(this.executeSingle);
+  execute(values: [CrystalValuesList<TData>]): CrystalResultsList<TData> {
+    return values[0].map(this.destructure);
   }
 
   finalize(): void {

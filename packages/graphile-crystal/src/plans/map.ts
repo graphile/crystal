@@ -58,7 +58,7 @@ export class MapPlan extends ExecutablePlan {
   }
 
   execute(values: any[][]): any[] {
-    return values.map(this.executeSingle);
+    return values[0].map(this.mapper);
   }
 
   executeSingle = (value: any[]): any => this.mapper(value[0]);

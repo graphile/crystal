@@ -218,10 +218,10 @@ export class ConnectionPlan<
   }
 
   public execute(
-    values: CrystalValuesList<any[]>,
+    values: Array<CrystalValuesList<any>>,
   ): CrystalResultsList<Record<string, never>> {
     // Fake execution; data actually comes from the child plans
-    return new Array(values.length).fill(EMPTY_OBJECT);
+    return new Array(values[0].length).fill(EMPTY_OBJECT);
   }
 }
 
@@ -263,9 +263,9 @@ export class EdgePlan<
     return this.getConnectionPlan().cursorPlan(this.getItemPlan());
   }
 
-  execute(values: CrystalValuesList<any>): CrystalResultsList<any> {
+  execute(values: Array<CrystalValuesList<any>>): CrystalResultsList<any> {
     // Fake execution; data actually comes from the child plans
-    return new Array(values.length).fill(EMPTY_OBJECT);
+    return new Array(values[0].length).fill(EMPTY_OBJECT);
   }
 }
 

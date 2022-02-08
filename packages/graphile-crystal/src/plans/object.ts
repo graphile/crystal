@@ -110,7 +110,12 @@ export class ObjectPlan<
   execute(
     values: Array<Array<DataFromPlans<TPlans>[keyof TPlans]>>,
   ): Array<DataFromPlans<TPlans>> {
-    return values.map(this.executeSingle!);
+    const count = values[0].length;
+    const result = new Array(count);
+    for (let i = 0; i < count; i++) {
+      result[i] = this.executeSingle!(values.map((v) => v[i]));
+    }
+    return result;
   }
 
   executeSingle:

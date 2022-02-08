@@ -30,12 +30,12 @@ export class LambdaPlan<TIn, TOut> extends ExecutablePlan<TOut> {
     return this;
   }
 
-  execute(values: CrystalValuesList<[TIn]>): CrystalResultsList<TOut> {
+  execute(values: [CrystalValuesList<TIn>]): CrystalResultsList<TOut> {
     const { planId } = this;
     if (planId != null) {
-      return values.map((v) => this.fn(v[planId]));
+      return values[planId].map(this.fn);
     } else {
-      return values.map(() => this.fn(undefined as any));
+      return values[0].map(this.fn);
     }
   }
 }

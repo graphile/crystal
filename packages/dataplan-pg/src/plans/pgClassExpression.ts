@@ -221,15 +221,17 @@ export class PgClassExpressionPlan<
     return this;
   }
 
-  public execute(values: CrystalValuesList<any[]>): CrystalResultsList<any> {
+  public execute(
+    values: Array<CrystalValuesList<any>>,
+  ): CrystalResultsList<any> {
     const { attrIndex, tableId } = this;
     const pg2gql = this.pgCodec.fromPg;
     if (attrIndex != null) {
-      const result = values.map((v) => {
-        if (v[tableId] == null) {
+      const result = values[tableId].map((v) => {
+        if (v == null) {
           return null;
         }
-        const rawValue = v[tableId][attrIndex];
+        const rawValue = v[attrIndex];
         if (rawValue == null) {
           return null;
         } else {

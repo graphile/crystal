@@ -60,14 +60,12 @@ export class PgSingleTablePolymorphicPlan<
   }
 
   execute(
-    values: CrystalValuesList<any[]>,
+    values: Array<CrystalValuesList<any>>,
   ): CrystalResultsList<PolymorphicData<
     string,
     ReadonlyArray<PgSourceRow<TColumns>>
   > | null> {
-    return values.map((v) =>
-      v[this.typePlanId] ? polymorphicWrap(v[this.typePlanId]) : null,
-    );
+    return values[this.typePlanId].map((v) => (v ? polymorphicWrap(v) : null));
   }
 }
 

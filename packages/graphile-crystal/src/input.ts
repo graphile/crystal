@@ -299,8 +299,8 @@ export class InputStaticLeafPlan<TLeaf = any> extends ExecutablePlan<TLeaf> {
     this.coercedValue = value != null ? valueFromAST(value, inputType) : value;
   }
 
-  execute(values: CrystalValuesList<[TLeaf]>): CrystalResultsList<TLeaf> {
-    return new Array(values.length).fill(this.coercedValue);
+  execute(values: [CrystalValuesList<TLeaf>]): CrystalResultsList<TLeaf> {
+    return new Array(values[0].length).fill(this.coercedValue);
   }
 
   eval(): TLeaf {
@@ -364,21 +364,23 @@ export class InputObjectPlan extends ExecutablePlan {
   }
 
   execute(values: any[][]): any[] {
-    return values.map(this.executeSingle);
-  }
-
-  executeSingle = (planResults: any[]): any => {
-    const resultValues = Object.create(null);
-    for (const inputFieldName in this.inputFields) {
-      const dependencyIndex = this.inputFields[inputFieldName].dependencyIndex;
-      if (dependencyIndex == null) {
-        throw new Error("inputFieldPlan has gone missing.");
+    const count = values[0].length;
+    const results = new Array(count);
+    for (let i = 0; i < count; i++) {
+      const resultValues = Object.create(null);
+      for (const inputFieldName in this.inputFields) {
+        const dependencyIndex =
+          this.inputFields[inputFieldName].dependencyIndex;
+        if (dependencyIndex == null) {
+          throw new Error("inputFieldPlan has gone missing.");
+        }
+        const value = values[dependencyIndex][i];
+        resultValues[inputFieldName] = value;
       }
-      const value = planResults[dependencyIndex];
-      resultValues[inputFieldName] = value;
+      results[i] = resultValues;
     }
-    return resultValues;
-  };
+    return results;
+  }
 
   get(attrName: string): InputPlan {
     const plan = this.inputFields[attrName]?.plan;

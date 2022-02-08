@@ -14,9 +14,9 @@ export class LastPlan<TData> extends ExecutablePlan<TData> {
   }
 
   execute(
-    values: CrystalValuesList<[ReadonlyArray<TData>]>,
+    values: [CrystalValuesList<ReadonlyArray<TData>>],
   ): CrystalResultsList<TData> {
-    return values.map(this.executeSingle);
+    return values[0].map((list) => list?.[list?.length - 1]);
   }
 
   executeSingle = ([list]: [ReadonlyArray<TData>]): TData => {

@@ -294,7 +294,7 @@ export class ExecutablePlan<TData = any> extends BasePlan {
    * memoizing results) so that you can expand your usage of meta in future.
    */
   execute(
-    values: CrystalValuesList<ReadonlyArray<any>>,
+    values: ReadonlyArray<CrystalValuesList<any>>,
     meta: Record<string, unknown>,
   ): PromiseOrDirect<CrystalResultsList<TData>> {
     // ESLint/TS: ignore not used.

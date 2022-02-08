@@ -53,9 +53,14 @@ export class ListPlan<
   }
 
   execute(
-    values: Array<UnwrapPlanTuple<TPlanTuple>>,
+    values: any[][], //Array<UnwrapPlanTuple<TPlanTuple>>,
   ): Array<UnwrapPlanTuple<TPlanTuple>> {
-    return values;
+    const count = values[0].length;
+    const result = new Array(count);
+    for (let i = 0; i < count; i++) {
+      result[i] = values.map((list) => list[i]);
+    }
+    return result;
   }
 
   deduplicate(peers: ListPlan<TPlanTuple>[]): ListPlan<TPlanTuple> {

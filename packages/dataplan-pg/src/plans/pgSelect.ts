@@ -1126,7 +1126,7 @@ export class PgSelectPlan<
    * the plans stored in this.identifiers to get actual values we can use.
    */
   async execute(
-    values: CrystalValuesList<any[]>,
+    values: Array<CrystalValuesList<any>>,
   ): Promise<CrystalResultsList<ReadonlyArray<PgSourceRow<TColumns>>>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectPlan before finalizing it.");
@@ -1135,14 +1135,14 @@ export class PgSelectPlan<
       this.finalizeResults;
 
     const executionResult = await this.source.executeWithCache(
-      values.map((value) => {
+      values[this.contextId].map((context, i) => {
         return {
           // The context is how we'd handle different connections with different claims
-          context: value[this.contextId],
+          context,
           queryValues:
             identifierIndex != null
               ? this.queryValues.map(({ dependencyIndex, codec }) =>
-                  codec.toPg(value[dependencyIndex]),
+                  codec.toPg(values[dependencyIndex][i]),
                 )
               : EMPTY_ARRAY,
         };
@@ -1186,7 +1186,7 @@ export class PgSelectPlan<
    * Like `execute`, but stream the results via async iterables.
    */
   async stream(
-    values: CrystalValuesList<any[]>,
+    values: Array<CrystalValuesList<any>>,
   ): Promise<CrystalResultStreamList<PgSourceRow<TColumns>>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot stream PgSelectPlan before finalizing it.");
@@ -1211,14 +1211,14 @@ export class PgSelectPlan<
     const initialFetchResult = text
       ? (
           await this.source.executeWithoutCache(
-            values.map((value) => {
+            values[this.contextId].map((context, i) => {
               return {
                 // The context is how we'd handle different connections with different claims
-                context: value[this.contextId],
+                context,
                 queryValues:
                   identifierIndex != null
                     ? this.queryValues.map(({ dependencyIndex, codec }) =>
-                        codec.toPg(value[dependencyIndex]),
+                        codec.toPg(values[dependencyIndex][i]),
                       )
                     : EMPTY_ARRAY,
               };
@@ -1235,14 +1235,14 @@ export class PgSelectPlan<
 
     const streams = (
       await this.source.executeStream(
-        values.map((value) => {
+        values[this.contextId].map((context, i) => {
           return {
             // The context is how we'd handle different connections with different claims
-            context: value[this.contextId],
+            context,
             queryValues:
               identifierIndex != null
                 ? this.queryValues.map(({ dependencyIndex, codec }) =>
-                    codec.toPg(value[dependencyIndex]),
+                    codec.toPg(values[dependencyIndex][i]),
                   )
                 : EMPTY_ARRAY,
           };

@@ -49,10 +49,9 @@ export class PgCursorPlan<
   }
 
   execute(
-    values: CrystalValuesList<ReadonlyArray<any[] | null>>,
+    values: [CrystalValuesList<any[] | null>],
   ): CrystalResultsList<string | null> {
-    return values.map((value) => {
-      const v = value[this.cursorValuesPlanId];
+    return values[this.cursorValuesPlanId].map((v) => {
       return v == null || v!.every((v) => v == null)
         ? null
         : Buffer.from(JSON.stringify([this.digest, ...v]), "utf8").toString(

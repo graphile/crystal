@@ -80,9 +80,13 @@ export class NodePlan<TCodecs extends { [key: string]: NodeIdCodec<any> }>
   }
 
   execute(
-    values: CrystalValuesList<any[]>,
+    values: Array<CrystalValuesList<any>>,
   ): CrystalResultsList<PolymorphicData<string, ReadonlyArray<any>> | null> {
-    return values.map(this.executeSingle);
+    return values[this.specPlanId].map((specifier) =>
+      specifier
+        ? polymorphicWrap(this.getTypeNameFromSpecifier(specifier))
+        : null,
+    );
   }
 
   executeSingle = (

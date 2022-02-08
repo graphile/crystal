@@ -40,9 +40,9 @@ export class PgValidateParsedCursorPlan extends ExecutablePlan<undefined> {
   }
 
   execute(
-    values: CrystalValuesList<[string | null]>,
+    values: [CrystalValuesList<string | null>],
   ): CrystalResultsList<undefined> {
-    return values.map(([decoded]) => {
+    return values[0].map((decoded) => {
       if (!decoded) {
         return;
       }

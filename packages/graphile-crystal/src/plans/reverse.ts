@@ -33,8 +33,8 @@ export class ReversePlan<TData> extends ExecutablePlan<readonly TData[]> {
     this.addDependency(plan);
   }
 
-  execute(values: CrystalValuesList<[TData[]]>): CrystalResultsList<TData[]> {
-    return values.map(this.executeSingle);
+  execute(values: [CrystalValuesList<TData[]>]): CrystalResultsList<TData[]> {
+    return values[0].map((arr) => (arr == null ? arr : reverseArray(arr)));
   }
 
   executeSingle = ([arr]: [TData[]]): TData[] =>

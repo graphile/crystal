@@ -102,12 +102,13 @@ export class PgPolymorphicPlan<
     return t;
   }
 
-  execute(values: CrystalValuesList<any[]>): CrystalResultsList<PolymorphicData<
+  execute(
+    values: Array<CrystalValuesList<any>>,
+  ): CrystalResultsList<PolymorphicData<
     string,
     ReadonlyArray<any> // TODO: something to do with TCodec
   > | null> {
-    return values.map((v) => {
-      const specifier = v[this.typeSpecifierPlanId];
+    return values[this.typeSpecifierPlanId].map((specifier) => {
       if (specifier) {
         const typeName = this.getTypeNameFromSpecifier(specifier);
         return polymorphicWrap(typeName);

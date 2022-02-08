@@ -536,31 +536,26 @@ export class PgSelectSinglePlan<
   execute(
     values: CrystalValuesList<[PgSourceRow<TColumns>]>,
   ): CrystalResultsList<PgSourceRow<TColumns> | null> {
-    return values.map(this.executeSingle);
+    return values[this.itemPlanId].map((result) => {
+      if (result == null) {
+        return null;
+      } else if (this.nullCheckAttributeIndex != null) {
+        const nullIfAttributeNull = result[this.nullCheckAttributeIndex];
+        if (nullIfAttributeNull == null) {
+          return null;
+        }
+      } else if (this.nullCheckId != null) {
+        const nullIfExpressionNotTrue = result[this.nullCheckId];
+        if (
+          nullIfExpressionNotTrue == null ||
+          TYPES.boolean.fromPg(nullIfExpressionNotTrue) != true
+        ) {
+          return null;
+        }
+      }
+      return result;
+    });
   }
-
-  executeSingle = (
-    value: [PgSourceRow<TColumns>],
-  ): PgSourceRow<TColumns> | null => {
-    const result = value[this.itemPlanId];
-    if (result == null) {
-      return null;
-    } else if (this.nullCheckAttributeIndex != null) {
-      const nullIfAttributeNull = result[this.nullCheckAttributeIndex];
-      if (nullIfAttributeNull == null) {
-        return null;
-      }
-    } else if (this.nullCheckId != null) {
-      const nullIfExpressionNotTrue = result[this.nullCheckId];
-      if (
-        nullIfExpressionNotTrue == null ||
-        TYPES.boolean.fromPg(nullIfExpressionNotTrue) != true
-      ) {
-        return null;
-      }
-    }
-    return result;
-  };
 }
 
 export function pgSelectSingleFromRecord<

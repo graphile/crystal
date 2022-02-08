@@ -30,8 +30,8 @@ export class ToPgPlan extends ExecutablePlan<any> {
     return this;
   }
 
-  execute(values: CrystalValuesList<[any]>): CrystalResultsList<any> {
-    return values.map(([value]) => this.codec.toPg(value));
+  execute(values: [CrystalValuesList<any>]): CrystalResultsList<any> {
+    return values[0].map(this.codec.toPg);
   }
 }
 

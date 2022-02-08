@@ -56,11 +56,13 @@ export class SubscribePlan<
   }
 
   stream(
-    values: CrystalValuesList<[CrystalSubscriber<TTopics>, TTopic]>,
+    values: [
+      CrystalValuesList<CrystalSubscriber<TTopics>>,
+      CrystalValuesList<TTopic>,
+    ],
   ): CrystalResultStreamList<TTopics[TTopic]> {
-    return values.map((value) => {
-      const pubsub = value[this.pubsubDepId as 0];
-      const topic = value[this.topicDepId as 1];
+    return values[this.pubsubDepId as 0].map((pubsub, i) => {
+      const topic = values[this.topicDepId as 1][i];
       return pubsub.subscribe(topic);
     });
   }

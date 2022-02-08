@@ -17,6 +17,8 @@ import { PgSelectSinglePlan } from "./pgSelectSingle";
 
 // PLEASE SEE pgPageInfo.md!
 
+const EMPTY_OBJECT = Object.freeze(Object.create(null));
+
 /**
  * Invoking PgPageInfoPlan should have no direct overhead (e.g.
  * `pageInfo { __typename }` is free); cost should not be incurred until one of
@@ -142,7 +144,7 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
   execute(
     values: CrystalValuesList<ReadonlyArray<any>>,
   ): CrystalResultsList<object> {
-    return values.map((_value) => ({}));
+    return new Array(values[0].length).fill(EMPTY_OBJECT);
   }
 }
 

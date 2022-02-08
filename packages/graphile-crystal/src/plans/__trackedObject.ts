@@ -69,9 +69,9 @@ export class __TrackedObjectPlan<TData = any> extends ExecutablePlan<TData> {
     this.path = path;
   }
 
-  execute(values: CrystalValuesList<[TData]>): CrystalResultsList<TData> {
+  execute(values: [CrystalValuesList<TData>]): CrystalResultsList<TData> {
     // We have only one dependency, return the value of that.
-    return values.map(this.executeSingle);
+    return values[0];
   }
 
   executeSingle = (v: [TData]): TData => v[0];
