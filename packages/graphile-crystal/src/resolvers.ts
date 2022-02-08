@@ -59,7 +59,7 @@ export interface CrystalWrapDetails<
 export function isCrystalWrapped<T>(
   t: T,
 ): t is T & { [$$crystalWrapped]: CrystalWrapDetails } {
-  return t != null && $$crystalWrapped in t;
+  return typeof t === "object" && t !== null && $$crystalWrapped in t;
 }
 
 const getAetherFromResolver = <TContext extends object>(
@@ -339,7 +339,9 @@ export function newCrystalObject(
 }
 
 export function isCrystalObject(input: any): input is CrystalObject {
-  return input != null && input[$$planResults] != null;
+  return (
+    typeof input === "object" && input !== null && input[$$planResults] != null
+  );
 }
 
 /**

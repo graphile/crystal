@@ -83,7 +83,11 @@ class LightPromise<T> {
   }
 
   public resolve = (input: T | PromiseLike<T>): void => {
-    if (input && typeof (input as any).then === "function") {
+    if (
+      typeof input === "object" &&
+      input !== null &&
+      typeof (input as any).then === "function"
+    ) {
       (input as any).then(this.resolve, this.reject);
     } else if (this.state === 0) {
       this.state = 1;

@@ -163,7 +163,11 @@ function newCrystalLayerObject(
 }
 
 export function isCrystalLayerObject(obj: unknown): obj is CrystalLayerObject {
-  return obj != null && (obj as any)[$$isCrystalLayerObject] === true;
+  return (
+    typeof obj === "object" &&
+    obj !== null &&
+    (obj as any)[$$isCrystalLayerObject] === true
+  );
 }
 
 const EMPTY_INDEXES = Object.freeze([] as number[]);
@@ -2133,7 +2137,7 @@ export class Aether<
       planResultsesIndex++
     ) {
       const planResults = planResultses[planResultsesIndex];
-      if (!planResults) {
+      if (planResults == null) {
         // It was null, it stays null
         result[planResultsesIndex] = null;
         continue;

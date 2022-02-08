@@ -16,7 +16,7 @@ export function exportAsMany(all: { [key: string]: any }): void {
     const value = all[key];
     if (
       (typeof value === "object" || typeof value === "function") &&
-      value != null &&
+      value !== null &&
       !("$$export" in value)
     ) {
       exportAs(all[key], key);

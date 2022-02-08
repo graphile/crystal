@@ -140,7 +140,7 @@ function isImportable(
 ): thing is { $$export: { moduleName: string; exportName: string } } {
   return (
     (typeof thing === "object" || typeof thing === "function") &&
-    thing != null &&
+    thing !== null &&
     "$$export" in (thing as object | AnyFunction)
   );
 }
@@ -160,7 +160,7 @@ function isExportedFromFactory<T, TTuple extends any[]>(
 ): thing is ExportedFromFactory<T, TTuple> {
   return (
     (typeof thing === "object" || typeof thing === "function") &&
-    thing != null &&
+    thing !== null &&
     "$exporter$factory" in thing
   );
 }
