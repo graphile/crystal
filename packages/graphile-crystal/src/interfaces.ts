@@ -136,7 +136,6 @@ export interface CrystalLayerObject {
   toString(): string;
   [$$isCrystalLayerObject]: true;
   parentCrystalObject: CrystalObject;
-  itemByItemPlanId: Map<number, any>;
   planResults: PlanResults;
 }
 

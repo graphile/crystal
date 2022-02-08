@@ -146,27 +146,24 @@ type AetherPhase =
   | "finalize"
   | "ready";
 
+function crystalLayerObjectToString(this: CrystalLayerObject) {
+  return chalk.bold.green(`CLO<${this.parentCrystalObject}>`);
+}
+
 function newCrystalLayerObject(
   parentCrystalObject: CrystalObject,
   planResults: PlanResults,
 ): CrystalLayerObject {
   return {
-    toString(): string {
-      return chalk.bold.green(`CLO<${parentCrystalObject}>`);
-    },
+    toString: crystalLayerObjectToString,
     [$$isCrystalLayerObject]: true,
     parentCrystalObject,
-    itemByItemPlanId: new Map(),
     planResults,
   };
 }
 
 export function isCrystalLayerObject(obj: unknown): obj is CrystalLayerObject {
-  return !!(
-    typeof obj === "object" &&
-    obj &&
-    (obj as any)[$$isCrystalLayerObject]
-  );
+  return obj != null && (obj as any)[$$isCrystalLayerObject] === true;
 }
 
 const EMPTY_INDEXES = Object.freeze([] as number[]);
@@ -3148,16 +3145,7 @@ export class Aether<
       const definitelyBatch: Batch = batch;
       this.batchByPathIdentity[pathIdentity] = definitelyBatch;
       // (Note: when batch is executed it will delete itself from aether.batchByPathIdentity.)
-      setTimeout(
-        () =>
-          this.executeBatch(definitelyBatch, crystalContext).then(null, (e) => {
-            // This should not be able to happen because executeBatch contains the try/catch.
-            console.error(
-              `GraphileInternalError<cd7c157b-9f20-432d-8716-7ff052acd1fd>: ${e.message}`,
-            );
-          }),
-        0,
-      );
+      setImmediate(() => this.executeBatch(definitelyBatch, crystalContext));
     }
     return batch;
   }
@@ -3517,9 +3505,7 @@ export class Aether<
        */
       const layers: Array<ExecutablePlan<any>> = [plan];
 
-      // TODO: this entire block can probably be eradicated by setting `layers` above to `[plan, ...path]`.
-      // This block to define a new scope for the mutable `depth` variable. (No shadowing.)
-      {
+      if (isDev) {
         let depth = 0;
         // Walk through the subplans, each time we find a `__ItemPlan` we
         // add a new layer and record the listItemPlanIdAtDepth.
@@ -3540,6 +3526,8 @@ export class Aether<
           }
           layers.push(subPlan);
         }
+      } else {
+        layers.push(...path);
       }
 
       const crystalLayerObjects = crystalObjects.map((crystalObject) =>
@@ -3549,15 +3537,14 @@ export class Aether<
       // First, execute side effects (in order, *not* in parallel)
       // TODO: assert that side effect plans cannot be nested under list items.
       const sideEffectCount = sideEffectPlans.length;
-      for (let i = 0; i < sideEffectCount; i++) {
-        const sideEffectPlan = sideEffectPlans[i];
-        await this.executePlan(
-          sideEffectPlan,
-          crystalContext,
-          crystalLayerObjects.map((clo) =>
-            clo == null ? null : clo.planResults,
-          ),
+      if (sideEffectCount > 0) {
+        const planResults = crystalLayerObjects.map((clo) =>
+          clo == null ? null : clo.planResults,
         );
+        for (let i = 0; i < sideEffectCount; i++) {
+          const sideEffectPlan = sideEffectPlans[i];
+          await this.executePlan(sideEffectPlan, crystalContext, planResults);
+        }
       }
 
       const isLeaf = isLeafType(namedReturnType);
