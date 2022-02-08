@@ -338,7 +338,7 @@ export function newCrystalObject(
 }
 
 export function isCrystalObject(input: any): input is CrystalObject {
-  return input != null && $$planResults in input;
+  return input != null && input[$$planResults] != null;
 }
 
 /**
