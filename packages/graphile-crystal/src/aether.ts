@@ -2465,14 +2465,14 @@ export class Aether<
             result[item.planResultsesIndex] = value;
             if (first) {
               first = false;
-              debugExecuteVerbose(
-                `%sExecutePlan(%s): writing value %c for %c to %c`,
-                indent,
-                plan,
-                value,
-                commonAncestorPathIdentity,
-                item.planResults,
-              );
+              // debugExecuteVerbose(
+              //   `%sExecutePlan(%s): writing value %c for %c to %c`,
+              //   indent,
+              //   plan,
+              //   value,
+              //   commonAncestorPathIdentity,
+              //   item.planResults,
+              // );
               item.planResults.set(commonAncestorPathIdentity, plan.id, value);
             } else if (isDev) {
               if (
