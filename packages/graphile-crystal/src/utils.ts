@@ -289,6 +289,14 @@ export function isPromise<T>(t: T | Promise<T>): t is Promise<T> {
   );
 }
 
+export function isPromiseLike<T>(
+  t: T | Promise<T> | PromiseLike<T>,
+): t is PromiseLike<T> {
+  return (
+    typeof t === "object" && t !== null && typeof (t as any).then === "function"
+  );
+}
+
 export function isDeferred<T>(
   t: T | Promise<T> | Deferred<T>,
 ): t is Deferred<T> {

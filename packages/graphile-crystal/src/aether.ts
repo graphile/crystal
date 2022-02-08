@@ -88,6 +88,7 @@ import {
   isListCapablePlan,
   isStreamablePlan,
 } from "./plan";
+import type { PlanResultsBucket } from "./planResults";
 import { PlanResults } from "./planResults";
 import { __ItemPlan, __TrackedObjectPlan, __ValuePlan } from "./plans";
 import { __ListTransformPlan } from "./plans/listTransform";
@@ -170,6 +171,7 @@ export function isCrystalLayerObject(obj: unknown): obj is CrystalLayerObject {
 }
 
 const EMPTY_INDEXES = Object.freeze([] as number[]);
+const EMPTY_ARRAY = Object.freeze([] as any[]);
 
 // For logging indentation
 let depth = 0;
@@ -2089,44 +2091,88 @@ export class Aether<
           : planResults.get(plan.commonAncestorPathIdentity, plan.id),
       );
     }
+
     const planResultsesLength = planResultses.length;
     const result = new Array(planResultsesLength);
-    debugExecuteVerbose(
-      "%sExecutePlan(%c): executing with %o plan results",
-      indent,
-      plan,
-      planResultsesLength,
-    );
+
+    // Though we've been passed a list of planResultses (some of which may be
+    // null), we don't actually need to execute for all of these. The common
+    // denominator is actually the unique "buckets" inside the planResultses
+    // that represent the plan's commonAncestorPathIdentity.
+    type PlanResultsAndIndex = {
+      planResults: PlanResults;
+      planResultsesIndex: number;
+    };
+    const planResultsesByBucket = new Map<
+      PlanResultsBucket,
+      Array<PlanResultsAndIndex>
+    >();
     const commonAncestorPathIdentity = plan.commonAncestorPathIdentity;
-
-    const pendingPlanResultses: PlanResults[] = []; // Length unknown
-    const pendingPlanResultsesIndexes: number[] = []; // Same length as pendingPlanResultses
-
-    // Collect uncompleted resultses
     for (
       let planResultsesIndex = 0;
       planResultsesIndex < planResultsesLength;
       planResultsesIndex++
     ) {
       const planResults = planResultses[planResultsesIndex];
-      if (planResults == null) {
+      if (!planResults) {
+        // It was null, it stays null
         result[planResultsesIndex] = null;
         continue;
       }
-      if (planResults.has(commonAncestorPathIdentity, plan.id)) {
-        const previousResult = planResults.get(
-          commonAncestorPathIdentity,
-          plan.id,
-        );
-        result[planResultsesIndex] = previousResult;
+      const bucket = planResults.getBucket(commonAncestorPathIdentity);
+      const list = planResultsesByBucket.get(bucket);
+      if (!list) {
+        planResultsesByBucket.set(bucket, [
+          { planResults, planResultsesIndex },
+        ]);
+      } else {
+        list.push({ planResults, planResultsesIndex });
+      }
+    }
 
-        debugExecuteVerbose(
-          "%s result[%o] for %c found: %c",
-          follow,
-          planResultsesIndex,
-          planResults,
-          result[planResultsesIndex],
-        );
+    // From here on out we're going to deal with the buckets until we tie it
+    // all back together again at the end.
+
+    debugExecuteVerbose(
+      "%sExecutePlan(%c): executing with %o plan results",
+      indent,
+      plan,
+      planResultsesLength,
+    );
+
+    const buckets = [...planResultsesByBucket.keys()];
+    const pendingPlanResultsAndIndexListList: Array<PlanResultsAndIndex[]> = []; // Length unknown
+
+    // Collect uncompleted resultses
+    for (const [
+      bucket,
+      bucketPlanResultses,
+    ] of planResultsesByBucket.entries()) {
+      // All planResults with the same bucket are equivalent as far as we're
+      // concerned.
+      //
+      // TODO: is this true? What if we're dealing with `~>forums[]>posts` but
+      // we have different entries for `~`? Can that happen? To prevent it we
+      // should forbid a "higher" commonAncestorPathIdentity bucket being
+      // created later, since that may only be done locally and not shared by
+      // siblings.
+
+      const planResults = bucketPlanResultses[0].planResults;
+      if (bucket.has(plan.id)) {
+        const previousResult = bucket.get(plan.id);
+
+        // Fill into the relevant places in `result`
+        for (const { planResultsesIndex } of bucketPlanResultses) {
+          result[planResultsesIndex] = previousResult;
+          debugExecuteVerbose(
+            "%s result[%o] for %c found: %c",
+            follow,
+            planResultsesIndex,
+            planResults,
+            previousResult,
+          );
+        }
+
         continue;
       }
       if (plan instanceof __ValuePlan) {
@@ -2140,19 +2186,26 @@ export class Aether<
           )}.`,
         );
       }
-      const bucket = planResults.getBucket(commonAncestorPathIdentity);
       // Need to start executing
       debugExecuteVerbose("%s no result for %c", follow, planResults);
 
-      pendingPlanResultses.push(planResults);
-      pendingPlanResultsesIndexes.push(planResultsesIndex);
+      pendingPlanResultsAndIndexListList.push(bucketPlanResultses);
     }
 
     // If none, return results
-    if (pendingPlanResultses.length === 0) {
+    if (pendingPlanResultsAndIndexListList.length === 0) {
       // Optimisation
       return result;
     }
+
+    // As before, all planResults in the same group (sharing the same bucket
+    // for this plan) are equivalent, so we'll pick the first one in each
+    // group. NOTE: this must continue to mirror
+    // pendingPlanResultsAndIndexListList - we use the index to these two lists
+    // interchangeably.
+    const pendingPlanResultses = pendingPlanResultsAndIndexListList.map(
+      (list) => list[0].planResults,
+    );
 
     // For each dependency of plan, get the results
     const dependenciesCount = plan.dependencies.length;
@@ -2186,13 +2239,14 @@ export class Aether<
         new Set([...visitedPlans]),
         depth + 1,
       );
-      if (typeof (allDependencyResultsOrPromise as any).then === "function") {
+      // TODO: change to `isPromiseLike`
+      if (isPromise(allDependencyResultsOrPromise)) {
         dependencyPromises.push({
           promise: allDependencyResultsOrPromise,
           dependencyIndex,
         });
         // Don't moan about unhandled rejections; we only care about the first fail (and we don't care if they get handled later)
-        (allDependencyResultsOrPromise as any).then(null, NOOP);
+        allDependencyResultsOrPromise.then(null, NOOP);
       } else {
         dependencyValuesList[dependencyIndex] = allDependencyResultsOrPromise;
       }
@@ -2212,13 +2266,11 @@ export class Aether<
           dependencyValuesList[dependencyIndex] = await promise;
         } catch (e) {
           // An error has occurred; we can short-circuit execution.
-          for (
-            let pendingPlanResultsesIndex = pendingPlanResultses.length;
-            pendingPlanResultsesIndex >= 0;
-            pendingPlanResultsesIndex--
-          ) {
-            result[pendingPlanResultsesIndexes[pendingPlanResultsesIndex]] =
-              new CrystalError(e);
+          const crystalError = new CrystalError(e);
+          for (const list of pendingPlanResultsAndIndexListList) {
+            for (const item of list) {
+              result[item.planResultsesIndex] = crystalError;
+            }
           }
           return result;
         }
@@ -2230,18 +2282,25 @@ export class Aether<
         pendingPlanResultsesIndex >= 0;
         pendingPlanResultsesIndex--
       ) {
+        // NOTE: pendingPlanResultsesIndex is also an index to pendingPlanResultsAndIndexListList
         const planResults = pendingPlanResultses[pendingPlanResultsesIndex];
         if (planResults.has(commonAncestorPathIdentity, plan.id)) {
           const previousResult = planResults.get(
             commonAncestorPathIdentity,
             plan.id,
           );
-          const index = pendingPlanResultsesIndexes[pendingPlanResultsesIndex];
-          result[index] = previousResult;
+          const list =
+            pendingPlanResultsAndIndexListList[pendingPlanResultsesIndex];
+          for (const item of list) {
+            result[item.planResultsesIndex] = previousResult;
+          }
 
           // Now remove this completed result from the relevant places
           pendingPlanResultses.splice(pendingPlanResultsesIndex, 1);
-          pendingPlanResultsesIndexes.splice(pendingPlanResultsesIndex, 1);
+          pendingPlanResultsAndIndexListList.splice(
+            pendingPlanResultsesIndex,
+            1,
+          );
           for (
             let dependencyIndex = 0;
             dependencyIndex < dependenciesCount;
@@ -2262,33 +2321,26 @@ export class Aether<
       }
 
       // Continue with execution
-      // TODO: should we just call doNext here instead?
-      return null;
+      return doNext();
     };
 
     // TODO: extract this to be a separate method.
     const doNext = () => {
       // Format the dependencies, detect & shortcircuit errors, etc
       const hasDependencies = dependenciesCount > 0;
-      let realPendingPlanResultsesLength = hasDependencies
-        ? 0
-        : pendingPlanResultses.length;
+      const toExecute = hasDependencies
+        ? []
+        : pendingPlanResultsAndIndexListList;
       const values = hasDependencies
         ? []
-        : new Array(realPendingPlanResultsesLength).fill([]);
-      const realPendingPlanResultses = hasDependencies
-        ? []
-        : pendingPlanResultses;
-      const indexMap = hasDependencies
-        ? []
-        : pendingPlanResultses.map((_, i) => i);
-      // Only run this loop if there are actually dependencies
+        : new Array(toExecute.length).fill(EMPTY_ARRAY);
+
+      // For each bucket, build dependency values to feed to execute
       if (hasDependencies) {
         for (
-          let pendingPlanResultsesIndex = 0,
-            pendingPlanResultsesLength = pendingPlanResultses.length;
-          pendingPlanResultsesIndex < pendingPlanResultsesLength;
-          pendingPlanResultsesIndex++
+          let pendingPlanResultsesIndex = pendingPlanResultses.length - 1;
+          pendingPlanResultsesIndex >= 0;
+          pendingPlanResultsesIndex--
         ) {
           const entry = new Array(dependenciesCount);
           let error;
@@ -2298,9 +2350,6 @@ export class Aether<
             dependencyIndex++
           ) {
             const dependencyValues = dependencyValuesList[dependencyIndex];
-            if (!dependencyValues) {
-              console.log(dependencyValuesList, dependencyIndex);
-            }
             const dependencyValue = dependencyValues[pendingPlanResultsesIndex];
             if (
               dependencyValue &&
@@ -2313,22 +2362,33 @@ export class Aether<
           }
           if (error) {
             // Error occurred; short-circuit execution
-            result[pendingPlanResultsesIndexes[pendingPlanResultsesIndex]] =
-              error;
-            const planResults = pendingPlanResultses[pendingPlanResultsesIndex];
-            planResults.set(commonAncestorPathIdentity, plan.id, error);
+            const list =
+              pendingPlanResultsAndIndexListList[pendingPlanResultsesIndex];
+            let first = true;
+            for (const item of list) {
+              result[item.planResultsesIndex] = error;
+              if (first) {
+                first = false;
+                item.planResults.set(
+                  commonAncestorPathIdentity,
+                  plan.id,
+                  error,
+                );
+              }
+            }
           } else {
-            values[realPendingPlanResultsesLength] = entry;
-            realPendingPlanResultses[realPendingPlanResultsesLength] =
-              pendingPlanResultses[pendingPlanResultsesIndex];
-            // TODO: should we change this to be
-            // pendingPlanResultsesIndexes[pendingPlanResultsesIndex] for
-            // increased efficiency later?
-            indexMap[realPendingPlanResultsesLength] =
-              pendingPlanResultsesIndex;
-            realPendingPlanResultsesLength++;
+            toExecute.push(
+              pendingPlanResultsAndIndexListList[pendingPlanResultsesIndex],
+            );
+            values.push(entry);
           }
         }
+      }
+
+      const toExecuteLength = toExecute.length;
+      // Are we done?
+      if (toExecuteLength === 0) {
+        return result;
       }
 
       let meta = crystalContext.metaByPlanId[plan.id];
@@ -2368,21 +2428,37 @@ export class Aether<
           crystalError = new CrystalError(e);
         }
         for (
-          let realPendingPlanResultsesIndex = 0,
-            realPendingPlanResultsesLength = realPendingPlanResultses.length;
-          realPendingPlanResultsesIndex < realPendingPlanResultsesLength;
-          realPendingPlanResultsesIndex++
+          let executableIndex = 0;
+          executableIndex < toExecuteLength;
+          executableIndex++
         ) {
-          const planResults =
-            realPendingPlanResultses[realPendingPlanResultsesIndex];
-          const underlyingIndex =
-            pendingPlanResultsesIndexes[
-              indexMap[realPendingPlanResultsesIndex]
-            ];
-          const value =
-            crystalError ?? executionResults![realPendingPlanResultsesIndex];
-          result[underlyingIndex] = value;
-          planResults.set(commonAncestorPathIdentity, plan.id, value);
+          const list = toExecute[executableIndex];
+          let first = true;
+          const value = crystalError ?? executionResults![executableIndex];
+          for (const item of list) {
+            result[item.planResultsesIndex] = value;
+            if (first) {
+              first = false;
+              debugExecuteVerbose(
+                `%sExecutePlan(%s): writing value %c for %c to %c`,
+                indent,
+                plan,
+                value,
+                commonAncestorPathIdentity,
+                item.planResults,
+              );
+              item.planResults.set(commonAncestorPathIdentity, plan.id, value);
+            } else if (isDev) {
+              if (
+                item.planResults.get(commonAncestorPathIdentity, plan.id) !==
+                value
+              ) {
+                throw new Error(
+                  "GraphileInternalError<f0af3cb6-7f0c-4002-aff5-976bf233269a>: The plan results should be equivalent, but apprently they're not?!",
+                );
+              }
+            }
+          }
         }
         return result;
       }
@@ -2402,13 +2478,7 @@ export class Aether<
     // If any dependency result was a promise, await all dependencyPromises then re-evaluate uncompleted resultses
     if (dependencyPromises.length > 0) {
       // Return a promise
-      return awaitDependencyPromises().then((finalResult) => {
-        if (finalResult) {
-          return finalResult;
-        } else {
-          return doNext();
-        }
-      });
+      return awaitDependencyPromises();
     } else {
       // Remain synchronous, if possible
       return doNext();
