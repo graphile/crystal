@@ -3535,12 +3535,13 @@ export class Aether<
       returnRaw,
     } = batch;
     const entriesLength = entries.length;
-    const crystalObjects: CrystalObject[] = new Array(entriesLength);
-    const deferredResults: Deferred<any>[] = new Array(entriesLength);
+    const crystalLayerObjects: CrystalLayerObject[] = new Array(entriesLength);
     for (let i = 0; i < entriesLength; i++) {
-      const [crystalObject, deferredResult] = entries[i];
-      crystalObjects[i] = crystalObject;
-      deferredResults[i] = deferredResult;
+      const crystalObject = entries[i][0];
+      crystalLayerObjects[i] = newCrystalLayerObject(
+        crystalObject,
+        crystalObject[$$planResults],
+      );
     }
 
     try {
@@ -3586,17 +3587,11 @@ export class Aether<
         layers.push(...path);
       }
 
-      const crystalLayerObjects = crystalObjects.map((crystalObject) =>
-        newCrystalLayerObject(crystalObject, crystalObject[$$planResults]),
-      );
-
       // First, execute side effects (in order, *not* in parallel)
       // TODO: assert that side effect plans cannot be nested under list items.
       const sideEffectCount = sideEffectPlans.length;
       if (sideEffectCount > 0) {
-        const planResults = crystalLayerObjects.map((clo) =>
-          clo == null ? null : clo.planResults,
-        );
+        const planResults = crystalLayerObjects.map((clo) => clo.planResults);
         for (let i = 0; i < sideEffectCount; i++) {
           const sideEffectPlan = sideEffectPlans[i];
           await this.executePlan(sideEffectPlan, crystalContext, planResults);
@@ -3658,11 +3653,11 @@ export class Aether<
       );
 
       for (let i = 0; i < entriesLength; i++) {
-        deferredResults[i].resolve(results[i]);
+        entries[i][1].resolve(results[i]);
       }
     } catch (e: any) {
       for (let i = 0; i < entriesLength; i++) {
-        deferredResults[i].reject(e);
+        entries[i][1].reject(e);
       }
     }
   }
