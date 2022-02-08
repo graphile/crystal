@@ -130,6 +130,12 @@ export class ExecutablePlan<TData = any> extends BasePlan {
   static $$export: any;
 
   /**
+   * @internal
+   */
+  public _pathByDescendent: Map<ExecutablePlan, ExecutablePlan[] | null> =
+    new Map();
+
+  /**
    * Set true if your plan executes synchronously (i.e. no
    * async/await/promises); this allows us to avoid deferreds and is a
    * performance optimisation.

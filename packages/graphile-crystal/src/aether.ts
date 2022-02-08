@@ -2007,14 +2007,20 @@ export class Aether<
   }
 
   /**
-   * Finds a (the?) path from ancestorPlan to descendentPlan. Semi-expensive; try
-   * and only use this at planning time, not execution time. Useful for tracking
-   * down all the `__ItemPlan`s.
+   * Finds a (the?) path from ancestorPlan to descendentPlan. Semi-expensive, so
+   * caches results.  Useful for tracking down all the `__ItemPlan`s.
    */
   private findPath(
     ancestorPlan: ExecutablePlan<any>,
     descendentPlan: ExecutablePlan<any>,
   ): Array<ExecutablePlan<any>> | null {
+    const known = ancestorPlan._pathByDescendent.get(descendentPlan);
+    if (known !== undefined) {
+      return known;
+    }
+    if (this.phase !== "ready") {
+      throw new Error("Only call findPath when aether is ready");
+    }
     if (ancestorPlan === descendentPlan) {
       return [];
     }
@@ -2029,9 +2035,12 @@ export class Aether<
       }
       const p = this.findPath(ancestorPlan, depPlan);
       if (p) {
-        return [...p, descendentPlan];
+        const path = [...p, descendentPlan];
+        ancestorPlan._pathByDescendent.set(descendentPlan, path);
+        return path;
       }
     }
+    ancestorPlan._pathByDescendent.set(descendentPlan, null);
     return null;
   }
 
