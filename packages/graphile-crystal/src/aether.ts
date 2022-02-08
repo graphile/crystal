@@ -2037,28 +2037,12 @@ export class Aether<
     return null;
   }
 
-  private executePlan<T>(
-    plan: ExecutablePlan<T>,
-    crystalContext: CrystalContext,
-    planResultses: ReadonlyArray<null | PlanResults>,
-    visitedPlans = new Set<ExecutablePlan>(),
-    depth = 0,
-  ): PromiseOrDirect<any[]> {
-    return this.executePlanAlt(
-      plan,
-      crystalContext,
-      planResultses,
-      visitedPlans,
-      depth,
-    );
-  }
-
   /**
    * Implements `ExecutePlan`.
    *
    * @remarks `await` is forbidden to avoid race conditions
    */
-  private executePlanAlt<T>(
+  private executePlan<T>(
     plan: ExecutablePlan<T>,
     crystalContext: CrystalContext,
     planResultses: ReadonlyArray<null | PlanResults>,
