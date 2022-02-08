@@ -145,6 +145,7 @@ export class PgExecutor<TSettings = any> {
   ): Promise<PgClientResult<TData>> {
     let queryResult: PgClientResult<TData> | null = null,
       error: any = null;
+    const start = process.hrtime.bigint();
     try {
       queryResult = await client.query({
         text,
@@ -154,8 +155,31 @@ export class PgExecutor<TSettings = any> {
     } catch (e) {
       error = e;
     }
-    debugVerbose(
-      `\
+    if (debugVerbose.enabled) {
+      const end = process.hrtime.bigint();
+      // TODO: why use bigint if you're just going to round it? :D
+      const duration = (Number((end - start) / 10000n) / 100).toFixed(2) + "ms";
+      const rows = queryResult?.rows;
+      const rowResults =
+        rows && rows.length > 10
+          ? "[\n  " +
+            rows
+              .slice(0, 3)
+              .map((row) =>
+                inspect(row, { colors: true, depth: 5 }).replace(/\n/g, "\n  "),
+              )
+              .join(",\n  ") +
+            ",\n\n  ...\n\n  " +
+            rows
+              .slice(rows.length - 3)
+              .map((row) =>
+                inspect(row, { colors: true, depth: 5 }).replace(/\n/g, "\n  "),
+              )
+              .join("\n  ") +
+            "\n]"
+          : inspect(queryResult?.rows, { colors: true, depth: 6 });
+      debugVerbose(
+        `\
 
 
 %s
@@ -172,18 +196,22 @@ ${
 %o`
     : `\
 # RESULT:
-%o`
+%s`
 }
+
+# DURATION
+${duration}
 %s
 
 
 `,
-      LOOK_DOWN,
-      formatSQLForDebugging(text, error),
-      values,
-      error ? error : queryResult?.rows,
-      LOOK_UP,
-    );
+        LOOK_DOWN,
+        formatSQLForDebugging(text, error),
+        values,
+        error ? error : rowResults,
+        LOOK_UP,
+      );
+    }
     if (error) {
       throw error;
     }
