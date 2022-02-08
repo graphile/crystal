@@ -2179,17 +2179,19 @@ export class Aether<
       const planResults = bucketPlanResultses[0].planResults;
       if (bucket.has(plan.id)) {
         const previousResult = bucket.get(plan.id);
+        if (debugExecuteVerbose.enabled) {
+          debugExecuteVerbose(
+            "%s result[%o] for %c found: %c",
+            follow,
+            bucketPlanResultses.map((i) => i.planResultsesIndex),
+            planResults,
+            previousResult,
+          );
+        }
 
         // Fill into the relevant places in `result`
         for (const { planResultsesIndex } of bucketPlanResultses) {
           result[planResultsesIndex] = previousResult;
-          debugExecuteVerbose(
-            "%s result[%o] for %c found: %c",
-            follow,
-            planResultsesIndex,
-            planResults,
-            previousResult,
-          );
         }
 
         continue;
@@ -2206,9 +2208,15 @@ export class Aether<
         );
       }
       // Need to start executing
-      debugExecuteVerbose("%s no result for %c", follow, planResults);
 
       pendingPlanResultsAndIndexListList.push(bucketPlanResultses);
+    }
+    if (debugExecuteVerbose.enabled) {
+      debugExecuteVerbose(
+        "%s no result for buckets with first entries %c",
+        follow,
+        pendingPlanResultsAndIndexListList.map((l) => l[0].planResults),
+      );
     }
 
     // If none, return results
