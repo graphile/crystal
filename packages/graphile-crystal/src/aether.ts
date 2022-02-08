@@ -1671,7 +1671,8 @@ export class Aether<
       return plan;
     }
 
-    const seenIds = new Set([plan.id]);
+    const seenIds = new Set();
+    seenIds.add(plan.id);
     const peers = this.plans.filter((potentialPeer) => {
       if (
         potentialPeer &&
@@ -1889,9 +1890,7 @@ export class Aether<
       );
       processPlan(treeNodePlan);
 
-      treeNode.children.forEach((child) =>
-        recurse(child, new Set([...knownPlans])),
-      );
+      treeNode.children.forEach((child) => recurse(child, new Set(knownPlans)));
     };
 
     recurse(this.rootTreeNode, new Set());
@@ -2219,7 +2218,7 @@ export class Aether<
         pendingPlanResultses,
         // This is to detect loops, so we don't want changes made inside to
         // cascade back outside -> clone.
-        new Set([...visitedPlans]),
+        new Set(visitedPlans),
         depth + 1,
       );
       if (isPromiseLike(allDependencyResultsOrPromise)) {
@@ -2706,7 +2705,7 @@ export class Aether<
         pendingPlanResultses,
         // This is to detect loops, so we don't want changes made inside to
         // cascade back outside -> clone.
-        new Set([...visitedPlans]),
+        new Set(visitedPlans),
         depth + 1,
       );
       dependencyValuesList[i] = allDependencyResults;
@@ -3762,7 +3761,7 @@ export class Aether<
       const plan = this.plans[planId];
       lines.push(
         "  ".repeat(depth) +
-          `${fieldPathIdentity.substr(
+          `${fieldPathIdentity.substring(
             parentFieldPathIdentity.length,
           )}: ${plan}`,
       );
@@ -3771,7 +3770,7 @@ export class Aether<
         if (
           childFieldPathIdentity.startsWith(fieldPathIdentity) &&
           /^(\[\])*>|@/.test(
-            childFieldPathIdentity.substr(fieldPathIdentity.length),
+            childFieldPathIdentity.substring(fieldPathIdentity.length),
           )
         ) {
           print(childFieldPathIdentity, fieldPathIdentity);
