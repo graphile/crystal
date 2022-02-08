@@ -309,6 +309,14 @@ export function makeCrystalSubscriber<
   return crystalWrapResolveOrSubscribe(undefined, true);
 }
 
+function crystalObjectToString(this: CrystalObject) {
+  return chalk.bold.blue(
+    `CO(${chalk.bold.yellow(
+      crystalPrintPathIdentity(this[$$pathIdentity]),
+    )}/${crystalPrint(this[$$id])})`,
+  );
+}
+
 /**
  * Implements `NewCrystalObject`
  */
@@ -317,28 +325,20 @@ export function newCrystalObject(
   typeName: string,
   id: UniqueId,
   crystalContext: CrystalContext,
-  // TODO: remove this?
   planResults: PlanResults,
 ): CrystalObject {
-  const crystalObject: CrystalObject = {
+  return {
     [$$pathIdentity]: pathIdentity,
     [$$concreteType]: typeName,
     [$$id]: id,
     [$$planResults]: planResults,
     [$$crystalContext]: crystalContext,
-    toString() {
-      return chalk.bold.blue(
-        `CO(${chalk.bold.yellow(
-          crystalPrintPathIdentity(pathIdentity),
-        )}/${crystalPrint(id)})`,
-      );
-    },
+    toString: crystalObjectToString,
   };
-  return crystalObject;
 }
 
 export function isCrystalObject(input: any): input is CrystalObject {
-  return typeof input === "object" && input && $$planResults in input;
+  return input != null && $$planResults in input;
 }
 
 /**
