@@ -3456,7 +3456,7 @@ export class Aether<
         ) {
           if (layerResults[finalResultIndex] instanceof CrystalError) {
             finalResult[finalResultIndex] = Promise.reject(
-              layerResults[finalResultIndex],
+              layerResults[finalResultIndex].originalError,
             );
           } else {
             pendingCrystalLayerObjects.push(
