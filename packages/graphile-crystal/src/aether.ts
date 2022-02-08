@@ -147,9 +147,7 @@ type AetherPhase =
 
 function newCrystalLayerObject(
   parentCrystalObject: CrystalObject,
-  planResults: PlanResults = new PlanResults(
-    parentCrystalObject[$$planResults],
-  ),
+  planResults: PlanResults,
 ): CrystalLayerObject {
   return {
     toString(): string {
@@ -3566,7 +3564,7 @@ export class Aether<
       }
 
       const crystalLayerObjects = crystalObjects.map((crystalObject) =>
-        newCrystalLayerObject(crystalObject),
+        newCrystalLayerObject(crystalObject, crystalObject[$$planResults]),
       );
 
       // First, execute side effects (in order, *not* in parallel)

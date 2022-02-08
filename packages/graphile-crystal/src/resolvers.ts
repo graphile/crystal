@@ -20,7 +20,7 @@ import {
   $$pathIdentity,
   $$planResults,
 } from "./interfaces";
-import { PlanResults } from "./planResults";
+import type { PlanResults } from "./planResults";
 import { __ValuePlan } from "./plans";
 import type { UniqueId } from "./utils";
 import { ROOT_VALUE_OBJECT, uid } from "./utils";
@@ -133,9 +133,7 @@ function makeParentCrystalObject(
     // for now.
     const indexes: ReadonlyArray<number> = []; //pathToIndexes(path);
 
-    const parentPlanResults = new PlanResults(
-      crystalContext.rootCrystalObject[$$planResults],
-    );
+    const parentPlanResults = crystalContext.rootCrystalObject[$$planResults];
     const { parentType } = info;
 
     const parentCrystalObject = newCrystalObject(
