@@ -34,8 +34,11 @@ export class ReversePlan<TData> extends ExecutablePlan<readonly TData[]> {
   }
 
   execute(values: CrystalValuesList<[TData[]]>): CrystalResultsList<TData[]> {
-    return values.map(([arr]) => (arr == null ? arr : reverseArray(arr)));
+    return values.map(this.executeSingle);
   }
+
+  executeSingle = ([arr]: [TData[]]): TData[] =>
+    arr == null ? arr : reverseArray(arr);
 
   deduplicate(peers: ReversePlan<TData>[]): ReversePlan<TData> {
     return peers.length > 0 ? peers[0] : this;

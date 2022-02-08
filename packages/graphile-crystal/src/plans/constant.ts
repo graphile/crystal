@@ -16,7 +16,7 @@ export class ConstantPlan<TData> extends ExecutablePlan<TData> {
   }
 
   execute(values: CrystalValuesList<[]>): CrystalResultsList<TData> {
-    return values.map(() => this.data);
+    return new Array(values.length).fill(this.data);
   }
 }
 

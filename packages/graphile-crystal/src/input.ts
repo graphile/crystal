@@ -356,23 +356,29 @@ export class InputObjectPlan extends ExecutablePlan {
     }
   }
 
-  execute(values: any[][]): any[] {
+  optimize() {
     if (this.inputValues?.kind === "NullValue") {
-      return new Array(values.length).fill(null);
+      return constant(null);
     }
-    return values.map((planResults) => {
-      const resultValues = Object.create(null);
-      for (const inputFieldName in this.inputFields) {
-        const { dependencyIndex } = this.inputFields[inputFieldName];
-        if (dependencyIndex == null) {
-          throw new Error("inputFieldPlan has gone missing.");
-        }
-        const value = planResults[dependencyIndex];
-        resultValues[inputFieldName] = value;
-      }
-      return resultValues;
-    });
+    return this;
   }
+
+  execute(values: any[][]): any[] {
+    return values.map(this.executeSingle);
+  }
+
+  executeSingle = (planResults: any[]): any => {
+    const resultValues = Object.create(null);
+    for (const inputFieldName in this.inputFields) {
+      const dependencyIndex = this.inputFields[inputFieldName].dependencyIndex;
+      if (dependencyIndex == null) {
+        throw new Error("inputFieldPlan has gone missing.");
+      }
+      const value = planResults[dependencyIndex];
+      resultValues[inputFieldName] = value;
+    }
+    return resultValues;
+  };
 
   get(attrName: string): InputPlan {
     const plan = this.inputFields[attrName]?.plan;

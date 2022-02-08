@@ -101,11 +101,23 @@ export class ObjectPlan<
     return newObj;
   }
 
+  finalize() {
+    // TODO: JIT here
+    this.executeSingle = this.tupleToObject.bind(this);
+    return super.finalize();
+  }
+
   execute(
     values: Array<Array<DataFromPlans<TPlans>[keyof TPlans]>>,
   ): Array<DataFromPlans<TPlans>> {
-    return values.map(this.tupleToObject.bind(this));
+    return values.map(this.executeSingle!);
   }
+
+  executeSingle:
+    | ((
+        values: Array<DataFromPlans<TPlans>[keyof TPlans]>,
+      ) => DataFromPlans<TPlans>)
+    | null = null;
 
   deduplicate(peers: ObjectPlan<any>[]): ObjectPlan<TPlans> {
     const myKeys = JSON.stringify(this.keys);

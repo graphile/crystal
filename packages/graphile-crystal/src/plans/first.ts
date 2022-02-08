@@ -16,8 +16,10 @@ export class FirstPlan<TData> extends ExecutablePlan<TData> {
   execute(
     values: CrystalValuesList<[ReadonlyArray<TData>]>,
   ): CrystalResultsList<TData> {
-    return values.map((tuple) => tuple[0]?.[0]);
+    return values.map(this.executeSingle);
   }
+
+  executeSingle = (tuple: [ReadonlyArray<TData>]) => tuple[0]?.[0];
 
   deduplicate(peers: FirstPlan<TData>[]): FirstPlan<TData> {
     return peers.length > 0 ? peers[0] : this;

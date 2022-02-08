@@ -82,16 +82,20 @@ export class NodePlan<TCodecs extends { [key: string]: NodeIdCodec<any> }>
   execute(
     values: CrystalValuesList<any[]>,
   ): CrystalResultsList<PolymorphicData<string, ReadonlyArray<any>> | null> {
-    return values.map((v) => {
-      const specifier = v[this.specPlanId];
-      if (specifier) {
-        const typeName = this.getTypeNameFromSpecifier(specifier);
-        return polymorphicWrap(typeName);
-      } else {
-        return null;
-      }
-    });
+    return values.map(this.executeSingle);
   }
+
+  executeSingle = (
+    v: any[],
+  ): PolymorphicData<string, ReadonlyArray<any>> | null => {
+    const specifier = v[this.specPlanId];
+    if (specifier) {
+      const typeName = this.getTypeNameFromSpecifier(specifier);
+      return polymorphicWrap(typeName);
+    } else {
+      return null;
+    }
+  };
 }
 
 export function node<TCodecs extends { [key: string]: NodeIdCodec<any> }>(

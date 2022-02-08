@@ -1,6 +1,7 @@
 import type { InputPlan } from "../input";
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
 import { ExecutablePlan } from "../plan";
+import { constant } from "./constant";
 
 export interface PageInfoCapablePlan extends ExecutablePlan<any> {
   hasNextPage(): ExecutablePlan<boolean>;
@@ -220,7 +221,7 @@ export class ConnectionPlan<
     values: CrystalValuesList<any[]>,
   ): CrystalResultsList<Record<string, never>> {
     // Fake execution; data actually comes from the child plans
-    return values.map(() => EMPTY_OBJECT);
+    return new Array(values.length).fill(EMPTY_OBJECT);
   }
 }
 
@@ -264,7 +265,7 @@ export class EdgePlan<
 
   execute(values: CrystalValuesList<any>): CrystalResultsList<any> {
     // Fake execution; data actually comes from the child plans
-    return values.map((v) => EMPTY_OBJECT);
+    return new Array(values.length).fill(EMPTY_OBJECT);
   }
 }
 

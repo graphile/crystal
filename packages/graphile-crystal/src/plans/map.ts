@@ -58,11 +58,10 @@ export class MapPlan extends ExecutablePlan {
   }
 
   execute(values: any[][]): any[] {
-    return values.map((value) => {
-      const previous = value[0];
-      return this.mapper(previous);
-    });
+    return values.map(this.executeSingle);
   }
+
+  executeSingle = (value: any[]): any => this.mapper(value[0]);
 
   deduplicate(peers: MapPlan[]): MapPlan {
     const myMap = JSON.stringify(this.actualKeyByDesiredKey);

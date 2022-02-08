@@ -162,7 +162,7 @@ export class AccessPlan<TData> extends ExecutablePlan<TData> {
   };
   sync = true;
 
-  private destructure: (value: [TData]) => any;
+  private executeSingle: (value: [TData]) => any;
   private parentPlanId: number;
 
   constructor(
@@ -172,7 +172,7 @@ export class AccessPlan<TData> extends ExecutablePlan<TData> {
     super();
     this.addDependency(parentPlan);
     this.parentPlanId = parentPlan.id;
-    this.destructure = constructDestructureFunction(path);
+    this.executeSingle = constructDestructureFunction(path);
   }
 
   toStringMeta(): string {
@@ -208,7 +208,7 @@ export class AccessPlan<TData> extends ExecutablePlan<TData> {
   }
 
   execute(values: CrystalValuesList<[TData]>): CrystalResultsList<TData> {
-    return values.map(this.destructure);
+    return values.map(this.executeSingle);
   }
 
   finalize(): void {
