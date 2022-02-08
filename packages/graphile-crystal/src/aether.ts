@@ -173,16 +173,18 @@ const EMPTY_ARRAY = Object.freeze([] as any[]);
 let depth = 0;
 
 const debugAether = debugFactory("crystal:aether");
-const debugPlan = debugAether.extend("plan");
-const debugPlanVerbose_ = debugPlan.extend("verbose");
-const debugExecute = debugAether.extend("execute");
-const debugExecuteVerbose_ = debugExecute.extend("verbose");
+const debugPlan_ = debugAether.extend("plan");
+const debugPlanVerbose_ = debugPlan_.extend("verbose");
+const debugExecute_ = debugAether.extend("execute");
+const debugExecuteVerbose_ = debugExecute_.extend("verbose");
 
 const depthWrap = (debugFn: debugFactory.Debugger) =>
   Object.assign(
     (t: string, ...args: any[]) => debugFn("  ".repeat(depth) + t, ...args),
     debugFn,
   );
+const debugPlan = depthWrap(debugPlan_);
+const debugExecute = depthWrap(debugExecute_);
 const debugPlanVerbose = depthWrap(debugPlanVerbose_);
 const debugExecuteVerbose = depthWrap(debugExecuteVerbose_);
 
@@ -2033,12 +2035,41 @@ export class Aether<
     return null;
   }
 
+  counter = 1;
+  private executePlan<T>(
+    plan: ExecutablePlan<T>,
+    crystalContext: CrystalContext,
+    planResultses: ReadonlyArray<null | PlanResults>,
+    visitedPlans = new Set<ExecutablePlan>(),
+    depth = 0,
+  ): PromiseOrDirect<any[]> {
+    let timeString: string | null = null;
+    if (debugExecute.enabled) {
+      timeString = `plan\t${this.counter++}\t${plan}`;
+      console.time(timeString);
+    }
+    const result = this.executePlanAlt(
+      plan,
+      crystalContext,
+      planResultses,
+      visitedPlans,
+      depth,
+    );
+    if (timeString) {
+      Promise.resolve(result).then(() => {
+        console.timeEnd(timeString!);
+      });
+    }
+
+    return result;
+  }
+
   /**
    * Implements `ExecutePlan`.
    *
    * @remarks `await` is forbidden to avoid race conditions
    */
-  private executePlan<T>(
+  private executePlanAlt<T>(
     plan: ExecutablePlan<T>,
     crystalContext: CrystalContext,
     planResultses: ReadonlyArray<null | PlanResults>,
@@ -2112,7 +2143,7 @@ export class Aether<
     // From here on out we're going to deal with the buckets until we tie it
     // all back together again at the end.
 
-    debugExecuteVerbose(
+    debugExecute(
       "%sExecutePlan(%c): executing with %o plan results",
       indent,
       plan,
@@ -2505,7 +2536,7 @@ export class Aether<
     }
     const planResultsesLength = planResultses.length;
     const result = new Array(planResultsesLength);
-    debugExecuteVerbose(
+    debugExecute(
       "%sExecutePlan(%c): executing with %o plan results",
       indent,
       plan,
@@ -2678,11 +2709,7 @@ export class Aether<
     const pendingPlanResultsesLength = pendingPlanResultses.length;
     const dependenciesCount = plan.dependencies.length;
     const dependencyValuesList = new Array(dependenciesCount);
-    debugExecuteVerbose(
-      "%s Executing %o dependencies",
-      follow,
-      dependenciesCount,
-    );
+    debugExecute("%s Executing %o dependencies", follow, dependenciesCount);
 
     for (let i = 0; i < dependenciesCount; i++) {
       const dependencyPlanId = plan.dependencies[i];
@@ -2829,7 +2856,7 @@ export class Aether<
       }
     }
 
-    debugExecuteVerbose(
+    debugExecute(
       `%sExecutePlan(%s): wrote results for %c`,
       indent,
       plan,
@@ -3137,6 +3164,11 @@ export class Aether<
   ): Batch {
     let batch = this.batchByPathIdentity[pathIdentity];
     if (!batch) {
+      let timeString: string | null = null;
+      if (debugExecute.enabled) {
+        timeString = `batch\t${this.counter++}\t${pathIdentity}`;
+        console.time(timeString);
+      }
       const crystalContext = parentCrystalObject
         ? parentCrystalObject[$$crystalContext]
         : this.newCrystalContext(variableValues, context, rootValue);
@@ -3145,7 +3177,14 @@ export class Aether<
       const definitelyBatch: Batch = batch;
       this.batchByPathIdentity[pathIdentity] = definitelyBatch;
       // (Note: when batch is executed it will delete itself from aether.batchByPathIdentity.)
-      setImmediate(() => this.executeBatch(definitelyBatch, crystalContext));
+      setImmediate(() => {
+        const promise = this.executeBatch(definitelyBatch, crystalContext);
+        if (timeString) {
+          promise.then(() => {
+            console.timeEnd(timeString!);
+          });
+        }
+      });
     }
     return batch;
   }
@@ -3180,7 +3219,7 @@ export class Aether<
           }
         : null;
 
-    debugExecuteVerbose(
+    debugExecute(
       "Executing layerPlan %c with %c crystal layer objects",
       layerPlan,
       crystalLayerObjectsLength,
@@ -3592,11 +3631,7 @@ export class Aether<
                 namedReturnType.name,
               );
 
-      debugExecuteVerbose(
-        `Executing batch with %s layers: %c`,
-        layers.length,
-        layers,
-      );
+      debugExecute(`Executing batch with %s layers: %c`, layers.length, layers);
 
       const results = await this.executeLayers(
         crystalContext,

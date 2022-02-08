@@ -26,6 +26,7 @@ import type { UniqueId } from "./utils";
 import { ROOT_VALUE_OBJECT, uid } from "./utils";
 
 const debug = debugFactory("crystal:resolvers");
+const debugVerbose = debug.extend("verbose");
 
 function pathToPathIdentity(initialPath: Path): string {
   /**
@@ -146,7 +147,7 @@ function makeParentCrystalObject(
 
     populateValuePlan(parentPlan, parentCrystalObject, parentObject, "parent");
 
-    debug(
+    debugVerbose(
       "👉  Created a new crystal object to represent the parent of %p: %c (results: %c)",
       pathIdentity,
       parentCrystalObject,
@@ -233,7 +234,7 @@ function crystalWrapResolveOrSubscribe<
       const isUnplanned =
         aether.isUnplannedByPathIdentity[pathIdentity] === true;
 
-      debug(
+      debugVerbose(
         `👈 %p/%c for %s; result: %c`,
         pathIdentity,
         parentCrystalObject[$$id],
@@ -244,7 +245,7 @@ function crystalWrapResolveOrSubscribe<
         // At this point, Aether will already have performed the relevant
         // checks to ensure this is safe to do. The values returned through
         // here must never be CrystalObjects (or lists thereof).
-        debug(
+        debugVerbose(
           "   Calling real resolver for %s.%s with %o",
           parentType.name,
           fieldName,
