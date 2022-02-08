@@ -3212,12 +3212,13 @@ export class Aether<
     // Even when AsyncIterators are involved, this will always be a concrete array
     crystalLayerObjects: ReadonlyArray<CrystalLayerObject | null>,
     rawMapResult: MapResult,
+    depth = 0,
   ): Promise<any[]> {
-    const [layerPlan, ...rest] = layers;
     const crystalLayerObjectsLength = crystalLayerObjects.length;
     if (crystalLayerObjectsLength === 0) {
       return [];
     }
+    const [layerPlan, ...rest] = layers;
 
     const mapResult =
       rest.length === 0
@@ -3280,7 +3281,7 @@ export class Aether<
           );
         }
         // NOTE: this could be an async iterator
-        const listResult = clo.planResults.get(
+        const listResult = planResults.get(
           dep.commonAncestorPathIdentity,
           dep.id,
         );
@@ -3351,6 +3352,7 @@ export class Aether<
                         // TODO: batch this over a tick?
                         [newCLO],
                         rawMapResult,
+                        depth + 1,
                       )
                     )[0];
                 return { done, value };
@@ -3402,6 +3404,7 @@ export class Aether<
           rest,
           pendingCLOs,
           rawMapResult,
+          depth + 1,
         );
         for (let j = 0; j < l; j++) {
           const [cloIndex, innerCLOIndex] = pendingCLOIndexes[j];
@@ -3468,6 +3471,7 @@ export class Aether<
               rest,
               pendingCrystalLayerObjects,
               rawMapResult,
+              depth + 1,
             );
             if (isDev) {
               assert.ok(
@@ -3612,7 +3616,9 @@ export class Aether<
         return newCrystalObject(
           batch.pathIdentity,
           typeName,
-          uid(crystalPrintPathIdentity(batch.pathIdentity)),
+          isDev
+            ? uid(crystalPrintPathIdentity(batch.pathIdentity))
+            : uid(batch.pathIdentity),
           crystalContext,
           clo.planResults,
         );
@@ -3630,10 +3636,9 @@ export class Aether<
           isPolymorphic
           ? (clo, data) => {
               assertPolymorphicData(data);
-              const { [$$concreteType]: typeName } = data;
               return crystalObjectFromCrystalLayerObjectAndTypeName(
                 clo,
-                typeName,
+                data[$$concreteType],
               );
             }
           : // Otherwise we represent a standard object, so we can just use the expected named type

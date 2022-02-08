@@ -4,7 +4,7 @@ import type { PolymorphicData } from "./interfaces";
 import { $$concreteType } from "./interfaces";
 
 export function isPolymorphicData(data: unknown): data is PolymorphicData {
-  if (typeof data !== "object" || !data) {
+  if (typeof data !== "object" || data == null) {
     return false;
   }
   if (typeof data[$$concreteType] !== "string") {
