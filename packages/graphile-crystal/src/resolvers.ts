@@ -35,7 +35,7 @@ function pathToPathIdentity(initialPath: Path): string {
    */
   let tailPathIdentity = "";
   let path: Path | undefined = initialPath;
-  while (path) {
+  while (path != null) {
     if (path.typename) {
       tailPathIdentity = `>${path.typename}.${path.key}${tailPathIdentity}`;
     } else {
@@ -59,7 +59,7 @@ export interface CrystalWrapDetails<
 export function isCrystalWrapped<T>(
   t: T,
 ): t is T & { [$$crystalWrapped]: CrystalWrapDetails } {
-  return typeof t === "object" && t !== null && $$crystalWrapped in t;
+  return typeof t === "function" && $$crystalWrapped in t;
 }
 
 const getAetherFromResolver = <TContext extends object>(
@@ -230,14 +230,16 @@ function crystalWrapResolveOrSubscribe<
       const isUnplanned =
         aether.isUnplannedByPathIdentity[pathIdentity] === true;
 
-      debugVerbose(
-        `👈 %p/%c for %s; result: %c`,
-        pathIdentity,
-        parentCrystalObject[$$id],
-        parentCrystalObject,
-        result,
-      );
-      if (userSpecifiedResolver) {
+      if (debugVerbose.enabled) {
+        debugVerbose(
+          `👈 %p/%c for %s; result: %c`,
+          pathIdentity,
+          parentCrystalObject[$$id],
+          parentCrystalObject,
+          result,
+        );
+      }
+      if (userSpecifiedResolver != null) {
         // At this point, Aether will already have performed the relevant
         // checks to ensure this is safe to do. The values returned through
         // here must never be CrystalObjects (or lists thereof).

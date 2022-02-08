@@ -26,7 +26,6 @@ import type {
   GraphQLType,
   GraphQLUnionTypeConfig,
 } from "graphql";
-import { printSchema } from "graphql";
 import {
   GraphQLEnumType,
   GraphQLInputObjectType,
@@ -39,6 +38,7 @@ import {
   isDirective,
   isNamedType,
   isSchema,
+  printSchema,
 } from "graphql";
 import type { GraphQLSchemaNormalizedConfig } from "graphql/type/schema";
 import { sql } from "pg-sql2";
@@ -50,8 +50,9 @@ import type { ExportOptions } from "./interfaces";
 import { optimize } from "./optimize";
 import { wellKnown } from "./wellKnown";
 
+// Do **NOT** allow variables that start with `__`!
 export const isSafeIdentifier = (key: string) =>
-  /^[a-z_$][a-z0-9_$]*$/i.test(key);
+  /^(?:[a-z$]|_[a-z0-9$])[a-z0-9_$]*$/i.test(key);
 
 function identifierOrLiteral(key: string | number) {
   if (typeof key === "number") {

@@ -3,10 +3,27 @@ import chalk from "chalk";
 
 import { ExecutablePlan } from "../plan";
 
+// Do **NOT** allow variables that start with `__`!
+export const isSafeIdentifier = (key: string) =>
+  /^(?:[a-z$]|_[a-z0-9$])[a-z0-9_$]*$/i.test(key);
+
 type ActualKeyByDesiredKey = { [desiredKey: string]: string };
 
 export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
-  // TODO: JIT this.
+  const entries = Object.entries(actualKeyByDesiredKey);
+  if (
+    entries.every(
+      ([key, val]) => isSafeIdentifier(key) && isSafeIdentifier(val),
+    )
+  ) {
+    // We can do a fast custom conversion
+    return eval(
+      `obj => ({ ${entries
+        .map(([key, val]) => `${key}: obj.${val}`)
+        .join(", ")} })`,
+    );
+  }
+  // Fallback to slow conversion
   return (obj: object): object => {
     return Object.keys(actualKeyByDesiredKey).reduce((memo, desiredKey) => {
       memo[desiredKey] = obj[actualKeyByDesiredKey[desiredKey]];

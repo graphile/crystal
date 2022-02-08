@@ -119,8 +119,8 @@ class LightPromise<T> {
   private executeThens(): void {
     const thens = this._thens;
     (this._thens as any) = null;
-    for (const { onfulfilled, onrejected, promise } of thens) {
-      this.then(onfulfilled, onrejected, promise);
+    for (const then of thens) {
+      this.then(then.onfulfilled, then.onrejected, then.promise);
     }
   }
 }

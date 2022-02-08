@@ -2163,14 +2163,10 @@ export class Aether<
       planResultsesLength,
     );
 
-    const buckets = [...planResultsesByBucket.keys()];
     const pendingPlanResultsAndIndexListList: Array<PlanResultsAndIndex[]> = []; // Length unknown
 
     // Collect uncompleted resultses
-    for (const [
-      bucket,
-      bucketPlanResultses,
-    ] of planResultsesByBucket.entries()) {
+    for (const [bucket, bucketPlanResultses] of planResultsesByBucket) {
       // All planResults with the same bucket are equivalent as far as we're
       // concerned.
       //
@@ -2180,10 +2176,10 @@ export class Aether<
       // created later, since that may only be done locally and not shared by
       // siblings.
 
-      const planResults = bucketPlanResultses[0].planResults;
       if (bucket.has(plan.id)) {
         const previousResult = bucket.get(plan.id);
         if (debugExecuteVerbose.enabled) {
+          const planResults = bucketPlanResultses[0].planResults;
           debugExecuteVerbose(
             "%s result[%o] for %c found: %c",
             follow,
@@ -2194,13 +2190,14 @@ export class Aether<
         }
 
         // Fill into the relevant places in `result`
-        for (const { planResultsesIndex } of bucketPlanResultses) {
-          result[planResultsesIndex] = previousResult;
+        for (const item of bucketPlanResultses) {
+          result[item.planResultsesIndex] = previousResult;
         }
 
         continue;
       }
       if (plan instanceof __ValuePlan) {
+        const planResults = bucketPlanResultses[0].planResults;
         throw new Error(
           `GraphileInternalError<079b214f-3ec9-4257-8de9-0ca2b2bdb8e9>: Attempted to queue __ValuePlan ${plan} (commonAncestorPathIdentity: '${
             plan.commonAncestorPathIdentity
@@ -2373,7 +2370,7 @@ export class Aether<
           pendingPlanResultsesIndex--
         ) {
           const entry = new Array(dependenciesCount);
-          let error;
+          let error: CrystalError | null = null;
           for (
             let dependencyIndex = 0;
             dependencyIndex < dependenciesCount;
@@ -2390,7 +2387,7 @@ export class Aether<
             }
             entry[dependencyIndex] = dependencyValue;
           }
-          if (error) {
+          if (error !== null) {
             // Error occurred; short-circuit execution
             const list =
               pendingPlanResultsAndIndexListList[pendingPlanResultsesIndex];
