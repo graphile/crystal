@@ -15,6 +15,9 @@ import { inspect } from "util";
 
 import { formatSQLForDebugging } from "./formatSQLForDebugging";
 
+const LOOK_DOWN = "👇".repeat(30);
+const LOOK_UP = "👆".repeat(30);
+
 const $$FINISHED: unique symbol = Symbol("finished");
 
 class Wrapped<T extends Error | typeof $$FINISHED = Error | typeof $$FINISHED> {
@@ -151,29 +154,36 @@ export class PgExecutor<TSettings = any> {
     } catch (e) {
       error = e;
     }
-    debugVerbose(`\
+    debugVerbose(
+      `\
 
 
-${"👇".repeat(30)}
+%s
 # SQL QUERY:
-${formatSQLForDebugging(text, error)}
+%s
 
 # PLACEHOLDERS:
-${inspect(values, { colors: true })}
+%o
 
 ${
   error
     ? `\
 # ERROR:
-${inspect(error, { colors: true })}`
+%o`
     : `\
 # RESULT:
-${inspect(queryResult?.rows, { colors: true, depth: 6 })}`
+%o`
 }
-${"👆".repeat(30)}
+%s
 
 
-`);
+`,
+      LOOK_DOWN,
+      formatSQLForDebugging(text, error),
+      values,
+      error ? error : queryResult?.rows,
+      LOOK_UP,
+    );
     if (error) {
       throw error;
     }

@@ -101,8 +101,9 @@ class SchemaBuilder<
       throw new Error("applyHooks was called with falsy input");
     }
     this.depth++;
+    const indent = INDENT.repeat(this.depth);
     try {
-      debug(`${INDENT.repeat(this.depth)}[${hookName}${debugStr}]: Running...`);
+      debug(`%s[%s%s]: Running...`, indent, hookName, debugStr);
 
       const hooks = this.hooks[hookName];
       if (!hooks) {
@@ -115,9 +116,11 @@ class SchemaBuilder<
         try {
           const hookDisplayName = hook.displayName || hook.name || "anonymous";
           debug(
-            `${INDENT.repeat(
-              this.depth,
-            )}[${hookName}${debugStr}]:   Executing '${hookDisplayName}'`,
+            `%s[%s%s]:   Executing '%s'`,
+            indent,
+            hookName,
+            debugStr,
+            hookDisplayName,
           );
 
           const previousHookName = build.status.currentHookName;
@@ -150,16 +153,18 @@ class SchemaBuilder<
             );
           }
           debug(
-            `${INDENT.repeat(
-              this.depth,
-            )}[${hookName}${debugStr}]:   '${hookDisplayName}' complete`,
+            `%s[%s%s]:   '%s' complete`,
+            indent,
+            hookName,
+            debugStr,
+            hookDisplayName,
           );
         } finally {
           this.depth--;
         }
       }
 
-      debug(`${INDENT.repeat(this.depth)}[${hookName}${debugStr}]: Complete`);
+      debug(`%s[%s%s]: Complete`, indent, hookName, debugStr);
 
       return newObj;
     } finally {

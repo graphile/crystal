@@ -31,7 +31,9 @@ export function crystalEnforce(schema: GraphQLSchema): GraphQLSchema {
           // Wrap `resolve`
           if (!resolve || !isCrystalWrapped(resolve)) {
             debug(
-              `Wrapping ${objectType.name}.${fieldName}'s resolve in crystals`,
+              `Wrapping %s.%s's resolve in crystals`,
+              objectType.name,
+              fieldName,
             );
             field.resolve = crystalWrapResolve(resolve);
           }
@@ -49,7 +51,9 @@ export function crystalEnforce(schema: GraphQLSchema): GraphQLSchema {
               /* noop */
             } else {
               debug(
-                `Giving ${objectType.name}.${fieldName} a crystal subscriber`,
+                `Giving %s.%s a crystal subscriber`,
+                objectType.name,
+                fieldName,
               );
               field.subscribe = makeCrystalSubscriber();
             }
