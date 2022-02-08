@@ -204,26 +204,22 @@ function crystalWrapResolveOrSubscribe<
       const aether = possiblyParentCrystalObject
         ? possiblyParentCrystalObject[$$crystalContext].aether
         : getAetherFromResolver(context, info);
-      const {
-        path,
-        parentType,
-        returnType,
-        variableValues,
-        rootValue,
-        fieldName,
-      } = info;
-      const pathIdentity = isSubscribe ? ROOT_PATH : pathToPathIdentity(path);
+      const pathIdentity = isSubscribe
+        ? ROOT_PATH
+        : pathToPathIdentity(info.path);
 
       // IMPORTANT: there must be no `await` between here and `getBatchResult`.
       /* 👇👇👇👇👇 NO AWAIT ALLOWED BELOW HERE 👇👇👇👇👇 */
-      const batch = aether.getBatch(
-        pathIdentity,
-        returnType,
-        possiblyParentCrystalObject,
-        variableValues,
-        context,
-        rootValue,
-      );
+      const batch =
+        aether.batchByPathIdentity[pathIdentity] ??
+        aether.getBatch(
+          pathIdentity,
+          info.returnType,
+          possiblyParentCrystalObject,
+          info.variableValues,
+          context,
+          info.rootValue,
+        );
       const parentCrystalObject =
         possiblyParentCrystalObject ??
         makeParentCrystalObject(batch, info, pathIdentity, parentObject);
@@ -245,12 +241,14 @@ function crystalWrapResolveOrSubscribe<
         // At this point, Aether will already have performed the relevant
         // checks to ensure this is safe to do. The values returned through
         // here must never be CrystalObjects (or lists thereof).
-        debugVerbose(
-          "   Calling real resolver for %s.%s with %o",
-          parentType.name,
-          fieldName,
-          result,
-        );
+        if (debugVerbose.enabled) {
+          debugVerbose(
+            "   Calling real resolver for %s.%s with %o",
+            info.parentType.name,
+            info.fieldName,
+            result,
+          );
+        }
         return userSpecifiedResolver(result, argumentValues, context, info);
       } else if (isUnplanned) {
         // If the field is unplanned then we want the default resolver to
