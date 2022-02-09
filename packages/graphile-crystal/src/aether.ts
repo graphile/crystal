@@ -3007,35 +3007,26 @@ export class Aether<
     const itemPlan = this.dangerouslyGetPlan(itemPlanId);
     const namedReturnType = plan.namedType;
     const listPlan = plan.dangerouslyGetListPlan();
-    const batch: Batch = {
-      // TODO: rename Batch.pathIdentity to fieldPathIdentity
-      pathIdentity: itemPlan.parentPathIdentity, // TODO: this is probably not right?
+    const pathIdentity = itemPlan.parentPathIdentity;
+    const crystalLayerObjects = planResultses.map((planResults) => {
+      // const planResults = new PlanResults(originalPlanResults);
+      const crystalObject = newCrystalObject(
+        pathIdentity,
+        namedReturnType.name,
+        uid(),
+        crystalContext,
+        planResults,
+      );
+
+      return newCrystalLayerObject(crystalObject, planResults);
+    });
+    const depResults = await this.executeBatchInner(
       crystalContext,
-      sideEffectPlans: [],
-      plan: listPlan,
+      crystalLayerObjects,
+      itemPlan.parentPathIdentity,
+      listPlan,
       itemPlan,
-      entries: [],
-      namedReturnType,
-      returnRaw: true,
-    };
-    batch.entries = planResultses
-      .map((planResults): [CrystalObject, Deferred<any>] | null =>
-        planResults
-          ? [
-              newCrystalObject(
-                batch.pathIdentity,
-                namedReturnType.name,
-                uid(),
-                crystalContext,
-                new PlanResults(planResults),
-              ),
-              defer(),
-            ]
-          : null,
-      )
-      .filter(isNotNullish);
-    await this.executeBatch(batch, crystalContext);
-    // This shouldn't actually execute it, because it should already be executed.
+    );
     const listResults = await this.executePlan(
       listPlan,
       crystalContext,
@@ -3043,12 +3034,11 @@ export class Aether<
       visitedPlans,
       depth, // TODO: should depth be incremented?
     );
-    const depResults = await Promise.all(batch.entries.map((t) => t[1]));
-    return listResults.map((list, listIndex) => {
-      const values = depResults[listIndex];
+    return listResults.map((list: any, listIndex: number) => {
       if (list == null) {
         return list;
       }
+      const values = depResults[listIndex];
       if (!Array.isArray(list) || !Array.isArray(values)) {
         // TODO: should this be an error?
         console.warn(
@@ -3056,11 +3046,13 @@ export class Aether<
         );
         return null;
       }
-      assert.strictEqual(
-        list.length,
-        values.length,
-        "GraphileInternalError<c85b6936-d406-4801-9c6b-625a567d32ff>: The list and values length must match for a __ListTransformPlan",
-      );
+      if (isDev) {
+        assert.strictEqual(
+          list.length,
+          values.length,
+          "GraphileInternalError<c85b6936-d406-4801-9c6b-625a567d32ff>: The list and values length must match for a __ListTransformPlan",
+        );
+      }
       const initialState = plan.initialState();
       const reduceResult = list.reduce(
         (memo, entireItemValue, listEntryIndex) =>
@@ -3673,10 +3665,10 @@ export class Aether<
     // polymorphic plan?
 
     // Execute the layers to get the result
-    const mapResult: MapResult =
+    const mapResult: MapResult | undefined =
       // The user has their own resolver, so we must not return a crystalObject
       returnRaw
-        ? (_clo, data) => data
+        ? undefined
         : // When we're returning something polymorphic we need to figure out the typeName which we get from the plan result.
         isPolymorphic
         ? (clo, data) => {
@@ -3746,32 +3738,7 @@ export class Aether<
      * `__ItemPlan`s we'll have one additional layer for each
      * `__ItemPlan` and intermediate plans.
      */
-    const layers: Array<ExecutablePlan<any>> = [plan];
-
-    if (isDev) {
-      let depth = 0;
-      // Walk through the subplans, each time we find a `__ItemPlan` we
-      // add a new layer and record the listItemPlanIdAtDepth.
-      for (const subPlan of path) {
-        if (subPlan instanceof __ItemPlan) {
-          assert.strictEqual(
-            subPlan.depth,
-            depth,
-            `Expected ${subPlan}'s depth to match our locally tracked depth`,
-          );
-          depth++;
-          // null means no need to transform the data; we might replace this in further iterations
-        } else {
-          /*
-           * We need to execute each layer in turn so that we can handle list
-           * item plans in their own special way.
-           */
-        }
-        layers.push(subPlan);
-      }
-    } else {
-      layers.push(...path);
-    }
+    const layers: Array<ExecutablePlan<any>> = [plan, ...path];
 
     debugExecute(`Executing batch with %s layers: %c`, layers.length, layers);
 
