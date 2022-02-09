@@ -1000,10 +1000,9 @@ export class Aether<
           // For logging only
           this.planIdByPathIdentity[nestedParentPathIdentity] = itemPlan.id;
 
-          this.transformDependencyPlanIdByTransformPlanId[
-            // TODO: if newPlan gets deduplicated, will this lookup be broken?
-            newPlan.id
-          ] = itemPlan.id;
+          // TODO: if newPlan gets deduplicated, will this lookup be broken?
+          this.transformDependencyPlanIdByTransformPlanId[newPlan.id] =
+            itemPlan.id;
         }
 
         {
