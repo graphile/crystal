@@ -2099,25 +2099,25 @@ export class Aether<
   private findPath(
     ancestorPlan: ExecutablePlan<any>,
     descendentPlan: ExecutablePlan<any>,
-  ): Array<ExecutablePlan<any>> | null {
+  ): ReadonlyArray<ExecutablePlan<any>> | null {
     const known = ancestorPlan._pathByDescendent.get(descendentPlan);
     if (known !== undefined) {
       return known;
-    }
-    if (this.phase !== "ready") {
+    } else if (ancestorPlan === descendentPlan) {
+      return EMPTY_ARRAY;
+    } else if (descendentPlan instanceof __ValuePlan) {
+      return EMPTY_ARRAY;
+    } else if (this.phase !== "ready") {
       throw new Error("Only call findPath when aether is ready");
     }
-    if (ancestorPlan === descendentPlan) {
-      return [];
-    }
-    if (descendentPlan instanceof __ValuePlan) {
-      return [];
-    }
+
     for (let i = 0, l = descendentPlan.dependencies.length; i < l; i++) {
       const depPlan = this.plans[descendentPlan.dependencies[i]];
       // Optimisation
       if (depPlan === ancestorPlan) {
-        return [descendentPlan];
+        const path = [descendentPlan];
+        ancestorPlan._pathByDescendent.set(descendentPlan, path);
+        return path;
       }
       const p = this.findPath(ancestorPlan, depPlan);
       if (p) {
