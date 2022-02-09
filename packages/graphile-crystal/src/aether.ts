@@ -3311,7 +3311,7 @@ export class Aether<
     layers: ExecutablePlan[],
     // Even when AsyncIterators are involved, this will always be a concrete array
     crystalLayerObjects: ReadonlyArray<CrystalLayerObject | null>,
-    rawMapResult: MapResult,
+    rawMapResult: MapResult | undefined,
     depth = 0,
   ): Promise<any[]> {
     const crystalLayerObjectsLength = crystalLayerObjects.length;
@@ -3333,7 +3333,7 @@ export class Aether<
             if (data == null) {
               return null;
             }
-            return rawMapResult(clo, data);
+            return rawMapResult ? rawMapResult(clo, data) : data;
           }
         : null;
 
@@ -3637,6 +3637,7 @@ export class Aether<
       itemPlan,
       namedReturnType,
       returnRaw,
+      pathIdentity,
     } = batch;
     const entriesLength = entries.length;
     const crystalLayerObjects: CrystalLayerObject[] = new Array(entriesLength);
@@ -3648,49 +3649,51 @@ export class Aether<
       );
     }
 
-    try {
-      assert.ok(plan, "No plan in batch?!");
-      assert.ok(itemPlan, "No itemPlan in batch?!");
+    const isLeaf = isLeafType(namedReturnType);
+    const isPolymorphic =
+      isUnionType(namedReturnType) || isInterfaceType(namedReturnType);
+    if (!isLeaf && !isPolymorphic) {
+      assertObjectType(namedReturnType);
+    }
 
-      const path = this.findPath(plan, itemPlan);
-      if (!path) {
-        throw new Error(
-          `Item plan ${itemPlan} for field plan ${plan} seem to be unrelated.`,
-        );
-      }
+    const crystalObjectFromCrystalLayerObjectAndTypeName = (
+      clo: CrystalLayerObject,
+      typeName: string,
+    ) => {
+      return newCrystalObject(
+        pathIdentity,
+        typeName,
+        isDev ? uid(crystalPrintPathIdentity(pathIdentity)) : uid(pathIdentity),
+        crystalContext,
+        clo.planResults,
+      );
+    };
 
-      /**
-       * We'll always have at least one layer, but for itemPlans that depend on
-       * `__ItemPlan`s we'll have one additional layer for each
-       * `__ItemPlan` and intermediate plans.
-       */
-      const layers: Array<ExecutablePlan<any>> = [plan];
+    // TODO: what should we do if the user has a graphqlResolver AND it's a
+    // polymorphic plan?
 
-      if (isDev) {
-        let depth = 0;
-        // Walk through the subplans, each time we find a `__ItemPlan` we
-        // add a new layer and record the listItemPlanIdAtDepth.
-        for (const subPlan of path) {
-          if (subPlan instanceof __ItemPlan) {
-            assert.strictEqual(
-              subPlan.depth,
-              depth,
-              `Expected ${subPlan}'s depth to match our locally tracked depth`,
+    // Execute the layers to get the result
+    const mapResult: MapResult =
+      // The user has their own resolver, so we must not return a crystalObject
+      returnRaw
+        ? (_clo, data) => data
+        : // When we're returning something polymorphic we need to figure out the typeName which we get from the plan result.
+        isPolymorphic
+        ? (clo, data) => {
+            assertPolymorphicData(data);
+            return crystalObjectFromCrystalLayerObjectAndTypeName(
+              clo,
+              data[$$concreteType],
             );
-            depth++;
-            // null means no need to transform the data; we might replace this in further iterations
-          } else {
-            /*
-             * We need to execute each layer in turn so that we can handle list
-             * item plans in their own special way.
-             */
           }
-          layers.push(subPlan);
-        }
-      } else {
-        layers.push(...path);
-      }
+        : // Otherwise we represent a standard object, so we can just use the expected named type
+          (clo, _data) =>
+            crystalObjectFromCrystalLayerObjectAndTypeName(
+              clo,
+              namedReturnType.name,
+            );
 
+    try {
       // First, execute side effects (in order, *not* in parallel)
       // TODO: assert that side effect plans cannot be nested under list items.
       const sideEffectCount = sideEffectPlans.length;
@@ -3702,61 +3705,14 @@ export class Aether<
         }
       }
 
-      const isLeaf = isLeafType(namedReturnType);
-      const isPolymorphic =
-        isUnionType(namedReturnType) || isInterfaceType(namedReturnType);
-      if (!isLeaf && !isPolymorphic) {
-        assertObjectType(namedReturnType);
-      }
-
-      const crystalObjectFromCrystalLayerObjectAndTypeName = (
-        clo: CrystalLayerObject,
-        typeName: string,
-      ) => {
-        return newCrystalObject(
-          batch.pathIdentity,
-          typeName,
-          isDev
-            ? uid(crystalPrintPathIdentity(batch.pathIdentity))
-            : uid(batch.pathIdentity),
-          crystalContext,
-          clo.planResults,
-        );
-      };
-
-      // TODO: what should we do if the user has a graphqlResolver AND it's a
-      // polymorphic plan?
-
-      // Execute the layers to get the result
-      const mapResult: MapResult =
-        // The user has their own resolver, so we must not return a crystalObject
-        returnRaw
-          ? (_clo, data) => data
-          : // When we're returning something polymorphic we need to figure out the typeName which we get from the plan result.
-          isPolymorphic
-          ? (clo, data) => {
-              assertPolymorphicData(data);
-              return crystalObjectFromCrystalLayerObjectAndTypeName(
-                clo,
-                data[$$concreteType],
-              );
-            }
-          : // Otherwise we represent a standard object, so we can just use the expected named type
-            (clo, _data) =>
-              crystalObjectFromCrystalLayerObjectAndTypeName(
-                clo,
-                namedReturnType.name,
-              );
-
-      debugExecute(`Executing batch with %s layers: %c`, layers.length, layers);
-
-      const results = await this.executeLayers(
+      const results = await this.executeBatchInner(
         crystalContext,
-        layers,
         crystalLayerObjects,
+        pathIdentity,
+        plan,
+        itemPlan,
         mapResult,
       );
-
       for (let i = 0; i < entriesLength; i++) {
         entries[i][1].resolve(results[i]);
       }
@@ -3765,6 +3721,66 @@ export class Aether<
         entries[i][1].reject(e);
       }
     }
+  }
+
+  private executeBatchInner(
+    crystalContext: CrystalContext,
+    crystalLayerObjects: CrystalLayerObject[],
+    pathIdentity: string,
+    plan: ExecutablePlan,
+    itemPlan: ExecutablePlan,
+    mapResult: MapResult | undefined = undefined,
+  ) {
+    assert.ok(plan, "No plan in batch?!");
+    assert.ok(itemPlan, "No itemPlan in batch?!");
+
+    const path = this.findPath(plan, itemPlan);
+    if (!path) {
+      throw new Error(
+        `Item plan ${itemPlan} for field plan ${plan} seem to be unrelated.`,
+      );
+    }
+
+    /**
+     * We'll always have at least one layer, but for itemPlans that depend on
+     * `__ItemPlan`s we'll have one additional layer for each
+     * `__ItemPlan` and intermediate plans.
+     */
+    const layers: Array<ExecutablePlan<any>> = [plan];
+
+    if (isDev) {
+      let depth = 0;
+      // Walk through the subplans, each time we find a `__ItemPlan` we
+      // add a new layer and record the listItemPlanIdAtDepth.
+      for (const subPlan of path) {
+        if (subPlan instanceof __ItemPlan) {
+          assert.strictEqual(
+            subPlan.depth,
+            depth,
+            `Expected ${subPlan}'s depth to match our locally tracked depth`,
+          );
+          depth++;
+          // null means no need to transform the data; we might replace this in further iterations
+        } else {
+          /*
+           * We need to execute each layer in turn so that we can handle list
+           * item plans in their own special way.
+           */
+        }
+        layers.push(subPlan);
+      }
+    } else {
+      layers.push(...path);
+    }
+
+    debugExecute(`Executing batch with %s layers: %c`, layers.length, layers);
+
+    return this.executeLayers(
+      crystalContext,
+      layers,
+      crystalLayerObjects,
+      mapResult,
+    );
   }
 
   /**
