@@ -28,11 +28,9 @@ class LightPromise<T> {
    */
   private _value: any = undefined;
 
-  private _thens: Array<{
-    onfulfilled: any;
-    onrejected: any;
-    promise: LightPromise<any>;
-  }> = [];
+  private _thens: Array<
+    [onfulfilled: any, onrejected: any, promise: LightPromise<any>]
+  > = [];
 
   constructor(
     executor: (
@@ -40,6 +38,8 @@ class LightPromise<T> {
       reject: (reason?: any) => void,
     ) => void,
   ) {
+    this.resolve = this.resolve.bind(this);
+    this.reject = this.reject.bind(this);
     if (executor !== NOOP) {
       executor(this.resolve, this.reject);
     }
@@ -57,7 +57,7 @@ class LightPromise<T> {
     promise: LightPromise<any> = new LightPromise(NOOP),
   ): LightPromise<TResult1 | TResult2> {
     if (this.state === 0) {
-      this._thens.push({ onfulfilled, onrejected, promise });
+      this._thens.push([onfulfilled, onrejected, promise]);
     } else if (this.state === 1) {
       if (typeof onfulfilled === "function") {
         try {
@@ -82,7 +82,7 @@ class LightPromise<T> {
     return promise;
   }
 
-  public resolve = (input: T | PromiseLike<T>): void => {
+  public resolve(input: T | PromiseLike<T>): void {
     if (
       typeof input === "object" &&
       input !== null &&
@@ -100,9 +100,9 @@ class LightPromise<T> {
         }.`,
       );
     }
-  };
+  }
 
-  public reject = (error: Error): void => {
+  public reject(error: Error): void {
     if (this.state === 0) {
       this.state = 2;
       this._value = error;
@@ -114,13 +114,13 @@ class LightPromise<T> {
         }.`,
       );
     }
-  };
+  }
 
   private executeThens(): void {
     const thens = this._thens;
     (this._thens as any) = null;
     for (const then of thens) {
-      this.then(then.onfulfilled, then.onrejected, then.promise);
+      this.then(then[0], then[1], then[2]);
     }
   }
 }
