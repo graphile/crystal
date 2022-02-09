@@ -2989,7 +2989,7 @@ export class Aether<
     }
 
     debugExecute(
-      `%sExecutePlan(%s): wrote results for %c`,
+      "%sExecutePlan(%s): wrote results for %c",
       indent,
       plan,
       pendingPlanResultses,
