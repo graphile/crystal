@@ -213,7 +213,7 @@ function crystalWrapResolveOrSubscribe<
         : getAetherFromResolver(context, info);
       const pathIdentity = isSubscribe
         ? ROOT_PATH
-        : possiblyParentCrystalObject
+        : possiblyParentCrystalObject != null
         ? aether.pathIdentityByParentPathIdentity[
             possiblyParentCrystalObject[$$pathIdentity]
           ][info.path.typename!][info.path.key]

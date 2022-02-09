@@ -3292,7 +3292,7 @@ export class Aether<
     const batch = this.newBatch(pathIdentity, returnType, crystalContext);
     this.batchByPathIdentity[pathIdentity] = batch;
     // (Note: when batch is executed it will delete itself from aether.batchByPathIdentity.)
-    setImmediate(() => {
+    process.nextTick(() => {
       this.executeBatch(batch, crystalContext);
     });
     return batch;
