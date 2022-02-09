@@ -258,6 +258,22 @@ export class Aether<
   public readonly isUnplannedByPathIdentity: {
     [pathIdentity: string]: boolean | undefined;
   };
+  /**
+   * Resolvers need a quick way of determining their path identity. Since the
+   * parent object already knows its path identity, it's always going to be
+   * something like `parentPathIdentity + something + TypeName.fieldAlias`,
+   * where the something could be empty or `[]` or `[][]` or similar. This
+   * lookup is responsible for doing that calculation for them.
+   *
+   * It also has the added advantage that the path identities will be a limited
+   * set of constants, so string concatenation and the related garbage
+   * collection costs will not be incurred.
+   */
+  public readonly pathIdentityByParentPathIdentityAndFieldAlias: {
+    [parentPathIdentity: string]: {
+      [fieldAlias: string]: string;
+    };
+  } = {};
 
   /**
    * Whereas `planIdByPathIdentity` references the plan that controls what a
@@ -413,6 +429,7 @@ export class Aether<
       [ROOT_PATH]: [0],
     });
     this.operationType = operation.operation;
+    this.pathIdentityByParentPathIdentityAndFieldAlias[ROOT_PATH] = {};
     try {
       switch (this.operationType) {
         case "query": {
@@ -497,6 +514,7 @@ export class Aether<
     this.finalizeArgumentsSince(0, ROOT_PATH);
     this.planSelectionSet(
       ROOT_PATH,
+      ROOT_PATH,
       this.trackedRootValuePlan,
       rootType,
       [
@@ -519,6 +537,7 @@ export class Aether<
     }
     this.finalizeArgumentsSince(0, ROOT_PATH);
     this.planSelectionSet(
+      ROOT_PATH,
       ROOT_PATH,
       this.trackedRootValuePlan,
       rootType,
@@ -608,6 +627,7 @@ export class Aether<
       this.finalizeArgumentsSince(0, ROOT_PATH);
       this.planSelectionSet(
         nestedParentPathIdentity,
+        nestedParentPathIdentity,
         streamItemPlan,
         rootType,
         [
@@ -623,6 +643,7 @@ export class Aether<
       this.subscriptionPlanId = subscribePlan.id;
       this.finalizeArgumentsSince(0, ROOT_PATH);
       this.planSelectionSet(
+        ROOT_PATH,
         ROOT_PATH,
         subscribePlan,
         rootType,
@@ -643,6 +664,7 @@ export class Aether<
    */
   private planSelectionSet(
     path: string,
+    parentFieldPathIdentity: string,
     parentPlan: ExecutablePlan,
     objectType: GraphQLObjectType,
     groupedSelectionsList: GroupedSelections[],
@@ -659,6 +681,9 @@ export class Aether<
     const objectTypeFields = objectType.getFields();
     for (const [responseKey, fieldAndGroups] of groupedFieldSet.entries()) {
       const pathIdentity = `${path}>${objectType.name}.${responseKey}`;
+      this.pathIdentityByParentPathIdentityAndFieldAlias[
+        parentFieldPathIdentity
+      ][responseKey] = pathIdentity;
 
       // We could use a Set for this, but for a very small data set arrays
       // are faster.
@@ -1084,6 +1109,8 @@ export class Aether<
       fieldType instanceof GraphQLUnionType
     ) {
       const groupedSubSelections = graphqlMergeSelectionSets(fieldAndGroups);
+      this.pathIdentityByParentPathIdentityAndFieldAlias[fieldPathIdentity] =
+        {};
       if (fieldType instanceof GraphQLObjectType) {
         if (isDev) {
           // Check that the plan we're dealing with is the one the user declared
@@ -1101,6 +1128,7 @@ export class Aether<
         }
         this.planSelectionSet(
           pathIdentity,
+          fieldPathIdentity,
           plan,
           fieldType as GraphQLObjectType,
           groupedSubSelections,
@@ -1125,6 +1153,7 @@ export class Aether<
 
             this.planSelectionSet(
               pathIdentity,
+              fieldPathIdentity,
               subPlan,
               possibleObjectType,
               groupedSubSelections,
@@ -3201,7 +3230,7 @@ export class Aether<
    *
    * @internal
    */
-  public getBatch(
+  public makeBatch(
     pathIdentity: string,
     returnType: GraphQLOutputType,
     parentCrystalObject: CrystalObject | null,
@@ -3212,30 +3241,15 @@ export class Aether<
     context: object,
     rootValue: unknown,
   ): Batch {
-    let batch = this.batchByPathIdentity[pathIdentity];
-    if (!batch) {
-      let timeString: string | null = null;
-      if (debugExecute.enabled) {
-        timeString = `batch\t${this.counter++}\t${pathIdentity}`;
-        console.time(timeString);
-      }
-      const crystalContext = parentCrystalObject
-        ? parentCrystalObject[$$crystalContext]
-        : this.newCrystalContext(variableValues, context, rootValue);
-      batch = this.newBatch(pathIdentity, returnType, crystalContext);
-      // TypeScript hack
-      const definitelyBatch: Batch = batch;
-      this.batchByPathIdentity[pathIdentity] = definitelyBatch;
-      // (Note: when batch is executed it will delete itself from aether.batchByPathIdentity.)
-      setImmediate(() => {
-        const promise = this.executeBatch(definitelyBatch, crystalContext);
-        if (timeString) {
-          promise.then(() => {
-            console.timeEnd(timeString!);
-          });
-        }
-      });
-    }
+    const crystalContext = parentCrystalObject
+      ? parentCrystalObject[$$crystalContext]
+      : this.newCrystalContext(variableValues, context, rootValue);
+    const batch = this.newBatch(pathIdentity, returnType, crystalContext);
+    this.batchByPathIdentity[pathIdentity] = batch;
+    // (Note: when batch is executed it will delete itself from aether.batchByPathIdentity.)
+    setImmediate(() => {
+      this.executeBatch(batch, crystalContext);
+    });
     return batch;
   }
 

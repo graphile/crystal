@@ -5,6 +5,7 @@ import type { GraphQLFieldResolver, GraphQLResolveInfo } from "graphql";
 import { defaultFieldResolver } from "graphql";
 import type { Path } from "graphql/jsutils/Path";
 
+import type { Aether } from "./aether";
 import { CrystalError, populateValuePlan } from "./aether";
 import * as assert from "./assert";
 import { ROOT_PATH } from "./constants";
@@ -102,7 +103,13 @@ function makeParentCrystalObject(
     // Special workaround for the root object.
     return crystalContext.rootCrystalObject;
   } else {
-    const parentPathIdentity = path.prev ? pathToPathIdentity(path.prev) : "";
+    // TODO: I think using path.prev here is a bug; should it be the first
+    // path.prev that has a type name? It happens to work currently because we
+    // only use it at the root, but if we were starting crystal resolution on a
+    // field of something returned from a list field things may be different.
+    const parentPathIdentity = path.prev
+      ? pathToPathIdentity(path.prev)
+      : ROOT_PATH;
     const { crystalContext } = batch;
     const { aether } = crystalContext;
     const parentPlanId =
@@ -179,7 +186,7 @@ function crystalWrapResolveOrSubscribe<
    * Implements the `ResolveFieldValueCrystal` algorithm.
    */
   const crystalResolver: GraphQLFieldResolver<TSource, TContext, TArgs> =
-    async function (
+    function (
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       source: any,
       argumentValues,
@@ -206,13 +213,19 @@ function crystalWrapResolveOrSubscribe<
         : getAetherFromResolver(context, info);
       const pathIdentity = isSubscribe
         ? ROOT_PATH
+        : possiblyParentCrystalObject
+        ? aether.pathIdentityByParentPathIdentityAndFieldAlias[
+            possiblyParentCrystalObject[$$pathIdentity]
+          ][info.path.key]
         : pathToPathIdentity(info.path);
+      const isUnplanned =
+        aether.isUnplannedByPathIdentity[pathIdentity] === true;
 
       // IMPORTANT: there must be no `await` between here and `getBatchResult`.
       /* 👇👇👇👇👇 NO AWAIT ALLOWED BELOW HERE 👇👇👇👇👇 */
       const batch =
         aether.batchByPathIdentity[pathIdentity] ??
-        aether.getBatch(
+        aether.makeBatch(
           pathIdentity,
           info.returnType,
           possiblyParentCrystalObject,
@@ -226,42 +239,44 @@ function crystalWrapResolveOrSubscribe<
       const resultPromise = getBatchResult(batch, parentCrystalObject);
       /* 👆👆👆👆👆 NO AWAIT ALLOWED ABOVE HERE 👆👆👆👆👆 */
 
-      const result = await resultPromise;
-      const isUnplanned =
-        aether.isUnplannedByPathIdentity[pathIdentity] === true;
-
       if (debugVerbose.enabled) {
-        debugVerbose(
-          `👈 %p/%c for %s; result: %c`,
-          pathIdentity,
-          parentCrystalObject[$$id],
-          parentCrystalObject,
-          result,
-        );
+        resultPromise.then((result) => {
+          debugVerbose(
+            `👈 %p/%c for %s; result: %c`,
+            pathIdentity,
+            parentCrystalObject[$$id],
+            parentCrystalObject,
+            result,
+          );
+        });
       }
       if (userSpecifiedResolver != null) {
         // At this point, Aether will already have performed the relevant
         // checks to ensure this is safe to do. The values returned through
         // here must never be CrystalObjects (or lists thereof).
-        if (debugVerbose.enabled) {
-          debugVerbose(
-            "   Calling real resolver for %s.%s with %o",
-            info.parentType.name,
-            info.fieldName,
-            result,
-          );
-        }
-        return userSpecifiedResolver(result, argumentValues, context, info);
+        return resultPromise.then((result) => {
+          if (debugVerbose.enabled) {
+            debugVerbose(
+              "   Calling real resolver for %s.%s with %o",
+              info.parentType.name,
+              info.fieldName,
+              result,
+            );
+          }
+          return userSpecifiedResolver(result, argumentValues, context, info);
+        });
       } else if (isUnplanned) {
         // If the field is unplanned then we want the default resolver to
         // extract the relevant property.
-        return defaultFieldResolver(result, argumentValues, context, info);
+        return resultPromise.then((result) =>
+          defaultFieldResolver(result, argumentValues, context, info),
+        );
       } else {
         // In the case of planned leaf fields this will just be the underlying
         // data to return; however in all other cases this is either a
         // CrystalObject or an n-dimensional list of CrystalObjects, or a
         // stream of these things.
-        return result;
+        return resultPromise;
       }
     };
   Object.defineProperty(crystalResolver, $$crystalWrapped, {
