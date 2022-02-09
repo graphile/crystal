@@ -147,4 +147,4 @@ export function deferWithNativePromise<T = void>(): Deferred<T> {
   return promise;
 }
 
-export const defer = deferWithLightPromise;
+export const defer = deferWithNativePromise;
