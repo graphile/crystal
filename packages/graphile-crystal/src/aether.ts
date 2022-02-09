@@ -3705,10 +3705,7 @@ export class Aether<
    *
    * @internal
    */
-  public logPlans(why?: string): void {
-    if (!debugPlanVerbose.enabled) {
-      return;
-    }
+  public printPlans(): string {
     const { plans } = this;
     const printDep = (depId: number) => {
       const actualDepId = this.plans[depId].id;
@@ -3773,40 +3770,42 @@ export class Aether<
         }
       });
     });
-
-    if (debugPlanVerbose.enabled) {
-      debugPlanVerbose(
-        "Plans%s: %s",
-        why ? ` ${why}` : "",
-        "\n" +
-          partsLines
-            .map((parts) => {
-              const id = ansiPad(parts[0], maxSizes[0], " ", "start");
-              const optimized = ansiPad(parts[1], maxSizes[1], " ", "end");
-              const plan = ansiPad(parts[2], maxSizes[2], " ", "end");
-              const deps = ansiPad(
-                parts[3] ? `  (deps: ${parts[3]})` : "",
-                9 + maxSizes[3] + 1,
-                " ",
-                "end",
-              );
-              const pathIdentity = ansiPad(parts[4], maxSizes[4], " ", "end");
-              const finalized = ansiPad(parts[5], maxSizes[5], " ", "end");
-              return `${id}: ${optimized}${finalized}${plan}${deps} ${pathIdentity}`;
-            })
-            .join("\n"),
-      );
-    }
+    return partsLines
+      .map((parts) => {
+        const id = ansiPad(parts[0], maxSizes[0], " ", "start");
+        const optimized = ansiPad(parts[1], maxSizes[1], " ", "end");
+        const plan = ansiPad(parts[2], maxSizes[2], " ", "end");
+        const deps = ansiPad(
+          parts[3] ? `  (deps: ${parts[3]})` : "",
+          9 + maxSizes[3] + 1,
+          " ",
+          "end",
+        );
+        const pathIdentity = ansiPad(parts[4], maxSizes[4], " ", "end");
+        const finalized = ansiPad(parts[5], maxSizes[5], " ", "end");
+        return `${id}: ${optimized}${finalized}${plan}${deps} ${pathIdentity}`;
+      })
+      .join("\n");
   }
 
   /**
    * @internal
    */
-  public logPlansByPath(why?: string): void {
+  public logPlans(why?: string): void {
     if (!debugPlanVerbose.enabled) {
       return;
     }
-    this.logPlans(why);
+    debugPlanVerbose(
+      "Plans%s: %s",
+      why ? ` ${why}` : "",
+      "\n" + this.printPlans(),
+    );
+  }
+
+  /**
+   * @internal
+   */
+  public printPlansByPath(): string {
     const fieldPathIdentities = Object.keys(this.planIdByPathIdentity)
       .sort((a, z) => a.length - z.length)
       .filter(
@@ -3853,14 +3852,22 @@ export class Aether<
     for (const fieldPathIdentity of fieldPathIdentities) {
       print(fieldPathIdentity, "");
     }
+    return lines.join("\n");
+  }
 
-    if (debugPlanVerbose.enabled) {
-      debugPlanVerbose(
-        `Plans by path%s: %s`,
-        why ? ` ${why}` : "",
-        "\n" + lines.join("\n"),
-      );
+  /**
+   * @internal
+   */
+  public logPlansByPath(why?: string): void {
+    if (!debugPlanVerbose.enabled) {
+      return;
     }
+    this.logPlans(why);
+    debugPlanVerbose(
+      `Plans by path%s: %s`,
+      why ? ` ${why}` : "",
+      "\n" + this.printPlansByPath(),
+    );
   }
 
   //----------------------------------------
