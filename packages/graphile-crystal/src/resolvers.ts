@@ -214,9 +214,9 @@ function crystalWrapResolveOrSubscribe<
       const pathIdentity = isSubscribe
         ? ROOT_PATH
         : possiblyParentCrystalObject
-        ? aether.pathIdentityByParentPathIdentityAndFieldAlias[
+        ? aether.pathIdentityByParentPathIdentity[
             possiblyParentCrystalObject[$$pathIdentity]
-          ][info.path.key]
+          ][info.path.typename!][info.path.key]
         : pathToPathIdentity(info.path);
       const isUnplanned =
         aether.isUnplannedByPathIdentity[pathIdentity] === true;

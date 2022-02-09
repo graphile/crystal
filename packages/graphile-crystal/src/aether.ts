@@ -269,9 +269,11 @@ export class Aether<
    * set of constants, so string concatenation and the related garbage
    * collection costs will not be incurred.
    */
-  public readonly pathIdentityByParentPathIdentityAndFieldAlias: {
+  public readonly pathIdentityByParentPathIdentity: {
     [parentPathIdentity: string]: {
-      [fieldAlias: string]: string;
+      [typeName: string]: {
+        [fieldAlias: string]: string;
+      };
     };
   } = {};
 
@@ -330,6 +332,8 @@ export class Aether<
   public readonly trackedRootValuePlan: __TrackedObjectPlan<TRootValue>;
   public readonly operationType: "query" | "mutation" | "subscription";
   public readonly queryTypeName: string;
+  public readonly mutationTypeName: string | undefined;
+  public readonly subscriptionTypeName: string | undefined;
   public readonly unionsContainingObjectType: {
     [objectTypeName: string]: ReadonlyArray<GraphQLUnionType>;
   };
@@ -348,12 +352,16 @@ export class Aether<
     public readonly rootValue: TRootValue,
   ) {
     const queryType = this.schema.getQueryType();
+    const mutationType = this.schema.getMutationType();
+    const subscriptionType = this.schema.getSubscriptionType();
     if (!queryType) {
       throw new Error(
         "This GraphQL schema does not support queries, it cannot be used.",
       );
     }
     this.queryTypeName = queryType.name;
+    this.mutationTypeName = mutationType?.name;
+    this.subscriptionTypeName = subscriptionType?.name;
 
     // Unions are a pain, let's cache some things up front to make them easier.
     const allTypes = Object.values(schema.getTypeMap());
@@ -429,18 +437,26 @@ export class Aether<
       [ROOT_PATH]: [0],
     });
     this.operationType = operation.operation;
-    this.pathIdentityByParentPathIdentityAndFieldAlias[ROOT_PATH] = {};
+    this.pathIdentityByParentPathIdentity[ROOT_PATH] = {};
     try {
       switch (this.operationType) {
         case "query": {
+          this.pathIdentityByParentPathIdentity[ROOT_PATH][this.queryTypeName] =
+            {};
           this.planQuery();
           break;
         }
         case "mutation": {
+          this.pathIdentityByParentPathIdentity[ROOT_PATH][
+            this.mutationTypeName!
+          ] = {};
           this.planMutation();
           break;
         }
         case "subscription": {
+          this.pathIdentityByParentPathIdentity[ROOT_PATH][
+            this.subscriptionTypeName!
+          ] = {};
           this.planSubscription();
           break;
         }
@@ -681,8 +697,18 @@ export class Aether<
     const objectTypeFields = objectType.getFields();
     for (const [responseKey, fieldAndGroups] of groupedFieldSet.entries()) {
       const pathIdentity = `${path}>${objectType.name}.${responseKey}`;
-      this.pathIdentityByParentPathIdentityAndFieldAlias[
-        parentFieldPathIdentity
+      if (
+        isDev &&
+        this.pathIdentityByParentPathIdentity[parentFieldPathIdentity][
+          objectType.name
+        ][responseKey] != null
+      ) {
+        throw new Error(
+          `Attempted to overwrite pathIdentityByParentPathIdentity[${parentFieldPathIdentity}][${objectType.name}][${responseKey}]`,
+        );
+      }
+      this.pathIdentityByParentPathIdentity[parentFieldPathIdentity][
+        objectType.name
       ][responseKey] = pathIdentity;
 
       // We could use a Set for this, but for a very small data set arrays
@@ -920,6 +946,10 @@ export class Aether<
       };
       parentTreeNode.children.push(treeNode);
 
+      if (!namedResultTypeIsLeaf) {
+        this.pathIdentityByParentPathIdentity[pathIdentity] = {};
+      }
+
       // Now we're building the child plans, the parentPathIdentity becomes
       // actually our identity.
       const itemPlan = this.planFieldReturnType(
@@ -1109,8 +1139,6 @@ export class Aether<
       fieldType instanceof GraphQLUnionType
     ) {
       const groupedSubSelections = graphqlMergeSelectionSets(fieldAndGroups);
-      this.pathIdentityByParentPathIdentityAndFieldAlias[fieldPathIdentity] =
-        {};
       if (fieldType instanceof GraphQLObjectType) {
         if (isDev) {
           // Check that the plan we're dealing with is the one the user declared
@@ -1126,6 +1154,19 @@ export class Aether<
             );
           }
         }
+        if (
+          isDev &&
+          this.pathIdentityByParentPathIdentity[fieldPathIdentity][
+            fieldType.name
+          ]
+        ) {
+          throw new Error(
+            "Attempted to overwrite entry in pathIdentityByParentPathIdentity",
+          );
+        }
+        this.pathIdentityByParentPathIdentity[fieldPathIdentity][
+          fieldType.name
+        ] = {};
         this.planSelectionSet(
           pathIdentity,
           fieldPathIdentity,
@@ -1150,6 +1191,19 @@ export class Aether<
               polymorphicPlan.planForType(possibleObjectType),
             );
             this.finalizeArgumentsSince(oldPlansLength, pathIdentity);
+            if (
+              isDev &&
+              this.pathIdentityByParentPathIdentity[fieldPathIdentity][
+                possibleObjectType.name
+              ]
+            ) {
+              throw new Error(
+                "Attempted to overwrite entry in pathIdentityByParentPathIdentity",
+              );
+            }
+            this.pathIdentityByParentPathIdentity[fieldPathIdentity][
+              possibleObjectType.name
+            ] = {};
 
             this.planSelectionSet(
               pathIdentity,
