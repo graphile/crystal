@@ -14,10 +14,10 @@ import type { Deferred } from "./deferred";
 import { defer } from "./deferred";
 import { establishAether } from "./establishAether";
 import type { Batch, CrystalContext, CrystalObject } from "./interfaces";
-import { $$data } from "./interfaces";
 import {
   $$concreteType,
   $$crystalContext,
+  $$data,
   $$id,
   $$pathIdentity,
   $$planResults,

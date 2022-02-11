@@ -213,6 +213,7 @@ interface FieldDigest {
   returnType: GraphQLOutputType;
   namedReturnType: GraphQLNamedType & GraphQLOutputType;
   isPolymorphic: boolean;
+  isLeaf: boolean;
   listDepth: number;
   returnRaw: boolean;
   planId: number;
@@ -841,8 +842,8 @@ export class Aether<
       const rawResolver = objectField.resolve;
 
       const typePlan = objectType.extensions?.graphile?.Plan;
-      const namedResultType = getNamedType(fieldType);
-      const namedResultTypeIsLeaf = isLeafType(namedResultType);
+      const namedReturnType = getNamedType(fieldType);
+      const namedResultTypeIsLeaf = isLeafType(namedReturnType);
 
       /**
        * This will never be the crystal resolver - only ever the user-supplied
@@ -853,10 +854,10 @@ export class Aether<
           ? rawResolver[$$crystalWrapped].original
           : rawResolver;
       /*
-        namedResultType instanceof GraphQLInterfaceType ||
-        namedResultType instanceof GraphQLUnionType
+        namedReturnType instanceof GraphQLInterfaceType ||
+        namedReturnType instanceof GraphQLUnionType
         */
-      const resultIsPlanned = isTypePlanned(this.schema, namedResultType);
+      const resultIsPlanned = isTypePlanned(this.schema, namedReturnType);
       const fieldHasPlan = !!planResolver;
 
       // Return raw data if either the user has their own resolver _or_ it's a leaf field.
@@ -874,13 +875,13 @@ export class Aether<
 
       if (!typePlan && resultIsPlanned && !fieldHasPlan) {
         throw new Error(
-          `Field ${objectType.name}.${fieldName} returns a ${namedResultType.name} which expects a plan to be available; however this field has no plan() method to produce such a plan; please add 'extensions.graphile.plan' to this field.`,
+          `Field ${objectType.name}.${fieldName} returns a ${namedReturnType.name} which expects a plan to be available; however this field has no plan() method to produce such a plan; please add 'extensions.graphile.plan' to this field.`,
         );
       }
 
       if (resultIsPlanned && graphqlResolver) {
         throw new Error(
-          `Field ${objectType.name}.${fieldName} returns a ${namedResultType.name} which expects a plan to be available; this means that ${objectType.name}.${fieldName} is forbidden from defining a GraphQL resolver.`,
+          `Field ${objectType.name}.${fieldName} returns a ${namedReturnType.name} which expects a plan to be available; this means that ${objectType.name}.${fieldName} is forbidden from defining a GraphQL resolver.`,
         );
       }
 
@@ -1001,12 +1002,20 @@ export class Aether<
         );
       this.itemPlanIdByFieldPathIdentity[pathIdentity] = itemPlan.id;
 
+      const isPolymorphic =
+        isInterfaceType(namedReturnType) || isUnionType(namedReturnType);
+      const isLeaf = isLeafType(namedReturnType);
+      if (!isLeaf && !isPolymorphic) {
+        assertObjectType(namedReturnType);
+      }
+
       this.fieldDigestByPathIdentity[pathIdentity] = {
         pathIdentity,
         returnType: fieldType,
-        namedReturnType: namedResultType,
+        namedReturnType: namedReturnType,
         returnRaw,
-        isPolymorphic: isInterfaceType(fieldType) || isUnionType(fieldType),
+        isPolymorphic,
+        isLeaf,
         planId: plan.id,
         itemPlanId: itemPlan.id,
         listDepth,
@@ -3277,8 +3286,6 @@ export class Aether<
       plan,
       itemPlan,
       entries: [],
-      namedReturnType,
-      returnRaw,
     };
     return batch;
   }
@@ -3694,15 +3701,7 @@ export class Aether<
     // This guarantees nothing else will be added to the batch
     delete this.batchByPathIdentity[batch.pathIdentity];
 
-    const {
-      entries,
-      sideEffectPlans,
-      plan,
-      itemPlan,
-      namedReturnType,
-      returnRaw,
-      pathIdentity,
-    } = batch;
+    const { entries, sideEffectPlans, plan, itemPlan, pathIdentity } = batch;
     const entriesLength = entries.length;
     const crystalLayerObjects: CrystalLayerObject[] = new Array(entriesLength);
     for (let i = 0; i < entriesLength; i++) {
@@ -3714,22 +3713,15 @@ export class Aether<
     }
 
     try {
-      const isLeaf = isLeafType(namedReturnType);
-      const isPolymorphic =
-        isUnionType(namedReturnType) || isInterfaceType(namedReturnType);
-      if (!isLeaf && !isPolymorphic) {
-        assertObjectType(namedReturnType);
-      }
+      const fieldDigest = this.fieldDigestByPathIdentity[pathIdentity];
 
       const results = await this.executeBatchForCLOs(
         crystalContext,
         pathIdentity,
-        namedReturnType,
+        fieldDigest,
         sideEffectPlans,
         plan,
         itemPlan,
-        returnRaw,
-        isPolymorphic,
         crystalLayerObjects,
       );
       for (let i = 0; i < entriesLength; i++) {
@@ -3745,14 +3737,13 @@ export class Aether<
   private async executeBatchForCLOs(
     crystalContext: CrystalContext,
     pathIdentity: string,
-    namedReturnType: GraphQLNamedType & GraphQLOutputType,
+    fieldDigest: FieldDigest,
     sideEffectPlans: ReadonlyArray<ExecutablePlan>,
     plan: ExecutablePlan,
     itemPlan: ExecutablePlan,
-    returnRaw: boolean,
-    isPolymorphic: boolean,
     crystalLayerObjects: CrystalLayerObject[],
   ) {
+    const { isPolymorphic, isLeaf, namedReturnType, returnRaw } = fieldDigest;
     const crystalObjectFromCrystalLayerObjectAndTypeName = (
       clo: CrystalLayerObject,
       typeName: string,
@@ -3829,12 +3820,10 @@ export class Aether<
         const subResults = await this.executeBatchForCLOs(
           crystalContext,
           fieldDigest.pathIdentity,
-          fieldDigest.namedReturnType,
+          fieldDigest,
           EMPTY_ARRAY,
           config.plan,
           config.itemPlan,
-          fieldDigest.returnRaw,
-          fieldDigest.isPolymorphic,
           resultCrystalLayerObjects,
         );
         for (let i = 0, l = resultCrystalObjects.length; i < l; i++) {

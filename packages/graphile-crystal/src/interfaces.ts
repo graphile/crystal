@@ -150,12 +150,6 @@ export interface Batch {
   plan: ExecutablePlan;
   itemPlan: ExecutablePlan;
   entries: Array<[CrystalObject, Deferred<any>]>;
-  namedReturnType: GraphQLNamedType & GraphQLOutputType;
-  /**
-   * If the user has their own resolver we must return raw data, otherwise
-   * we'll return CrystalObjects.
-   */
-  returnRaw: boolean;
 }
 
 export interface CrystalContext {
