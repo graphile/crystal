@@ -245,6 +245,9 @@ export class Aether<
 > {
   private phase: AetherPhase = "init";
 
+  /**
+   * @internal
+   */
   public maxGroupId = 0;
   private rootTreeNode: TreeNode = {
     pathIdentity: ROOT_PATH,
@@ -259,30 +262,44 @@ export class Aether<
   /**
    * This value is ethemeral, it only contains values whilst a specific field
    * is being planned.
+   *
+   * @internal
    */
   public readonly modifierPlans: ModifierPlan<any>[] = [];
 
+  /**
+   * @internal
+   */
   public readonly batchByPathIdentity: {
     [pathIdentity: string]: Batch | undefined;
   } = Object.create(null);
 
   /**
    * The plan id for the plan that represents the subscription (if any).
+   *
+   * @internal
    */
   public subscriptionPlanId: number | undefined;
 
   /**
    * The plan id for the plan that represents a single payload in the subscription stream (if any)
+   *
+   * @internal
    */
   public subscriptionItemPlanId: number | undefined;
 
   /**
    * The plan by path identity is the plan that will return the results that
    * the resolver at that plan identity should return.
+   *
+   * @internal
    */
   public readonly planIdByPathIdentity: {
     [pathIdentity: string]: number | undefined;
   };
+  /**
+   * @internal
+   */
   public readonly isUnplannedByPathIdentity: {
     [pathIdentity: string]: boolean | undefined;
   };
@@ -296,6 +313,8 @@ export class Aether<
    * It also has the added advantage that the path identities will be a limited
    * set of constants, so string concatenation and the related garbage
    * collection costs will not be incurred.
+   *
+   * @internal
    */
   public readonly pathIdentityByParentPathIdentity: {
     [parentPathIdentity: string]: {
@@ -312,26 +331,43 @@ export class Aether<
    * argument. When the field resolves to a type directly these will likely be
    * the same thing, but when a field returns a GraphQLList the itemPlan will
    * represent individual items within this (potentially nested) list.
+   *
+   * @internal
    */
   public readonly itemPlanIdByFieldPathIdentity: {
     [pathIdentity: string]: number | undefined;
   };
 
+  /**
+   * @internal
+   */
   public readonly sideEffectPlanIdsByPathIdentity: {
     [pathIdentity: string]: number[];
   };
 
+  /**
+   * @internal
+   */
   public readonly transformDependencyPlanIdByTransformPlanId: {
     [transformPlanId: number]: number;
   };
 
+  /**
+   * @internal
+   */
   public readonly returnRawValueByPathIdentity: {
     [fieldPathIdentity: string]: boolean;
   };
 
+  /**
+   * @internal
+   */
   public readonly fieldDigestByPathIdentity: {
     [pathIdentity: string]: FieldDigest;
   } = Object.create(null);
+  /**
+   * @internal
+   */
   public readonly prefetchesForPathIdentity: {
     [pathIdentity: string]: {
       [fieldAlias: string]: PrefetchConfig;
@@ -344,11 +380,16 @@ export class Aether<
    * itself into a parent plan in a different group). Groups are advanced by
    * features such as `@stream` and `@defer`. This behavior ensures that only
    * the logic required at each stage is executed at those stages.
+   *
+   * @internal
    */
   public readonly groupIdsByPathIdentity: {
     [pathIdentity: string]: number[] | undefined;
   };
 
+  /**
+   * @internal
+   */
   public readonly valueIdByObjectByPlanId: {
     // This is just some object, we don't need to access anything about it.
     // Critically, though, it is an object (not an `unknown`).
@@ -358,19 +399,49 @@ export class Aether<
 
   private readonly planOptionsByPlan = new Map<ExecutablePlan, PlanOptions>();
 
+  /**
+   * @internal
+   */
   public readonly variableValuesConstraints: Constraint[] = [];
+  /**
+   * @internal
+   */
   public readonly variableValuesPlan: __ValuePlan<TVariables>;
+  /**
+   * @internal
+   */
   public readonly trackedVariableValuesPlan: __TrackedObjectPlan<TVariables>;
+  /**
+   * @internal
+   */
   public readonly contextConstraints: Constraint[] = [];
+  /**
+   * @internal
+   */
   public readonly contextPlan: __ValuePlan<TContext>;
+  /**
+   * @internal
+   */
   public readonly trackedContextPlan: __TrackedObjectPlan<TContext>;
+  /**
+   * @internal
+   */
   public readonly rootValueConstraints: Constraint[] = [];
+  /**
+   * @internal
+   */
   public readonly rootValuePlan: __ValuePlan<TRootValue>;
+  /**
+   * @internal
+   */
   public readonly trackedRootValuePlan: __TrackedObjectPlan<TRootValue>;
   public readonly operationType: "query" | "mutation" | "subscription";
   public readonly queryTypeName: string;
   public readonly mutationTypeName: string | undefined;
   public readonly subscriptionTypeName: string | undefined;
+  /**
+   * @internal
+   */
   public readonly unionsContainingObjectType: {
     [objectTypeName: string]: ReadonlyArray<GraphQLUnionType>;
   };
