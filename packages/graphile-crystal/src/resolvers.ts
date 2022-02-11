@@ -209,7 +209,13 @@ function crystalWrapResolveOrSubscribe<
         const fieldAlias = info.path.key;
         if (fieldAlias in parentObject[$$data]) {
           // Short-circuit execution - we already have results
-          return parentObject[$$data][fieldAlias];
+          const result = parentObject[$$data][fieldAlias];
+          if (userSpecifiedResolver != null) {
+            return userSpecifiedResolver(result, argumentValues, context, info);
+            // NOTE: this cannot occur if the field is unplanned, so no need to handle that
+          } else {
+            return result;
+          }
         }
         possiblyParentCrystalObject = parentObject;
       }

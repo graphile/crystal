@@ -136,6 +136,13 @@ export class ExecutablePlan<TData = any> extends BasePlan {
     new Map();
 
   /**
+   * Only assigned once aether is 'ready'.
+   *
+   * @internal
+   */
+  public _recursiveDependencyIds = new Set<number>();
+
+  /**
    * Set true if your plan executes synchronously (i.e. no
    * async/await/promises); this allows us to avoid deferreds and is a
    * performance optimisation.

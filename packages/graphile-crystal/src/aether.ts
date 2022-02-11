@@ -101,11 +101,12 @@ import {
 } from "./resolvers";
 import { stripAnsi } from "./stripAnsi";
 import type { UniqueId } from "./utils";
-import { isPromiseLike } from "./utils";
 import {
   arraysMatch,
   defaultValueToValueNode,
   isPromise,
+  isPromiseLike,
+  planGroupsOverlap,
   ROOT_VALUE_OBJECT,
   uid,
 } from "./utils";
@@ -210,6 +211,7 @@ function assertPolymorphicPlan(
 
 interface FieldDigest {
   pathIdentity: string;
+  responseKey: string;
   returnType: GraphQLOutputType;
   namedReturnType: GraphQLNamedType & GraphQLOutputType;
   isPolymorphic: boolean;
@@ -218,7 +220,12 @@ interface FieldDigest {
   returnRaw: boolean;
   planId: number;
   itemPlanId: number;
-  childResponseKeys: null | string[];
+  /**
+   * Important: this does **NOT** represent the response keys, it represents
+   * all the fields that are selected on the child selection set - the same
+   * response key might be represented multiple times for polymorphic fields.
+   */
+  childFieldDigests: null | FieldDigest[];
 }
 
 interface PrefetchConfig {
@@ -545,14 +552,84 @@ export class Aether<
     // Log the plan now we're all done
     this.logPlansByPath("after optimization and finalization");
 
-    this.preparePrefetches();
-
     this.phase = "ready";
+
+    this.walkFinalizedPlans();
+    this.preparePrefetches();
+  }
+
+  /**
+   * Now that the plans are finalized, we can walk them and cache certain
+   * useful information:
+   *
+   * - the full (recursive) list of dependencies
+   * - the path between plans
+   * - etc
+   */
+  private walkFinalizedPlans() {
+    this.processPlans("walking", "dependencies-first", (plan) => {
+      for (const depId of plan.dependencies) {
+        // id may have changed, so get this plan
+        const dep = this.dangerouslyGetPlan(depId);
+        plan._recursiveDependencyIds.add(dep.id);
+        for (const depdep of dep._recursiveDependencyIds) {
+          plan._recursiveDependencyIds.add(depdep);
+        }
+      }
+      return plan;
+    });
   }
 
   private preparePrefetches() {
-    for (const pathIdentity in this.fieldDigestByPathIdentity) {
+    for (const [pathIdentity, fieldDigest] of Object.entries(
+      this.fieldDigestByPathIdentity,
+    )) {
       this.prefetchesForPathIdentity[pathIdentity] = Object.create(null);
+      if (fieldDigest.isPolymorphic) {
+        // More than one match for each responseKey; may need special handling
+        continue;
+      }
+      const itemPlan = this.dangerouslyGetPlan(fieldDigest.itemPlanId);
+      if (fieldDigest.childFieldDigests) {
+        for (const childFieldDigest of fieldDigest.childFieldDigests) {
+          const childPlan = this.dangerouslyGetPlan(childFieldDigest.planId);
+          const childItemPlan = this.dangerouslyGetPlan(
+            childFieldDigest.itemPlanId,
+          );
+
+          // Only prefetch plans in the same group
+          if (
+            !planGroupsOverlap(itemPlan, childPlan) ||
+            !planGroupsOverlap(itemPlan, childItemPlan)
+          ) {
+            continue;
+          }
+
+          // Don't prefetch async/side-effect plans
+          // Find all the planIds that itemPlan won't already have executed
+          const intermediatePlanIds = [
+            ...childItemPlan._recursiveDependencyIds.values(),
+          ].filter((id) => !itemPlan._recursiveDependencyIds.has(id));
+          const intermediatePlans = intermediatePlanIds.map((id) =>
+            this.dangerouslyGetPlan(id),
+          );
+          if (
+            !intermediatePlans.every(
+              (plan) => plan.sync && !plan.hasSideEffects,
+            )
+          ) {
+            continue;
+          }
+
+          this.prefetchesForPathIdentity[pathIdentity][
+            childFieldDigest.responseKey
+          ] = {
+            fieldDigest: childFieldDigest,
+            plan: childPlan,
+            itemPlan: childItemPlan,
+          };
+        }
+      }
     }
   }
 
@@ -678,7 +755,7 @@ export class Aether<
       );
       this.subscriptionItemPlanId = streamItemPlan.id;
       this.finalizeArgumentsSince(0, ROOT_PATH);
-      this.planSelectionSet(
+      const { fieldDigests } = this.planSelectionSet(
         nestedParentPathIdentity,
         nestedParentPathIdentity,
         streamItemPlan,
@@ -691,11 +768,17 @@ export class Aether<
         ],
         this.rootTreeNode,
       );
+      assert.strictEqual(
+        fieldDigests.length,
+        1,
+        "Expected exactly one subscription field",
+      );
+      this.fieldDigestByPathIdentity[ROOT_PATH] = fieldDigests[0];
     } else {
       const subscribePlan = this.trackedRootValuePlan;
       this.subscriptionPlanId = subscribePlan.id;
       this.finalizeArgumentsSince(0, ROOT_PATH);
-      this.planSelectionSet(
+      const { fieldDigests } = this.planSelectionSet(
         ROOT_PATH,
         ROOT_PATH,
         subscribePlan,
@@ -708,6 +791,12 @@ export class Aether<
         ],
         this.rootTreeNode,
       );
+      assert.strictEqual(
+        fieldDigests.length,
+        1,
+        "Expected exactly one subscription field",
+      );
+      this.fieldDigestByPathIdentity[ROOT_PATH] = fieldDigests[0];
     }
   }
 
@@ -723,7 +812,7 @@ export class Aether<
     groupedSelectionsList: GroupedSelections[],
     parentTreeNode: TreeNode,
     isMutation = false,
-  ): { responseKeys: string[] } {
+  ): { fieldDigests: FieldDigest[] } {
     assertObjectType(objectType);
     const groupedFieldSet = graphqlCollectFields(
       this,
@@ -732,6 +821,7 @@ export class Aether<
       isMutation,
     );
     const objectTypeFields = objectType.getFields();
+    const fieldDigests: FieldDigest[] = [];
     for (const [responseKey, fieldAndGroups] of groupedFieldSet.entries()) {
       const pathIdentity = `${path}>${objectType.name}.${responseKey}`;
       if (
@@ -989,7 +1079,7 @@ export class Aether<
 
       // Now we're building the child plans, the parentPathIdentity becomes
       // actually our identity.
-      const { itemPlan, listDepth, childResponseKeys } =
+      const { itemPlan, listDepth, childFieldDigests } =
         this.planFieldReturnType(
           fieldType,
           fieldAndGroups,
@@ -1009,8 +1099,9 @@ export class Aether<
         assertObjectType(namedReturnType);
       }
 
-      this.fieldDigestByPathIdentity[pathIdentity] = {
+      const fieldDigest: FieldDigest = {
         pathIdentity,
+        responseKey,
         returnType: fieldType,
         namedReturnType: namedReturnType,
         returnRaw,
@@ -1019,11 +1110,13 @@ export class Aether<
         planId: plan.id,
         itemPlanId: itemPlan.id,
         listDepth,
-        childResponseKeys,
+        childFieldDigests,
       };
+      this.fieldDigestByPathIdentity[pathIdentity] = fieldDigest;
+      fieldDigests.push(fieldDigest);
     }
 
-    return { responseKeys: [...groupedFieldSet.keys()] };
+    return { fieldDigests };
   }
 
   private finalizeArgumentsSince(
@@ -1101,7 +1194,7 @@ export class Aether<
   ): {
     listDepth: number;
     itemPlan: ExecutablePlan<any>;
-    childResponseKeys: string[] | null;
+    childFieldDigests: FieldDigest[] | null;
   } {
     if (isDev) {
       assert.strictEqual(
@@ -1196,7 +1289,7 @@ export class Aether<
       aether: this,
       parentPathIdentity: pathIdentity,
     }) as <T>(cb: () => T) => T;
-    let childResponseKeys: string[] | null;
+    let childFieldDigests: FieldDigest[] | null;
     if (
       fieldType instanceof GraphQLObjectType ||
       fieldType instanceof GraphQLInterfaceType ||
@@ -1231,7 +1324,7 @@ export class Aether<
         this.pathIdentityByParentPathIdentity[fieldPathIdentity][
           fieldType.name
         ] = {};
-        const { responseKeys } = this.planSelectionSet(
+        const { fieldDigests } = this.planSelectionSet(
           pathIdentity,
           fieldPathIdentity,
           plan,
@@ -1240,11 +1333,11 @@ export class Aether<
           treeNode,
           false,
         );
-        childResponseKeys = responseKeys;
+        childFieldDigests = fieldDigests;
       } else {
         assertPolymorphicPlan(plan, pathIdentity);
         const polymorphicPlan = plan;
-        const responseKeysSet = new Set<string>();
+        const fieldDigestsSet = new Set<FieldDigest>();
         const planPossibleObjectTypes = (
           possibleObjectTypes: readonly GraphQLObjectType[],
         ): void => {
@@ -1271,7 +1364,7 @@ export class Aether<
               possibleObjectType.name
             ] = {};
 
-            const { responseKeys: localResponseKeys } = this.planSelectionSet(
+            const { fieldDigests: localFieldDigests } = this.planSelectionSet(
               pathIdentity,
               fieldPathIdentity,
               subPlan,
@@ -1280,8 +1373,8 @@ export class Aether<
               treeNode,
               false,
             );
-            for (const key of localResponseKeys) {
-              responseKeysSet.add(key);
+            for (const localFieldDigest of localFieldDigests) {
+              fieldDigestsSet.add(localFieldDigest);
             }
           }
         };
@@ -1328,19 +1421,19 @@ export class Aether<
             /*@__INLINE__*/ planPossibleObjectTypes(possibleObjectTypes);
           }
         }
-        childResponseKeys = [...responseKeysSet.values()];
+        childFieldDigests = [...fieldDigestsSet.values()];
       }
     } else if (fieldType instanceof GraphQLScalarType) {
       const scalarPlanResolver = fieldType.extensions?.graphile?.plan;
       if (typeof scalarPlanResolver === "function") {
         plan = wgs(() => scalarPlanResolver(plan, { schema: this.schema }));
       }
-      childResponseKeys = null;
+      childFieldDigests = null;
     } else {
       // Enum?
-      childResponseKeys = null;
+      childFieldDigests = null;
     }
-    return { listDepth, itemPlan: plan, childResponseKeys };
+    return { listDepth, itemPlan: plan, childFieldDigests };
   }
 
   /**
