@@ -95,8 +95,9 @@ function makeParentCrystalObject(
   batch: Batch,
   info: GraphQLResolveInfo,
   pathIdentity: string,
-  parentObject: any,
+  source: object | null | undefined,
 ): CrystalObject {
+  const parentObject: object | CrystalObject = source ?? ROOT_VALUE_OBJECT;
   const { path } = info;
   // TODO: we're not actually using id below
   const crystalContext = batch.crystalContext;
@@ -194,8 +195,6 @@ function crystalWrapResolveOrSubscribe<
       context,
       info,
     ) {
-      const parentObject: Exclude<TSource, null | undefined> | CrystalObject =
-        source ?? ROOT_VALUE_OBJECT;
       let possiblyParentCrystalObject: CrystalObject | null = null;
 
       // Note: for the most optimal execution, `rootValue` passed to graphql
@@ -205,11 +204,11 @@ function crystalWrapResolveOrSubscribe<
       // `rootValue`s for multiple parallel executions (must be within the same
       // aether) - e.g. as a result of multiple identical subscription
       // operations.
-      if (isCrystalObject(parentObject)) {
+      if (isCrystalObject(source)) {
         const fieldAlias = info.path.key;
-        if (fieldAlias in parentObject[$$data]) {
+        if (fieldAlias in source[$$data]) {
           // Short-circuit execution - we already have results
-          const result = parentObject[$$data][fieldAlias];
+          const result = source[$$data][fieldAlias];
           if (userSpecifiedResolver != null) {
             return userSpecifiedResolver(result, argumentValues, context, info);
             // NOTE: this cannot occur if the field is unplanned, so no need to handle that
@@ -217,7 +216,7 @@ function crystalWrapResolveOrSubscribe<
             return result;
           }
         }
-        possiblyParentCrystalObject = parentObject;
+        possiblyParentCrystalObject = source;
       }
 
       const aether = possiblyParentCrystalObject
@@ -247,7 +246,7 @@ function crystalWrapResolveOrSubscribe<
         );
       const parentCrystalObject =
         possiblyParentCrystalObject ??
-        makeParentCrystalObject(batch, info, pathIdentity, parentObject);
+        makeParentCrystalObject(batch, info, pathIdentity, source);
       const resultPromise = getBatchResult(batch, parentCrystalObject);
       /* 👆👆👆👆👆 NO AWAIT ALLOWED ABOVE HERE 👆👆👆👆👆 */
 

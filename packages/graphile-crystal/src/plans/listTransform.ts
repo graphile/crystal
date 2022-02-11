@@ -58,7 +58,7 @@ export class __ListTransformPlan<
     moduleName: "graphile-crystal",
     exportName: "__ListTransformPlan",
   };
-  sync = false;
+  sync = true;
 
   private listPlanId: number;
   public itemPlanCallback: ListTransformItemPlanCallback<TListPlan, TDepsPlan>;

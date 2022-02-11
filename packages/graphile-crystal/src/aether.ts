@@ -67,10 +67,10 @@ import type {
   PromiseOrDirect,
   TrackedArguments,
 } from "./interfaces";
-import { $$data } from "./interfaces";
 import {
   $$concreteType,
   $$crystalContext,
+  $$data,
   $$isCrystalLayerObject,
   $$planResults,
 } from "./interfaces";
@@ -210,6 +210,7 @@ function assertPolymorphicPlan(
 }
 
 interface FieldDigest {
+  parentFieldDigest: FieldDigest | null;
   pathIdentity: string;
   responseKey: string;
   returnType: GraphQLOutputType;
@@ -589,9 +590,15 @@ export class Aether<
         // More than one match for each responseKey; may need special handling
         continue;
       }
+      if (this.isUnplannedByPathIdentity[pathIdentity]) {
+        continue;
+      }
       const itemPlan = this.dangerouslyGetPlan(fieldDigest.itemPlanId);
       if (fieldDigest.childFieldDigests) {
         for (const childFieldDigest of fieldDigest.childFieldDigests) {
+          if (this.isUnplannedByPathIdentity[childFieldDigest.pathIdentity]) {
+            continue;
+          }
           const childPlan = this.dangerouslyGetPlan(childFieldDigest.planId);
           const childItemPlan = this.dangerouslyGetPlan(
             childFieldDigest.itemPlanId,
@@ -605,19 +612,36 @@ export class Aether<
             continue;
           }
 
+          // Find all the plans that should already have been executed by now (i.e. have been executed by parent fields)
+          const executedPlanIds = new Set<number>();
+          let ancestorFieldDigest: FieldDigest | null = fieldDigest;
+          while (ancestorFieldDigest) {
+            if (
+              this.isUnplannedByPathIdentity[ancestorFieldDigest.pathIdentity]
+            ) {
+              break;
+            }
+            const ancestorItemPlan = this.dangerouslyGetPlan(
+              ancestorFieldDigest.itemPlanId,
+            );
+            for (const id of ancestorItemPlan._recursiveDependencyIds) {
+              executedPlanIds.add(id);
+            }
+            ancestorFieldDigest = ancestorFieldDigest.parentFieldDigest;
+          }
+
           // Don't prefetch async/side-effect plans
           // Find all the planIds that itemPlan won't already have executed
           const intermediatePlanIds = [
             ...childItemPlan._recursiveDependencyIds.values(),
-          ].filter((id) => !itemPlan._recursiveDependencyIds.has(id));
+          ].filter((id) => !executedPlanIds.has(id));
           const intermediatePlans = intermediatePlanIds.map((id) =>
             this.dangerouslyGetPlan(id),
           );
-          if (
-            !intermediatePlans.every(
-              (plan) => plan.sync && !plan.hasSideEffects,
-            )
-          ) {
+          const asyncOrSideEffectPlans = intermediatePlans.filter(
+            (plan) => !plan.sync || plan.hasSideEffects,
+          );
+          if (asyncOrSideEffectPlans.length > 0) {
             continue;
           }
 
@@ -1100,6 +1124,7 @@ export class Aether<
       }
 
       const fieldDigest: FieldDigest = {
+        parentFieldDigest: null,
         pathIdentity,
         responseKey,
         returnType: fieldType,
@@ -1112,6 +1137,12 @@ export class Aether<
         listDepth,
         childFieldDigests,
       };
+      if (childFieldDigests) {
+        childFieldDigests.forEach((child) => {
+          child.parentFieldDigest = fieldDigest;
+        });
+      }
+
       this.fieldDigestByPathIdentity[pathIdentity] = fieldDigest;
       fieldDigests.push(fieldDigest);
     }
@@ -1145,9 +1176,17 @@ export class Aether<
             parentPathIdentity: nestedParentPathIdentity,
           }) as <T>(cb: () => T) => T;
           const itemPlan = wgs(() => {
-            const __listItem = new __ItemPlan(listPlan);
-            const listItem = listPlan.listItem?.(__listItem) ?? __listItem;
-            return newPlan.itemPlanCallback(listItem);
+            const $__listItem = new __ItemPlan(listPlan);
+            const $listItem = listPlan.listItem?.($__listItem) ?? $__listItem;
+            const $newListItem = newPlan.itemPlanCallback($listItem);
+            if (
+              newPlan.sync &&
+              (!$__listItem.sync || !$listItem.sync || !$newListItem.sync)
+            ) {
+              // TODO: log this deopt?
+              newPlan.sync = false;
+            }
+            return $newListItem;
           });
 
           // For logging only
