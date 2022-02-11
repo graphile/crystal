@@ -267,7 +267,8 @@ ${duration}
     return this._executeWithOrWithoutCache<TInput, TOutput>(
       values,
       common,
-      this.cache,
+      // TODO: use `this.cache` instead; but we need to make the cache bustable first!
+      new Map(),
     );
   }
 
