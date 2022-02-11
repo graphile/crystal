@@ -212,6 +212,7 @@ function assertPolymorphicPlan(
 interface FieldDigest {
   parentFieldDigest: FieldDigest | null;
   pathIdentity: string;
+  itemPathIdentity: string;
   responseKey: string;
   returnType: GraphQLOutputType;
   namedReturnType: GraphQLNamedType & GraphQLOutputType;
@@ -370,7 +371,8 @@ export class Aether<
    */
   public readonly prefetchesForPathIdentity: {
     [pathIdentity: string]: {
-      [fieldAlias: string]: PrefetchConfig;
+      local: ExecutablePlan[];
+      children: PrefetchConfig[];
     };
   } = Object.create(null);
 
@@ -656,7 +658,10 @@ export class Aether<
     for (const [pathIdentity, fieldDigest] of Object.entries(
       this.fieldDigestByPathIdentity,
     )) {
-      this.prefetchesForPathIdentity[pathIdentity] = Object.create(null);
+      this.prefetchesForPathIdentity[pathIdentity] = Object.assign(
+        Object.create(null),
+        { local: [], children: [] },
+      );
       if (fieldDigest.isPolymorphic) {
         // More than one match for each responseKey; may need special handling
         continue;
@@ -665,6 +670,47 @@ export class Aether<
         continue;
       }
       const itemPlan = this.dangerouslyGetPlan(fieldDigest.itemPlanId);
+
+      // Find all the plans that should already have been executed by now (i.e. have been executed by parent fields)
+      const executedPlanIds = new Set<number>();
+      let ancestorFieldDigest: FieldDigest | null = fieldDigest;
+      while (ancestorFieldDigest) {
+        if (this.isUnplannedByPathIdentity[ancestorFieldDigest.pathIdentity]) {
+          break;
+        }
+        const ancestorItemPlan = this.dangerouslyGetPlan(
+          ancestorFieldDigest.itemPlanId,
+        );
+        for (const id of ancestorItemPlan._recursiveDependencyIds) {
+          executedPlanIds.add(id);
+        }
+        ancestorFieldDigest = ancestorFieldDigest.parentFieldDigest;
+      }
+
+      /*
+       * Sometimes there's plans that are defined at this level but they aren't
+       * needed to be executed until later - for example a connection field
+       * typically doesn't actually _do_ anything, it's the `edges` or
+       * `pageInfo` child fields that do the work.
+       *
+       * In order for us to benefit from the synchronous optimizations in the
+       * resolver we want to pull these executions up to this level so that the
+       * children can resolve synchronously.
+       */
+      const plansAtThisLevel = this.plans.filter(
+        (p) =>
+          p != null &&
+          p.commonAncestorPathIdentity === fieldDigest.itemPathIdentity &&
+          !executedPlanIds.has(p.id),
+      );
+      if (plansAtThisLevel.length) {
+        for (const plan of plansAtThisLevel) {
+          this.prefetchesForPathIdentity[pathIdentity].local.push(plan);
+          executedPlanIds.add(plan.id);
+        }
+      }
+
+      // Now look at the children that we can maybe run ahead of time.
       if (fieldDigest.childFieldDigests) {
         for (const childFieldDigest of fieldDigest.childFieldDigests) {
           if (this.isUnplannedByPathIdentity[childFieldDigest.pathIdentity]) {
@@ -683,24 +729,6 @@ export class Aether<
             continue;
           }
 
-          // Find all the plans that should already have been executed by now (i.e. have been executed by parent fields)
-          const executedPlanIds = new Set<number>();
-          let ancestorFieldDigest: FieldDigest | null = fieldDigest;
-          while (ancestorFieldDigest) {
-            if (
-              this.isUnplannedByPathIdentity[ancestorFieldDigest.pathIdentity]
-            ) {
-              break;
-            }
-            const ancestorItemPlan = this.dangerouslyGetPlan(
-              ancestorFieldDigest.itemPlanId,
-            );
-            for (const id of ancestorItemPlan._recursiveDependencyIds) {
-              executedPlanIds.add(id);
-            }
-            ancestorFieldDigest = ancestorFieldDigest.parentFieldDigest;
-          }
-
           // Don't prefetch async/side-effect plans
           // Find all the planIds that itemPlan won't already have executed
           const intermediatePlanIds = [
@@ -716,13 +744,11 @@ export class Aether<
             continue;
           }
 
-          this.prefetchesForPathIdentity[pathIdentity][
-            childFieldDigest.responseKey
-          ] = {
+          this.prefetchesForPathIdentity[pathIdentity].children.push({
             fieldDigest: childFieldDigest,
             plan: childPlan,
             itemPlan: childItemPlan,
-          };
+          });
         }
       }
     }
@@ -1174,7 +1200,7 @@ export class Aether<
 
       // Now we're building the child plans, the parentPathIdentity becomes
       // actually our identity.
-      const { itemPlan, listDepth, childFieldDigests } =
+      const { itemPlan, listDepth, childFieldDigests, itemPathIdentity } =
         this.planFieldReturnType(
           fieldType,
           fieldAndGroups,
@@ -1197,6 +1223,7 @@ export class Aether<
       const fieldDigest: FieldDigest = {
         parentFieldDigest: null,
         pathIdentity,
+        itemPathIdentity,
         responseKey,
         returnType: fieldType,
         namedReturnType: namedReturnType,
@@ -1305,6 +1332,7 @@ export class Aether<
     listDepth: number;
     itemPlan: ExecutablePlan<any>;
     childFieldDigests: FieldDigest[] | null;
+    itemPathIdentity: string;
   } {
     if (isDev) {
       assert.strictEqual(
@@ -1543,7 +1571,12 @@ export class Aether<
       // Enum?
       childFieldDigests = null;
     }
-    return { listDepth, itemPlan: plan, childFieldDigests };
+    return {
+      listDepth,
+      itemPlan: plan,
+      childFieldDigests,
+      itemPathIdentity: pathIdentity,
+    };
   }
 
   /**
@@ -3945,6 +3978,7 @@ export class Aether<
     plan: ExecutablePlan,
     itemPlan: ExecutablePlan,
     crystalLayerObjects: CrystalLayerObject[],
+    allowPrefetch = true,
   ) {
     const { isPolymorphic, isLeaf, namedReturnType, returnRaw } = fieldDigest;
     const crystalObjectFromCrystalLayerObjectAndTypeName = (
@@ -4014,11 +4048,24 @@ export class Aether<
       itemPlan,
       mapResult,
     );
-    if (!returnRaw) {
+    if (!returnRaw && allowPrefetch) {
       // chance to do pre-execution of next layers!
-      for (const [fieldAlias, config] of Object.entries(
-        this.prefetchesForPathIdentity[pathIdentity],
-      )) {
+      for (const localPlan of this.prefetchesForPathIdentity[pathIdentity]
+        .local) {
+        const subResults = await this.executeBatchForCLOs(
+          crystalContext,
+          fieldDigest.itemPathIdentity,
+          fieldDigest,
+          EMPTY_ARRAY,
+          localPlan,
+          localPlan,
+          resultCrystalLayerObjects,
+          false,
+        );
+      }
+
+      for (const config of this.prefetchesForPathIdentity[pathIdentity]
+        .children) {
         const fieldDigest = config.fieldDigest;
         const subResults = await this.executeBatchForCLOs(
           crystalContext,
@@ -4029,8 +4076,9 @@ export class Aether<
           config.itemPlan,
           resultCrystalLayerObjects,
         );
+        const responseKey = config.fieldDigest.responseKey;
         for (let i = 0, l = resultCrystalObjects.length; i < l; i++) {
-          resultCrystalObjects[i][$$data][fieldAlias] = subResults[i];
+          resultCrystalObjects[i][$$data][responseKey] = subResults[i];
         }
       }
     }
