@@ -655,9 +655,13 @@ export class Aether<
   }
 
   private preparePrefetches() {
-    for (const [pathIdentity, fieldDigest] of Object.entries(
-      this.fieldDigestByPathIdentity,
-    )) {
+    // Work through all the path identities, making sure that parents are
+    // processed before children.
+    const pathIdentities = Object.keys(this.fieldDigestByPathIdentity).sort(
+      (a, z) => a.length - z.length,
+    );
+    for (const pathIdentity of pathIdentities) {
+      const fieldDigest = this.fieldDigestByPathIdentity[pathIdentity];
       this.prefetchesForPathIdentity[pathIdentity] = Object.assign(
         Object.create(null),
         { local: [], children: [] },
@@ -683,6 +687,11 @@ export class Aether<
         );
         for (const id of ancestorItemPlan._recursiveDependencyIds) {
           executedPlanIds.add(id);
+        }
+        const prefetchConfig =
+          this.prefetchesForPathIdentity[ancestorFieldDigest.pathIdentity];
+        for (const localPlan of prefetchConfig.local) {
+          executedPlanIds.add(localPlan.id);
         }
         ancestorFieldDigest = ancestorFieldDigest.parentFieldDigest;
       }
