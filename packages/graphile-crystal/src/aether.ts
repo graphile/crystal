@@ -112,7 +112,7 @@ import {
 } from "./utils";
 
 interface PlanCacheForCLOs {
-  [planId: number]: any[];
+  [planId: number]: PromiseOrDirect<any[]>;
 }
 
 function NOOP() {}
@@ -2463,7 +2463,11 @@ export class Aether<
     planResultses: ReadonlyArray<null | PlanResults>,
     visitedPlans = new Set<ExecutablePlan>(),
     depth = 0,
+    planCacheForCLOs: PlanCacheForCLOs = Object.create(null),
   ): PromiseOrDirect<any[]> {
+    if (String(plan.id) in planCacheForCLOs) {
+      return planCacheForCLOs[plan.id];
+    }
     let timeString: string | null = null;
     if (debugExecute.enabled) {
       timeString = `plan\t${this.counter++}\t${plan}`;
@@ -2475,12 +2479,14 @@ export class Aether<
       planResultses,
       visitedPlans,
       depth,
+      planCacheForCLOs,
     );
     if (timeString) {
       Promise.resolve(result).then(() => {
         console.timeEnd(timeString!);
       });
     }
+    planCacheForCLOs[plan.id] = result;
 
     return result;
   }
@@ -2496,6 +2502,7 @@ export class Aether<
     planResultses: ReadonlyArray<null | PlanResults>,
     visitedPlans = new Set<ExecutablePlan>(),
     depth = 0,
+    planCacheForPlanResultses: PlanCacheForCLOs = Object.create(null),
   ): PromiseOrDirect<any[]> {
     const indent = "    ".repeat(depth);
     const follow = indent + "  ⮞";
@@ -2644,6 +2651,10 @@ export class Aether<
     const pendingPlanResultses = pendingPlanResultsAndIndexListList.map(
       (list) => list[0].planResults,
     );
+    const planCacheForPendingPlanResultses =
+      pendingPlanResultses.length === planResultses.length
+        ? planCacheForPlanResultses
+        : Object.create(null);
 
     // For each dependency of plan, get the results
     const dependenciesCount = plan.dependencies.length;
@@ -2682,6 +2693,7 @@ export class Aether<
           // cascade back outside -> clone.
           new Set(visitedPlans),
           depth + 1,
+          planCacheForPendingPlanResultses,
         );
         if (isPromiseLike(allDependencyResultsOrPromise)) {
           dependencyPromises.push({
@@ -2921,13 +2933,14 @@ export class Aether<
 
       // Plan's not synchronous
 
-      // TODO: this is a hack! Use the new execution algorithm.
+      // TODO: this is a hack! We should write the new execution algorithm...
       return this.executePlanOld(
         plan,
         crystalContext,
         planResultses,
         visitedPlans,
         depth,
+        planCacheForPlanResultses,
       );
     };
 
@@ -2955,6 +2968,7 @@ export class Aether<
     planResultses: ReadonlyArray<null | PlanResults>,
     visitedPlans = new Set<ExecutablePlan>(),
     depth = 0,
+    planCacheForPlanResultses: PlanCacheForCLOs = Object.create(null),
   ): PromiseOrDirect<any[]> {
     const indent = "    ".repeat(depth);
     const follow = indent + "  ⮞";
@@ -3064,6 +3078,11 @@ export class Aether<
       return result;
     }
 
+    const planCacheForPendingPlanResultses =
+      pendingPlanResultsesLength === planResultsesLength
+        ? planCacheForPlanResultses
+        : Object.create(null);
+
     const pendingResultsPromise =
       pendingPlanResultsesLength > 0
         ? this.executePlanPending(
@@ -3072,6 +3091,7 @@ export class Aether<
             pendingPlanResultses,
             visitedPlans,
             depth,
+            planCacheForPendingPlanResultses,
           )
         : Promise.resolve([]);
 
@@ -3149,6 +3169,7 @@ export class Aether<
     pendingPlanResultses: ReadonlyArray<PlanResults>,
     visitedPlans: Set<ExecutablePlan>,
     depth: number,
+    planCacheForCLOs: PlanCacheForCLOs,
   ): Promise<any[]> {
     const indent = "    ".repeat(depth);
     const follow = indent + "  ⮞";
@@ -3224,6 +3245,10 @@ export class Aether<
         realPendingPlanResultsesLength++;
       }
     }
+    const planCacheForRealPendingPlanResultses =
+      realPendingPlanResultses.length === pendingPlanResultses.length
+        ? planCacheForCLOs
+        : Object.create(null);
 
     // TODO: optimize this away
     realPendingPlanResultses.reverse();
@@ -3253,6 +3278,7 @@ export class Aether<
               crystalContext,
               realPendingPlanResultses,
               visitedPlans,
+              planCacheForRealPendingPlanResultses,
             )
           : isSubscribe || planOptions?.stream
           ? await (plan as unknown as StreamablePlan<unknown>).stream(
@@ -3334,6 +3360,7 @@ export class Aether<
     crystalContext: CrystalContext,
     planResultses: readonly PlanResults[],
     visitedPlans: Set<ExecutablePlan>,
+    planCacheForCLOs: PlanCacheForCLOs,
   ) {
     const itemPlanId = this.transformDependencyPlanIdByTransformPlanId[plan.id];
     const itemPlan = this.dangerouslyGetPlan(itemPlanId);
@@ -3358,6 +3385,7 @@ export class Aether<
       itemPlan.parentPathIdentity,
       listPlan,
       itemPlan,
+      planCacheForCLOs, // TODO: can we cache this?
     );
     const listResults = await this.executePlan(
       listPlan,
@@ -3365,6 +3393,7 @@ export class Aether<
       planResultses,
       visitedPlans,
       depth, // TODO: should depth be incremented?
+      planCacheForCLOs,
     );
     return listResults.map((list: any, listIndex: number) => {
       if (list == null) {
@@ -3634,8 +3663,8 @@ export class Aether<
     // Even when AsyncIterators are involved, this will always be a concrete array
     crystalLayerObjects: ReadonlyArray<CrystalLayerObject | null>,
     rawMapResult: MapResult | undefined,
+    planCacheForCLOs: PlanCacheForCLOs,
     depth = 0,
-    planCacheForCLOs: PlanCacheForCLOs = Object.create(null),
   ): Promise<any[]> {
     const crystalLayerObjectsLength = crystalLayerObjects.length;
     if (crystalLayerObjectsLength === 0) {
@@ -3776,8 +3805,8 @@ export class Aether<
                         // TODO: batch this over a tick?
                         [newCLO],
                         rawMapResult,
-                        depth + 1,
                         Object.create(null),
+                        depth + 1,
                       )
                     )[0];
                 return { done, value };
@@ -3829,8 +3858,8 @@ export class Aether<
           rest,
           pendingCLOs,
           rawMapResult,
-          depth + 1,
           planCacheForPendingCLOs,
+          depth + 1,
         );
         for (let j = 0; j < l; j++) {
           const [cloIndex, innerCLOIndex] = pendingCLOIndexes[j];
@@ -3840,19 +3869,16 @@ export class Aether<
       return layerResults;
     } else {
       // Execute the plan with the same crystalLayerObjects
-      const haveCachedResult = String(layerPlan.id) in planCacheForCLOs;
-      const layerResults = haveCachedResult
-        ? planCacheForCLOs[layerPlan.id]
-        : await this.executePlan(
-            layerPlan,
-            crystalContext,
-            crystalLayerObjects.map((clo) =>
-              clo == null ? null : clo.planResults,
-            ),
-          );
-      if (!haveCachedResult) {
-        planCacheForCLOs[layerPlan.id] = layerResults;
-      }
+      const layerResults = await this.executePlan(
+        layerPlan,
+        crystalContext,
+        crystalLayerObjects.map((clo) =>
+          clo == null ? null : clo.planResults,
+        ),
+        new Set(),
+        0,
+        planCacheForCLOs,
+      );
       if (isDev) {
         assert.ok(
           Array.isArray(layerResults),
@@ -3905,8 +3931,8 @@ export class Aether<
               rest,
               pendingCrystalLayerObjects,
               rawMapResult,
-              depth + 1,
               planCacheForCLOs,
+              depth + 1,
             );
             if (isDev) {
               assert.ok(
@@ -4077,8 +4103,8 @@ export class Aether<
       pathIdentity,
       plan,
       itemPlan,
-      mapResult,
       planCacheForCLOs,
+      mapResult,
     );
     if (!returnRaw && allowPrefetch) {
       // chance to do pre-execution of next layers!
@@ -4127,8 +4153,8 @@ export class Aether<
     pathIdentity: string,
     plan: ExecutablePlan,
     itemPlan: ExecutablePlan,
+    planCacheForCLOs: PlanCacheForCLOs,
     mapResult: MapResult | undefined = undefined,
-    planCacheForCLOs: PlanCacheForCLOs = Object.create(null),
   ) {
     assert.ok(plan, "No plan in batch?!");
     assert.ok(itemPlan, "No itemPlan in batch?!");
@@ -4154,8 +4180,8 @@ export class Aether<
       layers,
       crystalLayerObjects,
       mapResult,
-      0,
       planCacheForCLOs,
+      0,
     );
   }
 
