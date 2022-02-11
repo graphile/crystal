@@ -2324,6 +2324,8 @@ export class Aether<
     const hasDependencies = dependenciesCount > 0;
     const dependencyValuesList = hasDependencies
       ? new Array(dependenciesCount)
+      : plan.hasSideEffects
+      ? [new Array(pendingPlanResultses.length).fill(undefined)]
       : [[undefined]];
     const dependencyPromises: Array<{
       promise: PromiseOrDirect<any[]>;
@@ -2560,7 +2562,7 @@ export class Aether<
           let first = true;
           const value =
             crystalError ??
-            (hasDependencies
+            (hasDependencies || plan.hasSideEffects
               ? executionResults![executableIndex]
               : executionResults![0]);
           for (const item of list) {
@@ -2830,6 +2832,8 @@ export class Aether<
     const hasDependencies = dependenciesCount > 0;
     const dependencyValuesList = hasDependencies
       ? new Array(dependenciesCount)
+      : plan.hasSideEffects
+      ? [new Array(pendingPlanResultses.length).fill(undefined)]
       : [[undefined]];
     debugExecute("%s Executing %o dependencies", follow, dependenciesCount);
 
@@ -2960,7 +2964,9 @@ export class Aether<
         // This could be a Promise, an AsyncIterable, a Promise to an
         // AsyncIterable, or arbitrary data (including an array).
         const rawPendingResult =
-          hasDependencies || plan instanceof __ListTransformPlan
+          hasDependencies ||
+          plan instanceof __ListTransformPlan ||
+          plan.hasSideEffects
             ? pendingResults[i]
             : pendingResults[0];
 
