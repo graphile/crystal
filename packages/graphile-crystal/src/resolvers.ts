@@ -14,6 +14,7 @@ import type { Deferred } from "./deferred";
 import { defer } from "./deferred";
 import { establishAether } from "./establishAether";
 import type { Batch, CrystalContext, CrystalObject } from "./interfaces";
+import { $$data } from "./interfaces";
 import {
   $$concreteType,
   $$crystalContext,
@@ -205,6 +206,11 @@ function crystalWrapResolveOrSubscribe<
       // aether) - e.g. as a result of multiple identical subscription
       // operations.
       if (isCrystalObject(parentObject)) {
+        const fieldAlias = info.path.key;
+        if (fieldAlias in parentObject[$$data]) {
+          // Short-circuit execution - we already have results
+          return parentObject[$$data][fieldAlias];
+        }
         possiblyParentCrystalObject = parentObject;
       }
 
@@ -347,6 +353,7 @@ export function newCrystalObject(
     [$$pathIdentity]: pathIdentity,
     [$$concreteType]: typeName,
     [$$id]: id,
+    [$$data]: Object.create(null),
     [$$planResults]: planResults,
     [$$crystalContext]: crystalContext,
     toString: crystalObjectToString,

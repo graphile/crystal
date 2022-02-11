@@ -73,6 +73,7 @@ declare module "graphql" {
 export const $$crystalContext = Symbol("context");
 export const $$planResults = Symbol("planResults");
 export const $$id = Symbol("id");
+export const $$data = Symbol("data");
 export const $$pathIdentity = Symbol("pathIdentity");
 
 export const $$concreteType = Symbol("concreteType");
@@ -88,6 +89,9 @@ export interface IndexByListItemPlanId {
 // TODO: remove <TData>
 export interface CrystalObject {
   toString(): string;
+  [$$data]: {
+    [fieldAlias: string]: any;
+  };
   [$$id]: UniqueId;
   [$$pathIdentity]: string;
   [$$concreteType]: string;
