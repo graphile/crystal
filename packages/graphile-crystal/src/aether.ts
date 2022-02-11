@@ -690,8 +690,10 @@ export class Aether<
         }
         const prefetchConfig =
           this.prefetchesForPathIdentity[ancestorFieldDigest.pathIdentity];
-        for (const localPlan of prefetchConfig.local) {
-          executedPlanIds.add(localPlan.id);
+        if (prefetchConfig) {
+          for (const localPlan of prefetchConfig.local) {
+            executedPlanIds.add(localPlan.id);
+          }
         }
         ancestorFieldDigest = ancestorFieldDigest.parentFieldDigest;
       }
