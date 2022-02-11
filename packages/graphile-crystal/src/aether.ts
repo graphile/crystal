@@ -67,6 +67,7 @@ import type {
   PromiseOrDirect,
   TrackedArguments,
 } from "./interfaces";
+import { $$data } from "./interfaces";
 import {
   $$concreteType,
   $$crystalContext,
@@ -207,6 +208,24 @@ function assertPolymorphicPlan(
   );
 }
 
+interface FieldDigest {
+  pathIdentity: string;
+  returnType: GraphQLOutputType;
+  namedReturnType: GraphQLNamedType & GraphQLOutputType;
+  isPolymorphic: boolean;
+  listDepth: number;
+  returnRaw: boolean;
+  planId: number;
+  itemPlanId: number;
+  childResponseKeys: null | string[];
+}
+
+interface PrefetchConfig {
+  fieldDigest: FieldDigest;
+  plan: ExecutablePlan;
+  itemPlan: ExecutablePlan;
+}
+
 /**
  * Implements the `NewAether` algorithm.
  */
@@ -275,7 +294,7 @@ export class Aether<
         [fieldAlias: string]: string;
       };
     };
-  } = {};
+  } = Object.create(null);
 
   /**
    * Whereas `planIdByPathIdentity` references the plan that controls what a
@@ -300,6 +319,15 @@ export class Aether<
   public readonly returnRawValueByPathIdentity: {
     [fieldPathIdentity: string]: boolean;
   };
+
+  public readonly fieldDigestByPathIdentity: {
+    [pathIdentity: string]: FieldDigest;
+  } = Object.create(null);
+  public readonly prefetchesForPathIdentity: {
+    [pathIdentity: string]: {
+      [fieldAlias: string]: PrefetchConfig;
+    };
+  } = Object.create(null);
 
   /**
    * The field at each given path identity may be in one or more groups; these
@@ -516,7 +544,15 @@ export class Aether<
     // Log the plan now we're all done
     this.logPlansByPath("after optimization and finalization");
 
+    this.preparePrefetches();
+
     this.phase = "ready";
+  }
+
+  private preparePrefetches() {
+    for (const pathIdentity in this.fieldDigestByPathIdentity) {
+      this.prefetchesForPathIdentity[pathIdentity] = Object.create(null);
+    }
   }
 
   /**
@@ -686,7 +722,7 @@ export class Aether<
     groupedSelectionsList: GroupedSelections[],
     parentTreeNode: TreeNode,
     isMutation = false,
-  ): void {
+  ): { responseKeys: string[] } {
     assertObjectType(objectType);
     const groupedFieldSet = graphqlCollectFields(
       this,
@@ -952,18 +988,33 @@ export class Aether<
 
       // Now we're building the child plans, the parentPathIdentity becomes
       // actually our identity.
-      const itemPlan = this.planFieldReturnType(
-        fieldType,
-        fieldAndGroups,
-        pathIdentity,
-        pathIdentity,
-        plan,
-        treeNode,
-        returnRaw && !namedResultTypeIsLeaf,
-        namedResultTypeIsLeaf,
-      );
+      const { itemPlan, listDepth, childResponseKeys } =
+        this.planFieldReturnType(
+          fieldType,
+          fieldAndGroups,
+          pathIdentity,
+          pathIdentity,
+          plan,
+          treeNode,
+          returnRaw && !namedResultTypeIsLeaf,
+          namedResultTypeIsLeaf,
+        );
       this.itemPlanIdByFieldPathIdentity[pathIdentity] = itemPlan.id;
+
+      this.fieldDigestByPathIdentity[pathIdentity] = {
+        pathIdentity,
+        returnType: fieldType,
+        namedReturnType: namedResultType,
+        returnRaw,
+        isPolymorphic: isInterfaceType(fieldType) || isUnionType(fieldType),
+        planId: plan.id,
+        itemPlanId: itemPlan.id,
+        listDepth,
+        childResponseKeys,
+      };
     }
+
+    return { responseKeys: [...groupedFieldSet.keys()] };
   }
 
   private finalizeArgumentsSince(
@@ -1037,8 +1088,12 @@ export class Aether<
     treeNode: TreeNode,
     useValuePlan: boolean,
     isLeaf: boolean,
-    depth = 0,
-  ): ExecutablePlan<any> {
+    listDepth = 0,
+  ): {
+    listDepth: number;
+    itemPlan: ExecutablePlan<any>;
+    childResponseKeys: string[] | null;
+  } {
     if (isDev) {
       assert.strictEqual(
         isLeaf,
@@ -1058,7 +1113,7 @@ export class Aether<
         treeNode,
         useValuePlan,
         isLeaf,
-        depth,
+        listDepth,
       );
     } else if (fieldType instanceof GraphQLList) {
       const nestedParentPathIdentity = pathIdentity + "[]";
@@ -1082,9 +1137,9 @@ export class Aether<
         isListCapablePlan(plan)
           ? () =>
               (plan as ListCapablePlan<any>).listItem(
-                new __ItemPlan(plan, depth),
+                new __ItemPlan(plan, listDepth),
               )
-          : () => new __ItemPlan(plan, depth),
+          : () => new __ItemPlan(plan, listDepth),
       );
       this.finalizeArgumentsSince(oldPlansLength, nestedParentPathIdentity);
 
@@ -1098,7 +1153,7 @@ export class Aether<
         nestedTreeNode,
         useValuePlan,
         isLeaf,
-        depth + 1,
+        listDepth + 1,
       );
     } else if (useValuePlan) {
       // We don't do this check first because we need the TreeNode manipulation
@@ -1125,13 +1180,14 @@ export class Aether<
         treeNode,
         false,
         isLeaf,
-        depth,
+        listDepth,
       );
     }
     const wgs = withGlobalState.bind(null, {
       aether: this,
       parentPathIdentity: pathIdentity,
     }) as <T>(cb: () => T) => T;
+    let childResponseKeys: string[] | null;
     if (
       fieldType instanceof GraphQLObjectType ||
       fieldType instanceof GraphQLInterfaceType ||
@@ -1166,7 +1222,7 @@ export class Aether<
         this.pathIdentityByParentPathIdentity[fieldPathIdentity][
           fieldType.name
         ] = {};
-        this.planSelectionSet(
+        const { responseKeys } = this.planSelectionSet(
           pathIdentity,
           fieldPathIdentity,
           plan,
@@ -1175,9 +1231,11 @@ export class Aether<
           treeNode,
           false,
         );
+        childResponseKeys = responseKeys;
       } else {
         assertPolymorphicPlan(plan, pathIdentity);
         const polymorphicPlan = plan;
+        const responseKeysSet = new Set<string>();
         const planPossibleObjectTypes = (
           possibleObjectTypes: readonly GraphQLObjectType[],
         ): void => {
@@ -1204,7 +1262,7 @@ export class Aether<
               possibleObjectType.name
             ] = {};
 
-            this.planSelectionSet(
+            const { responseKeys: localResponseKeys } = this.planSelectionSet(
               pathIdentity,
               fieldPathIdentity,
               subPlan,
@@ -1213,6 +1271,9 @@ export class Aether<
               treeNode,
               false,
             );
+            for (const key of localResponseKeys) {
+              responseKeysSet.add(key);
+            }
           }
         };
         if (fieldType instanceof GraphQLUnionType) {
@@ -1258,14 +1319,19 @@ export class Aether<
             /*@__INLINE__*/ planPossibleObjectTypes(possibleObjectTypes);
           }
         }
+        childResponseKeys = [...responseKeysSet.values()];
       }
     } else if (fieldType instanceof GraphQLScalarType) {
       const scalarPlanResolver = fieldType.extensions?.graphile?.plan;
       if (typeof scalarPlanResolver === "function") {
         plan = wgs(() => scalarPlanResolver(plan, { schema: this.schema }));
       }
+      childResponseKeys = null;
+    } else {
+      // Enum?
+      childResponseKeys = null;
     }
-    return plan;
+    return { listDepth, itemPlan: plan, childResponseKeys };
   }
 
   /**
@@ -3647,13 +3713,46 @@ export class Aether<
       );
     }
 
-    const isLeaf = isLeafType(namedReturnType);
-    const isPolymorphic =
-      isUnionType(namedReturnType) || isInterfaceType(namedReturnType);
-    if (!isLeaf && !isPolymorphic) {
-      assertObjectType(namedReturnType);
-    }
+    try {
+      const isLeaf = isLeafType(namedReturnType);
+      const isPolymorphic =
+        isUnionType(namedReturnType) || isInterfaceType(namedReturnType);
+      if (!isLeaf && !isPolymorphic) {
+        assertObjectType(namedReturnType);
+      }
 
+      const results = await this.executeBatchForCLOs(
+        crystalContext,
+        pathIdentity,
+        namedReturnType,
+        sideEffectPlans,
+        plan,
+        itemPlan,
+        returnRaw,
+        isPolymorphic,
+        crystalLayerObjects,
+      );
+      for (let i = 0; i < entriesLength; i++) {
+        entries[i][1].resolve(results[i]);
+      }
+    } catch (e: any) {
+      for (let i = 0; i < entriesLength; i++) {
+        entries[i][1].reject(e);
+      }
+    }
+  }
+
+  private async executeBatchForCLOs(
+    crystalContext: CrystalContext,
+    pathIdentity: string,
+    namedReturnType: GraphQLNamedType & GraphQLOutputType,
+    sideEffectPlans: ReadonlyArray<ExecutablePlan>,
+    plan: ExecutablePlan,
+    itemPlan: ExecutablePlan,
+    returnRaw: boolean,
+    isPolymorphic: boolean,
+    crystalLayerObjects: CrystalLayerObject[],
+  ) {
     const crystalObjectFromCrystalLayerObjectAndTypeName = (
       clo: CrystalLayerObject,
       typeName: string,
@@ -3670,6 +3769,10 @@ export class Aether<
     // TODO: what should we do if the user has a graphqlResolver AND it's a
     // polymorphic plan?
 
+    // These two arrays have the same length
+    const resultCrystalLayerObjects: CrystalLayerObject[] = [];
+    const resultCrystalObjects: CrystalObject[] = [];
+
     // Execute the layers to get the result
     const mapResult: MapResult | undefined =
       // The user has their own resolver, so we must not return a crystalObject
@@ -3679,46 +3782,67 @@ export class Aether<
         isPolymorphic
         ? (clo, data) => {
             assertPolymorphicData(data);
-            return crystalObjectFromCrystalLayerObjectAndTypeName(
+            const co = crystalObjectFromCrystalLayerObjectAndTypeName(
               clo,
               data[$$concreteType],
             );
+            resultCrystalLayerObjects.push(clo);
+            resultCrystalObjects.push(co);
+            return co;
           }
         : // Otherwise we represent a standard object, so we can just use the expected named type
-          (clo, _data) =>
-            crystalObjectFromCrystalLayerObjectAndTypeName(
+          (clo, _data) => {
+            const co = crystalObjectFromCrystalLayerObjectAndTypeName(
               clo,
               namedReturnType.name,
             );
+            resultCrystalLayerObjects.push(clo);
+            resultCrystalObjects.push(co);
+            return co;
+          };
 
-    try {
-      // First, execute side effects (in order, *not* in parallel)
-      // TODO: assert that side effect plans cannot be nested under list items.
-      const sideEffectCount = sideEffectPlans.length;
-      if (sideEffectCount > 0) {
-        const planResults = crystalLayerObjects.map((clo) => clo.planResults);
-        for (let i = 0; i < sideEffectCount; i++) {
-          const sideEffectPlan = sideEffectPlans[i];
-          await this.executePlan(sideEffectPlan, crystalContext, planResults);
-        }
-      }
-
-      const results = await this.executeBatchInner(
-        crystalContext,
-        crystalLayerObjects,
-        pathIdentity,
-        plan,
-        itemPlan,
-        mapResult,
-      );
-      for (let i = 0; i < entriesLength; i++) {
-        entries[i][1].resolve(results[i]);
-      }
-    } catch (e: any) {
-      for (let i = 0; i < entriesLength; i++) {
-        entries[i][1].reject(e);
+    // First, execute side effects (in order, *not* in parallel)
+    // TODO: assert that side effect plans cannot be nested under list items.
+    const sideEffectCount = sideEffectPlans.length;
+    if (sideEffectCount > 0) {
+      const planResults = crystalLayerObjects.map((clo) => clo.planResults);
+      for (let i = 0; i < sideEffectCount; i++) {
+        const sideEffectPlan = sideEffectPlans[i];
+        await this.executePlan(sideEffectPlan, crystalContext, planResults);
       }
     }
+
+    const results = await this.executeBatchInner(
+      crystalContext,
+      crystalLayerObjects,
+      pathIdentity,
+      plan,
+      itemPlan,
+      mapResult,
+    );
+    if (!returnRaw) {
+      // chance to do pre-execution of next layers!
+      for (const [fieldAlias, config] of Object.entries(
+        this.prefetchesForPathIdentity[pathIdentity],
+      )) {
+        const fieldDigest = config.fieldDigest;
+        const subResults = await this.executeBatchForCLOs(
+          crystalContext,
+          fieldDigest.pathIdentity,
+          fieldDigest.namedReturnType,
+          EMPTY_ARRAY,
+          config.plan,
+          config.itemPlan,
+          fieldDigest.returnRaw,
+          fieldDigest.isPolymorphic,
+          resultCrystalLayerObjects,
+        );
+        for (let i = 0, l = resultCrystalObjects.length; i < l; i++) {
+          resultCrystalObjects[i][$$data][fieldAlias] = subResults[i];
+        }
+      }
+    }
+    return results;
   }
 
   private executeBatchInner(
