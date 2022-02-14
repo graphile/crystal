@@ -20,11 +20,7 @@ import type { InputPlan } from "./input";
 import type { ExecutablePlan, ListCapablePlan, ModifierPlan } from "./plan";
 import type { PlanResults, PlanResultsBucket } from "./planResults";
 import type { __TrackedObjectPlan } from "./plans";
-import type {
-  GraphileInputObjectType,
-  GraphileObjectType,
-  UniqueId,
-} from "./utils";
+import type { GraphileInputObjectType, GraphileObjectType } from "./utils";
 
 declare module "graphql" {
   interface GraphQLFieldExtensions<_TSource, _TContext, _TArgs = any> {
@@ -92,7 +88,6 @@ export interface CrystalObject {
   [$$data]: {
     [fieldAlias: string]: any;
   };
-  [$$id]: UniqueId;
   [$$pathIdentity]: string;
   [$$concreteType]: string;
   [$$crystalContext]: CrystalContext;
@@ -161,8 +156,6 @@ export interface CrystalContext {
   inProgressPlanResolutions: {
     [planId: number]: Map<PlanResultsBucket, Deferred<any>>;
   };
-
-  rootId: UniqueId;
 
   rootCrystalObject: CrystalObject;
 }

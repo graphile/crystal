@@ -24,9 +24,8 @@ import {
 } from "./interfaces";
 import type { PlanResults } from "./planResults";
 import { __ValuePlan } from "./plans";
-import type { UniqueId } from "./utils";
 import { sharedNull } from "./utils";
-import { ROOT_VALUE_OBJECT, uid } from "./utils";
+import { ROOT_VALUE_OBJECT } from "./utils";
 
 const debug = debugFactory("crystal:resolvers");
 const debugVerbose = debug.extend("verbose");
@@ -129,17 +128,6 @@ function makeParentCrystalObject(
       );
     }
 
-    // Note: we need to "fake" that the parent was a plan. Because we may
-    // have lots of resolvers all called for the same parent object, we use a
-    // map. This happens to mean that multiple values in the graph being the
-    // same object will be merged automatically.
-    const valueId = aether.getValuePlanId(
-      crystalContext,
-      parentPlan,
-      parentObject,
-      pathIdentity,
-    );
-
     // We don't really care about indexes, it's just for debugging. Skipping
     // for now.
     const indexes: ReadonlyArray<number> = []; //pathToIndexes(path);
@@ -150,7 +138,6 @@ function makeParentCrystalObject(
     const parentCrystalObject = newCrystalObject(
       parentPathIdentity,
       parentType.name,
-      valueId,
       crystalContext,
       parentPlanResults,
     );
@@ -351,7 +338,6 @@ function crystalObjectToString(this: CrystalObject) {
 export function newCrystalObject(
   pathIdentity: string,
   typeName: string,
-  id: UniqueId,
   crystalContext: CrystalContext,
   planResults: PlanResults,
 ): CrystalObject {
@@ -360,7 +346,6 @@ export function newCrystalObject(
     [$$crystalContext]: crystalContext,
     [$$pathIdentity]: pathIdentity,
     [$$concreteType]: typeName,
-    [$$id]: id,
     [$$planResults]: planResults,
     [$$data]: Object.create(sharedNull),
   };

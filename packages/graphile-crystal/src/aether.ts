@@ -100,7 +100,6 @@ import {
   newCrystalObject,
 } from "./resolvers";
 import { stripAnsi } from "./stripAnsi";
-import type { UniqueId } from "./utils";
 import {
   arraysMatch,
   defaultValueToValueNode,
@@ -108,7 +107,6 @@ import {
   isPromiseLike,
   planGroupsOverlap,
   ROOT_VALUE_OBJECT,
-  uid,
 } from "./utils";
 
 interface PlanCacheForCLOs {
@@ -388,16 +386,6 @@ export class Aether<
   public readonly groupIdsByPathIdentity: {
     [pathIdentity: string]: number[] | undefined;
   };
-
-  /**
-   * @internal
-   */
-  public readonly valueIdByObjectByPlanId: {
-    // This is just some object, we don't need to access anything about it.
-    // Critically, though, it is an object (not an `unknown`).
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    [planId: number]: WeakMap<object, UniqueId> | undefined;
-  } = Object.create(null);
 
   private readonly planOptionsByPlan = new Map<ExecutablePlan, PlanOptions>();
 
@@ -3418,50 +3406,6 @@ export class Aether<
   //----------------------------------------
 
   /**
-   * Used to implement `GetValuePlanId`, but was rewritten to factor in that we
-   * now key by crystal objects rather than id and indexes.
-   *
-   * @internal
-   */
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  public getValuePlanId<TData extends object>(
-    crystalContext: CrystalContext,
-    valuePlan: __ValuePlan<TData>,
-    object: TData,
-    pathIdentity: string,
-  ): UniqueId {
-    assert.ok(
-      valuePlan instanceof __ValuePlan,
-      "Expected getValuePlanId to be called with a __ValuePlan",
-    );
-    assert.ok(
-      object != null,
-      "object passed to getValuePlanId cannot be null; consider using ROOT_VALUE_OBJECT",
-    );
-    let valueIdByObject = this.valueIdByObjectByPlanId[valuePlan.id];
-    if (!valueIdByObject) {
-      valueIdByObject = new WeakMap();
-      valueIdByObject.set(ROOT_VALUE_OBJECT, crystalContext.rootId);
-      this.valueIdByObjectByPlanId[valuePlan.id] = valueIdByObject;
-    }
-    const key = object;
-    let valueId = valueIdByObject.get(key);
-    if (valueId === undefined) {
-      valueId = uid("val");
-      debugExecute(
-        "No id for object %c (parent object of %s) against plan %s, generated %c",
-        key,
-        pathIdentity,
-        valuePlan,
-        valueId,
-      );
-      valueIdByObject.set(key, valueId);
-      // populateValuePlan used to be here, but now it lives in resolvers.ts
-    }
-    return valueId;
-  }
-
-  /**
    * Get a plan without specifying who requested it; this disables all the
    * caller checks. Only intended to be called from internal code.
    *
@@ -3571,8 +3515,6 @@ export class Aether<
     context: object,
     rootValue: unknown,
   ): CrystalContext {
-    const rootId = uid("root");
-    debugExecuteVerbose("Root id is %c", rootId);
     const crystalContext: CrystalContext = {
       aether: this,
       metaByPlanId: Object.create(null),
@@ -3582,7 +3524,6 @@ export class Aether<
         }
         return memo;
       }, {}),
-      rootId,
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore We'll set this in just a moment...
       rootCrystalObject: null,
@@ -3590,7 +3531,6 @@ export class Aether<
     const rootCrystalObject = newCrystalObject(
       GLOBAL_PATH, // TODO: this should be ROOT_PATH I think?
       this.queryTypeName,
-      rootId,
       crystalContext,
       new PlanResults(),
     );
@@ -4032,7 +3972,6 @@ export class Aether<
       return newCrystalObject(
         pathIdentity,
         typeName,
-        isDev ? uid(crystalPrintPathIdentity(pathIdentity)) : uid(pathIdentity),
         crystalContext,
         clo.planResults,
       );
