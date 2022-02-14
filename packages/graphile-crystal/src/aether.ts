@@ -2591,8 +2591,8 @@ export class Aether<
       // created later, since that may only be done locally and not shared by
       // siblings.
 
-      if (bucket.has(plan.id)) {
-        const previousResult = bucket.get(plan.id);
+      if (plan.id in bucket) {
+        const previousResult = bucket[plan.id];
         if (debugExecuteVerbose.enabled) {
           const planResults = bucketPlanResultses[0].planResults;
           if (debugExecuteVerbose.enabled) {
@@ -3726,10 +3726,10 @@ export class Aether<
           throw new Error(
             `GraphileInternalError<355413ed-6688-45ce-8d5d-22faee9668a3>: Did not expect plans to exist within the '${
               layerPlan.commonAncestorPathIdentity
-            }' bucket yet (creating for ${layerPlan}, but already contains data from ${[
-              ...bucket.keys(),
-            ]
-              .map((id) => this.dangerouslyGetPlan(id))
+            }' bucket yet (creating for ${layerPlan}, but already contains data from ${Object.keys(
+              bucket,
+            )
+              .map((id) => this.dangerouslyGetPlan(Number(id)))
               .join(", ")}). Data found: ${crystalPrint(bucket)}`,
           );
         }

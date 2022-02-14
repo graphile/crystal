@@ -4,8 +4,22 @@ import { inspect } from "util";
 import { crystalColor, crystalPrintPathIdentity } from "./crystalPrint";
 import { isDev } from "./dev";
 
+const mapcount = 0;
 let planResultsId = 0;
-export type PlanResultsBucket = Map<number, any>;
+/*
+ * It's a peculiarity of V8 that `{}` is twice as fast as
+ * `Object.create(null)`, but `Object.create(sharedNull)` is the same speed as
+ * `{}`. Hat tip to @purge for bringing this to my attention.
+ */
+const sharedNull = Object.freeze(Object.create(null));
+
+/**
+ * @internal
+ */
+export interface PlanResultsBucket {
+  [planId: number]: any;
+}
+
 /**
  * PlanResults stores the results from plan execution. A `PlanResults` instance
  * is typically accessed via the `CrystalObject` to which it belongs, however
@@ -56,7 +70,7 @@ export class PlanResults {
     if (inheritFrom) {
       this.store = Object.create(inheritFrom.store);
     } else {
-      this.store = Object.create(null);
+      this.store = Object.create(sharedNull);
     }
   }
 
@@ -86,15 +100,16 @@ export class PlanResults {
     data: any,
   ): any {
     const bucket = this.getBucket(commonAncestorPathIdentity);
-    if (isDev && bucket.has(planId)) {
+    if (isDev && planId in bucket) {
       throw new Error(
         `${this}: Attempted to overwrite value for plan '${planId}' at path identity '${commonAncestorPathIdentity}' from '${inspect(
-          bucket.get(planId),
+          bucket[planId],
           { colors: true },
         )}' to '${inspect(data, { colors: true })}'`,
       );
     }
-    return bucket.set(planId, data);
+    bucket[planId] = data;
+    return;
   }
 
   /**
@@ -102,17 +117,22 @@ export class PlanResults {
    * plan.id.
    */
   public get(commonAncestorPathIdentity: string, planId: number): any {
-    return this.store[commonAncestorPathIdentity]?.get(planId);
+    return this.store[commonAncestorPathIdentity]?.[planId];
   }
 
   /**
    * Gets the bucket into which plan results are stored for plans with the
    * given commonAncestorPathIdentity.
+   *
+   * @internal
+   *
+   * (This is internal because we may change from objects to maps or vice versa
+   * depending on benchmark results.)
    */
   public getBucket(commonAncestorPathIdentity: string): PlanResultsBucket {
     const s =
       this.store[commonAncestorPathIdentity] ??
-      (this.store[commonAncestorPathIdentity] = new Map());
+      (this.store[commonAncestorPathIdentity] = Object.create(sharedNull));
     return s;
   }
 
@@ -121,13 +141,15 @@ export class PlanResults {
    * plan.commonAncestorPathIdentity and plan.id.
    */
   public has(commonAncestorPathIdentity: string, planId: number): boolean {
-    return this.store[commonAncestorPathIdentity]?.has(planId) ?? false;
+    return this.store[commonAncestorPathIdentity] !== undefined
+      ? planId in this.store[commonAncestorPathIdentity]!
+      : false;
   }
 
   /**
    * Determines if there is a "bucket" for the given "commonAncestorPathIdentity".
    */
   public hasPathIdentity(commonAncestorPathIdentity: string): boolean {
-    return !!this.store[commonAncestorPathIdentity];
+    return this.store[commonAncestorPathIdentity] !== undefined;
   }
 }
