@@ -117,26 +117,6 @@ export interface CrystalObject {
   [$$planResults]: PlanResults;
 }
 
-export const $$isCrystalLayerObject = Symbol("crystalLayerObject");
-
-/**
- * A "CrystalLayerObject" represents an intermediate stage whilst resolving a
- * field against a CrystalObject parent - it acts as a container for the
- * intermediate `planResults` (which is important!).
- *
- * Note that a field might actually have a stack of plans that need to be
- * executed, and may result in lists (or even lists of lists) being returned;
- * to handle this new CrystalLayerObjects are created at each list-like layer
- * in this stack before ultimately having CrystalObjects generated from the
- * result. I.e. CrystalLayerObjects are very short-lived - only existing during
- * `executePlan`.
- */
-export interface CrystalLayerObject {
-  toString(): string;
-  [$$isCrystalLayerObject]: true;
-  planResults: PlanResults;
-}
-
 export interface Batch {
   pathIdentity: string;
   crystalContext: CrystalContext;

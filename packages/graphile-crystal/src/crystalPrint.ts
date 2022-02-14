@@ -1,7 +1,6 @@
 import chalk from "chalk";
 import { inspect } from "util";
 
-import { isCrystalLayerObject } from "./aether";
 import { isDev } from "./dev";
 import type { CrystalObject } from "./interfaces";
 import { ExecutablePlan } from "./plan";
@@ -58,9 +57,6 @@ export function _crystalPrint(
     return chalk.gray`(blank)`;
   }
   if (isCrystalObject(symbol)) {
-    return String(symbol);
-  }
-  if (isCrystalLayerObject(symbol)) {
     return String(symbol);
   }
   if (symbol instanceof ExecutablePlan) {
