@@ -139,7 +139,6 @@ export const $$isCrystalLayerObject = Symbol("crystalLayerObject");
 export interface CrystalLayerObject {
   toString(): string;
   [$$isCrystalLayerObject]: true;
-  parentCrystalObject: CrystalObject;
   planResults: PlanResults;
 }
 

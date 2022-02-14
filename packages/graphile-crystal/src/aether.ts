@@ -153,17 +153,13 @@ type AetherPhase =
   | "ready";
 
 function crystalLayerObjectToString(this: CrystalLayerObject) {
-  return chalk.bold.green(`CLO<${this.parentCrystalObject}>`);
+  return chalk.bold.green(`CLO<${this.planResults}>`);
 }
 
-function newCrystalLayerObject(
-  parentCrystalObject: CrystalObject,
-  planResults: PlanResults,
-): CrystalLayerObject {
+function newCrystalLayerObject(planResults: PlanResults): CrystalLayerObject {
   return {
     toString: crystalLayerObjectToString,
     [$$isCrystalLayerObject]: true,
-    parentCrystalObject,
     planResults,
   };
 }
@@ -3367,18 +3363,10 @@ export class Aether<
     const namedReturnType = plan.namedType;
     const listPlan = plan.dangerouslyGetListPlan();
     const pathIdentity = itemPlan.parentPathIdentity;
-    const crystalLayerObjects = planResultses.map((planResults) => {
-      // const planResults = new PlanResults(originalPlanResults);
-      const crystalObject = newCrystalObject(
-        pathIdentity,
-        namedReturnType.name,
-        uid(),
-        crystalContext,
-        planResults,
-      );
-
-      return newCrystalLayerObject(crystalObject, planResults);
-    });
+    // TODO: can this be made more efficient?
+    const crystalLayerObjects = planResultses.map((planResults) =>
+      newCrystalLayerObject(planResults),
+    );
     const depResults = await this.executeBatchInner(
       crystalContext,
       crystalLayerObjects,
@@ -3706,7 +3694,7 @@ export class Aether<
         if (clo == null) {
           return null;
         }
-        const { parentCrystalObject, planResults } = clo;
+        const { planResults } = clo;
         if (
           planResults.has(layerPlan.commonAncestorPathIdentity, layerPlan.id)
         ) {
@@ -3751,7 +3739,7 @@ export class Aether<
               layerPlan.id,
               result,
             );
-            return newCrystalLayerObject(parentCrystalObject, copy);
+            return newCrystalLayerObject(copy);
           });
           if (mapResult) {
             return newCLOs.map(mapResult);
@@ -3795,7 +3783,7 @@ export class Aether<
                   layerPlan.id,
                   result,
                 );
-                const newCLO = newCrystalLayerObject(parentCrystalObject, copy);
+                const newCLO = newCrystalLayerObject(copy);
                 const value = mapResult
                   ? mapResult(newCLO)
                   : (
@@ -3999,7 +3987,6 @@ export class Aether<
     for (let i = 0; i < entriesLength; i++) {
       const crystalObject = entries[i][0];
       crystalLayerObjects[i] = newCrystalLayerObject(
-        crystalObject,
         crystalObject[$$planResults],
       );
     }
