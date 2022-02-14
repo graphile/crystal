@@ -25,6 +25,7 @@ import {
 import type { PlanResults } from "./planResults";
 import { __ValuePlan } from "./plans";
 import type { UniqueId } from "./utils";
+import { sharedNull } from "./utils";
 import { ROOT_VALUE_OBJECT, uid } from "./utils";
 
 const debug = debugFactory("crystal:resolvers");
@@ -355,13 +356,13 @@ export function newCrystalObject(
   planResults: PlanResults,
 ): CrystalObject {
   return {
+    toString: crystalObjectToString,
+    [$$crystalContext]: crystalContext,
     [$$pathIdentity]: pathIdentity,
     [$$concreteType]: typeName,
     [$$id]: id,
-    [$$data]: Object.create(null),
     [$$planResults]: planResults,
-    [$$crystalContext]: crystalContext,
-    toString: crystalObjectToString,
+    [$$data]: Object.create(sharedNull),
   };
 }
 

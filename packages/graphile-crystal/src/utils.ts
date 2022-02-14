@@ -616,3 +616,12 @@ export function getEnumValueConfig(
   }
   return cache.get(outputValue);
 }
+
+/**
+ * It's a peculiarity of V8 that `{}` is twice as fast as
+ * `Object.create(null)`, but `Object.create(sharedNull)` is the same speed as
+ * `{}`. Hat tip to @purge for bringing this to my attention.
+ *
+ * @internal
+ */
+export const sharedNull = Object.freeze(Object.create(null));

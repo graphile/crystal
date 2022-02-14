@@ -3,15 +3,10 @@ import { inspect } from "util";
 
 import { crystalColor, crystalPrintPathIdentity } from "./crystalPrint";
 import { isDev } from "./dev";
+import { sharedNull } from "./utils";
 
 const mapcount = 0;
 let planResultsId = 0;
-/*
- * It's a peculiarity of V8 that `{}` is twice as fast as
- * `Object.create(null)`, but `Object.create(sharedNull)` is the same speed as
- * `{}`. Hat tip to @purge for bringing this to my attention.
- */
-const sharedNull = Object.freeze(Object.create(null));
 
 /**
  * @internal
