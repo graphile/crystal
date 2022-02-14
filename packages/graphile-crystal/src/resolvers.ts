@@ -24,8 +24,7 @@ import {
 } from "./interfaces";
 import type { PlanResults } from "./planResults";
 import { __ValuePlan } from "./plans";
-import { sharedNull } from "./utils";
-import { ROOT_VALUE_OBJECT } from "./utils";
+import { ROOT_VALUE_OBJECT, sharedNull } from "./utils";
 
 const debug = debugFactory("crystal:resolvers");
 const debugVerbose = debug.extend("verbose");
@@ -169,7 +168,9 @@ function crystalWrapResolveOrSubscribe<
     );
   }
   const userSpecifiedResolver =
-    realResolver === defaultFieldResolver ? undefined : realResolver;
+    realResolver === defaultFieldResolver || !realResolver
+      ? undefined
+      : realResolver;
 
   //const wrapResult = makeResultWrapper(type);
   /**
@@ -197,7 +198,7 @@ function crystalWrapResolveOrSubscribe<
         if (fieldAlias in source[$$data]) {
           // Short-circuit execution - we already have results
           const result = source[$$data][fieldAlias];
-          if (userSpecifiedResolver != null) {
+          if (userSpecifiedResolver !== undefined) {
             return userSpecifiedResolver(result, argumentValues, context, info);
             // NOTE: this cannot occur if the field is unplanned, so no need to handle that
           } else {
