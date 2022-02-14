@@ -3603,9 +3603,9 @@ export class Aether<
       const depId = layerPlan.dependencies[0];
       const dep = this.plans[depId];
       const pendingPlanResultses: Array<PlanResults | null> = [];
-      const planCacheForPendingCLOs: PlanCacheForPlanResultses =
+      const planCacheForPendingPlanResultses: PlanCacheForPlanResultses =
         Object.create(null);
-      const pendingCLOIndexes: Array<[number, number]> = [];
+      const pendingPlanResultsesIndexes: Array<[number, number]> = [];
       const layerResults = planResultses.map(
         (planResults, planResultsesIndex) => {
           if (planResults == null) {
@@ -3672,7 +3672,7 @@ export class Aether<
                 pendingPlanResultses.push(
                   newPlanResultses[innerPlanResultsesIndex],
                 );
-                pendingCLOIndexes.push([
+                pendingPlanResultsesIndexes.push([
                   planResultsesIndex,
                   innerPlanResultsesIndex,
                 ]);
@@ -3773,12 +3773,14 @@ export class Aether<
           rest,
           pendingPlanResultses,
           rawMapResult,
-          planCacheForPendingCLOs,
+          planCacheForPendingPlanResultses,
           depth + 1,
         );
         for (let j = 0; j < l; j++) {
-          const [planResultsesIndex, innerCLOIndex] = pendingCLOIndexes[j];
-          layerResults[planResultsesIndex][innerCLOIndex] = allResults[j];
+          const [planResultsesIndex, innerPlanResultsesIndex] =
+            pendingPlanResultsesIndexes[j];
+          layerResults[planResultsesIndex][innerPlanResultsesIndex] =
+            allResults[j];
         }
       }
       return layerResults;
@@ -3915,7 +3917,7 @@ export class Aether<
     try {
       const fieldDigest = this.fieldDigestByPathIdentity[pathIdentity];
 
-      const results = await this.executeBatchForCLOs(
+      const results = await this.executeBatchForPlanResultses(
         crystalContext,
         pathIdentity,
         fieldDigest,
@@ -3934,7 +3936,7 @@ export class Aether<
     }
   }
 
-  private async executeBatchForCLOs(
+  private async executeBatchForPlanResultses(
     crystalContext: CrystalContext,
     pathIdentity: string,
     fieldDigest: FieldDigest,
@@ -4016,7 +4018,7 @@ export class Aether<
       // chance to do pre-execution of next layers!
       for (const localPlan of this.prefetchesForPathIdentity[pathIdentity]
         .local) {
-        const subResults = await this.executeBatchForCLOs(
+        const subResults = await this.executeBatchForPlanResultses(
           crystalContext,
           fieldDigest.itemPathIdentity,
           fieldDigest,
@@ -4029,12 +4031,12 @@ export class Aether<
         );
       }
 
-      // Different set of CLOs, so we use a different plan cache
-      const childPlanCacheForCLOs = Object.create(null);
+      // Different set of PlanResultses, so we use a different plan cache
+      const childPlanCacheForPlanResultses = Object.create(null);
       for (const config of this.prefetchesForPathIdentity[pathIdentity]
         .children) {
         const fieldDigest = config.fieldDigest;
-        const subResults = await this.executeBatchForCLOs(
+        const subResults = await this.executeBatchForPlanResultses(
           crystalContext,
           fieldDigest.pathIdentity,
           fieldDigest,
@@ -4042,7 +4044,7 @@ export class Aether<
           config.plan,
           config.itemPlan,
           resultPlanResultses,
-          childPlanCacheForCLOs,
+          childPlanCacheForPlanResultses,
         );
         const responseKey = config.fieldDigest.responseKey;
         for (let i = 0, l = resultCrystalObjects.length; i < l; i++) {
