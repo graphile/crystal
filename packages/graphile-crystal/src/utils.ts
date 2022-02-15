@@ -586,3 +586,34 @@ export function getEnumValueConfig(
  * @internal
  */
 export const sharedNull = Object.freeze(Object.create(null));
+
+/**
+ * Prints out the stack trace to the current position with a message; useful
+ * for debugging which code path has hit this line.
+ *
+ * @internal
+ */
+export function stack(message: string, length = 4) {
+  try {
+    throw new Error(message);
+  } catch (e) {
+    const lines = (e.stack as string).split("\n");
+    const start = lines.findIndex((line) => line.startsWith("Error:"));
+    if (start < 0) {
+      console.dir(e.stack);
+      return;
+    }
+    const filtered = [
+      lines[start],
+      ...lines.slice(start + 2, start + 2 + length),
+    ];
+    const mapped = filtered.map((line) =>
+      line.replace(
+        /^(.*?)\(\/home[^)]*\/packages\/([^)]*)\)/,
+        (_, start, rest) =>
+          `${start}${" ".repeat(Math.max(0, 45 - start.length))}(${rest})`,
+      ),
+    );
+    console.log(mapped.join("\n"));
+  }
+}
