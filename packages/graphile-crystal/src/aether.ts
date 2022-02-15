@@ -4028,6 +4028,9 @@ export class Aether<
       mapResult,
     );
     if (!returnRaw && allowPrefetch) {
+      // Different set of PlanResultses, so we use a different plan cache
+      const childPlanCacheForPlanResultses = Object.create(null);
+
       // chance to do pre-execution of next layers!
       for (const localPlan of this.prefetchesForPathIdentity[pathIdentity]
         .local) {
@@ -4039,13 +4042,11 @@ export class Aether<
           localPlan,
           localPlan,
           resultPlanResultses,
-          planCacheForPlanResultses,
+          childPlanCacheForPlanResultses,
           false,
         );
       }
 
-      // Different set of PlanResultses, so we use a different plan cache
-      const childPlanCacheForPlanResultses = Object.create(null);
       for (const config of this.prefetchesForPathIdentity[pathIdentity]
         .children) {
         const fieldDigest = config.fieldDigest;
