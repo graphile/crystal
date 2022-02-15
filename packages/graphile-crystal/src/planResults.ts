@@ -2,9 +2,9 @@ import chalk from "chalk";
 import { inspect } from "util";
 
 import { crystalColor, crystalPrintPathIdentity } from "./crystalPrint";
-import { isDev } from "./dev";
 import { sharedNull } from "./utils";
 
+const isDev = process.env.GRAPHILE_ENV === "development";
 const mapcount = 0;
 let planResultsId = 0;
 

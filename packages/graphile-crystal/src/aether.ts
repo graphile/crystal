@@ -42,7 +42,6 @@ import {
 } from "./crystalPrint";
 import type { Deferred } from "./deferred";
 import { defer } from "./deferred";
-import { isDev } from "./dev";
 import { withGlobalState } from "./global";
 import { getDirectiveArg, graphqlCollectFields } from "./graphqlCollectFields";
 import {
@@ -164,6 +163,8 @@ const debugPlanVerbose_ = debugPlan_.extend("verbose");
 const debugExecute_ = debugAether.extend("execute");
 const debugExecuteVerbose_ = debugExecute_.extend("verbose");
 
+const isDev = process.env.GRAPHILE_ENV === "development";
+
 const depthWrap = (debugFn: debugFactory.Debugger) =>
   Object.assign(
     (t: string, ...args: any[]) => debugFn("  ".repeat(depth) + t, ...args),
@@ -171,8 +172,11 @@ const depthWrap = (debugFn: debugFactory.Debugger) =>
   );
 const debugPlan = depthWrap(debugPlan_);
 const debugExecute = depthWrap(debugExecute_);
+const debugExecuteEnabled = isDev && debugExecute.enabled;
 const debugPlanVerbose = depthWrap(debugPlanVerbose_);
+const debugPlanVerboseEnabled = isDev && debugPlanVerbose.enabled;
 const debugExecuteVerbose = depthWrap(debugExecuteVerbose_);
+const debugExecuteVerboseEnabled = isDev && debugExecuteVerbose.enabled;
 
 function assertPolymorphicPlan(
   plan: ExecutablePlan | PolymorphicPlan,
@@ -471,10 +475,12 @@ export class Aether<
           this.variableValuesConstraints,
         ),
     );
-    debugPlanVerbose(
-      "Constructed trackedVariableValuesPlan %s",
-      this.trackedVariableValuesPlan,
-    );
+    if (debugPlanVerboseEnabled) {
+      debugPlanVerbose(
+        "Constructed trackedVariableValuesPlan %s",
+        this.trackedVariableValuesPlan,
+      );
+    }
     this.contextPlan = wgs(() => new __ValuePlan());
     debugPlan("Constructed contextPlan %s", this.contextPlan);
     this.trackedContextPlan = wgs(
@@ -485,10 +491,12 @@ export class Aether<
           this.contextConstraints,
         ),
     );
-    debugPlanVerbose(
-      "Constructed trackedContextPlan %s",
-      this.trackedContextPlan,
-    );
+    if (debugPlanVerboseEnabled) {
+      debugPlanVerbose(
+        "Constructed trackedContextPlan %s",
+        this.trackedContextPlan,
+      );
+    }
     this.rootValuePlan = wgs(() => new __ValuePlan());
     debugPlan("Constructed rootValuePlan %s", this.rootValuePlan);
     this.trackedRootValuePlan = wgs(
@@ -499,10 +507,12 @@ export class Aether<
           this.rootValueConstraints,
         ),
     );
-    debugPlanVerbose(
-      "Constructed trackedRootValuePlan %s",
-      this.trackedRootValuePlan,
-    );
+    if (debugPlanVerboseEnabled) {
+      debugPlanVerbose(
+        "Constructed trackedRootValuePlan %s",
+        this.trackedRootValuePlan,
+      );
+    }
     this.planIdByPathIdentity = Object.assign(Object.create(null), {
       [ROOT_PATH]: this.rootValuePlan.id,
     });
@@ -548,7 +558,9 @@ export class Aether<
     } catch (e) {
       // TODO: raise this somewhere critical
       console.error(`Error occurred during query planning: \n${e.stack || e}`);
-      this.logPlansByPath();
+      if (debugPlanVerboseEnabled) {
+        this.logPlansByPath();
+      }
       throw new Error(`Failed to plan this query.`);
     }
 
@@ -558,7 +570,9 @@ export class Aether<
     this.validatePlans();
 
     // Log the initial plan map
-    this.logPlansByPath("initial");
+    if (debugPlanVerboseEnabled) {
+      this.logPlansByPath("initial");
+    }
 
     // Get rid of temporary plans
     this.treeShakePlans();
@@ -573,7 +587,9 @@ export class Aether<
     this.treeShakePlans();
 
     // Log the plan map after deduplication
-    this.logPlansByPath("after deduplication");
+    if (debugPlanVerboseEnabled) {
+      this.logPlansByPath("after deduplication");
+    }
 
     this.phase = "optimize";
 
@@ -594,7 +610,9 @@ export class Aether<
     this.finalizePlans();
 
     // Log the plan now we're all done
-    this.logPlansByPath("after optimization and finalization");
+    if (debugPlanVerboseEnabled) {
+      this.logPlansByPath("after optimization and finalization");
+    }
 
     this.phase = "ready";
 
@@ -1151,11 +1169,13 @@ export class Aether<
         this.planOptionsByPlan.set(plan, planOptions);
 
         const newPlansLength = this.plans.length;
-        debugPlanVerbose(
-          "Created %o new plans whilst processing %p",
-          newPlansLength - oldPlansLength,
-          pathIdentity,
-        );
+        if (debugPlanVerboseEnabled) {
+          debugPlanVerbose(
+            "Created %o new plans whilst processing %p",
+            newPlansLength - oldPlansLength,
+            pathIdentity,
+          );
+        }
 
         this.finalizeArgumentsSince(oldPlansLength, pathIdentity, true);
 
@@ -1425,7 +1445,9 @@ export class Aether<
           // Check that the plan we're dealing with is the one the user declared
           const ExpectedPlan = fieldType.extensions?.graphile?.Plan;
           if (ExpectedPlan && !(plan instanceof ExpectedPlan)) {
-            this.logPlansByPath();
+            if (debugPlanVerboseEnabled) {
+              this.logPlansByPath();
+            }
             throw new Error(
               `Plan mis-match: expected ${
                 ExpectedPlan.name
@@ -1833,11 +1855,13 @@ export class Aether<
       }
       const shouldAbort = () => {
         if (!this.plans[plan.id]) {
-          debugPlanVerbose(
-            "%c is no longer needed; aborting %s",
-            plan,
-            actionDescription,
-          );
+          if (debugPlanVerboseEnabled) {
+            debugPlanVerbose(
+              "%c is no longer needed; aborting %s",
+              plan,
+              actionDescription,
+            );
+          }
           return true;
         }
         return false;
@@ -1866,13 +1890,15 @@ export class Aether<
       for (const depId of first) {
         const depPlan = this.plans[depId];
         if (depPlan && !processed.has(depPlan)) {
-          debugPlanVerbose(
-            `Before we can %s %c we must %s %c`,
-            actionDescription,
-            plan,
-            actionDescription,
-            depPlan,
-          );
+          if (debugPlanVerboseEnabled) {
+            debugPlanVerbose(
+              `Before we can %s %c we must %s %c`,
+              actionDescription,
+              plan,
+              actionDescription,
+              depPlan,
+            );
+          }
           depth++;
           process(depPlan);
           depth--;
@@ -1892,7 +1918,9 @@ export class Aether<
           () => callback(plan),
         );
       } catch (e) {
-        this.logPlans();
+        if (debugPlanVerboseEnabled) {
+          this.logPlans();
+        }
         console.error(
           `Error occurred whilst processing ${plan} in ${order} mode`,
         );
@@ -2088,14 +2116,18 @@ export class Aether<
           `deduplicatePlan error: Expected to replace plan ${plan} with one of its (identical) peers; instead found ${replacementPlan}. This is currently forbidden because it could cause confusion during the optimization process, instead apply this change in 'optimize', or make sure that any child selections aren't applied until the optimize/finalize phase so that no mapping is required during deduplicate.`,
         );
       }
-      debugPlanVerbose(
-        "Deduplicated %c with peers %c => %c",
-        plan,
-        peers,
-        replacementPlan,
-      );
+      if (debugPlanVerboseEnabled) {
+        debugPlanVerbose(
+          "Deduplicated %c with peers %c => %c",
+          plan,
+          peers,
+          replacementPlan,
+        );
+      }
     } else {
-      debugPlanVerbose("Didn't deduplicate %c with peers %c", plan, peers);
+      if (debugPlanVerboseEnabled) {
+        debugPlanVerbose("Didn't deduplicate %c with peers %c", plan, peers);
+      }
     }
     return replacementPlan;
   }
@@ -2111,14 +2143,16 @@ export class Aether<
     const options = this.planOptionsByPlan.get(plan);
     const replacementPlan = plan.optimize({ stream: options?.stream ?? null });
     this.optimizedPlans.add(plan);
-    if (replacementPlan !== plan) {
-      debugPlanVerbose(
-        "Optimized %c into %c (replaced plan)",
-        plan,
-        replacementPlan,
-      );
-    } else {
-      debugPlanVerbose("Optimized %c (same plan)", plan);
+    if (debugPlanVerboseEnabled) {
+      if (replacementPlan !== plan) {
+        debugPlanVerbose(
+          "Optimized %c into %c (replaced plan)",
+          plan,
+          replacementPlan,
+        );
+      } else {
+        debugPlanVerbose("Optimized %c (same plan)", plan);
+      }
     }
     return replacementPlan;
   }
@@ -2194,7 +2228,7 @@ export class Aether<
     for (let i = 0, l = this.plans.length; i < l; i++) {
       const plan = this.plans[i];
       if (plan && !activePlans.has(plan)) {
-        if (plan.id === i) {
+        if (debugPlanVerboseEnabled && plan.id === i) {
           debugPlanVerbose(`Deleting plan %c during tree shaking`, plan);
         }
         // We're going to delete this plan. Theoretically nothing can reference
@@ -2451,8 +2485,8 @@ export class Aether<
       return planCacheForPlanResultses[plan.id];
     }
     let timeString: string | null = null;
-    if (debugExecute.enabled) {
-      timeString = `plan\t${this.counter++}\t${plan}`;
+    if (debugExecuteEnabled) {
+      timeString = `plan\t${plan}`;
       console.time(timeString);
     }
     const result = this.executePlanAlt(
@@ -2464,9 +2498,13 @@ export class Aether<
       planCacheForPlanResultses,
     );
     if (timeString) {
-      Promise.resolve(result).then(() => {
+      if (isPromiseLike(result)) {
+        Promise.resolve(result).then(() => {
+          console.timeEnd(timeString!);
+        });
+      } else {
         console.timeEnd(timeString!);
-      });
+      }
     }
     planCacheForPlanResultses[plan.id] = result;
 
@@ -2552,12 +2590,14 @@ export class Aether<
     // From here on out we're going to deal with the buckets until we tie it
     // all back together again at the end.
 
-    debugExecute(
-      "%sExecutePlan(%c): executing with %o plan results",
-      indent,
-      plan,
-      planResultsesLength,
-    );
+    if (debugExecuteEnabled) {
+      debugExecute(
+        "%sExecutePlan(%c): executing with %o plan results",
+        indent,
+        plan,
+        planResultsesLength,
+      );
+    }
 
     const pendingPlanResultsAndIndexListList: Array<PlanResultsAndIndex[]> = []; // Length unknown
 
@@ -2574,17 +2614,15 @@ export class Aether<
 
       if (plan.id in bucket) {
         const previousResult = bucket[plan.id];
-        if (debugExecuteVerbose.enabled) {
-          const planResults = bucketPlanResultses[0].planResults;
-          if (debugExecuteVerbose.enabled) {
-            debugExecuteVerbose(
-              "%s result[%o] for %c found: %c",
-              follow,
-              bucketPlanResultses.map((i) => i.planResultsesIndex),
-              bucketPlanResultses.map((i) => i.planResults),
-              previousResult,
-            );
-          }
+        if (debugExecuteVerboseEnabled) {
+          const planResults = bucketPlanResultses.planResults;
+          debugExecuteVerbose(
+            "%s result[%o] for %c found: %c",
+            follow,
+            bucketPlanResultses.indexes,
+            planResults,
+            previousResult,
+          );
         }
 
         // Fill into the relevant places in `result`
@@ -2610,11 +2648,11 @@ export class Aether<
 
       pendingPlanResultsAndIndexListList.push(bucketPlanResultses);
     }
-    if (debugExecuteVerbose.enabled) {
+    if (debugExecuteVerboseEnabled) {
       debugExecuteVerbose(
         "%s no result for buckets with first entries %c",
         follow,
-        pendingPlanResultsAndIndexListList.map((l) => l[0].planResults),
+        pendingPlanResultsAndIndexListList.map((l) => l.planResults),
       );
     }
 
@@ -2978,12 +3016,14 @@ export class Aether<
     }
     const planResultsesLength = planResultses.length;
     const result = new Array(planResultsesLength);
-    debugExecute(
-      "%sExecutePlan(%c): executing with %o plan results",
-      indent,
-      plan,
-      planResultsesLength,
-    );
+    if (debugExecuteEnabled) {
+      debugExecute(
+        "%sExecutePlan(%c): executing with %o plan results",
+        indent,
+        plan,
+        planResultsesLength,
+      );
+    }
     const commonAncestorPathIdentity = plan.commonAncestorPathIdentity;
 
     const pendingPlanResultses: PlanResults[] = []; // Length unknown
@@ -3007,13 +3047,15 @@ export class Aether<
         );
         result[i] = previousResult;
 
-        debugExecuteVerbose(
-          "%s result[%o] for %c found: %c",
-          follow,
-          i,
-          planResults,
-          previousResult,
-        );
+        if (debugExecuteVerboseEnabled) {
+          debugExecuteVerbose(
+            "%s result[%o] for %c found: %c",
+            follow,
+            i,
+            planResults,
+            previousResult,
+          );
+        }
         continue;
       }
       if (plan instanceof __ValuePlan) {
@@ -3031,16 +3073,20 @@ export class Aether<
       if (deferredsByBucket.has(bucket)) {
         // In progress already
         const deferred = deferredsByBucket.get(bucket)!;
-        debugExecuteVerbose(
-          "%s already in progress for %c",
-          follow,
-          planResults,
-        );
+        if (debugExecuteVerboseEnabled) {
+          debugExecuteVerbose(
+            "%s already in progress for %c",
+            follow,
+            planResults,
+          );
+        }
         inProgressDeferreds.push(deferred);
         inProgressPlanResultsesIndexes.push(i);
       } else {
         // Need to start executing
-        debugExecuteVerbose("%s no result for %c", follow, planResults);
+        if (debugExecuteVerboseEnabled) {
+          debugExecuteVerbose("%s no result for %c", follow, planResults);
+        }
 
         const deferred = defer<any>();
 
@@ -3123,14 +3169,14 @@ export class Aether<
     return Promise.all([handlePendingPromise, handleInProgressPromise]).then(
       () => {
         if (isDev) {
-          if (debugExecuteVerbose.enabled) {
+          if (debugExecuteVerboseEnabled) {
             debugExecuteVerbose(
               `%sExecutePlan(%s): complete; results: %c`,
               indent,
               plan,
               result,
             );
-          } else {
+          } else if (debugExecuteEnabled) {
             debugExecute(`%sExecutePlan(%s): complete`, indent, plan);
           }
         }
@@ -3163,7 +3209,9 @@ export class Aether<
       : plan.hasSideEffects
       ? [new Array(pendingPlanResultses.length).fill(undefined)]
       : [[undefined]];
-    debugExecute("%s Executing %o dependencies", follow, dependenciesCount);
+    if (debugExecuteEnabled) {
+      debugExecute("%s Executing %o dependencies", follow, dependenciesCount);
+    }
 
     if (hasDependencies) {
       for (let i = 0; i < dependenciesCount; i++) {
@@ -3328,12 +3376,14 @@ export class Aether<
       }
     }
 
-    debugExecute(
-      "%sExecutePlan(%s): wrote results for %c",
-      indent,
-      plan,
-      pendingPlanResultses,
-    );
+    if (debugExecuteEnabled) {
+      debugExecute(
+        "%sExecutePlan(%s): wrote results for %c",
+        indent,
+        plan,
+        pendingPlanResultses,
+      );
+    }
     return result;
   }
 
@@ -3620,11 +3670,13 @@ export class Aether<
             return result;
           });
 
-    debugExecute(
-      "Executing layerPlan %c with %c planResultses",
-      layerPlan,
-      planResultsesLength,
-    );
+    if (debugExecuteEnabled) {
+      debugExecute(
+        "Executing layerPlan %c with %c planResultses",
+        layerPlan,
+        planResultsesLength,
+      );
+    }
 
     if (layerPlan instanceof __ItemPlan) {
       // Derive new PlanResultses from the existing ones.
@@ -3671,7 +3723,13 @@ export class Aether<
             dep.commonAncestorPathIdentity,
             dep.id,
           );
-          debugExecuteVerbose("Executing %c's dependency, %c", layerPlan, dep);
+          if (debugExecuteVerboseEnabled) {
+            debugExecuteVerbose(
+              "Executing %c's dependency, %c",
+              layerPlan,
+              dep,
+            );
+          }
           if (Array.isArray(listResult)) {
             // Turn each entry in this listResult into it's own PlanResultses, then execute the new layers.
             const newPlanResultses = listResult.map((result, i) => {
@@ -4087,14 +4145,16 @@ export class Aether<
             }
 
             if (allowPrefetch && hasAtLeastOneNonError) {
-              debugExecute(
-                "Prefetching after %c/%c, hasListBoundary=%c, count=%c, localPlans=%c",
-                plan,
-                itemPlan,
-                hasListBoundary,
-                childPlanResultses.length,
-                this.prefetchesForPathIdentity[pathIdentity].local,
-              );
+              if (debugExecuteEnabled) {
+                debugExecute(
+                  "Prefetching after %c/%c, hasListBoundary=%c, count=%c, localPlans=%c",
+                  plan,
+                  itemPlan,
+                  hasListBoundary,
+                  childPlanResultses.length,
+                  this.prefetchesForPathIdentity[pathIdentity].local,
+                );
+              }
 
               // chance to do pre-execution of next layers!
               const siblingPromises = [];
@@ -4226,7 +4286,9 @@ export class Aether<
      */
     const layers: Array<ExecutablePlan<any>> = [plan, ...path];
 
-    debugExecute(`Executing batch with %s layers: %c`, layers.length, layers);
+    if (debugExecuteEnabled) {
+      debugExecute(`Executing batch with %s layers: %c`, layers.length, layers);
+    }
 
     return this.executeLayers(
       crystalContext,
@@ -4330,9 +4392,6 @@ export class Aether<
    * @internal
    */
   public logPlans(why?: string): void {
-    if (!debugPlanVerbose.enabled) {
-      return;
-    }
     debugPlanVerbose(
       "Plans%s: %s",
       why ? ` ${why}` : "",
@@ -4397,9 +4456,6 @@ export class Aether<
    * @internal
    */
   public logPlansByPath(why?: string): void {
-    if (!debugPlanVerbose.enabled) {
-      return;
-    }
     this.logPlans(why);
     debugPlanVerbose(
       `Plans by path%s: %s`,
@@ -4459,7 +4515,9 @@ export function populateValuePlan(
     valuePlan.id,
     object ?? ROOT_VALUE_OBJECT,
   );
-  debugExecute("Populated value plan for %s", label);
+  if (debugExecuteEnabled) {
+    debugExecute("Populated value plan for %s", label);
+  }
 }
 
 function isNotNullish<T>(a: T | null | undefined): a is T {
