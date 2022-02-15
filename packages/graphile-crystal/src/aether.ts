@@ -1503,7 +1503,7 @@ export class Aether<
             unionType.getTypes(),
             subSelections,
           );
-          /*@__INLINE__*/ planPossibleObjectTypes(possibleObjectTypes);
+          /*#__INLINE__*/ planPossibleObjectTypes(possibleObjectTypes);
         } else {
           assert.ok(
             fieldType instanceof GraphQLInterfaceType,
@@ -1526,14 +1526,14 @@ export class Aether<
               subSelections,
             )
           ) {
-            /*@__INLINE__*/ planPossibleObjectTypes(implementations);
+            /*#__INLINE__*/ planPossibleObjectTypes(implementations);
           } else {
             const possibleObjectTypes = typesUsedInSelections(
               this,
               implementations,
               subSelections,
             );
-            /*@__INLINE__*/ planPossibleObjectTypes(possibleObjectTypes);
+            /*#__INLINE__*/ planPossibleObjectTypes(possibleObjectTypes);
           }
         }
         childFieldDigests = [...fieldDigestsSet.values()];
@@ -3511,19 +3511,19 @@ export class Aether<
     );
     crystalContext.rootCrystalObject = rootCrystalObject;
 
-    /*@__INLINE__*/ populateValuePlan(
+    /*#__INLINE__*/ populateValuePlan(
       this.variableValuesPlan,
       rootCrystalObject,
       variableValues,
       "variableValues",
     );
-    /*@__INLINE__*/ populateValuePlan(
+    /*#__INLINE__*/ populateValuePlan(
       this.contextPlan,
       rootCrystalObject,
       context,
       "context",
     );
-    /*@__INLINE__*/ populateValuePlan(
+    /*#__INLINE__*/ populateValuePlan(
       this.rootValuePlan,
       rootCrystalObject,
       rootValue,
@@ -3976,7 +3976,7 @@ export class Aether<
         isPolymorphic
         ? (planResults, data) => {
             assertPolymorphicData(data);
-            const co = crystalObjectFromPlanResultsAndTypeName(
+            const co = /*#__INLINE__*/ crystalObjectFromPlanResultsAndTypeName(
               planResults,
               data[$$concreteType],
             );
@@ -3986,7 +3986,7 @@ export class Aether<
           }
         : // Otherwise we represent a standard object, so we can just use the expected named type
           (planResults, _data) => {
-            const co = crystalObjectFromPlanResultsAndTypeName(
+            const co = /*#__INLINE__*/ crystalObjectFromPlanResultsAndTypeName(
               planResults,
               namedReturnType.name,
             );
