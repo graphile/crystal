@@ -2488,6 +2488,7 @@ export class Aether<
     if (debugExecuteEnabled) {
       timeString = `plan\t${plan}`;
       console.time(timeString);
+      console.timeLog(timeString, "START");
     }
     const result = this.executePlanAlt(
       plan,
@@ -2566,6 +2567,7 @@ export class Aether<
       Array<PlanResultsAndIndex>
     >();
     const commonAncestorPathIdentity = plan.commonAncestorPathIdentity;
+    if (debugExecuteEnabled) console.timeLog(`plan\t${plan}`, "loop 1");
     for (
       let planResultsesIndex = 0;
       planResultsesIndex < planResultsesLength;
@@ -2586,6 +2588,7 @@ export class Aether<
         list.push({ planResults, planResultsesIndex });
       }
     }
+    if (debugExecuteEnabled) console.timeLog(`plan\t${plan}`, "loop 1 done");
 
     // From here on out we're going to deal with the buckets until we tie it
     // all back together again at the end.
@@ -2648,6 +2651,7 @@ export class Aether<
 
       pendingPlanResultsAndIndexListList.push(bucketPlanResultses);
     }
+    if (debugExecuteEnabled) console.timeLog(`plan\t${plan}`, "loop 2 done");
     if (debugExecuteVerboseEnabled) {
       debugExecuteVerbose(
         "%s no result for buckets with first entries %c",
@@ -2725,10 +2729,13 @@ export class Aether<
           dependencyValuesList[dependencyIndex] = allDependencyResultsOrPromise;
         }
       }
+      if (debugExecuteEnabled) console.timeLog(`plan\t${plan}`, "deps done");
     }
 
     // TODO: extract this to be a separate method.
     const awaitDependencyPromises = async () => {
+      if (debugExecuteEnabled)
+        console.timeLog(`plan\t${plan}`, "awaitDependencyPromises");
       for (
         let dependencyPromiseIndex = 0,
           dependencyPromisesLength = dependencyPromises.length;
@@ -2801,7 +2808,9 @@ export class Aether<
 
     // TODO: extract this to be a separate method.
     const doNext = () => {
+      if (debugExecuteEnabled) console.timeLog(`plan\t${plan}`, "doNext");
       // Format the dependencies, detect & shortcircuit errors, etc
+
       const toExecute = hasDependencies
         ? []
         : pendingPlanResultsAndIndexListList;
@@ -2863,6 +2872,8 @@ export class Aether<
             );
           }
         }
+        if (debugExecuteEnabled)
+          console.timeLog(`plan\t${plan}`, "deps created");
       }
 
       const toExecuteLength = toExecute.length;
@@ -2873,6 +2884,8 @@ export class Aether<
 
       // TODO: optimize away
       toExecute.reverse();
+      if (debugExecuteEnabled)
+        console.timeLog(`plan\t${plan}`, "toExecute reversed");
 
       let meta = crystalContext.metaByPlanId[plan.id];
       if (!meta) {
@@ -2910,6 +2923,8 @@ export class Aether<
         } catch (e) {
           crystalError = new CrystalError(e);
         }
+        if (debugExecuteEnabled)
+          console.timeLog(`plan\t${plan}`, "pre executable loop");
         for (
           let executableIndex = 0;
           executableIndex < toExecuteLength;
@@ -2947,8 +2962,12 @@ export class Aether<
             }
           }
         }
+        if (debugExecuteEnabled)
+          console.timeLog(`plan\t${plan}`, "sync execution complete");
         return result;
       }
+      if (debugExecuteEnabled)
+        console.timeLog(`plan\t${plan}`, "async execution");
 
       // Plan's not synchronous
 
