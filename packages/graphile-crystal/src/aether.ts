@@ -94,6 +94,7 @@ import { __ListTransformPlan } from "./plans/listTransform";
 import { assertPolymorphicData } from "./polymorphic";
 import {
   $$crystalWrapped,
+  isCrystalObject,
   isCrystalWrapped,
   newCrystalObject,
 } from "./resolvers";
@@ -101,10 +102,10 @@ import { stripAnsi } from "./stripAnsi";
 import {
   arraysMatch,
   defaultValueToValueNode,
-  isPromise,
   isPromiseLike,
   planGroupsOverlap,
   ROOT_VALUE_OBJECT,
+  sharedNull,
 } from "./utils";
 
 interface PlanCacheForPlanResultses {
@@ -115,7 +116,10 @@ function NOOP() {}
 
 const $$FINISHED: unique symbol = Symbol("finished");
 
-type MapResult = (planResults: PlanResults, data: any) => any;
+type ProcessResults = (
+  planResultses: Array<PlanResults | CrystalError | null>,
+  planCacheForPlanResultses: PlanCacheForPlanResultses,
+) => any[];
 
 /**
  * Describes the document tree that we're parsing; is populated by
@@ -2422,7 +2426,7 @@ export class Aether<
   private executePlan<T>(
     plan: ExecutablePlan<T>,
     crystalContext: CrystalContext,
-    planResultses: ReadonlyArray<null | PlanResults>,
+    planResultses: ReadonlyArray<PlanResults | CrystalError | null>,
     visitedPlans = new Set<ExecutablePlan>(),
     depth = 0,
     planCacheForPlanResultses: PlanCacheForPlanResultses = Object.create(null),
@@ -2472,7 +2476,7 @@ export class Aether<
   private executePlanAlt<T>(
     plan: ExecutablePlan<T>,
     crystalContext: CrystalContext,
-    planResultses: ReadonlyArray<null | PlanResults>,
+    planResultses: ReadonlyArray<PlanResults | CrystalError | null>,
     visitedPlans = new Set<ExecutablePlan>(),
     depth = 0,
     planCacheForPlanResultses: PlanCacheForPlanResultses = Object.create(null),
@@ -2497,8 +2501,8 @@ export class Aether<
     if (plan instanceof __ItemPlan) {
       // Shortcut evaluation because __ItemPlan cannot be executed.
       return planResultses.map((planResults) =>
-        planResults == null
-          ? null
+        planResults == null || planResults instanceof CrystalError
+          ? planResults
           : planResults.get(plan.commonAncestorPathIdentity, plan.id),
       );
     }
@@ -2525,9 +2529,8 @@ export class Aether<
       planResultsesIndex++
     ) {
       const planResults = planResultses[planResultsesIndex];
-      if (planResults == null) {
-        // It was null, it stays null
-        result[planResultsesIndex] = null;
+      if (planResults == null || planResults instanceof CrystalError) {
+        result[planResultsesIndex] = planResults;
         continue;
       }
       const bucket = planResults.getBucket(commonAncestorPathIdentity);
@@ -2938,7 +2941,7 @@ export class Aether<
   private executePlanOld<T>(
     plan: ExecutablePlan<T>,
     crystalContext: CrystalContext,
-    planResultses: ReadonlyArray<null | PlanResults>,
+    planResultses: ReadonlyArray<PlanResults | CrystalError | null>,
     visitedPlans = new Set<ExecutablePlan>(),
     depth = 0,
     planCacheForPlanResultses: PlanCacheForPlanResultses = Object.create(null),
@@ -2963,8 +2966,8 @@ export class Aether<
     if (plan instanceof __ItemPlan) {
       // Shortcut evaluation because __ItemPlan cannot be executed.
       return planResultses.map((planResults) =>
-        planResults == null
-          ? null
+        planResults == null || planResults instanceof CrystalError
+          ? planResults
           : planResults.get(plan.commonAncestorPathIdentity, plan.id),
       );
     }
@@ -2988,8 +2991,8 @@ export class Aether<
 
     for (let i = 0; i < planResultsesLength; i++) {
       const planResults = planResultses[i];
-      if (planResults == null) {
-        result[i] = null;
+      if (planResults == null || planResults instanceof CrystalError) {
+        result[i] = planResults;
         continue;
       }
       if (planResults.has(commonAncestorPathIdentity, plan.id)) {
@@ -3298,7 +3301,7 @@ export class Aether<
 
         // NOTE: after this result[j] could be an AsyncIterable, or arbitrary
         // data (including an array).
-        if (isPromise(rawPendingResult)) {
+        if (isPromiseLike(rawPendingResult)) {
           try {
             result[underlyingIndex] = await rawPendingResult;
           } catch (e: any) {
@@ -3573,40 +3576,47 @@ export class Aether<
     return batch;
   }
 
-  private async executeLayers(
+  private executeLayers(
     crystalContext: CrystalContext,
     layers: ExecutablePlan[],
     // Even when AsyncIterators are involved, this will always be a concrete array
-    planResultses: ReadonlyArray<PlanResults | null>,
-    rawMapResult: MapResult | undefined,
+    planResultses: ReadonlyArray<PlanResults | CrystalError | null>,
+    rawProcessResults: ProcessResults | undefined,
     planCacheForPlanResultses: PlanCacheForPlanResultses,
     depth = 0,
-  ): Promise<any[]> {
+  ): PromiseOrDirect<any[]> {
     const planResultsesLength = planResultses.length;
     if (planResultsesLength === 0) {
       return [];
     }
     const [layerPlan, ...rest] = layers;
 
-    const mapResult =
-      rest.length === 0
-        ? (planResults: null | PlanResults) => {
-            if (planResults == null) {
-              return null;
+    const processResults: ProcessResults | undefined =
+      rest.length > 0
+        ? undefined
+        : rawProcessResults ??
+          ((planResultses) => {
+            const planResultsesLength = planResultses.length;
+            const result = new Array(planResultsesLength);
+            for (let i = 0, l = planResultsesLength; i < l; i++) {
+              const planResults = planResultses[i];
+              if (planResults == null) {
+                result[i] = null;
+              } else if (planResults instanceof CrystalError) {
+                result[i] = Promise.reject(planResults.originalError);
+              } else {
+                const data = planResults.get(
+                  layerPlan.commonAncestorPathIdentity,
+                  layerPlan.id,
+                );
+                result[i] = data ?? null;
+              }
             }
-            const data = planResults.get(
-              layerPlan.commonAncestorPathIdentity,
-              layerPlan.id,
-            );
-            if (data == null) {
-              return null;
-            }
-            return rawMapResult ? rawMapResult(planResults, data) : data;
-          }
-        : null;
+            return result;
+          });
 
     debugExecute(
-      "Executing layerPlan %c with %c crystal layer objects",
+      "Executing layerPlan %c with %c planResultses",
       layerPlan,
       planResultsesLength,
     );
@@ -3616,13 +3626,11 @@ export class Aether<
       const depId = layerPlan.dependencies[0];
       const dep = this.plans[depId];
       const pendingPlanResultses: Array<PlanResults | null> = [];
-      const planCacheForPendingPlanResultses: PlanCacheForPlanResultses =
-        Object.create(null);
       const pendingPlanResultsesIndexes: Array<[number, number]> = [];
       const layerResults = planResultses.map(
         (planResults, planResultsesIndex) => {
-          if (planResults == null) {
-            return null;
+          if (planResults == null || planResults instanceof CrystalError) {
+            return planResults;
           }
           if (
             planResults.has(layerPlan.commonAncestorPathIdentity, layerPlan.id)
@@ -3637,6 +3645,7 @@ export class Aether<
             return existingResult;
           }
           if (
+            isDev &&
             planResults.hasPathIdentity(layerPlan.commonAncestorPathIdentity)
           ) {
             const bucket = planResults.getBucket(
@@ -3672,8 +3681,8 @@ export class Aether<
               );
               return copy;
             });
-            if (mapResult) {
-              return newPlanResultses.map(mapResult);
+            if (processResults) {
+              return processResults(newPlanResultses, Object.create(null));
             } else {
               // Optimise this to call executeLayers once, rather than once per PlanResults - see code below `layerResults` loop.
               const l = newPlanResultses.length;
@@ -3723,20 +3732,30 @@ export class Aether<
                     layerPlan.id,
                     result,
                   );
-                  const value = mapResult
-                    ? mapResult(copy)
-                    : (
-                        await aether.executeLayers(
-                          crystalContext,
-                          rest,
-                          // TODO: batch this over a tick?
-                          [copy],
-                          rawMapResult,
-                          Object.create(null),
-                          depth + 1,
-                        )
-                      )[0];
-                  return { done, value };
+                  const copyList = [copy];
+                  const planCacheForCopyList = Object.create(sharedNull);
+                  // TODO: are CrystalError's handled correctly here?
+                  // TODO: batch this?
+                  if (processResults) {
+                    const [value] = processResults(
+                      copyList,
+                      planCacheForCopyList,
+                    );
+                    return { done, value };
+                  } else {
+                    const value = (
+                      await aether.executeLayers(
+                        crystalContext,
+                        rest,
+                        // TODO: batch this over a tick?
+                        copyList,
+                        rawProcessResults,
+                        planCacheForCopyList,
+                        depth + 1,
+                      )
+                    )[0];
+                    return { done, value };
+                  }
                 } catch (e) {
                   if (e === $$FINISHED) {
                     return { done: true, value: undefined };
@@ -3780,26 +3799,37 @@ export class Aether<
         },
       );
       const l = pendingPlanResultses.length;
-      if (!mapResult && l > 0) {
-        const allResults = await this.executeLayers(
+      if (!processResults && l > 0) {
+        const planCacheForPendingPlanResultses: PlanCacheForPlanResultses =
+          Object.create(null);
+        const allResults = this.executeLayers(
           crystalContext,
           rest,
           pendingPlanResultses,
-          rawMapResult,
+          rawProcessResults,
           planCacheForPendingPlanResultses,
           depth + 1,
         );
-        for (let j = 0; j < l; j++) {
-          const [planResultsesIndex, innerPlanResultsesIndex] =
-            pendingPlanResultsesIndexes[j];
-          layerResults[planResultsesIndex][innerPlanResultsesIndex] =
-            allResults[j];
+        const finaliseLayerResults = (allResults: any[]) => {
+          for (let j = 0; j < l; j++) {
+            const [planResultsesIndex, innerPlanResultsesIndex] =
+              pendingPlanResultsesIndexes[j];
+            layerResults[planResultsesIndex][innerPlanResultsesIndex] =
+              allResults[j];
+          }
+          return layerResults;
+        };
+        if (isPromiseLike(allResults)) {
+          return allResults.then(finaliseLayerResults);
+        } else {
+          return finaliseLayerResults(allResults);
         }
+      } else {
+        return layerResults;
       }
-      return layerResults;
     } else {
       // Execute the plan with the same PlanResultses
-      const layerResults = await this.executePlan(
+      const layerResultsOrPromise = this.executePlan(
         layerPlan,
         crystalContext,
         planResultses,
@@ -3808,97 +3838,124 @@ export class Aether<
         planCacheForPlanResultses,
       );
       if (isDev) {
-        assert.ok(
-          Array.isArray(layerResults),
-          "Expected plan execution to return an array",
-        );
-        assert.strictEqual(
-          layerResults.length,
-          planResultsesLength,
-          "Expected plan execution result to have same length as input objects",
-        );
+        Promise.resolve(layerResultsOrPromise).then((layerResults) => {
+          assert.ok(
+            Array.isArray(layerResults),
+            "Expected plan execution to return an array",
+          );
+          assert.strictEqual(
+            layerResults.length,
+            planResultsesLength,
+            "Expected plan execution result to have same length as input objects",
+          );
+        });
       }
 
-      if (mapResult) {
-        // No following layers; map the result
-        const finalResult = new Array(planResultsesLength);
-        for (let i = 0; i < planResultsesLength; i++) {
-          finalResult[i] =
-            layerResults[i] instanceof CrystalError
-              ? Promise.reject(layerResults[i].originalError)
-              : mapResult(planResultses[i]);
+      const finalizeLayerResults = (
+        layerResults: any[],
+      ): PromiseOrDirect<any[]> => {
+        if (processResults) {
+          // No following layers; map the result
+          const finalResult = new Array<PlanResults | CrystalError | null>(
+            planResultsesLength,
+          );
+          for (let i = 0; i < planResultsesLength; i++) {
+            finalResult[i] =
+              layerResults[i] instanceof CrystalError
+                ? layerResults[i]
+                : planResultses[i];
+          }
+          return processResults(finalResult, planCacheForPlanResultses);
+        } else {
+          // Now executing the following layers using the same planResultses
+          const finalResult = new Array(planResultsesLength);
+          const pendingPlanResultses = new Array(planResultses.length);
+          let hasAtLeastOneNonError = false;
+          for (
+            let finalResultIndex = 0;
+            finalResultIndex < planResultsesLength;
+            finalResultIndex++
+          ) {
+            if (layerResults[finalResultIndex] instanceof CrystalError) {
+              finalResult[finalResultIndex] = Promise.reject(
+                layerResults[finalResultIndex].originalError,
+              );
+              pendingPlanResultses[finalResultIndex] = null;
+            } else {
+              hasAtLeastOneNonError = true;
+              pendingPlanResultses[finalResultIndex] =
+                planResultses[finalResultIndex];
+            }
+          }
+          if (hasAtLeastOneNonError) {
+            let pendingResultsOrPromise: PromiseOrDirect<any[]>;
+            try {
+              pendingResultsOrPromise = this.executeLayers(
+                crystalContext,
+                rest,
+                pendingPlanResultses,
+                rawProcessResults,
+                planCacheForPlanResultses, // pendingPlanResultses shares indexes with planResultses
+                depth + 1,
+              );
+            } catch (e) {
+              pendingResultsOrPromise = Promise.reject(e);
+            }
+
+            const finalizePendingResults = (pendingResults: any[]): any[] => {
+              if (isDev) {
+                assert.ok(
+                  Array.isArray(pendingResults),
+                  "Expected non-error plan execution to return an array",
+                );
+                assert.strictEqual(
+                  pendingResults.length,
+                  pendingPlanResultses.length,
+                  "Expected non-error plan execution result to have same length as input objects",
+                );
+              }
+              // Stitch the results back into the list
+              for (
+                let finalResultIndex = 0, l = pendingResults.length;
+                finalResultIndex < l;
+                finalResultIndex++
+              ) {
+                if (pendingPlanResultses[finalResultIndex] != null) {
+                  finalResult[finalResultIndex] =
+                    // NOTE: if this would have been a CrystalError, processResults
+                    // should already have dealt with this via Promise.reject.
+                    pendingResults[finalResultIndex];
+                }
+              }
+              return finalResult;
+            };
+            if (isPromiseLike(pendingResultsOrPromise)) {
+              return pendingResultsOrPromise.then(
+                finalizePendingResults,
+                (e) => {
+                  for (
+                    let finalResultIndex = 0, l = pendingPlanResultses.length;
+                    finalResultIndex < l;
+                    finalResultIndex++
+                  ) {
+                    if (pendingPlanResultses[finalResultIndex] != null) {
+                      finalResult[finalResultIndex] = Promise.reject(e);
+                    }
+                  }
+                  return finalResult;
+                },
+              );
+            } else {
+              return finalizePendingResults(pendingResultsOrPromise);
+            }
+          }
+          return finalResult;
         }
-        return finalResult;
+      };
+      if (isPromiseLike(layerResultsOrPromise)) {
+        return layerResultsOrPromise.then(finalizeLayerResults);
       } else {
-        // Now executing the following layers using the same planResultses
-        const finalResult = new Array(planResultsesLength);
-        const pendingPlanResultses = new Array(planResultses.length);
-        let hasAtLeastOneNonError = false;
-        for (
-          let finalResultIndex = 0;
-          finalResultIndex < planResultsesLength;
-          finalResultIndex++
-        ) {
-          if (layerResults[finalResultIndex] instanceof CrystalError) {
-            finalResult[finalResultIndex] = Promise.reject(
-              layerResults[finalResultIndex].originalError,
-            );
-            pendingPlanResultses[finalResultIndex] = null;
-          } else {
-            hasAtLeastOneNonError = true;
-            pendingPlanResultses[finalResultIndex] =
-              planResultses[finalResultIndex];
-          }
-        }
-        if (hasAtLeastOneNonError) {
-          try {
-            const pendingResults = await this.executeLayers(
-              crystalContext,
-              rest,
-              pendingPlanResultses,
-              rawMapResult,
-              planCacheForPlanResultses,
-              depth + 1,
-            );
-            if (isDev) {
-              assert.ok(
-                Array.isArray(pendingResults),
-                "Expected non-error plan execution to return an array",
-              );
-              assert.strictEqual(
-                pendingResults.length,
-                pendingPlanResultses.length,
-                "Expected non-error plan execution result to have same length as input objects",
-              );
-            }
-            // Stitch the results back into the list
-            for (
-              let finalResultIndex = 0, l = pendingResults.length;
-              finalResultIndex < l;
-              finalResultIndex++
-            ) {
-              if (pendingPlanResultses[finalResultIndex] != null) {
-                finalResult[finalResultIndex] =
-                  pendingResults[finalResultIndex] instanceof CrystalError
-                    ? Promise.reject(
-                        pendingResults[finalResultIndex].originalError,
-                      )
-                    : pendingResults[finalResultIndex];
-              }
-            }
-          } catch (e) {
-            for (
-              let finalResultIndex = 0, l = pendingPlanResultses.length;
-              finalResultIndex < l;
-              finalResultIndex++
-            ) {
-              if (pendingPlanResultses[finalResultIndex] != null) {
-                finalResult[finalResultIndex] = Promise.reject(e);
-              }
-            }
-          }
-        }
-        return finalResult;
+        return finalizeLayerResults(layerResultsOrPromise);
       }
     }
   }
@@ -3949,14 +4006,14 @@ export class Aether<
     }
   }
 
-  private async executeBatchForPlanResultses(
+  private executeBatchForPlanResultses(
     crystalContext: CrystalContext,
     pathIdentity: string,
     fieldDigest: FieldDigest,
     sideEffectPlans: ReadonlyArray<ExecutablePlan>,
     plan: ExecutablePlan,
     itemPlan: ExecutablePlan,
-    planResultses: readonly PlanResults[],
+    planResultses: ReadonlyArray<PlanResults | CrystalError | null>,
     planCacheForPlanResultses: PlanCacheForPlanResultses = Object.create(null),
     allowPrefetch = true,
   ) {
@@ -3973,110 +4030,154 @@ export class Aether<
       );
     };
 
+    const hasListBoundary = fieldDigest.listDepth > 0;
+
     // TODO: what should we do if the user has a graphqlResolver AND it's a
     // polymorphic plan?
 
-    // These two arrays have the same length
-    const resultPlanResultses: PlanResults[] = [];
-    const resultCrystalObjects: CrystalObject[] = [];
-
     // Execute the layers to get the result
-    const mapResult: MapResult | undefined =
+    const processResults: ProcessResults | undefined =
       // The user has their own resolver, so we must not return a crystalObject
       returnRaw
         ? undefined
-        : // When we're returning something polymorphic we need to figure out the typeName which we get from the plan result.
-        isPolymorphic
-        ? (planResults, data) => {
-            assertPolymorphicData(data);
-            const co = /*#__INLINE__*/ crystalObjectFromPlanResultsAndTypeName(
-              planResults,
-              data[$$concreteType],
-            );
-            resultPlanResultses.push(planResults);
-            resultCrystalObjects.push(co);
-            return co;
-          }
-        : // Otherwise we represent a standard object, so we can just use the expected named type
-          (planResults, _data) => {
-            const co = /*#__INLINE__*/ crystalObjectFromPlanResultsAndTypeName(
-              planResults,
-              namedReturnType.name,
-            );
-            resultPlanResultses.push(planResults);
-            resultCrystalObjects.push(co);
-            return co;
+        : (childPlanResultses, planCacheForChildPlanResultses) => {
+            const childPlanResultsesLength = childPlanResultses.length;
+            const result = new Array(childPlanResultsesLength);
+            for (let i = 0; i < childPlanResultsesLength; i++) {
+              const childPlanResults = childPlanResultses[i];
+              if (childPlanResults == null) {
+                result[i] = null;
+              } else if (childPlanResults instanceof CrystalError) {
+                result[i] = Promise.reject(childPlanResults.originalError);
+              } else if (isPolymorphic) {
+                // When we're returning something polymorphic we need to figure out the typeName which we get from the plan result.       if (isPolymorphic
+                const data = childPlanResults.get(
+                  itemPlan.commonAncestorPathIdentity,
+                  itemPlan.id,
+                );
+                assertPolymorphicData(data);
+                const co =
+                  /*#__INLINE__*/ crystalObjectFromPlanResultsAndTypeName(
+                    childPlanResults,
+                    data[$$concreteType],
+                  );
+                result[i] = co;
+              } else {
+                // Otherwise we represent a standard object, so we can just use the expected named type
+                const co =
+                  /*#__INLINE__*/ crystalObjectFromPlanResultsAndTypeName(
+                    childPlanResults,
+                    namedReturnType.name,
+                  );
+                result[i] = co;
+              }
+            }
+
+            if (allowPrefetch) {
+              debugExecute(
+                "Prefetching after %c, hasListBoundary=%c, count=%c, localPlans=%c",
+                plan,
+                hasListBoundary,
+                childPlanResultses.length,
+                this.prefetchesForPathIdentity[pathIdentity].local,
+              );
+
+              // chance to do pre-execution of next layers!
+              for (const localPlan of this.prefetchesForPathIdentity[
+                pathIdentity
+              ].local) {
+                const subResults = this.executeBatchForPlanResultses(
+                  crystalContext,
+                  fieldDigest.itemPathIdentity,
+                  fieldDigest,
+                  EMPTY_ARRAY,
+                  localPlan,
+                  localPlan,
+                  childPlanResultses,
+                  planCacheForChildPlanResultses,
+                  false,
+                );
+                if (isPromiseLike(subResults)) {
+                  throw new Error(
+                    `GraphileInternalError<7b0f8380-6e84-4ea5-8ff8-1639f9a4ef69>: prefetching plan ${localPlan}, but a promise was returned`,
+                  );
+                }
+              }
+
+              for (const config of this.prefetchesForPathIdentity[pathIdentity]
+                .children) {
+                const fieldDigest = config.fieldDigest;
+                const subResults = this.executeBatchForPlanResultses(
+                  crystalContext,
+                  fieldDigest.pathIdentity,
+                  fieldDigest,
+                  EMPTY_ARRAY,
+                  config.plan,
+                  config.itemPlan,
+                  childPlanResultses,
+                  planCacheForChildPlanResultses,
+                );
+                if (isPromiseLike(subResults)) {
+                  throw new Error(
+                    `GraphileInternalError<826bf502-015e-487c-897b-b5acc9f94c76>: prefetching plan/itemPlan ${config.plan}/${config.itemPlan}, but a promise was returned`,
+                  );
+                }
+                const responseKey = config.fieldDigest.responseKey;
+                for (let i = 0, l = result.length; i < l; i++) {
+                  if (isCrystalObject(result[i])) {
+                    result[i][$$data][responseKey] = subResults[i];
+                  }
+                }
+              }
+              return result;
+            } else {
+              return result;
+            }
           };
 
     // First, execute side effects (in order, *not* in parallel)
     // TODO: assert that side effect plans cannot be nested under list items.
     const sideEffectCount = sideEffectPlans.length;
     if (sideEffectCount > 0) {
+      let chain: Promise<any> = Promise.resolve();
       for (let i = 0; i < sideEffectCount; i++) {
         const sideEffectPlan = sideEffectPlans[i];
-        await this.executePlan(sideEffectPlan, crystalContext, planResultses);
-      }
-    }
-
-    const results = await this.executeBatchInner(
-      crystalContext,
-      planResultses,
-      pathIdentity,
-      plan,
-      itemPlan,
-      planCacheForPlanResultses,
-      mapResult,
-    );
-    if (!returnRaw && allowPrefetch) {
-      // Different set of PlanResultses, so we use a different plan cache
-      const childPlanCacheForPlanResultses = Object.create(null);
-
-      // chance to do pre-execution of next layers!
-      for (const localPlan of this.prefetchesForPathIdentity[pathIdentity]
-        .local) {
-        const subResults = await this.executeBatchForPlanResultses(
-          crystalContext,
-          fieldDigest.itemPathIdentity,
-          fieldDigest,
-          EMPTY_ARRAY,
-          localPlan,
-          localPlan,
-          resultPlanResultses,
-          childPlanCacheForPlanResultses,
-          false,
+        chain = chain.then(() =>
+          this.executePlan(sideEffectPlan, crystalContext, planResultses),
         );
       }
-
-      for (const config of this.prefetchesForPathIdentity[pathIdentity]
-        .children) {
-        const fieldDigest = config.fieldDigest;
-        const subResults = await this.executeBatchForPlanResultses(
+      return chain.then(() =>
+        this.executeBatchInner(
           crystalContext,
-          fieldDigest.pathIdentity,
-          fieldDigest,
-          EMPTY_ARRAY,
-          config.plan,
-          config.itemPlan,
-          resultPlanResultses,
-          childPlanCacheForPlanResultses,
-        );
-        const responseKey = config.fieldDigest.responseKey;
-        for (let i = 0, l = resultCrystalObjects.length; i < l; i++) {
-          resultCrystalObjects[i][$$data][responseKey] = subResults[i];
-        }
-      }
+          planResultses,
+          pathIdentity,
+          plan,
+          itemPlan,
+          planCacheForPlanResultses,
+          processResults,
+        ),
+      );
+    } else {
+      return this.executeBatchInner(
+        crystalContext,
+        planResultses,
+        pathIdentity,
+        plan,
+        itemPlan,
+        planCacheForPlanResultses,
+        processResults,
+      );
     }
-    return results;
   }
 
   private executeBatchInner(
     crystalContext: CrystalContext,
-    planResultses: readonly PlanResults[],
+    planResultses: ReadonlyArray<PlanResults | CrystalError | null>,
     pathIdentity: string,
     plan: ExecutablePlan,
     itemPlan: ExecutablePlan,
     planCacheForPlanResultses: PlanCacheForPlanResultses,
-    mapResult: MapResult | undefined = undefined,
+    processResults: ProcessResults | undefined = undefined,
   ) {
     assert.ok(plan, "No plan in batch?!");
     assert.ok(itemPlan, "No itemPlan in batch?!");
@@ -4101,7 +4202,7 @@ export class Aether<
       crystalContext,
       layers,
       planResultses,
-      mapResult,
+      processResults,
       planCacheForPlanResultses,
       0,
     );
