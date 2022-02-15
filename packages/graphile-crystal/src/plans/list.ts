@@ -22,6 +22,12 @@ export class ListPlan<
     }
   }
 
+  toStringMeta() {
+    return this.dependencies
+      .map((id) => this.aether.dangerouslyGetPlan(id).id)
+      .join(",");
+  }
+
   // Could be used to reduce the number of unique values returned
   tupleToTuple(
     results: Array<UnwrapPlanTuple<TPlanTuple>>,
