@@ -107,6 +107,15 @@ import {
   sharedNull,
 } from "./utils";
 
+const dotEscape = (str: string): string => {
+  if (str.match(/^[a-z0-9 ]+$/i)) {
+    return str;
+  }
+  return `"${stripAnsi(str)
+    .replace(/[&"]/g, (l) => ({ "&": "&amp;", '"': "&quot;" }[l as any]))
+    .replace(/\r?\n/g, "<br />")}"`;
+};
+
 interface PlanCacheForPlanResultses {
   [planId: number]: PromiseOrDirect<any[]>;
 }
@@ -4422,6 +4431,33 @@ export class Aether<
    * @internal
    */
   public printPlansByPath(): string {
+    const graph = [
+      `graph TD`,
+      `    classDef path fill:#f96;`,
+      `    classDef plan fill:#f9f;`,
+      `    classDef itemplan fill:#bbf;`,
+    ];
+    const pathIdMap = {};
+    let pathCounter = 0;
+    const pathId = (pathIdentity: string): string => {
+      if (!pathIdMap[pathIdentity]) {
+        pathIdMap[pathIdentity] = `P${++pathCounter}`;
+        graph.push(
+          `    ${pathIdMap[pathIdentity]}(${dotEscape(
+            crystalPrintPathIdentity(pathIdentity),
+          )}):::path`,
+        );
+        if (this.planIdByPathIdentity[pathIdentity]) {
+          graph.push(
+            `    ${
+              this.plans[this.planIdByPathIdentity[pathIdentity]!].id
+            } --> ${pathIdMap[pathIdentity]}`,
+          );
+        }
+      }
+      return pathIdMap[pathIdentity];
+    };
+
     const fieldPathIdentities = Object.keys(this.planIdByPathIdentity)
       .sort((a, z) => a.length - z.length)
       .filter(
@@ -4452,6 +4488,9 @@ export class Aether<
             parentFieldPathIdentity.length,
           )}: ${plan}`,
       );
+      const fieldPathNodeId = pathId(fieldPathIdentity);
+      const parentFieldPathNodeId = pathId(parentFieldPathIdentity);
+      graph.push(`    ${parentFieldPathNodeId} --> ${fieldPathNodeId}`);
       depth++;
       for (const childFieldPathIdentity of fieldPathIdentities) {
         if (
@@ -4468,7 +4507,29 @@ export class Aether<
     for (const fieldPathIdentity of fieldPathIdentities) {
       print(fieldPathIdentity, "");
     }
-    return lines.join("\n");
+    const plansByPath = lines.join("\n");
+
+    for (const id in this.plans) {
+      const plan = this.plans[id];
+      if (plan && plan.id === parseInt(id, 10)) {
+        const meta = plan.toStringMeta();
+        const planString = `${plan.constructor.name.replace(/Plan$/, "")}[${
+          plan.id
+        }]\n${crystalPrintPathIdentity(plan.commonAncestorPathIdentity)}${
+          meta ? `\n<${meta}>` : ""
+        }`;
+        graph.push(
+          `    ${plan.id}[${dotEscape(planString)}]:::${
+            plan instanceof __ItemPlan ? "itemplan" : "plan"
+          }`,
+        );
+        for (const depId of plan.dependencies) {
+          graph.push(`    ${this.plans[depId].id} --> ${plan.id}`);
+        }
+      }
+    }
+
+    return plansByPath + "\n" + graph.join("\n");
   }
 
   /**
