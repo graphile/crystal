@@ -2428,6 +2428,17 @@ export class Aether<
     planCacheForPlanResultses: PlanCacheForPlanResultses = Object.create(null),
   ): PromiseOrDirect<any[]> {
     if (String(plan.id) in planCacheForPlanResultses) {
+      if (isDev) {
+        Promise.resolve(planCacheForPlanResultses[plan.id]).then(
+          (planCache) => {
+            assert.strictEqual(
+              planCache.length,
+              planResultses.length,
+              "Expected the planCache length to match the planResultses length",
+            );
+          },
+        );
+      }
       return planCacheForPlanResultses[plan.id];
     }
     let timeString: string | null = null;
