@@ -18,9 +18,9 @@ import { crystalPrint, stripAnsi } from "graphile-crystal";
 import { exportSchema } from "graphile-exporter";
 import { resolvePresets } from "graphile-plugin";
 import { graphql, printSchema } from "graphql";
+import * as jsonwebtoken from "jsonwebtoken";
 import { Pool } from "pg";
 import { inspect } from "util";
-import * as jsonwebtoken from "jsonwebtoken";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 
