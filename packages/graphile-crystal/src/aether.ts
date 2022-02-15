@@ -3462,6 +3462,7 @@ export class Aether<
       itemPlanId != null,
       `Could not find the itemPlanId for path identity '${fieldPathIdentity}'`,
     );
+    // TODO: precompute this (and various other things in here)
     const sideEffectPlans =
       sideEffectPlanIds?.map(
         (sideEffectPlanId) => this.plans[sideEffectPlanId],
