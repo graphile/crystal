@@ -3142,7 +3142,7 @@ export class Aether<
     pendingPlanResultses: ReadonlyArray<PlanResults>,
     visitedPlans: Set<ExecutablePlan>,
     depth: number,
-    planCacheForPlanResultses: PlanCacheForPlanResultses,
+    planCacheForPendingPlanResultses: PlanCacheForPlanResultses,
   ): Promise<any[]> {
     const indent = "    ".repeat(depth);
     const follow = indent + "  ⮞";
@@ -3178,6 +3178,7 @@ export class Aether<
           // cascade back outside -> clone.
           new Set(visitedPlans),
           depth + 1,
+          planCacheForPendingPlanResultses,
         );
         dependencyValuesList[i] = allDependencyResults;
       }
@@ -3220,7 +3221,7 @@ export class Aether<
     }
     const planCacheForRealPendingPlanResultses =
       realPendingPlanResultses.length === pendingPlanResultses.length
-        ? planCacheForPlanResultses
+        ? planCacheForPendingPlanResultses
         : Object.create(null);
 
     // TODO: optimize this away
