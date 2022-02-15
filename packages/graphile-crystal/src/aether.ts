@@ -2618,11 +2618,11 @@ export class Aether<
       if (plan.id in bucket) {
         const previousResult = bucket[plan.id];
         if (debugExecuteVerboseEnabled) {
-          const planResults = bucketPlanResultses.planResults;
+          const planResults = bucketPlanResultses[0].planResults;
           debugExecuteVerbose(
             "%s result[%o] for %c found: %c",
             follow,
-            bucketPlanResultses.indexes,
+            bucketPlanResultses.map((r) => r.planResultsesIndex),
             planResults,
             previousResult,
           );
@@ -2656,7 +2656,7 @@ export class Aether<
       debugExecuteVerbose(
         "%s no result for buckets with first entries %c",
         follow,
-        pendingPlanResultsAndIndexListList.map((l) => l.planResults),
+        pendingPlanResultsAndIndexListList.map((l) => l[0].planResults),
       );
     }
 
