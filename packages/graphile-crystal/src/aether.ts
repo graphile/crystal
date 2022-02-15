@@ -119,7 +119,7 @@ const $$FINISHED: unique symbol = Symbol("finished");
 type ProcessResults = (
   planResultses: Array<PlanResults | CrystalError | null>,
   planCacheForPlanResultses: PlanCacheForPlanResultses,
-) => any[];
+) => PromiseOrDirect<any[]>;
 
 /**
  * Describes the document tree that we're parsing; is populated by
@@ -647,6 +647,11 @@ export class Aether<
 
       // Find all the plans that should already have been executed by now (i.e. have been executed by parent fields)
       const executedPlanIds = new Set<number>();
+      const itemPlanId =
+        this.itemPlanIdByFieldPathIdentity[fieldDigest.pathIdentity];
+      if (itemPlanId != null) {
+        executedPlanIds.add(itemPlanId);
+      }
       let ancestorFieldDigest: FieldDigest | null = fieldDigest;
       while (ancestorFieldDigest) {
         if (this.isUnplannedByPathIdentity[ancestorFieldDigest.pathIdentity]) {
@@ -3737,7 +3742,7 @@ export class Aether<
                   // TODO: are CrystalError's handled correctly here?
                   // TODO: batch this?
                   if (processResults) {
-                    const [value] = processResults(
+                    const [value] = await processResults(
                       copyList,
                       planCacheForCopyList,
                     );
@@ -4016,7 +4021,7 @@ export class Aether<
     planResultses: ReadonlyArray<PlanResults | CrystalError | null>,
     planCacheForPlanResultses: PlanCacheForPlanResultses = Object.create(null),
     allowPrefetch = true,
-  ) {
+  ): PromiseOrDirect<any[]> {
     const { isPolymorphic, isLeaf, namedReturnType, returnRaw } = fieldDigest;
     const crystalObjectFromPlanResultsAndTypeName = (
       planResults: PlanResults,
@@ -4043,46 +4048,56 @@ export class Aether<
         : (childPlanResultses, planCacheForChildPlanResultses) => {
             const childPlanResultsesLength = childPlanResultses.length;
             const result = new Array(childPlanResultsesLength);
+            let hasAtLeastOneNonError = false;
             for (let i = 0; i < childPlanResultsesLength; i++) {
               const childPlanResults = childPlanResultses[i];
               if (childPlanResults == null) {
                 result[i] = null;
               } else if (childPlanResults instanceof CrystalError) {
                 result[i] = Promise.reject(childPlanResults.originalError);
-              } else if (isPolymorphic) {
-                // When we're returning something polymorphic we need to figure out the typeName which we get from the plan result.       if (isPolymorphic
+              } else {
                 const data = childPlanResults.get(
                   itemPlan.commonAncestorPathIdentity,
                   itemPlan.id,
                 );
-                assertPolymorphicData(data);
-                const co =
-                  /*#__INLINE__*/ crystalObjectFromPlanResultsAndTypeName(
-                    childPlanResults,
-                    data[$$concreteType],
-                  );
-                result[i] = co;
-              } else {
-                // Otherwise we represent a standard object, so we can just use the expected named type
-                const co =
-                  /*#__INLINE__*/ crystalObjectFromPlanResultsAndTypeName(
-                    childPlanResults,
-                    namedReturnType.name,
-                  );
-                result[i] = co;
+
+                if (data == null || data instanceof CrystalError) {
+                  result[i] = data;
+                } else if (isPolymorphic) {
+                  hasAtLeastOneNonError = true;
+                  // When we're returning something polymorphic we need to figure out the typeName which we get from the plan result.       if (isPolymorphic
+                  assertPolymorphicData(data);
+                  const co =
+                    /*#__INLINE__*/ crystalObjectFromPlanResultsAndTypeName(
+                      childPlanResults,
+                      data[$$concreteType],
+                    );
+                  result[i] = co;
+                } else {
+                  hasAtLeastOneNonError = true;
+                  // Otherwise we represent a standard object, so we can just use the expected named type
+                  const co =
+                    /*#__INLINE__*/ crystalObjectFromPlanResultsAndTypeName(
+                      childPlanResults,
+                      namedReturnType.name,
+                    );
+                  result[i] = co;
+                }
               }
             }
 
-            if (allowPrefetch) {
+            if (allowPrefetch && hasAtLeastOneNonError) {
               debugExecute(
-                "Prefetching after %c, hasListBoundary=%c, count=%c, localPlans=%c",
+                "Prefetching after %c/%c, hasListBoundary=%c, count=%c, localPlans=%c",
                 plan,
+                itemPlan,
                 hasListBoundary,
                 childPlanResultses.length,
                 this.prefetchesForPathIdentity[pathIdentity].local,
               );
 
               // chance to do pre-execution of next layers!
+              const siblingPromises = [];
               for (const localPlan of this.prefetchesForPathIdentity[
                 pathIdentity
               ].local) {
@@ -4098,38 +4113,53 @@ export class Aether<
                   false,
                 );
                 if (isPromiseLike(subResults)) {
-                  throw new Error(
-                    `GraphileInternalError<7b0f8380-6e84-4ea5-8ff8-1639f9a4ef69>: prefetching plan ${localPlan}, but a promise was returned`,
-                  );
+                  siblingPromises.push(subResults);
                 }
               }
 
-              for (const config of this.prefetchesForPathIdentity[pathIdentity]
-                .children) {
-                const fieldDigest = config.fieldDigest;
-                const subResults = this.executeBatchForPlanResultses(
-                  crystalContext,
-                  fieldDigest.pathIdentity,
-                  fieldDigest,
-                  EMPTY_ARRAY,
-                  config.plan,
-                  config.itemPlan,
-                  childPlanResultses,
-                  planCacheForChildPlanResultses,
-                );
-                if (isPromiseLike(subResults)) {
-                  throw new Error(
-                    `GraphileInternalError<826bf502-015e-487c-897b-b5acc9f94c76>: prefetching plan/itemPlan ${config.plan}/${config.itemPlan}, but a promise was returned`,
-                  );
-                }
-                const responseKey = config.fieldDigest.responseKey;
-                for (let i = 0, l = result.length; i < l; i++) {
-                  if (isCrystalObject(result[i])) {
-                    result[i][$$data][responseKey] = subResults[i];
+              const siblingsComplete = (): PromiseOrDirect<any[]> => {
+                const promises = [];
+                for (const config of this.prefetchesForPathIdentity[
+                  pathIdentity
+                ].children) {
+                  const fieldDigest = config.fieldDigest;
+                  const subResultsOrPromise: PromiseOrDirect<any[]> =
+                    this.executeBatchForPlanResultses(
+                      crystalContext,
+                      fieldDigest.pathIdentity,
+                      fieldDigest,
+                      EMPTY_ARRAY,
+                      config.plan,
+                      config.itemPlan,
+                      childPlanResultses,
+                      planCacheForChildPlanResultses,
+                    );
+                  const responseKey = config.fieldDigest.responseKey;
+                  const storeResults = (subResults: any[]) => {
+                    for (let i = 0, l = result.length; i < l; i++) {
+                      if (isCrystalObject(result[i])) {
+                        result[i][$$data][responseKey] = subResults[i];
+                      }
+                    }
+                  };
+                  if (isPromiseLike(subResultsOrPromise)) {
+                    promises.push(subResultsOrPromise.then(storeResults));
+                  } else {
+                    storeResults(subResultsOrPromise);
                   }
                 }
+                if (promises.length) {
+                  return Promise.all(promises).then(() => result);
+                } else {
+                  return result;
+                }
+              };
+
+              if (siblingPromises.length > 0) {
+                return Promise.all(siblingPromises).then(siblingsComplete);
+              } else {
+                return siblingsComplete();
               }
-              return result;
             } else {
               return result;
             }
