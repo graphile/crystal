@@ -125,10 +125,10 @@ export class PlanResults {
    * depending on benchmark results.)
    */
   public getBucket(commonAncestorPathIdentity: string): PlanResultsBucket {
-    const s =
+    return (
       this.store[commonAncestorPathIdentity] ??
-      (this.store[commonAncestorPathIdentity] = Object.create(sharedNull));
-    return s;
+      (this.store[commonAncestorPathIdentity] = Object.create(sharedNull))
+    );
   }
 
   /**
