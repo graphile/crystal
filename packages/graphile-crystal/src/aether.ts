@@ -112,11 +112,7 @@ const dotEscape = (str: string): string => {
     return str;
   }
   return `"${stripAnsi(str)
-    .replace(
-      /[&"<>]/g,
-      (l) =>
-        ({ "&": "&amp;", '"': "&quot;", "<": "&lt;", ">": "&gt;" }[l as any]),
-    )
+    .replace(/[#"]/g, (l) => ({ "#": "#35;", '"': "#quot;" }[l as any]))
     .replace(/\r?\n/g, "<br />")}"`;
 };
 
