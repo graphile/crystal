@@ -180,6 +180,7 @@ const depthWrap = (debugFn: debugFactory.Debugger) =>
     debugFn,
   );
 const debugPlan = depthWrap(debugPlan_);
+const debugPlanEnabled = debugPlan.enabled;
 const debugExecute = depthWrap(debugExecute_);
 const debugExecuteEnabled = isDev && debugExecute.enabled;
 const debugPlanVerbose = depthWrap(debugPlanVerbose_);
@@ -474,7 +475,10 @@ export class Aether<
       parentPathIdentity: GLOBAL_PATH,
     }) as <T>(cb: () => T) => T;
     this.variableValuesPlan = wgs(() => new __ValuePlan());
-    debugPlan("Constructed variableValuesPlan %s", this.variableValuesPlan);
+    debugPlanVerbose(
+      "Constructed variableValuesPlan %s",
+      this.variableValuesPlan,
+    );
     // TODO: this should use a more intelligent tracked object plan since the variables are strongly typed (unlike context/rootValue).
     this.trackedVariableValuesPlan = wgs(
       () =>
@@ -491,7 +495,7 @@ export class Aether<
       );
     }
     this.contextPlan = wgs(() => new __ValuePlan());
-    debugPlan("Constructed contextPlan %s", this.contextPlan);
+    debugPlanVerbose("Constructed contextPlan %s", this.contextPlan);
     this.trackedContextPlan = wgs(
       () =>
         new __TrackedObjectPlan(
@@ -507,7 +511,7 @@ export class Aether<
       );
     }
     this.rootValuePlan = wgs(() => new __ValuePlan());
-    debugPlan("Constructed rootValuePlan %s", this.rootValuePlan);
+    debugPlanVerbose("Constructed rootValuePlan %s", this.rootValuePlan);
     this.trackedRootValuePlan = wgs(
       () =>
         new __TrackedObjectPlan(
@@ -619,8 +623,14 @@ export class Aether<
     this.finalizePlans();
 
     // Log the plan now we're all done
-    if (debugPlanVerboseEnabled) {
-      this.logPlansByPath("after optimization and finalization");
+    if (debugPlanEnabled) {
+      const why = "after optimization and finalization";
+      debugPlan("Plans%s: %s", why ? ` ${why}` : "", "\n" + this.printPlans());
+      debugPlan(
+        `Plans by path%s: %s`,
+        why ? ` ${why}` : "",
+        "\n" + this.printPlansByPath(),
+      );
     }
 
     this.phase = "ready";
@@ -2021,7 +2031,10 @@ export class Aether<
       );
       loops++;
     } while (replacements > 0);
-    debugPlan("ExecutablePlan deduplication complete after %o loops", loops);
+    debugPlanVerbose(
+      "ExecutablePlan deduplication complete after %o loops",
+      loops,
+    );
   }
 
   /**

@@ -685,7 +685,7 @@ export class PgSelectPlan<
       }
     });
 
-    debugPlan(
+    debugPlanVerbose(
       `%s (%s) constructor (%s; %s)`,
       this,
       this.name,
@@ -1980,7 +1980,7 @@ lateral (${sql.indent(wrappedInnerQuery)}) as ${wrapperAlias}`;
         return false;
       }
 
-      debugPlan("Found that %c and %c are equivalent!", this, p);
+      debugPlanVerbose("Found that %c and %c are equivalent!", this, p);
 
       return true;
     });
