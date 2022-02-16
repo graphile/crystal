@@ -1,3 +1,4 @@
+import LRU from "@graphile/lru";
 import debugFactory from "debug";
 import type {
   FragmentDefinitionNode,
@@ -33,8 +34,7 @@ interface Cache {
   possibleAethers: LinkedList<Aether>;
   fragments: Fragments;
 }
-type CacheByOperation = WeakMap<OperationDefinitionNode, Cache>;
-const cacheByOperationBySchema = new WeakMap<GraphQLSchema, CacheByOperation>();
+type CacheByOperation = LRU<OperationDefinitionNode, Cache>;
 
 function reallyAssertFragmentsMatch(
   oldFragments: Fragments,
@@ -100,6 +100,8 @@ export function isAetherCompatible<
   return true;
 }
 
+const $$cacheByOperation = Symbol("cacheByOperation");
+
 /**
  * Implements the `EstablishAether` algorithm.
  *
@@ -122,7 +124,8 @@ export function establishAether<
 }): Aether<TVariables, TContext, TRootValue> {
   const { schema, operation, fragments, variableValues, context, rootValue } =
     details;
-  let cacheByOperation = cacheByOperationBySchema.get(schema);
+  let cacheByOperation = schema[$$cacheByOperation];
+
   let cache = cacheByOperation?.get(operation);
   if (cache) {
     assertFragmentsMatch(cache.fragments, fragments);
@@ -156,10 +159,11 @@ export function establishAether<
     rootValue,
   );
 
-  // Store it to the cache (temporarily)
+  // Store it to the cache
   if (!cacheByOperation) {
-    cacheByOperation = new WeakMap();
-    cacheByOperationBySchema.set(schema, cacheByOperation);
+    // TODO: make this configurable
+    cacheByOperation = new LRU({ maxLength: 500 });
+    schema[$$cacheByOperation] = cacheByOperation;
   }
   if (!cache) {
     cache = {

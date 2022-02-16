@@ -74,20 +74,14 @@ function makeWellKnownFromOptions(options: ExportOptions) {
   return { namespaces, wellKnownMap };
 }
 
-const cache = new WeakMap<
-  ExportOptions,
-  ReturnType<typeof makeWellKnownFromOptions>
->();
+const $$wellKnown = Symbol("wellKnown");
 function getWellKnownFromOptions(
   options: ExportOptions,
 ): ReturnType<typeof makeWellKnownFromOptions> {
-  if (cache.has(options)) {
-    return cache.get(options)!;
-  } else {
-    const result = makeWellKnownFromOptions(options);
-    cache.set(options, result);
-    return result;
+  if (!options[$$wellKnown]) {
+    options[$$wellKnown] = makeWellKnownFromOptions(options);
   }
+  return options[$$wellKnown];
 }
 
 /**

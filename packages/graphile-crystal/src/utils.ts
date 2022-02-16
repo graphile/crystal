@@ -1,3 +1,4 @@
+import LRU from "@graphile/lru";
 import type {
   GraphQLEnumValueConfig,
   GraphQLFieldConfig,
@@ -551,11 +552,7 @@ export function planGroupsOverlap(
   return plan1.groupIds.some((id) => plan2.groupIds.includes(id));
 }
 
-const enumValueDefinitionCache: WeakMap<
-  GraphQLEnumType,
-  Map<unknown, GraphQLEnumValueConfig>
-> = new WeakMap();
-
+const $$valueConfigByValue = Symbol("valueConfigByValue");
 /**
  * This would be equivalent to `enumType._valueLookup.get(outputValue)` except
  * that's not a public API so we have to do a bit of heavy lifting here. Since
@@ -566,16 +563,18 @@ export function getEnumValueConfig(
   enumType: GraphQLEnumType,
   outputValue: unknown,
 ): GraphQLEnumValueConfig | undefined {
-  let cache = enumValueDefinitionCache.get(enumType);
-  if (!cache) {
-    cache = new Map();
-    enumValueDefinitionCache.set(enumType, cache);
+  // We cache onto the enumType directly so that garbage collection can clear up after us easily.
+  if (!enumType[$$valueConfigByValue]) {
     const config = enumType.toConfig();
-    for (const value of Object.values(config.values)) {
-      cache.set(value.value, value);
-    }
+    enumType[$$valueConfigByValue] = Object.values(config.values).reduce(
+      (memo, value) => {
+        memo[value.value] = value;
+        return memo;
+      },
+      {},
+    );
   }
-  return cache.get(outputValue);
+  return enumType[$$valueConfigByValue][outputValue];
 }
 
 /**

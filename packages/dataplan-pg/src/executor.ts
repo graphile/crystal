@@ -112,13 +112,7 @@ export type PgExecutorSubscribeOptions = {
 export class PgExecutor<TSettings = any> {
   public name: string;
   private contextCallback: () => ObjectPlan<PgExecutorContextPlans<TSettings>>;
-  private cache: WeakMap<
-    Record<string, unknown> /* context */,
-    LRU<
-      string /* query and variables */,
-      Map<string /* queryValues (JSON) */, Deferred<any[]>>
-    >
-  > = new WeakMap();
+  private $$cache: symbol;
 
   constructor(options: {
     name: string;
@@ -126,6 +120,7 @@ export class PgExecutor<TSettings = any> {
   }) {
     const { name, context } = options;
     this.name = name;
+    this.$$cache = Symbol(this.name + "_cache");
     this.contextCallback = context;
   }
 
@@ -267,7 +262,7 @@ ${duration}
     return this._executeWithOrWithoutCache<TInput, TOutput>(
       values,
       common,
-      this.cache,
+      true,
     );
   }
 
@@ -280,20 +275,14 @@ ${duration}
     return this._executeWithOrWithoutCache<TInput, TOutput>(
       values,
       common,
-      new Map(),
+      false,
     );
   }
 
   private async _executeWithOrWithoutCache<TInput = any, TOutput = any>(
     values: CrystalValuesList<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
-    cache: WeakMap<
-      Record<string, unknown> /* context */,
-      LRU<
-        string /* query and variables */,
-        Map<string /* queryValues (JSON) */, Deferred<any[]>>
-      >
-    >,
+    useCache: boolean,
   ): Promise<{
     values: CrystalValuesList<ReadonlyArray<TOutput>>;
   }> {
@@ -332,10 +321,12 @@ ${duration}
       promises.push(
         (async () => {
           // TODO: cache must factor in placeholders.
-          let cacheForContext = cache.get(context);
+          let cacheForContext = useCache ? context[this.$$cache] : null;
           if (!cacheForContext) {
             cacheForContext = new LRU({ maxLength: 500 /* SQL queries */ });
-            cache.set(context, cacheForContext);
+            if (useCache) {
+              context[this.$$cache] = cacheForContext;
+            }
           }
 
           const textAndValues = `${text}\n${JSON.stringify(rawSqlValues)}`;
@@ -752,7 +743,7 @@ ${duration}
 
     // TODO: we could probably make this more efficient rather than blowing away the entire cache!
     // Wipe the cache since a mutation succeeded.
-    this.cache.get(context)?.reset();
+    context[this.$$cache]?.reset();
 
     return queryResult;
   }
