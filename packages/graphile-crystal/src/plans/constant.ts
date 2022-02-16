@@ -1,5 +1,6 @@
 import type { CrystalResultsList, CrystalValuesList } from "../interfaces";
 import { ExecutablePlan } from "../plan";
+import { arrayOfLength } from "../utils";
 
 /**
  * Converts a constant value (e.g. a string/number/etc) into a plan
@@ -16,7 +17,7 @@ export class ConstantPlan<TData> extends ExecutablePlan<TData> {
   }
 
   execute(values: [[undefined]]): CrystalResultsList<TData> {
-    return new Array(values[0].length).fill(this.data);
+    return arrayOfLength(values[0].length, this.data);
   }
 }
 

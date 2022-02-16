@@ -23,7 +23,7 @@ import * as assert from "./assert";
 import type { CrystalResultsList, CrystalValuesList } from "./interfaces";
 import { ExecutablePlan } from "./plan";
 import { __TrackedObjectPlan, constant } from "./plans";
-import { defaultValueToValueNode } from "./utils";
+import { arrayOfLength, defaultValueToValueNode } from "./utils";
 
 // TODO: should this have `__` prefix?
 export type InputPlan =
@@ -215,7 +215,7 @@ export class InputListPlan extends ExecutablePlan {
       return constant(null);
     } else {
       const itemPlansLength = this.itemPlanIds.length;
-      const list = new Array(itemPlansLength);
+      const list: any[] = [];
       for (
         let itemPlanIndex = 0;
         itemPlanIndex < itemPlansLength;
@@ -250,7 +250,7 @@ export class InputListPlan extends ExecutablePlan {
       return null;
     }
     const itemPlansLength = this.itemPlanIds.length;
-    const list = new Array(itemPlansLength);
+    const list: any[] = [];
     for (
       let itemPlanIndex = 0;
       itemPlanIndex < itemPlansLength;
@@ -300,7 +300,7 @@ export class InputStaticLeafPlan<TLeaf = any> extends ExecutablePlan<TLeaf> {
   }
 
   execute(values: [CrystalValuesList<TLeaf>]): CrystalResultsList<TLeaf> {
-    return new Array(values[0].length).fill(this.coercedValue);
+    return arrayOfLength(values[0].length, this.coercedValue);
   }
 
   eval(): TLeaf {
@@ -365,7 +365,7 @@ export class InputObjectPlan extends ExecutablePlan {
 
   execute(values: any[][]): any[] {
     const count = values[0].length;
-    const results = new Array(count);
+    const results = [];
     for (let i = 0; i < count; i++) {
       const resultValues = Object.create(null);
       for (const inputFieldName in this.inputFields) {

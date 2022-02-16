@@ -99,6 +99,7 @@ import {
 } from "./resolvers";
 import { stripAnsi } from "./stripAnsi";
 import {
+  arrayOfLength,
   arraysMatch,
   defaultValueToValueNode,
   isPromiseLike,
@@ -2621,7 +2622,7 @@ export class Aether<
     }
 
     const planResultsesLength = planResultses.length;
-    const result = new Array(planResultsesLength);
+    const result: any[] = [];
 
     // Though we've been passed a list of planResultses (some of which may be
     // null), we don't actually need to execute for all of these. The common
@@ -2642,6 +2643,7 @@ export class Aether<
       planResultsesIndex < planResultsesLength;
       planResultsesIndex++
     ) {
+      result[planResultsesIndex] = undefined;
       const planResults = planResultses[planResultsesIndex];
       if (planResults == null || planResults instanceof CrystalError) {
         result[planResultsesIndex] = planResults;
@@ -2752,9 +2754,9 @@ export class Aether<
     const dependenciesCount = plan.dependencies.length;
     const hasDependencies = dependenciesCount > 0;
     const dependencyValuesList = hasDependencies
-      ? new Array(dependenciesCount)
+      ? []
       : plan.hasSideEffects
-      ? [new Array(pendingPlanResultses.length).fill(undefined)]
+      ? [arrayOfLength(pendingPlanResultses.length)]
       : [[undefined]];
     const dependencyPromises: Array<{
       promise: PromiseOrDirect<any[]>;
@@ -2891,7 +2893,7 @@ export class Aether<
           pendingPlanResultsesIndex >= 0;
           pendingPlanResultsesIndex--
         ) {
-          const entry = new Array(dependenciesCount);
+          const entry = [];
           let error: CrystalError | null = null;
           for (
             let dependencyIndex = 0;
@@ -3103,7 +3105,7 @@ export class Aether<
       );
     }
     const planResultsesLength = planResultses.length;
-    const result = new Array(planResultsesLength);
+    const result: any[] = [];
     if (debugExecuteEnabled) {
       debugExecute(
         "%sExecutePlan(%c): executing with %o plan results",
@@ -3157,6 +3159,7 @@ export class Aether<
           )}.`,
         );
       }
+      result[i] = undefined;
       const bucket = planResults.getBucket(commonAncestorPathIdentity);
       if (deferredsByBucket.has(bucket)) {
         // In progress already
@@ -3293,9 +3296,9 @@ export class Aether<
     const dependenciesCount = plan.dependencies.length;
     const hasDependencies = dependenciesCount > 0;
     const dependencyValuesList = hasDependencies
-      ? new Array(dependenciesCount)
+      ? []
       : plan.hasSideEffects
-      ? [new Array(pendingPlanResultses.length).fill(undefined)]
+      ? [arrayOfLength(pendingPlanResultses.length)]
       : [[undefined]];
     if (debugExecuteEnabled) {
       debugExecute("%s Executing %o dependencies", follow, dependenciesCount);
@@ -3762,7 +3765,7 @@ export class Aether<
         : rawProcessResults ??
           ((planResultses) => {
             const planResultsesLength = planResultses.length;
-            const result = new Array(planResultsesLength);
+            const result = [];
             for (let i = 0, l = planResultsesLength; i < l; i++) {
               const planResults = planResultses[i];
               if (planResults == null) {
@@ -3872,7 +3875,7 @@ export class Aether<
                   innerPlanResultsesIndex,
                 ]);
               }
-              return new Array(l);
+              return arrayOfLength(l);
             }
           } else if (isAsyncIterable(listResult)) {
             const listResultIterator = listResult[Symbol.asyncIterator]();
@@ -4029,9 +4032,7 @@ export class Aether<
       ): PromiseOrDirect<any[]> => {
         if (processResults) {
           // No following layers; map the result
-          const finalResult = new Array<PlanResults | CrystalError | null>(
-            planResultsesLength,
-          );
+          const finalResult: Array<PlanResults | CrystalError | null> = [];
           for (let i = 0; i < planResultsesLength; i++) {
             finalResult[i] =
               layerResults[i] instanceof CrystalError
@@ -4041,8 +4042,9 @@ export class Aether<
           return processResults(finalResult, planCacheForPlanResultses);
         } else {
           // Now executing the following layers using the same planResultses
-          const finalResult = new Array(planResultsesLength);
-          const pendingPlanResultses = new Array(planResultses.length);
+          const finalResult: any[] = [];
+          const pendingPlanResultses: Array<PlanResults | CrystalError | null> =
+            [];
           let hasAtLeastOneNonError = false;
           for (
             let finalResultIndex = 0;
@@ -4055,6 +4057,7 @@ export class Aether<
               );
               pendingPlanResultses[finalResultIndex] = null;
             } else {
+              finalResult[finalResultIndex] = undefined;
               hasAtLeastOneNonError = true;
               pendingPlanResultses[finalResultIndex] =
                 planResultses[finalResultIndex];
@@ -4151,7 +4154,7 @@ export class Aether<
 
     const { entries, sideEffectPlans, plan, itemPlan, pathIdentity } = batch;
     const entriesLength = entries.length;
-    const planResultses: PlanResults[] = new Array(entriesLength);
+    const planResultses: PlanResults[] = [];
     for (let i = 0; i < entriesLength; i++) {
       const crystalObject = entries[i][0];
       planResultses[i] = crystalObject[$$planResults];
@@ -4215,7 +4218,7 @@ export class Aether<
         ? undefined
         : (childPlanResultses, planCacheForChildPlanResultses) => {
             const childPlanResultsesLength = childPlanResultses.length;
-            const result = new Array(childPlanResultsesLength);
+            const result: any[] = [];
             let hasAtLeastOneNonError = false;
             for (let i = 0; i < childPlanResultsesLength; i++) {
               const childPlanResults = childPlanResultses[i];

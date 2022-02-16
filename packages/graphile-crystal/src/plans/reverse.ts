@@ -11,7 +11,7 @@ export function reverseArray<TData = any>(list: readonly TData[]): TData[] {
     );
   }
   const l = list.length;
-  const newList = new Array(l);
+  const newList = [];
   for (let i = 0; i < l; i++) {
     newList[i] = list[l - i - 1];
   }

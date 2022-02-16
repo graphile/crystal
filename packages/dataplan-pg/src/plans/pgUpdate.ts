@@ -377,8 +377,8 @@ export class PgUpdatePlan<
         );
       } else {
         // This is our common path
-        const sqlWhereClauses: SQL[] = new Array(getByColumnsCount);
-        const sqlSets: SQL[] = new Array(columnsCount);
+        const sqlWhereClauses: SQL[] = [];
+        const sqlSets: SQL[] = [];
         const queryValueDetailsBySymbol: QueryValueDetailsBySymbol = new Map();
 
         for (let i = 0; i < getByColumnsCount; i++) {

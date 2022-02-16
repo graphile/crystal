@@ -62,7 +62,7 @@ export class ListPlan<
     values: any[][], //Array<UnwrapPlanTuple<TPlanTuple>>,
   ): Array<UnwrapPlanTuple<TPlanTuple>> {
     const count = values[0].length;
-    const result = new Array(count);
+    const result: any[] = [];
     for (let i = 0; i < count; i++) {
       result[i] = values.map((list) => list[i]);
     }

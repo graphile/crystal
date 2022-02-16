@@ -617,3 +617,16 @@ export function stack(message: string, length = 4) {
     console.log(mapped.join("\n"));
   }
 }
+
+/**
+ * Ridiculously, this is faster than `new Array(length).fill(fill)`
+ *
+ * @internal
+ */
+export function arrayOfLength(length: number, fill?: any) {
+  const arr = [];
+  for (let i = 0; i < length; i++) {
+    arr[i] = fill;
+  }
+  return arr;
+}

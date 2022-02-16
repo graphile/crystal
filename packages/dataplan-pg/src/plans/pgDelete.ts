@@ -314,7 +314,7 @@ export class PgDeletePlan<
         );
       } else {
         // This is our common path
-        const sqlWhereClauses: SQL[] = new Array(getByColumnsCount);
+        const sqlWhereClauses: SQL[] = [];
         const queryValueDetailsBySymbol: QueryValueDetailsBySymbol = new Map();
 
         for (let i = 0; i < getByColumnsCount; i++) {

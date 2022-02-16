@@ -603,7 +603,7 @@ export function identifier(...names: Array<string | symbol>): SQL {
     );
   }
 
-  const finalNames: Array<string | SymbolAndName> = new Array(nameCount);
+  const finalNames: Array<string | SymbolAndName> = [];
   for (let i = 0; i < nameCount; i++) {
     const name = names[i];
     if (typeof name === "string") {

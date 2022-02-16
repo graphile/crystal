@@ -333,8 +333,8 @@ export class PgInsertPlan<
       const columnsCount = this.columns.length;
       if (columnsCount > 0) {
         // This is our common path
-        const sqlColumns: SQL[] = new Array(columnsCount);
-        const valuePlaceholders: SQL[] = new Array(columnsCount);
+        const sqlColumns: SQL[] = [];
+        const valuePlaceholders: SQL[] = [];
         const queryValueDetailsBySymbol: QueryValueDetailsBySymbol = new Map();
         for (let i = 0; i < columnsCount; i++) {
           const { name, depId, pgCodec } = this.columns[i];

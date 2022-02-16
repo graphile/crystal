@@ -300,7 +300,7 @@ ${duration}
     const { text, rawSqlValues, identifierIndex, queryValuesSymbol } = common;
 
     const valuesCount = values.length;
-    const results: Deferred<Array<TOutput>>[] = new Array(valuesCount);
+    const results: Array<Deferred<Array<TOutput>> | undefined> = [];
 
     // Group by context
     const groupMap = new Map<
@@ -315,6 +315,7 @@ ${duration}
       resultIndex < l;
       resultIndex++
     ) {
+      results[resultIndex] = undefined;
       const { context, queryValues } = values[resultIndex];
 
       let entry = groupMap.get(context);
@@ -461,7 +462,11 @@ ${duration}
     // Avoids UnhandledPromiseRejection error.
     await Promise.allSettled(promises);
 
-    const finalResults = await Promise.all(results);
+    const finalResults = await Promise.all(
+      results as typeof results extends ReadonlyArray<infer U>
+        ? ReadonlyArray<Exclude<U, undefined>>
+        : never,
+    );
     return { values: finalResults };
   }
 
@@ -479,9 +484,7 @@ ${duration}
     const { text, rawSqlValues, identifierIndex, queryValuesSymbol } = common;
 
     const valuesCount = values.length;
-    const streams: Array<AsyncIterable<TOutput> | CrystalError> = new Array(
-      valuesCount,
-    );
+    const streams: Array<AsyncIterable<TOutput> | CrystalError | null> = [];
 
     // Group by context
     const groupMap = new Map<
@@ -491,11 +494,8 @@ ${duration}
         resultIndex: number;
       }>
     >();
-    for (
-      let resultIndex = 0, l = values.length;
-      resultIndex < l;
-      resultIndex++
-    ) {
+    for (let resultIndex = 0, l = valuesCount; resultIndex < l; resultIndex++) {
+      streams[resultIndex] = null;
       const { context, queryValues } = values[resultIndex];
 
       let entry = groupMap.get(context);
@@ -729,7 +729,7 @@ ${duration}
         tx.resolve();
         batch.forEach(({ resultIndex }) => {
           if (isAsyncIterable(streams[resultIndex])) {
-            streams[resultIndex][Symbol.asyncIterator].throw?.(e);
+            streams[resultIndex]![Symbol.asyncIterator].throw?.(e);
           }
           streams[resultIndex] = new CrystalError(e);
         });
@@ -740,7 +740,7 @@ ${duration}
     // Avoids UnhandledPromiseRejection error.
     await Promise.allSettled(promises);
 
-    return { streams };
+    return { streams: streams as Array<AsyncIterable<TOutput> | CrystalError> };
   }
 
   public async executeMutation<TData>(
