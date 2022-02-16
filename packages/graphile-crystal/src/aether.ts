@@ -363,6 +363,11 @@ export class Aether<
   /**
    * @internal
    */
+  public rootFieldDigest: FieldDigest | null = null;
+
+  /**
+   * @internal
+   */
   public readonly prefetchesForPathIdentity: {
     [pathIdentity: string]: {
       local: ExecutablePlan[];
@@ -425,6 +430,9 @@ export class Aether<
   public readonly queryTypeName: string;
   public readonly mutationTypeName: string | undefined;
   public readonly subscriptionTypeName: string | undefined;
+  public readonly queryType: GraphQLObjectType;
+  public readonly mutationType: GraphQLObjectType | undefined;
+  public readonly subscriptionType: GraphQLObjectType | undefined;
   /**
    * @internal
    */
@@ -453,8 +461,11 @@ export class Aether<
         "This GraphQL schema does not support queries, it cannot be used.",
       );
     }
+    this.queryType = queryType;
     this.queryTypeName = queryType.name;
+    this.mutationType = mutationType ?? undefined;
     this.mutationTypeName = mutationType?.name;
+    this.subscriptionType = subscriptionType ?? undefined;
     this.subscriptionTypeName = subscriptionType?.name;
 
     // Unions are a pain, let's cache some things up front to make them easier.
@@ -777,6 +788,31 @@ export class Aether<
     }
   }
 
+  private setRootFieldDigest(
+    type: GraphQLObjectType,
+    childFieldDigests: FieldDigest[],
+  ) {
+    this.rootFieldDigest = {
+      parentFieldDigest: null,
+      pathIdentity: ROOT_PATH,
+      itemPathIdentity: ROOT_PATH,
+      responseKey: "",
+      returnType: type,
+      namedReturnType: type,
+      returnRaw: false,
+      isPolymorphic: false,
+      isLeaf: false,
+      planId: this.rootValuePlan.id,
+      itemPlanId: this.rootValuePlan.id,
+      listDepth: 0,
+      childFieldDigests,
+    };
+    this.fieldDigestByPathIdentity[ROOT_PATH] = this.rootFieldDigest;
+    childFieldDigests.forEach((digest) => {
+      digest.parentFieldDigest = this.rootFieldDigest!;
+    });
+  }
+
   /**
    * Implements the `PlanAetherQuery` algorithm.
    */
@@ -786,7 +822,7 @@ export class Aether<
       throw new Error("No query type found in schema");
     }
     this.finalizeArgumentsSince(0, ROOT_PATH);
-    this.planSelectionSet(
+    const { fieldDigests } = this.planSelectionSet(
       ROOT_PATH,
       ROOT_PATH,
       this.trackedRootValuePlan,
@@ -799,6 +835,7 @@ export class Aether<
       ],
       this.rootTreeNode,
     );
+    this.setRootFieldDigest(this.queryType, fieldDigests);
   }
 
   /**
@@ -810,7 +847,7 @@ export class Aether<
       throw new Error("No mutation type found in schema");
     }
     this.finalizeArgumentsSince(0, ROOT_PATH);
-    this.planSelectionSet(
+    const { fieldDigests } = this.planSelectionSet(
       ROOT_PATH,
       ROOT_PATH,
       this.trackedRootValuePlan,
@@ -824,6 +861,7 @@ export class Aether<
       this.rootTreeNode,
       true,
     );
+    this.setRootFieldDigest(this.mutationType!, fieldDigests);
   }
 
   /**
@@ -917,7 +955,7 @@ export class Aether<
         1,
         "Expected exactly one subscription field",
       );
-      this.fieldDigestByPathIdentity[ROOT_PATH] = fieldDigests[0];
+      this.setRootFieldDigest(this.subscriptionType!, fieldDigests);
     } else {
       const subscribePlan = this.trackedRootValuePlan;
       this.subscriptionPlanId = subscribePlan.id;
@@ -940,7 +978,7 @@ export class Aether<
         1,
         "Expected exactly one subscription field",
       );
-      this.fieldDigestByPathIdentity[ROOT_PATH] = fieldDigests[0];
+      this.setRootFieldDigest(this.subscriptionType!, fieldDigests);
     }
   }
 
