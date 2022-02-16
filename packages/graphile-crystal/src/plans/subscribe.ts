@@ -25,12 +25,12 @@ export class SubscribePlan<
   /**
    * The id for the PostgreSQL context plan.
    */
-  private pubsubDepId: number;
+  private pubsubDep: number;
 
   /**
    * The plan that will tell us which topic we're subscribing to.
    */
-  private topicDepId: number;
+  private topicDep: number;
 
   constructor(
     pubsubOrPlan:
@@ -45,8 +45,8 @@ export class SubscribePlan<
     const $pubsub = isExecutablePlan(pubsubOrPlan)
       ? pubsubOrPlan
       : constant(pubsubOrPlan);
-    this.pubsubDepId = this.addDependency($pubsub);
-    this.topicDepId = this.addDependency($topic);
+    this.pubsubDep = this.addDependency($pubsub);
+    this.topicDep = this.addDependency($topic);
   }
 
   execute(): never {
@@ -61,8 +61,8 @@ export class SubscribePlan<
       CrystalValuesList<TTopic>,
     ],
   ): CrystalResultStreamList<TTopics[TTopic]> {
-    return values[this.pubsubDepId as 0].map((pubsub, i) => {
-      const topic = values[this.topicDepId as 1][i];
+    return values[this.pubsubDep as 0].map((pubsub, i) => {
+      const topic = values[this.topicDep as 1][i];
       return pubsub.subscribe(topic);
     });
   }

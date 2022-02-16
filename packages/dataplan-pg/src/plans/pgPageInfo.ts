@@ -35,7 +35,7 @@ export class PgPageInfoPlan<TPlan extends PgSelectPlan<any, any, any, any>>
 
   sync = true;
 
-  private connectionPlanId: number;
+  private connectionPlanId: string;
 
   constructor(connectionPlan: ConnectionPlan<any, TPlan, any>) {
     super();

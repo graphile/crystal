@@ -60,7 +60,7 @@ export class __ListTransformPlan<
   };
   sync = true;
 
-  private listPlanId: number;
+  private listPlanDepId: number;
   public itemPlanCallback: ListTransformItemPlanCallback<TListPlan, TDepsPlan>;
   public initialState: () => TMemo;
   public reduceCallback: ListTransformReduce<
@@ -87,7 +87,7 @@ export class __ListTransformPlan<
       namedType,
       meta,
     } = options;
-    this.listPlanId = this.addDependency(listPlan);
+    this.listPlanDepId = this.addDependency(listPlan);
     this.itemPlanCallback = itemPlanCallback;
     this.initialState = initialState;
     this.reduceCallback = reduceCallback;
@@ -102,12 +102,12 @@ export class __ListTransformPlan<
   }
 
   getListPlan(): TListPlan {
-    return this.getDep(this.listPlanId) as TListPlan;
+    return this.getDep(this.listPlanDepId) as TListPlan;
   }
 
   dangerouslyGetListPlan(): TListPlan {
     return this.aether.dangerouslyGetPlan(
-      this.dependencies[this.listPlanId],
+      this.dependencies[this.listPlanDepId],
     ) as TListPlan;
   }
 

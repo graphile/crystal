@@ -14,8 +14,8 @@ export class PgCursorPlan<
   };
   sync = true;
 
-  private cursorValuesPlanId: number;
-  private classSinglePlanId: number;
+  private cursorValuesDepId: number;
+  private classSinglePlanId: string;
   private digest: string;
 
   constructor(itemPlan: TPlan) {
@@ -35,7 +35,7 @@ export class PgCursorPlan<
             ),
           ],
     );
-    this.cursorValuesPlanId = this.addDependency(plan);
+    this.cursorValuesDepId = this.addDependency(plan);
   }
 
   public getClassSinglePlan(): TPlan {
@@ -51,7 +51,7 @@ export class PgCursorPlan<
   execute(
     values: [CrystalValuesList<any[] | null>],
   ): CrystalResultsList<string | null> {
-    return values[this.cursorValuesPlanId].map((v) => {
+    return values[this.cursorValuesDepId].map((v) => {
       return v == null || v!.every((v) => v == null)
         ? null
         : Buffer.from(JSON.stringify([this.digest, ...v]), "utf8").toString(

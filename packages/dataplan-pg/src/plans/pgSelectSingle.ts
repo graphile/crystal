@@ -79,7 +79,7 @@ export class PgSelectSinglePlan<
   public readonly pgCodec: PgTypeCodec<TColumns, any, any>;
   public readonly itemPlanId: number;
   public readonly mode: PgSelectMode;
-  private classPlanId: number;
+  private classPlanId: string;
   private nullCheckId: number | null = null;
   public readonly source: PgSource<TColumns, TUniques, TRelations, TParameters>;
 

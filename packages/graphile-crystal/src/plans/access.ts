@@ -159,7 +159,7 @@ export class AccessPlan<TData> extends ExecutablePlan<TData> {
   sync = true;
 
   private destructure: (value: TData) => any;
-  private parentPlanId: number;
+  private parentPlanId: string;
 
   constructor(
     parentPlan: ExecutablePlan<unknown>,

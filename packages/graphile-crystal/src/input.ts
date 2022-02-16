@@ -177,8 +177,8 @@ export class InputListPlan extends ExecutablePlan {
   };
   sync = true;
 
-  private itemPlanIds: number[] = [];
-  private outOfBoundsPlanId: number;
+  private itemPlanIds: string[] = [];
+  private outOfBoundsPlanId: string;
 
   constructor(
     inputType: GraphQLList<GraphQLInputType>,

@@ -140,7 +140,7 @@ export class ExecutablePlan<TData = any> extends BasePlan {
    *
    * @internal
    */
-  public _recursiveDependencyIds = new Set<number>();
+  public _recursiveDependencyIds = new Set<string>();
 
   /**
    * Set true if your plan executes synchronously (i.e. no
@@ -160,14 +160,14 @@ export class ExecutablePlan<TData = any> extends BasePlan {
    *
    * @internal
    */
-  private readonly _dependencies: number[] = [];
+  private readonly _dependencies: string[] = [];
 
   /**
    * The ids for plans this plan will need data from in order to execute.
    */
-  public readonly dependencies: ReadonlyArray<number> = this._dependencies;
+  public readonly dependencies: ReadonlyArray<string> = this._dependencies;
 
-  public readonly id: number;
+  public readonly id: string;
   /**
    * The group ids this plan is associated with (e.g. if the field this plan
    * was spawned from came from multiple selection sets in the GraphQL
@@ -201,7 +201,7 @@ export class ExecutablePlan<TData = any> extends BasePlan {
     this.id = this.aether._addPlan(this);
   }
 
-  protected getPlan(id: number): ExecutablePlan {
+  protected getPlan(id: string): ExecutablePlan {
     return this.aether.getPlan(id, this);
   }
 
@@ -389,10 +389,10 @@ export abstract class ModifierPlan<
   // Explicitly we do not add $$export here because we want children to set it
   static $$export: any;
 
-  public readonly id: number;
+  public readonly id: string;
   constructor(protected readonly $parent: TParentPlan) {
     super();
-    this.id = this.aether.modifierPlans.push(this) - 1;
+    this.id = this.aether._addModifierPlan(this);
   }
 
   /**

@@ -8,13 +8,13 @@ export class LambdaPlan<TIn, TOut> extends ExecutablePlan<TOut> {
   };
   sync = true;
 
-  private planId: number | null;
+  private planDep: number | null;
   constructor(
     $plan: ExecutablePlan<TIn> | null | undefined,
     private fn: (value: TIn) => TOut,
   ) {
     super();
-    this.planId = $plan != null ? this.addDependency($plan) : null;
+    this.planDep = $plan != null ? this.addDependency($plan) : null;
   }
 
   toStringMeta() {
@@ -31,9 +31,9 @@ export class LambdaPlan<TIn, TOut> extends ExecutablePlan<TOut> {
   }
 
   execute(values: [CrystalValuesList<TIn>]): CrystalResultsList<TOut> {
-    const { planId } = this;
-    if (planId != null) {
-      return values[planId].map(this.fn);
+    const { planDep } = this;
+    if (planDep != null) {
+      return values[planDep].map(this.fn);
     } else {
       return values[0].map(this.fn);
     }

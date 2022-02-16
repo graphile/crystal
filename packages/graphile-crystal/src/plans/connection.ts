@@ -42,14 +42,14 @@ export class ConnectionPlan<
   };
   sync = true;
 
-  private subplanId: number;
+  private subplanId: string;
 
   // Pagination stuff
-  private _firstId: number | null = null;
-  private _lastId: number | null = null;
-  private _offsetId: number | null = null;
-  private _beforeId: number | null = null;
-  private _afterId: number | null = null;
+  private _firstDepId: number | null = null;
+  private _lastDepId: number | null = null;
+  private _offsetDepId: number | null = null;
+  private _beforeDepId: number | null = null;
+  private _afterDepId: number | null = null;
 
   constructor(
     subplan: TPlan,
@@ -70,59 +70,59 @@ export class ConnectionPlan<
   }
 
   public getFirst(): InputPlan | null {
-    return this._firstId != null
-      ? (this.getDep(this._firstId) as InputPlan)
+    return this._firstDepId != null
+      ? (this.getDep(this._firstDepId) as InputPlan)
       : null;
   }
   public setFirst($firstPlan: InputPlan) {
-    if (this._firstId != null) {
+    if (this._firstDepId != null) {
       throw new Error(`${this}->setFirst already called`);
     }
-    this._firstId = this.addDependency($firstPlan);
+    this._firstDepId = this.addDependency($firstPlan);
   }
   public getLast(): InputPlan | null {
-    return this._lastId != null
-      ? (this.getDep(this._lastId) as InputPlan)
+    return this._lastDepId != null
+      ? (this.getDep(this._lastDepId) as InputPlan)
       : null;
   }
   public setLast($lastPlan: InputPlan) {
-    if (this._lastId != null) {
+    if (this._lastDepId != null) {
       throw new Error(`${this}->setLast already called`);
     }
-    this._lastId = this.addDependency($lastPlan);
+    this._lastDepId = this.addDependency($lastPlan);
   }
   public getOffset(): InputPlan | null {
-    return this._offsetId != null
-      ? (this.getDep(this._offsetId) as InputPlan)
+    return this._offsetDepId != null
+      ? (this.getDep(this._offsetDepId) as InputPlan)
       : null;
   }
   public setOffset($offsetPlan: InputPlan) {
-    if (this._offsetId != null) {
+    if (this._offsetDepId != null) {
       throw new Error(`${this}->setOffset already called`);
     }
-    this._offsetId = this.addDependency($offsetPlan);
+    this._offsetDepId = this.addDependency($offsetPlan);
   }
   public getBefore(): InputPlan | null {
-    return this._beforeId != null
-      ? (this.getDep(this._beforeId) as InputPlan)
+    return this._beforeDepId != null
+      ? (this.getDep(this._beforeDepId) as InputPlan)
       : null;
   }
   public setBefore($beforePlan: InputPlan) {
-    if (this._beforeId != null) {
+    if (this._beforeDepId != null) {
       throw new Error(`${this}->setBefore already called`);
     }
-    this._beforeId = this.addDependency($beforePlan);
+    this._beforeDepId = this.addDependency($beforePlan);
   }
   public getAfter(): InputPlan | null {
-    return this._afterId != null
-      ? (this.getDep(this._afterId) as InputPlan)
+    return this._afterDepId != null
+      ? (this.getDep(this._afterDepId) as InputPlan)
       : null;
   }
   public setAfter($afterPlan: InputPlan) {
-    if (this._afterId != null) {
+    if (this._afterDepId != null) {
       throw new Error(`${this}->setAfter already called`);
     }
-    this._afterId = this.addDependency($afterPlan);
+    this._afterDepId = this.addDependency($afterPlan);
   }
 
   /**
@@ -236,7 +236,7 @@ export class EdgePlan<
   };
   sync = true;
 
-  private connectionPlanId: number;
+  private connectionPlanId: string;
 
   constructor(
     $connection: ConnectionPlan<TItemPlan, TPlan, TNodePlan>,

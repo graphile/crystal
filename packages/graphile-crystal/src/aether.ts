@@ -117,7 +117,7 @@ const dotEscape = (str: string): string => {
 };
 
 interface PlanCacheForPlanResultses {
-  [planId: number]: PromiseOrDirect<any[]>;
+  [planId: string]: PromiseOrDirect<any[]>;
 }
 
 function NOOP() {}
@@ -214,8 +214,8 @@ interface FieldDigest {
   isLeaf: boolean;
   listDepth: number;
   returnRaw: boolean;
-  planId: number;
-  itemPlanId: number;
+  planId: string;
+  itemPlanId: string;
   /**
    * Important: this does **NOT** represent the response keys, it represents
    * all the fields that are selected on the child selection set - the same
@@ -252,7 +252,11 @@ export class Aether<
     children: [],
   };
 
-  private readonly plans: ExecutablePlan[] = [];
+  private planCount = 0;
+  private modifierPlanCount = 0;
+  private readonly plans: {
+    [key: string]: ExecutablePlan;
+  } = Object.create(sharedNull);
 
   /**
    * This value is ethemeral, it only contains values whilst a specific field
@@ -274,14 +278,14 @@ export class Aether<
    *
    * @internal
    */
-  public subscriptionPlanId: number | undefined;
+  public subscriptionPlanId: string | undefined;
 
   /**
    * The plan id for the plan that represents a single payload in the subscription stream (if any)
    *
    * @internal
    */
-  public subscriptionItemPlanId: number | undefined;
+  public subscriptionItemPlanId: string | undefined;
 
   /**
    * The plan by path identity is the plan that will return the results that
@@ -290,7 +294,7 @@ export class Aether<
    * @internal
    */
   public readonly planIdByPathIdentity: {
-    [pathIdentity: string]: number | undefined;
+    [pathIdentity: string]: string | undefined;
   };
   /**
    * @internal
@@ -330,21 +334,21 @@ export class Aether<
    * @internal
    */
   public readonly itemPlanIdByFieldPathIdentity: {
-    [pathIdentity: string]: number | undefined;
+    [pathIdentity: string]: string | undefined;
   };
 
   /**
    * @internal
    */
   public readonly sideEffectPlanIdsByPathIdentity: {
-    [pathIdentity: string]: number[];
+    [pathIdentity: string]: string[];
   };
 
   /**
    * @internal
    */
   public readonly transformDependencyPlanIdByTransformPlanId: {
-    [transformPlanId: number]: number;
+    [transformPlanId: string]: string;
   };
 
   /**
@@ -695,7 +699,7 @@ export class Aether<
       const itemPlan = this.dangerouslyGetPlan(fieldDigest.itemPlanId);
 
       // Find all the plans that should already have been executed by now (i.e. have been executed by parent fields)
-      const executedPlanIds = new Set<number>();
+      const executedPlanIds = new Set<string>();
       const itemPlanId =
         this.itemPlanIdByFieldPathIdentity[fieldDigest.pathIdentity];
       if (itemPlanId != null) {
@@ -732,7 +736,7 @@ export class Aether<
        * resolver we want to pull these executions up to this level so that the
        * children can resolve synchronously.
        */
-      const plansAtThisLevel = this.plans.filter(
+      const plansAtThisLevel = Object.values(this.plans).filter(
         (p) =>
           p != null &&
           p.commonAncestorPathIdentity === fieldDigest.itemPathIdentity &&
@@ -1163,7 +1167,7 @@ export class Aether<
       let plan: ExecutablePlan | PolymorphicPlan;
       this.sideEffectPlanIdsByPathIdentity[pathIdentity] = [];
       if (typeof planResolver === "function") {
-        const oldPlansLength = this.plans.length;
+        const oldPlansLength = this.planCount;
         const wgs = withGlobalState.bind(null, {
           aether: this,
           parentPathIdentity: path,
@@ -1226,7 +1230,7 @@ export class Aether<
         };
         this.planOptionsByPlan.set(plan, planOptions);
 
-        const newPlansLength = this.plans.length;
+        const newPlansLength = this.planCount;
         if (debugPlanVerboseEnabled) {
           debugPlanVerbose(
             "Created %o new plans whilst processing %p",
@@ -1317,7 +1321,8 @@ export class Aether<
     pathIdentity: string,
     allowSideEffects = false,
   ): void {
-    for (let i = oldPlansLength, l = this.plans.length; i < l; i++) {
+    const ids = this.getPlanIds(oldPlansLength);
+    for (const i of ids) {
       const newPlan = this.plans[i];
       // If the newPlan still exists, finalize it with respect to arguments (once only).
       if (newPlan != null && this.plans[newPlan.id] === newPlan) {
@@ -1429,7 +1434,7 @@ export class Aether<
         children: [],
       };
       treeNode.children.push(nestedTreeNode);
-      const oldPlansLength = this.plans.length;
+      const oldPlansLength = this.planCount;
 
       // TODO: transform?
       const listItemPlan = withGlobalState(
@@ -1463,7 +1468,7 @@ export class Aether<
       // We don't do this check first because we need the TreeNode manipulation
       // to have already taken place due to lists/etc.
 
-      const oldPlansLength = this.plans.length;
+      const oldPlansLength = this.planCount;
       const valuePlan = withGlobalState(
         { aether: this, parentPathIdentity: pathIdentity },
         () => new __ValuePlan(),
@@ -1548,7 +1553,7 @@ export class Aether<
           for (let i = 0, l = possibleObjectTypes.length; i < l; i++) {
             const possibleObjectType = possibleObjectTypes[i];
 
-            const oldPlansLength = this.plans.length;
+            const oldPlansLength = this.planCount;
             // This line implements `GetPolymorphicObjectPlanForType`.
             const subPlan = wgs(() =>
               polymorphicPlan.planForType(possibleObjectType),
@@ -1697,6 +1702,7 @@ export class Aether<
     const plansToApply = this.modifierPlans
       .splice(0, this.modifierPlans.length)
       .reverse();
+    this.modifierPlanCount = 0;
 
     // Apply the plans.
     for (let i = 0, l = plansToApply.length; i < l; i++) {
@@ -1854,10 +1860,15 @@ export class Aether<
     return trackedArgumentValues;
   }
 
-  private validatePlans(startingAtPlanId = 0): void {
+  private getPlanIds(offset = 0) {
+    return Object.keys(this.plans).slice(offset);
+  }
+
+  private validatePlans(offset = 0): void {
     const errors: Error[] = [];
-    for (let i = startingAtPlanId, l = this.plans.length; i < l; i++) {
-      const plan = this.plans[i];
+    const ids = this.getPlanIds(offset);
+    for (const id of ids) {
+      const plan = this.plans[id];
       const referencingPlanIsAllowed =
         // Required so that we can access the underlying value plan.
         plan instanceof __TrackedObjectPlan;
@@ -1880,7 +1891,7 @@ export class Aether<
     }
 
     // TODO: This might make sense to live somewhere else / be called at a different phase?
-    this.assignGroupIds(startingAtPlanId);
+    this.assignGroupIds(offset);
   }
 
   /**
@@ -1893,13 +1904,13 @@ export class Aether<
     callback: (plan: ExecutablePlan<any>) => ExecutablePlan<any>,
     {
       onPlanReplacement,
-      startingAtPlanId = 0,
+      offset = 0,
     }: {
       onPlanReplacement?: (
         originalPlan: ExecutablePlan,
         replacementPlan: ExecutablePlan,
       ) => void;
-      startingAtPlanId?: number;
+      offset?: number;
     } = {},
   ): void {
     depth = 0;
@@ -1925,9 +1936,9 @@ export class Aether<
         return false;
       };
       // Process dependents first
-      const first = new Set<number>();
+      const first = new Set<string>();
       if (order === "dependents-first") {
-        this.plans.forEach((possibleDependent) => {
+        Object.values(this.plans).forEach((possibleDependent) => {
           if (!possibleDependent) {
             return;
           }
@@ -1966,7 +1977,7 @@ export class Aether<
         }
       }
       let replacementPlan: ExecutablePlan;
-      const oldPlansLength = this.plans.length;
+      const oldPlansLength = this.planCount;
       try {
         replacementPlan = withGlobalState(
           {
@@ -1990,7 +2001,8 @@ export class Aether<
 
       if (replacementPlan != plan) {
         // Replace all references to `plan` with `replacementPlan`
-        for (let j = 0, m = this.plans.length; j < m; j++) {
+        const ids = this.getPlanIds();
+        for (const j of ids) {
           if (this.plans[j] && this.plans[j].id === plan.id) {
             this.plans[j] = replacementPlan;
           }
@@ -2002,30 +2014,27 @@ export class Aether<
     };
 
     let plansAdded = 0;
-    const oldPlanCount = this.plans.length;
+    const oldPlanCount = this.planCount;
     let l = oldPlanCount;
-    for (let i = startingAtPlanId; i < l; i++) {
+    const ids = this.getPlanIds(offset);
+    for (const i of ids) {
       process(this.plans[i]);
 
-      plansAdded += this.plans.length - l;
+      plansAdded += this.planCount - l;
 
       // NOTE: whilst processing plans new plans may be added, thus we must loop
-      // ascending and we must re-evaluate this.plans.length on each loop
+      // ascending and we must re-evaluate this.planCount on each loop
       // iteration.
       if (isDev && plansAdded > 100000) {
         throw new Error(
-          `Whilst processing plans as part of ${actionDescription}Plans, ${plansAdded} new plans have been created... That seems like it's likely a bug in the relevant method of one of your plans. The last plan processed was ${
-            this.plans[i]
-          } and this created the following plans: ${this.plans
-            .slice(i + 1)
-            .join(",")}`,
+          `Whilst processing plans as part of ${actionDescription}Plans, ${plansAdded} new plans have been created... That seems like it's likely a bug in the relevant method of one of your plans. The last plan processed was ${this.plans[i]}`,
         );
       }
 
-      l = this.plans.length;
+      l = this.planCount;
     }
 
-    if (this.plans.length > oldPlanCount) {
+    if (this.planCount > oldPlanCount) {
       // Any time new plans are added we should validate them.
       this.validatePlans(oldPlanCount);
     }
@@ -2042,7 +2051,7 @@ export class Aether<
    * with the former and having the former SELECT additional fields, then
    * transform the results back to what our child plans would be expecting.
    */
-  private deduplicatePlans(startingAtPlanId = 0): void {
+  private deduplicatePlans(offset = 0): void {
     let replacements = 0;
     let loops = 0;
     let lastOptimizedPlan;
@@ -2066,7 +2075,7 @@ export class Aether<
           }
           return replacementPlan;
         },
-        { startingAtPlanId },
+        { offset },
       );
       loops++;
     } while (replacements > 0);
@@ -2144,18 +2153,21 @@ export class Aether<
 
     const seenIds = new Set();
     seenIds.add(plan.id);
-    const peers = this.plans.filter((potentialPeer) => {
-      if (
-        potentialPeer &&
-        !potentialPeer.hasSideEffects &&
-        !seenIds.has(potentialPeer.id) &&
-        this.isPeer(plan, potentialPeer)
-      ) {
-        seenIds.add(potentialPeer.id);
-        return true;
-      }
-      return false;
-    });
+    const peers = Object.entries(this.plans)
+      .filter(([id, potentialPeer]) => {
+        if (
+          potentialPeer &&
+          potentialPeer.id === id &&
+          !potentialPeer.hasSideEffects &&
+          !seenIds.has(potentialPeer.id) &&
+          this.isPeer(plan, potentialPeer)
+        ) {
+          seenIds.add(potentialPeer.id);
+          return true;
+        }
+        return false;
+      })
+      .map((tuple) => tuple[1]);
 
     // TODO: should we keep this optimisation, or should we remove it so that
     // plans that are "smarter" than us can return replacement plans even if
@@ -2163,12 +2175,6 @@ export class Aether<
     if (peers.length === 0) {
       return plan;
     }
-
-    // Sort the peers so the one with the lowest id comes first - this is the
-    // one we'd rather substitute with.
-    peers.sort((a, z) => {
-      return a.id - z.id;
-    });
 
     const replacementPlan = plan.deduplicate(peers);
     if (replacementPlan !== plan) {
@@ -2286,7 +2292,8 @@ export class Aether<
       this.markPlanActive(plan, activePlans);
     }
 
-    for (let i = 0, l = this.plans.length; i < l; i++) {
+    const ids = this.getPlanIds();
+    for (const i of ids) {
       const plan = this.plans[i];
       if (plan && !activePlans.has(plan)) {
         if (debugPlanVerboseEnabled && plan.id === i) {
@@ -2378,7 +2385,7 @@ export class Aether<
    * plan is used, and then extract the groupIds from these. This helps us to
    * know when plans can and cannot be optimised (e.g. merged together).
    */
-  private assignGroupIds(_startingAtPlanId = 0) {
+  private assignGroupIds(_offset = 0) {
     this.walkTreeFirstPlanUsages((treeNode, plan) => {
       const groupIds = this.groupIdsByPathIdentity[treeNode.fieldPathIdentity];
       assert.ok(
@@ -2437,7 +2444,7 @@ export class Aether<
     // Assert it worked
     if (isDev) {
       let firstInvalidPlan: any = null;
-      for (const plan of this.plans) {
+      for (const plan of Object.values(this.plans)) {
         if (
           plan &&
           plan.commonAncestorPathIdentity === "" &&
@@ -2462,7 +2469,8 @@ export class Aether<
    */
   private finalizePlans(): void {
     const distinctActivePlansInReverseOrder = new Set<ExecutablePlan>();
-    for (let i = this.plans.length - 1; i >= 0; i--) {
+    const ids = this.getPlanIds();
+    for (const i of ids.reverse()) {
       const plan = this.plans[i];
       if (plan !== null) {
         // NOTE: checking the following would be redundant:
@@ -3536,7 +3544,7 @@ export class Aether<
    *
    * @internal
    */
-  public dangerouslyGetPlan(id: number): ExecutablePlan {
+  public dangerouslyGetPlan(id: string): ExecutablePlan {
     return this.plans[id];
   }
 
@@ -3546,13 +3554,32 @@ export class Aether<
    *
    * @internal
    */
-  public _addPlan(plan: ExecutablePlan): number {
+  public _addPlan(plan: ExecutablePlan): string {
     if (!["plan", "validate", "deduplicate", "optimize"].includes(this.phase)) {
       throw new Error(
         `Creating a plan during the '${this.phase}' phase is forbidden.`,
       );
     }
-    return this.plans.push(plan) - 1;
+    const planId = `_${++this.planCount}`;
+    this.plans[planId] = plan;
+    return planId;
+  }
+
+  /**
+   * Adds a plan to the known plans and returns the number to use as the plan
+   * id. ONLY to be used from Plan, user code should never call this directly.
+   *
+   * @internal
+   */
+  public _addModifierPlan(plan: ModifierPlan<any>): string {
+    if (!["plan", "validate", "deduplicate", "optimize"].includes(this.phase)) {
+      throw new Error(
+        `Creating a plan during the '${this.phase}' phase is forbidden.`,
+      );
+    }
+    const modifierPlanId = `_${this.modifierPlanCount++}`;
+    this.modifierPlans.push(plan);
+    return modifierPlanId;
   }
 
   /**
@@ -3644,12 +3671,15 @@ export class Aether<
     const crystalContext: CrystalContext = {
       aether: this,
       metaByPlanId: Object.create(null),
-      inProgressPlanResolutions: this.plans.reduce((memo, plan, idx) => {
-        if (plan && plan.id === idx) {
-          memo[plan.id] = new Map();
-        }
-        return memo;
-      }, {}),
+      inProgressPlanResolutions: Object.entries(this.plans).reduce(
+        (memo, [idx, plan]) => {
+          if (plan && plan.id === idx) {
+            memo[plan.id] = new Map();
+          }
+          return memo;
+        },
+        {},
+      ),
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore We'll set this in just a moment...
       rootCrystalObject: null,
@@ -3794,7 +3824,7 @@ export class Aether<
               }' bucket yet (creating for ${layerPlan}, but already contains data from ${Object.keys(
                 bucket,
               )
-                .map((id) => this.dangerouslyGetPlan(Number(id)))
+                .map((id) => this.dangerouslyGetPlan(id))
                 .join(", ")}). Data found: ${crystalPrint(bucket)}`,
             );
           }
@@ -4387,7 +4417,7 @@ export class Aether<
    */
   public printPlans(): string {
     const { plans } = this;
-    const printDep = (depId: number) => {
+    const printDep = (depId: string) => {
       const actualDepId = this.plans[depId].id;
       if (actualDepId !== depId) {
         return (
@@ -4399,8 +4429,8 @@ export class Aether<
         return chalk.bold.yellow(String(actualDepId));
       }
     };
-    const partsLines = plans
-      .map((plan, id) => {
+    const partsLines = Object.entries(plans)
+      .map(([id, plan]) => {
         if (!plan) {
           return null;
         } else if (plan.id !== id) {
@@ -4605,7 +4635,7 @@ export class Aether<
 
     for (const id in this.plans) {
       const plan = this.plans[id];
-      if (plan && plan.id === parseInt(id, 10)) {
+      if (plan && plan.id === id) {
         const planName = plan.constructor.name.replace(/Plan$/, "");
         const meta = plan.toStringMeta();
         const planClass =
@@ -4657,7 +4687,7 @@ export class Aether<
   //----------------------------------------
 
   public getPlan: (
-    id: number,
+    id: string,
     requestingPlan: ExecutablePlan,
   ) => ExecutablePlan = isDev
     ? (id, requestingPlan) => {

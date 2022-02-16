@@ -79,7 +79,7 @@ export interface PolymorphicData<TType extends string = string, TData = any> {
 }
 
 export interface IndexByListItemPlanId {
-  [listItemPlanId: number]: number;
+  [listItemPlanId: string]: number;
 }
 
 // TODO: remove <TData>
@@ -130,11 +130,11 @@ export interface CrystalContext {
   aether: Aether;
 
   metaByPlanId: {
-    [planId: number]: Record<string, unknown> | undefined;
+    [planId: string]: Record<string, unknown> | undefined;
   };
 
   inProgressPlanResolutions: {
-    [planId: number]: Map<PlanResultsBucket, Deferred<any>>;
+    [planId: string]: Map<PlanResultsBucket, Deferred<any>>;
   };
 
   rootCrystalObject: CrystalObject;

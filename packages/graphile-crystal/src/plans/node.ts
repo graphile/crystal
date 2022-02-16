@@ -26,7 +26,7 @@ export class NodePlan<TCodecs extends { [key: string]: NodeIdCodec<any> }>
   };
   sync = true;
 
-  private specPlanId: number;
+  private specPlanDep: number;
 
   constructor(
     private codecs: TCodecs,
@@ -36,7 +36,7 @@ export class NodePlan<TCodecs extends { [key: string]: NodeIdCodec<any> }>
     $id: ExecutablePlan<string>,
   ) {
     super();
-    this.specPlanId = this.addDependency(
+    this.specPlanDep = this.addDependency(
       lambda($id, (raw) =>
         Object.entries(codecs).reduce(
           (memo, [codecName, codec]) => {
@@ -56,7 +56,7 @@ export class NodePlan<TCodecs extends { [key: string]: NodeIdCodec<any> }>
   planForType(type: GraphQLObjectType): ExecutablePlan {
     const spec = this.possibleTypes[type.name];
     if (spec) {
-      return spec.get(access(this.getDep(this.specPlanId), [spec.codecName]));
+      return spec.get(access(this.getDep(this.specPlanDep), [spec.codecName]));
     } else {
       return constant(null);
     }
@@ -82,7 +82,7 @@ export class NodePlan<TCodecs extends { [key: string]: NodeIdCodec<any> }>
   execute(
     values: Array<CrystalValuesList<any>>,
   ): CrystalResultsList<PolymorphicData<string, ReadonlyArray<any>> | null> {
-    return values[this.specPlanId].map((specifier) =>
+    return values[this.specPlanDep].map((specifier) =>
       specifier
         ? polymorphicWrap(this.getTypeNameFromSpecifier(specifier))
         : null,
@@ -92,7 +92,7 @@ export class NodePlan<TCodecs extends { [key: string]: NodeIdCodec<any> }>
   executeSingle = (
     v: any[],
   ): PolymorphicData<string, ReadonlyArray<any>> | null => {
-    const specifier = v[this.specPlanId];
+    const specifier = v[this.specPlanDep];
     if (specifier) {
       const typeName = this.getTypeNameFromSpecifier(specifier);
       return polymorphicWrap(typeName);
