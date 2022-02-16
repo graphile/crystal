@@ -112,7 +112,11 @@ const dotEscape = (str: string): string => {
     return str;
   }
   return `"${stripAnsi(str)
-    .replace(/[&"]/g, (l) => ({ "&": "&amp;", '"': "&quot;" }[l as any]))
+    .replace(
+      /[&"<>]/g,
+      (l) =>
+        ({ "&": "&amp;", '"': "&quot;", "<": "&lt;", ">": "&gt;" }[l as any]),
+    )
     .replace(/\r?\n/g, "<br />")}"`;
 };
 
@@ -4449,6 +4453,7 @@ export class Aether<
       `    classDef path fill:#f96;`,
       `    classDef plan fill:#f9f;`,
       `    classDef itemplan fill:#bbf;`,
+      `    classDef sideeffectplan fill:#f00;`,
     ];
     const pathIdMap = {};
     let pathCounter = 0;
@@ -4457,7 +4462,7 @@ export class Aether<
         pathIdMap[pathIdentity] = `P${++pathCounter}`;
         graph.push(
           `    ${pathIdMap[pathIdentity]}(${dotEscape(
-            crystalPrintPathIdentity(pathIdentity),
+            crystalPrintPathIdentity(pathIdentity, 2, 3),
           )}):::path`,
         );
         if (this.planIdByPathIdentity[pathIdentity]) {
@@ -4525,24 +4530,29 @@ export class Aether<
     for (const id in this.plans) {
       const plan = this.plans[id];
       if (plan && plan.id === parseInt(id, 10)) {
+        const planName = plan.constructor.name.replace(/Plan$/, "");
         const meta = plan.toStringMeta();
-        const planString = `${plan.constructor.name.replace(/Plan$/, "")}[${
-          plan.id
-        }]\n${crystalPrintPathIdentity(plan.commonAncestorPathIdentity)}${
-          meta ? `\n<${meta}>` : ""
-        }`;
-        graph.push(
-          `    ${plan.id}[${dotEscape(planString)}]:::${
-            plan instanceof __ItemPlan ? "itemplan" : "plan"
-          }`,
-        );
+        const planClass =
+          plan instanceof __ItemPlan
+            ? "itemplan"
+            : plan.hasSideEffects
+            ? "sideeffectplan"
+            : "plan";
+
+        const planString = `${planName}[${plan.id}]\n${crystalPrintPathIdentity(
+          plan.commonAncestorPathIdentity,
+          2,
+          3,
+        )}${meta ? `\n<${meta}>` : ""}`;
+        graph.push(`    ${plan.id}[${dotEscape(planString)}]:::${planClass}`);
         for (const depId of plan.dependencies) {
           graph.push(`    ${this.plans[depId].id} --> ${plan.id}`);
         }
       }
     }
+    const graphString = graph.join("\n");
 
-    return plansByPath + "\n" + graph.join("\n");
+    return plansByPath + "\n" + graphString;
   }
 
   /**

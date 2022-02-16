@@ -207,7 +207,11 @@ export function ansiPad(
   }
 }
 
-export function crystalPrintPathIdentity(pathIdentity: string): string {
+export function crystalPrintPathIdentity(
+  pathIdentity: string,
+  l = 1,
+  r = 1,
+): string {
   let short = pathIdentity.replace(/>[A-Za-z0-9]+\./g, ">").slice(1);
   if (!short) return pathIdentity || "¤";
   if (isDev) {
@@ -217,11 +221,11 @@ export function crystalPrintPathIdentity(pathIdentity: string): string {
         // Don't compress last one
         return s;
       }
-      if (s.length < 5) {
+      if (s.length < 3 + l + r) {
         // Don't compress short ones
         return s;
       }
-      return `${s[0]}…${s[s.length - 1]}`;
+      return `${s.slice(0, l)}…${s.slice(s.length - r)}`;
     });
 
     short = shortenedSegments.join(">");
