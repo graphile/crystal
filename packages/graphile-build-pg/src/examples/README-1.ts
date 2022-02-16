@@ -2,6 +2,7 @@
 
 import type { WithPgClient } from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
+import LRU from "@graphile/lru";
 import chalk from "chalk";
 import express from "express";
 import { graphqlHTTP } from "express-graphql";
@@ -17,7 +18,8 @@ import {
 import { crystalPrint, stripAnsi } from "graphile-crystal";
 import { exportSchema } from "graphile-exporter";
 import { resolvePresets } from "graphile-plugin";
-import { graphql, printSchema } from "graphql";
+import type { DocumentNode, Source } from "graphql";
+import { graphql, parse, printSchema } from "graphql";
 import * as jsonwebtoken from "jsonwebtoken";
 import { Pool } from "pg";
 import { inspect } from "util";
@@ -144,11 +146,22 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     process.exit(1);
   }
 
+  const cache = new LRU<Source, DocumentNode>({ maxLength: 500 });
+  const cachingParse = (source: Source) => {
+    let parsed = cache.get(source);
+    if (!parsed) {
+      parsed = parse(source);
+      cache.set(source, parsed);
+    }
+    return parsed;
+  };
+
   const app = express();
   app.use(
     "/graphql",
     graphqlHTTP({
       schema: schema2,
+      customParseFn: cachingParse,
       graphiql: true,
       context: contextValue,
       pretty: true,
