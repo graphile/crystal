@@ -4551,6 +4551,9 @@ export class Aether<
       }
     }
     const graphString = graph.join("\n");
+    if (typeof (this.context as any)?.setPlanGraph === "function") {
+      (this.context as any).setPlanGraph(graphString);
+    }
 
     return plansByPath + "\n" + graphString;
   }
