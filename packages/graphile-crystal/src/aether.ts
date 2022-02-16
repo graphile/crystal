@@ -4571,14 +4571,14 @@ export class Aether<
         let parentId = pathId(parent.pathIdentity);
         if (parent.itemPathIdentity !== parent.pathIdentity) {
           const newParentId = pathId(parent.itemPathIdentity, true);
-          graph.push(`    ${parentId} -.-o ${newParentId}`);
+          graph.push(`    ${parentId} -.- ${newParentId}`);
           parentId = newParentId;
         }
         if (parent.childFieldDigests) {
           for (const child of parent.childFieldDigests) {
+            recurse(child);
             const childId = pathId(child.pathIdentity);
             graph.push(`    ${parentId} -.-> ${childId}`);
-            recurse(child);
           }
         }
       };
