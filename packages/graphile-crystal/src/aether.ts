@@ -232,6 +232,81 @@ interface PrefetchConfig {
 }
 
 /**
+ * A "bucket" is where the results from plans are stored so that other plans
+ * can retrieve them, it may take on different forms depending on the mode of
+ * execution. A "BucketDefinition" is used to both identify the bucket and to
+ * specify why it exists and how it behaves.
+ *
+ * Every `ExecutablePlan` belongs to exactly one bucket, specified by
+ * `plan.bucketId`. Which bucket the plan belongs to is determined by:
+ *
+ * - `__ItemPlan`s trigger a new bucket for themselves and anything
+ *   that depends on them.  This covers "list", "stream" and "subscription".
+ * - Otherwise, plans that cross a `@defer` boundary (i.e. they're needed to resolve a
+ *   `@defer`'d fragment but they aren't required to resolve the parent selection
+ *   set (ignoring the deferred fragment)) will be assigned a new "defer"
+ *   bucket.
+ * - Otherwise, plans that have no dependencies go into the root bucket
+ * - Otherwise, if all the plan's dependencies' buckets overlap then the plan
+ *   is assigned to the containing bucket (the largest bucket), and add the ids
+ *   for plans not in this containing bucket to the containing bucket's
+ *   `copyPlanIds`.
+ * - Otherwise, a new "join" bucket is created representing the union of the
+ *   largest non-overlapping buckets (and the relevant "copyPlanIds" are set).
+ *
+ * This value is then used to influence:
+ *
+ * 1. how plans are deduplicated
+ * 2. the order in which the plans are executed
+ * 3. where the result of executing the plan is stored
+ * 4. when the plan execution cache is allowed to be GC'd
+ *
+ * NOTE: `__ListTransformPlan`'s effectively have a temporary bucket inside
+ * them (built on the `__Item`) that's thrown away once the transform is
+ * complete.
+ *
+ * @internal
+ */
+interface BucketDefinition {
+  /**
+   * The array index of this BucketDefinition in Aether.buckets
+   */
+  id: number;
+
+  parent: BucketDefinition | null;
+  /**
+   * What type of bucket is this?
+   *
+   * - list - represents plans starting at an `__ItemPlan` from a list
+   * - stream - represents plans starting at an `__ItemPlan` from a list that has `@stream` (async iterator)
+   * - subscription - represents plans starting at an `__ItemPlan` from a subscription (async iterator)
+   * - defer - represents plans that are `@defer`-red
+   * - join - represents when two non-overlapping buckets are necessary to satisfy the dependencies of a plan
+   */
+  type: "list" | "stream" | "subscription" | "defer" | "join";
+
+  /**
+   * Which plan IDs available in the parent bucket need to be "copied across"
+   * to this bucket because plans in this bucket still reference them?
+   */
+  copyPlanIds: Set<string>;
+
+  /**
+   * If this bucket was caused by an `__ItemPlan` (list, stream, subscription)
+   * then what's the parent plan of that `__ItemPlan`. This is useful so that
+   * we can ensure we use the same BucketDefinition for all `__ItemPlan`s under
+   * a given plan to avoid duplication of effort.
+   */
+  reasonPlanId: string;
+
+  /**
+   * Which buckets inherit from this bucket? All buckets inherit from a bucket
+   * except for the root bucket.
+   */
+  children: BucketDefinition[];
+}
+
+/**
  * Implements the `NewAether` algorithm.
  */
 export class Aether<
