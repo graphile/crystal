@@ -398,7 +398,7 @@ export async function runTestQuery(
     if (graphString) {
       const basePath = path.replace(/\.test\.graphql$/, "");
       await fsp.writeFile(
-        `${basePath}${deoptimizedSchema ? ".deopt" : ""}.mermaid`,
+        `${basePath}${options.deoptimize ? ".deopt" : ""}.mermaid`,
         graphString,
       );
     }
