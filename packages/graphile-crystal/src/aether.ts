@@ -4609,6 +4609,14 @@ export class Aether<
         const depNodes = plan.dependencies.map((depId) => {
           return planId(this.plans[depId]);
         });
+        const transformItemPlanNode =
+          plan instanceof __ListTransformPlan
+            ? planId(
+                this.plans[
+                  this.transformDependencyPlanIdByTransformPlanId[plan.id]
+                ],
+              )
+            : null;
         const planName = plan.constructor.name.replace(/Plan$/, "");
         const planNode = `${planName}${plan.id}`;
         planIdMap[plan.id] = planNode;
@@ -4635,6 +4643,9 @@ export class Aether<
         const arrow = plan instanceof __ItemPlan ? "==>" : "-->";
         for (const depNode of depNodes) {
           graph.push(`    ${depNode} ${arrow} ${planNode}`);
+        }
+        if (transformItemPlanNode) {
+          graph.push(`    ${transformItemPlanNode} -.-> ${planNode}`);
         }
       }
       return planIdMap[plan.id];
