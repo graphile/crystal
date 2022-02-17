@@ -4570,7 +4570,11 @@ export class Aether<
     return plansByPath;
   }
 
-  public printPlanGraph(): string {
+  public printPlanGraph({
+    printPathRelations = false,
+  }: {
+    printPathRelations?: boolean;
+  } = {}): string {
     const graph = [
       `graph TD`,
       `    classDef path fill:#f96;`,
@@ -4642,14 +4646,18 @@ export class Aether<
         let parentId = pathId(parent.pathIdentity);
         if (parent.itemPathIdentity !== parent.pathIdentity) {
           const newParentId = pathId(parent.itemPathIdentity, true);
-          graph.push(`    ${parentId} -.- ${newParentId}`);
+          if (printPathRelations) {
+            graph.push(`    ${parentId} -.- ${newParentId}`);
+          }
           parentId = newParentId;
         }
         if (parent.childFieldDigests) {
           for (const child of parent.childFieldDigests) {
             recurse(child);
             const childId = pathId(child.pathIdentity);
-            graph.push(`    ${parentId} -.-> ${childId}`);
+            if (printPathRelations) {
+              graph.push(`    ${parentId} -.-> ${childId}`);
+            }
           }
         }
       };
@@ -4660,11 +4668,11 @@ export class Aether<
     {
       const recurse = (parent: FieldDigest) => {
         const parentId = pathId(parent.pathIdentity);
-        graph.push(`    ${planId(this.plans[parent.planId])} --> ${parentId}`);
+        graph.push(`    ${planId(this.plans[parent.planId])} -.-> ${parentId}`);
         if (parent.pathIdentity !== parent.itemPathIdentity) {
           const itemId = pathId(parent.itemPathIdentity);
           graph.push(
-            `    ${planId(this.plans[parent.itemPlanId])} --> ${itemId}`,
+            `    ${planId(this.plans[parent.itemPlanId])} -.-> ${itemId}`,
           );
         }
         if (parent.childFieldDigests) {
