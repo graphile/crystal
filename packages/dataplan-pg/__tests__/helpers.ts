@@ -31,6 +31,7 @@ import { makeExampleSchema } from "../src/examples/exampleSchema";
 import type { PgClientResult } from "../src/executor";
 
 export const UPDATE_SNAPSHOTS = process.env.UPDATE_SNAPSHOTS === "1";
+export const MERMAID = process.env.MERMAID === "1";
 
 const pathCompare = (
   path1: readonly (string | number)[],
@@ -308,6 +309,7 @@ export async function runTestQuery(
       client: PoolClient | null,
       payloads: Omit<AsyncExecutionResult, "hasNext">[],
     ) => Promise<void>;
+    path: string;
     deoptimize?: boolean;
   } = Object.create(null),
 ): Promise<{
@@ -320,6 +322,7 @@ export async function runTestQuery(
   queries: PgClientQuery[];
 }> {
   const { variableValues } = config;
+  const { path } = options;
   // Do not allow queries to run in parallel during these tests, we need
   // reproducibility (and we don't want to mess with the transactions, see
   // releaseClients below).
@@ -340,10 +343,16 @@ export async function runTestQuery(
       };
   const pgSubscriber = new PgSubscriber(testPool);
   try {
+    let graphString: string | null = null;
     const contextValue: BaseGraphQLContext = {
       pgSettings: {},
       withPgClient,
       pgSubscriber,
+      setPlanGraph(_graphString: string) {
+        if (MERMAID) {
+          graphString = _graphString;
+        }
+      },
     };
 
     const schemaValidationErrors = validateSchema(schema);
@@ -385,6 +394,14 @@ export async function runTestQuery(
             contextValue,
             rootValue: null,
           });
+
+    if (graphString) {
+      const basePath = path.replace(/\.test\.graphql$/, "");
+      await fsp.writeFile(
+        `${basePath}${deoptimizedSchema ? ".deopt" : ""}.mermaid`,
+        graphString,
+      );
+    }
 
     if (isAsyncIterable(result)) {
       let errors: GraphQLError[] | undefined = undefined;

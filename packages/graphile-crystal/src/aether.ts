@@ -4577,10 +4577,10 @@ export class Aether<
   } = {}): string {
     const graph = [
       `graph TD`,
-      `    classDef path fill:#f96;`,
-      `    classDef plan fill:#f9f;`,
-      `    classDef itemplan fill:#bbf;`,
-      `    classDef sideeffectplan fill:#f00;`,
+      `    classDef path fill:#eee`,
+      `    classDef plan fill:#fff`,
+      `    classDef itemplan fill:#fff, stroke-width:2px`,
+      `    classDef sideeffectplan fill:#f00`,
     ];
     const pathIdMap = {};
     let pathCounter = 0;
@@ -4646,9 +4646,7 @@ export class Aether<
         let parentId = pathId(parent.pathIdentity);
         if (parent.itemPathIdentity !== parent.pathIdentity) {
           const newParentId = pathId(parent.itemPathIdentity, true);
-          if (printPathRelations) {
-            graph.push(`    ${parentId} -.- ${newParentId}`);
-          }
+          graph.push(`    ${parentId} -.- ${newParentId}`);
           parentId = newParentId;
         }
         if (parent.childFieldDigests) {
