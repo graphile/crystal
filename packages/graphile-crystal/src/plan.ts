@@ -173,6 +173,8 @@ export class ExecutablePlan<TData = any> extends BasePlan {
    * was spawned from came from multiple selection sets in the GraphQL
    * document, some may have been deferred/streamed/etc which may lead to
    * multiple groupIds).
+   *
+   * @internal
    */
   public readonly groupIds: number[] = [];
 
@@ -180,6 +182,8 @@ export class ExecutablePlan<TData = any> extends BasePlan {
    * This identifies the deepest pathIdentity that is a common ancestor to all
    * the places this plan is used. This value is then used to influence where
    * the result of executing the plan is stored.
+   *
+   * @internal
    */
   public commonAncestorPathIdentity = "";
 
