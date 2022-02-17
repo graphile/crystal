@@ -2796,6 +2796,7 @@ export class Aether<
           });
           // Don't moan about unhandled rejections; we only care about the first fail (and we don't care if they get handled later)
           allDependencyResultsOrPromise.then(null, NOOP);
+          dependencyValuesList[dependencyIndex] = undefined as any; // We'll set this later
         } else {
           dependencyValuesList[dependencyIndex] = allDependencyResultsOrPromise;
         }
