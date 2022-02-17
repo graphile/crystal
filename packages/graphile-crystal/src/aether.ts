@@ -647,7 +647,7 @@ export class Aether<
         why ? ` ${why}` : "",
         "\n" + this.printPlansByPath(),
       );
-      debugPlan(`Plan graph: \n%s`, this.printPlanGraph());
+      debugPlan(`Plan graph: %s`, "\n" + this.printPlanGraph());
     }
 
     this.phase = "ready";
@@ -4599,6 +4599,43 @@ export class Aether<
       return pathIdMap[pathIdentity];
     };
 
+    const planIdMap = {};
+    const planId = (plan: ExecutablePlan): string => {
+      if (!planIdMap[plan.id]) {
+        const depNodes = plan.dependencies.map((depId) => {
+          return planId(this.plans[depId]);
+        });
+        const planName = plan.constructor.name.replace(/Plan$/, "");
+        const planNode = `${planName}${plan.id}`;
+        planIdMap[plan.id] = planNode;
+        const meta = plan.toStringMeta();
+        const planClass =
+          plan instanceof __ItemPlan
+            ? "itemplan"
+            : plan.hasSideEffects
+            ? "sideeffectplan"
+            : "plan";
+
+        const planString = `${planName}[${plan.id}]\n${crystalPrintPathIdentity(
+          plan.commonAncestorPathIdentity,
+          2,
+          3,
+        )}${meta ? `\n<${meta}>` : ""}`;
+        const [lBrace, rBrace] =
+          plan instanceof __ItemPlan ? [">", "]"] : ["[", "]"];
+        graph.push(
+          `    ${planNode}${lBrace}${dotEscape(
+            planString,
+          )}${rBrace}:::${planClass}`,
+        );
+        const arrow = plan instanceof __ItemPlan ? "==>" : "-->";
+        for (const depNode of depNodes) {
+          graph.push(`    ${depNode} ${arrow} ${planNode}`);
+        }
+      }
+      return planIdMap[plan.id];
+    };
+
     // graph.push("    subgraph fields");
     {
       const recurse = (parent: FieldDigest) => {
@@ -4623,10 +4660,12 @@ export class Aether<
     {
       const recurse = (parent: FieldDigest) => {
         const parentId = pathId(parent.pathIdentity);
-        graph.push(`    ${this.plans[parent.planId].id} --> ${parentId}`);
+        graph.push(`    ${planId(this.plans[parent.planId])} --> ${parentId}`);
         if (parent.pathIdentity !== parent.itemPathIdentity) {
           const itemId = pathId(parent.itemPathIdentity);
-          graph.push(`    ${this.plans[parent.itemPlanId].id} --> ${itemId}`);
+          graph.push(
+            `    ${planId(this.plans[parent.itemPlanId])} --> ${itemId}`,
+          );
         }
         if (parent.childFieldDigests) {
           for (const child of parent.childFieldDigests) {
@@ -4637,37 +4676,6 @@ export class Aether<
       recurse(this.rootFieldDigest!);
     }
 
-    for (const id in this.plans) {
-      const plan = this.plans[id];
-      if (plan && plan.id === id) {
-        const planName = plan.constructor.name.replace(/Plan$/, "");
-        const meta = plan.toStringMeta();
-        const planClass =
-          plan instanceof __ItemPlan
-            ? "itemplan"
-            : plan.hasSideEffects
-            ? "sideeffectplan"
-            : "plan";
-
-        const planString = `${planName}[${plan.id}]\n${crystalPrintPathIdentity(
-          plan.commonAncestorPathIdentity,
-          2,
-          3,
-        )}${meta ? `\n<${meta}>` : ""}`;
-        const [lBrace, rBrace] =
-          plan instanceof __ItemPlan ? [">", "]"] : ["[", "]"];
-        graph.push(
-          `    ${plan.id}${lBrace}${dotEscape(
-            planString,
-          )}${rBrace}:::${planClass}`,
-        );
-        for (const depId of plan.dependencies) {
-          const depPlan = this.plans[depId];
-          const arrow = plan instanceof __ItemPlan ? "==>" : "-->";
-          graph.push(`    ${depPlan.id} ${arrow} ${plan.id}`);
-        }
-      }
-    }
     const graphString = graph.join("\n");
     if (typeof (this.context as any)?.setPlanGraph === "function") {
       (this.context as any).setPlanGraph(graphString);
