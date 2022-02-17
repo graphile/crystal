@@ -20,6 +20,10 @@ export class __ItemPlan<TData> extends ExecutablePlan<TData> {
     this.addDependency(parentPlan);
   }
 
+  deduplicate(peers: __ItemPlan<any>[]): __ItemPlan<TData> {
+    return peers[0] ?? this;
+  }
+
   toStringMeta(): string {
     return chalk.bold.yellow(String(this.dependencies[0]));
   }
