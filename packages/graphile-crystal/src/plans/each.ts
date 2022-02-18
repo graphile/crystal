@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import { getNamedType } from "graphql";
 
-import { getGlobalState } from "../global";
+import { getCurrentGraphQLType } from "../global";
 import type { ExecutablePlan, ListCapablePlan } from "../plan";
 import { isListCapablePlan } from "../plan";
 import type { __ItemPlan } from "./__item";
@@ -19,7 +19,7 @@ export function each<
       : __ItemPlan<any>,
   ) => TResultItemPlan,
 ): __ListTransformPlan<any, any, any, any> {
-  const currentGraphQLType = getGlobalState().currentGraphQLType;
+  const currentGraphQLType = getCurrentGraphQLType();
   if (!currentGraphQLType) {
     throw new Error("partitionByIndex cannot be used in this position");
   }

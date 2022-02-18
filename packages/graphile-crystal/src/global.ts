@@ -2,6 +2,9 @@ import type { GraphQLOutputType } from "graphql";
 
 import type { Aether } from "./aether";
 
+/**
+ * @internal
+ */
 export interface GlobalState {
   aether: Aether;
   parentPathIdentity: string;
@@ -11,7 +14,10 @@ export interface GlobalState {
 
 let globalState: GlobalState | null = null;
 
-export function getGlobalState(): GlobalState {
+/**
+ * @internal
+ */
+function getGlobalState(): GlobalState {
   if (!globalState) {
     throw new Error(
       `getGlobalState called at inappropriate time - there is no global state right now.`,
@@ -20,6 +26,9 @@ export function getGlobalState(): GlobalState {
   return globalState;
 }
 
+/**
+ * @internal
+ */
 export function withGlobalState<T>(
   newGlobalState: GlobalState,
   callback: () => T,
@@ -54,9 +63,18 @@ export function getCurrentAether(): Aether {
 /**
  * Like with `getCurrentAether`, since plan functions are called synchronously
  * _by us_ we can pull the current parentPathIdentity from global state.
+ *
+ * @internal
  */
 export function getCurrentParentPathIdentity(): string {
   return getGlobalState().parentPathIdentity;
+}
+
+/**
+ * @internal
+ */
+export function getCurrentGraphQLType(): GraphQLOutputType | undefined {
+  return getGlobalState().currentGraphQLType;
 }
 
 let debug = false;
