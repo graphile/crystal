@@ -7,7 +7,7 @@ import { ExecutablePlan } from "./plan";
 import { PlanResults } from "./planResults";
 import { isCrystalObject } from "./resolvers";
 import { stripAnsi } from "./stripAnsi";
-import { isDeferred, isPromise, ROOT_VALUE_OBJECT } from "./utils";
+import { isDeferred, isPromise, ROOT_VALUE_OBJECT, sharedNull } from "./utils";
 
 const COLORS = [
   //chalk.black,
@@ -105,7 +105,11 @@ export function _crystalPrint(
         }>`,
       );
     }
-    if (![null, Object.prototype].includes(Object.getPrototypeOf(symbol))) {
+    if (
+      ![null, Object.prototype, sharedNull].includes(
+        Object.getPrototypeOf(symbol),
+      )
+    ) {
       return chalk.red(`OBJECT<${stripAnsi(String(symbol))}>`);
     }
     if (seen.has(symbol)) {

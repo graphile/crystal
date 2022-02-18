@@ -184,8 +184,42 @@ export class ExecutablePlan<TData = any> extends BasePlan {
    * the result of executing the plan is stored.
    *
    * @internal
+   *
+   * @deprecated Please use bucketId instead
    */
   public commonAncestorPathIdentity = "";
+
+  /**
+   * This identifies the "bucket" into which this plan's results will be stored;
+   * the this is determined as:
+   *
+   * - If this is an __ItemPlan then a new bucket is assigned (this covers
+   *   lists (whether streamed or not) and subscriptions)
+   * - Otherwise, if this plan is deferred, then the deferred bucket id
+   * - Otherwise, if no dependencies then the root bucket
+   * - Otherwise, if all dependencies buckets overlap then the containing
+   *   bucket (the largest bucket), and make this bucket dependent on the
+   *   relevant plans in the other buckets
+   * - Otherwise, a new bucket is created representing the union of the
+   *   largest non-overlapping buckets
+   *
+   * This value is then used to influence:
+   *
+   * 1. how plans are deduplicated
+   * 2. the order in which the plans are executed
+   * 3. where the result of executing the plan is stored
+   * 4. when the plan execution cache is allowed to be GC'd
+   *
+   * NOTE: `__ListTransformPlan`'s effectively have a temporary bucket inside
+   * them (built on the `__Item`) that's thrown away once the transform is
+   * complete.
+   *
+   * A value of -1 indicates that a bucket has not yet been assigned (buckets
+   * are assigned as the last step before the Aether is 'ready'.
+   *
+   * @internal
+   */
+  public bucketId = -1;
 
   constructor() {
     super();
@@ -248,12 +282,15 @@ export class ExecutablePlan<TData = any> extends BasePlan {
         );
       }
     }
+
     /*
+    
+    / *
      * We set our actual parentPathIdentity to be the shortest parentPathIdentity of all
      * of our dependencies; this effectively means that we only care about list
      * boundaries (since `__ItemPlan` opts out of this) which allows us to
      * optimise more plans.
-     */
+     * /
     if (plan.parentPathIdentity.length > this.parentPathIdentity.length) {
       this.parentPathIdentity = plan.parentPathIdentity;
       if (
@@ -264,6 +301,8 @@ export class ExecutablePlan<TData = any> extends BasePlan {
         );
       }
     }
+    */
+
     const existingIndex = this._dependencies.indexOf(plan.id);
     if (existingIndex >= 0) {
       return existingIndex;

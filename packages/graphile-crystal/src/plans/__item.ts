@@ -14,18 +14,25 @@ export class __ItemPlan<TData> extends ExecutablePlan<TData> {
     exportName: "__ItemPlan",
   };
   sync = true;
-  constructor(parentPlan: ExecutablePlan<TData>, public readonly depth = 0) {
+
+  /**
+   * @internal
+   */
+  public transformPlanId?: string;
+
+  constructor(
+    parentPlan: ExecutablePlan<TData> | ExecutablePlan<TData[]>,
+    public readonly depth = 0,
+  ) {
     super();
     this.parentPathIdentity = getCurrentParentPathIdentity();
     this.addDependency(parentPlan);
   }
 
-  deduplicate(peers: __ItemPlan<any>[]): __ItemPlan<TData> {
-    return peers[0] ?? this;
-  }
-
   toStringMeta(): string {
-    return chalk.bold.yellow(String(this.dependencies[0]));
+    return chalk.bold.yellow(
+      String(this.aether.dangerouslyGetPlan(this.dependencies[0]).id),
+    );
   }
 
   execute(): never {

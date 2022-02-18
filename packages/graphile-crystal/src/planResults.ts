@@ -15,6 +15,7 @@ export interface PlanResultsBucket {
   [planId: string]: any;
 }
 
+// TODO: rewrite this comment to refer to bucketId rather than commonAncestorPathIdentity
 /**
  * PlanResults stores the results from plan execution. A `PlanResults` instance
  * is typically accessed via the `CrystalObject` to which it belongs, however
@@ -86,18 +87,14 @@ export class PlanResults {
   }
 
   /**
-   * Sets the plan result for the given plan.commonAncestorPathIdentity and
+   * Sets the plan result for the given plan.bucketId and
    * plan.id.
    */
-  public set(
-    commonAncestorPathIdentity: string,
-    planId: string,
-    data: any,
-  ): any {
-    const bucket = this.getBucket(commonAncestorPathIdentity);
+  public set(bucketId: number, planId: string, data: any): any {
+    const bucket = this.getBucket(bucketId);
     if (isDev && planId in bucket) {
       throw new Error(
-        `${this}: Attempted to overwrite value for plan '${planId}' at path identity '${commonAncestorPathIdentity}' from '${inspect(
+        `${this}: Attempted to overwrite value for plan '${planId}' at bucket id '${bucketId}' from '${inspect(
           bucket[planId],
           { colors: true },
         )}' to '${inspect(data, { colors: true })}'`,
@@ -108,43 +105,42 @@ export class PlanResults {
   }
 
   /**
-   * Gets the plan result (if any) for the given plan.commonAncestorPathIdentity and
+   * Gets the plan result (if any) for the given plan.bucketId and
    * plan.id.
    */
-  public get(commonAncestorPathIdentity: string, planId: string): any {
-    return this.store[commonAncestorPathIdentity]?.[planId];
+  public get(bucketId: number, planId: string): any {
+    return this.store[bucketId]?.[planId];
   }
 
   /**
    * Gets the bucket into which plan results are stored for plans with the
-   * given commonAncestorPathIdentity.
+   * given bucketId.
    *
    * @internal
    *
    * (This is internal because we may change from objects to maps or vice versa
    * depending on benchmark results.)
    */
-  public getBucket(commonAncestorPathIdentity: string): PlanResultsBucket {
+  public getBucket(bucketId: number): PlanResultsBucket {
     return (
-      this.store[commonAncestorPathIdentity] ??
-      (this.store[commonAncestorPathIdentity] = Object.create(sharedNull))
+      this.store[bucketId] ?? (this.store[bucketId] = Object.create(sharedNull))
     );
   }
 
   /**
    * Determines if there is a plan result for the given
-   * plan.commonAncestorPathIdentity and plan.id.
+   * plan.bucketId and plan.id.
    */
-  public has(commonAncestorPathIdentity: string, planId: string): boolean {
-    return this.store[commonAncestorPathIdentity] !== undefined
-      ? planId in this.store[commonAncestorPathIdentity]!
+  public has(bucketId: number, planId: string): boolean {
+    return this.store[bucketId] !== undefined
+      ? planId in this.store[bucketId]!
       : false;
   }
 
   /**
-   * Determines if there is a "bucket" for the given "commonAncestorPathIdentity".
+   * Determines if there is a "bucket" for the given "bucketId".
    */
-  public hasPathIdentity(commonAncestorPathIdentity: string): boolean {
-    return this.store[commonAncestorPathIdentity] !== undefined;
+  public hasBucketId(bucketId: number): boolean {
+    return this.store[bucketId] !== undefined;
   }
 }

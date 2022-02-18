@@ -122,7 +122,10 @@ export class __ListTransformPlan<
         peer.finalizeCallback === this.finalizeCallback &&
         peer.listItem === this.listItem
       ) {
-        // TODO: We shouldn't return `peer` until we alias the replacement id in aether.listTransformDependencyPlanIdByListTransformPlanIdByFieldPathIdentity
+        // TODO: We shouldn't return `peer` until we alias the replacement id in
+        // aether.listTransformDependencyPlanIdByListTransformPlanIdByFieldPathIdentity.
+        // Also `itemPlanIdByListTransformPlanId`.
+        //
         // return peer;
       }
     }
@@ -132,6 +135,54 @@ export class __ListTransformPlan<
   // ListTransform plans must _NOT_ optimize away. They must persist.
   optimize() {
     return this;
+  }
+
+  finalize() {
+    // __ListTransformPlan must list all their child chain's external
+    // dependencies as their own so that pluarility is correct for the
+    // buckets.
+    const transformDependencyPlanId =
+      this.aether.transformDependencyPlanIdByTransformPlanId[this.id];
+    const transformDependencyPlan = this.aether.dangerouslyGetPlan(
+      transformDependencyPlanId,
+    );
+
+    const externalDependencies = new Set<ExecutablePlan>();
+    const listPlan = this.aether.dangerouslyGetPlan(this.dependencies[0]);
+
+    const recurse = (innerPlan: ExecutablePlan): boolean => {
+      if (innerPlan === listPlan) {
+        return true;
+      }
+      let hasInternal = false;
+      const externals = [];
+      for (const depId of innerPlan.dependencies) {
+        const dep = this.aether.dangerouslyGetPlan(depId);
+        const internal = recurse(dep);
+        if (internal) {
+          hasInternal = true;
+        } else {
+          externals.push(dep);
+        }
+      }
+      if (hasInternal && externals.length > 0) {
+        externals.forEach((external) => {
+          externalDependencies.add(external);
+        });
+      }
+      return hasInternal;
+    };
+
+    recurse(transformDependencyPlan);
+    if (externalDependencies.size > 0) {
+      const itemPlanId = this.aether.itemPlanIdByListTransformPlanId[this.id]!;
+      const itemPlan = this.aether.dangerouslyGetPlan(itemPlanId);
+      for (const dep of externalDependencies) {
+        this.addDependency(dep);
+        (itemPlan.dependencies as Array<string>).push(dep.id);
+      }
+    }
+    return super.finalize();
   }
 
   execute(): CrystalResultsList<TMemo> {
