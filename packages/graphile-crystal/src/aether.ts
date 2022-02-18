@@ -2730,7 +2730,7 @@ export class Aether<
       return plan;
     };
 
-    for (const plan of this.plans) {
+    for (const plan of Object.values(this.plans)) {
       if (plan != null) {
         process(plan);
       }
@@ -4938,7 +4938,11 @@ export class Aether<
         );
         depNodes.forEach((depNode, index) => {
           const arrow =
-            plan instanceof __ItemPlan && index === 0 ? "==>" : "-->";
+            plan instanceof __ItemPlan && index === 0
+              ? plan.transformPlanId == null
+                ? "==>"
+                : "-.->"
+              : "-->";
           graph.push(`    ${depNode} ${arrow} ${planNode}`);
         });
         if (transformItemPlanNode) {
