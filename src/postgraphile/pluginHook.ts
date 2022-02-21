@@ -96,7 +96,7 @@ export interface PostGraphilePlugin {
       document: graphql.DocumentNode | null; // optional for persisted query support
     },
     {
-      context: graphqlWs.Context<GraphQLWSContextExtra>;
+      context: graphqlWs.Context<any, GraphQLWSContextExtra>;
       message: graphqlWs.SubscribeMessage;
       options: CreateRequestHandlerOptions;
     }
