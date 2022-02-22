@@ -327,7 +327,7 @@ export function makeCrystalSubscriber<
   return crystalWrapResolveOrSubscribe(undefined, true);
 }
 
-function crystalObjectToString(this: CrystalObject) {
+export function crystalObjectToString(this: CrystalObject) {
   return chalk.bold.blue(
     `CO(${chalk.bold.yellow(
       crystalPrintPathIdentity(this[$$pathIdentity]),

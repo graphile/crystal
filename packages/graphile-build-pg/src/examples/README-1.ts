@@ -13,7 +13,13 @@ import {
   QueryQueryPlugin,
   SwallowErrorsPlugin,
 } from "graphile-build";
-import { crystalPrint, stripAnsi } from "graphile-crystal";
+import {
+  crystalPrint,
+  stripAnsi,
+  $$data,
+  crystalPrepare,
+  $$setPlanGraph,
+} from "graphile-crystal";
 import { exportSchema } from "graphile-exporter";
 import { resolvePresets } from "graphile-plugin";
 import type { DocumentNode, Source } from "graphql";
@@ -29,6 +35,7 @@ import * as jsonwebtoken from "jsonwebtoken";
 import { Pool } from "pg";
 import { inspect } from "util";
 import { envelop, useSchema, useExtendContext } from "@envelop/core";
+import type { Plugin } from "@envelop/core";
 import { useParserCache } from "@envelop/parser-cache";
 import fastify from "fastify";
 import fastifyStatic from "fastify-static";
@@ -119,7 +126,7 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
   let graph: string | null = null;
   const contextValue = {
     withPgClient,
-    setPlanGraph(_graph: string) {
+    [$$setPlanGraph](_graph: string) {
       graph = _graph;
     },
   };
@@ -166,12 +173,34 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     process.exit(1);
   }
 
+  const useCrystalExecutor = (): Plugin => {
+    return {
+      async onExecute({ args, executeFn, setExecuteFn }) {
+        if (process.env.NODE_ENV === "development") {
+          if (
+            args.rootValue != null &&
+            (typeof args.rootValue !== "object" ||
+              Object.keys(args.rootValue).length > 0)
+          ) {
+            throw new Error(
+              `Crystal executor doesn't support there being a rootValue (found ${inspect(
+                args.rootValue,
+              )})`,
+            );
+          }
+        }
+        args.rootValue = crystalPrepare(args);
+      },
+    };
+  };
+
   const contextCallback = () => contextValue;
   const getEnveloped = envelop({
     plugins: [
       useSchema(schema),
       /*useLogger(),*/ useParserCache(),
       useExtendContext(contextCallback),
+      useCrystalExecutor(),
     ],
   });
   const app = fastify();

@@ -114,6 +114,7 @@ import {
   isCrystalWrapped,
   makeCrystalSubscriber,
 } from "./resolvers";
+import { crystalPrepare } from "./prepare";
 import { stripAnsi } from "./stripAnsi";
 import {
   arraysMatch,
@@ -168,6 +169,7 @@ export {
   CrystalSubscriber,
   CrystalValuesList,
   crystalWrapResolve,
+  crystalPrepare,
   debugPlans,
   defer,
   Deferred,
@@ -314,6 +316,7 @@ exportAsMany({
   $$crystalWrapped,
   isCrystalWrapped,
   crystalWrapResolve,
+  crystalPrepare,
   crystalResolve,
   makeCrystalSubscriber,
   stripAnsi,
