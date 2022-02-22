@@ -408,6 +408,7 @@ export const PgRelationsPlugin: Plugin = {
               ? (EXPORTABLE(
                   new Function(
                     "otherSource",
+                    "connection",
                     `return $messages => {
   const $records = otherSource.find({ ${remoteColumns
     .map(
@@ -420,7 +421,7 @@ export const PgRelationsPlugin: Plugin = {
   return connection($records, $item => $item, $item => $item.cursor());
 }`,
                   ) as any,
-                  [otherSource],
+                  [otherSource, connection],
                 ) as any)
               : EXPORTABLE(
                   (connection, localColumns, otherSource, remoteColumns) =>
