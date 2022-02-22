@@ -1,16 +1,13 @@
-import { ExecutionArgs } from "graphql";
+import type { ExecutionArgs } from "graphql";
 import { buildExecutionContext } from "graphql/execution/execute";
-import { populateValuePlan } from "./aether";
-import { ROOT_PATH } from "./constants";
+
 import { establishAether } from "./establishAether";
+import type { $$data, CrystalObject, PromiseOrDirect } from "./interfaces";
 import {
   $$concreteType,
   $$crystalContext,
-  $$data,
   $$pathIdentity,
   $$planResults,
-  CrystalObject,
-  PromiseOrDirect,
 } from "./interfaces";
 import { PlanResults } from "./planResults";
 import { crystalObjectToString } from "./resolvers";
@@ -19,7 +16,7 @@ const EMPTY_OBJECT = Object.freeze(Object.create(null));
 
 export function crystalPrepare(
   args: ExecutionArgs,
-): PromiseOrDirect<CrystalObject> {
+): PromiseOrDirect<CrystalObject | { [$$data]: any }> {
   const {
     schema,
     contextValue: context,
