@@ -646,8 +646,12 @@ export const assertSnapshotsMatch = async (
       .join("\n\n");
     await snapshot(formattedQueries, sqlFileName);
   } else if (only === "mermaid") {
-    const mermaidFileName = basePath + (ext || "") + ".mermaid";
-    await snapshot(graphString ?? "-", mermaidFileName);
+    const mermaidFileName = basePath + (ext || "") + ".mermaid.md";
+    if (!graphString) {
+      throw new Error("No plan was emitted for this test!");
+    }
+    const content = `\`\`\`mermaid\n${graphString}\n\`\`\`\n`;
+    await snapshot(content, mermaidFileName);
   } else {
     throw new Error(
       `Unexpected argument to assertSnapshotsMatch; expected result|sql, received '${only}'`,
