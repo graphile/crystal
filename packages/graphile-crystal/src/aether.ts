@@ -307,6 +307,11 @@ interface BucketDefinition {
   ancestors: BucketDefinition[];
 
   /**
+   * All buckets that have this bucket as one of their parents
+   */
+  children: BucketDefinition[];
+
+  /**
    * What type of bucket is this?
    *
    * - root - the root bucket
@@ -374,6 +379,7 @@ export class Aether<
     id: 0,
     parents: [],
     ancestors: [],
+    children: [],
     type: "root",
     copyPlans: new Set(),
   };
@@ -2625,10 +2631,14 @@ export class Aether<
             id: this.buckets.length,
             parents: [parent],
             ancestors: [...parent.ancestors, parent],
+            children: [],
             type: "item",
             copyPlans: new Set(),
           };
           this.buckets[newBucket.id] = newBucket;
+          newBucket.parents.forEach((parent) => {
+            parent.children.push(newBucket);
+          });
           plan.bucketId = newBucket.id;
           return plan;
         } else {
@@ -2639,11 +2649,13 @@ export class Aether<
             id: this.buckets.length,
             parents: [parent],
             ancestors: [...parent.ancestors, parent],
+            children: [],
             type: "item",
             copyPlans: new Set(),
             reasonPlanId: listPlan.id,
           };
           this.buckets[newBucket.id] = newBucket;
+          newBucket.parents.map((parent) => parent.children.push(newBucket));
           plan.bucketId = newBucket.id;
           return plan;
         }
@@ -2691,10 +2703,14 @@ export class Aether<
               ...parents.flatMap((parent) => parent.ancestors),
             ]),
           ],
+          children: [],
           type: "group",
           copyPlans: new Set(dependencyPlans),
         };
         this.buckets[newBucket.id] = newBucket;
+        newBucket.parents.forEach((parent) => {
+          parent.children.push(newBucket);
+        });
         plan.bucketId = newBucket.id;
         return plan;
       }
@@ -2729,9 +2745,13 @@ export class Aether<
               ...parents.flatMap((parent) => parent.ancestors),
             ]),
           ],
+          children: [],
           type: "join",
           copyPlans: new Set(dependencyPlans),
         };
+        newBucket.parents.forEach((parent) => {
+          parent.children.push(newBucket);
+        });
         this.buckets[newBucket.id] = newBucket;
         return newBucket;
       };
