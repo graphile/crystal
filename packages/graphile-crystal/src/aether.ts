@@ -2762,9 +2762,12 @@ export class Aether<
       return plan;
     };
 
-    for (const plan of Object.values(this.plans)) {
-      if (plan != null) {
+    for (const [id, plan] of Object.entries(this.plans)) {
+      if (plan != null && plan.id === id) {
         process(plan);
+        if (plan.bucketId < 0) {
+          throw new Error(`Failed to assign bucket to ${plan}`);
+        }
       }
     }
   }
