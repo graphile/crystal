@@ -45,6 +45,8 @@ import {
   PolymorphicData,
   PromiseOrDirect,
   TrackedArguments,
+  $$data,
+  $$setPlanGraph,
 } from "./interfaces";
 import {
   assertListCapablePlan,
@@ -247,6 +249,8 @@ export {
   subscribe,
   SubscribePlan,
   TrackedArguments,
+  $$data,
+  $$setPlanGraph,
 };
 
 exportAsMany({
