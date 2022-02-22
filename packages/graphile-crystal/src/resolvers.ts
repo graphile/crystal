@@ -193,7 +193,7 @@ function crystalWrapResolveOrSubscribe<
       // `rootValue`s for multiple parallel executions (must be within the same
       // aether) - e.g. as a result of multiple identical subscription
       // operations.
-      if (isCrystalObject(source)) {
+      if (source?.[$$data]) {
         const fieldAlias = info.path.key;
         if (fieldAlias in source[$$data]) {
           // Short-circuit execution - we already have results
@@ -205,6 +205,8 @@ function crystalWrapResolveOrSubscribe<
             return result;
           }
         }
+      }
+      if (isCrystalObject(source)) {
         possiblyParentCrystalObject = source;
       }
 
