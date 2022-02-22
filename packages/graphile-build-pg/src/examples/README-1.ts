@@ -2,8 +2,13 @@
 
 import type { WithPgClient } from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
+import type { Plugin } from "@envelop/core";
+import { envelop, useExtendContext, useSchema } from "@envelop/core";
+import { useParserCache } from "@envelop/parser-cache";
 import LRU from "@graphile/lru";
 import chalk from "chalk";
+import fastify from "fastify";
+import fastifyStatic from "fastify-static";
 import { readFile } from "fs/promises";
 import {
   buildInflection,
@@ -14,38 +19,33 @@ import {
   SwallowErrorsPlugin,
 } from "graphile-build";
 import {
+  $$data,
+  $$setPlanGraph,
+  crystalPrepare,
   crystalPrint,
   stripAnsi,
-  $$data,
-  crystalPrepare,
-  $$setPlanGraph,
 } from "graphile-crystal";
 import { exportSchema } from "graphile-exporter";
 import { resolvePresets } from "graphile-plugin";
 import type { DocumentNode, Source } from "graphql";
 import {
-  graphql,
-  printSchema,
   execute,
+  graphql,
   GraphQLError,
   parse,
+  printSchema,
   validate,
 } from "graphql";
-import * as jsonwebtoken from "jsonwebtoken";
-import { Pool } from "pg";
-import { inspect } from "util";
-import { envelop, useSchema, useExtendContext } from "@envelop/core";
-import type { Plugin } from "@envelop/core";
-import { useParserCache } from "@envelop/parser-cache";
-import fastify from "fastify";
-import fastifyStatic from "fastify-static";
 import {
-  processRequest,
   getGraphQLParameters,
+  processRequest,
   renderGraphiQL,
   sendResult,
 } from "graphql-helix";
+import * as jsonwebtoken from "jsonwebtoken";
+import { Pool } from "pg";
 import pg from "pg";
+import { inspect } from "util";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 
@@ -194,6 +194,21 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     };
   };
 
+  const useMoreDetailedErrors = (): Plugin => ({
+    onExecute: () => ({
+      onExecuteDone({ result }) {
+        if ("errors" in result && result.errors) {
+          (result.errors as any) = result.errors.map((e) => {
+            const obj = e.toJSON();
+            return Object.assign(obj, {
+              message: stripAnsi(obj.message),
+              extensions: { stack: stripAnsi(e.stack ?? "").split("\n") },
+            });
+          });
+        }
+      },
+    }),
+  });
   const contextCallback = () => contextValue;
   const getEnveloped = envelop({
     plugins: [
@@ -201,6 +216,7 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
       /*useLogger(),*/ useParserCache(),
       useExtendContext(contextCallback),
       useCrystalExecutor(),
+      useMoreDetailedErrors(),
     ],
   });
   const app = fastify();
@@ -251,16 +267,6 @@ ${escapeHTMLEntities(graph ?? 'graph LR\nA["No query exists yet"]')}
   });
 
   app.listen(4000);
-
-  /*
-      customFormatErrorFn(e) {
-        const obj = e.toJSON();
-        return Object.assign(obj, {
-          message: stripAnsi(obj.message),
-          extensions: { stack: stripAnsi(e.stack ?? "").split("\n") },
-        });
-      },
-      */
 
   app.route({
     method: ["POST"],
