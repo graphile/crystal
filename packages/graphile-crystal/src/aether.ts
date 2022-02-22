@@ -4800,12 +4800,12 @@ export class Aether<
       return COLORS[i % COLORS.length];
     };
 
-    const planStyle = `fill:#fff,stroke-width:3px`;
-    const itemplanStyle = `fill:#fff,stroke-width:6px`;
-    const sideeffectplanStyle = `fill:#f00,stroke-width:6px`;
+    const planStyle = `fill:#fff,stroke-width:3px,color:#000`;
+    const itemplanStyle = `fill:#fff,stroke-width:6px,color:#000`;
+    const sideeffectplanStyle = `fill:#f00,stroke-width:6px,color:#000`;
     const graph = [
       `graph TD`,
-      `    classDef path fill:#eee,stroke:#000`,
+      `    classDef path fill:#eee,stroke:#000,color:#000`,
       `    classDef plan ${planStyle}`,
       `    classDef itemplan ${itemplanStyle}`,
       `    classDef sideeffectplan ${sideeffectplanStyle}`,
