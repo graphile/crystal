@@ -110,14 +110,15 @@ export const PgRowByUniquePlugin: Plugin = {
                      * read in the exported code.
                      */
                     EXPORTABLE(
-                      eval(
-                        `source => (_$root, args) => source.get({ ${columnNames
+                      new Function(
+                        "source",
+                        `return (_$root, args) => source.get({ ${columnNames
                           .map(
                             (columnName) =>
                               `${columnName}: args.${detailsByColumnName[columnName].graphqlName}`,
                           )
                           .join(", ")} })`,
-                      ),
+                      ) as any,
                       [source],
                     )
                   : EXPORTABLE(

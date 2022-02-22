@@ -71,8 +71,10 @@ export const PgTableNodePlugin: Plugin = {
             codecName: "base64JSON",
             plan: clean
               ? EXPORTABLE(
-                  eval(
-                    `(list, constant) => $record => list([constant(${JSON.stringify(
+                  new Function(
+                    "list",
+                    "constant",
+                    `return $record => list([constant(${JSON.stringify(
                       tableTypeName,
                     )}), ${pk
                       .map(
@@ -80,7 +82,7 @@ export const PgTableNodePlugin: Plugin = {
                           `$record.get(${JSON.stringify(columnName)})`,
                       )
                       .join(", ")}])`,
-                  ),
+                  ) as any,
                   [list, constant],
                 )
               : EXPORTABLE(
@@ -95,12 +97,14 @@ export const PgTableNodePlugin: Plugin = {
                 ),
             get: clean
               ? EXPORTABLE(
-                  eval(
-                    `(pgSource, access) => $list => pgSource.get({ ${pk.map(
+                  new Function(
+                    "pgSource",
+                    "access",
+                    `return $list => pgSource.get({ ${pk.map(
                       (columnName, index) =>
                         `${columnName}: access($list, [${index + 1}])`,
                     )} })`,
-                  ),
+                  ) as any,
                   [pgSource, access],
                 )
               : EXPORTABLE(

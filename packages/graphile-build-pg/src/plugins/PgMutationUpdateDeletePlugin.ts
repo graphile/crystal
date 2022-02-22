@@ -686,9 +686,12 @@ export const PgMutationUpdateDeletePlugin: Plugin = {
                           mode === "update"
                             ? specFromArgsString
                               ? EXPORTABLE(
-                                  eval(
-                                    `(object, pgUpdate, source) =>  (_$root, args) => object({result: pgUpdate(source, ${specFromArgsString})})`,
-                                  ),
+                                  new Function(
+                                    "object",
+                                    "pgUpdate",
+                                    "source",
+                                    `return (_$root, args) => object({result: pgUpdate(source, ${specFromArgsString})})`,
+                                  ) as any,
                                   [object, pgUpdate, source],
                                 )
                               : (EXPORTABLE(
@@ -708,9 +711,12 @@ export const PgMutationUpdateDeletePlugin: Plugin = {
                                 ) as any)
                             : specFromArgsString
                             ? EXPORTABLE(
-                                eval(
-                                  `(object, pgDelete, source) =>  (_$root, args) => object({result: pgDelete(source, ${specFromArgsString})})`,
-                                ),
+                                new Function(
+                                  "object",
+                                  "pgDelete",
+                                  "source",
+                                  `return (_$root, args) => object({result: pgDelete(source, ${specFromArgsString})})`,
+                                ) as any,
                                 [object, pgDelete, source],
                               )
                             : (EXPORTABLE(

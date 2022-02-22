@@ -17,11 +17,12 @@ export function makeMapper(actualKeyByDesiredKey: ActualKeyByDesiredKey) {
     )
   ) {
     // We can do a fast custom conversion
-    return eval(
-      `obj => ({ ${entries
+    return new Function(
+      "obj",
+      `return { ${entries
         .map(([key, val]) => `${key}: obj.${val}`)
-        .join(", ")} })`,
-    );
+        .join(", ")} }`,
+    ) as any;
   }
   // Fallback to slow conversion
   return (obj: object): object => {

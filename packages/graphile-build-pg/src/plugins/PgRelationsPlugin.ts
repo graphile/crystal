@@ -338,8 +338,9 @@ export const PgRelationsPlugin: Plugin = {
             const singleRecordPlan = clean
               ? // Optimise function for both execution and export.
                 (EXPORTABLE(
-                  eval(
-                    `(otherSource) => $messages => otherSource.get({ ${remoteColumns
+                  new Function(
+                    "otherSource",
+                    `return $messages => otherSource.get({ ${remoteColumns
                       .map(
                         (remoteColumnName, i) =>
                           `${
@@ -347,7 +348,7 @@ export const PgRelationsPlugin: Plugin = {
                           }: $messages.get(${JSON.stringify(localColumns[i])})`,
                       )
                       .join(", ")} })`,
-                  ),
+                  ) as any,
                   [otherSource],
                 ) as any)
               : EXPORTABLE(
@@ -371,8 +372,9 @@ export const PgRelationsPlugin: Plugin = {
 
             const listPlan = clean
               ? (EXPORTABLE(
-                  eval(
-                    `(otherSource) => $messages => otherSource.find({ ${remoteColumns
+                  new Function(
+                    "otherSource",
+                    `return $messages => otherSource.find({ ${remoteColumns
                       .map(
                         (remoteColumnName, i) =>
                           `${
@@ -380,7 +382,7 @@ export const PgRelationsPlugin: Plugin = {
                           }: $messages.get(${JSON.stringify(localColumns[i])})`,
                       )
                       .join(", ")} })`,
-                  ),
+                  ) as any,
                   [otherSource],
                 ) as any)
               : EXPORTABLE(
@@ -404,8 +406,9 @@ export const PgRelationsPlugin: Plugin = {
 
             const connectionPlan = clean
               ? (EXPORTABLE(
-                  eval(
-                    `(otherSource) => $messages => {
+                  new Function(
+                    "otherSource",
+                    `return $messages => {
   const $records = otherSource.find({ ${remoteColumns
     .map(
       (remoteColumnName, i) =>
@@ -416,7 +419,7 @@ export const PgRelationsPlugin: Plugin = {
     .join(", ")} });
   return connection($records, $item => $item, $item => $item.cursor());
 }`,
-                  ),
+                  ) as any,
                   [otherSource],
                 ) as any)
               : EXPORTABLE(
