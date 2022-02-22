@@ -3966,7 +3966,7 @@ export class Aether<
       rootCrystalObject: null,
     };
     const rootCrystalObject = newCrystalObject(
-      GLOBAL_PATH, // TODO: this should be ROOT_PATH I think?
+      ROOT_PATH,
       this.queryTypeName,
       crystalContext,
       new PlanResults(),
