@@ -3973,24 +3973,30 @@ export class Aether<
     );
     crystalContext.rootCrystalObject = rootCrystalObject;
 
-    /*#__INLINE__*/ populateValuePlan(
-      this.variableValuesPlan,
-      rootCrystalObject,
-      variableValues,
-      "variableValues",
-    );
-    /*#__INLINE__*/ populateValuePlan(
-      this.contextPlan,
-      rootCrystalObject,
-      context,
-      "context",
-    );
-    /*#__INLINE__*/ populateValuePlan(
-      this.rootValuePlan,
-      rootCrystalObject,
-      rootValue,
-      "rootValue",
-    );
+    if (this.variableValuesPlan.bucketId >= 0) {
+      /*#__INLINE__*/ populateValuePlan(
+        this.variableValuesPlan,
+        rootCrystalObject,
+        variableValues,
+        "variableValues",
+      );
+    }
+    if (this.contextPlan.bucketId >= 0) {
+      /*#__INLINE__*/ populateValuePlan(
+        this.contextPlan,
+        rootCrystalObject,
+        context,
+        "context",
+      );
+    }
+    if (this.rootValuePlan.bucketId >= 0) {
+      /*#__INLINE__*/ populateValuePlan(
+        this.rootValuePlan,
+        rootCrystalObject,
+        rootValue,
+        "rootValue",
+      );
+    }
     return crystalContext;
   }
 
