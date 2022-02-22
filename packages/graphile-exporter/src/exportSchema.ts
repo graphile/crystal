@@ -42,7 +42,6 @@ import {
 } from "graphql";
 import type { GraphQLSchemaNormalizedConfig } from "graphql/type/schema";
 import { sql } from "pg-sql2";
-import prettier from "prettier";
 import type { URL } from "url";
 import { inspect } from "util";
 
@@ -1732,10 +1731,15 @@ export async function exportSchema(
   const { code } = await exportSchemaAsString(schema, options);
   const HEADER = `/* eslint-disable graphile-exporter/export-instances, graphile-exporter/export-methods, graphile-exporter/exhaustive-deps */\n`;
   const toFormat = HEADER + code;
-  const config = await prettier.resolveConfig(toPath.toString());
-  const formatted = prettier.format(toFormat, {
-    parser: "babel",
-    ...(config ?? {}),
-  });
-  await writeFile(toPath, formatted);
+  if (options.prettier) {
+    const prettier = await import("prettier");
+    const config = await prettier.resolveConfig(toPath.toString());
+    const formatted = prettier.format(toFormat, {
+      parser: "babel",
+      ...(config ?? {}),
+    });
+    await writeFile(toPath, formatted);
+  } else {
+    await writeFile(toPath, toFormat);
+  }
 }

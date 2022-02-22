@@ -20,4 +20,8 @@ export interface ExportOptions {
   modules?: {
     [moduleName: string]: any;
   };
+  /**
+   * Set 'true' if we should use prettier to format the exported code.
+   */
+  prettier?: boolean;
 }
