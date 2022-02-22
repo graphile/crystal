@@ -4891,7 +4891,11 @@ export class Aether<
           meta ? `\n<${meta}>` : ""
         }`;
         const [lBrace, rBrace] =
-          plan instanceof __ItemPlan ? [">", "]"] : ["[", "]"];
+          plan instanceof __ItemPlan
+            ? [">", "]"]
+            : plan.sync
+            ? ["[", "]"]
+            : ["[[", "]]"];
         const planClass = plan.hasSideEffects
           ? "sideeffectplan"
           : plan instanceof __ItemPlan
