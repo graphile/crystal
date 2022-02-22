@@ -1,0 +1,22 @@
+## expect(errors).toBeFalsy()
+## expect(queries).toHaveLength(2)
+## expect(payloads[0].data.forums[0].name).toEqual("Cats")
+## expect(payloads[0].data.forums[1].name).toEqual("Postgres")
+## expect(payloads[1].path).toEqual(['forums', 0])
+## expect(payloads[1].data.messagesWithManyTransforms).toHaveLength(2)
+## expect(payloads[1].data.messagesWithManyTransforms[0].every(m => m.featured === false)).toEqual(true)
+## expect(payloads[1].data.messagesWithManyTransforms[1].every(m => m.featured === true)).toEqual(true)
+## expect(payloads[1].data.messagesWithManyTransforms.flat(2).every(m => m.body.match(/Dogs|Postgres/))).toEqual(true)
+## expect(payloads[2].path).toEqual(['forums', 1])
+## expect(payloads[2].data.messagesWithManyTransforms.flat(2).every(m => m.body.match(/Cats|Dogs/))).toEqual(true)
+{
+  forums {
+    name
+    ... @defer {
+      messagesWithManyTransforms {
+        body
+        featured
+      }
+    }
+  }
+}
