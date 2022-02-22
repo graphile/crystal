@@ -1,9 +1,9 @@
 ```mermaid
 graph TD
-    classDef path fill:#eee,stroke:#000
-    classDef plan fill:#fff,stroke-width:3px
-    classDef itemplan fill:#fff,stroke-width:6px
-    classDef sideeffectplan fill:#f00,stroke-width:6px
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:3px,color:#000
+    classDef itemplan fill:#fff,stroke-width:6px,color:#000
+    classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
 
     %% subgraph fields
     P1{{"~"}}:::path
