@@ -1,0 +1,94 @@
+```mermaid
+graph TD
+    classDef path fill:#eee,stroke:#000
+    classDef plan fill:#fff,stroke-width:3px
+    classDef itemplan fill:#fff,stroke-width:6px
+    classDef sideeffectplan fill:#f00,stroke-width:6px
+
+    %% subgraph fields
+    P1{{"~"}}:::path
+    P2[/">forums"\]:::path
+    P3>">forums[]"]:::path
+    P2 -.- P3
+    P4[/">fo…s[]>messagesListSet"\]:::path
+    P5>">fo…s[]>messagesListSet[][]"]:::path
+    P4 -.- P5
+    P6([">fo…s[]>me…][]>body"]):::path
+    %% P5 -.-> P6
+    P7([">fo…s[]>me…][]>featured"]):::path
+    %% P5 -.-> P7
+    %% P3 -.-> P4
+    %% P1 -.-> P2
+    %% end
+
+    %% define plans
+    __Value_3["__Value[_3∈0]<br /><context>"]:::plan
+    __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
+    PgSelect_17["PgSelect[_17∈0]<br /><forums>"]:::plan
+    __Item_21>"__Item[_21∈1]<br /><_17>"]:::itemplan
+    PgSelectSingle_22["PgSelectSingle[_22∈1]<br /><forums>"]:::plan
+    PgClassExpression_23["PgClassExpression[_23∈1]<br /><__forums__>"]:::plan
+    PgSelect_24["PgSelect[_24∈1]<br /><forums_messages_list_set>"]:::plan
+    Access_25["Access[_25∈0]<br /><_3.pgSettings>"]:::plan
+    Access_26["Access[_26∈0]<br /><_3.withPgClient>"]:::plan
+    Object_27["Object[_27∈0]<br /><{pgSettings,withPgClient}>"]:::plan
+    __ListTransform_28["__ListTransform[_28∈1]<br /><partitionByIndex1:_24>"]:::plan
+    __Item_29>"__Item[_29∈2]<br /><_24>"]:::itemplan
+    PgSelectSingle_30["PgSelectSingle[_30∈2]<br /><forums_messages_list_set>"]:::plan
+    PgClassExpression_31["PgClassExpression[_31∈2]<br /><__forums_m..._set_idx__>"]:::plan
+    __Item_32>"__Item[_32∈3]<br /><_28>"]:::itemplan
+    __ListTransform_33["__ListTransform[_33∈3]<br /><each:_32>"]:::plan
+    __Item_34>"__Item[_34∈4]<br /><_32>"]:::itemplan
+    __Item_35>"__Item[_35∈5]<br /><_33>"]:::itemplan
+    PgSelectSingle_36["PgSelectSingle[_36∈5]<br /><forums_messages_list_set>"]:::plan
+    PgClassExpression_37["PgClassExpression[_37∈5]<br /><__forums_m...t__.#quot;body#quot;>"]:::plan
+    PgClassExpression_38["PgClassExpression[_38∈5]<br /><__forums_m...#quot;featured#quot;>"]:::plan
+
+    %% plan dependencies
+    Object_27 --> PgSelect_17
+    PgSelect_17 ==> __Item_21
+    __Item_21 --> PgSelectSingle_22
+    PgSelectSingle_22 --> PgClassExpression_23
+    Object_27 --> PgSelect_24
+    PgClassExpression_23 --> PgSelect_24
+    __Value_3 --> Access_25
+    __Value_3 --> Access_26
+    Access_25 --> Object_27
+    Access_26 --> Object_27
+    PgSelect_24 --> __ListTransform_28
+    PgClassExpression_31 -.-> __ListTransform_28
+    PgSelect_24 -.-> __Item_29
+    __Item_29 --> PgSelectSingle_30
+    PgSelectSingle_30 --> PgClassExpression_31
+    __ListTransform_28 ==> __Item_32
+    __Item_32 --> __ListTransform_33
+    __Item_34 -.-> __ListTransform_33
+    __Item_32 -.-> __Item_34
+    __ListTransform_33 ==> __Item_35
+    __Item_35 --> PgSelectSingle_36
+    PgSelectSingle_36 --> PgClassExpression_37
+    PgSelectSingle_36 --> PgClassExpression_38
+
+    %% plan-to-path relationships
+    __Value_5 -.-> P1
+    PgSelect_17 -.-> P2
+    PgSelectSingle_22 -.-> P3
+    __ListTransform_28 -.-> P4
+    PgSelectSingle_36 -.-> P5
+    PgClassExpression_37 -.-> P6
+    PgClassExpression_38 -.-> P7
+
+    %% allocate buckets
+    classDef bucket0 stroke:#696969
+    class __Value_3,__Value_5,PgSelect_17,Access_25,Access_26,Object_27 bucket0
+    classDef bucket1 stroke:#a52a2a
+    class __Item_21,PgSelectSingle_22,PgClassExpression_23,PgSelect_24,__ListTransform_28 bucket1
+    classDef bucket2 stroke:#808000
+    class __Item_29,PgSelectSingle_30,PgClassExpression_31 bucket2
+    classDef bucket3 stroke:#3cb371
+    class __Item_32,__ListTransform_33 bucket3
+    classDef bucket4 stroke:#7f007f
+    class __Item_34 bucket4
+    classDef bucket5 stroke:#ff0000
+    class __Item_35,PgSelectSingle_36,PgClassExpression_37,PgClassExpression_38 bucket5
+```
