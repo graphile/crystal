@@ -4874,9 +4874,11 @@ export class Aether<
           for (const child of parent.childFieldDigests) {
             recurse(child);
             const childId = pathId(child.pathIdentity);
-            if (printPathRelations) {
-              graph.push(`    ${parentId} -.-> ${childId}`);
-            }
+            graph.push(
+              `    ${
+                printPathRelations ? "" : "%% "
+              }${parentId} -.-> ${childId}`,
+            );
           }
         }
       };
