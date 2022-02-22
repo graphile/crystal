@@ -4790,16 +4790,21 @@ export class Aether<
   }: {
     printPathRelations?: boolean;
   } = {}): string {
-    const graph = [`graph TD`, `    classDef path fill:#eee`];
-    const planStyle = `fill:#fff`;
-    const itemplanStyle = `fill:#fff,stroke-width:6px`;
-    const sideeffectplanStyle = `fill:#f00`;
     const color = (i: number) => {
       return COLORS[i % COLORS.length];
     };
 
-    const bucketStyle = (bucketId: number) =>
-      `stroke:${color(bucketId)},stroke-width:3px`;
+    const planStyle = `fill:#fff,stroke-width:3px`;
+    const itemplanStyle = `fill:#fff,stroke-width:6px`;
+    const sideeffectplanStyle = `fill:#f00,stroke-width:6px`;
+    const graph = [
+      `graph TD`,
+      `    classDef path fill:#eee`,
+      `    classDef plan ${planStyle}`,
+      `    classDef itemplan ${itemplanStyle}`,
+      `    classDef sideeffectplan ${sideeffectplanStyle}`,
+      ``,
+    ];
 
     const pathIdMap = {};
     let pathCounter = 0;
@@ -4823,19 +4828,9 @@ export class Aether<
     };
 
     const planIdMap = {};
+    const planDependencies: string[] = [];
     const planId = (plan: ExecutablePlan): string => {
       if (!planIdMap[plan.id]) {
-        const depNodes = plan.dependencies.map((depId) => {
-          return planId(this.plans[depId]);
-        });
-        const transformItemPlanNode =
-          plan instanceof __ListTransformPlan
-            ? planId(
-                this.plans[
-                  this.transformDependencyPlanIdByTransformPlanId[plan.id]
-                ],
-              )
-            : null;
         const planName = plan.constructor.name.replace(/Plan$/, "");
         const planNode = `${planName}${plan.id}`;
         planIdMap[plan.id] = planNode;
@@ -4852,31 +4847,21 @@ export class Aether<
         }`;
         const [lBrace, rBrace] =
           plan instanceof __ItemPlan ? [">", "]"] : ["[", "]"];
+        const planClass = plan.hasSideEffects
+          ? "sideeffectplan"
+          : plan instanceof __ItemPlan
+          ? "itemplan"
+          : "plan";
         graph.push(
-          `    classDef plan${plan.id} ${bucketStyle(plan.bucketId)},${style}`,
+          `    ${planNode}${lBrace}${dotEscape(
+            planString,
+          )}${rBrace}:::${planClass}`,
         );
-        graph.push(
-          `    ${planNode}${lBrace}${dotEscape(planString)}${rBrace}:::plan${
-            plan.id
-          }`,
-        );
-        depNodes.forEach((depNode, index) => {
-          const arrow =
-            plan instanceof __ItemPlan && index === 0
-              ? plan.transformPlanId == null
-                ? "==>"
-                : "-.->"
-              : "-->";
-          graph.push(`    ${depNode} ${arrow} ${planNode}`);
-        });
-        if (transformItemPlanNode) {
-          graph.push(`    ${transformItemPlanNode} -.-> ${planNode}`);
-        }
       }
       return planIdMap[plan.id];
     };
 
-    // graph.push("    subgraph fields");
+    graph.push("    %% subgraph fields");
     {
       const recurse = (parent: FieldDigest) => {
         let parentId = pathId(parent.pathIdentity);
@@ -4897,8 +4882,49 @@ export class Aether<
       };
       recurse(this.rootFieldDigest!);
     }
-    // graph.push("    end");
+    graph.push("    %% end");
 
+    graph.push("");
+    graph.push("    %% define plans");
+    for (const [id, plan] of Object.entries(this.plans)) {
+      if (plan && plan.id === id) {
+        planId(plan);
+      }
+    }
+
+    graph.push("");
+    graph.push("    %% plan dependencies");
+    for (const [id, plan] of Object.entries(this.plans)) {
+      if (plan && plan.id === id) {
+        const planNode = planId(plan);
+        const depNodes = plan.dependencies.map((depId) => {
+          return planId(this.plans[depId]);
+        });
+        const transformItemPlanNode =
+          plan instanceof __ListTransformPlan
+            ? planId(
+                this.plans[
+                  this.transformDependencyPlanIdByTransformPlanId[plan.id]
+                ],
+              )
+            : null;
+        depNodes.forEach((depNode, index) => {
+          const arrow =
+            plan instanceof __ItemPlan && index === 0
+              ? plan.transformPlanId == null
+                ? "==>"
+                : "-.->"
+              : "-->";
+          graph.push(`    ${depNode} ${arrow} ${planNode}`);
+        });
+        if (transformItemPlanNode) {
+          graph.push(`    ${transformItemPlanNode} -.-> ${planNode}`);
+        }
+      }
+    }
+
+    graph.push("");
+    graph.push("    %% plan-to-path relationships");
     {
       const recurse = (parent: FieldDigest) => {
         const parentId = pathId(parent.pathIdentity);
@@ -4916,6 +4942,26 @@ export class Aether<
         }
       };
       recurse(this.rootFieldDigest!);
+    }
+
+    graph.push("");
+    graph.push("    %% allocate buckets");
+    for (const bucket of this.buckets) {
+      if (bucket.id > 0) {
+        const plans = Object.entries(this.plans).filter(
+          ([id, plan]) => plan && plan.id === id && plan.bucketId === bucket.id,
+        );
+        if (plans.length > 0) {
+          graph.push(
+            `    classDef bucket${bucket.id} stroke:${color(bucket.id)}`,
+          );
+          graph.push(
+            `    class ${plans
+              .map(([, plan]) => planId(plan))
+              .join(",")} bucket${bucket.id}`,
+          );
+        }
+      }
     }
 
     const graphString = graph.join("\n");
