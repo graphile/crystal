@@ -2659,12 +2659,13 @@ export class Aether<
       // What's left are the unique parent buckets
       const parents = [...nonOverlappingParents.values()];
 
-      // Plans that are in a new group get their own bucket
+      // Plans that are in a new group get their own bucket (unless they're sync plans)
       if (
-        (plan.dependencies.length === 0 && !plan.groupIds.includes(0)) ||
-        plan.dependencies.some(
-          (depId) => !planGroupsOverlap(plan, this.plans[depId]),
-        )
+        !plan.sync &&
+        ((plan.dependencies.length === 0 && !plan.groupIds.includes(0)) ||
+          plan.dependencies.some(
+            (depId) => !planGroupsOverlap(plan, this.plans[depId]),
+          ))
       ) {
         const newBucket: BucketDefinition = {
           id: this.buckets.length,
@@ -4799,7 +4800,7 @@ export class Aether<
     const sideeffectplanStyle = `fill:#f00,stroke-width:6px`;
     const graph = [
       `graph TD`,
-      `    classDef path fill:#eee`,
+      `    classDef path fill:#eee,stroke:#000`,
       `    classDef plan ${planStyle}`,
       `    classDef itemplan ${itemplanStyle}`,
       `    classDef sideeffectplan ${sideeffectplanStyle}`,
@@ -4949,20 +4950,18 @@ export class Aether<
     graph.push("");
     graph.push("    %% allocate buckets");
     for (const bucket of this.buckets) {
-      if (bucket.id > 0) {
-        const plans = Object.entries(this.plans).filter(
-          ([id, plan]) => plan && plan.id === id && plan.bucketId === bucket.id,
+      const plans = Object.entries(this.plans).filter(
+        ([id, plan]) => plan && plan.id === id && plan.bucketId === bucket.id,
+      );
+      if (plans.length > 0) {
+        graph.push(
+          `    classDef bucket${bucket.id} stroke:${color(bucket.id)}`,
         );
-        if (plans.length > 0) {
-          graph.push(
-            `    classDef bucket${bucket.id} stroke:${color(bucket.id)}`,
-          );
-          graph.push(
-            `    class ${plans
-              .map(([, plan]) => planId(plan))
-              .join(",")} bucket${bucket.id}`,
-          );
-        }
+        graph.push(
+          `    class ${plans.map(([, plan]) => planId(plan)).join(",")} bucket${
+            bucket.id
+          }`,
+        );
       }
     }
 
