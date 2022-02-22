@@ -73,12 +73,12 @@ graph TD
     InputStaticLeaf_10["InputStaticLeaf[_10∈0]"]:::plan
     Constant_11["Constant[_11∈0]"]:::plan
     Constant_12["Constant[_12∈0]"]:::plan
-    PgInsert_13["PgInsert[_13∈0]"]:::sideeffectplan
+    PgInsert_13[["PgInsert[_13∈0]"]]:::sideeffectplan
     PgClassExpression_17["PgClassExpression[_17∈0]<br /><__relation...ems__.#quot;id#quot;>"]:::plan
-    PgInsert_18["PgInsert[_18∈0]"]:::sideeffectplan
+    PgInsert_18[["PgInsert[_18∈0]"]]:::sideeffectplan
     PgClassExpression_22["PgClassExpression[_22∈0]<br /><__relational_posts__>"]:::plan
     PgClassExpression_23["PgClassExpression[_23∈0]<br /><(__relatio...ts__).#quot;id#quot;>"]:::plan
-    PgSelect_25["PgSelect[_25∈0]<br /><relational_posts>"]:::plan
+    PgSelect_25[["PgSelect[_25∈0]<br /><relational_posts>"]]:::plan
     First_29["First[_29∈0]"]:::plan
     PgSelectSingle_30["PgSelectSingle[_30∈0]<br /><relational_posts>"]:::plan
     PgClassExpression_31["PgClassExpression[_31∈0]<br /><__relation...sts__.#quot;id#quot;>"]:::plan
@@ -90,12 +90,12 @@ graph TD
     InputStaticLeaf_38["InputStaticLeaf[_38∈0]"]:::plan
     Constant_39["Constant[_39∈0]"]:::plan
     Constant_40["Constant[_40∈0]"]:::plan
-    PgInsert_41["PgInsert[_41∈0]"]:::sideeffectplan
+    PgInsert_41[["PgInsert[_41∈0]"]]:::sideeffectplan
     PgClassExpression_45["PgClassExpression[_45∈0]<br /><__relation...ems__.#quot;id#quot;>"]:::plan
-    PgInsert_46["PgInsert[_46∈0]"]:::sideeffectplan
+    PgInsert_46[["PgInsert[_46∈0]"]]:::sideeffectplan
     PgClassExpression_50["PgClassExpression[_50∈0]<br /><__relational_posts__>"]:::plan
     PgClassExpression_51["PgClassExpression[_51∈0]<br /><(__relatio...ts__).#quot;id#quot;>"]:::plan
-    PgSelect_53["PgSelect[_53∈0]<br /><relational_posts>"]:::plan
+    PgSelect_53[["PgSelect[_53∈0]<br /><relational_posts>"]]:::plan
     First_57["First[_57∈0]"]:::plan
     PgSelectSingle_58["PgSelectSingle[_58∈0]<br /><relational_posts>"]:::plan
     PgClassExpression_59["PgClassExpression[_59∈0]<br /><__relation...sts__.#quot;id#quot;>"]:::plan
@@ -107,12 +107,12 @@ graph TD
     InputStaticLeaf_66["InputStaticLeaf[_66∈0]"]:::plan
     Constant_67["Constant[_67∈0]"]:::plan
     Constant_68["Constant[_68∈0]"]:::plan
-    PgInsert_69["PgInsert[_69∈0]"]:::sideeffectplan
+    PgInsert_69[["PgInsert[_69∈0]"]]:::sideeffectplan
     PgClassExpression_73["PgClassExpression[_73∈0]<br /><__relation...ems__.#quot;id#quot;>"]:::plan
-    PgInsert_74["PgInsert[_74∈0]"]:::sideeffectplan
+    PgInsert_74[["PgInsert[_74∈0]"]]:::sideeffectplan
     PgClassExpression_78["PgClassExpression[_78∈0]<br /><__relational_posts__>"]:::plan
     PgClassExpression_79["PgClassExpression[_79∈0]<br /><(__relatio...ts__).#quot;id#quot;>"]:::plan
-    PgSelect_81["PgSelect[_81∈0]<br /><relational_posts>"]:::plan
+    PgSelect_81[["PgSelect[_81∈0]<br /><relational_posts>"]]:::plan
     First_85["First[_85∈0]"]:::plan
     PgSelectSingle_86["PgSelectSingle[_86∈0]<br /><relational_posts>"]:::plan
     PgClassExpression_87["PgClassExpression[_87∈0]<br /><__relation...sts__.#quot;id#quot;>"]:::plan
@@ -124,12 +124,12 @@ graph TD
     InputStaticLeaf_94["InputStaticLeaf[_94∈0]"]:::plan
     Constant_95["Constant[_95∈0]"]:::plan
     Constant_96["Constant[_96∈0]"]:::plan
-    PgInsert_97["PgInsert[_97∈0]"]:::sideeffectplan
+    PgInsert_97[["PgInsert[_97∈0]"]]:::sideeffectplan
     PgClassExpression_101["PgClassExpression[_101∈0]<br /><__relation...ems__.#quot;id#quot;>"]:::plan
-    PgInsert_102["PgInsert[_102∈0]"]:::sideeffectplan
+    PgInsert_102[["PgInsert[_102∈0]"]]:::sideeffectplan
     PgClassExpression_106["PgClassExpression[_106∈0]<br /><__relational_posts__>"]:::plan
     PgClassExpression_107["PgClassExpression[_107∈0]<br /><(__relatio...ts__).#quot;id#quot;>"]:::plan
-    PgSelect_109["PgSelect[_109∈0]<br /><relational_posts>"]:::plan
+    PgSelect_109[["PgSelect[_109∈0]<br /><relational_posts>"]]:::plan
     Access_110["Access[_110∈0]<br /><_3.pgSettings>"]:::plan
     Access_111["Access[_111∈0]<br /><_3.withPgClient>"]:::plan
     Object_112["Object[_112∈0]<br /><{pgSettings,withPgClient}>"]:::plan

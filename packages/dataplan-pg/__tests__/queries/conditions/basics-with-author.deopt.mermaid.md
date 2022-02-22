@@ -30,18 +30,18 @@ graph TD
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    PgSelect_17["PgSelect[_17∈0]<br /><forums>"]:::plan
+    PgSelect_17[["PgSelect[_17∈0]<br /><forums>"]]:::plan
     __Item_21>"__Item[_21∈1]<br /><_17>"]:::itemplan
     PgSelectSingle_22["PgSelectSingle[_22∈1]<br /><forums>"]:::plan
     PgClassExpression_23["PgClassExpression[_23∈1]<br /><__forums__.#quot;name#quot;>"]:::plan
     PgClassExpression_32["PgClassExpression[_32∈1]<br /><__forums__.#quot;id#quot;>"]:::plan
-    PgSelect_33["PgSelect[_33∈1]<br /><messages>"]:::plan
+    PgSelect_33[["PgSelect[_33∈1]<br /><messages>"]]:::plan
     PgClassExpression_37["PgClassExpression[_37∈1]<br /><__forums__...chived_at#quot;>"]:::plan
     __Item_38>"__Item[_38∈2]<br /><_33>"]:::itemplan
     PgSelectSingle_39["PgSelectSingle[_39∈2]<br /><messages>"]:::plan
     PgClassExpression_40["PgClassExpression[_40∈2]<br /><__messages__.#quot;body#quot;>"]:::plan
     PgClassExpression_41["PgClassExpression[_41∈2]<br /><__messages...author_id#quot;>"]:::plan
-    PgSelect_42["PgSelect[_42∈2]<br /><users>"]:::plan
+    PgSelect_42[["PgSelect[_42∈2]<br /><users>"]]:::plan
     Access_43["Access[_43∈0]<br /><_3.pgSettings>"]:::plan
     Access_44["Access[_44∈0]<br /><_3.withPgClient>"]:::plan
     Object_45["Object[_45∈0]<br /><{pgSettings,withPgClient}>"]:::plan

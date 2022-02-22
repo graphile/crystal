@@ -24,11 +24,11 @@ graph TD
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    PgSelect_17["PgSelect[_17∈0]<br /><forums>"]:::plan
+    PgSelect_17[["PgSelect[_17∈0]<br /><forums>"]]:::plan
     __Item_21>"__Item[_21∈1]<br /><_17>"]:::itemplan
     PgSelectSingle_22["PgSelectSingle[_22∈1]<br /><forums>"]:::plan
     PgClassExpression_23["PgClassExpression[_23∈1]<br /><__forums__>"]:::plan
-    PgSelect_24["PgSelect[_24∈1]<br /><forums_messages_list_set>"]:::plan
+    PgSelect_24[["PgSelect[_24∈1]<br /><forums_messages_list_set>"]]:::plan
     Access_25["Access[_25∈0]<br /><_3.pgSettings>"]:::plan
     Access_26["Access[_26∈0]<br /><_3.withPgClient>"]:::plan
     Object_27["Object[_27∈0]<br /><{pgSettings,withPgClient}>"]:::plan

@@ -56,21 +56,21 @@ graph TD
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    PgSelect_17["PgSelect[_17∈0]<br /><forums>"]:::plan
+    PgSelect_17[["PgSelect[_17∈0]<br /><forums>"]]:::plan
     __Item_21>"__Item[_21∈1]<br /><_17>"]:::itemplan
     PgSelectSingle_22["PgSelectSingle[_22∈1]<br /><forums>"]:::plan
     PgClassExpression_23["PgClassExpression[_23∈1]<br /><__forums__.#quot;name#quot;>"]:::plan
     InputStaticLeaf_24["InputStaticLeaf[_24∈0]"]:::plan
     InputStaticLeaf_25["InputStaticLeaf[_25∈0]"]:::plan
     PgClassExpression_33["PgClassExpression[_33∈1]<br /><__forums__.#quot;id#quot;>"]:::plan
-    PgSelect_34["PgSelect[_34∈1]<br /><messages>"]:::plan
+    PgSelect_34[["PgSelect[_34∈1]<br /><messages>"]]:::plan
     Connection_38["Connection[_38∈0]<br /><_34>"]:::plan
     PgClassExpression_39["PgClassExpression[_39∈1]<br /><__forums__...chived_at#quot;>"]:::plan
     __Item_41>"__Item[_41∈2]<br /><_34>"]:::itemplan
     PgSelectSingle_42["PgSelectSingle[_42∈2]<br /><messages>"]:::plan
     PgClassExpression_43["PgClassExpression[_43∈2]<br /><__messages__.#quot;body#quot;>"]:::plan
     PgClassExpression_44["PgClassExpression[_44∈2]<br /><__messages...author_id#quot;>"]:::plan
-    PgSelect_45["PgSelect[_45∈2]<br /><users>"]:::plan
+    PgSelect_45[["PgSelect[_45∈2]<br /><users>"]]:::plan
     First_49["First[_49∈2]"]:::plan
     PgSelectSingle_50["PgSelectSingle[_50∈2]<br /><users>"]:::plan
     PgClassExpression_51["PgClassExpression[_51∈2]<br /><__users__.#quot;username#quot;>"]:::plan
@@ -84,7 +84,7 @@ graph TD
     PgPageInfo_68["PgPageInfo[_68∈0]"]:::plan
     Constant_69["Constant[_69∈0]"]:::plan
     Constant_70["Constant[_70∈0]"]:::plan
-    PgSelect_71["PgSelect[_71∈1]<br /><messages>"]:::plan
+    PgSelect_71[["PgSelect[_71∈1]<br /><messages>"]]:::plan
     First_72["First[_72∈1]"]:::plan
     PgSelectSingle_73["PgSelectSingle[_73∈1]<br /><messages>"]:::plan
     PgClassExpression_74["PgClassExpression[_74∈1]<br /><count(*)>"]:::plan

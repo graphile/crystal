@@ -43,7 +43,7 @@ graph TD
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
     InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
-    PgSelect_8["PgSelect[_8∈0]<br /><entity_search>"]:::plan
+    PgSelect_8[["PgSelect[_8∈0]<br /><entity_search>"]]:::plan
     __ListTransform_12["__ListTransform[_12∈0]<br /><each:_8>"]:::plan
     __Item_13>"__Item[_13∈1]<br /><_8>"]:::itemplan
     PgSelectSingle_14["PgSelectSingle[_14∈1]<br /><entity_search>"]:::plan
@@ -62,7 +62,7 @@ graph TD
     PgSelectSingle_35["PgSelectSingle[_35∈2]<br /><posts>"]:::plan
     PgClassExpression_36["PgClassExpression[_36∈2]<br /><__posts__.#quot;post_id#quot;>"]:::plan
     PgClassExpression_37["PgClassExpression[_37∈2]<br /><__posts__.#quot;author_id#quot;>"]:::plan
-    PgSelect_38["PgSelect[_38∈2]<br /><people>"]:::plan
+    PgSelect_38[["PgSelect[_38∈2]<br /><people>"]]:::plan
     First_42["First[_42∈2]"]:::plan
     PgSelectSingle_43["PgSelectSingle[_43∈2]<br /><people>"]:::plan
     PgClassExpression_44["PgClassExpression[_44∈2]<br /><__people__.#quot;username#quot;>"]:::plan
@@ -71,12 +71,12 @@ graph TD
     PgSelectSingle_51["PgSelectSingle[_51∈2]<br /><comments>"]:::plan
     PgClassExpression_52["PgClassExpression[_52∈2]<br /><__comments...omment_id#quot;>"]:::plan
     PgClassExpression_53["PgClassExpression[_53∈2]<br /><__comments...author_id#quot;>"]:::plan
-    PgSelect_54["PgSelect[_54∈2]<br /><people>"]:::plan
+    PgSelect_54[["PgSelect[_54∈2]<br /><people>"]]:::plan
     First_58["First[_58∈2]"]:::plan
     PgSelectSingle_59["PgSelectSingle[_59∈2]<br /><people>"]:::plan
     PgClassExpression_60["PgClassExpression[_60∈2]<br /><__people__.#quot;username#quot;>"]:::plan
     PgClassExpression_61["PgClassExpression[_61∈2]<br /><__comments__.#quot;post_id#quot;>"]:::plan
-    PgSelect_62["PgSelect[_62∈2]<br /><posts>"]:::plan
+    PgSelect_62[["PgSelect[_62∈2]<br /><posts>"]]:::plan
     Access_63["Access[_63∈0]<br /><_3.pgSettings>"]:::plan
     Access_64["Access[_64∈0]<br /><_3.withPgClient>"]:::plan
     Object_65["Object[_65∈0]<br /><{pgSettings,withPgClient}>"]:::plan

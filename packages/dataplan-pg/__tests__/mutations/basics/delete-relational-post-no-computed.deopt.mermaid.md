@@ -21,13 +21,13 @@ graph TD
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
     InputStaticLeaf_8["InputStaticLeaf[_8∈0]"]:::plan
-    PgDelete_9["PgDelete[_9∈0]"]:::sideeffectplan
+    PgDelete_9[["PgDelete[_9∈0]"]]:::sideeffectplan
     Access_10["Access[_10∈0]<br /><_3.pgSettings>"]:::plan
     Access_11["Access[_11∈0]<br /><_3.withPgClient>"]:::plan
     Object_12["Object[_12∈0]<br /><{pgSettings,withPgClient}>"]:::plan
     PgClassExpression_13["PgClassExpression[_13∈0]<br /><__relation...sts__.#quot;id#quot;>"]:::plan
     InputStaticLeaf_15["InputStaticLeaf[_15∈0]"]:::plan
-    PgDelete_16["PgDelete[_16∈0]"]:::sideeffectplan
+    PgDelete_16[["PgDelete[_16∈0]"]]:::sideeffectplan
     PgClassExpression_20["PgClassExpression[_20∈0]<br /><__relation...sts__.#quot;id#quot;>"]:::plan
 
     %% plan dependencies

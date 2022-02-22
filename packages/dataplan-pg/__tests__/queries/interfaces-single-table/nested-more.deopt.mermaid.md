@@ -632,12 +632,12 @@ graph TD
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    PgSelect_7["PgSelect[_7∈0]<br /><people>"]:::plan
+    PgSelect_7[["PgSelect[_7∈0]<br /><people>"]]:::plan
     __Item_11>"__Item[_11∈1]<br /><_7>"]:::itemplan
     PgSelectSingle_12["PgSelectSingle[_12∈1]<br /><people>"]:::plan
     PgClassExpression_13["PgClassExpression[_13∈1]<br /><__people__.#quot;username#quot;>"]:::plan
     PgClassExpression_14["PgClassExpression[_14∈1]<br /><__people__.#quot;person_id#quot;>"]:::plan
-    PgSelect_15["PgSelect[_15∈1]<br /><single_table_items>"]:::plan
+    PgSelect_15[["PgSelect[_15∈1]<br /><single_table_items>"]]:::plan
     __ListTransform_19["__ListTransform[_19∈1]<br /><each:_15>"]:::plan
     __Item_20>"__Item[_20∈2]<br /><_15>"]:::itemplan
     PgSelectSingle_21["PgSelectSingle[_21∈2]<br /><single_table_items>"]:::plan
@@ -647,7 +647,7 @@ graph TD
     Lambda_25["Lambda[_25∈3]"]:::plan
     PgSingleTablePolymorphic_26["PgSingleTablePolymorphic[_26∈3]"]:::plan
     PgClassExpression_27["PgClassExpression[_27∈3]<br /><__single_t...parent_id#quot;>"]:::plan
-    PgSelect_28["PgSelect[_28∈3]<br /><single_table_items>"]:::plan
+    PgSelect_28[["PgSelect[_28∈3]<br /><single_table_items>"]]:::plan
     First_32["First[_32∈3]"]:::plan
     PgSelectSingle_33["PgSelectSingle[_33∈3]<br /><single_table_items>"]:::plan
     PgClassExpression_34["PgClassExpression[_34∈3]<br /><__single_t...s__.#quot;type#quot;>"]:::plan
@@ -655,7 +655,7 @@ graph TD
     PgSingleTablePolymorphic_36["PgSingleTablePolymorphic[_36∈3]"]:::plan
     PgClassExpression_39["PgClassExpression[_39∈3]<br /><__single_t...__.#quot;type2#quot;>"]:::plan
     PgClassExpression_40["PgClassExpression[_40∈3]<br /><__single_t...author_id#quot;>"]:::plan
-    PgSelect_41["PgSelect[_41∈3]<br /><people>"]:::plan
+    PgSelect_41[["PgSelect[_41∈3]<br /><people>"]]:::plan
     First_45["First[_45∈3]"]:::plan
     PgSelectSingle_46["PgSelectSingle[_46∈3]<br /><people>"]:::plan
     PgClassExpression_47["PgClassExpression[_47∈3]<br /><__people__.#quot;username#quot;>"]:::plan
@@ -667,7 +667,7 @@ graph TD
     PgClassExpression_117["PgClassExpression[_117∈3]<br /><__single_t...ems__.#quot;id#quot;>"]:::plan
     PgClassExpression_119["PgClassExpression[_119∈3]<br /><__single_t...__.#quot;type2#quot;>"]:::plan
     PgClassExpression_120["PgClassExpression[_120∈3]<br /><__single_t...author_id#quot;>"]:::plan
-    PgSelect_121["PgSelect[_121∈3]<br /><people>"]:::plan
+    PgSelect_121[["PgSelect[_121∈3]<br /><people>"]]:::plan
     First_125["First[_125∈3]"]:::plan
     PgSelectSingle_126["PgSelectSingle[_126∈3]<br /><people>"]:::plan
     PgClassExpression_127["PgClassExpression[_127∈3]<br /><__people__.#quot;username#quot;>"]:::plan

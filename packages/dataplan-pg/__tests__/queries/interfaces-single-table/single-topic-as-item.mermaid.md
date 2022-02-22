@@ -34,7 +34,7 @@ graph TD
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
     InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
     Constant_8["Constant[_8∈0]"]:::plan
-    PgSelect_9["PgSelect[_9∈0]<br /><single_table_items>"]:::plan
+    PgSelect_9[["PgSelect[_9∈0]<br /><single_table_items>"]]:::plan
     Access_10["Access[_10∈0]<br /><_3.pgSettings>"]:::plan
     Access_11["Access[_11∈0]<br /><_3.withPgClient>"]:::plan
     Object_12["Object[_12∈0]<br /><{pgSettings,withPgClient}>"]:::plan

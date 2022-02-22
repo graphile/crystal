@@ -22,7 +22,7 @@ graph TD
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    PgSelect_7["PgSelect[_7∈0]<br /><random_user>"]:::plan
+    PgSelect_7[["PgSelect[_7∈0]<br /><random_user>"]]:::plan
     Access_8["Access[_8∈0]<br /><_3.pgSettings>"]:::plan
     Access_9["Access[_9∈0]<br /><_3.withPgClient>"]:::plan
     Object_10["Object[_10∈0]<br /><{pgSettings,withPgClient}>"]:::plan

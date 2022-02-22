@@ -43,7 +43,7 @@ graph TD
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
     InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
-    PgSelect_8["PgSelect[_8∈0]<br /><entity_search>"]:::plan
+    PgSelect_8[["PgSelect[_8∈0]<br /><entity_search>"]]:::plan
     __ListTransform_12["__ListTransform[_12∈0]<br /><each:_8>"]:::plan
     __Item_13>"__Item[_13∈1]<br /><_8>"]:::itemplan
     PgSelectSingle_14["PgSelectSingle[_14∈1]<br /><entity_search>"]:::plan

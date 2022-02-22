@@ -47,7 +47,7 @@ graph TD
     InputStaticLeaf_16["InputStaticLeaf[_16∈0]"]:::plan
     InputStaticLeaf_17["InputStaticLeaf[_17∈0]"]:::plan
     Connection_26["Connection[_26∈0]<br /><_22>"]:::plan
-    PgSelect_27["PgSelect[_27∈0]<br /><messages>"]:::plan
+    PgSelect_27[["PgSelect[_27∈0]<br /><messages>"]]:::plan
     __Item_28>"__Item[_28∈1]<br /><_27>"]:::itemplan
     PgSelectSingle_29["PgSelectSingle[_29∈1]<br /><messages>"]:::plan
     PgCursor_30["PgCursor[_30∈1]"]:::plan
@@ -80,7 +80,7 @@ graph TD
     PgClassExpression_62["PgClassExpression[_62∈0]<br /><__messages__.body>"]:::plan
     PgClassExpression_63["PgClassExpression[_63∈0]<br /><__messages__.#quot;id#quot;>"]:::plan
     List_64["List[_64∈0]<br /><_61,_62,_63>"]:::plan
-    PgSelect_65["PgSelect[_65∈0]<br /><messages>"]:::plan
+    PgSelect_65[["PgSelect[_65∈0]<br /><messages>"]]:::plan
     First_66["First[_66∈0]"]:::plan
     PgSelectSingle_67["PgSelectSingle[_67∈0]<br /><messages>"]:::plan
     PgClassExpression_68["PgClassExpression[_68∈0]<br /><count(*)>"]:::plan

@@ -740,7 +740,7 @@ graph TD
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    PgSelect_7["PgSelect[_7∈0]<br /><people>"]:::plan
+    PgSelect_7[["PgSelect[_7∈0]<br /><people>"]]:::plan
     __Item_11>"__Item[_11∈1]<br /><_7>"]:::itemplan
     PgSelectSingle_12["PgSelectSingle[_12∈1]<br /><people>"]:::plan
     PgClassExpression_13["PgClassExpression[_13∈1]<br /><__people__.#quot;username#quot;>"]:::plan

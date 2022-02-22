@@ -32,13 +32,13 @@ graph TD
     Connection_24["Connection[_24∈0]<br /><_20>"]:::plan
     PgPageInfo_25["PgPageInfo[_25∈0]"]:::plan
     Constant_26["Constant[_26∈0]"]:::plan
-    PgSelect_27["PgSelect[_27∈0]<br /><messages>"]:::plan
+    PgSelect_27[["PgSelect[_27∈0]<br /><messages>"]]:::plan
     Lambda_28["Lambda[_28∈0]<br /><parseCursor>"]:::plan
     Lambda_29["Lambda[_29∈0]<br /><listHasMore>"]:::plan
     PgValidateParsedCursor_30["PgValidateParsedCursor[_30∈0]"]:::plan
     Access_31["Access[_31∈0]<br /><_28.1>"]:::plan
     ToPg_32["ToPg[_32∈0]"]:::plan
-    PgSelect_33["PgSelect[_33∈0]<br /><messages>"]:::plan
+    PgSelect_33[["PgSelect[_33∈0]<br /><messages>"]]:::plan
     First_34["First[_34∈0]"]:::plan
     PgSelectSingle_35["PgSelectSingle[_35∈0]<br /><messages>"]:::plan
     PgClassExpression_36["PgClassExpression[_36∈0]<br /><count(*)>"]:::plan

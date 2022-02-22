@@ -41,12 +41,12 @@ graph TD
     InputStaticLeaf_10["InputStaticLeaf[_10∈0]"]:::plan
     Constant_11["Constant[_11∈0]"]:::plan
     Constant_12["Constant[_12∈0]"]:::plan
-    PgInsert_13["PgInsert[_13∈0]"]:::sideeffectplan
+    PgInsert_13[["PgInsert[_13∈0]"]]:::sideeffectplan
     PgClassExpression_17["PgClassExpression[_17∈0]<br /><__relation...ems__.#quot;id#quot;>"]:::plan
-    PgInsert_18["PgInsert[_18∈0]"]:::sideeffectplan
+    PgInsert_18[["PgInsert[_18∈0]"]]:::sideeffectplan
     PgClassExpression_22["PgClassExpression[_22∈0]<br /><__relational_posts__>"]:::plan
     PgClassExpression_23["PgClassExpression[_23∈0]<br /><(__relatio...ts__).#quot;id#quot;>"]:::plan
-    PgSelect_25["PgSelect[_25∈0]<br /><relational_posts>"]:::plan
+    PgSelect_25[["PgSelect[_25∈0]<br /><relational_posts>"]]:::plan
     First_29["First[_29∈0]"]:::plan
     PgSelectSingle_30["PgSelectSingle[_30∈0]<br /><relational_posts>"]:::plan
     PgClassExpression_31["PgClassExpression[_31∈0]<br /><__relation...sts__.#quot;id#quot;>"]:::plan

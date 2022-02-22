@@ -23,13 +23,13 @@ graph TD
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
     InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
-    PgSelect_8["PgSelect[_8∈0]<br /><messages>"]:::plan
+    PgSelect_8[["PgSelect[_8∈0]<br /><messages>"]]:::plan
     First_12["First[_12∈0]"]:::plan
     PgSelectSingle_13["PgSelectSingle[_13∈0]<br /><messages>"]:::plan
     PgClassExpression_14["PgClassExpression[_14∈0]<br /><__messages__.#quot;id#quot;>"]:::plan
     PgClassExpression_15["PgClassExpression[_15∈0]<br /><__messages__.#quot;body#quot;>"]:::plan
     PgClassExpression_16["PgClassExpression[_16∈0]<br /><__messages__.#quot;forum_id#quot;>"]:::plan
-    PgSelect_17["PgSelect[_17∈0]<br /><forums>"]:::plan
+    PgSelect_17[["PgSelect[_17∈0]<br /><forums>"]]:::plan
     Access_18["Access[_18∈0]<br /><_3.pgSettings>"]:::plan
     Access_19["Access[_19∈0]<br /><_3.withPgClient>"]:::plan
     Object_20["Object[_20∈0]<br /><{pgSettings,withPgClient}>"]:::plan

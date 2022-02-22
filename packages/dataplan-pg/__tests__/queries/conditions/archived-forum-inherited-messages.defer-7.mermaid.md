@@ -48,21 +48,21 @@ graph TD
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    PgSelect_17["PgSelect[_17∈0]<br /><forums>"]:::plan
+    PgSelect_17[["PgSelect[_17∈0]<br /><forums>"]]:::plan
     __Item_21>"__Item[_21∈1]<br /><_17>"]:::itemplan
     PgSelectSingle_22["PgSelectSingle[_22∈1]<br /><forums>"]:::plan
     PgClassExpression_23["PgClassExpression[_23∈1]<br /><__forums__.#quot;name#quot;>"]:::plan
     InputStaticLeaf_24["InputStaticLeaf[_24∈0]"]:::plan
     InputStaticLeaf_25["InputStaticLeaf[_25∈0]"]:::plan
     PgClassExpression_33["PgClassExpression[_33∈1]<br /><__forums__.#quot;id#quot;>"]:::plan
-    PgSelect_34["PgSelect[_34∈2]<br /><messages>"]:::plan
+    PgSelect_34[["PgSelect[_34∈2]<br /><messages>"]]:::plan
     Connection_38["Connection[_38∈0]<br /><_34>"]:::plan
     PgClassExpression_39["PgClassExpression[_39∈1]<br /><__forums__...chived_at#quot;>"]:::plan
     __Item_41>"__Item[_41∈3]<br /><_34>"]:::itemplan
     PgSelectSingle_42["PgSelectSingle[_42∈3]<br /><messages>"]:::plan
     PgClassExpression_43["PgClassExpression[_43∈3]<br /><__messages__.#quot;body#quot;>"]:::plan
     PgClassExpression_44["PgClassExpression[_44∈3]<br /><__messages...author_id#quot;>"]:::plan
-    PgSelect_45["PgSelect[_45∈4]<br /><users>"]:::plan
+    PgSelect_45[["PgSelect[_45∈4]<br /><users>"]]:::plan
     First_49["First[_49∈4]"]:::plan
     PgSelectSingle_50["PgSelectSingle[_50∈4]<br /><users>"]:::plan
     PgClassExpression_51["PgClassExpression[_51∈4]<br /><__users__.#quot;username#quot;>"]:::plan

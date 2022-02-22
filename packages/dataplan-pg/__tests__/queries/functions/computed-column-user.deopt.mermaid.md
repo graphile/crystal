@@ -21,11 +21,11 @@ graph TD
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
     InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
-    PgSelect_8["PgSelect[_8∈0]<br /><forums>"]:::plan
+    PgSelect_8[["PgSelect[_8∈0]<br /><forums>"]]:::plan
     First_12["First[_12∈0]"]:::plan
     PgSelectSingle_13["PgSelectSingle[_13∈0]<br /><forums>"]:::plan
     PgClassExpression_14["PgClassExpression[_14∈0]<br /><__forums__>"]:::plan
-    PgSelect_15["PgSelect[_15∈0]<br /><forums_random_user>"]:::plan
+    PgSelect_15[["PgSelect[_15∈0]<br /><forums_random_user>"]]:::plan
     Access_16["Access[_16∈0]<br /><_3.pgSettings>"]:::plan
     Access_17["Access[_17∈0]<br /><_3.withPgClient>"]:::plan
     Object_18["Object[_18∈0]<br /><{pgSettings,withPgClient}>"]:::plan

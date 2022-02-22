@@ -19,7 +19,7 @@ graph TD
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
     InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
-    PgSelect_8["PgSelect[_8∈0]<br /><forums>"]:::plan
+    PgSelect_8[["PgSelect[_8∈0]<br /><forums>"]]:::plan
     Access_9["Access[_9∈0]<br /><_3.pgSettings>"]:::plan
     Access_10["Access[_10∈0]<br /><_3.withPgClient>"]:::plan
     Object_11["Object[_11∈0]<br /><{pgSettings,withPgClient}>"]:::plan

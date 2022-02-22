@@ -47,7 +47,7 @@ graph TD
     InputStaticLeaf_16["InputStaticLeaf[_16∈0]"]:::plan
     InputStaticLeaf_17["InputStaticLeaf[_17∈0]"]:::plan
     Connection_24["Connection[_24∈0]<br /><_20>"]:::plan
-    PgSelect_25["PgSelect[_25∈0]<br /><messages>"]:::plan
+    PgSelect_25[["PgSelect[_25∈0]<br /><messages>"]]:::plan
     Lambda_26["Lambda[_26∈0]<br /><parseCursor>"]:::plan
     PgValidateParsedCursor_27["PgValidateParsedCursor[_27∈0]"]:::plan
     Access_28["Access[_28∈0]<br /><_26.1>"]:::plan
@@ -59,7 +59,7 @@ graph TD
     List_34["List[_34∈1]<br /><_33>"]:::plan
     PgClassExpression_35["PgClassExpression[_35∈1]<br /><__messages__.#quot;body#quot;>"]:::plan
     PgClassExpression_36["PgClassExpression[_36∈1]<br /><__messages...author_id#quot;>"]:::plan
-    PgSelect_37["PgSelect[_37∈1]<br /><users>"]:::plan
+    PgSelect_37[["PgSelect[_37∈1]<br /><users>"]]:::plan
     Access_38["Access[_38∈0]<br /><_3.pgSettings>"]:::plan
     Access_39["Access[_39∈0]<br /><_3.withPgClient>"]:::plan
     Object_40["Object[_40∈0]<br /><{pgSettings,withPgClient}>"]:::plan
@@ -80,7 +80,7 @@ graph TD
     PgCursor_67["PgCursor[_67∈0]"]:::plan
     PgClassExpression_71["PgClassExpression[_71∈0]<br /><__messages__.#quot;id#quot;>"]:::plan
     List_72["List[_72∈0]<br /><_71>"]:::plan
-    PgSelect_73["PgSelect[_73∈0]<br /><messages>"]:::plan
+    PgSelect_73[["PgSelect[_73∈0]<br /><messages>"]]:::plan
     First_74["First[_74∈0]"]:::plan
     PgSelectSingle_75["PgSelectSingle[_75∈0]<br /><messages>"]:::plan
     PgClassExpression_76["PgClassExpression[_76∈0]<br /><count(*)>"]:::plan

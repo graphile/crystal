@@ -56,7 +56,7 @@ graph TD
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    PgSelect_17["PgSelect[_17∈0]<br /><forums>"]:::plan
+    PgSelect_17[["PgSelect[_17∈0]<br /><forums>"]]:::plan
     __Item_21>"__Item[_21∈1]<br /><_17>"]:::itemplan
     PgSelectSingle_22["PgSelectSingle[_22∈1]<br /><forums>"]:::plan
     PgClassExpression_23["PgClassExpression[_23∈1]<br /><__forums__.#quot;name#quot;>"]:::plan
@@ -65,7 +65,7 @@ graph TD
     PgClassExpression_33["PgClassExpression[_33∈1]<br /><__forums__.#quot;id#quot;>"]:::plan
     Connection_38["Connection[_38∈0]<br /><_34>"]:::plan
     PgClassExpression_39["PgClassExpression[_39∈1]<br /><__forums__...chived_at#quot;>"]:::plan
-    PgSelect_40["PgSelect[_40∈2]<br /><messages>"]:::plan
+    PgSelect_40[["PgSelect[_40∈2]<br /><messages>"]]:::plan
     __Item_41>"__Item[_41∈3]<br /><_40>"]:::itemplan
     PgSelectSingle_42["PgSelectSingle[_42∈3]<br /><messages>"]:::plan
     PgClassExpression_43["PgClassExpression[_43∈3]<br /><__messages__.#quot;body#quot;>"]:::plan
@@ -73,7 +73,7 @@ graph TD
     PgSelectSingle_50["PgSelectSingle[_50∈3]<br /><users>"]:::plan
     PgClassExpression_51["PgClassExpression[_51∈3]<br /><__users__.#quot;username#quot;>"]:::plan
     PgClassExpression_52["PgClassExpression[_52∈3]<br /><__users__....vatar_url#quot;>"]:::plan
-    PgSelect_53["PgSelect[_53∈4]<br /><messages>"]:::plan
+    PgSelect_53[["PgSelect[_53∈4]<br /><messages>"]]:::plan
     __Item_54>"__Item[_54∈5]<br /><_53>"]:::itemplan
     PgSelectSingle_55["PgSelectSingle[_55∈5]<br /><messages>"]:::plan
     PgCursor_56["PgCursor[_56∈5]"]:::plan

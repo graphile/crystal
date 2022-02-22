@@ -53,7 +53,7 @@ graph TD
     Access_14["Access[_14∈1]<br /><_12.op>"]:::plan
     Lambda_15["Lambda[_15∈1]"]:::plan
     Access_16["Access[_16∈1]<br /><_12.id>"]:::plan
-    PgSelect_17["PgSelect[_17∈1]<br /><messages>"]:::plan
+    PgSelect_17[["PgSelect[_17∈1]<br /><messages>"]]:::plan
     First_21["First[_21∈1]"]:::plan
     PgSelectSingle_22["PgSelectSingle[_22∈1]<br /><messages>"]:::plan
     PgClassExpression_23["PgClassExpression[_23∈1]<br /><__messages__.#quot;id#quot;>"]:::plan

@@ -48,7 +48,7 @@ graph TD
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    PgSelect_17["PgSelect[_17∈0]<br /><forums>"]:::plan
+    PgSelect_17[["PgSelect[_17∈0]<br /><forums>"]]:::plan
     __Item_21>"__Item[_21∈1]<br /><_17>"]:::itemplan
     PgSelectSingle_22["PgSelectSingle[_22∈1]<br /><forums>"]:::plan
     PgClassExpression_23["PgClassExpression[_23∈1]<br /><__forums__.#quot;name#quot;>"]:::plan
@@ -59,7 +59,7 @@ graph TD
     PgSelectSingle_42["PgSelectSingle[_42∈2]<br /><messages>"]:::plan
     PgClassExpression_43["PgClassExpression[_43∈2]<br /><__messages__.#quot;body#quot;>"]:::plan
     PgClassExpression_44["PgClassExpression[_44∈2]<br /><__messages...author_id#quot;>"]:::plan
-    PgSelect_45["PgSelect[_45∈3]<br /><users>"]:::plan
+    PgSelect_45[["PgSelect[_45∈3]<br /><users>"]]:::plan
     First_49["First[_49∈3]"]:::plan
     PgSelectSingle_50["PgSelectSingle[_50∈3]<br /><users>"]:::plan
     PgClassExpression_51["PgClassExpression[_51∈3]<br /><__users__.#quot;username#quot;>"]:::plan

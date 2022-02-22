@@ -212,12 +212,12 @@ graph TD
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    PgSelect_7["PgSelect[_7∈0]<br /><people>"]:::plan
+    PgSelect_7[["PgSelect[_7∈0]<br /><people>"]]:::plan
     __Item_11>"__Item[_11∈1]<br /><_7>"]:::itemplan
     PgSelectSingle_12["PgSelectSingle[_12∈1]<br /><people>"]:::plan
     PgClassExpression_13["PgClassExpression[_13∈1]<br /><__people__.#quot;username#quot;>"]:::plan
     PgClassExpression_14["PgClassExpression[_14∈1]<br /><__people__.#quot;person_id#quot;>"]:::plan
-    PgSelect_15["PgSelect[_15∈1]<br /><relational_items>"]:::plan
+    PgSelect_15[["PgSelect[_15∈1]<br /><relational_items>"]]:::plan
     __ListTransform_19["__ListTransform[_19∈1]<br /><each:_15>"]:::plan
     __Item_20>"__Item[_20∈2]<br /><_15>"]:::itemplan
     PgSelectSingle_21["PgSelectSingle[_21∈2]<br /><relational_items>"]:::plan
@@ -226,7 +226,7 @@ graph TD
     PgClassExpression_24["PgClassExpression[_24∈3]<br /><__relation...s__.#quot;type#quot;>"]:::plan
     PgPolymorphic_25["PgPolymorphic[_25∈3]"]:::plan
     PgClassExpression_33["PgClassExpression[_33∈3]<br /><__relation...parent_id#quot;>"]:::plan
-    PgSelect_34["PgSelect[_34∈3]<br /><relational_items>"]:::plan
+    PgSelect_34[["PgSelect[_34∈3]<br /><relational_items>"]]:::plan
     First_38["First[_38∈3]"]:::plan
     PgSelectSingle_39["PgSelectSingle[_39∈3]<br /><relational_items>"]:::plan
     PgClassExpression_40["PgClassExpression[_40∈3]<br /><__relation...s__.#quot;type#quot;>"]:::plan

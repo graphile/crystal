@@ -18,7 +18,7 @@ graph TD
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    PgSelect_17["PgSelect[_17∈0]<br /><forums>"]:::plan
+    PgSelect_17[["PgSelect[_17∈0]<br /><forums>"]]:::plan
     Access_18["Access[_18∈0]<br /><_3.pgSettings>"]:::plan
     Access_19["Access[_19∈0]<br /><_3.withPgClient>"]:::plan
     Object_20["Object[_20∈0]<br /><{pgSettings,withPgClient}>"]:::plan

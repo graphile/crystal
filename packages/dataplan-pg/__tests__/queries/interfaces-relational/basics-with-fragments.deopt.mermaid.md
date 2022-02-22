@@ -120,12 +120,12 @@ graph TD
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    PgSelect_7["PgSelect[_7∈0]<br /><people>"]:::plan
+    PgSelect_7[["PgSelect[_7∈0]<br /><people>"]]:::plan
     __Item_11>"__Item[_11∈1]<br /><_7>"]:::itemplan
     PgSelectSingle_12["PgSelectSingle[_12∈1]<br /><people>"]:::plan
     PgClassExpression_13["PgClassExpression[_13∈1]<br /><__people__.#quot;username#quot;>"]:::plan
     PgClassExpression_14["PgClassExpression[_14∈1]<br /><__people__.#quot;person_id#quot;>"]:::plan
-    PgSelect_15["PgSelect[_15∈1]<br /><relational_items>"]:::plan
+    PgSelect_15[["PgSelect[_15∈1]<br /><relational_items>"]]:::plan
     __ListTransform_19["__ListTransform[_19∈1]<br /><each:_15>"]:::plan
     __Item_20>"__Item[_20∈2]<br /><_15>"]:::itemplan
     PgSelectSingle_21["PgSelectSingle[_21∈2]<br /><relational_items>"]:::plan
@@ -133,7 +133,7 @@ graph TD
     PgSelectSingle_23["PgSelectSingle[_23∈3]<br /><relational_items>"]:::plan
     PgClassExpression_24["PgClassExpression[_24∈3]<br /><__relation...s__.#quot;type#quot;>"]:::plan
     PgPolymorphic_25["PgPolymorphic[_25∈3]"]:::plan
-    PgSelect_27["PgSelect[_27∈3]<br /><relational_topics>"]:::plan
+    PgSelect_27[["PgSelect[_27∈3]<br /><relational_topics>"]]:::plan
     First_31["First[_31∈3]"]:::plan
     PgSelectSingle_32["PgSelectSingle[_32∈3]<br /><relational_topics>"]:::plan
     PgClassExpression_35["PgClassExpression[_35∈3]<br /><__relation...__.#quot;type2#quot;>"]:::plan
@@ -143,23 +143,23 @@ graph TD
     PgClassExpression_39["PgClassExpression[_39∈3]<br /><__relation..._archived#quot;>"]:::plan
     PgClassExpression_40["PgClassExpression[_40∈3]<br /><__relation...chived_at#quot;>"]:::plan
     PgClassExpression_41["PgClassExpression[_41∈3]<br /><__relation...__.#quot;title#quot;>"]:::plan
-    PgSelect_43["PgSelect[_43∈3]<br /><relational_posts>"]:::plan
+    PgSelect_43[["PgSelect[_43∈3]<br /><relational_posts>"]]:::plan
     First_47["First[_47∈3]"]:::plan
     PgSelectSingle_48["PgSelectSingle[_48∈3]<br /><relational_posts>"]:::plan
     PgClassExpression_57["PgClassExpression[_57∈3]<br /><__relation...__.#quot;title#quot;>"]:::plan
     PgClassExpression_58["PgClassExpression[_58∈3]<br /><__relation...scription#quot;>"]:::plan
     PgClassExpression_59["PgClassExpression[_59∈3]<br /><__relation...s__.#quot;note#quot;>"]:::plan
-    PgSelect_61["PgSelect[_61∈3]<br /><relational_dividers>"]:::plan
+    PgSelect_61[["PgSelect[_61∈3]<br /><relational_dividers>"]]:::plan
     First_65["First[_65∈3]"]:::plan
     PgSelectSingle_66["PgSelectSingle[_66∈3]<br /><relational_dividers>"]:::plan
     PgClassExpression_75["PgClassExpression[_75∈3]<br /><__relation...__.#quot;title#quot;>"]:::plan
     PgClassExpression_76["PgClassExpression[_76∈3]<br /><__relation...__.#quot;color#quot;>"]:::plan
-    PgSelect_78["PgSelect[_78∈3]<br /><relational_checklists>"]:::plan
+    PgSelect_78[["PgSelect[_78∈3]<br /><relational_checklists>"]]:::plan
     First_82["First[_82∈3]"]:::plan
     PgSelectSingle_83["PgSelectSingle[_83∈3]<br /><relational_checklists>"]:::plan
     PgClassExpression_92["PgClassExpression[_92∈3]<br /><__relation...__.#quot;title#quot;>"]:::plan
     PgClassExpression_93["PgClassExpression[_93∈3]<br /><__relation...ems__.#quot;id#quot;>"]:::plan
-    PgSelect_94["PgSelect[_94∈3]<br /><relational_checklist_items>"]:::plan
+    PgSelect_94[["PgSelect[_94∈3]<br /><relational_checklist_items>"]]:::plan
     Access_95["Access[_95∈0]<br /><_3.pgSettings>"]:::plan
     Access_96["Access[_96∈0]<br /><_3.withPgClient>"]:::plan
     Object_97["Object[_97∈0]<br /><{pgSettings,withPgClient}>"]:::plan

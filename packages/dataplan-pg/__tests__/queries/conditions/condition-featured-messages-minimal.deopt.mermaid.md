@@ -24,7 +24,7 @@ graph TD
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    PgSelect_17["PgSelect[_17∈0]<br /><forums>"]:::plan
+    PgSelect_17[["PgSelect[_17∈0]<br /><forums>"]]:::plan
     __Item_21>"__Item[_21∈1]<br /><_17>"]:::itemplan
     PgSelectSingle_22["PgSelectSingle[_22∈1]<br /><forums>"]:::plan
     InputStaticLeaf_23["InputStaticLeaf[_23∈0]"]:::plan
@@ -37,9 +37,9 @@ graph TD
     Connection_37["Connection[_37∈0]<br /><_33>"]:::plan
     PgClassExpression_38["PgClassExpression[_38∈1]<br /><__forums__...chived_at#quot;>"]:::plan
     PgPageInfo_39["PgPageInfo[_39∈0]"]:::plan
-    PgSelect_40["PgSelect[_40∈1]<br /><messages>"]:::plan
+    PgSelect_40[["PgSelect[_40∈1]<br /><messages>"]]:::plan
     Lambda_41["Lambda[_41∈1]<br /><listHasMore>"]:::plan
-    PgSelect_42["PgSelect[_42∈1]<br /><messages>"]:::plan
+    PgSelect_42[["PgSelect[_42∈1]<br /><messages>"]]:::plan
     First_43["First[_43∈1]"]:::plan
     PgSelectSingle_44["PgSelectSingle[_44∈1]<br /><messages>"]:::plan
     PgClassExpression_45["PgClassExpression[_45∈1]<br /><count(*)>"]:::plan
