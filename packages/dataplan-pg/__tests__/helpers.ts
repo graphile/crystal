@@ -75,8 +75,12 @@ beforeAll(() => {
   });
 });
 
-afterAll(() => {
-  testPool.end();
+afterAll(async () => {
+  await testPool.end();
+  const p = testPool as any;
+  if (p._clients.length > 0) {
+    console.warn(`Warning: ${p._clients.length} clients are still in the pool`);
+  }
   testPool = null;
   optimizedSchema = deoptimizedSchema = null;
 });
