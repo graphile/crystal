@@ -74,6 +74,8 @@ export const $$pathIdentity = Symbol("pathIdentity");
 
 export const $$concreteType = Symbol("concreteType");
 
+export const $$setPlanGraph = Symbol("setPlanGraph");
+
 export interface PolymorphicData<TType extends string = string, TData = any> {
   [$$concreteType]: TType;
 }

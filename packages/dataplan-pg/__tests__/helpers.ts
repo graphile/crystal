@@ -5,6 +5,7 @@ if (process.env.DEBUG) {
 }
 import { promises as fsp } from "fs";
 import type { BaseGraphQLContext } from "graphile-crystal";
+import { $$setPlanGraph } from "graphile-crystal/dist/interfaces";
 import type {
   AsyncExecutionResult,
   ExecutionPatchResult,
@@ -31,7 +32,6 @@ import { makeExampleSchema } from "../src/examples/exampleSchema";
 import type { PgClientResult } from "../src/executor";
 
 export const UPDATE_SNAPSHOTS = process.env.UPDATE_SNAPSHOTS === "1";
-export const MERMAID = process.env.MERMAID === "1";
 
 const pathCompare = (
   path1: readonly (string | number)[],
@@ -320,6 +320,7 @@ export async function runTestQuery(
   data?: { [key: string]: any };
   errors?: readonly GraphQLError[];
   queries: PgClientQuery[];
+  graphString: string | null;
 }> {
   const { variableValues } = config;
   const { path } = options;
@@ -348,10 +349,8 @@ export async function runTestQuery(
       pgSettings: {},
       withPgClient,
       pgSubscriber,
-      setPlanGraph(_graphString: string) {
-        if (MERMAID) {
-          graphString = _graphString;
-        }
+      [$$setPlanGraph](_graphString: string) {
+        graphString = _graphString;
       },
     };
 
@@ -394,14 +393,6 @@ export async function runTestQuery(
             contextValue,
             rootValue: null,
           });
-
-    if (graphString) {
-      const basePath = path.replace(/\.test\.graphql$/, "");
-      await fsp.writeFile(
-        `${basePath}${options.deoptimize ? ".deopt" : ""}.mermaid`,
-        graphString,
-      );
-    }
 
     if (isAsyncIterable(result)) {
       let errors: GraphQLError[] | undefined = undefined;
@@ -503,7 +494,7 @@ export async function runTestQuery(
         ...originalPayloads.slice(1).sort(sortPayloads),
       ];
 
-      return { payloads, errors, queries };
+      return { payloads, errors, queries, graphString };
     } else {
       const { data, errors } = result;
       if (errors) {
@@ -514,7 +505,7 @@ export async function runTestQuery(
           "Callback is only appropriate when operation returns an async iterable",
         );
       }
-      return { data, errors, queries };
+      return { data, errors, queries, graphString };
     }
   } finally {
     await pgSubscriber.release();
@@ -597,7 +588,7 @@ function makeResultSnapshotSafe(
 }
 
 export const assertSnapshotsMatch = async (
-  only: "sql" | "result" | "errors",
+  only: "sql" | "result" | "errors" | "mermaid",
   props: {
     result: ReturnType<typeof runTestQuery>;
     document: string;
@@ -612,7 +603,7 @@ export const assertSnapshotsMatch = async (
     throw new Error(`Failed to trim .test.graphql from '${path}'`);
   }
 
-  const { data, payloads, queries, errors } = await result;
+  const { data, payloads, queries, errors, graphString } = await result;
 
   if (only === "result") {
     const resultFileName = basePath + (ext || "") + ".json5";
@@ -654,6 +645,9 @@ export const assertSnapshotsMatch = async (
       .map((q) => makeSQLSnapshotSafe(q.text))
       .join("\n\n");
     await snapshot(formattedQueries, sqlFileName);
+  } else if (only === "mermaid") {
+    const mermaidFileName = basePath + (ext || "") + ".mermaid";
+    await snapshot(graphString ?? "-", mermaidFileName);
   } else {
     throw new Error(
       `Unexpected argument to assertSnapshotsMatch; expected result|sql, received '${only}'`,

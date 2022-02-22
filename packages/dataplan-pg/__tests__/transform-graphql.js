@@ -105,6 +105,13 @@ it('matches SQL snapshots', () => assertSnapshotsMatch('sql', {
   result: result1,
 }));
 
+it('matches plan (mermaid) snapshots', () => assertSnapshotsMatch('mermaid', {
+  document,
+  path,
+  config,
+  result: result1,
+}));
+
 it('matches data snapshot', () => assertSnapshotsMatch('result', {
   document,
   path,
@@ -125,6 +132,14 @@ it('returns same data for optimized vs deoptimized', () => assertResultsMatch(re
 it('returns same errors for optimized vs deoptimized', () => assertErrorsMatch(result1, result2));
 
 it('matches SQL snapshots with inlining disabled', () => assertSnapshotsMatch('sql', {
+  document,
+  path,
+  config,
+  result: result2,
+  ext: ".deopt",
+}));
+
+it('matches plan (mermaid) snapshots with inlining disabled', () => assertSnapshotsMatch('mermaid', {
   document,
   path,
   config,

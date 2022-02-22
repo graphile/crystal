@@ -65,6 +65,7 @@ import type {
   PromiseOrDirect,
   TrackedArguments,
 } from "./interfaces";
+import { $$setPlanGraph } from "./interfaces";
 import {
   $$concreteType,
   $$crystalContext,
@@ -787,6 +788,10 @@ export class Aether<
         "\n" + this.printPlansByPath(),
       );
       debugPlan(`Plan graph: %s`, "\n" + this.printPlanGraph());
+    }
+
+    if (typeof (this.context as any)?.[$$setPlanGraph] === "function") {
+      (this.context as any)[$$setPlanGraph](this.printPlanGraph());
     }
 
     this.phase = "ready";
@@ -4966,10 +4971,6 @@ export class Aether<
     }
 
     const graphString = graph.join("\n");
-    if (typeof (this.context as any)?.setPlanGraph === "function") {
-      (this.context as any).setPlanGraph(graphString);
-    }
-
     return graphString;
   }
 
