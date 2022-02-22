@@ -65,12 +65,12 @@ import type {
   PromiseOrDirect,
   TrackedArguments,
 } from "./interfaces";
-import { $$setPlanGraph } from "./interfaces";
 import {
   $$concreteType,
   $$crystalContext,
   $$data,
   $$planResults,
+  $$setPlanGraph,
 } from "./interfaces";
 import type {
   ListCapablePlan,
