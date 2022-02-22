@@ -167,6 +167,11 @@ export class ExecutablePlan<TData = any> extends BasePlan {
    */
   public readonly dependencies: ReadonlyArray<string> = this._dependencies;
 
+  /**
+   * @internal
+   */
+  public dependentPlans: Array<ExecutablePlan> = [];
+
   public readonly id: string;
   /**
    * The group ids this plan is associated with (e.g. if the field this plan

@@ -774,6 +774,16 @@ export class Aether<
     // themselves (e.g. compiling SQL queries ahead of time).
     this.finalizePlans();
 
+    // Populate 'dependentPlans' for all plans
+    for (const [id, plan] of Object.entries(this.plans)) {
+      if (plan && plan.id === id) {
+        for (const depId of plan.dependencies) {
+          const dep = this.plans[depId];
+          dep.dependentPlans.push(plan);
+        }
+      }
+    }
+
     // Assign bucket IDs; this MUST come after finalization otherwise
     // `__ListTransformPlan`s will be broken
     this.assignBucketIds();
