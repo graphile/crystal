@@ -4,8 +4,6 @@ import type { WithPgClient } from "@dataplan/pg";
 import { makeNodePostgresWithPgClient } from "@dataplan/pg/adaptors/node-postgres";
 import LRU from "@graphile/lru";
 import chalk from "chalk";
-import express from "express";
-import { graphqlHTTP } from "express-graphql";
 import { readFile } from "fs/promises";
 import {
   buildInflection,
@@ -19,10 +17,28 @@ import { crystalPrint, stripAnsi } from "graphile-crystal";
 import { exportSchema } from "graphile-exporter";
 import { resolvePresets } from "graphile-plugin";
 import type { DocumentNode, Source } from "graphql";
-import { graphql, parse, printSchema } from "graphql";
+import {
+  graphql,
+  printSchema,
+  execute,
+  GraphQLError,
+  parse,
+  validate,
+} from "graphql";
 import * as jsonwebtoken from "jsonwebtoken";
 import { Pool } from "pg";
 import { inspect } from "util";
+import { envelop, useSchema, useExtendContext } from "@envelop/core";
+import { useParserCache } from "@envelop/parser-cache";
+import fastify from "fastify";
+import fastifyStatic from "fastify-static";
+import {
+  processRequest,
+  getGraphQLParameters,
+  renderGraphiQL,
+  sendResult,
+} from "graphql-helix";
+import pg from "pg";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 
@@ -150,17 +166,16 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     process.exit(1);
   }
 
-  const cache = new LRU<Source, DocumentNode>({ maxLength: 500 });
-  const cachingParse = (source: Source) => {
-    let parsed = cache.get(source);
-    if (!parsed) {
-      parsed = parse(source);
-      cache.set(source, parsed);
-    }
-    return parsed;
-  };
+  const contextCallback = () => contextValue;
+  const getEnveloped = envelop({
+    plugins: [
+      useSchema(schema),
+      /*useLogger(),*/ useParserCache(),
+      useExtendContext(contextCallback),
+    ],
+  });
+  const app = fastify();
 
-  const app = express();
   function escapeHTMLEntities(str: string): string {
     return str.replace(
       /[&"<>]/g,
@@ -169,9 +184,23 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
     );
   }
 
-  app.use(express.static(`${__dirname}/../../../../node_modules/mermaid/dist`));
-  app.get("/", (req, res, next) => {
-    res.contentType("html").end(`\
+  app.register(fastifyStatic, {
+    root: `${__dirname}/../../../../node_modules/mermaid/dist`,
+  });
+
+  app.route({
+    method: ["GET"],
+    url: "/",
+    async handler(req, res) {
+      res.type("text/html").send(renderGraphiQL());
+    },
+  });
+
+  app.route({
+    method: ["GET"],
+    url: "/plan",
+    async handler(req, res) {
+      res.type("text/html").send(`\
 <!DOCTYPE html>
 <html>
 <head>
@@ -189,16 +218,12 @@ ${escapeHTMLEntities(graph ?? 'graph LR\nA["No query exists yet"]')}
 </body>
 </html>
 `);
+    },
   });
 
-  app.use(
-    "/graphql",
-    graphqlHTTP({
-      schema: schema2,
-      customParseFn: cachingParse,
-      graphiql: true,
-      context: contextValue,
-      pretty: true,
+  app.listen(4000);
+
+  /*
       customFormatErrorFn(e) {
         const obj = e.toJSON();
         return Object.assign(obj, {
@@ -206,9 +231,48 @@ ${escapeHTMLEntities(graph ?? 'graph LR\nA["No query exists yet"]')}
           extensions: { stack: stripAnsi(e.stack ?? "").split("\n") },
         });
       },
-    }),
-  );
-  app.listen(4000);
+      */
+
+  app.route({
+    method: ["POST"],
+    url: "/graphql",
+    async handler(req, res) {
+      // Here we can pass the request and make available as part of the "context".
+      // The return value is the a GraphQL-proxy that exposes all the functions.
+      const { parse, validate, contextFactory, execute, schema } = getEnveloped(
+        {
+          req,
+        },
+      );
+      const request = {
+        body: req.body,
+        headers: req.headers,
+        method: req.method,
+        query: req.query,
+      };
+      const { operationName, query, variables } = getGraphQLParameters(request);
+
+      // Here, we pass our custom functions to Helix, and it will take care of the rest.
+      const result = await processRequest({
+        operationName,
+        query,
+        variables,
+        request,
+        schema,
+        parse,
+        validate,
+        execute,
+        contextFactory,
+        // sendResponseResult: true,
+      });
+
+      sendResult(result, res.raw);
+    },
+  });
+
+  app.listen(4000, () => {
+    console.log(`GraphQL server is running...`);
+  });
   console.log("Running a GraphQL API server at http://localhost:4000/graphql");
   // Keep alive forever.
   return new Promise(() => {});
