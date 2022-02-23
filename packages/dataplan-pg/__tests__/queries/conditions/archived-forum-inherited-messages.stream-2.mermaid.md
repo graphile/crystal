@@ -62,41 +62,41 @@ graph TD
     PgClassExpression_23["PgClassExpression[_23∈1]<br /><__forums__.#quot;name#quot;>"]:::plan
     InputStaticLeaf_24["InputStaticLeaf[_24∈0]"]:::plan
     InputStaticLeaf_25["InputStaticLeaf[_25∈0]"]:::plan
-    PgClassExpression_33["PgClassExpression[_33∈1]<br /><__forums__.#quot;id#quot;>"]:::plan
+    PgClassExpression_33["PgClassExpression[_33∈1] {1,2,0}<br /><__forums__.#quot;id#quot;>"]:::plan
     Connection_38["Connection[_38∈0]<br /><_34>"]:::plan
-    PgClassExpression_39["PgClassExpression[_39∈1]<br /><__forums__...chived_at#quot;>"]:::plan
-    PgSelect_40[["PgSelect[_40∈2]<br /><messages>"]]:::plan
-    __Item_41>"__Item[_41∈3]<br /><_40>"]:::itemplan
-    PgSelectSingle_42["PgSelectSingle[_42∈3]<br /><messages>"]:::plan
-    PgClassExpression_43["PgClassExpression[_43∈3]<br /><__messages__.#quot;body#quot;>"]:::plan
-    First_49["First[_49∈3]"]:::plan
-    PgSelectSingle_50["PgSelectSingle[_50∈3]<br /><users>"]:::plan
-    PgClassExpression_51["PgClassExpression[_51∈3]<br /><__users__.#quot;username#quot;>"]:::plan
-    PgClassExpression_52["PgClassExpression[_52∈3]<br /><__users__....vatar_url#quot;>"]:::plan
-    PgSelect_53[["PgSelect[_53∈4]<br /><messages>"]]:::plan
-    __Item_54>"__Item[_54∈5]<br /><_53>"]:::itemplan
-    PgSelectSingle_55["PgSelectSingle[_55∈5]<br /><messages>"]:::plan
-    PgCursor_56["PgCursor[_56∈5]"]:::plan
-    PgClassExpression_57["PgClassExpression[_57∈5]<br /><__messages__.#quot;id#quot;>"]:::plan
-    List_58["List[_58∈5]<br /><_57>"]:::plan
-    PgClassExpression_59["PgClassExpression[_59∈5]<br /><__messages__.#quot;body#quot;>"]:::plan
+    PgClassExpression_39["PgClassExpression[_39∈1] {1,2,0}<br /><__forums__...chived_at#quot;>"]:::plan
+    PgSelect_40[["PgSelect[_40∈2] {1}<br /><messages>"]]:::plan
+    __Item_41>"__Item[_41∈3] {1}<br /><_40>"]:::itemplan
+    PgSelectSingle_42["PgSelectSingle[_42∈3] {1}<br /><messages>"]:::plan
+    PgClassExpression_43["PgClassExpression[_43∈3] {1}<br /><__messages__.#quot;body#quot;>"]:::plan
+    First_49["First[_49∈3] {1}"]:::plan
+    PgSelectSingle_50["PgSelectSingle[_50∈3] {1}<br /><users>"]:::plan
+    PgClassExpression_51["PgClassExpression[_51∈3] {1}<br /><__users__.#quot;username#quot;>"]:::plan
+    PgClassExpression_52["PgClassExpression[_52∈3] {1}<br /><__users__....vatar_url#quot;>"]:::plan
+    PgSelect_53[["PgSelect[_53∈4] {2}<br /><messages>"]]:::plan
+    __Item_54>"__Item[_54∈5] {2}<br /><_53>"]:::itemplan
+    PgSelectSingle_55["PgSelectSingle[_55∈5] {2}<br /><messages>"]:::plan
+    PgCursor_56["PgCursor[_56∈5] {2}"]:::plan
+    PgClassExpression_57["PgClassExpression[_57∈5] {2}<br /><__messages__.#quot;id#quot;>"]:::plan
+    List_58["List[_58∈5] {2}<br /><_57>"]:::plan
+    PgClassExpression_59["PgClassExpression[_59∈5] {2}<br /><__messages__.#quot;body#quot;>"]:::plan
     Access_62["Access[_62∈0]<br /><_3.pgSettings>"]:::plan
     Access_63["Access[_63∈0]<br /><_3.withPgClient>"]:::plan
     Object_64["Object[_64∈0]<br /><{pgSettings,withPgClient}>"]:::plan
-    First_65["First[_65∈5]"]:::plan
-    PgSelectSingle_66["PgSelectSingle[_66∈5]<br /><users>"]:::plan
-    PgClassExpression_67["PgClassExpression[_67∈5]<br /><__users__.#quot;username#quot;>"]:::plan
-    PgClassExpression_68["PgClassExpression[_68∈5]<br /><__users__....vatar_url#quot;>"]:::plan
+    First_65["First[_65∈5] {2}"]:::plan
+    PgSelectSingle_66["PgSelectSingle[_66∈5] {2}<br /><users>"]:::plan
+    PgClassExpression_67["PgClassExpression[_67∈5] {2}<br /><__users__.#quot;username#quot;>"]:::plan
+    PgClassExpression_68["PgClassExpression[_68∈5] {2}<br /><__users__....vatar_url#quot;>"]:::plan
     PgPageInfo_69["PgPageInfo[_69∈0]"]:::plan
     Constant_70["Constant[_70∈0]"]:::plan
     Constant_71["Constant[_71∈0]"]:::plan
     First_73["First[_73∈1]"]:::plan
     PgSelectSingle_74["PgSelectSingle[_74∈1]<br /><messages>"]:::plan
     PgClassExpression_75["PgClassExpression[_75∈1]<br /><count(*)>"]:::plan
-    Map_76["Map[_76∈3]<br /><_42:{#quot;0#quot;:1,#quot;1#quot;:2}>"]:::plan
-    List_77["List[_77∈3]<br /><_76>"]:::plan
-    Map_78["Map[_78∈5]<br /><_55:{#quot;0#quot;:2,#quot;1#quot;:3}>"]:::plan
-    List_79["List[_79∈5]<br /><_78>"]:::plan
+    Map_76["Map[_76∈3] {1}<br /><_42:{#quot;0#quot;:1,#quot;1#quot;:2}>"]:::plan
+    List_77["List[_77∈3] {1}<br /><_76>"]:::plan
+    Map_78["Map[_78∈5] {2}<br /><_55:{#quot;0#quot;:2,#quot;1#quot;:3}>"]:::plan
+    List_79["List[_79∈5] {2}<br /><_78>"]:::plan
     Access_80["Access[_80∈1]<br /><_21.1>"]:::plan
 
     %% plan dependencies

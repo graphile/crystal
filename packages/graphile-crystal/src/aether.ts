@@ -4887,7 +4887,11 @@ export class Aether<
             ? sideeffectplanStyle
             : planStyle;
 
-        const planString = `${planName}[${plan.id}∈${plan.bucketId}]${
+        const groups =
+          plan.groupIds.length === 1 && plan.groupIds[0] === 0
+            ? ""
+            : ` {${plan.groupIds}}`;
+        const planString = `${planName}[${plan.id}∈${plan.bucketId}]${groups}${
           meta ? `\n<${meta}>` : ""
         }`;
         const [lBrace, rBrace] =

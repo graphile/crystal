@@ -75,9 +75,9 @@ graph TD
     PgSelectSingle_50["PgSelectSingle[_50∈2]<br /><users>"]:::plan
     PgClassExpression_51["PgClassExpression[_51∈2]<br /><__users__.#quot;username#quot;>"]:::plan
     PgClassExpression_52["PgClassExpression[_52∈2]<br /><__users__....vatar_url#quot;>"]:::plan
-    PgCursor_55["PgCursor[_55∈2]"]:::plan
-    PgClassExpression_56["PgClassExpression[_56∈2]<br /><__messages__.#quot;id#quot;>"]:::plan
-    List_57["List[_57∈2]<br /><_56>"]:::plan
+    PgCursor_55["PgCursor[_55∈2] {1}"]:::plan
+    PgClassExpression_56["PgClassExpression[_56∈2] {1}<br /><__messages__.#quot;id#quot;>"]:::plan
+    List_57["List[_57∈2] {1}<br /><_56>"]:::plan
     Access_61["Access[_61∈0]<br /><_3.pgSettings>"]:::plan
     Access_62["Access[_62∈0]<br /><_3.withPgClient>"]:::plan
     Object_63["Object[_63∈0]<br /><{pgSettings,withPgClient}>"]:::plan

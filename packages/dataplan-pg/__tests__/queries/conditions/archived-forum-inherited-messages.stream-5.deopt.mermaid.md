@@ -38,22 +38,22 @@ graph TD
     PgClassExpression_23["PgClassExpression[_23∈1]<br /><__forums__.#quot;name#quot;>"]:::plan
     InputStaticLeaf_24["InputStaticLeaf[_24∈0]"]:::plan
     InputStaticLeaf_25["InputStaticLeaf[_25∈0]"]:::plan
-    PgClassExpression_33["PgClassExpression[_33∈1]<br /><__forums__.#quot;id#quot;>"]:::plan
+    PgClassExpression_33["PgClassExpression[_33∈1] {1}<br /><__forums__.#quot;id#quot;>"]:::plan
     Connection_38["Connection[_38∈0]<br /><_34>"]:::plan
-    PgClassExpression_39["PgClassExpression[_39∈1]<br /><__forums__...chived_at#quot;>"]:::plan
-    PgSelect_40[["PgSelect[_40∈2]<br /><messages>"]]:::plan
-    __Item_41>"__Item[_41∈3]<br /><_40>"]:::itemplan
-    PgSelectSingle_42["PgSelectSingle[_42∈3]<br /><messages>"]:::plan
-    PgClassExpression_43["PgClassExpression[_43∈3]<br /><__messages__.#quot;body#quot;>"]:::plan
-    PgClassExpression_44["PgClassExpression[_44∈3]<br /><__messages...author_id#quot;>"]:::plan
-    PgSelect_45[["PgSelect[_45∈4]<br /><users>"]]:::plan
+    PgClassExpression_39["PgClassExpression[_39∈1] {1}<br /><__forums__...chived_at#quot;>"]:::plan
+    PgSelect_40[["PgSelect[_40∈2] {1}<br /><messages>"]]:::plan
+    __Item_41>"__Item[_41∈3] {1}<br /><_40>"]:::itemplan
+    PgSelectSingle_42["PgSelectSingle[_42∈3] {1}<br /><messages>"]:::plan
+    PgClassExpression_43["PgClassExpression[_43∈3] {1}<br /><__messages__.#quot;body#quot;>"]:::plan
+    PgClassExpression_44["PgClassExpression[_44∈3] {1}<br /><__messages...author_id#quot;>"]:::plan
+    PgSelect_45[["PgSelect[_45∈4] {1}<br /><users>"]]:::plan
     Access_46["Access[_46∈0]<br /><_3.pgSettings>"]:::plan
     Access_47["Access[_47∈0]<br /><_3.withPgClient>"]:::plan
     Object_48["Object[_48∈0]<br /><{pgSettings,withPgClient}>"]:::plan
-    First_49["First[_49∈4]"]:::plan
-    PgSelectSingle_50["PgSelectSingle[_50∈4]<br /><users>"]:::plan
-    PgClassExpression_51["PgClassExpression[_51∈4]<br /><__users__.#quot;username#quot;>"]:::plan
-    PgClassExpression_52["PgClassExpression[_52∈4]<br /><__users__....vatar_url#quot;>"]:::plan
+    First_49["First[_49∈4] {1}"]:::plan
+    PgSelectSingle_50["PgSelectSingle[_50∈4] {1}<br /><users>"]:::plan
+    PgClassExpression_51["PgClassExpression[_51∈4] {1}<br /><__users__.#quot;username#quot;>"]:::plan
+    PgClassExpression_52["PgClassExpression[_52∈4] {1}<br /><__users__....vatar_url#quot;>"]:::plan
 
     %% plan dependencies
     Object_48 --> PgSelect_17

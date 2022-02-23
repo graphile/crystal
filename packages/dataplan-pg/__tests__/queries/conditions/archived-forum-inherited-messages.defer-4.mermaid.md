@@ -69,11 +69,11 @@ graph TD
     Connection_38["Connection[_38∈0]<br /><_34>"]:::plan
     __Item_41>"__Item[_41∈2]<br /><_89>"]:::itemplan
     PgSelectSingle_42["PgSelectSingle[_42∈2]<br /><messages>"]:::plan
-    PgClassExpression_43["PgClassExpression[_43∈2]<br /><__messages__.#quot;body#quot;>"]:::plan
-    First_49["First[_49∈2]"]:::plan
-    PgSelectSingle_50["PgSelectSingle[_50∈2]<br /><users>"]:::plan
-    PgClassExpression_51["PgClassExpression[_51∈2]<br /><__users__.#quot;username#quot;>"]:::plan
-    PgClassExpression_52["PgClassExpression[_52∈2]<br /><__users__....vatar_url#quot;>"]:::plan
+    PgClassExpression_43["PgClassExpression[_43∈2] {1,0}<br /><__messages__.#quot;body#quot;>"]:::plan
+    First_49["First[_49∈2] {1,0}"]:::plan
+    PgSelectSingle_50["PgSelectSingle[_50∈2] {1,0}<br /><users>"]:::plan
+    PgClassExpression_51["PgClassExpression[_51∈2] {1,0}<br /><__users__.#quot;username#quot;>"]:::plan
+    PgClassExpression_52["PgClassExpression[_52∈2] {1,0}<br /><__users__....vatar_url#quot;>"]:::plan
     PgCursor_55["PgCursor[_55∈2]"]:::plan
     PgClassExpression_56["PgClassExpression[_56∈2]<br /><__messages__.#quot;id#quot;>"]:::plan
     List_57["List[_57∈2]<br /><_56>"]:::plan
@@ -96,8 +96,8 @@ graph TD
     First_84["First[_84∈1]"]:::plan
     PgSelectSingle_85["PgSelectSingle[_85∈1]<br /><messages>"]:::plan
     PgClassExpression_86["PgClassExpression[_86∈1]<br /><count(*)>"]:::plan
-    Map_87["Map[_87∈2]<br /><_42:{#quot;0#quot;:1,#quot;1#quot;:2}>"]:::plan
-    List_88["List[_88∈2]<br /><_87>"]:::plan
+    Map_87["Map[_87∈2] {1,0}<br /><_42:{#quot;0#quot;:1,#quot;1#quot;:2}>"]:::plan
+    List_88["List[_88∈2] {1,0}<br /><_87>"]:::plan
     Access_89["Access[_89∈1]<br /><_21.1>"]:::plan
     Access_90["Access[_90∈1]<br /><_21.2>"]:::plan
 
