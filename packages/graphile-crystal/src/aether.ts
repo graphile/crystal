@@ -2825,8 +2825,9 @@ export class Aether<
               `GraphileInternalError<e5dfb383-d413-49d8-8a3f-2d2f677c373d>: could not determine the path identities served by ${listPlan}`,
             );
           }
-          const rootPathIdentities = listPlanPathIdentities.map(
-            (pi) => `${pi}[]`,
+          const rootPathIdentities = listPlanPathIdentities.map((pi) =>
+            // This ternary is a hack for subscriptions support; see TODO in planSubscription
+            pi === `~` ? pi : `${pi}[]`,
           );
           const parent = this.buckets[listPlan.bucketId];
           const newBucket: BucketDefinition = {
