@@ -320,7 +320,7 @@ interface BucketDefinition {
    * - group - branched due to a groupId change between the plan itself and its dependencies (indicates a @defer fragment or mutation payload selection set)
    * - join - represents when two non-overlapping buckets are necessary to satisfy the dependencies of a plan
    */
-  type: "root" | "item" | "group" | "join";
+  type: "root" | "item" | "group";
   /*
    * TODO:
    *
