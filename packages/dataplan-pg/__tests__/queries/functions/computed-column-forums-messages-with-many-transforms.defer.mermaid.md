@@ -34,27 +34,27 @@ graph TD
     PgSelectSingle_22["PgSelectSingle[_22∈1]<br /><forums>"]:::plan
     PgClassExpression_23["PgClassExpression[_23∈1]<br /><__forums__.#quot;name#quot;>"]:::plan
     PgSelect_24[["PgSelect[_24∈2@1]<br /><messages>"]]:::plan
-    __ListTransform_28["__ListTransform[_28∈3@1]<br /><filter:_24>"]:::plan
-    __ListTransform_29["__ListTransform[_29∈3@1]<br /><groupBy:_28>"]:::plan
-    Lambda_30["Lambda[_30∈3@1]"]:::plan
-    __ListTransform_31["__ListTransform[_31∈3@1]<br /><each:_30>"]:::plan
-    __Item_32>"__Item[_32∈4@1]<br /><_24>"]:::itemplan
-    PgSelectSingle_33["PgSelectSingle[_33∈4@1]<br /><messages>"]:::plan
-    PgClassExpression_34["PgClassExpression[_34∈4@1]<br /><__messages__.#quot;forum_id#quot;>"]:::plan
-    PgClassExpression_35["PgClassExpression[_35∈1@1]<br /><__forums__.#quot;id#quot;>"]:::plan
-    List_36["List[_36∈4@1]<br /><_34,_35>"]:::plan
-    Lambda_37["Lambda[_37∈4@1]"]:::plan
-    __Item_38>"__Item[_38∈5@1]<br /><_28>"]:::itemplan
-    PgSelectSingle_39["PgSelectSingle[_39∈5@1]<br /><messages>"]:::plan
-    PgClassExpression_40["PgClassExpression[_40∈5@1]<br /><__messages__.#quot;featured#quot;>"]:::plan
-    __Item_41>"__Item[_41∈6@1]<br /><_30>"]:::itemplan
-    __Item_42>"__Item[_42∈7@1]<br /><_31>"]:::itemplan
-    __ListTransform_43["__ListTransform[_43∈7@1]<br /><each:_42>"]:::plan
-    __Item_44>"__Item[_44∈8@1]<br /><_42>"]:::itemplan
-    __Item_45>"__Item[_45∈9@1]<br /><_43>"]:::itemplan
-    PgSelectSingle_46["PgSelectSingle[_46∈9@1]<br /><messages>"]:::plan
-    PgClassExpression_47["PgClassExpression[_47∈9@1]<br /><__messages__.#quot;body#quot;>"]:::plan
-    PgClassExpression_48["PgClassExpression[_48∈9@1]<br /><__messages__.#quot;featured#quot;>"]:::plan
+    __ListTransform_28["__ListTransform[_28∈2@1]<br /><filter:_24>"]:::plan
+    __ListTransform_29["__ListTransform[_29∈2@1]<br /><groupBy:_28>"]:::plan
+    Lambda_30["Lambda[_30∈2@1]"]:::plan
+    __ListTransform_31["__ListTransform[_31∈2@1]<br /><each:_30>"]:::plan
+    __Item_32>"__Item[_32∈3@1]<br /><_24>"]:::itemplan
+    PgSelectSingle_33["PgSelectSingle[_33∈3@1]<br /><messages>"]:::plan
+    PgClassExpression_34["PgClassExpression[_34∈3@1]<br /><__messages__.#quot;forum_id#quot;>"]:::plan
+    PgClassExpression_35["PgClassExpression[_35∈2@1]<br /><__forums__.#quot;id#quot;>"]:::plan
+    List_36["List[_36∈3@1]<br /><_34,_35>"]:::plan
+    Lambda_37["Lambda[_37∈3@1]"]:::plan
+    __Item_38>"__Item[_38∈4@1]<br /><_28>"]:::itemplan
+    PgSelectSingle_39["PgSelectSingle[_39∈4@1]<br /><messages>"]:::plan
+    PgClassExpression_40["PgClassExpression[_40∈4@1]<br /><__messages__.#quot;featured#quot;>"]:::plan
+    __Item_41>"__Item[_41∈5@1]<br /><_30>"]:::itemplan
+    __Item_42>"__Item[_42∈6@1]<br /><_31>"]:::itemplan
+    __ListTransform_43["__ListTransform[_43∈6@1]<br /><each:_42>"]:::plan
+    __Item_44>"__Item[_44∈7@1]<br /><_42>"]:::itemplan
+    __Item_45>"__Item[_45∈8@1]<br /><_43>"]:::itemplan
+    PgSelectSingle_46["PgSelectSingle[_46∈8@1]<br /><messages>"]:::plan
+    PgClassExpression_47["PgClassExpression[_47∈8@1]<br /><__messages__.#quot;body#quot;>"]:::plan
+    PgClassExpression_48["PgClassExpression[_48∈8@1]<br /><__messages__.#quot;featured#quot;>"]:::plan
 
     %% plan dependencies
     Object_20 --> PgSelect_17
@@ -109,21 +109,19 @@ graph TD
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,PgSelect_17,Access_18,Access_19,Object_20 bucket0
     classDef bucket1 stroke:#a52a2a
-    class __Item_21,PgSelectSingle_22,PgClassExpression_23,PgClassExpression_35 bucket1
+    class __Item_21,PgSelectSingle_22,PgClassExpression_23 bucket1
     classDef bucket2 stroke:#808000
-    class PgSelect_24 bucket2
+    class PgSelect_24,__ListTransform_28,__ListTransform_29,Lambda_30,__ListTransform_31,PgClassExpression_35 bucket2
     classDef bucket3 stroke:#3cb371
-    class __ListTransform_28,__ListTransform_29,Lambda_30,__ListTransform_31 bucket3
+    class __Item_32,PgSelectSingle_33,PgClassExpression_34,List_36,Lambda_37 bucket3
     classDef bucket4 stroke:#7f007f
-    class __Item_32,PgSelectSingle_33,PgClassExpression_34,List_36,Lambda_37 bucket4
+    class __Item_38,PgSelectSingle_39,PgClassExpression_40 bucket4
     classDef bucket5 stroke:#ff0000
-    class __Item_38,PgSelectSingle_39,PgClassExpression_40 bucket5
+    class __Item_41 bucket5
     classDef bucket6 stroke:#ffa500
-    class __Item_41 bucket6
+    class __Item_42,__ListTransform_43 bucket6
     classDef bucket7 stroke:#ffff00
-    class __Item_42,__ListTransform_43 bucket7
+    class __Item_44 bucket7
     classDef bucket8 stroke:#7fff00
-    class __Item_44 bucket8
-    classDef bucket9 stroke:#4169e1
-    class __Item_45,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_48 bucket9
+    class __Item_45,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_48 bucket8
 ```

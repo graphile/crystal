@@ -59,11 +59,11 @@ graph TD
     PgSelectSingle_42["PgSelectSingle[_42∈2]<br /><messages>"]:::plan
     PgClassExpression_43["PgClassExpression[_43∈2]<br /><__messages__.#quot;body#quot;>"]:::plan
     PgClassExpression_44["PgClassExpression[_44∈2] {1,2}<br /><__messages...author_id#quot;>"]:::plan
-    PgSelect_45[["PgSelect[_45∈3] {1,2}<br /><users>"]]:::plan
-    First_49["First[_49∈3] {1,2}"]:::plan
-    PgSelectSingle_50["PgSelectSingle[_50∈3] {1,2}<br /><users>"]:::plan
-    PgClassExpression_51["PgClassExpression[_51∈3] {1,2}<br /><__users__.#quot;username#quot;>"]:::plan
-    PgClassExpression_52["PgClassExpression[_52∈3] {1,2}<br /><__users__....vatar_url#quot;>"]:::plan
+    PgSelect_45[["PgSelect[_45∈2] {1,2}<br /><users>"]]:::plan
+    First_49["First[_49∈2] {1,2}"]:::plan
+    PgSelectSingle_50["PgSelectSingle[_50∈2] {1,2}<br /><users>"]:::plan
+    PgClassExpression_51["PgClassExpression[_51∈2] {1,2}<br /><__users__.#quot;username#quot;>"]:::plan
+    PgClassExpression_52["PgClassExpression[_52∈2] {1,2}<br /><__users__....vatar_url#quot;>"]:::plan
     PgCursor_55["PgCursor[_55∈2]"]:::plan
     PgClassExpression_56["PgClassExpression[_56∈2]<br /><__messages__.#quot;id#quot;>"]:::plan
     List_57["List[_57∈2]<br /><_56>"]:::plan
@@ -125,7 +125,5 @@ graph TD
     classDef bucket1 stroke:#a52a2a
     class __Item_21,PgSelectSingle_22,PgClassExpression_23,Access_68 bucket1
     classDef bucket2 stroke:#808000
-    class __Item_41,PgSelectSingle_42,PgClassExpression_43,PgClassExpression_44,PgCursor_55,PgClassExpression_56,List_57 bucket2
-    classDef bucket3 stroke:#3cb371
-    class PgSelect_45,First_49,PgSelectSingle_50,PgClassExpression_51,PgClassExpression_52 bucket3
+    class __Item_41,PgSelectSingle_42,PgClassExpression_43,PgClassExpression_44,PgSelect_45,First_49,PgSelectSingle_50,PgClassExpression_51,PgClassExpression_52,PgCursor_55,PgClassExpression_56,List_57 bucket2
 ```
