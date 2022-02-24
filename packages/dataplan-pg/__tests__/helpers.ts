@@ -506,7 +506,8 @@ export async function runTestQuery(
       }
       if (options.callback) {
         throw new Error(
-          "Callback is only appropriate when operation returns an async iterable",
+          "Callback is only appropriate when operation returns an async iterable" +
+            String(errors ? errors[0].originalError || errors[0] : ""),
         );
       }
       return { data, errors, queries, graphString };
