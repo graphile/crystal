@@ -4,6 +4,7 @@ graph TD
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
     %% subgraph fields
     P1{{"~"}}:::path
@@ -740,6 +741,7 @@ graph TD
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
+    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     PgSelect_7[["PgSelect[_7∈0]<br /><people>"]]:::plan
     __Item_11>"__Item[_11∈1]<br /><_7>"]:::itemplan
     PgSelectSingle_12["PgSelectSingle[_12∈1]<br /><people>"]:::plan
@@ -864,6 +866,7 @@ graph TD
     PgClassExpression_814["PgClassExpression[_814∈3]<br /><__relation...s__.#quot;note#quot;>"]:::plan
 
     %% plan dependencies
+    __Value_5 --> __TrackedObject_6
     Object_804 --> PgSelect_7
     PgSelect_7 ==> __Item_11
     __Item_11 --> PgSelectSingle_12
@@ -1010,7 +1013,7 @@ graph TD
     PgSelectSingle_663 --> PgClassExpression_814
 
     %% plan-to-path relationships
-    __Value_5 -.-> P1
+    __TrackedObject_6 -.-> P1
     PgSelect_7 -.-> P2
     PgSelectSingle_12 -.-> P3
     PgClassExpression_13 -.-> P4
@@ -1378,11 +1381,25 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,PgSelect_7,Access_802,Access_803,Object_804 bucket0
+    class __Value_3,__Value_5,__TrackedObject_6,PgSelect_7,Access_802,Access_803,Object_804 bucket0
     classDef bucket1 stroke:#a52a2a
     class __Item_11,PgSelectSingle_12,PgClassExpression_13,PgClassExpression_14,PgSelect_15,__ListTransform_19 bucket1
     classDef bucket2 stroke:#808000
     class __Item_20,PgSelectSingle_21 bucket2
     classDef bucket3 stroke:#3cb371
     class __Item_22,PgSelectSingle_23,PgClassExpression_24,PgPolymorphic_25,PgSelect_27,First_31,PgSelectSingle_32,PgClassExpression_33,PgSelect_34,First_38,PgSelectSingle_39,PgClassExpression_40,PgPolymorphic_41,PgSelect_43,First_47,PgSelectSingle_48,PgClassExpression_51,PgClassExpression_52,PgSelect_53,First_57,PgSelectSingle_58,PgClassExpression_59,PgClassExpression_60,PgClassExpression_61,PgClassExpression_62,PgClassExpression_63,PgClassExpression_64,PgClassExpression_65,PgSelect_67,First_71,PgSelectSingle_72,PgClassExpression_89,PgClassExpression_90,PgClassExpression_91,PgSelect_93,First_97,PgSelectSingle_98,PgClassExpression_115,PgClassExpression_116,PgSelect_118,First_122,PgSelectSingle_123,PgClassExpression_140,PgSelect_142,First_146,PgSelectSingle_147,PgClassExpression_164,PgClassExpression_165,PgClassExpression_168,PgClassExpression_169,PgSelect_170,First_174,PgSelectSingle_175,PgClassExpression_176,PgClassExpression_177,PgClassExpression_178,PgClassExpression_179,PgClassExpression_180,PgClassExpression_181,PgClassExpression_182,PgSelect_184,First_188,PgSelectSingle_189,PgClassExpression_197,PgPolymorphic_198,PgClassExpression_222,PgClassExpression_246,PgClassExpression_272,PgClassExpression_297,PgClassExpression_321,PgClassExpression_339,PgClassExpression_340,PgClassExpression_341,PgSelect_343,First_347,PgSelectSingle_348,PgClassExpression_356,PgPolymorphic_357,PgClassExpression_381,PgClassExpression_405,PgClassExpression_431,PgClassExpression_456,PgClassExpression_480,PgClassExpression_498,PgClassExpression_499,PgSelect_501,First_505,PgSelectSingle_506,PgClassExpression_514,PgPolymorphic_515,PgClassExpression_539,PgClassExpression_563,PgClassExpression_589,PgClassExpression_614,PgClassExpression_638,PgClassExpression_656,PgClassExpression_657,PgSelect_658,First_662,PgSelectSingle_663,PgClassExpression_671,PgPolymorphic_672,PgClassExpression_696,PgClassExpression_720,PgClassExpression_746,PgClassExpression_771,PgClassExpression_772,PgClassExpression_795,PgClassExpression_813,PgClassExpression_814 bucket3
+
+    subgraph Buckets
+    Bucket0("Bucket 0 (root)<br />~"):::bucket
+    style Bucket0 stroke:#696969
+    Bucket1("Bucket 1 (__Item[_11])<br />>people[]"):::bucket
+    style Bucket1 stroke:#a52a2a
+    Bucket0 --> Bucket1
+    Bucket2("Bucket 2 (__Item[_20])<br />"):::bucket
+    style Bucket2 stroke:#808000
+    Bucket1 --> Bucket2
+    Bucket3("Bucket 3 (__Item[_22])<br />>people[]>items[]"):::bucket
+    style Bucket3 stroke:#3cb371
+    Bucket1 --> Bucket3
+    end
 ```

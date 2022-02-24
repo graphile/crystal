@@ -4,6 +4,7 @@ graph TD
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
     %% subgraph fields
     P1{{"~"}}:::path
@@ -54,6 +55,7 @@ graph TD
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
+    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
     PgSelect_8[["PgSelect[_8∈0]<br /><people>"]]:::plan
     First_12["First[_12∈0]"]:::plan
@@ -113,6 +115,7 @@ graph TD
     Access_92["Access[_92∈0]<br /><_12.0>"]:::plan
 
     %% plan dependencies
+    __Value_5 --> __TrackedObject_6
     Object_81 --> PgSelect_8
     InputStaticLeaf_7 --> PgSelect_8
     PgSelect_8 --> First_12
@@ -180,7 +183,7 @@ graph TD
     First_12 --> Access_92
 
     %% plan-to-path relationships
-    __Value_5 -.-> P1
+    __TrackedObject_6 -.-> P1
     PgSelectSingle_13 -.-> P2
     PgClassExpression_14 -.-> P3
     PgClassExpression_15 -.-> P4
@@ -205,7 +208,15 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgClassExpression_15,Access_79,Access_80,Object_81,Access_92 bucket0
+    class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgClassExpression_15,Access_79,Access_80,Object_81,Access_92 bucket0
     classDef bucket1 stroke:#a52a2a
     class __Item_21,PgSelectSingle_22,PgClassExpression_23,PgClassExpression_24,PgSelect_25,First_29,PgSelectSingle_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34,PgClassExpression_35,List_36,PgPolymorphic_37,First_42,PgSelectSingle_43,PgClassExpression_44,PgClassExpression_45,First_50,PgSelectSingle_51,PgClassExpression_52,PgClassExpression_53,PgSelect_54,First_58,PgSelectSingle_59,PgClassExpression_60,PgClassExpression_61,First_66,PgSelectSingle_67,PgClassExpression_68,PgClassExpression_69,PgSelect_70,First_74,PgSelectSingle_75,PgClassExpression_76,PgClassExpression_77,PgSelect_78,First_82,PgSelectSingle_83,PgClassExpression_84,PgClassExpression_85,Map_86,List_87,Map_88,List_89,Map_90,List_91 bucket1
+
+    subgraph Buckets
+    Bucket0("Bucket 0 (root)<br />~"):::bucket
+    style Bucket0 stroke:#696969
+    Bucket1("Bucket 1 (__Item[_21])<br />>perso…sonId>personBookmarksList[]"):::bucket
+    style Bucket1 stroke:#a52a2a
+    Bucket0 --> Bucket1
+    end
 ```

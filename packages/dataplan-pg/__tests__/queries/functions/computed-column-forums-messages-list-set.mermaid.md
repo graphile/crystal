@@ -4,6 +4,7 @@ graph TD
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
     %% subgraph fields
     P1{{"~"}}:::path
@@ -24,6 +25,7 @@ graph TD
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
+    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     PgSelect_17[["PgSelect[_17∈0]<br /><forums>"]]:::plan
     __Item_21>"__Item[_21∈1]<br /><_17>"]:::itemplan
     PgSelectSingle_22["PgSelectSingle[_22∈1]<br /><forums>"]:::plan
@@ -44,6 +46,7 @@ graph TD
     Access_39["Access[_39∈1]<br /><_21.0>"]:::plan
 
     %% plan dependencies
+    __Value_5 --> __TrackedObject_6
     Object_27 --> PgSelect_17
     PgSelect_17 ==> __Item_21
     __Item_21 --> PgSelectSingle_22
@@ -67,7 +70,7 @@ graph TD
     __Item_21 --> Access_39
 
     %% plan-to-path relationships
-    __Value_5 -.-> P1
+    __TrackedObject_6 -.-> P1
     PgSelect_17 -.-> P2
     PgSelectSingle_22 -.-> P3
     __ListTransform_28 -.-> P4
@@ -77,7 +80,7 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,PgSelect_17,Access_25,Access_26,Object_27 bucket0
+    class __Value_3,__Value_5,__TrackedObject_6,PgSelect_17,Access_25,Access_26,Object_27 bucket0
     classDef bucket1 stroke:#a52a2a
     class __Item_21,PgSelectSingle_22,__ListTransform_28,Access_39 bucket1
     classDef bucket2 stroke:#808000
@@ -88,4 +91,24 @@ graph TD
     class __Item_34 bucket4
     classDef bucket5 stroke:#ff0000
     class __Item_35,PgSelectSingle_36,PgClassExpression_37,PgClassExpression_38 bucket5
+
+    subgraph Buckets
+    Bucket0("Bucket 0 (root)<br />~"):::bucket
+    style Bucket0 stroke:#696969
+    Bucket1("Bucket 1 (__Item[_21])<br />>forums[]"):::bucket
+    style Bucket1 stroke:#a52a2a
+    Bucket0 --> Bucket1
+    Bucket2("Bucket 2 (__Item[_29])<br />"):::bucket
+    style Bucket2 stroke:#808000
+    Bucket1 --> Bucket2
+    Bucket3("Bucket 3 (__Item[_32])<br />>forums[]>messagesListSet[]"):::bucket
+    style Bucket3 stroke:#3cb371
+    Bucket1 --> Bucket3
+    Bucket4("Bucket 4 (__Item[_34])<br />"):::bucket
+    style Bucket4 stroke:#7f007f
+    Bucket3 --> Bucket4
+    Bucket5("Bucket 5 (__Item[_35])<br />>forums[]>messagesListSet[][]"):::bucket
+    style Bucket5 stroke:#ff0000
+    Bucket3 --> Bucket5
+    end
 ```

@@ -4,6 +4,7 @@ graph TD
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
     %% subgraph fields
     P1{{"~"}}:::path
@@ -32,6 +33,7 @@ graph TD
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
+    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
     Constant_8["Constant[_8∈0]"]:::plan
     PgSelect_9[["PgSelect[_9∈0]<br /><single_table_items>"]]:::plan
@@ -51,6 +53,7 @@ graph TD
     PgClassExpression_23["PgClassExpression[_23∈0]<br /><__single_t...__.#quot;title#quot;>"]:::plan
 
     %% plan dependencies
+    __Value_5 --> __TrackedObject_6
     Object_12 --> PgSelect_9
     InputStaticLeaf_7 --> PgSelect_9
     Constant_8 --> PgSelect_9
@@ -71,7 +74,7 @@ graph TD
     PgSelectSingle_14 --> PgClassExpression_23
 
     %% plan-to-path relationships
-    __Value_5 -.-> P1
+    __TrackedObject_6 -.-> P1
     PgSelectSingle_14 -.-> P2
     PgClassExpression_15 -.-> P3
     PgClassExpression_16 -.-> P4
@@ -85,5 +88,10 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,InputStaticLeaf_7,Constant_8,PgSelect_9,Access_10,Access_11,Object_12,First_13,PgSelectSingle_14,PgClassExpression_15,PgClassExpression_16,PgClassExpression_17,PgClassExpression_18,PgClassExpression_19,PgClassExpression_20,PgClassExpression_21,PgClassExpression_22,PgClassExpression_23 bucket0
+    class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,Constant_8,PgSelect_9,Access_10,Access_11,Object_12,First_13,PgSelectSingle_14,PgClassExpression_15,PgClassExpression_16,PgClassExpression_17,PgClassExpression_18,PgClassExpression_19,PgClassExpression_20,PgClassExpression_21,PgClassExpression_22,PgClassExpression_23 bucket0
+
+    subgraph Buckets
+    Bucket0("Bucket 0 (root)<br />~"):::bucket
+    style Bucket0 stroke:#696969
+    end
 ```

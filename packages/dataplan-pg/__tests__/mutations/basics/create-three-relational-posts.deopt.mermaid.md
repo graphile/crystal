@@ -4,6 +4,7 @@ graph TD
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
     %% subgraph fields
     P1{{"~"}}:::path
@@ -70,7 +71,7 @@ graph TD
     %% define plans
     __Value_3["__Value[_3∈1@1]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0] {}"]:::plan
+    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     Constant_7["Constant[_7∈1@1]"]:::plan
     Constant_8["Constant[_8∈1@1]"]:::plan
     PgInsert_9[["PgInsert[_9∈1@1]"]]:::sideeffectplan
@@ -220,7 +221,7 @@ graph TD
     Access_201 --> Object_202
 
     %% plan-to-path relationships
-    __Value_5 -.-> P1
+    __TrackedObject_6 -.-> P1
     PgClassExpression_49 -.-> P2
     __Value_5 -.-> P3
     PgPolymorphic_58 -.-> P4
@@ -256,4 +257,12 @@ graph TD
     class __Value_5,__TrackedObject_6 bucket0
     classDef bucket1 stroke:#a52a2a
     class __Value_3,Constant_7,Constant_8,PgInsert_9,PgClassExpression_13,Constant_14,Constant_15,Constant_16,PgInsert_17,Constant_21,Constant_22,PgInsert_23,PgClassExpression_27,Constant_28,Constant_29,Constant_30,PgInsert_31,Constant_35,Constant_36,PgInsert_37,PgClassExpression_41,Constant_42,Constant_43,Constant_44,PgInsert_45,PgClassExpression_49,InputStaticLeaf_50,PgSelect_51,First_55,PgSelectSingle_56,PgClassExpression_57,PgPolymorphic_58,PgSelect_68,First_72,PgSelectSingle_73,PgClassExpression_75,PgClassExpression_76,PgClassExpression_77,PgClassExpression_94,InputStaticLeaf_102,PgSelect_103,First_107,PgSelectSingle_108,PgClassExpression_109,PgPolymorphic_110,PgSelect_120,First_124,PgSelectSingle_125,PgClassExpression_127,PgClassExpression_128,PgClassExpression_129,PgClassExpression_146,InputStaticLeaf_154,PgSelect_155,First_159,PgSelectSingle_160,PgClassExpression_161,PgPolymorphic_162,PgSelect_172,First_176,PgSelectSingle_177,PgClassExpression_179,PgClassExpression_180,PgClassExpression_181,PgClassExpression_198,Access_200,Access_201,Object_202 bucket1
+
+    subgraph Buckets
+    Bucket0("Bucket 0 (root)<br />~"):::bucket
+    style Bucket0 stroke:#696969
+    Bucket1("Bucket 1 (group 1 / mutation)<br />~"):::bucket
+    style Bucket1 stroke:#a52a2a
+    Bucket0 --> Bucket1
+    end
 ```

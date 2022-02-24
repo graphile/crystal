@@ -4,6 +4,7 @@ graph TD
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
     %% subgraph fields
     P1{{"~"}}:::path
@@ -108,7 +109,7 @@ graph TD
     %% define plans
     __Value_3["__Value[_3∈0] {1,2,3,4}<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0] {}"]:::plan
+    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     InputStaticLeaf_8["InputStaticLeaf[_8∈1@1]"]:::plan
     InputStaticLeaf_11["InputStaticLeaf[_11∈1@1]"]:::plan
     PgUpdate_13[["PgUpdate[_13∈1@1]"]]:::sideeffectplan
@@ -341,7 +342,7 @@ graph TD
     Map_245 --> List_246
 
     %% plan-to-path relationships
-    __Value_5 -.-> P1
+    __TrackedObject_6 -.-> P1
     PgUpdate_13 -.-> P2
     PgClassExpression_17 -.-> P3
     PgSelectSingle_24 -.-> P4
@@ -402,4 +403,21 @@ graph TD
     class InputStaticLeaf_116,InputStaticLeaf_119,PgUpdate_121,PgClassExpression_125,PgSelect_127,First_131,PgSelectSingle_132,PgClassExpression_133,PgClassExpression_134,PgClassExpression_135,PgClassExpression_136,First_142,PgSelectSingle_143,PgClassExpression_144,First_150,PgSelectSingle_151,PgClassExpression_152,First_165,PgSelectSingle_166,PgClassExpression_167,PgClassExpression_168,Map_235,List_236,Map_237,List_238,Map_239,List_240 bucket3
     classDef bucket4 stroke:#7f007f
     class InputStaticLeaf_170,InputStaticLeaf_173,PgUpdate_175,PgClassExpression_179,PgSelect_181,First_185,PgSelectSingle_186,PgClassExpression_187,PgClassExpression_188,PgClassExpression_189,PgClassExpression_190,First_196,PgSelectSingle_197,PgClassExpression_198,First_204,PgSelectSingle_205,PgClassExpression_206,First_219,PgSelectSingle_220,PgClassExpression_221,PgClassExpression_222,Map_241,List_242,Map_243,List_244,Map_245,List_246 bucket4
+
+    subgraph Buckets
+    Bucket0("Bucket 0 (root)<br />~"):::bucket
+    style Bucket0 stroke:#696969
+    Bucket1("Bucket 1 (group 1 / mutation)<br />~"):::bucket
+    style Bucket1 stroke:#a52a2a
+    Bucket0 --> Bucket1
+    Bucket2("Bucket 2 (group 2 / mutation)<br />~"):::bucket
+    style Bucket2 stroke:#808000
+    Bucket0 --> Bucket2
+    Bucket3("Bucket 3 (group 3 / mutation)<br />~"):::bucket
+    style Bucket3 stroke:#3cb371
+    Bucket0 --> Bucket3
+    Bucket4("Bucket 4 (group 4 / mutation)<br />~"):::bucket
+    style Bucket4 stroke:#7f007f
+    Bucket0 --> Bucket4
+    end
 ```

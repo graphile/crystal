@@ -4,6 +4,7 @@ graph TD
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
     %% subgraph fields
     P1{{"~"}}:::path
@@ -20,7 +21,7 @@ graph TD
     %% define plans
     __Value_3["__Value[_3∈0] {1,2}<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0] {}"]:::plan
+    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     InputStaticLeaf_8["InputStaticLeaf[_8∈1@1]"]:::plan
     PgDelete_9[["PgDelete[_9∈1@1]"]]:::sideeffectplan
     Access_10["Access[_10∈0] {1,2}<br /><_3.pgSettings>"]:::plan
@@ -45,7 +46,7 @@ graph TD
     PgDelete_16 --> PgClassExpression_20
 
     %% plan-to-path relationships
-    __Value_5 -.-> P1
+    __TrackedObject_6 -.-> P1
     PgDelete_9 -.-> P2
     PgClassExpression_13 -.-> P3
     PgDelete_16 -.-> P4
@@ -58,4 +59,15 @@ graph TD
     class InputStaticLeaf_8,PgDelete_9,PgClassExpression_13 bucket1
     classDef bucket2 stroke:#808000
     class InputStaticLeaf_15,PgDelete_16,PgClassExpression_20 bucket2
+
+    subgraph Buckets
+    Bucket0("Bucket 0 (root)<br />~"):::bucket
+    style Bucket0 stroke:#696969
+    Bucket1("Bucket 1 (group 1 / mutation)<br />~"):::bucket
+    style Bucket1 stroke:#a52a2a
+    Bucket0 --> Bucket1
+    Bucket2("Bucket 2 (group 2 / mutation)<br />~"):::bucket
+    style Bucket2 stroke:#808000
+    Bucket0 --> Bucket2
+    end
 ```

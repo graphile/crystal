@@ -4,6 +4,7 @@ graph TD
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
     %% subgraph fields
     P1{{"~"}}:::path
@@ -130,7 +131,7 @@ graph TD
     %% define plans
     __Value_3["__Value[_3∈0] {1,2,3}<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0] {}"]:::plan
+    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     InputStaticLeaf_8["InputStaticLeaf[_8∈1@1]"]:::plan
     InputStaticLeaf_9["InputStaticLeaf[_9∈1@1]"]:::plan
     InputStaticLeaf_10["InputStaticLeaf[_10∈1@1]"]:::plan
@@ -374,7 +375,7 @@ graph TD
     Map_377 --> List_378
 
     %% plan-to-path relationships
-    __Value_5 -.-> P1
+    __TrackedObject_6 -.-> P1
     PgClassExpression_22 -.-> P2
     PgClassExpression_38 -.-> P3
     __Value_5 -.-> P4
@@ -444,4 +445,18 @@ graph TD
     class InputStaticLeaf_24,InputStaticLeaf_25,InputStaticLeaf_26,Constant_27,Constant_28,PgInsert_29,PgClassExpression_33,PgInsert_34,PgClassExpression_38,InputStaticLeaf_39,PgSelect_40,First_44,PgSelectSingle_45,PgClassExpression_46,PgPolymorphic_47,First_61,PgSelectSingle_62,PgClassExpression_64,PgClassExpression_65,PgClassExpression_66,PgClassExpression_83,InputStaticLeaf_91,PgSelect_92,First_96,PgSelectSingle_97,PgClassExpression_98,PgPolymorphic_99,First_113,PgSelectSingle_114,PgClassExpression_116,PgClassExpression_117,PgClassExpression_118,PgClassExpression_135,InputStaticLeaf_143,PgSelect_144,First_148,PgSelectSingle_149,PgClassExpression_150,PgPolymorphic_151,First_165,PgSelectSingle_166,PgClassExpression_168,PgClassExpression_169,PgClassExpression_170,PgClassExpression_187,Map_367,List_368,Map_369,List_370,Map_371,List_372 bucket2
     classDef bucket3 stroke:#3cb371
     class InputStaticLeaf_196,InputStaticLeaf_197,InputStaticLeaf_198,Constant_199,Constant_200,PgInsert_201,PgClassExpression_205,PgInsert_206,PgClassExpression_210,InputStaticLeaf_211,PgSelect_212,First_216,PgSelectSingle_217,PgClassExpression_218,PgPolymorphic_219,First_233,PgSelectSingle_234,PgClassExpression_236,PgClassExpression_237,PgClassExpression_238,PgClassExpression_255,InputStaticLeaf_263,PgSelect_264,First_268,PgSelectSingle_269,PgClassExpression_270,PgPolymorphic_271,First_285,PgSelectSingle_286,PgClassExpression_288,PgClassExpression_289,PgClassExpression_290,PgClassExpression_307,InputStaticLeaf_315,PgSelect_316,First_320,PgSelectSingle_321,PgClassExpression_322,PgPolymorphic_323,First_337,PgSelectSingle_338,PgClassExpression_340,PgClassExpression_341,PgClassExpression_342,PgClassExpression_359,Map_373,List_374,Map_375,List_376,Map_377,List_378 bucket3
+
+    subgraph Buckets
+    Bucket0("Bucket 0 (root)<br />~"):::bucket
+    style Bucket0 stroke:#696969
+    Bucket1("Bucket 1 (group 1 / mutation)<br />~"):::bucket
+    style Bucket1 stroke:#a52a2a
+    Bucket0 --> Bucket1
+    Bucket2("Bucket 2 (group 2 / mutation)<br />~"):::bucket
+    style Bucket2 stroke:#808000
+    Bucket0 --> Bucket2
+    Bucket3("Bucket 3 (group 3 / mutation)<br />~"):::bucket
+    style Bucket3 stroke:#3cb371
+    Bucket0 --> Bucket3
+    end
 ```
