@@ -356,6 +356,7 @@ interface BucketDefinition {
 }
 
 interface GroupAndChildren extends Group {
+  id: number;
   parent: GroupAndChildren | null;
   children: Group[];
 }
@@ -375,6 +376,7 @@ export class Aether<
    */
   public groups: Array<GroupAndChildren> = [
     {
+      id: 0,
       parent: null,
       reason: "root",
       children: [],
@@ -835,11 +837,14 @@ export class Aether<
     if (group.reason === "root") {
       throw new Error("Only the root group may use the 'root' reason");
     }
+    const id = this.groups.length;
     const groupAndChildren = Object.assign(group, {
+      id,
       children: [],
     }) as GroupAndChildren;
     groupAndChildren.parent!.children.push(groupAndChildren);
-    return this.groups.push(groupAndChildren) - 1;
+    this.groups[id] = groupAndChildren;
+    return id;
   }
 
   /**
