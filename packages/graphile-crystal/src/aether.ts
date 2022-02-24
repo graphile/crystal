@@ -2739,6 +2739,9 @@ export class Aether<
       const subscriptionPlan = this.plans[this.subscriptionPlanId];
       pathIdentitiesByPlanId[subscriptionPlan.id] = [ROOT_PATH];
     }
+    for (const list of Object.values(pathIdentitiesByPlanId)) {
+      list.sort((a, z) => a.length - z.length);
+    }
 
     // See description of BucketDefinition for fuller explanation of this algorithm
     const bucketByGroupId: {
