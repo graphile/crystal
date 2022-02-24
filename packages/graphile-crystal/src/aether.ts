@@ -2729,6 +2729,10 @@ export class Aether<
         pathIdentitiesByPlanId[planId].push(pathIdentity);
       }
     }
+    if (this.subscriptionPlanId != null) {
+      const subscriptionPlan = this.plans[this.subscriptionPlanId];
+      pathIdentitiesByPlanId[subscriptionPlan.id] = [ROOT_PATH];
+    }
 
     // See description of BucketDefinition for fuller explanation of this algorithm
     const bucketByGroupId: {
