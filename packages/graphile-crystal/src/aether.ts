@@ -303,6 +303,26 @@ interface BucketDefinition {
   parent: BucketDefinition | null;
 
   /**
+   * Every bucket represents one or more selection sets (or a list/stream
+   * intermediary), as such they have a list of "root path identities" they
+   * represent. For `group` buckets this is the rootPathIdentities of the
+   * group, for `item` buckets this is the path identities that the
+   * `__ItemPlan`'s parent serves plus `[]`.
+   */
+  rootPathIdentities: string[];
+
+  /**
+   * Some plans that execute within this bucket may be output to a particular
+   * path identity or list of path identities (as dictated by a reverse lookup
+   * on Aether's planIdByPathIdentity). This output map is a digest of this
+   * information, further digesting the path identities into path `string[]`s
+   * relative to the relevant rootPathIdentity.
+   */
+  outputMap: {
+    [planId: string]: Array<[rootPathIdentityIndex: number, path: string[]]>;
+  };
+
+  /**
    * Parents, grandparents, etc
    */
   ancestors: BucketDefinition[];
@@ -406,6 +426,8 @@ export class Aether<
   private rootBucket: BucketDefinition = {
     id: 0,
     parent: null,
+    rootPathIdentities: [ROOT_PATH],
+    outputMap: Object.create(null),
     ancestors: [],
     children: [],
     type: "root",
@@ -2692,6 +2714,22 @@ export class Aether<
   }
 
   private assignBucketIds() {
+    const pathIdentitiesByPlanId: {
+      [planId: string]: string[];
+    } = Object.create(null);
+
+    for (const [pathIdentity, rawPlanId] of Object.entries(
+      this.planIdByPathIdentity,
+    )) {
+      if (rawPlanId != null) {
+        const planId = this.plans[rawPlanId].id;
+        if (!pathIdentitiesByPlanId[planId]) {
+          pathIdentitiesByPlanId[planId] = [];
+        }
+        pathIdentitiesByPlanId[planId].push(pathIdentity);
+      }
+    }
+
     // See description of BucketDefinition for fuller explanation of this algorithm
     const bucketByGroupId: {
       [groupId: number]: BucketDefinition;
@@ -2748,6 +2786,8 @@ export class Aether<
           const newBucket: BucketDefinition = {
             id: this.buckets.length,
             parent,
+            rootPathIdentities: [], // Transform plan buckets never write output, so we don't need this.
+            outputMap: Object.create(null),
             ancestors: [...parent.ancestors, parent],
             children: [],
             type: "item",
@@ -2759,12 +2799,28 @@ export class Aether<
           plan.bucketId = newBucket.id;
           return plan;
         } else {
+          /**
+           * The plan that returns the items; though this is called "listPlan"
+           * it could also be a subscription plan which returns a stream of
+           * results.
+           */
           const listPlan = this.plans[plan.dependencies[0]]!;
           process(listPlan);
+          const listPlanPathIdentities = pathIdentitiesByPlanId[listPlan.id];
+          if (!listPlanPathIdentities || listPlanPathIdentities.length === 0) {
+            throw new Error(
+              `GraphileInternalError<e5dfb383-d413-49d8-8a3f-2d2f677c373d>: could not determine the path identities served by ${listPlan}`,
+            );
+          }
+          const rootPathIdentities = listPlanPathIdentities.map(
+            (pi) => `${pi}[]`,
+          );
           const parent = this.buckets[listPlan.bucketId];
           const newBucket: BucketDefinition = {
             id: this.buckets.length,
             parent,
+            rootPathIdentities,
+            outputMap: Object.create(null),
             ancestors: [...parent.ancestors, parent],
             children: [],
             type: "item",
@@ -2823,9 +2879,17 @@ export class Aether<
           }
           process(groupParentPlan);
           const parent = this.buckets[groupParentPlan.bucketId];
+          const rootPathIdentities = pathIdentitiesByPlanId[groupParentPlan.id];
+          if (!rootPathIdentities || rootPathIdentities.length === 0) {
+            throw new Error(
+              `GraphileInternalError<e5dfb383-d413-49d8-8a3f-2d2f677c373d>: could not determine the path identities served by group parent plan ${groupParentPlan}`,
+            );
+          }
           const newBucket: BucketDefinition = {
             id: this.buckets.length,
             parent,
+            rootPathIdentities,
+            outputMap: Object.create(null),
             ancestors: [...new Set([parent, ...parent.ancestors])],
             children: [],
             type: "group",
@@ -5118,7 +5182,7 @@ export class Aether<
     }
 
     graph.push("");
-    graph.push("    %% render buckets");
+    graph.push("    subgraph Buckets");
     for (const bucket of this.buckets) {
       const raisonDEtre = (() => {
         switch (bucket.type) {
@@ -5140,7 +5204,9 @@ export class Aether<
       })();
       graph.push(
         `    Bucket${bucket.id}(${dotEscape(
-          `Bucket ${bucket.id} (${raisonDEtre})`,
+          `Bucket ${bucket.id} (${raisonDEtre})\n${bucket.rootPathIdentities
+            .map((pi) => crystalPrintPathIdentity(pi, 5, 5))
+            .join("\n")}`,
         )}):::bucket`,
       );
       graph.push(`    style Bucket${bucket.id} stroke:${color(bucket.id)}`);
@@ -5148,6 +5214,7 @@ export class Aether<
         graph.push(`    Bucket${bucket.parent.id} --> Bucket${bucket.id}`);
       }
     }
+    graph.push("    end");
 
     const graphString = graph.join("\n");
     return graphString;
