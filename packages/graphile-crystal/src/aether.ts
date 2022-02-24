@@ -135,7 +135,7 @@ const dotEscape = (str: string): string => {
   if (str.match(/^[a-z0-9 ]+$/i)) {
     return str;
   }
-  return `"${stripAnsi(str)
+  return `"${stripAnsi(str.trim())
     .replace(/[#"]/g, (l) => ({ "#": "#35;", '"': "#quot;" }[l as any]))
     .replace(/\r?\n/g, "<br />")}"`;
 };
