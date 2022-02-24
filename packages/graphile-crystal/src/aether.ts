@@ -374,14 +374,7 @@ export class Aether<
   /**
    * @internal
    */
-  public groups: Array<GroupAndChildren> = [
-    {
-      id: 0,
-      parent: null,
-      reason: "root",
-      children: [],
-    },
-  ];
+  public groups: Array<GroupAndChildren> = [];
   private rootTreeNode: TreeNode = {
     pathIdentity: ROOT_PATH,
     fieldPathIdentity: ROOT_PATH,
@@ -717,6 +710,13 @@ export class Aether<
     });
     this.operationType = operation.operation;
     this.pathIdentityByParentPathIdentity[ROOT_PATH] = {};
+    this.groups.push({
+      id: 0,
+      parent: null,
+      parentPlanId: this.rootValuePlan.id,
+      reason: "root",
+      children: [],
+    });
     try {
       switch (this.operationType) {
         case "query": {
@@ -1093,12 +1093,17 @@ export class Aether<
       throw new Error("No subscription type found in schema");
     }
     const selectionSet = this.operation.selectionSet;
-    const groupedFieldSet = graphqlCollectFields(this, rootType, [
-      {
-        groupId: 0,
-        selections: selectionSet.selections,
-      },
-    ]);
+    const groupedFieldSet = graphqlCollectFields(
+      this,
+      this.rootValuePlan.id,
+      rootType,
+      [
+        {
+          groupId: 0,
+          selections: selectionSet.selections,
+        },
+      ],
+    );
     let firstKey: string | undefined = undefined;
     for (const key of groupedFieldSet.keys()) {
       if (firstKey !== undefined) {
@@ -1218,6 +1223,7 @@ export class Aether<
     assertObjectType(objectType);
     const groupedFieldSet = graphqlCollectFields(
       this,
+      parentPlan.id,
       objectType,
       groupedSelectionsList,
       isMutation,
@@ -2518,6 +2524,18 @@ export class Aether<
       }
     }
 
+    // Mark all group-root plans as active.
+    for (const group of this.groups) {
+      const plan = this.plans[group.parentPlanId];
+      if (isDev) {
+        assert.ok(
+          plan,
+          `Could not find group ${group.id} parent plan for identifier '${group.parentPlanId}'`,
+        );
+      }
+      this.markPlanActive(plan, activePlans);
+    }
+
     // Mark all plans used in transforms as active.
     const planIds = Object.values(
       this.transformDependencyPlanIdByTransformPlanId,
@@ -2653,6 +2671,11 @@ export class Aether<
 
   private assignBucketIds() {
     // See description of BucketDefinition for fuller explanation of this algorithm
+    const bucketByGroupId: {
+      [groupId: number]: BucketDefinition;
+    } = {
+      0: this.rootBucket,
+    };
     const processedPlans = new Set<ExecutablePlan>();
     const process = (plan: ExecutablePlan) => {
       if (processedPlans.has(plan)) {
@@ -2759,33 +2782,42 @@ export class Aether<
       // What's left are the unique parent buckets
       const parents = [...nonOverlappingParents.values()];
 
-      // Plans that are in a new group get their own bucket (unless they're sync plans)
+      // Plans that are in a new group get their own bucket (unless they're sync plans, unless they have side effects)
       if (
-        !plan.sync &&
-        ((plan.dependencies.length === 0 && !plan.groupIds.includes(0)) ||
-          plan.dependencies.some(
-            (depId) => !planGroupsOverlap(plan, this.plans[depId]),
-          ))
+        (plan.dependencies.length === 0 && plan.primaryGroupId !== 0) ||
+        plan.dependencies.every(
+          (depId) => plan.primaryGroupId !== this.plans[depId].primaryGroupId,
+        )
       ) {
-        const newBucket: BucketDefinition = {
-          id: this.buckets.length,
-          parents,
-          ancestors: [
-            ...new Set([
-              ...parents,
-              ...parents.flatMap((parent) => parent.ancestors),
-            ]),
-          ],
-          children: [],
-          type: "group",
-          copyPlans: new Set(dependencyPlans),
-        };
-        this.buckets[newBucket.id] = newBucket;
-        newBucket.parents.forEach((parent) => {
-          parent.children.push(newBucket);
-        });
-        plan.bucketId = newBucket.id;
-        return plan;
+        if (bucketByGroupId[plan.primaryGroupId]) {
+          plan.bucketId = bucketByGroupId[plan.primaryGroupId].id;
+          return plan;
+        } else {
+          const group = this.groups[plan.primaryGroupId];
+          const groupParentPlan = this.plans[group.parentPlanId];
+          if (!groupParentPlan) {
+            throw new Error(
+              `Group ${plan.primaryGroupId} had parentPlanId ${group.parentPlanId} but we couldn't find a plan with that id.`,
+            );
+          }
+          process(groupParentPlan);
+          const parent = this.buckets[groupParentPlan.bucketId];
+          const newBucket: BucketDefinition = {
+            id: this.buckets.length,
+            parents: [parent],
+            ancestors: [...new Set([parent, ...parent.ancestors])],
+            children: [],
+            type: "group",
+            copyPlans: new Set(dependencyPlans),
+          };
+          bucketByGroupId[plan.primaryGroupId] = newBucket;
+          this.buckets[newBucket.id] = newBucket;
+          newBucket.parents.forEach((parent) => {
+            parent.children.push(newBucket);
+          });
+          plan.bucketId = newBucket.id;
+          return plan;
+        }
       }
 
       // Plans with no dependencies go in the root bucket
@@ -2800,39 +2832,13 @@ export class Aether<
         return plan;
       }
 
-      const joinBucketFor = (parents: BucketDefinition[]): BucketDefinition => {
-        const existing = this.buckets.find(
-          (b) =>
-            b.parents.length === parents.length &&
-            b.parents.every((parent) => parents.includes(parent)),
-        );
-        if (existing) {
-          return existing;
-        }
-        const newBucket: BucketDefinition = {
-          id: this.buckets.length,
-          parents,
-          ancestors: [
-            ...new Set([
-              ...parents,
-              ...parents.flatMap((parent) => parent.ancestors),
-            ]),
-          ],
-          children: [],
-          type: "join",
-          copyPlans: new Set(dependencyPlans),
-        };
-        newBucket.parents.forEach((parent) => {
-          parent.children.push(newBucket);
-        });
-        this.buckets[newBucket.id] = newBucket;
-        return newBucket;
-      };
-
-      // Otherwise a join bucket is assigned
-      const joinBucket = joinBucketFor([...parents]);
-      plan.bucketId = joinBucket.id;
-      return plan;
+      throw new Error(
+        `GraphileInternalError<9d83ff70-0240-416d-b79e-1b1593600b6d>: planning error; every "bucket" should have exactly one parent, however when attempting to assign a bucket to ${plan} we found that its dependencies come from ${
+          parents.length
+        } incompatible buckets: ${parents.map(
+          (bucket) => `${bucket.id}(${bucket.type}, ${bucket.parents[0]})`,
+        )}`,
+      );
     };
 
     for (const [id, plan] of Object.entries(this.plans)) {

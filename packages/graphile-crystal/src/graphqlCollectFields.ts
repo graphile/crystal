@@ -104,6 +104,7 @@ function graphqlDoesFragmentTypeApply(
  */
 export interface Group {
   parent: Group | null;
+  parentPlanId: string;
   reason: "root" | "defer" | "stream" | "mutation" | "mutationPayload";
 }
 
@@ -117,6 +118,7 @@ export interface Group {
  */
 export function graphqlCollectFields(
   aether: Aether,
+  parentPlanId: string,
   objectType: GraphQLObjectType,
   groupedSelectionsList: GroupedSelections[],
   isMutation = false,
@@ -167,9 +169,9 @@ export function graphqlCollectFields(
             assertListType(fieldType);
           }
           const selectionGroupId = stream
-            ? aether.addGroup({ reason: "stream", parent })
+            ? aether.addGroup({ reason: "stream", parentPlanId, parent })
             : isMutation
-            ? aether.addGroup({ reason: "mutation", parent })
+            ? aether.addGroup({ reason: "mutation", parentPlanId, parent })
             : groupId;
 
           groupForResponseKey.push({
@@ -205,13 +207,18 @@ export function graphqlCollectFields(
 
           const defer = getDirective(selection, "defer");
           const fragmentGroupId = defer
-            ? aether.addGroup({ reason: "defer", parent })
+            ? aether.addGroup({ reason: "defer", parentPlanId, parent })
             : isMutation
-            ? aether.addGroup({ reason: "mutationPayload", parent })
+            ? aether.addGroup({
+                reason: "mutationPayload",
+                parentPlanId,
+                parent,
+              })
             : groupId;
 
           graphqlCollectFields(
             aether,
+            parentPlanId,
             objectType,
             [
               {
@@ -256,11 +263,12 @@ export function graphqlCollectFields(
           // I've thus removed this, but we need to be sure it's correct to do
           // so.
           const fragmentGroupId = defer
-            ? aether.addGroup({ reason: "defer", parent })
+            ? aether.addGroup({ reason: "defer", parentPlanId, parent })
             : groupId;
 
           graphqlCollectFields(
             aether,
+            parentPlanId,
             objectType,
             [
               {
