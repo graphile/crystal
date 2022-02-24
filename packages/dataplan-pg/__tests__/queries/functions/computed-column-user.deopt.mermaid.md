@@ -64,9 +64,4 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgSelect_15,Access_16,Access_17,Object_18,First_19,PgSelectSingle_20,PgClassExpression_21,PgClassExpression_22 bucket0
-
-    subgraph Buckets
-    Bucket0("Bucket 0 (root)<br />~"):::bucket
-    style Bucket0 stroke:#696969
-    end
 ```

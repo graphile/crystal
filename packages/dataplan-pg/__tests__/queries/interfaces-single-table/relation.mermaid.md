@@ -361,9 +361,4 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,Lambda_15,PgSingleTablePolymorphic_16,PgClassExpression_17,First_22,PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26,First_33,PgSelectSingle_34,PgClassExpression_35,PgClassExpression_72,PgClassExpression_80,Lambda_81,PgSingleTablePolymorphic_82,PgClassExpression_136,Lambda_137,PgSingleTablePolymorphic_138,PgClassExpression_192,Lambda_193,PgSingleTablePolymorphic_194,PgClassExpression_248,Lambda_249,PgSingleTablePolymorphic_250,Access_290,Access_291,Object_292,Map_297,List_298,Map_299,List_300 bucket0
-
-    subgraph Buckets
-    Bucket0("Bucket 0 (root)<br />~"):::bucket
-    style Bucket0 stroke:#696969
-    end
 ```
