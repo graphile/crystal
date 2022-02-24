@@ -5185,40 +5185,42 @@ export class Aether<
       }
     }
 
-    graph.push("");
-    graph.push("    subgraph Buckets");
-    for (const bucket of this.buckets) {
-      const raisonDEtre = (() => {
-        switch (bucket.type) {
-          case "root": {
-            return "root";
+    if (this.buckets.length > 1) {
+      graph.push("");
+      graph.push("    subgraph Buckets");
+      for (const bucket of this.buckets) {
+        const raisonDEtre = (() => {
+          switch (bucket.type) {
+            case "root": {
+              return "root";
+            }
+            case "item": {
+              return `__Item[${bucket.itemPlanId}]`;
+            }
+            case "group": {
+              const group = this.groups[bucket.groupId!];
+              return `group ${group.id} / ${group.reason}`;
+            }
+            default: {
+              const never: never = bucket.type;
+              throw new Error(`Unhandled bucket type '${never}'`);
+            }
           }
-          case "item": {
-            return `__Item[${bucket.itemPlanId}]`;
-          }
-          case "group": {
-            const group = this.groups[bucket.groupId!];
-            return `group ${group.id} / ${group.reason}`;
-          }
-          default: {
-            const never: never = bucket.type;
-            throw new Error(`Unhandled bucket type '${never}'`);
-          }
+        })();
+        graph.push(
+          `    Bucket${bucket.id}(${dotEscape(
+            `Bucket ${bucket.id} (${raisonDEtre})\n${bucket.rootPathIdentities
+              .map((pi) => crystalPrintPathIdentity(pi, 5, 5))
+              .join("\n")}`,
+          )}):::bucket`,
+        );
+        graph.push(`    style Bucket${bucket.id} stroke:${color(bucket.id)}`);
+        if (bucket.parent) {
+          graph.push(`    Bucket${bucket.parent.id} --> Bucket${bucket.id}`);
         }
-      })();
-      graph.push(
-        `    Bucket${bucket.id}(${dotEscape(
-          `Bucket ${bucket.id} (${raisonDEtre})\n${bucket.rootPathIdentities
-            .map((pi) => crystalPrintPathIdentity(pi, 5, 5))
-            .join("\n")}`,
-        )}):::bucket`,
-      );
-      graph.push(`    style Bucket${bucket.id} stroke:${color(bucket.id)}`);
-      if (bucket.parent) {
-        graph.push(`    Bucket${bucket.parent.id} --> Bucket${bucket.id}`);
       }
+      graph.push("    end");
     }
-    graph.push("    end");
 
     const graphString = graph.join("\n");
     return graphString;
