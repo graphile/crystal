@@ -300,7 +300,7 @@ interface BucketDefinition {
   /**
    * All buckets have at least one parent, except the root bucket
    */
-  parents: BucketDefinition[];
+  parent: BucketDefinition | null;
 
   /**
    * Parents, grandparents, etc
@@ -384,7 +384,7 @@ export class Aether<
   };
   private rootBucket: BucketDefinition = {
     id: 0,
-    parents: [],
+    parent: null,
     ancestors: [],
     children: [],
     type: "root",
@@ -537,8 +537,9 @@ export class Aether<
    * The field at each given path identity may be in one or more groups; these
    * groups govern how the plans run (e.g. a plan will likely not optimise
    * itself into a parent plan in a different group). Groups are advanced by
-   * features such as `@stream` and `@defer`. This behavior ensures that only
-   * the logic required at each stage is executed at those stages.
+   * mutations and features such as `@stream` and `@defer`. This behavior
+   * ensures that only the logic required at each stage is executed at those
+   * stages.
    *
    * @internal
    */
@@ -2725,16 +2726,14 @@ export class Aether<
           const parent = this.buckets[transformPlan.bucketId];
           const newBucket: BucketDefinition = {
             id: this.buckets.length,
-            parents: [parent],
+            parent,
             ancestors: [...parent.ancestors, parent],
             children: [],
             type: "item",
             copyPlans: new Set(),
           };
           this.buckets[newBucket.id] = newBucket;
-          newBucket.parents.forEach((parent) => {
-            parent.children.push(newBucket);
-          });
+          parent.children.push(newBucket);
           plan.bucketId = newBucket.id;
           return plan;
         } else {
@@ -2743,7 +2742,7 @@ export class Aether<
           const parent = this.buckets[listPlan.bucketId];
           const newBucket: BucketDefinition = {
             id: this.buckets.length,
-            parents: [parent],
+            parent,
             ancestors: [...parent.ancestors, parent],
             children: [],
             type: "item",
@@ -2751,7 +2750,7 @@ export class Aether<
             reasonPlanId: listPlan.id,
           };
           this.buckets[newBucket.id] = newBucket;
-          newBucket.parents.map((parent) => parent.children.push(newBucket));
+          parent.children.push(newBucket);
           plan.bucketId = newBucket.id;
           return plan;
         }
@@ -2804,7 +2803,7 @@ export class Aether<
           const parent = this.buckets[groupParentPlan.bucketId];
           const newBucket: BucketDefinition = {
             id: this.buckets.length,
-            parents: [parent],
+            parent,
             ancestors: [...new Set([parent, ...parent.ancestors])],
             children: [],
             type: "group",
@@ -2812,9 +2811,7 @@ export class Aether<
           };
           bucketByGroupId[plan.primaryGroupId] = newBucket;
           this.buckets[newBucket.id] = newBucket;
-          newBucket.parents.forEach((parent) => {
-            parent.children.push(newBucket);
-          });
+          parent.children.push(newBucket);
           plan.bucketId = newBucket.id;
           return plan;
         }
@@ -2836,7 +2833,7 @@ export class Aether<
         `GraphileInternalError<9d83ff70-0240-416d-b79e-1b1593600b6d>: planning error; every "bucket" should have exactly one parent, however when attempting to assign a bucket to ${plan} we found that its dependencies come from ${
           parents.length
         } incompatible buckets: ${parents.map(
-          (bucket) => `${bucket.id}(${bucket.type}, ${bucket.parents[0]})`,
+          (bucket) => `${bucket.id}(${bucket.type}, ${bucket.parent})`,
         )}`,
       );
     };
