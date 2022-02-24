@@ -740,11 +740,11 @@ export class Aether<
       );
     }
     this.planIdByPathIdentity = Object.assign(Object.create(null), {
-      [ROOT_PATH]: this.rootValuePlan.id,
+      [ROOT_PATH]: this.trackedRootValuePlan.id,
     });
     this.isUnplannedByPathIdentity = Object.create(null);
     this.itemPlanIdByFieldPathIdentity = Object.assign(Object.create(null), {
-      [ROOT_PATH]: this.rootValuePlan.id,
+      [ROOT_PATH]: this.trackedRootValuePlan.id,
     });
     this.sideEffectPlanIdsByPathIdentity = Object.create(null);
     this.transformDependencyPlanIdByTransformPlanId = Object.create(null);
@@ -757,7 +757,7 @@ export class Aether<
     this.groups.push({
       id: 0,
       parent: null,
-      parentPlanId: this.rootValuePlan.id,
+      parentPlanId: this.trackedRootValuePlan.id,
       reason: "root",
       children: [],
     });
@@ -1066,8 +1066,8 @@ export class Aether<
       returnRaw: false,
       isPolymorphic: false,
       isLeaf: false,
-      planId: this.rootValuePlan.id,
-      itemPlanId: this.rootValuePlan.id,
+      planId: this.trackedRootValuePlan.id,
+      itemPlanId: this.trackedRootValuePlan.id,
       listDepth: 0,
       childFieldDigests,
     };
@@ -1139,7 +1139,7 @@ export class Aether<
     const selectionSet = this.operation.selectionSet;
     const groupedFieldSet = graphqlCollectFields(
       this,
-      this.rootValuePlan.id,
+      this.trackedRootValuePlan.id,
       rootType,
       [
         {
