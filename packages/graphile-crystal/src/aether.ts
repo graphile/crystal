@@ -2939,11 +2939,49 @@ export class Aether<
       );
     };
 
+    // Assign bucketIds
     for (const [id, plan] of Object.entries(this.plans)) {
       if (plan != null && plan.id === id) {
         process(plan);
         if (plan.bucketId < 0) {
           throw new Error(`Failed to assign bucket to ${plan}`);
+        }
+      }
+    }
+
+    // Set the bucket's outputMap
+    for (const [id, plan] of Object.entries(this.plans)) {
+      if (plan != null && plan.id === id) {
+        if (!processedPlans.has(plan)) {
+          throw new Error(`Didn't assign bucketId to ${plan}`);
+        }
+
+        const pathIdentities = pathIdentitiesByPlanId[plan.id];
+        if (pathIdentities) {
+          const bucket = this.buckets[plan.bucketId];
+          if (bucket.rootPathIdentities.length > 0) {
+            for (const pathIdentity of pathIdentities) {
+              const matchingParentPathIdentities =
+                bucket.rootPathIdentities.filter(
+                  (rpi) =>
+                    rpi === pathIdentity || pathIdentity.startsWith(rpi + ">"),
+                );
+              if (matchingParentPathIdentities.length !== 1) {
+                throw new Error(
+                  `GraphileInternalError<204ef204-7112-48e3-9d9b-2ce96aea86ec> Bad bucketing; couldn't find match for '${pathIdentity}' in '${bucket.rootPathIdentities.join(
+                    "', '",
+                  )}'`,
+                );
+              }
+              const rootPathIdentity = matchingParentPathIdentities[0];
+              const rootPathIdentityIndex =
+                bucket.rootPathIdentities.indexOf(rootPathIdentity);
+              const remainingPath = pathIdentity.substring(
+                rootPathIdentity.length + 1,
+              );
+              // TODO: how to handle polymorphism?
+            }
+          }
         }
       }
     }
@@ -5224,7 +5262,9 @@ export class Aether<
           `    Bucket${bucket.id}(${dotEscape(
             `Bucket ${bucket.id} (${raisonDEtre})\n${bucket.rootPathIdentities
               .map((pi) => crystalPrintPathIdentity(pi, 5, 5))
-              .join("\n")}`,
+              .join("\n")}\n${Object.entries(bucket.outputMap).map(
+              ([planId, tuples]) => `${planId}: ${JSON.stringify(tuples)}`,
+            )}`,
           )}):::bucket`,
         );
         graph.push(`    style Bucket${bucket.id} stroke:${color(bucket.id)}`);
