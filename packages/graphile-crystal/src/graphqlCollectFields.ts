@@ -100,6 +100,14 @@ function graphqlDoesFragmentTypeApply(
 }
 
 /**
+ * @internal
+ */
+export interface Group {
+  parent: Group | null;
+  reason: "root" | "defer" | "stream" | "mutation" | "mutationPayload";
+}
+
+/**
  * Implements the `GraphQLCollectFields` algorithm - like `CollectFields` the
  * GraphQL spec, but modified such that access to variables is tracked.
  *
@@ -121,6 +129,7 @@ export function graphqlCollectFields(
     listIndex++
   ) {
     const { groupId, selections } = groupedSelectionsList[listIndex];
+    const parent = aether.groups[groupId];
     const objectTypeFields = objectType.getFields();
     const trackedVariableValuesPlan = aether.trackedVariableValuesPlan;
     for (let i = 0, l = selections.length; i < l; i++) {
@@ -157,8 +166,11 @@ export function graphqlCollectFields(
             const fieldType = objectTypeFields[fieldName].type;
             assertListType(fieldType);
           }
-          const selectionGroupId =
-            stream || isMutation ? ++aether.maxGroupId : groupId;
+          const selectionGroupId = stream
+            ? aether.addGroup({ reason: "stream", parent })
+            : isMutation
+            ? aether.addGroup({ reason: "mutation", parent })
+            : groupId;
 
           groupForResponseKey.push({
             field,
@@ -192,8 +204,11 @@ export function graphqlCollectFields(
           const fragmentSelectionSet = fragment.selectionSet;
 
           const defer = getDirective(selection, "defer");
-          const fragmentGroupId =
-            defer || isMutation ? ++aether.maxGroupId : groupId;
+          const fragmentGroupId = defer
+            ? aether.addGroup({ reason: "defer", parent })
+            : isMutation
+            ? aether.addGroup({ reason: "mutationPayload", parent })
+            : groupId;
 
           graphqlCollectFields(
             aether,
@@ -234,8 +249,15 @@ export function graphqlCollectFields(
           const fragmentSelectionSet = selection.selectionSet;
 
           const defer = getDirective(selection, "defer");
-          const fragmentGroupId =
-            defer || isMutation ? ++aether.maxGroupId : groupId;
+
+          // TODO: previously we bumped the groupId here if it was a mutation;
+          // however it doesn't seem that this is actually desired/necessary
+          // since the parent selection set would already have been bumped.
+          // I've thus removed this, but we need to be sure it's correct to do
+          // so.
+          const fragmentGroupId = defer
+            ? aether.addGroup({ reason: "defer", parent })
+            : groupId;
 
           graphqlCollectFields(
             aether,

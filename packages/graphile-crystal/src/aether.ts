@@ -43,6 +43,7 @@ import {
 import type { Deferred } from "./deferred";
 import { defer } from "./deferred";
 import { withGlobalState } from "./global";
+import type { Group } from "./graphqlCollectFields";
 import { getDirectiveArg, graphqlCollectFields } from "./graphqlCollectFields";
 import {
   graphqlMergeSelectionSets,
@@ -367,7 +368,12 @@ export class Aether<
   /**
    * @internal
    */
-  public maxGroupId = 0;
+  public groups: Group[] = [
+    {
+      parent: null,
+      reason: "root",
+    },
+  ];
   private rootTreeNode: TreeNode = {
     pathIdentity: ROOT_PATH,
     fieldPathIdentity: ROOT_PATH,
@@ -814,6 +820,10 @@ export class Aether<
 
     this.walkFinalizedPlans();
     this.preparePrefetches();
+  }
+
+  public addGroup(group: Group): number {
+    return this.groups.push(group) - 1;
   }
 
   /**
