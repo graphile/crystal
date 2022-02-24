@@ -338,9 +338,10 @@ interface BucketDefinition {
    * - root - the root bucket
    * - item - branched due to an `__ItemPlan` (plurality changes - list, stream, subscription)
    * - group - branched due to a groupId change between the plan itself and its dependencies (indicates a @defer fragment or mutation payload selection set)
-   * - join - represents when two non-overlapping buckets are necessary to satisfy the dependencies of a plan
+   * - polymorphic - branched due to handling polymorphic types
+   *
    */
-  type: "root" | "item" | "group";
+  type: "root" | "item" | "group" | "polymorphic";
   /*
    * TODO:
    *
@@ -376,6 +377,11 @@ interface BucketDefinition {
    * If this is a 'group' bucket, which group is it?
    */
   groupId?: number;
+
+  /**
+   * If this is a 'polymorphic' bucket, the name of the type.
+   */
+  polymorphicType?: string;
 }
 
 // IMPORTANT: this WILL NOT WORK when compiled down to ES5. It requires ES6+
@@ -5200,6 +5206,9 @@ export class Aether<
             case "group": {
               const group = this.groups[bucket.groupId!];
               return `group ${group.id} / ${group.reason}`;
+            }
+            case "polymorphic": {
+              return `polymorphic ${bucket.polymorphicType}`;
             }
             default: {
               const never: never = bucket.type;
