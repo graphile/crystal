@@ -184,6 +184,18 @@ export class ExecutablePlan<TData = any> extends BasePlan {
   public readonly groupIds: number[] = [];
 
   /**
+   * The deepest group that can be accessed by all `groupIds`; this dictates
+   * when the plan will actually be executed (and also influences into which
+   * bucket it is stored).
+   *
+   * This will be assigned whilst bucketIds are being allocated, just before
+   * the Aether becomes "ready".
+   *
+   * @internal
+   */
+  public primaryGroupId = -1;
+
+  /**
    * This identifies the deepest pathIdentity that is a common ancestor to all
    * the places this plan is used. This value is then used to influence where
    * the result of executing the plan is stored.

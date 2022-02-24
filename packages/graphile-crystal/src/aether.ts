@@ -2652,6 +2652,40 @@ export class Aether<
       }
       processedPlans.add(plan);
 
+      if (plan.groupIds.length === 0 || plan.groupIds.includes(0)) {
+        plan.primaryGroupId = 0;
+      } else if (plan.groupIds.length === 1) {
+        plan.primaryGroupId = plan.groupIds[0];
+      } else {
+        let g: GroupAndChildren | null = this.groups[plan.groupIds[0]];
+        // Find a 'g' such that 'g' is an ancestor (or self) of all of the
+        // plan's groups.
+        while (g) {
+          if (
+            plan.groupIds.every((groupId) => {
+              // Is g an ancestor of groupId?
+              let ancestor: GroupAndChildren | null = this.groups[groupId];
+              while (ancestor) {
+                if (ancestor === g) {
+                  return true;
+                }
+                ancestor = ancestor.parent;
+              }
+              return false;
+            })
+          ) {
+            break;
+          }
+          g = g.parent;
+        }
+        if (!g) {
+          throw new Error(
+            `Failed to find common group ID - this should be impossible because group 0 is a common group ID for everything`,
+          );
+        }
+        plan.primaryGroupId = g.id;
+      }
+
       // __ItemPlan's get their own bucket
       if (plan instanceof __ItemPlan) {
         if (plan.transformPlanId) {
@@ -4919,12 +4953,12 @@ export class Aether<
             : planStyle;
 
         const groups =
-          plan.groupIds.length === 1 && plan.groupIds[0] === 0
+          plan.groupIds.length === 1 && plan.groupIds[0] === plan.primaryGroupId
             ? ""
             : ` {${plan.groupIds}}`;
-        const planString = `${planName}[${plan.id}∈${plan.bucketId}]${groups}${
-          meta ? `\n<${meta}>` : ""
-        }`;
+        const planString = `${planName}[${plan.id}∈${plan.bucketId}${
+          plan.primaryGroupId > 0 ? `@${plan.primaryGroupId}` : ""
+        }]${groups}${meta ? `\n<${meta}>` : ""}`;
         const [lBrace, rBrace] =
           plan instanceof __ItemPlan
             ? [">", "]"]
