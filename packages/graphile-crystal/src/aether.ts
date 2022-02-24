@@ -2600,6 +2600,14 @@ export class Aether<
         }
       }
 
+      const sideEffectPlanIds =
+        this.sideEffectPlanIdsByPathIdentity[treeNode.pathIdentity];
+      if (sideEffectPlanIds) {
+        sideEffectPlanIds.forEach((sideEffectPlanId) =>
+          processPlan(this.plans[sideEffectPlanId]),
+        );
+      }
+
       const treeNodePlanId = this.planIdByPathIdentity[treeNode.pathIdentity];
       assert.ok(
         treeNodePlanId != null,
