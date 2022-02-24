@@ -329,7 +329,7 @@ interface BucketDefinition {
    * - stream - represents plans starting at an `__ItemPlan` from a list that has `@stream` (async iterator)
    * - subscription - represents plans starting at an `__ItemPlan` from a subscription (async iterator)
    *
-   * Consiider splitting 'group' into:
+   * Consider splitting 'group' into:
    *
    * - mutation - plans that are for a mutations' resulting selection set
    * - defer - represents plans that are `@defer`-red
