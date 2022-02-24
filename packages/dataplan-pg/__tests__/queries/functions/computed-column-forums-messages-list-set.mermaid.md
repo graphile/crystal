@@ -98,13 +98,13 @@ graph TD
     Bucket1("Bucket 1 (__Item[_21])<br />>forums[]"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (__Item[_29])<br />"):::bucket
+    Bucket2("Bucket 2 (__Item[_29])"):::bucket
     style Bucket2 stroke:#808000
     Bucket1 --> Bucket2
     Bucket3("Bucket 3 (__Item[_32])<br />>forums[]>messagesListSet[]"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket1 --> Bucket3
-    Bucket4("Bucket 4 (__Item[_34])<br />"):::bucket
+    Bucket4("Bucket 4 (__Item[_34])"):::bucket
     style Bucket4 stroke:#7f007f
     Bucket3 --> Bucket4
     Bucket5("Bucket 5 (__Item[_35])<br />>forums[]>messagesListSet[][]"):::bucket

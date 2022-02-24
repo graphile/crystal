@@ -1275,7 +1275,7 @@ graph TD
     Bucket1("Bucket 1 (__Item[_11])<br />>people[]"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (__Item[_20])<br />"):::bucket
+    Bucket2("Bucket 2 (__Item[_20])"):::bucket
     style Bucket2 stroke:#808000
     Bucket1 --> Bucket2
     Bucket3("Bucket 3 (__Item[_22])<br />>people[]>items[]"):::bucket

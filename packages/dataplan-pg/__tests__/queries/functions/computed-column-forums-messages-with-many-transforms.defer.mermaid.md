@@ -137,19 +137,19 @@ graph TD
     Bucket2("Bucket 2 (group 1 / defer)<br />>forums[]"):::bucket
     style Bucket2 stroke:#808000
     Bucket1 --> Bucket2
-    Bucket3("Bucket 3 (__Item[_32])<br />"):::bucket
+    Bucket3("Bucket 3 (__Item[_32])"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket2 --> Bucket3
-    Bucket4("Bucket 4 (__Item[_38])<br />"):::bucket
+    Bucket4("Bucket 4 (__Item[_38])"):::bucket
     style Bucket4 stroke:#7f007f
     Bucket2 --> Bucket4
-    Bucket5("Bucket 5 (__Item[_41])<br />"):::bucket
+    Bucket5("Bucket 5 (__Item[_41])"):::bucket
     style Bucket5 stroke:#ff0000
     Bucket2 --> Bucket5
     Bucket6("Bucket 6 (__Item[_42])<br />>forums[]>messagesWithManyTransforms[]"):::bucket
     style Bucket6 stroke:#ffa500
     Bucket2 --> Bucket6
-    Bucket7("Bucket 7 (__Item[_44])<br />"):::bucket
+    Bucket7("Bucket 7 (__Item[_44])"):::bucket
     style Bucket7 stroke:#ffff00
     Bucket6 --> Bucket7
     Bucket8("Bucket 8 (__Item[_45])<br />>forums[]>messagesWithManyTransforms[][]"):::bucket
