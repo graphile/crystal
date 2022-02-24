@@ -348,11 +348,14 @@ interface BucketDefinition {
 
   /**
    * If this bucket was caused by an `__ItemPlan` (list, stream, subscription)
-   * then what's the parent plan of that `__ItemPlan`. This is useful so that
-   * we can ensure we use the same BucketDefinition for all `__ItemPlan`s under
-   * a given plan to avoid duplication of effort.
+   * then what's the id of that `__ItemPlan`.
    */
-  reasonPlanId?: string;
+  itemPlanId?: string;
+
+  /**
+   * If this is a 'group' bucket, which group is it?
+   */
+  groupId?: number;
 }
 
 interface GroupAndChildren extends Group {
@@ -2731,6 +2734,7 @@ export class Aether<
             children: [],
             type: "item",
             copyPlans: new Set(),
+            itemPlanId: plan.id,
           };
           this.buckets[newBucket.id] = newBucket;
           parent.children.push(newBucket);
@@ -2747,7 +2751,7 @@ export class Aether<
             children: [],
             type: "item",
             copyPlans: new Set(),
-            reasonPlanId: listPlan.id,
+            itemPlanId: plan.id,
           };
           this.buckets[newBucket.id] = newBucket;
           parent.children.push(newBucket);
@@ -2808,6 +2812,7 @@ export class Aether<
             children: [],
             type: "group",
             copyPlans: new Set(dependencyPlans),
+            groupId: plan.primaryGroupId,
           };
           bucketByGroupId[plan.primaryGroupId] = newBucket;
           this.buckets[newBucket.id] = newBucket;
@@ -4924,6 +4929,7 @@ export class Aether<
       `    classDef plan ${planStyle}`,
       `    classDef itemplan ${itemplanStyle}`,
       `    classDef sideeffectplan ${sideeffectplanStyle}`,
+      `    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px`,
       ``,
     ];
 
@@ -5090,6 +5096,38 @@ export class Aether<
             bucket.id
           }`,
         );
+      }
+    }
+
+    graph.push("");
+    graph.push("    %% render buckets");
+    for (const bucket of this.buckets) {
+      const raisonDEtre = (() => {
+        switch (bucket.type) {
+          case "root": {
+            return "root";
+          }
+          case "item": {
+            return `__Item[${bucket.itemPlanId}]`;
+          }
+          case "group": {
+            const group = this.groups[bucket.groupId!];
+            return `group ${group.id} / ${group.reason}`;
+          }
+          default: {
+            const never: never = bucket.type;
+            throw new Error(`Unhandled bucket type '${never}'`);
+          }
+        }
+      })();
+      graph.push(
+        `    Bucket${bucket.id}(${dotEscape(
+          `Bucket ${bucket.id} (${raisonDEtre})`,
+        )}):::bucket`,
+      );
+      graph.push(`    style Bucket${bucket.id} stroke:${color(bucket.id)}`);
+      if (bucket.parent) {
+        graph.push(`    Bucket${bucket.parent.id} --> Bucket${bucket.id}`);
       }
     }
 
