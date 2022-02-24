@@ -355,6 +355,11 @@ interface BucketDefinition {
   reasonPlanId?: string;
 }
 
+interface GroupAndChildren extends Group {
+  parent: GroupAndChildren | null;
+  children: Group[];
+}
+
 /**
  * Implements the `NewAether` algorithm.
  */
@@ -368,10 +373,11 @@ export class Aether<
   /**
    * @internal
    */
-  public groups: Group[] = [
+  public groups: Array<GroupAndChildren> = [
     {
       parent: null,
       reason: "root",
+      children: [],
     },
   ];
   private rootTreeNode: TreeNode = {
@@ -823,7 +829,17 @@ export class Aether<
   }
 
   public addGroup(group: Group): number {
-    return this.groups.push(group) - 1;
+    if (!group.parent) {
+      throw new Error("Only the root group may have no parent");
+    }
+    if (group.reason === "root") {
+      throw new Error("Only the root group may use the 'root' reason");
+    }
+    const groupAndChildren = Object.assign(group, {
+      children: [],
+    }) as GroupAndChildren;
+    groupAndChildren.parent!.children.push(groupAndChildren);
+    return this.groups.push(groupAndChildren) - 1;
   }
 
   /**
