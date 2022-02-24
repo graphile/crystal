@@ -24,27 +24,27 @@ graph TD
     %% end
 
     %% define plans
-    __Value_3["__Value[_3∈0] {1}<br /><context>"]:::plan
+    __Value_3["__Value[_3∈0@1]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    InputStaticLeaf_8["InputStaticLeaf[_8∈0] {1}"]:::plan
-    InputStaticLeaf_10["InputStaticLeaf[_10∈0] {1}"]:::plan
-    Constant_11["Constant[_11∈0] {1}"]:::plan
-    Constant_12["Constant[_12∈0] {1}"]:::plan
-    PgInsert_13[["PgInsert[_13∈0] {1}"]]:::sideeffectplan
-    PgClassExpression_17["PgClassExpression[_17∈0] {1}<br /><__relation...ems__.#quot;id#quot;>"]:::plan
-    PgInsert_18[["PgInsert[_18∈0] {1}"]]:::sideeffectplan
-    PgClassExpression_22["PgClassExpression[_22∈0] {1}<br /><__relational_posts__>"]:::plan
-    PgClassExpression_23["PgClassExpression[_23∈0] {1}<br /><(__relatio...ts__).#quot;id#quot;>"]:::plan
-    PgSelect_25[["PgSelect[_25∈0] {1}<br /><relational_posts>"]]:::plan
-    Access_26["Access[_26∈0] {1}<br /><_3.pgSettings>"]:::plan
-    Access_27["Access[_27∈0] {1}<br /><_3.withPgClient>"]:::plan
-    Object_28["Object[_28∈0] {1}<br /><{pgSettings,withPgClient}>"]:::plan
-    First_29["First[_29∈0] {1}"]:::plan
-    PgSelectSingle_30["PgSelectSingle[_30∈0] {1}<br /><relational_posts>"]:::plan
-    PgClassExpression_31["PgClassExpression[_31∈0] {1}<br /><__relation...sts__.#quot;id#quot;>"]:::plan
-    PgClassExpression_32["PgClassExpression[_32∈0] {1}<br /><__relation...__.#quot;title#quot;>"]:::plan
-    PgClassExpression_33["PgClassExpression[_33∈0] {1}<br /><__relation...scription#quot;>"]:::plan
-    PgClassExpression_34["PgClassExpression[_34∈0] {1}<br /><__relation...s__.#quot;note#quot;>"]:::plan
+    InputStaticLeaf_8["InputStaticLeaf[_8∈0@1]"]:::plan
+    InputStaticLeaf_10["InputStaticLeaf[_10∈0@1]"]:::plan
+    Constant_11["Constant[_11∈0@1]"]:::plan
+    Constant_12["Constant[_12∈0@1]"]:::plan
+    PgInsert_13[["PgInsert[_13∈0@1]"]]:::sideeffectplan
+    PgClassExpression_17["PgClassExpression[_17∈0@1]<br /><__relation...ems__.#quot;id#quot;>"]:::plan
+    PgInsert_18[["PgInsert[_18∈0@1]"]]:::sideeffectplan
+    PgClassExpression_22["PgClassExpression[_22∈0@1]<br /><__relational_posts__>"]:::plan
+    PgClassExpression_23["PgClassExpression[_23∈0@1]<br /><(__relatio...ts__).#quot;id#quot;>"]:::plan
+    PgSelect_25[["PgSelect[_25∈0@1]<br /><relational_posts>"]]:::plan
+    Access_26["Access[_26∈0@1]<br /><_3.pgSettings>"]:::plan
+    Access_27["Access[_27∈0@1]<br /><_3.withPgClient>"]:::plan
+    Object_28["Object[_28∈0@1]<br /><{pgSettings,withPgClient}>"]:::plan
+    First_29["First[_29∈0@1]"]:::plan
+    PgSelectSingle_30["PgSelectSingle[_30∈0@1]<br /><relational_posts>"]:::plan
+    PgClassExpression_31["PgClassExpression[_31∈0@1]<br /><__relation...sts__.#quot;id#quot;>"]:::plan
+    PgClassExpression_32["PgClassExpression[_32∈0@1]<br /><__relation...__.#quot;title#quot;>"]:::plan
+    PgClassExpression_33["PgClassExpression[_33∈0@1]<br /><__relation...scription#quot;>"]:::plan
+    PgClassExpression_34["PgClassExpression[_34∈0@1]<br /><__relation...s__.#quot;note#quot;>"]:::plan
 
     %% plan dependencies
     Object_28 --> PgInsert_13

@@ -34,44 +34,44 @@ graph TD
     %% end
 
     %% define plans
-    __Value_3["__Value[_3∈0] {1}<br /><context>"]:::plan
+    __Value_3["__Value[_3∈0@1]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    InputStaticLeaf_8["InputStaticLeaf[_8∈0] {1}"]:::plan
-    InputStaticLeaf_9["InputStaticLeaf[_9∈0] {1}"]:::plan
-    InputStaticLeaf_10["InputStaticLeaf[_10∈0] {1}"]:::plan
-    Constant_11["Constant[_11∈0] {1}"]:::plan
-    Constant_12["Constant[_12∈0] {1}"]:::plan
-    PgInsert_13[["PgInsert[_13∈0] {1}"]]:::sideeffectplan
-    PgClassExpression_17["PgClassExpression[_17∈0] {1}<br /><__relation...ems__.#quot;id#quot;>"]:::plan
-    PgInsert_18[["PgInsert[_18∈0] {1}"]]:::sideeffectplan
-    PgClassExpression_22["PgClassExpression[_22∈0] {1}<br /><__relational_posts__>"]:::plan
-    PgClassExpression_23["PgClassExpression[_23∈0] {1}<br /><(__relatio...ts__).#quot;id#quot;>"]:::plan
-    PgSelect_25[["PgSelect[_25∈0] {1}<br /><relational_posts>"]]:::plan
-    First_29["First[_29∈0] {1}"]:::plan
-    PgSelectSingle_30["PgSelectSingle[_30∈0] {1}<br /><relational_posts>"]:::plan
-    PgClassExpression_31["PgClassExpression[_31∈0] {1}<br /><__relation...sts__.#quot;id#quot;>"]:::plan
-    PgClassExpression_32["PgClassExpression[_32∈0] {1}<br /><__relation...__.#quot;title#quot;>"]:::plan
-    PgClassExpression_33["PgClassExpression[_33∈0] {1}<br /><__relation...scription#quot;>"]:::plan
-    PgClassExpression_34["PgClassExpression[_34∈0] {1}<br /><__relation...s__.#quot;note#quot;>"]:::plan
-    First_40["First[_40∈0] {1}"]:::plan
-    PgSelectSingle_41["PgSelectSingle[_41∈0] {1}<br /><text>"]:::plan
-    PgClassExpression_42["PgClassExpression[_42∈0] {1}<br /><__relation...le_lower__>"]:::plan
-    First_48["First[_48∈0] {1}"]:::plan
-    PgSelectSingle_49["PgSelectSingle[_49∈0] {1}<br /><relational_items>"]:::plan
-    PgClassExpression_50["PgClassExpression[_50∈0] {1}<br /><__relation..._archived#quot;>"]:::plan
-    PgClassExpression_58["PgClassExpression[_58∈0] {1}<br /><__relation...author_id#quot;>"]:::plan
-    PgSelect_59[["PgSelect[_59∈0] {1}<br /><people>"]]:::plan
-    Access_60["Access[_60∈0] {1}<br /><_3.pgSettings>"]:::plan
-    Access_61["Access[_61∈0] {1}<br /><_3.withPgClient>"]:::plan
-    Object_62["Object[_62∈0] {1}<br /><{pgSettings,withPgClient}>"]:::plan
-    First_63["First[_63∈0] {1}"]:::plan
-    PgSelectSingle_64["PgSelectSingle[_64∈0] {1}<br /><people>"]:::plan
-    PgClassExpression_65["PgClassExpression[_65∈0] {1}<br /><__people__.#quot;person_id#quot;>"]:::plan
-    PgClassExpression_66["PgClassExpression[_66∈0] {1}<br /><__people__.#quot;username#quot;>"]:::plan
-    Map_67["Map[_67∈0] {1}<br /><_30:{#quot;0#quot;:0,#quot;1#quot;:1}>"]:::plan
-    List_68["List[_68∈0] {1}<br /><_67>"]:::plan
-    Map_69["Map[_69∈0] {1}<br /><_30:{#quot;0#quot;:6}>"]:::plan
-    List_70["List[_70∈0] {1}<br /><_69>"]:::plan
+    InputStaticLeaf_8["InputStaticLeaf[_8∈0@1]"]:::plan
+    InputStaticLeaf_9["InputStaticLeaf[_9∈0@1]"]:::plan
+    InputStaticLeaf_10["InputStaticLeaf[_10∈0@1]"]:::plan
+    Constant_11["Constant[_11∈0@1]"]:::plan
+    Constant_12["Constant[_12∈0@1]"]:::plan
+    PgInsert_13[["PgInsert[_13∈0@1]"]]:::sideeffectplan
+    PgClassExpression_17["PgClassExpression[_17∈0@1]<br /><__relation...ems__.#quot;id#quot;>"]:::plan
+    PgInsert_18[["PgInsert[_18∈0@1]"]]:::sideeffectplan
+    PgClassExpression_22["PgClassExpression[_22∈0@1]<br /><__relational_posts__>"]:::plan
+    PgClassExpression_23["PgClassExpression[_23∈0@1]<br /><(__relatio...ts__).#quot;id#quot;>"]:::plan
+    PgSelect_25[["PgSelect[_25∈0@1]<br /><relational_posts>"]]:::plan
+    First_29["First[_29∈0@1]"]:::plan
+    PgSelectSingle_30["PgSelectSingle[_30∈0@1]<br /><relational_posts>"]:::plan
+    PgClassExpression_31["PgClassExpression[_31∈0@1]<br /><__relation...sts__.#quot;id#quot;>"]:::plan
+    PgClassExpression_32["PgClassExpression[_32∈0@1]<br /><__relation...__.#quot;title#quot;>"]:::plan
+    PgClassExpression_33["PgClassExpression[_33∈0@1]<br /><__relation...scription#quot;>"]:::plan
+    PgClassExpression_34["PgClassExpression[_34∈0@1]<br /><__relation...s__.#quot;note#quot;>"]:::plan
+    First_40["First[_40∈0@1]"]:::plan
+    PgSelectSingle_41["PgSelectSingle[_41∈0@1]<br /><text>"]:::plan
+    PgClassExpression_42["PgClassExpression[_42∈0@1]<br /><__relation...le_lower__>"]:::plan
+    First_48["First[_48∈0@1]"]:::plan
+    PgSelectSingle_49["PgSelectSingle[_49∈0@1]<br /><relational_items>"]:::plan
+    PgClassExpression_50["PgClassExpression[_50∈0@1]<br /><__relation..._archived#quot;>"]:::plan
+    PgClassExpression_58["PgClassExpression[_58∈0@1]<br /><__relation...author_id#quot;>"]:::plan
+    PgSelect_59[["PgSelect[_59∈0@1]<br /><people>"]]:::plan
+    Access_60["Access[_60∈0@1]<br /><_3.pgSettings>"]:::plan
+    Access_61["Access[_61∈0@1]<br /><_3.withPgClient>"]:::plan
+    Object_62["Object[_62∈0@1]<br /><{pgSettings,withPgClient}>"]:::plan
+    First_63["First[_63∈0@1]"]:::plan
+    PgSelectSingle_64["PgSelectSingle[_64∈0@1]<br /><people>"]:::plan
+    PgClassExpression_65["PgClassExpression[_65∈0@1]<br /><__people__.#quot;person_id#quot;>"]:::plan
+    PgClassExpression_66["PgClassExpression[_66∈0@1]<br /><__people__.#quot;username#quot;>"]:::plan
+    Map_67["Map[_67∈0@1]<br /><_30:{#quot;0#quot;:0,#quot;1#quot;:1}>"]:::plan
+    List_68["List[_68∈0@1]<br /><_67>"]:::plan
+    Map_69["Map[_69∈0@1]<br /><_30:{#quot;0#quot;:6}>"]:::plan
+    List_70["List[_70∈0@1]<br /><_69>"]:::plan
 
     %% plan dependencies
     Object_62 --> PgInsert_13
