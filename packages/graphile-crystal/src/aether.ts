@@ -332,16 +332,32 @@ interface BucketDefinition {
    */
   children: BucketDefinition[];
 
+  // The following properties indicate the type of this bucket -
+  // item/group/polymorphic. Note that every bucket should have at least one of
+  // these properties set. The root bucket is seen as "group 0".  Previously we
+  // had a 'type' field, but we need to cover the case of a "deferred
+  // polymorphic" bucket which mixes group and polymorphic, so we went with a
+  // list of options instead.
+  // TODO: a stream interface should really have that the stream item is both
+  // deferred (group) and item.
   /**
-   * What type of bucket is this?
-   *
-   * - root - the root bucket
-   * - item - branched due to an `__ItemPlan` (plurality changes - list, stream, subscription)
-   * - group - branched due to a groupId change between the plan itself and its dependencies (indicates a @defer fragment or mutation payload selection set)
-   * - polymorphic - branched due to handling polymorphic types
-   *
+   * If this bucket was caused by an `__ItemPlan` (list, stream, subscription)
+   * then what's the id of that `__ItemPlan`.
    */
-  type: "root" | "item" | "group" | "polymorphic";
+  itemPlanId?: string;
+  /**
+   * If this is a 'group' bucket, which group is it?
+   */
+  groupId?: number;
+  /**
+   * If this is a 'polymorphic' bucket, the id of the polymorphic plan
+   */
+  polymorphicPlanId?: string;
+  /**
+   * If this is a 'polymorphic' bucket, the name of the object type(s) it applies to.
+   */
+  polymorphicTypeNames?: string[];
+
   /*
    * TODO:
    *
@@ -366,22 +382,6 @@ interface BucketDefinition {
    * reference them?
    */
   copyPlans: Set<ExecutablePlan>;
-
-  /**
-   * If this bucket was caused by an `__ItemPlan` (list, stream, subscription)
-   * then what's the id of that `__ItemPlan`.
-   */
-  itemPlanId?: string;
-
-  /**
-   * If this is a 'group' bucket, which group is it?
-   */
-  groupId?: number;
-
-  /**
-   * If this is a 'polymorphic' bucket, the name of the type.
-   */
-  polymorphicType?: string;
 }
 
 // IMPORTANT: this WILL NOT WORK when compiled down to ES5. It requires ES6+
@@ -436,8 +436,8 @@ export class Aether<
     outputMap: Object.create(null),
     ancestors: [],
     children: [],
-    type: "root",
     copyPlans: new Set(),
+    groupId: 0,
   };
   private buckets: BucketDefinition[] = [this.rootBucket];
 
@@ -597,6 +597,12 @@ export class Aether<
   };
 
   private readonly planOptionsByPlan = new Map<ExecutablePlan, PlanOptions>();
+
+  // TODO: this is hideous, there must be a better way. Search HIDEOUS_POLY
+  private readonly polymorphicDetailsByPlanId: Record<
+    string,
+    { polymorphicPlanId: string; typeNames: string[] }
+  > = Object.create(null);
 
   /**
    * @internal
@@ -1837,6 +1843,20 @@ export class Aether<
             const subPlan = wgs(() =>
               polymorphicPlan.planForType(possibleObjectType),
             );
+
+            // TODO: this is hideous, there must be a better way. Search HIDEOUS_POLY
+            {
+              if (!this.polymorphicDetailsByPlanId[subPlan.id]) {
+                this.polymorphicDetailsByPlanId[subPlan.id] = {
+                  polymorphicPlanId: polymorphicPlan.id,
+                  typeNames: [],
+                };
+              }
+              this.polymorphicDetailsByPlanId[subPlan.id].typeNames.push(
+                possibleObjectType.name,
+              );
+            }
+
             this.finalizeArgumentsSince(oldPlansLength, pathIdentity);
             if (
               isDev &&
@@ -2744,8 +2764,8 @@ export class Aether<
     }
 
     // See description of BucketDefinition for fuller explanation of this algorithm
-    const bucketByGroupId: {
-      [groupId: number]: BucketDefinition;
+    const bucketByGroupKey: {
+      [groupKey: string]: BucketDefinition;
     } = {
       0: this.rootBucket,
     };
@@ -2790,7 +2810,91 @@ export class Aether<
         plan.primaryGroupId = g.id;
       }
 
-      // __ItemPlan's get their own bucket
+      // TODO: this is hideous, there must be a better way. Search HIDEOUS_POLY
+      /**
+       * Due to plan rewriting/deduplication/etc, there may be multiple ids
+       * that point to this same plan. What are they all?
+       */
+      const equivalentPlanIds = Object.keys(this.plans).filter(
+        (id) => this.plans[id] === plan,
+      );
+
+      const dependencyPlans = plan.dependencies.map((depId) => {
+        const dep = this.plans[depId]!;
+        process(dep);
+        return dep;
+      });
+      const allParents = [
+        ...new Set(dependencyPlans.map((plan) => this.buckets[plan.bucketId])),
+      ];
+
+      // Go through `allParents` and remove the buckets who are contained in the ancestors of other buckets
+      const nonOverlappingParents = new Set(allParents);
+      for (const parent of nonOverlappingParents) {
+        for (const otherParent of nonOverlappingParents) {
+          if (
+            otherParent !== parent &&
+            otherParent.ancestors.includes(parent)
+          ) {
+            nonOverlappingParents.delete(parent);
+            break;
+          }
+        }
+      }
+      // What's left are the unique parent buckets
+      const parents = [...nonOverlappingParents.values()];
+
+      const polymorphicDetailsList = equivalentPlanIds
+        .map((planId) => this.polymorphicDetailsByPlanId[planId])
+        .filter(isNotNullish);
+      const polymorphicDetails = polymorphicDetailsList.reduce(
+        (memo, polymorphicDetailsListEntry) => {
+          if (memo === undefined) {
+            return {
+              polymorphicPlanId:
+                this.plans[polymorphicDetailsListEntry.polymorphicPlanId].id,
+              typeNames: [...polymorphicDetailsListEntry.typeNames],
+            };
+          } else {
+            if (
+              this.plans[polymorphicDetailsListEntry.polymorphicPlanId].id !==
+              memo.polymorphicPlanId
+            ) {
+              throw new Error(
+                `GraphileInternalError<192e9e33-2548-4921-a075-05c7c33ea955>: mismatch - polymorphic details should line up to use same polymorphicPlanId but they do not`,
+              );
+            }
+            for (const typeName of polymorphicDetailsListEntry.typeNames) {
+              if (!memo.typeNames.includes(typeName)) {
+                memo.typeNames.push(typeName);
+              }
+            }
+            return memo;
+          }
+        },
+        undefined as
+          | undefined
+          | { polymorphicPlanId: string; typeNames: string[] },
+      );
+
+      const itemPlanId = plan instanceof __ItemPlan ? plan.id : undefined;
+      // Plans that are in a new group get their own bucket
+      const groupId =
+        plan.primaryGroupId !== 0 &&
+        (plan.dependencies.length === 0 ||
+          plan.dependencies.every(
+            (depId) => plan.primaryGroupId !== this.plans[depId].primaryGroupId,
+          ))
+          ? plan.primaryGroupId
+          : undefined;
+      const polymorphicPlanId = polymorphicDetails
+        ? polymorphicDetails.polymorphicPlanId
+        : undefined;
+      const polymorphicTypeNames = polymorphicDetails
+        ? polymorphicDetails.typeNames
+        : undefined;
+
+      // __ItemPlan's get their own bucket (these may or may not be in a new group too)
       if (plan instanceof __ItemPlan) {
         if (plan.transformPlanId) {
           const transformPlan = this.plans[plan.transformPlanId]!;
@@ -2803,9 +2907,11 @@ export class Aether<
             outputMap: Object.create(null),
             ancestors: [...parent.ancestors, parent],
             children: [],
-            type: "item",
             copyPlans: new Set(),
-            itemPlanId: plan.id,
+            itemPlanId,
+            groupId,
+            polymorphicPlanId,
+            polymorphicTypeNames,
           };
           this.buckets[newBucket.id] = newBucket;
           parent.children.push(newBucket);
@@ -2837,9 +2943,11 @@ export class Aether<
             outputMap: Object.create(null),
             ancestors: [...parent.ancestors, parent],
             children: [],
-            type: "item",
             copyPlans: new Set(),
-            itemPlanId: plan.id,
+            itemPlanId,
+            groupId,
+            polymorphicPlanId,
+            polymorphicTypeNames,
           };
           this.buckets[newBucket.id] = newBucket;
           parent.children.push(newBucket);
@@ -2848,40 +2956,13 @@ export class Aether<
         }
       }
 
-      const dependencyPlans = plan.dependencies.map((depId) => {
-        const dep = this.plans[depId]!;
-        process(dep);
-        return dep;
-      });
-      const allParents = [
-        ...new Set(dependencyPlans.map((plan) => this.buckets[plan.bucketId])),
-      ];
-
-      // Go through `allParents` and remove the buckets who are contained in the ancestors of other buckets
-      const nonOverlappingParents = new Set(allParents);
-      for (const parent of nonOverlappingParents) {
-        for (const otherParent of nonOverlappingParents) {
-          if (
-            otherParent !== parent &&
-            otherParent.ancestors.includes(parent)
-          ) {
-            nonOverlappingParents.delete(parent);
-            break;
-          }
-        }
-      }
-      // What's left are the unique parent buckets
-      const parents = [...nonOverlappingParents.values()];
-
-      // Plans that are in a new group get their own bucket (unless they're sync plans, unless they have side effects)
-      if (
-        (plan.dependencies.length === 0 && plan.primaryGroupId !== 0) ||
-        plan.dependencies.every(
-          (depId) => plan.primaryGroupId !== this.plans[depId].primaryGroupId,
-        )
-      ) {
-        if (bucketByGroupId[plan.primaryGroupId]) {
-          plan.bucketId = bucketByGroupId[plan.primaryGroupId].id;
+      // Plans that are in a new group (and don't have a bucket already due to being __ItemPlans) get their own bucket
+      if (groupId !== undefined) {
+        const groupKey = `${groupId}|${polymorphicPlanId ?? ""}|${
+          polymorphicTypeNames?.join(",") ?? ""
+        }`;
+        if (bucketByGroupKey[groupKey]) {
+          plan.bucketId = bucketByGroupKey[groupKey].id;
           return plan;
         } else {
           const group = this.groups[plan.primaryGroupId];
@@ -2906,16 +2987,40 @@ export class Aether<
             outputMap: Object.create(null),
             ancestors: [...new Set([parent, ...parent.ancestors])],
             children: [],
-            type: "group",
             copyPlans: new Set(dependencyPlans),
-            groupId: plan.primaryGroupId,
+            groupId,
+            polymorphicPlanId,
+            polymorphicTypeNames,
           };
-          bucketByGroupId[plan.primaryGroupId] = newBucket;
+          bucketByGroupKey[groupKey] = newBucket;
           this.buckets[newBucket.id] = newBucket;
           parent.children.push(newBucket);
           plan.bucketId = newBucket.id;
           return plan;
         }
+      }
+
+      // The "planForType" from polymorphic plans get their own buckets
+      if (polymorphicPlanId !== undefined) {
+        const polymorphicPlan = this.plans[polymorphicPlanId];
+        const parent = this.buckets[polymorphicPlan.bucketId];
+        const rootPathIdentities = pathIdentitiesByPlanId[polymorphicPlan.id];
+        const newBucket: BucketDefinition = {
+          id: this.buckets.length,
+          parent,
+          rootPathIdentities,
+          outputMap: Object.create(null),
+          ancestors: [...new Set([parent, ...parent.ancestors])],
+          children: [],
+          copyPlans: new Set(dependencyPlans),
+          groupId,
+          polymorphicPlanId,
+          polymorphicTypeNames,
+        };
+        this.buckets[newBucket.id] = newBucket;
+        parent.children.push(newBucket);
+        plan.bucketId = newBucket.id;
+        return plan;
       }
 
       // Plans with no dependencies go in the root bucket
@@ -2934,7 +3039,12 @@ export class Aether<
         `GraphileInternalError<9d83ff70-0240-416d-b79e-1b1593600b6d>: planning error; every "bucket" should have exactly one parent, however when attempting to assign a bucket to ${plan} we found that its dependencies come from ${
           parents.length
         } incompatible buckets: ${parents.map(
-          (bucket) => `${bucket.id}(${bucket.type}, ${bucket.parent})`,
+          (bucket) =>
+            `${bucket.id}(i=${bucket.itemPlanId ?? "-"}, g=${
+              bucket.groupId ?? "-"
+            }, t=${bucket.polymorphicTypeNames?.join(",") ?? "-"}, p=${
+              bucket.parent
+            })`,
         )}`,
       );
     };
@@ -5238,25 +5348,23 @@ export class Aether<
       graph.push("    subgraph Buckets");
       for (const bucket of this.buckets) {
         const raisonDEtre = (() => {
-          switch (bucket.type) {
-            case "root": {
-              return "root";
-            }
-            case "item": {
-              return `__Item[${bucket.itemPlanId}]`;
-            }
-            case "group": {
-              const group = this.groups[bucket.groupId!];
-              return `group ${group.id} / ${group.reason}`;
-            }
-            case "polymorphic": {
-              return `polymorphic ${bucket.polymorphicType}`;
-            }
-            default: {
-              const never: never = bucket.type;
-              throw new Error(`Unhandled bucket type '${never}'`);
-            }
+          const reasons: string[] = [];
+          if (bucket.groupId != null) {
+            reasons.push(
+              `group${bucket.groupId}[${this.groups[bucket.groupId].reason}]`,
+            );
           }
+          if (bucket.itemPlanId != null) {
+            reasons.push(`item${bucket.itemPlanId}`);
+          }
+          if (bucket.polymorphicPlanId != null) {
+            reasons.push(
+              `polymorphic${
+                bucket.polymorphicPlanId
+              }[${bucket.polymorphicTypeNames!.join("|")}]`,
+            );
+          }
+          return reasons.join(", ");
         })();
         graph.push(
           `    Bucket${bucket.id}(${dotEscape(
