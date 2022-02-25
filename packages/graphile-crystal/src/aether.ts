@@ -336,18 +336,12 @@ interface BucketDefinition {
    * What type of bucket is this?
    *
    * - root - the root bucket
-   * - item - branched due to an `__ItemPlan` (plurality changes - list,
-   *   stream, subscription)
-   * - group - branched due to a groupId change between the plan itself and its
-   *   dependencies, could be caused by:
-   *   - `@defer`
-   *   - `@stream` (the stream itself, not the resulting items - they get their own 'item' bucket)
-   *   - polymorphism
-   *   - mutation field
-   *   - mutation payload
+   * - item - branched due to an `__ItemPlan` (plurality changes - list, stream, subscription)
+   * - group - branched due to a groupId change between the plan itself and its dependencies (indicates a @defer fragment or mutation payload selection set)
+   * - polymorphic - branched due to handling polymorphic types
    *
    */
-  type: "root" | "item" | "group";
+  type: "root" | "item" | "group" | "polymorphic";
   /*
    * TODO:
    *
@@ -1787,15 +1781,6 @@ export class Aether<
       fieldType instanceof GraphQLInterfaceType ||
       fieldType instanceof GraphQLUnionType
     ) {
-      /**
-       * The set of subselections on this field. Roughly speaking this is found
-       * by looping over all the matches for this specific field (which is
-       * always a field on a known Object type) in the parent selection set and
-       * then extracting and merging the selection sets made on that field.
-       *
-       * The groups in this are the groups that the field was requested in, NOT
-       * the group that the selection set has.
-       */
       const groupedSubSelections = graphqlMergeSelectionSets(fieldAndGroups);
       if (fieldType instanceof GraphQLObjectType) {
         if (isDev) {
@@ -1867,33 +1852,12 @@ export class Aether<
               possibleObjectType.name
             ] = {};
 
-            const fieldGroupIds = [
-              ...new Set(groupedSubSelections.map((s) => s.groupId)),
-            ];
-            const polyGroupIdByFieldGroupId: {
-              [fieldGroupId: number]: number;
-            } = fieldGroupIds.reduce((memo, fieldGroupId) => {
-              const parent = this.groups[fieldGroupId];
-              memo[fieldGroupId] = this.addGroup({
-                parent,
-                parentPlanId: plan.id,
-                reason: "polymorphic",
-                typeName: possibleObjectType.name,
-              });
-              return memo;
-            }, Object.create(null));
-
-            const polyGroupedSubSelections = groupedSubSelections.map((s) => ({
-              groupId: polyGroupIdByFieldGroupId[s.groupId],
-              selections: s.selections,
-            }));
-
             const { fieldDigests: localFieldDigests } = this.planSelectionSet(
               pathIdentity,
               fieldPathIdentity,
               subPlan,
               possibleObjectType,
-              polyGroupedSubSelections,
+              groupedSubSelections,
               treeNode,
               false,
             );

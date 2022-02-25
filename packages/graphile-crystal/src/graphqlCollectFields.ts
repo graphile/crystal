@@ -105,14 +105,7 @@ function graphqlDoesFragmentTypeApply(
 export interface Group {
   parent: Group | null;
   parentPlanId: string;
-  reason:
-    | "root"
-    | "defer"
-    | "stream"
-    | "mutation"
-    | "mutationPayload"
-    | "polymorphic";
-  typeName?: string;
+  reason: "root" | "defer" | "stream" | "mutation" | "mutationPayload";
 }
 
 /**
