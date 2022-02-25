@@ -355,9 +355,10 @@ interface BucketDefinition {
    */
   groupId?: number;
   /**
-   * If this is a 'polymorphic' bucket, the id of the polymorphic plan
+   * If this is a 'polymorphic' bucket, the ids of the polymorphic plan(s) that
+   * can use it.
    */
-  polymorphicPlanId?: string;
+  polymorphicPlanIds?: string[];
   /**
    * If this is a 'polymorphic' bucket, the name of the object type(s) it applies to.
    */
@@ -606,7 +607,7 @@ export class Aether<
   // TODO: this is hideous, there must be a better way. Search HIDEOUS_POLY
   private readonly polymorphicDetailsByPlanId: Record<
     string,
-    { polymorphicPlanId: string; typeNames: string[] }
+    { polymorphicPlanIds: string[]; typeNames: string[] }
   > = Object.create(null);
 
   /**
@@ -1853,20 +1854,18 @@ export class Aether<
 
             // TODO: this is hideous, there must be a better way. Search HIDEOUS_POLY
             {
-              if (!this.polymorphicDetailsByPlanId[subPlan.id]) {
-                this.polymorphicDetailsByPlanId[subPlan.id] = {
-                  polymorphicPlanId: polymorphicPlan.id,
+              let details = this.polymorphicDetailsByPlanId[subPlan.id];
+              if (!details) {
+                this.polymorphicDetailsByPlanId[subPlan.id] = details = {
+                  polymorphicPlanIds: [],
                   typeNames: [],
                 };
               }
-              if (
-                !this.polymorphicDetailsByPlanId[subPlan.id].typeNames.includes(
-                  possibleObjectType.name,
-                )
-              ) {
-                this.polymorphicDetailsByPlanId[subPlan.id].typeNames.push(
-                  possibleObjectType.name,
-                );
+              if (!details.polymorphicPlanIds.includes(polymorphicPlan.id)) {
+                details.polymorphicPlanIds.push(polymorphicPlan.id);
+              }
+              if (!details.typeNames.includes(possibleObjectType.name)) {
+                details.typeNames.push(possibleObjectType.name);
               }
             }
 
@@ -2869,23 +2868,20 @@ export class Aether<
         (memo, polymorphicDetailsListEntry) => {
           if (memo === undefined) {
             return {
-              polymorphicPlanId:
-                this.plans[polymorphicDetailsListEntry.polymorphicPlanId].id,
+              polymorphicPlanIds:
+                polymorphicDetailsListEntry.polymorphicPlanIds.map(
+                  (id) => this.plans[id].id,
+                ),
               typeNames: [...polymorphicDetailsListEntry.typeNames],
             };
           } else {
-            if (
-              this.plans[polymorphicDetailsListEntry.polymorphicPlanId].id !==
-              memo.polymorphicPlanId
-            ) {
-              // TODO: if plans do not get sufficiently deduplicated, this can
-              // happen. Needs investigation. To reproduce, remove the
-              // `deduplicate` method in `PgPolymorphicPlan` and remove the
-              // symbolSubstitutes from the deduplicate method in
-              // PgClassExpressionPlan
-              throw new Error(
-                `GraphileInternalError<192e9e33-2548-4921-a075-05c7c33ea955>: mismatch - polymorphic details for ${plan} should line up to use same polymorphicPlanId but they do not`,
-              );
+            const ids = polymorphicDetailsListEntry.polymorphicPlanIds.map(
+              (id) => this.plans[id].id,
+            );
+            for (const id of ids) {
+              if (!memo.polymorphicPlanIds.includes(id)) {
+                memo.polymorphicPlanIds.push(id);
+              }
             }
             for (const typeName of polymorphicDetailsListEntry.typeNames) {
               if (!memo.typeNames.includes(typeName)) {
@@ -2897,7 +2893,7 @@ export class Aether<
         },
         undefined as
           | undefined
-          | { polymorphicPlanId: string; typeNames: string[] },
+          | { polymorphicPlanIds: string[]; typeNames: string[] },
       );
 
       const itemPlanId = plan instanceof __ItemPlan ? plan.id : undefined;
@@ -2910,8 +2906,8 @@ export class Aether<
           ))
           ? plan.primaryGroupId
           : undefined;
-      const polymorphicPlanId = polymorphicDetails
-        ? polymorphicDetails.polymorphicPlanId
+      const polymorphicPlanIds = polymorphicDetails
+        ? polymorphicDetails.polymorphicPlanIds
         : undefined;
       const polymorphicTypeNames = polymorphicDetails
         ? polymorphicDetails.typeNames
@@ -2933,7 +2929,7 @@ export class Aether<
             copyPlans: new Set(),
             itemPlanId,
             groupId,
-            polymorphicPlanId,
+            polymorphicPlanIds,
             polymorphicTypeNames,
           };
           this.buckets[newBucket.id] = newBucket;
@@ -2969,7 +2965,7 @@ export class Aether<
             copyPlans: new Set(),
             itemPlanId,
             groupId,
-            polymorphicPlanId,
+            polymorphicPlanIds,
             polymorphicTypeNames,
           };
           this.buckets[newBucket.id] = newBucket;
@@ -2981,7 +2977,7 @@ export class Aether<
 
       // Plans that are in a new group (and don't have a bucket already due to being __ItemPlans) get their own bucket
       if (groupId !== undefined) {
-        const groupKey = `${groupId}|${polymorphicPlanId ?? ""}|${
+        const groupKey = `${groupId}|${polymorphicPlanIds ?? ""}|${
           polymorphicTypeNames?.join(",") ?? ""
         }`;
         if (bucketByGroupKey[groupKey]) {
@@ -3012,7 +3008,7 @@ export class Aether<
             children: [],
             copyPlans: new Set(dependencyPlans),
             groupId,
-            polymorphicPlanId,
+            polymorphicPlanIds,
             polymorphicTypeNames,
           };
           bucketByGroupKey[groupKey] = newBucket;
@@ -3024,13 +3020,19 @@ export class Aether<
       }
 
       // The "planForType" from polymorphic plans get their own buckets
-      if (polymorphicPlanId !== undefined) {
+      if (polymorphicPlanIds !== undefined) {
         const parent = parents.length === 0 ? this.rootBucket : parents[0];
-        const polymorphicPlan = this.plans[polymorphicPlanId];
-        const rootPathIdentities = pathIdentitiesByPlanId[polymorphicPlan.id];
+        const polymorphicPlans = polymorphicPlanIds.map((id) => this.plans[id]);
+        const rootPathIdentities = [
+          ...new Set(
+            polymorphicPlans.flatMap(
+              (polymorphicPlan) => pathIdentitiesByPlanId[polymorphicPlan.id],
+            ),
+          ),
+        ];
         if (!rootPathIdentities || rootPathIdentities.length === 0) {
           throw new Error(
-            `Planning issue - polymorphic plans must be associated with one or more path identities, however ${polymorphicPlan} is not.`,
+            `Planning issue - polymorphic plans must be associated with one or more path identities, however ${polymorphicPlans} are not.`,
           );
         }
         const newBucket: BucketDefinition = {
@@ -3042,7 +3044,7 @@ export class Aether<
           children: [],
           copyPlans: new Set(dependencyPlans),
           groupId,
-          polymorphicPlanId,
+          polymorphicPlanIds,
           polymorphicTypeNames,
         };
         this.buckets[newBucket.id] = newBucket;
@@ -5412,7 +5414,7 @@ export class Aether<
           if (
             bucket.groupId === 0 &&
             bucket.itemPlanId == null &&
-            bucket.polymorphicPlanId == null
+            bucket.polymorphicPlanIds == null
           ) {
             return "root";
           }
@@ -5425,11 +5427,11 @@ export class Aether<
           if (bucket.itemPlanId != null) {
             reasons.push(`item${bucket.itemPlanId}`);
           }
-          if (bucket.polymorphicPlanId != null) {
+          if (bucket.polymorphicPlanIds != null) {
             reasons.push(
-              `polymorphic${
-                bucket.polymorphicPlanId
-              }[${bucket.polymorphicTypeNames!.join("|")}]`,
+              `polymorphic${bucket.polymorphicPlanIds.join(
+                "&",
+              )}[${bucket.polymorphicTypeNames!.join("|")}]`,
             );
           }
           return reasons.join(", ");
