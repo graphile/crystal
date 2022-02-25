@@ -1841,6 +1841,26 @@ export class Aether<
         assertPolymorphicPlan(plan, pathIdentity);
         const polymorphicPlan = plan;
         const fieldDigestsSet = new Set<FieldDigest>();
+
+        const fieldGroupIds = [
+          ...new Set(groupedSubSelections.map((s) => s.groupId)),
+        ];
+        const polyGroupIdByFieldGroupId: {
+          [fieldGroupId: number]: number;
+        } = fieldGroupIds.reduce((memo, fieldGroupId) => {
+          const parent = this.groups[fieldGroupId];
+          memo[fieldGroupId] = this.addGroup({
+            parent,
+            parentPlanId: plan.id,
+            reason: "polymorphic",
+          });
+          return memo;
+        }, Object.create(null));
+        const polyGroupedSubSelections = groupedSubSelections.map((s) => ({
+          groupId: polyGroupIdByFieldGroupId[s.groupId],
+          selections: s.selections,
+        }));
+
         const planPossibleObjectTypes = (
           possibleObjectTypes: readonly GraphQLObjectType[],
         ): void => {
@@ -1867,27 +1887,6 @@ export class Aether<
               possibleObjectType.name
             ] = {};
 
-            const fieldGroupIds = [
-              ...new Set(groupedSubSelections.map((s) => s.groupId)),
-            ];
-            const polyGroupIdByFieldGroupId: {
-              [fieldGroupId: number]: number;
-            } = fieldGroupIds.reduce((memo, fieldGroupId) => {
-              const parent = this.groups[fieldGroupId];
-              memo[fieldGroupId] = this.addGroup({
-                parent,
-                parentPlanId: plan.id,
-                reason: "polymorphic",
-                typeName: possibleObjectType.name,
-              });
-              return memo;
-            }, Object.create(null));
-
-            const polyGroupedSubSelections = groupedSubSelections.map((s) => ({
-              groupId: polyGroupIdByFieldGroupId[s.groupId],
-              selections: s.selections,
-            }));
-
             const { fieldDigests: localFieldDigests } = this.planSelectionSet(
               pathIdentity,
               fieldPathIdentity,
@@ -1904,7 +1903,7 @@ export class Aether<
         };
         if (fieldType instanceof GraphQLUnionType) {
           const unionType = fieldType as GraphQLUnionType;
-          const subSelections = groupedSubSelections.flatMap(
+          const subSelections = polyGroupedSubSelections.flatMap(
             (s) => s.selections,
           );
           const possibleObjectTypes = typesUsedInSelections(
@@ -1925,7 +1924,7 @@ export class Aether<
           // we only need to plan the reachable types.
           const implementations =
             this.schema.getImplementations(interfaceType).objects;
-          const subSelections = groupedSubSelections.flatMap(
+          const subSelections = polyGroupedSubSelections.flatMap(
             (s) => s.selections,
           );
           if (
