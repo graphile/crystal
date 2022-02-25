@@ -2747,7 +2747,7 @@ export class Aether<
     });
   }
 
-  private assignBucketIds() {
+  private getPathIdentitiesByPlanId() {
     const pathIdentitiesByPlanId: {
       [planId: string]: string[];
     } = Object.create(null);
@@ -2770,6 +2770,11 @@ export class Aether<
     for (const list of Object.values(pathIdentitiesByPlanId)) {
       list.sort((a, z) => a.length - z.length);
     }
+    return pathIdentitiesByPlanId;
+  }
+
+  private assignBucketIds() {
+    const pathIdentitiesByPlanId = this.getPathIdentitiesByPlanId();
 
     // See description of BucketDefinition for fuller explanation of this algorithm
     const bucketByGroupKey: {
@@ -5178,6 +5183,8 @@ export class Aether<
   }: {
     printPathRelations?: boolean;
   } = {}): string {
+    const pathIdentitiesByPlanId = this.getPathIdentitiesByPlanId();
+
     const color = (i: number) => {
       return COLORS[i % COLORS.length];
     };
@@ -5258,6 +5265,7 @@ export class Aether<
       return planIdMap[plan.id];
     };
 
+    /*
     graph.push("    %% subgraph fields");
     {
       const recurse = (parent: FieldDigest) => {
@@ -5271,17 +5279,20 @@ export class Aether<
           for (const child of parent.childFieldDigests) {
             recurse(child);
             const childId = pathId(child.pathIdentity);
-            graph.push(
-              `    ${
-                printPathRelations ? "" : "%% "
-              }${parentId} -.-> ${childId}`,
-            );
+            if (printPathRelations) {
+              graph.push(
+                `    ${
+                  printPathRelations ? "" : "%% "
+                }${parentId} -.-> ${childId}`,
+              );
+            }
           }
         }
       };
       recurse(this.rootFieldDigest!);
     }
     graph.push("    %% end");
+    */
 
     graph.push("");
     graph.push("    %% define plans");
@@ -5325,6 +5336,32 @@ export class Aether<
     graph.push("");
     graph.push("    %% plan-to-path relationships");
     {
+      let pathNodeCounter = 0;
+      for (const [pathPlanId, pathIdentities] of Object.entries(
+        pathIdentitiesByPlanId,
+      )) {
+        const crystalPathIdentities = pathIdentities.reduce(
+          (memo, pathIdentity) => {
+            const crystalPathIdentity = crystalPrintPathIdentity(pathIdentity);
+            if (!memo[crystalPathIdentity]) {
+              memo[crystalPathIdentity] = 0;
+            }
+            memo[crystalPathIdentity]++;
+            return memo;
+          },
+          {} as { [crystalPrintPathIdentity: string]: number },
+        );
+        const text = Object.entries(crystalPathIdentities)
+          .sort((a, z) => z[1] - a[1])
+          .map(([id, count]) => `${id}${count > 1 ? ` x${count}` : ""}`)
+          .join("\n");
+        const pathNode = `P${++pathNodeCounter}`;
+        graph.push(`    ${pathNode}[${dotEscape(text)}]`);
+        graph.push(`    ${planId(this.plans[pathPlanId])} -.-> ${pathNode}`);
+      }
+    }
+    /*
+    {
       const recurse = (parent: FieldDigest) => {
         const parentId = pathId(parent.pathIdentity);
         graph.push(`    ${planId(this.plans[parent.planId])} -.-> ${parentId}`);
@@ -5342,6 +5379,7 @@ export class Aether<
       };
       recurse(this.rootFieldDigest!);
     }
+    */
 
     graph.push("");
     graph.push("    %% allocate buckets");
