@@ -191,28 +191,28 @@ graph TD
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_11)<br />>people[]"):::bucket
+    Bucket1("Bucket 1 (item_11)<br />~>Query.people[]"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_20)"):::bucket
     style Bucket2 stroke:#808000
     Bucket1 --> Bucket2
-    Bucket3("Bucket 3 (item_22)<br />>people[]>items[]"):::bucket
+    Bucket3("Bucket 3 (item_22)<br />~>Query.people[]>Person.items[]"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket1 --> Bucket3
-    Bucket4("Bucket 4 (polymorphic_25[RelationalTopic])<br />>people[]>items[]"):::bucket
+    Bucket4("Bucket 4 (polymorphic_25[RelationalTopic])<br />~>Query.people[]>Person.items[]"):::bucket
     style Bucket4 stroke:#7f007f
     Bucket3 --> Bucket4
-    Bucket5("Bucket 5 (polymorphic_25[RelationalPost])<br />>people[]>items[]"):::bucket
+    Bucket5("Bucket 5 (polymorphic_25[RelationalPost])<br />~>Query.people[]>Person.items[]"):::bucket
     style Bucket5 stroke:#ff0000
     Bucket3 --> Bucket5
-    Bucket6("Bucket 6 (polymorphic_25[RelationalDivider])<br />>people[]>items[]"):::bucket
+    Bucket6("Bucket 6 (polymorphic_25[RelationalDivider])<br />~>Query.people[]>Person.items[]"):::bucket
     style Bucket6 stroke:#ffa500
     Bucket3 --> Bucket6
-    Bucket7("Bucket 7 (polymorphic_25[RelationalChecklist])<br />>people[]>items[]"):::bucket
+    Bucket7("Bucket 7 (polymorphic_25[RelationalChecklist])<br />~>Query.people[]>Person.items[]"):::bucket
     style Bucket7 stroke:#ffff00
     Bucket3 --> Bucket7
-    Bucket8("Bucket 8 (polymorphic_25[RelationalChecklistItem])<br />>people[]>items[]"):::bucket
+    Bucket8("Bucket 8 (polymorphic_25[RelationalChecklistItem])<br />~>Query.people[]>Person.items[]"):::bucket
     style Bucket8 stroke:#7fff00
     Bucket3 --> Bucket8
     end

@@ -132,10 +132,10 @@ graph TD
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_21)<br />>forums[]"):::bucket
+    Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (group1[defer])<br />>forums[]"):::bucket
+    Bucket2("Bucket 2 (group1[defer])<br />~>Query.forums[]"):::bucket
     style Bucket2 stroke:#808000
     Bucket1 --> Bucket2
     Bucket3("Bucket 3 (item_32)"):::bucket
@@ -147,13 +147,13 @@ graph TD
     Bucket5("Bucket 5 (item_41)"):::bucket
     style Bucket5 stroke:#ff0000
     Bucket2 --> Bucket5
-    Bucket6("Bucket 6 (item_42)<br />>forums[]>messagesWithManyTransforms[]"):::bucket
+    Bucket6("Bucket 6 (item_42)<br />~>Query.forums[]>Forum.messagesWithManyTransforms[]"):::bucket
     style Bucket6 stroke:#ffa500
     Bucket2 --> Bucket6
     Bucket7("Bucket 7 (item_44)"):::bucket
     style Bucket7 stroke:#ffff00
     Bucket6 --> Bucket7
-    Bucket8("Bucket 8 (item_45)<br />>forums[]>messagesWithManyTransforms[][]"):::bucket
+    Bucket8("Bucket 8 (item_45)<br />~>Query.forums[]>Forum.messagesWithManyTransforms[][]"):::bucket
     style Bucket8 stroke:#7fff00
     Bucket6 --> Bucket8
     end

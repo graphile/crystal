@@ -31,14 +31,6 @@ graph TD
     PgSelectSingle_34["PgSelectSingle[_34∈2]<br /><people>"]:::plan
     PgClassExpression_35["PgClassExpression[_35∈2]<br /><__people__.”username”>"]:::plan
     PgClassExpression_72["PgClassExpression[_72∈1]<br /><__single_t...ems__.”id”>"]:::plan
-    Lambda_81["Lambda[_81∈2]"]:::plan
-    PgSingleTablePolymorphic_82["PgSingleTablePolymorphic[_82∈2]"]:::plan
-    Lambda_137["Lambda[_137∈2]"]:::plan
-    PgSingleTablePolymorphic_138["PgSingleTablePolymorphic[_138∈2]"]:::plan
-    Lambda_193["Lambda[_193∈2]"]:::plan
-    PgSingleTablePolymorphic_194["PgSingleTablePolymorphic[_194∈2]"]:::plan
-    Lambda_249["Lambda[_249∈2]"]:::plan
-    PgSingleTablePolymorphic_250["PgSingleTablePolymorphic[_250∈2]"]:::plan
     Access_290["Access[_290∈0]<br /><_3.pgSettings>"]:::plan
     Access_291["Access[_291∈0]<br /><_3.withPgClient>"]:::plan
     Object_292["Object[_292∈0]<br /><{pgSettings,withPgClient}>"]:::plan
@@ -69,18 +61,6 @@ graph TD
     First_33 --> PgSelectSingle_34
     PgSelectSingle_34 --> PgClassExpression_35
     PgSelectSingle_13 --> PgClassExpression_72
-    PgClassExpression_24 --> Lambda_81
-    Lambda_81 --> PgSingleTablePolymorphic_82
-    PgSelectSingle_23 --> PgSingleTablePolymorphic_82
-    PgClassExpression_24 --> Lambda_137
-    Lambda_137 --> PgSingleTablePolymorphic_138
-    PgSelectSingle_23 --> PgSingleTablePolymorphic_138
-    PgClassExpression_24 --> Lambda_193
-    Lambda_193 --> PgSingleTablePolymorphic_194
-    PgSelectSingle_23 --> PgSingleTablePolymorphic_194
-    PgClassExpression_24 --> Lambda_249
-    Lambda_249 --> PgSingleTablePolymorphic_250
-    PgSelectSingle_23 --> PgSingleTablePolymorphic_250
     __Value_3 --> Access_290
     __Value_3 --> Access_291
     Access_290 --> Object_292
@@ -91,7 +71,7 @@ graph TD
     __TrackedObject_6 -.-> P1
     P2[">item"]
     PgSingleTablePolymorphic_16 -.-> P2
-    P3[">item>parent"]
+    P3[">item>parent x5"]
     PgSingleTablePolymorphic_26 -.-> P3
     P4[">item>p…t>id x25"]
     PgClassExpression_17 -.-> P4
@@ -101,14 +81,6 @@ graph TD
     PgClassExpression_35 -.-> P6
     P7[">item>id x5"]
     PgClassExpression_72 -.-> P7
-    P8[">item>parent"]
-    PgSingleTablePolymorphic_82 -.-> P8
-    P9[">item>parent"]
-    PgSingleTablePolymorphic_138 -.-> P9
-    P10[">item>parent"]
-    PgSingleTablePolymorphic_194 -.-> P10
-    P11[">item>parent"]
-    PgSingleTablePolymorphic_250 -.-> P11
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
@@ -116,15 +88,15 @@ graph TD
     classDef bucket1 stroke:#a52a2a
     class PgSelectSingle_13,PgClassExpression_14,Lambda_15,PgSingleTablePolymorphic_16,PgClassExpression_17,PgSelect_18,First_22,PgClassExpression_72 bucket1
     classDef bucket2 stroke:#808000
-    class PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26,PgClassExpression_28,PgSelect_29,First_33,PgSelectSingle_34,PgClassExpression_35,Lambda_81,PgSingleTablePolymorphic_82,Lambda_137,PgSingleTablePolymorphic_138,Lambda_193,PgSingleTablePolymorphic_194,Lambda_249,PgSingleTablePolymorphic_250 bucket2
+    class PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26,PgClassExpression_28,PgSelect_29,First_33,PgSelectSingle_34,PgClassExpression_35 bucket2
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (polymorphic_16[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />>item"):::bucket
+    Bucket1("Bucket 1 (polymorphic_16[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />~>Query.item"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (polymorphic_26[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />>item>parent"):::bucket
+    Bucket2("Bucket 2 (polymorphic_26[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />~>Query.item>SingleTablePost.parent<br />~>Query.item>SingleTableTopic.parent<br />~>Query.item>SingleTableDivider.parent<br />~>Query.item>SingleTableChecklist.parent<br />~>Query.item>SingleTableChecklistItem.parent"):::bucket
     style Bucket2 stroke:#808000
     Bucket1 --> Bucket2
     end

@@ -139,10 +139,10 @@ graph TD
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_21)<br />>forums[]"):::bucket
+    Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (item_40)<br />>forums[]>messa…ction>nodes[]"):::bucket
+    Bucket2("Bucket 2 (item_40)<br />~>Query.forums[]>Forum.messagesConnection>MessagesConnection.nodes[]"):::bucket
     style Bucket2 stroke:#808000
     Bucket1 --> Bucket2
     end

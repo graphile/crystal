@@ -153,16 +153,16 @@ graph TD
     Bucket1("Bucket 1 (item_13)"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (item_15)<br />>allRelationalCommentablesList[]"):::bucket
+    Bucket2("Bucket 2 (item_15)<br />~>Query.allRelationalCommentablesList[]"):::bucket
     style Bucket2 stroke:#808000
     Bucket0 --> Bucket2
-    Bucket3("Bucket 3 (polymorphic_18[RelationalPost])<br />>allRelationalCommentablesList[]"):::bucket
+    Bucket3("Bucket 3 (polymorphic_18[RelationalPost])<br />~>Query.allRelationalCommentablesList[]"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket2 --> Bucket3
-    Bucket4("Bucket 4 (polymorphic_18[RelationalChecklist])<br />>allRelationalCommentablesList[]"):::bucket
+    Bucket4("Bucket 4 (polymorphic_18[RelationalChecklist])<br />~>Query.allRelationalCommentablesList[]"):::bucket
     style Bucket4 stroke:#7f007f
     Bucket2 --> Bucket4
-    Bucket5("Bucket 5 (polymorphic_18[RelationalChecklistItem])<br />>allRelationalCommentablesList[]"):::bucket
+    Bucket5("Bucket 5 (polymorphic_18[RelationalChecklistItem])<br />~>Query.allRelationalCommentablesList[]"):::bucket
     style Bucket5 stroke:#ff0000
     Bucket2 --> Bucket5
     end

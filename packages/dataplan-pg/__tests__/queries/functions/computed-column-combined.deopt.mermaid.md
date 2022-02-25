@@ -106,7 +106,7 @@ graph TD
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_44)<br />>forum>randomUser>mostR…Forum>featuredMessages[]"):::bucket
+    Bucket1("Bucket 1 (item_44)<br />~>Query.forum>Forum.randomUser>User.mostRecentForum>Forum.featuredMessages[]"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
     end

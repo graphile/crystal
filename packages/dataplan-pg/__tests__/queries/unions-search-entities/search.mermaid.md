@@ -174,16 +174,16 @@ graph TD
     Bucket1("Bucket 1 (item_13)"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (item_15)<br />>searchEntities[]"):::bucket
+    Bucket2("Bucket 2 (item_15)<br />~>Query.searchEntities[]"):::bucket
     style Bucket2 stroke:#808000
     Bucket0 --> Bucket2
-    Bucket3("Bucket 3 (polymorphic_21[Person])<br />>searchEntities[]"):::bucket
+    Bucket3("Bucket 3 (polymorphic_21[Person])<br />~>Query.searchEntities[]"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket2 --> Bucket3
-    Bucket4("Bucket 4 (polymorphic_21[Post])<br />>searchEntities[]"):::bucket
+    Bucket4("Bucket 4 (polymorphic_21[Post])<br />~>Query.searchEntities[]"):::bucket
     style Bucket4 stroke:#7f007f
     Bucket2 --> Bucket4
-    Bucket5("Bucket 5 (polymorphic_21[Comment])<br />>searchEntities[]"):::bucket
+    Bucket5("Bucket 5 (polymorphic_21[Comment])<br />~>Query.searchEntities[]"):::bucket
     style Bucket5 stroke:#ff0000
     Bucket2 --> Bucket5
     end

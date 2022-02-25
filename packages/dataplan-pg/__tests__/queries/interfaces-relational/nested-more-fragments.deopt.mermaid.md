@@ -348,43 +348,43 @@ graph TD
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_11)<br />>people[]"):::bucket
+    Bucket1("Bucket 1 (item_11)<br />~>Query.people[]"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_20)"):::bucket
     style Bucket2 stroke:#808000
     Bucket1 --> Bucket2
-    Bucket3("Bucket 3 (item_22)<br />>people[]>items[]"):::bucket
+    Bucket3("Bucket 3 (item_22)<br />~>Query.people[]>Person.items[]"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket1 --> Bucket3
-    Bucket4("Bucket 4 (polymorphic_25[RelationalTopic])<br />>people[]>items[]"):::bucket
+    Bucket4("Bucket 4 (polymorphic_25[RelationalTopic])<br />~>Query.people[]>Person.items[]"):::bucket
     style Bucket4 stroke:#7f007f
     Bucket3 --> Bucket4
-    Bucket5("Bucket 5 (polymorphic_41[RelationalTopic])<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent"):::bucket
+    Bucket5("Bucket 5 (polymorphic_41[RelationalTopic])<br />~>Query.people[]>Person.items[]>RelationalPost.parent<br />~>Query.people[]>Person.items[]>RelationalTopic.parent<br />~>Query.people[]>Person.items[]>RelationalDivider.parent<br />~>Query.people[]>Person.items[]>RelationalChecklist.parent<br />~>Query.people[]>Person.items[]>RelationalChecklistItem.parent"):::bucket
     style Bucket5 stroke:#ff0000
     Bucket3 --> Bucket5
-    Bucket6("Bucket 6 (polymorphic_41[RelationalPost])<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent"):::bucket
+    Bucket6("Bucket 6 (polymorphic_41[RelationalPost])<br />~>Query.people[]>Person.items[]>RelationalPost.parent<br />~>Query.people[]>Person.items[]>RelationalTopic.parent<br />~>Query.people[]>Person.items[]>RelationalDivider.parent<br />~>Query.people[]>Person.items[]>RelationalChecklist.parent<br />~>Query.people[]>Person.items[]>RelationalChecklistItem.parent"):::bucket
     style Bucket6 stroke:#ffa500
     Bucket3 --> Bucket6
-    Bucket7("Bucket 7 (polymorphic_41[RelationalDivider])<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent"):::bucket
+    Bucket7("Bucket 7 (polymorphic_41[RelationalDivider])<br />~>Query.people[]>Person.items[]>RelationalPost.parent<br />~>Query.people[]>Person.items[]>RelationalTopic.parent<br />~>Query.people[]>Person.items[]>RelationalDivider.parent<br />~>Query.people[]>Person.items[]>RelationalChecklist.parent<br />~>Query.people[]>Person.items[]>RelationalChecklistItem.parent"):::bucket
     style Bucket7 stroke:#ffff00
     Bucket3 --> Bucket7
-    Bucket8("Bucket 8 (polymorphic_41[RelationalChecklist])<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent"):::bucket
+    Bucket8("Bucket 8 (polymorphic_41[RelationalChecklist])<br />~>Query.people[]>Person.items[]>RelationalPost.parent<br />~>Query.people[]>Person.items[]>RelationalTopic.parent<br />~>Query.people[]>Person.items[]>RelationalDivider.parent<br />~>Query.people[]>Person.items[]>RelationalChecklist.parent<br />~>Query.people[]>Person.items[]>RelationalChecklistItem.parent"):::bucket
     style Bucket8 stroke:#7fff00
     Bucket3 --> Bucket8
-    Bucket9("Bucket 9 (polymorphic_41[RelationalChecklistItem])<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent"):::bucket
+    Bucket9("Bucket 9 (polymorphic_41[RelationalChecklistItem])<br />~>Query.people[]>Person.items[]>RelationalPost.parent<br />~>Query.people[]>Person.items[]>RelationalTopic.parent<br />~>Query.people[]>Person.items[]>RelationalDivider.parent<br />~>Query.people[]>Person.items[]>RelationalChecklist.parent<br />~>Query.people[]>Person.items[]>RelationalChecklistItem.parent"):::bucket
     style Bucket9 stroke:#4169e1
     Bucket3 --> Bucket9
-    Bucket10("Bucket 10 (polymorphic_25[RelationalPost])<br />>people[]>items[]"):::bucket
+    Bucket10("Bucket 10 (polymorphic_25[RelationalPost])<br />~>Query.people[]>Person.items[]"):::bucket
     style Bucket10 stroke:#00ffff
     Bucket3 --> Bucket10
-    Bucket11("Bucket 11 (polymorphic_25[RelationalDivider])<br />>people[]>items[]"):::bucket
+    Bucket11("Bucket 11 (polymorphic_25[RelationalDivider])<br />~>Query.people[]>Person.items[]"):::bucket
     style Bucket11 stroke:#00bfff
     Bucket3 --> Bucket11
-    Bucket12("Bucket 12 (polymorphic_25[RelationalChecklist])<br />>people[]>items[]"):::bucket
+    Bucket12("Bucket 12 (polymorphic_25[RelationalChecklist])<br />~>Query.people[]>Person.items[]"):::bucket
     style Bucket12 stroke:#0000ff
     Bucket3 --> Bucket12
-    Bucket13("Bucket 13 (polymorphic_25[RelationalChecklistItem])<br />>people[]>items[]"):::bucket
+    Bucket13("Bucket 13 (polymorphic_25[RelationalChecklistItem])<br />~>Query.people[]>Person.items[]"):::bucket
     style Bucket13 stroke:#ff00ff
     Bucket3 --> Bucket13
     end

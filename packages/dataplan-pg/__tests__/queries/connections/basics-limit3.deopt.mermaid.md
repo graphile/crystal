@@ -131,7 +131,7 @@ graph TD
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_26)<br />>allMe…ction>edges[]"):::bucket
+    Bucket1("Bucket 1 (item_26)<br />~>Query.allMessagesConnection>MessagesConnection.edges[]"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
     end

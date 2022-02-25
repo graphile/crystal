@@ -65,7 +65,7 @@ graph TD
     Bucket1("Bucket 1 (item_12)"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (item_15)<br />>FORUM_NAMES[]"):::bucket
+    Bucket2("Bucket 2 (item_15)<br />~>Query.FORUM_NAMES[]"):::bucket
     style Bucket2 stroke:#808000
     Bucket0 --> Bucket2
     end

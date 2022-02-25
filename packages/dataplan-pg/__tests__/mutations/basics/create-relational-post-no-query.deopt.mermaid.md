@@ -350,25 +350,25 @@ graph TD
     Bucket2("Bucket 2 (group2[mutation])<br />~"):::bucket
     style Bucket2 stroke:#808000
     Bucket0 --> Bucket2
-    Bucket3("Bucket 3 (polymorphic_47[RelationalPost])<br />>p2>query>i1"):::bucket
+    Bucket3("Bucket 3 (polymorphic_47[RelationalPost])<br />~>Mutation.p2>CreateRelationalPostPayload.query>Query.i1"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket2 --> Bucket3
-    Bucket4("Bucket 4 (polymorphic_99[RelationalPost])<br />>p2>query>i2"):::bucket
+    Bucket4("Bucket 4 (polymorphic_99[RelationalPost])<br />~>Mutation.p2>CreateRelationalPostPayload.query>Query.i2"):::bucket
     style Bucket4 stroke:#7f007f
     Bucket2 --> Bucket4
-    Bucket5("Bucket 5 (polymorphic_151[RelationalPost])<br />>p2>query>i3"):::bucket
+    Bucket5("Bucket 5 (polymorphic_151[RelationalPost])<br />~>Mutation.p2>CreateRelationalPostPayload.query>Query.i3"):::bucket
     style Bucket5 stroke:#ff0000
     Bucket2 --> Bucket5
     Bucket6("Bucket 6 (group3[mutation])<br />~"):::bucket
     style Bucket6 stroke:#ffa500
     Bucket0 --> Bucket6
-    Bucket7("Bucket 7 (polymorphic_219[RelationalPost])<br />>p3>query>i1"):::bucket
+    Bucket7("Bucket 7 (polymorphic_219[RelationalPost])<br />~>Mutation.p3>CreateRelationalPostPayload.query>Query.i1"):::bucket
     style Bucket7 stroke:#ffff00
     Bucket6 --> Bucket7
-    Bucket8("Bucket 8 (polymorphic_271[RelationalPost])<br />>p3>query>i2"):::bucket
+    Bucket8("Bucket 8 (polymorphic_271[RelationalPost])<br />~>Mutation.p3>CreateRelationalPostPayload.query>Query.i2"):::bucket
     style Bucket8 stroke:#7fff00
     Bucket6 --> Bucket8
-    Bucket9("Bucket 9 (polymorphic_323[RelationalPost])<br />>p3>query>i3"):::bucket
+    Bucket9("Bucket 9 (polymorphic_323[RelationalPost])<br />~>Mutation.p3>CreateRelationalPostPayload.query>Query.i3"):::bucket
     style Bucket9 stroke:#4169e1
     Bucket6 --> Bucket9
     end
