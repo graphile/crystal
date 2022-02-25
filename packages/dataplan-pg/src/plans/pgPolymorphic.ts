@@ -4,7 +4,12 @@ import type {
   PolymorphicData,
   PolymorphicPlan,
 } from "graphile-crystal";
-import { ExecutablePlan, isDev, polymorphicWrap } from "graphile-crystal";
+import {
+  arraysMatch,
+  ExecutablePlan,
+  isDev,
+  polymorphicWrap,
+} from "graphile-crystal";
 import type { GraphQLObjectType } from "graphql";
 import { inspect } from "util";
 
@@ -13,18 +18,23 @@ import type { PgTypeCodec } from "../interfaces";
 import type { PgClassExpressionPlan } from "./pgClassExpression";
 import type { PgSelectSinglePlan } from "./pgSelectSingle";
 
-interface PgPolymorphicTypeMap<
+export interface PgPolymorphicTypeMap<
+  TItemPlan extends
+    | PgSelectSinglePlan<any, any, any, any>
+    | PgClassExpressionPlan<any, any, any, any, any, any>,
   TTypeSpecifier,
-  TTypeSpecifierPlan extends ExecutablePlan<TTypeSpecifier>,
+  TTypeSpecifierPlan extends ExecutablePlan<TTypeSpecifier> = ExecutablePlan<TTypeSpecifier>,
 > {
   [typeName: string]: {
     match(specifier: TTypeSpecifier): boolean;
-    plan($specifier: TTypeSpecifierPlan): ExecutablePlan<any>;
+    plan($specifier: TTypeSpecifierPlan, $item: TItemPlan): ExecutablePlan<any>;
   };
 }
 
 export class PgPolymorphicPlan<
-    TCodec extends PgTypeCodec<any, any, any>,
+    TItemPlan extends
+      | PgSelectSinglePlan<any, any, any, any>
+      | PgClassExpressionPlan<any, any, any, any, any, any>,
     TTypeSpecifier,
     TTypeSpecifierPlan extends ExecutablePlan<TTypeSpecifier> = ExecutablePlan<TTypeSpecifier>,
   >
@@ -42,18 +52,10 @@ export class PgPolymorphicPlan<
   private types: string[];
 
   constructor(
-    $itemPlan:
-      | PgSelectSinglePlan<TCodec["columns"], any, any, any>
-      | PgClassExpressionPlan<
-          TCodec["columns"],
-          TCodec,
-          TCodec["columns"],
-          any,
-          any,
-          any
-        >,
+    $itemPlan: TItemPlan,
     $typeSpecifierPlan: TTypeSpecifierPlan,
     private possibleTypes: PgPolymorphicTypeMap<
+      TItemPlan,
       TTypeSpecifier,
       TTypeSpecifierPlan
     >,
@@ -62,6 +64,11 @@ export class PgPolymorphicPlan<
     this.itemPlanId = this.addDependency($itemPlan);
     this.typeSpecifierPlanId = this.addDependency($typeSpecifierPlan);
     this.types = Object.keys(possibleTypes);
+  }
+
+  itemPlan(): TItemPlan {
+    const plan = this.getPlan(this.dependencies[this.itemPlanId]);
+    return plan as any;
   }
 
   typeSpecifierPlan(): TTypeSpecifierPlan {
@@ -82,7 +89,7 @@ export class PgPolymorphicPlan<
         ).join("', '")}'`,
       );
     }
-    return spec.plan(this.typeSpecifierPlan());
+    return spec.plan(this.typeSpecifierPlan(), this.itemPlan());
   }
 
   private getTypeNameFromSpecifier(specifier: TTypeSpecifier) {
@@ -120,18 +127,21 @@ export class PgPolymorphicPlan<
 }
 
 export function pgPolymorphic<
-  TColumns extends PgSourceColumns,
-  TCodec extends PgTypeCodec<TColumns, any, any>,
+  TItemPlan extends
+    | PgSelectSinglePlan<any, any, any, any>
+    | PgClassExpressionPlan<any, any, any, any, any, any>,
   TTypeSpecifier = any,
   TTypeSpecifierPlan extends ExecutablePlan<TTypeSpecifier> = ExecutablePlan<TTypeSpecifier>,
 >(
-  $itemPlan:
-    | PgSelectSinglePlan<TColumns, any, any, any>
-    | PgClassExpressionPlan<TColumns, TCodec, TColumns, any, any, any>,
+  $itemPlan: TItemPlan,
   $typeSpecifierPlan: TTypeSpecifierPlan,
-  possibleTypes: PgPolymorphicTypeMap<TTypeSpecifier, TTypeSpecifierPlan>,
-): PgPolymorphicPlan<TCodec, TTypeSpecifier, TTypeSpecifierPlan> {
-  return new PgPolymorphicPlan<TCodec, TTypeSpecifier, TTypeSpecifierPlan>(
+  possibleTypes: PgPolymorphicTypeMap<
+    TItemPlan,
+    TTypeSpecifier,
+    TTypeSpecifierPlan
+  >,
+): PgPolymorphicPlan<TItemPlan, TTypeSpecifier, TTypeSpecifierPlan> {
+  return new PgPolymorphicPlan<TItemPlan, TTypeSpecifier, TTypeSpecifierPlan>(
     $itemPlan,
     $typeSpecifierPlan,
     possibleTypes,
