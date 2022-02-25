@@ -3121,7 +3121,7 @@ export function makeExampleSchema(
                     author_id: $personId,
                   });
                 deoptimizeIfAppropriate($items);
-                return each($items, ($item) => singleTableItemInterface($item));
+                return each($items, singleTableItemInterface);
               },
             [
               deoptimizeIfAppropriate,

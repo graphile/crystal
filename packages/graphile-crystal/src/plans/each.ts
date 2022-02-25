@@ -8,6 +8,32 @@ import type { __ItemPlan } from "./__item";
 import type { __ListTransformPlan } from "./listTransform";
 import { listTransform } from "./listTransform";
 
+const eachReduceCallback = (memo: any[], item: any) => {
+  memo.push(item);
+  return memo;
+};
+const eachItemPlanCallback = (itemPlan: ExecutablePlan) => itemPlan;
+const eachInitialState = () => [] as any;
+
+const outerCache = new WeakMap<any, WeakMap<any, any>>();
+const eachCallbackForListPlan = (
+  listPlan: ListCapablePlan<any>,
+  mapper: any,
+): any => {
+  let innerCache = outerCache.get(listPlan);
+  if (!innerCache) {
+    innerCache = new WeakMap();
+    outerCache.set(listPlan, innerCache);
+  }
+  let result = innerCache.get(mapper);
+  if (!result) {
+    result = (itemPlan: any) =>
+      mapper(listPlan.listItem(itemPlan as any) as any);
+    innerCache.set(mapper, result);
+  }
+  return result;
+};
+
 export function each<
   TListPlan extends ExecutablePlan<readonly any[]>,
   TResultItemPlan extends ExecutablePlan<any>,
@@ -26,14 +52,11 @@ export function each<
   const namedType = getNamedType(currentGraphQLType);
   return listTransform<any, any, any, any>({
     listPlan,
-    itemPlanCallback: (itemPlan) => itemPlan,
-    initialState: () => [] as any,
-    reduceCallback: (memo, item) => {
-      memo.push(item);
-      return memo;
-    },
+    itemPlanCallback: eachItemPlanCallback,
+    initialState: eachInitialState,
+    reduceCallback: eachReduceCallback,
     listItem: isListCapablePlan(listPlan)
-      ? (itemPlan) => mapper(listPlan.listItem(itemPlan as any) as any)
+      ? eachCallbackForListPlan(listPlan, mapper)
       : mapper,
     namedType,
     meta: `each:${chalk.yellow(listPlan.id)}${
