@@ -1854,9 +1854,15 @@ export class Aether<
                   typeNames: [],
                 };
               }
-              this.polymorphicDetailsByPlanId[subPlan.id].typeNames.push(
-                possibleObjectType.name,
-              );
+              if (
+                !this.polymorphicDetailsByPlanId[subPlan.id].typeNames.includes(
+                  possibleObjectType.name,
+                )
+              ) {
+                this.polymorphicDetailsByPlanId[subPlan.id].typeNames.push(
+                  possibleObjectType.name,
+                );
+              }
             }
 
             this.finalizeArgumentsSince(oldPlansLength, pathIdentity);
