@@ -5436,9 +5436,11 @@ export class Aether<
         })();
         graph.push(
           `    Bucket${bucket.id}(${dotEscape(
-            `Bucket ${bucket.id} (${raisonDEtre})\n${bucket.rootPathIdentities
-              .map((pi) => crystalPrintPathIdentity(pi, 5, 5))
-              .join("\n")}\n${Object.entries(bucket.outputMap).map(
+            `Bucket ${
+              bucket.id
+            } (${raisonDEtre})\n${bucket.rootPathIdentities.join(
+              "\n",
+            )}\n${Object.entries(bucket.outputMap).map(
               ([planId, tuples]) => `${planId}: ${JSON.stringify(tuples)}`,
             )}`,
           )}):::bucket`,
