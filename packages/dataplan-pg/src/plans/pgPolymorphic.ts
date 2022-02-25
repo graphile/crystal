@@ -66,6 +66,15 @@ export class PgPolymorphicPlan<
     this.types = Object.keys(possibleTypes);
   }
 
+  deduplicate(
+    peers: PgPolymorphicPlan<any, any, any>[],
+  ): PgPolymorphicPlan<TItemPlan, TTypeSpecifier, TTypeSpecifierPlan> {
+    const identical = peers.find((peer) => {
+      return peer.possibleTypes === this.possibleTypes;
+    }) as any;
+    return identical ?? this;
+  }
+
   itemPlan(): TItemPlan {
     const plan = this.getPlan(this.dependencies[this.itemPlanId]);
     return plan as any;
