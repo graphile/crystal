@@ -168,19 +168,19 @@ graph TD
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (polymorphic_15[UnionTopic])<br />~"):::bucket
+    Bucket1("Bucket 1 (polymorphic_15[UnionTopic])<br />>item18"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (polymorphic_15[UnionPost])<br />~"):::bucket
+    Bucket2("Bucket 2 (polymorphic_15[UnionPost])<br />>item18"):::bucket
     style Bucket2 stroke:#808000
     Bucket0 --> Bucket2
-    Bucket3("Bucket 3 (polymorphic_15[UnionDivider])<br />~"):::bucket
+    Bucket3("Bucket 3 (polymorphic_15[UnionDivider])<br />>item18"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket0 --> Bucket3
-    Bucket4("Bucket 4 (polymorphic_15[UnionChecklist])<br />~"):::bucket
+    Bucket4("Bucket 4 (polymorphic_15[UnionChecklist])<br />>item18"):::bucket
     style Bucket4 stroke:#7f007f
     Bucket0 --> Bucket4
-    Bucket5("Bucket 5 (polymorphic_15[UnionChecklistItem])<br />~"):::bucket
+    Bucket5("Bucket 5 (polymorphic_15[UnionChecklistItem])<br />>item18"):::bucket
     style Bucket5 stroke:#ff0000
     Bucket0 --> Bucket5
     end

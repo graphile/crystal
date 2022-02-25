@@ -241,13 +241,13 @@ graph TD
     Bucket1("Bucket 1 (group1[mutation])<br />~"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (polymorphic_36[RelationalPost])<br />~"):::bucket
+    Bucket2("Bucket 2 (polymorphic_36[RelationalPost])<br />>creat…puted>query>i1"):::bucket
     style Bucket2 stroke:#808000
     Bucket1 --> Bucket2
-    Bucket3("Bucket 3 (polymorphic_88[RelationalPost])<br />~"):::bucket
+    Bucket3("Bucket 3 (polymorphic_88[RelationalPost])<br />>creat…puted>query>i2"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket1 --> Bucket3
-    Bucket4("Bucket 4 (polymorphic_140[RelationalPost])<br />~"):::bucket
+    Bucket4("Bucket 4 (polymorphic_140[RelationalPost])<br />>creat…puted>query>i3"):::bucket
     style Bucket4 stroke:#7f007f
     Bucket1 --> Bucket4
     end

@@ -1368,19 +1368,19 @@ graph TD
     Bucket4("Bucket 4 (polymorphic_25[RelationalTopic])<br />>people[]>items[]"):::bucket
     style Bucket4 stroke:#7f007f
     Bucket3 --> Bucket4
-    Bucket5("Bucket 5 (polymorphic_41[RelationalTopic])<br />>people[]>items[]"):::bucket
+    Bucket5("Bucket 5 (polymorphic_41[RelationalTopic])<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent"):::bucket
     style Bucket5 stroke:#ff0000
     Bucket3 --> Bucket5
-    Bucket6("Bucket 6 (polymorphic_41[RelationalPost])<br />>people[]>items[]"):::bucket
+    Bucket6("Bucket 6 (polymorphic_41[RelationalPost])<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent"):::bucket
     style Bucket6 stroke:#ffa500
     Bucket3 --> Bucket6
-    Bucket7("Bucket 7 (polymorphic_41[RelationalDivider])<br />>people[]>items[]"):::bucket
+    Bucket7("Bucket 7 (polymorphic_41[RelationalDivider])<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent"):::bucket
     style Bucket7 stroke:#ffff00
     Bucket3 --> Bucket7
-    Bucket8("Bucket 8 (polymorphic_41[RelationalChecklist])<br />>people[]>items[]"):::bucket
+    Bucket8("Bucket 8 (polymorphic_41[RelationalChecklist])<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent"):::bucket
     style Bucket8 stroke:#7fff00
     Bucket3 --> Bucket8
-    Bucket9("Bucket 9 (polymorphic_41[RelationalChecklistItem])<br />>people[]>items[]"):::bucket
+    Bucket9("Bucket 9 (polymorphic_41[RelationalChecklistItem])<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent<br />>people[]>items[]>parent"):::bucket
     style Bucket9 stroke:#4169e1
     Bucket3 --> Bucket9
     Bucket10("Bucket 10 (polymorphic_25[RelationalPost])<br />>people[]>items[]"):::bucket
