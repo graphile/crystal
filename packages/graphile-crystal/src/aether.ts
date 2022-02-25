@@ -135,8 +135,13 @@ const dotEscape = (str: string): string => {
   if (str.match(/^[a-z0-9 ]+$/i)) {
     return str;
   }
+  // Technically we should replace with escapes like this:
+  //.replace(/[#"]/g, (l) => ({ "#": "#35;", '"': "#quot;" }[l as any]))
+  // However there's a bug in Mermaid's rendering that causes the node to use
+  // the escaped string as the width for the node rather than the unescaped
+  // string. Thus we replace with similar looking characters.
   return `"${stripAnsi(str.trim())
-    .replace(/[#"]/g, (l) => ({ "#": "#35;", '"': "#quot;" }[l as any]))
+    .replace(/[#"]/g, (l) => ({ "#": "ꖛ", '"': "”" }[l as any]))
     .replace(/\r?\n/g, "<br />")}"`;
 };
 
