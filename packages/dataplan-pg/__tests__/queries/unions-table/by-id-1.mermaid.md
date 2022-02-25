@@ -54,29 +54,29 @@ graph TD
     PgClassExpression_14["PgClassExpression[_14∈0]<br /><__union_items__.#quot;type#quot;>"]:::plan
     PgPolymorphic_15["PgPolymorphic[_15∈0]"]:::plan
     First_21["First[_21∈0]"]:::plan
-    PgSelectSingle_22["PgSelectSingle[_22∈0]<br /><union_topics>"]:::plan
-    PgClassExpression_23["PgClassExpression[_23∈0]<br /><__union_topics__.#quot;id#quot;>"]:::plan
-    PgClassExpression_24["PgClassExpression[_24∈0]<br /><__union_to...__.#quot;title#quot;>"]:::plan
+    PgSelectSingle_22["PgSelectSingle[_22∈1]<br /><union_topics>"]:::plan
+    PgClassExpression_23["PgClassExpression[_23∈1]<br /><__union_topics__.#quot;id#quot;>"]:::plan
+    PgClassExpression_24["PgClassExpression[_24∈1]<br /><__union_to...__.#quot;title#quot;>"]:::plan
     First_30["First[_30∈0]"]:::plan
-    PgSelectSingle_31["PgSelectSingle[_31∈0]<br /><union_posts>"]:::plan
-    PgClassExpression_32["PgClassExpression[_32∈0]<br /><__union_posts__.#quot;id#quot;>"]:::plan
-    PgClassExpression_33["PgClassExpression[_33∈0]<br /><__union_posts__.#quot;title#quot;>"]:::plan
-    PgClassExpression_34["PgClassExpression[_34∈0]<br /><__union_po...scription#quot;>"]:::plan
-    PgClassExpression_35["PgClassExpression[_35∈0]<br /><__union_posts__.#quot;note#quot;>"]:::plan
+    PgSelectSingle_31["PgSelectSingle[_31∈2]<br /><union_posts>"]:::plan
+    PgClassExpression_32["PgClassExpression[_32∈2]<br /><__union_posts__.#quot;id#quot;>"]:::plan
+    PgClassExpression_33["PgClassExpression[_33∈2]<br /><__union_posts__.#quot;title#quot;>"]:::plan
+    PgClassExpression_34["PgClassExpression[_34∈2]<br /><__union_po...scription#quot;>"]:::plan
+    PgClassExpression_35["PgClassExpression[_35∈2]<br /><__union_posts__.#quot;note#quot;>"]:::plan
     First_41["First[_41∈0]"]:::plan
-    PgSelectSingle_42["PgSelectSingle[_42∈0]<br /><union_dividers>"]:::plan
-    PgClassExpression_43["PgClassExpression[_43∈0]<br /><__union_dividers__.#quot;id#quot;>"]:::plan
-    PgClassExpression_44["PgClassExpression[_44∈0]<br /><__union_di...__.#quot;title#quot;>"]:::plan
-    PgClassExpression_45["PgClassExpression[_45∈0]<br /><__union_di...__.#quot;color#quot;>"]:::plan
+    PgSelectSingle_42["PgSelectSingle[_42∈3]<br /><union_dividers>"]:::plan
+    PgClassExpression_43["PgClassExpression[_43∈3]<br /><__union_dividers__.#quot;id#quot;>"]:::plan
+    PgClassExpression_44["PgClassExpression[_44∈3]<br /><__union_di...__.#quot;title#quot;>"]:::plan
+    PgClassExpression_45["PgClassExpression[_45∈3]<br /><__union_di...__.#quot;color#quot;>"]:::plan
     First_51["First[_51∈0]"]:::plan
-    PgSelectSingle_52["PgSelectSingle[_52∈0]<br /><union_checklists>"]:::plan
-    PgClassExpression_53["PgClassExpression[_53∈0]<br /><__union_ch...sts__.#quot;id#quot;>"]:::plan
-    PgClassExpression_54["PgClassExpression[_54∈0]<br /><__union_ch...__.#quot;title#quot;>"]:::plan
+    PgSelectSingle_52["PgSelectSingle[_52∈4]<br /><union_checklists>"]:::plan
+    PgClassExpression_53["PgClassExpression[_53∈4]<br /><__union_ch...sts__.#quot;id#quot;>"]:::plan
+    PgClassExpression_54["PgClassExpression[_54∈4]<br /><__union_ch...__.#quot;title#quot;>"]:::plan
     First_60["First[_60∈0]"]:::plan
-    PgSelectSingle_61["PgSelectSingle[_61∈0]<br /><union_checklist_items>"]:::plan
-    PgClassExpression_62["PgClassExpression[_62∈0]<br /><__union_ch...ems__.#quot;id#quot;>"]:::plan
-    PgClassExpression_63["PgClassExpression[_63∈0]<br /><__union_ch...scription#quot;>"]:::plan
-    PgClassExpression_64["PgClassExpression[_64∈0]<br /><__union_ch...s__.#quot;note#quot;>"]:::plan
+    PgSelectSingle_61["PgSelectSingle[_61∈5]<br /><union_checklist_items>"]:::plan
+    PgClassExpression_62["PgClassExpression[_62∈5]<br /><__union_ch...ems__.#quot;id#quot;>"]:::plan
+    PgClassExpression_63["PgClassExpression[_63∈5]<br /><__union_ch...scription#quot;>"]:::plan
+    PgClassExpression_64["PgClassExpression[_64∈5]<br /><__union_ch...s__.#quot;note#quot;>"]:::plan
     Map_65["Map[_65∈0]<br /><_13:{#quot;0#quot;:1,#quot;1#quot;:2}>"]:::plan
     List_66["List[_66∈0]<br /><_65>"]:::plan
     Map_67["Map[_67∈0]<br /><_13:{#quot;0#quot;:3,#quot;1#quot;:4,#quot;2#quot;:5,#quot;3#quot;:6}>"]:::plan
@@ -156,5 +156,35 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,PgSelect_8,Access_9,Access_10,Object_11,First_12,PgSelectSingle_13,PgClassExpression_14,PgPolymorphic_15,First_21,PgSelectSingle_22,PgClassExpression_23,PgClassExpression_24,First_30,PgSelectSingle_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34,PgClassExpression_35,First_41,PgSelectSingle_42,PgClassExpression_43,PgClassExpression_44,PgClassExpression_45,First_51,PgSelectSingle_52,PgClassExpression_53,PgClassExpression_54,First_60,PgSelectSingle_61,PgClassExpression_62,PgClassExpression_63,PgClassExpression_64,Map_65,List_66,Map_67,List_68,Map_69,List_70,Map_71,List_72,Map_73,List_74 bucket0
+    class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,PgSelect_8,Access_9,Access_10,Object_11,First_12,PgSelectSingle_13,PgClassExpression_14,PgPolymorphic_15,First_21,First_30,First_41,First_51,First_60,Map_65,List_66,Map_67,List_68,Map_69,List_70,Map_71,List_72,Map_73,List_74 bucket0
+    classDef bucket1 stroke:#a52a2a
+    class PgSelectSingle_22,PgClassExpression_23,PgClassExpression_24 bucket1
+    classDef bucket2 stroke:#808000
+    class PgSelectSingle_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34,PgClassExpression_35 bucket2
+    classDef bucket3 stroke:#3cb371
+    class PgSelectSingle_42,PgClassExpression_43,PgClassExpression_44,PgClassExpression_45 bucket3
+    classDef bucket4 stroke:#7f007f
+    class PgSelectSingle_52,PgClassExpression_53,PgClassExpression_54 bucket4
+    classDef bucket5 stroke:#ff0000
+    class PgSelectSingle_61,PgClassExpression_62,PgClassExpression_63,PgClassExpression_64 bucket5
+
+    subgraph Buckets
+    Bucket0("Bucket 0 (root)<br />~"):::bucket
+    style Bucket0 stroke:#696969
+    Bucket1("Bucket 1 (polymorphic_15[UnionTopic])<br />~"):::bucket
+    style Bucket1 stroke:#a52a2a
+    Bucket0 --> Bucket1
+    Bucket2("Bucket 2 (polymorphic_15[UnionPost])<br />~"):::bucket
+    style Bucket2 stroke:#808000
+    Bucket0 --> Bucket2
+    Bucket3("Bucket 3 (polymorphic_15[UnionDivider])<br />~"):::bucket
+    style Bucket3 stroke:#3cb371
+    Bucket0 --> Bucket3
+    Bucket4("Bucket 4 (polymorphic_15[UnionChecklist])<br />~"):::bucket
+    style Bucket4 stroke:#7f007f
+    Bucket0 --> Bucket4
+    Bucket5("Bucket 5 (polymorphic_15[UnionChecklistItem])<br />~"):::bucket
+    style Bucket5 stroke:#ff0000
+    Bucket0 --> Bucket5
+    end
 ```

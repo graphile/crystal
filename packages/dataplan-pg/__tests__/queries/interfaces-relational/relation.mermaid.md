@@ -199,15 +199,7 @@ graph TD
     First_45["First[_45∈0]"]:::plan
     PgSelectSingle_46["PgSelectSingle[_46∈0]<br /><people>"]:::plan
     PgClassExpression_47["PgClassExpression[_47∈0]<br /><__people__.#quot;username#quot;>"]:::plan
-    PgClassExpression_127["PgClassExpression[_127∈0]<br /><__relation...s__.#quot;type#quot;>"]:::plan
-    PgPolymorphic_128["PgPolymorphic[_128∈0]"]:::plan
-    PgClassExpression_224["PgClassExpression[_224∈0]<br /><__relation...s__.#quot;type#quot;>"]:::plan
-    PgPolymorphic_225["PgPolymorphic[_225∈0]"]:::plan
-    PgClassExpression_321["PgClassExpression[_321∈0]<br /><__relation...s__.#quot;type#quot;>"]:::plan
-    PgPolymorphic_322["PgPolymorphic[_322∈0]"]:::plan
     PgClassExpression_404["PgClassExpression[_404∈0]<br /><__relation...ems__.#quot;id#quot;>"]:::plan
-    PgClassExpression_418["PgClassExpression[_418∈0]<br /><__relation...s__.#quot;type#quot;>"]:::plan
-    PgPolymorphic_419["PgPolymorphic[_419∈0]"]:::plan
     PgClassExpression_484["PgClassExpression[_484∈0]<br /><__relation...ems__.#quot;id#quot;>"]:::plan
     Access_494["Access[_494∈0]<br /><_3.pgSettings>"]:::plan
     Access_495["Access[_495∈0]<br /><_3.withPgClient>"]:::plan
@@ -234,19 +226,7 @@ graph TD
     List_502 --> First_45
     First_45 --> PgSelectSingle_46
     PgSelectSingle_46 --> PgClassExpression_47
-    PgSelectSingle_29 --> PgClassExpression_127
-    PgSelectSingle_29 --> PgPolymorphic_128
-    PgClassExpression_127 --> PgPolymorphic_128
-    PgSelectSingle_29 --> PgClassExpression_224
-    PgSelectSingle_29 --> PgPolymorphic_225
-    PgClassExpression_224 --> PgPolymorphic_225
-    PgSelectSingle_29 --> PgClassExpression_321
-    PgSelectSingle_29 --> PgPolymorphic_322
-    PgClassExpression_321 --> PgPolymorphic_322
     PgSelectSingle_13 --> PgClassExpression_404
-    PgSelectSingle_29 --> PgClassExpression_418
-    PgSelectSingle_29 --> PgPolymorphic_419
-    PgClassExpression_418 --> PgPolymorphic_419
     PgSelectSingle_29 --> PgClassExpression_484
     __Value_3 --> Access_494
     __Value_3 --> Access_495
@@ -277,7 +257,7 @@ graph TD
     PgSelectSingle_46 -.-> P17
     PgClassExpression_47 -.-> P18
     PgClassExpression_404 -.-> P19
-    PgPolymorphic_128 -.-> P20
+    PgPolymorphic_31 -.-> P20
     PgClassExpression_484 -.-> P21
     PgSelectSingle_46 -.-> P22
     PgClassExpression_47 -.-> P23
@@ -294,7 +274,7 @@ graph TD
     PgSelectSingle_46 -.-> P34
     PgClassExpression_47 -.-> P35
     PgClassExpression_404 -.-> P36
-    PgPolymorphic_225 -.-> P37
+    PgPolymorphic_31 -.-> P37
     PgClassExpression_484 -.-> P38
     PgSelectSingle_46 -.-> P39
     PgClassExpression_47 -.-> P40
@@ -311,7 +291,7 @@ graph TD
     PgSelectSingle_46 -.-> P51
     PgClassExpression_47 -.-> P52
     PgClassExpression_404 -.-> P53
-    PgPolymorphic_322 -.-> P54
+    PgPolymorphic_31 -.-> P54
     PgClassExpression_484 -.-> P55
     PgSelectSingle_46 -.-> P56
     PgClassExpression_47 -.-> P57
@@ -328,7 +308,7 @@ graph TD
     PgSelectSingle_46 -.-> P68
     PgClassExpression_47 -.-> P69
     PgClassExpression_404 -.-> P70
-    PgPolymorphic_419 -.-> P71
+    PgPolymorphic_31 -.-> P71
     PgClassExpression_484 -.-> P72
     PgSelectSingle_46 -.-> P73
     PgClassExpression_47 -.-> P74
@@ -348,5 +328,5 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgPolymorphic_15,First_28,PgSelectSingle_29,PgClassExpression_30,PgPolymorphic_31,First_45,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_127,PgPolymorphic_128,PgClassExpression_224,PgPolymorphic_225,PgClassExpression_321,PgPolymorphic_322,PgClassExpression_404,PgClassExpression_418,PgPolymorphic_419,PgClassExpression_484,Access_494,Access_495,Object_496,Map_501,List_502,Map_503,List_504 bucket0
+    class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgPolymorphic_15,First_28,PgSelectSingle_29,PgClassExpression_30,PgPolymorphic_31,First_45,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_404,PgClassExpression_484,Access_494,Access_495,Object_496,Map_501,List_502,Map_503,List_504 bucket0
 ```

@@ -95,19 +95,19 @@ graph TD
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (__Item[_21])<br />>forums[]"):::bucket
+    Bucket1("Bucket 1 (item_21)<br />>forums[]"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (__Item[_29])"):::bucket
+    Bucket2("Bucket 2 (item_29)"):::bucket
     style Bucket2 stroke:#808000
     Bucket1 --> Bucket2
-    Bucket3("Bucket 3 (__Item[_32])<br />>forums[]>messagesListSet[]"):::bucket
+    Bucket3("Bucket 3 (item_32)<br />>forums[]>messagesListSet[]"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket1 --> Bucket3
-    Bucket4("Bucket 4 (__Item[_34])"):::bucket
+    Bucket4("Bucket 4 (item_34)"):::bucket
     style Bucket4 stroke:#7f007f
     Bucket3 --> Bucket4
-    Bucket5("Bucket 5 (__Item[_35])<br />>forums[]>messagesListSet[][]"):::bucket
+    Bucket5("Bucket 5 (item_35)<br />>forums[]>messagesListSet[][]"):::bucket
     style Bucket5 stroke:#ff0000
     Bucket3 --> Bucket5
     end

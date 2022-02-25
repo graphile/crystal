@@ -219,13 +219,13 @@ graph TD
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (__Item[_11])<br />>people[]"):::bucket
+    Bucket1("Bucket 1 (item_11)<br />>people[]"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (__Item[_20])"):::bucket
+    Bucket2("Bucket 2 (item_20)"):::bucket
     style Bucket2 stroke:#808000
     Bucket1 --> Bucket2
-    Bucket3("Bucket 3 (__Item[_22])<br />>people[]>items[]"):::bucket
+    Bucket3("Bucket 3 (item_22)<br />>people[]>items[]"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket1 --> Bucket3
     end

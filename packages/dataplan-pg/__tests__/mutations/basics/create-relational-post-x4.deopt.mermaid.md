@@ -271,16 +271,16 @@ graph TD
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (group 1 / mutation)<br />~"):::bucket
+    Bucket1("Bucket 1 (group1[mutation])<br />~"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (group 2 / mutation)<br />~"):::bucket
+    Bucket2("Bucket 2 (group2[mutation])<br />~"):::bucket
     style Bucket2 stroke:#808000
     Bucket0 --> Bucket2
-    Bucket3("Bucket 3 (group 3 / mutation)<br />~"):::bucket
+    Bucket3("Bucket 3 (group3[mutation])<br />~"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket0 --> Bucket3
-    Bucket4("Bucket 4 (group 4 / mutation)<br />~"):::bucket
+    Bucket4("Bucket 4 (group4[mutation])<br />~"):::bucket
     style Bucket4 stroke:#7f007f
     Bucket0 --> Bucket4
     end

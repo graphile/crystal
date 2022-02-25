@@ -133,21 +133,21 @@ graph TD
     __Item_20>"__Item[_20∈2]<br /><_76>"]:::itemplan
     PgSelectSingle_21["PgSelectSingle[_21∈2]<br /><single_table_items>"]:::plan
     __Item_22>"__Item[_22∈3]<br /><_19>"]:::itemplan
-    PgSelectSingle_23["PgSelectSingle[_23∈3]<br /><single_table_items>"]:::plan
-    PgClassExpression_24["PgClassExpression[_24∈3]<br /><__single_t...s__.#quot;type#quot;>"]:::plan
-    Lambda_25["Lambda[_25∈3]"]:::plan
-    PgSingleTablePolymorphic_26["PgSingleTablePolymorphic[_26∈3]"]:::plan
-    PgClassExpression_27["PgClassExpression[_27∈3]<br /><__single_t...ems__.#quot;id#quot;>"]:::plan
-    PgClassExpression_29["PgClassExpression[_29∈3]<br /><__single_t...__.#quot;type2#quot;>"]:::plan
-    PgClassExpression_30["PgClassExpression[_30∈3]<br /><__single_t...#quot;position#quot;>"]:::plan
-    PgClassExpression_31["PgClassExpression[_31∈3]<br /><__single_t...reated_at#quot;>"]:::plan
-    PgClassExpression_32["PgClassExpression[_32∈3]<br /><__single_t...pdated_at#quot;>"]:::plan
-    PgClassExpression_33["PgClassExpression[_33∈3]<br /><__single_t..._archived#quot;>"]:::plan
-    PgClassExpression_34["PgClassExpression[_34∈3]<br /><__single_t...chived_at#quot;>"]:::plan
-    PgClassExpression_35["PgClassExpression[_35∈3]<br /><__single_t...__.#quot;title#quot;>"]:::plan
-    PgClassExpression_45["PgClassExpression[_45∈3]<br /><__single_t...scription#quot;>"]:::plan
-    PgClassExpression_46["PgClassExpression[_46∈3]<br /><__single_t...s__.#quot;note#quot;>"]:::plan
-    PgClassExpression_56["PgClassExpression[_56∈3]<br /><__single_t...__.#quot;color#quot;>"]:::plan
+    PgSelectSingle_23["PgSelectSingle[_23∈4]<br /><single_table_items>"]:::plan
+    PgClassExpression_24["PgClassExpression[_24∈4]<br /><__single_t...s__.#quot;type#quot;>"]:::plan
+    Lambda_25["Lambda[_25∈4]"]:::plan
+    PgSingleTablePolymorphic_26["PgSingleTablePolymorphic[_26∈4]"]:::plan
+    PgClassExpression_27["PgClassExpression[_27∈4]<br /><__single_t...ems__.#quot;id#quot;>"]:::plan
+    PgClassExpression_29["PgClassExpression[_29∈4]<br /><__single_t...__.#quot;type2#quot;>"]:::plan
+    PgClassExpression_30["PgClassExpression[_30∈4]<br /><__single_t...#quot;position#quot;>"]:::plan
+    PgClassExpression_31["PgClassExpression[_31∈4]<br /><__single_t...reated_at#quot;>"]:::plan
+    PgClassExpression_32["PgClassExpression[_32∈4]<br /><__single_t...pdated_at#quot;>"]:::plan
+    PgClassExpression_33["PgClassExpression[_33∈4]<br /><__single_t..._archived#quot;>"]:::plan
+    PgClassExpression_34["PgClassExpression[_34∈4]<br /><__single_t...chived_at#quot;>"]:::plan
+    PgClassExpression_35["PgClassExpression[_35∈4]<br /><__single_t...__.#quot;title#quot;>"]:::plan
+    PgClassExpression_45["PgClassExpression[_45∈4]<br /><__single_t...scription#quot;>"]:::plan
+    PgClassExpression_46["PgClassExpression[_46∈4]<br /><__single_t...s__.#quot;note#quot;>"]:::plan
+    PgClassExpression_56["PgClassExpression[_56∈4]<br /><__single_t...__.#quot;color#quot;>"]:::plan
     Access_76["Access[_76∈1]<br /><_11.1>"]:::plan
 
     %% plan dependencies
@@ -248,19 +248,24 @@ graph TD
     classDef bucket2 stroke:#808000
     class __Item_20,PgSelectSingle_21 bucket2
     classDef bucket3 stroke:#3cb371
-    class __Item_22,PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26,PgClassExpression_27,PgClassExpression_29,PgClassExpression_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34,PgClassExpression_35,PgClassExpression_45,PgClassExpression_46,PgClassExpression_56 bucket3
+    class __Item_22 bucket3
+    classDef bucket4 stroke:#7f007f
+    class PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26,PgClassExpression_27,PgClassExpression_29,PgClassExpression_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34,PgClassExpression_35,PgClassExpression_45,PgClassExpression_46,PgClassExpression_56 bucket4
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (__Item[_11])<br />>people[]"):::bucket
+    Bucket1("Bucket 1 (item_11)<br />>people[]"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (__Item[_20])"):::bucket
+    Bucket2("Bucket 2 (item_20)"):::bucket
     style Bucket2 stroke:#808000
     Bucket1 --> Bucket2
-    Bucket3("Bucket 3 (__Item[_22])<br />>people[]>items[]"):::bucket
+    Bucket3("Bucket 3 (item_22)<br />>people[]>items[]"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket1 --> Bucket3
+    Bucket4("Bucket 4 (polymorphic_26[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />>people[]>items[]"):::bucket
+    style Bucket4 stroke:#7f007f
+    Bucket3 --> Bucket4
     end
 ```

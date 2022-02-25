@@ -81,16 +81,16 @@ graph TD
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (__Item[_12])"):::bucket
+    Bucket1("Bucket 1 (item_12)"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (__Item[_15])<br />>randomUserArraySet[]"):::bucket
+    Bucket2("Bucket 2 (item_15)<br />>randomUserArraySet[]"):::bucket
     style Bucket2 stroke:#808000
     Bucket0 --> Bucket2
-    Bucket3("Bucket 3 (__Item[_17])"):::bucket
+    Bucket3("Bucket 3 (item_17)"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket2 --> Bucket3
-    Bucket4("Bucket 4 (__Item[_18])<br />>randomUserArraySet[][]"):::bucket
+    Bucket4("Bucket 4 (item_18)<br />>randomUserArraySet[][]"):::bucket
     style Bucket4 stroke:#7f007f
     Bucket2 --> Bucket4
     end

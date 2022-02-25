@@ -750,64 +750,60 @@ graph TD
     __Item_20>"__Item[_20∈2]<br /><_617>"]:::itemplan
     PgSelectSingle_21["PgSelectSingle[_21∈2]<br /><single_table_items>"]:::plan
     __Item_22>"__Item[_22∈3]<br /><_19>"]:::itemplan
-    PgSelectSingle_23["PgSelectSingle[_23∈3]<br /><single_table_items>"]:::plan
-    PgClassExpression_24["PgClassExpression[_24∈3]<br /><__single_t...s__.#quot;type#quot;>"]:::plan
-    Lambda_25["Lambda[_25∈3]"]:::plan
-    PgSingleTablePolymorphic_26["PgSingleTablePolymorphic[_26∈3]"]:::plan
-    PgClassExpression_27["PgClassExpression[_27∈3]<br /><__single_t...parent_id#quot;>"]:::plan
-    First_32["First[_32∈3]"]:::plan
-    PgSelectSingle_33["PgSelectSingle[_33∈3]<br /><single_table_items>"]:::plan
-    PgClassExpression_34["PgClassExpression[_34∈3]<br /><__single_t...s__.#quot;type#quot;>"]:::plan
-    Lambda_35["Lambda[_35∈3]"]:::plan
-    PgSingleTablePolymorphic_36["PgSingleTablePolymorphic[_36∈3]"]:::plan
-    PgClassExpression_39["PgClassExpression[_39∈3]<br /><__single_t...__.#quot;type2#quot;>"]:::plan
-    First_45["First[_45∈3]"]:::plan
-    PgSelectSingle_46["PgSelectSingle[_46∈3]<br /><people>"]:::plan
-    PgClassExpression_47["PgClassExpression[_47∈3]<br /><__people__.#quot;username#quot;>"]:::plan
-    PgClassExpression_48["PgClassExpression[_48∈3]<br /><__single_t...#quot;position#quot;>"]:::plan
-    PgClassExpression_49["PgClassExpression[_49∈3]<br /><__single_t...reated_at#quot;>"]:::plan
-    PgClassExpression_50["PgClassExpression[_50∈3]<br /><__single_t...pdated_at#quot;>"]:::plan
-    PgClassExpression_51["PgClassExpression[_51∈3]<br /><__single_t..._archived#quot;>"]:::plan
-    PgClassExpression_52["PgClassExpression[_52∈3]<br /><__single_t...chived_at#quot;>"]:::plan
-    PgClassExpression_53["PgClassExpression[_53∈3]<br /><__single_t...__.#quot;title#quot;>"]:::plan
-    PgClassExpression_71["PgClassExpression[_71∈3]<br /><__single_t...scription#quot;>"]:::plan
-    PgClassExpression_72["PgClassExpression[_72∈3]<br /><__single_t...s__.#quot;note#quot;>"]:::plan
-    PgClassExpression_90["PgClassExpression[_90∈3]<br /><__single_t...__.#quot;color#quot;>"]:::plan
-    PgClassExpression_126["PgClassExpression[_126∈3]<br /><__single_t...ems__.#quot;id#quot;>"]:::plan
-    PgClassExpression_128["PgClassExpression[_128∈3]<br /><__single_t...__.#quot;type2#quot;>"]:::plan
-    First_134["First[_134∈3]"]:::plan
-    PgSelectSingle_135["PgSelectSingle[_135∈3]<br /><people>"]:::plan
-    PgClassExpression_136["PgClassExpression[_136∈3]<br /><__people__.#quot;username#quot;>"]:::plan
-    PgClassExpression_137["PgClassExpression[_137∈3]<br /><__single_t...#quot;position#quot;>"]:::plan
-    PgClassExpression_138["PgClassExpression[_138∈3]<br /><__single_t...reated_at#quot;>"]:::plan
-    PgClassExpression_139["PgClassExpression[_139∈3]<br /><__single_t...pdated_at#quot;>"]:::plan
-    PgClassExpression_140["PgClassExpression[_140∈3]<br /><__single_t..._archived#quot;>"]:::plan
-    PgClassExpression_141["PgClassExpression[_141∈3]<br /><__single_t...chived_at#quot;>"]:::plan
-    PgClassExpression_142["PgClassExpression[_142∈3]<br /><__single_t...__.#quot;title#quot;>"]:::plan
-    PgClassExpression_150["PgClassExpression[_150∈3]<br /><__single_t...s__.#quot;type#quot;>"]:::plan
-    Lambda_151["Lambda[_151∈3]"]:::plan
-    PgSingleTablePolymorphic_152["PgSingleTablePolymorphic[_152∈3]"]:::plan
-    PgClassExpression_259["PgClassExpression[_259∈3]<br /><__single_t...scription#quot;>"]:::plan
-    PgClassExpression_260["PgClassExpression[_260∈3]<br /><__single_t...s__.#quot;note#quot;>"]:::plan
-    PgClassExpression_268["PgClassExpression[_268∈3]<br /><__single_t...s__.#quot;type#quot;>"]:::plan
-    Lambda_269["Lambda[_269∈3]"]:::plan
-    PgSingleTablePolymorphic_270["PgSingleTablePolymorphic[_270∈3]"]:::plan
-    PgClassExpression_377["PgClassExpression[_377∈3]<br /><__single_t...__.#quot;color#quot;>"]:::plan
-    PgClassExpression_385["PgClassExpression[_385∈3]<br /><__single_t...s__.#quot;type#quot;>"]:::plan
-    Lambda_386["Lambda[_386∈3]"]:::plan
-    PgSingleTablePolymorphic_387["PgSingleTablePolymorphic[_387∈3]"]:::plan
-    PgClassExpression_501["PgClassExpression[_501∈3]<br /><__single_t...s__.#quot;type#quot;>"]:::plan
-    Lambda_502["Lambda[_502∈3]"]:::plan
-    PgSingleTablePolymorphic_503["PgSingleTablePolymorphic[_503∈3]"]:::plan
+    PgSelectSingle_23["PgSelectSingle[_23∈4]<br /><single_table_items>"]:::plan
+    PgClassExpression_24["PgClassExpression[_24∈4]<br /><__single_t...s__.#quot;type#quot;>"]:::plan
+    Lambda_25["Lambda[_25∈4]"]:::plan
+    PgSingleTablePolymorphic_26["PgSingleTablePolymorphic[_26∈4]"]:::plan
+    PgClassExpression_27["PgClassExpression[_27∈4]<br /><__single_t...parent_id#quot;>"]:::plan
+    First_32["First[_32∈4]"]:::plan
+    PgSelectSingle_33["PgSelectSingle[_33∈5]<br /><single_table_items>"]:::plan
+    PgClassExpression_34["PgClassExpression[_34∈5]<br /><__single_t...s__.#quot;type#quot;>"]:::plan
+    Lambda_35["Lambda[_35∈5]"]:::plan
+    PgSingleTablePolymorphic_36["PgSingleTablePolymorphic[_36∈5]"]:::plan
+    PgClassExpression_39["PgClassExpression[_39∈5]<br /><__single_t...__.#quot;type2#quot;>"]:::plan
+    First_45["First[_45∈5]"]:::plan
+    PgSelectSingle_46["PgSelectSingle[_46∈5]<br /><people>"]:::plan
+    PgClassExpression_47["PgClassExpression[_47∈5]<br /><__people__.#quot;username#quot;>"]:::plan
+    PgClassExpression_48["PgClassExpression[_48∈5]<br /><__single_t...#quot;position#quot;>"]:::plan
+    PgClassExpression_49["PgClassExpression[_49∈5]<br /><__single_t...reated_at#quot;>"]:::plan
+    PgClassExpression_50["PgClassExpression[_50∈5]<br /><__single_t...pdated_at#quot;>"]:::plan
+    PgClassExpression_51["PgClassExpression[_51∈5]<br /><__single_t..._archived#quot;>"]:::plan
+    PgClassExpression_52["PgClassExpression[_52∈5]<br /><__single_t...chived_at#quot;>"]:::plan
+    PgClassExpression_53["PgClassExpression[_53∈5]<br /><__single_t...__.#quot;title#quot;>"]:::plan
+    PgClassExpression_71["PgClassExpression[_71∈5]<br /><__single_t...scription#quot;>"]:::plan
+    PgClassExpression_72["PgClassExpression[_72∈5]<br /><__single_t...s__.#quot;note#quot;>"]:::plan
+    PgClassExpression_90["PgClassExpression[_90∈5]<br /><__single_t...__.#quot;color#quot;>"]:::plan
+    PgClassExpression_126["PgClassExpression[_126∈4]<br /><__single_t...ems__.#quot;id#quot;>"]:::plan
+    PgClassExpression_128["PgClassExpression[_128∈4]<br /><__single_t...__.#quot;type2#quot;>"]:::plan
+    First_134["First[_134∈4]"]:::plan
+    PgSelectSingle_135["PgSelectSingle[_135∈4]<br /><people>"]:::plan
+    PgClassExpression_136["PgClassExpression[_136∈4]<br /><__people__.#quot;username#quot;>"]:::plan
+    PgClassExpression_137["PgClassExpression[_137∈4]<br /><__single_t...#quot;position#quot;>"]:::plan
+    PgClassExpression_138["PgClassExpression[_138∈4]<br /><__single_t...reated_at#quot;>"]:::plan
+    PgClassExpression_139["PgClassExpression[_139∈4]<br /><__single_t...pdated_at#quot;>"]:::plan
+    PgClassExpression_140["PgClassExpression[_140∈4]<br /><__single_t..._archived#quot;>"]:::plan
+    PgClassExpression_141["PgClassExpression[_141∈4]<br /><__single_t...chived_at#quot;>"]:::plan
+    PgClassExpression_142["PgClassExpression[_142∈4]<br /><__single_t...__.#quot;title#quot;>"]:::plan
+    Lambda_151["Lambda[_151∈5]"]:::plan
+    PgSingleTablePolymorphic_152["PgSingleTablePolymorphic[_152∈5]"]:::plan
+    PgClassExpression_259["PgClassExpression[_259∈4]<br /><__single_t...scription#quot;>"]:::plan
+    PgClassExpression_260["PgClassExpression[_260∈4]<br /><__single_t...s__.#quot;note#quot;>"]:::plan
+    Lambda_269["Lambda[_269∈5]"]:::plan
+    PgSingleTablePolymorphic_270["PgSingleTablePolymorphic[_270∈5]"]:::plan
+    PgClassExpression_377["PgClassExpression[_377∈4]<br /><__single_t...__.#quot;color#quot;>"]:::plan
+    Lambda_386["Lambda[_386∈5]"]:::plan
+    PgSingleTablePolymorphic_387["PgSingleTablePolymorphic[_387∈5]"]:::plan
+    Lambda_502["Lambda[_502∈5]"]:::plan
+    PgSingleTablePolymorphic_503["PgSingleTablePolymorphic[_503∈5]"]:::plan
     Access_598["Access[_598∈0]<br /><_3.pgSettings>"]:::plan
     Access_599["Access[_599∈0]<br /><_3.withPgClient>"]:::plan
     Object_600["Object[_600∈0]<br /><{pgSettings,withPgClient}>"]:::plan
-    Map_611["Map[_611∈3]<br /><_33:{#quot;0#quot;:2}>"]:::plan
-    List_612["List[_612∈3]<br /><_611>"]:::plan
-    Map_613["Map[_613∈3]<br /><_23:{#quot;0#quot;:1,#quot;1#quot;:2,#quot;2#quot;:3,#quot;3#quot;:4,#quot;4#quot;:5,#quot;5#quot;:6,#quot;6#quot;:7,#quot;7#quot;:8,#quot;8#quot;:9,#quot;9#quot;:10,#quot;10#quot;:11,#quot;11#quot;:12}>"]:::plan
-    List_614["List[_614∈3]<br /><_613>"]:::plan
-    Map_615["Map[_615∈3]<br /><_23:{#quot;0#quot;:16}>"]:::plan
-    List_616["List[_616∈3]<br /><_615>"]:::plan
+    Map_611["Map[_611∈5]<br /><_33:{#quot;0#quot;:2}>"]:::plan
+    List_612["List[_612∈5]<br /><_611>"]:::plan
+    Map_613["Map[_613∈4]<br /><_23:{#quot;0#quot;:1,#quot;1#quot;:2,#quot;2#quot;:3,#quot;3#quot;:4,#quot;4#quot;:5,#quot;5#quot;:6,#quot;6#quot;:7,#quot;7#quot;:8,#quot;8#quot;:9,#quot;9#quot;:10,#quot;10#quot;:11,#quot;11#quot;:12}>"]:::plan
+    List_614["List[_614∈4]<br /><_613>"]:::plan
+    Map_615["Map[_615∈4]<br /><_23:{#quot;0#quot;:16}>"]:::plan
+    List_616["List[_616∈4]<br /><_615>"]:::plan
     Access_617["Access[_617∈1]<br /><_11.1>"]:::plan
 
     %% plan dependencies
@@ -857,23 +853,19 @@ graph TD
     PgSelectSingle_23 --> PgClassExpression_140
     PgSelectSingle_23 --> PgClassExpression_141
     PgSelectSingle_23 --> PgClassExpression_142
-    PgSelectSingle_33 --> PgClassExpression_150
-    PgClassExpression_150 --> Lambda_151
+    PgClassExpression_34 --> Lambda_151
     Lambda_151 --> PgSingleTablePolymorphic_152
     PgSelectSingle_33 --> PgSingleTablePolymorphic_152
     PgSelectSingle_23 --> PgClassExpression_259
     PgSelectSingle_23 --> PgClassExpression_260
-    PgSelectSingle_33 --> PgClassExpression_268
-    PgClassExpression_268 --> Lambda_269
+    PgClassExpression_34 --> Lambda_269
     Lambda_269 --> PgSingleTablePolymorphic_270
     PgSelectSingle_33 --> PgSingleTablePolymorphic_270
     PgSelectSingle_23 --> PgClassExpression_377
-    PgSelectSingle_33 --> PgClassExpression_385
-    PgClassExpression_385 --> Lambda_386
+    PgClassExpression_34 --> Lambda_386
     Lambda_386 --> PgSingleTablePolymorphic_387
     PgSelectSingle_33 --> PgSingleTablePolymorphic_387
-    PgSelectSingle_33 --> PgClassExpression_501
-    PgClassExpression_501 --> Lambda_502
+    PgClassExpression_34 --> Lambda_502
     Lambda_502 --> PgSingleTablePolymorphic_503
     PgSelectSingle_33 --> PgSingleTablePolymorphic_503
     __Value_3 --> Access_598
@@ -1263,19 +1255,29 @@ graph TD
     classDef bucket2 stroke:#808000
     class __Item_20,PgSelectSingle_21 bucket2
     classDef bucket3 stroke:#3cb371
-    class __Item_22,PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26,PgClassExpression_27,First_32,PgSelectSingle_33,PgClassExpression_34,Lambda_35,PgSingleTablePolymorphic_36,PgClassExpression_39,First_45,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_48,PgClassExpression_49,PgClassExpression_50,PgClassExpression_51,PgClassExpression_52,PgClassExpression_53,PgClassExpression_71,PgClassExpression_72,PgClassExpression_90,PgClassExpression_126,PgClassExpression_128,First_134,PgSelectSingle_135,PgClassExpression_136,PgClassExpression_137,PgClassExpression_138,PgClassExpression_139,PgClassExpression_140,PgClassExpression_141,PgClassExpression_142,PgClassExpression_150,Lambda_151,PgSingleTablePolymorphic_152,PgClassExpression_259,PgClassExpression_260,PgClassExpression_268,Lambda_269,PgSingleTablePolymorphic_270,PgClassExpression_377,PgClassExpression_385,Lambda_386,PgSingleTablePolymorphic_387,PgClassExpression_501,Lambda_502,PgSingleTablePolymorphic_503,Map_611,List_612,Map_613,List_614,Map_615,List_616 bucket3
+    class __Item_22 bucket3
+    classDef bucket4 stroke:#7f007f
+    class PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26,PgClassExpression_27,First_32,PgClassExpression_126,PgClassExpression_128,First_134,PgSelectSingle_135,PgClassExpression_136,PgClassExpression_137,PgClassExpression_138,PgClassExpression_139,PgClassExpression_140,PgClassExpression_141,PgClassExpression_142,PgClassExpression_259,PgClassExpression_260,PgClassExpression_377,Map_613,List_614,Map_615,List_616 bucket4
+    classDef bucket5 stroke:#ff0000
+    class PgSelectSingle_33,PgClassExpression_34,Lambda_35,PgSingleTablePolymorphic_36,PgClassExpression_39,First_45,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_48,PgClassExpression_49,PgClassExpression_50,PgClassExpression_51,PgClassExpression_52,PgClassExpression_53,PgClassExpression_71,PgClassExpression_72,PgClassExpression_90,Lambda_151,PgSingleTablePolymorphic_152,Lambda_269,PgSingleTablePolymorphic_270,Lambda_386,PgSingleTablePolymorphic_387,Lambda_502,PgSingleTablePolymorphic_503,Map_611,List_612 bucket5
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (__Item[_11])<br />>people[]"):::bucket
+    Bucket1("Bucket 1 (item_11)<br />>people[]"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (__Item[_20])"):::bucket
+    Bucket2("Bucket 2 (item_20)"):::bucket
     style Bucket2 stroke:#808000
     Bucket1 --> Bucket2
-    Bucket3("Bucket 3 (__Item[_22])<br />>people[]>items[]"):::bucket
+    Bucket3("Bucket 3 (item_22)<br />>people[]>items[]"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket1 --> Bucket3
+    Bucket4("Bucket 4 (polymorphic_26[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />>people[]>items[]"):::bucket
+    style Bucket4 stroke:#7f007f
+    Bucket3 --> Bucket4
+    Bucket5("Bucket 5 (polymorphic_36[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem|SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem|SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem|SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem|SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />>people[]>items[]"):::bucket
+    style Bucket5 stroke:#ff0000
+    Bucket4 --> Bucket5
     end
 ```

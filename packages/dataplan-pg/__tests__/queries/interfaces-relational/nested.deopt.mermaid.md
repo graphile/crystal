@@ -235,15 +235,7 @@ graph TD
     PgPolymorphic_41["PgPolymorphic[_41∈3]"]:::plan
     PgClassExpression_51["PgClassExpression[_51∈3]<br /><__relation...__.#quot;type2#quot;>"]:::plan
     PgClassExpression_94["PgClassExpression[_94∈3]<br /><__relation...__.#quot;type2#quot;>"]:::plan
-    PgClassExpression_109["PgClassExpression[_109∈3]<br /><__relation...s__.#quot;type#quot;>"]:::plan
-    PgPolymorphic_110["PgPolymorphic[_110∈3]"]:::plan
-    PgClassExpression_178["PgClassExpression[_178∈3]<br /><__relation...s__.#quot;type#quot;>"]:::plan
-    PgPolymorphic_179["PgPolymorphic[_179∈3]"]:::plan
-    PgClassExpression_247["PgClassExpression[_247∈3]<br /><__relation...s__.#quot;type#quot;>"]:::plan
-    PgPolymorphic_248["PgPolymorphic[_248∈3]"]:::plan
     PgClassExpression_302["PgClassExpression[_302∈3]<br /><__relation...ems__.#quot;id#quot;>"]:::plan
-    PgClassExpression_316["PgClassExpression[_316∈3]<br /><__relation...s__.#quot;type#quot;>"]:::plan
-    PgPolymorphic_317["PgPolymorphic[_317∈3]"]:::plan
     PgClassExpression_358["PgClassExpression[_358∈3]<br /><__relation...ems__.#quot;id#quot;>"]:::plan
     Access_360["Access[_360∈0]<br /><_3.pgSettings>"]:::plan
     Access_361["Access[_361∈0]<br /><_3.withPgClient>"]:::plan
@@ -277,19 +269,7 @@ graph TD
     PgClassExpression_40 --> PgPolymorphic_41
     PgSelectSingle_39 --> PgClassExpression_51
     PgSelectSingle_23 --> PgClassExpression_94
-    PgSelectSingle_39 --> PgClassExpression_109
-    PgSelectSingle_39 --> PgPolymorphic_110
-    PgClassExpression_109 --> PgPolymorphic_110
-    PgSelectSingle_39 --> PgClassExpression_178
-    PgSelectSingle_39 --> PgPolymorphic_179
-    PgClassExpression_178 --> PgPolymorphic_179
-    PgSelectSingle_39 --> PgClassExpression_247
-    PgSelectSingle_39 --> PgPolymorphic_248
-    PgClassExpression_247 --> PgPolymorphic_248
     PgSelectSingle_23 --> PgClassExpression_302
-    PgSelectSingle_39 --> PgClassExpression_316
-    PgSelectSingle_39 --> PgPolymorphic_317
-    PgClassExpression_316 --> PgPolymorphic_317
     PgSelectSingle_39 --> PgClassExpression_358
     __Value_3 --> Access_360
     __Value_3 --> Access_361
@@ -322,7 +302,7 @@ graph TD
     PgClassExpression_302 -.-> P23
     PgClassExpression_24 -.-> P24
     PgClassExpression_94 -.-> P25
-    PgPolymorphic_110 -.-> P26
+    PgPolymorphic_41 -.-> P26
     PgClassExpression_358 -.-> P27
     PgClassExpression_40 -.-> P28
     PgClassExpression_51 -.-> P29
@@ -341,7 +321,7 @@ graph TD
     PgClassExpression_302 -.-> P42
     PgClassExpression_24 -.-> P43
     PgClassExpression_94 -.-> P44
-    PgPolymorphic_179 -.-> P45
+    PgPolymorphic_41 -.-> P45
     PgClassExpression_358 -.-> P46
     PgClassExpression_40 -.-> P47
     PgClassExpression_51 -.-> P48
@@ -360,7 +340,7 @@ graph TD
     PgClassExpression_302 -.-> P61
     PgClassExpression_24 -.-> P62
     PgClassExpression_94 -.-> P63
-    PgPolymorphic_248 -.-> P64
+    PgPolymorphic_41 -.-> P64
     PgClassExpression_358 -.-> P65
     PgClassExpression_40 -.-> P66
     PgClassExpression_51 -.-> P67
@@ -379,7 +359,7 @@ graph TD
     PgClassExpression_302 -.-> P80
     PgClassExpression_24 -.-> P81
     PgClassExpression_94 -.-> P82
-    PgPolymorphic_317 -.-> P83
+    PgPolymorphic_41 -.-> P83
     PgClassExpression_358 -.-> P84
     PgClassExpression_40 -.-> P85
     PgClassExpression_51 -.-> P86
@@ -407,18 +387,18 @@ graph TD
     classDef bucket2 stroke:#808000
     class __Item_20,PgSelectSingle_21 bucket2
     classDef bucket3 stroke:#3cb371
-    class __Item_22,PgSelectSingle_23,PgClassExpression_24,PgPolymorphic_25,PgClassExpression_33,PgSelect_34,First_38,PgSelectSingle_39,PgClassExpression_40,PgPolymorphic_41,PgClassExpression_51,PgClassExpression_94,PgClassExpression_109,PgPolymorphic_110,PgClassExpression_178,PgPolymorphic_179,PgClassExpression_247,PgPolymorphic_248,PgClassExpression_302,PgClassExpression_316,PgPolymorphic_317,PgClassExpression_358 bucket3
+    class __Item_22,PgSelectSingle_23,PgClassExpression_24,PgPolymorphic_25,PgClassExpression_33,PgSelect_34,First_38,PgSelectSingle_39,PgClassExpression_40,PgPolymorphic_41,PgClassExpression_51,PgClassExpression_94,PgClassExpression_302,PgClassExpression_358 bucket3
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (__Item[_11])<br />>people[]"):::bucket
+    Bucket1("Bucket 1 (item_11)<br />>people[]"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (__Item[_20])"):::bucket
+    Bucket2("Bucket 2 (item_20)"):::bucket
     style Bucket2 stroke:#808000
     Bucket1 --> Bucket2
-    Bucket3("Bucket 3 (__Item[_22])<br />>people[]>items[]"):::bucket
+    Bucket3("Bucket 3 (item_22)<br />>people[]>items[]"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket1 --> Bucket3
     end
