@@ -1777,11 +1777,13 @@ export class Aether<
         listDepth,
       );
     }
+
     const wgs = withGlobalState.bind(null, {
       aether: this,
       parentPathIdentity: pathIdentity,
     }) as <T>(cb: () => T) => T;
     let childFieldDigests: FieldDigest[] | null;
+
     if (
       fieldType instanceof GraphQLObjectType ||
       fieldType instanceof GraphQLInterfaceType ||
