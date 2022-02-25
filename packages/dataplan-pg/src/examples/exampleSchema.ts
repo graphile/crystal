@@ -2853,28 +2853,33 @@ export function makeExampleSchema(
     }),
   });
 
+  const singleTableTypeNameCallback = EXPORTABLE(
+    () => (v: string) => {
+      if (v == null) {
+        return v;
+      }
+      const type = {
+        TOPIC: "SingleTableTopic",
+        POST: "SingleTablePost",
+        DIVIDER: "SingleTableDivider",
+        CHECKLIST: "SingleTableChecklist",
+        CHECKLIST_ITEM: "SingleTableChecklistItem",
+      }[v];
+      if (!type) {
+        throw new Error(`Could not determine type for '${v}'`);
+      }
+      return type;
+    },
+    [],
+  );
+
   const singleTableTypeName = EXPORTABLE(
-    (lambda) => ($entity: SingleTableItemPlan) => {
+    (lambda, singleTableTypeNameCallback) => ($entity: SingleTableItemPlan) => {
       const $type = $entity.get("type");
-      const $typeName = lambda($type, (v) => {
-        if (v == null) {
-          return v;
-        }
-        const type = {
-          TOPIC: "SingleTableTopic",
-          POST: "SingleTablePost",
-          DIVIDER: "SingleTableDivider",
-          CHECKLIST: "SingleTableChecklist",
-          CHECKLIST_ITEM: "SingleTableChecklistItem",
-        }[v];
-        if (!type) {
-          throw new Error(`Could not determine type for '${v}'`);
-        }
-        return type;
-      });
+      const $typeName = lambda($type, singleTableTypeNameCallback);
       return $typeName;
     },
-    [lambda],
+    [lambda, singleTableTypeNameCallback],
   );
 
   const singleTableItemInterface = EXPORTABLE(
