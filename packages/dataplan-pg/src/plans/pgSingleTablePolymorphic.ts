@@ -53,6 +53,12 @@ export class PgSingleTablePolymorphicPlan<
     return this.getPlan(this.dependencies[this.rowPlanId]);
   }
 
+  deduplicate(
+    peers: PgSingleTablePolymorphicPlan<any, any, any, any>[],
+  ): PgSingleTablePolymorphicPlan<TColumns, TUniques, TRelations, TParameters> {
+    return peers[0] ?? this;
+  }
+
   planForType(_type: GraphQLObjectType): ExecutablePlan {
     // TODO: need to include the `_type` information so we know what type it
     // is. Can we wrap it?
