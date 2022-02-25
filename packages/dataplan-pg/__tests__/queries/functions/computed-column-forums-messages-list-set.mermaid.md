@@ -6,21 +6,6 @@ graph TD
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
-    %% subgraph fields
-    P1{{"~"}}:::path
-    P2[/">forums"\]:::path
-    P3>">forums[]"]:::path
-    P2 -.- P3
-    P4[/">fo…s[]>messagesListSet"\]:::path
-    P5>">fo…s[]>messagesListSet[][]"]:::path
-    P4 -.- P5
-    P6([">fo…s[]>me…][]>body"]):::path
-    %% P5 -.-> P6
-    P7([">fo…s[]>me…][]>featured"]):::path
-    %% P5 -.-> P7
-    %% P3 -.-> P4
-    %% P1 -.-> P2
-    %% end
 
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
@@ -41,8 +26,8 @@ graph TD
     __Item_34>"__Item[_34∈4]<br /><_32>"]:::itemplan
     __Item_35>"__Item[_35∈5]<br /><_33>"]:::itemplan
     PgSelectSingle_36["PgSelectSingle[_36∈5]<br /><forums_messages_list_set>"]:::plan
-    PgClassExpression_37["PgClassExpression[_37∈5]<br /><__forums_m...t__.#quot;body#quot;>"]:::plan
-    PgClassExpression_38["PgClassExpression[_38∈5]<br /><__forums_m...#quot;featured#quot;>"]:::plan
+    PgClassExpression_37["PgClassExpression[_37∈5]<br /><__forums_m...t__.”body”>"]:::plan
+    PgClassExpression_38["PgClassExpression[_38∈5]<br /><__forums_m...”featured”>"]:::plan
     Access_39["Access[_39∈1]<br /><_21.0>"]:::plan
 
     %% plan dependencies
@@ -70,13 +55,26 @@ graph TD
     __Item_21 --> Access_39
 
     %% plan-to-path relationships
+    P1["~"]
     __TrackedObject_6 -.-> P1
+    P2[">forums"]
     PgSelect_17 -.-> P2
+    P3[">forums[]"]
     PgSelectSingle_22 -.-> P3
-    __ListTransform_28 -.-> P4
-    PgSelectSingle_36 -.-> P5
-    PgClassExpression_37 -.-> P6
-    PgClassExpression_38 -.-> P7
+    P4[">f…]>messagesListSet@_28[]"]
+    PgClassExpression_31 -.-> P4
+    P5[">f…]>messagesListSet"]
+    __ListTransform_28 -.-> P5
+    P6[">f…]>messagesListSet[]@_33[]"]
+    __Item_34 -.-> P6
+    P7[">f…]>messagesListSet[]"]
+    __ListTransform_33 -.-> P7
+    P8[">f…]>messagesListSet[][]"]
+    PgSelectSingle_36 -.-> P8
+    P9[">f…]>m…]>body"]
+    PgClassExpression_37 -.-> P9
+    P10[">f…]>m…]>featured"]
+    PgClassExpression_38 -.-> P10
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

@@ -6,39 +6,6 @@ graph TD
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
-    %% subgraph fields
-    P1{{"~"}}:::path
-    P2[/">searchEntities"\]:::path
-    P3>">searchEntities[]"]:::path
-    P2 -.- P3
-    P4([">se…s[]>personId"]):::path
-    %% P3 -.-> P4
-    P5([">se…s[]>username"]):::path
-    %% P3 -.-> P5
-    P6([">se…s[]>postId"]):::path
-    %% P3 -.-> P6
-    P7{{">se…s[]>author"}}:::path
-    P8([">se…s[]>author>username"]):::path
-    %% P7 -.-> P8
-    %% P3 -.-> P7
-    P9([">se…s[]>body"]):::path
-    %% P3 -.-> P9
-    P10([">se…s[]>commentId"]):::path
-    %% P3 -.-> P10
-    P11{{">se…s[]>author"}}:::path
-    P12([">se…s[]>author>username"]):::path
-    %% P11 -.-> P12
-    %% P3 -.-> P11
-    P13{{">se…s[]>post"}}:::path
-    P14([">se…s[]>post>postId"]):::path
-    %% P13 -.-> P14
-    P15([">se…s[]>post>body"]):::path
-    %% P13 -.-> P15
-    %% P3 -.-> P13
-    P16([">se…s[]>body"]):::path
-    %% P3 -.-> P16
-    %% P1 -.-> P2
-    %% end
 
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
@@ -51,47 +18,47 @@ graph TD
     PgSelectSingle_14["PgSelectSingle[_14∈1]<br /><entity_search>"]:::plan
     __Item_15>"__Item[_15∈2]<br /><_12>"]:::itemplan
     PgSelectSingle_16["PgSelectSingle[_16∈2]<br /><entity_search>"]:::plan
-    PgClassExpression_17["PgClassExpression[_17∈2]<br /><__entity_s...person_id#quot;>"]:::plan
-    PgClassExpression_18["PgClassExpression[_18∈2]<br /><__entity_s....#quot;post_id#quot;>"]:::plan
-    PgClassExpression_19["PgClassExpression[_19∈2]<br /><__entity_s...omment_id#quot;>"]:::plan
+    PgClassExpression_17["PgClassExpression[_17∈2]<br /><__entity_s...person_id”>"]:::plan
+    PgClassExpression_18["PgClassExpression[_18∈2]<br /><__entity_s....”post_id”>"]:::plan
+    PgClassExpression_19["PgClassExpression[_19∈2]<br /><__entity_s...omment_id”>"]:::plan
     List_20["List[_20∈2]<br /><_17,_18,_19>"]:::plan
     PgPolymorphic_21["PgPolymorphic[_21∈2]"]:::plan
     First_26["First[_26∈2]"]:::plan
     PgSelectSingle_27["PgSelectSingle[_27∈3]<br /><people>"]:::plan
-    PgClassExpression_28["PgClassExpression[_28∈3]<br /><__people__.#quot;person_id#quot;>"]:::plan
-    PgClassExpression_29["PgClassExpression[_29∈3]<br /><__people__.#quot;username#quot;>"]:::plan
+    PgClassExpression_28["PgClassExpression[_28∈3]<br /><__people__.”person_id”>"]:::plan
+    PgClassExpression_29["PgClassExpression[_29∈3]<br /><__people__.”username”>"]:::plan
     First_34["First[_34∈2]"]:::plan
     PgSelectSingle_35["PgSelectSingle[_35∈4]<br /><posts>"]:::plan
-    PgClassExpression_36["PgClassExpression[_36∈4]<br /><__posts__.#quot;post_id#quot;>"]:::plan
-    PgClassExpression_37["PgClassExpression[_37∈4]<br /><__posts__.#quot;author_id#quot;>"]:::plan
+    PgClassExpression_36["PgClassExpression[_36∈4]<br /><__posts__.”post_id”>"]:::plan
+    PgClassExpression_37["PgClassExpression[_37∈4]<br /><__posts__.”author_id”>"]:::plan
     PgSelect_38[["PgSelect[_38∈4]<br /><people>"]]:::plan
     First_42["First[_42∈4]"]:::plan
     PgSelectSingle_43["PgSelectSingle[_43∈4]<br /><people>"]:::plan
-    PgClassExpression_44["PgClassExpression[_44∈4]<br /><__people__.#quot;username#quot;>"]:::plan
-    PgClassExpression_45["PgClassExpression[_45∈4]<br /><__posts__.#quot;body#quot;>"]:::plan
+    PgClassExpression_44["PgClassExpression[_44∈4]<br /><__people__.”username”>"]:::plan
+    PgClassExpression_45["PgClassExpression[_45∈4]<br /><__posts__.”body”>"]:::plan
     First_50["First[_50∈2]"]:::plan
     PgSelectSingle_51["PgSelectSingle[_51∈5]<br /><comments>"]:::plan
-    PgClassExpression_52["PgClassExpression[_52∈5]<br /><__comments...omment_id#quot;>"]:::plan
-    PgClassExpression_53["PgClassExpression[_53∈5]<br /><__comments...author_id#quot;>"]:::plan
+    PgClassExpression_52["PgClassExpression[_52∈5]<br /><__comments...omment_id”>"]:::plan
+    PgClassExpression_53["PgClassExpression[_53∈5]<br /><__comments...author_id”>"]:::plan
     PgSelect_54[["PgSelect[_54∈5]<br /><people>"]]:::plan
     First_58["First[_58∈5]"]:::plan
     PgSelectSingle_59["PgSelectSingle[_59∈5]<br /><people>"]:::plan
-    PgClassExpression_60["PgClassExpression[_60∈5]<br /><__people__.#quot;username#quot;>"]:::plan
-    PgClassExpression_61["PgClassExpression[_61∈5]<br /><__comments__.#quot;post_id#quot;>"]:::plan
+    PgClassExpression_60["PgClassExpression[_60∈5]<br /><__people__.”username”>"]:::plan
+    PgClassExpression_61["PgClassExpression[_61∈5]<br /><__comments__.”post_id”>"]:::plan
     PgSelect_62[["PgSelect[_62∈5]<br /><posts>"]]:::plan
     Access_63["Access[_63∈0]<br /><_3.pgSettings>"]:::plan
     Access_64["Access[_64∈0]<br /><_3.withPgClient>"]:::plan
     Object_65["Object[_65∈0]<br /><{pgSettings,withPgClient}>"]:::plan
     First_66["First[_66∈5]"]:::plan
     PgSelectSingle_67["PgSelectSingle[_67∈5]<br /><posts>"]:::plan
-    PgClassExpression_68["PgClassExpression[_68∈5]<br /><__posts__.#quot;post_id#quot;>"]:::plan
-    PgClassExpression_69["PgClassExpression[_69∈5]<br /><__posts__.#quot;body#quot;>"]:::plan
-    PgClassExpression_70["PgClassExpression[_70∈5]<br /><__comments__.#quot;body#quot;>"]:::plan
-    Map_71["Map[_71∈2]<br /><_16:{#quot;0#quot;:0,#quot;1#quot;:1}>"]:::plan
+    PgClassExpression_68["PgClassExpression[_68∈5]<br /><__posts__.”post_id”>"]:::plan
+    PgClassExpression_69["PgClassExpression[_69∈5]<br /><__posts__.”body”>"]:::plan
+    PgClassExpression_70["PgClassExpression[_70∈5]<br /><__comments__.”body”>"]:::plan
+    Map_71["Map[_71∈2]<br /><_16:{”0”:0,”1”:1}>"]:::plan
     List_72["List[_72∈2]<br /><_71>"]:::plan
-    Map_73["Map[_73∈2]<br /><_16:{#quot;0#quot;:3,#quot;1#quot;:4,#quot;2#quot;:5}>"]:::plan
+    Map_73["Map[_73∈2]<br /><_16:{”0”:3,”1”:4,”2”:5}>"]:::plan
     List_74["List[_74∈2]<br /><_73>"]:::plan
-    Map_75["Map[_75∈2]<br /><_16:{#quot;0#quot;:7,#quot;1#quot;:8,#quot;2#quot;:9,#quot;3#quot;:10}>"]:::plan
+    Map_75["Map[_75∈2]<br /><_16:{”0”:7,”1”:8,”2”:9,”3”:10}>"]:::plan
     List_76["List[_76∈2]<br /><_75>"]:::plan
 
     %% plan dependencies
@@ -155,22 +122,40 @@ graph TD
     Map_75 --> List_76
 
     %% plan-to-path relationships
+    P1["~"]
     __TrackedObject_6 -.-> P1
-    __ListTransform_12 -.-> P2
-    PgPolymorphic_21 -.-> P3
-    PgClassExpression_28 -.-> P4
-    PgClassExpression_29 -.-> P5
-    PgClassExpression_36 -.-> P6
-    PgSelectSingle_43 -.-> P7
-    PgClassExpression_44 -.-> P8
-    PgClassExpression_45 -.-> P9
-    PgClassExpression_52 -.-> P10
-    PgSelectSingle_59 -.-> P11
-    PgClassExpression_60 -.-> P12
-    PgSelectSingle_67 -.-> P13
-    PgClassExpression_68 -.-> P14
-    PgClassExpression_69 -.-> P15
-    PgClassExpression_70 -.-> P16
+    P2[">searchEntities@_12[]"]
+    PgSelectSingle_14 -.-> P2
+    P3[">searchEntities"]
+    __ListTransform_12 -.-> P3
+    P4[">searchEntities[]"]
+    PgPolymorphic_21 -.-> P4
+    P5[">s…]>personId"]
+    PgClassExpression_28 -.-> P5
+    P6[">s…]>username"]
+    PgClassExpression_29 -.-> P6
+    P7[">s…]>postId"]
+    PgClassExpression_36 -.-> P7
+    P8[">s…]>author"]
+    PgSelectSingle_43 -.-> P8
+    P9[">s…]>a…r>username"]
+    PgClassExpression_44 -.-> P9
+    P10[">s…]>body"]
+    PgClassExpression_45 -.-> P10
+    P11[">s…]>commentId"]
+    PgClassExpression_52 -.-> P11
+    P12[">s…]>author"]
+    PgSelectSingle_59 -.-> P12
+    P13[">s…]>a…r>username"]
+    PgClassExpression_60 -.-> P13
+    P14[">s…]>post"]
+    PgSelectSingle_67 -.-> P14
+    P15[">s…]>post>postId"]
+    PgClassExpression_68 -.-> P15
+    P16[">s…]>post>body"]
+    PgClassExpression_69 -.-> P16
+    P17[">s…]>body"]
+    PgClassExpression_70 -.-> P17
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

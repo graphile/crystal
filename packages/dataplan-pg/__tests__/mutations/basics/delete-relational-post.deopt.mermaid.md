@@ -6,53 +6,6 @@ graph TD
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
-    %% subgraph fields
-    P1{{"~"}}:::path
-    P2{{">d1"}}:::path
-    P3([">d1>id"]):::path
-    %% P2 -.-> P3
-    P4{{">d1>post"}}:::path
-    P5([">d1>post>id"]):::path
-    %% P4 -.-> P5
-    P6([">d1>post>title"]):::path
-    %% P4 -.-> P6
-    P7([">d1>post>description"]):::path
-    %% P4 -.-> P7
-    P8([">d1>post>note"]):::path
-    %% P4 -.-> P8
-    P9([">d1>post>titleLower"]):::path
-    %% P4 -.-> P9
-    P10{{">d1>post>author"}}:::path
-    P11([">d1>post>author>personId"]):::path
-    %% P10 -.-> P11
-    P12([">d1>post>author>username"]):::path
-    %% P10 -.-> P12
-    %% P4 -.-> P10
-    %% P2 -.-> P4
-    %% P1 -.-> P2
-    P13{{">d2"}}:::path
-    P14([">d2>id"]):::path
-    %% P13 -.-> P14
-    P15{{">d2>post"}}:::path
-    P16([">d2>post>id"]):::path
-    %% P15 -.-> P16
-    P17([">d2>post>title"]):::path
-    %% P15 -.-> P17
-    P18([">d2>post>description"]):::path
-    %% P15 -.-> P18
-    P19([">d2>post>note"]):::path
-    %% P15 -.-> P19
-    P20([">d2>post>titleLower"]):::path
-    %% P15 -.-> P20
-    P21{{">d2>post>author"}}:::path
-    P22([">d2>post>author>personId"]):::path
-    %% P21 -.-> P22
-    P23([">d2>post>author>username"]):::path
-    %% P21 -.-> P23
-    %% P15 -.-> P21
-    %% P13 -.-> P15
-    %% P1 -.-> P13
-    %% end
 
     %% define plans
     __Value_3["__Value[_3∈0] {1,2}<br /><context>"]:::plan
@@ -60,58 +13,58 @@ graph TD
     __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     InputStaticLeaf_8["InputStaticLeaf[_8∈1@1]"]:::plan
     PgDelete_9[["PgDelete[_9∈1@1]"]]:::sideeffectplan
-    PgClassExpression_13["PgClassExpression[_13∈1@1]<br /><__relation...sts__.#quot;id#quot;>"]:::plan
+    PgClassExpression_13["PgClassExpression[_13∈1@1]<br /><__relation...sts__.”id”>"]:::plan
     PgClassExpression_14["PgClassExpression[_14∈1@1]<br /><__relational_posts__>"]:::plan
     PgSelect_15[["PgSelect[_15∈1@1]<br /><relational_posts>"]]:::plan
     First_19["First[_19∈1@1]"]:::plan
     PgSelectSingle_20["PgSelectSingle[_20∈1@1]<br /><relational_posts>"]:::plan
-    PgClassExpression_21["PgClassExpression[_21∈1@1]<br /><__relation...sts__.#quot;id#quot;>"]:::plan
-    PgClassExpression_22["PgClassExpression[_22∈1@1]<br /><__relation...__.#quot;title#quot;>"]:::plan
-    PgClassExpression_23["PgClassExpression[_23∈1@1]<br /><__relation...scription#quot;>"]:::plan
-    PgClassExpression_24["PgClassExpression[_24∈1@1]<br /><__relation...s__.#quot;note#quot;>"]:::plan
+    PgClassExpression_21["PgClassExpression[_21∈1@1]<br /><__relation...sts__.”id”>"]:::plan
+    PgClassExpression_22["PgClassExpression[_22∈1@1]<br /><__relation...__.”title”>"]:::plan
+    PgClassExpression_23["PgClassExpression[_23∈1@1]<br /><__relation...scription”>"]:::plan
+    PgClassExpression_24["PgClassExpression[_24∈1@1]<br /><__relation...s__.”note”>"]:::plan
     First_30["First[_30∈1@1]"]:::plan
     PgSelectSingle_31["PgSelectSingle[_31∈1@1]<br /><text>"]:::plan
     PgClassExpression_32["PgClassExpression[_32∈1@1]<br /><__relation...le_lower__>"]:::plan
     First_38["First[_38∈1@1]"]:::plan
     PgSelectSingle_39["PgSelectSingle[_39∈1@1]<br /><relational_items>"]:::plan
-    PgClassExpression_40["PgClassExpression[_40∈1@1]<br /><__relation...author_id#quot;>"]:::plan
+    PgClassExpression_40["PgClassExpression[_40∈1@1]<br /><__relation...author_id”>"]:::plan
     PgSelect_41[["PgSelect[_41∈1@1]<br /><people>"]]:::plan
     First_45["First[_45∈1@1]"]:::plan
     PgSelectSingle_46["PgSelectSingle[_46∈1@1]<br /><people>"]:::plan
-    PgClassExpression_47["PgClassExpression[_47∈1@1]<br /><__people__.#quot;person_id#quot;>"]:::plan
-    PgClassExpression_48["PgClassExpression[_48∈1@1]<br /><__people__.#quot;username#quot;>"]:::plan
+    PgClassExpression_47["PgClassExpression[_47∈1@1]<br /><__people__.”person_id”>"]:::plan
+    PgClassExpression_48["PgClassExpression[_48∈1@1]<br /><__people__.”username”>"]:::plan
     InputStaticLeaf_50["InputStaticLeaf[_50∈2@2]"]:::plan
     PgDelete_51[["PgDelete[_51∈2@2]"]]:::sideeffectplan
-    PgClassExpression_55["PgClassExpression[_55∈2@2]<br /><__relation...sts__.#quot;id#quot;>"]:::plan
+    PgClassExpression_55["PgClassExpression[_55∈2@2]<br /><__relation...sts__.”id”>"]:::plan
     PgClassExpression_56["PgClassExpression[_56∈2@2]<br /><__relational_posts__>"]:::plan
     PgSelect_57[["PgSelect[_57∈2@2]<br /><relational_posts>"]]:::plan
     First_61["First[_61∈2@2]"]:::plan
     PgSelectSingle_62["PgSelectSingle[_62∈2@2]<br /><relational_posts>"]:::plan
-    PgClassExpression_63["PgClassExpression[_63∈2@2]<br /><__relation...sts__.#quot;id#quot;>"]:::plan
-    PgClassExpression_64["PgClassExpression[_64∈2@2]<br /><__relation...__.#quot;title#quot;>"]:::plan
-    PgClassExpression_65["PgClassExpression[_65∈2@2]<br /><__relation...scription#quot;>"]:::plan
-    PgClassExpression_66["PgClassExpression[_66∈2@2]<br /><__relation...s__.#quot;note#quot;>"]:::plan
+    PgClassExpression_63["PgClassExpression[_63∈2@2]<br /><__relation...sts__.”id”>"]:::plan
+    PgClassExpression_64["PgClassExpression[_64∈2@2]<br /><__relation...__.”title”>"]:::plan
+    PgClassExpression_65["PgClassExpression[_65∈2@2]<br /><__relation...scription”>"]:::plan
+    PgClassExpression_66["PgClassExpression[_66∈2@2]<br /><__relation...s__.”note”>"]:::plan
     First_72["First[_72∈2@2]"]:::plan
     PgSelectSingle_73["PgSelectSingle[_73∈2@2]<br /><text>"]:::plan
     PgClassExpression_74["PgClassExpression[_74∈2@2]<br /><__relation...le_lower__>"]:::plan
     First_80["First[_80∈2@2]"]:::plan
     PgSelectSingle_81["PgSelectSingle[_81∈2@2]<br /><relational_items>"]:::plan
-    PgClassExpression_82["PgClassExpression[_82∈2@2]<br /><__relation...author_id#quot;>"]:::plan
+    PgClassExpression_82["PgClassExpression[_82∈2@2]<br /><__relation...author_id”>"]:::plan
     PgSelect_83[["PgSelect[_83∈2@2]<br /><people>"]]:::plan
     Access_84["Access[_84∈0] {1,2}<br /><_3.pgSettings>"]:::plan
     Access_85["Access[_85∈0] {1,2}<br /><_3.withPgClient>"]:::plan
     Object_86["Object[_86∈0] {1,2}<br /><{pgSettings,withPgClient}>"]:::plan
     First_87["First[_87∈2@2]"]:::plan
     PgSelectSingle_88["PgSelectSingle[_88∈2@2]<br /><people>"]:::plan
-    PgClassExpression_89["PgClassExpression[_89∈2@2]<br /><__people__.#quot;person_id#quot;>"]:::plan
-    PgClassExpression_90["PgClassExpression[_90∈2@2]<br /><__people__.#quot;username#quot;>"]:::plan
-    Map_91["Map[_91∈1@1]<br /><_20:{#quot;0#quot;:0}>"]:::plan
+    PgClassExpression_89["PgClassExpression[_89∈2@2]<br /><__people__.”person_id”>"]:::plan
+    PgClassExpression_90["PgClassExpression[_90∈2@2]<br /><__people__.”username”>"]:::plan
+    Map_91["Map[_91∈1@1]<br /><_20:{”0”:0}>"]:::plan
     List_92["List[_92∈1@1]<br /><_91>"]:::plan
-    Map_93["Map[_93∈1@1]<br /><_20:{#quot;0#quot;:5}>"]:::plan
+    Map_93["Map[_93∈1@1]<br /><_20:{”0”:5}>"]:::plan
     List_94["List[_94∈1@1]<br /><_93>"]:::plan
-    Map_95["Map[_95∈2@2]<br /><_62:{#quot;0#quot;:0}>"]:::plan
+    Map_95["Map[_95∈2@2]<br /><_62:{”0”:0}>"]:::plan
     List_96["List[_96∈2@2]<br /><_95>"]:::plan
-    Map_97["Map[_97∈2@2]<br /><_62:{#quot;0#quot;:5}>"]:::plan
+    Map_97["Map[_97∈2@2]<br /><_62:{”0”:5}>"]:::plan
     List_98["List[_98∈2@2]<br /><_97>"]:::plan
 
     %% plan dependencies
@@ -178,28 +131,51 @@ graph TD
     Map_97 --> List_98
 
     %% plan-to-path relationships
+    P1["~"]
     __TrackedObject_6 -.-> P1
+    P2[">d1"]
     PgDelete_9 -.-> P2
+    P3[">d1>id"]
     PgClassExpression_13 -.-> P3
+    P4[">d1>post"]
     PgSelectSingle_20 -.-> P4
+    P5[">d1>post>id"]
     PgClassExpression_21 -.-> P5
+    P6[">d1>post>title"]
     PgClassExpression_22 -.-> P6
+    P7[">d1>post>description"]
     PgClassExpression_23 -.-> P7
+    P8[">d1>post>note"]
     PgClassExpression_24 -.-> P8
+    P9[">d1>post>titleLower"]
     PgClassExpression_32 -.-> P9
+    P10[">d1>post>author"]
     PgSelectSingle_46 -.-> P10
+    P11[">d1>post>a…r>personId"]
     PgClassExpression_47 -.-> P11
+    P12[">d1>post>a…r>username"]
     PgClassExpression_48 -.-> P12
+    P13[">d2"]
     PgDelete_51 -.-> P13
+    P14[">d2>id"]
     PgClassExpression_55 -.-> P14
+    P15[">d2>post"]
     PgSelectSingle_62 -.-> P15
+    P16[">d2>post>id"]
     PgClassExpression_63 -.-> P16
+    P17[">d2>post>title"]
     PgClassExpression_64 -.-> P17
+    P18[">d2>post>description"]
     PgClassExpression_65 -.-> P18
+    P19[">d2>post>note"]
     PgClassExpression_66 -.-> P19
+    P20[">d2>post>titleLower"]
     PgClassExpression_74 -.-> P20
+    P21[">d2>post>author"]
     PgSelectSingle_88 -.-> P21
+    P22[">d2>post>a…r>personId"]
     PgClassExpression_89 -.-> P22
+    P23[">d2>post>a…r>username"]
     PgClassExpression_90 -.-> P23
 
     %% allocate buckets

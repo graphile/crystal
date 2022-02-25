@@ -6,21 +6,6 @@ graph TD
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
-    %% subgraph fields
-    P1{{"~"}}:::path
-    P2[/">forums"\]:::path
-    P3>">forums[]"]:::path
-    P2 -.- P3
-    P4{{">fo…s[]>messagesConnection"}}:::path
-    P5{{">fo…s[]>me…ion>pageInfo"}}:::path
-    P6([">fo…s[]>me…ion>pa…nfo>hasNextPage"]):::path
-    %% P5 -.-> P6
-    %% P4 -.-> P5
-    P7([">fo…s[]>me…ion>totalCount"]):::path
-    %% P4 -.-> P7
-    %% P3 -.-> P4
-    %% P1 -.-> P2
-    %% end
 
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
@@ -66,12 +51,19 @@ graph TD
     __Item_21 --> Access_48
 
     %% plan-to-path relationships
+    P1["~"]
     __TrackedObject_6 -.-> P1
+    P2[">forums"]
     PgSelect_17 -.-> P2
+    P3[">forums[]"]
     PgSelectSingle_22 -.-> P3
+    P4[">f…]>messagesConnection"]
     Connection_37 -.-> P4
+    P5[">f…]>m…n>pageInfo"]
     PgPageInfo_39 -.-> P5
+    P6[">f…]>m…n>p…o>hasNextPage"]
     Lambda_41 -.-> P6
+    P7[">f…]>m…n>totalCount"]
     PgClassExpression_45 -.-> P7
 
     %% allocate buckets

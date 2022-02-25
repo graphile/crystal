@@ -6,17 +6,6 @@ graph TD
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
-    %% subgraph fields
-    P1{{"~"}}:::path
-    P2{{">forum"}}:::path
-    P3([">forum>all"]):::path
-    %% P2 -.-> P3
-    P4([">forum>featured"]):::path
-    %% P2 -.-> P4
-    P5([">forum>unfeatured"]):::path
-    %% P2 -.-> P5
-    %% P1 -.-> P2
-    %% end
 
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
@@ -41,11 +30,11 @@ graph TD
     First_38["First[_38∈0]"]:::plan
     PgSelectSingle_39["PgSelectSingle[_39∈0]<br /><forums_unique_author_count>"]:::plan
     PgClassExpression_40["PgClassExpression[_40∈0]<br /><__forums_u...or_count__>"]:::plan
-    Map_41["Map[_41∈0]<br /><_13:{#quot;0#quot;:0}>"]:::plan
+    Map_41["Map[_41∈0]<br /><_13:{”0”:0}>"]:::plan
     List_42["List[_42∈0]<br /><_41>"]:::plan
-    Map_43["Map[_43∈0]<br /><_13:{#quot;0#quot;:1}>"]:::plan
+    Map_43["Map[_43∈0]<br /><_13:{”0”:1}>"]:::plan
     List_44["List[_44∈0]<br /><_43>"]:::plan
-    Map_45["Map[_45∈0]<br /><_13:{#quot;0#quot;:2}>"]:::plan
+    Map_45["Map[_45∈0]<br /><_13:{”0”:2}>"]:::plan
     List_46["List[_46∈0]<br /><_45>"]:::plan
 
     %% plan dependencies
@@ -78,10 +67,15 @@ graph TD
     Map_45 --> List_46
 
     %% plan-to-path relationships
+    P1["~"]
     __TrackedObject_6 -.-> P1
+    P2[">forum"]
     PgSelectSingle_13 -.-> P2
+    P3[">f…m>all"]
     PgClassExpression_22 -.-> P3
+    P4[">f…m>featured"]
     PgClassExpression_31 -.-> P4
+    P5[">f…m>unfeatured"]
     PgClassExpression_40 -.-> P5
 
     %% allocate buckets

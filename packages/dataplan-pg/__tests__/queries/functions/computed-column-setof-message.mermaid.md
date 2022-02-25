@@ -6,17 +6,6 @@ graph TD
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
-    %% subgraph fields
-    P1{{"~"}}:::path
-    P2{{">forum"}}:::path
-    P3[/">forum>featuredMessages"\]:::path
-    P4>">forum>featuredMessages[]"]:::path
-    P3 -.- P4
-    P5([">forum>fe…s[]>body"]):::path
-    %% P4 -.-> P5
-    %% P2 -.-> P3
-    %% P1 -.-> P2
-    %% end
 
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
@@ -31,7 +20,7 @@ graph TD
     Object_18["Object[_18∈0]<br /><{pgSettings,withPgClient}>"]:::plan
     __Item_19>"__Item[_19∈1]<br /><_22>"]:::itemplan
     PgSelectSingle_20["PgSelectSingle[_20∈1]<br /><forums_featured_messages>"]:::plan
-    PgClassExpression_21["PgClassExpression[_21∈1]<br /><__forums_f...s__.#quot;body#quot;>"]:::plan
+    PgClassExpression_21["PgClassExpression[_21∈1]<br /><__forums_f...s__.”body”>"]:::plan
     Access_22["Access[_22∈0]<br /><_12.0>"]:::plan
 
     %% plan dependencies
@@ -50,10 +39,15 @@ graph TD
     First_12 --> Access_22
 
     %% plan-to-path relationships
+    P1["~"]
     __TrackedObject_6 -.-> P1
+    P2[">forum"]
     PgSelectSingle_13 -.-> P2
+    P3[">f…m>featuredMessages"]
     Access_22 -.-> P3
+    P4[">f…m>featuredMessages[]"]
     PgSelectSingle_20 -.-> P4
+    P5[">f…m>f…]>body"]
     PgClassExpression_21 -.-> P5
 
     %% allocate buckets

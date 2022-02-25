@@ -6,45 +6,6 @@ graph TD
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
-    %% subgraph fields
-    P1{{"~"}}:::path
-    P2{{">randomUser"}}:::path
-    P3([">ra…ser>username"]):::path
-    %% P2 -.-> P3
-    P4{{">ra…ser>usernameHashes"}}:::path
-    P5([">ra…ser>us…hes>md5"]):::path
-    %% P4 -.-> P5
-    P6([">ra…ser>us…hes>sha256"]):::path
-    %% P4 -.-> P6
-    P7{{">ra…ser>us…hes>self"}}:::path
-    P8{{">ra…ser>us…hes>self>nne"}}:::path
-    P9([">ra…ser>us…hes>self>nne>md5"]):::path
-    %% P8 -.-> P9
-    P10([">ra…ser>us…hes>self>nne>sha256"]):::path
-    %% P8 -.-> P10
-    P11([">ra…ser>us…hes>self>nne>throwNonNullError"]):::path
-    %% P8 -.-> P11
-    %% P7 -.-> P8
-    P12{{">ra…ser>us…hes>self>te"}}:::path
-    P13([">ra…ser>us…hes>self>te>md5"]):::path
-    %% P12 -.-> P13
-    P14([">ra…ser>us…hes>self>te>sha256"]):::path
-    %% P12 -.-> P14
-    P15([">ra…ser>us…hes>self>te>throwTestError"]):::path
-    %% P12 -.-> P15
-    %% P7 -.-> P12
-    P16([">ra…ser>us…hes>self>MD5"]):::path
-    %% P7 -.-> P16
-    P17([">ra…ser>us…hes>self>SHA256"]):::path
-    %% P7 -.-> P17
-    P18([">ra…ser>us…hes>self>SHA256_2"]):::path
-    %% P7 -.-> P18
-    %% P4 -.-> P7
-    P19([">ra…ser>us…hes>throwTestError"]):::path
-    %% P4 -.-> P19
-    %% P2 -.-> P4
-    %% P1 -.-> P2
-    %% end
 
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
@@ -56,7 +17,7 @@ graph TD
     Object_10["Object[_10∈0]<br /><{pgSettings,withPgClient}>"]:::plan
     First_11["First[_11∈0]"]:::plan
     PgSelectSingle_12["PgSelectSingle[_12∈0]<br /><users>"]:::plan
-    PgClassExpression_13["PgClassExpression[_13∈0]<br /><__random_u...#quot;username#quot;>"]:::plan
+    PgClassExpression_13["PgClassExpression[_13∈0]<br /><__random_u...”username”>"]:::plan
     __Value_15["__Value[_15∈0]"]:::plan
     __Value_16["__Value[_16∈0]"]:::plan
     __Value_17["__Value[_17∈0]"]:::plan
@@ -74,25 +35,20 @@ graph TD
     PgSelectSingle_12 --> PgClassExpression_13
 
     %% plan-to-path relationships
+    P1["~"]
     __TrackedObject_6 -.-> P1
+    P2[">randomUser"]
     PgSelectSingle_12 -.-> P2
+    P3[">r…r>username<br />>r…r>usernameHashes"]
     PgClassExpression_13 -.-> P3
-    PgClassExpression_13 -.-> P4
-    __Value_15 -.-> P5
-    __Value_15 -.-> P6
-    __Value_15 -.-> P7
-    __Value_16 -.-> P8
-    __Value_17 -.-> P9
-    __Value_17 -.-> P10
-    __Value_17 -.-> P11
-    __Value_16 -.-> P12
-    __Value_18 -.-> P13
-    __Value_18 -.-> P14
-    __Value_18 -.-> P15
-    __Value_16 -.-> P16
-    __Value_16 -.-> P17
-    __Value_16 -.-> P18
-    __Value_15 -.-> P19
+    P4[">r…r>u…s>md5<br />>r…r>u…s>self<br />>r…r>u…s>sha256<br />>r…r>u…s>throwTestError"]
+    __Value_15 -.-> P4
+    P5[">r…r>u…s>self>te<br />>r…r>u…s>self>nne<br />>r…r>u…s>self>MD5<br />>r…r>u…s>self>SHA256<br />>r…r>u…s>self>SHA256_2"]
+    __Value_16 -.-> P5
+    P6[">r…r>u…s>self>nne>md5<br />>r…r>u…s>self>nne>sha256<br />>r…r>u…s>self>nne>throwNonNullError"]
+    __Value_17 -.-> P6
+    P7[">r…r>u…s>self>te>md5<br />>r…r>u…s>self>te>sha256<br />>r…r>u…s>self>te>throwTestError"]
+    __Value_18 -.-> P7
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

@@ -6,23 +6,6 @@ graph TD
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
-    %% subgraph fields
-    P1{{"~"}}:::path
-    P2[/">forums"\]:::path
-    P3>">forums[]"]:::path
-    P2 -.- P3
-    P4([">fo…s[]>name"]):::path
-    %% P3 -.-> P4
-    P5[/">fo…s[]>messagesList"\]:::path
-    P6>">fo…s[]>messagesList[]"]:::path
-    P5 -.- P6
-    P7([">fo…s[]>me…t[]>body"]):::path
-    %% P6 -.-> P7
-    P8([">fo…s[]>me…t[]>featured"]):::path
-    %% P6 -.-> P8
-    %% P3 -.-> P5
-    %% P1 -.-> P2
-    %% end
 
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
@@ -32,18 +15,18 @@ graph TD
     PgSelect_17[["PgSelect[_17∈0]<br /><forums>"]]:::plan
     __Item_21>"__Item[_21∈1]<br /><_17>"]:::itemplan
     PgSelectSingle_22["PgSelectSingle[_22∈1]<br /><forums>"]:::plan
-    PgClassExpression_23["PgClassExpression[_23∈1]<br /><__forums__.#quot;name#quot;>"]:::plan
+    PgClassExpression_23["PgClassExpression[_23∈1]<br /><__forums__.”name”>"]:::plan
     InputStaticLeaf_30["InputStaticLeaf[_30∈0]"]:::plan
-    PgClassExpression_32["PgClassExpression[_32∈1]<br /><__forums__.#quot;id#quot;>"]:::plan
+    PgClassExpression_32["PgClassExpression[_32∈1]<br /><__forums__.”id”>"]:::plan
     PgSelect_33[["PgSelect[_33∈1]<br /><messages>"]]:::plan
     Access_34["Access[_34∈0]<br /><_3.pgSettings>"]:::plan
     Access_35["Access[_35∈0]<br /><_3.withPgClient>"]:::plan
     Object_36["Object[_36∈0]<br /><{pgSettings,withPgClient}>"]:::plan
-    PgClassExpression_37["PgClassExpression[_37∈1]<br /><__forums__...chived_at#quot;>"]:::plan
+    PgClassExpression_37["PgClassExpression[_37∈1]<br /><__forums__...chived_at”>"]:::plan
     __Item_38>"__Item[_38∈2]<br /><_33>"]:::itemplan
     PgSelectSingle_39["PgSelectSingle[_39∈2]<br /><messages>"]:::plan
-    PgClassExpression_40["PgClassExpression[_40∈2]<br /><__messages__.#quot;body#quot;>"]:::plan
-    PgClassExpression_41["PgClassExpression[_41∈2]<br /><__messages__.#quot;featured#quot;>"]:::plan
+    PgClassExpression_40["PgClassExpression[_40∈2]<br /><__messages__.”body”>"]:::plan
+    PgClassExpression_41["PgClassExpression[_41∈2]<br /><__messages__.”featured”>"]:::plan
 
     %% plan dependencies
     __Value_5 --> __TrackedObject_6
@@ -68,13 +51,21 @@ graph TD
     PgSelectSingle_39 --> PgClassExpression_41
 
     %% plan-to-path relationships
+    P1["~"]
     __TrackedObject_6 -.-> P1
+    P2[">forums"]
     PgSelect_17 -.-> P2
+    P3[">forums[]"]
     PgSelectSingle_22 -.-> P3
+    P4[">f…]>name"]
     PgClassExpression_23 -.-> P4
+    P5[">f…]>messagesList"]
     PgSelect_33 -.-> P5
+    P6[">f…]>messagesList[]"]
     PgSelectSingle_39 -.-> P6
+    P7[">f…]>m…]>body"]
     PgClassExpression_40 -.-> P7
+    P8[">f…]>m…]>featured"]
     PgClassExpression_41 -.-> P8
 
     %% allocate buckets

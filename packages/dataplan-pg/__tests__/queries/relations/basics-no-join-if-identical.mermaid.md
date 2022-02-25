@@ -6,19 +6,6 @@ graph TD
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
-    %% subgraph fields
-    P1{{"~"}}:::path
-    P2{{">message"}}:::path
-    P3([">message>id"]):::path
-    %% P2 -.-> P3
-    P4([">message>body"]):::path
-    %% P2 -.-> P4
-    P5{{">message>forum"}}:::path
-    P6([">message>forum>id"]):::path
-    %% P5 -.-> P6
-    %% P2 -.-> P5
-    %% P1 -.-> P2
-    %% end
 
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
@@ -28,15 +15,15 @@ graph TD
     PgSelect_8[["PgSelect[_8∈0]<br /><messages>"]]:::plan
     First_12["First[_12∈0]"]:::plan
     PgSelectSingle_13["PgSelectSingle[_13∈0]<br /><messages>"]:::plan
-    PgClassExpression_14["PgClassExpression[_14∈0]<br /><__messages__.#quot;id#quot;>"]:::plan
-    PgClassExpression_15["PgClassExpression[_15∈0]<br /><__messages__.#quot;body#quot;>"]:::plan
-    PgClassExpression_16["PgClassExpression[_16∈0]<br /><__messages__.#quot;forum_id#quot;>"]:::plan
+    PgClassExpression_14["PgClassExpression[_14∈0]<br /><__messages__.”id”>"]:::plan
+    PgClassExpression_15["PgClassExpression[_15∈0]<br /><__messages__.”body”>"]:::plan
+    PgClassExpression_16["PgClassExpression[_16∈0]<br /><__messages__.”forum_id”>"]:::plan
     Access_18["Access[_18∈0]<br /><_3.pgSettings>"]:::plan
     Access_19["Access[_19∈0]<br /><_3.withPgClient>"]:::plan
     Object_20["Object[_20∈0]<br /><{pgSettings,withPgClient}>"]:::plan
     First_21["First[_21∈0]"]:::plan
     PgSelectSingle_22["PgSelectSingle[_22∈0]<br /><forums>"]:::plan
-    Map_24["Map[_24∈0]<br /><_13:{#quot;0#quot;:2}>"]:::plan
+    Map_24["Map[_24∈0]<br /><_13:{”0”:2}>"]:::plan
     List_25["List[_25∈0]<br /><_24>"]:::plan
 
     %% plan dependencies
@@ -58,11 +45,17 @@ graph TD
     Map_24 --> List_25
 
     %% plan-to-path relationships
+    P1["~"]
     __TrackedObject_6 -.-> P1
+    P2[">message"]
     PgSelectSingle_13 -.-> P2
+    P3[">m…e>id"]
     PgClassExpression_14 -.-> P3
+    P4[">m…e>body"]
     PgClassExpression_15 -.-> P4
+    P5[">m…e>forum"]
     PgSelectSingle_22 -.-> P5
+    P6[">m…e>f…m>id"]
     PgClassExpression_16 -.-> P6
 
     %% allocate buckets

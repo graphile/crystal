@@ -6,21 +6,6 @@ graph TD
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
-    %% subgraph fields
-    P1{{"~"}}:::path
-    P2[/">forums"\]:::path
-    P3>">forums[]"]:::path
-    P2 -.- P3
-    P4{{">fo…s[]>messagesConnection"}}:::path
-    P5{{">fo…s[]>me…ion>pageInfo"}}:::path
-    P6([">fo…s[]>me…ion>pa…nfo>hasNextPage"]):::path
-    %% P5 -.-> P6
-    %% P4 -.-> P5
-    P7([">fo…s[]>me…ion>totalCount"]):::path
-    %% P4 -.-> P7
-    %% P3 -.-> P4
-    %% P1 -.-> P2
-    %% end
 
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
@@ -32,12 +17,12 @@ graph TD
     InputStaticLeaf_23["InputStaticLeaf[_23∈0]"]:::plan
     InputStaticLeaf_24["InputStaticLeaf[_24∈0]"]:::plan
     InputStaticLeaf_26["InputStaticLeaf[_26∈0]"]:::plan
-    PgClassExpression_32["PgClassExpression[_32∈1]<br /><__forums__.#quot;id#quot;>"]:::plan
+    PgClassExpression_32["PgClassExpression[_32∈1]<br /><__forums__.”id”>"]:::plan
     Access_34["Access[_34∈0]<br /><_3.pgSettings>"]:::plan
     Access_35["Access[_35∈0]<br /><_3.withPgClient>"]:::plan
     Object_36["Object[_36∈0]<br /><{pgSettings,withPgClient}>"]:::plan
     Connection_37["Connection[_37∈0]<br /><_33>"]:::plan
-    PgClassExpression_38["PgClassExpression[_38∈1]<br /><__forums__...chived_at#quot;>"]:::plan
+    PgClassExpression_38["PgClassExpression[_38∈1]<br /><__forums__...chived_at”>"]:::plan
     PgPageInfo_39["PgPageInfo[_39∈0]"]:::plan
     PgSelect_40[["PgSelect[_40∈1]<br /><messages>"]]:::plan
     Lambda_41["Lambda[_41∈1]<br /><listHasMore>"]:::plan
@@ -73,12 +58,19 @@ graph TD
     PgSelectSingle_44 --> PgClassExpression_45
 
     %% plan-to-path relationships
+    P1["~"]
     __TrackedObject_6 -.-> P1
+    P2[">forums"]
     PgSelect_17 -.-> P2
+    P3[">forums[]"]
     PgSelectSingle_22 -.-> P3
+    P4[">f…]>messagesConnection"]
     Connection_37 -.-> P4
+    P5[">f…]>m…n>pageInfo"]
     PgPageInfo_39 -.-> P5
+    P6[">f…]>m…n>p…o>hasNextPage"]
     Lambda_41 -.-> P6
+    P7[">f…]>m…n>totalCount"]
     PgClassExpression_45 -.-> P7
 
     %% allocate buckets

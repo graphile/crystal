@@ -6,13 +6,6 @@ graph TD
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
-    %% subgraph fields
-    P1{{"~"}}:::path
-    P2[/">forumNamesCasesList"\]:::path
-    P3>">forumNamesCasesList[][]"]:::path
-    P2 -.- P3
-    %% P1 -.-> P2
-    %% end
 
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
@@ -40,9 +33,14 @@ graph TD
     PgClassExpression_13 ==> __Item_14
 
     %% plan-to-path relationships
+    P1["~"]
     __TrackedObject_6 -.-> P1
+    P2[">forumNamesCasesList"]
     PgSelect_7 -.-> P2
-    __Item_14 -.-> P3
+    P3[">forumNamesCasesList[]"]
+    PgClassExpression_13 -.-> P3
+    P4[">forumNamesCasesList[][]"]
+    __Item_14 -.-> P4
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

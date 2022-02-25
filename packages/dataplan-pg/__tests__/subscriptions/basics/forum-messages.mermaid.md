@@ -6,41 +6,6 @@ graph TD
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
-    %% subgraph fields
-    P1{{"~"}}:::path
-    P2{{">forumMessage"}}:::path
-    P3([">fo…age>operationType"]):::path
-    %% P2 -.-> P3
-    P4{{">fo…age>message"}}:::path
-    P5([">fo…age>message>id"]):::path
-    %% P4 -.-> P5
-    P6([">fo…age>message>featured"]):::path
-    %% P4 -.-> P6
-    P7([">fo…age>message>body"]):::path
-    %% P4 -.-> P7
-    P8([">fo…age>message>isArchived"]):::path
-    %% P4 -.-> P8
-    P9{{">fo…age>message>forum"}}:::path
-    P10([">fo…age>message>forum>id"]):::path
-    %% P9 -.-> P10
-    P11([">fo…age>message>forum>name"]):::path
-    %% P9 -.-> P11
-    P12([">fo…age>message>forum>isArchived"]):::path
-    %% P9 -.-> P12
-    P13{{">fo…age>message>forum>self"}}:::path
-    P14([">fo…age>message>forum>self>name"]):::path
-    %% P13 -.-> P14
-    %% P9 -.-> P13
-    %% P4 -.-> P9
-    P15{{">fo…age>message>author"}}:::path
-    P16([">fo…age>message>author>username"]):::path
-    %% P15 -.-> P16
-    P17([">fo…age>message>author>gravatarUrl"]):::path
-    %% P15 -.-> P17
-    %% P4 -.-> P15
-    %% P2 -.-> P4
-    %% P1 -.-> P2
-    %% end
 
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
@@ -58,25 +23,25 @@ graph TD
     PgSelect_17[["PgSelect[_17∈1]<br /><messages>"]]:::plan
     First_21["First[_21∈1]"]:::plan
     PgSelectSingle_22["PgSelectSingle[_22∈1]<br /><messages>"]:::plan
-    PgClassExpression_23["PgClassExpression[_23∈1]<br /><__messages__.#quot;id#quot;>"]:::plan
-    PgClassExpression_24["PgClassExpression[_24∈1]<br /><__messages__.#quot;featured#quot;>"]:::plan
-    PgClassExpression_25["PgClassExpression[_25∈1]<br /><__messages__.#quot;body#quot;>"]:::plan
+    PgClassExpression_23["PgClassExpression[_23∈1]<br /><__messages__.”id”>"]:::plan
+    PgClassExpression_24["PgClassExpression[_24∈1]<br /><__messages__.”featured”>"]:::plan
+    PgClassExpression_25["PgClassExpression[_25∈1]<br /><__messages__.”body”>"]:::plan
     PgClassExpression_26["PgClassExpression[_26∈1]<br /><(__message... not null)>"]:::plan
-    PgClassExpression_27["PgClassExpression[_27∈1]<br /><__messages__.#quot;forum_id#quot;>"]:::plan
+    PgClassExpression_27["PgClassExpression[_27∈1]<br /><__messages__.”forum_id”>"]:::plan
     First_32["First[_32∈1]"]:::plan
     PgSelectSingle_33["PgSelectSingle[_33∈1]<br /><forums>"]:::plan
-    PgClassExpression_35["PgClassExpression[_35∈1]<br /><__forums__.#quot;name#quot;>"]:::plan
+    PgClassExpression_35["PgClassExpression[_35∈1]<br /><__forums__.”name”>"]:::plan
     PgClassExpression_36["PgClassExpression[_36∈1]<br /><(__forums_... not null)>"]:::plan
     Access_40["Access[_40∈0]<br /><_3.pgSettings>"]:::plan
     Access_41["Access[_41∈0]<br /><_3.withPgClient>"]:::plan
     Object_42["Object[_42∈0]<br /><{pgSettings,withPgClient}>"]:::plan
     First_43["First[_43∈1]"]:::plan
     PgSelectSingle_44["PgSelectSingle[_44∈1]<br /><users>"]:::plan
-    PgClassExpression_45["PgClassExpression[_45∈1]<br /><__users__.#quot;username#quot;>"]:::plan
-    PgClassExpression_46["PgClassExpression[_46∈1]<br /><__users__....vatar_url#quot;>"]:::plan
-    Map_47["Map[_47∈1]<br /><_22:{#quot;0#quot;:4,#quot;1#quot;:5}>"]:::plan
+    PgClassExpression_45["PgClassExpression[_45∈1]<br /><__users__.”username”>"]:::plan
+    PgClassExpression_46["PgClassExpression[_46∈1]<br /><__users__....vatar_url”>"]:::plan
+    Map_47["Map[_47∈1]<br /><_22:{”0”:4,”1”:5}>"]:::plan
     List_48["List[_48∈1]<br /><_47>"]:::plan
-    Map_49["Map[_49∈1]<br /><_22:{#quot;0#quot;:7,#quot;1#quot;:8}>"]:::plan
+    Map_49["Map[_49∈1]<br /><_22:{”0”:7,”1”:8}>"]:::plan
     List_50["List[_50∈1]<br /><_49>"]:::plan
 
     %% plan dependencies
@@ -117,23 +82,38 @@ graph TD
     Map_49 --> List_50
 
     %% plan-to-path relationships
+    P1["~"]
     __TrackedObject_6 -.-> P1
+    P2[">forumMessage"]
     JSONParse_12 -.-> P2
+    P3[">f…e>operationType"]
     Lambda_15 -.-> P3
+    P4[">f…e>message"]
     PgSelectSingle_22 -.-> P4
+    P5[">f…e>m…e>id"]
     PgClassExpression_23 -.-> P5
+    P6[">f…e>m…e>featured"]
     PgClassExpression_24 -.-> P6
+    P7[">f…e>m…e>body"]
     PgClassExpression_25 -.-> P7
+    P8[">f…e>m…e>isArchived"]
     PgClassExpression_26 -.-> P8
+    P9[">f…e>m…e>forum<br />>f…e>m…e>f…m>self"]
     PgSelectSingle_33 -.-> P9
+    P10[">f…e>m…e>f…m>id"]
     PgClassExpression_27 -.-> P10
+    P11[">f…e>m…e>f…m>name<br />>f…e>m…e>f…m>self>name"]
     PgClassExpression_35 -.-> P11
+    P12[">f…e>m…e>f…m>isArchived"]
     PgClassExpression_36 -.-> P12
-    PgSelectSingle_33 -.-> P13
-    PgClassExpression_35 -.-> P14
-    PgSelectSingle_44 -.-> P15
-    PgClassExpression_45 -.-> P16
-    PgClassExpression_46 -.-> P17
+    P13[">f…e>m…e>author"]
+    PgSelectSingle_44 -.-> P13
+    P14[">f…e>m…e>a…r>username"]
+    PgClassExpression_45 -.-> P14
+    P15[">f…e>m…e>a…r>gravatarUrl"]
+    PgClassExpression_46 -.-> P15
+    P16["~"]
+    Subscribe_10 -.-> P16
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

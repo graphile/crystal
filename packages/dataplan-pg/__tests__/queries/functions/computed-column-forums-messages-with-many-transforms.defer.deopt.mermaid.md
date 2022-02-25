@@ -6,23 +6,6 @@ graph TD
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
-    %% subgraph fields
-    P1{{"~"}}:::path
-    P2[/">forums"\]:::path
-    P3>">forums[]"]:::path
-    P2 -.- P3
-    P4([">fo…s[]>name"]):::path
-    %% P3 -.-> P4
-    P5[/">fo…s[]>messagesWithManyTransforms"\]:::path
-    P6>">fo…s[]>messagesWithManyTransforms[][]"]:::path
-    P5 -.- P6
-    P7([">fo…s[]>me…][]>body"]):::path
-    %% P6 -.-> P7
-    P8([">fo…s[]>me…][]>featured"]):::path
-    %% P6 -.-> P8
-    %% P3 -.-> P5
-    %% P1 -.-> P2
-    %% end
 
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
@@ -34,7 +17,7 @@ graph TD
     Object_20["Object[_20∈0]<br /><{pgSettings,withPgClient}>"]:::plan
     __Item_21>"__Item[_21∈1]<br /><_17>"]:::itemplan
     PgSelectSingle_22["PgSelectSingle[_22∈1]<br /><forums>"]:::plan
-    PgClassExpression_23["PgClassExpression[_23∈1]<br /><__forums__.#quot;name#quot;>"]:::plan
+    PgClassExpression_23["PgClassExpression[_23∈1]<br /><__forums__.”name”>"]:::plan
     PgSelect_24[["PgSelect[_24∈2@1]<br /><messages>"]]:::plan
     __ListTransform_28["__ListTransform[_28∈2@1]<br /><filter:_24>"]:::plan
     __ListTransform_29["__ListTransform[_29∈2@1]<br /><groupBy:_28>"]:::plan
@@ -42,21 +25,21 @@ graph TD
     __ListTransform_31["__ListTransform[_31∈2@1]<br /><each:_30>"]:::plan
     __Item_32>"__Item[_32∈3@1]<br /><_24>"]:::itemplan
     PgSelectSingle_33["PgSelectSingle[_33∈3@1]<br /><messages>"]:::plan
-    PgClassExpression_34["PgClassExpression[_34∈3@1]<br /><__messages__.#quot;forum_id#quot;>"]:::plan
-    PgClassExpression_35["PgClassExpression[_35∈2@1]<br /><__forums__.#quot;id#quot;>"]:::plan
+    PgClassExpression_34["PgClassExpression[_34∈3@1]<br /><__messages__.”forum_id”>"]:::plan
+    PgClassExpression_35["PgClassExpression[_35∈2@1]<br /><__forums__.”id”>"]:::plan
     List_36["List[_36∈3@1]<br /><_34,_35>"]:::plan
     Lambda_37["Lambda[_37∈3@1]"]:::plan
     __Item_38>"__Item[_38∈4@1]<br /><_28>"]:::itemplan
     PgSelectSingle_39["PgSelectSingle[_39∈4@1]<br /><messages>"]:::plan
-    PgClassExpression_40["PgClassExpression[_40∈4@1]<br /><__messages__.#quot;featured#quot;>"]:::plan
+    PgClassExpression_40["PgClassExpression[_40∈4@1]<br /><__messages__.”featured”>"]:::plan
     __Item_41>"__Item[_41∈5@1]<br /><_30>"]:::itemplan
     __Item_42>"__Item[_42∈6@1]<br /><_31>"]:::itemplan
     __ListTransform_43["__ListTransform[_43∈6@1]<br /><each:_42>"]:::plan
     __Item_44>"__Item[_44∈7@1]<br /><_42>"]:::itemplan
     __Item_45>"__Item[_45∈8@1]<br /><_43>"]:::itemplan
     PgSelectSingle_46["PgSelectSingle[_46∈8@1]<br /><messages>"]:::plan
-    PgClassExpression_47["PgClassExpression[_47∈8@1]<br /><__messages__.#quot;body#quot;>"]:::plan
-    PgClassExpression_48["PgClassExpression[_48∈8@1]<br /><__messages__.#quot;featured#quot;>"]:::plan
+    PgClassExpression_47["PgClassExpression[_47∈8@1]<br /><__messages__.”body”>"]:::plan
+    PgClassExpression_48["PgClassExpression[_48∈8@1]<br /><__messages__.”featured”>"]:::plan
 
     %% plan dependencies
     __Value_5 --> __TrackedObject_6
@@ -99,14 +82,32 @@ graph TD
     PgSelectSingle_46 --> PgClassExpression_48
 
     %% plan-to-path relationships
+    P1["~"]
     __TrackedObject_6 -.-> P1
+    P2[">forums"]
     PgSelect_17 -.-> P2
+    P3[">forums[]"]
     PgSelectSingle_22 -.-> P3
+    P4[">f…]>name"]
     PgClassExpression_23 -.-> P4
-    __ListTransform_31 -.-> P5
-    PgSelectSingle_46 -.-> P6
-    PgClassExpression_47 -.-> P7
-    PgClassExpression_48 -.-> P8
+    P5[">f…]>messagesWithManyTransforms@_28[]"]
+    Lambda_37 -.-> P5
+    P6[">f…]>messagesWithManyTransforms@_29[]"]
+    PgClassExpression_40 -.-> P6
+    P7[">f…]>messagesWithManyTransforms@_31[]"]
+    __Item_41 -.-> P7
+    P8[">f…]>messagesWithManyTransforms"]
+    __ListTransform_31 -.-> P8
+    P9[">f…]>messagesWithManyTransforms[]@_43[]"]
+    __Item_44 -.-> P9
+    P10[">f…]>messagesWithManyTransforms[]"]
+    __ListTransform_43 -.-> P10
+    P11[">f…]>messagesWithManyTransforms[][]"]
+    PgSelectSingle_46 -.-> P11
+    P12[">f…]>m…]>body"]
+    PgClassExpression_47 -.-> P12
+    P13[">f…]>m…]>featured"]
+    PgClassExpression_48 -.-> P13
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

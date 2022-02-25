@@ -6,23 +6,6 @@ graph TD
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
-    %% subgraph fields
-    P1{{"~"}}:::path
-    P2{{">createRelationalPost"}}:::path
-    P3([">cr…ost>id"]):::path
-    %% P2 -.-> P3
-    P4{{">cr…ost>post"}}:::path
-    P5([">cr…ost>post>id"]):::path
-    %% P4 -.-> P5
-    P6([">cr…ost>post>title"]):::path
-    %% P4 -.-> P6
-    P7([">cr…ost>post>description"]):::path
-    %% P4 -.-> P7
-    P8([">cr…ost>post>note"]):::path
-    %% P4 -.-> P8
-    %% P2 -.-> P4
-    %% P1 -.-> P2
-    %% end
 
     %% define plans
     __Value_3["__Value[_3∈1@1]<br /><context>"]:::plan
@@ -34,20 +17,20 @@ graph TD
     Constant_11["Constant[_11∈1@1]"]:::plan
     Constant_12["Constant[_12∈1@1]"]:::plan
     PgInsert_13[["PgInsert[_13∈1@1]"]]:::sideeffectplan
-    PgClassExpression_17["PgClassExpression[_17∈1@1]<br /><__relation...ems__.#quot;id#quot;>"]:::plan
+    PgClassExpression_17["PgClassExpression[_17∈1@1]<br /><__relation...ems__.”id”>"]:::plan
     PgInsert_18[["PgInsert[_18∈1@1]"]]:::sideeffectplan
     PgClassExpression_22["PgClassExpression[_22∈1@1]<br /><__relational_posts__>"]:::plan
-    PgClassExpression_23["PgClassExpression[_23∈1@1]<br /><(__relatio...ts__).#quot;id#quot;>"]:::plan
+    PgClassExpression_23["PgClassExpression[_23∈1@1]<br /><(__relatio...ts__).”id”>"]:::plan
     PgSelect_25[["PgSelect[_25∈1@1]<br /><relational_posts>"]]:::plan
     Access_26["Access[_26∈1@1]<br /><_3.pgSettings>"]:::plan
     Access_27["Access[_27∈1@1]<br /><_3.withPgClient>"]:::plan
     Object_28["Object[_28∈1@1]<br /><{pgSettings,withPgClient}>"]:::plan
     First_29["First[_29∈1@1]"]:::plan
     PgSelectSingle_30["PgSelectSingle[_30∈1@1]<br /><relational_posts>"]:::plan
-    PgClassExpression_31["PgClassExpression[_31∈1@1]<br /><__relation...sts__.#quot;id#quot;>"]:::plan
-    PgClassExpression_32["PgClassExpression[_32∈1@1]<br /><__relation...__.#quot;title#quot;>"]:::plan
-    PgClassExpression_33["PgClassExpression[_33∈1@1]<br /><__relation...scription#quot;>"]:::plan
-    PgClassExpression_34["PgClassExpression[_34∈1@1]<br /><__relation...s__.#quot;note#quot;>"]:::plan
+    PgClassExpression_31["PgClassExpression[_31∈1@1]<br /><__relation...sts__.”id”>"]:::plan
+    PgClassExpression_32["PgClassExpression[_32∈1@1]<br /><__relation...__.”title”>"]:::plan
+    PgClassExpression_33["PgClassExpression[_33∈1@1]<br /><__relation...scription”>"]:::plan
+    PgClassExpression_34["PgClassExpression[_34∈1@1]<br /><__relation...s__.”note”>"]:::plan
 
     %% plan dependencies
     __Value_5 --> __TrackedObject_6
@@ -76,13 +59,21 @@ graph TD
     PgSelectSingle_30 --> PgClassExpression_34
 
     %% plan-to-path relationships
+    P1["~"]
     __TrackedObject_6 -.-> P1
+    P2[">createRelationalPost"]
     PgClassExpression_22 -.-> P2
+    P3[">c…t>id"]
     PgClassExpression_23 -.-> P3
+    P4[">c…t>post"]
     PgSelectSingle_30 -.-> P4
+    P5[">c…t>post>id"]
     PgClassExpression_31 -.-> P5
+    P6[">c…t>post>title"]
     PgClassExpression_32 -.-> P6
+    P7[">c…t>post>description"]
     PgClassExpression_33 -.-> P7
+    P8[">c…t>post>note"]
     PgClassExpression_34 -.-> P8
 
     %% allocate buckets

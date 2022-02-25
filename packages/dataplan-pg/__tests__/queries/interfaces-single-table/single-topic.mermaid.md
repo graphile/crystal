@@ -6,29 +6,6 @@ graph TD
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
-    %% subgraph fields
-    P1{{"~"}}:::path
-    P2{{">singleTableTopicById"}}:::path
-    P3([">si…yId>id"]):::path
-    %% P2 -.-> P3
-    P4([">si…yId>type"]):::path
-    %% P2 -.-> P4
-    P5([">si…yId>type2"]):::path
-    %% P2 -.-> P5
-    P6([">si…yId>position"]):::path
-    %% P2 -.-> P6
-    P7([">si…yId>createdAt"]):::path
-    %% P2 -.-> P7
-    P8([">si…yId>updatedAt"]):::path
-    %% P2 -.-> P8
-    P9([">si…yId>isExplicitlyArchived"]):::path
-    %% P2 -.-> P9
-    P10([">si…yId>archivedAt"]):::path
-    %% P2 -.-> P10
-    P11([">si…yId>title"]):::path
-    %% P2 -.-> P11
-    %% P1 -.-> P2
-    %% end
 
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
@@ -42,15 +19,15 @@ graph TD
     Object_12["Object[_12∈0]<br /><{pgSettings,withPgClient}>"]:::plan
     First_13["First[_13∈0]"]:::plan
     PgSelectSingle_14["PgSelectSingle[_14∈0]<br /><single_table_items>"]:::plan
-    PgClassExpression_15["PgClassExpression[_15∈0]<br /><__single_t...ems__.#quot;id#quot;>"]:::plan
-    PgClassExpression_16["PgClassExpression[_16∈0]<br /><__single_t...s__.#quot;type#quot;>"]:::plan
-    PgClassExpression_17["PgClassExpression[_17∈0]<br /><__single_t...__.#quot;type2#quot;>"]:::plan
-    PgClassExpression_18["PgClassExpression[_18∈0]<br /><__single_t...#quot;position#quot;>"]:::plan
-    PgClassExpression_19["PgClassExpression[_19∈0]<br /><__single_t...reated_at#quot;>"]:::plan
-    PgClassExpression_20["PgClassExpression[_20∈0]<br /><__single_t...pdated_at#quot;>"]:::plan
-    PgClassExpression_21["PgClassExpression[_21∈0]<br /><__single_t..._archived#quot;>"]:::plan
-    PgClassExpression_22["PgClassExpression[_22∈0]<br /><__single_t...chived_at#quot;>"]:::plan
-    PgClassExpression_23["PgClassExpression[_23∈0]<br /><__single_t...__.#quot;title#quot;>"]:::plan
+    PgClassExpression_15["PgClassExpression[_15∈0]<br /><__single_t...ems__.”id”>"]:::plan
+    PgClassExpression_16["PgClassExpression[_16∈0]<br /><__single_t...s__.”type”>"]:::plan
+    PgClassExpression_17["PgClassExpression[_17∈0]<br /><__single_t...__.”type2”>"]:::plan
+    PgClassExpression_18["PgClassExpression[_18∈0]<br /><__single_t...”position”>"]:::plan
+    PgClassExpression_19["PgClassExpression[_19∈0]<br /><__single_t...reated_at”>"]:::plan
+    PgClassExpression_20["PgClassExpression[_20∈0]<br /><__single_t...pdated_at”>"]:::plan
+    PgClassExpression_21["PgClassExpression[_21∈0]<br /><__single_t..._archived”>"]:::plan
+    PgClassExpression_22["PgClassExpression[_22∈0]<br /><__single_t...chived_at”>"]:::plan
+    PgClassExpression_23["PgClassExpression[_23∈0]<br /><__single_t...__.”title”>"]:::plan
 
     %% plan dependencies
     __Value_5 --> __TrackedObject_6
@@ -74,16 +51,27 @@ graph TD
     PgSelectSingle_14 --> PgClassExpression_23
 
     %% plan-to-path relationships
+    P1["~"]
     __TrackedObject_6 -.-> P1
+    P2[">singleTableTopicById"]
     PgSelectSingle_14 -.-> P2
+    P3[">s…d>id"]
     PgClassExpression_15 -.-> P3
+    P4[">s…d>type"]
     PgClassExpression_16 -.-> P4
+    P5[">s…d>type2"]
     PgClassExpression_17 -.-> P5
+    P6[">s…d>position"]
     PgClassExpression_18 -.-> P6
+    P7[">s…d>createdAt"]
     PgClassExpression_19 -.-> P7
+    P8[">s…d>updatedAt"]
     PgClassExpression_20 -.-> P8
+    P9[">s…d>isExplicitlyArchived"]
     PgClassExpression_21 -.-> P9
+    P10[">s…d>archivedAt"]
     PgClassExpression_22 -.-> P10
+    P11[">s…d>title"]
     PgClassExpression_23 -.-> P11
 
     %% allocate buckets

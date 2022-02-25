@@ -6,17 +6,6 @@ graph TD
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
-    %% subgraph fields
-    P1{{"~"}}:::path
-    P2[/">randomUserArraySet"\]:::path
-    P3>">randomUserArraySet[][]"]:::path
-    P2 -.- P3
-    P4([">ra…][]>username"]):::path
-    %% P3 -.-> P4
-    P5([">ra…][]>gravatarUrl"]):::path
-    %% P3 -.-> P5
-    %% P1 -.-> P2
-    %% end
 
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
@@ -35,8 +24,8 @@ graph TD
     __Item_17>"__Item[_17∈3]<br /><_15>"]:::itemplan
     __Item_18>"__Item[_18∈4]<br /><_16>"]:::itemplan
     PgSelectSingle_19["PgSelectSingle[_19∈4]<br /><random_user_array_set>"]:::plan
-    PgClassExpression_20["PgClassExpression[_20∈4]<br /><__random_u...#quot;username#quot;>"]:::plan
-    PgClassExpression_21["PgClassExpression[_21∈4]<br /><__random_u...vatar_url#quot;>"]:::plan
+    PgClassExpression_20["PgClassExpression[_20∈4]<br /><__random_u...”username”>"]:::plan
+    PgClassExpression_21["PgClassExpression[_21∈4]<br /><__random_u...vatar_url”>"]:::plan
 
     %% plan dependencies
     __Value_5 --> __TrackedObject_6
@@ -60,11 +49,22 @@ graph TD
     PgSelectSingle_19 --> PgClassExpression_21
 
     %% plan-to-path relationships
+    P1["~"]
     __TrackedObject_6 -.-> P1
-    __ListTransform_11 -.-> P2
-    PgSelectSingle_19 -.-> P3
-    PgClassExpression_20 -.-> P4
-    PgClassExpression_21 -.-> P5
+    P2[">randomUserArraySet@_11[]"]
+    PgClassExpression_14 -.-> P2
+    P3[">randomUserArraySet"]
+    __ListTransform_11 -.-> P3
+    P4[">randomUserArraySet[]@_16[]"]
+    __Item_17 -.-> P4
+    P5[">randomUserArraySet[]"]
+    __ListTransform_16 -.-> P5
+    P6[">randomUserArraySet[][]"]
+    PgSelectSingle_19 -.-> P6
+    P7[">r…]>username"]
+    PgClassExpression_20 -.-> P7
+    P8[">r…]>gravatarUrl"]
+    PgClassExpression_21 -.-> P8
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

@@ -6,117 +6,6 @@ graph TD
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
-    %% subgraph fields
-    P1{{"~"}}:::path
-    P2[/">people"\]:::path
-    P3>">people[]"]:::path
-    P2 -.- P3
-    P4([">pe…e[]>username"]):::path
-    %% P3 -.-> P4
-    P5[/">pe…e[]>items"\]:::path
-    P6>">pe…e[]>items[]"]:::path
-    P5 -.- P6
-    P7([">pe…e[]>items[]>id"]):::path
-    %% P6 -.-> P7
-    P8([">pe…e[]>items[]>type"]):::path
-    %% P6 -.-> P8
-    P9([">pe…e[]>items[]>type2"]):::path
-    %% P6 -.-> P9
-    P10([">pe…e[]>items[]>position"]):::path
-    %% P6 -.-> P10
-    P11([">pe…e[]>items[]>createdAt"]):::path
-    %% P6 -.-> P11
-    P12([">pe…e[]>items[]>updatedAt"]):::path
-    %% P6 -.-> P12
-    P13([">pe…e[]>items[]>isExplicitlyArchived"]):::path
-    %% P6 -.-> P13
-    P14([">pe…e[]>items[]>archivedAt"]):::path
-    %% P6 -.-> P14
-    P15([">pe…e[]>items[]>title"]):::path
-    %% P6 -.-> P15
-    P16([">pe…e[]>items[]>id"]):::path
-    %% P6 -.-> P16
-    P17([">pe…e[]>items[]>type"]):::path
-    %% P6 -.-> P17
-    P18([">pe…e[]>items[]>type2"]):::path
-    %% P6 -.-> P18
-    P19([">pe…e[]>items[]>position"]):::path
-    %% P6 -.-> P19
-    P20([">pe…e[]>items[]>createdAt"]):::path
-    %% P6 -.-> P20
-    P21([">pe…e[]>items[]>updatedAt"]):::path
-    %% P6 -.-> P21
-    P22([">pe…e[]>items[]>isExplicitlyArchived"]):::path
-    %% P6 -.-> P22
-    P23([">pe…e[]>items[]>archivedAt"]):::path
-    %% P6 -.-> P23
-    P24([">pe…e[]>items[]>title"]):::path
-    %% P6 -.-> P24
-    P25([">pe…e[]>items[]>description"]):::path
-    %% P6 -.-> P25
-    P26([">pe…e[]>items[]>note"]):::path
-    %% P6 -.-> P26
-    P27([">pe…e[]>items[]>id"]):::path
-    %% P6 -.-> P27
-    P28([">pe…e[]>items[]>type"]):::path
-    %% P6 -.-> P28
-    P29([">pe…e[]>items[]>type2"]):::path
-    %% P6 -.-> P29
-    P30([">pe…e[]>items[]>position"]):::path
-    %% P6 -.-> P30
-    P31([">pe…e[]>items[]>createdAt"]):::path
-    %% P6 -.-> P31
-    P32([">pe…e[]>items[]>updatedAt"]):::path
-    %% P6 -.-> P32
-    P33([">pe…e[]>items[]>isExplicitlyArchived"]):::path
-    %% P6 -.-> P33
-    P34([">pe…e[]>items[]>archivedAt"]):::path
-    %% P6 -.-> P34
-    P35([">pe…e[]>items[]>title"]):::path
-    %% P6 -.-> P35
-    P36([">pe…e[]>items[]>color"]):::path
-    %% P6 -.-> P36
-    P37([">pe…e[]>items[]>id"]):::path
-    %% P6 -.-> P37
-    P38([">pe…e[]>items[]>type"]):::path
-    %% P6 -.-> P38
-    P39([">pe…e[]>items[]>type2"]):::path
-    %% P6 -.-> P39
-    P40([">pe…e[]>items[]>position"]):::path
-    %% P6 -.-> P40
-    P41([">pe…e[]>items[]>createdAt"]):::path
-    %% P6 -.-> P41
-    P42([">pe…e[]>items[]>updatedAt"]):::path
-    %% P6 -.-> P42
-    P43([">pe…e[]>items[]>isExplicitlyArchived"]):::path
-    %% P6 -.-> P43
-    P44([">pe…e[]>items[]>archivedAt"]):::path
-    %% P6 -.-> P44
-    P45([">pe…e[]>items[]>title"]):::path
-    %% P6 -.-> P45
-    P46([">pe…e[]>items[]>id"]):::path
-    %% P6 -.-> P46
-    P47([">pe…e[]>items[]>type"]):::path
-    %% P6 -.-> P47
-    P48([">pe…e[]>items[]>type2"]):::path
-    %% P6 -.-> P48
-    P49([">pe…e[]>items[]>position"]):::path
-    %% P6 -.-> P49
-    P50([">pe…e[]>items[]>createdAt"]):::path
-    %% P6 -.-> P50
-    P51([">pe…e[]>items[]>updatedAt"]):::path
-    %% P6 -.-> P51
-    P52([">pe…e[]>items[]>isExplicitlyArchived"]):::path
-    %% P6 -.-> P52
-    P53([">pe…e[]>items[]>archivedAt"]):::path
-    %% P6 -.-> P53
-    P54([">pe…e[]>items[]>description"]):::path
-    %% P6 -.-> P54
-    P55([">pe…e[]>items[]>note"]):::path
-    %% P6 -.-> P55
-    %% P3 -.-> P5
-    %% P1 -.-> P2
-    %% end
 
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
@@ -125,8 +14,8 @@ graph TD
     PgSelect_7[["PgSelect[_7∈0]<br /><people>"]]:::plan
     __Item_11>"__Item[_11∈1]<br /><_7>"]:::itemplan
     PgSelectSingle_12["PgSelectSingle[_12∈1]<br /><people>"]:::plan
-    PgClassExpression_13["PgClassExpression[_13∈1]<br /><__people__.#quot;username#quot;>"]:::plan
-    PgClassExpression_14["PgClassExpression[_14∈1]<br /><__people__.#quot;person_id#quot;>"]:::plan
+    PgClassExpression_13["PgClassExpression[_13∈1]<br /><__people__.”username”>"]:::plan
+    PgClassExpression_14["PgClassExpression[_14∈1]<br /><__people__.”person_id”>"]:::plan
     PgSelect_15[["PgSelect[_15∈1]<br /><single_table_items>"]]:::plan
     Access_16["Access[_16∈0]<br /><_3.pgSettings>"]:::plan
     Access_17["Access[_17∈0]<br /><_3.withPgClient>"]:::plan
@@ -136,20 +25,20 @@ graph TD
     PgSelectSingle_21["PgSelectSingle[_21∈2]<br /><single_table_items>"]:::plan
     __Item_22>"__Item[_22∈3]<br /><_19>"]:::itemplan
     PgSelectSingle_23["PgSelectSingle[_23∈4]<br /><single_table_items>"]:::plan
-    PgClassExpression_24["PgClassExpression[_24∈4]<br /><__single_t...s__.#quot;type#quot;>"]:::plan
+    PgClassExpression_24["PgClassExpression[_24∈4]<br /><__single_t...s__.”type”>"]:::plan
     Lambda_25["Lambda[_25∈4]"]:::plan
     PgSingleTablePolymorphic_26["PgSingleTablePolymorphic[_26∈4]"]:::plan
-    PgClassExpression_27["PgClassExpression[_27∈4]<br /><__single_t...ems__.#quot;id#quot;>"]:::plan
-    PgClassExpression_29["PgClassExpression[_29∈4]<br /><__single_t...__.#quot;type2#quot;>"]:::plan
-    PgClassExpression_30["PgClassExpression[_30∈4]<br /><__single_t...#quot;position#quot;>"]:::plan
-    PgClassExpression_31["PgClassExpression[_31∈4]<br /><__single_t...reated_at#quot;>"]:::plan
-    PgClassExpression_32["PgClassExpression[_32∈4]<br /><__single_t...pdated_at#quot;>"]:::plan
-    PgClassExpression_33["PgClassExpression[_33∈4]<br /><__single_t..._archived#quot;>"]:::plan
-    PgClassExpression_34["PgClassExpression[_34∈4]<br /><__single_t...chived_at#quot;>"]:::plan
-    PgClassExpression_35["PgClassExpression[_35∈4]<br /><__single_t...__.#quot;title#quot;>"]:::plan
-    PgClassExpression_45["PgClassExpression[_45∈4]<br /><__single_t...scription#quot;>"]:::plan
-    PgClassExpression_46["PgClassExpression[_46∈4]<br /><__single_t...s__.#quot;note#quot;>"]:::plan
-    PgClassExpression_56["PgClassExpression[_56∈4]<br /><__single_t...__.#quot;color#quot;>"]:::plan
+    PgClassExpression_27["PgClassExpression[_27∈4]<br /><__single_t...ems__.”id”>"]:::plan
+    PgClassExpression_29["PgClassExpression[_29∈4]<br /><__single_t...__.”type2”>"]:::plan
+    PgClassExpression_30["PgClassExpression[_30∈4]<br /><__single_t...”position”>"]:::plan
+    PgClassExpression_31["PgClassExpression[_31∈4]<br /><__single_t...reated_at”>"]:::plan
+    PgClassExpression_32["PgClassExpression[_32∈4]<br /><__single_t...pdated_at”>"]:::plan
+    PgClassExpression_33["PgClassExpression[_33∈4]<br /><__single_t..._archived”>"]:::plan
+    PgClassExpression_34["PgClassExpression[_34∈4]<br /><__single_t...chived_at”>"]:::plan
+    PgClassExpression_35["PgClassExpression[_35∈4]<br /><__single_t...__.”title”>"]:::plan
+    PgClassExpression_45["PgClassExpression[_45∈4]<br /><__single_t...scription”>"]:::plan
+    PgClassExpression_46["PgClassExpression[_46∈4]<br /><__single_t...s__.”note”>"]:::plan
+    PgClassExpression_56["PgClassExpression[_56∈4]<br /><__single_t...__.”color”>"]:::plan
 
     %% plan dependencies
     __Value_5 --> __TrackedObject_6
@@ -187,61 +76,44 @@ graph TD
     PgSelectSingle_23 --> PgClassExpression_56
 
     %% plan-to-path relationships
+    P1["~"]
     __TrackedObject_6 -.-> P1
+    P2[">people"]
     PgSelect_7 -.-> P2
+    P3[">people[]"]
     PgSelectSingle_12 -.-> P3
+    P4[">p…]>username"]
     PgClassExpression_13 -.-> P4
-    __ListTransform_19 -.-> P5
-    PgSingleTablePolymorphic_26 -.-> P6
-    PgClassExpression_27 -.-> P7
-    PgClassExpression_24 -.-> P8
-    PgClassExpression_29 -.-> P9
-    PgClassExpression_30 -.-> P10
-    PgClassExpression_31 -.-> P11
-    PgClassExpression_32 -.-> P12
-    PgClassExpression_33 -.-> P13
-    PgClassExpression_34 -.-> P14
-    PgClassExpression_35 -.-> P15
-    PgClassExpression_27 -.-> P16
-    PgClassExpression_24 -.-> P17
-    PgClassExpression_29 -.-> P18
-    PgClassExpression_30 -.-> P19
-    PgClassExpression_31 -.-> P20
-    PgClassExpression_32 -.-> P21
-    PgClassExpression_33 -.-> P22
-    PgClassExpression_34 -.-> P23
-    PgClassExpression_35 -.-> P24
-    PgClassExpression_45 -.-> P25
-    PgClassExpression_46 -.-> P26
-    PgClassExpression_27 -.-> P27
-    PgClassExpression_24 -.-> P28
-    PgClassExpression_29 -.-> P29
-    PgClassExpression_30 -.-> P30
-    PgClassExpression_31 -.-> P31
-    PgClassExpression_32 -.-> P32
-    PgClassExpression_33 -.-> P33
-    PgClassExpression_34 -.-> P34
-    PgClassExpression_35 -.-> P35
-    PgClassExpression_56 -.-> P36
-    PgClassExpression_27 -.-> P37
-    PgClassExpression_24 -.-> P38
-    PgClassExpression_29 -.-> P39
-    PgClassExpression_30 -.-> P40
-    PgClassExpression_31 -.-> P41
-    PgClassExpression_32 -.-> P42
-    PgClassExpression_33 -.-> P43
-    PgClassExpression_34 -.-> P44
-    PgClassExpression_35 -.-> P45
-    PgClassExpression_27 -.-> P46
-    PgClassExpression_24 -.-> P47
-    PgClassExpression_29 -.-> P48
-    PgClassExpression_30 -.-> P49
-    PgClassExpression_31 -.-> P50
-    PgClassExpression_32 -.-> P51
-    PgClassExpression_33 -.-> P52
-    PgClassExpression_34 -.-> P53
-    PgClassExpression_45 -.-> P54
-    PgClassExpression_46 -.-> P55
+    P5[">p…]>items@_19[]"]
+    PgSelectSingle_21 -.-> P5
+    P6[">p…]>items"]
+    __ListTransform_19 -.-> P6
+    P7[">p…]>items[]"]
+    PgSingleTablePolymorphic_26 -.-> P7
+    P8[">p…]>i…]>id x5"]
+    PgClassExpression_27 -.-> P8
+    P9[">p…]>i…]>type x5"]
+    PgClassExpression_24 -.-> P9
+    P10[">p…]>i…]>type2 x5"]
+    PgClassExpression_29 -.-> P10
+    P11[">p…]>i…]>position x5"]
+    PgClassExpression_30 -.-> P11
+    P12[">p…]>i…]>createdAt x5"]
+    PgClassExpression_31 -.-> P12
+    P13[">p…]>i…]>updatedAt x5"]
+    PgClassExpression_32 -.-> P13
+    P14[">p…]>i…]>isExplicitlyArchived x5"]
+    PgClassExpression_33 -.-> P14
+    P15[">p…]>i…]>archivedAt x5"]
+    PgClassExpression_34 -.-> P15
+    P16[">p…]>i…]>title x4"]
+    PgClassExpression_35 -.-> P16
+    P17[">p…]>i…]>description x2"]
+    PgClassExpression_45 -.-> P17
+    P18[">p…]>i…]>note x2"]
+    PgClassExpression_46 -.-> P18
+    P19[">p…]>i…]>color"]
+    PgClassExpression_56 -.-> P19
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

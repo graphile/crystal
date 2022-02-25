@@ -6,23 +6,6 @@ graph TD
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
 
-    %% subgraph fields
-    P1{{"~"}}:::path
-    P2[/">forums"\]:::path
-    P3>">forums[]"]:::path
-    P2 -.- P3
-    P4([">fo…s[]>name"]):::path
-    %% P3 -.-> P4
-    P5{{">fo…s[]>messagesConnection"}}:::path
-    P6{{">fo…s[]>me…ion>pageInfo"}}:::path
-    P7([">fo…s[]>me…ion>pa…nfo>hasNextPage"]):::path
-    %% P6 -.-> P7
-    P8([">fo…s[]>me…ion>pa…nfo>hasPreviousPage"]):::path
-    %% P6 -.-> P8
-    %% P5 -.-> P6
-    %% P3 -.-> P5
-    %% P1 -.-> P2
-    %% end
 
     %% define plans
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
@@ -31,7 +14,7 @@ graph TD
     PgSelect_17[["PgSelect[_17∈0]<br /><forums>"]]:::plan
     __Item_21>"__Item[_21∈1]<br /><_17>"]:::itemplan
     PgSelectSingle_22["PgSelectSingle[_22∈1]<br /><forums>"]:::plan
-    PgClassExpression_23["PgClassExpression[_23∈1]<br /><__forums__.#quot;name#quot;>"]:::plan
+    PgClassExpression_23["PgClassExpression[_23∈1]<br /><__forums__.”name”>"]:::plan
     InputStaticLeaf_24["InputStaticLeaf[_24∈0]"]:::plan
     InputStaticLeaf_25["InputStaticLeaf[_25∈0]"]:::plan
     Access_35["Access[_35∈0]<br /><_3.pgSettings>"]:::plan
@@ -56,13 +39,21 @@ graph TD
     InputStaticLeaf_25 --> Connection_38
 
     %% plan-to-path relationships
+    P1["~"]
     __TrackedObject_6 -.-> P1
+    P2[">forums"]
     PgSelect_17 -.-> P2
+    P3[">forums[]"]
     PgSelectSingle_22 -.-> P3
+    P4[">f…]>name"]
     PgClassExpression_23 -.-> P4
+    P5[">f…]>messagesConnection"]
     Connection_38 -.-> P5
+    P6[">f…]>m…n>pageInfo"]
     PgPageInfo_40 -.-> P6
+    P7[">f…]>m…n>p…o>hasNextPage"]
     Constant_41 -.-> P7
+    P8[">f…]>m…n>p…o>hasPreviousPage"]
     Constant_42 -.-> P8
 
     %% allocate buckets
