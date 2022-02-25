@@ -3008,8 +3008,13 @@ export class Aether<
       // The "planForType" from polymorphic plans get their own buckets
       if (polymorphicPlanId !== undefined) {
         const parent = parents.length === 0 ? this.rootBucket : parents[0];
-        // TODO: this doesn't seem right
-        const rootPathIdentities = parent.rootPathIdentities;
+        const polymorphicPlan = this.plans[polymorphicPlanId];
+        const rootPathIdentities = pathIdentitiesByPlanId[polymorphicPlan.id];
+        if (!rootPathIdentities || rootPathIdentities.length === 0) {
+          throw new Error(
+            `Planning issue - polymorphic plans must be associated with one or more path identities, however ${polymorphicPlan} is not.`,
+          );
+        }
         const newBucket: BucketDefinition = {
           id: this.buckets.length,
           parent,
