@@ -2860,8 +2860,13 @@ export class Aether<
               this.plans[polymorphicDetailsListEntry.polymorphicPlanId].id !==
               memo.polymorphicPlanId
             ) {
+              // TODO: if plans do not get sufficiently deduplicated, this can
+              // happen. Needs investigation. To reproduce, remove the
+              // `deduplicate` method in `PgPolymorphicPlan` and remove the
+              // symbolSubstitutes from the deduplicate method in
+              // PgClassExpressionPlan
               throw new Error(
-                `GraphileInternalError<192e9e33-2548-4921-a075-05c7c33ea955>: mismatch - polymorphic details should line up to use same polymorphicPlanId but they do not`,
+                `GraphileInternalError<192e9e33-2548-4921-a075-05c7c33ea955>: mismatch - polymorphic details for ${plan} should line up to use same polymorphicPlanId but they do not`,
               );
             }
             for (const typeName of polymorphicDetailsListEntry.typeNames) {
@@ -3002,9 +3007,9 @@ export class Aether<
 
       // The "planForType" from polymorphic plans get their own buckets
       if (polymorphicPlanId !== undefined) {
-        const polymorphicPlan = this.plans[polymorphicPlanId];
-        const parent = this.buckets[polymorphicPlan.bucketId];
-        const rootPathIdentities = pathIdentitiesByPlanId[polymorphicPlan.id];
+        const parent = parents.length === 0 ? this.rootBucket : parents[0];
+        // TODO: this doesn't seem right
+        const rootPathIdentities = parent.rootPathIdentities;
         const newBucket: BucketDefinition = {
           id: this.buckets.length,
           parent,
@@ -5348,6 +5353,13 @@ export class Aether<
       graph.push("    subgraph Buckets");
       for (const bucket of this.buckets) {
         const raisonDEtre = (() => {
+          if (
+            bucket.groupId === 0 &&
+            bucket.itemPlanId == null &&
+            bucket.polymorphicPlanId == null
+          ) {
+            return "root";
+          }
           const reasons: string[] = [];
           if (bucket.groupId != null) {
             reasons.push(
