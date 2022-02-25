@@ -11,6 +11,7 @@ import type {
   ExecutablePlan,
   InputObjectPlan,
   InputStaticLeafPlan,
+  ListPlan,
 } from "graphile-crystal";
 import {
   __ListTransformPlan,
@@ -92,6 +93,7 @@ import {
 import { listOfType } from "../codecs";
 import type { PgSourceColumns } from "../datasource";
 import { PgPageInfoPlan } from "../plans/pgPageInfo";
+import type { PgPolymorphicTypeMap } from "../plans/pgPolymorphic";
 
 declare module ".." {
   interface PgEnumSourceExtensions {
@@ -2882,84 +2884,153 @@ export function makeExampleSchema(
     [pgSingleTablePolymorphic, singleTableTypeName],
   );
 
+  const relationalItemPolymorphicTypeMap = EXPORTABLE(
+    (
+      deoptimizeIfAppropriate,
+    ): PgPolymorphicTypeMap<RelationalItemPlan, string> => ({
+      RelationalTopic: {
+        match: (t) => t === "TOPIC",
+        plan: (_, $item) =>
+          deoptimizeIfAppropriate($item.singleRelation("topic")),
+      },
+      RelationalPost: {
+        match: (t) => t === "POST",
+        plan: (_, $item) =>
+          deoptimizeIfAppropriate($item.singleRelation("post")),
+      },
+      RelationalDivider: {
+        match: (t) => t === "DIVIDER",
+        plan: (_, $item) =>
+          deoptimizeIfAppropriate($item.singleRelation("divider")),
+      },
+      RelationalChecklist: {
+        match: (t) => t === "CHECKLIST",
+        plan: (_, $item) =>
+          deoptimizeIfAppropriate($item.singleRelation("checklist")),
+      },
+      RelationalChecklistItem: {
+        match: (t) => t === "CHECKLIST_ITEM",
+        plan: (_, $item) =>
+          deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
+      },
+    }),
+    [deoptimizeIfAppropriate],
+  );
+
   const relationalItemInterface = EXPORTABLE(
-    (deoptimizeIfAppropriate, pgPolymorphic) => ($item: RelationalItemPlan) =>
-      pgPolymorphic($item, $item.get("type"), {
-        RelationalTopic: {
-          match: (t) => t === "TOPIC",
-          plan: () => deoptimizeIfAppropriate($item.singleRelation("topic")),
-        },
-        RelationalPost: {
-          match: (t) => t === "POST",
-          plan: () => deoptimizeIfAppropriate($item.singleRelation("post")),
-        },
-        RelationalDivider: {
-          match: (t) => t === "DIVIDER",
-          plan: () => deoptimizeIfAppropriate($item.singleRelation("divider")),
-        },
-        RelationalChecklist: {
-          match: (t) => t === "CHECKLIST",
-          plan: () =>
-            deoptimizeIfAppropriate($item.singleRelation("checklist")),
-        },
-        RelationalChecklistItem: {
-          match: (t) => t === "CHECKLIST_ITEM",
-          plan: () =>
-            deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
-        },
-      }),
-    [deoptimizeIfAppropriate, pgPolymorphic],
+    (pgPolymorphic, relationalItemPolymorphicTypeMap) =>
+      ($item: RelationalItemPlan) =>
+        pgPolymorphic(
+          $item,
+          $item.get("type"),
+          relationalItemPolymorphicTypeMap,
+        ),
+    [pgPolymorphic, relationalItemPolymorphicTypeMap],
+  );
+
+  const unionItemPolymorphicTypeMap = EXPORTABLE(
+    (deoptimizeIfAppropriate): PgPolymorphicTypeMap<UnionItemPlan, string> => ({
+      UnionTopic: {
+        match: (t) => t === "TOPIC",
+        plan: (_, $item) =>
+          deoptimizeIfAppropriate($item.singleRelation("topic")),
+      },
+      UnionPost: {
+        match: (t) => t === "POST",
+        plan: (_, $item) =>
+          deoptimizeIfAppropriate($item.singleRelation("post")),
+      },
+      UnionDivider: {
+        match: (t) => t === "DIVIDER",
+        plan: (_, $item) =>
+          deoptimizeIfAppropriate($item.singleRelation("divider")),
+      },
+      UnionChecklist: {
+        match: (t) => t === "CHECKLIST",
+        plan: (_, $item) =>
+          deoptimizeIfAppropriate($item.singleRelation("checklist")),
+      },
+      UnionChecklistItem: {
+        match: (t) => t === "CHECKLIST_ITEM",
+        plan: (_, $item) =>
+          deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
+      },
+    }),
+    [deoptimizeIfAppropriate],
   );
 
   const unionItemUnion = EXPORTABLE(
-    (deoptimizeIfAppropriate, pgPolymorphic) => ($item: UnionItemPlan) =>
-      pgPolymorphic($item, $item.get("type"), {
-        UnionTopic: {
-          match: (t) => t === "TOPIC",
-          plan: () => deoptimizeIfAppropriate($item.singleRelation("topic")),
-        },
-        UnionPost: {
-          match: (t) => t === "POST",
-          plan: () => deoptimizeIfAppropriate($item.singleRelation("post")),
-        },
-        UnionDivider: {
-          match: (t) => t === "DIVIDER",
-          plan: () => deoptimizeIfAppropriate($item.singleRelation("divider")),
-        },
-        UnionChecklist: {
-          match: (t) => t === "CHECKLIST",
-          plan: () =>
-            deoptimizeIfAppropriate($item.singleRelation("checklist")),
-        },
-        UnionChecklistItem: {
-          match: (t) => t === "CHECKLIST_ITEM",
-          plan: () =>
-            deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
-        },
-      }),
-    [deoptimizeIfAppropriate, pgPolymorphic],
+    (pgPolymorphic, unionItemPolymorphicTypeMap) => ($item: UnionItemPlan) =>
+      pgPolymorphic($item, $item.get("type"), unionItemPolymorphicTypeMap),
+    [pgPolymorphic, unionItemPolymorphicTypeMap],
+  );
+
+  const relationalCommentablePolymorphicTypeMap = EXPORTABLE(
+    (
+      deoptimizeIfAppropriate,
+    ): PgPolymorphicTypeMap<RelationalCommentablePlan, string> => ({
+      RelationalPost: {
+        match: (t) => t === "POST",
+        plan: (_, $item) =>
+          deoptimizeIfAppropriate($item.singleRelation("post")),
+      },
+      RelationalChecklist: {
+        match: (t) => t === "CHECKLIST",
+        plan: (_, $item) =>
+          deoptimizeIfAppropriate($item.singleRelation("checklist")),
+      },
+      RelationalChecklistItem: {
+        match: (t) => t === "CHECKLIST_ITEM",
+        plan: (_, $item) =>
+          deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
+      },
+    }),
+    [deoptimizeIfAppropriate],
   );
 
   const relationalCommentableInterface = EXPORTABLE(
-    (deoptimizeIfAppropriate, pgPolymorphic) =>
+    (pgPolymorphic, relationalCommentablePolymorphicTypeMap) =>
       ($item: RelationalCommentablePlan) =>
-        pgPolymorphic($item, $item.get("type"), {
-          RelationalPost: {
-            match: (t) => t === "POST",
-            plan: () => deoptimizeIfAppropriate($item.singleRelation("post")),
-          },
-          RelationalChecklist: {
-            match: (t) => t === "CHECKLIST",
-            plan: () =>
-              deoptimizeIfAppropriate($item.singleRelation("checklist")),
-          },
-          RelationalChecklistItem: {
-            match: (t) => t === "CHECKLIST_ITEM",
-            plan: () =>
-              deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
-          },
-        }),
-    [deoptimizeIfAppropriate, pgPolymorphic],
+        pgPolymorphic(
+          $item,
+          $item.get("type"),
+          relationalCommentablePolymorphicTypeMap,
+        ),
+    [pgPolymorphic, relationalCommentablePolymorphicTypeMap],
+  );
+
+  const entityPolymorphicTypeMap = EXPORTABLE(
+    (
+      commentSource,
+      personSource,
+      postSource,
+    ): PgPolymorphicTypeMap<
+      | PgSelectSinglePlan<any, any, any, any>
+      | PgClassExpressionPlan<
+          any,
+          PgTypeCodec<any, any, any>,
+          any,
+          any,
+          any,
+          any
+        >,
+      number[],
+      ListPlan<ExecutablePlan<number>[]>
+    > => ({
+      Person: {
+        match: (v) => v[0] != null,
+        plan: ($list) => personSource.get({ person_id: $list.at(0) }),
+      },
+      Post: {
+        match: (v) => v[1] != null,
+        plan: ($list) => postSource.get({ post_id: $list.at(1) }),
+      },
+      Comment: {
+        match: (v) => v[2] != null,
+        plan: ($list) => commentSource.get({ comment_id: $list.at(2) }),
+      },
+    }),
+    [commentSource, personSource, postSource],
   );
 
   /**
@@ -2973,14 +3044,7 @@ export function makeExampleSchema(
    * and so on.
    */
   const entityUnion = EXPORTABLE(
-    (
-        PgSelectSinglePlan,
-        commentSource,
-        list,
-        personSource,
-        pgPolymorphic,
-        postSource,
-      ) =>
+    (PgSelectSinglePlan, entityPolymorphicTypeMap, list, pgPolymorphic) =>
       <TColumns extends typeof unionEntityColumns>(
         $item:
           | PgSelectSinglePlan<TColumns, any, any, any>
@@ -3008,29 +3072,9 @@ export function makeExampleSchema(
               ? $item.get("comment_id")
               : $item.get("comment_id"),
           ]),
-          {
-            Person: {
-              match: (v) => v[0] != null,
-              plan: ($list) => personSource.get({ person_id: $list.at(0) }),
-            },
-            Post: {
-              match: (v) => v[1] != null,
-              plan: ($list) => postSource.get({ post_id: $list.at(1) }),
-            },
-            Comment: {
-              match: (v) => v[2] != null,
-              plan: ($list) => commentSource.get({ comment_id: $list.at(2) }),
-            },
-          },
+          entityPolymorphicTypeMap,
         ),
-    [
-      PgSelectSinglePlan,
-      commentSource,
-      list,
-      personSource,
-      pgPolymorphic,
-      postSource,
-    ],
+    [PgSelectSinglePlan, entityPolymorphicTypeMap, list, pgPolymorphic],
   );
 
   const PersonBookmark: GraphQLObjectType<any, OurGraphQLContext> =
