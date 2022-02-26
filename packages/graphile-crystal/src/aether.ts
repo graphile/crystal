@@ -2990,10 +2990,39 @@ export class Aether<
             `GraphileInternalError<74be1e65-f549-4ec8-bd2b-6f8f0b72f7aa>: there was more than one parent bucket of a grouped plan`,
           );
         }
-        const parent =
-          parents.length === 1
-            ? parents[0]
-            : this.buckets[groupParentPlan.bucketId];
+        const depsParentBucket = parents[0] as BucketDefinition | undefined;
+        const groupParentBucket = this.buckets[groupParentPlan.bucketId];
+        /**
+         * Returns the bucket that is an ancestor of the other bucket.
+         */
+        const deepest = (
+          bucket1: BucketDefinition,
+          bucket2: BucketDefinition,
+          tryReverse = true,
+        ): BucketDefinition => {
+          let b: BucketDefinition | null = bucket1;
+          while (b) {
+            if (b === bucket2) {
+              return bucket1;
+            }
+            b = b.parent;
+          }
+          // bucket2 must be the ancestor; but let's check that
+          if (isDev) {
+            if (tryReverse) {
+              return deepest(bucket2, bucket1, false);
+            } else {
+              throw new Error(
+                `bucket1 and bucket2 do not exist on the same lineage - one is not an ancestor of the other`,
+              );
+            }
+          }
+
+          return bucket2;
+        };
+        const parent = depsParentBucket
+          ? deepest(depsParentBucket, groupParentBucket)
+          : groupParentBucket;
         const groupKey = `${groupId}|${parent.id}|${polymorphicPlanIds ?? ""}|${
           polymorphicTypeNames?.join(",") ?? ""
         }`;
