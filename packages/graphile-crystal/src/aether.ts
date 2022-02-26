@@ -2992,7 +2992,15 @@ export class Aether<
             );
           }
           process(groupParentPlan);
-          const parent = this.buckets[groupParentPlan.bucketId];
+          if (parents.length > 1) {
+            throw new Error(
+              `GraphileInternalError<74be1e65-f549-4ec8-bd2b-6f8f0b72f7aa>: there was more than one parent bucket of a grouped plan`,
+            );
+          }
+          const parent =
+            parents.length === 1
+              ? parents[0]
+              : this.buckets[groupParentPlan.bucketId];
           const rootPathIdentities = pathIdentitiesByPlanId[groupParentPlan.id];
           if (!rootPathIdentities || rootPathIdentities.length === 0) {
             throw new Error(
