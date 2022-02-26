@@ -3262,206 +3262,251 @@ export class Aether<
       return winningBucket;
     };
 
-    for (const bucket of this.buckets) {
-      if (bucket.rootPathIdentities.length > 0) {
-        /**
-         * Tuples of [pathIdentity, plan] for all the path identities that
-         * should be set within this bucket. NOTE: this is not necessarily only
-         * (or all) plans belonging to this bucket, for example there may be a
-         * plan that only depends on constants (and thus is in bucket 0) and
-         * yet it might write to path identities that are a few nested lists
-         * deep.
-         *
-         * Our strategy is to find the deeper of the plan's own bucket and the
-         * deepest bucket for the plans for each of the path identity's
-         * ancestors.
-         */
-        const planPathIdentityTuples = Object.keys(this.plans)
-          .flatMap((planId) => {
-            const plan = this.plans[planId];
-            if (plan && plan.id === planId) {
-              const pathIdentities = pathIdentitiesByPlanId[plan.id];
-              if (pathIdentities && pathIdentities.length > 0) {
-                return pathIdentities.map((pathIdentity) => {
-                  if (pathIdentity.includes("@")) {
-                    // Fake path, we don't care about this.
-                    return null;
-                  }
-                  const deepestBucket = getDeepestBucket(plan, pathIdentity);
-                  if (deepestBucket === bucket) {
-                    return [pathIdentity, plan] as [string, ExecutablePlan];
-                  } else {
-                    return null;
-                  }
-                });
+    // TODO: make `plan.groupId` rather than `plan.groupIds` - each group
+    // should get its own plans.
+    /**
+     * This governs whether the new execution strategy might be able to be
+     * used.  Currently it doesn't support stream/defer (read on), but even if
+     * this is true that doesn't mean we necessarily support it.
+     *
+     * The new execution strategy is reliant on the buckets knowing where
+     * they're writing the results. However, for stream and defer, the writing
+     * of results can be ambiguous in the current system. A decision was made a
+     * long time ago that needs revisiting - namely that when a selection set
+     * is evaluated the fields can be in many groupIds but only get planned
+     * once. Instead, each field should be planned once for each groupId it's
+     * in, thus each plan should have exactly one groupId. To make this
+     * achievable we need to fix `planIdByPathIdentity`; for regular queries,
+     * mutations and even subscriptions this is fine since there is only one
+     * "selection set" that ultimately gets output. However, for stream/defer
+     * there's many selection sets, so there could be more than one plan for
+     * each path through the GraphQL document. To solve this, we're going to
+     * introduce new "root paths" for streamed/deferred selection sets, so
+     * where the root paths all start like `~>Query.myField` or similar, for
+     * streamed/deferred payloads we'll use path identities such as
+     * `~defer1>User.topPosts`.  The root path identity for these (e.g.
+     * `~defer1`) will have the plan id at the root of the selection set
+     * (`Group.parentPlanId`) supplied.
+     *
+     * Temporarily I've disabled this for subscriptions too, since they want to
+     * write to the root twice.
+     */
+    const canPrepare = this.groups.every(
+      (g) =>
+        g.reason != "defer" &&
+        g.reason != "stream" &&
+        this.operationType !== "subscription",
+    );
+
+    if (canPrepare) {
+      for (const bucket of this.buckets) {
+        if (bucket.rootPathIdentities.length > 0) {
+          /**
+           * Tuples of [pathIdentity, plan] for all the path identities that
+           * should be set within this bucket. NOTE: this is not necessarily only
+           * (or all) plans belonging to this bucket, for example there may be a
+           * plan that only depends on constants (and thus is in bucket 0) and
+           * yet it might write to path identities that are a few nested lists
+           * deep.
+           *
+           * ~~Our strategy is to find the bucket for the plan, and then to walk
+           * that bucket's non-group children (item plans and polymorphic plans
+           * are fine) whilst their child bucket's rootPathIdentities is still
+           * compatible.~~
+           *
+           * Our strategy is to find the deeper of the plan's own bucket and the
+           * deepest bucket for the plans for each of the path identity's
+           * ancestors.
+           */
+          const planPathIdentityTuples = Object.keys(this.plans)
+            .flatMap((planId) => {
+              const plan = this.plans[planId];
+              if (plan && plan.id === planId) {
+                const pathIdentities = pathIdentitiesByPlanId[plan.id];
+                if (pathIdentities && pathIdentities.length > 0) {
+                  return pathIdentities.map((pathIdentity) => {
+                    if (pathIdentity.includes("@")) {
+                      // Fake path, we don't care about this.
+                      return null;
+                    }
+                    const deepestBucket = getDeepestBucket(plan, pathIdentity);
+                    if (deepestBucket === bucket) {
+                      return [pathIdentity, plan] as [string, ExecutablePlan];
+                    } else {
+                      return null;
+                    }
+                  });
+                }
               }
-            }
-            return null;
-          })
-          .filter(isNotNullish);
+              return null;
+            })
+            .filter(isNotNullish);
 
-        /*
-         * Sort the path identities by their number of component parts so we
-         * can just loop through them and their ancestors (if any) will already
-         * exist.
-         * NOTE: the GraphQL spec specifies that we must maintain the field order
-         * the user specifies (see
-         * https://spec.graphql.org/draft/#sec-Executing-Selection-Sets), we don't currently
-         * do that, so the output cannot be used for GraphQL verbatim.
-         */
-        // TODO: sort this so it matches the GraphQL field order.
-        planPathIdentityTuples.sort(
-          (a, z) => a[0].split(">").length - z[0].split(">").length,
-        );
-
-        for (const [pathIdentity, plan] of planPathIdentityTuples) {
-          const fieldDigest = this.fieldDigestByPathIdentity[pathIdentity];
-          const mode = fieldDigest?.isLeaf
-            ? "L"
-            : fieldDigest?.listDepth === 0
-            ? "O"
-            : "A"; // If there's no fieldDigest then it must be an array intermediary result
-          const matchingParentPathIdentities = bucket.rootPathIdentities.filter(
-            (rpi) => rpi === pathIdentity || pathIdentity.startsWith(rpi + ">"),
+          /*
+           * Sort the path identities by their number of component parts so we
+           * can just loop through them and their ancestors (if any) will already
+           * exist.
+           * NOTE: the GraphQL spec specifies that we must maintain the field order
+           * the user specifies (see
+           * https://spec.graphql.org/draft/#sec-Executing-Selection-Sets), we don't currently
+           * do that, so the output cannot be used for GraphQL verbatim.
+           */
+          // TODO: sort this so it matches the GraphQL field order.
+          planPathIdentityTuples.sort(
+            (a, z) => a[0].split(">").length - z[0].split(">").length,
           );
-          if (matchingParentPathIdentities.length !== 1) {
-            throw new Error(
-              `GraphileInternalError<204ef204-7112-48e3-9d9b-2ce96aea86ec> Bad bucketing; couldn't find match for '${pathIdentity}' in '${bucket.rootPathIdentities.join(
-                "', '",
-              )}'`,
+
+          for (const [pathIdentity, plan] of planPathIdentityTuples) {
+            const fieldDigest = this.fieldDigestByPathIdentity[pathIdentity];
+            const mode = fieldDigest?.isLeaf
+              ? "L"
+              : fieldDigest?.listDepth === 0
+              ? "O"
+              : "A"; // If there's no fieldDigest then it must be an array intermediary result
+            const matchingParentPathIdentities =
+              bucket.rootPathIdentities.filter(
+                (rpi) =>
+                  rpi === pathIdentity || pathIdentity.startsWith(rpi + ">"),
+              );
+            if (matchingParentPathIdentities.length !== 1) {
+              throw new Error(
+                `GraphileInternalError<204ef204-7112-48e3-9d9b-2ce96aea86ec> Bad bucketing; couldn't find match for '${pathIdentity}' in '${bucket.rootPathIdentities.join(
+                  "', '",
+                )}'`,
+              );
+            }
+            const rootPathIdentity = matchingParentPathIdentities[0];
+            const rootPathIdentityIndex =
+              bucket.rootPathIdentities.indexOf(rootPathIdentity);
+            const remainingPath = pathIdentity.substring(
+              rootPathIdentity.length + 1,
             );
-          }
-          const rootPathIdentity = matchingParentPathIdentities[0];
-          const rootPathIdentityIndex =
-            bucket.rootPathIdentities.indexOf(rootPathIdentity);
-          const remainingPath = pathIdentity.substring(
-            rootPathIdentity.length + 1,
-          );
-          const parts = remainingPath
-            ? remainingPath.split(">").map((part) => part.split("."))
-            : [];
-          const path = parts.map((part) => part[1]);
-          if (isDev) {
-            const isValidIdentifier = (identifier: string) =>
-              /^[a-zA-Z_0-9]+$/.test(identifier);
-            const invalidPaths = path.filter(
-              (identifier) => !isValidIdentifier(identifier),
-            );
-            if (invalidPaths.length > 0) {
-              throw new Error(
-                `GraphileInternalError<c53bbc17-1e38-4642-8bc1-ee27043ea3b6>: invalid paths found for bucket ${
-                  bucket.id
-                } / plan ${plan.id} -> ${invalidPaths.join(", ")}`,
+            const parts = remainingPath
+              ? remainingPath.split(">").map((part) => part.split("."))
+              : [];
+            const path = parts.map((part) => part[1]);
+            if (isDev) {
+              const isValidIdentifier = (identifier: string) =>
+                /^[a-zA-Z_0-9]+$/.test(identifier);
+              const invalidPaths = path.filter(
+                (identifier) => !isValidIdentifier(identifier),
               );
-            }
-          }
-
-          if (path.length === 0) {
-            if (
-              bucket.rootOutputPlanId != null &&
-              bucket.rootOutputPlanId !== plan.id
-            ) {
-              throw new Error(
-                `GraphileInternalError<f9a8ba81-5025-440e-aa03-d355125705ea>: bucket ${bucket.id}'s rootOutputPlanId is already set to '${bucket.rootOutputPlanId}', cannot set it to '${plan.id}'`,
-              );
-            }
-            if (bucket.polymorphicPlanIds) {
-              throw new Error(
-                `GraphileInternalError<d09677c6-f5ff-4d8b-af0f-a82e2efadd30>: A polymorphic plan cannot set the root object path, this must be set outside.`,
-              );
-            }
-            bucket.rootOutputPlanId = plan.id;
-          } else {
-            let spec = bucket.outputMap;
-            for (let i = 0, l = path.length - 1; i < l; i++) {
-              const pathComponent = path[i];
-
-              const field = spec[pathComponent];
-              if (!field) {
-                /*
-                 * This path doesn't exist yet. This could happen for a number
-                 * of reasons.
-                 *
-                 * Reason 1: we're the root bucket and there's a deep plan that
-                 * returns a constant (e.g. it only depends on `context` or
-                 * similar, or maybe has no dependencies at all); in this case,
-                 * it's not our responsibility to set that key - we should pass
-                 * it down to our child(ren).
-                 *
-                 * Reason 2: we're a "group" bucket (defer, stream, mutation,
-                 * subscription, etc) and the required key has already been
-                 * populated in our parent. In the case of defer/stream, we
-                 * want to copy the result from our parent (no need to run it
-                 * again), but in the case of mutation/subscription we really
-                 * ought to re-evaluate it. Let's assume that that
-                 * re-evaluation has been handled for us by the query planner
-                 * rules (specifically that a duplicate plan will have been
-                 * created and will not be de-duplicated since it's in a
-                 * separate group) so we shouldn't need to handle that here; so
-                 * we only need to handle the "copy it from parent" case.
-                 */
-
+              if (invalidPaths.length > 0) {
                 throw new Error(
-                  `GraphileInternalError<7f7193d9-a8af-4154-ad8e-b8d16396f19f>: component ${i} ('${pathComponent}') of '${path.join(
-                    ">",
-                  )}' was not (yet) set in bucket ${bucket.id}'s outputMap`,
+                  `GraphileInternalError<c53bbc17-1e38-4642-8bc1-ee27043ea3b6>: invalid paths found for bucket ${
+                    bucket.id
+                  } / plan ${plan.id} -> ${invalidPaths.join(", ")}`,
                 );
               }
-              const nextSpec = field.children;
-              if (!nextSpec) {
-                throw new Error(
-                  `GraphileInternalError<3067ac98-f448-4669-baa3-c5212fa50fa5>: component ${i} ('${pathComponent}') of '${path.join(
-                    ">",
-                  )}' doesn't have any children`,
-                );
-              }
-              spec = nextSpec;
             }
 
-            const typeName = parts.length ? parts[0][0] : null;
-            const fieldName = path[path.length - 1];
-
-            if (!spec[fieldName]) {
-              spec[fieldName] = {
-                planIdByRootPathIdentity: Object.create(null),
-                mode,
-                children: mode === "O" ? Object.create(null) : null,
-                typeNames: bucket.polymorphicPlanIds ? [] : null,
-              };
+            if (path.length === 0) {
+              if (
+                bucket.rootOutputPlanId != null &&
+                bucket.rootOutputPlanId !== plan.id
+              ) {
+                throw new Error(
+                  `GraphileInternalError<f9a8ba81-5025-440e-aa03-d355125705ea>: bucket ${bucket.id}'s rootOutputPlanId is already set to '${bucket.rootOutputPlanId}', cannot set it to '${plan.id}'`,
+                );
+              }
+              if (bucket.polymorphicPlanIds) {
+                throw new Error(
+                  `GraphileInternalError<d09677c6-f5ff-4d8b-af0f-a82e2efadd30>: A polymorphic plan cannot set the root object path, this must be set outside.`,
+                );
+              }
+              bucket.rootOutputPlanId = plan.id;
             } else {
-              // Consistency check
-              if (spec[fieldName].mode !== mode) {
-                throw new Error(
-                  `GraphileInternalError<b2286484-49af-47b3-8e72-4c72c8e488f2>: modes cannot differ here!`,
+              let spec = bucket.outputMap;
+              for (let i = 0, l = path.length - 1; i < l; i++) {
+                const pathComponent = path[i];
+
+                const field = spec[pathComponent];
+                if (!field) {
+                  /*
+                   * This path doesn't exist yet. This could happen for a number
+                   * of reasons.
+                   *
+                   * Reason 1: we're the root bucket and there's a deep plan that
+                   * returns a constant (e.g. it only depends on `context` or
+                   * similar, or maybe has no dependencies at all); in this case,
+                   * it's not our responsibility to set that key - we should pass
+                   * it down to our child(ren).
+                   *
+                   * Reason 2: we're a "group" bucket (defer, stream, mutation,
+                   * subscription, etc) and the required key has already been
+                   * populated in our parent. In the case of defer/stream, we
+                   * want to copy the result from our parent (no need to run it
+                   * again), but in the case of mutation/subscription we really
+                   * ought to re-evaluate it. Let's assume that that
+                   * re-evaluation has been handled for us by the query planner
+                   * rules (specifically that a duplicate plan will have been
+                   * created and will not be de-duplicated since it's in a
+                   * separate group) so we shouldn't need to handle that here; so
+                   * we only need to handle the "copy it from parent" case.
+                   */
+
+                  throw new Error(
+                    `GraphileInternalError<7f7193d9-a8af-4154-ad8e-b8d16396f19f>: component ${i} ('${pathComponent}') of '${path.join(
+                      ">",
+                    )}' was not (yet) set in bucket ${bucket.id}'s outputMap`,
+                  );
+                }
+                const nextSpec = field.children;
+                if (!nextSpec) {
+                  throw new Error(
+                    `GraphileInternalError<3067ac98-f448-4669-baa3-c5212fa50fa5>: component ${i} ('${pathComponent}') of '${path.join(
+                      ">",
+                    )}' doesn't have any children`,
+                  );
+                }
+                spec = nextSpec;
+              }
+
+              const typeName = parts.length ? parts[0][0] : null;
+              const fieldName = path[path.length - 1];
+
+              if (!spec[fieldName]) {
+                spec[fieldName] = {
+                  planIdByRootPathIdentity: Object.create(null),
+                  mode,
+                  children: mode === "O" ? Object.create(null) : null,
+                  typeNames: bucket.polymorphicPlanIds ? [] : null,
+                };
+              } else {
+                // Consistency check
+                if (spec[fieldName].mode !== mode) {
+                  throw new Error(
+                    `GraphileInternalError<b2286484-49af-47b3-8e72-4c72c8e488f2>: modes cannot differ here!`,
+                  );
+                }
+              }
+              const fieldSpec = spec[fieldName];
+              if (
+                fieldSpec.planIdByRootPathIdentity[rootPathIdentity] != null &&
+                fieldSpec.planIdByRootPathIdentity[rootPathIdentity] !== plan.id
+              ) {
+                console.error(
+                  `GraphileInternalError<1ba4a423-abe6-447f-a9a7-4de24d4b419d>: bucket ${
+                    bucket.id
+                  }'s field spec for '${path.join(">")}' already has plan ${
+                    fieldSpec.planIdByRootPathIdentity[rootPathIdentity]
+                  } set for root path identity '${rootPathIdentity}', cannot set to ${
+                    plan.id
+                  }`,
                 );
               }
-            }
-            const fieldSpec = spec[fieldName];
-            if (
-              fieldSpec.planIdByRootPathIdentity[rootPathIdentity] != null &&
-              fieldSpec.planIdByRootPathIdentity[rootPathIdentity] !== plan.id
-            ) {
-              console.error(
-                `GraphileInternalError<1ba4a423-abe6-447f-a9a7-4de24d4b419d>: bucket ${
-                  bucket.id
-                }'s field spec for '${path.join(">")}' already has plan ${
-                  fieldSpec.planIdByRootPathIdentity[rootPathIdentity]
-                } set for root path identity '${rootPathIdentity}', cannot set to ${
-                  plan.id
-                }`,
-              );
-            }
-            fieldSpec.planIdByRootPathIdentity[rootPathIdentity] = plan.id;
-            if (
-              fieldSpec.typeNames &&
-              !fieldSpec.typeNames.includes(typeName!)
-            ) {
-              if (!typeName) {
-                throw new Error(
-                  `GraphileInternalError<5f412f08-4c69-4b8d-8360-b25aa27d5160>: typeName must be set for polymorphic bucket`,
-                );
+              fieldSpec.planIdByRootPathIdentity[rootPathIdentity] = plan.id;
+              if (
+                fieldSpec.typeNames &&
+                !fieldSpec.typeNames.includes(typeName!)
+              ) {
+                if (!typeName) {
+                  throw new Error(
+                    `GraphileInternalError<5f412f08-4c69-4b8d-8360-b25aa27d5160>: typeName must be set for polymorphic bucket`,
+                  );
+                }
+                fieldSpec.typeNames.push(typeName);
               }
-              fieldSpec.typeNames.push(typeName);
             }
           }
         }
