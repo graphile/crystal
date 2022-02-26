@@ -14,16 +14,16 @@ graph TD
     InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
     PgSelect_8[["PgSelect[_8∈0]<br /><single_table_items>"]]:::plan
     First_12["First[_12∈0]"]:::plan
-    PgSelectSingle_13["PgSelectSingle[_13∈1]<br /><single_table_items>"]:::plan
-    PgClassExpression_14["PgClassExpression[_14∈1]<br /><__single_t...s__.”type”>"]:::plan
-    Lambda_15["Lambda[_15∈1]"]:::plan
-    PgSingleTablePolymorphic_16["PgSingleTablePolymorphic[_16∈1]"]:::plan
+    PgSelectSingle_13["PgSelectSingle[_13∈0]<br /><single_table_items>"]:::plan
+    PgClassExpression_14["PgClassExpression[_14∈0]<br /><__single_t...s__.”type”>"]:::plan
+    Lambda_15["Lambda[_15∈0]"]:::plan
+    PgSingleTablePolymorphic_16["PgSingleTablePolymorphic[_16∈0]"]:::plan
     PgClassExpression_17["PgClassExpression[_17∈1]<br /><__single_t...parent_id”>"]:::plan
     First_22["First[_22∈1]"]:::plan
-    PgSelectSingle_23["PgSelectSingle[_23∈2]<br /><single_table_items>"]:::plan
-    PgClassExpression_24["PgClassExpression[_24∈2]<br /><__single_t...s__.”type”>"]:::plan
-    Lambda_25["Lambda[_25∈2]"]:::plan
-    PgSingleTablePolymorphic_26["PgSingleTablePolymorphic[_26∈2]"]:::plan
+    PgSelectSingle_23["PgSelectSingle[_23∈1]<br /><single_table_items>"]:::plan
+    PgClassExpression_24["PgClassExpression[_24∈1]<br /><__single_t...s__.”type”>"]:::plan
+    Lambda_25["Lambda[_25∈1]"]:::plan
+    PgSingleTablePolymorphic_26["PgSingleTablePolymorphic[_26∈1]"]:::plan
     First_33["First[_33∈2]"]:::plan
     PgSelectSingle_34["PgSelectSingle[_34∈2]<br /><people>"]:::plan
     PgClassExpression_35["PgClassExpression[_35∈2]<br /><__people__.”username”>"]:::plan
@@ -84,11 +84,11 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,PgSelect_8,First_12,Access_290,Access_291,Object_292 bucket0
+    class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,Lambda_15,PgSingleTablePolymorphic_16,Access_290,Access_291,Object_292 bucket0
     classDef bucket1 stroke:#a52a2a
-    class PgSelectSingle_13,PgClassExpression_14,Lambda_15,PgSingleTablePolymorphic_16,PgClassExpression_17,First_22,PgClassExpression_72,Map_299,List_300 bucket1
+    class PgClassExpression_17,First_22,PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26,PgClassExpression_72,Map_299,List_300 bucket1
     classDef bucket2 stroke:#808000
-    class PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26,First_33,PgSelectSingle_34,PgClassExpression_35,Map_297,List_298 bucket2
+    class First_33,PgSelectSingle_34,PgClassExpression_35,Map_297,List_298 bucket2
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~"):::bucket

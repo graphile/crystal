@@ -24,10 +24,10 @@ graph TD
     __Item_20>"__Item[_20∈2]<br /><_15>"]:::itemplan
     PgSelectSingle_21["PgSelectSingle[_21∈2]<br /><single_table_items>"]:::plan
     __Item_22>"__Item[_22∈3]<br /><_19>"]:::itemplan
-    PgSelectSingle_23["PgSelectSingle[_23∈4]<br /><single_table_items>"]:::plan
-    PgClassExpression_24["PgClassExpression[_24∈4]<br /><__single_t...s__.”type”>"]:::plan
-    Lambda_25["Lambda[_25∈4]"]:::plan
-    PgSingleTablePolymorphic_26["PgSingleTablePolymorphic[_26∈4]"]:::plan
+    PgSelectSingle_23["PgSelectSingle[_23∈3]<br /><single_table_items>"]:::plan
+    PgClassExpression_24["PgClassExpression[_24∈3]<br /><__single_t...s__.”type”>"]:::plan
+    Lambda_25["Lambda[_25∈3]"]:::plan
+    PgSingleTablePolymorphic_26["PgSingleTablePolymorphic[_26∈3]"]:::plan
     PgClassExpression_27["PgClassExpression[_27∈4]<br /><__single_t...ems__.”id”>"]:::plan
     PgClassExpression_29["PgClassExpression[_29∈4]<br /><__single_t...__.”type2”>"]:::plan
     PgClassExpression_30["PgClassExpression[_30∈4]<br /><__single_t...”position”>"]:::plan
@@ -107,9 +107,9 @@ graph TD
     classDef bucket2 stroke:#808000
     class __Item_20,PgSelectSingle_21 bucket2
     classDef bucket3 stroke:#3cb371
-    class __Item_22 bucket3
+    class __Item_22,PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26 bucket3
     classDef bucket4 stroke:#7f007f
-    class PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26,PgClassExpression_27,PgClassExpression_29,PgClassExpression_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34 bucket4
+    class PgClassExpression_27,PgClassExpression_29,PgClassExpression_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34 bucket4
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~"):::bucket

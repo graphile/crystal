@@ -21,17 +21,17 @@ graph TD
     __Item_20>"__Item[_20∈2]<br /><_15>"]:::itemplan
     PgSelectSingle_21["PgSelectSingle[_21∈2]<br /><single_table_items>"]:::plan
     __Item_22>"__Item[_22∈3]<br /><_19>"]:::itemplan
-    PgSelectSingle_23["PgSelectSingle[_23∈4]<br /><single_table_items>"]:::plan
-    PgClassExpression_24["PgClassExpression[_24∈4]<br /><__single_t...s__.”type”>"]:::plan
-    Lambda_25["Lambda[_25∈4]"]:::plan
-    PgSingleTablePolymorphic_26["PgSingleTablePolymorphic[_26∈4]"]:::plan
+    PgSelectSingle_23["PgSelectSingle[_23∈3]<br /><single_table_items>"]:::plan
+    PgClassExpression_24["PgClassExpression[_24∈3]<br /><__single_t...s__.”type”>"]:::plan
+    Lambda_25["Lambda[_25∈3]"]:::plan
+    PgSingleTablePolymorphic_26["PgSingleTablePolymorphic[_26∈3]"]:::plan
     PgClassExpression_27["PgClassExpression[_27∈4]<br /><__single_t...parent_id”>"]:::plan
     PgSelect_28[["PgSelect[_28∈4]<br /><single_table_items>"]]:::plan
     First_32["First[_32∈4]"]:::plan
-    PgSelectSingle_33["PgSelectSingle[_33∈5]<br /><single_table_items>"]:::plan
-    PgClassExpression_34["PgClassExpression[_34∈5]<br /><__single_t...s__.”type”>"]:::plan
-    Lambda_35["Lambda[_35∈5]"]:::plan
-    PgSingleTablePolymorphic_36["PgSingleTablePolymorphic[_36∈5]"]:::plan
+    PgSelectSingle_33["PgSelectSingle[_33∈4]<br /><single_table_items>"]:::plan
+    PgClassExpression_34["PgClassExpression[_34∈4]<br /><__single_t...s__.”type”>"]:::plan
+    Lambda_35["Lambda[_35∈4]"]:::plan
+    PgSingleTablePolymorphic_36["PgSingleTablePolymorphic[_36∈4]"]:::plan
     PgClassExpression_39["PgClassExpression[_39∈5]<br /><__single_t...__.”type2”>"]:::plan
     PgClassExpression_52["PgClassExpression[_52∈4]<br /><__single_t...ems__.”id”>"]:::plan
     PgClassExpression_54["PgClassExpression[_54∈4]<br /><__single_t...__.”type2”>"]:::plan
@@ -113,11 +113,11 @@ graph TD
     classDef bucket2 stroke:#808000
     class __Item_20,PgSelectSingle_21 bucket2
     classDef bucket3 stroke:#3cb371
-    class __Item_22 bucket3
+    class __Item_22,PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26 bucket3
     classDef bucket4 stroke:#7f007f
-    class PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26,PgClassExpression_27,PgSelect_28,First_32,PgClassExpression_52,PgClassExpression_54 bucket4
+    class PgClassExpression_27,PgSelect_28,First_32,PgSelectSingle_33,PgClassExpression_34,Lambda_35,PgSingleTablePolymorphic_36,PgClassExpression_52,PgClassExpression_54 bucket4
     classDef bucket5 stroke:#ff0000
-    class PgSelectSingle_33,PgClassExpression_34,Lambda_35,PgSingleTablePolymorphic_36,PgClassExpression_39 bucket5
+    class PgClassExpression_39 bucket5
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~"):::bucket
