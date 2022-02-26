@@ -3089,6 +3089,48 @@ export class Aether<
       }
     }
 
+    // TODO: remove this post-processing step!
+    /*
+     * When we assign the bucketId to `planForType` polymorphic child plans,
+     * depending on what plans are involved there's a significant chance that
+     * we'll include the polymorphic plan itself in the polymorphic bucket.
+     * This leads to a chicken and egg situation - we need to complete the
+     * polymorphic plan so we know what type the object is so that we know
+     * which bucket to create/pass results to, but we need the bucket to be
+     * created in order to evaluate the polymorphic plan... Catch-22 y'see? So
+     * to work around this, we do all the regular allocation and then as a
+     * post-processing step we go back through and remove the polymorphic plan
+     * and any of its dependencies from the polymorphic bucket and put them in
+     * the parent bucket instead.
+     */
+    for (const bucket of this.buckets) {
+      /**
+       * Moves a plan (and any of its dependencies) out of `bucket` and into
+       * the bucket's parent instead.
+       */
+      const exfiltrate = (plan: ExecutablePlan, bucket: BucketDefinition) => {
+        if (plan.bucketId !== bucket.id) {
+          return;
+        }
+        if (!bucket.parent) {
+          throw new Error(
+            `Cannot exfiltrate a plan from a bucket that has no parent.`,
+          );
+        }
+        plan.bucketId = bucket.parent.id;
+        plan.dependencies.forEach((depId) => {
+          const dep = this.plans[depId];
+          exfiltrate(dep, bucket);
+        });
+      };
+      if (bucket.polymorphicPlanIds) {
+        for (const planId of bucket.polymorphicPlanIds) {
+          const plan = this.plans[planId];
+          exfiltrate(plan, bucket);
+        }
+      }
+    }
+
     // Set the bucket's outputMap
     for (const [id, plan] of Object.entries(this.plans)) {
       if (plan != null && plan.id === id) {
