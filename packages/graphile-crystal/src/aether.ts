@@ -5742,7 +5742,9 @@ export class Aether<
         process(bucket.outputMap);
         graph.push(
           `    Bucket${bucket.id}(${dotEscape(
-            `Bucket ${bucket.id} (${raisonDEtre})\n${
+            `Bucket ${
+              bucket.id
+            } (${raisonDEtre})\n${bucket.rootPathIdentities.join("\n")}\n${
               bucket.rootOutputPlanId != null
                 ? `⠀ROOT <-O- ${bucket.rootOutputPlanId}\n`
                 : ""
