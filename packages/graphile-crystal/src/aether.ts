@@ -5443,7 +5443,6 @@ export class Aether<
     graph.push("");
     graph.push("    %% plan-to-path relationships");
     {
-      let pathNodeCounter = 0;
       for (const [pathPlanId, pathIdentities] of Object.entries(
         pathIdentitiesByPlanId,
       )) {
@@ -5462,7 +5461,7 @@ export class Aether<
           .sort((a, z) => z[1] - a[1])
           .map(([id, count]) => `${id}${count > 1 ? ` x${count}` : ""}`)
           .join("\n");
-        const pathNode = `P${++pathNodeCounter}`;
+        const pathNode = `P${pathPlanId}`;
         graph.push(`    ${pathNode}[${dotEscape(text)}]`);
         graph.push(`    ${planId(this.plans[pathPlanId])} -.-> ${pathNode}`);
       }
