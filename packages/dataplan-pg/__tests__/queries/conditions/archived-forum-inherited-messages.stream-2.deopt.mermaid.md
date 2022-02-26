@@ -172,13 +172,13 @@ graph TD
     Bucket0 --> Bucket1
     Bucket2("Bucket 2 (group1[stream])<br />~>Query.forums[]>Forum.messagesConnection"):::bucket
     style Bucket2 stroke:#808000
-    Bucket0 --> Bucket2
+    Bucket1 --> Bucket2
     Bucket3("Bucket 3 (item_41)<br />~>Query.forums[]>Forum.messagesConnection>MessagesConnection.nodes[]"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket2 --> Bucket3
     Bucket4("Bucket 4 (group2[stream])<br />~>Query.forums[]>Forum.messagesConnection"):::bucket
     style Bucket4 stroke:#7f007f
-    Bucket0 --> Bucket4
+    Bucket1 --> Bucket4
     Bucket5("Bucket 5 (item_54)<br />~>Query.forums[]>Forum.messagesConnection>MessagesConnection.edges[]"):::bucket
     style Bucket5 stroke:#ff0000
     Bucket4 --> Bucket5

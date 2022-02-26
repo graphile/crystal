@@ -114,6 +114,6 @@ graph TD
     Bucket1 --> Bucket2
     Bucket3("Bucket 3 (group2[defer])<br />~>Query.forums[]>Forum.messagesConnection"):::bucket
     style Bucket3 stroke:#3cb371
-    Bucket0 --> Bucket3
+    Bucket2 --> Bucket3
     end
 ```
