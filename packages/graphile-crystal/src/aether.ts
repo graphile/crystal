@@ -2977,30 +2977,30 @@ export class Aether<
 
       // Plans that are in a new group (and don't have a bucket already due to being __ItemPlans) get their own bucket
       if (groupId !== undefined) {
-        const groupKey = `${groupId}|${polymorphicPlanIds ?? ""}|${
+        const group = this.groups[plan.primaryGroupId];
+        const groupParentPlan = this.plans[group.parentPlanId];
+        if (!groupParentPlan) {
+          throw new Error(
+            `Group ${plan.primaryGroupId} had parentPlanId ${group.parentPlanId} but we couldn't find a plan with that id.`,
+          );
+        }
+        process(groupParentPlan);
+        if (parents.length > 1) {
+          throw new Error(
+            `GraphileInternalError<74be1e65-f549-4ec8-bd2b-6f8f0b72f7aa>: there was more than one parent bucket of a grouped plan`,
+          );
+        }
+        const parent =
+          parents.length === 1
+            ? parents[0]
+            : this.buckets[groupParentPlan.bucketId];
+        const groupKey = `${groupId}|${parent.id}|${polymorphicPlanIds ?? ""}|${
           polymorphicTypeNames?.join(",") ?? ""
         }`;
         if (bucketByGroupKey[groupKey]) {
           plan.bucketId = bucketByGroupKey[groupKey].id;
           return plan;
         } else {
-          const group = this.groups[plan.primaryGroupId];
-          const groupParentPlan = this.plans[group.parentPlanId];
-          if (!groupParentPlan) {
-            throw new Error(
-              `Group ${plan.primaryGroupId} had parentPlanId ${group.parentPlanId} but we couldn't find a plan with that id.`,
-            );
-          }
-          process(groupParentPlan);
-          if (parents.length > 1) {
-            throw new Error(
-              `GraphileInternalError<74be1e65-f549-4ec8-bd2b-6f8f0b72f7aa>: there was more than one parent bucket of a grouped plan`,
-            );
-          }
-          const parent =
-            parents.length === 1
-              ? parents[0]
-              : this.buckets[groupParentPlan.bucketId];
           const rootPathIdentities = pathIdentitiesByPlanId[groupParentPlan.id];
           if (!rootPathIdentities || rootPathIdentities.length === 0) {
             throw new Error(
