@@ -138,19 +138,19 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,__TrackedObject_6,PgSelect_17,InputStaticLeaf_24,InputStaticLeaf_25,InputStaticLeaf_27,Connection_38,Access_61,Access_62,Object_63,PgPageInfo_68,Constant_71 bucket0
-    classDef bucket1 stroke:#a52a2a
+    classDef bucket1 stroke:#00bfff
     class __Item_21,PgSelectSingle_22,PgClassExpression_23,Lambda_70,First_73,PgSelectSingle_74,PgCursor_75,PgClassExpression_76,List_77,Last_79,PgSelectSingle_80,PgCursor_81,PgClassExpression_82,List_83,First_85,PgSelectSingle_86,PgClassExpression_87,Access_90,Lambda_91,Access_92 bucket1
-    classDef bucket2 stroke:#808000
+    classDef bucket2 stroke:#7f007f
     class __Item_41,PgSelectSingle_42,PgClassExpression_43,First_49,PgSelectSingle_50,PgClassExpression_51,PgClassExpression_52,PgCursor_55,PgClassExpression_56,List_57,Map_88,List_89 bucket2
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀forums <-A- _17"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]<br />⠀ROOT <-O- _22<br />⠀⠀name <-L- _23<br />⠀⠀messagesConnection <-O- _38<br />⠀⠀⠀messagesConnection.pageInfo <-O- _68<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage <-L- _70<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasPreviousPage <-L- _71<br />⠀⠀⠀⠀messagesConnection.pageInfo.startCursor <-L- _75<br />⠀⠀⠀⠀messagesConnection.pageInfo.endCursor <-L- _81<br />⠀⠀⠀messagesConnection.totalCount <-L- _87<br />⠀⠀⠀messagesConnection.nodes <-A- _91<br />⠀⠀⠀messagesConnection.edges <-A- _91"):::bucket
-    style Bucket1 stroke:#a52a2a
+    style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_41)<br />~>Query.forums[]>Forum.messagesConnection>MessagesConnection.nodes[]<br />~>Query.forums[]>Forum.messagesConnection>MessagesConnection.edges[]<br />⠀ROOT <-O- _42<br />⠀⠀node <-O- _42<br />⠀⠀⠀node.body <-L- _43<br />⠀⠀⠀node.author <-O- _50<br />⠀⠀⠀⠀node.author.username <-L- _51<br />⠀⠀⠀⠀node.author.gravatarUrl <-L- _52<br />⠀⠀body <-L- _43<br />⠀⠀author <-O- _50<br />⠀⠀⠀author.username <-L- _51<br />⠀⠀⠀author.gravatarUrl <-L- _52<br />⠀⠀cursor <-L- _55"):::bucket
-    style Bucket2 stroke:#808000
+    style Bucket2 stroke:#7f007f
     Bucket1 --> Bucket2
     end
 ```

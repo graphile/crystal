@@ -82,34 +82,34 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,__TrackedObject_6,PgSelect_17,Access_25,Access_26,Object_27 bucket0
-    classDef bucket1 stroke:#a52a2a
+    classDef bucket1 stroke:#00bfff
     class __Item_21,PgSelectSingle_22,PgClassExpression_23,PgSelect_24,__ListTransform_28 bucket1
-    classDef bucket2 stroke:#808000
+    classDef bucket2 stroke:#7f007f
     class __Item_29,PgSelectSingle_30,PgClassExpression_31 bucket2
-    classDef bucket3 stroke:#3cb371
+    classDef bucket3 stroke:#ffa500
     class __Item_32,__ListTransform_33 bucket3
-    classDef bucket4 stroke:#7f007f
+    classDef bucket4 stroke:#0000ff
     class __Item_34 bucket4
-    classDef bucket5 stroke:#ff0000
+    classDef bucket5 stroke:#7fff00
     class __Item_35,PgSelectSingle_36,PgClassExpression_37,PgClassExpression_38 bucket5
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀forums <-A- _17"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]<br />⠀ROOT <-O- _22<br />⠀⠀messagesListSet <-A- _28"):::bucket
-    style Bucket1 stroke:#a52a2a
+    style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_29)"):::bucket
-    style Bucket2 stroke:#808000
+    style Bucket2 stroke:#7f007f
     Bucket1 --> Bucket2
     Bucket3("Bucket 3 (item_32)<br />~>Query.forums[]>Forum.messagesListSet[]<br />⠀ROOT <-O- _33"):::bucket
-    style Bucket3 stroke:#3cb371
+    style Bucket3 stroke:#ffa500
     Bucket1 --> Bucket3
     Bucket4("Bucket 4 (item_34)"):::bucket
-    style Bucket4 stroke:#7f007f
+    style Bucket4 stroke:#0000ff
     Bucket3 --> Bucket4
     Bucket5("Bucket 5 (item_35)<br />~>Query.forums[]>Forum.messagesListSet[][]<br />⠀ROOT <-O- _36<br />⠀⠀body <-L- _37<br />⠀⠀featured <-L- _38"):::bucket
-    style Bucket5 stroke:#ff0000
+    style Bucket5 stroke:#7fff00
     Bucket3 --> Bucket5
     end
 ```

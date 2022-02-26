@@ -43,14 +43,14 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,__TrackedObject_6,PgSelect_17,Access_18,Access_19,Object_20 bucket0
-    classDef bucket1 stroke:#a52a2a
+    classDef bucket1 stroke:#00bfff
     class __Item_21,PgSelectSingle_22,PgClassExpression_23 bucket1
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀a <-A- _17<br />⠀⠀b <-A- _17"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />~>Query.a[]<br />~>Query.b[]<br />⠀ROOT <-O- _22<br />⠀⠀a <-L- _23<br />⠀⠀b <-L- _23"):::bucket
-    style Bucket1 stroke:#a52a2a
+    style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     end
 ```

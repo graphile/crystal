@@ -108,34 +108,34 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,__TrackedObject_6,PgSelect_7,Access_141,Access_142,Object_143 bucket0
-    classDef bucket1 stroke:#a52a2a
+    classDef bucket1 stroke:#00bfff
     class __Item_11,PgSelectSingle_12,PgClassExpression_13,PgClassExpression_14,PgSelect_15,__ListTransform_19 bucket1
-    classDef bucket2 stroke:#808000
+    classDef bucket2 stroke:#7f007f
     class __Item_20,PgSelectSingle_21 bucket2
-    classDef bucket3 stroke:#3cb371
+    classDef bucket3 stroke:#ffa500
     class __Item_22,PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26 bucket3
-    classDef bucket4 stroke:#7f007f
+    classDef bucket4 stroke:#0000ff
     class PgClassExpression_27,PgSelect_28,First_32,PgSelectSingle_33,PgClassExpression_34,Lambda_35,PgSingleTablePolymorphic_36,PgClassExpression_52,PgClassExpression_54 bucket4
-    classDef bucket5 stroke:#ff0000
+    classDef bucket5 stroke:#7fff00
     class PgClassExpression_39 bucket5
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀people <-A- _7"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_11)<br />~>Query.people[]<br />⠀ROOT <-O- _12<br />⠀⠀username <-L- _13<br />⠀⠀items <-A- _19"):::bucket
-    style Bucket1 stroke:#a52a2a
+    style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_20)"):::bucket
-    style Bucket2 stroke:#808000
+    style Bucket2 stroke:#7f007f
     Bucket1 --> Bucket2
     Bucket3("Bucket 3 (item_22)<br />~>Query.people[]>Person.items[]<br />⠀ROOT <-O- _26<br />⠀⠀type <-L- _24"):::bucket
-    style Bucket3 stroke:#3cb371
+    style Bucket3 stroke:#ffa500
     Bucket1 --> Bucket3
     Bucket4("Bucket 4 (polymorphic_26[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />~>Query.people[]>Person.items[]<br />⠀⠀parent <-O- _36<br />⠀⠀⠀parent.id <-L- _27<br />⠀⠀⠀parent.type <-L- _34<br />⠀⠀id <-L- _52<br />⠀⠀type2 <-L- _54"):::bucket
-    style Bucket4 stroke:#7f007f
+    style Bucket4 stroke:#0000ff
     Bucket3 --> Bucket4
     Bucket5("Bucket 5 (polymorphic_36[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />~>Query.people[]>Person.items[]>SingleTablePost.parent<br />~>Query.people[]>Person.items[]>SingleTableTopic.parent<br />~>Query.people[]>Person.items[]>SingleTableDivider.parent<br />~>Query.people[]>Person.items[]>SingleTableChecklist.parent<br />~>Query.people[]>Person.items[]>SingleTableChecklistItem.parent<br />⠀⠀type2 <-L- _39"):::bucket
-    style Bucket5 stroke:#ff0000
+    style Bucket5 stroke:#7fff00
     Bucket4 --> Bucket5
     end
 ```

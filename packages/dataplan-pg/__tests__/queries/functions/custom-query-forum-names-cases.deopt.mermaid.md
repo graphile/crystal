@@ -45,19 +45,19 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,__TrackedObject_6,PgSelect_7,Access_8,Access_9,Object_10 bucket0
-    classDef bucket1 stroke:#a52a2a
+    classDef bucket1 stroke:#00bfff
     class __Item_11,PgSelectSingle_12,PgClassExpression_13 bucket1
-    classDef bucket2 stroke:#808000
+    classDef bucket2 stroke:#7f007f
     class __Item_14 bucket2
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀forumNamesCasesList <-L- _7"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_11)<br />~>Query.forumNamesCasesList[]<br />⠀ROOT <-O- _13"):::bucket
-    style Bucket1 stroke:#a52a2a
+    style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_14)<br />~>Query.forumNamesCasesList[][]<br />⠀ROOT <-O- _14"):::bucket
-    style Bucket2 stroke:#808000
+    style Bucket2 stroke:#7f007f
     Bucket1 --> Bucket2
     end
 ```

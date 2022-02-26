@@ -174,29 +174,29 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_5,__TrackedObject_6 bucket0
-    classDef bucket1 stroke:#a52a2a
+    classDef bucket1 stroke:#00bfff
     class __Value_3,Constant_7,Constant_8,PgSelect_9,Constant_13,Constant_14,PgSelect_15,Constant_19,Constant_20,PgSelect_21,First_25,PgSelectSingle_26,PgClassExpression_27,InputStaticLeaf_28,PgSelect_29,First_33,PgSelectSingle_34,PgClassExpression_35,PgPolymorphic_36,First_50,PgClassExpression_72,InputStaticLeaf_80,PgSelect_81,First_85,PgSelectSingle_86,PgClassExpression_87,PgPolymorphic_88,First_102,PgClassExpression_124,InputStaticLeaf_132,PgSelect_133,First_137,PgSelectSingle_138,PgClassExpression_139,PgPolymorphic_140,First_154,PgClassExpression_176,Access_178,Access_179,Object_180,Map_184,List_185,Map_186,List_187,Map_188,List_189 bucket1
-    classDef bucket2 stroke:#808000
+    classDef bucket2 stroke:#7f007f
     class PgSelectSingle_51,PgClassExpression_53,PgClassExpression_54,PgClassExpression_55 bucket2
-    classDef bucket3 stroke:#3cb371
+    classDef bucket3 stroke:#ffa500
     class PgSelectSingle_103,PgClassExpression_105,PgClassExpression_106,PgClassExpression_107 bucket3
-    classDef bucket4 stroke:#7f007f
+    classDef bucket4 stroke:#0000ff
     class PgSelectSingle_155,PgClassExpression_157,PgClassExpression_158,PgClassExpression_159 bucket4
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (group1[mutation])<br />~>Mutation.createThreeRelationalPostsComputed<br />⠀ROOT <-O- _27<br />⠀⠀query <-O- _5<br />⠀⠀⠀query.i1 <-O- _36<br />⠀⠀⠀⠀query.i1.id <-L- _72<br />⠀⠀⠀query.i2 <-O- _88<br />⠀⠀⠀⠀query.i2.id <-L- _124<br />⠀⠀⠀query.i3 <-O- _140<br />⠀⠀⠀⠀query.i3.id <-L- _176"):::bucket
-    style Bucket1 stroke:#a52a2a
+    style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     Bucket2("Bucket 2 (polymorphic_36[RelationalPost])<br />~>Mutation.createThreeRelationalPostsComputed>CreateRelationalPostPayload.query>Query.i1<br />⠀⠀title <-L- _53<br />⠀⠀description <-L- _54<br />⠀⠀note <-L- _55"):::bucket
-    style Bucket2 stroke:#808000
+    style Bucket2 stroke:#7f007f
     Bucket1 --> Bucket2
     Bucket3("Bucket 3 (polymorphic_88[RelationalPost])<br />~>Mutation.createThreeRelationalPostsComputed>CreateRelationalPostPayload.query>Query.i2<br />⠀⠀title <-L- _105<br />⠀⠀description <-L- _106<br />⠀⠀note <-L- _107"):::bucket
-    style Bucket3 stroke:#3cb371
+    style Bucket3 stroke:#ffa500
     Bucket1 --> Bucket3
     Bucket4("Bucket 4 (polymorphic_140[RelationalPost])<br />~>Mutation.createThreeRelationalPostsComputed>CreateRelationalPostPayload.query>Query.i3<br />⠀⠀title <-L- _157<br />⠀⠀description <-L- _158<br />⠀⠀note <-L- _159"):::bucket
-    style Bucket4 stroke:#7f007f
+    style Bucket4 stroke:#0000ff
     Bucket1 --> Bucket4
     end
 ```

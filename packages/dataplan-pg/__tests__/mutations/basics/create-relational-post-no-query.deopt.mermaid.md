@@ -322,54 +322,54 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,__TrackedObject_6,Access_361,Access_362,Object_363 bucket0
-    classDef bucket1 stroke:#a52a2a
+    classDef bucket1 stroke:#00bfff
     class InputStaticLeaf_8,InputStaticLeaf_9,InputStaticLeaf_10,Constant_11,Constant_12,PgInsert_13,PgClassExpression_17,PgInsert_18,PgClassExpression_22 bucket1
-    classDef bucket2 stroke:#808000
+    classDef bucket2 stroke:#7f007f
     class InputStaticLeaf_24,InputStaticLeaf_25,InputStaticLeaf_26,Constant_27,Constant_28,PgInsert_29,PgClassExpression_33,PgInsert_34,PgClassExpression_38,InputStaticLeaf_39,PgSelect_40,First_44,PgSelectSingle_45,PgClassExpression_46,PgPolymorphic_47,PgSelect_57,First_61,PgClassExpression_83,InputStaticLeaf_91,PgSelect_92,First_96,PgSelectSingle_97,PgClassExpression_98,PgPolymorphic_99,PgSelect_109,First_113,PgClassExpression_135,InputStaticLeaf_143,PgSelect_144,First_148,PgSelectSingle_149,PgClassExpression_150,PgPolymorphic_151,PgSelect_161,First_165,PgClassExpression_187 bucket2
-    classDef bucket3 stroke:#3cb371
+    classDef bucket3 stroke:#ffa500
     class PgSelectSingle_62,PgClassExpression_64,PgClassExpression_65,PgClassExpression_66 bucket3
-    classDef bucket4 stroke:#7f007f
+    classDef bucket4 stroke:#0000ff
     class PgSelectSingle_114,PgClassExpression_116,PgClassExpression_117,PgClassExpression_118 bucket4
-    classDef bucket5 stroke:#ff0000
+    classDef bucket5 stroke:#7fff00
     class PgSelectSingle_166,PgClassExpression_168,PgClassExpression_169,PgClassExpression_170 bucket5
-    classDef bucket6 stroke:#ffa500
+    classDef bucket6 stroke:#ff1493
     class InputStaticLeaf_196,InputStaticLeaf_197,InputStaticLeaf_198,Constant_199,Constant_200,PgInsert_201,PgClassExpression_205,PgInsert_206,PgClassExpression_210,InputStaticLeaf_211,PgSelect_212,First_216,PgSelectSingle_217,PgClassExpression_218,PgPolymorphic_219,PgSelect_229,First_233,PgClassExpression_255,InputStaticLeaf_263,PgSelect_264,First_268,PgSelectSingle_269,PgClassExpression_270,PgPolymorphic_271,PgSelect_281,First_285,PgClassExpression_307,InputStaticLeaf_315,PgSelect_316,First_320,PgSelectSingle_321,PgClassExpression_322,PgPolymorphic_323,PgSelect_333,First_337,PgClassExpression_359 bucket6
-    classDef bucket7 stroke:#ffff00
+    classDef bucket7 stroke:#808000
     class PgSelectSingle_234,PgClassExpression_236,PgClassExpression_237,PgClassExpression_238 bucket7
-    classDef bucket8 stroke:#7fff00
+    classDef bucket8 stroke:#dda0dd
     class PgSelectSingle_286,PgClassExpression_288,PgClassExpression_289,PgClassExpression_290 bucket8
-    classDef bucket9 stroke:#4169e1
+    classDef bucket9 stroke:#ff0000
     class PgSelectSingle_338,PgClassExpression_340,PgClassExpression_341,PgClassExpression_342 bucket9
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (group1[mutation])<br />~>Mutation.p1<br />⠀ROOT <-O- _22"):::bucket
-    style Bucket1 stroke:#a52a2a
+    style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     Bucket2("Bucket 2 (group2[mutation])<br />~>Mutation.p2<br />⠀ROOT <-O- _38<br />⠀⠀query <-O- _5<br />⠀⠀⠀query.i1 <-O- _47<br />⠀⠀⠀⠀query.i1.id <-L- _83<br />⠀⠀⠀query.i2 <-O- _99<br />⠀⠀⠀⠀query.i2.id <-L- _135<br />⠀⠀⠀query.i3 <-O- _151<br />⠀⠀⠀⠀query.i3.id <-L- _187"):::bucket
-    style Bucket2 stroke:#808000
+    style Bucket2 stroke:#7f007f
     Bucket0 --> Bucket2
     Bucket3("Bucket 3 (polymorphic_47[RelationalPost])<br />~>Mutation.p2>CreateRelationalPostPayload.query>Query.i1<br />⠀⠀title <-L- _64<br />⠀⠀description <-L- _65<br />⠀⠀note <-L- _66"):::bucket
-    style Bucket3 stroke:#3cb371
+    style Bucket3 stroke:#ffa500
     Bucket2 --> Bucket3
     Bucket4("Bucket 4 (polymorphic_99[RelationalPost])<br />~>Mutation.p2>CreateRelationalPostPayload.query>Query.i2<br />⠀⠀title <-L- _116<br />⠀⠀description <-L- _117<br />⠀⠀note <-L- _118"):::bucket
-    style Bucket4 stroke:#7f007f
+    style Bucket4 stroke:#0000ff
     Bucket2 --> Bucket4
     Bucket5("Bucket 5 (polymorphic_151[RelationalPost])<br />~>Mutation.p2>CreateRelationalPostPayload.query>Query.i3<br />⠀⠀title <-L- _168<br />⠀⠀description <-L- _169<br />⠀⠀note <-L- _170"):::bucket
-    style Bucket5 stroke:#ff0000
+    style Bucket5 stroke:#7fff00
     Bucket2 --> Bucket5
     Bucket6("Bucket 6 (group3[mutation])<br />~>Mutation.p3<br />⠀ROOT <-O- _210<br />⠀⠀query <-O- _5<br />⠀⠀⠀query.i1 <-O- _219<br />⠀⠀⠀⠀query.i1.id <-L- _255<br />⠀⠀⠀query.i2 <-O- _271<br />⠀⠀⠀⠀query.i2.id <-L- _307<br />⠀⠀⠀query.i3 <-O- _323<br />⠀⠀⠀⠀query.i3.id <-L- _359"):::bucket
-    style Bucket6 stroke:#ffa500
+    style Bucket6 stroke:#ff1493
     Bucket0 --> Bucket6
     Bucket7("Bucket 7 (polymorphic_219[RelationalPost])<br />~>Mutation.p3>CreateRelationalPostPayload.query>Query.i1<br />⠀⠀title <-L- _236<br />⠀⠀description <-L- _237<br />⠀⠀note <-L- _238"):::bucket
-    style Bucket7 stroke:#ffff00
+    style Bucket7 stroke:#808000
     Bucket6 --> Bucket7
     Bucket8("Bucket 8 (polymorphic_271[RelationalPost])<br />~>Mutation.p3>CreateRelationalPostPayload.query>Query.i2<br />⠀⠀title <-L- _288<br />⠀⠀description <-L- _289<br />⠀⠀note <-L- _290"):::bucket
-    style Bucket8 stroke:#7fff00
+    style Bucket8 stroke:#dda0dd
     Bucket6 --> Bucket8
     Bucket9("Bucket 9 (polymorphic_323[RelationalPost])<br />~>Mutation.p3>CreateRelationalPostPayload.query>Query.i3<br />⠀⠀title <-L- _340<br />⠀⠀description <-L- _341<br />⠀⠀note <-L- _342"):::bucket
-    style Bucket9 stroke:#4169e1
+    style Bucket9 stroke:#ff0000
     Bucket6 --> Bucket9
     end
 ```

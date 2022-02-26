@@ -349,29 +349,29 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,__TrackedObject_6,Access_216,Access_217,Object_218 bucket0
-    classDef bucket1 stroke:#a52a2a
+    classDef bucket1 stroke:#00bfff
     class InputStaticLeaf_8,InputStaticLeaf_11,PgUpdate_13,PgClassExpression_17,PgSelect_19,First_23,PgSelectSingle_24,PgClassExpression_25,PgClassExpression_26,PgClassExpression_27,PgClassExpression_28,First_34,PgSelectSingle_35,PgClassExpression_36,First_42,PgSelectSingle_43,PgClassExpression_44,PgClassExpression_52,PgSelect_53,First_57,PgSelectSingle_58,PgClassExpression_59,PgClassExpression_60,Map_223,List_224,Map_225,List_226 bucket1
-    classDef bucket2 stroke:#808000
+    classDef bucket2 stroke:#7f007f
     class InputStaticLeaf_62,InputStaticLeaf_66,PgUpdate_67,PgClassExpression_71,PgSelect_73,First_77,PgSelectSingle_78,PgClassExpression_79,PgClassExpression_80,PgClassExpression_81,PgClassExpression_82,First_88,PgSelectSingle_89,PgClassExpression_90,First_96,PgSelectSingle_97,PgClassExpression_98,PgClassExpression_106,PgSelect_107,First_111,PgSelectSingle_112,PgClassExpression_113,PgClassExpression_114,Map_227,List_228,Map_229,List_230 bucket2
-    classDef bucket3 stroke:#3cb371
+    classDef bucket3 stroke:#ffa500
     class InputStaticLeaf_116,InputStaticLeaf_119,PgUpdate_121,PgClassExpression_125,PgSelect_127,First_131,PgSelectSingle_132,PgClassExpression_133,PgClassExpression_134,PgClassExpression_135,PgClassExpression_136,First_142,PgSelectSingle_143,PgClassExpression_144,First_150,PgSelectSingle_151,PgClassExpression_152,PgClassExpression_160,PgSelect_161,First_165,PgSelectSingle_166,PgClassExpression_167,PgClassExpression_168,Map_231,List_232,Map_233,List_234 bucket3
-    classDef bucket4 stroke:#7f007f
+    classDef bucket4 stroke:#0000ff
     class InputStaticLeaf_170,InputStaticLeaf_173,PgUpdate_175,PgClassExpression_179,PgSelect_181,First_185,PgSelectSingle_186,PgClassExpression_187,PgClassExpression_188,PgClassExpression_189,PgClassExpression_190,First_196,PgSelectSingle_197,PgClassExpression_198,First_204,PgSelectSingle_205,PgClassExpression_206,PgClassExpression_214,PgSelect_215,First_219,PgSelectSingle_220,PgClassExpression_221,PgClassExpression_222,Map_235,List_236,Map_237,List_238 bucket4
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (group1[mutation])<br />~>Mutation.u1<br />⠀ROOT <-O- _13<br />⠀⠀id <-L- _17<br />⠀⠀post <-O- _24<br />⠀⠀⠀post.id <-L- _25<br />⠀⠀⠀post.title <-L- _26<br />⠀⠀⠀post.description <-L- _27<br />⠀⠀⠀post.note <-L- _28<br />⠀⠀⠀post.titleLower <-L- _36<br />⠀⠀⠀post.isExplicitlyArchived <-L- _44<br />⠀⠀⠀post.author <-O- _58<br />⠀⠀⠀⠀post.author.personId <-L- _59<br />⠀⠀⠀⠀post.author.username <-L- _60"):::bucket
-    style Bucket1 stroke:#a52a2a
+    style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     Bucket2("Bucket 2 (group2[mutation])<br />~>Mutation.u2<br />⠀ROOT <-O- _67<br />⠀⠀id <-L- _71<br />⠀⠀post <-O- _78<br />⠀⠀⠀post.id <-L- _79<br />⠀⠀⠀post.title <-L- _80<br />⠀⠀⠀post.description <-L- _81<br />⠀⠀⠀post.note <-L- _82<br />⠀⠀⠀post.titleLower <-L- _90<br />⠀⠀⠀post.isExplicitlyArchived <-L- _98<br />⠀⠀⠀post.author <-O- _112<br />⠀⠀⠀⠀post.author.personId <-L- _113<br />⠀⠀⠀⠀post.author.username <-L- _114"):::bucket
-    style Bucket2 stroke:#808000
+    style Bucket2 stroke:#7f007f
     Bucket0 --> Bucket2
     Bucket3("Bucket 3 (group3[mutation])<br />~>Mutation.u3<br />⠀ROOT <-O- _121<br />⠀⠀id <-L- _125<br />⠀⠀post <-O- _132<br />⠀⠀⠀post.id <-L- _133<br />⠀⠀⠀post.title <-L- _134<br />⠀⠀⠀post.description <-L- _135<br />⠀⠀⠀post.note <-L- _136<br />⠀⠀⠀post.titleLower <-L- _144<br />⠀⠀⠀post.isExplicitlyArchived <-L- _152<br />⠀⠀⠀post.author <-O- _166<br />⠀⠀⠀⠀post.author.personId <-L- _167<br />⠀⠀⠀⠀post.author.username <-L- _168"):::bucket
-    style Bucket3 stroke:#3cb371
+    style Bucket3 stroke:#ffa500
     Bucket0 --> Bucket3
     Bucket4("Bucket 4 (group4[mutation])<br />~>Mutation.u4<br />⠀ROOT <-O- _175<br />⠀⠀id <-L- _179<br />⠀⠀post <-O- _186<br />⠀⠀⠀post.id <-L- _187<br />⠀⠀⠀post.title <-L- _188<br />⠀⠀⠀post.description <-L- _189<br />⠀⠀⠀post.note <-L- _190<br />⠀⠀⠀post.titleLower <-L- _198<br />⠀⠀⠀post.isExplicitlyArchived <-L- _206<br />⠀⠀⠀post.author <-O- _220<br />⠀⠀⠀⠀post.author.personId <-L- _221<br />⠀⠀⠀⠀post.author.username <-L- _222"):::bucket
-    style Bucket4 stroke:#7f007f
+    style Bucket4 stroke:#0000ff
     Bucket0 --> Bucket4
     end
 ```

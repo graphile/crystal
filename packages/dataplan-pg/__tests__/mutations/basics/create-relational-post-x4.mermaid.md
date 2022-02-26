@@ -229,29 +229,29 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,__TrackedObject_6,Access_110,Access_111,Object_112 bucket0
-    classDef bucket1 stroke:#a52a2a
+    classDef bucket1 stroke:#00bfff
     class InputStaticLeaf_8,InputStaticLeaf_9,InputStaticLeaf_10,Constant_11,Constant_12,PgInsert_13,PgClassExpression_17,PgInsert_18,PgClassExpression_22,PgClassExpression_23,PgSelect_25,First_29,PgSelectSingle_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34 bucket1
-    classDef bucket2 stroke:#808000
+    classDef bucket2 stroke:#7f007f
     class InputStaticLeaf_36,InputStaticLeaf_37,InputStaticLeaf_38,Constant_39,Constant_40,PgInsert_41,PgClassExpression_45,PgInsert_46,PgClassExpression_50,PgClassExpression_51,PgSelect_53,First_57,PgSelectSingle_58,PgClassExpression_59,PgClassExpression_60,PgClassExpression_61,PgClassExpression_62 bucket2
-    classDef bucket3 stroke:#3cb371
+    classDef bucket3 stroke:#ffa500
     class InputStaticLeaf_64,InputStaticLeaf_65,InputStaticLeaf_66,Constant_67,Constant_68,PgInsert_69,PgClassExpression_73,PgInsert_74,PgClassExpression_78,PgClassExpression_79,PgSelect_81,First_85,PgSelectSingle_86,PgClassExpression_87,PgClassExpression_88,PgClassExpression_89,PgClassExpression_90 bucket3
-    classDef bucket4 stroke:#7f007f
+    classDef bucket4 stroke:#0000ff
     class InputStaticLeaf_92,InputStaticLeaf_93,InputStaticLeaf_94,Constant_95,Constant_96,PgInsert_97,PgClassExpression_101,PgInsert_102,PgClassExpression_106,PgClassExpression_107,PgSelect_109,First_113,PgSelectSingle_114,PgClassExpression_115,PgClassExpression_116,PgClassExpression_117,PgClassExpression_118 bucket4
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (group1[mutation])<br />~>Mutation.p1<br />⠀ROOT <-O- _22<br />⠀⠀id <-L- _23<br />⠀⠀post <-O- _30<br />⠀⠀⠀post.id <-L- _31<br />⠀⠀⠀post.title <-L- _32<br />⠀⠀⠀post.description <-L- _33<br />⠀⠀⠀post.note <-L- _34"):::bucket
-    style Bucket1 stroke:#a52a2a
+    style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     Bucket2("Bucket 2 (group2[mutation])<br />~>Mutation.p2<br />⠀ROOT <-O- _50<br />⠀⠀id <-L- _51<br />⠀⠀post <-O- _58<br />⠀⠀⠀post.id <-L- _59<br />⠀⠀⠀post.title <-L- _60<br />⠀⠀⠀post.description <-L- _61<br />⠀⠀⠀post.note <-L- _62"):::bucket
-    style Bucket2 stroke:#808000
+    style Bucket2 stroke:#7f007f
     Bucket0 --> Bucket2
     Bucket3("Bucket 3 (group3[mutation])<br />~>Mutation.p3<br />⠀ROOT <-O- _78<br />⠀⠀id <-L- _79<br />⠀⠀post <-O- _86<br />⠀⠀⠀post.id <-L- _87<br />⠀⠀⠀post.title <-L- _88<br />⠀⠀⠀post.description <-L- _89<br />⠀⠀⠀post.note <-L- _90"):::bucket
-    style Bucket3 stroke:#3cb371
+    style Bucket3 stroke:#ffa500
     Bucket0 --> Bucket3
     Bucket4("Bucket 4 (group4[mutation])<br />~>Mutation.p4<br />⠀ROOT <-O- _106<br />⠀⠀id <-L- _107<br />⠀⠀post <-O- _114<br />⠀⠀⠀post.id <-L- _115<br />⠀⠀⠀post.title <-L- _116<br />⠀⠀⠀post.description <-L- _117<br />⠀⠀⠀post.note <-L- _118"):::bucket
-    style Bucket4 stroke:#7f007f
+    style Bucket4 stroke:#0000ff
     Bucket0 --> Bucket4
     end
 ```

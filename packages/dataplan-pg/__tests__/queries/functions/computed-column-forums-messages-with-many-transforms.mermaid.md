@@ -112,44 +112,44 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,__TrackedObject_6,PgSelect_17,Access_18,Access_19,Object_20,PgSelect_24 bucket0
-    classDef bucket1 stroke:#a52a2a
+    classDef bucket1 stroke:#00bfff
     class __Item_21,PgSelectSingle_22,PgClassExpression_23,__ListTransform_28,__ListTransform_29,Lambda_30,__ListTransform_31,PgClassExpression_35 bucket1
-    classDef bucket2 stroke:#808000
+    classDef bucket2 stroke:#7f007f
     class __Item_32,PgSelectSingle_33,PgClassExpression_34,List_36,Lambda_37 bucket2
-    classDef bucket3 stroke:#3cb371
+    classDef bucket3 stroke:#ffa500
     class __Item_38,PgSelectSingle_39,PgClassExpression_40 bucket3
-    classDef bucket4 stroke:#7f007f
+    classDef bucket4 stroke:#0000ff
     class __Item_41 bucket4
-    classDef bucket5 stroke:#ff0000
+    classDef bucket5 stroke:#7fff00
     class __Item_42,__ListTransform_43 bucket5
-    classDef bucket6 stroke:#ffa500
+    classDef bucket6 stroke:#ff1493
     class __Item_44 bucket6
-    classDef bucket7 stroke:#ffff00
+    classDef bucket7 stroke:#808000
     class __Item_45,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_48 bucket7
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀forums <-A- _17"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]<br />⠀ROOT <-O- _22<br />⠀⠀name <-L- _23<br />⠀⠀messagesWithManyTransforms <-A- _31"):::bucket
-    style Bucket1 stroke:#a52a2a
+    style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_32)"):::bucket
-    style Bucket2 stroke:#808000
+    style Bucket2 stroke:#7f007f
     Bucket1 --> Bucket2
     Bucket3("Bucket 3 (item_38)"):::bucket
-    style Bucket3 stroke:#3cb371
+    style Bucket3 stroke:#ffa500
     Bucket1 --> Bucket3
     Bucket4("Bucket 4 (item_41)"):::bucket
-    style Bucket4 stroke:#7f007f
+    style Bucket4 stroke:#0000ff
     Bucket1 --> Bucket4
     Bucket5("Bucket 5 (item_42)<br />~>Query.forums[]>Forum.messagesWithManyTransforms[]<br />⠀ROOT <-O- _43"):::bucket
-    style Bucket5 stroke:#ff0000
+    style Bucket5 stroke:#7fff00
     Bucket1 --> Bucket5
     Bucket6("Bucket 6 (item_44)"):::bucket
-    style Bucket6 stroke:#ffa500
+    style Bucket6 stroke:#ff1493
     Bucket5 --> Bucket6
     Bucket7("Bucket 7 (item_45)<br />~>Query.forums[]>Forum.messagesWithManyTransforms[][]<br />⠀ROOT <-O- _46<br />⠀⠀body <-L- _47<br />⠀⠀featured <-L- _48"):::bucket
-    style Bucket7 stroke:#ffff00
+    style Bucket7 stroke:#808000
     Bucket5 --> Bucket7
     end
 ```

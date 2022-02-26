@@ -100,14 +100,14 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgSelect_15,First_19,PgSelectSingle_20,PgClassExpression_21,PgClassExpression_22,PgClassExpression_23,PgSelect_24,First_28,PgSelectSingle_29,InputStaticLeaf_30,PgClassExpression_31,First_36,PgSelectSingle_37,PgClassExpression_38,PgSelect_40,Access_41,Access_42,Object_43,Map_47,List_48 bucket0
-    classDef bucket1 stroke:#a52a2a
+    classDef bucket1 stroke:#00bfff
     class __Item_44,PgSelectSingle_45,PgClassExpression_46 bucket1
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀forum <-O- _13<br />⠀⠀⠀forum.randomUser <-O- _20<br />⠀⠀⠀⠀forum.randomUser.username <-L- _21<br />⠀⠀⠀⠀forum.randomUser.gravatarUrl <-L- _22<br />⠀⠀⠀⠀forum.randomUser.mostRecentForum <-O- _29<br />⠀⠀⠀⠀⠀forum.randomUser.mostRecentForum.uniqueAuthorCount <-L- _38<br />⠀⠀⠀⠀⠀forum.randomUser.mostRecentForum.featuredMessages <-A- _40"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_44)<br />~>Query.forum>Forum.randomUser>User.mostRecentForum>Forum.featuredMessages[]<br />⠀ROOT <-O- _45<br />⠀⠀body <-L- _46"):::bucket
-    style Bucket1 stroke:#a52a2a
+    style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     end
 ```

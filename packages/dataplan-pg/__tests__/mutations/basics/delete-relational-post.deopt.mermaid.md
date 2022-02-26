@@ -181,19 +181,19 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,__TrackedObject_6,Access_84,Access_85,Object_86 bucket0
-    classDef bucket1 stroke:#a52a2a
+    classDef bucket1 stroke:#00bfff
     class InputStaticLeaf_8,PgDelete_9,PgClassExpression_13,PgClassExpression_14,PgSelect_15,First_19,PgSelectSingle_20,PgClassExpression_21,PgClassExpression_22,PgClassExpression_23,PgClassExpression_24,First_30,PgSelectSingle_31,PgClassExpression_32,First_38,PgSelectSingle_39,PgClassExpression_40,PgSelect_41,First_45,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_48,Map_91,List_92,Map_93,List_94 bucket1
-    classDef bucket2 stroke:#808000
+    classDef bucket2 stroke:#7f007f
     class InputStaticLeaf_50,PgDelete_51,PgClassExpression_55,PgClassExpression_56,PgSelect_57,First_61,PgSelectSingle_62,PgClassExpression_63,PgClassExpression_64,PgClassExpression_65,PgClassExpression_66,First_72,PgSelectSingle_73,PgClassExpression_74,First_80,PgSelectSingle_81,PgClassExpression_82,PgSelect_83,First_87,PgSelectSingle_88,PgClassExpression_89,PgClassExpression_90,Map_95,List_96,Map_97,List_98 bucket2
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (group1[mutation])<br />~>Mutation.d1<br />⠀ROOT <-O- _9<br />⠀⠀id <-L- _13<br />⠀⠀post <-O- _20<br />⠀⠀⠀post.id <-L- _21<br />⠀⠀⠀post.title <-L- _22<br />⠀⠀⠀post.description <-L- _23<br />⠀⠀⠀post.note <-L- _24<br />⠀⠀⠀post.titleLower <-L- _32<br />⠀⠀⠀post.author <-O- _46<br />⠀⠀⠀⠀post.author.personId <-L- _47<br />⠀⠀⠀⠀post.author.username <-L- _48"):::bucket
-    style Bucket1 stroke:#a52a2a
+    style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     Bucket2("Bucket 2 (group2[mutation])<br />~>Mutation.d2<br />⠀ROOT <-O- _51<br />⠀⠀id <-L- _55<br />⠀⠀post <-O- _62<br />⠀⠀⠀post.id <-L- _63<br />⠀⠀⠀post.title <-L- _64<br />⠀⠀⠀post.description <-L- _65<br />⠀⠀⠀post.note <-L- _66<br />⠀⠀⠀post.titleLower <-L- _74<br />⠀⠀⠀post.author <-O- _88<br />⠀⠀⠀⠀post.author.personId <-L- _89<br />⠀⠀⠀⠀post.author.username <-L- _90"):::bucket
-    style Bucket2 stroke:#808000
+    style Bucket2 stroke:#7f007f
     Bucket0 --> Bucket2
     end
 ```

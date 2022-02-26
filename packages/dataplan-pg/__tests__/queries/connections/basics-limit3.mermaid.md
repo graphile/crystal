@@ -124,14 +124,14 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_14,InputStaticLeaf_15,InputStaticLeaf_16,InputStaticLeaf_17,Connection_24,PgSelect_25,Access_34,Access_35,Object_36,PgPageInfo_41,Lambda_43,Constant_44,First_46,PgSelectSingle_47,PgCursor_48,PgClassExpression_49,List_50,Last_52,PgSelectSingle_53,PgCursor_54,PgClassExpression_55,List_56,PgSelect_57,First_58,PgSelectSingle_59,PgClassExpression_60 bucket0
-    classDef bucket1 stroke:#a52a2a
+    classDef bucket1 stroke:#00bfff
     class __Item_26,PgSelectSingle_27,PgCursor_28,PgClassExpression_29,List_30,PgClassExpression_31,First_37,PgSelectSingle_38,PgClassExpression_39,PgClassExpression_40,Map_61,List_62 bucket1
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀allMessagesConnection <-O- _24<br />⠀⠀⠀allMessagesConnection.edges <-A- _25<br />⠀⠀⠀allMessagesConnection.pageInfo <-O- _41<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasNextPage <-L- _43<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasPreviousPage <-L- _44<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.startCursor <-L- _48<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.endCursor <-L- _54<br />⠀⠀⠀allMessagesConnection.totalCount <-L- _60"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_26)<br />~>Query.allMessagesConnection>MessagesConnection.edges[]<br />⠀ROOT <-O- _27<br />⠀⠀node <-O- _27<br />⠀⠀⠀node.body <-L- _31<br />⠀⠀⠀node.author <-O- _38<br />⠀⠀⠀⠀node.author.username <-L- _39<br />⠀⠀⠀⠀node.author.gravatarUrl <-L- _40<br />⠀⠀cursor <-L- _28"):::bucket
-    style Bucket1 stroke:#a52a2a
+    style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     end
 ```

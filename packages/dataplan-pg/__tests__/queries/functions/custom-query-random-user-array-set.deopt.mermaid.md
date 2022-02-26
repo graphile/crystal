@@ -69,29 +69,29 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,__TrackedObject_6,PgSelect_7,Access_8,Access_9,Object_10,__ListTransform_11 bucket0
-    classDef bucket1 stroke:#a52a2a
+    classDef bucket1 stroke:#00bfff
     class __Item_12,PgSelectSingle_13,PgClassExpression_14 bucket1
-    classDef bucket2 stroke:#808000
+    classDef bucket2 stroke:#7f007f
     class __Item_15,__ListTransform_16 bucket2
-    classDef bucket3 stroke:#3cb371
+    classDef bucket3 stroke:#ffa500
     class __Item_17 bucket3
-    classDef bucket4 stroke:#7f007f
+    classDef bucket4 stroke:#0000ff
     class __Item_18,PgSelectSingle_19,PgClassExpression_20,PgClassExpression_21 bucket4
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀randomUserArraySet <-A- _11"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_12)"):::bucket
-    style Bucket1 stroke:#a52a2a
+    style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_15)<br />~>Query.randomUserArraySet[]<br />⠀ROOT <-O- _16"):::bucket
-    style Bucket2 stroke:#808000
+    style Bucket2 stroke:#7f007f
     Bucket0 --> Bucket2
     Bucket3("Bucket 3 (item_17)"):::bucket
-    style Bucket3 stroke:#3cb371
+    style Bucket3 stroke:#ffa500
     Bucket2 --> Bucket3
     Bucket4("Bucket 4 (item_18)<br />~>Query.randomUserArraySet[][]<br />⠀ROOT <-O- _19<br />⠀⠀username <-L- _20<br />⠀⠀gravatarUrl <-L- _21"):::bucket
-    style Bucket4 stroke:#7f007f
+    style Bucket4 stroke:#0000ff
     Bucket2 --> Bucket4
     end
 ```

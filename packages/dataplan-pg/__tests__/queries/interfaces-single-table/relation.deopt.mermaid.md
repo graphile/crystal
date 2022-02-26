@@ -85,19 +85,19 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,Lambda_15,PgSingleTablePolymorphic_16,Access_290,Access_291,Object_292 bucket0
-    classDef bucket1 stroke:#a52a2a
+    classDef bucket1 stroke:#00bfff
     class PgClassExpression_17,PgSelect_18,First_22,PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26,PgClassExpression_72 bucket1
-    classDef bucket2 stroke:#808000
+    classDef bucket2 stroke:#7f007f
     class PgClassExpression_28,PgSelect_29,First_33,PgSelectSingle_34,PgClassExpression_35 bucket2
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀item <-O- _16"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (polymorphic_16[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />~>Query.item<br />⠀⠀parent <-O- _26<br />⠀⠀⠀parent.id <-L- _17<br />⠀⠀id <-L- _72"):::bucket
-    style Bucket1 stroke:#a52a2a
+    style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     Bucket2("Bucket 2 (polymorphic_26[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />~>Query.item>SingleTablePost.parent<br />~>Query.item>SingleTableTopic.parent<br />~>Query.item>SingleTableDivider.parent<br />~>Query.item>SingleTableChecklist.parent<br />~>Query.item>SingleTableChecklistItem.parent<br />⠀⠀author <-O- _34<br />⠀⠀⠀author.username <-L- _35"):::bucket
-    style Bucket2 stroke:#808000
+    style Bucket2 stroke:#7f007f
     Bucket1 --> Bucket2
     end
 ```

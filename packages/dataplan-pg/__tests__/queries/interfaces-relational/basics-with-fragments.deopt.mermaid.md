@@ -171,49 +171,49 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,__TrackedObject_6,PgSelect_7,Access_95,Access_96,Object_97 bucket0
-    classDef bucket1 stroke:#a52a2a
+    classDef bucket1 stroke:#00bfff
     class __Item_11,PgSelectSingle_12,PgClassExpression_13,PgClassExpression_14,PgSelect_15,__ListTransform_19 bucket1
-    classDef bucket2 stroke:#808000
+    classDef bucket2 stroke:#7f007f
     class __Item_20,PgSelectSingle_21 bucket2
-    classDef bucket3 stroke:#3cb371
+    classDef bucket3 stroke:#ffa500
     class __Item_22,PgSelectSingle_23,PgClassExpression_24,PgPolymorphic_25,PgSelect_27,First_31,PgClassExpression_35,PgClassExpression_36,PgClassExpression_37,PgClassExpression_38,PgClassExpression_39,PgClassExpression_40,PgSelect_43,First_47,PgSelect_61,First_65,PgSelect_78,First_82,PgClassExpression_93,PgSelect_94,First_98 bucket3
-    classDef bucket4 stroke:#7f007f
+    classDef bucket4 stroke:#0000ff
     class PgSelectSingle_32,PgClassExpression_41 bucket4
-    classDef bucket5 stroke:#ff0000
+    classDef bucket5 stroke:#7fff00
     class PgSelectSingle_48,PgClassExpression_57,PgClassExpression_58,PgClassExpression_59 bucket5
-    classDef bucket6 stroke:#ffa500
+    classDef bucket6 stroke:#ff1493
     class PgSelectSingle_66,PgClassExpression_75,PgClassExpression_76 bucket6
-    classDef bucket7 stroke:#ffff00
+    classDef bucket7 stroke:#808000
     class PgSelectSingle_83,PgClassExpression_92 bucket7
-    classDef bucket8 stroke:#7fff00
+    classDef bucket8 stroke:#dda0dd
     class PgSelectSingle_99,PgClassExpression_108,PgClassExpression_109 bucket8
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀people <-A- _7"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_11)<br />~>Query.people[]<br />⠀ROOT <-O- _12<br />⠀⠀username <-L- _13<br />⠀⠀items <-A- _19"):::bucket
-    style Bucket1 stroke:#a52a2a
+    style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_20)"):::bucket
-    style Bucket2 stroke:#808000
+    style Bucket2 stroke:#7f007f
     Bucket1 --> Bucket2
     Bucket3("Bucket 3 (item_22)<br />~>Query.people[]>Person.items[]<br />⠀ROOT <-O- _25<br />⠀⠀type <-L- _24<br />⠀⠀type2 <-L- _35<br />⠀⠀position <-L- _36<br />⠀⠀createdAt <-L- _37<br />⠀⠀updatedAt <-L- _38<br />⠀⠀isExplicitlyArchived <-L- _39<br />⠀⠀archivedAt <-L- _40<br />⠀⠀id <-L- _93"):::bucket
-    style Bucket3 stroke:#3cb371
+    style Bucket3 stroke:#ffa500
     Bucket1 --> Bucket3
     Bucket4("Bucket 4 (polymorphic_25[RelationalTopic])<br />~>Query.people[]>Person.items[]<br />⠀⠀title <-L- _41"):::bucket
-    style Bucket4 stroke:#7f007f
+    style Bucket4 stroke:#0000ff
     Bucket3 --> Bucket4
     Bucket5("Bucket 5 (polymorphic_25[RelationalPost])<br />~>Query.people[]>Person.items[]<br />⠀⠀title <-L- _57<br />⠀⠀description <-L- _58<br />⠀⠀note <-L- _59"):::bucket
-    style Bucket5 stroke:#ff0000
+    style Bucket5 stroke:#7fff00
     Bucket3 --> Bucket5
     Bucket6("Bucket 6 (polymorphic_25[RelationalDivider])<br />~>Query.people[]>Person.items[]<br />⠀⠀title <-L- _75<br />⠀⠀color <-L- _76"):::bucket
-    style Bucket6 stroke:#ffa500
+    style Bucket6 stroke:#ff1493
     Bucket3 --> Bucket6
     Bucket7("Bucket 7 (polymorphic_25[RelationalChecklist])<br />~>Query.people[]>Person.items[]<br />⠀⠀title <-L- _92"):::bucket
-    style Bucket7 stroke:#ffff00
+    style Bucket7 stroke:#808000
     Bucket3 --> Bucket7
     Bucket8("Bucket 8 (polymorphic_25[RelationalChecklistItem])<br />~>Query.people[]>Person.items[]<br />⠀⠀description <-L- _108<br />⠀⠀note <-L- _109"):::bucket
-    style Bucket8 stroke:#7fff00
+    style Bucket8 stroke:#dda0dd
     Bucket3 --> Bucket8
     end
 ```

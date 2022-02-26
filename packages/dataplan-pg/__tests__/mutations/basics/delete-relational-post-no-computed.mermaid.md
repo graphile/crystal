@@ -49,19 +49,19 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,__TrackedObject_6,Access_10,Access_11,Object_12 bucket0
-    classDef bucket1 stroke:#a52a2a
+    classDef bucket1 stroke:#00bfff
     class InputStaticLeaf_8,PgDelete_9,PgClassExpression_13 bucket1
-    classDef bucket2 stroke:#808000
+    classDef bucket2 stroke:#7f007f
     class InputStaticLeaf_15,PgDelete_16,PgClassExpression_20 bucket2
 
     subgraph Buckets
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (group1[mutation])<br />~>Mutation.d1<br />⠀ROOT <-O- _9<br />⠀⠀id <-L- _13"):::bucket
-    style Bucket1 stroke:#a52a2a
+    style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     Bucket2("Bucket 2 (group2[mutation])<br />~>Mutation.d2<br />⠀ROOT <-O- _16<br />⠀⠀id <-L- _20"):::bucket
-    style Bucket2 stroke:#808000
+    style Bucket2 stroke:#7f007f
     Bucket0 --> Bucket2
     end
 ```
