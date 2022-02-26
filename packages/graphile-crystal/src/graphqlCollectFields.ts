@@ -106,6 +106,10 @@ export interface Group {
   parent: Group | null;
   parentPlanId: string;
   reason: "root" | "defer" | "stream" | "mutation" | "mutationPayload";
+  /**
+   * Only set for 'mutation'
+   */
+  responseKey?: string;
 }
 
 /**
@@ -171,7 +175,12 @@ export function graphqlCollectFields(
           const selectionGroupId = stream
             ? aether.addGroup({ reason: "stream", parentPlanId, parent })
             : isMutation
-            ? aether.addGroup({ reason: "mutation", parentPlanId, parent })
+            ? aether.addGroup({
+                reason: "mutation",
+                parentPlanId,
+                parent,
+                responseKey,
+              })
             : groupId;
 
           groupForResponseKey.push({

@@ -3074,7 +3074,10 @@ export class Aether<
           plan.bucketId = bucketByGroupKey[groupKey].id;
           return plan;
         } else {
-          const rootPathIdentities = pathIdentitiesByPlanId[groupParentPlan.id];
+          const rootPathIdentities =
+            group.reason === "mutation"
+              ? [`${ROOT_PATH}>${this.mutationTypeName}.${group.responseKey}`]
+              : pathIdentitiesByPlanId[groupParentPlan.id];
           if (!rootPathIdentities || rootPathIdentities.length === 0) {
             throw new Error(
               `GraphileInternalError<e5dfb383-d413-49d8-8a3f-2d2f677c373d>: could not determine the path identities served by group parent plan ${groupParentPlan}`,
