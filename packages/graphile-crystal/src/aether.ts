@@ -3036,36 +3036,8 @@ export class Aether<
         }
         const depsParentBucket = parents[0] as BucketDefinition | undefined;
         const groupParentBucket = this.buckets[groupParentPlan.bucketId];
-        /**
-         * Returns the bucket that is an ancestor of the other bucket.
-         */
-        const deepest = (
-          bucket1: BucketDefinition,
-          bucket2: BucketDefinition,
-          tryReverse = true,
-        ): BucketDefinition => {
-          let b: BucketDefinition | null = bucket1;
-          while (b) {
-            if (b === bucket2) {
-              return bucket1;
-            }
-            b = b.parent;
-          }
-          // bucket2 must be the ancestor; but let's check that
-          if (isDev) {
-            if (tryReverse) {
-              return deepest(bucket2, bucket1, false);
-            } else {
-              throw new Error(
-                `bucket1 and bucket2 do not exist on the same lineage - one is not an ancestor of the other`,
-              );
-            }
-          }
-
-          return bucket2;
-        };
         const parent = depsParentBucket
-          ? deepest(depsParentBucket, groupParentBucket)
+          ? deeper(depsParentBucket, groupParentBucket)
           : groupParentBucket;
         const groupKey = `${groupId}|${parent.id}|${polymorphicPlanIds ?? ""}|${
           polymorphicTypeNames?.join(",") ?? ""
@@ -3268,18 +3240,60 @@ export class Aether<
      * going on to executing the child buckets.
      */
 
+    const getDeepestBucket = (
+      plan: ExecutablePlan,
+      planPathIdentity: string,
+    ): BucketDefinition => {
+      const planBucket = this.buckets[plan.bucketId];
+      let pathIdentity = getParentPathIdentity(planPathIdentity);
+      let winningBucket = planBucket;
+      while (pathIdentity) {
+        const planId = this.planIdByPathIdentity[pathIdentity];
+        if (planId == null) {
+          throw new Error(
+            `Failed to get a plan for path identity '${pathIdentity}'`,
+          );
+        }
+        const fieldPlan = this.plans[planId];
+        const fieldBucket = this.buckets[fieldPlan.bucketId];
+        winningBucket = deeper(winningBucket, fieldBucket);
+        pathIdentity = getParentPathIdentity(pathIdentity);
+      }
+      return winningBucket;
+    };
+
     for (const bucket of this.buckets) {
       if (bucket.rootPathIdentities.length > 0) {
+        /**
+         * Tuples of [pathIdentity, plan] for all the path identities that
+         * should be set within this bucket. NOTE: this is not necessarily only
+         * (or all) plans belonging to this bucket, for example there may be a
+         * plan that only depends on constants (and thus is in bucket 0) and
+         * yet it might write to path identities that are a few nested lists
+         * deep.
+         *
+         * Our strategy is to find the deeper of the plan's own bucket and the
+         * deepest bucket for the plans for each of the path identity's
+         * ancestors.
+         */
         const planPathIdentityTuples = Object.keys(this.plans)
           .flatMap((planId) => {
             const plan = this.plans[planId];
-            if (plan && plan.id === planId && plan.bucketId === bucket.id) {
+            if (plan && plan.id === planId) {
               const pathIdentities = pathIdentitiesByPlanId[plan.id];
               if (pathIdentities && pathIdentities.length > 0) {
-                return pathIdentities.map(
-                  (pathIdentity) =>
-                    [pathIdentity, plan] as [string, ExecutablePlan],
-                );
+                return pathIdentities.map((pathIdentity) => {
+                  if (pathIdentity.includes("@")) {
+                    // Fake path, we don't care about this.
+                    return null;
+                  }
+                  const deepestBucket = getDeepestBucket(plan, pathIdentity);
+                  if (deepestBucket === bucket) {
+                    return [pathIdentity, plan] as [string, ExecutablePlan];
+                  } else {
+                    return null;
+                  }
+                });
               }
             }
             return null;
@@ -3343,9 +3357,12 @@ export class Aether<
           }
 
           if (path.length === 0) {
-            if (bucket.rootOutputPlanId != null) {
+            if (
+              bucket.rootOutputPlanId != null &&
+              bucket.rootOutputPlanId !== plan.id
+            ) {
               throw new Error(
-                `GraphileInternalError<f9a8ba81-5025-440e-aa03-d355125705ea>: bucket ${bucket.id}'s rootOutputPlanId is already set`,
+                `GraphileInternalError<f9a8ba81-5025-440e-aa03-d355125705ea>: bucket ${bucket.id}'s rootOutputPlanId is already set to '${bucket.rootOutputPlanId}', cannot set it to '${plan.id}'`,
               );
             }
             if (bucket.polymorphicPlanIds) {
@@ -3358,12 +3375,44 @@ export class Aether<
             let spec = bucket.outputMap;
             for (let i = 0, l = path.length - 1; i < l; i++) {
               const pathComponent = path[i];
-              const nextSpec = spec[pathComponent].children;
-              if (!nextSpec) {
+
+              const field = spec[pathComponent];
+              if (!field) {
+                /*
+                 * This path doesn't exist yet. This could happen for a number
+                 * of reasons.
+                 *
+                 * Reason 1: we're the root bucket and there's a deep plan that
+                 * returns a constant (e.g. it only depends on `context` or
+                 * similar, or maybe has no dependencies at all); in this case,
+                 * it's not our responsibility to set that key - we should pass
+                 * it down to our child(ren).
+                 *
+                 * Reason 2: we're a "group" bucket (defer, stream, mutation,
+                 * subscription, etc) and the required key has already been
+                 * populated in our parent. In the case of defer/stream, we
+                 * want to copy the result from our parent (no need to run it
+                 * again), but in the case of mutation/subscription we really
+                 * ought to re-evaluate it. Let's assume that that
+                 * re-evaluation has been handled for us by the query planner
+                 * rules (specifically that a duplicate plan will have been
+                 * created and will not be de-duplicated since it's in a
+                 * separate group) so we shouldn't need to handle that here; so
+                 * we only need to handle the "copy it from parent" case.
+                 */
+
                 throw new Error(
                   `GraphileInternalError<7f7193d9-a8af-4154-ad8e-b8d16396f19f>: component ${i} ('${pathComponent}') of '${path.join(
                     ">",
                   )}' was not (yet) set in bucket ${bucket.id}'s outputMap`,
+                );
+              }
+              const nextSpec = field.children;
+              if (!nextSpec) {
+                throw new Error(
+                  `GraphileInternalError<3067ac98-f448-4669-baa3-c5212fa50fa5>: component ${i} ('${pathComponent}') of '${path.join(
+                    ">",
+                  )}' doesn't have any children`,
                 );
               }
               spec = nextSpec;
@@ -3389,11 +3438,17 @@ export class Aether<
             }
             const fieldSpec = spec[fieldName];
             if (
-              fieldSpec.planIdByRootPathIdentity[rootPathIdentity] &&
+              fieldSpec.planIdByRootPathIdentity[rootPathIdentity] != null &&
               fieldSpec.planIdByRootPathIdentity[rootPathIdentity] !== plan.id
             ) {
-              throw new Error(
-                `GraphileInternalError<1ba4a423-abe6-447f-a9a7-4de24d4b419d>: plan id for this rootPathIdentity already set`,
+              console.error(
+                `GraphileInternalError<1ba4a423-abe6-447f-a9a7-4de24d4b419d>: bucket ${
+                  bucket.id
+                }'s field spec for '${path.join(">")}' already has plan ${
+                  fieldSpec.planIdByRootPathIdentity[rootPathIdentity]
+                } set for root path identity '${rootPathIdentity}', cannot set to ${
+                  plan.id
+                }`,
               );
             }
             fieldSpec.planIdByRootPathIdentity[rootPathIdentity] = plan.id;
@@ -5909,5 +5964,47 @@ function isTypePlanned(
     return !!firstHadPlan;
   } else {
     return false;
+  }
+}
+
+/**
+ * Returns the bucket that is an ancestor of the other bucket.
+ */
+function deeper(
+  bucket1: BucketDefinition,
+  bucket2: BucketDefinition,
+  tryReverse = true,
+): BucketDefinition {
+  let b: BucketDefinition | null = bucket1;
+  while (b) {
+    if (b === bucket2) {
+      return bucket1;
+    }
+    b = b.parent;
+  }
+  // bucket2 must be the ancestor; but let's check that
+  if (isDev) {
+    if (tryReverse) {
+      return deeper(bucket2, bucket1, false);
+    } else {
+      throw new Error(
+        `bucket1 and bucket2 do not exist on the same lineage - one is not an ancestor of the other`,
+      );
+    }
+  }
+
+  return bucket2;
+}
+
+function getParentPathIdentity(pathIdentity: string): string | null {
+  if (pathIdentity.endsWith("[]")) {
+    return pathIdentity.substring(0, pathIdentity.length - 2);
+  } else {
+    const i = pathIdentity.lastIndexOf(">");
+    if (i >= 0) {
+      return pathIdentity.substring(0, i);
+    } else {
+      return null;
+    }
   }
 }
