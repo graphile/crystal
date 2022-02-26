@@ -59,8 +59,6 @@ graph TD
     PgSelectSingle_22 -.-> P_22
     P_23[">f…]>name"]
     PgClassExpression_23 -.-> P_23
-    P_52[">f…]>messagesList"]
-    Access_52 -.-> P_52
     P_39[">f…]>messagesList[]"]
     PgSelectSingle_39 -.-> P_39
     P_40[">f…]>m…]>body"]
@@ -71,6 +69,8 @@ graph TD
     PgClassExpression_48 -.-> P_48
     P_49[">f…]>m…]>a…r>gravatarUrl"]
     PgClassExpression_49 -.-> P_49
+    P_52[">f…]>messagesList"]
+    Access_52 -.-> P_52
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

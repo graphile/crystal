@@ -142,8 +142,6 @@ graph TD
     PgClassExpression_14 -.-> P_14
     P_15[">p…d>username"]
     PgClassExpression_15 -.-> P_15
-    P_100[">p…d>personBookmarksList"]
-    Access_100 -.-> P_100
     P_22[">p…d>personBookmarksList[]"]
     PgSelectSingle_22 -.-> P_22
     P_23[">p…d>p…]>id"]
@@ -178,6 +176,8 @@ graph TD
     PgClassExpression_84 -.-> P_84
     P_85[">p…d>p…]>b…y>body"]
     PgClassExpression_85 -.-> P_85
+    P_100[">p…d>personBookmarksList"]
+    Access_100 -.-> P_100
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

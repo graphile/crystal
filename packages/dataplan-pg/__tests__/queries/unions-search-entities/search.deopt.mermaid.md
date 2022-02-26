@@ -124,10 +124,10 @@ graph TD
     %% plan-to-path relationships
     P_6["~"]
     __TrackedObject_6 -.-> P_6
-    P_14[">searchEntities@_12[]"]
-    PgSelectSingle_14 -.-> P_14
     P_12[">searchEntities"]
     __ListTransform_12 -.-> P_12
+    P_14[">searchEntities@_12[]"]
+    PgSelectSingle_14 -.-> P_14
     P_21[">searchEntities[]"]
     PgPolymorphic_21 -.-> P_21
     P_28[">s…]>personId"]

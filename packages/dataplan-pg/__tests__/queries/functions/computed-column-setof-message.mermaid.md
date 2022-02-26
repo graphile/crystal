@@ -43,12 +43,12 @@ graph TD
     __TrackedObject_6 -.-> P_6
     P_13[">forum"]
     PgSelectSingle_13 -.-> P_13
-    P_22[">f…m>featuredMessages"]
-    Access_22 -.-> P_22
     P_20[">f…m>featuredMessages[]"]
     PgSelectSingle_20 -.-> P_20
     P_21[">f…m>f…]>body"]
     PgClassExpression_21 -.-> P_21
+    P_22[">f…m>featuredMessages"]
+    Access_22 -.-> P_22
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

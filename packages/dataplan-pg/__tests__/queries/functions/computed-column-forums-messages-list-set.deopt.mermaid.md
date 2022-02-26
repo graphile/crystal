@@ -64,14 +64,14 @@ graph TD
     PgSelect_17 -.-> P_17
     P_22[">forums[]"]
     PgSelectSingle_22 -.-> P_22
-    P_31[">f…]>messagesListSet@_28[]"]
-    PgClassExpression_31 -.-> P_31
     P_28[">f…]>messagesListSet"]
     __ListTransform_28 -.-> P_28
-    P_34[">f…]>messagesListSet[]@_33[]"]
-    __Item_34 -.-> P_34
+    P_31[">f…]>messagesListSet@_28[]"]
+    PgClassExpression_31 -.-> P_31
     P_33[">f…]>messagesListSet[]"]
     __ListTransform_33 -.-> P_33
+    P_34[">f…]>messagesListSet[]@_33[]"]
+    __Item_34 -.-> P_34
     P_36[">f…]>messagesListSet[][]"]
     PgSelectSingle_36 -.-> P_36
     P_37[">f…]>m…]>body"]

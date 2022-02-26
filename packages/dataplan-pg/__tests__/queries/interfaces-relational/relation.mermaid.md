@@ -69,14 +69,14 @@ graph TD
     PgPolymorphic_15 -.-> P_15
     P_31[">item>parent x5"]
     PgPolymorphic_31 -.-> P_31
-    P_484[">item>p…t>id x25"]
-    PgClassExpression_484 -.-> P_484
     P_46[">item>p…t>author x25"]
     PgSelectSingle_46 -.-> P_46
     P_47[">item>p…t>a…r>username x25"]
     PgClassExpression_47 -.-> P_47
     P_404[">item>id x5"]
     PgClassExpression_404 -.-> P_404
+    P_484[">item>p…t>id x25"]
+    PgClassExpression_484 -.-> P_484
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

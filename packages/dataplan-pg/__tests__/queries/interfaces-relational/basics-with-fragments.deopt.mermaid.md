@@ -127,16 +127,14 @@ graph TD
     PgSelectSingle_12 -.-> P_12
     P_13[">p…]>username"]
     PgClassExpression_13 -.-> P_13
-    P_21[">p…]>items@_19[]"]
-    PgSelectSingle_21 -.-> P_21
     P_19[">p…]>items"]
     __ListTransform_19 -.-> P_19
-    P_25[">p…]>items[]"]
-    PgPolymorphic_25 -.-> P_25
-    P_93[">p…]>i…]>id x5"]
-    PgClassExpression_93 -.-> P_93
+    P_21[">p…]>items@_19[]"]
+    PgSelectSingle_21 -.-> P_21
     P_24[">p…]>i…]>type x5"]
     PgClassExpression_24 -.-> P_24
+    P_25[">p…]>items[]"]
+    PgPolymorphic_25 -.-> P_25
     P_35[">p…]>i…]>type2 x5"]
     PgClassExpression_35 -.-> P_35
     P_36[">p…]>i…]>position x5"]
@@ -163,6 +161,8 @@ graph TD
     PgClassExpression_76 -.-> P_76
     P_92[">p…]>i…]>title"]
     PgClassExpression_92 -.-> P_92
+    P_93[">p…]>i…]>id x5"]
+    PgClassExpression_93 -.-> P_93
     P_108[">p…]>i…]>description"]
     PgClassExpression_108 -.-> P_108
     P_109[">p…]>i…]>note"]

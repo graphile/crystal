@@ -54,10 +54,10 @@ graph TD
     PgClassExpression_14 -.-> P_14
     P_15[">m…e>body"]
     PgClassExpression_15 -.-> P_15
-    P_22[">m…e>forum"]
-    PgSelectSingle_22 -.-> P_22
     P_16[">m…e>f…m>id"]
     PgClassExpression_16 -.-> P_16
+    P_22[">m…e>forum"]
+    PgSelectSingle_22 -.-> P_22
     P_24[">m…e>f…m>name"]
     PgClassExpression_24 -.-> P_24
 

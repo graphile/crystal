@@ -90,18 +90,18 @@ graph TD
     PgSelectSingle_22 -.-> P_22
     P_23[">f…]>name"]
     PgClassExpression_23 -.-> P_23
+    P_31[">f…]>messagesWithManyTransforms"]
+    __ListTransform_31 -.-> P_31
     P_37[">f…]>messagesWithManyTransforms@_28[]"]
     Lambda_37 -.-> P_37
     P_40[">f…]>messagesWithManyTransforms@_29[]"]
     PgClassExpression_40 -.-> P_40
     P_41[">f…]>messagesWithManyTransforms@_31[]"]
     __Item_41 -.-> P_41
-    P_31[">f…]>messagesWithManyTransforms"]
-    __ListTransform_31 -.-> P_31
-    P_44[">f…]>messagesWithManyTransforms[]@_43[]"]
-    __Item_44 -.-> P_44
     P_43[">f…]>messagesWithManyTransforms[]"]
     __ListTransform_43 -.-> P_43
+    P_44[">f…]>messagesWithManyTransforms[]@_43[]"]
+    __Item_44 -.-> P_44
     P_46[">f…]>messagesWithManyTransforms[][]"]
     PgSelectSingle_46 -.-> P_46
     P_47[">f…]>m…]>body"]

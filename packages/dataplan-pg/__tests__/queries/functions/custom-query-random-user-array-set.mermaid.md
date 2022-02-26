@@ -51,14 +51,14 @@ graph TD
     %% plan-to-path relationships
     P_6["~"]
     __TrackedObject_6 -.-> P_6
-    P_14[">randomUserArraySet@_11[]"]
-    PgClassExpression_14 -.-> P_14
     P_11[">randomUserArraySet"]
     __ListTransform_11 -.-> P_11
-    P_17[">randomUserArraySet[]@_16[]"]
-    __Item_17 -.-> P_17
+    P_14[">randomUserArraySet@_11[]"]
+    PgClassExpression_14 -.-> P_14
     P_16[">randomUserArraySet[]"]
     __ListTransform_16 -.-> P_16
+    P_17[">randomUserArraySet[]@_16[]"]
+    __Item_17 -.-> P_17
     P_19[">randomUserArraySet[][]"]
     PgSelectSingle_19 -.-> P_19
     P_20[">r…]>username"]

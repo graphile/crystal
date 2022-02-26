@@ -85,12 +85,12 @@ graph TD
     PgSelectSingle_29 -.-> P_29
     P_38[">f…m>r…r>m…m>uniqueAuthorCount"]
     PgClassExpression_38 -.-> P_38
-    P_49[">f…m>r…r>m…m>featuredMessages"]
-    Access_49 -.-> P_49
     P_45[">f…m>r…r>m…m>featuredMessages[]"]
     PgSelectSingle_45 -.-> P_45
     P_46[">f…m>r…r>m…m>f…]>body"]
     PgClassExpression_46 -.-> P_46
+    P_49[">f…m>r…r>m…m>featuredMessages"]
+    Access_49 -.-> P_49
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

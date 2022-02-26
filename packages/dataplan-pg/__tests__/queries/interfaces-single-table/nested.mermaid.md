@@ -82,24 +82,24 @@ graph TD
     PgSelectSingle_12 -.-> P_12
     P_13[">p…]>username"]
     PgClassExpression_13 -.-> P_13
-    P_21[">p…]>items@_19[]"]
-    PgSelectSingle_21 -.-> P_21
     P_19[">p…]>items"]
     __ListTransform_19 -.-> P_19
+    P_21[">p…]>items@_19[]"]
+    PgSelectSingle_21 -.-> P_21
+    P_24[">p…]>i…]>type x5"]
+    PgClassExpression_24 -.-> P_24
     P_26[">p…]>items[]"]
     PgSingleTablePolymorphic_26 -.-> P_26
-    P_36[">p…]>i…]>parent x5"]
-    PgSingleTablePolymorphic_36 -.-> P_36
     P_27[">p…]>i…]>p…t>id x25"]
     PgClassExpression_27 -.-> P_27
     P_34[">p…]>i…]>p…t>type x25"]
     PgClassExpression_34 -.-> P_34
+    P_36[">p…]>i…]>parent x5"]
+    PgSingleTablePolymorphic_36 -.-> P_36
     P_39[">p…]>i…]>p…t>type2 x25"]
     PgClassExpression_39 -.-> P_39
     P_52[">p…]>i…]>id x5"]
     PgClassExpression_52 -.-> P_52
-    P_24[">p…]>i…]>type x5"]
-    PgClassExpression_24 -.-> P_24
     P_54[">p…]>i…]>type2 x5"]
     PgClassExpression_54 -.-> P_54
 

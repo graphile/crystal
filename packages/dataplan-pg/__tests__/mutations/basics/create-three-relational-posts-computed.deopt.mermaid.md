@@ -131,42 +131,42 @@ graph TD
     Access_179 --> Object_180
 
     %% plan-to-path relationships
+    P_5[">c…d>query"]
+    __Value_5 -.-> P_5
     P_6["~"]
     __TrackedObject_6 -.-> P_6
     P_27[">createThreeRelationalPostsComputed"]
     PgClassExpression_27 -.-> P_27
-    P_5[">c…d>query"]
-    __Value_5 -.-> P_5
     P_36[">c…d>q…y>i1"]
     PgPolymorphic_36 -.-> P_36
-    P_72[">c…d>q…y>i1>id x5"]
-    PgClassExpression_72 -.-> P_72
     P_53[">c…d>q…y>i1>title"]
     PgClassExpression_53 -.-> P_53
     P_54[">c…d>q…y>i1>description"]
     PgClassExpression_54 -.-> P_54
     P_55[">c…d>q…y>i1>note"]
     PgClassExpression_55 -.-> P_55
+    P_72[">c…d>q…y>i1>id x5"]
+    PgClassExpression_72 -.-> P_72
     P_88[">c…d>q…y>i2"]
     PgPolymorphic_88 -.-> P_88
-    P_124[">c…d>q…y>i2>id x5"]
-    PgClassExpression_124 -.-> P_124
     P_105[">c…d>q…y>i2>title"]
     PgClassExpression_105 -.-> P_105
     P_106[">c…d>q…y>i2>description"]
     PgClassExpression_106 -.-> P_106
     P_107[">c…d>q…y>i2>note"]
     PgClassExpression_107 -.-> P_107
+    P_124[">c…d>q…y>i2>id x5"]
+    PgClassExpression_124 -.-> P_124
     P_140[">c…d>q…y>i3"]
     PgPolymorphic_140 -.-> P_140
-    P_176[">c…d>q…y>i3>id x5"]
-    PgClassExpression_176 -.-> P_176
     P_157[">c…d>q…y>i3>title"]
     PgClassExpression_157 -.-> P_157
     P_158[">c…d>q…y>i3>description"]
     PgClassExpression_158 -.-> P_158
     P_159[">c…d>q…y>i3>note"]
     PgClassExpression_159 -.-> P_159
+    P_176[">c…d>q…y>i3>id x5"]
+    PgClassExpression_176 -.-> P_176
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

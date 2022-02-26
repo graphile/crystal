@@ -92,10 +92,10 @@ graph TD
     %% plan-to-path relationships
     P_6["~"]
     __TrackedObject_6 -.-> P_6
-    P_24[">allMessagesConnection"]
-    Connection_24 -.-> P_24
     P_20[">a…n>edges"]
     PgSelect_20 -.-> P_20
+    P_24[">allMessagesConnection"]
+    Connection_24 -.-> P_24
     P_27[">a…n>edges[]<br />>a…n>e…]>node"]
     PgSelectSingle_27 -.-> P_27
     P_28[">a…n>e…]>cursor"]

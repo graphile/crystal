@@ -84,6 +84,8 @@ graph TD
     %% plan-to-path relationships
     P_6["~"]
     __TrackedObject_6 -.-> P_6
+    P_10["~"]
+    Subscribe_10 -.-> P_10
     P_12[">forumMessage"]
     JSONParse_12 -.-> P_12
     P_15[">f…e>operationType"]
@@ -98,10 +100,10 @@ graph TD
     PgClassExpression_25 -.-> P_25
     P_26[">f…e>m…e>isArchived"]
     PgClassExpression_26 -.-> P_26
-    P_33[">f…e>m…e>forum<br />>f…e>m…e>f…m>self"]
-    PgSelectSingle_33 -.-> P_33
     P_27[">f…e>m…e>f…m>id"]
     PgClassExpression_27 -.-> P_27
+    P_33[">f…e>m…e>forum<br />>f…e>m…e>f…m>self"]
+    PgSelectSingle_33 -.-> P_33
     P_35[">f…e>m…e>f…m>name<br />>f…e>m…e>f…m>self>name"]
     PgClassExpression_35 -.-> P_35
     P_36[">f…e>m…e>f…m>isArchived"]
@@ -112,8 +114,6 @@ graph TD
     PgClassExpression_45 -.-> P_45
     P_46[">f…e>m…e>a…r>gravatarUrl"]
     PgClassExpression_46 -.-> P_46
-    P_10["~"]
-    Subscribe_10 -.-> P_10
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

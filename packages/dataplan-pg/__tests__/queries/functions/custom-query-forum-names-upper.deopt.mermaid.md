@@ -44,10 +44,10 @@ graph TD
     %% plan-to-path relationships
     P_6["~"]
     __TrackedObject_6 -.-> P_6
-    P_14[">FORUM_NAMES@_11[]"]
-    PgClassExpression_14 -.-> P_14
     P_11[">FORUM_NAMES"]
     __ListTransform_11 -.-> P_11
+    P_14[">FORUM_NAMES@_11[]"]
+    PgClassExpression_14 -.-> P_14
     P_18[">FORUM_NAMES[]"]
     Lambda_18 -.-> P_18
 

@@ -109,10 +109,10 @@ graph TD
     %% plan-to-path relationships
     P_6["~"]
     __TrackedObject_6 -.-> P_6
-    P_14[">allRelationalCommentablesList@_12[]"]
-    PgSelectSingle_14 -.-> P_14
     P_12[">allRelationalCommentablesList"]
     __ListTransform_12 -.-> P_12
+    P_14[">allRelationalCommentablesList@_12[]"]
+    PgSelectSingle_14 -.-> P_14
     P_18[">allRelationalCommentablesList[]"]
     PgPolymorphic_18 -.-> P_18
     P_33[">a…]>type"]

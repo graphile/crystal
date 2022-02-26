@@ -254,76 +254,76 @@ graph TD
     Map_377 --> List_378
 
     %% plan-to-path relationships
+    P_5[">p2>query<br />>p3>query"]
+    __Value_5 -.-> P_5
     P_6["~"]
     __TrackedObject_6 -.-> P_6
     P_22[">p1"]
     PgClassExpression_22 -.-> P_22
     P_38[">p2"]
     PgClassExpression_38 -.-> P_38
-    P_5[">p2>query<br />>p3>query"]
-    __Value_5 -.-> P_5
     P_47[">p2>q…y>i1"]
     PgPolymorphic_47 -.-> P_47
-    P_83[">p2>q…y>i1>id x5"]
-    PgClassExpression_83 -.-> P_83
     P_64[">p2>q…y>i1>title"]
     PgClassExpression_64 -.-> P_64
     P_65[">p2>q…y>i1>description"]
     PgClassExpression_65 -.-> P_65
     P_66[">p2>q…y>i1>note"]
     PgClassExpression_66 -.-> P_66
+    P_83[">p2>q…y>i1>id x5"]
+    PgClassExpression_83 -.-> P_83
     P_99[">p2>q…y>i2"]
     PgPolymorphic_99 -.-> P_99
-    P_135[">p2>q…y>i2>id x5"]
-    PgClassExpression_135 -.-> P_135
     P_116[">p2>q…y>i2>title"]
     PgClassExpression_116 -.-> P_116
     P_117[">p2>q…y>i2>description"]
     PgClassExpression_117 -.-> P_117
     P_118[">p2>q…y>i2>note"]
     PgClassExpression_118 -.-> P_118
+    P_135[">p2>q…y>i2>id x5"]
+    PgClassExpression_135 -.-> P_135
     P_151[">p2>q…y>i3"]
     PgPolymorphic_151 -.-> P_151
-    P_187[">p2>q…y>i3>id x5"]
-    PgClassExpression_187 -.-> P_187
     P_168[">p2>q…y>i3>title"]
     PgClassExpression_168 -.-> P_168
     P_169[">p2>q…y>i3>description"]
     PgClassExpression_169 -.-> P_169
     P_170[">p2>q…y>i3>note"]
     PgClassExpression_170 -.-> P_170
+    P_187[">p2>q…y>i3>id x5"]
+    PgClassExpression_187 -.-> P_187
     P_210[">p3"]
     PgClassExpression_210 -.-> P_210
     P_219[">p3>q…y>i1"]
     PgPolymorphic_219 -.-> P_219
-    P_255[">p3>q…y>i1>id x5"]
-    PgClassExpression_255 -.-> P_255
     P_236[">p3>q…y>i1>title"]
     PgClassExpression_236 -.-> P_236
     P_237[">p3>q…y>i1>description"]
     PgClassExpression_237 -.-> P_237
     P_238[">p3>q…y>i1>note"]
     PgClassExpression_238 -.-> P_238
+    P_255[">p3>q…y>i1>id x5"]
+    PgClassExpression_255 -.-> P_255
     P_271[">p3>q…y>i2"]
     PgPolymorphic_271 -.-> P_271
-    P_307[">p3>q…y>i2>id x5"]
-    PgClassExpression_307 -.-> P_307
     P_288[">p3>q…y>i2>title"]
     PgClassExpression_288 -.-> P_288
     P_289[">p3>q…y>i2>description"]
     PgClassExpression_289 -.-> P_289
     P_290[">p3>q…y>i2>note"]
     PgClassExpression_290 -.-> P_290
+    P_307[">p3>q…y>i2>id x5"]
+    PgClassExpression_307 -.-> P_307
     P_323[">p3>q…y>i3"]
     PgPolymorphic_323 -.-> P_323
-    P_359[">p3>q…y>i3>id x5"]
-    PgClassExpression_359 -.-> P_359
     P_340[">p3>q…y>i3>title"]
     PgClassExpression_340 -.-> P_340
     P_341[">p3>q…y>i3>description"]
     PgClassExpression_341 -.-> P_341
     P_342[">p3>q…y>i3>note"]
     PgClassExpression_342 -.-> P_342
+    P_359[">p3>q…y>i3>id x5"]
+    PgClassExpression_359 -.-> P_359
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

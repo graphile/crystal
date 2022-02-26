@@ -71,10 +71,10 @@ graph TD
     __TrackedObject_6 -.-> P_6
     P_16[">item"]
     PgSingleTablePolymorphic_16 -.-> P_16
-    P_26[">item>parent x5"]
-    PgSingleTablePolymorphic_26 -.-> P_26
     P_17[">item>p…t>id x25"]
     PgClassExpression_17 -.-> P_17
+    P_26[">item>parent x5"]
+    PgSingleTablePolymorphic_26 -.-> P_26
     P_34[">item>p…t>author x25"]
     PgSelectSingle_34 -.-> P_34
     P_35[">item>p…t>a…r>username x25"]

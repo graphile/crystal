@@ -77,10 +77,10 @@ graph TD
     PgSelectSingle_22 -.-> P_22
     P_23[">f…]>name"]
     PgClassExpression_23 -.-> P_23
-    P_38[">f…]>messagesConnection"]
-    Connection_38 -.-> P_38
     P_34[">f…]>m…n>nodes<br />>f…]>m…n>edges"]
     PgSelect_34 -.-> P_34
+    P_38[">f…]>messagesConnection"]
+    Connection_38 -.-> P_38
     P_42[">f…]>m…n>nodes[]<br />>f…]>m…n>edges[]<br />>f…]>m…n>e…]>node"]
     PgSelectSingle_42 -.-> P_42
     P_43[">f…]>m…n>n…]>body<br />>f…]>m…n>e…]>node>body"]

@@ -108,8 +108,6 @@ graph TD
     PgClassExpression_23 -.-> P_23
     P_38[">f…]>messagesConnection"]
     Connection_38 -.-> P_38
-    P_91[">f…]>m…n>nodes<br />>f…]>m…n>edges"]
-    Lambda_91 -.-> P_91
     P_42[">f…]>m…n>nodes[]<br />>f…]>m…n>edges[]<br />>f…]>m…n>e…]>node"]
     PgSelectSingle_42 -.-> P_42
     P_43[">f…]>m…n>n…]>body<br />>f…]>m…n>e…]>node>body"]
@@ -134,6 +132,8 @@ graph TD
     PgCursor_81 -.-> P_81
     P_87[">f…]>m…n>totalCount"]
     PgClassExpression_87 -.-> P_87
+    P_91[">f…]>m…n>nodes<br />>f…]>m…n>edges"]
+    Lambda_91 -.-> P_91
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
