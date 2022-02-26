@@ -3131,6 +3131,27 @@ export class Aether<
       }
     }
 
+    // Now to set up the bucket's `copyPlans`
+    for (const [id, plan] of Object.entries(this.plans)) {
+      if (plan != null && plan.id === id) {
+        for (const depId of plan.dependencies) {
+          const dep = this.plans[depId];
+          if (dep.bucketId !== plan.bucketId) {
+            let bucket = this.buckets[plan.bucketId];
+            while (bucket.id !== dep.bucketId) {
+              bucket.copyPlans.add(dep);
+              if (!bucket.parent) {
+                throw new Error(
+                  `${plan} (bucket ${plan.bucketId}) depends on ${dep} (bucket ${dep.bucketId}), but bucket ${dep.bucketId} does not appear in bucket ${plan.bucketId}'s ancestors.`,
+                );
+              }
+              bucket = bucket.parent;
+            }
+          }
+        }
+      }
+    }
+
     // Set the bucket's outputMap
     for (const [id, plan] of Object.entries(this.plans)) {
       if (plan != null && plan.id === id) {
