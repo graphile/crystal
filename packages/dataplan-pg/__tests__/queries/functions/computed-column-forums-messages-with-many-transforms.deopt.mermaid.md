@@ -4,7 +4,7 @@ graph TD
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
 
 
     %% define plans
@@ -128,9 +128,9 @@ graph TD
     class __Item_45,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_48 bucket7
 
     subgraph Buckets
-    Bucket0("Bucket 0 (root)<br />~"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀forums <-A- _17"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]"):::bucket
+    Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]<br />⠀ROOT <-O- _22<br />⠀⠀name <-L- _23<br />⠀⠀messagesWithManyTransforms <-A- _31"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_32)"):::bucket
@@ -142,13 +142,13 @@ graph TD
     Bucket4("Bucket 4 (item_41)"):::bucket
     style Bucket4 stroke:#7f007f
     Bucket1 --> Bucket4
-    Bucket5("Bucket 5 (item_42)<br />~>Query.forums[]>Forum.messagesWithManyTransforms[]"):::bucket
+    Bucket5("Bucket 5 (item_42)<br />~>Query.forums[]>Forum.messagesWithManyTransforms[]<br />⠀ROOT <-O- _43"):::bucket
     style Bucket5 stroke:#ff0000
     Bucket1 --> Bucket5
     Bucket6("Bucket 6 (item_44)"):::bucket
     style Bucket6 stroke:#ffa500
     Bucket5 --> Bucket6
-    Bucket7("Bucket 7 (item_45)<br />~>Query.forums[]>Forum.messagesWithManyTransforms[][]"):::bucket
+    Bucket7("Bucket 7 (item_45)<br />~>Query.forums[]>Forum.messagesWithManyTransforms[][]<br />⠀ROOT <-O- _46<br />⠀⠀body <-L- _47<br />⠀⠀featured <-L- _48"):::bucket
     style Bucket7 stroke:#ffff00
     Bucket5 --> Bucket7
     end

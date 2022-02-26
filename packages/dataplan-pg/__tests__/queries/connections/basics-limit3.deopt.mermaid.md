@@ -4,7 +4,7 @@ graph TD
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
 
 
     %% define plans
@@ -129,9 +129,9 @@ graph TD
     class __Item_26,PgSelectSingle_27,PgCursor_28,PgClassExpression_29,List_30,PgClassExpression_31,PgClassExpression_32,PgSelect_33,First_37,PgSelectSingle_38,PgClassExpression_39,PgClassExpression_40 bucket1
 
     subgraph Buckets
-    Bucket0("Bucket 0 (root)<br />~"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀allMessagesConnection <-O- _24<br />⠀⠀⠀allMessagesConnection.edges <-A- _25<br />⠀⠀⠀allMessagesConnection.pageInfo <-O- _41<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasNextPage <-L- _43<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasPreviousPage <-L- _44<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.startCursor <-L- _48<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.endCursor <-L- _54<br />⠀⠀⠀allMessagesConnection.totalCount <-L- _60"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_26)<br />~>Query.allMessagesConnection>MessagesConnection.edges[]"):::bucket
+    Bucket1("Bucket 1 (item_26)<br />~>Query.allMessagesConnection>MessagesConnection.edges[]<br />⠀ROOT <-O- _27<br />⠀⠀node <-O- _27<br />⠀⠀⠀node.body <-L- _31<br />⠀⠀⠀node.author <-O- _38<br />⠀⠀⠀⠀node.author.username <-L- _39<br />⠀⠀⠀⠀node.author.gravatarUrl <-L- _40<br />⠀⠀cursor <-L- _28"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
     end

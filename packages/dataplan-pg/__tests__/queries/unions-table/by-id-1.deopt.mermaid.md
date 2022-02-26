@@ -4,7 +4,7 @@ graph TD
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
 
 
     %% define plans
@@ -149,21 +149,21 @@ graph TD
     class PgSelectSingle_61,PgClassExpression_62,PgClassExpression_63,PgClassExpression_64 bucket5
 
     subgraph Buckets
-    Bucket0("Bucket 0 (root)<br />~"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀item1 <-O- _15"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (polymorphic_15[UnionTopic])<br />~>Query.item1"):::bucket
+    Bucket1("Bucket 1 (polymorphic_15[UnionTopic])<br />~>Query.item1<br />⠀⠀id <-L- _23<br />⠀⠀title <-L- _24"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (polymorphic_15[UnionPost])<br />~>Query.item1"):::bucket
+    Bucket2("Bucket 2 (polymorphic_15[UnionPost])<br />~>Query.item1<br />⠀⠀id <-L- _32<br />⠀⠀title <-L- _33<br />⠀⠀description <-L- _34<br />⠀⠀note <-L- _35"):::bucket
     style Bucket2 stroke:#808000
     Bucket0 --> Bucket2
-    Bucket3("Bucket 3 (polymorphic_15[UnionDivider])<br />~>Query.item1"):::bucket
+    Bucket3("Bucket 3 (polymorphic_15[UnionDivider])<br />~>Query.item1<br />⠀⠀id <-L- _43<br />⠀⠀title <-L- _44<br />⠀⠀color <-L- _45"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket0 --> Bucket3
-    Bucket4("Bucket 4 (polymorphic_15[UnionChecklist])<br />~>Query.item1"):::bucket
+    Bucket4("Bucket 4 (polymorphic_15[UnionChecklist])<br />~>Query.item1<br />⠀⠀id <-L- _53<br />⠀⠀title <-L- _54"):::bucket
     style Bucket4 stroke:#7f007f
     Bucket0 --> Bucket4
-    Bucket5("Bucket 5 (polymorphic_15[UnionChecklistItem])<br />~>Query.item1"):::bucket
+    Bucket5("Bucket 5 (polymorphic_15[UnionChecklistItem])<br />~>Query.item1<br />⠀⠀id <-L- _62<br />⠀⠀description <-L- _63<br />⠀⠀note <-L- _64"):::bucket
     style Bucket5 stroke:#ff0000
     Bucket0 --> Bucket5
     end

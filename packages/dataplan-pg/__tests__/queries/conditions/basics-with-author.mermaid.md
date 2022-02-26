@@ -4,7 +4,7 @@ graph TD
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
 
 
     %% define plans
@@ -81,12 +81,12 @@ graph TD
     class __Item_38,PgSelectSingle_39,PgClassExpression_40,First_46,PgSelectSingle_47,PgClassExpression_48,PgClassExpression_49,Map_50,List_51 bucket2
 
     subgraph Buckets
-    Bucket0("Bucket 0 (root)<br />~"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀forums <-A- _17"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]"):::bucket
+    Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]<br />⠀ROOT <-O- _22<br />⠀⠀name <-L- _23<br />⠀⠀messagesList <-A- _52"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (item_38)<br />~>Query.forums[]>Forum.messagesList[]"):::bucket
+    Bucket2("Bucket 2 (item_38)<br />~>Query.forums[]>Forum.messagesList[]<br />⠀ROOT <-O- _39<br />⠀⠀body <-L- _40<br />⠀⠀author <-O- _47<br />⠀⠀⠀author.username <-L- _48<br />⠀⠀⠀author.gravatarUrl <-L- _49"):::bucket
     style Bucket2 stroke:#808000
     Bucket1 --> Bucket2
     end

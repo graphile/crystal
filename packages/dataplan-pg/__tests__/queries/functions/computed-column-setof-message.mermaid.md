@@ -4,7 +4,7 @@ graph TD
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
 
 
     %% define plans
@@ -57,9 +57,9 @@ graph TD
     class __Item_19,PgSelectSingle_20,PgClassExpression_21 bucket1
 
     subgraph Buckets
-    Bucket0("Bucket 0 (root)<br />~"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀forum <-O- _13<br />⠀⠀⠀forum.featuredMessages <-A- _22"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_19)<br />~>Query.forum>Forum.featuredMessages[]"):::bucket
+    Bucket1("Bucket 1 (item_19)<br />~>Query.forum>Forum.featuredMessages[]<br />⠀ROOT <-O- _20<br />⠀⠀body <-L- _21"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
     end

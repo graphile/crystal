@@ -4,7 +4,7 @@ graph TD
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
 
 
     %% define plans
@@ -355,18 +355,18 @@ graph TD
     class InputStaticLeaf_170,InputStaticLeaf_173,PgUpdate_175,PgClassExpression_179,PgSelect_181,First_185,PgSelectSingle_186,PgClassExpression_187,PgClassExpression_188,PgClassExpression_189,PgClassExpression_190,First_196,PgSelectSingle_197,PgClassExpression_198,First_204,PgSelectSingle_205,PgClassExpression_206,First_219,PgSelectSingle_220,PgClassExpression_221,PgClassExpression_222,Map_241,List_242,Map_243,List_244,Map_245,List_246 bucket4
 
     subgraph Buckets
-    Bucket0("Bucket 0 (root)<br />~"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (group1[mutation])<br />~"):::bucket
+    Bucket1("Bucket 1 (group1[mutation])<br />~>Mutation.u1<br />⠀ROOT <-O- _13<br />⠀⠀id <-L- _17<br />⠀⠀post <-O- _24<br />⠀⠀⠀post.id <-L- _25<br />⠀⠀⠀post.title <-L- _26<br />⠀⠀⠀post.description <-L- _27<br />⠀⠀⠀post.note <-L- _28<br />⠀⠀⠀post.titleLower <-L- _36<br />⠀⠀⠀post.isExplicitlyArchived <-L- _44<br />⠀⠀⠀post.author <-O- _58<br />⠀⠀⠀⠀post.author.personId <-L- _59<br />⠀⠀⠀⠀post.author.username <-L- _60"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (group2[mutation])<br />~"):::bucket
+    Bucket2("Bucket 2 (group2[mutation])<br />~>Mutation.u2<br />⠀ROOT <-O- _67<br />⠀⠀id <-L- _71<br />⠀⠀post <-O- _78<br />⠀⠀⠀post.id <-L- _79<br />⠀⠀⠀post.title <-L- _80<br />⠀⠀⠀post.description <-L- _81<br />⠀⠀⠀post.note <-L- _82<br />⠀⠀⠀post.titleLower <-L- _90<br />⠀⠀⠀post.isExplicitlyArchived <-L- _98<br />⠀⠀⠀post.author <-O- _112<br />⠀⠀⠀⠀post.author.personId <-L- _113<br />⠀⠀⠀⠀post.author.username <-L- _114"):::bucket
     style Bucket2 stroke:#808000
     Bucket0 --> Bucket2
-    Bucket3("Bucket 3 (group3[mutation])<br />~"):::bucket
+    Bucket3("Bucket 3 (group3[mutation])<br />~>Mutation.u3<br />⠀ROOT <-O- _121<br />⠀⠀id <-L- _125<br />⠀⠀post <-O- _132<br />⠀⠀⠀post.id <-L- _133<br />⠀⠀⠀post.title <-L- _134<br />⠀⠀⠀post.description <-L- _135<br />⠀⠀⠀post.note <-L- _136<br />⠀⠀⠀post.titleLower <-L- _144<br />⠀⠀⠀post.isExplicitlyArchived <-L- _152<br />⠀⠀⠀post.author <-O- _166<br />⠀⠀⠀⠀post.author.personId <-L- _167<br />⠀⠀⠀⠀post.author.username <-L- _168"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket0 --> Bucket3
-    Bucket4("Bucket 4 (group4[mutation])<br />~"):::bucket
+    Bucket4("Bucket 4 (group4[mutation])<br />~>Mutation.u4<br />⠀ROOT <-O- _175<br />⠀⠀id <-L- _179<br />⠀⠀post <-O- _186<br />⠀⠀⠀post.id <-L- _187<br />⠀⠀⠀post.title <-L- _188<br />⠀⠀⠀post.description <-L- _189<br />⠀⠀⠀post.note <-L- _190<br />⠀⠀⠀post.titleLower <-L- _198<br />⠀⠀⠀post.isExplicitlyArchived <-L- _206<br />⠀⠀⠀post.author <-O- _220<br />⠀⠀⠀⠀post.author.personId <-L- _221<br />⠀⠀⠀⠀post.author.username <-L- _222"):::bucket
     style Bucket4 stroke:#7f007f
     Bucket0 --> Bucket4
     end

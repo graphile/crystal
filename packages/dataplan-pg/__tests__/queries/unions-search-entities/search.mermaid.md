@@ -4,7 +4,7 @@ graph TD
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
 
 
     %% define plans
@@ -169,21 +169,21 @@ graph TD
     class PgSelectSingle_51,PgClassExpression_52,First_58,PgSelectSingle_59,PgClassExpression_60,First_66,PgSelectSingle_67,PgClassExpression_68,PgClassExpression_69,PgClassExpression_70,Map_77,List_78,Map_79,List_80 bucket5
 
     subgraph Buckets
-    Bucket0("Bucket 0 (root)<br />~"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀searchEntities <-A- _12"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_13)"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (item_15)<br />~>Query.searchEntities[]"):::bucket
+    Bucket2("Bucket 2 (item_15)<br />~>Query.searchEntities[]<br />⠀ROOT <-O- _21"):::bucket
     style Bucket2 stroke:#808000
     Bucket0 --> Bucket2
-    Bucket3("Bucket 3 (polymorphic_21[Person])<br />~>Query.searchEntities[]"):::bucket
+    Bucket3("Bucket 3 (polymorphic_21[Person])<br />~>Query.searchEntities[]<br />⠀⠀personId <-L- _28<br />⠀⠀username <-L- _29"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket2 --> Bucket3
-    Bucket4("Bucket 4 (polymorphic_21[Post])<br />~>Query.searchEntities[]"):::bucket
+    Bucket4("Bucket 4 (polymorphic_21[Post])<br />~>Query.searchEntities[]<br />⠀⠀postId <-L- _36<br />⠀⠀author <-O- _43<br />⠀⠀⠀author.username <-L- _44<br />⠀⠀body <-L- _45"):::bucket
     style Bucket4 stroke:#7f007f
     Bucket2 --> Bucket4
-    Bucket5("Bucket 5 (polymorphic_21[Comment])<br />~>Query.searchEntities[]"):::bucket
+    Bucket5("Bucket 5 (polymorphic_21[Comment])<br />~>Query.searchEntities[]<br />⠀⠀commentId <-L- _52<br />⠀⠀author <-O- _59<br />⠀⠀⠀author.username <-L- _60<br />⠀⠀post <-O- _67<br />⠀⠀⠀post.postId <-L- _68<br />⠀⠀⠀post.body <-L- _69<br />⠀⠀body <-L- _70"):::bucket
     style Bucket5 stroke:#ff0000
     Bucket2 --> Bucket5
     end

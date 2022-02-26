@@ -4,7 +4,7 @@ graph TD
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
 
 
     %% define plans
@@ -342,33 +342,33 @@ graph TD
     class PgSelectSingle_338,PgClassExpression_340,PgClassExpression_341,PgClassExpression_342 bucket9
 
     subgraph Buckets
-    Bucket0("Bucket 0 (root)<br />~"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (group1[mutation])<br />~"):::bucket
+    Bucket1("Bucket 1 (group1[mutation])<br />~>Mutation.p1<br />⠀ROOT <-O- _22"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (group2[mutation])<br />~"):::bucket
+    Bucket2("Bucket 2 (group2[mutation])<br />~>Mutation.p2<br />⠀ROOT <-O- _38<br />⠀⠀query <-O- _5<br />⠀⠀⠀query.i1 <-O- _47<br />⠀⠀⠀⠀query.i1.id <-L- _83<br />⠀⠀⠀query.i2 <-O- _99<br />⠀⠀⠀⠀query.i2.id <-L- _135<br />⠀⠀⠀query.i3 <-O- _151<br />⠀⠀⠀⠀query.i3.id <-L- _187"):::bucket
     style Bucket2 stroke:#808000
     Bucket0 --> Bucket2
-    Bucket3("Bucket 3 (polymorphic_47[RelationalPost])<br />~>Mutation.p2>CreateRelationalPostPayload.query>Query.i1"):::bucket
+    Bucket3("Bucket 3 (polymorphic_47[RelationalPost])<br />~>Mutation.p2>CreateRelationalPostPayload.query>Query.i1<br />⠀⠀title <-L- _64<br />⠀⠀description <-L- _65<br />⠀⠀note <-L- _66"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket2 --> Bucket3
-    Bucket4("Bucket 4 (polymorphic_99[RelationalPost])<br />~>Mutation.p2>CreateRelationalPostPayload.query>Query.i2"):::bucket
+    Bucket4("Bucket 4 (polymorphic_99[RelationalPost])<br />~>Mutation.p2>CreateRelationalPostPayload.query>Query.i2<br />⠀⠀title <-L- _116<br />⠀⠀description <-L- _117<br />⠀⠀note <-L- _118"):::bucket
     style Bucket4 stroke:#7f007f
     Bucket2 --> Bucket4
-    Bucket5("Bucket 5 (polymorphic_151[RelationalPost])<br />~>Mutation.p2>CreateRelationalPostPayload.query>Query.i3"):::bucket
+    Bucket5("Bucket 5 (polymorphic_151[RelationalPost])<br />~>Mutation.p2>CreateRelationalPostPayload.query>Query.i3<br />⠀⠀title <-L- _168<br />⠀⠀description <-L- _169<br />⠀⠀note <-L- _170"):::bucket
     style Bucket5 stroke:#ff0000
     Bucket2 --> Bucket5
-    Bucket6("Bucket 6 (group3[mutation])<br />~"):::bucket
+    Bucket6("Bucket 6 (group3[mutation])<br />~>Mutation.p3<br />⠀ROOT <-O- _210<br />⠀⠀query <-O- _5<br />⠀⠀⠀query.i1 <-O- _219<br />⠀⠀⠀⠀query.i1.id <-L- _255<br />⠀⠀⠀query.i2 <-O- _271<br />⠀⠀⠀⠀query.i2.id <-L- _307<br />⠀⠀⠀query.i3 <-O- _323<br />⠀⠀⠀⠀query.i3.id <-L- _359"):::bucket
     style Bucket6 stroke:#ffa500
     Bucket0 --> Bucket6
-    Bucket7("Bucket 7 (polymorphic_219[RelationalPost])<br />~>Mutation.p3>CreateRelationalPostPayload.query>Query.i1"):::bucket
+    Bucket7("Bucket 7 (polymorphic_219[RelationalPost])<br />~>Mutation.p3>CreateRelationalPostPayload.query>Query.i1<br />⠀⠀title <-L- _236<br />⠀⠀description <-L- _237<br />⠀⠀note <-L- _238"):::bucket
     style Bucket7 stroke:#ffff00
     Bucket6 --> Bucket7
-    Bucket8("Bucket 8 (polymorphic_271[RelationalPost])<br />~>Mutation.p3>CreateRelationalPostPayload.query>Query.i2"):::bucket
+    Bucket8("Bucket 8 (polymorphic_271[RelationalPost])<br />~>Mutation.p3>CreateRelationalPostPayload.query>Query.i2<br />⠀⠀title <-L- _288<br />⠀⠀description <-L- _289<br />⠀⠀note <-L- _290"):::bucket
     style Bucket8 stroke:#7fff00
     Bucket6 --> Bucket8
-    Bucket9("Bucket 9 (polymorphic_323[RelationalPost])<br />~>Mutation.p3>CreateRelationalPostPayload.query>Query.i3"):::bucket
+    Bucket9("Bucket 9 (polymorphic_323[RelationalPost])<br />~>Mutation.p3>CreateRelationalPostPayload.query>Query.i3<br />⠀⠀title <-L- _340<br />⠀⠀description <-L- _341<br />⠀⠀note <-L- _342"):::bucket
     style Bucket9 stroke:#4169e1
     Bucket6 --> Bucket9
     end

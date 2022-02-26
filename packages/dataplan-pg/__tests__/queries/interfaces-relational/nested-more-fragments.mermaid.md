@@ -4,7 +4,7 @@ graph TD
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
 
 
     %% define plans
@@ -350,45 +350,45 @@ graph TD
     class PgSelectSingle_663,PgClassExpression_813,PgClassExpression_814 bucket13
 
     subgraph Buckets
-    Bucket0("Bucket 0 (root)<br />~"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀people <-A- _7"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_11)<br />~>Query.people[]"):::bucket
+    Bucket1("Bucket 1 (item_11)<br />~>Query.people[]<br />⠀ROOT <-O- _12<br />⠀⠀username <-L- _13<br />⠀⠀items <-A- _19"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
     Bucket2("Bucket 2 (item_20)"):::bucket
     style Bucket2 stroke:#808000
     Bucket1 --> Bucket2
-    Bucket3("Bucket 3 (item_22)<br />~>Query.people[]>Person.items[]"):::bucket
+    Bucket3("Bucket 3 (item_22)<br />~>Query.people[]>Person.items[]<br />⠀ROOT <-O- _25<br />⠀⠀type <-L- _24<br />⠀⠀parent <-O- _41<br />⠀⠀⠀parent.type <-L- _40<br />⠀⠀⠀parent.type2 <-L- _51<br />⠀⠀⠀parent.author <-O- _58<br />⠀⠀⠀⠀parent.author.username <-L- _59<br />⠀⠀⠀parent.position <-L- _60<br />⠀⠀⠀parent.createdAt <-L- _61<br />⠀⠀⠀parent.updatedAt <-L- _62<br />⠀⠀⠀parent.isExplicitlyArchived <-L- _63<br />⠀⠀⠀parent.archivedAt <-L- _64<br />⠀⠀⠀parent.id <-L- _772<br />⠀⠀type2 <-L- _168<br />⠀⠀author <-O- _175<br />⠀⠀⠀author.username <-L- _176<br />⠀⠀position <-L- _177<br />⠀⠀createdAt <-L- _178<br />⠀⠀updatedAt <-L- _179<br />⠀⠀isExplicitlyArchived <-L- _180<br />⠀⠀archivedAt <-L- _181<br />⠀⠀id <-L- _657"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket1 --> Bucket3
-    Bucket4("Bucket 4 (polymorphic_25[RelationalTopic])<br />~>Query.people[]>Person.items[]"):::bucket
+    Bucket4("Bucket 4 (polymorphic_25[RelationalTopic])<br />~>Query.people[]>Person.items[]<br />⠀⠀title <-L- _182"):::bucket
     style Bucket4 stroke:#7f007f
     Bucket3 --> Bucket4
-    Bucket5("Bucket 5 (polymorphic_41[RelationalTopic])<br />~>Query.people[]>Person.items[]>RelationalPost.parent<br />~>Query.people[]>Person.items[]>RelationalTopic.parent<br />~>Query.people[]>Person.items[]>RelationalDivider.parent<br />~>Query.people[]>Person.items[]>RelationalChecklist.parent<br />~>Query.people[]>Person.items[]>RelationalChecklistItem.parent"):::bucket
+    Bucket5("Bucket 5 (polymorphic_41[RelationalTopic])<br />~>Query.people[]>Person.items[]>RelationalPost.parent<br />~>Query.people[]>Person.items[]>RelationalTopic.parent<br />~>Query.people[]>Person.items[]>RelationalDivider.parent<br />~>Query.people[]>Person.items[]>RelationalChecklist.parent<br />~>Query.people[]>Person.items[]>RelationalChecklistItem.parent<br />⠀⠀title <-L- _65"):::bucket
     style Bucket5 stroke:#ff0000
     Bucket3 --> Bucket5
-    Bucket6("Bucket 6 (polymorphic_41[RelationalPost])<br />~>Query.people[]>Person.items[]>RelationalPost.parent<br />~>Query.people[]>Person.items[]>RelationalTopic.parent<br />~>Query.people[]>Person.items[]>RelationalDivider.parent<br />~>Query.people[]>Person.items[]>RelationalChecklist.parent<br />~>Query.people[]>Person.items[]>RelationalChecklistItem.parent"):::bucket
+    Bucket6("Bucket 6 (polymorphic_41[RelationalPost])<br />~>Query.people[]>Person.items[]>RelationalPost.parent<br />~>Query.people[]>Person.items[]>RelationalTopic.parent<br />~>Query.people[]>Person.items[]>RelationalDivider.parent<br />~>Query.people[]>Person.items[]>RelationalChecklist.parent<br />~>Query.people[]>Person.items[]>RelationalChecklistItem.parent<br />⠀⠀title <-L- _89<br />⠀⠀description <-L- _90<br />⠀⠀note <-L- _91"):::bucket
     style Bucket6 stroke:#ffa500
     Bucket3 --> Bucket6
-    Bucket7("Bucket 7 (polymorphic_41[RelationalDivider])<br />~>Query.people[]>Person.items[]>RelationalPost.parent<br />~>Query.people[]>Person.items[]>RelationalTopic.parent<br />~>Query.people[]>Person.items[]>RelationalDivider.parent<br />~>Query.people[]>Person.items[]>RelationalChecklist.parent<br />~>Query.people[]>Person.items[]>RelationalChecklistItem.parent"):::bucket
+    Bucket7("Bucket 7 (polymorphic_41[RelationalDivider])<br />~>Query.people[]>Person.items[]>RelationalPost.parent<br />~>Query.people[]>Person.items[]>RelationalTopic.parent<br />~>Query.people[]>Person.items[]>RelationalDivider.parent<br />~>Query.people[]>Person.items[]>RelationalChecklist.parent<br />~>Query.people[]>Person.items[]>RelationalChecklistItem.parent<br />⠀⠀title <-L- _115<br />⠀⠀color <-L- _116"):::bucket
     style Bucket7 stroke:#ffff00
     Bucket3 --> Bucket7
-    Bucket8("Bucket 8 (polymorphic_41[RelationalChecklist])<br />~>Query.people[]>Person.items[]>RelationalPost.parent<br />~>Query.people[]>Person.items[]>RelationalTopic.parent<br />~>Query.people[]>Person.items[]>RelationalDivider.parent<br />~>Query.people[]>Person.items[]>RelationalChecklist.parent<br />~>Query.people[]>Person.items[]>RelationalChecklistItem.parent"):::bucket
+    Bucket8("Bucket 8 (polymorphic_41[RelationalChecklist])<br />~>Query.people[]>Person.items[]>RelationalPost.parent<br />~>Query.people[]>Person.items[]>RelationalTopic.parent<br />~>Query.people[]>Person.items[]>RelationalDivider.parent<br />~>Query.people[]>Person.items[]>RelationalChecklist.parent<br />~>Query.people[]>Person.items[]>RelationalChecklistItem.parent<br />⠀⠀title <-L- _140"):::bucket
     style Bucket8 stroke:#7fff00
     Bucket3 --> Bucket8
-    Bucket9("Bucket 9 (polymorphic_41[RelationalChecklistItem])<br />~>Query.people[]>Person.items[]>RelationalPost.parent<br />~>Query.people[]>Person.items[]>RelationalTopic.parent<br />~>Query.people[]>Person.items[]>RelationalDivider.parent<br />~>Query.people[]>Person.items[]>RelationalChecklist.parent<br />~>Query.people[]>Person.items[]>RelationalChecklistItem.parent"):::bucket
+    Bucket9("Bucket 9 (polymorphic_41[RelationalChecklistItem])<br />~>Query.people[]>Person.items[]>RelationalPost.parent<br />~>Query.people[]>Person.items[]>RelationalTopic.parent<br />~>Query.people[]>Person.items[]>RelationalDivider.parent<br />~>Query.people[]>Person.items[]>RelationalChecklist.parent<br />~>Query.people[]>Person.items[]>RelationalChecklistItem.parent<br />⠀⠀description <-L- _164<br />⠀⠀note <-L- _165"):::bucket
     style Bucket9 stroke:#4169e1
     Bucket3 --> Bucket9
-    Bucket10("Bucket 10 (polymorphic_25[RelationalPost])<br />~>Query.people[]>Person.items[]"):::bucket
+    Bucket10("Bucket 10 (polymorphic_25[RelationalPost])<br />~>Query.people[]>Person.items[]<br />⠀⠀title <-L- _339<br />⠀⠀description <-L- _340<br />⠀⠀note <-L- _341"):::bucket
     style Bucket10 stroke:#00ffff
     Bucket3 --> Bucket10
-    Bucket11("Bucket 11 (polymorphic_25[RelationalDivider])<br />~>Query.people[]>Person.items[]"):::bucket
+    Bucket11("Bucket 11 (polymorphic_25[RelationalDivider])<br />~>Query.people[]>Person.items[]<br />⠀⠀title <-L- _498<br />⠀⠀color <-L- _499"):::bucket
     style Bucket11 stroke:#00bfff
     Bucket3 --> Bucket11
-    Bucket12("Bucket 12 (polymorphic_25[RelationalChecklist])<br />~>Query.people[]>Person.items[]"):::bucket
+    Bucket12("Bucket 12 (polymorphic_25[RelationalChecklist])<br />~>Query.people[]>Person.items[]<br />⠀⠀title <-L- _656"):::bucket
     style Bucket12 stroke:#0000ff
     Bucket3 --> Bucket12
-    Bucket13("Bucket 13 (polymorphic_25[RelationalChecklistItem])<br />~>Query.people[]>Person.items[]"):::bucket
+    Bucket13("Bucket 13 (polymorphic_25[RelationalChecklistItem])<br />~>Query.people[]>Person.items[]<br />⠀⠀description <-L- _813<br />⠀⠀note <-L- _814"):::bucket
     style Bucket13 stroke:#ff00ff
     Bucket3 --> Bucket13
     end

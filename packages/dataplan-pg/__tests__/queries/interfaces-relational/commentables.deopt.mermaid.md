@@ -4,7 +4,7 @@ graph TD
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
 
 
     %% define plans
@@ -184,21 +184,21 @@ graph TD
     class PgSelectSingle_93,PgClassExpression_94,First_100,PgSelectSingle_101,PgClassExpression_102,PgClassExpression_110,PgClassExpression_118,PgClassExpression_119,PgClassExpression_120,Map_125,List_126 bucket5
 
     subgraph Buckets
-    Bucket0("Bucket 0 (root)<br />~"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀allRelationalCommentablesList <-A- _12"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_13)"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (item_15)<br />~>Query.allRelationalCommentablesList[]"):::bucket
+    Bucket2("Bucket 2 (item_15)<br />~>Query.allRelationalCommentablesList[]<br />⠀ROOT <-O- _18"):::bucket
     style Bucket2 stroke:#808000
     Bucket0 --> Bucket2
-    Bucket3("Bucket 3 (polymorphic_18[RelationalPost])<br />~>Query.allRelationalCommentablesList[]"):::bucket
+    Bucket3("Bucket 3 (polymorphic_18[RelationalPost])<br />~>Query.allRelationalCommentablesList[]<br />⠀⠀id <-L- _26<br />⠀⠀type <-L- _34<br />⠀⠀type2 <-L- _42<br />⠀⠀position <-L- _50<br />⠀⠀title <-L- _51<br />⠀⠀description <-L- _52<br />⠀⠀note <-L- _53"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket2 --> Bucket3
-    Bucket4("Bucket 4 (polymorphic_18[RelationalChecklist])<br />~>Query.allRelationalCommentablesList[]"):::bucket
+    Bucket4("Bucket 4 (polymorphic_18[RelationalChecklist])<br />~>Query.allRelationalCommentablesList[]<br />⠀⠀id <-L- _61<br />⠀⠀type <-L- _69<br />⠀⠀type2 <-L- _77<br />⠀⠀position <-L- _85<br />⠀⠀title <-L- _86"):::bucket
     style Bucket4 stroke:#7f007f
     Bucket2 --> Bucket4
-    Bucket5("Bucket 5 (polymorphic_18[RelationalChecklistItem])<br />~>Query.allRelationalCommentablesList[]"):::bucket
+    Bucket5("Bucket 5 (polymorphic_18[RelationalChecklistItem])<br />~>Query.allRelationalCommentablesList[]<br />⠀⠀id <-L- _94<br />⠀⠀type <-L- _102<br />⠀⠀type2 <-L- _110<br />⠀⠀position <-L- _118<br />⠀⠀description <-L- _119<br />⠀⠀note <-L- _120"):::bucket
     style Bucket5 stroke:#ff0000
     Bucket2 --> Bucket5
     end

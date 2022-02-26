@@ -4,7 +4,7 @@ graph TD
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
     classDef sideeffectplan fill:#f00,stroke-width:6px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:6px,text-align:left
 
 
     %% define plans
@@ -239,18 +239,18 @@ graph TD
     class InputStaticLeaf_92,InputStaticLeaf_93,InputStaticLeaf_94,Constant_95,Constant_96,PgInsert_97,PgClassExpression_101,PgInsert_102,PgClassExpression_106,PgClassExpression_107,PgSelect_109,First_113,PgSelectSingle_114,PgClassExpression_115,PgClassExpression_116,PgClassExpression_117,PgClassExpression_118 bucket4
 
     subgraph Buckets
-    Bucket0("Bucket 0 (root)<br />~"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (group1[mutation])<br />~"):::bucket
+    Bucket1("Bucket 1 (group1[mutation])<br />~>Mutation.p1<br />⠀ROOT <-O- _22<br />⠀⠀id <-L- _23<br />⠀⠀post <-O- _30<br />⠀⠀⠀post.id <-L- _31<br />⠀⠀⠀post.title <-L- _32<br />⠀⠀⠀post.description <-L- _33<br />⠀⠀⠀post.note <-L- _34"):::bucket
     style Bucket1 stroke:#a52a2a
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (group2[mutation])<br />~"):::bucket
+    Bucket2("Bucket 2 (group2[mutation])<br />~>Mutation.p2<br />⠀ROOT <-O- _50<br />⠀⠀id <-L- _51<br />⠀⠀post <-O- _58<br />⠀⠀⠀post.id <-L- _59<br />⠀⠀⠀post.title <-L- _60<br />⠀⠀⠀post.description <-L- _61<br />⠀⠀⠀post.note <-L- _62"):::bucket
     style Bucket2 stroke:#808000
     Bucket0 --> Bucket2
-    Bucket3("Bucket 3 (group3[mutation])<br />~"):::bucket
+    Bucket3("Bucket 3 (group3[mutation])<br />~>Mutation.p3<br />⠀ROOT <-O- _78<br />⠀⠀id <-L- _79<br />⠀⠀post <-O- _86<br />⠀⠀⠀post.id <-L- _87<br />⠀⠀⠀post.title <-L- _88<br />⠀⠀⠀post.description <-L- _89<br />⠀⠀⠀post.note <-L- _90"):::bucket
     style Bucket3 stroke:#3cb371
     Bucket0 --> Bucket3
-    Bucket4("Bucket 4 (group4[mutation])<br />~"):::bucket
+    Bucket4("Bucket 4 (group4[mutation])<br />~>Mutation.p4<br />⠀ROOT <-O- _106<br />⠀⠀id <-L- _107<br />⠀⠀post <-O- _114<br />⠀⠀⠀post.id <-L- _115<br />⠀⠀⠀post.title <-L- _116<br />⠀⠀⠀post.description <-L- _117<br />⠀⠀⠀post.note <-L- _118"):::bucket
     style Bucket4 stroke:#7f007f
     Bucket0 --> Bucket4
     end
