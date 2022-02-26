@@ -160,42 +160,42 @@ graph TD
     Access_201 --> Object_202
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">createThreeRelationalPosts"]
-    PgClassExpression_49 -.-> P2
-    P3[">c…s>query"]
-    __Value_5 -.-> P3
-    P4[">c…s>q…y>i1"]
-    PgPolymorphic_58 -.-> P4
-    P5[">c…s>q…y>i1>id x5"]
-    PgClassExpression_94 -.-> P5
-    P6[">c…s>q…y>i1>title"]
-    PgClassExpression_75 -.-> P6
-    P7[">c…s>q…y>i1>description"]
-    PgClassExpression_76 -.-> P7
-    P8[">c…s>q…y>i1>note"]
-    PgClassExpression_77 -.-> P8
-    P9[">c…s>q…y>i2"]
-    PgPolymorphic_110 -.-> P9
-    P10[">c…s>q…y>i2>id x5"]
-    PgClassExpression_146 -.-> P10
-    P11[">c…s>q…y>i2>title"]
-    PgClassExpression_127 -.-> P11
-    P12[">c…s>q…y>i2>description"]
-    PgClassExpression_128 -.-> P12
-    P13[">c…s>q…y>i2>note"]
-    PgClassExpression_129 -.-> P13
-    P14[">c…s>q…y>i3"]
-    PgPolymorphic_162 -.-> P14
-    P15[">c…s>q…y>i3>id x5"]
-    PgClassExpression_198 -.-> P15
-    P16[">c…s>q…y>i3>title"]
-    PgClassExpression_179 -.-> P16
-    P17[">c…s>q…y>i3>description"]
-    PgClassExpression_180 -.-> P17
-    P18[">c…s>q…y>i3>note"]
-    PgClassExpression_181 -.-> P18
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_49[">createThreeRelationalPosts"]
+    PgClassExpression_49 -.-> P_49
+    P_5[">c…s>query"]
+    __Value_5 -.-> P_5
+    P_58[">c…s>q…y>i1"]
+    PgPolymorphic_58 -.-> P_58
+    P_94[">c…s>q…y>i1>id x5"]
+    PgClassExpression_94 -.-> P_94
+    P_75[">c…s>q…y>i1>title"]
+    PgClassExpression_75 -.-> P_75
+    P_76[">c…s>q…y>i1>description"]
+    PgClassExpression_76 -.-> P_76
+    P_77[">c…s>q…y>i1>note"]
+    PgClassExpression_77 -.-> P_77
+    P_110[">c…s>q…y>i2"]
+    PgPolymorphic_110 -.-> P_110
+    P_146[">c…s>q…y>i2>id x5"]
+    PgClassExpression_146 -.-> P_146
+    P_127[">c…s>q…y>i2>title"]
+    PgClassExpression_127 -.-> P_127
+    P_128[">c…s>q…y>i2>description"]
+    PgClassExpression_128 -.-> P_128
+    P_129[">c…s>q…y>i2>note"]
+    PgClassExpression_129 -.-> P_129
+    P_162[">c…s>q…y>i3"]
+    PgPolymorphic_162 -.-> P_162
+    P_198[">c…s>q…y>i3>id x5"]
+    PgClassExpression_198 -.-> P_198
+    P_179[">c…s>q…y>i3>title"]
+    PgClassExpression_179 -.-> P_179
+    P_180[">c…s>q…y>i3>description"]
+    PgClassExpression_180 -.-> P_180
+    P_181[">c…s>q…y>i3>note"]
+    PgClassExpression_181 -.-> P_181
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

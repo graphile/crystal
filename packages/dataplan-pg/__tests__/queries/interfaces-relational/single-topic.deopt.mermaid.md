@@ -57,28 +57,28 @@ graph TD
     Map_72 --> List_73
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">relationalTopicById"]
-    PgSelectSingle_13 -.-> P2
-    P3[">r…d>id"]
-    PgClassExpression_14 -.-> P3
-    P4[">r…d>type"]
-    PgClassExpression_22 -.-> P4
-    P5[">r…d>type2"]
-    PgClassExpression_30 -.-> P5
-    P6[">r…d>position"]
-    PgClassExpression_38 -.-> P6
-    P7[">r…d>createdAt"]
-    PgClassExpression_46 -.-> P7
-    P8[">r…d>updatedAt"]
-    PgClassExpression_54 -.-> P8
-    P9[">r…d>isExplicitlyArchived"]
-    PgClassExpression_62 -.-> P9
-    P10[">r…d>archivedAt"]
-    PgClassExpression_70 -.-> P10
-    P11[">r…d>title"]
-    PgClassExpression_71 -.-> P11
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_13[">relationalTopicById"]
+    PgSelectSingle_13 -.-> P_13
+    P_14[">r…d>id"]
+    PgClassExpression_14 -.-> P_14
+    P_22[">r…d>type"]
+    PgClassExpression_22 -.-> P_22
+    P_30[">r…d>type2"]
+    PgClassExpression_30 -.-> P_30
+    P_38[">r…d>position"]
+    PgClassExpression_38 -.-> P_38
+    P_46[">r…d>createdAt"]
+    PgClassExpression_46 -.-> P_46
+    P_54[">r…d>updatedAt"]
+    PgClassExpression_54 -.-> P_54
+    P_62[">r…d>isExplicitlyArchived"]
+    PgClassExpression_62 -.-> P_62
+    P_70[">r…d>archivedAt"]
+    PgClassExpression_70 -.-> P_70
+    P_71[">r…d>title"]
+    PgClassExpression_71 -.-> P_71
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

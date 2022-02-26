@@ -57,18 +57,18 @@ graph TD
     PgSelectSingle_35 --> PgClassExpression_36
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">allMessagesConnection"]
-    Connection_24 -.-> P2
-    P3[">a…n>pageInfo"]
-    PgPageInfo_25 -.-> P3
-    P4[">a…n>p…o>hasNextPage"]
-    Constant_26 -.-> P4
-    P5[">a…n>p…o>hasPreviousPage"]
-    Lambda_29 -.-> P5
-    P6[">a…n>totalCount"]
-    PgClassExpression_36 -.-> P6
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_24[">allMessagesConnection"]
+    Connection_24 -.-> P_24
+    P_25[">a…n>pageInfo"]
+    PgPageInfo_25 -.-> P_25
+    P_26[">a…n>p…o>hasNextPage"]
+    Constant_26 -.-> P_26
+    P_29[">a…n>p…o>hasPreviousPage"]
+    Lambda_29 -.-> P_29
+    P_36[">a…n>totalCount"]
+    PgClassExpression_36 -.-> P_36
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

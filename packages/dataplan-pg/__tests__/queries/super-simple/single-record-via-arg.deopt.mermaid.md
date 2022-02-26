@@ -35,14 +35,14 @@ graph TD
     PgSelectSingle_13 --> PgClassExpression_15
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">forum"]
-    PgSelectSingle_13 -.-> P2
-    P3[">f…m>id"]
-    PgClassExpression_14 -.-> P3
-    P4[">f…m>name"]
-    PgClassExpression_15 -.-> P4
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_13[">forum"]
+    PgSelectSingle_13 -.-> P_13
+    P_14[">f…m>id"]
+    PgClassExpression_14 -.-> P_14
+    P_15[">f…m>name"]
+    PgClassExpression_15 -.-> P_15
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

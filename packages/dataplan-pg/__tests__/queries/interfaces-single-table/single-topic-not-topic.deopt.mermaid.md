@@ -51,28 +51,28 @@ graph TD
     PgSelectSingle_14 --> PgClassExpression_23
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">singleTableTopicById"]
-    PgSelectSingle_14 -.-> P2
-    P3[">s…d>id"]
-    PgClassExpression_15 -.-> P3
-    P4[">s…d>type"]
-    PgClassExpression_16 -.-> P4
-    P5[">s…d>type2"]
-    PgClassExpression_17 -.-> P5
-    P6[">s…d>position"]
-    PgClassExpression_18 -.-> P6
-    P7[">s…d>createdAt"]
-    PgClassExpression_19 -.-> P7
-    P8[">s…d>updatedAt"]
-    PgClassExpression_20 -.-> P8
-    P9[">s…d>isExplicitlyArchived"]
-    PgClassExpression_21 -.-> P9
-    P10[">s…d>archivedAt"]
-    PgClassExpression_22 -.-> P10
-    P11[">s…d>title"]
-    PgClassExpression_23 -.-> P11
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_14[">singleTableTopicById"]
+    PgSelectSingle_14 -.-> P_14
+    P_15[">s…d>id"]
+    PgClassExpression_15 -.-> P_15
+    P_16[">s…d>type"]
+    PgClassExpression_16 -.-> P_16
+    P_17[">s…d>type2"]
+    PgClassExpression_17 -.-> P_17
+    P_18[">s…d>position"]
+    PgClassExpression_18 -.-> P_18
+    P_19[">s…d>createdAt"]
+    PgClassExpression_19 -.-> P_19
+    P_20[">s…d>updatedAt"]
+    PgClassExpression_20 -.-> P_20
+    P_21[">s…d>isExplicitlyArchived"]
+    PgClassExpression_21 -.-> P_21
+    P_22[">s…d>archivedAt"]
+    PgClassExpression_22 -.-> P_22
+    P_23[">s…d>title"]
+    PgClassExpression_23 -.-> P_23
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

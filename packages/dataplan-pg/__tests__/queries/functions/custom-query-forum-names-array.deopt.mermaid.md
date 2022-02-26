@@ -33,12 +33,12 @@ graph TD
     PgClassExpression_13 ==> __Item_14
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">forumNamesArray"]
-    PgClassExpression_13 -.-> P2
-    P3[">forumNamesArray[]"]
-    __Item_14 -.-> P3
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_13[">forumNamesArray"]
+    PgClassExpression_13 -.-> P_13
+    P_14[">forumNamesArray[]"]
+    __Item_14 -.-> P_14
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

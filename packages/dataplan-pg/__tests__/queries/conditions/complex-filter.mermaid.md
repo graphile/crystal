@@ -45,22 +45,22 @@ graph TD
     __Item_21 --> Access_42
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">forums"]
-    PgSelect_17 -.-> P2
-    P3[">forums[]"]
-    PgSelectSingle_22 -.-> P3
-    P4[">f…]>name"]
-    PgClassExpression_23 -.-> P4
-    P5[">f…]>messagesList"]
-    Access_42 -.-> P5
-    P6[">f…]>messagesList[]"]
-    PgSelectSingle_39 -.-> P6
-    P7[">f…]>m…]>body"]
-    PgClassExpression_40 -.-> P7
-    P8[">f…]>m…]>featured"]
-    PgClassExpression_41 -.-> P8
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_17[">forums"]
+    PgSelect_17 -.-> P_17
+    P_22[">forums[]"]
+    PgSelectSingle_22 -.-> P_22
+    P_23[">f…]>name"]
+    PgClassExpression_23 -.-> P_23
+    P_42[">f…]>messagesList"]
+    Access_42 -.-> P_42
+    P_39[">f…]>messagesList[]"]
+    PgSelectSingle_39 -.-> P_39
+    P_40[">f…]>m…]>body"]
+    PgClassExpression_40 -.-> P_40
+    P_41[">f…]>m…]>featured"]
+    PgClassExpression_41 -.-> P_41
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

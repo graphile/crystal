@@ -99,42 +99,42 @@ graph TD
     PgSelectSingle_85 --> PgClassExpression_86
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">forums"]
-    PgSelect_17 -.-> P2
-    P3[">forums[]"]
-    PgSelectSingle_22 -.-> P3
-    P4[">f…]>name"]
-    PgClassExpression_23 -.-> P4
-    P5[">f…]>messagesConnection"]
-    Connection_38 -.-> P5
-    P6[">f…]>m…n>nodes<br />>f…]>m…n>edges"]
-    PgSelect_39 -.-> P6
-    P7[">f…]>m…n>nodes[]<br />>f…]>m…n>edges[]<br />>f…]>m…n>e…]>node"]
-    PgSelectSingle_41 -.-> P7
-    P8[">f…]>m…n>n…]>body<br />>f…]>m…n>e…]>node>body"]
-    PgClassExpression_42 -.-> P8
-    P9[">f…]>m…n>n…]>author<br />>f…]>m…n>e…]>node>author"]
-    PgSelectSingle_49 -.-> P9
-    P10[">f…]>m…n>n…]>a…r>username<br />>f…]>m…n>e…]>node>a…r>username"]
-    PgClassExpression_50 -.-> P10
-    P11[">f…]>m…n>n…]>a…r>gravatarUrl<br />>f…]>m…n>e…]>node>a…r>gravatarUrl"]
-    PgClassExpression_51 -.-> P11
-    P12[">f…]>m…n>e…]>cursor"]
-    PgCursor_54 -.-> P12
-    P13[">f…]>m…n>pageInfo"]
-    PgPageInfo_67 -.-> P13
-    P14[">f…]>m…n>p…o>hasNextPage"]
-    Constant_68 -.-> P14
-    P15[">f…]>m…n>p…o>hasPreviousPage"]
-    Lambda_70 -.-> P15
-    P16[">f…]>m…n>p…o>startCursor"]
-    PgCursor_74 -.-> P16
-    P17[">f…]>m…n>p…o>endCursor"]
-    PgCursor_80 -.-> P17
-    P18[">f…]>m…n>totalCount"]
-    PgClassExpression_86 -.-> P18
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_17[">forums"]
+    PgSelect_17 -.-> P_17
+    P_22[">forums[]"]
+    PgSelectSingle_22 -.-> P_22
+    P_23[">f…]>name"]
+    PgClassExpression_23 -.-> P_23
+    P_38[">f…]>messagesConnection"]
+    Connection_38 -.-> P_38
+    P_39[">f…]>m…n>nodes<br />>f…]>m…n>edges"]
+    PgSelect_39 -.-> P_39
+    P_41[">f…]>m…n>nodes[]<br />>f…]>m…n>edges[]<br />>f…]>m…n>e…]>node"]
+    PgSelectSingle_41 -.-> P_41
+    P_42[">f…]>m…n>n…]>body<br />>f…]>m…n>e…]>node>body"]
+    PgClassExpression_42 -.-> P_42
+    P_49[">f…]>m…n>n…]>author<br />>f…]>m…n>e…]>node>author"]
+    PgSelectSingle_49 -.-> P_49
+    P_50[">f…]>m…n>n…]>a…r>username<br />>f…]>m…n>e…]>node>a…r>username"]
+    PgClassExpression_50 -.-> P_50
+    P_51[">f…]>m…n>n…]>a…r>gravatarUrl<br />>f…]>m…n>e…]>node>a…r>gravatarUrl"]
+    PgClassExpression_51 -.-> P_51
+    P_54[">f…]>m…n>e…]>cursor"]
+    PgCursor_54 -.-> P_54
+    P_67[">f…]>m…n>pageInfo"]
+    PgPageInfo_67 -.-> P_67
+    P_68[">f…]>m…n>p…o>hasNextPage"]
+    Constant_68 -.-> P_68
+    P_70[">f…]>m…n>p…o>hasPreviousPage"]
+    Lambda_70 -.-> P_70
+    P_74[">f…]>m…n>p…o>startCursor"]
+    PgCursor_74 -.-> P_74
+    P_80[">f…]>m…n>p…o>endCursor"]
+    PgCursor_80 -.-> P_80
+    P_86[">f…]>m…n>totalCount"]
+    PgClassExpression_86 -.-> P_86
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

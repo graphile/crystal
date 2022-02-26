@@ -42,16 +42,16 @@ graph TD
     PgSelectSingle_20 --> PgClassExpression_21
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">forum"]
-    PgSelectSingle_13 -.-> P2
-    P3[">f…m>featuredMessages"]
-    PgSelect_15 -.-> P3
-    P4[">f…m>featuredMessages[]"]
-    PgSelectSingle_20 -.-> P4
-    P5[">f…m>f…]>body"]
-    PgClassExpression_21 -.-> P5
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_13[">forum"]
+    PgSelectSingle_13 -.-> P_13
+    P_15[">f…m>featuredMessages"]
+    PgSelect_15 -.-> P_15
+    P_20[">f…m>featuredMessages[]"]
+    PgSelectSingle_20 -.-> P_20
+    P_21[">f…m>f…]>body"]
+    PgClassExpression_21 -.-> P_21
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

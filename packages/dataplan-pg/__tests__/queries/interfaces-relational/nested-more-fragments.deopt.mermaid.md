@@ -222,98 +222,98 @@ graph TD
     PgSelectSingle_663 --> PgClassExpression_814
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">people"]
-    PgSelect_7 -.-> P2
-    P3[">people[]"]
-    PgSelectSingle_12 -.-> P3
-    P4[">p…]>username"]
-    PgClassExpression_13 -.-> P4
-    P5[">p…]>items@_19[]"]
-    PgSelectSingle_21 -.-> P5
-    P6[">p…]>items"]
-    __ListTransform_19 -.-> P6
-    P7[">p…]>items[]"]
-    PgPolymorphic_25 -.-> P7
-    P8[">p…]>i…]>parent x5"]
-    PgPolymorphic_41 -.-> P8
-    P9[">p…]>i…]>p…t>id x25"]
-    PgClassExpression_772 -.-> P9
-    P10[">p…]>i…]>p…t>type x25"]
-    PgClassExpression_40 -.-> P10
-    P11[">p…]>i…]>p…t>type2 x25"]
-    PgClassExpression_51 -.-> P11
-    P12[">p…]>i…]>p…t>author x25"]
-    PgSelectSingle_58 -.-> P12
-    P13[">p…]>i…]>p…t>a…r>username x25"]
-    PgClassExpression_59 -.-> P13
-    P14[">p…]>i…]>p…t>position x25"]
-    PgClassExpression_60 -.-> P14
-    P15[">p…]>i…]>p…t>createdAt x25"]
-    PgClassExpression_61 -.-> P15
-    P16[">p…]>i…]>p…t>updatedAt x25"]
-    PgClassExpression_62 -.-> P16
-    P17[">p…]>i…]>p…t>isExplicitlyArchived x25"]
-    PgClassExpression_63 -.-> P17
-    P18[">p…]>i…]>p…t>archivedAt x25"]
-    PgClassExpression_64 -.-> P18
-    P19[">p…]>i…]>p…t>title x5"]
-    PgClassExpression_65 -.-> P19
-    P20[">p…]>i…]>p…t>title x5"]
-    PgClassExpression_89 -.-> P20
-    P21[">p…]>i…]>p…t>description x5"]
-    PgClassExpression_90 -.-> P21
-    P22[">p…]>i…]>p…t>note x5"]
-    PgClassExpression_91 -.-> P22
-    P23[">p…]>i…]>p…t>title x5"]
-    PgClassExpression_115 -.-> P23
-    P24[">p…]>i…]>p…t>color x5"]
-    PgClassExpression_116 -.-> P24
-    P25[">p…]>i…]>p…t>title x5"]
-    PgClassExpression_140 -.-> P25
-    P26[">p…]>i…]>p…t>description x5"]
-    PgClassExpression_164 -.-> P26
-    P27[">p…]>i…]>p…t>note x5"]
-    PgClassExpression_165 -.-> P27
-    P28[">p…]>i…]>id x5"]
-    PgClassExpression_657 -.-> P28
-    P29[">p…]>i…]>type x5"]
-    PgClassExpression_24 -.-> P29
-    P30[">p…]>i…]>type2 x5"]
-    PgClassExpression_168 -.-> P30
-    P31[">p…]>i…]>author x5"]
-    PgSelectSingle_175 -.-> P31
-    P32[">p…]>i…]>a…r>username x5"]
-    PgClassExpression_176 -.-> P32
-    P33[">p…]>i…]>position x5"]
-    PgClassExpression_177 -.-> P33
-    P34[">p…]>i…]>createdAt x5"]
-    PgClassExpression_178 -.-> P34
-    P35[">p…]>i…]>updatedAt x5"]
-    PgClassExpression_179 -.-> P35
-    P36[">p…]>i…]>isExplicitlyArchived x5"]
-    PgClassExpression_180 -.-> P36
-    P37[">p…]>i…]>archivedAt x5"]
-    PgClassExpression_181 -.-> P37
-    P38[">p…]>i…]>title"]
-    PgClassExpression_182 -.-> P38
-    P39[">p…]>i…]>title"]
-    PgClassExpression_339 -.-> P39
-    P40[">p…]>i…]>description"]
-    PgClassExpression_340 -.-> P40
-    P41[">p…]>i…]>note"]
-    PgClassExpression_341 -.-> P41
-    P42[">p…]>i…]>title"]
-    PgClassExpression_498 -.-> P42
-    P43[">p…]>i…]>color"]
-    PgClassExpression_499 -.-> P43
-    P44[">p…]>i…]>title"]
-    PgClassExpression_656 -.-> P44
-    P45[">p…]>i…]>description"]
-    PgClassExpression_813 -.-> P45
-    P46[">p…]>i…]>note"]
-    PgClassExpression_814 -.-> P46
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_7[">people"]
+    PgSelect_7 -.-> P_7
+    P_12[">people[]"]
+    PgSelectSingle_12 -.-> P_12
+    P_13[">p…]>username"]
+    PgClassExpression_13 -.-> P_13
+    P_21[">p…]>items@_19[]"]
+    PgSelectSingle_21 -.-> P_21
+    P_19[">p…]>items"]
+    __ListTransform_19 -.-> P_19
+    P_25[">p…]>items[]"]
+    PgPolymorphic_25 -.-> P_25
+    P_41[">p…]>i…]>parent x5"]
+    PgPolymorphic_41 -.-> P_41
+    P_772[">p…]>i…]>p…t>id x25"]
+    PgClassExpression_772 -.-> P_772
+    P_40[">p…]>i…]>p…t>type x25"]
+    PgClassExpression_40 -.-> P_40
+    P_51[">p…]>i…]>p…t>type2 x25"]
+    PgClassExpression_51 -.-> P_51
+    P_58[">p…]>i…]>p…t>author x25"]
+    PgSelectSingle_58 -.-> P_58
+    P_59[">p…]>i…]>p…t>a…r>username x25"]
+    PgClassExpression_59 -.-> P_59
+    P_60[">p…]>i…]>p…t>position x25"]
+    PgClassExpression_60 -.-> P_60
+    P_61[">p…]>i…]>p…t>createdAt x25"]
+    PgClassExpression_61 -.-> P_61
+    P_62[">p…]>i…]>p…t>updatedAt x25"]
+    PgClassExpression_62 -.-> P_62
+    P_63[">p…]>i…]>p…t>isExplicitlyArchived x25"]
+    PgClassExpression_63 -.-> P_63
+    P_64[">p…]>i…]>p…t>archivedAt x25"]
+    PgClassExpression_64 -.-> P_64
+    P_65[">p…]>i…]>p…t>title x5"]
+    PgClassExpression_65 -.-> P_65
+    P_89[">p…]>i…]>p…t>title x5"]
+    PgClassExpression_89 -.-> P_89
+    P_90[">p…]>i…]>p…t>description x5"]
+    PgClassExpression_90 -.-> P_90
+    P_91[">p…]>i…]>p…t>note x5"]
+    PgClassExpression_91 -.-> P_91
+    P_115[">p…]>i…]>p…t>title x5"]
+    PgClassExpression_115 -.-> P_115
+    P_116[">p…]>i…]>p…t>color x5"]
+    PgClassExpression_116 -.-> P_116
+    P_140[">p…]>i…]>p…t>title x5"]
+    PgClassExpression_140 -.-> P_140
+    P_164[">p…]>i…]>p…t>description x5"]
+    PgClassExpression_164 -.-> P_164
+    P_165[">p…]>i…]>p…t>note x5"]
+    PgClassExpression_165 -.-> P_165
+    P_657[">p…]>i…]>id x5"]
+    PgClassExpression_657 -.-> P_657
+    P_24[">p…]>i…]>type x5"]
+    PgClassExpression_24 -.-> P_24
+    P_168[">p…]>i…]>type2 x5"]
+    PgClassExpression_168 -.-> P_168
+    P_175[">p…]>i…]>author x5"]
+    PgSelectSingle_175 -.-> P_175
+    P_176[">p…]>i…]>a…r>username x5"]
+    PgClassExpression_176 -.-> P_176
+    P_177[">p…]>i…]>position x5"]
+    PgClassExpression_177 -.-> P_177
+    P_178[">p…]>i…]>createdAt x5"]
+    PgClassExpression_178 -.-> P_178
+    P_179[">p…]>i…]>updatedAt x5"]
+    PgClassExpression_179 -.-> P_179
+    P_180[">p…]>i…]>isExplicitlyArchived x5"]
+    PgClassExpression_180 -.-> P_180
+    P_181[">p…]>i…]>archivedAt x5"]
+    PgClassExpression_181 -.-> P_181
+    P_182[">p…]>i…]>title"]
+    PgClassExpression_182 -.-> P_182
+    P_339[">p…]>i…]>title"]
+    PgClassExpression_339 -.-> P_339
+    P_340[">p…]>i…]>description"]
+    PgClassExpression_340 -.-> P_340
+    P_341[">p…]>i…]>note"]
+    PgClassExpression_341 -.-> P_341
+    P_498[">p…]>i…]>title"]
+    PgClassExpression_498 -.-> P_498
+    P_499[">p…]>i…]>color"]
+    PgClassExpression_499 -.-> P_499
+    P_656[">p…]>i…]>title"]
+    PgClassExpression_656 -.-> P_656
+    P_813[">p…]>i…]>description"]
+    PgClassExpression_813 -.-> P_813
+    P_814[">p…]>i…]>note"]
+    PgClassExpression_814 -.-> P_814
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

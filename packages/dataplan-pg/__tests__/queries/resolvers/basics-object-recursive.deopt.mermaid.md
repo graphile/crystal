@@ -34,18 +34,18 @@ graph TD
     PgSelectSingle_12 --> PgClassExpression_13
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">randomUser"]
-    PgSelectSingle_12 -.-> P2
-    P3[">r…r>username<br />>r…r>usernameHashes"]
-    PgClassExpression_13 -.-> P3
-    P4[">r…r>u…s>md5<br />>r…r>u…s>self<br />>r…r>u…s>sha256"]
-    __Value_15 -.-> P4
-    P5[">r…r>u…s>self>MD5<br />>r…r>u…s>self>self<br />>r…r>u…s>self>SHA256<br />>r…r>u…s>self>SHA256_2"]
-    __Value_16 -.-> P5
-    P6[">r…r>u…s>self>self>md5<br />>r…r>u…s>self>self>sha256"]
-    __Value_17 -.-> P6
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_12[">randomUser"]
+    PgSelectSingle_12 -.-> P_12
+    P_13[">r…r>username<br />>r…r>usernameHashes"]
+    PgClassExpression_13 -.-> P_13
+    P_15[">r…r>u…s>md5<br />>r…r>u…s>self<br />>r…r>u…s>sha256"]
+    __Value_15 -.-> P_15
+    P_16[">r…r>u…s>self>MD5<br />>r…r>u…s>self>self<br />>r…r>u…s>self>SHA256<br />>r…r>u…s>self>SHA256_2"]
+    __Value_16 -.-> P_16
+    P_17[">r…r>u…s>self>self>md5<br />>r…r>u…s>self>self>sha256"]
+    __Value_17 -.-> P_17
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

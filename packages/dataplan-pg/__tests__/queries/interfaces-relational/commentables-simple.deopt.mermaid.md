@@ -106,32 +106,32 @@ graph TD
     Map_116 --> List_117
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">allRelationalCommentablesList@_12[]"]
-    PgSelectSingle_14 -.-> P2
-    P3[">allRelationalCommentablesList"]
-    __ListTransform_12 -.-> P3
-    P4[">allRelationalCommentablesList[]"]
-    PgPolymorphic_18 -.-> P4
-    P5[">a…]>type"]
-    PgClassExpression_33 -.-> P5
-    P6[">a…]>type2"]
-    PgClassExpression_41 -.-> P6
-    P7[">a…]>position"]
-    PgClassExpression_49 -.-> P7
-    P8[">a…]>type"]
-    PgClassExpression_64 -.-> P8
-    P9[">a…]>type2"]
-    PgClassExpression_72 -.-> P9
-    P10[">a…]>position"]
-    PgClassExpression_80 -.-> P10
-    P11[">a…]>type"]
-    PgClassExpression_95 -.-> P11
-    P12[">a…]>type2"]
-    PgClassExpression_103 -.-> P12
-    P13[">a…]>position"]
-    PgClassExpression_111 -.-> P13
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_14[">allRelationalCommentablesList@_12[]"]
+    PgSelectSingle_14 -.-> P_14
+    P_12[">allRelationalCommentablesList"]
+    __ListTransform_12 -.-> P_12
+    P_18[">allRelationalCommentablesList[]"]
+    PgPolymorphic_18 -.-> P_18
+    P_33[">a…]>type"]
+    PgClassExpression_33 -.-> P_33
+    P_41[">a…]>type2"]
+    PgClassExpression_41 -.-> P_41
+    P_49[">a…]>position"]
+    PgClassExpression_49 -.-> P_49
+    P_64[">a…]>type"]
+    PgClassExpression_64 -.-> P_64
+    P_72[">a…]>type2"]
+    PgClassExpression_72 -.-> P_72
+    P_80[">a…]>position"]
+    PgClassExpression_80 -.-> P_80
+    P_95[">a…]>type"]
+    PgClassExpression_95 -.-> P_95
+    P_103[">a…]>type2"]
+    PgClassExpression_103 -.-> P_103
+    P_111[">a…]>position"]
+    PgClassExpression_111 -.-> P_111
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

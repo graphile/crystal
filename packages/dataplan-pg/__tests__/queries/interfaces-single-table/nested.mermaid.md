@@ -74,34 +74,34 @@ graph TD
     __Item_11 --> Access_169
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">people"]
-    PgSelect_7 -.-> P2
-    P3[">people[]"]
-    PgSelectSingle_12 -.-> P3
-    P4[">p…]>username"]
-    PgClassExpression_13 -.-> P4
-    P5[">p…]>items@_19[]"]
-    PgSelectSingle_21 -.-> P5
-    P6[">p…]>items"]
-    __ListTransform_19 -.-> P6
-    P7[">p…]>items[]"]
-    PgSingleTablePolymorphic_26 -.-> P7
-    P8[">p…]>i…]>parent x5"]
-    PgSingleTablePolymorphic_36 -.-> P8
-    P9[">p…]>i…]>p…t>id x25"]
-    PgClassExpression_27 -.-> P9
-    P10[">p…]>i…]>p…t>type x25"]
-    PgClassExpression_34 -.-> P10
-    P11[">p…]>i…]>p…t>type2 x25"]
-    PgClassExpression_39 -.-> P11
-    P12[">p…]>i…]>id x5"]
-    PgClassExpression_52 -.-> P12
-    P13[">p…]>i…]>type x5"]
-    PgClassExpression_24 -.-> P13
-    P14[">p…]>i…]>type2 x5"]
-    PgClassExpression_54 -.-> P14
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_7[">people"]
+    PgSelect_7 -.-> P_7
+    P_12[">people[]"]
+    PgSelectSingle_12 -.-> P_12
+    P_13[">p…]>username"]
+    PgClassExpression_13 -.-> P_13
+    P_21[">p…]>items@_19[]"]
+    PgSelectSingle_21 -.-> P_21
+    P_19[">p…]>items"]
+    __ListTransform_19 -.-> P_19
+    P_26[">p…]>items[]"]
+    PgSingleTablePolymorphic_26 -.-> P_26
+    P_36[">p…]>i…]>parent x5"]
+    PgSingleTablePolymorphic_36 -.-> P_36
+    P_27[">p…]>i…]>p…t>id x25"]
+    PgClassExpression_27 -.-> P_27
+    P_34[">p…]>i…]>p…t>type x25"]
+    PgClassExpression_34 -.-> P_34
+    P_39[">p…]>i…]>p…t>type2 x25"]
+    PgClassExpression_39 -.-> P_39
+    P_52[">p…]>i…]>id x5"]
+    PgClassExpression_52 -.-> P_52
+    P_24[">p…]>i…]>type x5"]
+    PgClassExpression_24 -.-> P_24
+    P_54[">p…]>i…]>type2 x5"]
+    PgClassExpression_54 -.-> P_54
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

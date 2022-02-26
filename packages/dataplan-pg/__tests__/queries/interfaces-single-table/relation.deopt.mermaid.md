@@ -67,20 +67,20 @@ graph TD
     Access_291 --> Object_292
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">item"]
-    PgSingleTablePolymorphic_16 -.-> P2
-    P3[">item>parent x5"]
-    PgSingleTablePolymorphic_26 -.-> P3
-    P4[">item>p…t>id x25"]
-    PgClassExpression_17 -.-> P4
-    P5[">item>p…t>author x25"]
-    PgSelectSingle_34 -.-> P5
-    P6[">item>p…t>a…r>username x25"]
-    PgClassExpression_35 -.-> P6
-    P7[">item>id x5"]
-    PgClassExpression_72 -.-> P7
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_16[">item"]
+    PgSingleTablePolymorphic_16 -.-> P_16
+    P_26[">item>parent x5"]
+    PgSingleTablePolymorphic_26 -.-> P_26
+    P_17[">item>p…t>id x25"]
+    PgClassExpression_17 -.-> P_17
+    P_34[">item>p…t>author x25"]
+    PgSelectSingle_34 -.-> P_34
+    P_35[">item>p…t>a…r>username x25"]
+    PgClassExpression_35 -.-> P_35
+    P_72[">item>id x5"]
+    PgClassExpression_72 -.-> P_72
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

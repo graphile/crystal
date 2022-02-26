@@ -82,32 +82,32 @@ graph TD
     PgSelectSingle_46 --> PgClassExpression_48
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">forums"]
-    PgSelect_17 -.-> P2
-    P3[">forums[]"]
-    PgSelectSingle_22 -.-> P3
-    P4[">f…]>name"]
-    PgClassExpression_23 -.-> P4
-    P5[">f…]>messagesWithManyTransforms@_28[]"]
-    Lambda_37 -.-> P5
-    P6[">f…]>messagesWithManyTransforms@_29[]"]
-    PgClassExpression_40 -.-> P6
-    P7[">f…]>messagesWithManyTransforms@_31[]"]
-    __Item_41 -.-> P7
-    P8[">f…]>messagesWithManyTransforms"]
-    __ListTransform_31 -.-> P8
-    P9[">f…]>messagesWithManyTransforms[]@_43[]"]
-    __Item_44 -.-> P9
-    P10[">f…]>messagesWithManyTransforms[]"]
-    __ListTransform_43 -.-> P10
-    P11[">f…]>messagesWithManyTransforms[][]"]
-    PgSelectSingle_46 -.-> P11
-    P12[">f…]>m…]>body"]
-    PgClassExpression_47 -.-> P12
-    P13[">f…]>m…]>featured"]
-    PgClassExpression_48 -.-> P13
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_17[">forums"]
+    PgSelect_17 -.-> P_17
+    P_22[">forums[]"]
+    PgSelectSingle_22 -.-> P_22
+    P_23[">f…]>name"]
+    PgClassExpression_23 -.-> P_23
+    P_37[">f…]>messagesWithManyTransforms@_28[]"]
+    Lambda_37 -.-> P_37
+    P_40[">f…]>messagesWithManyTransforms@_29[]"]
+    PgClassExpression_40 -.-> P_40
+    P_41[">f…]>messagesWithManyTransforms@_31[]"]
+    __Item_41 -.-> P_41
+    P_31[">f…]>messagesWithManyTransforms"]
+    __ListTransform_31 -.-> P_31
+    P_44[">f…]>messagesWithManyTransforms[]@_43[]"]
+    __Item_44 -.-> P_44
+    P_43[">f…]>messagesWithManyTransforms[]"]
+    __ListTransform_43 -.-> P_43
+    P_46[">f…]>messagesWithManyTransforms[][]"]
+    PgSelectSingle_46 -.-> P_46
+    P_47[">f…]>m…]>body"]
+    PgClassExpression_47 -.-> P_47
+    P_48[">f…]>m…]>featured"]
+    PgClassExpression_48 -.-> P_48
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

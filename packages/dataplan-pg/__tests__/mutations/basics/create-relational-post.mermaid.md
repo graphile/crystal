@@ -91,32 +91,32 @@ graph TD
     Map_71 --> List_72
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">createRelationalPost"]
-    PgClassExpression_22 -.-> P2
-    P3[">c…t>id"]
-    PgClassExpression_23 -.-> P3
-    P4[">c…t>post"]
-    PgSelectSingle_30 -.-> P4
-    P5[">c…t>post>id"]
-    PgClassExpression_31 -.-> P5
-    P6[">c…t>post>title"]
-    PgClassExpression_32 -.-> P6
-    P7[">c…t>post>description"]
-    PgClassExpression_33 -.-> P7
-    P8[">c…t>post>note"]
-    PgClassExpression_34 -.-> P8
-    P9[">c…t>post>titleLower"]
-    PgClassExpression_42 -.-> P9
-    P10[">c…t>post>isExplicitlyArchived"]
-    PgClassExpression_50 -.-> P10
-    P11[">c…t>post>author"]
-    PgSelectSingle_64 -.-> P11
-    P12[">c…t>post>a…r>personId"]
-    PgClassExpression_65 -.-> P12
-    P13[">c…t>post>a…r>username"]
-    PgClassExpression_66 -.-> P13
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_22[">createRelationalPost"]
+    PgClassExpression_22 -.-> P_22
+    P_23[">c…t>id"]
+    PgClassExpression_23 -.-> P_23
+    P_30[">c…t>post"]
+    PgSelectSingle_30 -.-> P_30
+    P_31[">c…t>post>id"]
+    PgClassExpression_31 -.-> P_31
+    P_32[">c…t>post>title"]
+    PgClassExpression_32 -.-> P_32
+    P_33[">c…t>post>description"]
+    PgClassExpression_33 -.-> P_33
+    P_34[">c…t>post>note"]
+    PgClassExpression_34 -.-> P_34
+    P_42[">c…t>post>titleLower"]
+    PgClassExpression_42 -.-> P_42
+    P_50[">c…t>post>isExplicitlyArchived"]
+    PgClassExpression_50 -.-> P_50
+    P_64[">c…t>post>author"]
+    PgSelectSingle_64 -.-> P_64
+    P_65[">c…t>post>a…r>personId"]
+    PgClassExpression_65 -.-> P_65
+    P_66[">c…t>post>a…r>username"]
+    PgClassExpression_66 -.-> P_66
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

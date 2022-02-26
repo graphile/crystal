@@ -33,16 +33,16 @@ graph TD
     PgSelectSingle_22 --> PgClassExpression_24
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">forums"]
-    PgSelect_17 -.-> P2
-    P3[">forums[]"]
-    PgSelectSingle_22 -.-> P3
-    P4[">f…]>name"]
-    PgClassExpression_23 -.-> P4
-    P5[">f…]>isArchived"]
-    PgClassExpression_24 -.-> P5
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_17[">forums"]
+    PgSelect_17 -.-> P_17
+    P_22[">forums[]"]
+    PgSelectSingle_22 -.-> P_22
+    P_23[">f…]>name"]
+    PgClassExpression_23 -.-> P_23
+    P_24[">f…]>isArchived"]
+    PgClassExpression_24 -.-> P_24
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

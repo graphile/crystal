@@ -68,36 +68,36 @@ graph TD
     PgSelectSingle_23 --> PgClassExpression_34
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">people"]
-    PgSelect_7 -.-> P2
-    P3[">people[]"]
-    PgSelectSingle_12 -.-> P3
-    P4[">p…]>username"]
-    PgClassExpression_13 -.-> P4
-    P5[">p…]>items@_19[]"]
-    PgSelectSingle_21 -.-> P5
-    P6[">p…]>items"]
-    __ListTransform_19 -.-> P6
-    P7[">p…]>items[]"]
-    PgSingleTablePolymorphic_26 -.-> P7
-    P8[">p…]>i…]>id x5"]
-    PgClassExpression_27 -.-> P8
-    P9[">p…]>i…]>type x5"]
-    PgClassExpression_24 -.-> P9
-    P10[">p…]>i…]>type2 x5"]
-    PgClassExpression_29 -.-> P10
-    P11[">p…]>i…]>position x5"]
-    PgClassExpression_30 -.-> P11
-    P12[">p…]>i…]>createdAt x5"]
-    PgClassExpression_31 -.-> P12
-    P13[">p…]>i…]>updatedAt x5"]
-    PgClassExpression_32 -.-> P13
-    P14[">p…]>i…]>isExplicitlyArchived x5"]
-    PgClassExpression_33 -.-> P14
-    P15[">p…]>i…]>archivedAt x5"]
-    PgClassExpression_34 -.-> P15
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_7[">people"]
+    PgSelect_7 -.-> P_7
+    P_12[">people[]"]
+    PgSelectSingle_12 -.-> P_12
+    P_13[">p…]>username"]
+    PgClassExpression_13 -.-> P_13
+    P_21[">p…]>items@_19[]"]
+    PgSelectSingle_21 -.-> P_21
+    P_19[">p…]>items"]
+    __ListTransform_19 -.-> P_19
+    P_26[">p…]>items[]"]
+    PgSingleTablePolymorphic_26 -.-> P_26
+    P_27[">p…]>i…]>id x5"]
+    PgClassExpression_27 -.-> P_27
+    P_24[">p…]>i…]>type x5"]
+    PgClassExpression_24 -.-> P_24
+    P_29[">p…]>i…]>type2 x5"]
+    PgClassExpression_29 -.-> P_29
+    P_30[">p…]>i…]>position x5"]
+    PgClassExpression_30 -.-> P_30
+    P_31[">p…]>i…]>createdAt x5"]
+    PgClassExpression_31 -.-> P_31
+    P_32[">p…]>i…]>updatedAt x5"]
+    PgClassExpression_32 -.-> P_32
+    P_33[">p…]>i…]>isExplicitlyArchived x5"]
+    PgClassExpression_33 -.-> P_33
+    P_34[">p…]>i…]>archivedAt x5"]
+    PgClassExpression_34 -.-> P_34
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

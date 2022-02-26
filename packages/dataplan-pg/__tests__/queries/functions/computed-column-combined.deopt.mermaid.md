@@ -76,26 +76,26 @@ graph TD
     Map_47 --> List_48
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">forum"]
-    PgSelectSingle_13 -.-> P2
-    P3[">f…m>randomUser"]
-    PgSelectSingle_20 -.-> P3
-    P4[">f…m>r…r>username"]
-    PgClassExpression_21 -.-> P4
-    P5[">f…m>r…r>gravatarUrl"]
-    PgClassExpression_22 -.-> P5
-    P6[">f…m>r…r>mostRecentForum"]
-    PgSelectSingle_29 -.-> P6
-    P7[">f…m>r…r>m…m>uniqueAuthorCount"]
-    PgClassExpression_38 -.-> P7
-    P8[">f…m>r…r>m…m>featuredMessages"]
-    PgSelect_40 -.-> P8
-    P9[">f…m>r…r>m…m>featuredMessages[]"]
-    PgSelectSingle_45 -.-> P9
-    P10[">f…m>r…r>m…m>f…]>body"]
-    PgClassExpression_46 -.-> P10
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_13[">forum"]
+    PgSelectSingle_13 -.-> P_13
+    P_20[">f…m>randomUser"]
+    PgSelectSingle_20 -.-> P_20
+    P_21[">f…m>r…r>username"]
+    PgClassExpression_21 -.-> P_21
+    P_22[">f…m>r…r>gravatarUrl"]
+    PgClassExpression_22 -.-> P_22
+    P_29[">f…m>r…r>mostRecentForum"]
+    PgSelectSingle_29 -.-> P_29
+    P_38[">f…m>r…r>m…m>uniqueAuthorCount"]
+    PgClassExpression_38 -.-> P_38
+    P_40[">f…m>r…r>m…m>featuredMessages"]
+    PgSelect_40 -.-> P_40
+    P_45[">f…m>r…r>m…m>featuredMessages[]"]
+    PgSelectSingle_45 -.-> P_45
+    P_46[">f…m>r…r>m…m>f…]>body"]
+    PgClassExpression_46 -.-> P_46
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

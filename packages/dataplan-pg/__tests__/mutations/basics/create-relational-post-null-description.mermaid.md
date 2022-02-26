@@ -59,22 +59,22 @@ graph TD
     PgSelectSingle_30 --> PgClassExpression_34
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">createRelationalPost"]
-    PgClassExpression_22 -.-> P2
-    P3[">c…t>id"]
-    PgClassExpression_23 -.-> P3
-    P4[">c…t>post"]
-    PgSelectSingle_30 -.-> P4
-    P5[">c…t>post>id"]
-    PgClassExpression_31 -.-> P5
-    P6[">c…t>post>title"]
-    PgClassExpression_32 -.-> P6
-    P7[">c…t>post>description"]
-    PgClassExpression_33 -.-> P7
-    P8[">c…t>post>note"]
-    PgClassExpression_34 -.-> P8
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_22[">createRelationalPost"]
+    PgClassExpression_22 -.-> P_22
+    P_23[">c…t>id"]
+    PgClassExpression_23 -.-> P_23
+    P_30[">c…t>post"]
+    PgSelectSingle_30 -.-> P_30
+    P_31[">c…t>post>id"]
+    PgClassExpression_31 -.-> P_31
+    P_32[">c…t>post>title"]
+    PgClassExpression_32 -.-> P_32
+    P_33[">c…t>post>description"]
+    PgClassExpression_33 -.-> P_33
+    P_34[">c…t>post>note"]
+    PgClassExpression_34 -.-> P_34
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

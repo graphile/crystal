@@ -67,16 +67,16 @@ graph TD
     Map_45 --> List_46
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">forum"]
-    PgSelectSingle_13 -.-> P2
-    P3[">f…m>all"]
-    PgClassExpression_22 -.-> P3
-    P4[">f…m>featured"]
-    PgClassExpression_31 -.-> P4
-    P5[">f…m>unfeatured"]
-    PgClassExpression_40 -.-> P5
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_13[">forum"]
+    PgSelectSingle_13 -.-> P_13
+    P_22[">f…m>all"]
+    PgClassExpression_22 -.-> P_22
+    P_31[">f…m>featured"]
+    PgClassExpression_31 -.-> P_31
+    P_40[">f…m>unfeatured"]
+    PgClassExpression_40 -.-> P_40
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

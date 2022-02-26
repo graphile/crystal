@@ -119,54 +119,54 @@ graph TD
     PgSelectSingle_99 --> PgClassExpression_109
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">people"]
-    PgSelect_7 -.-> P2
-    P3[">people[]"]
-    PgSelectSingle_12 -.-> P3
-    P4[">p…]>username"]
-    PgClassExpression_13 -.-> P4
-    P5[">p…]>items@_19[]"]
-    PgSelectSingle_21 -.-> P5
-    P6[">p…]>items"]
-    __ListTransform_19 -.-> P6
-    P7[">p…]>items[]"]
-    PgPolymorphic_25 -.-> P7
-    P8[">p…]>i…]>id x5"]
-    PgClassExpression_93 -.-> P8
-    P9[">p…]>i…]>type x5"]
-    PgClassExpression_24 -.-> P9
-    P10[">p…]>i…]>type2 x5"]
-    PgClassExpression_35 -.-> P10
-    P11[">p…]>i…]>position x5"]
-    PgClassExpression_36 -.-> P11
-    P12[">p…]>i…]>createdAt x5"]
-    PgClassExpression_37 -.-> P12
-    P13[">p…]>i…]>updatedAt x5"]
-    PgClassExpression_38 -.-> P13
-    P14[">p…]>i…]>isExplicitlyArchived x5"]
-    PgClassExpression_39 -.-> P14
-    P15[">p…]>i…]>archivedAt x5"]
-    PgClassExpression_40 -.-> P15
-    P16[">p…]>i…]>title"]
-    PgClassExpression_41 -.-> P16
-    P17[">p…]>i…]>title"]
-    PgClassExpression_57 -.-> P17
-    P18[">p…]>i…]>description"]
-    PgClassExpression_58 -.-> P18
-    P19[">p…]>i…]>note"]
-    PgClassExpression_59 -.-> P19
-    P20[">p…]>i…]>title"]
-    PgClassExpression_75 -.-> P20
-    P21[">p…]>i…]>color"]
-    PgClassExpression_76 -.-> P21
-    P22[">p…]>i…]>title"]
-    PgClassExpression_92 -.-> P22
-    P23[">p…]>i…]>description"]
-    PgClassExpression_108 -.-> P23
-    P24[">p…]>i…]>note"]
-    PgClassExpression_109 -.-> P24
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_7[">people"]
+    PgSelect_7 -.-> P_7
+    P_12[">people[]"]
+    PgSelectSingle_12 -.-> P_12
+    P_13[">p…]>username"]
+    PgClassExpression_13 -.-> P_13
+    P_21[">p…]>items@_19[]"]
+    PgSelectSingle_21 -.-> P_21
+    P_19[">p…]>items"]
+    __ListTransform_19 -.-> P_19
+    P_25[">p…]>items[]"]
+    PgPolymorphic_25 -.-> P_25
+    P_93[">p…]>i…]>id x5"]
+    PgClassExpression_93 -.-> P_93
+    P_24[">p…]>i…]>type x5"]
+    PgClassExpression_24 -.-> P_24
+    P_35[">p…]>i…]>type2 x5"]
+    PgClassExpression_35 -.-> P_35
+    P_36[">p…]>i…]>position x5"]
+    PgClassExpression_36 -.-> P_36
+    P_37[">p…]>i…]>createdAt x5"]
+    PgClassExpression_37 -.-> P_37
+    P_38[">p…]>i…]>updatedAt x5"]
+    PgClassExpression_38 -.-> P_38
+    P_39[">p…]>i…]>isExplicitlyArchived x5"]
+    PgClassExpression_39 -.-> P_39
+    P_40[">p…]>i…]>archivedAt x5"]
+    PgClassExpression_40 -.-> P_40
+    P_41[">p…]>i…]>title"]
+    PgClassExpression_41 -.-> P_41
+    P_57[">p…]>i…]>title"]
+    PgClassExpression_57 -.-> P_57
+    P_58[">p…]>i…]>description"]
+    PgClassExpression_58 -.-> P_58
+    P_59[">p…]>i…]>note"]
+    PgClassExpression_59 -.-> P_59
+    P_75[">p…]>i…]>title"]
+    PgClassExpression_75 -.-> P_75
+    P_76[">p…]>i…]>color"]
+    PgClassExpression_76 -.-> P_76
+    P_92[">p…]>i…]>title"]
+    PgClassExpression_92 -.-> P_92
+    P_108[">p…]>i…]>description"]
+    PgClassExpression_108 -.-> P_108
+    P_109[">p…]>i…]>note"]
+    PgClassExpression_109 -.-> P_109
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

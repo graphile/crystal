@@ -31,12 +31,12 @@ graph TD
     PgSelectSingle_12 --> PgClassExpression_13
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">forumNames"]
-    PgSelect_7 -.-> P2
-    P3[">forumNames[]"]
-    PgClassExpression_13 -.-> P3
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_7[">forumNames"]
+    PgSelect_7 -.-> P_7
+    P_13[">forumNames[]"]
+    PgClassExpression_13 -.-> P_13
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

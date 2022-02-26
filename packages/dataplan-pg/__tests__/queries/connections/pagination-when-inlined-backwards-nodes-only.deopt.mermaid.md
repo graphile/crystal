@@ -93,40 +93,40 @@ graph TD
     PgSelectSingle_70 --> PgClassExpression_71
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">forums"]
-    PgSelect_17 -.-> P2
-    P3[">forums[]"]
-    PgSelectSingle_22 -.-> P3
-    P4[">f…]>name"]
-    PgClassExpression_23 -.-> P4
-    P5[">f…]>messagesConnection"]
-    Connection_38 -.-> P5
-    P6[">f…]>m…n>nodes"]
-    PgSelect_39 -.-> P6
-    P7[">f…]>m…n>nodes[]"]
-    PgSelectSingle_41 -.-> P7
-    P8[">f…]>m…n>n…]>body"]
-    PgClassExpression_42 -.-> P8
-    P9[">f…]>m…n>n…]>author"]
-    PgSelectSingle_49 -.-> P9
-    P10[">f…]>m…n>n…]>a…r>username"]
-    PgClassExpression_50 -.-> P10
-    P11[">f…]>m…n>n…]>a…r>gravatarUrl"]
-    PgClassExpression_51 -.-> P11
-    P12[">f…]>m…n>pageInfo"]
-    PgPageInfo_52 -.-> P12
-    P13[">f…]>m…n>p…o>hasNextPage"]
-    Constant_53 -.-> P13
-    P14[">f…]>m…n>p…o>hasPreviousPage"]
-    Lambda_55 -.-> P14
-    P15[">f…]>m…n>p…o>startCursor"]
-    PgCursor_59 -.-> P15
-    P16[">f…]>m…n>p…o>endCursor"]
-    PgCursor_65 -.-> P16
-    P17[">f…]>m…n>totalCount"]
-    PgClassExpression_71 -.-> P17
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_17[">forums"]
+    PgSelect_17 -.-> P_17
+    P_22[">forums[]"]
+    PgSelectSingle_22 -.-> P_22
+    P_23[">f…]>name"]
+    PgClassExpression_23 -.-> P_23
+    P_38[">f…]>messagesConnection"]
+    Connection_38 -.-> P_38
+    P_39[">f…]>m…n>nodes"]
+    PgSelect_39 -.-> P_39
+    P_41[">f…]>m…n>nodes[]"]
+    PgSelectSingle_41 -.-> P_41
+    P_42[">f…]>m…n>n…]>body"]
+    PgClassExpression_42 -.-> P_42
+    P_49[">f…]>m…n>n…]>author"]
+    PgSelectSingle_49 -.-> P_49
+    P_50[">f…]>m…n>n…]>a…r>username"]
+    PgClassExpression_50 -.-> P_50
+    P_51[">f…]>m…n>n…]>a…r>gravatarUrl"]
+    PgClassExpression_51 -.-> P_51
+    P_52[">f…]>m…n>pageInfo"]
+    PgPageInfo_52 -.-> P_52
+    P_53[">f…]>m…n>p…o>hasNextPage"]
+    Constant_53 -.-> P_53
+    P_55[">f…]>m…n>p…o>hasPreviousPage"]
+    Lambda_55 -.-> P_55
+    P_59[">f…]>m…n>p…o>startCursor"]
+    PgCursor_59 -.-> P_59
+    P_65[">f…]>m…n>p…o>endCursor"]
+    PgCursor_65 -.-> P_65
+    P_71[">f…]>m…n>totalCount"]
+    PgClassExpression_71 -.-> P_71
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

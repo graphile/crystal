@@ -39,22 +39,22 @@ graph TD
     InputStaticLeaf_25 --> Connection_38
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">forums"]
-    PgSelect_17 -.-> P2
-    P3[">forums[]"]
-    PgSelectSingle_22 -.-> P3
-    P4[">f…]>name"]
-    PgClassExpression_23 -.-> P4
-    P5[">f…]>messagesConnection"]
-    Connection_38 -.-> P5
-    P6[">f…]>m…n>pageInfo"]
-    PgPageInfo_40 -.-> P6
-    P7[">f…]>m…n>p…o>hasNextPage"]
-    Constant_41 -.-> P7
-    P8[">f…]>m…n>p…o>hasPreviousPage"]
-    Constant_42 -.-> P8
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_17[">forums"]
+    PgSelect_17 -.-> P_17
+    P_22[">forums[]"]
+    PgSelectSingle_22 -.-> P_22
+    P_23[">f…]>name"]
+    PgClassExpression_23 -.-> P_23
+    P_38[">f…]>messagesConnection"]
+    Connection_38 -.-> P_38
+    P_40[">f…]>m…n>pageInfo"]
+    PgPageInfo_40 -.-> P_40
+    P_41[">f…]>m…n>p…o>hasNextPage"]
+    Constant_41 -.-> P_41
+    P_42[">f…]>m…n>p…o>hasPreviousPage"]
+    Constant_42 -.-> P_42
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

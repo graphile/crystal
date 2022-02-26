@@ -43,16 +43,16 @@ graph TD
     Map_23 --> List_24
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">forum"]
-    PgSelectSingle_13 -.-> P2
-    P3[">f…m>randomUser"]
-    PgSelectSingle_20 -.-> P3
-    P4[">f…m>r…r>username"]
-    PgClassExpression_21 -.-> P4
-    P5[">f…m>r…r>gravatarUrl"]
-    PgClassExpression_22 -.-> P5
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_13[">forum"]
+    PgSelectSingle_13 -.-> P_13
+    P_20[">f…m>randomUser"]
+    PgSelectSingle_20 -.-> P_20
+    P_21[">f…m>r…r>username"]
+    PgClassExpression_21 -.-> P_21
+    P_22[">f…m>r…r>gravatarUrl"]
+    PgClassExpression_22 -.-> P_22
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

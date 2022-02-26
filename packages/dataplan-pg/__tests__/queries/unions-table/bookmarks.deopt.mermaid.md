@@ -138,50 +138,50 @@ graph TD
     First_12 --> Access_92
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">personByPersonId"]
-    PgSelectSingle_13 -.-> P2
-    P3[">p…d>personId"]
-    PgClassExpression_14 -.-> P3
-    P4[">p…d>username"]
-    PgClassExpression_15 -.-> P4
-    P5[">p…d>personBookmarksList"]
-    Access_92 -.-> P5
-    P6[">p…d>personBookmarksList[]"]
-    PgSelectSingle_22 -.-> P6
-    P7[">p…d>p…]>id"]
-    PgClassExpression_23 -.-> P7
-    P8[">p…d>p…]>person"]
-    PgSelectSingle_30 -.-> P8
-    P9[">p…d>p…]>p…n>username"]
-    PgClassExpression_31 -.-> P9
-    P10[">p…d>p…]>bookmarkedEntity"]
-    PgPolymorphic_37 -.-> P10
-    P11[">p…d>p…]>b…y>personId"]
-    PgClassExpression_44 -.-> P11
-    P12[">p…d>p…]>b…y>username"]
-    PgClassExpression_45 -.-> P12
-    P13[">p…d>p…]>b…y>postId"]
-    PgClassExpression_52 -.-> P13
-    P14[">p…d>p…]>b…y>author"]
-    PgSelectSingle_59 -.-> P14
-    P15[">p…d>p…]>b…y>a…r>username"]
-    PgClassExpression_60 -.-> P15
-    P16[">p…d>p…]>b…y>body"]
-    PgClassExpression_61 -.-> P16
-    P17[">p…d>p…]>b…y>commentId"]
-    PgClassExpression_68 -.-> P17
-    P18[">p…d>p…]>b…y>author"]
-    PgSelectSingle_75 -.-> P18
-    P19[">p…d>p…]>b…y>a…r>username"]
-    PgClassExpression_76 -.-> P19
-    P20[">p…d>p…]>b…y>post"]
-    PgSelectSingle_83 -.-> P20
-    P21[">p…d>p…]>b…y>post>body"]
-    PgClassExpression_84 -.-> P21
-    P22[">p…d>p…]>b…y>body"]
-    PgClassExpression_85 -.-> P22
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_13[">personByPersonId"]
+    PgSelectSingle_13 -.-> P_13
+    P_14[">p…d>personId"]
+    PgClassExpression_14 -.-> P_14
+    P_15[">p…d>username"]
+    PgClassExpression_15 -.-> P_15
+    P_92[">p…d>personBookmarksList"]
+    Access_92 -.-> P_92
+    P_22[">p…d>personBookmarksList[]"]
+    PgSelectSingle_22 -.-> P_22
+    P_23[">p…d>p…]>id"]
+    PgClassExpression_23 -.-> P_23
+    P_30[">p…d>p…]>person"]
+    PgSelectSingle_30 -.-> P_30
+    P_31[">p…d>p…]>p…n>username"]
+    PgClassExpression_31 -.-> P_31
+    P_37[">p…d>p…]>bookmarkedEntity"]
+    PgPolymorphic_37 -.-> P_37
+    P_44[">p…d>p…]>b…y>personId"]
+    PgClassExpression_44 -.-> P_44
+    P_45[">p…d>p…]>b…y>username"]
+    PgClassExpression_45 -.-> P_45
+    P_52[">p…d>p…]>b…y>postId"]
+    PgClassExpression_52 -.-> P_52
+    P_59[">p…d>p…]>b…y>author"]
+    PgSelectSingle_59 -.-> P_59
+    P_60[">p…d>p…]>b…y>a…r>username"]
+    PgClassExpression_60 -.-> P_60
+    P_61[">p…d>p…]>b…y>body"]
+    PgClassExpression_61 -.-> P_61
+    P_68[">p…d>p…]>b…y>commentId"]
+    PgClassExpression_68 -.-> P_68
+    P_75[">p…d>p…]>b…y>author"]
+    PgSelectSingle_75 -.-> P_75
+    P_76[">p…d>p…]>b…y>a…r>username"]
+    PgClassExpression_76 -.-> P_76
+    P_83[">p…d>p…]>b…y>post"]
+    PgSelectSingle_83 -.-> P_83
+    P_84[">p…d>p…]>b…y>post>body"]
+    PgClassExpression_84 -.-> P_84
+    P_85[">p…d>p…]>b…y>body"]
+    PgClassExpression_85 -.-> P_85
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

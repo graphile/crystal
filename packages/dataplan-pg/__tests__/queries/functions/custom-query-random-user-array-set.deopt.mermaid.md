@@ -49,22 +49,22 @@ graph TD
     PgSelectSingle_19 --> PgClassExpression_21
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">randomUserArraySet@_11[]"]
-    PgClassExpression_14 -.-> P2
-    P3[">randomUserArraySet"]
-    __ListTransform_11 -.-> P3
-    P4[">randomUserArraySet[]@_16[]"]
-    __Item_17 -.-> P4
-    P5[">randomUserArraySet[]"]
-    __ListTransform_16 -.-> P5
-    P6[">randomUserArraySet[][]"]
-    PgSelectSingle_19 -.-> P6
-    P7[">r…]>username"]
-    PgClassExpression_20 -.-> P7
-    P8[">r…]>gravatarUrl"]
-    PgClassExpression_21 -.-> P8
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_14[">randomUserArraySet@_11[]"]
+    PgClassExpression_14 -.-> P_14
+    P_11[">randomUserArraySet"]
+    __ListTransform_11 -.-> P_11
+    P_17[">randomUserArraySet[]@_16[]"]
+    __Item_17 -.-> P_17
+    P_16[">randomUserArraySet[]"]
+    __ListTransform_16 -.-> P_16
+    P_19[">randomUserArraySet[][]"]
+    PgSelectSingle_19 -.-> P_19
+    P_20[">r…]>username"]
+    PgClassExpression_20 -.-> P_20
+    P_21[">r…]>gravatarUrl"]
+    PgClassExpression_21 -.-> P_21
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

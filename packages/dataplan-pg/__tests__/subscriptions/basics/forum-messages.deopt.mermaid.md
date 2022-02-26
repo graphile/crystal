@@ -82,38 +82,38 @@ graph TD
     PgSelectSingle_44 --> PgClassExpression_46
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">forumMessage"]
-    JSONParse_12 -.-> P2
-    P3[">f…e>operationType"]
-    Lambda_15 -.-> P3
-    P4[">f…e>message"]
-    PgSelectSingle_22 -.-> P4
-    P5[">f…e>m…e>id"]
-    PgClassExpression_23 -.-> P5
-    P6[">f…e>m…e>featured"]
-    PgClassExpression_24 -.-> P6
-    P7[">f…e>m…e>body"]
-    PgClassExpression_25 -.-> P7
-    P8[">f…e>m…e>isArchived"]
-    PgClassExpression_26 -.-> P8
-    P9[">f…e>m…e>forum<br />>f…e>m…e>f…m>self"]
-    PgSelectSingle_33 -.-> P9
-    P10[">f…e>m…e>f…m>id"]
-    PgClassExpression_27 -.-> P10
-    P11[">f…e>m…e>f…m>name<br />>f…e>m…e>f…m>self>name"]
-    PgClassExpression_35 -.-> P11
-    P12[">f…e>m…e>f…m>isArchived"]
-    PgClassExpression_36 -.-> P12
-    P13[">f…e>m…e>author"]
-    PgSelectSingle_44 -.-> P13
-    P14[">f…e>m…e>a…r>username"]
-    PgClassExpression_45 -.-> P14
-    P15[">f…e>m…e>a…r>gravatarUrl"]
-    PgClassExpression_46 -.-> P15
-    P16["~"]
-    Subscribe_10 -.-> P16
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_12[">forumMessage"]
+    JSONParse_12 -.-> P_12
+    P_15[">f…e>operationType"]
+    Lambda_15 -.-> P_15
+    P_22[">f…e>message"]
+    PgSelectSingle_22 -.-> P_22
+    P_23[">f…e>m…e>id"]
+    PgClassExpression_23 -.-> P_23
+    P_24[">f…e>m…e>featured"]
+    PgClassExpression_24 -.-> P_24
+    P_25[">f…e>m…e>body"]
+    PgClassExpression_25 -.-> P_25
+    P_26[">f…e>m…e>isArchived"]
+    PgClassExpression_26 -.-> P_26
+    P_33[">f…e>m…e>forum<br />>f…e>m…e>f…m>self"]
+    PgSelectSingle_33 -.-> P_33
+    P_27[">f…e>m…e>f…m>id"]
+    PgClassExpression_27 -.-> P_27
+    P_35[">f…e>m…e>f…m>name<br />>f…e>m…e>f…m>self>name"]
+    PgClassExpression_35 -.-> P_35
+    P_36[">f…e>m…e>f…m>isArchived"]
+    PgClassExpression_36 -.-> P_36
+    P_44[">f…e>m…e>author"]
+    PgSelectSingle_44 -.-> P_44
+    P_45[">f…e>m…e>a…r>username"]
+    PgClassExpression_45 -.-> P_45
+    P_46[">f…e>m…e>a…r>gravatarUrl"]
+    PgClassExpression_46 -.-> P_46
+    P_10["~"]
+    Subscribe_10 -.-> P_10
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

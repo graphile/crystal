@@ -104,38 +104,38 @@ graph TD
     Map_73 --> List_74
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">item1"]
-    PgPolymorphic_15 -.-> P2
-    P3[">i…1>id"]
-    PgClassExpression_23 -.-> P3
-    P4[">i…1>title"]
-    PgClassExpression_24 -.-> P4
-    P5[">i…1>id"]
-    PgClassExpression_32 -.-> P5
-    P6[">i…1>title"]
-    PgClassExpression_33 -.-> P6
-    P7[">i…1>description"]
-    PgClassExpression_34 -.-> P7
-    P8[">i…1>note"]
-    PgClassExpression_35 -.-> P8
-    P9[">i…1>id"]
-    PgClassExpression_43 -.-> P9
-    P10[">i…1>title"]
-    PgClassExpression_44 -.-> P10
-    P11[">i…1>color"]
-    PgClassExpression_45 -.-> P11
-    P12[">i…1>id"]
-    PgClassExpression_53 -.-> P12
-    P13[">i…1>title"]
-    PgClassExpression_54 -.-> P13
-    P14[">i…1>id"]
-    PgClassExpression_62 -.-> P14
-    P15[">i…1>description"]
-    PgClassExpression_63 -.-> P15
-    P16[">i…1>note"]
-    PgClassExpression_64 -.-> P16
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_15[">item1"]
+    PgPolymorphic_15 -.-> P_15
+    P_23[">i…1>id"]
+    PgClassExpression_23 -.-> P_23
+    P_24[">i…1>title"]
+    PgClassExpression_24 -.-> P_24
+    P_32[">i…1>id"]
+    PgClassExpression_32 -.-> P_32
+    P_33[">i…1>title"]
+    PgClassExpression_33 -.-> P_33
+    P_34[">i…1>description"]
+    PgClassExpression_34 -.-> P_34
+    P_35[">i…1>note"]
+    PgClassExpression_35 -.-> P_35
+    P_43[">i…1>id"]
+    PgClassExpression_43 -.-> P_43
+    P_44[">i…1>title"]
+    PgClassExpression_44 -.-> P_44
+    P_45[">i…1>color"]
+    PgClassExpression_45 -.-> P_45
+    P_53[">i…1>id"]
+    PgClassExpression_53 -.-> P_53
+    P_54[">i…1>title"]
+    PgClassExpression_54 -.-> P_54
+    P_62[">i…1>id"]
+    PgClassExpression_62 -.-> P_62
+    P_63[">i…1>description"]
+    PgClassExpression_63 -.-> P_63
+    P_64[">i…1>note"]
+    PgClassExpression_64 -.-> P_64
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

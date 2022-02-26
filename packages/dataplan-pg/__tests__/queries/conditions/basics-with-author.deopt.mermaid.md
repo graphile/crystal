@@ -58,26 +58,26 @@ graph TD
     PgSelectSingle_47 --> PgClassExpression_49
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">forums"]
-    PgSelect_17 -.-> P2
-    P3[">forums[]"]
-    PgSelectSingle_22 -.-> P3
-    P4[">f…]>name"]
-    PgClassExpression_23 -.-> P4
-    P5[">f…]>messagesList"]
-    PgSelect_33 -.-> P5
-    P6[">f…]>messagesList[]"]
-    PgSelectSingle_39 -.-> P6
-    P7[">f…]>m…]>body"]
-    PgClassExpression_40 -.-> P7
-    P8[">f…]>m…]>author"]
-    PgSelectSingle_47 -.-> P8
-    P9[">f…]>m…]>a…r>username"]
-    PgClassExpression_48 -.-> P9
-    P10[">f…]>m…]>a…r>gravatarUrl"]
-    PgClassExpression_49 -.-> P10
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_17[">forums"]
+    PgSelect_17 -.-> P_17
+    P_22[">forums[]"]
+    PgSelectSingle_22 -.-> P_22
+    P_23[">f…]>name"]
+    PgClassExpression_23 -.-> P_23
+    P_33[">f…]>messagesList"]
+    PgSelect_33 -.-> P_33
+    P_39[">f…]>messagesList[]"]
+    PgSelectSingle_39 -.-> P_39
+    P_40[">f…]>m…]>body"]
+    PgClassExpression_40 -.-> P_40
+    P_47[">f…]>m…]>author"]
+    PgSelectSingle_47 -.-> P_47
+    P_48[">f…]>m…]>a…r>username"]
+    PgClassExpression_48 -.-> P_48
+    P_49[">f…]>m…]>a…r>gravatarUrl"]
+    PgClassExpression_49 -.-> P_49
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

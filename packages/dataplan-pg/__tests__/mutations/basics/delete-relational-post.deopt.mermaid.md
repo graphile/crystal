@@ -131,52 +131,52 @@ graph TD
     Map_97 --> List_98
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">d1"]
-    PgDelete_9 -.-> P2
-    P3[">d1>id"]
-    PgClassExpression_13 -.-> P3
-    P4[">d1>post"]
-    PgSelectSingle_20 -.-> P4
-    P5[">d1>post>id"]
-    PgClassExpression_21 -.-> P5
-    P6[">d1>post>title"]
-    PgClassExpression_22 -.-> P6
-    P7[">d1>post>description"]
-    PgClassExpression_23 -.-> P7
-    P8[">d1>post>note"]
-    PgClassExpression_24 -.-> P8
-    P9[">d1>post>titleLower"]
-    PgClassExpression_32 -.-> P9
-    P10[">d1>post>author"]
-    PgSelectSingle_46 -.-> P10
-    P11[">d1>post>a…r>personId"]
-    PgClassExpression_47 -.-> P11
-    P12[">d1>post>a…r>username"]
-    PgClassExpression_48 -.-> P12
-    P13[">d2"]
-    PgDelete_51 -.-> P13
-    P14[">d2>id"]
-    PgClassExpression_55 -.-> P14
-    P15[">d2>post"]
-    PgSelectSingle_62 -.-> P15
-    P16[">d2>post>id"]
-    PgClassExpression_63 -.-> P16
-    P17[">d2>post>title"]
-    PgClassExpression_64 -.-> P17
-    P18[">d2>post>description"]
-    PgClassExpression_65 -.-> P18
-    P19[">d2>post>note"]
-    PgClassExpression_66 -.-> P19
-    P20[">d2>post>titleLower"]
-    PgClassExpression_74 -.-> P20
-    P21[">d2>post>author"]
-    PgSelectSingle_88 -.-> P21
-    P22[">d2>post>a…r>personId"]
-    PgClassExpression_89 -.-> P22
-    P23[">d2>post>a…r>username"]
-    PgClassExpression_90 -.-> P23
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_9[">d1"]
+    PgDelete_9 -.-> P_9
+    P_13[">d1>id"]
+    PgClassExpression_13 -.-> P_13
+    P_20[">d1>post"]
+    PgSelectSingle_20 -.-> P_20
+    P_21[">d1>post>id"]
+    PgClassExpression_21 -.-> P_21
+    P_22[">d1>post>title"]
+    PgClassExpression_22 -.-> P_22
+    P_23[">d1>post>description"]
+    PgClassExpression_23 -.-> P_23
+    P_24[">d1>post>note"]
+    PgClassExpression_24 -.-> P_24
+    P_32[">d1>post>titleLower"]
+    PgClassExpression_32 -.-> P_32
+    P_46[">d1>post>author"]
+    PgSelectSingle_46 -.-> P_46
+    P_47[">d1>post>a…r>personId"]
+    PgClassExpression_47 -.-> P_47
+    P_48[">d1>post>a…r>username"]
+    PgClassExpression_48 -.-> P_48
+    P_51[">d2"]
+    PgDelete_51 -.-> P_51
+    P_55[">d2>id"]
+    PgClassExpression_55 -.-> P_55
+    P_62[">d2>post"]
+    PgSelectSingle_62 -.-> P_62
+    P_63[">d2>post>id"]
+    PgClassExpression_63 -.-> P_63
+    P_64[">d2>post>title"]
+    PgClassExpression_64 -.-> P_64
+    P_65[">d2>post>description"]
+    PgClassExpression_65 -.-> P_65
+    P_66[">d2>post>note"]
+    PgClassExpression_66 -.-> P_66
+    P_74[">d2>post>titleLower"]
+    PgClassExpression_74 -.-> P_74
+    P_88[">d2>post>author"]
+    PgSelectSingle_88 -.-> P_88
+    P_89[">d2>post>a…r>personId"]
+    PgClassExpression_89 -.-> P_89
+    P_90[">d2>post>a…r>username"]
+    PgClassExpression_90 -.-> P_90
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

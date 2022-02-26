@@ -35,16 +35,16 @@ graph TD
     PgDelete_16 --> PgClassExpression_20
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">d1"]
-    PgDelete_9 -.-> P2
-    P3[">d1>id"]
-    PgClassExpression_13 -.-> P3
-    P4[">d2"]
-    PgDelete_16 -.-> P4
-    P5[">d2>id"]
-    PgClassExpression_20 -.-> P5
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_9[">d1"]
+    PgDelete_9 -.-> P_9
+    P_13[">d1>id"]
+    PgClassExpression_13 -.-> P_13
+    P_16[">d2"]
+    PgDelete_16 -.-> P_16
+    P_20[">d2>id"]
+    PgClassExpression_20 -.-> P_20
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

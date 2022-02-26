@@ -53,14 +53,14 @@ graph TD
     PgSelectSingle_29 --> PgClassExpression_30
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">all"]
-    PgClassExpression_14 -.-> P2
-    P3[">featured"]
-    PgClassExpression_22 -.-> P3
-    P4[">unfeatured"]
-    PgClassExpression_30 -.-> P4
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_14[">all"]
+    PgClassExpression_14 -.-> P_14
+    P_22[">featured"]
+    PgClassExpression_22 -.-> P_22
+    P_30[">unfeatured"]
+    PgClassExpression_30 -.-> P_30
 
     %% allocate buckets
     classDef bucket0 stroke:#696969

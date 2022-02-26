@@ -42,14 +42,14 @@ graph TD
     PgClassExpression_17 --> Lambda_18
 
     %% plan-to-path relationships
-    P1["~"]
-    __TrackedObject_6 -.-> P1
-    P2[">FORUM_NAMES@_11[]"]
-    PgClassExpression_14 -.-> P2
-    P3[">FORUM_NAMES"]
-    __ListTransform_11 -.-> P3
-    P4[">FORUM_NAMES[]"]
-    Lambda_18 -.-> P4
+    P_6["~"]
+    __TrackedObject_6 -.-> P_6
+    P_14[">FORUM_NAMES@_11[]"]
+    PgClassExpression_14 -.-> P_14
+    P_11[">FORUM_NAMES"]
+    __ListTransform_11 -.-> P_11
+    P_18[">FORUM_NAMES[]"]
+    Lambda_18 -.-> P_18
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
