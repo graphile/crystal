@@ -2774,7 +2774,14 @@ export class Aether<
     for (const list of Object.values(pathIdentitiesByPlanId)) {
       list.sort((a, z) => a.length - z.length);
     }
-    return pathIdentitiesByPlanId;
+    const keys = Object.keys(pathIdentitiesByPlanId).sort(
+      (a, z) => parseInt(a.substring(1), 10) - parseInt(z.substring(1), 10),
+    );
+    // Return pathIdentitiesByPlanId but with sorted keys
+    return keys.reduce((memo, key) => {
+      memo[key] = pathIdentitiesByPlanId[key];
+      return memo;
+    }, Object.create(null) as typeof pathIdentitiesByPlanId);
   }
 
   private assignBucketIds() {
