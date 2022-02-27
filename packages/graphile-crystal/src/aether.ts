@@ -5814,75 +5814,73 @@ export class Aether<
       }
     }
 
-    if (this.buckets.length > 1) {
-      graph.push("");
-      graph.push("    subgraph Buckets");
-      for (const bucket of this.buckets) {
-        const raisonDEtre = (() => {
-          if (
-            bucket.groupId === 0 &&
-            bucket.itemPlanId == null &&
-            bucket.polymorphicPlanIds == null
-          ) {
-            return "root";
-          }
-          const reasons: string[] = [];
-          if (bucket.groupId != null) {
-            reasons.push(
-              `group${bucket.groupId}[${this.groups[bucket.groupId].reason}]`,
-            );
-          }
-          if (bucket.itemPlanId != null) {
-            reasons.push(`item${bucket.itemPlanId}`);
-          }
-          if (bucket.polymorphicPlanIds != null) {
-            reasons.push(
-              `polymorphic${bucket.polymorphicPlanIds.join(
-                "&",
-              )}[${bucket.polymorphicTypeNames!.join("|")}]`,
-            );
-          }
-          return reasons.join(", ");
-        })();
-        const outputMapStuff: string[] = [];
-        const process = (
-          obj: { [fieldName: string]: BucketDefinitionFieldOutputMap },
-          path = "⠀⠀",
-        ): void => {
-          for (const fieldName in obj) {
-            const def = obj[fieldName];
-            const planIds = Object.values(def.planIdByRootPathIdentity);
-            const allIdsSame = planIds.every((id) => id === planIds[0]);
-            const planSource = allIdsSame
-              ? planIds[0]
-              : JSON.stringify(def.planIdByRootPathIdentity);
-            outputMapStuff.push(
-              `${path}${fieldName} <-${def.mode}- ${planSource}`,
-            );
-            if (def.children) {
-              process(def.children, `⠀${path}${fieldName}.`);
-            }
-          }
-        };
-        process(bucket.outputMap);
-        graph.push(
-          `    Bucket${bucket.id}(${dotEscape(
-            `Bucket ${
-              bucket.id
-            } (${raisonDEtre})\n${bucket.rootPathIdentities.join("\n")}\n${
-              bucket.rootOutputPlanId != null
-                ? `⠀ROOT <-O- ${bucket.rootOutputPlanId}\n`
-                : ""
-            }${outputMapStuff.join("\n")}`,
-          )}):::bucket`,
-        );
-        graph.push(`    style Bucket${bucket.id} stroke:${color(bucket.id)}`);
-        if (bucket.parent) {
-          graph.push(`    Bucket${bucket.parent.id} --> Bucket${bucket.id}`);
+    graph.push("");
+    graph.push("    subgraph Buckets");
+    for (const bucket of this.buckets) {
+      const raisonDEtre = (() => {
+        if (
+          bucket.groupId === 0 &&
+          bucket.itemPlanId == null &&
+          bucket.polymorphicPlanIds == null
+        ) {
+          return "root";
         }
+        const reasons: string[] = [];
+        if (bucket.groupId != null) {
+          reasons.push(
+            `group${bucket.groupId}[${this.groups[bucket.groupId].reason}]`,
+          );
+        }
+        if (bucket.itemPlanId != null) {
+          reasons.push(`item${bucket.itemPlanId}`);
+        }
+        if (bucket.polymorphicPlanIds != null) {
+          reasons.push(
+            `polymorphic${bucket.polymorphicPlanIds.join(
+              "&",
+            )}[${bucket.polymorphicTypeNames!.join("|")}]`,
+          );
+        }
+        return reasons.join(", ");
+      })();
+      const outputMapStuff: string[] = [];
+      const process = (
+        obj: { [fieldName: string]: BucketDefinitionFieldOutputMap },
+        path = "⠀⠀",
+      ): void => {
+        for (const fieldName in obj) {
+          const def = obj[fieldName];
+          const planIds = Object.values(def.planIdByRootPathIdentity);
+          const allIdsSame = planIds.every((id) => id === planIds[0]);
+          const planSource = allIdsSame
+            ? planIds[0]
+            : JSON.stringify(def.planIdByRootPathIdentity);
+          outputMapStuff.push(
+            `${path}${fieldName} <-${def.mode}- ${planSource}`,
+          );
+          if (def.children) {
+            process(def.children, `⠀${path}${fieldName}.`);
+          }
+        }
+      };
+      process(bucket.outputMap);
+      graph.push(
+        `    Bucket${bucket.id}(${dotEscape(
+          `Bucket ${
+            bucket.id
+          } (${raisonDEtre})\n${bucket.rootPathIdentities.join("\n")}\n${
+            bucket.rootOutputPlanId != null
+              ? `⠀ROOT <-O- ${bucket.rootOutputPlanId}\n`
+              : ""
+          }${outputMapStuff.join("\n")}`,
+        )}):::bucket`,
+      );
+      graph.push(`    style Bucket${bucket.id} stroke:${color(bucket.id)}`);
+      if (bucket.parent) {
+        graph.push(`    Bucket${bucket.parent.id} --> Bucket${bucket.id}`);
       }
-      graph.push("    end");
     }
+    graph.push("    end");
 
     const graphString = graph.join("\n");
     return graphString;
