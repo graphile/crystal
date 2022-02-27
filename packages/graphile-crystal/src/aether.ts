@@ -3710,6 +3710,9 @@ export class Aether<
                 );
               }
               fieldSpec.planIdByRootPathIdentity[rootPathIdentity] = plan.id;
+              if (plan.bucketId !== bucket.id) {
+                bucket.copyPlans.add(plan);
+              }
               if (
                 fieldSpec.typeNames &&
                 !fieldSpec.typeNames.includes(typeName!)
@@ -6482,9 +6485,11 @@ export class Aether<
       process(bucket.outputMap);
       graph.push(
         `    Bucket${bucket.id}(${dotEscape(
-          `Bucket ${
-            bucket.id
-          } (${raisonDEtre})\n${bucket.rootPathIdentities.join("\n")}\n${
+          `Bucket ${bucket.id} (${raisonDEtre})\n${
+            bucket.copyPlans.size > 0
+              ? `Deps: ${[...bucket.copyPlans].map((p) => p.id).join(", ")}\n`
+              : ""
+          }${bucket.rootPathIdentities.join("\n")}\n${
             bucket.rootOutputPlanId != null
               ? `⠀ROOT <-O- ${bucket.rootOutputPlanId}\n`
               : ""
