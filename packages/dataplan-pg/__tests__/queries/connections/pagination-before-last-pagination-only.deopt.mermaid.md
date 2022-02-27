@@ -8,9 +8,8 @@ graph TD
 
 
     %% define plans
+    __Value_0["__Value[_0∈0]"]:::plan
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     InputStaticLeaf_14["InputStaticLeaf[_14∈0]"]:::plan
     InputStaticLeaf_15["InputStaticLeaf[_15∈0]"]:::plan
     InputStaticLeaf_16["InputStaticLeaf[_16∈0]"]:::plan
@@ -33,7 +32,6 @@ graph TD
     PgClassExpression_36["PgClassExpression[_36∈0]<br /><count(*)>"]:::plan
 
     %% plan dependencies
-    __Value_5 --> __TrackedObject_6
     __Value_3 --> Access_21
     __Value_3 --> Access_22
     Access_21 --> Object_23
@@ -57,8 +55,8 @@ graph TD
     PgSelectSingle_35 --> PgClassExpression_36
 
     %% plan-to-path relationships
-    P_6["~"]
-    __TrackedObject_6 -.-> P_6
+    P_0["~"]
+    __Value_0 -.-> P_0
     P_24[">allMessagesConnection"]
     Connection_24 -.-> P_24
     P_25[">a…n>pageInfo"]
@@ -72,10 +70,10 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_14,InputStaticLeaf_15,InputStaticLeaf_16,InputStaticLeaf_17,Access_21,Access_22,Object_23,Connection_24,PgPageInfo_25,Constant_26,PgSelect_27,Lambda_28,Lambda_29,PgValidateParsedCursor_30,Access_31,ToPg_32,PgSelect_33,First_34,PgSelectSingle_35,PgClassExpression_36 bucket0
+    class __Value_0,__Value_3,InputStaticLeaf_14,InputStaticLeaf_15,InputStaticLeaf_16,InputStaticLeaf_17,Access_21,Access_22,Object_23,Connection_24,PgPageInfo_25,Constant_26,PgSelect_27,Lambda_28,Lambda_29,PgValidateParsedCursor_30,Access_31,ToPg_32,PgSelect_33,First_34,PgSelectSingle_35,PgClassExpression_36 bucket0
 
     subgraph "Buckets for queries/connections/pagination-before-last-pagination-only"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀allMessagesConnection <-O- _24<br />⠀⠀⠀allMessagesConnection.pageInfo <-O- _25<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasNextPage <-L- _26<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasPreviousPage <-L- _29<br />⠀⠀⠀allMessagesConnection.totalCount <-L- _36"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀allMessagesConnection <-O- _24<br />⠀⠀⠀allMessagesConnection.pageInfo <-O- _25<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasNextPage <-L- _26<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasPreviousPage <-L- _29<br />⠀⠀⠀allMessagesConnection.totalCount <-L- _36"):::bucket
     style Bucket0 stroke:#696969
     end
 ```
