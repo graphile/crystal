@@ -4257,6 +4257,7 @@ export class Aether<
         }
       },
       (error) => {
+        const crystalError = new CrystalError(error);
         for (let i = 0; i < pendingPlanResultsesLength; i++) {
           // Execution complete; delete from cache
           const planResults = pendingPlanResultses[i];
@@ -4266,7 +4267,7 @@ export class Aether<
           // Add the result to our results
           const j = pendingPlanResultsesIndexes[i];
           // TODO: is wrapping in a CrystalError here correct?
-          result[j] = new CrystalError(error);
+          result[j] = crystalError;
 
           // Reject the promise
           pendingDeferreds[i].reject(error);
