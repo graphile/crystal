@@ -371,7 +371,9 @@ interface BucketDefinition {
   /**
    * If this is not a polymorphic bucket, what is the associated type name?
    */
-  singleTypeName: string | null;
+  singleTypeNameByRootPathIdentity: {
+    [rootPathIdentity: string]: string;
+  } | null;
 
   /**
    * Some plans that execute within this bucket may be output to a particular
@@ -884,14 +886,6 @@ export class Aether<
       parent: null,
       rootPathIdentities: [ROOT_PATH],
       groupId: 0,
-      singleTypeName:
-        this.operationType === "query"
-          ? this.queryTypeName
-          : this.operationType === "mutation"
-          ? this.mutationTypeName ?? null
-          : this.operationType === "subscription"
-          ? this.subscriptionTypeName ?? null
-          : null,
     });
     assert.strictEqual(
       this.rootBucket.id,
@@ -1106,13 +1100,38 @@ export class Aether<
       | "polymorphicPlanIds"
       | "polymorphicTypeNames"
       | "rootPathIdentities"
-      | "singleTypeName"
     >,
   ): BucketDefinition {
     const id = this.buckets.length;
+    let singleTypeNameByRootPathIdentity: BucketDefinition["singleTypeNameByRootPathIdentity"] =
+      spec.polymorphicTypeNames ? null : {};
+    if (singleTypeNameByRootPathIdentity) {
+      for (const rootPathIdentity of spec.rootPathIdentities) {
+        if (rootPathIdentity == ROOT_PATH) {
+          singleTypeNameByRootPathIdentity[rootPathIdentity] =
+            this.operationType === "query"
+              ? this.queryTypeName
+              : this.operationType === "mutation"
+              ? this.mutationTypeName!
+              : this.operationType === "subscription"
+              ? this.subscriptionTypeName!
+              : (null as never);
+        } else {
+          const fieldDigest = this.fieldDigestByPathIdentity[rootPathIdentity];
+          if (fieldDigest) {
+            singleTypeNameByRootPathIdentity[rootPathIdentity] =
+              fieldDigest.namedReturnType.name;
+          } else {
+            singleTypeNameByRootPathIdentity = null;
+            break;
+          }
+        }
+      }
+    }
     const bucket: BucketDefinition = {
       id,
       ...spec,
+      singleTypeNameByRootPathIdentity,
       outputMap: Object.create(null),
       ancestors: spec.parent ? [...spec.parent.ancestors, spec.parent] : [],
       children: [],
@@ -3174,19 +3193,6 @@ export class Aether<
       const fieldDigests = pathIdentitiesByPlanId[plan.id]
         ?.map((pathIdentity) => this.fieldDigestByPathIdentity[pathIdentity])
         .filter(isNotNullish);
-      const singleTypeNames = polymorphicDetails
-        ? null
-        : fieldDigests?.map((d) => d.namedReturnType.name) ?? null;
-      const singleTypeName = singleTypeNames?.[0] ?? null;
-      if (singleTypeName != null) {
-        if (!singleTypeNames!.every((tn) => tn === singleTypeName)) {
-          throw new Error(
-            `Expected all type names to be equal to '${singleTypeName}', instead found ${singleTypeNames!.join(
-              ", ",
-            )}`,
-          );
-        }
-      }
 
       // __ItemPlan's get their own bucket (these may or may not be in a new group too)
       if (plan instanceof __ItemPlan) {
@@ -3201,7 +3207,6 @@ export class Aether<
             groupId,
             polymorphicPlanIds,
             polymorphicTypeNames,
-            singleTypeName,
           });
           plan.bucketId = newBucket.id;
           return plan;
@@ -3231,7 +3236,6 @@ export class Aether<
             groupId,
             polymorphicPlanIds,
             polymorphicTypeNames,
-            singleTypeName,
           });
           plan.bucketId = newBucket.id;
           return plan;
@@ -3280,7 +3284,6 @@ export class Aether<
             groupId,
             polymorphicPlanIds,
             polymorphicTypeNames,
-            singleTypeName,
           });
           dependencyPlans.forEach((dependencyPlan) =>
             newBucket.copyPlans.add(dependencyPlan),
@@ -3313,7 +3316,6 @@ export class Aether<
           groupId,
           polymorphicPlanIds,
           polymorphicTypeNames,
-          singleTypeName,
         });
         dependencyPlans.forEach((dependencyPlan) =>
           newBucket.copyPlans.add(dependencyPlan),
@@ -5728,7 +5730,8 @@ export class Aether<
         [this.contextPlan.id]: ctxs,
         [this.rootValuePlan.id]: rvs,
       }),
-      singleTypeName: this.rootBucket.singleTypeName,
+      singleTypeName:
+        this.rootBucket.singleTypeNameByRootPathIdentity![ROOT_PATH],
       rootPathIdentity: ROOT_PATH,
     };
     const metaByPlanId: CrystalContext["metaByPlanId"] = Object.create(null);
@@ -6030,7 +6033,10 @@ export class Aether<
               rootPathIdentity: childRootPathIdentity,
               singleTypeName: child.childBucketDefinition.polymorphicTypeNames
                 ? null
-                : child.childBucketDefinition.singleTypeName,
+                : child.childBucketDefinition
+                    .singleTypeNameByRootPathIdentity?.[
+                    childRootPathIdentity
+                  ] ?? null,
               definition: child.childBucketDefinition,
               store: child.store,
               size: child.inputs.length,
