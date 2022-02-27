@@ -60,6 +60,7 @@ import type {
   CrystalContext,
   CrystalObject,
   CrystalResultsList,
+  CrystalValuesList,
   FieldAndGroup,
   GroupedSelections,
   PlanOptions,
@@ -426,6 +427,9 @@ interface BucketDefinition {
    * reference them?
    */
   copyPlans: Set<ExecutablePlan>;
+
+  plans: ExecutablePlan[];
+  startPlans: ExecutablePlan[];
 }
 
 // IMPORTANT: this WILL NOT WORK when compiled down to ES5. It requires ES6+
@@ -444,6 +448,113 @@ export class CrystalError extends Error {
     super(message ? `CrystalError: ${message}` : `CrystalError`);
     this.originalError = originalError;
   }
+}
+
+/**
+ * When we take a plan result and store it to the result tree, for non-leaf
+ * plans we're either storing a list or an object. What the underlying plan
+ * represents this as is irrelevant - e.g. a plan for an object type might
+ * return a tuple instead of an object; this is fine - we should still add an
+ * object to the result tree.
+ *
+ * Where possible we try and "merge" the result with the previous result.
+ *
+ * @internal
+ */
+function bucketValue(
+  previousValue: any,
+  value: any,
+  mode: BucketDefinitionFieldOutputMap["mode"],
+): any {
+  switch (mode) {
+    case "A": {
+      if (Array.isArray(value)) {
+        if (Array.isArray(previousValue)) {
+          if (previousValue.length !== value.length) {
+            throw new Error(
+              `Bucket value was already set to an array, but had the wrong length.`,
+            );
+          }
+          return previousValue;
+        }
+        return new Array(value.length).fill(undefined);
+      } else if (value == null || value instanceof CrystalError) {
+        return value;
+      } else {
+        // TODO: should we fallback to null, or raise an error, or...?
+        console.warn(
+          `Hit fallback for value ${inspect(value)} coercion to mode ${mode}`,
+        );
+        return null;
+      }
+    }
+    case "O": {
+      if (value == null || value instanceof CrystalError) {
+        return value;
+      } else {
+        if (
+          typeof previousValue === "object" &&
+          previousValue != null &&
+          !(previousValue instanceof CrystalError)
+        ) {
+          return previousValue;
+        } else {
+          return Object.create(null);
+        }
+      }
+    }
+    case "L": {
+      return value;
+    }
+    default: {
+      const never: never = mode;
+      throw new Error(
+        `GraphileInternalError<31d26531-b20f-434c-91d8-686048da404c>: Unhandled bucket mode '${never}'`,
+      );
+    }
+  }
+}
+
+class BucketSetter {
+  public readonly root: any;
+  constructor(
+    private parentObject: Record<string, unknown> | unknown[],
+    private parentKey: number | string,
+  ) {
+    this.root = parentObject[parentKey];
+  }
+
+  public setRoot(newRoot: any) {
+    (this.root as any) = newRoot;
+    this.parentObject[this.parentKey] = newRoot;
+  }
+}
+
+interface Bucket {
+  /**
+   * The bucket definition this bucket adheres to
+   */
+  definition: BucketDefinition;
+  rootPathIdentity: string;
+  typeName: string | null;
+  /**
+   * The number of elements the bucket represents.
+   */
+  size: number;
+  /**
+   * Same length as the bucket has 'size'
+   */
+  input: BucketSetter[];
+  /**
+   * An array of the same size as the bucket to feed to plans that have no
+   * dependencies so they output the right number of results.
+   */
+  noDepsList: readonly undefined[];
+  /**
+   * Every entry in the store is a list with the same length as the bucket has
+   * `size`.
+   */
+  store: { [planId: string]: any[] };
 }
 
 interface GroupAndChildren extends Group {
@@ -901,11 +1012,16 @@ export class Aether<
     // themselves (e.g. compiling SQL queries ahead of time).
     this.finalizePlans();
 
-    // Populate 'dependentPlans' for all plans
+    // Populate 'dependentPlans' for all plans, also fix the depIds
     for (const [id, plan] of Object.entries(this.plans)) {
       if (plan && plan.id === id) {
-        for (const depId of plan.dependencies) {
+        for (let i = 0, l = plan.dependencies.length; i < l; i++) {
+          const depId = plan.dependencies[i];
           const dep = this.plans[depId];
+
+          // Fix the dependency reference
+          (plan.dependencies[i] as any) = dep.id;
+
           dep.dependentPlans.push(plan);
         }
       }
@@ -956,6 +1072,8 @@ export class Aether<
       ancestors: spec.parent ? [...spec.parent.ancestors, spec.parent] : [],
       children: [],
       copyPlans: new Set(),
+      plans: [],
+      startPlans: [],
     };
     spec.parent?.children.push(bucket);
     this.buckets[id] = bucket;
@@ -3528,6 +3646,39 @@ export class Aether<
         }
       }
     }
+
+    // Thes are populated for us in `executePreemptive` so they don't really count
+    const ignoredPlans: ExecutablePlan[] = [
+      this.variableValuesPlan,
+      this.contextPlan,
+      this.rootValuePlan,
+    ];
+    // Track which plans belong in which buckets
+    for (const bucket of this.buckets) {
+      const plans = Object.entries(this.plans)
+        .filter(
+          ([planId, plan]) =>
+            plan &&
+            plan.id === planId &&
+            plan.bucketId === bucket.id &&
+            !ignoredPlans.includes(plan),
+        )
+        .map((t) => t[1]);
+      bucket.plans = plans;
+      // Start plans are the plans that have no dependencies within this bucket
+      bucket.startPlans = plans.filter((p) =>
+        p.dependencies.every((depId) => {
+          const dep = this.plans[depId];
+          if (dep.bucketId !== bucket.id) {
+            return true;
+          }
+          if (ignoredPlans.includes(dep)) {
+            return true;
+          }
+          return false;
+        }),
+      );
+    }
   }
 
   /**
@@ -5438,6 +5589,178 @@ export class Aether<
       planCacheForPlanResultses,
       0,
     );
+  }
+
+  public executePreemptive(
+    variableValues: any,
+    context: any,
+    rootValue: any,
+  ): null | PromiseOrDirect<{ [$$data]: any }> {
+    if (!this.pure) {
+      // Cannot currently preempt operations that involve user-supplied resolvers
+      return null;
+    }
+    if (this.operationType !== "query") {
+      // Cannot currently preempt mutation/subscription requests
+      return null;
+    }
+    if (this.groups.length > 1) {
+      // Cannot currently preempt stream/defer/subscription/mutation execution
+      return null;
+    }
+    if (this.buckets.length > 1) {
+      // Cannot currently preempt across multiple buckets
+      return null;
+    }
+    const rootField = this.fieldDigestByPathIdentity[ROOT_PATH];
+    if (!rootField.childFieldDigests) {
+      throw new Error(
+        "GraphileInternalError<51dfe77e-3912-4aaa-9481-6e760a07c03b>: missing selection set? Field digests not present for root.",
+      );
+    }
+
+    // TODO: batch this method so it can process multiple GraphQL requests in parallel
+    const batch = [undefined];
+    const input = batch.map((value, index) => new BucketSetter(batch, index));
+    const vars = batch.map(() => variableValues);
+    const ctxs = batch.map(() => context);
+    const rvs = batch.map(() => rootValue);
+    const rootBucket: Bucket = {
+      definition: this.rootBucket,
+      size: input.length,
+      input,
+      noDepsList: Object.freeze(new Array(input.length).fill(undefined)),
+      store: Object.assign(Object.create(null), {
+        [this.variableValuesPlan.id]: vars,
+        [this.contextPlan.id]: ctxs,
+        [this.rootValuePlan.id]: rvs,
+      }),
+      typeName: null,
+      rootPathIdentity: ROOT_PATH,
+    };
+    const metaByPlanId: CrystalContext["metaByPlanId"] = Object.create(null);
+    for (const [planId, plan] of Object.entries(this.plans)) {
+      if (plan && plan.id === planId) {
+        metaByPlanId[plan.id] = Object.create(null);
+      }
+    }
+    return this.executeBucket(metaByPlanId, rootBucket);
+  }
+
+  public executeBucket(
+    metaByPlanId: CrystalContext["metaByPlanId"],
+    bucket: Bucket,
+  ): PromiseOrDirect<{ [$$data]: any }> {
+    const inProgressPlans = new Set();
+    const pendingPlans = new Set(bucket.definition.plans);
+
+    const completedPlan = (
+      finishedPlan: ExecutablePlan,
+      result: CrystalValuesList<any>,
+    ): void | Promise<void> => {
+      if (!Array.isArray(result)) {
+        throw new Error(
+          `Result from ${finishedPlan} should be an array, instead received ${inspect(
+            result,
+            { colors: true },
+          )}`,
+        );
+      }
+      if (result.length !== bucket.size) {
+        throw new Error(
+          `Result array from ${finishedPlan} should have length ${bucket.size}, instead it had length ${result.length}`,
+        );
+      }
+      bucket.store[finishedPlan.id] = result;
+      inProgressPlans.delete(finishedPlan);
+      pendingPlans.delete(finishedPlan);
+      if (pendingPlans.size === 0) {
+        // Finished!
+        return;
+      }
+      const promises: PromiseLike<void>[] = [];
+      for (const potentialNextPlan of finishedPlan.dependentPlans) {
+        const isPending = pendingPlans.has(potentialNextPlan);
+        const isSuitable = isPending
+          ? potentialNextPlan.dependencies.every((depId) =>
+              Array.isArray(bucket.store[depId]),
+            )
+          : false;
+        if (isSuitable) {
+          // executePlan never THROW/REJECTs
+          const r = executePlan(potentialNextPlan);
+          if (isPromiseLike(r)) {
+            promises.push(r);
+          }
+        }
+      }
+      if (promises.length > 0) {
+        return Promise.all(promises) as Promise<any> as Promise<void>;
+      } else {
+        return;
+      }
+    };
+
+    /**
+     * This function MUST NEVER THROW/REJECT.
+     */
+    const executePlan = (plan: ExecutablePlan): void | PromiseLike<void> => {
+      if (inProgressPlans.has(plan)) {
+        return;
+      }
+      inProgressPlans.add(plan);
+      try {
+        const meta = metaByPlanId[plan.id]!;
+        const dependencies =
+          plan.dependencies.length > 0
+            ? plan.dependencies.map((depId) => bucket.store[depId])
+            : [bucket.noDepsList];
+        const result = plan.execute(dependencies, meta);
+        if (isPromiseLike(result)) {
+          return result.then(
+            (values) => {
+              return completedPlan(plan, values);
+            },
+            (error) => {
+              return completedPlan(
+                plan,
+                new Array(bucket.size).fill(new CrystalError(error)),
+              );
+            },
+          );
+        } else {
+          return completedPlan(plan, result);
+        }
+      } catch (error) {
+        return completedPlan(
+          plan,
+          new Array(bucket.size).fill(new CrystalError(error)),
+        );
+      }
+    };
+    const starterPromises: PromiseLike<void>[] = [];
+    for (const plan of bucket.definition.startPlans) {
+      const r = executePlan(plan);
+      if (isPromiseLike(r)) {
+        starterPromises.push(r);
+      }
+    }
+    const produceOutput = (): { [$$data]: any } => {
+      if (pendingPlans.size > 0) {
+        throw new Error(
+          `produceOutput called before all plans were complete! Remaining plans were: ${[
+            ...pendingPlans,
+          ].join(", ")}`,
+        );
+      }
+      console.dir(bucket.store);
+      return Object.create(null);
+    };
+    if (starterPromises.length > 0) {
+      return Promise.all(starterPromises).then(produceOutput);
+    } else {
+      return produceOutput();
+    }
   }
 
   /**
