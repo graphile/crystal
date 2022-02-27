@@ -189,7 +189,7 @@ const withPgClient: WithPgClient = makeNodePostgresWithPgClient(pool);
             );
           }
         }
-        args.rootValue = crystalPrepare(args);
+        args.rootValue = await crystalPrepare(args);
       },
     };
   };
