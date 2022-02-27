@@ -698,6 +698,11 @@ export class Aether<
     [objectTypeName: string]: ReadonlyArray<GraphQLUnionType>;
   };
 
+  /**
+   * If true, then this operation doesn't use resolvers.
+   */
+  public pure = true;
+
   constructor(
     public readonly schema: GraphQLSchema,
     // Note: whereas the `NewAether` algorithm refers to `document` and
@@ -1451,6 +1456,11 @@ export class Aether<
         rawResolver && isCrystalWrapped(rawResolver)
           ? rawResolver[$$crystalWrapped].original
           : rawResolver;
+
+      if (graphqlResolver) {
+        this.pure = false;
+      }
+
       /*
         namedReturnType instanceof GraphQLInterfaceType ||
         namedReturnType instanceof GraphQLUnionType
