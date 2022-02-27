@@ -52,6 +52,7 @@ const config = ${JSON.stringify(config)};
 
 let result1;
 let result2;
+let result3;
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -80,12 +81,16 @@ beforeAll(() => {
   result2 = result1.then(() => {}, () => {}).then(() =>
     runTestQuery(document, config, { callback, path, deoptimize: true })
   );
+  // Always run result3 after result2 finishes
+  result3 = result2.then(() => {}, () => {}).then(() =>
+    runTestQuery(document, config, { callback, path, deoptimize: true, prepare: false })
+  );
   // Wait for these promises to resolve, even if it's with errors.
-  return Promise.all([result1.catch(e => {}), result2.catch(e => {})]);
-});
+  return Promise.all([result1.catch(e => {}), result2.catch(e => {}), result3.catch(e => {})]);
+}, 30000);
 
 afterAll(() => {
-  result1 = result2 = null;
+  result1 = result2 = result3 = null;
 });
 
 ${assertions
@@ -130,6 +135,8 @@ if (config.checkErrorShapshots) {
 
 it('returns same data for optimized vs deoptimized', () => assertResultsMatch(result1, result2));
 it('returns same errors for optimized vs deoptimized', () => assertErrorsMatch(result1, result2));
+it('returns same data for optimized vs unprepared deoptimized', () => assertResultsMatch(result1, result3));
+it('returns same errors for optimized vs unprepared deoptimized', () => assertErrorsMatch(result1, result3));
 
 it('matches SQL snapshots with inlining disabled', () => assertSnapshotsMatch('sql', {
   document,

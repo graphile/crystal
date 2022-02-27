@@ -4,7 +4,7 @@ if (process.env.DEBUG) {
   jest.setTimeout(30000);
 }
 import { promises as fsp } from "fs";
-import type { BaseGraphQLContext} from "graphile-crystal";
+import type { BaseGraphQLContext } from "graphile-crystal";
 import { crystalPrepare } from "graphile-crystal";
 import { $$setPlanGraph } from "graphile-crystal/dist/interfaces";
 import type {
@@ -317,6 +317,7 @@ export async function runTestQuery(
     ) => Promise<void>;
     path: string;
     deoptimize?: boolean;
+    prepare?: boolean;
   } = Object.create(null),
 ): Promise<{
   payloads?: Array<{
@@ -383,13 +384,23 @@ export async function runTestQuery(
       );
     }
 
-    const rootValue = crystalPrepare({
-      schema,
-      document,
-      variableValues,
-      contextValue,
-      rootValue: null,
-    });
+    const rootValueRaw =
+      options.prepare === false
+        ? null
+        : crystalPrepare({
+            schema,
+            document,
+            variableValues,
+            contextValue,
+            rootValue: null,
+          });
+
+    const rootValue =
+      rootValueRaw != null &&
+      "then" in rootValueRaw &&
+      typeof rootValueRaw.then === "function"
+        ? await rootValueRaw
+        : rootValueRaw;
 
     const result =
       operationType === "subscription"
