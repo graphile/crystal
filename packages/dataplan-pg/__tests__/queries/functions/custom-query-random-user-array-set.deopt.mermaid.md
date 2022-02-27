@@ -78,7 +78,7 @@ graph TD
     classDef bucket4 stroke:#0000ff
     class __Item_18,PgSelectSingle_19,PgClassExpression_20,PgClassExpression_21 bucket4
 
-    subgraph Buckets
+    subgraph "Buckets for queries/functions/custom-query-random-user-array-set"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀randomUserArraySet <-A- _11"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_12)"):::bucket

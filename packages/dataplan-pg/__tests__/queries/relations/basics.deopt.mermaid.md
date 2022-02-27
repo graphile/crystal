@@ -1,5 +1,7 @@
 ```mermaid
 graph TD
+    subgraph "queries/relations/basics"
+    end
     classDef path fill:#eee,stroke:#000,color:#000
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000

@@ -148,7 +148,7 @@ graph TD
     classDef bucket5 stroke:#7fff00
     class PgSelectSingle_61,PgClassExpression_62,PgClassExpression_63,PgClassExpression_64 bucket5
 
-    subgraph Buckets
+    subgraph "Buckets for queries/unions-table/by-id-1"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀item1 <-O- _15"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (polymorphic_15[UnionTopic])<br />~>Query.item1<br />⠀⠀id <-L- _23<br />⠀⠀title <-L- _24"):::bucket

@@ -354,7 +354,7 @@ graph TD
     classDef bucket4 stroke:#0000ff
     class InputStaticLeaf_170,InputStaticLeaf_173,PgUpdate_175,PgClassExpression_179,PgSelect_181,First_185,PgSelectSingle_186,PgClassExpression_187,PgClassExpression_188,PgClassExpression_189,PgClassExpression_190,First_196,PgSelectSingle_197,PgClassExpression_198,First_204,PgSelectSingle_205,PgClassExpression_206,First_219,PgSelectSingle_220,PgClassExpression_221,PgClassExpression_222,Map_241,List_242,Map_243,List_244,Map_245,List_246 bucket4
 
-    subgraph Buckets
+    subgraph "Buckets for mutations/basics/update-relational-post"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (group1[mutation])<br />~>Mutation.u1<br />⠀ROOT <-O- _13<br />⠀⠀id <-L- _17<br />⠀⠀post <-O- _24<br />⠀⠀⠀post.id <-L- _25<br />⠀⠀⠀post.title <-L- _26<br />⠀⠀⠀post.description <-L- _27<br />⠀⠀⠀post.note <-L- _28<br />⠀⠀⠀post.titleLower <-L- _36<br />⠀⠀⠀post.isExplicitlyArchived <-L- _44<br />⠀⠀⠀post.author <-O- _58<br />⠀⠀⠀⠀post.author.personId <-L- _59<br />⠀⠀⠀⠀post.author.username <-L- _60"):::bucket

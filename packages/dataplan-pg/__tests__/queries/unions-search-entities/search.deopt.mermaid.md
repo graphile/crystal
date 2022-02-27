@@ -171,7 +171,7 @@ graph TD
     classDef bucket5 stroke:#7fff00
     class PgSelectSingle_51,PgClassExpression_52,PgClassExpression_53,PgSelect_54,First_58,PgSelectSingle_59,PgClassExpression_60,PgClassExpression_61,PgSelect_62,First_66,PgSelectSingle_67,PgClassExpression_68,PgClassExpression_69,PgClassExpression_70 bucket5
 
-    subgraph Buckets
+    subgraph "Buckets for queries/unions-search-entities/search"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀searchEntities <-A- _12"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_13)"):::bucket

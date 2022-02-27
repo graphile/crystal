@@ -59,7 +59,7 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class __Item_15,PgSelectSingle_16,PgClassExpression_17,Lambda_18 bucket2
 
-    subgraph Buckets
+    subgraph "Buckets for queries/functions/custom-query-forum-names-upper"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀FORUM_NAMES <-L- _11"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_12)"):::bucket

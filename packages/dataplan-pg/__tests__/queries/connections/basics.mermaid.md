@@ -126,7 +126,7 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class __Item_26,PgSelectSingle_27,PgCursor_28,PgClassExpression_29,List_30,PgClassExpression_31,First_37,PgSelectSingle_38,PgClassExpression_39,PgClassExpression_40,Map_60,List_61 bucket1
 
-    subgraph Buckets
+    subgraph "Buckets for queries/connections/basics"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀allMessagesConnection <-O- _24<br />⠀⠀⠀allMessagesConnection.edges <-A- _20<br />⠀⠀⠀allMessagesConnection.pageInfo <-O- _41<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasNextPage <-L- _42<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasPreviousPage <-L- _43<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.startCursor <-L- _47<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.endCursor <-L- _53<br />⠀⠀⠀allMessagesConnection.totalCount <-L- _59"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_26)<br />~>Query.allMessagesConnection>MessagesConnection.edges[]<br />⠀ROOT <-O- _27<br />⠀⠀node <-O- _27<br />⠀⠀⠀node.body <-L- _31<br />⠀⠀⠀node.author <-O- _38<br />⠀⠀⠀⠀node.author.username <-L- _39<br />⠀⠀⠀⠀node.author.gravatarUrl <-L- _40<br />⠀⠀cursor <-L- _28"):::bucket

@@ -103,7 +103,7 @@ graph TD
     classDef bucket3 stroke:#ffa500
     class PgCursor_55,PgClassExpression_56,List_57 bucket3
 
-    subgraph Buckets
+    subgraph "Buckets for queries/conditions/archived-forum-inherited-messages.defer-3"
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]"):::bucket

@@ -117,7 +117,7 @@ graph TD
     classDef bucket5 stroke:#7fff00
     class PgClassExpression_39 bucket5
 
-    subgraph Buckets
+    subgraph "Buckets for queries/interfaces-single-table/nested"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀people <-A- _7"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_11)<br />~>Query.people[]<br />⠀ROOT <-O- _12<br />⠀⠀username <-L- _13<br />⠀⠀items <-A- _19"):::bucket

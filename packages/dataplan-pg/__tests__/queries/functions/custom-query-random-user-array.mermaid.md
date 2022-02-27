@@ -50,7 +50,7 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class __Item_11,PgSelectSingle_12,PgClassExpression_13,PgClassExpression_14 bucket1
 
-    subgraph Buckets
+    subgraph "Buckets for queries/functions/custom-query-random-user-array"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀randomUserArray <-A- _7"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_11)<br />~>Query.randomUserArray[]<br />⠀ROOT <-O- _12<br />⠀⠀username <-L- _13<br />⠀⠀gravatarUrl <-L- _14"):::bucket

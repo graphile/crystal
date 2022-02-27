@@ -50,7 +50,7 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class __Item_21,PgSelectSingle_22,PgClassExpression_23,PgClassExpression_26 bucket1
 
-    subgraph Buckets
+    subgraph "Buckets for queries/super-simple/expression-plan"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀forums <-A- _17"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]<br />⠀ROOT <-O- _22<br />⠀⠀name <-L- _23<br />⠀⠀archivedAtIsNotNull <-L- _26"):::bucket

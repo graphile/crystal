@@ -147,7 +147,7 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class __Item_41,PgSelectSingle_42,PgClassExpression_43,PgClassExpression_44,PgSelect_45,First_49,PgSelectSingle_50,PgClassExpression_51,PgClassExpression_52,PgCursor_55,PgClassExpression_56,List_57 bucket2
 
-    subgraph Buckets
+    subgraph "Buckets for queries/conditions/archived-forum-inherited-messages.defer-4"
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]"):::bucket

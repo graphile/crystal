@@ -160,7 +160,7 @@ graph TD
     classDef bucket5 stroke:#7fff00
     class __Item_54,PgSelectSingle_55,PgCursor_56,PgClassExpression_57,List_58,PgClassExpression_59,First_65,PgSelectSingle_66,PgClassExpression_67,PgClassExpression_68,Map_78,List_79 bucket5
 
-    subgraph Buckets
+    subgraph "Buckets for queries/conditions/archived-forum-inherited-messages.stream-2"
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]"):::bucket

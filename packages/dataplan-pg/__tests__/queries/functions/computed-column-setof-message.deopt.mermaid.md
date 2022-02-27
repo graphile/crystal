@@ -59,7 +59,7 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class __Item_19,PgSelectSingle_20,PgClassExpression_21 bucket1
 
-    subgraph Buckets
+    subgraph "Buckets for queries/functions/computed-column-setof-message"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀forum <-O- _13<br />⠀⠀⠀forum.featuredMessages <-A- _15"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_19)<br />~>Query.forum>Forum.featuredMessages[]<br />⠀ROOT <-O- _20<br />⠀⠀body <-L- _21"):::bucket

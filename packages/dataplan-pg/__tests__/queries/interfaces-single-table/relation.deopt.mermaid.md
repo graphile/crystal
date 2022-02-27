@@ -90,7 +90,7 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class PgClassExpression_28,PgSelect_29,First_33,PgSelectSingle_34,PgClassExpression_35 bucket2
 
-    subgraph Buckets
+    subgraph "Buckets for queries/interfaces-single-table/relation"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀item <-O- _16"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (polymorphic_16[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />~>Query.item<br />⠀⠀parent <-O- _26<br />⠀⠀⠀parent.id <-L- _17<br />⠀⠀id <-L- _72"):::bucket

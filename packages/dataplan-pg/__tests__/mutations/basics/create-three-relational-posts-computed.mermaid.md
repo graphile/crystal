@@ -183,7 +183,7 @@ graph TD
     classDef bucket4 stroke:#0000ff
     class PgSelectSingle_155,PgClassExpression_157,PgClassExpression_158,PgClassExpression_159 bucket4
 
-    subgraph Buckets
+    subgraph "Buckets for mutations/basics/create-three-relational-posts-computed"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (group1[mutation])<br />~>Mutation.createThreeRelationalPostsComputed<br />⠀ROOT <-O- _27<br />⠀⠀query <-O- _5<br />⠀⠀⠀query.i1 <-O- _36<br />⠀⠀⠀⠀query.i1.id <-L- _72<br />⠀⠀⠀query.i2 <-O- _88<br />⠀⠀⠀⠀query.i2.id <-L- _124<br />⠀⠀⠀query.i3 <-O- _140<br />⠀⠀⠀⠀query.i3.id <-L- _176"):::bucket

@@ -54,7 +54,7 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class InputStaticLeaf_15,PgDelete_16,PgClassExpression_20 bucket2
 
-    subgraph Buckets
+    subgraph "Buckets for mutations/basics/delete-relational-post-no-computed"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (group1[mutation])<br />~>Mutation.d1<br />⠀ROOT <-O- _9<br />⠀⠀id <-L- _13"):::bucket

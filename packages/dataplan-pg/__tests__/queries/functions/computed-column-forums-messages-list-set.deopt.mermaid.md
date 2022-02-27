@@ -93,7 +93,7 @@ graph TD
     classDef bucket5 stroke:#7fff00
     class __Item_35,PgSelectSingle_36,PgClassExpression_37,PgClassExpression_38 bucket5
 
-    subgraph Buckets
+    subgraph "Buckets for queries/functions/computed-column-forums-messages-list-set"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀forums <-A- _17"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]<br />⠀ROOT <-O- _22<br />⠀⠀messagesListSet <-A- _28"):::bucket

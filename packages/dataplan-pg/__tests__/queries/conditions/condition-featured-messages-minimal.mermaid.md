@@ -72,7 +72,7 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class __Item_21,PgSelectSingle_22,Lambda_41,First_43,PgSelectSingle_44,PgClassExpression_45,Access_46,Lambda_47,Access_48 bucket1
 
-    subgraph Buckets
+    subgraph "Buckets for queries/conditions/condition-featured-messages-minimal"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀forums <-A- _17"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]<br />⠀ROOT <-O- _22<br />⠀⠀messagesConnection <-O- _37<br />⠀⠀⠀messagesConnection.pageInfo <-O- _39<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage <-L- _41<br />⠀⠀⠀messagesConnection.totalCount <-L- _45"):::bucket

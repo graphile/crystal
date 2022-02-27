@@ -347,7 +347,7 @@ graph TD
     classDef bucket9 stroke:#ff0000
     class PgSelectSingle_338,PgClassExpression_340,PgClassExpression_341,PgClassExpression_342 bucket9
 
-    subgraph Buckets
+    subgraph "Buckets for mutations/basics/create-relational-post-no-query"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (group1[mutation])<br />~>Mutation.p1<br />⠀ROOT <-O- _22"):::bucket

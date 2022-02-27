@@ -191,7 +191,7 @@ graph TD
     classDef bucket4 stroke:#0000ff
     class PgSelectSingle_67,PgClassExpression_68,First_74,PgSelectSingle_75,PgClassExpression_76,First_82,PgSelectSingle_83,PgClassExpression_84,PgClassExpression_85,Map_94,List_95,Map_96,List_97 bucket4
 
-    subgraph Buckets
+    subgraph "Buckets for queries/unions-table/bookmarks"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀personByPersonId <-O- _13<br />⠀⠀⠀personByPersonId.personId <-L- _14<br />⠀⠀⠀personByPersonId.username <-L- _15<br />⠀⠀⠀personByPersonId.personBookmarksList <-A- _100"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />~>Query.personByPersonId>Person.personBookmarksList[]<br />⠀ROOT <-O- _22<br />⠀⠀id <-L- _23<br />⠀⠀person <-O- _30<br />⠀⠀⠀person.username <-L- _31<br />⠀⠀bookmarkedEntity <-O- _37"):::bucket

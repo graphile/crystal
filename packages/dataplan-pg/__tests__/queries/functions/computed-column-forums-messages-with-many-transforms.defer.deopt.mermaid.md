@@ -129,7 +129,7 @@ graph TD
     classDef bucket8 stroke:#dda0dd
     class __Item_45,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_48 bucket8
 
-    subgraph Buckets
+    subgraph "Buckets for queries/functions/computed-column-forums-messages-with-many-transforms.defer"
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]"):::bucket

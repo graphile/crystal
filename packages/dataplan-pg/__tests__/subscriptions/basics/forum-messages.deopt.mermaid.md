@@ -121,7 +121,7 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class __Item_11,JSONParse_12,Access_14,Lambda_15,Access_16,PgSelect_17,First_21,PgSelectSingle_22,PgClassExpression_23,PgClassExpression_24,PgClassExpression_25,PgClassExpression_26,PgClassExpression_27,PgSelect_28,First_32,PgSelectSingle_33,PgClassExpression_35,PgClassExpression_36,PgClassExpression_38,PgSelect_39,First_43,PgSelectSingle_44,PgClassExpression_45,PgClassExpression_46 bucket1
 
-    subgraph Buckets
+    subgraph "Buckets for subscriptions/basics/forum-messages"
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_11)<br />~"):::bucket

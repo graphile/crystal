@@ -46,7 +46,7 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class __Item_14 bucket1
 
-    subgraph Buckets
+    subgraph "Buckets for queries/functions/custom-query-forum-names-array"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀forumNamesArray <-L- _13"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_14)<br />~>Query.forumNamesArray[]<br />⠀ROOT <-O- _14"):::bucket

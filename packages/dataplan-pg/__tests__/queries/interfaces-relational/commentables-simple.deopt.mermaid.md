@@ -147,7 +147,7 @@ graph TD
     classDef bucket5 stroke:#7fff00
     class PgSelectSingle_87,First_93,PgSelectSingle_94,PgClassExpression_95,PgClassExpression_103,PgClassExpression_111,Map_116,List_117 bucket5
 
-    subgraph Buckets
+    subgraph "Buckets for queries/interfaces-relational/commentables-simple"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀allRelationalCommentablesList <-A- _12"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_13)"):::bucket

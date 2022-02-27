@@ -103,7 +103,7 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class __Item_44,PgSelectSingle_45,PgClassExpression_46 bucket1
 
-    subgraph Buckets
+    subgraph "Buckets for queries/functions/computed-column-combined"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀forum <-O- _13<br />⠀⠀⠀forum.randomUser <-O- _20<br />⠀⠀⠀⠀forum.randomUser.username <-L- _21<br />⠀⠀⠀⠀forum.randomUser.gravatarUrl <-L- _22<br />⠀⠀⠀⠀forum.randomUser.mostRecentForum <-O- _29<br />⠀⠀⠀⠀⠀forum.randomUser.mostRecentForum.uniqueAuthorCount <-L- _38<br />⠀⠀⠀⠀⠀forum.randomUser.mostRecentForum.featuredMessages <-A- _40"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_44)<br />~>Query.forum>Forum.randomUser>User.mostRecentForum>Forum.featuredMessages[]<br />⠀ROOT <-O- _45<br />⠀⠀body <-L- _46"):::bucket

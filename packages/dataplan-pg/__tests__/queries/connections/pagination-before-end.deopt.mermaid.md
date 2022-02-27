@@ -139,7 +139,7 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class __Item_30,PgSelectSingle_31,PgCursor_32,PgClassExpression_33,List_34,PgClassExpression_35,PgClassExpression_36,PgSelect_37,First_41,PgSelectSingle_42,PgClassExpression_43,PgClassExpression_44 bucket1
 
-    subgraph Buckets
+    subgraph "Buckets for queries/connections/pagination-before-end"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀allMessagesConnection <-O- _24<br />⠀⠀⠀allMessagesConnection.edges <-A- _25<br />⠀⠀⠀allMessagesConnection.pageInfo <-O- _45<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasNextPage <-L- _48<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasPreviousPage <-L- _52<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.startCursor <-L- _57<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.endCursor <-L- _67<br />⠀⠀⠀allMessagesConnection.totalCount <-L- _76"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_30)<br />~>Query.allMessagesConnection>MessagesConnection.edges[]<br />⠀ROOT <-O- _31<br />⠀⠀node <-O- _31<br />⠀⠀⠀node.body <-L- _35<br />⠀⠀⠀node.author <-O- _42<br />⠀⠀⠀⠀node.author.username <-L- _43<br />⠀⠀⠀⠀node.author.gravatarUrl <-L- _44<br />⠀⠀cursor <-L- _32"):::bucket
