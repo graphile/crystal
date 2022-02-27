@@ -1,7 +1,5 @@
 ```mermaid
 graph TD
-    subgraph "queries/interfaces-relational/relation"
-    end
     classDef path fill:#eee,stroke:#000,color:#000
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
@@ -83,4 +81,9 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgPolymorphic_15,First_28,PgSelectSingle_29,PgClassExpression_30,PgPolymorphic_31,First_45,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_404,PgClassExpression_484,Access_494,Access_495,Object_496,Map_501,List_502,Map_503,List_504 bucket0
+
+    subgraph "Buckets for queries/interfaces-relational/relation"
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀item <-O- _15<br />⠀⠀⠀item.parent <-O- _31<br />⠀⠀⠀⠀item.parent.author <-O- _46<br />⠀⠀⠀⠀⠀item.parent.author.username <-L- _47<br />⠀⠀⠀⠀item.parent.id <-L- _484<br />⠀⠀⠀item.id <-L- _404"):::bucket
+    style Bucket0 stroke:#696969
+    end
 ```

@@ -1,7 +1,5 @@
 ```mermaid
 graph TD
-    subgraph "queries/interfaces-relational/single-topic-as-item"
-    end
     classDef path fill:#eee,stroke:#000,color:#000
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
@@ -85,4 +83,9 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,First_20,PgSelectSingle_21,PgClassExpression_22,PgClassExpression_30,PgClassExpression_38,PgClassExpression_46,PgClassExpression_54,PgClassExpression_62,Access_65,Access_66,Object_67,PgClassExpression_70,PgClassExpression_71,Map_72,List_73 bucket0
+
+    subgraph "Buckets for queries/interfaces-relational/single-topic-as-item"
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀relationalTopicById <-O- _13<br />⠀⠀⠀relationalTopicById.id <-L- _14<br />⠀⠀⠀relationalTopicById.type <-L- _22<br />⠀⠀⠀relationalTopicById.type2 <-L- _30<br />⠀⠀⠀relationalTopicById.position <-L- _38<br />⠀⠀⠀relationalTopicById.createdAt <-L- _46<br />⠀⠀⠀relationalTopicById.updatedAt <-L- _54<br />⠀⠀⠀relationalTopicById.isExplicitlyArchived <-L- _62<br />⠀⠀⠀relationalTopicById.archivedAt <-L- _70<br />⠀⠀⠀relationalTopicById.title <-L- _71"):::bucket
+    style Bucket0 stroke:#696969
+    end
 ```

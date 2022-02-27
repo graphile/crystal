@@ -1,7 +1,5 @@
 ```mermaid
 graph TD
-    subgraph "queries/resolvers/basics"
-    end
     classDef path fill:#eee,stroke:#000,color:#000
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
@@ -47,4 +45,9 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,__TrackedObject_6,PgSelect_7,Access_8,Access_9,Object_10,First_11,PgSelectSingle_12,PgClassExpression_13,Object_16 bucket0
+
+    subgraph "Buckets for queries/resolvers/basics"
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀randomUser <-O- _12<br />⠀⠀⠀randomUser.username <-L- _13<br />⠀⠀⠀randomUser.usernameHash <-L- _16"):::bucket
+    style Bucket0 stroke:#696969
+    end
 ```

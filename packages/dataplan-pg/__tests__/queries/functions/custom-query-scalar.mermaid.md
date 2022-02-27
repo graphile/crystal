@@ -1,7 +1,5 @@
 ```mermaid
 graph TD
-    subgraph "queries/functions/custom-query-scalar"
-    end
     classDef path fill:#eee,stroke:#000,color:#000
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
@@ -67,4 +65,9 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,PgSelect_8,Access_9,Access_10,Object_11,First_12,PgSelectSingle_13,PgClassExpression_14,InputStaticLeaf_15,PgSelect_16,First_20,PgSelectSingle_21,PgClassExpression_22,InputStaticLeaf_23,PgSelect_24,First_28,PgSelectSingle_29,PgClassExpression_30 bucket0
+
+    subgraph "Buckets for queries/functions/custom-query-scalar"
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀all <-L- _14<br />⠀⠀featured <-L- _22<br />⠀⠀unfeatured <-L- _30"):::bucket
+    style Bucket0 stroke:#696969
+    end
 ```

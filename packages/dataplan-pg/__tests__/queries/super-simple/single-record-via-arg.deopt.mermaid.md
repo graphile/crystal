@@ -1,7 +1,5 @@
 ```mermaid
 graph TD
-    subgraph "queries/super-simple/single-record-via-arg"
-    end
     classDef path fill:#eee,stroke:#000,color:#000
     classDef plan fill:#fff,stroke-width:3px,color:#000
     classDef itemplan fill:#fff,stroke-width:6px,color:#000
@@ -49,4 +47,9 @@ graph TD
     %% allocate buckets
     classDef bucket0 stroke:#696969
     class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,PgSelect_8,Access_9,Access_10,Object_11,First_12,PgSelectSingle_13,PgClassExpression_14,PgClassExpression_15 bucket0
+
+    subgraph "Buckets for queries/super-simple/single-record-via-arg"
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀forum <-O- _13<br />⠀⠀⠀forum.id <-L- _14<br />⠀⠀⠀forum.name <-L- _15"):::bucket
+    style Bucket0 stroke:#696969
+    end
 ```
