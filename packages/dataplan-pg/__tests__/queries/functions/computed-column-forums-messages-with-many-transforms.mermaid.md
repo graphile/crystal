@@ -128,25 +128,25 @@ graph TD
     subgraph "Buckets for queries/functions/computed-column-forums-messages-with-many-transforms"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀forums <-A- _17"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]<br />⠀ROOT <-O- _22<br />⠀⠀name <-L- _23<br />⠀⠀messagesWithManyTransforms <-A- _31"):::bucket
+    Bucket1("Bucket 1 (item_21)<br />Deps: _17, _24<br />~>Query.forums[]<br />⠀ROOT <-O- _22<br />⠀⠀name <-L- _23<br />⠀⠀messagesWithManyTransforms <-A- _31"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (item_32)"):::bucket
+    Bucket2("Bucket 2 (item_32)<br />Deps: _24, _35"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket1 --> Bucket2
-    Bucket3("Bucket 3 (item_38)"):::bucket
+    Bucket3("Bucket 3 (item_38)<br />Deps: _28"):::bucket
     style Bucket3 stroke:#ffa500
     Bucket1 --> Bucket3
-    Bucket4("Bucket 4 (item_41)"):::bucket
+    Bucket4("Bucket 4 (item_41)<br />Deps: _30"):::bucket
     style Bucket4 stroke:#0000ff
     Bucket1 --> Bucket4
-    Bucket5("Bucket 5 (item_42)<br />~>Query.forums[]>Forum.messagesWithManyTransforms[]<br />⠀ROOT <-O- _43"):::bucket
+    Bucket5("Bucket 5 (item_42)<br />Deps: _31<br />~>Query.forums[]>Forum.messagesWithManyTransforms[]<br />⠀ROOT <-O- _43"):::bucket
     style Bucket5 stroke:#7fff00
     Bucket1 --> Bucket5
-    Bucket6("Bucket 6 (item_44)"):::bucket
+    Bucket6("Bucket 6 (item_44)<br />Deps: _42"):::bucket
     style Bucket6 stroke:#ff1493
     Bucket5 --> Bucket6
-    Bucket7("Bucket 7 (item_45)<br />~>Query.forums[]>Forum.messagesWithManyTransforms[][]<br />⠀ROOT <-O- _46<br />⠀⠀body <-L- _47<br />⠀⠀featured <-L- _48"):::bucket
+    Bucket7("Bucket 7 (item_45)<br />Deps: _43<br />~>Query.forums[]>Forum.messagesWithManyTransforms[][]<br />⠀ROOT <-O- _46<br />⠀⠀body <-L- _47<br />⠀⠀featured <-L- _48"):::bucket
     style Bucket7 stroke:#808000
     Bucket5 --> Bucket7
     end

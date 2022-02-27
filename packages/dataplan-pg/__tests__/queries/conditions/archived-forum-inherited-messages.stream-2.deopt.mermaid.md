@@ -165,19 +165,19 @@ graph TD
     subgraph "Buckets for queries/conditions/archived-forum-inherited-messages.stream-2"
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]"):::bucket
+    Bucket1("Bucket 1 (item_21)<br />Deps: _17, _64<br />~>Query.forums[]"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (group1[stream])<br />~>Query.forums[]>Forum.messagesConnection"):::bucket
+    Bucket2("Bucket 2 (group1[stream])<br />Deps: _64, _33, _39<br />~>Query.forums[]>Forum.messagesConnection"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket1 --> Bucket2
-    Bucket3("Bucket 3 (item_41)<br />~>Query.forums[]>Forum.messagesConnection>MessagesConnection.nodes[]"):::bucket
+    Bucket3("Bucket 3 (item_41)<br />Deps: _40, _64<br />~>Query.forums[]>Forum.messagesConnection>MessagesConnection.nodes[]"):::bucket
     style Bucket3 stroke:#ffa500
     Bucket2 --> Bucket3
-    Bucket4("Bucket 4 (group2[stream])<br />~>Query.forums[]>Forum.messagesConnection"):::bucket
+    Bucket4("Bucket 4 (group2[stream])<br />Deps: _64, _33, _39<br />~>Query.forums[]>Forum.messagesConnection"):::bucket
     style Bucket4 stroke:#0000ff
     Bucket1 --> Bucket4
-    Bucket5("Bucket 5 (item_54)<br />~>Query.forums[]>Forum.messagesConnection>MessagesConnection.edges[]"):::bucket
+    Bucket5("Bucket 5 (item_54)<br />Deps: _53, _64<br />~>Query.forums[]>Forum.messagesConnection>MessagesConnection.edges[]"):::bucket
     style Bucket5 stroke:#7fff00
     Bucket4 --> Bucket5
     end

@@ -79,16 +79,16 @@ graph TD
     subgraph "Buckets for queries/functions/custom-query-random-user-array-set"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀randomUserArraySet <-A- _11"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_12)"):::bucket
+    Bucket1("Bucket 1 (item_12)<br />Deps: _7"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (item_15)<br />~>Query.randomUserArraySet[]<br />⠀ROOT <-O- _16"):::bucket
+    Bucket2("Bucket 2 (item_15)<br />Deps: _11<br />~>Query.randomUserArraySet[]<br />⠀ROOT <-O- _16"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket0 --> Bucket2
-    Bucket3("Bucket 3 (item_17)"):::bucket
+    Bucket3("Bucket 3 (item_17)<br />Deps: _15"):::bucket
     style Bucket3 stroke:#ffa500
     Bucket2 --> Bucket3
-    Bucket4("Bucket 4 (item_18)<br />~>Query.randomUserArraySet[][]<br />⠀ROOT <-O- _19<br />⠀⠀username <-L- _20<br />⠀⠀gravatarUrl <-L- _21"):::bucket
+    Bucket4("Bucket 4 (item_18)<br />Deps: _16<br />~>Query.randomUserArraySet[][]<br />⠀ROOT <-O- _19<br />⠀⠀username <-L- _20<br />⠀⠀gravatarUrl <-L- _21"):::bucket
     style Bucket4 stroke:#0000ff
     Bucket2 --> Bucket4
     end

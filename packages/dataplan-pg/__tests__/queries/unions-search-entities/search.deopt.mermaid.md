@@ -172,19 +172,19 @@ graph TD
     subgraph "Buckets for queries/unions-search-entities/search"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀searchEntities <-A- _12"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_13)"):::bucket
+    Bucket1("Bucket 1 (item_13)<br />Deps: _8"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (item_15)<br />~>Query.searchEntities[]<br />⠀ROOT <-O- _21"):::bucket
+    Bucket2("Bucket 2 (item_15)<br />Deps: _12, _65<br />~>Query.searchEntities[]<br />⠀ROOT <-O- _21"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket0 --> Bucket2
-    Bucket3("Bucket 3 (polymorphic_21[Person])<br />~>Query.searchEntities[]<br />⠀⠀personId <-L- _28<br />⠀⠀username <-L- _29"):::bucket
+    Bucket3("Bucket 3 (polymorphic_21[Person])<br />Deps: _26<br />~>Query.searchEntities[]<br />⠀⠀personId <-L- _28<br />⠀⠀username <-L- _29"):::bucket
     style Bucket3 stroke:#ffa500
     Bucket2 --> Bucket3
-    Bucket4("Bucket 4 (polymorphic_21[Post])<br />~>Query.searchEntities[]<br />⠀⠀postId <-L- _36<br />⠀⠀author <-O- _43<br />⠀⠀⠀author.username <-L- _44<br />⠀⠀body <-L- _45"):::bucket
+    Bucket4("Bucket 4 (polymorphic_21[Post])<br />Deps: _34, _65<br />~>Query.searchEntities[]<br />⠀⠀postId <-L- _36<br />⠀⠀author <-O- _43<br />⠀⠀⠀author.username <-L- _44<br />⠀⠀body <-L- _45"):::bucket
     style Bucket4 stroke:#0000ff
     Bucket2 --> Bucket4
-    Bucket5("Bucket 5 (polymorphic_21[Comment])<br />~>Query.searchEntities[]<br />⠀⠀commentId <-L- _52<br />⠀⠀author <-O- _59<br />⠀⠀⠀author.username <-L- _60<br />⠀⠀post <-O- _67<br />⠀⠀⠀post.postId <-L- _68<br />⠀⠀⠀post.body <-L- _69<br />⠀⠀body <-L- _70"):::bucket
+    Bucket5("Bucket 5 (polymorphic_21[Comment])<br />Deps: _50, _65<br />~>Query.searchEntities[]<br />⠀⠀commentId <-L- _52<br />⠀⠀author <-O- _59<br />⠀⠀⠀author.username <-L- _60<br />⠀⠀post <-O- _67<br />⠀⠀⠀post.postId <-L- _68<br />⠀⠀⠀post.body <-L- _69<br />⠀⠀body <-L- _70"):::bucket
     style Bucket5 stroke:#7fff00
     Bucket2 --> Bucket5
     end

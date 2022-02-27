@@ -47,7 +47,7 @@ graph TD
     subgraph "Buckets for queries/functions/custom-query-setof-message"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀featuredMessages <-A- _7"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_11)<br />~>Query.featuredMessages[]<br />⠀ROOT <-O- _12<br />⠀⠀body <-L- _13"):::bucket
+    Bucket1("Bucket 1 (item_11)<br />Deps: _7<br />~>Query.featuredMessages[]<br />⠀ROOT <-O- _12<br />⠀⠀body <-L- _13"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     end

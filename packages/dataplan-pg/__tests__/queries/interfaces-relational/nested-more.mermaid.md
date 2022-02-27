@@ -178,13 +178,13 @@ graph TD
     subgraph "Buckets for queries/interfaces-relational/nested-more"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀people <-A- _7"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_11)<br />~>Query.people[]<br />⠀ROOT <-O- _12<br />⠀⠀username <-L- _13<br />⠀⠀items <-A- _19"):::bucket
+    Bucket1("Bucket 1 (item_11)<br />Deps: _7<br />~>Query.people[]<br />⠀ROOT <-O- _12<br />⠀⠀username <-L- _13<br />⠀⠀items <-A- _19"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (item_20)"):::bucket
+    Bucket2("Bucket 2 (item_20)<br />Deps: _767"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket1 --> Bucket2
-    Bucket3("Bucket 3 (item_22)<br />~>Query.people[]>Person.items[]<br />⠀ROOT <-O- _25<br />⠀⠀type <-L- _24<br />⠀⠀parent <-O- _41<br />⠀⠀⠀parent.type <-L- _40<br />⠀⠀⠀parent.type2 <-L- _51<br />⠀⠀⠀parent.author <-O- _58<br />⠀⠀⠀⠀parent.author.username <-L- _59<br />⠀⠀⠀parent.position <-L- _60<br />⠀⠀⠀parent.createdAt <-L- _61<br />⠀⠀⠀parent.updatedAt <-L- _62<br />⠀⠀⠀parent.isExplicitlyArchived <-L- _63<br />⠀⠀⠀parent.archivedAt <-L- _64<br />⠀⠀⠀parent.id <-L- _722<br />⠀⠀type2 <-L- _159<br />⠀⠀author <-O- _166<br />⠀⠀⠀author.username <-L- _167<br />⠀⠀position <-L- _168<br />⠀⠀createdAt <-L- _169<br />⠀⠀updatedAt <-L- _170<br />⠀⠀isExplicitlyArchived <-L- _171<br />⠀⠀archivedAt <-L- _172<br />⠀⠀id <-L- _614"):::bucket
+    Bucket3("Bucket 3 (item_22)<br />Deps: _19<br />~>Query.people[]>Person.items[]<br />⠀ROOT <-O- _25<br />⠀⠀type <-L- _24<br />⠀⠀parent <-O- _41<br />⠀⠀⠀parent.type <-L- _40<br />⠀⠀⠀parent.type2 <-L- _51<br />⠀⠀⠀parent.author <-O- _58<br />⠀⠀⠀⠀parent.author.username <-L- _59<br />⠀⠀⠀parent.position <-L- _60<br />⠀⠀⠀parent.createdAt <-L- _61<br />⠀⠀⠀parent.updatedAt <-L- _62<br />⠀⠀⠀parent.isExplicitlyArchived <-L- _63<br />⠀⠀⠀parent.archivedAt <-L- _64<br />⠀⠀⠀parent.id <-L- _722<br />⠀⠀type2 <-L- _159<br />⠀⠀author <-O- _166<br />⠀⠀⠀author.username <-L- _167<br />⠀⠀position <-L- _168<br />⠀⠀createdAt <-L- _169<br />⠀⠀updatedAt <-L- _170<br />⠀⠀isExplicitlyArchived <-L- _171<br />⠀⠀archivedAt <-L- _172<br />⠀⠀id <-L- _614"):::bucket
     style Bucket3 stroke:#ffa500
     Bucket1 --> Bucket3
     end

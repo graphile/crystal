@@ -63,7 +63,7 @@ graph TD
     subgraph "Buckets for queries/connections/empty"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀forums <-A- _17"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]<br />⠀ROOT <-O- _22<br />⠀⠀name <-L- _23<br />⠀⠀messagesConnection <-O- _38<br />⠀⠀⠀messagesConnection.pageInfo <-O- _40<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage <-L- _41<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasPreviousPage <-L- _42"):::bucket
+    Bucket1("Bucket 1 (item_21)<br />Deps: _17, _38, _40, _41, _42<br />~>Query.forums[]<br />⠀ROOT <-O- _22<br />⠀⠀name <-L- _23<br />⠀⠀messagesConnection <-O- _38<br />⠀⠀⠀messagesConnection.pageInfo <-O- _40<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage <-L- _41<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasPreviousPage <-L- _42"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     end

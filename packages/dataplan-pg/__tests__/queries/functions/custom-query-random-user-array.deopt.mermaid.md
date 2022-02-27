@@ -51,7 +51,7 @@ graph TD
     subgraph "Buckets for queries/functions/custom-query-random-user-array"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀randomUserArray <-A- _7"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_11)<br />~>Query.randomUserArray[]<br />⠀ROOT <-O- _12<br />⠀⠀username <-L- _13<br />⠀⠀gravatarUrl <-L- _14"):::bucket
+    Bucket1("Bucket 1 (item_11)<br />Deps: _7<br />~>Query.randomUserArray[]<br />⠀ROOT <-O- _12<br />⠀⠀username <-L- _13<br />⠀⠀gravatarUrl <-L- _14"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     end

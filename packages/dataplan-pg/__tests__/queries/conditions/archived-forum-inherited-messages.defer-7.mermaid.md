@@ -105,13 +105,13 @@ graph TD
     subgraph "Buckets for queries/conditions/archived-forum-inherited-messages.defer-7"
     Bucket0("Bucket 0 (root)<br />~"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]"):::bucket
+    Bucket1("Bucket 1 (item_21)<br />Deps: _17, _63<br />~>Query.forums[]"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (group1[defer])<br />~>Query.forums[]"):::bucket
+    Bucket2("Bucket 2 (group1[defer])<br />Deps: _22, _63<br />~>Query.forums[]"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket1 --> Bucket2
-    Bucket3("Bucket 3 (item_41)<br />~>Query.forums[]>Forum.messagesConnection>MessagesConnection.nodes[]<br />~>Query.forums[]>Forum.messagesConnection>MessagesConnection.edges[]"):::bucket
+    Bucket3("Bucket 3 (item_41)<br />Deps: _34, _63<br />~>Query.forums[]>Forum.messagesConnection>MessagesConnection.nodes[]<br />~>Query.forums[]>Forum.messagesConnection>MessagesConnection.edges[]"):::bucket
     style Bucket3 stroke:#ffa500
     Bucket2 --> Bucket3
     end

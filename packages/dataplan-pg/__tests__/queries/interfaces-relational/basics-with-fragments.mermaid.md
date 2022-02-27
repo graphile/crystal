@@ -191,28 +191,28 @@ graph TD
     subgraph "Buckets for queries/interfaces-relational/basics-with-fragments"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀people <-A- _7"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_11)<br />~>Query.people[]<br />⠀ROOT <-O- _12<br />⠀⠀username <-L- _13<br />⠀⠀items <-A- _19"):::bucket
+    Bucket1("Bucket 1 (item_11)<br />Deps: _7<br />~>Query.people[]<br />⠀ROOT <-O- _12<br />⠀⠀username <-L- _13<br />⠀⠀items <-A- _19"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (item_20)"):::bucket
+    Bucket2("Bucket 2 (item_20)<br />Deps: _120"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket1 --> Bucket2
-    Bucket3("Bucket 3 (item_22)<br />~>Query.people[]>Person.items[]<br />⠀ROOT <-O- _25<br />⠀⠀type <-L- _24<br />⠀⠀type2 <-L- _35<br />⠀⠀position <-L- _36<br />⠀⠀createdAt <-L- _37<br />⠀⠀updatedAt <-L- _38<br />⠀⠀isExplicitlyArchived <-L- _39<br />⠀⠀archivedAt <-L- _40<br />⠀⠀id <-L- _93"):::bucket
+    Bucket3("Bucket 3 (item_22)<br />Deps: _19<br />~>Query.people[]>Person.items[]<br />⠀ROOT <-O- _25<br />⠀⠀type <-L- _24<br />⠀⠀type2 <-L- _35<br />⠀⠀position <-L- _36<br />⠀⠀createdAt <-L- _37<br />⠀⠀updatedAt <-L- _38<br />⠀⠀isExplicitlyArchived <-L- _39<br />⠀⠀archivedAt <-L- _40<br />⠀⠀id <-L- _93"):::bucket
     style Bucket3 stroke:#ffa500
     Bucket1 --> Bucket3
-    Bucket4("Bucket 4 (polymorphic_25[RelationalTopic])<br />~>Query.people[]>Person.items[]<br />⠀⠀title <-L- _41"):::bucket
+    Bucket4("Bucket 4 (polymorphic_25[RelationalTopic])<br />Deps: _31<br />~>Query.people[]>Person.items[]<br />⠀⠀title <-L- _41"):::bucket
     style Bucket4 stroke:#0000ff
     Bucket3 --> Bucket4
-    Bucket5("Bucket 5 (polymorphic_25[RelationalPost])<br />~>Query.people[]>Person.items[]<br />⠀⠀title <-L- _57<br />⠀⠀description <-L- _58<br />⠀⠀note <-L- _59"):::bucket
+    Bucket5("Bucket 5 (polymorphic_25[RelationalPost])<br />Deps: _47<br />~>Query.people[]>Person.items[]<br />⠀⠀title <-L- _57<br />⠀⠀description <-L- _58<br />⠀⠀note <-L- _59"):::bucket
     style Bucket5 stroke:#7fff00
     Bucket3 --> Bucket5
-    Bucket6("Bucket 6 (polymorphic_25[RelationalDivider])<br />~>Query.people[]>Person.items[]<br />⠀⠀title <-L- _75<br />⠀⠀color <-L- _76"):::bucket
+    Bucket6("Bucket 6 (polymorphic_25[RelationalDivider])<br />Deps: _65<br />~>Query.people[]>Person.items[]<br />⠀⠀title <-L- _75<br />⠀⠀color <-L- _76"):::bucket
     style Bucket6 stroke:#ff1493
     Bucket3 --> Bucket6
-    Bucket7("Bucket 7 (polymorphic_25[RelationalChecklist])<br />~>Query.people[]>Person.items[]<br />⠀⠀title <-L- _92"):::bucket
+    Bucket7("Bucket 7 (polymorphic_25[RelationalChecklist])<br />Deps: _82<br />~>Query.people[]>Person.items[]<br />⠀⠀title <-L- _92"):::bucket
     style Bucket7 stroke:#808000
     Bucket3 --> Bucket7
-    Bucket8("Bucket 8 (polymorphic_25[RelationalChecklistItem])<br />~>Query.people[]>Person.items[]<br />⠀⠀description <-L- _108<br />⠀⠀note <-L- _109"):::bucket
+    Bucket8("Bucket 8 (polymorphic_25[RelationalChecklistItem])<br />Deps: _98<br />~>Query.people[]>Person.items[]<br />⠀⠀description <-L- _108<br />⠀⠀note <-L- _109"):::bucket
     style Bucket8 stroke:#dda0dd
     Bucket3 --> Bucket8
     end

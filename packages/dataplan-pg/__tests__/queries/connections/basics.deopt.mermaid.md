@@ -128,7 +128,7 @@ graph TD
     subgraph "Buckets for queries/connections/basics"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀allMessagesConnection <-O- _24<br />⠀⠀⠀allMessagesConnection.edges <-A- _20<br />⠀⠀⠀allMessagesConnection.pageInfo <-O- _41<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasNextPage <-L- _42<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasPreviousPage <-L- _43<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.startCursor <-L- _47<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.endCursor <-L- _53<br />⠀⠀⠀allMessagesConnection.totalCount <-L- _59"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_26)<br />~>Query.allMessagesConnection>MessagesConnection.edges[]<br />⠀ROOT <-O- _27<br />⠀⠀node <-O- _27<br />⠀⠀⠀node.body <-L- _31<br />⠀⠀⠀node.author <-O- _38<br />⠀⠀⠀⠀node.author.username <-L- _39<br />⠀⠀⠀⠀node.author.gravatarUrl <-L- _40<br />⠀⠀cursor <-L- _28"):::bucket
+    Bucket1("Bucket 1 (item_26)<br />Deps: _20, _36<br />~>Query.allMessagesConnection>MessagesConnection.edges[]<br />⠀ROOT <-O- _27<br />⠀⠀node <-O- _27<br />⠀⠀⠀node.body <-L- _31<br />⠀⠀⠀node.author <-O- _38<br />⠀⠀⠀⠀node.author.username <-L- _39<br />⠀⠀⠀⠀node.author.gravatarUrl <-L- _40<br />⠀⠀cursor <-L- _28"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     end

@@ -51,7 +51,7 @@ graph TD
     subgraph "Buckets for queries/super-simple/many-field-aliases-and-mismatched-fields"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀a <-A- _17<br />⠀⠀b <-A- _17"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_21)<br />~>Query.a[]<br />~>Query.b[]<br />⠀ROOT <-O- _22<br />⠀⠀id <-L- _23<br />⠀⠀a <-L- _24<br />⠀⠀b <-L- _24"):::bucket
+    Bucket1("Bucket 1 (item_21)<br />Deps: _17<br />~>Query.a[]<br />~>Query.b[]<br />⠀ROOT <-O- _22<br />⠀⠀id <-L- _23<br />⠀⠀a <-L- _24<br />⠀⠀b <-L- _24"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     end

@@ -152,19 +152,19 @@ graph TD
     subgraph "Buckets for queries/unions-table/by-id-18"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀item18 <-O- _15"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (polymorphic_15[UnionTopic])<br />~>Query.item18<br />⠀⠀id <-L- _23<br />⠀⠀title <-L- _24"):::bucket
+    Bucket1("Bucket 1 (polymorphic_15[UnionTopic])<br />Deps: _21<br />~>Query.item18<br />⠀⠀id <-L- _23<br />⠀⠀title <-L- _24"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (polymorphic_15[UnionPost])<br />~>Query.item18<br />⠀⠀id <-L- _32<br />⠀⠀title <-L- _33<br />⠀⠀description <-L- _34<br />⠀⠀note <-L- _35"):::bucket
+    Bucket2("Bucket 2 (polymorphic_15[UnionPost])<br />Deps: _30<br />~>Query.item18<br />⠀⠀id <-L- _32<br />⠀⠀title <-L- _33<br />⠀⠀description <-L- _34<br />⠀⠀note <-L- _35"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket0 --> Bucket2
-    Bucket3("Bucket 3 (polymorphic_15[UnionDivider])<br />~>Query.item18<br />⠀⠀id <-L- _43<br />⠀⠀title <-L- _44<br />⠀⠀color <-L- _45"):::bucket
+    Bucket3("Bucket 3 (polymorphic_15[UnionDivider])<br />Deps: _41<br />~>Query.item18<br />⠀⠀id <-L- _43<br />⠀⠀title <-L- _44<br />⠀⠀color <-L- _45"):::bucket
     style Bucket3 stroke:#ffa500
     Bucket0 --> Bucket3
-    Bucket4("Bucket 4 (polymorphic_15[UnionChecklist])<br />~>Query.item18<br />⠀⠀id <-L- _53<br />⠀⠀title <-L- _54"):::bucket
+    Bucket4("Bucket 4 (polymorphic_15[UnionChecklist])<br />Deps: _51<br />~>Query.item18<br />⠀⠀id <-L- _53<br />⠀⠀title <-L- _54"):::bucket
     style Bucket4 stroke:#0000ff
     Bucket0 --> Bucket4
-    Bucket5("Bucket 5 (polymorphic_15[UnionChecklistItem])<br />~>Query.item18<br />⠀⠀id <-L- _62<br />⠀⠀description <-L- _63<br />⠀⠀note <-L- _64"):::bucket
+    Bucket5("Bucket 5 (polymorphic_15[UnionChecklistItem])<br />Deps: _60<br />~>Query.item18<br />⠀⠀id <-L- _62<br />⠀⠀description <-L- _63<br />⠀⠀note <-L- _64"):::bucket
     style Bucket5 stroke:#7fff00
     Bucket0 --> Bucket5
     end

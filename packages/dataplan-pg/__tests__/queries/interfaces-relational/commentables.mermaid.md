@@ -185,19 +185,19 @@ graph TD
     subgraph "Buckets for queries/interfaces-relational/commentables"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀allRelationalCommentablesList <-A- _12"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_13)"):::bucket
+    Bucket1("Bucket 1 (item_13)<br />Deps: _8"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (item_15)<br />~>Query.allRelationalCommentablesList[]<br />⠀ROOT <-O- _18"):::bucket
+    Bucket2("Bucket 2 (item_15)<br />Deps: _12<br />~>Query.allRelationalCommentablesList[]<br />⠀ROOT <-O- _18"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket0 --> Bucket2
-    Bucket3("Bucket 3 (polymorphic_18[RelationalPost])<br />~>Query.allRelationalCommentablesList[]<br />⠀⠀id <-L- _26<br />⠀⠀type <-L- _34<br />⠀⠀type2 <-L- _42<br />⠀⠀position <-L- _50<br />⠀⠀title <-L- _51<br />⠀⠀description <-L- _52<br />⠀⠀note <-L- _53"):::bucket
+    Bucket3("Bucket 3 (polymorphic_18[RelationalPost])<br />Deps: _24<br />~>Query.allRelationalCommentablesList[]<br />⠀⠀id <-L- _26<br />⠀⠀type <-L- _34<br />⠀⠀type2 <-L- _42<br />⠀⠀position <-L- _50<br />⠀⠀title <-L- _51<br />⠀⠀description <-L- _52<br />⠀⠀note <-L- _53"):::bucket
     style Bucket3 stroke:#ffa500
     Bucket2 --> Bucket3
-    Bucket4("Bucket 4 (polymorphic_18[RelationalChecklist])<br />~>Query.allRelationalCommentablesList[]<br />⠀⠀id <-L- _61<br />⠀⠀type <-L- _69<br />⠀⠀type2 <-L- _77<br />⠀⠀position <-L- _85<br />⠀⠀title <-L- _86"):::bucket
+    Bucket4("Bucket 4 (polymorphic_18[RelationalChecklist])<br />Deps: _59<br />~>Query.allRelationalCommentablesList[]<br />⠀⠀id <-L- _61<br />⠀⠀type <-L- _69<br />⠀⠀type2 <-L- _77<br />⠀⠀position <-L- _85<br />⠀⠀title <-L- _86"):::bucket
     style Bucket4 stroke:#0000ff
     Bucket2 --> Bucket4
-    Bucket5("Bucket 5 (polymorphic_18[RelationalChecklistItem])<br />~>Query.allRelationalCommentablesList[]<br />⠀⠀id <-L- _94<br />⠀⠀type <-L- _102<br />⠀⠀type2 <-L- _110<br />⠀⠀position <-L- _118<br />⠀⠀description <-L- _119<br />⠀⠀note <-L- _120"):::bucket
+    Bucket5("Bucket 5 (polymorphic_18[RelationalChecklistItem])<br />Deps: _92<br />~>Query.allRelationalCommentablesList[]<br />⠀⠀id <-L- _94<br />⠀⠀type <-L- _102<br />⠀⠀type2 <-L- _110<br />⠀⠀position <-L- _118<br />⠀⠀description <-L- _119<br />⠀⠀note <-L- _120"):::bucket
     style Bucket5 stroke:#7fff00
     Bucket2 --> Bucket5
     end

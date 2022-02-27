@@ -187,16 +187,16 @@ graph TD
     subgraph "Buckets for mutations/basics/create-three-relational-posts-computed"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (group1[mutation])<br />~>Mutation.createThreeRelationalPostsComputed<br />⠀ROOT <-O- _27<br />⠀⠀query <-O- _5<br />⠀⠀⠀query.i1 <-O- _36<br />⠀⠀⠀⠀query.i1.id <-L- _72<br />⠀⠀⠀query.i2 <-O- _88<br />⠀⠀⠀⠀query.i2.id <-L- _124<br />⠀⠀⠀query.i3 <-O- _140<br />⠀⠀⠀⠀query.i3.id <-L- _176"):::bucket
+    Bucket1("Bucket 1 (group1[mutation])<br />Deps: _3, _5<br />~>Mutation.createThreeRelationalPostsComputed<br />⠀ROOT <-O- _27<br />⠀⠀query <-O- _5<br />⠀⠀⠀query.i1 <-O- _36<br />⠀⠀⠀⠀query.i1.id <-L- _72<br />⠀⠀⠀query.i2 <-O- _88<br />⠀⠀⠀⠀query.i2.id <-L- _124<br />⠀⠀⠀query.i3 <-O- _140<br />⠀⠀⠀⠀query.i3.id <-L- _176"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (polymorphic_36[RelationalPost])<br />~>Mutation.createThreeRelationalPostsComputed>CreateRelationalPostPayload.query>Query.i1<br />⠀⠀title <-L- _53<br />⠀⠀description <-L- _54<br />⠀⠀note <-L- _55"):::bucket
+    Bucket2("Bucket 2 (polymorphic_36[RelationalPost])<br />Deps: _50<br />~>Mutation.createThreeRelationalPostsComputed>CreateRelationalPostPayload.query>Query.i1<br />⠀⠀title <-L- _53<br />⠀⠀description <-L- _54<br />⠀⠀note <-L- _55"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket1 --> Bucket2
-    Bucket3("Bucket 3 (polymorphic_88[RelationalPost])<br />~>Mutation.createThreeRelationalPostsComputed>CreateRelationalPostPayload.query>Query.i2<br />⠀⠀title <-L- _105<br />⠀⠀description <-L- _106<br />⠀⠀note <-L- _107"):::bucket
+    Bucket3("Bucket 3 (polymorphic_88[RelationalPost])<br />Deps: _102<br />~>Mutation.createThreeRelationalPostsComputed>CreateRelationalPostPayload.query>Query.i2<br />⠀⠀title <-L- _105<br />⠀⠀description <-L- _106<br />⠀⠀note <-L- _107"):::bucket
     style Bucket3 stroke:#ffa500
     Bucket1 --> Bucket3
-    Bucket4("Bucket 4 (polymorphic_140[RelationalPost])<br />~>Mutation.createThreeRelationalPostsComputed>CreateRelationalPostPayload.query>Query.i3<br />⠀⠀title <-L- _157<br />⠀⠀description <-L- _158<br />⠀⠀note <-L- _159"):::bucket
+    Bucket4("Bucket 4 (polymorphic_140[RelationalPost])<br />Deps: _154<br />~>Mutation.createThreeRelationalPostsComputed>CreateRelationalPostPayload.query>Query.i3<br />⠀⠀title <-L- _157<br />⠀⠀description <-L- _158<br />⠀⠀note <-L- _159"):::bucket
     style Bucket4 stroke:#0000ff
     Bucket1 --> Bucket4
     end

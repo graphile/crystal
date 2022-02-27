@@ -149,19 +149,19 @@ graph TD
     subgraph "Buckets for queries/interfaces-relational/commentables-simple"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀allRelationalCommentablesList <-A- _12"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_13)"):::bucket
+    Bucket1("Bucket 1 (item_13)<br />Deps: _8"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (item_15)<br />~>Query.allRelationalCommentablesList[]<br />⠀ROOT <-O- _18"):::bucket
+    Bucket2("Bucket 2 (item_15)<br />Deps: _12<br />~>Query.allRelationalCommentablesList[]<br />⠀ROOT <-O- _18"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket0 --> Bucket2
-    Bucket3("Bucket 3 (polymorphic_18[RelationalPost])<br />~>Query.allRelationalCommentablesList[]<br />⠀⠀type <-L- _33<br />⠀⠀type2 <-L- _41<br />⠀⠀position <-L- _49"):::bucket
+    Bucket3("Bucket 3 (polymorphic_18[RelationalPost])<br />Deps: _24<br />~>Query.allRelationalCommentablesList[]<br />⠀⠀type <-L- _33<br />⠀⠀type2 <-L- _41<br />⠀⠀position <-L- _49"):::bucket
     style Bucket3 stroke:#ffa500
     Bucket2 --> Bucket3
-    Bucket4("Bucket 4 (polymorphic_18[RelationalChecklist])<br />~>Query.allRelationalCommentablesList[]<br />⠀⠀type <-L- _64<br />⠀⠀type2 <-L- _72<br />⠀⠀position <-L- _80"):::bucket
+    Bucket4("Bucket 4 (polymorphic_18[RelationalChecklist])<br />Deps: _55<br />~>Query.allRelationalCommentablesList[]<br />⠀⠀type <-L- _64<br />⠀⠀type2 <-L- _72<br />⠀⠀position <-L- _80"):::bucket
     style Bucket4 stroke:#0000ff
     Bucket2 --> Bucket4
-    Bucket5("Bucket 5 (polymorphic_18[RelationalChecklistItem])<br />~>Query.allRelationalCommentablesList[]<br />⠀⠀type <-L- _95<br />⠀⠀type2 <-L- _103<br />⠀⠀position <-L- _111"):::bucket
+    Bucket5("Bucket 5 (polymorphic_18[RelationalChecklistItem])<br />Deps: _86<br />~>Query.allRelationalCommentablesList[]<br />⠀⠀type <-L- _95<br />⠀⠀type2 <-L- _103<br />⠀⠀position <-L- _111"):::bucket
     style Bucket5 stroke:#7fff00
     Bucket2 --> Bucket5
     end

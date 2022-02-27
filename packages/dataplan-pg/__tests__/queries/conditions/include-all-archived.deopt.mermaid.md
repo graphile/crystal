@@ -85,10 +85,10 @@ graph TD
     subgraph "Buckets for queries/conditions/include-all-archived"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀forums <-A- _17"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]<br />⠀ROOT <-O- _22<br />⠀⠀name <-L- _23<br />⠀⠀messagesList <-A- _33"):::bucket
+    Bucket1("Bucket 1 (item_21)<br />Deps: _17, _44<br />~>Query.forums[]<br />⠀ROOT <-O- _22<br />⠀⠀name <-L- _23<br />⠀⠀messagesList <-A- _33"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (item_37)<br />~>Query.forums[]>Forum.messagesList[]<br />⠀ROOT <-O- _38<br />⠀⠀body <-L- _39<br />⠀⠀author <-O- _46<br />⠀⠀⠀author.username <-L- _47<br />⠀⠀⠀author.gravatarUrl <-L- _48"):::bucket
+    Bucket2("Bucket 2 (item_37)<br />Deps: _33, _44<br />~>Query.forums[]>Forum.messagesList[]<br />⠀ROOT <-O- _38<br />⠀⠀body <-L- _39<br />⠀⠀author <-O- _46<br />⠀⠀⠀author.username <-L- _47<br />⠀⠀⠀author.gravatarUrl <-L- _48"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket1 --> Bucket2
     end

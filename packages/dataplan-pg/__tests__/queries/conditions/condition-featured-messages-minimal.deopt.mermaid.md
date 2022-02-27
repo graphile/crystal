@@ -80,7 +80,7 @@ graph TD
     subgraph "Buckets for queries/conditions/condition-featured-messages-minimal"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀forums <-A- _17"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]<br />⠀ROOT <-O- _22<br />⠀⠀messagesConnection <-O- _37<br />⠀⠀⠀messagesConnection.pageInfo <-O- _39<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage <-L- _41<br />⠀⠀⠀messagesConnection.totalCount <-L- _45"):::bucket
+    Bucket1("Bucket 1 (item_21)<br />Deps: _17, _36, _26, _37, _39<br />~>Query.forums[]<br />⠀ROOT <-O- _22<br />⠀⠀messagesConnection <-O- _37<br />⠀⠀⠀messagesConnection.pageInfo <-O- _39<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage <-L- _41<br />⠀⠀⠀messagesConnection.totalCount <-L- _45"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     end

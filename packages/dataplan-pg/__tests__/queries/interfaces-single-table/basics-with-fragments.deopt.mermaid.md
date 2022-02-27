@@ -128,16 +128,16 @@ graph TD
     subgraph "Buckets for queries/interfaces-single-table/basics-with-fragments"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀people <-A- _7"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_11)<br />~>Query.people[]<br />⠀ROOT <-O- _12<br />⠀⠀username <-L- _13<br />⠀⠀items <-A- _19"):::bucket
+    Bucket1("Bucket 1 (item_11)<br />Deps: _7, _18<br />~>Query.people[]<br />⠀ROOT <-O- _12<br />⠀⠀username <-L- _13<br />⠀⠀items <-A- _19"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (item_20)"):::bucket
+    Bucket2("Bucket 2 (item_20)<br />Deps: _15"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket1 --> Bucket2
-    Bucket3("Bucket 3 (item_22)<br />~>Query.people[]>Person.items[]<br />⠀ROOT <-O- _26<br />⠀⠀type <-L- _24"):::bucket
+    Bucket3("Bucket 3 (item_22)<br />Deps: _19<br />~>Query.people[]>Person.items[]<br />⠀ROOT <-O- _26<br />⠀⠀type <-L- _24"):::bucket
     style Bucket3 stroke:#ffa500
     Bucket1 --> Bucket3
-    Bucket4("Bucket 4 (polymorphic_26[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />~>Query.people[]>Person.items[]<br />⠀⠀id <-L- _27<br />⠀⠀type2 <-L- _29<br />⠀⠀position <-L- _30<br />⠀⠀createdAt <-L- _31<br />⠀⠀updatedAt <-L- _32<br />⠀⠀isExplicitlyArchived <-L- _33<br />⠀⠀archivedAt <-L- _34<br />⠀⠀title <-L- _35<br />⠀⠀description <-L- _45<br />⠀⠀note <-L- _46<br />⠀⠀color <-L- _56"):::bucket
+    Bucket4("Bucket 4 (polymorphic_26[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />Deps: _22, _23<br />~>Query.people[]>Person.items[]<br />⠀⠀id <-L- _27<br />⠀⠀type2 <-L- _29<br />⠀⠀position <-L- _30<br />⠀⠀createdAt <-L- _31<br />⠀⠀updatedAt <-L- _32<br />⠀⠀isExplicitlyArchived <-L- _33<br />⠀⠀archivedAt <-L- _34<br />⠀⠀title <-L- _35<br />⠀⠀description <-L- _45<br />⠀⠀note <-L- _46<br />⠀⠀color <-L- _56"):::bucket
     style Bucket4 stroke:#0000ff
     Bucket3 --> Bucket4
     end

@@ -192,16 +192,16 @@ graph TD
     subgraph "Buckets for queries/unions-table/bookmarks"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀personByPersonId <-O- _13<br />⠀⠀⠀personByPersonId.personId <-L- _14<br />⠀⠀⠀personByPersonId.username <-L- _15<br />⠀⠀⠀personByPersonId.personBookmarksList <-A- _100"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_21)<br />~>Query.personByPersonId>Person.personBookmarksList[]<br />⠀ROOT <-O- _22<br />⠀⠀id <-L- _23<br />⠀⠀person <-O- _30<br />⠀⠀⠀person.username <-L- _31<br />⠀⠀bookmarkedEntity <-O- _37"):::bucket
+    Bucket1("Bucket 1 (item_21)<br />Deps: _100<br />~>Query.personByPersonId>Person.personBookmarksList[]<br />⠀ROOT <-O- _22<br />⠀⠀id <-L- _23<br />⠀⠀person <-O- _30<br />⠀⠀⠀person.username <-L- _31<br />⠀⠀bookmarkedEntity <-O- _37"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (polymorphic_37[Person])<br />~>Query.personByPersonId>Person.personBookmarksList[]>PersonBookmark.bookmarkedEntity<br />⠀⠀personId <-L- _44<br />⠀⠀username <-L- _45"):::bucket
+    Bucket2("Bucket 2 (polymorphic_37[Person])<br />Deps: _42<br />~>Query.personByPersonId>Person.personBookmarksList[]>PersonBookmark.bookmarkedEntity<br />⠀⠀personId <-L- _44<br />⠀⠀username <-L- _45"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket1 --> Bucket2
-    Bucket3("Bucket 3 (polymorphic_37[Post])<br />~>Query.personByPersonId>Person.personBookmarksList[]>PersonBookmark.bookmarkedEntity<br />⠀⠀postId <-L- _52<br />⠀⠀author <-O- _59<br />⠀⠀⠀author.username <-L- _60<br />⠀⠀body <-L- _61"):::bucket
+    Bucket3("Bucket 3 (polymorphic_37[Post])<br />Deps: _50<br />~>Query.personByPersonId>Person.personBookmarksList[]>PersonBookmark.bookmarkedEntity<br />⠀⠀postId <-L- _52<br />⠀⠀author <-O- _59<br />⠀⠀⠀author.username <-L- _60<br />⠀⠀body <-L- _61"):::bucket
     style Bucket3 stroke:#ffa500
     Bucket1 --> Bucket3
-    Bucket4("Bucket 4 (polymorphic_37[Comment])<br />~>Query.personByPersonId>Person.personBookmarksList[]>PersonBookmark.bookmarkedEntity<br />⠀⠀commentId <-L- _68<br />⠀⠀author <-O- _75<br />⠀⠀⠀author.username <-L- _76<br />⠀⠀post <-O- _83<br />⠀⠀⠀post.body <-L- _84<br />⠀⠀body <-L- _85"):::bucket
+    Bucket4("Bucket 4 (polymorphic_37[Comment])<br />Deps: _66<br />~>Query.personByPersonId>Person.personBookmarksList[]>PersonBookmark.bookmarkedEntity<br />⠀⠀commentId <-L- _68<br />⠀⠀author <-O- _75<br />⠀⠀⠀author.username <-L- _76<br />⠀⠀post <-O- _83<br />⠀⠀⠀post.body <-L- _84<br />⠀⠀body <-L- _85"):::bucket
     style Bucket4 stroke:#0000ff
     Bucket1 --> Bucket4
     end

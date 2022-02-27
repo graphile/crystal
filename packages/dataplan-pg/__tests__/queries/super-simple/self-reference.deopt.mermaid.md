@@ -51,7 +51,7 @@ graph TD
     subgraph "Buckets for queries/super-simple/self-reference"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀forums <-A- _17"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]<br />⠀ROOT <-O- _22<br />⠀⠀self <-O- _22<br />⠀⠀⠀self.name <-L- _23<br />⠀⠀⠀self.id <-L- _24<br />⠀⠀name <-L- _23"):::bucket
+    Bucket1("Bucket 1 (item_21)<br />Deps: _17<br />~>Query.forums[]<br />⠀ROOT <-O- _22<br />⠀⠀self <-O- _22<br />⠀⠀⠀self.name <-L- _23<br />⠀⠀⠀self.id <-L- _24<br />⠀⠀name <-L- _23"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
     end

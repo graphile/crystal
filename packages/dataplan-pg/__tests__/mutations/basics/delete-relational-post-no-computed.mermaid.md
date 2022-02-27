@@ -58,10 +58,10 @@ graph TD
     subgraph "Buckets for mutations/basics/delete-relational-post-no-computed"
     Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0"):::bucket
     style Bucket0 stroke:#696969
-    Bucket1("Bucket 1 (group1[mutation])<br />~>Mutation.d1<br />⠀ROOT <-O- _9<br />⠀⠀id <-L- _13"):::bucket
+    Bucket1("Bucket 1 (group1[mutation])<br />Deps: _12<br />~>Mutation.d1<br />⠀ROOT <-O- _9<br />⠀⠀id <-L- _13"):::bucket
     style Bucket1 stroke:#00bfff
     Bucket0 --> Bucket1
-    Bucket2("Bucket 2 (group2[mutation])<br />~>Mutation.d2<br />⠀ROOT <-O- _16<br />⠀⠀id <-L- _20"):::bucket
+    Bucket2("Bucket 2 (group2[mutation])<br />Deps: _12<br />~>Mutation.d2<br />⠀ROOT <-O- _16<br />⠀⠀id <-L- _20"):::bucket
     style Bucket2 stroke:#7f007f
     Bucket0 --> Bucket2
     end
