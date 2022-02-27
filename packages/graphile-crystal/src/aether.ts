@@ -5021,17 +5021,21 @@ export class Aether<
         planCacheForPlanResultses,
       );
       if (isDev) {
-        Promise.resolve(layerResultsOrPromise).then((layerResults) => {
-          assert.ok(
-            Array.isArray(layerResults),
-            "Expected plan execution to return an array",
-          );
-          assert.strictEqual(
-            layerResults.length,
-            planResultsesLength,
-            "Expected plan execution result to have same length as input objects",
-          );
-        });
+        Promise.resolve(layerResultsOrPromise)
+          .then((layerResults) => {
+            assert.ok(
+              Array.isArray(layerResults),
+              "Expected plan execution to return an array",
+            );
+            assert.strictEqual(
+              layerResults.length,
+              planResultsesLength,
+              "Expected plan execution result to have same length as input objects",
+            );
+          })
+          .catch((e) => {
+            console.error(e);
+          });
       }
 
       const finalizeLayerResults = (
