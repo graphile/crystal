@@ -5120,13 +5120,14 @@ export class Aether<
               return pendingResultsOrPromise.then(
                 finalizePendingResults,
                 (e) => {
+                  const errorPromise = Promise.reject(e);
                   for (
                     let finalResultIndex = 0, l = pendingPlanResultses.length;
                     finalResultIndex < l;
                     finalResultIndex++
                   ) {
                     if (pendingPlanResultses[finalResultIndex] != null) {
-                      finalResult[finalResultIndex] = Promise.reject(e);
+                      finalResult[finalResultIndex] = errorPromise;
                     }
                   }
                   return finalResult;
