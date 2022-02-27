@@ -1103,7 +1103,7 @@ export class Aether<
     >,
   ): BucketDefinition {
     const id = this.buckets.length;
-    let singleTypeNameByRootPathIdentity: BucketDefinition["singleTypeNameByRootPathIdentity"] =
+    const singleTypeNameByRootPathIdentity: BucketDefinition["singleTypeNameByRootPathIdentity"] =
       spec.polymorphicTypeNames ? null : {};
     if (singleTypeNameByRootPathIdentity) {
       for (const rootPathIdentity of spec.rootPathIdentities) {
@@ -1117,13 +1117,21 @@ export class Aether<
               ? this.subscriptionTypeName!
               : (null as never);
         } else {
-          const fieldDigest = this.fieldDigestByPathIdentity[rootPathIdentity];
+          const trimmedRootPathIdentity = rootPathIdentity.replace(
+            /(?:\[\])+$/,
+            "",
+          );
+          const fieldDigest =
+            this.fieldDigestByPathIdentity[trimmedRootPathIdentity];
           if (fieldDigest) {
             singleTypeNameByRootPathIdentity[rootPathIdentity] =
               fieldDigest.namedReturnType.name;
           } else {
-            singleTypeNameByRootPathIdentity = null;
-            break;
+            throw new Error(
+              `Could not find fieldDigest for ${trimmedRootPathIdentity} (valid IDs: ${Object.keys(
+                this.fieldDigestByPathIdentity,
+              )})`,
+            );
           }
         }
       }
@@ -5997,12 +6005,16 @@ export class Aether<
           }
         };
         if (setter.root && !(setter.root instanceof CrystalError)) {
+          const typeName = bucket.singleTypeName ?? setter.root[$$concreteType];
+          if (typeName == null) {
+            throw new Error(
+              `Could not determine typeName in bucket ${bucket.definition.id}`,
+            );
+          }
           process(
             setter.root[$$data],
             bucket.definition.outputMap,
-            `${bucket.rootPathIdentity}>${
-              bucket.singleTypeName ?? setter.root[$$concreteType]
-            }.`,
+            `${bucket.rootPathIdentity}>${typeName}.`,
           );
         }
 
