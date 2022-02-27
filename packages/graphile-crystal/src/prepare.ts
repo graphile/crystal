@@ -37,6 +37,16 @@ export function crystalPrepare(
     context: context as any,
     rootValue,
   });
+
+  const preemptiveResult = aether.executePreemptive(
+    variableValues,
+    context,
+    rootValue,
+  );
+  if (preemptiveResult) {
+    return preemptiveResult;
+  }
+
   const crystalContext = aether.newCrystalContext(
     variableValues,
     context as any,

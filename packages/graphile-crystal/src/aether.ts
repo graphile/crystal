@@ -91,7 +91,12 @@ import {
 } from "./plan";
 import type { PlanResultsBucket } from "./planResults";
 import { PlanResults } from "./planResults";
-import { __ItemPlan, __TrackedObjectPlan, __ValuePlan } from "./plans";
+import {
+  __ItemPlan,
+  __TrackedObjectPlan,
+  __ValuePlan,
+  constant,
+} from "./plans";
 import { __ListTransformPlan } from "./plans/listTransform";
 import { assertPolymorphicData } from "./polymorphic";
 import {
@@ -283,7 +288,7 @@ interface BucketDefinitionFieldOutputMap {
    * Only valid when mode is 'O'; otherwise null
    */
   children: {
-    [fieldName: string]: BucketDefinitionFieldOutputMap;
+    [responseKey: string]: BucketDefinitionFieldOutputMap;
   } | null;
   /**
    * For a polymorphic bucket, the list of type names within that bucket that
@@ -468,6 +473,9 @@ function bucketValue(
 ): any {
   switch (mode) {
     case "A": {
+      if (Math.random() < 2) {
+        throw new Error("NEEDS REVISITING DUE TO $$data");
+      }
       if (Array.isArray(value)) {
         if (Array.isArray(previousValue)) {
           if (previousValue.length !== value.length) {
@@ -490,16 +498,18 @@ function bucketValue(
     }
     case "O": {
       if (value == null || value instanceof CrystalError) {
-        return value;
+        return { [$$data]: value };
       } else {
         if (
-          typeof previousValue === "object" &&
+          previousValue === "object" &&
           previousValue != null &&
-          !(previousValue instanceof CrystalError)
+          typeof previousValue[$$data] === "object" &&
+          previousValue[$$data] != null &&
+          !(previousValue[$$data] instanceof CrystalError)
         ) {
           return previousValue;
         } else {
-          return Object.create(null);
+          return { [$$data]: Object.create(null) };
         }
       }
     }
@@ -914,11 +924,11 @@ export class Aether<
       );
     }
     this.planIdByPathIdentity = Object.assign(Object.create(null), {
-      [ROOT_PATH]: this.trackedRootValuePlan.id,
+      [ROOT_PATH]: wgs(() => constant(Object.freeze(Object.create(null)))).id,
     });
     this.isUnplannedByPathIdentity = Object.create(null);
     this.itemPlanIdByFieldPathIdentity = Object.assign(Object.create(null), {
-      [ROOT_PATH]: this.trackedRootValuePlan.id,
+      [ROOT_PATH]: this.planIdByPathIdentity[ROOT_PATH],
     });
     this.sideEffectPlanIdsByPathIdentity = Object.create(null);
     this.transformDependencyPlanIdByTransformPlanId = Object.create(null);
@@ -5644,15 +5654,21 @@ export class Aether<
         metaByPlanId[plan.id] = Object.create(null);
       }
     }
-    return this.executeBucket(metaByPlanId, rootBucket);
+    const p = this.executeBucket(metaByPlanId, rootBucket);
+    if (isPromiseLike(p)) {
+      return p.then((list) => list[0]);
+    } else {
+      return p[0];
+    }
   }
 
   public executeBucket(
     metaByPlanId: CrystalContext["metaByPlanId"],
     bucket: Bucket,
-  ): PromiseOrDirect<{ [$$data]: any }> {
+  ): PromiseOrDirect<Array<{ [$$data]: any }>> {
     const inProgressPlans = new Set();
     const pendingPlans = new Set(bucket.definition.plans);
+    const store = bucket.store;
 
     const completedPlan = (
       finishedPlan: ExecutablePlan,
@@ -5671,7 +5687,7 @@ export class Aether<
           `Result array from ${finishedPlan} should have length ${bucket.size}, instead it had length ${result.length}`,
         );
       }
-      bucket.store[finishedPlan.id] = result;
+      store[finishedPlan.id] = result;
       inProgressPlans.delete(finishedPlan);
       pendingPlans.delete(finishedPlan);
       if (pendingPlans.size === 0) {
@@ -5683,7 +5699,7 @@ export class Aether<
         const isPending = pendingPlans.has(potentialNextPlan);
         const isSuitable = isPending
           ? potentialNextPlan.dependencies.every((depId) =>
-              Array.isArray(bucket.store[depId]),
+              Array.isArray(store[depId]),
             )
           : false;
         if (isSuitable) {
@@ -5713,7 +5729,7 @@ export class Aether<
         const meta = metaByPlanId[plan.id]!;
         const dependencies =
           plan.dependencies.length > 0
-            ? plan.dependencies.map((depId) => bucket.store[depId])
+            ? plan.dependencies.map((depId) => store[depId])
             : [bucket.noDepsList];
         const result = plan.execute(dependencies, meta);
         if (isPromiseLike(result)) {
@@ -5745,7 +5761,8 @@ export class Aether<
         starterPromises.push(r);
       }
     }
-    const produceOutput = (): { [$$data]: any } => {
+
+    const produceOutput = (): Array<{ [$$data]: any }> => {
       if (pendingPlans.size > 0) {
         throw new Error(
           `produceOutput called before all plans were complete! Remaining plans were: ${[
@@ -5753,9 +5770,50 @@ export class Aether<
           ].join(", ")}`,
         );
       }
-      console.dir(bucket.store);
-      return Object.create(null);
+      return bucket.input.map((setter, index) => {
+        if (bucket.definition.rootOutputPlanId != null) {
+          setter.setRoot(
+            bucketValue(
+              setter.root,
+              store[bucket.definition.rootOutputPlanId][index],
+              "O",
+            ),
+          );
+        }
+        const process = (
+          obj: undefined | null | object | CrystalError,
+          map: { [responseKey: string]: BucketDefinitionFieldOutputMap },
+        ) => {
+          if (obj == null || obj instanceof CrystalError) {
+            return;
+          }
+          for (const responseKey in map) {
+            const field = map[responseKey];
+            if (
+              field.typeNames &&
+              !field.typeNames.includes(bucket.typeName!)
+            ) {
+              continue;
+            }
+            const planId =
+              field.planIdByRootPathIdentity[bucket.rootPathIdentity];
+            const value = bucketValue(
+              obj[responseKey],
+              store[planId][index],
+              field.mode,
+            );
+            obj[responseKey] = value;
+
+            if (field.children) {
+              process(obj[responseKey]?.[$$data], field.children);
+            }
+          }
+        };
+        process(setter.root?.[$$data], bucket.definition.outputMap);
+        return setter.root;
+      });
     };
+
     if (starterPromises.length > 0) {
       return Promise.all(starterPromises).then(produceOutput);
     } else {
