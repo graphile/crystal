@@ -8,9 +8,8 @@ graph TD
 
 
     %% define plans
+    __Value_0["__Value[_0∈0]"]:::plan
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
     PgSelect_8[["PgSelect[_8∈0]<br /><forums>"]]:::plan
     Access_9["Access[_9∈0]<br /><_3.pgSettings>"]:::plan
@@ -22,7 +21,6 @@ graph TD
     PgClassExpression_15["PgClassExpression[_15∈0]<br /><__forums__.”name”>"]:::plan
 
     %% plan dependencies
-    __Value_5 --> __TrackedObject_6
     Object_11 --> PgSelect_8
     InputStaticLeaf_7 --> PgSelect_8
     __Value_3 --> Access_9
@@ -35,8 +33,8 @@ graph TD
     PgSelectSingle_13 --> PgClassExpression_15
 
     %% plan-to-path relationships
-    P_6["~"]
-    __TrackedObject_6 -.-> P_6
+    P_0["~"]
+    __Value_0 -.-> P_0
     P_13[">forum"]
     PgSelectSingle_13 -.-> P_13
     P_14[">f…m>id"]
@@ -46,10 +44,10 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,PgSelect_8,Access_9,Access_10,Object_11,First_12,PgSelectSingle_13,PgClassExpression_14,PgClassExpression_15 bucket0
+    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,Access_9,Access_10,Object_11,First_12,PgSelectSingle_13,PgClassExpression_14,PgClassExpression_15 bucket0
 
     subgraph "Buckets for queries/super-simple/single-record-via-arg"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀forum <-O- _13<br />⠀⠀⠀forum.id <-L- _14<br />⠀⠀⠀forum.name <-L- _15"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀forum <-O- _13<br />⠀⠀⠀forum.id <-L- _14<br />⠀⠀⠀forum.name <-L- _15"):::bucket
     style Bucket0 stroke:#696969
     end
 ```

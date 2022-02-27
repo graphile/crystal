@@ -8,9 +8,8 @@ graph TD
 
 
     %% define plans
+    __Value_0["__Value[_0∈0]"]:::plan
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     InputStaticLeaf_14["InputStaticLeaf[_14∈0]"]:::plan
     InputStaticLeaf_15["InputStaticLeaf[_15∈0]"]:::plan
     InputStaticLeaf_16["InputStaticLeaf[_16∈0]"]:::plan
@@ -51,7 +50,6 @@ graph TD
     List_62["List[_62∈1]<br /><_61>"]:::plan
 
     %% plan dependencies
-    __Value_5 --> __TrackedObject_6
     InputStaticLeaf_14 --> Connection_24
     InputStaticLeaf_15 --> Connection_24
     InputStaticLeaf_16 --> Connection_24
@@ -90,8 +88,8 @@ graph TD
     Map_61 --> List_62
 
     %% plan-to-path relationships
-    P_6["~"]
-    __TrackedObject_6 -.-> P_6
+    P_0["~"]
+    __Value_0 -.-> P_0
     P_24[">allMessagesConnection"]
     Connection_24 -.-> P_24
     P_25[">a…n>edges"]
@@ -123,12 +121,12 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_14,InputStaticLeaf_15,InputStaticLeaf_16,InputStaticLeaf_17,Connection_24,PgSelect_25,Access_34,Access_35,Object_36,PgPageInfo_41,Lambda_43,Constant_44,First_46,PgSelectSingle_47,PgCursor_48,PgClassExpression_49,List_50,Last_52,PgSelectSingle_53,PgCursor_54,PgClassExpression_55,List_56,PgSelect_57,First_58,PgSelectSingle_59,PgClassExpression_60 bucket0
+    class __Value_0,__Value_3,InputStaticLeaf_14,InputStaticLeaf_15,InputStaticLeaf_16,InputStaticLeaf_17,Connection_24,PgSelect_25,Access_34,Access_35,Object_36,PgPageInfo_41,Lambda_43,Constant_44,First_46,PgSelectSingle_47,PgCursor_48,PgClassExpression_49,List_50,Last_52,PgSelectSingle_53,PgCursor_54,PgClassExpression_55,List_56,PgSelect_57,First_58,PgSelectSingle_59,PgClassExpression_60 bucket0
     classDef bucket1 stroke:#00bfff
     class __Item_26,PgSelectSingle_27,PgCursor_28,PgClassExpression_29,List_30,PgClassExpression_31,First_37,PgSelectSingle_38,PgClassExpression_39,PgClassExpression_40,Map_61,List_62 bucket1
 
     subgraph "Buckets for queries/connections/basics-limit3"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀allMessagesConnection <-O- _24<br />⠀⠀⠀allMessagesConnection.edges <-A- _25<br />⠀⠀⠀allMessagesConnection.pageInfo <-O- _41<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasNextPage <-L- _43<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasPreviousPage <-L- _44<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.startCursor <-L- _48<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.endCursor <-L- _54<br />⠀⠀⠀allMessagesConnection.totalCount <-L- _60"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀allMessagesConnection <-O- _24<br />⠀⠀⠀allMessagesConnection.edges <-A- _25<br />⠀⠀⠀allMessagesConnection.pageInfo <-O- _41<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasNextPage <-L- _43<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.hasPreviousPage <-L- _44<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.startCursor <-L- _48<br />⠀⠀⠀⠀allMessagesConnection.pageInfo.endCursor <-L- _54<br />⠀⠀⠀allMessagesConnection.totalCount <-L- _60"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_26)<br />~>Query.allMessagesConnection>MessagesConnection.edges[]<br />⠀ROOT <-O- _27<br />⠀⠀node <-O- _27<br />⠀⠀⠀node.body <-L- _31<br />⠀⠀⠀node.author <-O- _38<br />⠀⠀⠀⠀node.author.username <-L- _39<br />⠀⠀⠀⠀node.author.gravatarUrl <-L- _40<br />⠀⠀cursor <-L- _28"):::bucket
     style Bucket1 stroke:#00bfff

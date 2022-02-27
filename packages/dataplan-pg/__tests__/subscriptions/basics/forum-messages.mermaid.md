@@ -8,9 +8,8 @@ graph TD
 
 
     %% define plans
+    __Value_0["__Value[_0∈0]"]:::plan
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
     Lambda_8["Lambda[_8∈0]"]:::plan
     Access_9["Access[_9∈0]<br /><_3.pgSubscriber>"]:::plan
@@ -45,7 +44,6 @@ graph TD
     List_50["List[_50∈1]<br /><_49>"]:::plan
 
     %% plan dependencies
-    __Value_5 --> __TrackedObject_6
     InputStaticLeaf_7 --> Lambda_8
     __Value_3 --> Access_9
     Access_9 --> Subscribe_10
@@ -82,8 +80,8 @@ graph TD
     Map_49 --> List_50
 
     %% plan-to-path relationships
-    P_6["~"]
-    __TrackedObject_6 -.-> P_6
+    P_0["~"]
+    __Value_0 -.-> P_0
     P_10["~"]
     Subscribe_10 -.-> P_10
     P_12[">forumMessage"]
@@ -117,7 +115,7 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,Lambda_8,Access_9,Subscribe_10,Access_40,Access_41,Object_42 bucket0
+    class __Value_0,__Value_3,InputStaticLeaf_7,Lambda_8,Access_9,Subscribe_10,Access_40,Access_41,Object_42 bucket0
     classDef bucket1 stroke:#00bfff
     class __Item_11,JSONParse_12,Access_14,Lambda_15,Access_16,PgSelect_17,First_21,PgSelectSingle_22,PgClassExpression_23,PgClassExpression_24,PgClassExpression_25,PgClassExpression_26,PgClassExpression_27,First_32,PgSelectSingle_33,PgClassExpression_35,PgClassExpression_36,First_43,PgSelectSingle_44,PgClassExpression_45,PgClassExpression_46,Map_47,List_48,Map_49,List_50 bucket1
 

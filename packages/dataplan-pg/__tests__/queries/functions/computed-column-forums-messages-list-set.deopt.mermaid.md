@@ -8,9 +8,8 @@ graph TD
 
 
     %% define plans
+    __Value_0["__Value[_0∈0]"]:::plan
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     PgSelect_17[["PgSelect[_17∈0]<br /><forums>"]]:::plan
     __Item_21>"__Item[_21∈1]<br /><_17>"]:::itemplan
     PgSelectSingle_22["PgSelectSingle[_22∈1]<br /><forums>"]:::plan
@@ -32,7 +31,6 @@ graph TD
     PgClassExpression_38["PgClassExpression[_38∈5]<br /><__forums_m...”featured”>"]:::plan
 
     %% plan dependencies
-    __Value_5 --> __TrackedObject_6
     Object_27 --> PgSelect_17
     PgSelect_17 ==> __Item_21
     __Item_21 --> PgSelectSingle_22
@@ -58,8 +56,8 @@ graph TD
     PgSelectSingle_36 --> PgClassExpression_38
 
     %% plan-to-path relationships
-    P_6["~"]
-    __TrackedObject_6 -.-> P_6
+    P_0["~"]
+    __Value_0 -.-> P_0
     P_17[">forums"]
     PgSelect_17 -.-> P_17
     P_22[">forums[]"]
@@ -81,7 +79,7 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,PgSelect_17,Access_25,Access_26,Object_27 bucket0
+    class __Value_0,__Value_3,PgSelect_17,Access_25,Access_26,Object_27 bucket0
     classDef bucket1 stroke:#00bfff
     class __Item_21,PgSelectSingle_22,PgClassExpression_23,PgSelect_24,__ListTransform_28 bucket1
     classDef bucket2 stroke:#7f007f
@@ -94,7 +92,7 @@ graph TD
     class __Item_35,PgSelectSingle_36,PgClassExpression_37,PgClassExpression_38 bucket5
 
     subgraph "Buckets for queries/functions/computed-column-forums-messages-list-set"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀forums <-A- _17"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀forums <-A- _17"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]<br />⠀ROOT <-O- _22<br />⠀⠀messagesListSet <-A- _28"):::bucket
     style Bucket1 stroke:#00bfff

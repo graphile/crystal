@@ -8,18 +8,17 @@ graph TD
 
 
     %% define plans
+    __Value_0["__Value[_0∈0]"]:::plan
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     PgSelect_17[["PgSelect[_17∈0]<br /><forums>"]]:::plan
     __Item_21>"__Item[_21∈1]<br /><_17>"]:::itemplan
     PgSelectSingle_22["PgSelectSingle[_22∈1]<br /><forums>"]:::plan
     PgClassExpression_23["PgClassExpression[_23∈1]<br /><__forums__.”name”>"]:::plan
     InputStaticLeaf_24["InputStaticLeaf[_24∈0]"]:::plan
     InputStaticLeaf_25["InputStaticLeaf[_25∈0]"]:::plan
-    PgClassExpression_33["PgClassExpression[_33∈1] {1,2,0}<br /><__forums__.”id”>"]:::plan
+    PgClassExpression_33["PgClassExpression[_33∈1]<br /><__forums__.”id”>"]:::plan
     Connection_38["Connection[_38∈0]<br /><_34>"]:::plan
-    PgClassExpression_39["PgClassExpression[_39∈1] {1,2,0}<br /><__forums__...chived_at”>"]:::plan
+    PgClassExpression_39["PgClassExpression[_39∈1]<br /><__forums__...chived_at”>"]:::plan
     PgSelect_40[["PgSelect[_40∈2@1]<br /><messages>"]]:::plan
     __Item_41>"__Item[_41∈3@1]<br /><_40>"]:::itemplan
     PgSelectSingle_42["PgSelectSingle[_42∈3@1]<br /><messages>"]:::plan
@@ -55,7 +54,6 @@ graph TD
     Access_80["Access[_80∈1]<br /><_21.1>"]:::plan
 
     %% plan dependencies
-    __Value_5 --> __TrackedObject_6
     Object_64 --> PgSelect_17
     PgSelect_17 ==> __Item_21
     __Item_21 --> PgSelectSingle_22
@@ -101,8 +99,8 @@ graph TD
     __Item_21 --> Access_80
 
     %% plan-to-path relationships
-    P_6["~"]
-    __TrackedObject_6 -.-> P_6
+    P_0["~"]
+    __Value_0 -.-> P_0
     P_17[">forums"]
     PgSelect_17 -.-> P_17
     P_22[">forums[]"]
@@ -148,7 +146,7 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,PgSelect_17,InputStaticLeaf_24,InputStaticLeaf_25,Connection_38,Access_62,Access_63,Object_64,PgPageInfo_69,Constant_70,Constant_71 bucket0
+    class __Value_0,__Value_3,PgSelect_17,InputStaticLeaf_24,InputStaticLeaf_25,Connection_38,Access_62,Access_63,Object_64,PgPageInfo_69,Constant_70,Constant_71 bucket0
     classDef bucket1 stroke:#00bfff
     class __Item_21,PgSelectSingle_22,PgClassExpression_23,PgClassExpression_33,PgClassExpression_39,First_73,PgSelectSingle_74,PgClassExpression_75,Access_80 bucket1
     classDef bucket2 stroke:#7f007f

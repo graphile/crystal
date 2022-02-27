@@ -8,9 +8,8 @@ graph TD
 
 
     %% define plans
+    __Value_0["__Value[_0∈0]"]:::plan
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     PgSelect_17[["PgSelect[_17∈0]<br /><forums>"]]:::plan
     __Item_21>"__Item[_21∈1]<br /><_17>"]:::itemplan
     PgSelectSingle_22["PgSelectSingle[_22∈1]<br /><forums>"]:::plan
@@ -23,13 +22,13 @@ graph TD
     PgClassExpression_39["PgClassExpression[_39∈1]<br /><__forums__...chived_at”>"]:::plan
     __Item_41>"__Item[_41∈2]<br /><_34>"]:::itemplan
     PgSelectSingle_42["PgSelectSingle[_42∈2]<br /><messages>"]:::plan
-    PgClassExpression_43["PgClassExpression[_43∈2] {1,0}<br /><__messages__.”body”>"]:::plan
-    PgClassExpression_44["PgClassExpression[_44∈2] {1,0}<br /><__messages...author_id”>"]:::plan
-    PgSelect_45[["PgSelect[_45∈2] {1,0}<br /><users>"]]:::plan
-    First_49["First[_49∈2] {1,0}"]:::plan
-    PgSelectSingle_50["PgSelectSingle[_50∈2] {1,0}<br /><users>"]:::plan
-    PgClassExpression_51["PgClassExpression[_51∈2] {1,0}<br /><__users__.”username”>"]:::plan
-    PgClassExpression_52["PgClassExpression[_52∈2] {1,0}<br /><__users__....vatar_url”>"]:::plan
+    PgClassExpression_43["PgClassExpression[_43∈2]<br /><__messages__.”body”>"]:::plan
+    PgClassExpression_44["PgClassExpression[_44∈2]<br /><__messages...author_id”>"]:::plan
+    PgSelect_45[["PgSelect[_45∈2]<br /><users>"]]:::plan
+    First_49["First[_49∈2]"]:::plan
+    PgSelectSingle_50["PgSelectSingle[_50∈2]<br /><users>"]:::plan
+    PgClassExpression_51["PgClassExpression[_51∈2]<br /><__users__.”username”>"]:::plan
+    PgClassExpression_52["PgClassExpression[_52∈2]<br /><__users__....vatar_url”>"]:::plan
     PgCursor_55["PgCursor[_55∈2]"]:::plan
     PgClassExpression_56["PgClassExpression[_56∈2]<br /><__messages__.”id”>"]:::plan
     List_57["List[_57∈2]<br /><_56>"]:::plan
@@ -55,7 +54,6 @@ graph TD
     PgClassExpression_86["PgClassExpression[_86∈1]<br /><count(*)>"]:::plan
 
     %% plan dependencies
-    __Value_5 --> __TrackedObject_6
     Object_63 --> PgSelect_17
     PgSelect_17 ==> __Item_21
     __Item_21 --> PgSelectSingle_22
@@ -102,8 +100,8 @@ graph TD
     PgSelectSingle_85 --> PgClassExpression_86
 
     %% plan-to-path relationships
-    P_6["~"]
-    __TrackedObject_6 -.-> P_6
+    P_0["~"]
+    __Value_0 -.-> P_0
     P_17[">forums"]
     PgSelect_17 -.-> P_17
     P_22[">forums[]"]
@@ -141,7 +139,7 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,PgSelect_17,InputStaticLeaf_24,InputStaticLeaf_25,Connection_38,Access_61,Access_62,Object_63,PgPageInfo_68,Constant_69,Constant_70 bucket0
+    class __Value_0,__Value_3,PgSelect_17,InputStaticLeaf_24,InputStaticLeaf_25,Connection_38,Access_61,Access_62,Object_63,PgPageInfo_68,Constant_69,Constant_70 bucket0
     classDef bucket1 stroke:#00bfff
     class __Item_21,PgSelectSingle_22,PgClassExpression_23,PgClassExpression_33,PgSelect_34,PgClassExpression_39,First_72,PgSelectSingle_73,PgCursor_74,PgClassExpression_75,List_76,Last_78,PgSelectSingle_79,PgCursor_80,PgClassExpression_81,List_82,PgSelect_83,First_84,PgSelectSingle_85,PgClassExpression_86 bucket1
     classDef bucket2 stroke:#7f007f

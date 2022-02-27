@@ -8,9 +8,8 @@ graph TD
 
 
     %% define plans
+    __Value_0["__Value[_0∈0]"]:::plan
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     PgSelect_8[["PgSelect[_8∈0]<br /><relational_commentables>"]]:::plan
     __ListTransform_12["__ListTransform[_12∈0]<br /><each:_8>"]:::plan
     __Item_13>"__Item[_13∈1]<br /><_8>"]:::itemplan
@@ -66,7 +65,6 @@ graph TD
     List_132["List[_132∈2]<br /><_131>"]:::plan
 
     %% plan dependencies
-    __Value_5 --> __TrackedObject_6
     Object_115 --> PgSelect_8
     PgSelect_8 --> __ListTransform_12
     PgSelectSingle_14 -.-> __ListTransform_12
@@ -125,8 +123,8 @@ graph TD
     Map_131 --> List_132
 
     %% plan-to-path relationships
-    P_6["~"]
-    __TrackedObject_6 -.-> P_6
+    P_0["~"]
+    __Value_0 -.-> P_0
     P_12[">allRelationalCommentablesList"]
     __ListTransform_12 -.-> P_12
     P_14[">allRelationalCommentablesList@_12[]"]
@@ -172,7 +170,7 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,PgSelect_8,__ListTransform_12,Access_113,Access_114,Object_115 bucket0
+    class __Value_0,__Value_3,PgSelect_8,__ListTransform_12,Access_113,Access_114,Object_115 bucket0
     classDef bucket1 stroke:#00bfff
     class __Item_13,PgSelectSingle_14 bucket1
     classDef bucket2 stroke:#7f007f
@@ -185,7 +183,7 @@ graph TD
     class PgSelectSingle_93,PgClassExpression_94,First_100,PgSelectSingle_101,PgClassExpression_102,PgClassExpression_110,PgClassExpression_118,PgClassExpression_119,PgClassExpression_120,Map_129,List_130 bucket5
 
     subgraph "Buckets for queries/interfaces-relational/commentables"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀allRelationalCommentablesList <-A- _12"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀allRelationalCommentablesList <-A- _12"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_13)"):::bucket
     style Bucket1 stroke:#00bfff

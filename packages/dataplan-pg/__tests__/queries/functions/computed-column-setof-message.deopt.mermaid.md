@@ -8,9 +8,8 @@ graph TD
 
 
     %% define plans
+    __Value_0["__Value[_0∈0]"]:::plan
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
     PgSelect_8[["PgSelect[_8∈0]<br /><forums>"]]:::plan
     First_12["First[_12∈0]"]:::plan
@@ -25,7 +24,6 @@ graph TD
     PgClassExpression_21["PgClassExpression[_21∈1]<br /><__forums_f...s__.”body”>"]:::plan
 
     %% plan dependencies
-    __Value_5 --> __TrackedObject_6
     Object_18 --> PgSelect_8
     InputStaticLeaf_7 --> PgSelect_8
     PgSelect_8 --> First_12
@@ -42,8 +40,8 @@ graph TD
     PgSelectSingle_20 --> PgClassExpression_21
 
     %% plan-to-path relationships
-    P_6["~"]
-    __TrackedObject_6 -.-> P_6
+    P_0["~"]
+    __Value_0 -.-> P_0
     P_13[">forum"]
     PgSelectSingle_13 -.-> P_13
     P_15[">f…m>featuredMessages"]
@@ -55,12 +53,12 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgSelect_15,Access_16,Access_17,Object_18 bucket0
+    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgSelect_15,Access_16,Access_17,Object_18 bucket0
     classDef bucket1 stroke:#00bfff
     class __Item_19,PgSelectSingle_20,PgClassExpression_21 bucket1
 
     subgraph "Buckets for queries/functions/computed-column-setof-message"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀forum <-O- _13<br />⠀⠀⠀forum.featuredMessages <-A- _15"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀forum <-O- _13<br />⠀⠀⠀forum.featuredMessages <-A- _15"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_19)<br />~>Query.forum>Forum.featuredMessages[]<br />⠀ROOT <-O- _20<br />⠀⠀body <-L- _21"):::bucket
     style Bucket1 stroke:#00bfff

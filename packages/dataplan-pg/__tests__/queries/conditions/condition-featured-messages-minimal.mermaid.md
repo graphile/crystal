@@ -8,9 +8,8 @@ graph TD
 
 
     %% define plans
+    __Value_0["__Value[_0∈0]"]:::plan
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     PgSelect_17[["PgSelect[_17∈0]<br /><forums>"]]:::plan
     __Item_21>"__Item[_21∈1]<br /><_17>"]:::itemplan
     PgSelectSingle_22["PgSelectSingle[_22∈1]<br /><forums>"]:::plan
@@ -31,7 +30,6 @@ graph TD
     Access_48["Access[_48∈1]<br /><_21.1>"]:::plan
 
     %% plan dependencies
-    __Value_5 --> __TrackedObject_6
     Object_36 --> PgSelect_17
     InputStaticLeaf_26 --> PgSelect_17
     PgSelect_17 ==> __Item_21
@@ -51,8 +49,8 @@ graph TD
     __Item_21 --> Access_48
 
     %% plan-to-path relationships
-    P_6["~"]
-    __TrackedObject_6 -.-> P_6
+    P_0["~"]
+    __Value_0 -.-> P_0
     P_17[">forums"]
     PgSelect_17 -.-> P_17
     P_22[">forums[]"]
@@ -68,12 +66,12 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,PgSelect_17,InputStaticLeaf_23,InputStaticLeaf_24,InputStaticLeaf_26,Access_34,Access_35,Object_36,Connection_37,PgPageInfo_39 bucket0
+    class __Value_0,__Value_3,PgSelect_17,InputStaticLeaf_23,InputStaticLeaf_24,InputStaticLeaf_26,Access_34,Access_35,Object_36,Connection_37,PgPageInfo_39 bucket0
     classDef bucket1 stroke:#00bfff
     class __Item_21,PgSelectSingle_22,Lambda_41,First_43,PgSelectSingle_44,PgClassExpression_45,Access_46,Lambda_47,Access_48 bucket1
 
     subgraph "Buckets for queries/conditions/condition-featured-messages-minimal"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀forums <-A- _17"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀forums <-A- _17"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />~>Query.forums[]<br />⠀ROOT <-O- _22<br />⠀⠀messagesConnection <-O- _37<br />⠀⠀⠀messagesConnection.pageInfo <-O- _39<br />⠀⠀⠀⠀messagesConnection.pageInfo.hasNextPage <-L- _41<br />⠀⠀⠀messagesConnection.totalCount <-L- _45"):::bucket
     style Bucket1 stroke:#00bfff

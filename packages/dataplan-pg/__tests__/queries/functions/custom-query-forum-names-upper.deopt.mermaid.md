@@ -8,9 +8,8 @@ graph TD
 
 
     %% define plans
+    __Value_0["__Value[_0∈0]"]:::plan
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     PgSelect_7[["PgSelect[_7∈0]<br /><forum_names>"]]:::plan
     Access_8["Access[_8∈0]<br /><_3.pgSettings>"]:::plan
     Access_9["Access[_9∈0]<br /><_3.withPgClient>"]:::plan
@@ -25,7 +24,6 @@ graph TD
     Lambda_18["Lambda[_18∈2]"]:::plan
 
     %% plan dependencies
-    __Value_5 --> __TrackedObject_6
     Object_10 --> PgSelect_7
     __Value_3 --> Access_8
     __Value_3 --> Access_9
@@ -42,8 +40,8 @@ graph TD
     PgClassExpression_17 --> Lambda_18
 
     %% plan-to-path relationships
-    P_6["~"]
-    __TrackedObject_6 -.-> P_6
+    P_0["~"]
+    __Value_0 -.-> P_0
     P_11[">FORUM_NAMES"]
     __ListTransform_11 -.-> P_11
     P_14[">FORUM_NAMES@_11[]"]
@@ -53,14 +51,14 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,PgSelect_7,Access_8,Access_9,Object_10,__ListTransform_11 bucket0
+    class __Value_0,__Value_3,PgSelect_7,Access_8,Access_9,Object_10,__ListTransform_11 bucket0
     classDef bucket1 stroke:#00bfff
     class __Item_12,PgSelectSingle_13,PgClassExpression_14 bucket1
     classDef bucket2 stroke:#7f007f
     class __Item_15,PgSelectSingle_16,PgClassExpression_17,Lambda_18 bucket2
 
     subgraph "Buckets for queries/functions/custom-query-forum-names-upper"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀FORUM_NAMES <-L- _11"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀FORUM_NAMES <-L- _11"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_12)"):::bucket
     style Bucket1 stroke:#00bfff

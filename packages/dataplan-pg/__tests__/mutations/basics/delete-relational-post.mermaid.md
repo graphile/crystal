@@ -8,7 +8,8 @@ graph TD
 
 
     %% define plans
-    __Value_3["__Value[_3∈0] {1,2}<br /><context>"]:::plan
+    __Value_0["__Value[_0∈0]"]:::plan
+    __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
     __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     InputStaticLeaf_8["InputStaticLeaf[_8∈1@1]"]:::plan
@@ -129,8 +130,8 @@ graph TD
     Map_101 --> List_102
 
     %% plan-to-path relationships
-    P_6["~"]
-    __TrackedObject_6 -.-> P_6
+    P_0["~"]
+    __Value_0 -.-> P_0
     P_9[">d1"]
     PgDelete_9 -.-> P_9
     P_13[">d1>id"]
@@ -178,14 +179,14 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,Access_84,Access_85,Object_86 bucket0
+    class __Value_0,__Value_3,__Value_5,__TrackedObject_6,Access_84,Access_85,Object_86 bucket0
     classDef bucket1 stroke:#00bfff
     class InputStaticLeaf_8,PgDelete_9,PgClassExpression_13,PgClassExpression_14,PgSelect_15,First_19,PgSelectSingle_20,PgClassExpression_21,PgClassExpression_22,PgClassExpression_23,PgClassExpression_24,First_30,PgSelectSingle_31,PgClassExpression_32,First_38,PgSelectSingle_39,First_45,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_48,Map_91,List_92,Map_93,List_94,Map_95,List_96 bucket1
     classDef bucket2 stroke:#7f007f
     class InputStaticLeaf_50,PgDelete_51,PgClassExpression_55,PgClassExpression_56,PgSelect_57,First_61,PgSelectSingle_62,PgClassExpression_63,PgClassExpression_64,PgClassExpression_65,PgClassExpression_66,First_72,PgSelectSingle_73,PgClassExpression_74,First_80,PgSelectSingle_81,First_87,PgSelectSingle_88,PgClassExpression_89,PgClassExpression_90,Map_97,List_98,Map_99,List_100,Map_101,List_102 bucket2
 
     subgraph "Buckets for mutations/basics/delete-relational-post"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (group1[mutation])<br />~>Mutation.d1<br />⠀ROOT <-O- _9<br />⠀⠀id <-L- _13<br />⠀⠀post <-O- _20<br />⠀⠀⠀post.id <-L- _21<br />⠀⠀⠀post.title <-L- _22<br />⠀⠀⠀post.description <-L- _23<br />⠀⠀⠀post.note <-L- _24<br />⠀⠀⠀post.titleLower <-L- _32<br />⠀⠀⠀post.author <-O- _46<br />⠀⠀⠀⠀post.author.personId <-L- _47<br />⠀⠀⠀⠀post.author.username <-L- _48"):::bucket
     style Bucket1 stroke:#00bfff

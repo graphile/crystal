@@ -8,7 +8,8 @@ graph TD
 
 
     %% define plans
-    __Value_3["__Value[_3∈1@1]<br /><context>"]:::plan
+    __Value_0["__Value[_0∈0]"]:::plan
+    __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
     __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     Constant_7["Constant[_7∈1@1]"]:::plan
@@ -160,10 +161,10 @@ graph TD
     Access_201 --> Object_202
 
     %% plan-to-path relationships
+    P_0["~"]
+    __Value_0 -.-> P_0
     P_5[">c…s>query"]
     __Value_5 -.-> P_5
-    P_6["~"]
-    __TrackedObject_6 -.-> P_6
     P_49[">createThreeRelationalPosts"]
     PgClassExpression_49 -.-> P_49
     P_58[">c…s>q…y>i1"]
@@ -199,9 +200,9 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_5,__TrackedObject_6 bucket0
+    class __Value_0,__Value_3,__Value_5,__TrackedObject_6 bucket0
     classDef bucket1 stroke:#00bfff
-    class __Value_3,Constant_7,Constant_8,PgInsert_9,PgClassExpression_13,Constant_14,Constant_15,Constant_16,PgInsert_17,Constant_21,Constant_22,PgInsert_23,PgClassExpression_27,Constant_28,Constant_29,Constant_30,PgInsert_31,Constant_35,Constant_36,PgInsert_37,PgClassExpression_41,Constant_42,Constant_43,Constant_44,PgInsert_45,PgClassExpression_49,InputStaticLeaf_50,PgSelect_51,First_55,PgSelectSingle_56,PgClassExpression_57,PgPolymorphic_58,PgSelect_68,First_72,PgClassExpression_94,InputStaticLeaf_102,PgSelect_103,First_107,PgSelectSingle_108,PgClassExpression_109,PgPolymorphic_110,PgSelect_120,First_124,PgClassExpression_146,InputStaticLeaf_154,PgSelect_155,First_159,PgSelectSingle_160,PgClassExpression_161,PgPolymorphic_162,PgSelect_172,First_176,PgClassExpression_198,Access_200,Access_201,Object_202 bucket1
+    class Constant_7,Constant_8,PgInsert_9,PgClassExpression_13,Constant_14,Constant_15,Constant_16,PgInsert_17,Constant_21,Constant_22,PgInsert_23,PgClassExpression_27,Constant_28,Constant_29,Constant_30,PgInsert_31,Constant_35,Constant_36,PgInsert_37,PgClassExpression_41,Constant_42,Constant_43,Constant_44,PgInsert_45,PgClassExpression_49,InputStaticLeaf_50,PgSelect_51,First_55,PgSelectSingle_56,PgClassExpression_57,PgPolymorphic_58,PgSelect_68,First_72,PgClassExpression_94,InputStaticLeaf_102,PgSelect_103,First_107,PgSelectSingle_108,PgClassExpression_109,PgPolymorphic_110,PgSelect_120,First_124,PgClassExpression_146,InputStaticLeaf_154,PgSelect_155,First_159,PgSelectSingle_160,PgClassExpression_161,PgPolymorphic_162,PgSelect_172,First_176,PgClassExpression_198,Access_200,Access_201,Object_202 bucket1
     classDef bucket2 stroke:#7f007f
     class PgSelectSingle_73,PgClassExpression_75,PgClassExpression_76,PgClassExpression_77 bucket2
     classDef bucket3 stroke:#ffa500
@@ -210,7 +211,7 @@ graph TD
     class PgSelectSingle_177,PgClassExpression_179,PgClassExpression_180,PgClassExpression_181 bucket4
 
     subgraph "Buckets for mutations/basics/create-three-relational-posts"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (group1[mutation])<br />~>Mutation.createThreeRelationalPosts<br />⠀ROOT <-O- _49<br />⠀⠀query <-O- _5<br />⠀⠀⠀query.i1 <-O- _58<br />⠀⠀⠀⠀query.i1.id <-L- _94<br />⠀⠀⠀query.i2 <-O- _110<br />⠀⠀⠀⠀query.i2.id <-L- _146<br />⠀⠀⠀query.i3 <-O- _162<br />⠀⠀⠀⠀query.i3.id <-L- _198"):::bucket
     style Bucket1 stroke:#00bfff

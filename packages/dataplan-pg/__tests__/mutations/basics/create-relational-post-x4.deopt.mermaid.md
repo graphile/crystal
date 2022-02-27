@@ -8,7 +8,8 @@ graph TD
 
 
     %% define plans
-    __Value_3["__Value[_3∈0] {1,2,3,4}<br /><context>"]:::plan
+    __Value_0["__Value[_0∈0]"]:::plan
+    __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
     __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     InputStaticLeaf_8["InputStaticLeaf[_8∈1@1]"]:::plan
@@ -167,8 +168,8 @@ graph TD
     PgSelectSingle_114 --> PgClassExpression_118
 
     %% plan-to-path relationships
-    P_6["~"]
-    __TrackedObject_6 -.-> P_6
+    P_0["~"]
+    __Value_0 -.-> P_0
     P_22[">p1"]
     PgClassExpression_22 -.-> P_22
     P_23[">p1>id"]
@@ -228,7 +229,7 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,Access_110,Access_111,Object_112 bucket0
+    class __Value_0,__Value_3,__Value_5,__TrackedObject_6,Access_110,Access_111,Object_112 bucket0
     classDef bucket1 stroke:#00bfff
     class InputStaticLeaf_8,InputStaticLeaf_9,InputStaticLeaf_10,Constant_11,Constant_12,PgInsert_13,PgClassExpression_17,PgInsert_18,PgClassExpression_22,PgClassExpression_23,PgSelect_25,First_29,PgSelectSingle_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34 bucket1
     classDef bucket2 stroke:#7f007f
@@ -239,7 +240,7 @@ graph TD
     class InputStaticLeaf_92,InputStaticLeaf_93,InputStaticLeaf_94,Constant_95,Constant_96,PgInsert_97,PgClassExpression_101,PgInsert_102,PgClassExpression_106,PgClassExpression_107,PgSelect_109,First_113,PgSelectSingle_114,PgClassExpression_115,PgClassExpression_116,PgClassExpression_117,PgClassExpression_118 bucket4
 
     subgraph "Buckets for mutations/basics/create-relational-post-x4"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (group1[mutation])<br />~>Mutation.p1<br />⠀ROOT <-O- _22<br />⠀⠀id <-L- _23<br />⠀⠀post <-O- _30<br />⠀⠀⠀post.id <-L- _31<br />⠀⠀⠀post.title <-L- _32<br />⠀⠀⠀post.description <-L- _33<br />⠀⠀⠀post.note <-L- _34"):::bucket
     style Bucket1 stroke:#00bfff

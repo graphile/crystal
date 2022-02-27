@@ -8,9 +8,8 @@ graph TD
 
 
     %% define plans
+    __Value_0["__Value[_0∈0]"]:::plan
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
     PgSelect_8[["PgSelect[_8∈0]<br /><messages>"]]:::plan
     First_12["First[_12∈0]"]:::plan
@@ -27,7 +26,6 @@ graph TD
     PgClassExpression_24["PgClassExpression[_24∈0]<br /><__forums__.”name”>"]:::plan
 
     %% plan dependencies
-    __Value_5 --> __TrackedObject_6
     Object_20 --> PgSelect_8
     InputStaticLeaf_7 --> PgSelect_8
     PgSelect_8 --> First_12
@@ -46,8 +44,8 @@ graph TD
     PgSelectSingle_22 --> PgClassExpression_24
 
     %% plan-to-path relationships
-    P_6["~"]
-    __TrackedObject_6 -.-> P_6
+    P_0["~"]
+    __Value_0 -.-> P_0
     P_13[">message"]
     PgSelectSingle_13 -.-> P_13
     P_14[">m…e>id"]
@@ -63,10 +61,10 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgClassExpression_15,PgClassExpression_16,PgSelect_17,Access_18,Access_19,Object_20,First_21,PgSelectSingle_22,PgClassExpression_24 bucket0
+    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgClassExpression_15,PgClassExpression_16,PgSelect_17,Access_18,Access_19,Object_20,First_21,PgSelectSingle_22,PgClassExpression_24 bucket0
 
     subgraph "Buckets for queries/relations/basics"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀message <-O- _13<br />⠀⠀⠀message.id <-L- _14<br />⠀⠀⠀message.body <-L- _15<br />⠀⠀⠀message.forum <-O- _22<br />⠀⠀⠀⠀message.forum.id <-L- _16<br />⠀⠀⠀⠀message.forum.name <-L- _24"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀message <-O- _13<br />⠀⠀⠀message.id <-L- _14<br />⠀⠀⠀message.body <-L- _15<br />⠀⠀⠀message.forum <-O- _22<br />⠀⠀⠀⠀message.forum.id <-L- _16<br />⠀⠀⠀⠀message.forum.name <-L- _24"):::bucket
     style Bucket0 stroke:#696969
     end
 ```

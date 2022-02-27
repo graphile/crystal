@@ -8,7 +8,8 @@ graph TD
 
 
     %% define plans
-    __Value_3["__Value[_3∈0] {1,2,3}<br /><context>"]:::plan
+    __Value_0["__Value[_0∈0]"]:::plan
+    __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
     __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     InputStaticLeaf_8["InputStaticLeaf[_8∈1@1]"]:::plan
@@ -254,10 +255,10 @@ graph TD
     Map_377 --> List_378
 
     %% plan-to-path relationships
+    P_0["~"]
+    __Value_0 -.-> P_0
     P_5[">p2>query<br />>p3>query"]
     __Value_5 -.-> P_5
-    P_6["~"]
-    __TrackedObject_6 -.-> P_6
     P_22[">p1"]
     PgClassExpression_22 -.-> P_22
     P_38[">p2"]
@@ -327,7 +328,7 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,Access_361,Access_362,Object_363 bucket0
+    class __Value_0,__Value_3,__Value_5,__TrackedObject_6,Access_361,Access_362,Object_363 bucket0
     classDef bucket1 stroke:#00bfff
     class InputStaticLeaf_8,InputStaticLeaf_9,InputStaticLeaf_10,Constant_11,Constant_12,PgInsert_13,PgClassExpression_17,PgInsert_18,PgClassExpression_22 bucket1
     classDef bucket2 stroke:#7f007f
@@ -348,7 +349,7 @@ graph TD
     class PgSelectSingle_338,PgClassExpression_340,PgClassExpression_341,PgClassExpression_342 bucket9
 
     subgraph "Buckets for mutations/basics/create-relational-post-no-query"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (group1[mutation])<br />~>Mutation.p1<br />⠀ROOT <-O- _22"):::bucket
     style Bucket1 stroke:#00bfff

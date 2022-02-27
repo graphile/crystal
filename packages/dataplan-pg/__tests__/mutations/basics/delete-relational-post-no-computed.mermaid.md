@@ -8,7 +8,8 @@ graph TD
 
 
     %% define plans
-    __Value_3["__Value[_3∈0] {1,2}<br /><context>"]:::plan
+    __Value_0["__Value[_0∈0]"]:::plan
+    __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
     __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     InputStaticLeaf_8["InputStaticLeaf[_8∈1@1]"]:::plan
@@ -35,8 +36,8 @@ graph TD
     PgDelete_16 --> PgClassExpression_20
 
     %% plan-to-path relationships
-    P_6["~"]
-    __TrackedObject_6 -.-> P_6
+    P_0["~"]
+    __Value_0 -.-> P_0
     P_9[">d1"]
     PgDelete_9 -.-> P_9
     P_13[">d1>id"]
@@ -48,14 +49,14 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,Access_10,Access_11,Object_12 bucket0
+    class __Value_0,__Value_3,__Value_5,__TrackedObject_6,Access_10,Access_11,Object_12 bucket0
     classDef bucket1 stroke:#00bfff
     class InputStaticLeaf_8,PgDelete_9,PgClassExpression_13 bucket1
     classDef bucket2 stroke:#7f007f
     class InputStaticLeaf_15,PgDelete_16,PgClassExpression_20 bucket2
 
     subgraph "Buckets for mutations/basics/delete-relational-post-no-computed"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (group1[mutation])<br />~>Mutation.d1<br />⠀ROOT <-O- _9<br />⠀⠀id <-L- _13"):::bucket
     style Bucket1 stroke:#00bfff

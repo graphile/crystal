@@ -8,9 +8,8 @@ graph TD
 
 
     %% define plans
+    __Value_0["__Value[_0∈0]"]:::plan
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
     PgSelect_8[["PgSelect[_8∈0]<br /><people>"]]:::plan
     First_12["First[_12∈0]"]:::plan
@@ -70,7 +69,6 @@ graph TD
     Access_100["Access[_100∈0]<br /><_12.0>"]:::plan
 
     %% plan dependencies
-    __Value_5 --> __TrackedObject_6
     Object_81 --> PgSelect_8
     InputStaticLeaf_7 --> PgSelect_8
     PgSelect_8 --> First_12
@@ -134,8 +132,8 @@ graph TD
     First_12 --> Access_100
 
     %% plan-to-path relationships
-    P_6["~"]
-    __TrackedObject_6 -.-> P_6
+    P_0["~"]
+    __Value_0 -.-> P_0
     P_13[">personByPersonId"]
     PgSelectSingle_13 -.-> P_13
     P_14[">p…d>personId"]
@@ -181,7 +179,7 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgClassExpression_15,Access_79,Access_80,Object_81,Access_100 bucket0
+    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgClassExpression_15,Access_79,Access_80,Object_81,Access_100 bucket0
     classDef bucket1 stroke:#00bfff
     class __Item_21,PgSelectSingle_22,PgClassExpression_23,First_29,PgSelectSingle_30,PgClassExpression_31,PgClassExpression_32,PgClassExpression_33,PgClassExpression_34,PgClassExpression_35,List_36,PgPolymorphic_37,First_42,First_50,First_66,Map_86,List_87,Map_88,List_89,Map_92,List_93,Map_98,List_99 bucket1
     classDef bucket2 stroke:#7f007f
@@ -192,7 +190,7 @@ graph TD
     class PgSelectSingle_67,PgClassExpression_68,First_74,PgSelectSingle_75,PgClassExpression_76,First_82,PgSelectSingle_83,PgClassExpression_84,PgClassExpression_85,Map_94,List_95,Map_96,List_97 bucket4
 
     subgraph "Buckets for queries/unions-table/bookmarks"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀personByPersonId <-O- _13<br />⠀⠀⠀personByPersonId.personId <-L- _14<br />⠀⠀⠀personByPersonId.username <-L- _15<br />⠀⠀⠀personByPersonId.personBookmarksList <-A- _100"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀personByPersonId <-O- _13<br />⠀⠀⠀personByPersonId.personId <-L- _14<br />⠀⠀⠀personByPersonId.username <-L- _15<br />⠀⠀⠀personByPersonId.personBookmarksList <-A- _100"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (item_21)<br />~>Query.personByPersonId>Person.personBookmarksList[]<br />⠀ROOT <-O- _22<br />⠀⠀id <-L- _23<br />⠀⠀person <-O- _30<br />⠀⠀⠀person.username <-L- _31<br />⠀⠀bookmarkedEntity <-O- _37"):::bucket
     style Bucket1 stroke:#00bfff

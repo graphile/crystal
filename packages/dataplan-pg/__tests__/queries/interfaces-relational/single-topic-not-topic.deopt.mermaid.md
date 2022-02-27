@@ -8,9 +8,8 @@ graph TD
 
 
     %% define plans
+    __Value_0["__Value[_0∈0]"]:::plan
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
     PgSelect_8[["PgSelect[_8∈0]<br /><relational_topics>"]]:::plan
     First_12["First[_12∈0]"]:::plan
@@ -33,7 +32,6 @@ graph TD
     List_73["List[_73∈0]<br /><_72>"]:::plan
 
     %% plan dependencies
-    __Value_5 --> __TrackedObject_6
     Object_67 --> PgSelect_8
     InputStaticLeaf_7 --> PgSelect_8
     PgSelect_8 --> First_12
@@ -57,8 +55,8 @@ graph TD
     Map_72 --> List_73
 
     %% plan-to-path relationships
-    P_6["~"]
-    __TrackedObject_6 -.-> P_6
+    P_0["~"]
+    __Value_0 -.-> P_0
     P_13[">relationalTopicById"]
     PgSelectSingle_13 -.-> P_13
     P_14[">r…d>id"]
@@ -82,10 +80,10 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,First_20,PgSelectSingle_21,PgClassExpression_22,PgClassExpression_30,PgClassExpression_38,PgClassExpression_46,PgClassExpression_54,PgClassExpression_62,Access_65,Access_66,Object_67,PgClassExpression_70,PgClassExpression_71,Map_72,List_73 bucket0
+    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,First_20,PgSelectSingle_21,PgClassExpression_22,PgClassExpression_30,PgClassExpression_38,PgClassExpression_46,PgClassExpression_54,PgClassExpression_62,Access_65,Access_66,Object_67,PgClassExpression_70,PgClassExpression_71,Map_72,List_73 bucket0
 
     subgraph "Buckets for queries/interfaces-relational/single-topic-not-topic"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀relationalTopicById <-O- _13<br />⠀⠀⠀relationalTopicById.id <-L- _14<br />⠀⠀⠀relationalTopicById.type <-L- _22<br />⠀⠀⠀relationalTopicById.type2 <-L- _30<br />⠀⠀⠀relationalTopicById.position <-L- _38<br />⠀⠀⠀relationalTopicById.createdAt <-L- _46<br />⠀⠀⠀relationalTopicById.updatedAt <-L- _54<br />⠀⠀⠀relationalTopicById.isExplicitlyArchived <-L- _62<br />⠀⠀⠀relationalTopicById.archivedAt <-L- _70<br />⠀⠀⠀relationalTopicById.title <-L- _71"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀relationalTopicById <-O- _13<br />⠀⠀⠀relationalTopicById.id <-L- _14<br />⠀⠀⠀relationalTopicById.type <-L- _22<br />⠀⠀⠀relationalTopicById.type2 <-L- _30<br />⠀⠀⠀relationalTopicById.position <-L- _38<br />⠀⠀⠀relationalTopicById.createdAt <-L- _46<br />⠀⠀⠀relationalTopicById.updatedAt <-L- _54<br />⠀⠀⠀relationalTopicById.isExplicitlyArchived <-L- _62<br />⠀⠀⠀relationalTopicById.archivedAt <-L- _70<br />⠀⠀⠀relationalTopicById.title <-L- _71"):::bucket
     style Bucket0 stroke:#696969
     end
 ```

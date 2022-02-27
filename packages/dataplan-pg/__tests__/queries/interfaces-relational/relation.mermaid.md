@@ -8,9 +8,8 @@ graph TD
 
 
     %% define plans
+    __Value_0["__Value[_0∈0]"]:::plan
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
     PgSelect_8[["PgSelect[_8∈0]<br /><relational_items>"]]:::plan
     First_12["First[_12∈0]"]:::plan
@@ -35,7 +34,6 @@ graph TD
     List_504["List[_504∈0]<br /><_503>"]:::plan
 
     %% plan dependencies
-    __Value_5 --> __TrackedObject_6
     Object_496 --> PgSelect_8
     InputStaticLeaf_7 --> PgSelect_8
     PgSelect_8 --> First_12
@@ -63,8 +61,8 @@ graph TD
     Map_503 --> List_504
 
     %% plan-to-path relationships
-    P_6["~"]
-    __TrackedObject_6 -.-> P_6
+    P_0["~"]
+    __Value_0 -.-> P_0
     P_15[">item"]
     PgPolymorphic_15 -.-> P_15
     P_31[">item>parent x5"]
@@ -80,10 +78,10 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgPolymorphic_15,First_28,PgSelectSingle_29,PgClassExpression_30,PgPolymorphic_31,First_45,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_404,PgClassExpression_484,Access_494,Access_495,Object_496,Map_501,List_502,Map_503,List_504 bucket0
+    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,PgPolymorphic_15,First_28,PgSelectSingle_29,PgClassExpression_30,PgPolymorphic_31,First_45,PgSelectSingle_46,PgClassExpression_47,PgClassExpression_404,PgClassExpression_484,Access_494,Access_495,Object_496,Map_501,List_502,Map_503,List_504 bucket0
 
     subgraph "Buckets for queries/interfaces-relational/relation"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀item <-O- _15<br />⠀⠀⠀item.parent <-O- _31<br />⠀⠀⠀⠀item.parent.author <-O- _46<br />⠀⠀⠀⠀⠀item.parent.author.username <-L- _47<br />⠀⠀⠀⠀item.parent.id <-L- _484<br />⠀⠀⠀item.id <-L- _404"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀item <-O- _15<br />⠀⠀⠀item.parent <-O- _31<br />⠀⠀⠀⠀item.parent.author <-O- _46<br />⠀⠀⠀⠀⠀item.parent.author.username <-L- _47<br />⠀⠀⠀⠀item.parent.id <-L- _484<br />⠀⠀⠀item.id <-L- _404"):::bucket
     style Bucket0 stroke:#696969
     end
 ```

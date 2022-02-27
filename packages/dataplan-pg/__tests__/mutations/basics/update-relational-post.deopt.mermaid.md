@@ -8,7 +8,8 @@ graph TD
 
 
     %% define plans
-    __Value_3["__Value[_3∈0] {1,2,3,4}<br /><context>"]:::plan
+    __Value_0["__Value[_0∈0]"]:::plan
+    __Value_3["__Value[_3∈0]<br /><context>"]:::plan
     __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
     __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     InputStaticLeaf_8["InputStaticLeaf[_8∈1@1]"]:::plan
@@ -247,8 +248,8 @@ graph TD
     Map_237 --> List_238
 
     %% plan-to-path relationships
-    P_6["~"]
-    __TrackedObject_6 -.-> P_6
+    P_0["~"]
+    __Value_0 -.-> P_0
     P_13[">u1"]
     PgUpdate_13 -.-> P_13
     P_17[">u1>id"]
@@ -348,7 +349,7 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,Access_216,Access_217,Object_218 bucket0
+    class __Value_0,__Value_3,__Value_5,__TrackedObject_6,Access_216,Access_217,Object_218 bucket0
     classDef bucket1 stroke:#00bfff
     class InputStaticLeaf_8,InputStaticLeaf_11,PgUpdate_13,PgClassExpression_17,PgSelect_19,First_23,PgSelectSingle_24,PgClassExpression_25,PgClassExpression_26,PgClassExpression_27,PgClassExpression_28,First_34,PgSelectSingle_35,PgClassExpression_36,First_42,PgSelectSingle_43,PgClassExpression_44,PgClassExpression_52,PgSelect_53,First_57,PgSelectSingle_58,PgClassExpression_59,PgClassExpression_60,Map_223,List_224,Map_225,List_226 bucket1
     classDef bucket2 stroke:#7f007f
@@ -359,7 +360,7 @@ graph TD
     class InputStaticLeaf_170,InputStaticLeaf_173,PgUpdate_175,PgClassExpression_179,PgSelect_181,First_185,PgSelectSingle_186,PgClassExpression_187,PgClassExpression_188,PgClassExpression_189,PgClassExpression_190,First_196,PgSelectSingle_197,PgClassExpression_198,First_204,PgSelectSingle_205,PgClassExpression_206,PgClassExpression_214,PgSelect_215,First_219,PgSelectSingle_220,PgClassExpression_221,PgClassExpression_222,Map_235,List_236,Map_237,List_238 bucket4
 
     subgraph "Buckets for mutations/basics/update-relational-post"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (group1[mutation])<br />~>Mutation.u1<br />⠀ROOT <-O- _13<br />⠀⠀id <-L- _17<br />⠀⠀post <-O- _24<br />⠀⠀⠀post.id <-L- _25<br />⠀⠀⠀post.title <-L- _26<br />⠀⠀⠀post.description <-L- _27<br />⠀⠀⠀post.note <-L- _28<br />⠀⠀⠀post.titleLower <-L- _36<br />⠀⠀⠀post.isExplicitlyArchived <-L- _44<br />⠀⠀⠀post.author <-O- _58<br />⠀⠀⠀⠀post.author.personId <-L- _59<br />⠀⠀⠀⠀post.author.username <-L- _60"):::bucket
     style Bucket1 stroke:#00bfff

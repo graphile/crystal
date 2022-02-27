@@ -8,9 +8,8 @@ graph TD
 
 
     %% define plans
+    __Value_0["__Value[_0∈0]"]:::plan
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
     PgSelect_8[["PgSelect[_8∈0]<br /><single_table_items>"]]:::plan
     First_12["First[_12∈0]"]:::plan
@@ -37,7 +36,6 @@ graph TD
     List_300["List[_300∈1]<br /><_299>"]:::plan
 
     %% plan dependencies
-    __Value_5 --> __TrackedObject_6
     Object_292 --> PgSelect_8
     InputStaticLeaf_7 --> PgSelect_8
     PgSelect_8 --> First_12
@@ -67,8 +65,8 @@ graph TD
     Map_299 --> List_300
 
     %% plan-to-path relationships
-    P_6["~"]
-    __TrackedObject_6 -.-> P_6
+    P_0["~"]
+    __Value_0 -.-> P_0
     P_16[">item"]
     PgSingleTablePolymorphic_16 -.-> P_16
     P_17[">item>p…t>id x25"]
@@ -84,14 +82,14 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,Lambda_15,PgSingleTablePolymorphic_16,Access_290,Access_291,Object_292 bucket0
+    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,First_12,PgSelectSingle_13,PgClassExpression_14,Lambda_15,PgSingleTablePolymorphic_16,Access_290,Access_291,Object_292 bucket0
     classDef bucket1 stroke:#00bfff
     class PgClassExpression_17,First_22,PgSelectSingle_23,PgClassExpression_24,Lambda_25,PgSingleTablePolymorphic_26,PgClassExpression_72,Map_299,List_300 bucket1
     classDef bucket2 stroke:#7f007f
     class First_33,PgSelectSingle_34,PgClassExpression_35,Map_297,List_298 bucket2
 
     subgraph "Buckets for queries/interfaces-single-table/relation"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀item <-O- _16"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀item <-O- _16"):::bucket
     style Bucket0 stroke:#696969
     Bucket1("Bucket 1 (polymorphic_16[SingleTableTopic|SingleTablePost|SingleTableDivider|SingleTableChecklist|SingleTableChecklistItem])<br />~>Query.item<br />⠀⠀parent <-O- _26<br />⠀⠀⠀parent.id <-L- _17<br />⠀⠀id <-L- _72"):::bucket
     style Bucket1 stroke:#00bfff

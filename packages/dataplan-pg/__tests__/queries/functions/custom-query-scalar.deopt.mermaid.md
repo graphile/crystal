@@ -8,9 +8,8 @@ graph TD
 
 
     %% define plans
+    __Value_0["__Value[_0∈0]"]:::plan
     __Value_3["__Value[_3∈0]<br /><context>"]:::plan
-    __Value_5["__Value[_5∈0]<br /><rootValue>"]:::plan
-    __TrackedObject_6["__TrackedObject[_6∈0]"]:::plan
     InputStaticLeaf_7["InputStaticLeaf[_7∈0]"]:::plan
     PgSelect_8[["PgSelect[_8∈0]<br /><unique_author_count>"]]:::plan
     Access_9["Access[_9∈0]<br /><_3.pgSettings>"]:::plan
@@ -31,7 +30,6 @@ graph TD
     PgClassExpression_30["PgClassExpression[_30∈0]<br /><__unique_a...or_count__>"]:::plan
 
     %% plan dependencies
-    __Value_5 --> __TrackedObject_6
     Object_11 --> PgSelect_8
     InputStaticLeaf_7 --> PgSelect_8
     __Value_3 --> Access_9
@@ -53,8 +51,8 @@ graph TD
     PgSelectSingle_29 --> PgClassExpression_30
 
     %% plan-to-path relationships
-    P_6["~"]
-    __TrackedObject_6 -.-> P_6
+    P_0["~"]
+    __Value_0 -.-> P_0
     P_14[">all"]
     PgClassExpression_14 -.-> P_14
     P_22[">featured"]
@@ -64,10 +62,10 @@ graph TD
 
     %% allocate buckets
     classDef bucket0 stroke:#696969
-    class __Value_3,__Value_5,__TrackedObject_6,InputStaticLeaf_7,PgSelect_8,Access_9,Access_10,Object_11,First_12,PgSelectSingle_13,PgClassExpression_14,InputStaticLeaf_15,PgSelect_16,First_20,PgSelectSingle_21,PgClassExpression_22,InputStaticLeaf_23,PgSelect_24,First_28,PgSelectSingle_29,PgClassExpression_30 bucket0
+    class __Value_0,__Value_3,InputStaticLeaf_7,PgSelect_8,Access_9,Access_10,Object_11,First_12,PgSelectSingle_13,PgClassExpression_14,InputStaticLeaf_15,PgSelect_16,First_20,PgSelectSingle_21,PgClassExpression_22,InputStaticLeaf_23,PgSelect_24,First_28,PgSelectSingle_29,PgClassExpression_30 bucket0
 
     subgraph "Buckets for queries/functions/custom-query-scalar"
-    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _6<br />⠀⠀all <-L- _14<br />⠀⠀featured <-L- _22<br />⠀⠀unfeatured <-L- _30"):::bucket
+    Bucket0("Bucket 0 (root)<br />~<br />⠀ROOT <-O- _0<br />⠀⠀all <-L- _14<br />⠀⠀featured <-L- _22<br />⠀⠀unfeatured <-L- _30"):::bucket
     style Bucket0 stroke:#696969
     end
 ```
