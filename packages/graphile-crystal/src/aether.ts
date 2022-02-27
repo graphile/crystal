@@ -94,7 +94,7 @@ import { PlanResults } from "./planResults";
 import type { ConstantPlan } from "./plans";
 import { __ItemPlan, __TrackedObjectPlan, __ValuePlan } from "./plans";
 import { __ListTransformPlan } from "./plans/listTransform";
-import { assertPolymorphicData } from "./polymorphic";
+import { assertPolymorphicData, isPolymorphicData } from "./polymorphic";
 import {
   $$crystalWrapped,
   isCrystalObject,
@@ -494,8 +494,9 @@ function bucketValue(
     }
     case "O": {
       if (value == null || value instanceof CrystalError) {
-        return { [$$data]: value };
+        return value;
       } else {
+        let o: any;
         if (
           previousValue === "object" &&
           previousValue != null &&
@@ -503,10 +504,14 @@ function bucketValue(
           previousValue[$$data] != null &&
           !(previousValue[$$data] instanceof CrystalError)
         ) {
-          return previousValue;
+          o = previousValue;
         } else {
-          return { [$$data]: Object.create(null) };
+          o = { [$$data]: Object.create(null) };
         }
+        if (isPolymorphicData(value)) {
+          o[$$concreteType] = value[$$concreteType];
+        }
+        return o;
       }
     }
     case "L": {
