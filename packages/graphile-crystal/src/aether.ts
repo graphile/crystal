@@ -148,6 +148,13 @@ const dotEscape = (str: string): string => {
     .replace(/\r?\n/g, "<br />")}"`;
 };
 
+/**
+ * Returns true if this "executable plan" isn't actually executable because
+ * it's a special internal plan type whose values get auto-populated
+ */
+const isInternalPlan = (plan: ExecutablePlan) =>
+  plan instanceof __ValuePlan || plan instanceof __ItemPlan;
+
 interface PlanCacheForPlanResultses {
   [planId: string]: PromiseOrDirect<any[]>;
 }
@@ -281,7 +288,11 @@ interface BucketDefinitionFieldOutputMap {
    */
   mode: "O" | "A" | "L";
   /**
-   * Only valid when mode is 'O'; otherwise null
+   * The name of the named GraphQL result type of this field.
+   */
+  typeName: string | null;
+  /**
+   * Only valid when mode is 'O'; otherwise null.
    */
   children: {
     [responseKey: string]: BucketDefinitionFieldOutputMap;
@@ -356,6 +367,11 @@ interface BucketDefinition {
    * that.
    */
   rootOutputPlanId?: string;
+
+  /**
+   * If this is not a polymorphic bucket, what is the associated type name?
+   */
+  singleTypeName: string | null;
 
   /**
    * Some plans that execute within this bucket may be output to a particular
@@ -469,9 +485,6 @@ function bucketValue(
 ): any {
   switch (mode) {
     case "A": {
-      if (Math.random() < 2) {
-        throw new Error("NEEDS REVISITING DUE TO $$data");
-      }
       if (Array.isArray(value)) {
         if (Array.isArray(previousValue)) {
           if (previousValue.length !== value.length) {
@@ -529,7 +542,7 @@ function bucketValue(
 class BucketSetter {
   public readonly root: any;
   constructor(
-    private parentObject: Record<string, unknown> | unknown[],
+    private parentObject: object | unknown[],
     private parentKey: number | string,
   ) {
     this.root = parentObject[parentKey];
@@ -547,7 +560,10 @@ interface Bucket {
    */
   definition: BucketDefinition;
   rootPathIdentity: string;
-  typeName: string | null;
+  /**
+   * If this bucket isn't polymorphic, what is the type of the root of it?
+   */
+  singleTypeName: string | null;
   /**
    * The number of elements the bucket represents.
    */
@@ -862,10 +878,20 @@ export class Aether<
       );
     }
 
+    this.operationType = operation.operation;
+
     this.rootBucket = this.newBucket({
       parent: null,
       rootPathIdentities: [ROOT_PATH],
       groupId: 0,
+      singleTypeName:
+        this.operationType === "query"
+          ? this.queryTypeName
+          : this.operationType === "mutation"
+          ? this.mutationTypeName ?? null
+          : this.operationType === "subscription"
+          ? this.subscriptionTypeName ?? null
+          : null,
     });
     assert.strictEqual(
       this.rootBucket.id,
@@ -945,7 +971,6 @@ export class Aether<
     this.groupIdsByPathIdentity = Object.assign(Object.create(null), {
       [ROOT_PATH]: [0],
     });
-    this.operationType = operation.operation;
     this.pathIdentityByParentPathIdentity[ROOT_PATH] = {};
     this.groups.push({
       id: 0,
@@ -1081,6 +1106,7 @@ export class Aether<
       | "polymorphicPlanIds"
       | "polymorphicTypeNames"
       | "rootPathIdentities"
+      | "singleTypeName"
     >,
   ): BucketDefinition {
     const id = this.buckets.length;
@@ -3013,6 +3039,7 @@ export class Aether<
       processedPlans.add(plan);
 
       if (
+        // TODO: should this be "if (plan instanceof __ValuePlan)"?
         (
           [
             this.rootSelectionSetPlan,
@@ -3144,6 +3171,22 @@ export class Aether<
       const polymorphicTypeNames = polymorphicDetails
         ? polymorphicDetails.typeNames
         : undefined;
+      const fieldDigests = pathIdentitiesByPlanId[plan.id]
+        ?.map((pathIdentity) => this.fieldDigestByPathIdentity[pathIdentity])
+        .filter(isNotNullish);
+      const singleTypeNames = polymorphicDetails
+        ? null
+        : fieldDigests?.map((d) => d.namedReturnType.name) ?? null;
+      const singleTypeName = singleTypeNames?.[0] ?? null;
+      if (singleTypeName != null) {
+        if (!singleTypeNames!.every((tn) => tn === singleTypeName)) {
+          throw new Error(
+            `Expected all type names to be equal to '${singleTypeName}', instead found ${singleTypeNames!.join(
+              ", ",
+            )}`,
+          );
+        }
+      }
 
       // __ItemPlan's get their own bucket (these may or may not be in a new group too)
       if (plan instanceof __ItemPlan) {
@@ -3158,6 +3201,7 @@ export class Aether<
             groupId,
             polymorphicPlanIds,
             polymorphicTypeNames,
+            singleTypeName,
           });
           plan.bucketId = newBucket.id;
           return plan;
@@ -3187,6 +3231,7 @@ export class Aether<
             groupId,
             polymorphicPlanIds,
             polymorphicTypeNames,
+            singleTypeName,
           });
           plan.bucketId = newBucket.id;
           return plan;
@@ -3235,6 +3280,7 @@ export class Aether<
             groupId,
             polymorphicPlanIds,
             polymorphicTypeNames,
+            singleTypeName,
           });
           dependencyPlans.forEach((dependencyPlan) =>
             newBucket.copyPlans.add(dependencyPlan),
@@ -3267,6 +3313,7 @@ export class Aether<
           groupId,
           polymorphicPlanIds,
           polymorphicTypeNames,
+          singleTypeName,
         });
         dependencyPlans.forEach((dependencyPlan) =>
           newBucket.copyPlans.add(dependencyPlan),
@@ -3635,6 +3682,7 @@ export class Aether<
                 spec[fieldName] = {
                   planIdByRootPathIdentity: Object.create(null),
                   mode,
+                  typeName: fieldDigest.namedReturnType.name,
                   children: mode === "O" ? Object.create(null) : null,
                   typeNames: bucket.polymorphicPlanIds ? [] : null,
                 };
@@ -3679,13 +3727,6 @@ export class Aether<
       }
     }
 
-    // Thes are populated for us in `executePreemptive` so they don't really count
-    const ignoredPlans: ExecutablePlan[] = [
-      this.rootSelectionSetPlan,
-      this.variableValuesPlan,
-      this.contextPlan,
-      this.rootValuePlan,
-    ];
     // Track which plans belong in which buckets
     for (const bucket of this.buckets) {
       const plans = Object.entries(this.plans)
@@ -3694,7 +3735,7 @@ export class Aether<
             plan &&
             plan.id === planId &&
             plan.bucketId === bucket.id &&
-            !ignoredPlans.includes(plan),
+            !isInternalPlan(plan),
         )
         .map((t) => t[1]);
       bucket.plans = plans;
@@ -3705,7 +3746,7 @@ export class Aether<
           if (dep.bucketId !== bucket.id) {
             return true;
           }
-          if (ignoredPlans.includes(dep)) {
+          if (isInternalPlan(dep)) {
             return true;
           }
           return false;
@@ -5649,8 +5690,14 @@ export class Aether<
       // Cannot currently preempt stream/defer/subscription/mutation execution
       return null;
     }
-    if (this.buckets.length > 1) {
-      // Cannot currently preempt across multiple buckets
+    if (
+      this.buckets.some(
+        (b) =>
+          (b.groupId != null && b.groupId !== 0) ||
+          b.polymorphicPlanIds != null,
+      )
+    ) {
+      // Cannot currently preempt polymorphic/grouped operations
       return null;
     }
     const rootField = this.fieldDigestByPathIdentity[ROOT_PATH];
@@ -5678,7 +5725,7 @@ export class Aether<
         [this.contextPlan.id]: ctxs,
         [this.rootValuePlan.id]: rvs,
       }),
-      typeName: null,
+      singleTypeName: this.rootBucket.singleTypeName,
       rootPathIdentity: ROOT_PATH,
     };
     const metaByPlanId: CrystalContext["metaByPlanId"] = Object.create(null);
@@ -5795,7 +5842,7 @@ export class Aether<
       }
     }
 
-    const produceOutput = (): Array<{ [$$data]: any }> => {
+    const produceOutput = (): PromiseOrDirect<Array<{ [$$data]: any }>> => {
       if (pendingPlans.size > 0) {
         throw new Error(
           `produceOutput called before all plans were complete! Remaining plans were: ${[
@@ -5803,7 +5850,40 @@ export class Aether<
           ].join(", ")}`,
         );
       }
-      return bucket.input.map((setter, index) => {
+      const childrenByPathIdentity: {
+        [pathIdentity: string]:
+          | Array<{
+              childBucketDefinition: BucketDefinition;
+              inputs: BucketSetter[];
+              store: { [planId: string]: any[] };
+            }>
+          | undefined;
+      } = Object.create(null);
+      for (const childBucketDefinition of bucket.definition.children) {
+        for (const childRootPathIdentity of childBucketDefinition.rootPathIdentities) {
+          if (
+            childRootPathIdentity === bucket.rootPathIdentity ||
+            childRootPathIdentity.startsWith(bucket.rootPathIdentity + ">")
+          ) {
+            if (!childrenByPathIdentity[childRootPathIdentity]) {
+              childrenByPathIdentity[childRootPathIdentity] = [];
+            }
+            const entry = {
+              childBucketDefinition,
+              inputs: [],
+              store: Object.create(null),
+            };
+            for (const plan of childBucketDefinition.copyPlans) {
+              entry.store[plan.id] = [];
+            }
+            if (childBucketDefinition.itemPlanId) {
+              entry.store[childBucketDefinition.itemPlanId] = [];
+            }
+            childrenByPathIdentity[childRootPathIdentity]!.push(entry);
+          }
+        }
+      }
+      const result = bucket.input.map((setter, index) => {
         if (bucket.definition.rootOutputPlanId != null) {
           setter.setRoot(
             bucketValue(
@@ -5816,35 +5896,157 @@ export class Aether<
         const process = (
           obj: undefined | null | object | CrystalError,
           map: { [responseKey: string]: BucketDefinitionFieldOutputMap },
+          pathIdentity: string,
         ) => {
           if (obj == null || obj instanceof CrystalError) {
             return;
           }
           for (const responseKey in map) {
             const field = map[responseKey];
+            const keyPathIdentity = pathIdentity + responseKey;
+            // console.log(keyPathIdentity);
             if (
               field.typeNames &&
-              !field.typeNames.includes(bucket.typeName!)
+              !field.typeNames.includes(setter.root?.[$$concreteType])
             ) {
               continue;
             }
             const planId =
               field.planIdByRootPathIdentity[bucket.rootPathIdentity];
-            const value = bucketValue(
-              obj[responseKey],
-              store[planId][index],
-              field.mode,
-            );
+            const rawValue = store[planId][index];
+            const value = bucketValue(obj[responseKey], rawValue, field.mode);
             obj[responseKey] = value;
 
-            if (field.children) {
-              process(obj[responseKey]?.[$$data], field.children);
+            if (field.mode === "A") {
+              if (Array.isArray(value)) {
+                const children = childrenByPathIdentity[keyPathIdentity + "[]"];
+                if (children) {
+                  for (const child of children) {
+                    if (child.childBucketDefinition.itemPlanId == null) {
+                      throw new Error(
+                        `INCONSISTENCY! A list bucket, but this bucket isn't list capable`,
+                      );
+                    }
+                    if (child.childBucketDefinition.polymorphicPlanIds) {
+                      // TODO: will this ever be supported?
+                      throw new Error(
+                        "Polymorphism inside list currently unsupported",
+                      );
+                    }
+                    if (child.childBucketDefinition.groupId != null) {
+                      throw new Error(
+                        "Group inside list currently unsupported",
+                      );
+                    }
+                    for (let i = 0, l = value.length; i < l; i++) {
+                      child.inputs.push(new BucketSetter(value, i));
+                      child.store[child.childBucketDefinition.itemPlanId].push(
+                        rawValue[i],
+                      );
+                      for (const plan of child.childBucketDefinition
+                        .copyPlans) {
+                        child.store[plan.id].push(bucket.store[plan.id][index]);
+                      }
+                    }
+                  }
+                }
+              }
+            } else if (field.mode === "O") {
+              const d = value?.[$$data];
+              if (d && !(d instanceof CrystalError)) {
+                if (field.children) {
+                  process(
+                    d,
+                    field.children,
+                    `${keyPathIdentity}>${field.typeName}.`,
+                  );
+                }
+                const children = childrenByPathIdentity[keyPathIdentity];
+                if (children) {
+                  for (const child of children) {
+                    if (child.childBucketDefinition.itemPlanId != null) {
+                      throw new Error("INCONSISTENT!");
+                    }
+                    if (child.childBucketDefinition.groupId != null) {
+                      throw new Error(
+                        "Group inside list currently unsupported",
+                      );
+                    }
+                    const match =
+                      !child.childBucketDefinition.polymorphicTypeNames ||
+                      child.childBucketDefinition.polymorphicTypeNames.includes(
+                        value[$$concreteType],
+                      );
+                    if (match) {
+                      child.inputs.push(new BucketSetter(obj, responseKey));
+                      for (const plan of child.childBucketDefinition
+                        .copyPlans) {
+                        child.store[plan.id].push(bucket.store[plan.id][index]);
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         };
-        process(setter.root?.[$$data], bucket.definition.outputMap);
+        if (setter.root && !(setter.root instanceof CrystalError)) {
+          process(
+            setter.root[$$data],
+            bucket.definition.outputMap,
+            `${bucket.rootPathIdentity}>${
+              bucket.singleTypeName ?? setter.root[$$concreteType]
+            }.`,
+          );
+        }
+
+        // And any root buckets
+        {
+          const children = childrenByPathIdentity[bucket.rootPathIdentity];
+          if (children) {
+            for (const child of children) {
+              throw new Error(
+                `This should not be able to happen until we support stream/defer`,
+              );
+            }
+          }
+        }
+
         return setter.root;
       });
+
+      // Now to call any nested buckets
+      // console.dir(childrenByPathIdentity);
+      const childPromises: PromiseLike<any>[] = [];
+      for (const [childRootPathIdentity, children] of Object.entries(
+        childrenByPathIdentity,
+      )) {
+        for (const child of children!) {
+          if (child.inputs.length > 0) {
+            const bucket: Bucket = {
+              rootPathIdentity: childRootPathIdentity,
+              singleTypeName: child.childBucketDefinition.polymorphicTypeNames
+                ? null
+                : child.childBucketDefinition.singleTypeName,
+              definition: child.childBucketDefinition,
+              store: child.store,
+              size: child.inputs.length,
+              input: child.inputs,
+              noDepsList: new Array(child.inputs.length).fill(undefined),
+            };
+            const r = this.executeBucket(metaByPlanId, bucket);
+            if (isPromiseLike(r)) {
+              childPromises.push(r);
+            }
+          }
+        }
+      }
+
+      if (childPromises.length > 0) {
+        return Promise.all(childPromises).then(() => result);
+      } else {
+        return result;
+      }
     };
 
     if (starterPromises.length > 0) {
