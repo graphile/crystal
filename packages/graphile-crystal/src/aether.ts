@@ -3012,7 +3012,20 @@ export class Aether<
       }
       processedPlans.add(plan);
 
-      if (plan.groupIds.length === 0 || plan.groupIds.includes(0)) {
+      if (
+        (
+          [
+            this.rootSelectionSetPlan,
+            this.variableValuesPlan,
+            this.contextPlan,
+            this.rootValuePlan,
+          ] as ExecutablePlan[]
+        ).includes(plan)
+      ) {
+        (plan.groupIds as any) = [0];
+        plan.primaryGroupId = 0;
+      } else if (plan.groupIds.length === 0 || plan.groupIds.includes(0)) {
+        (plan.groupIds as any) = [0];
         plan.primaryGroupId = 0;
       } else if (plan.groupIds.length === 1) {
         plan.primaryGroupId = plan.groupIds[0];
