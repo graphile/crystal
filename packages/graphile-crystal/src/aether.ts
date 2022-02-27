@@ -5927,6 +5927,9 @@ export class Aether<
             }
             const planId =
               field.planIdByRootPathIdentity[bucket.rootPathIdentity];
+            if (planId == null) {
+              continue;
+            }
             const rawValue = store[planId][index];
             const value = bucketValue(obj[responseKey], rawValue, field.mode);
             obj[responseKey] = value;
