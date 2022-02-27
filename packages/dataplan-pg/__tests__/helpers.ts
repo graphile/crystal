@@ -4,7 +4,8 @@ if (process.env.DEBUG) {
   jest.setTimeout(30000);
 }
 import { promises as fsp } from "fs";
-import type { BaseGraphQLContext } from "graphile-crystal";
+import type { BaseGraphQLContext} from "graphile-crystal";
+import { crystalPrepare } from "graphile-crystal";
 import { $$setPlanGraph } from "graphile-crystal/dist/interfaces";
 import type {
   AsyncExecutionResult,
@@ -382,6 +383,14 @@ export async function runTestQuery(
       );
     }
 
+    const rootValue = crystalPrepare({
+      schema,
+      document,
+      variableValues,
+      contextValue,
+      rootValue: null,
+    });
+
     const result =
       operationType === "subscription"
         ? await subscribe({
@@ -389,14 +398,14 @@ export async function runTestQuery(
             document,
             variableValues,
             contextValue,
-            rootValue: null,
+            rootValue,
           })
         : await execute({
             schema,
             document,
             variableValues,
             contextValue,
-            rootValue: null,
+            rootValue,
           });
 
     if (isAsyncIterable(result)) {
