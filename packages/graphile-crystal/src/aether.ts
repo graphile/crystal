@@ -473,16 +473,11 @@ export class Aether<
     parent: null,
     children: [],
   };
-  private rootBucket: BucketDefinition = {
-    id: 0,
+  private rootBucket: BucketDefinition = this.newBucket({
     parent: null,
     rootPathIdentities: [ROOT_PATH],
-    outputMap: Object.create(null),
-    ancestors: [],
-    children: [],
-    copyPlans: new Set(),
     groupId: 0,
-  };
+  });
   private buckets: BucketDefinition[] = [this.rootBucket];
 
   private planCount = 0;
@@ -933,6 +928,31 @@ export class Aether<
 
     this.walkFinalizedPlans();
     this.preparePrefetches();
+  }
+
+  private newBucket(
+    spec: Pick<
+      BucketDefinition,
+      | "parent"
+      | "itemPlanId"
+      | "groupId"
+      | "polymorphicPlanIds"
+      | "polymorphicTypeNames"
+      | "rootPathIdentities"
+    >,
+  ): BucketDefinition {
+    const id = this.buckets.length;
+    const bucket: BucketDefinition = {
+      id,
+      ...spec,
+      outputMap: Object.create(null),
+      ancestors: spec.parent ? [...spec.parent.ancestors, spec.parent] : [],
+      children: [],
+      copyPlans: new Set(),
+    };
+    spec.parent?.children.push(bucket);
+    this.buckets[id] = bucket;
+    return bucket;
   }
 
   public addGroup(group: Group): number {
@@ -2974,21 +2994,14 @@ export class Aether<
           const transformPlan = this.plans[plan.transformPlanId]!;
           process(transformPlan);
           const parent = this.buckets[transformPlan.bucketId];
-          const newBucket: BucketDefinition = {
-            id: this.buckets.length,
+          const newBucket: BucketDefinition = this.newBucket({
             parent,
             rootPathIdentities: [], // Transform plan buckets never write output, so we don't need this.
-            outputMap: Object.create(null),
-            ancestors: [...parent.ancestors, parent],
-            children: [],
-            copyPlans: new Set(),
             itemPlanId,
             groupId,
             polymorphicPlanIds,
             polymorphicTypeNames,
-          };
-          this.buckets[newBucket.id] = newBucket;
-          parent.children.push(newBucket);
+          });
           plan.bucketId = newBucket.id;
           return plan;
         } else {
@@ -3010,21 +3023,14 @@ export class Aether<
             pi === `~` ? pi : `${pi}[]`,
           );
           const parent = this.buckets[listPlan.bucketId];
-          const newBucket: BucketDefinition = {
-            id: this.buckets.length,
+          const newBucket: BucketDefinition = this.newBucket({
             parent,
             rootPathIdentities,
-            outputMap: Object.create(null),
-            ancestors: [...parent.ancestors, parent],
-            children: [],
-            copyPlans: new Set(),
             itemPlanId,
             groupId,
             polymorphicPlanIds,
             polymorphicTypeNames,
-          };
-          this.buckets[newBucket.id] = newBucket;
-          parent.children.push(newBucket);
+          });
           plan.bucketId = newBucket.id;
           return plan;
         }
@@ -3066,21 +3072,17 @@ export class Aether<
               `GraphileInternalError<e5dfb383-d413-49d8-8a3f-2d2f677c373d>: could not determine the path identities served by group parent plan ${groupParentPlan}`,
             );
           }
-          const newBucket: BucketDefinition = {
-            id: this.buckets.length,
+          const newBucket: BucketDefinition = this.newBucket({
             parent,
             rootPathIdentities,
-            outputMap: Object.create(null),
-            ancestors: [...new Set([parent, ...parent.ancestors])],
-            children: [],
-            copyPlans: new Set(dependencyPlans),
             groupId,
             polymorphicPlanIds,
             polymorphicTypeNames,
-          };
+          });
+          dependencyPlans.forEach((dependencyPlan) =>
+            newBucket.copyPlans.add(dependencyPlan),
+          );
           bucketByGroupKey[groupKey] = newBucket;
-          this.buckets[newBucket.id] = newBucket;
-          parent.children.push(newBucket);
           plan.bucketId = newBucket.id;
           return plan;
         }
@@ -3102,20 +3104,16 @@ export class Aether<
             `Planning issue - polymorphic plans must be associated with one or more path identities, however ${polymorphicPlans} are not.`,
           );
         }
-        const newBucket: BucketDefinition = {
-          id: this.buckets.length,
+        const newBucket: BucketDefinition = this.newBucket({
           parent,
           rootPathIdentities,
-          outputMap: Object.create(null),
-          ancestors: [...new Set([parent, ...parent.ancestors])],
-          children: [],
-          copyPlans: new Set(dependencyPlans),
           groupId,
           polymorphicPlanIds,
           polymorphicTypeNames,
-        };
-        this.buckets[newBucket.id] = newBucket;
-        parent.children.push(newBucket);
+        });
+        dependencyPlans.forEach((dependencyPlan) =>
+          newBucket.copyPlans.add(dependencyPlan),
+        );
         plan.bucketId = newBucket.id;
         return plan;
       }
