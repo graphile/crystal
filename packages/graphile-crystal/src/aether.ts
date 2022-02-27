@@ -473,12 +473,8 @@ export class Aether<
     parent: null,
     children: [],
   };
-  private rootBucket: BucketDefinition = this.newBucket({
-    parent: null,
-    rootPathIdentities: [ROOT_PATH],
-    groupId: 0,
-  });
-  private buckets: BucketDefinition[] = [this.rootBucket];
+  private rootBucket: BucketDefinition;
+  private buckets: BucketDefinition[] = [];
 
   private planCount = 0;
   private modifierPlanCount = 0;
@@ -736,6 +732,17 @@ export class Aether<
         u.getTypes().includes(objectType),
       );
     }
+
+    this.rootBucket = this.newBucket({
+      parent: null,
+      rootPathIdentities: [ROOT_PATH],
+      groupId: 0,
+    });
+    assert.strictEqual(
+      this.rootBucket.id,
+      0,
+      "Expected the root bucket to have id 0",
+    );
 
     this.phase = "plan";
     /** with global state */
