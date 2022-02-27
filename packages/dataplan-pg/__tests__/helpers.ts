@@ -22,6 +22,7 @@ import {
 } from "graphql";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
+import { relative } from "path";
 import type { PoolClient } from "pg";
 import { Pool } from "pg";
 
@@ -655,7 +656,16 @@ export const assertSnapshotsMatch = async (
     if (!graphString) {
       throw new Error("No plan was emitted for this test!");
     }
-    const content = `\`\`\`mermaid\n${graphString}\n\`\`\`\n`;
+    const lines = graphString.split("\n");
+    const relativePath = relative(__dirname, basePath);
+    const i = lines.indexOf("    subgraph Buckets");
+    if (i < 0) {
+      throw new Error(
+        `The 'subgraph Buckets' line was not found, please update __tests__/helpers.ts to reference the new line`,
+      );
+    }
+    lines.splice(i, 1, `    subgraph "Buckets for ${relativePath}"`);
+    const content = `\`\`\`mermaid\n${lines.join("\n")}\n\`\`\`\n`;
     await snapshot(content, mermaidFileName);
   } else {
     throw new Error(
