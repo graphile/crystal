@@ -91,12 +91,8 @@ import {
 } from "./plan";
 import type { PlanResultsBucket } from "./planResults";
 import { PlanResults } from "./planResults";
-import {
-  __ItemPlan,
-  __TrackedObjectPlan,
-  __ValuePlan,
-  constant,
-} from "./plans";
+import type { ConstantPlan } from "./plans";
+import { __ItemPlan, __TrackedObjectPlan, __ValuePlan } from "./plans";
 import { __ListTransformPlan } from "./plans/listTransform";
 import { assertPolymorphicData } from "./polymorphic";
 import {
@@ -761,6 +757,13 @@ export class Aether<
   > = Object.create(null);
 
   /**
+   * The root selection set is always an object (independent of what
+   * `rootValue` is set to).
+   *
+   * @internal
+   */
+  public readonly rootSelectionSetPlan: __ValuePlan<object>;
+  /**
    * @internal
    */
   public readonly variableValuesConstraints: Constraint[] = [];
@@ -871,6 +874,7 @@ export class Aether<
       aether: this,
       parentPathIdentity: GLOBAL_PATH,
     }) as <T>(cb: () => T) => T;
+    this.rootSelectionSetPlan = wgs(() => new __ValuePlan());
     this.variableValuesPlan = wgs(() => new __ValuePlan());
     debugPlanVerbose(
       "Constructed variableValuesPlan %s",
@@ -924,7 +928,7 @@ export class Aether<
       );
     }
     this.planIdByPathIdentity = Object.assign(Object.create(null), {
-      [ROOT_PATH]: wgs(() => constant(Object.freeze(Object.create(null)))).id,
+      [ROOT_PATH]: this.rootSelectionSetPlan.id,
     });
     this.isUnplannedByPathIdentity = Object.create(null);
     this.itemPlanIdByFieldPathIdentity = Object.assign(Object.create(null), {
@@ -941,7 +945,7 @@ export class Aether<
     this.groups.push({
       id: 0,
       parent: null,
-      parentPlanId: this.trackedRootValuePlan.id,
+      parentPlanId: this.rootSelectionSetPlan.id,
       reason: "root",
       children: [],
     });
@@ -1282,8 +1286,8 @@ export class Aether<
       returnRaw: false,
       isPolymorphic: false,
       isLeaf: false,
-      planId: this.trackedRootValuePlan.id,
-      itemPlanId: this.trackedRootValuePlan.id,
+      planId: this.rootSelectionSetPlan.id,
+      itemPlanId: this.rootSelectionSetPlan.id,
       listDepth: 0,
       childFieldDigests,
     };
@@ -3659,6 +3663,7 @@ export class Aether<
 
     // Thes are populated for us in `executePreemptive` so they don't really count
     const ignoredPlans: ExecutablePlan[] = [
+      this.rootSelectionSetPlan,
       this.variableValuesPlan,
       this.contextPlan,
       this.rootValuePlan,
@@ -4761,7 +4766,7 @@ export class Aether<
         `Creating a plan during the '${this.phase}' phase is forbidden.`,
       );
     }
-    const planId = `_${++this.planCount}`;
+    const planId = `_${this.planCount++}`;
     this.plans[planId] = plan;
     return planId;
   }
@@ -4893,6 +4898,14 @@ export class Aether<
     );
     crystalContext.rootCrystalObject = rootCrystalObject;
 
+    if (this.rootSelectionSetPlan.bucketId >= 0) {
+      /*#__INLINE__*/ populateValuePlan(
+        this.rootSelectionSetPlan,
+        rootCrystalObject,
+        Object.create(null),
+        "rootSelectionSet",
+      );
+    }
     if (this.variableValuesPlan.bucketId >= 0) {
       /*#__INLINE__*/ populateValuePlan(
         this.variableValuesPlan,
@@ -5632,6 +5645,7 @@ export class Aether<
     // TODO: batch this method so it can process multiple GraphQL requests in parallel
     const batch = [undefined];
     const input = batch.map((value, index) => new BucketSetter(batch, index));
+    const roots = batch.map(() => Object.create(null));
     const vars = batch.map(() => variableValues);
     const ctxs = batch.map(() => context);
     const rvs = batch.map(() => rootValue);
@@ -5641,6 +5655,7 @@ export class Aether<
       input,
       noDepsList: Object.freeze(new Array(input.length).fill(undefined)),
       store: Object.assign(Object.create(null), {
+        [this.rootSelectionSetPlan.id]: roots,
         [this.variableValuesPlan.id]: vars,
         [this.contextPlan.id]: ctxs,
         [this.rootValuePlan.id]: rvs,
