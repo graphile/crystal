@@ -660,11 +660,10 @@ export const assertSnapshotsMatch = async (
     const relativePath = relative(__dirname, basePath);
     const i = lines.indexOf("    subgraph Buckets");
     if (i < 0) {
-      throw new Error(
-        `The 'subgraph Buckets' line was not found, please update __tests__/helpers.ts to reference the new line`,
-      );
+      lines.splice(1, 0, `    subgraph "${relativePath}"`, `    end`);
+    } else {
+      lines.splice(i, 1, `    subgraph "Buckets for ${relativePath}"`);
     }
-    lines.splice(i, 1, `    subgraph "Buckets for ${relativePath}"`);
     const content = `\`\`\`mermaid\n${lines.join("\n")}\n\`\`\`\n`;
     await snapshot(content, mermaidFileName);
   } else {
