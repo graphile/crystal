@@ -2494,7 +2494,7 @@ export class Aether<
   ): void {
     depth = 0;
     const processed = new Set<ExecutablePlan>();
-    const process = (plan: ExecutablePlan): void => {
+    const processPlan = (plan: ExecutablePlan): void => {
       if (!plan) {
         return;
       }
@@ -2548,7 +2548,7 @@ export class Aether<
             );
           }
           depth++;
-          process(depPlan);
+          processPlan(depPlan);
           depth--;
           if (shouldAbort()) {
             return;
@@ -2597,7 +2597,7 @@ export class Aether<
     let l = oldPlanCount;
     const ids = this.getPlanIds(offset);
     for (const i of ids) {
-      process(this.plans[i]);
+      processPlan(this.plans[i]);
 
       plansAdded += this.planCount - l;
 
@@ -3062,7 +3062,7 @@ export class Aether<
       0: this.rootBucket,
     };
     const processedPlans = new Set<ExecutablePlan>();
-    const process = (plan: ExecutablePlan) => {
+    const processPlan = (plan: ExecutablePlan) => {
       if (processedPlans.has(plan)) {
         return;
       }
@@ -3127,7 +3127,7 @@ export class Aether<
 
       const dependencyPlans = plan.dependencies.map((depId) => {
         const dep = this.plans[depId]!;
-        process(dep);
+        processPlan(dep);
         return dep;
       });
       const allParents = [
@@ -3211,7 +3211,7 @@ export class Aether<
           const transformPlan = this.plans[
             plan.transformPlanId
           ]! as __ListTransformPlan<any, any, any>;
-          process(transformPlan);
+          processPlan(transformPlan);
           const parent = this.buckets[transformPlan.bucketId];
           const newBucket: BucketDefinition = this.newBucket({
             parent,
@@ -3231,7 +3231,7 @@ export class Aether<
            * results.
            */
           const listPlan = this.plans[plan.dependencies[0]]!;
-          process(listPlan);
+          processPlan(listPlan);
           const listPlanPathIdentities = pathIdentitiesByPlanId[listPlan.id];
           if (!listPlanPathIdentities || listPlanPathIdentities.length === 0) {
             throw new Error(
@@ -3265,7 +3265,7 @@ export class Aether<
             `Group ${plan.primaryGroupId} had parentPlanId ${group.parentPlanId} but we couldn't find a plan with that id.`,
           );
         }
-        process(groupParentPlan);
+        processPlan(groupParentPlan);
         if (parents.length > 1) {
           throw new Error(
             `GraphileInternalError<74be1e65-f549-4ec8-bd2b-6f8f0b72f7aa>: there was more than one parent bucket of a grouped plan`,
@@ -3367,7 +3367,7 @@ export class Aether<
     // Assign bucketIds
     for (const [id, plan] of Object.entries(this.plans)) {
       if (plan != null && plan.id === id) {
-        process(plan);
+        processPlan(plan);
         if (plan.bucketId < 0) {
           throw new Error(`Failed to assign bucket to ${plan}`);
         }
@@ -6014,7 +6014,7 @@ export class Aether<
             ),
           );
         }
-        const process = (
+        const processObject = (
           obj: undefined | null | object | CrystalError,
           map: { [responseKey: string]: BucketDefinitionFieldOutputMap },
           pathIdentity: string,
@@ -6079,7 +6079,7 @@ export class Aether<
               const d = value?.[$$data];
               if (d && !(d instanceof CrystalError)) {
                 if (field.children) {
-                  process(
+                  processObject(
                     d,
                     field.children,
                     `${keyPathIdentity}>${field.typeName}.`,
@@ -6121,7 +6121,7 @@ export class Aether<
               `Could not determine typeName in bucket ${bucket.definition.id}`,
             );
           }
-          process(
+          processObject(
             setter.root[$$data],
             bucket.definition.outputMap,
             `${bucket.rootPathIdentity}>${typeName}.`,
@@ -6591,7 +6591,7 @@ export class Aether<
         return reasons.join(", ");
       })();
       const outputMapStuff: string[] = [];
-      const process = (
+      const processObject = (
         obj: { [fieldName: string]: BucketDefinitionFieldOutputMap },
         path = "⠀⠀",
       ): void => {
@@ -6606,11 +6606,11 @@ export class Aether<
             `${path}${fieldName} <-${def.mode}- ${planSource}`,
           );
           if (def.children) {
-            process(def.children, `⠀${path}${fieldName}.`);
+            processObject(def.children, `⠀${path}${fieldName}.`);
           }
         }
       };
-      process(bucket.outputMap);
+      processObject(bucket.outputMap);
       graph.push(
         `    Bucket${bucket.id}(${dotEscape(
           `Bucket ${bucket.id} (${raisonDEtre})\n${
